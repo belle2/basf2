@@ -56,6 +56,20 @@
 [WARNING] An alias with the name 'distToClosestTrkAtECL0_VS_K_all' exists and is set to 'extraInfo(distToClosestTrkAtECL0_VS_K+:all)', setting it to 'extraInfo(distToClosestTrkAtECL0_VS_K-:all)'. Be aware: only the last alias defined before processing the events will be used!
 [WARNING] An alias with the name 'distToClosestTrkAtECL1_VS_K_all' exists and is set to 'extraInfo(distToClosestTrkAtECL1_VS_K+:all)', setting it to 'extraInfo(distToClosestTrkAtECL1_VS_K-:all)'. Be aware: only the last alias defined before processing the events will be used!
 [WARNING] An alias with the name 'distToClosestTrkAtKLM0_VS_K_all' exists and is set to 'extraInfo(distToClosestTrkAtKLM0_VS_K+:all)', setting it to 'extraInfo(distToClosestTrkAtKLM0_VS_K-:all)'. Be aware: only the last alias defined before processing the events will be used!
+[WARNING] An alias with the name 'distToClosestTrkAtCDC0_VS_pi_all' exists and is set to 'extraInfo(distToClosestTrkAtCDC0_VS_pi-:all)', setting it to 'extraInfo(distToClosestTrkAtCDC0_VS_pi+:all)'. Be aware: only the last alias defined before processing the events will be used!
+[WARNING] An alias with the name 'distToClosestTrkAtCDC1_VS_pi_all' exists and is set to 'extraInfo(distToClosestTrkAtCDC1_VS_pi-:all)', setting it to 'extraInfo(distToClosestTrkAtCDC1_VS_pi+:all)'. Be aware: only the last alias defined before processing the events will be used!
+[WARNING] An alias with the name 'distToClosestTrkAtCDC2_VS_pi_all' exists and is set to 'extraInfo(distToClosestTrkAtCDC2_VS_pi-:all)', setting it to 'extraInfo(distToClosestTrkAtCDC2_VS_pi+:all)'. Be aware: only the last alias defined before processing the events will be used!
+[WARNING] An alias with the name 'distToClosestTrkAtCDC3_VS_pi_all' exists and is set to 'extraInfo(distToClosestTrkAtCDC3_VS_pi-:all)', setting it to 'extraInfo(distToClosestTrkAtCDC3_VS_pi+:all)'. Be aware: only the last alias defined before processing the events will be used!
+[WARNING] An alias with the name 'distToClosestTrkAtCDC4_VS_pi_all' exists and is set to 'extraInfo(distToClosestTrkAtCDC4_VS_pi-:all)', setting it to 'extraInfo(distToClosestTrkAtCDC4_VS_pi+:all)'. Be aware: only the last alias defined before processing the events will be used!
+[WARNING] An alias with the name 'distToClosestTrkAtCDC5_VS_pi_all' exists and is set to 'extraInfo(distToClosestTrkAtCDC5_VS_pi-:all)', setting it to 'extraInfo(distToClosestTrkAtCDC5_VS_pi+:all)'. Be aware: only the last alias defined before processing the events will be used!
+[WARNING] An alias with the name 'distToClosestTrkAtCDC6_VS_pi_all' exists and is set to 'extraInfo(distToClosestTrkAtCDC6_VS_pi-:all)', setting it to 'extraInfo(distToClosestTrkAtCDC6_VS_pi+:all)'. Be aware: only the last alias defined before processing the events will be used!
+[WARNING] An alias with the name 'distToClosestTrkAtCDC7_VS_pi_all' exists and is set to 'extraInfo(distToClosestTrkAtCDC7_VS_pi-:all)', setting it to 'extraInfo(distToClosestTrkAtCDC7_VS_pi+:all)'. Be aware: only the last alias defined before processing the events will be used!
+[WARNING] An alias with the name 'distToClosestTrkAtCDC8_VS_pi_all' exists and is set to 'extraInfo(distToClosestTrkAtCDC8_VS_pi-:all)', setting it to 'extraInfo(distToClosestTrkAtCDC8_VS_pi+:all)'. Be aware: only the last alias defined before processing the events will be used!
+[WARNING] An alias with the name 'distToClosestTrkAtTOP0_VS_pi_all' exists and is set to 'extraInfo(distToClosestTrkAtTOP0_VS_pi-:all)', setting it to 'extraInfo(distToClosestTrkAtTOP0_VS_pi+:all)'. Be aware: only the last alias defined before processing the events will be used!
+[WARNING] An alias with the name 'distToClosestTrkAtARICH0_VS_pi_all' exists and is set to 'extraInfo(distToClosestTrkAtARICH0_VS_pi-:all)', setting it to 'extraInfo(distToClosestTrkAtARICH0_VS_pi+:all)'. Be aware: only the last alias defined before processing the events will be used!
+[WARNING] An alias with the name 'distToClosestTrkAtECL0_VS_pi_all' exists and is set to 'extraInfo(distToClosestTrkAtECL0_VS_pi-:all)', setting it to 'extraInfo(distToClosestTrkAtECL0_VS_pi+:all)'. Be aware: only the last alias defined before processing the events will be used!
+[WARNING] An alias with the name 'distToClosestTrkAtECL1_VS_pi_all' exists and is set to 'extraInfo(distToClosestTrkAtECL1_VS_pi-:all)', setting it to 'extraInfo(distToClosestTrkAtECL1_VS_pi+:all)'. Be aware: only the last alias defined before processing the events will be used!
+[WARNING] An alias with the name 'distToClosestTrkAtKLM0_VS_pi_all' exists and is set to 'extraInfo(distToClosestTrkAtKLM0_VS_pi-:all)', setting it to 'extraInfo(distToClosestTrkAtKLM0_VS_pi+:all)'. Be aware: only the last alias defined before processing the events will be used!
 [INFO] Starting event processing, random seed is set to '1337'
 [INFO] Added file ${BELLE2_VALIDATION_DATA_DIR}/mdst14.root
 [INFO] ParticleLoader's Summary of Actions:
@@ -303,34 +317,34 @@
 [INFO]    -> With cuts  : 1.10 < M < 1.13
 [INFO] ParticleSelector: Lambda0:RD
 [INFO]    -> With cuts  : extraInfo(highQualityVertex)
-[INFO] Calculating track-based isolation variables at CDC0 surface for the decay string Lambda0:merged -> ^p+ pi- using the reference ParticleList pi-:all.
-[INFO] Calculating track-based isolation variables at CDC1 surface for the decay string Lambda0:merged -> ^p+ pi- using the reference ParticleList pi-:all.
-[INFO] Calculating track-based isolation variables at CDC2 surface for the decay string Lambda0:merged -> ^p+ pi- using the reference ParticleList pi-:all.
-[INFO] Calculating track-based isolation variables at CDC3 surface for the decay string Lambda0:merged -> ^p+ pi- using the reference ParticleList pi-:all.
-[INFO] Calculating track-based isolation variables at CDC4 surface for the decay string Lambda0:merged -> ^p+ pi- using the reference ParticleList pi-:all.
-[INFO] Calculating track-based isolation variables at CDC5 surface for the decay string Lambda0:merged -> ^p+ pi- using the reference ParticleList pi-:all.
-[INFO] Calculating track-based isolation variables at CDC6 surface for the decay string Lambda0:merged -> ^p+ pi- using the reference ParticleList pi-:all.
-[INFO] Calculating track-based isolation variables at CDC7 surface for the decay string Lambda0:merged -> ^p+ pi- using the reference ParticleList pi-:all.
-[INFO] Calculating track-based isolation variables at CDC8 surface for the decay string Lambda0:merged -> ^p+ pi- using the reference ParticleList pi-:all.
-[INFO] Calculating track-based isolation variables at TOP0 surface for the decay string Lambda0:merged -> ^p+ pi- using the reference ParticleList pi-:all.
-[INFO] Calculating track-based isolation variables at ARICH0 surface for the decay string Lambda0:merged -> ^p+ pi- using the reference ParticleList pi-:all.
-[INFO] Calculating track-based isolation variables at ECL0 surface for the decay string Lambda0:merged -> ^p+ pi- using the reference ParticleList pi-:all.
-[INFO] Calculating track-based isolation variables at ECL1 surface for the decay string Lambda0:merged -> ^p+ pi- using the reference ParticleList pi-:all.
-[INFO] Calculating track-based isolation variables at KLM0 surface for the decay string Lambda0:merged -> ^p+ pi- using the reference ParticleList pi-:all.
-[INFO] Calculating track-based isolation variables at CDC0 surface for the decay string Lambda0:merged -> p+ ^pi- using the reference ParticleList pi-:all.
-[INFO] Calculating track-based isolation variables at CDC1 surface for the decay string Lambda0:merged -> p+ ^pi- using the reference ParticleList pi-:all.
-[INFO] Calculating track-based isolation variables at CDC2 surface for the decay string Lambda0:merged -> p+ ^pi- using the reference ParticleList pi-:all.
-[INFO] Calculating track-based isolation variables at CDC3 surface for the decay string Lambda0:merged -> p+ ^pi- using the reference ParticleList pi-:all.
-[INFO] Calculating track-based isolation variables at CDC4 surface for the decay string Lambda0:merged -> p+ ^pi- using the reference ParticleList pi-:all.
-[INFO] Calculating track-based isolation variables at CDC5 surface for the decay string Lambda0:merged -> p+ ^pi- using the reference ParticleList pi-:all.
-[INFO] Calculating track-based isolation variables at CDC6 surface for the decay string Lambda0:merged -> p+ ^pi- using the reference ParticleList pi-:all.
-[INFO] Calculating track-based isolation variables at CDC7 surface for the decay string Lambda0:merged -> p+ ^pi- using the reference ParticleList pi-:all.
-[INFO] Calculating track-based isolation variables at CDC8 surface for the decay string Lambda0:merged -> p+ ^pi- using the reference ParticleList pi-:all.
-[INFO] Calculating track-based isolation variables at TOP0 surface for the decay string Lambda0:merged -> p+ ^pi- using the reference ParticleList pi-:all.
-[INFO] Calculating track-based isolation variables at ARICH0 surface for the decay string Lambda0:merged -> p+ ^pi- using the reference ParticleList pi-:all.
-[INFO] Calculating track-based isolation variables at ECL0 surface for the decay string Lambda0:merged -> p+ ^pi- using the reference ParticleList pi-:all.
-[INFO] Calculating track-based isolation variables at ECL1 surface for the decay string Lambda0:merged -> p+ ^pi- using the reference ParticleList pi-:all.
-[INFO] Calculating track-based isolation variables at KLM0 surface for the decay string Lambda0:merged -> p+ ^pi- using the reference ParticleList pi-:all.
+[INFO] Calculating track-based isolation variables at CDC0 surface for the decay string Lambda0:merged -> ^p+ pi- using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at CDC1 surface for the decay string Lambda0:merged -> ^p+ pi- using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at CDC2 surface for the decay string Lambda0:merged -> ^p+ pi- using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at CDC3 surface for the decay string Lambda0:merged -> ^p+ pi- using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at CDC4 surface for the decay string Lambda0:merged -> ^p+ pi- using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at CDC5 surface for the decay string Lambda0:merged -> ^p+ pi- using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at CDC6 surface for the decay string Lambda0:merged -> ^p+ pi- using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at CDC7 surface for the decay string Lambda0:merged -> ^p+ pi- using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at CDC8 surface for the decay string Lambda0:merged -> ^p+ pi- using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at TOP0 surface for the decay string Lambda0:merged -> ^p+ pi- using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at ARICH0 surface for the decay string Lambda0:merged -> ^p+ pi- using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at ECL0 surface for the decay string Lambda0:merged -> ^p+ pi- using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at ECL1 surface for the decay string Lambda0:merged -> ^p+ pi- using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at KLM0 surface for the decay string Lambda0:merged -> ^p+ pi- using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at CDC0 surface for the decay string Lambda0:merged -> p+ ^pi- using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at CDC1 surface for the decay string Lambda0:merged -> p+ ^pi- using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at CDC2 surface for the decay string Lambda0:merged -> p+ ^pi- using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at CDC3 surface for the decay string Lambda0:merged -> p+ ^pi- using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at CDC4 surface for the decay string Lambda0:merged -> p+ ^pi- using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at CDC5 surface for the decay string Lambda0:merged -> p+ ^pi- using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at CDC6 surface for the decay string Lambda0:merged -> p+ ^pi- using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at CDC7 surface for the decay string Lambda0:merged -> p+ ^pi- using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at CDC8 surface for the decay string Lambda0:merged -> p+ ^pi- using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at TOP0 surface for the decay string Lambda0:merged -> p+ ^pi- using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at ARICH0 surface for the decay string Lambda0:merged -> p+ ^pi- using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at ECL0 surface for the decay string Lambda0:merged -> p+ ^pi- using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at ECL1 surface for the decay string Lambda0:merged -> p+ ^pi- using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at KLM0 surface for the decay string Lambda0:merged -> p+ ^pi- using the reference ParticleList p+:all.
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: K_S0:V0 (K_S0:V0)
 [INFO]    -> MDST source: V0
@@ -341,34 +355,34 @@
 [INFO]    -> MDST source: Tracks
 [INFO] ParticleSelector: K_S0:RD
 [INFO]    -> With cuts  : 0.450 < M < 0.550
-[INFO] Calculating track-based isolation variables at CDC0 surface for the decay string K_S0:merged -> ^pi+ pi- using the reference ParticleList pi-:all.
-[INFO] Calculating track-based isolation variables at CDC1 surface for the decay string K_S0:merged -> ^pi+ pi- using the reference ParticleList pi-:all.
-[INFO] Calculating track-based isolation variables at CDC2 surface for the decay string K_S0:merged -> ^pi+ pi- using the reference ParticleList pi-:all.
-[INFO] Calculating track-based isolation variables at CDC3 surface for the decay string K_S0:merged -> ^pi+ pi- using the reference ParticleList pi-:all.
-[INFO] Calculating track-based isolation variables at CDC4 surface for the decay string K_S0:merged -> ^pi+ pi- using the reference ParticleList pi-:all.
-[INFO] Calculating track-based isolation variables at CDC5 surface for the decay string K_S0:merged -> ^pi+ pi- using the reference ParticleList pi-:all.
-[INFO] Calculating track-based isolation variables at CDC6 surface for the decay string K_S0:merged -> ^pi+ pi- using the reference ParticleList pi-:all.
-[INFO] Calculating track-based isolation variables at CDC7 surface for the decay string K_S0:merged -> ^pi+ pi- using the reference ParticleList pi-:all.
-[INFO] Calculating track-based isolation variables at CDC8 surface for the decay string K_S0:merged -> ^pi+ pi- using the reference ParticleList pi-:all.
-[INFO] Calculating track-based isolation variables at TOP0 surface for the decay string K_S0:merged -> ^pi+ pi- using the reference ParticleList pi-:all.
-[INFO] Calculating track-based isolation variables at ARICH0 surface for the decay string K_S0:merged -> ^pi+ pi- using the reference ParticleList pi-:all.
-[INFO] Calculating track-based isolation variables at ECL0 surface for the decay string K_S0:merged -> ^pi+ pi- using the reference ParticleList pi-:all.
-[INFO] Calculating track-based isolation variables at ECL1 surface for the decay string K_S0:merged -> ^pi+ pi- using the reference ParticleList pi-:all.
-[INFO] Calculating track-based isolation variables at KLM0 surface for the decay string K_S0:merged -> ^pi+ pi- using the reference ParticleList pi-:all.
-[INFO] Calculating track-based isolation variables at CDC0 surface for the decay string K_S0:merged -> pi+ ^pi- using the reference ParticleList pi-:all.
-[INFO] Calculating track-based isolation variables at CDC1 surface for the decay string K_S0:merged -> pi+ ^pi- using the reference ParticleList pi-:all.
-[INFO] Calculating track-based isolation variables at CDC2 surface for the decay string K_S0:merged -> pi+ ^pi- using the reference ParticleList pi-:all.
-[INFO] Calculating track-based isolation variables at CDC3 surface for the decay string K_S0:merged -> pi+ ^pi- using the reference ParticleList pi-:all.
-[INFO] Calculating track-based isolation variables at CDC4 surface for the decay string K_S0:merged -> pi+ ^pi- using the reference ParticleList pi-:all.
-[INFO] Calculating track-based isolation variables at CDC5 surface for the decay string K_S0:merged -> pi+ ^pi- using the reference ParticleList pi-:all.
-[INFO] Calculating track-based isolation variables at CDC6 surface for the decay string K_S0:merged -> pi+ ^pi- using the reference ParticleList pi-:all.
-[INFO] Calculating track-based isolation variables at CDC7 surface for the decay string K_S0:merged -> pi+ ^pi- using the reference ParticleList pi-:all.
-[INFO] Calculating track-based isolation variables at CDC8 surface for the decay string K_S0:merged -> pi+ ^pi- using the reference ParticleList pi-:all.
-[INFO] Calculating track-based isolation variables at TOP0 surface for the decay string K_S0:merged -> pi+ ^pi- using the reference ParticleList pi-:all.
-[INFO] Calculating track-based isolation variables at ARICH0 surface for the decay string K_S0:merged -> pi+ ^pi- using the reference ParticleList pi-:all.
-[INFO] Calculating track-based isolation variables at ECL0 surface for the decay string K_S0:merged -> pi+ ^pi- using the reference ParticleList pi-:all.
-[INFO] Calculating track-based isolation variables at ECL1 surface for the decay string K_S0:merged -> pi+ ^pi- using the reference ParticleList pi-:all.
-[INFO] Calculating track-based isolation variables at KLM0 surface for the decay string K_S0:merged -> pi+ ^pi- using the reference ParticleList pi-:all.
+[INFO] Calculating track-based isolation variables at CDC0 surface for the decay string K_S0:merged -> ^pi+ pi- using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at CDC1 surface for the decay string K_S0:merged -> ^pi+ pi- using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at CDC2 surface for the decay string K_S0:merged -> ^pi+ pi- using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at CDC3 surface for the decay string K_S0:merged -> ^pi+ pi- using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at CDC4 surface for the decay string K_S0:merged -> ^pi+ pi- using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at CDC5 surface for the decay string K_S0:merged -> ^pi+ pi- using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at CDC6 surface for the decay string K_S0:merged -> ^pi+ pi- using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at CDC7 surface for the decay string K_S0:merged -> ^pi+ pi- using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at CDC8 surface for the decay string K_S0:merged -> ^pi+ pi- using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at TOP0 surface for the decay string K_S0:merged -> ^pi+ pi- using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at ARICH0 surface for the decay string K_S0:merged -> ^pi+ pi- using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at ECL0 surface for the decay string K_S0:merged -> ^pi+ pi- using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at ECL1 surface for the decay string K_S0:merged -> ^pi+ pi- using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at KLM0 surface for the decay string K_S0:merged -> ^pi+ pi- using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at CDC0 surface for the decay string K_S0:merged -> pi+ ^pi- using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at CDC1 surface for the decay string K_S0:merged -> pi+ ^pi- using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at CDC2 surface for the decay string K_S0:merged -> pi+ ^pi- using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at CDC3 surface for the decay string K_S0:merged -> pi+ ^pi- using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at CDC4 surface for the decay string K_S0:merged -> pi+ ^pi- using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at CDC5 surface for the decay string K_S0:merged -> pi+ ^pi- using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at CDC6 surface for the decay string K_S0:merged -> pi+ ^pi- using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at CDC7 surface for the decay string K_S0:merged -> pi+ ^pi- using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at CDC8 surface for the decay string K_S0:merged -> pi+ ^pi- using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at TOP0 surface for the decay string K_S0:merged -> pi+ ^pi- using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at ARICH0 surface for the decay string K_S0:merged -> pi+ ^pi- using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at ECL0 surface for the decay string K_S0:merged -> pi+ ^pi- using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at ECL1 surface for the decay string K_S0:merged -> pi+ ^pi- using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at KLM0 surface for the decay string K_S0:merged -> pi+ ^pi- using the reference ParticleList pi+:all.
 [INFO] Conditions Database: found working server
 	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
 [INFO] Conditions data: configured globaltag is release-05-01-03
@@ -2962,244 +2976,244 @@
 [INFO] [ParticlePrinterModule] START ------------------------------
 [INFO]  ParticleLists: pi+:ref (8+0) + pi-:ref (8+0)
 [INFO]  - 32 = 211[0]
-[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = 4.13797
+[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = 5.45042
+[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = 6.18232
+[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = 3.40805
+[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = 4.40301
+[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = 1.50205
+[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = 2.92014
+[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = 0.0954875
+[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = 13.1736
+[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = 43.0507
 [INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = 111.144
+[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = 69.2291
 [INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = nan
 [INFO]  - 33 = 211[1]
-[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = 1.36576
+[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = 4.29791
+[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = 7.73876
+[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = 2.45667
+[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = 6.08352
+[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = 14.2633
+[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = 21.8817
+[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = 29.3362
+[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = 33.4275
 [INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = nan
 [INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = nan
 [INFO]      o) distToClosestTrkAtECL0_VS_pi_all = nan
 [INFO]      o) distToClosestTrkAtECL1_VS_pi_all = nan
 [INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = nan
 [INFO]  - 38 = 211[2]
-[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = 4.13797
+[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = 5.45042
+[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = 6.18232
+[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = 2.45667
+[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = 4.40301
+[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = 1.50205
+[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = 2.92014
+[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = 5.9006
+[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = 4.25308
+[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = 23.7605
 [INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = 111.58
+[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = 136.02
+[INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = 203.002
 [INFO]  - 39 = 211[3]
-[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = 10.8053
+[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = 11.886
+[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = 8.30937
+[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = 1.80155
+[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = 12.2653
+[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = 5.0151
+[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = 5.3075
+[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = 19.754
+[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = 37.6605
+[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = 72.2633
 [INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = 94.4671
+[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = 108.387
 [INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = nan
 [INFO]  - 40 = 211[4]
-[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = 0.061474
+[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = 1.93964
+[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = 1.10962
+[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = 6.67045
+[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = 6.36942
+[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = 5.29673
+[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = 3.48469
+[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = 0.737612
+[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = 2.82076
+[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = 9.85145
 [INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = 19.031
+[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = 28.1635
+[INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = 135.563
 [INFO]  - 41 = 211[5]
-[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = 0.061474
+[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = 1.93964
+[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = 4.1077
+[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = 9.60065
+[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = 14.8157
+[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = 21.3338
+[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = 9.401
+[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = 18.0564
+[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = 28.388
+[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = 56.3754
 [INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = 65.1765
+[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = 79.8521
+[INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = 283.844
 [INFO]  - 42 = 211[6]
-[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = 3.72787
+[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = 5.17071
+[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = 6.25529
+[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = 1.31255
+[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = 6.36942
+[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = 5.29673
+[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = 3.48469
+[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = 0.737612
+[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = 2.82076
+[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = 9.85145
 [INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = 19.031
+[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = 28.1635
+[INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = 135.563
 [INFO]  - 44 = 211[7]
-[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = 4.78861
+[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = 9.68718
+[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = 19.4651
+[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = 34.2456
+[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = 28.2389
+[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = 15.1499
+[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = 21.2311
+[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = 23.6022
+[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = 27.8336
 [INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = nan
 [INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = nan
 [INFO]      o) distToClosestTrkAtECL0_VS_pi_all = nan
 [INFO]      o) distToClosestTrkAtECL1_VS_pi_all = nan
 [INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = nan
 [INFO]  - 34 = -211[8]
-[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = 0.740482
+[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = 3.34994
+[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = 8.87645
+[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = 16.1281
+[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = 12.2653
+[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = 5.0151
+[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = 5.3075
+[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = 19.754
+[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = 37.6605
+[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = 65.017
 [INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = 86.2496
+[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = 79.8521
+[INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = 159.664
 [INFO]  - 35 = -211[9]
-[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = 0.740482
+[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = 3.34994
+[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = 8.30937
+[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = 1.80155
+[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = 19.0646
+[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = 25.0044
+[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = 9.401
+[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = 18.0564
+[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = 17.0958
 [INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = 87.7525
+[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = 85.9784
+[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = 69.2291
 [INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = nan
 [INFO]  - 36 = -211[10]
-[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = 5.81101
+[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = 3.39634
+[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = 1.10962
+[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = 1.31255
+[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = 15.9912
+[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = 32.548
+[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = 1.34674
+[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = 0.0954875
+[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = 6.02613
 [INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = 87.7525
+[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = 85.9784
+[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = 75.7261
 [INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = nan
 [INFO]  - 37 = -211[11]
-[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = 1.1661
+[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = 1.59853
+[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = 0.499922
+[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = 6.67214
+[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = 12.7226
+[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = 16.0587
+[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = 15.7918
+[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = 14.3412
+[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = 11.4873
+[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = 3.49731
 [INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = 64.9554
+[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = 79.4532
+[INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = 295.777
 [INFO]  - 43 = -211[12]
-[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = 7.94473
+[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = 15.1196
+[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = 21.4913
+[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = 22.9639
+[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = 22.2181
+[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = 19.134
+[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = 1.34674
+[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = 3.79253
+[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = 4.25308
+[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = 23.7605
 [INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = 111.144
+[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = 136.02
+[INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = 197.656
 [INFO]  - 45 = -211[13]
-[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = 1.36576
+[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = 4.29791
+[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = 11.7126
+[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = 13.9361
+[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = 2.67473
+[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = 9.63423
+[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = 15.7918
+[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = 14.3412
+[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = 11.4873
+[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = 3.49731
 [INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = 64.9554
+[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = 79.4532
 [INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = nan
 [INFO]  - 46 = -211[14]
-[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = 0.537266
+[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = 1.59853
+[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = 0.499922
+[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = 6.67214
+[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = 2.67473
+[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = 9.63423
+[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = 20.9132
+[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = 23.6022
+[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = 27.8336
+[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = 65.1883
 [INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = 78.0651
+[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = 95.1784
+[INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = 197.656
 [INFO]  - 47 = -211[15]
-[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = 0.537266
+[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = 1.98905
+[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = 7.92454
+[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = 9.35752
+[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = 26.3925
+[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = 15.1499
+[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = 31.5081
+[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = 31.0225
+[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = 29.2823
 [INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = 111.644
+[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = 110.392
+[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = 103.469
 [INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = nan
 [INFO] [ParticlePrinterModule] END   ------------------------------
 [INFO] [ParticlePrinterModule] START ------------------------------
@@ -7213,64 +7227,64 @@
 [INFO]  ParticleLists: Lambda0:merged (0+0) + anti-Lambda0:merged (2+0)
 [INFO]  - 139 = -3122[0]
 [INFO]      o) daughter indices = 79 33
-[INFO]      o) p_distToClosestTrkAtCDC0_VS_pi_all = 0.644204
-[INFO]      o) p_distToClosestTrkAtCDC1_VS_pi_all = 1.70932
-[INFO]      o) p_distToClosestTrkAtCDC2_VS_pi_all = 7.3021
-[INFO]      o) p_distToClosestTrkAtCDC3_VS_pi_all = 8.16408
-[INFO]      o) p_distToClosestTrkAtCDC4_VS_pi_all = 24.3504
-[INFO]      o) p_distToClosestTrkAtCDC5_VS_pi_all = 17.2264
-[INFO]      o) p_distToClosestTrkAtCDC6_VS_pi_all = 29.1385
-[INFO]      o) p_distToClosestTrkAtCDC7_VS_pi_all = 28.3115
-[INFO]      o) p_distToClosestTrkAtCDC8_VS_pi_all = 26.241
-[INFO]      o) p_distToClosestTrkAtTOP0_VS_pi_all = nan
-[INFO]      o) p_distToClosestTrkAtARICH0_VS_pi_all = 110.996
-[INFO]      o) p_distToClosestTrkAtECL0_VS_pi_all = 109.757
-[INFO]      o) p_distToClosestTrkAtECL1_VS_pi_all = 102.97
-[INFO]      o) p_distToClosestTrkAtKLM0_VS_pi_all = nan
-[INFO]      o) pi_distToClosestTrkAtCDC0_VS_pi_all = 1.36576
-[INFO]      o) pi_distToClosestTrkAtCDC1_VS_pi_all = 4.29791
-[INFO]      o) pi_distToClosestTrkAtCDC2_VS_pi_all = 7.73876
-[INFO]      o) pi_distToClosestTrkAtCDC3_VS_pi_all = 2.45667
-[INFO]      o) pi_distToClosestTrkAtCDC4_VS_pi_all = 6.08352
-[INFO]      o) pi_distToClosestTrkAtCDC5_VS_pi_all = 14.2633
-[INFO]      o) pi_distToClosestTrkAtCDC6_VS_pi_all = 21.8817
-[INFO]      o) pi_distToClosestTrkAtCDC7_VS_pi_all = 29.3362
-[INFO]      o) pi_distToClosestTrkAtCDC8_VS_pi_all = 33.4275
-[INFO]      o) pi_distToClosestTrkAtTOP0_VS_pi_all = nan
-[INFO]      o) pi_distToClosestTrkAtARICH0_VS_pi_all = nan
-[INFO]      o) pi_distToClosestTrkAtECL0_VS_pi_all = nan
-[INFO]      o) pi_distToClosestTrkAtECL1_VS_pi_all = nan
-[INFO]      o) pi_distToClosestTrkAtKLM0_VS_pi_all = nan
+[INFO]      o) p_distToClosestTrkAtCDC0_VS_p_all = 1.08131
+[INFO]      o) p_distToClosestTrkAtCDC1_VS_p_all = 0.840745
+[INFO]      o) p_distToClosestTrkAtCDC2_VS_p_all = 6.07265
+[INFO]      o) p_distToClosestTrkAtCDC3_VS_p_all = 8.4311
+[INFO]      o) p_distToClosestTrkAtCDC4_VS_p_all = 24.6607
+[INFO]      o) p_distToClosestTrkAtCDC5_VS_p_all = 29.175
+[INFO]      o) p_distToClosestTrkAtCDC6_VS_p_all = 29.7564
+[INFO]      o) p_distToClosestTrkAtCDC7_VS_p_all = 22.5469
+[INFO]      o) p_distToClosestTrkAtCDC8_VS_p_all = 3.6217
+[INFO]      o) p_distToClosestTrkAtTOP0_VS_p_all = nan
+[INFO]      o) p_distToClosestTrkAtARICH0_VS_p_all = 91.908
+[INFO]      o) p_distToClosestTrkAtECL0_VS_p_all = 93.514
+[INFO]      o) p_distToClosestTrkAtECL1_VS_p_all = 99.0854
+[INFO]      o) p_distToClosestTrkAtKLM0_VS_p_all = nan
+[INFO]      o) pi_distToClosestTrkAtCDC0_VS_p_all = 1.49506
+[INFO]      o) pi_distToClosestTrkAtCDC1_VS_p_all = 3.9567
+[INFO]      o) pi_distToClosestTrkAtCDC2_VS_p_all = 7.07094
+[INFO]      o) pi_distToClosestTrkAtCDC3_VS_p_all = 2.28034
+[INFO]      o) pi_distToClosestTrkAtCDC4_VS_p_all = 4.14506
+[INFO]      o) pi_distToClosestTrkAtCDC5_VS_p_all = 11.3313
+[INFO]      o) pi_distToClosestTrkAtCDC6_VS_p_all = 20.5664
+[INFO]      o) pi_distToClosestTrkAtCDC7_VS_p_all = 28.6268
+[INFO]      o) pi_distToClosestTrkAtCDC8_VS_p_all = 34.1052
+[INFO]      o) pi_distToClosestTrkAtTOP0_VS_p_all = nan
+[INFO]      o) pi_distToClosestTrkAtARICH0_VS_p_all = nan
+[INFO]      o) pi_distToClosestTrkAtECL0_VS_p_all = nan
+[INFO]      o) pi_distToClosestTrkAtECL1_VS_p_all = nan
+[INFO]      o) pi_distToClosestTrkAtKLM0_VS_p_all = nan
 [INFO]  - 151 = -3122[1]
 [INFO]      o) daughter indices = 67 44
-[INFO]      o) p_distToClosestTrkAtCDC0_VS_pi_all = 0.261828
-[INFO]      o) p_distToClosestTrkAtCDC1_VS_pi_all = 2.06419
-[INFO]      o) p_distToClosestTrkAtCDC2_VS_pi_all = 5.95513
-[INFO]      o) p_distToClosestTrkAtCDC3_VS_pi_all = 3.94202
-[INFO]      o) p_distToClosestTrkAtCDC4_VS_pi_all = 8.76548
-[INFO]      o) p_distToClosestTrkAtCDC5_VS_pi_all = 29.0481
-[INFO]      o) p_distToClosestTrkAtCDC6_VS_pi_all = 28.5582
-[INFO]      o) p_distToClosestTrkAtCDC7_VS_pi_all = 5.12196
-[INFO]      o) p_distToClosestTrkAtCDC8_VS_pi_all = 2.54865
-[INFO]      o) p_distToClosestTrkAtTOP0_VS_pi_all = nan
-[INFO]      o) p_distToClosestTrkAtARICH0_VS_pi_all = 120.744
-[INFO]      o) p_distToClosestTrkAtECL0_VS_pi_all = 119.59
-[INFO]      o) p_distToClosestTrkAtECL1_VS_pi_all = 43.1417
-[INFO]      o) p_distToClosestTrkAtKLM0_VS_pi_all = nan
-[INFO]      o) pi_distToClosestTrkAtCDC0_VS_pi_all = 4.78861
-[INFO]      o) pi_distToClosestTrkAtCDC1_VS_pi_all = 9.68718
-[INFO]      o) pi_distToClosestTrkAtCDC2_VS_pi_all = 19.4651
-[INFO]      o) pi_distToClosestTrkAtCDC3_VS_pi_all = 34.2456
-[INFO]      o) pi_distToClosestTrkAtCDC4_VS_pi_all = 28.2389
-[INFO]      o) pi_distToClosestTrkAtCDC5_VS_pi_all = 15.1499
-[INFO]      o) pi_distToClosestTrkAtCDC6_VS_pi_all = 21.2311
-[INFO]      o) pi_distToClosestTrkAtCDC7_VS_pi_all = 23.6022
-[INFO]      o) pi_distToClosestTrkAtCDC8_VS_pi_all = 27.8336
-[INFO]      o) pi_distToClosestTrkAtTOP0_VS_pi_all = nan
-[INFO]      o) pi_distToClosestTrkAtARICH0_VS_pi_all = nan
-[INFO]      o) pi_distToClosestTrkAtECL0_VS_pi_all = nan
-[INFO]      o) pi_distToClosestTrkAtECL1_VS_pi_all = nan
-[INFO]      o) pi_distToClosestTrkAtKLM0_VS_pi_all = nan
+[INFO]      o) p_distToClosestTrkAtCDC0_VS_p_all = 0.276559
+[INFO]      o) p_distToClosestTrkAtCDC1_VS_p_all = 2.10147
+[INFO]      o) p_distToClosestTrkAtCDC2_VS_p_all = 6.03382
+[INFO]      o) p_distToClosestTrkAtCDC3_VS_p_all = 5.12629
+[INFO]      o) p_distToClosestTrkAtCDC4_VS_p_all = 6.90037
+[INFO]      o) p_distToClosestTrkAtCDC5_VS_p_all = 26.3074
+[INFO]      o) p_distToClosestTrkAtCDC6_VS_p_all = 29.8915
+[INFO]      o) p_distToClosestTrkAtCDC7_VS_p_all = 7.01918
+[INFO]      o) p_distToClosestTrkAtCDC8_VS_p_all = 0.0137242
+[INFO]      o) p_distToClosestTrkAtTOP0_VS_p_all = nan
+[INFO]      o) p_distToClosestTrkAtARICH0_VS_p_all = 120.031
+[INFO]      o) p_distToClosestTrkAtECL0_VS_p_all = 119.301
+[INFO]      o) p_distToClosestTrkAtECL1_VS_p_all = 114.252
+[INFO]      o) p_distToClosestTrkAtKLM0_VS_p_all = nan
+[INFO]      o) pi_distToClosestTrkAtCDC0_VS_p_all = 4.77403
+[INFO]      o) pi_distToClosestTrkAtCDC1_VS_p_all = 9.65054
+[INFO]      o) pi_distToClosestTrkAtCDC2_VS_p_all = 19.389
+[INFO]      o) pi_distToClosestTrkAtCDC3_VS_p_all = 34.1159
+[INFO]      o) pi_distToClosestTrkAtCDC4_VS_p_all = 30.2643
+[INFO]      o) pi_distToClosestTrkAtCDC5_VS_p_all = 17.2264
+[INFO]      o) pi_distToClosestTrkAtCDC6_VS_p_all = 21.1481
+[INFO]      o) pi_distToClosestTrkAtCDC7_VS_p_all = 23.4758
+[INFO]      o) pi_distToClosestTrkAtCDC8_VS_p_all = 27.6464
+[INFO]      o) pi_distToClosestTrkAtTOP0_VS_p_all = nan
+[INFO]      o) pi_distToClosestTrkAtARICH0_VS_p_all = nan
+[INFO]      o) pi_distToClosestTrkAtECL0_VS_p_all = nan
+[INFO]      o) pi_distToClosestTrkAtECL1_VS_p_all = nan
+[INFO]      o) pi_distToClosestTrkAtKLM0_VS_p_all = nan
 [INFO] [ParticlePrinterModule] END   ------------------------------
 [INFO] [ParticlePrinterModule] START ------------------------------
 [INFO]  ParticleList : K_S0:merged (0+8)
@@ -9155,139 +9169,139 @@
 [INFO] [ParticlePrinterModule] START ------------------------------
 [INFO]  ParticleLists: pi+:ref (4+0) + pi-:ref (5+0)
 [INFO]  - 19 = 211[0]
-[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = 3.30308
+[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = 0.254889
+[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = 8.19504
+[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = 22.7314
+[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = 42.7665
+[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = 50.1363
+[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = 51.9642
+[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = 20.5867
+[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = 5.69847
 [INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = nan
 [INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = 133.937
 [INFO]      o) distToClosestTrkAtECL1_VS_pi_all = nan
 [INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = nan
 [INFO]  - 20 = 211[1]
-[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = 5.44918
+[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = 7.32961
+[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = 8.56623
+[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = 8.44973
+[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = 6.69247
+[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = 2.57097
+[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = 4.79017
+[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = 8.49767
+[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = 11.4926
 [INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = 150.094
+[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = 154.41
+[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = 153.736
 [INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = nan
 [INFO]  - 21 = 211[2]
-[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = 5.44918
+[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = 7.32961
+[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = 8.56623
+[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = 8.44973
+[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = 6.69247
+[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = 2.57097
+[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = 4.79017
+[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = 10.9912
+[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = 6.41902
+[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = 3.47517
 [INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = 86.677
+[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = 100.073
 [INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = nan
 [INFO]  - 25 = 211[3]
-[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = 7.6567
+[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = 10.7721
+[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = 13.652
+[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = 15.5415
+[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = 16.2673
+[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = 15.8221
+[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = 9.36934
+[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = 8.49767
+[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = 6.41902
+[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = 3.47517
 [INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = 86.677
+[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = 100.073
+[INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = 246.951
 [INFO]  - 18 = -211[4]
-[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = 3.30308
+[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = 0.254889
+[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = 8.19504
+[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = 17.7507
+[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = 17.382
+[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = 14.8273
+[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = 9.813
+[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = 1.12542
+[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = 12.28
+[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = 61.8692
 [INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = 133.937
 [INFO]      o) distToClosestTrkAtECL1_VS_pi_all = nan
 [INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = nan
 [INFO]  - 22 = -211[5]
-[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = 9.69182
+[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = 13.0975
+[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = 12.3245
+[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = 5.36122
+[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = 2.05246
 [INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = nan
 [INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = nan
 [INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = nan
 [INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = nan
 [INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = 150.094
+[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = 154.41
+[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = 153.736
 [INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = nan
 [INFO]  - 23 = -211[6]
-[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = 7.12151
+[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = 10.1909
+[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = 12.3245
+[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = 5.36122
+[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = 15.2354
+[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = 18.1366
+[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = 51.9642
+[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = 43.9038
+[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = 46.9648
+[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = 20.8999
 [INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = 7.75266
+[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = 26.9148
+[INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = 358.276
 [INFO]  - 24 = -211[7]
-[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = 6.2964
+[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = 12.9189
+[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = 16.2531
+[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = 17.7507
+[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = 17.382
+[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = 14.8273
+[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = 9.813
+[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = 1.12542
+[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = 12.28
+[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = 61.8692
 [INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = 165.161
+[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = 166.119
+[INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = 246.951
 [INFO]  - 26 = -211[8]
-[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = 7.12151
+[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = 10.1909
+[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = 13.2686
+[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = 15.6851
+[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = 2.05246
+[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = 18.1366
+[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = 80.4515
+[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = 20.5867
+[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = 5.69847
+[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = 20.8999
 [INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = 7.75266
+[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = 26.9148
 [INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = nan
 [INFO] [ParticlePrinterModule] END   ------------------------------
 [INFO] [ParticlePrinterModule] START ------------------------------
@@ -11586,64 +11600,64 @@
 [INFO]  ParticleLists: Lambda0:merged (1+0) + anti-Lambda0:merged (1+0)
 [INFO]  - 58 = 3122[0]
 [INFO]      o) daughter indices = 39 22
-[INFO]      o) p_distToClosestTrkAtCDC0_VS_pi_all = 5.39025
-[INFO]      o) p_distToClosestTrkAtCDC1_VS_pi_all = 7.1618
-[INFO]      o) p_distToClosestTrkAtCDC2_VS_pi_all = 8.18766
-[INFO]      o) p_distToClosestTrkAtCDC3_VS_pi_all = 7.75688
-[INFO]      o) p_distToClosestTrkAtCDC4_VS_pi_all = 5.5967
-[INFO]      o) p_distToClosestTrkAtCDC5_VS_pi_all = 0.939912
-[INFO]      o) p_distToClosestTrkAtCDC6_VS_pi_all = 7.06516
-[INFO]      o) p_distToClosestTrkAtCDC7_VS_pi_all = 14.0926
-[INFO]      o) p_distToClosestTrkAtCDC8_VS_pi_all = 10.5221
-[INFO]      o) p_distToClosestTrkAtTOP0_VS_pi_all = 2.57131
-[INFO]      o) p_distToClosestTrkAtARICH0_VS_pi_all = nan
-[INFO]      o) p_distToClosestTrkAtECL0_VS_pi_all = 86.1885
-[INFO]      o) p_distToClosestTrkAtECL1_VS_pi_all = 97.8752
-[INFO]      o) p_distToClosestTrkAtKLM0_VS_pi_all = nan
-[INFO]      o) pi_distToClosestTrkAtCDC0_VS_pi_all = 9.69182
-[INFO]      o) pi_distToClosestTrkAtCDC1_VS_pi_all = 13.0975
-[INFO]      o) pi_distToClosestTrkAtCDC2_VS_pi_all = 12.3245
-[INFO]      o) pi_distToClosestTrkAtCDC3_VS_pi_all = 5.36122
-[INFO]      o) pi_distToClosestTrkAtCDC4_VS_pi_all = 2.05246
-[INFO]      o) pi_distToClosestTrkAtCDC5_VS_pi_all = nan
-[INFO]      o) pi_distToClosestTrkAtCDC6_VS_pi_all = nan
-[INFO]      o) pi_distToClosestTrkAtCDC7_VS_pi_all = nan
-[INFO]      o) pi_distToClosestTrkAtCDC8_VS_pi_all = nan
-[INFO]      o) pi_distToClosestTrkAtTOP0_VS_pi_all = nan
-[INFO]      o) pi_distToClosestTrkAtARICH0_VS_pi_all = 150.094
-[INFO]      o) pi_distToClosestTrkAtECL0_VS_pi_all = 154.41
-[INFO]      o) pi_distToClosestTrkAtECL1_VS_pi_all = 153.736
-[INFO]      o) pi_distToClosestTrkAtKLM0_VS_pi_all = nan
+[INFO]      o) p_distToClosestTrkAtCDC0_VS_p_all = 5.61699
+[INFO]      o) p_distToClosestTrkAtCDC1_VS_p_all = 7.74703
+[INFO]      o) p_distToClosestTrkAtCDC2_VS_p_all = 9.46793
+[INFO]      o) p_distToClosestTrkAtCDC3_VS_p_all = 10.1201
+[INFO]      o) p_distToClosestTrkAtCDC4_VS_p_all = 9.47062
+[INFO]      o) p_distToClosestTrkAtCDC5_VS_p_all = 7.12693
+[INFO]      o) p_distToClosestTrkAtCDC6_VS_p_all = 2.66321
+[INFO]      o) p_distToClosestTrkAtCDC7_VS_p_all = 5.54582
+[INFO]      o) p_distToClosestTrkAtCDC8_VS_p_all = 10.2393
+[INFO]      o) p_distToClosestTrkAtTOP0_VS_p_all = 2.58846
+[INFO]      o) p_distToClosestTrkAtARICH0_VS_p_all = nan
+[INFO]      o) p_distToClosestTrkAtECL0_VS_p_all = 86.1762
+[INFO]      o) p_distToClosestTrkAtECL1_VS_p_all = 97.8586
+[INFO]      o) p_distToClosestTrkAtKLM0_VS_p_all = nan
+[INFO]      o) pi_distToClosestTrkAtCDC0_VS_p_all = 0.469699
+[INFO]      o) pi_distToClosestTrkAtCDC1_VS_p_all = 4.76017
+[INFO]      o) pi_distToClosestTrkAtCDC2_VS_p_all = 12.3006
+[INFO]      o) pi_distToClosestTrkAtCDC3_VS_p_all = 5.31828
+[INFO]      o) pi_distToClosestTrkAtCDC4_VS_p_all = 15.301
+[INFO]      o) pi_distToClosestTrkAtCDC5_VS_p_all = nan
+[INFO]      o) pi_distToClosestTrkAtCDC6_VS_p_all = nan
+[INFO]      o) pi_distToClosestTrkAtCDC7_VS_p_all = nan
+[INFO]      o) pi_distToClosestTrkAtCDC8_VS_p_all = nan
+[INFO]      o) pi_distToClosestTrkAtTOP0_VS_p_all = nan
+[INFO]      o) pi_distToClosestTrkAtARICH0_VS_p_all = 156.859
+[INFO]      o) pi_distToClosestTrkAtECL0_VS_p_all = 162.21
+[INFO]      o) pi_distToClosestTrkAtECL1_VS_p_all = 167.419
+[INFO]      o) pi_distToClosestTrkAtKLM0_VS_p_all = nan
 [INFO]  - 60 = -3122[1]
 [INFO]      o) daughter indices = 36 19
-[INFO]      o) p_distToClosestTrkAtCDC0_VS_pi_all = 3.58395
-[INFO]      o) p_distToClosestTrkAtCDC1_VS_pi_all = 1.00497
-[INFO]      o) p_distToClosestTrkAtCDC2_VS_pi_all = 6.55626
-[INFO]      o) p_distToClosestTrkAtCDC3_VS_pi_all = 19.8044
-[INFO]      o) p_distToClosestTrkAtCDC4_VS_pi_all = 22.1104
-[INFO]      o) p_distToClosestTrkAtCDC5_VS_pi_all = 22.0813
-[INFO]      o) p_distToClosestTrkAtCDC6_VS_pi_all = 20.4008
-[INFO]      o) p_distToClosestTrkAtCDC7_VS_pi_all = 16.6249
-[INFO]      o) p_distToClosestTrkAtCDC8_VS_pi_all = 10.5497
-[INFO]      o) p_distToClosestTrkAtTOP0_VS_pi_all = 4.51597
-[INFO]      o) p_distToClosestTrkAtARICH0_VS_pi_all = nan
-[INFO]      o) p_distToClosestTrkAtECL0_VS_pi_all = 48.6684
-[INFO]      o) p_distToClosestTrkAtECL1_VS_pi_all = 87.0447
-[INFO]      o) p_distToClosestTrkAtKLM0_VS_pi_all = nan
-[INFO]      o) pi_distToClosestTrkAtCDC0_VS_pi_all = 3.30308
-[INFO]      o) pi_distToClosestTrkAtCDC1_VS_pi_all = 0.254889
-[INFO]      o) pi_distToClosestTrkAtCDC2_VS_pi_all = 8.19504
-[INFO]      o) pi_distToClosestTrkAtCDC3_VS_pi_all = 22.7314
-[INFO]      o) pi_distToClosestTrkAtCDC4_VS_pi_all = 42.7665
-[INFO]      o) pi_distToClosestTrkAtCDC5_VS_pi_all = 50.1363
-[INFO]      o) pi_distToClosestTrkAtCDC6_VS_pi_all = 51.9642
-[INFO]      o) pi_distToClosestTrkAtCDC7_VS_pi_all = 20.5867
-[INFO]      o) pi_distToClosestTrkAtCDC8_VS_pi_all = 5.69847
-[INFO]      o) pi_distToClosestTrkAtTOP0_VS_pi_all = nan
-[INFO]      o) pi_distToClosestTrkAtARICH0_VS_pi_all = nan
-[INFO]      o) pi_distToClosestTrkAtECL0_VS_pi_all = 133.937
-[INFO]      o) pi_distToClosestTrkAtECL1_VS_pi_all = nan
-[INFO]      o) pi_distToClosestTrkAtKLM0_VS_pi_all = nan
+[INFO]      o) p_distToClosestTrkAtCDC0_VS_p_all = 3.94239
+[INFO]      o) p_distToClosestTrkAtCDC1_VS_p_all = 1.98014
+[INFO]      o) p_distToClosestTrkAtCDC2_VS_p_all = 4.35625
+[INFO]      o) p_distToClosestTrkAtCDC3_VS_p_all = 15.6659
+[INFO]      o) p_distToClosestTrkAtCDC4_VS_p_all = 22.094
+[INFO]      o) p_distToClosestTrkAtCDC5_VS_p_all = 22.0561
+[INFO]      o) p_distToClosestTrkAtCDC6_VS_p_all = 20.3654
+[INFO]      o) p_distToClosestTrkAtCDC7_VS_p_all = 16.5768
+[INFO]      o) p_distToClosestTrkAtCDC8_VS_p_all = 10.4875
+[INFO]      o) p_distToClosestTrkAtTOP0_VS_p_all = 4.60234
+[INFO]      o) p_distToClosestTrkAtARICH0_VS_p_all = nan
+[INFO]      o) p_distToClosestTrkAtECL0_VS_p_all = 48.6909
+[INFO]      o) p_distToClosestTrkAtECL1_VS_p_all = 87.1315
+[INFO]      o) p_distToClosestTrkAtKLM0_VS_p_all = nan
+[INFO]      o) pi_distToClosestTrkAtCDC0_VS_p_all = 3.58395
+[INFO]      o) pi_distToClosestTrkAtCDC1_VS_p_all = 1.00497
+[INFO]      o) pi_distToClosestTrkAtCDC2_VS_p_all = 6.55626
+[INFO]      o) pi_distToClosestTrkAtCDC3_VS_p_all = 19.8044
+[INFO]      o) pi_distToClosestTrkAtCDC4_VS_p_all = 38.267
+[INFO]      o) pi_distToClosestTrkAtCDC5_VS_p_all = 64.5457
+[INFO]      o) pi_distToClosestTrkAtCDC6_VS_p_all = 39.1451
+[INFO]      o) pi_distToClosestTrkAtCDC7_VS_p_all = 20.6118
+[INFO]      o) pi_distToClosestTrkAtCDC8_VS_p_all = 5.63148
+[INFO]      o) pi_distToClosestTrkAtTOP0_VS_p_all = nan
+[INFO]      o) pi_distToClosestTrkAtARICH0_VS_p_all = nan
+[INFO]      o) pi_distToClosestTrkAtECL0_VS_p_all = nan
+[INFO]      o) pi_distToClosestTrkAtECL1_VS_p_all = nan
+[INFO]      o) pi_distToClosestTrkAtKLM0_VS_p_all = nan
 [INFO] [ParticlePrinterModule] END   ------------------------------
 [INFO] Writing NTuple K_S0
 [INFO] [1;35m================================================================================[0m

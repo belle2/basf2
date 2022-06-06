@@ -3520,17 +3520,12 @@ def calculateTrackIsolation(decay_string, path, *detectors, reference_list_name=
     """
 
     import variables.utils as vu
-    from ROOT import Belle2
+    from ROOT import Belle2, TDatabasePDG
 
     decayDescriptor = Belle2.DecayDescriptor()
     if not decayDescriptor.init(decay_string):
         B2FATAL(f"Invalid particle list {decay_string} in calculateTrackIsolation!")
-    if not reference_list_name:
-        daughter_pdgs = decayDescriptor.getSelectionPDGCodes()
-        if len(daughter_pdgs) > 0:
-            reference_list_name = 'pi-:all'
-        else:
-            reference_list_name = f'{decay_string.split(":")[0]}:all'
+    no_reference_list_name = not reference_list_name
 
     det_choices = ["CDC", "TOP", "ARICH", "ECL", "KLM"]
     if any(d not in det_choices for d in detectors):
@@ -3544,8 +3539,6 @@ def calculateTrackIsolation(decay_string, path, *detectors, reference_list_name=
             det_labels.extend([f"{det}{ilayer}" for ilayer in range(2)])
         else:
             det_labels.append(f"{det}0")
-
-    suffix = f"_VS_{reference_list_name}"
 
     # The module allows only one daughter to be selected at a time,
     # that's why here we preprocess the input decay string.
@@ -3561,19 +3554,28 @@ def calculateTrackIsolation(decay_string, path, *detectors, reference_list_name=
         processed_decay_strings += [decay_string]
 
     for processed_dec in processed_decay_strings:
+        if no_reference_list_name:
+            decayDescriptor.init(processed_dec)
+            daughter_pdgs = decayDescriptor.getSelectionPDGCodes()
+            if len(daughter_pdgs) > 0:
+                reference_list_name = f'{TDatabasePDG.Instance().GetParticle(abs(daughter_pdgs[0])).GetName()}:all'
+            else:
+                reference_list_name = f'{processed_dec.split(":")[0]}:all'
+
         for det in det_labels:
             trackiso = path.add_module("TrackIsoCalculator",
                                        decayString=processed_dec,
                                        detectorSurface=det,
                                        particleListReference=reference_list_name,
                                        useHighestProbMassForExt=highest_prob_mass_for_ext)
-            trackiso.set_name(f"TrackIsoCalculator{det}_{processed_dec}{suffix}")
+            trackiso.set_name(f"TrackIsoCalculator{det}_{processed_dec}_VS_{reference_list_name}")
 
     # Use a special suffix to identify variables in case the helix extrapolation is done
     # using the best fit mass hypothesis.
     extra_suffix = "" if not highest_prob_mass_for_ext else "__useHighestProbMassForExt"
 
-    aliases = vu.create_aliases([f"distToClosestTrkAt{det}{suffix}{extra_suffix}" for det in det_labels], "extraInfo({variable})")
+    aliases = vu.create_aliases(
+        [f"distToClosestTrkAt{det}_VS_{reference_list_name}{extra_suffix}" for det in det_labels], "extraInfo({variable})")
 
     return aliases
 

@@ -3480,7 +3480,7 @@ def calculateTrackIsolation(decay_string, path, *detectors, reference_list_name=
 
     - CDC: as the segmentation is very coarse along z,
            the distance is defined as the cord length on the (rho=R, phi) plane.
-           A total of 9 distances are caluclated: the cylindrical surfaces are defined at R values
+           A total of 9 distances are calculated: the cylindrical surfaces are defined at R values
            that correspond to the positions of the 9 CDC wire superlayers.
     - TOP: as there is no segmentation along z,
            the distance is defined as the cord length on the (rho=R, phi) plane.

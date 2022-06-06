@@ -63,229 +63,229 @@
 [INFO]    -> MDST source: Tracks
 [INFO] ParticleSelector: e-:ref
 [INFO]    -> With cuts  : [pt > 0.1] and [thetaInCDCAcceptance]
-[INFO] Calculating isolation variables at CDC0 surface for decayString: e-:ref, reference ParticleList: e-:all.
-[INFO] Calculating isolation variables at CDC1 surface for decayString: e-:ref, reference ParticleList: e-:all.
-[INFO] Calculating isolation variables at CDC2 surface for decayString: e-:ref, reference ParticleList: e-:all.
-[INFO] Calculating isolation variables at CDC3 surface for decayString: e-:ref, reference ParticleList: e-:all.
-[INFO] Calculating isolation variables at CDC4 surface for decayString: e-:ref, reference ParticleList: e-:all.
-[INFO] Calculating isolation variables at CDC5 surface for decayString: e-:ref, reference ParticleList: e-:all.
-[INFO] Calculating isolation variables at CDC6 surface for decayString: e-:ref, reference ParticleList: e-:all.
-[INFO] Calculating isolation variables at CDC7 surface for decayString: e-:ref, reference ParticleList: e-:all.
-[INFO] Calculating isolation variables at CDC8 surface for decayString: e-:ref, reference ParticleList: e-:all.
-[INFO] Calculating isolation variables at TOP0 surface for decayString: e-:ref, reference ParticleList: e-:all.
-[INFO] Calculating isolation variables at ARICH0 surface for decayString: e-:ref, reference ParticleList: e-:all.
-[INFO] Calculating isolation variables at ECL0 surface for decayString: e-:ref, reference ParticleList: e-:all.
-[INFO] Calculating isolation variables at ECL1 surface for decayString: e-:ref, reference ParticleList: e-:all.
-[INFO] Calculating isolation variables at KLM0 surface for decayString: e-:ref, reference ParticleList: e-:all.
+[INFO] Calculating track-based isolation variables at CDC0 surface for DecayString: e-:ref, reference ParticleList: e-:all.
+[INFO] Calculating track-based isolation variables at CDC1 surface for DecayString: e-:ref, reference ParticleList: e-:all.
+[INFO] Calculating track-based isolation variables at CDC2 surface for DecayString: e-:ref, reference ParticleList: e-:all.
+[INFO] Calculating track-based isolation variables at CDC3 surface for DecayString: e-:ref, reference ParticleList: e-:all.
+[INFO] Calculating track-based isolation variables at CDC4 surface for DecayString: e-:ref, reference ParticleList: e-:all.
+[INFO] Calculating track-based isolation variables at CDC5 surface for DecayString: e-:ref, reference ParticleList: e-:all.
+[INFO] Calculating track-based isolation variables at CDC6 surface for DecayString: e-:ref, reference ParticleList: e-:all.
+[INFO] Calculating track-based isolation variables at CDC7 surface for DecayString: e-:ref, reference ParticleList: e-:all.
+[INFO] Calculating track-based isolation variables at CDC8 surface for DecayString: e-:ref, reference ParticleList: e-:all.
+[INFO] Calculating track-based isolation variables at TOP0 surface for DecayString: e-:ref, reference ParticleList: e-:all.
+[INFO] Calculating track-based isolation variables at ARICH0 surface for DecayString: e-:ref, reference ParticleList: e-:all.
+[INFO] Calculating track-based isolation variables at ECL0 surface for DecayString: e-:ref, reference ParticleList: e-:all.
+[INFO] Calculating track-based isolation variables at ECL1 surface for DecayString: e-:ref, reference ParticleList: e-:all.
+[INFO] Calculating track-based isolation variables at KLM0 surface for DecayString: e-:ref, reference ParticleList: e-:all.
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: e+:all (e-:all)
 [INFO]    -> MDST source: Tracks
 [INFO] ParticleSelector: e+:ref
 [INFO]    -> With cuts  : [pt > 0.1] and [thetaInCDCAcceptance]
-[INFO] Calculating isolation variables at CDC0 surface for decayString: e+:ref, reference ParticleList: e+:all.
-[INFO] Calculating isolation variables at CDC1 surface for decayString: e+:ref, reference ParticleList: e+:all.
-[INFO] Calculating isolation variables at CDC2 surface for decayString: e+:ref, reference ParticleList: e+:all.
-[INFO] Calculating isolation variables at CDC3 surface for decayString: e+:ref, reference ParticleList: e+:all.
-[INFO] Calculating isolation variables at CDC4 surface for decayString: e+:ref, reference ParticleList: e+:all.
-[INFO] Calculating isolation variables at CDC5 surface for decayString: e+:ref, reference ParticleList: e+:all.
-[INFO] Calculating isolation variables at CDC6 surface for decayString: e+:ref, reference ParticleList: e+:all.
-[INFO] Calculating isolation variables at CDC7 surface for decayString: e+:ref, reference ParticleList: e+:all.
-[INFO] Calculating isolation variables at CDC8 surface for decayString: e+:ref, reference ParticleList: e+:all.
-[INFO] Calculating isolation variables at TOP0 surface for decayString: e+:ref, reference ParticleList: e+:all.
-[INFO] Calculating isolation variables at ARICH0 surface for decayString: e+:ref, reference ParticleList: e+:all.
-[INFO] Calculating isolation variables at ECL0 surface for decayString: e+:ref, reference ParticleList: e+:all.
-[INFO] Calculating isolation variables at ECL1 surface for decayString: e+:ref, reference ParticleList: e+:all.
-[INFO] Calculating isolation variables at KLM0 surface for decayString: e+:ref, reference ParticleList: e+:all.
+[INFO] Calculating track-based isolation variables at CDC0 surface for DecayString: e+:ref, reference ParticleList: e+:all.
+[INFO] Calculating track-based isolation variables at CDC1 surface for DecayString: e+:ref, reference ParticleList: e+:all.
+[INFO] Calculating track-based isolation variables at CDC2 surface for DecayString: e+:ref, reference ParticleList: e+:all.
+[INFO] Calculating track-based isolation variables at CDC3 surface for DecayString: e+:ref, reference ParticleList: e+:all.
+[INFO] Calculating track-based isolation variables at CDC4 surface for DecayString: e+:ref, reference ParticleList: e+:all.
+[INFO] Calculating track-based isolation variables at CDC5 surface for DecayString: e+:ref, reference ParticleList: e+:all.
+[INFO] Calculating track-based isolation variables at CDC6 surface for DecayString: e+:ref, reference ParticleList: e+:all.
+[INFO] Calculating track-based isolation variables at CDC7 surface for DecayString: e+:ref, reference ParticleList: e+:all.
+[INFO] Calculating track-based isolation variables at CDC8 surface for DecayString: e+:ref, reference ParticleList: e+:all.
+[INFO] Calculating track-based isolation variables at TOP0 surface for DecayString: e+:ref, reference ParticleList: e+:all.
+[INFO] Calculating track-based isolation variables at ARICH0 surface for DecayString: e+:ref, reference ParticleList: e+:all.
+[INFO] Calculating track-based isolation variables at ECL0 surface for DecayString: e+:ref, reference ParticleList: e+:all.
+[INFO] Calculating track-based isolation variables at ECL1 surface for DecayString: e+:ref, reference ParticleList: e+:all.
+[INFO] Calculating track-based isolation variables at KLM0 surface for DecayString: e+:ref, reference ParticleList: e+:all.
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: mu-:all (mu+:all)
 [INFO]    -> MDST source: Tracks
 [INFO] ParticleSelector: mu-:ref
 [INFO]    -> With cuts  : [pt > 0.1] and [thetaInCDCAcceptance]
-[INFO] Calculating isolation variables at CDC0 surface for decayString: mu-:ref, reference ParticleList: mu-:all.
-[INFO] Calculating isolation variables at CDC1 surface for decayString: mu-:ref, reference ParticleList: mu-:all.
-[INFO] Calculating isolation variables at CDC2 surface for decayString: mu-:ref, reference ParticleList: mu-:all.
-[INFO] Calculating isolation variables at CDC3 surface for decayString: mu-:ref, reference ParticleList: mu-:all.
-[INFO] Calculating isolation variables at CDC4 surface for decayString: mu-:ref, reference ParticleList: mu-:all.
-[INFO] Calculating isolation variables at CDC5 surface for decayString: mu-:ref, reference ParticleList: mu-:all.
-[INFO] Calculating isolation variables at CDC6 surface for decayString: mu-:ref, reference ParticleList: mu-:all.
-[INFO] Calculating isolation variables at CDC7 surface for decayString: mu-:ref, reference ParticleList: mu-:all.
-[INFO] Calculating isolation variables at CDC8 surface for decayString: mu-:ref, reference ParticleList: mu-:all.
-[INFO] Calculating isolation variables at TOP0 surface for decayString: mu-:ref, reference ParticleList: mu-:all.
-[INFO] Calculating isolation variables at ARICH0 surface for decayString: mu-:ref, reference ParticleList: mu-:all.
-[INFO] Calculating isolation variables at ECL0 surface for decayString: mu-:ref, reference ParticleList: mu-:all.
-[INFO] Calculating isolation variables at ECL1 surface for decayString: mu-:ref, reference ParticleList: mu-:all.
-[INFO] Calculating isolation variables at KLM0 surface for decayString: mu-:ref, reference ParticleList: mu-:all.
+[INFO] Calculating track-based isolation variables at CDC0 surface for DecayString: mu-:ref, reference ParticleList: mu-:all.
+[INFO] Calculating track-based isolation variables at CDC1 surface for DecayString: mu-:ref, reference ParticleList: mu-:all.
+[INFO] Calculating track-based isolation variables at CDC2 surface for DecayString: mu-:ref, reference ParticleList: mu-:all.
+[INFO] Calculating track-based isolation variables at CDC3 surface for DecayString: mu-:ref, reference ParticleList: mu-:all.
+[INFO] Calculating track-based isolation variables at CDC4 surface for DecayString: mu-:ref, reference ParticleList: mu-:all.
+[INFO] Calculating track-based isolation variables at CDC5 surface for DecayString: mu-:ref, reference ParticleList: mu-:all.
+[INFO] Calculating track-based isolation variables at CDC6 surface for DecayString: mu-:ref, reference ParticleList: mu-:all.
+[INFO] Calculating track-based isolation variables at CDC7 surface for DecayString: mu-:ref, reference ParticleList: mu-:all.
+[INFO] Calculating track-based isolation variables at CDC8 surface for DecayString: mu-:ref, reference ParticleList: mu-:all.
+[INFO] Calculating track-based isolation variables at TOP0 surface for DecayString: mu-:ref, reference ParticleList: mu-:all.
+[INFO] Calculating track-based isolation variables at ARICH0 surface for DecayString: mu-:ref, reference ParticleList: mu-:all.
+[INFO] Calculating track-based isolation variables at ECL0 surface for DecayString: mu-:ref, reference ParticleList: mu-:all.
+[INFO] Calculating track-based isolation variables at ECL1 surface for DecayString: mu-:ref, reference ParticleList: mu-:all.
+[INFO] Calculating track-based isolation variables at KLM0 surface for DecayString: mu-:ref, reference ParticleList: mu-:all.
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: mu+:all (mu-:all)
 [INFO]    -> MDST source: Tracks
 [INFO] ParticleSelector: mu+:ref
 [INFO]    -> With cuts  : [pt > 0.1] and [thetaInCDCAcceptance]
-[INFO] Calculating isolation variables at CDC0 surface for decayString: mu+:ref, reference ParticleList: mu+:all.
-[INFO] Calculating isolation variables at CDC1 surface for decayString: mu+:ref, reference ParticleList: mu+:all.
-[INFO] Calculating isolation variables at CDC2 surface for decayString: mu+:ref, reference ParticleList: mu+:all.
-[INFO] Calculating isolation variables at CDC3 surface for decayString: mu+:ref, reference ParticleList: mu+:all.
-[INFO] Calculating isolation variables at CDC4 surface for decayString: mu+:ref, reference ParticleList: mu+:all.
-[INFO] Calculating isolation variables at CDC5 surface for decayString: mu+:ref, reference ParticleList: mu+:all.
-[INFO] Calculating isolation variables at CDC6 surface for decayString: mu+:ref, reference ParticleList: mu+:all.
-[INFO] Calculating isolation variables at CDC7 surface for decayString: mu+:ref, reference ParticleList: mu+:all.
-[INFO] Calculating isolation variables at CDC8 surface for decayString: mu+:ref, reference ParticleList: mu+:all.
-[INFO] Calculating isolation variables at TOP0 surface for decayString: mu+:ref, reference ParticleList: mu+:all.
-[INFO] Calculating isolation variables at ARICH0 surface for decayString: mu+:ref, reference ParticleList: mu+:all.
-[INFO] Calculating isolation variables at ECL0 surface for decayString: mu+:ref, reference ParticleList: mu+:all.
-[INFO] Calculating isolation variables at ECL1 surface for decayString: mu+:ref, reference ParticleList: mu+:all.
-[INFO] Calculating isolation variables at KLM0 surface for decayString: mu+:ref, reference ParticleList: mu+:all.
+[INFO] Calculating track-based isolation variables at CDC0 surface for DecayString: mu+:ref, reference ParticleList: mu+:all.
+[INFO] Calculating track-based isolation variables at CDC1 surface for DecayString: mu+:ref, reference ParticleList: mu+:all.
+[INFO] Calculating track-based isolation variables at CDC2 surface for DecayString: mu+:ref, reference ParticleList: mu+:all.
+[INFO] Calculating track-based isolation variables at CDC3 surface for DecayString: mu+:ref, reference ParticleList: mu+:all.
+[INFO] Calculating track-based isolation variables at CDC4 surface for DecayString: mu+:ref, reference ParticleList: mu+:all.
+[INFO] Calculating track-based isolation variables at CDC5 surface for DecayString: mu+:ref, reference ParticleList: mu+:all.
+[INFO] Calculating track-based isolation variables at CDC6 surface for DecayString: mu+:ref, reference ParticleList: mu+:all.
+[INFO] Calculating track-based isolation variables at CDC7 surface for DecayString: mu+:ref, reference ParticleList: mu+:all.
+[INFO] Calculating track-based isolation variables at CDC8 surface for DecayString: mu+:ref, reference ParticleList: mu+:all.
+[INFO] Calculating track-based isolation variables at TOP0 surface for DecayString: mu+:ref, reference ParticleList: mu+:all.
+[INFO] Calculating track-based isolation variables at ARICH0 surface for DecayString: mu+:ref, reference ParticleList: mu+:all.
+[INFO] Calculating track-based isolation variables at ECL0 surface for DecayString: mu+:ref, reference ParticleList: mu+:all.
+[INFO] Calculating track-based isolation variables at ECL1 surface for DecayString: mu+:ref, reference ParticleList: mu+:all.
+[INFO] Calculating track-based isolation variables at KLM0 surface for DecayString: mu+:ref, reference ParticleList: mu+:all.
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: pi+:all (pi-:all)
 [INFO]    -> MDST source: Tracks
 [INFO] ParticleSelector: pi+:ref
 [INFO]    -> With cuts  : [pt > 0.1] and [thetaInCDCAcceptance]
-[INFO] Calculating isolation variables at CDC0 surface for decayString: pi+:ref, reference ParticleList: pi+:all.
-[INFO] Calculating isolation variables at CDC1 surface for decayString: pi+:ref, reference ParticleList: pi+:all.
-[INFO] Calculating isolation variables at CDC2 surface for decayString: pi+:ref, reference ParticleList: pi+:all.
-[INFO] Calculating isolation variables at CDC3 surface for decayString: pi+:ref, reference ParticleList: pi+:all.
-[INFO] Calculating isolation variables at CDC4 surface for decayString: pi+:ref, reference ParticleList: pi+:all.
-[INFO] Calculating isolation variables at CDC5 surface for decayString: pi+:ref, reference ParticleList: pi+:all.
-[INFO] Calculating isolation variables at CDC6 surface for decayString: pi+:ref, reference ParticleList: pi+:all.
-[INFO] Calculating isolation variables at CDC7 surface for decayString: pi+:ref, reference ParticleList: pi+:all.
-[INFO] Calculating isolation variables at CDC8 surface for decayString: pi+:ref, reference ParticleList: pi+:all.
-[INFO] Calculating isolation variables at TOP0 surface for decayString: pi+:ref, reference ParticleList: pi+:all.
-[INFO] Calculating isolation variables at ARICH0 surface for decayString: pi+:ref, reference ParticleList: pi+:all.
-[INFO] Calculating isolation variables at ECL0 surface for decayString: pi+:ref, reference ParticleList: pi+:all.
-[INFO] Calculating isolation variables at ECL1 surface for decayString: pi+:ref, reference ParticleList: pi+:all.
-[INFO] Calculating isolation variables at KLM0 surface for decayString: pi+:ref, reference ParticleList: pi+:all.
+[INFO] Calculating track-based isolation variables at CDC0 surface for DecayString: pi+:ref, reference ParticleList: pi+:all.
+[INFO] Calculating track-based isolation variables at CDC1 surface for DecayString: pi+:ref, reference ParticleList: pi+:all.
+[INFO] Calculating track-based isolation variables at CDC2 surface for DecayString: pi+:ref, reference ParticleList: pi+:all.
+[INFO] Calculating track-based isolation variables at CDC3 surface for DecayString: pi+:ref, reference ParticleList: pi+:all.
+[INFO] Calculating track-based isolation variables at CDC4 surface for DecayString: pi+:ref, reference ParticleList: pi+:all.
+[INFO] Calculating track-based isolation variables at CDC5 surface for DecayString: pi+:ref, reference ParticleList: pi+:all.
+[INFO] Calculating track-based isolation variables at CDC6 surface for DecayString: pi+:ref, reference ParticleList: pi+:all.
+[INFO] Calculating track-based isolation variables at CDC7 surface for DecayString: pi+:ref, reference ParticleList: pi+:all.
+[INFO] Calculating track-based isolation variables at CDC8 surface for DecayString: pi+:ref, reference ParticleList: pi+:all.
+[INFO] Calculating track-based isolation variables at TOP0 surface for DecayString: pi+:ref, reference ParticleList: pi+:all.
+[INFO] Calculating track-based isolation variables at ARICH0 surface for DecayString: pi+:ref, reference ParticleList: pi+:all.
+[INFO] Calculating track-based isolation variables at ECL0 surface for DecayString: pi+:ref, reference ParticleList: pi+:all.
+[INFO] Calculating track-based isolation variables at ECL1 surface for DecayString: pi+:ref, reference ParticleList: pi+:all.
+[INFO] Calculating track-based isolation variables at KLM0 surface for DecayString: pi+:ref, reference ParticleList: pi+:all.
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: pi-:all (pi+:all)
 [INFO]    -> MDST source: Tracks
 [INFO] ParticleSelector: pi-:ref
 [INFO]    -> With cuts  : [pt > 0.1] and [thetaInCDCAcceptance]
-[INFO] Calculating isolation variables at CDC0 surface for decayString: pi-:ref, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at CDC1 surface for decayString: pi-:ref, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at CDC2 surface for decayString: pi-:ref, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at CDC3 surface for decayString: pi-:ref, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at CDC4 surface for decayString: pi-:ref, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at CDC5 surface for decayString: pi-:ref, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at CDC6 surface for decayString: pi-:ref, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at CDC7 surface for decayString: pi-:ref, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at CDC8 surface for decayString: pi-:ref, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at TOP0 surface for decayString: pi-:ref, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at ARICH0 surface for decayString: pi-:ref, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at ECL0 surface for decayString: pi-:ref, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at ECL1 surface for decayString: pi-:ref, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at KLM0 surface for decayString: pi-:ref, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at CDC0 surface for DecayString: pi-:ref, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at CDC1 surface for DecayString: pi-:ref, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at CDC2 surface for DecayString: pi-:ref, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at CDC3 surface for DecayString: pi-:ref, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at CDC4 surface for DecayString: pi-:ref, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at CDC5 surface for DecayString: pi-:ref, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at CDC6 surface for DecayString: pi-:ref, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at CDC7 surface for DecayString: pi-:ref, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at CDC8 surface for DecayString: pi-:ref, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at TOP0 surface for DecayString: pi-:ref, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at ARICH0 surface for DecayString: pi-:ref, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at ECL0 surface for DecayString: pi-:ref, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at ECL1 surface for DecayString: pi-:ref, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at KLM0 surface for DecayString: pi-:ref, reference ParticleList: pi-:all.
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: K+:all (K-:all)
 [INFO]    -> MDST source: Tracks
 [INFO] ParticleSelector: K+:ref
 [INFO]    -> With cuts  : [pt > 0.1] and [thetaInCDCAcceptance]
-[INFO] Calculating isolation variables at CDC0 surface for decayString: K+:ref, reference ParticleList: K+:all.
-[INFO] Calculating isolation variables at CDC1 surface for decayString: K+:ref, reference ParticleList: K+:all.
-[INFO] Calculating isolation variables at CDC2 surface for decayString: K+:ref, reference ParticleList: K+:all.
-[INFO] Calculating isolation variables at CDC3 surface for decayString: K+:ref, reference ParticleList: K+:all.
-[INFO] Calculating isolation variables at CDC4 surface for decayString: K+:ref, reference ParticleList: K+:all.
-[INFO] Calculating isolation variables at CDC5 surface for decayString: K+:ref, reference ParticleList: K+:all.
-[INFO] Calculating isolation variables at CDC6 surface for decayString: K+:ref, reference ParticleList: K+:all.
-[INFO] Calculating isolation variables at CDC7 surface for decayString: K+:ref, reference ParticleList: K+:all.
-[INFO] Calculating isolation variables at CDC8 surface for decayString: K+:ref, reference ParticleList: K+:all.
-[INFO] Calculating isolation variables at TOP0 surface for decayString: K+:ref, reference ParticleList: K+:all.
-[INFO] Calculating isolation variables at ARICH0 surface for decayString: K+:ref, reference ParticleList: K+:all.
-[INFO] Calculating isolation variables at ECL0 surface for decayString: K+:ref, reference ParticleList: K+:all.
-[INFO] Calculating isolation variables at ECL1 surface for decayString: K+:ref, reference ParticleList: K+:all.
-[INFO] Calculating isolation variables at KLM0 surface for decayString: K+:ref, reference ParticleList: K+:all.
+[INFO] Calculating track-based isolation variables at CDC0 surface for DecayString: K+:ref, reference ParticleList: K+:all.
+[INFO] Calculating track-based isolation variables at CDC1 surface for DecayString: K+:ref, reference ParticleList: K+:all.
+[INFO] Calculating track-based isolation variables at CDC2 surface for DecayString: K+:ref, reference ParticleList: K+:all.
+[INFO] Calculating track-based isolation variables at CDC3 surface for DecayString: K+:ref, reference ParticleList: K+:all.
+[INFO] Calculating track-based isolation variables at CDC4 surface for DecayString: K+:ref, reference ParticleList: K+:all.
+[INFO] Calculating track-based isolation variables at CDC5 surface for DecayString: K+:ref, reference ParticleList: K+:all.
+[INFO] Calculating track-based isolation variables at CDC6 surface for DecayString: K+:ref, reference ParticleList: K+:all.
+[INFO] Calculating track-based isolation variables at CDC7 surface for DecayString: K+:ref, reference ParticleList: K+:all.
+[INFO] Calculating track-based isolation variables at CDC8 surface for DecayString: K+:ref, reference ParticleList: K+:all.
+[INFO] Calculating track-based isolation variables at TOP0 surface for DecayString: K+:ref, reference ParticleList: K+:all.
+[INFO] Calculating track-based isolation variables at ARICH0 surface for DecayString: K+:ref, reference ParticleList: K+:all.
+[INFO] Calculating track-based isolation variables at ECL0 surface for DecayString: K+:ref, reference ParticleList: K+:all.
+[INFO] Calculating track-based isolation variables at ECL1 surface for DecayString: K+:ref, reference ParticleList: K+:all.
+[INFO] Calculating track-based isolation variables at KLM0 surface for DecayString: K+:ref, reference ParticleList: K+:all.
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: K-:all (K+:all)
 [INFO]    -> MDST source: Tracks
 [INFO] ParticleSelector: K-:ref
 [INFO]    -> With cuts  : [pt > 0.1] and [thetaInCDCAcceptance]
-[INFO] Calculating isolation variables at CDC0 surface for decayString: K-:ref, reference ParticleList: K-:all.
-[INFO] Calculating isolation variables at CDC1 surface for decayString: K-:ref, reference ParticleList: K-:all.
-[INFO] Calculating isolation variables at CDC2 surface for decayString: K-:ref, reference ParticleList: K-:all.
-[INFO] Calculating isolation variables at CDC3 surface for decayString: K-:ref, reference ParticleList: K-:all.
-[INFO] Calculating isolation variables at CDC4 surface for decayString: K-:ref, reference ParticleList: K-:all.
-[INFO] Calculating isolation variables at CDC5 surface for decayString: K-:ref, reference ParticleList: K-:all.
-[INFO] Calculating isolation variables at CDC6 surface for decayString: K-:ref, reference ParticleList: K-:all.
-[INFO] Calculating isolation variables at CDC7 surface for decayString: K-:ref, reference ParticleList: K-:all.
-[INFO] Calculating isolation variables at CDC8 surface for decayString: K-:ref, reference ParticleList: K-:all.
-[INFO] Calculating isolation variables at TOP0 surface for decayString: K-:ref, reference ParticleList: K-:all.
-[INFO] Calculating isolation variables at ARICH0 surface for decayString: K-:ref, reference ParticleList: K-:all.
-[INFO] Calculating isolation variables at ECL0 surface for decayString: K-:ref, reference ParticleList: K-:all.
-[INFO] Calculating isolation variables at ECL1 surface for decayString: K-:ref, reference ParticleList: K-:all.
-[INFO] Calculating isolation variables at KLM0 surface for decayString: K-:ref, reference ParticleList: K-:all.
+[INFO] Calculating track-based isolation variables at CDC0 surface for DecayString: K-:ref, reference ParticleList: K-:all.
+[INFO] Calculating track-based isolation variables at CDC1 surface for DecayString: K-:ref, reference ParticleList: K-:all.
+[INFO] Calculating track-based isolation variables at CDC2 surface for DecayString: K-:ref, reference ParticleList: K-:all.
+[INFO] Calculating track-based isolation variables at CDC3 surface for DecayString: K-:ref, reference ParticleList: K-:all.
+[INFO] Calculating track-based isolation variables at CDC4 surface for DecayString: K-:ref, reference ParticleList: K-:all.
+[INFO] Calculating track-based isolation variables at CDC5 surface for DecayString: K-:ref, reference ParticleList: K-:all.
+[INFO] Calculating track-based isolation variables at CDC6 surface for DecayString: K-:ref, reference ParticleList: K-:all.
+[INFO] Calculating track-based isolation variables at CDC7 surface for DecayString: K-:ref, reference ParticleList: K-:all.
+[INFO] Calculating track-based isolation variables at CDC8 surface for DecayString: K-:ref, reference ParticleList: K-:all.
+[INFO] Calculating track-based isolation variables at TOP0 surface for DecayString: K-:ref, reference ParticleList: K-:all.
+[INFO] Calculating track-based isolation variables at ARICH0 surface for DecayString: K-:ref, reference ParticleList: K-:all.
+[INFO] Calculating track-based isolation variables at ECL0 surface for DecayString: K-:ref, reference ParticleList: K-:all.
+[INFO] Calculating track-based isolation variables at ECL1 surface for DecayString: K-:ref, reference ParticleList: K-:all.
+[INFO] Calculating track-based isolation variables at KLM0 surface for DecayString: K-:ref, reference ParticleList: K-:all.
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: p+:all (anti-p-:all)
 [INFO]    -> MDST source: Tracks
 [INFO] ParticleSelector: p+:ref
 [INFO]    -> With cuts  : [pt > 0.1] and [thetaInCDCAcceptance]
-[INFO] Calculating isolation variables at CDC0 surface for decayString: p+:ref, reference ParticleList: p+:all.
-[INFO] Calculating isolation variables at CDC1 surface for decayString: p+:ref, reference ParticleList: p+:all.
-[INFO] Calculating isolation variables at CDC2 surface for decayString: p+:ref, reference ParticleList: p+:all.
-[INFO] Calculating isolation variables at CDC3 surface for decayString: p+:ref, reference ParticleList: p+:all.
-[INFO] Calculating isolation variables at CDC4 surface for decayString: p+:ref, reference ParticleList: p+:all.
-[INFO] Calculating isolation variables at CDC5 surface for decayString: p+:ref, reference ParticleList: p+:all.
-[INFO] Calculating isolation variables at CDC6 surface for decayString: p+:ref, reference ParticleList: p+:all.
-[INFO] Calculating isolation variables at CDC7 surface for decayString: p+:ref, reference ParticleList: p+:all.
-[INFO] Calculating isolation variables at CDC8 surface for decayString: p+:ref, reference ParticleList: p+:all.
-[INFO] Calculating isolation variables at TOP0 surface for decayString: p+:ref, reference ParticleList: p+:all.
-[INFO] Calculating isolation variables at ARICH0 surface for decayString: p+:ref, reference ParticleList: p+:all.
-[INFO] Calculating isolation variables at ECL0 surface for decayString: p+:ref, reference ParticleList: p+:all.
-[INFO] Calculating isolation variables at ECL1 surface for decayString: p+:ref, reference ParticleList: p+:all.
-[INFO] Calculating isolation variables at KLM0 surface for decayString: p+:ref, reference ParticleList: p+:all.
+[INFO] Calculating track-based isolation variables at CDC0 surface for DecayString: p+:ref, reference ParticleList: p+:all.
+[INFO] Calculating track-based isolation variables at CDC1 surface for DecayString: p+:ref, reference ParticleList: p+:all.
+[INFO] Calculating track-based isolation variables at CDC2 surface for DecayString: p+:ref, reference ParticleList: p+:all.
+[INFO] Calculating track-based isolation variables at CDC3 surface for DecayString: p+:ref, reference ParticleList: p+:all.
+[INFO] Calculating track-based isolation variables at CDC4 surface for DecayString: p+:ref, reference ParticleList: p+:all.
+[INFO] Calculating track-based isolation variables at CDC5 surface for DecayString: p+:ref, reference ParticleList: p+:all.
+[INFO] Calculating track-based isolation variables at CDC6 surface for DecayString: p+:ref, reference ParticleList: p+:all.
+[INFO] Calculating track-based isolation variables at CDC7 surface for DecayString: p+:ref, reference ParticleList: p+:all.
+[INFO] Calculating track-based isolation variables at CDC8 surface for DecayString: p+:ref, reference ParticleList: p+:all.
+[INFO] Calculating track-based isolation variables at TOP0 surface for DecayString: p+:ref, reference ParticleList: p+:all.
+[INFO] Calculating track-based isolation variables at ARICH0 surface for DecayString: p+:ref, reference ParticleList: p+:all.
+[INFO] Calculating track-based isolation variables at ECL0 surface for DecayString: p+:ref, reference ParticleList: p+:all.
+[INFO] Calculating track-based isolation variables at ECL1 surface for DecayString: p+:ref, reference ParticleList: p+:all.
+[INFO] Calculating track-based isolation variables at KLM0 surface for DecayString: p+:ref, reference ParticleList: p+:all.
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: anti-p-:all (p+:all)
 [INFO]    -> MDST source: Tracks
 [INFO] ParticleSelector: anti-p-:ref
 [INFO]    -> With cuts  : [pt > 0.1] and [thetaInCDCAcceptance]
-[INFO] Calculating isolation variables at CDC0 surface for decayString: anti-p-:ref, reference ParticleList: anti-p-:all.
-[INFO] Calculating isolation variables at CDC1 surface for decayString: anti-p-:ref, reference ParticleList: anti-p-:all.
-[INFO] Calculating isolation variables at CDC2 surface for decayString: anti-p-:ref, reference ParticleList: anti-p-:all.
-[INFO] Calculating isolation variables at CDC3 surface for decayString: anti-p-:ref, reference ParticleList: anti-p-:all.
-[INFO] Calculating isolation variables at CDC4 surface for decayString: anti-p-:ref, reference ParticleList: anti-p-:all.
-[INFO] Calculating isolation variables at CDC5 surface for decayString: anti-p-:ref, reference ParticleList: anti-p-:all.
-[INFO] Calculating isolation variables at CDC6 surface for decayString: anti-p-:ref, reference ParticleList: anti-p-:all.
-[INFO] Calculating isolation variables at CDC7 surface for decayString: anti-p-:ref, reference ParticleList: anti-p-:all.
-[INFO] Calculating isolation variables at CDC8 surface for decayString: anti-p-:ref, reference ParticleList: anti-p-:all.
-[INFO] Calculating isolation variables at TOP0 surface for decayString: anti-p-:ref, reference ParticleList: anti-p-:all.
-[INFO] Calculating isolation variables at ARICH0 surface for decayString: anti-p-:ref, reference ParticleList: anti-p-:all.
-[INFO] Calculating isolation variables at ECL0 surface for decayString: anti-p-:ref, reference ParticleList: anti-p-:all.
-[INFO] Calculating isolation variables at ECL1 surface for decayString: anti-p-:ref, reference ParticleList: anti-p-:all.
-[INFO] Calculating isolation variables at KLM0 surface for decayString: anti-p-:ref, reference ParticleList: anti-p-:all.
+[INFO] Calculating track-based isolation variables at CDC0 surface for DecayString: anti-p-:ref, reference ParticleList: anti-p-:all.
+[INFO] Calculating track-based isolation variables at CDC1 surface for DecayString: anti-p-:ref, reference ParticleList: anti-p-:all.
+[INFO] Calculating track-based isolation variables at CDC2 surface for DecayString: anti-p-:ref, reference ParticleList: anti-p-:all.
+[INFO] Calculating track-based isolation variables at CDC3 surface for DecayString: anti-p-:ref, reference ParticleList: anti-p-:all.
+[INFO] Calculating track-based isolation variables at CDC4 surface for DecayString: anti-p-:ref, reference ParticleList: anti-p-:all.
+[INFO] Calculating track-based isolation variables at CDC5 surface for DecayString: anti-p-:ref, reference ParticleList: anti-p-:all.
+[INFO] Calculating track-based isolation variables at CDC6 surface for DecayString: anti-p-:ref, reference ParticleList: anti-p-:all.
+[INFO] Calculating track-based isolation variables at CDC7 surface for DecayString: anti-p-:ref, reference ParticleList: anti-p-:all.
+[INFO] Calculating track-based isolation variables at CDC8 surface for DecayString: anti-p-:ref, reference ParticleList: anti-p-:all.
+[INFO] Calculating track-based isolation variables at TOP0 surface for DecayString: anti-p-:ref, reference ParticleList: anti-p-:all.
+[INFO] Calculating track-based isolation variables at ARICH0 surface for DecayString: anti-p-:ref, reference ParticleList: anti-p-:all.
+[INFO] Calculating track-based isolation variables at ECL0 surface for DecayString: anti-p-:ref, reference ParticleList: anti-p-:all.
+[INFO] Calculating track-based isolation variables at ECL1 surface for DecayString: anti-p-:ref, reference ParticleList: anti-p-:all.
+[INFO] Calculating track-based isolation variables at KLM0 surface for DecayString: anti-p-:ref, reference ParticleList: anti-p-:all.
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: deuteron:all (anti-deuteron:all)
 [INFO]    -> MDST source: Tracks
 [INFO] ParticleSelector: deuteron:ref
 [INFO]    -> With cuts  : [pt > 0.1] and [thetaInCDCAcceptance]
-[INFO] Calculating isolation variables at CDC0 surface for decayString: deuteron:ref, reference ParticleList: deuteron:all.
-[INFO] Calculating isolation variables at CDC1 surface for decayString: deuteron:ref, reference ParticleList: deuteron:all.
-[INFO] Calculating isolation variables at CDC2 surface for decayString: deuteron:ref, reference ParticleList: deuteron:all.
-[INFO] Calculating isolation variables at CDC3 surface for decayString: deuteron:ref, reference ParticleList: deuteron:all.
-[INFO] Calculating isolation variables at CDC4 surface for decayString: deuteron:ref, reference ParticleList: deuteron:all.
-[INFO] Calculating isolation variables at CDC5 surface for decayString: deuteron:ref, reference ParticleList: deuteron:all.
-[INFO] Calculating isolation variables at CDC6 surface for decayString: deuteron:ref, reference ParticleList: deuteron:all.
-[INFO] Calculating isolation variables at CDC7 surface for decayString: deuteron:ref, reference ParticleList: deuteron:all.
-[INFO] Calculating isolation variables at CDC8 surface for decayString: deuteron:ref, reference ParticleList: deuteron:all.
-[INFO] Calculating isolation variables at TOP0 surface for decayString: deuteron:ref, reference ParticleList: deuteron:all.
-[INFO] Calculating isolation variables at ARICH0 surface for decayString: deuteron:ref, reference ParticleList: deuteron:all.
-[INFO] Calculating isolation variables at ECL0 surface for decayString: deuteron:ref, reference ParticleList: deuteron:all.
-[INFO] Calculating isolation variables at ECL1 surface for decayString: deuteron:ref, reference ParticleList: deuteron:all.
-[INFO] Calculating isolation variables at KLM0 surface for decayString: deuteron:ref, reference ParticleList: deuteron:all.
+[INFO] Calculating track-based isolation variables at CDC0 surface for DecayString: deuteron:ref, reference ParticleList: deuteron:all.
+[INFO] Calculating track-based isolation variables at CDC1 surface for DecayString: deuteron:ref, reference ParticleList: deuteron:all.
+[INFO] Calculating track-based isolation variables at CDC2 surface for DecayString: deuteron:ref, reference ParticleList: deuteron:all.
+[INFO] Calculating track-based isolation variables at CDC3 surface for DecayString: deuteron:ref, reference ParticleList: deuteron:all.
+[INFO] Calculating track-based isolation variables at CDC4 surface for DecayString: deuteron:ref, reference ParticleList: deuteron:all.
+[INFO] Calculating track-based isolation variables at CDC5 surface for DecayString: deuteron:ref, reference ParticleList: deuteron:all.
+[INFO] Calculating track-based isolation variables at CDC6 surface for DecayString: deuteron:ref, reference ParticleList: deuteron:all.
+[INFO] Calculating track-based isolation variables at CDC7 surface for DecayString: deuteron:ref, reference ParticleList: deuteron:all.
+[INFO] Calculating track-based isolation variables at CDC8 surface for DecayString: deuteron:ref, reference ParticleList: deuteron:all.
+[INFO] Calculating track-based isolation variables at TOP0 surface for DecayString: deuteron:ref, reference ParticleList: deuteron:all.
+[INFO] Calculating track-based isolation variables at ARICH0 surface for DecayString: deuteron:ref, reference ParticleList: deuteron:all.
+[INFO] Calculating track-based isolation variables at ECL0 surface for DecayString: deuteron:ref, reference ParticleList: deuteron:all.
+[INFO] Calculating track-based isolation variables at ECL1 surface for DecayString: deuteron:ref, reference ParticleList: deuteron:all.
+[INFO] Calculating track-based isolation variables at KLM0 surface for DecayString: deuteron:ref, reference ParticleList: deuteron:all.
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: anti-deuteron:all (deuteron:all)
 [INFO]    -> MDST source: Tracks
 [INFO] ParticleSelector: anti-deuteron:ref
 [INFO]    -> With cuts  : [pt > 0.1] and [thetaInCDCAcceptance]
-[INFO] Calculating isolation variables at CDC0 surface for decayString: anti-deuteron:ref, reference ParticleList: anti-deuteron:all.
-[INFO] Calculating isolation variables at CDC1 surface for decayString: anti-deuteron:ref, reference ParticleList: anti-deuteron:all.
-[INFO] Calculating isolation variables at CDC2 surface for decayString: anti-deuteron:ref, reference ParticleList: anti-deuteron:all.
-[INFO] Calculating isolation variables at CDC3 surface for decayString: anti-deuteron:ref, reference ParticleList: anti-deuteron:all.
-[INFO] Calculating isolation variables at CDC4 surface for decayString: anti-deuteron:ref, reference ParticleList: anti-deuteron:all.
-[INFO] Calculating isolation variables at CDC5 surface for decayString: anti-deuteron:ref, reference ParticleList: anti-deuteron:all.
-[INFO] Calculating isolation variables at CDC6 surface for decayString: anti-deuteron:ref, reference ParticleList: anti-deuteron:all.
-[INFO] Calculating isolation variables at CDC7 surface for decayString: anti-deuteron:ref, reference ParticleList: anti-deuteron:all.
-[INFO] Calculating isolation variables at CDC8 surface for decayString: anti-deuteron:ref, reference ParticleList: anti-deuteron:all.
-[INFO] Calculating isolation variables at TOP0 surface for decayString: anti-deuteron:ref, reference ParticleList: anti-deuteron:all.
-[INFO] Calculating isolation variables at ARICH0 surface for decayString: anti-deuteron:ref, reference ParticleList: anti-deuteron:all.
-[INFO] Calculating isolation variables at ECL0 surface for decayString: anti-deuteron:ref, reference ParticleList: anti-deuteron:all.
-[INFO] Calculating isolation variables at ECL1 surface for decayString: anti-deuteron:ref, reference ParticleList: anti-deuteron:all.
-[INFO] Calculating isolation variables at KLM0 surface for decayString: anti-deuteron:ref, reference ParticleList: anti-deuteron:all.
+[INFO] Calculating track-based isolation variables at CDC0 surface for DecayString: anti-deuteron:ref, reference ParticleList: anti-deuteron:all.
+[INFO] Calculating track-based isolation variables at CDC1 surface for DecayString: anti-deuteron:ref, reference ParticleList: anti-deuteron:all.
+[INFO] Calculating track-based isolation variables at CDC2 surface for DecayString: anti-deuteron:ref, reference ParticleList: anti-deuteron:all.
+[INFO] Calculating track-based isolation variables at CDC3 surface for DecayString: anti-deuteron:ref, reference ParticleList: anti-deuteron:all.
+[INFO] Calculating track-based isolation variables at CDC4 surface for DecayString: anti-deuteron:ref, reference ParticleList: anti-deuteron:all.
+[INFO] Calculating track-based isolation variables at CDC5 surface for DecayString: anti-deuteron:ref, reference ParticleList: anti-deuteron:all.
+[INFO] Calculating track-based isolation variables at CDC6 surface for DecayString: anti-deuteron:ref, reference ParticleList: anti-deuteron:all.
+[INFO] Calculating track-based isolation variables at CDC7 surface for DecayString: anti-deuteron:ref, reference ParticleList: anti-deuteron:all.
+[INFO] Calculating track-based isolation variables at CDC8 surface for DecayString: anti-deuteron:ref, reference ParticleList: anti-deuteron:all.
+[INFO] Calculating track-based isolation variables at TOP0 surface for DecayString: anti-deuteron:ref, reference ParticleList: anti-deuteron:all.
+[INFO] Calculating track-based isolation variables at ARICH0 surface for DecayString: anti-deuteron:ref, reference ParticleList: anti-deuteron:all.
+[INFO] Calculating track-based isolation variables at ECL0 surface for DecayString: anti-deuteron:ref, reference ParticleList: anti-deuteron:all.
+[INFO] Calculating track-based isolation variables at ECL1 surface for DecayString: anti-deuteron:ref, reference ParticleList: anti-deuteron:all.
+[INFO] Calculating track-based isolation variables at KLM0 surface for DecayString: anti-deuteron:ref, reference ParticleList: anti-deuteron:all.
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: Lambda0:V0 (anti-Lambda0:V0)
 [INFO]    -> MDST source: V0
@@ -303,34 +303,34 @@
 [INFO]    -> With cuts  : 1.10 < M < 1.13
 [INFO] ParticleSelector: Lambda0:RD
 [INFO]    -> With cuts  : extraInfo(highQualityVertex)
-[INFO] Calculating isolation variables at CDC0 surface for decayString: Lambda0:merged -> ^p+ pi-, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at CDC1 surface for decayString: Lambda0:merged -> ^p+ pi-, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at CDC2 surface for decayString: Lambda0:merged -> ^p+ pi-, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at CDC3 surface for decayString: Lambda0:merged -> ^p+ pi-, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at CDC4 surface for decayString: Lambda0:merged -> ^p+ pi-, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at CDC5 surface for decayString: Lambda0:merged -> ^p+ pi-, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at CDC6 surface for decayString: Lambda0:merged -> ^p+ pi-, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at CDC7 surface for decayString: Lambda0:merged -> ^p+ pi-, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at CDC8 surface for decayString: Lambda0:merged -> ^p+ pi-, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at TOP0 surface for decayString: Lambda0:merged -> ^p+ pi-, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at ARICH0 surface for decayString: Lambda0:merged -> ^p+ pi-, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at ECL0 surface for decayString: Lambda0:merged -> ^p+ pi-, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at ECL1 surface for decayString: Lambda0:merged -> ^p+ pi-, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at KLM0 surface for decayString: Lambda0:merged -> ^p+ pi-, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at CDC0 surface for decayString: Lambda0:merged -> p+ ^pi-, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at CDC1 surface for decayString: Lambda0:merged -> p+ ^pi-, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at CDC2 surface for decayString: Lambda0:merged -> p+ ^pi-, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at CDC3 surface for decayString: Lambda0:merged -> p+ ^pi-, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at CDC4 surface for decayString: Lambda0:merged -> p+ ^pi-, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at CDC5 surface for decayString: Lambda0:merged -> p+ ^pi-, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at CDC6 surface for decayString: Lambda0:merged -> p+ ^pi-, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at CDC7 surface for decayString: Lambda0:merged -> p+ ^pi-, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at CDC8 surface for decayString: Lambda0:merged -> p+ ^pi-, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at TOP0 surface for decayString: Lambda0:merged -> p+ ^pi-, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at ARICH0 surface for decayString: Lambda0:merged -> p+ ^pi-, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at ECL0 surface for decayString: Lambda0:merged -> p+ ^pi-, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at ECL1 surface for decayString: Lambda0:merged -> p+ ^pi-, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at KLM0 surface for decayString: Lambda0:merged -> p+ ^pi-, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at CDC0 surface for DecayString: Lambda0:merged -> ^p+ pi-, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at CDC1 surface for DecayString: Lambda0:merged -> ^p+ pi-, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at CDC2 surface for DecayString: Lambda0:merged -> ^p+ pi-, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at CDC3 surface for DecayString: Lambda0:merged -> ^p+ pi-, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at CDC4 surface for DecayString: Lambda0:merged -> ^p+ pi-, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at CDC5 surface for DecayString: Lambda0:merged -> ^p+ pi-, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at CDC6 surface for DecayString: Lambda0:merged -> ^p+ pi-, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at CDC7 surface for DecayString: Lambda0:merged -> ^p+ pi-, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at CDC8 surface for DecayString: Lambda0:merged -> ^p+ pi-, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at TOP0 surface for DecayString: Lambda0:merged -> ^p+ pi-, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at ARICH0 surface for DecayString: Lambda0:merged -> ^p+ pi-, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at ECL0 surface for DecayString: Lambda0:merged -> ^p+ pi-, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at ECL1 surface for DecayString: Lambda0:merged -> ^p+ pi-, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at KLM0 surface for DecayString: Lambda0:merged -> ^p+ pi-, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at CDC0 surface for DecayString: Lambda0:merged -> p+ ^pi-, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at CDC1 surface for DecayString: Lambda0:merged -> p+ ^pi-, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at CDC2 surface for DecayString: Lambda0:merged -> p+ ^pi-, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at CDC3 surface for DecayString: Lambda0:merged -> p+ ^pi-, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at CDC4 surface for DecayString: Lambda0:merged -> p+ ^pi-, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at CDC5 surface for DecayString: Lambda0:merged -> p+ ^pi-, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at CDC6 surface for DecayString: Lambda0:merged -> p+ ^pi-, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at CDC7 surface for DecayString: Lambda0:merged -> p+ ^pi-, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at CDC8 surface for DecayString: Lambda0:merged -> p+ ^pi-, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at TOP0 surface for DecayString: Lambda0:merged -> p+ ^pi-, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at ARICH0 surface for DecayString: Lambda0:merged -> p+ ^pi-, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at ECL0 surface for DecayString: Lambda0:merged -> p+ ^pi-, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at ECL1 surface for DecayString: Lambda0:merged -> p+ ^pi-, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at KLM0 surface for DecayString: Lambda0:merged -> p+ ^pi-, reference ParticleList: pi-:all.
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: K_S0:V0 (K_S0:V0)
 [INFO]    -> MDST source: V0
@@ -341,34 +341,34 @@
 [INFO]    -> MDST source: Tracks
 [INFO] ParticleSelector: K_S0:RD
 [INFO]    -> With cuts  : 0.450 < M < 0.550
-[INFO] Calculating isolation variables at CDC0 surface for decayString: K_S0:merged -> ^pi+ pi-, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at CDC1 surface for decayString: K_S0:merged -> ^pi+ pi-, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at CDC2 surface for decayString: K_S0:merged -> ^pi+ pi-, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at CDC3 surface for decayString: K_S0:merged -> ^pi+ pi-, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at CDC4 surface for decayString: K_S0:merged -> ^pi+ pi-, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at CDC5 surface for decayString: K_S0:merged -> ^pi+ pi-, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at CDC6 surface for decayString: K_S0:merged -> ^pi+ pi-, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at CDC7 surface for decayString: K_S0:merged -> ^pi+ pi-, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at CDC8 surface for decayString: K_S0:merged -> ^pi+ pi-, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at TOP0 surface for decayString: K_S0:merged -> ^pi+ pi-, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at ARICH0 surface for decayString: K_S0:merged -> ^pi+ pi-, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at ECL0 surface for decayString: K_S0:merged -> ^pi+ pi-, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at ECL1 surface for decayString: K_S0:merged -> ^pi+ pi-, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at KLM0 surface for decayString: K_S0:merged -> ^pi+ pi-, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at CDC0 surface for decayString: K_S0:merged -> pi+ ^pi-, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at CDC1 surface for decayString: K_S0:merged -> pi+ ^pi-, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at CDC2 surface for decayString: K_S0:merged -> pi+ ^pi-, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at CDC3 surface for decayString: K_S0:merged -> pi+ ^pi-, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at CDC4 surface for decayString: K_S0:merged -> pi+ ^pi-, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at CDC5 surface for decayString: K_S0:merged -> pi+ ^pi-, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at CDC6 surface for decayString: K_S0:merged -> pi+ ^pi-, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at CDC7 surface for decayString: K_S0:merged -> pi+ ^pi-, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at CDC8 surface for decayString: K_S0:merged -> pi+ ^pi-, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at TOP0 surface for decayString: K_S0:merged -> pi+ ^pi-, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at ARICH0 surface for decayString: K_S0:merged -> pi+ ^pi-, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at ECL0 surface for decayString: K_S0:merged -> pi+ ^pi-, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at ECL1 surface for decayString: K_S0:merged -> pi+ ^pi-, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at KLM0 surface for decayString: K_S0:merged -> pi+ ^pi-, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at CDC0 surface for DecayString: K_S0:merged -> ^pi+ pi-, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at CDC1 surface for DecayString: K_S0:merged -> ^pi+ pi-, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at CDC2 surface for DecayString: K_S0:merged -> ^pi+ pi-, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at CDC3 surface for DecayString: K_S0:merged -> ^pi+ pi-, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at CDC4 surface for DecayString: K_S0:merged -> ^pi+ pi-, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at CDC5 surface for DecayString: K_S0:merged -> ^pi+ pi-, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at CDC6 surface for DecayString: K_S0:merged -> ^pi+ pi-, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at CDC7 surface for DecayString: K_S0:merged -> ^pi+ pi-, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at CDC8 surface for DecayString: K_S0:merged -> ^pi+ pi-, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at TOP0 surface for DecayString: K_S0:merged -> ^pi+ pi-, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at ARICH0 surface for DecayString: K_S0:merged -> ^pi+ pi-, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at ECL0 surface for DecayString: K_S0:merged -> ^pi+ pi-, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at ECL1 surface for DecayString: K_S0:merged -> ^pi+ pi-, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at KLM0 surface for DecayString: K_S0:merged -> ^pi+ pi-, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at CDC0 surface for DecayString: K_S0:merged -> pi+ ^pi-, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at CDC1 surface for DecayString: K_S0:merged -> pi+ ^pi-, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at CDC2 surface for DecayString: K_S0:merged -> pi+ ^pi-, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at CDC3 surface for DecayString: K_S0:merged -> pi+ ^pi-, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at CDC4 surface for DecayString: K_S0:merged -> pi+ ^pi-, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at CDC5 surface for DecayString: K_S0:merged -> pi+ ^pi-, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at CDC6 surface for DecayString: K_S0:merged -> pi+ ^pi-, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at CDC7 surface for DecayString: K_S0:merged -> pi+ ^pi-, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at CDC8 surface for DecayString: K_S0:merged -> pi+ ^pi-, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at TOP0 surface for DecayString: K_S0:merged -> pi+ ^pi-, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at ARICH0 surface for DecayString: K_S0:merged -> pi+ ^pi-, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at ECL0 surface for DecayString: K_S0:merged -> pi+ ^pi-, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at ECL1 surface for DecayString: K_S0:merged -> pi+ ^pi-, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at KLM0 surface for DecayString: K_S0:merged -> pi+ ^pi-, reference ParticleList: pi-:all.
 [INFO] Conditions Database: found working server
 	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
 [INFO] Conditions data: configured globaltag is release-05-01-03

@@ -106,17 +106,19 @@ void TrackIsoCalculatorModule::event()
 
     auto iParticle = m_pListTarget->getParticle(iPart);
 
-    // Check if the distance for this target particle has been set already,
-    // e.g. by a previous instance of this module.
-    if (iParticle->hasExtraInfo(m_extraInfoName)) {
-      continue;
-    }
-
     if (m_nSelectedDaughters) {
       for (auto* iDaughter : m_decaydescriptor.getSelectionParticles(iParticle)) {
+        // Check if the distance for this target particle has been set already,
+        // e.g. by a previous instance of this module.
+        if (iDaughter->hasExtraInfo(m_extraInfoName)) {
+          continue;
+        }
         targetParticles.insert({iDaughter->getMdstArrayIndex(), iDaughter});
       }
     } else {
+      if (iParticle->hasExtraInfo(m_extraInfoName)) {
+        continue;
+      }
       targetParticles.insert({iParticle->getMdstArrayIndex(), iParticle});
     }
   }
@@ -135,7 +137,9 @@ void TrackIsoCalculatorModule::event()
   // where the keys are pairs of mdst indexes.
   std::map<std::pair<unsigned int, unsigned int>, double> particleMdstIdxPairsToDist;
 
-  for (const auto& [iMdstIdx, iParticle] : targetParticles) {
+  for (const auto& targetParticle : targetParticles) {
+    auto iMdstIdx = targetParticle.first;
+    auto iParticle = targetParticle.second;
 
     for (unsigned int jPart(0); jPart < nParticlesReference; ++jPart) {
 
@@ -167,7 +171,9 @@ void TrackIsoCalculatorModule::event()
   }
 
   // For each particle in the input list, find the minimum among all distances to the reference particles.
-  for (const auto& [iMdstIdx, iParticle] : targetParticles) {
+  for (const auto& targetParticle : targetParticles) {
+    auto iMdstIdx = targetParticle.first;
+    auto iParticle = targetParticle.second;
 
     std::vector<double> iDistances;
     for (const auto& [mdstIdxs, dist] : particleMdstIdxPairsToDist) {

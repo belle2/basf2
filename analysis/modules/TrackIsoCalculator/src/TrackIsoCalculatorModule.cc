@@ -12,8 +12,6 @@
 #include <cmath>
 #include <iomanip>
 
-
-
 using namespace Belle2;
 
 REG_MODULE(TrackIsoCalculator);
@@ -50,7 +48,7 @@ void TrackIsoCalculatorModule::initialize()
 
   bool valid = m_decaydescriptor.init(m_decayString);
   if (!valid) {
-    B2ERROR("Invalid input DecayString: " << m_decayString);
+    B2ERROR("Decay string " << m_decayString << " is invalid.");
   }
 
   const DecayDescriptorParticle* mother = m_decaydescriptor.getMother();
@@ -59,17 +57,17 @@ void TrackIsoCalculatorModule::initialize()
   m_nSelectedDaughters = m_decaydescriptor.getSelectionNames().size();
 
   if (m_nSelectedDaughters > 1) {
-    B2ERROR("Only one *selected* charged stable daughter is allowed in DecayString: " << m_decayString);
+    B2ERROR("More than one daughter is selected in the decay string " << m_decayString << ".");
   }
 
   m_pListReference.isRequired(m_pListReferenceName);
 
-  B2INFO("Calculating track-based isolation variables at " << m_detSurface << " surface for DecayString: "
-         << m_decayString << ", " << "reference ParticleList: " << m_pListReferenceName << ".");
+  B2INFO("Calculating track-based isolation variables at " << m_detSurface << " surface for the decay string "
+         << m_decayString << " using the reference ParticleList " << m_pListReferenceName << ".");
 
   if (!onlySelectedStdChargedInDecay()) {
-    B2FATAL("Selected ParticleList in DecayString: " << m_decayString << " and/or reference ParticleList: " << m_pListReferenceName <<
-            " is not that of a valid particle in Const::chargedStableSet! Aborting...");
+    B2ERROR("Selected ParticleList in decay string " << m_decayString << " and/or reference ParticleList " << m_pListReferenceName <<
+            " is not that of a valid particle in Const::chargedStableSet!");
   }
 
   if (m_useHighestProbMassForExt) {

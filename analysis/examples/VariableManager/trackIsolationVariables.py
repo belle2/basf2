@@ -99,7 +99,7 @@ if __name__ == "__main__":
     # Mode 2: calculate the track isolation variables
     # on the selected muon daughters in the decay.
     # This time, use the mass hypotheiss w/ highest probability for the track extrapolation.
-    trackiso_vars_highestprobmass = ma.calculateTrackIsolation("J/psi:mumu -> ^mu+:muons ^mu-:muons",
+    trackiso_vars_highestprobmass = ma.calculateTrackIsolation("J/psi:mumu -> ^mu+ ^mu-",
                                                                path,
                                                                *args.detectors,
                                                                reference_list_name=ref,

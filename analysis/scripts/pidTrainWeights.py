@@ -1,7 +1,14 @@
-"""
-pidTrainWeights.py
-Connor Hainje & Jan Strube -- {connor.hainje, jan.strube}@pnnl.gov
+#!/usr/bin/env python3
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+"""
 Methods and a script for training PID calibration weights.
 
 Sample usage:

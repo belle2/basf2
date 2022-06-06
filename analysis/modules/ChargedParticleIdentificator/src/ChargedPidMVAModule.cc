@@ -98,10 +98,9 @@ void ChargedPidMVAModule::event()
 {
 
   B2DEBUG(11, "EVENT: " << m_event_metadata->getEvent());
-  for (unsigned int ds_index = 0; ds_index < m_decayStrings.size(); ds_index++) {
-    auto name = m_decayStrings[ds_index];
+  for (auto decayString : m_decayStrings) {
     DecayDescriptor decayDescriptor;
-    decayDescriptor.init(name);
+    decayDescriptor.init(decayString);
     auto pl_name = decayDescriptor.getMother()->getFullName();
     unsigned short m_nSelectedDaughters = decayDescriptor.getSelectionNames().size();
     StoreObjPtr<ParticleList> pList(pl_name);

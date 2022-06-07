@@ -11,6 +11,8 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <tracking/dataobjects/RecoTrack.h>
+#include <framework/datastore/StoreAccessorBase.h>
+#include <framework/datastore/RelationArray.h>
 #include <mdst/dataobjects/Track.h>
 
 /**
@@ -33,9 +35,10 @@ namespace Belle2 {
   private:
     /// Name of the input StoreArray
     std::string m_inputStoreArrayName;
-
+    /// Name of the input StoreArray for flipped tracks
+    std::string m_inputStoreArrayNameFlipped;
     /// Store Array of the input tracks
-    StoreArray<RecoTrack> m_inputRecoTracks;
+    //StoreArray<RecoTrack> m_inputRecoTracks;
     /// Store Array of the input tracks (for relations)
     //StoreArray<Track> m_tracks;
 

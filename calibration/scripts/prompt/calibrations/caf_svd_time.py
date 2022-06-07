@@ -187,8 +187,10 @@ def create_pre_collector_path(clusterizers, isMC=False, max_events_per_run=10000
     modules with different configurations. This way they re-use the same reconstructed objects.
 
     Parameters:
-        clusterizers (list[pybasf2.Module]): All the differently configured SVDSimpleClusterizer modules.
-        They should output to different datastore objects.
+        clusterizers (list[pybasf2.Module]): All the differently configured
+            SVDSimpleClusterizer modules. They should output to different datastore objects.
+        max_events_per_run (int, optional): Max events read per run. Defaults to 10000.
+        is_validation (bool, optional): Is used to produce the validation plots. Defaults to False.
 
     returns:
         pybasf2.Path

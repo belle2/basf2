@@ -20,6 +20,7 @@
 #include <analysis/utility/DistanceTools.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/RotationTools.h>
+#include <analysis/utility/ReferenceFrame.h>
 
 // framework aux
 #include <framework/gearbox/Const.h>
@@ -354,6 +355,17 @@ namespace Belle2 {
       auto* vert = part->getRelatedTo<TagVertex>();
       if (!vert) return realNaN;
       return vert->getTagVolErr();
+    }
+
+    // cosTheta boost direction
+
+    double particleCosThetaBoostDirection(const Particle* part)
+    {
+      const auto& frame = ReferenceFrame::GetCurrent();
+      B2Vector3D boost = PCmsLabTransform().getBoostVector();
+      ROOT::Math::PxPyPzEVector pxpypze = frame.getMomentum(part);
+      B2Vector3D momentum(pxpypze.Px(), pxpypze.Py(), pxpypze.Pz());
+      return cos(momentum.Angle(boost));
     }
 
     double particleInternalTagVMCFlavor(const Particle* part)
@@ -946,6 +958,9 @@ namespace Belle2 {
                       "Returns the error of TagV in the boost direction", "cm");
     REGISTER_VARIABLE("TagVOBoostErr", tagVErrOrthogonalBoostDirection,
                       "Returns the error of TagV in the direction orthogonal to the boost", "cm");
+
+    REGISTER_VARIABLE("cosThetaBoost", particleCosThetaBoostDirection,
+                      "cosine of the angle between momentum and boost vector");
 
     REGISTER_VARIABLE("internalTagVMCFlavor", particleInternalTagVMCFlavor,
                       "[Expert] [Debugging] This variable is only for internal checks of the TagV module by developers. \n"

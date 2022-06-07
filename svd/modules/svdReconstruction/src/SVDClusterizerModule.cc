@@ -507,14 +507,14 @@ void SVDClusterizerModule::alterClusterPosition()
   if (trueHit) {
     double trkLength = isU ? trueHit->getExitU() - trueHit->getEntryU() : trueHit->getExitV() - trueHit->getEntryV();
     double trkHeight = std::abs(trueHit->getExitW() - trueHit->getEntryW());
-    trkAngle = m_radToDeg * atan2(trkLength, trkHeight);
+    trkAngle = atan2(trkLength, trkHeight);
   }
 
   // get the appropriate sigma to alter the position
   double sigma = m_mcFudgeFactor.getFudgeFactor(sensorID, isU, trkAngle);
 
   // do the job
-  float fudgeFactor = (float) gRandom->Gaus(0., sigma) * 0.0001; // microns converted to cm
+  float fudgeFactor = (float) gRandom->Gaus(0., sigma);
   m_storeClusters[clsIndex]->setPosition(clsPosition + fudgeFactor);
 
   B2DEBUG(20, "Layer number: " << layerNum << ", is U side: " << isU << ", track angle: " << trkAngle << ", sigma: " << sigma <<

@@ -136,9 +136,6 @@ namespace Belle2 {
       // 4. Calibration Objects
       bool m_returnRawClusterTime = false; /**< if true cluster time is not calibrated, to be used for time calibration */
 
-      // 5. Utils
-      double m_radToDeg{TMath::RadToDeg()}; /** convert radians to degrees */
-
       DBObjPtr<SVDRecoConfiguration> m_recoConfig; /**< SVD Reconstruction Configuration payload*/
       SVDNoiseCalibrations m_NoiseCal; /**<SVDNoise calibrations db object*/
       SVDClustering m_ClusterCal; /**<SVDCluster calibrations db object*/

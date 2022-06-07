@@ -3438,12 +3438,15 @@ def applyChargedPidMVA(particleLists, path, trainingMode, chargeIndependent=Fals
         decayDescriptor = Belle2.DecayDescriptor()
         for name in plSet:
             if not decayDescriptor.init(name):
-                raise ValueError("Invalid paritlceLists")
-
-            pdg = abs(decayDescriptor.getMother().getPDGCode())
-            if pdg not in binaryHypoPDGCodes:
-                B2WARNING("Given ParticleList: ", name, " (", pdg, ") is neither signal (", binaryHypoPDGCodes[0],
-                          ") nor background (", binaryHypoPDGCodes[1], ").")
+                raise ValueError(f"Invalid particle list {name} in applyChargedPidMVA!")
+            pdgs = [abs(decayDescriptor.getMother().getPDGCode())]
+            daughter_pdgs = decayDescriptor.getSelectionPDGCodes()
+            if len(daughter_pdgs) > 0:
+                pdgs = daughter_pdgs
+            for pdg in pdgs:
+                if pdg not in binaryHypoPDGCodes:
+                    B2WARNING("Given ParticleList: ", name, " (", pdg, ") is neither signal (", binaryHypoPDGCodes[0],
+                              ") nor background (", binaryHypoPDGCodes[1], ").")
 
         chargedpid = register_module("ChargedPidMVA")
         chargedpid.set_name(f"ChargedPidMVA_{binaryHypoPDGCodes[0]}_vs_{binaryHypoPDGCodes[1]}_{mode}")
@@ -3461,9 +3464,10 @@ def applyChargedPidMVA(particleLists, path, trainingMode, chargeIndependent=Fals
     path.add_module(chargedpid)
 
 
-def calculateTrackIsolation(list_name, path, *detectors, reference_list_name=None, highest_prob_mass_for_ext=False):
+def calculateTrackIsolation(decay_string, path, *detectors, reference_list_name=None, highest_prob_mass_for_ext=False):
     """
-    Given a list of charged stable particles, compute variables that quantify "isolation" of the associated tracks.
+    Given an input decay string, compute variables that quantify track-based "isolation" of the charged
+    stable particles in the decay chain.
 
     Note:
         Currently, a proxy for isolation is defined as the distance
@@ -3476,7 +3480,7 @@ def calculateTrackIsolation(list_name, path, *detectors, reference_list_name=Non
 
     - CDC: as the segmentation is very coarse along z,
            the distance is defined as the cord length on the (rho=R, phi) plane.
-           A total of 9 distances are caluclated: the cylindrical surfaces are defined at R values
+           A total of 9 distances are calculated: the cylindrical surfaces are defined at R values
            that correspond to the positions of the 9 CDC wire superlayers.
     - TOP: as there is no segmentation along z,
            the distance is defined as the cord length on the (rho=R, phi) plane.
@@ -3493,17 +3497,18 @@ def calculateTrackIsolation(list_name, path, *detectors, reference_list_name=Non
            Only one distance at the KLM first strip entry radius R (barrel), Z (endcaps) is calculated.
 
     Parameters:
-        list_name (str): name of the input ParticleList.
-                         It must be a list of charged stable particles as defined in ``Const::chargedStableSet``.
-                         The charge-conjugate ParticleList will be also processed automatically.
-        path (basf2.Path): the module is added to this path.
+        decay_string (str): name of the input decay string with selected charged stable daughters,
+                            for example: ``Lambda0:merged -> ^p+ ^pi-``.
+                            Alternatively, it can be a particle list for charged stable particles
+                            as defined in ``Const::chargedStableSet``, for example: ``mu+:all``.
+                            The charge-conjugate particle list will be also processed automatically.
+        path (basf2.Path): path to which module(s) will be added.
         *detectors: detectors for which track isolation variables will be calculated.
                     Choose among: "CDC", "TOP", "ARICH", "ECL", "KLM"
-        reference_list_name (Optional[str]): name of the input ParticleList for the reference track.
-                                             By default, the ``:all`` ParticleList of the same particle type
-                                             of ``list_name`` is used.
-                                             It must be a list of charged stable particles, too.
-                                             The charge-conjugate ParticleList will be also processed automatically.
+        reference_list_name (Optional[str]): name of the input charged stable particle list for the reference tracks.
+                                             By default, the ``:all`` ParticleList of the same type
+                                             of the selected particle in ``decay_string`` is used.
+                                             The charge-conjugate particle list will be also processed automatically.
         highest_prob_mass_for_hex (Optional[bool]): if this option is set, the helix extrapolation for the particles
                                                     will use the track fit result for the most
                                                     probable mass hypothesis, namely, the one that gives the highest
@@ -3515,10 +3520,16 @@ def calculateTrackIsolation(list_name, path, *detectors, reference_list_name=Non
     """
 
     import variables.utils as vu
+    from ROOT import Belle2, TDatabasePDG
+
+    decayDescriptor = Belle2.DecayDescriptor()
+    if not decayDescriptor.init(decay_string):
+        B2FATAL(f"Invalid particle list {decay_string} in calculateTrackIsolation!")
+    no_reference_list_name = not reference_list_name
 
     det_choices = ["CDC", "TOP", "ARICH", "ECL", "KLM"]
     if any(d not in det_choices for d in detectors):
-        B2ERROR("Your input detector list: ", detectors, " contains an invalid choice. Please select among: ", det_choices)
+        B2FATAL("Your input detector list: ", detectors, " contains an invalid choice. Please select among: ", det_choices)
 
     det_labels = []
     for det in detectors:
@@ -3529,20 +3540,42 @@ def calculateTrackIsolation(list_name, path, *detectors, reference_list_name=Non
         else:
             det_labels.append(f"{det}0")
 
-    if reference_list_name is None:
-        particle = list_name.split(":")[0]
-        reference_list_name = f"{particle}:all"
+    # The module allows only one daughter to be selected at a time,
+    # that's why here we preprocess the input decay string.
+    select_symbol = '^'
+    processed_decay_strings = []
+    if select_symbol in decay_string:
+        splitted_ds = decay_string.split(select_symbol)
+        for i in range(decay_string.count(select_symbol)):
+            tmp = list(splitted_ds)
+            tmp.insert(i+1, select_symbol)
+            processed_decay_strings += [''.join(tmp)]
+    else:
+        processed_decay_strings += [decay_string]
 
-    suffix = f"_VS_{reference_list_name}"
-    for det in det_labels:
-        trackiso = path.add_module("TrackIsoCalculator",
-                                   particleList=list_name,
-                                   detectorSurface=det,
-                                   particleListReference=reference_list_name,
-                                   useHighestProbMassForExt=highest_prob_mass_for_ext)
-        trackiso.set_name(f"TrackIsoCalculator{det}{suffix}")
+    for processed_dec in processed_decay_strings:
+        if no_reference_list_name:
+            decayDescriptor.init(processed_dec)
+            daughter_pdgs = decayDescriptor.getSelectionPDGCodes()
+            if len(daughter_pdgs) > 0:
+                reference_list_name = f'{TDatabasePDG.Instance().GetParticle(abs(daughter_pdgs[0])).GetName()}:all'
+            else:
+                reference_list_name = f'{processed_dec.split(":")[0]}:all'
 
-    aliases = vu.create_aliases([f"distToClosestTrkAt{det}{suffix}" for det in det_labels], "extraInfo({variable})")
+        for det in det_labels:
+            trackiso = path.add_module("TrackIsoCalculator",
+                                       decayString=processed_dec,
+                                       detectorSurface=det,
+                                       particleListReference=reference_list_name,
+                                       useHighestProbMassForExt=highest_prob_mass_for_ext)
+            trackiso.set_name(f"TrackIsoCalculator{det}_{processed_dec}_VS_{reference_list_name}")
+
+    # Use a special suffix to identify variables in case the helix extrapolation is done
+    # using the best fit mass hypothesis.
+    extra_suffix = "" if not highest_prob_mass_for_ext else "__useHighestProbMassForExt"
+
+    aliases = vu.create_aliases(
+        [f"distToClosestTrkAt{det}_VS_{reference_list_name}{extra_suffix}" for det in det_labels], "extraInfo({variable})")
 
     return aliases
 

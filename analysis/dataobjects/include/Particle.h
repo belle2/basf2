@@ -887,7 +887,7 @@ namespace Belle2 {
      * be different than the Particle's PDG id as not all mass hypothesis
      * are fitted during the reconstruction.
      */
-    int getPDGCodeUsedForFit()
+    int getPDGCodeUsedForFit() const
     {
       return std::abs(m_pdgCodeUsedForFit);
     }

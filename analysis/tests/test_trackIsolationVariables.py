@@ -8,9 +8,11 @@
 
 import basf2 as b2
 import modularAnalysis as ma
+import stdV0s as stdv0
 import pdg
 from ROOT import Belle2
 import b2test_utils
+import variables.utils as vu
 
 path = b2.create_path()
 
@@ -20,7 +22,6 @@ b2.set_random_seed("1337")
 ma.inputMdstList(filelist=[b2test_utils.require_file("mdst14.root", "validation")],
                  entrySequences=["0:1"],
                  path=path)
-
 detectors = ["CDC", "TOP", "ARICH", "ECL", "KLM"]
 
 # Pdg code of the charged stable particles & antiparticles.
@@ -45,12 +46,27 @@ for pname in pdg.to_names(chargedStableList):
 
     ma.printList(plist, full=True, path=path)
     ma.printVariableValues(plist, ntup_vars, path=path)
-
     ma.variablesToNtuple(plist,
                          ntup_vars,
                          treename=pname,
                          filename="TrackIsolationVariables.root", path=path)
+v0_types = ['Lambda0:merged', 'K_S0:merged']
+v0_functions = [stdv0.stdLambdas, stdv0.stdKshorts]
+v0_decays = [' -> ^p+ ^pi-', ' -> ^pi+ ^pi-']
+for v0_type, v0_function, v0_decay in zip(v0_types, v0_functions, v0_decays):
+    v0_function(path=path)
 
+    ntup_vars = ma.calculateTrackIsolation(v0_type+v0_decay,
+                                           path,
+                                           *detectors)
+    track_vars = vu.create_aliases_for_selected(list_of_variables=ntup_vars,
+                                                decay_string=v0_type+v0_decay)
+    ma.printList(v0_type, full=True, path=path)
+    ma.printVariableValues(v0_type, track_vars, path=path)
+    ma.variablesToNtuple(v0_type,
+                         track_vars,
+                         treename=f"{v0_type.split(':')[0]}",
+                         filename="TrackIsolationVariables.root", path=path)
 with b2test_utils.clean_working_directory():
     with b2test_utils.set_loglevel(b2.LogLevel.INFO):
         b2.process(path)

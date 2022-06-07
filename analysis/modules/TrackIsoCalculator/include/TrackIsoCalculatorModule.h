@@ -16,6 +16,8 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/VariableManager/Utility.h>
+#include <analysis/DecayDescriptor/DecayDescriptor.h>
+#include <framework/datastore/StoreArray.h>
 
 
 namespace Belle2 {
@@ -93,9 +95,19 @@ namespace Belle2 {
   private:
 
     /**
-     * The name of the input ParticleList.
+     * StoreArray of Particles
      */
-    std::string m_pListName;
+    StoreArray<Particle> m_particles;
+
+    /**
+     * The name of the input charged stable particle list, or composite particle w/ charged stable daughters for which distances are to be calculated.
+     */
+    std::string m_decayString;
+
+    /**
+     * The number of selected daughters in the decay string.
+     */
+    unsigned short m_nSelectedDaughters;
 
     /**
      * The name of the input ParticleList of reference tracks.
@@ -144,9 +156,14 @@ namespace Belle2 {
     StoreObjPtr<EventMetaData> m_event_metadata;
 
     /**
-     * The input ParticleList object.
+     * The input ParticleList object for which distances are to be calculated.
      */
-    StoreObjPtr<ParticleList> m_pList;
+    StoreObjPtr<ParticleList> m_pListTarget;
+
+    /**
+     *< Decay descriptor of decays to look for.
+     */
+    DecayDescriptor m_decaydescriptor;
 
     /**
      * The input ParticleList object of reference tracks.
@@ -154,21 +171,21 @@ namespace Belle2 {
     StoreObjPtr<ParticleList> m_pListReference;
 
     /**
-     * If this option is set, the helix extrapolation for the particles in the reference list will use the track fit result
+     * If this option is set, the helix extrapolation for the target and reference particles will use the track fit result
      *  for the most probable mass hypothesis, namely, the one that gives the highest chi2Prob of the fit.
      */
-    bool m_useHighestProbMass;
+    bool m_useHighestProbMassForExt;
 
     /**
      * Calculate the distance between the points where the two input
      * extrapolated track helices cross the given detector's cylindrical surface.
      */
-    double getDistAtDetSurface(Particle* iParticle, Particle* jParticle);
+    double getDistAtDetSurface(const Particle* iParticle, const Particle* jParticle);
 
     /**
      * Check whether input particle list and reference list are of a valid charged stable particle.
      */
-    bool isStdChargedList();
+    bool onlySelectedStdChargedInDecay();
 
   };
 }

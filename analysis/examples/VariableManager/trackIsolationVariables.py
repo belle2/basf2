@@ -78,6 +78,8 @@ if __name__ == "__main__":
     ref = f"{args.std_charged_ref}+:presel"
     ma.fillParticleList(ref, f"{base_trk_selection}", path=path)
 
+    # Mode 1: calculate the track isolation variables
+    # directly on the muons particle list.
     trackiso_vars = ma.calculateTrackIsolation("mu+:muons",
                                                path,
                                                *args.detectors,
@@ -85,7 +87,6 @@ if __name__ == "__main__":
                                                highest_prob_mass_for_ext=False)
 
     # Reconstruct the J/psi decay.
-
     jpsimumu = "J/psi:mumu -> mu+:muons mu-:muons"
     jpsi_cuts = [
         "[2.8 < M < 3.3]",
@@ -95,10 +96,19 @@ if __name__ == "__main__":
 
     ma.reconstructDecay(jpsimumu, jpsi_cut, path=path)
 
+    # Mode 2: calculate the track isolation variables
+    # on the selected muon daughters in the decay.
+    # This time, use the mass hypotheiss w/ highest probability for the track extrapolation.
+    trackiso_vars_highestprobmass = ma.calculateTrackIsolation("J/psi:mumu -> ^mu+ ^mu-",
+                                                               path,
+                                                               *args.detectors,
+                                                               reference_list_name=ref,
+                                                               highest_prob_mass_for_ext=True)
+
     variables_jpsi = vc.kinematics + ["daughterDiffOfPhi(0, 1)"]
     variables_jpsi += vu.create_aliases(variables_jpsi, "useCMSFrame({variable})", "CMS")
     variables_jpsi += vc.inv_mass
-    variables_mu = vc.kinematics + ["theta", "phi", "clusterE"] + trackiso_vars + [
+    variables_mu = vc.kinematics + ["theta", "phi", "clusterE"] + trackiso_vars + trackiso_vars_highestprobmass + [
         "inARICHAcceptance",
         "inCDCAcceptance",
         "inECLAcceptance",

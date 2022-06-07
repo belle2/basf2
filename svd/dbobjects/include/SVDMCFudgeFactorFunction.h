@@ -56,14 +56,23 @@ namespace Belle2 {
     }
 
     //SETTERS FOR function ID = 0 (cheby_v0)
-    /** set the Chebyshev coefficients*/
+    /**
+     * Set the vector of Chebyshev coefficients
+     * Input:
+     * @param c
+     */
     void set_chebyCoeffs(std::vector<double> c)
     {
       m_chebyCoeffs = c;
     }
 
     //SETTERS FOR function ID = 1 (tgraph_v0)
-    /** set the TGraph points */
+    /**
+     * Set vectors of TGraph points (x for angles, y for sigmas)
+     * Input:
+     * @param x
+     * @param y
+     */
     void set_graphPoints(std::vector<double> x, std::vector<double> y)
     {
       m_x = x;
@@ -81,6 +90,8 @@ namespace Belle2 {
 
     /** ID = {0}, rel07: fudge factor parametrized with Chebyshev polynomial
      */
+
+    /** Vector of Chebyshev coefficients */
     std::vector<double> m_chebyCoeffs;
 
     /** cheby_v0 implementation
@@ -97,6 +108,8 @@ namespace Belle2 {
 
     /** ID = {1}, rel07: fudge factor parametrized with linear interpolation between graph points
      */
+
+    /** Vectors of TGraph points, m_x for the angles and m_y for the sigmas */
     std::vector<double> m_x;
     std::vector<double> m_y;
 

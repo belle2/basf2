@@ -13,7 +13,6 @@
 #include <svd/dbobjects/SVDCalibrationsScalar.h>
 #include <svd/dbobjects/SVDMCFudgeFactorFunction.h>
 #include <framework/database/DBObjPtr.h>
-//#include <framework/logging/Logger.h>
 #include <string>
 
 namespace Belle2 {

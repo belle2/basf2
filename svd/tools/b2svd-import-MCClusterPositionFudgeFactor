@@ -10,7 +10,7 @@
 ##########################################################################
 
 """
-SVD MC Cluster ErrorScale Factor Formulas importer:
+SVD MC Cluster Position Fudge Factor Formulas importer:
 json files can be found in the svd_cdb_json repository (B2SVD).
 """
 import basf2 as b2

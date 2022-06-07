@@ -181,7 +181,7 @@ def create_svd_clusterizer(name="ClusterReconstruction",
     return cluster
 
 
-def create_pre_collector_path(clusterizers, isMC=False, max_events_per_run=10000, is_validation=False,):
+def create_pre_collector_path(clusterizers, isMC=False, max_events_per_run=10000, is_validation=False):
     """
     Create a basf2 path that runs a common reconstruction path and also runs several SVDSimpleClusterizer
     modules with different configurations. This way they re-use the same reconstructed objects.

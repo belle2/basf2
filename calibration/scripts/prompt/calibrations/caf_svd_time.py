@@ -181,7 +181,7 @@ def create_svd_clusterizer(name="ClusterReconstruction",
     return cluster
 
 
-def create_pre_collector_path(clusterizers, isMC=False, is_validation=False):
+def create_pre_collector_path(clusterizers, isMC=False, max_events_per_run=10000, is_validation=False,):
     """
     Create a basf2 path that runs a common reconstruction path and also runs several SVDSimpleClusterizer
     modules with different configurations. This way they re-use the same reconstructed objects.
@@ -198,7 +198,7 @@ def create_pre_collector_path(clusterizers, isMC=False, is_validation=False):
 
     # Read from file only what is needed
     if not isMC:
-        path.add_module("RootInput", branchNames=HLT_INPUT_OBJECTS)
+        path.add_module("RootInput", branchNames=HLT_INPUT_OBJECTS, entrySequences=[f'0:{max_events_per_run}'])
     else:
         path.add_module("RootInput")
 
@@ -355,7 +355,7 @@ def get_calibrations(input_data, **kwargs):
 
     pre_collector_path = create_pre_collector_path(
         clusterizers=[cog6, cog3, els3],
-        isMC=isMC)
+        isMC=isMC, max_events_per_run=max_events_per_run)
     pre_collector_path.add_module(coll_cog6)
     pre_collector_path.add_module(coll_cog3)
     # We leave the coll_els3 to be the one "managed" by the CAF
@@ -449,7 +449,7 @@ def get_calibrations(input_data, **kwargs):
         clusterizers=[val_cog6, val_cog6_onTracks,
                       val_cog3, val_cog3_onTracks,
                       val_els3, val_els3_onTracks],
-        isMC=isMC, is_validation=True)
+        isMC=isMC, max_events_per_run=max_events_per_run, is_validation=True)
     val_pre_collector_path.add_module(val_coll_cog6)
     val_pre_collector_path.add_module(val_coll_cog3)
 

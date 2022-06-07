@@ -634,3 +634,71 @@ class BtoKplusLLP(BaseSkim):
                             kinematicCuts, path=path)
 
         return ["B+:b" + btoksLbl]
+
+
+@fancy_skim_header
+class InelasticDarkMatterWithDarkHiggs(BaseSkim):
+    """
+    Skim list contains events with at least one displaced vertex and no additional unused tracks for the IP.
+    """
+    __authors__ = ["Patrick Ecker"]
+    __contact__ = __liaison__
+    __description__ = "Skim for the inelastic Dark Matter with a Dark Higsg analysis."
+    __category__ = "physics, dark sector"
+    ApplyHLTHadronCut = False
+
+    def addParticlesToPDG(self):
+        """Adds the particle codes to the basf2 pdg instance """
+        pdg.add_particle("chi2", 52, 0, 0, 0, 0)
+
+    def load_standard_lists(self, path):
+        stdE("all", path=path)
+        stdMu("all", path=path)
+
+    def additional_setup(self, path):
+        self.addParticlesToPDG()
+
+    def build_lists(self, path):
+        muonRequirement = "muonID > 1e-10"
+        electronRequirement = "electronID_noTOP > 1e-10"
+
+        trackRequirements = "[pionID < 0.99 and formula(nPXDHits + nSVDHits + nCDCHits) > 6]"
+
+        ma.cutAndCopyList("e+:idmdh", "e+:all", f"[{trackRequirements} and {electronRequirement}]", path=path)
+        ma.cutAndCopyList("mu+:idmdh", "mu+:all", f"[{trackRequirements} and {muonRequirement}]", path=path)
+
+        ma.reconstructDecay(
+            decayString="A0:idmdh -> mu+:idmdh mu-:idmdh",
+            cut="pt > 0.1",
+            path=path
+        )
+        vertex.treeFit(
+            list_name="A0:idmdh",
+            conf_level=0,
+            updateAllDaughters=True,
+            path=path,
+        )
+        ma.reconstructDecay(
+            decayString="chi2:idmdh -> e+:idmdh e-:idmdh",
+            cut="pt > 0.1",
+            path=path
+        )
+        vertex.treeFit(
+            list_name="chi2:idmdh",
+            conf_level=0,
+            updateAllDaughters=True,
+            path=path,
+        )
+
+        drCut = "dr >= 0.2"
+        ma.cutAndCopyList("A0:dr", "A0:idmdh", f"[{drCut}]", path=path)
+        ma.cutAndCopyList("chi2:dr", "chi2:idmdh", f"[{drCut}]", path=path)
+
+        nTrackEventCut = "[nCleanedTracks([nCDCHits > 20] and [thetaInCDCAcceptance] and [dr < 0.5] and [abs(dz) < 2]) < 5]"
+        drEventCut = "[nParticlesInList(A0:dr) > 0 or nParticlesInList(chi2:dr) > 0]"
+
+        idmdhEventCuts = f"[{nTrackEventCut} and {drEventCut}]"
+
+        path = self.skim_event_cuts(idmdhEventCuts, path=path)
+
+        return ["A0:idmdh", "chi2:idmdh"]

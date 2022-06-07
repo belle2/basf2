@@ -461,10 +461,10 @@
     1.8e-06   -2.4e-07   -1.1e-07    2.4e-07   -4.2e-06    1.5e-06    6.7e-07
    -2.4e-07    1.2e-06   -3.4e-07    8.4e-07    1.4e-06   -4.9e-07      2e-06
    -1.1e-07   -3.4e-07    1.8e-06    3.7e-07   -5.5e-09    1.7e-09   -4.9e-06
-    2.4e-07    8.4e-07    3.7e-07    9.5e-07    4.8e-08   -1.7e-08    4.6e-11
+    2.4e-07    8.4e-07    3.7e-07    9.5e-07    4.8e-08   -1.7e-08    4.7e-11
    -4.2e-06    1.4e-06   -5.5e-09    4.8e-08    1.1e-05   -3.9e-06   -4.8e-08
     1.5e-06   -4.9e-07    1.7e-09   -1.7e-08   -3.9e-06    1.4e-06    1.9e-08
-    6.7e-07      2e-06   -4.9e-06    4.6e-11   -4.8e-08    1.9e-08    1.6e-05
+    6.7e-07      2e-06   -4.9e-06    4.7e-11   -4.8e-08    1.9e-08    1.6e-05
 
  extra info=( distToClosestTrkAtCDC0_VS_e-:all=1.166 distToClosestTrkAtCDC1_VS_e-:all=1.599 distToClosestTrkAtCDC2_VS_e-:all=0.4999 distToClosestTrkAtCDC3_VS_e-:all=6.672 distToClosestTrkAtCDC4_VS_e-:all=12.72 distToClosestTrkAtCDC5_VS_e-:all=16.06 distToClosestTrkAtCDC6_VS_e-:all=15.79 distToClosestTrkAtCDC7_VS_e-:all=14.34 distToClosestTrkAtCDC8_VS_e-:all=11.49 distToClosestTrkAtECL0_VS_e-:all=64.96 distToClosestTrkAtECL1_VS_e-:all=79.45 distToClosestTrkAtKLM0_VS_e-:all=295.8 distToClosestTrkAtTOP0_VS_e-:all=3.497 ) 
 
@@ -1187,10 +1187,10 @@
     1.8e-06   -2.4e-07   -1.1e-07    2.4e-07   -4.2e-06    1.5e-06    6.7e-07
    -2.4e-07    1.2e-06   -3.4e-07    8.4e-07    1.4e-06   -4.9e-07      2e-06
    -1.1e-07   -3.4e-07    1.8e-06    3.7e-07   -5.5e-09    1.7e-09   -4.9e-06
-    2.4e-07    8.4e-07    3.7e-07    9.5e-07    4.8e-08   -1.7e-08    4.6e-11
+    2.4e-07    8.4e-07    3.7e-07    9.5e-07    4.8e-08   -1.7e-08    4.7e-11
    -4.2e-06    1.4e-06   -5.5e-09    4.8e-08    1.1e-05   -3.9e-06   -4.8e-08
     1.5e-06   -4.9e-07    1.7e-09   -1.7e-08   -3.9e-06    1.4e-06    1.9e-08
-    6.7e-07      2e-06   -4.9e-06    4.6e-11   -4.8e-08    1.9e-08    1.6e-05
+    6.7e-07      2e-06   -4.9e-06    4.7e-11   -4.8e-08    1.9e-08    1.6e-05
 
  extra info=( distToClosestTrkAtCDC0_VS_e+:all=1.166 distToClosestTrkAtCDC0_VS_e-:all=1.166 distToClosestTrkAtCDC1_VS_e+:all=1.599 distToClosestTrkAtCDC1_VS_e-:all=1.599 distToClosestTrkAtCDC2_VS_e+:all=0.4999 distToClosestTrkAtCDC2_VS_e-:all=0.4999 distToClosestTrkAtCDC3_VS_e+:all=6.672 distToClosestTrkAtCDC3_VS_e-:all=6.672 distToClosestTrkAtCDC4_VS_e+:all=12.72 distToClosestTrkAtCDC4_VS_e-:all=12.72 distToClosestTrkAtCDC5_VS_e+:all=16.06 distToClosestTrkAtCDC5_VS_e-:all=16.06 distToClosestTrkAtCDC6_VS_e+:all=15.79 distToClosestTrkAtCDC6_VS_e-:all=15.79 distToClosestTrkAtCDC7_VS_e+:all=14.34 distToClosestTrkAtCDC7_VS_e-:all=14.34 distToClosestTrkAtCDC8_VS_e+:all=11.49 distToClosestTrkAtCDC8_VS_e-:all=11.49 distToClosestTrkAtECL0_VS_e+:all=64.96 distToClosestTrkAtECL0_VS_e-:all=64.96 distToClosestTrkAtECL1_VS_e+:all=79.45 distToClosestTrkAtECL1_VS_e-:all=79.45 distToClosestTrkAtKLM0_VS_e+:all=295.8 distToClosestTrkAtKLM0_VS_e-:all=295.8 distToClosestTrkAtTOP0_VS_e+:all=3.497 distToClosestTrkAtTOP0_VS_e-:all=3.497 ) 
 
@@ -1355,7 +1355,7 @@
 [INFO]  - 9 = -11[5]
 [INFO]      o) distToClosestTrkAtCDC0_VS_e_all = 0.061474
 [INFO]      o) distToClosestTrkAtCDC1_VS_e_all = 1.93964
-[INFO]      o) distToClosestTrkAtCDC2_VS_e_all = 4.1077
+[INFO]      o) distToClosestTrkAtCDC2_VS_e_all = 4.10769
 [INFO]      o) distToClosestTrkAtCDC3_VS_e_all = 9.60065
 [INFO]      o) distToClosestTrkAtCDC4_VS_e_all = 14.8157
 [INFO]      o) distToClosestTrkAtCDC5_VS_e_all = 21.3338
@@ -2487,7 +2487,7 @@
 [INFO]  - 25 = -13[5]
 [INFO]      o) distToClosestTrkAtCDC0_VS_mu_all = 0.061474
 [INFO]      o) distToClosestTrkAtCDC1_VS_mu_all = 1.93964
-[INFO]      o) distToClosestTrkAtCDC2_VS_mu_all = 4.1077
+[INFO]      o) distToClosestTrkAtCDC2_VS_mu_all = 4.10769
 [INFO]      o) distToClosestTrkAtCDC3_VS_mu_all = 9.60065
 [INFO]      o) distToClosestTrkAtCDC4_VS_mu_all = 14.8157
 [INFO]      o) distToClosestTrkAtCDC5_VS_mu_all = 21.3338
@@ -3053,7 +3053,7 @@
 [INFO]  - 41 = 211[5]
 [INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = 0.061474
 [INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = 1.93964
-[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = 4.1077
+[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = 4.10769
 [INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = 9.60065
 [INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = 14.8157
 [INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = 21.3338
@@ -3739,7 +3739,7 @@
 [INFO]  - 41 = 211[13]
 [INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = 0.061474
 [INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = 1.93964
-[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = 4.1077
+[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = 4.10769
 [INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = 9.60065
 [INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = 14.8157
 [INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = 21.3338
@@ -4900,7 +4900,7 @@
 [INFO]      o) distToClosestTrkAtKLM0_VS_K_all = 127.501
 [INFO]  - 60 = 321[15]
 [INFO]      o) distToClosestTrkAtCDC0_VS_K_all = 4.699
-[INFO]      o) distToClosestTrkAtCDC1_VS_K_all = 9.46945
+[INFO]      o) distToClosestTrkAtCDC1_VS_K_all = 9.46946
 [INFO]      o) distToClosestTrkAtCDC2_VS_K_all = 18.8579
 [INFO]      o) distToClosestTrkAtCDC3_VS_K_all = 32.8869
 [INFO]      o) distToClosestTrkAtCDC4_VS_K_all = 31.4296
@@ -5089,10 +5089,10 @@
     3.8e-06    6.5e-08    1.7e-07   -1.6e-06   -2.8e-09    8.4e-08   -6.5e-06
     6.5e-08      4e-06   -1.8e-08   -8.1e-08    2.9e-07   -8.6e-06   -2.5e-07
     1.7e-07   -1.8e-08    3.9e-06    1.2e-06   -2.2e-09    6.8e-08   -8.8e-06
-   -1.6e-06   -8.1e-08    1.2e-06    1.1e-06   -2.8e-09    8.5e-08   -1.5e-11
+   -1.6e-06   -8.1e-08    1.2e-06    1.1e-06   -2.8e-09    8.5e-08   -1.6e-11
    -2.8e-09    2.9e-07   -2.2e-09   -2.8e-09    2.2e-08   -6.6e-07   -5.2e-09
     8.4e-08   -8.6e-06    6.8e-08    8.5e-08   -6.6e-07      2e-05    1.5e-07
-   -6.5e-06   -2.5e-07   -8.8e-06   -1.5e-11   -5.2e-09    1.5e-07    3.1e-05
+   -6.5e-06   -2.5e-07   -8.8e-06   -1.6e-11   -5.2e-09    1.5e-07    3.1e-05
 
  extra info=( distToClosestTrkAtCDC0_VS_p+:all=0.2766 distToClosestTrkAtCDC1_VS_p+:all=2.101 distToClosestTrkAtCDC2_VS_p+:all=6.034 distToClosestTrkAtCDC3_VS_p+:all=12.37 distToClosestTrkAtCDC4_VS_p+:all=14.33 distToClosestTrkAtCDC5_VS_p+:all=8.118 distToClosestTrkAtCDC6_VS_p+:all=0.9312 distToClosestTrkAtCDC7_VS_p+:all=13.7 distToClosestTrkAtCDC8_VS_p+:all=29.52 distToClosestTrkAtECL0_VS_p+:all=80.16 distToClosestTrkAtECL1_VS_p+:all=84 distToClosestTrkAtKLM0_VS_p+:all=158.1 distToClosestTrkAtTOP0_VS_p+:all=59.71 ) 
 
@@ -5422,7 +5422,7 @@
 [INFO]  - 75 = -2212[12]
 [INFO]      o) distToClosestTrkAtCDC0_VS_p_all = 7.89843
 [INFO]      o) distToClosestTrkAtCDC1_VS_p_all = 14.9954
-[INFO]      o) distToClosestTrkAtCDC2_VS_p_all = 21.6427
+[INFO]      o) distToClosestTrkAtCDC2_VS_p_all = 21.6428
 [INFO]      o) distToClosestTrkAtCDC3_VS_p_all = 23.2448
 [INFO]      o) distToClosestTrkAtCDC4_VS_p_all = 22.6647
 [INFO]      o) distToClosestTrkAtCDC5_VS_p_all = 19.7986
@@ -5477,7 +5477,7 @@
 [INFO]      o) distToClosestTrkAtTOP0_VS_p_all = nan
 [INFO]      o) distToClosestTrkAtARICH0_VS_p_all = 91.908
 [INFO]      o) distToClosestTrkAtECL0_VS_p_all = 93.514
-[INFO]      o) distToClosestTrkAtECL1_VS_p_all = 99.0854
+[INFO]      o) distToClosestTrkAtECL1_VS_p_all = 99.0855
 [INFO]      o) distToClosestTrkAtKLM0_VS_p_all = nan
 [INFO] [ParticlePrinterModule] END   ------------------------------
 [INFO] [ParticlePrinterModule] START ------------------------------
@@ -5495,10 +5495,10 @@
     3.8e-06    6.5e-08    1.7e-07   -1.6e-06   -2.8e-09    8.4e-08   -6.5e-06
     6.5e-08      4e-06   -1.8e-08   -8.1e-08    2.9e-07   -8.6e-06   -2.5e-07
     1.7e-07   -1.8e-08    3.9e-06    1.2e-06   -2.2e-09    6.8e-08   -8.8e-06
-   -1.6e-06   -8.1e-08    1.2e-06    1.1e-06   -2.8e-09    8.5e-08   -1.5e-11
+   -1.6e-06   -8.1e-08    1.2e-06    1.1e-06   -2.8e-09    8.5e-08   -1.6e-11
    -2.8e-09    2.9e-07   -2.2e-09   -2.8e-09    2.2e-08   -6.6e-07   -5.2e-09
     8.4e-08   -8.6e-06    6.8e-08    8.5e-08   -6.6e-07      2e-05    1.5e-07
-   -6.5e-06   -2.5e-07   -8.8e-06   -1.5e-11   -5.2e-09    1.5e-07    3.1e-05
+   -6.5e-06   -2.5e-07   -8.8e-06   -1.6e-11   -5.2e-09    1.5e-07    3.1e-05
 
  extra info=( distToClosestTrkAtCDC0_VS_anti-p-:all=0.2766 distToClosestTrkAtCDC0_VS_p+:all=0.2766 distToClosestTrkAtCDC1_VS_anti-p-:all=2.101 distToClosestTrkAtCDC1_VS_p+:all=2.101 distToClosestTrkAtCDC2_VS_anti-p-:all=6.034 distToClosestTrkAtCDC2_VS_p+:all=6.034 distToClosestTrkAtCDC3_VS_anti-p-:all=12.37 distToClosestTrkAtCDC3_VS_p+:all=12.37 distToClosestTrkAtCDC4_VS_anti-p-:all=14.33 distToClosestTrkAtCDC4_VS_p+:all=14.33 distToClosestTrkAtCDC5_VS_anti-p-:all=8.118 distToClosestTrkAtCDC5_VS_p+:all=8.118 distToClosestTrkAtCDC6_VS_anti-p-:all=0.9312 distToClosestTrkAtCDC6_VS_p+:all=0.9312 distToClosestTrkAtCDC7_VS_anti-p-:all=13.7 distToClosestTrkAtCDC7_VS_p+:all=13.7 distToClosestTrkAtCDC8_VS_anti-p-:all=29.52 distToClosestTrkAtCDC8_VS_p+:all=29.52 distToClosestTrkAtECL0_VS_anti-p-:all=80.16 distToClosestTrkAtECL0_VS_p+:all=80.16 distToClosestTrkAtECL1_VS_anti-p-:all=84 distToClosestTrkAtECL1_VS_p+:all=84 distToClosestTrkAtKLM0_VS_anti-p-:all=158.1 distToClosestTrkAtKLM0_VS_p+:all=158.1 distToClosestTrkAtTOP0_VS_anti-p-:all=59.71 distToClosestTrkAtTOP0_VS_p+:all=59.71 ) 
 
@@ -5868,7 +5868,7 @@
 [INFO]  - 75 = -2212[4]
 [INFO]      o) distToClosestTrkAtCDC0_VS_anti_p_all = 7.89843
 [INFO]      o) distToClosestTrkAtCDC1_VS_anti_p_all = 14.9954
-[INFO]      o) distToClosestTrkAtCDC2_VS_anti_p_all = 21.6427
+[INFO]      o) distToClosestTrkAtCDC2_VS_anti_p_all = 21.6428
 [INFO]      o) distToClosestTrkAtCDC3_VS_anti_p_all = 23.2448
 [INFO]      o) distToClosestTrkAtCDC4_VS_anti_p_all = 22.6647
 [INFO]      o) distToClosestTrkAtCDC5_VS_anti_p_all = 19.7986
@@ -5923,7 +5923,7 @@
 [INFO]      o) distToClosestTrkAtTOP0_VS_anti_p_all = nan
 [INFO]      o) distToClosestTrkAtARICH0_VS_anti_p_all = 91.908
 [INFO]      o) distToClosestTrkAtECL0_VS_anti_p_all = 93.514
-[INFO]      o) distToClosestTrkAtECL1_VS_anti_p_all = 99.0854
+[INFO]      o) distToClosestTrkAtECL1_VS_anti_p_all = 99.0855
 [INFO]      o) distToClosestTrkAtKLM0_VS_anti_p_all = nan
 [INFO]  - 64 = 2212[8]
 [INFO]      o) distToClosestTrkAtCDC0_VS_anti_p_all = 4.23586
@@ -6554,7 +6554,7 @@
 [INFO]  - 91 = -1000010020[12]
 [INFO]      o) distToClosestTrkAtCDC0_VS_deuteron_all = 7.89843
 [INFO]      o) distToClosestTrkAtCDC1_VS_deuteron_all = 14.9954
-[INFO]      o) distToClosestTrkAtCDC2_VS_deuteron_all = 21.6427
+[INFO]      o) distToClosestTrkAtCDC2_VS_deuteron_all = 21.6428
 [INFO]      o) distToClosestTrkAtCDC3_VS_deuteron_all = 23.2448
 [INFO]      o) distToClosestTrkAtCDC4_VS_deuteron_all = 22.6647
 [INFO]      o) distToClosestTrkAtCDC5_VS_deuteron_all = 19.7986
@@ -6609,7 +6609,7 @@
 [INFO]      o) distToClosestTrkAtTOP0_VS_deuteron_all = nan
 [INFO]      o) distToClosestTrkAtARICH0_VS_deuteron_all = 91.908
 [INFO]      o) distToClosestTrkAtECL0_VS_deuteron_all = 93.514
-[INFO]      o) distToClosestTrkAtECL1_VS_deuteron_all = 99.0854
+[INFO]      o) distToClosestTrkAtECL1_VS_deuteron_all = 99.0855
 [INFO]      o) distToClosestTrkAtKLM0_VS_deuteron_all = nan
 [INFO] [ParticlePrinterModule] END   ------------------------------
 [INFO] [ParticlePrinterModule] START ------------------------------
@@ -7000,7 +7000,7 @@
 [INFO]  - 91 = -1000010020[4]
 [INFO]      o) distToClosestTrkAtCDC0_VS_anti_deuteron_all = 7.89843
 [INFO]      o) distToClosestTrkAtCDC1_VS_anti_deuteron_all = 14.9954
-[INFO]      o) distToClosestTrkAtCDC2_VS_anti_deuteron_all = 21.6427
+[INFO]      o) distToClosestTrkAtCDC2_VS_anti_deuteron_all = 21.6428
 [INFO]      o) distToClosestTrkAtCDC3_VS_anti_deuteron_all = 23.2448
 [INFO]      o) distToClosestTrkAtCDC4_VS_anti_deuteron_all = 22.6647
 [INFO]      o) distToClosestTrkAtCDC5_VS_anti_deuteron_all = 19.7986
@@ -7055,7 +7055,7 @@
 [INFO]      o) distToClosestTrkAtTOP0_VS_anti_deuteron_all = nan
 [INFO]      o) distToClosestTrkAtARICH0_VS_anti_deuteron_all = 91.908
 [INFO]      o) distToClosestTrkAtECL0_VS_anti_deuteron_all = 93.514
-[INFO]      o) distToClosestTrkAtECL1_VS_anti_deuteron_all = 99.0854
+[INFO]      o) distToClosestTrkAtECL1_VS_anti_deuteron_all = 99.0855
 [INFO]      o) distToClosestTrkAtKLM0_VS_anti_deuteron_all = nan
 [INFO]  - 80 = 1000010020[8]
 [INFO]      o) distToClosestTrkAtCDC0_VS_anti_deuteron_all = 4.23586
@@ -7239,7 +7239,7 @@
 [INFO]      o) p_distToClosestTrkAtTOP0_VS_p_all = nan
 [INFO]      o) p_distToClosestTrkAtARICH0_VS_p_all = 91.908
 [INFO]      o) p_distToClosestTrkAtECL0_VS_p_all = 93.514
-[INFO]      o) p_distToClosestTrkAtECL1_VS_p_all = 99.0854
+[INFO]      o) p_distToClosestTrkAtECL1_VS_p_all = 99.0855
 [INFO]      o) p_distToClosestTrkAtKLM0_VS_p_all = nan
 [INFO]      o) pi_distToClosestTrkAtCDC0_VS_p_all = 1.49506
 [INFO]      o) pi_distToClosestTrkAtCDC1_VS_p_all = 3.9567
@@ -7423,7 +7423,7 @@
  momentum=(0.26, 0.08, -0.03) p=0.2761
  momentum scaling factor=1
  position=(-50.92, 44.96, 41.95)
- p-value of fit (if done): 0
+ p-value of fit (if done): 9.434e-174
  error matrix (px, py, pz, E, x, y ,z):
     3.4e-06    1.9e-06   -2.1e-06    2.8e-06          0          0          0
     1.9e-06    8.6e-06   -1.1e-06    4.7e-06          0          0          0
@@ -7433,7 +7433,7 @@
           0          0          0          0      -0.11       0.52      0.059
           0          0          0          0       0.04      0.059        0.6
 
- extra info=( chiSquared=789.7 decayModeID=1 failed=0 modifiedPValue=0 ndf=1 ) 
+ extra info=( chiSquared=789.7 decayModeID=1 failed=0 modifiedPValue=7.469e-171 ndf=1 ) 
 
 [INFO] collection=Particles
  PDGCode=310 Charge=0 PDGMass=0.4976
@@ -7462,7 +7462,7 @@
 [INFO]  - 160 = 310[0]
 [INFO]      o) pi_0_distToClosestTrkAtCDC0_VS_pi_all = 0.061474
 [INFO]      o) pi_0_distToClosestTrkAtCDC1_VS_pi_all = 1.93964
-[INFO]      o) pi_0_distToClosestTrkAtCDC2_VS_pi_all = 4.1077
+[INFO]      o) pi_0_distToClosestTrkAtCDC2_VS_pi_all = 4.10769
 [INFO]      o) pi_0_distToClosestTrkAtCDC3_VS_pi_all = 9.60065
 [INFO]      o) pi_0_distToClosestTrkAtCDC4_VS_pi_all = 14.8157
 [INFO]      o) pi_0_distToClosestTrkAtCDC5_VS_pi_all = 21.3338
@@ -9665,7 +9665,7 @@
    -1.1e-05   -9.5e-06   -3.2e-08   -6.2e-08    5.3e-05    4.5e-05   -7.6e-07
    -1.8e-05    2.1e-05   -2.2e-05   -1.3e-09   -9.4e-07   -7.6e-07    0.00028
 
- extra info=( distToClosestTrkAtCDC0_VS_K+:all=5.49 distToClosestTrkAtCDC1_VS_K+:all=7.428 distToClosestTrkAtCDC2_VS_K+:all=8.777 distToClosestTrkAtCDC3_VS_K+:all=8.839 distToClosestTrkAtCDC4_VS_K+:all=7.343 distToClosestTrkAtCDC5_VS_K+:all=3.652 distToClosestTrkAtCDC6_VS_K+:all=2.97 distToClosestTrkAtCDC7_VS_K+:all=4.094 distToClosestTrkAtCDC8_VS_K+:all=8.842 ) 
+ extra info=( distToClosestTrkAtCDC0_VS_K+:all=5.49 distToClosestTrkAtCDC1_VS_K+:all=7.428 distToClosestTrkAtCDC2_VS_K+:all=8.777 distToClosestTrkAtCDC3_VS_K+:all=8.839 distToClosestTrkAtCDC4_VS_K+:all=7.343 distToClosestTrkAtCDC5_VS_K+:all=3.652 distToClosestTrkAtCDC6_VS_K+:all=2.971 distToClosestTrkAtCDC7_VS_K+:all=4.094 distToClosestTrkAtCDC8_VS_K+:all=8.842 ) 
 
 [INFO] collection=Particles
  PDGCode=321 Charge=1 PDGMass=0.4937
@@ -9685,7 +9685,7 @@
      -2e-06     -7e-07    1.1e-08   -1.7e-08    6.4e-06    1.9e-06   -5.9e-08
       1e-08    8.8e-08   -7.9e-06    6.4e-11   -1.9e-07   -5.9e-08    2.5e-05
 
- extra info=( distToClosestTrkAtCDC0_VS_K+:all=5.49 distToClosestTrkAtCDC1_VS_K+:all=7.428 distToClosestTrkAtCDC2_VS_K+:all=8.777 distToClosestTrkAtCDC3_VS_K+:all=8.839 distToClosestTrkAtCDC4_VS_K+:all=7.343 distToClosestTrkAtCDC5_VS_K+:all=3.652 distToClosestTrkAtCDC6_VS_K+:all=2.97 distToClosestTrkAtCDC7_VS_K+:all=11.67 distToClosestTrkAtCDC8_VS_K+:all=7.327 distToClosestTrkAtECL0_VS_K+:all=86.51 distToClosestTrkAtECL1_VS_K+:all=99.47 distToClosestTrkAtTOP0_VS_K+:all=2.123 ) 
+ extra info=( distToClosestTrkAtCDC0_VS_K+:all=5.49 distToClosestTrkAtCDC1_VS_K+:all=7.428 distToClosestTrkAtCDC2_VS_K+:all=8.777 distToClosestTrkAtCDC3_VS_K+:all=8.839 distToClosestTrkAtCDC4_VS_K+:all=7.343 distToClosestTrkAtCDC5_VS_K+:all=3.652 distToClosestTrkAtCDC6_VS_K+:all=2.971 distToClosestTrkAtCDC7_VS_K+:all=11.67 distToClosestTrkAtCDC8_VS_K+:all=7.327 distToClosestTrkAtECL0_VS_K+:all=86.51 distToClosestTrkAtECL1_VS_K+:all=99.47 distToClosestTrkAtTOP0_VS_K+:all=2.123 ) 
 
 [INFO] collection=Particles
  PDGCode=321 Charge=1 PDGMass=0.4937
@@ -10086,7 +10086,7 @@
    -1.1e-05   -9.5e-06   -3.2e-08   -6.2e-08    5.3e-05    4.5e-05   -7.6e-07
    -1.8e-05    2.1e-05   -2.2e-05   -1.3e-09   -9.4e-07   -7.6e-07    0.00028
 
- extra info=( distToClosestTrkAtCDC0_VS_K+:all=5.49 distToClosestTrkAtCDC0_VS_K-:all=5.49 distToClosestTrkAtCDC1_VS_K+:all=7.428 distToClosestTrkAtCDC1_VS_K-:all=7.428 distToClosestTrkAtCDC2_VS_K+:all=8.777 distToClosestTrkAtCDC2_VS_K-:all=8.777 distToClosestTrkAtCDC3_VS_K+:all=8.839 distToClosestTrkAtCDC3_VS_K-:all=8.839 distToClosestTrkAtCDC4_VS_K+:all=7.343 distToClosestTrkAtCDC4_VS_K-:all=7.343 distToClosestTrkAtCDC5_VS_K+:all=3.652 distToClosestTrkAtCDC5_VS_K-:all=3.652 distToClosestTrkAtCDC6_VS_K+:all=2.97 distToClosestTrkAtCDC6_VS_K-:all=2.97 distToClosestTrkAtCDC7_VS_K+:all=4.094 distToClosestTrkAtCDC7_VS_K-:all=4.094 distToClosestTrkAtCDC8_VS_K+:all=8.842 distToClosestTrkAtCDC8_VS_K-:all=8.842 ) 
+ extra info=( distToClosestTrkAtCDC0_VS_K+:all=5.49 distToClosestTrkAtCDC0_VS_K-:all=5.49 distToClosestTrkAtCDC1_VS_K+:all=7.428 distToClosestTrkAtCDC1_VS_K-:all=7.428 distToClosestTrkAtCDC2_VS_K+:all=8.777 distToClosestTrkAtCDC2_VS_K-:all=8.777 distToClosestTrkAtCDC3_VS_K+:all=8.839 distToClosestTrkAtCDC3_VS_K-:all=8.839 distToClosestTrkAtCDC4_VS_K+:all=7.343 distToClosestTrkAtCDC4_VS_K-:all=7.343 distToClosestTrkAtCDC5_VS_K+:all=3.652 distToClosestTrkAtCDC5_VS_K-:all=3.652 distToClosestTrkAtCDC6_VS_K+:all=2.971 distToClosestTrkAtCDC6_VS_K-:all=2.971 distToClosestTrkAtCDC7_VS_K+:all=4.094 distToClosestTrkAtCDC7_VS_K-:all=4.094 distToClosestTrkAtCDC8_VS_K+:all=8.842 distToClosestTrkAtCDC8_VS_K-:all=8.842 ) 
 
 [INFO] collection=Particles
  PDGCode=321 Charge=1 PDGMass=0.4937
@@ -10106,7 +10106,7 @@
      -2e-06     -7e-07    1.1e-08   -1.7e-08    6.4e-06    1.9e-06   -5.9e-08
       1e-08    8.8e-08   -7.9e-06    6.4e-11   -1.9e-07   -5.9e-08    2.5e-05
 
- extra info=( distToClosestTrkAtCDC0_VS_K+:all=5.49 distToClosestTrkAtCDC0_VS_K-:all=5.49 distToClosestTrkAtCDC1_VS_K+:all=7.428 distToClosestTrkAtCDC1_VS_K-:all=7.428 distToClosestTrkAtCDC2_VS_K+:all=8.777 distToClosestTrkAtCDC2_VS_K-:all=8.777 distToClosestTrkAtCDC3_VS_K+:all=8.839 distToClosestTrkAtCDC3_VS_K-:all=8.839 distToClosestTrkAtCDC4_VS_K+:all=7.343 distToClosestTrkAtCDC4_VS_K-:all=7.343 distToClosestTrkAtCDC5_VS_K+:all=3.652 distToClosestTrkAtCDC5_VS_K-:all=3.652 distToClosestTrkAtCDC6_VS_K+:all=2.97 distToClosestTrkAtCDC6_VS_K-:all=2.97 distToClosestTrkAtCDC7_VS_K+:all=11.67 distToClosestTrkAtCDC7_VS_K-:all=11.67 distToClosestTrkAtCDC8_VS_K+:all=7.327 distToClosestTrkAtCDC8_VS_K-:all=7.327 distToClosestTrkAtECL0_VS_K+:all=86.51 distToClosestTrkAtECL0_VS_K-:all=86.51 distToClosestTrkAtECL1_VS_K+:all=99.47 distToClosestTrkAtECL1_VS_K-:all=99.47 distToClosestTrkAtTOP0_VS_K+:all=2.123 distToClosestTrkAtTOP0_VS_K-:all=2.123 ) 
+ extra info=( distToClosestTrkAtCDC0_VS_K+:all=5.49 distToClosestTrkAtCDC0_VS_K-:all=5.49 distToClosestTrkAtCDC1_VS_K+:all=7.428 distToClosestTrkAtCDC1_VS_K-:all=7.428 distToClosestTrkAtCDC2_VS_K+:all=8.777 distToClosestTrkAtCDC2_VS_K-:all=8.777 distToClosestTrkAtCDC3_VS_K+:all=8.839 distToClosestTrkAtCDC3_VS_K-:all=8.839 distToClosestTrkAtCDC4_VS_K+:all=7.343 distToClosestTrkAtCDC4_VS_K-:all=7.343 distToClosestTrkAtCDC5_VS_K+:all=3.652 distToClosestTrkAtCDC5_VS_K-:all=3.652 distToClosestTrkAtCDC6_VS_K+:all=2.971 distToClosestTrkAtCDC6_VS_K-:all=2.971 distToClosestTrkAtCDC7_VS_K+:all=11.67 distToClosestTrkAtCDC7_VS_K-:all=11.67 distToClosestTrkAtCDC8_VS_K+:all=7.327 distToClosestTrkAtCDC8_VS_K-:all=7.327 distToClosestTrkAtECL0_VS_K+:all=86.51 distToClosestTrkAtECL0_VS_K-:all=86.51 distToClosestTrkAtECL1_VS_K+:all=99.47 distToClosestTrkAtECL1_VS_K-:all=99.47 distToClosestTrkAtTOP0_VS_K+:all=2.123 distToClosestTrkAtTOP0_VS_K-:all=2.123 ) 
 
 [INFO] collection=Particles
  PDGCode=321 Charge=1 PDGMass=0.4937
@@ -10302,10 +10302,10 @@
       1e-05    1.1e-06    1.7e-06   -9.1e-07   -2.9e-05   -2.4e-05     -4e-05
     1.1e-06      1e-05     -2e-06    1.1e-06   -2.5e-05   -2.1e-05    4.8e-05
     1.7e-06     -2e-06    8.1e-06    1.8e-06   -1.3e-07   -1.1e-07     -5e-05
-   -9.1e-07    1.1e-06    1.8e-06    8.8e-07   -1.3e-07   -1.1e-07    2.1e-10
+   -9.1e-07    1.1e-06    1.8e-06    8.8e-07   -1.3e-07   -1.1e-07      2e-10
    -2.9e-05   -2.5e-05   -1.3e-07   -1.3e-07    0.00013    0.00011   -2.7e-06
    -2.4e-05   -2.1e-05   -1.1e-07   -1.1e-07    0.00011    9.1e-05   -2.2e-06
-     -4e-05    4.8e-05     -5e-05    2.1e-10   -2.7e-06   -2.2e-06    0.00057
+     -4e-05    4.8e-05     -5e-05      2e-10   -2.7e-06   -2.2e-06    0.00057
 
  extra info=( distToClosestTrkAtARICH0_VS_p+:all=170.4 distToClosestTrkAtCDC0_VS_p+:all=5.617 distToClosestTrkAtCDC1_VS_p+:all=7.747 distToClosestTrkAtCDC2_VS_p+:all=9.468 distToClosestTrkAtCDC3_VS_p+:all=10.12 distToClosestTrkAtCDC4_VS_p+:all=9.471 distToClosestTrkAtCDC5_VS_p+:all=7.127 distToClosestTrkAtCDC6_VS_p+:all=2.663 distToClosestTrkAtCDC7_VS_p+:all=5.546 distToClosestTrkAtCDC8_VS_p+:all=0.2967 distToClosestTrkAtECL0_VS_p+:all=164.3 ) 
 
@@ -10723,10 +10723,10 @@
       1e-05    1.1e-06    1.7e-06   -9.1e-07   -2.9e-05   -2.4e-05     -4e-05
     1.1e-06      1e-05     -2e-06    1.1e-06   -2.5e-05   -2.1e-05    4.8e-05
     1.7e-06     -2e-06    8.1e-06    1.8e-06   -1.3e-07   -1.1e-07     -5e-05
-   -9.1e-07    1.1e-06    1.8e-06    8.8e-07   -1.3e-07   -1.1e-07    2.1e-10
+   -9.1e-07    1.1e-06    1.8e-06    8.8e-07   -1.3e-07   -1.1e-07      2e-10
    -2.9e-05   -2.5e-05   -1.3e-07   -1.3e-07    0.00013    0.00011   -2.7e-06
    -2.4e-05   -2.1e-05   -1.1e-07   -1.1e-07    0.00011    9.1e-05   -2.2e-06
-     -4e-05    4.8e-05     -5e-05    2.1e-10   -2.7e-06   -2.2e-06    0.00057
+     -4e-05    4.8e-05     -5e-05      2e-10   -2.7e-06   -2.2e-06    0.00057
 
  extra info=( distToClosestTrkAtARICH0_VS_anti-p-:all=170.4 distToClosestTrkAtARICH0_VS_p+:all=170.4 distToClosestTrkAtCDC0_VS_anti-p-:all=5.617 distToClosestTrkAtCDC0_VS_p+:all=5.617 distToClosestTrkAtCDC1_VS_anti-p-:all=7.747 distToClosestTrkAtCDC1_VS_p+:all=7.747 distToClosestTrkAtCDC2_VS_anti-p-:all=9.468 distToClosestTrkAtCDC2_VS_p+:all=9.468 distToClosestTrkAtCDC3_VS_anti-p-:all=10.12 distToClosestTrkAtCDC3_VS_p+:all=10.12 distToClosestTrkAtCDC4_VS_anti-p-:all=9.471 distToClosestTrkAtCDC4_VS_p+:all=9.471 distToClosestTrkAtCDC5_VS_anti-p-:all=7.127 distToClosestTrkAtCDC5_VS_p+:all=7.127 distToClosestTrkAtCDC6_VS_anti-p-:all=2.663 distToClosestTrkAtCDC6_VS_p+:all=2.663 distToClosestTrkAtCDC7_VS_anti-p-:all=5.546 distToClosestTrkAtCDC7_VS_p+:all=5.546 distToClosestTrkAtCDC8_VS_anti-p-:all=0.2967 distToClosestTrkAtCDC8_VS_p+:all=0.2967 distToClosestTrkAtECL0_VS_anti-p-:all=164.3 distToClosestTrkAtECL0_VS_p+:all=164.3 ) 
 

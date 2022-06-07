@@ -77,7 +77,7 @@ void TRGGRLUnpackerModule::event()
     if (raw_trgarray[i]->GetTRGType(0) == 7) {continue;}
 
     for (int j = 0; j < raw_trgarray[i]->GetNumEntries(); j++) {
-      if (raw_trgarray[i]->GetNodeID(j) == node_id) {
+      if ((int)raw_trgarray[i]->GetNodeID(j) == node_id) {
         //cout << raw_trgarray[i]->GetDetectorNwords(j, 0) << endl;
         //if (raw_trgarray[i]->GetDetectorNwords(j, 0) == 0xC03)
         if (raw_trgarray[i]->GetDetectorNwords(j, ch_id) > 0) {

@@ -887,7 +887,7 @@ namespace Belle2 {
      * be different than the Particle's PDG id as not all mass hypothesis
      * are fitted during the reconstruction.
      */
-    int getPDGCodeUsedForFit()
+    int getPDGCodeUsedForFit() const
     {
       return std::abs(m_pdgCodeUsedForFit);
     }
@@ -904,8 +904,21 @@ namespace Belle2 {
 
     /**
      * Returns true if the (track-based) particle is created with its most likely mass hypothesis
+     * based on PID likelihood.
      */
     bool isMostLikely() const;
+
+    /**
+     * For a (track-based) particle, returns the charged stable mass hypothesis associated to the most probable TrackFitResult,
+     * and the TrackFitResult itself.
+     */
+    std::pair<Const::ChargedStable, const TrackFitResult*> getMostLikelyTrackFitResult() const;
+
+    /**
+     * Returns true if the (track-based) particle is created with its most likely mass hypothesis
+     * based on TrackFitResult.
+     */
+    bool isMostLikelyTrackFitResult() const;
 
     /**
     * Returns the ECLCluster EHypothesisBit for this Particle.

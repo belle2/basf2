@@ -116,7 +116,7 @@ namespace Belle2 {
                 ss << "ch# " << ch << "(" << val << ") ";
                 hasHit = true;
                 if (febno < 0 || febno > 6) {
-                  B2ERROR("FEB is bad:" << LogVar("FEB", int(febno) + " hslb-" + finesse)
+                  B2ERROR("FEB is bad:" << LogVar("FEB", to_string(febno) + " hslb-" + to_string(finesse))
                           << LogVar("type", type_feb) << LogVar("ver", ver)
                           << LogVar("boardid", boardid) << LogVar("febno", febno)
                           << LogVar("length", length) << LogVar("evtno", evtno));
@@ -138,7 +138,7 @@ namespace Belle2 {
                 ss << "ch# " << ch << "(" << val << ") ";
                 hasHit = true;
                 if (febno < 0 || febno > 6) {
-                  B2ERROR("FEB is bad:" << LogVar("FEB", int(febno) + " hslb-" + finesse)
+                  B2ERROR("FEB is bad:" << LogVar("FEB", to_string(febno) + " hslb-" + to_string(finesse))
                           << LogVar("type", type_feb) << LogVar("ver", ver)
                           << LogVar("boardid", boardid) << LogVar("febno", febno)
                           << LogVar("length", length) << LogVar("evtno", evtno));

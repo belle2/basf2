@@ -959,7 +959,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("TagVOBoostErr", tagVErrOrthogonalBoostDirection,
                       "Returns the error of TagV in the direction orthogonal to the boost", "cm");
 
-    REGISTER_VARIABLE("cosThetaBoost", particleCosThetaBoostDirection,
+    REGISTER_VARIABLE("cosAngleBetweenMomentumAndBoostVector", particleCosThetaBoostDirection,
                       "cosine of the angle between momentum and boost vector");
 
     REGISTER_VARIABLE("internalTagVMCFlavor", particleInternalTagVMCFlavor,

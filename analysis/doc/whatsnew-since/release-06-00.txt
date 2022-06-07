@@ -73,7 +73,7 @@ Variables
  * Added optional argument to `helixExtTheta`, `helixExtPhi` to allow performing the extrapolation using the mass hypothesis that provides
    the best track fit result, regardless of the particle object's PDG.
  * Users can clear aliases by using ``variables.clearAliases()``, which is useful when processing several independent ``Path`` objects in a single basf2 session, e.g. b2luigi job submission.
- * Added the variable `cosThetaBoost` which returns the cosine of angle between momentum and boost vector.
+ * Added the variable `cosAngleBetweenMomentumAndBoostVector` which returns the cosine of angle between momentum and boost vector.
 
 Modules
 +++++++

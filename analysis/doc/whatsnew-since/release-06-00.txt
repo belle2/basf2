@@ -130,3 +130,10 @@ MC Truth Information
  * An argument ``suppressPrint`` is added to `modularAnalysis.printMCParticles` to suppress printing the information
    on the log message. This option helps to reduce the size of the log message while keeping the branch
    ``__MCDecayString__`` in a TTree.
+
+MVA-based K_S0 Selector
++++++++++++++++++++++++
+
+ * Added a new function :func:`ksSelector.ksSelector`, which applies MVA-based selection of K_S0 particleList
+ * Added a example for usage and training of ``ksSelector`` at ``B2A910``, ``B2A911``, and ``B2A912``
+

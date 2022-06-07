@@ -677,6 +677,14 @@ std::vector<const Belle2::Particle*> Particle::getFinalStateDaughters() const
   return fspDaughters;
 }
 
+std::vector<const Belle2::Particle*> Particle::getAllDaughters() const
+{
+  std::vector<const Particle*> allDaughters;
+  fillAllDaughters(allDaughters);
+
+  return allDaughters;
+}
+
 std::vector<int> Particle::getMdstArrayIndices(EParticleSourceObject source) const
 {
   std::vector<int> mdstIndices;
@@ -1108,6 +1116,19 @@ void Particle::fillFSPDaughters(std::vector<const Belle2::Particle*>& fspDaughte
     getDaughter(i)->fillFSPDaughters(fspDaughters);
 }
 
+void Particle::fillAllDaughters(std::vector<const Belle2::Particle*>& allDaughters) const
+{
+  // this is FSP
+  if (getNDaughters() == 0)
+    return;
+
+  // this is not FSP (fill it and go one level down)
+  for (unsigned i = 0; i < getNDaughters(); i++) {
+    allDaughters.push_back(getDaughter(i));
+    getDaughter(i)->fillAllDaughters(allDaughters);
+  }
+}
+
 void Particle::fillDecayChain(std::vector<int>& decayChain) const
 {
   decayChain.push_back(m_pdgCode);
@@ -1361,4 +1382,30 @@ bool Particle::isMostLikely() const
   const PIDLikelihood* likelihood = Particle::getPIDLikelihood();
   if (likelihood) return likelihood->getMostLikely().getPDGCode() == std::abs(m_pdgCode);
   else return false;
+}
+
+std::pair<Const::ChargedStable, const TrackFitResult*> Particle::getMostLikelyTrackFitResult() const
+{
+
+  const auto track = this->getTrack();
+
+  if (!track) {
+    return std::make_pair(Const::ChargedStable(std::abs(this->getPDGCode())), nullptr);
+  }
+
+  // Find the track fit with the highest pValue
+  auto trackFitResults = track->getTrackFitResults();
+  auto it_maxPValue = std::max_element(std::begin(trackFitResults), std::end(trackFitResults),
+  [](auto tfrAndM1, auto tfrAndM2) {return tfrAndM1.second->getPValue() < tfrAndM2.second->getPValue();});
+
+  return trackFitResults[std::distance(std::begin(trackFitResults), it_maxPValue)];
+
+}
+
+bool Particle::isMostLikelyTrackFitResult() const
+{
+  const auto trackFit = this->getTrackFitResult();
+  if (!trackFit) return false;
+
+  return (trackFit == this->getMostLikelyTrackFitResult().second);
 }

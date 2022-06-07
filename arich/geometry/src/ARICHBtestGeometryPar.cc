@@ -84,7 +84,7 @@ namespace Belle2 {
     return m_hapdeid[id];
   }
 
-  int ARICHBtestGeometryPar::AddHapdChannelPositionPair(double x , double y)
+  int ARICHBtestGeometryPar::AddHapdChannelPositionPair(double x, double y)
   {
     m_hapdmap.push_back(std::make_pair(x, y));
     return m_hapdmap.size();

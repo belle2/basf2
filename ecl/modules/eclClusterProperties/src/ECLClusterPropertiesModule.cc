@@ -15,7 +15,7 @@ using namespace ECL;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(ECLClusterProperties)
+REG_MODULE(ECLClusterProperties);
 
 //-----------------------------------------------------------------
 //                 Implementation

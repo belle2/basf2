@@ -706,6 +706,13 @@ namespace Belle2 {
     //Need namespace qualifier because ROOT CINT has troubles otherwise
 
     /**
+     * Returns a vector of pointers to all generations' daughter particles
+     * @return vector of pointers to all generations' daughter particles
+     */
+    std::vector<const Belle2::Particle*> getAllDaughters() const;
+    //Need namespace qualifier because ROOT CINT has troubles otherwise
+
+    /**
      * Returns a vector of StoreArray indices of given MDST dataobjects
      *
      * @param type EParticleSourceObject corresponding to a given MDST dataobject
@@ -880,7 +887,7 @@ namespace Belle2 {
      * be different than the Particle's PDG id as not all mass hypothesis
      * are fitted during the reconstruction.
      */
-    int getPDGCodeUsedForFit()
+    int getPDGCodeUsedForFit() const
     {
       return std::abs(m_pdgCodeUsedForFit);
     }
@@ -897,8 +904,21 @@ namespace Belle2 {
 
     /**
      * Returns true if the (track-based) particle is created with its most likely mass hypothesis
+     * based on PID likelihood.
      */
     bool isMostLikely() const;
+
+    /**
+     * For a (track-based) particle, returns the charged stable mass hypothesis associated to the most probable TrackFitResult,
+     * and the TrackFitResult itself.
+     */
+    std::pair<Const::ChargedStable, const TrackFitResult*> getMostLikelyTrackFitResult() const;
+
+    /**
+     * Returns true if the (track-based) particle is created with its most likely mass hypothesis
+     * based on TrackFitResult.
+     */
+    bool isMostLikelyTrackFitResult() const;
 
     /**
     * Returns the ECLCluster EHypothesisBit for this Particle.
@@ -1022,6 +1042,13 @@ namespace Belle2 {
      * @param fspDaughters vector of daughter particles
      */
     void fillFSPDaughters(std::vector<const Belle2::Particle*>& fspDaughters) const;
+    /**
+     * Fill all generations' daughters into a vector
+     *
+     * Function is called recursively
+     * @param allDaughters vector of daughter particles
+     */
+    void fillAllDaughters(std::vector<const Belle2::Particle*>& allDaughters) const;
 
     /**
      * Fill vector with (PDGCode, MdstSource) pairs for the entire decay chain.

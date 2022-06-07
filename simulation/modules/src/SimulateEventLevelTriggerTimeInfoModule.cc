@@ -10,7 +10,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(SimulateEventLevelTriggerTimeInfo)
+REG_MODULE(SimulateEventLevelTriggerTimeInfo);
 
 SimulateEventLevelTriggerTimeInfoModule::SimulateEventLevelTriggerTimeInfoModule() : Module()
 {

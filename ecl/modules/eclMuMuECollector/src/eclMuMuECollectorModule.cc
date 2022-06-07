@@ -36,7 +36,7 @@ using namespace ECL;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(eclMuMuECollector)
+REG_MODULE(eclMuMuECollector);
 
 //-----------------------------------------------------------------
 //                 Implementation

@@ -155,7 +155,7 @@ namespace Belle2 {
     //! Get the mapping of the electronic channel to the HAPD module nr and the channel number
     std::pair<int, int> GetHapdElectronicMap(int);
     //! Set the position of the HAPD channel
-    int AddHapdChannelPositionPair(double , double);
+    int AddHapdChannelPositionPair(double, double);
     //! Set the mapping of the electronic channel to the HAPD module nr and the channel number
     int AddHapdElectronicMapPair(int, int);
     //! Set of the setup global offset

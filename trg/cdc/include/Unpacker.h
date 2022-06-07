@@ -1054,7 +1054,7 @@ namespace Belle2 {
 
       for (unsigned iSL = 0; iSL < 9; ++iSL) {
         if (trkNN.ts[iSL][3] > 0) {
-          CDCTriggerSegmentHit* hit = addTSHit(trkNN.ts[iSL] , iSL, iTracker, tsHits, foundTime);
+          CDCTriggerSegmentHit* hit = addTSHit(trkNN.ts[iSL], iSL, iTracker, tsHits, foundTime);
           trackNN->addRelationTo(hit);
         }
       }
@@ -1485,7 +1485,7 @@ namespace Belle2 {
 
                   // cppcheck-suppress knownConditionTrueFalse
                   if (!hit) {
-                    hit = addTSHit(trkNN.ts[iSL] , iSL, iTracker, tsHits, iclock);
+                    hit = addTSHit(trkNN.ts[iSL], iSL, iTracker, tsHits, iclock);
                     //   B2DEBUG(1, "Hit with short drift time added, should not happen!");
                     // }
                   }

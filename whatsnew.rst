@@ -48,6 +48,15 @@ And similarly for :py:func:`modularAnalysis.inputMdstList`.
 
 .. warning:: We no longer support MC5-10 files.
 
+.. rubric:: Breaking of backward compatibility for kinematic variables
+
+The floating-point members of the Particle class (invariant mass, momentum and
+position components) are now stored as doubles and no longer as floats.
+Previously, in some edge cases like for ISR photons, in particular the energy
+calculation could suffer from a cancellation of significant digits. This
+change might slightly modify the values of (derived) kinematic variables,
+however it should be below most analysts sensitivity.
+
 .. include:: analysis/doc/whatsnew-since/release-06-00.txt
 
 .. List of changes for the framework package

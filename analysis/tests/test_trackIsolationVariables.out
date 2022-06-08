@@ -56,6 +56,20 @@
 [WARNING] An alias with the name 'distToClosestTrkAtECL0_VS_K_all' exists and is set to 'extraInfo(distToClosestTrkAtECL0_VS_K+:all)', setting it to 'extraInfo(distToClosestTrkAtECL0_VS_K-:all)'. Be aware: only the last alias defined before processing the events will be used!
 [WARNING] An alias with the name 'distToClosestTrkAtECL1_VS_K_all' exists and is set to 'extraInfo(distToClosestTrkAtECL1_VS_K+:all)', setting it to 'extraInfo(distToClosestTrkAtECL1_VS_K-:all)'. Be aware: only the last alias defined before processing the events will be used!
 [WARNING] An alias with the name 'distToClosestTrkAtKLM0_VS_K_all' exists and is set to 'extraInfo(distToClosestTrkAtKLM0_VS_K+:all)', setting it to 'extraInfo(distToClosestTrkAtKLM0_VS_K-:all)'. Be aware: only the last alias defined before processing the events will be used!
+[WARNING] An alias with the name 'distToClosestTrkAtCDC0_VS_pi_all' exists and is set to 'extraInfo(distToClosestTrkAtCDC0_VS_pi-:all)', setting it to 'extraInfo(distToClosestTrkAtCDC0_VS_pi+:all)'. Be aware: only the last alias defined before processing the events will be used!
+[WARNING] An alias with the name 'distToClosestTrkAtCDC1_VS_pi_all' exists and is set to 'extraInfo(distToClosestTrkAtCDC1_VS_pi-:all)', setting it to 'extraInfo(distToClosestTrkAtCDC1_VS_pi+:all)'. Be aware: only the last alias defined before processing the events will be used!
+[WARNING] An alias with the name 'distToClosestTrkAtCDC2_VS_pi_all' exists and is set to 'extraInfo(distToClosestTrkAtCDC2_VS_pi-:all)', setting it to 'extraInfo(distToClosestTrkAtCDC2_VS_pi+:all)'. Be aware: only the last alias defined before processing the events will be used!
+[WARNING] An alias with the name 'distToClosestTrkAtCDC3_VS_pi_all' exists and is set to 'extraInfo(distToClosestTrkAtCDC3_VS_pi-:all)', setting it to 'extraInfo(distToClosestTrkAtCDC3_VS_pi+:all)'. Be aware: only the last alias defined before processing the events will be used!
+[WARNING] An alias with the name 'distToClosestTrkAtCDC4_VS_pi_all' exists and is set to 'extraInfo(distToClosestTrkAtCDC4_VS_pi-:all)', setting it to 'extraInfo(distToClosestTrkAtCDC4_VS_pi+:all)'. Be aware: only the last alias defined before processing the events will be used!
+[WARNING] An alias with the name 'distToClosestTrkAtCDC5_VS_pi_all' exists and is set to 'extraInfo(distToClosestTrkAtCDC5_VS_pi-:all)', setting it to 'extraInfo(distToClosestTrkAtCDC5_VS_pi+:all)'. Be aware: only the last alias defined before processing the events will be used!
+[WARNING] An alias with the name 'distToClosestTrkAtCDC6_VS_pi_all' exists and is set to 'extraInfo(distToClosestTrkAtCDC6_VS_pi-:all)', setting it to 'extraInfo(distToClosestTrkAtCDC6_VS_pi+:all)'. Be aware: only the last alias defined before processing the events will be used!
+[WARNING] An alias with the name 'distToClosestTrkAtCDC7_VS_pi_all' exists and is set to 'extraInfo(distToClosestTrkAtCDC7_VS_pi-:all)', setting it to 'extraInfo(distToClosestTrkAtCDC7_VS_pi+:all)'. Be aware: only the last alias defined before processing the events will be used!
+[WARNING] An alias with the name 'distToClosestTrkAtCDC8_VS_pi_all' exists and is set to 'extraInfo(distToClosestTrkAtCDC8_VS_pi-:all)', setting it to 'extraInfo(distToClosestTrkAtCDC8_VS_pi+:all)'. Be aware: only the last alias defined before processing the events will be used!
+[WARNING] An alias with the name 'distToClosestTrkAtTOP0_VS_pi_all' exists and is set to 'extraInfo(distToClosestTrkAtTOP0_VS_pi-:all)', setting it to 'extraInfo(distToClosestTrkAtTOP0_VS_pi+:all)'. Be aware: only the last alias defined before processing the events will be used!
+[WARNING] An alias with the name 'distToClosestTrkAtARICH0_VS_pi_all' exists and is set to 'extraInfo(distToClosestTrkAtARICH0_VS_pi-:all)', setting it to 'extraInfo(distToClosestTrkAtARICH0_VS_pi+:all)'. Be aware: only the last alias defined before processing the events will be used!
+[WARNING] An alias with the name 'distToClosestTrkAtECL0_VS_pi_all' exists and is set to 'extraInfo(distToClosestTrkAtECL0_VS_pi-:all)', setting it to 'extraInfo(distToClosestTrkAtECL0_VS_pi+:all)'. Be aware: only the last alias defined before processing the events will be used!
+[WARNING] An alias with the name 'distToClosestTrkAtECL1_VS_pi_all' exists and is set to 'extraInfo(distToClosestTrkAtECL1_VS_pi-:all)', setting it to 'extraInfo(distToClosestTrkAtECL1_VS_pi+:all)'. Be aware: only the last alias defined before processing the events will be used!
+[WARNING] An alias with the name 'distToClosestTrkAtKLM0_VS_pi_all' exists and is set to 'extraInfo(distToClosestTrkAtKLM0_VS_pi-:all)', setting it to 'extraInfo(distToClosestTrkAtKLM0_VS_pi+:all)'. Be aware: only the last alias defined before processing the events will be used!
 [INFO] Starting event processing, random seed is set to '1337'
 [INFO] Added file ${BELLE2_VALIDATION_DATA_DIR}/mdst14.root
 [INFO] ParticleLoader's Summary of Actions:
@@ -63,229 +77,312 @@
 [INFO]    -> MDST source: Tracks
 [INFO] ParticleSelector: e-:ref
 [INFO]    -> With cuts  : [pt > 0.1] and [thetaInCDCAcceptance]
-[INFO] Calculating isolation variables at CDC0 surface for ParticleList: e-:ref, reference ParticleList: e-:all.
-[INFO] Calculating isolation variables at CDC1 surface for ParticleList: e-:ref, reference ParticleList: e-:all.
-[INFO] Calculating isolation variables at CDC2 surface for ParticleList: e-:ref, reference ParticleList: e-:all.
-[INFO] Calculating isolation variables at CDC3 surface for ParticleList: e-:ref, reference ParticleList: e-:all.
-[INFO] Calculating isolation variables at CDC4 surface for ParticleList: e-:ref, reference ParticleList: e-:all.
-[INFO] Calculating isolation variables at CDC5 surface for ParticleList: e-:ref, reference ParticleList: e-:all.
-[INFO] Calculating isolation variables at CDC6 surface for ParticleList: e-:ref, reference ParticleList: e-:all.
-[INFO] Calculating isolation variables at CDC7 surface for ParticleList: e-:ref, reference ParticleList: e-:all.
-[INFO] Calculating isolation variables at CDC8 surface for ParticleList: e-:ref, reference ParticleList: e-:all.
-[INFO] Calculating isolation variables at TOP0 surface for ParticleList: e-:ref, reference ParticleList: e-:all.
-[INFO] Calculating isolation variables at ARICH0 surface for ParticleList: e-:ref, reference ParticleList: e-:all.
-[INFO] Calculating isolation variables at ECL0 surface for ParticleList: e-:ref, reference ParticleList: e-:all.
-[INFO] Calculating isolation variables at ECL1 surface for ParticleList: e-:ref, reference ParticleList: e-:all.
-[INFO] Calculating isolation variables at KLM0 surface for ParticleList: e-:ref, reference ParticleList: e-:all.
+[INFO] Calculating track-based isolation variables at CDC0 surface for the decay string e-:ref using the reference ParticleList e-:all.
+[INFO] Calculating track-based isolation variables at CDC1 surface for the decay string e-:ref using the reference ParticleList e-:all.
+[INFO] Calculating track-based isolation variables at CDC2 surface for the decay string e-:ref using the reference ParticleList e-:all.
+[INFO] Calculating track-based isolation variables at CDC3 surface for the decay string e-:ref using the reference ParticleList e-:all.
+[INFO] Calculating track-based isolation variables at CDC4 surface for the decay string e-:ref using the reference ParticleList e-:all.
+[INFO] Calculating track-based isolation variables at CDC5 surface for the decay string e-:ref using the reference ParticleList e-:all.
+[INFO] Calculating track-based isolation variables at CDC6 surface for the decay string e-:ref using the reference ParticleList e-:all.
+[INFO] Calculating track-based isolation variables at CDC7 surface for the decay string e-:ref using the reference ParticleList e-:all.
+[INFO] Calculating track-based isolation variables at CDC8 surface for the decay string e-:ref using the reference ParticleList e-:all.
+[INFO] Calculating track-based isolation variables at TOP0 surface for the decay string e-:ref using the reference ParticleList e-:all.
+[INFO] Calculating track-based isolation variables at ARICH0 surface for the decay string e-:ref using the reference ParticleList e-:all.
+[INFO] Calculating track-based isolation variables at ECL0 surface for the decay string e-:ref using the reference ParticleList e-:all.
+[INFO] Calculating track-based isolation variables at ECL1 surface for the decay string e-:ref using the reference ParticleList e-:all.
+[INFO] Calculating track-based isolation variables at KLM0 surface for the decay string e-:ref using the reference ParticleList e-:all.
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: e+:all (e-:all)
 [INFO]    -> MDST source: Tracks
 [INFO] ParticleSelector: e+:ref
 [INFO]    -> With cuts  : [pt > 0.1] and [thetaInCDCAcceptance]
-[INFO] Calculating isolation variables at CDC0 surface for ParticleList: e+:ref, reference ParticleList: e+:all.
-[INFO] Calculating isolation variables at CDC1 surface for ParticleList: e+:ref, reference ParticleList: e+:all.
-[INFO] Calculating isolation variables at CDC2 surface for ParticleList: e+:ref, reference ParticleList: e+:all.
-[INFO] Calculating isolation variables at CDC3 surface for ParticleList: e+:ref, reference ParticleList: e+:all.
-[INFO] Calculating isolation variables at CDC4 surface for ParticleList: e+:ref, reference ParticleList: e+:all.
-[INFO] Calculating isolation variables at CDC5 surface for ParticleList: e+:ref, reference ParticleList: e+:all.
-[INFO] Calculating isolation variables at CDC6 surface for ParticleList: e+:ref, reference ParticleList: e+:all.
-[INFO] Calculating isolation variables at CDC7 surface for ParticleList: e+:ref, reference ParticleList: e+:all.
-[INFO] Calculating isolation variables at CDC8 surface for ParticleList: e+:ref, reference ParticleList: e+:all.
-[INFO] Calculating isolation variables at TOP0 surface for ParticleList: e+:ref, reference ParticleList: e+:all.
-[INFO] Calculating isolation variables at ARICH0 surface for ParticleList: e+:ref, reference ParticleList: e+:all.
-[INFO] Calculating isolation variables at ECL0 surface for ParticleList: e+:ref, reference ParticleList: e+:all.
-[INFO] Calculating isolation variables at ECL1 surface for ParticleList: e+:ref, reference ParticleList: e+:all.
-[INFO] Calculating isolation variables at KLM0 surface for ParticleList: e+:ref, reference ParticleList: e+:all.
+[INFO] Calculating track-based isolation variables at CDC0 surface for the decay string e+:ref using the reference ParticleList e+:all.
+[INFO] Calculating track-based isolation variables at CDC1 surface for the decay string e+:ref using the reference ParticleList e+:all.
+[INFO] Calculating track-based isolation variables at CDC2 surface for the decay string e+:ref using the reference ParticleList e+:all.
+[INFO] Calculating track-based isolation variables at CDC3 surface for the decay string e+:ref using the reference ParticleList e+:all.
+[INFO] Calculating track-based isolation variables at CDC4 surface for the decay string e+:ref using the reference ParticleList e+:all.
+[INFO] Calculating track-based isolation variables at CDC5 surface for the decay string e+:ref using the reference ParticleList e+:all.
+[INFO] Calculating track-based isolation variables at CDC6 surface for the decay string e+:ref using the reference ParticleList e+:all.
+[INFO] Calculating track-based isolation variables at CDC7 surface for the decay string e+:ref using the reference ParticleList e+:all.
+[INFO] Calculating track-based isolation variables at CDC8 surface for the decay string e+:ref using the reference ParticleList e+:all.
+[INFO] Calculating track-based isolation variables at TOP0 surface for the decay string e+:ref using the reference ParticleList e+:all.
+[INFO] Calculating track-based isolation variables at ARICH0 surface for the decay string e+:ref using the reference ParticleList e+:all.
+[INFO] Calculating track-based isolation variables at ECL0 surface for the decay string e+:ref using the reference ParticleList e+:all.
+[INFO] Calculating track-based isolation variables at ECL1 surface for the decay string e+:ref using the reference ParticleList e+:all.
+[INFO] Calculating track-based isolation variables at KLM0 surface for the decay string e+:ref using the reference ParticleList e+:all.
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: mu-:all (mu+:all)
 [INFO]    -> MDST source: Tracks
 [INFO] ParticleSelector: mu-:ref
 [INFO]    -> With cuts  : [pt > 0.1] and [thetaInCDCAcceptance]
-[INFO] Calculating isolation variables at CDC0 surface for ParticleList: mu-:ref, reference ParticleList: mu-:all.
-[INFO] Calculating isolation variables at CDC1 surface for ParticleList: mu-:ref, reference ParticleList: mu-:all.
-[INFO] Calculating isolation variables at CDC2 surface for ParticleList: mu-:ref, reference ParticleList: mu-:all.
-[INFO] Calculating isolation variables at CDC3 surface for ParticleList: mu-:ref, reference ParticleList: mu-:all.
-[INFO] Calculating isolation variables at CDC4 surface for ParticleList: mu-:ref, reference ParticleList: mu-:all.
-[INFO] Calculating isolation variables at CDC5 surface for ParticleList: mu-:ref, reference ParticleList: mu-:all.
-[INFO] Calculating isolation variables at CDC6 surface for ParticleList: mu-:ref, reference ParticleList: mu-:all.
-[INFO] Calculating isolation variables at CDC7 surface for ParticleList: mu-:ref, reference ParticleList: mu-:all.
-[INFO] Calculating isolation variables at CDC8 surface for ParticleList: mu-:ref, reference ParticleList: mu-:all.
-[INFO] Calculating isolation variables at TOP0 surface for ParticleList: mu-:ref, reference ParticleList: mu-:all.
-[INFO] Calculating isolation variables at ARICH0 surface for ParticleList: mu-:ref, reference ParticleList: mu-:all.
-[INFO] Calculating isolation variables at ECL0 surface for ParticleList: mu-:ref, reference ParticleList: mu-:all.
-[INFO] Calculating isolation variables at ECL1 surface for ParticleList: mu-:ref, reference ParticleList: mu-:all.
-[INFO] Calculating isolation variables at KLM0 surface for ParticleList: mu-:ref, reference ParticleList: mu-:all.
+[INFO] Calculating track-based isolation variables at CDC0 surface for the decay string mu-:ref using the reference ParticleList mu-:all.
+[INFO] Calculating track-based isolation variables at CDC1 surface for the decay string mu-:ref using the reference ParticleList mu-:all.
+[INFO] Calculating track-based isolation variables at CDC2 surface for the decay string mu-:ref using the reference ParticleList mu-:all.
+[INFO] Calculating track-based isolation variables at CDC3 surface for the decay string mu-:ref using the reference ParticleList mu-:all.
+[INFO] Calculating track-based isolation variables at CDC4 surface for the decay string mu-:ref using the reference ParticleList mu-:all.
+[INFO] Calculating track-based isolation variables at CDC5 surface for the decay string mu-:ref using the reference ParticleList mu-:all.
+[INFO] Calculating track-based isolation variables at CDC6 surface for the decay string mu-:ref using the reference ParticleList mu-:all.
+[INFO] Calculating track-based isolation variables at CDC7 surface for the decay string mu-:ref using the reference ParticleList mu-:all.
+[INFO] Calculating track-based isolation variables at CDC8 surface for the decay string mu-:ref using the reference ParticleList mu-:all.
+[INFO] Calculating track-based isolation variables at TOP0 surface for the decay string mu-:ref using the reference ParticleList mu-:all.
+[INFO] Calculating track-based isolation variables at ARICH0 surface for the decay string mu-:ref using the reference ParticleList mu-:all.
+[INFO] Calculating track-based isolation variables at ECL0 surface for the decay string mu-:ref using the reference ParticleList mu-:all.
+[INFO] Calculating track-based isolation variables at ECL1 surface for the decay string mu-:ref using the reference ParticleList mu-:all.
+[INFO] Calculating track-based isolation variables at KLM0 surface for the decay string mu-:ref using the reference ParticleList mu-:all.
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: mu+:all (mu-:all)
 [INFO]    -> MDST source: Tracks
 [INFO] ParticleSelector: mu+:ref
 [INFO]    -> With cuts  : [pt > 0.1] and [thetaInCDCAcceptance]
-[INFO] Calculating isolation variables at CDC0 surface for ParticleList: mu+:ref, reference ParticleList: mu+:all.
-[INFO] Calculating isolation variables at CDC1 surface for ParticleList: mu+:ref, reference ParticleList: mu+:all.
-[INFO] Calculating isolation variables at CDC2 surface for ParticleList: mu+:ref, reference ParticleList: mu+:all.
-[INFO] Calculating isolation variables at CDC3 surface for ParticleList: mu+:ref, reference ParticleList: mu+:all.
-[INFO] Calculating isolation variables at CDC4 surface for ParticleList: mu+:ref, reference ParticleList: mu+:all.
-[INFO] Calculating isolation variables at CDC5 surface for ParticleList: mu+:ref, reference ParticleList: mu+:all.
-[INFO] Calculating isolation variables at CDC6 surface for ParticleList: mu+:ref, reference ParticleList: mu+:all.
-[INFO] Calculating isolation variables at CDC7 surface for ParticleList: mu+:ref, reference ParticleList: mu+:all.
-[INFO] Calculating isolation variables at CDC8 surface for ParticleList: mu+:ref, reference ParticleList: mu+:all.
-[INFO] Calculating isolation variables at TOP0 surface for ParticleList: mu+:ref, reference ParticleList: mu+:all.
-[INFO] Calculating isolation variables at ARICH0 surface for ParticleList: mu+:ref, reference ParticleList: mu+:all.
-[INFO] Calculating isolation variables at ECL0 surface for ParticleList: mu+:ref, reference ParticleList: mu+:all.
-[INFO] Calculating isolation variables at ECL1 surface for ParticleList: mu+:ref, reference ParticleList: mu+:all.
-[INFO] Calculating isolation variables at KLM0 surface for ParticleList: mu+:ref, reference ParticleList: mu+:all.
+[INFO] Calculating track-based isolation variables at CDC0 surface for the decay string mu+:ref using the reference ParticleList mu+:all.
+[INFO] Calculating track-based isolation variables at CDC1 surface for the decay string mu+:ref using the reference ParticleList mu+:all.
+[INFO] Calculating track-based isolation variables at CDC2 surface for the decay string mu+:ref using the reference ParticleList mu+:all.
+[INFO] Calculating track-based isolation variables at CDC3 surface for the decay string mu+:ref using the reference ParticleList mu+:all.
+[INFO] Calculating track-based isolation variables at CDC4 surface for the decay string mu+:ref using the reference ParticleList mu+:all.
+[INFO] Calculating track-based isolation variables at CDC5 surface for the decay string mu+:ref using the reference ParticleList mu+:all.
+[INFO] Calculating track-based isolation variables at CDC6 surface for the decay string mu+:ref using the reference ParticleList mu+:all.
+[INFO] Calculating track-based isolation variables at CDC7 surface for the decay string mu+:ref using the reference ParticleList mu+:all.
+[INFO] Calculating track-based isolation variables at CDC8 surface for the decay string mu+:ref using the reference ParticleList mu+:all.
+[INFO] Calculating track-based isolation variables at TOP0 surface for the decay string mu+:ref using the reference ParticleList mu+:all.
+[INFO] Calculating track-based isolation variables at ARICH0 surface for the decay string mu+:ref using the reference ParticleList mu+:all.
+[INFO] Calculating track-based isolation variables at ECL0 surface for the decay string mu+:ref using the reference ParticleList mu+:all.
+[INFO] Calculating track-based isolation variables at ECL1 surface for the decay string mu+:ref using the reference ParticleList mu+:all.
+[INFO] Calculating track-based isolation variables at KLM0 surface for the decay string mu+:ref using the reference ParticleList mu+:all.
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: pi+:all (pi-:all)
 [INFO]    -> MDST source: Tracks
 [INFO] ParticleSelector: pi+:ref
 [INFO]    -> With cuts  : [pt > 0.1] and [thetaInCDCAcceptance]
-[INFO] Calculating isolation variables at CDC0 surface for ParticleList: pi+:ref, reference ParticleList: pi+:all.
-[INFO] Calculating isolation variables at CDC1 surface for ParticleList: pi+:ref, reference ParticleList: pi+:all.
-[INFO] Calculating isolation variables at CDC2 surface for ParticleList: pi+:ref, reference ParticleList: pi+:all.
-[INFO] Calculating isolation variables at CDC3 surface for ParticleList: pi+:ref, reference ParticleList: pi+:all.
-[INFO] Calculating isolation variables at CDC4 surface for ParticleList: pi+:ref, reference ParticleList: pi+:all.
-[INFO] Calculating isolation variables at CDC5 surface for ParticleList: pi+:ref, reference ParticleList: pi+:all.
-[INFO] Calculating isolation variables at CDC6 surface for ParticleList: pi+:ref, reference ParticleList: pi+:all.
-[INFO] Calculating isolation variables at CDC7 surface for ParticleList: pi+:ref, reference ParticleList: pi+:all.
-[INFO] Calculating isolation variables at CDC8 surface for ParticleList: pi+:ref, reference ParticleList: pi+:all.
-[INFO] Calculating isolation variables at TOP0 surface for ParticleList: pi+:ref, reference ParticleList: pi+:all.
-[INFO] Calculating isolation variables at ARICH0 surface for ParticleList: pi+:ref, reference ParticleList: pi+:all.
-[INFO] Calculating isolation variables at ECL0 surface for ParticleList: pi+:ref, reference ParticleList: pi+:all.
-[INFO] Calculating isolation variables at ECL1 surface for ParticleList: pi+:ref, reference ParticleList: pi+:all.
-[INFO] Calculating isolation variables at KLM0 surface for ParticleList: pi+:ref, reference ParticleList: pi+:all.
+[INFO] Calculating track-based isolation variables at CDC0 surface for the decay string pi+:ref using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at CDC1 surface for the decay string pi+:ref using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at CDC2 surface for the decay string pi+:ref using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at CDC3 surface for the decay string pi+:ref using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at CDC4 surface for the decay string pi+:ref using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at CDC5 surface for the decay string pi+:ref using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at CDC6 surface for the decay string pi+:ref using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at CDC7 surface for the decay string pi+:ref using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at CDC8 surface for the decay string pi+:ref using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at TOP0 surface for the decay string pi+:ref using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at ARICH0 surface for the decay string pi+:ref using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at ECL0 surface for the decay string pi+:ref using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at ECL1 surface for the decay string pi+:ref using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at KLM0 surface for the decay string pi+:ref using the reference ParticleList pi+:all.
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: pi-:all (pi+:all)
 [INFO]    -> MDST source: Tracks
 [INFO] ParticleSelector: pi-:ref
 [INFO]    -> With cuts  : [pt > 0.1] and [thetaInCDCAcceptance]
-[INFO] Calculating isolation variables at CDC0 surface for ParticleList: pi-:ref, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at CDC1 surface for ParticleList: pi-:ref, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at CDC2 surface for ParticleList: pi-:ref, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at CDC3 surface for ParticleList: pi-:ref, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at CDC4 surface for ParticleList: pi-:ref, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at CDC5 surface for ParticleList: pi-:ref, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at CDC6 surface for ParticleList: pi-:ref, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at CDC7 surface for ParticleList: pi-:ref, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at CDC8 surface for ParticleList: pi-:ref, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at TOP0 surface for ParticleList: pi-:ref, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at ARICH0 surface for ParticleList: pi-:ref, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at ECL0 surface for ParticleList: pi-:ref, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at ECL1 surface for ParticleList: pi-:ref, reference ParticleList: pi-:all.
-[INFO] Calculating isolation variables at KLM0 surface for ParticleList: pi-:ref, reference ParticleList: pi-:all.
+[INFO] Calculating track-based isolation variables at CDC0 surface for the decay string pi-:ref using the reference ParticleList pi-:all.
+[INFO] Calculating track-based isolation variables at CDC1 surface for the decay string pi-:ref using the reference ParticleList pi-:all.
+[INFO] Calculating track-based isolation variables at CDC2 surface for the decay string pi-:ref using the reference ParticleList pi-:all.
+[INFO] Calculating track-based isolation variables at CDC3 surface for the decay string pi-:ref using the reference ParticleList pi-:all.
+[INFO] Calculating track-based isolation variables at CDC4 surface for the decay string pi-:ref using the reference ParticleList pi-:all.
+[INFO] Calculating track-based isolation variables at CDC5 surface for the decay string pi-:ref using the reference ParticleList pi-:all.
+[INFO] Calculating track-based isolation variables at CDC6 surface for the decay string pi-:ref using the reference ParticleList pi-:all.
+[INFO] Calculating track-based isolation variables at CDC7 surface for the decay string pi-:ref using the reference ParticleList pi-:all.
+[INFO] Calculating track-based isolation variables at CDC8 surface for the decay string pi-:ref using the reference ParticleList pi-:all.
+[INFO] Calculating track-based isolation variables at TOP0 surface for the decay string pi-:ref using the reference ParticleList pi-:all.
+[INFO] Calculating track-based isolation variables at ARICH0 surface for the decay string pi-:ref using the reference ParticleList pi-:all.
+[INFO] Calculating track-based isolation variables at ECL0 surface for the decay string pi-:ref using the reference ParticleList pi-:all.
+[INFO] Calculating track-based isolation variables at ECL1 surface for the decay string pi-:ref using the reference ParticleList pi-:all.
+[INFO] Calculating track-based isolation variables at KLM0 surface for the decay string pi-:ref using the reference ParticleList pi-:all.
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: K+:all (K-:all)
 [INFO]    -> MDST source: Tracks
 [INFO] ParticleSelector: K+:ref
 [INFO]    -> With cuts  : [pt > 0.1] and [thetaInCDCAcceptance]
-[INFO] Calculating isolation variables at CDC0 surface for ParticleList: K+:ref, reference ParticleList: K+:all.
-[INFO] Calculating isolation variables at CDC1 surface for ParticleList: K+:ref, reference ParticleList: K+:all.
-[INFO] Calculating isolation variables at CDC2 surface for ParticleList: K+:ref, reference ParticleList: K+:all.
-[INFO] Calculating isolation variables at CDC3 surface for ParticleList: K+:ref, reference ParticleList: K+:all.
-[INFO] Calculating isolation variables at CDC4 surface for ParticleList: K+:ref, reference ParticleList: K+:all.
-[INFO] Calculating isolation variables at CDC5 surface for ParticleList: K+:ref, reference ParticleList: K+:all.
-[INFO] Calculating isolation variables at CDC6 surface for ParticleList: K+:ref, reference ParticleList: K+:all.
-[INFO] Calculating isolation variables at CDC7 surface for ParticleList: K+:ref, reference ParticleList: K+:all.
-[INFO] Calculating isolation variables at CDC8 surface for ParticleList: K+:ref, reference ParticleList: K+:all.
-[INFO] Calculating isolation variables at TOP0 surface for ParticleList: K+:ref, reference ParticleList: K+:all.
-[INFO] Calculating isolation variables at ARICH0 surface for ParticleList: K+:ref, reference ParticleList: K+:all.
-[INFO] Calculating isolation variables at ECL0 surface for ParticleList: K+:ref, reference ParticleList: K+:all.
-[INFO] Calculating isolation variables at ECL1 surface for ParticleList: K+:ref, reference ParticleList: K+:all.
-[INFO] Calculating isolation variables at KLM0 surface for ParticleList: K+:ref, reference ParticleList: K+:all.
+[INFO] Calculating track-based isolation variables at CDC0 surface for the decay string K+:ref using the reference ParticleList K+:all.
+[INFO] Calculating track-based isolation variables at CDC1 surface for the decay string K+:ref using the reference ParticleList K+:all.
+[INFO] Calculating track-based isolation variables at CDC2 surface for the decay string K+:ref using the reference ParticleList K+:all.
+[INFO] Calculating track-based isolation variables at CDC3 surface for the decay string K+:ref using the reference ParticleList K+:all.
+[INFO] Calculating track-based isolation variables at CDC4 surface for the decay string K+:ref using the reference ParticleList K+:all.
+[INFO] Calculating track-based isolation variables at CDC5 surface for the decay string K+:ref using the reference ParticleList K+:all.
+[INFO] Calculating track-based isolation variables at CDC6 surface for the decay string K+:ref using the reference ParticleList K+:all.
+[INFO] Calculating track-based isolation variables at CDC7 surface for the decay string K+:ref using the reference ParticleList K+:all.
+[INFO] Calculating track-based isolation variables at CDC8 surface for the decay string K+:ref using the reference ParticleList K+:all.
+[INFO] Calculating track-based isolation variables at TOP0 surface for the decay string K+:ref using the reference ParticleList K+:all.
+[INFO] Calculating track-based isolation variables at ARICH0 surface for the decay string K+:ref using the reference ParticleList K+:all.
+[INFO] Calculating track-based isolation variables at ECL0 surface for the decay string K+:ref using the reference ParticleList K+:all.
+[INFO] Calculating track-based isolation variables at ECL1 surface for the decay string K+:ref using the reference ParticleList K+:all.
+[INFO] Calculating track-based isolation variables at KLM0 surface for the decay string K+:ref using the reference ParticleList K+:all.
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: K-:all (K+:all)
 [INFO]    -> MDST source: Tracks
 [INFO] ParticleSelector: K-:ref
 [INFO]    -> With cuts  : [pt > 0.1] and [thetaInCDCAcceptance]
-[INFO] Calculating isolation variables at CDC0 surface for ParticleList: K-:ref, reference ParticleList: K-:all.
-[INFO] Calculating isolation variables at CDC1 surface for ParticleList: K-:ref, reference ParticleList: K-:all.
-[INFO] Calculating isolation variables at CDC2 surface for ParticleList: K-:ref, reference ParticleList: K-:all.
-[INFO] Calculating isolation variables at CDC3 surface for ParticleList: K-:ref, reference ParticleList: K-:all.
-[INFO] Calculating isolation variables at CDC4 surface for ParticleList: K-:ref, reference ParticleList: K-:all.
-[INFO] Calculating isolation variables at CDC5 surface for ParticleList: K-:ref, reference ParticleList: K-:all.
-[INFO] Calculating isolation variables at CDC6 surface for ParticleList: K-:ref, reference ParticleList: K-:all.
-[INFO] Calculating isolation variables at CDC7 surface for ParticleList: K-:ref, reference ParticleList: K-:all.
-[INFO] Calculating isolation variables at CDC8 surface for ParticleList: K-:ref, reference ParticleList: K-:all.
-[INFO] Calculating isolation variables at TOP0 surface for ParticleList: K-:ref, reference ParticleList: K-:all.
-[INFO] Calculating isolation variables at ARICH0 surface for ParticleList: K-:ref, reference ParticleList: K-:all.
-[INFO] Calculating isolation variables at ECL0 surface for ParticleList: K-:ref, reference ParticleList: K-:all.
-[INFO] Calculating isolation variables at ECL1 surface for ParticleList: K-:ref, reference ParticleList: K-:all.
-[INFO] Calculating isolation variables at KLM0 surface for ParticleList: K-:ref, reference ParticleList: K-:all.
+[INFO] Calculating track-based isolation variables at CDC0 surface for the decay string K-:ref using the reference ParticleList K-:all.
+[INFO] Calculating track-based isolation variables at CDC1 surface for the decay string K-:ref using the reference ParticleList K-:all.
+[INFO] Calculating track-based isolation variables at CDC2 surface for the decay string K-:ref using the reference ParticleList K-:all.
+[INFO] Calculating track-based isolation variables at CDC3 surface for the decay string K-:ref using the reference ParticleList K-:all.
+[INFO] Calculating track-based isolation variables at CDC4 surface for the decay string K-:ref using the reference ParticleList K-:all.
+[INFO] Calculating track-based isolation variables at CDC5 surface for the decay string K-:ref using the reference ParticleList K-:all.
+[INFO] Calculating track-based isolation variables at CDC6 surface for the decay string K-:ref using the reference ParticleList K-:all.
+[INFO] Calculating track-based isolation variables at CDC7 surface for the decay string K-:ref using the reference ParticleList K-:all.
+[INFO] Calculating track-based isolation variables at CDC8 surface for the decay string K-:ref using the reference ParticleList K-:all.
+[INFO] Calculating track-based isolation variables at TOP0 surface for the decay string K-:ref using the reference ParticleList K-:all.
+[INFO] Calculating track-based isolation variables at ARICH0 surface for the decay string K-:ref using the reference ParticleList K-:all.
+[INFO] Calculating track-based isolation variables at ECL0 surface for the decay string K-:ref using the reference ParticleList K-:all.
+[INFO] Calculating track-based isolation variables at ECL1 surface for the decay string K-:ref using the reference ParticleList K-:all.
+[INFO] Calculating track-based isolation variables at KLM0 surface for the decay string K-:ref using the reference ParticleList K-:all.
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: p+:all (anti-p-:all)
 [INFO]    -> MDST source: Tracks
 [INFO] ParticleSelector: p+:ref
 [INFO]    -> With cuts  : [pt > 0.1] and [thetaInCDCAcceptance]
-[INFO] Calculating isolation variables at CDC0 surface for ParticleList: p+:ref, reference ParticleList: p+:all.
-[INFO] Calculating isolation variables at CDC1 surface for ParticleList: p+:ref, reference ParticleList: p+:all.
-[INFO] Calculating isolation variables at CDC2 surface for ParticleList: p+:ref, reference ParticleList: p+:all.
-[INFO] Calculating isolation variables at CDC3 surface for ParticleList: p+:ref, reference ParticleList: p+:all.
-[INFO] Calculating isolation variables at CDC4 surface for ParticleList: p+:ref, reference ParticleList: p+:all.
-[INFO] Calculating isolation variables at CDC5 surface for ParticleList: p+:ref, reference ParticleList: p+:all.
-[INFO] Calculating isolation variables at CDC6 surface for ParticleList: p+:ref, reference ParticleList: p+:all.
-[INFO] Calculating isolation variables at CDC7 surface for ParticleList: p+:ref, reference ParticleList: p+:all.
-[INFO] Calculating isolation variables at CDC8 surface for ParticleList: p+:ref, reference ParticleList: p+:all.
-[INFO] Calculating isolation variables at TOP0 surface for ParticleList: p+:ref, reference ParticleList: p+:all.
-[INFO] Calculating isolation variables at ARICH0 surface for ParticleList: p+:ref, reference ParticleList: p+:all.
-[INFO] Calculating isolation variables at ECL0 surface for ParticleList: p+:ref, reference ParticleList: p+:all.
-[INFO] Calculating isolation variables at ECL1 surface for ParticleList: p+:ref, reference ParticleList: p+:all.
-[INFO] Calculating isolation variables at KLM0 surface for ParticleList: p+:ref, reference ParticleList: p+:all.
+[INFO] Calculating track-based isolation variables at CDC0 surface for the decay string p+:ref using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at CDC1 surface for the decay string p+:ref using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at CDC2 surface for the decay string p+:ref using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at CDC3 surface for the decay string p+:ref using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at CDC4 surface for the decay string p+:ref using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at CDC5 surface for the decay string p+:ref using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at CDC6 surface for the decay string p+:ref using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at CDC7 surface for the decay string p+:ref using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at CDC8 surface for the decay string p+:ref using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at TOP0 surface for the decay string p+:ref using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at ARICH0 surface for the decay string p+:ref using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at ECL0 surface for the decay string p+:ref using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at ECL1 surface for the decay string p+:ref using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at KLM0 surface for the decay string p+:ref using the reference ParticleList p+:all.
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: anti-p-:all (p+:all)
 [INFO]    -> MDST source: Tracks
 [INFO] ParticleSelector: anti-p-:ref
 [INFO]    -> With cuts  : [pt > 0.1] and [thetaInCDCAcceptance]
-[INFO] Calculating isolation variables at CDC0 surface for ParticleList: anti-p-:ref, reference ParticleList: anti-p-:all.
-[INFO] Calculating isolation variables at CDC1 surface for ParticleList: anti-p-:ref, reference ParticleList: anti-p-:all.
-[INFO] Calculating isolation variables at CDC2 surface for ParticleList: anti-p-:ref, reference ParticleList: anti-p-:all.
-[INFO] Calculating isolation variables at CDC3 surface for ParticleList: anti-p-:ref, reference ParticleList: anti-p-:all.
-[INFO] Calculating isolation variables at CDC4 surface for ParticleList: anti-p-:ref, reference ParticleList: anti-p-:all.
-[INFO] Calculating isolation variables at CDC5 surface for ParticleList: anti-p-:ref, reference ParticleList: anti-p-:all.
-[INFO] Calculating isolation variables at CDC6 surface for ParticleList: anti-p-:ref, reference ParticleList: anti-p-:all.
-[INFO] Calculating isolation variables at CDC7 surface for ParticleList: anti-p-:ref, reference ParticleList: anti-p-:all.
-[INFO] Calculating isolation variables at CDC8 surface for ParticleList: anti-p-:ref, reference ParticleList: anti-p-:all.
-[INFO] Calculating isolation variables at TOP0 surface for ParticleList: anti-p-:ref, reference ParticleList: anti-p-:all.
-[INFO] Calculating isolation variables at ARICH0 surface for ParticleList: anti-p-:ref, reference ParticleList: anti-p-:all.
-[INFO] Calculating isolation variables at ECL0 surface for ParticleList: anti-p-:ref, reference ParticleList: anti-p-:all.
-[INFO] Calculating isolation variables at ECL1 surface for ParticleList: anti-p-:ref, reference ParticleList: anti-p-:all.
-[INFO] Calculating isolation variables at KLM0 surface for ParticleList: anti-p-:ref, reference ParticleList: anti-p-:all.
+[INFO] Calculating track-based isolation variables at CDC0 surface for the decay string anti-p-:ref using the reference ParticleList anti-p-:all.
+[INFO] Calculating track-based isolation variables at CDC1 surface for the decay string anti-p-:ref using the reference ParticleList anti-p-:all.
+[INFO] Calculating track-based isolation variables at CDC2 surface for the decay string anti-p-:ref using the reference ParticleList anti-p-:all.
+[INFO] Calculating track-based isolation variables at CDC3 surface for the decay string anti-p-:ref using the reference ParticleList anti-p-:all.
+[INFO] Calculating track-based isolation variables at CDC4 surface for the decay string anti-p-:ref using the reference ParticleList anti-p-:all.
+[INFO] Calculating track-based isolation variables at CDC5 surface for the decay string anti-p-:ref using the reference ParticleList anti-p-:all.
+[INFO] Calculating track-based isolation variables at CDC6 surface for the decay string anti-p-:ref using the reference ParticleList anti-p-:all.
+[INFO] Calculating track-based isolation variables at CDC7 surface for the decay string anti-p-:ref using the reference ParticleList anti-p-:all.
+[INFO] Calculating track-based isolation variables at CDC8 surface for the decay string anti-p-:ref using the reference ParticleList anti-p-:all.
+[INFO] Calculating track-based isolation variables at TOP0 surface for the decay string anti-p-:ref using the reference ParticleList anti-p-:all.
+[INFO] Calculating track-based isolation variables at ARICH0 surface for the decay string anti-p-:ref using the reference ParticleList anti-p-:all.
+[INFO] Calculating track-based isolation variables at ECL0 surface for the decay string anti-p-:ref using the reference ParticleList anti-p-:all.
+[INFO] Calculating track-based isolation variables at ECL1 surface for the decay string anti-p-:ref using the reference ParticleList anti-p-:all.
+[INFO] Calculating track-based isolation variables at KLM0 surface for the decay string anti-p-:ref using the reference ParticleList anti-p-:all.
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: deuteron:all (anti-deuteron:all)
 [INFO]    -> MDST source: Tracks
 [INFO] ParticleSelector: deuteron:ref
 [INFO]    -> With cuts  : [pt > 0.1] and [thetaInCDCAcceptance]
-[INFO] Calculating isolation variables at CDC0 surface for ParticleList: deuteron:ref, reference ParticleList: deuteron:all.
-[INFO] Calculating isolation variables at CDC1 surface for ParticleList: deuteron:ref, reference ParticleList: deuteron:all.
-[INFO] Calculating isolation variables at CDC2 surface for ParticleList: deuteron:ref, reference ParticleList: deuteron:all.
-[INFO] Calculating isolation variables at CDC3 surface for ParticleList: deuteron:ref, reference ParticleList: deuteron:all.
-[INFO] Calculating isolation variables at CDC4 surface for ParticleList: deuteron:ref, reference ParticleList: deuteron:all.
-[INFO] Calculating isolation variables at CDC5 surface for ParticleList: deuteron:ref, reference ParticleList: deuteron:all.
-[INFO] Calculating isolation variables at CDC6 surface for ParticleList: deuteron:ref, reference ParticleList: deuteron:all.
-[INFO] Calculating isolation variables at CDC7 surface for ParticleList: deuteron:ref, reference ParticleList: deuteron:all.
-[INFO] Calculating isolation variables at CDC8 surface for ParticleList: deuteron:ref, reference ParticleList: deuteron:all.
-[INFO] Calculating isolation variables at TOP0 surface for ParticleList: deuteron:ref, reference ParticleList: deuteron:all.
-[INFO] Calculating isolation variables at ARICH0 surface for ParticleList: deuteron:ref, reference ParticleList: deuteron:all.
-[INFO] Calculating isolation variables at ECL0 surface for ParticleList: deuteron:ref, reference ParticleList: deuteron:all.
-[INFO] Calculating isolation variables at ECL1 surface for ParticleList: deuteron:ref, reference ParticleList: deuteron:all.
-[INFO] Calculating isolation variables at KLM0 surface for ParticleList: deuteron:ref, reference ParticleList: deuteron:all.
+[INFO] Calculating track-based isolation variables at CDC0 surface for the decay string deuteron:ref using the reference ParticleList deuteron:all.
+[INFO] Calculating track-based isolation variables at CDC1 surface for the decay string deuteron:ref using the reference ParticleList deuteron:all.
+[INFO] Calculating track-based isolation variables at CDC2 surface for the decay string deuteron:ref using the reference ParticleList deuteron:all.
+[INFO] Calculating track-based isolation variables at CDC3 surface for the decay string deuteron:ref using the reference ParticleList deuteron:all.
+[INFO] Calculating track-based isolation variables at CDC4 surface for the decay string deuteron:ref using the reference ParticleList deuteron:all.
+[INFO] Calculating track-based isolation variables at CDC5 surface for the decay string deuteron:ref using the reference ParticleList deuteron:all.
+[INFO] Calculating track-based isolation variables at CDC6 surface for the decay string deuteron:ref using the reference ParticleList deuteron:all.
+[INFO] Calculating track-based isolation variables at CDC7 surface for the decay string deuteron:ref using the reference ParticleList deuteron:all.
+[INFO] Calculating track-based isolation variables at CDC8 surface for the decay string deuteron:ref using the reference ParticleList deuteron:all.
+[INFO] Calculating track-based isolation variables at TOP0 surface for the decay string deuteron:ref using the reference ParticleList deuteron:all.
+[INFO] Calculating track-based isolation variables at ARICH0 surface for the decay string deuteron:ref using the reference ParticleList deuteron:all.
+[INFO] Calculating track-based isolation variables at ECL0 surface for the decay string deuteron:ref using the reference ParticleList deuteron:all.
+[INFO] Calculating track-based isolation variables at ECL1 surface for the decay string deuteron:ref using the reference ParticleList deuteron:all.
+[INFO] Calculating track-based isolation variables at KLM0 surface for the decay string deuteron:ref using the reference ParticleList deuteron:all.
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: anti-deuteron:all (deuteron:all)
 [INFO]    -> MDST source: Tracks
 [INFO] ParticleSelector: anti-deuteron:ref
 [INFO]    -> With cuts  : [pt > 0.1] and [thetaInCDCAcceptance]
-[INFO] Calculating isolation variables at CDC0 surface for ParticleList: anti-deuteron:ref, reference ParticleList: anti-deuteron:all.
-[INFO] Calculating isolation variables at CDC1 surface for ParticleList: anti-deuteron:ref, reference ParticleList: anti-deuteron:all.
-[INFO] Calculating isolation variables at CDC2 surface for ParticleList: anti-deuteron:ref, reference ParticleList: anti-deuteron:all.
-[INFO] Calculating isolation variables at CDC3 surface for ParticleList: anti-deuteron:ref, reference ParticleList: anti-deuteron:all.
-[INFO] Calculating isolation variables at CDC4 surface for ParticleList: anti-deuteron:ref, reference ParticleList: anti-deuteron:all.
-[INFO] Calculating isolation variables at CDC5 surface for ParticleList: anti-deuteron:ref, reference ParticleList: anti-deuteron:all.
-[INFO] Calculating isolation variables at CDC6 surface for ParticleList: anti-deuteron:ref, reference ParticleList: anti-deuteron:all.
-[INFO] Calculating isolation variables at CDC7 surface for ParticleList: anti-deuteron:ref, reference ParticleList: anti-deuteron:all.
-[INFO] Calculating isolation variables at CDC8 surface for ParticleList: anti-deuteron:ref, reference ParticleList: anti-deuteron:all.
-[INFO] Calculating isolation variables at TOP0 surface for ParticleList: anti-deuteron:ref, reference ParticleList: anti-deuteron:all.
-[INFO] Calculating isolation variables at ARICH0 surface for ParticleList: anti-deuteron:ref, reference ParticleList: anti-deuteron:all.
-[INFO] Calculating isolation variables at ECL0 surface for ParticleList: anti-deuteron:ref, reference ParticleList: anti-deuteron:all.
-[INFO] Calculating isolation variables at ECL1 surface for ParticleList: anti-deuteron:ref, reference ParticleList: anti-deuteron:all.
-[INFO] Calculating isolation variables at KLM0 surface for ParticleList: anti-deuteron:ref, reference ParticleList: anti-deuteron:all.
+[INFO] Calculating track-based isolation variables at CDC0 surface for the decay string anti-deuteron:ref using the reference ParticleList anti-deuteron:all.
+[INFO] Calculating track-based isolation variables at CDC1 surface for the decay string anti-deuteron:ref using the reference ParticleList anti-deuteron:all.
+[INFO] Calculating track-based isolation variables at CDC2 surface for the decay string anti-deuteron:ref using the reference ParticleList anti-deuteron:all.
+[INFO] Calculating track-based isolation variables at CDC3 surface for the decay string anti-deuteron:ref using the reference ParticleList anti-deuteron:all.
+[INFO] Calculating track-based isolation variables at CDC4 surface for the decay string anti-deuteron:ref using the reference ParticleList anti-deuteron:all.
+[INFO] Calculating track-based isolation variables at CDC5 surface for the decay string anti-deuteron:ref using the reference ParticleList anti-deuteron:all.
+[INFO] Calculating track-based isolation variables at CDC6 surface for the decay string anti-deuteron:ref using the reference ParticleList anti-deuteron:all.
+[INFO] Calculating track-based isolation variables at CDC7 surface for the decay string anti-deuteron:ref using the reference ParticleList anti-deuteron:all.
+[INFO] Calculating track-based isolation variables at CDC8 surface for the decay string anti-deuteron:ref using the reference ParticleList anti-deuteron:all.
+[INFO] Calculating track-based isolation variables at TOP0 surface for the decay string anti-deuteron:ref using the reference ParticleList anti-deuteron:all.
+[INFO] Calculating track-based isolation variables at ARICH0 surface for the decay string anti-deuteron:ref using the reference ParticleList anti-deuteron:all.
+[INFO] Calculating track-based isolation variables at ECL0 surface for the decay string anti-deuteron:ref using the reference ParticleList anti-deuteron:all.
+[INFO] Calculating track-based isolation variables at ECL1 surface for the decay string anti-deuteron:ref using the reference ParticleList anti-deuteron:all.
+[INFO] Calculating track-based isolation variables at KLM0 surface for the decay string anti-deuteron:ref using the reference ParticleList anti-deuteron:all.
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: Lambda0:V0 (anti-Lambda0:V0)
+[INFO]    -> MDST source: V0
+[INFO] ParticleSelector: Lambda0:V0_MassWindow
+[INFO]    -> With cuts  : 1.10 < M < 1.13
+[INFO] ParticleSelector: Lambda0:V0_MassWindow
+[INFO]    -> With cuts  : extraInfo(highQualityVertex)
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: pi+:all (pi-:all)
+[INFO]    -> MDST source: Tracks
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: p+:all (anti-p-:all)
+[INFO]    -> MDST source: Tracks
+[INFO] ParticleSelector: Lambda0:RD
+[INFO]    -> With cuts  : 1.10 < M < 1.13
+[INFO] ParticleSelector: Lambda0:RD
+[INFO]    -> With cuts  : extraInfo(highQualityVertex)
+[INFO] Calculating track-based isolation variables at CDC0 surface for the decay string Lambda0:merged -> ^p+ pi- using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at CDC1 surface for the decay string Lambda0:merged -> ^p+ pi- using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at CDC2 surface for the decay string Lambda0:merged -> ^p+ pi- using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at CDC3 surface for the decay string Lambda0:merged -> ^p+ pi- using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at CDC4 surface for the decay string Lambda0:merged -> ^p+ pi- using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at CDC5 surface for the decay string Lambda0:merged -> ^p+ pi- using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at CDC6 surface for the decay string Lambda0:merged -> ^p+ pi- using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at CDC7 surface for the decay string Lambda0:merged -> ^p+ pi- using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at CDC8 surface for the decay string Lambda0:merged -> ^p+ pi- using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at TOP0 surface for the decay string Lambda0:merged -> ^p+ pi- using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at ARICH0 surface for the decay string Lambda0:merged -> ^p+ pi- using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at ECL0 surface for the decay string Lambda0:merged -> ^p+ pi- using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at ECL1 surface for the decay string Lambda0:merged -> ^p+ pi- using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at KLM0 surface for the decay string Lambda0:merged -> ^p+ pi- using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at CDC0 surface for the decay string Lambda0:merged -> p+ ^pi- using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at CDC1 surface for the decay string Lambda0:merged -> p+ ^pi- using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at CDC2 surface for the decay string Lambda0:merged -> p+ ^pi- using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at CDC3 surface for the decay string Lambda0:merged -> p+ ^pi- using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at CDC4 surface for the decay string Lambda0:merged -> p+ ^pi- using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at CDC5 surface for the decay string Lambda0:merged -> p+ ^pi- using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at CDC6 surface for the decay string Lambda0:merged -> p+ ^pi- using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at CDC7 surface for the decay string Lambda0:merged -> p+ ^pi- using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at CDC8 surface for the decay string Lambda0:merged -> p+ ^pi- using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at TOP0 surface for the decay string Lambda0:merged -> p+ ^pi- using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at ARICH0 surface for the decay string Lambda0:merged -> p+ ^pi- using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at ECL0 surface for the decay string Lambda0:merged -> p+ ^pi- using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at ECL1 surface for the decay string Lambda0:merged -> p+ ^pi- using the reference ParticleList p+:all.
+[INFO] Calculating track-based isolation variables at KLM0 surface for the decay string Lambda0:merged -> p+ ^pi- using the reference ParticleList p+:all.
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: K_S0:V0 (K_S0:V0)
+[INFO]    -> MDST source: V0
+[INFO] ParticleSelector: K_S0:V0_MassWindow
+[INFO]    -> With cuts  : 0.450 < M < 0.550
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: pi+:all (pi-:all)
+[INFO]    -> MDST source: Tracks
+[INFO] ParticleSelector: K_S0:RD
+[INFO]    -> With cuts  : 0.450 < M < 0.550
+[INFO] Calculating track-based isolation variables at CDC0 surface for the decay string K_S0:merged -> ^pi+ pi- using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at CDC1 surface for the decay string K_S0:merged -> ^pi+ pi- using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at CDC2 surface for the decay string K_S0:merged -> ^pi+ pi- using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at CDC3 surface for the decay string K_S0:merged -> ^pi+ pi- using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at CDC4 surface for the decay string K_S0:merged -> ^pi+ pi- using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at CDC5 surface for the decay string K_S0:merged -> ^pi+ pi- using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at CDC6 surface for the decay string K_S0:merged -> ^pi+ pi- using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at CDC7 surface for the decay string K_S0:merged -> ^pi+ pi- using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at CDC8 surface for the decay string K_S0:merged -> ^pi+ pi- using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at TOP0 surface for the decay string K_S0:merged -> ^pi+ pi- using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at ARICH0 surface for the decay string K_S0:merged -> ^pi+ pi- using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at ECL0 surface for the decay string K_S0:merged -> ^pi+ pi- using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at ECL1 surface for the decay string K_S0:merged -> ^pi+ pi- using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at KLM0 surface for the decay string K_S0:merged -> ^pi+ pi- using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at CDC0 surface for the decay string K_S0:merged -> pi+ ^pi- using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at CDC1 surface for the decay string K_S0:merged -> pi+ ^pi- using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at CDC2 surface for the decay string K_S0:merged -> pi+ ^pi- using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at CDC3 surface for the decay string K_S0:merged -> pi+ ^pi- using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at CDC4 surface for the decay string K_S0:merged -> pi+ ^pi- using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at CDC5 surface for the decay string K_S0:merged -> pi+ ^pi- using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at CDC6 surface for the decay string K_S0:merged -> pi+ ^pi- using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at CDC7 surface for the decay string K_S0:merged -> pi+ ^pi- using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at CDC8 surface for the decay string K_S0:merged -> pi+ ^pi- using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at TOP0 surface for the decay string K_S0:merged -> pi+ ^pi- using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at ARICH0 surface for the decay string K_S0:merged -> pi+ ^pi- using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at ECL0 surface for the decay string K_S0:merged -> pi+ ^pi- using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at ECL1 surface for the decay string K_S0:merged -> pi+ ^pi- using the reference ParticleList pi+:all.
+[INFO] Calculating track-based isolation variables at KLM0 surface for the decay string K_S0:merged -> pi+ ^pi- using the reference ParticleList pi+:all.
 [INFO] Conditions Database: found working server
 	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
 [INFO] Conditions data: configured globaltag is release-05-01-03
@@ -364,10 +461,10 @@
     1.8e-06   -2.4e-07   -1.1e-07    2.4e-07   -4.2e-06    1.5e-06    6.7e-07
    -2.4e-07    1.2e-06   -3.4e-07    8.4e-07    1.4e-06   -4.9e-07      2e-06
    -1.1e-07   -3.4e-07    1.8e-06    3.7e-07   -5.5e-09    1.7e-09   -4.9e-06
-    2.4e-07    8.4e-07    3.7e-07    9.5e-07    4.8e-08   -1.7e-08    4.6e-11
+    2.4e-07    8.4e-07    3.7e-07    9.5e-07    4.8e-08   -1.7e-08    4.7e-11
    -4.2e-06    1.4e-06   -5.5e-09    4.8e-08    1.1e-05   -3.9e-06   -4.8e-08
     1.5e-06   -4.9e-07    1.7e-09   -1.7e-08   -3.9e-06    1.4e-06    1.9e-08
-    6.7e-07      2e-06   -4.9e-06    4.6e-11   -4.8e-08    1.9e-08    1.6e-05
+    6.7e-07      2e-06   -4.9e-06    4.7e-11   -4.8e-08    1.9e-08    1.6e-05
 
  extra info=( distToClosestTrkAtCDC0_VS_e-:all=1.166 distToClosestTrkAtCDC1_VS_e-:all=1.599 distToClosestTrkAtCDC2_VS_e-:all=0.4999 distToClosestTrkAtCDC3_VS_e-:all=6.672 distToClosestTrkAtCDC4_VS_e-:all=12.72 distToClosestTrkAtCDC5_VS_e-:all=16.06 distToClosestTrkAtCDC6_VS_e-:all=15.79 distToClosestTrkAtCDC7_VS_e-:all=14.34 distToClosestTrkAtCDC8_VS_e-:all=11.49 distToClosestTrkAtECL0_VS_e-:all=64.96 distToClosestTrkAtECL1_VS_e-:all=79.45 distToClosestTrkAtKLM0_VS_e-:all=295.8 distToClosestTrkAtTOP0_VS_e-:all=3.497 ) 
 
@@ -1090,10 +1187,10 @@
     1.8e-06   -2.4e-07   -1.1e-07    2.4e-07   -4.2e-06    1.5e-06    6.7e-07
    -2.4e-07    1.2e-06   -3.4e-07    8.4e-07    1.4e-06   -4.9e-07      2e-06
    -1.1e-07   -3.4e-07    1.8e-06    3.7e-07   -5.5e-09    1.7e-09   -4.9e-06
-    2.4e-07    8.4e-07    3.7e-07    9.5e-07    4.8e-08   -1.7e-08    4.6e-11
+    2.4e-07    8.4e-07    3.7e-07    9.5e-07    4.8e-08   -1.7e-08    4.7e-11
    -4.2e-06    1.4e-06   -5.5e-09    4.8e-08    1.1e-05   -3.9e-06   -4.8e-08
     1.5e-06   -4.9e-07    1.7e-09   -1.7e-08   -3.9e-06    1.4e-06    1.9e-08
-    6.7e-07      2e-06   -4.9e-06    4.6e-11   -4.8e-08    1.9e-08    1.6e-05
+    6.7e-07      2e-06   -4.9e-06    4.7e-11   -4.8e-08    1.9e-08    1.6e-05
 
  extra info=( distToClosestTrkAtCDC0_VS_e+:all=1.166 distToClosestTrkAtCDC0_VS_e-:all=1.166 distToClosestTrkAtCDC1_VS_e+:all=1.599 distToClosestTrkAtCDC1_VS_e-:all=1.599 distToClosestTrkAtCDC2_VS_e+:all=0.4999 distToClosestTrkAtCDC2_VS_e-:all=0.4999 distToClosestTrkAtCDC3_VS_e+:all=6.672 distToClosestTrkAtCDC3_VS_e-:all=6.672 distToClosestTrkAtCDC4_VS_e+:all=12.72 distToClosestTrkAtCDC4_VS_e-:all=12.72 distToClosestTrkAtCDC5_VS_e+:all=16.06 distToClosestTrkAtCDC5_VS_e-:all=16.06 distToClosestTrkAtCDC6_VS_e+:all=15.79 distToClosestTrkAtCDC6_VS_e-:all=15.79 distToClosestTrkAtCDC7_VS_e+:all=14.34 distToClosestTrkAtCDC7_VS_e-:all=14.34 distToClosestTrkAtCDC8_VS_e+:all=11.49 distToClosestTrkAtCDC8_VS_e-:all=11.49 distToClosestTrkAtECL0_VS_e+:all=64.96 distToClosestTrkAtECL0_VS_e-:all=64.96 distToClosestTrkAtECL1_VS_e+:all=79.45 distToClosestTrkAtECL1_VS_e-:all=79.45 distToClosestTrkAtKLM0_VS_e+:all=295.8 distToClosestTrkAtKLM0_VS_e-:all=295.8 distToClosestTrkAtTOP0_VS_e+:all=3.497 distToClosestTrkAtTOP0_VS_e-:all=3.497 ) 
 
@@ -1258,7 +1355,7 @@
 [INFO]  - 9 = -11[5]
 [INFO]      o) distToClosestTrkAtCDC0_VS_e_all = 0.061474
 [INFO]      o) distToClosestTrkAtCDC1_VS_e_all = 1.93964
-[INFO]      o) distToClosestTrkAtCDC2_VS_e_all = 4.1077
+[INFO]      o) distToClosestTrkAtCDC2_VS_e_all = 4.10769
 [INFO]      o) distToClosestTrkAtCDC3_VS_e_all = 9.60065
 [INFO]      o) distToClosestTrkAtCDC4_VS_e_all = 14.8157
 [INFO]      o) distToClosestTrkAtCDC5_VS_e_all = 21.3338
@@ -2390,7 +2487,7 @@
 [INFO]  - 25 = -13[5]
 [INFO]      o) distToClosestTrkAtCDC0_VS_mu_all = 0.061474
 [INFO]      o) distToClosestTrkAtCDC1_VS_mu_all = 1.93964
-[INFO]      o) distToClosestTrkAtCDC2_VS_mu_all = 4.1077
+[INFO]      o) distToClosestTrkAtCDC2_VS_mu_all = 4.10769
 [INFO]      o) distToClosestTrkAtCDC3_VS_mu_all = 9.60065
 [INFO]      o) distToClosestTrkAtCDC4_VS_mu_all = 14.8157
 [INFO]      o) distToClosestTrkAtCDC5_VS_mu_all = 21.3338
@@ -2879,244 +2976,244 @@
 [INFO] [ParticlePrinterModule] START ------------------------------
 [INFO]  ParticleLists: pi+:ref (8+0) + pi-:ref (8+0)
 [INFO]  - 32 = 211[0]
-[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = 4.13797
+[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = 5.45042
+[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = 6.18232
+[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = 3.40805
+[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = 4.40301
+[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = 1.50205
+[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = 2.92014
+[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = 0.0954875
+[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = 13.1736
+[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = 43.0507
 [INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = 111.144
+[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = 69.2291
 [INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = nan
 [INFO]  - 33 = 211[1]
-[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = 1.36576
+[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = 4.29791
+[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = 7.73876
+[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = 2.45667
+[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = 6.08352
+[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = 14.2633
+[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = 21.8817
+[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = 29.3362
+[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = 33.4275
 [INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = nan
 [INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = nan
 [INFO]      o) distToClosestTrkAtECL0_VS_pi_all = nan
 [INFO]      o) distToClosestTrkAtECL1_VS_pi_all = nan
 [INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = nan
 [INFO]  - 38 = 211[2]
-[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = 4.13797
+[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = 5.45042
+[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = 6.18232
+[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = 2.45667
+[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = 4.40301
+[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = 1.50205
+[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = 2.92014
+[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = 5.9006
+[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = 4.25308
+[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = 23.7605
 [INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = 111.58
+[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = 136.02
+[INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = 203.002
 [INFO]  - 39 = 211[3]
-[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = 10.8053
+[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = 11.886
+[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = 8.30937
+[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = 1.80155
+[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = 12.2653
+[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = 5.0151
+[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = 5.3075
+[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = 19.754
+[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = 37.6605
+[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = 72.2633
 [INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = 94.4671
+[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = 108.387
 [INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = nan
 [INFO]  - 40 = 211[4]
-[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = 0.061474
+[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = 1.93964
+[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = 1.10962
+[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = 6.67045
+[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = 6.36942
+[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = 5.29673
+[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = 3.48469
+[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = 0.737612
+[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = 2.82076
+[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = 9.85145
 [INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = 19.031
+[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = 28.1635
+[INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = 135.563
 [INFO]  - 41 = 211[5]
-[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = 0.061474
+[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = 1.93964
+[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = 4.10769
+[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = 9.60065
+[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = 14.8157
+[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = 21.3338
+[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = 9.401
+[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = 18.0564
+[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = 28.388
+[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = 56.3754
 [INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = 65.1765
+[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = 79.8521
+[INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = 283.844
 [INFO]  - 42 = 211[6]
-[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = 3.72787
+[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = 5.17071
+[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = 6.25529
+[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = 1.31255
+[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = 6.36942
+[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = 5.29673
+[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = 3.48469
+[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = 0.737612
+[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = 2.82076
+[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = 9.85145
 [INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = 19.031
+[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = 28.1635
+[INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = 135.563
 [INFO]  - 44 = 211[7]
-[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = 4.78861
+[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = 9.68718
+[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = 19.4651
+[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = 34.2456
+[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = 28.2389
+[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = 15.1499
+[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = 21.2311
+[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = 23.6022
+[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = 27.8336
 [INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = nan
 [INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = nan
 [INFO]      o) distToClosestTrkAtECL0_VS_pi_all = nan
 [INFO]      o) distToClosestTrkAtECL1_VS_pi_all = nan
 [INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = nan
 [INFO]  - 34 = -211[8]
-[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = 0.740482
+[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = 3.34994
+[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = 8.87645
+[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = 16.1281
+[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = 12.2653
+[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = 5.0151
+[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = 5.3075
+[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = 19.754
+[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = 37.6605
+[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = 65.017
 [INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = 86.2496
+[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = 79.8521
+[INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = 159.664
 [INFO]  - 35 = -211[9]
-[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = 0.740482
+[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = 3.34994
+[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = 8.30937
+[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = 1.80155
+[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = 19.0646
+[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = 25.0044
+[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = 9.401
+[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = 18.0564
+[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = 17.0958
 [INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = 87.7525
+[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = 85.9784
+[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = 69.2291
 [INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = nan
 [INFO]  - 36 = -211[10]
-[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = 5.81101
+[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = 3.39634
+[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = 1.10962
+[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = 1.31255
+[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = 15.9912
+[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = 32.548
+[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = 1.34674
+[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = 0.0954875
+[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = 6.02613
 [INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = 87.7525
+[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = 85.9784
+[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = 75.7261
 [INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = nan
 [INFO]  - 37 = -211[11]
-[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = 1.1661
+[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = 1.59853
+[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = 0.499922
+[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = 6.67214
+[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = 12.7226
+[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = 16.0587
+[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = 15.7918
+[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = 14.3412
+[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = 11.4873
+[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = 3.49731
 [INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = 64.9554
+[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = 79.4532
+[INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = 295.777
 [INFO]  - 43 = -211[12]
-[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = 7.94473
+[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = 15.1196
+[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = 21.4913
+[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = 22.9639
+[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = 22.2181
+[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = 19.134
+[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = 1.34674
+[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = 3.79253
+[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = 4.25308
+[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = 23.7605
 [INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = 111.144
+[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = 136.02
+[INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = 197.656
 [INFO]  - 45 = -211[13]
-[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = 1.36576
+[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = 4.29791
+[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = 11.7126
+[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = 13.9361
+[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = 2.67473
+[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = 9.63423
+[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = 15.7918
+[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = 14.3412
+[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = 11.4873
+[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = 3.49731
 [INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = 64.9554
+[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = 79.4532
 [INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = nan
 [INFO]  - 46 = -211[14]
-[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = 0.537266
+[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = 1.59853
+[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = 0.499922
+[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = 6.67214
+[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = 2.67473
+[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = 9.63423
+[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = 20.9132
+[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = 23.6022
+[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = 27.8336
+[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = 65.1883
 [INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = 78.0651
+[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = 95.1784
+[INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = 197.656
 [INFO]  - 47 = -211[15]
-[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = 0.537266
+[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = 1.98905
+[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = 7.92454
+[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = 9.35752
+[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = 26.3925
+[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = 15.1499
+[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = 31.5081
+[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = 31.0225
+[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = 29.2823
 [INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = 111.644
+[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = 110.392
+[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = 103.469
 [INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = nan
 [INFO] [ParticlePrinterModule] END   ------------------------------
 [INFO] [ParticlePrinterModule] START ------------------------------
@@ -3642,7 +3739,7 @@
 [INFO]  - 41 = 211[13]
 [INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = 0.061474
 [INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = 1.93964
-[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = 4.1077
+[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = 4.10769
 [INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = 9.60065
 [INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = 14.8157
 [INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = 21.3338
@@ -4803,7 +4900,7 @@
 [INFO]      o) distToClosestTrkAtKLM0_VS_K_all = 127.501
 [INFO]  - 60 = 321[15]
 [INFO]      o) distToClosestTrkAtCDC0_VS_K_all = 4.699
-[INFO]      o) distToClosestTrkAtCDC1_VS_K_all = 9.46945
+[INFO]      o) distToClosestTrkAtCDC1_VS_K_all = 9.46946
 [INFO]      o) distToClosestTrkAtCDC2_VS_K_all = 18.8579
 [INFO]      o) distToClosestTrkAtCDC3_VS_K_all = 32.8869
 [INFO]      o) distToClosestTrkAtCDC4_VS_K_all = 31.4296
@@ -4992,10 +5089,10 @@
     3.8e-06    6.5e-08    1.7e-07   -1.6e-06   -2.8e-09    8.4e-08   -6.5e-06
     6.5e-08      4e-06   -1.8e-08   -8.1e-08    2.9e-07   -8.6e-06   -2.5e-07
     1.7e-07   -1.8e-08    3.9e-06    1.2e-06   -2.2e-09    6.8e-08   -8.8e-06
-   -1.6e-06   -8.1e-08    1.2e-06    1.1e-06   -2.8e-09    8.5e-08   -1.5e-11
+   -1.6e-06   -8.1e-08    1.2e-06    1.1e-06   -2.8e-09    8.5e-08   -1.6e-11
    -2.8e-09    2.9e-07   -2.2e-09   -2.8e-09    2.2e-08   -6.6e-07   -5.2e-09
     8.4e-08   -8.6e-06    6.8e-08    8.5e-08   -6.6e-07      2e-05    1.5e-07
-   -6.5e-06   -2.5e-07   -8.8e-06   -1.5e-11   -5.2e-09    1.5e-07    3.1e-05
+   -6.5e-06   -2.5e-07   -8.8e-06   -1.6e-11   -5.2e-09    1.5e-07    3.1e-05
 
  extra info=( distToClosestTrkAtCDC0_VS_p+:all=0.2766 distToClosestTrkAtCDC1_VS_p+:all=2.101 distToClosestTrkAtCDC2_VS_p+:all=6.034 distToClosestTrkAtCDC3_VS_p+:all=12.37 distToClosestTrkAtCDC4_VS_p+:all=14.33 distToClosestTrkAtCDC5_VS_p+:all=8.118 distToClosestTrkAtCDC6_VS_p+:all=0.9312 distToClosestTrkAtCDC7_VS_p+:all=13.7 distToClosestTrkAtCDC8_VS_p+:all=29.52 distToClosestTrkAtECL0_VS_p+:all=80.16 distToClosestTrkAtECL1_VS_p+:all=84 distToClosestTrkAtKLM0_VS_p+:all=158.1 distToClosestTrkAtTOP0_VS_p+:all=59.71 ) 
 
@@ -5325,7 +5422,7 @@
 [INFO]  - 75 = -2212[12]
 [INFO]      o) distToClosestTrkAtCDC0_VS_p_all = 7.89843
 [INFO]      o) distToClosestTrkAtCDC1_VS_p_all = 14.9954
-[INFO]      o) distToClosestTrkAtCDC2_VS_p_all = 21.6427
+[INFO]      o) distToClosestTrkAtCDC2_VS_p_all = 21.6428
 [INFO]      o) distToClosestTrkAtCDC3_VS_p_all = 23.2448
 [INFO]      o) distToClosestTrkAtCDC4_VS_p_all = 22.6647
 [INFO]      o) distToClosestTrkAtCDC5_VS_p_all = 19.7986
@@ -5380,7 +5477,7 @@
 [INFO]      o) distToClosestTrkAtTOP0_VS_p_all = nan
 [INFO]      o) distToClosestTrkAtARICH0_VS_p_all = 91.908
 [INFO]      o) distToClosestTrkAtECL0_VS_p_all = 93.514
-[INFO]      o) distToClosestTrkAtECL1_VS_p_all = 99.0854
+[INFO]      o) distToClosestTrkAtECL1_VS_p_all = 99.0855
 [INFO]      o) distToClosestTrkAtKLM0_VS_p_all = nan
 [INFO] [ParticlePrinterModule] END   ------------------------------
 [INFO] [ParticlePrinterModule] START ------------------------------
@@ -5398,10 +5495,10 @@
     3.8e-06    6.5e-08    1.7e-07   -1.6e-06   -2.8e-09    8.4e-08   -6.5e-06
     6.5e-08      4e-06   -1.8e-08   -8.1e-08    2.9e-07   -8.6e-06   -2.5e-07
     1.7e-07   -1.8e-08    3.9e-06    1.2e-06   -2.2e-09    6.8e-08   -8.8e-06
-   -1.6e-06   -8.1e-08    1.2e-06    1.1e-06   -2.8e-09    8.5e-08   -1.5e-11
+   -1.6e-06   -8.1e-08    1.2e-06    1.1e-06   -2.8e-09    8.5e-08   -1.6e-11
    -2.8e-09    2.9e-07   -2.2e-09   -2.8e-09    2.2e-08   -6.6e-07   -5.2e-09
     8.4e-08   -8.6e-06    6.8e-08    8.5e-08   -6.6e-07      2e-05    1.5e-07
-   -6.5e-06   -2.5e-07   -8.8e-06   -1.5e-11   -5.2e-09    1.5e-07    3.1e-05
+   -6.5e-06   -2.5e-07   -8.8e-06   -1.6e-11   -5.2e-09    1.5e-07    3.1e-05
 
  extra info=( distToClosestTrkAtCDC0_VS_anti-p-:all=0.2766 distToClosestTrkAtCDC0_VS_p+:all=0.2766 distToClosestTrkAtCDC1_VS_anti-p-:all=2.101 distToClosestTrkAtCDC1_VS_p+:all=2.101 distToClosestTrkAtCDC2_VS_anti-p-:all=6.034 distToClosestTrkAtCDC2_VS_p+:all=6.034 distToClosestTrkAtCDC3_VS_anti-p-:all=12.37 distToClosestTrkAtCDC3_VS_p+:all=12.37 distToClosestTrkAtCDC4_VS_anti-p-:all=14.33 distToClosestTrkAtCDC4_VS_p+:all=14.33 distToClosestTrkAtCDC5_VS_anti-p-:all=8.118 distToClosestTrkAtCDC5_VS_p+:all=8.118 distToClosestTrkAtCDC6_VS_anti-p-:all=0.9312 distToClosestTrkAtCDC6_VS_p+:all=0.9312 distToClosestTrkAtCDC7_VS_anti-p-:all=13.7 distToClosestTrkAtCDC7_VS_p+:all=13.7 distToClosestTrkAtCDC8_VS_anti-p-:all=29.52 distToClosestTrkAtCDC8_VS_p+:all=29.52 distToClosestTrkAtECL0_VS_anti-p-:all=80.16 distToClosestTrkAtECL0_VS_p+:all=80.16 distToClosestTrkAtECL1_VS_anti-p-:all=84 distToClosestTrkAtECL1_VS_p+:all=84 distToClosestTrkAtKLM0_VS_anti-p-:all=158.1 distToClosestTrkAtKLM0_VS_p+:all=158.1 distToClosestTrkAtTOP0_VS_anti-p-:all=59.71 distToClosestTrkAtTOP0_VS_p+:all=59.71 ) 
 
@@ -5771,7 +5868,7 @@
 [INFO]  - 75 = -2212[4]
 [INFO]      o) distToClosestTrkAtCDC0_VS_anti_p_all = 7.89843
 [INFO]      o) distToClosestTrkAtCDC1_VS_anti_p_all = 14.9954
-[INFO]      o) distToClosestTrkAtCDC2_VS_anti_p_all = 21.6427
+[INFO]      o) distToClosestTrkAtCDC2_VS_anti_p_all = 21.6428
 [INFO]      o) distToClosestTrkAtCDC3_VS_anti_p_all = 23.2448
 [INFO]      o) distToClosestTrkAtCDC4_VS_anti_p_all = 22.6647
 [INFO]      o) distToClosestTrkAtCDC5_VS_anti_p_all = 19.7986
@@ -5826,7 +5923,7 @@
 [INFO]      o) distToClosestTrkAtTOP0_VS_anti_p_all = nan
 [INFO]      o) distToClosestTrkAtARICH0_VS_anti_p_all = 91.908
 [INFO]      o) distToClosestTrkAtECL0_VS_anti_p_all = 93.514
-[INFO]      o) distToClosestTrkAtECL1_VS_anti_p_all = 99.0854
+[INFO]      o) distToClosestTrkAtECL1_VS_anti_p_all = 99.0855
 [INFO]      o) distToClosestTrkAtKLM0_VS_anti_p_all = nan
 [INFO]  - 64 = 2212[8]
 [INFO]      o) distToClosestTrkAtCDC0_VS_anti_p_all = 4.23586
@@ -6457,7 +6554,7 @@
 [INFO]  - 91 = -1000010020[12]
 [INFO]      o) distToClosestTrkAtCDC0_VS_deuteron_all = 7.89843
 [INFO]      o) distToClosestTrkAtCDC1_VS_deuteron_all = 14.9954
-[INFO]      o) distToClosestTrkAtCDC2_VS_deuteron_all = 21.6427
+[INFO]      o) distToClosestTrkAtCDC2_VS_deuteron_all = 21.6428
 [INFO]      o) distToClosestTrkAtCDC3_VS_deuteron_all = 23.2448
 [INFO]      o) distToClosestTrkAtCDC4_VS_deuteron_all = 22.6647
 [INFO]      o) distToClosestTrkAtCDC5_VS_deuteron_all = 19.7986
@@ -6512,7 +6609,7 @@
 [INFO]      o) distToClosestTrkAtTOP0_VS_deuteron_all = nan
 [INFO]      o) distToClosestTrkAtARICH0_VS_deuteron_all = 91.908
 [INFO]      o) distToClosestTrkAtECL0_VS_deuteron_all = 93.514
-[INFO]      o) distToClosestTrkAtECL1_VS_deuteron_all = 99.0854
+[INFO]      o) distToClosestTrkAtECL1_VS_deuteron_all = 99.0855
 [INFO]      o) distToClosestTrkAtKLM0_VS_deuteron_all = nan
 [INFO] [ParticlePrinterModule] END   ------------------------------
 [INFO] [ParticlePrinterModule] START ------------------------------
@@ -6903,7 +7000,7 @@
 [INFO]  - 91 = -1000010020[4]
 [INFO]      o) distToClosestTrkAtCDC0_VS_anti_deuteron_all = 7.89843
 [INFO]      o) distToClosestTrkAtCDC1_VS_anti_deuteron_all = 14.9954
-[INFO]      o) distToClosestTrkAtCDC2_VS_anti_deuteron_all = 21.6427
+[INFO]      o) distToClosestTrkAtCDC2_VS_anti_deuteron_all = 21.6428
 [INFO]      o) distToClosestTrkAtCDC3_VS_anti_deuteron_all = 23.2448
 [INFO]      o) distToClosestTrkAtCDC4_VS_anti_deuteron_all = 22.6647
 [INFO]      o) distToClosestTrkAtCDC5_VS_anti_deuteron_all = 19.7986
@@ -6958,7 +7055,7 @@
 [INFO]      o) distToClosestTrkAtTOP0_VS_anti_deuteron_all = nan
 [INFO]      o) distToClosestTrkAtARICH0_VS_anti_deuteron_all = 91.908
 [INFO]      o) distToClosestTrkAtECL0_VS_anti_deuteron_all = 93.514
-[INFO]      o) distToClosestTrkAtECL1_VS_anti_deuteron_all = 99.0854
+[INFO]      o) distToClosestTrkAtECL1_VS_anti_deuteron_all = 99.0855
 [INFO]      o) distToClosestTrkAtKLM0_VS_anti_deuteron_all = nan
 [INFO]  - 80 = 1000010020[8]
 [INFO]      o) distToClosestTrkAtCDC0_VS_anti_deuteron_all = 4.23586
@@ -7080,6 +7177,527 @@
 [INFO]      o) distToClosestTrkAtECL0_VS_anti_deuteron_all = 62.8915
 [INFO]      o) distToClosestTrkAtECL1_VS_anti_deuteron_all = 39.7168
 [INFO]      o) distToClosestTrkAtKLM0_VS_anti_deuteron_all = nan
+[INFO] [ParticlePrinterModule] END   ------------------------------
+[INFO] [ParticlePrinterModule] START ------------------------------
+[INFO]  ParticleLists: Lambda0:merged (0+0) + anti-Lambda0:merged (2+0)
+[INFO] collection=Particles
+ PDGCode=-3122 Charge=0 PDGMass=1.116
+ flavorType=1 particleSource=6 particleTypeUsedForFit=0
+ mdstIndex=0 arrayIndex=139 identifier=-1 daughterIndices: 79, 33, 
+ daughter PDGCodes: -2212, 211, 
+ mass=1.129
+ momentum=(0.09, 0.29, 0.39) p=0.4942
+ momentum scaling factor=1
+ position=(-0.06, 0.00, -0.02)
+ p-value of fit (if done): 0.2157
+ error matrix (px, py, pz, E, x, y ,z):
+    6.4e-05    0.00014    0.00033    0.00016          0          0          0
+    0.00014    0.00049     0.0011    0.00053          0          0          0
+    0.00033     0.0011     0.0025     0.0012          0          0          0
+    0.00016    0.00053     0.0012     0.0006          0          0          0
+          0          0          0          0    0.00035    8.3e-05    1.4e-05
+          0          0          0          0    8.3e-05    0.00069    1.4e-05
+          0          0          0          0    1.4e-05    1.4e-05    0.00057
+
+ extra info=( chiSquared=1.533 decayModeID=1 failed=0 highQualityVertex=1 modifiedPValue=0.6747 ndf=1 ) 
+
+[INFO] collection=Particles
+ PDGCode=-3122 Charge=0 PDGMass=1.116
+ flavorType=1 particleSource=6 particleTypeUsedForFit=0
+ mdstIndex=0 arrayIndex=151 identifier=-1 daughterIndices: 67, 44, 
+ daughter PDGCodes: -2212, 211, 
+ mass=1.126
+ momentum=(-0.37, 0.01, 0.36) p=0.5147
+ momentum scaling factor=1
+ position=(-8.78, 1.10, 10.54)
+ p-value of fit (if done): 9.241e-33
+ error matrix (px, py, pz, E, x, y ,z):
+    1.8e-05    6.1e-07    4.9e-06     -3e-06          0          0          0
+    6.1e-07    1.6e-05    1.7e-06      1e-06          0          0          0
+    4.9e-06    1.7e-06    1.6e-05    2.6e-06          0          0          0
+     -3e-06      1e-06    2.6e-06    1.6e-06          0          0          0
+          0          0          0          0       0.15     -0.008      -0.17
+          0          0          0          0     -0.008     0.0049     0.0095
+          0          0          0          0      -0.17     0.0095       0.21
+
+ extra info=( chiSquared=142.1 decayModeID=1 failed=0 highQualityVertex=1 modifiedPValue=1.332e-30 ndf=1 ) 
+
+[INFO] [ParticlePrinterModule] END   ------------------------------
+[INFO] [ParticlePrinterModule] START ------------------------------
+[INFO]  ParticleLists: Lambda0:merged (0+0) + anti-Lambda0:merged (2+0)
+[INFO]  - 139 = -3122[0]
+[INFO]      o) daughter indices = 79 33
+[INFO]      o) p_distToClosestTrkAtCDC0_VS_p_all = 1.08131
+[INFO]      o) p_distToClosestTrkAtCDC1_VS_p_all = 0.840745
+[INFO]      o) p_distToClosestTrkAtCDC2_VS_p_all = 6.07265
+[INFO]      o) p_distToClosestTrkAtCDC3_VS_p_all = 8.4311
+[INFO]      o) p_distToClosestTrkAtCDC4_VS_p_all = 24.6607
+[INFO]      o) p_distToClosestTrkAtCDC5_VS_p_all = 29.175
+[INFO]      o) p_distToClosestTrkAtCDC6_VS_p_all = 29.7564
+[INFO]      o) p_distToClosestTrkAtCDC7_VS_p_all = 22.5469
+[INFO]      o) p_distToClosestTrkAtCDC8_VS_p_all = 3.6217
+[INFO]      o) p_distToClosestTrkAtTOP0_VS_p_all = nan
+[INFO]      o) p_distToClosestTrkAtARICH0_VS_p_all = 91.908
+[INFO]      o) p_distToClosestTrkAtECL0_VS_p_all = 93.514
+[INFO]      o) p_distToClosestTrkAtECL1_VS_p_all = 99.0855
+[INFO]      o) p_distToClosestTrkAtKLM0_VS_p_all = nan
+[INFO]      o) pi_distToClosestTrkAtCDC0_VS_p_all = 1.49506
+[INFO]      o) pi_distToClosestTrkAtCDC1_VS_p_all = 3.9567
+[INFO]      o) pi_distToClosestTrkAtCDC2_VS_p_all = 7.07094
+[INFO]      o) pi_distToClosestTrkAtCDC3_VS_p_all = 2.28034
+[INFO]      o) pi_distToClosestTrkAtCDC4_VS_p_all = 4.14506
+[INFO]      o) pi_distToClosestTrkAtCDC5_VS_p_all = 11.3313
+[INFO]      o) pi_distToClosestTrkAtCDC6_VS_p_all = 20.5664
+[INFO]      o) pi_distToClosestTrkAtCDC7_VS_p_all = 28.6268
+[INFO]      o) pi_distToClosestTrkAtCDC8_VS_p_all = 34.1052
+[INFO]      o) pi_distToClosestTrkAtTOP0_VS_p_all = nan
+[INFO]      o) pi_distToClosestTrkAtARICH0_VS_p_all = nan
+[INFO]      o) pi_distToClosestTrkAtECL0_VS_p_all = nan
+[INFO]      o) pi_distToClosestTrkAtECL1_VS_p_all = nan
+[INFO]      o) pi_distToClosestTrkAtKLM0_VS_p_all = nan
+[INFO]  - 151 = -3122[1]
+[INFO]      o) daughter indices = 67 44
+[INFO]      o) p_distToClosestTrkAtCDC0_VS_p_all = 0.276559
+[INFO]      o) p_distToClosestTrkAtCDC1_VS_p_all = 2.10147
+[INFO]      o) p_distToClosestTrkAtCDC2_VS_p_all = 6.03382
+[INFO]      o) p_distToClosestTrkAtCDC3_VS_p_all = 5.12629
+[INFO]      o) p_distToClosestTrkAtCDC4_VS_p_all = 6.90037
+[INFO]      o) p_distToClosestTrkAtCDC5_VS_p_all = 26.3074
+[INFO]      o) p_distToClosestTrkAtCDC6_VS_p_all = 29.8915
+[INFO]      o) p_distToClosestTrkAtCDC7_VS_p_all = 7.01918
+[INFO]      o) p_distToClosestTrkAtCDC8_VS_p_all = 0.0137242
+[INFO]      o) p_distToClosestTrkAtTOP0_VS_p_all = nan
+[INFO]      o) p_distToClosestTrkAtARICH0_VS_p_all = 120.031
+[INFO]      o) p_distToClosestTrkAtECL0_VS_p_all = 119.301
+[INFO]      o) p_distToClosestTrkAtECL1_VS_p_all = 114.252
+[INFO]      o) p_distToClosestTrkAtKLM0_VS_p_all = nan
+[INFO]      o) pi_distToClosestTrkAtCDC0_VS_p_all = 4.77403
+[INFO]      o) pi_distToClosestTrkAtCDC1_VS_p_all = 9.65054
+[INFO]      o) pi_distToClosestTrkAtCDC2_VS_p_all = 19.389
+[INFO]      o) pi_distToClosestTrkAtCDC3_VS_p_all = 34.1159
+[INFO]      o) pi_distToClosestTrkAtCDC4_VS_p_all = 30.2643
+[INFO]      o) pi_distToClosestTrkAtCDC5_VS_p_all = 17.2264
+[INFO]      o) pi_distToClosestTrkAtCDC6_VS_p_all = 21.1481
+[INFO]      o) pi_distToClosestTrkAtCDC7_VS_p_all = 23.4758
+[INFO]      o) pi_distToClosestTrkAtCDC8_VS_p_all = 27.6464
+[INFO]      o) pi_distToClosestTrkAtTOP0_VS_p_all = nan
+[INFO]      o) pi_distToClosestTrkAtARICH0_VS_p_all = nan
+[INFO]      o) pi_distToClosestTrkAtECL0_VS_p_all = nan
+[INFO]      o) pi_distToClosestTrkAtECL1_VS_p_all = nan
+[INFO]      o) pi_distToClosestTrkAtKLM0_VS_p_all = nan
+[INFO] [ParticlePrinterModule] END   ------------------------------
+[INFO] [ParticlePrinterModule] START ------------------------------
+[INFO]  ParticleList : K_S0:merged (0+8)
+[INFO] collection=Particles
+ PDGCode=310 Charge=0 PDGMass=0.4976
+ flavorType=0 particleSource=4 particleTypeUsedForFit=0
+ mdstIndex=0 arrayIndex=160 identifier=0 daughterIndices: 158, 159, 
+ daughter PDGCodes: 211, -211, 
+ mass=0.4983
+ momentum=(0.52, -0.56, 0.46) p=0.8961
+ momentum scaling factor=1
+ position=(3.30, -3.58, 2.99)
+ p-value of fit (if done): 2.005e-05
+ error matrix (px, py, pz, E, x, y ,z):
+    1.7e-06   -9.5e-08    9.7e-08    9.3e-07          0          0          0
+   -9.5e-08    1.2e-06    3.9e-08   -7.2e-07          0          0          0
+    9.7e-08    3.9e-08    1.9e-06    8.4e-07          0          0          0
+    9.3e-07   -7.2e-07    8.4e-07    1.5e-06          0          0          0
+          0          0          0          0    6.8e-05   -4.5e-05    3.5e-05
+          0          0          0          0   -4.5e-05    7.3e-05   -3.4e-05
+          0          0          0          0    3.5e-05   -3.4e-05    7.6e-05
+
+ extra info=( chiSquared=18.19 failed=0 modifiedPValue=0.0004028 ndf=1 ) 
+
+[INFO] collection=Particles
+ PDGCode=310 Charge=0 PDGMass=0.4976
+ flavorType=0 particleSource=6 particleTypeUsedForFit=0
+ mdstIndex=0 arrayIndex=162 identifier=-1 daughterIndices: 39, 34, 
+ daughter PDGCodes: 211, -211, 
+ mass=0.4507
+ momentum=(-0.68, -0.26, 0.52) p=0.8967
+ momentum scaling factor=1
+ position=(-0.06, 0.01, -0.00)
+ p-value of fit (if done): 0.001365
+ error matrix (px, py, pz, E, x, y ,z):
+    2.4e-06   -2.8e-07    1.4e-07   -1.3e-06          0          0          0
+   -2.8e-07    2.1e-06    2.4e-07   -3.4e-07          0          0          0
+    1.4e-07    2.4e-07    2.4e-06      1e-06          0          0          0
+   -1.3e-06   -3.4e-07      1e-06    1.7e-06          0          0          0
+          0          0          0          0    2.5e-05    6.3e-06   -1.5e-05
+          0          0          0          0    6.3e-06    7.4e-06   -4.8e-06
+          0          0          0          0   -1.5e-05   -4.8e-06    1.6e-05
+
+ extra info=( chiSquared=10.25 decayModeID=1 failed=0 modifiedPValue=0.01654 ndf=1 ) 
+
+[INFO] collection=Particles
+ PDGCode=310 Charge=0 PDGMass=0.4976
+ flavorType=0 particleSource=6 particleTypeUsedForFit=0
+ mdstIndex=0 arrayIndex=164 identifier=-1 daughterIndices: 32, 35, 
+ daughter PDGCodes: 211, -211, 
+ mass=0.486
+ momentum=(0.05, 0.19, 0.45) p=0.4935
+ momentum scaling factor=1
+ position=(-0.05, 0.02, 0.00)
+ p-value of fit (if done): 0.3258
+ error matrix (px, py, pz, E, x, y ,z):
+    2.7e-06   -5.1e-08    2.2e-07   -1.1e-07          0          0          0
+   -5.1e-08      3e-06   -2.1e-07    2.6e-07          0          0          0
+    2.2e-07   -2.1e-07    2.3e-06    8.9e-07          0          0          0
+   -1.1e-07    2.6e-07    8.9e-07    1.1e-06          0          0          0
+          0          0          0          0      4e-05    1.7e-05    2.4e-05
+          0          0          0          0    1.7e-05    3.3e-05    2.3e-05
+          0          0          0          0    2.4e-05    2.3e-05    5.5e-05
+
+ extra info=( chiSquared=0.9654 decayModeID=1 failed=0 modifiedPValue=0.8096 ndf=1 ) 
+
+[INFO] collection=Particles
+ PDGCode=310 Charge=0 PDGMass=0.4976
+ flavorType=0 particleSource=6 particleTypeUsedForFit=0
+ mdstIndex=0 arrayIndex=169 identifier=-1 daughterIndices: 32, 36, 
+ daughter PDGCodes: 211, -211, 
+ mass=0.4978
+ momentum=(0.18, 0.01, 0.45) p=0.4817
+ momentum scaling factor=1
+ position=(-0.05, 0.02, 0.00)
+ p-value of fit (if done): 0.4562
+ error matrix (px, py, pz, E, x, y ,z):
+    3.4e-06    2.1e-07    2.7e-07    2.5e-07          0          0          0
+    2.1e-07    3.1e-06    7.2e-07   -1.5e-07          0          0          0
+    2.7e-07    7.2e-07    2.7e-06    8.4e-07          0          0          0
+    2.5e-07   -1.5e-07    8.4e-07    1.1e-06          0          0          0
+          0          0          0          0    7.3e-05    4.4e-05    6.4e-05
+          0          0          0          0    4.4e-05    5.8e-05    5.2e-05
+          0          0          0          0    6.4e-05    5.2e-05     0.0001
+
+ extra info=( chiSquared=0.5551 decayModeID=1 failed=0 modifiedPValue=0.9066 ndf=1 ) 
+
+[INFO] collection=Particles
+ PDGCode=310 Charge=0 PDGMass=0.4976
+ flavorType=0 particleSource=6 particleTypeUsedForFit=0
+ mdstIndex=0 arrayIndex=173 identifier=-1 daughterIndices: 40, 36, 
+ daughter PDGCodes: 211, -211, 
+ mass=0.5357
+ momentum=(0.35, -1.10, 0.41) p=1.221
+ momentum scaling factor=1
+ position=(-0.06, 0.04, -0.02)
+ p-value of fit (if done): 0.6347
+ error matrix (px, py, pz, E, x, y ,z):
+    3.3e-06   -1.8e-06   -6.6e-07    1.1e-06          0          0          0
+   -1.8e-06    4.8e-06    2.9e-07   -3.5e-06          0          0          0
+   -6.6e-07    2.9e-07    2.5e-06    1.2e-06          0          0          0
+    1.1e-06   -3.5e-06    1.2e-06    3.9e-06          0          0          0
+          0          0          0          0    5.1e-05   -0.00012    2.8e-05
+          0          0          0          0   -0.00012     0.0003   -6.9e-05
+          0          0          0          0    2.8e-05   -6.9e-05    1.9e-05
+
+ extra info=( chiSquared=0.2258 decayModeID=1 failed=0 modifiedPValue=0.9733 ndf=1 ) 
+
+[INFO] collection=Particles
+ PDGCode=310 Charge=0 PDGMass=0.4976
+ flavorType=0 particleSource=6 particleTypeUsedForFit=0
+ mdstIndex=0 arrayIndex=181 identifier=-1 daughterIndices: 32, 43, 
+ daughter PDGCodes: 211, -211, 
+ mass=0.5029
+ momentum=(0.62, -0.05, 0.64) p=0.8895
+ momentum scaling factor=1
+ position=(-1.39, -1.09, -1.51)
+ p-value of fit (if done): 3.898e-19
+ error matrix (px, py, pz, E, x, y ,z):
+    3.3e-06      2e-07   -9.6e-07    1.2e-06          0          0          0
+      2e-07    4.2e-06    1.8e-07   -1.3e-07          0          0          0
+   -9.6e-07    1.8e-07    3.4e-06    1.2e-06          0          0          0
+    1.2e-06   -1.3e-07    1.2e-06    1.8e-06          0          0          0
+          0          0          0          0    0.00038    0.00013    0.00031
+          0          0          0          0    0.00013     0.0002    0.00015
+          0          0          0          0    0.00031    0.00015    0.00048
+
+ extra info=( chiSquared=79.92 decayModeID=1 failed=0 modifiedPValue=3.192e-17 ndf=1 ) 
+
+[INFO] collection=Particles
+ PDGCode=310 Charge=0 PDGMass=0.4976
+ flavorType=0 particleSource=6 particleTypeUsedForFit=0
+ mdstIndex=0 arrayIndex=201 identifier=-1 daughterIndices: 44, 46, 
+ daughter PDGCodes: 211, -211, 
+ mass=0.5281
+ momentum=(0.26, 0.08, -0.03) p=0.2761
+ momentum scaling factor=1
+ position=(-50.92, 44.96, 41.95)
+ p-value of fit (if done): 9.434e-174
+ error matrix (px, py, pz, E, x, y ,z):
+    3.4e-06    1.9e-06   -2.1e-06    2.8e-06          0          0          0
+    1.9e-06    8.6e-06   -1.1e-06    4.7e-06          0          0          0
+   -2.1e-06   -1.1e-06    3.5e-06   -2.4e-06          0          0          0
+    2.8e-06    4.7e-06   -2.4e-06    8.3e-06          0          0          0
+          0          0          0          0        0.4      -0.11       0.04
+          0          0          0          0      -0.11       0.52      0.059
+          0          0          0          0       0.04      0.059        0.6
+
+ extra info=( chiSquared=789.7 decayModeID=1 failed=0 modifiedPValue=7.469e-171 ndf=1 ) 
+
+[INFO] collection=Particles
+ PDGCode=310 Charge=0 PDGMass=0.4976
+ flavorType=0 particleSource=6 particleTypeUsedForFit=0
+ mdstIndex=0 arrayIndex=207 identifier=-1 daughterIndices: 44, 47, 
+ daughter PDGCodes: 211, -211, 
+ mass=0.451
+ momentum=(-0.11, 0.15, 0.51) p=0.5444
+ momentum scaling factor=1
+ position=(0.57, 1.87, 4.31)
+ p-value of fit (if done): 3.929e-19
+ error matrix (px, py, pz, E, x, y ,z):
+    1.4e-05    2.3e-05    5.4e-05    5.2e-05          0          0          0
+    2.3e-05    7.9e-05    0.00017    0.00017          0          0          0
+    5.4e-05    0.00017    0.00038     0.0004          0          0          0
+    5.2e-05    0.00017     0.0004    0.00042          0          0          0
+          0          0          0          0     0.0016     0.0048      0.011
+          0          0          0          0     0.0048      0.015      0.034
+          0          0          0          0      0.011      0.034      0.078
+
+ extra info=( chiSquared=79.9 decayModeID=1 failed=0 modifiedPValue=3.217e-17 ndf=1 ) 
+
+[INFO] [ParticlePrinterModule] END   ------------------------------
+[INFO] [ParticlePrinterModule] START ------------------------------
+[INFO]  ParticleList : K_S0:merged (0+8)
+[INFO]  - 160 = 310[0]
+[INFO]      o) pi_0_distToClosestTrkAtCDC0_VS_pi_all = 0.061474
+[INFO]      o) pi_0_distToClosestTrkAtCDC1_VS_pi_all = 1.93964
+[INFO]      o) pi_0_distToClosestTrkAtCDC2_VS_pi_all = 4.10769
+[INFO]      o) pi_0_distToClosestTrkAtCDC3_VS_pi_all = 9.60065
+[INFO]      o) pi_0_distToClosestTrkAtCDC4_VS_pi_all = 14.8157
+[INFO]      o) pi_0_distToClosestTrkAtCDC5_VS_pi_all = 21.3338
+[INFO]      o) pi_0_distToClosestTrkAtCDC6_VS_pi_all = 9.401
+[INFO]      o) pi_0_distToClosestTrkAtCDC7_VS_pi_all = 18.0564
+[INFO]      o) pi_0_distToClosestTrkAtCDC8_VS_pi_all = 28.388
+[INFO]      o) pi_0_distToClosestTrkAtTOP0_VS_pi_all = 56.3754
+[INFO]      o) pi_0_distToClosestTrkAtARICH0_VS_pi_all = nan
+[INFO]      o) pi_0_distToClosestTrkAtECL0_VS_pi_all = 65.1765
+[INFO]      o) pi_0_distToClosestTrkAtECL1_VS_pi_all = 79.8521
+[INFO]      o) pi_0_distToClosestTrkAtKLM0_VS_pi_all = 283.844
+[INFO]      o) pi_1_distToClosestTrkAtCDC0_VS_pi_all = 7.94473
+[INFO]      o) pi_1_distToClosestTrkAtCDC1_VS_pi_all = 15.1196
+[INFO]      o) pi_1_distToClosestTrkAtCDC2_VS_pi_all = 21.4913
+[INFO]      o) pi_1_distToClosestTrkAtCDC3_VS_pi_all = 22.9639
+[INFO]      o) pi_1_distToClosestTrkAtCDC4_VS_pi_all = 22.2181
+[INFO]      o) pi_1_distToClosestTrkAtCDC5_VS_pi_all = 19.134
+[INFO]      o) pi_1_distToClosestTrkAtCDC6_VS_pi_all = 1.34674
+[INFO]      o) pi_1_distToClosestTrkAtCDC7_VS_pi_all = 3.79253
+[INFO]      o) pi_1_distToClosestTrkAtCDC8_VS_pi_all = 4.25308
+[INFO]      o) pi_1_distToClosestTrkAtTOP0_VS_pi_all = 23.7605
+[INFO]      o) pi_1_distToClosestTrkAtARICH0_VS_pi_all = nan
+[INFO]      o) pi_1_distToClosestTrkAtECL0_VS_pi_all = 111.144
+[INFO]      o) pi_1_distToClosestTrkAtECL1_VS_pi_all = 136.02
+[INFO]      o) pi_1_distToClosestTrkAtKLM0_VS_pi_all = 197.656
+[INFO]  - 162 = 310[1]
+[INFO]      o) daughter indices = 39 34
+[INFO]      o) pi_0_distToClosestTrkAtCDC0_VS_pi_all = 10.8053
+[INFO]      o) pi_0_distToClosestTrkAtCDC1_VS_pi_all = 11.886
+[INFO]      o) pi_0_distToClosestTrkAtCDC2_VS_pi_all = 8.30937
+[INFO]      o) pi_0_distToClosestTrkAtCDC3_VS_pi_all = 1.80155
+[INFO]      o) pi_0_distToClosestTrkAtCDC4_VS_pi_all = 12.2653
+[INFO]      o) pi_0_distToClosestTrkAtCDC5_VS_pi_all = 5.0151
+[INFO]      o) pi_0_distToClosestTrkAtCDC6_VS_pi_all = 5.3075
+[INFO]      o) pi_0_distToClosestTrkAtCDC7_VS_pi_all = 19.754
+[INFO]      o) pi_0_distToClosestTrkAtCDC8_VS_pi_all = 37.6605
+[INFO]      o) pi_0_distToClosestTrkAtTOP0_VS_pi_all = 72.2633
+[INFO]      o) pi_0_distToClosestTrkAtARICH0_VS_pi_all = nan
+[INFO]      o) pi_0_distToClosestTrkAtECL0_VS_pi_all = 94.4671
+[INFO]      o) pi_0_distToClosestTrkAtECL1_VS_pi_all = 108.387
+[INFO]      o) pi_0_distToClosestTrkAtKLM0_VS_pi_all = nan
+[INFO]      o) pi_1_distToClosestTrkAtCDC0_VS_pi_all = 0.740482
+[INFO]      o) pi_1_distToClosestTrkAtCDC1_VS_pi_all = 3.34994
+[INFO]      o) pi_1_distToClosestTrkAtCDC2_VS_pi_all = 8.87645
+[INFO]      o) pi_1_distToClosestTrkAtCDC3_VS_pi_all = 16.1281
+[INFO]      o) pi_1_distToClosestTrkAtCDC4_VS_pi_all = 12.2653
+[INFO]      o) pi_1_distToClosestTrkAtCDC5_VS_pi_all = 5.0151
+[INFO]      o) pi_1_distToClosestTrkAtCDC6_VS_pi_all = 5.3075
+[INFO]      o) pi_1_distToClosestTrkAtCDC7_VS_pi_all = 19.754
+[INFO]      o) pi_1_distToClosestTrkAtCDC8_VS_pi_all = 37.6605
+[INFO]      o) pi_1_distToClosestTrkAtTOP0_VS_pi_all = 65.017
+[INFO]      o) pi_1_distToClosestTrkAtARICH0_VS_pi_all = nan
+[INFO]      o) pi_1_distToClosestTrkAtECL0_VS_pi_all = 86.2496
+[INFO]      o) pi_1_distToClosestTrkAtECL1_VS_pi_all = 79.8521
+[INFO]      o) pi_1_distToClosestTrkAtKLM0_VS_pi_all = 159.664
+[INFO]  - 164 = 310[2]
+[INFO]      o) daughter indices = 32 35
+[INFO]      o) pi_0_distToClosestTrkAtCDC0_VS_pi_all = 4.13797
+[INFO]      o) pi_0_distToClosestTrkAtCDC1_VS_pi_all = 5.45042
+[INFO]      o) pi_0_distToClosestTrkAtCDC2_VS_pi_all = 6.18232
+[INFO]      o) pi_0_distToClosestTrkAtCDC3_VS_pi_all = 3.40805
+[INFO]      o) pi_0_distToClosestTrkAtCDC4_VS_pi_all = 4.40301
+[INFO]      o) pi_0_distToClosestTrkAtCDC5_VS_pi_all = 1.50205
+[INFO]      o) pi_0_distToClosestTrkAtCDC6_VS_pi_all = 2.92014
+[INFO]      o) pi_0_distToClosestTrkAtCDC7_VS_pi_all = 0.0954875
+[INFO]      o) pi_0_distToClosestTrkAtCDC8_VS_pi_all = 13.1736
+[INFO]      o) pi_0_distToClosestTrkAtTOP0_VS_pi_all = 43.0507
+[INFO]      o) pi_0_distToClosestTrkAtARICH0_VS_pi_all = nan
+[INFO]      o) pi_0_distToClosestTrkAtECL0_VS_pi_all = 111.144
+[INFO]      o) pi_0_distToClosestTrkAtECL1_VS_pi_all = 69.2291
+[INFO]      o) pi_0_distToClosestTrkAtKLM0_VS_pi_all = nan
+[INFO]      o) pi_1_distToClosestTrkAtCDC0_VS_pi_all = 0.740482
+[INFO]      o) pi_1_distToClosestTrkAtCDC1_VS_pi_all = 3.34994
+[INFO]      o) pi_1_distToClosestTrkAtCDC2_VS_pi_all = 8.30937
+[INFO]      o) pi_1_distToClosestTrkAtCDC3_VS_pi_all = 1.80155
+[INFO]      o) pi_1_distToClosestTrkAtCDC4_VS_pi_all = 19.0646
+[INFO]      o) pi_1_distToClosestTrkAtCDC5_VS_pi_all = 25.0044
+[INFO]      o) pi_1_distToClosestTrkAtCDC6_VS_pi_all = 9.401
+[INFO]      o) pi_1_distToClosestTrkAtCDC7_VS_pi_all = 18.0564
+[INFO]      o) pi_1_distToClosestTrkAtCDC8_VS_pi_all = 17.0958
+[INFO]      o) pi_1_distToClosestTrkAtTOP0_VS_pi_all = nan
+[INFO]      o) pi_1_distToClosestTrkAtARICH0_VS_pi_all = 87.7525
+[INFO]      o) pi_1_distToClosestTrkAtECL0_VS_pi_all = 85.9784
+[INFO]      o) pi_1_distToClosestTrkAtECL1_VS_pi_all = 69.2291
+[INFO]      o) pi_1_distToClosestTrkAtKLM0_VS_pi_all = nan
+[INFO]  - 169 = 310[3]
+[INFO]      o) daughter indices = 32 36
+[INFO]      o) pi_0_distToClosestTrkAtCDC0_VS_pi_all = 4.13797
+[INFO]      o) pi_0_distToClosestTrkAtCDC1_VS_pi_all = 5.45042
+[INFO]      o) pi_0_distToClosestTrkAtCDC2_VS_pi_all = 6.18232
+[INFO]      o) pi_0_distToClosestTrkAtCDC3_VS_pi_all = 3.40805
+[INFO]      o) pi_0_distToClosestTrkAtCDC4_VS_pi_all = 4.40301
+[INFO]      o) pi_0_distToClosestTrkAtCDC5_VS_pi_all = 1.50205
+[INFO]      o) pi_0_distToClosestTrkAtCDC6_VS_pi_all = 2.92014
+[INFO]      o) pi_0_distToClosestTrkAtCDC7_VS_pi_all = 0.0954875
+[INFO]      o) pi_0_distToClosestTrkAtCDC8_VS_pi_all = 13.1736
+[INFO]      o) pi_0_distToClosestTrkAtTOP0_VS_pi_all = 43.0507
+[INFO]      o) pi_0_distToClosestTrkAtARICH0_VS_pi_all = nan
+[INFO]      o) pi_0_distToClosestTrkAtECL0_VS_pi_all = 111.144
+[INFO]      o) pi_0_distToClosestTrkAtECL1_VS_pi_all = 69.2291
+[INFO]      o) pi_0_distToClosestTrkAtKLM0_VS_pi_all = nan
+[INFO]      o) pi_1_distToClosestTrkAtCDC0_VS_pi_all = 5.81101
+[INFO]      o) pi_1_distToClosestTrkAtCDC1_VS_pi_all = 3.39634
+[INFO]      o) pi_1_distToClosestTrkAtCDC2_VS_pi_all = 1.10962
+[INFO]      o) pi_1_distToClosestTrkAtCDC3_VS_pi_all = 1.31255
+[INFO]      o) pi_1_distToClosestTrkAtCDC4_VS_pi_all = 15.9912
+[INFO]      o) pi_1_distToClosestTrkAtCDC5_VS_pi_all = 32.548
+[INFO]      o) pi_1_distToClosestTrkAtCDC6_VS_pi_all = 1.34674
+[INFO]      o) pi_1_distToClosestTrkAtCDC7_VS_pi_all = 0.0954875
+[INFO]      o) pi_1_distToClosestTrkAtCDC8_VS_pi_all = 6.02613
+[INFO]      o) pi_1_distToClosestTrkAtTOP0_VS_pi_all = nan
+[INFO]      o) pi_1_distToClosestTrkAtARICH0_VS_pi_all = 87.7525
+[INFO]      o) pi_1_distToClosestTrkAtECL0_VS_pi_all = 85.9784
+[INFO]      o) pi_1_distToClosestTrkAtECL1_VS_pi_all = 75.7261
+[INFO]      o) pi_1_distToClosestTrkAtKLM0_VS_pi_all = nan
+[INFO]  - 173 = 310[4]
+[INFO]      o) daughter indices = 40 36
+[INFO]      o) pi_0_distToClosestTrkAtCDC0_VS_pi_all = 0.061474
+[INFO]      o) pi_0_distToClosestTrkAtCDC1_VS_pi_all = 1.93964
+[INFO]      o) pi_0_distToClosestTrkAtCDC2_VS_pi_all = 1.10962
+[INFO]      o) pi_0_distToClosestTrkAtCDC3_VS_pi_all = 6.67045
+[INFO]      o) pi_0_distToClosestTrkAtCDC4_VS_pi_all = 6.36942
+[INFO]      o) pi_0_distToClosestTrkAtCDC5_VS_pi_all = 5.29673
+[INFO]      o) pi_0_distToClosestTrkAtCDC6_VS_pi_all = 3.48469
+[INFO]      o) pi_0_distToClosestTrkAtCDC7_VS_pi_all = 0.737612
+[INFO]      o) pi_0_distToClosestTrkAtCDC8_VS_pi_all = 2.82076
+[INFO]      o) pi_0_distToClosestTrkAtTOP0_VS_pi_all = 9.85145
+[INFO]      o) pi_0_distToClosestTrkAtARICH0_VS_pi_all = nan
+[INFO]      o) pi_0_distToClosestTrkAtECL0_VS_pi_all = 19.031
+[INFO]      o) pi_0_distToClosestTrkAtECL1_VS_pi_all = 28.1635
+[INFO]      o) pi_0_distToClosestTrkAtKLM0_VS_pi_all = 135.563
+[INFO]      o) pi_1_distToClosestTrkAtCDC0_VS_pi_all = 5.81101
+[INFO]      o) pi_1_distToClosestTrkAtCDC1_VS_pi_all = 3.39634
+[INFO]      o) pi_1_distToClosestTrkAtCDC2_VS_pi_all = 1.10962
+[INFO]      o) pi_1_distToClosestTrkAtCDC3_VS_pi_all = 1.31255
+[INFO]      o) pi_1_distToClosestTrkAtCDC4_VS_pi_all = 15.9912
+[INFO]      o) pi_1_distToClosestTrkAtCDC5_VS_pi_all = 32.548
+[INFO]      o) pi_1_distToClosestTrkAtCDC6_VS_pi_all = 1.34674
+[INFO]      o) pi_1_distToClosestTrkAtCDC7_VS_pi_all = 0.0954875
+[INFO]      o) pi_1_distToClosestTrkAtCDC8_VS_pi_all = 6.02613
+[INFO]      o) pi_1_distToClosestTrkAtTOP0_VS_pi_all = nan
+[INFO]      o) pi_1_distToClosestTrkAtARICH0_VS_pi_all = 87.7525
+[INFO]      o) pi_1_distToClosestTrkAtECL0_VS_pi_all = 85.9784
+[INFO]      o) pi_1_distToClosestTrkAtECL1_VS_pi_all = 75.7261
+[INFO]      o) pi_1_distToClosestTrkAtKLM0_VS_pi_all = nan
+[INFO]  - 181 = 310[5]
+[INFO]      o) daughter indices = 32 43
+[INFO]      o) pi_0_distToClosestTrkAtCDC0_VS_pi_all = 4.13797
+[INFO]      o) pi_0_distToClosestTrkAtCDC1_VS_pi_all = 5.45042
+[INFO]      o) pi_0_distToClosestTrkAtCDC2_VS_pi_all = 6.18232
+[INFO]      o) pi_0_distToClosestTrkAtCDC3_VS_pi_all = 3.40805
+[INFO]      o) pi_0_distToClosestTrkAtCDC4_VS_pi_all = 4.40301
+[INFO]      o) pi_0_distToClosestTrkAtCDC5_VS_pi_all = 1.50205
+[INFO]      o) pi_0_distToClosestTrkAtCDC6_VS_pi_all = 2.92014
+[INFO]      o) pi_0_distToClosestTrkAtCDC7_VS_pi_all = 0.0954875
+[INFO]      o) pi_0_distToClosestTrkAtCDC8_VS_pi_all = 13.1736
+[INFO]      o) pi_0_distToClosestTrkAtTOP0_VS_pi_all = 43.0507
+[INFO]      o) pi_0_distToClosestTrkAtARICH0_VS_pi_all = nan
+[INFO]      o) pi_0_distToClosestTrkAtECL0_VS_pi_all = 111.144
+[INFO]      o) pi_0_distToClosestTrkAtECL1_VS_pi_all = 69.2291
+[INFO]      o) pi_0_distToClosestTrkAtKLM0_VS_pi_all = nan
+[INFO]      o) pi_1_distToClosestTrkAtCDC0_VS_pi_all = 7.94473
+[INFO]      o) pi_1_distToClosestTrkAtCDC1_VS_pi_all = 15.1196
+[INFO]      o) pi_1_distToClosestTrkAtCDC2_VS_pi_all = 21.4913
+[INFO]      o) pi_1_distToClosestTrkAtCDC3_VS_pi_all = 22.9639
+[INFO]      o) pi_1_distToClosestTrkAtCDC4_VS_pi_all = 22.2181
+[INFO]      o) pi_1_distToClosestTrkAtCDC5_VS_pi_all = 19.134
+[INFO]      o) pi_1_distToClosestTrkAtCDC6_VS_pi_all = 1.34674
+[INFO]      o) pi_1_distToClosestTrkAtCDC7_VS_pi_all = 3.79253
+[INFO]      o) pi_1_distToClosestTrkAtCDC8_VS_pi_all = 4.25308
+[INFO]      o) pi_1_distToClosestTrkAtTOP0_VS_pi_all = 23.7605
+[INFO]      o) pi_1_distToClosestTrkAtARICH0_VS_pi_all = nan
+[INFO]      o) pi_1_distToClosestTrkAtECL0_VS_pi_all = 111.144
+[INFO]      o) pi_1_distToClosestTrkAtECL1_VS_pi_all = 136.02
+[INFO]      o) pi_1_distToClosestTrkAtKLM0_VS_pi_all = 197.656
+[INFO]  - 201 = 310[6]
+[INFO]      o) daughter indices = 44 46
+[INFO]      o) pi_0_distToClosestTrkAtCDC0_VS_pi_all = 4.78861
+[INFO]      o) pi_0_distToClosestTrkAtCDC1_VS_pi_all = 9.68718
+[INFO]      o) pi_0_distToClosestTrkAtCDC2_VS_pi_all = 19.4651
+[INFO]      o) pi_0_distToClosestTrkAtCDC3_VS_pi_all = 34.2456
+[INFO]      o) pi_0_distToClosestTrkAtCDC4_VS_pi_all = 28.2389
+[INFO]      o) pi_0_distToClosestTrkAtCDC5_VS_pi_all = 15.1499
+[INFO]      o) pi_0_distToClosestTrkAtCDC6_VS_pi_all = 21.2311
+[INFO]      o) pi_0_distToClosestTrkAtCDC7_VS_pi_all = 23.6022
+[INFO]      o) pi_0_distToClosestTrkAtCDC8_VS_pi_all = 27.8336
+[INFO]      o) pi_0_distToClosestTrkAtTOP0_VS_pi_all = nan
+[INFO]      o) pi_0_distToClosestTrkAtARICH0_VS_pi_all = nan
+[INFO]      o) pi_0_distToClosestTrkAtECL0_VS_pi_all = nan
+[INFO]      o) pi_0_distToClosestTrkAtECL1_VS_pi_all = nan
+[INFO]      o) pi_0_distToClosestTrkAtKLM0_VS_pi_all = nan
+[INFO]      o) pi_1_distToClosestTrkAtCDC0_VS_pi_all = 0.537266
+[INFO]      o) pi_1_distToClosestTrkAtCDC1_VS_pi_all = 1.59853
+[INFO]      o) pi_1_distToClosestTrkAtCDC2_VS_pi_all = 0.499922
+[INFO]      o) pi_1_distToClosestTrkAtCDC3_VS_pi_all = 6.67214
+[INFO]      o) pi_1_distToClosestTrkAtCDC4_VS_pi_all = 2.67473
+[INFO]      o) pi_1_distToClosestTrkAtCDC5_VS_pi_all = 9.63423
+[INFO]      o) pi_1_distToClosestTrkAtCDC6_VS_pi_all = 20.9132
+[INFO]      o) pi_1_distToClosestTrkAtCDC7_VS_pi_all = 23.6022
+[INFO]      o) pi_1_distToClosestTrkAtCDC8_VS_pi_all = 27.8336
+[INFO]      o) pi_1_distToClosestTrkAtTOP0_VS_pi_all = 65.1883
+[INFO]      o) pi_1_distToClosestTrkAtARICH0_VS_pi_all = nan
+[INFO]      o) pi_1_distToClosestTrkAtECL0_VS_pi_all = 78.0651
+[INFO]      o) pi_1_distToClosestTrkAtECL1_VS_pi_all = 95.1784
+[INFO]      o) pi_1_distToClosestTrkAtKLM0_VS_pi_all = 197.656
+[INFO]  - 207 = 310[7]
+[INFO]      o) daughter indices = 44 47
+[INFO]      o) pi_0_distToClosestTrkAtCDC0_VS_pi_all = 4.78861
+[INFO]      o) pi_0_distToClosestTrkAtCDC1_VS_pi_all = 9.68718
+[INFO]      o) pi_0_distToClosestTrkAtCDC2_VS_pi_all = 19.4651
+[INFO]      o) pi_0_distToClosestTrkAtCDC3_VS_pi_all = 34.2456
+[INFO]      o) pi_0_distToClosestTrkAtCDC4_VS_pi_all = 28.2389
+[INFO]      o) pi_0_distToClosestTrkAtCDC5_VS_pi_all = 15.1499
+[INFO]      o) pi_0_distToClosestTrkAtCDC6_VS_pi_all = 21.2311
+[INFO]      o) pi_0_distToClosestTrkAtCDC7_VS_pi_all = 23.6022
+[INFO]      o) pi_0_distToClosestTrkAtCDC8_VS_pi_all = 27.8336
+[INFO]      o) pi_0_distToClosestTrkAtTOP0_VS_pi_all = nan
+[INFO]      o) pi_0_distToClosestTrkAtARICH0_VS_pi_all = nan
+[INFO]      o) pi_0_distToClosestTrkAtECL0_VS_pi_all = nan
+[INFO]      o) pi_0_distToClosestTrkAtECL1_VS_pi_all = nan
+[INFO]      o) pi_0_distToClosestTrkAtKLM0_VS_pi_all = nan
+[INFO]      o) pi_1_distToClosestTrkAtCDC0_VS_pi_all = 0.537266
+[INFO]      o) pi_1_distToClosestTrkAtCDC1_VS_pi_all = 1.98905
+[INFO]      o) pi_1_distToClosestTrkAtCDC2_VS_pi_all = 7.92454
+[INFO]      o) pi_1_distToClosestTrkAtCDC3_VS_pi_all = 9.35752
+[INFO]      o) pi_1_distToClosestTrkAtCDC4_VS_pi_all = 26.3925
+[INFO]      o) pi_1_distToClosestTrkAtCDC5_VS_pi_all = 15.1499
+[INFO]      o) pi_1_distToClosestTrkAtCDC6_VS_pi_all = 31.5081
+[INFO]      o) pi_1_distToClosestTrkAtCDC7_VS_pi_all = 31.0225
+[INFO]      o) pi_1_distToClosestTrkAtCDC8_VS_pi_all = 29.2823
+[INFO]      o) pi_1_distToClosestTrkAtTOP0_VS_pi_all = nan
+[INFO]      o) pi_1_distToClosestTrkAtARICH0_VS_pi_all = 111.644
+[INFO]      o) pi_1_distToClosestTrkAtECL0_VS_pi_all = 110.392
+[INFO]      o) pi_1_distToClosestTrkAtECL1_VS_pi_all = 103.469
+[INFO]      o) pi_1_distToClosestTrkAtKLM0_VS_pi_all = nan
 [INFO] [ParticlePrinterModule] END   ------------------------------
 [INFO] [ParticlePrinterModule] START ------------------------------
 [INFO]  ParticleLists: e-:ref (5+0) + e+:ref (4+0)
@@ -8551,139 +9169,139 @@
 [INFO] [ParticlePrinterModule] START ------------------------------
 [INFO]  ParticleLists: pi+:ref (4+0) + pi-:ref (5+0)
 [INFO]  - 19 = 211[0]
-[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = 3.30308
+[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = 0.254889
+[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = 8.19504
+[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = 22.7314
+[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = 42.7665
+[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = 50.1363
+[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = 51.9642
+[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = 20.5867
+[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = 5.69847
 [INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = nan
 [INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = 133.937
 [INFO]      o) distToClosestTrkAtECL1_VS_pi_all = nan
 [INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = nan
 [INFO]  - 20 = 211[1]
-[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = 5.44918
+[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = 7.32961
+[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = 8.56623
+[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = 8.44973
+[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = 6.69247
+[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = 2.57097
+[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = 4.79017
+[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = 8.49767
+[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = 11.4926
 [INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = 150.094
+[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = 154.41
+[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = 153.736
 [INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = nan
 [INFO]  - 21 = 211[2]
-[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = 5.44918
+[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = 7.32961
+[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = 8.56623
+[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = 8.44973
+[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = 6.69247
+[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = 2.57097
+[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = 4.79017
+[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = 10.9912
+[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = 6.41902
+[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = 3.47517
 [INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = 86.677
+[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = 100.073
 [INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = nan
 [INFO]  - 25 = 211[3]
-[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = 7.6567
+[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = 10.7721
+[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = 13.652
+[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = 15.5415
+[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = 16.2673
+[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = 15.8221
+[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = 9.36934
+[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = 8.49767
+[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = 6.41902
+[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = 3.47517
 [INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = 86.677
+[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = 100.073
+[INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = 246.951
 [INFO]  - 18 = -211[4]
-[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = 3.30308
+[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = 0.254889
+[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = 8.19504
+[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = 17.7507
+[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = 17.382
+[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = 14.8273
+[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = 9.813
+[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = 1.12542
+[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = 12.28
+[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = 61.8692
 [INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = 133.937
 [INFO]      o) distToClosestTrkAtECL1_VS_pi_all = nan
 [INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = nan
 [INFO]  - 22 = -211[5]
-[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = 9.69182
+[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = 13.0975
+[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = 12.3245
+[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = 5.36122
+[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = 2.05246
 [INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = nan
 [INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = nan
 [INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = nan
 [INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = nan
 [INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = 150.094
+[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = 154.41
+[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = 153.736
 [INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = nan
 [INFO]  - 23 = -211[6]
-[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = 7.12151
+[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = 10.1909
+[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = 12.3245
+[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = 5.36122
+[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = 15.2354
+[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = 18.1366
+[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = 51.9642
+[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = 43.9038
+[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = 46.9648
+[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = 20.8999
 [INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = 7.75266
+[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = 26.9148
+[INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = 358.276
 [INFO]  - 24 = -211[7]
-[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = 6.2964
+[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = 12.9189
+[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = 16.2531
+[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = 17.7507
+[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = 17.382
+[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = 14.8273
+[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = 9.813
+[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = 1.12542
+[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = 12.28
+[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = 61.8692
 [INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = 165.161
+[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = 166.119
+[INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = 246.951
 [INFO]  - 26 = -211[8]
-[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtCDC0_VS_pi_all = 7.12151
+[INFO]      o) distToClosestTrkAtCDC1_VS_pi_all = 10.1909
+[INFO]      o) distToClosestTrkAtCDC2_VS_pi_all = 13.2686
+[INFO]      o) distToClosestTrkAtCDC3_VS_pi_all = 15.6851
+[INFO]      o) distToClosestTrkAtCDC4_VS_pi_all = 2.05246
+[INFO]      o) distToClosestTrkAtCDC5_VS_pi_all = 18.1366
+[INFO]      o) distToClosestTrkAtCDC6_VS_pi_all = 80.4515
+[INFO]      o) distToClosestTrkAtCDC7_VS_pi_all = 20.5867
+[INFO]      o) distToClosestTrkAtCDC8_VS_pi_all = 5.69847
+[INFO]      o) distToClosestTrkAtTOP0_VS_pi_all = 20.8999
 [INFO]      o) distToClosestTrkAtARICH0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = nan
-[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = nan
+[INFO]      o) distToClosestTrkAtECL0_VS_pi_all = 7.75266
+[INFO]      o) distToClosestTrkAtECL1_VS_pi_all = 26.9148
 [INFO]      o) distToClosestTrkAtKLM0_VS_pi_all = nan
 [INFO] [ParticlePrinterModule] END   ------------------------------
 [INFO] [ParticlePrinterModule] START ------------------------------
@@ -9047,7 +9665,7 @@
    -1.1e-05   -9.5e-06   -3.2e-08   -6.2e-08    5.3e-05    4.5e-05   -7.6e-07
    -1.8e-05    2.1e-05   -2.2e-05   -1.3e-09   -9.4e-07   -7.6e-07    0.00028
 
- extra info=( distToClosestTrkAtCDC0_VS_K+:all=5.49 distToClosestTrkAtCDC1_VS_K+:all=7.428 distToClosestTrkAtCDC2_VS_K+:all=8.777 distToClosestTrkAtCDC3_VS_K+:all=8.839 distToClosestTrkAtCDC4_VS_K+:all=7.343 distToClosestTrkAtCDC5_VS_K+:all=3.652 distToClosestTrkAtCDC6_VS_K+:all=2.97 distToClosestTrkAtCDC7_VS_K+:all=4.094 distToClosestTrkAtCDC8_VS_K+:all=8.842 ) 
+ extra info=( distToClosestTrkAtCDC0_VS_K+:all=5.49 distToClosestTrkAtCDC1_VS_K+:all=7.428 distToClosestTrkAtCDC2_VS_K+:all=8.777 distToClosestTrkAtCDC3_VS_K+:all=8.839 distToClosestTrkAtCDC4_VS_K+:all=7.343 distToClosestTrkAtCDC5_VS_K+:all=3.652 distToClosestTrkAtCDC6_VS_K+:all=2.971 distToClosestTrkAtCDC7_VS_K+:all=4.094 distToClosestTrkAtCDC8_VS_K+:all=8.842 ) 
 
 [INFO] collection=Particles
  PDGCode=321 Charge=1 PDGMass=0.4937
@@ -9067,7 +9685,7 @@
      -2e-06     -7e-07    1.1e-08   -1.7e-08    6.4e-06    1.9e-06   -5.9e-08
       1e-08    8.8e-08   -7.9e-06    6.4e-11   -1.9e-07   -5.9e-08    2.5e-05
 
- extra info=( distToClosestTrkAtCDC0_VS_K+:all=5.49 distToClosestTrkAtCDC1_VS_K+:all=7.428 distToClosestTrkAtCDC2_VS_K+:all=8.777 distToClosestTrkAtCDC3_VS_K+:all=8.839 distToClosestTrkAtCDC4_VS_K+:all=7.343 distToClosestTrkAtCDC5_VS_K+:all=3.652 distToClosestTrkAtCDC6_VS_K+:all=2.97 distToClosestTrkAtCDC7_VS_K+:all=11.67 distToClosestTrkAtCDC8_VS_K+:all=7.327 distToClosestTrkAtECL0_VS_K+:all=86.51 distToClosestTrkAtECL1_VS_K+:all=99.47 distToClosestTrkAtTOP0_VS_K+:all=2.123 ) 
+ extra info=( distToClosestTrkAtCDC0_VS_K+:all=5.49 distToClosestTrkAtCDC1_VS_K+:all=7.428 distToClosestTrkAtCDC2_VS_K+:all=8.777 distToClosestTrkAtCDC3_VS_K+:all=8.839 distToClosestTrkAtCDC4_VS_K+:all=7.343 distToClosestTrkAtCDC5_VS_K+:all=3.652 distToClosestTrkAtCDC6_VS_K+:all=2.971 distToClosestTrkAtCDC7_VS_K+:all=11.67 distToClosestTrkAtCDC8_VS_K+:all=7.327 distToClosestTrkAtECL0_VS_K+:all=86.51 distToClosestTrkAtECL1_VS_K+:all=99.47 distToClosestTrkAtTOP0_VS_K+:all=2.123 ) 
 
 [INFO] collection=Particles
  PDGCode=321 Charge=1 PDGMass=0.4937
@@ -9468,7 +10086,7 @@
    -1.1e-05   -9.5e-06   -3.2e-08   -6.2e-08    5.3e-05    4.5e-05   -7.6e-07
    -1.8e-05    2.1e-05   -2.2e-05   -1.3e-09   -9.4e-07   -7.6e-07    0.00028
 
- extra info=( distToClosestTrkAtCDC0_VS_K+:all=5.49 distToClosestTrkAtCDC0_VS_K-:all=5.49 distToClosestTrkAtCDC1_VS_K+:all=7.428 distToClosestTrkAtCDC1_VS_K-:all=7.428 distToClosestTrkAtCDC2_VS_K+:all=8.777 distToClosestTrkAtCDC2_VS_K-:all=8.777 distToClosestTrkAtCDC3_VS_K+:all=8.839 distToClosestTrkAtCDC3_VS_K-:all=8.839 distToClosestTrkAtCDC4_VS_K+:all=7.343 distToClosestTrkAtCDC4_VS_K-:all=7.343 distToClosestTrkAtCDC5_VS_K+:all=3.652 distToClosestTrkAtCDC5_VS_K-:all=3.652 distToClosestTrkAtCDC6_VS_K+:all=2.97 distToClosestTrkAtCDC6_VS_K-:all=2.97 distToClosestTrkAtCDC7_VS_K+:all=4.094 distToClosestTrkAtCDC7_VS_K-:all=4.094 distToClosestTrkAtCDC8_VS_K+:all=8.842 distToClosestTrkAtCDC8_VS_K-:all=8.842 ) 
+ extra info=( distToClosestTrkAtCDC0_VS_K+:all=5.49 distToClosestTrkAtCDC0_VS_K-:all=5.49 distToClosestTrkAtCDC1_VS_K+:all=7.428 distToClosestTrkAtCDC1_VS_K-:all=7.428 distToClosestTrkAtCDC2_VS_K+:all=8.777 distToClosestTrkAtCDC2_VS_K-:all=8.777 distToClosestTrkAtCDC3_VS_K+:all=8.839 distToClosestTrkAtCDC3_VS_K-:all=8.839 distToClosestTrkAtCDC4_VS_K+:all=7.343 distToClosestTrkAtCDC4_VS_K-:all=7.343 distToClosestTrkAtCDC5_VS_K+:all=3.652 distToClosestTrkAtCDC5_VS_K-:all=3.652 distToClosestTrkAtCDC6_VS_K+:all=2.971 distToClosestTrkAtCDC6_VS_K-:all=2.971 distToClosestTrkAtCDC7_VS_K+:all=4.094 distToClosestTrkAtCDC7_VS_K-:all=4.094 distToClosestTrkAtCDC8_VS_K+:all=8.842 distToClosestTrkAtCDC8_VS_K-:all=8.842 ) 
 
 [INFO] collection=Particles
  PDGCode=321 Charge=1 PDGMass=0.4937
@@ -9488,7 +10106,7 @@
      -2e-06     -7e-07    1.1e-08   -1.7e-08    6.4e-06    1.9e-06   -5.9e-08
       1e-08    8.8e-08   -7.9e-06    6.4e-11   -1.9e-07   -5.9e-08    2.5e-05
 
- extra info=( distToClosestTrkAtCDC0_VS_K+:all=5.49 distToClosestTrkAtCDC0_VS_K-:all=5.49 distToClosestTrkAtCDC1_VS_K+:all=7.428 distToClosestTrkAtCDC1_VS_K-:all=7.428 distToClosestTrkAtCDC2_VS_K+:all=8.777 distToClosestTrkAtCDC2_VS_K-:all=8.777 distToClosestTrkAtCDC3_VS_K+:all=8.839 distToClosestTrkAtCDC3_VS_K-:all=8.839 distToClosestTrkAtCDC4_VS_K+:all=7.343 distToClosestTrkAtCDC4_VS_K-:all=7.343 distToClosestTrkAtCDC5_VS_K+:all=3.652 distToClosestTrkAtCDC5_VS_K-:all=3.652 distToClosestTrkAtCDC6_VS_K+:all=2.97 distToClosestTrkAtCDC6_VS_K-:all=2.97 distToClosestTrkAtCDC7_VS_K+:all=11.67 distToClosestTrkAtCDC7_VS_K-:all=11.67 distToClosestTrkAtCDC8_VS_K+:all=7.327 distToClosestTrkAtCDC8_VS_K-:all=7.327 distToClosestTrkAtECL0_VS_K+:all=86.51 distToClosestTrkAtECL0_VS_K-:all=86.51 distToClosestTrkAtECL1_VS_K+:all=99.47 distToClosestTrkAtECL1_VS_K-:all=99.47 distToClosestTrkAtTOP0_VS_K+:all=2.123 distToClosestTrkAtTOP0_VS_K-:all=2.123 ) 
+ extra info=( distToClosestTrkAtCDC0_VS_K+:all=5.49 distToClosestTrkAtCDC0_VS_K-:all=5.49 distToClosestTrkAtCDC1_VS_K+:all=7.428 distToClosestTrkAtCDC1_VS_K-:all=7.428 distToClosestTrkAtCDC2_VS_K+:all=8.777 distToClosestTrkAtCDC2_VS_K-:all=8.777 distToClosestTrkAtCDC3_VS_K+:all=8.839 distToClosestTrkAtCDC3_VS_K-:all=8.839 distToClosestTrkAtCDC4_VS_K+:all=7.343 distToClosestTrkAtCDC4_VS_K-:all=7.343 distToClosestTrkAtCDC5_VS_K+:all=3.652 distToClosestTrkAtCDC5_VS_K-:all=3.652 distToClosestTrkAtCDC6_VS_K+:all=2.971 distToClosestTrkAtCDC6_VS_K-:all=2.971 distToClosestTrkAtCDC7_VS_K+:all=11.67 distToClosestTrkAtCDC7_VS_K-:all=11.67 distToClosestTrkAtCDC8_VS_K+:all=7.327 distToClosestTrkAtCDC8_VS_K-:all=7.327 distToClosestTrkAtECL0_VS_K+:all=86.51 distToClosestTrkAtECL0_VS_K-:all=86.51 distToClosestTrkAtECL1_VS_K+:all=99.47 distToClosestTrkAtECL1_VS_K-:all=99.47 distToClosestTrkAtTOP0_VS_K+:all=2.123 distToClosestTrkAtTOP0_VS_K-:all=2.123 ) 
 
 [INFO] collection=Particles
  PDGCode=321 Charge=1 PDGMass=0.4937
@@ -9684,10 +10302,10 @@
       1e-05    1.1e-06    1.7e-06   -9.1e-07   -2.9e-05   -2.4e-05     -4e-05
     1.1e-06      1e-05     -2e-06    1.1e-06   -2.5e-05   -2.1e-05    4.8e-05
     1.7e-06     -2e-06    8.1e-06    1.8e-06   -1.3e-07   -1.1e-07     -5e-05
-   -9.1e-07    1.1e-06    1.8e-06    8.8e-07   -1.3e-07   -1.1e-07    2.1e-10
+   -9.1e-07    1.1e-06    1.8e-06    8.8e-07   -1.3e-07   -1.1e-07      2e-10
    -2.9e-05   -2.5e-05   -1.3e-07   -1.3e-07    0.00013    0.00011   -2.7e-06
    -2.4e-05   -2.1e-05   -1.1e-07   -1.1e-07    0.00011    9.1e-05   -2.2e-06
-     -4e-05    4.8e-05     -5e-05    2.1e-10   -2.7e-06   -2.2e-06    0.00057
+     -4e-05    4.8e-05     -5e-05      2e-10   -2.7e-06   -2.2e-06    0.00057
 
  extra info=( distToClosestTrkAtARICH0_VS_p+:all=170.4 distToClosestTrkAtCDC0_VS_p+:all=5.617 distToClosestTrkAtCDC1_VS_p+:all=7.747 distToClosestTrkAtCDC2_VS_p+:all=9.468 distToClosestTrkAtCDC3_VS_p+:all=10.12 distToClosestTrkAtCDC4_VS_p+:all=9.471 distToClosestTrkAtCDC5_VS_p+:all=7.127 distToClosestTrkAtCDC6_VS_p+:all=2.663 distToClosestTrkAtCDC7_VS_p+:all=5.546 distToClosestTrkAtCDC8_VS_p+:all=0.2967 distToClosestTrkAtECL0_VS_p+:all=164.3 ) 
 
@@ -10105,10 +10723,10 @@
       1e-05    1.1e-06    1.7e-06   -9.1e-07   -2.9e-05   -2.4e-05     -4e-05
     1.1e-06      1e-05     -2e-06    1.1e-06   -2.5e-05   -2.1e-05    4.8e-05
     1.7e-06     -2e-06    8.1e-06    1.8e-06   -1.3e-07   -1.1e-07     -5e-05
-   -9.1e-07    1.1e-06    1.8e-06    8.8e-07   -1.3e-07   -1.1e-07    2.1e-10
+   -9.1e-07    1.1e-06    1.8e-06    8.8e-07   -1.3e-07   -1.1e-07      2e-10
    -2.9e-05   -2.5e-05   -1.3e-07   -1.3e-07    0.00013    0.00011   -2.7e-06
    -2.4e-05   -2.1e-05   -1.1e-07   -1.1e-07    0.00011    9.1e-05   -2.2e-06
-     -4e-05    4.8e-05     -5e-05    2.1e-10   -2.7e-06   -2.2e-06    0.00057
+     -4e-05    4.8e-05     -5e-05      2e-10   -2.7e-06   -2.2e-06    0.00057
 
  extra info=( distToClosestTrkAtARICH0_VS_anti-p-:all=170.4 distToClosestTrkAtARICH0_VS_p+:all=170.4 distToClosestTrkAtCDC0_VS_anti-p-:all=5.617 distToClosestTrkAtCDC0_VS_p+:all=5.617 distToClosestTrkAtCDC1_VS_anti-p-:all=7.747 distToClosestTrkAtCDC1_VS_p+:all=7.747 distToClosestTrkAtCDC2_VS_anti-p-:all=9.468 distToClosestTrkAtCDC2_VS_p+:all=9.468 distToClosestTrkAtCDC3_VS_anti-p-:all=10.12 distToClosestTrkAtCDC3_VS_p+:all=10.12 distToClosestTrkAtCDC4_VS_anti-p-:all=9.471 distToClosestTrkAtCDC4_VS_p+:all=9.471 distToClosestTrkAtCDC5_VS_anti-p-:all=7.127 distToClosestTrkAtCDC5_VS_p+:all=7.127 distToClosestTrkAtCDC6_VS_anti-p-:all=2.663 distToClosestTrkAtCDC6_VS_p+:all=2.663 distToClosestTrkAtCDC7_VS_anti-p-:all=5.546 distToClosestTrkAtCDC7_VS_p+:all=5.546 distToClosestTrkAtCDC8_VS_anti-p-:all=0.2967 distToClosestTrkAtCDC8_VS_p+:all=0.2967 distToClosestTrkAtECL0_VS_anti-p-:all=164.3 distToClosestTrkAtECL0_VS_p+:all=164.3 ) 
 
@@ -10933,6 +11551,204 @@
 [INFO]      o) distToClosestTrkAtECL1_VS_anti_deuteron_all = 97.8586
 [INFO]      o) distToClosestTrkAtKLM0_VS_anti_deuteron_all = 247.148
 [INFO] [ParticlePrinterModule] END   ------------------------------
+[INFO] [ParticlePrinterModule] START ------------------------------
+[INFO]  ParticleLists: Lambda0:merged (1+0) + anti-Lambda0:merged (1+0)
+[INFO] collection=Particles
+ PDGCode=3122 Charge=0 PDGMass=1.116
+ flavorType=1 particleSource=6 particleTypeUsedForFit=0
+ mdstIndex=0 arrayIndex=58 identifier=-1 daughterIndices: 39, 22, 
+ daughter PDGCodes: 2212, -211, 
+ mass=1.103
+ momentum=(-0.22, 0.47, 0.06) p=0.5212
+ momentum scaling factor=1
+ position=(-0.04, 0.00, -0.04)
+ p-value of fit (if done): 0.669
+ error matrix (px, py, pz, E, x, y ,z):
+    7.3e-06    1.7e-06    4.8e-07   -5.3e-07          0          0          0
+    1.7e-06    4.9e-06   -4.3e-07    1.3e-06          0          0          0
+    4.8e-07   -4.3e-07    8.3e-06    1.1e-07          0          0          0
+   -5.3e-07    1.3e-06    1.1e-07    6.6e-07          0          0          0
+          0          0          0          0    0.00011   -0.00015   -2.2e-05
+          0          0          0          0   -0.00015    0.00036    4.2e-05
+          0          0          0          0   -2.2e-05    4.2e-05    4.3e-05
+
+ extra info=( chiSquared=0.1828 decayModeID=1 failed=0 highQualityVertex=1 modifiedPValue=0.9803 ndf=1 ) 
+
+[INFO] collection=Particles
+ PDGCode=-3122 Charge=0 PDGMass=1.116
+ flavorType=1 particleSource=6 particleTypeUsedForFit=0
+ mdstIndex=0 arrayIndex=60 identifier=-1 daughterIndices: 36, 19, 
+ daughter PDGCodes: -2212, 211, 
+ mass=1.122
+ momentum=(0.20, -0.43, -0.07) p=0.4776
+ momentum scaling factor=1
+ position=(-0.06, -0.00, -0.06)
+ p-value of fit (if done): 0.8238
+ error matrix (px, py, pz, E, x, y ,z):
+    1.1e-05    2.2e-06    1.5e-07    4.6e-07          0          0          0
+    2.2e-06    5.6e-06     -7e-07   -1.3e-06          0          0          0
+    1.5e-07     -7e-07    9.2e-06   -2.1e-07          0          0          0
+    4.6e-07   -1.3e-06   -2.1e-07    5.3e-07          0          0          0
+          0          0          0          0    0.00026   -0.00032   -6.4e-05
+          0          0          0          0   -0.00032    0.00054    9.9e-05
+          0          0          0          0   -6.4e-05    9.9e-05    7.1e-05
+
+ extra info=( chiSquared=0.0496 decayModeID=1 failed=0 highQualityVertex=1 modifiedPValue=0.9971 ndf=1 ) 
+
+[INFO] [ParticlePrinterModule] END   ------------------------------
+[INFO] [ParticlePrinterModule] START ------------------------------
+[INFO]  ParticleLists: Lambda0:merged (1+0) + anti-Lambda0:merged (1+0)
+[INFO]  - 58 = 3122[0]
+[INFO]      o) daughter indices = 39 22
+[INFO]      o) p_distToClosestTrkAtCDC0_VS_p_all = 5.61699
+[INFO]      o) p_distToClosestTrkAtCDC1_VS_p_all = 7.74703
+[INFO]      o) p_distToClosestTrkAtCDC2_VS_p_all = 9.46793
+[INFO]      o) p_distToClosestTrkAtCDC3_VS_p_all = 10.1201
+[INFO]      o) p_distToClosestTrkAtCDC4_VS_p_all = 9.47062
+[INFO]      o) p_distToClosestTrkAtCDC5_VS_p_all = 7.12693
+[INFO]      o) p_distToClosestTrkAtCDC6_VS_p_all = 2.66321
+[INFO]      o) p_distToClosestTrkAtCDC7_VS_p_all = 5.54582
+[INFO]      o) p_distToClosestTrkAtCDC8_VS_p_all = 10.2393
+[INFO]      o) p_distToClosestTrkAtTOP0_VS_p_all = 2.58846
+[INFO]      o) p_distToClosestTrkAtARICH0_VS_p_all = nan
+[INFO]      o) p_distToClosestTrkAtECL0_VS_p_all = 86.1762
+[INFO]      o) p_distToClosestTrkAtECL1_VS_p_all = 97.8586
+[INFO]      o) p_distToClosestTrkAtKLM0_VS_p_all = nan
+[INFO]      o) pi_distToClosestTrkAtCDC0_VS_p_all = 0.469699
+[INFO]      o) pi_distToClosestTrkAtCDC1_VS_p_all = 4.76017
+[INFO]      o) pi_distToClosestTrkAtCDC2_VS_p_all = 12.3006
+[INFO]      o) pi_distToClosestTrkAtCDC3_VS_p_all = 5.31828
+[INFO]      o) pi_distToClosestTrkAtCDC4_VS_p_all = 15.301
+[INFO]      o) pi_distToClosestTrkAtCDC5_VS_p_all = nan
+[INFO]      o) pi_distToClosestTrkAtCDC6_VS_p_all = nan
+[INFO]      o) pi_distToClosestTrkAtCDC7_VS_p_all = nan
+[INFO]      o) pi_distToClosestTrkAtCDC8_VS_p_all = nan
+[INFO]      o) pi_distToClosestTrkAtTOP0_VS_p_all = nan
+[INFO]      o) pi_distToClosestTrkAtARICH0_VS_p_all = 156.859
+[INFO]      o) pi_distToClosestTrkAtECL0_VS_p_all = 162.21
+[INFO]      o) pi_distToClosestTrkAtECL1_VS_p_all = 167.419
+[INFO]      o) pi_distToClosestTrkAtKLM0_VS_p_all = nan
+[INFO]  - 60 = -3122[1]
+[INFO]      o) daughter indices = 36 19
+[INFO]      o) p_distToClosestTrkAtCDC0_VS_p_all = 3.94239
+[INFO]      o) p_distToClosestTrkAtCDC1_VS_p_all = 1.98014
+[INFO]      o) p_distToClosestTrkAtCDC2_VS_p_all = 4.35625
+[INFO]      o) p_distToClosestTrkAtCDC3_VS_p_all = 15.6659
+[INFO]      o) p_distToClosestTrkAtCDC4_VS_p_all = 22.094
+[INFO]      o) p_distToClosestTrkAtCDC5_VS_p_all = 22.0561
+[INFO]      o) p_distToClosestTrkAtCDC6_VS_p_all = 20.3654
+[INFO]      o) p_distToClosestTrkAtCDC7_VS_p_all = 16.5768
+[INFO]      o) p_distToClosestTrkAtCDC8_VS_p_all = 10.4875
+[INFO]      o) p_distToClosestTrkAtTOP0_VS_p_all = 4.60234
+[INFO]      o) p_distToClosestTrkAtARICH0_VS_p_all = nan
+[INFO]      o) p_distToClosestTrkAtECL0_VS_p_all = 48.6909
+[INFO]      o) p_distToClosestTrkAtECL1_VS_p_all = 87.1315
+[INFO]      o) p_distToClosestTrkAtKLM0_VS_p_all = nan
+[INFO]      o) pi_distToClosestTrkAtCDC0_VS_p_all = 3.58395
+[INFO]      o) pi_distToClosestTrkAtCDC1_VS_p_all = 1.00497
+[INFO]      o) pi_distToClosestTrkAtCDC2_VS_p_all = 6.55626
+[INFO]      o) pi_distToClosestTrkAtCDC3_VS_p_all = 19.8044
+[INFO]      o) pi_distToClosestTrkAtCDC4_VS_p_all = 38.267
+[INFO]      o) pi_distToClosestTrkAtCDC5_VS_p_all = 64.5457
+[INFO]      o) pi_distToClosestTrkAtCDC6_VS_p_all = 39.1451
+[INFO]      o) pi_distToClosestTrkAtCDC7_VS_p_all = 20.6118
+[INFO]      o) pi_distToClosestTrkAtCDC8_VS_p_all = 5.63148
+[INFO]      o) pi_distToClosestTrkAtTOP0_VS_p_all = nan
+[INFO]      o) pi_distToClosestTrkAtARICH0_VS_p_all = nan
+[INFO]      o) pi_distToClosestTrkAtECL0_VS_p_all = nan
+[INFO]      o) pi_distToClosestTrkAtECL1_VS_p_all = nan
+[INFO]      o) pi_distToClosestTrkAtKLM0_VS_p_all = nan
+[INFO] [ParticlePrinterModule] END   ------------------------------
+[INFO] Writing NTuple K_S0
+[INFO] [1;35m================================================================================[0m
+[INFO] [40;97m            ,.,                                                                 [0m
+[INFO] [40;97m           ;%&M%;_   ,..,                                                       [0m
+[INFO] [40;97m             "_ "__" % M % M %;          , ..., ,                               [0m
+[INFO] [40;97m      , ..., __." --"    , .,     _ - " % &W % WM %;                            [0m
+[INFO] [40;97m     ; % M&$M % "___ "_._   %M%"_."" _ """"""                                   [0m
+[INFO] [40;97m       """""    "" , \_.   "_. ."                                               [0m
+[INFO] [40;97m              , ., _"__ \__./ ."                                                [0m
+[INFO] [40;97m          ___       __ |  y     , ..,     [97;40mThank you for using TreeFitter.       [0m
+[INFO] [40;97m         /)'\    ''''| u  \ %W%W%%;                                             [0m
+[INFO] [40;97m     ___)/   "---\_ \   |____"            [97;40mPlease cite both:                     [0m
+[INFO] [40;97m   ;&&%%;           (|__.|)./  ,..,           [97;40m10.1016/j.nima.2020.164269        [0m
+[INFO] [40;97m             ,.., ___\    |/     &&"       [97;40m   10.1016/j.nima.2005.06.078        [0m
+[INFO] [40;97m           &&%%&    (| Uo /        '"     [97;40mEmail:                                [0m
+[INFO] [40;97m            ''''     \ 7 \                   [97;40mfrancesco.tenchini@desy.de         [0m
+[INFO] [40;97m  ._______________.-'____""-.____.           [97;40mjo-frederik.krohn@desy.de          [0m
+[INFO] [40;97m   \                           /                                                [0m
+[INFO] [40;97m    \       [0m[32;40mTREEFITTER[0m[40;97m        /                                                 [0m
+[INFO] [40;97m     \_______________________/                                                  [0m
+[INFO] [40;97m      (_)                 (_)                                                   [0m
+[INFO] [40;97m                                                                                [0m
+[INFO] [1;35m============= TREEFIT STATISTICS ===============================================[0m
+[INFO] [1;39mCandidates before fit: 59[0m
+[INFO] [1;39mCandidates after fit:  53[0m
+[INFO] [1;39mA total of 6 candidates were removed during the fit.[0m
+[INFO] [1;39m89.8305% of candidates survived the fit.[0m
+[INFO] [1;39m10.1695% of candidates did not.[0m
+[INFO] [1;39mYou choose to drop all candidates with pValue < 0.[0m
+[INFO] [1;35m================================================================================[0m
+[INFO] [1;35m================================================================================[0m
+[INFO] [40;97m            ,.,                                                                 [0m
+[INFO] [40;97m           ;%&M%;_   ,..,                                                       [0m
+[INFO] [40;97m             "_ "__" % M % M %;          , ..., ,                               [0m
+[INFO] [40;97m      , ..., __." --"    , .,     _ - " % &W % WM %;                            [0m
+[INFO] [40;97m     ; % M&$M % "___ "_._   %M%"_."" _ """"""                                   [0m
+[INFO] [40;97m       """""    "" , \_.   "_. ."                                               [0m
+[INFO] [40;97m              , ., _"__ \__./ ."                                                [0m
+[INFO] [40;97m          ___       __ |  y     , ..,     [97;40mThank you for using TreeFitter.       [0m
+[INFO] [40;97m         /)'\    ''''| u  \ %W%W%%;                                             [0m
+[INFO] [40;97m     ___)/   "---\_ \   |____"            [97;40mPlease cite both:                     [0m
+[INFO] [40;97m   ;&&%%;           (|__.|)./  ,..,           [97;40m10.1016/j.nima.2020.164269        [0m
+[INFO] [40;97m             ,.., ___\    |/     &&"       [97;40m   10.1016/j.nima.2005.06.078        [0m
+[INFO] [40;97m           &&%%&    (| Uo /        '"     [97;40mEmail:                                [0m
+[INFO] [40;97m            ''''     \ 7 \                   [97;40mfrancesco.tenchini@desy.de         [0m
+[INFO] [40;97m  ._______________.-'____""-.____.           [97;40mjo-frederik.krohn@desy.de          [0m
+[INFO] [40;97m   \                           /                                                [0m
+[INFO] [40;97m    \       [0m[32;40mTREEFITTER[0m[40;97m        /                                                 [0m
+[INFO] [40;97m     \_______________________/                                                  [0m
+[INFO] [40;97m      (_)                 (_)                                                   [0m
+[INFO] [40;97m                                                                                [0m
+[INFO] [1;35m============= TREEFIT STATISTICS ===============================================[0m
+[INFO] [1;39mCandidates before fit: 1[0m
+[INFO] [1;39mCandidates after fit:  1[0m
+[INFO] [1;39mA total of 0 candidates were removed during the fit.[0m
+[INFO] [1;39m100% of candidates survived the fit.[0m
+[INFO] [1;39m0% of candidates did not.[0m
+[INFO] [1;39mYou choose to drop all candidates with pValue < 0.[0m
+[INFO] [1;35m================================================================================[0m
+[INFO] Writing NTuple Lambda0
+[INFO] [1;35m================================================================================[0m
+[INFO] [40;97m            ,.,                                                                 [0m
+[INFO] [40;97m           ;%&M%;_   ,..,                                                       [0m
+[INFO] [40;97m             "_ "__" % M % M %;          , ..., ,                               [0m
+[INFO] [40;97m      , ..., __." --"    , .,     _ - " % &W % WM %;                            [0m
+[INFO] [40;97m     ; % M&$M % "___ "_._   %M%"_."" _ """"""                                   [0m
+[INFO] [40;97m       """""    "" , \_.   "_. ."                                               [0m
+[INFO] [40;97m              , ., _"__ \__./ ."                                                [0m
+[INFO] [40;97m          ___       __ |  y     , ..,     [97;40mThank you for using TreeFitter.       [0m
+[INFO] [40;97m         /)'\    ''''| u  \ %W%W%%;                                             [0m
+[INFO] [40;97m     ___)/   "---\_ \   |____"            [97;40mPlease cite both:                     [0m
+[INFO] [40;97m   ;&&%%;           (|__.|)./  ,..,           [97;40m10.1016/j.nima.2020.164269        [0m
+[INFO] [40;97m             ,.., ___\    |/     &&"       [97;40m   10.1016/j.nima.2005.06.078        [0m
+[INFO] [40;97m           &&%%&    (| Uo /        '"     [97;40mEmail:                                [0m
+[INFO] [40;97m            ''''     \ 7 \                   [97;40mfrancesco.tenchini@desy.de         [0m
+[INFO] [40;97m  ._______________.-'____""-.____.           [97;40mjo-frederik.krohn@desy.de          [0m
+[INFO] [40;97m   \                           /                                                [0m
+[INFO] [40;97m    \       [0m[32;40mTREEFITTER[0m[40;97m        /                                                 [0m
+[INFO] [40;97m     \_______________________/                                                  [0m
+[INFO] [40;97m      (_)                 (_)                                                   [0m
+[INFO] [40;97m                                                                                [0m
+[INFO] [1;35m============= TREEFIT STATISTICS ===============================================[0m
+[INFO] [1;39mCandidates before fit: 77[0m
+[INFO] [1;39mCandidates after fit:  72[0m
+[INFO] [1;39mA total of 5 candidates were removed during the fit.[0m
+[INFO] [1;39m93.5065% of candidates survived the fit.[0m
+[INFO] [1;39m6.49351% of candidates did not.[0m
+[INFO] [1;39mYou choose to drop all candidates with pValue < 0.[0m
+[INFO] [1;35m================================================================================[0m
+[WARNING] Not a single candidate survived the fit. Candidates before fit: 0 after: 0
 [INFO] Writing NTuple anti-deuteron
 [INFO] Writing NTuple deuteron
 [INFO] Writing NTuple anti-p-

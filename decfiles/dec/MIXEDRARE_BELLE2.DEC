@@ -1451,32 +1451,32 @@ Decay anti-B0Rare
 0.000001000   f_0  b_10                                    SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
 
 # Penguin dominated modes are sin2beta, not sin2alpha. #[w/CPV - BO 09/2017]
-0.000004300   phi  K_S0                                    SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;
-0.000004300   phi  K_L0                                    SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
-0.000000550   eta  K_S0                                    SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;
-0.000000550   eta  K_L0                                    SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
-0.000033000   eta'  K_S0                                   SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;
-0.000033000   eta'  K_L0                                   SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
-0.000002500   omega  K_S0                                  SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;
-0.000002500   omega  K_L0                                  SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
-
 # Don't allow jetset to simulate the same decay but to a K0 or anti-K0: Lange 1/30/2003.
 #$ forbid_pythia()
 0.000000000   phi  K0                                      PHSP;
 #$ forbid_pythia()
 0.000000000   phi  anti-K0                                 PHSP;
+0.000004300   phi  K_S0                                    SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;
+0.000004300   phi  K_L0                                    SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
 #$ forbid_pythia()
 0.000000000   eta  K0                                      PHSP;
 #$ forbid_pythia()
 0.000000000   eta  anti-K0                                 PHSP;
+0.000000550   eta  K_S0                                    SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;
+0.000000550   eta  K_L0                                    SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
 #$ forbid_pythia()
 0.000000000   eta'  K0                                     PHSP;
 #$ forbid_pythia()
 0.000000000   eta'  anti-K0                                PHSP;
+0.000033000   eta'  K_S0                                   SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;
+0.000033000   eta'  K_L0                                   SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
 #$ forbid_pythia()
 0.000000000   omega  K0                                    PHSP;
 #$ forbid_pythia()
 0.000000000   omega  anti-K0                               PHSP;
+0.000002500   omega  K_S0                                  SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;
+0.000002500   omega  K_L0                                  SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
+
 
 0.000000100   phi  pi0                                     SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0; #BF<0. Set BF<UL.  https://arxiv.org/pdf/1206.4760.pdf. #[BF update - PG 09/2020]
 0.000000200   phi  eta                                     SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0; #BF with 1.4sigma. https://arxiv.org/pdf/0907.1743.pdf. #[BF update - PG 09/2020]
@@ -1605,8 +1605,6 @@ Decay anti-B0Rare
 0.000001000   anti-K0  eta  eta                            PHSP;
 0.000001000   anti-K0  eta  eta'                           PHSP;
 0.000001000   anti-K0  eta'  eta'                          PHSP;
-#$ forbid_pythia()
-0.000000000   anti-K0  K0  anti-K0                         PHSP; #Assume 8*BF(KsKsKs)~=48 (8 is a guess). KS/KL combination are in PPP section below
 
 0.000001000   pi0  pi0  pi0                                PHSP;
 0.000001000   pi0  pi0  eta                                PHSP;
@@ -2184,6 +2182,9 @@ Decay anti-B0Rare
 
 # PPP
 #
+# Don't allow jetset to simulate the same decay but to a K0 or anti-K0: Lange 1/30/2003.
+#$ forbid_pythia()
+0.000000000   anti-K0  K0  anti-K0                         PHSP; #Assume 8*BF(KsKsKs)~=48 (8 is a guess). KS/KL combination are in PPP section below
 0.000006200   K_S0  K_S0  K_S0                             PHSP; #Measured, inclusive
 0.000006200   K_L0  K_L0  K_L0                             PHSP; #Same as KsKsKs
 0.000007400   K_S0  K_S0  K_L0                             PHSP; #UL

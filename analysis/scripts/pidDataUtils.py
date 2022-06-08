@@ -9,14 +9,29 @@
 ##########################################################################
 
 
+import ROOT.Belle2
 import numpy as np
 import pandas as pd
 import h5py
 
 
-PARTICLES = ["e", "mu", "pi", "K", "p", "d"]
-DETECTORS = ["SVD", "CDC", "TOP", "ARICH", "ECL", "KLM"]
-PDG_CODES = [11, 13, 211, 321, 2212, 1000010020]
+PARTICLES, PDG_CODES = [], []
+for i in range(len(ROOT.Belle2.Const.chargedStableSet)):
+    particle = ROOT.Belle2.Const.chargedStableSet.at(i)
+    name = (particle.__repr__()[7:-1]
+            .replace("-", "")
+            .replace("+", "")
+            .replace("euteron", ""))
+    PARTICLES.append(name)
+    PDG_CODES.append(particle.getPDGCode())
+# PARTICLES = ["e", "mu", "pi", "K", "p", "d"]
+# PDG_CODES = [11, 13, 211, 321, 2212, 1000010020]
+
+DETECTORS = []
+for det in ROOT.Belle2.Const.PIDDetectors.set():
+    DETECTORS.append(ROOT.Belle2.Const.parseDetectors(det))
+# DETECTORS = ["SVD", "CDC", "TOP", "ARICH", "ECL", "KLM"]
+
 P_BINS = np.array([0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.5])
 THETA_BINS = np.radians(np.array([17, 28, 40, 60, 77, 96, 115, 133, 150]))
 

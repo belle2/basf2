@@ -15,6 +15,7 @@ Variables
    provides the best track fit result, regardless of the particle object's PDG.
  * Users can clear aliases by using ``variables.clearAliases()``, which is useful when processing several independent ``Path``
    objects in a single basf2 session, e.g. b2luigi job submission.
+ * Added the variable `cosAngleBetweenMomentumAndBoostVector` which returns the cosine of angle between momentum and boost vector.
 
 Modules
 +++++++
@@ -142,24 +143,6 @@ Variables
    meson.
  * Added `percentageWrongParticlesBTag` which gives the percentage of FSP reconstructed not originating from the
    `mostcommonBTagIndex`.
- * Added the variable `TracksLBoostChi2`, which returns the change of the track positions in the boost direction after a vertex KFit
-   in terms of a :math:`\chi^2` value.
- * Added new Flavor Tagger related meta-variables to use ROE-mask correctly, ``pMissTag``, ``cosTPTO``, ``ptTracksRoe``,
-   ``pt2TracksRoe``, ``isMajorityInRestOfEventFromB0``, ``isMajorityInRestOfEventFromB0bar``, ``hasRestOfEventTracks``, and
-   ``isRelatedRestOfEventMajorityB0Flavor``. Added an argument ``maskName`` to ``BtagToWBosonVariables``.
- * Added the variable `trackFitCovariance`, which returns the track fit covariance matrix element corresponding to the two provided
-   indices.
- * Added the variable `nPrimaryMCParticles` which returns the number of primary MC particles.
- * Added the variable `nVirtualPrimaryMCParticles` which returns the number of virtual primary MC particles.
- * Added the variable `nInitialPrimaryMCParticles` which returns the number of initial primary MC particles.
- * Changed the `nCompositeDaughters` so that one can specify the PDG code of composite daughters.
-   If no argument is given, it works same as before. Please note that brackets have to appended even if no argument is given i.e.
-   ``nCompositeDaughters()``.
- * Added `nCompositeAllGenerationDaughters` which works similar with `nCompositeDaughters` but it includes all generations of daughters.
- * Added optional argument to `helixExtTheta`, `helixExtPhi` to allow performing the extrapolation using the mass hypothesis that provides
-   the best track fit result, regardless of the particle object's PDG.
- * Users can clear aliases by using ``variables.clearAliases()``, which is useful when processing several independent ``Path`` objects in a single basf2 session, e.g. b2luigi job submission.
- * Added the variable `cosAngleBetweenMomentumAndBoostVector` which returns the cosine of angle between momentum and boost vector.
 
 Modules
 +++++++

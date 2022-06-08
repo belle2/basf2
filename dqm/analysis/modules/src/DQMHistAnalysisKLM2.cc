@@ -39,6 +39,8 @@ DQMHistAnalysisKLM2Module::~DQMHistAnalysisKLM2Module()
 
 void DQMHistAnalysisKLM2Module::initialize()
 {
+  m_monObj = getMonitoringObject("klm");
+
   gROOT->cd();
   m_c_eff_bklm = new TCanvas("KLMEfficiencyDQM/c_eff_bklm_plane");
   m_c_eff_eklm = new TCanvas("KLMEfficiencyDQM/c_eff_eklm_plane");
@@ -88,6 +90,29 @@ void DQMHistAnalysisKLM2Module::beginRun()
 
 void DQMHistAnalysisKLM2Module::endRun()
 {
+  std::string name;
+
+  for (int bin = 0; bin < m_eff_bklm_sector->GetXaxis()->GetNbins(); bin++) {
+    name = "eff_B";
+    if (bin < 8)
+      name += "B";
+    else
+      name += "F";
+    name += std::to_string(bin % 8);
+
+    m_monObj->setVariable(name, m_eff_bklm_sector->GetBinContent(bin + 1));
+  }
+
+  for (int bin = 0; bin < m_eff_eklm_sector->GetXaxis()->GetNbins(); bin++) {
+    name = "eff_E";
+    if (bin < 4)
+      name += "B";
+    else
+      name += "F";
+    name += std::to_string(bin % 4);
+
+    m_monObj->setVariable(name, m_eff_eklm_sector->GetBinContent(bin + 1));
+  }
 }
 
 

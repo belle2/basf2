@@ -40,8 +40,8 @@ using namespace ECL;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(ECLShowerShape)
-REG_MODULE(ECLShowerShapePureCsI)
+REG_MODULE(ECLShowerShape);
+REG_MODULE(ECLShowerShapePureCsI);
 
 //-----------------------------------------------------------------
 //                 Implementation

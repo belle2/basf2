@@ -177,6 +177,8 @@ namespace Belle2 {
     std::string m_MCParticlesToSimHitsName;    /**< Relation for origin of incoming SimHits. */
     std::string m_SimHitsTOCDCHitsName;      /**< Relation for outgoing CDCHits. */
 
+    std::string m_OptionalMCParticlesToHitsName;      /**< Relation name for optional matching of all particles. */
+
     bool m_useSimpleDigitization;            /**< Use float Gaussian Smearing instead of proper digitization. */
     //--- Paramters for simple digitization -------------------------------------------------------------------------------------
     double m_fraction;          /**< Fraction of the first Gaussian used to smear drift length */
@@ -243,6 +245,7 @@ namespace Belle2 {
     bool m_align;             /**< A switch to control alignment */
     bool m_correctForWireSag;    /**< A switch to control wire sag */
     bool m_treatNegT0WiresAsGood;    /**< A switch for negative-t0 wires */
+    bool m_matchAllParticles;    /**< A switch to match all particles to a hit, not just the first */
 //    float m_eventTime;         /**< It is a timing of event, which includes a time jitter due to the trigger system */
 
     bool m_useDB4FEE;             /**< Fetch FEE params from DB */

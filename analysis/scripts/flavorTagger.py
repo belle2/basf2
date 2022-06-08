@@ -1138,15 +1138,6 @@ def flavorTagger(
         if eventLevel(mode, weightFiles, categories, roe_path):
             combinerLevel(mode, weightFiles, categories, variablesCombinerLevel, categoriesCombinationCode, roe_path)
 
-        # Removes EventExtraInfos and ParticleExtraInfos of the EventParticleLists
-        particleListsToRemoveExtraInfo = []
-        for category in categories:
-            particleList = AvailableCategories[category].particleList
-            if particleList not in particleListsToRemoveExtraInfo:
-                particleListsToRemoveExtraInfo.append(particleList)
-
-        ma.removeExtraInfo(particleListsToRemoveExtraInfo, False, roe_path)
-
         path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
     elif mode == 'Expert':
@@ -1175,15 +1166,6 @@ def flavorTagger(
             flavorTaggerInfoFiller.param('trackPointers', False)
             roe_path.add_module(flavorTaggerInfoFiller)  # Add FlavorTag Info filler to roe_path
             add_default_FlavorTagger_aliases()
-
-        # Removes EventExtraInfos and ParticleExtraInfos of the EventParticleLists
-        particleListsToRemoveExtraInfo = []
-        for category in categories:
-            particleList = AvailableCategories[category].particleList
-            if particleList not in particleListsToRemoveExtraInfo:
-                particleListsToRemoveExtraInfo.append(particleList)
-
-        ma.removeExtraInfo(particleListsToRemoveExtraInfo, True, roe_path)
 
         path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 

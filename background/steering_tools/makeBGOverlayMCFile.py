@@ -62,17 +62,33 @@ if len(argvs) > 3 and argvs[3] == 'gated':
 # background files
 if 'BELLE2_BACKGROUND_MIXING_DIR' not in os.environ:
     B2ERROR('BELLE2_BACKGROUND_MIXING_DIR variable is not set - it must contain the path to BG samples')
+    B2INFO('on KEKCC: /sw/belle2/bkg.mixing')
     sys.exit()
 
 bg = glob.glob(os.environ['BELLE2_BACKGROUND_MIXING_DIR'] + '/*.root')
+
 if len(bg) == 0:
     B2ERROR('No root files found in folder ' + os.environ['BELLE2_BACKGROUND_MIXING_DIR'])
+    sys.exit()
+
+# extra files for adding SVD pick-up noise
+if 'BELLE2_BACKGROUND_MIXING_EXTRA_DIRS' not in os.environ:
+    B2ERROR('BELLE2_BACKGROUND_MIXING_EXTRA_DIRS variable is not set - it must contain the path to extra samples')
+    B2INFO('on KEKCC: /sw/belle2/bkg.mixing_extra')
+    sys.exit()
+
+SVDOverlayDir = os.environ['BELLE2_BACKGROUND_MIXING_EXTRA_DIRS'] + '/SVD'
+SVDOverlayFiles = glob.glob(SVDOverlayDir + '/*_overlay.root')
+
+if len(SVDOverlayFiles) == 0:
+    B2ERROR('No root files found in folder ' + SVDOverlayDir)
     sys.exit()
 
 B2INFO('Making BG overlay sample for ' + argvs[1] + ' with ECL compression = ' +
        str(compression) + ' and PXD in ' + mode + ' mode')
 B2INFO('Using background samples from folder ' + os.environ['BELLE2_BACKGROUND_MIXING_DIR'])
 B2INFO('With scaling factor: ' + str(scaleFactor))
+B2INFO('With SVD xTalk&Noise files from folder ' + str(SVDOverlayDir))
 
 set_log_level(LogLevel.WARNING)
 
@@ -110,6 +126,10 @@ else:
 
 # SVD digitization
 add_svd_simulation(main)
+# SVD overlay of random trigger data to add SVD Noise & xTalk
+main.add_module('BGOverlayInput', skipExperimentCheck=True, bkgInfoName='BackgroundInfoSVDOverlay', inputFileNames=SVDOverlayFiles)
+main.add_module('BGOverlayExecutor', bkgInfoName='BackgroundInfoSVDOverlay')
+main.add_module('SVDShaperDigitSorter')
 
 # CDC digitization
 main.add_module('CDCDigitizer')

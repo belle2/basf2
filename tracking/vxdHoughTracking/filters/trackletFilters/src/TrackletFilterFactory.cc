@@ -47,6 +47,7 @@ TrackletFilterFactory::create(const std::string& filterName) const
     return std::make_unique<TrackFindingCDC::AllFilter<BaseTrackletFilter>>();
   }
 
+  // cppcheck-suppress knownConditionTrueFalse
   if (filterName == "none") {
     return std::make_unique<TrackFindingCDC::NoneFilter<BaseTrackletFilter>>();
   }

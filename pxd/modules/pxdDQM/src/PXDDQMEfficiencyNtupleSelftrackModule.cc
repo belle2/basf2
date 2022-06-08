@@ -19,7 +19,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(PXDDQMEfficiencyNtupleSelftrack)
+REG_MODULE(PXDDQMEfficiencyNtupleSelftrack);
 
 //-----------------------------------------------------------------
 //                 Implementation

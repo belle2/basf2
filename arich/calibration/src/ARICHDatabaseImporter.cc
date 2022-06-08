@@ -104,7 +104,7 @@ ARICHDatabaseImporter::ARICHDatabaseImporter(int experiment, int run)
   m_iov = IntervalOfValidity(0, 0, -1, -1);
 }
 
-void ARICHDatabaseImporter::SetIOV(int experimentLow, int runLow, int experimentHigh , int runHigh)
+void ARICHDatabaseImporter::SetIOV(int experimentLow, int runLow, int experimentHigh, int runHigh)
 {
   m_iov = IntervalOfValidity(experimentLow, runLow, experimentHigh, runHigh);
 }
@@ -1174,7 +1174,7 @@ void ARICHDatabaseImporter::dumpAerogelOpticalProperties(std::string outRootFile
   ARICHAerogelHist* h2_aerogel_down_thick = new ARICHAerogelHist("h2_aerogel_down_thick", "aerogel down thick");
 
   std::string condDBname = "ARICHdata";
-
+  // cppcheck-suppress knownConditionTrueFalse
   if (condDBname == "ARICHdata") {
 
     //
@@ -1305,7 +1305,7 @@ void ARICHDatabaseImporter::importAerogelInfo(TString coreNameSuffix)
     }
 
     // save data as an element of the array
-    new(agelConstants[agel]) ARICHAerogelInfo(version, serial, id, index, trlen, thickness, lambdas, transmittances);
+    new (agelConstants[agel]) ARICHAerogelInfo(version, serial, id, index, trlen, thickness, lambdas, transmittances);
     agel++;
   }
 
@@ -1399,7 +1399,7 @@ void ARICHDatabaseImporter::importAerogelMap()
       if (layer == 0) agelserial = aerogel.getString("downaerogelserial");
 
       // save data as an element of the array
-      new(agelMap[agel]) ARICHAerogelMap();
+      new (agelMap[agel]) ARICHAerogelMap();
       auto* agelConst = static_cast<ARICHAerogelMap*>(agelMap[agel]);
       agelConst->setAerogelSN(agelserial);
       agelConst->setAerogelRingID(ring);
@@ -1469,11 +1469,11 @@ void ARICHDatabaseImporter::importAerogelInfoEventDep()
       }
 
       // save data as an element of the array
-      if (someint == 0)    new(agelConstantsA[agel]) ARICHAerogelInfo(version, serial, id, index, trlen, thickness, lambdas,
+      if (someint == 0)    new (agelConstantsA[agel]) ARICHAerogelInfo(version, serial, id, index, trlen, thickness, lambdas,
             transmittances);
-      if (someint == 1)    new(agelConstantsB[agel]) ARICHAerogelInfo(version, serial, id, index, trlen, thickness, lambdas,
+      if (someint == 1)    new (agelConstantsB[agel]) ARICHAerogelInfo(version, serial, id, index, trlen, thickness, lambdas,
             transmittances);
-      if (someint == 2)    new(agelConstantsC[agel]) ARICHAerogelInfo(version, serial, id, index, trlen, thickness, lambdas,
+      if (someint == 2)    new (agelConstantsC[agel]) ARICHAerogelInfo(version, serial, id, index, trlen, thickness, lambdas,
             transmittances);
       agel++;
     }
@@ -1618,7 +1618,7 @@ void ARICHDatabaseImporter::importHapdQA()
     }
 
     // save data as an element of the array
-    new(hapdQAConstants[hapd]) ARICHHapdQA(hapdSerial, arrivalDate, leakCurrent, hitData2D, noise, hitCount);
+    new (hapdQAConstants[hapd]) ARICHHapdQA(hapdSerial, arrivalDate, leakCurrent, hitData2D, noise, hitCount);
     hapd++;
   }
 
@@ -1667,7 +1667,7 @@ void ARICHDatabaseImporter::importAsicInfo()
 
 
     // save data as an element of the array
-    new(asicConstants[asic])  ARICHAsicInfo();
+    new (asicConstants[asic])  ARICHAsicInfo();
     auto* asicConst = static_cast<ARICHAsicInfo*>(asicConstants[asic]);
 
     asicConst->setAsicID(asicSerial);
@@ -1832,7 +1832,7 @@ void ARICHDatabaseImporter::importFebTest()
   for (const auto& runserial : content.getNodes("run")) {
     int serial = runserial.getInt("sn");
     // save data as an element of the array
-    new(febConstants[feb]) ARICHFebTest();
+    new (febConstants[feb]) ARICHFebTest();
     auto* febConst = static_cast<ARICHFebTest*>(febConstants[feb]);
     febConst->setFebSerial(serial);
 
@@ -2386,7 +2386,7 @@ void ARICHDatabaseImporter::importHapdChipInfo()
 
     // prepare ARICHHapdChipInfo class for each chip
     for (unsigned int l = 0; l < 4; l++)  {
-      new(chipConstants[4 * chip_i + l]) ARICHHapdChipInfo();
+      new (chipConstants[4 * chip_i + l]) ARICHHapdChipInfo();
       auto* chipConst = static_cast<ARICHHapdChipInfo*>(chipConstants[4 * chip_i + l]);
 
       chipConst->setHapdSerial(sn);
@@ -2439,7 +2439,7 @@ void ARICHDatabaseImporter::importHapdInfo()
   // extract chip info, such as bias voltage, lists of dead and bad channels etc.
   for (const auto& hapdInfo : content.getNodes("hapd")) {
     // define element of TClonesArray
-    new(hapdConstants[hapd_i]) ARICHHapdInfo();
+    new (hapdConstants[hapd_i]) ARICHHapdInfo();
     auto* hapdConst = static_cast<ARICHHapdInfo*>(hapdConstants[hapd_i]);
 
     // extract information about HAPD
@@ -2655,7 +2655,7 @@ void ARICHDatabaseImporter::importHapdQE()
     }
 
     // save data as an element of the array
-    new(hapdQEConstants[hapd]) ARICHHapdQE(hapdSerial, qe2D);
+    new (hapdQEConstants[hapd]) ARICHHapdQE(hapdSerial, qe2D);
     hapd++;
     f->Close();
   }
@@ -2793,7 +2793,7 @@ void ARICHDatabaseImporter::importFEBoardInfo()
     if (!sentKEK.empty()) location = "KEK";
 
     // save data as an element of the array
-    new(febConstants[feb]) ARICHFEBoardInfo();
+    new (febConstants[feb]) ARICHFEBoardInfo();
     auto* febConst = static_cast<ARICHFEBoardInfo*>(febConstants[feb]);
     febConst->setFEBoardSerial(febSN);
     febConst->setAsicPosition(0, asic1);
@@ -3004,7 +3004,7 @@ void ARICHDatabaseImporter::importModuleTest(const std::string& mypath, const st
     }
 
     // save data as an element of the array
-    new(moduleConstants[module]) ARICHModuleTest();
+    new (moduleConstants[module]) ARICHModuleTest();
     auto* moduleConst = static_cast<ARICHModuleTest*>(moduleConstants[module]);
     moduleConst->setFebSN(febSN);
     moduleConst->setHapdSN(hapdSN);
@@ -3092,7 +3092,7 @@ void ARICHDatabaseImporter::importSensorModuleInfo()
     int hvSerial = sensor.getInt("HVserial");
 
     // save data as an element of the array
-    new(moduleInfoConstants[module]) ARICHSensorModuleInfo();
+    new (moduleInfoConstants[module]) ARICHSensorModuleInfo();
     auto* moduleInfoConst = static_cast<ARICHSensorModuleInfo*>(moduleInfoConstants[module]);
     moduleInfoConst->setSensorModuleID(id);
     moduleInfoConst->setFEBserial(febSerial);
@@ -3152,7 +3152,7 @@ void ARICHDatabaseImporter::importSensorModuleMap()
     int id = sensor.getInt("moduleID");
 
     // save data as an element of the array
-    new(moduleMapConstants[module]) ARICHSensorModuleMap();
+    new (moduleMapConstants[module]) ARICHSensorModuleMap();
     auto* moduleMapConst = static_cast<ARICHSensorModuleMap*>(moduleMapConstants[module]);
     moduleMapConst->setSensorModuleSextantID(sextant);
     moduleMapConst->setSensorModuleRingID(ring);
@@ -3232,7 +3232,7 @@ void ARICHDatabaseImporter::importMagnetTest()
   // loop over xml files and extract the data
   for (const auto& module : content.getNodes("module")) {
     // save data as an element of the array
-    new(magnetConstants[num]) ARICHMagnetTest();
+    new (magnetConstants[num]) ARICHMagnetTest();
     auto* magnetConst = static_cast<ARICHMagnetTest*>(magnetConstants[num]);
 
     int snint = module.getInt("hapdID");

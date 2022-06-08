@@ -68,6 +68,8 @@ namespace Belle2 {
     std::string m_histogramDirectoryName;
     //! prefix for EPICS PVs
     std::string m_pvPrefix;
+    /** Update entry intervall */
+    int m_minEntries = 10000;
 
     //! Histogram covering all error types
     TH1* m_hDAQError = nullptr;
@@ -78,7 +80,9 @@ namespace Belle2 {
     //! Histogram covering all modules*DHP
     TH1F* m_hMissingDHP = nullptr;
     //! Histogram covering stat
-    TH1F* m_hStatistic = nullptr;
+    TH1D* m_hStatistic = nullptr;
+    //! Histogram preserving last stat upd
+    TH1* m_hDaqStatOld = nullptr;
     //! Final Canvas
     TCanvas* m_cDAQError = nullptr;
     //! Final Canvas
@@ -89,6 +93,8 @@ namespace Belle2 {
     TCanvas* m_cMissingDHP = nullptr;
     //! Final Canvas
     TCanvas* m_cStatistic = nullptr;
+    //! Final Canvas
+    TCanvas* m_cStatisticUpd = nullptr;
 
 
     /** Monitoring Object */

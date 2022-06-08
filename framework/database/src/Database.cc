@@ -255,11 +255,11 @@ namespace Belle2 {
       }
       // If so, warn again ... because
       if (not m_testingPayloads.empty()) {
-        B2WARNING(R"(Conditions data: configured to look for temporary tesing payloads from one or more local folders.
+        B2WARNING(R"(Conditions data: configured to look for temporary testing payloads from one or more local folders.
 
     This will lead to non-reproducible results and is strictly only for testing purposes.
     It is NOT ALLOWED for official productions or data analysis and any results obtained like this WILL NOT BE PUBLISHED.
-  )";);
+  )");
       }
       m_configState = c_Ready;
     }

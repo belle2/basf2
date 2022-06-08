@@ -142,6 +142,8 @@ Advanced Topics
 
 .. toctree:: Priors
 
+.. toctree:: KsSelector
+
 .. toctree:: PIDCalibrationWeights
 
 .. _analysismodules:

@@ -50,6 +50,8 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
            "Name of relation between MCParticles and CDCSimHits used",     string(""));
   addParam("CDCSimHistToCDCHitsName",      m_SimHitsTOCDCHitsName,
            "Name of relation between the CDCSimHits and the CDCHits used", string(""));
+  addParam("OptionalMCParticlesToHitsName",      m_OptionalMCParticlesToHitsName,
+           "Optional name of relation between the MCParticles and CDCHits used", string("MultipleMatchedParticles"));
 
 
   //Parameters for Digitization
@@ -160,6 +162,9 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
   addParam("ExtraADCSmearing", m_extraADCSmearing, "Switch for extra ADC smearing; true: on; false: off", m_extraADCSmearing);
   //  addParam("SigmaForExtraADCSmearing", m_sigmaForExtraADCSmearing, "Gaussian sigma for extra ADC smearing; specify range [0,1]", m_sigmaForExtraADCSmearing);
 
+  // Switch for optional relations
+  addParam("MatchAllParticles", m_matchAllParticles, "Switch to store all relations instead of only the first", false);
+
 #if defined(CDC_DEBUG)
   cout << " " << endl;
   cout << "CDCDigitizer constructor" << endl;
@@ -175,6 +180,8 @@ void CDCDigitizerModule::initialize()
   m_cdcHits.registerInDataStore(m_outputCDCHitsName);
   m_simHits.registerRelationTo(m_cdcHits);
   m_mcParticles.registerRelationTo(m_cdcHits);
+  m_mcParticles.registerRelationTo(m_cdcHits, DataStore::c_Event, DataStore::c_WriteOut, m_OptionalMCParticlesToHitsName);
+
   // Arrays for trigger.
   m_cdcHits4Trg.registerInDataStore(m_outputCDCHitsName4Trg);
   m_simHits.registerRelationTo(m_cdcHits4Trg);
@@ -665,6 +672,44 @@ void CDCDigitizerModule::event()
       const MCParticle* mcparticle = rels[0];
       double weight = rels.weight(0);
       mcparticle->addRelationTo(firstHit, weight);
+    }
+
+    //set all relations to first hit if requested but dont create additional hits!
+    // relation 1
+    if (m_matchAllParticles > 0) {
+      if (iterSignalMap->second.m_simHitIndex >= 0) {
+        RelationVector<MCParticle> rels1 = m_simHits[iterSignalMap->second.m_simHitIndex]->getRelationsFrom<MCParticle>();
+        if (rels1.size() != 0) {
+          //assumption: only one MCParticle
+          const MCParticle* mcparticle = rels1[0];
+          double weight = rels1.weight(0);
+          mcparticle->addRelationTo(firstHit, weight, m_OptionalMCParticlesToHitsName);
+        }
+      }
+
+      // relation 2
+      if (iterSignalMap->second.m_simHitIndex2 >= 0) {
+        RelationVector<MCParticle> rels2 = m_simHits[iterSignalMap->second.m_simHitIndex2]->getRelationsFrom<MCParticle>();
+        if (rels2.size() != 0) {
+          //assumption: only one MCParticle
+          const MCParticle* mcparticle = rels2[0];
+          double weight = rels2.weight(0);
+          mcparticle->addRelationTo(firstHit, weight, m_OptionalMCParticlesToHitsName);
+        }
+      }
+
+      // relation 3
+      if (iterSignalMap->second.m_simHitIndex3 >= 0) {
+        RelationVector<MCParticle> rels3 = m_simHits[iterSignalMap->second.m_simHitIndex3]->getRelationsFrom<MCParticle>();
+        if (rels3.size() != 0) {
+          //assumption: only one MCParticle
+          const MCParticle* mcparticle = rels3[0];
+          double weight = rels3.weight(0);
+          mcparticle->addRelationTo(firstHit, weight, m_OptionalMCParticlesToHitsName);
+        }
+      }
+
+
     }
 
     //Set 2nd-hit related things if it exists

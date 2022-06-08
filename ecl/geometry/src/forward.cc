@@ -294,7 +294,7 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
     G4Transform3D t2 = G4Translate3D(0, 130. / 2 + 35, 40. + 137. / 2);
     l2->SetVisAttributes(batt);
 
-    Point_t v3[] = {{ -75. / 2, -265. / 2}, {75. / 2 - 30, -265. / 2}, {75. / 2, -265. / 2 + 30}, {75. / 2, 265. / 2} , { -75. / 2, 265. / 2}};
+    Point_t v3[] = {{ -75. / 2, -265. / 2}, {75. / 2 - 30, -265. / 2}, {75. / 2, -265. / 2 + 30}, {75. / 2, 265. / 2}, { -75. / 2, 265. / 2}};
     const int n3 = sizeof(v3) / sizeof(Point_t);
     G4ThreeVector c3[n3 * 2];
 

@@ -139,9 +139,6 @@ void Utility::expert(const std::vector<std::string>& filenames, const std::vecto
                      const std::string& outputfile, int experiment, int run, int event, bool copy_target)
 {
 
-  std::vector<Weightfile> weightfiles;
-  std::vector<TBranch*> branches;
-
   TFile file(outputfile.c_str(), "RECREATE");
   file.cd();
   TTree tree("variables", "variables");
@@ -176,9 +173,10 @@ void Utility::expert(const std::vector<std::string>& filenames, const std::vecto
     general_options.m_datafiles = datafiles;
     ROOTDataset data(general_options);
 
+    std::vector<TBranch*> branches;
     //create the output branches
-    float result = std::numeric_limits<float>::quiet_NaN();
     if (not isMulticlass) {
+      float result = 0;
       std::string branchname = Belle2::MakeROOTCompatible::makeROOTCompatible(filename);
       branches.push_back(tree.Branch(branchname.c_str(), &result, (branchname + "/F").c_str()));
       std::chrono::high_resolution_clock::time_point start = std::chrono::high_resolution_clock::now();
@@ -193,6 +191,7 @@ void Utility::expert(const std::vector<std::string>& filenames, const std::vecto
       }
 
     } else {
+      float result = 0;
       for (unsigned int iClass = 0; iClass < general_options.m_nClasses; ++iClass) {
         std::string branchname = Belle2::MakeROOTCompatible::makeROOTCompatible(filename + "_" + std::to_string(iClass));
         branches.push_back(tree.Branch(branchname.c_str(), &result, (branchname + "/F").c_str()));
@@ -215,7 +214,7 @@ void Utility::expert(const std::vector<std::string>& filenames, const std::vecto
     if (not general_options.m_target_variable.empty()) {
       std::string branchname = Belle2::MakeROOTCompatible::makeROOTCompatible(filename + "_" +
                                general_options.m_target_variable);
-      float target = std::numeric_limits<float>::quiet_NaN();
+      float target = 0;
       auto target_branch = tree.Branch(branchname.c_str(), &target, (branchname + "/F").c_str());
       auto targets = data.getTargets();
       for (auto& t : targets) {

@@ -26,7 +26,6 @@ def tree2dict(tree, tree_columns, dict_columns=None):
         dict_columns = tree_columns
     try:
         import root_numpy
-        print(tree_columns)
         d = root_numpy.tree2array(tree, branches=tree_columns)
         d.dtype.names = dict_columns
     except ImportError:

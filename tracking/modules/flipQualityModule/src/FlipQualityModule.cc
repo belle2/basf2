@@ -13,12 +13,12 @@
 #include <memory>
 
 namespace Belle2 {
-
+  /// Register the Module
   REG_MODULE(FlipQuality);
-
+  ///  Implementation
   FlipQualityModule::FlipQualityModule() : Module()
   {
-    setDescription("Moudle to apply the mva based filter to determine if a recoTracks need to be flipped");
+    setDescription("This Module is meant to apply the (index 1 or 2) mva based filter to determine if a recoTracks should be flipped");
 
     setPropertyFlags(c_ParallelProcessingCertified);
 

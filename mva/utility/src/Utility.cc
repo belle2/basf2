@@ -177,8 +177,8 @@ void Utility::expert(const std::vector<std::string>& filenames, const std::vecto
     ROOTDataset data(general_options);
 
     //create the output branches
+    float result = std::numeric_limits<float>::quiet_NaN();
     if (not isMulticlass) {
-      float result = 0;
       std::string branchname = Belle2::MakeROOTCompatible::makeROOTCompatible(filename);
       branches.push_back(tree.Branch(branchname.c_str(), &result, (branchname + "/F").c_str()));
       std::chrono::high_resolution_clock::time_point start = std::chrono::high_resolution_clock::now();
@@ -193,7 +193,6 @@ void Utility::expert(const std::vector<std::string>& filenames, const std::vecto
       }
 
     } else {
-      float result = 0;
       for (unsigned int iClass = 0; iClass < general_options.m_nClasses; ++iClass) {
         std::string branchname = Belle2::MakeROOTCompatible::makeROOTCompatible(filename + "_" + std::to_string(iClass));
         branches.push_back(tree.Branch(branchname.c_str(), &result, (branchname + "/F").c_str()));
@@ -216,7 +215,7 @@ void Utility::expert(const std::vector<std::string>& filenames, const std::vecto
     if (not general_options.m_target_variable.empty()) {
       std::string branchname = Belle2::MakeROOTCompatible::makeROOTCompatible(filename + "_" +
                                general_options.m_target_variable);
-      float target = 0;
+      float target = std::numeric_limits<float>::quiet_NaN();
       auto target_branch = tree.Branch(branchname.c_str(), &target, (branchname + "/F").c_str());
       auto targets = data.getTargets();
       for (auto& t : targets) {

@@ -69,7 +69,9 @@ def apply(state, X):
     If the estimator has a predict_proba it is called, otherwise call just predict.
     """
     if hasattr(state.estimator, 'predict_proba'):
-        x = state.estimator.predict_proba(X)[:, 1]
+        x = state.estimator.predict_proba(X)
+        if x.shape[1] == 2:
+            x = state.estimator.predict_proba(X)[:, 1]
     else:
         x = state.estimator.predict(X)
     return np.require(x, dtype=np.float32, requirements=['A', 'W', 'C', 'O'])

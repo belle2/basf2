@@ -87,7 +87,7 @@ def apply(state, X):
     """
     Apply estimator to passed data.
     """
-    r = state.model.predict(X)
+    r = state.model.predict(X).squeeze()
     return np.require(r, dtype=np.float32, requirements=['A', 'W', 'C', 'O'])
 
 

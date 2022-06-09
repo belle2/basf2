@@ -113,7 +113,7 @@ def apply(state, X):
     """
     Apply estimator to passed data.
     """
-    r = state.model(X).numpy()
+    r = state.model(X).numpy().flatten()
     return np.require(r, dtype=np.float32, requirements=['A', 'W', 'C', 'O'])
 
 

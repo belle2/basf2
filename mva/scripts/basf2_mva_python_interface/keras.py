@@ -79,7 +79,6 @@ def load(obj):
 
         for index, key in enumerate(obj[2]):
             setattr(state, key, obj[3][index])
-
     return state
 
 
@@ -87,7 +86,9 @@ def apply(state, X):
     """
     Apply estimator to passed data.
     """
-    r = state.model.predict(X).squeeze()
+    r = state.model.predict(X)
+    if r.shape[1] == 1:
+        r = r[:, 0]  # cannot use squeeze because we might have output of shape [1,X classes]
     return np.require(r, dtype=np.float32, requirements=['A', 'W', 'C', 'O'])
 
 

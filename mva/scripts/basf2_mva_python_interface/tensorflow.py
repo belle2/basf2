@@ -113,7 +113,9 @@ def apply(state, X):
     """
     Apply estimator to passed data.
     """
-    r = state.model(X).numpy().flatten()
+    r = state.model(X).numpy()
+    if r.shape[1] == 1:
+        r = r[:, 0]  # cannot use squeeze because we might have output of shape [1,X classes]
     return np.require(r, dtype=np.float32, requirements=['A', 'W', 'C', 'O'])
 
 

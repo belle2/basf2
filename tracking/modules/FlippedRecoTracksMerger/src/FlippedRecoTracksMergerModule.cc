@@ -27,94 +27,115 @@ FlippedRecoTracksMergerModule::FlippedRecoTracksMergerModule() :
 
 void FlippedRecoTracksMergerModule::initialize()
 {
-
-  //StoreArray<RecoTrack> m_inputRecoTracks(m_inputStoreArrayName);
-  //m_outputRecoTracks.registerInDataStore(m_outputStoreArrayName, DataStore::c_ErrorIfAlreadyRegistered);
-  //RecoTrack::registerRequiredRelations(m_outputRecoTracks);
-
-  //m_outputRecoTracks.registerRelationTo(m_inputRecoTracks);
-
-  //if (m_tracks.optionalRelationTo(m_inputRecoTracks)) {
-  //  m_tracks.registerRelationTo(m_outputRecoTracks);
-  //}
+  //m_inputRecoTracks.isRequired(m_inputStoreArrayName);
 }
 
 void FlippedRecoTracksMergerModule::event()
 {
 
   Belle2::StoreArray<RecoTrack> m_inputRecoTracks(m_inputStoreArrayName);
+  Belle2::StoreArray<RecoTrack> m_inputRecoTracksFlipped(m_inputStoreArrayNameFlipped);
 
-  for (auto& recoTrack : m_inputRecoTracks) {
+  // record the index of FitResults in store Array
+  unsigned int lastFitResultIndexInArray = -1;
+  unsigned int fitResultsIndexFlipped = -1;
+
+  // get the last index of the fitresults
+  for (int ireco = 0; ireco <  m_inputRecoTracks.getEntries(); ireco++) {
+    RecoTrack* recoTrack = m_inputRecoTracks[ireco];
     // check if the recoTracks was fitted successfully
-    if (not recoTrack.wasFitSuccessful()) {
+    if (not recoTrack->wasFitSuccessful()) {
+      continue;
+    }
+
+    Track* b2track = recoTrack->getRelatedFrom<Belle2::Track>();
+    if (b2track) {
+      lastFitResultIndexInArray += b2track->getNumberOfFittedHypotheses();
+    }
+  }
+  // the flipped fitResults' index in the storeArray
+  fitResultsIndexFlipped = lastFitResultIndexInArray + 1;
+
+  // loop all the recoTracks
+  for (int ireco = 0; ireco <  m_inputRecoTracks.getEntries(); ireco++) {
+
+    RecoTrack* recoTrack = m_inputRecoTracks[ireco];
+    // check if the recoTracks was fitted successfully
+    if (not recoTrack->wasFitSuccessful()) {
       continue;
     }
     // get the related Belle2::Tracks
-    Track* b2track = recoTrack.getRelatedFrom<Belle2::Track>();
+    Track* b2track = recoTrack->getRelatedFrom<Belle2::Track>();
 
     if (b2track) {
       // printing out the fit results for testing
-      auto allFitRes = b2track->getTrackFitResults();
-      for (auto fitRes : allFitRes) {
-        B2INFO("before flipping : phi0_variance " << fitRes.second->getCov()[5]);
-      }
+      //fitResultsIndex += b2track->getNumberOfFittedHypotheses();
+      //auto allFitRes = b2track->getTrackFitResults();
+      //for (auto fitRes : allFitRes) {
+      //  B2INFO("before flipping : phi0_variance " << fitRes.second->getCov()[5]);
+      //}
 
       // if the 2ndMVA passed the cut
-      if (recoTrack.get2ndFlipQualityIndicator() > m_2nd_mva_cut) {
-        B2INFO(" step 3: pass the : > m_2nd_mva_cut");
+      if (recoTrack->get2ndFlipQualityIndicator() > m_2nd_mva_cut) {
+        //B2INFO(" step 3: pass the : > m_2nd_mva_cut");
 
         // get the related RecoTrack_flipped
-        RecoTrack* RecoTrack_flipped =  recoTrack.getRelatedFrom<Belle2::RecoTrack>("RecoTracks_flipped");
+        RecoTrack* RecoTrack_flipped =  recoTrack->getRelatedFrom<Belle2::RecoTrack>("RecoTracks_flipped");
 
         if (RecoTrack_flipped) {
-          B2INFO(" step 4: found flipped");
 
           // get the Tracks_flipped
           Track* b2trackFlipped = RecoTrack_flipped->getRelatedFrom<Belle2::Track>("Tracks_flipped");
+
           if (b2trackFlipped) {
 
             // printing out the fit results for testing
-            allFitRes = b2trackFlipped->getTrackFitResults();
-            for (auto fitRes : allFitRes) {
-              B2INFO("the flipped output : phi0_variance " << fitRes.second->getCov()[5]);
+            //allFitRes = b2trackFlipped->getTrackFitResults();
+            //for (auto fitRes : allFitRes) {
+            //  B2INFO("the flipped output : phi0_variance " << fitRes.second->getCov()[5]);
+            //}
+
+            //TVector3 currentPosition , currentMomentum;
+            //double currentCharge = 0;
+
+            //const auto& measuredStateOnPlane = recoTrack->getMeasuredStateOnPlaneFromLastHit();
+            //currentPosition = measuredStateOnPlane.getPos();
+            //currentMomentum = measuredStateOnPlane.getMom();
+            //currentCharge = measuredStateOnPlane.getCharge();
+
+            //// revert the charge and momentum
+            //recoTrack->setChargeSeedOnly(-currentCharge);
+            //recoTrack->setPositionAndMomentumOnly(currentPosition,  -currentMomentum);
+
+            //// Can we only reverse the SortingParameters?
+            //auto RecoHitInfos = recoTrack->getRecoHitInformations();
+            //unsigned int temp = 0xffffffff;
+            //for (auto RecoHitInfo : RecoHitInfos) {
+            //  RecoHitInfo->setSortingParameter(temp - RecoHitInfo->getSortingParameter());
+            //}
+
+            //std::vector<Track::ChargedStableTrackFitResultPair> fitResultsBefore = b2track->getTrackFitResults();
+            std::vector<Track::ChargedStableTrackFitResultPair> fitResultsAfter = b2trackFlipped->getTrackFitResults();
+
+            //b2track->getTrackFitResults().clear();
+            //Problem to be fixed:
+            //    if the original Track has 3 fitResults but the flipped one has 2.
+            //    the last fitResults will not be changed with the following code
+            for (long unsigned int index = 0; index <  fitResultsAfter.size(); index++) {
+              auto fitResultAfter  = fitResultsAfter[index];
+              b2track -> setTrackFitResultIndex(fitResultAfter.first, fitResultsIndexFlipped + index);
             }
-
-            // get the StoreAccessorBase for recoTrack
-            auto c_PersistentDurability = BIT(21);
-            bool array = (dynamic_cast<TClonesArray*>(&recoTrack) != nullptr);
-            bool isPersistent = recoTrack.TestBit(c_PersistentDurability);
-            DataStore::EDurability durability = isPersistent ? (DataStore::c_Persistent) : (DataStore::c_Event);
-
-            StoreAccessorBase* RecoTracksStoreAccessorBase = new Belle2::StoreAccessorBase(m_inputStoreArrayName, durability,
-                RecoTrack::Class(), array);
-
-
-            // get the StoreAccessorBase for RecoTrack_flipped
-            array = (dynamic_cast<TClonesArray*>(RecoTrack_flipped) != nullptr);
-            isPersistent = RecoTrack_flipped->TestBit(c_PersistentDurability);
-            durability = isPersistent ? (DataStore::c_Persistent) : (DataStore::c_Event);
-            StoreAccessorBase* RecoTracksFlippedStoreAccessorBase = new Belle2::StoreAccessorBase(m_inputStoreArrayNameFlipped, durability,
-                RecoTrack::Class(), array);
-
-            // replace the contents of recoTrack using RecoTrack_flipped
-            //     this is the key part but not working properly at the moment...
-            DataStore::Instance().replaceData(*RecoTracksFlippedStoreAccessorBase, *RecoTracksStoreAccessorBase);
-
-            // swap the Relations to Belle2::Tracks and FitResults
-            RelationArray RecoTracksFlippedRelation(DataStore::relationName("Tracks_flipped", m_inputStoreArrayNameFlipped));
-            RelationArray RecoTracksRelation(DataStore::relationName("Tracks", m_inputStoreArrayName));
-            DataStore::Instance().replaceData(RecoTracksFlippedRelation, RecoTracksRelation);
           }
 
           //check  the fit results again to see if it changed or not
-          B2INFO(" step 5: done ?");
-          b2track = recoTrack.getRelatedFrom<Belle2::Track>();
-          if (b2track) {
-            allFitRes = b2track->getTrackFitResults();
-            for (auto fitRes : allFitRes) {
-              B2INFO("after flipping : phi0_variance " << fitRes.second->getCov()[5]);
-            }
-          }
+          //B2INFO(" step 5: done ?");
+          //b2track = recoTrack->getRelatedFrom<Belle2::Track>();
+          //if (b2track) {
+          //  allFitRes = b2track->getTrackFitResults();
+          //  for (auto fitRes : allFitRes) {
+          //    B2INFO("after flipping : phi0_variance " << fitRes.second->getCov()[5]);
+          //  }
+          //}
         }
       }
     }

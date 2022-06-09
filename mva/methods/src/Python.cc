@@ -422,7 +422,7 @@ namespace Belle2 {
         }
       }
 
-      std::vector<float> probabilities(test_data.getNumberOfEvents());
+      std::vector<float> probabilities(test_data.getNumberOfEvents(), std::numeric_limits<float>::quiet_NaN());
 
       try {
         auto ndarray_X = boost::python::handle<>(PyArray_SimpleNewFromData(2, dimensions_X, NPY_FLOAT32, X.get()));
@@ -464,7 +464,8 @@ namespace Belle2 {
       }
 
       unsigned int nClasses = static_cast<unsigned int>(m_general_options.m_nClasses);
-      std::vector<std::vector<float>> probabilities(test_data.getNumberOfEvents(), std::vector<float>(nClasses, -999.0));
+      std::vector<std::vector<float>> probabilities(test_data.getNumberOfEvents(), std::vector<float>(nClasses,
+                                                    std::numeric_limits<float>::quiet_NaN()));
 
       try {
         auto ndarray_X = boost::python::handle<>(PyArray_SimpleNewFromData(2, dimensions_X, NPY_FLOAT32, X.get()));

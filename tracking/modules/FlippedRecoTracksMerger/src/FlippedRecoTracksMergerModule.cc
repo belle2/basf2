@@ -103,16 +103,16 @@ void FlippedRecoTracksMergerModule::event()
             //currentMomentum = measuredStateOnPlane.getMom();
             //currentCharge = measuredStateOnPlane.getCharge();
 
-            //// revert the charge and momentum
-            //recoTrack->setChargeSeedOnly(-currentCharge);
-            //recoTrack->setPositionAndMomentumOnly(currentPosition,  -currentMomentum);
+            // revert the charge and momentum
+            recoTrack->setChargeSeedOnly(-currentCharge);
+            recoTrack->setPositionAndMomentumOnly(currentPosition,  -currentMomentum);
 
-            //// Can we only reverse the SortingParameters?
-            //auto RecoHitInfos = recoTrack->getRecoHitInformations();
-            //unsigned int temp = 0xffffffff;
-            //for (auto RecoHitInfo : RecoHitInfos) {
-            //  RecoHitInfo->setSortingParameter(temp - RecoHitInfo->getSortingParameter());
-            //}
+            // Can we only reverse the SortingParameters?
+            auto RecoHitInfos = recoTrack->getRecoHitInformations();
+            unsigned int temp = 0xffffffff;
+            for (auto RecoHitInfo : RecoHitInfos) {
+              RecoHitInfo->setSortingParameter(temp - RecoHitInfo->getSortingParameter());
+            }
 
             //std::vector<Track::ChargedStableTrackFitResultPair> fitResultsBefore = b2track->getTrackFitResults();
             std::vector<Track::ChargedStableTrackFitResultPair> fitResultsAfter = b2trackFlipped->getTrackFitResults();

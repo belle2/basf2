@@ -48,15 +48,12 @@ void RecoTracksReverterModule::event()
       Track* b2track = recoTrack.getRelatedFrom<Belle2::Track>();
       if (b2track) {
 
-        TVector3 tmp_current_position, tmp_current_momentum;
-        double tmp_current_charge = 0;
-
         const auto& measuredStateOnPlane = recoTrack.getMeasuredStateOnPlaneFromLastHit();
-        tmp_current_position = measuredStateOnPlane.getPos();
-        tmp_current_momentum = measuredStateOnPlane.getMom();
-        tmp_current_charge = measuredStateOnPlane.getCharge();
+        TVector3 currentPosition = measuredStateOnPlane.getPos();
+        TVector3 currentMomentum = measuredStateOnPlane.getMom();
+        double currentCharge = measuredStateOnPlane.getCharge();
 
-        RecoTrack* newRecoTrack = m_outputRecoTracks.appendNew(tmp_current_position, -tmp_current_momentum, -tmp_current_charge,
+        RecoTrack* newRecoTrack = m_outputRecoTracks.appendNew(currentPosition, -currentMomentum, -currentCharge,
                                                                recoTrack.getStoreArrayNameOfCDCHits(), recoTrack.getStoreArrayNameOfSVDHits(), recoTrack.getStoreArrayNameOfPXDHits(),
                                                                recoTrack.getStoreArrayNameOfBKLMHits(), recoTrack.getStoreArrayNameOfEKLMHits(),
                                                                recoTrack.getStoreArrayNameOfRecoHitInformation());

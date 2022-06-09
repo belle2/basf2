@@ -26,6 +26,7 @@ def tree2dict(tree, tree_columns, dict_columns=None):
         dict_columns = tree_columns
     try:
         import root_numpy
+        print(tree_columns)
         d = root_numpy.tree2array(tree, branches=tree_columns)
         d.dtype.names = dict_columns
     except ImportError:
@@ -253,9 +254,23 @@ class Method(object):
 
             expert_target = identifier + '_' + self.general_options.m_target_variable
             stripped_expert_target = self.identifier + '_' + self.general_options.m_target_variable
-            d = tree2dict(
-                roottree, [
+
+            output_names = [self.identifier]
+            branch_names = [
                     ROOT.Belle2.MakeROOTCompatible.makeROOTCompatible(identifier),
-                    ROOT.Belle2.MakeROOTCompatible.makeROOTCompatible(expert_target)], [
-                    self.identifier, stripped_expert_target])
-        return d[self.identifier], d[stripped_expert_target]
+                    ]
+            if self.general_options.m_nClasses > 2:
+                output_names = [self.identifier+f'_{i}' for i in range(self.general_options.m_nClasses)]
+                branch_names = [
+                    ROOT.Belle2.MakeROOTCompatible.makeROOTCompatible(
+                        identifier +
+                        f'_{i}') for i in range(
+                        self.general_options.m_nClasses)]
+
+            d = tree2dict(
+                roottree,
+                [*branch_names, ROOT.Belle2.MakeROOTCompatible.makeROOTCompatible(expert_target)],
+                [*output_names, stripped_expert_target])
+
+        return (d[self.identifier] if self.general_options.m_nClasses <= 2 else np.array([d[x]
+                for x in output_names]).T), d[stripped_expert_target]

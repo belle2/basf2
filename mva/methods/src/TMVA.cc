@@ -294,6 +294,7 @@ namespace Belle2 {
     // Implement me!
     Weightfile TMVATeacherMulticlass::train(Dataset& training_data) const
     {
+      B2ERROR("Training TMVAMulticlass classifiers within the MVA package has not been implemented yet.");
       (void) training_data;
       return Weightfile();
     }

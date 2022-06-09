@@ -95,13 +95,11 @@ void FlippedRecoTracksMergerModule::event()
             //  B2INFO("the flipped output : phi0_variance " << fitRes.second->getCov()[5]);
             //}
 
-            //TVector3 currentPosition , currentMomentum;
-            //double currentCharge = 0;
+            const auto& measuredStateOnPlane = recoTrack->getMeasuredStateOnPlaneFromLastHit();
 
-            //const auto& measuredStateOnPlane = recoTrack->getMeasuredStateOnPlaneFromLastHit();
-            //currentPosition = measuredStateOnPlane.getPos();
-            //currentMomentum = measuredStateOnPlane.getMom();
-            //currentCharge = measuredStateOnPlane.getCharge();
+            TVector3 currentPosition = measuredStateOnPlane.getPos();
+            TVector3 currentMomentum = measuredStateOnPlane.getMom();
+            double currentCharge = measuredStateOnPlane.getCharge();
 
             // revert the charge and momentum
             recoTrack->setChargeSeedOnly(-currentCharge);

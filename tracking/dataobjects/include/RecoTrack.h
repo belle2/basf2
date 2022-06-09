@@ -16,7 +16,8 @@
 
 #include <tracking/dataobjects/RecoHitInformation.h>
 
-#include <optional>
+#include <boost/optional.hpp>
+
 #include <string>
 #include <vector>
 
@@ -30,7 +31,6 @@ namespace Belle2 {
   class RecoTrackGenfitAccess;
 
   BELLE2_DEFINE_EXCEPTION(NoTrackFitResult, "No track fit result available for this hit (e.g. DAF has removed it).")
-  BELLE2_DEFINE_EXCEPTION(NoStateOnPlaneFound, "No measured state on plane for any track point found.")
 
   /** This is the Reconstruction Event-Data Model Track.
    *
@@ -220,7 +220,7 @@ namespace Belle2 {
      * @return The number of hits copied.
      */
     size_t addHitsFromRecoTrack(const RecoTrack* recoTrack, unsigned int sortingParameterOffset = 0,
-                                bool reversed = false, std::optional<double> optionalMinimalWeight = std::nullopt);
+                                bool reversed = false, boost::optional<double> optionalMinimalWeight = boost::none);
 
     /**
      * Adds a cdc hit with the given information to the reco track.
@@ -511,6 +511,18 @@ namespace Belle2 {
       deleteFittedInformation();
     }
 
+    /// Only Set the position and momentum seed of the reco track. ATTENTION: This is not the fitted position or momentum.
+    void setPositionAndMomentumOnly(const TVector3& positionSeed, const TVector3& momentumSeed)
+    {
+      m_genfitTrack.setStateSeed(positionSeed, momentumSeed);
+    }
+
+    /// ONLY Set the charge seed stored in the reco track. ATTENTION: This is not the fitted charge.
+    void setChargeSeedOnly(const short int chargeSeed)
+    {
+      m_charge = chargeSeed;
+    }
+
     /// Set the time seed. ATTENTION: This is not the fitted time.
     void setTimeSeed(const double timeSeed)
     {
@@ -597,6 +609,7 @@ namespace Belle2 {
       * Also, set the flags of the corresponding RecoHitInformation to pruned. Only to be used in the prune module.
       */
     void prune();
+    void prune_all();
 
     /// Return a list of measurements and track points, which can be used e.g. to extrapolate. You are not allowed to modify or delete them!
     const std::vector<genfit::TrackPoint*>& getHitPointsWithMeasurement() const
@@ -733,27 +746,27 @@ namespace Belle2 {
       m_qualityIndicator = qualityIndicator;
     }
 
-    /// Get the quality from 1st flipping MVA attached to this RecoTrack as a reference for flipping.
+    /// Get the quality index attached to this RecoTrack as a reference for flipping.
     float getFlipQualityIndicator() const
     {
-      return m_flipQualityIndicator;
+      return m_flipqualityIndicator;
     }
 
-    /// Set the 1st flipping quality attached to this RecoTrack.
+    /// Set the quality index attached to this RecoTrack as a reference for flipping.
     void setFlipQualityIndicator(const float qualityIndicator)
     {
-      m_flipQualityIndicator = qualityIndicator;
+      m_flipqualityIndicator = qualityIndicator;
     }
-    /// Get the quality from 2nd flipping MVA attached to this RecoTrack as a reference for flipping.
+    /// Get the quality index attached to this RecoTrack as a reference for flipping.
     float get2ndFlipQualityIndicator() const
     {
-      return m_2ndflipQualityIndicator;
+      return m_2ndflipqualityIndicator;
     }
 
-    /// Set the 2nd flipping quality attached to this RecoTrack.
+    /// Set the quality index attached to this RecoTrack as a reference for flipping.
     void set2ndFlipQualityIndicator(const float qualityIndicator)
     {
-      m_2ndflipQualityIndicator = qualityIndicator;
+      m_2ndflipqualityIndicator = qualityIndicator;
     }
     /**
      * Delete all fitted information for all representations.
@@ -801,9 +814,9 @@ namespace Belle2 {
     /// Quality index for classification of fake vs. MC-matched Tracks.
     float m_qualityIndicator = NAN;
     /// Quality index for flipping.
-    float m_flipQualityIndicator = NAN;
+    float m_flipqualityIndicator = NAN;
     /// Quality index for flipping.
-    float m_2ndflipQualityIndicator = NAN;
+    float m_2ndflipqualityIndicator = NAN;
 
     /**
      * Add a generic hit with the given parameters for the reco hit information.

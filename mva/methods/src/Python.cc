@@ -468,15 +468,14 @@ namespace Belle2 {
 
       try {
         auto ndarray_X = boost::python::handle<>(PyArray_SimpleNewFromData(2, dimensions_X, NPY_FLOAT32, X.get()));
-        // apply returns a flattened list - should we check or enforce this more rigorously?
         auto result = m_framework.attr("apply")(m_state, ndarray_X);
         for (uint64_t iEvent = 0; iEvent < numberOfEvents; ++iEvent) {
           // We have to do some nasty casting here, because the Python C-Api uses structs which are binary compatible
           // to a PyObject but do not inherit from it!
           for (uint64_t iClass = 0; iClass < nClasses; ++iClass) {
-            probabilities[iEvent][iClass] = static_cast<float>(*static_cast<float*>(PyArray_GETPTR1(reinterpret_cast<PyArrayObject*>
+            probabilities[iEvent][iClass] = static_cast<float>(*static_cast<float*>(PyArray_GETPTR2(reinterpret_cast<PyArrayObject*>
                                                                (result.ptr()),
-                                                               iEvent * nClasses + iClass)));
+                                                               iEvent, iClass)));
           }
         }
       } catch (...) {

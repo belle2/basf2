@@ -10,10 +10,10 @@ import pathlib
 import tempfile
 import numpy as np
 
-
 from tensorflow.keras.layers import Dense, Input
 from tensorflow.keras.models import Model, load_model
 from tensorflow.keras.losses import binary_crossentropy
+import tensorflow as tf
 
 
 class State(object):
@@ -86,7 +86,10 @@ def apply(state, X):
     """
     Apply estimator to passed data.
     """
-    r = state.model.predict(X)
+    # convert array input to tensor to avoid creating a new graph for each input
+    # calling the model directly is faster than using the predict method in most of our applications
+    # as we do a loop over events.
+    r = state.model(tf.convert_to_tensor(np.atleast_2d(X), dtype=tf.float32), training=False).numpy()
     if r.shape[1] == 1:
         r = r[:, 0]  # cannot use squeeze because we might have output of shape [1,X classes]
     return np.require(r, dtype=np.float32, requirements=['A', 'W', 'C', 'O'])

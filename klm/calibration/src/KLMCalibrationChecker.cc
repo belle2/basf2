@@ -19,6 +19,7 @@
 #include <klm/dbobjects/KLMStripEfficiency.h>
 #include <klm/dbobjects/KLMTimeCableDelay.h>
 #include <klm/dbobjects/KLMTimeConstants.h>
+#include <klm/dbobjects/KLMTimeResolution.h>
 
 /* Belle II headers. */
 #include <framework/database/Database.h>
@@ -483,7 +484,7 @@ void KLMCalibrationChecker::checkTimeCableDelay()
   if (m_GlobalTagName != "")
     printPayloadInformation(timeCableDelay);
   /* Create trees with time cable delay measurement results. */
-  int subdetector, section, sector, layer, plane, strip, channelno;
+  int subdetector, section, sector, layer, plane, strip, channelNumber;
   double timeDelay;
   TFile* timeCableDelayResults =
     new TFile(m_TimeCableDelayResultsFile.c_str(), "recreate");
@@ -496,7 +497,7 @@ void KLMCalibrationChecker::checkTimeCableDelay()
   cabledelayTree->Branch("layer", &layer, "layer/I");
   cabledelayTree->Branch("plane", &plane, "plane/I");
   cabledelayTree->Branch("strip", &strip, "strip/I");
-  cabledelayTree->Branch("channelno", &channelno, "channelno/I");
+  cabledelayTree->Branch("channelNumber", &channelNumber, "channelNumber/I");
   cabledelayTree->Branch("timeDelay", &timeDelay, "timeDelay/D");
   KLMChannelIndex klmStrips(KLMChannelIndex::c_IndexLevelStrip);
   for (KLMChannelIndex& klmStrip : klmStrips) {
@@ -509,7 +510,7 @@ void KLMCalibrationChecker::checkTimeCableDelay()
     KLMChannelNumber channel = m_ElementNumbers->channelNumber(
                                  subdetector, section, sector, layer, plane, strip);
     timeDelay = timeCableDelay->getTimeDelay(channel);
-    channelno = m_ElementNumbers->channelNumber(subdetector, section, sector, layer, plane, strip);
+    channelNumber = m_ElementNumbers->channelNumber(subdetector, section, sector, layer, plane, strip);
     cabledelayTree->Fill();
   }
   cabledelayTree->Write();
@@ -531,7 +532,7 @@ void KLMCalibrationChecker::checkTimeConstants()
     printPayloadInformation(timeConstants);
   /* Create trees with time constant measurement results. */
   int subdetector, section, sector, layer, plane, strip, module, channelno;
-  float contEKLM, contBKLM, contRPCPhi, contRPCZ;
+  float delayEKLM, delayBKLM, delayRPCPhi, delayRPCZ;
   TFile* timeConstantsResults =
     new TFile(m_TimeConstantsResultsFile.c_str(), "recreate");
   TTree* constantsTree = new TTree("constants", "KLM timeConstants data.");
@@ -545,10 +546,10 @@ void KLMCalibrationChecker::checkTimeConstants()
   constantsTree->Branch("strip", &strip, "strip/I");
   constantsTree->Branch("module", &module, "module/I");
   constantsTree->Branch("channelno", &channelno, "channelno/I");
-  constantsTree->Branch("contEKLM", &contEKLM, "contEKLM/F");
-  constantsTree->Branch("contBKLM", &contBKLM, "contBKLM/F");
-  constantsTree->Branch("contRPCPhi", &contRPCPhi, "contRPCPhi/F");
-  constantsTree->Branch("contRPCZ", &contRPCZ, "contRPCZ/F");
+  constantsTree->Branch("delayEKLM", &delayEKLM, "delayEKLM/F");
+  constantsTree->Branch("delayBKLM", &delayBKLM, "delayBKLM/F");
+  constantsTree->Branch("delayRPCPhi", &delayRPCPhi, "delayRPCPhi/F");
+  constantsTree->Branch("delayRPCZ", &delayRPCZ, "delayRPCZ/F");
   KLMChannelIndex klmStrips(KLMChannelIndex::c_IndexLevelStrip);
   for (KLMChannelIndex& klmStrip : klmStrips) {
     subdetector = klmStrip.getSubdetector();
@@ -563,10 +564,10 @@ void KLMCalibrationChecker::checkTimeConstants()
     int c_BKLM = 2;
     int c_RPCPhi = 3;
     int c_RPCZ = 4;
-    contEKLM = timeConstants->getDelay(c_EKLM);
-    contBKLM = timeConstants->getDelay(c_BKLM);
-    contRPCPhi = timeConstants->getDelay(c_RPCPhi);
-    contRPCZ = timeConstants->getDelay(c_RPCZ);
+    delayEKLM = timeConstants->getDelay(c_EKLM);
+    delayBKLM = timeConstants->getDelay(c_BKLM);
+    delayRPCPhi = timeConstants->getDelay(c_RPCPhi);
+    delayRPCZ = timeConstants->getDelay(c_RPCZ);
     constantsTree->Fill();
   }
   constantsTree->Write();

@@ -164,7 +164,7 @@ void ECLChargedPIDMVAModule::event()
     // We can then evaluate the likelihoods from this curve directly or further transform the responses.
     for (unsigned int iResponse = 0; iResponse < scores.size(); iResponse++) {
       if (phasespaceCategory->getTransformMode() !=
-          ECLChargedPIDPhasespaceCategory::MVAResponseTransformMode::c_directMVAResponse) {
+          ECLChargedPIDPhasespaceCategory::MVAResponseTransformMode::c_DirectMVAResponse) {
         scores[iResponse] = logTransformation(scores[iResponse],
                                               phasespaceCategory->getLogTransformOffset(),
                                               phasespaceCategory->getMaxPossibleResponseValue());
@@ -207,7 +207,7 @@ void ECLChargedPIDMVAModule::event()
       // Get the pdf values for each response value
       float logL = 0.0;
       if (phasespaceCategory->getTransformMode() ==
-          ECLChargedPIDPhasespaceCategory::MVAResponseTransformMode::c_directMVAResponse) {
+          ECLChargedPIDPhasespaceCategory::MVAResponseTransformMode::c_DirectMVAResponse) {
         logLikelihoods[hypo_idx] = scores[phasespaceCategory->getMVAIndexForHypothesis(absPdgId)];
         continue;
       }

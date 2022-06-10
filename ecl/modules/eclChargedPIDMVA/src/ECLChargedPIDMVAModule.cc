@@ -22,7 +22,7 @@
 #include <mva/interface/Interface.h>
 #include <mva/methods/TMVA.h>
 
-// MVA
+// MDST
 #include <mdst/dataobjects/Track.h>
 
 // C++
@@ -33,7 +33,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(ECLChargedPIDMVA)
+REG_MODULE(ECLChargedPIDMVA);
 
 ECLChargedPIDMVAModule::ECLChargedPIDMVAModule() : Module()
 {
@@ -97,7 +97,9 @@ void ECLChargedPIDMVAModule::initializeMVA()
     auto clf_vars = weightfile.getVector<std::string>(identifier);
     m_variables[iterator.first] = manager.getVariables(clf_vars);
 
-    std::vector<float> features(general_options.m_variables.size(), 0.0);
+    B2DEBUG(12, "\t\t Weightfile at " << iterator.first << " has " << m_variables[iterator.first].size() << " features.");
+
+    std::vector<float> features(clf_vars.size(), 0.0);
     std::vector<float> spectators;
 
     m_datasets[iterator.first] = std::make_unique<MVA::SingleDataset>(general_options, features, 1.0, spectators);
@@ -161,10 +163,19 @@ void ECLChargedPIDMVAModule::event()
     // is heavily peaked at 0 and 1 into a smooth curve.
     // We can then evaluate the likelihoods from this curve directly or further transform the responses.
     for (unsigned int iResponse = 0; iResponse < scores.size(); iResponse++) {
-      scores[iResponse] = logTransformation(scores[iResponse],
-                                            phasespaceCategory->getLogTransformOffset(),
-                                            phasespaceCategory->getMaxPossibleResponseValue());
+      if (phasespaceCategory->getTransformMode() !=
+          ECLChargedPIDPhasespaceCategory::MVAResponseTransformMode::c_directMVAResponse) {
+        scores[iResponse] = logTransformation(scores[iResponse],
+                                              phasespaceCategory->getLogTransformOffset(),
+                                              phasespaceCategory->getMaxPossibleResponseValue());
+      }
     }
+
+    B2DEBUG(12, "Scores: ");
+    for (unsigned int iResponse = 0; iResponse < scores.size(); iResponse++) {
+      B2DEBUG(12, "\t\t " << iResponse << " : " << scores[iResponse]);
+    }
+
     float logLikelihoods[Const::ChargedStable::c_SetSize];
 
     // Order of loop is defined in UnitConst.cc: e, mu, pi, K, p, d
@@ -195,8 +206,14 @@ void ECLChargedPIDMVAModule::event()
 
       // Get the pdf values for each response value
       float logL = 0.0;
-      for (unsigned int iResponse = 0; iResponse < transformed_scores.size(); iResponse++) {
+      if (phasespaceCategory->getTransformMode() ==
+          ECLChargedPIDPhasespaceCategory::MVAResponseTransformMode::c_directMVAResponse) {
+        logLikelihoods[hypo_idx] = scores[phasespaceCategory->getMVAIndexForHypothesis(absPdgId)];
+        continue;
+      }
+      B2DEBUG(12, "MVA Index for hypo " << absPdgId << " : " << phasespaceCategory->getMVAIndexForHypothesis(absPdgId));
 
+      for (unsigned int iResponse = 0; iResponse < transformed_scores.size(); iResponse++) {
         if ((phasespaceCategory->getTransformMode() ==
              ECLChargedPIDPhasespaceCategory::MVAResponseTransformMode::c_LogTransformSingle)
             and (phasespaceCategory->getMVAIndexForHypothesis(absPdgId) != iResponse)) {continue;}
@@ -215,6 +232,11 @@ void ECLChargedPIDMVAModule::event()
       }
       logLikelihoods[hypo_idx] = logL;
     } // hypo loop
+
+    B2DEBUG(12, "logL: ");
+    for (unsigned int iLogL = 0; iLogL < Const::ChargedStable::c_SetSize; iLogL++) {
+      B2DEBUG(12, "\t\t " << iLogL << " : " << logLikelihoods[iLogL]);
+    }
 
     const auto eclPidLikelihood = m_eclPidLikelihoods.appendNew(logLikelihoods);
 

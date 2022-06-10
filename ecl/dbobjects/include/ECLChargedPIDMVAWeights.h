@@ -137,7 +137,9 @@ namespace Belle2 {
       /** Gaussian transform of the log transformed mva response. */
       c_GaussianTransform = 2,
       /** Decorrelation transform of the gaussian transformed mva responses. */
-      c_DecorrelationTransform = 3
+      c_DecorrelationTransform = 3,
+      /** Directly take the MVA response as the logL, useful if we train neural nets to learn the logL. */
+      c_directMVAResponse = 4
     };
 
     /**

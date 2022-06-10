@@ -53,8 +53,9 @@ void FlippedRecoTracksMergerModule::event()
       lastFitResultIndexInArray += b2track->getNumberOfFittedHypotheses();
     }
   }
+
   // the flipped fitResults' index in the storeArray
-  fitResultsIndexFlipped = lastFitResultIndexInArray + 1;
+  fitResultsIndexFlipped = lastFitResultIndexInArray;
 
   // loop all the recoTracks
   for (int ireco = 0; ireco <  m_inputRecoTracks.getEntries(); ireco++) {
@@ -68,76 +69,52 @@ void FlippedRecoTracksMergerModule::event()
     Track* b2track = recoTrack->getRelatedFrom<Belle2::Track>();
 
     if (b2track) {
-      // printing out the fit results for testing
-      //fitResultsIndex += b2track->getNumberOfFittedHypotheses();
-      //auto allFitRes = b2track->getTrackFitResults();
-      //for (auto fitRes : allFitRes) {
-      //  B2INFO("before flipping : phi0_variance " << fitRes.second->getCov()[5]);
-      //}
 
-      // if the 2ndMVA passed the cut
-      if (recoTrack->get2ndFlipQualityIndicator() > m_2nd_mva_cut) {
-        //B2INFO(" step 3: pass the : > m_2nd_mva_cut");
+      // if the 2ndMVA is not -999 (aka passed the 1st MVA)
+      if (recoTrack->get2ndFlipQualityIndicator() != -999) {
 
         // get the related RecoTrack_flipped
         RecoTrack* RecoTrack_flipped =  recoTrack->getRelatedFrom<Belle2::RecoTrack>("RecoTracks_flipped");
+        // get the Tracks_flipped
+        Track* b2trackFlipped = RecoTrack_flipped->getRelatedFrom<Belle2::Track>("Tracks_flipped");
+        // get the flipped fitResults
+        std::vector<Track::ChargedStableTrackFitResultPair> fitResultsAfter = b2trackFlipped->getTrackFitResults();
 
-        if (RecoTrack_flipped) {
-
-          // get the Tracks_flipped
-          Track* b2trackFlipped = RecoTrack_flipped->getRelatedFrom<Belle2::Track>("Tracks_flipped");
-
-          if (b2trackFlipped) {
-
-            // printing out the fit results for testing
-            //allFitRes = b2trackFlipped->getTrackFitResults();
-            //for (auto fitRes : allFitRes) {
-            //  B2INFO("the flipped output : phi0_variance " << fitRes.second->getCov()[5]);
-            //}
-
-            const auto& measuredStateOnPlane = recoTrack->getMeasuredStateOnPlaneFromLastHit();
-
-            TVector3 currentPosition = measuredStateOnPlane.getPos();
-            TVector3 currentMomentum = measuredStateOnPlane.getMom();
-            double currentCharge = measuredStateOnPlane.getCharge();
-
-            // revert the charge and momentum
-            recoTrack->setChargeSeedOnly(-currentCharge);
-            recoTrack->setPositionAndMomentumOnly(currentPosition,  -currentMomentum);
-
-            // Can we only reverse the SortingParameters?
-            auto RecoHitInfos = recoTrack->getRecoHitInformations();
-            unsigned int temp = 0xffffffff;
-            for (auto RecoHitInfo : RecoHitInfos) {
-              RecoHitInfo->setSortingParameter(temp - RecoHitInfo->getSortingParameter());
-            }
-
-            //std::vector<Track::ChargedStableTrackFitResultPair> fitResultsBefore = b2track->getTrackFitResults();
-            std::vector<Track::ChargedStableTrackFitResultPair> fitResultsAfter = b2trackFlipped->getTrackFitResults();
-
-            //b2track->getTrackFitResults().clear();
-            //Problem to be fixed:
-            //    if the original Track has 3 fitResults but the flipped one has 2.
-            //    the last fitResults will not be changed with the following code
-            for (long unsigned int index = 0; index <  fitResultsAfter.size(); index++) {
-              auto fitResultAfter  = fitResultsAfter[index];
-              b2track -> setTrackFitResultIndex(fitResultAfter.first, fitResultsIndexFlipped + index);
-            }
+        // if the 2MVA existed and passed the selection
+        if (recoTrack->get2ndFlipQualityIndicator() > m_2nd_mva_cut) {
+          // assign the Index of fitResult in storeArray to Flipped fitResults Index
+          // if the original Track has more fitResults, the rest of them will not be changed --> to be updated
+          for (long unsigned int index = 0; index < fitResultsAfter.size(); index++) {
+            auto fitResultAfter  = fitResultsAfter[index];
+            fitResultsIndexFlipped ++;
+            b2track -> setTrackFitResultIndex(fitResultAfter.first, fitResultsIndexFlipped);
+            //B2INFO("the flipped output : phi0_variance " << fitResultAfter.second->getCov()[5]);
           }
 
-          //check  the fit results again to see if it changed or not
-          //B2INFO(" step 5: done ?");
-          //b2track = recoTrack->getRelatedFrom<Belle2::Track>();
-          //if (b2track) {
-          //  allFitRes = b2track->getTrackFitResults();
-          //  for (auto fitRes : allFitRes) {
-          //    B2INFO("after flipping : phi0_variance " << fitRes.second->getCov()[5]);
-          //  }
-          //}
+          // update the contents in RecoTracks
+          const auto& measuredStateOnPlane = recoTrack->getMeasuredStateOnPlaneFromLastHit();
+          TVector3 currentPosition = measuredStateOnPlane.getPos();
+          TVector3 currentMomentum = measuredStateOnPlane.getMom();
+          double currentCharge = measuredStateOnPlane.getCharge();
+
+          // revert the charge and momentum
+          recoTrack->setChargeSeedOnly(-currentCharge);
+          recoTrack->setPositionAndMomentumOnly(currentPosition,  -currentMomentum);
+
+          // Can we only reverse the SortingParameters?
+          auto RecoHitInfos = recoTrack->getRecoHitInformations();
+          unsigned int temp = 0xffffffff;
+          for (auto RecoHitInfo : RecoHitInfos) {
+            RecoHitInfo->setSortingParameter(temp - RecoHitInfo->getSortingParameter());
+          }
+
+        } else {
+          // in case the track was flipped and had fitResults saved
+          fitResultsIndexFlipped += fitResultsAfter.size() ;
+
         }
+
       }
     }
   }
 }
-
-

@@ -113,7 +113,13 @@ def apply(state, X):
     """
     Apply estimator to passed data.
     """
-    r = state.model(X).numpy()
+    try:
+        import tensorflow as tf
+    except ImportError:
+        print("Please install tensorflow: pip3 install tensorflow")
+        sys.exit(1)
+
+    r = state.model(tf.convert_to_tensor(np.atleast_2d(X), dtype=tf.float32)).numpy()
     if r.shape[1] == 1:
         r = r[:, 0]  # cannot use squeeze because we might have output of shape [1,X classes]
     return np.require(r, dtype=np.float32, requirements=['A', 'W', 'C', 'O'])

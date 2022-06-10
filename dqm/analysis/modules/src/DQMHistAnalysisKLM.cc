@@ -111,8 +111,6 @@ void DQMHistAnalysisKLMModule::endRun()
   hist_max_bin = time_scint_eklm->GetMaximumBin();
   max_position = time_scint_eklm->GetXaxis()->GetBinCenter(hist_max_bin);
   m_monObj->setVariable("EKLM Scint Time Peak", max_position);
-
-
 }
 
 double DQMHistAnalysisKLMModule::getProcessedEvents()

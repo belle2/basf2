@@ -233,6 +233,9 @@ void SVDUnpackerModule::event()
         short strip, sample[6];
         vector<uint32_t> crc16vec;
 
+        //reset value for headers and trailers check
+        seenHeadersAndTrailers = 0;
+
         for (; data32_it != &data32tab[buf][nWords[buf]]; data32_it++) {
           m_data32 = *data32_it; //put current 32-bit frame to union
 
@@ -534,9 +537,6 @@ void SVDUnpackerModule::event()
           if (!(seenHeadersAndTrailers & 4)) {B2ERROR("Missing FADC Trailer is detected. SVD data might be corrupted!" << LogVar("Event number", eventNo) << LogVar("FADC", fadc)); missedTrailer = true;}
           if (!(seenHeadersAndTrailers & 8)) {B2ERROR("Missing FTB Trailer is detected. SVD data might be corrupted!" << LogVar("Event number", eventNo) << LogVar("FADC", fadc)); missedTrailer = true;}
         }
-
-        //reset value for headers and trailers check
-        seenHeadersAndTrailers = 0;
 
         for (auto p : vDiagnostic_ptr) {
           // adding remaining info to Diagnostic object

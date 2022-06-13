@@ -45,8 +45,8 @@ void EventT0CombinerModule::event()
   // check if a CDC hypothesis exists
   auto cdcHypos = m_eventT0->getTemporaryEventT0s(Const::EDetector::CDC);
 
-  if (svdHypos.size() == 0 && cdcHypos.size() == 0) {
-    B2DEBUG(20, "No SVD and CDC time hypotheses available, stopping");
+  if (svdHypos.size() == 0) {
+    B2DEBUG(20, "No SVD time hypotheses available, stopping");
     // if no SVD value was found, the best t0 has already been set by the ECL t0 module.
     return;
   }

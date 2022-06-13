@@ -35,10 +35,12 @@ void FlippedRecoTracksMergerModule::event()
 
   Belle2::StoreArray<RecoTrack> m_inputRecoTracks(m_inputStoreArrayName);
   Belle2::StoreArray<RecoTrack> m_inputRecoTracksFlipped(m_inputStoreArrayNameFlipped);
+  Belle2::StoreArray<TrackFitResult> TrackFitResultsArray("TrackFitResults");
 
   // record the index of FitResults in store Array
   unsigned int lastFitResultIndexInArray = -1;
   unsigned int fitResultsIndexFlipped = -1;
+  unsigned int fitResultsIndexCurrent = -1;
 
   // get the last index of the fitresults
   for (int ireco = 0; ireco <  m_inputRecoTracks.getEntries(); ireco++) {
@@ -53,7 +55,6 @@ void FlippedRecoTracksMergerModule::event()
       lastFitResultIndexInArray += b2track->getNumberOfFittedHypotheses();
     }
   }
-
   // the flipped fitResults' index in the storeArray
   fitResultsIndexFlipped = lastFitResultIndexInArray;
 
@@ -69,8 +70,7 @@ void FlippedRecoTracksMergerModule::event()
     Track* b2track = recoTrack->getRelatedFrom<Belle2::Track>();
 
     if (b2track) {
-
-      // if the 2ndMVA is not -999 (aka passed the 1st MVA)
+      // if the 2ndMVA was assigned. aka: passed the 1st MVA
       if (recoTrack->get2ndFlipQualityIndicator() != -999) {
 
         // get the related RecoTrack_flipped
@@ -79,20 +79,32 @@ void FlippedRecoTracksMergerModule::event()
         Track* b2trackFlipped = RecoTrack_flipped->getRelatedFrom<Belle2::Track>("Tracks_flipped");
         // get the flipped fitResults
         std::vector<Track::ChargedStableTrackFitResultPair> fitResultsAfter = b2trackFlipped->getTrackFitResults();
-
-        // if the 2MVA existed and passed the selection
+        // get the original fitResults
+        std::vector<Track::ChargedStableTrackFitResultPair> fitResultsBefore = b2track->getTrackFitResults();
+        // if the 2nd MVA passed the cut
         if (recoTrack->get2ndFlipQualityIndicator() > m_2nd_mva_cut) {
-          // assign the Index of fitResult in storeArray to Flipped fitResults Index
-          // if the original Track has more fitResults, the rest of them will not be changed --> to be updated
+
+          //for (long unsigned int index = 0; index < fitResultsBefore.size(); index++) {
+          // Because the size of the fitResultsAfter and fitResultsBefore are different.
+          // The extra slices of the original fitResults will not be updated and there will be an
+          // error about 'index out of range' if it was removed here --> improvement
           for (long unsigned int index = 0; index < fitResultsAfter.size(); index++) {
+            fitResultsIndexCurrent++;
+            // this is the 'dangerous' part: TClonesArray* StoreArray::getPtr()
+            TrackFitResultsArray.getPtr()->RemoveAt(fitResultsIndexCurrent);
+
+          }
+
+          // update the fitResults using the flipped one
+          for (long unsigned int index = 0; index < fitResultsAfter.size() ; index++) {
             auto fitResultAfter  = fitResultsAfter[index];
             fitResultsIndexFlipped ++;
             b2track -> setTrackFitResultIndex(fitResultAfter.first, fitResultsIndexFlipped);
-            //B2INFO("the flipped output : phi0_variance " << fitResultAfter.second->getCov()[5]);
           }
 
-          // update the contents in RecoTracks
+          // following part update the RecoTracks contents
           const auto& measuredStateOnPlane = recoTrack->getMeasuredStateOnPlaneFromLastHit();
+
           TVector3 currentPosition = measuredStateOnPlane.getPos();
           TVector3 currentMomentum = measuredStateOnPlane.getMom();
           double currentCharge = measuredStateOnPlane.getCharge();
@@ -108,9 +120,10 @@ void FlippedRecoTracksMergerModule::event()
             RecoHitInfo->setSortingParameter(temp - RecoHitInfo->getSortingParameter());
           }
 
+
         } else {
-          // in case the track was flipped and had fitResults saved
           fitResultsIndexFlipped += fitResultsAfter.size() ;
+          fitResultsIndexCurrent += fitResultsAfter.size() ;
 
         }
 

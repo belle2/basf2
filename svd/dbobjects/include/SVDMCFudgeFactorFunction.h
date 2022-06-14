@@ -28,7 +28,7 @@ namespace Belle2 {
     /** typedef of the return value of the fudge factor function*/
     typedef double (SVDMCFudgeFactorFunction::*fudgeFactorFunction)(double) const;
 
-    /** returns the position error, depending on the track's angle*/
+    /** returns the fudge factor, depending on the track's angle*/
     double getFudgeFactor(double trkAngle) const
     {
       fudgeFactorFunction f = m_implementations[m_current];

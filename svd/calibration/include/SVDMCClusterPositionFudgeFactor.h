@@ -17,9 +17,8 @@
 
 namespace Belle2 {
 
-  /** This class defines the dbobject and the methods to access the
-   * SVD position error parameters and provide the position error
-   * for the CoGOnly algorithm
+  /** This class defines the dbobject and the methods to access
+   * the SVD cluster position fudge factors for the SVDClusterizer module
    */
   class SVDMCClusterPositionFudgeFactor {
   public:

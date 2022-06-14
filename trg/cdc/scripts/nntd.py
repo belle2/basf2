@@ -136,10 +136,6 @@ class nntd(basf2.Module):
         pre = status
         if neuro:
 
-            print(evlist)
-            print(len(evlist))
-            print(self.varnum[pre + "neuroz"])
-            print(self.varnum[pre + "neuroz"][0])
             evlist[self.varnum[pre + "neuroz"][0]] = neuro.getZ0()
             evlist[self.varnum[pre + "neurotheta"][0]] = self.costotheta(neuro.getCotTheta() / np.sqrt(1 + neuro.getCotTheta()**2))
             evlist[self.varnum[pre + "neurophi"][0]] = neuro.getPhi0()
@@ -179,7 +175,6 @@ class nntd(basf2.Module):
         return evlist
 
     def event(self):
-        print(self.neurotracksname)
         # TODO: update the plots every nth time
         # if self.showplots != 0:
         #     if eventnumber % self.showplots = 0:

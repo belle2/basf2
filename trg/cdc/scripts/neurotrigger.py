@@ -45,6 +45,29 @@ def filterTRG(path):
     mfilter.if_value('<1', nullpath)
 
 
+class casefilter(basf2.Module):
+    def initialize(self):
+        self.filterarrayname = "RecoTracks"
+        self.lowerthan = 0
+        self.higherthan = -1
+
+    def param(self, params):
+        for key, value in params.items():
+            setattr(self, key, value)
+
+    def event(self):
+        lower = self.lowerthan == 0 or bool(len(Belle2.PyStoreArray(self.filterarrayname)) < self.lowerthan)
+        higher = bool(len(Belle2.PyStoreArray(self.filterarrayname)) > self.higherthan)
+        self.return_value(lower and higher)
+
+
+lt2reco = basf2.register_module(casefilter())
+lt2reco.param({"filterarrayname": "RecoTracks", "lowerthan": 2})
+
+lt4reco = basf2.register_module(casefilter())
+lt4reco.param({"filterarrayname": "RecoTracks", "lowerthan": 4})
+
+
 class nnt_eventfilter(basf2.Module):
     def initialize(self,
                    tracksegmentsname=hwneuroinputsegmenthits,

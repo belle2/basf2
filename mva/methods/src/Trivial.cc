@@ -53,6 +53,7 @@ namespace Belle2 {
 
     void TrivialExpert::load(Weightfile& weightfile)
     {
+      weightfile.getOptions(m_general_options);
       weightfile.getOptions(m_specific_options);
     }
 
@@ -69,5 +70,17 @@ namespace Belle2 {
 
     }
 
+    std::vector<std::vector<float>> TrivialExpert::applyMulticlass(Dataset& test_data) const
+    {
+
+      std::vector<std::vector<float>> probabilities(test_data.getNumberOfEvents(), std::vector<float>(m_general_options.m_nClasses));
+      for (unsigned int iEvent = 0; iEvent < test_data.getNumberOfEvents(); ++iEvent) {
+        test_data.loadEvent(iEvent);
+        for (unsigned int iClass = 0; iClass < m_general_options.m_nClasses; ++iClass) {
+          probabilities[iEvent][iClass] = m_specific_options.m_output + iClass;
+        }
+      }
+      return probabilities;
+    }
   }
 }

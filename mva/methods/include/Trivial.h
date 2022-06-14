@@ -92,6 +92,12 @@ namespace Belle2 {
        */
       virtual std::vector<float> apply(Dataset& test_data) const override;
 
+      /**
+       * Apply this expert onto a dataset
+       * @param test_data dataset
+       */
+      virtual std::vector<std::vector<float>> applyMulticlass(Dataset& test_data) const override;
+
     private:
       TrivialOptions m_specific_options; /**< Method specific options */
     };

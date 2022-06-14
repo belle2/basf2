@@ -275,7 +275,12 @@ namespace Belle2 {
         // check, if enough axials are there. first, we select the axial bits from the
         // hitpattern (341 = int('101010101',base=2)) and then check if the number of
         // ones is equal or greater than 4.
-        if (std::popcount(hitPattern & 341) < 4) {
+        if ((hitPattern & 341) != 341 && // this is an ugly workaround, because popcount is only
+            (hitPattern & 341) != 340 && // available with c++20 and newer
+            (hitPattern & 341) != 337 &&
+            (hitPattern & 341) != 325 &&
+            (hitPattern & 341) != 277 &&
+            (hitPattern & 341) != 85) {
           B2DEBUG(250, "Not enough axial hits (<4), skipping!");
           continue;
         }

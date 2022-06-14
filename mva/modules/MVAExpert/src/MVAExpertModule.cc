@@ -145,28 +145,28 @@ std::vector<float> MVAExpertModule::analyseMulticlass(Particle* particle)
   return m_expert->applyMulticlass(*m_dataset)[0];
 }
 
-void MVAExpertModule::setExtraInfoField(Particle* particle, std::string extraInfoName, float targetValue)
+void MVAExpertModule::setExtraInfoField(Particle* particle, std::string extraInfoName, float responseValue)
 {
   if (particle->hasExtraInfo(extraInfoName)) {
-    if (particle->getExtraInfo(extraInfoName) != targetValue) {
+    if (particle->getExtraInfo(extraInfoName) != responseValue) {
       m_existGivenExtraInfo = true;
       if (m_overwriteExistingExtraInfo)
-        particle->setExtraInfo(extraInfoName, targetValue);
+        particle->setExtraInfo(extraInfoName, responseValue);
     }
   } else {
-    particle->addExtraInfo(extraInfoName, targetValue);
+    particle->addExtraInfo(extraInfoName, responseValue);
   }
 }
 
 void MVAExpertModule::setEventExtraInfoField(StoreObjPtr<EventExtraInfo> eventExtraInfo, std::string extraInfoName,
-                                             float targetValue)
+                                             float responseValue)
 {
   if (eventExtraInfo->hasExtraInfo(extraInfoName)) {
     m_existGivenExtraInfo = true;
     if (m_overwriteExistingExtraInfo)
-      eventExtraInfo->setExtraInfo(extraInfoName, targetValue);
+      eventExtraInfo->setExtraInfo(extraInfoName, responseValue);
   } else {
-    eventExtraInfo->addExtraInfo(extraInfoName, targetValue);
+    eventExtraInfo->addExtraInfo(extraInfoName, responseValue);
   }
 }
 
@@ -178,16 +178,16 @@ void MVAExpertModule::event()
     for (unsigned i = 0; i < list->getListSize(); ++i) {
       Particle* particle = list->getParticle(i);
       if (m_nClasses == 2) {
-        float targetValue = analyse(particle);
-        setExtraInfoField(particle, m_extraInfoName, targetValue);
+        float responseValue = analyse(particle);
+        setExtraInfoField(particle, m_extraInfoName, responseValue);
       } else if (m_nClasses > 2) {
-        std::vector<float> targetValues = analyseMulticlass(particle);
-        if (targetValues.size() != m_nClasses) {
-          B2ERROR("Size of results returned by MVA Expert applyMulticlass (" << targetValues.size() <<
+        std::vector<float> responseValues = analyseMulticlass(particle);
+        if (responseValues.size() != m_nClasses) {
+          B2ERROR("Size of results returned by MVA Expert applyMulticlass (" << responseValues.size() <<
                   ") does not match the declared number of classes (" << m_nClasses << ").");
         }
         for (unsigned int iClass = 0; iClass < m_nClasses; iClass++) {
-          setExtraInfoField(particle, m_extraInfoName + "_" + std::to_string(iClass), targetValues[iClass]);
+          setExtraInfoField(particle, m_extraInfoName + "_" + std::to_string(iClass), responseValues[iClass]);
         }
       } else {
         B2ERROR("Received a value of " << m_nClasses <<
@@ -201,16 +201,16 @@ void MVAExpertModule::event()
       eventExtraInfo.create();
 
     if (m_nClasses == 2) {
-      float targetValue = analyse(nullptr);
-      setEventExtraInfoField(eventExtraInfo, m_extraInfoName, targetValue);
+      float responseValue = analyse(nullptr);
+      setEventExtraInfoField(eventExtraInfo, m_extraInfoName, responseValue);
     } else if (m_nClasses > 2) {
-      std::vector<float> targetValues = analyseMulticlass(nullptr);
-      if (targetValues.size() != m_nClasses) {
-        B2ERROR("Size of results returned by MVA Expert applyMulticlass (" << targetValues.size() <<
+      std::vector<float> responseValues = analyseMulticlass(nullptr);
+      if (responseValues.size() != m_nClasses) {
+        B2ERROR("Size of results returned by MVA Expert applyMulticlass (" << responseValues.size() <<
                 ") does not match the declared number of classes (" << m_nClasses << ").");
       }
       for (unsigned int iClass = 0; iClass < m_nClasses; iClass++) {
-        setEventExtraInfoField(eventExtraInfo, m_extraInfoName + "_" + std::to_string(iClass), targetValues[iClass]);
+        setEventExtraInfoField(eventExtraInfo, m_extraInfoName + "_" + std::to_string(iClass), responseValues[iClass]);
       }
     } else {
       B2ERROR("Received a value of " << m_nClasses <<

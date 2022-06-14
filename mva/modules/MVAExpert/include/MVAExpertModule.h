@@ -109,7 +109,7 @@ namespace Belle2 {
     bool m_existGivenExtraInfo; /**< check if the given extraInfo is already defined. */
 
     unsigned int
-    m_nClasses; /** number of classes (~outputs) of the current MVA Expert. If m_nClasses==2 then only 1 output is expected. */
+    m_nClasses; /**< number of classes (~outputs) of the current MVA Expert. If m_nClasses==2 then only 1 output is expected. */
   };
 
 } // Belle2 namespace

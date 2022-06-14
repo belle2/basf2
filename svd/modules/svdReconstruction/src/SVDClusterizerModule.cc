@@ -402,9 +402,12 @@ void SVDClusterizerModule::finalizeCluster(Belle2::SVD::RawCluster& rawCluster)
     //..and write relations
     writeClusterRelations(rawCluster);
 
-    //alter cluster position on MC to match resolution measured on data
+    //alter cluster position and time on MC to match resolution measured on data
     bool isMC = Environment::Instance().isMC();
-    if (isMC) alterClusterPosition();
+    if (isMC) {
+      alterClusterPosition();
+      alterClusterTime();
+    }
   }
 }
 
@@ -511,7 +514,7 @@ void SVDClusterizerModule::alterClusterPosition()
   }
 
   // get the appropriate sigma to alter the position
-  double sigma = m_mcFudgeFactor.getFudgeFactor(sensorID, isU, trkAngle);
+  double sigma = m_mcPositionFudgeFactor.getFudgeFactor(sensorID, isU, trkAngle);
 
   // do the job
   float fudgeFactor = (float) gRandom->Gaus(0., sigma);
@@ -519,6 +522,27 @@ void SVDClusterizerModule::alterClusterPosition()
 
   B2DEBUG(20, "Layer number: " << layerNum << ", is U side: " << isU << ", track angle: " << trkAngle << ", sigma: " << sigma <<
           ", cluster position: " << clsPosition << ", fudge factor: " << fudgeFactor);
+}
+
+void SVDClusterizerModule::alterClusterTime()
+{
+  // alter the time of the last cluster in the array
+  int clsIndex = m_storeClusters.getEntries() - 1;
+
+  // get the necessary information on the cluster
+  float clsTime = m_storeClusters[clsIndex]->getClsTime();
+  VxdID sensorID = m_storeClusters[clsIndex]->getSensorID();
+  bool isU = m_storeClusters[clsIndex]->isUCluster();
+
+  // get the appropriate sigma to alter the time
+  double sigma = m_mcTimeFudgeFactor.getFudgeFactor(sensorID, isU);
+
+  // do the job
+  float fudgeFactor = (float) gRandom->Gaus(0., sigma);
+  m_storeClusters[clsIndex]->setClsTime(clsTime + fudgeFactor);
+
+  B2DEBUG(20, "Layer number: " << sensorID.getLayerNumber() << ", is U side: " << isU << ", sigma: " << sigma <<
+          ", cluster time: " << clsTime << ", fudge factor: " << fudgeFactor);
 }
 
 void SVDClusterizerModule::endRun()

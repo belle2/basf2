@@ -1,0 +1,15 @@
+{
+    "_COMMENT": "First version for release-07",
+ 
+    "uniqueID": { "INFO":{ "first": "noFudge",
+			   "current": "float", 
+			   "tag": "rel07_v0"
+		     }
+	    },
+    "U":{"L3":  0.0,
+        "L456":  0.0
+        },
+    "V":{"L3":  0.0,
+        "L456":  0.0
+        }
+}

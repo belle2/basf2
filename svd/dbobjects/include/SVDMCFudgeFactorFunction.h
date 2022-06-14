@@ -109,8 +109,9 @@ namespace Belle2 {
     /** ID = {1}, rel07: fudge factor parametrized with linear interpolation between graph points
      */
 
-    /** Vectors of TGraph points, m_x for the angles and m_y for the sigmas */
+    /** Vectors of TGraph points for the angles */
     std::vector<double> m_x;
+    /** Vectors of TGraph points for the sigmas */
     std::vector<double> m_y;
 
     /** tgraph_v0 implementation

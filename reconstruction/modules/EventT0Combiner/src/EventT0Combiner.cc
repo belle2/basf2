@@ -42,29 +42,20 @@ void EventT0CombinerModule::event()
   // check if a SVD hypothesis exists
   auto svdHypos = m_eventT0->getTemporaryEventT0s(Const::EDetector::SVD);
 
+  // check if a CDC hypothesis exists
+  auto cdcHypos = m_eventT0->getTemporaryEventT0s(Const::EDetector::CDC);
+
   if (svdHypos.size() == 0) {
-    B2DEBUG(20, "No SVD time hypothesis available, stopping");
+    B2DEBUG(20, "No SVD time hypotheses available, stopping");
     // if no SVD value was found, the best t0 has already been set by the ECL t0 module.
     return;
   }
+
   // get the latest SVD hypothesis information, this is also the most accurate t0 value the SVD can provide
   const auto svdBestT0 = svdHypos.back();
 
   B2DEBUG(20, "Best SVD time hypothesis t0 = " << svdBestT0.eventT0 << " +- " << svdBestT0.eventT0Uncertainty);
 
-  // check if a CDC hypothesis exists
-  auto cdcHypos = m_eventT0->getTemporaryEventT0s(Const::EDetector::CDC);
-
-  if (cdcHypos.size() == 0) {
-    B2DEBUG(20, "No CDC time hypothesis available, stopping");
-    // if no CDC value was found, the best t0 has already been set by the ECL t0 module.
-    return;
-  }
-
-  // get the latest CDC hypothesis information, this is also the most accurate t0 value the CDC can provide
-  const auto cdcBestT0 = cdcHypos.back();
-
-  B2DEBUG(20, "Best CDC time hypothesis t0 = " << cdcBestT0.eventT0 << " +- " << cdcBestT0.eventT0Uncertainty);
   if (m_paramCombinationMode == m_combinationModePreferSVD) {
     // we have a SVD value, so set this as new best global value
     B2DEBUG(20, "Setting SVD time hypothesis t0 = " << svdBestT0.eventT0 << " +- " << svdBestT0.eventT0Uncertainty <<
@@ -72,6 +63,8 @@ void EventT0CombinerModule::event()
     //set SVD value, if available
     m_eventT0->setEventT0(svdBestT0);
   } else if (m_paramCombinationMode == m_combinationModePreferCDC) {
+    // get the latest CDC hypothesis information, this is also the most accurate t0 value the CDC can provide
+    const auto cdcBestT0 = cdcHypos.back();
     // we have a CDC value, so set this as new best global value
     B2DEBUG(20, "Setting CDC time hypothesis t0 = " << cdcBestT0.eventT0 << " +- " << cdcBestT0.eventT0Uncertainty <<
             " as new final value.");

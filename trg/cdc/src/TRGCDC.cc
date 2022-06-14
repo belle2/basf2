@@ -499,53 +499,53 @@ namespace Belle2 {
     const int shape[2][30] = {
       {
         -2, 0, // relative layer id, relative wire id
-        -1, -1, // assuming layer offset 0.0, not 0.5
-        -1, 0,
-        0, -1,
-        0, 0,
-        0, 1,
-        1, -2,
-        1, -1,
-        1, 0,
-        1, 1,
-        2, -2,
-        2, -1,
-        2, 0,
-        2, 1,
-        2, 2
-        //-2, 0, // relative layer id, relative wire id
-        //-1, 0, // assuming layer offset 0.5, not 0.0
-        //-1, 1,
-        //0, -1,
-        //0, 0,
-        //0, 1,
-        //1, -1,
-        //1, -0,
-        //1, 1,
-        //1, 2,
-        //2, -2,
-        //2, -1,
-        //2, 0,
-        //2, 1,
-        //2, 2
-      },
+          -1, -1, // assuming layer offset 0.0, not 0.5
+          -1, 0,
+          0, -1,
+          0, 0,
+          0, 1,
+          1, -2,
+          1, -1,
+          1, 0,
+          1, 1,
+          2, -2,
+          2, -1,
+          2, 0,
+          2, 1,
+          2, 2
+          //-2, 0, // relative layer id, relative wire id
+          //-1, 0, // assuming layer offset 0.5, not 0.0
+          //-1, 1,
+          //0, -1,
+          //0, 0,
+          //0, 1,
+          //1, -1,
+          //1, -0,
+          //1, 1,
+          //1, 2,
+          //2, -2,
+          //2, -1,
+          //2, 0,
+          //2, 1,
+          //2, 2
+        },
       {
         -2, -1,
-        -2, 0,
-        -2, 1,
-        -1, -1,
-        -1, 0,
-        0, 0,
-        1, -1,
-        1, 0,
-        2, -1,
-        2, 0,
-        2, 1,
-        0, 0,
-        0, 0,
-        0, 0,
-        0, 0
-      }
+          -2, 0,
+          -2, 1,
+          -1, -1,
+          -1, 0,
+          0, 0,
+          1, -1,
+          1, 0,
+          2, -1,
+          2, 0,
+          2, 1,
+          0, 0,
+          0, 0,
+          0, 0,
+          0, 0
+        }
     };
     const int layerOffset[2] = {5, 2};
     unsigned id = 0;
@@ -906,7 +906,7 @@ namespace Belle2 {
 // }
 
   const TCWire*
-  TRGCDC::wire(float , float) const
+  TRGCDC::wire(float, float) const
   {
     //...Not implemented yet...
     return _wires[0];
@@ -1540,7 +1540,7 @@ namespace Belle2 {
     if (allTrgData) {
       allTrgData->push_back(trgData);
       // Clean up memory
-      for (unsigned i = 0; i < allTrgData->size(); i++) delete(*allTrgData)[i];
+      for (unsigned i = 0; i < allTrgData->size(); i++) delete (*allTrgData)[i];
       delete allTrgData;
     }
 
@@ -2762,7 +2762,7 @@ namespace Belle2 {
       t_rootCDCHitInformation[2] = hitWiresFromCDC[iHit][2];
       t_rootCDCHitInformation[3] = hitWiresFromCDC[iHit][3];
       t_rootCDCHitInformation[4] = hitWiresFromCDC[iHit][4];
-      new(rootCDCHitInformation[iHit]) TVectorD(t_rootCDCHitInformation);
+      new (rootCDCHitInformation[iHit]) TVectorD(t_rootCDCHitInformation);
     } // End of hit loop
   }
 
@@ -2776,7 +2776,7 @@ namespace Belle2 {
       t_rootTRGHitInformation[1] = hitWiresFromTRG[iHit][1];
       t_rootTRGHitInformation[2] = hitWiresFromTRG[iHit][2];
       t_rootTRGHitInformation[3] = hitWiresFromTRG[iHit][3];
-      new(rootTRGHitInformation[iHit]) TVectorD(t_rootTRGHitInformation);
+      new (rootTRGHitInformation[iHit]) TVectorD(t_rootTRGHitInformation);
     } // End of hit loop
   }
 
@@ -2787,7 +2787,7 @@ namespace Belle2 {
     for (unsigned iWindow = 0; iWindow < trgInformations.size(); iWindow++) {
       TObjString t_rootTRGRawInformation;
       t_rootTRGRawInformation.SetString(trgInformations[iWindow].c_str());
-      new(rootTRGRawInformation[iWindow]) TObjString(t_rootTRGRawInformation);
+      new (rootTRGRawInformation[iWindow]) TObjString(t_rootTRGRawInformation);
     } // End of hit loop
   }
 

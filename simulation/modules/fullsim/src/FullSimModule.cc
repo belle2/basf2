@@ -61,7 +61,7 @@ using namespace G4InuclParticleNames;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(FullSim)
+REG_MODULE(FullSim);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -96,7 +96,7 @@ FullSimModule::FullSimModule() : Module(), m_useNativeGeant4(true)
            "[cm] Apply continuous energy loss to primary particle which has no longer enough energy to produce secondaries which travel at least the specified productionCut distance.",
            0.07);
   addParam("PXDProductionCut", m_pxdProductionCut, "[cm] Secondary production threshold in PXD envelope.", 0.0);
-  addParam("SVDProductionCut", m_svdProductionCut, "[cm] Secondary production threshold in SVD envelope.", 0.0005);
+  addParam("SVDProductionCut", m_svdProductionCut, "[cm] Secondary production threshold in SVD envelope.", 0.0);
   addParam("CDCProductionCut", m_cdcProductionCut, "[cm] Secondary production threshold in CDC envelope.", 0.0);
   addParam("ARICHTOPProductionCut", m_arichtopProductionCut, "[cm] Secondary production threshold in ARICH and TOP envelopes.", 0.02);
   addParam("ECLProductionCut", m_eclProductionCut, "[cm] Secondary production threshold in ECL envelope.", 0.0);

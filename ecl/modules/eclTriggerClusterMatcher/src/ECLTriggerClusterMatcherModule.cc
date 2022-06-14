@@ -24,7 +24,7 @@ using namespace std;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(ECLTriggerClusterMatcher)
+REG_MODULE(ECLTriggerClusterMatcher);
 
 //-----------------------------------------------------------------
 //                 Implementation

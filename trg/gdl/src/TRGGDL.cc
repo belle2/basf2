@@ -583,22 +583,22 @@ namespace Belle2 {
     //...Clear signal bundles...
     if (_isb) {
       for (unsigned i = 0; i < _isb->size(); i++)
-        delete(* _isb)[i];
+        delete (* _isb)[i];
       delete _isb;
     }
     if (_osb) {
       for (unsigned i = 0; i < _osb->size(); i++)
-        delete(* _osb)[i];
+        delete (* _osb)[i];
       delete _osb;
     }
     if (_tsb) {
       for (unsigned i = 0; i < _tsb->size(); i++)
-        delete(* _tsb)[i];
+        delete (* _tsb)[i];
       delete _tsb;
     }
     if (_tosb) {
       for (unsigned i = 0; i < _tosb->size(); i++)
-        delete(* _tosb)[i];
+        delete (* _tosb)[i];
       delete _tosb;
     }
 

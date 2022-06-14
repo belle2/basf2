@@ -124,12 +124,12 @@ CalibrationAlgorithm::EResult PXDChargeCalibrationAlgorithm::calibrate()
   // Check that we have collected enough Data
   if (cluster_counter->GetEntries() < int(safetyFactor * minClusters * nSensors * nBinsU * nBinsV)) {
     if (not forceContinue) {
-      B2INFO("Not enough Data: Only " <<  cluster_counter->GetEntries() << " hits were collected but " << int(safetyFactor * minClusters *
+      B2INFO("Not enough Data: Only " <<  cluster_counter->GetEntries() << " hits were collected but " << int(safetyFactor * minClusters*
              nSensors * nBinsU * nBinsV) << " needed!");
       return c_NotEnoughData;
     } else {
       B2INFO("Continue despite low statistics: Only " <<  cluster_counter->GetEntries() << " hits were collected but" << int(
-               safetyFactor * minClusters *
+               safetyFactor * minClusters*
                nSensors * nBinsU * nBinsV) << " would be desirable!");
     }
   }

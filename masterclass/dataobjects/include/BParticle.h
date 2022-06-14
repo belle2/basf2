@@ -30,6 +30,8 @@ public:
   BParticle() {};
 //! Constructor using the particle
   BParticle(const BParticle&) = default;
+//! Operator to add particle
+  BParticle& operator+=(const BParticle&);
 
   /**
    * Constructor of fthe particle
@@ -121,23 +123,7 @@ public:
   * @param mupper upper limit of the range
   */
 
-  int  InMassRange(float mlower, float mupper) { float m = GetMass(); if (m >= mlower && m <= mupper) return 1; else return 0; };
-
-//! Adds to particles
-  BParticle operator+(const BParticle& b)
-  {
-
-    BParticle particle(
-      px() + b.px(),
-      py() + b.py(),
-      pz() + b.pz(),
-      e()  + b.e(),
-      charge() + b.charge(),
-      PHOTON // wrong
-    );
-
-    return particle;
-  };
+  int InMassRange(float mlower, float mupper) { float m = GetMass(); if (m >= mlower && m <= mupper) return 1; else return 0; };
 
 //! Assign a particle
   BParticle& operator=(const BParticle&  p)
@@ -154,7 +140,7 @@ public:
   ClassDef(BParticle, 1)    // Simple particle class
 };
 
-int SelectParticles(TClonesArray* pin , int charge, SIMPLEPID type, TClonesArray* pout);
+int SelectParticles(TClonesArray* pin, int charge, SIMPLEPID type, TClonesArray* pout);
 
-int CombineParticles(TClonesArray* plist1 , TClonesArray* plist2 , int same, float masslow, float massup, SIMPLEPID pid,
+int CombineParticles(TClonesArray* plist1, TClonesArray* plist2, int same, float masslow, float massup, SIMPLEPID pid,
                      TClonesArray* pout);

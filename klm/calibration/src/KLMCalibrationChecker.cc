@@ -531,7 +531,7 @@ void KLMCalibrationChecker::checkTimeConstants()
   if (m_GlobalTagName != "")
     printPayloadInformation(timeConstants);
   /* Create trees with time constant measurement results. */
-  int subdetector, section, sector, layer, plane, strip, module, channelno;
+  int subdetector, section, sector, layer, plane, strip, module, channelNumber;
   float delayEKLM, delayBKLM, delayRPCPhi, delayRPCZ;
   TFile* timeConstantsResults =
     new TFile(m_TimeConstantsResultsFile.c_str(), "recreate");
@@ -545,7 +545,7 @@ void KLMCalibrationChecker::checkTimeConstants()
   constantsTree->Branch("plane", &plane, "plane/I");
   constantsTree->Branch("strip", &strip, "strip/I");
   constantsTree->Branch("module", &module, "module/I");
-  constantsTree->Branch("channelno", &channelno, "channelno/I");
+  constantsTree->Branch("channelNumber", &channelNumber, "channelNumber/I");
   constantsTree->Branch("delayEKLM", &delayEKLM, "delayEKLM/F");
   constantsTree->Branch("delayBKLM", &delayBKLM, "delayBKLM/F");
   constantsTree->Branch("delayRPCPhi", &delayRPCPhi, "delayRPCPhi/F");
@@ -558,7 +558,7 @@ void KLMCalibrationChecker::checkTimeConstants()
     layer = klmStrip.getLayer();
     plane = klmStrip.getPlane();
     strip = klmStrip.getStrip();
-    channelno = m_ElementNumbers->channelNumber(subdetector, section, sector, layer, plane, strip);
+    channelNumber = m_ElementNumbers->channelNumber(subdetector, section, sector, layer, plane, strip);
     module = m_ElementNumbers->moduleNumber(subdetector, section, sector, layer);
     int c_EKLM = 1;
     int c_BKLM = 2;

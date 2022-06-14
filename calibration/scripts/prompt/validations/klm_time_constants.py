@@ -17,10 +17,11 @@ Validation of KLM time constants calibration.
 import basf2
 from prompt import ValidationSettings
 import ROOT
-from ROOT.Belle2 import KLMCalibrationChecker
+from ROOT.Belle2 import KLMCalibrationChecker, BKLMElementNumbers, KLMElementNumbers
 import sys
 import subprocess
 import math
+from ROOT import TH2F, TCanvas, TFile, gStyle
 import os
 import json
 
@@ -128,9 +129,58 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
                 f'time_constants_exp{exp}_run{run}.root' for run in run_list[chunk * chunk_size:(chunk + 1) * chunk_size]]
             subprocess.run(['hadd', '-f', file_name] + run_files, check=True)
             input_file = ROOT.TFile(f'{file_name}')
-            output_file = ROOT.TFile(f'histograms_{file_name}', 'recreate')
+            gStyle.SetOptStat(1111111)
+            gStyle.SetOptFit(1111)
+
+            barrel_RPCPhi = TH2F("barrel_RPCPhi", "time constants for Barrel RPC phi readout", 100, 30000, 65000, 100, 0.008, 0.011)
+            barrel_scintillator = TH2F(
+                "barrel_scintillator",
+                "time constants for Barrel scintillator",
+                100,
+                30000,
+                65000,
+                100,
+                0.081,
+                0.082)
+            endcap_scintillator = TH2F(
+                "endcap_scintillator",
+                "time constants for endcap scintillator",
+                100,
+                0,
+                16000,
+                100,
+                0.069,
+                0.075)
+
+            tree = input_file.Get("constants")
+            assert isinstance(tree, ROOT.TTree) == 1
+            bklm = KLMElementNumbers.c_BKLM
+            eklm = KLMElementNumbers.c_EKLM
+            first_rpc = BKLMElementNumbers.c_FirstRPCLayer
+            myC = TCanvas("myC")
+
+            if (f'subdetector=={bklm} && layer>={first_rpc}'):
+                tree.Draw("delayRPCPhi:channelNumber>>barrel_RPCPhi", "", "colz")
+                barrel_RPCPhi.GetXaxis().SetTitle("Channel number")
+                barrel_RPCPhi.GetYaxis().SetTitle("Time Delay constants")
+                myC.Print("barrel_RPCPhi.png")
+            if (f'subdetector=={bklm} && layer<{first_rpc}'):
+                tree.Draw("delayBKLM:channelNumber>>barrel_scintillator", "", "colz")
+                barrel_scintillator.GetXaxis().SetTitle("Channel number")
+                barrel_scintillator.GetYaxis().SetTitle("Time Delay constants")
+                myC.Print("barrel_scintillator.png")
+            if (f'subdetector=={eklm}'):
+                tree.Draw("delayEKLM:channelNumber>>endcap_scintillator", "", "colz")
+                endcap_scintillator.GetXaxis().SetTitle("Channel number")
+                endcap_scintillator.GetYaxis().SetTitle("Time Delay constants")
+                myC.Print("endcap_scintillator.png")
+
+            fout = TFile("KLMTimeConstants.root", "recreate")
+            barrel_RPCPhi.Write()
+            barrel_scintillator.Write()
+            endcap_scintillator.Write()
             input_file.Close()
-            output_file.Close()
+            fout.Close()
 
             # Let's delete the files for single IoVs.
             for run_file in run_files:

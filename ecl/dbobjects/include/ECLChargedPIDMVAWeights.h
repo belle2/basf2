@@ -139,7 +139,9 @@ namespace Belle2 {
       /** Decorrelation transform of the gaussian transformed mva responses. */
       c_DecorrelationTransform = 3,
       /** Directly take the MVA response as the logL, useful if we train neural nets to learn the logL. */
-      c_DirectMVAResponse = 4
+      c_DirectMVAResponse = 4,
+      /** Take the log of the MVA response. Essentially undoes the softmax function. */
+      c_LogMVAResponse = 5
     };
 
     /**
@@ -147,7 +149,8 @@ namespace Belle2 {
     */
     ECLChargedPIDPhasespaceCategory() :
       m_log_transform_offset("logTransformOffset", 1e-15),
-      m_max_possible_response_value("maxPossibleResponseValue", 1.0)
+      m_max_possible_response_value("maxPossibleResponseValue", 1.0),
+      m_temperature("temperature", 1.0)
     {};
 
     /**
@@ -263,6 +266,22 @@ namespace Belle2 {
     }
 
     /**
+     * Set the temperature parameter used to calibrate the MVA
+     */
+    void setTemperature(const float& temperature)
+    {
+      m_temperature.SetVal(temperature);
+    }
+
+    /**
+     * Getter for the temperature.
+     */
+    float getTemperature() const
+    {
+      return m_temperature.GetVal();
+    }
+
+    /**
      * Set the max possible response value, used in log transformation of the responses.
      */
     void setMaxPossibleResponseValue(const float& offset)
@@ -291,6 +310,7 @@ namespace Belle2 {
 
   private:
 
+    TParameter<float> m_temperature; /**< calibration factor for MVA responses. Follows arXiv:1706.04599 */
     TParameter<float> m_log_transform_offset; /**< Small offset to avoid mva response values of 1.0 being log transformed to NaN. */
     TParameter<float> m_max_possible_response_value; /**< Max possible value of the mva response. Used in the log transformation. */
 

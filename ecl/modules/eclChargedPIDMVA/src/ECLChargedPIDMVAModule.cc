@@ -163,8 +163,10 @@ void ECLChargedPIDMVAModule::event()
     // is heavily peaked at 0 and 1 into a smooth curve.
     // We can then evaluate the likelihoods from this curve directly or further transform the responses.
     for (unsigned int iResponse = 0; iResponse < scores.size(); iResponse++) {
-      if (phasespaceCategory->getTransformMode() !=
-          ECLChargedPIDPhasespaceCategory::MVAResponseTransformMode::c_DirectMVAResponse) {
+      if ((phasespaceCategory->getTransformMode() !=
+           ECLChargedPIDPhasespaceCategory::MVAResponseTransformMode::c_DirectMVAResponse) and
+          (phasespaceCategory->getTransformMode() !=
+           ECLChargedPIDPhasespaceCategory::MVAResponseTransformMode::c_LogMVAResponse)) {
         scores[iResponse] = logTransformation(scores[iResponse],
                                               phasespaceCategory->getLogTransformOffset(),
                                               phasespaceCategory->getMaxPossibleResponseValue());
@@ -206,9 +208,18 @@ void ECLChargedPIDMVAModule::event()
 
       // Get the pdf values for each response value
       float logL = 0.0;
-      if (phasespaceCategory->getTransformMode() ==
-          ECLChargedPIDPhasespaceCategory::MVAResponseTransformMode::c_DirectMVAResponse) {
+      if ((phasespaceCategory->getTransformMode() ==
+           ECLChargedPIDPhasespaceCategory::MVAResponseTransformMode::c_DirectMVAResponse) or
+          (phasespaceCategory->getTransformMode() ==
+           ECLChargedPIDPhasespaceCategory::MVAResponseTransformMode::c_LogMVAResponse)) {
+
         logLikelihoods[hypo_idx] = scores[phasespaceCategory->getMVAIndexForHypothesis(absPdgId)];
+        if (phasespaceCategory->getTransformMode() ==
+            ECLChargedPIDPhasespaceCategory::MVAResponseTransformMode::c_LogMVAResponse) {
+          logLikelihoods[hypo_idx] = (std::isnormal(logLikelihoods[hypo_idx])
+                                      && logLikelihoods[hypo_idx] > 0) ? std::log(logLikelihoods[hypo_idx]) : c_dummyLogL;
+        }
+        logLikelihoods[hypo_idx] = logLikelihoods[hypo_idx] / phasespaceCategory->getTemperature();
         continue;
       }
       B2DEBUG(12, "MVA Index for hypo " << absPdgId << " : " << phasespaceCategory->getMVAIndexForHypothesis(absPdgId));

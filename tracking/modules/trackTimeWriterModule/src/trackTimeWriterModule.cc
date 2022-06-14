@@ -12,18 +12,7 @@
 #include <framework/logging/Logger.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <mdst/dataobjects/Track.h>
-
-
-
-
-/* --------------- WARNING ---------------------------------------------- *
-If you have more complex parameter types in your class then simple int,
-double or std::vector of those you might need to uncomment the following
-include directive to avoid an undefined reference on compilation.
-* ---------------------------------------------------------------------- */
 #include <framework/core/ModuleParam.templateDetails.h>
-
-
 
 using namespace Belle2;
 
@@ -60,27 +49,32 @@ void trackTimeWriterModule::event()
   if (!evtT0) {
     eventT0 = std::numeric_limits<double>::quiet_NaN();
   }
-  if (evtT0->hasEventT0()) {
-    eventT0 = evtT0->getEventT0();
-    // if eventT0 exists then loop over tracks, don't otherwise
-    for (int i = 0; i < tracks.getEntries(); i++) {
-      const auto& Track = tracks.operator[](i);
-      const auto& recoTrack = Track->getRelatedTo<RecoTrack>(m_recoTrackColName);
-      std::vector SVDHitsList = recoTrack->getSVDHitList();
-      if (SVDHitsList.size() == 0) {
-        Track->setTrackTime(std::numeric_limits<float>::quiet_NaN());
-      } else {
-        float averageTime = 0;
-        for (auto const& hit : SVDHitsList) {
-          averageTime = averageTime + hit->getClsTime();
+  if (evtT0) {
+    auto svdHypos = evtT0->getTemporaryEventT0s(Const::EDetector::SVD);
+    if (svdHypos.size() > 0) { // if SVD eventT0 exists then loop over tracks, don't otherwise and leave their averageTime set at NaN
+      // get the latest SVD hypothesis information, this is also the most accurate t0 value the SVD can provide
+      const auto svdBestT0 = svdHypos.back();
+      for (int i = 0; i < tracks.getEntries(); i++) {
+        // Access Track
+        const auto& Track = tracks.operator[](i);
+        // Access related recoTrack
+        const auto& recoTrack = Track->getRelatedTo<RecoTrack>(m_recoTrackColName);
+        // Get SVD hits
+        std::vector SVDHitsList = recoTrack->getSVDHitList();
+        if (SVDHitsList.size() == 0) {
+          Track->setTrackTime(std::numeric_limits<float>::quiet_NaN());
+        } else {
+          float averageTime = 0;
+          for (auto const& hit : SVDHitsList) { // Compute average of ClsTime
+            averageTime = averageTime + hit->getClsTime();
+          }
+          averageTime = averageTime / (SVDHitsList.size());
+          Track->setTrackTime(averageTime - svdBestT0.eventT0);
         }
-        averageTime = averageTime / (SVDHitsList.size());
-        Track->setTrackTime(averageTime - eventT0);
       }
+    } else {
+      eventT0 = std::numeric_limits<double>::quiet_NaN();
     }
-  } else { // actually not needed, either we go in previous if or we don't and then we don't need below var eventT0, just leaving the else for now
-    // in case i need this condition later so i don't forget it
-    eventT0 = std::numeric_limits<double>::quiet_NaN();
   }
 
 }

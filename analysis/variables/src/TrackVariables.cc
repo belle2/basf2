@@ -459,7 +459,7 @@ namespace Belle2 {
     {
       return getHelixParameterPullAtIndex(part, 4);
     }
-    float SVDTrackTime(const Particle* part)
+    double SVDTrackTime(const Particle* part)
     {
       return  part->getTrack()->getTrackTime();
     }

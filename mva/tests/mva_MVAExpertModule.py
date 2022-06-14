@@ -29,6 +29,7 @@ class MVAExtraInfoChecker(b2.Module):
         """Create particle list object"""
         #: particle list object
         self.plist = Belle2.PyStoreObj("pi+:test")
+        self.eventExtraInfo = Belle2.PyStoreObj("EventExtraInfo")
 
     def event(self):
         """check the extra info names are what we expect!"""
@@ -46,7 +47,22 @@ class MVAExtraInfoChecker(b2.Module):
                                 ('multiClassMultiExpert_2', 2),
                                 ('multiClassMultiExpert_3', 3),
                                ]:
-                assert p.getExtraInfo(name) == value, 'Extra Info value not what was expected'
+                assert p.getExtraInfo(name) == value, 'ExtraInfo value not what was expected'
+
+        for name, value in [
+                            ('singleClassSingleExpert', 42),
+                            ('multiClassSingleExpert_0', 0),
+                            ('multiClassSingleExpert_1', 1),
+                            ('multiClassSingleExpert_2', 2),
+                            ('multiClassSingleExpert_3', 3),
+
+                            ('singleClassMultiExpert', 42),
+                            ('multiClassMultiExpert_0', 0),
+                            ('multiClassMultiExpert_1', 1),
+                            ('multiClassMultiExpert_2', 2),
+                            ('multiClassMultiExpert_3', 3),
+                           ]:
+            assert self.eventExtraInfo.getExtraInfo(name) == value, 'pventExtraInfo value not what was expected'
 
 
 if __name__ == "__main__":

@@ -66,7 +66,7 @@ class jsonSVDMCClusterPositionFudgeFactorImporter(b2.Module):
         """
         iov = Belle2.IntervalOfValidity.always()
 
-        # cluster position error
+        # cluster position fudge factor
         clsParam = SVDMCFudgeFactorFunction()
 
         uniqueID = "MCClusterPositionFudgeFactor_"+str(self.first)+"_" + str(
@@ -88,7 +88,7 @@ class jsonSVDMCClusterPositionFudgeFactorImporter(b2.Module):
                     sensorNumber = sensor.getSensorNumber()
                     for side in (0, 1):
 
-                        print("setting MC Cluster Error Scale Factor for " +
+                        print("setting MC Cluster Position Fudge Factor for " +
                               str(layerNumber) + "." + str(ladderNumber) + "." + str(sensorNumber) + "." + str(side) +
                               " --> " + str(get_sensor_type(layerNumber)) + " " + get_side(side))
 

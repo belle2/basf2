@@ -17,7 +17,6 @@ Sample usage:
 Use `python pidTrainWeights.py -h` to see all command-line options.
 """
 
-import ROOT.Belle2
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -29,22 +28,31 @@ from os.path import join
 from tqdm.auto import tqdm
 
 
-PARTICLES, PDG_CODES = [], []
-for i in range(len(ROOT.Belle2.Const.chargedStableSet)):
-    particle = ROOT.Belle2.Const.chargedStableSet.at(i)
-    name = (particle.__repr__()[7:-1]
-            .replace("-", "")
-            .replace("+", "")
-            .replace("euteron", ""))
-    PARTICLES.append(name)
-    PDG_CODES.append(particle.getPDGCode())
-# PARTICLES = ["e", "mu", "pi", "K", "p", "d"]
-# PDG_CODES = [11, 13, 211, 321, 2212, 1000010020]
+def _make_const_lists():
+    """Moving this code into a function to avoid a top-level ROOT import."""
+    import ROOT.Belle2
 
-DETECTORS = []
-for det in ROOT.Belle2.Const.PIDDetectors.set():
-    DETECTORS.append(ROOT.Belle2.Const.parseDetectors(det))
-# DETECTORS = ["SVD", "CDC", "TOP", "ARICH", "ECL", "KLM"]
+    PARTICLES, PDG_CODES = [], []
+    for i in range(len(ROOT.Belle2.Const.chargedStableSet)):
+        particle = ROOT.Belle2.Const.chargedStableSet.at(i)
+        name = (particle.__repr__()[7:-1]
+                .replace("-", "")
+                .replace("+", "")
+                .replace("euteron", ""))
+        PARTICLES.append(name)
+        PDG_CODES.append(particle.getPDGCode())
+    # PARTICLES = ["e", "mu", "pi", "K", "p", "d"]
+    # PDG_CODES = [11, 13, 211, 321, 2212, 1000010020]
+
+    DETECTORS = []
+    for det in ROOT.Belle2.Const.PIDDetectors.set():
+        DETECTORS.append(ROOT.Belle2.Const.parseDetectors(det))
+    # DETECTORS = ["SVD", "CDC", "TOP", "ARICH", "ECL", "KLM"]
+
+    return PARTICLES, PDG_CODES, DETECTORS
+
+
+PARTICLES, PDG_CODES, DETECTORS = _make_const_lists()
 
 
 class WeightNet(nn.Module):

@@ -29,6 +29,7 @@ class MVAExtraInfoChecker(b2.Module):
         """Create particle list object"""
         #: particle list object
         self.plist = Belle2.PyStoreObj("pi+:test")
+        #: event extra info object
         self.eventExtraInfo = Belle2.PyStoreObj("EventExtraInfo")
 
     def event(self):

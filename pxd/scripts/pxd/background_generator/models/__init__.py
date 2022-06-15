@@ -86,4 +86,5 @@ def _get_generate_func(model: str) -> Callable:
 MODELS = (
     "convnet",
     "resnet",
+    "ieagan"
 )

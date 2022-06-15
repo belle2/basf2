@@ -70,8 +70,14 @@ class WeightNet(nn.Module):
                 used instead. Defaults to 1.
         """
         super().__init__()
+
+        #: number of particle types
         self.n_class = n_class
+
+        #: number of detectors
         self.n_detector = n_detector
+
+        #: linear layers for each particle type
         self.fcs = nn.ModuleList(
             [nn.Linear(self.n_detector, 1, bias=False) for _ in range(self.n_class)]
         )

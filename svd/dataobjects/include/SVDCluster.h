@@ -181,6 +181,14 @@ namespace Belle2 {
       m_position = position;
     }
 
+    /** Set time of the cluster
+    *
+    */
+    void setClsTime(const double time)
+    {
+      m_clsTime = time;
+    }
+
     /** Add quality indicator to object.
     *
     */

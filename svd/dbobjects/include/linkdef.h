@@ -25,6 +25,9 @@
 #pragma link C++ class Belle2::SVDCalibrationsBase<Belle2::SVDCalibrationsVector<float>>+; // checksum=0x80db1433, version=2
 #pragma link C++ class Belle2::SVDCalibrationsVector<float> +; // checksum=0x5cfaf009, version=-1
 
+#pragma link C++ class Belle2::SVDCalibrationsBase<Belle2::SVDCalibrationsScalar<float>>+;
+#pragma link C++ class Belle2::SVDCalibrationsScalar<float> +;
+
 #pragma link C++ class Belle2::SVDCalibrationsBase<Belle2::SVDCalibrationsVector<Belle2::SVDStripCalAmp>>+; // checksum=0x8a2533e1, version=2
 #pragma link C++ class Belle2::SVDCalibrationsVector<Belle2::SVDStripCalAmp> +; // checksum=0xfff37002, version=-1
 #pragma link C++ struct Belle2::SVDStripCalAmp +;
@@ -50,9 +53,9 @@
 #pragma link C++ class Belle2::SVDCalibrationsScalar< Belle2::SVDPositionErrorFunction> +; // checksum=0xa7c28262, version=-1
 #pragma link C++ class Belle2::SVDPositionErrorFunction +; // checksum=0x8ef416ec, version=2
 
-#pragma link C++ class Belle2::SVDCalibrationsBase<Belle2::SVDCalibrationsScalar< Belle2::SVDMCFudgeFactorFunction >> +;
-#pragma link C++ class Belle2::SVDCalibrationsScalar< Belle2::SVDMCFudgeFactorFunction> +;
-#pragma link C++ class Belle2::SVDMCFudgeFactorFunction +;
+#pragma link C++ class Belle2::SVDCalibrationsBase<Belle2::SVDCalibrationsScalar< Belle2::SVDMCFudgeFactorFunction >> +; // checksum=0x189eee4b, version=2
+#pragma link C++ class Belle2::SVDCalibrationsScalar< Belle2::SVDMCFudgeFactorFunction> +; // checksum=0xf67c216d, version=-1
+#pragma link C++ class Belle2::SVDMCFudgeFactorFunction +; // checksum=0x51abf9f7, version=2
 
 #pragma link C++ class Belle2::SVDCalibrationsBase< Belle2::SVDCalibrationsScalar< Belle2::SVDClusterCuts>> +; // checksum=0x49d91267, version=2
 #pragma link C++ class Belle2::SVDCalibrationsScalar< Belle2::SVDClusterCuts> +; // checksum=0x2f2a326, version=-1

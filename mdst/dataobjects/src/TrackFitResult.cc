@@ -80,6 +80,20 @@ TrackFitResult::TrackFitResult(const std::vector<float>& tau, const std::vector<
     m_cov5[i] = cov5[i];
 }
 
+void TrackFitResult::updateTrackFitResult(const TrackFitResult& input)
+{
+  m_pdg = input.m_pdg;
+  m_pValue = input.m_pValue;
+  m_NDF = input.m_NDF;
+  m_hitPatternCDCInitializer = input.m_hitPatternCDCInitializer;
+  m_hitPatternVXDInitializer = input.m_hitPatternVXDInitializer;
+
+  for (unsigned int i = 0; i < c_NPars; ++i)
+    m_tau[i] = input.m_tau[i];
+  for (unsigned int i = 0; i < c_NCovEntries; ++i)
+    m_cov5[i] = input.m_cov5[i];
+}
+
 int TrackFitResult::getNDF() const
 {
   if (m_NDF == c_NDFFlag) {
@@ -95,7 +109,7 @@ double TrackFitResult::getChi2() const
   if (pValue == 0) {
     return std::numeric_limits<double>::infinity();
   }
-  if (nDF <= 0) {
+  if (nDF < 0) {
     return std::numeric_limits<double>::quiet_NaN();
   }
   return 2 * boost::math::gamma_q_inv(nDF / 2., pValue);

@@ -225,8 +225,6 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
     add_mc_matcher(path, components=components, reco_tracks=reco_tracks,
                    use_second_cdc_hits=use_second_cdc_hits)
 
-    add_time_extraction(path, components=components)
-    add_mc_matcher(path, components=components, reco_tracks=reco_tracks, use_second_cdc_hits=use_second_cdc_hits)
     if fit_tracks:
         add_prefilter_track_fit_and_track_creator(path,
                                                   trackFitHypotheses=trackFitHypotheses,

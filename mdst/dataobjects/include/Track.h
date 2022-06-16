@@ -25,7 +25,8 @@ namespace Belle2 {
     * Pair to hold the particle hypothesis used for the fit as first entry and
     * the result of the track fit as second.
     */
-    typedef std::pair< Const::ChargedStable, const TrackFitResult*> ChargedStableTrackFitResultPair;
+    //typedef std::pair< Const::ChargedStable, const TrackFitResult*> ChargedStableTrackFitResultPair;
+    typedef std::pair< Const::ChargedStable, TrackFitResult*> ChargedStableTrackFitResultPair;
 
     /** Constructor of Track without any attached TrackFitResults.
      *

@@ -45,7 +45,7 @@ using namespace std;
 namespace Belle2 {
 
   TRGCDCHough3DFinder::TRGCDCHough3DFinder(const TRGCDC& TRGCDC, bool makeRootFile, int finderMode)
-    : _cdc(TRGCDC), m_makeRootFile(makeRootFile) , m_finderMode(finderMode)
+    : _cdc(TRGCDC), m_makeRootFile(makeRootFile), m_finderMode(finderMode)
   {
 
     m_fileFinder3D = 0;

@@ -3,7 +3,6 @@
 import basf2
 from ROOT import Belle2
 import os
-import glob
 
 """
 Example script showing how to train neural networks

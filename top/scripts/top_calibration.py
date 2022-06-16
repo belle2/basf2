@@ -123,7 +123,7 @@ def BS13d_calibration_cdst(inputFiles, time_offset=0, globalTags=None, localDBs=
         main.add_module('TOPUnpacker')
         main.add_module('TOPRawDigitConverter')
         main.add_module('TOPChannelMasker')
-        main.add_module('TOPBunchFinder', autoRange=True, subtractRunningOffset=False)
+        main.add_module('TOPBunchFinder', autoRange=True, useTimeSeed=False, useFillPattern=False, subtractRunningOffset=False)
         main.add_module('TOPTimeRecalibrator',
                         useAsicShiftCalibration=False, useChannelT0Calibration=True)
     else:
@@ -175,12 +175,12 @@ def moduleT0_calibration_DeltaT(inputFiles, globalTags=None, localDBs=None,
         main.add_module('TOPUnpacker')
         main.add_module('TOPRawDigitConverter')
         main.add_module('TOPChannelMasker')
-        main.add_module('TOPBunchFinder', autoRange=True, subtractRunningOffset=False)
+        main.add_module('TOPBunchFinder', autoRange=True, useTimeSeed=False, useFillPattern=False, subtractRunningOffset=False)
     else:
         main.add_module('TOPGeometryParInitializer')
         main.add_module('TOPTimeRecalibrator', subtractBunchTime=False)
         main.add_module('TOPChannelMasker')
-        main.add_module('TOPBunchFinder', usePIDLikelihoods=True, autoRange=True,
+        main.add_module('TOPBunchFinder', usePIDLikelihoods=True, autoRange=True, useTimeSeed=False, useFillPattern=False,
                         subtractRunningOffset=False)
 
     #   collector module
@@ -228,12 +228,12 @@ def moduleT0_calibration_LL(inputFiles, sample='dimuon', globalTags=None, localD
         main.add_module('TOPUnpacker')
         main.add_module('TOPRawDigitConverter')
         main.add_module('TOPChannelMasker')
-        main.add_module('TOPBunchFinder', autoRange=True, subtractRunningOffset=False)
+        main.add_module('TOPBunchFinder', autoRange=True, useTimeSeed=False, useFillPattern=False, subtractRunningOffset=False)
     else:
         main.add_module('TOPGeometryParInitializer')
         main.add_module('TOPTimeRecalibrator', subtractBunchTime=False)
         main.add_module('TOPChannelMasker')
-        main.add_module('TOPBunchFinder', usePIDLikelihoods=True, autoRange=True,
+        main.add_module('TOPBunchFinder', usePIDLikelihoods=True, autoRange=True, useTimeSeed=False, useFillPattern=False,
                         subtractRunningOffset=False)
 
     #   collector module
@@ -281,12 +281,12 @@ def commonT0_calibration_BF(inputFiles, globalTags=None, localDBs=None,
         main.add_module('TOPUnpacker')
         main.add_module('TOPRawDigitConverter')
         main.add_module('TOPChannelMasker')
-        main.add_module('TOPBunchFinder', autoRange=True, subtractRunningOffset=False)
+        main.add_module('TOPBunchFinder', autoRange=True, useTimeSeed=False, useFillPattern=False, subtractRunningOffset=False)
     else:
         main.add_module('TOPGeometryParInitializer')
         main.add_module('TOPTimeRecalibrator', subtractBunchTime=False)
         main.add_module('TOPChannelMasker')
-        main.add_module('TOPBunchFinder', usePIDLikelihoods=True, autoRange=True,
+        main.add_module('TOPBunchFinder', usePIDLikelihoods=True, autoRange=True, useTimeSeed=False, useFillPattern=False,
                         subtractRunningOffset=False)
 
     #   collector module
@@ -333,12 +333,12 @@ def commonT0_calibration_LL(inputFiles, sample='dimuon', globalTags=None, localD
         main.add_module('TOPUnpacker')
         main.add_module('TOPRawDigitConverter')
         main.add_module('TOPChannelMasker')
-        main.add_module('TOPBunchFinder', autoRange=True, subtractRunningOffset=False)
+        main.add_module('TOPBunchFinder', autoRange=True, useTimeSeed=False, useFillPattern=False, subtractRunningOffset=False)
     else:
         main.add_module('TOPGeometryParInitializer')
         main.add_module('TOPTimeRecalibrator', subtractBunchTime=False)
         main.add_module('TOPChannelMasker')
-        main.add_module('TOPBunchFinder', usePIDLikelihoods=True, autoRange=True,
+        main.add_module('TOPBunchFinder', usePIDLikelihoods=True, autoRange=True, useTimeSeed=False, useFillPattern=False,
                         subtractRunningOffset=False)
 
     #   collector module
@@ -486,12 +486,13 @@ def module_alignment(inputFiles, sample='dimuon', fixedParameters=None,
             main.add_module('TOPUnpacker')
             main.add_module('TOPRawDigitConverter')
             main.add_module('TOPChannelMasker')
-            main.add_module('TOPBunchFinder', autoRange=True, subtractRunningOffset=False)
+            main.add_module('TOPBunchFinder', autoRange=True, useTimeSeed=False, useFillPattern=False,
+                            subtractRunningOffset=False)
         else:
             main.add_module('TOPGeometryParInitializer')
             main.add_module('TOPTimeRecalibrator', subtractBunchTime=False)
             main.add_module('TOPChannelMasker')
-            main.add_module('TOPBunchFinder', autoRange=True,
+            main.add_module('TOPBunchFinder', autoRange=True, useTimeSeed=False, useFillPattern=False,
                             usePIDLikelihoods=True, subtractRunningOffset=False)
 
         #   collector module: executing iterative alignment method

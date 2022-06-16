@@ -15,7 +15,7 @@
 
 #include <TVector3.h>
 #include <TMatrixDSym.h>
-#include <TLorentzVector.h>
+#include <Math/Vector4D.h>
 
 #include <stdint.h>
 #include <vector>
@@ -90,6 +90,7 @@ namespace Belle2 {
                    const uint32_t hitPatternVXDInitializer,
                    const uint16_t NDF
                   );
+
     /** update the TrackFitResults */
     void updateTrackFitResult(const TrackFitResult& input);
 
@@ -110,9 +111,10 @@ namespace Belle2 {
     /** Getter for the 4Momentum at the closest approach of the track in the r/phi projection.
      * P = (px, py, pz, E) where E is calculated via the momentum and the particle hypothesis of the TrackFitResult.
      */
-    TLorentzVector get4Momentum() const
+    ROOT::Math::PxPyPzEVector get4Momentum() const
     {
-      return TLorentzVector(getMomentum(), getEnergy());
+      const B2Vector3D momentum = getMomentum();
+      return ROOT::Math::PxPyPzEVector(momentum.x(), momentum.y(), momentum.z(), getEnergy());
     }
 
     /** Getter for the Energy at the closest approach of the track in the r/phi projection.
@@ -295,7 +297,7 @@ namespace Belle2 {
 
     ClassDefOverride(TrackFitResult, 9); /**< Values of the result of a track fit with a given particle hypothesis. */
     /* Version history:
-       ver 9: add updateTrackFitResult() and change m_pValue, m_pdg, m_hitPatternVXDInitializer to a non-const value
+       ver 9: add updateTrackFitResult() and remove the const classifier
        ver 8: add NDF
        ver 7: fixed sign errors in the translation of position and momentum covariances.
        ver 6: use fixed size arrays instead of vectors (add schema evolution rule), use Double32_t.

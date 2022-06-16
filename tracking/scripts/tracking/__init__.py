@@ -255,7 +255,7 @@ def add_flipping_of_recoTracks(path, fit_tracks=True, reco_tracks="RecoTracks", 
         path.add_module("IPTrackTimeEstimator",
                         recoTracksStoreArrayName=reco_tracks_flipped, useFittedInformation=False)
     path.add_module("TrackCreator", trackColName="Tracks_flipped",
-                    trackFitResultColName="TrackFitResults",
+                    trackFitResultColName="TrackFitResults_flipped",
                     recoTrackColName=reco_tracks_flipped,
                     pdgCodes=[
                         211,

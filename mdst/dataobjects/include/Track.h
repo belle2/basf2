@@ -48,11 +48,13 @@ namespace Belle2 {
      * TODO: Do something special if we did not even try to fit!
      *
      *  @param chargedStable   Determines the particle for which you want to get the best available fit hypothesis.
+     *  @param trackFitResultsName   The storeArray to save the TrackFitResults
      *  @return TrackFitResult for fit with particle hypothesis given by ParticleCode or a nullptr, if no result is
      *          available.
      *  @sa TrackFitResult
      */
-    const TrackFitResult* getTrackFitResult(const Const::ChargedStable& chargedStable) const;
+    const TrackFitResult* getTrackFitResult(const Const::ChargedStable& chargedStable,
+                                            const std::string trackFitResultsName = "TrackFitResults") const;
 
     /** Return the track fit for a fit hypothesis with the closest mass
      *
@@ -69,17 +71,20 @@ namespace Belle2 {
      * which can return nullptr if the requested Particle type was not fitted).
      *
      * @param requestedType The particle type for which the fit result should be returned.
+     * @param trackFitResultsName   The storeArray to save the TrackFitResults
      * @return a pointer to the TrackFitResult object. Use TrackFitResult::getParticleType()
      *         to check which fitting hypothesis was actually used for this result.
      */
-    const TrackFitResult* getTrackFitResultWithClosestMass(const Const::ChargedStable& requestedType) const;
+    const TrackFitResult* getTrackFitResultWithClosestMass(const Const::ChargedStable& requestedType,
+                                                           const std::string trackFitResultsName = "TrackFitResults") const;
 
     /** Access to all track fit results at the same time
      *
+     * @param trackFitResultsName   The storeArray to save the TrackFitResults
      * Returns a vector of pair of all track fit results which have been set and the respective particle
      * hypothesis they have been fitted with.
      */
-    std::vector<ChargedStableTrackFitResultPair> getTrackFitResults() const;
+    std::vector<ChargedStableTrackFitResultPair> getTrackFitResults(const std::string trackFitResultsName = "TrackFitResults") const;
 
     /** Set an index (for positive values) or unavailability-code (with negative values) for a specific mass hypothesis.
      *

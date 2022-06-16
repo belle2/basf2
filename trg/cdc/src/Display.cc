@@ -28,7 +28,7 @@ namespace Belle2 {
   bool TRGCDCDisplay::_nonStop = false;
 
   TRGCDCDisplay::TRGCDCDisplay(const string& name,
-                               int ,
+                               int,
                                int)
     : _skip(false),
       _wireName(false),

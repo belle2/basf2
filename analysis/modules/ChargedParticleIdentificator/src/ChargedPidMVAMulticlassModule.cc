@@ -28,8 +28,8 @@ ChargedPidMVAMulticlassModule::ChargedPidMVAMulticlassModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("particleLists",
-           m_particle_lists,
-           "The input list of ParticleList names.",
+           m_decayStrings,
+           "The input list of decay strings, where the mother particle string should correspond to a full name of a particle list. One can select to run on daughters instead of mother particle, e.g. ['Lambda0 -> ^p+ ^pi-'].",
            std::vector<std::string>());
   addParam("payloadName",
            m_payload_name,
@@ -55,7 +55,6 @@ void ChargedPidMVAMulticlassModule::initialize()
   m_event_metadata.isRequired();
 
   m_weightfiles_representation = std::make_unique<DBObjPtr<ChargedPidMVAWeights>>(m_payload_name);
-
 }
 
 
@@ -74,25 +73,45 @@ void ChargedPidMVAMulticlassModule::event()
 
   B2DEBUG(11, "EVENT: " << m_event_metadata->getEvent());
 
-  for (const auto& name : m_particle_lists) {
+  for (auto decayString : m_decayStrings) {
+    DecayDescriptor decayDescriptor;
+    decayDescriptor.init(decayString);
+    auto pl_name = decayDescriptor.getMother()->getFullName();
 
-    StoreObjPtr<ParticleList> pList(name);
-    if (!pList) { B2FATAL("ParticleList: " << name << " could not be found. Aborting..."); }
+    unsigned short m_nSelectedDaughters = decayDescriptor.getSelectionNames().size();
+    StoreObjPtr<ParticleList> pList(pl_name);
 
+    if (!pList) { B2FATAL("ParticleList: " << pl_name << " could not be found. Aborting..."); }
+    const auto nTargetParticles = (m_nSelectedDaughters == 0) ? pList->getListSize() : pList->getListSize() *
+                                  m_nSelectedDaughters;
     // Need to get an absolute value in order to check if in Const::ChargedStable.
-    int pdg = abs(pList->getPDGCode());
-
-    // Check if this ParticleList is made up of legit Const::ChargedStable particles.
-    if (!(*m_weightfiles_representation.get())->isValidPdg(pdg)) {
-      B2FATAL("PDG: " << pList->getPDGCode() << " of ParticleList: " << pList->getParticleListName() <<
-              " is not that of a valid particle in Const::chargedStableSet! Aborting...");
+    std::vector<int> pdgs;
+    if (m_nSelectedDaughters == 0)
+      pdgs.push_back(pList->getPDGCode());
+    else
+      pdgs = decayDescriptor.getSelectionPDGCodes();
+    for (auto pdg : pdgs) {
+      // Check if this ParticleList is made up of legit Const::ChargedStable particles.
+      if (!(*m_weightfiles_representation.get())->isValidPdg(abs(pdg))) {
+        B2FATAL("PDG: " << pdg << " of ParticleList: " << pl_name <<
+                " is not that of a valid particle in Const::chargedStableSet! Aborting...");
+      }
     }
-
+    std::vector<const Particle*> targetParticles;
+    if (m_nSelectedDaughters > 0) {
+      for (unsigned int iPart(0); iPart < pList->getListSize(); ++iPart) {
+        auto* iParticle = pList->getParticle(iPart);
+        auto daughters = decayDescriptor.getSelectionParticles(iParticle);
+        for (auto* iDaughter : daughters) {
+          targetParticles.push_back(iDaughter);
+        }
+      }
+    }
     B2DEBUG(11, "ParticleList: " << pList->getParticleListName() << " - N = " << pList->getListSize() << " particles.");
 
-    for (unsigned int ipart(0); ipart < pList->getListSize(); ++ipart) {
+    for (unsigned int ipart(0); ipart < nTargetParticles; ++ipart) {
 
-      Particle* particle = pList->getParticle(ipart);
+      const Particle* particle = (m_nSelectedDaughters > 0) ? targetParticles[ipart] : pList->getParticle(ipart);
 
       B2DEBUG(11, "\tParticle [" << ipart << "]");
 
@@ -222,7 +241,7 @@ void ChargedPidMVAMulticlassModule::event()
         B2DEBUG(12, "\t\tExtraInfo: " << score_varname);
 
         // Store the MVA score as a new particle object property.
-        particle->writeExtraInfo(score_varname, scores[classID]);
+        m_particles[particle->getArrayIndex()]->writeExtraInfo(score_varname, scores[classID]);
 
       }
 

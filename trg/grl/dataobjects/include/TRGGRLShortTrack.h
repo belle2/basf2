@@ -19,7 +19,7 @@ namespace Belle2 {
   public:
 
     /// Constructor
-    TRGGRLShortTrack(): m_TS_ID( {0}) {}
+    TRGGRLShortTrack(): m_TS_ID({0}) {}
     /// Destructor
     ~TRGGRLShortTrack() {}
 

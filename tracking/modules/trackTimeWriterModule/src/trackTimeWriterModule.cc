@@ -45,10 +45,6 @@ void trackTimeWriterModule::event()
   StoreArray<Track> tracks(m_trackColName);
   // Accessing eventT0
   StoreObjPtr<EventT0> evtT0;
-  double eventT0;
-  if (!evtT0) {
-    eventT0 = std::numeric_limits<double>::quiet_NaN();
-  }
   if (evtT0) {
     auto svdHypos = evtT0->getTemporaryEventT0s(Const::EDetector::SVD);
     if (svdHypos.size() > 0) { // if SVD eventT0 exists then loop over tracks, don't otherwise and leave their averageTime set at NaN
@@ -72,8 +68,6 @@ void trackTimeWriterModule::event()
           Track->setTrackTime(averageTime - svdBestT0.eventT0);
         }
       }
-    } else {
-      eventT0 = std::numeric_limits<double>::quiet_NaN();
     }
   }
 

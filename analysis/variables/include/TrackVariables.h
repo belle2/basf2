@@ -222,7 +222,7 @@ namespace Belle2 {
     B2Vector3D getPositionOnHelix(const Particle* part, const std::vector<double>& pars);
 
     /** return the SVD Track time */
-    double SVDTrackTime(const Particle* part);
+    double trackTime(const Particle* part);
   }
 } // Belle2 namespace
 

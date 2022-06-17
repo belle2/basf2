@@ -470,7 +470,9 @@ namespace Belle2 {
     }
     double SVDTrackTime(const Particle* part)
     {
-      return  part->getTrack()->getTrackTime();
+      const Track* track = part->getTrack();
+      if (!track) return realNaN;
+      return track->getTrackTime();
     }
 
 

@@ -9,36 +9,35 @@
 #pragma once
 #include <framework/core/Module.h>
 
-#include <framework/database/DBObjPtr.h>
-
-#include <framework/datastore/StoreObjPtr.h>
 #include <tracking/dataobjects/RecoTrack.h>
+#include <mdst/dataobjects/Track.h>
+#include <framework/dataobjects/EventT0.h>
+
+
 
 
 namespace Belle2 {
   /**
    * Computes the track time, defined as the difference between the average of SVD clusters time and the SVDEvent T0
    */
-  class trackTimeWriterModule : public Module {
+  class TrackTimeEstimatorModule : public Module {
 
   public:
 
-    /**
-     * Constructor: Sets the description, the properties and the parameters of the module.
-     */
-    trackTimeWriterModule();
+    TrackTimeEstimatorModule();
 
-    /** Register input and output data */
     void initialize() ;
 
-    /**  */
+    // Loop over all Tracks, get related recoTrack, get SVDHitlist, compute average time, set trackTime
     void event() ;
 
 
   private:
-    /// Name of collection holding the Tracks (input).
-    std::string m_trackColName = "";
-    /// Name of collection holding the RecoTracks (input).
-    std::string m_recoTrackColName = "";
+    // Accessing the recoTracks, they have the SVD Hits attached
+    StoreArray<RecoTrack> m_recoTracks; //(m_recoTrackColName);
+    // Accessing the Tracks
+    StoreArray<Track> m_tracks;
+    // Accessing eventT0, as we want SVDEventT0
+    StoreObjPtr<EventT0> m_evtT0;
   };
 }

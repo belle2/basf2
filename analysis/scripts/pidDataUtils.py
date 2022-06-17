@@ -650,7 +650,7 @@ def read_npz(filename):
     return df
 
 
-def prepare_df(
+def produce_analysis_df(
     df,
     compute_cols=True,
     drop_nans=True,

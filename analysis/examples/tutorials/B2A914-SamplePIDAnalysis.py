@@ -27,8 +27,8 @@ print(f'{len(standard)} events')
 weights = np.load('models/net_wgt.npy')
 
 # Prepare DataFrames for analysis
-standard = pdu.prepare_df(standard)                   # Standard PID: _no_ weights
-weighted = pdu.prepare_df(weighted, weights=weights)  # Weighted PID: uses the calibration weights
+standard = pdu.produce_analysis_df(standard)                   # Standard PID: _no_ weights
+weighted = pdu.produce_analysis_df(weighted, weights=weights)  # Weighted PID: uses the calibration weights
 print(f'{len(standard)} events after cuts')
 
 print('\nValues of the weights')

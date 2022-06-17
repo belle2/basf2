@@ -40,12 +40,10 @@ std::vector<Track::ChargedStableTrackFitResultPair> Track::getTrackFitResults(co
 
   const auto validParticleIndices = getValidIndices();
 
-  B2INFO(" validParticleIndices = getValidIndices().size  " <<  validParticleIndices.size());
   // extract the particle class and trackfitresult pointer for each
   // stored hypothesis
   for (auto  particleIndex : validParticleIndices) {
     const auto indexInStoreArray = m_trackFitIndices[particleIndex];
-    B2INFO("   indexInStoreArray  : " << indexInStoreArray);
     result.emplace_back(std::make_pair(Const::ChargedStable(Const::chargedStableSet.at(particleIndex)),
                                        trackFitResults[indexInStoreArray]));
   }

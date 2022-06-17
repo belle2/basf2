@@ -264,13 +264,9 @@ def add_flipping_of_recoTracks(path, fit_tracks=True, reco_tracks="RecoTracks", 
     path.add_module("FlipQuality", recoTracksStoreArrayName=reco_tracks,
                     identifier='/home/belle2/hanyubo/development/mva/examples/basics/localdb/dbstore_Weightfile_rev_19eac1.root',
                     indexOfFlippingMVA=2).set_name("FlipQuality_2ndMVA")
-    """
-     path.add_module(
-             "RecoTracksReverter",
-             inputStoreArrayName=reco_tracks,
-             outputStoreArrayName="",
-             mvaFlipCut=0.9).set_name("RecoTracksReverter")
-    """
+    path.add_module("FlippedRecoTracksMerger",
+                    inputStoreArrayName=reco_tracks,
+                    inputStoreArrayNameFlipped=reco_tracks_flipped, MVA2nd_cut=0.8)
 
 
 def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=False, fit_tracks=True, reco_tracks="RecoTracks",

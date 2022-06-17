@@ -511,18 +511,6 @@ namespace Belle2 {
       deleteFittedInformation();
     }
 
-    /// Only Set the position and momentum seed of the reco track. ATTENTION: This is not the fitted position or momentum.
-    void setPositionAndMomentumOnly(const TVector3& positionSeed, const TVector3& momentumSeed)
-    {
-      m_genfitTrack.setStateSeed(positionSeed, momentumSeed);
-    }
-
-    /// ONLY Set the charge seed stored in the reco track. ATTENTION: This is not the fitted charge.
-    void setChargeSeedOnly(const short int chargeSeed)
-    {
-      m_charge = chargeSeed;
-    }
-
     /// Set the time seed. ATTENTION: This is not the fitted time.
     void setTimeSeed(const double timeSeed)
     {

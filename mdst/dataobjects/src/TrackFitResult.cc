@@ -109,7 +109,7 @@ double TrackFitResult::getChi2() const
   if (pValue == 0) {
     return std::numeric_limits<double>::infinity();
   }
-  if (nDF < 0) {
+  if (nDF <= 0) {
     return std::numeric_limits<double>::quiet_NaN();
   }
   return 2 * boost::math::gamma_q_inv(nDF / 2., pValue);

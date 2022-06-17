@@ -55,44 +55,48 @@ void FlippedRecoTracksMergerModule::event()
 
         // get the related RecoTrack_flipped
         RecoTrack* RecoTrack_flipped =  recoTrack->getRelatedFrom<Belle2::RecoTrack>("RecoTracks_flipped");
-        // get the Tracks_flipped
-        Track* b2trackFlipped = RecoTrack_flipped->getRelatedFrom<Belle2::Track>("Tracks_flipped");
 
-        std::vector<Track::ChargedStableTrackFitResultPair> fitResultsAfter = b2trackFlipped->getTrackFitResults("TrackFitResults_flipped");
-        std::vector<Track::ChargedStableTrackFitResultPair> fitResultsBefore = b2track->getTrackFitResults();
+        if (RecoTrack_flipped) {
 
-        // pass the 2nd MVA cuts
-        if (recoTrack->get2ndFlipQualityIndicator() > m_2nd_mva_cut) {
-          // loop over the original fitResults
-          for (long unsigned int index = 0; index < fitResultsBefore.size() ; index++) {
-            // update the fitResults
-            if (index < fitResultsAfter.size()) {
-              auto fitResultAfter  = fitResultsAfter[index].second;
+          // get the Tracks_flipped
+          Track* b2trackFlipped = RecoTrack_flipped->getRelatedFrom<Belle2::Track>("Tracks_flipped");
+          if (b2trackFlipped) {
+            std::vector<Track::ChargedStableTrackFitResultPair> fitResultsAfter = b2trackFlipped->getTrackFitResults("TrackFitResults_flipped");
+            std::vector<Track::ChargedStableTrackFitResultPair> fitResultsBefore = b2track->getTrackFitResults();
 
-              fitResultsBefore[index].second->updateTrackFitResult(*fitResultAfter);
-            } else {
-              fitResultsBefore[index].second->maskThisFitResult();
+            // pass the 2nd MVA cuts
+            if (recoTrack->get2ndFlipQualityIndicator() > m_2nd_mva_cut) {
+              // loop over the original fitResults
+              for (long unsigned int index = 0; index < fitResultsBefore.size() ; index++) {
+                // update the fitResults
+                if (index < fitResultsAfter.size()) {
+                  auto fitResultAfter  = fitResultsAfter[index].second;
+
+                  fitResultsBefore[index].second->updateTrackFitResult(*fitResultAfter);
+                } else {
+                  fitResultsBefore[index].second->maskThisFitResult();
+                }
+              }
+
+
+              const auto& measuredStateOnPlane = recoTrack->getMeasuredStateOnPlaneFromLastHit();
+
+              TVector3 currentPosition = measuredStateOnPlane.getPos();
+              TVector3 currentMomentum = measuredStateOnPlane.getMom();
+              double currentCharge = measuredStateOnPlane.getCharge();
+
+              // revert the charge and momentum
+              recoTrack->setChargeSeed(-currentCharge);
+              recoTrack->setPositionAndMomentum(currentPosition,  -currentMomentum);
+
+              // Reverse the SortingParameters
+              auto RecoHitInfos = recoTrack->getRecoHitInformations();
+              for (auto RecoHitInfo : RecoHitInfos) {
+                RecoHitInfo->setSortingParameter(std::numeric_limits<unsigned int>::max() - RecoHitInfo->getSortingParameter());
+              }
+
             }
           }
-
-
-          const auto& measuredStateOnPlane = recoTrack->getMeasuredStateOnPlaneFromLastHit();
-
-          TVector3 currentPosition = measuredStateOnPlane.getPos();
-          TVector3 currentMomentum = measuredStateOnPlane.getMom();
-          double currentCharge = measuredStateOnPlane.getCharge();
-
-          // revert the charge and momentum
-          recoTrack->setChargeSeed(-currentCharge);
-          recoTrack->setPositionAndMomentum(currentPosition,  -currentMomentum);
-
-          // Reverse the SortingParameters
-          auto RecoHitInfos = recoTrack->getRecoHitInformations();
-          for (auto RecoHitInfo : RecoHitInfos) {
-            RecoHitInfo->setSortingParameter(std::numeric_limits<unsigned int>::max() - RecoHitInfo->getSortingParameter());
-          }
-
-
         }
       }
     }

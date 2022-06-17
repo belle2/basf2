@@ -17,20 +17,12 @@
 ##########################################################################
 
 import basf2 as b2
+import root_pandas as rtp
 import pidDataUtils as pdu
 
 # Read data into DataFrame
-df = pdu.read_root(b2.find_file('Dst_mc14p1_MC14ri_1_merged_sWeights.root', 'examples', False))
+df = rtp.read_root(b2.find_file('mc_dstar.root', 'examples', False))
 print("ROOT file read into DataFrame.")
-
-# Apply cuts
-df = df.query('(abs(DST_D0_K_d0) < 2) & (abs(DST_D0_pi_d0) < 2) & (abs(DST_pi_d0) < 2)')
-df = df.query('(abs(DST_D0_K_z0) < 4) & (abs(DST_D0_pi_z0) < 4) & (abs(DST_pi_z0) < 4)')
-df = df.query('(DST_D0_K_nCDCHits>40) & (DST_D0_pi_nCDCHits>40)')
-df = df.query('DST_D0_p > 3.0')
-df = df.query('M - DST_D0_M < 0.15')
-df = df.query('1.847 < DST_D0_M < 1.883')
-print("Cuts applied to data.")
 
 # Make slim h5 files for each particle type and merge into one large file
 pdu.make_h5(df, ['DST_D0_pi', 'DST_pi'], 'data/slim_dstar_pion.h5', pdg=211)

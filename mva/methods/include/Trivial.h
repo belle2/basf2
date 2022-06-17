@@ -47,6 +47,7 @@ namespace Belle2 {
       virtual std::string getMethod() const override { return "Trivial"; }
 
       double m_output = 0.5; /**< Output of the trivial method */
+      std::vector<double> m_multiple_output = {}; /**< Output of the trivial method */
     };
 
     /**

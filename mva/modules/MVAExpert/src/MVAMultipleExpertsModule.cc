@@ -160,20 +160,6 @@ void MVAMultipleExpertsModule::fillDatasets(Particle* particle)
   }
 }
 
-
-// std::vector<float> MVAMultipleExpertsModule::analyse(Particle* particle)
-// {
-//   std::vector<float> responseValues;
-//   responseValues.resize(m_identifiers.size());
-
-//   fillDatasets(particle);
-
-//   for (unsigned int i = 0; i < m_identifiers.size(); ++i) {
-//     responseValues[i] = m_experts[i]->apply(*m_datasets[i])[0];
-//   }
-//   return responseValues;
-// }
-
 std::vector<std::vector<float>> MVAMultipleExpertsModule::analyse(Particle* particle)
 {
   std::vector<std::vector<float>> responseValues;

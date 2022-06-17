@@ -139,6 +139,11 @@ if __name__ == "__main__":
             <datafile0>train.root</datafile0>
             <Trivial_version>1</Trivial_version>
             <Trivial_output>0</Trivial_output>
+            <Trivial_number_of_multiple_outputs>4</Trivial_number_of_multiple_outputs>
+            <Trivial_multiple_output0>0</Trivial_multiple_output0>
+            <Trivial_multiple_output1>1</Trivial_multiple_output1>
+            <Trivial_multiple_output2>2</Trivial_multiple_output2>
+            <Trivial_multiple_output3>3</Trivial_multiple_output3>
             <signal_fraction>0.5</signal_fraction>
             """
         with open("multiClass.xml", "w") as f:

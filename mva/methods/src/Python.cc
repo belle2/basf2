@@ -463,7 +463,7 @@ namespace Belle2 {
         }
       }
 
-      unsigned int nClasses = static_cast<unsigned int>(m_general_options.m_nClasses);
+      unsigned int nClasses = m_general_options.m_nClasses;
       std::vector<std::vector<float>> probabilities(test_data.getNumberOfEvents(), std::vector<float>(nClasses,
                                                     std::numeric_limits<float>::quiet_NaN()));
 

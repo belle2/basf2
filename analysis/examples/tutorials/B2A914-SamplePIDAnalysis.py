@@ -18,14 +18,18 @@
 import pidDataUtils as pdu
 import numpy as np
 
-std = pdu.read_npz('data/slim_dstar/test.npz')
-wgt = std.copy(deep=True)
-print(f'{len(std)} events')
+# Read in the dataset (specifically the held-out test set from our training split.)
+standard = pdu.read_npz('data/slim_dstar/test.npz')  # read PID info from npz into a DataFrame
+weighted = standard.copy(deep=True)                  # make a copy of the df
+print(f'{len(standard)} events')
 
+# Load the weights
 weights = np.load('models/net_wgt.npy')
-std = pdu.prepare_df(std)
-wgt = pdu.prepare_df(wgt, weights=weights)
-print(f'{len(std)} events after cuts')
+
+# Prepare DataFrames for analysis
+standard = pdu.prepare_df(standard)                   # Standard PID: _no_ weights
+weighted = pdu.prepare_df(weighted, weights=weights)  # Weighted PID: uses the calibration weights
+print(f'{len(standard)} events after cuts')
 
 print('\nValues of the weights')
 print(weights)
@@ -37,15 +41,15 @@ def compute_accuracy(df, mask=None):
     return (_df['pid'] == _df['labels']).values.sum() / len(_df)
 
 
-print('\n          (std)  (wgt)')
-std_acc = compute_accuracy(std)
-wgt_acc = compute_accuracy(wgt)
-print(f'Accuracy: {std_acc:.3f}  {wgt_acc:.3f}')
+print('\n          no wgt  wgt')
+standard_acc = compute_accuracy(standard)
+weighted_acc = compute_accuracy(weighted)
+print(f'Accuracy: {standard_acc:.3f}   {weighted_acc:.3f}')
 for label in [2, 3]:
     lbl = "pion" if label == 2 else "kaon"
-    _std_eff = compute_accuracy(std, mask=std["labels"] == label)
-    _wgt_eff = compute_accuracy(wgt, mask=wgt["labels"] == label)
-    print(f'{lbl} eff: {_std_eff:.3f}  {_wgt_eff:.3f}')
+    _standard_eff = compute_accuracy(standard, mask=standard["labels"] == label)
+    _weighted_eff = compute_accuracy(weighted, mask=weighted["labels"] == label)
+    print(f'{lbl} eff: {_standard_eff:.3f}   {_weighted_eff:.3f}')
 
 # I have an external package, 'pidplots', that interfaces with these DataFrames
 # and provides many methods for quickly making plots of the PID performance.

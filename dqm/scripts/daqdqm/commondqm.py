@@ -294,6 +294,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
 
         neurotrigger.add_neurotrigger_hw(path)
         path.add_module('CDCTriggerNeuroDQMOnline')
+        path.add_module('CDCTriggerNeuroDQM')
     # TRG after skim
     if (components is None or 'TRG' in components) and (dqm_mode in ["dont_care", "filtered"]):
         # TRGGDL

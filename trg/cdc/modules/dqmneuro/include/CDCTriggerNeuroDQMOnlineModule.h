@@ -242,6 +242,8 @@ private:
   TH1F* m_neuroHWSimCosTheta = nullptr;
   TH1F* m_neuroErrors = nullptr;
 
+  unsigned m_errcount = 9;
+
 };
 
 

@@ -108,6 +108,12 @@ void CDCTriggerNeuroDQMOnlineModule::defineHisto()
   m_neuroHWOutZ = new TH1F("NeuroHWOutZ",
                            "z distribution of unpacked and valid neuro tracks; z [cm]",
                            200, -100, 100);
+  m_recoZ = new TH1F("RecoTrackZ",
+                     "z distribution of all RecoTracks; z [cm]",
+                     400, -200, 200);
+  m_recoZ_related = new TH1F("NeuroHWOutZ",
+                             "z distribution of all related Recotracks; z [cm]",
+                             400, -200, 200);
   m_neuroHWOutSTTZ = new TH1F("NeuroHWOutSTTZ",
                               "z distribution of unpacked and valid first not updated per event Neurotracks  and p<0.7GeV; z [cm]",
                               200, -100, 100);
@@ -230,6 +236,8 @@ void CDCTriggerNeuroDQMOnlineModule::beginRun()
   // histograms with only hwneurotracks
 
   m_neuroHWOutZ->Reset();
+  m_recoZ->Reset();
+  m_recoZ_related->Reset();
   m_neuroHWOutSTTZ->Reset();
   m_neuroHWOutCosTheta->Reset();
   m_neuroHWOutPhi0->Reset();
@@ -799,7 +807,7 @@ void CDCTriggerNeuroDQMOnlineModule::fillRecoPlots()
       B2DEBUG(150, "No valid representation found for RecoTrack, skipping.");
       continue;
     }
-
+    m_recoZ->Fill(zTarget);
     // try to find related neurotrack
 
     CDCTriggerTrack* neuroHWTrack = recoTrack.getRelatedFrom<CDCTriggerTrack>(m_unpackedNeuroTracksName);
@@ -822,6 +830,7 @@ void CDCTriggerNeuroDQMOnlineModule::fillRecoPlots()
     //    state.setPosMom(state.getPos(), -state.getMom());
     //    state.setChargeSign(-state.getCharge());
     //  }
+    m_recoZ_related->Fill(zTarget);
     m_neuroHWOutdzall->Fill(neuroHWTrack->getZ0() - zTarget);
     switch (neuroHWTrack->getQuadrant()) {
       case -1:

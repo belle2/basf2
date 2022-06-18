@@ -223,6 +223,8 @@ private:
   TH1F* m_neuroHWSimRecodZ = nullptr;
 
   TH1F* m_neuroHWOutZ = nullptr;
+  TH1F* m_recoZ = nullptr;
+  TH1F* m_recoZ_related = nullptr;
   TH1F* m_neuroHWOutSTTZ = nullptr;
   TH1F* m_neuroHWOutCosTheta = nullptr;
   TH1F* m_neuroHWOutPhi0 = nullptr;

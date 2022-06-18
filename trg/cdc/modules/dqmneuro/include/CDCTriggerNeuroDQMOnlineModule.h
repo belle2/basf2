@@ -243,6 +243,8 @@ private:
   TH1F* m_neuroErrors = nullptr;
 
   unsigned m_errcount = 9;
+  std::vector<std::string> m_errdict{"Not All Axials in HWTrack", "|HW-SW| > 1cm", "Delta Input IDs not all 0", "Delta Input Alphas not all 0", "Drifttime Overflow / Scaling Error", "TS only in HW", "TS only in SW", "Multiple ET per Track", "Eventcounter"};
+
 
 };
 

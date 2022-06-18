@@ -87,16 +87,16 @@ void CDCTriggerNeuroDQMOnlineModule::defineHisto()
   m_neuroHWOutdzall = new TH1F("NeuroHWOutZ-RecoZ",
                                "z Resolution of unpacked and valid neuro tracks; z [cm]",
                                200, -100, 100);
-  m_neuroHWOutdz0 = new TH1F("Q0 NeuroHWOutZ-RecoZ",
+  m_neuroHWOutdz0 = new TH1F("Q0NeuroHWOutZ-RecoZ",
                              "Quadrant0 z Resolution of unpacked and valid neuro tracks; z [cm]",
                              200, -100, 100);
-  m_neuroHWOutdz1 = new TH1F("Q1 NeuroHWOutZ-RecoZ",
+  m_neuroHWOutdz1 = new TH1F("Q1NeuroHWOutZ-RecoZ",
                              "Quadrant1 z Resolution of unpacked and valid neuro tracks; z [cm]",
                              200, -100, 100);
-  m_neuroHWOutdz2 = new TH1F("Q2 NeuroHWOutZ-RecoZ",
+  m_neuroHWOutdz2 = new TH1F("Q2NeuroHWOutZ-RecoZ",
                              "Quadrant2 z Resolution of unpacked and valid neuro tracks; z [cm]",
                              200, -100, 100);
-  m_neuroHWOutdz3 = new TH1F("Q3 NeuroHWOutZ-RecoZ",
+  m_neuroHWOutdz3 = new TH1F("Q3NeuroHWOutZ-RecoZ",
                              "Quadrant3 z Resolution of unpacked and valid neuro tracks; z [cm]",
                              200, -100, 100);
   m_neuroHWSimRecodZ = new TH1F("NeuroHWSimZ-RecoZ",
@@ -108,6 +108,9 @@ void CDCTriggerNeuroDQMOnlineModule::defineHisto()
   m_neuroHWOutZ = new TH1F("NeuroHWOutZ",
                            "z distribution of unpacked and valid neuro tracks; z [cm]",
                            200, -100, 100);
+  m_neuroHWOutSTTZ = new TH1F("NeuroHWOutSTTZ",
+                              "z distribution of unpacked and valid first not updated per event Neurotracks  and p<0.7GeV; z [cm]",
+                              200, -100, 100);
   m_neuroHWOutCosTheta = new TH1F("NeuroHWOutCosTheta",
                                   "cos theta distribution of unpacked and valid neuro tracks; cos(#theta) ",
                                   100, -1, 1);
@@ -129,8 +132,8 @@ void CDCTriggerNeuroDQMOnlineModule::defineHisto()
                              5, 0, 5);
   m_neuroHWInTSID = new TH1F("NeuroHWInTSID", "ID of incoming track segments",
                              2336, 0, 2336);
-  m_neuroHWInTSIDSel = new TH1F("NeuroHWInSelTSID", "ID of incoming track segments",
-                                2336, 0, 2335);
+  m_neuroHWInTSIDSel = new TH1F("NeuroHWInSelTSID", "ID of selected NNT track segments",
+                                2336, 0, 2336);
   m_neuroHWInCDCFE = new TH1F("NeuroHWInCDCFE", "Number of incoming CDCFE board",
                               300, 0, 300);
   m_neuroHWInm_time = new TH1F("NeuroHWInM_time", "m_time distribution from incoming 2dtracks; clock cycle",
@@ -140,7 +143,7 @@ void CDCTriggerNeuroDQMOnlineModule::defineHisto()
 
   // now the histograms with hwsim neurotracks:
 
-  m_neuroHWOutHwSimdZ = new TH1F("NeuroHWOut z - NeuroHWSim z",
+  m_neuroHWOutHwSimdZ = new TH1F("NeuroHWOutz-NeuroHWSimz",
                                  "dz Distribution of Valid Neuro Tracks and Simulated HW Tracks; z [cm]",
                                  200, -100, 100);
   m_neuroHWSimZ = new TH1F("NeuroHWSimZ",
@@ -149,7 +152,16 @@ void CDCTriggerNeuroDQMOnlineModule::defineHisto()
   m_neuroHWSimCosTheta = new TH1F("NeuroHWSimCosTheta",
                                   "cos theta Distribution of Simulated HW Tracks; cos(#theta) ",
                                   100, -1, 1);
-  m_neuroErrors = new TH1F("Neurotrigger Errors", "Errors in the Neuro Hardware", 10, 0, 10);
+  m_neuroErrors = new TH1F("Neurotrigger-Errors", "Errors in the Neuro Hardware", m_errcount, 0, m_errcount);
+  //m_neuroErrors->SetDirectory(0);
+  //m_neuroErrors->SetOption("bar");
+  //m_neuroErrors->SetFillStyle(0);
+  //m_neuroErrors->SetMinimum(0);
+  //m_neuroErrors->SetStats(false);
+  //m_neuroErrors->Draw("hist");
+  //m_neuroErrors->SetDirectory(0);
+  //m_neuroErrors->SetDirectory(0);
+
   //m_neuroErrorsRaw = new Th1F("Neurotrigger Errors");
   // cd back to root directory
   oldDir->cd();
@@ -218,6 +230,7 @@ void CDCTriggerNeuroDQMOnlineModule::beginRun()
   // histograms with only hwneurotracks
 
   m_neuroHWOutZ->Reset();
+  m_neuroHWOutSTTZ->Reset();
   m_neuroHWOutCosTheta->Reset();
   m_neuroHWOutPhi0->Reset();
   m_neuroHWOutPt->Reset();
@@ -237,6 +250,9 @@ void CDCTriggerNeuroDQMOnlineModule::beginRun()
   m_neuroHWSimZ->Reset();
   m_neuroHWSimCosTheta->Reset();
   m_neuroErrors->Reset();
+  for (unsigned i = 0; i < m_errcount; ++i) {
+    m_neuroErrors->GetXaxis()->SetBinLabel(i + 1, m_errdict[i].c_str());
+  }
   //m_neuroErrorsRaw->Reset();
 }
 void CDCTriggerNeuroDQMOnlineModule::event()
@@ -278,6 +294,7 @@ void CDCTriggerNeuroDQMOnlineModule::fillHWPlots()
   // now, we loop over the hardware neurotracks and fill the
   // corresponding histograms
 
+  bool firsttrack = true;
   for (CDCTriggerTrack& neuroHWTrack : m_unpackedNeuroTracks) {
     bool valtrack = false;
     try {
@@ -295,8 +312,14 @@ void CDCTriggerNeuroDQMOnlineModule::fillHWPlots()
       if (phinorm < 0.) {phinorm += 360.;}
       m_neuroHWOutPhi0->Fill(phinorm);
       m_neuroHWOutPt->Fill(neuroHWTrack.getPt());
-      m_neuroHWOutP->Fill(neuroHWTrack.getPt() / sin(acos(neuroHWTrack.getCotTheta() / sqrt(1 + neuroHWTrack.getCotTheta()
-                                                          *neuroHWTrack.getCotTheta()))));
+      float momentum = neuroHWTrack.getPt() / sin(acos(neuroHWTrack.getCotTheta() / sqrt(1 + neuroHWTrack.getCotTheta() *
+                                                       neuroHWTrack.getCotTheta())));
+      m_neuroHWOutP->Fill(momentum);
+      if (momentum < 0.7 && firsttrack && neuroHWTrack.getFoundOldTrack()[0] == false) {
+        m_neuroHWOutSTTZ->Fill(neuroHWTrack.getZ0());
+        firsttrack = false;
+      }
+
       m_neuroHWOutm_time->Fill(neuroHWTrack.getTime());
       m_neuroHWSector->Fill(neuroHWTrack.getRelatedTo<CDCTriggerMLPInput>(m_unpackedNeuroInputVectorName)->getSector());
 
@@ -338,7 +361,7 @@ void CDCTriggerNeuroDQMOnlineModule::fillHWPlots()
           if (hwZero != hwSimZero) {missingTS = true;}
         }
         double diff = neuroHWTrack.getZ0() - neuroSimTrack->getZ0();
-        if (abs(diff > 1.)) {neuroHWTrack.setQualityVector(2);}
+        if (abs(diff) > 1.) {neuroHWTrack.setQualityVector(2);}
         if (!sameInputId) {neuroHWTrack.setQualityVector(4);}
         if (!sameInputAlpha) {neuroHWTrack.setQualityVector(8);}
         if (scaleErr) {neuroHWTrack.setQualityVector(16);}
@@ -348,7 +371,9 @@ void CDCTriggerNeuroDQMOnlineModule::fillHWPlots()
         // now fill the error histogram:
         unsigned qvec = neuroHWTrack.getQualityVector();
         //m_neuroErrorsRaw->Fill(qvec);
-        for (unsigned k = 0; k < 33; k++) {
+        m_neuroErrors->Fill(8);
+        for (unsigned k = 0; k < m_errcount; k++) {
+          //if (qvec & (1 << k)) {m_neuroErrors->Fill(m_errordict[k], 1);}
           if (qvec & (1 << k)) {m_neuroErrors->Fill(k);}
         }
       }

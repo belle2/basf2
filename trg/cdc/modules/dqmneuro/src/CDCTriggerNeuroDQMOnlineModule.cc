@@ -111,7 +111,7 @@ void CDCTriggerNeuroDQMOnlineModule::defineHisto()
   m_recoZ = new TH1F("RecoTrackZ",
                      "z distribution of all RecoTracks; z [cm]",
                      400, -200, 200);
-  m_recoZ_related = new TH1F("NeuroHWOutZ",
+  m_recoZ_related = new TH1F("RecoTrackZ_related",
                              "z distribution of all related Recotracks; z [cm]",
                              400, -200, 200);
   m_neuroHWOutSTTZ = new TH1F("NeuroHWOutSTTZ",
@@ -149,7 +149,7 @@ void CDCTriggerNeuroDQMOnlineModule::defineHisto()
 
   // now the histograms with hwsim neurotracks:
 
-  m_neuroHWOutHwSimdZ = new TH1F("NeuroHWOutz-NeuroHWSimz",
+  m_neuroHWOutHwSimdZ = new TH1F("NeuroHWOutZ-NeuroHWSimZ",
                                  "dz Distribution of Valid Neuro Tracks and Simulated HW Tracks; z [cm]",
                                  200, -100, 100);
   m_neuroHWSimZ = new TH1F("NeuroHWSimZ",

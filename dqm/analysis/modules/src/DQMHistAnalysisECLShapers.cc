@@ -36,11 +36,8 @@ DQMHistAnalysisECLShapersModule::~DQMHistAnalysisECLShapersModule()
 
 void DQMHistAnalysisECLShapersModule::initialize()
 {
-  B2DEBUG(20, "DQMHistAnalysisECLShapers: initialized.");
-
 #ifdef _BELLE2_EPICS
   if (m_useEpics) {
-
     if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
     for (int i = 0; i < c_collector_count; i++) {
       std::string pv_name = "ECL:logic_check:crate" + std::to_string(i + 1);
@@ -57,6 +54,13 @@ void DQMHistAnalysisECLShapersModule::initialize()
     SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
   }
 #endif
+
+  m_monObj = getMonitoringObject("ecl");
+
+  m_c_main = new TCanvas("ecl_main");
+  m_monObj->addCanvas(m_c_main);
+
+  B2DEBUG(20, "DQMHistAnalysisECLShapers: initialized.");
 }
 
 void DQMHistAnalysisECLShapersModule::beginRun()
@@ -69,44 +73,54 @@ void DQMHistAnalysisECLShapersModule::event()
   TH1* h_fail_crateid  = findHist("ECL/fail_crateid");
   TProfile* h_pedrms_cellid = (TProfile*)findHist("ECL/pedrms_cellid");
 
+  if (h_pedrms_cellid != NULL) {
+    // Using multiset to automatically sort the added values.
+    std::multiset<double> barrel_pedwidth;
+    std::multiset<double> bwd_pedwidth;
+    std::multiset<double> fwd_pedwidth;
+
+    for (int i = 0; i < 8736; i++) {
+      const int cellid = i + 1;
+      if (h_pedrms_cellid->GetBinEntries(cellid) < 100) continue;
+      double pedrms = h_pedrms_cellid->GetBinContent(cellid);
+      if (cellid < 1153) {
+        fwd_pedwidth.insert(pedrms);
+      } else if (cellid < 7777) {
+        barrel_pedwidth.insert(pedrms);
+      } else {
+        bwd_pedwidth.insert(pedrms);
+      }
+    }
+
+    // Use approximate conversion factor
+    // to convert from ADC units to MeV.
+    const double adc_to_mev = 0.05;
+
+    m_pedwidth_max[0] = robust_max(fwd_pedwidth)    * adc_to_mev;
+    m_pedwidth_max[1] = robust_max(barrel_pedwidth) * adc_to_mev;
+    m_pedwidth_max[2] = robust_max(bwd_pedwidth)    * adc_to_mev;
+    m_pedwidth_max[3] = *std::max(&m_pedwidth_max[0], &m_pedwidth_max[2]);
+  } else {
+    for (int i = 0; i < 4; i++) {
+      m_pedwidth_max[i] = 0;
+    }
+  }
+
+  //== Set EPICS PVs
+
 #ifdef _BELLE2_EPICS
   if (m_useEpics) {
     if (h_fail_crateid != NULL) {
+      // Set fit consistency check PVs
       for (int i = 0; i < c_collector_count; i++) {
         int errors_count = h_fail_crateid->GetBinContent(i + 1);
         if (chid_logic[i]) SEVCHK(ca_put(DBR_LONG, chid_logic[i], (void*)&errors_count), "ca_set failure");
       }
-    }
-    if (h_pedrms_cellid != NULL) {
-      // Using multiset to automatically sort the added values.
-      std::multiset<double> barrel_pedwidth;
-      std::multiset<double> bwd_pedwidth;
-      std::multiset<double> fwd_pedwidth;
-
-      for (int i = 0; i < 8736; i++) {
-        const int cellid = i + 1;
-        if (h_pedrms_cellid->GetBinEntries(cellid) < 100) continue;
-        double pedrms = h_pedrms_cellid->GetBinContent(cellid);
-        if (cellid < 1153) {
-          fwd_pedwidth.insert(pedrms);
-        } else if (cellid < 7777) {
-          barrel_pedwidth.insert(pedrms);
-        } else {
-          bwd_pedwidth.insert(pedrms);
-        }
-      }
-
-      double pedwidth_max[4] = {
-        robust_max(barrel_pedwidth),
-        robust_max(bwd_pedwidth),
-        robust_max(fwd_pedwidth),
-        0
-      };
-      pedwidth_max[3] = *std::max(&pedwidth_max[0], &pedwidth_max[2]);
+      // Set pedestal width PVs
       for (int i = 0; i < 4; i++) {
-        if (pedwidth_max[i] <= 0) continue;
+        if (m_pedwidth_max[i] <= 0) continue;
         if (!chid_pedwidth[i]) continue;
-        SEVCHK(ca_put(DBR_DOUBLE, chid_pedwidth[i], (void*)&pedwidth_max[i]), "ca_set failure");
+        SEVCHK(ca_put(DBR_DOUBLE, chid_pedwidth[i], (void*)&m_pedwidth_max[i]), "ca_set failure");
       }
     }
     SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
@@ -117,6 +131,26 @@ void DQMHistAnalysisECLShapersModule::event()
 void DQMHistAnalysisECLShapersModule::endRun()
 {
   B2DEBUG(20, "DQMHistAnalysisECLShapers: endRun called");
+
+  //= Set the contents of ECL monitoring object
+  m_c_main->Clear(); // clear existing content
+
+  TProfile* h_pedrms_cellid = (TProfile*)findHist("ECL/pedrms_cellid");
+  if (h_pedrms_cellid == nullptr) {
+    m_monObj->setVariable("comment", "No ECL pedestal width histograms available");
+    B2INFO("Histogram named ECL/pedrms_cellid is not found.");
+    return;
+  }
+
+  m_c_main->cd();
+  h_pedrms_cellid->Draw();
+
+  // set values of monitoring variables (if variable already exists this will
+  // change its value, otherwise it will insert new variable)
+  m_monObj->setVariable("pedwidthFWD", m_pedwidth_max[0]);
+  m_monObj->setVariable("pedwidthBarrel", m_pedwidth_max[1]);
+  m_monObj->setVariable("pedwidthBWD", m_pedwidth_max[2]);
+  m_monObj->setVariable("pedwidthTotal", m_pedwidth_max[3]);
 }
 
 

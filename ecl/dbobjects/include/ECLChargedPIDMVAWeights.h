@@ -166,8 +166,8 @@ namespace Belle2 {
                                     const std::vector<std::unordered_map<unsigned int, TF1>>& pdfs,
                                     const std::unordered_map<unsigned int, unsigned int>& mvaIndexForHypothesis) :
       m_log_transform_offset("logTransformOffset", 1e-15),
-      m_max_possible_response_value("maxPossibleResponseValue", 1.0)
-
+      m_max_possible_response_value("maxPossibleResponseValue", 1.0),
+      m_temperature("temperature", 1.0)
     {
       // Load and serialize the MVA::Weightfile object into a string for storage in the database,
       // otherwise there are issues w/ dictionary generation for the payload class...

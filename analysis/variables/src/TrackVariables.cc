@@ -468,7 +468,7 @@ namespace Belle2 {
     {
       return getHelixParameterPullAtIndex(part, 4);
     }
-    float getTrackTime(const Particle* part)
+    double getTrackTime(const Particle* part)
     {
       const Track* track = part->getTrack();
       if (!track) return realNaN;

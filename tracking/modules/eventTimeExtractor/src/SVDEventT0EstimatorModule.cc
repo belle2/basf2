@@ -62,7 +62,7 @@ void SVDEventT0EstimatorModule::event()
   double clsTime_sum = 0;
   double clsTime_err_sum = 0;
   double quality = NAN;
-  int N_cls = 0;
+  int numberOfSVDClusters = 0;
 
   // loop on recotracks
   for (const auto& recoTrack : m_recoTracks) {
@@ -74,24 +74,24 @@ void SVDEventT0EstimatorModule::event()
       clsTime_sum += svdCluster->getClsTime();
       clsTime_err_sum += (svdCluster->getClsTimeSigma() * svdCluster->getClsTimeSigma());
     }
-    N_cls += svdClusters.size();
+    numberOfSVDClusters += svdClusters.size();
   }
-// do nothing if no clusters associated to tracks, or if EventT0 is not valid
-  if ((N_cls == 0) || !(m_eventT0.isValid()))
+  // do nothing if no clusters associated to tracks, or if EventT0 is not valid
+  if ((numberOfSVDClusters == 0) || !(m_eventT0.isValid()))
     return;
 
-// otherwise, eventT0 is the average of cluster times
-// using clusters associated to selected tracks
-  evtT0 = clsTime_sum / N_cls;
-  quality = N_cls;
+  // otherwise, eventT0 is the average of cluster times
+  // using clusters associated to selected tracks
+  evtT0 = clsTime_sum / numberOfSVDClusters;
+  quality = numberOfSVDClusters;
 
-// now compute the error
-  if (N_cls > 1)
-    evtT0_err = std::sqrt(clsTime_err_sum / (N_cls * (N_cls - 1)));
+  // now compute the error
+  if (numberOfSVDClusters > 1)
+    evtT0_err = std::sqrt(clsTime_err_sum / (numberOfSVDClusters * (numberOfSVDClusters - 1)));
   else
     evtT0_err = std::sqrt(clsTime_err_sum);
 
-// and finally set a temporary EventT0
+  // and finally set a temporary EventT0
   EventT0::EventT0Component evtT0_comp(evtT0, evtT0_err, Const::SVD, m_algorithm, quality);
   m_eventT0->addTemporaryEventT0(evtT0_comp);
   m_eventT0->setEventT0(evtT0_comp);

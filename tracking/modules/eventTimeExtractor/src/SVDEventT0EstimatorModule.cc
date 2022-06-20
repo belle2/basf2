@@ -76,14 +76,24 @@ void SVDEventT0EstimatorModule::event()
     }
     N_cls += svdClusters.size();
   }
-  if (N_cls > 1) {
-    quality = N_cls;
-    evtT0 = clsTime_sum / N_cls;
+// do nothing if no clusters associated to tracks, or if EventT0 is not valid
+  if ((N_cls == 0) || !(m_eventT0.isValid()))
+    return;
+
+// otherwise, eventT0 is the average of cluster times
+// using clusters associated to selected tracks
+  evtT0 = clsTime_sum / N_cls;
+  quality = N_cls;
+
+// now compute the error
+  if (N_cls > 1)
     evtT0_err = std::sqrt(clsTime_err_sum / (N_cls * (N_cls - 1)));
-  }
+  else
+    evtT0_err = std::sqrt(clsTime_err_sum);
+
+// and finally set a temporary EventT0
   EventT0::EventT0Component evtT0_comp(evtT0, evtT0_err, Const::SVD, m_algorithm, quality);
-  if (m_eventT0.isValid()) {
-    m_eventT0->addTemporaryEventT0(evtT0_comp);
-    m_eventT0->setEventT0(evtT0_comp);
-  }
+  m_eventT0->addTemporaryEventT0(evtT0_comp);
+  m_eventT0->setEventT0(evtT0_comp);
+
 }

@@ -124,7 +124,7 @@ Reconstruction Calibrations
 
 	       Stores the position error formulas for the ``CoGOnly`` algorithm, with the same granularity_ as simulation objects
 
-Check `CoGOnlyErr@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDCoGOnlyPositionError&perpage=25&>`_ all revisions available in the Conditions Database.  Revision **2** is used for exp 0, 1003 and data reconstruction.
+Check `CoGOnlyErr@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDCoGOnlyPositionError&perpage=25&>`_ all revisions available in the Conditions Database.  Revision **5** is used for exp 0, 1003 and data reconstruction.
 
 .. _svdcogonlycal:
 
@@ -133,6 +133,7 @@ Check `CoGOnlyErr@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDCoGOnlyPosit
 	       Stores the position error scaling factors for the ``CoGOnly`` algorithm, with the same granularity_ as simulation objects
 
 Check `CoGOnlySF@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDCoGOnlyErrorScaleFactors&perpage=25&>`_ all revisions available in the Conditions Database. Revision **2** (scale factors = 1) is used for exp 0, 1003 and data reconstruction.
+While revision **6** (scale factors != 1) is used for data.
 
 .. _svdolddefaultcal:
 

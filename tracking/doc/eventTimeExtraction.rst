@@ -5,13 +5,16 @@ Event Time Extraction
   
 The event time (EventT0) is the time of the collision (in ns) with respect to the trigger.
 There are several estimators in the tracking package:
+
 #. CDC Hit Based estimator: used in the CDC pattern recognition step
-#. CDC Chi2-based Full Grid estimator: the most precise estimator, but has a with long execution time
+
+#. CDC Chi2-based Full Grid estimator: the most precise estimator, but has a long execution time
+
 #. SVD estimator: the default estimator
 
 SVD Event Time Estimator
 ------------------------
-This is a very simple estimator that is run after tracking: the SVD clusters used
+This is a simple estimator that is computed after tracking: the SVD clusters used
 in the reconstruction of tracks with :math:`p_T > 250` MeV/c are selected and then 
 compute the time of the event as the average of the cluster times. This is the default
 time of the event computed by tracking.

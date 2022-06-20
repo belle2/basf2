@@ -47,6 +47,27 @@ In simulation, sensors are grouped by type (L3, origami, backward, forward) and 
 
 Check `ChargeSimulation@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDChargeSimulationCalibrations&perpage=25&>`_ all revisions available in the Conditions Database. Revision **4** is used for experiment 0 and 1003.
 
+
+.. _svdfudgeposition:
+
+.. cpp:class:: SVDMCClusterPositionFudgeFactor
+
+	       Parameter to fudge position reconstruction in simulation, to match resolution measured in data, with sensor-side granularity_:
+
+	       #. fudge factor: width of the gaussian from which we draw a random number to be added to the reconstructed cluster position, depends on the track incident angle
+
+Check `MCPositionFudge@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDMCClusterPositionFudgeFactor&perpage=25&>`_ all revisions available in the Conditions Database. Revision **5** is used for experiment 0 and 1003.
+
+.. _svdfudgetime:
+
+.. cpp:class:: SVDMCClusterTimeFudgeFactor
+
+	       Parameter to fudge time reconstruction in simulation, to match resolution measured in data, with sensor-side granularity_:
+
+	       #. fudge factor: width of the gaussian from which we draw a random number to be added to the reconstructed cluster time
+
+Check `MCTimeFudge@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDMCClusterTimeFudgeFactor&perpage=25&>`_ all revisions available in the Conditions Database. Revision **1** is used for experiment 0 and 1003 (no fudge).
+
 The local calibrations wrappers  :ref:`SVDNoiseCalibrations<svdnoisecal>`, :ref:`SVDPulseShapeCalibrations<svdpulsecal>` and :ref:`SVDFADCMaskedStrips<svdmaskedcal>` are also used in the digitizer.
 
 Local Calibrations

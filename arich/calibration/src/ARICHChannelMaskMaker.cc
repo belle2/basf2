@@ -14,7 +14,7 @@ using namespace Belle2;
 ARICHChannelMaskMaker::ARICHChannelMaskMaker(): CalibrationAlgorithm("ARICHChannelMask")
 {
   setDescription(
-    " --------------------- ARICHChannelMask Calibration Algoritm ------------------\n"
+    " --------------------- ARICHChannelMask Calibration Algorithm -----------------\n"
     "                                                                               \n"
     "  Produces channel mask for arich hot/dead channels, based on criteria of      \n"
     "  minimal and maximal occupancy                                                \n"
@@ -38,24 +38,24 @@ CalibrationAlgorithm::EResult ARICHChannelMaskMaker::calibrate()
   auto* mask = new ARICHChannelMask();
 
   double ringChnAvg[7] = {0.};
-  double ringChnAvgS2N[7] = {0.};
-  int hapdInRing[7] = {42, 48, 54, 60, 66, 72, 78};
+  // double ringChnAvgS2N[7] = {0.};
+  const int hapdInRing[7] = {42, 48, 54, 60, 66, 72, 78};
 
   for (int bin = 1; bin < numChannels; ++bin) {
     int moduleID = (bin - 1) / NumberOfChannelsPerHapd + 1;
     double nsig = hist->GetBinContent(bin, 2) + hist->GetBinContent(bin, 3) - hist->GetBinContent(bin, 1) - hist->GetBinContent(bin, 4);
-    double s2n = nsig  / (hist->GetBinContent(bin, 2) + hist->GetBinContent(bin, 3));
+    // double s2n = nsig  / (hist->GetBinContent(bin, 2) + hist->GetBinContent(bin, 3));
     int ring = getRing(moduleID);
     if (nsig / float(nevt) > 0.02) continue; // skip channels with anomalously high occupancy
     ringChnAvg[ring] += nsig;
-    ringChnAvgS2N[ring] += s2n;
+    // ringChnAvgS2N[ring] += s2n;
   }
 
   for (int i = 0; i < 7; i++) {
     ringChnAvg[i] /= float(hapdInRing[i] * NumberOfChannelsPerHapd);
-    ringChnAvgS2N[i] /= float(hapdInRing[i] * NumberOfChannelsPerHapd);
+    // ringChnAvgS2N[i] /= float(hapdInRing[i] * NumberOfChannelsPerHapd);
   }
-  B2INFO("Average hits in channel in outter HAPD ring is " << ringChnAvg[6] << " (which is less that minimaly required,  " <<
+  B2INFO("Average hits in channel in outer HAPD ring is " << ringChnAvg[6] << " (which is less that minimally required,  " <<
          m_minHitPerChn << ")");
   if (ringChnAvg[6] < m_minHitPerChn) return c_NotEnoughData;
 

@@ -1,0 +1,83 @@
+# EventType: 2613052121
+# Descriptor: [ccbar Dstar_sm2D_smPi0 D_sm2Kstar0Kstarm Kstar02KpPim Kstarm2KsKm Ks2PipPim]
+# NickName: Dstar_smToD_smPi0_D_smToKstar0Kstarm_Kstar0ToKpPim_KstarmToKsKm_KsToPipPim
+# Cuts: None
+# Documentation: MC15ri_b signal request
+# PhysicsWG: Charm
+# Tested: Yes
+# Responsible: Michel Bertemes
+# Email: mbertemes@bnl.gov
+# Date: 20220421 (YYYYMMDD)
+
+
+#JetSetPar PARJ(21)=0.28 ---> Pythia8 does not support this parameter, but a similar Pythia8 parameter may be available
+
+#JetSetPar PARJ(25)=0.27 ---> corresponding to Pythia8 StringFlav:etaSup
+PythiaBothParam StringFlav:etaSup=0.27
+
+#JetSetPar PARJ(26)=0.12 ---> corresponding to Pythia8 StringFlav:etaPrimeSup
+PythiaBothParam StringFlav:etaPrimeSup=0.12
+
+#JetSetPar PARJ(33)=0.3 ---> corresponding to Pythia8 StringFragmentation:stopMass
+PythiaBothParam StringFragmentation:stopMass=0.3
+
+#JetSetPar PARJ(41)=0.32 ---> corresponding to Pythia8 StringZ:aLund
+PythiaBothParam StringZ:aLund=0.32
+
+#JetSetPar PARJ(42)=0.62 ---> corresponding to Pythia8 StringZ:bLund
+PythiaBothParam StringZ:bLund=0.62
+
+#JetSetPar PARJ(81)=0.38 ---> Pythia8 does not support this parameter, but a similar Pythia8 parameter may be available
+#JetSetPar PARJ(82)=0.76 ---> Pythia8 does not support this parameter, but a similar Pythia8 parameter may be available
+
+#JetSetPar PARP(2)=4.0 ---> Pythia8 does not support this parameter, but a similar Pythia8 parameter may be available
+#JetSetPar MSTP(141)=1 ---> Pythia8 does not support this parameter, but a similar Pythia8 parameter may be available
+#JetSetPar MSTP(171)=1 ---> Pythia8 does not support this parameter, but a similar Pythia8 parameter may be available
+#JetSetPar MSTP(172)=1 ---> Pythia8 does not support this parameter, but a similar Pythia8 parameter may be available
+
+
+#JetSetPar MSTJ(11)=4 is not supported. Therefore, it is changed from 4 to 5.
+#JetSetPar MSTJ(11)=5 ---> corrsponding to Pythia8 StringZ:usePeterson{C,B,H}
+PythiaBothParam StringZ:usePetersonC=off
+PythiaBothParam StringZ:usePetersonB=off
+PythiaBothParam StringZ:usePetersonH=off
+
+#JetSetPar PARJ(46)=1.0 ---> corresponding to Pythia8 StringZ:rFactC
+PythiaBothParam StringZ:rFactC=1.0
+
+
+Alias pi0sig pi0
+Alias K*0sig K*0
+Alias K*-sig K*-
+Alias K0sig K0
+
+Decay vpho
+1.000 c anti-c PYTHIA 91;
+Enddecay
+
+Decay D_s*-
+1.0 D_s-sig pi0sig VSS;
+Enddecay
+
+Decay D_s-sig
+1.0 K*0sig K*-sig SVV_HELAMP 1.0 0.0 1.0 0.0 1.0 0.0;
+Enddecay
+
+Decay K*0sig
+1.0 K+ pi- VSS;
+Enddecay
+
+Decay K*-sig
+1.0 K0sig pi- VSS;
+Enddecay
+
+Decay K0sig
+1.0 K_S0 PHSP;
+Enddecay
+
+Decay pi0sig
+1.0 gamma gamma PHSP;
+Enddecay
+
+
+End

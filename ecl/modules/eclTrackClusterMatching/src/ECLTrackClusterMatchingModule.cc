@@ -19,7 +19,7 @@
 using namespace std;
 using namespace Belle2;
 
-REG_MODULE(ECLTrackClusterMatching)
+REG_MODULE(ECLTrackClusterMatching);
 
 ECLTrackClusterMatchingModule::ECLTrackClusterMatchingModule() : Module(),
   m_matchingParameterizations("ECLTrackClusterMatchingParameterizations"),

@@ -693,6 +693,21 @@ namespace Belle2 {
       /** Output datastore for unpacker **/
       StoreArray<TRGCDCETFUnpackerStore> m_store;
 
+      /** address of copper module **/
+      unsigned int m_copper_address = 0x1100000a;
+
+      /** address of copper module **/
+      unsigned int m_copper_ab = 1;
+
+      /** address of PCIe40 module **/
+      unsigned int m_pcie40_address = 0x10000001;
+
+      /** channel ID of PCIe40 module **/
+      unsigned int m_pcie40_ch = 20;
+
+      /** PCIe40 data or copper data **/
+      bool m_pciedata = false;
+
     };
   }
 } // end namespace Belle2

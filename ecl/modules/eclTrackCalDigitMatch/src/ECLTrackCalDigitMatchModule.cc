@@ -32,7 +32,7 @@ using namespace std;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(ECLTrackCalDigitMatch)
+REG_MODULE(ECLTrackCalDigitMatch);
 
 //-----------------------------------------------------------------
 //                 Implementation

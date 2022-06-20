@@ -143,6 +143,10 @@ void FragmentationModule::initialize()
       B2INFO("Using non-standard DECAY file \"" << m_DecFile << "\"");
     }
     evtgen = new EvtGenDecays(m_Pythia, evtGen);
+    // Set signal particle suffix.
+    // Signal particle names must end in "sig" in user decay file.
+    evtgen->signalSuffix = "sig";
+    // Read the user decay file.
     evtgen->readDecayFile(m_UserDecFile);
     // Workaround for Pythia bug. It is the only way to call
     // EvtGenDecays::updateData(true) to disable particle decays

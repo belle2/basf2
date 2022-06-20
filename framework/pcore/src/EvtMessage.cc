@@ -179,7 +179,7 @@ char* EvtMessage::msg()
 void EvtMessage::setMsg(char const* msgin, int size, ERecordType type)
 {
   //initialize message header properly
-  new(m_data) EvtHeader(size + sizeof(EvtHeader), type);
+  new (m_data) EvtHeader(size + sizeof(EvtHeader), type);
   struct timeval tv;
   gettimeofday(&tv, nullptr);
   this->setTime(tv);

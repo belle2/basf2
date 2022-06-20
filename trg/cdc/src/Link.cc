@@ -850,7 +850,7 @@ namespace Belle2 {
   }
 
   void*
-  TRGCDCLink::operator new(size_t size)
+  TRGCDCLink::operator new (size_t size)
   {
     void* p = malloc(size);
     _all.push_back(static_cast<TRGCDCLink*>(p));
@@ -863,7 +863,7 @@ namespace Belle2 {
   }
 
   void
-  TRGCDCLink::operator delete(void* t)
+  TRGCDCLink::operator delete (void* t)
   {
     for (vector<TRGCDCLink*>::iterator it = _all.begin();
          it != _all.end();

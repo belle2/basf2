@@ -113,7 +113,7 @@ bool FileCatalog::registerFile(const std::string& fileName, FileMetaData& metaDa
 
   // check whether a file with this name is already registered and remove if so
   for (auto it = fileMap.begin(); it != fileMap.end(); ++it) {
-    auto&& [lfn, value] = *it;
+    auto&& lfn = (*it).first;
     if (!oldLFN.empty() and oldLFN == lfn) {
       // old LFN exists and we requested an update so no warning, just remove
       fileMap.erase(it);
@@ -121,7 +121,7 @@ bool FileCatalog::registerFile(const std::string& fileName, FileMetaData& metaDa
     }
     if (metaData.getLfn() == lfn) {
       B2WARNING("A file with the same LFN is already registered and will be overwritten in the catalog."
-                << LogVar("LFN", lfn) << LogVar("old PFN", value.first) << LogVar("new PFN", fileName));
+                << LogVar("LFN", lfn) << LogVar("old PFN", (*it).second.first) << LogVar("new PFN", fileName));
       fileMap.erase(it);
       break;
     }

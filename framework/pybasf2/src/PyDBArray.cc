@@ -47,3 +47,13 @@ PyDBArray::PyDBArray(const TClass* objClass, bool required): PyDBArray(DataStore
 
 PyDBArray::PyDBArray(const std::string& name, const TClass* objClass, bool required): DBAccessorBase(name, objClass, true,
       required) {}
+
+PyObject* PyDBArray::getIntraRunBoundariesList() const
+{
+  PyObject* list = PyList_New(0);
+  // Currently, the boundaries are defined only as unsigned int.
+  // If in the future this will change, this method has to be updated accordingly.
+  for (auto boundary : getIntraRunBoundaries())
+    PyList_Append(list, PyLong_FromUnsignedLong(boundary));
+  return list;
+}

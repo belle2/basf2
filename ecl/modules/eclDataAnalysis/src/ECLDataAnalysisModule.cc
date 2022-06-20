@@ -41,7 +41,7 @@ using namespace Belle2;
 //                 Register the Module
 //-----------------------------------------------------------------
 
-REG_MODULE(ECLDataAnalysis)
+REG_MODULE(ECLDataAnalysis);
 
 //-----------------------------------------------------------------
 //                 Implementation

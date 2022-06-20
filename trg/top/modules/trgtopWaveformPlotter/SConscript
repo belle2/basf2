@@ -1,14 +1,6 @@
 Import('env')
 env['LIBS'] = ['framework',
-               'trg',
-               'trg_ecl_dataobjects',
-               'trg_gdl_dataobjects',
-               'trg_grl_dataobjects',
                'trg_top_dataobjects',
-	       'top',
-               'top_dataobjects',
-               'mdst_dataobjects',
-               'rawdata_dataobjects',
 	       '$ROOT_LIBS']
 Return('env')
 

@@ -178,12 +178,12 @@ GRLNeuroTrainerModule::initialize()
   h_ncdcs_sig.push_back(new TH1D("h_ncdcs_sig", "h_ncdcs_sig", 10, 0, 10));
   h_ncdci_sig.push_back(new TH1D("h_ncdci_sig", "h_ncdci_sig", 10, 0, 10));
   h_ncdc_sig.push_back(new TH1D("h_ncdc_sig", "h_ncdc_sig", 10, 0, 10));
-  h_necl_sig.push_back(new TH1D("h_necl_sig"  , "h_necl_sig" , 10, 0, 10));
-  h_ncdcf_bg.push_back(new TH1D("h_ncdcf_bg"  , "h_ncdcf_bg" , 10, 0, 10));
-  h_ncdcs_bg.push_back(new TH1D("h_ncdcs_bg"  , "h_ncdcs_bg" , 10, 0, 10));
-  h_ncdci_bg.push_back(new TH1D("h_ncdci_bg"  , "h_ncdci_bg" , 10, 0, 10));
+  h_necl_sig.push_back(new TH1D("h_necl_sig", "h_necl_sig", 10, 0, 10));
+  h_ncdcf_bg.push_back(new TH1D("h_ncdcf_bg", "h_ncdcf_bg", 10, 0, 10));
+  h_ncdcs_bg.push_back(new TH1D("h_ncdcs_bg", "h_ncdcs_bg", 10, 0, 10));
+  h_ncdci_bg.push_back(new TH1D("h_ncdci_bg", "h_ncdci_bg", 10, 0, 10));
   h_ncdc_bg.push_back(new TH1D("h_ncdc_bg", "h_ncdc_bg", 10, 0, 10));
-  h_necl_bg.push_back(new TH1D("h_necl_bg"    , "h_necl_bg"  , 10, 0, 10));
+  h_necl_bg.push_back(new TH1D("h_necl_bg", "h_necl_bg", 10, 0, 10));
 
   //..Trigger ThetaID for each trigger cell. Could be replaced by getMaxThetaId() for newer MC
   TrgEclMapping* trgecl_obj = new TrgEclMapping();

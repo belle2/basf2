@@ -31,8 +31,8 @@ using namespace ECL;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(ECLFinalizer)
-REG_MODULE(ECLFinalizerPureCsI)
+REG_MODULE(ECLFinalizer);
+REG_MODULE(ECLFinalizerPureCsI);
 
 //-----------------------------------------------------------------
 //                 Implementation

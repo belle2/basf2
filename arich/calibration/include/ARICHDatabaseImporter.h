@@ -52,7 +52,7 @@ namespace Belle2 {
      */
     virtual ~ARICHDatabaseImporter() {};
 
-    void SetIOV(int experimentLow, int runLow, int experimentHigh , int runHigh);
+    void SetIOV(int experimentLow, int runLow, int experimentHigh, int runHigh);
 
     void setExperimentAndRun(int experiment, int run);
 

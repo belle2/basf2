@@ -57,11 +57,11 @@ void SVDEventT0EstimatorModule::initialize()
 void SVDEventT0EstimatorModule::event()
 {
 
-  double evtT0 = NAN;
-  double evtT0_err = NAN;
-  double clsTime_sum = 0;
-  double clsTime_err_sum = 0;
-  double quality = NAN;
+  double evtT0 = std::numeric_limits<double>::quiet_NaN();
+  double evtT0Err = std::numeric_limits<double>::quiet_NaN();
+  double clsTimeSum = 0;
+  double clsTimeErrSum = 0;
+  double quality = std::numeric_limits<double>::quiet_NaN();
   int numberOfSVDClusters = 0;
 
   // loop on recotracks
@@ -71,8 +71,8 @@ void SVDEventT0EstimatorModule::event()
     const vector<SVDCluster* >& svdClusters = recoTrack.getSVDHitList();
     B2DEBUG(20, "FITTED TRACK:   NUMBER OF SVD HITS = " << svdClusters.size());
     for (const SVDCluster* svdCluster : svdClusters) {
-      clsTime_sum += svdCluster->getClsTime();
-      clsTime_err_sum += (svdCluster->getClsTimeSigma() * svdCluster->getClsTimeSigma());
+      clsTimeSum += svdCluster->getClsTime();
+      clsTimeErrSum += (svdCluster->getClsTimeSigma() * svdCluster->getClsTimeSigma());
     }
     numberOfSVDClusters += svdClusters.size();
   }
@@ -82,18 +82,18 @@ void SVDEventT0EstimatorModule::event()
 
   // otherwise, eventT0 is the average of cluster times
   // using clusters associated to selected tracks
-  evtT0 = clsTime_sum / numberOfSVDClusters;
+  evtT0 = clsTimeSum / numberOfSVDClusters;
   quality = numberOfSVDClusters;
 
   // now compute the error
   if (numberOfSVDClusters > 1)
-    evtT0_err = std::sqrt(clsTime_err_sum / (numberOfSVDClusters * (numberOfSVDClusters - 1)));
+    evtT0Err = std::sqrt(clsTimeErrSum / (numberOfSVDClusters * (numberOfSVDClusters - 1)));
   else
-    evtT0_err = std::sqrt(clsTime_err_sum);
+    evtT0Err = std::sqrt(clsTimeErrSum);
 
   // and finally set a temporary EventT0
-  EventT0::EventT0Component evtT0_comp(evtT0, evtT0_err, Const::SVD, m_algorithm, quality);
-  m_eventT0->addTemporaryEventT0(evtT0_comp);
-  m_eventT0->setEventT0(evtT0_comp);
+  EventT0::EventT0Component evtT0Component(evtT0, evtT0Err, Const::SVD, m_algorithm, quality);
+  m_eventT0->addTemporaryEventT0(evtT0Component);
+  m_eventT0->setEventT0(evtT0Component);
 
 }

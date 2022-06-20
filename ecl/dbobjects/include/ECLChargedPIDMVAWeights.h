@@ -310,9 +310,9 @@ namespace Belle2 {
 
   private:
 
-    TParameter<float> m_temperature; /**< calibration factor for MVA responses. Follows arXiv:1706.04599 */
     TParameter<float> m_log_transform_offset; /**< Small offset to avoid mva response values of 1.0 being log transformed to NaN. */
     TParameter<float> m_max_possible_response_value; /**< Max possible value of the mva response. Used in the log transformation. */
+    TParameter<float> m_temperature; /**< calibration factor for MVA responses. Follows arXiv:1706.04599 */
 
     /**
      * Serialsed MVA weightfile.

@@ -117,7 +117,7 @@ namespace Belle2 {
     }
 
     /** Set track time computed as the difference between the average of SVD clusters time and the SVD EventT0 */
-    void setTrackTime(const float track_time)
+    void setTrackTime(float track_time)
     {
       m_trackTime = track_time;
     }

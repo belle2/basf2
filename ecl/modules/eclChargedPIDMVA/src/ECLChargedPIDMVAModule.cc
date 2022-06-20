@@ -32,6 +32,7 @@
 #include "TMath.h"
 
 using namespace Belle2;
+typedef ECLChargedPIDPhasespaceCategory::MVAResponseTransformMode transformModes;
 
 REG_MODULE(ECLChargedPIDMVA);
 
@@ -61,7 +62,6 @@ void ECLChargedPIDMVAModule::checkDBPayloads()
 {
   if (!m_mvaWeights) {B2FATAL("No ECLChargedPidMVAWeights payload found in database!");}
 }
-
 
 void ECLChargedPIDMVAModule::initializeMVA()
 {
@@ -106,7 +106,6 @@ void ECLChargedPIDMVAModule::initializeMVA()
   }
 }
 
-
 void ECLChargedPIDMVAModule::beginRun()
 {
   (*m_mvaWeights.get()).addCallback([this]() { checkDBPayloads();});
@@ -147,6 +146,7 @@ void ECLChargedPIDMVAModule::event()
 
     // Get the phasespaceCategory
     const auto phasespaceCategory = (*m_mvaWeights.get())->getPhasespaceCategory(linearCategoryIndex);
+    const auto transformMode = phasespaceCategory->getTransformMode();
 
     // Fill the feature vectors
     unsigned int nvars = m_variables.at(linearCategoryIndex).size();
@@ -163,10 +163,8 @@ void ECLChargedPIDMVAModule::event()
     // is heavily peaked at 0 and 1 into a smooth curve.
     // We can then evaluate the likelihoods from this curve directly or further transform the responses.
     for (unsigned int iResponse = 0; iResponse < scores.size(); iResponse++) {
-      if ((phasespaceCategory->getTransformMode() !=
-           ECLChargedPIDPhasespaceCategory::MVAResponseTransformMode::c_DirectMVAResponse) and
-          (phasespaceCategory->getTransformMode() !=
-           ECLChargedPIDPhasespaceCategory::MVAResponseTransformMode::c_LogMVAResponse)) {
+      if ((transformMode != transformModes::c_DirectMVAResponse) and
+          (transformMode != transformModes::c_LogMVAResponse)) {
         scores[iResponse] = logTransformation(scores[iResponse],
                                               phasespaceCategory->getLogTransformOffset(),
                                               phasespaceCategory->getMaxPossibleResponseValue());
@@ -190,32 +188,25 @@ void ECLChargedPIDMVAModule::event()
       transformed_scores = scores;
 
       // Perform extra transformations if they are booked
-      if ((phasespaceCategory->getTransformMode() ==
-           ECLChargedPIDPhasespaceCategory::MVAResponseTransformMode::c_GaussianTransform)
-          or
-          (phasespaceCategory->getTransformMode() ==
-           ECLChargedPIDPhasespaceCategory::MVAResponseTransformMode::c_DecorrelationTransform)) {
+      if ((transformMode == transformModes::c_GaussianTransform) or
+          (transformMode == transformModes::c_DecorrelationTransform)) {
 
         // Gaussian transform
         for (unsigned int iResponse = 0; iResponse < scores.size(); iResponse++) {
           transformed_scores[iResponse] = gaussTransformation(scores[iResponse], phasespaceCategory->getCDF(absPdgId,  iResponse));
         }
-        if (phasespaceCategory->getTransformMode() ==
-            ECLChargedPIDPhasespaceCategory::MVAResponseTransformMode::c_DecorrelationTransform) {
+        if (transformMode == transformModes::c_DecorrelationTransform) {
           transformed_scores = decorrTransformation(transformed_scores, phasespaceCategory->getDecorrelationMatrix(absPdgId));
         }
       }
 
       // Get the pdf values for each response value
       float logL = 0.0;
-      if ((phasespaceCategory->getTransformMode() ==
-           ECLChargedPIDPhasespaceCategory::MVAResponseTransformMode::c_DirectMVAResponse) or
-          (phasespaceCategory->getTransformMode() ==
-           ECLChargedPIDPhasespaceCategory::MVAResponseTransformMode::c_LogMVAResponse)) {
+      if ((transformMode == transformModes::c_DirectMVAResponse) or
+          (transformMode == transformModes::c_LogMVAResponse)) {
 
         logLikelihoods[hypo_idx] = scores[phasespaceCategory->getMVAIndexForHypothesis(absPdgId)];
-        if (phasespaceCategory->getTransformMode() ==
-            ECLChargedPIDPhasespaceCategory::MVAResponseTransformMode::c_LogMVAResponse) {
+        if (transformMode == transformModes::c_LogMVAResponse) {
           logLikelihoods[hypo_idx] = (std::isnormal(logLikelihoods[hypo_idx])
                                       && logLikelihoods[hypo_idx] > 0) ? std::log(logLikelihoods[hypo_idx]) : c_dummyLogL;
         }
@@ -225,9 +216,8 @@ void ECLChargedPIDMVAModule::event()
       B2DEBUG(12, "MVA Index for hypo " << absPdgId << " : " << phasespaceCategory->getMVAIndexForHypothesis(absPdgId));
 
       for (unsigned int iResponse = 0; iResponse < transformed_scores.size(); iResponse++) {
-        if ((phasespaceCategory->getTransformMode() ==
-             ECLChargedPIDPhasespaceCategory::MVAResponseTransformMode::c_LogTransformSingle)
-            and (phasespaceCategory->getMVAIndexForHypothesis(absPdgId) != iResponse)) {continue;}
+        if ((transformMode == transformModes::c_LogTransformSingle) and
+            (phasespaceCategory->getMVAIndexForHypothesis(absPdgId) != iResponse)) {continue;}
 
         double xmin, xmax;
         phasespaceCategory->getPDF(iResponse, absPdgId)->GetRange(xmin, xmax);

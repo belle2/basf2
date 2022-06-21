@@ -13,14 +13,14 @@
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
 
-bool Belle2::generators::initializeEvtGenDecayFile(
+bool Belle2::generators::checkEvtGenDecayFile(
   const std::string& decayFile)
 {
   const std::string defaultDecFile =
     FileSystem::findFile("decfiles/dec/DECAY_BELLE2.DEC", true);
   if (decayFile.empty()) {
     B2ERROR("No global decay file defined, please make sure "
-            "the parameter 'DecFile' is set correctly.");
+            "the decay-file parameter is set correctly.");
     return false;
   }
   if (defaultDecFile.empty()) {

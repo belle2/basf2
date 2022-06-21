@@ -58,7 +58,7 @@ void EvtGenInputModule::initialize()
 {
   StoreArray<MCParticle> mcparticle;
   mcparticle.registerInDataStore();
-  generators::initializeEvtGenDecayFile(m_DECFileName);
+  generators::checkEvtGenDecayFile(m_DECFileName);
   // Initial particle for beam parameters.
   m_initial.initialize();
 }

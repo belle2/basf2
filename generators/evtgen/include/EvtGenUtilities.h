@@ -16,11 +16,11 @@ namespace Belle2 {
   namespace generators {
 
     /**
-     * Initialize EvtGen decay file.
+     * Check EvtGen decay file name.
      * @param[in] decayFile Decay file.
      * @return True if the file is set up correctly.
      */
-    bool initializeEvtGenDecayFile(const std::string& decayFile);
+    bool checkEvtGenDecayFile(const std::string& decayFile);
 
   }
 

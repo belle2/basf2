@@ -48,7 +48,7 @@ void EvtGenDecayModule::initialize()
 {
   StoreArray<MCParticle> mcParticles(m_MCParticleColName);
   mcParticles.isRequired();
-  generators::initializeEvtGenDecayFile(m_DecFile);
+  generators::checkEvtGenDecayFile(m_DecFile);
 }
 
 void EvtGenDecayModule::beginRun()

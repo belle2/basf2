@@ -24,7 +24,8 @@ import torch.optim as optim
 
 import numpy as np
 
-from os.path import join
+from os import makedirs
+from os.path import join, dirname
 from tqdm.auto import tqdm
 
 
@@ -158,8 +159,8 @@ class WeightNet(nn.Module):
             for i, pdg in enumerate(PDG_CODES):
                 if pdg in only:
                     continue
-                self.fcs[i].weight.fill_(0)
                 self.fcs[i].weight.requires_grad = False
+                self.fcs[i].weight.fill_(1)
 
 
 def load_training_data(directory, p_lims=None, theta_lims=None, device=None):
@@ -259,6 +260,7 @@ def save_checkpoint(filename, net, opt, epoch, loss_t, loss_v, accu_t, accu_v):
             from every tenth epoch.
     """
     net.cpu()
+    makedirs(dirname(filename), exist_ok=True)
     torch.save(
         {
             "model_state_dict": net.state_dict(),

@@ -68,12 +68,6 @@ class CNN_PID_ECL(b2.Module):
         torch.manual_seed(1234)
         self.device = torch.device('cpu')
 
-        self.charge = 'plus'
-        self.model_plus = self.read_model()
-
-        self.charge = 'minus'
-        self.model_minus = self.read_model()
-
     def initialize(self):
         """ Initialize necessary arrays and/or objects """
 
@@ -82,6 +76,15 @@ class CNN_PID_ECL(b2.Module):
         self.eclCnnMuon = self.Belle2.PyStoreArray('ECLCNNPid')
         self.tracks = self.Belle2.PyStoreArray('Track')
         self.tracks.registerRelationTo(self.eclCnnMuon)
+
+    def beginRun(self):
+        """ Read CNN payloads which include weights and biases """
+
+        self.charge = 'plus'
+        self.model_plus = self.read_model()
+
+        self.charge = 'minus'
+        self.model_minus = self.read_model()
 
     def event(self):
         """ Event processing
@@ -96,7 +99,7 @@ class CNN_PID_ECL(b2.Module):
 
         variable_muon = 'cnn_pid_ecl_muon'
 
-        for i, track in enumerate(self.tracks):
+        for track in self.tracks:
 
             fit_result = track.getTrackFitResultWithClosestMass(self.Belle2.Const.pion)
             if not fit_result:

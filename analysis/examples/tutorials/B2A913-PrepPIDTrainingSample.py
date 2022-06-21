@@ -19,12 +19,14 @@
 import basf2 as b2
 import root_pandas as rtp
 import pidDataUtils as pdu
+from os import makedirs
 
 # Read data into DataFrame
 df = rtp.read_root(b2.find_file('mc_dstar.root', 'examples', False))
 print("ROOT file read into DataFrame.")
 
 # Make slim h5 files for each particle type and merge into one large file
+makedirs('data', exist_ok=True)
 pdu.make_h5(df, ['DST_D0_pi', 'DST_pi'], 'data/slim_dstar_pion.h5', pdg=211)
 print("Slim h5 file made at data/slim_dstar_pion.h5")
 

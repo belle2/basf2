@@ -53,7 +53,10 @@ def _make_const_lists():
     return PARTICLES, PDG_CODES, DETECTORS
 
 
-PARTICLES, PDG_CODES, DETECTORS = _make_const_lists()
+# PARTICLES, PDG_CODES, DETECTORS = _make_const_lists()
+PARTICLES = ["e", "mu", "pi", "K", "p", "d"]
+PDG_CODES = [11, 13, 211, 321, 2212, 1000010020]
+DETECTORS = ["SVD", "CDC", "TOP", "ARICH", "ECL", "KLM"]
 
 
 class WeightNet(nn.Module):

@@ -38,7 +38,10 @@ def _make_const_lists():
     return PARTICLES, PDG_CODES, DETECTORS
 
 
-PARTICLES, PDG_CODES, DETECTORS = _make_const_lists()
+# PARTICLES, PDG_CODES, DETECTORS = _make_const_lists()
+PARTICLES = ["e", "mu", "pi", "K", "p", "d"]
+PDG_CODES = [11, 13, 211, 321, 2212, 1000010020]
+DETECTORS = ["SVD", "CDC", "TOP", "ARICH", "ECL", "KLM"]
 
 P_BINS = np.array([0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.5])
 THETA_BINS = np.radians(np.array([17, 28, 40, 60, 77, 96, 115, 133, 150]))

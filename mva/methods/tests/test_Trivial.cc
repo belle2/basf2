@@ -25,21 +25,30 @@ namespace {
     EXPECT_EQ(specific_options.m_output, 0.5);
 
     specific_options.m_output = 0.1;
+    specific_options.m_multiple_output = {1.0, 2.0, 3.0};
 
     boost::property_tree::ptree pt;
     specific_options.save(pt);
     EXPECT_FLOAT_EQ(pt.get<double>("Trivial_output"), 0.1);
 
+    EXPECT_FLOAT_EQ(pt.get<unsigned int>("Trivial_number_of_multiple_outputs"), 3);
+    EXPECT_FLOAT_EQ(pt.get<double>("Trivial_multiple_output0"), 1.0);
+    EXPECT_FLOAT_EQ(pt.get<double>("Trivial_multiple_output1"), 2.0);
+    EXPECT_FLOAT_EQ(pt.get<double>("Trivial_multiple_output2"), 3.0);
+
     MVA::TrivialOptions specific_options2;
     specific_options2.load(pt);
 
     EXPECT_EQ(specific_options2.m_output, 0.1);
+    EXPECT_EQ(specific_options2.m_multiple_output.at(0), 1.0);
+    EXPECT_EQ(specific_options2.m_multiple_output.at(1), 2.0);
+    EXPECT_EQ(specific_options2.m_multiple_output.at(2), 3.0);
 
     EXPECT_EQ(specific_options.getMethod(), std::string("Trivial"));
 
     // Test if po::options_description is created without crashing
     auto description = specific_options.getDescription();
-    EXPECT_EQ(description.options().size(), 1);
+    EXPECT_EQ(description.options().size(), 2);
 
     // Check for B2ERROR and throw if version is wrong
     // we try with version 100, surely we will never reach this!
@@ -70,7 +79,6 @@ namespace {
     std::vector<float> getFeature(unsigned int) override { return m_data; }
 
     std::vector<float> m_data;
-
   };
 
 

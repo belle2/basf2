@@ -36,8 +36,7 @@ print(weights)
 
 
 def compute_accuracy(df, mask=None):
-    if mask:
-        _df = df.loc[mask]
+    _df = df.loc[mask] if mask is not None else df
     return (_df['pid'] == _df['labels']).values.sum() / len(_df)
 
 

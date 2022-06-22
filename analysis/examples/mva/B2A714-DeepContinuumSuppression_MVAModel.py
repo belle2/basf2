@@ -209,7 +209,7 @@ def begin_fit(state, Xtest, Stest, ytest, wtest):
     return state
 
 
-def partial_fit(state, X, S, y, w, epoch):
+def partial_fit(state, X, S, y, w, epoch, batch):
     """
     Fit the model.
     For every training step of MLP. Adverserial Network (if used) will be trained K times.

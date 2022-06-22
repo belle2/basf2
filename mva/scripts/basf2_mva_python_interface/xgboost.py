@@ -27,6 +27,7 @@ class State(object):
     """
     XGBoost state
     """
+
     def __init__(self, num_round=0, parameters=None):
         """ Constructor of the state object """
         #: Parameters passed to xgboost model
@@ -94,7 +95,7 @@ def begin_fit(state, Xtest, Stest, ytest, wtest):
     return state
 
 
-def partial_fit(state, X, S, y, w, epoch):
+def partial_fit(state, X, S, y, w, epoch, batch):
     """
     Stores received training data.
     XGBoost is usually not able to perform a partial fit.

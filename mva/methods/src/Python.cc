@@ -271,8 +271,13 @@ namespace Belle2 {
 
         uint64_t nBatches = std::floor(numberOfTrainingEvents / batch_size);
         bool continue_loop = true;
+
         for (uint64_t iIteration = 0; (iIteration < m_specific_options.m_nIterations or m_specific_options.m_nIterations == 0)
              and continue_loop; ++iIteration) {
+
+          // shuffle the indices on each iteration to get randomised batches
+          if (iIteration > 0) std::shuffle(std::begin(iteration_index_vector), std::end(iteration_index_vector), rng);
+
           for (uint64_t iBatch = 0; iBatch < nBatches and continue_loop; ++iBatch) {
 
             // Release Global Interpreter Lock in python to allow multithreading while reading root files
@@ -302,7 +307,7 @@ namespace Belle2 {
             // Reactivate Global Interpreter Lock to safely execute python code
             PyEval_RestoreThread(m_thread_state);
             auto r = framework.attr("partial_fit")(state, ndarray_X, ndarray_S, ndarray_y,
-                                                   ndarray_w, iIteration * nBatches + iBatch);
+                                                   ndarray_w, iIteration, iBatch);
             boost::python::extract<bool> proxy(r);
             if (proxy.check())
               continue_loop = static_cast<bool>(proxy);

@@ -157,6 +157,9 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
             return - tf.reduce_sum(w * tf.math.log(diff_from_truth + epsilon)) / tf.reduce_sum(w)
 
     state = State(model=my_model())
+    state.epoch = 0
+    state.avg_costs = []  # keeps track of the avg costs per batch over an epoch
+
     return state
 
 
@@ -169,7 +172,7 @@ def begin_fit(state, Xtest, Stest, ytest, wtest):
     return state
 
 
-def partial_fit(state, X, S, y, w, epoch):
+def partial_fit(state, X, S, y, w, epoch, batch):
     """Pass received data to tensorflow session"""
 
     def variable_is_trainable(var, parameters, pre_training=False):
@@ -189,11 +192,15 @@ def partial_fit(state, X, S, y, w, epoch):
         with tf.GradientTape() as tape:
             avg_cost = state.model.loss(state.model.pre_train(S), y, w)
             grads = tape.gradient(avg_cost, pre_trainable_variables)
-
         state.model.pre_optimizer.apply_gradients(zip(grads, pre_trainable_variables))
 
-        if epoch % 1000 == 0:
-            print("Pre-Training: Epoch:", '%04d' % (epoch), "cost=", "{:.9f}".format(avg_cost))
+        if state.epoch == epoch:
+            state.avg_costs.append()
+        else:
+            # started a new epoch, reset the avg_costs and update the counter
+            print(f"Pre-Training: Epoch: {epoch-1:05d}, cost={np.mean(state.avg_costs):.5f}")
+            state.avg_costs = [avg_cost]
+            state.epoch = epoch
 
     # Training of the whole network.
     else:
@@ -206,9 +213,19 @@ def partial_fit(state, X, S, y, w, epoch):
 
         state.model.optimizer.apply_gradients(zip(grads, trainable_variables))
 
-        if epoch % 1000 == 0:
-            print("Epoch:", '%04d' % (epoch), "cost=", "{:.9f}".format(avg_cost))
-            return EARLY_STOPPER.check(avg_cost)
+        if state.epoch == epoch:
+            state.avg_costs.append()
+        else:
+            # started a new epoch, reset the avg_costs and update the counter
+            if epoch == state.model.parameters['pre_training_epochs']:
+                print(f"Pre-Training: Epoch: {epoch-1:05d}, cost={np.mean(state.avg_costs):.5f}")
+            else:
+                print(f"Epoch: {epoch-1:05d}, cost={np.mean(state.avg_costs):.5f}")
+
+            early_stopper_flag = EARLY_STOPPER.check(np.mean(state.avg_costs))
+            state.avg_costs = [avg_cost]
+            state.epoch = epoch
+            return early_stopper_flag
     return True
 
 
@@ -298,7 +315,7 @@ if __name__ == "__main__":
 
         print('Train relational net with pre-training')
         general_options.m_identifier = os.path.join(path, 'relation_2.xml')
-        specific_options.m_config = json.dumps({'use_relations': True, 'use_feed_forward': False, 'pre_training_epochs': 3000})
+        specific_options.m_config = json.dumps({'use_relations': True, 'use_feed_forward': False, 'pre_training_epochs': 10})
         basf2_mva.teacher(general_options, specific_options)
 
         print('Train feed forward net')

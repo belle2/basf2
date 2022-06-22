@@ -123,12 +123,12 @@ def begin_fit(state, Xtest, Stest, ytest, wtest):
     return state
 
 
-def partial_fit(state, X, S, y, w, epoch):
+def partial_fit(state, X, S, y, w, epoch, batch):
     """
     Put data in the queue.
     """
     state.queue.enqueue_many([X, w, y])
-    print("Queue Epoch: %d, Queue Size: %d" % (epoch, state.queue.size()))
+    print("Queue Epoch: %d, Queue Batch: %d, Queue Size: %d" % (epoch, batch, state.queue.size()))
     return True
 
 

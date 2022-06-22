@@ -71,7 +71,7 @@ def begin_fit(state, Xtest, Stest, ytest, wtest):
     return state
 
 
-def partial_fit(state, X, S, y, w, epoch):
+def partial_fit(state, X, S, y, w, epoch, batch):
     """
     Can be called multiple times per training depending on the user configuration:
     If m_nIterations == 1 and m_mini_batch_size == 0 (these are the default values)
@@ -92,7 +92,8 @@ def partial_fit(state, X, S, y, w, epoch):
     @param S numpy array containing the spectators of the training sample
     @param y numpy array containing the target values of the training sample
     @param w numpy array containing the weights of the training sample
-    @param epoch the total number of previous calls to partial_fit
+    @param epoch the index of the current iteration through the total data set.
+    @param batch the index of the current mini batch passed to partial_fit
 
     Since our method doesn't use the streaming capability,
     we just collect the data in our state object.

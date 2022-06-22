@@ -29,9 +29,9 @@ namespace TreeFitter {
                             m_customOriginCovariance({}),
                             m_originDimension(3),
                             m_headOfTreePDG(0),
-                            m_inflationFactorCovZ(1)
                             m_beamConstraint(0),
-                            {};
+                            m_inflationFactorCovZ(1)
+    {};
 
     /** constructor */
     ConstraintConfiguration(const bool& massConstraintType,

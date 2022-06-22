@@ -261,9 +261,9 @@ namespace TreeFitter {
 
     const Belle2::DBObjPtr<Belle2::BeamParameters> beamparams;
 
-    const TLorentzVector& her = beamparams->getHER();
-    const TLorentzVector& ler = beamparams->getLER();
-    const TLorentzVector& cms = her + ler;
+    const ROOT::Math::PxPyPzEVector her = beamparams->getHER();
+    const ROOT::Math::PxPyPzEVector ler = beamparams->getLER();
+    const ROOT::Math::PxPyPzEVector cms = her + ler;
 
     Eigen::Matrix<double, 4, 1> beamMomE = Eigen::Matrix<double, 4, 1>::Zero();
     beamMomE(0) = cms.X();

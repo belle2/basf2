@@ -16,8 +16,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
 #include <fstream>
-#include <algorithm>
-#include <TRandom.h>
+#include <numeric>
 
 namespace Belle2 {
   namespace MVA {

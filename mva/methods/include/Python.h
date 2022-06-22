@@ -14,6 +14,8 @@
 #include <mva/interface/Teacher.h>
 #include <mva/interface/Expert.h>
 
+#include <TRandom.h>
+
 /**
  * Python headers include some weird stuff which
  * we don't want to be seen by CLING, otherwise there are
@@ -37,6 +39,7 @@
 #else
 #pragma GCC diagnostic pop
 #endif
+
 
 namespace Belle2 {
   namespace MVA {

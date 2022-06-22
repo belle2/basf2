@@ -16,8 +16,8 @@
 #include <mdst/dataobjects/Track.h>
 
 /**
- * Moudule doing the "merging" of the original RecoTracks, Tracks and TrackFitResults.
- * The contents in RecoTracks and TrackFitResults will be updated
+ * Module doing the "merging" of the RecoTracks, Tracks and TrackFitResults
+ * of the original and flipped ones.
  */
 namespace Belle2 {
   /// Module to copy RecoTracks.

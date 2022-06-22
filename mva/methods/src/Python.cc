@@ -171,7 +171,7 @@ namespace Belle2 {
       }
 
       if (batch_size > numberOfTrainingEvents) {
-        B2WARNING("Mini batch size (" << batch_size << ") is larger than the number of Training Events (" << numberOfTrainingEvents << ")"\
+        B2WARNING("Mini batch size (" << batch_size << ") is larger than the number of training events (" << numberOfTrainingEvents << ")"\
                   " The batch size has been set equal to the number of training events.");
         batch_size = numberOfTrainingEvents;
       };

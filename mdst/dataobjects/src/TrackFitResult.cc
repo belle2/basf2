@@ -82,16 +82,18 @@ TrackFitResult::TrackFitResult(const std::vector<float>& tau, const std::vector<
 
 void TrackFitResult::updateTrackFitResult(const TrackFitResult& input)
 {
+  // skip self-assigns
+  if (this == &input) return;
   m_pdg = input.m_pdg;
   m_pValue = input.m_pValue;
   m_NDF = input.m_NDF;
   m_hitPatternCDCInitializer = input.m_hitPatternCDCInitializer;
   m_hitPatternVXDInitializer = input.m_hitPatternVXDInitializer;
 
-  for (unsigned int i = 0; i < c_NPars; ++i)
-    m_tau[i] = input.m_tau[i];
-  for (unsigned int i = 0; i < c_NCovEntries; ++i)
-    m_cov5[i] = input.m_cov5[i];
+  std::copy(std::begin(input.m_tau), std::end(input.m_tau), std::begin(this->m_tau));
+
+  std::copy(std::begin(input.m_cov5), std::end(input.m_cov5), std::begin(this->m_cov5));
+
 }
 
 int TrackFitResult::getNDF() const

@@ -34,7 +34,7 @@ namespace Belle2 {
   {
     // If the identifier does not end on .root or .xml, we are dealing with a database identifier
     // so we need to create a DBObjPtr, which will fetch the weightfile from the database
-    B2INFO("init he FlipQualityModule");
+    B2INFO("init the FlipQualityModule");
     m_recoTracks.isRequired(m_recoTracksStoreArrayName);
 
     if (m_flipMVAIndex == 1) {
@@ -62,7 +62,7 @@ namespace Belle2 {
     // It can happen that for example the database doesn't find the payload
     // and the expert ends up uninitialized.
     if (not m_mvaExpert) {
-      B2DEBUG(1, "MVA Expert is not loaded! I will return 0");
+      B2ERROR("MVA Expert is not loaded!");
       return;
     }
 

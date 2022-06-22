@@ -38,23 +38,22 @@ void FlippedRecoTracksMergerModule::event()
   Belle2::StoreArray<TrackFitResult> TrackFitResultsArray("TrackFitResults");
 
   // loop all the recoTracks
-  for (int ireco = 0; ireco <  m_inputRecoTracks.getEntries(); ireco++) {
+  for (RecoTrack& recoTrack : m_inputRecoTracks) {
 
-    RecoTrack* recoTrack = m_inputRecoTracks[ireco];
     // check if the recoTracks was fitted successfully
-    if (not recoTrack->wasFitSuccessful()) {
+    if (not recoTrack.wasFitSuccessful()) {
       continue;
     }
     // get the related Belle2::Tracks
-    Track* b2track = recoTrack->getRelatedFrom<Belle2::Track>();
+    Track* b2track = recoTrack.getRelatedFrom<Belle2::Track>();
 
     if (b2track) {
 
       // if the 2ndMVA was assigned, aka: passed the 1st MVA
-      if (recoTrack->get2ndFlipQualityIndicator() != -999) {
+      if (recoTrack.get2ndFlipQualityIndicator() != -999) {
 
         // get the related RecoTrack_flipped
-        RecoTrack* RecoTrack_flipped =  recoTrack->getRelatedFrom<Belle2::RecoTrack>("RecoTracks_flipped");
+        RecoTrack* RecoTrack_flipped =  recoTrack.getRelatedFrom<Belle2::RecoTrack>("RecoTracks_flipped");
 
         if (RecoTrack_flipped) {
 
@@ -65,7 +64,7 @@ void FlippedRecoTracksMergerModule::event()
             std::vector<Track::ChargedStableTrackFitResultPair> fitResultsBefore = b2track->getTrackFitResults();
 
             // pass the 2nd MVA cuts
-            if (recoTrack->get2ndFlipQualityIndicator() > m_2nd_mva_cut) {
+            if (recoTrack.get2ndFlipQualityIndicator() > m_2nd_mva_cut) {
               // loop over the original fitResults
               for (long unsigned int index = 0; index < fitResultsBefore.size() ; index++) {
                 // update the fitResults
@@ -79,18 +78,18 @@ void FlippedRecoTracksMergerModule::event()
               }
 
 
-              const auto& measuredStateOnPlane = recoTrack->getMeasuredStateOnPlaneFromLastHit();
+              const auto& measuredStateOnPlane = recoTrack.getMeasuredStateOnPlaneFromLastHit();
 
               TVector3 currentPosition = measuredStateOnPlane.getPos();
               TVector3 currentMomentum = measuredStateOnPlane.getMom();
               double currentCharge = measuredStateOnPlane.getCharge();
 
               // revert the charge and momentum
-              recoTrack->setChargeSeed(-currentCharge);
-              recoTrack->setPositionAndMomentum(currentPosition,  -currentMomentum);
+              recoTrack.setChargeSeed(-currentCharge);
+              recoTrack.setPositionAndMomentum(currentPosition,  -currentMomentum);
 
               // Reverse the SortingParameters
-              auto RecoHitInfos = recoTrack->getRecoHitInformations();
+              auto RecoHitInfos = recoTrack.getRecoHitInformations();
               for (auto RecoHitInfo : RecoHitInfos) {
                 RecoHitInfo->setSortingParameter(std::numeric_limits<unsigned int>::max() - RecoHitInfo->getSortingParameter());
               }

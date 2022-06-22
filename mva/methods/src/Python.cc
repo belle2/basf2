@@ -170,6 +170,12 @@ namespace Belle2 {
         batch_size = numberOfTrainingEvents;
       }
 
+      if (batch_size > numberOfTrainingEvents) {
+        B2WARNING("Mini batch size (" << batch_size << ") is larger than the number of Training Events (" << numberOfTrainingEvents << ")"\
+                  " The batch size has been set equal to the number of training events.");
+        batch_size = numberOfTrainingEvents;
+      };
+
       if (m_specific_options.m_training_fraction <= 0.0 or m_specific_options.m_training_fraction > 1.0) {
         B2ERROR("Please provide a positive training fraction");
         throw std::runtime_error("Please provide a training fraction between (0.0,1.0]");

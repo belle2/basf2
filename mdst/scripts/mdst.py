@@ -96,8 +96,7 @@ def add_mdst_dump(path, print_untested=False):
             "getRelationsWith": ["MCParticles"],
         }),
         DataStorePrinter("TrackFitResult", [
-            "maskThisFitResult", "getPosition",
-            "getMomentum", "get4Momentum", "getEnergy", "getTransverseMomentum",
+            "getPosition", "getMomentum", "get4Momentum", "getEnergy", "getTransverseMomentum",
             "getCovariance6", "getParticleType", "getChargeSign", "getPValue", "getD0", "getPhi0",
             "getPhi", "getOmega", "getZ0", "getTanLambda", "getCotTheta",
             "getTau", "getCov", "getCovariance5", "getHitPatternCDC", "getHitPatternVXD", "getNDF", "getChi2"

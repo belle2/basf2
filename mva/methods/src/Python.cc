@@ -275,9 +275,6 @@ namespace Belle2 {
         for (uint64_t iIteration = 0; (iIteration < m_specific_options.m_nIterations or m_specific_options.m_nIterations == 0)
              and continue_loop; ++iIteration) {
 
-          // shuffle the indices on each iteration to get randomised batches
-          if (iIteration > 0) std::shuffle(std::begin(iteration_index_vector), std::end(iteration_index_vector), rng);
-
           for (uint64_t iBatch = 0; iBatch < nBatches and continue_loop; ++iBatch) {
 
             // Release Global Interpreter Lock in python to allow multithreading while reading root files

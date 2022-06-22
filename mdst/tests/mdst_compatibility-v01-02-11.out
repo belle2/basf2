@@ -1,4 +1,4 @@
-[INFO] Steering file: mdst/tests/mdst_compatibility-v01-02-11.py
+[INFO] Steering file: mdst_compatibility-v01-02-11.py
 [INFO] The random number seed is set to "1"
 [INFO] Starting event processing, random seed is set to '1'
 [INFO] Added file ${BELLE2_SOFTWARE_DIR}/mdst/tests/mdst-v01-02-11.root
@@ -23,6 +23,8 @@ Untested method V0::getTrackIndices
 Untested method TrackFitResult::getHelix
 Untested method TrackFitResult::getInfoHTML
 Untested method TrackFitResult::getUncertainHelix
+Untested method TrackFitResult::maskThisFitResult
+Untested method TrackFitResult::updateTrackFitResult
 Untested method EventLevelTrackingInfo::getNVXDClustersInLayer
 Untested method EventLevelTrackingInfo::hasCDCSLayer
 Untested method EventLevelTrackingInfo::setCDCLayer

@@ -36,6 +36,9 @@ CHANGES since release-04-00-03:
 - TrackFitResult:
   + ndf
   + chi2
+  + remove the const classifier of TrackFitResults and add a function to update the contents
+  + updateTrackFitResult
+  + maskThisFitResult
 - ECLCluster:
   + getMinTrkDistanceID
 - EventLevelTriggerTimeInfo

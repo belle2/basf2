@@ -28,6 +28,9 @@ CHANGES since release-00-09-03:
 - TrackFitResult:
   + ndf
   + chi2
+  + remove the const classifier of TrackFitResults and add a function to update the contents
+  + updateTrackFitResult
+  + maskThisFitResult
 - TRGSummary:
   + getTimQuality added
   + isPoissonInInjectionVeto()

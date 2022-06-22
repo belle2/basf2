@@ -37,6 +37,9 @@ CHANGES since release-02-01-00:
 - TrackFitResult:
   + ndf
   + chi2
+  + remove the const classifier of TrackFitResults and add a function to update the contents
+  + updateTrackFitResult
+  + maskThisFitResult
 - Particle masses:
   * The particle masses have been updated to PDG 2020. As a result, the
     energies corresponding to the measured momenta became slightly different.

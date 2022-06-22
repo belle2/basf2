@@ -74,6 +74,9 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
             return - tf.reduce_sum(w * tf.math.log(diff_from_truth + epsilon)) / tf.reduce_sum(w)
 
     state = State(model=my_model())
+
+    state.epoch = 0
+    state.avg_costs = []  # keeps track of the avg costs per batch over an epoch
     return state
 
 
@@ -132,7 +135,7 @@ def begin_fit(state, Xtest, Stest, ytest, wtest):
     return state
 
 
-def partial_fit(state, X, S, y, w, epoch):
+def partial_fit(state, X, S, y, w, epoch, batch):
     """
     Pass batches of received data to tensorflow
     """
@@ -148,9 +151,14 @@ def partial_fit(state, X, S, y, w, epoch):
 
     state.model.optimizer.apply_gradients(zip(grads, state.model.trainable_variables))
 
-    # epoch = i_epoch * nBatches + iBatch
-    if epoch % 1000 == 0:
-        print(f"Epoch: {epoch:04d} cost= {avg_cost:.9f}")
+    if state.epoch == epoch:
+        state.avg_costs.append(avg_cost)
+    else:
+        # started a new epoch, print results of the last epoch, reset the avg_costs and update the counter
+        print(f"Epoch: {epoch-1:04d} cost= {np.mean(state.avg_costs):.9f}")
+        state.avg_costs = [avg_cost]
+        state.epoch = epoch
+
     if epoch == 100000:
         return False
     return True

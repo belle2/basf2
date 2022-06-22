@@ -122,9 +122,9 @@ def begin_fit(state, Xvalid, Svalid, yvalid, wvalid):
     return state
 
 
-def partial_fit(state, X, S, y, w, epoch):
+def partial_fit(state, X, S, y, w, epoch, batch):
     avg_cost = state.train_function(X, y) / len(y)
-    print("Epoch:", '%04d' % (epoch), "cost=", "{:.9f}".format(avg_cost))
+    print("Epoch:", '%04d' % (epoch), "Batch:", '%04d' % (batch), "cost=", "{:.9f}".format(avg_cost))
     return True
 
 

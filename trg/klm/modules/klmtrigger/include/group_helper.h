@@ -1,10 +1,3 @@
-/**************************************************************************
- * basf2 (Belle II Analysis Software Framework)                           *
- * Author: The Belle II Collaboration                                     *
- *                                                                        *
- * See git log for contributors and copyright holders.                    *
- * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
- **************************************************************************/
 #pragma once
 #include <type_traits>
 #include <unordered_map>
@@ -12,8 +5,45 @@
 #include <numeric>
 #include <vector>
 #include <tuple>
+#include <iostream>
+
 
 namespace Belle2::group_helper {
+  inline std::string root_type_name(int)
+  {
+    return "I";
+  }
+
+  inline std::string root_type_name(double)
+  {
+    return "D";
+  }
+  inline std::string root_type_name(float)
+  {
+    return "F";
+  }
+  inline std::string root_type_name(int64_t)
+  {
+    return "L";
+  }
+  inline std::string root_type_name(uint64_t)
+  {
+    return "l";
+  }
+
+
+  template <typename T, typename Tuple>
+  struct has_type;
+
+  template <typename T>
+  struct has_type<T, std::tuple<>> : std::false_type {};
+
+  template <typename T, typename U, typename... Ts>
+  struct has_type<T, std::tuple<U, Ts...>> : has_type<T, std::tuple<Ts...>> {};
+
+  template <typename T, typename... Ts>
+  struct has_type<T, std::tuple<T, Ts...>> : std::true_type {};
+
 
   template <class _Ty>
   using _Remove_cvref_t = std::remove_cv_t<std::remove_reference_t<_Ty>>;
@@ -35,7 +65,7 @@ namespace Belle2::group_helper {
   };
 
 
-#define  AXIS_NAME(name_, type_) \
+#define  AXIS_NAME1(name_, type_, name_str) \
   struct name_; \
   struct name_ : axis_name_t<type_> { \
     name_(type_ val) : axis_name_t<type_>(val) {}  \
@@ -43,17 +73,44 @@ namespace Belle2::group_helper {
     name_(const std::tuple <T1...> & val) :name_( std::get<name_>(val)) {}  \
     name_() = default; \
     template <typename T1> \
-    auto operator()(const T1& val){ \
-      m_value = std::get<name_>(val); \
-      return *this; \
+    auto operator()(const T1& val) const{ \
+      return std::get<name_>(val); \
     } \
     template <typename T1>\
     auto operator==(const  T1& rhs ) const -> decltype( std::get<name_>(rhs) == m_value ){\
       return std::get<name_>(rhs) == m_value ;\
     }\
-  };
+    friend inline std::string __get__name__(const name_&){ return name_str ;}\
+    friend inline std::string __get__name__and_type(const name_&){ return std::string(name_str) +"/"+ root_type_name(type_{});}\
+  }
 
 
+
+#define  AXIS_NAME(name_, type_)  AXIS_NAME1(name_, type_, #name_ )
+
+
+
+
+
+
+  template <size_t N, typename... T>
+  void  tuple_print(std::ostream& out, const std::tuple<T...>& tup)
+  {
+    if constexpr(N < std::tuple_size<std::tuple<T...>>::value) {
+      out << __get__name__(std::get<N>(tup)) << ": " << std::get<N>(tup) << "| ";
+      tuple_print < N + 1 > (out, tup);
+    }
+
+
+  }
+  template <typename... T>
+  std::ostream& operator<<(std::ostream& out, const std::tuple<T...>& tup)
+  {
+    out << "| ";
+    tuple_print<0>(out, tup);
+
+    return out;
+  }
 
 
   template <typename T, typename... FUNC_T>
@@ -152,6 +209,43 @@ namespace Belle2::group_helper {
       return ret;
     }
 
+    template <typename VEC_T, typename FUNC_T>
+    static auto apply1(const std::vector<VEC_T>& vec, FUNC_T&&  fun)
+    {
+
+
+      std::vector <
+      decltype(
+        tuple_cat(
+          std::make_tuple(std::get<T>(*vec.begin())...),
+          fun(__range__(std::begin(vec), std::end(vec)))
+        )
+      )
+      > ret;
+      if (vec.empty()) {
+        return ret;
+      }
+      auto tail = std::begin(vec);
+
+      for (auto head = std::begin(vec); head != std::end(vec); ++head) {
+        if (!group<T...>::__isEequal<VEC_T, T...>(*head, *tail)) {
+
+
+          auto t = tuple_cat(
+                     std::make_tuple(std::get<T>(*tail)...),
+                     fun(__range__(tail, head))
+                   );
+
+          ret.push_back(t);
+          tail = head;
+        }
+      }
+
+      auto t = tuple_cat(std::make_tuple(std::get<T>(*tail)...), fun(__range__(tail, std::end(vec))));
+      ret.push_back(t);
+      return ret;
+    }
+
     template <typename A1, typename... ARGGS>
     struct __get_element {
 
@@ -221,6 +315,12 @@ namespace Belle2::group_helper {
   void drop_duplicates(CONTAINER_T& container)
   {
     container.erase(std::unique(container.begin(), container.end()), container.end());
+  }
+
+  template <typename CONTAINER_T, typename FUNCTION_T>
+  bool contains(const CONTAINER_T& container, FUNCTION_T&& fun)
+  {
+    return std::find_if(container.begin(), container.end(), fun) == container.end();
   }
 
   struct plus {
@@ -294,4 +394,54 @@ namespace Belle2::group_helper {
     }
     return ret;
   }
+
+  template <typename CONTAINER_T, typename CONDITION_T>
+  auto get_first(const  CONTAINER_T& container, const CONDITION_T& con)
+  {
+
+    for (const auto& e : container) {
+      if (con == e) {
+        return e;
+      }
+    }
+    return decltype(container[0]) {};
+  }
+
+  struct Compare_true {
+    template<typename T1, typename T2>
+    constexpr bool operator()(T1&&, T2&&) const noexcept
+    {
+      return true;
+    }
+
+  };
+
+  struct to_pair {
+    template<typename T1, typename T2>
+    constexpr auto operator()(T1&& t1, T2&& t2) const noexcept
+    {
+      return std::make_pair(t1, t2);
+    }
+  };
+
+
+
+  template <typename T1, typename T2, typename Comparision_T = Compare_true, typename projecttion_t = to_pair>
+  auto vec_join(const T1& t1, const T2& t2, Comparision_T comp = Compare_true(), projecttion_t project = to_pair())
+  {
+    std::vector<  decltype(project(t1[0], t2[0]))  > ret;
+    for (const auto& e1 : t1) {
+      for (const auto& e2 : t2) {
+        if (comp(e1, e2)) {
+          ret.push_back(project(e1, e2));
+        }
+      }
+    }
+    return ret;
+  }
+
+
+
+
+
 }

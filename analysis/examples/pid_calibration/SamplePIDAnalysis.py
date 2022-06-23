@@ -12,7 +12,7 @@
 # This tutorial shows how to kick off an analysis using a trained set of #
 # PID calibration weights. Only the computation of overall accuracy and  #
 # the pi and K efficiencies is shown. This is intended to be used after  #
-# B2A913-PrepPIDTrainingSample.py and training a set of weights.         #
+# PrepPIDTrainingSample.py and training a set of weights.                #
 ##########################################################################
 
 import pidDataUtils as pdu

@@ -13,7 +13,7 @@
 # calibration weights. After completing the tutorial, you can train the  #
 # weights using the pidTrainWeights script, e.g.                         #
 # $ python /path/to/release/analysis/scripts/pidTrainWeights.py \        #
-#       ./data/slim_dstar ./models/net.pt -n 1000                        #
+#       ./data/slim_dstar ./models/net.pt -n 100 --only 211 321          #
 ##########################################################################
 
 import basf2 as b2

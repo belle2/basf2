@@ -136,6 +136,8 @@ void ParticleLoaderModule::initialize()
       string listName = mother->getName() + ":all";
       // ROE particles get the full name
       if (m_useROEs) listName = mother->getFullName();
+      // dummy particles get the full name
+      else if (m_useDummy) listName = mother->getFullName();
       // MC particles get the label "MC"
       else if (m_useMCParticles) listName = mother->getName() + ":MC";
       // V0s get the label "V0"
@@ -277,6 +279,7 @@ void ParticleLoaderModule::terminate()
     }
 }
 
+
 void ParticleLoaderModule::dummyToParticles()
 {
   if (m_Dummies2Plists.empty()) // nothing to do
@@ -325,6 +328,7 @@ void ParticleLoaderModule::dummyToParticles()
     if (m_dummyTreatAsInvisble) newAntiPart->writeExtraInfo("treeFitterTreatMeAsInvisible", 1);
     plist->addParticle(newAntiPart);
   }
+
 }
 
 

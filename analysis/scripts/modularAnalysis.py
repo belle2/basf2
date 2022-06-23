@@ -1169,7 +1169,7 @@ def fillParticleListFromDummy(decayString,
 
     pload = register_module('ParticleLoader')
     pload.set_name('ParticleLoader_' + decayString)
-    pload.param('decayStringsWithCuts', [(decayString, "")])
+    pload.param('decayStrings', [decayString])
     pload.param('useDummy', True)
     pload.param('dummyMDSTIndex', mdstIndex)
     pload.param('dummyCovMatrix', covMatrix)

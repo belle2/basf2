@@ -80,6 +80,19 @@ ParticleLoaderModule::ParticleLoaderModule() : Module()
   addParam("enforceFitHypothesis", m_enforceFitHypothesis,
            "If true, a Particle is only created if a track fit with the particle hypothesis passed to the ParticleLoader is available.",
            m_enforceFitHypothesis);
+
+  addParam("useDummy", m_useDummy,
+           "Use Dummy instead of reconstructed MDST dataobjects (tracks, ECL, KLM, clusters, V0s, ...)", false);
+
+  addParam("dummyMDSTIndex", m_dummyMDSTIndex,
+           "mdst index to use for dummy particle", 0);
+
+  addParam("dummyCovMatrix", m_dummyCovMatrix,
+           "Diagonal value of covariance matrix to use for dummy particle", -1.);
+
+  addParam("dummyTreatAsInvisible", m_dummyTreatAsInvisble,
+           "Should treeFitter treat the particle as invisible?", true);
+
 }
 
 void ParticleLoaderModule::initialize()
@@ -142,7 +155,7 @@ void ParticleLoaderModule::initialize()
         }
       }
 
-      if (not isValidPDGCode(pdgCode) and (m_useMCParticles == false and m_useROEs == false))
+      if (not isValidPDGCode(pdgCode) and (m_useMCParticles == false and m_useROEs == false and m_useDummy == false))
         B2ERROR("Invalid particle type requested to be loaded. Set a valid decayString module parameter.");
 
       // if we're not loading MCParticles and we are loading K0S, Lambdas, or photons --> ee then this decaystring is a V0
@@ -154,7 +167,7 @@ void ParticleLoaderModule::initialize()
 
       if (mdstSourceIsV0 == false) {
         if (nProducts > 0) {
-          if (!m_useROEs) {
+          if (!m_useROEs and !m_useDummy) {
             B2ERROR("ParticleLoaderModule::initialize Invalid input DecayString " << decayString
                     << ". DecayString should not contain any daughters, only the mother particle.");
           } else {
@@ -179,6 +192,9 @@ void ParticleLoaderModule::initialize()
       if (m_useROEs) {
         B2INFO("   -> MDST source: RestOfEvents");
         m_ROE2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle);
+      } else if (m_useDummy) {
+        B2INFO("   -> MDST source: Dummy");
+        m_Dummies2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle);
       } else if (m_useMCParticles) {
         B2INFO("   -> MDST source: MCParticles");
         m_MCParticles2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle);
@@ -230,6 +246,8 @@ void ParticleLoaderModule::event()
 
   if (m_useROEs)
     roeToParticles();
+  else if (m_useDummy)
+    dummyToParticles();
   else if (m_useMCParticles)
     mcParticlesToParticles();
   else {
@@ -258,6 +276,57 @@ void ParticleLoaderModule::terminate()
                 << get<c_PListName>(v02Plist));
     }
 }
+
+void ParticleLoaderModule::dummyToParticles()
+{
+  if (m_Dummies2Plists.empty()) // nothing to do
+    return;
+  // Multiple particle lists are not supported
+  auto dummy2Plist = m_Dummies2Plists[0];
+  string dummyListName = get<c_PListName>(dummy2Plist);
+  string antiDummyListName = get<c_AntiPListName>(dummy2Plist);
+  int pdgCode = get<c_PListPDGCode>(dummy2Plist);
+  bool isSelfConjugatedParticle = get<c_IsPListSelfConjugated>(dummy2Plist);
+
+  StoreObjPtr<ParticleList> plist(dummyListName);
+  plist.create();
+  plist->initialize(pdgCode, dummyListName);
+
+  // TODO check self conjugation
+  if (!isSelfConjugatedParticle) {
+    StoreObjPtr<ParticleList> antiPlist(antiDummyListName);
+    antiPlist.create();
+    antiPlist->initialize(-1 * pdgCode, antiDummyListName);
+    antiPlist->bindAntiParticleList(*(plist));
+  }
+
+  TMatrixFSym covariance(7);
+  for (int row = 0; row < 7; ++row) { //diag
+    covariance(row, row) = m_dummyCovMatrix; //TODO value
+  }
+
+  Particle* newPart = nullptr;
+  Particle* newAntiPart = nullptr;
+
+  auto isFlavored = (isSelfConjugatedParticle) ? Particle::EFlavorType::c_Unflavored : Particle::EFlavorType::c_Flavored;
+
+  ROOT::Math::PxPyPzEVector zero4Vector = {0., 0., 0., 0.};
+
+  newPart = m_particles.appendNew(zero4Vector, pdgCode, isFlavored, Particle::EParticleSourceObject::c_Undefined,
+                                  m_dummyMDSTIndex); //TODO mdst Index?
+  if (m_dummyCovMatrix > 0.) newPart->setMomentumVertexErrorMatrix(covariance);
+  if (m_dummyTreatAsInvisble) newPart->writeExtraInfo("treeFitterTreatMeAsInvisible", 1);
+  plist->addParticle(newPart);
+
+  if (!isSelfConjugatedParticle) {
+    newAntiPart = m_particles.appendNew(zero4Vector, -pdgCode, isFlavored, Particle::EParticleSourceObject::c_Undefined,
+                                        m_dummyMDSTIndex);
+    if (m_dummyCovMatrix > 0.) newAntiPart->setMomentumVertexErrorMatrix(covariance);
+    if (m_dummyTreatAsInvisble) newAntiPart->writeExtraInfo("treeFitterTreatMeAsInvisible", 1);
+    plist->addParticle(newAntiPart);
+  }
+}
+
 
 void ParticleLoaderModule::roeToParticles()
 {

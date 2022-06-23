@@ -12,8 +12,8 @@
 # This tutorial shows how to create a data sample for training the PID   #
 # calibration weights. After completing the tutorial, you can train the  #
 # weights using the pidTrainWeights script, e.g.                         #
-# $ python /path/to/release/analysis/scripts/pidTrainWeights.py \  #
-#       ./data/slim_dstar ./models/net.pt -n 1000  #
+# $ python /path/to/release/analysis/scripts/pidTrainWeights.py \        #
+#       ./data/slim_dstar ./models/net.pt -n 1000                        #
 ##########################################################################
 
 import basf2 as b2

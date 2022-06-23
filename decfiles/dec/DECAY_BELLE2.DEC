@@ -11638,8 +11638,7 @@ Decay Lambda_c+
 0.014800000   p+  K*-  pi+                                 PHSP;  # [PDG 2021]
 0.001770000   p+  K-  pi+  pi+  pi-                        PHSP;  # Use isopin model rather than PDG for pK(3pi)
 0.001240000   p+  K-  pi+  pi0  pi0                        PHSP;  # Seen
-0.002820000   p+  anti-K0  pi+ pi-  pi0                    PHSP;  #  
-0.001240000   p+  K-  pi+  pi0  pi0                        PHSP;  #  
+0.002820000   p+  anti-K0  pi+ pi-  pi0                    PHSP;  #    
 0.001240000   n0  anti-K0  pi+  pi0  pi0                   PHSP;  #  
 0.001410000   n0 K- pi+ pi+ pi0                            PHSP;  # 
 0.001760000   n0 anti-K0 pi+ pi+ pi-                       PHSP;  # 
@@ -11653,13 +11652,13 @@ Decay Lambda_c+
 0.004860000   n0  pi+  pi0                                 PHSP;  # [Isospin model]  
 0.002430000   n0  pi+  pi0  pi-  pi-                       PHSP;  # [Isospin model]
 0.001690000   n0  pi+  pi0  pi0  pi0                       PHSP;  # [Isospin model]
-0.000530000   n0  K+  K0                                   PHSP;  # [PDG 2021 in addtion to pphi mode]
+0.000530000   n0  K+  K0                                   PHSP;  # [PDG 2021]
 0.038490000   n0 anti-K0 pi+                               PHSP;  # [PDG 2021]
 0.062180000   Lambda0  pi+  pi0                            PHSP;  # [PDG 2021]
 # In addition there is 0.00634 from rho and 0.00371 from Sigma*0 pi+ and 0.00279 from Sigma*+ pi0
 # Lambda0  pi+  pi+  pi-                                   PHSP;  #[No non-resonant decays in PDG2021]
 0.015860000   Lambda0  pi+  rho0                           PHSP;  #[PDG 2021; goes to Lambda pi+pi-pi+]
-0.025340000   Lambda0 pi+ pi0 pi0                          PHSP;  # Isospin model guess
+0.026580060   Lambda0 pi+ pi0 pi0                          PHSP;  # Isospin model guess
 0.000000000   Lambda0  pi+  pi+  pi-  pi0                  PHSP;  #[No non-resonant decays in PDG 2021] 
 0.019450000   Lambda0  pi+  eta                            PHSP;  #[PDG 2021; contributes to L0 4pi]
 0.015890000   Lambda0  pi+  omega                          PHSP;  #[PDG 2021; contributes to L0 4pi]

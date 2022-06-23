@@ -11681,8 +11681,7 @@ Decay Lambda_c+
 0.006030000   Xi0  K+  pi0                                 PHSP;  #[Isospin model subtracted for Xi(1530)K]
 0.006550000   Xi0  K0  pi+                                 PHSP;  #[Isospin model]		
 0.000000000   Sigma+  K+  pi-                              PHSP;  #PDG 2021 only decays resonantly
-# FIXME: EvtGen does not know what Lambda0(1520) is.
-# 0.023260000   Lambda0(1520) pi+                            PHSP;  #PDG 2021 
+0.023260000   Lambda0(1520)0 pi+                           PHSP;  #PDG 2021 
 # Contributes 0.00534 to pKpi, 0.00534 to nK0bar pi, 0.00324 to Sigma+pipi 0.00324 to Sigma-pipi
 # 0.0015 to Lambda 3pi
 0.000110000   p+ K+ pi-                                    PHSP;  #[PDG 2021]

@@ -50,7 +50,7 @@ void FlippedRecoTracksMergerModule::event()
     if (b2track) {
 
       // if the 2ndMVA was assigned, aka: passed the 1st MVA
-      if (recoTrack.get2ndFlipQualityIndicator() != -999) {
+      if (!isnan(recoTrack.get2ndFlipQualityIndicator())) {
 
         // get the related RecoTrack_flipped
         RecoTrack* RecoTrack_flipped =  recoTrack.getRelatedFrom<Belle2::RecoTrack>("RecoTracks_flipped");

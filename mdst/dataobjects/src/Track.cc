@@ -84,6 +84,9 @@ const TrackFitResult* Track::getTrackFitResultWithClosestMass(const Const::Charg
     return massDiffA < massDiffB;
   });
 
+  if (isnan(bestMassFit->second->getPValue())) {
+    return nullptr;
+  }
   return bestMassFit->second;
 }
 

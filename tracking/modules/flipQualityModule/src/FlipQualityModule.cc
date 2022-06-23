@@ -34,7 +34,6 @@ namespace Belle2 {
   {
     // If the identifier does not end on .root or .xml, we are dealing with a database identifier
     // so we need to create a DBObjPtr, which will fetch the weightfile from the database
-    B2INFO("init the FlipQualityModule");
     m_recoTracks.isRequired(m_recoTracksStoreArrayName);
 
     if (m_flipMVAIndex == 1) {
@@ -42,7 +41,7 @@ namespace Belle2 {
     } else if (m_flipMVAIndex == 2) {
       m_recoTrackExtractor2nd = std::make_unique<FlipRecoTrackExtractor2nd>(m_variableSet);
     } else {
-      B2INFO("no input value extractor");
+      B2FATAL("no input value extractor!");
     }
     // The supported methods have to be initialized once (calling it more than once is save)
     m_mvaExpert = std::make_unique<MVAExpert>(m_identifier, m_variableSet);
@@ -85,8 +84,6 @@ namespace Belle2 {
           m_recoTrackExtractor2nd->extractVariables(recoTrack);
           float probability = m_mvaExpert->predict();
           recoTrack.set2ndFlipQualityIndicator(probability);
-        } else {
-          recoTrack.set2ndFlipQualityIndicator(-999);
         }
       } else {
         B2DEBUG(1, "Nothing will be saved into the flipping qi");

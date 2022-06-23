@@ -11,6 +11,26 @@
 import time
 
 from basf2_mva_python_interface.torch import State
+import torch
+
+
+class myModel(torch.nn.Module):
+    def __init__(self, number_of_features=1):
+        super(myModel, self).__init__()
+
+        # a dense model with one hidden layer
+        self.network = torch.nn.Sequential(
+            torch.nn.Linear(number_of_features, 128),
+            torch.nn.ReLU(),
+            torch.nn.Linear(128, 128),
+            torch.nn.ReLU(),
+            torch.nn.Linear(128, 1),
+            torch.nn.Sigmoid(),
+        )
+
+    def forward(self, x):
+        prob = self.network(x)
+        return prob
 
 
 def get_model(number_of_features, number_of_spectators, number_of_events, training_fraction, parameters):
@@ -19,32 +39,13 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     """
     import torch
 
-    class myModel(torch.nn.Module):
-        def __init__(self):
-            super(myModel, self).__init__()
-
-            # a dense model with one hidden layer
-            self.network = torch.nn.Sequential(
-                torch.nn.Linear(number_of_features, 128),
-                torch.nn.ReLU(),
-                torch.nn.Linear(128, 128),
-                torch.nn.ReLU(),
-                torch.nn.Linear(128, 1),
-                torch.nn.Sigmoid(),
-            )
-
-            self.loss = torch.nn.BCELoss()
-            self.optimizer = torch.optim.SGD
-
-        def forward(self, x):
-            prob = self.network(x)
-            return prob
-
-    state = State(myModel().to("cuda" if torch.cuda.is_available() else "cpu"))
+    state = State(myModel(number_of_features).to("cuda" if torch.cuda.is_available() else "cpu"))
     print(state.model)
 
-    # one way to pass settings used during training
-    state.learning_rate = parameters.get('learning_rate', 1e-3)
+    state.optimizer = torch.optim.SGD(state.model.parameters(), parameters.get('learning_rate', 1e-2))
+
+    # we recreate the loss function on each batch so that we can pass in the weights
+    state.loss_fn = torch.nn.BCELoss
 
     # for book keeping
     state.epoch = 0
@@ -56,6 +57,7 @@ if __name__ == "__main__":
     from basf2 import conditions
     import basf2_mva
     import basf2_mva_util
+    import json
 
     # NOTE: do not use testing payloads in production! Any results obtained like this WILL NOT BE PUBLISHED
     conditions.testing_payloads = [
@@ -83,7 +85,10 @@ if __name__ == "__main__":
     specific_options.m_framework = "torch"
     specific_options.m_steering_file = 'mva/examples/torch/simple.py'
     specific_options.m_nIterations = 100
-    specific_options.m_mini_batch_size = 100
+    specific_options.m_mini_batch_size = 200
+    specific_options.m_config = json.dumps({'learning_rate': 1e-2})
+    specific_options.m_training_fraction = 0.8
+    specific_options.m_normalise = True
 
     training_start = time.time()
     basf2_mva.teacher(general_options, specific_options)

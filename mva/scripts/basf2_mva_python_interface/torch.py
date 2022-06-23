@@ -12,6 +12,7 @@
 import tempfile
 import pathlib
 import numpy as np
+import torch
 
 
 class State(object):
@@ -41,38 +42,36 @@ def feature_importance(state):
     return []
 
 
+class myModel(torch.nn.Module):
+    def __init__(self, number_of_features=1):
+        super(myModel, self).__init__()
+
+        # a dense model with one hidden layer
+        self.network = torch.nn.Sequential(
+            torch.nn.Linear(number_of_features, 128),
+            torch.nn.ReLU(),
+            torch.nn.Linear(128, 128),
+            torch.nn.ReLU(),
+            torch.nn.Linear(128, 1),
+            torch.nn.Sigmoid(),
+        )
+
+    def forward(self, x):
+        prob = self.network(x)
+        return prob
+
+
 def get_model(number_of_features, number_of_spectators, number_of_events, training_fraction, parameters):
     """
     Returns default torch model
     """
-    import torch
-
-    class myModel(torch.nn.Module):
-        def __init__(self):
-            super(myModel, self).__init__()
-
-            # a dense model with one hidden layer
-            self.network = torch.nn.Sequential(
-                torch.nn.Linear(number_of_features, 128),
-                torch.nn.ReLU(),
-                torch.nn.Linear(128, 128),
-                torch.nn.ReLU(),
-                torch.nn.Linear(128, 1),
-                torch.nn.Sigmoid(),
-            )
-
-            self.loss = torch.nn.BCELoss()
-            self.optimizer = torch.optim.SGD
-
-        def forward(self, x):
-            prob = self.network(x)
-            return prob
-
-    state = State(myModel().to("cuda" if torch.cuda.is_available() else "cpu"))
+    state = State(myModel(number_of_features).to("cuda" if torch.cuda.is_available() else "cpu"))
     print(state.model)
 
-    # one way to pass settings used during training
-    state.learning_rate = parameters.get('learning_rate', 1e-3)
+    state.optimizer = torch.optim.SGD(state.model.parameters(), parameters.get('learning_rate', 1e-3))
+
+    # we recreate the loss function on each batch so that we can pass in the weights
+    state.loss_fn = torch.nn.BCELoss
 
     # for book keeping
     state.epoch = 0
@@ -84,8 +83,6 @@ def begin_fit(state, Xtest, Stest, ytest, wtest):
     """
     Passes in a fraction of events if specific_options.m_training_fraction is set.
     """
-    import torch
-
     # transform to torch tensor and store the validation sample for later use
     device = "cuda" if torch.cuda.is_available() else "cpu"
     state.Xtest = torch.from_numpy(Xtest).to(device)
@@ -105,50 +102,47 @@ def partial_fit(state, X, S, y, w, epoch, batch):
     which will pass all training data as a single batch once.
     This can then be loaded into torch in any way you want.
     """
-    import torch
-
-    def weighted_loss(y_pred, y_true, weight):
-        return (state.loss(y_pred, y_true)*weight).mean()
-
     # transform to torch tensor
     device = "cuda" if torch.cuda.is_available() else "cpu"
     tensor_x = torch.from_numpy(X).to(device)
-    tensor_y = torch.from_numpy(y).to(device)
+    tensor_y = torch.from_numpy(y).to(device).type(torch.float)
     tensor_w = torch.from_numpy(w).to(device)
 
-    optimizer = state.model.optimizer(state.model.parameters(), state.learning_rate)
-
     # Compute prediction and loss
+    loss_fn = state.loss_fn(weight=tensor_w)
     pred = state.model(tensor_x)
-    loss = weighted_loss(pred, tensor_y, tensor_w)
+    loss = loss_fn(pred, tensor_y)
 
     # Backpropagation
-    optimizer.zero_grad()
+    state.optimizer.zero_grad()
     loss.backward()
-    optimizer.step()
+    state.optimizer.step()
 
     if epoch != state.epoch:
         # we are at the start of a new epoch, print out details of the last epoch
-        # run the validation set:
-        test_pred = state.model(state.Xtest)
-        test_loss = weighted_loss(test_pred, state.ytest, state.w).item()
-        test_correct = (test_pred.round() == state.ytest).type(torch.float).sum().item()
+        if len(state.ytest) > 0:
+            # run the validation set:
+            test_pred = state.model(state.Xtest)
+            test_loss_fn = state.loss_fn(weight=state.wtest)
+            test_loss = test_loss_fn(test_pred, state.ytest).item()
+            test_correct = (test_pred.round() == state.ytest).type(torch.float).sum().item()
+            print(f"Epoch: {epoch-1:04d},\t Training Cost: {np.mean((state.avg_costs)):.4f},"
+                  f"\t Testing Cost: {test_loss:.4f}, \t Testing Accuracy: {test_correct/len(state.ytest)}")
+        else:
+            print(f"Epoch: {epoch-1:04d},\t Training Cost: {np.mean((state.avg_costs)):.4f}")
 
-        print(f"Epoch: {epoch-1:04d},\t Training Cost: {np.mean(state.avg_costs):.4f},"
-              f"\t Testing Cost: {np.mean(test_loss):.4f}, \t Testing Accuracy: {test_correct/len(state.ytest)}")
-        state.avg_costs = [loss.numpy()]
+        state.avg_costs = [loss.detach().numpy()]
+        state.epoch = epoch
     else:
-        state.avg_costs.append(loss.numpy())
-    return False
+        state.avg_costs.append(loss.detach().numpy())
+    return True
 
 
 def apply(state, X):
     """
     Apply estimator to passed data.
     """
-    import torch
-
-    r = state.model(torch.from_numpy(X)).numpy()
+    r = state.model(torch.from_numpy(X)).detach().numpy()
     if r.shape[1] == 1:
         r = r[:, 0]  # cannot use squeeze because we might have output of shape [1,X classes]
     return np.require(r, dtype=np.float32, requirements=['A', 'W', 'C', 'O'])
@@ -158,8 +152,6 @@ def load(obj):
     """
     Load the trained torch model into state.
     """
-    import torch
-
     with tempfile.TemporaryDirectory() as temp_path:
         temp_path = pathlib.Path(temp_path)
 
@@ -171,11 +163,11 @@ def load(obj):
             with open(path, 'w+b') as file:
                 file.write(bytes(obj[1][file_index]))
 
-        model = torch.load(file_names[0])
+        model = torch.load(temp_path.joinpath(file_names[0]))
         model.eval()  # sets dropout and batch norm layers to eval mode
         device = "cuda" if torch.cuda.is_available() else "cpu"
         model.to(device)
-        state = State(model())
+        state = State(model)
 
     # load everything else we saved
     for index, key in enumerate(obj[2]):
@@ -193,7 +185,7 @@ def end_fit(state):
 
         # this creates:
         # path/my_model.pt
-        state.model.save(temp_path.joinpath('my_model.pt'))
+        torch.save(state.model, temp_path.joinpath('my_model.pt'))
 
         file_names = ['my_model.pt']
         files = []

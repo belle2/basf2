@@ -11642,7 +11642,8 @@ Decay Lambda_c+
 0.001240000   n0  anti-K0  pi+  pi0  pi0                   PHSP;  #  
 0.001410000   n0 K- pi+ pi+ pi0                            PHSP;  # 
 0.001760000   n0 anti-K0 pi+ pi+ pi-                       PHSP;  # 
-0.001310000   p+ eta                                       PHSP;  # [PDG 2021]
+# FIXME: next line duplicate
+# 0.001310000   p+ eta                                       PHSP;  # [PDG 2021]
 0.004860000   p+  pi+  pi-                                 PHSP;  # [PDG 2021]    
 0.004860000   p+  pi0  pi0                                 PHSP;  # [Isospin model]
 0.002430000   p+  pi+  pi+  pi-  pi-                       PHSP;  # [PDG 2021]
@@ -11650,7 +11651,7 @@ Decay Lambda_c+
 0.001160000   p+  pi0  pi0  pi0  pi0                       PHSP;  # [Isospin model]		
 0.000530000   p+  K+  K-                                   PHSP;  # [PDG 2021 in addtion to pphi mode]
 0.004860000   n0  pi+  pi0                                 PHSP;  # [Isospin model]  
-0.002430000   n0  pi+  pi0  pi-  pi-                       PHSP;  # [Isospin model]
+0.002430000   n0  pi+  pi0  pi+  pi-                       PHSP;  # [Isospin model]
 0.001690000   n0  pi+  pi0  pi0  pi0                       PHSP;  # [Isospin model]
 0.000530000   n0  K+  K0                                   PHSP;  # [PDG 2021]
 0.038490000   n0 anti-K0 pi+                               PHSP;  # [PDG 2021]
@@ -11678,9 +11679,10 @@ Decay Lambda_c+
 0.003700000   Sigma0  K+ anti-K0                           PHSP;  #[From phase-space model]	
 0.004650000   Xi-  K+  pi+                                 PHSP;  #[PDG 2021 - subtracted for Xi(1530)K]
 0.006030000   Xi0  K+  pi0                                 PHSP;  #[Isospin model subtracted for Xi(1530)K]
-0.006550000   Xi0  K0 pi0                                  PHSP;  #[Isospin model]		
+0.006550000   Xi0  K0  pi+                                 PHSP;  #[Isospin model]		
 0.000000000   Sigma+  K+  pi-                              PHSP;  #PDG 2021 only decays resonantly
-0.023260000   Lambda0(1520) pi+                            PHSP;  #PDG 2021 
+# FIXME: EvtGen does not know what Lambda0(1520) is.
+# 0.023260000   Lambda0(1520) pi+                            PHSP;  #PDG 2021 
 # Contributes 0.00534 to pKpi, 0.00534 to nK0bar pi, 0.00324 to Sigma+pipi 0.00324 to Sigma-pipi
 # 0.0015 to Lambda 3pi
 0.000110000   p+ K+ pi-                                    PHSP;  #[PDG 2021]

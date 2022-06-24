@@ -30,7 +30,7 @@ void TrackTimeEstimatorModule::initialize()
 
 void TrackTimeEstimatorModule::event()
 {
-  if (m_evtT0) {
+  if (m_evtT0.isValid()) {
     auto svdHypos = m_evtT0->getTemporaryEventT0s(Const::EDetector::SVD);
     if (svdHypos.size() > 0) { // if SVD eventT0 exists then loop over tracks, don't otherwise and leave their averageTime set at NaN
       // get the latest SVD hypothesis information, this is also the most accurate t0 value the SVD can provide (see SVDEventT0 doc)

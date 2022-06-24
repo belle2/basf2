@@ -11605,8 +11605,7 @@ Decay Lambda_c+
 0.001140000   Delta++  pi-                                 PYTHIA         0; #[PDG 2021]
 0.001060000   Delta++  rho-                                PYTHIA         0;
 0.000080000   p+  pi0                                      PYTHIA         0; #[Theoretical prediction]
-0.000180000   p+  eta                                      PYTHIA         0; #[Theoretical prediction]
-0.001060000   p+  eta'                                     PYTHIA         0;
+0.000500000   p+  eta'                                     PYTHIA         0; #[Belle 2022]
 0.002110000   p+  rho0                                     PYTHIA         0;
 0.002110000   p+  omega                                    PYTHIA         0;
 0.001120000   p+  phi                                      PYTHIA         0; #[Reconstructed PDG2011]
@@ -11642,8 +11641,7 @@ Decay Lambda_c+
 0.001240000   n0  anti-K0  pi+  pi0  pi0                   PHSP;  #  
 0.001410000   n0 K- pi+ pi+ pi0                            PHSP;  # 
 0.001760000   n0 anti-K0 pi+ pi+ pi-                       PHSP;  # 
-# FIXME: next line duplicate
-# 0.001310000   p+ eta                                       PHSP;  # [PDG 2021]
+0.001310000   p+ eta                                       PHSP;  # [PDG 2021]
 0.004860000   p+  pi+  pi-                                 PHSP;  # [PDG 2021]    
 0.004860000   p+  pi0  pi0                                 PHSP;  # [Isospin model]
 0.002430000   p+  pi+  pi+  pi-  pi-                       PHSP;  # [PDG 2021]
@@ -11659,7 +11657,7 @@ Decay Lambda_c+
 # In addition there is 0.00634 from rho and 0.00371 from Sigma*0 pi+ and 0.00279 from Sigma*+ pi0
 # Lambda0  pi+  pi+  pi-                                   PHSP;  #[No non-resonant decays in PDG2021]
 0.015860000   Lambda0  pi+  rho0                           PHSP;  #[PDG 2021; goes to Lambda pi+pi-pi+]
-0.026580060   Lambda0 pi+ pi0 pi0                          PHSP;  # Isospin model guess
+0.027320110   Lambda0  pi+ pi0 pi0                         PHSP;  # Isospin model guess
 0.000000000   Lambda0  pi+  pi+  pi-  pi0                  PHSP;  #[No non-resonant decays in PDG 2021] 
 0.019450000   Lambda0  pi+  eta                            PHSP;  #[PDG 2021; contributes to L0 4pi]
 0.015890000   Lambda0  pi+  omega                          PHSP;  #[PDG 2021; contributes to L0 4pi]

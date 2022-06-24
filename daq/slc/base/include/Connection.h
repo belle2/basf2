@@ -37,7 +37,6 @@ namespace Belle2 {
      * Operator =.
      */
     const Connection& operator=(const Connection& connection);
-
     const Connection& operator=(const std::string& msg);
     const Connection& operator=(const char* msg);
     const Connection& operator=(int i);

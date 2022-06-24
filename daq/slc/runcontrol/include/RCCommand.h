@@ -53,7 +53,6 @@ namespace Belle2 {
      * Operator =.
      */
     const RCCommand& operator=(const RCCommand& command);
-
     const RCCommand& operator=(const std::string& label);
     const RCCommand& operator=(const char* label);
     const RCCommand& operator=(int id);

@@ -9,4 +9,4 @@ Changes in the mva package since release-06-00
  * Updated the ``partial_fit(...)`` function for python based methods. Previously the ``epoch`` parameter was confusingly defined as 
    ``iEpoch * nBatches + iBatch``. It now returns correctly ``iEpoch`` with a new ``batch`` argument giving the index of the current batch.
    User scripts must be updated to overwrite ``partial_fit(state, X, S, y, w, epoch, batch)``.
-* Added an interface for pyTorch. Please see ``mva/examples/torch/simple.py`` for a basic example for binary classification. As with all other python interfaces the interface is designed for users to override the ``get_model(...)``, ``begin_fit(...)``, and ``partial_fit(...)`` methods in the training script to define their models and training loop.
+ * Added an interface for pyTorch. Please see ``mva/examples/torch/simple.py`` for a basic example for binary classification. As with all other python interfaces the interface is designed for users to override the ``get_model(...)``, ``begin_fit(...)``, and ``partial_fit(...)`` methods in the training script to define their models and training loop.

@@ -157,18 +157,16 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
             return - tf.reduce_sum(w * tf.math.log(diff_from_truth + epsilon)) / tf.reduce_sum(w)
 
     state = State(model=my_model())
-    state.epoch = 0
-    state.avg_costs = []  # keeps track of the avg costs per batch over an epoch
-
     return state
 
 
-def begin_fit(state, Xtest, Stest, ytest, wtest):
+def begin_fit(state, Xtest, Stest, ytest, wtest, nBatches):
     """Saves the training validation set for monitoring."""
     state.val_x = Xtest
     state.val_y = ytest
     state.val_z = Stest
 
+    state.nBatches = nBatches
     return state
 
 
@@ -213,18 +211,19 @@ def partial_fit(state, X, S, y, w, epoch, batch):
 
         state.model.optimizer.apply_gradients(zip(grads, trainable_variables))
 
-        if state.epoch == epoch:
-            state.avg_costs.append()
+        if batch == 0 and epoch == 0:
+            state.avg_costs = [avg_cost]
+        elif batch != state.nBatches-1:
+            state.avg_costs.append(avg_cost)
         else:
             # started a new epoch, reset the avg_costs and update the counter
             if epoch == state.model.parameters['pre_training_epochs']:
-                print(f"Pre-Training: Epoch: {epoch-1:05d}, cost={np.mean(state.avg_costs):.5f}")
+                print(f"Pre-Training: Epoch: {epoch:05d}, cost={np.mean(state.avg_costs):.5f}")
             else:
-                print(f"Epoch: {epoch-1:05d}, cost={np.mean(state.avg_costs):.5f}")
+                print(f"Epoch: {epoch:05d}, cost={np.mean(state.avg_costs):.5f}")
 
             early_stopper_flag = EARLY_STOPPER.check(np.mean(state.avg_costs))
             state.avg_costs = [avg_cost]
-            state.epoch = epoch
             return early_stopper_flag
     return True
 

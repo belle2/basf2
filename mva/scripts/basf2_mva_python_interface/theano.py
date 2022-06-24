@@ -118,7 +118,7 @@ def apply(state, X):
     return numpy.require(result, dtype=numpy.float32, requirements=['A', 'W', 'C', 'O'])
 
 
-def begin_fit(state, Xvalid, Svalid, yvalid, wvalid):
+def begin_fit(state, Xvalid, Svalid, yvalid, wvalid, nBatches):
     return state
 
 

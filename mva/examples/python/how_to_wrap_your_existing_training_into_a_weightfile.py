@@ -26,7 +26,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     return None
 
 
-def begin_fit(state, Xtest, Stest, ytest, wtest):
+def begin_fit(state, Xtest, Stest, ytest, wtest, nBatches):
     """ Must be implemented otherwise custom framework will raise an error """
     return state
 

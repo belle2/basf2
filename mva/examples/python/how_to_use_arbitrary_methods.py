@@ -51,7 +51,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     return MyFancyClassifier(parameters)
 
 
-def begin_fit(state, Xtest, Stest, ytest, wtest):
+def begin_fit(state, Xtest, Stest, ytest, wtest, nBatches):
     """
     Is called once per training after get_model.
     You can initialize your training here.
@@ -61,6 +61,7 @@ def begin_fit(state, Xtest, Stest, ytest, wtest):
     @param Stest numpy array containing the spectators of the validation sample
     @param ytest numpy array containing the target values of the validation sample
     @param wtest numpy array containing the weights of the validation sample
+    @param nBatches int containing the number of batches that will be passed to partial_fit in each epoch.
 
     Since our method does not support out-of-core fitting, the usual thing is to add
     some arrays which collect the data passed to partial_fit.

@@ -198,7 +198,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     return state
 
 
-def begin_fit(state, Xtest, Stest, ytest, wtest):
+def begin_fit(state, Xtest, Stest, ytest, wtest, nBatches):
     """
     Save Validation Data for monitoring Training
     """

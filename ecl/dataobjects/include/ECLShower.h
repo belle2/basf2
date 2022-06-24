@@ -75,7 +75,7 @@ namespace Belle2 {
       m_trkDepth(0.0),                         /**< Path on track extrapolation to POCA to average cluster direction   */
       m_showerDepth(0.0),                      /**< Same as above, but on the cluster average direction */
       m_numberOfCrystals(0.0),                 /**< Sum of weights of crystals (~number of crystals) */
-      m_absZernikeMoments{ -999.0},            /**< Shower shape variables, absolute values of Zernike Moments 10 to 66 */
+      m_absZernikeMoments{ -999.0},            /**< Shower shape variables, absolute values of Zernike Moments 10 to 55 */
       m_zernikeMVA(0.0),                       /**< Shower shape variable, Zernike MVA output */
       m_secondMoment(0.0),                     /**< Shower shape variable, second moment (needed for merged pi0) */
       m_E1oE9(0.0),                            /**< Shower shape variable, E1oE9 */
@@ -178,7 +178,7 @@ namespace Belle2 {
      */
     void setNumberOfCrystals(double nofCrystals) { m_numberOfCrystals = nofCrystals; }
 
-    /*! Set absolute value of Zernike Moment nm
+    /*! Set absolute value of Zernike Moment nm, for nm between 10 and 55
      */
     void setAbsZernikeMoment(unsigned int n, unsigned int m, double absZernikeMoment) { m_absZernikeMoments[(n * (n + 1)) / 2 + m - 1] = absZernikeMoment; }
 
@@ -348,7 +348,7 @@ namespace Belle2 {
     double getNumberOfCrystals() const { return m_numberOfCrystals; }
 
     /*! Get absolute value of Zernike Moment nm
-     * @return Absolute Value of Zernike Moment nm, for nm between 10 and 66
+     * @return Absolute Value of Zernike Moment nm, for nm between 10 and 55
      */
     double getAbsZernikeMoment(unsigned int n, unsigned int m) const { return m_absZernikeMoments[(n * (n + 1)) / 2 + m - 1]; }
 
@@ -510,7 +510,7 @@ namespace Belle2 {
     Double32_t m_trkDepth;          /**< Path on track ext. to POCA to avg. cluster dir. (GDN) */
     Double32_t m_showerDepth;       /**< Same as above, but on the cluster average direction (GDN) */
     Double32_t m_numberOfCrystals;       /**< Sum of weights of crystals (~number of crystals) (TF) */
-    Double32_t m_absZernikeMoments[27];  /**< Shower shape variables, absolute values of Zernike Moments (MH) */
+    Double32_t m_absZernikeMoments[20];  /**< Shower shape variables, absolute values of Zernike Moments (MH) */
     Double32_t m_zernikeMVA;        /**< Shower shape variable, zernike MVA output */
     Double32_t m_secondMoment;      /**< Shower shape variable, second moment (for merged pi0) (TF) */
     Double32_t m_E1oE9;             /**< Shower shape variable, E1oE9 (TF) */

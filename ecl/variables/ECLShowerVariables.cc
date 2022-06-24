@@ -86,7 +86,7 @@ namespace Belle2 {
       return std::numeric_limits<double>::quiet_NaN();
     }
 
-    // returns the nm zernike moment (between 10 and 66)
+    // returns the nm zernike moment (between 10 and 55)
     double getAbsZernikeMomentNM(const Particle* particle,
                                  const std::vector<double>& arguments)
     {
@@ -96,8 +96,8 @@ namespace Belle2 {
       const long n = std::lround(arguments[0]);
       const long m = std::lround(arguments[1]);
 
-      if ((n < 1) or (n > 6)) {
-        B2FATAL("n must be between 1 and 6 for meta function absZernikeMoment");
+      if ((n < 1) or (n > 5)) {
+        B2FATAL("n must be between 1 and 5 for meta function absZernikeMoment");
       }
       if (m > n) {
         B2FATAL("m must be less than or equal to n for meta function absZernikeMoment");
@@ -133,6 +133,6 @@ namespace Belle2 {
     VARIABLE_GROUP("ECL Shower Variables (cDST)");
 
     REGISTER_VARIABLE("absZernikeMoment(n, m)", getAbsZernikeMomentNM,
-                      "[eclChargedPIDExpert] the absolute value of zernike moment nm. Requires n <= 6 and m <= n.");
+                      "[eclChargedPIDExpert] the absolute value of zernike moment nm. Requires n <= 5 and m <= n.");
   }
 }

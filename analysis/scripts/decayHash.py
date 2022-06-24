@@ -53,8 +53,9 @@ class DecayHashMap:
 
     def __init__(self, rootfile, removeRadiativeGammaFlag=False):
         """Constructor"""
-        import root_numpy
-        import ROOT
+        import root_numpy  # noqa
+        # Always avoid the top-level 'import ROOT'.
+        import ROOT  # noqa
         ntuple = root_numpy.root2array(rootfile)
         # self._removeGammaFlag = removeRadiativeGammaFlag
         #: Dict Int -> DecayStrings
@@ -74,7 +75,8 @@ class DecayHashMap:
         @param decayHash output of extraInfo(decayHash)
         @param decayHashExtended output of extraInfo(decayHashExtended)
         """
-        import ROOT
+        # Always avoid the top-level 'import ROOT'.
+        import ROOT  # noqa
         return self._string[ROOT.Belle2.DecayForest.decayHashFloatToInt(decayHash, decayHashExtended)]
 
     def get_original_decay(self, decayHash, decayHashExtended):
@@ -83,7 +85,8 @@ class DecayHashMap:
         @param decayHash output of extraInfo(decayHash)
         @param decayHashExtended output of extraInfo(decayHashExtended)
         """
-        import ROOT
+        # Always avoid the top-level 'import ROOT'.
+        import ROOT  # noqa
         return self._forest[ROOT.Belle2.DecayForest.decayHashFloatToInt(decayHash, decayHashExtended)].getOriginalTree()
 
     def get_reconstructed_decay(self, decayHash, decayHashExtended):
@@ -92,7 +95,8 @@ class DecayHashMap:
         @param decayHash output of extraInfo(decayHash)
         @param decayHashExtended output of extraInfo(decayHashExtended)
         """
-        import ROOT
+        # Always avoid the top-level 'import ROOT'.
+        import ROOT  # noqa
         return self._forest[ROOT.Belle2.DecayForest.decayHashFloatToInt(decayHash, decayHashExtended)].getReconstructedTree()
 
     def print_hash(self, decayHash, decayHashExtended):

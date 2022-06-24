@@ -11,8 +11,6 @@
 
 import basf2
 
-from ROOT import Belle2
-
 from geometry import check_components
 
 from svd import add_svd_reconstruction
@@ -203,6 +201,9 @@ def add_prefilter_reconstruction(
     :param use_cdc_full_grid_eventt0: If True, the module FullGridChi2TrackTimeExtractor is added to the path
                                       for computing the EventT0.
     """
+
+    # Always avoid the top-level 'import ROOT'.
+    from ROOT import Belle2  # noqa
 
     # Check components.
     check_components(components)

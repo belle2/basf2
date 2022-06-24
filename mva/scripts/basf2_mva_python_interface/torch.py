@@ -43,10 +43,18 @@ def feature_importance(state):
 
 
 class myModel(torch.nn.Module):
-    def __init__(self, number_of_features=1):
+    """
+    My dense neural network
+    """
+
+    def __init__(self, number_of_features):
+        """
+        Init the network
+        param: number_of_features number of input variables
+        """
         super(myModel, self).__init__()
 
-        # a dense model with one hidden layer
+        #: a dense model with one hidden layer
         self.network = torch.nn.Sequential(
             torch.nn.Linear(number_of_features, 128),
             torch.nn.ReLU(),
@@ -57,6 +65,9 @@ class myModel(torch.nn.Module):
         )
 
     def forward(self, x):
+        """
+        Run the network
+        """
         prob = self.network(x)
         return prob
 
@@ -65,17 +76,16 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     """
     Returns default torch model
     """
-    state = State(myModel(number_of_features).to("cuda" if torch.cuda.is_available() else "cpu"))
+
+    state = State(myModel().to("cuda" if torch.cuda.is_available() else "cpu"))
     print(state.model)
 
     state.optimizer = torch.optim.SGD(state.model.parameters(), parameters.get('learning_rate', 1e-3))
 
     # we recreate the loss function on each batch so that we can pass in the weights
+    # this is a weird feature of how torch handles event weights
     state.loss_fn = torch.nn.BCELoss
 
-    # for book keeping
-    state.epoch = 0
-    state.avg_costs = []
     return state
 
 
@@ -118,7 +128,10 @@ def partial_fit(state, X, S, y, w, epoch, batch):
     loss.backward()
     state.optimizer.step()
 
-    if epoch != state.epoch:
+    if batch == 0 and epoch == 0:
+        state.avg_costs = [loss.detach().numpy()]
+        state.epoch = epoch
+    elif epoch != state.epoch:
         # we are at the start of a new epoch, print out details of the last epoch
         if len(state.ytest) > 0:
             # run the validation set:
@@ -135,6 +148,9 @@ def partial_fit(state, X, S, y, w, epoch, batch):
         state.epoch = epoch
     else:
         state.avg_costs.append(loss.detach().numpy())
+
+    if epoch == 100000:
+        return False
     return True
 
 
@@ -163,6 +179,9 @@ def load(obj):
             with open(path, 'w+b') as file:
                 file.write(bytes(obj[1][file_index]))
 
+        # state = get_model(*args, **kwargs)
+        # model = torch.jit.load(temp_path.joinpath(file_names[0]))
+        # model.load_state_dict(torch.load(temp_path.joinpath(file_names[0])))
         model = torch.load(temp_path.joinpath(file_names[0]))
         model.eval()  # sets dropout and batch norm layers to eval mode
         device = "cuda" if torch.cuda.is_available() else "cpu"

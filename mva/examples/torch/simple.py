@@ -15,10 +15,18 @@ import torch
 
 
 class myModel(torch.nn.Module):
-    def __init__(self, number_of_features=1):
+    """
+    My dense neural network
+    """
+
+    def __init__(self, number_of_features):
+        """
+        Init the network
+        param: number_of_features number of input variables
+        """
         super(myModel, self).__init__()
 
-        # a dense model with one hidden layer
+        #: a dense model with one hidden layer
         self.network = torch.nn.Sequential(
             torch.nn.Linear(number_of_features, 128),
             torch.nn.ReLU(),
@@ -29,6 +37,9 @@ class myModel(torch.nn.Module):
         )
 
     def forward(self, x):
+        """
+        Run the network
+        """
         prob = self.network(x)
         return prob
 
@@ -37,7 +48,6 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     """
     Returns default torch model
     """
-    import torch
 
     state = State(myModel(number_of_features).to("cuda" if torch.cuda.is_available() else "cpu"))
     print(state.model)
@@ -84,7 +94,7 @@ if __name__ == "__main__":
     specific_options = basf2_mva.PythonOptions()
     specific_options.m_framework = "torch"
     specific_options.m_steering_file = 'mva/examples/torch/simple.py'
-    specific_options.m_nIterations = 100
+    specific_options.m_nIterations = 1
     specific_options.m_mini_batch_size = 200
     specific_options.m_config = json.dumps({'learning_rate': 1e-2})
     specific_options.m_training_fraction = 0.8

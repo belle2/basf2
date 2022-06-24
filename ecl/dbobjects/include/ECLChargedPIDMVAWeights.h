@@ -119,9 +119,9 @@ namespace Belle2 {
    * Stores all required information for the ECLChargedPIDMVA for a phasespace category.
    * This includes:
    *  - MVA weightfiles for multiclass MVA.
-   *  - TF1 p.d.fs for each charged particle hypothesis for each mva output variable.
    *  - MVAResponseTransform mode detailing which transformations will be applied to the MVA response.
    *  - unordered_map mapping a particle hypothesis to the output index of a MVA.
+   *  - (Optional) TF1 p.d.fs for each charged particle hypothesis for each mva output variable.
    *  - (Optional) TH1F for each charged particle hypothesis for each mva output variable for gaussianisation.
    *  - (Optional) vector of floats (flattened square matrix) for potential linear decorrelation of the gaussian transformed mva response variables.
    */
@@ -163,7 +163,6 @@ namespace Belle2 {
     */
     ECLChargedPIDPhasespaceCategory(const std::string weightfilePath,
                                     const MVAResponseTransformMode& mvaResponeTransformMode,
-                                    const std::vector<std::unordered_map<unsigned int, TF1>>& pdfs,
                                     const std::unordered_map<unsigned int, unsigned int>& mvaIndexForHypothesis) :
       m_log_transform_offset("logTransformOffset", 1e-15),
       m_max_possible_response_value("maxPossibleResponseValue", 1.0),
@@ -186,7 +185,6 @@ namespace Belle2 {
       // store
       m_weight = ss.str();
       m_mvaResponseTransformMode = mvaResponeTransformMode;
-      m_pdfs = pdfs;
       m_mvaIndexForHypothesis = mvaIndexForHypothesis;
     }
 
@@ -239,6 +237,14 @@ namespace Belle2 {
      * @param cdfs vector of map of cdfs to be stored in the payload.
      */
     void setCDFs(std::vector<std::unordered_map<unsigned int, TH1F>> cdfs) {m_cdfs = cdfs;}
+
+
+    /**
+     * Set the pdfs.
+     * @param pdfs vector of map of pdfs to be stored in the payload.
+     */
+    void setPDFs(std::vector<std::unordered_map<unsigned int, TF1>>& pdfs) {m_pdfs = pdfs;}
+
 
     /**
      * Set the decorrelation matrices.

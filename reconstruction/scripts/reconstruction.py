@@ -785,6 +785,8 @@ def add_ecl_chargedpid_module(path, components=None, legacyMode=False):
         if legacyMode:
             path.add_module('ECLChargedPID')
         else:
+            path.add_module('ECLFillCellIdMapping')
+            path.add_module('ECLCNNPid')
             path.add_module('ECLChargedPIDMVA')
 
 

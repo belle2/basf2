@@ -64,10 +64,11 @@ void SingleHoughSpaceFastInterceptFinder::initialize()
   Super::initialize();
 
   m_maxRecursionLevel = ceil(log2(std::max(m_nAngleSectors, m_nVerticalSectors))) - 1;
-  B2ASSERT("The maximum number of recursions (maximumRecursionLevel) must not be larger than 14, but it is " <<
-           m_maxRecursionLevel <<
-           ", please choose a smaller value for maximumRecursionLevel, and / or for nAngleSectors and / or nVerticalSectors.",
-           m_maxRecursionLevel <= 14);
+  if (m_maxRecursionLevel > 14) {
+    B2ERROR("The maximum number of recursions (maximumRecursionLevel) must not be larger than 14, but it is " <<
+            m_maxRecursionLevel <<
+            ", please choose a smaller value for maximumRecursionLevel, and / or for nAngleSectors and / or nVerticalSectors.");
+  }
   m_unitX = (m_maximumX - m_minimumX) / (double)m_nAngleSectors;
   for (uint i = 0; i < m_nAngleSectors; i++) {
     double x = m_minimumX + m_unitX * (double)i;

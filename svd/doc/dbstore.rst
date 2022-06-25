@@ -66,7 +66,7 @@ Check `MCPositionFudge@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDMCClust
 
 	       #. fudge factor: width of the gaussian from which we draw a random number to be added to the reconstructed cluster time
 
-Check `MCTimeFudge@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDMCClusterTimeFudgeFactor&perpage=25&>`_ all revisions available in the Conditions Database. Revision **2** is used for experiment 0 and 1003.
+Check `MCTimeFudge@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDMCClusterTimeFudgeFactor&perpage=25&>`_ all revisions available in the Conditions Database. Revision **3** is used for experiment 0 and 1003, and run-dependent MC.
 
 The local calibrations wrappers  :ref:`SVDNoiseCalibrations<svdnoisecal>`, :ref:`SVDPulseShapeCalibrations<svdpulsecal>` and :ref:`SVDFADCMaskedStrips<svdmaskedcal>` are also used in the digitizer.
 

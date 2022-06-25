@@ -47,13 +47,13 @@ namespace Belle2 {
       po::options_description description("Trivial options");
       description.add_options()
       ("output", po::value<double>(&m_output),
-       "Outputs this value for all predictions in binary classification. If passthrough is not enabled.");
+       "Outputs this value for all predictions in binary classification (unless passthrough is enabled).");
       description.add_options()
       ("multiple_output", po::value<std::vector<double>>(&m_multiple_output)->multitoken(),
-       "Outputs these values for their respective classes in multiclass classification. If passthrough is not enabled.");
+       "Outputs these values for their respective classes in multiclass classification (unless passthrough is enabled).");
       description.add_options()
       ("passthrough", po::value<bool>(&m_passthrough),
-       "If enabled the method returns the value of the input variable. Requires there to be only a single input variable. For multiclass classification the same value is returned for all classes.");
+       "If enabled, the method returns the value of the input variable. This option requires the presence of only one input variable. For multiclass classification, the same value is returned for all classes.");
       return description;
     }
 

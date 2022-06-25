@@ -28,7 +28,15 @@ const int c_MaxSectorID = 7;
 const int c_TotalLayers = 15;
 
 
+constexpr  KLM_type c_BKLM = KLMElementNumbers::c_BKLM;
+constexpr  KLM_type c_EKLM = KLMElementNumbers::c_EKLM;
 
+
+constexpr  isectors_t c_backward_eklm = KLM_TRG_definitions::c_backward_eklm;
+constexpr  isectors_t c_backward_bklm = KLM_TRG_definitions::c_backward_bklm;
+
+constexpr  isectors_t c_forward_bklm  = KLM_TRG_definitions::c_forward_bklm;
+constexpr  isectors_t c_forward_eklm = KLM_TRG_definitions::c_forward_eklm;
 
 
 std::size_t countBits(uint64_t n)
@@ -104,7 +112,7 @@ Belle2::KLM_trg_summery Belle2::make_trg(std::vector<KLM_Digit_compact>& hits, i
 {
 
 
-  std::cout << "eventNr: " << eventNr << std::endl;
+
 
   sort(hits);
   //drop_duplicates(hits);
@@ -152,30 +160,24 @@ Belle2::KLM_trg_summery Belle2::make_trg(std::vector<KLM_Digit_compact>& hits, i
 
   return std::make_tuple(
            KLM_digit_n::event_nr(eventNr),
-           BKLM_n_trg_sectors(first_or_default(summery2, KLM_type(KLMElementNumbers::c_BKLM), 0, n_sections_trig{})),
-           EKLM_n_trg_sectors(first_or_default(summery2, KLM_type(KLMElementNumbers::c_EKLM), 0, n_sections_trig{})),
+           BKLM_n_trg_sectors(n_sections_trig(get_first(summery2, c_BKLM))),
+           EKLM_n_trg_sectors(n_sections_trig(get_first(summery2, c_EKLM))),
 
 
-           Sector_mask_Backward_Barrel(first_or_default(n_triggered_sectors2, isectors_t(KLM_TRG_definitions::i_backward_bklm), 0, sector_mask{})),
-           Sector_mask_Forward_Barrel(first_or_default(n_triggered_sectors2, isectors_t(KLM_TRG_definitions::i_forward_bklm), 0, sector_mask{})),
-           Sector_mask_Backward_Endcap(first_or_default(n_triggered_sectors2, isectors_t(KLM_TRG_definitions::i_backward_eklm), 0, sector_mask{}))
-           ,
-           Sector_mask_Forward_Endcap(first_or_default(n_triggered_sectors2, isectors_t(KLM_TRG_definitions::i_forward_eklm), 0, sector_mask{})),
+           Sector_mask_Backward_Barrel(sector_mask(get_first(n_triggered_sectors2, c_backward_bklm))),
+           Sector_mask_Forward_Barrel(sector_mask(get_first(n_triggered_sectors2, c_forward_bklm))),
+           Sector_mask_Backward_Endcap(sector_mask(get_first(n_triggered_sectors2, c_backward_eklm))),
+           Sector_mask_Forward_Endcap(sector_mask(get_first(n_triggered_sectors2, c_forward_eklm))),
 
 
-           Sector_mask_OR_Backward_Barrel(first_or_default(n_triggered_sectors2, isectors_t(KLM_TRG_definitions::i_backward_bklm), 0,
-                                                           sector_mask_or{})),
-           Sector_mask_OR_Forward_Barrel(first_or_default(n_triggered_sectors2, isectors_t(KLM_TRG_definitions::i_forward_bklm), 0,
-                                                          sector_mask_or{})),
-           Sector_mask_OR_Backward_Endcap(first_or_default(n_triggered_sectors2, isectors_t(KLM_TRG_definitions::i_backward_eklm), 0,
-                                                           sector_mask_or{})),
-           Sector_mask_OR_Forward_Endcap(first_or_default(n_triggered_sectors2, isectors_t(KLM_TRG_definitions::i_forward_eklm), 0,
-                                                          sector_mask_or{})),
+           Sector_mask_OR_Backward_Barrel(sector_mask_or(get_first(n_triggered_sectors2, c_backward_bklm))),
+           Sector_mask_OR_Forward_Barrel(sector_mask_or(get_first(n_triggered_sectors2, c_forward_bklm))),
+           Sector_mask_OR_Backward_Endcap(sector_mask_or(get_first(n_triggered_sectors2, c_backward_eklm))),
+           Sector_mask_OR_Forward_Endcap(sector_mask_or(get_first(n_triggered_sectors2, c_forward_eklm))),
 
 
-
-           BKLM_back_to_back_flag(first_or_default(summery1, KLM_type(KLMElementNumbers::c_BKLM), 0, back2back_t{})),
-           EKLM_back_to_back_flag(first_or_default(summery1, KLM_type(KLMElementNumbers::c_EKLM), 0, back2back_t{}))
+           BKLM_back_to_back_flag(back2back_t(get_first(summery1, c_BKLM))),
+           EKLM_back_to_back_flag(back2back_t(get_first(summery1, c_EKLM)))
 
          );
 

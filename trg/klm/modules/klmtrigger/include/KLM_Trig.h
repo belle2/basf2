@@ -7,10 +7,10 @@ namespace Belle2 {
   class KLM_TRG_definitions {
   public:
     enum SubdetectorSector {
-      i_forward_eklm = 0,
-      i_forward_bklm = 1,
-      i_backward_bklm = 2,
-      i_backward_eklm = 3
+      c_forward_eklm = 0,
+      c_forward_bklm = 1,
+      c_backward_bklm = 2,
+      c_backward_eklm = 3
     };
   };
 

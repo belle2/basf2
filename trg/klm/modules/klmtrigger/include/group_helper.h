@@ -54,8 +54,8 @@ namespace Belle2::group_helper {
     T m_value = T{};
 
     using my_type = T;
-    axis_name_t() = default;
-    explicit axis_name_t(T val) : m_value(val) {}
+    constexpr axis_name_t() = default;
+    constexpr explicit axis_name_t(T val) : m_value(val) {}
 
     operator T() const
     {
@@ -68,7 +68,7 @@ namespace Belle2::group_helper {
 #define  AXIS_NAME1(name_, type_, name_str) \
   struct name_; \
   struct name_ : axis_name_t<type_> { \
-    name_(type_ val) : axis_name_t<type_>(val) {}  \
+    constexpr name_(type_ val) : axis_name_t<type_>(val) {}  \
     template <typename... T1>\
     name_(const std::tuple <T1...> & val) :name_( std::get<name_>(val)) {}  \
     name_() = default; \
@@ -404,8 +404,10 @@ namespace Belle2::group_helper {
         return e;
       }
     }
-    return decltype(container[0]) {};
+    static decltype(container[0])  ret{};
+    return ret;
   }
+
 
   struct Compare_true {
     template<typename T1, typename T2>

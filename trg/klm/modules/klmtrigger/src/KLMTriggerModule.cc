@@ -224,13 +224,13 @@ void KLMTriggerModule::endRun()
 int to_i_sector(int KLM_type_, int section_)
 {
   if (KLM_type_ == KLMElementNumbers::c_BKLM && section_ == BKLMElementNumbers::c_BackwardSection) {
-    return Belle2::KLM_TRG_definitions::i_backward_bklm;
+    return Belle2::KLM_TRG_definitions::c_backward_bklm;
   } else if (KLM_type_ == KLMElementNumbers::c_BKLM && section_ == BKLMElementNumbers::c_ForwardSection) {
-    return Belle2::KLM_TRG_definitions::i_forward_bklm;
+    return Belle2::KLM_TRG_definitions::c_forward_bklm;
   } else if (KLM_type_ == KLMElementNumbers::c_EKLM && section_ == EKLMElementNumbers::c_BackwardSection) {
-    return Belle2::KLM_TRG_definitions::i_backward_eklm;
+    return Belle2::KLM_TRG_definitions::c_backward_eklm;
   } else if (KLM_type_ == KLMElementNumbers::c_EKLM && section_ == EKLMElementNumbers::c_ForwardSection) {
-    return Belle2::KLM_TRG_definitions::i_forward_eklm;
+    return Belle2::KLM_TRG_definitions::c_forward_eklm;
   }
 
   return 0;

@@ -458,7 +458,7 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
 
 
 def add_cr_track_finding(path, reco_tracks="RecoTracks", components=None,
-                         merge_tracks=True, use_second_cdc_hits=False, ):
+                         merge_tracks=True, use_second_cdc_hits=False):
 
     # register EventTrackingInfo
     if 'RegisterEventLevelTrackingInfo' not in path:

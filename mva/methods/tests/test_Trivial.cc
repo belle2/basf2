@@ -101,5 +101,23 @@ namespace {
       EXPECT_FLOAT_EQ(probabilities[i], 0.5);
 
   }
+  TEST(TrivialTest, TrivialPassThrough)
+  {
+    MVA::Interface<MVA::TrivialOptions, MVA::TrivialTeacher, MVA::TrivialExpert> interface;
 
+    MVA::GeneralOptions general_options;
+    MVA::TrivialOptions specific_options;
+    specific_options.m_passthrough = true;
+    TestDataset dataset({1.0, 1.0, 1.0, 1.0, 2.0, 3.0, 2.0, 3.0});
+
+    auto teacher = interface.getTeacher(general_options, specific_options);
+    auto weightfile = teacher->train(dataset);
+
+    auto expert = interface.getExpert();
+    expert->load(weightfile);
+    auto probabilities = expert->apply(dataset);
+    EXPECT_EQ(probabilities.size(), dataset.getNumberOfEvents());
+    for (unsigned int i = 0; i < dataset.getNumberOfEvents(); ++i)
+      EXPECT_FLOAT_EQ(probabilities[i], dataset.m_input[i]);
+  }
 }

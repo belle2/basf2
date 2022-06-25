@@ -28,6 +28,7 @@ namespace Belle2 {
         m_multiple_output[i] = pt.get<double>(std::string("Trivial_multiple_output") + std::to_string(i));
       }
 
+      m_passthrough = pt.get<double>("Trivial_passthrough", false);
     }
 
     void TrivialOptions::save(boost::property_tree::ptree& pt) const
@@ -38,16 +39,21 @@ namespace Belle2 {
       for (unsigned int i = 0; i < m_multiple_output.size(); ++i) {
         pt.put(std::string("Trivial_multiple_output") + std::to_string(i), m_multiple_output[i]);
       }
+      pt.put("Trivial_passthrough", m_passthrough);
     }
 
     po::options_description TrivialOptions::getDescription()
     {
       po::options_description description("Trivial options");
       description.add_options()
-      ("output", po::value<double>(&m_output), "Outputs this value for all predicitions in binary classification.");
+      ("output", po::value<double>(&m_output),
+       "Outputs this value for all predictions in binary classification. If passthrough is not enabled.");
       description.add_options()
       ("multiple_output", po::value<std::vector<double>>(&m_multiple_output)->multitoken(),
-       "Outputs these values for their respective classes in multiclass classification.");
+       "Outputs these values for their respective classes in multiclass classification. If passthrough is not enabled.");
+      description.add_options()
+      ("passthrough", po::value<bool>(&m_passthrough),
+       "If enabled the method returns the value of the input variable. Requires there to be only a single input variable. For multiclass classification the same value is returned for all classes.");
       return description;
     }
 
@@ -74,14 +80,21 @@ namespace Belle2 {
     std::vector<float> TrivialExpert::apply(Dataset& test_data) const
     {
 
+      if (m_specific_options.m_passthrough) {
+        if (test_data.m_input.size() != 1) {
+          B2ERROR("Trivial method in passthrough mode requires exactly 1 input variables. Found " << test_data.m_input.size());
+        }
+      }
       std::vector<float> probabilities(test_data.getNumberOfEvents());
       for (unsigned int iEvent = 0; iEvent < test_data.getNumberOfEvents(); ++iEvent) {
         test_data.loadEvent(iEvent);
-        probabilities[iEvent] = m_specific_options.m_output;
+        if (m_specific_options.m_passthrough) {
+          probabilities[iEvent] = test_data.m_input[iEvent];
+        } else {
+          probabilities[iEvent] = m_specific_options.m_output;
+        }
       }
-
       return probabilities;
-
     }
 
     std::vector<std::vector<float>> TrivialExpert::applyMulticlass(Dataset& test_data) const
@@ -89,11 +102,22 @@ namespace Belle2 {
       if (m_general_options.m_nClasses != m_specific_options.m_multiple_output.size()) {
         B2ERROR("The number of classes declared in the general options do not match the number of outputs declared in the specific options for the Trivial expert");
       }
+
+      if (m_specific_options.m_passthrough) {
+        if (test_data.m_input.size() != 1) {
+          B2ERROR("Trivial method in passthrough mode requires exactly 1 input variables. Found " << test_data.m_input.size());
+        }
+      }
+
       std::vector<std::vector<float>> probabilities(test_data.getNumberOfEvents(), std::vector<float>(m_general_options.m_nClasses));
       for (unsigned int iEvent = 0; iEvent < test_data.getNumberOfEvents(); ++iEvent) {
         test_data.loadEvent(iEvent);
         for (unsigned int iClass = 0; iClass < m_general_options.m_nClasses; ++iClass) {
-          probabilities[iEvent][iClass] = m_specific_options.m_multiple_output.at(iClass);
+          if (m_specific_options.m_passthrough) {
+            probabilities[iEvent][iClass] = test_data.m_input[iEvent];
+          } else {
+            probabilities[iEvent][iClass] = m_specific_options.m_multiple_output.at(iClass);
+          }
         }
       }
       return probabilities;

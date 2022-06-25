@@ -371,7 +371,7 @@ namespace Belle2 {
        */
       void appendPDFOther(const PDFConstructor* pdfOther)
       {
-        if (not pdfOther or pdfOther == this) return;
+        if (not pdfOther) return;
         m_pdfOtherTracks.push_back(pdfOther);
       }
 

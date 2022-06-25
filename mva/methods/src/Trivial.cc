@@ -28,7 +28,7 @@ namespace Belle2 {
         m_multiple_output[i] = pt.get<double>(std::string("Trivial_multiple_output") + std::to_string(i));
       }
 
-      m_passthrough = pt.get<double>("Trivial_passthrough", false);
+      m_passthrough = pt.get<bool>("Trivial_passthrough", false);
     }
 
     void TrivialOptions::save(boost::property_tree::ptree& pt) const
@@ -79,17 +79,16 @@ namespace Belle2 {
 
     std::vector<float> TrivialExpert::apply(Dataset& test_data) const
     {
-
       if (m_specific_options.m_passthrough) {
-        if (test_data.m_input.size() != 1) {
-          B2ERROR("Trivial method in passthrough mode requires exactly 1 input variables. Found " << test_data.m_input.size());
+        if (m_general_options.m_variables.size() != 1) {
+          B2ERROR("Trivial method in passthrough mode requires exactly 1 input variables. Found " << m_general_options.m_variables.size());
         }
       }
       std::vector<float> probabilities(test_data.getNumberOfEvents());
       for (unsigned int iEvent = 0; iEvent < test_data.getNumberOfEvents(); ++iEvent) {
         test_data.loadEvent(iEvent);
         if (m_specific_options.m_passthrough) {
-          probabilities[iEvent] = test_data.m_input[iEvent];
+          probabilities[iEvent] = test_data.m_input[0];
         } else {
           probabilities[iEvent] = m_specific_options.m_output;
         }
@@ -99,13 +98,13 @@ namespace Belle2 {
 
     std::vector<std::vector<float>> TrivialExpert::applyMulticlass(Dataset& test_data) const
     {
-      if (m_general_options.m_nClasses != m_specific_options.m_multiple_output.size()) {
+      if ((m_general_options.m_nClasses != m_specific_options.m_multiple_output.size()) and (not m_specific_options.m_passthrough)) {
         B2ERROR("The number of classes declared in the general options do not match the number of outputs declared in the specific options for the Trivial expert");
       }
 
       if (m_specific_options.m_passthrough) {
-        if (test_data.m_input.size() != 1) {
-          B2ERROR("Trivial method in passthrough mode requires exactly 1 input variables. Found " << test_data.m_input.size());
+        if (m_general_options.m_variables.size() != 1) {
+          B2ERROR("Trivial method in passthrough mode requires exactly 1 input variables. Found " << m_general_options.m_variables.size());
         }
       }
 
@@ -114,7 +113,7 @@ namespace Belle2 {
         test_data.loadEvent(iEvent);
         for (unsigned int iClass = 0; iClass < m_general_options.m_nClasses; ++iClass) {
           if (m_specific_options.m_passthrough) {
-            probabilities[iEvent][iClass] = test_data.m_input[iEvent];
+            probabilities[iEvent][iClass] = test_data.m_input[0];
           } else {
             probabilities[iEvent][iClass] = m_specific_options.m_multiple_output.at(iClass);
           }

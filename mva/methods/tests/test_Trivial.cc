@@ -26,10 +26,12 @@ namespace {
 
     specific_options.m_output = 0.1;
     specific_options.m_multiple_output = {1.0, 2.0, 3.0};
+    specific_options.m_passthrough = true;
 
     boost::property_tree::ptree pt;
     specific_options.save(pt);
     EXPECT_FLOAT_EQ(pt.get<double>("Trivial_output"), 0.1);
+    EXPECT_FLOAT_EQ(pt.get<bool>("Trivial_passthrough"), true);
 
     EXPECT_FLOAT_EQ(pt.get<unsigned int>("Trivial_number_of_multiple_outputs"), 3);
     EXPECT_FLOAT_EQ(pt.get<double>("Trivial_multiple_output0"), 1.0);
@@ -44,11 +46,12 @@ namespace {
     EXPECT_EQ(specific_options2.m_multiple_output.at(1), 2.0);
     EXPECT_EQ(specific_options2.m_multiple_output.at(2), 3.0);
 
-    EXPECT_EQ(specific_options.getMethod(), std::string("Trivial"));
+    EXPECT_EQ(specific_options2.getMethod(), std::string("Trivial"));
+    EXPECT_FLOAT_EQ(specific_options2.m_passthrough, true);
 
     // Test if po::options_description is created without crashing
     auto description = specific_options.getDescription();
-    EXPECT_EQ(description.options().size(), 2);
+    EXPECT_EQ(description.options().size(), 3);
 
     // Check for B2ERROR and throw if version is wrong
     // we try with version 100, surely we will never reach this!
@@ -99,14 +102,15 @@ namespace {
     EXPECT_EQ(probabilities.size(), dataset.getNumberOfEvents());
     for (unsigned int i = 0; i < dataset.getNumberOfEvents(); ++i)
       EXPECT_FLOAT_EQ(probabilities[i], 0.5);
-
   }
+
   TEST(TrivialTest, TrivialPassThrough)
   {
     MVA::Interface<MVA::TrivialOptions, MVA::TrivialTeacher, MVA::TrivialExpert> interface;
 
     MVA::GeneralOptions general_options;
     MVA::TrivialOptions specific_options;
+    general_options.m_variables = {"p",};
     specific_options.m_passthrough = true;
     TestDataset dataset({1.0, 1.0, 1.0, 1.0, 2.0, 3.0, 2.0, 3.0});
 
@@ -118,6 +122,31 @@ namespace {
     auto probabilities = expert->apply(dataset);
     EXPECT_EQ(probabilities.size(), dataset.getNumberOfEvents());
     for (unsigned int i = 0; i < dataset.getNumberOfEvents(); ++i)
-      EXPECT_FLOAT_EQ(probabilities[i], dataset.m_input[i]);
+      EXPECT_FLOAT_EQ(probabilities[i], dataset.m_data[i]);
+  }
+
+  TEST(TrivialTest, TrivialPassThroughMulticlass)
+  {
+    MVA::Interface<MVA::TrivialOptions, MVA::TrivialTeacher, MVA::TrivialExpert> interface;
+
+    MVA::GeneralOptions general_options;
+    MVA::TrivialOptions specific_options;
+    general_options.m_variables = {"p",};
+    specific_options.m_passthrough = true;
+    general_options.m_nClasses = 3;
+    TestDataset dataset({1.0, 1.0, 1.0, 1.0, 2.0, 3.0, 2.0, 3.0});
+
+    auto teacher = interface.getTeacher(general_options, specific_options);
+    auto weightfile = teacher->train(dataset);
+
+    auto expert = interface.getExpert();
+    expert->load(weightfile);
+    auto probabilities = expert->applyMulticlass(dataset);
+    EXPECT_EQ(probabilities.size(), dataset.getNumberOfEvents());
+    for (unsigned int i = 0; i < dataset.getNumberOfEvents(); ++i) {
+      for (unsigned int j = 0; j < probabilities[i].size(); ++ j) {
+        EXPECT_FLOAT_EQ(probabilities[i][j], dataset.m_data[i]);
+      }
+    }
   }
 }

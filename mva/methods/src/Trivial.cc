@@ -53,10 +53,9 @@ namespace Belle2 {
        "Outputs these values for their respective classes in multiclass classification (unless passthrough is enabled).");
       description.add_options()
       ("passthrough", po::value<bool>(&m_passthrough),
-       "If enabled, the method returns the value of the input variable. This option requires the presence of only one input variable. For multiclass classification, the same value is returned for all classes.");
+       "If enabled, the method returns the value of the input variable. For binary classification this option requires the presence of only one input variable. For multiclass classification we require either one input variable which is returned for all classes, or an input variable per class.");
       return description;
     }
-
 
     TrivialTeacher::TrivialTeacher(const GeneralOptions& general_options,
                                    const TrivialOptions& specific_options) : Teacher(general_options),
@@ -103,8 +102,9 @@ namespace Belle2 {
       }
 
       if (m_specific_options.m_passthrough) {
-        if (m_general_options.m_variables.size() != 1) {
-          B2ERROR("Trivial method in passthrough mode requires exactly 1 input variables. Found " << m_general_options.m_variables.size());
+        if ((m_general_options.m_variables.size() != 1) and (m_general_options.m_variables.size() != m_general_options.m_nClasses)) {
+          B2ERROR("Trivial method in passthrough mode requires either exactly one input variable or one per class, matching the number of classes declared in the general options. Found "
+                  << m_general_options.m_variables.size());
         }
       }
 
@@ -113,7 +113,11 @@ namespace Belle2 {
         test_data.loadEvent(iEvent);
         for (unsigned int iClass = 0; iClass < m_general_options.m_nClasses; ++iClass) {
           if (m_specific_options.m_passthrough) {
-            probabilities[iEvent][iClass] = test_data.m_input[0];
+            if (m_general_options.m_variables.size() == 1) {
+              probabilities[iEvent][iClass] = test_data.m_input[0];
+            } else {
+              probabilities[iEvent][iClass] = test_data.m_input[iClass];
+            }
           } else {
             probabilities[iEvent][iClass] = m_specific_options.m_multiple_output.at(iClass);
           }

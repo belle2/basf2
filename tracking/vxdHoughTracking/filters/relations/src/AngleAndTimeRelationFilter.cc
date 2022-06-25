@@ -28,6 +28,8 @@ void AngleAndTimeRelationFilter::exposeParameters(ModuleParamList* moduleParamLi
                                 "Cut on the difference in u-side cluster time between two hits during relation creation.", m_DeltaTU);
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "AngleAndTimeDeltaVTime"), m_DeltaTV,
                                 "Cut on the difference in v-side cluster time between two hits during relation creation.", m_DeltaTV);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "useDeltaTCuts"), m_useDeltaTCuts,
+                                "Use the cut on the time difference between two hits during relation creation?", m_useDeltaTCuts);
 }
 
 TrackFindingCDC::Weight
@@ -54,8 +56,10 @@ AngleAndTimeRelationFilter::operator()(const std::pair<const VXDHoughState*, con
   if ((absLayerDiff == 1 and absThetaDiff < m_ThetaCutDeltaL1) or
       (absLayerDiff == 2 and absThetaDiff < m_ThetaCutDeltaL2)) {
 
-    if (abs(currentHitData.uTime - nextHitData.uTime) < m_DeltaTU and
-        abs(currentHitData.vTime - nextHitData.vTime) < m_DeltaTV) {
+    if (not m_useDeltaTCuts or
+        (m_useDeltaTCuts and
+         abs(currentHitData.uTime - nextHitData.uTime) < m_DeltaTU and
+         abs(currentHitData.vTime - nextHitData.vTime) < m_DeltaTV)) {
       return 1.0;
     }
 

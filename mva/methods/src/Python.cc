@@ -422,7 +422,7 @@ namespace Belle2 {
         }
       }
 
-      std::vector<float> probabilities(test_data.getNumberOfEvents());
+      std::vector<float> probabilities(test_data.getNumberOfEvents(), std::numeric_limits<float>::quiet_NaN());
 
       try {
         auto ndarray_X = boost::python::handle<>(PyArray_SimpleNewFromData(2, dimensions_X, NPY_FLOAT32, X.get()));
@@ -432,6 +432,52 @@ namespace Belle2 {
           // to a PyObject but do not inherit from it!
           probabilities[iEvent] = static_cast<float>(*static_cast<float*>(PyArray_GETPTR1(reinterpret_cast<PyArrayObject*>(result.ptr()),
                                                      iEvent)));
+        }
+      } catch (...) {
+        PyErr_Print();
+        PyErr_Clear();
+        B2ERROR("Failed calling applying PythonExpert");
+        throw std::runtime_error("Failed calling applying PythonExpert");
+      }
+
+      return probabilities;
+    }
+
+    std::vector<std::vector<float>> PythonExpert::applyMulticlass(Dataset& test_data) const
+    {
+
+      uint64_t numberOfFeatures = test_data.getNumberOfFeatures();
+      uint64_t numberOfEvents = test_data.getNumberOfEvents();
+
+      auto X = std::unique_ptr<float[]>(new float[numberOfEvents * numberOfFeatures]);
+      npy_intp dimensions_X[2] = {static_cast<npy_intp>(numberOfEvents), static_cast<npy_intp>(numberOfFeatures)};
+
+      for (uint64_t iEvent = 0; iEvent < numberOfEvents; ++iEvent) {
+        test_data.loadEvent(iEvent);
+        if (m_specific_options.m_normalize) {
+          for (uint64_t iFeature = 0; iFeature < numberOfFeatures; ++iFeature)
+            X[iEvent * numberOfFeatures + iFeature] = (test_data.m_input[iFeature] - m_means[iFeature]) / m_stds[iFeature];
+        } else {
+          for (uint64_t iFeature = 0; iFeature < numberOfFeatures; ++iFeature)
+            X[iEvent * numberOfFeatures + iFeature] = test_data.m_input[iFeature];
+        }
+      }
+
+      unsigned int nClasses = m_general_options.m_nClasses;
+      std::vector<std::vector<float>> probabilities(test_data.getNumberOfEvents(), std::vector<float>(nClasses,
+                                                    std::numeric_limits<float>::quiet_NaN()));
+
+      try {
+        auto ndarray_X = boost::python::handle<>(PyArray_SimpleNewFromData(2, dimensions_X, NPY_FLOAT32, X.get()));
+        auto result = m_framework.attr("apply")(m_state, ndarray_X);
+        for (uint64_t iEvent = 0; iEvent < numberOfEvents; ++iEvent) {
+          // We have to do some nasty casting here, because the Python C-Api uses structs which are binary compatible
+          // to a PyObject but do not inherit from it!
+          for (uint64_t iClass = 0; iClass < nClasses; ++iClass) {
+            probabilities[iEvent][iClass] = static_cast<float>(*static_cast<float*>(PyArray_GETPTR2(reinterpret_cast<PyArrayObject*>
+                                                               (result.ptr()),
+                                                               iEvent, iClass)));
+          }
         }
       } catch (...) {
         PyErr_Print();

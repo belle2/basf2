@@ -10,7 +10,6 @@ import argparse
 import multiprocessing
 
 import basf2
-import ROOT
 
 from softwaretrigger import constants
 from pxd import add_roi_payload_assembler, add_roi_finder
@@ -149,6 +148,10 @@ def add_hlt_processing(path,
     """
     Add all modules for processing on HLT filter machines
     """
+
+    # Always avoid the top-level 'import ROOT'.
+    import ROOT  # noqa
+
     path.add_module('StatisticsSummary').set_name('Sum_Wait')
 
     if unpacker_components is None:

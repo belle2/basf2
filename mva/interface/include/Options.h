@@ -82,6 +82,7 @@ namespace Belle2 {
       std::vector<std::string> m_variables; /**< Vector of all variables (branch names) used in the training */
       std::vector<std::string> m_spectators; /**< Vector of all spectators (branch names) used in the training */
       int m_signal_class = 1; /**< Signal class which is used as signal in a classification problem */
+      unsigned int m_nClasses = 2; /**< Number of classes in a classification problem. */
       std::string m_target_variable = "isSignal"; /**< Target variable (branch name) defining the target */
       std::string m_weight_variable = "__weight__"; /**< Weight variable (branch name) defining the weights */
       unsigned int m_max_events = 0; /**< Maximum number of events to process, 0 means all */
@@ -149,7 +150,7 @@ namespace Belle2 {
         if (v <= min || v >= max)
         {
           throw po::validation_error(po::validation_error::invalid_option_value, name,
-          std::to_string(min) + " <= " + name + " <= " + std::to_string(max) + ": provided value " + std::to_string(v));
+                                     std::to_string(min) + " <= " + name + " <= " + std::to_string(max) + ": provided value " + std::to_string(v));
         }
       };
     }
@@ -162,7 +163,7 @@ namespace Belle2 {
         {
           if (v <= min || v >= max) {
             throw po::validation_error(po::validation_error::invalid_option_value, name,
-            std::to_string(min) + " <= " + name + " <= " + std::to_string(max) + ": provided value " + std::to_string(v));
+                                       std::to_string(min) + " <= " + name + " <= " + std::to_string(max) + ": provided value " + std::to_string(v));
           }
         }
       };

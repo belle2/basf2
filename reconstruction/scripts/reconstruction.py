@@ -11,8 +11,6 @@
 
 import basf2
 
-from ROOT import Belle2
-
 from geometry import check_components
 
 from svd import add_svd_reconstruction
@@ -210,6 +208,9 @@ def add_prefilter_reconstruction(
     :param legacy_ecl_charged_pid: Bool denoting whether to use the legacy EoP based charged particleID in the ECL (true) or
       MVA based charged particle ID (false).
     """
+
+    # Always avoid the top-level 'import ROOT'.
+    from ROOT import Belle2  # noqa
 
     # Check components.
     check_components(components)

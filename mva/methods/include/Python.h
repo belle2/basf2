@@ -125,6 +125,12 @@ namespace Belle2 {
        */
       virtual std::vector<float> apply(Dataset& test_data) const override;
 
+      /**
+       * Apply this expert onto a dataset for multiclass problem
+       * @param test_data dataset
+       */
+      virtual std::vector<std::vector<float>> applyMulticlass(Dataset& test_data) const override;
+
     protected:
       PythonOptions m_specific_options; /**< Method specific options */
       boost::python::object m_framework; /**< Framework module */

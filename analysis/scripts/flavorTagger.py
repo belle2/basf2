@@ -135,7 +135,6 @@ def getFastBDTCategories():
     Helper function for getting the FastBDT categories.
     It's necessary for removing top-level ROOT imports.
     '''
-    import ROOT  # noqa
     fastBDTCategories = basf2_mva.FastBDTOptions()
     fastBDTCategories.m_nTrees = 500
     fastBDTCategories.m_nCuts = 8
@@ -150,7 +149,6 @@ def getFastBDTCombiner():
     Helper function for getting the FastBDT combiner.
     It's necessary for removing top-level ROOT imports.
     '''
-    import ROOT  # noqa
     fastBDTCombiner = basf2_mva.FastBDTOptions()
     fastBDTCombiner.m_nTrees = 500
     fastBDTCombiner.m_nCuts = 8
@@ -165,7 +163,6 @@ def getMlpFANNCombiner():
     Helper function for getting the MLP FANN combiner.
     It's necessary for removing top-level ROOT imports.
     '''
-    import ROOT  # noqa
     mlpFANNCombiner = basf2_mva.FANNOptions()
     mlpFANNCombiner.m_max_epochs = 10000
     mlpFANNCombiner.m_hidden_layers_architecture = "3*N"

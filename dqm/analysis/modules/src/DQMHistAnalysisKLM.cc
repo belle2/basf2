@@ -73,7 +73,7 @@ void DQMHistAnalysisKLMModule::initialize()
             << LogVar("Threshold for masked channels", m_ThresholdForMasked));
 
   if (m_refFileName != "") {
-    m_refFile = new TFile(m_refFileName.data(), "READ");
+    m_refFile = TFile::Open(m_refFileName.data(), "READ");
   }
 
   //search for reference
@@ -86,6 +86,8 @@ void DQMHistAnalysisKLMModule::initialize()
 
 void DQMHistAnalysisKLMModule::terminate()
 {
+  m_refFile->Close();
+  delete m_refFile;
 }
 
 void DQMHistAnalysisKLMModule::beginRun()
@@ -138,7 +140,7 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
   histogram->Draw();
   n = histogram->GetXaxis()->GetNbins();
 
-  TH1* ref_histogram = NULL;
+  TH1* ref_histogram = nullptr;
   float ref_average = 0;
   if (m_refFile && m_refFile->IsOpen()) {
     ref_histogram = (TH1*)m_refFile->Get(histogram->GetName());
@@ -147,7 +149,7 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
     }
   }
 
-  if (ref_histogram != NULL) {
+  if (ref_histogram != nullptr) {
     for (i = 1; i <= n; i++) {
       double nHitsPerModuleRef = ref_histogram->GetBinContent(i);
       ref_average = ref_average + nHitsPerModuleRef;
@@ -251,7 +253,7 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
 
   if (histogram->GetMaximum()*n > histogram->Integral()*m_ThresholdForLog && average * activeModuleChannels > m_MinHitsForFlagging) {
     canvas->SetLogy();
-  } else if (ref_histogram != NULL) {
+  } else if (ref_histogram != nullptr) {
     if (ref_histogram->GetMaximum()*n > ref_histogram->Integral()*m_ThresholdForLog
         && ref_average * activeModuleChannels > m_MinHitsForFlagging) {
       canvas->SetLogy();

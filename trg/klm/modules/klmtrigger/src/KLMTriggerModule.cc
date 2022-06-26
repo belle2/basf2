@@ -199,8 +199,8 @@ void KLMTriggerModule::initialize()
   KLMTrgFittedTrack_.registerInDataStore();
 
   try {
-    std::cout << m_geometry_fileName << std::endl;
-    m_geo = std::make_shared<KLMTriggerModule::geometry_data>(m_geometry_fileName);
+    // std::cout << m_geometry_fileName << std::endl;
+    // m_geo = std::make_shared<KLMTriggerModule::geometry_data>(m_geometry_fileName);
   } catch (const std::exception& er) {
     B2FATAL(er.what());
   }
@@ -243,7 +243,7 @@ int to_i_sector(int KLM_type_, int section_)
 void KLMTriggerModule::event()
 {
   try {
-    make_linear_fit();
+    //make_linear_fit();
 
     m_KLMTrgSummary.create();
 

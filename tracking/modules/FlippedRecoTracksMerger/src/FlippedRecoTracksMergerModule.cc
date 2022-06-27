@@ -86,8 +86,8 @@ void FlippedRecoTracksMergerModule::event()
               double currentCharge = measuredStateOnPlane.getCharge();
 
               // revert the charge and momentum
-              recoTrack.setChargeSeedOnly(-currentCharge);
-              recoTrack.setPositionAndMomentumOnly(currentPosition,  -currentMomentum);
+              recoTrack.setChargeSeed(-currentCharge);
+              recoTrack.setPositionAndMomentum(currentPosition,  -currentMomentum);
 
               // Reverse the SortingParameters
               auto RecoHitInfos = recoTrack.getRecoHitInformations();

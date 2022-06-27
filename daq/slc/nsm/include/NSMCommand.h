@@ -56,6 +56,11 @@ namespace Belle2 {
       : Enum(id, label) {}
 
   public:
+
+    /**
+     * Operator =.
+     */
+    const NSMCommand& operator=(const NSMCommand& command);
     const NSMCommand& operator=(const std::string& label);
     const NSMCommand& operator=(const char* label);
     const NSMCommand& operator=(int id);

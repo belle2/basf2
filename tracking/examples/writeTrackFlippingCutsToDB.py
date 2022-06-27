@@ -15,7 +15,7 @@ from ROOT import Belle2
 parameters = Belle2.TrackFlippingCuts()
 parameters.setCuts(0.01, 0.8)
 
-iov = Belle2.IntervalOfValidity(0, 0, 0, -1)
+iov = Belle2.IntervalOfValidity(0, 0, -1, -1)
 
 # write db object to 'localdb/'
 Belle2.Database.Instance().storeData('TrackFlippingCuts', parameters, iov)

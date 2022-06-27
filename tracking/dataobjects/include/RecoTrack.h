@@ -497,18 +497,6 @@ namespace Belle2 {
     /// Return the position, the momentum and the charge of the first measured state on plane or - if unfitted - the seeds.
     std::tuple<TVector3, TVector3, short> extractTrackState() const;
 
-    /// Set the position and momentum seed of the reco track without deleting the fit informations.
-    void setPositionAndMomentumOnly(const TVector3& positionSeed, const TVector3& momentumSeed)
-    {
-      m_genfitTrack.setStateSeed(positionSeed, momentumSeed);
-    }
-
-    /// Set the charge seed stored in the reco track without deleting the fit informations.
-    void setChargeSeedOnly(const short int chargeSeed)
-    {
-      m_charge = chargeSeed;
-    }
-
     /// Set the position and momentum seed of the reco track. ATTENTION: This is not the fitted position or momentum.
     void setPositionAndMomentum(const TVector3& positionSeed, const TVector3& momentumSeed)
     {

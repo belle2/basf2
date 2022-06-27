@@ -58,6 +58,7 @@ change might slightly modify the values of (derived) kinematic variables,
 however it should be below most analysts sensitivity.
 
 .. rubric:: Variables
+
 ++++++++++++++
 
  * Added a new variable ``trackTime``, computed by the ``TrackTimeEstimatorModule``. 

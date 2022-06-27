@@ -57,12 +57,12 @@ calculation could suffer from a cancellation of significant digits. This
 change might slightly modify the values of (derived) kinematic variables,
 however it should be below most analysts sensitivity.
 
-.. rubric:: Variables
+.. rubric:: Track time
 
-++++++++++++++
-
- * Added a new variable ``trackTime``, computed by the ``TrackTimeEstimatorModule``. 
-   This track time is the average time of the SVD clusters attached to the track minus the ``SVDEventT0``
+When reconstructing data with release-07 the new variable `trackTime` becomes
+available, which is computed by the ``TrackTimeEstimatorModule``. This track
+time is the average time of the SVD clusters attached to the track minus the
+``SVDEventT0``.
 
 .. include:: analysis/doc/whatsnew-since/release-06-00.txt
 

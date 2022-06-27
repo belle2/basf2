@@ -53,10 +53,10 @@ One can configure :b2:var:`isSignal` to accept missing particles or not to accep
 Marker of unspecified particle
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Particle can be marked as unspecified particle with an at-sign, :code:`'@'`, in the DecayString.
-If the particle is marked as unspecified it will not checked for its identity when doing :ref:`MCMatching`. Any particle which decays into the correct daughters will be flagged as correct. 
-The marker should be added to the beginning of the particle name.
-For example the DecayString :code:`'@K*0 -> K+ pi-'` would match all particles which decay into a Kaon and a pion, for example K*, B0, D0, Xsd ...
+A particle can be marked as unspecified with an at-sign, :code:`'@'`, in the DecayString.
+If the particle is marked as unspecified its identity will not be checked when doing :ref:`MCMatching`. Any particle which decays into the correct daughters will be flagged as correct. 
+However, even the unspecified particle must be a valid particle defined in the evt.pdl file. All available particle names can be listed by ``b2help-particle``, please see :ref:`b2help-particles`.
+For example the DecayString :code:`'@K*0 -> K+ pi-'` would match all particles which decay into a Kaon and a pion, for example K*, B0, D0, Xsd, ...
 Still the daughters need to be stated correctly so this can be used for "sum of exclusive" decays.
 Here is an example of use:
 

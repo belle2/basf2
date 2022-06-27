@@ -8,9 +8,11 @@
 #pragma once
 
 #include <framework/core/Module.h>
+#include <framework/database/DBObjPtr.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <tracking/dataobjects/RecoTrack.h>
+#include <tracking/dbobjects/TrackFlippingCuts.h>
 #include <framework/datastore/StoreAccessorBase.h>
 #include <framework/datastore/RelationArray.h>
 #include <mdst/dataobjects/Track.h>
@@ -38,13 +40,10 @@ namespace Belle2 {
     std::string m_inputStoreArrayName;
     /// Name of the input StoreArray for flipped tracks
     std::string m_inputStoreArrayNameFlipped;
-    /// Store Array of the input tracks
-    //StoreArray<RecoTrack> m_inputRecoTracks;
-    /// Store Array of the input tracks (for relations)
-    //StoreArray<Track> m_tracks;
-
     /// Parameter: the 2nd mva cut
-    float m_2nd_mva_cut = 0.9;
+    float m_2nd_mva_cut = -1.0;
+    /// flipping cuts could be read from the DB
+    OptionalDBObjPtr<TrackFlippingCuts> m_flipCutsFromDB{"TRKTrackFlipAndRefit_MVA_cuts"};
   };
 }
 

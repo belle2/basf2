@@ -8,11 +8,14 @@
 #pragma once
 
 #include <framework/core/Module.h>
+#include <framework/database/DBObjPtr.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
+#include <tracking/dbobjects/TrackFlippingCuts.h>
+
 /**
  * module to revert the recotracks.
  */
@@ -35,8 +38,10 @@ namespace Belle2 {
     std::string m_inputStoreArrayName;
     /// Name of the output StoreArray
     std::string m_outputStoreArrayName;
-    /// mva cut to be applied
-    double m_mvaFlipCut = 0;
+    /// mva cut to be applied.
+    double m_mvaFlipCut = -1.0;
+    /// the flipping cuts can be read from the DB
+    OptionalDBObjPtr<TrackFlippingCuts> m_flipCutsFromDB{"TRKTrackFlipAndRefit_MVA_cuts"};
     /// Store Array of the input tracks
     StoreArray<RecoTrack> m_inputRecoTracks;
     /// Store Array of the output tracks

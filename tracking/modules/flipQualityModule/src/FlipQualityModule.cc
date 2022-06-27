@@ -86,7 +86,7 @@ namespace Belle2 {
           recoTrack.set2ndFlipQualityIndicator(probability);
         }
       } else {
-        B2DEBUG(1, "Nothing will be saved into the flipping qi");
+        B2DEBUG(20, "Nothing will be saved into the flipping qi");
 
       }
 

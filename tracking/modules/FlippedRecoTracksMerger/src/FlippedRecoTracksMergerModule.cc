@@ -22,7 +22,6 @@ FlippedRecoTracksMergerModule::FlippedRecoTracksMergerModule() :
            "Name of the input StoreArray");
   addParam("inputStoreArrayNameFlipped", m_inputStoreArrayNameFlipped,
            "Name of the input StoreArray for flipped tracks");
-  addParam("MVA2nd_cut", m_2nd_mva_cut, "the cut for 2nd flip mva",  m_2nd_mva_cut);
 }
 
 void FlippedRecoTracksMergerModule::initialize()
@@ -49,22 +48,24 @@ void FlippedRecoTracksMergerModule::event()
 
     if (b2track) {
 
-      // if the 2ndMVA was assigned, aka: passed the 1st MVA
-      if (!isnan(recoTrack.get2ndFlipQualityIndicator())) {
+      // get the cut from DB
+      if (m_flipCutsFromDB.isValid()) {
+        m_2nd_mva_cut = (*m_flipCutsFromDB).getSecondCut();
 
-        // get the related RecoTrack_flipped
-        RecoTrack* RecoTrack_flipped =  recoTrack.getRelatedFrom<Belle2::RecoTrack>("RecoTracks_flipped");
+        // if both the 1st MVA and 2nd MVA were passed.
+        if (!isnan(recoTrack.get2ndFlipQualityIndicator()) and (recoTrack.get2ndFlipQualityIndicator() > m_2nd_mva_cut)) {
 
-        if (RecoTrack_flipped) {
+          // get the related RecoTrack_flipped
+          RecoTrack* RecoTrack_flipped =  recoTrack.getRelatedFrom<Belle2::RecoTrack>("RecoTracks_flipped");
 
-          // get the Tracks_flipped
-          Track* b2trackFlipped = RecoTrack_flipped->getRelatedFrom<Belle2::Track>("Tracks_flipped");
-          if (b2trackFlipped) {
-            std::vector<Track::ChargedStableTrackFitResultPair> fitResultsAfter = b2trackFlipped->getTrackFitResults("TrackFitResults_flipped");
-            std::vector<Track::ChargedStableTrackFitResultPair> fitResultsBefore = b2track->getTrackFitResults();
+          if (RecoTrack_flipped) {
 
-            // pass the 2nd MVA cuts
-            if (recoTrack.get2ndFlipQualityIndicator() > m_2nd_mva_cut) {
+            // get the Tracks_flipped
+            Track* b2trackFlipped = RecoTrack_flipped->getRelatedFrom<Belle2::Track>("Tracks_flipped");
+            if (b2trackFlipped) {
+              std::vector<Track::ChargedStableTrackFitResultPair> fitResultsAfter = b2trackFlipped->getTrackFitResults("TrackFitResults_flipped");
+              std::vector<Track::ChargedStableTrackFitResultPair> fitResultsBefore = b2track->getTrackFitResults();
+
               // loop over the original fitResults
               for (long unsigned int index = 0; index < fitResultsBefore.size() ; index++) {
                 // update the fitResults
@@ -85,8 +86,8 @@ void FlippedRecoTracksMergerModule::event()
               double currentCharge = measuredStateOnPlane.getCharge();
 
               // revert the charge and momentum
-              recoTrack.setChargeSeed(-currentCharge);
-              recoTrack.setPositionAndMomentum(currentPosition,  -currentMomentum);
+              recoTrack.setChargeSeedOnly(-currentCharge);
+              recoTrack.setPositionAndMomentumOnly(currentPosition,  -currentMomentum);
 
               // Reverse the SortingParameters
               auto RecoHitInfos = recoTrack.getRecoHitInformations();

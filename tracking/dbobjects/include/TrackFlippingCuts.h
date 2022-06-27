@@ -33,23 +33,21 @@ namespace Belle2 {
     }
 
     /** get the first cuts value */
-    float getFirstCut()
+    float getFirstCut() const
     {
       return m_cutFirst;
     }
 
     /** get the second cuts value */
-    float getSecondCut()
+    float getSecondCut() const
     {
       return m_cutSecond;
     }
 
   private:
-    /** The cuts for the 1st filter
-    */
+    /** The cuts for the 1st filter*/
     float m_cutFirst;
-    /** The cuts for the 2nd filter
-    */
+    /** The cuts for the 2nd filter*/
     float m_cutSecond;
 
     ClassDef(TrackFlippingCuts, 1);  /**< ClassDef, necessary for ROOT */

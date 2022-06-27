@@ -92,31 +92,31 @@ namespace Belle2 {
      */
     std::vector<ChargedStableTrackFitResultPair> getTrackFitResults(const std::string trackFitResultsName = "TrackFitResults") const;
 
-    /* Add Track Refining Status Bit
+    /** Add Track Refining Status Bit
      * @param bitmask to be added to the m_statusBitmap
      */
     void addStatusBit(unsigned short int bitmask) { m_statusBitmap |= bitmask; }
 
-    /* Check the Track status after the Refining step
-    * @return 1 if the track was flipped and refitted in the refining step
-    */
+    /**Check the Track status after the Refining step
+     * @return 1 if the track was flipped and refitted in the refining step
+     */
     void setFlippedAndRefitted() { addStatusBit(c_isFlippedAndRefitted); }
 
-    /* Get Track Status after Refining
-      * @param bitmask
-      *
-      * @return status (1 or 0) corresponding to the bitmask
-      */
+    /** Get Track Status after Refining
+     * @param bitmask
+     *
+     * @return status (1 or 0) corresponding to the bitmask
+     */
     bool getStatusBit(unsigned short int bitmask) const { return (m_statusBitmap & bitmask) == bitmask; }
 
-    /* Check the Track status after the Refining step
-    * @return 1 if the track was flipped and refitted in the refining step
+    /** Check the Track status after the Refining step
+     * @return 1 if the track was flipped and refitted in the refining step
      */
     bool isFlippedAndRefitted() const { return getStatusBit(c_isFlippedAndRefitted); }
 
-    /* Check whether Track was modified in the Refining step
+    /** Check whether Track was modified in the Refining step
      * @return 1 if the track was modified in the refining step
-      */
+     */
     bool wasTrackModified() { return m_statusBitmap > 0; }
 
     /** Set an index (for positive values) or unavailability-code (index = -1) for a specific mass hypothesis.

@@ -15,6 +15,8 @@ Test backwards compatibility for an mdst file produced with release-06-00-00.
 See https://confluence.desy.de/display/BI/Backward+Compatibility if this test fails.
 
 CHANGES since release-06-00-00:
+- Track:
+  + statusBitmap
 - TrackFitResult:
   + remove the const classifier of TrackFitResults and add a function to update the contents
   + updateTrackFitResult

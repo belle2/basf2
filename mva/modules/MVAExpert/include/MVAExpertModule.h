@@ -17,10 +17,10 @@
 #include <framework/database/DBObjPtr.h>
 
 #include <analysis/VariableManager/Manager.h>
+#include <analysis/dataobjects/EventExtraInfo.h>
 
 #include <vector>
 #include <string>
-#include <memory>
 
 namespace Belle2 {
 
@@ -65,10 +65,30 @@ namespace Belle2 {
     float analyse(Particle*);
 
     /**
+     * Calculates expert output for given Particle pointer
+     */
+    std::vector<float> analyseMulticlass(Particle*);
+
+    /**
      * Initialize mva expert, dataset and features
      * Called every time the weightfile in the database changes in begin run
      */
     void init_mva(MVA::Weightfile& weightfile);
+
+    /**
+     * Evaluate the variables and fill the Dataset to be used by the expert.
+     */
+    void fillDataset(Particle*);
+
+    /**
+     * Set the extra info field.
+     */
+    void setExtraInfoField(Particle*, std::string, float);
+
+    /**
+     * Set the event extra info field.
+     */
+    void setEventExtraInfoField(StoreObjPtr<EventExtraInfo>, std::string, float);
 
 
   private:
@@ -87,6 +107,9 @@ namespace Belle2 {
 
     bool m_overwriteExistingExtraInfo; /**< if true, when the given extraInfo is already defined, the old extraInfo value is overwritten */
     bool m_existGivenExtraInfo; /**< check if the given extraInfo is already defined. */
+
+    unsigned int
+    m_nClasses; /**< number of classes (~outputs) of the current MVA Expert. If m_nClasses==2 then only 1 output is expected. */
   };
 
 } // Belle2 namespace

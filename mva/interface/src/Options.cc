@@ -28,6 +28,8 @@ namespace Belle2 {
       ("target_variable", po::value<std::string>(&m_target_variable),
        "target variable used to distinguish between signal and background, isSignal is used as default.")
       ("signal_class", po::value<int>(&m_signal_class), "integer which identifies signal events")
+      ("nClasses", po::value<unsigned int>(&m_nClasses),
+       "number of classes under consideration. Must be supplied for multiclass classifications. Not all methods support multiclass classification.")
       ("weight_variable", po::value<std::string>(&m_weight_variable), "weight variable used to weight each event")
       ("max_events", po::value<unsigned int>(&m_max_events), "maximum number of events to process, 0 means all")
       ("method", po::value<std::string>(&m_method)->required(),
@@ -44,6 +46,7 @@ namespace Belle2 {
       m_weight_variable = pt.get<std::string>("weight_variable");
       m_signal_class = pt.get<int>("signal_class");
       m_max_events = pt.get<unsigned int>("max_events", 0u);
+      m_nClasses = pt.get<unsigned int>("nClasses", 2u);
 
       unsigned int numberOfFiles = pt.get<unsigned int>("number_data_files", 0);
       m_datafiles.resize(numberOfFiles);
@@ -73,6 +76,7 @@ namespace Belle2 {
       pt.put("weight_variable", m_weight_variable);
       pt.put("signal_class", m_signal_class);
       pt.put("max_events", m_max_events);
+      pt.put("nClasses", m_nClasses);
 
       pt.put("number_feature_variables", m_variables.size());
       for (unsigned int i = 0; i < m_variables.size(); ++i) {

@@ -91,7 +91,7 @@ class Basf2CalculationProcess(CalculationProcess):
             self.result_queue.put("ipython.statistics", Basf2CalculationQueueStatistics(_basf2.statistics))
 
             # import ROOT late due to all the side effects
-            from ROOT import Belle2
+            from ROOT import Belle2  # noqa
             store_arrays = list(Belle2.PyStoreArray.list())
             all_arrays = list(dict(Belle2.DataStore.Instance().getStoreEntryMap(Belle2.DataStore.c_Event)).keys())
 

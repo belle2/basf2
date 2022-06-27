@@ -65,12 +65,16 @@ void FlippedRecoTracksMergerModule::event()
 
             // pass the 2nd MVA cuts
             if (recoTrack.get2ndFlipQualityIndicator() > m_2nd_mva_cut) {
+
+              //set the c_isFlippedAndRefitted bit
+              b2track->setFlippedAndRefitted();
+
               // loop over the original fitResults
               for (long unsigned int index = 0; index < fitResultsBefore.size() ; index++) {
+
                 // update the fitResults
                 if (index < fitResultsAfter.size()) {
                   auto fitResultAfter  = fitResultsAfter[index].second;
-
                   fitResultsBefore[index].second->updateTrackFitResult(*fitResultAfter);
                 } else {
                   fitResultsBefore[index].second->maskThisFitResult();

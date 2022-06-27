@@ -86,8 +86,10 @@ void DQMHistAnalysisKLMModule::initialize()
 
 void DQMHistAnalysisKLMModule::terminate()
 {
-  m_refFile->Close();
-  delete m_refFile;
+  if (m_refFile) {
+    m_refFile->Close();
+    delete m_refFile;
+  }
 }
 
 void DQMHistAnalysisKLMModule::beginRun()

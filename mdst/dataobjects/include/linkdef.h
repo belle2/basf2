@@ -17,7 +17,7 @@
 
 #pragma link C++ class Belle2::EventLevelClusteringInfo+; // checksum=0x9b632f9, version=1
 
-#pragma link C++ class Belle2::Track+; // , checksum=0x37562101, version=5
+#pragma link C++ class Belle2::Track+; // checksum=0xf1f141c1, version=5
 #pragma link C++ class Belle2::HitPatternCDC+; // checksum=0x8d86d89e, version=-1
 #pragma link C++ class Belle2::HitPatternVXD+; // checksum=0x5599d6f5, version=-1
 #pragma link C++ class Belle2::TrackFitResult+; // checksum=0x87046527, version=9

@@ -471,7 +471,7 @@ namespace Belle2 {
 
     double isTrackFlippedAndRefitted(const Particle* part)
     {
-      return (part->getTrack())->getStatusBit(Track::c_IsFlippedAndRefitted) ? 1 : 0;
+      return (part->getTrack())->isFlippedAndRefitted() ? 1 : 0;
     }
 
     VARIABLE_GROUP("Tracking");

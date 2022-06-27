@@ -24,7 +24,7 @@ namespace Belle2 {
     /** status enumerator */
     enum StatusBit {
 
-      c_isFlippedAndRefitted = 1 << 0,
+      c_isFlippedAndRefitted = 1 << 0
 
     };
 
@@ -92,29 +92,34 @@ namespace Belle2 {
      */
     std::vector<ChargedStableTrackFitResultPair> getTrackFitResults(const std::string trackFitResultsName = "TrackFitResults") const;
 
-    /* Get Track Status after Refining
-     * @param bitmask
-     *
-     * @return status (1 or 0) corresponding to the bitmask
-     */
-    bool getStatusBit(unsigned short int bitmask) const { return (m_statusBitmap & bitmask) == bitmask; }
-
     /* Add Track Refining Status Bit
      * @param bitmask to be added to the m_statusBitmap
      */
     void addStatusBit(unsigned short int bitmask) { m_statusBitmap |= bitmask; }
 
+    /* Get Track Status after Refining
+      * @param bitmask
+      *
+      * @return status (1 or 0) corresponding to the bitmask
+      */
+    bool getStatusBit(unsigned short int bitmask) const { return (m_statusBitmap & bitmask) == bitmask; }
+
+    /* Check the Track status after the Refining step
+    * @return 1 if the track was flipped and refitted in the refining step
+     */
+    bool isFlippedAndRefitted() const { return getStatusBit(c_isFlippedAndRefitted); }
+
     /* Check whether Track was modified in the Refining step
      * @return 1 if the track was modified in the refining step
       */
-    bool wasTrackModified() { return m_statusBitmap > 0 ? 1 : 0; }
+    bool wasTrackModified() { return m_statusBitmap > 0; }
 
-    /** Set an index (for positive values) or unavailability-code (with negative values) for a specific mass hypothesis.
+    /** Set an index (for positive values) or unavailability-code (index = -1) for a specific mass hypothesis.
       *
       *  The TrackFitResult itself should be saved separately in the DataStore.
       *
       *  @param chargedStable  Determines the hypothesis for which you want to store the index or unavailability-code.
-      *  @param index  index of track fir result (for positive values) or unavailability-code (with negative values)
+      *  @param index  index of track fit result (for positive values) or unavailability-code (index = -1)
       */
     void setTrackFitResultIndex(const Const::ChargedStable& chargedStable, short index)
     {
@@ -149,6 +154,11 @@ namespace Belle2 {
     virtual std::string getInfoHTML() const override;
 
   private:
+
+    /** Bitmap of the track status, contains informations on the refining stage
+    */
+    unsigned short int m_statusBitmap = 0;
+
     /** Index list of the TrackFitResults associated with this Track. */
     short int m_trackFitIndices[Const::ChargedStable::c_SetSize];
 
@@ -165,9 +175,6 @@ namespace Belle2 {
      */
     float const m_qualityIndicator;
 
-    /** Bitmap of the track status, contains informations on the refining stage
-     */
-    unsigned short int m_statusBitmap = 0;
 
     ClassDefOverride(Track, 5); /**< Class that bundles various TrackFitResults. */
   };

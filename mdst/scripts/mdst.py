@@ -87,7 +87,7 @@ def add_mdst_dump(path, print_untested=False):
             "getProduction", "getTime", "getParentLfn", "getGeneratedWeight",
             "isEndOfRun"
         ], array=False),
-        DataStorePrinter("Track", ["getNumberOfFittedHypotheses", "getQualityIndicator"], {
+        DataStorePrinter("Track", ["getNumberOfFittedHypotheses", "getQualityIndicator", "isFlippedAndRefitted"], {
             "getTrackFitResult": charged_stables,
             "getTrackFitResultWithClosestMass": charged_stables,
             "getRelationsWith": ["ECLClusters", "KLMClusters", "MCParticles", "PIDLikelihoods"],

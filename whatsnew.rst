@@ -86,7 +86,7 @@ Changes since release-05
    .. rubric:: ``HepMCInput``, ``HepevtInput`` and ``LHEInput`` modules do not anymore boost the ``MCParticles``
 
    The modules ``HepMCInput``, ``HepevtInput`` and ``LHEInput`` do not anymore boost the ``MCParticles``, and the
-   paramater ``boost2Lab`` is now removed from the modules. These modules can not read the ``BeamParameters``
+   parameter ``boost2Lab`` is now removed from the modules. These modules can not read the ``BeamParameters``
    payloads from the conditions database, so having the particles boosted correctly and in a reproducible way was
    non-trivial.
    A new module, ``BoostMCParticles``, is added for boosting into the laboratory frame the ``MCParticles`` using the

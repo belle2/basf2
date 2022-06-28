@@ -50,5 +50,6 @@ for label in [2, 3]:
     _weighted_eff = compute_accuracy(weighted, mask=weighted["labels"] == label)
     print(f'{lbl} eff: {_standard_eff:.3f}   {_weighted_eff:.3f}')
 
-# I have an external package, 'pidplots', that interfaces with these DataFrames
-# and provides many methods for quickly making plots of the PID performance.
+# There is also an external package, 'pidplots', that interfaces with these
+# DataFrames and provides many methods for quickly making plots of the PID
+# performance.

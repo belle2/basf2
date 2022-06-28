@@ -66,7 +66,8 @@ namespace {
 
   class TestDataset : public MVA::Dataset {
   public:
-    explicit TestDataset(const std::vector<float>& data) : MVA::Dataset(MVA::GeneralOptions()), m_data(data)
+    explicit TestDataset(const std::vector<std::vector<float>>& data) : MVA::Dataset(MVA::GeneralOptions()), m_data(data),
+      m_nFeatures(data[0].size())
     {
       m_input = {0.0};
       m_target = 0.0;
@@ -74,16 +75,22 @@ namespace {
       m_weight = 1.0;
     }
 
-    [[nodiscard]] unsigned int getNumberOfFeatures() const override { return 1; }
+    [[nodiscard]] unsigned int getNumberOfFeatures() const override { return m_nFeatures;}
     [[nodiscard]] unsigned int getNumberOfSpectators() const override { return 0; }
     [[nodiscard]] unsigned int getNumberOfEvents() const override { return m_data.size(); }
-    void loadEvent(unsigned int iEvent) override { m_input[0] = m_data[iEvent]; m_target = iEvent % 2; m_isSignal = m_target == 1; };
+    void loadEvent(unsigned int iEvent) override { m_input = m_data[iEvent]; m_target = iEvent % 2; m_isSignal = m_target == 1; };
     float getSignalFraction() override { return 0.1; };
-    std::vector<float> getFeature(unsigned int) override { return m_data; }
-
-    std::vector<float> m_data;
+    std::vector<float> getFeature(unsigned int iFeature) override
+    {
+      std::vector<float> feature(m_data.size(), 0.0);
+      for (unsigned int iEvent = 0; iEvent << m_data.size(); iEvent++) {
+        feature[iEvent] = m_data[iEvent][iFeature];
+      }
+      return feature;
+    }
+    std::vector<std::vector<float>> m_data;
+    unsigned int m_nFeatures;
   };
-
 
   TEST(TrivialTest, TrivialInterface)
   {
@@ -91,7 +98,7 @@ namespace {
 
     MVA::GeneralOptions general_options;
     MVA::TrivialOptions specific_options;
-    TestDataset dataset({1.0, 1.0, 1.0, 1.0, 2.0, 3.0, 2.0, 3.0});
+    TestDataset dataset({{1.0,}, {1.0,}, {1.0,}, {1.0,}, {2.0,}, {3.0,}, {2.0,}, {3.0,}});
 
     auto teacher = interface.getTeacher(general_options, specific_options);
     auto weightfile = teacher->train(dataset);
@@ -112,7 +119,7 @@ namespace {
     MVA::TrivialOptions specific_options;
     general_options.m_variables = {"p",};
     specific_options.m_passthrough = true;
-    TestDataset dataset({1.0, 1.0, 1.0, 1.0, 2.0, 3.0, 2.0, 3.0});
+    TestDataset dataset({{1.0,}, {1.0,}, {1.0,}, {1.0,}, {2.0,}, {3.0,}, {2.0,}, {3.0,}});
 
     auto teacher = interface.getTeacher(general_options, specific_options);
     auto weightfile = teacher->train(dataset);
@@ -122,7 +129,7 @@ namespace {
     auto probabilities = expert->apply(dataset);
     EXPECT_EQ(probabilities.size(), dataset.getNumberOfEvents());
     for (unsigned int i = 0; i < dataset.getNumberOfEvents(); ++i)
-      EXPECT_FLOAT_EQ(probabilities[i], dataset.m_data[i]);
+      EXPECT_FLOAT_EQ(probabilities[i], dataset.m_data[i][0]);
   }
 
   TEST(TrivialTest, TrivialPassThroughMulticlass)
@@ -134,7 +141,7 @@ namespace {
     general_options.m_variables = {"p",};
     specific_options.m_passthrough = true;
     general_options.m_nClasses = 3;
-    TestDataset dataset({1.0, 1.0, 1.0, 1.0, 2.0, 3.0, 2.0, 3.0});
+    TestDataset dataset({{1.0,}, {1.0,}, {1.0,}, {1.0,}, {2.0,}, {3.0,}, {2.0,}, {3.0,}});
 
     auto teacher = interface.getTeacher(general_options, specific_options);
     auto weightfile = teacher->train(dataset);
@@ -145,7 +152,32 @@ namespace {
     EXPECT_EQ(probabilities.size(), dataset.getNumberOfEvents());
     for (unsigned int i = 0; i < dataset.getNumberOfEvents(); ++i) {
       for (unsigned int j = 0; j < probabilities[i].size(); ++ j) {
-        EXPECT_FLOAT_EQ(probabilities[i][j], dataset.m_data[i]);
+        EXPECT_FLOAT_EQ(probabilities[i][j], dataset.m_data[i][0]);
+      }
+    }
+  }
+
+  TEST(TrivialTest, TrivialPassThroughMulticlassMultiVariable)
+  {
+    MVA::Interface<MVA::TrivialOptions, MVA::TrivialTeacher, MVA::TrivialExpert> interface;
+
+    MVA::GeneralOptions general_options;
+    MVA::TrivialOptions specific_options;
+    general_options.m_variables = {"px", "py", "pz"};
+    specific_options.m_passthrough = true;
+    general_options.m_nClasses = 3;
+    TestDataset dataset({{1.0, 2.0, 3.0}, {1.0, 3.0, 4.0}, {1.0, 7.0, 13.0}});
+
+    auto teacher = interface.getTeacher(general_options, specific_options);
+    auto weightfile = teacher->train(dataset);
+
+    auto expert = interface.getExpert();
+    expert->load(weightfile);
+    auto probabilities = expert->applyMulticlass(dataset);
+    EXPECT_EQ(probabilities.size(), dataset.getNumberOfEvents());
+    for (unsigned int i = 0; i < dataset.getNumberOfEvents(); ++i) {
+      for (unsigned int j = 0; j < probabilities[i].size(); ++ j) {
+        EXPECT_FLOAT_EQ(probabilities[i][j], dataset.m_data[i][j]);
       }
     }
   }

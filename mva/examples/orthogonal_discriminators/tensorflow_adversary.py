@@ -163,14 +163,15 @@ def partial_fit(state, X, S, y, w, epoch, batch):
 
     state.model.optimizer.apply_gradients(zip(grads, trainable_vars))
 
-    if state.epoch == epoch:
-        state.avg_costs.append()
-    else:
-        # started a new epoch, reset the avg_costs and update the counter
+    if batch == 0 and epoch == 0:
         state.avg_costs = [cost]
-        state.epoch = epoch
+    elif batch != state.nBatches-1:
+        state.avg_costs.append(cost)
+    else:
+        # end of the epoch, print summary results, reset the avg_costs and update the counter
+        print(f"Epoch: {epoch:04d} cost= {np.mean(state.avg_costs):.9f}")
+        state.avg_costs = [cost]
 
-    print(f"Epoch: {epoch:04d} cost= {np.mean(state.avg_costs):.9f}")
     if epoch == 100000:
         return False
     return True

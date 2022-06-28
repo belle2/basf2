@@ -471,7 +471,9 @@ namespace Belle2 {
 
     double isTrackFlippedAndRefitted(const Particle* part)
     {
-      return (part->getTrack())->isFlippedAndRefitted() ? 1 : 0;
+      auto track = part->getTrack();
+      if (!track) return realNaN;
+      return track->isFlippedAndRefitted() ? 1 : 0;
     }
 
     VARIABLE_GROUP("Tracking");

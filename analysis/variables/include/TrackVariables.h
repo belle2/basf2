@@ -224,6 +224,9 @@ namespace Belle2 {
     /** 1 if the track that has been flipped and refitted in the refining step */
     double isTrackFlippedAndRefitted(const Particle* part);
 
+    /** return the SVD Track time */
+    double getTrackTime(const Particle* part);
+
   }
 } // Belle2 namespace
 

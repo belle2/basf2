@@ -17,6 +17,7 @@ See https://confluence.desy.de/display/BI/Backward+Compatibility if this test fa
 CHANGES since release-06-00-00:
 - Track:
   + statusBitmap
+  + getTrackTime added
 - TrackFitResult:
   + remove the const classifier of TrackFitResults and add a function to update the contents
   + updateTrackFitResult

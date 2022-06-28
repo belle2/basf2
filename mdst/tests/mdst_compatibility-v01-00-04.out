@@ -21,6 +21,7 @@ Untested method Track::getStatusBit
 Untested method Track::getTrackFitResults
 Untested method Track::setFlippedAndRefitted
 Untested method Track::setTrackFitResultIndex
+Untested method Track::setTrackTime
 Untested method Track::wasTrackModified
 Untested method V0::getTrackFitResultIndices
 Untested method V0::getTrackIndices
@@ -189,6 +190,7 @@ Track#0:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#1
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#2
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#2
+  getTrackTime(): 2.81751e+20
   isFlippedAndRefitted(): False
 Track#1:
   getNumberOfFittedHypotheses(): 3
@@ -213,6 +215,7 @@ Track#1:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#4
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#5
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#5
+  getTrackTime(): 0
   isFlippedAndRefitted(): False
 Track#2:
   getNumberOfFittedHypotheses(): 3
@@ -237,6 +240,7 @@ Track#2:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#7
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#8
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#8
+  getTrackTime(): 0
   isFlippedAndRefitted(): False
 Track#3:
   getNumberOfFittedHypotheses(): 1
@@ -259,6 +263,7 @@ Track#3:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#9
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#9
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#9
+  getTrackTime(): 0
   isFlippedAndRefitted(): False
 Track#4:
   getNumberOfFittedHypotheses(): 3
@@ -281,6 +286,7 @@ Track#4:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#11
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#12
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#12
+  getTrackTime(): 0
   isFlippedAndRefitted(): False
 Track#5:
   getNumberOfFittedHypotheses(): 3
@@ -305,6 +311,7 @@ Track#5:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#14
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#15
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#15
+  getTrackTime(): 0
   isFlippedAndRefitted(): False
 TrackFitResult#0:
 [INFO] Conditions Database: found working server
@@ -5656,6 +5663,7 @@ Track#0:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#1
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#2
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#2
+  getTrackTime(): 2.81751e+20
   isFlippedAndRefitted(): False
 Track#1:
   getNumberOfFittedHypotheses(): 3
@@ -5680,6 +5688,7 @@ Track#1:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#4
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#5
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#5
+  getTrackTime(): 0
   isFlippedAndRefitted(): False
 Track#2:
   getNumberOfFittedHypotheses(): 3
@@ -5702,6 +5711,7 @@ Track#2:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#7
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#8
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#8
+  getTrackTime(): 0
   isFlippedAndRefitted(): False
 Track#3:
   getNumberOfFittedHypotheses(): 3
@@ -5724,6 +5734,7 @@ Track#3:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#10
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#11
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#11
+  getTrackTime(): 0
   isFlippedAndRefitted(): False
 Track#4:
   getNumberOfFittedHypotheses(): 3
@@ -5748,6 +5759,7 @@ Track#4:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#13
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#14
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#14
+  getTrackTime(): 0
   isFlippedAndRefitted(): False
 Track#5:
   getNumberOfFittedHypotheses(): 3
@@ -5769,6 +5781,7 @@ Track#5:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#16
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#17
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#17
+  getTrackTime(): 0
   isFlippedAndRefitted(): False
 Track#6:
   getNumberOfFittedHypotheses(): 1
@@ -5791,6 +5804,7 @@ Track#6:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#18
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#18
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#18
+  getTrackTime(): 8.96831e-44
   isFlippedAndRefitted(): False
 Track#7:
   getNumberOfFittedHypotheses(): 3
@@ -5813,6 +5827,7 @@ Track#7:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#20
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#21
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#21
+  getTrackTime(): 8.96831e-44
   isFlippedAndRefitted(): False
 TrackFitResult#0:
   get4Momentum(): (-0.413809,-0.0745542,0.156042,0.469708)
@@ -11699,6 +11714,7 @@ Track#0:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#1
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#2
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#2
+  getTrackTime(): 2.81751e+20
   isFlippedAndRefitted(): False
 Track#1:
   getNumberOfFittedHypotheses(): 3
@@ -11723,6 +11739,7 @@ Track#1:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#4
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#5
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#5
+  getTrackTime(): 0
   isFlippedAndRefitted(): False
 Track#2:
   getNumberOfFittedHypotheses(): 3
@@ -11747,6 +11764,7 @@ Track#2:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#7
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#8
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#8
+  getTrackTime(): 0
   isFlippedAndRefitted(): False
 Track#3:
   getNumberOfFittedHypotheses(): 3
@@ -11772,6 +11790,7 @@ Track#3:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#10
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#11
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#11
+  getTrackTime(): 0
   isFlippedAndRefitted(): False
 Track#4:
   getNumberOfFittedHypotheses(): 3
@@ -11794,6 +11813,7 @@ Track#4:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#13
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#14
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#14
+  getTrackTime(): 0
   isFlippedAndRefitted(): False
 TrackFitResult#0:
   get4Momentum(): (-0.613985,0.619082,0.0134006,0.883119)
@@ -16202,6 +16222,7 @@ Track#0:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#1
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#2
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#2
+  getTrackTime(): 2.81751e+20
   isFlippedAndRefitted(): False
 Track#1:
   getNumberOfFittedHypotheses(): 3
@@ -16226,6 +16247,7 @@ Track#1:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#4
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#5
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#5
+  getTrackTime(): 0
   isFlippedAndRefitted(): False
 Track#2:
   getNumberOfFittedHypotheses(): 3
@@ -16251,6 +16273,7 @@ Track#2:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#7
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#8
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#8
+  getTrackTime(): 0
   isFlippedAndRefitted(): False
 Track#3:
   getNumberOfFittedHypotheses(): 3
@@ -16275,6 +16298,7 @@ Track#3:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#10
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#11
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#11
+  getTrackTime(): 0
   isFlippedAndRefitted(): False
 Track#4:
   getNumberOfFittedHypotheses(): 3
@@ -16300,6 +16324,7 @@ Track#4:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#13
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#14
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#14
+  getTrackTime(): 0
   isFlippedAndRefitted(): False
 Track#5:
   getNumberOfFittedHypotheses(): 3
@@ -16324,6 +16349,7 @@ Track#5:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#16
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#17
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#17
+  getTrackTime(): 0
   isFlippedAndRefitted(): False
 Track#6:
   getNumberOfFittedHypotheses(): 3
@@ -16348,6 +16374,7 @@ Track#6:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#19
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#20
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#20
+  getTrackTime(): 8.96831e-44
   isFlippedAndRefitted(): False
 Track#7:
   getNumberOfFittedHypotheses(): 3
@@ -16370,6 +16397,7 @@ Track#7:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#22
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#23
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#23
+  getTrackTime(): 8.96831e-44
   isFlippedAndRefitted(): False
 Track#8:
   getNumberOfFittedHypotheses(): 3
@@ -16393,6 +16421,7 @@ Track#8:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#25
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#26
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#26
+  getTrackTime(): 8.96831e-44
   isFlippedAndRefitted(): False
 Track#9:
   getNumberOfFittedHypotheses(): 3
@@ -16417,6 +16446,7 @@ Track#9:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#28
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#29
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#29
+  getTrackTime(): 8.96831e-44
   isFlippedAndRefitted(): False
 Track#10:
   getNumberOfFittedHypotheses(): 3
@@ -16441,6 +16471,7 @@ Track#10:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#31
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#32
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#32
+  getTrackTime(): 8.96831e-44
   isFlippedAndRefitted(): False
 Track#11:
   getNumberOfFittedHypotheses(): 3
@@ -16465,6 +16496,7 @@ Track#11:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#34
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#35
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#35
+  getTrackTime(): 8.96831e-44
   isFlippedAndRefitted(): False
 Track#12:
   getNumberOfFittedHypotheses(): 3
@@ -16489,6 +16521,7 @@ Track#12:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#37
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#38
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#38
+  getTrackTime(): 8.96831e-44
   isFlippedAndRefitted(): False
 Track#13:
   getNumberOfFittedHypotheses(): 3
@@ -16511,6 +16544,7 @@ Track#13:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#40
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#41
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#41
+  getTrackTime(): 8.96831e-44
   isFlippedAndRefitted(): False
 Track#14:
   getNumberOfFittedHypotheses(): 3
@@ -16533,6 +16567,7 @@ Track#14:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#43
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#44
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#44
+  getTrackTime(): 8.96831e-44
   isFlippedAndRefitted(): False
 Track#15:
   getNumberOfFittedHypotheses(): 3
@@ -16557,6 +16592,7 @@ Track#15:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#46
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#47
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#47
+  getTrackTime(): 0
   isFlippedAndRefitted(): False
 V0#0:
   getRelationsWith(MCParticles): size(0)
@@ -25240,6 +25276,7 @@ Track#0:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#1
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#2
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#2
+  getTrackTime(): 2.81751e+20
   isFlippedAndRefitted(): False
 Track#1:
   getNumberOfFittedHypotheses(): 2
@@ -25262,6 +25299,7 @@ Track#1:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#4
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#4
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#4
+  getTrackTime(): 0
   isFlippedAndRefitted(): False
 Track#2:
   getNumberOfFittedHypotheses(): 3
@@ -25286,6 +25324,7 @@ Track#2:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#6
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#7
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#7
+  getTrackTime(): 0
   isFlippedAndRefitted(): False
 Track#3:
   getNumberOfFittedHypotheses(): 3
@@ -25308,6 +25347,7 @@ Track#3:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#9
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#10
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#10
+  getTrackTime(): 0
   isFlippedAndRefitted(): False
 Track#4:
   getNumberOfFittedHypotheses(): 3
@@ -25332,6 +25372,7 @@ Track#4:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#12
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#13
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#13
+  getTrackTime(): 0
   isFlippedAndRefitted(): False
 Track#5:
   getNumberOfFittedHypotheses(): 3
@@ -25356,6 +25397,7 @@ Track#5:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#15
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#16
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#16
+  getTrackTime(): 0
   isFlippedAndRefitted(): False
 Track#6:
   getNumberOfFittedHypotheses(): 3
@@ -25380,6 +25422,7 @@ Track#6:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#18
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#19
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#19
+  getTrackTime(): 8.96831e-44
   isFlippedAndRefitted(): False
 Track#7:
   getNumberOfFittedHypotheses(): 3
@@ -25404,6 +25447,7 @@ Track#7:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#21
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#22
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#22
+  getTrackTime(): 8.96831e-44
   isFlippedAndRefitted(): False
 Track#8:
   getNumberOfFittedHypotheses(): 3
@@ -25428,6 +25472,7 @@ Track#8:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#24
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#25
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#25
+  getTrackTime(): 8.96831e-44
   isFlippedAndRefitted(): False
 Track#9:
   getNumberOfFittedHypotheses(): 3
@@ -25450,6 +25495,7 @@ Track#9:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#27
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#28
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#28
+  getTrackTime(): 8.96831e-44
   isFlippedAndRefitted(): False
 Track#10:
   getNumberOfFittedHypotheses(): 3
@@ -25472,6 +25518,7 @@ Track#10:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#30
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#31
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#31
+  getTrackTime(): 8.96831e-44
   isFlippedAndRefitted(): False
 Track#11:
   getNumberOfFittedHypotheses(): 3
@@ -25496,6 +25543,7 @@ Track#11:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#33
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#34
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#34
+  getTrackTime(): 8.96831e-44
   isFlippedAndRefitted(): False
 V0#0:
   getRelationsWith(MCParticles): size(0)

@@ -44,6 +44,8 @@ CHANGES since release-03-01-02:
     energies corresponding to the measured momenta became slightly different.
 - EventLevelTriggerTimeInfo
   *  added new storage element for information from the Trigger Timing Distribution (TTD)
+- Track:
+  + getTrackTime added
 """
 
 from basf2 import create_path, process, set_random_seed, find_file

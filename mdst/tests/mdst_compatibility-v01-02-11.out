@@ -18,6 +18,7 @@ Untested method EventMetaData::setTime
 Untested method Track::getInfoHTML
 Untested method Track::getTrackFitResults
 Untested method Track::setTrackFitResultIndex
+Untested method Track::setTrackTime
 Untested method V0::getTrackFitResultIndices
 Untested method V0::getTrackIndices
 Untested method TrackFitResult::getHelix
@@ -181,6 +182,7 @@ Track#0:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#1
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#1
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#1
+  getTrackTime(): nan
 Track#1:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): 0
@@ -202,6 +204,7 @@ Track#1:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#3
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#4
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#4
+  getTrackTime(): nan
 Track#2:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): 0
@@ -225,6 +228,7 @@ Track#2:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#6
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#7
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#7
+  getTrackTime(): nan
 Track#3:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): 0
@@ -248,6 +252,7 @@ Track#3:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#9
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#10
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#10
+  getTrackTime(): nan
 Track#4:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): 0
@@ -271,6 +276,7 @@ Track#4:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#12
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#13
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#13
+  getTrackTime(): nan
 Track#5:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): 0
@@ -294,6 +300,7 @@ Track#5:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#15
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#16
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#16
+  getTrackTime(): nan
 Track#6:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): 0
@@ -317,6 +324,7 @@ Track#6:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#18
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#19
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#19
+  getTrackTime(): nan
 Track#7:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): 0
@@ -340,6 +348,7 @@ Track#7:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#21
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#22
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#22
+  getTrackTime(): nan
 Track#8:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): 0
@@ -363,6 +372,7 @@ Track#8:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#24
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#25
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#25
+  getTrackTime(): nan
 Track#9:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): 0
@@ -386,6 +396,7 @@ Track#9:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#27
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#28
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#28
+  getTrackTime(): nan
 Track#10:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): 0
@@ -409,6 +420,7 @@ Track#10:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#30
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#31
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#31
+  getTrackTime(): nan
 Track#11:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): 0
@@ -430,6 +442,7 @@ Track#11:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#33
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#34
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#34
+  getTrackTime(): nan
 Track#12:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): 0
@@ -453,6 +466,7 @@ Track#12:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#36
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#37
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#37
+  getTrackTime(): nan
 Track#13:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): 0
@@ -476,6 +490,7 @@ Track#13:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#39
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#40
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#40
+  getTrackTime(): nan
 Track#14:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): 0
@@ -497,6 +512,7 @@ Track#14:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#42
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#43
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#43
+  getTrackTime(): nan
 Track#15:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): 0
@@ -520,6 +536,7 @@ Track#15:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#45
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#46
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#46
+  getTrackTime(): nan
 V0#0:
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
@@ -10370,6 +10387,7 @@ Track#0:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#1
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#2
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#2
+  getTrackTime(): nan
 Track#1:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): 0
@@ -10394,6 +10412,7 @@ Track#1:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#4
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#5
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#5
+  getTrackTime(): nan
 Track#2:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): 0
@@ -10415,6 +10434,7 @@ Track#2:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#7
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#8
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#8
+  getTrackTime(): nan
 Track#3:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): 0
@@ -10438,6 +10458,7 @@ Track#3:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#10
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#11
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#11
+  getTrackTime(): nan
 Track#4:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): 0
@@ -10461,6 +10482,7 @@ Track#4:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#13
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#14
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#14
+  getTrackTime(): nan
 Track#5:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): 0
@@ -10484,6 +10506,7 @@ Track#5:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#16
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#17
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#17
+  getTrackTime(): nan
 Track#6:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): 0
@@ -10507,6 +10530,7 @@ Track#6:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#19
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#20
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#20
+  getTrackTime(): nan
 Track#7:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): 0
@@ -10528,6 +10552,7 @@ Track#7:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#22
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#23
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#23
+  getTrackTime(): nan
 Track#8:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): 0
@@ -10549,6 +10574,7 @@ Track#8:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#25
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#26
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#26
+  getTrackTime(): nan
 Track#9:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): 0
@@ -10570,6 +10596,7 @@ Track#9:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#28
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#29
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#29
+  getTrackTime(): nan
 Track#10:
   getNumberOfFittedHypotheses(): 1
   getQualityIndicator(): 0
@@ -10591,6 +10618,7 @@ Track#10:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#30
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#30
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#30
+  getTrackTime(): nan
 Track#11:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): 0
@@ -10614,6 +10642,7 @@ Track#11:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#32
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#33
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#33
+  getTrackTime(): nan
 Track#12:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): 0
@@ -10634,6 +10663,7 @@ Track#12:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#35
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#36
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#36
+  getTrackTime(): nan
 Track#13:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): 0
@@ -10655,6 +10685,7 @@ Track#13:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#38
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#39
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#39
+  getTrackTime(): nan
 V0#0:
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
@@ -20247,6 +20278,7 @@ Track#0:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#1
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#2
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#2
+  getTrackTime(): nan
 Track#1:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): 0
@@ -20268,6 +20300,7 @@ Track#1:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#4
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#5
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#5
+  getTrackTime(): nan
 Track#2:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): 0
@@ -20289,6 +20322,7 @@ Track#2:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#7
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#8
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#8
+  getTrackTime(): nan
 Track#3:
   getNumberOfFittedHypotheses(): 2
   getQualityIndicator(): 0
@@ -20310,6 +20344,7 @@ Track#3:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#10
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#10
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#10
+  getTrackTime(): nan
 Track#4:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): 0
@@ -20331,6 +20366,7 @@ Track#4:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#12
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#13
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#13
+  getTrackTime(): nan
 Track#5:
   getNumberOfFittedHypotheses(): 1
   getQualityIndicator(): 0
@@ -20352,6 +20388,7 @@ Track#5:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#14
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#14
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#14
+  getTrackTime(): nan
 Track#6:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): 0
@@ -20375,6 +20412,7 @@ Track#6:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#16
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#17
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#17
+  getTrackTime(): nan
 Track#7:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): 0
@@ -20399,6 +20437,7 @@ Track#7:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#19
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#20
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#20
+  getTrackTime(): nan
 Track#8:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): 0
@@ -20422,6 +20461,7 @@ Track#8:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#22
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#23
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#23
+  getTrackTime(): nan
 Track#9:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): 0
@@ -20443,6 +20483,7 @@ Track#9:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#25
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#26
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#26
+  getTrackTime(): nan
 Track#10:
   getNumberOfFittedHypotheses(): 1
   getQualityIndicator(): 0
@@ -20464,6 +20505,7 @@ Track#10:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#27
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#27
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#27
+  getTrackTime(): nan
 Track#11:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): 0
@@ -20488,6 +20530,7 @@ Track#11:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#29
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#30
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#30
+  getTrackTime(): nan
 Track#12:
   getNumberOfFittedHypotheses(): 1
   getQualityIndicator(): 0
@@ -20509,6 +20552,7 @@ Track#12:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#31
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#31
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#31
+  getTrackTime(): nan
 Track#13:
   getNumberOfFittedHypotheses(): 2
   getQualityIndicator(): 0
@@ -20529,6 +20573,7 @@ Track#13:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#33
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#33
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#33
+  getTrackTime(): nan
 V0#0:
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair

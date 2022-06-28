@@ -25,6 +25,7 @@ CHANGES since release-00-09-03:
 - Track:
   * getTrackFitResult behavior changed for non-pion tracks
   + getQualityIndicator
+  + getTrackTime added
 - TrackFitResult:
   + ndf
   + chi2

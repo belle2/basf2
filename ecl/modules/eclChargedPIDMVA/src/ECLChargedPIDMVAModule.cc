@@ -65,7 +65,7 @@ void ECLChargedPIDMVAModule::checkDBPayloads()
 
 void ECLChargedPIDMVAModule::initializeMVA()
 {
-  B2DEBUG(12, "Run: " << m_eventMetaData->getRun() <<
+  B2DEBUG(22, "Run: " << m_eventMetaData->getRun() <<
           ". Loading supported MVA interfaces for multi-class charged particle identification.");
 
   Variable::Manager& manager = Variable::Manager::Instance();
@@ -76,7 +76,7 @@ void ECLChargedPIDMVAModule::initializeMVA()
 
   for (const auto& iterator : * (*m_mvaWeights.get())->getPhasespaceCategories()) {
 
-    B2DEBUG(12, "\t\tweightfile[" << iterator.first << "]");
+    B2DEBUG(22, "\t\tweightfile[" << iterator.first << "]");
 
     // De-serialize the string into an MVA::Weightfile object.
     std::stringstream ss(iterator.second.getSerialisedWeight());
@@ -89,7 +89,7 @@ void ECLChargedPIDMVAModule::initializeMVA()
     m_experts[iterator.first] = supported_interfaces[general_options.m_method]->getExpert();
     m_experts.at(iterator.first)->load(weightfile);
 
-    B2DEBUG(12, "\t\tweightfile  at " << iterator.first << " successfully initialised.");
+    B2DEBUG(22, "\t\tweightfile  at " << iterator.first << " successfully initialised.");
 
     // Get the full version of the variable names.
     // These are stored in the xml as an additional vector.
@@ -97,7 +97,7 @@ void ECLChargedPIDMVAModule::initializeMVA()
     auto clf_vars = weightfile.getVector<std::string>(identifier);
     m_variables[iterator.first] = manager.getVariables(clf_vars);
 
-    B2DEBUG(12, "\t\t Weightfile at " << iterator.first << " has " << m_variables[iterator.first].size() << " features.");
+    B2DEBUG(22, "\t\t Weightfile at " << iterator.first << " has " << m_variables[iterator.first].size() << " features.");
 
     std::vector<float> features(clf_vars.size(), 0.0);
     std::vector<float> spectators;
@@ -171,9 +171,9 @@ void ECLChargedPIDMVAModule::event()
       }
     }
 
-    B2DEBUG(12, "Scores: ");
+    B2DEBUG(22, "Scores: ");
     for (unsigned int iResponse = 0; iResponse < scores.size(); iResponse++) {
-      B2DEBUG(12, "\t\t " << iResponse << " : " << scores[iResponse]);
+      B2DEBUG(22, "\t\t " << iResponse << " : " << scores[iResponse]);
     }
 
     float logLikelihoods[Const::ChargedStable::c_SetSize];
@@ -213,7 +213,7 @@ void ECLChargedPIDMVAModule::event()
         logLikelihoods[hypo_idx] = logLikelihoods[hypo_idx] / phasespaceCategory->getTemperature();
         continue;
       }
-      B2DEBUG(12, "MVA Index for hypo " << absPdgId << " : " << phasespaceCategory->getMVAIndexForHypothesis(absPdgId));
+      B2DEBUG(22, "MVA Index for hypo " << absPdgId << " : " << phasespaceCategory->getMVAIndexForHypothesis(absPdgId));
 
       for (unsigned int iResponse = 0; iResponse < transformed_scores.size(); iResponse++) {
         if ((transformMode == transformModes::c_LogTransformSingle) and
@@ -229,14 +229,14 @@ void ECLChargedPIDMVAModule::event()
         float pdfval = phasespaceCategory->getPDF(iResponse, absPdgId)->Eval(transformed_score_copy);
         // Don't take a log of inf or 0
         logL += (std::isnormal(pdfval) && pdfval > 0) ? std::log(pdfval) : c_dummyLogL;
-        B2DEBUG(12, "MVA response index, MVA score, logL: " << iResponse << "  " << transformed_score_copy << "  " << logL << " \n");
+        B2DEBUG(22, "MVA response index, MVA score, logL: " << iResponse << "  " << transformed_score_copy << "  " << logL << " \n");
       }
       logLikelihoods[hypo_idx] = logL;
     } // hypo loop
 
-    B2DEBUG(12, "logL: ");
+    B2DEBUG(22, "logL: ");
     for (unsigned int iLogL = 0; iLogL < Const::ChargedStable::c_SetSize; iLogL++) {
-      B2DEBUG(12, "\t\t " << iLogL << " : " << logLikelihoods[iLogL]);
+      B2DEBUG(22, "\t\t " << iLogL << " : " << logLikelihoods[iLogL]);
     }
 
     const auto eclPidLikelihood = m_eclPidLikelihoods.appendNew(logLikelihoods);

@@ -45,7 +45,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
                                 use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False,
                                 add_cdcTrack_QI=True, add_vxdTrack_QI=False, add_recoTrack_QI=False,
                                 pxd_filtering_offline=False, use_cdc_full_grid_eventt0=False,
-                                flip_recoTrack=False, flip_mva_cut=0.01):
+                                flip_recoTrack=False):
     """
     This function adds the **standard tracking reconstruction** modules
     to a path:
@@ -105,7 +105,6 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
     :param use_cdc_full_grid_eventt0: If True, the module FullGridChi2TrackTimeExtractor is added to the path
                                       for computing the EventT0.
     :param flip_recoTrack: if true, add the recoTracks flipping function in the postfilter
-    :param flip_mva_cut: the cut applied to the 1st Flipping MVA
     """
 
     add_prefilter_tracking_reconstruction(
@@ -133,7 +132,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
                                            fit_tracks=fit_tracks,
                                            reco_tracks=reco_tracks,
                                            prune_temporary_tracks=prune_temporary_tracks,
-                                           flip_recoTrack=flip_recoTrack, flip_mva_cut=flip_mva_cut)
+                                           flip_recoTrack=flip_recoTrack)
 
 
 def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdding=False,
@@ -232,24 +231,23 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
                                                   add_mva_quality_indicator=add_recoTrack_QI)
 
 
-def add_flipping_of_recoTracks(path, fit_tracks=True, reco_tracks="RecoTracks", flip_mva_cut=0.05, trackFitHypotheses=None):
+def add_flipping_of_recoTracks(path, fit_tracks=True, reco_tracks="RecoTracks", trackFitHypotheses=None):
     """
     This function adds the mva based selections and the flipping of the recoTracks
 
     :param path: The path to add the tracking reconstruction modules to
     :param fit_tracks: fit the flipped recotracks or not
     :param reco_tracks: Name of the StoreArray where the reco tracks should be flipped
-    :param flip_mva_cut: the cut applied to the 1st flip Qi to determine if the recoTrack will be flipped
     :param trackFitHypotheses: Which pdg hypothesis to fit. Defaults to [211, 321, 2212].
     """
 
     path.add_module("FlipQuality", recoTracksStoreArrayName=reco_tracks,
-                    identifier='/home/belle2/hanyubo/development/mva/examples/basics/localdb/dbstore_Weightfile_rev_999c51.root',
+                    identifier='TRKTrackFlipAndRefit_MVA1_weightfile',
                     indexOfFlippingMVA=1).set_name("FlipQuality_1stMVA")
 
     reco_tracks_flipped = "RecoTracks_flipped"
     path.add_module("RecoTracksReverter", inputStoreArrayName=reco_tracks,
-                    outputStoreArrayName=reco_tracks_flipped, mvaFlipCut=flip_mva_cut)
+                    outputStoreArrayName=reco_tracks_flipped)
     if fit_tracks:
         path.add_module("DAFRecoFitter", recoTracksStoreArrayName=reco_tracks_flipped).set_name("Combined_DAFRecoFitter_flipped")
         path.add_module("IPTrackTimeEstimator",
@@ -262,15 +260,15 @@ def add_flipping_of_recoTracks(path, fit_tracks=True, reco_tracks="RecoTracks", 
                         321,
                         2212] if not trackFitHypotheses else trackFitHypotheses).set_name("TrackCreator_flipped")
     path.add_module("FlipQuality", recoTracksStoreArrayName=reco_tracks,
-                    identifier='/home/belle2/hanyubo/development/mva/examples/basics/localdb/dbstore_Weightfile_rev_19eac1.root',
+                    identifier='TRKTrackFlipAndRefit_MVA2_weightfile',
                     indexOfFlippingMVA=2).set_name("FlipQuality_2ndMVA")
     path.add_module("FlippedRecoTracksMerger",
                     inputStoreArrayName=reco_tracks,
-                    inputStoreArrayNameFlipped=reco_tracks_flipped, MVA2nd_cut=0.8)
+                    inputStoreArrayNameFlipped=reco_tracks_flipped)
 
 
 def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=False, fit_tracks=True, reco_tracks="RecoTracks",
-                                           prune_temporary_tracks=True, flip_recoTrack=False, flip_mva_cut=0.01):
+                                           prune_temporary_tracks=True, flip_recoTrack=False):
     """
     This function adds the tracking reconstruction modules not required to calculate HLT filter
     decision to a path.
@@ -283,14 +281,13 @@ def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=Fa
     :param prune_temporary_tracks: If false, store all information of the single CDC and VXD tracks before merging.
         If true, prune them.
     :param flip_recoTrack: if true, add the recoTracks flipping function in the postfilter
-    :param flip_mva_cut: the cut applied to the 1st Flipping MVA
     """
 
     if fit_tracks:
         add_postfilter_track_fit(path, components=components, pruneTracks=pruneTracks, reco_tracks=reco_tracks)
 
     if flip_recoTrack:
-        add_flipping_of_recoTracks(path, reco_tracks="RecoTracks", flip_mva_cut=flip_mva_cut)
+        add_flipping_of_recoTracks(path, reco_tracks="RecoTracks")
 
     if prune_temporary_tracks or pruneTracks:
         path.add_module("PruneRecoHits")

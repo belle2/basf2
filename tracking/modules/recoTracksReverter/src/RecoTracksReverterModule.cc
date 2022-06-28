@@ -22,8 +22,6 @@ RecoTracksReverterModule::RecoTracksReverterModule() :
            "Name of the input StoreArray");
   addParam("outputStoreArrayName", m_outputStoreArrayName,
            "Name of the output StoreArray");
-  addParam("mvaFlipCut", m_mvaFlipCut,
-           "mva Flip cut",  m_mvaFlipCut);
 }
 
 void RecoTracksReverterModule::initialize()
@@ -44,24 +42,29 @@ void RecoTracksReverterModule::event()
     if (not recoTrack.wasFitSuccessful()) {
       continue;
     }
-    if (recoTrack.getFlipQualityIndicator() > m_mvaFlipCut) {
-      Track* b2track = recoTrack.getRelatedFrom<Belle2::Track>();
-      if (b2track) {
 
-        const auto& measuredStateOnPlane = recoTrack.getMeasuredStateOnPlaneFromLastHit();
-        TVector3 currentPosition = measuredStateOnPlane.getPos();
-        TVector3 currentMomentum = measuredStateOnPlane.getMom();
-        double currentCharge = measuredStateOnPlane.getCharge();
+    // get the cut from DB
+    if (m_flipCutsFromDB.isValid()) {
+      m_mvaFlipCut = (*m_flipCutsFromDB).getFirstCut();
 
-        RecoTrack* newRecoTrack = m_outputRecoTracks.appendNew(currentPosition, -currentMomentum, -currentCharge,
-                                                               recoTrack.getStoreArrayNameOfCDCHits(), recoTrack.getStoreArrayNameOfSVDHits(), recoTrack.getStoreArrayNameOfPXDHits(),
-                                                               recoTrack.getStoreArrayNameOfBKLMHits(), recoTrack.getStoreArrayNameOfEKLMHits(),
-                                                               recoTrack.getStoreArrayNameOfRecoHitInformation());
-        newRecoTrack->addHitsFromRecoTrack(&recoTrack, newRecoTrack->getNumberOfTotalHits(), true);
-        newRecoTrack->addRelationTo(&recoTrack);
+      if (recoTrack.getFlipQualityIndicator() > m_mvaFlipCut) {
+        Track* b2track = recoTrack.getRelatedFrom<Belle2::Track>();
+        if (b2track) {
+
+          const auto& measuredStateOnPlane = recoTrack.getMeasuredStateOnPlaneFromLastHit();
+          TVector3 currentPosition = measuredStateOnPlane.getPos();
+          TVector3 currentMomentum = measuredStateOnPlane.getMom();
+          double currentCharge = measuredStateOnPlane.getCharge();
+
+          RecoTrack* newRecoTrack = m_outputRecoTracks.appendNew(currentPosition, -currentMomentum, -currentCharge,
+                                                                 recoTrack.getStoreArrayNameOfCDCHits(), recoTrack.getStoreArrayNameOfSVDHits(), recoTrack.getStoreArrayNameOfPXDHits(),
+                                                                 recoTrack.getStoreArrayNameOfBKLMHits(), recoTrack.getStoreArrayNameOfEKLMHits(),
+                                                                 recoTrack.getStoreArrayNameOfRecoHitInformation());
+          newRecoTrack->addHitsFromRecoTrack(&recoTrack, newRecoTrack->getNumberOfTotalHits(), true);
+          newRecoTrack->addRelationTo(&recoTrack);
+        }
       }
     }
-
   }
 }
 

@@ -1,24 +1,21 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
- *                                                                        *
+ * basf2 (Belle II Analysis Software Framework)                           *
  * Author: The Belle II Collaboration                                     *
- * Contributors:  Dmitri Liventsev                                        *
  *                                                                        *
- * This software is provided "as is" without any warranty.                *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
 #ifndef KLMTRIGGERMODULE_H
 #define KLMTRIGGERMODULE_H
 
-#include <memory>
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/database/DBObjPtr.h>
 #include <trg/klm/dataobjects/KLMTrgSummary.h>
-
+#include <trg/klm/dbobjects/KLMTriggerParameters.h>
 
 namespace Belle2 {
-
 
   class KLMTriggerModule : public Module {
   public:
@@ -37,18 +34,13 @@ namespace Belle2 {
 
   private: // Parameters
 
-    void make_linear_fit();
+    StoreObjPtr<KLMTrgSummary> m_KLMTrgSummary;
+
+    DBObjPtr<KLMTriggerParameters> m_KLMTriggerParameters;
 
     int m_nLayerTrigger = 0;
-
-    StoreObjPtr<KLMTrgSummary> m_KLMTrgSummary;
-    int m_event_nr = 0;
-
     std::vector<int> m_layerUsed;
     std::string m_dummy_used_layers;
-    std::string m_geometry_fileName;
-    class geometry_data;
-    std::shared_ptr<geometry_data> m_geo;
   };
 } // namespace Belle2
 

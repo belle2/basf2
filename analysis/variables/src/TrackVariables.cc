@@ -469,6 +469,12 @@ namespace Belle2 {
       return getHelixParameterPullAtIndex(part, 4);
     }
 
+    double isTrackFlippedAndRefitted(const Particle* part)
+    {
+      auto track = part->getTrack();
+      if (!track) return realNaN;
+      return track->isFlippedAndRefitted() ? 1 : 0;
+    }
 
     VARIABLE_GROUP("Tracking");
     REGISTER_VARIABLE("d0Pull", getHelixD0Pull,     R"DOC(
@@ -759,5 +765,11 @@ there was a track in the event missed by the tracking, or the track finding was
 
 Returns NaN if there is no event-level tracking information available.
     )DOC");
+
+    REGISTER_VARIABLE("isTrackFlippedAndRefitted", isTrackFlippedAndRefitted, R"DOC(
+Returns 1 if the charged final state particle comes from a track that has been flipped and refitted
+at the end of the reconstruction chain, in particular after the outer detector reconstruction.
+    )DOC");
+
   }
 }

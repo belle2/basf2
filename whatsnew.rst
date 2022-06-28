@@ -71,6 +71,14 @@ however it should be below most analysts sensitivity.
 
 .. include:: mva/doc/whatsnew-since/release-06-00.txt
 
+.. List of changes for the tracking package
+
+.. include:: tracking/doc/whatsnew-since/release-06-00.txt
+
+.. List of changes for the svd package
+
+.. include:: svd/doc/whatsnew-since/release-06-00.txt
+
 Changes since release-05
 ========================
 

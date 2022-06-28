@@ -55,6 +55,7 @@
 //                   |      1 |         91    | [hie2] hie && 1CL veto(not (N(CL)=1 && CL in FW)) && 2CL veto-2(not (N(CL)=2 && 160 < dphi < 200 || 150 < sum theta < 250))
 //                   |      1 |         92    | [hie3] hie && 1CL veto(not (N(CL)=1 && CL in FW)) && 2CL veto-3(not (N(CL)=2 && CL_lowe in FW or BW)
 //                   |      1 |         93    | [ecltaub2b v2] for 1x1 tau process : (120<delta phi(CM)<240, 140<Thata Sum(CM)<220, Etot1to17(Lab)<7GeV, N(CL) in endcap with E(CL)(3GeV) , E(CL)>0.165 for N(CL)==2, 1CL E(CL)>0.14 and 2CL E(CL)>0.165 for N(CL)==3,  2CL E(CL)>0.14 and 2CL E(CL)>0.165 for N(CL)==4,  1CL E(CL)>0.12 and 2CL E(CL)>0.14 and 2CL E(CL)>0.165 for N(CL)>4
+//                   |      1 |         94    | [ecltaub2b v3] for 1x1 tau process : (120<delta phi(CM)<240, 140<Thata Sum(CM)<220, Etot1to17(Lab)<7GeV, E(CL)>0.140 in lab for one of 2CL in b2b CLs, CL ThetaID= 2-16 for b2b CLs, CL(E)>0.12GeV in lab for all CLs, CL(E)<4.5GeV in lab for all CLs)
 // ---------------------------------------------------------------------------------
 
 #define TRG_SHORT_NAMES
@@ -87,6 +88,10 @@ TrgEclMaster::TrgEclMaster():
   m_taub2b2EtotCut(7.0),
   m_taub2b2CLEEndcapCut(3.0),
   m_taub2b2CLECut(0.162),
+  m_taub2b3EtotCut(7.0),
+  m_taub2b3CLEb2bCut(0.14),
+  m_taub2b3CLELowCut(0.12),
+  m_taub2b3CLEHighCut(4.5),
   _n300MeVCluster(1),
   _ECLBurstThreshold(200)
 {
@@ -171,6 +176,13 @@ TrgEclMaster::initialize(int)
   m_taub2b2EtotCut = 7.0; // GeV
   m_taub2b2CLEEndcapCut = 3.0; // GeV
   m_taub2b2CLECut = 0.162; // GeV
+
+  //taub2b3 cut by S.Ito
+  m_taub2b3AngleCut   = {120, 240, 140, 220}; // degree
+  m_taub2b3EtotCut    = 7.0; // GeV
+  m_taub2b3CLEb2bCut  = 0.14; // GeV
+  m_taub2b3CLELowCut  = 0.12; // GeV
+  m_taub2b3CLEHighCut = 4.5;  // GeV
 
 }
 //========================================================
@@ -371,6 +383,12 @@ TrgEclMaster::simulate01(int m_nEvent) // Firmware simulator(time window 250 ns 
                               m_taub2b2EtotCut,
                               m_taub2b2CLEEndcapCut,
                               m_taub2b2CLECut);
+    //Added by S.Ito
+    obj_bhabha->setTaub2b3Cut(m_taub2b3AngleCut,
+                              m_taub2b3EtotCut,
+                              m_taub2b3CLEb2bCut,
+                              m_taub2b3CLELowCut,
+                              m_taub2b3CLEHighCut);
 
     std::vector<double> vct_bhabha;
     vct_bhabha.clear();
@@ -382,6 +400,7 @@ TrgEclMaster::simulate01(int m_nEvent) // Firmware simulator(time window 250 ns 
     int bhabha3DSelectionThetaFlag = 0;
     int taub2bFlag = 0;
     int taub2b2Flag = 0;
+    int taub2b3Flag = 0;//By S.Ito
 
     bool b_2Dbhabha = obj_bhabha->GetBhabha00(phiringsum);
     vct_bhabha = obj_bhabha->GetBhabhaComb();
@@ -396,6 +415,8 @@ TrgEclMaster::simulate01(int m_nEvent) // Firmware simulator(time window 250 ns 
     bhabha3DSelectionThetaFlag = obj_bhabha->get3DBhabhaSelectionThetaFlag();
     taub2bFlag  = (obj_bhabha->GetTaub2b(E_total)) ? 1 : 0;
     taub2b2Flag = (obj_bhabha->GetTaub2b2(E_total)) ? 1 : 0;
+    taub2b3Flag = (obj_bhabha->GetTaub2b3(E_total)) ? 1 : 0;
+
     //------------------------
     // Beam Background veto (Old cosmic veto)
     //------------------------
@@ -438,7 +459,7 @@ TrgEclMaster::simulate01(int m_nEvent) // Firmware simulator(time window 250 ns 
                    EventTimingQualityFlag,
                    bhabha3DVetoInTrackFlag,
                    bhabha3DSelectionThetaFlag,
-                   taub2bFlag, 0, taub2b2Flag);
+                   taub2bFlag, 0, taub2b2Flag, taub2b3Flag);
 
     int m_hitEneNum = 0;
     StoreArray<TRGECLTrg> trgEcltrgArray;
@@ -749,6 +770,13 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
                             m_taub2b2EtotCut,
                             m_taub2b2CLEEndcapCut,
                             m_taub2b2CLECut);
+  //Added by S.Ito
+  obj_bhabha->setTaub2b3Cut(m_taub2b3AngleCut,
+                            m_taub2b3EtotCut,
+                            m_taub2b3CLEb2bCut,
+                            m_taub2b3CLELowCut,
+                            m_taub2b3CLEHighCut);
+
 
   std::vector<double> vct_bhabha;
   vct_bhabha.clear();
@@ -760,6 +788,7 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
   int bhabha3DSelectionThetaFlag = -1;
   int taub2bFlag = 0;
   int taub2b2Flag = 0;
+  int taub2b3Flag = 0;//By S.Ito
 
   bool b_2Dbhabha = obj_bhabha->GetBhabha00(phiringsum);
   vct_bhabha = obj_bhabha->GetBhabhaComb();
@@ -781,6 +810,8 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
   bhabha3DSelectionThetaFlag = obj_bhabha->get3DBhabhaSelectionThetaFlag();
   taub2bFlag  = (obj_bhabha->GetTaub2b(E_total)) ? 1 : 0;
   taub2b2Flag = (obj_bhabha->GetTaub2b2(E_total)) ? 1 : 0;
+  taub2b3Flag = (obj_bhabha->GetTaub2b3(E_total)) ? 1 : 0;
+
   //------------------------
   // additional Bhabha veto
   //------------------------
@@ -832,7 +863,8 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
                  bhabha3DSelectionThetaFlag,
                  taub2bFlag,
                  bit_hie_bhav,
-                 taub2b2Flag);
+                 taub2b2Flag,
+                 taub2b3Flag);
 
   //----------------------------------------------------
   // ECL trigger
@@ -1092,7 +1124,8 @@ TrgEclMaster::makeTriggerBit(int hit, int Timing, int RevoFAM, int TimingSource,
                              int bhabha3DSelectionThetaFlag,
                              int taub2bFlag,
                              int bit_hie_bhav,
-                             int taub2b2Flag)
+                             int taub2b2Flag,
+                             int taub2b3Flag)
 {
 
   _Triggerbit[0] = 0;
@@ -1162,7 +1195,11 @@ TrgEclMaster::makeTriggerBit(int hit, int Timing, int RevoFAM, int TimingSource,
   }
   int bit_taub2bflag = taub2bFlag & 0x01;
   int bit_taub2b2flag = taub2b2Flag & 0x01;
+  int bit_taub2b3flag = taub2b3Flag & 0x01;
 
+
+  _Triggerbit[2] |= bit_taub2b3flag;//taub2b3 added by S.Ito, bit:94
+  _Triggerbit[2] <<= 1;//taub2b3 added by S.Ito, bit:94
   _Triggerbit[2] |= bit_taub2b2flag;
   _Triggerbit[2] <<= 3;
   _Triggerbit[2] |= bit_hie_bhav;

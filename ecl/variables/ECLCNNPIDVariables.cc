@@ -7,9 +7,12 @@
  **************************************************************************/
 
 #include <ecl/variables/ECLCNNPIDVariables.h>
+#include <ecl/dataobjects/ECLCNNPid.h>
 
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/dataobjects/Particle.h>
+
+#include <mdst/dataobjects/Track.h>
 
 #include <framework/logging/Logger.h>
 
@@ -20,30 +23,23 @@ namespace Belle2 {
   namespace Variable {
 
     // CNNPIDECLPion -------------------------------------------
-    double CNNPIDECLPion(const Particle* part)
-    {
-      if (part->hasExtraInfo("cnn_pid_ecl_pion")) return part->getExtraInfo("cnn_pid_ecl_pion");
-      else {
-        B2WARNING("The ExtraInfo 'cnn_pid_ecl_pion' not found!");
-        return std::numeric_limits<double>::quiet_NaN();
-      }
-    }
-
-    // CNNPIDECLPion -------------------------------------------
     double CNNPIDECLMuon(const Particle* part)
     {
-      if (part->hasExtraInfo("cnn_pid_ecl_muon")) return part->getExtraInfo("cnn_pid_ecl_muon");
-      else {
-        B2WARNING("The ExtraInfo 'cnn_pid_ecl_muon' not found!");
+      auto track = part->getTrack();
+      if (!track) return std::numeric_limits<double>::quiet_NaN();
+
+      const auto eclCnnMuonRelationVector = track->getRelationsWith<ECLCNNPid>();
+      if (eclCnnMuonRelationVector.size() == 0) return std::numeric_limits<double>::quiet_NaN();
+
+      if (eclCnnMuonRelationVector.size() == 1) {
+        return eclCnnMuonRelationVector.object(0)->getEclCnnMuon();
+      } else {
+        B2FATAL("Somehow found more than 1 ECL CNN muon probabilities matched to the extrapolated track. This should not be possible!");
         return std::numeric_limits<double>::quiet_NaN();
       }
     }
 
     VARIABLE_GROUP("CNN PID ECL variable (cDST)");
-
-    REGISTER_VARIABLE("cnn_pid_ecl_pion", CNNPIDECLPion,
-                      R"DOC(CNN runs over extrapolated tracks and output probabilities of pion or muon like. The variable here is pion-like probablity.
-Returns NaN if CNN was not run or if the ``cnn_pid_ecl_pion`` parameter was not set.)DOC");
 
     REGISTER_VARIABLE("cnn_pid_ecl_muon", CNNPIDECLMuon,
                       R"DOC(CNN runs over extrapolated tracks and output probabilities of pion or muon like. The variable here is muon-like probablity.

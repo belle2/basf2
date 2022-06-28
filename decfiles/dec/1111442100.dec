@@ -1,6 +1,6 @@
 # EventType: 1111442100
 # Descriptor: [B0 -> J/psi [-> mu+ mu-] pi0 [-> gamma gamma] K_S0 [-> pi+ pi-]]
-# NickName: Bd_JpsipiK_mumu
+# NickName: Bd_JpsipiKS_mumu
 # Documentation: B -> charmonium decays.
 # Tested: Yes
 # PhysicsWG: Charmonium

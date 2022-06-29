@@ -71,13 +71,19 @@ void FlippedRecoTracksMergerModule::event()
 
               // loop over the original fitResults
               for (long unsigned int index = 0; index < fitResultsBefore.size() ; index++) {
+                bool updatedFitResult = false;
+                for (long unsigned int index1 = 0; index1 < fitResultsAfter.size() ; index1++) {
+                  if (fitResultsBefore[index].first == fitResultsAfter[index1].first) {
 
-                // update the fitResults
-                if (index < fitResultsAfter.size()) {
-                  auto fitResultAfter  = fitResultsAfter[index].second;
-                  fitResultsBefore[index].second->updateTrackFitResult(*fitResultAfter);
-                } else {
+                    auto fitResultAfter  = fitResultsAfter[index1].second;
+                    fitResultsBefore[index].second->updateTrackFitResult(*fitResultAfter);
+                    updatedFitResult = true;
+                  }
+
+                }
+                if (not updatedFitResult) {
                   fitResultsBefore[index].second->maskThisFitResult();
+                  b2track->setTrackFitResultIndex(fitResultsBefore[index].first, -1);
                 }
               }
 

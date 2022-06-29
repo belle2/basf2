@@ -434,7 +434,7 @@ namespace Belle2 {
           return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(321, SVD, CDC, TOP, ECL, KLM)")->function(part));
         }
       }
-      return kaonID(part)
+      return kaonID(part);
     }
 
 

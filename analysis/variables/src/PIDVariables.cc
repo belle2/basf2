@@ -407,6 +407,67 @@ namespace Belle2 {
       return std::get<double>(Manager::Instance().getVariable(var)->function(part));
     }
 
+
+    double pionID_noARICHwoECL(const Particle* part)
+    {
+      // remove arich if no ecl cluster + identified as kaon in arich
+      const ECLCluster* cluster = part->getECLCluster();
+      if (!cluster) {
+        const PIDLikelihood* pid = part->getPIDLikelihood();
+        if (!pid) return std::numeric_limits<float>::quiet_NaN();
+        if (pid->getLogL(Const::kaon, Const::ARICH) > pid->getLogL(Const::pion, Const::ARICH)) {
+          return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(211, SVD, CDC, TOP, ECL, KLM)")->function(part));
+        }
+      }
+      return pionID(part);
+    }
+
+
+    double kaonID_noARICHwoECL(const Particle* part)
+    {
+      // remove arich if no ecl cluster + identified as kaon in arich
+      const ECLCluster* cluster = part->getECLCluster();
+      if (!cluster) {
+        const PIDLikelihood* pid = part->getPIDLikelihood();
+        if (!pid) return std::numeric_limits<float>::quiet_NaN();
+        if (pid->getLogL(Const::kaon, Const::ARICH) > pid->getLogL(Const::pion, Const::ARICH)) {
+          return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(321, SVD, CDC, TOP, ECL, KLM)")->function(part));
+        }
+      }
+      return kaonID(part);
+    }
+
+
+    double binaryPID_noARICHwoECL(const Particle* part, const std::vector<double>& arguments)
+    {
+      // Excluding ARICH for tracks without ECL cluster and identified as heavier of the two hypotheses from binary ID.
+      if (arguments.size() != 2) {
+        B2ERROR("The variable binaryPID_noARICHwoECL needs exactly two arguments: the PDG codes of two hypotheses.");
+        return std::numeric_limits<float>::quiet_NaN();;
+      }
+      int pdgCodeHyp = std::abs(int(std::lround(arguments[0])));
+      int pdgCodeTest = std::abs(int(std::lround(arguments[1])));
+      auto hypType = Const::ChargedStable(abs(pdgCodeHyp));
+      auto testType = Const::ChargedStable(abs(pdgCodeTest));
+
+      const ECLCluster* cluster = part->getECLCluster();
+      if (!cluster) {
+        const PIDLikelihood* pid = part->getPIDLikelihood();
+        if (!pid) return std::numeric_limits<float>::quiet_NaN();
+        double lkhdiff = pid->getLogL(hypType, Const::ARICH) - pid->getLogL(testType, Const::ARICH);
+        if ((lkhdiff > 0 && pdgCodeHyp > pdgCodeTest) || (lkhdiff < 0 && pdgCodeHyp < pdgCodeTest)) {
+          return std::get<double>(Manager::Instance().getVariable("pidPairProbabilityExpert(" + std::to_string(
+                                                                    pdgCodeHyp) + ", " + std::to_string(
+                                                                    pdgCodeTest) + ", SVD, CDC, TOP, ECL, KLM)")->function(part));
+        }
+      }
+
+      return binaryPID(part, arguments);
+
+    }
+
+
+
     double antineutronID(const Particle* particle)
     {
       if (particle->hasExtraInfo("nbarID")) {
@@ -658,6 +719,13 @@ The variables used are `clusterPulseShapeDiscriminationMVA`, `clusterE`, `cluste
                       "**(SPECIAL (TEMP) variable)** electron identification probability defined as :math:`\\mathcal{L}_e/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors *excluding the SVD and the TOP*. *NB:* this variable must be used in place of `electronID` when analysing data (MC) processed (simulated) in *release 5*");
     REGISTER_METAVARIABLE("binaryElectronID_noSVD_noTOP(pdgCodeTest)", binaryElectronID_noSVD_noTOP,
                           "**(SPECIAL (TEMP) variable)** Returns the binary probability for the electron mass hypothesis with respect to another mass hypothesis using all detector components, *excluding the SVD and the TOP*. *NB:* this variable must be used in place of `binaryPID` (``pdgCode1=11``) when analysing data (MC) processed (simulated) in **release 5**",
+                          Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("pionID_noARICHwoECL", pionID_noARICHwoECL,
+                      "**(SPECIAL (TEMP) variable)** pion identification probability defined as :math:`\\mathcal{L}_\\pi/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors but ARICH info excluded for tracks without associated ECL cluster");
+    REGISTER_VARIABLE("kaonID_noARICHwoECL", kaonID_noARICHwoECL,
+                      "**(SPECIAL (TEMP) variable)** kaon identification probability defined as :math:`\\mathcal{L}_K/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors but ARICH info excluded for tracks without associated ECL cluster");
+    REGISTER_METAVARIABLE("binaryPID_noARICHwoECL(pdgCode1, pdgCode2)", binaryPID_noARICHwoECL,
+                          "Returns the binary probability for the first provided mass hypothesis with respect to the second mass hypothesis using all detector components, but ARICH info excluded for tracks without associated ECL cluster",
                           Manager::VariableDataType::c_double);
 
     // Metafunctions for experts to access the basic PID quantities

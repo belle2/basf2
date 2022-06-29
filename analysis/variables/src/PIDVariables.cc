@@ -419,7 +419,7 @@ namespace Belle2 {
           return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(211, SVD, CDC, TOP, ECL, KLM)")->function(part));
         }
       }
-      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(211, ALL)")->function(part));
+      return pionID(part);
     }
 
 
@@ -434,7 +434,7 @@ namespace Belle2 {
           return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(321, SVD, CDC, TOP, ECL, KLM)")->function(part));
         }
       }
-      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(321, ALL)")->function(part));
+      return kaonID(part)
     }
 
 
@@ -461,9 +461,9 @@ namespace Belle2 {
                                                                     pdgCodeTest) + ", SVD, CDC, TOP, ECL, KLM)")->function(part));
         }
       }
-      return std::get<double>(Manager::Instance().getVariable("pidPairProbabilityExpert(" + std::to_string(
-                                                                pdgCodeHyp) + ", " + std::to_string(
-                                                                pdgCodeTest) + ", ALL)")->function(part));
+
+      return binaryPID(part, arguments);
+
     }
 
 

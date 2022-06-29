@@ -1,3 +1,16 @@
+Changes in the analysis package in light-2207-bengal
+----------------------------------------------------
+
+Variables
++++++++++
+ * Added the variable `pionID_noARICHwoECL` which returns pionID without using ARICH likelihood for tracks without associated
+   ECL cluster. 
+ * Added the variable `kaonID_noARICHwoECL` which returns kaonID without using ARICH likelihood for tracks without associated
+   ECL cluster. 
+ * Added the metavariable `binaryPID_noARICHwoECL(pdgCode1, pdgCode2)` which returns binary PID without using ARICH likelihood 
+   for tracks without associated ECL cluster. 
+ 
+
 Changes in the analysis package in light-2205-abys
 --------------------------------------------------
 

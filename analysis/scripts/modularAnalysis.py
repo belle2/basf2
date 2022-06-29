@@ -1987,6 +1987,8 @@ def reconstructMCDecay(
     Finds and creates a ``ParticleList`` from given decay string.
     ``ParticleList`` of daughters with sub-decay is created.
 
+    Only the particles made from MCParticle, which can be loaded by `fillParticleListFromMC`, are accepted as daughters.
+
     Only signal particle, which means :b2:var:`isSignal` is equal to 1, is stored. One can use the decay string grammar
     to change the behavior of :b2:var:`isSignal`. One can find detailed information in :ref:`DecayString`.
 
@@ -1994,6 +1996,13 @@ def reconstructMCDecay(
         If one uses same sub-decay twice, same particles are registered to a ``ParticleList``. For example,
         ``K_S0:pi0pi0 =direct=> [pi0:gg =direct=> gamma:MC gamma:MC] [pi0:gg =direct=> gamma:MC gamma:MC]``.
         One can skip the second sub-decay, ``K_S0:pi0pi0 =direct=> [pi0:gg =direct=> gamma:MC gamma:MC] pi0:gg``.
+
+    .. tip::
+        It is recommended to use only primary particles as daughter particles unless you want to explicitly study the secondary
+        particles. The behavior of MC-matching for secondary particles from a stable particle decay is not guaranteed.
+        Please consider to use `fillParticleListFromMC` with ``skipNonPrimary=True`` to load daughter particles.
+        Moreover, it is recommended to load ``K_S0`` and ``Lambda0`` directly from MCParticle by `fillParticleListFromMC` rather
+        than reconstructing from two pions or a proton-pion pair, because their direct daughters can be the secondary particle.
 
 
     @param decayString :ref:`DecayString` specifying what kind of the decay should be reconstructed

@@ -10,7 +10,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(IoVDependentCondition)
+REG_MODULE(IoVDependentCondition);
 
 IoVDependentConditionModule::IoVDependentConditionModule() : Module()
 {

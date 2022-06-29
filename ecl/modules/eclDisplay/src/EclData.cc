@@ -324,7 +324,7 @@ void EclData::loadRootFile(const char* path)
 
   tree->SetBranchAddress("ECLCalDigits.m_CellId", &m_branch_ch);
   tree->SetBranchAddress("ECLCalDigits.m_Energy", &m_branch_energy);
-  tree->SetBranchAddress("ECLCalDigits.m_Time"  , &m_branch_time);
+  tree->SetBranchAddress("ECLCalDigits.m_Time", &m_branch_time);
 
   TLeaf* leafCellId;
   TLeaf* leafEnergy;

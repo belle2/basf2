@@ -306,6 +306,13 @@ namespace Belle2 {
     bool contains(const Particle* p, bool includingAntiList = true) const;
 
     /**
+     * Returns index of the given particle 'p' in this list.
+     * If 'p' is not in this list, return -1.
+     * Will check flavour-specific and self-conjugated list, and optionally (with includingAntiList=true) also the anti-particle list.
+     */
+    int getIndex(const Particle* p, bool includingAntiList = true) const;
+
+    /**
      * Prints the list
      */
     void print() const;

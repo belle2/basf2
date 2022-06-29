@@ -18,6 +18,7 @@ Untested method EventMetaData::setTime
 Untested method Track::getInfoHTML
 Untested method Track::getTrackFitResults
 Untested method Track::setTrackFitResultIndex
+Untested method Track::setTrackTime
 Untested method V0::getTrackFitResultIndices
 Untested method V0::getTrackIndices
 Untested method TrackFitResult::getHelix
@@ -183,6 +184,7 @@ Track#0:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#1
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#2
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#2
+  getTrackTime(): nan
 Track#1:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -205,6 +207,7 @@ Track#1:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#4
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#5
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#5
+  getTrackTime(): nan
 Track#2:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -228,6 +231,7 @@ Track#2:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#7
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#8
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#8
+  getTrackTime(): nan
 Track#3:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -250,6 +254,7 @@ Track#3:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#10
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#11
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#11
+  getTrackTime(): nan
 Track#4:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -273,6 +278,7 @@ Track#4:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#13
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#14
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#14
+  getTrackTime(): nan
 Track#5:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -296,6 +302,7 @@ Track#5:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#16
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#17
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#17
+  getTrackTime(): nan
 Track#6:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -320,6 +327,7 @@ Track#6:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#19
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#20
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#20
+  getTrackTime(): nan
 Track#7:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -342,6 +350,7 @@ Track#7:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#22
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#23
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#23
+  getTrackTime(): nan
 Track#8:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -363,6 +372,7 @@ Track#8:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#25
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#26
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#26
+  getTrackTime(): nan
 Track#9:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -384,6 +394,7 @@ Track#9:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#28
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#29
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#29
+  getTrackTime(): nan
 TrackFitResult#0:
 [INFO] Conditions Database: found working server
 	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
@@ -4175,7 +4186,8 @@ MCParticle#4:
   getName(): mu+
   getPDG(): -13
  ... message repeated 4 times
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000916344
@@ -4207,7 +4219,8 @@ MCParticle#5:
   getNDaughters(): 0
   getName(): nu_mu
   getPDG(): 14
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000916344
@@ -4271,7 +4284,8 @@ MCParticle#7:
   getNDaughters(): 0
   getName(): e-
   getPDG(): 11
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.0039719
@@ -4303,7 +4317,8 @@ MCParticle#8:
   getNDaughters(): 0
   getName(): anti-nu_e
   getPDG(): -12
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.0039719
@@ -4368,7 +4383,8 @@ MCParticle#10:
   getNDaughters(): 1
   getName(): mu-
   getPDG(): 13
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000946989
@@ -4400,7 +4416,8 @@ MCParticle#11:
   getNDaughters(): 0
   getName(): anti-nu_mu
   getPDG(): -14
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000946989
@@ -4432,7 +4449,8 @@ MCParticle#12:
   getNDaughters(): 0
   getName(): anti-nu_mu
   getPDG(): -14
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 2998.92
@@ -4464,7 +4482,8 @@ MCParticle#13:
   getNDaughters(): 0
   getName(): nu_e
   getPDG(): 12
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 2998.92
@@ -4496,7 +4515,8 @@ MCParticle#14:
   getNDaughters(): 0
   getName(): e+
   getPDG(): -11
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 2998.92
@@ -4560,7 +4580,8 @@ MCParticle#16:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.0039719
@@ -4655,7 +4676,8 @@ MCParticle#19:
   getNDaughters(): 0
   getName(): e-
   getPDG(): 11
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 2.86771
@@ -4721,7 +4743,8 @@ MCParticle#21:
   getNDaughters(): 2
   getName(): pi0
   getPDG(): 111
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00433429
@@ -4756,7 +4779,8 @@ MCParticle#22:
   getNDaughters(): 3
   getName(): K_L0
   getPDG(): 130
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000946989
@@ -4789,7 +4813,8 @@ MCParticle#23:
   getNDaughters(): 1
   getName(): p+
   getPDG(): 2212
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.824385
@@ -4822,7 +4847,8 @@ MCParticle#24:
   getNDaughters(): 1
   getName(): p+
   getPDG(): 2212
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.824385
@@ -4888,7 +4914,8 @@ MCParticle#26:
   getNDaughters(): 2
   getName(): pi+
   getPDG(): 211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00433429
@@ -4920,7 +4947,8 @@ MCParticle#27:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00433543
@@ -4953,7 +4981,8 @@ MCParticle#28:
   getNDaughters(): 1
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00433543
@@ -4985,7 +5014,8 @@ MCParticle#29:
   getNDaughters(): 0
   getName(): pi-
   getPDG(): -211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 10.3593
@@ -5019,7 +5049,8 @@ MCParticle#30:
   getNDaughters(): 2
   getName(): pi+
   getPDG(): 211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 10.3593
@@ -5051,7 +5082,8 @@ MCParticle#31:
   getNDaughters(): 0
   getName(): n0
   getPDG(): 2112
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 70.1926
@@ -5083,7 +5115,8 @@ MCParticle#32:
   getNDaughters(): 0
   getName(): e-
   getPDG(): 11
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 3.51005
@@ -5115,7 +5148,8 @@ MCParticle#33:
   getNDaughters(): 0
   getName(): e-
   getPDG(): 11
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 4.07664
@@ -5179,7 +5213,8 @@ MCParticle#35:
   getNDaughters(): 1
   getName(): pi-
   getPDG(): -211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00433429
@@ -5211,7 +5246,8 @@ MCParticle#36:
   getNDaughters(): 0
   getName(): nu_mu
   getPDG(): 14
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 14.1152
@@ -5246,7 +5282,8 @@ MCParticle#37:
   getNDaughters(): 3
   getName(): mu+
   getPDG(): -13
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 14.1152
@@ -5278,7 +5315,8 @@ MCParticle#38:
   getNDaughters(): 0
   getName(): e-
   getPDG(): 11
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 10.2751
@@ -5310,7 +5348,8 @@ MCParticle#39:
   getNDaughters(): 0
   getName(): nu_mu
   getPDG(): 14
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 48.0974
@@ -5345,7 +5384,8 @@ MCParticle#40:
   getNDaughters(): 3
   getName(): mu+
   getPDG(): -13
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 48.0974
@@ -5409,7 +5449,8 @@ MCParticle#42:
   getNDaughters(): 0
   getName(): n0
   getPDG(): 2112
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 17.4288
@@ -5441,7 +5482,8 @@ MCParticle#43:
   getNDaughters(): 0
   getName(): anti-nu_mu
   getPDG(): -14
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 1178.84
@@ -5473,7 +5515,8 @@ MCParticle#44:
   getNDaughters(): 0
   getName(): nu_e
   getPDG(): 12
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 1178.84
@@ -5505,7 +5548,8 @@ MCParticle#45:
   getNDaughters(): 0
   getName(): e+
   getPDG(): -11
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 1178.84
@@ -5537,7 +5581,8 @@ MCParticle#46:
   getNDaughters(): 0
   getName(): anti-nu_mu
   getPDG(): -14
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 149.364
@@ -5569,7 +5614,8 @@ MCParticle#47:
   getNDaughters(): 0
   getName(): nu_e
   getPDG(): 12
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 149.364
@@ -5601,7 +5647,8 @@ MCParticle#48:
   getNDaughters(): 0
   getName(): e+
   getPDG(): -11
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 149.364
@@ -5635,7 +5682,8 @@ MCParticle#49:
   getNDaughters(): 2
   getName(): pi+
   getPDG(): 211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.016282
@@ -5667,7 +5715,8 @@ MCParticle#50:
   getNDaughters(): 0
   getName(): pi-
   getPDG(): -211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.016282
@@ -5699,7 +5748,8 @@ MCParticle#51:
   getNDaughters(): 0
   getName(): nu_mu
   getPDG(): 14
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 41.0191
@@ -5734,7 +5784,8 @@ MCParticle#52:
   getNDaughters(): 3
   getName(): mu+
   getPDG(): -13
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 41.0191
@@ -5766,7 +5817,8 @@ MCParticle#53:
   getNDaughters(): 0
   getName(): anti-nu_mu
   getPDG(): -14
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 4163.5
@@ -5798,7 +5850,8 @@ MCParticle#54:
   getNDaughters(): 0
   getName(): nu_e
   getPDG(): 12
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 4163.5
@@ -5832,7 +5885,8 @@ MCParticle#55:
   getNDaughters(): 2
   getName(): e+
   getPDG(): -11
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 4163.5
@@ -5864,7 +5918,8 @@ MCParticle#56:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 4165.04
@@ -5896,7 +5951,8 @@ MCParticle#57:
   getNDaughters(): 0
   getName(): e-
   getPDG(): 11
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 4169.68
@@ -5942,6 +5998,7 @@ Track#0:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#1
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#2
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#2
+  getTrackTime(): nan
 Track#1:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -5963,6 +6020,7 @@ Track#1:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#4
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#5
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#5
+  getTrackTime(): nan
 Track#2:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -5986,6 +6044,7 @@ Track#2:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#7
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#8
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#8
+  getTrackTime(): nan
 Track#3:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -6008,6 +6067,7 @@ Track#3:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#10
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#11
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#11
+  getTrackTime(): nan
 Track#4:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -6030,6 +6090,7 @@ Track#4:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#13
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#14
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#14
+  getTrackTime(): nan
 Track#5:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -6053,6 +6114,7 @@ Track#5:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#16
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#17
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#17
+  getTrackTime(): nan
 Track#6:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -6076,6 +6138,7 @@ Track#6:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#19
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#20
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#20
+  getTrackTime(): nan
 Track#7:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -6099,6 +6162,7 @@ Track#7:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#22
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#23
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#23
+  getTrackTime(): nan
 Track#8:
   getNumberOfFittedHypotheses(): 2
   getQualityIndicator(): nan
@@ -6120,6 +6184,7 @@ Track#8:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#25
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#25
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#25
+  getTrackTime(): nan
 Track#9:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -6142,6 +6207,7 @@ Track#9:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#27
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#28
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#28
+  getTrackTime(): nan
 Track#10:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -6163,6 +6229,7 @@ Track#10:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#30
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#31
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#31
+  getTrackTime(): nan
 Track#11:
   getNumberOfFittedHypotheses(): 1
   getQualityIndicator(): nan
@@ -6184,6 +6251,7 @@ Track#11:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#32
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#32
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#32
+  getTrackTime(): nan
 Track#12:
   getNumberOfFittedHypotheses(): 1
   getQualityIndicator(): nan
@@ -6204,6 +6272,7 @@ Track#12:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#33
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#33
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#33
+  getTrackTime(): nan
 Track#13:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -6225,6 +6294,7 @@ Track#13:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#35
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#36
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#36
+  getTrackTime(): nan
 TrackFitResult#0:
   get4Momentum(): (-0.21798,-0.28011,0.234538,0.447733)
   getChargeSign(): -1
@@ -10584,7 +10654,8 @@ MCParticle#4:
   getName(): rho+
   getPDG(): 213
  ... message repeated 1 times
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000299995
@@ -10684,7 +10755,8 @@ MCParticle#7:
   getNDaughters(): 2
   getName(): pi0
   getPDG(): 111
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000299995
@@ -10750,7 +10822,8 @@ MCParticle#9:
   getNDaughters(): 0
   getName(): e-
   getPDG(): 11
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00163356
@@ -10782,7 +10855,8 @@ MCParticle#10:
   getNDaughters(): 0
   getName(): anti-nu_e
   getPDG(): -12
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00163356
@@ -10878,7 +10952,8 @@ MCParticle#13:
   getNDaughters(): 0
   getName(): pi+
   getPDG(): 211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000299995
@@ -10912,7 +10987,8 @@ MCParticle#14:
   getNDaughters(): 2
   getName(): pi0
   getPDG(): 111
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000299995
@@ -10976,7 +11052,8 @@ MCParticle#16:
   getNDaughters(): 1
   getName(): pi-
   getPDG(): -211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000299995
@@ -11008,7 +11085,8 @@ MCParticle#17:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000299995
@@ -11043,7 +11121,8 @@ MCParticle#18:
   getNDaughters(): 3
   getName(): pi-
   getPDG(): -211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000299995
@@ -11075,7 +11154,8 @@ MCParticle#19:
   getNDaughters(): 0
   getName(): pi+
   getPDG(): 211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000299995
@@ -11109,7 +11189,8 @@ MCParticle#20:
   getNDaughters(): 2
   getName(): pi0
   getPDG(): 111
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000299995
@@ -11141,7 +11222,8 @@ MCParticle#21:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000299995
@@ -11173,7 +11255,8 @@ MCParticle#22:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000299995
@@ -11246,7 +11329,8 @@ MCParticle#24:
   getNDaughters(): 8
   getName(): pi+
   getPDG(): 211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00244598
@@ -11278,7 +11362,8 @@ MCParticle#25:
   getNDaughters(): 0
   getName(): pi-
   getPDG(): -211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00244598
@@ -11312,7 +11397,8 @@ MCParticle#26:
   getNDaughters(): 2
   getName(): pi0
   getPDG(): 111
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00244598
@@ -11346,7 +11432,8 @@ MCParticle#27:
   getNDaughters(): 2
   getName(): rho0
   getPDG(): 113
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000353349
@@ -11379,7 +11466,8 @@ MCParticle#28:
   getNDaughters(): 1
   getName(): pi-
   getPDG(): -211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000353349
@@ -11413,7 +11501,8 @@ MCParticle#29:
   getNDaughters(): 2
   getName(): pi0
   getPDG(): 111
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 12.9843
@@ -11447,7 +11536,8 @@ MCParticle#30:
   getNDaughters(): 2
   getName(): pi+
   getPDG(): 211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 12.9843
@@ -11479,7 +11569,8 @@ MCParticle#31:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000300331
@@ -11511,7 +11602,8 @@ MCParticle#32:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000300331
@@ -11544,7 +11636,8 @@ MCParticle#33:
   getNDaughters(): 1
   getName(): pi+
   getPDG(): 211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 1.58382
@@ -11576,7 +11669,8 @@ MCParticle#34:
   getNDaughters(): 0
   getName(): n0
   getPDG(): 2112
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 272.658
@@ -11608,7 +11702,8 @@ MCParticle#35:
   getNDaughters(): 0
   getName(): e-
   getPDG(): 11
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 1.82071
@@ -11640,7 +11735,8 @@ MCParticle#36:
   getNDaughters(): 0
   getName(): anti-nu_mu
   getPDG(): -14
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 3.72485
@@ -11672,7 +11768,8 @@ MCParticle#37:
   getNDaughters(): 0
   getName(): mu-
   getPDG(): 13
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 3.72485
@@ -11704,7 +11801,8 @@ MCParticle#38:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000300657
@@ -11736,7 +11834,8 @@ MCParticle#39:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000300657
@@ -11771,7 +11870,8 @@ MCParticle#40:
   getNDaughters(): 3
   getName(): pi+
   getPDG(): 211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.0238278
@@ -11805,7 +11905,8 @@ MCParticle#41:
   getNDaughters(): 2
   getName(): pi-
   getPDG(): -211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.0238278
@@ -11837,7 +11938,8 @@ MCParticle#42:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.0238278
@@ -11869,7 +11971,8 @@ MCParticle#43:
   getNDaughters(): 0
   getName(): e-
   getPDG(): 11
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 2.73739
@@ -11901,7 +12004,8 @@ MCParticle#44:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 6.62264
@@ -11933,7 +12037,8 @@ MCParticle#45:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 6.62264
@@ -11965,7 +12070,8 @@ MCParticle#46:
   getNDaughters(): 0
   getName(): nu_mu
   getPDG(): 14
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 16.444
@@ -12000,7 +12106,8 @@ MCParticle#47:
   getNDaughters(): 3
   getName(): mu+
   getPDG(): -13
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 16.444
@@ -12032,7 +12139,8 @@ MCParticle#48:
   getNDaughters(): 0
   getName(): n0
   getPDG(): 2112
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 56.9058
@@ -12064,7 +12172,8 @@ MCParticle#49:
   getNDaughters(): 0
   getName(): nu_mu
   getPDG(): 14
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 8.05172
@@ -12099,7 +12208,8 @@ MCParticle#50:
   getNDaughters(): 3
   getName(): mu+
   getPDG(): -13
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 8.05172
@@ -12131,7 +12241,8 @@ MCParticle#51:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00244606
@@ -12163,7 +12274,8 @@ MCParticle#52:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00244606
@@ -12195,7 +12307,8 @@ MCParticle#53:
   getNDaughters(): 0
   getName(): pi+
   getPDG(): 211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000353349
@@ -12228,7 +12341,8 @@ MCParticle#54:
   getNDaughters(): 1
   getName(): pi-
   getPDG(): -211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000353349
@@ -12260,7 +12374,8 @@ MCParticle#55:
   getNDaughters(): 0
   getName(): p+
   getPDG(): 2212
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.368401
@@ -12292,7 +12407,8 @@ MCParticle#56:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 12.9843
@@ -12324,7 +12440,8 @@ MCParticle#57:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 12.9843
@@ -12356,7 +12473,8 @@ MCParticle#58:
   getNDaughters(): 0
   getName(): nu_mu
   getPDG(): 14
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 17.2898
@@ -12391,7 +12509,8 @@ MCParticle#59:
   getNDaughters(): 3
   getName(): mu+
   getPDG(): -13
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 17.2898
@@ -12423,7 +12542,8 @@ MCParticle#60:
   getNDaughters(): 0
   getName(): n0
   getPDG(): 2112
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 34.1453
@@ -12455,7 +12575,8 @@ MCParticle#61:
   getNDaughters(): 0
   getName(): e-
   getPDG(): 11
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 2.97878
@@ -12487,7 +12608,8 @@ MCParticle#62:
   getNDaughters(): 0
   getName(): nu_mu
   getPDG(): 14
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 86.2209
@@ -12522,7 +12644,8 @@ MCParticle#63:
   getNDaughters(): 3
   getName(): mu+
   getPDG(): -13
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 86.2209
@@ -12554,7 +12677,8 @@ MCParticle#64:
   getNDaughters(): 0
   getName(): n0
   getPDG(): 2112
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 11.3825
@@ -12586,7 +12710,8 @@ MCParticle#65:
   getNDaughters(): 0
   getName(): n0
   getPDG(): 2112
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 644.523
@@ -12618,7 +12743,8 @@ MCParticle#66:
   getNDaughters(): 0
   getName(): anti-nu_mu
   getPDG(): -14
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 893.872
@@ -12650,7 +12776,8 @@ MCParticle#67:
   getNDaughters(): 0
   getName(): nu_e
   getPDG(): 12
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 893.872
@@ -12682,7 +12809,8 @@ MCParticle#68:
   getNDaughters(): 0
   getName(): e+
   getPDG(): -11
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 893.872
@@ -12714,7 +12842,8 @@ MCParticle#69:
   getNDaughters(): 0
   getName(): anti-nu_mu
   getPDG(): -14
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 516.706
@@ -12746,7 +12875,8 @@ MCParticle#70:
   getNDaughters(): 0
   getName(): nu_e
   getPDG(): 12
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 516.706
@@ -12778,7 +12908,8 @@ MCParticle#71:
   getNDaughters(): 0
   getName(): e+
   getPDG(): -11
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 516.706
@@ -12810,7 +12941,8 @@ MCParticle#72:
   getNDaughters(): 0
   getName(): pi-
   getPDG(): -211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 6.10883
@@ -12842,7 +12974,8 @@ MCParticle#73:
   getNDaughters(): 0
   getName(): anti-nu_mu
   getPDG(): -14
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 1439.53
@@ -12874,7 +13007,8 @@ MCParticle#74:
   getNDaughters(): 0
   getName(): nu_e
   getPDG(): 12
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 1439.53
@@ -12906,7 +13040,8 @@ MCParticle#75:
   getNDaughters(): 0
   getName(): e+
   getPDG(): -11
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 1439.53
@@ -12938,7 +13073,8 @@ MCParticle#76:
   getNDaughters(): 0
   getName(): anti-nu_mu
   getPDG(): -14
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 3589.98
@@ -12970,7 +13106,8 @@ MCParticle#77:
   getNDaughters(): 0
   getName(): nu_e
   getPDG(): 12
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 3589.98
@@ -13002,7 +13139,8 @@ MCParticle#78:
   getNDaughters(): 0
   getName(): e+
   getPDG(): -11
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 3589.98
@@ -13048,6 +13186,7 @@ Track#0:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#1
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#1
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#1
+  getTrackTime(): nan
 Track#1:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -13071,6 +13210,7 @@ Track#1:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#3
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#4
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#4
+  getTrackTime(): nan
 Track#2:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -13092,6 +13232,7 @@ Track#2:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#6
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#7
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#7
+  getTrackTime(): nan
 Track#3:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -13115,6 +13256,7 @@ Track#3:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#9
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#10
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#10
+  getTrackTime(): nan
 Track#4:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -13138,6 +13280,7 @@ Track#4:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#12
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#13
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#13
+  getTrackTime(): nan
 Track#5:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -13161,6 +13304,7 @@ Track#5:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#15
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#16
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#16
+  getTrackTime(): nan
 Track#6:
   getNumberOfFittedHypotheses(): 2
   getQualityIndicator(): nan
@@ -13182,6 +13326,7 @@ Track#6:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#18
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#18
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#18
+  getTrackTime(): nan
 Track#7:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -13204,6 +13349,7 @@ Track#7:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#20
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#21
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#21
+  getTrackTime(): nan
 Track#8:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -13225,6 +13371,7 @@ Track#8:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#23
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#24
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#24
+  getTrackTime(): nan
 Track#9:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -13248,6 +13395,7 @@ Track#9:
   getTrackFitResultWithClosestMass(<type: K+>): -> TrackFitResults#26
   getTrackFitResultWithClosestMass(<type: p+>): -> TrackFitResults#27
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#27
+  getTrackTime(): nan
 V0#0:
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair
@@ -17468,7 +17616,8 @@ MCParticle#4:
   getName(): omega
   getPDG(): 223
  ... message repeated 2 times
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.0011964
@@ -17502,7 +17651,8 @@ MCParticle#5:
   getNDaughters(): 2
   getName(): pi+
   getPDG(): 211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.0011964
@@ -17571,7 +17721,8 @@ MCParticle#7:
   getNDaughters(): 4
   getName(): tau-
   getPDG(): 15
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00184956
@@ -17603,7 +17754,8 @@ MCParticle#8:
   getNDaughters(): 0
   getName(): anti-nu_tau
   getPDG(): -16
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00184956
@@ -17668,7 +17820,8 @@ MCParticle#10:
   getNDaughters(): 0
   getName(): pi-
   getPDG(): -211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.0011964
@@ -17700,7 +17853,8 @@ MCParticle#11:
   getNDaughters(): 0
   getName(): pi-
   getPDG(): -211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.0011964
@@ -17734,7 +17888,8 @@ MCParticle#12:
   getNDaughters(): 2
   getName(): pi+
   getPDG(): 211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.0011964
@@ -17768,7 +17923,8 @@ MCParticle#13:
   getNDaughters(): 2
   getName(): pi0
   getPDG(): 111
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.0011964
@@ -17800,7 +17956,8 @@ MCParticle#14:
   getNDaughters(): 0
   getName(): nu_mu
   getPDG(): 14
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 4.74737
@@ -17835,7 +17992,8 @@ MCParticle#15:
   getNDaughters(): 3
   getName(): mu+
   getPDG(): -13
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 4.74737
@@ -17870,7 +18028,8 @@ MCParticle#16:
   getNDaughters(): 3
   getName(): K_L0
   getPDG(): 130
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00253829
@@ -17904,7 +18063,8 @@ MCParticle#17:
   getNDaughters(): 2
   getName(): pi+
   getPDG(): 211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00253829
@@ -17938,7 +18098,8 @@ MCParticle#18:
   getNDaughters(): 2
   getName(): pi0
   getPDG(): 111
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00253829
@@ -17970,7 +18131,8 @@ MCParticle#19:
   getNDaughters(): 0
   getName(): pi-
   getPDG(): -211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00219663
@@ -18002,7 +18164,8 @@ MCParticle#20:
   getNDaughters(): 0
   getName(): pi-
   getPDG(): -211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00219663
@@ -18036,7 +18199,8 @@ MCParticle#21:
   getNDaughters(): 2
   getName(): pi+
   getPDG(): 211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00219663
@@ -18068,7 +18232,8 @@ MCParticle#22:
   getNDaughters(): 0
   getName(): nu_tau
   getPDG(): 16
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00219663
@@ -18133,7 +18298,8 @@ MCParticle#24:
   getNDaughters(): 0
   getName(): pi+
   getPDG(): 211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00122273
@@ -18167,7 +18333,8 @@ MCParticle#25:
   getNDaughters(): 2
   getName(): pi-
   getPDG(): -211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00122273
@@ -18199,7 +18366,8 @@ MCParticle#26:
   getNDaughters(): 0
   getName(): nu_mu
   getPDG(): 14
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 27.3535
@@ -18234,7 +18402,8 @@ MCParticle#27:
   getNDaughters(): 3
   getName(): mu+
   getPDG(): -13
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 27.3535
@@ -18266,7 +18435,8 @@ MCParticle#28:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00119653
@@ -18298,7 +18468,8 @@ MCParticle#29:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00119653
@@ -18330,7 +18501,8 @@ MCParticle#30:
   getNDaughters(): 0
   getName(): anti-nu_mu
   getPDG(): -14
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 114.836
@@ -18362,7 +18534,8 @@ MCParticle#31:
   getNDaughters(): 0
   getName(): nu_e
   getPDG(): 12
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 114.836
@@ -18394,7 +18567,8 @@ MCParticle#32:
   getNDaughters(): 0
   getName(): e+
   getPDG(): -11
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 114.836
@@ -18426,7 +18600,8 @@ MCParticle#33:
   getNDaughters(): 0
   getName(): pi+
   getPDG(): 211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 5.74517
@@ -18458,7 +18633,8 @@ MCParticle#34:
   getNDaughters(): 0
   getName(): mu-
   getPDG(): 13
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 5.74517
@@ -18490,7 +18666,8 @@ MCParticle#35:
   getNDaughters(): 0
   getName(): nu_mu
   getPDG(): 14
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 5.74517
@@ -18522,7 +18699,8 @@ MCParticle#36:
   getNDaughters(): 0
   getName(): nu_mu
   getPDG(): 14
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 1.39713
@@ -18557,7 +18735,8 @@ MCParticle#37:
   getNDaughters(): 3
   getName(): mu+
   getPDG(): -13
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 1.39713
@@ -18589,7 +18768,8 @@ MCParticle#38:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00253935
@@ -18621,7 +18801,8 @@ MCParticle#39:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00253935
@@ -18653,7 +18834,8 @@ MCParticle#40:
   getNDaughters(): 0
   getName(): nu_mu
   getPDG(): 14
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 24.5939
@@ -18688,7 +18870,8 @@ MCParticle#41:
   getNDaughters(): 3
   getName(): mu+
   getPDG(): -13
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 24.5939
@@ -18721,7 +18904,8 @@ MCParticle#42:
   getNDaughters(): 1
   getName(): pi+
   getPDG(): 211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.235784
@@ -18759,7 +18943,8 @@ MCParticle#43:
   getNDaughters(): 6
   getName(): pi-
   getPDG(): -211
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.235784
@@ -18791,7 +18976,8 @@ MCParticle#44:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.235784
@@ -18823,7 +19009,8 @@ MCParticle#45:
   getNDaughters(): 0
   getName(): n0
   getPDG(): 2112
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 62.3942
@@ -18855,7 +19042,8 @@ MCParticle#46:
   getNDaughters(): 0
   getName(): n0
   getPDG(): 2112
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 131.187
@@ -18887,7 +19075,8 @@ MCParticle#47:
   getNDaughters(): 0
   getName(): anti-nu_mu
   getPDG(): -14
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 9074.74
@@ -18919,7 +19108,8 @@ MCParticle#48:
   getNDaughters(): 0
   getName(): nu_e
   getPDG(): 12
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 9074.74
@@ -18951,7 +19141,8 @@ MCParticle#49:
   getNDaughters(): 0
   getName(): e+
   getPDG(): -11
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 9074.74
@@ -18983,7 +19174,8 @@ MCParticle#50:
   getNDaughters(): 0
   getName(): anti-nu_mu
   getPDG(): -14
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 17563.1
@@ -19015,7 +19207,8 @@ MCParticle#51:
   getNDaughters(): 0
   getName(): nu_e
   getPDG(): 12
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 17563.1
@@ -19047,7 +19240,8 @@ MCParticle#52:
   getNDaughters(): 0
   getName(): e+
   getPDG(): -11
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 17563.1
@@ -19079,7 +19273,8 @@ MCParticle#53:
   getNDaughters(): 0
   getName(): anti-nu_mu
   getPDG(): -14
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 506.689
@@ -19111,7 +19306,8 @@ MCParticle#54:
   getNDaughters(): 0
   getName(): nu_e
   getPDG(): 12
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 506.689
@@ -19143,7 +19339,8 @@ MCParticle#55:
   getNDaughters(): 0
   getName(): e+
   getPDG(): -11
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 506.689
@@ -19175,7 +19372,8 @@ MCParticle#56:
   getNDaughters(): 0
   getName(): n0
   getPDG(): 2112
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 119.062
@@ -19207,7 +19405,8 @@ MCParticle#57:
   getNDaughters(): 0
   getName(): n0
   getPDG(): 2112
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 9.28747
@@ -19239,7 +19438,8 @@ MCParticle#58:
   getNDaughters(): 0
   getName(): n0
   getPDG(): 2112
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 1.62284
@@ -19273,7 +19473,8 @@ MCParticle#59:
   getNDaughters(): 2
   getName(): e-
   getPDG(): 11
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 225.144
@@ -19305,7 +19506,8 @@ MCParticle#60:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 81.1163
@@ -19337,7 +19539,8 @@ MCParticle#61:
   getNDaughters(): 0
   getName(): n0
   getPDG(): 2112
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 3.28973
@@ -19369,7 +19572,8 @@ MCParticle#62:
   getNDaughters(): 0
   getName(): n0
   getPDG(): 2112
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 1.35392
@@ -19401,7 +19605,8 @@ MCParticle#63:
   getNDaughters(): 0
   getName(): e-
   getPDG(): 11
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 232.648
@@ -19433,7 +19638,8 @@ MCParticle#64:
   getNDaughters(): 0
   getName(): e-
   getPDG(): 11
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 247.757

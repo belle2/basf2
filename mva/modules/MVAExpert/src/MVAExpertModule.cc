@@ -17,7 +17,6 @@
 #include <mva/interface/Interface.h>
 
 #include <boost/algorithm/string/predicate.hpp>
-#include <memory>
 
 #include <framework/logging/Logger.h>
 
@@ -36,10 +35,13 @@ MVAExpertModule::MVAExpertModule() : Module()
            "Particles from these ParticleLists are used as input. If no name is given the expert is applied to every event once, and one can only use variables which accept nullptr as Particle*",
            empty);
   addParam("extraInfoName", m_extraInfoName,
-           "Name under which the output of the expert is stored in the ExtraInfo of the Particle object.");
+           "Name under which the output of the expert is stored in the ExtraInfo of the Particle object. If the expert returns multiple values, the index of the value is appended to the name in the form '_0', '_1', ...");
   addParam("identifier", m_identifier, "The database identifier which is used to load the weights during the training.");
   addParam("signalFraction", m_signal_fraction_override,
            "signalFraction to calculate probability (if -1 the signalFraction of the training data is used)", -1.0);
+  addParam("overwriteExistingExtraInfo", m_overwriteExistingExtraInfo,
+           "If true, when the given extraInfo has already defined, the old extraInfo value is overwritten. If false, the original value is kept.",
+           true);
 }
 
 void MVAExpertModule::initialize()
@@ -64,6 +66,7 @@ void MVAExpertModule::initialize()
   }
   MVA::AbstractInterface::initSupportedInterfaces();
 
+  m_existGivenExtraInfo = false;
 }
 
 void MVAExpertModule::beginRun()
@@ -105,15 +108,11 @@ void MVAExpertModule::init_mva(MVA::Weightfile& weightfile)
   std::vector<float> dummy;
   dummy.resize(m_feature_variables.size(), 0);
   m_dataset = std::make_unique<MVA::SingleDataset>(general_options, dummy, 0);
-
+  m_nClasses = general_options.m_nClasses;
 }
 
-float MVAExpertModule::analyse(Particle* particle)
+void MVAExpertModule::fillDataset(Particle* particle)
 {
-  if (not m_expert) {
-    B2ERROR("MVA Expert is not loaded! I will return 0");
-    return 0.0;
-  }
   for (unsigned int i = 0; i < m_feature_variables.size(); ++i) {
     auto var_result = m_feature_variables[i]->function(particle);
     if (std::holds_alternative<double>(var_result)) {
@@ -124,9 +123,52 @@ float MVAExpertModule::analyse(Particle* particle)
       m_dataset->m_input[i] = std::get<bool>(var_result);
     }
   }
+}
+
+float MVAExpertModule::analyse(Particle* particle)
+{
+  if (not m_expert) {
+    B2ERROR("MVA Expert is not loaded! I will return 0");
+    return 0.0;
+  }
+  fillDataset(particle);
   return m_expert->apply(*m_dataset)[0];
 }
 
+std::vector<float> MVAExpertModule::analyseMulticlass(Particle* particle)
+{
+  if (not m_expert) {
+    B2ERROR("MVA Expert is not loaded! I will return 0");
+    return std::vector<float>(m_nClasses, 0.0);
+  }
+  fillDataset(particle);
+  return m_expert->applyMulticlass(*m_dataset)[0];
+}
+
+void MVAExpertModule::setExtraInfoField(Particle* particle, std::string extraInfoName, float responseValue)
+{
+  if (particle->hasExtraInfo(extraInfoName)) {
+    if (particle->getExtraInfo(extraInfoName) != responseValue) {
+      m_existGivenExtraInfo = true;
+      if (m_overwriteExistingExtraInfo)
+        particle->setExtraInfo(extraInfoName, responseValue);
+    }
+  } else {
+    particle->addExtraInfo(extraInfoName, responseValue);
+  }
+}
+
+void MVAExpertModule::setEventExtraInfoField(StoreObjPtr<EventExtraInfo> eventExtraInfo, std::string extraInfoName,
+                                             float responseValue)
+{
+  if (eventExtraInfo->hasExtraInfo(extraInfoName)) {
+    m_existGivenExtraInfo = true;
+    if (m_overwriteExistingExtraInfo)
+      eventExtraInfo->setExtraInfo(extraInfoName, responseValue);
+  } else {
+    eventExtraInfo->addExtraInfo(extraInfoName, responseValue);
+  }
+}
 
 void MVAExpertModule::event()
 {
@@ -135,14 +177,21 @@ void MVAExpertModule::event()
     // Calculate target Value for Particles
     for (unsigned i = 0; i < list->getListSize(); ++i) {
       Particle* particle = list->getParticle(i);
-      float targetValue = analyse(particle);
-      if (particle->hasExtraInfo(m_extraInfoName)) {
-        if (particle->getExtraInfo(m_extraInfoName) != targetValue) {
-          B2WARNING("Extra Info with given name is already set! Overwriting old value!");
-          particle->setExtraInfo(m_extraInfoName, targetValue);
+      if (m_nClasses == 2) {
+        float responseValue = analyse(particle);
+        setExtraInfoField(particle, m_extraInfoName, responseValue);
+      } else if (m_nClasses > 2) {
+        std::vector<float> responseValues = analyseMulticlass(particle);
+        if (responseValues.size() != m_nClasses) {
+          B2ERROR("Size of results returned by MVA Expert applyMulticlass (" << responseValues.size() <<
+                  ") does not match the declared number of classes (" << m_nClasses << ").");
+        }
+        for (unsigned int iClass = 0; iClass < m_nClasses; iClass++) {
+          setExtraInfoField(particle, m_extraInfoName + "_" + std::to_string(iClass), responseValues[iClass]);
         }
       } else {
-        particle->addExtraInfo(m_extraInfoName, targetValue);
+        B2ERROR("Received a value of " << m_nClasses <<
+                " for the number of classes considered by the MVA Expert. This value should be >=2.");
       }
     }
   }
@@ -150,11 +199,36 @@ void MVAExpertModule::event()
     StoreObjPtr<EventExtraInfo> eventExtraInfo;
     if (not eventExtraInfo.isValid())
       eventExtraInfo.create();
-    if (eventExtraInfo->hasExtraInfo(m_extraInfoName)) {
-      B2WARNING("Extra Info with given name is already set! I won't set it again!");
+
+    if (m_nClasses == 2) {
+      float responseValue = analyse(nullptr);
+      setEventExtraInfoField(eventExtraInfo, m_extraInfoName, responseValue);
+    } else if (m_nClasses > 2) {
+      std::vector<float> responseValues = analyseMulticlass(nullptr);
+      if (responseValues.size() != m_nClasses) {
+        B2ERROR("Size of results returned by MVA Expert applyMulticlass (" << responseValues.size() <<
+                ") does not match the declared number of classes (" << m_nClasses << ").");
+      }
+      for (unsigned int iClass = 0; iClass < m_nClasses; iClass++) {
+        setEventExtraInfoField(eventExtraInfo, m_extraInfoName + "_" + std::to_string(iClass), responseValues[iClass]);
+      }
     } else {
-      float targetValue = analyse(nullptr);
-      eventExtraInfo->addExtraInfo(m_extraInfoName, targetValue);
+      B2ERROR("Received a value of " << m_nClasses <<
+              " for the number of classes considered by the MVA Expert. This value should be >=2.");
     }
+  }
+}
+
+void MVAExpertModule::terminate()
+{
+  m_expert.reset();
+  m_dataset.reset();
+
+  if (m_existGivenExtraInfo) {
+    if (m_overwriteExistingExtraInfo)
+      B2WARNING("The extraInfo " << m_extraInfoName << " has already been set! It was overwritten by this module!");
+    else
+      B2WARNING("The extraInfo " << m_extraInfoName << " has already been set! "
+                << "The original value was kept and this module did not overwrite it!");
   }
 }

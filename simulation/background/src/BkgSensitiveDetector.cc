@@ -78,11 +78,11 @@ namespace Belle2 {
       m_trackID = track.GetTrackID();
       //Get world position
       const G4ThreeVector& worldPosition = preStep.GetPosition();
-      m_startPos.SetXYZ(worldPosition.x() * Unit::mm / Unit::cm , worldPosition.y() * Unit::mm / Unit::cm,
+      m_startPos.SetXYZ(worldPosition.x() * Unit::mm / Unit::cm, worldPosition.y() * Unit::mm / Unit::cm,
                         worldPosition.z() * Unit::mm / Unit::cm);
       //Get momentum
       const G4ThreeVector& momentum = preStep.GetMomentum() ;
-      m_startMom.SetXYZ(momentum.x() * Unit::MeV, momentum.y() * Unit::MeV ,
+      m_startMom.SetXYZ(momentum.x() * Unit::MeV, momentum.y() * Unit::MeV,
                         momentum.z() * Unit::MeV);
       //Get time
       m_startTime = preStep.GetGlobalTime();

@@ -26,7 +26,7 @@ using namespace std;
 using namespace Belle2;
 using namespace ECL;
 
-REG_MODULE(ECLPacker)
+REG_MODULE(ECLPacker);
 
 ECLPackerModule::ECLPackerModule() :
   m_bufPos(0),
@@ -315,7 +315,7 @@ void ECLPackerModule::event()
             // pack time
             tim = m_eclDigits[i_digit]->getTimeFit();
           }
-          unsigned int hit_data = ((qua & 3) << 30) & 0xC0000000;
+          unsigned int hit_data = ((unsigned int)(qua & 3) << 30) & 0xC0000000;
           hit_data |= (tim & 0xFFF) << 18;
           hit_data |= ((amp + 128) & 0x3FFFF);
           buff[iFINESSE].push_back(hit_data);

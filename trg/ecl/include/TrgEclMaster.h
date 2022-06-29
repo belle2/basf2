@@ -86,11 +86,19 @@ namespace Belle2 {
     void setNofTopTC(int noftoptc) {_NofTopTC = noftoptc;}
     /** make LowMultiTriggerBit **/
     void makeLowMultiTriggerBit(std::vector<int>, std::vector<double>);
+
     /** make Trigger bit except for Low Multiplicity related bit **/
+    /*
     void makeTriggerBit(int, int, int, int, double, int, int,
                         std::vector<int>, int, int, int, int,
                         int, int, int, int, int, int, int,
                         int, int, int, int);
+    */
+    void makeTriggerBit(int, int, int, int, double, int, int,
+                        std::vector<int>, int, int, int, int,
+                        int, int, int, int, int, int, int,
+                        int, int, int, int, int);//one int parameter was added for taub2b3
+
     /** Set Total Energy*/
     double setTotalEnergy(std::vector<double>);
     //! Get ECL Trigger bit
@@ -154,7 +162,7 @@ namespace Belle2 {
       m_taub2bClusterECut1 = itaub2bClusterECut1;
       m_taub2bClusterECut2 = itaub2bClusterECut2;
     }
-    // set taub2b2 cut
+    //! set taub2b2 cut
     void setTaub2b2Cut(const std::vector<int>& iTaub2b2AngleCut,
                        const double iTaub2b2EtotCut,
                        const double iTaub2b2CLEEndcapCut,
@@ -164,6 +172,19 @@ namespace Belle2 {
       m_taub2b2EtotCut      = iTaub2b2EtotCut;
       m_taub2b2CLEEndcapCut = iTaub2b2CLEEndcapCut;
       m_taub2b2CLECut       = iTaub2b2CLECut;
+    }
+    //! set taub2b3 cut
+    void setTaub2b3Cut(const std::vector<int>& iTaub2b3AngleCut,
+                       const double iTaub2b3EtotCut,
+                       const double iTaub2b3CLEb2bCut,
+                       const double iTaub2b3CLELowCut,
+                       const double iTaub2b3CLEHighCut)
+    {
+      m_taub2b3AngleCut     = iTaub2b3AngleCut;
+      m_taub2b3EtotCut      = iTaub2b3EtotCut;
+      m_taub2b3CLEb2bCut    = iTaub2b3CLEb2bCut;
+      m_taub2b3CLELowCut    = iTaub2b3CLELowCut;
+      m_taub2b3CLEHighCut   = iTaub2b3CLEHighCut;
     }
     //! set the number of cluster exceeding 300 MeV
     void setn300MeVClusterThreshold(int n300MeVCluster)
@@ -185,12 +206,12 @@ namespace Belle2 {
     {
       _LowMultiThreshold = iLowMultiThreshold;
     }
-    // set theta ID region (low and high) of 3DBhabhaVeto InTrack for gg selection
+    //! set theta ID region (low and high) of 3DBhabhaVeto InTrack for gg selection
     void set3DBhabhaVetoInTrackThetaRegion(const std::vector<int>& i3DBhabhaVetoInTrackThetaRegion)
     {
       m_3DBhabhaVetoInTrackThetaRegion = i3DBhabhaVetoInTrackThetaRegion;
     }
-    // set energy threshold(low and high) of event timing quality flag (GeV)
+    //! set energy threshold(low and high) of event timing quality flag (GeV)
     void setEventTimingQualityThresholds(const std::vector<double>& iEventTimingQualityThresholds)
     {
       m_EventTimingQualityThresholds = iEventTimingQualityThresholds;
@@ -264,25 +285,37 @@ namespace Belle2 {
     double _mumuThreshold;
     //! mumu bit  Angle
     std::vector<double> _mumuAngle;
-    // Angle selection of additional Bhabha addition in CM frame
+    //! Angle selection of additional Bhabha addition in CM frame
     std::vector<double> m_3DBhabhaAddAngleCut;
     //! tau b2b 2 cluster angle cut (degree)
-    // (dphi low, dphi high, theta_sum low, theta_sum high)
+    //! (dphi low, dphi high, theta_sum low, theta_sum high)
     std::vector<int> m_taub2bAngleCut;
     //! tau b2b total energy (TC theta ID =1-17) (GeV)
     double m_taub2bEtotCut;
     //! taub2b one Cluster energy selection (GeV)
     double m_taub2bClusterECut1;
+    //! taub2b one Cluster energy selection (GeV)
     double m_taub2bClusterECut2;
-    // taub2b2 angle selection(degree)
-    // (3,2,1,0) = (dphi low, dphi high, theta_sum low, theta_sum high)
+    //! taub2b2 angle selection(degree)
+    //! (3,2,1,0) = (dphi low, dphi high, theta_sum low, theta_sum high)
     std::vector<int> m_taub2b2AngleCut;
     //! taub2b2 total energy (TC theta ID =1-17) (GeV)
     double m_taub2b2EtotCut;
-    // taub2b2 cluster energy cut for endcap cluster (GeV)
+    //! taub2b2 cluster energy cut for endcap cluster (GeV)
     double m_taub2b2CLEEndcapCut;
     //! taub2b2 cluseter energy cut (GeV)
     double m_taub2b2CLECut;
+    //! taub2b3 selection cuts
+    //! (3,2,1,0) = (dphi low, dphi high, theta_sum low, theta_sum high)
+    std::vector<int> m_taub2b3AngleCut;
+    //! taub2b3 total energy (TC theta ID =1-17) (GeV)
+    double m_taub2b3EtotCut;
+    //! taub2b3 cluster energy cut in lab for one of b2b clusters (GeV)
+    double m_taub2b3CLEb2bCut;
+    //! taub2b3 cluster energy low cut in lab for all clusters (GeV)
+    double m_taub2b3CLELowCut;
+    //! taub2b3 cluster energy high cut in lab for all clusters (GeV)
+    double m_taub2b3CLEHighCut;
     //! The number of Cluster exceeding 300 MeV
     int _n300MeVCluster;
     //!ECL Burst Bit Threshold
@@ -291,9 +324,9 @@ namespace Belle2 {
     std::vector<double> _TotalEnergy;
     //! Low Multiplicity Threshold
     std::vector<double> _LowMultiThreshold;
-    // Theta region (low, high) of 3D Bhabha Veto InTrack
+    //! Theta region (low, high) of 3D Bhabha Veto InTrack
     std::vector<int> m_3DBhabhaVetoInTrackThetaRegion;
-    // energy threshold(low, high) for quality flag (GeV)
+    //! energy threshold(low, high) for quality flag (GeV)
     std::vector<double> m_EventTimingQualityThresholds;
 
     /** Mapping object */
@@ -313,4 +346,4 @@ namespace Belle2 {
 //
 //
 //
-} /// namespace Belle2
+} // namespace Belle2

@@ -47,7 +47,8 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
                                 use_second_cdc_hits=False, skipHitPreparerAdding=False,
                                 use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False,
                                 add_cdcTrack_QI=True, add_vxdTrack_QI=False, add_recoTrack_QI=False,
-                                pxd_filtering_offline=False, useVTX=False, use_vtx_to_cdc_ckf=True, useVTXClusterShapes=True):
+                                pxd_filtering_offline=False, use_cdc_full_grid_eventt0=False,
+                                useVTX=False, use_vtx_to_cdc_ckf=True, useVTXClusterShapes=True):
     """
     This function adds the **standard tracking reconstruction** modules
     to a path:
@@ -93,8 +94,6 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
     :param trackFitHypotheses: which pdg hypothesis to fit. Defaults to [211, 321, 2212].
     :param use_svd_to_cdc_ckf: if true, add SVD to CDC CKF module.
     :param use_ecl_to_cdc_ckf: if true, add ECL to CDC CKF module.
-    :param use_vtx_to_cdc_ckf: if true, add VTX to CDC CKF module.
-    :param useVTX: If true, the VTX reconstruction is performed.
     :param add_cdcTrack_QI: if true, add the MVA track quality estimation
         to the path that sets the quality indicator property of the found CDC standalone tracks
     :param add_vxdTrack_QI: if true, add the MVA track quality estimation
@@ -106,6 +105,11 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
         (Both other QIs needed as input.)
     :param pxd_filtering_offline: If True, PXD data reduction (ROI filtering) is applied during the track reconstruction.
         The reconstructed SVD/CDC tracks are used to define the ROIs and reject all PXD clusters outside of these.
+    :param use_cdc_full_grid_eventt0: If True, the module FullGridChi2TrackTimeExtractor is added to the path
+                                      for computing the EventT0.
+    :param useVTX: If true, the VTX reconstruction is performed.
+    :param use_vtx_to_cdc_ckf: if true, add VTX to CDC CKF module.
+    :param useVTXClusterShapes: use the VTX cluster shapes
     """
 
     add_prefilter_tracking_reconstruction(
@@ -125,6 +129,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
         add_vxdTrack_QI=add_vxdTrack_QI,
         add_recoTrack_QI=add_recoTrack_QI,
         pxd_filtering_offline=pxd_filtering_offline,
+        use_cdc_full_grid_eventt0=use_cdc_full_grid_eventt0,
         useVTX=useVTX,
         use_vtx_to_cdc_ckf=use_vtx_to_cdc_ckf,
         useVTXClusterShapes=useVTXClusterShapes)
@@ -143,7 +148,7 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
                                           use_second_cdc_hits=False, skipHitPreparerAdding=False,
                                           use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False,
                                           add_cdcTrack_QI=True, add_vxdTrack_QI=False, add_recoTrack_QI=False,
-                                          pxd_filtering_offline=False,
+                                          pxd_filtering_offline=False, use_cdc_full_grid_eventt0=False,
                                           useVTX=False, use_vtx_to_cdc_ckf=False, useVTXClusterShapes=True):
     """
     This function adds the tracking reconstruction modules required to calculate HLT filter decision
@@ -177,6 +182,8 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
         (Both other QIs needed as input.)
     :param pxd_filtering_offline: If True, PXD data reduction (ROI filtering) is applied during the track reconstruction.
         The reconstructed SVD/CDC tracks are used to define the ROIs and reject all PXD clusters outside of these.
+    :param use_cdc_full_grid_eventt0: If True, the module FullGridChi2TrackTimeExtractor is added to the path
+                                      for computing the EventT0.
     :param useVTX: If true, the VTX reconstruction is performed.
     :param use_vtx_to_cdc_ckf: if true, add VTX to CDC CKF module.
     :param useVTXClusterShapes: If true, use cluster shape corrections for hit position finding.
@@ -226,7 +233,7 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
 
     # Only run the track time extraction on the full reconstruction chain for now. Later, we may
     # consider to do the CDC-hit based method already during the fast reconstruction stage
-    add_time_extraction(path, components=components)
+    add_time_extraction(path, use_cdc_full_grid_eventt0, components=components)
 
     add_mc_matcher(path, components=components, reco_tracks=reco_tracks,
                    use_second_cdc_hits=use_second_cdc_hits)
@@ -259,13 +266,22 @@ def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=Fa
     if prune_temporary_tracks or pruneTracks:
         path.add_module("PruneRecoHits")
 
+    path.add_module('TrackTimeEstimator')
 
-def add_time_extraction(path, components=None):
+
+def add_time_extraction(path, use_cdc_full_grid_eventt0=False, components=None):
     """
     Add time extraction components via tracking
-    """
 
-    if is_cdc_used(components):
+    :param path: The path to add the tracking reconstruction modules to
+    :param use_cdc_full_grid_eventt0: If True, the module FullGridChi2TrackTimeExtractor is added to the path
+                                      for computing the EventT0.
+    :param components: the list of geometry components in use or None for all components.
+    """
+    if is_svd_used(components):
+        path.add_module("SVDEventT0Estimator")
+
+    if is_cdc_used(components) and use_cdc_full_grid_eventt0:
         path.add_module("FullGridChi2TrackTimeExtractor")
 
 

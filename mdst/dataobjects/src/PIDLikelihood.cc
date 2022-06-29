@@ -163,7 +163,7 @@ void PIDLikelihood::probability(double probabilities[],
 void PIDLikelihood::printArray() const
 {
 
-  string detectorName[Const::PIDDetectors::c_size] =
+  const string detectorName[Const::PIDDetectors::c_size] =
   {"SVD", "CDC", "TOP", "ARICH", "ECL", "KLM"};
   string hline("-------");
   for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; i++)
@@ -214,7 +214,7 @@ void PIDLikelihood::printArray() const
 
 std::string PIDLikelihood::getInfoHTML() const
 {
-  string detectorName[Const::PIDDetectors::c_size] = {"SVD", "CDC", "TOP", "ARICH", "ECL", "KLM"};
+  const string detectorName[Const::PIDDetectors::c_size] = {"SVD", "CDC", "TOP", "ARICH", "ECL", "KLM"};
 
   std::stringstream stream;
   stream << std::setprecision(4);

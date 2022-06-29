@@ -90,7 +90,7 @@ Priority TSF::priority(int index)
 void TSF::write(const char* message, FILE* outstream)
 {
   // write input to TSF firmware
-  fprintf(outstream, "%s\n" , message);
+  fprintf(outstream, "%s\n", message);
   fflush(outstream);
 }
 
@@ -523,8 +523,10 @@ void TSF::pack(inputVector::reverse_iterator& input, unsigned number,
     if (width == 1)
     {
       return (get<field>(output)[0][i]) ? one_val : zero_val;
-    } else {
-      return (get<field>(output)[i / width][i % width]) ? one_val : zero_val;}});
+    } else
+    {
+      return (get<field>(output)[i / width][i % width]) ? one_val : zero_val;
+    }});
   input += number * width;
 }
 

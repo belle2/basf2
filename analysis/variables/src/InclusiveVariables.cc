@@ -47,16 +47,16 @@ namespace Belle2 {
 
     int nDaughterCharged(const Particle* particle, const std::vector<double>& argument)
     {
-      int pdgCode = 0;
+      int absPDGCode = 0;
       if (argument.size() == 1) {
-        pdgCode = std::lround(argument[0]);
+        absPDGCode = abs(std::lround(argument[0]));
       }
 
       int result = 0;
       auto fspDaughters = particle->getFinalStateDaughters();
       for (auto* daughter : fspDaughters) {
-        if (pdgCode != 0) {
-          if (abs(daughter->getPDGCode()) == pdgCode) {
+        if (absPDGCode != 0) {
+          if (abs(daughter->getPDGCode()) == absPDGCode) {
             result++;
           }
         } else if (abs(daughter->getCharge()) > 0) {
@@ -66,14 +66,49 @@ namespace Belle2 {
       return result;
     }
 
-    int nCompositeDaughters(const Particle* particle)
+    int nCompositeDaughters(const Particle* particle, const std::vector<double>& argument)
     {
+      int absPDGCode = 0;
+      if (argument.size() == 1) {
+        absPDGCode = abs(std::lround(argument[0]));
+      }
+
       int result = 0;
-      auto fspDaughters = particle->getDaughters();
-      for (auto* daughter : fspDaughters) {
+      auto primaryDaughters = particle->getDaughters();
+      for (auto* daughter : primaryDaughters) {
         if (daughter->getParticleSource() == Particle::EParticleSourceObject::c_Composite or
             daughter->getParticleSource() == Particle::EParticleSourceObject::c_V0) {
-          result++;
+          if (absPDGCode != 0) {
+            if (abs(daughter->getPDGCode()) == absPDGCode) {
+              result++;
+            }
+          } else {
+            result++;
+          }
+        }
+      }
+      return result;
+    }
+
+    int nCompositeAllGenerationDaughters(const Particle* particle, const std::vector<double>& argument)
+    {
+      int absPDGCode = 0;
+      if (argument.size() == 1) {
+        absPDGCode = abs(std::lround(argument[0]));
+      }
+
+      int result = 0;
+      auto allDaughters = particle->getAllDaughters();
+      for (auto* daughter : allDaughters) {
+        if (daughter->getParticleSource() == Particle::EParticleSourceObject::c_Composite or
+            daughter->getParticleSource() == Particle::EParticleSourceObject::c_V0) {
+          if (absPDGCode != 0) {
+            if (abs(daughter->getPDGCode()) == absPDGCode) {
+              result++;
+            }
+          } else {
+            result++;
+          }
         }
       }
       return result;
@@ -118,9 +153,16 @@ namespace Belle2 {
                       "Returns the number of K_L0 or neutrons among the final state daughters.");
     REGISTER_VARIABLE("nDaughterCharged(pdg)",   nDaughterCharged,
                       "Returns the number of charged daughters with the provided PDG code or the number "
-                      "of all charged daughters if no argument has been provided.");
-    REGISTER_VARIABLE("nCompositeDaughters",   nCompositeDaughters,
-                      "Returns the number of final state composite daughters.");
+                      "of all charged daughters if no argument has been provided. "
+                      "The variable is flavor agnostic and it returns the sum of the number of particle and anti-particle.");
+    REGISTER_VARIABLE("nCompositeDaughters(pdg)",   nCompositeDaughters,
+                      "Returns the number of primary composite daughters with the provided PDG code or the number"
+                      "of all primary composite daughters if no argument has been provided. "
+                      "The variable is flavor agnostic and it returns the sum of the number of particle and anti-particle.");
+    REGISTER_VARIABLE("nCompositeAllGenerationDaughters(pdg)",   nCompositeAllGenerationDaughters,
+                      "Returns the number of all generations' composite daughters with the provided PDG code or the number"
+                      "of all generations' composite daughters if no argument has been provided. "
+                      "The variable is flavor agnostic and it returns the sum of the number of particle and anti-particle.");
     REGISTER_METAVARIABLE("daughterAverageOf(variable)", daughterAverageOf,
                           "Returns the mean value of a variable over all daughters.", Manager::VariableDataType::c_double)
   }

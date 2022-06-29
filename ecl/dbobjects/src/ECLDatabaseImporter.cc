@@ -91,7 +91,7 @@ void ECLDatabaseImporter::importDigitEnergyCalibration()
   for (int bin = 1; bin <= amplitude->GetNbinsX(); ++bin) {
     float amplitudeval = amplitude->GetBinContent(bin);
     float energyval = energy->GetBinContent(bin);
-    new(digitCalibrationConstants[cell]) ECLDigitEnergyConstants(bin, amplitudeval, energyval);
+    new (digitCalibrationConstants[cell]) ECLDigitEnergyConstants(bin, amplitudeval, energyval);
     cell++;
   }
 
@@ -131,7 +131,7 @@ void ECLDatabaseImporter::importDigitTimeCalibration()
   int cell = 0;
   for (int bin = 1; bin <= offset->GetNbinsX(); ++bin) {
     float offsetval = offset->GetBinContent(bin);
-    new(digitCalibrationConstants[cell]) ECLDigitTimeConstants(bin, offsetval);
+    new (digitCalibrationConstants[cell]) ECLDigitTimeConstants(bin, offsetval);
     cell++;
   }
 
@@ -320,19 +320,19 @@ void ECLDatabaseImporter::importShowerShapesSecondMomentCorrections()
 
   //N1 theta
   TGraph* theta_N1_graph = getRootObjectFromFile<TGraph*>(inputFile, "SecondMomentCorrections_theta_N1");
-  dbArray.appendNew(ECLShower::c_nPhotons, ECLShowerShapeModule::c_thetaType , *theta_N1_graph);
+  dbArray.appendNew(ECLShower::c_nPhotons, ECLShowerShapeModule::c_thetaType, *theta_N1_graph);
 
   //N1 phi
   TGraph* phi_N1_graph = getRootObjectFromFile<TGraph*>(inputFile, "SecondMomentCorrections_phi_N1");
-  dbArray.appendNew(ECLShower::c_nPhotons, ECLShowerShapeModule::c_phiType , *phi_N1_graph);
+  dbArray.appendNew(ECLShower::c_nPhotons, ECLShowerShapeModule::c_phiType, *phi_N1_graph);
 
   //N2 theta
   TGraph* theta_N2_graph = getRootObjectFromFile<TGraph*>(inputFile, "SecondMomentCorrections_theta_N2");
-  dbArray.appendNew(ECLShower::c_neutralHadron, ECLShowerShapeModule::c_thetaType , *theta_N2_graph);
+  dbArray.appendNew(ECLShower::c_neutralHadron, ECLShowerShapeModule::c_thetaType, *theta_N2_graph);
 
   //N2 phi
   TGraph* phi_N2_graph = getRootObjectFromFile<TGraph*>(inputFile, "SecondMomentCorrections_phi_N2");
-  dbArray.appendNew(ECLShower::c_neutralHadron, ECLShowerShapeModule::c_phiType , *phi_N2_graph);
+  dbArray.appendNew(ECLShower::c_neutralHadron, ECLShowerShapeModule::c_phiType, *phi_N2_graph);
 
 
   //Import to DB

@@ -67,6 +67,21 @@ namespace Belle2 {
     int nMCParticles(const Particle*);
 
     /**
+     * return number of primary MCParticles in event
+     */
+    int nPrimaryMCParticles(const Particle*);
+
+    /**
+     * return number of initial primary MCParticles in event
+     */
+    int nInitialPrimaryMCParticles(const Particle*);
+
+    /**
+     * return number of virtual primary MCParticles in event
+     */
+    int nVirtualPrimaryMCParticles(const Particle*);
+
+    /**
     * return experiment number
     */
     int expNum(const Particle*);

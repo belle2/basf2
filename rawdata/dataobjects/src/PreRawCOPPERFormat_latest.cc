@@ -177,7 +177,7 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
     }
   } else {
     printf("[DEBUG] New run started. cur run %.8x prev. run %.8x cur eve %.8x prev eve %8.x : eve 0x%x exp %d run %d sub %d\n",
-           *cur_exprunsubrun_no, prev_exprunsubrun_no , *cur_evenum_rawcprhdr, prev_evenum,
+           *cur_exprunsubrun_no, prev_exprunsubrun_no, *cur_evenum_rawcprhdr, prev_evenum,
            GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n));
 
     // Check if the first event of a run is zero.
@@ -201,8 +201,8 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
                 "[FATAL] %s ch=%d : ERROR_EVENT : Invalid Event # at the beginning of the run (It should be zero.): preveve 0x%x cureve 0x%x : prev(exp %u run %u sub %u ) cur(exp %u run %u sub %u ) (",
                 hostname, -1,
                 prev_evenum, *cur_evenum_rawcprhdr,
-                prev_exprunsubrun_no >> 22 , (prev_exprunsubrun_no >> 8) & 0x3FFF, prev_exprunsubrun_no & 0xFF,
-                *cur_exprunsubrun_no >> 22 , (*cur_exprunsubrun_no >> 8) & 0x3FFF, *cur_exprunsubrun_no & 0xFF);
+                prev_exprunsubrun_no >> 22, (prev_exprunsubrun_no >> 8) & 0x3FFF, prev_exprunsubrun_no & 0xFF,
+                *cur_exprunsubrun_no >> 22, (*cur_exprunsubrun_no >> 8) & 0x3FFF, *cur_exprunsubrun_no & 0xFF);
 
         char err_buf_temp[2500];
         for (unsigned i = 0; i < summary_table.size(); ++i) {
@@ -602,7 +602,7 @@ int PreRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
     PrintData(GetBuffer(n), *(GetBuffer(n) + tmp_header.POS_NWORDS));
     printf("[FATAL] %s ch=%d : ERROR_EVENT : PRE CRC16 error : slot %c : B2LCRC16 %x Calculated CRC16 %x : Nwords of FINESSE buf %d\n",
            hostname, finesse_num,
-           65 + finesse_num, *buf , temp_crc16, GetFINESSENwords(n, finesse_num));
+           65 + finesse_num, *buf, temp_crc16, GetFINESSENwords(n, finesse_num));
     int* temp_buf = GetFINESSEBuffer(n, finesse_num);
     for (int k = 0; k <  GetFINESSENwords(n, finesse_num); k++) {
       printf("%.8x ", temp_buf[ k ]);

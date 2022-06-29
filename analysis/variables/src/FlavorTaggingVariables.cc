@@ -2200,9 +2200,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("pMissTag", momentumMissingTagSide, R"DOC(
 [Expert] Calculates the missing momentum for a given particle on the tag side. 
 :noindex:
-)DOC");
+)DOC","GeV/c");
     REGISTER_METAVARIABLE("pMissTag(maskName)", momentumMissingTagSideWithMask,
-                          "[Expert] Calculates the missing momentum for a given particle on the tag side.",
+                          "[Expert] Calculates the missing momentum for a given particle on the tag side. The unit of the missing momentum is ``GeV/c`` ",
                           Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("cosTPTO"  , cosTPTO, R"DOC(
 [Expert] Returns cosine of angle between thrust axis of given particle and thrust axis of ROE.
@@ -2214,22 +2214,22 @@ namespace Belle2 {
     REGISTER_VARIABLE("lambdaFlavor", lambdaFlavor,
                       "[Expert] Returns 1.0 if particle is ``Lambda0``, -1.0 in case of ``anti-Lambda0``, 0.0 otherwise.");
     REGISTER_VARIABLE("isLambda", isLambda,  "[Expert] Returns 1.0 if particle is truth-matched to ``Lambda0``, 0.0 otherwise.");
-    REGISTER_VARIABLE("lambdaZError", lambdaZError,  "[Expert] Returns the variance of the z-component of the decay vertex.");
+    REGISTER_VARIABLE("lambdaZError", lambdaZError,  "[Expert] Returns the variance of the z-component of the decay vertex.",":math:`\\text{cm}^2`");
     REGISTER_VARIABLE("momentumOfSecondDaughter", momentumOfSecondDaughter,
-                      "[Expert] Returns the momentum of second daughter if exists, 0. otherwise.");
+                      "[Expert] Returns the momentum of second daughter if exists, 0. otherwise.","GeV/c");
     REGISTER_VARIABLE("momentumOfSecondDaughterCMS", momentumOfSecondDaughterCMS,
-                      "[Expert] Returns the momentum of the second daughter in the centre-of-mass system, 0. if this daughter doesn't exist.");
+                      "[Expert] Returns the momentum of the second daughter in the centre-of-mass system, 0. if this daughter doesn't exist.","GeV/c");
     REGISTER_VARIABLE("chargeTimesKaonLiklihood", chargeTimesKaonLiklihood,
                       "[Expert] Returns ``q*(highest PID_Likelihood for Kaons)``, 0. otherwise.");
     REGISTER_VARIABLE("ptTracksRoe", transverseMomentumOfChargeTracksInRoe, R"DOC(
 [Expert] Returns the transverse momentum of all charged tracks of the ROE related to the given particle, 0.0 if particle has no related ROE.
 :noindex:
-)DOC");
+)DOC","GeV/c");
     REGISTER_METAVARIABLE("ptTracksRoe(maskName)", transverseMomentumOfChargeTracksInRoeWithMask,
-                          "[Exepert] Returns the transverse momentum of all charged tracks of the ROE related to the given particle, 0.0 if particle has no related ROE.",
+                          "[Expert] Returns the transverse momentum of all charged tracks of the ROE related to the given particle, 0.0 if particle has no related ROE. The unit of the momentum is ``GeV/c`` ",
                           Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("pt2TracksRoe(maskName)", transverseMomentumSquaredOfChargeTracksInRoeWithMask,
-                          "[Expert] Returns the transverse momentum squared of all charged tracks of the ROE related to the given particle, 0.0 if particle has no related ROE.",
+                          "[Expert] Returns the transverse momentum squared of all charged tracks of the ROE related to the given particle, 0.0 if particle has no related ROE. The unit of the momentum squared is :math:`[\\text{GeV}/\\text{c}]^2` ",
                           Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("NumberOfKShortsInRoe", NumberOfKShortsInRoe,
                       "[Expert] Returns the number of ``K_S0`` in the rest of event. The particle list ``K_S0:inRoe`` has to be filled beforehand.");
@@ -2285,7 +2285,7 @@ In other words, this variable checks the generated flavor of the other generated
 
     REGISTER_METAVARIABLE("BtagToWBosonVariables(requestedVariable[, maskName])", BtagToWBosonVariables, R"DOC(
 [Eventbased][Expert] Returns values of FlavorTagging-specific kinematical variables assuming a semileptonic decay with the given particle as target.
-The input values of ``requestedVariable`` can be the following:  recoilMass, pMissCMS, cosThetaMissCMS and EW90.
+The input values of ``requestedVariable`` can be the following:  recoilMass in GeV/c^2 , pMissCMS in ``GeV/c``, cosThetaMissCMS and EW90.
 )DOC", Manager::VariableDataType::c_double);
   REGISTER_METAVARIABLE("KaonPionVariables(requestedVariable)"  , KaonPionVariables , R"DOC(
 [Expert] Returns values of FlavorTagging-specific kinematical variables for ``KaonPion`` category.
@@ -2293,7 +2293,7 @@ The input values of ``requestedVariable`` can be the following:  cosKaonPion, Ha
 )DOC", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("FSCVariables(requestedVariable)", FSCVariables, R"DOC(
 [Eventbased][Expert] Returns values of FlavorTagging-specific kinematical variables for ``FastSlowCorrelated`` category.
-The input values of ``requestedVariable`` can be the following: pFastCMS, cosSlowFast, SlowFastHaveOpositeCharges, or cosTPTOFast.
+The input values of ``requestedVariable`` can be the following: pFastCMS in ``GeV/c``, cosSlowFast, SlowFastHaveOpositeCharges, or cosTPTOFast.
 )DOC", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("hasHighestProbInCat(particleListName, extraInfoName)", hasHighestProbInCat, R"DOC(
 [Expert] Returns 1.0 if the given Particle is classified as target track, i.e. if it has the highest target track probability in particleListName. 

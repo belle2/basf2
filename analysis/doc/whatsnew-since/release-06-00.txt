@@ -7,7 +7,7 @@ Variables
    ECL cluster. 
  * Added the variable `kaonID_noARICHwoECL` which returns kaonID without using ARICH likelihood for tracks without associated
    ECL cluster. 
- * Added the metavariable `binaryPID_noARICHwoECL(pdgCode1, pdgCode2)` which returns binary PID without using ARICH likelihood 
+ * Added the metavariable `binaryPID_noARICHwoECL` which returns binary PID without using ARICH likelihood 
    for tracks without associated ECL cluster. 
  
 

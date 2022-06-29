@@ -45,7 +45,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
                                 use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False,
                                 add_cdcTrack_QI=True, add_vxdTrack_QI=False, add_recoTrack_QI=False,
                                 pxd_filtering_offline=False, append_full_grid_cdc_eventt0=False,
-                                flip_recoTrack=False):
+                                flip_recoTrack=True):
     """
     This function adds the **standard tracking reconstruction** modules
     to a path:
@@ -268,7 +268,7 @@ def add_flipping_of_recoTracks(path, fit_tracks=True, reco_tracks="RecoTracks", 
 
 
 def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=False, fit_tracks=True, reco_tracks="RecoTracks",
-                                           prune_temporary_tracks=True, flip_recoTrack=False):
+                                           prune_temporary_tracks=True, flip_recoTrack=True):
     """
     This function adds the tracking reconstruction modules not required to calculate HLT filter
     decision to a path.

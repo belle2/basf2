@@ -84,8 +84,8 @@ namespace Belle2 {
           omega_estimate = trackFitResult->getOmega();
           omega_variance = trackFitResult->getCov()[9];
           phi0_variance = trackFitResult->getCov()[5];
-          phi0_estimate = trackFitResult->getPhi() > 2.0 * TMath::Pi() ? trackFitResult->getPhi() - 2.0 * TMath::Pi() :
-                          trackFitResult->getPhi();
+          phi0_estimate = trackFitResult->getPhi() > 0.0 ? trackFitResult->getPhi() : trackFitResult->getPhi() + 2.0 * TMath::Pi();
+
           tan_lambda_estimate = trackFitResult->getCotTheta();
           tan_lambda_variance = trackFitResult->getCov()[14];
           m_variables.at(m_prefix + "first_cdc_layer") = trackFitResult->getHitPatternCDC().getFirstLayer();

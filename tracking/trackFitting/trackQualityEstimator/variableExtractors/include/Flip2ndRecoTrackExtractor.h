@@ -123,8 +123,8 @@ namespace Belle2 {
               m_variables.at(m_prefix + "px_estimate") = mom.X();
               m_variables.at(m_prefix + "pt_variance") = pt_variance;
 
-              m_variables.at(m_prefix + "phi0_estimate") = trackFitResult->getPhi() > 2.0 *  TMath::Pi() ? trackFitResult->getPhi() - 2.0 *
-                                                           TMath::Pi() : trackFitResult->getPhi();
+              m_variables.at(m_prefix + "phi0_estimate") = trackFitResult->getPhi() > 0.0 ? trackFitResult->getPhi() : trackFitResult->getPhi() +
+                                                           2.0 * TMath::Pi();
               m_variables.at(m_prefix + "flipped_z_estimate") = pos_flipped.Z();
               m_variables.at(m_prefix + "py_estimate") = mom.Y();
               m_variables.at(m_prefix + "flipped_z_variance") = cov6_flipped(2, 2);

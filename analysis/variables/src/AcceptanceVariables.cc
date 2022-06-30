@@ -187,7 +187,8 @@ This variable checks if the particle polar angle :math:`\theta` is within certai
 Return values and the corresponding :math:`\theta` ranges are the following:
 
 * 0: Outside of ECL acceptance, :math:`\theta < 12.4^\circ` or :math:`\theta > 155.1^\circ`,
-     or in the acceptance gaps :math:`31.4 < theta < 32.2`` or :math:``128.7 < theta < 130.7`.
+  or in one of the acceptance gaps at :math:`31.4^{\circ} < \theta < 32.2^{\circ}`
+  or :math:`128.7^{\circ} < \theta < 130.7^{\circ}`;
 * 1: Forward ECL,  :math:`12.4^\circ < \theta < 31.4^\circ`; 
 * 2: Barrel ECL,   :math:`32.2^\circ < \theta < 128.7^\circ`; 
 * 3: Backward ECL, :math:`130.7^\circ < \theta < 155.1^\circ`.

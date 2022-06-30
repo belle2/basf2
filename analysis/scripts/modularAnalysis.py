@@ -1302,7 +1302,35 @@ def applyEventCuts(cut, path):
         cut (str): Events that do not pass these selection criteria are skipped
         path (basf2.Path): modules are added to this path
     """
+    import b2parser
+    from variables import variables
 
+    def find_vars(t: tuple, var_list: list) -> None:
+        """ Recursive helper function to find variable names """
+        if not isinstance(t, tuple):
+            return
+        if t[0] == b2parser.B2ExpressionParser.node_types['IdentifierNode']:
+            var_list += [t[1]]
+            return
+        for i in t:
+            if isinstance(i, tuple):
+                find_vars(i, var_list)
+    event_var_id = '[Eventbased]'
+    formula_id = 'formula'
+    parsed_cut = b2parser.parse(cut)
+    var_list = []
+    find_vars(parsed_cut, var_list=var_list)
+    if len(var_list) == 0:
+        B2WARNING(f'Cut string "{cut}" has no variables for applyEventCuts helper function!')
+    for var_string in var_list:
+        # Get the variable and get rid of aliases
+        var = variables.getVariable(var_string)
+        # Do not check the formula
+        if formula_id in var.name:
+            continue
+        # Check if there is eventbased marker in description
+        if event_var_id not in var.description:
+            B2ERROR(f'Variable {var_string} is not an eventbased variable! Please check your inputs to the applyEventCuts method!')
     eselect = register_module('VariableToReturnValue')
     eselect.param('variable', 'passesEventCut(' + cut + ')')
     path.add_module(eselect)

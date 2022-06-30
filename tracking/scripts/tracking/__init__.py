@@ -283,11 +283,11 @@ def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=Fa
     :param flip_recoTrack: if true, add the recoTracks flipping function in the postfilter
     """
 
-    if flip_recoTrack:
-        add_flipping_of_recoTracks(path, reco_tracks="RecoTracks")
-
     if fit_tracks:
         add_postfilter_track_fit(path, components=components, pruneTracks=pruneTracks, reco_tracks=reco_tracks)
+
+    if flip_recoTrack:
+        add_flipping_of_recoTracks(path, reco_tracks="RecoTracks")
 
     if prune_temporary_tracks or pruneTracks:
         path.add_module("PruneRecoHits")

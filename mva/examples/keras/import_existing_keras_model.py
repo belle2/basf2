@@ -22,7 +22,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     return State(load_model(parameters['file_path']))
 
 
-def partial_fit(state, X, S, y, w, epoch):
+def partial_fit(state, X, S, y, w, epoch, batch):
     """
     This should be empty, because our model is already fitted.
     """

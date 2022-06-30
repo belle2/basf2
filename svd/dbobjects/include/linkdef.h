@@ -25,8 +25,8 @@
 #pragma link C++ class Belle2::SVDCalibrationsBase<Belle2::SVDCalibrationsVector<float>>+; // checksum=0x80db1433, version=2
 #pragma link C++ class Belle2::SVDCalibrationsVector<float> +; // checksum=0x5cfaf009, version=-1
 
-#pragma link C++ class Belle2::SVDCalibrationsBase<Belle2::SVDCalibrationsScalar<float>>+;
-#pragma link C++ class Belle2::SVDCalibrationsScalar<float> +;
+#pragma link C++ class Belle2::SVDCalibrationsBase<Belle2::SVDCalibrationsScalar<float>>+; // checksum=0xb549547d, version=2
+#pragma link C++ class Belle2::SVDCalibrationsScalar<float> +; // checksum=0x5cd79908, version=-1
 
 #pragma link C++ class Belle2::SVDCalibrationsBase<Belle2::SVDCalibrationsVector<Belle2::SVDStripCalAmp>>+; // checksum=0x8a2533e1, version=2
 #pragma link C++ class Belle2::SVDCalibrationsVector<Belle2::SVDStripCalAmp> +; // checksum=0xfff37002, version=-1

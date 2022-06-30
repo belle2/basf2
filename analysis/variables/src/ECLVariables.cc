@@ -1364,13 +1364,13 @@ Returns 1.0 if the cluster has the 'neutral hadrons' hypothesis (historically ca
 0.0 if not, and NaN if no cluster is associated to the particle.
 )DOC");
     REGISTER_VARIABLE("eclExtTheta", eclExtTheta, R"DOC(
-Returns extrapolated :math:`\theta`.
+Returns extrapolated :math:`\theta` of particle track associated to the cluster (if any). Requires module ECLTrackCalDigitMatch to be executed.
 )DOC","rad");
     REGISTER_VARIABLE("eclExtPhi", eclExtPhi, R"DOC(
-Returns extrapolated :math:`\phi`.
+Returns extrapolated :math:`\phi` of particle track associated to the cluster (if any). Requires module ECLTrackCalDigitMatch to be executed..
 )DOC","rad");
     REGISTER_VARIABLE("eclExtPhiId", eclExtPhiId, R"DOC(
-Returns extrapolated :math:`\phi` ID.
+Returns extrapolated :math:`\phi` ID of particle track associated to the cluster (if any). Requires module ECLTrackCalDigitMatch to be executed..
 )DOC");
     REGISTER_VARIABLE("weightedAverageECLTime", weightedAverageECLTime, R"DOC(
 Returns ECL weighted average time of all clusters (neutrals) and matched clusters (charged) of daughters

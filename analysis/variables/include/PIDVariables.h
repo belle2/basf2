@@ -176,6 +176,24 @@ namespace Belle2 {
     double binaryElectronID_noSVD_noTOP(const Particle* part, const std::vector<double>& arguments);
 
     /**
+     * SPECIAL (TEMP) variable (BII-9461)
+     * @return pion ID with special ARICH likelihood treatment
+     */
+    double pionID_noARICHwoECL(const Particle* part);
+
+    /**
+     * SPECIAL (TEMP) variable (BII-9461)
+     * @return kaon ID with special ARICH likelihood treatment
+     */
+    double kaonID_noARICHwoECL(const Particle* part);
+
+    /**
+     * SPECIAL (TEMP) variable (BII-9461)
+     * @return binary PID between two particle hypotheses with special ARICH likelihood treatment
+     */
+    double binaryPID_noARICHwoECL(const Particle* part, const std::vector<double>& arguments);
+
+    /**
     * returns the MVA score for anti-neutron PID (not for neutron)
     * -1 means invalid
     *  0 background-like

@@ -19,7 +19,7 @@ Enddecay
 
 
 Decay B+sig
-0.000084530   rho0   tau+sig    nu_tau      BCL -0.861 1.444 0.266 0.378 0.165 0.291 0.718 0.384 0.331 -0.876 1.907; #[FF values from a combined fit on LCSR prediction (1203.1359) and measurements from Belle (1306.2781) and BaBar (1005.3288)]
+0.000084530   rho0   tau+sig    nu_tau      BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88; # fit results for BCL expansion coefficients from (2104.05739)
 Enddecay
 CDecay B-sig
 

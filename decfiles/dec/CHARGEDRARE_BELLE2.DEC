@@ -42,8 +42,8 @@ Decay B+Rare
 # fit results for BCL expansion coefficients from (2104.05739) #[BCL model update - KMA 06/2022]
 0.000158000   rho0  e+  nu_e                               BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88;
 0.000158000   rho0  mu+  nu_mu                             BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88;
-0.000119000   omega  e+  nu_e                              BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88;
-0.000119000   omega  mu+  nu_mu                            BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88;
+0.000119000   omega  e+  nu_e                              BCL -0.94 1.78 0.24 0.30 0.00 0.25 0.54 -0.03 0.31 -0.89 1.81;
+0.000119000   omega  mu+  nu_mu                            BCL -0.94 1.78 0.24 0.30 0.00 0.25 0.54 -0.03 0.31 -0.89 1.81;
 
 0.000023000   eta'  e+  nu_e                               ISGW2; #[PDG2017]
 0.000023000   eta'  mu+  nu_mu                             ISGW2; #[PDG2017]
@@ -56,7 +56,7 @@ Decay B+Rare
 
 0.000050804   pi0  tau+  nu_tau                            BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52; #Assuming R_pi  = 0.641 (arXiv:1509.06938). #[BF update - PG 09/2020] #[BCL model update - KMA 06/2022]
 0.000084530   rho0  tau+  nu_tau                           BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88; #Assuming R_rho = 0.535 (priv. comm. M. Prim). #[BF update - PG 09/2020] #[BCL model update - KMA 06/2022]
-0.000064974   omega  tau+  nu_tau                          ISGW2; #Assuming R_om  = 0.546 (priv. comm. M. Prim). #[BF update - PG 09/2020]
+0.000064974   omega  tau+  nu_tau                          BCL -0.94 1.78 0.24 0.30 0.00 0.25 0.54 -0.03 0.31 -0.89 1.81; #Assuming R_om  = 0.543 (priv. comm. M. Prim). #[BF update - PG 09/2020] #[BCL model update - KMA 06/2022]
 0.000012000   eta  tau+  nu_tau                            ISGW2;
 0.000018000   eta'  tau+  nu_tau                           ISGW2;
 0.000046000   a_10  tau+  nu_tau                           ISGW2;
@@ -1188,8 +1188,8 @@ Decay B-Rare
 # fit results for BCL expansion coefficients from (2104.05739) #[BCL model update - KMA 06/2022]
 0.000158000   rho0  e-  anti-nu_e                          BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88;
 0.000158000   rho0  mu-  anti-nu_mu                        BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88;
-0.000119000   omega  e-  anti-nu_e                         BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88;
-0.000119000   omega  mu-  anti-nu_mu                       BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88;
+0.000119000   omega  e-  anti-nu_e                         BCL -0.94 1.78 0.24 0.30 0.00 0.25 0.54 -0.03 0.31 -0.89 1.81;
+0.000119000   omega  mu-  anti-nu_mu                       BCL -0.94 1.78 0.24 0.30 0.00 0.25 0.54 -0.03 0.31 -0.89 1.81;
 
 0.000023000   eta'  e-  anti-nu_e                          ISGW2; #[PDG2017]
 0.000023000   eta'  mu-  anti-nu_mu                        ISGW2; #[PDG2017]
@@ -1202,7 +1202,7 @@ Decay B-Rare
 
 0.000050804   pi0  tau-  anti-nu_tau                       BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52; #Assuming R_pi  = 0.641 (arXiv:1509.06938). #[BF update - PG 09/2020] #[BCL model update - KMA 06/2022]
 0.000084530   rho0  tau-  anti-nu_tau                      BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88; #Assuming R_rho = 0.535 (priv. comm. M. Prim). #[BF update - PG 09/2020] #[BCL model update - KMA 06/2022]
-0.000064974   omega  tau-  anti-nu_tau                     ISGW2; #Assuming R_om  = 0.546 (priv. comm. M. Prim). #[BF update - PG 09/2020]
+0.000064974   omega  tau-  anti-nu_tau                     BCL -0.94 1.78 0.24 0.30 0.00 0.25 0.54 -0.03 0.31 -0.89 1.81; #Assuming R_om  = 0.543 (priv. comm. M. Prim). #[BF update - PG 09/2020] #[BCL model update - KMA 06/2022]
 0.000012000   eta  tau-  anti-nu_tau                       ISGW2;
 0.000018000   eta'  tau-  anti-nu_tau                      ISGW2;
 0.000046000   a_10  tau-  anti-nu_tau                      ISGW2;

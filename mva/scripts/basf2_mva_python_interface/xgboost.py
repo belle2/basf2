@@ -82,7 +82,7 @@ def apply(state, X):
     return np.require(result, dtype=np.float32, requirements=['A', 'W', 'C', 'O'])
 
 
-def begin_fit(state, Xtest, Stest, ytest, wtest):
+def begin_fit(state, Xtest, Stest, ytest, wtest, nBatches):
     """
     Initialize lists which will store the received data
     """

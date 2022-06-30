@@ -274,9 +274,10 @@ namespace Belle2 {
         auto ndarray_y_v = boost::python::handle<>(PyArray_SimpleNewFromData(2, dimensions_y_v, NPY_FLOAT32, y_v.get()));
         auto ndarray_w_v = boost::python::handle<>(PyArray_SimpleNewFromData(2, dimensions_w_v, NPY_FLOAT32, w_v.get()));
 
-        auto state = framework.attr("begin_fit")(model, ndarray_X_v, ndarray_S_v, ndarray_y_v, ndarray_w_v);
-
         uint64_t nBatches = std::floor(numberOfTrainingEvents / batch_size);
+
+        auto state = framework.attr("begin_fit")(model, ndarray_X_v, ndarray_S_v, ndarray_y_v, ndarray_w_v, nBatches);
+
         bool continue_loop = true;
 
         std::vector<uint64_t> iteration_index_vector(numberOfTrainingEvents);
@@ -284,9 +285,6 @@ namespace Belle2 {
 
         for (uint64_t iIteration = 0; (iIteration < m_specific_options.m_nIterations or m_specific_options.m_nIterations == 0)
              and continue_loop; ++iIteration) {
-
-          // shuffle the indices on each iteration to get randomised batches
-          if (iIteration > 0) std::shuffle(std::begin(iteration_index_vector), std::end(iteration_index_vector), TRandomWrapper());
 
           for (uint64_t iBatch = 0; iBatch < nBatches and continue_loop; ++iBatch) {
 

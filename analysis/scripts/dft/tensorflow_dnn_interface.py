@@ -198,7 +198,7 @@ def load(obj):
     return state
 
 
-def begin_fit(state, Xtest, Stest, ytest, wtest):
+def begin_fit(state, Xtest, Stest, ytest, wtest, nBatches):
     """
     use test sets for monitoring
     """

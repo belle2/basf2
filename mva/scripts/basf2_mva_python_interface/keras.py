@@ -96,7 +96,7 @@ def apply(state, X):
     return np.require(r, dtype=np.float32, requirements=['A', 'W', 'C', 'O'])
 
 
-def begin_fit(state, Xtest, Stest, ytest, wtest):
+def begin_fit(state, Xtest, Stest, ytest, wtest, nBatches):
     """
     Returns just the state object
     """

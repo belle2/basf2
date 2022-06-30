@@ -201,7 +201,8 @@ def test_script(script_location, input_file_name, temp_dir):
     # even if a valid and existing working directory is specified
     if os.path.exists(histos_file_name):
         final_histos_file_name = os.path.join(temp_dir, histos_file_name)
-        shutil.move(histos_file_name, os.path.join(temp_dir, final_histos_file_name))
+        shutil.copy(histos_file_name, os.path.join(temp_dir, final_histos_file_name))
+        os.unlink(histos_file_name)
 
     # Go back to the original directory for safety
     os.chdir(cwd)

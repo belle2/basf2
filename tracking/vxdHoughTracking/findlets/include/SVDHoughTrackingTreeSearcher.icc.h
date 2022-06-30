@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/vxdHoughTracking/findlets/VXDHoughTrackingTreeSearcher.dcl.h>
+#include <tracking/vxdHoughTracking/findlets/SVDHoughTrackingTreeSearcher.dcl.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
 #include <framework/logging/Logger.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
@@ -19,25 +19,25 @@ namespace Belle2 {
   namespace vxdHoughTracking {
 
     template <class AHit, class APathFilter, class AResult>
-    VXDHoughTrackingTreeSearcher<AHit, APathFilter, AResult>::VXDHoughTrackingTreeSearcher() : Super()
+    SVDHoughTrackingTreeSearcher<AHit, APathFilter, AResult>::SVDHoughTrackingTreeSearcher() : Super()
     {
       Super::addProcessingSignalListener(&m_pathFilter);
     };
 
     template <class AHit, class APathFilter, class AResult>
-    void VXDHoughTrackingTreeSearcher<AHit, APathFilter, AResult>::exposeParameters(ModuleParamList* moduleParamList,
+    void SVDHoughTrackingTreeSearcher<AHit, APathFilter, AResult>::exposeParameters(ModuleParamList* moduleParamList,
         const std::string& prefix)
     {
       m_pathFilter.exposeParameters(moduleParamList, prefix);
 
       moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "twoHitFilterLimit"),
-                                    m_param_applyTwoHitFilterIfMoreChildStates,
+                                    m_applyTwoHitFilterIfMoreChildStates,
                                     "Use the TwoHitFilter (path length == 1) if there are more child states than this value.",
-                                    m_param_applyTwoHitFilterIfMoreChildStates);
+                                    m_applyTwoHitFilterIfMoreChildStates);
     }
 
     template <class AHit, class APathFilter, class AResult>
-    void VXDHoughTrackingTreeSearcher<AHit, APathFilter, AResult>::apply(std::vector<AHit*>& hits,
+    void SVDHoughTrackingTreeSearcher<AHit, APathFilter, AResult>::apply(std::vector<AHit*>& hits,
         const std::vector<TrackFindingCDC::WeightedRelation<AHit>>& relations,
         std::vector<AResult>& results)
     {
@@ -66,7 +66,7 @@ namespace Belle2 {
     }
 
     template <class AHit, class APathFilter, class AResult>
-    void VXDHoughTrackingTreeSearcher<AHit, APathFilter, AResult>::traverseTree(std::vector<TrackFindingCDC::WithWeight<const AHit*>>&
+    void SVDHoughTrackingTreeSearcher<AHit, APathFilter, AResult>::traverseTree(std::vector<TrackFindingCDC::WithWeight<const AHit*>>&
         path,
         const std::vector<TrackFindingCDC::WeightedRelation<AHit>>& relations,
         std::vector<AResult>& results)
@@ -94,7 +94,7 @@ namespace Belle2 {
 
       // Do everything with child states, linking, extrapolation, teaching, discarding, what have you.
       const std::vector<TrackFindingCDC::WithWeight<const AHit*>>& constPath = path;
-      if (path.size() > 1 or childHits.size() > m_param_applyTwoHitFilterIfMoreChildStates) {
+      if (path.size() > 1 or childHits.size() > m_applyTwoHitFilterIfMoreChildStates) {
         m_pathFilter.apply(constPath, childHits);
       }
 

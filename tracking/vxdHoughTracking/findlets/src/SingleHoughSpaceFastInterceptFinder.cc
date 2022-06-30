@@ -27,35 +27,35 @@ void SingleHoughSpaceFastInterceptFinder::exposeParameters(ModuleParamList* modu
 {
   Super::exposeParameters(moduleParamList, prefix);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumRecursionLevel"), m_param_maxRecursionLevel,
-                                "Maximum recursion level for the fast Hough trafo algorithm.",  m_param_maxRecursionLevel);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumRecursionLevel"), m_maxRecursionLevel,
+                                "Maximum recursion level for the fast Hough trafo algorithm.",  m_maxRecursionLevel);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "nAngleSectors"), m_param_nAngleSectors,
-                                "Number of angle sectors (= x-axis) dividing the Hough space.", m_param_nAngleSectors);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "nAngleSectors"), m_nAngleSectors,
+                                "Number of angle sectors (= x-axis) dividing the Hough space.", m_nAngleSectors);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "nVerticalSectors"), m_param_nVerticalSectors,
-                                "Number of vertical sectors (= y-axis) dividing the Hough space.", m_param_nVerticalSectors);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "nVerticalSectors"), m_nVerticalSectors,
+                                "Number of vertical sectors (= y-axis) dividing the Hough space.", m_nVerticalSectors);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "verticalHoughSpaceSize"), m_param_verticalHoughSpaceSize,
-                                "Vertical size of the Hough space.", m_param_verticalHoughSpaceSize);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "verticalHoughSpaceSize"), m_verticalHoughSpaceSize,
+                                "Vertical size of the Hough space.", m_verticalHoughSpaceSize);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "HoughSpaceMinimumX"), m_param_minimumX,
-                                "Minimum x value of the Hough space.", m_param_minimumX);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "HoughSpaceMinimumX"), m_minimumX,
+                                "Minimum x value of the Hough space.", m_minimumX);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "HoughSpaceMaximumX"), m_param_maximumX,
-                                "Maximum x value of the Hough space.", m_param_maximumX);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "HoughSpaceMaximumX"), m_maximumX,
+                                "Maximum x value of the Hough space.", m_maximumX);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minimumHSClusterSize"), m_param_MinimumHSClusterSize,
-                                "Maximum x value of the Hough space.", m_param_MinimumHSClusterSize);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minimumHSClusterSize"), m_MinimumHSClusterSize,
+                                "Maximum x value of the Hough space.", m_MinimumHSClusterSize);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumHSClusterSize"), m_param_MaximumHSClusterSize,
-                                "Maximum x value of the Hough space.", m_param_MaximumHSClusterSize);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumHSClusterSize"), m_MaximumHSClusterSize,
+                                "Maximum x value of the Hough space.", m_MaximumHSClusterSize);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumHSClusterSizeX"), m_param_MaximumHSClusterSizeX,
-                                "Maximum x value of the Hough space.", m_param_MaximumHSClusterSizeX);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumHSClusterSizeX"), m_MaximumHSClusterSizeX,
+                                "Maximum x value of the Hough space.", m_MaximumHSClusterSizeX);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumHSClusterSizeY"), m_param_MaximumHSClusterSizeY,
-                                "Maximum x value of the Hough space.", m_param_MaximumHSClusterSizeY);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumHSClusterSizeY"), m_MaximumHSClusterSizeY,
+                                "Maximum x value of the Hough space.", m_MaximumHSClusterSizeY);
 
 }
 
@@ -63,14 +63,15 @@ void SingleHoughSpaceFastInterceptFinder::initialize()
 {
   Super::initialize();
 
-  m_param_maxRecursionLevel = ceil(log2(std::max(m_param_nAngleSectors, m_param_nVerticalSectors))) - 1;
-  B2ASSERT("The maximum number of recursions (maximumRecursionLevel) must not be larger than 14, but it is " <<
-           m_param_maxRecursionLevel <<
-           ", please choose a smaller value for maximumRecursionLevel, and / or for nAngleSectors and / or nVerticalSectors.",
-           m_param_maxRecursionLevel <= 14);
-  m_unitX = (m_param_maximumX - m_param_minimumX) / (double)m_param_nAngleSectors;
-  for (uint i = 0; i < m_param_nAngleSectors; i++) {
-    double x = m_param_minimumX + m_unitX * (double)i;
+  m_maxRecursionLevel = ceil(log2(std::max(m_nAngleSectors, m_nVerticalSectors))) - 1;
+  if (m_maxRecursionLevel > 14) {
+    B2ERROR("The maximum number of recursions (maximumRecursionLevel) must not be larger than 14, but it is " <<
+            m_maxRecursionLevel <<
+            ", please choose a smaller value for maximumRecursionLevel, and / or for nAngleSectors and / or nVerticalSectors.");
+  }
+  m_unitX = (m_maximumX - m_minimumX) / (double)m_nAngleSectors;
+  for (uint i = 0; i < m_nAngleSectors; i++) {
+    double x = m_minimumX + m_unitX * (double)i;
     double xc = x + 0.5 * m_unitX;
 
     m_HSXLUT[i] = x;
@@ -80,16 +81,16 @@ void SingleHoughSpaceFastInterceptFinder::initialize()
     m_HSCenterCosValuesLUT[i] = cos(xc);
     m_HSXCenterLUT[i] = xc;
   }
-  m_HSXLUT[m_param_nAngleSectors] = m_param_maximumX;
-  m_HSSinValuesLUT[m_param_nAngleSectors] = sin(m_param_maximumX);
-  m_HSCosValuesLUT[m_param_nAngleSectors] = cos(m_param_maximumX);
+  m_HSXLUT[m_nAngleSectors] = m_maximumX;
+  m_HSSinValuesLUT[m_nAngleSectors] = sin(m_maximumX);
+  m_HSCosValuesLUT[m_nAngleSectors] = cos(m_maximumX);
 
-  m_unitY = 2. * m_param_verticalHoughSpaceSize / m_param_nVerticalSectors;
-  for (uint i = 0; i <= m_param_nVerticalSectors; i++) {
-    m_HSYLUT[i] = m_param_verticalHoughSpaceSize - m_unitY * i;
-    m_HSYCenterLUT[i] = m_param_verticalHoughSpaceSize - m_unitY * i - 0.5 * m_unitY;
+  m_unitY = 2. * m_verticalHoughSpaceSize / m_nVerticalSectors;
+  for (uint i = 0; i <= m_nVerticalSectors; i++) {
+    m_HSYLUT[i] = m_verticalHoughSpaceSize - m_unitY * i;
+    m_HSYCenterLUT[i] = m_verticalHoughSpaceSize - m_unitY * i - 0.5 * m_unitY;
   }
-  B2DEBUG(29, "HS size x: " << (m_param_maximumX - m_param_minimumX) << " HS size y: " << m_param_verticalHoughSpaceSize <<
+  B2DEBUG(29, "HS size x: " << (m_maximumX - m_minimumX) << " HS size y: " << m_verticalHoughSpaceSize <<
           " unitX: " << m_unitX << " unitY: " << m_unitY);
 }
 
@@ -102,7 +103,7 @@ void SingleHoughSpaceFastInterceptFinder::apply(std::vector<VXDHoughState>& hits
 
   const std::vector<VXDHoughState*> currentEventHitList = TrackFindingCDC::as_pointers<VXDHoughState>(hits);
 
-  fastInterceptFinder2d(currentEventHitList, 0, m_param_nAngleSectors, 0, m_param_nVerticalSectors, 0);
+  fastInterceptFinder2d(currentEventHitList, 0, m_nAngleSectors, 0, m_nVerticalSectors, 0);
 
   FindHoughSpaceCluster();
 
@@ -133,7 +134,7 @@ void SingleHoughSpaceFastInterceptFinder::fastInterceptFinder2d(const std::vecto
   containedHits.reserve(hits.size());
   std::bitset<8> layerHits; /* For layer filter */
 
-  if (currentRecursion == m_param_maxRecursionLevel + 1) return;
+  if (currentRecursion == m_maxRecursionLevel + 1) return;
 
   // these int-divisions can cause {min, center} or {center, max} to be the same, which is a desired behaviour
   const uint centerx = xmin + (uint)((xmax - xmin) / 2);
@@ -199,8 +200,8 @@ void SingleHoughSpaceFastInterceptFinder::fastInterceptFinder2d(const std::vecto
       }
 
       if (layerFilter(layerHits) > 0) {
-        // recursive call of fastInterceptFinder2d, until currentRecursion == m_param_maxRecursionLevel
-        if (currentRecursion < m_param_maxRecursionLevel) {
+        // recursive call of fastInterceptFinder2d, until currentRecursion == m_maxRecursionLevel
+        if (currentRecursion < m_maxRecursionLevel) {
           fastInterceptFinder2d(containedHits, left, right, lowerIndex, upperIndex, currentRecursion + 1);
         } else {
           m_activeSectors.insert({std::make_pair(localIndexX, localIndexY), std::make_pair(-layerFilter(layerHits), containedHits) });
@@ -235,7 +236,7 @@ void SingleHoughSpaceFastInterceptFinder::FindHoughSpaceCluster()
     // Check for HS sectors connected to each other which could form a cluster
     DepthFirstSearch(currentCell.first.first, currentCell.first.second);
     // if cluster valid (i.e. not too small and not too big): finalize!
-    if (m_clusterSize >= m_param_MinimumHSClusterSize and m_clusterSize <= m_param_MaximumHSClusterSize) {
+    if (m_clusterSize >= m_MinimumHSClusterSize and m_clusterSize <= m_MaximumHSClusterSize) {
 
       m_trackCandidates.emplace_back(m_currentTrackCandidate);
       m_currentTrackCandidate.clear();
@@ -246,25 +247,25 @@ void SingleHoughSpaceFastInterceptFinder::FindHoughSpaceCluster()
 
 void SingleHoughSpaceFastInterceptFinder::DepthFirstSearch(uint lastIndexX, uint lastIndexY)
 {
-  if (m_clusterSize >= m_param_MaximumHSClusterSize) return;
+  if (m_clusterSize >= m_MaximumHSClusterSize) return;
 
   for (uint currentIndexY = lastIndexY; currentIndexY >= lastIndexY - 1; currentIndexY--) {
-    if (abs((int)m_clusterInitialPosition.second - (int)currentIndexY) >= m_param_MaximumHSClusterSizeY or
-        m_clusterSize >= m_param_MaximumHSClusterSize or currentIndexY > m_param_nVerticalSectors) return;
+    if (abs((int)m_clusterInitialPosition.second - (int)currentIndexY) >= m_MaximumHSClusterSizeY or
+        m_clusterSize >= m_MaximumHSClusterSize or currentIndexY > m_nVerticalSectors) return;
     for (uint currentIndexX = lastIndexX; currentIndexX <= lastIndexX + 1; currentIndexX++) {
-      if (abs((int)m_clusterInitialPosition.first - (int)currentIndexX) >= m_param_MaximumHSClusterSizeX or
-          m_clusterSize >= m_param_MaximumHSClusterSize or currentIndexX > m_param_nAngleSectors) return;
+      if (abs((int)m_clusterInitialPosition.first - (int)currentIndexX) >= m_MaximumHSClusterSizeX or
+          m_clusterSize >= m_MaximumHSClusterSize or currentIndexX > m_nAngleSectors) return;
 
       // The cell (currentIndexX, currentIndexY) is the current one has already been checked, so continue
       if (lastIndexX == currentIndexX && lastIndexY == currentIndexY) continue;
 
       // first check bounds to avoid out-of-bound array access
       // as they are uints, they are always >= 0, and in case of an overflow they would be too large
-      if (currentIndexX < m_param_nAngleSectors and currentIndexY < m_param_nVerticalSectors) {
+      if (currentIndexX < m_nAngleSectors and currentIndexY < m_nVerticalSectors) {
 
         auto activeSector = m_activeSectors.find({currentIndexX, currentIndexY});
         // Only continue searching if the current cluster is smaller than the maximum cluster size
-        if (activeSector != m_activeSectors.end() and activeSector->second.first < 0 /*and m_clusterSize < m_param_MaximumHSClusterSize*/) {
+        if (activeSector != m_activeSectors.end() and activeSector->second.first < 0 /*and m_clusterSize < m_MaximumHSClusterSize*/) {
           activeSector->second.first = m_clusterCount;
           m_clusterSize++;
 

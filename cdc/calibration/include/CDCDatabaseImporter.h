@@ -208,6 +208,12 @@ namespace Belle2 {
     /// Do some basic testing of the CDCCrossTalkLibrary
     void testCDCCrossTalkLibrary(bool spotChecks = false) const;
 
+    /// import CDClayerTimeCut
+    void importCDClayerTimeCut(const std::string& jsonFileName) const;
+
+    /// Print content of CDClayerTimeCut
+    void printCDClayerTimeCut() const;
+
   private:
 
     /**

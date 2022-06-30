@@ -65,7 +65,6 @@ class CNN_PID_ECL(b2.Module):
         self.pt_range = pt_range
         self.path = path
 
-        torch.manual_seed(1234)
         self.device = torch.device('cpu')
 
     def initialize(self):
@@ -73,8 +72,9 @@ class CNN_PID_ECL(b2.Module):
 
         self.eclCalDigits = self.Belle2.PyStoreArray('ECLCalDigits')
         self.mapping = self.Belle2.PyStoreObj('ECLCellIdMapping')
-        self.eclCnnMuon = self.Belle2.PyStoreArray('ECLCNNPid')
-        self.tracks = self.Belle2.PyStoreArray('Track')
+        self.eclCnnMuon = self.Belle2.PyStoreArray(self.Belle2.ECLCNNPid.Class())
+        self.eclCnnMuon.registerInDataStore()
+        self.tracks = self.Belle2.PyStoreArray('Tracks')
         self.tracks.registerRelationTo(self.eclCnnMuon)
 
     def beginRun(self):
@@ -109,8 +109,9 @@ class CNN_PID_ECL(b2.Module):
             if charge == 0:
                 continue
 
-            if (track and self.getExtCell(track)):
-                extHit_dict = self.getExtCell(track)
+            extHit_dict = self.getExtCell(track)
+
+            if (track and extHit_dict):
                 maxCellId = extHit_dict['cellid']
                 self.pt = extHit_dict['pt']
                 self.pt = np.array([self.pt])
@@ -154,12 +155,13 @@ class CNN_PID_ECL(b2.Module):
                         prob_CNN_dict = self.extract_cnn_value(model)
                         prob_CNN_muon = prob_CNN_dict['cnn_muon']
 
-                        eclCnnMuon = self.eclCnnMuon.appendNew(prob_CNN_muon)
+                        eclCnnMuon = self.eclCnnMuon.appendNew()
+                        eclCnnMuon.setEclCnnMuon(prob_CNN_muon)
                         track.addRelationTo(eclCnnMuon)
 
-                        b2.B2DEBUG(11, f'{variable_muon}: {prob_CNN_muon}')
+                        b2.B2DEBUG(22, f'{variable_muon}: {prob_CNN_muon}')
                     else:
-                        b2.B2DEBUG(11, 'Track is either outside ECL Barrel or Pt is outside [0.2, 1.0] GeV/c. No CNN value.')
+                        b2.B2DEBUG(22, 'Track is either outside ECL Barrel or Pt is outside [0.2, 1.0] GeV/c. No CNN value.')
 
     def getExtCell(self, track):
         """ Extract cellId and pt of an extrapolated track

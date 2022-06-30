@@ -15,6 +15,8 @@ Test backwards compatibility for an mdst file produced with release-06-00-00.
 See https://confluence.desy.de/display/BI/Backward+Compatibility if this test fails.
 
 CHANGES since release-06-00-00:
+- Track:
+  + getTrackTime added
 """
 
 from basf2 import create_path, process, set_random_seed, find_file

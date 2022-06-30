@@ -73,6 +73,11 @@ void WireHitCreator::exposeParameters(ModuleParamList* moduleParamList, const st
                                 "List of super layers to be used.",
                                 m_param_useSuperLayers);
 
+  moduleParamList->addParameter(prefixed(prefix, "maxDriftTimes"),
+                                m_param_maxDriftTimes,
+                                "Maximum drift time (nsec) allowed per super layer (in order of super layer#0-8). No cut is applied if this value is negative",
+                                m_param_maxDriftTimes);
+
   moduleParamList->addParameter(prefixed(prefix, "useLayers"),
                                 m_param_useLayers,
                                 "List of layers to be used. "
@@ -149,6 +154,11 @@ void WireHitCreator::initialize()
     FlightTimeEstimator::instance(std::make_unique<CosmicRayFlightTimeEstimator>(m_triggerPoint));
   } else if (m_flightTimeEstimation == EPreferredDirection::c_Outwards) {
     FlightTimeEstimator::instance(std::make_unique<BeamEventFlightTimeEstimator>());
+  }
+
+  int nSL = m_param_maxDriftTimes.size();
+  for (int iSL = 0; iSL < nSL; ++iSL) {
+    m_maxDriftTimes.at(iSL) = m_param_maxDriftTimes.at(iSL);
   }
 
   if (not m_param_useSuperLayers.empty()) {
@@ -256,7 +266,12 @@ void WireHitCreator::apply(std::vector<CDCWireHit>& outputWireHits)
       continue;
     }
 
+    // Exclude hit with large drift time
+    // In the following, the tof correction is off; the propagation-delay corr. is off (default of the translator); the event time corr. is on when it is available.
+    const double approxDriftTime = tdcCountTranslator.getDriftTime(hit.getTDCCount(), wireID, 0, 0, hit.getADCCount());
     ISuperLayer iSL = wireID.getISuperLayer();
+    if (m_maxDriftTimes.at(iSL) > 0 && approxDriftTime > m_maxDriftTimes.at(iSL)) continue;
+
     if (not m_useSuperLayers[iSL]) continue;
     unsigned short layer = wireID.getICLayer();
     if (not m_useLayers[layer]) continue;

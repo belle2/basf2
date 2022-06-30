@@ -188,6 +188,8 @@ namespace Belle2 {
     double m_resolution2;       /**< Resolution of the second Gassian used to smear drift length */
     double m_tdcThreshold4Outer; /**< TDC threshold for outer layers in unit of eV */
     double m_tdcThreshold4Inner; /**< TDC threshold for inner layers in unit of eV */
+    double m_corrFact2Threshold4Outer; /**< Corr. factor to TDC threshold for outer layers */
+    double m_corrFact2Threshold4Inner; /**< Corr. factor to TDC threshold for inner layers */
     int    m_eDepInGasMode;     /**< Mode for extracting dE(gas) from dE(gas+wire) */
     int    m_adcThreshold;      /**< Threshold for ADC in unit of count */
     double m_tMin;              /**< Lower edge of time window in ns */
@@ -224,7 +226,7 @@ namespace Belle2 {
     double m_addFudgeFactorForSigma; /**< additional fudge factor for space resol. */
     double m_totalFudgeFactor = 1.;  /**< total fudge factor for space resol. */
 
-    bool m_gasGainSmearing = false;  /**< Swtich for gas gain smearing */
+    bool m_gasGainSmearing = true;  /**< Swtich for gas gain smearing */
     double m_effWForGasGainSmearing = 0.0266;  /**< Effective energy (keV) for one electron prod. for gas gain smearing */
     double m_thetaOfPolya = 0.5;     /**< theta of Polya function for gas gain smearing */
     bool m_extraADCSmearing = false; /**< Swtich for extra ADC smearing */

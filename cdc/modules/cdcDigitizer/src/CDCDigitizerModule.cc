@@ -98,6 +98,8 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
            "TDC threshold (dE in eV) for Layers#8-56. The value corresponds to He-C2H6 gas", 250.);
   addParam("TDCThreshold4Inner", m_tdcThreshold4Inner,
            "Same as TDCThreshold4Outer but for Layers#0-7,", 150.);
+  addParam("CorrFact2Threshold4Outer", m_corrFact2Threshold4Outer, "Correction factor to the TDC threshold for Layers#8-56.", 2.9);
+  addParam("CorrFact2Threshold4Inner", m_corrFact2Threshold4Inner, "Correction factor to the TDC threshold for Layers#0-07.", 2.9);
   addParam("EDepInGasMode", m_eDepInGasMode,
            "Mode for extracting energy deposit in gas from energy deposit in gas+wire; =0: scaling using electron density; 1: scaling using most probab. energy deposit; 2: similar to 2 but slightly different; 3: extraction based on probability; 4: regeneration following probability",
            0);
@@ -154,7 +156,8 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
   addParam("DebugLevel4XTalk", m_debugLevel4XTalk, "Debug level for crosstalk; 20-29 are usable.", 21);
 
   //Gain smearing
-  addParam("GasGainSmearing", m_gasGainSmearing, "Switch for gas gain smearing; true: on; false: off", m_gasGainSmearing);
+  addParam("GasGainSmearing", m_gasGainSmearing, "Switch for gas gain smearing for ADC simulation; true: on; false: off",
+           m_gasGainSmearing);
   addParam("EffWForGasGainSmearing", m_effWForGasGainSmearing,
            "Effective energy (keV) needed for one electron production for gas gain smearing; average for alpha- and beta-sources.",
            m_effWForGasGainSmearing);
@@ -494,7 +497,6 @@ void CDCDigitizerModule::event()
 
     //Apply energy threshold
     // If hitdE < dEThreshold, the hit is ignored
-    // M. Uchida 2012.08.31
     double dEThreshold = 0.;
     if (m_useDB4FEE && m_useDB4EDepToADC) {
       dEThreshold = m_tdcThresh[m_boardID] / convFactorForThreshold * Unit::keV;
@@ -502,6 +504,7 @@ void CDCDigitizerModule::event()
       dEThreshold = (m_wireID.getISuperLayer() == 0) ? m_tdcThreshold4Inner : m_tdcThreshold4Outer;
       dEThreshold *= Unit::eV;
     }
+    dEThreshold *= (m_wireID.getISuperLayer() == 0) ? m_corrFact2Threshold4Inner : m_corrFact2Threshold4Outer;
     B2DEBUG(m_debugLevel, "hitdE,dEThreshold,driftLength " << hitdE << " " << dEThreshold << " " << hitDriftLength);
 
     if (hitdE < dEThreshold) {
@@ -1014,10 +1017,11 @@ void CDCDigitizerModule::makeSignalsAfterShapers(const WireID& wid, double dEinG
   }
 
   if (m_gasGainSmearing) {
-    //TODO: replace the following sum with a gaussian for large nElectrons if gas-gain smearing turns out to be important
-    const double nElectrons = dEInkeV / m_effWForGasGainSmearing;
+    const int nElectrons = std::round(dEInkeV / m_effWForGasGainSmearing);
     double relGain = 0;
-    if (nElectrons >= 1) {
+    if (20 <= nElectrons) {
+      relGain = gRandom->Gaus(1., sqrt(1. / (nElectrons * (1. + m_thetaOfPolya))));
+    } else if (1 <= nElectrons && nElectrons < 20) {
       for (int i = 1; i <= nElectrons; ++i) {
         relGain += Polya();
       }

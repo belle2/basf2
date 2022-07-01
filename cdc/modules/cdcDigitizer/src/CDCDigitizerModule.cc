@@ -1020,7 +1020,7 @@ void CDCDigitizerModule::makeSignalsAfterShapers(const WireID& wid, double dEinG
     const int nElectrons = std::round(dEInkeV / m_effWForGasGainSmearing);
     double relGain = 0;
     if (20 <= nElectrons) {
-      relGain = gRandom->Gaus(1., sqrt(1. / (nElectrons * (1. + m_thetaOfPolya))));
+      relGain = std::max(0., gRandom->Gaus(1., sqrt(1. / (nElectrons * (1. + m_thetaOfPolya)))));
     } else if (1 <= nElectrons) {
       for (int i = 1; i <= nElectrons; ++i) {
         relGain += Polya();

@@ -17,12 +17,13 @@
 ##########################################################################
 
 import basf2 as b2
-import root_pandas as rtp
+import uproot
 import pidDataUtils as pdu
 from os import makedirs
 
 # Read data into DataFrame
-df = rtp.read_root(b2.find_file('mc_dstar.root', 'examples', False))
+filename = b2.find_file('mc_dstar.root', 'examples', False)
+df = uproot.open(filename)['my_ttree'].arrays(library="pd")
 print("ROOT file read into DataFrame.")
 
 # Make slim h5 files for each particle type and merge into one large file

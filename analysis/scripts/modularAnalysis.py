@@ -1324,7 +1324,7 @@ def applyEventCuts(cut, path):
     var_list = []
     meta_list = []
     find_vars(parsed_cut, var_list=var_list, meta_list=meta_list)
-    if len(var_list) == 0:
+    if len(var_list) == 0 and len(meta_list) == 0:
         B2WARNING(f'Cut string "{cut}" has no variables for applyEventCuts helper function!')
     for var_string in var_list:
         # Get the variable and get rid of aliases

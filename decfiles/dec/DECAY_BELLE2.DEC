@@ -11592,24 +11592,24 @@ Decay Lambda_c+
 0.004650000   Sigma+  eta                                  PYTHIA         0; #[PDG 2021]
 0.015860000   Sigma+  eta'                                 PYTHIA         0; #[PDG 2021]
 0.004230000   Sigma+  rho0                                 PYTHIA         0; #[goes into Sigma+ pi+pi-]
-0.017980000   Sigma+  omega                                PYTHIA         0; #PDG 2021 CHECK
+0.017980000   Sigma+  omega                                PYTHIA         0; #[PDG 2021]
 0.003170000   Sigma*+  pi0                                 PYTHIA         0;
 # 0.00279 to Lambda pi+ pi0
-0.008990000   Sigma*+  eta                                 PYTHIA         0; #[Reconstructed PDG2011]
+0.008990000   Sigma*+  eta                                 PYTHIA         0; #[PDG2011]
 # Contributes 0.0791 To Lambda  pi eta
 0.000630000   Sigma*+  rho0                                PYTHIA         0; #[PDG 2021 contributes to L(3pi)]]
 0.003170000   Sigma*+  omega                               PYTHIA         0;
-0.005810000   Xi0  K+                                      PYTHIA         0; #[Reconstructed PDG2011]
+0.005810000   Xi0  K+                                      PYTHIA         0; #[PDG2021]
 0.002110000   Xi0  K*+                                     PYTHIA         0;
-0.004540000   Xi*0  K+                                     PYTHIA         0; #[Reconstructed PDG2011]
+0.004540000   Xi*0  K+                                     PYTHIA         0; #[PDG 2021]
 0.001140000   Delta++  pi-                                 PYTHIA         0; #[PDG 2021]
 0.001060000   Delta++  rho-                                PYTHIA         0;
 0.000080000   p+  pi0                                      PYTHIA         0; #[Theoretical prediction]
 0.000500000   p+  eta'                                     PYTHIA         0; #[Belle 2022]
 0.002110000   p+  rho0                                     PYTHIA         0;
 0.002110000   p+  omega                                    PYTHIA         0;
-0.001120000   p+  phi                                      PYTHIA         0; #[Reconstructed PDG2011]
-0.002960000   p+  f_0                                      PYTHIA         0; #[Reconstructed PDG2011]
+0.001120000   p+  phi                                      PYTHIA         0; #[PDG2021]
+0.002960000   p+  f_0                                      PYTHIA         0; #[PDG2021]
 0.001060000   Delta+  pi0                                  PYTHIA         0;
 0.001060000   Delta+  eta                                  PYTHIA         0;
 0.001060000   Delta+  eta'                                 PYTHIA         0;

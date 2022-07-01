@@ -106,7 +106,7 @@ namespace Belle2 {
       for (int i = 0; i < RFBuckets; i++) {
         int k = (i + offset) % RFBuckets;
         corrBuckets->SetBinContent(i + 1, a[k]);
-        n += a[k] * a0[i];
+        if (a0[i] > 0) n += a[k];
         n0 += a[k];
       }
       double fract = n / n0;

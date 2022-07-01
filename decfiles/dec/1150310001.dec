@@ -1,7 +1,7 @@
-# EventType: 1150310000   
+# EventType: 1150310001   
 # Descriptor: [B0 -> pi tau nu ]cc
 # NickName: Bd_pitaunu
-# Documentation: 
+# Documentation: with generic tau decays
 # Tested: YES
 # PhysicsWG: SL
 # Responsible: Karol Adamczyk, Anja Novosel
@@ -18,16 +18,9 @@ Enddecay
 #
 
 Decay B0sig
-1.0     pi-     tau+sig      nu_tau     BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52;
+1.0     pi-     tau+      nu_tau     BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52;
 Enddecay
 CDecay anti-B0sig
-#
-
-Decay tau+sig
-0.178175    e+      nu_e      anti-nu_tau   TAULNUNU;
-0.173937    mu+     nu_mu     anti-nu_tau   TAULNUNU;
-Enddecay
-CDecay tau-sig
 
 #
 End

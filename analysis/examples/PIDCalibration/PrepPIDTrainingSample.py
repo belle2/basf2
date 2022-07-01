@@ -44,4 +44,5 @@ print("Data in data/slim_dstar.h5 split into train/val/test files in directory: 
 
 # Now you can train weights using the pidTrainWeights script, e.g.
 # $ python3 path/to/pidTrainWeights.py ./data/slim_dstar ./models/net.pt -n 100
-subprocess.run("python3 ../../scripts/pidTrainWeights.py ./data/slim_dstar ./models/net.pt -n 100 --only 211 321", shell=True)
+script_path = b2.find_file('analysis/scripts/pidTrainWeights.py')
+subprocess.run(f"python3 {script_path} ./data/slim_dstar ./models/net.pt -n 100 --only 211 321", shell=True)

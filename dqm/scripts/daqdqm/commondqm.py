@@ -285,6 +285,9 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
             path.add_module('TRGCDCT3DDQM', T3DMOD=mod_t3d)
         # CDCTriggerNeuro
         import neurotrigger
+
+        neurotrigger.add_neurotrigger_hw(path)
+
         path.add_module('CDCTriggerRecoMatcher', TrgTrackCollectionName=neurotrigger.hwneurotracks,
                         hitCollectionName=neurotrigger.hwneuroinputsegmenthits, axialOnly=True)
         path.add_module('CDCTriggerRecoMatcher', TrgTrackCollectionName=neurotrigger.hwsimneurotracks,
@@ -292,7 +295,6 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         path.add_module('CDCTriggerRecoMatcher', TrgTrackCollectionName=neurotrigger.hwneuroinput2dfindertracks,
                         hitCollectionName=neurotrigger.hwneuroinputsegmenthits, axialOnly=True)
 
-        neurotrigger.add_neurotrigger_hw(path)
         path.add_module('CDCTriggerNeuroDQMOnline')
         path.add_module('CDCTriggerNeuroDQM')
     # TRG after skim

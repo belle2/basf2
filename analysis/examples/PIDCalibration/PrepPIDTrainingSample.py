@@ -19,6 +19,7 @@
 import basf2 as b2
 import uproot
 import pidDataUtils as pdu
+import subprocess
 from os import makedirs
 
 # Read data into DataFrame
@@ -42,4 +43,5 @@ pdu.split_h5('data/slim_dstar.h5', 'data/slim_dstar')
 print("Data in data/slim_dstar.h5 split into train/val/test files in directory: data/slim_dstar")
 
 # Now you can train weights using the pidTrainWeights script, e.g.
-# $ python3 path/to/pidTrainWeights.py ./data/slim_dstar ./models/net.pt -n 1000
+# $ python3 path/to/pidTrainWeights.py ./data/slim_dstar ./models/net.pt -n 100
+subprocess.run("python3 ../../scripts/pidTrainWeights.py ./data/slim_dstar ./models/net.pt -n 100 --only 211 321", shell=True)

@@ -567,6 +567,57 @@ def channel_mask_calibration(inputFiles, globalTags=None, localDBs=None, unpack=
     return cal
 
 
+def offset_calibration(inputFiles, globalTags=None, localDBs=None,
+                       new_cdst_format=True):
+    '''
+    Returns calibration object for common T0 calibration with method BF
+    :param inputFiles: A list of input files in cdst data format
+    :param globalTags: a list of global tags, highest priority first
+    :param localDBs: a list of local databases, highest priority first
+    :param new_cdst_format: True or False for new or old cdst format, respectively
+    '''
+
+    #   create path
+    main = basf2.create_path()
+
+    #   add basic modules
+    main.add_module('RootInput')
+    if new_cdst_format:
+        main.add_module('Gearbox')
+        main.add_module('Geometry')
+        main.add_module('Ext')
+        main.add_module('TOPUnpacker')
+        main.add_module('TOPRawDigitConverter')
+        main.add_module('TOPChannelMasker')
+        main.add_module('TOPBunchFinder', autoRange=True, useTimeSeed=False, useFillPattern=False, subtractRunningOffset=False)
+    else:
+        main.add_module('TOPGeometryParInitializer')
+        main.add_module('TOPTimeRecalibrator', subtractBunchTime=False)
+        main.add_module('TOPChannelMasker')
+        main.add_module('TOPBunchFinder', usePIDLikelihoods=True, autoRange=True, useTimeSeed=False, useFillPattern=False,
+                        subtractRunningOffset=False)
+
+    #   collector module
+    collector = basf2.register_module('TOPOffsetCollector')
+
+    #   algorithms
+    algorithms = [TOP.TOPEventT0OffsetAlgorithm(), TOP.TOPFillPatternOffsetAlgorithm()]
+
+    #   define calibration
+    cal = Calibration(name='TOP_offsetCalibration', collector=collector,
+                      algorithms=algorithms, input_files=inputFiles)
+    if globalTags:
+        for globalTag in reversed(globalTags):
+            cal.use_central_database(globalTag)
+    if localDBs:
+        for localDB in reversed(localDBs):
+            cal.use_local_database(localDB)
+    cal.pre_collector_path = main
+    cal.strategies = SequentialRunByRun
+
+    return cal
+
+
 def calibration_validation(inputFiles, sample='dimuon', globalTags=None, localDBs=None, new_cdst_format=True):
     '''
     Returns calibration object for final module T0 calibration with method LL

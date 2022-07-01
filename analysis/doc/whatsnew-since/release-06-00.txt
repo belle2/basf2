@@ -7,6 +7,15 @@ PID Calibration Weight Tools
  * Added the script ``scripts/pidTrainWeights.py`` to train a set of calibration weights on a dataset
  * Added an example for training a set of weights and using them in an analysis in ``examples/pid_calibration``
 
+Variables
++++++++++
+ * Added the variable `pionID_noARICHwoECL` which returns pionID without using ARICH likelihood for tracks without associated
+   ECL cluster. 
+ * Added the variable `kaonID_noARICHwoECL` which returns kaonID without using ARICH likelihood for tracks without associated
+   ECL cluster. 
+ * Added the metavariable `binaryPID_noARICHwoECL` which returns binary PID without using ARICH likelihood 
+   for tracks without associated ECL cluster. 
+
 Changes in the analysis package in light-2205-abys
 --------------------------------------------------
 

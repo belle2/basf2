@@ -11,8 +11,6 @@
 
 import basf2
 
-from ROOT import Belle2
-
 from geometry import check_components
 
 from svd import add_svd_reconstruction
@@ -78,7 +76,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                        trackFitHypotheses=None, addClusterExpertModules=True,
                        use_second_cdc_hits=False, add_muid_hits=False, reconstruct_cdst=None,
                        event_abort=default_event_abort, use_random_numbers_for_hlt_prescale=True,
-                       pxd_filtering_offline=False):
+                       pxd_filtering_offline=False, append_full_grid_cdc_eventt0=False):
     """
     This function adds the standard reconstruction modules to a path.
     Consists of clustering, tracking and the PID modules essentially in this structure:
@@ -117,7 +115,15 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
         generated numbers, otherwise are applied using an internal counter.
     :param pxd_filtering_offline: If True, PXD data reduction (ROI filtering) is applied during the track reconstruction.
         The reconstructed SVD/CDC tracks are used to define the ROIs and reject all PXD clusters outside of these.
+    :param append_full_grid_cdc_eventt0: If True, the module FullGridChi2TrackTimeExtractor is added to the path
+                                      and provides the CDC temporary EventT0.
+
     """
+
+    # By default, the FullGrid module is not used in the reconstruction chain.
+    # It is needed for detectors that perform post-tracking calibration with respect to CDC EventT0 using cDST
+    if reconstruct_cdst == 'rawFormat':
+        append_full_grid_cdc_eventt0 = True
 
     add_prefilter_reconstruction(path,
                                  components=components,
@@ -131,7 +137,8 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                                  pruneTracks=False,
                                  event_abort=event_abort,
                                  use_random_numbers_for_hlt_prescale=use_random_numbers_for_hlt_prescale,
-                                 pxd_filtering_offline=pxd_filtering_offline)
+                                 pxd_filtering_offline=pxd_filtering_offline,
+                                 append_full_grid_cdc_eventt0=append_full_grid_cdc_eventt0)
 
     # Add the modules calculating the software trigger cuts (but not performing them)
     if add_trigger_calculation and (not components or ("CDC" in components and "ECL" in components and "KLM" in components)):
@@ -147,11 +154,21 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
         add_skim_software_trigger(path)
 
 
-def add_prefilter_reconstruction(path, components=None, add_modules_for_trigger_calculation=True,
-                                 skipGeometryAdding=False, trackFitHypotheses=None, use_second_cdc_hits=False,
-                                 add_muid_hits=False, reconstruct_cdst=None, addClusterExpertModules=True,
-                                 pruneTracks=True, event_abort=default_event_abort,
-                                 use_random_numbers_for_hlt_prescale=True, pxd_filtering_offline=False):
+def add_prefilter_reconstruction(
+        path,
+        components=None,
+        add_modules_for_trigger_calculation=True,
+        skipGeometryAdding=False,
+        trackFitHypotheses=None,
+        use_second_cdc_hits=False,
+        add_muid_hits=False,
+        reconstruct_cdst=None,
+        addClusterExpertModules=True,
+        pruneTracks=True,
+        event_abort=default_event_abort,
+        use_random_numbers_for_hlt_prescale=True,
+        pxd_filtering_offline=False,
+        append_full_grid_cdc_eventt0=False):
     """
     This function adds only the reconstruction modules required to calculate HLT filter decision to a path.
     Consists of essential tracking and the functionality provided by :func:`add_prefilter_posttracking_reconstruction()`.
@@ -182,7 +199,12 @@ def add_prefilter_reconstruction(path, components=None, add_modules_for_trigger_
         post-filter reconstruction is also run).
     :param pxd_filtering_offline: If True, PXD data reduction (ROI filtering) is applied during the track reconstruction.
         The reconstructed SVD/CDC tracks are used to define the ROIs and reject all PXD clusters outside of these.
+    :param append_full_grid_cdc_eventt0: If True, the module FullGridChi2TrackTimeExtractor is added to the path
+                                      and provides the CDC temporary EventT0.
     """
+
+    # Always avoid the top-level 'import ROOT'.
+    from ROOT import Belle2  # noqa
 
     # Check components.
     check_components(components)
@@ -203,7 +225,8 @@ def add_prefilter_reconstruction(path, components=None, add_modules_for_trigger_
                                           skipGeometryAdding=skipGeometryAdding,
                                           trackFitHypotheses=trackFitHypotheses,
                                           use_second_cdc_hits=use_second_cdc_hits,
-                                          pxd_filtering_offline=pxd_filtering_offline)
+                                          pxd_filtering_offline=pxd_filtering_offline,
+                                          append_full_grid_cdc_eventt0=append_full_grid_cdc_eventt0)
 
     # Statistics summary
     path.add_module('StatisticsSummary').set_name('Sum_Prefilter_Tracking')
@@ -291,7 +314,9 @@ def add_cosmics_reconstruction(
         use_second_cdc_hits=False,
         add_muid_hits=False,
         reconstruct_cdst=False,
-        posttracking=True):
+        posttracking=True,
+        eventt0_combiner_mode="prefer_cdc"
+        ):
     """
     This function adds the standard reconstruction modules for cosmic data to a path.
     Consists of tracking and the functionality provided by :func:`add_prefilter_posttracking_reconstruction()`,
@@ -316,6 +341,7 @@ def add_cosmics_reconstruction(
 
     :param reconstruct_cdst: run only the minimal reconstruction needed to produce the cdsts (raw+tracking+dE/dx)
     :param posttracking: run reconstruction for outer detectors.
+    :param eventt0_combiner_mode: Mode to combine the t0 values of the sub-detectors
     """
 
     # Check components.
@@ -354,7 +380,8 @@ def add_cosmics_reconstruction(
                                                       pruneTracks=pruneTracks,
                                                       addClusterExpertModules=addClusterExpertModules,
                                                       add_muid_hits=add_muid_hits,
-                                                      cosmics=True)
+                                                      cosmics=True,
+                                                      eventt0_combiner_mode=eventt0_combiner_mode)
 
 
 def add_mc_reconstruction(path, components=None, pruneTracks=True, addClusterExpertModules=True,
@@ -406,7 +433,7 @@ def add_prefilter_pretracking_reconstruction(path, components=None):
 
 def add_prefilter_posttracking_reconstruction(path, components=None, pruneTracks=True, addClusterExpertModules=True,
                                               add_muid_hits=False, cosmics=False, for_cdst_analysis=False,
-                                              add_eventt0_combiner_for_cdst=False):
+                                              add_eventt0_combiner_for_cdst=False, eventt0_combiner_mode="prefer_svd"):
     """
     This function adds the standard reconstruction modules after tracking
     to a path.
@@ -424,6 +451,7 @@ def add_prefilter_posttracking_reconstruction(path, components=None, pruneTracks
            for_cdst_analysis is False. This is useful for validation purposes for avoiding to run the full
            add_reconstruction(). Note that, with the default settings (for_cdst_analysis=False and
            add_eventt0_combiner_for_cdst=False), the EventT0Combiner module is added to the path.
+    :param eventt0_combiner_mode: Mode to combine the t0 values of the sub-detectors
     """
 
     # Not add dEdx modules in prepare_cdst_analysis()
@@ -440,7 +468,7 @@ def add_prefilter_posttracking_reconstruction(path, components=None, pruneTracks
     # but be lenient and add it if requested.
     # By default, since for_cdst_analysis is False, the module is added by this function.
     if not for_cdst_analysis or add_eventt0_combiner_for_cdst:
-        path.add_module("EventT0Combiner")
+        path.add_module("EventT0Combiner", combinationLogic=eventt0_combiner_mode)
 
     # only add the OnlineEventT0Creator if not preparing cDST
     if not for_cdst_analysis:

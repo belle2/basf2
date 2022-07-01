@@ -5,10 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
+#include <svd/calibration/SVDMCClusterTimeFudgeFactor.h>
 
-#include <tracking/modules/VXDHoughTracking/VXDHoughTrackingModule.h>
-
-using namespace Belle2;
-// using namespace vxdHoughTracking;
-
-REG_MODULE(VXDHoughTracking)
+std::string Belle2::SVDMCClusterTimeFudgeFactor::name = std::string("SVDMCClusterTimeFudgeFactor");

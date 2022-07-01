@@ -61,21 +61,21 @@ def apply(state, X):
     return np.require(p, dtype=np.float32, requirements=['A', 'W', 'C', 'O'])
 
 
-def begin_fit(state, Xtest, Stest, ytest, wtest):
+def begin_fit(state, Xtest, Stest, ytest, wtest, nBatches):
     """
     Test begin_fit function
     """
     print("Called begin_fit")
-    print(state, Xtest.shape, Stest.shape, ytest.shape, wtest.shape)
+    print(state, Xtest.shape, Stest.shape, ytest.shape, wtest.shape, nBatches)
     return state
 
 
-def partial_fit(state, X, S, y, w, epoch):
+def partial_fit(state, X, S, y, w, epoch, batch):
     """
     Test partial_fit function
     """
     print("Called partial_fit")
-    print(state, X.shape, S.shape, y.shape, w.shape, epoch)
+    print(state, X.shape, S.shape, y.shape, w.shape, epoch, batch)
     return True
 
 

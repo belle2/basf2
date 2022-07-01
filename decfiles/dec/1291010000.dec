@@ -1,4 +1,4 @@
-# EventType: 129201000 
+# EventType: 1291010000
 # Descriptor: peaking background in [B+ -> X(3872) K+ ]cc
 # NickName: Bu_K+non_X3872
 # Documentation: for the branching fraction measurement of B+ -> X(3872) K+
@@ -11,8 +11,8 @@
 
 
 Decay Upsilon(4S)
-0.5 B+sig   B-                   VSS;
-0.5 B+      B-sig                VSS;
+0.5 B+sig   B-                VSS;
+0.5 B-sig   B+                VSS;
 Enddecay
 
 Decay B+sig

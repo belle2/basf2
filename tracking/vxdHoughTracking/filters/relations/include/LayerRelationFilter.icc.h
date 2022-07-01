@@ -26,8 +26,8 @@ namespace Belle2 {
     template <class AFilter>
     void LayerRelationFilter<AFilter>::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
     {
-      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "hitJumping"), m_param_hitJumping,
-                                    "Make it possible to jump over N layers.", m_param_hitJumping);
+      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "hitJumping"), m_hitJumping,
+                                    "Make it possible to jump over N layers.", m_hitJumping);
 
       m_filter.exposeParameters(moduleParamList, prefix);
     }
@@ -57,7 +57,7 @@ namespace Belle2 {
 
       const VXDHoughState::DataCache& currentVXDHoughState = currentHit->getDataCache();
       const unsigned int currentLayer = currentVXDHoughState.layer;
-      const unsigned int nextPossibleLayer = std::max(static_cast<int>(currentLayer) - 1 - m_param_hitJumping, 0);
+      const unsigned int nextPossibleLayer = std::max(static_cast<int>(currentLayer) - 1 - m_hitJumping, 0);
 
       for (VXDHoughState* nextHit : hits) {
         if (currentHit == nextHit) {

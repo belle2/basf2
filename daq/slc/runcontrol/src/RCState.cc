@@ -24,6 +24,12 @@ const RCState RCState::BOOTING_RS(12, "BOOTING");
 const RCState RCState::RECOVERING_RS(13, "RECOVERING");
 const RCState RCState::ABORTING_RS(14, "ABORTING");
 
+const RCState& RCState::operator=(const RCState& state)
+{
+  NSMState::operator=(state);
+  return *this;
+}
+
 const RCState& RCState::operator=(const std::string& label)
 {
   if (label == NOTREADY_S.getLabel()) *this = NOTREADY_S;

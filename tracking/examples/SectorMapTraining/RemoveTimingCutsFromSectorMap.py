@@ -33,7 +33,7 @@ setupToRead = "SVDOnlyDefault"
 if(len(sys.argv) > 2):
     setupToRead = sys.argv[2]
 
-# read the sectormap from file
+# Using the SectorMapBootstrap module to read the sectormap from file
 SMBSM1 = b2.register_module("SectorMapBootstrap")
 SMBSM1.param("ReadSecMapFromDB", False)
 SMBSM1.param("ReadSectorMap", True)

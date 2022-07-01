@@ -86,6 +86,9 @@ namespace Belle2 {
     TH1F* TOPFillPatternOffsetAlgorithm::getChi2Histogram(TH1F* recBuckets, TH1F* fillPattern)
     {
       int RFBuckets = fillPattern->GetNbinsX();
+      for (int i = 0; i < RFBuckets; i++) {
+        if (fillPattern->GetBinContent(i + 1) > 0) fillPattern->SetBinContent(i + 1, 1);
+      }
       auto* h_chi2 = new TH1F("chi2", "#chi^{2} vs. circular shift; circular shift; #chi^{2}", RFBuckets, 0, RFBuckets);
       for (int i = 0; i < RFBuckets; i++) {
         h_chi2->SetBinContent(i + 1, Chi2(recBuckets, fillPattern, i));

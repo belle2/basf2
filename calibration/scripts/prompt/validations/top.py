@@ -402,6 +402,9 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
     for i, h in enumerate(fillPatt):
         canvas.cd(3 + i)
         if h:
+            if i == 1:
+                for k in range(h.GetNbinsX()):
+                    h.SetBinError(k + 1, h.GetBinContent(k + 1) / 1000)
             h.Draw()
 
     canvas.Print(outputFileName)

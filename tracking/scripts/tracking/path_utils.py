@@ -541,7 +541,10 @@ def add_svd_standalone_tracking(path,
                                      add_mva_quality_indicator=add_mva_quality_indicator, suffix=suffix)
         add_svd_hough_tracking(path, reco_tracks=reco_tracks+"Hough", suffix=suffix)
 
-        # TODO: seeking for the correct module to merge the two StoreArrays. Any ideas?
+        path.add_module('RecoTrackStoreArrayCombiner',
+                        Temp1RecoTracksStoreArrayName=reco_tracks+"VXDTF2",
+                        Temp2RecoTracksStoreArrayName=reco_tracks+"Hough",
+                        recoTracksStoreArrayName=reco_tracks)
 
     else:
         raise ValueError(f"Do not understand the svd_standalone_mode {svd_standalone_mode}")

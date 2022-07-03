@@ -378,7 +378,8 @@ def add_svd_track_finding(
            property for tracks from VXDTF2 standalone tracking
            (ATTENTION: Standard triplet QI of VXDTF2 is replaced in this case
            -> setting this option to 'True' will have some influence on the final track collection)
-    :param svd_standalone_mode: which SVD standalone tracking is used. Options are "VXDTF2" and "SVDHough", defaults to "VXDTF2"
+    :param svd_standalone_mode: Which SVD standalone tracking is used. Options are "VXDTF2", "SVDHough", and "both".
+           Defaults to "VXDTF2"
     """
 
     if not is_svd_used(components):
@@ -474,7 +475,7 @@ def add_svd_track_finding(
     else:
         combined_svd_cdc_standalone_tracks = output_reco_tracks
 
-        # Write out the combinations of tracks
+    # Write out the combinations of tracks
     path.add_module("RelatedTracksCombiner", VXDRecoTracksStoreArrayName=temporary_reco_tracks,
                     CDCRecoTracksStoreArrayName=input_reco_tracks,
                     recoTracksStoreArrayName=combined_svd_cdc_standalone_tracks)
@@ -516,7 +517,8 @@ def add_svd_standalone_tracking(path,
     :param path: basf2 path
     :param components: components to use, defaults to SVD
     :param svd_clusters: Name of the SVDClusters StoreArray used for tracking
-    :param svd_standalone_mode: Mode for SVD standalone track finding. Options are "VXDTF2" and "SVDHough", defaults to "VXDTF2"
+    :param svd_standalone_mode: Which SVD standalone tracking is used. Options are "VXDTF2", "SVDHough", and "both".
+           Defaults to "VXDTF2"
     :param reco_tracks: In case the only SVD standalone tracking is performed, these are the final RecoTracks,
            otherwise it's an intermediate StoreaArray where the SVD tracks from the SVD standalone track finding
            are stored, before they are merged with CDC tracks and extended via the CKF tracking.
@@ -533,6 +535,13 @@ def add_svd_standalone_tracking(path,
 
     elif svd_standalone_mode == "SVDHough":
         add_svd_hough_tracking(path, reco_tracks=reco_tracks, suffix=suffix)
+
+    elif svd_standalone_mode == "both":
+        add_vxd_track_finding_vxdtf2(path, components=components, svd_clusters=svd_clusters, reco_tracks=reco_tracks+"VXDTF2",
+                                     add_mva_quality_indicator=add_mva_quality_indicator, suffix=suffix)
+        add_svd_hough_tracking(path, reco_tracks=reco_tracks+"Hough", suffix=suffix)
+
+        # TODO: seeking for the correct module to merge the two StoreArrays. Any ideas?
 
     else:
         raise ValueError(f"Do not understand the svd_standalone_mode {svd_standalone_mode}")

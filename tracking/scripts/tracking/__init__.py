@@ -352,7 +352,8 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
     :param svd_ckf_mode: how to apply the CKF (with or without SVD standalone tracking). Defaults to "SVD_after".
     :param add_both_directions: Curlers may be found in the wrong orientation by the CDC track finder, so try to
            extrapolate also in the other direction.
-    :param svd_standalone_mode: which SVD standalone tracking is used. Options are "VXDTF2" and "SVDHough", defaults to "VXDTF2"
+    :param svd_standalone_mode: Which SVD standalone tracking is used. Options are "VXDTF2", "SVDHough", and "both".
+           Defaults to "VXDTF2"
     :param use_second_cdc_hits: whether to use the secondary CDC hit during CDC track finding or not
     :param components: the list of geometry components in use or None for all components.
     :param prune_temporary_tracks: If false, store all information of the single CDC and VXD tracks before merging.

@@ -77,7 +77,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                        trackFitHypotheses=None, addClusterExpertModules=True,
                        use_second_cdc_hits=False, add_muid_hits=False, reconstruct_cdst=None,
                        event_abort=default_event_abort, use_random_numbers_for_hlt_prescale=True,
-                       pxd_filtering_offline=False, use_cdc_full_grid_eventt0=False,
+                       pxd_filtering_offline=False, append_full_grid_cdc_eventt0=False,
                        useVTX=False, useVTXClusterShapes=True):
     """
     This function adds the standard reconstruction modules to a path.
@@ -117,8 +117,8 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
         generated numbers, otherwise are applied using an internal counter.
     :param pxd_filtering_offline: If True, PXD data reduction (ROI filtering) is applied during the track reconstruction.
         The reconstructed SVD/CDC tracks are used to define the ROIs and reject all PXD clusters outside of these.
-    :param use_cdc_full_grid_eventt0: If True, the module FullGridChi2TrackTimeExtractor is added to the path
-                                      for computing the EventT0.
+    :param append_full_grid_cdc_eventt0: If True, the module FullGridChi2TrackTimeExtractor is added to the path
+                                      and provides the CDC temporary EventT0.
     :param useVTX: If true, the VTX reconstruction is performed.
     :param useVTXClusterShapes: If true, use cluster shape corrections for hit position finding.
     """
@@ -126,7 +126,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
     # By default, the FullGrid module is not used in the reconstruction chain.
     # It is needed for detectors that perform post-tracking calibration with respect to CDC EventT0 using cDST
     if reconstruct_cdst == 'rawFormat':
-        use_cdc_full_grid_eventt0 = True
+        append_full_grid_cdc_eventt0 = True
 
     add_prefilter_reconstruction(path,
                                  components=components,
@@ -141,7 +141,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                                  event_abort=event_abort,
                                  use_random_numbers_for_hlt_prescale=use_random_numbers_for_hlt_prescale,
                                  pxd_filtering_offline=pxd_filtering_offline,
-                                 use_cdc_full_grid_eventt0=use_cdc_full_grid_eventt0,
+                                 append_full_grid_cdc_eventt0=append_full_grid_cdc_eventt0,
                                  useVTX=useVTX, useVTXClusterShapes=useVTXClusterShapes)
 
     # Add the modules calculating the software trigger cuts (but not performing them)
@@ -172,7 +172,7 @@ def add_prefilter_reconstruction(
         event_abort=default_event_abort,
         use_random_numbers_for_hlt_prescale=True,
         pxd_filtering_offline=False,
-        use_cdc_full_grid_eventt0=False,
+        append_full_grid_cdc_eventt0=False,
         useVTX=False,
         useVTXClusterShapes=True):
     """
@@ -205,8 +205,8 @@ def add_prefilter_reconstruction(
         post-filter reconstruction is also run).
     :param pxd_filtering_offline: If True, PXD data reduction (ROI filtering) is applied during the track reconstruction.
         The reconstructed SVD/CDC tracks are used to define the ROIs and reject all PXD clusters outside of these.
-    :param use_cdc_full_grid_eventt0: If True, the module FullGridChi2TrackTimeExtractor is added to the path
-                                      for computing the EventT0.
+    :param append_full_grid_cdc_eventt0: If True, the module FullGridChi2TrackTimeExtractor is added to the path
+                                      and provides the CDC temporary EventT0.
     :param useVTX: If true, the VTX reconstruction is performed.
     :param useVTXClusterShapes: If true, use cluster shape corrections for hit position finding.
     """
@@ -234,7 +234,7 @@ def add_prefilter_reconstruction(
                                           trackFitHypotheses=trackFitHypotheses,
                                           use_second_cdc_hits=use_second_cdc_hits,
                                           pxd_filtering_offline=pxd_filtering_offline,
-                                          use_cdc_full_grid_eventt0=use_cdc_full_grid_eventt0,
+                                          append_full_grid_cdc_eventt0=append_full_grid_cdc_eventt0,
                                           useVTX=useVTX)
 
     # Statistics summary

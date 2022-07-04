@@ -10,6 +10,7 @@
 ##########################################################################
 
 import numpy as np
+from basf2 import B2WARNING
 
 try:
     import sklearn  # noqa
@@ -77,7 +78,7 @@ def apply(state, X):
     return np.require(x, dtype=np.float32, requirements=['A', 'W', 'C', 'O'])
 
 
-def begin_fit(state, X, S, y, w):
+def begin_fit(state, Xtest, Stest, ytest, wtest, nBatches):
     """
     Initialize lists which will store the received data
     """
@@ -87,11 +88,15 @@ def begin_fit(state, X, S, y, w):
     return state
 
 
-def partial_fit(state, X, S, y, w, epoch):
+def partial_fit(state, X, S, y, w, epoch, batch):
     """
     Stores received training data.
     SKLearn is usually not able to perform a partial fit.
     """
+    if epoch > 0:
+        B2WARNING("The sklearn training interface has been called with specific_options.m_nIterations > 1."
+                  " This means duplicates of the training sample will be used during training.")
+
     state.X.append(X)
     state.y.append(y.flatten())
     state.w.append(w.flatten())

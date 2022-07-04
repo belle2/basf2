@@ -378,7 +378,7 @@ def add_svd_track_finding(
            property for tracks from VXDTF2 standalone tracking
            (ATTENTION: Standard triplet QI of VXDTF2 is replaced in this case
            -> setting this option to 'True' will have some influence on the final track collection)
-    :param svd_standalone_mode: Which SVD standalone tracking is used. Options are "VXDTF2", "SVDHough", and "both".
+    #:param svd_standalone_mode: Which SVD standalone tracking is used. Options are "VXDTF2", "SVDHough", and "VXDTF2_and_SVDHough".
            Defaults to "VXDTF2"
     """
 
@@ -517,7 +517,7 @@ def add_svd_standalone_tracking(path,
     :param path: basf2 path
     :param components: components to use, defaults to SVD
     :param svd_clusters: Name of the SVDClusters StoreArray used for tracking
-    :param svd_standalone_mode: Which SVD standalone tracking is used. Options are "VXDTF2", "SVDHough", and "both".
+    :param svd_standalone_mode: Which SVD standalone tracking is used. Options are "VXDTF2", "SVDHough", and "VXDTF2_and_SVDHough".
            Defaults to "VXDTF2"
     :param reco_tracks: In case the only SVD standalone tracking is performed, these are the final RecoTracks,
            otherwise it's an intermediate StoreaArray where the SVD tracks from the SVD standalone track finding
@@ -536,7 +536,7 @@ def add_svd_standalone_tracking(path,
     elif svd_standalone_mode == "SVDHough":
         add_svd_hough_tracking(path, reco_tracks=reco_tracks, suffix=suffix)
 
-    elif svd_standalone_mode == "both":
+    elif svd_standalone_mode == "VXDTF2_and_SVDHough":
         add_vxd_track_finding_vxdtf2(path, components=components, svd_clusters=svd_clusters, reco_tracks=reco_tracks+"VXDTF2",
                                      add_mva_quality_indicator=add_mva_quality_indicator, suffix=suffix)
         add_svd_hough_tracking(path, reco_tracks=reco_tracks+"Hough", suffix=suffix)

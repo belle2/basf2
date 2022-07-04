@@ -38,10 +38,14 @@ namespace Belle2 {
   private:
     /// Name of the input StoreArray
     std::string m_inputStoreArrayName;
+    /// store array for the input RecoTracks
+    StoreArray<RecoTrack> m_inputRecoTracks;
     /// Name of the input StoreArray for flipped tracks
     std::string m_inputStoreArrayNameFlipped;
+    /// store array for the input flipped RecoTracks
+    StoreArray<RecoTrack> m_inputRecoTracksFlipped;
     /// Parameter: the 2nd mva cut
-    float m_2nd_mva_cut = -1.0;
+    float m_2ndMVACut = -1.0;
     /// flipping cuts could be read from the DB
     OptionalDBObjPtr<TrackFlippingCuts> m_flipCutsFromDB{"TRKTrackFlipAndRefit_MVA_cuts"};
   };

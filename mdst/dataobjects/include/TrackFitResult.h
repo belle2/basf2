@@ -299,7 +299,7 @@ namespace Belle2 {
 
     ClassDefOverride(TrackFitResult, 9); /**< Values of the result of a track fit with a given particle hypothesis. */
     /* Version history:
-       ver 9: add updateTrackFitResult() and change m_pValue, m_pdg, m_hitPatternVXDInitializer to a non-const value
+       ver 9: change m_pValue, m_pdg, m_hitPatternVXDInitializer to a non-const value
        ver 8: add NDF
        ver 7: fixed sign errors in the translation of position and momentum covariances.
        ver 6: use fixed size arrays instead of vectors (add schema evolution rule), use Double32_t.

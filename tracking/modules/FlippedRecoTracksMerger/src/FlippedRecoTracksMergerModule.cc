@@ -15,7 +15,7 @@ REG_MODULE(FlippedRecoTracksMerger);
 FlippedRecoTracksMergerModule::FlippedRecoTracksMergerModule() :
   Module()
 {
-  setDescription("Copies RecoTracks without their fit information.");
+  setDescription("This module will check the 2 flipping QIs of one RecoTrack and update the original RecoTrack, Track and TrackFitResults if the flipped one should be taken (according to the 2 flipping QIs)");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("inputStoreArrayName", m_inputStoreArrayName,
@@ -26,15 +26,12 @@ FlippedRecoTracksMergerModule::FlippedRecoTracksMergerModule() :
 
 void FlippedRecoTracksMergerModule::initialize()
 {
-  //m_inputRecoTracks.isRequired(m_inputStoreArrayName);
+  m_inputRecoTracks.isRequired(m_inputStoreArrayName);
+  m_inputRecoTracksFlipped.isRequired(m_inputStoreArrayNameFlipped);
 }
 
 void FlippedRecoTracksMergerModule::event()
 {
-
-  Belle2::StoreArray<RecoTrack> m_inputRecoTracks(m_inputStoreArrayName);
-  Belle2::StoreArray<RecoTrack> m_inputRecoTracksFlipped(m_inputStoreArrayNameFlipped);
-  Belle2::StoreArray<TrackFitResult> TrackFitResultsArray("TrackFitResults");
 
   // loop all the recoTracks
   for (RecoTrack& recoTrack : m_inputRecoTracks) {
@@ -44,30 +41,30 @@ void FlippedRecoTracksMergerModule::event()
       continue;
     }
     // get the related Belle2::Tracks
-    Track* b2track = recoTrack.getRelatedFrom<Belle2::Track>();
+    Track* track = recoTrack.getRelatedFrom<Belle2::Track>();
 
-    if (b2track) {
+    if (track) {
 
       // get the cut from DB
       if (m_flipCutsFromDB.isValid()) {
-        m_2nd_mva_cut = (*m_flipCutsFromDB).getSecondCut();
+        m_2ndMVACut = (*m_flipCutsFromDB).getSecondCut();
 
         // if both the 1st MVA and 2nd MVA were passed.
-        if (!isnan(recoTrack.get2ndFlipQualityIndicator()) and (recoTrack.get2ndFlipQualityIndicator() > m_2nd_mva_cut)) {
+        if (!isnan(recoTrack.get2ndFlipQualityIndicator()) and (recoTrack.get2ndFlipQualityIndicator() > m_2ndMVACut)) {
 
-          // get the related RecoTrack_flipped
-          RecoTrack* RecoTrack_flipped =  recoTrack.getRelatedFrom<Belle2::RecoTrack>("RecoTracks_flipped");
+          // get the related RecoTrackflipped
+          RecoTrack* RecoTrackflipped =  recoTrack.getRelatedFrom<Belle2::RecoTrack>("RecoTracks_flipped");
 
-          if (RecoTrack_flipped) {
+          if (RecoTrackflipped) {
 
-            // get the Tracks_flipped
-            Track* b2trackFlipped = RecoTrack_flipped->getRelatedFrom<Belle2::Track>("Tracks_flipped");
-            if (b2trackFlipped) {
-              std::vector<Track::ChargedStableTrackFitResultPair> fitResultsAfter = b2trackFlipped->getTrackFitResults("TrackFitResults_flipped");
-              std::vector<Track::ChargedStableTrackFitResultPair> fitResultsBefore = b2track->getTrackFitResults();
+            // get the tracksflipped
+            Track* trackFlipped = RecoTrackflipped->getRelatedFrom<Belle2::Track>("Tracks_flipped");
+            if (trackFlipped) {
+              std::vector<Track::ChargedStableTrackFitResultPair> fitResultsAfter = trackFlipped->getTrackFitResults("TrackFitResults_flipped");
+              std::vector<Track::ChargedStableTrackFitResultPair> fitResultsBefore = track->getTrackFitResults();
 
               //set the c_isFlippedAndRefitted bit
-              b2track->setFlippedAndRefitted();
+              track->setFlippedAndRefitted();
 
               // loop over the original fitResults
               for (long unsigned int index = 0; index < fitResultsBefore.size() ; index++) {
@@ -83,16 +80,16 @@ void FlippedRecoTracksMergerModule::event()
                 }
                 if (not updatedFitResult) {
                   fitResultsBefore[index].second->maskThisFitResult();
-                  b2track->setTrackFitResultIndex(fitResultsBefore[index].first, -1);
+                  track->setTrackFitResultIndex(fitResultsBefore[index].first, -1);
                 }
               }
 
 
               const auto& measuredStateOnPlane = recoTrack.getMeasuredStateOnPlaneFromLastHit();
 
-              TVector3 currentPosition = measuredStateOnPlane.getPos();
-              TVector3 currentMomentum = measuredStateOnPlane.getMom();
-              double currentCharge = measuredStateOnPlane.getCharge();
+              const TVector3& currentPosition = measuredStateOnPlane.getPos();
+              const TVector3& currentMomentum = measuredStateOnPlane.getMom();
+              const double& currentCharge = measuredStateOnPlane.getCharge();
 
               // revert the charge and momentum
               recoTrack.setChargeSeed(-currentCharge);

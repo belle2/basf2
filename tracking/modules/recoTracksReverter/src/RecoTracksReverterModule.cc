@@ -15,7 +15,7 @@ REG_MODULE(RecoTracksReverter);
 RecoTracksReverterModule::RecoTracksReverterModule() :
   Module()
 {
-  setDescription("Revert the RecoTracks (without their fit information)");
+  setDescription("Revert the RecoTracks, including changing of the seed position, reverting the momentum and revising the hits Order");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("inputStoreArrayName", m_inputStoreArrayName,
@@ -48,13 +48,13 @@ void RecoTracksReverterModule::event()
       m_mvaFlipCut = (*m_flipCutsFromDB).getFirstCut();
 
       if (recoTrack.getFlipQualityIndicator() > m_mvaFlipCut) {
-        Track* b2track = recoTrack.getRelatedFrom<Belle2::Track>();
-        if (b2track) {
+        Track* track = recoTrack.getRelatedFrom<Belle2::Track>();
+        if (track) {
 
           const auto& measuredStateOnPlane = recoTrack.getMeasuredStateOnPlaneFromLastHit();
-          TVector3 currentPosition = measuredStateOnPlane.getPos();
-          TVector3 currentMomentum = measuredStateOnPlane.getMom();
-          double currentCharge = measuredStateOnPlane.getCharge();
+          const TVector3& currentPosition = measuredStateOnPlane.getPos();
+          const TVector3& currentMomentum = measuredStateOnPlane.getMom();
+          const double& currentCharge = measuredStateOnPlane.getCharge();
 
           RecoTrack* newRecoTrack = m_outputRecoTracks.appendNew(currentPosition, -currentMomentum, -currentCharge,
                                                                  recoTrack.getStoreArrayNameOfCDCHits(), recoTrack.getStoreArrayNameOfSVDHits(), recoTrack.getStoreArrayNameOfPXDHits(),

@@ -97,14 +97,13 @@ namespace Belle2 {
      */
     void addStatusBit(unsigned short int bitmask) { m_statusBitmap |= bitmask; }
 
-    /**Check the Track status after the Refining step
-     * @return 1 if the track was flipped and refitted in the refining step
+    /**Set the Track status after the Refining step
+     * based on the 2 flipping QIs
      */
     void setFlippedAndRefitted() { addStatusBit(c_isFlippedAndRefitted); }
 
     /** Get Track Status after Refining
      * @param bitmask
-     *
      * @return status (1 or 0) corresponding to the bitmask
      */
     bool getStatusBit(unsigned short int bitmask) const { return (m_statusBitmap & bitmask) == bitmask; }

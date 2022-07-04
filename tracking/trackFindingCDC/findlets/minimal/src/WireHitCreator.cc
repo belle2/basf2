@@ -230,6 +230,12 @@ void WireHitCreator::apply(std::vector<CDCWireHit>& outputWireHits)
   std::map<int, size_t> nHitsByMCParticleId;
 
   outputWireHits.reserve(nHits);
+
+  // make sure that DB object for time cut is valid:
+  if (not m_DBCDClayerTimeCut.isValid()) {
+    B2FATAL("CDClayerTimeCut DB object is invalid");
+  }
+
   for (const CDCHit& hit : hits) {
 
     if (hit.getICLayer() < geometryPar.getOffsetOfFirstLayer() or

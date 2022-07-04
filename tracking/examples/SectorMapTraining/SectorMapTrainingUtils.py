@@ -57,7 +57,7 @@ def add_event_generation(path, randomSeed, eventType, expNumber):
     vertex_y = random.uniform(vertex_y_min, vertex_y_max)
     vertex_z = random.uniform(vertex_z_min, vertex_z_max)
 
-    print("WARNING: setting non-default beam vertex at x= " + str(vertex_x) + " y= " + str(vertex_y) + " z= " + str(vertex_z))
+    b2.B2WARNING("Setting non-default beam vertex at x= " + str(vertex_x) + " y= " + str(vertex_y) + " z= " + str(vertex_z))
 
     # Beam parameters
     beamparameters = add_beamparameters(path, "Y4S")
@@ -105,6 +105,7 @@ def add_simulation_and_reconstruction_modules(path, usePXD=False):
     '''
     # Detector Simulation:
     add_simulation(path=path,
+                   forceSetPXDDataReduction=True,  # needs to be true to override the DB settings
                    usePXDDataReduction=False,  # for training one does not want the data reduction
                    components=None)  # dont specify components because else not the whole geometry will be loaded!
 
@@ -292,8 +293,15 @@ def setup_RTCtoSPTCConverters(
         return None
 
 
-def add_training_data_collector(path):
-    ''' Adds the modules which extract and collect the actual training data from simulated events '''
+def add_training_data_collector(path, usePXD=False, nameTag='', outputDir='./', use_noKick=False):
+    ''' Adds the modules which extract and collect the actual training data from simulated events.
+        @param path: The basf2 path to add the modules
+        @param usePXD: If False PXD hits will be ignored
+        @param nameTag: Output file names are generated automatically. With this name tag can be set to have a unique
+          output file name. It will be added at the end of output file name.
+        @param outputDir: The output file will be written to that directory.
+        @param use_noKick: Activates alternative trainings method. Note: This trainings method is experimental and not maintained
+          anymore. So if you dont know what you do, keep it set to False!'''
 
     # puts the geometry and gearbox in the path
     if 'Gearbox' not in path:
@@ -304,3 +312,37 @@ def add_training_data_collector(path):
     if 'Geometry' not in path:
         geometry = b2.register_module('Geometry')
         path.add_module(geometry)
+
+    # Converts GenFit track candidates and checks them, with respect to the SecMap settings
+    # Produces SpacePoint TrackCand which is used in VXDTFTrainingDataCollector.
+    setup_RTCtoSPTCConverters(path=path,
+                              SVDSPscollection='SVDSpacePoints',
+                              PXDSPscollection='PXDSpacePoints',
+                              RTCinput='MCRecoTracks',
+                              sptcOutput='checkedSPTCs',
+                              usePXD=usePXD,
+                              logLevel=b2.LogLevel.ERROR,
+                              useNoKick=use_noKick,
+                              useOnlyFittedTracks=True)  # train on fitted tracks only
+
+    # SecMap BootStrap
+    # Module to fetch SecMap Config and store or load SecMap Training.
+    # Config is defined in /tracking/modules/vxdtfRedesing/src/SectorMapBootstrapModule.cc
+    # and must be available for the training of the SecMap
+    # Double False for "ReadSectorMap" and "WriteSectorMap" only fetches config.
+    secMapBootStrap = b2.register_module('SectorMapBootstrap')
+    secMapBootStrap.param('ReadSectorMap', False)
+    secMapBootStrap.param('WriteSectorMap', False)
+    path.add_module(secMapBootStrap)
+
+    # Module for generation of train sample for SecMap Training
+    if usePXD:
+        nameTag += 'VXD'
+    else:
+        nameTag += 'SVDOnly'
+
+    SecMapTrainerBase = b2.register_module('VXDTFTrainingDataCollector')
+    SecMapTrainerBase.param('outputDir', outputDir)
+    SecMapTrainerBase.param('NameTag', nameTag)
+    SecMapTrainerBase.param('SpacePointTrackCandsName', 'checkedSPTCs')
+    path.add_module(SecMapTrainerBase)

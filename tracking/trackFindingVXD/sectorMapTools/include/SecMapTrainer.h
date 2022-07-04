@@ -90,7 +90,7 @@ namespace Belle2 {
         ids += std::to_string(allowedLayer) + " ";
         if (allowedLayer == layerID) found = true;
       }
-      B2DEBUG(10, "SecMapTrainer::acceptHit: the TC has layerID: " << layerID << " and allowd layers: " << ids << " and was " <<
+      B2DEBUG(20, "SecMapTrainer::acceptHit: the TC has layerID: " << layerID << " and allowd layers: " << ids << " and was " <<
               (found ? "accepted" : "rejected"));
 
       return found;
@@ -102,7 +102,7 @@ namespace Belle2 {
     unsigned process2HitCombinations(const SecMapTrainerTC& aTC)
     {
       unsigned nValues = 0;
-      B2DEBUG(10, "SecMapTrainer::process2HitCombinations: nHits/trackID/pdg: " << aTC.size() << "/" << aTC.getTrackID() << "/" <<
+      B2DEBUG(20, "SecMapTrainer::process2HitCombinations: nHits/trackID/pdg: " << aTC.size() << "/" << aTC.getTrackID() << "/" <<
               aTC.getPDG());
       if (aTC.size() < 2) { return nValues; }
 
@@ -113,7 +113,7 @@ namespace Belle2 {
       // loop over all 2-hit-combis, collect data for each filterType and store it in root-tree:
       std::vector<std::pair<std::string, double> > collectedResults;
       for (; innerIt != aTC.innerEnd();) {
-        B2DEBUG(10, "SecMapTrainer::process2HitCombinations: outerHit-/innerHitSecID: " << outerIt->getSectorIDString() <<
+        B2DEBUG(20, "SecMapTrainer::process2HitCombinations: outerHit-/innerHitSecID: " << outerIt->getSectorIDString() <<
                 "/" << innerIt->getSectorIDString());
 
         auto& dataSet = m_rootInterface.get2HitDataSet();
@@ -133,7 +133,7 @@ namespace Belle2 {
 
         // fill data for each filter type:
         for (const auto& entry : collectedResults) {
-          B2DEBUG(50, "SecMapTrainer::process2HitCombinations: filter/value: " << entry.first << "/" << entry.second);
+          B2DEBUG(20, "SecMapTrainer::process2HitCombinations: filter/value: " << entry.first << "/" << entry.second);
           dataSet.setValueOfFilter(entry.first, entry.second);
           ++nValues;
         }
@@ -151,7 +151,7 @@ namespace Belle2 {
     unsigned process3HitCombinations(const SecMapTrainerTC& aTC)
     {
       unsigned nValues = 0;
-      B2DEBUG(10, "SecMapTrainer::process3HitCombinations: nHits/trackID/pdg: " << aTC.size() << "/" << aTC.getTrackID() << "/" <<
+      B2DEBUG(20, "SecMapTrainer::process3HitCombinations: nHits/trackID/pdg: " << aTC.size() << "/" << aTC.getTrackID() << "/" <<
               aTC.getPDG());
       if (aTC.size() < 3) { return nValues; }
 
@@ -163,7 +163,7 @@ namespace Belle2 {
       // loop over all 3-hit-combis, collect data for each filterType and store it in root-tree:
       std::vector<std::pair<std::string, double> > collectedResults;
       for (; innerIt != aTC.innerEnd();) {
-        B2DEBUG(10, "SecMapTrainer::process3HitCombinations: outer-/center-/innerHitSecID: " << outerIt->getSectorIDString() <<
+        B2DEBUG(20, "SecMapTrainer::process3HitCombinations: outer-/center-/innerHitSecID: " << outerIt->getSectorIDString() <<
                 "/" << centerIt->getSectorIDString() <<
                 "/" << innerIt->getSectorIDString());
 
@@ -186,7 +186,7 @@ namespace Belle2 {
 
         // fill data for each filter type:
         for (const auto& entry : collectedResults) {
-          B2DEBUG(50, "SecMapTrainer::process3HitCombinations: filter/value: " << entry.first << "/" << entry.second);
+          B2DEBUG(20, "SecMapTrainer::process3HitCombinations: filter/value: " << entry.first << "/" << entry.second);
           dataSet.setValueOfFilter(entry.first, entry.second);
           ++nValues;
         }
@@ -205,7 +205,7 @@ namespace Belle2 {
       const std::vector<std::pair< FullSecID, const SpacePoint*> >& goodSPs,
       unsigned tcID, double pTValue, int pdgCode)
     {
-      B2DEBUG(10, "SecMapTrainer::convertSPTC: nGoodHits: " << goodSPs.size());
+      B2DEBUG(20, "SecMapTrainer::convertSPTC: nGoodHits: " << goodSPs.size());
 
       SecMapTrainerTC newTrack(tcID, pTValue, pdgCode);
 
@@ -228,7 +228,7 @@ namespace Belle2 {
   public:
 
     /** constructor. */
-    explicit SecMapTrainer(const std::string& setupName, const std::string& appendix = "") :
+    explicit SecMapTrainer(const std::string& setupName, const std::string& appendix = "", const std::string& outputdir = "./") :
       m_nameSetup(setupName),
       m_config(m_filtersContainer.getFilters(m_nameSetup)->getConfig()),
       m_factory(
@@ -238,7 +238,7 @@ namespace Belle2 {
         m_config.mField),
 
       m_filterMill(),
-      m_rootInterface(m_config.secMapName, appendix),
+      m_rootInterface(m_config.secMapName, appendix, outputdir),
       m_expNo(std::numeric_limits<unsigned>::max()),
       m_runNo(std::numeric_limits<unsigned>::max()),
       m_evtNo(std::numeric_limits<unsigned>::max())

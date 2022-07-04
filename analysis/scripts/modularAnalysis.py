@@ -1295,8 +1295,9 @@ def applyEventCuts(cut, path):
 
             applyEventCuts("[nTracks > 5] and [isContinuumEvent], path=mypath)
 
-    Warning:
-        You must use square braces ``[`` and ``]`` for conditional statements.
+    .. warning::
+      One has to use only event-based variables in this function
+      and only square brackets ``[`` and ``]`` for conditional statements.
 
     Parameters:
         cut (str): Events that do not pass these selection criteria are skipped
@@ -1319,7 +1320,10 @@ def applyEventCuts(cut, path):
             if isinstance(i, tuple):
                 find_vars(i, var_list, meta_list)
     event_var_id = '[Eventbased]'
-    formula_id = 'formula'
+    formula_ids = ['formula', 'abs',
+                   'cos', 'acos',
+                   'tan', 'atan',
+                   'sin', 'asin']
     parsed_cut = b2parser.parse(cut)
     var_list = []
     meta_list = []
@@ -1331,16 +1335,18 @@ def applyEventCuts(cut, path):
         var = variables.getVariable(var_string)
         # Check if there is eventbased marker in description
         if event_var_id not in var.description:
-            B2ERROR(f'Variable {var_string} is not an eventbased variable! Please check your inputs to the applyEventCuts method!')
+            B2ERROR(f'Variable {var_string} is not an event-based variable! Please check your inputs to the applyEventCuts method!')
     for meta_string_list in meta_list:
         # Get the variable and get rid of aliases
         var = variables.getVariable(meta_string_list[0], meta_string_list[1:])
         # Do not check the formula
-        if formula_id in var.name:
+        if any([fid in var.name for fid in formula_ids]):
+            B2INFO(f'applyEventCuts: the check if "{var.name}" is an event-based variable has been skipped '
+                   'because it is a formula-based or a universal metavariable.')
             continue
         # Check if there is eventbased marker in description
         if event_var_id not in var.description:
-            B2ERROR(f'Variable {var.name} is not an eventbased variable! Please check your inputs to the applyEventCuts method!')
+            B2ERROR(f'Variable {var.name} is not an event-based variable! Please check your inputs to the applyEventCuts method!')
     eselect = register_module('VariableToReturnValue')
     eselect.param('variable', 'passesEventCut(' + cut + ')')
     path.add_module(eselect)

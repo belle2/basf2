@@ -24,7 +24,7 @@ import tracking
 from tracking.validation.run import TrackingValidationRun
 import logging
 import basf2
-from vxdHoughTracking.vxdHoughTracking_functions import add_svd_hough_tracking
+from tracking.path_utils import add_svd_hough_tracking
 
 VALIDATION_OUTPUT_FILE = 'SVDHoughTrackingValidation.root'
 N_EVENTS = 1000

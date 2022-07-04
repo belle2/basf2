@@ -27,6 +27,7 @@
 #include <reconstruction/dbobjects/CDCDedxWireGain.h>
 //#include <cdc/dbobjects/CDCEDepToADCConversions.h>
 #include <cdc/dbobjects/CDCCrossTalkLibrary.h>
+#include <cdc/dbobjects/CDCCorrToThresholds.h>
 
 //C++/C standard lib elements.
 #include <string>
@@ -188,8 +189,6 @@ namespace Belle2 {
     double m_resolution2;       /**< Resolution of the second Gassian used to smear drift length */
     double m_tdcThreshold4Outer; /**< TDC threshold for outer layers in unit of eV */
     double m_tdcThreshold4Inner; /**< TDC threshold for inner layers in unit of eV */
-    double m_corrFact2Threshold4Outer; /**< Corr. factor to TDC threshold for outer layers */
-    double m_corrFact2Threshold4Inner; /**< Corr. factor to TDC threshold for inner layers */
     int    m_eDepInGasMode;     /**< Mode for extracting dE(gas) from dE(gas+wire) */
     int    m_adcThreshold;      /**< Threshold for ADC in unit of count */
     double m_tMin;              /**< Lower edge of time window in ns */
@@ -274,6 +273,7 @@ namespace Belle2 {
     int  m_debugLevel      ;   /**< Debug level */
     int  m_debugLevel4XTalk;   /**< Debug level for crosstalk */
     DBObjPtr<CDCCrossTalkLibrary>* m_xTalkFromDB = nullptr; /*!< Pointer to cross-talk from DB. */
+    DBObjPtr<CDCCorrToThresholds>* m_corrToThresholdFromDB = nullptr; /*!< Pointer to threshold correction from DB. */
 
     StoreObjPtr<SimClockState> m_simClockState; /**< generated hardware clock state */
     bool m_synchronization = true; /**< Flag to switch on/off timing synchronization */

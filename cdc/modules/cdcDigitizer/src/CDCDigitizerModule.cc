@@ -98,8 +98,6 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
            "TDC threshold (dE in eV) for Layers#8-56. The value corresponds to He-C2H6 gas", 250.);
   addParam("TDCThreshold4Inner", m_tdcThreshold4Inner,
            "Same as TDCThreshold4Outer but for Layers#0-7,", 150.);
-  addParam("CorrFact2Threshold4Outer", m_corrFact2Threshold4Outer, "Correction factor to the TDC threshold for Layers#8-56.", 2.9);
-  addParam("CorrFact2Threshold4Inner", m_corrFact2Threshold4Inner, "Correction factor to the TDC threshold for Layers#0-07.", 2.9);
   addParam("EDepInGasMode", m_eDepInGasMode,
            "Mode for extracting energy deposit in gas from energy deposit in gas+wire; =0: scaling using electron density; 1: scaling using most probab. energy deposit; 2: similar to 2 but slightly different; 3: extraction based on probability; 4: regeneration following probability",
            0);
@@ -262,6 +260,12 @@ void CDCDigitizerModule::initialize()
     } else {
       B2FATAL("CDCCrossTalkLibrary invalid!");
     }
+  }
+
+  m_corrToThresholdFromDB = new DBObjPtr<CDCCorrToThresholds>;
+  if ((*m_corrToThresholdFromDB).isValid()) {
+  } else {
+    B2FATAL("CDCCorrToThresholds invalid!");
   }
 
 #if defined(CDC_DEBUG)
@@ -504,7 +508,7 @@ void CDCDigitizerModule::event()
       dEThreshold = (m_wireID.getISuperLayer() == 0) ? m_tdcThreshold4Inner : m_tdcThreshold4Outer;
       dEThreshold *= Unit::eV;
     }
-    dEThreshold *= (m_wireID.getISuperLayer() == 0) ? m_corrFact2Threshold4Inner : m_corrFact2Threshold4Outer;
+    dEThreshold *= (*m_corrToThresholdFromDB)->getParam(m_wireID.getICLayer());
     B2DEBUG(m_debugLevel, "hitdE,dEThreshold,driftLength " << hitdE << " " << dEThreshold << " " << hitDriftLength);
 
     if (hitdE < dEThreshold) {

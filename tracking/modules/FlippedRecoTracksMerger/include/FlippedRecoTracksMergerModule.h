@@ -22,7 +22,7 @@
  * of the original and flipped ones.
  */
 namespace Belle2 {
-  /// Module to copy RecoTracks.
+  /// Module to merge the original and flipped RecoTracks.
   class FlippedRecoTracksMergerModule : public Module {
 
   public:
@@ -32,7 +32,7 @@ namespace Belle2 {
     /// Declare required StoreArray
     void initialize() override;
 
-    /// Event processing, copies store array
+    /// Event processing
     void event() override;
 
   private:

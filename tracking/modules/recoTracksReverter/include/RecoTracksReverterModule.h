@@ -30,7 +30,7 @@ namespace Belle2 {
     /// Declare required StoreArray
     void initialize() override;
 
-    /// Event processing, copies store array
+    /// Event processing
     void event() override;
 
   private:

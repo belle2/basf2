@@ -11559,58 +11559,58 @@ Enddecay
 Decay Lambda_c+
 # Note that PDG 2021 numbers are normalized to a pKpi branching fraction of a guess of 0.0664
 # For isospin model, see Gronau and Rosner, Phys. Rev. D 98, 030001 and references therein
-0.038060000   e+  nu_e  Lambda0                            PYTHIA         22; #[PDG2021]
-0.000530000   e+  nu_e  Sigma0                             PYTHIA         22; #All other e modes are small PDG2021
+0.038060000   e+  nu_e  Lambda0                            PYTHIA         22; # [PDG2021]
+0.000530000   e+  nu_e  Sigma0                             PYTHIA         22; # All other e modes are small PDG2021
 0.000530000   e+  nu_e  Sigma*0                            PYTHIA         22;
 0.000530000   e+  nu_e  n0                                 PYTHIA         22;
 0.000530000   e+  nu_e  Delta0                             PYTHIA         22;
 0.000530000   e+  nu_e  p+  pi-                            PYTHIA         22;
 0.000530000   e+  nu_e  n0  pi0                            PYTHIA         22;
-0.036989630   mu+  nu_mu  Lambda0                          PYTHIA         22; #[PDG2021]
-0.000530000   mu+  nu_mu  Sigma0                           PYTHIA         22; #All other mu modes are small PDG2021
+0.036989630   mu+  nu_mu  Lambda0                          PYTHIA         22; # [PDG2021]
+0.000530000   mu+  nu_mu  Sigma0                           PYTHIA         22; # All other mu modes are small PDG2021
 0.000530000   mu+  nu_mu  Sigma*0                          PYTHIA         22;
 0.000530000   mu+  nu_mu  n0                               PYTHIA         22;
 0.000530000   mu+  nu_mu  Delta0                           PYTHIA         22;
 0.000530000   mu+  nu_mu  p+  pi-                          PYTHIA         22;
 0.000530000   mu+  nu_mu  n0  pi0                          PYTHIA         22;
-0.011420000   Delta++  K-                                  PYTHIA         0; #[PDG 2021]
+0.011420000   Delta++  K-                                  PYTHIA         0; # [PDG2021]
 # Contributes 0.01142 to pK-pi+
 0.026440000   Delta++  K*-                                 PYTHIA         0;
 # Contributes 0.025*0.66 = 0.0166 to pK0pi-pi+  and 0.0083 to pKpi0pi+
-0.033620000   p+  anti-K0                                  PYTHIA         0; #[PDG 2021]
-0.020730000   p+  anti-K*0                                 PYTHIA         0; #[PDG 2021]
+0.033620000   p+  anti-K0                                  PYTHIA         0; # [PDG2021]
+0.020730000   p+  anti-K*0                                 PYTHIA         0; # [PDG2021]
 # Contributes 0.0207*0.665 = 0.01376 to pKpi+ and 0.0207*0.333 = 0.0689 to pK0pi0 
-0.005290000   Delta+  anti-K0                              PYTHIA         0; #[produces ppi0K0 and npiK0]
+0.005290000   Delta+  anti-K0                              PYTHIA         0; # [produces ppi0K0 and npiK0]
 0.005290000   Delta+  anti-K*0                             PYTHIA         0;
-0.013750000   Lambda0  pi+                                 PYTHIA         0; #[PDG 2021]
-0.006340000   Lambda0  rho+                                PYTHIA         0; #[ESTIMATE goes into L0pipi0] 
-0.013650000   Sigma0  pi+                                  PYTHIA         0; #[PDG 2021]
-0.005290000   Sigma0  rho+                                 PYTHIA         0; #[ESTIMATE goes into S0pipi0]
+0.013750000   Lambda0  pi+                                 PYTHIA         0; # [PDG2021]
+0.006340000   Lambda0  rho+                                PYTHIA         0; # [ESTIMATE goes into L0pipi0] 
+0.013650000   Sigma0  pi+                                  PYTHIA         0; # [PDG2021]
+0.005290000   Sigma0  rho+                                 PYTHIA         0; # [ESTIMATE goes into S0pipi0]
 0.004220000   Sigma*0  pi+                                 PYTHIA         0;
 # Contributes 0.00371 to Lambda pi0 pi+ 
 0.004230000   Sigma*0  rho+                                PYTHIA         0;
-0.013210000   Sigma+  pi0                                  PYTHIA         0; #[PDG 2021]
-0.004650000   Sigma+  eta                                  PYTHIA         0; #[PDG 2021]
-0.015860000   Sigma+  eta'                                 PYTHIA         0; #[PDG 2021]
-0.004230000   Sigma+  rho0                                 PYTHIA         0; #[goes into Sigma+ pi+pi-]
-0.017980000   Sigma+  omega                                PYTHIA         0; #[PDG 2021]
+0.013210000   Sigma+  pi0                                  PYTHIA         0; # [PDG2021]
+0.004650000   Sigma+  eta                                  PYTHIA         0; # [PDG2021]
+0.015860000   Sigma+  eta'                                 PYTHIA         0; # [PDG2021]
+0.004230000   Sigma+  rho0                                 PYTHIA         0; # [goes into Sigma+ pi+pi-]
+0.017980000   Sigma+  omega                                PYTHIA         0; # [PDG2021]
 0.003170000   Sigma*+  pi0                                 PYTHIA         0;
 # 0.00279 to Lambda pi+ pi0
-0.008990000   Sigma*+  eta                                 PYTHIA         0; #[PDG2011]
+0.008990000   Sigma*+  eta                                 PYTHIA         0; # [PDG2011]
 # Contributes 0.0791 To Lambda  pi eta
-0.000630000   Sigma*+  rho0                                PYTHIA         0; #[PDG 2021 contributes to L(3pi)]]
+0.000630000   Sigma*+  rho0                                PYTHIA         0; # [PDG2021 contributes to L(3pi)]]
 0.003170000   Sigma*+  omega                               PYTHIA         0;
-0.005810000   Xi0  K+                                      PYTHIA         0; #[PDG2021]
+0.005810000   Xi0  K+                                      PYTHIA         0; # [PDG2021]
 0.002110000   Xi0  K*+                                     PYTHIA         0;
-0.004540000   Xi*0  K+                                     PYTHIA         0; #[PDG 2021]
-0.001140000   Delta++  pi-                                 PYTHIA         0; #[PDG 2021]
+0.004540000   Xi*0  K+                                     PYTHIA         0; # [PDG2021]
+0.001140000   Delta++  pi-                                 PYTHIA         0; # [PDG2021]
 0.001060000   Delta++  rho-                                PYTHIA         0;
-0.000080000   p+  pi0                                      PYTHIA         0; #[Theory - Cheng, Kang, Xu, Phys. Rev D 97, 074028 ]
-0.000500000   p+  eta'                                     PYTHIA         0; #[Belle 2022]
+0.000080000   p+  pi0                                      PYTHIA         0; # [Theory - Cheng, Kang, Xu, Phys. Rev D 97, 074028 ]
+0.000500000   p+  eta'                                     PYTHIA         0; # [Belle2022]
 0.002110000   p+  rho0                                     PYTHIA         0;
 0.002110000   p+  omega                                    PYTHIA         0;
-0.001120000   p+  phi                                      PYTHIA         0; #[PDG2021]
-0.002960000   p+  f_0                                      PYTHIA         0; #[PDG2021]
+0.001120000   p+  phi                                      PYTHIA         0; # [PDG2021]
+0.002960000   p+  f_0                                      PYTHIA         0; # [PDG2021]
 0.001060000   Delta+  pi0                                  PYTHIA         0;
 0.001060000   Delta+  eta                                  PYTHIA         0;
 0.001060000   Delta+  eta'                                 PYTHIA         0;
@@ -11620,70 +11620,70 @@ Decay Lambda_c+
 0.003170000   n0  rho+                                     PYTHIA         0;
 0.003170000   Delta0  pi+                                  PYTHIA         0;
 0.003170000   Delta0  rho+                                 PYTHIA         0;
-0.006450000   Lambda0  K+                                  PYTHIA         0; # [PDG 2021]
+0.006450000   Lambda0  K+                                  PYTHIA         0; # [PDG2021]
 0.005280000   Lambda0  K*+                                 PYTHIA         0;
-0.000530000   Sigma0  K+                                   PYTHIA         0; # [PDG 2021]
+0.000530000   Sigma0  K+                                   PYTHIA         0; # [PDG2021]
 0.002110000   Sigma0  K*+                                  PYTHIA         0;
 0.001060000   Sigma*0  K+                                  PYTHIA         0;
 0.001060000   Sigma*0  K*+                                 PYTHIA         0;
 0.002110000   Sigma+  K0                                   PYTHIA         0;
-0.003700000   Sigma+  K*0                                  PYTHIA         0; # [PDG 2021]
+0.003700000   Sigma+  K*0                                  PYTHIA         0; # [PDG2021]
 0.001060000   Sigma*+  K0                                  PYTHIA         0;
 0.001060000   Sigma*+  K*0                                 PYTHIA         0;
-0.035850000   p+  K-  pi+                                  PHSP;  # [adjusted  PDG2021 such that total is 0.0664]
-0.034780000   p+  anti-K0  pi0                             PHSP;  # [PDG 2021 corrected for pKstar (2*1.97 - 0.33*1.96)]
-0.008670000   p+  anti-K0  eta                             PHSP;  # [PDG 2021 *2]
-0.033850000   p+  anti-K0  pi+  pi-                        PHSP;  # [PDG 2021 *2 ]
-0.037220000   p+  K-  pi+  pi0                             PHSP;  # [PDG 2021 - 0.666*0.014 from pK*- pi+]
-0.014800000   p+  K*-  pi+                                 PHSP;  # [PDG 2021]
+0.035850000   p+  K-  pi+                                  PHSP;  # [Adjusted PDG2021 such that total is 0.0664]
+0.034780000   p+  anti-K0  pi0                             PHSP;  # [PDG2021 corrected for pKstar (2*1.97 - 0.33*1.96)]
+0.008670000   p+  anti-K0  eta                             PHSP;  # [PDG2021 *2]
+0.033850000   p+  anti-K0  pi+  pi-                        PHSP;  # [PDG2021 *2 ]
+0.037220000   p+  K-  pi+  pi0                             PHSP;  # [PDG2021 - 0.666*0.014 from pK*- pi+]
+0.014800000   p+  K*-  pi+                                 PHSP;  # [PDG2021]
 0.001770000   p+  K-  pi+  pi+  pi-                        PHSP;  # Use isopin model rather than PDG for pK(3pi)
 0.001240000   p+  K-  pi+  pi0  pi0                        PHSP;  # Use isospin model rather than PDG for pK(3pi)
 0.002820000   p+  anti-K0  pi+ pi-  pi0                    PHSP;  #    
 0.001240000   n0  anti-K0  pi+  pi0  pi0                   PHSP;  #  
 0.001410000   n0 K- pi+ pi+ pi0                            PHSP;  # 
 0.001760000   n0 anti-K0 pi+ pi+ pi-                       PHSP;  # 
-0.001310000   p+ eta                                       PHSP;  # [PDG 2021]
-0.004860000   p+  pi+  pi-                                 PHSP;  # [PDG 2021]    
+0.001310000   p+ eta                                       PHSP;  # [PDG2021]
+0.004860000   p+  pi+  pi-                                 PHSP;  # [PDG2021]    
 0.004860000   p+  pi0  pi0                                 PHSP;  # [Isospin model]
-0.002430000   p+  pi+  pi+  pi-  pi-                       PHSP;  # [PDG 2021]
+0.002430000   p+  pi+  pi+  pi-  pi-                       PHSP;  # [PDG2021]
 0.001690000   p+  pi+  pi-  pi0  pi0                       PHSP;  # [Isospin model]
 0.001160000   p+  pi0  pi0  pi0  pi0                       PHSP;  # [Isospin model]		
-0.000530000   p+  K+  K-                                   PHSP;  # [PDG 2021 in addtion to pphi mode]
+0.000530000   p+  K+  K-                                   PHSP;  # [PDG2021 in addtion to pphi mode]
 0.004860000   n0  pi+  pi0                                 PHSP;  # [Isospin model]  
 0.002430000   n0  pi+  pi0  pi+  pi-                       PHSP;  # [Isospin model]
 0.001690000   n0  pi+  pi0  pi0  pi0                       PHSP;  # [Isospin model]
-0.000530000   n0  K+  K0                                   PHSP;  # [PDG 2021]
-0.038490000   n0 anti-K0 pi+                               PHSP;  # [PDG 2021]
-0.062180000   Lambda0  pi+  pi0                            PHSP;  # [PDG 2021]
+0.000530000   n0  K+  K0                                   PHSP;  # [PDG2021]
+0.038490000   n0 anti-K0 pi+                               PHSP;  # [PDG2021]
+0.062180000   Lambda0  pi+  pi0                            PHSP;  # [PDG2021]
 # In addition there is 0.00634 from rho and 0.00371 from Sigma*0 pi+ and 0.00279 from Sigma*+ pi0
-# Lambda0  pi+  pi+  pi-                                   PHSP;  #[No non-resonant decays in PDG2021]
-0.015860000   Lambda0  pi+  rho0                           PHSP;  #[PDG 2021; goes to Lambda pi+pi-pi+]
+# Lambda0  pi+  pi+  pi-                                   PHSP;  # [No non-resonant decays in PDG2021]
+0.015860000   Lambda0  pi+  rho0                           PHSP;  # [PDG2021; goes to Lambda pi+pi-pi+]
 0.027320110   Lambda0  pi+ pi0 pi0                         PHSP;  # Isospin model guess
-0.000000000   Lambda0  pi+  pi+  pi-  pi0                  PHSP;  #[No non-resonant decays in PDG 2021] 
-0.019450000   Lambda0  pi+  eta                            PHSP;  #[PDG 2021; contributes to L0 4pi]
-0.015890000   Lambda0  pi+  omega                          PHSP;  #[PDG 2021; contributes to L0 4pi]
-0.006020000   Lambda0  K+  anti-K0                         PHSP;  #[PDG 2021]
-0.047580000   Sigma+  pi+  pi-                             PHSP;  #[PDG 2021 - resonances not measured]
-0.016390000   Sigma+  pi0  pi0                             PHSP;  #[PDG 2021 - resonances not measured]	
-0.019780000   Sigma-  pi+  pi+                             PHSP;  #[PDG 2021]
-0.037000000   Sigma0  pi+  pi0                             PHSP;  #[PDG 2021]
-0.011740000   Sigma0  pi+  pi+  pi-                        PHSP;  #[PDG 2021]
+0.000000000   Lambda0  pi+  pi+  pi-  pi0                  PHSP;  # [No non-resonant decays in PDG 2021] 
+0.019450000   Lambda0  pi+  eta                            PHSP;  # [PDG2021; contributes to L0 4pi]
+0.015890000   Lambda0  pi+  omega                          PHSP;  # [PDG2021; contributes to L0 4pi]
+0.006020000   Lambda0  K+  anti-K0                         PHSP;  # [PDG2021]
+0.047580000   Sigma+  pi+  pi-                             PHSP;  # [PDG2021 - resonances not measured]
+0.016390000   Sigma+  pi0  pi0                             PHSP;  # [PDG2021 - resonances not measured]	
+0.019780000   Sigma-  pi+  pi+                             PHSP;  # [PDG2021]
+0.037000000   Sigma0  pi+  pi0                             PHSP;  # [PDG2021]
+0.011740000   Sigma0  pi+  pi+  pi-                        PHSP;  # [PDG2021]
 0.011740000   Sigma0  pi+  pi0  pi0                        PHSP;  # not measured
-0.022210000   Sigma-  pi+  pi+  pi0                        PHSP;  #[PDG 2021]
+0.022210000   Sigma-  pi+  pi+  pi0                        PHSP;  # [PDG2021]
 0.011740000   Sigma+  pi+  pi-  pi0                        PHSP;  # not measured
 0.011630000   Sigma+  pi0  pi0  pi0                        PHSP;  # not measured
-0.001590000   Sigma+  K+  K-                               PHSP;  #[PDG 2021 - Sigma+phi]
-0.004120000   Sigma+  phi                                  PHSP;  #[PDG 2021 contributes to Sigma+ K+K-] 
-0.003700000   Sigma+  K0 anti-K0                           PHSP;  #[From phase-space model]
-0.003700000   Sigma0  K+ anti-K0                           PHSP;  #[From phase-space model]	
-0.004650000   Xi-  K+  pi+                                 PHSP;  #[PDG 2021 - subtracted for Xi(1530)K]
-0.006030000   Xi0  K+  pi0                                 PHSP;  #[Isospin model subtracted for Xi(1530)K]
-0.006550000   Xi0  K0  pi+                                 PHSP;  #[Isospin model]		
-0.000000000   Sigma+  K+  pi-                              PHSP;  #PDG 2021 only decays resonantly
-0.023260000   Lambda(1520)0 pi+                            PHSP;  #PDG 2021 
+0.001590000   Sigma+  K+  K-                               PHSP;  # [PDG2021 - Sigma+phi]
+0.004120000   Sigma+  phi                                  PHSP;  # [PDG2021 contributes to Sigma+ K+K-] 
+0.003700000   Sigma+  K0 anti-K0                           PHSP;  # [From phase-space model]
+0.003700000   Sigma0  K+ anti-K0                           PHSP;  # [From phase-space model]	
+0.004650000   Xi-  K+  pi+                                 PHSP;  # [PDG2021 - subtracted for Xi(1530)K]
+0.006030000   Xi0  K+  pi0                                 PHSP;  # [Isospin model subtracted for Xi(1530)K]
+0.006550000   Xi0  K0  pi+                                 PHSP;  # [Isospin model]		
+0.000000000   Sigma+  K+  pi-                              PHSP;  # [PDG2021 only decays resonantly]
+0.023260000   Lambda(1520)0 pi+                            PHSP;  # [PDG2021]
 # Contributes 0.00534 to pKpi, 0.00534 to nK0bar pi, 0.00324 to Sigma+pipi 0.00324 to Sigma-pipi
 # 0.0015 to Lambda 3pi
-0.000110000   p+ K+ pi-                                    PHSP;  #[PDG 2021]
+0.000110000   p+ K+ pi-                                    PHSP;  # [PDG2021]
 Enddecay
 CDecay anti-Lambda_c-
 

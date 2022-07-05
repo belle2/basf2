@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+
+
+<!-- Page 1 -->
+<svg x="0" y="0" width="1100" height="825" viewBox="0 0 1100 825" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+style="display: block;margin-left: auto;margin-right: auto;">
+<defs>
+<clipPath id="c_1"><path d="M0,0H1100V825H0Z"/></clipPath>
+<clipPath id="c0"><path d="M108.2,351.1V6.8H940.1V351.1Z"/></clipPath>
+
+<style type="text/css"><![CDATA[
+text { white-space: pre; }
+path, image { pointer-events: none; }
+
+.s1{
+font-size: 36.67px;
+font-family: Calibri_3y;
+fill: #000;
+}
+.s2{
+font-size: 24.38px;
+font-family: Calibri_3y;
+fill: #000;
+}
+.s3{
+font-size: 24.38px;
+font-family: Calibri-Bold_3-;
+fill: #000;
+}
+.s4{
+font-size: 21.45px;
+font-family: Calibri_3y;
+fill: #000;
+}
+.s5{
+font-size: 36.67px;
+font-family: MS-PGothic_3w;
+fill: #000;
+}
+
+.g0{
+fill: #FFFFFF;
+}
+.g1{
+fill: none;
+stroke: #385D8A;
+stroke-width: 3.055;
+stroke-linecap: butt;
+stroke-linejoin: round;
+}
+.g2{
+fill: #4F81BD;
+}
+.g3{
+fill: none;
+stroke: #385D8A;
+stroke-width: 3.055;
+stroke-linecap: butt;
+stroke-linejoin: miter;
+stroke-miterlimit: 8;
+}
+.g4{
+fill: none;
+stroke: #4A7EBB;
+stroke-width: 1.527;
+stroke-linecap: butt;
+stroke-linejoin: round;
+}
+.g5{
+fill: #4A7EBB;
+}
+
+]]></style>
+
+</defs>
+<path d="M0,0
+L0,825
+L1100,825
+L1100,0 Z " 
+fill="#FFFFFF" stroke="none"/>
+<g clip-path="url(#c_1)">
+<path d="M0,825H1100V0H0V825Z" class="g0"/>
+<path d="M160,412.6H982.9V772.5H160V412.6Z" class="g1"/>
+<image clip-path="url(#c0)" preserveAspectRatio="none" x="108" y="7" width="832" height="344" xlink:href="1/img/1.jpg"/>
+<path fill-rule="evenodd" d="M765.7,359l9.7,10.9l65.9,-59.2l19.5,21.7l-65.9,59.2l9.7,10.8l-41.2,-2.2Z" class="g2"/>
+<path d="M765.7,359l9.7,10.9l65.9,-59.2l19.5,21.7l-65.9,59.2l9.7,10.8l-41.2,-2.2L765.7,359Z" class="g3"/>
+<text x="503.7" y="393.5" dx="0,0,0,0,0,0,-.1,0,0" class="s1">GDL logic </text>
+<path d="M194.6,490.5H307.5V707H194.6V490.5Z" class="g1"/>
+<text x="226.3" y="611" dx="0,-.1,-.1" class="s1">ITD </text>
+<path d="M439.2,491.1H552.1V707.6H439.2V491.1Z" class="g1"/>
+<text x="459.3" y="611.6" dx="0,0,-.1,0" class="s1">FTDL </text>
+<path d="M663.8,494.2H776.7V710.9H663.8V494.2Z" class="g1"/>
+<text x="674.7" y="614.7" dx="0,-.1,0,0" class="s1">PSNM </text>
+<text x="6.1" y="447.4" dx="0,.1,0,0,0,.1,-.2,0,.1,.1,0,-.2,.1,-.4,0,0" class="s2">Input bits from </text>
+<text x="23.3" y="476.7" dx="0,0,0,-.2,-.4,-.2,-.2,-.1,0,-.1" class="s2">subsystems </text>
+<text x="253.6" y="450" dx="0,0,0,.1,-.3,0,0,.1,0,0,0,-.2,-.1,0,0,-.2,.1,0,0,0,.1,-.2,0,.1,.1" class="s2">Delay adjusted input bits </text>
+<text x="330.6" y="479.3" dx="0,-.1,0,-.1,-.1,-.1,-.1,-.1,0" class="s3">(L1Input) </text>
+<text x="556.5" y="449.7" dx="0,0,0,.1,0,0,.1,0,0,.1,.1" class="s2">Output bit </text>
+<text x="564.9" y="479" dx="0,-.1,0,-.1,0,0,0,0" class="s3">(L1FTDL) </text>
+<text x="180.5" y="733.4" dx="0,0,0,0,-.4,0,.1,0,-.1,-.1,.1,.1,0,-.1,0,-.1" class="s4">Delay and width </text>
+<text x="201.4" y="759" dx="0,0,-.1,0,-.1,-.1,0,-.1,0,-.3" class="s4">adjustment </text>
+<text x="406.7" y="732.2" dx="0,-.1,-.1,0,-.1,-.1,0,.5,-.1,0,0,.1,-.3,0,0,-.1,-.1,0,-.2,0,0,.1" class="s4">Output bit calculation </text>
+<text x="355.2" y="757.9" dx="0,-.1,0,.1,0,0,-.3,0,0,.1,-.3,.1,-.1,-.1,0,-.1,-.2,0,0,.1,-.1,.1,.1,.1,-.3,0,-.1,-.1,-.1,0,.3,-.1,0,0,0" class="s4">(logical combination of input bits) </text>
+<path d="M90.6,507.8h83.5" class="g4"/>
+<path fill-rule="evenodd" d="M172.5,503.2l9.2,4.6l-9.2,4.6Z" class="g5"/>
+<path d="M90.6,533.7h83.5" class="g4"/>
+<path fill-rule="evenodd" d="M172.5,529.1l9.2,4.6l-9.2,4.6Z" class="g5"/>
+<path d="M90.6,557.5h83.5" class="g4"/>
+<path fill-rule="evenodd" d="M172.5,552.9l9.2,4.6l-9.2,4.6Z" class="g5"/>
+<path d="M99,681.1h75" class="g4"/>
+<path fill-rule="evenodd" d="M172.5,676.5l9.2,4.6l-9.2,4.6Z" class="g5"/>
+<text transform="matrix(0,1,-1,0,118.1,590.5)" class="s5">・・・ </text>
+<text x="659.9" y="734.2" dx="0,0,-.1,-.1,0,0,.1,-.1,-.3,0,0,-.3,0,0" class="s4">Apply prescale </text>
+<text x="706.5" y="450" dx="0,0,0,.1,0,0,.1,0,0,.1,.1,-.2,0,.1,.1,0,0,0,-.4,0,0,-.2,.1,.1" class="s2">Output bit with prescale </text>
+<text x="776.8" y="479.3" dx="0,-.1,0,-.1,0,0,.1,0" class="s3">(L1PSNM) </text>
+<path d="M885.2,494.7h77.9V711.2H885.2V494.7Z" class="g1"/>
+<text x="902" y="615.1" dx="0,-.1" class="s1">OR </text>
+<text x="46.7" y="513.5" dx="0,0,.1,.1" class="s2">bit0 </text>
+<text x="46.9" y="541" dx="0,0,.1,.1" class="s2">bit1 </text>
+<text x="46.7" y="564.6" dx="0,0,.1,.1" class="s2">bit2 </text>
+<text x="35.3" y="689.1" dx="0,0,.1,.1,-.1,-.1" class="s2">bit159 </text>
+<path d="M963,602.4h107.4" class="g4"/>
+<path fill-rule="evenodd" d="M1068.9,597.8l9.1,4.6l-9.1,4.6Z" class="g5"/>
+<text x="990.7" y="559.4" dx="0,0,0,.1,0,0,.1,0,-.1,0" class="s2">Output to </text>
+<text x="1016.9" y="588.7" dx="0,-.3,-.2" class="s2">DAQ </text>
+<path d="M324.5,507.8H408" class="g4"/>
+<path fill-rule="evenodd" d="M406.5,503.2l9.1,4.6l-9.1,4.6Z" class="g5"/>
+<path d="M324.5,533.7H408" class="g4"/>
+<path fill-rule="evenodd" d="M406.5,529.1l9.1,4.6l-9.1,4.6Z" class="g5"/>
+<path d="M324.5,557.5H408" class="g4"/>
+<path fill-rule="evenodd" d="M406.5,552.9l9.1,4.6l-9.1,4.6Z" class="g5"/>
+<path d="M332.9,681.1H408" class="g4"/>
+<path fill-rule="evenodd" d="M406.4,676.5l9.2,4.6l-9.2,4.6Z" class="g5"/>
+<text transform="matrix(0,1,-1,0,352,590.5)" class="s5">・・・ </text>
+<path d="M562.5,507.8H646" class="g4"/>
+<path fill-rule="evenodd" d="M644.4,503.2l9.2,4.6l-9.2,4.6Z" class="g5"/>
+<path d="M562.5,533.7H646" class="g4"/>
+<path fill-rule="evenodd" d="M644.4,529.1l9.2,4.6l-9.2,4.6Z" class="g5"/>
+<path d="M562.5,557.5H646" class="g4"/>
+<path fill-rule="evenodd" d="M644.4,552.9l9.2,4.6l-9.2,4.6Z" class="g5"/>
+<path d="M570.9,681.1h75" class="g4"/>
+<path fill-rule="evenodd" d="M644.4,676.5l9.2,4.6l-9.2,4.6Z" class="g5"/>
+<text transform="matrix(0,1,-1,0,590,590.5)" class="s5">・・・ </text>
+<path d="M783.6,507.8h83.5" class="g4"/>
+<path fill-rule="evenodd" d="M865.5,503.2l9.2,4.6l-9.2,4.6Z" class="g5"/>
+<path d="M783.6,533.7h83.5" class="g4"/>
+<path fill-rule="evenodd" d="M865.5,529.1l9.2,4.6l-9.2,4.6Z" class="g5"/>
+<path d="M783.6,557.5h83.5" class="g4"/>
+<path fill-rule="evenodd" d="M865.5,552.9l9.2,4.6l-9.2,4.6Z" class="g5"/>
+<path d="M792,681.1h75" class="g4"/>
+<path fill-rule="evenodd" d="M865.5,676.5l9.2,4.6l-9.2,4.6Z" class="g5"/>
+<text transform="matrix(0,1,-1,0,811.1,590.5)" class="s5">・・・ </text>
+
+</g>
+
+<!-- Any embedded fonts defined here -->
+<style type="text/css" ><![CDATA[
+
+@font-face {
+	font-family: Calibri-Bold_3-;
+	src: url("fonts/Calibri-Bold_3-.woff") format("woff");
+}
+
+@font-face {
+	font-family: Calibri_3y;
+	src: url("fonts/Calibri_3y.woff") format("woff");
+}
+
+@font-face {
+	font-family: MS-PGothic_3w;
+	src: url("fonts/MS-PGothic_3w.woff") format("woff");
+}
+
+]]></style>
+
+</svg>

@@ -27,7 +27,7 @@ or `the dedicated Belle II note
 
 There are three kinds of trigger bits: input trigger bits (L1Input),
 output trigger bits (L1FTDL), and prescaled trigger bits (L1PSNM). They
-are defined inside the global decision logic (GDL), as shown in the figure below.
+are defined inside the global decision logic (GDL), as shown in :numref:`fig:gdl`.
 Input trigger bits are predefined selections from each
 sub-detector, with adjustment of the delay and width, in order to fix
 latency on GDL. For example, ``ty_0`` is one of the input trigger bits
@@ -48,18 +48,23 @@ configuration of the prescales in TSIM can be different from data, so L1
 FTDL is recommended. In run-dependent MC, configuration of the prescales
 in TSIM is consistent with data, so L1PSNM is recommended.
 
-In different experiments, the trigger bits menu could be different,
-depending on the contents of the global tag. This global tag is
-available when producing the signal MC samples corresponding to a
-particular trigger configuration. However, some testing trigger bits
-might be limited in TSIM. The missing (not valid) trigger bits in TSIM
-could be found on `confuence
-page <https://confluence.desy.de/display/BI/Invalid+trigger+bits>`__.
+.. warning::
+   In different experiments, the trigger bits menu could be different,
+   depending on the contents of the global tag. This global tag is
+   available when producing the signal MC samples corresponding to a
+   particular trigger configuration. However, some testing trigger bits
+   might be limited in TSIM. The missing (not valid) trigger bits in TSIM
+   could be found on `this Confuence page
+   <https://confluence.desy.de/display/BI/Invalid+trigger+bits>`__.
+
+.. _fig:gdl:
 
 .. figure:: gdl.png
     :align: center
     :width: 900px
-    :alt: Simplified view of the L1 system and GDL logic.
+
+    Simplified view of the L1 system and GDL logic.
+
 
 Efficiency of a certain trigger bit
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -77,21 +82,20 @@ can be calculated as follows:
 
 :math:`\epsilon = \frac{N_\text{ffy}}{N_\text{all}}`
 
-where :math:`N_\text{all}` is the number of all generated events, and :math:`N_\text{ffy}` is the
-  number of ``ffy`` satisfied events. This efficiency is called “true
-  trigger efficiency”.
+where :math:`N_\text{all}` is the number of all generated events, and :math:`N_\text{ffy}`
+is the number of ``ffy`` satisfied events. This efficiency is called “true trigger efficiency”.
 
 On the other hand, with data, we do not know the number of generated
 events, because only L1 passed events are recorded on data. One general
 way to solve this problem is to use a reference trigger bit, which is
 independent from the interested trigger bits. For example, to calculate
-the efficiency of a CDC trigger bit, ``ffy`` (``(ty_2 or ty_3) and !veto``),
-ECL trigger bits, ``hie`` (``ehigh and !bha_veto and !veto``) and ``c4`` (``clst>3 and
-!bha_veto and !veto``) can be used as the reference:
+the efficiency of a CDC trigger bit like ``ffy`` (``(ty_2 or ty_3) and !veto``),
+the ECL trigger bits, like ``hie`` (``ehigh and !bha_veto and !veto``) and ``c4``
+(``clst>3 and !bha_veto and !veto``), can be used as the reference:
 
-:math:`\epsilon_\text{exp} = \\frac{N_\text{fff} && (N_\text{hie}||N_\text{c4}) }{ N_\text{hie}||N_\text{c4}}`
+:math:`\epsilon_\text{exp} = \frac{N_\text{fff} \: \text{and} \: (N_\text{hie} \: \text{or} \: N_\text{c4})}{ N_\text{hie} \: \text{or} \: N_\text{c4}}`
 
-It is recommended to evaluate data/MC difference of the trigger efficiency with this method,
+It is recommended to evaluate the differences between data and MC of the trigger efficiency with this method,
 and apply correction and systematics to the true trigger efficiency.
 
 .. tip::
@@ -107,9 +111,8 @@ and apply correction and systematics to the true trigger efficiency.
    <https://confluence.desy.de/pages/viewpage.action?spaceKey=BI&title=Trigger+performance>`__.
 
 
-
-Functions in mdst.py
---------------------
+Functions in ``L1trigger.py``
++++++++++++++++++++++++++++++
 
 It's not necessary for average users to call any of the functions listed
 here. Default behavior is enough for analysts.

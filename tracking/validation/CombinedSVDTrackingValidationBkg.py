@@ -13,7 +13,7 @@
 <header>
   <contact>software-tracking@belle2.org</contact>
   <input>EvtGenSim.root</input>
-  <output>SVDCombinedTrackingValidationBkg.root</output>
+  <output>CombinedSVDTrackingValidationBkg.root</output>
   <description>
   This module validates that the combined VXDTF2 and SVDHoughTracking is capable of reconstructing tracks in Y(4S) runs.
   </description>
@@ -26,14 +26,14 @@ import logging
 import basf2
 from tracking.path_utils import add_svd_standalone_tracking
 
-VALIDATION_OUTPUT_FILE = 'SVDCombinedTrackingValidationBkg.root'
+VALIDATION_OUTPUT_FILE = 'CombinedSVDTrackingValidationBkg.root'
 N_EVENTS = 1000
 ACTIVE = True
 
 basf2.set_random_seed(1337)
 
 
-class SVDCombinedTrackingValidationBkg(TrackingValidationRun):
+class CombinedSVDTrackingValidationBkg(TrackingValidationRun):
     """
     Validation class for the DATCON tracking
     """
@@ -74,7 +74,7 @@ def main():
     """
     create SVD validation class and execute
     """
-    validation_run = SVDCombinedTrackingValidationBkg()
+    validation_run = CombinedSVDTrackingValidationBkg()
     validation_run.configure_and_execute_from_commandline()
 
 

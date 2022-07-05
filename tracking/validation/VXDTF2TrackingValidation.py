@@ -13,9 +13,9 @@
 <header>
   <contact>software-tracking@belle2.org</contact>
   <input>EvtGenSimNoBkg.root</input>
-  <output>SVDCombinedTrackingValidation.root</output>
+  <output>VXDTF2TrackingValidation.root</output>
   <description>
-  This module validates that the combined VXDTF2 and SVDHoughTracking is capable of reconstructing tracks in Y(4S) runs.
+  This module validates that the VXDTF2 SVD-only track finding is capable of reconstructing tracks in Y(4S) runs.
   </description>
 </header>
 """
@@ -24,16 +24,19 @@ import tracking
 from tracking.validation.run import TrackingValidationRun
 import logging
 import basf2
-from tracking.path_utils import add_svd_standalone_tracking
-
-VALIDATION_OUTPUT_FILE = 'SVDCombinedTrackingValidation.root'
+VALIDATION_OUTPUT_FILE = 'VXDTF2TrackingValidation.root'
 N_EVENTS = 1000
 ACTIVE = True
 
 basf2.set_random_seed(1337)
 
 
-class SVDCombinedTrackingValidation(TrackingValidationRun):
+def setupFinderModule(path):
+    tracking.add_hit_preparation_modules(path, components=["SVD"])
+    tracking.add_vxd_track_finding_vxdtf2(path, components=["SVD"])
+
+
+class VXDTF2TrackingValidation(TrackingValidationRun):
     """
     Validation class for the four 4-SVD Layer tracking
     """
@@ -46,11 +49,8 @@ class SVDCombinedTrackingValidation(TrackingValidationRun):
     #: use full detector for validation
     components = None
 
-    @staticmethod
-    def finder_module(path):
-        """Add the combined SVD standalone track finders and related modules to the basf2 path"""
-        tracking.add_hit_preparation_modules(path, components=["SVD"])
-        add_svd_standalone_tracking(path, reco_tracks="RecoTracks", svd_standalone_mode="VXDTF2_and_SVDHough")
+    #: lambda method which is used by the validation to add the svd finder modules
+    finder_module = staticmethod(setupFinderModule)
 
     #: use only the svd hits when computing efficiencies
     tracking_coverage = {
@@ -64,23 +64,21 @@ class SVDCombinedTrackingValidation(TrackingValidationRun):
     fit_tracks = True
     #: plot pull distributions
     pulls = True
-    #: create expert-level histograms
-    use_expert_folder = True
-    #: Include resolution information in the validation output
-    resolution = True
-    #: Use the fit information in validation
-    use_fit_information = True
     #: output file of plots
     output_file_name = VALIDATION_OUTPUT_FILE
-    #: define empty list of non expert parameters so that no shifter plots are created (to revert just remove following line)
-    non_expert_parameters = []
+
+    # tweak sectormap
+    # def adjust_path(self, path):
+    #     basf2.set_module_parameters( path, "SectorMapBootstrap", ReadSecMapFromDB=False)
+    #     basf2.set_module_parameters( path, "SectorMapBootstrap", ReadSectorMap=True)
+    #     basf2.set_module_parameters( path, "SectorMapBootstrap", SectorMapsInputFile="mymap.root")
 
 
 def main():
     """
     create SVD validation class and execute
     """
-    validation_run = SVDCombinedTrackingValidation()
+    validation_run = VXDTF2TrackingValidation()
     validation_run.configure_and_execute_from_commandline()
 
 

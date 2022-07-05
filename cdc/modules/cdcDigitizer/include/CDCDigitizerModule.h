@@ -27,6 +27,7 @@
 #include <reconstruction/dbobjects/CDCDedxWireGain.h>
 //#include <cdc/dbobjects/CDCEDepToADCConversions.h>
 #include <cdc/dbobjects/CDCCrossTalkLibrary.h>
+#include <cdc/dbobjects/CDCCorrToThresholds.h>
 
 //C++/C standard lib elements.
 #include <string>
@@ -225,7 +226,7 @@ namespace Belle2 {
     double m_addFudgeFactorForSigma; /**< additional fudge factor for space resol. */
     double m_totalFudgeFactor = 1.;  /**< total fudge factor for space resol. */
 
-    bool m_gasGainSmearing = false;  /**< Swtich for gas gain smearing */
+    bool m_gasGainSmearing = true;  /**< Swtich for gas gain smearing */
     double m_effWForGasGainSmearing = 0.0266;  /**< Effective energy (keV) for one electron prod. for gas gain smearing */
     double m_thetaOfPolya = 0.5;     /**< theta of Polya function for gas gain smearing */
     bool m_extraADCSmearing = false; /**< Swtich for extra ADC smearing */
@@ -274,6 +275,7 @@ namespace Belle2 {
     int  m_debugLevel      ;   /**< Debug level */
     int  m_debugLevel4XTalk;   /**< Debug level for crosstalk */
     DBObjPtr<CDCCrossTalkLibrary>* m_xTalkFromDB = nullptr; /*!< Pointer to cross-talk from DB. */
+    DBObjPtr<CDCCorrToThresholds>* m_corrToThresholdFromDB = nullptr; /*!< Pointer to threshold correction from DB. */
 
     StoreObjPtr<SimClockState> m_simClockState; /**< generated hardware clock state */
     bool m_synchronization = true; /**< Flag to switch on/off timing synchronization */

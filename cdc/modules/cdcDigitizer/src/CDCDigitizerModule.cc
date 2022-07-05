@@ -156,7 +156,8 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
   addParam("DebugLevel4XTalk", m_debugLevel4XTalk, "Debug level for crosstalk; 20-29 are usable.", 21);
 
   //Gain smearing
-  addParam("GasGainSmearing", m_gasGainSmearing, "Switch for gas gain smearing; true: on; false: off", m_gasGainSmearing);
+  addParam("GasGainSmearing", m_gasGainSmearing, "Switch for gas gain smearing for ADC simulation; true: on; false: off",
+           m_gasGainSmearing);
   addParam("EffWForGasGainSmearing", m_effWForGasGainSmearing,
            "Effective energy (keV) needed for one electron production for gas gain smearing; average for alpha- and beta-sources.",
            m_effWForGasGainSmearing);
@@ -264,6 +265,14 @@ void CDCDigitizerModule::initialize()
     } else {
       B2FATAL("CDCCrossTalkLibrary invalid!");
     }
+  }
+
+  //  m_corrToThresholdFromDB = new DBObjPtr<CDCCorrToThresholds>;
+  m_corrToThresholdFromDB = new OptionalDBObjPtr<CDCCorrToThresholds>;
+  if ((*m_corrToThresholdFromDB).isValid()) {
+  } else {
+    //    B2FATAL("CDCCorrToThresholds invalid!");
+    B2INFO("CDCCorrToThresholds invalid!");
   }
 
 #if defined(CDC_DEBUG)
@@ -504,7 +513,6 @@ void CDCDigitizerModule::event()
 
     //Apply energy threshold
     // If hitdE < dEThreshold, the hit is ignored
-    // M. Uchida 2012.08.31
     double dEThreshold = 0.;
     if (m_useDB4FEE && m_useDB4EDepToADC) {
       dEThreshold = m_tdcThresh[m_boardID] / convFactorForThreshold * Unit::keV;
@@ -512,6 +520,8 @@ void CDCDigitizerModule::event()
       dEThreshold = (m_wireID.getISuperLayer() == 0) ? m_tdcThreshold4Inner : m_tdcThreshold4Outer;
       dEThreshold *= Unit::eV;
     }
+    //    dEThreshold *= (*m_corrToThresholdFromDB)->getParam(m_wireID.getICLayer());
+    dEThreshold *= 1.;
     B2DEBUG(m_debugLevel, "hitdE,dEThreshold,driftLength " << hitdE << " " << dEThreshold << " " << hitDriftLength);
 
     if (hitdE < dEThreshold) {
@@ -1060,10 +1070,11 @@ void CDCDigitizerModule::makeSignalsAfterShapers(const WireID& wid, double dEinG
   }
 
   if (m_gasGainSmearing) {
-    //TODO: replace the following sum with a gaussian for large nElectrons if gas-gain smearing turns out to be important
-    const double nElectrons = dEInkeV / m_effWForGasGainSmearing;
+    const int nElectrons = std::round(dEInkeV / m_effWForGasGainSmearing);
     double relGain = 0;
-    if (nElectrons >= 1) {
+    if (20 <= nElectrons) {
+      relGain = std::max(0., gRandom->Gaus(1., sqrt(1. / (nElectrons * (1. + m_thetaOfPolya)))));
+    } else if (1 <= nElectrons) {
       for (int i = 1; i <= nElectrons; ++i) {
         relGain += Polya();
       }

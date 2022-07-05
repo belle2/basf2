@@ -38,8 +38,6 @@ namespace Belle2 {
     std::string m_inputStoreArrayName;
     /// Name of the output StoreArray
     std::string m_outputStoreArrayName;
-    /// mva cut to be applied.
-    double m_mvaFlipCut = -1.0;
     /// the flipping cuts can be read from the DB
     OptionalDBObjPtr<TrackFlippingCuts> m_flipCutsFromDB{"TRKTrackFlipAndRefit_MVA_cuts"};
     /// Store Array of the input tracks

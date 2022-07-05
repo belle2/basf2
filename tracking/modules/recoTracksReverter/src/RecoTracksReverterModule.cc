@@ -44,27 +44,24 @@ void RecoTracksReverterModule::event()
     }
 
     // get the cut from DB
-    if (m_flipCutsFromDB.isValid()) {
-      m_mvaFlipCut = (*m_flipCutsFromDB).getFirstCut();
+    if (!m_flipCutsFromDB.isValid()) continue;
+    double mvaFlipCut = (*m_flipCutsFromDB).getFirstCut();
 
-      if (recoTrack.getFlipQualityIndicator() > m_mvaFlipCut) {
-        Track* track = recoTrack.getRelatedFrom<Belle2::Track>();
-        if (track) {
+    if (recoTrack.getFlipQualityIndicator() < mvaFlipCut) continue;
+    Track* track = recoTrack.getRelatedFrom<Belle2::Track>();
+    if (!track) continue;
 
-          const auto& measuredStateOnPlane = recoTrack.getMeasuredStateOnPlaneFromLastHit();
-          const TVector3& currentPosition = measuredStateOnPlane.getPos();
-          const TVector3& currentMomentum = measuredStateOnPlane.getMom();
-          const double& currentCharge = measuredStateOnPlane.getCharge();
+    const auto& measuredStateOnPlane = recoTrack.getMeasuredStateOnPlaneFromLastHit();
+    const TVector3& currentPosition = measuredStateOnPlane.getPos();
+    const TVector3& currentMomentum = measuredStateOnPlane.getMom();
+    const double& currentCharge = measuredStateOnPlane.getCharge();
 
-          RecoTrack* newRecoTrack = m_outputRecoTracks.appendNew(currentPosition, -currentMomentum, -currentCharge,
-                                                                 recoTrack.getStoreArrayNameOfCDCHits(), recoTrack.getStoreArrayNameOfSVDHits(), recoTrack.getStoreArrayNameOfPXDHits(),
-                                                                 recoTrack.getStoreArrayNameOfBKLMHits(), recoTrack.getStoreArrayNameOfEKLMHits(),
-                                                                 recoTrack.getStoreArrayNameOfRecoHitInformation());
-          newRecoTrack->addHitsFromRecoTrack(&recoTrack, newRecoTrack->getNumberOfTotalHits(), true);
-          newRecoTrack->addRelationTo(&recoTrack);
-        }
-      }
-    }
+    RecoTrack* newRecoTrack = m_outputRecoTracks.appendNew(currentPosition, -currentMomentum, -currentCharge,
+                                                           recoTrack.getStoreArrayNameOfCDCHits(), recoTrack.getStoreArrayNameOfSVDHits(), recoTrack.getStoreArrayNameOfPXDHits(),
+                                                           recoTrack.getStoreArrayNameOfBKLMHits(), recoTrack.getStoreArrayNameOfEKLMHits(),
+                                                           recoTrack.getStoreArrayNameOfRecoHitInformation());
+    newRecoTrack->addHitsFromRecoTrack(&recoTrack, newRecoTrack->getNumberOfTotalHits(), true);
+    newRecoTrack->addRelationTo(&recoTrack);
   }
 }
 

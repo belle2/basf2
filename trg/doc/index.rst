@@ -48,6 +48,14 @@ configuration of the prescales in TSIM can be different from data, so L1
 FTDL is recommended. In run-dependent MC, configuration of the prescales
 in TSIM is consistent with data, so L1PSNM is recommended.
 
+.. tip::
+   In the analysis package we provide all the necessary variables for storing
+   the L1Input, L1FTDL and L1PSNM information, please see :ref:`trigger variables
+   documentation <variables_trigger>`. Note that it is possible to store the
+   L1 information using the trigger bit name (e.g.: ``L1PSNM(yyy)`` recommended)
+   or the trigger bit number (deprecated, since the trigger bit number may change
+   across different data taking periods).
+
 .. warning::
    In different experiments, the trigger bits menu could be different,
    depending on the contents of the global tag. This global tag is
@@ -59,7 +67,7 @@ in TSIM is consistent with data, so L1PSNM is recommended.
 
 .. _fig:gdl:
 
-.. figure:: gdl.png
+.. figure:: gdl.svg
     :align: center
     :width: 900px
 

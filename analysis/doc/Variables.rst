@@ -225,6 +225,7 @@ Here is a list of variables for acceptance cuts:
 .. b2-variables::
    :group: Acceptance
 
+.. _variables_trigger:
 Trigger
 ~~~~~~~
 

@@ -537,21 +537,17 @@ def add_svd_standalone_tracking(path,
         add_svd_hough_tracking(path, reco_tracks=reco_tracks, suffix=suffix)
 
     elif svd_standalone_mode == "VXDTF2_and_SVDHough":
-        add_vxd_track_finding_vxdtf2(
-            path,
-            components=components,
-            svd_clusters=svd_clusters,
-            nameSPTCs="SPTrackCands"+"VXDTF2",
-            reco_tracks=reco_tracks+"VXDTF2",
-            add_mva_quality_indicator=add_mva_quality_indicator,
-            suffix=suffix)
-        add_svd_hough_tracking(
-            path,
-            reco_tracks=reco_tracks +
-            "Hough",
-            svd_space_point_track_candidates="SPTrackCands" +
-            "Hough",
-            suffix=suffix)
+        add_vxd_track_finding_vxdtf2(path,
+                                     components=components,
+                                     svd_clusters=svd_clusters,
+                                     nameSPTCs="SPTrackCands"+"VXDTF2",
+                                     reco_tracks=reco_tracks+"VXDTF2",
+                                     add_mva_quality_indicator=add_mva_quality_indicator,
+                                     suffix=suffix)
+        add_svd_hough_tracking(path,
+                               reco_tracks=reco_tracks+"Hough",
+                               svd_space_point_track_candidates="SPTrackCands"+"Hough",
+                               suffix=suffix)
 
         path.add_module('RecoTrackStoreArrayCombiner',
                         Temp1RecoTracksStoreArrayName=reco_tracks+"VXDTF2",

@@ -378,7 +378,9 @@ def add_svd_track_finding(
            property for tracks from VXDTF2 standalone tracking
            (ATTENTION: Standard triplet QI of VXDTF2 is replaced in this case
            -> setting this option to 'True' will have some influence on the final track collection)
-    :param svd_standalone_mode: which SVD standalone tracking is used. Options are "VXDTF2" and "SVDHough", defaults to "VXDTF2"
+    :param svd_standalone_mode: Which SVD standalone tracking is used.
+           Options are "VXDTF2", "SVDHough", "VXDTF2_and_SVDHough", and "SVDHough_and_VXDTF2".
+           Defaults to "VXDTF2"
     """
 
     if not is_svd_used(components):
@@ -474,7 +476,7 @@ def add_svd_track_finding(
     else:
         combined_svd_cdc_standalone_tracks = output_reco_tracks
 
-        # Write out the combinations of tracks
+    # Write out the combinations of tracks
     path.add_module("RelatedTracksCombiner", VXDRecoTracksStoreArrayName=temporary_reco_tracks,
                     CDCRecoTracksStoreArrayName=input_reco_tracks,
                     recoTracksStoreArrayName=combined_svd_cdc_standalone_tracks)
@@ -516,7 +518,9 @@ def add_svd_standalone_tracking(path,
     :param path: basf2 path
     :param components: components to use, defaults to SVD
     :param svd_clusters: Name of the SVDClusters StoreArray used for tracking
-    :param svd_standalone_mode: Mode for SVD standalone track finding. Options are "VXDTF2" and "SVDHough", defaults to "VXDTF2"
+    :param svd_standalone_mode: Which SVD standalone tracking is used.
+           Options are "VXDTF2", "SVDHough", "VXDTF2_and_SVDHough", and "SVDHough_and_VXDTF2".
+           Defaults to "VXDTF2"
     :param reco_tracks: In case the only SVD standalone tracking is performed, these are the final RecoTracks,
            otherwise it's an intermediate StoreaArray where the SVD tracks from the SVD standalone track finding
            are stored, before they are merged with CDC tracks and extended via the CKF tracking.
@@ -533,6 +537,46 @@ def add_svd_standalone_tracking(path,
 
     elif svd_standalone_mode == "SVDHough":
         add_svd_hough_tracking(path, reco_tracks=reco_tracks, suffix=suffix)
+
+    elif svd_standalone_mode == "VXDTF2_and_SVDHough":
+        add_vxd_track_finding_vxdtf2(path,
+                                     components=components,
+                                     svd_clusters=svd_clusters,
+                                     nameSPTCs="SPTrackCands"+"VXDTF2",
+                                     reco_tracks=reco_tracks+"VXDTF2",
+                                     add_mva_quality_indicator=add_mva_quality_indicator,
+                                     suffix=suffix)
+        add_svd_hough_tracking(path,
+                               reco_tracks=reco_tracks+"Hough",
+                               svd_space_point_track_candidates="SPTrackCands"+"Hough",
+                               suffix=suffix)
+
+        path.add_module('RecoTrackStoreArrayCombiner',
+                        Temp1RecoTracksStoreArrayName=reco_tracks+"VXDTF2",
+                        Temp2RecoTracksStoreArrayName=reco_tracks+"Hough",
+                        recoTracksStoreArrayName=reco_tracks)
+        path.add_module('PruneRecoTracks', storeArrayName=reco_tracks+"VXDTF2")
+        path.add_module('PruneRecoTracks', storeArrayName=reco_tracks+"Hough")
+
+    elif svd_standalone_mode == "SVDHough_and_VXDTF2":
+        add_svd_hough_tracking(path,
+                               reco_tracks=reco_tracks+"Hough",
+                               svd_space_point_track_candidates="SPTrackCands"+"Hough",
+                               suffix=suffix)
+        add_vxd_track_finding_vxdtf2(path,
+                                     components=components,
+                                     svd_clusters=svd_clusters,
+                                     nameSPTCs="SPTrackCands"+"VXDTF2",
+                                     reco_tracks=reco_tracks+"VXDTF2",
+                                     add_mva_quality_indicator=add_mva_quality_indicator,
+                                     suffix=suffix)
+
+        path.add_module('RecoTrackStoreArrayCombiner',
+                        Temp1RecoTracksStoreArrayName=reco_tracks+"Hough",
+                        Temp2RecoTracksStoreArrayName=reco_tracks+"VXDTF2",
+                        recoTracksStoreArrayName=reco_tracks)
+        path.add_module('PruneRecoTracks', storeArrayName=reco_tracks+"Hough")
+        path.add_module('PruneRecoTracks', storeArrayName=reco_tracks+"VXDTF2")
 
     else:
         raise ValueError(f"Do not understand the svd_standalone_mode {svd_standalone_mode}")
@@ -851,6 +895,7 @@ def add_vxd_track_finding_vxdtf2(
     path,
     svd_clusters="",
     reco_tracks="RecoTracks",
+    nameSPTCs='SPTrackCands',
     components=None,
     suffix="",
     useTwoStepSelection=True,
@@ -871,6 +916,7 @@ def add_vxd_track_finding_vxdtf2(
     :param path: basf2 path
     :param svd_clusters: SVDCluster collection name
     :param reco_tracks: Name of the output RecoTracks, Defaults to RecoTracks.
+    :param nameSPTCs: Name of the SpacePointTrackCands StoreArray
     :param components: List of the detector components to be used in the reconstruction. Defaults to None which means
                        all components.
     :param suffix: all names of intermediate Storearrays will have the suffix appended. Useful in cases someone needs to
@@ -959,7 +1005,7 @@ def add_vxd_track_finding_vxdtf2(
     #################
 
     # append a suffix to the storearray name
-    nameSPTCs = 'SPTrackCands' + suffix
+    nameSPTCs += suffix
 
     trackFinder = register_module('TrackFinderVXDCellOMat')
     trackFinder.param('NetworkName', nameSegNet)

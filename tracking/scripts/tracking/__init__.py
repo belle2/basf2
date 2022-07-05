@@ -289,10 +289,10 @@ def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=Fa
     if flip_recoTrack:
         add_flipping_of_recoTracks(path, reco_tracks="RecoTracks")
 
+    path.add_module('TrackTimeEstimator')
+
     if prune_temporary_tracks or pruneTracks:
         path.add_module("PruneRecoHits")
-
-    path.add_module('TrackTimeEstimator')
 
 
 def add_time_extraction(path, append_full_grid_cdc_eventt0=False, components=None):

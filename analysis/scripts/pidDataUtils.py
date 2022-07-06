@@ -82,7 +82,7 @@ def read_root(root_filenames):
             a string. If more than one, should be given as a list or tuple.
 
     Returns:
-        pd.DataFrame: DataFrame containing the data of the ROOT datafile(s).
+        pandas.DataFrame: DataFrame containing the data of the ROOT datafile(s).
     """
 
     import root_pandas as rtp
@@ -101,7 +101,7 @@ def make_h5(df, tags, out_filename, pdg=None, column=root_column):
     """Make an HDF5 file in our 'slim' format from the given DataFrame.
 
     Args:
-        df (pd.DataFrame): The DataFrame containing the data.
+        df (pandas.DataFrame): The DataFrame containing the data.
         tags (list(str) or str): The particle tags used as a prefix for desired
             columns. e.g. for kaons in a D* decay, this is 'DST_D0_K'. One or
             more can be given.
@@ -277,11 +277,11 @@ def softmax(x):
         https://stackoverflow.com/a/67112412/18837571
 
     Args:
-        x (np.array): Data to be softmaxed. Softmax is calculated over the last
+        x (:func:`numpy.array`): Data to be softmaxed. Softmax is calculated over the last
             dimension.
 
     Returns:
-        np.array: Softmaxed data.
+        :func:`numpy.array`: Softmaxed data.
     """
     maxes = np.amax(x, axis=-1, keepdims=True)
     x_exp = np.exp(x - maxes)
@@ -294,7 +294,7 @@ def make_labels(df):
     on.
 
     Args:
-        df (pd.DataFrame): DataFrame that 'labels' column will be added to. Must
+        df (pandas.DataFrame): DataFrame that 'labels' column will be added to. Must
             not have NaN values in the 'pdg' column.
     """
     labels = np.abs(df["pdg"].values)
@@ -316,10 +316,10 @@ def make_bins(df, p_bins=P_BINS, theta_bins=THETA_BINS):
     """Make 'p_bin' and 'theta_bin' column in the given DataFrame.
 
     Args:
-        df (pd.DataFrame): The DataFrame to add bins columns to.
-        p_bins (np.array): The edges of the momentum bins in GeV.
+        df (pandas.DataFrame): The DataFrame to add bins columns to.
+        p_bins (:func:`numpy.array`): The edges of the momentum bins in GeV.
             Defaults to P_BINS, [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.5] GeV.
-        theta_bins (np.array): The edges of the theta bins in radians.
+        theta_bins (:func:`numpy.array`): The edges of the theta bins in radians.
             Defaults to THETA_BINS, [17, 28, 40, 60, 77, 96, 115, 133, 150]
             degrees.
     """
@@ -332,7 +332,7 @@ def make_lrs(df, column=_column):
     given DataFrame.
 
     Args:
-        df (pd.DataFrame): DataFrame to which the columns will be added.
+        df (pandas.DataFrame): DataFrame to which the columns will be added.
         column: A function which given the particle and
             detector names returns the corresponding detector log-likelihood
             column name. Defaults to _column, which gives column names of the
@@ -358,7 +358,7 @@ def make_binary_lrs(df, column=_column):
     particle type hypotheses in the given DataFrame.
 
     Args:
-        df (pd.DataFrame): DataFrame to which the columns will be added.
+        df (pandas.DataFrame): DataFrame to which the columns will be added.
         column: A function which given the particle and
             detector names returns the corresponding detector log-likelihood
             column name. Defaults to _column, which gives column names of the
@@ -384,7 +384,7 @@ def make_pid(df):
     predicted particle type. Requires likelihood ratio columns to exist.
 
     Args:
-        df (pd.DataFrame): DataFrame to which the 'pid' column will be added.
+        df (pandas.DataFrame): DataFrame to which the 'pid' column will be added.
     """
     lrs = np.stack([df[f"lr_{p}"].values for p in PARTICLES], axis=-1)
     pids = np.argmax(lrs, axis=-1)
@@ -395,7 +395,7 @@ def compute_det_lrs(d, det, column=_column):
     """Computes single-detector likelihood ratios from the given DataFrame.
 
     Args:
-        d (pd.DataFrame): DataFrame containing the detector log-likelihoods.
+        d (pandas.DataFrame): DataFrame containing the detector log-likelihoods.
         det (str): The name of the detector for which the single-detector
             likelihood ratios will be calculated.
         column: A function which given the particle and
@@ -404,7 +404,7 @@ def compute_det_lrs(d, det, column=_column):
             format f"{detector}_{particle}".
 
     Returns:
-        np.array: The detector likelihood ratios.
+        :func:`numpy.array`: The detector likelihood ratios.
     """
     h_logls = d[[column(p, det) for p in PARTICLES]].values
     lrs = softmax(h_logls)
@@ -415,7 +415,7 @@ def make_pid_det(df, column=_column):
     """Makes single-detector PID columns for each of the detectors in the given DataFrame.
 
     Args:
-        df (pd.DataFrame): DataFrame to which the columns will be added.
+        df (pandas.DataFrame): DataFrame to which the columns will be added.
         column: A function which given the particle and
             detector names returns the corresponding detector log-likelihood
             column name. Defaults to _column, which gives column names of the
@@ -433,7 +433,7 @@ def compute_abl_lrs(d, det, column=_column):
     """Computes ablation likelihood ratios from the given DataFrame.
 
     Args:
-        d (pd.DataFrame): DataFrame containing the detector log-likelihoods.
+        d (pandas.DataFrame): DataFrame containing the detector log-likelihoods.
         det (str): The name of the detector to be omitted for the ablation.
         column: A function which given the particle and
             detector names returns the corresponding detector log-likelihood
@@ -441,7 +441,7 @@ def compute_abl_lrs(d, det, column=_column):
             format f"{detector}_{particle}".
 
     Returns:
-        np.array: The ablation likelihood ratios.
+        :func:`numpy.array`: The ablation likelihood ratios.
     """
 
     def _cols(p):
@@ -458,7 +458,7 @@ def make_pid_abl(df, column=_column):
     DataFrame.
 
     Args:
-        df (pd.DataFrame): DataFrame to which the columns will be added.
+        df (pandas.DataFrame): DataFrame to which the columns will be added.
         column: A function which given the particle and
             detector names returns the corresponding detector log-likelihood
             column name. Defaults to _column, which gives column names of the
@@ -474,13 +474,13 @@ def compute_contrib(d, corr=True):
     """Computes the detector contributions.
 
     Args:
-        d (pd.DataFrame): DataFrame containing the likelihood ratio data.
+        d (pandas.DataFrame): DataFrame containing the likelihood ratio data.
         corr (bool): Whether to compute contribution to the likelihood
             ratio of the _correct_ hypothesis (True) or the _chosen_ hypothesis
             (False). Defaults to True.
 
     Returns:
-        dict[str,np.array]: The contributions of each detector.
+        dict[str, :func:`numpy.array`]: The contributions of each detector.
     """
     out = dict()
     for det in DETECTORS:
@@ -498,7 +498,7 @@ def make_contrib(df, corr=True):
     """Makes columns for the detector contributions in the given DataFrame.
 
     Args:
-        df (pd.DataFrame): DataFrame to which the columns will be added.
+        df (pandas.DataFrame): DataFrame to which the columns will be added.
         corr (bool): Whether to compute contribution to the likelihood
             ratio of the _correct_ hypothesis (True) or the _chosen_ hypothesis
             (False). Defaults to True.
@@ -518,10 +518,10 @@ def make_columns(
     """Makes all the additional columns for a given DataFrame.
 
     Args:
-        df (pd.DataFrame): DataFrame to which the columns will be added.
-        p_bins (np.array): The edges of the momentum bins in GeV.
+        df (pandas.DataFrame): DataFrame to which the columns will be added.
+        p_bins (:func:`numpy.array`): The edges of the momentum bins in GeV.
             Defaults to P_BINS, [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.5] GeV.
-        theta_bins (np.array): The edges of the theta bins in radians.
+        theta_bins (:func:`numpy.array`): The edges of the theta bins in radians.
             Defaults to THETA_BINS, [17, 28, 40, 60, 77, 96, 115, 133, 150]
             degrees.
         contrib_corr (bool): Whether to compute contribution to the
@@ -546,14 +546,14 @@ def apply_weights(df, weights, p_bins=P_BINS, theta_bins=THETA_BINS, column=_col
     """Applies the given weights to the log-likelihood data in the DataFrame.
 
     Args:
-        df (pd.DataFrame): DataFrame to which the weights are applied.
-        weights (dict[tuple(int),np.array] or np.array): The calibration weight
+        df (pandas.DataFrame): DataFrame to which the weights are applied.
+        weights (dict[tuple(int), :func:`numpy.array`] or :func:`numpy.array`): The calibration weight
             values. If a dict, keys should be a tuple of ints, and each value is
             the six-by-six array of weights for the bin. If a single np.array,
             should be a six-by-six array of weights to be applied globally.
-        p_bins (np.array): The edges of the momentum bins in GeV.
+        p_bins (:func:`numpy.array`): The edges of the momentum bins in GeV.
             Defaults to P_BINS, [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.5] GeV.
-        theta_bins (np.array): The edges of the theta bins in radians.
+        theta_bins (:func:`numpy.array`): The edges of the theta bins in radians.
             Defaults to THETA_BINS, [17, 28, 40, 60, 77, 96, 115, 133, 150]
             degrees.
         column: A function which given the particle and
@@ -591,7 +591,7 @@ def cut_particles(df, allowed_particles, column=_column):
     """Cuts the log-likelihood data associated with given particle types.
 
     Args:
-        df (pd.DataFrame): DataFrame to which the cuts will be applied.
+        df (pandas.DataFrame): DataFrame to which the cuts will be applied.
         allowed_particles (list(str)): List of allowed particle types. Any
             particle types not present will be cut, unless the list is empty (in
             which case no cuts are applied).
@@ -616,7 +616,7 @@ def read_h5(filename):
         filename (str): Input filename.
 
     Returns:
-        pd.DataFrame: DataFrame containing data.
+        pandas.DataFrame: DataFrame containing data.
     """
     df = pd.DataFrame()
     with h5py.File(filename, "r") as f:
@@ -636,7 +636,7 @@ def read_npz(filename):
         filename (str): Input filename.
 
     Returns:
-        pd.DataFrame: DataFrame containing data.
+        pandas.DataFrame: DataFrame containing data.
     """
     data = np.load(filename)
     df = pd.DataFrame(
@@ -668,22 +668,22 @@ def produce_analysis_df(
     adding additional columns, cutting NaNs, and more.
 
     Args:
-        df (pd.DataFrame): DataFrame to prepare for analysis.
+        df (pandas.DataFrame): DataFrame to prepare for analysis.
         compute_cols (bool): Whether to compute and add additional
             columns. Defaults to True.
         drop_nans (bool): Whether to drop rows that contain NaNs.
             Defaults to True.
         drop_outside_bins (bool): Whether to drop rows for particles
             outside of the momentum and theta bins. Defaults to True.
-        weights (np.array): Calibration weights to be applied to the
+        weights (:func:`numpy.array`): Calibration weights to be applied to the
             detector log-likelihoods. Defaults to None.
         allowed_particles (list(str)): If not empty, specifies the
             allowed particle types. Any not allowed particle types will be
             excluded from the PID calculations. If empty, all particle types are
             considered.  Defaults to [].
-        p_bins (np.array): The edges of the momentum bins in GeV.
+        p_bins (:func:`numpy.array`): The edges of the momentum bins in GeV.
             Defaults to P_BINS, [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.5] GeV.
-        theta_bins (np.array): The edges of the theta bins in radians.
+        theta_bins (:func:`numpy.array`): The edges of the theta bins in radians.
             Defaults to THETA_BINS, [17, 28, 40, 60, 77, 96, 115, 133, 150]
             degrees.
         column: A function which given the particle and
@@ -692,7 +692,7 @@ def produce_analysis_df(
             format f"{detector}_{particle}".
 
     Returns:
-        pd.DataFrame: Return the prepared DataFrame. (Not all modifications in
+        pandas.DataFrame: Return the prepared DataFrame. (Not all modifications in
             this method are in-place.)
     """
     if column is not None:

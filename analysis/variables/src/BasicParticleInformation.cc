@@ -13,6 +13,7 @@
 #include <analysis/VariableManager/Manager.h>
 
 #include <analysis/dataobjects/Particle.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 namespace Belle2 {
   namespace Variable {
@@ -65,7 +66,11 @@ namespace Belle2 {
 
     int particleNDaughters(const Particle* part)
     {
-      return part->getNDaughters();
+      if (part->getParticleSource() == Particle::EParticleSourceObject::c_MCParticle) {
+        const MCParticle* mcparticle = part->getMCParticle();
+        return mcparticle->getNDaughters();
+      } else
+        return part->getNDaughters();
     }
 
     int particleFlavorType(const Particle* part)

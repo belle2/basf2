@@ -14,8 +14,8 @@
 
 using namespace Belle2;
 
-const TrackFitResult* Track::getTrackFitResult(const Const::ChargedStable& chargedStable,
-                                               const std::string trackFitResultsName) const
+const TrackFitResult* Track::getTrackFitResultByName(const Const::ChargedStable& chargedStable,
+                                                     const std::string trackFitResultsName) const
 {
   const auto trackFitResultArrayIndex = m_trackFitIndices[chargedStable.getIndex()];
   if (trackFitResultArrayIndex < 0) {
@@ -27,13 +27,19 @@ const TrackFitResult* Track::getTrackFitResult(const Const::ChargedStable& charg
   return trackFitResults[trackFitResultArrayIndex];
 }
 
+const TrackFitResult* Track::getTrackFitResult(const Const::ChargedStable& chargedStable) const
+{
+  return getTrackFitResultByName(chargedStable, "");
+}
+
+
 unsigned int Track::getNumberOfFittedHypotheses() const
 {
   return getValidIndices().size();
 }
 
 
-std::vector<Track::ChargedStableTrackFitResultPair> Track::getTrackFitResults(const std::string trackFitResultsName) const
+std::vector<Track::ChargedStableTrackFitResultPair> Track::getTrackFitResultsByName(const std::string trackFitResultsName) const
 {
   StoreArray<TrackFitResult> trackFitResults(trackFitResultsName);
   std::vector<Track::ChargedStableTrackFitResultPair> result;
@@ -51,6 +57,11 @@ std::vector<Track::ChargedStableTrackFitResultPair> Track::getTrackFitResults(co
   return result;
 }
 
+std::vector<Track::ChargedStableTrackFitResultPair> Track::getTrackFitResults() const
+{
+  return getTrackFitResultsByName("");
+}
+
 std::vector < short int> Track::getValidIndices() const
 {
   std::vector <short int> resultParticleIndex;
@@ -66,7 +77,7 @@ std::vector < short int> Track::getValidIndices() const
   return resultParticleIndex;
 }
 
-const TrackFitResult* Track::getTrackFitResultWithClosestMass(const Const::ChargedStable& requestedType,
+const TrackFitResult* Track::getTrackFitResultWithClosestMassByName(const Const::ChargedStable& requestedType,
     const std::string trackFitResultsName) const
 {
   // make sure at least one hypothesis exist. No B2 Track should exist which does not have at least
@@ -74,7 +85,7 @@ const TrackFitResult* Track::getTrackFitResultWithClosestMass(const Const::Charg
   B2ASSERT("Belle2::Track must always have at least one successfully fitted hypothesis.", getNumberOfFittedHypotheses() > 0);
 
   // find fitted hypothesis which is closest to the mass of our requested particle type
-  auto allFitRes = getTrackFitResults(trackFitResultsName);
+  auto allFitRes = getTrackFitResultsByName(trackFitResultsName);
 
   // sort so the closest mass hypothesis fit in the first entry of the vector
   auto bestMassFit = std::min_element(allFitRes.begin(), allFitRes.end(), [requestedType](auto & a, auto & b) {
@@ -88,6 +99,11 @@ const TrackFitResult* Track::getTrackFitResultWithClosestMass(const Const::Charg
     return nullptr;
   }
   return bestMassFit->second;
+}
+
+const TrackFitResult* Track::getTrackFitResultWithClosestMass(const Const::ChargedStable& requestedType) const
+{
+  return getTrackFitResultWithClosestMassByName(requestedType, "");
 }
 
 std::string Track::getInfoHTML() const

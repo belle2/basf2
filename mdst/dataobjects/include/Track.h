@@ -46,7 +46,7 @@ namespace Belle2 {
       std::fill(m_trackFitIndices, m_trackFitIndices + Const::chargedStableSet.size(), -1);
     }
 
-    /** Access to TrackFitResults.
+    /** Access to TrackFitResults with a specified Name
      *
      * This tries to return the TrackFitResult for the requested track hypothesis. If the requested track hypothesis is
      * not available, we return a nullptr.
@@ -54,13 +54,50 @@ namespace Belle2 {
      * TODO: Do something special if we did not even try to fit!
      *
      *  @param chargedStable   Determines the particle for which you want to get the best available fit hypothesis.
-     *  @param trackFitResultsName  The storeArray to get the TrackFitResults from
+     *  @param trackFitResultsName   The name of the storeArray to get the TrackFitResults from
      *  @return TrackFitResult for fit with particle hypothesis given by ParticleCode or a nullptr, if no result is
      *          available.
      *  @sa TrackFitResult
      */
-    const TrackFitResult* getTrackFitResult(const Const::ChargedStable& chargedStable,
-                                            const std::string trackFitResultsName = "TrackFitResults") const;
+    const TrackFitResult* getTrackFitResultByName(const Const::ChargedStable& chargedStable,
+                                                  const std::string trackFitResultsName) const;
+
+    /** Default Access to TrackFitResults.
+     *
+     * This tries to return the TrackFitResult for the requested track hypothesis. If the requested track hypothesis is
+     * not available, we return a nullptr.
+     *
+     * TODO: Do something special if we did not even try to fit!
+     *
+     *  @param chargedStable   Determines the particle for which you want to get the best available fit hypothesis.
+     *  @return TrackFitResult for fit with particle hypothesis given by ParticleCode or a nullptr, if no result is
+     *          available.
+     *  @sa TrackFitResult
+     */
+    const TrackFitResult* getTrackFitResult(const Const::ChargedStable& chargedStable) const;
+
+
+    /** Return the track fit (from TrackFitResult with specified name) for a fit hypothesis with the closest mass
+     *
+     * Multiple particle hypothesis are used for fitting during the reconstruction and stored with
+     * this Track class. Not all hypothesis are available for all tracks because either a specific hypothesis
+     * was not fitted or because the fit failed.
+     * This method returns the track fit result of a successful fit with the hypothesis of a mass closest
+     * to the requested particle type. If the requested type's hypothesis is available it will be returned
+     * otherwise the next closest hypothesis in terms of the absolute mass difference will be returned.
+     *
+     * For example, if a pion is requested (mass 140 MeV) and only a muon fit (mass 106 MeV) and an
+     * electron fit (mass 511 kEV) is available, the muon fit result will be returned.
+     * So this method is guaranteed to always return a TrackFitResult (opposite to getTrackFitResult()
+     * which can return nullptr if the requested Particle type was not fitted).
+     *
+     * @param requestedType The particle type for which the fit result should be returned.
+     * @param trackFitResultsName  The name of the storeArray to get the TrackFitResults from
+     * @return a pointer to the TrackFitResult object. Use TrackFitResult::getParticleType()
+     *         to check which fitting hypothesis was actually used for this result.
+     */
+    const TrackFitResult* getTrackFitResultWithClosestMassByName(const Const::ChargedStable& requestedType,
+        const std::string trackFitResultsName) const;
 
     /** Return the track fit for a fit hypothesis with the closest mass
      *
@@ -77,20 +114,25 @@ namespace Belle2 {
      * which can return nullptr if the requested Particle type was not fitted).
      *
      * @param requestedType The particle type for which the fit result should be returned.
-     * @param trackFitResultsName   The storeArray to save the TrackFitResults
      * @return a pointer to the TrackFitResult object. Use TrackFitResult::getParticleType()
      *         to check which fitting hypothesis was actually used for this result.
      */
-    const TrackFitResult* getTrackFitResultWithClosestMass(const Const::ChargedStable& requestedType,
-                                                           const std::string trackFitResultsName = "TrackFitResults") const;
+    const TrackFitResult* getTrackFitResultWithClosestMass(const Const::ChargedStable& requestedType) const;
 
-    /** Access to all track fit results at the same time
+    /** Access to all track fit results at the same time (from TrackFitResult with specified name)
      *
-     * @param trackFitResultsName   The storeArray to save the TrackFitResults
+     * @param trackFitResultsName   The name of the storeArray to get the TrackFitResults from
      * Returns a vector of pair of all track fit results which have been set and the respective particle
      * hypothesis they have been fitted with.
      */
-    std::vector<ChargedStableTrackFitResultPair> getTrackFitResults(const std::string trackFitResultsName = "TrackFitResults") const;
+    std::vector<ChargedStableTrackFitResultPair> getTrackFitResultsByName(const std::string trackFitResultsName) const;
+
+    /** Deafult Access to all track fit results at the same time
+        *
+        * Returns a vector of pair of all track fit results which have been set and the respective particle
+        * hypothesis they have been fitted with.
+        */
+    std::vector<ChargedStableTrackFitResultPair> getTrackFitResults() const;
 
     /** Add Track Refining Status Bit
      * @param bitmask to be added to the m_statusBitmap

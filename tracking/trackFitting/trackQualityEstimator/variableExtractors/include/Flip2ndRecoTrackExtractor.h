@@ -80,7 +80,7 @@ namespace Belle2 {
         if (RecoTrack_flipped) {
           Track* b2track_flipped = RecoTrack_flipped->getRelatedFrom<Track>("Tracks_flipped");
           if (b2track_flipped) {
-            auto fitTrack_flipped = b2track_flipped->getTrackFitResultWithClosestMass(Const::pion, "TrackFitResults_flipped");
+            auto fitTrack_flipped = b2track_flipped->getTrackFitResultWithClosestMassByName(Const::pion, "TrackFitResults_flipped");
             if (trackFitResult && fitTrack_flipped) {
               auto cov6 = trackFitResult->getCovariance6();
               auto mom = trackFitResult->getMomentum();

@@ -59,7 +59,8 @@ void FlippedRecoTracksMergerModule::event()
     // get the tracksflipped
     Track* trackFlipped = RecoTrackflipped->getRelatedFrom<Belle2::Track>("Tracks_flipped");
     if (!trackFlipped) continue;
-    std::vector<Track::ChargedStableTrackFitResultPair> fitResultsAfter = trackFlipped->getTrackFitResults("TrackFitResults_flipped");
+    std::vector<Track::ChargedStableTrackFitResultPair> fitResultsAfter =
+      trackFlipped->getTrackFitResultsByName("TrackFitResults_flipped");
     std::vector<Track::ChargedStableTrackFitResultPair> fitResultsBefore = track->getTrackFitResults();
 
     //set the c_isFlippedAndRefitted bit

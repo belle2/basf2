@@ -78,7 +78,7 @@ void FlippedRecoTracksMergerModule::event()
 
       }
       if (not updatedFitResult) {
-        fitResultsBefore[index].second->maskThisFitResult();
+        fitResultsBefore[index].second->mask();
         track->setTrackFitResultIndex(fitResultsBefore[index].first, -1);
       }
     }

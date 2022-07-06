@@ -90,11 +90,14 @@ namespace Belle2 {
                    const uint32_t hitPatternVXDInitializer,
                    const uint16_t NDF
                   );
-    /** update the TrackFitResults */
+    /** update the TrackFitResults
+    * @param input the TrackFitResult that will be
+    * copied into this TrackFitResult
+    */
     void updateTrackFitResult(const TrackFitResult& input);
 
-    /** mask this FitResults by setting the pValue to nan*/
-    void maskThisFitResult() {m_pValue = NAN;}
+    /** mask this TrackFitResults by setting the pValue to nan*/
+    void mask() {m_pValue = NAN;}
 
     /** Getter for vector of position at closest approach of track in r/phi projection. */
     TVector3 getPosition() const { return getHelix().getPerigee(); }

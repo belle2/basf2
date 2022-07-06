@@ -54,7 +54,7 @@ namespace Belle2 {
      * TODO: Do something special if we did not even try to fit!
      *
      *  @param chargedStable   Determines the particle for which you want to get the best available fit hypothesis.
-     *  @param trackFitResultsName   The storeArray to save the TrackFitResults
+     *  @param trackFitResultsName  The storeArray to get the TrackFitResults from
      *  @return TrackFitResult for fit with particle hypothesis given by ParticleCode or a nullptr, if no result is
      *          available.
      *  @sa TrackFitResult
@@ -95,12 +95,12 @@ namespace Belle2 {
     /** Add Track Refining Status Bit
      * @param bitmask to be added to the m_statusBitmap
      */
-    void addStatusBit(unsigned short int bitmask) { m_statusBitmap |= bitmask; }
+    void addStatusBits(unsigned short int bitmask) { m_statusBitmap |= bitmask; }
 
-    /**Set the Track status after the Refining step
-     * based on the 2 flipping QIs
+    /**Set the Track status bit when the track
+     * has been flipped and refitted in the refining step
      */
-    void setFlippedAndRefitted() { addStatusBit(c_isFlippedAndRefitted); }
+    void setFlippedAndRefitted() { addStatusBits(c_isFlippedAndRefitted); }
 
     /** Get Track Status after Refining
      * @param bitmask
@@ -109,14 +109,14 @@ namespace Belle2 {
     bool getStatusBit(unsigned short int bitmask) const { return (m_statusBitmap & bitmask) == bitmask; }
 
     /** Check the Track status after the Refining step
-     * @return 1 if the track was flipped and refitted in the refining step
+     * @return true if the track was flipped and refitted in the refining step
      */
     bool isFlippedAndRefitted() const { return getStatusBit(c_isFlippedAndRefitted); }
 
     /** Check whether Track was modified in the Refining step
-     * @return 1 if the track was modified in the refining step
+     * @return true if the track was modified in the refining step
      */
-    bool wasTrackModified() { return m_statusBitmap > 0; }
+    bool wasRefined() { return m_statusBitmap > 0; }
 
     /** Set an index (for positive values) or unavailability-code (index = -1) for a specific mass hypothesis.
       *
@@ -194,6 +194,6 @@ namespace Belle2 {
     /** Track time, computed as the difference between the average of SVD clusters time and the SVDEvent T0 */
     float m_trackTime = std::numeric_limits<float>::quiet_NaN();
 
-    ClassDefOverride(Track, 5); /**< Class that bundles various TrackFitResults. */
+    ClassDefOverride(Track, 6); /**< Class that bundles various TrackFitResults. */
   };
 }

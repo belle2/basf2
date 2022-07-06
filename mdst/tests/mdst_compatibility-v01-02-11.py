@@ -28,6 +28,9 @@ CHANGES since release-01-02-11:
   + getTrackTime added
   + wasRefined
   + isFlippedAndRefitted
+  + getTrackFitResultByName
+  + getTrackFitResultsByName
+  + getTrackFitResultWithClosestMassByName
 - TrackFitResult:
   + ndf
   + chi2

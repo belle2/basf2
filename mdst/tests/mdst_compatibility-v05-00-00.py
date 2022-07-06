@@ -40,6 +40,9 @@ CHANGES since release-05-00-00:
   + getTrackTime added
   + wasRefined
   + isFlippedAndRefitted
+  + getTrackFitResultByName
+  + getTrackFitResultsByName
+  + getTrackFitResultWithClosestMassByName
 """
 
 from basf2 import create_path, process, set_random_seed, find_file

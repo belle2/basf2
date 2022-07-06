@@ -19,7 +19,10 @@ Untested method EventMetaData::setTime
 Untested method Track::addStatusBits
 Untested method Track::getInfoHTML
 Untested method Track::getStatusBit
+Untested method Track::getTrackFitResultByName
+Untested method Track::getTrackFitResultWithClosestMassByName
 Untested method Track::getTrackFitResults
+Untested method Track::getTrackFitResultsByName
 Untested method Track::setFlippedAndRefitted
 Untested method Track::setTrackFitResultIndex
 Untested method Track::setTrackTime

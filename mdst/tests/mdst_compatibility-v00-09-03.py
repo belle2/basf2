@@ -26,9 +26,12 @@ CHANGES since release-00-09-03:
   * getTrackFitResult behavior changed for non-pion tracks
   + getQualityIndicator
   + statusBitmap and getStatusBit
-  + getTrackTime added
+  + getTrackTime
   + wasRefined
   + isFlippedAndRefitted
+  + getTrackFitResultByName
+  + getTrackFitResultsByName
+  + getTrackFitResultWithClosestMassByName
 - TrackFitResult:
   + ndf
   + chi2

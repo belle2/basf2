@@ -20,6 +20,9 @@ CHANGES since release-06-00-00:
   + getTrackTime added
   + wasRefined
   + isFlippedAndRefitted
+  + getTrackFitResultByName
+  + getTrackFitResultsByName
+  + getTrackFitResultWithClosestMassByName
 - TrackFitResult:
   + remove the const classifier of TrackFitResults and add a function to update the contents
   + updateTrackFitResult

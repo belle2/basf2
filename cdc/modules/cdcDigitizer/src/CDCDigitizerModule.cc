@@ -267,12 +267,10 @@ void CDCDigitizerModule::initialize()
     }
   }
 
-  //  m_corrToThresholdFromDB = new DBObjPtr<CDCCorrToThresholds>;
-  m_corrToThresholdFromDB = new OptionalDBObjPtr<CDCCorrToThresholds>;
+  m_corrToThresholdFromDB = new DBObjPtr<CDCCorrToThresholds>;
   if ((*m_corrToThresholdFromDB).isValid()) {
   } else {
-    //    B2FATAL("CDCCorrToThresholds invalid!");
-    B2INFO("CDCCorrToThresholds invalid!");
+    B2FATAL("CDCCorrToThresholds invalid!");
   }
 
 #if defined(CDC_DEBUG)
@@ -520,8 +518,7 @@ void CDCDigitizerModule::event()
       dEThreshold = (m_wireID.getISuperLayer() == 0) ? m_tdcThreshold4Inner : m_tdcThreshold4Outer;
       dEThreshold *= Unit::eV;
     }
-    //    dEThreshold *= (*m_corrToThresholdFromDB)->getParam(m_wireID.getICLayer());
-    dEThreshold *= 1.;
+    dEThreshold *= (*m_corrToThresholdFromDB)->getParam(m_wireID.getICLayer());
     B2DEBUG(m_debugLevel, "hitdE,dEThreshold,driftLength " << hitdE << " " << dEThreshold << " " << hitDriftLength);
 
     if (hitdE < dEThreshold) {

@@ -359,7 +359,11 @@ texinfo_documents = [
 # texinfo_no_detailmenu = False
 
 # allow to have links to python documentation
-intersphinx_mapping = {'python': ('https://docs.python.org/3.6', None)}
+intersphinx_mapping = {'python': ('https://docs.python.org/3.8/', None),
+                       'numpy': ('https://numpy.org/doc/stable/', None),
+                       'scipy': ('https://docs.scipy.org/doc/scipy/', None),
+                       'pandas': ('https://pandas.pydata.org/docs/', None),
+                       'matplotlib': ('https://matplotlib.org/stable/', None)}
 
 
 def process_sig(app, what, name, obj, options, signature, return_annotation):

@@ -25,13 +25,16 @@ CHANGES since release-00-09-03:
 - Track:
   * getTrackFitResult behavior changed for non-pion tracks
   + getQualityIndicator
+  + statusBitmap and getStatusBit
   + getTrackTime added
+  + wasRefined
+  + isFlippedAndRefitted
 - TrackFitResult:
   + ndf
   + chi2
   + remove the const classifier of TrackFitResults and add a function to update the contents
   + updateTrackFitResult
-  + maskThisFitResult
+  + mask
 - TRGSummary:
   + getTimQuality added
   + isPoissonInInjectionVeto()

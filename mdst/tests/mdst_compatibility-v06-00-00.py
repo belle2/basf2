@@ -16,12 +16,14 @@ See https://confluence.desy.de/display/BI/Backward+Compatibility if this test fa
 
 CHANGES since release-06-00-00:
 - Track:
-  + statusBitmap
+  + statusBitmap and getStatusBit
   + getTrackTime added
+  + wasRefined
+  + isFlippedAndRefitted
 - TrackFitResult:
   + remove the const classifier of TrackFitResults and add a function to update the contents
   + updateTrackFitResult
-  + maskThisFitResult
+  + mask
 """
 
 from basf2 import create_path, process, set_random_seed, find_file

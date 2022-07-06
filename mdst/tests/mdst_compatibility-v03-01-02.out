@@ -1,4 +1,4 @@
-[INFO] Steering file: mdst/tests/mdst_compatibility-v03-01-02.py
+[INFO] Steering file: mdst_compatibility-v03-01-02.py
 [INFO] The random number seed is set to "1"
 [INFO] Starting event processing, random seed is set to '1'
 [INFO] Added file ${BELLE2_SOFTWARE_DIR}/mdst/tests/mdst-v03-01-02.root
@@ -15,20 +15,19 @@ Untested method EventMetaData::setProduction
 Untested method EventMetaData::setRun
 Untested method EventMetaData::setSubrun
 Untested method EventMetaData::setTime
-Untested method Track::addStatusBit
+Untested method Track::addStatusBits
 Untested method Track::getInfoHTML
 Untested method Track::getStatusBit
 Untested method Track::getTrackFitResults
 Untested method Track::setFlippedAndRefitted
 Untested method Track::setTrackFitResultIndex
 Untested method Track::setTrackTime
-Untested method Track::wasTrackModified
 Untested method V0::getTrackFitResultIndices
 Untested method V0::getTrackIndices
 Untested method TrackFitResult::getHelix
 Untested method TrackFitResult::getInfoHTML
 Untested method TrackFitResult::getUncertainHelix
-Untested method TrackFitResult::maskThisFitResult
+Untested method TrackFitResult::mask
 Untested method TrackFitResult::updateTrackFitResult
 Untested method EventLevelTrackingInfo::getNVXDClustersInLayer
 Untested method EventLevelTrackingInfo::hasCDCSLayer
@@ -190,6 +189,7 @@ Track#0:
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#2
   getTrackTime(): nan
   isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#1:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -213,6 +213,7 @@ Track#1:
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#5
   getTrackTime(): nan
   isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#2:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -238,6 +239,7 @@ Track#2:
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#8
   getTrackTime(): nan
   isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#3:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -263,6 +265,7 @@ Track#3:
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#11
   getTrackTime(): nan
   isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#4:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -288,6 +291,7 @@ Track#4:
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#14
   getTrackTime(): nan
   isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#5:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -313,6 +317,7 @@ Track#5:
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#17
   getTrackTime(): nan
   isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#6:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -339,6 +344,7 @@ Track#6:
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#20
   getTrackTime(): nan
   isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#7:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -364,6 +370,7 @@ Track#7:
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#23
   getTrackTime(): nan
   isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#8:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -389,6 +396,7 @@ Track#8:
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#26
   getTrackTime(): nan
   isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#9:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -415,6 +423,7 @@ Track#9:
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#29
   getTrackTime(): nan
   isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#10:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -440,6 +449,7 @@ Track#10:
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#32
   getTrackTime(): nan
   isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#11:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -465,6 +475,7 @@ Track#11:
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#35
   getTrackTime(): nan
   isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#12:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -488,6 +499,7 @@ Track#12:
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#38
   getTrackTime(): nan
   isFlippedAndRefitted(): False
+  wasRefined(): False
 TrackFitResult#0:
 [INFO] Conditions Database: found working server
 	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
@@ -8621,6 +8633,7 @@ Track#0:
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#2
   getTrackTime(): nan
   isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#1:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -8646,6 +8659,7 @@ Track#1:
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#5
   getTrackTime(): nan
   isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#2:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -8669,6 +8683,7 @@ Track#2:
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#8
   getTrackTime(): nan
   isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#3:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -8695,6 +8710,7 @@ Track#3:
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#11
   getTrackTime(): nan
   isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#4:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -8721,6 +8737,7 @@ Track#4:
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#14
   getTrackTime(): nan
   isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#5:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -8746,6 +8763,7 @@ Track#5:
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#17
   getTrackTime(): nan
   isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#6:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -8771,6 +8789,7 @@ Track#6:
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#20
   getTrackTime(): nan
   isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#7:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -8794,6 +8813,7 @@ Track#7:
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#23
   getTrackTime(): nan
   isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#8:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -8817,6 +8837,7 @@ Track#8:
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#26
   getTrackTime(): nan
   isFlippedAndRefitted(): False
+  wasRefined(): False
 TrackFitResult#0:
   get4Momentum(): (0.0212787,0.158398,-0.0542394,0.219008)
   getChargeSign(): 1
@@ -16355,6 +16376,7 @@ Track#0:
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#2
   getTrackTime(): nan
   isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#1:
   getNumberOfFittedHypotheses(): 2
   getQualityIndicator(): nan
@@ -16378,6 +16400,7 @@ Track#1:
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#4
   getTrackTime(): nan
   isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#2:
   getNumberOfFittedHypotheses(): 2
   getQualityIndicator(): nan
@@ -16401,6 +16424,7 @@ Track#2:
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#6
   getTrackTime(): nan
   isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#3:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -16424,6 +16448,7 @@ Track#3:
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#9
   getTrackTime(): nan
   isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#4:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -16447,6 +16472,7 @@ Track#4:
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#12
   getTrackTime(): nan
   isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#5:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -16471,6 +16497,7 @@ Track#5:
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#15
   getTrackTime(): nan
   isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#6:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -16496,6 +16523,7 @@ Track#6:
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#18
   getTrackTime(): nan
   isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#7:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -16519,6 +16547,7 @@ Track#7:
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#21
   getTrackTime(): nan
   isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#8:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -16542,6 +16571,7 @@ Track#8:
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#24
   getTrackTime(): nan
   isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#9:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -16567,6 +16597,7 @@ Track#9:
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#27
   getTrackTime(): nan
   isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#10:
   getNumberOfFittedHypotheses(): 2
   getQualityIndicator(): nan
@@ -16590,6 +16621,7 @@ Track#10:
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#29
   getTrackTime(): nan
   isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#11:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -16615,6 +16647,7 @@ Track#11:
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#32
   getTrackTime(): nan
   isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#12:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -16640,6 +16673,7 @@ Track#12:
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#35
   getTrackTime(): nan
   isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#13:
   getNumberOfFittedHypotheses(): 2
   getQualityIndicator(): nan
@@ -16663,6 +16697,7 @@ Track#13:
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#37
   getTrackTime(): nan
   isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#14:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -16686,6 +16721,7 @@ Track#14:
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#40
   getTrackTime(): nan
   isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#15:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -16709,6 +16745,7 @@ Track#15:
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#43
   getTrackTime(): nan
   isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#16:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -16732,6 +16769,7 @@ Track#16:
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#46
   getTrackTime(): nan
   isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#17:
   getNumberOfFittedHypotheses(): 3
   getQualityIndicator(): nan
@@ -16755,6 +16793,7 @@ Track#17:
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#49
   getTrackTime(): nan
   isFlippedAndRefitted(): False
+  wasRefined(): False
 Track#18:
   getNumberOfFittedHypotheses(): 2
   getQualityIndicator(): nan
@@ -16778,6 +16817,7 @@ Track#18:
   getTrackFitResultWithClosestMass(<type: deuteron>): -> TrackFitResults#51
   getTrackTime(): nan
   isFlippedAndRefitted(): False
+  wasRefined(): False
 V0#0:
   getRelationsWith(MCParticles): size(0)
   getTrackFitResults(): pair

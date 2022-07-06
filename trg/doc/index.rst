@@ -22,8 +22,8 @@ trigger system. Thus only 1 (fired) or 0 (not fired) could be assigned
 to each trigger bit. Details of the trigger bit definitions could be
 found on `the dedicated Confluence page
 <https://confluence.desy.de/pages/viewpage.action?spaceKey=BI&title=TriggerBitTable>`__
-or `the dedicated Belle II note
-<https://docs.belle2.org/record/2817/files/ver1.pdf>`__.
+or `the dedicated Belle II notes
+<https://docs.belle2.org/search?ln=en&p=%22Trigger+Summary%22&f=&action_search=Search&c=Belle+II+Notes>`__.
 
 There are three kinds of trigger bits: input trigger bits (L1Input),
 output trigger bits (L1FTDL), and prescaled trigger bits (L1PSNM). They

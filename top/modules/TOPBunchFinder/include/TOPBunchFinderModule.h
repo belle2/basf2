@@ -146,6 +146,7 @@ namespace Belle2 {
     unsigned m_success = 0; /**< events with reconstructed bunch */
     int m_nodEdxCount = 0; /**< counter of tracks with no dEdx, reset at each event */
     unsigned short m_revo9Counter = 0xFFFF; /**< number of system clocks since last revo9 marker */
+    bool m_isMC = false; /**< is Monte Carlo */
 
     // collections
     StoreArray<TOPDigit> m_topDigits; /**< collection of TOP digits */

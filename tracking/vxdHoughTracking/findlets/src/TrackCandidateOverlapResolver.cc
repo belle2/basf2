@@ -31,24 +31,24 @@ void TrackCandidateOverlapResolver::exposeParameters(ModuleParamList* modulePara
 {
   Super::exposeParameters(moduleParamList, prefix);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "ResolveMethod"), m_param_resolveMethod,
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "ResolveMethod"), m_resolveMethod,
                                 "Strategy used to resolve overlaps. Currently implemented are \"greedy\" and \"hopfield\".",
-                                m_param_resolveMethod);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "NameSVDClusters"), m_param_nameSVDClusters,
-                                "Name of expected SVDClusters StoreArray.", m_param_nameSVDClusters);
+                                m_resolveMethod);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "NameSVDClusters"), m_nameSVDClusters,
+                                "Name of expected SVDClusters StoreArray.", m_nameSVDClusters);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minActivityState"), m_param_minActivityState,
-                                "Sets the minimal value of activity for acceptance. [0,1]", m_param_minActivityState);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minActivityState"), m_minActivityState,
+                                "Sets the minimal value of activity for acceptance. [0,1]", m_minActivityState);
 }
 
 void TrackCandidateOverlapResolver::initialize()
 {
   Super::initialize();
 
-  m_svdClusters.isRequired(m_param_nameSVDClusters);
+  m_svdClusters.isRequired(m_nameSVDClusters);
 
-  B2ASSERT("ResolveMethod has to be either 'greedy' or 'hopfield'. Selected ResolveMethod: " << m_param_resolveMethod,
-           m_param_resolveMethod == "greedy" || m_param_resolveMethod == "hopfield");
+  B2ASSERT("ResolveMethod has to be either 'greedy' or 'hopfield'. Selected ResolveMethod: " << m_resolveMethod,
+           m_resolveMethod == "greedy" || m_resolveMethod == "hopfield");
 
 }
 
@@ -80,7 +80,7 @@ void TrackCandidateOverlapResolver::apply(std::vector<SpacePointTrackCand>& spac
       if (spacePointPointer->getType() != VXD::SensorInfoBase::SensorType::SVD) continue;
 
       //at the position of the svdCluster Index, the track index is pushed back;
-      RelationVector<SVDCluster> svdClusterRelations = spacePointPointer->getRelationsTo<SVDCluster>(m_param_nameSVDClusters);
+      RelationVector<SVDCluster> svdClusterRelations = spacePointPointer->getRelationsTo<SVDCluster>(m_nameSVDClusters);
       for (SVDCluster const& svdClusterPointer : svdClusterRelations) {
         svdHitRelatedTracks[svdClusterPointer.getArrayIndex()].push_back(iCand);
       }
@@ -106,12 +106,12 @@ void TrackCandidateOverlapResolver::apply(std::vector<SpacePointTrackCand>& spac
       1);
   }
 
-  if (m_param_resolveMethod == "greedy") {
+  if (m_resolveMethod == "greedy") {
     //make a Scrooge and udpate the activity
     Scrooge scrooge;
     scrooge.performSelection(qiTrackOverlap);
 
-  } else if (m_param_resolveMethod == "hopfield") {
+  } else if (m_resolveMethod == "hopfield") {
     //Performs the actual HNN.
     //As the parameter is taken as reference, the values are changed and can be reused below.
     HopfieldNetwork hopfieldNetwork;
@@ -121,8 +121,8 @@ void TrackCandidateOverlapResolver::apply(std::vector<SpacePointTrackCand>& spac
     }
   }
 
-  for (auto && track : qiTrackOverlap) {
-    if (track.activityState < m_param_minActivityState) {
+  for (auto&& track : qiTrackOverlap) {
+    if (track.activityState < m_minActivityState) {
       activeCandidates[track.trackIndex]->removeRefereeStatus(SpacePointTrackCand::c_isActive);
     }
   }

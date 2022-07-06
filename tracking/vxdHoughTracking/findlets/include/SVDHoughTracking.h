@@ -28,18 +28,18 @@ namespace Belle2 {
     class VXDHoughState;
 
     /**
-    * Main Findlet for DATCON.
+    * Main Findlet for the SVDHoughTracking.
     */
-    class VXDHoughTracking : public TrackFindingCDC::Findlet<> {
+    class SVDHoughTracking : public TrackFindingCDC::Findlet<> {
       /// Parent class
       using Super = TrackFindingCDC::Findlet<>;
 
     public:
       /// Constructor for adding the subfindlets
-      VXDHoughTracking();
+      SVDHoughTracking();
 
       /// Default desctructor
-      ~VXDHoughTracking();
+      ~SVDHoughTracking();
 
       /// Expose the parameters of the sub findlets.
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
@@ -92,7 +92,7 @@ namespace Belle2 {
 
       /// Use the elaborate FastInterceptFinder2D with multiple Hough spaces (true)
       /// or the simple one with just one Hough space (false)
-      bool m_param_useMultiHoughSpaceInterceptFinding = false;
+      bool m_useMultiHoughSpaceInterceptFinding = false;
 
     };
 

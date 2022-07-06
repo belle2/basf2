@@ -36,6 +36,7 @@
 #include <cdc/dbobjects/CDCADCDeltaPedestals.h>
 #include <cdc/dbobjects/CDCFEElectronics.h>
 #include <cdc/dbobjects/CDCEDepToADCConversions.h>
+#include <cdc/dbobjects/CDCCorrToThresholds.h>
 #include <cdc/dbobjects/CDCWireHitRequirements.h>
 #include <cdc/dbobjects/CDCCrossTalkLibrary.h>
 #include <cdc/dbobjects/CDClayerTimeCut.h>
@@ -327,6 +328,45 @@ void CDCDatabaseImporter::importPropSpeed(std::string fileName)
                          m_lastExperiment, m_lastRun);
   ps.import(iov);
   B2INFO("PropSpeed table imported to database.");
+}
+
+
+void CDCDatabaseImporter::importCorrToThreshold(std::string fileName)
+{
+  std::ifstream stream;
+  stream.open(fileName.c_str());
+  if (!stream) {
+    B2FATAL("openFile: " << fileName << " *** failed to open");
+    return;
+  }
+  B2INFO(fileName << ": open for reading");
+
+  DBImportObjPtr<CDCCorrToThresholds> cr;
+  cr.construct();
+
+  uint iCL(0), nRead(0);
+  double param(1.);
+
+  while (true) {
+    stream >> iCL >> param;
+    if (stream.eof()) break;
+
+    if (iCL < m_firstLayerOffset) {
+      continue;
+    }
+
+    ++nRead;
+    cr->setParam(iCL, param);
+  }
+  stream.close();
+
+  if (nRead != c_maxNSenseLayers) B2FATAL("#lines read-in (=" << nRead << ") is not equal to #sense layers (=" << c_maxNSenseLayers <<
+                                            ") !");
+
+  IntervalOfValidity iov(m_firstExperiment, m_firstRun,
+                         m_lastExperiment, m_lastRun);
+  cr.import(iov);
+  B2INFO("CorrToThreshold table imported to database.");
 }
 
 

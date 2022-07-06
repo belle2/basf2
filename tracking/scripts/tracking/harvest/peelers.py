@@ -334,6 +334,7 @@ def peel_quality_indicators(reco_track, key="{part_name}"):
 def peel_trackfinder(reco_track, key="{part_name}"):
     used_CDCTrackFinder = False
     used_VXDTrackFinder = False
+    used_SVDHough = False
     used_SVDtoCDCCKF = False
     used_ECLtoCDCCKF = False
     used_CDCtoSVDCKF = False
@@ -344,6 +345,7 @@ def peel_trackfinder(reco_track, key="{part_name}"):
             svd_tf = info.getFoundByTrackFinder()
             used_VXDTrackFinder = svd_tf == Belle2.RecoHitInformation.c_VXDTrackFinder
             used_CDCtoSVDCKF = svd_tf == Belle2.RecoHitInformation.c_CDCtoSVDCKF
+            used_SVDHough = svd_tf == Belle2.RecoHitInformation.c_SVDHough
 
         if reco_track.getNumberOfCDCHits() > 0:
             info = get_reco_hit_information(reco_track, reco_track.getCDCHitList()[0])
@@ -355,6 +357,7 @@ def peel_trackfinder(reco_track, key="{part_name}"):
     crops = dict(
         foundby_CDCTrackFinder=used_CDCTrackFinder,
         foundby_VXDTrackFinder=used_VXDTrackFinder,
+        foundby_SVDHough=used_SVDHough,
         foundby_SVDtoCDCCKF=used_SVDtoCDCCKF,
         foundby_CDCtoSVDCKF=used_CDCtoSVDCKF,
         foundby_ECLtoCDCCKF=used_ECLtoCDCCKF,

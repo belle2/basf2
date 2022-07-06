@@ -92,6 +92,12 @@ namespace Belle2 {
       return (m_calibrations[detector].sigma > 0);
     }
 
+    /**
+     * Is object empty?
+     * @return true if empty
+     */
+    bool isEmpty() const {return m_data.empty();}
+
   private:
 
     /**

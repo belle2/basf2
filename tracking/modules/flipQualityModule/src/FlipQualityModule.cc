@@ -51,19 +51,16 @@ namespace Belle2 {
   void FlipQualityModule::beginRun()
   {
 
+    // Just to be safe we check if the MVA::Expert is loaded
+    if (not m_mvaExpert) {
+      B2FATAL("MVA Expert is not loaded!");
+    }
     m_mvaExpert->beginRun();
 
   }
 
   void FlipQualityModule::event()
   {
-    // Just to be safe we check again if the MVA::Expert is loaded
-    // It can happen that for example the database doesn't find the payload
-    // and the expert ends up uninitialized.
-    if (not m_mvaExpert) {
-      B2ERROR("MVA Expert is not loaded!");
-      return;
-    }
 
     // fill the dataset
     // The order must be the same as the order of the variables in general_options.m_variables

@@ -196,6 +196,10 @@ if __name__ == '__main__':
             This section contains an overview of the importance and correlation of the variables used by the classifiers.
             And distribution plots of the variables on the independent dataset. The distributions are normed for signal and
             background separately, and only the region +- 3 sigma around the mean is shown.
+
+            The importance scores shown are based on calculations of the internal importance of each variable scaled between
+            0 and 100. This means the variable with the lowest internal importance will have score 0, and the variable
+            with the highest internal importance will have score 100.
         """)
 
         table = b2latex.LongTable(r"ll", "Abbreviations of variables", "{name} & {abbr}", r"Variable & Abbreviation")

@@ -257,6 +257,72 @@ namespace Belle2 {
     double eIDBelle(const Particle*);
 
     /**
+     * @return  Weighted LogL(particle's hypothesis) for a particle, using an arbitrary combination of sub-detectors
+     * For expert's use only!!
+     * The first argument should be the db object name of the calibration weight matrix.
+     * The particle hypothesis and the detectors combination to be used for the likelihood calculation are passed as a vector of strings.
+     * The possible options for the detectors are any combination of {TOP, CDC, SVD, ARICH, ECL, KLM} or ALL.
+     * Examples:
+     * pi likelihood using TOP and CDC only =  particleWeightedLogLikelihoodValue(CalibrationWeightMatrix, 211, TOP, CDC);
+     * pi likelihood using all the information =  particleWeightedLogLikelihoodValue(CalibrationWeightMatrix,211, ALL);
+     */
+    Manager::FunctionPtr pidWeightedLogLikelihoodValueExpert(const std::vector<std::string>& arguments);
+
+    /**
+     * @return  weighted posterior probability for a certain mass hypothesis  with respect to an alternative hypothesis. Any set of detectors can be used to calculate the likelihood ratios.
+     * For expert's use only!!
+     * The first argument should be the db object name of the calibration weight matrix.
+     * The particle hypothesis and the detectors combination to be used for the likelihood calculation are passed as a vector of strings.
+     * The possible options for the detectors are any combination of {TOP, CDC, SVD, ARICH, ECL, KLM} or ALL.
+     * Examples:
+     * probability of pi over K, using TOP and CDC only =  particleWeightedPairProbability(CalibrationWeightMatrix, 211, 321, TOP, CDC);
+     * probability of K over pi, using ARICH, TOP, CDC only =  particleWeightedPairProbability(CalibrationWeightMatrix, 321, 211, ARICH, TOP, CDC);
+     */
+    Manager::FunctionPtr pidWeightedPairProbabilityExpert(const std::vector<std::string>& arguments);
+
+    /**
+     * @return  weighted posterior probability for a certain mass hypothesis  with respect to an alternative hypothesis. Any set of detectors can be used to calculate the likelihood ratios.
+     * For expert's use only!!
+     * The first argument should be the db object name of the calibration weight matrix.
+     * The particle hypothesis and the detectors combination to be used for the likelihood calculation are passed as a vector of strings.
+     * The possible options for the detectors are any combination of {TOP, CDC, SVD, ARICH, ECL, KLM} or ALL.
+     * Examples:
+     * probability of pi over K, using TOP and CDC only =  particleWeightedPairProbability(CalibrationWeightMatrix, 211, 321, TOP, CDC);
+     * probability of K over pi, using ARICH, TOP, CDC only =  particleWeightedPairProbability(CalibrationWeightMatrix, 321, 211, ARICH, TOP, CDC);
+     */
+    Manager::FunctionPtr pidWeightedPairProbabilityExpert(const std::vector<std::string>& arguments);
+
+    /**
+     * @return weighted electron ID to be used in the physics analyses
+     */
+    Manager::FunctionPtr weightedElectronID(const std::vector<std::string>& arguments);
+
+    /**
+     * @return weighted muon ID to be used in the physics analyses
+     */
+    Manager::FunctionPtr weightedMuonID(const std::vector<std::string>& arguments);
+
+    /**
+     * @return weighted pion ID to be used in the physics analyses
+     */
+    Manager::FunctionPtr weightedPionID(const std::vector<std::string>& arguments);
+
+    /**
+     * @return weighted kaon ID to be used in the physics analyses
+     */
+    Manager::FunctionPtr weightedKaonID(const std::vector<std::string>& arguments);
+
+    /**
+     * @return weighted proton ID to be used in the physics analyses
+     */
+    Manager::FunctionPtr weightedProtonID(const std::vector<std::string>& arguments);
+
+    /**
+     * @return weighted deuteron ID to be used in the physics analyses
+     */
+    Manager::FunctionPtr weightedDeuteronID(const std::vector<std::string>& arguments);
+
+    /**
      * Parses the detector list for the PID metafunctions.
      **/
     Const::PIDDetectorSet parseDetectors(const std::vector<std::string>& arguments);

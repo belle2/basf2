@@ -208,7 +208,7 @@ class Plotter(object):
             # TODO: remove in release 8.
             if not isinstance(xerr, (numpy.ndarray, list)):
                 xerr = xerr*numpy.ones(len(x))
-            mask = numpy.prod([numpy.isfinite(v) for v in [x, y, xerr, yerr]], axis=0)
+            mask = numpy.logical_and.reduce([numpy.isfinite(v) for v in [x, y, xerr, yerr]])
 
             e = axis.errorbar(x[mask], y[mask], xerr=xerr[mask], yerr=yerr[mask], rasterized=True, **errorbar_kwargs)
             patches.append(e)

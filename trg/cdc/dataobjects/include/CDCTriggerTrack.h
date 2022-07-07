@@ -168,7 +168,7 @@ namespace Belle2 {
     int getRawOmega() const {return m_rawomega;}
     int getRawZ() const {return m_rawz;}
     int getRawTheta() const {return m_rawtheta;}
-    std::vector<int> getRawInput const {return m_rawinput;}
+    std::vector<int> getRawInput() const {return m_rawinput;}
 
   protected:
     float m_chi2D;

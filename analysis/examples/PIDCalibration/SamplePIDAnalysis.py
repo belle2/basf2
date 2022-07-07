@@ -15,6 +15,7 @@
 # PrepPIDTrainingSample.py and training a set of weights.                #
 ##########################################################################
 
+import basf2 as b2
 import pidDataUtils as pdu
 import numpy as np
 
@@ -53,3 +54,26 @@ for label in [2, 3]:
 # There is also an external package, 'pidplots', that interfaces with these
 # DataFrames and provides many methods for quickly making plots of the PID
 # performance.
+
+
+matrixName = "PIDCalibrationWeight_Example"
+weightMatrix = weights.tolist()
+
+addmatrix = b2.register_module('PIDCalibrationWeightCreator')
+addmatrix.param('matrixName', matrixName)
+addmatrix.param('weightMatrix', weightMatrix)
+addmatrix.param('experimentHigh', -1)
+addmatrix.param('experimentLow', 0)
+addmatrix.param('runHigh', -1)
+addmatrix.param('runLow', 0)
+
+eventinfosetter = b2.register_module('EventInfoSetter')
+eventinfosetter.param('evtNumList', [10])
+eventinfosetter.param('runList', [0])
+eventinfosetter.param('expList', [0])
+
+my_path = b2.create_path()
+my_path.add_module(addmatrix)
+my_path.add_module(eventinfosetter)
+
+b2.process(my_path)

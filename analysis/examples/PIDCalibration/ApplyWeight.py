@@ -8,6 +8,11 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
+##########################################################################
+# This tutorial shows how to use the weighted PID variables with the     #
+# dataobject created by SamplePIDAnalysis.py                             #
+##########################################################################
+
 import basf2 as b2
 import modularAnalysis as ma
 

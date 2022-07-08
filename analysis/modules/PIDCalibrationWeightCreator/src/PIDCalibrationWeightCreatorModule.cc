@@ -14,8 +14,6 @@
 #include <framework/database/DBImportObjPtr.h>
 #include <framework/logging/Logger.h>
 
-
-using namespace std;
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -33,9 +31,7 @@ PIDCalibrationWeightCreatorModule::PIDCalibrationWeightCreatorModule() : Module(
 {
   setDescription("Creates the calibration weight matrix");
   addParam("matrixName", m_matrixName, "Name of the WeightMatrix");
-
   addParam("weightMatrix", m_weightMatrix, "6x6 WeightMatrix");
-
   addParam("experimentLow", m_experimentLow, "Interval of validity, ex.low");
   addParam("experimentHigh", m_experimentHigh, "Interval of validity, ex.high");
   addParam("runLow", m_runLow, "Interval of validity, run low");

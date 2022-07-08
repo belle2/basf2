@@ -18,7 +18,7 @@
 #include <framework/gearbox/Const.h>
 
 // database
-#include <framework/database/DBObjPtr.h>
+//#include <framework/database/DBObjPtr.h>
 #include <analysis/dbobjects/PIDCalibrationWeight.h>
 #include <analysis/utility/PIDCalibrationWeightUtil.h>
 

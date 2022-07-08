@@ -14,8 +14,6 @@
 #include <boost/algorithm/string.hpp>
 
 #include <TObject.h>
-#include <limits>
-#include <map>
 
 namespace Belle2 {
 

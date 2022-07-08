@@ -10,7 +10,6 @@
 
 #include <framework/core/Module.h>
 #include <analysis/dbobjects/PIDCalibrationWeight.h>
-#include <string>
 
 namespace Belle2 {
 

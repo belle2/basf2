@@ -13,6 +13,10 @@
 # PID calibration weights. Only the computation of overall accuracy and  #
 # the pi and K efficiencies is shown. This is intended to be used after  #
 # PrepPIDTrainingSample.py and training a set of weights.                #
+#                                                                        #
+# Also this tutorial shows how to create the PIDCalibrationWeight with   #
+# PIDCalibrationWeightCreator module from the weights created by the     #
+# tutorial.                                                              #
 ##########################################################################
 
 import basf2 as b2
@@ -56,8 +60,11 @@ for label in [2, 3]:
 # performance.
 
 
+# create path to create the data object
+my_path = b2.create_path()
+
 matrixName = "PIDCalibrationWeight_Example"
-weightMatrix = weights.tolist()
+weightMatrix = weights.tolist()  # convert np.ndarray to list(list)
 
 addmatrix = b2.register_module('PIDCalibrationWeightCreator')
 addmatrix.param('matrixName', matrixName)
@@ -72,7 +79,6 @@ eventinfosetter.param('evtNumList', [10])
 eventinfosetter.param('runList', [0])
 eventinfosetter.param('expList', [0])
 
-my_path = b2.create_path()
 my_path.add_module(addmatrix)
 my_path.add_module(eventinfosetter)
 

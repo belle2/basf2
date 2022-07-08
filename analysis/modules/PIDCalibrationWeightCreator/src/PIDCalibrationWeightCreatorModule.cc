@@ -45,6 +45,18 @@ PIDCalibrationWeightCreatorModule::PIDCalibrationWeightCreatorModule() : Module(
 
 void PIDCalibrationWeightCreatorModule::initialize()
 {
+  // Check the size of m_weightMatrix. It has to be 6x6.
+  bool isValid = true;
+  if (m_weightMatrix.size() == 6) {
+    for (const auto& vec : m_weightMatrix)
+      if (vec.size() != 6) isValid = false;
+  } else {
+    isValid = false;
+  }
+
+  if (!isValid)
+    B2ERROR("The given weight matrix size is invalid! It must be 6 (particle types) x 6 (detectors)!");
+
   Belle2::DBImportObjPtr<Belle2::PIDCalibrationWeight> importer{m_matrixName};
   importer.construct(m_weightMatrix);
   importer.import(Belle2::IntervalOfValidity(m_experimentLow, m_runLow, m_experimentHigh, m_runHigh));

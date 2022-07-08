@@ -118,7 +118,7 @@ versions of the payload and cannot be read correctly.
    If you change the member defintion of a payload class:
    
      - you must make sure you increase the ``ClassDef`` version number
-       `correctly <https://root.cern.ch/how/how-use-classdef-preprocessor-macro>`__;
+       `correctly <https://root.cern/manual/io_custom_classes/#the-classdef-macro>`__;
      - you run the tool ``b2code-classversion-update`` over the corresponding ``linkdef.h`` file;
      - you should, if possible, provide schema evolution rules or otherwise make sure the code still works if an
        older version of the payload is found in a globaltag.

@@ -754,86 +754,116 @@ namespace Belle2 {
 
     Manager::FunctionPtr weightedElectronID(const std::vector<std::string>& arguments)
     {
+      std::string varName;
       if (arguments.size() == 0) {
-        const std::vector<std::string> args = {"PIDCalibrationWeightMatrix", "11", "ALL"};
-        return pidWeightedProbabilityExpert(args);
+        varName = "pidWeightedProbabilityExpert(PIDCalibrationWeightMatrix, 11, ALL)";
       } else if (arguments.size() == 1) {
-        const std::vector<std::string> args = {arguments[0], "11", "ALL"};
-        return pidWeightedProbabilityExpert(args);
+        varName = "pidWeightedProbabilityExpert(" + arguments[0] + ", 11, ALL)";
       } else {
         B2ERROR("Need zero or one argument for weightedElectronID");
         return nullptr;
       }
+
+      const Variable::Manager::Var* var = Manager::Instance().getVariable(varName);
+      auto func = [var](const Particle * particle) -> double {
+        return std::get<double>(var->function(particle));
+      };
+      return func;
     };
 
     Manager::FunctionPtr weightedMuonID(const std::vector<std::string>& arguments)
     {
+      std::string varName;
       if (arguments.size() == 0) {
-        const std::vector<std::string> args = {"PIDCalibrationWeightMatrix", "13", "ALL"};
-        return pidWeightedProbabilityExpert(args);
+        varName = "pidWeightedProbabilityExpert(PIDCalibrationWeightMatrix, 13, ALL)";
       } else if (arguments.size() == 1) {
-        const std::vector<std::string> args = {arguments[0], "13", "ALL"};
-        return pidWeightedProbabilityExpert(args);
+        varName = "pidWeightedProbabilityExpert(" + arguments[0] + ", 13, ALL)";
       } else {
         B2ERROR("Need zero or one argument for weightedMuonID");
         return nullptr;
       }
+
+      const Variable::Manager::Var* var = Manager::Instance().getVariable(varName);
+      auto func = [var](const Particle * particle) -> double {
+        return std::get<double>(var->function(particle));
+      };
+      return func;
     };
 
     Manager::FunctionPtr weightedPionID(const std::vector<std::string>& arguments)
     {
+      std::string varName;
       if (arguments.size() == 0) {
-        const std::vector<std::string> args = {"PIDCalibrationWeightMatrix", "211", "ALL"};
-        return pidWeightedProbabilityExpert(args);
+        varName = "pidWeightedProbabilityExpert(PIDCalibrationWeightMatrix, 211, ALL)";
       } else if (arguments.size() == 1) {
-        const std::vector<std::string> args = {arguments[0], "211", "ALL"};
-        return pidWeightedProbabilityExpert(args);
+        varName = "pidWeightedProbabilityExpert(" + arguments[0] + ", 211, ALL)";
       } else {
         B2ERROR("Need zero or one argument for weightedPionID");
         return nullptr;
       }
+
+      const Variable::Manager::Var* var = Manager::Instance().getVariable(varName);
+      auto func = [var](const Particle * particle) -> double {
+        return std::get<double>(var->function(particle));
+      };
+      return func;
     };
 
     Manager::FunctionPtr weightedKaonID(const std::vector<std::string>& arguments)
     {
+      std::string varName;
       if (arguments.size() == 0) {
-        const std::vector<std::string> args = {"PIDCalibrationWeightMatrix", "321", "ALL"};
-        return pidWeightedProbabilityExpert(args);
+        varName = "pidWeightedProbabilityExpert(PIDCalibrationWeightMatrix, 321, ALL)";
       } else if (arguments.size() == 1) {
-        const std::vector<std::string> args = {arguments[0], "321", "ALL"};
-        return pidWeightedProbabilityExpert(args);
+        varName = "pidWeightedProbabilityExpert(" + arguments[0] + ", 321, ALL)";
       } else {
         B2ERROR("Need zero or one argument for weightedKaonID");
         return nullptr;
       }
+
+      const Variable::Manager::Var* var = Manager::Instance().getVariable(varName);
+      auto func = [var](const Particle * particle) -> double {
+        return std::get<double>(var->function(particle));
+      };
+      return func;
     };
 
     Manager::FunctionPtr weightedProtonID(const std::vector<std::string>& arguments)
     {
+      std::string varName;
       if (arguments.size() == 0) {
-        const std::vector<std::string> args = {"PIDCalibrationWeightMatrix", "2212", "ALL"};
-        return pidWeightedProbabilityExpert(args);
+        varName = "pidWeightedProbabilityExpert(PIDCalibrationWeightMatrix, 2212, ALL)";
       } else if (arguments.size() == 1) {
-        const std::vector<std::string> args = {arguments[0], "2212", "ALL"};
-        return pidWeightedProbabilityExpert(args);
+        varName = "pidWeightedProbabilityExpert(" + arguments[0] + ", 2212, ALL)";
       } else {
         B2ERROR("Need zero or one argument for weightedProtonID");
         return nullptr;
       }
+
+      const Variable::Manager::Var* var = Manager::Instance().getVariable(varName);
+      auto func = [var](const Particle * particle) -> double {
+        return std::get<double>(var->function(particle));
+      };
+      return func;
     };
 
     Manager::FunctionPtr weightedDeuteronID(const std::vector<std::string>& arguments)
     {
+      std::string varName;
       if (arguments.size() == 0) {
-        const std::vector<std::string> args = {"PIDCalibrationWeightMatrix", "1000010020", "ALL"};
-        return pidWeightedProbabilityExpert(args);
+        varName = "pidWeightedProbabilityExpert(PIDCalibrationWeightMatrix, 1000010020, ALL)";
       } else if (arguments.size() == 1) {
-        const std::vector<std::string> args = {arguments[0], "1000010020", "ALL"};
-        return pidWeightedProbabilityExpert(args);
+        varName = "pidWeightedProbabilityExpert(" + arguments[0] + ", 1000010020, ALL)";
       } else {
         B2ERROR("Need zero or one argument for weightedDeuteronID");
         return nullptr;
       }
+
+      const Variable::Manager::Var* var = Manager::Instance().getVariable(varName);
+      auto func = [var](const Particle * particle) -> double {
+        return std::get<double>(var->function(particle));
+      };
+      return func;
     };
 
     //*************

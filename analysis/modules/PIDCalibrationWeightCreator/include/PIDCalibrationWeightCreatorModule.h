@@ -14,7 +14,7 @@
 namespace Belle2 {
 
   /**
-   * Module that creates WeightMatrix and upload it to the DB
+   * Module that creates WeightMatrix and uploads it to the DB
    */
   class PIDCalibrationWeightCreatorModule : public Module {
 

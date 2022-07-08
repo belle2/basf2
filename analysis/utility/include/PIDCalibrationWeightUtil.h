@@ -10,6 +10,7 @@
 
 #include <analysis/dbobjects/PIDCalibrationWeight.h>
 #include <framework/database/DBObjPtr.h>
+#include <framework/logging/Logger.h>
 
 #include <framework/gearbox/Const.h>
 
@@ -28,6 +29,9 @@ namespace Belle2 {
     PIDCalibrationWeightUtil()
     {
       m_pidWeightDB = new DBObjPtr<PIDCalibrationWeight>();
+
+      if (!(*m_pidWeightDB))
+        B2FATAL("The dbobject PIDCalibrationWeight could not be found! It is necessary for the weighted PID variables.");
     };
 
     /**
@@ -37,6 +41,10 @@ namespace Belle2 {
     {
       m_matrixName = matrixName;
       m_pidWeightDB = new DBObjPtr<PIDCalibrationWeight>(m_matrixName);
+
+      if (!(*m_pidWeightDB))
+        B2FATAL("The dbobject PIDCalibrationWeight, " << m_matrixName <<
+                " could not be found! It is necessary for the weighted PID variables.");
     };
 
     /**

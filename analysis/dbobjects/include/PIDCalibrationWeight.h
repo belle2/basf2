@@ -49,7 +49,7 @@ namespace Belle2 {
 
     /**
      * Set the WeightMatrix.
-     * @param 6x6 weightMatrix
+     * @param weightMatrix is the weight matrix to be set.
      */
     void setWeightMatrix(WeightMatrix weightMatrix)
     {
@@ -58,7 +58,6 @@ namespace Belle2 {
 
     /**
      * Get the WeightMatrix.
-     * @param 6x6 weightMatrix
      */
     WeightMatrix getWeightMatrix() const
     {
@@ -92,7 +91,7 @@ namespace Belle2 {
     /**
      * Get the weight for the given combination of the PDG code and the detector in Const::EDetector.
      * @param pdg is the PDG code
-     * @param detector is the detector in Const::EDetector
+     * @param det is the detector in Const::EDetector
      * @return weight for the given set of the PDG code and the detector in Const::EDetector
      */
     double getWeight(int pdg, Const::EDetector det) const

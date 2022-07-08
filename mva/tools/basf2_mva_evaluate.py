@@ -198,8 +198,8 @@ if __name__ == '__main__':
             background separately, and only the region +- 3 sigma around the mean is shown.
 
             The importance scores shown are based on the variable importance as estimated by each MVA method internally.
-            This means the variable with the lowest internal importance will have score 0, and the variable
-            with the highest internal importance will have score 100. If the method does not provide such a ranking, all
+            This means the variable with the lowest importance will have score 0, and the variable
+            with the highest importance will have score 100. If the method does not provide such a ranking, all
             importances will be 0.
         """)
 

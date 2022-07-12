@@ -3,18 +3,18 @@
 Updating the main globaltag
 +++++++++++++++++++++++++++
 
-basf2 needs payload to work so we need a special globaltag (usually called "main globaltag") for software development.
+basf2 needs payloads to work so we need a special globaltag (usually called "main globaltag") for software development.
 The main globaltag is also used as baseline for our run-independent MC productions. Due to the development model there 
-are a few requirements on this globaltag:
+are a few requirements for this globaltag:
 
 - The contents of the database should work correctly for any commit on the main basf2 branch. We have to be sure that
   updates to the globaltag do not affect existing development on other branches. As such every change to the code which
   requires changes to the payloads to work needs to be coordinated and result in a new globaltag.
 
-- The globaltag should not contain run dependent calibrations for data.
+- The globaltag should not contain run-dependent calibrations for data.
 
-- The tag should clearly fail when running on data. Running with wrong calibrations is worse than not running at all.
-  The main globaltag only contains payloads for experiment 0 (nominal Phase 3), 1002 (Phase 2) and 1003 (early
+- The globaltag should clearly fail when running on data. Running with wrong calibrations is worse than not running
+  at all. The main globaltag only contains payloads for experiment 0 (nominal Phase 3), 1002 (Phase 2) and 1003 (early
   Phase 3).
 
 .. tip::
@@ -27,7 +27,7 @@ are a few requirements on this globaltag:
 Preparation of payloads
 -----------------------
 
-Before any changes of payloads is to be requested the payload code needs to be prepared. Please create a pull request
+Before requesting any changes of payloads the payload code needs to be prepared. Please create a pull request
 which contains the changes to the code which are required. In all cases we ask you to create a local database
 containing the new payload versions. This is one text file containing a description of which payload is valid for
 which experiment and run range and the payloads themselves as root files named
@@ -37,9 +37,9 @@ look something like this:
 
 ::
 
-  dbstore/BeamParameters b82d5b 0,0,0,-1
-  dbstore/BeamParameters b82d5b 1002,0,1002,-1
-  dbstore/CollisionInvariantMass a211cd3 0,0,-1,-1
+  dbstore/KLMStripEfficiency b82d5b 0,0,0,-1
+  dbstore/KLMStripEfficiency b82d5b 1003,0,1003,-1
+  dbstore/ECLLeakageCorrections a211cd3 0,0,-1,-1
 
 Each line describes one interval of validity for one payload and consists of:
 
@@ -69,7 +69,7 @@ IoV             Valid for
 
 Mostly the ``database.txt`` file should be generated automatically if you use the ``DBImport`` interface but please
 review it and make sure all payloads have the correct IoV and make sure it contains all the payloads you want to add
-and nothing else. The ``database.txt`` and the corresponding payload files should then provided to the globaltag
+and nothing else. The ``database.txt`` and the corresponding payload files should then be provided to the globaltag
 manager for each of the three following use cases:
 
 
@@ -90,7 +90,7 @@ up and simplifies the globaltag update procedure.
 
 .. tip::
 
-   For crearing a new payload, please check the :ref:`corresponding documentation<cdb_payload_creation>`.
+   For creating a new payload, please check the :ref:`corresponding documentation<cdb_payload_creation>`.
 
 .. warning::
    
@@ -115,7 +115,7 @@ versions of the payload and cannot be read correctly.
 
 .. warning::
    
-   If you change the member defintion of a payload class:
+   If you change the member definition of a payload class:
    
      - you must make sure you increase the ``ClassDef`` version number
        `correctly <https://root.cern/manual/io_custom_classes/#the-classdef-macro>`__;
@@ -123,7 +123,7 @@ versions of the payload and cannot be read correctly.
      - you should, if possible, provide schema evolution rules or otherwise make sure the code still works if an
        older version of the payload is found in a globaltag.
 
-If your are manage to make sure the code works also with the old payload you can just review and test the changes as
+If you manage to make sure that the code also works with the old payload you can just review and test the changes as
 usual and don't need to coordinate with the globaltag manager. Once your new payload definition is merged you can
 just provide the new payloads to the globaltag manager.
 
@@ -139,12 +139,12 @@ Testing of all changes
 ----------------------
 
 Please make sure the payloads contain the contents you expect them to have. You can easily inspect a payload file
-using the tool ``b2conditionsdb-dump``.
+using the tool ``b2conditionsdb-dump`` (see the full documentation :ref:`here <b2conditionsdb>`.
 
 .. warning::
 
-   Don't do this for very large payloads, a glorious and former basf2 core developer tested it with the magnetic field
-   once and it worked, but it took half an hour and ~10 GB of RAM.
+   It's not recommended to inspect very large payloads like the magnetic field as this can take up to half an hour
+   and :math:`\mathcal{O}(10)` GB of RAM.
 
 .. tip::
    
@@ -153,7 +153,7 @@ using the tool ``b2conditionsdb-dump``.
 All pull requests and payload requests must be tested. Once you have prepared your local database file please run the
 following snippet:
 
-.. code-block: bash
+.. code-block:: bash
 
    # include your local database in the fallbacks
    export BELLE2_CONDB_FALLBACK="/cvmfs/belle.cern.ch/conditions /full/path/to/your/database.txt"
@@ -171,16 +171,18 @@ parallel.
 Update procedure
 ----------------
 
-Once you have prepared all the payloads and the pull request if one is required you need to notify the globaltag
-manager that you need a change to payloads on main by calling
+Once you have prepared all the payloads, and the pull request if one is required, you need to notify the globaltag
+manager that you need a change to payloads on main using the :ref:`b2conditionsdb-request <b2conditionsdb-request>`
+tool by calling
 
-.. code-block: bash
+.. code-block:: bash
 
    b2condtionsdb-request /path/to/database.txt
 
 and following the instructions (select ``main`` as target of your request).
 
-You need to provide appropriate information so that the other groups how to handle this payload in other globaltags:
+You need to provide appropriate information so that the other groups know how to handle this payload in other
+globaltags:
 
 1. The new payloads.
 
@@ -224,11 +226,11 @@ review the changes in the globaltag.
 
 3. The remaining changes to the main globaltag will be posted on the TUPPR description
 
-Finally, once these changes are reviewed the globaltag will be published and the TUPPR will be merged and make the
+Finally, once these changes are reviewed the globaltag will be published and the TUPPR will be merged which makes the
 changes available on the main branch.
 
 .. figure:: tuppr.png
     :align: center
     :width: 900px
 
-    Worflow for updating the main globaltag via TUPPR.
+    Workflow for updating the main globaltag via TUPPR.

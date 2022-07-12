@@ -107,7 +107,7 @@ void prepareSADsample(std::string inputFile = "", std::string outputFile = "", d
   }
 
   TFile* file = TFile::Open(outputFile.c_str(), "recreate");
-  TTree* tree = new TTree("sad", Form("selected SAD particles: abs(s) < %.f [m]",rangeS));
+  TTree* tree = new TTree("sad", Form("selected SAD particles: abs(s) < %.1f [m]",rangeS));
   tree->Branch("sraw", &m_sad.sraw, "sraw/D");
   tree->Branch("s", &m_sad.s, "s/D");
   tree->Branch("ss", &m_sad.ss, "ss/D");
@@ -139,15 +139,15 @@ void prepareSADsample(std::string inputFile = "", std::string outputFile = "", d
   double pipeRy = 0.040; // default beam pipe aperture in Y-axis
   double rate = 0;
   for(int i = 0; i < numEntries; i++) {
-    	chain.GetEntry(i);
-    	m_sad.rate /= nFiles;
+	chain.GetEntry(i);
+	m_sad.rate /= nFiles;
 	// Select Range
-    	if(abs(m_sad.s) < rangeS) {
+	if(abs(m_sad.s) < rangeS) {
 		// put lost particles at the nearest collimator onto its surface
 		if(collPosS-delta < m_sad.s && m_sad.s < collPosS+delta) { // longitudinal cut
 			if(abs(m_sad.y) <= jawWidth) { // vertical cut within the jaw width
 				// 1. shift by the half length of the collimator tip
-				m_sad.s = m_sad.s - tipLength/2;	
+				m_sad.s = m_sad.s - tipLength/2;
 				// 2. move onto the surface of the jaw
 				if(m_sad.x < 0) { // inner jaw
 					m_sad.s = m_sad.s - abs(m_sad.x - d1)/TMath::Tan(12.0*TMath::Pi()/180.0);
@@ -158,16 +158,16 @@ void prepareSADsample(std::string inputFile = "", std::string outputFile = "", d
 			}
 			else {
 				// manually set the particle outside the jaw edge onto the surface of the beam-pipe
-				Double_t xraw = m_sad.x; 
-				Double_t yraw = m_sad.y; 
+				Double_t xraw = m_sad.x;
+				Double_t yraw = m_sad.y;
 				Double_t ellip = TMath::Sqrt((xraw/pipeRx)*(xraw/pipeRx)+(yraw/pipeRy)*(yraw/pipeRy));
 				m_sad.x = xraw/ellip;
 				m_sad.y = yraw/ellip;
 			}
 		}
-      		tree->Fill();
-      		rate += m_sad.rate;
-    	}
+		tree->Fill();
+		rate += m_sad.rate;
+	}
   }
   cout << "entries written to 'sad' tree: " << tree->GetEntries() << endl;
   cout << "total IR rate: " << rate/1e6 << " MHz" << endl;

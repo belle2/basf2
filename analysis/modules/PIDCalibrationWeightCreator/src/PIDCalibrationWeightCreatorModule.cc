@@ -45,7 +45,10 @@ void PIDCalibrationWeightCreatorModule::initialize()
   bool isValid = true;
   if (m_weightMatrix.size() == 6) {
     for (const auto& vec : m_weightMatrix)
-      if (vec.size() != 6) isValid = false;
+      if (vec.size() != 6) {
+        isValid = false;
+        break;
+      }
   } else {
     isValid = false;
   }

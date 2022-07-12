@@ -19,9 +19,9 @@ namespace Belle2 {
 
   /**
    * PID calibration weight matrix, 6 (particle type) x 6 (detectors).
-   * The order of the vector<vector> is as follows, [e, mu, pi, K, p, d] that is inherited by Const::chargedStableSet.
+   * The particle types are sorted by their invariant mass (e, mu, pi, K, p, d), which is inherited from Const::chargedStableSet.
    * Each vector<double> has 6 weights for different sub-detectors for a particle type.
-   * The order is as follows, [SVD, CDC, TOP, ARICH, ECL. KLM] that is inherited by Const::PIDDetectors.
+   * The order is as follows, [SVD, CDC, TOP, ARICH, ECL. KLM] that is inherited from Const::PIDDetectors.
    */
   typedef std::vector<std::vector<double>> WeightMatrix;
 
@@ -29,13 +29,6 @@ namespace Belle2 {
    * Class for handling the PID calibration weight matrix
    */
   class PIDCalibrationWeight : public TObject {
-
-    /**
-     * PID calibration weight matrix.
-     */
-    WeightMatrix m_weightMatrix;
-
-    ClassDef(PIDCalibrationWeight, 1); /**< ClassDef as this is a TObject */
 
   public:
     /// Constructor
@@ -121,6 +114,15 @@ namespace Belle2 {
 
       return m_weightMatrix[p_index];
     };
+
+  private:
+
+    /**
+     * PID calibration weight matrix.
+     */
+    WeightMatrix m_weightMatrix;
+
+    ClassDef(PIDCalibrationWeight, 1); /**< ClassDef as this is a TObject */
 
   };
 

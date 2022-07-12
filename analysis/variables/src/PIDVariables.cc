@@ -1088,19 +1088,19 @@ following the order shown in the metavariable's declaration. Flat priors are ass
     REGISTER_METAVARIABLE("pidWeightedLogLikelihoodValueExpert(weightMatrixName, pdgCode, detectorList)",
                           pidWeightedLogLikelihoodValueExpert,
                           "returns the weighted log likelihood value of for a specific mass hypothesis and set of detectors, "
-                          ":math:`\\log\\mathcal{wL}_{hyp} = \\sum_{j\\in\\mathrm{detectorList}} \\mathcal{w}_{hyp,j}\\log\\mathcal{L}_{hyp,j}",
+                          ":math:`\\log\\mathcal{wL}_{hyp} = \\sum_{j\\in\\mathrm{detectorList}} \\mathcal{w}_{hyp,j}\\log\\mathcal{L}_{hyp,j}`",
                           Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("pidWeightedPairProbabilityExpert(weightMatrixName, pdgCodeHyp, pdgCodeTest, detectorList)",
                           pidWeightedPairProbabilityExpert,
                           "Weighted pair (or binary) probability for the pdgCodeHyp mass hypothesis with respect to the pdgCodeTest one, using an arbitrary set of detectors, "
                           ":math:`\\mathcal{wL}_{hyp}/(\\mathcal{wL}_{test}+\\mathcal{wL}_{hyp})` where :math:`\\mathcal{wL}_{i}` is defined as "
-                          ":math:`\\log\\mathcal{wL}_{i} = \\sum_{j\\in\\mathrm{detectorList}} \\mathcal{w}_{i,j}\\log\\mathcal{L}_{i,j}",
+                          ":math:`\\log\\mathcal{wL}_{i} = \\sum_{j\\in\\mathrm{detectorList}} \\mathcal{w}_{i,j}\\log\\mathcal{L}_{i,j}`",
                           Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("pidWeightedProbabilityExpert(weightMatrixName, pdgCodeHyp, detectorList)",
                           pidWeightedProbabilityExpert,
                           "Weighted probability for the pdgCodeHyp mass hypothesis with respect to all the other ones, using an arbitrary set of detectors, "
                           ":math:`\\mathcal{wL}_{hyp}/\\sum_{i=e,\\mu,\\pi,K,p,d} \\mathcal{wL}_i` where :math:`\\mathcal{wL}_{i}` is defined as "
-                          ":math:`\\log\\mathcal{wL}_{i} = \\sum_{j\\in\\mathrm{detectorList}} \\mathcal{w}_{i,j}\\log\\mathcal{L}_{i,j}",
+                          ":math:`\\log\\mathcal{wL}_{i} = \\sum_{j\\in\\mathrm{detectorList}} \\mathcal{w}_{i,j}\\log\\mathcal{L}_{i,j}`",
                           Manager::VariableDataType::c_double);
 
     // B2BII PID

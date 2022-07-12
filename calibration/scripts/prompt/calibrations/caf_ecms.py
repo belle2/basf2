@@ -38,13 +38,13 @@ settings = CalibrationSettings(
             INPUT_DATA_FILTERS["Data Quality Tag"]["Good Or Recoverable"],
             INPUT_DATA_FILTERS["Magnet"]["On"]],
         "mumu4S": [
-            INPUT_DATA_FILTERS["Data Tag"]["mumutight_or_highm_calib"],
+            INPUT_DATA_FILTERS["Data Tag"]["mumutight_calib"],
             INPUT_DATA_FILTERS["Run Type"]["physics"],
             INPUT_DATA_FILTERS["Beam Energy"]["4S"],
             INPUT_DATA_FILTERS["Data Quality Tag"]["Good Or Recoverable"],
             INPUT_DATA_FILTERS["Magnet"]["On"]],
         "mumuOff": [
-            INPUT_DATA_FILTERS["Data Tag"]["mumutight_or_highm_calib"],
+            INPUT_DATA_FILTERS["Data Tag"]["mumutight_calib"],
             INPUT_DATA_FILTERS["Run Type"]["physics"],
             INPUT_DATA_FILTERS["Beam Energy"]["Continuum"],
             INPUT_DATA_FILTERS['Beam Energy']['Scan'],

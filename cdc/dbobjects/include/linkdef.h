@@ -39,6 +39,7 @@
 #pragma link C++ class Belle2::CDCEDepToADCConversions+; // checksum=0x3d6b427c, version=3
 #pragma link C++ class Belle2::CDCWireHitRequirements+; // checksum=0x4c504d88, version=2
 #pragma link C++ class Belle2::CDCCrossTalkLibrary+; // checksum=0x4ace6024, version=2
+#pragma link C++ class Belle2::CDCCorrToThresholds+; // checksum=0xbea4131b, version=2
 #pragma link C++ class Belle2::CDCFudgeFactorsForSigma+; // checksum=0x37bcdd67, version=1
 
 #pragma link C++ class Belle2::asicChannel+; // checksum=0x7a22a583, implicit, version=-1

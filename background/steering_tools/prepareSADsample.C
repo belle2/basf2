@@ -135,6 +135,7 @@ void prepareSADsample(std::string inputFile = "", std::string outputFile = "", d
   double delta = 0.01; // region of beam losses around the collimator center in [m]
   double jawWidth = 6.0e-3; // collimator jaw width in [m]
   double tipLength = 10.0e-3; // collimator tip/head length in [mm] 
+  double tipAngle = 12.0*TMath::Pi()/180.0; // collimator tip/head angle in [rad] = 12 [deg]
   double pipeRx = 0.040; // default beam pipe aperture in X-axis
   double pipeRy = 0.040; // default beam pipe aperture in Y-axis
   double rate = 0;
@@ -150,10 +151,10 @@ void prepareSADsample(std::string inputFile = "", std::string outputFile = "", d
 				m_sad.s = m_sad.s - tipLength/2;
 				// 2. move onto the surface of the jaw
 				if(m_sad.x < 0) { // inner jaw
-					m_sad.s = m_sad.s - abs(m_sad.x - d1)/TMath::Tan(12.0*TMath::Pi()/180.0);
+					m_sad.s = m_sad.s - abs(m_sad.x - d1)/TMath::Tan(tipAngle);
 				}
 				else { // outer jaw
-					m_sad.s = m_sad.s - abs(m_sad.x - d2)/TMath::Tan(12.0*TMath::Pi()/180.0);
+					m_sad.s = m_sad.s - abs(m_sad.x - d2)/TMath::Tan(tipAngle);
 				}
 			}
 			else {

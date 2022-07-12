@@ -129,7 +129,7 @@ namespace Belle2 {
         const PIDLikelihood* pid = part->getPIDLikelihood();
         if (!pid)
           return std::numeric_limits<float>::quiet_NaN();
-        // No information form any subdetector in the list
+        // No information from any subdetector in the list
         if (pid->getLogL(hypType, detectorSet) == 0)
           return std::numeric_limits<float>::quiet_NaN();
 
@@ -168,7 +168,7 @@ namespace Belle2 {
       auto func = [hypType, testType, detectorSet](const Particle * part) -> double {
         const PIDLikelihood* pid = part->getPIDLikelihood();
         if (!pid) return std::numeric_limits<float>::quiet_NaN();
-        // No information form any subdetector in the list
+        // No information from any subdetector in the list
         if (pid->getLogL(hypType, detectorSet) == 0)
           return std::numeric_limits<float>::quiet_NaN();
 
@@ -284,7 +284,7 @@ namespace Belle2 {
       try {
         pdgCode = Belle2::convertString<int>(arguments[1]);
       } catch (std::invalid_argument& e) {
-        B2ERROR("First argument of pidLogLikelihoodValueExpert must be a PDG code");
+        B2ERROR("Second argument of pidWeightedLogLikelihoodValueExpert must be a PDG code");
         return nullptr;
       }
       std::vector<std::string> detectors(arguments.begin() + 2, arguments.end());
@@ -296,7 +296,7 @@ namespace Belle2 {
         const PIDLikelihood* pid = part->getPIDLikelihood();
         if (!pid)
           return std::numeric_limits<float>::quiet_NaN();
-        // No information form any subdetector in the list
+        // No information from any subdetector in the list
         if (pid->getLogL(hypType, detectorSet) == 0)
           return std::numeric_limits<float>::quiet_NaN();
 
@@ -325,7 +325,7 @@ namespace Belle2 {
       try {
         pdgCodeHyp = Belle2::convertString<int>(arguments[1]);
       } catch (std::invalid_argument& e) {
-        B2ERROR("First argument of pidProbabilityExpert must be PDG code");
+        B2ERROR("Second argument of pidWeightedProbabilityExpert must be PDG code");
         return nullptr;
       }
 
@@ -387,13 +387,13 @@ namespace Belle2 {
       try {
         pdgCodeHyp = Belle2::convertString<int>(arguments[1]);
       } catch (std::invalid_argument& e) {
-        B2ERROR("First argument of pidPairProbabilityExpert must be PDG code");
+        B2ERROR("Second argument of pidWeightedPairProbabilityExpert must be PDG code");
         return nullptr;
       }
       try {
         pdgCodeTest = Belle2::convertString<int>(arguments[2]);
       } catch (std::invalid_argument& e) {
-        B2ERROR("Second argument of pidPairProbabilityExpert must be PDG code");
+        B2ERROR("Third argument of pidWeightedPairProbabilityExpert must be PDG code");
         return nullptr;
       }
 
@@ -1018,23 +1018,47 @@ The variables used are `clusterPulseShapeDiscriminationMVA`, `clusterE`, `cluste
                           Manager::VariableDataType::c_double);
 
 
-    REGISTER_METAVARIABLE("weightedElectronID", weightedElectronID,
-                          "weighted electron identification probability defined as :math:`\\mathcal{L}_\\e/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors",
+    REGISTER_METAVARIABLE("weightedElectronID(weightMatrixName)", weightedElectronID,
+                          R"DOC(
+weighted electron identification probability defined as :math:`\\frac{\\mathcal{wL}_e}{\\sum_{i=e,\\mu,\\pi,K,p,d} \\mathcal{wL}_i},
+where :math:`\\mathcal{wL}_i` is defined as :math:`\\log\\mathcal{wL}_i = \\sum_{j={\\mathrm{SVD, CDC, TOP, ARICH, ECL, KLM}}} \\mathcal{w}_{ij}\\log\\mathcal{L}_{ij}`.
+One can provide the name of the weight matrix as the argument.
+)DOC",
                           Manager::VariableDataType::c_double);
-    REGISTER_METAVARIABLE("weightedMuonID", weightedMuonID,
-                          "weighted muon identification probability defined as :math:`\\mathcal{L}_\\mu/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors",
+    REGISTER_METAVARIABLE("weightedMuonID(weightMatrixName)", weightedMuonID,
+			  R"DOC(
+weighted muon identification probability defined as :math:`\\frac{\\mathcal{wL}_\\mu}{\\sum_{i=e,\\mu,\\pi,K,p,d} \\mathcal{wL}_i},
+where :math:`\\mathcal{wL}_i` is defined as :math:`\\log\\mathcal{wL}_i = \\sum_{j={\\mathrm{SVD, CDC, TOP, ARICH, ECL, KLM}}} \\mathcal{w}_{ij}\\log\\mathcal{L}_{ij}`.
+One can provide the name of the weight matrix as the argument.
+)DOC",
                           Manager::VariableDataType::c_double);
-    REGISTER_METAVARIABLE("weightedPionID", weightedPionID,
-                          "weighted pion identification probability defined as :math:`\\mathcal{L}_\\pi/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors",
+    REGISTER_METAVARIABLE("weightedPionID(weightMatrixName)", weightedPionID,
+			  R"DOC(
+weighted pion identification probability defined as :math:`\\frac{\\mathcal{wL}_\\pi}{\\sum_{i=e,\\mu,\\pi,K,p,d} \\mathcal{wL}_i},
+where :math:`\\mathcal{wL}_i` is defined as :math:`\\log\\mathcal{wL}_i = \\sum_{j={\\mathrm{SVD, CDC, TOP, ARICH, ECL, KLM}}} \\mathcal{w}_{ij}\\log\\mathcal{L}_{ij}`.
+One can provide the name of the weight matrix as the argument.
+)DOC",
                           Manager::VariableDataType::c_double);
-    REGISTER_METAVARIABLE("weightedKaonID", weightedKaonID,
-                          "weighted kaon identification probability defined as :math:`\\mathcal{L}_K/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors",
+    REGISTER_METAVARIABLE("weightedKaonID(weightMatrixName)", weightedKaonID,
+			  R"DOC(
+weighted kaon identification probability defined as :math:`\\frac{\\mathcal{wL}_K}{\\sum_{i=e,\\mu,\\pi,K,p,d} \\mathcal{wL}_i},
+where :math:`\\mathcal{wL}_i` is defined as :math:`\\log\\mathcal{wL}_i = \\sum_{j={\\mathrm{SVD, CDC, TOP, ARICH, ECL, KLM}}} \\mathcal{w}_{ij}\\log\\mathcal{L}_{ij}`.
+One can provide the name of the weight matrix as the argument.
+)DOC",
                           Manager::VariableDataType::c_double);
-    REGISTER_METAVARIABLE("weightedProtonID", weightedProtonID,
-                          "weighted proton identification probability defined as :math:`\\mathcal{L}_p/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors",
+    REGISTER_METAVARIABLE("weightedProtonID(weightMatrixName)", weightedProtonID,
+			  R"DOC(
+weighted proton identification probability defined as :math:`\\frac{\\mathcal{wL}_p}{\\sum_{i=e,\\mu,\\pi,K,p,d} \\mathcal{wL}_i},
+where :math:`\\mathcal{wL}_i` is defined as :math:`\\log\\mathcal{wL}_i = \\sum_{j={\\mathrm{SVD, CDC, TOP, ARICH, ECL, KLM}}} \\mathcal{w}_{ij}\\log\\mathcal{L}_{ij}`.
+One can provide the name of the weight matrix as the argument.
+)DOC",
                           Manager::VariableDataType::c_double);
-    REGISTER_METAVARIABLE("weightedDeuteronID", weightedDeuteronID,
-                          "weighted deuteron identification probability defined as :math:`\\mathcal{L}_d/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors",
+    REGISTER_METAVARIABLE("weightedDeuteronID(weightMatrixName)", weightedDeuteronID,
+			  R"DOC(
+weighted deuteron identification probability defined as :math:`\\frac{\\mathcal{wL}_d}{\\sum_{i=e,\\mu,\\pi,K,p,d} \\mathcal{wL}_i},
+where :math:`\\mathcal{wL}_i` is defined as :math:`\\log\\mathcal{wL}_i = \\sum_{j={\\mathrm{SVD, CDC, TOP, ARICH, ECL, KLM}}} \\mathcal{w}_{ij}\\log\\mathcal{L}_{ij}`.
+One can provide the name of the weight matrix as the argument.
+)DOC",
                           Manager::VariableDataType::c_double);
 
     // Metafunctions for experts to access the basic PID quantities
@@ -1060,17 +1084,23 @@ following the order shown in the metavariable's declaration. Flat priors are ass
 Returns True if the largest PID likelihood of a given particle corresponds to its particle hypothesis.
 This function accepts either no arguments, or 6 floats as priors for the charged particle hypotheses
 following the order shown in the metavariable's declaration. Flat priors are assumed as default.)DOC");
-    REGISTER_METAVARIABLE("pidWeightedLogLikelihoodValueExpert(WeightMatrixName, pdgCode, detectorList)",
+
+    REGISTER_METAVARIABLE("pidWeightedLogLikelihoodValueExpert(weightMatrixName, pdgCode, detectorList)",
                           pidWeightedLogLikelihoodValueExpert,
-                          "returns the weighted log likelihood value of for a specific mass hypothesis and  set of detectors.",
+                          "returns the weighted log likelihood value of for a specific mass hypothesis and set of detectors, "
+                          ":math:`\\log\\mathcal{wL}_{hyp} = \\sum_{j\\in\\mathrm{detectorList}} \\mathcal{w}_{hyp,j}\\log\\mathcal{L}_{hyp,j}",
                           Manager::VariableDataType::c_double);
-    REGISTER_METAVARIABLE("pidWeightedPairProbabilityExpert(WeightMatrixName, pdgCodeHyp, pdgCodeTest, detectorList)",
+    REGISTER_METAVARIABLE("pidWeightedPairProbabilityExpert(weightMatrixName, pdgCodeHyp, pdgCodeTest, detectorList)",
                           pidWeightedPairProbabilityExpert,
-                          "Weighted pair (or binary) probability for the pdgCodeHyp mass hypothesis respect to the pdgCodeTest one, using an arbitrary set of detectors. :math:`\\mathcal{L}_{hyp}/(\\mathcal{L}_{test}+\\mathcal{L}_{hyp}`",
+                          "Weighted pair (or binary) probability for the pdgCodeHyp mass hypothesis with respect to the pdgCodeTest one, using an arbitrary set of detectors, "
+                          ":math:`\\mathcal{wL}_{hyp}/(\\mathcal{wL}_{test}+\\mathcal{wL}_{hyp})` where :math:`\\mathcal{wL}_{i}` is defined as "
+                          ":math:`\\log\\mathcal{wL}_{i} = \\sum_{j\\in\\mathrm{detectorList}} \\mathcal{w}_{i,j}\\log\\mathcal{L}_{i,j}",
                           Manager::VariableDataType::c_double);
-    REGISTER_METAVARIABLE("pidWeightedProbabilityExpert(WeightMatrixName, pdgCodeHyp, detectorList)",
+    REGISTER_METAVARIABLE("pidWeightedProbabilityExpert(weightMatrixName, pdgCodeHyp, detectorList)",
                           pidWeightedProbabilityExpert,
-                          "weighted probability for the pdgCodeHyp mass hypothesis respect to all the other ones, using an arbitrary set of detectors :math:`\\mathcal{L}_{hyp}/(\\Sigma_{\\text{all~hyp}}\\mathcal{L}_{i}`. ",
+                          "Weighted probability for the pdgCodeHyp mass hypothesis with respect to all the other ones, using an arbitrary set of detectors, "
+                          ":math:`\\mathcal{wL}_{hyp}/\\sum_{i=e,\\mu,\\pi,K,p,d} \\mathcal{wL}_i` where :math:`\\mathcal{wL}_{i}` is defined as "
+                          ":math:`\\log\\mathcal{wL}_{i} = \\sum_{j\\in\\mathrm{detectorList}} \\mathcal{w}_{i,j}\\log\\mathcal{L}_{i,j}",
                           Manager::VariableDataType::c_double);
 
     // B2BII PID

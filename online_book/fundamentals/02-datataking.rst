@@ -310,7 +310,7 @@ ARICH
     and the fraction of particles actually hitting the backwards direction of
     the detector is low.
 
-    With higher boost we would not need a backawards detector at all. And if we
+    With higher boost we would not need a backwards detector at all. And if we
     could go even higher with the boost we might not even need a barrel region.
 
     So now if you look at the LHCb detector you might understand why its only a

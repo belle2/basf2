@@ -48,7 +48,7 @@ SADTree m_sad; /**< TTree entry data */
  * @param d1 the nearest to the IP collimator aperture (inner jaw) in meters: D02H4IN in the LER or D01H5IN in the HER 
  * @param d2 the nearest to the IP collimator aperture (outer jaw) in meters: D02H4OUT in the LER or D01H5OUT in the HER 
  */
-void prepareSADsample(std::string inputFile = "", std::string outputFile = "", double rangeS = 4, std::string ring = "LER", double d1 = -8.62e-3, double d2 = 9.35e-3)
+void prepareSADsample(std::string inputFile = "", std::string outputFile = "", double rangeS = 4, const std::string& ring = "LER", double d1 = -8.62e-3, double d2 = 9.35e-3)
 {
 
   TChain chain("tp");

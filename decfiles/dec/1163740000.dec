@@ -1,0 +1,49 @@
+# EventType: 1163740000
+# Descriptor: [B0 -> [D -> K pi pi] e(mu) nu]cc
+# NickName: Bd_D+lnu_K2pi
+# Documentation: B0->D e/mu nu, D->K pi pi, normalization mode for inclusive tagging R(D)
+# Tested: Yes
+# PhysicsWG: SL
+# Responsible: Boyang Zhang
+# Email: zhangboy@hawaii.edu 
+# Cuts: None
+# Date: 20220708
+
+
+yesPhotos
+
+# Alias will have the same properties as the original particle except the decay table
+
+Alias B0sig B0
+Alias anti-B0sig anti-B0
+ChargeConj B0sig anti-B0sig
+
+Alias D+sig D+
+Alias D-sig D-
+ChargeConj D+sig D-sig
+
+
+# One B decays to signal mode, while the other to generic decay modes
+
+Decay Upsilon(4S)
+0.483122645         B0  anti-B0  B0sig  anti-B0sig     VSS_BMIX dm;
+#Verctor to scalar + scalar model with the 'mass difference between two daughters' dm defined generally.
+Enddecay
+
+
+# CDecay automatically creates the decay table for charge conjugated particle
+# (to use this feature Alias has to be defined)
+
+Decay anti-B0sig
+0.021400000   D+sig  e-  anti-nu_e                            BGL 0.0126 -0.094 0.34 -0.1 0.0115 -0.057 0.12 0.4;    #[Belle measurement: 1510.03657]
+0.021400000   D+sig  mu-  anti-nu_mu                          BGL 0.0126 -0.094 0.34 -0.1 0.0115 -0.057 0.12 0.4;    #[Belle measurement: 1510.03657]
+Enddecay
+CDecay B0sig
+
+Decay D+sig
+0.093800000   K-   pi+   pi+                   D_DALITZ;
+Enddecay
+CDecay D-sig
+
+
+End

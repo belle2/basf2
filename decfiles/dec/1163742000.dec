@@ -1,0 +1,59 @@
+# EventType: 1163742000
+# Descriptor: [B0 -> [D* -> [D -> K pi pi] pi0(gamma)] e(mu) nu]cc
+# NickName: Bd_Dst+lnu_K2pi
+# Documentation: B0->D*+ l nu, D*+->D+ pi0(gamma), D+->K pi pi, normalization mode for inclusive tagging R(D*)
+# Tested: Yes
+# PhysicsWG: SL
+# Responsible: Boyang Zhang
+# Email: zhangboy@hawaii.edu 
+# Cuts: None
+# Date: 20220708
+
+
+yesPhotos
+
+# Alias will have the same properties as the original particle except the decay table
+
+Alias B0sig B0
+Alias anti-B0sig anti-B0
+ChargeConj B0sig anti-B0sig
+
+Alias D*+sig D*+
+Alias D*-sig D*-
+ChargeConj D*+sig D*-sig
+
+Alias D+sig D+
+Alias D-sig D-
+ChargeConj D+sig D-sig
+
+
+# One B decays to signal mode, while the other to generic decay modes
+
+Decay Upsilon(4S)
+0.483122645         B0  anti-B0  B0sig  anti-B0sig     VSS_BMIX dm;
+#Verctor to scalar + scalar model with the 'mass difference between two daughters' dm defined generally.
+Enddecay
+
+
+# CDecay automatically creates the decay table for charge conjugated particle
+# (to use this feature Alias has to be defined)
+
+Decay anti-B0sig
+0.051100000   D*+sig  e-  anti-nu_e               BGL 0.02596 -0.06049 0.01311 0.01713 0.00753 -0.09346; #FF values taken from [arxiv:2008.09341]
+0.051100000   D*+sig  mu-  anti-nu_mu             BGL 0.02596 -0.06049 0.01311 0.01713 0.00753 -0.09346; #FF values taken from [arxiv:2008.09341]
+Enddecay
+CDecay B0sig
+
+Decay D*+sig
+0.307000000   D+sig  pi0                          VSS;
+0.016000000   D+sig  gamma                        VSP_PWAVE;
+Enddecay
+CDecay D*-sig
+
+Decay D+sig
+0.093800000   K-   pi+   pi+                   D_DALITZ;
+Enddecay
+CDecay D-sig
+
+
+End

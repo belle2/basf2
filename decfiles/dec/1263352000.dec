@@ -29,26 +29,6 @@ Alias anti-D_2*0sig anti-D_2*0
 ChargeConj D_2*0sig anti-D_2*0sig
 
 
-# set partial waves for narrow D**
-SetLineshapePW D_1+ D*+ pi0 2
-SetLineshapePW D_1+ D*0 pi+ 2
-SetLineshapePW D_1- D*- pi0 2
-SetLineshapePW D_1- anti-D*0 pi- 2
-SetLineshapePW D_10 D*0 pi0 2
-SetLineshapePW D_10 D*+ pi- 2
-SetLineshapePW anti-D_10 anti-D*0 pi0 2
-SetLineshapePW anti-D_10 D*- pi+ 2
-
-SetLineshapePW D_2*+ D*+ pi0 2
-SetLineshapePW D_2*+ D*0 pi+ 2
-SetLineshapePW D_2*- D*- pi0 2
-SetLineshapePW D_2*- anti-D*0 pi- 2
-SetLineshapePW D_2*0 D*0 pi0 2
-SetLineshapePW D_2*0 D*+ pi- 2
-SetLineshapePW anti-D_2*0 anti-D*0 pi0 2
-SetLineshapePW anti-D_2*0 D*- pi+ 2
-
-
 # One B decays to signal mode, while the other to generic decay modes
 Decay Upsilon(4S)
 0.5000   B+sig   B-       VSS;

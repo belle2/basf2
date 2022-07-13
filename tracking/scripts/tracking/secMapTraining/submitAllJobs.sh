@@ -54,7 +54,7 @@ fi
 for seed in ${rndseeds_BB[@]} 
 do
   echo $seed
-  sleep 0.1  # sleep a bit to avoid hammering the queue too frequently 
+  sleep 0.05  # sleep a bit to avoid hammering the queue too frequently 
   # use loglevel WARNING so that information on non-default DB payloads is displayed
   bsub -q $queue -o ${outdir}log${seed}.log  basf2 -l WARNING -n $nevt CollectTrainingsData.py -- --rndSeed $seed --outputDir $outdir --eventType BBbar
 done
@@ -63,7 +63,7 @@ done
 for seed in ${rndseeds_BhaBha[@]} 
 do
   echo $seed
-  sleep 0.1  # sleep a bit to avoid hammering the queue too frequently 
+  sleep 0.05  # sleep a bit to avoid hammering the queue too frequently 
   # use loglevel WARNING so that information on non-default DB payloads is displayed
   bsub -q $queue -o ${outdir}log${seed}.log  basf2 -l WARNING -n $nevt CollectTrainingsData.py -- --rndSeed $seed --outputDir $outdir --eventType BhaBha
 done

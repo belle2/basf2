@@ -10,26 +10,43 @@
 ##########################################################################
 
 #####################################################################
-# VXDTF2 Example Scripts - Step 0 - Simulation
+# VXDTF2 Script to write out the training data needed to train a SectorMap
 #
-# This script can be used to produce MC data from particle guns or
-# Y(4S) events for the training and validation of the VXDTF 1 and 2.
+# This script can be used to produce MC data. Two types of events can be
+# generated: 1) "BBbar" which are Y(4S) events mixed with ParticleGun tracks.
+#            2) "BhaBha" which ee->ee events mixed with ParticleGun tracks
+#    The event type can be set with the "--eventType" option followed by
+#    one of the two options above ("BBbar" or "BhaBha")
 #
 # The number of events which will be simulated can be set via the
 # basf2 commandline option -n.
-# The name of the root output file can be defined with the option -o.
 #
-# E.g.: 'basf2 eventSimulation.py -n 1000 -o trainingSample.root'
+# There are tow types of outputs:
+#    1) The full root output which can be used to study the trainings data
+#       collection or the generated events. These events have to undergo an
+#       additional step to be usable for the training of a SectorMap
+#       (see SectorMapTrainingUtils.add_training_data_collector) This option
+#       is by default deactivated as these files are very big and not needed for
+#       the actual training. To enable it use the option
+#       "--enableFullRootOutput".
+#    2) Root files where only the data is stored which is needed to perform
+#       the training. For 10Mio BBbar plus 2Mio BhaBha events (default training)
+#       this will generate approximately 100GB of output (log files + root files).
 #
-# The settings for the particle gun(s) and EvtGen simulation can be
-# adapted in this script. Some convenience functions are outsourced
-# to setup_modules.py.
+# All output will be written to the output directory (default "./"). The output
+# directory can be set with the option "--outputDir". The names of the output files
+# are generated automatically using the random seed and the type of generated events.
+# The random seed can be set with the option "--rndSeed".
 #
-# The script takes two optional command line arguments: the first will
-# be interpreted as random seed, the second as directory for the output.
-# e.g: basf2 'eventSimulation.py 12354 ./datadir/'
-# will result in setting the random seed to 12354 and the output will
-# be written to './datadir/'
+# By default no PXD data are collected during the data collection. To enable it use
+# the option "--usePXD"
+#
+# The settings for the particle gun(s) and EvtGen simulation have to be
+# adapted in the convenience functions defined in SectorMapTrainingUtils.py
+#
+# By default the user should specify the random seed, the output directory, and the
+# event type to be generated. An example call generating 1000 BBbar events is given below:
+# basf2  -n 1000 CollectTrainingsData.py -- --rndSeed 12345 --outputDir "./outdir/" --eventType "BBbar"
 #####################################################################
 
 # default basf2 stuff
@@ -84,6 +101,13 @@ parser.add_argument(
     dest="outputDir",
     help="Set the output directory. All output will be written to that directory (make sure it exists)")
 
+parser.add_argument(
+    '--enableFullRootOutput',
+    dest='fullRootOutput',
+    action='store_const',
+    const=True,
+    default=False,
+    help="If this option is called the full root output is enabled. WARNING: this will generate large files!")
 
 # the arguments for this scripts
 args = parser.parse_args()
@@ -102,8 +126,8 @@ add_event_generation(path=main, randomSeed=args.rndSeed, eventType=args.eventTyp
 # for now we dont need the PXD
 add_simulation_and_reconstruction_modules(path=main, usePXD=args.usePXD)
 
-# make root output optional, as its a lot!!
-if False:
+# full root output. Optional, as its a lot!!
+if args.fullRootOutput:
     add_rootoutput(path=main, outputFileName=args.outputDir + "/RootOutput_" + args.eventType + str(args.rndSeed) + ".root")
 
 # add the actual data collection
@@ -113,7 +137,7 @@ add_training_data_collector(path=main, usePXD=args.usePXD, nameTag=args.eventTyp
 # dump some logging
 b2.log_to_file(args.outputDir + '/createSim_' + args.eventType + str(args.rndSeed) + '.log', append=False)
 
-
+# show path before starting (useful for debugging)
 b2.print_path(main)
 
 main.add_module("Progress")

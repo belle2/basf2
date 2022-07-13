@@ -78,6 +78,10 @@ namespace Belle2 {
     OptionalDBObjPtr<CDCTriggerDeadch> m_db_deadchannel;
     /** TDC based crosstalk filtering logic on CDCFE. True:enable False:disable */
     bool m_crosstalk_tdcfilter;
+    /** remove hits with lower ADC than cut threshold. True:enable False:disable */
+    bool m_adcflag;
+    /** threshold for the adc cut. Default: -1 */
+    int m_adccut;
 
   private:
     /** structure to hold pointers to all wires in the CDC */

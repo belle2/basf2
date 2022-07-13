@@ -76,6 +76,14 @@ CDCTriggerTSFModule::CDCTriggerTSFModule() : Module::Module()
            m_crosstalk_tdcfilter,
            "TDC based crosstalk filtering logic on CDCFE. True:enable False:disable",
            true);
+  addParam("ADC_cut_enable",
+           m_adcflag,
+           "remove hits with lower ADC than cut threshold. True:enable False:disable",
+           false);
+  addParam("ADC_cut_threshold",
+           m_adccut,
+           "Threshold for the adc cut.  Default: -1",
+           -1);
 }
 
 void
@@ -384,6 +392,11 @@ CDCTriggerTSFModule::event()
     }
     // skim crosstalk hit
     if (filtered_hit[i] == 1)continue;
+
+    // remove hits with low ADC
+    if (m_adcflag) {
+      if (h.getADCCount() < m_adccut)continue;
+    }
 
     TRGCDCWire& w =
       (TRGCDCWire&) superLayers[h.getISuperLayer()][h.getILayer()]->cell(h.getIWire());

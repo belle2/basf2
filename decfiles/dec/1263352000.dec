@@ -12,13 +12,6 @@
 
 yesPhotos
 
-# Alias will have the same properties as the original particle except the decay table
-
-Alias B0sig B0
-Alias anti-B0sig anti-B0
-ChargeConj B0sig anti-B0sig
-
-
 Alias D_10sig D_10
 Alias anti-D_10sig anti-D_10
 ChargeConj D_10sig anti-D_10sig
@@ -34,19 +27,6 @@ ChargeConj D'_10sig anti-D'_10sig
 Alias D_2*0sig D_2*0
 Alias anti-D_2*0sig anti-D_2*0
 ChargeConj D_2*0sig anti-D_2*0sig
-
-
-Alias D*+sig D*+
-Alias D*-sig D*-
-ChargeConj D*+sig D*-sig
-
-Alias D+sig D+
-Alias D-sig D-
-ChargeConj D+sig D-sig
-
-Alias tau+sig tau+
-Alias tau-sig tau-
-ChargeConj tau+sig tau-sig
 
 
 # set partial waves for narrow D**
@@ -75,15 +55,11 @@ Decay Upsilon(4S)
 0.5000   B+     B-sig     VSS;
 Enddecay
 
-# CDecay automatically creates the decay table for charge conjugated particle
-# (to use this feature Alias has to be defined)
-
-
 Decay B-sig
-0.001300000    D_10sig   tau-sig  anti-nu_tau                  LLSW 0.71 -1.6 -0.5 2.9;
-0.001300000    D_0*0sig  tau-sig  anti-nu_tau                  LLSW 0.68 -0.2 0.3;
-0.002000000    D'_10sig  tau-sig  anti-nu_tau                  LLSW 0.68 -0.2 0.3;
-0.002000000    D_2*0sig  tau-sig  anti-nu_tau                  LLSW 0.71 -1.6 -0.5 2.9;
+0.001300000    D_10sig   tau-sig  anti-nu_tau               LLSW 0.71 -1.6 -0.5 2.9;
+0.001300000    D_0*0sig  tau-sig  anti-nu_tau               LLSW 0.68 -0.2 0.3;
+0.002000000    D'_10sig  tau-sig  anti-nu_tau               LLSW 0.68 -0.2 0.3;
+0.002000000    D_2*0sig  tau-sig  anti-nu_tau               LLSW 0.71 -1.6 -0.5 2.9;
 Enddecay
 CDecay B+sig
 
@@ -111,19 +87,19 @@ Enddecay
 CDecay anti-D_2*0sig
 
 Decay D*+sig
-0.307000000    D+sig  pi0                          VSS;
-0.016000000    D+sig  gamma                        VSP_PWAVE;
+0.307000000    D+sig  pi0                                   VSS;
+0.016000000    D+sig  gamma                                 VSP_PWAVE;
 Enddecay
 CDecay D*-sig
 
 Decay D+sig
-0.093800000    K-   pi+   pi+                   D_DALITZ;
+0.093800000    K-   pi+   pi+                               D_DALITZ;
 Enddecay
 CDecay D-sig
 
 Decay tau-sig
-0.178175       e-           anti-nu_e      nu_tau     TAULNUNU;
-0.173937       mu-          anti-nu_mu     nu_tau     TAULNUNU;
+0.178175       e-       anti-nu_e      nu_tau               TAULNUNU;
+0.173937       mu-      anti-nu_mu     nu_tau               TAULNUNU;
 Enddecay
 CDecay tau+sig
 

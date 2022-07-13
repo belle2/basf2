@@ -12,12 +12,6 @@
 
 yesPhotos
 
-# Alias will have the same properties as the original particle except the decay table
-
-Alias B0sig B0
-Alias anti-B0sig anti-B0
-ChargeConj B0sig anti-B0sig
-
 Alias D_1+sig D_1+
 Alias D_1-sig D_1-
 ChargeConj D_1+sig D_1-sig
@@ -33,19 +27,6 @@ ChargeConj D'_1+sig D'_1-sig
 Alias D_2*+sig D_2*+
 Alias D_2*-sig D_2*-
 ChargeConj D_2*+sig D_2*-sig
-
-
-Alias D*+sig D*+
-Alias D*-sig D*-
-ChargeConj D*+sig D*-sig
-
-Alias D+sig D+
-Alias D-sig D-
-ChargeConj D+sig D-sig
-
-Alias tau+sig tau+
-Alias tau-sig tau-
-ChargeConj tau+sig tau-sig
 
 
 # set partial waves for narrow D**
@@ -72,12 +53,7 @@ SetLineshapePW anti-D_2*0 D*- pi+ 2
 # One B decays to signal mode, while the other to generic decay modes
 Decay Upsilon(4S)
 0.483122645         B0  anti-B0  B0sig  anti-B0sig     VSS_BMIX dm;
-#Verctor to scalar + scalar model with the 'mass difference between two daughters' dm defined generally.
 Enddecay
-
-
-# CDecay automatically creates the decay table for charge conjugated particle
-# (to use this feature Alias has to be defined)
 
 Decay anti-B0sig
 0.001300000    D_1+sig   tau-sig anti-nu_tau                     LLSW 0.71 -1.6 -0.5 2.9;

@@ -1,7 +1,7 @@
 # EventType: 1163344000
-# Descriptor: [B0 -> [D**+ -> [D+ -> K pi pi] pi(pi0)] [tau -> e(mu) nu nu] nu]cc
+# Descriptor: [B0 -> [D**+ -> [D+ -> K pi pi] pi(pi0)] [tau -> l nu nu] nu]cc
 # NickName: Bd_Dstst+taunu_K2pi
-# Documentation: B0->D**+ tau nu, D**+(D*+)->D+ 2pi(pi0), D+->K pi pi, tau->e(mu) nu nu, bkg mode for inclusive tagging R(D(*))
+# Documentation: B0->D**+ tau nu, D**+(D*+)->D+ 2pi(pi0), D+->K pi pi, tau->l nu nu, bkg mode for inclusive tagging R(D(*))
 # Tested: Yes
 # PhysicsWG: SL
 # Responsible: Boyang Zhang

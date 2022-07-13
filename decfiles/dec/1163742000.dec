@@ -1,5 +1,5 @@
 # EventType: 1163742000
-# Descriptor: [B0 -> [D* -> [D -> K pi pi] pi0(gamma)] e(mu) nu]cc
+# Descriptor: [B0 -> [D*+ -> [D+ -> K pi pi] pi0(gamma)] l nu]cc
 # NickName: Bd_Dst+lnu_K2pi
 # Documentation: B0->D*+ l nu, D*+->D+ pi0(gamma), D+->K pi pi, normalization mode for inclusive tagging R(D*)
 # Tested: Yes

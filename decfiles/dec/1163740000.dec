@@ -1,7 +1,7 @@
 # EventType: 1163740000
-# Descriptor: [B0 -> [D -> K pi pi] e(mu) nu]cc
+# Descriptor: [B0 -> [D+ -> K pi pi] l nu]cc
 # NickName: Bd_D+lnu_K2pi
-# Documentation: B0->D e/mu nu, D->K pi pi, normalization mode for inclusive tagging R(D)
+# Documentation: B0->D+ l nu, D->K pi pi, normalization mode for inclusive tagging R(D)
 # Tested: Yes
 # PhysicsWG: SL
 # Responsible: Boyang Zhang

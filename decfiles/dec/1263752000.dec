@@ -1,5 +1,5 @@
 # EventType: 1263752000
-# Descriptor: [B- -> [D**0 -> [D -> K pi pi] pi(pi0)] e(mu) nu]cc
+# Descriptor: [B- -> [D**0 -> [D+ -> K pi pi] pi(pi0)] l nu]cc
 # NickName: Bu_Dstst0lnu_K2pi
 # Documentation: B-->D**0 l nu, D**0(D*+)->D+ pi(pi0), D+->K pi pi, bkg mode for inclusive tagging R(D(*))
 # Tested: Yes

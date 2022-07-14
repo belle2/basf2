@@ -3,7 +3,10 @@
 Updating the main globaltag
 +++++++++++++++++++++++++++
 
-basf2 needs payloads to work so we need a special globaltag (usually called "main globaltag") for software development.
+.. tip::
+   Please have a look to :ref:`this page<conditionsdb_overview>` for a broader overview about the Conditions Database.
+
+basf2 needs payloads to work so we need a special globaltag (usually called "main" globaltag) for software development.
 The main globaltag is also used as baseline for our run-independent MC productions. Due to the development model there 
 are a few requirements for this globaltag:
 
@@ -27,10 +30,10 @@ are a few requirements for this globaltag:
 Preparation of payloads
 -----------------------
 
-Before requesting any changes of payloads the payload code needs to be prepared. Please create a pull request
-which contains the changes to the code which are required. In all cases we ask you to create a local database
-containing the new payload versions. This is one text file containing a description of which payload is valid for
-which experiment and run range and the payloads themselves as root files named
+Before requesting any changes of payloads, or introduction of new payloads, the the payload code needs to be prepared.
+Please create a pull request which contains the changes to the code which are required. In all cases you should create
+a local database containing the new payload versions. This is one text file containing a description of which payload
+is valid for which experiment and run range and the payloads themselves as root files named
 ``dbstore_${payloadName}_rev_${revision}.root`` where the revision number is just an alphanumeric string (the first few
 characters of the MD5 checksum of the payload file) to distinguish different versions. A local database file might
 look something like this:
@@ -47,7 +50,8 @@ Each line describes one interval of validity for one payload and consists of:
 
 2. The payload name. This is usually the class name of your payload.
 
-3. The revision code. The final revision in the Conditions Database is instead a number and it is unique.
+3. The revision code. Note that the revision code is not the final revision in the Conditions Database, that is
+   instead a number and it is unique
 
 4. The Interval of Validity (IoV) for which the payload is valid, see the
    :ref:`Conditions Database overview <conditionsdb_overview>`.
@@ -70,7 +74,8 @@ IoV             Valid for
 Mostly the ``database.txt`` file should be generated automatically if you use the ``DBImport`` interface but please
 review it and make sure all payloads have the correct IoV and make sure it contains all the payloads you want to add
 and nothing else. The ``database.txt`` and the corresponding payload files should then be provided to the globaltag
-manager for each of the three following use cases:
+manager (using the :ref:`b2conditionsdb-request <b2conditionsdb-request>` tool) for each of the three following use
+cases:
 
 
 Create a new payload
@@ -90,7 +95,7 @@ up and simplifies the globaltag update procedure.
 
 .. tip::
 
-   For creating a new payload, please check the :ref:`corresponding documentation<cdb_payload_creation>`.
+   To create new payload, please check the :ref:`corresponding documentation<cdb_payload_creation>`.
 
 .. warning::
    
@@ -120,8 +125,8 @@ versions of the payload and cannot be read correctly.
      - you must make sure you increase the ``ClassDef`` version number
        `correctly <https://root.cern/manual/io_custom_classes/#the-classdef-macro>`__;
      - you run the tool ``b2code-classversion-update`` over the corresponding ``linkdef.h`` file;
-     - you should, if possible, provide schema evolution rules or otherwise make sure the code still works if an
-       older version of the payload is found in a globaltag.
+     - you should provide schema evolution rules or otherwise make sure the code still works if an older version of
+       the payload is found in a globaltag.
 
 If you manage to make sure that the code also works with the old payload you can just review and test the changes as
 usual and don't need to coordinate with the globaltag manager. Once your new payload definition is merged you can
@@ -129,17 +134,18 @@ just provide the new payloads to the globaltag manager.
 
 .. warning::
 
-   If you cannot ensure backwards compatibility please create a pull request with the code changes and make sure that,
-   apart from the missing payload, it is approved by all necessary people and can be merged on short notice. Only then
-   should you ask for an update of the globaltag by providing the pull request number and the new payloads to the
-   globaltag manager.
+   If you cannot ensure backwards compatibility, you should discuss about this with the globaltag manager or during a
+   `Software Developers meeting<https://indico.belle2.org/category/18/>`__. Then, after having found a proper
+   solution, please create a pull request with the code changes and make sure that, apart from the missing payload, it
+   is approved by all necessary people and can be merged on short notice. Only then you should ask for an update of
+   the globaltag by providing the pull request number and the new payloads to the globaltag manager.
 
 
 Testing of all changes
 ----------------------
 
 Please make sure the payloads contain the contents you expect them to have. You can easily inspect a payload file
-using the tool ``b2conditionsdb-dump`` (see the full documentation :ref:`here <b2conditionsdb>`.
+using the tool ``b2conditionsdb-dump`` (see the full documentation :ref:`here <b2conditionsdb>`).
 
 .. warning::
 
@@ -163,6 +169,8 @@ following snippet:
    b2test-units
    b2test-scripts
    # don't forget to unset the environment variables afterwards
+   unset BELLE2_CONDB_FALLBACK
+   unset BELLE2_CONDB_GLOBALTAG
 
 and make sure there are no failing tests. You might want to run ``b2test-scripts -j N`` to execute ``N`` tests in
 parallel.

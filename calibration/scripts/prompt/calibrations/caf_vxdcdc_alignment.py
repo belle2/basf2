@@ -269,7 +269,7 @@ def create_beamspot(files, cfg):
       Expert config dictionary
     """
 
-    mumu = files["mumu"]
+    mumu = select_files(files["mumu"], 10e6, cfg["mumu.max_processed_events_per_file"])
 
     ###################################################
     # Algorithm setup
@@ -463,6 +463,10 @@ def get_calibrations(input_data, **kwargs):
     beamspot.depends_on(prompt)
     stage1.depends_on(beamspot)
     stage2.depends_on(stage1)
+
+    # Do not save BeamSpot payloads in the final output database
+    # because alignment is changed -> BeamSpot payloads now invalid
+    beamspot.save_payloads = False
 
     return [prompt, beamspot, stage1, stage2]
 

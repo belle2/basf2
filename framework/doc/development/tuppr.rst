@@ -135,7 +135,7 @@ just provide the new payloads to the globaltag manager.
 .. warning::
 
    If you cannot ensure backwards compatibility, you should discuss about this with the globaltag manager or during a
-   `Software Developers meeting<https://indico.belle2.org/category/18/>`__. Then, after having found a proper
+   `Software Developers meeting <https://indico.belle2.org/category/18/>`__. Then, after having found a proper
    solution, please create a pull request with the code changes and make sure that, apart from the missing payload, it
    is approved by all necessary people and can be merged on short notice. Only then you should ask for an update of
    the globaltag by providing the pull request number and the new payloads to the globaltag manager.

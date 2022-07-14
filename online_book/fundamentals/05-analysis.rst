@@ -82,6 +82,9 @@ starting from those signals and combined particles that are reconstructed as sum
     :math:`L_{\mu} \approx 63` m and :math:`L_{D^0} \approx 170` μm. Only the muon reaches
     the tracking system.
 
+<!---
+Please double check your answers, I got quite different numerical results just from plugging in numbers (:math:`L_{\mu} \approx 6234` m and :math:`L_{D^0} \approx 66` μm). I might be wrong though.
+--->
 
 .. admonition:: Question
     :class: exercise stacked

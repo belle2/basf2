@@ -26,7 +26,7 @@ _VALIDATION_SAMPLE = "mdst14.root"
 def tauskim_particle_selection(label, path):
     # Track
     trackCuts = "-3.0 < dz < 3.0 and dr < 1.0"
-    ma.cutAndCopyList("pi+:%s" % label, "pi+:all", trackCuts, path=path)
+    ma.cutAndCopyList(f"pi+:{label}", "pi+:all", trackCuts, path=path)
 
     # pi0
 
@@ -43,7 +43,7 @@ def tauskim_particle_selection(label, path):
         gammaForPi0Cuts += ' and -0.8660 < cosTheta < 0.9563'
         gammaForPi0Cuts += ' and clusterNHits > 1.5'
         gammaForPi0Cuts += ' and [[minC2TDist > 40] or [E > 0.4]]'  # new
-        gammaForPi0 = 'gamma:looseForPi0%s%s' % (label, g)
+        gammaForPi0 = f'gamma:looseForPi0{label}{g}'
         gammaForPi0lists.append(gammaForPi0)
         ma.cutAndCopyLists(gammaForPi0, 'gamma:all', gammaForPi0Cuts, path=path)
 
@@ -70,16 +70,16 @@ def tauskim_particle_selection(label, path):
     Pi0lists = []
     for cut in Pi0CutValue.keys():
         gammalists = cut.split(",")
-        CurrentPi0List = 'pi0:fromLooseGammas%s%s%s' % (label, gammalists[0], gammalists[1])
+        CurrentPi0List = f'pi0:fromLooseGammas{label}{gammalists[0]}{gammalists[1]}'
         Pi0lists.append(CurrentPi0List)
         Pi0Cut = '0.115 < M < 0.152'
         for i, c in enumerate(Pi0CutLabel):
-            Pi0Cut += ' and %s > %s' % (c, Pi0CutValue[cut][i])
+            Pi0Cut += f' and {c} > {Pi0CutValue[cut][i]}'
 
-        ma.reconstructDecay('%s -> gamma:looseForPi0%s%s gamma:looseForPi0%s%s' %
-                            (CurrentPi0List, label, gammalists[0], label, gammalists[1]), Pi0Cut, path=path)
+        ma.reconstructDecay(f'{CurrentPi0List} -> gamma:looseForPi0{label}{gammalists[0]} gamma:looseForPi0{label}{gammalists[1]}',
+                            Pi0Cut, path=path)
 
-    ma.copyLists('pi0:%s' % label, Pi0lists, path=path)
+    ma.copyLists(f'pi0:{label}', Pi0lists, path=path)
 
     # gamma
     gammaCuts = 'E > 0.2'
@@ -87,8 +87,8 @@ def tauskim_particle_selection(label, path):
     gammaCuts += ' and abs(clusterTiming) < 200'
     gammaCuts += ' and -0.8660 < cosTheta < 0.9563'
     gammaCuts += ' and clusterNHits > 1.5'
-    gammaCuts += ' and isDescendantOfList(pi0:%s) == 0' % label
-    ma.cutAndCopyList('gamma:%s' % label, 'gamma:all', gammaCuts, path=path)
+    gammaCuts += f' and isDescendantOfList(pi0:{label}) == 0'
+    ma.cutAndCopyList(f'gamma:{label}', 'gamma:all', gammaCuts, path=path)
 
 
 @fancy_skim_header

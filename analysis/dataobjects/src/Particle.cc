@@ -847,7 +847,7 @@ const TrackFitResult* Particle::getTrackFitResult() const
 {
   // if the particle is related to a TrackFitResult then return this
   auto* selfrelated = this->getRelatedTo<TrackFitResult>();
-  if (selfrelated)
+  if (selfrelated && !isnan(selfrelated->getPValue()))
     return selfrelated;
 
   // if not get the TFR with closest mass to this particle

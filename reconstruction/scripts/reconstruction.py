@@ -77,7 +77,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                        use_second_cdc_hits=False, add_muid_hits=False, reconstruct_cdst=None,
                        event_abort=default_event_abort, use_random_numbers_for_hlt_prescale=True,
                        pxd_filtering_offline=False, append_full_grid_cdc_eventt0=False,
-                       legacy_ecl_charged_pid=True):
+                       legacy_ecl_charged_pid=False):
     """
     This function adds the standard reconstruction modules to a path.
     Consists of clustering, tracking and the PID modules essentially in this structure:
@@ -172,7 +172,7 @@ def add_prefilter_reconstruction(
         use_random_numbers_for_hlt_prescale=True,
         pxd_filtering_offline=False,
         append_full_grid_cdc_eventt0=False,
-        legacy_ecl_charged_pid=True):
+        legacy_ecl_charged_pid=False):
     """
     This function adds only the reconstruction modules required to calculate HLT filter decision to a path.
     Consists of essential tracking and the functionality provided by :func:`add_prefilter_posttracking_reconstruction()`.
@@ -325,7 +325,7 @@ def add_cosmics_reconstruction(
         reconstruct_cdst=False,
         posttracking=True,
         eventt0_combiner_mode="prefer_cdc",
-        legacy_ecl_charged_pid=True,
+        legacy_ecl_charged_pid=False,
         ):
     """
     This function adds the standard reconstruction modules for cosmic data to a path.
@@ -398,7 +398,7 @@ def add_cosmics_reconstruction(
 
 
 def add_mc_reconstruction(path, components=None, pruneTracks=True, addClusterExpertModules=True,
-                          use_second_cdc_hits=False, add_muid_hits=False, legacy_ecl_charged_pid=True):
+                          use_second_cdc_hits=False, add_muid_hits=False, legacy_ecl_charged_pid=False):
     """
     This function adds the standard reconstruction modules with MC tracking
     to a path.
@@ -456,7 +456,7 @@ def add_prefilter_posttracking_reconstruction(path,
                                               for_cdst_analysis=False,
                                               add_eventt0_combiner_for_cdst=False,
                                               eventt0_combiner_mode="prefer_svd",
-                                              legacy_ecl_charged_pid=True):
+                                              legacy_ecl_charged_pid=False):
     """
     This function adds the standard reconstruction modules after tracking
     to a path.
@@ -826,7 +826,7 @@ def add_dedx_modules(path, components=None):
         path.add_module('VXDDedxPID')
 
 
-def prepare_cdst_analysis(path, components=None, mc=False, add_eventt0_combiner=False, legacy_ecl_charged_pid=True):
+def prepare_cdst_analysis(path, components=None, mc=False, add_eventt0_combiner=False, legacy_ecl_charged_pid=False):
     """
     Adds to a (analysis) path all the modules needed to analyse a cDST file in the raw+tracking format
     for collisions/cosmics data or in the digits+tracking format for MC data.

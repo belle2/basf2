@@ -91,7 +91,13 @@ void LowEnergyPi0VetoExpertModule::init_mva(MVA::Weightfile& weightfile)
   m_expert = supported_interfaces[general_options.m_method]->getExpert();
   m_expert->load(weightfile);
   std::vector<float> dummy;
-  dummy.resize(m_Belle1 ? 7 : 9, 0);
+  /* The number of input variables depends on the experiment. */
+  int nInputVariables;
+  if (m_Belle1)
+    nInputVariables = 7;
+  else
+    nInputVariables = 9;
+  dummy.resize(nInputVariables, 0);
   m_dataset = std::unique_ptr<MVA::SingleDataset>(new MVA::SingleDataset(general_options, std::move(dummy), 0));
 }
 

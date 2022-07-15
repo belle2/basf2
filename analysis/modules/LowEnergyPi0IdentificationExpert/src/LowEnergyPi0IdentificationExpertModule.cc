@@ -78,7 +78,13 @@ void LowEnergyPi0IdentificationExpertModule::init_mva(MVA::Weightfile& weightfil
   m_expert = supported_interfaces[general_options.m_method]->getExpert();
   m_expert->load(weightfile);
   std::vector<float> dummy;
-  dummy.resize(m_Belle1 ? 6 : 8, 0);
+  /* The number of input variables depends on the experiment. */
+  int nInputVariables;
+  if (m_Belle1)
+    nInputVariables = 6;
+  else
+    nInputVariables = 8;
+  dummy.resize(nInputVariables, 0);
   m_dataset = std::unique_ptr<MVA::SingleDataset>(new MVA::SingleDataset(general_options, std::move(dummy), 0));
 }
 

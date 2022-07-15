@@ -25,8 +25,8 @@ LowEnergyPi0IdentificationExpertModule::LowEnergyPi0IdentificationExpertModule()
   addParam("Pi0ListName", m_Pi0ListName, "Pi0 particle list name.",
            std::string("pi0"));
   addParam("Belle1", m_Belle1, "Belle 1 data analysis.", false);
-  addParam("classifierPath", m_identifier,
-           "Path to the classifier you want to use. It is recommended to use the default classifiers and not to mess around with this.",
+  addParam("identifier", m_identifier,
+           "Database identifier or file used to load the weights.",
            m_identifier);
   setPropertyFlags(c_ParallelProcessingCertified);
 }

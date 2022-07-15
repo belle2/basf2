@@ -80,16 +80,16 @@ namespace Belle2 {
     /** pi0 candidates. */
     StoreObjPtr<ParticleList> m_ListPi0;
 
-    /** mva identifier. no ending means its loaded from the database  */
+    /** Database identifier or file used to load the weights. */
     std::string m_identifier = "LowEnergyPi0Identification";
 
-    /** Database pointer to the Database representation of the weightfile */
+    /** Database pointer to the database representation of the weightfile. */
     std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>> m_weightfile_representation;
 
-    /** Pointer to the current MVA Expert */
+    /** Pointer to the current MVA expert. */
     std::unique_ptr<MVA::Expert> m_expert;
 
-    /** Pointer to the current dataset */
+    /** Pointer to the current dataset. */
     std::unique_ptr<MVA::SingleDataset> m_dataset;
 
   };

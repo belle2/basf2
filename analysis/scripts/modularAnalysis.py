@@ -2947,11 +2947,12 @@ def lowEnergyPi0Identification(pi0List, gammaList, globalTag, path=None,
     basf2.conditions.prepend_globaltag(globalTag)
     # Select photons with higher energy for formation of veto combinations.
     cutAndCopyList('gamma:pi0veto', gammaList, 'E > 0.2', path=path)
+    import b2bii
     path.add_module('LowEnergyPi0VetoExpert', VetoPi0Daughters=True,
                     GammaListName='gamma:pi0veto', Pi0ListName=pi0List,
-                    Belle1=belle1)
+                    Belle1=b2bii.isB2BII())
     path.add_module('LowEnergyPi0IdentificationExpert', Pi0ListName=pi0List,
-                    Belle1=belle1)
+                    Belle1=b2bii.isB2BII())
 
 
 def getBeamBackgroundProbability(particleList, path=None):

@@ -2935,12 +2935,11 @@ def lowEnergyPi0Identification(pi0List, gammaList, globalTag, path=None,
     The result is stored as ExtraInfo 'lowEnergyPi0Identification'.
     @param[in] pi0List   Pi0 list.
     @param[in] gammaList Gamma list. First, an energy cut E > 0.2 is applied
-                         to the photons from this list. Then, all possible
-                         combinations with a pi0 daughter photon are formed
-                         except the one corresponding to the reconstructed pi0.
-                         The maximum low-energy pi0 veto value is calculated
-                         for such photon pairs and used as one of the input
-                         variables for the identification classifier.
+    to the photons from this list. Then, all possible combinations with a pi0
+    daughter photon are formed except the one corresponding to
+    the reconstructed pi0. The maximum low-energy pi0 veto value is calculated
+    for such photon pairs and used as one of the input variables for
+    the identification classifier.
     @param[in] globalTag Global tag with MVA payloads.
     @param[in] path      Module path.
     @param[in] belle1    Whether Belle data are analysed.

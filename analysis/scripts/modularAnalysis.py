@@ -2928,6 +2928,30 @@ def writePi0EtaVeto(
     path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
 
+def lowEnergyPi0Identification(pi0List, gammaList, globalTag, path=None,
+                               belle1=False):
+    """
+    Calculate low-energy pi0 identification.
+    The result is stored as ExtraInfo 'lowEnergyPi0Identification'.
+    @param[in] pi0List   Pi0 list.
+    @param[in] gammaList Gamma list. Photons are used to calculate maximum
+                         pi0 veto for all combinations except corresponding
+                         to the reconstructed pi0. It is then used as one of
+                         input variables.
+    @param[in] globalTag Global tag with MVA payloads.
+    @param[in] path      Module path.
+    @param[in] belle1    Whether Belle data are analysed.
+    """
+    basf2.conditions.prepend_globaltag(globalTag)
+    # Select photons with higher energy for formation of veto combninations.
+    cutAndCopyList('gamma:pi0veto', gammaList, 'E > 0.2', path=path)
+    path.add_module('LowEnergyPi0VetoExpert', VetoPi0Daughters=True,
+                    GammaListName='gamma:pi0veto', Pi0ListName=pi0List,
+                    Belle1=belle1)
+    path.add_module('LowEnergyPi0IdentificationExpert', Pi0ListName=pi0List,
+                    Belle1=belle1)
+
+
 def getBeamBackgroundProbability(particleList, path=None):
     """
     Assign a probability to each ECL cluster as being signal like (1) compared to beam background like (0)

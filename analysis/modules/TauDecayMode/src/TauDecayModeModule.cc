@@ -285,40 +285,38 @@ void TauDecayModeModule::AnalyzeTauPairEvent()
     if (pdgid == Const::electron.getPDGCode() && elecFirst)  {
       elecFirst = false;
       const MCParticle* mother = p.getMother();
-      if (mother) { // In some low multiplicity generators there may be no mother
-        const vector<MCParticle*> daughters = mother->getDaughters();
-        int nElMinus = 0;
-        int nElPlus = 0;
-        stringstream elec_ss;
-        for (MCParticle* d : daughters) {
-          if (!d->hasStatus(MCParticle::c_PrimaryParticle)) continue;
-          elec_ss <<  d->getPDG() << " ";
-          if (d->getPDG() == Const::electron.getPDGCode()) nElMinus++;
-          if (d->getPDG() == -Const::electron.getPDGCode()) nElPlus++;
-        }
-        if (nElMinus == 1 && nElPlus == 1) { // use this information in getRecursiveMotherCharge
-          B2DEBUG(1, "Mother of elec pair is = " << mother->getPDG() << " which has daughters : " << elec_ss.str());
-        }
+      if (not mother) continue; // In some low multiplicity generators there may be no mother
+      const vector<MCParticle*> daughters = mother->getDaughters();
+      int nElMinus = 0;
+      int nElPlus = 0;
+      stringstream elec_ss;
+      for (MCParticle* d : daughters) {
+        if (!d->hasStatus(MCParticle::c_PrimaryParticle)) continue;
+        elec_ss <<  d->getPDG() << " ";
+        if (d->getPDG() == Const::electron.getPDGCode()) nElMinus++;
+        if (d->getPDG() == -Const::electron.getPDGCode()) nElPlus++;
+      }
+      if (nElMinus == 1 && nElPlus == 1) { // use this information in getRecursiveMotherCharge
+        B2DEBUG(1, "Mother of elec pair is = " << mother->getPDG() << " which has daughters : " << elec_ss.str());
       }
     }
 
     if (pdgid == Const::muon.getPDGCode() && muonFirst)  {
       muonFirst = false;
       const MCParticle* mother = p.getMother();
-      if (mother) { // In some low multiplicity generators there may be no mother
-        const vector<MCParticle*> daughters = mother->getDaughters();
-        int nMuMinus = 0;
-        int nMuPlus = 0;
-        stringstream muon_ss;
-        for (MCParticle* d : daughters) {
-          if (!d->hasStatus(MCParticle::c_PrimaryParticle)) continue;
-          muon_ss <<  d->getPDG() << " ";
-          if (d->getPDG() == Const::muon.getPDGCode()) nMuMinus++;
-          if (d->getPDG() == -Const::muon.getPDGCode()) nMuPlus++;
-        }
-        if (nMuMinus == 1 && nMuPlus == 1) { // use this information in getRecursiveMotherCharge
-          B2DEBUG(1, "Mother of muon pair is = " << mother->getPDG() << " which has daughters : " << muon_ss.str());
-        }
+      if (not mother) continue; // In some low multiplicity generators there may be no mother
+      const vector<MCParticle*> daughters = mother->getDaughters();
+      int nMuMinus = 0;
+      int nMuPlus = 0;
+      stringstream muon_ss;
+      for (MCParticle* d : daughters) {
+        if (!d->hasStatus(MCParticle::c_PrimaryParticle)) continue;
+        muon_ss <<  d->getPDG() << " ";
+        if (d->getPDG() == Const::muon.getPDGCode()) nMuMinus++;
+        if (d->getPDG() == -Const::muon.getPDGCode()) nMuPlus++;
+      }
+      if (nMuMinus == 1 && nMuPlus == 1) { // use this information in getRecursiveMotherCharge
+        B2DEBUG(1, "Mother of muon pair is = " << mother->getPDG() << " which has daughters : " << muon_ss.str());
       }
     }
 
@@ -326,224 +324,223 @@ void TauDecayModeModule::AnalyzeTauPairEvent()
     bool accept_photon = false;
     if (pdgid == Const::photon.getPDGCode())  {
       const MCParticle* mother = p.getMother();
-      if (mother) { // In some low multiplicity generators there may be no mother
-        int mothid = abs(mother->getPDG());
+      if (not mother) continue; // In some low multiplicity generators there may be no mother
+      int mothid = abs(mother->getPDG());
 
-        // check if the gamma comes from final state charged particles {e, mu, pi, K, p, b_1}
-        bool isRadiationfromFinalStateChargedParticle = false;
-        if (mothid == 11 ||
-            mothid == 13 ||
-            mothid == 211 ||
-            mothid == 321 ||
-            mothid == 2212 ||
-            mothid == 10213) {
-          isRadiationfromFinalStateChargedParticle = true;
+      // check if the gamma comes from final state charged particles {e, mu, pi, K, p, b_1}
+      bool isRadiationfromFinalStateChargedParticle = false;
+      if (mothid == 11 ||
+          mothid == 13 ||
+          mothid == 211 ||
+          mothid == 321 ||
+          mothid == 2212 ||
+          mothid == 10213) {
+        isRadiationfromFinalStateChargedParticle = true;
+      }
+
+      // check if the gamma from ChargedRho
+      bool isRadiationFromChargedRho = false;
+      if (mothid == 213) {
+        int chg = getRecursiveMotherCharge(mother);
+        if (chg < 0 && isChargedRhoFromTauMinusFirst) {
+          isChargedRhoFromTauMinusFirst = false;
+          isRadiationFromChargedRho = true;
         }
-
-        // check if the gamma from ChargedRho
-        bool isRadiationFromChargedRho = false;
-        if (mothid == 213) {
-          int chg = getRecursiveMotherCharge(mother);
-          if (chg < 0 && isChargedRhoFromTauMinusFirst) {
-            isChargedRhoFromTauMinusFirst = false;
-            isRadiationFromChargedRho = true;
-          }
-          if (chg > 0 && isChargedRhoFromTauPlusFirst) {
-            isChargedRhoFromTauPlusFirst = false;
-            isRadiationFromChargedRho = true;
-          }
+        if (chg > 0 && isChargedRhoFromTauPlusFirst) {
+          isChargedRhoFromTauPlusFirst = false;
+          isRadiationFromChargedRho = true;
         }
+      }
 
-        // check if the gamma from ChargedA1
-        bool isRadiationFromChargedA1 = false;
-        if (mothid == 20213) {
-          int chg = getRecursiveMotherCharge(mother);
-          if (chg < 0 && isChargedA1FromTauMinusFirst) {
-            isChargedA1FromTauMinusFirst = false;
-            isRadiationFromChargedA1 = true;
-          }
-          if (chg > 0 && isChargedA1FromTauPlusFirst) {
-            isChargedA1FromTauPlusFirst = false;
-            isRadiationFromChargedA1 = true;
-          }
+      // check if the gamma from ChargedA1
+      bool isRadiationFromChargedA1 = false;
+      if (mothid == 20213) {
+        int chg = getRecursiveMotherCharge(mother);
+        if (chg < 0 && isChargedA1FromTauMinusFirst) {
+          isChargedA1FromTauMinusFirst = false;
+          isRadiationFromChargedA1 = true;
         }
-
-        // check if the gamma comes from intermediate W+- boson
-        bool isRadiationfromIntermediateWBoson = false;
-        if (mothid == 24) isRadiationfromIntermediateWBoson = true;
-
-        // check if it is a tau- -> pi- omega nu, omega -> pi0 gamma decay
-        // Note: TauolaBelle2 generator treats this a coherent production
-        // e.g. includes omega in the form factor but not as an explicit final state particle
-        bool isPiPizGam = false;
-        if (isRadiationfromIntermediateWBoson) {
-          if (p.get4Vector().E() > 0.050) { // 50 MeV threshold
-            const vector<MCParticle*> daughters = mother->getDaughters();
-            int nPiSisters = 0;
-            int nPizSisters = 0;
-            int nTotSisters = 0;
-            int nOtherSisters = 0;
-            for (MCParticle* d : daughters) {
-              if (!d->hasStatus(MCParticle::c_PrimaryParticle)) continue;
-              nTotSisters++;
-              if (abs(d->getPDG()) == 211) {
-                nPiSisters++;
-              } else if (abs(d->getPDG()) == 111) {
-                nPizSisters++;
-              } else if (abs(d->getPDG()) != 22) {
-                nOtherSisters++;
-              }
-            }
-            // allow final state radiation from the tau lepton, but ignore information on number of photons for decay mode classifiction
-            if (nTotSisters >= 3 && nPiSisters == 1 && nPizSisters == 1 && nOtherSisters == 0) {
-              int chg = getRecursiveMotherCharge(mother);
-              if (chg < 0 && isPiPizGamTauMinusFirst) {
-                isPiPizGamTauMinusFirst = false;
-                isPiPizGam = true;
-              }
-              if (chg > 0 && isPiPizGamTauPlusFirst) {
-                isPiPizGamTauPlusFirst = false;
-                isPiPizGam = true;
-              }
-            }
-          }
+        if (chg > 0 && isChargedA1FromTauPlusFirst) {
+          isChargedA1FromTauPlusFirst = false;
+          isRadiationFromChargedA1 = true;
         }
+      }
 
-        // check if the gamma comes from tau
-        bool isRadiationfromTau = false;
-        if (mothid == 15) isRadiationfromTau = true;
+      // check if the gamma comes from intermediate W+- boson
+      bool isRadiationfromIntermediateWBoson = false;
+      if (mothid == 24) isRadiationfromIntermediateWBoson = true;
 
-        // check if the gamma comes from 2 body LFV decays of tau, e.g. tau- -> e-/mu- gamma with arbitrary number of extra photon radiations from PHOTOS/FSR
-        bool isLFVTau2BodyDecay = false;
-        if (isRadiationfromTau) {
-          bool hasNeutrinoAsSister = false;
-          int numChargedSister = 0;
-          int numNeutralNonNeutrinoNonPhotonSister = 0;
+      // check if it is a tau- -> pi- omega nu, omega -> pi0 gamma decay
+      // Note: TauolaBelle2 generator treats this a coherent production
+      // e.g. includes omega in the form factor but not as an explicit final state particle
+      bool isPiPizGam = false;
+      if (isRadiationfromIntermediateWBoson) {
+        if (p.get4Vector().E() > 0.050) { // 50 MeV threshold
           const vector<MCParticle*> daughters = mother->getDaughters();
+          int nPiSisters = 0;
+          int nPizSisters = 0;
+          int nTotSisters = 0;
+          int nOtherSisters = 0;
           for (MCParticle* d : daughters) {
             if (!d->hasStatus(MCParticle::c_PrimaryParticle)) continue;
-            hasNeutrinoAsSister = find(begin(Neutrinos), end(Neutrinos), abs(d->getPDG())) != end(Neutrinos);
-            if (hasNeutrinoAsSister) break;
-          }
-          if (!hasNeutrinoAsSister) {
-            for (MCParticle* d : daughters) {
-              if (!d->hasStatus(MCParticle::c_PrimaryParticle)) continue;
-              bool isChargedFinalState = find(begin(finalStatePDGs), end(finalStatePDGs), abs(d->getPDG())) != end(finalStatePDGs);
-              if (isChargedFinalState) {
-                numChargedSister++;
-              } else if (d->getPDG() != 22) {
-                numNeutralNonNeutrinoNonPhotonSister++;
-              }
-            }
-            if (numChargedSister == 1 && numNeutralNonNeutrinoNonPhotonSister == 0) {
-              if (mother->getPDG() == 15 && isLFVTauMinus2BodyDecayFirst) {
-                isLFVTauMinus2BodyDecayFirst = false;
-                isLFVTau2BodyDecay = true;
-              }
-              if (mother->getPDG() == -15 && isLFVTauPlus2BodyDecayFirst) {
-                isLFVTauPlus2BodyDecayFirst = false;
-                isLFVTau2BodyDecay = true;
-              }
+            nTotSisters++;
+            if (abs(d->getPDG()) == 211) {
+              nPiSisters++;
+            } else if (abs(d->getPDG()) == 111) {
+              nPizSisters++;
+            } else if (abs(d->getPDG()) != 22) {
+              nOtherSisters++;
             }
           }
-          B2DEBUG(1, "hasNeutrinoAsSister = " << hasNeutrinoAsSister
-                  << " numChargedSister = " << numChargedSister
-                  << " numNeutralNonNeutrinoNonPhotonSister = " << numNeutralNonNeutrinoNonPhotonSister
-                  << " isLFVTau2BodyDecay = " << isLFVTau2BodyDecay);
+          // allow final state radiation from the tau lepton, but ignore information on number of photons for decay mode classifiction
+          if (nTotSisters >= 3 && nPiSisters == 1 && nPizSisters == 1 && nOtherSisters == 0) {
+            int chg = getRecursiveMotherCharge(mother);
+            if (chg < 0 && isPiPizGamTauMinusFirst) {
+              isPiPizGamTauMinusFirst = false;
+              isPiPizGam = true;
+            }
+            if (chg > 0 && isPiPizGamTauPlusFirst) {
+              isPiPizGamTauPlusFirst = false;
+              isPiPizGam = true;
+            }
+          }
         }
+      }
 
-        bool isPi0GG = false;
-        bool isEtaGG = false;
-        bool isEtpGG = false;
-        bool isPi0GEE = false;
-        bool isEtaPPG = false;
-        bool isOmPizG = false;
-        if (mothid == 111 || mothid == 221 || mothid == 331 || mothid == 223) {
-          const vector<MCParticle*> daughters = mother->getDaughters();
-          int numberofTotalDaughters = 0;
-          int numberOfPhotonDaughters = 0;
-          int numberOfElectronDaughters = 0;
-          int numberOfPionDaughters = 0;
-          int numberOfPizDaughters = 0;
+      // check if the gamma comes from tau
+      bool isRadiationfromTau = false;
+      if (mothid == 15) isRadiationfromTau = true;
+
+      // check if the gamma comes from 2 body LFV decays of tau, e.g. tau- -> e-/mu- gamma with arbitrary number of extra photon radiations from PHOTOS/FSR
+      bool isLFVTau2BodyDecay = false;
+      if (isRadiationfromTau) {
+        bool hasNeutrinoAsSister = false;
+        int numChargedSister = 0;
+        int numNeutralNonNeutrinoNonPhotonSister = 0;
+        const vector<MCParticle*> daughters = mother->getDaughters();
+        for (MCParticle* d : daughters) {
+          if (!d->hasStatus(MCParticle::c_PrimaryParticle)) continue;
+          hasNeutrinoAsSister = find(begin(Neutrinos), end(Neutrinos), abs(d->getPDG())) != end(Neutrinos);
+          if (hasNeutrinoAsSister) break;
+        }
+        if (!hasNeutrinoAsSister) {
           for (MCParticle* d : daughters) {
             if (!d->hasStatus(MCParticle::c_PrimaryParticle)) continue;
-            numberofTotalDaughters ++;
-            if (abs(d->getPDG()) == 22) numberOfPhotonDaughters++;
-            if (abs(d->getPDG()) == 11) numberOfElectronDaughters++;
-            if (abs(d->getPDG()) == 211) numberOfPionDaughters++;
-            if (abs(d->getPDG()) == 111) numberOfPizDaughters++;
-          }
-          if (numberofTotalDaughters == 2 && numberOfPhotonDaughters == 2) {
-            if (mothid == 111) isPi0GG = true;
-            if (mothid == 221) isEtaGG = true;
-            if (mothid == 331) isEtpGG = true;
-          }
-          if (numberofTotalDaughters >= 3 && numberOfPhotonDaughters >= 1 && numberOfElectronDaughters == 2 && numberOfPionDaughters == 0
-              && numberOfPizDaughters == 0) {
-            if (mothid == 111) isPi0GEE = true;
-          }
-          if (numberofTotalDaughters >= 3 && numberOfPhotonDaughters >= 1 && numberOfPizDaughters == 0 && numberOfPionDaughters == 2) {
-            if (mothid == 221) {
-              int chg = getRecursiveMotherCharge(mother);
-              if (chg < 0 && isEtaPPGFromTauMinusFirst)  {
-                isEtaPPGFromTauMinusFirst = false;
-                isEtaPPG = true;
-              }
-              if (chg > 0 && isEtaPPGFromTauPlusFirst)  {
-                isEtaPPGFromTauPlusFirst = false;
-                isEtaPPG = true;
-              }
+            bool isChargedFinalState = find(begin(finalStatePDGs), end(finalStatePDGs), abs(d->getPDG())) != end(finalStatePDGs);
+            if (isChargedFinalState) {
+              numChargedSister++;
+            } else if (d->getPDG() != 22) {
+              numNeutralNonNeutrinoNonPhotonSister++;
             }
           }
-          if (numberofTotalDaughters >= 2 && numberOfPhotonDaughters >= 1 && numberOfPizDaughters == 1 && numberOfPionDaughters == 0) {
-            if (mothid == 223) {
-              int chg = getRecursiveMotherCharge(mother);
-              if (chg < 0 && isOmegaPizGamFromTauMinusFirst) {
-                isOmegaPizGamFromTauMinusFirst = false;
-                isOmPizG = true;
-              }
-              if (chg > 0 && isOmegaPizGamFromTauPlusFirst) {
-                isOmegaPizGamFromTauPlusFirst = false;
-                isOmPizG = true;
-              }
+          if (numChargedSister == 1 && numNeutralNonNeutrinoNonPhotonSister == 0) {
+            if (mother->getPDG() == 15 && isLFVTauMinus2BodyDecayFirst) {
+              isLFVTauMinus2BodyDecayFirst = false;
+              isLFVTau2BodyDecay = true;
+            }
+            if (mother->getPDG() == -15 && isLFVTauPlus2BodyDecayFirst) {
+              isLFVTauPlus2BodyDecayFirst = false;
+              isLFVTau2BodyDecay = true;
             }
           }
         }
+        B2DEBUG(1, "hasNeutrinoAsSister = " << hasNeutrinoAsSister
+                << " numChargedSister = " << numChargedSister
+                << " numNeutralNonNeutrinoNonPhotonSister = " << numNeutralNonNeutrinoNonPhotonSister
+                << " isLFVTau2BodyDecay = " << isLFVTau2BodyDecay);
+      }
 
-        B2DEBUG(1, "isRadiationfromFinalStateChargedParticle = " << isRadiationfromFinalStateChargedParticle);
-        B2DEBUG(1, "isRadiationFromChargedRho = " << isRadiationFromChargedRho);
-        B2DEBUG(1, "isRadiationFromChargedA1 = " << isRadiationFromChargedA1);
-        B2DEBUG(1, "isRadiationfromIntermediateWBoson = " << isRadiationfromIntermediateWBoson << " isPiPizGam = " << isPiPizGam);
-        B2DEBUG(1, "isRadiationfromTau = " << isRadiationfromTau << " isLFVTau2BodyDecay = " << isLFVTau2BodyDecay);
-        B2DEBUG(1, "isPi0GG = " << isPi0GG << " isEtaGG = " << isEtaGG << " isEtpGG = " << isEtpGG << " isPi0GEE = " << isPi0GEE);
-        B2DEBUG(1, "isEtaPPG = " << isEtaPPG << " isOmPizG = " << isOmPizG);
+      bool isPi0GG = false;
+      bool isEtaGG = false;
+      bool isEtpGG = false;
+      bool isPi0GEE = false;
+      bool isEtaPPG = false;
+      bool isOmPizG = false;
+      if (mothid == 111 || mothid == 221 || mothid == 331 || mothid == 223) {
+        const vector<MCParticle*> daughters = mother->getDaughters();
+        int numberofTotalDaughters = 0;
+        int numberOfPhotonDaughters = 0;
+        int numberOfElectronDaughters = 0;
+        int numberOfPionDaughters = 0;
+        int numberOfPizDaughters = 0;
+        for (MCParticle* d : daughters) {
+          if (!d->hasStatus(MCParticle::c_PrimaryParticle)) continue;
+          numberofTotalDaughters ++;
+          if (abs(d->getPDG()) == 22) numberOfPhotonDaughters++;
+          if (abs(d->getPDG()) == 11) numberOfElectronDaughters++;
+          if (abs(d->getPDG()) == 211) numberOfPionDaughters++;
+          if (abs(d->getPDG()) == 111) numberOfPizDaughters++;
+        }
+        if (numberofTotalDaughters == 2 && numberOfPhotonDaughters == 2) {
+          if (mothid == 111) isPi0GG = true;
+          if (mothid == 221) isEtaGG = true;
+          if (mothid == 331) isEtpGG = true;
+        }
+        if (numberofTotalDaughters >= 3 && numberOfPhotonDaughters >= 1 && numberOfElectronDaughters == 2 && numberOfPionDaughters == 0
+            && numberOfPizDaughters == 0) {
+          if (mothid == 111) isPi0GEE = true;
+        }
+        if (numberofTotalDaughters >= 3 && numberOfPhotonDaughters >= 1 && numberOfPizDaughters == 0 && numberOfPionDaughters == 2) {
+          if (mothid == 221) {
+            int chg = getRecursiveMotherCharge(mother);
+            if (chg < 0 && isEtaPPGFromTauMinusFirst)  {
+              isEtaPPGFromTauMinusFirst = false;
+              isEtaPPG = true;
+            }
+            if (chg > 0 && isEtaPPGFromTauPlusFirst)  {
+              isEtaPPGFromTauPlusFirst = false;
+              isEtaPPG = true;
+            }
+          }
+        }
+        if (numberofTotalDaughters >= 2 && numberOfPhotonDaughters >= 1 && numberOfPizDaughters == 1 && numberOfPionDaughters == 0) {
+          if (mothid == 223) {
+            int chg = getRecursiveMotherCharge(mother);
+            if (chg < 0 && isOmegaPizGamFromTauMinusFirst) {
+              isOmegaPizGamFromTauMinusFirst = false;
+              isOmPizG = true;
+            }
+            if (chg > 0 && isOmegaPizGamFromTauPlusFirst) {
+              isOmegaPizGamFromTauPlusFirst = false;
+              isOmPizG = true;
+            }
+          }
+        }
+      }
 
-        // accept photons if (isRadiationfromFinalStateChargedParticle is false) or
-        // if (isRadiationfromIntermediateWBoson is false) or
-        // if (isRadiationfromTau is true) {gamma is from 2 body LFV decays of tau} or
-        // if the radiation is coming from any other decay [except pi0 -> gamma gamma, eta-> gamma gamma, eta' -> gamma gamma]
-        if (isRadiationfromFinalStateChargedParticle) {
-        } else if (isRadiationFromChargedRho) {
-          accept_photon = true;
-        } else if (isRadiationFromChargedA1) {
-          accept_photon = true;
-        } else if (isRadiationfromIntermediateWBoson) {
-          if (isPiPizGam) {
-            accept_photon = true;
-          }
-        } else if (isRadiationfromTau) { // accept one photon from tau -> (charged particle) + gamma [no neutrinos]
-          if (isLFVTau2BodyDecay) {
-            accept_photon = true;
-          }
-        } else if (isPi0GG) {
-        } else if (isEtaGG) {
-        } else if (isEtpGG) {
-        } else if (isPi0GEE) {
-        } else if (isEtaPPG) {
-          accept_photon = true;
-        } else if (isOmPizG) {
+      B2DEBUG(1, "isRadiationfromFinalStateChargedParticle = " << isRadiationfromFinalStateChargedParticle);
+      B2DEBUG(1, "isRadiationFromChargedRho = " << isRadiationFromChargedRho);
+      B2DEBUG(1, "isRadiationFromChargedA1 = " << isRadiationFromChargedA1);
+      B2DEBUG(1, "isRadiationfromIntermediateWBoson = " << isRadiationfromIntermediateWBoson << " isPiPizGam = " << isPiPizGam);
+      B2DEBUG(1, "isRadiationfromTau = " << isRadiationfromTau << " isLFVTau2BodyDecay = " << isLFVTau2BodyDecay);
+      B2DEBUG(1, "isPi0GG = " << isPi0GG << " isEtaGG = " << isEtaGG << " isEtpGG = " << isEtpGG << " isPi0GEE = " << isPi0GEE);
+      B2DEBUG(1, "isEtaPPG = " << isEtaPPG << " isOmPizG = " << isOmPizG);
+
+      // accept photons if (isRadiationfromFinalStateChargedParticle is false) or
+      // if (isRadiationfromIntermediateWBoson is false) or
+      // if (isRadiationfromTau is true) {gamma is from 2 body LFV decays of tau} or
+      // if the radiation is coming from any other decay [except pi0 -> gamma gamma, eta-> gamma gamma, eta' -> gamma gamma]
+      if (isRadiationfromFinalStateChargedParticle) {
+      } else if (isRadiationFromChargedRho) {
+        accept_photon = true;
+      } else if (isRadiationFromChargedA1) {
+        accept_photon = true;
+      } else if (isRadiationfromIntermediateWBoson) {
+        if (isPiPizGam) {
           accept_photon = true;
         }
+      } else if (isRadiationfromTau) { // accept one photon from tau -> (charged particle) + gamma [no neutrinos]
+        if (isLFVTau2BodyDecay) {
+          accept_photon = true;
+        }
+      } else if (isPi0GG) {
+      } else if (isEtaGG) {
+      } else if (isEtpGG) {
+      } else if (isPi0GEE) {
+      } else if (isEtaPPG) {
+        accept_photon = true;
+      } else if (isOmPizG) {
+        accept_photon = true;
       }
     }
 
@@ -553,25 +550,24 @@ void TauDecayModeModule::AnalyzeTauPairEvent()
 
     if (pdgid == 111 && (isEtaPizPizPizFromTauMinusFirst || isEtaPizPizPizFromTauPlusFirst)) {
       const MCParticle* mother = p.getMother();
-      if (mother) { // In some low multiplicity generators there may be no mother
-        if (mother->getPDG() == 221) { // eta -> pi0 pi0 pi0
-          const vector<MCParticle*> daughters = mother->getDaughters();
-          int nPizSisters = 0;
-          for (MCParticle* d : daughters) {
-            if (!d->hasStatus(MCParticle::c_PrimaryParticle)) continue;
-            if (d->getPDG() == 111) nPizSisters++;
+      // In some low multiplicity generators there may be no mother
+      if (mother and (mother->getPDG() == 221)) { // eta -> pi0 pi0 pi0
+        const vector<MCParticle*> daughters = mother->getDaughters();
+        int nPizSisters = 0;
+        for (MCParticle* d : daughters) {
+          if (!d->hasStatus(MCParticle::c_PrimaryParticle)) continue;
+          if (d->getPDG() == 111) nPizSisters++;
+        }
+        B2DEBUG(1, "nPizSisters = " << nPizSisters);
+        if (nPizSisters == 3) {
+          int chg = getRecursiveMotherCharge(mother);
+          if (chg < 0 && isEtaPizPizPizFromTauMinusFirst) {
+            isEtaPizPizPizFromTauMinusFirst = false;
+            m_isEtaPizPizPizFromTauMinus = true;
           }
-          B2DEBUG(1, "nPizSisters = " << nPizSisters);
-          if (nPizSisters == 3) {
-            int chg = getRecursiveMotherCharge(mother);
-            if (chg < 0 && isEtaPizPizPizFromTauMinusFirst) {
-              isEtaPizPizPizFromTauMinusFirst = false;
-              m_isEtaPizPizPizFromTauMinus = true;
-            }
-            if (chg > 0 && isEtaPizPizPizFromTauPlusFirst) {
-              isEtaPizPizPizFromTauPlusFirst = false;
-              m_isEtaPizPizPizFromTauPlus = true;
-            }
+          if (chg > 0 && isEtaPizPizPizFromTauPlusFirst) {
+            isEtaPizPizPizFromTauPlusFirst = false;
+            m_isEtaPizPizPizFromTauPlus = true;
           }
         }
       }
@@ -598,35 +594,34 @@ void TauDecayModeModule::AnalyzeTauPairEvent()
 
     if (pdgid == -211 && (isOmegaPimPipFromTauMinusFirst || isOmegaPimPipFromTauPlusFirst)) {
       const MCParticle* mother = p.getMother();
-      if (mother) { // In some low multiplicity generators there may be no mother
-        if (mother->getPDG() == 223) { // omega -> pi- pi+
-          const vector<MCParticle*> daughters = mother->getDaughters();
-          int nOmegaDaughters = 0;
-          int nPimSisters = 0;
-          int nPipSisters = 0;
-          int nPizSisters = 0;
-          for (MCParticle* d : daughters) {
-            if (!d->hasStatus(MCParticle::c_PrimaryParticle)) continue;
-            nOmegaDaughters++;
-            if (d->getPDG() == -211) nPimSisters++;
-            if (d->getPDG() ==  211) nPipSisters++;
-            if (d->getPDG() ==  111) nPizSisters++;
+      // In some low multiplicity generators there may be no mother
+      if (mother and (mother->getPDG() == 223)) { // omega -> pi- pi+
+        const vector<MCParticle*> daughters = mother->getDaughters();
+        int nOmegaDaughters = 0;
+        int nPimSisters = 0;
+        int nPipSisters = 0;
+        int nPizSisters = 0;
+        for (MCParticle* d : daughters) {
+          if (!d->hasStatus(MCParticle::c_PrimaryParticle)) continue;
+          nOmegaDaughters++;
+          if (d->getPDG() == -211) nPimSisters++;
+          if (d->getPDG() ==  211) nPipSisters++;
+          if (d->getPDG() ==  111) nPizSisters++;
+        }
+        B2DEBUG(1,
+                "nOmegaDaughters = " << nOmegaDaughters << " "
+                "nPimSisters = " << nPimSisters << " "
+                "nPipSisters = " << nPipSisters << " "
+                "nPizSisters = " << nPizSisters);
+        if (nOmegaDaughters >= 2 && nPimSisters == 1 && nPipSisters == 1 && nPizSisters == 0) { // allow omega->pi-pi+gama
+          int chg = getRecursiveMotherCharge(mother);
+          if (chg < 0 && isOmegaPimPipFromTauMinusFirst) {
+            isOmegaPimPipFromTauMinusFirst = false;
+            m_isOmegaPimPipFromTauMinus = true;
           }
-          B2DEBUG(1,
-                  "nOmegaDaughters = " << nOmegaDaughters << " "
-                  "nPimSisters = " << nPimSisters << " "
-                  "nPipSisters = " << nPipSisters << " "
-                  "nPizSisters = " << nPizSisters);
-          if (nOmegaDaughters >= 2 && nPimSisters == 1 && nPipSisters == 1 && nPizSisters == 0) { // allow omega->pi-pi+gama
-            int chg = getRecursiveMotherCharge(mother);
-            if (chg < 0 && isOmegaPimPipFromTauMinusFirst) {
-              isOmegaPimPipFromTauMinusFirst = false;
-              m_isOmegaPimPipFromTauMinus = true;
-            }
-            if (chg > 0 && isOmegaPimPipFromTauPlusFirst) {
-              isOmegaPimPipFromTauPlusFirst = false;
-              m_isOmegaPimPipFromTauPlus = true;
-            }
+          if (chg > 0 && isOmegaPimPipFromTauPlusFirst) {
+            isOmegaPimPipFromTauPlusFirst = false;
+            m_isOmegaPimPipFromTauPlus = true;
           }
         }
       }

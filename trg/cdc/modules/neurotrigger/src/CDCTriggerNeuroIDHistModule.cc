@@ -1,5 +1,4 @@
 
-#pragma once
 #include "trg/cdc/modules/neurotrigger/CDCTriggerNeuroIDHistModule.h"
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/MCParticle.h>
@@ -54,9 +53,9 @@ namespace Belle2 {
     addParam("nMLP", m_parameters.nMLP,
              "Number of expert MLPs.", m_parameters.nMLP);
     addParam("targetZ", m_parameters.targetZ,
-             "Train one output of MLP to give z.", m_parameters.targetZ);
+             "Train one output of MLP to give z.", true);
     addParam("targetTheta", m_parameters.targetTheta,
-             "Train one output of MLP to give theta.", m_parameters.targetTheta);
+             "Train one output of MLP to give theta.", true);
     addParam("phiRange", m_parameters.phiRange,
              "Phi region in degree for which experts are trained. "
              "1 value pair, nMLP value pairs or nPhi value pairs "
@@ -128,7 +127,6 @@ namespace Belle2 {
       // for every 1st priority wire there is a corresponding track segment.
       int layerId = 3;
       for (int iSL = 0; iSL < 9; ++iSL) {
-        std::cout << "wires in layer " << iSL << ": " << cdc.nWiresInLayer(layerId) << std::endl;
 
         m_trainSets_prepare[iMLP].addCounters(cdc.nWiresInLayer(layerId));
         // the first superlayer has 2 layers extra compared to the rest
@@ -162,7 +160,9 @@ namespace Belle2 {
       // and retrieve track parameters
 
       std::vector<float> targetvector = NeuroTrainer::getTrainTargets(m_trainOnRecoTracks, m_tracks[itrack], m_targetCollectionName);
-      if (targetvector[4] == 0) {continue;} // no valid representation found
+      if (targetvector[4] == 0) {
+        continue;
+      } // no valid representation found
       float phi0Target = targetvector[0];
       float invptTarget = targetvector[1];
       float thetaTarget = targetvector[2];

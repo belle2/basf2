@@ -346,7 +346,7 @@ int main(int argc, char** argv)
   int nconn = 0;
 
   while (1) {
-    int nready = poll(client, maxi + 1, -1);
+    //int nready = poll(client, maxi + 1, -1);
     if (client[0].revents & POLLRDNORM) {
       printf("Accepting..."); fflush(stdout);
       int connfd = accept(listenfd, (struct sockaddr*) NULL, NULL);
@@ -416,9 +416,9 @@ int main(int argc, char** argv)
                cnt,
                cur_time - init_time,
                NUM_CLIENTS * (cnt - prev_cnt)*total_words * sizeof(int) / 1000000. / (cur_time - prev_time),
-               (cnt - prev_cnt) / (cur_time - prev_time) / 1000. ,
+               (cnt - prev_cnt) / (cur_time - prev_time) / 1000.,
                NUM_CLIENTS * (cnt - start_cnt)*total_words * sizeof(int) / 1000000. / (cur_time - init_time),
-               (cnt - start_cnt) / (cur_time - init_time) / 1000. , total_words);
+               (cnt - start_cnt) / (cur_time - init_time) / 1000., total_words);
 
         fflush(stdout);
         prev_time = cur_time;

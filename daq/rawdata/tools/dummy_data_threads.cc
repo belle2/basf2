@@ -455,9 +455,9 @@ int sender(int sender_id, int   run_no, int nwords_per_fee, int ncpr, int nhslb)
                cnt,
                cur_time - init_time,
                NUM_CLIENTS_PER_THREAD * (cnt - prev_cnt)*total_words * sizeof(int) / 1000000. / (cur_time - prev_time),
-               (cnt - prev_cnt) / (cur_time - prev_time) / 1000. ,
+               (cnt - prev_cnt) / (cur_time - prev_time) / 1000.,
                NUM_CLIENTS_PER_THREAD * (cnt - start_cnt)*total_words * sizeof(int) / 1000000. / (cur_time - init_time),
-               (cnt - start_cnt) / (cur_time - init_time) / 1000. , total_words);
+               (cnt - start_cnt) / (cur_time - init_time) / 1000., total_words);
 
         fflush(stdout);
         prev_time = cur_time;
@@ -608,9 +608,9 @@ int main(int argc, char** argv)
                cnt,
                cur_time - init_time,
                NUM_CLIENTS * (cnt - prev_cnt)*total_words * sizeof(int) / 1000000. / (cur_time - prev_time),
-               (cnt - prev_cnt) / (cur_time - prev_time) / 1000. ,
+               (cnt - prev_cnt) / (cur_time - prev_time) / 1000.,
                NUM_CLIENTS * (cnt - start_cnt)*total_words * sizeof(int) / 1000000. / (cur_time - init_time),
-               (cnt - start_cnt) / (cur_time - init_time) / 1000. , total_words);
+               (cnt - start_cnt) / (cur_time - init_time) / 1000., total_words);
 
         fflush(stdout);
         prev_time = cur_time;

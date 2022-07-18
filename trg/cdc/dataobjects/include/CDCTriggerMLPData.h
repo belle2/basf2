@@ -30,7 +30,7 @@ namespace Belle2 {
       {
         if (relevantID.size() == 18) {
           for (unsigned i = 0; i < 18; ++i) {relID[i] = relevantID[i];}
-        } else {std::cout << "ERROR! wrong length of relID vector!" << std::endl;}
+        } else {B2ERROR("ERROR! wrong length of relID vector!");}
         exPert = expert;
       }
       friend std::ostream& operator << (std::ostream& out, const HeaderSet& hset)
@@ -134,12 +134,22 @@ namespace Belle2 {
         for (unsigned i = 0; i < inLen; ++i) {
           help = "";
           std::getline(in, help, '\t');
-          dset.input[i] = std::stof(help);
+          try {
+            dset.input[i] = std::stof(help);
+          } catch (const std::out_of_range& oor) {
+            B2WARNING("out of range error: " << help << " is not in float range!");
+            dset.input[i] = 0.;
+          }
         }
         for (unsigned i = 0; i < outLen; ++i) {
           help = "";
           std::getline(in, help, '\t');
-          dset.target[i] = std::stof(help);
+          try {
+            dset.target[i] = std::stof(help);
+          } catch (const std::out_of_range& oor) {
+            B2WARNING("out of range error: " << help << " is not in float range!");
+            dset.target[i] = 0.;
+          }
         }
         return in;
       }

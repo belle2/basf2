@@ -143,13 +143,13 @@ void KLMTimeCollectorModule::collect()
   StoreObjPtr<EventMetaData> eventMetaData("EventMetaData", DataStore::c_Event);
 
   m_Event.t0 = 0.0;
-  /* Require event T0 determined from SVD. */
+  /* Require event T0 determined from CDC. */
   if (m_useEvtT0) {
     if (!m_eventT0.isValid())
       return;
-    if (!m_eventT0->hasTemporaryEventT0(Const::EDetector::SVD))
+    if (!m_eventT0->hasTemporaryEventT0(Const::EDetector::CDC))
       return;
-    const std::vector<EventT0::EventT0Component> evtT0C = m_eventT0->getTemporaryEventT0s(Const::EDetector::SVD);
+    const std::vector<EventT0::EventT0Component> evtT0C = m_eventT0->getTemporaryEventT0s(Const::EDetector::CDC);
     m_Event.t0 = evtT0C.back().eventT0;
   }
 

@@ -19,7 +19,6 @@
 /* CLHEP headers. */
 #include <CLHEP/Units/SystemOfUnits.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace CLHEP;
 
@@ -62,7 +61,7 @@ BKLMAnaModule::BKLMAnaModule() : Module(),
     m_effiTrkThephi[i] = nullptr;
   }
   setDescription("analyze bklm efficiency associated to CDC, check performance of bklm et al.");
-  addParam("filename", m_filename, "Output root filename", string("bklmana.root"));
+  addParam("filename", m_filename, "Output root filename", std::string("bklmana.root"));
 }
 
 BKLMAnaModule::~BKLMAnaModule()

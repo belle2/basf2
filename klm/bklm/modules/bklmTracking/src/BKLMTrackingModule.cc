@@ -18,7 +18,6 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace Belle2::bklm;
 using namespace CLHEP;
@@ -51,7 +50,7 @@ BKLMTrackingModule::BKLMTrackingModule() : Module(),
            "[bool], do the BKLMTrack fitting in global system (multi-sectors track) or local system (sector by sector) (default is false, local sys.)",
            false);
   addParam("StudyEffiMode", m_studyEffi, "[bool], run in efficieny study mode (default is false)", false);
-  addParam("outputName", m_outPath, "[string],  output file name containing efficiencies plots ", string("bklmEffi.root"));
+  addParam("outputName", m_outPath, "[string],  output file name containing efficiencies plots ", std::string("bklmEffi.root"));
 }
 
 BKLMTrackingModule::~BKLMTrackingModule()
@@ -400,7 +399,7 @@ bool BKLMTrackingModule::findClosestRecoTrack(BKLMTrack* bklmTrk, RecoTrack*& cl
 void BKLMTrackingModule::generateEffi(int iSection, int iSector, int iLayer)
 {
 
-  set<int> m_pointUsed;
+  std::set<int> m_pointUsed;
   m_pointUsed.clear();
   if (m_storeTracks.getEntries() < 1)
     return;

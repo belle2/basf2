@@ -20,7 +20,6 @@
 #include <framework/database/DBObjPtr.h>
 #include <simulation/background/BkgSensitiveDetector.h>
 
-using namespace std;
 using namespace Belle2::bklm;
 
 GeometryPar* GeometryPar::m_Instance = nullptr;
@@ -727,21 +726,21 @@ bool GeometryPar::hasRPCs(int layer) const
 const Module* GeometryPar::findModule(int section, int sector, int layer) const
 {
   int moduleID = BKLMElementNumbers::moduleNumber(section, sector, layer);
-  map<int, Module*>::const_iterator iM = m_Modules.find(moduleID);
+  std::map<int, Module*>::const_iterator iM = m_Modules.find(moduleID);
   return (iM == m_Modules.end() ? nullptr : iM->second);
 }
 
 const HepGeom::Transform3D GeometryPar::getModuleAlignment(int section, int sector, int layer) const
 {
   int moduleID = BKLMElementNumbers::moduleNumber(section, sector, layer);
-  map<int, HepGeom::Transform3D>::const_iterator iA = m_Alignments.find(moduleID);
+  std::map<int, HepGeom::Transform3D>::const_iterator iA = m_Alignments.find(moduleID);
   return (iA == m_Alignments.end() ? HepGeom::Transform3D() : iA->second);
 }
 
 const HepGeom::Transform3D GeometryPar::getModuleDisplacedGeo(int section, int sector, int layer) const
 {
   int moduleID = BKLMElementNumbers::moduleNumber(section, sector, layer);
-  map<int, HepGeom::Transform3D>::const_iterator iDis = m_Displacements.find(moduleID);
+  std::map<int, HepGeom::Transform3D>::const_iterator iDis = m_Displacements.find(moduleID);
   return (iDis == m_Displacements.end() ? HepGeom::Transform3D() : iDis->second);
 }
 

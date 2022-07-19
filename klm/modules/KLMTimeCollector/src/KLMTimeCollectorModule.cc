@@ -59,7 +59,6 @@ KLMTimeCollectorModule::KLMTimeCollectorModule() :
   setDescription("Module for KLM time calibration (data collection).");
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  addParam("debug", m_Debug, "debug mode.", false);
   addParam("inputParticleList", m_inputListName, "input particle list.", std::string("mu+:cali"));
   addParam("useEventT0", m_useEvtT0, "Use event T0 or not.", true);
   addParam("IgnoreBackwardPropagation", m_IgnoreBackwardPropagation,
@@ -70,25 +69,21 @@ KLMTimeCollectorModule::KLMTimeCollectorModule() :
 
 KLMTimeCollectorModule::~KLMTimeCollectorModule()
 {
-  B2INFO("Destructor done..");
 }
-
 
 void KLMTimeCollectorModule::prepare()
 {
   /* Initialize geometry. */
-  //B2INFO("prepare :: Initialize geometry..");
   m_geoParB = bklm::GeometryPar::instance();
   m_geoParE = &(EKLM::GeometryData::Instance());
   m_TransformData = new EKLM::TransformData(true, EKLM::TransformData::c_None);
 
   /* Require input dataobjects. */
-  //B2INFO("prepare :: Require input dataobjects..");
   if (m_useEvtT0)
     m_eventT0.isRequired("EventT0");
   m_tracks.isRequired();
 
-  //B2INFO("prepare :: Initialize outTree..");
+  /* Initialization of output tree. */
   m_outTree = new TTree("time_calibration_data", "");
   m_outTree->Branch("t0",        &m_Event.t0,        "t0/D");
   m_outTree->Branch("flyTime",   &m_Event.flyTime,   "flyTime/D");
@@ -105,7 +100,7 @@ void KLMTimeCollectorModule::prepare()
 
   registerObject<TTree>("time_calibration_data", m_outTree);
 
-  B2DEBUG(20, "prepare :: Initialize histgrams..");
+  /* Initialization of histograms. */
   m_HeventT0_0 = new TH1D("m_HeventT0_0", "collision time before track number request;t0[ns]", 200, -100, 100);
   m_HeventT0_1 = new TH1D("m_HeventT0_1", "collision time after track number request;t0[ns]", 200, -100, 100);
   m_HnumTrack = new TH1I("m_HnnumTrack", "Number of Track;nTrack", 30, 0, 30);
@@ -148,7 +143,7 @@ void KLMTimeCollectorModule::collect()
   StoreObjPtr<EventMetaData> eventMetaData("EventMetaData", DataStore::c_Event);
 
   m_Event.t0 = 0.0;
-  /* Require event T0 determined from CDC */
+  /* Require event T0 determined from CDC. */
   if (m_useEvtT0) {
     if (!m_eventT0.isValid())
       return;
@@ -158,7 +153,7 @@ void KLMTimeCollectorModule::collect()
     m_Event.t0 = evtT0C.back().eventT0;
   }
 
-  /* Read data meta infor */
+  /* Read event metadata. */
   int runId = eventMetaData->getRun();
   int evtId = eventMetaData->getEvent();
 
@@ -166,10 +161,11 @@ void KLMTimeCollectorModule::collect()
 
   const StoreObjPtr<ParticleList> inputList(m_inputListName);
   unsigned n_track =  inputList->getListSize();
+  /* Return if there are no tracks. */
   if (n_track < 1) {
     B2DEBUG(20, "No necessary tracks in" << LogVar("run", runId) << LogVar("event", evtId));
     return;
-  }  // track existence
+  }
 
   B2DEBUG(20, "debug infor for" << LogVar("run", runId) << LogVar("event", evtId) << LogVar("number of rec tracks", n_track));
 
@@ -472,7 +468,6 @@ std::pair<ExtHit*, ExtHit*> KLMTimeCollectorModule::matchExt(
   std::multimap<unsigned int, ExtHit>::iterator it, itlow, itup;
   itlow = v_ExtHits.lower_bound(channelID);
   itup = v_ExtHits.upper_bound(channelID);
-
   for (it = itlow; it != itup; ++it) {
     if (entryHit == nullptr) {
       entryHit = &(it->second);
@@ -485,28 +480,6 @@ std::pair<ExtHit*, ExtHit*> KLMTimeCollectorModule::matchExt(
       exitHit = &(it->second);
     }
   }
-
-  // switch turn on when entry status avaiable
-  /*
-  switch (eHit.getStatus()) {
-    case EXT_ENTER:
-      if (entryHit == NULL) {
-        entryHit = eHit;
-      } else if (eHit->getTOF() < entryHit.getTOF()) {
-        entryHit = eHit;
-      }
-      break;
-    case EXT_EXIT:
-      if (exitHit == NULL) {
-        exitHit = eHit;
-      } else if (eHit.getTOF() > exitHit.getTOF()) {
-        exitHit = eHit;
-      }
-      break;
-    default:
-      break;
-  }
-  */
   std::pair<ExtHit*, ExtHit*> p_extHits = std::make_pair(entryHit, exitHit);
   return p_extHits;
 }
@@ -528,5 +501,4 @@ void KLMTimeCollectorModule::storeDistDiff(TVector3& pDiff)
 
 void KLMTimeCollectorModule::finish()
 {
-  B2INFO("Data Collection Done.");
 }

@@ -235,7 +235,6 @@ inline void addEvent(int* buf, int nwords_per_fee, unsigned int event, int ncpr,
 //inline void addEvent(int* buf, int nwords, unsigned int event)
 {
   int offset = 0;
-  int prev_offset;
   buf[ offset + 4 ] = event;
   offset += NW_SEND_HEADER;
 
@@ -243,7 +242,6 @@ inline void addEvent(int* buf, int nwords_per_fee, unsigned int event, int ncpr,
     int nwords = buf[ offset ];
     int posback_xorchksum = 2;
     int pos_xorchksum = offset + nwords - posback_xorchksum;
-    prev_offset = offset;
     if (buf[ offset + 4 ] != CTIME_VAL) {
       printf("[FATAL] data-production error 2 0x%.x", buf[ offset + 4 ]);
       fflush(stdout);

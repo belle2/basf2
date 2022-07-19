@@ -23,7 +23,7 @@ using namespace Belle2;
 
 CprErrorMessage::CprErrorMessage()
 {
-  openlog("", LOG_PERROR , LOG_LOCAL0);
+  openlog("", LOG_PERROR, LOG_LOCAL0);
 }
 
 CprErrorMessage::~CprErrorMessage()

@@ -90,9 +90,6 @@ namespace Belle2 {
     /** Save position difference betwen matched kLMHit and ExtHit. */
     void storeDistDiff(TVector3&);
 
-    /** Debug flag. Not used currently. */
-    bool m_Debug;
-
     /** Use event T0 or not. */
     bool m_useEvtT0;
 

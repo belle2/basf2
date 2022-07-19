@@ -9,22 +9,16 @@
 #include <tracking/modules/mcTrackCandClassifier/MCTrackCandClassifierModule.h>
 
 #include <pxd/dataobjects/PXDTrueHit.h>
-#include <pxd/dataobjects/PXDCluster.h>
 #include <svd/dataobjects/SVDTrueHit.h>
-#include <svd/dataobjects/SVDCluster.h>
 #include <vxd/geometry/GeoCache.h>
 
-#include <framework/datastore/StoreArray.h>
 #include <framework/geometry/B2Vector3.h>
 #include <framework/geometry/BFieldManager.h>
-
-#include <genfit/TrackCand.h>
 
 #include <boost/foreach.hpp>
 
 #include <TH2F.h>
 
-using namespace std;
 using namespace Belle2;
 
 /// Register the Module
@@ -81,25 +75,12 @@ MCTrackCandClassifierModule::MCTrackCandClassifierModule() : Module()
 void MCTrackCandClassifierModule::initialize()
 {
   // MCParticles, MCTrackCands, MCTracks needed for this module
-  StoreArray<PXDCluster> pxdClusters;
-  pxdClusters.isRequired();
+  m_PXDClusters.isRequired();
+  m_SVDClusters.isRequired();
+  m_MCParticles.isRequired(m_mcParticlesName);
 
-  StoreArray<SVDCluster> svdClusters;
-  svdClusters.isRequired();
-
-  StoreArray<MCParticle> mcParticles(m_mcParticlesName);
-  mcParticles.isRequired();
-
-  StoreArray<genfit::TrackCand> mcTrackCands(m_mcTrackCandsColName);
-  mcTrackCands.isRequired();
-  StoreArray<genfit::TrackCand> idealMCTrackCands("idealMCTrackCands");
-  idealMCTrackCands.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered);
-
-  StoreArray<PXDTrueHit> pxdTrueHits;
-  pxdTrueHits.isRequired();
-
-  StoreArray<SVDTrueHit> svdTrueHits;
-  svdTrueHits.isRequired();
+  m_GenfitMCTrackCands.isRequired(m_mcTrackCandsColName);
+  m_GenfitIdealMCTrackCands.registerInDataStore("idealMCTrackCands", DataStore::c_ErrorIfAlreadyRegistered);
 
   //create list of histograms to be saved in the rootfile
   m_histoList = new TList;
@@ -223,15 +204,10 @@ void MCTrackCandClassifierModule::event()
 
   B2DEBUG(1, "+++++ 1. loop on MCTrackCands");
 
-  StoreArray<genfit::TrackCand> idealMCTrackCands("idealMCTrackCands");
-  StoreArray<genfit::TrackCand> mcTrackCands;
-  StoreArray<PXDCluster> pxdClusters;
-  StoreArray<SVDCluster> svdClusters;
-
   const VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
 
   //1.a retrieve the MCTrackCands
-  BOOST_FOREACH(genfit::TrackCand & mcTrackCand, mcTrackCands) {
+  BOOST_FOREACH(genfit::TrackCand & mcTrackCand, m_GenfitMCTrackCands) {
 
     int nGoodTrueHits = 0;
     int nBadTrueHits = 0;
@@ -302,7 +278,7 @@ void MCTrackCandClassifierModule::event()
 
         if (detId == Const::PXD && m_usePXD) {
 
-          PXDCluster* aPXDCluster = pxdClusters[hitId];
+          PXDCluster* aPXDCluster = m_PXDClusters[hitId];
           RelationVector<PXDTrueHit> PXDTrueHit_fromPXDCluster = aPXDCluster->getRelationsWith<PXDTrueHit>();
           if (PXDTrueHit_fromPXDCluster.size() == 0) {
             B2WARNING("What's happening?!? no True Hit associated to the PXD Cluster");
@@ -326,7 +302,7 @@ void MCTrackCandClassifierModule::event()
 
           hasPXDCluster = true;
         } else if (detId == Const::SVD) {
-          SVDCluster* aSVDCluster = svdClusters[hitId];
+          SVDCluster* aSVDCluster = m_SVDClusters[hitId];
           RelationVector<SVDTrueHit> SVDTrueHit_fromSVDCluster = aSVDCluster->getRelationsWith<SVDTrueHit>();
           if (SVDTrueHit_fromSVDCluster.size() == 0) {
             B2WARNING("What's happening?!? no True Hit associated to the SVD Cluster");
@@ -453,7 +429,7 @@ void MCTrackCandClassifierModule::event()
               tmpTrackCand->addHit(mcTrackCand.getHit(hit));
           tmpTrackCand->sortHits();
         }
-        idealMCTrackCands.appendNew(*tmpTrackCand);
+        m_GenfitIdealMCTrackCands.appendNew(*tmpTrackCand);
 
         m_h1_firstRejectedHit->Fill(tmpTrackCand->getNHits());
         m_h1_firstRejectedOVERMCHit->Fill((float)tmpTrackCand->getNHits() / mcTrackCand.getNHits());

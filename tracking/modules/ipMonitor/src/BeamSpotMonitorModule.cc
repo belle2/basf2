@@ -14,7 +14,6 @@
 #include <TMatrixDSym.h>
 
 using namespace Belle2;
-using namespace std;
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -60,6 +59,8 @@ void BeamSpotMonitorModule::initialize()
 
 void BeamSpotMonitorModule::beginRun()
 {
+  m_EventMetaData.isRequired();
+
   if (! m_BeamSpotDB.isValid()) {
     B2WARNING("No valid BeamSpot for the requested IoV");
   } else {
@@ -70,10 +71,8 @@ void BeamSpotMonitorModule::beginRun()
 
 void BeamSpotMonitorModule::event()
 {
-
-  StoreObjPtr<EventMetaData> meta;
-  m_exp = meta->getExperiment();
-  m_run = meta->getRun();
+  m_exp = m_EventMetaData->getExperiment();
+  m_run = m_EventMetaData->getRun();
   B2DEBUG(25, "monitoring beam spot for experiment = " << m_exp << ", run = " << m_run);
 
   if (! m_BeamSpotDB.isValid())

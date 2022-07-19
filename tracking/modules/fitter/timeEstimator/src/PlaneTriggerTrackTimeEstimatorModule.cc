@@ -11,7 +11,6 @@
 #include <framework/dataobjects/Helix.h>
 #include <framework/geometry/BFieldManager.h>
 
-using namespace std;
 using namespace Belle2;
 
 REG_MODULE(PlaneTriggerTrackTimeEstimator);

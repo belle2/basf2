@@ -8,11 +8,9 @@
 #include <tracking/modules/fitter/timeEstimator/BaseTrackTimeEstimatorModule.h>
 
 #include <tracking/trackFitting/fitter/base/TrackFitter.h>
-#include <tracking/dataobjects/RecoTrack.h>
 
 #include <TVector3.h>
 
-using namespace std;
 using namespace Belle2;
 
 namespace {
@@ -64,7 +62,7 @@ BaseTrackTimeEstimatorModule::BaseTrackTimeEstimatorModule() :
            "When this feature is enabled, the length from the incident of the particle in the trigger to the position"
            "set by the readoutPosition flag is calculated and using the readoutPositionPropagationSpeed, a time is"
            "calculated which is used in the time estimation as an offset."
-           "In the moment, this feature is only possible when using the fitted information." , m_param_useReadoutPosition);
+           "In the moment, this feature is only possible when using the fitted information.", m_param_useReadoutPosition);
   addParam("readoutPositionPropagationSpeed", m_param_readoutPositionPropagationSpeed,
            "Speed of the propagation from the hit on the trigger to the readoutPosition. Only is used when the"
            "flag useReadoutPosition is enabled.", m_param_readoutPositionPropagationSpeed);
@@ -73,8 +71,7 @@ BaseTrackTimeEstimatorModule::BaseTrackTimeEstimatorModule() :
 void BaseTrackTimeEstimatorModule::initialize()
 {
   // Read and write out RecoTracks
-  StoreArray<RecoTrack> recoTracks(m_param_recoTracksStoreArrayName);
-  recoTracks.isRequired();
+  m_recoTracks.isRequired(m_param_recoTracksStoreArrayName);
 
   if (m_param_useReadoutPosition and not m_param_useFittedInformation) {
     B2FATAL("The combination of using the seed information and the readout position is not implemented in the moment.");
@@ -83,12 +80,10 @@ void BaseTrackTimeEstimatorModule::initialize()
 
 void BaseTrackTimeEstimatorModule::event()
 {
-  StoreArray<RecoTrack> recoTracks(m_param_recoTracksStoreArrayName);
-
   const Const::ChargedStable particleHypothesis(m_param_pdgCodeToUseForEstimation);
 
   // Estimate the track time for each reco track depending on the settings of the module.
-  for (auto& recoTrack : recoTracks) {
+  for (auto& recoTrack : m_recoTracks) {
     double timeSeed;
     if (m_param_useFittedInformation) {
       try {

@@ -8,7 +8,6 @@
 
 #include <tracking/modules/pxdDataReduction/ROIReadTestModule.h>
 
-using namespace std;
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -42,7 +41,6 @@ void ROIReadTestModule::initialize()
   }
 }
 
-
 void ROIReadTestModule::event()
 {
   int length = m_ROIPayloads->getLength();
@@ -53,7 +51,6 @@ void ROIReadTestModule::event()
     fputc(rootdata[i], m_pFile);
   }
 }
-
 
 void ROIReadTestModule::terminate()
 {

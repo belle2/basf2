@@ -18,7 +18,6 @@
 #include <vxd/geometry/GeoCache.h>
 
 
-using namespace std;
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -102,7 +101,7 @@ PXDROIFinderAnalysisModule::PXDROIFinderAnalysisModule() : Module()
 
   addParam("rootFileName", m_rootFileName,
            "fileName used for . Will be ignored if parameter 'writeToRoot' is false (standard)",
-           string("pxdDataRedAnalysis"));
+           std::string("pxdDataRedAnalysis"));
 
   addParam("recoTrackListName", m_recoTrackListName,
            "name of the input collection of RecoTracks", std::string(""));
@@ -800,7 +799,7 @@ void PXDROIFinderAnalysisModule::event()
 
   m_h1okROIs->Fill(nROIs);
   m_h1okROIfrac->Fill(1.*nROIs / m_ROIs.getEntries());
-  cout << "" << endl;
+  std::cout << "" << std::endl;
 
 
 }

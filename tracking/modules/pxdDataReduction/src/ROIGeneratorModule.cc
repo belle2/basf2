@@ -9,7 +9,6 @@
 #include <tracking/modules/pxdDataReduction/ROIGeneratorModule.h>
 #include <framework/datastore/StoreArray.h>
 
-using namespace std;
 using namespace Belle2;
 
 //-----------------------------------------------------------------

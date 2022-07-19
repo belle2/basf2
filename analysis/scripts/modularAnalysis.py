@@ -1339,21 +1339,19 @@ def applyEventCuts(cut, path):
         if event_var_id not in var.description:
             B2ERROR(f'Variable {var_string} is not an event-based variable! Please check your inputs to the applyEventCuts method!')
     for meta_string_list in meta_list:
-        var_list_in_meta = []
+        var_list_temp = []
         while meta_string_list[0] in metavar_ids:
             # remove special meta variable
             meta_string_list.pop(0)
-            var_list_temp = []
             for meta_string in meta_string_list[0].split(","):
                 find_vars(b2parser.parse(meta_string), var_list_temp, meta_string_list)
-            var_list_in_meta += var_list_temp
             if len(meta_string_list) > 0:
                 meta_string_list.pop(0)
             if len(meta_string_list) == 0:
                 break
             if isinstance(meta_string_list[0], list):
                 meta_string_list = [element for element in meta_string_list[0]]
-        for var_string in var_list_in_meta:
+        for var_string in var_list_temp:
             # Get the variable and get rid of aliases
             var = variables.getVariable(var_string)
             # Throw an error message if the variable's description doesn't contain the event-based marker

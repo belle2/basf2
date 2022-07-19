@@ -515,7 +515,7 @@ void DesSerPrePC::checkData(RawDataBlockFormat* raw_datablk, unsigned int* eve_c
           ctime_type_array[ 0 ] != ctime_type_array[ l ]) {
         char err_buf[500];
         for (int m = 0; m < num_nodes_in_sendblock; m++) {
-          printf("[DEBUG] node %d eve # %d utime %x ctime %x\n",
+          printf("[DEBUG] node %d eve # %x utime %x ctime %x\n",
                  m,  eve_array[ m ], utime_array[ m ], ctime_type_array[ m ]);
         }
         sprintf(err_buf, "[FATAL] CORRUPTED DATA: Event or Time record mismatch. Exiting...");

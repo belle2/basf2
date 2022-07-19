@@ -468,7 +468,7 @@ void DesSer::Accept(bool close_listen)
     m_status.setOutputPort(ntohs(sock_listen.sin_port));
     m_status.setOutputAddress(sock_listen.sin_addr.s_addr);
     //    B2INFO("Accepted " << (int)ntohs(sock_listen.sin_port) << " " << (int)sock_listen.sin_addr.s_addr);
-    printf("Accepted. port %d address %u\n", (int)ntohs(sock_listen.sin_port), (int)sock_listen.sin_addr.s_addr); fflush(stdout);
+    printf("Accepted. port %d address %d\n", (int)ntohs(sock_listen.sin_port), (int)sock_listen.sin_addr.s_addr); fflush(stdout);
   }
 
   return;

@@ -411,7 +411,7 @@ int main(int argc, char** argv)
     if (cnt % 10000 == 1) {
       if (cnt > start_cnt) {
         double cur_time = getTimeSec();
-        printf("run %d evt %lld time %.1lf dataflow %.1lf MB/s rate %.2lf kHz : so far dataflow %.1lf MB/s rate %.2lf kHz size %d\n",
+        printf("run %d evt %llu time %.1lf dataflow %.1lf MB/s rate %.2lf kHz : so far dataflow %.1lf MB/s rate %.2lf kHz size %d\n",
                run_no,
                cnt,
                cur_time - init_time,

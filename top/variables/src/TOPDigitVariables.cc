@@ -94,7 +94,7 @@ namespace Belle2 {
         const auto* extHit = getExtHit(particle);
         if (not extHit) return false;
         int slotID = extHit->getCopyID();
-        const auto position = extHit->getPosition();
+        const auto position = extHit->getPositionTVector3();
         const auto* geo = TOP::TOPGeometryPar::Instance()->getGeometry();
         if (not geo or not geo->isModuleIDValid(slotID)) return false;
         const auto& module = geo->getModule(slotID);
@@ -168,7 +168,7 @@ namespace Belle2 {
         const auto* extHit = getExtHit(particle);
         if (not extHit) return false;
         int slotID = extHit->getCopyID();
-        const auto& momentum = extHit->getMomentum();
+        const auto& momentum = extHit->getMomentumTVector3();
         const auto* geo = TOP::TOPGeometryPar::Instance()->getGeometry();
         if ((not geo) or (not geo->isModuleIDValid(slotID))) return false;
         const auto& module = geo->getModule(slotID);

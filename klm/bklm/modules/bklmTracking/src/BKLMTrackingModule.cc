@@ -344,10 +344,10 @@ bool BKLMTrackingModule::findClosestRecoTrack(BKLMTrack* bklmTrk, RecoTrack*& cl
   double oldAngle = INFINITY;
   closestTrack = nullptr;
   //TVector3 poca = TVector3(0, 0, 0);
-  TVector3 firstBKLMHitPosition(0, 0, 0);
   //bklmHits are already sorted by layer
   //possible two hits in one layer?
-  firstBKLMHitPosition = bklmHits[0]->getPosition();
+  ROOT::Math::XYZVector hitPosition = bklmHits[0]->getPosition();
+  TVector3 firstBKLMHitPosition(hitPosition.X(), hitPosition.Y(), hitPosition.Z());
 
   TMatrixDSym cov(6);
   TVector3 pos(0, 0, 0);

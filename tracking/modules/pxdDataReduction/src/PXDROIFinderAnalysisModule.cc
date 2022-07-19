@@ -7,17 +7,12 @@
  **************************************************************************/
 
 #include <tracking/modules/pxdDataReduction/PXDROIFinderAnalysisModule.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 
-#include <mdst/dataobjects/MCParticle.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <pxd/dataobjects/PXDDigit.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
-#include <tracking/dataobjects/RecoTrack.h>
-#include <tracking/dataobjects/ROIid.h>
-#include <tracking/dataobjects/PXDIntercept.h>
 #include <TVector3.h>
 
 #include <vxd/geometry/GeoCache.h>
@@ -124,18 +119,10 @@ PXDROIFinderAnalysisModule::PXDROIFinderAnalysisModule() : Module()
 
 void PXDROIFinderAnalysisModule::initialize()
 {
-
-  StoreArray<RecoTrack> recoTracks;
-  recoTracks.isRequired(m_recoTrackListName);
-
-  StoreArray<ROIid> roiIDs;
-  roiIDs.isRequired(m_ROIListName);
-
-  StoreArray<PXDIntercept> pxdIntercepts;
-  pxdIntercepts.isRequired(m_PXDInterceptListName);
-
-  StoreArray<MCParticle> mcParticles;
-  mcParticles.isRequired();
+  m_recoTracks.isRequired(m_recoTrackListName);
+  m_ROIs.isRequired(m_ROIListName);
+  m_PXDIntercepts.isRequired(m_PXDInterceptListName);
+  m_MCParticles.isRequired();
 
   n_rois           = 0;
   n_intercepts     = 0;
@@ -376,15 +363,14 @@ void PXDROIFinderAnalysisModule::event()
 
 
   //ROIs general
-  StoreArray<ROIid> ROIList(m_ROIListName);
-  for (int i = 0; i < (int)ROIList.getEntries(); i++) { //loop on ROIlist
+  for (int i = 0; i < (int)m_ROIs.getEntries(); i++) { //loop on ROIlist
 
-    m_h2ROIbottomLeft->Fill(ROIList[i]->getMinUid(), ROIList[i]->getMinVid());
-    m_h2ROItopRight->Fill(ROIList[i]->getMaxUid(), ROIList[i]->getMaxVid());
-    m_h2ROIuMinMax->Fill(ROIList[i]->getMinUid(), ROIList[i]->getMaxUid());
-    m_h2ROIvMinMax->Fill(ROIList[i]->getMinVid(), ROIList[i]->getMaxVid());
-    int tmpArea = (ROIList[i]->getMaxUid() - ROIList[i]->getMinUid()) * (ROIList[i]->getMaxVid() - ROIList[i]->getMinVid());
-    if ((ROIList[i]->getSensorID()).getLayerNumber() == 1)
+    m_h2ROIbottomLeft->Fill(m_ROIs[i]->getMinUid(), m_ROIs[i]->getMinVid());
+    m_h2ROItopRight->Fill(m_ROIs[i]->getMaxUid(), m_ROIs[i]->getMaxVid());
+    m_h2ROIuMinMax->Fill(m_ROIs[i]->getMinUid(), m_ROIs[i]->getMaxUid());
+    m_h2ROIvMinMax->Fill(m_ROIs[i]->getMinVid(), m_ROIs[i]->getMaxVid());
+    int tmpArea = (m_ROIs[i]->getMaxUid() - m_ROIs[i]->getMinUid()) * (m_ROIs[i]->getMaxVid() - m_ROIs[i]->getMinVid());
+    if ((m_ROIs[i]->getSensorID()).getLayerNumber() == 1)
       totArea_L1 += tmpArea;
     else
       totArea_L2 += tmpArea;
@@ -400,7 +386,7 @@ void PXDROIFinderAnalysisModule::event()
       if (!isOK)
         //loop on PXDDigits
         for (unsigned int iPXDDigit = 0; iPXDDigit < pxdDigits_MCParticle.size(); iPXDDigit++)
-          if (ROIList[i]->Contains(*(pxdDigits_MCParticle[iPXDDigit]))) {
+          if (m_ROIs[i]->Contains(*(pxdDigits_MCParticle[iPXDDigit]))) {
             nROIs++;
             isOK = true;
             break;
@@ -415,16 +401,14 @@ void PXDROIFinderAnalysisModule::event()
   m_h1redFactor_L1->Fill((double) redFactor_L1);
   m_h1redFactor_L2->Fill((double) redFactor_L2);
 
-  m_h1totROIs->Fill(ROIList.getEntries());
-  n_rois += ROIList.getEntries();
+  m_h1totROIs->Fill(m_ROIs.getEntries());
+  n_rois += m_ROIs.getEntries();
 
   //RecoTrack general
-  StoreArray<RecoTrack> trackList(m_recoTrackListName);
-  n_tracks += trackList.getEntries();
+  n_tracks += m_recoTracks.getEntries();
 
   //PXDIntercepts general
-  StoreArray<PXDIntercept> PXDInterceptList(m_PXDInterceptListName);
-  n_intercepts += PXDInterceptList.getEntries();
+  n_intercepts += m_PXDIntercepts.getEntries();
 
   Int_t n_NoInterceptTracks = 0;
 
@@ -809,13 +793,13 @@ void PXDROIFinderAnalysisModule::event()
   n_tracksWithDigitsInROI += NtrackHit;
 
   m_rootEvent++;
-  B2RESULT(" o  PXDROIFinder ANALYSIS: tot ROIs = " << ROIList.getEntries() << ", ok ROIs = " << nROIs);
+  B2RESULT(" o  PXDROIFinder ANALYSIS: tot ROIs = " << m_ROIs.getEntries() << ", ok ROIs = " << nROIs);
   B2RESULT(" o                           : NtrackHit/Ntrack = " << NtrackHit << "/ " << Ntrack << " = " <<
            (double)NtrackHit / Ntrack);
-  if (nROIs > ROIList.getEntries()) B2RESULT(" HOUSTON WE HAVE A PROBLEM!");
+  if (nROIs > m_ROIs.getEntries()) B2RESULT(" HOUSTON WE HAVE A PROBLEM!");
 
   m_h1okROIs->Fill(nROIs);
-  m_h1okROIfrac->Fill(1.*nROIs / ROIList.getEntries());
+  m_h1okROIfrac->Fill(1.*nROIs / m_ROIs.getEntries());
   cout << "" << endl;
 
 

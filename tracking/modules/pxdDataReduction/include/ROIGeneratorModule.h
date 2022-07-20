@@ -43,8 +43,8 @@ namespace Belle2 {
      */
     void event() override final;
 
-    StoreObjPtr<EventMetaData> m_eventMetaData;
-    StoreArray<ROIid> m_ROIs;
+    StoreObjPtr<EventMetaData> m_eventMetaData;   /**< EventMetaData DataStore pointer */
+    StoreArray<ROIid> m_ROIs;   /**< ROIs StoreArray */
 
     std::string m_ROIListName; /**< ROi list name*/
     int m_divider; /**< generate one ROI every m_divider event*/

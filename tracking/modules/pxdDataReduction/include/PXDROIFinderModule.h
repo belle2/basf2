@@ -57,9 +57,9 @@ namespace Belle2 {
      */
     void endRun() override;
 
-    StoreArray<RecoTrack> m_RecoTracks;
-    StoreArray<PXDIntercept> m_PXDIntercepts;
-    StoreArray<ROIid> m_ROIs;
+    StoreArray<RecoTrack> m_RecoTracks;   /**< RecoTracks StoreArray */
+    StoreArray<PXDIntercept> m_PXDIntercepts;   /**< PXDIntercepts StoreArray */
+    StoreArray<ROIid> m_ROIs;   /**< ROIs StoreArray */
     ROIinfo m_ROIinfo; /**< contains the parameters that can be changed by the user*/
 
     std::string m_PXDInterceptListName; /**< intercept list name*/

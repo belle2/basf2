@@ -31,15 +31,15 @@ namespace Belle2 {
 
   private:
 
-    /**  */
+    /** Initialize all necessary variables */
     void initialize() override final;
 
 
-    /**  */
+    /** Event function */
     void event() override final;
 
-    StoreArray<ROIid> m_ROIs;
-    StoreArray<PXDRawHit> m_PXDRawHits;
+    StoreArray<ROIid> m_ROIs;   /**< ROIs StoreArray */
+    StoreArray<PXDRawHit> m_PXDRawHits;   /**< PXDRawHits StoreArray */
 
     SelectSubset< PXDRawHit > m_selectorIN; /**< selector of the subset of PXDRawHits contained in the ROIs*/
     SelectSubset< PXDRawHit > m_selectorOUT; /**< selector of the subset of PXDRawHits NOT contained in the ROIs*/

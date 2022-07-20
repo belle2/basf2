@@ -182,7 +182,8 @@ void BKLMTrackingModule::runTracking(int mode, int iSection, int iSector, int iL
         continue;
       if (!m_globalFit && !sameSector(hits2D[hi], hits2D[hj]))
         continue;
-      if (sameSector(hits2D[hi], hits2D[hj]) && abs(hits2D[hi]->getLayer() - hits2D[hj]->getLayer()) < 3)
+      if (sameSector(hits2D[hi], hits2D[hj]) &&
+          std::abs(hits2D[hi]->getLayer() - hits2D[hj]->getLayer()) < 3)
         continue;
 
       std::list<KLMHit2d*> sectorHitList;

@@ -52,12 +52,3 @@ void BKLMDatabaseImporter::importSimulationPar()
                          m_ExperimentHigh, m_RunHigh);
   Database::Instance().storeData("BKLMSimulationPar", &bklmSimulationPar, iov);
 }
-
-void BKLMDatabaseImporter::importADCThreshold(BKLMADCThreshold* inputThreshold)
-{
-  DBImportObjPtr<BKLMADCThreshold> adcThreshold;
-  adcThreshold.construct(*inputThreshold);
-  IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
-                         m_ExperimentHigh, m_RunHigh);
-  adcThreshold.import(iov);
-}

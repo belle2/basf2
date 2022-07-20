@@ -96,7 +96,7 @@ void LowEnergyPi0VetoExpertModule::init_mva(MVA::Weightfile& weightfile)
   if (m_Belle1)
     nInputVariables = 7;
   else
-    nInputVariables = 9;
+    nInputVariables = 11;
   dummy.resize(nInputVariables, 0);
   m_dataset = std::unique_ptr<MVA::SingleDataset>(new MVA::SingleDataset(general_options, std::move(dummy), 0));
 }
@@ -127,28 +127,12 @@ float LowEnergyPi0VetoExpertModule::getMaximumVeto(const Particle* gamma1,
     }
     double gammaLowEnergyEnergy, gammaHighEnergyEnergy;
     double gammaLowEnergyE9E21, gammaHighEnergyE9E21;
+    double gammaLowEnergyClusterTheta, gammaHighEnergyClusterTheta;
     double gammaLowEnergyZernikeMVA, gammaHighEnergyZernikeMVA;
     double gammaLowEnergyIsolation, gammaHighEnergyIsolation;
-    double gammaLowEnergyClusterTheta, gammaHighEnergyClusterTheta;
     double cosHelicityAngleMomentum;
     gammaLowEnergyEnergy = gammaLowEnergy->getEnergy();
     gammaHighEnergyEnergy = gammaHighEnergy->getEnergy();
-    if (m_Belle1) {
-      gammaLowEnergyE9E21 = Variable::eclClusterE9E21(gammaLowEnergy);
-      gammaHighEnergyE9E21 = Variable::eclClusterE9E21(gammaHighEnergy);
-    }
-    if (!m_Belle1) {
-      gammaLowEnergyZernikeMVA =
-        Variable::eclClusterZernikeMVA(gammaLowEnergy);
-      gammaHighEnergyZernikeMVA =
-        Variable::eclClusterZernikeMVA(gammaHighEnergy);
-      gammaLowEnergyIsolation = Variable::eclClusterIsolation(gammaLowEnergy);
-      gammaHighEnergyIsolation =
-        Variable::eclClusterIsolation(gammaHighEnergy);
-    }
-    gammaLowEnergyClusterTheta = Variable::eclClusterTheta(gammaLowEnergy);
-    gammaHighEnergyClusterTheta = Variable::eclClusterTheta(gammaHighEnergy);
-
     ROOT::Math::PxPyPzEVector gammaHighEnergyMomentum(
       gammaHighEnergy->getPx(), gammaHighEnergy->getPy(),
       gammaHighEnergy->getPz(), gammaHighEnergyEnergy);
@@ -163,24 +147,31 @@ float LowEnergyPi0VetoExpertModule::getMaximumVeto(const Particle* gamma1,
     cosHelicityAngleMomentum =
       fabs(ROOT::Math::VectorUtil::CosTheta(momentum.Vect(),
                                             gammaHighEnergyMomentum.Vect()));
-    if (m_Belle1) {
-      m_dataset->m_input[0] = gammaLowEnergyEnergy;
-      m_dataset->m_input[1] = gammaLowEnergyE9E21;
-      m_dataset->m_input[2] = gammaHighEnergyE9E21;
-      m_dataset->m_input[3] = gammaLowEnergyClusterTheta;
-      m_dataset->m_input[4] = gammaHighEnergyClusterTheta;
-      m_dataset->m_input[5] = pi0Mass;
-      m_dataset->m_input[6] = cosHelicityAngleMomentum;
-    } else {
-      m_dataset->m_input[0] = gammaLowEnergyEnergy;
-      m_dataset->m_input[1] = gammaLowEnergyZernikeMVA;
-      m_dataset->m_input[2] = gammaHighEnergyZernikeMVA;
-      m_dataset->m_input[3] = gammaLowEnergyIsolation;
-      m_dataset->m_input[4] = gammaHighEnergyIsolation;
-      m_dataset->m_input[5] = gammaLowEnergyClusterTheta;
-      m_dataset->m_input[6] = gammaHighEnergyClusterTheta;
-      m_dataset->m_input[7] = pi0Mass;
-      m_dataset->m_input[8] = cosHelicityAngleMomentum;
+    gammaLowEnergyE9E21 = Variable::eclClusterE9E21(gammaLowEnergy);
+    gammaHighEnergyE9E21 = Variable::eclClusterE9E21(gammaHighEnergy);
+    gammaLowEnergyClusterTheta = Variable::eclClusterTheta(gammaLowEnergy);
+    gammaHighEnergyClusterTheta = Variable::eclClusterTheta(gammaHighEnergy);
+    if (!m_Belle1) {
+      gammaLowEnergyZernikeMVA =
+        Variable::eclClusterZernikeMVA(gammaLowEnergy);
+      gammaHighEnergyZernikeMVA =
+        Variable::eclClusterZernikeMVA(gammaHighEnergy);
+      gammaLowEnergyIsolation = Variable::eclClusterIsolation(gammaLowEnergy);
+      gammaHighEnergyIsolation =
+        Variable::eclClusterIsolation(gammaHighEnergy);
+    }
+    m_dataset->m_input[0] = gammaLowEnergyEnergy;
+    m_dataset->m_input[1] = pi0Mass;
+    m_dataset->m_input[2] = cosHelicityAngleMomentum;
+    m_dataset->m_input[3] = gammaLowEnergyE9E21;
+    m_dataset->m_input[4] = gammaHighEnergyE9E21;
+    m_dataset->m_input[5] = gammaLowEnergyClusterTheta;
+    m_dataset->m_input[6] = gammaHighEnergyClusterTheta;
+    if (!m_Belle1) {
+      m_dataset->m_input[7] = gammaLowEnergyZernikeMVA;
+      m_dataset->m_input[8] = gammaHighEnergyZernikeMVA;
+      m_dataset->m_input[9] = gammaLowEnergyIsolation;
+      m_dataset->m_input[10] = gammaHighEnergyIsolation;
     }
     float veto = m_expert->apply(*m_dataset)[0];
     if (veto > maxVeto)

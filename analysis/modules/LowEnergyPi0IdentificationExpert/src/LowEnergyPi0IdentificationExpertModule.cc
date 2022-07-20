@@ -83,7 +83,7 @@ void LowEnergyPi0IdentificationExpertModule::init_mva(MVA::Weightfile& weightfil
   if (m_Belle1)
     nInputVariables = 6;
   else
-    nInputVariables = 8;
+    nInputVariables = 10;
   dummy.resize(nInputVariables, 0);
   m_dataset = std::unique_ptr<MVA::SingleDataset>(new MVA::SingleDataset(general_options, std::move(dummy), 0));
 }
@@ -103,15 +103,18 @@ void LowEnergyPi0IdentificationExpertModule::event()
       gammaLowEnergy = gamma1;
       gammaHighEnergy = gamma2;
     }
+    double gammaLowEnergyPi0Veto, gammaHighEnergyPi0Veto;
     double gammaLowEnergyE9E21, gammaHighEnergyE9E21;
+    double gammaLowEnergyClusterTheta, gammaHighEnergyClusterTheta;
     double gammaLowEnergyZernikeMVA, gammaHighEnergyZernikeMVA;
     double gammaLowEnergyIsolation, gammaHighEnergyIsolation;
-    double gammaLowEnergyClusterTheta, gammaHighEnergyClusterTheta;
-    double gammaLowEnergyPi0Veto, gammaHighEnergyPi0Veto;
-    if (m_Belle1) {
-      gammaLowEnergyE9E21 = Variable::eclClusterE9E21(gammaLowEnergy);
-      gammaHighEnergyE9E21 = Variable::eclClusterE9E21(gammaHighEnergy);
-    }
+    gammaLowEnergyPi0Veto = pi0->getExtraInfo("lowEnergyPi0VetoGammaLowEnergy");
+    gammaHighEnergyPi0Veto =
+      pi0->getExtraInfo("lowEnergyPi0VetoGammaHighEnergy");
+    gammaLowEnergyE9E21 = Variable::eclClusterE9E21(gammaLowEnergy);
+    gammaHighEnergyE9E21 = Variable::eclClusterE9E21(gammaHighEnergy);
+    gammaLowEnergyClusterTheta = Variable::eclClusterTheta(gammaLowEnergy);
+    gammaHighEnergyClusterTheta = Variable::eclClusterTheta(gammaHighEnergy);
     if (!m_Belle1) {
       gammaLowEnergyZernikeMVA = Variable::eclClusterZernikeMVA(gammaLowEnergy);
       gammaHighEnergyZernikeMVA =
@@ -119,27 +122,17 @@ void LowEnergyPi0IdentificationExpertModule::event()
       gammaLowEnergyIsolation = Variable::eclClusterIsolation(gammaLowEnergy);
       gammaHighEnergyIsolation = Variable::eclClusterIsolation(gammaHighEnergy);
     }
-    gammaLowEnergyClusterTheta = Variable::eclClusterTheta(gammaLowEnergy);
-    gammaHighEnergyClusterTheta = Variable::eclClusterTheta(gammaHighEnergy);
-    gammaLowEnergyPi0Veto = pi0->getExtraInfo("lowEnergyPi0VetoGammaLowEnergy");
-    gammaHighEnergyPi0Veto =
-      pi0->getExtraInfo("lowEnergyPi0VetoGammaHighEnergy");
-    if (m_Belle1) {
-      m_dataset->m_input[0] = gammaLowEnergyE9E21;
-      m_dataset->m_input[1] = gammaHighEnergyE9E21;
-      m_dataset->m_input[2] = gammaLowEnergyClusterTheta;
-      m_dataset->m_input[3] = gammaHighEnergyClusterTheta;
-      m_dataset->m_input[4] = gammaLowEnergyPi0Veto;
-      m_dataset->m_input[5] = gammaHighEnergyPi0Veto;
-    } else {
-      m_dataset->m_input[0] = gammaLowEnergyZernikeMVA;
-      m_dataset->m_input[1] = gammaHighEnergyZernikeMVA;
-      m_dataset->m_input[2] = gammaLowEnergyIsolation;
-      m_dataset->m_input[3] = gammaHighEnergyIsolation;
-      m_dataset->m_input[4] = gammaLowEnergyClusterTheta;
-      m_dataset->m_input[5] = gammaHighEnergyClusterTheta;
-      m_dataset->m_input[6] = gammaLowEnergyPi0Veto;
-      m_dataset->m_input[7] = gammaHighEnergyPi0Veto;
+    m_dataset->m_input[0] = gammaLowEnergyPi0Veto;
+    m_dataset->m_input[1] = gammaHighEnergyPi0Veto;
+    m_dataset->m_input[2] = gammaLowEnergyE9E21;
+    m_dataset->m_input[3] = gammaHighEnergyE9E21;
+    m_dataset->m_input[4] = gammaLowEnergyClusterTheta;
+    m_dataset->m_input[5] = gammaHighEnergyClusterTheta;
+    if (!m_Belle1) {
+      m_dataset->m_input[6] = gammaLowEnergyZernikeMVA;
+      m_dataset->m_input[7] = gammaHighEnergyZernikeMVA;
+      m_dataset->m_input[8] = gammaLowEnergyIsolation;
+      m_dataset->m_input[9] = gammaHighEnergyIsolation;
     }
     float identification = m_expert->apply(*m_dataset)[0];
     pi0->addExtraInfo("lowEnergyPi0Identification", identification);

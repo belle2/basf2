@@ -12,7 +12,6 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/logging/Logger.h>
 
-using namespace std;
 using namespace Belle2;
 
 TrackMatchLookUp::TrackMatchLookUp(const std::string& mcRecoTrackStoreArrayName,

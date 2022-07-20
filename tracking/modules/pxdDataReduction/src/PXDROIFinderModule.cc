@@ -50,7 +50,7 @@ PXDROIFinderModule::PXDROIFinderModule() : Module(), m_ROIinfo()
 
 void PXDROIFinderModule::initialize()
 {
-  m_RecoTracks.isRequired(m_recoTracksListName);
+  m_RecoTracks.isOptional(m_recoTracksListName);
   m_ROIs.registerInDataStore(m_ROIListName, DataStore::c_ErrorIfAlreadyRegistered);
   m_PXDIntercepts.registerInDataStore(m_PXDInterceptListName, DataStore::c_ErrorIfAlreadyRegistered);
 

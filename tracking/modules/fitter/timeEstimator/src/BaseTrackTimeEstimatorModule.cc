@@ -105,7 +105,7 @@ void BaseTrackTimeEstimatorModule::event()
       timeSeed += m_param_timeOffset;
     }
 
-    B2DEBUG(100, "Setting seed to " <<  timeSeed);
+    B2DEBUG(28, "Setting seed to " <<  timeSeed);
     recoTrack.setTimeSeed(timeSeed);
   }
 }

@@ -12,7 +12,6 @@
 #include <mdst/dataobjects/PIDLikelihood.h>
 
 using namespace Belle2;
-using namespace std;
 
 #include <iostream>
 

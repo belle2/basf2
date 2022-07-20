@@ -15,8 +15,6 @@
 
 #include <vxd/geometry/GeoCache.h>
 
-#include <mdst/dataobjects/MCParticle.h>
-#include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
 #include <mdst/dataobjects/HitPatternVXD.h>
 
@@ -24,8 +22,6 @@
 #include <svd/reconstruction/SVDRecoHit.h>
 #include <svd/reconstruction/SVDRecoHit2D.h>
 #include <cdc/dataobjects/CDCRecoHit.h>
-
-#include <tracking/dataobjects/RecoTrack.h>
 
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <pxd/dataobjects/PXDCluster.h>
@@ -69,17 +65,11 @@ TrackingPerformanceEvaluationModule::~TrackingPerformanceEvaluationModule()
 void TrackingPerformanceEvaluationModule::initialize()
 {
   // MCParticles, Tracks, RecoTracks, MCRecoTracks needed for this module
-  StoreArray<MCParticle> mcParticles;
-  mcParticles.isRequired(m_MCParticlesName);
+  m_MCParticles.isRequired(m_MCParticlesName);
+  m_PRRecoTracks.isRequired(m_RecoTracksName);
+  m_MCRecoTracks.isRequired(m_MCRecoTracksName);
 
-  StoreArray<RecoTrack> recoTracks;
-  recoTracks.isRequired(m_RecoTracksName);
-
-  StoreArray<RecoTrack> mcRecoTracks;
-  mcRecoTracks.isRequired(m_MCRecoTracksName);
-
-  StoreArray<Track> tracks;
-  tracks.isRequired(m_TracksName);
+  m_Tracks.isRequired(m_TracksName);
 
   //create list of histograms to be saved in the rootfile
   m_histoList = new TList;
@@ -356,14 +346,11 @@ void TrackingPerformanceEvaluationModule::beginRun()
 
 void TrackingPerformanceEvaluationModule::event()
 {
-
-  StoreArray<MCParticle> mcParticles(m_MCParticlesName);
-
   B2Vector3D magField = BFieldManager::getField(0, 0, 0) / Unit::T;
 
   bool hasTrack = false;
   B2DEBUG(99, "+++++ 1. loop on MCParticles");
-  BOOST_FOREACH(MCParticle & mcParticle, mcParticles) {
+  BOOST_FOREACH(MCParticle & mcParticle, m_MCParticles) {
 
     if (! isTraceable(mcParticle))
       continue;
@@ -487,7 +474,7 @@ void TrackingPerformanceEvaluationModule::event()
   //2. retrieve all the MCParticles related to the Tracks
   StoreArray<Track> tracks(m_TracksName);
 
-  BOOST_FOREACH(Track & track, tracks) {
+  BOOST_FOREACH(Track & track, m_Tracks) {
 
     int nMCParticles = 0;
 
@@ -541,13 +528,12 @@ void TrackingPerformanceEvaluationModule::event()
   B2DEBUG(99, "+++++ 3. loop on MCRecoTracks");
 
   //3. retrieve all MCRecoTracks
-  StoreArray<RecoTrack> mcRecoTracks(m_MCRecoTracksName);
-  StoreArray<PXDCluster> pxdClusters;
-  StoreArray<SVDCluster> svdClusters;
-  StoreArray<CDCHit> cdcHit;
+//   StoreArray<PXDCluster> pxdClusters;
+//   StoreArray<SVDCluster> svdClusters;
+//   StoreArray<CDCHit> cdcHit;
 
 
-  BOOST_FOREACH(RecoTrack & mcRecoTrack, mcRecoTracks) {
+  BOOST_FOREACH(RecoTrack & mcRecoTrack, m_MCRecoTracks) {
 
     int nRecoTrack = 0;
     bool hasRecoTrack = false;
@@ -582,9 +568,8 @@ void TrackingPerformanceEvaluationModule::event()
   B2DEBUG(99, "+++++ 4. loop on RecoTracks");
 
   //4. retrieve all RecoTracks
-  StoreArray<RecoTrack> RecoTracks;
 
-  BOOST_FOREACH(RecoTrack & recoTrack, RecoTracks) {
+  BOOST_FOREACH(RecoTrack & recoTrack, m_PRRecoTracks) {
 
     //   int nMCRecoTrack = 0;
 

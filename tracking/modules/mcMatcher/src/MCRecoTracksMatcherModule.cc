@@ -195,43 +195,50 @@ MCRecoTracksMatcherModule::MCRecoTracksMatcherModule()
 
 void MCRecoTracksMatcherModule::initialize()
 {
-  // Require both RecoTrack arrays and the MCParticles to be present in the DataStore
-  m_MCParticles.isRequired();
-  m_PRRecoTracks.isRequired(m_param_prRecoTracksStoreArrayName);
-  m_MCRecoTracks.isRequired(m_param_mcRecoTracksStoreArrayName);
+  if (m_MCParticles.isOptional()) {
+    m_mcParticlesPresent = true;
 
-  // Purity relation - for each PRTrack to store the purest MCTrack
-  m_PRRecoTracks.registerRelationTo(m_MCRecoTracks);
+    // Require both RecoTrack arrays and the MCParticles to be present in the DataStore
+    m_MCParticles.isRequired();
+    m_PRRecoTracks.isRequired(m_param_prRecoTracksStoreArrayName);
+    m_MCRecoTracks.isRequired(m_param_mcRecoTracksStoreArrayName);
 
-  // Efficiency relation - for each MCTrack to store the most efficient PRTrack
-  m_MCRecoTracks.registerRelationTo(m_PRRecoTracks);
+    // Purity relation - for each PRTrack to store the purest MCTrack
+    m_PRRecoTracks.registerRelationTo(m_MCRecoTracks);
 
-  // MCParticle matching relation - purity
-  m_PRRecoTracks.registerRelationTo(m_MCParticles);
+    // Efficiency relation - for each MCTrack to store the most efficient PRTrack
+    m_MCRecoTracks.registerRelationTo(m_PRRecoTracks);
 
-  // MCParticle matching relation - efficiency
-  m_MCParticles.registerRelationTo(m_PRRecoTracks);
+    // MCParticle matching relation - purity
+    m_PRRecoTracks.registerRelationTo(m_MCParticles);
 
-  // Announce optional store arrays to the hits or clusters in case they should be used
-  // We make them optional in case of limited detector setup.
-  // PXD
-  if (m_param_usePXDHits) {
-    m_PXDClusters.isRequired();
-  }
+    // MCParticle matching relation - efficiency
+    m_MCParticles.registerRelationTo(m_PRRecoTracks);
 
-  // SVD
-  if (m_param_useSVDHits) {
-    m_SVDClusters.isRequired();
-  }
+    // PXD
+    if (m_param_usePXDHits) {
+      m_PXDClusters.isRequired();
+    }
 
-  // CDC
-  if (m_param_useCDCHits) {
-    m_CDCHits.isRequired();
+    // SVD
+    if (m_param_useSVDHits) {
+      m_SVDClusters.isRequired();
+    }
+
+    // CDC
+    if (m_param_useCDCHits) {
+      m_CDCHits.isRequired();
+    }
   }
 }
 
 void MCRecoTracksMatcherModule::event()
 {
+  // Skip in the case there are no MC particles present.
+  if (not m_mcParticlesPresent) {
+    B2DEBUG(23, "Skipping MC Track Matcher as there are no MC Particles registered in the DataStore.");
+    return;
+  }
 
   B2DEBUG(23, "########## MCRecoTracksMatcherModule ############");
 

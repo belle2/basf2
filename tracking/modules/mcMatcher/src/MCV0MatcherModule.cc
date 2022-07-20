@@ -57,7 +57,6 @@ void MCV0MatcherModule::beginRun()
 
 void MCV0MatcherModule::event()
 {
-  StoreArray<V0> v0s(m_V0ColName);
   B2DEBUG(20, (m_V0s.getEntries() != 0 ? "V0s has entries." : " No V0s."));
 
   for (const auto& v0 : m_V0s) {

@@ -173,8 +173,9 @@ namespace Belle2 {
     StoreArray<SVDCluster>  m_SVDClusters;  /**< StoreArray containing SVDClusters */
     StoreArray<CDCHit>      m_CDCHits;      /**< StoreArray containing CDCHits */
 
+    //! Flag to indicated whether the Monte Carlo track are on the DataStore
+    bool m_mcParticlesPresent = false;
 
-  public: // Other variables
     //! Descriptive type defintion for a number of degrees of freedom.
     using NDF = int;
 

@@ -12,6 +12,8 @@
 #include <framework/core/Module.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <framework/datastore/StoreArray.h>
+#include <genfit/TrackCand.h>
+#include <tracking/spacePointCreation/SpacePointTrackCand.h>
 
 // ROOT
 #include <TFile.h>
@@ -126,6 +128,10 @@ namespace Belle2 {
      * @returns the original allIDs interlaced with the vectors of mcPartIds that were in the reference but not in the vector
      */
     std::vector<std::vector<int> > getDiffIds(const std::vector<std::vector<int> >& allIDs);
+
+    StoreArray<MCParticle> m_MCParticles; /**< MCParticles StoreArray */
+    StoreArray<genfit::TrackCand> m_GenfitTrackCands; /**< Genfit::TrackCands StoreArray */
+    StoreArray<SpacePointTrackCand> m_SpacePointTrackCands; /**< SpacePointTrackCands StoreArray */
 
   };
 }

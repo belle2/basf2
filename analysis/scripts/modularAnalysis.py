@@ -2928,8 +2928,8 @@ def writePi0EtaVeto(
     path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
 
-def lowEnergyPi0Identification(pi0List, gammaList, globalTag, path=None,
-                               belle1=False):
+def lowEnergyPi0Identification(pi0List, gammaList, payloadNameSuffix,
+                               path=None):
     """
     Calculate low-energy pi0 identification.
     The result is stored as ExtraInfo 'lowEnergyPi0Identification'.
@@ -2940,11 +2940,14 @@ def lowEnergyPi0Identification(pi0List, gammaList, globalTag, path=None,
     the reconstructed pi0. The maximum low-energy pi0 veto value is calculated
     for such photon pairs and used as one of the input variables for
     the identification classifier.
-    @param[in] globalTag Global tag with MVA payloads.
+    @param[in] payloadNameSuffix
+    Payload name suffix. The weight payloads are stored in
+    the analysis global tag and have the following names:
+    'LowEnergyPi0Veto' + payloadNameSuffix
+    'LowEnergyPi0Identification' + payloadNameSuffix
     @param[in] path      Module path.
-    @param[in] belle1    Whether Belle data are analysed.
     """
-    basf2.conditions.prepend_globaltag(globalTag)
+    basf2.conditions.prepend_globaltag(getAnalysisGlobaltag())
     # Select photons with higher energy for formation of veto combinations.
     cutAndCopyList('gamma:pi0veto', gammaList, 'E > 0.2', path=path)
     import b2bii

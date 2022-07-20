@@ -74,6 +74,8 @@ MCTrackCandClassifierModule::MCTrackCandClassifierModule() : Module()
 
 void MCTrackCandClassifierModule::initialize()
 {
+  m_magField = BFieldManager::getField(0, 0, 0) / Unit::T;
+
   // MCParticles, MCTrackCands, MCTracks needed for this module
   m_PXDClusters.isRequired();
   m_SVDClusters.isRequired();
@@ -100,7 +102,7 @@ void MCTrackCandClassifierModule::initialize()
 
   for (int bin = 0; bin < 10 + 1; bin++) {
     bins_lambda[bin] = - TMath::Pi() / 2 + bin * width_lambda;
-    B2DEBUG(1, bins_lambda[bin] << "   " <<  bins_theta[bin]);
+    B2DEBUG(21, bins_lambda[bin] << "   " <<  bins_theta[bin]);
   }
 
   m_h3_MCParticle = createHistogram3D("h3MCParticle", "entry per MCParticle",
@@ -200,9 +202,7 @@ void MCTrackCandClassifierModule::beginRun()
 
 void MCTrackCandClassifierModule::event()
 {
-  B2Vector3D magField = BFieldManager::getField(0, 0, 0) / Unit::T;
-
-  B2DEBUG(1, "+++++ 1. loop on MCTrackCands");
+  B2DEBUG(21, "+++++ 1. loop on MCTrackCands");
 
   const VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
 
@@ -213,19 +213,19 @@ void MCTrackCandClassifierModule::event()
     int nBadTrueHits = 0;
     int nGood1Dinfo = 0;
 
-    B2DEBUG(1, " a NEW MCTrackCand ");
+    B2DEBUG(21, " a NEW MCTrackCand ");
 
     //1.b retrieve the MCParticle
     RelationVector<MCParticle> MCParticles_fromMCTrackCand = DataStore::getRelationsWithObj<MCParticle>(&mcTrackCand);
 
-    B2DEBUG(1, "~~~ " << MCParticles_fromMCTrackCand.size() << " MCParticles related to this MCTrackCand");
+    B2DEBUG(21, "~~~ " << MCParticles_fromMCTrackCand.size() << " MCParticles related to this MCTrackCand");
     for (int mcp = 0; mcp < (int)MCParticles_fromMCTrackCand.size(); mcp++) { //should be ONE
 
       MCParticle mcParticle = *MCParticles_fromMCTrackCand[mcp];
 
-      B2DEBUG(1, " a NEW charged MC Particle, " << mcParticle.getIndex() << ", " << mcParticle.getPDG());
+      B2DEBUG(21, " a NEW charged MC Particle, " << mcParticle.getIndex() << ", " << mcParticle.getPDG());
 
-      MCParticleInfo mcParticleInfo(mcParticle, magField);
+      MCParticleInfo mcParticleInfo(mcParticle, m_magField);
 
       B2Vector3D decayVertex = mcParticle.getProductionVertex();
       TVector3 mom = mcParticle.getMomentum();
@@ -256,7 +256,7 @@ void MCTrackCandClassifierModule::event()
       int firstRejectedHit =  Nhits + 1;
       double prevHitRadius = abs(1 / omega);
 
-      double lapTime = 2 * M_PI * mcParticle.getEnergy() / 0.299792 / magField.Z();
+      double lapTime = 2 * M_PI * mcParticle.getEnergy() / 0.299792 / m_magField.Z();
       double FirstHitTime = -1;
       double HitTime = -1;
 
@@ -353,9 +353,9 @@ void MCTrackCandClassifierModule::event()
           accepted1 = isInSemiPlane(semiPlane(decayVertex, center, globalHit), omega);
 
         if (accepted1) {
-          B2DEBUG(1, "     semiplane: ACCEPTED");
+          B2DEBUG(21, "     semiplane: ACCEPTED");
         } else {
-          B2DEBUG(1, "     semiplane: REJECTED, next track");
+          B2DEBUG(21, "     semiplane: REJECTED, next track");
         }
 
         double dR = compute_dR(thetaMS, theDistance(TVector3(0, 0, 0), globalHit));
@@ -371,9 +371,9 @@ void MCTrackCandClassifierModule::event()
         prevHitRadius = hitRadius;
 
         if (accepted2) {
-          B2DEBUG(1, "     annulus: ACCEPTED");
+          B2DEBUG(21, "     annulus: ACCEPTED");
         } else {
-          B2DEBUG(1, "     annulus: REJECTED, next track");
+          B2DEBUG(21, "     annulus: REJECTED, next track");
         }
 
         bool accepted3 = true;
@@ -381,9 +381,9 @@ void MCTrackCandClassifierModule::event()
           accepted3 = isFirstLap(FirstHitTime,  HitTime, lapTime);
 
         if (accepted3) {
-          B2DEBUG(1, "     lapTime: ACCEPTED");
+          B2DEBUG(21, "     lapTime: ACCEPTED");
         } else {
-          B2DEBUG(1, "     lapTime: REJECTED, next track");
+          B2DEBUG(21, "     lapTime: REJECTED, next track");
         }
 
         if (accepted2 && accepted1 && accepted3 && accepted4) {
@@ -409,13 +409,13 @@ void MCTrackCandClassifierModule::event()
             nGood1Dinfo++;
         }
         if (hasPXDCluster || hasSVDuCluster || hasSVDvCluster)
-          B2DEBUG(1, "cluster: ACCEPTED (" << nGood1Dinfo << ")");
+          B2DEBUG(21, "cluster: ACCEPTED (" << nGood1Dinfo << ")");
 
         cluster++;
       }//close loop on clusters
 
       if (nGood1Dinfo >= m_minHit) {
-        B2DEBUG(1, "  idealMCTrackCand FOUND!! " << nGood1Dinfo << " 1D infos (" << nGoodTrueHits << " good true hits)");
+        B2DEBUG(21, "  idealMCTrackCand FOUND!! " << nGood1Dinfo << " 1D infos (" << nGoodTrueHits << " good true hits)");
         m_h3_idealMCTrackCand->Fill(mcParticleInfo.getPt(), mcParticleInfo.getLambda(), mcParticleInfo.getPphi());
         m_h1_nGoodTrueHits->Fill(nGoodTrueHits);
         m_h1_nGood1dInfo->Fill(nGood1Dinfo);
@@ -434,12 +434,12 @@ void MCTrackCandClassifierModule::event()
         m_h1_firstRejectedHit->Fill(tmpTrackCand->getNHits());
         m_h1_firstRejectedOVERMCHit->Fill((float)tmpTrackCand->getNHits() / mcTrackCand.getNHits());
       } else {
-        B2DEBUG(1, "  too few good hits (" << nGood1Dinfo << ") to track this one ( vs " << nGoodTrueHits << " true hits)");
+        B2DEBUG(21, "  too few good hits (" << nGood1Dinfo << ") to track this one ( vs " << nGoodTrueHits << " true hits)");
         m_h1_nBadTrueHits->Fill(nGoodTrueHits);
         m_h1_nBad1dInfo->Fill(nGood1Dinfo);
       }
 
-      B2DEBUG(1, "");
+      B2DEBUG(21, "");
     }//close loop on MCParticles
   }//close loop on MCTrackCands
 }
@@ -480,8 +480,8 @@ void MCTrackCandClassifierModule::endRun()
   B2INFO("        # MCTrackCand = " << den);
   B2INFO("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
   B2INFO("");
-  B2DEBUG(1, "  nWedge = " << nWedge);
-  B2DEBUG(1, " nBarrel = " << nBarrel);
+  B2DEBUG(21, "  nWedge = " << nWedge);
+  B2DEBUG(21, " nBarrel = " << nBarrel);
 }
 
 
@@ -509,13 +509,13 @@ double MCTrackCandClassifierModule::semiPlane(TVector3 vertex, TVector3 center, 
 
   double semiPlane = err.Y() / err.X() * hit.X() + err.Y() / err.X() * vertex.x() - vertex.Y();
 
-  B2DEBUG(1, "");
-  B2DEBUG(1, " SEMI-PLANE defined by: y + " << err.Y() / err.X() << " x + " << err.Y() / err.X()*vertex.x() - vertex.Y() << " = 0");
-  B2DEBUG(1, "     with: center(" << center.X() << "," << center.Y() << ")");
-  B2DEBUG(1, "           decayV(" << vertex.X() << "," << vertex.Y() << ")");
-  B2DEBUG(1, "           vector(" << err.X() << "," << err.Y() << ")");
-  B2DEBUG(1, "           y SLOPE = " << semiPlane << " VS y HIT = " << hit.Y());
-  B2DEBUG(1, "           HIT - SLOPE = " << - semiPlane + hit.Y());
+  B2DEBUG(21, "");
+  B2DEBUG(21, " SEMI-PLANE defined by: y + " << err.Y() / err.X() << " x + " << err.Y() / err.X()*vertex.x() - vertex.Y() << " = 0");
+  B2DEBUG(21, "     with: center(" << center.X() << "," << center.Y() << ")");
+  B2DEBUG(21, "           decayV(" << vertex.X() << "," << vertex.Y() << ")");
+  B2DEBUG(21, "           vector(" << err.X() << "," << err.Y() << ")");
+  B2DEBUG(21, "           y SLOPE = " << semiPlane << " VS y HIT = " << hit.Y());
+  B2DEBUG(21, "           HIT - SLOPE = " << - semiPlane + hit.Y());
 
   if (vertex.X() < center.X())
     return hit.Y() - semiPlane;
@@ -546,11 +546,11 @@ bool MCTrackCandClassifierModule::isInAnnulus(double hitDistance, double R, doub
 {
   bool accepted = false;
 
-  B2DEBUG(1, "");
-  B2DEBUG(1, " ANNULUS defined between radii: " << R - dR << " and " << R + dR);
-  B2DEBUG(1, "     hit distance = " << hitDistance);
-  B2DEBUG(1, "     helix radius = " << R);
-  B2DEBUG(1, "               dR = " << dR);
+  B2DEBUG(21, "");
+  B2DEBUG(21, " ANNULUS defined between radii: " << R - dR << " and " << R + dR);
+  B2DEBUG(21, "     hit distance = " << hitDistance);
+  B2DEBUG(21, "     helix radius = " << R);
+  B2DEBUG(21, "               dR = " << dR);
 
   if ((hitDistance > R - dR) && (hitDistance < R + dR))
     accepted = true;
@@ -563,11 +563,11 @@ bool MCTrackCandClassifierModule::isFirstLap(double FirstHitTime, double HitTime
 {
   bool accepted = false;
 
-  B2DEBUG(1, "");
-  B2DEBUG(1, " lapTime: " << LapTime);
-  B2DEBUG(1, "     FirstHitTime = " << FirstHitTime);
-  B2DEBUG(1, "          HitTime = " << HitTime);
-  B2DEBUG(1, "       difference = " << HitTime - FirstHitTime);
+  B2DEBUG(21, "");
+  B2DEBUG(21, " lapTime: " << LapTime);
+  B2DEBUG(21, "     FirstHitTime = " << FirstHitTime);
+  B2DEBUG(21, "          HitTime = " << HitTime);
+  B2DEBUG(21, "       difference = " << HitTime - FirstHitTime);
 
   m_h1_lapTime->Fill(LapTime);
   m_h1_timeDifference->Fill(HitTime - FirstHitTime);
@@ -756,9 +756,9 @@ TH1F* MCTrackCandClassifierModule::createHistogramsRatio(const char* name, const
         else if (axisRef == 2) bin = hden->GetBin(other1_bin, other2_bin, the_bin);
 
         if (hden->IsBinUnderflow(bin))
-          B2DEBUG(1, "  bin = " << bin << "(" << the_bin << "," << other1_bin << "," << other2_bin << "), UNDERFLOW");
+          B2DEBUG(21, "  bin = " << bin << "(" << the_bin << "," << other1_bin << "," << other2_bin << "), UNDERFLOW");
         if (hden->IsBinOverflow(bin))
-          B2DEBUG(1, "  bin = " << bin << "(" << the_bin << "," << other1_bin << "," << other2_bin << "), OVERFLOW");
+          B2DEBUG(21, "  bin = " << bin << "(" << the_bin << "," << other1_bin << "," << other2_bin << "), OVERFLOW");
 
         num += hnum->GetBinContent(bin);
         den += hden->GetBinContent(bin);

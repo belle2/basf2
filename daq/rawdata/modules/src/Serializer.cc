@@ -60,7 +60,7 @@ SerializerModule::~SerializerModule()
 
 void SerializerModule::initialize()
 {
-  signal(SIGPIPE , SIG_IGN);
+  signal(SIGPIPE, SIG_IGN);
 
 #ifdef DUMMY
   m_buffer = new int[ BUF_SIZE_WORD ];
@@ -139,17 +139,17 @@ void SerializerModule::shmOpen(char* path_cfg, char* path_sta)
   m_shmfd_cfg = shm_open(path_cfg, O_RDWR, 0666);
   if (m_shmfd_cfg < 0) {
     char err_buf[500];
-    sprintf(err_buf, "[FATAL] Failed to shm_open (%s). Exiting... : path %s\n" ,
+    sprintf(err_buf, "[FATAL] Failed to shm_open (%s). Exiting... : path %s\n",
             strerror(errno), path_cfg);
     print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     sleep(1234567);
     exit(1);
   }
 
-  m_shmfd_sta = shm_open(path_sta , O_RDWR, 0666);
+  m_shmfd_sta = shm_open(path_sta, O_RDWR, 0666);
   if (m_shmfd_sta < 0) {
     char err_buf[500];
-    sprintf(err_buf, "[FATAL] Failed to shm_open (%s). Exiting... : path %s\n" ,
+    sprintf(err_buf, "[FATAL] Failed to shm_open (%s). Exiting... : path %s\n",
             strerror(errno), path_sta);
     print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     sleep(1234567);
@@ -183,7 +183,7 @@ void SerializerModule::fillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl,
   if (rawdblk->GetNumEntries() == 1) {
     if (total_send_nwords != (rawdblk->GetBuffer(0))[ 0 ] + 8) {
       char err_buf[500];
-      sprintf(err_buf, "[FATAL] Length error. total length %d rawdblk length %d. Exting...\n" ,
+      sprintf(err_buf, "[FATAL] Length error. total length %d rawdblk length %d. Exting...\n",
               total_send_nwords, (rawdblk->GetBuffer(0))[ 0 ]);
       printData(rawdblk->GetBuffer(0), rawdblk->TotalBufNwords());
       print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -206,7 +206,7 @@ void SerializerModule::fillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl,
 
     //Error if you cannot find any COPPER block
     if (i == (rawdblk->GetNumEntries() - 1)) {
-      printf("[DEBUG] i= %d : num entries %d : Tot words %d\n", i , rawdblk->GetNumEntries(), rawdblk->TotalBufNwords());
+      printf("[DEBUG] i= %d : num entries %d : Tot words %d\n", i, rawdblk->GetNumEntries(), rawdblk->TotalBufNwords());
       printData(rawdblk->GetBuffer(0), rawdblk->TotalBufNwords());
 
       char err_buf[500] = "[FATAL] CORRUPTED DATA: No COPPER blocks in RawDataBlock. Exiting...";
@@ -261,7 +261,7 @@ int SerializerModule::sendByWriteV(RawDataBlock* rawdblk)
         continue;
       } else {
         char err_buf[500];
-        sprintf(err_buf, "[WARNING] WRITEVa error.(%s) : sent %d bytes, header %lu bytes body %lu trailer %lu : %s %s %d\n" ,
+        sprintf(err_buf, "[WARNING] WRITEVa error.(%s) : sent %d bytes, header %lu bytes body %lu trailer %lu : %s %s %d\n",
                 strerror(errno), n, iov[0].iov_len, iov[1].iov_len, iov[2].iov_len,
                 __FILE__, __PRETTY_FUNCTION__, __LINE__);
 #ifdef NONSTOP
@@ -556,7 +556,7 @@ int SerializerModule::CheckConnection(int socket)
           /* not EOF, no data in queue */
           return 0;
         } else {
-          printf("ERROR %d errno %d err %s\n", socket , errno, strerror(errno)); fflush(stdout);
+          printf("ERROR %d errno %d err %s\n", socket, errno, strerror(errno)); fflush(stdout);
           close(socket);
           return -1;
         }

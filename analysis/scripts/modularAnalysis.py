@@ -3214,8 +3214,8 @@ def tagCurlTracks(particleLists,
       .. _BN1079: https://belle.kek.jp/secured/belle_note/gn1079/bn1079.pdf
 
 
-    The module loops over all particles in a given list that meet the preselection **ptCut** and assigns them to
-    bundles based on the response of the chosen **selector** and the required minimum response set by the
+    The module loops over all particles in a given list with a transverse momentum below the pre-selection **ptCut**
+    and assigns them to bundles based on the response of the chosen **selector** and the required minimum response set by the
     **responseCut**. Once all particles are assigned they are ranked by 25dr^2+dz^2. All but the lowest are tagged
     with extraInfo(isCurl=1) to allow for later removal by cutting the list or removing these from ROE as
     applicable.
@@ -3231,7 +3231,9 @@ def tagCurlTracks(particleLists,
     @param selectorType:  string name of selector to use. The available options are 'cut' and 'mva'.
                           It is strongly recommended to used the 'mva' selection. The 'cut' selection
                           is based on BN1079 and is only calibrated for Belle data.
-    @param ptCut:         pre-selection cut on transverse momentum.
+
+    @param ptCut:         Pre-selection cut on transverse momentum. Only tracks below that are considered as curler candidates.
+
     @param expert_train:  flag to set training mode if selector has a training mode (mva).
     @param expert_filename: set file name of produced training ntuple (mva).
     @param path:          module is added to this path.

@@ -7,7 +7,7 @@
 # Responsible: Boyang Zhang
 # Email: zhangboy@hawaii.edu 
 # Cuts: None
-# Date: 20220708
+# Date: 20220721
 
 
 yesPhotos
@@ -31,8 +31,8 @@ ChargeConj D_2*0sig anti-D_2*0sig
 
 # One B decays to signal mode, while the other to generic decay modes
 Decay Upsilon(4S)
-0.5000   B+sig   B-       VSS;
-0.5000   B+     B-sig     VSS;
+0.5000         B+sig     B-                                 VSS;
+0.5000         B+        B-sig                              VSS;
 Enddecay
 
 Decay B-sig
@@ -51,12 +51,12 @@ Enddecay
 CDecay anti-D_10sig
 
 Decay D_0*0sig
-0.666700000    D+sig    pi-                                 PHSP;
+1.0            D+sig    pi-                                 PHSP;
 Enddecay
 CDecay anti-D_0*0sig
 
 Decay D'_10sig
-0.666700000    D*+sig   pi-                                 VVS_PWAVE  1.0 0.0 0.0 0.0 0.0 0.0;
+1.0            D*+sig   pi-                                 VVS_PWAVE  1.0 0.0 0.0 0.0 0.0 0.0;
 Enddecay
 CDecay anti-D'_10sig
 
@@ -73,7 +73,7 @@ Enddecay
 CDecay D*-sig
 
 Decay D+sig
-0.093800000    K-   pi+   pi+                               D_DALITZ;
+1.0            K-   pi+   pi+                               D_DALITZ;
 Enddecay
 CDecay D-sig
 

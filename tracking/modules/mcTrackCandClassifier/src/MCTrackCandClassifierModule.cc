@@ -15,8 +15,6 @@
 #include <framework/geometry/B2Vector3.h>
 #include <framework/geometry/BFieldManager.h>
 
-#include <boost/foreach.hpp>
-
 #include <TH2F.h>
 
 using namespace Belle2;
@@ -207,7 +205,7 @@ void MCTrackCandClassifierModule::event()
   const VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
 
   //1.a retrieve the MCTrackCands
-  BOOST_FOREACH(genfit::TrackCand & mcTrackCand, m_GenfitMCTrackCands) {
+  for (const genfit::TrackCand& mcTrackCand : m_GenfitMCTrackCands) {
 
     int nGoodTrueHits = 0;
     int nBadTrueHits = 0;

@@ -20,7 +20,6 @@
 
 #include <root/TObject.h>
 
-#include <boost/foreach.hpp>
 #include <vector>
 
 using namespace Belle2;
@@ -516,7 +515,7 @@ void EffPlotsModule::event()
   B2Vector3D magField = BFieldManager::getField(0, 0, 0) / Unit::T;
 
   B2DEBUG(29, "+++++ 1. loop on MCParticles");
-  BOOST_FOREACH(MCParticle & mcParticle, m_MCParticles) {
+  for (const MCParticle& mcParticle : m_MCParticles) {
 
     //------------------------------------------------------------------//
     //                          MC PARTICLES                            //

@@ -22,7 +22,6 @@
 #include <root/TAxis.h>
 #include <root/TObject.h>
 
-#include <boost/foreach.hpp>
 #include <vector>
 
 using namespace Belle2;
@@ -155,7 +154,7 @@ void V0findingPerformanceEvaluationModule::event()
   B2Vector3D magField = BFieldManager::getField(0, 0, 0) / Unit::T;
 
   B2DEBUG(29, "+++++ 1. loop on MCParticles");
-  BOOST_FOREACH(MCParticle & mcParticle, m_MCParticles) {
+  for (const MCParticle& mcParticle : m_MCParticles) {
 
     if (! isV0(mcParticle))
       continue;
@@ -232,7 +231,7 @@ void V0findingPerformanceEvaluationModule::event()
 
   B2DEBUG(29, "+++++ 2. loop on V0s");
 
-  BOOST_FOREACH(V0ValidationVertex & v0, m_V0ValidationVertices) {
+  for (const V0ValidationVertex& v0 : m_V0ValidationVertices) {
 
     int nMCParticles = 0;
 

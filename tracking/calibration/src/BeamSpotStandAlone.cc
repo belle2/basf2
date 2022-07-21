@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Program obtain the Beam Spot properstd::ties from mumu track variables
+// Program obtain the Beam Spot properties from mumu track variables
 // inspired by https://docs.belle2.org/record/1511/files/BELLE2-NOTE-TE-2019-018.pdf
 //          and https://arxiv.org/pdf/1405.6569.pdf
 
@@ -329,7 +329,7 @@ namespace Belle2::BeamSpotCalib {
 
 
 
-  /** structure including all variables of interest with uncertainstd::ties from boot-strap */
+  /** structure including all variables of interest with uncertainties from boot-strap */
   struct UnknownPars {
     UnknowSpline x;  ///< BS position (x coordinate)
     UnknowSpline y;  ///< BS position (y coordinate)

@@ -104,6 +104,11 @@ void ParticleLoaderModule::initialize()
     m_mcparticles.isRequired();
   }
 
+  if (m_useROEs) {
+    m_roes.isRequired();
+    m_roes.registerRelationTo(m_particles);
+  }
+
   if (m_decayStrings.empty()) {
     B2WARNING("Obsolete usage of the ParticleLoader module (load all MDST objects as all possible Particle object types). Specify the particle type via decayStrings module parameter instead.");
   } else {
@@ -289,12 +294,19 @@ void ParticleLoaderModule::roeToParticles()
     StoreObjPtr<ParticleList> pList(m_sourceParticleListName);
     if (!pList.isValid())
       B2FATAL("ParticleList " << m_sourceParticleListName << " could not be found or is not valid!");
+
     for (unsigned int i = 0; i < pList->getListSize(); i++) {
       RestOfEvent* roe = pList->getParticle(i)->getRelatedTo<RestOfEvent>("ALL");
       if (!roe) {
         B2ERROR("ParticleList " << m_sourceParticleListName << " has no associated ROEs!");
       } else {
-        addROEToParticleList(roe, i, pdgCode, isSelfConjugatedParticle);
+
+        if (isSelfConjugatedParticle)
+          addROEToParticleList(roe, i, pdgCode, isSelfConjugatedParticle);
+        else if (i < pList->getListSize(false))
+          addROEToParticleList(roe, i, pdgCode, isSelfConjugatedParticle);
+        else
+          addROEToParticleList(roe, i, -1 * pdgCode, isSelfConjugatedParticle);
       }
     }
 
@@ -324,8 +336,10 @@ void ParticleLoaderModule::addROEToParticleList(RestOfEvent* roe, int mdstIndex,
     ROOT::Math::PxPyPzEVector missing4Vector = boost4Vector - signal4Vector - roe4Vector;
     auto isFlavored = (isSelfConjugatedParticle) ? Particle::EFlavorType::c_Unflavored : Particle::EFlavorType::c_Flavored;
     newPart = m_particles.appendNew(missing4Vector, pdgCode, isFlavored, Particle::EParticleSourceObject::c_Undefined, mdstIndex);
-
   }
+
+  roe->addRelationTo(newPart);
+
   for (auto roe2Plist : m_ROE2Plists) {
     string listName = get<c_PListName>(roe2Plist);
     StoreObjPtr<ParticleList> plist(listName);

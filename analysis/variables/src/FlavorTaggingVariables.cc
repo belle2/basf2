@@ -630,7 +630,7 @@ namespace Belle2 {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
       if (!roe.isValid()) return 0;
 
-      const Particle* Bcp = roe->getRelated<Particle>();
+      const Particle* Bcp = roe->getRelatedFrom<Particle>();
       return Variable::isRelatedRestOfEventB0Flavor(Bcp);
     }
 
@@ -639,7 +639,7 @@ namespace Belle2 {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
       if (!roe.isValid()) return 0;
 
-      const MCParticle* BcpMC = roe->getRelated<Particle>()->getMCParticle();
+      const MCParticle* BcpMC = roe->getRelatedFrom<Particle>()->getMCParticle();
       const MCParticle* Y4S = BcpMC->getMother();
       const MCParticle* mcParticle = particle->getMCParticle();
 
@@ -666,8 +666,8 @@ namespace Belle2 {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
       if (!roe.isValid()) return -1;
 
-      const Particle* Bcp = roe->getRelated<Particle>();
-      const MCParticle* BcpMC = roe->getRelated<Particle>()->getMCParticle();
+      const Particle* Bcp = roe->getRelatedFrom<Particle>();
+      const MCParticle* BcpMC = roe->getRelatedFrom<Particle>()->getMCParticle();
       return MCMatching::getMCErrors(Bcp, BcpMC);
     }
 
@@ -753,7 +753,7 @@ namespace Belle2 {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
       if (!roe.isValid()) return -2;//gRandom->Uniform(0, 1);
 
-      const Particle* Bcp = roe->getRelated<Particle>();
+      const Particle* Bcp = roe->getRelatedFrom<Particle>();
       return Variable::isRelatedRestOfEventMajorityB0Flavor(Bcp);
     }
 

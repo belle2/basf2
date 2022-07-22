@@ -2237,8 +2237,8 @@ The neutrino momentum is calculated from ROE taking into account the specified m
                       "For debugging, prints indices of all particles in the ROE and all masks. Returns 0.");
 
     REGISTER_VARIABLE("hasCorrectROECombination", hasCorrectROECombination,
-		      "Return 1 if there is correct combination of daughter particles, source particle of a ROE and particle loaded from the ROE. "
-		      "Return 0 if there is not correct combination. "
+		      "Returns 1 if there is correct combination of daughter particles between the particle that is the basis of the ROE and the particle loaded from the ROE. "
+		      "Returns 0 if there is not correct combination. "
 		      "If there is no daughter particle loaded from the ROE, returns quiet NaN.");
 
     REGISTER_METAVARIABLE("pi0Prob(mode)", pi0Prob,

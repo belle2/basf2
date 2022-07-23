@@ -107,6 +107,10 @@ void ParticleLoaderModule::initialize()
   if (m_useROEs) {
     m_roes.isRequired();
     m_roes.registerRelationTo(m_particles);
+
+    StoreArray<RestOfEvent> nestedRoes("NestedRestOfEvents");
+    if (nestedRoes.isOptional())
+      nestedRoes.registerRelationTo(m_particles);
   }
 
   if (m_decayStrings.empty()) {

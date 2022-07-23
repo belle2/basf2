@@ -2962,12 +2962,12 @@ def lowEnergyPi0Identification(pi0List, gammaList, payloadNameSuffix,
     cutAndCopyList('gamma:pi0veto', gammaList, 'E > 0.2', path=path)
     import b2bii
     payload_name = 'LowEnergyPi0Veto' + payloadNameSuffix
-    path.add_module('LowEnergyPi0VetoExpert', PayloadName=payload_name,
+    path.add_module('LowEnergyPi0VetoExpert', identifier=payload_name,
                     VetoPi0Daughters=True, GammaListName='gamma:pi0veto',
                     Pi0ListName=pi0List, Belle1=b2bii.isB2BII())
     payload_name = 'LowEnergyPi0Identification' + payloadNameSuffix
     path.add_module('LowEnergyPi0IdentificationExpert',
-                    PayloadName=payload_name, Pi0ListName=pi0List,
+                    identifier=payload_name, Pi0ListName=pi0List,
                     Belle1=b2bii.isB2BII())
 
 

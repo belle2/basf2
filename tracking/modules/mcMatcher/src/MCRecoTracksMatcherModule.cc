@@ -215,19 +215,21 @@ void MCRecoTracksMatcherModule::initialize()
     // MCParticle matching relation - efficiency
     m_MCParticles.registerRelationTo(m_PRRecoTracks);
 
+    // Announce optional store arrays to the hits or clusters in case they should be used
+    // We make them optional in case of limited detector setup.
     // PXD
     if (m_param_usePXDHits) {
-      m_PXDClusters.isRequired();
+      m_PXDClusters.isOptional();
     }
 
     // SVD
     if (m_param_useSVDHits) {
-      m_SVDClusters.isRequired();
+      m_SVDClusters.isOptional();
     }
 
     // CDC
     if (m_param_useCDCHits) {
-      m_CDCHits.isRequired();
+      m_CDCHits.isOptional();
     }
   }
 }

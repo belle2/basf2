@@ -242,7 +242,7 @@ class SingleTagPseudoScalar(BaseSkim):
         TrackCuts = "abs(dz) < 2.0 and dr < 0.5 and pt > 0.15"
 
         ma.fillParticleList(f"e+:{label}", f"{TrackCuts} and E > 1.5 and clusterEoP > 0.7", path=path)
-        ma.fillParticleList(f"pi+:{label}", f"{TrackCuts} and [not isInList(e+:{label})]", path=path)
+        ma.fillParticleList(f"pi+:{label}", f"{TrackCuts} and [isInList(e+:{label})==0]", path=path)
         ma.fillParticleList(f"gamma:{label}", "clusterE > 0.1", path=path, loadPhotonBeamBackgroundMVA=False)
 
         pi0MassWindow = "0.06 < InvM < 0.18"

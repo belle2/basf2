@@ -1349,6 +1349,8 @@ def applyEventCuts(cut, path):
                 meta_string_list.pop(0)
             if len(meta_string_list) == 0:
                 break
+            if len(meta_string_list) > 1:
+                meta_list += meta_string_list[1:]
             if isinstance(meta_string_list[0], list):
                 meta_string_list = [element for element in meta_string_list[0]]
         for var_string in var_list_temp:

@@ -211,7 +211,7 @@ class V0ValidationPlots:
 
         V0ValidationPlots.efficiency_plot(self.hist_r_found, self.hist_r, 'Efficiency vs R', 'r', 'cm',
                                           description='Reconstruction Efficiency vs. r (perpendicular)',
-                                          check='',
+                                          check='Highest efficiency is expected between r = 1 and r = 5 cm.',
                                           contact='software-tracking@belle2.org',
                                           meta_options='shifter').Write()
 

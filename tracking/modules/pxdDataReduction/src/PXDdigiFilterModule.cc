@@ -7,11 +7,9 @@
  **************************************************************************/
 
 #include <tracking/modules/pxdDataReduction/PXDdigiFilterModule.h>
-#include <tracking/dataobjects/ROIid.h>
 #include <map>
 
 using namespace Belle2;
-using namespace std;
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -25,7 +23,7 @@ REG_MODULE(PXDdigiFilter);
 PXDdigiFilterModule::PXDdigiFilterModule() : Module()
 {
   // Set module properties
-  setDescription("The module produce a StoreArray of PXDDigit inside the ROIs.");
+  setDescription("The module produce a StoreArray of PXDDigit inside the ROIs. A second StoreArray with PXDDigits outside the ROI can be created on demand.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   // Parameter definitions
@@ -43,24 +41,21 @@ PXDdigiFilterModule::PXDdigiFilterModule() : Module()
 
 void PXDdigiFilterModule::initialize()
 {
+  m_ROIs.isRequired(m_ROIidsName);
+  m_PXDDigits.isRequired(m_PXDDigitsName);  /**< The PXDDigits to be filtered */
 
-  StoreArray<ROIid> roiIDs;
-  roiIDs.isRequired(m_ROIidsName);
-
-  StoreArray<PXDDigit> PXDDigits(m_PXDDigitsName);   /**< The PXDDigits to be filtered */
-  PXDDigits.isRequired();
   if (m_PXDDigitsName == m_PXDDigitsInsideROIName) {
-    m_selectorIN.registerSubset(PXDDigits);
+    m_selectorIN.registerSubset(m_PXDDigits);
   } else {
-    m_selectorIN.registerSubset(PXDDigits, m_PXDDigitsInsideROIName, DataStore::c_WriteOut);
+    m_selectorIN.registerSubset(m_PXDDigits, m_PXDDigitsInsideROIName, DataStore::c_WriteOut);
     m_selectorIN.inheritAllRelations();
   }
 
   if (m_CreateOutside) {
     if (m_PXDDigitsName == m_PXDDigitsOutsideROIName) {
-      m_selectorOUT.registerSubset(PXDDigits);
+      m_selectorOUT.registerSubset(m_PXDDigits);
     } else {
-      m_selectorOUT.registerSubset(PXDDigits, m_PXDDigitsOutsideROIName);
+      m_selectorOUT.registerSubset(m_PXDDigits, m_PXDDigitsOutsideROIName);
       m_selectorOUT.inheritAllRelations();
     }
   }
@@ -116,13 +111,10 @@ void PXDdigiFilterModule::event()
 
 void PXDdigiFilterModule::filterDigits()
 {
-  StoreArray<PXDDigit> PXDDigits(m_PXDDigitsName);   /**< The PXDDigits to be filtered */
-  StoreArray<ROIid> ROIids_store_array(m_ROIidsName); /**< The ROIs */
+  std::multimap< VxdID, ROIid > ROIids;
 
-  multimap< VxdID, ROIid > ROIids;
-
-  for (auto ROI : ROIids_store_array)
-    ROIids.insert(pair<VxdID, ROIid> (ROI.getSensorID(), ROI));
+  for (auto ROI : m_ROIs)
+    ROIids.insert(std::pair<VxdID, ROIid> (ROI.getSensorID(), ROI));
 
   m_selectorIN.select([ROIids](const PXDDigit * thePxdDigit) {
     auto ROIidsRange = ROIids.equal_range(thePxdDigit->getSensorID()) ;

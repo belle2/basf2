@@ -125,7 +125,7 @@ namespace Belle2 {
       secIDCombis += "};";
 
       if (print2File == true) {
-        B2DEBUG(99, "Printing static sector relations to file " << configName << "4Mathematica.txt...\n");
+        B2DEBUG(29, "Printing static sector relations to file " << configName << "4Mathematica.txt...\n");
         std::ofstream ofs;
         ofs.open(configName + "4Mathematica.txt", std::ofstream::out | std::ofstream::trunc);
         ofs << secIDCombis;

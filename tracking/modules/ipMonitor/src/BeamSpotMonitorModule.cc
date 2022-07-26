@@ -35,6 +35,7 @@ BeamSpotMonitorModule::BeamSpotMonitorModule() : Module()
 
 void BeamSpotMonitorModule::initialize()
 {
+  m_EventMetaData.isRequired();
 
   TDirectory* olddir = gDirectory;
   m_rootFilePtr = new TFile(m_rootFileName.c_str(), "RECREATE");
@@ -59,8 +60,6 @@ void BeamSpotMonitorModule::initialize()
 
 void BeamSpotMonitorModule::beginRun()
 {
-  m_EventMetaData.isRequired();
-
   if (! m_BeamSpotDB.isValid()) {
     B2WARNING("No valid BeamSpot for the requested IoV");
   } else {

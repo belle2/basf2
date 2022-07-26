@@ -496,7 +496,7 @@ int GFTC2SPTCConverterModule::getAppropriateSpacePointIndex(const std::vector<st
             "There are only Cluster Combinations where one of the Clusters is already used by another SpacePoint! This genfit::TrackCand cannot be converted properly to a SpacePointTrackCand!");
     return c_unsuitableGFTC;
   } else if (nValidSP < 1 && nExistingButUsedSP < 1) {
-    B2DEBUG(2120, "Found no valid SpacePoint and no SpacePoint with existing but used Clusters/Hits!");
+    B2DEBUG(28, "Found no valid SpacePoint and no SpacePoint with existing but used Clusters/Hits!");
     return c_noValidSP;
   }  // if there is at least one valid SpacePoint, check the position difference and then decide if the SP can be used!
   else if (nValidSP > 0) {
@@ -508,7 +508,7 @@ int GFTC2SPTCConverterModule::getAppropriateSpacePointIndex(const std::vector<st
       // sign doesnot matter, comparing squared values later only!
       int posDiff = clusterPositions.at(iSP * 2).second - clusterPositions.at(iSP * 2 + 1).second;
 
-      B2DEBUG(200, "Difference of positions of Clusters for entry " << iSP << " is " << posDiff);
+      B2DEBUG(28, "Difference of positions of Clusters for entry " << iSP << " is " << posDiff);
       positionInfos.push_back(std::make_pair(iSP, posDiff * posDiff));
     }
 
@@ -535,7 +535,7 @@ bool GFTC2SPTCConverterModule::checkUsedAllHits(std::vector<flaggedPair<int> >& 
   bool usedAll = true; // defining variable here so that all hits are checked (debug output)
   for (unsigned int i = 0; i < flaggedHitIDs.size(); ++i) {
     flaggedPair<int> fPair = flaggedHitIDs[i];
-    B2DEBUG(200, "Hit " << i << " with (detID,hitID): (" << fPair.get<1>() << "," << fPair.get<2>() << ") has been used: " <<
+    B2DEBUG(28, "Hit " << i << " with (detID,hitID): (" << fPair.get<1>() << "," << fPair.get<2>() << ") has been used: " <<
             fPair.get<0>());
     if (!fPair.get<0>()) {
 //       return false;

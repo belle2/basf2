@@ -303,11 +303,11 @@ void SVDROIFinderAnalysisDataModule::event()
 
     float edgeStripsU = m_edgeU / pitchU;
     float edgeStripsV = m_edgeV / pitchV;
-    B2DEBUG(210, "good U in range " << edgeStripsU << ", " << nStripsU - edgeStripsU);
-    B2DEBUG(210, "good V in range " << edgeStripsV << ", " << nStripsV - edgeStripsV);
+    B2DEBUG(21, "good U in range " << edgeStripsU << ", " << nStripsU - edgeStripsU);
+    B2DEBUG(21, "good V in range " << edgeStripsV << ", " << nStripsV - edgeStripsV);
 
-    B2DEBUG(210, "U check: " << abs(centerROIU - centerSensorU) << " < (good) " << centerSensorU - edgeStripsU);
-    B2DEBUG(210, "V check: " << abs(centerROIV - centerSensorV) << " < (good) " << centerSensorV - edgeStripsV);
+    B2DEBUG(21, "U check: " << abs(centerROIU - centerSensorU) << " < (good) " << centerSensorU - edgeStripsU);
+    B2DEBUG(21, "V check: " << abs(centerROIV - centerSensorV) << " < (good) " << centerSensorV - edgeStripsV);
 
     if ((abs(centerROIU - centerSensorU) > centerSensorU - edgeStripsU)
         || (abs(centerROIV - centerSensorV) > centerSensorV - edgeStripsV))

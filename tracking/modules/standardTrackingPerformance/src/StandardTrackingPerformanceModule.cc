@@ -52,9 +52,6 @@ void StandardTrackingPerformanceModule::initialize()
 {
   // MCParticles and Tracks needed for this module
   m_MCParticles.isRequired();
-//   m_Tracks.isRequired();
-//   m_RecoTracks.isRequired(m_recoTracksStoreArrayName);
-//   m_TrackFitResults.isRequired();
 
   m_outputFile = new TFile(m_outputFileName.c_str(), "RECREATE");
   TDirectory* oldDir = gDirectory;
@@ -72,7 +69,7 @@ void StandardTrackingPerformanceModule::event()
   unsigned long runNumber = eventMetaData->getRun();
   unsigned long expNumber = eventMetaData->getExperiment();
 
-  B2DEBUG(99,
+  B2DEBUG(29,
           "Processes experiment " << expNumber << " run " << runNumber << " event " << eventNumber);
 
   m_nGeneratedChargedStableMcParticles = 0;
@@ -85,7 +82,7 @@ void StandardTrackingPerformanceModule::event()
       setVariablesToDefaultValue();
 
       int pdgCode = mcParticle.getPDG();
-      B2DEBUG(99, "Primary MCParticle has PDG code " << pdgCode);
+      B2DEBUG(29, "Primary MCParticle has PDG code " << pdgCode);
 
       m_nGeneratedChargedStableMcParticles++;
 
@@ -323,7 +320,7 @@ void StandardTrackingPerformanceModule::addChargedStable(const MCParticle& mcPar
   // charged stable particle is added to the interesting particle vector
   if (isChargedStable(mcParticle) && isPrimaryMcParticle(mcParticle)
       && mcParticle.hasStatus(MCParticle::c_StableInGenerator)) {
-//   B2DEBUG(99,
+//   B2DEBUG(29,
 //          "Found a charged stable particle. Add it to interesting MCParticles. PDG(" << mcParticle->getPDG() << ").");
     m_interestingChargedStableMcParcticles.push_back(&mcParticle);
     return;

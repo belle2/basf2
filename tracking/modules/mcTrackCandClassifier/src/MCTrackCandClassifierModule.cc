@@ -72,8 +72,6 @@ MCTrackCandClassifierModule::MCTrackCandClassifierModule() : Module()
 
 void MCTrackCandClassifierModule::initialize()
 {
-  m_magField = BFieldManager::getField(0, 0, 0) / Unit::T;
-
   // MCParticles, MCTrackCands, MCTracks needed for this module
   m_PXDClusters.isRequired();
   m_SVDClusters.isRequired();
@@ -195,6 +193,8 @@ void MCTrackCandClassifierModule::beginRun()
 {
   nWedge = 0;
   nBarrel = 0;
+
+  m_magField = BFieldManager::getField(0, 0, 0) / Unit::T;
 }
 
 

@@ -3805,6 +3805,9 @@ def getAnalysisGlobaltag(timeout=180) -> str:
     Parameters:
         timeout: Seconds to wait for b2conditionsdb-recommend
     """
+    import b2bii
+    if b2bii.isB2BII():
+        return 'analysis_b2bii'
     # b2conditionsdb-recommend relies on a different repository, so it's better to protect
     # this function against potential failures of check_output.
     try:

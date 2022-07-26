@@ -216,7 +216,7 @@ class V0ValidationPlots:
             'r',
             'cm',
             description='Reconstruction Efficiency vs. r (perpendicular)',
-            check='Check that efficiencies are close to the reference. Report significant defiations.',
+            check='Check that efficiencies are close to the reference. Report significant deviations.',
             contact='software-tracking@belle2.org',
             meta_options='shifter').Write()
 

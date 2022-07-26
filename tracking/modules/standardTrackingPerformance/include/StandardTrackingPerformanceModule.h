@@ -54,7 +54,6 @@ namespace Belle2 {
     TTree* m_dataTree; /**< root tree with all output data. Tree will be written to the output root file */
 
     StoreArray<MCParticle> m_MCParticles; /**< MCParticles StoreArray */
-//     StoreArray<Track> m_Tracks; /**< Tracks StoreArray */
 
     /** vector with all interesting charged stable MCParticles in the event */
     std::vector<const MCParticle*> m_interestingChargedStableMcParcticles;

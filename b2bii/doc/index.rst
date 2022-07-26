@@ -42,8 +42,7 @@ B2BII Analysis
 
 Prerequisites
 -------------
-The recommended versions to be used are ``release-06-00-08`` or the latest light release
-``light-2201-venus``.
+The recommended versions to be used are ``release-06-00-08`` or the latest light release.
 
 
 B2BII Converter
@@ -85,7 +84,7 @@ performs some kind of reconstruction, you simply need to replace the loading of
 Belle II MDST files with the Belle MDST files and executing the conversion.
 
 
-To load Belle MDST file(s) and to convert them use :code:`convertBelleMdstToBelleIIMdst`.
+To load Belle MDST file(s) and to convert them use `convertBelleMdstToBelleIIMdst`.
 This function has input parameters to specify the input MDST files to be converted,
 flag to specify whether or not the fix_mdst should be applied or not (it should!)
 and path.
@@ -96,9 +95,9 @@ and path.
    convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, path=my_path)
 
 - ``inputBelleMDSTFile`` : a BASF mdst file name or an url of the mdst file location.
-- ``pathe=my_path`` : your basf2 steering process path.
+- ``path=my_path`` : your basf2 steering process path.
 
-Examples of analysis steering files can be found in example directory of b2bii package:
+Examples of analysis steering files can be found in example directory of the b2bii package:
 
 .. code-block:: csh
 

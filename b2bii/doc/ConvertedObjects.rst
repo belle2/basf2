@@ -3,18 +3,18 @@
 -----------------------------
 Charged Final State Particles
 -----------------------------
-BASF and BASF2 use different Helix parameterisations, however there exist a
-well defined transformation from one parameterisation to another. Belle MDST
+BASF and BASF2 use different Helix parameterisations, however there is a
+well defined transformation from one parameterisation to the other. The Belle MDST
 format stores in addition to the five helix parameters also the reference point
 (or pivot point), which is assumed to be always point ``(0,0,0)`` in the case of
 Belle II MDST format. Therefore in the conversion process any charged track
-found in Belle MDST with pivot point different from ``(0,0,0)`` is first transformed
-in way so that its pivot point becomes ``(0,0,0)``. This is especially important
+found in Belle MDST with a pivot point different from ``(0,0,0)`` is first transformed
+such that its pivot point becomes ``(0,0,0)``. This is especially important
 in the case of conversion of ``V0``'s daughter tracks.
 
 .. note::
    There is nothing special to note regarding the usage of converted charged
-   tracks in BASF2. Use the usuall ``fillParticleList(...)`` or
+   tracks in BASF2. Use the usual ``fillParticleList(...)`` or
    ``fillParticleLists(...)`` analysis functions to create and fill charged
    kaon, pion, electron, muon and proton `ParticleList`_ s.
 
@@ -24,14 +24,14 @@ in the case of conversion of ``V0``'s daughter tracks.
 Particle Identification
 ~~~~~~~~~~~~~~~~~~~~~~~
 Despite the different parameterisations, charged final state particles can still
-be reconstructed using `fillParticleList` function in basf2.
+be reconstructed using the `fillParticleList` function in basf2.
 But due to the different definition, as well as detector, it is not
 recommended to use Belle II style PID in b2bii.
 
 basf provided three different packages for PID:
-* atc_pid (KID) to separate kaons and pions, but also used for proton id
-* eID (electron ID) to separate electrons from hadrons
-* muid (muon ID) to separate muons from hadrons
+ * atc_pid (KID) to separate kaons and pions, but also used for proton id
+ * eID (electron ID) to separate electrons from hadrons
+ * muid (muon ID) to separate muons from hadrons
 
 Each of them in its own way combined information collected from various sub detector
 systems (CDC, ACC, TOF, ECL, KLM). The combination of individual likelihoods from
@@ -39,7 +39,7 @@ each sub detector system is in some cases (eID) combined with the usage of exter
 information, such as a priori probabilities of each particle type that is read from
 the Belle DB.
 Due to this fact the Belle-like PID probabilities can not be reproduced in BASF2 from
-the raw likelihoods and special Belle-legacy Variables that reproduce them are
+the raw likelihoods and special Belle-legacy variables that reproduce them are
 introduced.
 
 Alternatively, we can use the following predefined Belle-style PID variables to

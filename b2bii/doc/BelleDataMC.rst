@@ -88,7 +88,7 @@ Users can choose between basf or B2BII to generate a set of signal MC for one's 
 Generating signal MC with basf
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The ``mcproduzh`` package has been used to generate signal MC in Belle for many years.
-This package was developed by "U"shiroda-san, A. "Z"upanc, and "H"orii-san, and
+This package was developed by Ushiroda-san, A. Zupanc, and Horii-san, and
 it consists of generation, simulation, and reconstruction based on ``evtgen`` and
 ``gsim`` scripts (``gsim`` is Belle slang for the simulated detector response
 that results from the use of ``Geant3`` within the Belle analysis software
@@ -135,6 +135,10 @@ spread in MC generation, please modify the prepended global tag:
    basf2.conditions.prepend_globaltag('b2bii_beamParameters_with_smearing')
 
 
+.. warning::
+   To generate run-independent MC, one must use ``B2BII_MC`` for now.
+
+
 .. rubric:: Run dependent MC
 
 If you like to generate run-dependent beam energy MC for non-:math:`\Upsilon(4S)`
@@ -145,13 +149,15 @@ Then modify the following line in your generation script:
 
 .. code-block:: python3
 
-   # Generate for experiment 55, run 0 (run-independent MC).
-   main.add_module('EventInfoSetter', expList=55, runList=0, evtNumList=100)
+   # Generate for experiment 55, run 402 (run-dependent MC).
+   main.add_module('EventInfoSetter', expList=55, runList=402, evtNumList=100)
+
+This will generate signal MC using the beam energy from run 402 in experiment 55.
 
 
 .. rubric:: User signal decay files
 
-To generate user-defined decay files, use the following line in the script:
+To generate user-defined decay files (aka signal decay files), use the following line in the script:
 
 .. code-block:: python3
 

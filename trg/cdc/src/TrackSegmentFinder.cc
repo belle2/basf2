@@ -307,7 +307,8 @@ namespace Belle2 {
     result.push_back(resultT);
     result.push_back(resultE);
 
-    delete [] LUTValue;
+    // cppcheck-suppress uninitdata
+    delete[] LUTValue;
     delete Hitmap;
 
     return result;
@@ -1160,7 +1161,8 @@ namespace Belle2 {
     result.push_back(resultT);
     result.push_back(resultE);
 
-    delete [] LUTValue;
+    // cppcheck-suppress uninitdata
+    delete[] LUTValue;
     delete Hitmap;
 
     return result;
@@ -2572,7 +2574,8 @@ namespace Belle2 {
     result.push_back(resultT);
     result.push_back(resultE);
 
-    delete [] LUTValue;
+    // cppcheck-suppress uninitdata
+    delete[] LUTValue;
     delete Hitmap;
 
     return result;
@@ -2796,7 +2799,8 @@ namespace Belle2 {
     result.push_back(resultT);
     result.push_back(resultE);
 
-    delete [] LUTValue;
+    // cppcheck-suppress uninitdata
+    delete[] LUTValue;
     delete Hitmap;
 
     return result;

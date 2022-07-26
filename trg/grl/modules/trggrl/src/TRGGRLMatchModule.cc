@@ -34,7 +34,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(TRGGRLMatch)
+REG_MODULE(TRGGRLMatch);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -700,6 +700,7 @@ void TRGGRLMatchModule::make_veto_map(StoreArray<CDCTriggerTrack> track2Dlist, s
     _w = abs(_w);
 
     int L;
+    // cppcheck-suppress knownConditionTrueFalse
     if (_w >= 0 && _w <= 8) { L = _phi; }
     else if (_w >= 9 && _w <= 15) {
       if (charge < 0) { L = _phi + 1; }
@@ -722,6 +723,7 @@ void TRGGRLMatchModule::make_veto_map(StoreArray<CDCTriggerTrack> track2Dlist, s
     }
 
     int R;
+    // cppcheck-suppress knownConditionTrueFalse
     if (_w >= 0 && _w <= 8) { R = _phi; }
     else if (_w >= 9 && _w <= 15) {
       if (charge < 0) { R = _phi; }

@@ -531,8 +531,11 @@ TrgEclCluster::setForwardICN(int Method)
         continue;
       }
     }
-    for (int iinit = 0; iinit < 9; iinit ++) {TempCluster[iinit] = 0;}
-    if (TCFire[iii] == 0) { continue; }
+    for (int iinit = 0; iinit < 9; iinit ++)
+      TempCluster[iinit] = 0;
+    if (TCFire[iii] == 0)
+      continue;
+    // cppcheck-suppress knownConditionTrueFalse
     if (iii < 32) { // most inner
       if (iii == 0) {
         TempCluster[0] = TCFire[iii];

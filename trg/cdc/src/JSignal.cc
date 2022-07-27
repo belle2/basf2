@@ -1674,6 +1674,7 @@ namespace Belle2 {
     int secondBitwidth = second.m_bitsize;
 
     if (operation == "+" || operation == "-") {
+      // cppcheck-suppress knownConditionTrueFalse
       if (first.m_type != 1 || second.m_type != 1) {
         type = -1;
         bitwidth = max(firstBitwidth, secondBitwidth);
@@ -1682,6 +1683,7 @@ namespace Belle2 {
         bitwidth = max(first.m_bitsize, second.m_bitsize);
       }
     } else if (operation == "*") {
+      // cppcheck-suppress knownConditionTrueFalse
       if (first.m_type != 1 || second.m_type != 1) {
         type = -1;
         bitwidth = firstBitwidth + secondBitwidth;
@@ -2200,7 +2202,6 @@ namespace Belle2 {
   }
 
   void TRGCDCJSignal::valuesToMapSignals(std::vector<std::tuple<string, double, int, double, double, int> > const& inValues,
-                                         // cppcheck-suppress constParameter
                                          Belle2::TRGCDCJSignalData* inCommonData, std::map<std::string, Belle2::TRGCDCJSignal>& outMap)
   {
     for (unsigned iSignals = 0; iSignals < inValues.size(); iSignals++) {

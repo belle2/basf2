@@ -1674,6 +1674,12 @@ namespace Belle2 {
 
     double hasCorrectROECombination(const Particle* particle)
     {
+      unsigned nDaughters = particle->getNDaughters();
+      if (nDaughters < 2) {
+        B2ERROR("The particle must have at least two daughters.");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+
       for (unsigned i = 0; i < particle->getNDaughters(); i++) {
 
         // Find a daughter that is loaded from a ROE object

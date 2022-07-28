@@ -557,7 +557,6 @@ void EffPlotsModule::event()
 
     const B2Vector3D& MC_prodvtx = mcParticle.getVertex();
     const TVector3& MC_vtx = mcParticle.getDecayVertex();
-    const TVector3& MC_FL = MC_vtx - MC_prodvtx;
 
     float MC_transDist = sqrt(MC_vtx.X() * MC_vtx.X() + MC_vtx.Y() * MC_vtx.Y());
     float MC_pt = mcParticle.getMomentum().Pt();

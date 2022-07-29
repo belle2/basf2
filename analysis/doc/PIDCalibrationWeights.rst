@@ -198,37 +198,10 @@ PID calibration weights on the basf2 path
 -----------------------------------------
 
 The PID calibration weights can be registered in the database to utilize them on
-the basf2 path. The module PIDCalibrationWeightCreator can produce the dataobject
-PIDCalibrationWeight with a unique name of the weight matrix.
-
-.. code-block:: python
-
-    import basf2 as b2
-    import numpy as np
-
-    # Load the weights
-    weights = np.load('models/net_wgt.npy')
-
-    matrixName = "PIDCalibrationWeight_Example"
-    weightMatrix = weights.tolist()  # convert np.ndarray to list(list)
-
-    addmatrix = b2.register_module('PIDCalibrationWeightCreator')
-    addmatrix.param('matrixName', matrixName)
-    addmatrix.param('weightMatrix', weightMatrix)
-    addmatrix.param('experimentHigh', -1)
-    addmatrix.param('experimentLow', 0)
-    addmatrix.param('runHigh', -1)
-    addmatrix.param('runLow', 0)
-
-    eventinfosetter = b2.register_module('EventInfoSetter')
-    eventinfosetter.param('evtNumList', [10])
-    eventinfosetter.param('runList', [0])
-    eventinfosetter.param('expList', [0])
-
-    my_path.add_module(addmatrix)
-    my_path.add_module(eventinfosetter)
-
-    b2.process(my_path)
+the basf2 path. The module :b2:mod:`PIDCalibrationWeightCreator` can produce the
+dataobject PIDCalibrationWeight with a unique name of the weight matrix.
+One can find an example of the usage of the module in
+``analysis/examples/PIDCalibration/02_SamplePIDAnalysis.py``.
 
 By loading the data object, the basf2 variables, such as
 :b2:var:`weightedElectronID`, provide the weighted PID probability from the

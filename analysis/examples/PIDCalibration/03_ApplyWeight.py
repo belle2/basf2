@@ -10,7 +10,7 @@
 
 ##########################################################################
 # This tutorial shows how to use the weighted PID variables with the     #
-# dataobject created by SamplePIDAnalysis.py                             #
+# dbobject created by SamplePIDAnalysis.py                               #
 ##########################################################################
 
 import basf2 as b2

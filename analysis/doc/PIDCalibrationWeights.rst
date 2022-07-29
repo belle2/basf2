@@ -199,7 +199,7 @@ PID calibration weights on the basf2 path
 
 The PID calibration weights can be registered in the database to utilize them on
 the basf2 path. The module :b2:mod:`PIDCalibrationWeightCreator` can produce the
-dataobject PIDCalibrationWeight with a unique name of the weight matrix.
+dbobject PIDCalibrationWeight with a unique name of the weight matrix.
 One can find an example of the usage of the module in
 ``analysis/examples/PIDCalibration/02_SamplePIDAnalysis.py``.
 
@@ -216,10 +216,10 @@ weight matrix in the argument of the variables.
    # create path
    my_path = b2.create_path()
 
-   # load the local dataobject
+   # load the local dbobject
    localDB = 'localdb/database.txt'
    b2.conditions.append_testing_payloads(localDB)
-   # or use the central global tag including the dataobject
+   # or use the central global tag including the dbobject
 
    ma.fillParticleList('pi+:all', cut='', path=my_path)
 

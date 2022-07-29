@@ -17,6 +17,8 @@ be adapted when changing to the new release.
 Changes since release-07
 ========================
 
+.. include:: analysis/doc/whatsnew-since/release-07-00.txt
+
 .. List of changes for the mva package
 
 .. include:: mva/doc/whatsnew-since/release-07-00.txt

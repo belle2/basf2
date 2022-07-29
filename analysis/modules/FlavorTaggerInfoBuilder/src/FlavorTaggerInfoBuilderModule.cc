@@ -44,7 +44,7 @@ void FlavorTaggerInfoBuilderModule::event()
 {
   for (int i = 0; i < m_roes.getEntries(); i++) {
     const RestOfEvent* roe = m_roes[i];
-    const Particle* particle = roe->getRelated<Particle>();
+    const Particle* particle = roe->getRelatedFrom<Particle>();
 
     // create FlavorTaggerInfo object if it does not exist
     FlavorTaggerInfo* flavTag = roe->getRelatedTo<FlavorTaggerInfo>() ? roe->getRelatedTo<FlavorTaggerInfo>() :

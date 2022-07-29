@@ -54,7 +54,7 @@ namespace Belle2 {
      * FunctionOf<2, double, SpacePoint>::functionType is the type of
      * a function returning a double and having two SpacePoint as arguments
      */
-    template <size_t n , class returnType, class parameterType, class ... Ts>
+    template <size_t n, class returnType, class parameterType, class ... Ts>
     struct FunctionOf {
       /// Handy typedef for the functionType
       typedef typename FunctionOf < n - 1, returnType, parameterType,

@@ -18,8 +18,6 @@
 #include <TVector3.h>
 #include "TMath.h"
 
-
-using namespace std;
 using namespace Belle2;
 
 

@@ -13,9 +13,9 @@
 <header>
   <contact>software-tracking@belle2.org</contact>
   <input>EvtGenSim.root</input>
-  <output>SVDTrackingValidationBkg.root</output>
+  <output>VXDTF2TrackingValidationBkg.root</output>
   <description>
-  This module validates that the svd only track finding is capable of reconstructing tracks in Y(4S) runs with bkg included.
+  This module validates that the VXDTF2 SVD-only track finding is capable of reconstructing tracks in Y(4S) runs with bkg included.
   </description>
 </header>
 """
@@ -24,7 +24,7 @@ import tracking
 from tracking.validation.run import TrackingValidationRun
 import logging
 import basf2
-VALIDATION_OUTPUT_FILE = 'SVDTrackingValidationBkg.root'
+VALIDATION_OUTPUT_FILE = 'VXDTF2TrackingValidationBkg.root'
 N_EVENTS = 1000
 ACTIVE = True
 
@@ -36,7 +36,7 @@ def setupFinderModule(path):
     tracking.add_vxd_track_finding_vxdtf2(path, components=["SVD"])
 
 
-class SVD4Layer(TrackingValidationRun):
+class VXDTF2TrackingValidationBkg(TrackingValidationRun):
     """
     Validation class for the four 4-SVD Layer tracking
     """
@@ -78,7 +78,7 @@ def main():
     """
     create SVD validation class and execute
     """
-    validation_run = SVD4Layer()
+    validation_run = VXDTF2TrackingValidationBkg()
     validation_run.configure_and_execute_from_commandline()
 
 

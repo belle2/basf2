@@ -16,6 +16,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
 #include <fstream>
+#include <numeric>
 
 namespace Belle2 {
   namespace MVA {
@@ -169,6 +170,12 @@ namespace Belle2 {
         batch_size = numberOfTrainingEvents;
       }
 
+      if (batch_size > numberOfTrainingEvents) {
+        B2WARNING("Mini batch size (" << batch_size << ") is larger than the number of training events (" << numberOfTrainingEvents << ")"\
+                  " The batch size has been set equal to the number of training events.");
+        batch_size = numberOfTrainingEvents;
+      };
+
       if (m_specific_options.m_training_fraction <= 0.0 or m_specific_options.m_training_fraction > 1.0) {
         B2ERROR("Please provide a positive training fraction");
         throw std::runtime_error("Please provide a training fraction between (0.0,1.0]");
@@ -273,8 +280,14 @@ namespace Belle2 {
 
         bool continue_loop = true;
 
+        std::vector<uint64_t> iteration_index_vector(numberOfTrainingEvents);
+        std::iota(std::begin(iteration_index_vector), std::end(iteration_index_vector), 0);
+
         for (uint64_t iIteration = 0; (iIteration < m_specific_options.m_nIterations or m_specific_options.m_nIterations == 0)
              and continue_loop; ++iIteration) {
+
+          // shuffle the indices on each iteration to get randomised batches
+          if (iIteration > 0) std::shuffle(std::begin(iteration_index_vector), std::end(iteration_index_vector), TRandomWrapper());
 
           for (uint64_t iBatch = 0; iBatch < nBatches and continue_loop; ++iBatch) {
 
@@ -282,7 +295,7 @@ namespace Belle2 {
             // also see: https://docs.python.org/3.5/c-api/init.html
             PyThreadState* m_thread_state =  PyEval_SaveThread();
             for (uint64_t iEvent = 0; iEvent < batch_size; ++iEvent) {
-              training_data.loadEvent(iEvent + iBatch * batch_size + numberOfValidationEvents);
+              training_data.loadEvent(iteration_index_vector.at(iEvent + iBatch * batch_size) + numberOfValidationEvents);
               if (m_specific_options.m_normalize) {
                 for (uint64_t iFeature = 0; iFeature < numberOfFeatures; ++iFeature)
                   X[iEvent * numberOfFeatures + iFeature] = (training_data.m_input[iFeature] - means[iFeature]) / stds[iFeature];

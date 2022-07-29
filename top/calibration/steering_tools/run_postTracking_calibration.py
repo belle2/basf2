@@ -28,6 +28,7 @@ from basf2 import B2ERROR
 from top_calibration import BS13d_calibration_cdst
 from top_calibration import moduleT0_calibration_DeltaT, moduleT0_calibration_LL
 from top_calibration import commonT0_calibration_BF, commonT0_calibration_LL
+from top_calibration import offset_calibration
 
 # ----- those parameters need to be adjusted before running -----------------------------
 #
@@ -100,15 +101,19 @@ elif method == 'LL':
 else:
     B2ERROR('Invalid method name: ' + method)
     sys.exit()
+cal5 = offset_calibration(inputFiles, globalTags, localDBs, new_cdst_format)
+
 cal1.backend_args = {"queue": "s"}
 cal2.backend_args = {"queue": "s"}
 cal3.backend_args = {"queue": "s"}
 cal4.backend_args = {"queue": "s"}
+cal5.backend_args = {"queue": "s"}
 
 # Dependencies
 cal2.depends_on(cal1)
 cal3.depends_on(cal2)
 cal4.depends_on(cal3)
+cal5.depends_on(cal4)
 
 # Add calibrations to CAF
 cal_fw = CAF()
@@ -116,6 +121,7 @@ cal_fw.add_calibration(cal1)
 cal_fw.add_calibration(cal2)
 cal_fw.add_calibration(cal3)
 cal_fw.add_calibration(cal4)
+cal_fw.add_calibration(cal5)
 cal_fw.output_dir = output_dir
 cal_fw.backend = backends.LSF()
 

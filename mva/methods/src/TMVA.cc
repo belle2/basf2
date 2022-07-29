@@ -384,7 +384,7 @@ namespace Belle2 {
       // Initialize TMVA and ROOT stuff
       TMVA::Tools::Instance();
 
-      m_expert = std::make_unique<TMVA::Reader>("!Color:!Silent");
+      m_expert = std::make_unique<TMVA::Reader>("!Color:Silent");
 
       GeneralOptions general_options;
       weightfile.getOptions(general_options);

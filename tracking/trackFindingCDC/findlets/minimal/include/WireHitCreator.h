@@ -17,6 +17,9 @@
 
 #include <cdc/geometry/CDCGeometryParConstants.h>
 
+#include <framework/database/DBObjPtr.h>
+#include <cdc/dbobjects/CDClayerTimeCut.h>
+
 #include <vector>
 #include <tuple>
 #include <string>
@@ -127,6 +130,9 @@ namespace Belle2 {
 
       /// ADC Count translator to be used to calculate the charge deposit in the drift cell
       std::unique_ptr<CDC::ADCCountTranslatorBase> m_adcCountTranslator;
+
+      /// Cut for approximate drift time (super-layer dependent)
+      DBObjPtr<CDClayerTimeCut> m_DBCDClayerTimeCut;
     };
   }
 }

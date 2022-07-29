@@ -75,7 +75,7 @@ void WireHitCreator::exposeParameters(ModuleParamList* moduleParamList, const st
 
   moduleParamList->addParameter(prefixed(prefix, "maxDriftTimes"),
                                 m_param_maxDriftTimes,
-                                "Maximum drift time (nsec) allowed per super layer (in order of super layer#0-8). No cut is applied if this value is negative",
+                                "Maximum drift time (nsec) allowed per super layer (in order of super layer#0-8). Default payload-based cut is applied if this value is negative",
                                 m_param_maxDriftTimes);
 
   moduleParamList->addParameter(prefixed(prefix, "useLayers"),
@@ -230,6 +230,12 @@ void WireHitCreator::apply(std::vector<CDCWireHit>& outputWireHits)
   std::map<int, size_t> nHitsByMCParticleId;
 
   outputWireHits.reserve(nHits);
+
+  // make sure that DB object for time cut is valid:
+  if (not m_DBCDClayerTimeCut.isValid()) {
+    B2FATAL("CDClayerTimeCut DB object is invalid");
+  }
+
   for (const CDCHit& hit : hits) {
 
     if (hit.getICLayer() < geometryPar.getOffsetOfFirstLayer() or
@@ -270,7 +276,13 @@ void WireHitCreator::apply(std::vector<CDCWireHit>& outputWireHits)
     // In the following, the tof correction is off; the propagation-delay corr. is off (default of the translator); the event time corr. is on when it is available.
     const double approxDriftTime = tdcCountTranslator.getDriftTime(hit.getTDCCount(), wireID, 0, 0, hit.getADCCount());
     ISuperLayer iSL = wireID.getISuperLayer();
-    if (m_maxDriftTimes.at(iSL) > 0 && approxDriftTime > m_maxDriftTimes.at(iSL)) continue;
+
+    // If input module parameter is set to positive value, use it. Otherwise use DB
+    if (m_maxDriftTimes.at(iSL) > 0) {
+      if (approxDriftTime > m_maxDriftTimes.at(iSL)) continue;
+    } else {
+      if (m_DBCDClayerTimeCut->getLayerTimeCut(iSL) > 0 && approxDriftTime > m_DBCDClayerTimeCut->getLayerTimeCut(iSL)) continue;
+    }
 
     if (not m_useSuperLayers[iSL]) continue;
     unsigned short layer = wireID.getICLayer();

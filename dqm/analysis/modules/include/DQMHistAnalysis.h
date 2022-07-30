@@ -14,6 +14,7 @@
 
 #include <framework/core/Module.h>
 #include <dqm/dataobjects/MonitoringObject.h>
+#include <dqm/analysis/HistDelta.h>
 #include <TH1.h>
 
 #include <string>
@@ -36,6 +37,10 @@ namespace Belle2 {
      */
     typedef std::map<std::string, MonitoringObject*> MonObjList;
 
+    /**
+     * The type of list of delta settings and histograms.
+     */
+    typedef std::map<std::string, HistDelta*> DeltaList;
 
 
   private:
@@ -48,6 +53,10 @@ namespace Belle2 {
      */
     static MonObjList g_monObj;
 
+    /**
+     * The list of Delta Histograms and settings.
+     */
+    static DeltaList g_delta;
 
   public:
     /**
@@ -61,6 +70,12 @@ namespace Belle2 {
      * @return The list of the MonitoringObjects.
      */
     static const MonObjList& getMonObjList() { return g_monObj;};
+
+    /**
+     * Get the list of the delta histograms.
+     * @return The list of the delta histograms.
+     */
+    static const DeltaList& getDeltaList() { return g_delta;};
 
     /**
      * Find canvas by name

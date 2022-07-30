@@ -14,8 +14,6 @@
 #include <TROOT.h>
 #include <TClass.h>
 
-
-
 using namespace std;
 using namespace Belle2;
 
@@ -30,25 +28,29 @@ REG_MODULE(DQMHistAnalysis);
 
 DQMHistAnalysisModule::HistList DQMHistAnalysisModule::g_hist;
 DQMHistAnalysisModule::MonObjList DQMHistAnalysisModule::g_monObj;
+DQMHistAnalysisModule::DeltaList DQMHistAnalysisModule::g_delta;
+
 
 DQMHistAnalysisModule::DQMHistAnalysisModule() : Module()
 {
   //Set module properties
-  setDescription("Histgram Analysis module");
-}
-
-
-DQMHistAnalysisModule::~DQMHistAnalysisModule()
-{
-
+  setDescription("Histogram Analysis module base class");
 }
 
 void DQMHistAnalysisModule::addHist(const std::string& dirname, const std::string& histname, TH1* h)
 {
+  std::string fullname;
   if (dirname.size() > 0) {
-    g_hist.insert(HistList::value_type(dirname + "/" + histname, h));
+    fullname = dirname + "/" + histname;
   } else {
-    g_hist.insert(HistList::value_type(histname, h));
+    fullname = histname;
+  }
+  g_hist.insert(HistList::value_type(fullname, h));
+
+  // check if delta histogram update needed
+  auto it = g_delta.find(fullname);
+  if (it != g_delta.end()) {
+    it->second->update(h); // update
   }
 }
 

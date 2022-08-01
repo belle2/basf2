@@ -68,6 +68,7 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
         convertBeamParameters (bool): Convert beam parameters or use information stored in Belle II database.
         generatorLevelReconstruction (bool): Enables to bypass skims and corrections applied in B2BIIFixMdst.
         generatorLevelMCMatching (bool): Enables to switch MCTruth matching to generator-level particles.
+            This is recommended for analyses with gammas in the final state.
         path (basf2.Path): Path to add modules in.
         entrySequences (list(str)): The number sequences (e.g. 23:42,101) defining
             the entries which are processed for each inputFileName.

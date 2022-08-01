@@ -84,12 +84,13 @@ namespace Belle2 {
     static TH1* findHist(const std::string& dirname,
                          const std::string& histname);
     /**
-     * Find histogram.
+     * Find histogram in specific TDirectory (e.g. ref file).
      * @param histdir  The TDirectory of the directory.
      * @param histname The name of the histogram.
      * @return The found histogram, or nullptr if not found.
      */
     static TH1* findHist(const TDirectory* histdir, const TString& histname);
+
     /**
      * Find MonitoringObject.
      * @param objName The name of the MonitoringObject.

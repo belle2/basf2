@@ -85,7 +85,6 @@ TH1* DQMHistAnalysisModule::findHist(const std::string& histname)
 {
   if (g_hist.find(histname) != g_hist.end()) {
     if (g_hist[histname]) {
-      //Want to search elsewhere if null-pointer saved in map
       return g_hist[histname];
     } else {
       B2ERROR("Histogram " << histname << " listed as being in memfile but points to nowhere.");
@@ -103,12 +102,34 @@ TH1* DQMHistAnalysisModule::findHist(const std::string& dirname, const std::stri
   return findHist(histname);
 }
 
+TH1* DQMHistAnalysisModule::findHistInCanvas(const std::string& histo_name)
+{
+  // parse the dir+histo name and create the corresponding canvas name
+  auto s = StringSplit(histo_name, '/');
+  auto dirname = s.at(0);
+  auto hname = s.at(1);
+  std::string canvas_name = dirname + "/c_" + hname;
+
+  auto cobj = findCanvas(canvas_name);
+  if (cobj == nullptr) return nullptr;
+
+  TIter nextkey(((TCanvas*)cobj)->GetListOfPrimitives());
+  TObject* obj{};
+  while ((obj = dynamic_cast<TObject*>(nextkey()))) {
+    if (obj->IsA()->InheritsFrom("TH1")) {
+      if (obj->GetName() == histo_name)
+        return  dynamic_cast<TH1*>(obj);
+    }
+  }
+  return nullptr;
+}
+
+
 TH1* DQMHistAnalysisModule::findHist(const TDirectory* histdir, const TString& histname)
 {
   TObject* obj = histdir->FindObject(histname);
   if (obj != NULL) {
     if (obj->IsA()->InheritsFrom("TH1")) {
-      B2INFO("Histogram " << histname << " found in mem");
       return (TH1*)obj;
     }
   } else {

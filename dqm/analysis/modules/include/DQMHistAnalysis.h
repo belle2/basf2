@@ -92,6 +92,13 @@ namespace Belle2 {
     static TH1* findHist(const TDirectory* histdir, const TString& histname);
 
     /**
+     * Find histogram in corresponding canvas.
+     * @param hname Name of the histogram (dir+name)
+     * @return The pointer to the histogram, or nullptr if not found.
+     */
+    TH1* findHistInCanvas(const std::string& hname);
+
+    /**
      * Find MonitoringObject.
      * @param objName The name of the MonitoringObject.
      * @return The found MonitoringObject, or nullptr if not found.

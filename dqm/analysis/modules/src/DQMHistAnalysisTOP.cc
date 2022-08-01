@@ -105,26 +105,6 @@ void DQMHistAnalysisTOPModule::beginRun()
   m_IsNullRun = (m_RunTypeString == "null");
 }
 
-TH1* DQMHistAnalysisTOPModule::find_histo_in_canvas(const std::string& histo_name)
-{
-  auto s = StringSplit(histo_name, '/');
-  auto dirname = s.at(0);
-  auto hname = s.at(1);
-  std::string canvas_name = dirname + "/c_" + hname;
-
-  auto cobj = findCanvas(canvas_name);
-  if (cobj == nullptr) return nullptr;
-
-  TIter nextkey(((TCanvas*)cobj)->GetListOfPrimitives());
-  TObject* obj{};
-  while ((obj = dynamic_cast<TObject*>(nextkey()))) {
-    if (obj->IsA()->InheritsFrom("TH1")) {
-      if (obj->GetName() == histo_name)
-        return  dynamic_cast<TH1*>(obj);
-    }
-  }
-  return nullptr;
-}
 
 void DQMHistAnalysisTOPModule::event()
 {

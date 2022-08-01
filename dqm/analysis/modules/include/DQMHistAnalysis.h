@@ -112,6 +112,7 @@ namespace Belle2 {
      * @return The found histogram, or nullptr if not found.
      */
     static TH1* findHist(const TDirectory* histdir, const TString& histname);
+
     /**
      * Find MonitoringObject.
      * @param objName The name of the MonitoringObject.
@@ -132,6 +133,7 @@ namespace Belle2 {
     /**
      * Get MonitoringObject with given name (new object is created if non-existing)
      * @param histname name of MonitoringObject to get
+     * @return The MonitoringObject
      */
     static MonitoringObject* getMonitoringObject(const std::string& histname);
 
@@ -142,18 +144,30 @@ namespace Belle2 {
 
     /**
      * Get Delta histogram.
+     * @param fullname directory+name of histogram
+     * @param n index of delta histogram, 0 is most recent one
+     * @return delta histogram or nullptr
      */
     TH1* getDelta(const std::string& fullname, int n = 0);
 
     /**
      * Get Delta histogram.
+     * @param dirname directory
+     * @param histname name of histogram
+     * @param n index of delta histogram, 0 is most recent one
+     * @return delta histogram or nullptr
      */
     TH1* getDelta(const std::string& dirname, const std::string& histname, int n = 0);
 
     /**
      * Add Delta histogram parameters.
+     * @param dirname directory
+     * @param histname name of histogram
+     * @param t type of delta histogramming
+     * @param p numerical parameter depnding on type, e.g. number of entries
+     * @param a amount of histograms in the past
      */
-    void addDeltaPar(const std::string& dirname, const std::string& histname, int t, int p, int a);
+    void addDeltaPar(const std::string& dirname, const std::string& histname, int t, int p, unsigned int a);
 
     // Public functions
   public:

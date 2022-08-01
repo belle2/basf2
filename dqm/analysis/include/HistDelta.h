@@ -9,6 +9,7 @@
 
 #include <TH1.h>
 #include <queue>
+#include <vector>
 
 namespace Belle2 {
 
@@ -16,15 +17,18 @@ namespace Belle2 {
    * Class to keep track of delta histograms
    */
   class HistDelta {
-  private:
+  public:
     int m_type;
     int m_parameter;
-    int m_amountDeltas;
+    unsigned int m_amountDeltas;
     TH1* m_lastHist;
-    std::queue<TH1*> m_deltaHists;
+    std::vector<TH1*> m_deltaHists;
   public:
+    HistDelta(int t = 0, int p = 0, unsigned int a = 0);
+    void set(int t, int p, unsigned int a);
     void update(TH1* hist);
     void reset(void);
+    TH1* getDelta(unsigned int n = 0);
   };
 
 }

@@ -11,9 +11,24 @@
 
 using namespace Belle2;
 
+HistDelta::HistDelta(int t, int p, unsigned int a)
+{
+  m_type = t;
+  m_parameter = p;
+  m_amountDeltas = a;
+  m_lastHist = nullptr;
+};
+
+void HistDelta::set(int t, int p, unsigned int a)
+{
+  m_type = t;
+  m_parameter = p;
+  m_amountDeltas = a;
+};
 
 void HistDelta::update(TH1* currentHist)
 {
+  if (currentHist == nullptr) return; // this wont make sense
   gROOT->cd(); // make sure we dont accidentally write the histograms to a open file
   // cover first update after start
   if (m_lastHist == nullptr) {
@@ -26,24 +41,30 @@ void HistDelta::update(TH1* currentHist)
   // start with the simple case, we may add other types later
   double last_entries = m_lastHist->GetEntries();
   double current_entries = currentHist->GetEntries();
-//  B2DEBUG(20, "Entries: " << last_entries << "," << current_entries);
   if (current_entries - last_entries >= m_parameter) {
-//      B2DEBUG(20, "Update Delta");
     gROOT->cd();
     TH1* delta = (TH1*)currentHist->Clone();
     delta->Add(m_lastHist, -1.);
-    m_deltaHists.push(delta);// insert at position 0, move all others, maybe better use push and pop!
+
+    // we use this as a fifo, but cannot use queue as we need the random access
+    // maybe use deque?
+    m_deltaHists.emplace(m_deltaHists.begin(), delta);
     if (m_deltaHists.size() > m_amountDeltas) {
-      auto h = m_deltaHists.front();
-      m_deltaHists.pop(); // does it proper delet?
+      // remove (and delete) last element
+      auto h = m_deltaHists.back();
+      m_deltaHists.erase(m_deltaHists.begin() + m_deltaHists.size() - 1);
       if (h) delete h;
     }
     m_lastHist->Reset();
     m_lastHist->Add(currentHist);
-  } else {
-    // and now check if we didnt update, do we want to have initial sampling
-    // a bit hard to check
   }
+  /// else {
+  /// not (yet) enough data for update
+  /// we will NOT cover the case of initial sampling in this code
+  /// but leave it up to the user code
+  /// e.g. if getDelta(0) returns a nullptr, the user code writer
+  /// should decide if it is useful to use the basic histogram
+  /// }
 }
 
 void HistDelta::reset(void)
@@ -53,3 +74,8 @@ void HistDelta::reset(void)
   if (m_lastHist) m_lastHist->Reset();
 }
 
+TH1* HistDelta::getDelta(unsigned int n)
+{
+  if (n >= m_deltaHists.size()) return nullptr;
+  return m_deltaHists.at(n);
+}

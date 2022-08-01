@@ -85,6 +85,13 @@ namespace Belle2 {
     TCanvas* findCanvas(TString cname);
 
     /**
+     * Get histogram from list (no other search).
+     * @param histname The name of the histogram.
+     * @return The found histogram, or nullptr if not found.
+     */
+    static TH1* getHist(const std::string& histname);
+
+    /**
      * Find histogram.
      * @param histname The name of the histogram.
      * @return The found histogram, or nullptr if not found.
@@ -133,12 +140,27 @@ namespace Belle2 {
      */
     static void resetHist() { g_hist = std::map<std::string, TH1*>(); }
 
+    /**
+     * Get Delta histogram.
+     */
+    TH1* getDelta(const std::string& fullname, int n = 0);
+
+    /**
+     * Get Delta histogram.
+     */
+    TH1* getDelta(const std::string& dirname, const std::string& histname, int n = 0);
+
+    /**
+     * Add Delta histogram parameters.
+     */
+    void addDeltaPar(const std::string& dirname, const std::string& histname, int t, int p, int a);
+
     // Public functions
   public:
 
     //! Constructor / Destructor
     DQMHistAnalysisModule();
-    virtual ~DQMHistAnalysisModule();
+    virtual ~DQMHistAnalysisModule() {};
 
     // Data members
   private:

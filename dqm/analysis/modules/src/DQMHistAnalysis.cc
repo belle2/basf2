@@ -50,8 +50,40 @@ void DQMHistAnalysisModule::addHist(const std::string& dirname, const std::strin
   // check if delta histogram update needed
   auto it = g_delta.find(fullname);
   if (it != g_delta.end()) {
+    B2INFO("Found Delta" << fullname);
     it->second->update(h); // update
   }
+}
+
+void DQMHistAnalysisModule::addDeltaPar(const std::string& dirname, const std::string& histname, int t, int p, int a)
+{
+  std::string fullname;
+  if (dirname.size() > 0) {
+    fullname = dirname + "/" + histname;
+  } else {
+    fullname = histname;
+  }
+  g_delta[fullname] = new HistDelta(t, p, a);
+}
+
+TH1* DQMHistAnalysisModule::getDelta(const std::string& dirname, const std::string& histname, int n)
+{
+  std::string fullname;
+  if (dirname.size() > 0) {
+    fullname = dirname + "/" + histname;
+  } else {
+    fullname = histname;
+  }
+  return getDelta(fullname, n);
+}
+
+TH1* DQMHistAnalysisModule::getDelta(const std::string& fullname, int n)
+{
+  auto it = g_delta.find(fullname);
+  if (it != g_delta.end()) {
+    return it->second->getDelta(n);
+  }
+  return nullptr;
 }
 
 MonitoringObject* DQMHistAnalysisModule::getMonitoringObject(const std::string& objName)
@@ -81,6 +113,19 @@ TCanvas* DQMHistAnalysisModule::findCanvas(TString canvas_name)
         return dynamic_cast<TCanvas*>(obj);
     }
   }
+  return nullptr;
+}
+
+TH1* DQMHistAnalysisModule::getHist(const std::string& histname)
+{
+  if (g_hist.find(histname) != g_hist.end()) {
+    if (g_hist[histname]) {
+      return g_hist[histname];
+    } else {
+      B2ERROR("Histogram " << histname << " listed as being in memfile but nullptr.");
+    }
+  }
+  B2INFO("Histogram " << histname << " not in list.");
   return nullptr;
 }
 

@@ -53,9 +53,9 @@ DQMHistComparitorModule::~DQMHistComparitorModule()
 
 TH1* DQMHistComparitorModule::find_histo_in_canvas(TString histo_name)
 {
-  StringList s = StringUtil::split(histo_name.Data(), '/');
-  std::string dirname = s[0];
-  std::string hname = s[1];
+  auto s = StringUtil::split(histo_name.Data(), '/');
+  auto dirname = s.at(0);
+  auto hname = s.at(1);
   std::string canvas_name = dirname + "/c_" + hname;
 
   TIter nextckey(gROOT->GetListOfCanvases());

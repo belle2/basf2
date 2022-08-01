@@ -115,9 +115,9 @@ void DQMHistDeltaHistoModule::event()
       }
     }
     TString a = histoname;
-    StringList s = StringUtil::split(a.Data(), '/');
-    std::string dirname = s[0];
-    std::string hname = s[1];
+    auto s = StringUtil::split(a.Data(), '/');
+    auto dirname = s.at(0);
+    auto hname = s.at(1);
     std::string canvas_name = dirname + "/c_" + hname;
     TCanvas* c = findCanvas(canvas_name);
     if (c == nullptr) continue;

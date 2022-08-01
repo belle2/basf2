@@ -66,7 +66,7 @@ namespace Belle2 {
      * @param hname Name of the histogram
      * @return The pointer to the histogram, or nullptr if not found.
      */
-    TH1* find_histo_in_canvas(TString hname);
+    TH1* find_histo_in_canvas(const std::string& hname);
     //! Data members
   private:
     /** Histogram from DQMInfo with run type. */

@@ -13,7 +13,6 @@
 
 #include <framework/core/ModuleParam.templateDetails.h>
 #include <dqm/analysis/modules/DQMHistComparitor.h>
-#include <daq/slc/base/StringUtil.h>
 #include <TROOT.h>
 #include <TStyle.h>
 #include <TClass.h>
@@ -53,7 +52,7 @@ DQMHistComparitorModule::~DQMHistComparitorModule()
 
 TH1* DQMHistComparitorModule::find_histo_in_canvas(TString histo_name)
 {
-  auto s = StringUtil::split(histo_name.Data(), '/');
+  auto s = StringSplit(histo_name.Data(), '/');
   auto dirname = s.at(0);
   auto hname = s.at(1);
   std::string canvas_name = dirname + "/c_" + hname;

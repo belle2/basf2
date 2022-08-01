@@ -8,7 +8,7 @@
 
 #include <dqm/analysis/modules/DQMHistAnalysisTOP.h>
 #include <boost/format.hpp>
-#include <daq/slc/base/StringUtil.h>
+#include <boost/algorithm/string.hpp>
 #include <TClass.h>
 #include <TH2.h>
 #include "TROOT.h"
@@ -105,9 +105,9 @@ void DQMHistAnalysisTOPModule::beginRun()
   m_IsNullRun = (m_RunTypeString == "null");
 }
 
-TH1* DQMHistAnalysisTOPModule::find_histo_in_canvas(TString histo_name)
+TH1* DQMHistAnalysisTOPModule::find_histo_in_canvas(const std::string& histo_name)
 {
-  auto s = StringUtil::split(histo_name.Data(), '/');
+  auto s = StringSplit(histo_name, '/');
   auto dirname = s.at(0);
   auto hname = s.at(1);
   std::string canvas_name = dirname + "/c_" + hname;

@@ -9,6 +9,7 @@
 
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <cdc/dataobjects/CDCRawHit.h>
+#include <cdc/dataobjects/WireID.h>
 #include <mdst/dataobjects/MCParticle.h>
 
 #include <cdc/geometry/CDCGeometryPar.h>
@@ -332,16 +333,15 @@ CDCTriggerTSFModule::event()
     int ncdchit_asic[500][6] = {0};
     vector<int> id_ncdchit_asic[500][6];
     for (int i = 0; i < m_cdcHits.getEntries(); ++i) {
-      RelationVector<CDCRawHit> cdcrawHits = m_cdcHits[i]->getRelationsTo<CDCRawHit>();
-      if (cdcrawHits.size() > 0) {
-        CDCRawHit* cdcrawhit = cdcrawHits[0];
-        int boardid = cdcrawhit->getBoardId();
-        int fechid = cdcrawhit->getFEChannel();
-        int asicid = fechid / 8;
-        if (boardid >= 0 && boardid < 500 && asicid >= 0 && asicid < 6) {
-          ncdchit_asic[boardid][asicid]++;
-          id_ncdchit_asic[boardid][asicid].push_back(i);
-        }
+      UChar_t lay = m_cdcHits[i]->getICLayer();
+      UShort_t IWire = m_cdcHits[i]->getIWire();
+      WireID wireid(lay, IWire);
+      int boardid = cdc.getBoardID(wireid);
+      int fechid = cdc.getChannelID(wireid);
+      int asicid = fechid / 8;
+      if (boardid >= 0 && boardid < 500 && asicid >= 0 && asicid < 6) {
+        ncdchit_asic[boardid][asicid]++;
+        id_ncdchit_asic[boardid][asicid].push_back(i);
       }
     }
     //check 16ns time coinsidence if >=4 hits are found in the same asic

@@ -57,6 +57,9 @@ namespace Belle2 {
      */
     void terminate() override final;
 
+    /**
+     * Plot/print function for debugging
+     */
     void PlotDelta(void);
 
   private:

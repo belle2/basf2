@@ -11,7 +11,7 @@
 //-
 
 
-#include <dqm/analysis/modules/DQMHistAnalysisInput.h>
+#include <dqm/analysis/shminput/DQMHistAnalysisInput.h>
 
 #include <ctime>
 

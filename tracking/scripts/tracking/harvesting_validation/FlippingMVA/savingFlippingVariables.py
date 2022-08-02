@@ -16,7 +16,7 @@ from tracking.validation.utilities import getObjectList
 ROOT.gSystem.Load("libtracking")
 
 
-class CheckObject(harvesting.HarvestingModule):
+class Saving1stMVAData(harvesting.HarvestingModule):
     """ A dedicated module to save the variables using in flipping steps"""
 
     def __init__(self, name, contact=None, preInfo="", checkObj='RecoTracks', output_file_name='output.root'):
@@ -29,15 +29,15 @@ class CheckObject(harvesting.HarvestingModule):
 
     def initialize(self):
         super().initialize()
-        self.track_match_look_up = Belle2.TrackMatchLookUp(self.checkObj, self.mcRecoTracks)
+        self.track_match_look_up = Belle2.TrackMatchLookUp(self.mcRecoTracks, self.checkObj)
         output_tfile = ROOT.TFile(self.outputname, "RECREATE")
         self.outputname = output_tfile
 
     def prepare(self):
+        super().prepare()
         checkDatas = Belle2.PyStoreArray(self.checkObj)
         if (not checkDatas):
             return False
-        super().prepare()
 
     def pick(self, recoTrack):
         return True
@@ -96,22 +96,19 @@ class CheckObject(harvesting.HarvestingModule):
                 cdc_qualityindicator = cdc_track_cand.getQualityIndicator()
 
             omega_estimate = fit_result.getOmega()
+            z0_estimate = fit_result.getZ0()
+            d0_estimate = fit_result.getD0()
+            phi0_estimate = fit_result.getPhi() % (2.0 * math.pi)
+            tan_lambda_estimate = fit_result.getCotTheta()
 
             d0_variance = fit_result.getCov()[0]
             z0_variance = fit_result.getCov()[12]
-
-            z0_estimate = fit_result.getZ0()
-            d0_estimate = fit_result.getD0()
-
             phi0_variance = fit_result.getCov()[5]
-            phi0_estimate = fit_result.getPhi() % (2.0 * math.pi)
-
-            tan_lambda_estimate = fit_result.getCotTheta()
             omega_variance = fit_result.getCov()[9]
 
             reco_svdcdc_track = recoTrack.getRelated("SVDCDCRecoTracks")
-            seed_fit_result = peelers.get_seed_track_fit_result(reco_svdcdc_track)
 
+            seed_fit_result = peelers.get_seed_track_fit_result(reco_svdcdc_track)
             seed_mom = seed_fit_result.getMomentum()
             seed_pos = seed_fit_result.getPosition()
             seed_cov6 = seed_fit_result.getCovariance6()
@@ -148,7 +145,6 @@ class CheckObject(harvesting.HarvestingModule):
 
             n_hits = n_pxd_hits + n_svd_hits + n_cdc_hits
             ndf_hits = 2 * n_pxd_hits + n_svd_hits + n_cdc_hits
-
         crops = dict(
             d0_variance=d0_variance,
             seed_pz_estimate=seed_pz_estimate,

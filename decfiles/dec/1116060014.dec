@@ -21,9 +21,10 @@ Alias a_1+sig a_1+
 ChargeConj anti-K*0sig K*0sig
 ChargeConj a_1+sig a_1-sig
 
+Define dm 0.507e12
+
 Decay Upsilon(4S)
-0.5 B0sig   anti-B0 VSS;
-0.5 anti-B0sig   B0 VSS;
+1.000 B0 anti-B0 B0sig anti-B0sig VSS_BMIX dm;
 Enddecay
 
 Decay anti-B0sig

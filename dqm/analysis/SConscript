@@ -1,7 +1,0 @@
-Import('env')
-
-env['LIBS'] = ['framework', '$ROOT_LIBS']
-
-env['SUBLIB'] = True
-
-Return('env')

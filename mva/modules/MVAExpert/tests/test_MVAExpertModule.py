@@ -169,8 +169,8 @@ if __name__ == "__main__":
                 (['weightfile_mid.xml', 'weightfile_mid.xml'], ['multi_low_higher', 'multi_high_higher'], [1, 1]),
                 (['weightfile_low.xml', 'weightfile_high.xml'], ['multi_low_never', 'multi_high_never'], [0, 0]),
                 (['weightfile_low.xml', 'weightfile_high.xml'], ['multi_low_always', 'multi_high_always'], [2, 2]),
-                (['weightfile_low.xml', 'weightfile_high.xml'], ['multi_low_lower', 'multi_high_lower'], [-1, -1]),
-                (['weightfile_low.xml', 'weightfile_high.xml'], ['multi_low_higher', 'multi_high_higher'], [1, 1]),
+                (['weightfile_low.xml', 'weightfile_high.xml'], ['multi_low_higher', 'multi_high_lower'], [1, -1]),
+                (['weightfile_low.xml', 'weightfile_high.xml'], ['multi_low_lower', 'multi_high_higher'], [-1, 1]),
                 ]:
             extra_info_names = [prefix+x for x in extra_info_names]
             identifiers = [prefix+x for x in identifiers]

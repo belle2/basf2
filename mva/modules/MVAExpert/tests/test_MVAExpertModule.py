@@ -16,6 +16,11 @@ import b2test_utils
 
 from ROOT import Belle2
 
+"""
+Check the MVAExpertModule and MVAMultipleExpertsModule modules properly sets the extraInfo fields they should
+ and that the overwrite settings are respected.
+"""
+
 
 class MVAExtraInfoChecker(basf2.Module):
     """Check if the extra Info values are correctly overwritten"""
@@ -123,16 +128,15 @@ if __name__ == "__main__":
     # test all combinations of [single expert, multiexpert] x [binary, multiclass]
     for prefix in ['', 'multiclass_']:
         for identifier, extra_info_name, overwrite_option in [
-            # set the initial values
-            ('weightfile_mid.xml', 'low_never', 0),
-            ('weightfile_mid.xml', 'low_always', 2),
-            ('weightfile_mid.xml', 'low_lower', -1),
-            ('weightfile_mid.xml', 'low_higher', 1),
-            ('weightfile_mid.xml', 'high_never', 0),
-            ('weightfile_mid.xml', 'high_always', 2),
-            ('weightfile_mid.xml', 'high_lower', -1),
-            ('weightfile_mid.xml', 'high_higher', 1),
-
+                # set the initial values
+                ('weightfile_mid.xml', 'low_never', 0),
+                ('weightfile_mid.xml', 'low_always', 2),
+                ('weightfile_mid.xml', 'low_lower', -1),
+                ('weightfile_mid.xml', 'low_higher', 1),
+                ('weightfile_mid.xml', 'high_never', 0),
+                ('weightfile_mid.xml', 'high_always', 2),
+                ('weightfile_mid.xml', 'high_lower', -1),
+                ('weightfile_mid.xml', 'high_higher', 1),
                 # try to overwrite them
                 ('weightfile_low.xml', 'low_never', 0),
                 ('weightfile_low.xml', 'low_always', 2),
@@ -159,11 +163,10 @@ if __name__ == "__main__":
                 overwriteExistingExtraInfo=overwrite_option)
 
         for identifiers, extra_info_names, overwrite_options in [
-            (['weightfile_mid.xml', 'weightfile_mid.xml'], ['multi_low_never', 'multi_high_never'], [0, 0]),
-            (['weightfile_mid.xml', 'weightfile_mid.xml'], ['multi_low_always', 'multi_high_always'], [2, 2]),
-            (['weightfile_mid.xml', 'weightfile_mid.xml'], ['multi_low_lower', 'multi_high_lower'], [-1, -1]),
-            (['weightfile_mid.xml', 'weightfile_mid.xml'], ['multi_low_higher', 'multi_high_higher'], [1, 1]),
-
+                (['weightfile_mid.xml', 'weightfile_mid.xml'], ['multi_low_never', 'multi_high_never'], [0, 0]),
+                (['weightfile_mid.xml', 'weightfile_mid.xml'], ['multi_low_always', 'multi_high_always'], [2, 2]),
+                (['weightfile_mid.xml', 'weightfile_mid.xml'], ['multi_low_lower', 'multi_high_lower'], [-1, -1]),
+                (['weightfile_mid.xml', 'weightfile_mid.xml'], ['multi_low_higher', 'multi_high_higher'], [1, 1]),
                 (['weightfile_low.xml', 'weightfile_high.xml'], ['multi_low_never', 'multi_high_never'], [0, 0]),
                 (['weightfile_low.xml', 'weightfile_high.xml'], ['multi_low_always', 'multi_high_always'], [2, 2]),
                 (['weightfile_low.xml', 'weightfile_high.xml'], ['multi_low_lower', 'multi_high_lower'], [-1, -1]),

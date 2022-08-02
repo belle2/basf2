@@ -21,8 +21,8 @@ if __name__ == "__main__":
 
     conditions.testing_payloads = ['localdb/database.txt']
 
-    training_data = basf2_mva.vector("train.root")
-    test_data = basf2_mva.vector("test.root")
+    training_data = basf2_mva.vector("train_1stmva.root")
+    test_data = basf2_mva.vector("test_1stmva.root")
 
     # rate by the importance
     variables = ["d0_variance",

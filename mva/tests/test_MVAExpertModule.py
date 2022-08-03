@@ -174,8 +174,6 @@ if __name__ == "__main__":
                 ]:
             extra_info_names = [prefix+x for x in extra_info_names]
             identifiers = [prefix+x for x in identifiers]
-            print(extra_info_names)
-            print(identifiers)
             path.add_module(
                 'MVAMultipleExperts',
                 listNames=['pi+:test'],

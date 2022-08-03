@@ -295,9 +295,9 @@ void KLMTimeCollectorModule::collectScintEnd(const RelationVector<KLMHit2d>& klm
 
       m_Event.flyTime = 0.5 * (entryHit.getTOF() + exitHit.getTOF());
 
-      TVector3 positionGlobal_extHit = 0.5 * (entryHit.getPosition() + exitHit.getPosition());
-      TVector3 positionGlobal_digit = hit2d.getPosition();
-      TVector3 positionGlobal_diff = positionGlobal_extHit - positionGlobal_digit;
+      ROOT::Math::XYZVector positionGlobal_extHit = 0.5 * (entryHit.getPosition() + exitHit.getPosition());
+      ROOT::Math::XYZVector positionGlobal_digit = hit2d.getPosition();
+      ROOT::Math::XYZVector positionGlobal_diff = positionGlobal_extHit - positionGlobal_digit;
 
       storeDistDiff(positionGlobal_diff);
 
@@ -334,7 +334,7 @@ void KLMTimeCollectorModule::collectScint(RelationVector<KLMHit2d>& klmHit2ds)
     if (bklmHit1ds.size() != 2)
       continue;
 
-    TVector3 positionGlobal_hit2d = hit2d.getPosition();
+    ROOT::Math::XYZVector positionGlobal_hit2d = hit2d.getPosition();
     const bklm::Module* corMod = m_geoParB->findModule(hit2d.getSection(), hit2d.getSector(), hit2d.getLayer());
     stripWidtm_HZ = corMod->getZStripWidth();
     stripWidtm_HPhi = corMod->getPhiStripWidth();
@@ -362,9 +362,9 @@ void KLMTimeCollectorModule::collectScint(RelationVector<KLMHit2d>& klmHit2ds)
         m_Event.inRPC = digitHit.inRPC();
         m_Event.flyTime = 0.5 * (entryHit.getTOF() + exitHit.getTOF());
 
-        TVector3 positionGlobal_extHit = 0.5 * (entryHit.getPosition() + exitHit.getPosition());
-        TVector3 positionGlobal_diff = positionGlobal_extHit - positionGlobal_hit2d;
-        B2DEBUG(20, LogVar("Distance between digit and hit2d", positionGlobal_diff.Mag()));
+        ROOT::Math::XYZVector positionGlobal_extHit = 0.5 * (entryHit.getPosition() + exitHit.getPosition());
+        ROOT::Math::XYZVector positionGlobal_diff = positionGlobal_extHit - positionGlobal_hit2d;
+        B2DEBUG(20, LogVar("Distance between digit and hit2d", positionGlobal_diff.R()));
 
         storeDistDiff(positionGlobal_diff);
         const CLHEP::Hep3Vector positionLocal_extHit = corMod->globalToLocal(CLHEP::Hep3Vector(
@@ -404,7 +404,7 @@ void KLMTimeCollectorModule::collectRPC(RelationVector<KLMHit2d>& klmHit2ds)
     if (bklmHit1ds.size() != 2)
       continue;
 
-    TVector3 positionGlobal_hit2d = hit2d.getPosition();
+    ROOT::Math::XYZVector positionGlobal_hit2d = hit2d.getPosition();
     const bklm::Module* corMod = m_geoParB->findModule(hit2d.getSection(), hit2d.getSector(), hit2d.getLayer());
     double stripWidtm_HZ = corMod->getZStripWidth();
     double stripWidtm_HPhi = corMod->getPhiStripWidth();
@@ -430,9 +430,9 @@ void KLMTimeCollectorModule::collectRPC(RelationVector<KLMHit2d>& klmHit2ds)
         ExtHit& exitHit = *(pair_extHits.second);
 
         m_Event.flyTime = 0.5 * (entryHit.getTOF() + exitHit.getTOF());
-        TVector3 positionGlobal_extHit = 0.5 * (entryHit.getPosition() + exitHit.getPosition());
-        TVector3 positionGlobal_diff = positionGlobal_extHit - positionGlobal_hit2d;
-        B2DEBUG(20, LogVar("Distance between digit and hit2d", positionGlobal_diff.Mag()));
+        ROOT::Math::XYZVector positionGlobal_extHit = 0.5 * (entryHit.getPosition() + exitHit.getPosition());
+        ROOT::Math::XYZVector positionGlobal_diff = positionGlobal_extHit - positionGlobal_hit2d;
+        B2DEBUG(20, LogVar("Distance between digit and hit2d", positionGlobal_diff.R()));
 
         storeDistDiff(positionGlobal_diff);
         const CLHEP::Hep3Vector positionLocal_extHit = corMod->globalToLocal(CLHEP::Hep3Vector(
@@ -484,9 +484,9 @@ std::pair<ExtHit*, ExtHit*> KLMTimeCollectorModule::matchExt(
   return p_extHits;
 }
 
-void KLMTimeCollectorModule::storeDistDiff(TVector3& pDiff)
+void KLMTimeCollectorModule::storeDistDiff(ROOT::Math::XYZVector& pDiff)
 {
-  double diffM = pDiff.Mag();
+  double diffM = pDiff.R();
   double diffX = pDiff.X();
   double diffY = pDiff.Y();
   double diffZ = pDiff.Z();

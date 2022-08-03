@@ -42,6 +42,69 @@ namespace Belle2 {
     }
 
     /**
+     * Get the lund code of the (leading) particle.
+     * @return Particle code.
+     */
+    int getPDG() const
+    {
+      return m_PDG;
+    }
+
+    /**
+     * Set the lund code of the (leading) particle
+     * @param[in] pdg Particle code.
+     */
+    void setPDG(int pdg)
+    {
+      m_PDG = pdg;
+    }
+
+    /**
+     * Get track ID
+     * @return Track ID.
+     */
+    int getTrackID() const
+    {
+      return m_trackID;
+    }
+
+    /**
+     * Set track ID.
+     * @param[in] track track ID.
+     */
+    void setTrackID(int track)
+    {
+      m_trackID = track;
+    }
+
+    /**
+     * Get ID of parent track.
+     * @return Track ID.
+     */
+    int getParentTrackID() const
+    {
+      return m_parentTrackID;
+    }
+
+    /**
+     * Set ID of parent track.
+     * @param[in] track track ID.
+     */
+    void setParentTrackID(int track)
+    {
+      m_parentTrackID = track;
+    }
+
+    /**
+     * Get volume identifier.
+     * @return Identifier.
+     */
+    int getVolumeID() const
+    {
+      return m_volid;
+    }
+
+    /**
      * Get section number.
      * @return Section number.
      */
@@ -165,24 +228,6 @@ namespace Belle2 {
     void setTime(float time)
     {
       m_Time = time;
-    }
-
-    /**
-     * Get the lund code of the (leading) particle.
-     * @return Particle code.
-     */
-    int getPDG() const
-    {
-      return m_PDG;
-    }
-
-    /**
-     * Set the lund code of the (leading) particle
-     * @param[in] pdg Particle code.
-     */
-    void setPDG(int pdg)
-    {
-      m_PDG = pdg;
     }
 
     /**
@@ -316,51 +361,6 @@ namespace Belle2 {
     }
 
     /**
-     * Get track ID
-     * @return Track ID.
-     */
-    int getTrackID() const
-    {
-      return m_trackID;
-    }
-
-    /**
-     * Set track ID.
-     * @param[in] track track ID.
-     */
-    void setTrackID(int track)
-    {
-      m_trackID = track;
-    }
-
-    /**
-     * Get ID of parent track.
-     * @return Track ID.
-     */
-    int getParentTrackID() const
-    {
-      return m_parentTrackID;
-    }
-
-    /**
-     * Set ID of parent track.
-     * @param[in] track track ID.
-     */
-    void setParentTrackID(int track)
-    {
-      m_parentTrackID = track;
-    }
-
-    /**
-     * Get volume identifier.
-     * @return Identifier.
-     */
-    int getVolumeID() const
-    {
-      return m_volid;
-    }
-
-    /**
      * Set volume identifier.
      * @param[in] id Identifier.
      */
@@ -392,11 +392,14 @@ namespace Belle2 {
     /** PDG code of the (leading) particle. */
     int m_PDG = -1;
 
-    /** Time of the hit. */
-    float m_Time = -1;
+    /** Track ID. */
+    int m_trackID = -1;
 
-    /** Energy deposition. */
-    float m_EDep = -1;
+    /** Parent track ID. */
+    int m_parentTrackID = -1;
+
+    /** Volume identifier. */
+    int m_volid = -1;
 
     /** Number of section. */
     int m_Section = 0;
@@ -412,6 +415,12 @@ namespace Belle2 {
 
     /** Number of strip. */
     int m_Strip = 0;
+
+    /** Time of the hit. */
+    float m_Time = -1;
+
+    /** Energy deposition. */
+    float m_EDep = -1;
 
     /** Local position X coordinate. */
     float m_localX = 0;
@@ -442,15 +451,6 @@ namespace Belle2 {
 
     /** Momentum Z component. */
     float m_pZ = 0;
-
-    /** Track ID. */
-    int m_trackID = -1;
-
-    /** Parent track ID. */
-    int m_parentTrackID = -1;
-
-    /** Volume identifier. */
-    int m_volid = -1;
 
     /** Class version. */
     ClassDefOverride(Belle2::EKLMSimHit, 3);

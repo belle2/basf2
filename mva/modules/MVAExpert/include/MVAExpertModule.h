@@ -17,7 +17,7 @@
 #include <framework/database/DBObjPtr.h>
 
 #include <analysis/VariableManager/Manager.h>
-#include <analysis/dataobjects/EventExtraInfo.h>
+#include <framework/dataobjects/EventExtraInfo.h>
 
 #include <vector>
 #include <string>

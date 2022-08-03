@@ -14,7 +14,6 @@
 
 using namespace Belle2;
 using namespace Belle2::HistogramFactory;
-using namespace std;
 using boost::format;
 
 //-----------------------------------------------------------------
@@ -82,17 +81,17 @@ void TrackingExpressRecoDQMModule::defineHisto()
   originalDirectory->cd();
 
   for (auto change : m_histogramParameterChanges)
-    ProcessHistogramParameterChange(get<0>(change), get<1>(change), get<2>(change));
+    ProcessHistogramParameterChange(std::get<0>(change), std::get<1>(change), std::get<2>(change));
 
   // Add the title suffix (if a suffix was provided via the module parameter)
   for (TH1* hist : m_histograms) {
     // Skip histograms whose content does *not* depend on the list (StoreArray)
     // of tracks used as input to this module
-    if (hist->GetName() == string("NumberTrackingErrorFlags"))
+    if (hist->GetName() == std::string("NumberTrackingErrorFlags"))
       continue;
-    if (hist->GetName() == string("TrackingErrorFlagsReasons"))
+    if (hist->GetName() == std::string("TrackingErrorFlagsReasons"))
       continue;
-    string newTitle = hist->GetTitle() + m_histogramTitleSuffix;
+    std::string newTitle = hist->GetTitle() + m_histogramTitleSuffix;
     hist->SetTitle(newTitle.c_str());
   }
 }

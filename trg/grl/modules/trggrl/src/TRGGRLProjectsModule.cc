@@ -64,7 +64,7 @@ double radtodeg;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(TRGGRLProjects)
+REG_MODULE(TRGGRLProjects);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -646,6 +646,7 @@ void TRGGRLProjectsModule::event()
   //ecltaub2b
   bool ecltaub2b = (ECLtoGDL[2] & (1 << (89 - 32 * 2))) != 0;
   bool ecltaub2b2 = (ECLtoGDL[2] & (1 << (93 - 32 * 2))) != 0;
+  bool ecltaub2b3 = (ECLtoGDL[2] & (1 << (94 - 32 * 2))) != 0;
   // ehigh1-3
   bool ehigh1 = (ECLtoGDL[2] & (1 << (90 - 32 * 2))) != 0;
   bool ehigh2 = (ECLtoGDL[2] & (1 << (91 - 32 * 2))) != 0;
@@ -869,6 +870,7 @@ void TRGGRLProjectsModule::event()
     else if (bitname == "ecl_bst") {bit = ecl_bst;}
     else if (bitname == "ecl_taub2b") {bit = ecltaub2b;}
     else if (bitname == "ecl_taub2b2") {bit = ecltaub2b2;}
+    else if (bitname == "ecl_taub2b3") {bit = ecltaub2b3;}
     else if (bitname == "ehigh1") {bit = ehigh1;}
     else if (bitname == "ehigh2") {bit = ehigh2;}
     else if (bitname == "ehigh3") {bit = ehigh3;}

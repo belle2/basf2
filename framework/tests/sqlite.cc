@@ -49,7 +49,7 @@ namespace {
   {
     sqlite::Statement<std::string, double> stmt(m_connection, "SELECT name, x from test ORDER by name DESC", false);
     std::vector<std::tuple<std::string, double>> expected{{"IP", 0.}, {"X", 1.}, {"Y", 0.}, {"Z", 0.}};
-    for (auto && row : stmt) {
+    for (auto&& row : stmt) {
       ASSERT_FALSE(expected.empty());
       ASSERT_EQ(row, expected.back());
       expected.pop_back();
@@ -62,7 +62,7 @@ namespace {
   {
     sqlite::Statement<std::string, std::string> stmt(m_connection, "SELECT name, x from test ORDER by name DESC", false);
     std::vector<std::tuple<std::string, std::string>> expected{{"IP", "0.0"}, {"X", "1.0"}, {"Y", "0.0"}, {"Z", "0.0"}};
-    for (auto && row : stmt) {
+    for (auto&& row : stmt) {
       ASSERT_FALSE(expected.empty());
       ASSERT_EQ(row, expected.back());
       expected.pop_back();
@@ -75,7 +75,7 @@ namespace {
   {
     sqlite::Statement<std::string, int> stmt(m_connection, "SELECT name, x from test ORDER by name DESC", false);
     std::vector<std::tuple<std::string, int>> expected{{"IP", 0}, {"X", 1}, {"Y", 0}, {"Z", 0}};
-    for (auto && row : stmt) {
+    for (auto&& row : stmt) {
       ASSERT_FALSE(expected.empty());
       ASSERT_EQ(row, expected.back());
       expected.pop_back();

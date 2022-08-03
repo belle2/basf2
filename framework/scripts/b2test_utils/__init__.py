@@ -310,7 +310,8 @@ def get_streamer_checksums(objects):
 
     Returns a dictionary object name -> (version, checksum).
     """
-    import ROOT
+    # Always avoid the top-level 'import ROOT'.
+    import ROOT  # noqa
 
     # Write out the objects to a mem file
     f = ROOT.TMemFile("test_mem_file", "RECREATE")
@@ -341,7 +342,7 @@ def get_object_with_name(object_name, root=None):
     If not, the object is extracted via a getattr call.
     """
     if root is None:
-        from ROOT import Belle2
+        from ROOT import Belle2  # noqa
         root = Belle2
 
     if "." in object_name:

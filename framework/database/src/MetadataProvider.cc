@@ -56,7 +56,7 @@ namespace Belle2::Conditions {
         // already filled by previous gt or has a filename from testing payloads ... so don't do anything
         if (payload.revision > 0 or !payload.filename.empty()) return true;
         // otherwise look for the payload in the list of existing payloads for this run
-        if (auto && it = existing.find(payload.name); it != existing.end()) {
+        if (auto&& it = existing.find(payload.name); it != existing.end()) {
           payload.update(it->second);
           B2DEBUG(35, "Found requested payload metadata"
                   << LogVar("globaltag", payload.globaltag)

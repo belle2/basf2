@@ -28,7 +28,7 @@ G4MonopoleEquation::~G4MonopoleEquation()
 
 void
 G4MonopoleEquation::SetChargeMomentumMass(G4ChargeState particleChargeState,
-                                          G4double      ,           // momentum,
+                                          G4double,                 // momentum,
                                           G4double particleMass)
 {
   G4double particleMagneticCharge = particleChargeState.MagneticCharge();

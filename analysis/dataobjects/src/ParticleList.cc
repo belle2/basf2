@@ -213,6 +213,29 @@ bool ParticleList::contains(const Particle* p, bool includingAntiList) const
   return false;
 }
 
+int ParticleList::getIndex(const Particle* p, bool includingAntiList) const
+{
+  const int index = p->getArrayIndex();
+
+  auto it_fs = std::find(m_fsList.begin(), m_fsList.end(), index);
+  if (it_fs != m_fsList.end()) {
+    return std::distance(m_fsList.begin(), it_fs);
+  }
+
+  auto it_sc = std::find(m_scList.begin(), m_scList.end(), index);
+  if (it_sc != m_scList.end()) {
+    return std::distance(m_scList.begin(), it_sc) + m_fsList.size();
+  }
+
+  if (includingAntiList and !m_antiListName.empty()) {
+    int indexAnti = getAntiParticleList().getIndex(p, false);
+    if (indexAnti != -1)
+      return indexAnti + m_fsList.size() + m_scList.size();
+  }
+
+  return -1;
+}
+
 void ParticleList::print() const
 {
   B2INFO(HTML::htmlToPlainText(getInfoHTML()));

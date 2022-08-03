@@ -34,10 +34,10 @@ using namespace boost;
 namespace Belle2 {
   namespace arich {
     //-----------------------------------------------------------------
-    //                 Register the Module
+    ///                Register the Module
     //-----------------------------------------------------------------
 
-    REG_MODULE(ARICHBackground)
+    REG_MODULE(ARICHBackground);
 
 
     //-----------------------------------------------------------------

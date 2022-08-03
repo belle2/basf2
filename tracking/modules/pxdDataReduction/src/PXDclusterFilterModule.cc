@@ -10,7 +10,6 @@
 #include <map>
 
 using namespace Belle2;
-using namespace std;
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -42,19 +41,15 @@ PXDclusterFilterModule::PXDclusterFilterModule() : Module()
 
 void PXDclusterFilterModule::initialize()
 {
-
-  StoreArray<ROIid> roiIDs;
-  roiIDs.isRequired(m_ROIidsName);
-
+  m_ROIs.isRequired(m_ROIidsName);
   // We have to change it once the hardware type clusters are well defined
-  StoreArray<PXDCluster> PXDClusters(m_PXDClustersName);   /**< The PXDClusters to be filtered */
-  PXDClusters.isRequired();
+  m_PXDClusters.isRequired(m_PXDClustersName);   /**< The PXDClusters to be filtered */
 
-  m_selectorIN.registerSubset(PXDClusters, m_PXDClustersInsideROIName);
+  m_selectorIN.registerSubset(m_PXDClusters, m_PXDClustersInsideROIName);
   m_selectorIN.inheritAllRelations();
 
   if (m_CreateOutside) {
-    m_selectorOUT.registerSubset(PXDClusters, m_PXDClustersOutsideROIName);
+    m_selectorOUT.registerSubset(m_PXDClusters, m_PXDClustersOutsideROIName);
     m_selectorOUT.inheritAllRelations();
   }
 }
@@ -129,14 +124,10 @@ void PXDclusterFilterModule::event()
 
 void PXDclusterFilterModule::filterClusters()
 {
-  // We have to change it once the hardware type clusters are well defined
-  StoreArray<PXDCluster> PXDClusters(m_PXDClustersName);   /**< The PXDClusters to be filtered */
-  StoreArray<ROIid> ROIids_store_array(m_ROIidsName); /**< The ROIs */
+  std::multimap< VxdID, ROIid > ROIids;
 
-  multimap< VxdID, ROIid > ROIids;
-
-  for (auto ROI : ROIids_store_array)
-    ROIids.insert(pair<VxdID, ROIid> (ROI.getSensorID(), ROI));
+  for (auto ROI : m_ROIs)
+    ROIids.insert(std::pair<VxdID, ROIid> (ROI.getSensorID(), ROI));
 
   m_selectorIN.select([ROIids, this](const PXDCluster * thePxdCluster) {
     auto ROIidsRange = ROIids.equal_range(thePxdCluster->getSensorID()) ;

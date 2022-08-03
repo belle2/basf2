@@ -44,7 +44,7 @@ def get_all_iovsets(existing_payloads, run_range=None):
         try:
             by_name[payload.name].add(iov)
         except ValueError as e:
-            B2ERROR(f"Overlap for payload {payload.name}: {e}")
+            B2ERROR(f"Overlap for payload {payload.name} r{payload.revision}: {e}")
 
     # so now flatten the thing again and return PayloadInformation objects we slightly modify
     result = []
@@ -182,8 +182,15 @@ def command_tag_merge(args, db=None):
 
         # For each globaltag
         for tag in args.globaltag:
+            # get all the payloads and iovs from the globaltag
+            all_payloads = db.get_all_iovs(tag)
+            # sort all the payloads by revision number (reversed sort: highest revisions first)
+            all_payloads.sort(key=lambda p: p.revision, reverse=True)
+            # and sort again but this time by name: not really necessary,
+            # but it helps printing the log messages ordered by payloads name
+            all_payloads.sort(key=lambda p: p.name, reverse=False)
             # get all payload information objects with their iovs already merged to iovset instances
-            payloads = get_all_iovsets(db.get_all_iovs(tag), args.run_range)
+            payloads = get_all_iovsets(all_payloads, args.run_range)
             for payload in payloads:
                 # make sure it doesn't overlap with any of the previous
                 payload.iov.remove(existing[payload.name])

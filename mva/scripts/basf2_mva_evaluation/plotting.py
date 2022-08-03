@@ -202,7 +202,15 @@ class Plotter(object):
                 errorbar_kwargs['color'] = color
             if 'ecolor' not in errorbar_kwargs:
                 errorbar_kwargs['ecolor'] = [0.5 * x for x in color]
-            e = axis.errorbar(x, y, xerr=xerr, yerr=yerr, rasterized=True, **errorbar_kwargs)
+
+            # fully mask nan values.
+            # Needed until https://github.com/matplotlib/matplotlib/pull/23333 makes it into the externals.
+            # TODO: remove in release 8.
+            if not isinstance(xerr, (numpy.ndarray, list)):
+                xerr = xerr*numpy.ones(len(x))
+            mask = numpy.logical_and.reduce([numpy.isfinite(v) for v in [x, y, xerr, yerr]])
+
+            e = axis.errorbar(x[mask], y[mask], xerr=xerr[mask], yerr=yerr[mask], rasterized=True, **errorbar_kwargs)
             patches.append(e)
 
         if errorband_kwargs is not None and yerr is not None:

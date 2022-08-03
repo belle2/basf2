@@ -13,7 +13,7 @@
 using namespace std;
 using namespace Belle2;
 
-REG_MODULE(PruneDataStore)
+REG_MODULE(PruneDataStore);
 
 PruneDataStoreModule::PruneDataStoreModule() :
   Module()

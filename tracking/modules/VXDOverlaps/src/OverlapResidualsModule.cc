@@ -30,7 +30,6 @@
 #include <mdst/dataobjects/TrackFitResult.h>
 
 using namespace Belle2;
-using namespace std;
 
 
 //-----------------------------------------------------------------
@@ -476,9 +475,9 @@ void OverlapResidualsModule::event()
     if (! trk.wasFitSuccessful()) {
       continue;
     }
-    const vector<PXDCluster* > pxdClusters = trk.getPXDHitList();
-    const vector<SVDCluster* > svdClusters = trk.getSVDHitList();
-    B2DEBUG(40, "FITTED TRACK:   NUMBER OF PXD HITS = " << pxdClusters.size() << "    NUMBER OF SVD HITS = " << svdClusters.size());
+    const std::vector<PXDCluster* > pxdClusters = trk.getPXDHitList();
+    const std::vector<SVDCluster* > svdClusters = trk.getSVDHitList();
+    B2DEBUG(29, "FITTED TRACK:   NUMBER OF PXD HITS = " << pxdClusters.size() << "    NUMBER OF SVD HITS = " << svdClusters.size());
     //LOOKING FOR 2 CONSECUTIVE PXD HITS IN OVERLAPPING MODULES OF A SAME LAYER
     for (unsigned int i = 0; i < pxdClusters.size(); i++) {
       const PXDCluster* pxd_1 = pxdClusters[i];
@@ -512,7 +511,7 @@ void OverlapResidualsModule::event()
         const unsigned short pxd_Sensor_2 = pxd_id_2.getSensorNumber();
         if (pxd_Layer_1 == pxd_Layer_2 && ((pxd_Ladder_2 - pxd_Ladder_1) == -1.0 || (pxd_Ladder_2 - pxd_Ladder_1) == 7.0
                                            || (pxd_Ladder_2 - pxd_Ladder_1) == 11.0)) {
-          B2DEBUG(40, " ============= 2 hits in a PXD overlap ============= ");
+          B2DEBUG(29, " ============= 2 hits in a PXD overlap ============= ");
           const TVectorD resUnBias_PXD_1 = fittedResult_1->getResidual(0, false).getState();
           const TVectorD resUnBias_PXD_2 = fittedResult_2->getResidual(0, false).getState();
           const float res_U_1 = resUnBias_PXD_1.GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
@@ -531,7 +530,7 @@ void OverlapResidualsModule::event()
           double pxdPhi_2 = atan2(pxdGlobal_2(1), pxdGlobal_2(0));
           double pxdZ_1 = pxdGlobal_1(2);
           double pxdZ_2 = pxdGlobal_2(2);
-          B2DEBUG(40, "PXD: difference of residuals " << over_U_PXD << "   " << over_V_PXD);
+          B2DEBUG(29, "PXD: difference of residuals " << over_U_PXD << "   " << over_V_PXD);
           //Fill PXD tree for overlaps if required by the user
           if (m_ExpertLevel) {
             deltaResU_PXD = over_U_PXD;
@@ -652,7 +651,7 @@ void OverlapResidualsModule::event()
         const unsigned short svd_Sensor_2 = svd_id_2.getSensorNumber();
         if (svd_Layer_1 == svd_Layer_2 && ((svd_Ladder_2 - svd_Ladder_1) == 1.0 || (svd_Ladder_2 - svd_Ladder_1) == -6.0
                                            || (svd_Ladder_2 - svd_Ladder_1) == -9.0 || (svd_Ladder_2 - svd_Ladder_1) == -11.0 || (svd_Ladder_2 - svd_Ladder_1) == -15.0)) {
-          B2DEBUG(40, " ============= 2 hits in a SVD overlap ============= ");
+          B2DEBUG(29, " ============= 2 hits in a SVD overlap ============= ");
           const TVectorD resUnBias_SVD_1 =  fittedResult_1->getResidual(0, false).getState();
           const TVectorD resUnBias_SVD_2 =  fittedResult_2->getResidual(0, false).getState();
           genfit::MeasuredStateOnPlane state_unbiased_1 = fittedResult_1->getFittedState(false);
@@ -686,7 +685,7 @@ void OverlapResidualsModule::event()
             double svdPhi_2 = atan2(svdGlobal_2(1), svdGlobal_2(0));
             double svdZ_1 = svdGlobal_1(2);
             double svdZ_2 = svdGlobal_2(2);
-            B2DEBUG(40, "SVD: difference of u-residuals =========> " << over_U_SVD);
+            B2DEBUG(29, "SVD: difference of u-residuals =========> " << over_U_SVD);
             //Fill SVD tree for u-overlaps if required by the user
             if (m_ExpertLevel) {
               svdDeltaRes_U = over_U_SVD;
@@ -743,7 +742,7 @@ void OverlapResidualsModule::event()
                 for (unsigned int d = 0; d < svdSize_U_int; d++) {
                   svdStripCharge_U_int.push_back(theRecoDigits_1[d]->getCharge());
                   SVDShaperDigit* ShaperDigit_1 = theRecoDigits_1[d]->getRelated<SVDShaperDigit>();
-                  array<float, 6> Samples_1 = ShaperDigit_1->getSamples();
+                  std::array<float, 6> Samples_1 = ShaperDigit_1->getSamples();
                   std::copy(std::begin(Samples_1), std::end(Samples_1), std::back_inserter(svdStrip6Samples_U_int));
                   svdStripTime_U_int.push_back(theRecoDigits_1[d]->getTime());
                   double misalignedStripPos = svdSensor_1.getUCellPosition(theRecoDigits_1[d]->getCellID());
@@ -797,7 +796,7 @@ void OverlapResidualsModule::event()
                 for (unsigned int d = 0; d < svdSize_U_ext; d++) {
                   svdStripCharge_U_ext.push_back(theRecoDigits_2[d]->getCharge());
                   SVDShaperDigit* ShaperDigit_2 = theRecoDigits_2[d]->getRelated<SVDShaperDigit>();
-                  array<float, 6> Samples_2 = ShaperDigit_2->getSamples();
+                  std::array<float, 6> Samples_2 = ShaperDigit_2->getSamples();
                   std::copy(std::begin(Samples_2), std::end(Samples_2), std::back_inserter(svdStrip6Samples_U_ext));
                   svdStripTime_U_ext.push_back(theRecoDigits_2[d]->getTime());
                   double misalignedStripPos = svdSensor_2.getUCellPosition(theRecoDigits_2[d]->getCellID());
@@ -869,7 +868,7 @@ void OverlapResidualsModule::event()
             double svdPhi_2 = atan2(svdGlobal_2(1), svdGlobal_2(0));
             double svdZ_1 = svdGlobal_1(2);
             double svdZ_2 = svdGlobal_2(2);
-            B2DEBUG(40, "SVD: difference of v-residuals =========> " << over_V_SVD);
+            B2DEBUG(29, "SVD: difference of v-residuals =========> " << over_V_SVD);
             //Fill SVD tree for v-overlaps if required by the user
             if (m_ExpertLevel) {
               svdDeltaRes_V = over_V_SVD;
@@ -924,7 +923,7 @@ void OverlapResidualsModule::event()
                 for (unsigned int d = 0; d < svdSize_V_int; d++) {
                   svdStripCharge_V_int.push_back(theRecoDigits_1[d]->getCharge());
                   SVDShaperDigit* ShaperDigit_1 = theRecoDigits_1[d]->getRelated<SVDShaperDigit>();
-                  array<float, 6> Samples_1 = ShaperDigit_1->getSamples();
+                  std::array<float, 6> Samples_1 = ShaperDigit_1->getSamples();
                   std::copy(std::begin(Samples_1), std::end(Samples_1), std::back_inserter(svdStrip6Samples_V_int));
                   svdStripTime_V_int.push_back(theRecoDigits_1[d]->getTime());
                   double misalignedStripPos = svdSensor_1.getVCellPosition(theRecoDigits_1[d]->getCellID());
@@ -978,7 +977,7 @@ void OverlapResidualsModule::event()
                 for (unsigned int d = 0; d < svdSize_V_ext; d++) {
                   svdStripCharge_V_ext.push_back(theRecoDigits_2[d]->getCharge());
                   SVDShaperDigit* ShaperDigit_2 = theRecoDigits_2[d]->getRelated<SVDShaperDigit>();
-                  array<float, 6> Samples_2 = ShaperDigit_2->getSamples();
+                  std::array<float, 6> Samples_2 = ShaperDigit_2->getSamples();
                   std::copy(std::begin(Samples_2), std::end(Samples_2), std::back_inserter(svdStrip6Samples_V_ext));
                   svdStripTime_V_ext.push_back(theRecoDigits_2[d]->getTime());
                   double misalignedStripPos = svdSensor_2.getVCellPosition(theRecoDigits_2[d]->getCellID());

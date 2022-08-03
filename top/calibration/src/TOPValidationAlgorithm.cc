@@ -110,6 +110,12 @@ namespace Belle2 {
       inputTree->SetBranchAddress("numActiveCalibrated", &m_treeEntry.numActiveCalibrated);
       inputTree->SetBranchAddress("thrEffi", &m_treeEntry.thrEffi);
       inputTree->SetBranchAddress("asicShifts", &m_treeEntry.asicShifts);
+      inputTree->SetBranchAddress("svdOffset", &m_treeEntry.svdOffset);
+      inputTree->SetBranchAddress("svdSigma", &m_treeEntry.svdSigma);
+      inputTree->SetBranchAddress("cdcOffset", &m_treeEntry.cdcOffset);
+      inputTree->SetBranchAddress("cdcSigma", &m_treeEntry.cdcSigma);
+      inputTree->SetBranchAddress("fillPatternOffset", &m_treeEntry.fillPatternOffset);
+      inputTree->SetBranchAddress("fillPatternFraction", &m_treeEntry.fillPatternFraction);
 
       // sort input tree entries according to exp/run
 
@@ -246,6 +252,37 @@ namespace Belle2 {
             h->SetBinError(i + 1, 0.001);
           }
         }
+      }
+
+      auto* h_svdOffset = new TH1F("svdOffset", "Event T0 offset w.r.t TOP; run index; offset [ns]", nx, 0, nx);
+      auto* h_svdSigma = new TH1F("svdSigma", "Event T0 resolution; run index; sigma [ns]", nx, 0, nx);
+      for (int i = 0; i < nx; i++) {
+        h_svdOffset->SetBinContent(i + 1, mergedEntries[i].svdOffset);
+        h_svdOffset->SetBinError(i + 1, mergedEntries[i].svdSigma / 1000);
+        h_svdSigma->SetBinContent(i + 1, mergedEntries[i].svdSigma);
+        h_svdSigma->SetBinError(i + 1, 0.001);
+      }
+
+      auto* h_cdcOffset = new TH1F("cdcOffset", "Event T0 offset w.r.t TOP; run index; offset [ns]", nx, 0, nx);
+      auto* h_cdcSigma = new TH1F("cdcSigma", "Event T0 resolution; run index; sigma [ns]", nx, 0, nx);
+      for (int i = 0; i < nx; i++) {
+        h_cdcOffset->SetBinContent(i + 1, mergedEntries[i].cdcOffset);
+        h_cdcOffset->SetBinError(i + 1, mergedEntries[i].cdcSigma / 1000);
+        h_cdcSigma->SetBinContent(i + 1, mergedEntries[i].cdcSigma);
+        h_cdcSigma->SetBinError(i + 1, 0.001);
+      }
+
+      auto* h_fillPatternOffset = new TH1F("fillPatternOffset", "Fill pattern offset; run index; offset [RF clk]", nx, 0, nx);
+      auto* h_fillPatternFract = new TH1F("fillPatternFract",
+                                          "Fraction of buckets matched with filled ones; run index; fraction", nx, 0, nx);
+      for (int i = 0; i < nx; i++) {
+        if (isnan(mergedEntries[i].fillPatternOffset)) {
+          h_fillPatternOffset->SetBinError(i + 1, 0);
+        } else {
+          h_fillPatternOffset->SetBinContent(i + 1, mergedEntries[i].fillPatternOffset);
+          h_fillPatternOffset->SetBinError(i + 1, 0.01);
+        }
+        h_fillPatternFract->SetBinContent(i + 1, mergedEntries[i].fillPatternFraction);
       }
 
       // write-out the results

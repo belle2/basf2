@@ -17,7 +17,6 @@
 
 using namespace Belle2;
 using namespace Belle2::HistogramFactory;
-using namespace std;
 using boost::format;
 
 //-----------------------------------------------------------------
@@ -94,7 +93,8 @@ void DQMHistoModuleBase::event()
   }
 }
 
-TH1F* DQMHistoModuleBase::Create(string name, string title, int nbinsx, double xlow, double xup, string xTitle, string yTitle)
+TH1F* DQMHistoModuleBase::Create(std::string name, std::string title, int nbinsx, double xlow, double xup, std::string xTitle,
+                                 std::string yTitle)
 {
   TH1F* histogram = new TH1F(name.c_str(), title.c_str(), nbinsx, xlow, xup);
   histogram->GetXaxis()->SetTitle(xTitle.c_str());
@@ -105,8 +105,8 @@ TH1F* DQMHistoModuleBase::Create(string name, string title, int nbinsx, double x
   return histogram;
 }
 
-TH2F* DQMHistoModuleBase::Create(string name, string title, int nbinsx, double xlow, double xup, int nbinsy, double ylow,
-                                 double yup, string xTitle, string yTitle, string zTitle)
+TH2F* DQMHistoModuleBase::Create(std::string name, std::string title, int nbinsx, double xlow, double xup, int nbinsy, double ylow,
+                                 double yup, std::string xTitle, std::string yTitle, std::string zTitle)
 {
   TH2F* histogram = new TH2F(name.c_str(), title.c_str(), nbinsx, xlow, xup, nbinsy, ylow, yup);
   histogram->GetXaxis()->SetTitle(xTitle.c_str());
@@ -118,19 +118,19 @@ TH2F* DQMHistoModuleBase::Create(string name, string title, int nbinsx, double x
   return histogram;
 }
 
-string DQMHistoModuleBase::SensorNameDescription(VxdID sensorID)
+std::string DQMHistoModuleBase::SensorNameDescription(VxdID sensorID)
 {
   return str(format("%1%_%2%_%3%") % sensorID.getLayerNumber() % sensorID.getLadderNumber() % sensorID.getSensorNumber());
 }
 
-string DQMHistoModuleBase::SensorTitleDescription(VxdID sensorID)
+std::string DQMHistoModuleBase::SensorTitleDescription(VxdID sensorID)
 {
   return str(format("Layer %1% Ladder %2% Sensor %3%") % sensorID.getLayerNumber() % sensorID.getLadderNumber() %
              sensorID.getSensorNumber());
 }
 
 TH1F** DQMHistoModuleBase::CreateLayers(boost::format nameTemplate, boost::format titleTemplate, int nbinsx, double xlow,
-                                        double xup, string xTitle, string yTitle)
+                                        double xup, std::string xTitle, std::string yTitle)
 {
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   auto gTools = geo.getGeoTools();
@@ -140,8 +140,8 @@ TH1F** DQMHistoModuleBase::CreateLayers(boost::format nameTemplate, boost::forma
   for (VxdID layer : geo.getLayers()) {
     int layerNumber = layer.getLayerNumber();
     int layerIndex = gTools->getLayerIndex(layerNumber);
-    string name = str(nameTemplate % layerNumber);
-    string title = str(titleTemplate % layerNumber);
+    std::string name = str(nameTemplate % layerNumber);
+    std::string title = str(titleTemplate % layerNumber);
     output[layerIndex] = Create(name, title, nbinsx, xlow, xup, xTitle, yTitle);
   }
 
@@ -149,7 +149,7 @@ TH1F** DQMHistoModuleBase::CreateLayers(boost::format nameTemplate, boost::forma
 }
 
 TH2F** DQMHistoModuleBase::CreateLayers(boost::format nameTemplate, boost::format titleTemplate, int nbinsx, double xlow,
-                                        double xup, int nbinsy, double ylow, double yup, string xTitle, string yTitle, string zTitle)
+                                        double xup, int nbinsy, double ylow, double yup, std::string xTitle, std::string yTitle, std::string zTitle)
 {
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   auto gTools = geo.getGeoTools();
@@ -159,8 +159,8 @@ TH2F** DQMHistoModuleBase::CreateLayers(boost::format nameTemplate, boost::forma
   for (VxdID layer : geo.getLayers()) {
     int layerNumber = layer.getLayerNumber();
     int layerIndex = gTools->getLayerIndex(layerNumber);
-    string name = str(nameTemplate % layerNumber);
-    string title = str(titleTemplate % layerNumber);
+    std::string name = str(nameTemplate % layerNumber);
+    std::string title = str(titleTemplate % layerNumber);
     output[layerIndex] = Create(name, title, nbinsx, xlow, xup, nbinsy, ylow, yup, xTitle, yTitle, zTitle);
   }
 
@@ -168,7 +168,7 @@ TH2F** DQMHistoModuleBase::CreateLayers(boost::format nameTemplate, boost::forma
 }
 
 TH1F** DQMHistoModuleBase::CreateSensors(boost::format nameTemplate, boost::format titleTemplate, int nbinsx, double xlow,
-                                         double xup, string xTitle, string yTitle)
+                                         double xup, std::string xTitle, std::string yTitle)
 {
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   auto gTools = geo.getGeoTools();
@@ -178,8 +178,8 @@ TH1F** DQMHistoModuleBase::CreateSensors(boost::format nameTemplate, boost::form
 
   for (int sensorIndex = 0; sensorIndex < nVXDSensors; sensorIndex++) {
     VxdID sensorID = gTools->getSensorIDFromIndex(sensorIndex);
-    string name = str(nameTemplate % SensorNameDescription(sensorID));
-    string title = str(titleTemplate % SensorTitleDescription(sensorID));
+    std::string name = str(nameTemplate % SensorNameDescription(sensorID));
+    std::string title = str(titleTemplate % SensorTitleDescription(sensorID));
     output[sensorIndex] = Create(name, title, nbinsx, xlow, xup, xTitle, yTitle);
   }
 
@@ -187,7 +187,7 @@ TH1F** DQMHistoModuleBase::CreateSensors(boost::format nameTemplate, boost::form
 }
 
 TH2F** DQMHistoModuleBase::CreateSensors(boost::format nameTemplate, boost::format titleTemplate, int nbinsx, double xlow,
-                                         double xup, int nbinsy, double ylow, double yup, string xTitle, string yTitle, string zTitle)
+                                         double xup, int nbinsy, double ylow, double yup, std::string xTitle, std::string yTitle, std::string zTitle)
 {
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   auto gTools = geo.getGeoTools();
@@ -197,8 +197,8 @@ TH2F** DQMHistoModuleBase::CreateSensors(boost::format nameTemplate, boost::form
 
   for (int sensorIndex = 0; sensorIndex < nVXDSensors; sensorIndex++) {
     VxdID sensorID = gTools->getSensorIDFromIndex(sensorIndex);
-    string name = str(nameTemplate % SensorNameDescription(sensorID));
-    string title = str(titleTemplate % SensorTitleDescription(sensorID));
+    std::string name = str(nameTemplate % SensorNameDescription(sensorID));
+    std::string title = str(titleTemplate % SensorTitleDescription(sensorID));
     output[sensorIndex] = Create(name, title, nbinsx, xlow, xup, nbinsy, ylow, yup, xTitle, yTitle, zTitle);
   }
 
@@ -392,10 +392,10 @@ void DQMHistoModuleBase::DefineTRClusters()
     int layerIndex = gTools->getLayerIndex(layerNumber);
 
     /** Track related clusters - neighbor corelations in Phi */
-    string name = str(format("CorrelationsPhiLayers_%1%_%2%") % layerNumber % (layerNumber + 1));
-    string title = str(format("Correlations in Phi for Layers %1% %2%") % layerNumber % (layerNumber + 1));
-    string xTitle = str(format("angle layer %1% [deg]") % layerNumber);
-    string yTitle = str(format("angle layer %1% [deg]") % (layerNumber + 1));
+    std::string name = str(format("CorrelationsPhiLayers_%1%_%2%") % layerNumber % (layerNumber + 1));
+    std::string title = str(format("Correlations in Phi for Layers %1% %2%") % layerNumber % (layerNumber + 1));
+    std::string xTitle = str(format("angle layer %1% [deg]") % layerNumber);
+    std::string yTitle = str(format("angle layer %1% [deg]") % (layerNumber + 1));
     m_TRClusterCorrelationsPhi[layerIndex] = Create(name, title, nbins, -range, range, nbins, -range, range,
                                                     xTitle, yTitle, "counts");
 
@@ -596,7 +596,8 @@ void DQMHistoModuleBase::ComputeMean(TH1F* output, TH2F* input, bool onX)
   }
 }
 
-void DQMHistoModuleBase::ProcessHistogramParameterChange(const string& name, const string& parameter, const string& value)
+void DQMHistoModuleBase::ProcessHistogramParameterChange(const std::string& name, const std::string& parameter,
+                                                         const std::string& value)
 {
   TH1* histogram = nullptr;
 
@@ -611,17 +612,17 @@ void DQMHistoModuleBase::ProcessHistogramParameterChange(const string& name, con
   } else {
     try {
       EditHistogramParameter(histogram, parameter, value);
-    } catch (const invalid_argument& e) {
+    } catch (const std::invalid_argument& e) {
       B2WARNING("Value " + value + " of parameter " + parameter + " for histogram " + histogram->GetName() +
                 " could not be parsed, parameter change is skipped in " + getName() + ".");
-    } catch (const out_of_range& e) {
+    } catch (const std::out_of_range& e) {
       B2WARNING("Value " + value + " of parameter " + parameter + " for histogram " + histogram->GetName() +
                 " is out of range, parameter change is skipped in " + getName() + ".");
     }
   }
 }
 
-void DQMHistoModuleBase::EditHistogramParameter(TH1* histogram, const string& parameter, string value)
+void DQMHistoModuleBase::EditHistogramParameter(TH1* histogram, const std::string& parameter, std::string value)
 {
   if (parameter == "title") {
     histogram->SetTitle(value.c_str());

@@ -26,7 +26,6 @@
 #include <minimizer.h>
 #endif
 
-using namespace std;
 using Eigen::VectorXd;
 using Eigen::Vector3d;
 using Eigen::MatrixXd;
@@ -59,10 +58,10 @@ namespace Belle2::BoostVectorCalib {
 
 
   // Read events from TTree to std::vector
-  vector<Event> getEvents(TTree* tr)
+  std::vector<Event> getEvents(TTree* tr)
   {
 
-    vector<Event> events;
+    std::vector<Event> events;
     events.reserve(tr->GetEntries());
 
     Event evt;
@@ -121,7 +120,7 @@ namespace Belle2::BoostVectorCalib {
 
 
   /** Convert vector of vectors (i.e. columns) to Eigen matrix  */
-  MatrixXd toMat(const vector<vector<double>>& vecs)
+  MatrixXd toMat(const std::vector<std::vector<double>>& vecs)
   {
     MatrixXd mat(vecs[0].size(), vecs.size());
 
@@ -133,7 +132,7 @@ namespace Belle2::BoostVectorCalib {
 
 
   /** Rapidities of particles with momenta vecs wrt the input boost vector (tanAngleX, tanAnlgeY) (in mili-units) */
-  vector<double> getRapidities(vector<TVector3> vecs, vector<double> boostDir)
+  std::vector<double> getRapidities(std::vector<TVector3> vecs, std::vector<double> boostDir)
   {
     TVector3 boost(boostDir[0], boostDir[1], 1);
     boost = boost.Unit();
@@ -156,19 +155,19 @@ namespace Belle2::BoostVectorCalib {
   }
 
   /** Fit the tanAngleX and tanAngleY of the boost vector */
-  vector<double> fitBoostFast(const vector<Event>& evts)
+  std::vector<double> fitBoostFast(const std::vector<Event>& evts)
   {
-    vector<double> vCos, vSin, vData;
+    std::vector<double> vCos, vSin, vData;
 
     for (const auto& e : evts) {
       if (e.nBootStrap * e.isSig == 0) continue;
-      vector<TVector3> vecs = {e.mu0.p, e.mu1.p};
+      std::vector<TVector3> vecs = {e.mu0.p, e.mu1.p};
 
 
       TVector3 n = vecs[0].Cross(vecs[1]);
       double phi = n.Phi();
       double angle = M_PI / 2 - n.Theta();
-      auto res = make_pair(phi, tan(angle));
+      auto res = std::make_pair(phi, tan(angle));
 
       for (int i = 0; i < e.nBootStrap * e.isSig; ++i) {
         vCos.push_back(cos(res.first));
@@ -183,7 +182,7 @@ namespace Belle2::BoostVectorCalib {
     fun.mat = toMat({vCos, vSin, vData});
     fun.res.resize(vCos.size());
 
-    auto res = getMinimum(fun, 130e-3 , 170e-3, -20e-3, 20e-3);
+    auto res = getMinimum(fun, 130e-3, 170e-3, -20e-3, 20e-3);
 
 
     return res;
@@ -197,9 +196,9 @@ namespace Belle2::BoostVectorCalib {
     @param rapCut: Cut on rapidity in CMS system, to suppress forward/backward topology where detector acceptance is limited
     @return A filtered vector of events
   */
-  vector<Event> filter(const vector<Event>& evts, const vector<double>& boostDir, double pidCut, double rapCut)
+  std::vector<Event> filter(const std::vector<Event>& evts, const std::vector<double>& boostDir, double pidCut, double rapCut)
   {
-    vector<Event> evtsF;
+    std::vector<Event> evtsF;
 
     for (const auto& e : evts) {
       for (int i = 0; i < e.nBootStrap * e.isSig; ++i) {
@@ -209,8 +208,8 @@ namespace Belle2::BoostVectorCalib {
           continue;
         }
 
-        vector<TVector3> vecs = {e.mu0.p, e.mu1.p};
-        vector<double> raps = getRapidities(vecs, boostDir);
+        std::vector<TVector3> vecs = {e.mu0.p, e.mu1.p};
+        std::vector<double> raps = getRapidities(vecs, boostDir);
 
         double yDiff = abs(raps[0] - raps[1]) / 2;
 
@@ -227,16 +226,16 @@ namespace Belle2::BoostVectorCalib {
 
 
   /** fit the BoostVector magnitude with boost direction vector as input */
-  double fitBoostMagnitude(const vector<Event>& evts, const vector<double>& boostDir)
+  double fitBoostMagnitude(const std::vector<Event>& evts, const std::vector<double>& boostDir)
   {
 
-    vector<double> yAvgVec;
+    std::vector<double> yAvgVec;
 
     for (auto e : evts) {
       if (e.nBootStrap * e.isSig == 0) continue;
-      vector<TVector3> vecs = {e.mu0.p, e.mu1.p};
+      std::vector<TVector3> vecs = {e.mu0.p, e.mu1.p};
 
-      vector<double> raps = getRapidities(vecs, boostDir);
+      std::vector<double> raps = getRapidities(vecs, boostDir);
 
       double yAvg = (raps[0] + raps[1]) / 2.;
       for (int i = 0; i < e.nBootStrap * e.isSig; ++i) {
@@ -250,7 +249,7 @@ namespace Belle2::BoostVectorCalib {
 
   /** Structure to store all bootstrap replicas */
   struct VectorVar {
-    vector<Vector3d> vecs; ///< Vector of replicas
+    std::vector<Vector3d> vecs; ///< Vector of replicas
 
     /** Add replica */
     void add(Vector3d v) { vecs.push_back(v); }
@@ -277,10 +276,10 @@ namespace Belle2::BoostVectorCalib {
 
 
   /** run boost vector calibration over evts */
-  TVector3 getBoostVector(const vector<Event>& evts)
+  TVector3 getBoostVector(const std::vector<Event>& evts)
   {
     // Get the direction of the boost vector (tanXZ and tanYZ)
-    vector<double> boostDir = fitBoostFast(evts);
+    std::vector<double> boostDir = fitBoostFast(evts);
 
     // Get the rapidity of the boost vector
     double yMag = fitBoostMagnitude(evts, boostDir);
@@ -298,7 +297,7 @@ namespace Belle2::BoostVectorCalib {
   }
 
   /** run boost vector calibration for several bootstrap replicas to get unc. */
-  pair<Vector3d, Matrix3d>  getBoostAndError(vector<Event> evts)
+  std::pair<Vector3d, Matrix3d>  getBoostAndError(std::vector<Event> evts)
   {
     evts = filter(evts, {151.986e-3 /*TanNomAngle*/, 0}, 0.9/*muon pid*/,  1.0 /*rap cut*/);
 
@@ -314,14 +313,14 @@ namespace Belle2::BoostVectorCalib {
       Vector3d boost(b.X(), b.Y(), b.Z());
       var.add(boost);
     }
-    return make_pair(var.getNom(), var.getCov());
+    return std::make_pair(var.getNom(), var.getCov());
 
   }
 
   /** cluster events in evts vector to several pieces according to the splitPoints (times of partitions) */
-  vector<vector<Event>> separate(const vector<Event>& evts, const vector<double>& splitPoints)
+  std::vector<std::vector<Event>> separate(const std::vector<Event>& evts, const std::vector<double>& splitPoints)
   {
-    vector<vector<Event>> evtsOut(splitPoints.size() + 1);
+    std::vector<std::vector<Event>> evtsOut(splitPoints.size() + 1);
 
     for (const auto& ev : evts) {
       for (int i = 0; i < int(splitPoints.size()) - 1; ++i) {
@@ -347,20 +346,20 @@ namespace Belle2::BoostVectorCalib {
 
   // Returns tuple with the boost vector parameters
   // cppcheck-suppress passedByValue
-  tuple<vector<VectorXd>, vector<MatrixXd>, MatrixXd>  runBoostVectorAnalysis(vector<Event> evts,
-      const vector<double>& splitPoints)
+  std::tuple<std::vector<VectorXd>, std::vector<MatrixXd>, MatrixXd>  runBoostVectorAnalysis(std::vector<Event> evts,
+      const std::vector<double>& splitPoints)
   {
     int n = splitPoints.size() + 1;
-    vector<VectorXd>     boostVec(n);
-    vector<MatrixXd>  boostVecUnc(n);
+    std::vector<VectorXd>     boostVec(n);
+    std::vector<MatrixXd>  boostVecUnc(n);
     MatrixXd          boostVecSpred;
 
-    vector<vector<Event>> evtsSep = separate(evts, splitPoints);
+    std::vector<std::vector<Event>> evtsSep = separate(evts, splitPoints);
 
 
     for (int i = 0; i < n; ++i) {
 
-      tie(boostVec[i], boostVecUnc[i]) =  getBoostAndError(evtsSep[i]);
+      std::tie(boostVec[i], boostVecUnc[i]) =  getBoostAndError(evtsSep[i]);
 
 
       // TanThetaXZ of boostVector [mrad]
@@ -380,7 +379,7 @@ namespace Belle2::BoostVectorCalib {
     // Spread is currently not calculated
     boostVecSpred = MatrixXd::Zero(3, 3);
 
-    return make_tuple(boostVec, boostVecUnc, boostVecSpred);
+    return std::make_tuple(boostVec, boostVecUnc, boostVecSpred);
   }
 
 }

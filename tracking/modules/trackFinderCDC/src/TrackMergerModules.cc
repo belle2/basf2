@@ -14,11 +14,11 @@ REG_MODULE(TFCDC_TrackLinker);
 REG_MODULE(TFCDC_TrackCombiner);
 
 TFCDC_TrackLinkerModule::TFCDC_TrackLinkerModule()
-  : Super( {"CDCTrackVector"})
+  : Super({"CDCTrackVector"})
 {
 }
 
 TFCDC_TrackCombinerModule::TFCDC_TrackCombinerModule()
-  : Super( {"" /*to be set externally*/, "" /*to be set externally*/, ""  /*to be set externally*/})
+  : Super({"" /*to be set externally*/, "" /*to be set externally*/, ""  /*to be set externally*/})
 {
 }

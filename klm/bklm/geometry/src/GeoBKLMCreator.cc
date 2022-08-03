@@ -30,7 +30,6 @@
 #include <G4UnionSolid.hh>
 #include <G4VisAttributes.hh>
 
-using namespace std;
 using namespace Belle2::bklm;
 using namespace Belle2::geometry;
 

@@ -52,6 +52,7 @@ namespace Belle2 {
       virtual std::vector<std::vector<float>> applyMulticlass(Dataset& test_data) const
       {
 
+        B2ERROR("Attempted to call applyMulticlass() of the abstract base class MVA::Expert. All methods that support multiclass classification should override this definition.");
         (void) test_data;
 
         return std::vector<std::vector<float>>();

@@ -34,3 +34,13 @@ PyDBObj::PyDBObj(const std::string& name, bool required): PyDBObj(name, getDefau
 PyDBObj::PyDBObj(const TClass* objClass, bool required): PyDBObj(DataStore::defaultObjectName(objClass), objClass, required) {}
 
 PyDBObj::PyDBObj(const std::string& name, const TClass* objClass, bool required): DBAccessorBase(name, objClass, false, required) {}
+
+PyObject* PyDBObj::getIntraRunBoundariesList() const
+{
+  PyObject* list = PyList_New(0);
+  // Currently, the boundaries are defined only as unsigned int.
+  // If in the future this will change, this method has to be updated accordingly.
+  for (auto boundary : getIntraRunBoundaries())
+    PyList_Append(list, PyLong_FromUnsignedLong(boundary));
+  return list;
+}

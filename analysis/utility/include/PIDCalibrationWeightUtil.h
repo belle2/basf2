@@ -28,7 +28,7 @@ namespace Belle2 {
      */
     PIDCalibrationWeightUtil()
     {
-      m_pidWeightDB = new DBObjPtr<PIDCalibrationWeight>();
+      m_pidWeightDB = std::make_unique<DBObjPtr<PIDCalibrationWeight>>();
 
       if (!(*m_pidWeightDB))
         B2FATAL("The dbobject PIDCalibrationWeight could not be found! It is necessary for the weighted PID variables.");
@@ -40,7 +40,7 @@ namespace Belle2 {
     PIDCalibrationWeightUtil(std::string matrixName)
     {
       m_matrixName = matrixName;
-      m_pidWeightDB = new DBObjPtr<PIDCalibrationWeight>(m_matrixName);
+      m_pidWeightDB = std::make_unique<DBObjPtr<PIDCalibrationWeight>>(m_matrixName);
 
       if (!(*m_pidWeightDB))
         B2FATAL("The dbobject PIDCalibrationWeight, " << m_matrixName <<
@@ -73,7 +73,7 @@ namespace Belle2 {
 
   private:
     std::string m_matrixName = "PIDCalibrationWeight"; /**< name of the matrix. */
-    DBObjPtr<PIDCalibrationWeight>* m_pidWeightDB = 0; /**< db object for the calibration weight matrix. */
+    std::unique_ptr<DBObjPtr<PIDCalibrationWeight>> m_pidWeightDB; /**< db object for the calibration weight matrix. */
 
   };
 

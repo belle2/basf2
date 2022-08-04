@@ -163,12 +163,13 @@ namespace Belle2 {
   private:
 
     /** Calculate FourVector of a beam from energy and angle wrt the z-axis.
-     * Negative angles will be treated as angle = M_PI - fabs(angle)
+     * if dir=-1, angles are measured wrt -p instead of p
      * @param energy beam energy
      * @param angleX horizontal angle wrt z-axis
      * @param angleY vertical angle wrt z-axis
+     * @param dir  direction of the beam, dir=1 for HER and dir=-1 for LER
      */
-    static ROOT::Math::PxPyPzEVector getFourVector(double energy, double angleX, double angleY);
+    static ROOT::Math::PxPyPzEVector getFourVector(double energy, double angleX, double angleY, int dir);
 
     /** Set covariance matrix from vector of entries.
      *

@@ -28,14 +28,14 @@ namespace {
 
 void BeamParameters::setLER(double energy, double angleX, double angleY, const std::vector<double>& cov)
 {
-  ROOT::Math::PxPyPzEVector vec = getFourVector(energy, angleX, angleY, -1);
+  ROOT::Math::PxPyPzEVector vec = getFourVector(energy, angleX, angleY, false);
   setLER(vec);
   setCovMatrix(m_covLER, cov, false);
 }
 
 void BeamParameters::setHER(double energy, double angleX, double angleY, const std::vector<double>& cov)
 {
-  ROOT::Math::PxPyPzEVector vec = getFourVector(energy, angleX, angleY, +1);
+  ROOT::Math::PxPyPzEVector vec = getFourVector(energy, angleX, angleY, true);
   setHER(vec);
   setCovMatrix(m_covHER, cov, false);
 }
@@ -46,14 +46,14 @@ void BeamParameters::setVertex(const TVector3& vertex, const std::vector<double>
   setCovMatrix(m_covVertex, cov, true);
 }
 
-ROOT::Math::PxPyPzEVector BeamParameters::getFourVector(double energy, double angleX, double angleY, int dir)
+ROOT::Math::PxPyPzEVector BeamParameters::getFourVector(double energy, double angleX, double angleY, bool isHER)
 {
-  double p = sqrt(pow(energy, 2) - pow(Const::electronMass, 2));
+  double p   = sqrt(pow(energy, 2) - pow(Const::electronMass, 2));
+  double dir = isHER ? 1 : -1;
 
   double pz = dir * p / sqrt(1 + pow(tan(angleX), 2) + pow(tan(angleY), 2));
 
   return ROOT::Math::PxPyPzEVector(pz * tan(angleX), pz * tan(angleY), pz, energy);
-
 }
 
 TMatrixDSym BeamParameters::getCovMatrix(const Double32_t* member)

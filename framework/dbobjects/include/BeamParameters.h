@@ -163,13 +163,14 @@ namespace Belle2 {
   private:
 
     /** Calculate FourVector of a beam from energy and angle wrt the z-axis.
-     * if dir=-1, angles are measured wrt -p instead of p
+     * if isHER=true,  the angles are measured wrt +p
+     * if isHER=false, the angles are measured wrt -p, as is the standard convention for LER
      * @param energy beam energy
      * @param angleX horizontal angle wrt z-axis
      * @param angleY vertical angle wrt z-axis
-     * @param dir  direction of the beam, dir=1 for HER and dir=-1 for LER
+     * @param isHER  isHER=true for HER, isHER=false for LER
      */
-    static ROOT::Math::PxPyPzEVector getFourVector(double energy, double angleX, double angleY, int dir);
+    static ROOT::Math::PxPyPzEVector getFourVector(double energy, double angleX, double angleY, bool isHER);
 
     /** Set covariance matrix from vector of entries.
      *

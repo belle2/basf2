@@ -61,6 +61,7 @@ import datetime
 import timeit
 import xml.etree.cElementTree as ET
 from collections import defaultdict
+from b2test_utils import is_ci
 
 # allow stopping tests with Ctrl+c
 import signal
@@ -134,7 +135,11 @@ def run_test(argument):
     name, release_dir = argument
     ext = os.path.splitext(name)[1]
     if ext == ".ipynb":
-        return run_test_ipynb(argument)
+        # FIXME: we temporarily ignore the jupyter tests on our CI pipeline
+        if is_ci():
+            return (None, "Temporarily skipped on our CI pipeline", 0, "")
+        else:
+            return run_test_ipynb(argument)
     elif ext == ".py":
         return run_test_py(argument)
     else:

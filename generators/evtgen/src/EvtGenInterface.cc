@@ -109,7 +109,8 @@ int EvtGenInterface::setup(const std::string& DECFileName, const std::string& pa
 }
 
 
-int EvtGenInterface::simulateEvent(MCParticleGraph& graph, ROOT::Math::PxPyPzEVector pParentParticle, TVector3 pPrimaryVertex,
+int EvtGenInterface::simulateEvent(MCParticleGraph& graph, ROOT::Math::PxPyPzEVector pParentParticle,  TVector3 beamCMS,
+                                   TVector3 pPrimaryVertex,
                                    int inclusiveType, const std::string& inclusiveParticle)
 {
   EvtId inclusiveParticleID, inclusiveAntiParticleID;
@@ -134,7 +135,19 @@ int EvtGenInterface::simulateEvent(MCParticleGraph& graph, ROOT::Math::PxPyPzEVe
   do {
     m_logCaptureDebug.start();
     m_parent = EvtParticleFactory::particleFactory(m_ParentParticle, m_pinit);
-    m_parent->setVectorSpinDensity();
+
+
+    // spin-density matrix for Vector particle produced in e+e-
+    EvtSpinDensity rho;
+    //Set helicity +1 and -1 to 1.
+    rho.setDiag(m_parent->getSpinStates());
+    rho.set(1, 1, EvtComplex(0.0, 0.0));
+
+    // set spin-density matrix, polarisation axis in CMS defined by alpha,beta Euler angles
+    double alpha = beamCMS.Phi(), beta = beamCMS.Theta(), gamma = 0;
+    m_parent->setSpinDensityForwardHelicityBasis(rho, alpha, beta, gamma);
+
+
     m_Generator->generateDecay(m_parent);
     m_logCaptureDebug.finish();
 

@@ -16,6 +16,7 @@
 #include <framework/core/Module.h>
 
 #include <string>
+#include <utility>
 
 namespace Belle2 {
 
@@ -54,8 +55,8 @@ namespace Belle2 {
      * @param maxMass maximum mass for the beam particle to be accepted
      * @return lorentzvector of the compound beam particle
      */
-    ROOT::Math::PxPyPzEVector createBeamParticle(double minMass = 0.0,
-                                                 double maxMass = std::numeric_limits<double>::infinity());
+    std::pair<ROOT::Math::PxPyPzEVector, TVector3> createBeamParticle(double minMass = 0.0,
+        double maxMass = std::numeric_limits<double>::infinity());
 
     MCParticleGraph mpg;        /**< An instance of the MCParticle graph. */
     EvtGenInterface m_Ievtgen;  /**< An instance of the EvtGen Interface. */

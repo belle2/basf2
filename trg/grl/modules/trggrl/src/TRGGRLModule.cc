@@ -86,7 +86,6 @@ namespace Belle2 {
     string cfn = _configFilename;
 
     //...GRL...
-    cout << "test, calling trggrl" << endl;
     if (_grl == 0) {
       _grl = TRGGRL::getTRGGRL(cfn,
                                _simulationMode,

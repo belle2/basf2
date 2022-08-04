@@ -194,10 +194,10 @@ CDCTriggerNeuroModule::event()
     if (m_neuroTrackInputMode) {
       quadrant = m_tracks2D[itrack]->getQuadrant();
     } else {
-      if (tphi > -1 * M_PI_4 && tphi <  1 * M_PI_4) { quadrant = 0; }
-      else if (tphi >  1 * M_PI_4 && tphi <  3 * M_PI_4) { quadrant = 1; }
-      else if (tphi >  3 * M_PI_4 || tphi < -3 * M_PI_4) { quadrant = 2; }
-      else if (tphi > -3 * M_PI_4 && tphi < -1 * M_PI_4) { quadrant = 3; }
+      if (tphi > -1 * M_PI_4 && tphi <  1 * M_PI_4) { quadrant = 3; }
+      else if (tphi >  1 * M_PI_4 && tphi <  3 * M_PI_4) { quadrant = 0; }
+      else if (tphi >  3 * M_PI_4 || tphi < -3 * M_PI_4) { quadrant = 1; }
+      else if (tphi > -3 * M_PI_4 && tphi < -1 * M_PI_4) { quadrant = 2; }
     }
 
 

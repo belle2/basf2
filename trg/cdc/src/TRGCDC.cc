@@ -2514,7 +2514,7 @@ namespace Belle2 {
       if (! f) {
         newFrontEnd = true;
         const string name = "CDCFrontEnd" + TRGUtil::itostring(fid);
-        TCFrontEnd::boardType t = TCFrontEnd::unknown;
+        TCFrontEnd::boardType t;
         if (sl == 0) {
           if (_wires[wid]->localLayerId() < 5)
             t = TCFrontEnd::innerInside;
@@ -2539,7 +2539,7 @@ namespace Belle2 {
       // part, well, seems not good in coding
       //
       bool newMerger = false;
-      TCMerger* m = 0;
+      TCMerger* m = nullptr;
       if (newFrontEnd) {
         if (mid != 99999) {
           if (mid < _mergers.size())
@@ -2548,7 +2548,7 @@ namespace Belle2 {
             newMerger = true;
             const string name = "CDCMerger" + TRGUtil::itostring(sl) +
                                 "-" + TRGUtil::itostring(lastMergerLocalId);
-            TCMerger::unitType mt = TCMerger::unknown;
+            TCMerger::unitType mt;
             if (sl == 0)
               mt = TCMerger::innerType;
             else
@@ -2584,7 +2584,7 @@ namespace Belle2 {
             t = _tsfboards[tid];
           if (!t) {
             const string name = "CDCTSFBoard" + TRGUtil::itostring(tid);
-            TSFinder::boardType tt = TSFinder::unknown;
+            TSFinder::boardType tt;
             if (_wires[wid]->superLayerId() == 0)
               tt = TSFinder::innerType;
             else

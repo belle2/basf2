@@ -131,8 +131,8 @@ namespace Belle2 {
 
       // average values - to print in terminate()
       const auto& module = geo->getModule(trk.getModuleID());
-      m_avrgMomentum += module.momentumToLocal(trk.getExtHit()->getMomentum());
-      m_avrgPosition += module.pointToLocal(trk.getExtHit()->getPosition());
+      m_avrgMomentum += module.momentumToLocal(trk.getExtHit()->getMomentumTVector3());
+      m_avrgPosition += module.pointToLocal(trk.getExtHit()->getPositionTVector3());
       m_numTracks++;
       m_slotIDs.emplace(trk.getModuleID());
       m_PDGCodes.emplace(trk.getPDGCode());

@@ -103,7 +103,7 @@ namespace Belle2 {
                 " after lockdown! This is unintended behavior - doing nothing instead...");
         return;
       }
-      B2DEBUG(5, "FilterMill::add2HitFilter: filter " << newFilter.first << " added");
+      B2DEBUG(20, "FilterMill::add2HitFilter: filter " << newFilter.first << " added");
       m_2Hitfilters.push_back(std::move(newFilter));
     }
 
@@ -116,7 +116,7 @@ namespace Belle2 {
                 " after lockdown! This is unintended behavior - doing nothing instead...");
         return;
       }
-      B2DEBUG(5, "FilterMill::add3HitFilter: filter " << newFilter.first << " added");
+      B2DEBUG(20, "FilterMill::add3HitFilter: filter " << newFilter.first << " added");
       m_3Hitfilters.push_back(std::move(newFilter));
     }
 
@@ -129,7 +129,7 @@ namespace Belle2 {
                 " after lockdown! This is unintended behavior - doing nothing instead...");
         return;
       }
-      B2DEBUG(5, "FilterMill::add4HitFilter: filter " << newFilter.first << " added");
+      B2DEBUG(20, "FilterMill::add4HitFilter: filter " << newFilter.first << " added");
       m_4Hitfilters.push_back(std::move(newFilter));
     }
 
@@ -139,7 +139,7 @@ namespace Belle2 {
                        std::vector<std::pair<std::string, double> >& collectedData) const
     {
       checkLocked("grindData2Hit");
-      if (m_2Hitfilters.empty()) { B2DEBUG(5, "there are no 2-hit-filters stored, skipping grinding"); return; }
+      if (m_2Hitfilters.empty()) { B2DEBUG(20, "there are no 2-hit-filters stored, skipping grinding"); return; }
 
       std::vector<std::pair<std::string, double>> tempData;
       try {
@@ -162,7 +162,7 @@ namespace Belle2 {
 
       collectedData.insert(collectedData.end(), tempData.begin(), tempData.end());
 
-      B2DEBUG(5, "FilterMill::grindData2Hit: collectedData has now " << collectedData.size() << " entries");
+      B2DEBUG(20, "FilterMill::grindData2Hit: collectedData has now " << collectedData.size() << " entries");
     }
 
 
@@ -171,7 +171,7 @@ namespace Belle2 {
                        std::vector<std::pair<std::string, double> >& collectedData) const
     {
       checkLocked("grindData3Hit");
-      if (m_3Hitfilters.empty()) { B2DEBUG(5, "there are no 3-hit-filters stored, skipping grinding"); return; }
+      if (m_3Hitfilters.empty()) { B2DEBUG(20, "there are no 3-hit-filters stored, skipping grinding"); return; }
 
       std::vector<std::pair<std::string, double>> tempData;
       try {
@@ -194,7 +194,7 @@ namespace Belle2 {
       }
       collectedData.insert(collectedData.end(), tempData.begin(), tempData.end());
 
-      B2DEBUG(5, "FilterMill::grindData3Hit: collectedData has now " << collectedData.size() << " entries");
+      B2DEBUG(20, "FilterMill::grindData3Hit: collectedData has now " << collectedData.size() << " entries");
     }
 
 
@@ -203,7 +203,7 @@ namespace Belle2 {
                        std::vector<std::pair<std::string, double> >& collectedData) const
     {
       checkLocked("grindData4Hit");
-      if (m_4Hitfilters.empty()) { B2DEBUG(5, "there are no 4-hit-filters stored, skipping grinding"); return; }
+      if (m_4Hitfilters.empty()) { B2DEBUG(20, "there are no 4-hit-filters stored, skipping grinding"); return; }
 
       std::vector<std::pair<std::string, double>> tempData;
       try {
@@ -222,7 +222,7 @@ namespace Belle2 {
       }
       collectedData.insert(collectedData.end(), tempData.begin(), tempData.end());
 
-      B2DEBUG(5, "FilterMill::grindData4Hit: collectedData has now " << collectedData.size() << " entries");
+      B2DEBUG(20, "FilterMill::grindData4Hit: collectedData has now " << collectedData.size() << " entries");
     }
 
   };

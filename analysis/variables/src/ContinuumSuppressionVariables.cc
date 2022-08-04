@@ -373,7 +373,7 @@ namespace Belle2 {
 
         auto func = [var, modeisSignal, modeisAuto, maskName](const Particle * particle) -> double {
           StoreObjPtr<RestOfEvent> roe("RestOfEvent");
-          const Particle* Bparticle = roe->getRelated<Particle>();
+          const Particle* Bparticle = roe->getRelatedFrom<Particle>();
           RelationVector<ContinuumSuppression> continuumSuppressionRelations = Bparticle->getRelationsTo<ContinuumSuppression>("ALL");
           ContinuumSuppression* qq = nullptr;
           if (maskName.empty())

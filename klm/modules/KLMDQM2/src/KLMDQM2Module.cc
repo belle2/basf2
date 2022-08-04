@@ -275,7 +275,7 @@ bool KLMDQM2Module::collectDataTrack(
   KLMChannelNumber channel;
   enum KLMChannelStatus::ChannelStatus status;
   struct HitData hitData, hitDataPrevious;
-  TVector3 extHitPosition;
+  ROOT::Math::XYZVector extHitPosition;
   CLHEP::Hep3Vector extHitPositionCLHEP, localPosition;
   int layer;
   int extHitLayer[nExtrapolationLayers] = {0};

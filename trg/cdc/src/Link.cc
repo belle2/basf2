@@ -339,7 +339,6 @@ namespace Belle2 {
           }
         }
       }
-      // cppcheck-suppress knownConditionTrueFalse
       if (MCCOverFlow)
         cout << "(counter overflow)";
       cout << endl;

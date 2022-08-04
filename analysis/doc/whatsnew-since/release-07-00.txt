@@ -7,3 +7,10 @@ Variables
    `weightedPionID`, `weightedKaonID`, `weightedProtonID`, and `weightedDeuteronID`.
    Also, the expert PID variables were added, `pidWeightedLogLikelihoodValueExpert`, `pidWeightedPairProbabilityExpert`,
    and `pidWeightedProbabilityExpert`.
+ * Added the variable `hasCorrectROECombination` to check if the correct combination of the particle that is the basis of
+   the ROE object and the particle that is loaded from the ROE.
+
+Modules
++++++++
+ * Fixed a bug in the :func:`modularAnalysis.fillParticleListFromROE`. The relationship of the pdg code between the loaded
+   particle and the source particle was inconsistent when the loaded particle was not a self-conjugated particle.

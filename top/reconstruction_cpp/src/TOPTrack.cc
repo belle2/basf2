@@ -110,7 +110,7 @@ namespace Belle2 {
       // set track parameters and helix
 
       m_moduleID = m_extHit->getCopyID();
-      m_momentum = m_extHit->getMomentum().Mag();
+      m_momentum = m_extHit->getMomentum().R();
       m_charge = fitResult->getChargeSign();
       m_TOFLength = m_extHit->getTOF() * Const::speedOfLight * getBeta(chargedStable);
       m_valid = setHelix(m_alignment->getRotation(m_moduleID), m_alignment->getTranslation(m_moduleID));
@@ -168,9 +168,9 @@ namespace Belle2 {
 
       const auto* geo = TOPGeometryPar::Instance()->getGeometry();
       const auto& module = geo->getModule(m_moduleID);
-      auto globalPosition = m_extHit->getPosition();
+      auto globalPosition = m_extHit->getPositionTVector3();
       auto position = module.pointGlobalToNominal(globalPosition);
-      auto momentum = module.momentumGlobalToNominal(m_extHit->getMomentum());
+      auto momentum = module.momentumGlobalToNominal(m_extHit->getMomentumTVector3());
       double Bz = BFieldManager::getField(globalPosition).Z();
       m_helix.set(position, momentum, m_charge, Bz);
       m_helix.setTransformation(rotation, translation);

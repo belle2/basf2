@@ -23,7 +23,6 @@ Changes since release-07
 
 .. include:: mva/doc/whatsnew-since/release-07-00.txt
 
-
 Changes since release-06
 ========================
 

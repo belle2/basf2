@@ -3,6 +3,10 @@ Changes in the analysis package in light-2207-bengal
 
 Variables
 +++++++++
+ * Added the variables of the PID probability with the calibration weights, `weightedElectronID`, `weightedMuonID`,
+   `weightedPionID`, `weightedKaonID`, `weightedProtonID`, and `weightedDeuteronID`.
+   Also, the expert PID variables were added, `pidWeightedLogLikelihoodValueExpert`, `pidWeightedPairProbabilityExpert`,
+   and `pidWeightedProbabilityExpert`.
  * Added the variable `hasCorrectROECombination` to check if the correct combination of the particle that is the basis of
    the ROE object and the particle that is loaded from the ROE.
 

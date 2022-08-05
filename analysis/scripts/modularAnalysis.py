@@ -2932,30 +2932,23 @@ def lowEnergyPi0Identification(pi0List, gammaList, payloadNameSuffix,
                                path=None):
     """
     Calculate low-energy pi0 identification.
-    The result is stored as ExtraInfo 'lowEnergyPi0Identification'.
+    The result is stored as ExtraInfo ``lowEnergyPi0Identification``.
 
-    @param[in] pi0List
-    Pi0 list.
-
-    @param[in] gammaList
-    Gamma list. First, an energy cut E > 0.2 is applied
-    to the photons from this list. Then, all possible combinations with a pi0
-    daughter photon are formed except the one corresponding to
-    the reconstructed pi0. The maximum low-energy pi0 veto value is calculated
-    for such photon pairs and used as one of the input variables for
-    the identification classifier.
-
-    @param[in] payloadNameSuffix
-    Payload name suffix. The weight payloads are stored in
-    the analysis global tag and have the following names:
-    'LowEnergyPi0Veto' + payloadNameSuffix
-    'LowEnergyPi0Identification' + payloadNameSuffix
-    The possible suffixes are:
-    * 'Belle1' Belle data.
-    * 'Belle2Release5' Belle II release 5 data (MC14, proc12, buckets 16 - 25).
-
-    @param[in] path
-    Module path.
+    @param pi0List              Pi0 list.
+    @param gammaList            Gamma list. First, an energy cut E > 0.2 is applied
+                                to the photons from this list. Then, all possible combinations with a pi0
+                                daughter photon are formed except the one corresponding to
+                                the reconstructed pi0. The maximum low-energy pi0 veto value is calculated
+                                for such photon pairs and used as one of the input variables for
+                                the identification classifier.
+    @param payloadNameSuffix    Payload name suffix. The weight payloads are stored in
+                                the analysis global tag and have the following names:\n
+                                  * ``'LowEnergyPi0Veto' + payloadNameSuffix``
+                                  * ``'LowEnergyPi0Identification' + payloadNameSuffix``\n
+                                The possible suffixes are:\n
+                                  * ``'Belle1'`` for Belle data.
+                                  * ``'Belle2Release5'`` for Belle II release 5 data (MC14, proc12, buckets 16 - 25).\n
+    @param path                 Module path.
     """
     basf2.conditions.prepend_globaltag(getAnalysisGlobaltag())
     # Select photons with higher energy for formation of veto combinations.

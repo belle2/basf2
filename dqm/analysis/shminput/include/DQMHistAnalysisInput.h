@@ -14,7 +14,6 @@
 
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/core/ModuleParam.templateDetails.h>
 
 #include <daq/dqm/DqmMemFile.h>
 #include <dqm/analysis/modules/DQMHistAnalysis.h>

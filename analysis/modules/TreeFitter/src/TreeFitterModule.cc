@@ -214,6 +214,6 @@ void TreeFitterModule::plotFancyASCII()
          "% of candidates survived the fit.\033[0m");
   B2INFO("\033[1;39m" << 100. - (double)m_nCandidatesAfter / (double)m_nCandidatesBeforeFit * 100.0 <<
          "% of candidates did not.\033[0m");
-  B2INFO("\033[1;39mYou choose to drop all candidates with pValue < " << m_confidenceLevel << ".\033[0m");
+  B2INFO("\033[1;39mYou chose to drop all candidates with pValue < " << m_confidenceLevel << ".\033[0m");
   B2INFO("\033[1;35m================================================================================\033[0m");
 }

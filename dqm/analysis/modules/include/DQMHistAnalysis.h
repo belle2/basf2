@@ -125,9 +125,16 @@ namespace Belle2 {
     DQMHistAnalysisModule();
     virtual ~DQMHistAnalysisModule();
 
+    /**
+     * Helper function for string token split
+     * @param s String to split
+     * @param delim delimiter
+     * @return vector of strings
+     */
+    std::vector <std::string> StringSplit(const std::string& s, const char delim);
+
     // Data members
   private:
-
   };
 } // end namespace Belle2
 

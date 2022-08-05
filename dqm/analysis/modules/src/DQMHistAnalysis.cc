@@ -11,10 +11,9 @@
 //-
 
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <boost/algorithm/string.hpp>
 #include <TROOT.h>
 #include <TClass.h>
-
-
 
 using namespace std;
 using namespace Belle2;
@@ -164,3 +163,11 @@ MonitoringObject* DQMHistAnalysisModule::findMonitoringObject(const std::string&
   B2INFO("MonitoringObject " << objName << " not in memfile.");
   return NULL;
 }
+
+std::vector <std::string> DQMHistAnalysisModule::StringSplit(const std::string& in, const char delim)
+{
+  std::vector <std::string> out;
+  boost::split(out, in, [delim](char c) {return c == delim;});
+  return out;
+}
+

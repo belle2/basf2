@@ -126,7 +126,7 @@ if __name__ == "__main__":
             output_file_name=outputfile)
         main.add_module(trackingVali_0)
     else:
-        B2ERROR("no variable saving module added ...")
+        B2ERROR("no data saving module added ...")
 
     # Process events
     print_path(main)

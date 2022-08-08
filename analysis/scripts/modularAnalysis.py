@@ -1162,7 +1162,7 @@ def fillParticleListFromDummy(decayString,
     @param decayString             specifies type of Particles and determines the name of the ParticleList
     @param mdstIndex               sets the mdst index of Particles
     @param covMatrix               sets the value of the diagonal covariance matrix of Particles
-    @param treatAsInvisible        whethter treeFitter should treat the Particles as invisible
+    @param treatAsInvisible        whether treeFitter should treat the Particles as invisible
     @param writeOut                whether RootOutput module should save the created ParticleList
     @param path                    modules are added to this path
     """
@@ -1442,13 +1442,13 @@ def makeInvisible(
         eraseFourMomentum=True,
         path=None):
     """
-    This module makes one particle in the decay invisible to the treefitter module.
+    This module makes one Particle in the decay invisible to the treefitter module.
 
-    @param motherParticleList Name of the mother particleList
-    @param decayStringTarget  Select the daughter which will be made invisible
-    @param covMatrix          Sets the value of the diagonal covariance matrix of the target Particle
-    @param eraseFourMomentum  If true, the four-momemtum of the invisible particle will be set to zero
-    @param path               Module is added to this path
+    @param motherParticleList name of the mother particleList
+    @param decayStringTarget  select the daughter which will be made invisible
+    @param covMatrix          sets the value of the diagonal covariance matrix of the target Particle
+    @param eraseFourMomentum  if true, the four-momemtum of the invisible particle will be set to zero
+    @param path               module is added to this path
     """
 
     pmake = register_module('InvisibleMaker')
@@ -1499,11 +1499,12 @@ def reconstructMissingKlongDecayExpert(decayString,
 
 def setBeamConstrainedMomentum(particleList, decayStringTarget, decayStringDaughters, copyDaughters=False, path=None):
     """
-    Replace the  four momentum of the selected particles by beam - selected daughters
-    @param particleList
-    @param decayStringTarget
-    @param decayStringDaughters
-    @param copyDaughters
+    Replace the four-momentum of the target Particle by p(beam) - p(selected daughters)
+
+    @param particleList         mother Particlelist
+    @param decayStringTarget    target Particle whose momentum will be updated
+    @param decayStringDaughters selected daughters
+    @param copyDaughters        make a unique copy of the mother's decay chain for each mother Particle
     """
     mod = register_module('ParticleMomentumUpdater')
     mod.set_name('ParticleMomentumUpdater' + particleList)

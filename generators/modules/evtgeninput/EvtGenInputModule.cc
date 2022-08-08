@@ -44,8 +44,6 @@ EvtGenInputModule::EvtGenInputModule() : Module(),
            "particle from the beam energies which fits inside the mass window "
            "before giving up", 100000);
 
-  m_PrimaryVertex = TVector3(0., 0., 0.);
-
 }
 
 
@@ -76,24 +74,15 @@ void EvtGenInputModule::beginRun()
 
 }
 
-std::pair<ROOT::Math::PxPyPzEVector, TVector3> EvtGenInputModule::createBeamParticle(double minMass, double maxMass)
+MCInitialParticles  EvtGenInputModule::createBeamParticle(double minMass, double maxMass)
 {
   // try to generate the 4 momentum a m_maxTries amount of times before we give up
   for (int i = 0; i < m_maxTries; ++i) {
-    const MCInitialParticles& initial = m_initial.generate();
+    const MCInitialParticles initial = m_initial.generate();
 
     // check if we fullfill the mass window
-    if (initial.getMass() >= minMass && initial.getMass() < maxMass) {
-
-      ROOT::Math::PxPyPzEVector beam = initial.getLER() + initial.getHER();
-      m_PrimaryVertex = initial.getVertex();
-
-      // calculate HER momentum in CMS system obtained from pure boost
-      ROOT::Math::PxPyPzEVector pHcms = ROOT::Math::Boost(beam.BoostToCM()) *  initial.getHER();
-      TVector3 beamCMS = TVector3(pHcms.Px(), pHcms.Py(), pHcms.Pz());
-
-      return make_pair(beam, beamCMS);
-    }
+    if (initial.getMass() >= minMass && initial.getMass() < maxMass)
+      return initial;
   }
 
   //Apparently the beam energies don't match the particle mass we want to generate
@@ -102,7 +91,7 @@ std::pair<ROOT::Math::PxPyPzEVector, TVector3> EvtGenInputModule::createBeamPart
           << "maxMass=" << maxMass << " GeV");
 
   //This will never be reached so return empty to avoid warning
-  return make_pair(ROOT::Math::PxPyPzEVector(0, 0, 0, 0), TVector3());
+  return MCInitialParticles();
 }
 
 void EvtGenInputModule::event()
@@ -118,27 +107,24 @@ void EvtGenInputModule::event()
     }
   }
 
-  ROOT::Math::PxPyPzEVector pParentParticle;
-  TVector3 beamCMS;
+  MCInitialParticles initial;
 
   //Initialize the beam energy for each event separatly
   if (EvtPDL::getStdHep(m_parentId) == 10022) {
     //virtual photon (vpho), no mass window, we accept everything
-    tie(pParentParticle, beamCMS) = createBeamParticle();
+    initial = createBeamParticle();
   } else {
     //everything else needs to be in the mass window
-    tie(pParentParticle, beamCMS) = createBeamParticle(EvtPDL::getMinMass(m_parentId),
-                                                       EvtPDL::getMaxMass(m_parentId));
+    initial = createBeamParticle(EvtPDL::getMinMass(m_parentId),
+                                 EvtPDL::getMaxMass(m_parentId));
   }
   //end initialization
 
   //clear existing MCParticles
   mpg.clear();
 
-
   //generate event.
-  int nPart =  m_Ievtgen.simulateEvent(mpg, pParentParticle, beamCMS, m_PrimaryVertex,
-                                       m_inclusiveType, m_inclusiveParticle);
+  int nPart =  m_Ievtgen.simulateEvent(mpg,  initial, m_inclusiveType, m_inclusiveParticle);
 
   B2DEBUG(10, "EvtGen: generated event with " << nPart << " particles.");
 }

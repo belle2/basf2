@@ -95,6 +95,8 @@ namespace Belle2 {
 
     /** type conversion in TVector3 */
     operator TVector3() const { return GetTVector3(); }
+    /** type conversion in XYZVector */
+    operator ROOT::Math::XYZVector() const { return GetXYZVector(); }
 
     /** Comparison for equality with a B2Vector3 */
     bool operator == (const B2Vector3<DataType>& b) const { return X() == b.X() && Y() == b.Y() && Z() == b.Z(); }
@@ -438,6 +440,7 @@ namespace Belle2 {
     void GetXYZ(TVector3* tVec) const;
     /** returns a TVector3 containing the same coordinates */
     TVector3 GetTVector3() const;
+    ROOT::Math::XYZVector GetXYZVector() const;
 
     /** set X/1st-coordinate */
     void SetX(DataType x) { m_coordinates[0] = x; }
@@ -643,6 +646,18 @@ namespace Belle2 {
   {
     return
       TVector3(
+        static_cast<Double_t>(X()),
+        static_cast<Double_t>(Y()),
+        static_cast<Double_t>(Z())
+      );
+  }
+
+  /** returns a XYZVector containing the same coordinates */
+  template< typename DataType >
+  ROOT::Math::XYZVector B2Vector3<DataType>::GetXYZVector() const
+  {
+    return
+      ROOT::Math::XYZVector(
         static_cast<Double_t>(X()),
         static_cast<Double_t>(Y()),
         static_cast<Double_t>(Z())

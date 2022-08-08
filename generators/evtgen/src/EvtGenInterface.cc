@@ -109,15 +109,19 @@ int EvtGenInterface::setup(const std::string& DECFileName, const std::string& pa
 }
 
 
-int EvtGenInterface::simulateEvent(MCParticleGraph& graph, ROOT::Math::PxPyPzEVector pParentParticle,  TVector3 beamCMS,
-                                   TVector3 pPrimaryVertex,
-                                   int inclusiveType, const std::string& inclusiveParticle)
+int EvtGenInterface::simulateEvent(MCParticleGraph& graph,  MCInitialParticles initial, int inclusiveType,
+                                   const std::string& inclusiveParticle)
 {
   EvtId inclusiveParticleID, inclusiveAntiParticleID;
 
   if (!m_ParentInitialized)
     B2FATAL("Parent particle is not initialized.");
   //Init evtgen
+
+  ROOT::Math::PxPyPzEVector pParentParticle = initial.getHER() + initial.getLER();
+  ROOT::Math::PxPyPzEVector herCMS = initial.getBoostedHER();
+  ROOT::Math::XYZVector pPrimaryVertex = initial.getVertex();
+
   m_pinit.set(pParentParticle.E(), pParentParticle.X(), pParentParticle.Y(), pParentParticle.Z());
 
   if (inclusiveType != 0) {
@@ -144,7 +148,7 @@ int EvtGenInterface::simulateEvent(MCParticleGraph& graph, ROOT::Math::PxPyPzEVe
     rho.set(1, 1, EvtComplex(0.0, 0.0));
 
     // set spin-density matrix, polarisation axis in CMS defined by alpha,beta Euler angles
-    double alpha = beamCMS.Phi(), beta = beamCMS.Theta(), gamma = 0;
+    double alpha = herCMS.Phi(), beta = herCMS.Theta(), gamma = 0;
     m_parent->setSpinDensityForwardHelicityBasis(rho, alpha, beta, gamma);
 
 
@@ -211,7 +215,7 @@ int EvtGenInterface::simulateDecay(MCParticleGraph& graph,
   return iPart;
 }
 
-int EvtGenInterface::addParticles2Graph(EvtParticle* top, MCParticleGraph& graph, TVector3 pPrimaryVertex,
+int EvtGenInterface::addParticles2Graph(EvtParticle* top, MCParticleGraph& graph, ROOT::Math::XYZVector pPrimaryVertex,
                                         MCParticleGraph::GraphParticle* parent, double timeOffset)
 {
   //Fill top particle in the tree & starting the queue:
@@ -266,7 +270,7 @@ int EvtGenInterface::addParticles2Graph(EvtParticle* top, MCParticleGraph& graph
 
 
 void EvtGenInterface::updateGraphParticle(EvtParticle* eParticle, MCParticleGraph::GraphParticle* gParticle,
-                                          TVector3 pPrimaryVertex, double timeOffset)
+                                          ROOT::Math::XYZVector pPrimaryVertex, double timeOffset)
 {
   //updating the GraphParticle information from the EvtParticle information
 
@@ -280,10 +284,10 @@ void EvtGenInterface::updateGraphParticle(EvtParticle* eParticle, MCParticleGrap
 
   EvtVector4R Evtpos = eParticle->get4Pos();
 
-  TVector3 pVertex(Evtpos.get(1)*Unit::mm, Evtpos.get(2)*Unit::mm, Evtpos.get(3)*Unit::mm);
+  ROOT::Math::XYZVector pVertex(Evtpos.get(1)*Unit::mm, Evtpos.get(2)*Unit::mm, Evtpos.get(3)*Unit::mm);
   pVertex = pVertex + pPrimaryVertex;
 
-  gParticle->setProductionVertex(pVertex(0), pVertex(1), pVertex(2));
+  gParticle->setProductionVertex(pVertex.x(), pVertex.y(), pVertex.z());
   gParticle->setProductionTime((Evtpos.get(0)*Unit::mm / Const::speedOfLight) + timeOffset);
   gParticle->setValidVertex(true);
 

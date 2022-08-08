@@ -1435,6 +1435,26 @@ def combineAllParticles(inputParticleLists, outputList, cut='', writeOut=False, 
     path.add_module(pmake)
 
 
+def makeInvisible(
+        motherParticleList,
+        decayStringTarget,
+        covMatrix=10000,
+        path=None):
+    """
+    @param motherParticleList Name of the mother particleList
+    @param decayStringTarget  Select the daughter which will be made invisible
+    @param covMatrix          Sets the value of the diagonal covariance matrix of the target Particle
+    @param path               Module is added to this path
+    """
+
+    pmake = register_module('InvisibleMaker')
+    pmake.set_name('InvisibleMaker_' + motherParticleList)
+    pmake.param('motherParticleList', motherParticleList)
+    pmake.param('decayStringTarget', decayStringTarget)
+    pmake.param('dummyCovMatrix', covMatrix)
+    path.add_module(pmake)
+
+
 def reconstructMissingKlongDecayExpert(decayString,
                                        cut,
                                        dmID=0,

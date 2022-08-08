@@ -659,45 +659,54 @@ class InelasticDarkMatterWithDarkHiggs(BaseSkim):
         self.addParticlesToPDG()
 
     def build_lists(self, path):
+        skim_str = "InelasticDarkMatterWithDarkHiggs"
         n_track_event_cut = "[nCleanedTracks([nCDCHits > 20] and [thetaInCDCAcceptance] and [dr < 0.5] and [abs(dz) < 2]) < 5]"
 
-        track_requirements = "[formula(nPXDHits + nSVDHits + nCDCHits) > 6]"
+        track_requirements = "[(nPXDHits + nSVDHits + nCDCHits) > 6]"
         binary_pid_e = "[binaryPID(11, 13) > 0.1]"
         binary_pid_mu = "[binaryPID(11, 13) < 0.9]"
 
-        ma.cutAndCopyList("e+:idmdh", "e+:all", f"[{track_requirements} and {n_track_event_cut} and {binary_pid_e}]", path=path)
-        ma.cutAndCopyList("mu+:idmdh", "mu+:all", f"[{track_requirements} and {n_track_event_cut} and {binary_pid_mu}]", path=path)
+        ma.cutAndCopyList(
+            f"e+:{skim_str}",
+            "e+:all",
+            f"[{track_requirements} and {n_track_event_cut} and {binary_pid_e}]",
+            path=path)
+        ma.cutAndCopyList(
+            f"mu+:{skim_str}",
+            "mu+:all",
+            f"[{track_requirements} and {n_track_event_cut} and {binary_pid_mu}]",
+            path=path)
 
         ma.reconstructDecay(
-            decayString="A0:idmdh -> mu+:idmdh mu-:idmdh",
+            decayString=f"A0:{skim_str} -> mu+:{skim_str} mu-:{skim_str}",
             cut="pt > 0.1",
             path=path
         )
         vertex.treeFit(
-            list_name="A0:idmdh",
+            list_name=f"A0:{skim_str}",
             conf_level=0,
             updateAllDaughters=True,
             path=path,
         )
         ma.reconstructDecay(
-            decayString="chi2:idmdh -> e+:idmdh e-:idmdh",
+            decayString=f"chi2:{skim_str} -> e+:{skim_str} e-:{skim_str}",
             cut="pt > 0.1",
             path=path
         )
         vertex.treeFit(
-            list_name="chi2:idmdh",
+            list_name=f"chi2:{skim_str}",
             conf_level=0,
             updateAllDaughters=True,
             path=path,
         )
 
         dr_cut = "dr >= 0.2"
-        ma.cutAndCopyList("A0:dr", "A0:idmdh", f"[{dr_cut}]", path=path)
-        ma.cutAndCopyList("chi2:dr", "chi2:idmdh", f"[{dr_cut}]", path=path)
+        ma.cutAndCopyList("A0:dr", f"A0:{skim_str}", f"[{dr_cut}]", path=path)
+        ma.cutAndCopyList("chi2:dr", f"chi2:{skim_str}", f"[{dr_cut}]", path=path)
 
         dr_event_cut = "[nParticlesInList(A0:dr) > 0 or nParticlesInList(chi2:dr) > 0]"
         idmdh_event_cuts = f"{dr_event_cut}"
 
         path = self.skim_event_cuts(idmdh_event_cuts, path=path)
 
-        return ["A0:idmdh", "chi2:idmdh"]
+        return [f"A0:{skim_str}", f"chi2:{skim_str}"]

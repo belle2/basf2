@@ -18,8 +18,7 @@
 
 namespace Belle2 {
 
-  /** This module replaces the mass of the particles inside the given particleLists
-  with the invariant mass of the particle corresponding to the given pdgCode. */
+  /**This module makes one Particle in the decay invisible to the treefitter module. */
 
   class InvisibleMakerModule : public Module {
   private:

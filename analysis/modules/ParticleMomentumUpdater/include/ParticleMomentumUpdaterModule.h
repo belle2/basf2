@@ -22,7 +22,7 @@
 
 namespace Belle2 {
 
-  /** This module replaces the momentum of the particles in the target particle list
+  /** This module replaces the momentum of the Particle in the target particle list
   by p(beam) - p(selected daughters). */
 
   class ParticleMomentumUpdaterModule : public Module {

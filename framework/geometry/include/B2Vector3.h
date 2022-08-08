@@ -574,6 +574,16 @@ namespace Belle2 {
     return *this;
   }
 
+  /** Assignment via XYZVector */
+  template< typename DataType >
+  B2Vector3<DataType>& B2Vector3<DataType>::operator = (const ROOT::Math::XYZVector& b)
+  {
+    m_coordinates[0] = b.X();
+    m_coordinates[1] = b.Y();
+    m_coordinates[2] = b.Z();
+    return *this;
+  }
+
   /** addition */
   template< typename DataType >
   B2Vector3<DataType>& B2Vector3<DataType>::operator += (const B2Vector3<DataType>& b)

@@ -11682,12 +11682,13 @@
 [INFO] [40;97m      (_)                 (_)                                                   [0m
 [INFO] [40;97m                                                                                [0m
 [INFO] [1;35m============= TREEFIT STATISTICS ===============================================[0m
+[INFO] [1;39mTarget particle list: K_S0:RD[0m
 [INFO] [1;39mCandidates before fit: 59[0m
 [INFO] [1;39mCandidates after fit:  53[0m
 [INFO] [1;39mA total of 6 candidates were removed during the fit.[0m
 [INFO] [1;39m89.8305% of candidates survived the fit.[0m
 [INFO] [1;39m10.1695% of candidates did not.[0m
-[INFO] [1;39mYou choose to drop all candidates with pValue < 0.[0m
+[INFO] [1;39mYou chose to drop all candidates with pValue < 0.[0m
 [INFO] [1;35m================================================================================[0m
 [INFO] [1;35m================================================================================[0m
 [INFO] [40;97m            ,.,                                                                 [0m
@@ -11711,12 +11712,13 @@
 [INFO] [40;97m      (_)                 (_)                                                   [0m
 [INFO] [40;97m                                                                                [0m
 [INFO] [1;35m============= TREEFIT STATISTICS ===============================================[0m
+[INFO] [1;39mTarget particle list: K_S0:V0_MassWindow[0m
 [INFO] [1;39mCandidates before fit: 1[0m
 [INFO] [1;39mCandidates after fit:  1[0m
 [INFO] [1;39mA total of 0 candidates were removed during the fit.[0m
 [INFO] [1;39m100% of candidates survived the fit.[0m
 [INFO] [1;39m0% of candidates did not.[0m
-[INFO] [1;39mYou choose to drop all candidates with pValue < 0.[0m
+[INFO] [1;39mYou chose to drop all candidates with pValue < 0.[0m
 [INFO] [1;35m================================================================================[0m
 [INFO] Writing NTuple Lambda0
 [INFO] [1;35m================================================================================[0m
@@ -11741,12 +11743,13 @@
 [INFO] [40;97m      (_)                 (_)                                                   [0m
 [INFO] [40;97m                                                                                [0m
 [INFO] [1;35m============= TREEFIT STATISTICS ===============================================[0m
+[INFO] [1;39mTarget particle list: Lambda0:RD[0m
 [INFO] [1;39mCandidates before fit: 77[0m
 [INFO] [1;39mCandidates after fit:  72[0m
 [INFO] [1;39mA total of 5 candidates were removed during the fit.[0m
 [INFO] [1;39m93.5065% of candidates survived the fit.[0m
 [INFO] [1;39m6.49351% of candidates did not.[0m
-[INFO] [1;39mYou choose to drop all candidates with pValue < 0.[0m
+[INFO] [1;39mYou chose to drop all candidates with pValue < 0.[0m
 [INFO] [1;35m================================================================================[0m
 [WARNING] Not a single candidate survived the fit. Candidates before fit: 0 after: 0
 [INFO] Writing NTuple anti-deuteron

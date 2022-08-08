@@ -639,7 +639,7 @@ class BtoKplusLLP(BaseSkim):
 @fancy_skim_header
 class InelasticDarkMatterWithDarkHiggs(BaseSkim):
     """
-    Skim list contains events with at least one displaced vertex and no additional unused tracks for the IP.
+    Skim list contains events with at least one displaced vertex and no additional unused tracks from the IP.
     """
     __authors__ = ["Patrick Ecker"]
     __contact__ = __liaison__
@@ -660,14 +660,13 @@ class InelasticDarkMatterWithDarkHiggs(BaseSkim):
 
     def build_lists(self, path):
         n_track_event_cut = "[nCleanedTracks([nCDCHits > 20] and [thetaInCDCAcceptance] and [dr < 0.5] and [abs(dz) < 2]) < 5]"
-        ma.applyEventCuts(
-            cut=n_track_event_cut,
-            path=path,
-        )
 
-        track_requirements = "formula(nPXDHits + nSVDHits + nCDCHits) > 6"
-        ma.cutAndCopyList("e+:idmdh", "e+:all", f"[{track_requirements}]", path=path)
-        ma.cutAndCopyList("mu+:idmdh", "mu+:all", f"[{track_requirements}]", path=path)
+        track_requirements = "[formula(nPXDHits + nSVDHits + nCDCHits) > 6]"
+        binary_pid_e = "[binaryPID(11, 13) > 0.1]"
+        binary_pid_mu = "[binaryPID(11, 13) < 0.9]"
+
+        ma.cutAndCopyList("e+:idmdh", "e+:all", f"[{track_requirements} and {n_track_event_cut} and {binary_pid_e}]", path=path)
+        ma.cutAndCopyList("mu+:idmdh", "mu+:all", f"[{track_requirements} and {n_track_event_cut} and {binary_pid_mu}]", path=path)
 
         ma.reconstructDecay(
             decayString="A0:idmdh -> mu+:idmdh mu-:idmdh",

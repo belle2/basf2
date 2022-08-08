@@ -137,20 +137,9 @@ class Saving2ndMVAData(harvesting.HarvestingModule):
                         pos_flipped = fit_result_flipped.getPosition()
 
                         flipped_pt_variance = np.divide(
-                            mom_flipped.X() ** 2 *
-                            cov6_flipped(
-                                3,
-                                3) +
-                            mom_flipped.Y() ** 2 *
-                            cov6_flipped(
-                                4,
-                                4) -
-                            2 *
-                            mom_flipped.X() *
-                            mom_flipped.Y() *
-                            cov6_flipped(
-                                3,
-                                4),
+                            mom_flipped.X() ** 2 * cov6_flipped(3, 3) +
+                            mom_flipped.Y() ** 2 * cov6_flipped(4, 4) -
+                            2 * mom_flipped.X() * mom_flipped.Y() * cov6_flipped(3, 4),
                             mom_flipped.Perp2())
 
                         flipped_z_estimate = pos_flipped.Z()

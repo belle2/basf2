@@ -95,56 +95,57 @@ class Saving1stMVAData(harvesting.HarvestingModule):
             if cdc_track_cand:
                 cdc_qualityindicator = cdc_track_cand.getQualityIndicator()
 
-            omega_estimate = fit_result.getOmega()
-            z0_estimate = fit_result.getZ0()
-            d0_estimate = fit_result.getD0()
-            phi0_estimate = fit_result.getPhi() % (2.0 * math.pi)
-            tan_lambda_estimate = fit_result.getCotTheta()
+            if fit_result:
+                omega_estimate = fit_result.getOmega()
+                z0_estimate = fit_result.getZ0()
+                d0_estimate = fit_result.getD0()
+                phi0_estimate = fit_result.getPhi() % (2.0 * math.pi)
+                tan_lambda_estimate = fit_result.getCotTheta()
 
-            d0_variance = fit_result.getCov()[0]
-            z0_variance = fit_result.getCov()[12]
-            phi0_variance = fit_result.getCov()[5]
-            omega_variance = fit_result.getCov()[9]
+                d0_variance = fit_result.getCov()[0]
+                z0_variance = fit_result.getCov()[12]
+                phi0_variance = fit_result.getCov()[5]
+                omega_variance = fit_result.getCov()[9]
 
-            reco_svdcdc_track = recoTrack.getRelated("SVDCDCRecoTracks")
+                reco_svdcdc_track = recoTrack.getRelated("SVDCDCRecoTracks")
 
-            seed_fit_result = peelers.get_seed_track_fit_result(reco_svdcdc_track)
-            seed_mom = seed_fit_result.getMomentum()
-            seed_pos = seed_fit_result.getPosition()
-            seed_cov6 = seed_fit_result.getCovariance6()
-            seed_tan_lambda_estimate = seed_fit_result.getCotTheta()
+                seed_fit_result = peelers.get_seed_track_fit_result(reco_svdcdc_track)
+                seed_mom = seed_fit_result.getMomentum()
+                seed_pos = seed_fit_result.getPosition()
+                seed_cov6 = seed_fit_result.getCovariance6()
+                seed_tan_lambda_estimate = seed_fit_result.getCotTheta()
 
-            seed_pz_estimate = seed_mom.Z()
-            seed_pz_variance = seed_cov6(5, 5)
-            seed_z_estimate = seed_pos.Z()
-            seed_x_estimate = seed_pos.X()
-            seed_y_estimate = seed_pos.Y()
+                seed_pz_estimate = seed_mom.Z()
+                seed_pz_variance = seed_cov6(5, 5)
+                seed_z_estimate = seed_pos.Z()
+                seed_x_estimate = seed_pos.X()
+                seed_y_estimate = seed_pos.Y()
 
-            seed_pt_estimate = seed_mom.Perp()
-            seed_py_variance = seed_cov6(4, 4)
-            seed_d0_estimate = seed_fit_result.getD0()
-            seed_omega_variance = seed_fit_result.getCov()[9]
-            seed_tan_lambda_variance = seed_fit_result.getCov()[14]
-            seed_z_variance = seed_cov6(2, 2)
+                seed_pt_estimate = seed_mom.Perp()
+                seed_py_variance = seed_cov6(4, 4)
+                seed_d0_estimate = seed_fit_result.getD0()
+                seed_omega_variance = seed_fit_result.getCov()[9]
+                seed_tan_lambda_variance = seed_fit_result.getCov()[14]
+                seed_z_variance = seed_cov6(2, 2)
 
-            tan_lambda_variance = seed_fit_result.getCov()[14]
-            for svd_hit in getObjectList(recoTrack.getSVDHitList()):
-                if svd_hit.getSensorID().getLayerNumber() == 3:
-                    svd_layer3_positionSigma = svd_hit.getPositionSigma()
-                if svd_hit.getSensorID().getLayerNumber() == 6:
-                    svd_layer6_clsTime = svd_hit.getClsTime()
+                tan_lambda_variance = seed_fit_result.getCov()[14]
+                for svd_hit in getObjectList(recoTrack.getSVDHitList()):
+                    if svd_hit.getSensorID().getLayerNumber() == 3:
+                        svd_layer3_positionSigma = svd_hit.getPositionSigma()
+                    if svd_hit.getSensorID().getLayerNumber() == 6:
+                        svd_layer6_clsTime = svd_hit.getClsTime()
 
-            cdc_hits = [hit.getICLayer() for hit in getObjectList(recoTrack.getCDCHitList())]
-            if cdc_hits:
-                first_cdc_layer = min(cdc_hits)
-                last_cdc_layer = max(cdc_hits)
+                cdc_hits = [hit.getICLayer() for hit in getObjectList(recoTrack.getCDCHitList())]
+                if cdc_hits:
+                    first_cdc_layer = min(cdc_hits)
+                    last_cdc_layer = max(cdc_hits)
 
-            n_cdc_hits = recoTrack.getNumberOfCDCHits()
-            n_svd_hits = recoTrack.getNumberOfSVDHits()
-            n_pxd_hits = recoTrack.getNumberOfPXDHits()
+                n_cdc_hits = recoTrack.getNumberOfCDCHits()
+                n_svd_hits = recoTrack.getNumberOfSVDHits()
+                n_pxd_hits = recoTrack.getNumberOfPXDHits()
 
-            n_hits = n_pxd_hits + n_svd_hits + n_cdc_hits
-            ndf_hits = 2 * n_pxd_hits + n_svd_hits + n_cdc_hits
+                n_hits = n_pxd_hits + n_svd_hits + n_cdc_hits
+                ndf_hits = 2 * n_pxd_hits + n_svd_hits + n_cdc_hits
         crops = dict(
             d0_variance=d0_variance,
             seed_pz_estimate=seed_pz_estimate,

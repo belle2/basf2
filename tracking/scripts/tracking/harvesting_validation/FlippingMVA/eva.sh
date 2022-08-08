@@ -1,3 +1,11 @@
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 #generating the ttree for training and testing 
 # --- for 1st MVA
 basf2 BBbar.py  -- -n 1000 --exp 1003 --ranseed 12 --output_file_mva train_1stmva.root --num 1

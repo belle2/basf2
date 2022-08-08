@@ -10,7 +10,7 @@
 ##########################################################################
 
 from basf2 import register_module, process, \
-    set_random_seed, create_path, statistics, print_path
+    set_random_seed, create_path, statistics, print_path, B2ERROR
 
 from basf2 import conditions as b2c
 import simulation as si
@@ -18,17 +18,15 @@ import tracking as trk
 from tracking.harvesting_validation.FlippingMVA.savingFlippingVariables import Saving1stMVAData
 from tracking.harvesting_validation.FlippingMVA.savingFlippingVariablesFor2ndMVA import Saving2ndMVAData
 
-"""
-import variables.utils as vu
-from variables import variables as vm
-import os
-"""
 import argparse
 import glob
 
+"""
+generating BBbar MC samples for training and testing the track-flipping MVAs
+"""
+
 
 def arg_parser():
-
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('-n', '--events',
                         default=100,
@@ -36,7 +34,7 @@ def arg_parser():
                         help='number of events',
                         metavar='EVENTS')
     parser.add_argument('--no_bkg',
-                        default=False,
+                        default=True,
                         action='store_true',
                         help='flag to remove beam background from simulation')
     parser.add_argument('--exp',
@@ -56,16 +54,12 @@ def arg_parser():
                         help='output name')
     parser.add_argument('--flip_recoTrack',
                         default=False,
-                        action='store_true',
-                        help='add this option to flip the reco_tracks')
-    parser.add_argument('--flip_mva_cut',
-                        default=0.5,
-                        type=float,
-                        help='the mva cut for flipping')
+                        type=bool,
+                        help='trun on and off the track-flipping steps')
     parser.add_argument('--num',
                         default=1,
                         type=int,
-                        help='the index of mva',
+                        help='the index of track-flipping MVA variables to be savd. (1 or 2)',
                         metavar='NUMS')
     parser.add_argument('--ranseed',
                         default=0,
@@ -84,10 +78,6 @@ if __name__ == "__main__":
     # Setting the random seed for particle generation
     set_random_seed(args.ranseed)
 
-    # Argument parsing
-    args.events
-    args.output_file_mva
-
     # Prepend and/or append the input GTs
     if not (args.prepend_gt == ''):
         for gt in reversed(args.prepend_gt):
@@ -102,25 +92,23 @@ if __name__ == "__main__":
     if args.no_bkg:
         bkgFiles = None
 
-    flip_recoTrack = False
-    if args.flip_recoTrack:
-        flip_recoTrack = True
-    # particle type
     #####################################################
-    # Part 1: setup PArticleGun
-    #####################################################
-    # Part 2: setup other modules
+    # Part 1: setup the EventInfoSetter
     eventinfosetter = register_module('EventInfoSetter')
     eventinfosetter.param({'evtNumList': [args.events], 'runList': [1], 'expList': [args.exp]})
 
-    #####################################################
-    # Part 3: build the path for generation/simulation/reconstruction
     main = create_path()
     main.add_module(eventinfosetter)
     main.add_module("Progress")
+
+    #####################################################
+    # Part 2: setup other modules
     main.add_module("EvtGenInput")
+
+    #####################################################
+    # Part 3: build the path for simulation/reconstruction
     si.add_simulation(main, bkgfiles=bkgFiles)
-    trk.add_tracking_reconstruction(main, flip_recoTrack=flip_recoTrack)
+    trk.add_tracking_reconstruction(main, flip_recoTrack=args.flip_recoTrack)
 
     #####################################################
     outputfile = args.output_file_mva
@@ -131,12 +119,14 @@ if __name__ == "__main__":
             contact="none",
             output_file_name=outputfile)
         main.add_module(trackingVali_0)
-    if (args.num == 2):
+    elif (args.num == 2):
         trackingVali_0 = Saving2ndMVAData(
             name="saving2ndMVA_BBbar",
             contact="none",
             output_file_name=outputfile)
         main.add_module(trackingVali_0)
+    else:
+        B2ERROR("no variable saving module added ...")
 
     # Process events
     print_path(main)

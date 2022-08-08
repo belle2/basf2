@@ -1439,11 +1439,15 @@ def makeInvisible(
         motherParticleList,
         decayStringTarget,
         covMatrix=10000,
+        eraseFourMomentum=True,
         path=None):
     """
+    This module makes one particle in the decay invisible to the treefitter module.
+
     @param motherParticleList Name of the mother particleList
     @param decayStringTarget  Select the daughter which will be made invisible
     @param covMatrix          Sets the value of the diagonal covariance matrix of the target Particle
+    @param eraseFourMomentum  If true, the four-momemtum of the invisible particle will be set to zero
     @param path               Module is added to this path
     """
 

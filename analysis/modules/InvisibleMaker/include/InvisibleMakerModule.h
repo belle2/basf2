@@ -35,6 +35,8 @@ namespace Belle2 {
     /**Value of the diagonal covariance matrix of the target Particle*/
     double m_dummyCovMatrix;
 
+    /**If true, the four-momemtum of the invisible particle will be set to zero*/
+    bool m_eraseFourMomentum;
 
   public:
     /** Constructor. */

@@ -25,12 +25,14 @@ REG_MODULE(InvisibleMaker)
 InvisibleMakerModule::InvisibleMakerModule() : Module()
 {
   //Set module properties
-  setDescription("This module does something interesting");
+  setDescription("This module makes one particle in the decay invisible to the treefitter module.");
   setPropertyFlags(c_ParallelProcessingCertified);
   //Parameter definition
   addParam("motherParticleList", m_strMotherParticleList, "Name of the mother particleList", std::string());
   addParam("decayStringTarget", m_decayStringTarget, "Select the daughter which will be made invisible",
            std::string());
+  addParam("eraseFourMomentum", m_eraseFourMomentum, "If true, the four-momemtum of the invisible particle will be set to zero",
+           true);
   addParam("dummyCovMatrix", m_dummyCovMatrix, "Sets the value of the diagonal covariance matrix of the target Particle", 10000.);
 }
 
@@ -80,8 +82,9 @@ void InvisibleMakerModule::event()
 
     targetD->writeExtraInfo("treeFitterTreatMeAsInvisible", 1);
     targetD->setMomentumVertexErrorMatrix(covariance);
-    ROOT::Math::PxPyPzEVector new4Vector = {0., 0., 0., 0.};
-    targetD->set4Vector(new4Vector);
+    ROOT::Math::PxPyPzEVector zero4Vector = {0., 0., 0., 0.};
+    if (m_eraseFourMomentum)
+      targetD->set4Vector(zero4Vector);
 
   }
 }

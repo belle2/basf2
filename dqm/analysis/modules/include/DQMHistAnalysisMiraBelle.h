@@ -9,11 +9,11 @@
 #pragma once
 
 //DQM
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 
 // Monitoring
 #include <dqm/dataobjects/DQMFileMetaData.h>
-#include <dqm/dataobjects/MonitoringObject.h>
+#include <dqm/core/MonitoringObject.h>
 
 #include <vector>
 

@@ -13,7 +13,7 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <dqm/dataobjects/MonitoringObject.h>
+#include <dqm/core/MonitoringObject.h>
 #include <TH1.h>
 
 #include <string>

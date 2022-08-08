@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <dqm/dataobjects/MonitoringObject.h>
+#include <dqm/core/MonitoringObject.h>
 
 #include <framework/utilities/KeyValuePrinter.h>
 

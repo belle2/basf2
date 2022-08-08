@@ -10,7 +10,7 @@
 // Description : Baseclass for DQM histogram analysis module
 //-
 
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 #include <boost/algorithm/string.hpp>
 #include <TROOT.h>
 #include <TClass.h>
@@ -33,7 +33,7 @@ DQMHistAnalysisModule::MonObjList DQMHistAnalysisModule::g_monObj;
 DQMHistAnalysisModule::DQMHistAnalysisModule() : Module()
 {
   //Set module properties
-  setDescription("Histgram Analysis module");
+  setDescription("Histogram Analysis module");
 }
 
 

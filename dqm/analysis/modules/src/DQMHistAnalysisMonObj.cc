@@ -10,7 +10,7 @@
 #include <dqm/analysis/modules/DQMHistAnalysisMonObj.h>
 
 //DQM
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 
 #include <TH1F.h>
 

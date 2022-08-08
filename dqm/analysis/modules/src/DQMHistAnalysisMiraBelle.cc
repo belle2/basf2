@@ -10,7 +10,7 @@
 #include <dqm/analysis/modules/DQMHistAnalysisMiraBelle.h>
 
 //DQM
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 
 #include <TFile.h>
 #include <TF1.h>

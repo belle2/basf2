@@ -50,6 +50,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/utilities/ColorPalette.h>
 
+#include <Math/VectorUtil.h>
 #include <TEveArrow.h>
 #include <TEveBox.h>
 #include <TEveCalo.h>
@@ -1834,7 +1835,7 @@ void EVEVisualization::showUserData(const DisplayData& displayData)
     text->SetName(labelPair.first.c_str());
     text->SetTitle(labelPair.first.c_str());
     text->SetMainColor(kGray + 1);
-    const TVector3& p = labelPair.second;
+    const ROOT::Math::XYZVector& p = labelPair.second;
     text->PtrMainTrans()->SetPos(p.x(), p.y(), p.z());
     addToGroup("DisplayData", text);
   }
@@ -1844,7 +1845,7 @@ void EVEVisualization::showUserData(const DisplayData& displayData)
     points->SetTitle(pointPair.first.c_str());
     points->SetMarkerStyle(7);
     points->SetMainColor(kGreen);
-    for (const TVector3& p : pointPair.second) {
+    for (const auto& p : pointPair.second) {
       points->SetNextPoint(p.x(), p.y(), p.z());
     }
     addToGroup("DisplayData", points);
@@ -1852,8 +1853,8 @@ void EVEVisualization::showUserData(const DisplayData& displayData)
 
   int randomColor = 2; //primary colours, changing rapidly with index
   for (const auto& arrow : displayData.m_arrows) {
-    const TVector3 pos = arrow.start;
-    const TVector3 dir = arrow.end - pos;
+    const ROOT::Math::XYZVector pos = arrow.start;
+    const ROOT::Math::XYZVector dir = arrow.end - pos;
     TEveArrow* eveArrow = new TEveArrow(dir.x(), dir.y(), dir.z(), pos.x(), pos.y(), pos.z());
     eveArrow->SetName(arrow.name.c_str());
     eveArrow->SetTitle(arrow.name.c_str());
@@ -1867,8 +1868,23 @@ void EVEVisualization::showUserData(const DisplayData& displayData)
     //add label
     TEveText* text = new TEveText(arrow.name.c_str());
     text->SetMainColor(arrowColor);
-    //in middle of arrow, with some slight offset
-    const TVector3& labelPos = pos + 0.5 * dir + 0.1 * dir.Orthogonal();
+    //place label in middle of arrow, with some slight offset
+    // orthogonal direction is arbitrary, set smallest component zero
+    ROOT::Math::XYZVector orthogonalDir;
+    if (std::abs(dir.x()) < std::abs(dir.y())) {
+      if (std::abs(dir.x()) < std::abs(dir.z())) {
+        orthogonalDir.SetCoordinates(0, dir.z(), -dir.y());
+      } else {
+        orthogonalDir.SetCoordinates(dir.y(), -dir.x(), 0);
+      }
+    } else {
+      if (std::abs(dir.y()) < std::abs(dir.z())) {
+        orthogonalDir.SetCoordinates(-dir.z(), 0, dir.x());
+      } else {
+        orthogonalDir.SetCoordinates(dir.y(), -dir.x(), 0);
+      }
+    }
+    const ROOT::Math::XYZVector& labelPos = pos + 0.5 * dir + 0.1 * orthogonalDir;
     text->PtrMainTrans()->SetPos(labelPos.x(), labelPos.y(), labelPos.z());
     eveArrow->AddElement(text);
     addToGroup("DisplayData", eveArrow);

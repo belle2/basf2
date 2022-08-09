@@ -973,7 +973,7 @@ namespace Belle2 {
     m_mVector_in["impactPosition"] = vector<double> ({impactPosition.X(), impactPosition.Y(), impactPosition.Z()});
 
     // Access track's particle parameters
-    m_mDouble_in["mcPt"] = trackMCParticle.getMomentum().Pt();
+    m_mDouble_in["mcPt"] = trackMCParticle.getMomentum().Rho();
     m_mDouble_in["mcPhi0"] = 0;
     if (trackMCParticle.getCharge() > 0) m_mDouble_in["mcPhi0"] = trackMCParticle.getMomentum().Phi() - m_mConstD_in.at("Trg_PI") / 2;
     if (trackMCParticle.getCharge() < 0) m_mDouble_in["mcPhi0"] = trackMCParticle.getMomentum().Phi() + m_mConstD_in.at("Trg_PI") / 2;
@@ -981,7 +981,7 @@ namespace Belle2 {
     if (m_mDouble_in["mcPhi0"] < 0) m_mDouble_in["mcPhi0"] += 2 * m_mConstD_in.at("Trg_PI");
     //m_mDouble["mcZ0"] = trackMCParticle.getVertex().Z();
     m_mDouble_in["mcZ0"] = impactPosition.Z();
-    m_mDouble_in["mcCot"] = trackMCParticle.getMomentum().Pz() / trackMCParticle.getMomentum().Pt();
+    m_mDouble_in["mcCot"] = trackMCParticle.getMomentum().z() / trackMCParticle.getMomentum().Rho();
     m_mDouble_in["mcCharge"] = trackMCParticle.getCharge();
 
     // mcStatus[0]: statusbit, mcStatus[1]: pdg, mcStatus[2]: charge

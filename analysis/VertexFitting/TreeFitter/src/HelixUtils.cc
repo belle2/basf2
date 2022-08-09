@@ -18,8 +18,8 @@ namespace TreeFitter {
 
   void HelixUtils::vertexFromHelix(const Belle2::Helix& helix,
                                    double L, double Bz,
-                                   Belle2::B2Vector3D& position,
-                                   Belle2::B2Vector3D& momentum, int& charge)
+                                   ROOT::Math::XYZVector& position,
+                                   ROOT::Math::XYZVector& momentum, int& charge)
   {
     position = helix.getPositionAtArcLength2D(L);
     momentum = helix.getMomentumAtArcLength2D(L, Bz);
@@ -34,12 +34,12 @@ namespace TreeFitter {
   {
 
 
-    Belle2::B2Vector3D position(positionAndMomentum(0),
-                                positionAndMomentum(1),
-                                positionAndMomentum(2));
-    Belle2::B2Vector3D momentum(positionAndMomentum(3),
-                                positionAndMomentum(4),
-                                positionAndMomentum(5));
+    ROOT::Math::XYZVector position(positionAndMomentum(0),
+                                   positionAndMomentum(1),
+                                   positionAndMomentum(2));
+    ROOT::Math::XYZVector momentum(positionAndMomentum(3),
+                                   positionAndMomentum(4),
+                                   positionAndMomentum(5));
 
     helix = Belle2::Helix(position, momentum, charge, Bz);
     L = helix.getArcLength2DAtXY(positionAndMomentum(0),
@@ -134,13 +134,13 @@ namespace TreeFitter {
                                                           Eigen::Matrix<double, 5, 6>& jacobian)
   {
 
-    Belle2::B2Vector3D position(positionAndMom(0),
-                                positionAndMom(1),
-                                positionAndMom(2));
+    ROOT::Math::XYZVector position(positionAndMom(0),
+                                   positionAndMom(1),
+                                   positionAndMom(2));
 
-    Belle2::B2Vector3D momentum(positionAndMom(3),
-                                positionAndMom(4),
-                                positionAndMom(5));
+    ROOT::Math::XYZVector momentum(positionAndMom(3),
+                                   positionAndMom(4),
+                                   positionAndMom(5));
 
     helix = Belle2::Helix(position, momentum, charge, Bz);
 
@@ -149,19 +149,18 @@ namespace TreeFitter {
 
     double delta = 1e-5;// this is arbitrary, only needs to be small
 
-    Belle2::B2Vector3D postmp;
-    Belle2::B2Vector3D momtmp;
+    ROOT::Math::XYZVector postmp;
+    ROOT::Math::XYZVector momtmp;
 
     for (int jin = 0; jin < 6; ++jin) {
-      for (int i = 0; i < 3; ++i) {
-        postmp[i] = positionAndMom(i);
-        momtmp[i] = positionAndMom(i + 3);
-      }
-      if (jin < 3) {
-        postmp[jin] += delta;
-      } else {
-        momtmp[jin - 3] += delta;
-      }
+      postmp.SetCoordinates(positionAndMom(0), positionAndMom(1), positionAndMom(2));
+      momtmp.SetCoordinates(positionAndMom(3), positionAndMom(4), positionAndMom(5));
+      if (jin == 0) postmp.SetX(postmp.x() + delta);
+      if (jin == 1) postmp.SetY(postmp.y() + delta);
+      if (jin == 2) postmp.SetZ(postmp.z() + delta);
+      if (jin == 3) momtmp.SetX(momtmp.x() + delta);
+      if (jin == 4) momtmp.SetY(momtmp.y() + delta);
+      if (jin == 5) momtmp.SetZ(momtmp.z() + delta);
 
       helixPlusDelta = Belle2::Helix(postmp, momtmp, charge, Bz);
       jacobian(iD0, jin)        = (helixPlusDelta.getD0()        - helix.getD0())        / delta ;
@@ -185,20 +184,18 @@ namespace TreeFitter {
     // numeric calculation of the jacobian
     Belle2::Helix helixPlusDelta;
 
-    Belle2::B2Vector3D postmp;
-    Belle2::B2Vector3D momtmp;
+    ROOT::Math::XYZVector postmp;
+    ROOT::Math::XYZVector momtmp;
 
     for (int jin = 0; jin < 6; ++jin) {
-      for (int i = 0; i < 3; ++i) {
-        postmp[i] = positionAndMom(i);
-        momtmp[i] = positionAndMom(i + 3);
-      }
-
-      if (jin < 3) {
-        postmp[jin] += delta;
-      } else {
-        momtmp[jin - 3] += delta;
-      }
+      postmp.SetCoordinates(positionAndMom(0), positionAndMom(1), positionAndMom(2));
+      momtmp.SetCoordinates(positionAndMom(3), positionAndMom(4), positionAndMom(5));
+      if (jin == 0) postmp.SetX(postmp.x() + delta);
+      if (jin == 1) postmp.SetY(postmp.y() + delta);
+      if (jin == 2) postmp.SetZ(postmp.z() + delta);
+      if (jin == 3) momtmp.SetX(momtmp.x() + delta);
+      if (jin == 4) momtmp.SetY(momtmp.y() + delta);
+      if (jin == 5) momtmp.SetZ(momtmp.z() + delta);
 
       helixPlusDelta = Belle2::Helix(postmp, momtmp, charge, Bz);
       jacobian(iD0, jin)        = (helixPlusDelta.getD0()        - helix.getD0())        / delta ;

@@ -230,9 +230,9 @@ namespace Belle2 {
         return result;
 
       result = 0.0;
-      result += TMath::Power(part->getPx() - mcp->getMomentum().Px(), 2.0) / part->getMomentumVertexErrorMatrix()(0, 0);
-      result += TMath::Power(part->getPy() - mcp->getMomentum().Py(), 2.0) / part->getMomentumVertexErrorMatrix()(1, 1);
-      result += TMath::Power(part->getPz() - mcp->getMomentum().Pz(), 2.0) / part->getMomentumVertexErrorMatrix()(2, 2);
+      result += TMath::Power(part->getPx() - mcp->getMomentum().x(), 2.0) / part->getMomentumVertexErrorMatrix()(0, 0);
+      result += TMath::Power(part->getPy() - mcp->getMomentum().y(), 2.0) / part->getMomentumVertexErrorMatrix()(1, 1);
+      result += TMath::Power(part->getPz() - mcp->getMomentum().z(), 2.0) / part->getMomentumVertexErrorMatrix()(2, 2);
 
       return result;
     }
@@ -493,9 +493,9 @@ namespace Belle2 {
 
     double particleInvariantMassFromDaughtersDisplaced(const Particle* part)
     {
-      B2Vector3D vertex = part->getVertex();
+      ROOT::Math::XYZVector vertex = part->getVertex();
       if (part->getParticleSource() != Particle::EParticleSourceObject::c_V0
-          && vertex.Perp() < 0.5) return particleInvariantMassFromDaughters(part);
+          && vertex.Rho() < 0.5) return particleInvariantMassFromDaughters(part);
 
       const std::vector<Particle*> daughters = part->getDaughters();
       if (daughters.size() == 0) return particleInvariantMassFromDaughters(part);

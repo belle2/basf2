@@ -134,7 +134,7 @@ std::string MCParticle::getInfoHTML() const
   out << ",<b>isVirtual</b>=" << isVirtual();
   out << "<br>";
 
-  out << "<b>pT</b>=" << getMomentum().Pt();
+  out << "<b>pT</b>=" << getMomentum().Rho();
   out << ", <b>pZ</b>=" << m_momentum_z;
   out << "<br>";
   std::string unitType = HTML::chooseUnitOfLength(B2Vector3D(getProductionVertex()));

@@ -364,17 +364,17 @@ void AlignDQMModule::FillHelixParametersAndCorrelations(const TrackFitResult* tf
   DQMHistoModuleBase::FillHelixParametersAndCorrelations(tfr);
 
   m_PhiZ0->Fill(tfr->getPhi0() / Unit::deg, tfr->getZ0());
-  m_PhiMomPt->Fill(tfr->getPhi0() / Unit::deg, tfr->getMomentum().Pt());
+  m_PhiMomPt->Fill(tfr->getPhi0() / Unit::deg, tfr->getMomentum().Rho());
   m_PhiOmega->Fill(tfr->getPhi0() / Unit::deg, tfr->getOmega());
   m_PhiTanLambda->Fill(tfr->getPhi0() / Unit::deg, tfr->getTanLambda());
-  m_D0MomPt->Fill(tfr->getD0(), tfr->getMomentum().Pt());
+  m_D0MomPt->Fill(tfr->getD0(), tfr->getMomentum().Rho());
   m_D0Omega->Fill(tfr->getD0(), tfr->getOmega());
   m_D0TanLambda->Fill(tfr->getD0(), tfr->getTanLambda());
-  m_Z0MomPt->Fill(tfr->getZ0(), tfr->getMomentum().Pt());
+  m_Z0MomPt->Fill(tfr->getZ0(), tfr->getMomentum().Rho());
   m_Z0Omega->Fill(tfr->getZ0(), tfr->getOmega());
   m_Z0TanLambda->Fill(tfr->getZ0(), tfr->getTanLambda());
-  m_MomPtOmega->Fill(tfr->getMomentum().Pt(), tfr->getOmega());
-  m_MomPtTanLambda->Fill(tfr->getMomentum().Pt(), tfr->getTanLambda());
+  m_MomPtOmega->Fill(tfr->getMomentum().Rho(), tfr->getOmega());
+  m_MomPtTanLambda->Fill(tfr->getMomentum().Rho(), tfr->getTanLambda());
   m_OmegaTanLambda->Fill(tfr->getOmega(), tfr->getTanLambda());
 }
 

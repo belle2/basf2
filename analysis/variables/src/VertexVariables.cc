@@ -209,8 +209,8 @@ namespace Belle2 {
         return frame.getVertex(part->getVertex() - ROOT::Math::XYZVector(beamSpotDB->getIPPosition()));
 
       UncertainHelix helix = trackFit->getUncertainHelix();
-      helix.passiveMoveBy(beamSpotDB->getIPPosition());
-      return frame.getVertex(ROOT::Math::XYZVector(helix.getPerigee()));
+      helix.passiveMoveBy(ROOT::Math::XYZVector(beamSpotDB->getIPPosition()));
+      return frame.getVertex(helix.getPerigee());
     }
 
 

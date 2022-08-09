@@ -73,7 +73,7 @@ void HepMCOutputModule::event()
       continue;
     }
 
-    TVector3 mom = mcPart.getMomentum();
+    ROOT::Math::XYZVector mom = mcPart.getMomentum();
     B2Vector3D vert = mcPart.getVertex();
 
     int isthep = 1;

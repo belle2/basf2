@@ -460,11 +460,11 @@ void DQMHistoModuleBase::FillHitNumbers(int nPXD, int nSVD, int nCDC)
 
 void DQMHistoModuleBase::FillMomentumAngles(const TrackFitResult* tfr)
 {
-  TVector3 mom = tfr->getMomentum();
+  ROOT::Math::XYZVector mom = tfr->getMomentum();
 
-  float px = mom.Px();
-  float py = mom.Py();
-  float pz = mom.Pz();
+  float px = mom.x();
+  float py = mom.y();
+  float pz = mom.z();
 
   float Phi = atan2(py, px);
   float pxy = sqrt(px * px + py * py);
@@ -477,13 +477,13 @@ void DQMHistoModuleBase::FillMomentumAngles(const TrackFitResult* tfr)
 
 void DQMHistoModuleBase::FillMomentumCoordinates(const TrackFitResult* tfr)
 {
-  TVector3 mom = tfr->getMomentum();
+  ROOT::Math::XYZVector mom = tfr->getMomentum();
 
-  m_MomX->Fill(mom.Px());
-  m_MomY->Fill(mom.Py());
-  m_MomZ->Fill(mom.Pz());
-  m_Mom->Fill(mom.Mag());
-  m_MomPt->Fill(mom.Pt());
+  m_MomX->Fill(mom.x());
+  m_MomY->Fill(mom.y());
+  m_MomZ->Fill(mom.z());
+  m_Mom->Fill(mom.R());
+  m_MomPt->Fill(mom.Rho());
 }
 
 void DQMHistoModuleBase::FillHelixParametersAndCorrelations(const TrackFitResult* tfr)

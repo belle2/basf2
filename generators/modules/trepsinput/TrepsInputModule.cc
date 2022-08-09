@@ -111,14 +111,14 @@ void TrepsInputModule::event()
   MCParticleGraph::GraphParticle& electron = m_mpg.addParticle();
   electron.addStatus(MCParticle::c_Initial | MCParticle::c_PrimaryParticle | MCParticle::c_StableInGenerator);
   electron.setPDG(11);
-  electron.setMomentum(m_generator.getElectronMomentum());
+  electron.setMomentum(ROOT::Math::XYZVector(m_generator.getElectronMomentum()));
   electron.setMass(m_generator.me);
   electron.setEnergy(sqrt(m_generator.me * m_generator.me + m_generator.getElectronMomentum().Mag2()));
 
   MCParticleGraph::GraphParticle& positron = m_mpg.addParticle();
   positron.addStatus(MCParticle::c_Initial | MCParticle::c_PrimaryParticle | MCParticle::c_StableInGenerator);
   positron.setPDG(-11);
-  positron.setMomentum(m_generator.getPositronMomentum());
+  positron.setMomentum(ROOT::Math::XYZVector(m_generator.getPositronMomentum()));
   positron.setMass(m_generator.me);
   positron.setEnergy(sqrt(m_generator.me * m_generator.me + m_generator.getPositronMomentum().Mag2()));
 

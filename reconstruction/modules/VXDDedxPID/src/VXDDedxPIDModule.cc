@@ -205,16 +205,16 @@ void VXDDedxPIDModule::event()
         const MCParticle* mother = mcpart->getMother();
         dedxTrack->m_motherPDG = mother ? mother->getPDG() : 0;
 
-        const TVector3 trueMomentum = mcpart->getMomentum();
-        dedxTrack->m_pTrue = trueMomentum.Mag();
+        const ROOT::Math::XYZVector trueMomentum = mcpart->getMomentum();
+        dedxTrack->m_pTrue = trueMomentum.R();
       }
     }
 
     // get momentum (at origin) from fit result
-    const TVector3& trackPos = fitResult->getPosition();
-    const TVector3& trackMom = fitResult->getMomentum();
-    dedxTrack->m_p = trackMom.Mag();
-    dedxTrack->m_cosTheta = trackMom.CosTheta();
+    const ROOT::Math::XYZVector& trackPos = fitResult->getPosition();
+    const ROOT::Math::XYZVector& trackMom = fitResult->getMomentum();
+    dedxTrack->m_p = trackMom.R();
+    dedxTrack->m_cosTheta = cos(trackMom.Theta());
     dedxTrack->m_charge = fitResult->getChargeSign();
 
     // dE/dx values will be calculated using associated RecoTrack
@@ -232,7 +232,7 @@ void VXDDedxPIDModule::event()
     }
 
     //used for PXD/SVD hits
-    const HelixHelper helixAtOrigin(trackPos, trackMom, dedxTrack->m_charge);
+    const HelixHelper helixAtOrigin(B2Vector3D(trackPos), B2Vector3D(trackMom), dedxTrack->m_charge);
 
     if (m_usePXD) {
       const std::vector<PXDCluster*>& pxdClusters = recoTrack->getPXDHitList();

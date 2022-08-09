@@ -254,7 +254,7 @@ namespace Belle2 {
     /**
      * This finds the point on the true particle trajectory closest to the measured track position
      */
-    static B2Vector3D getTruePoca(ParticleAndWeight const& paw);
+    static ROOT::Math::XYZVector getTruePoca(ParticleAndWeight const& paw);
 
     /**
      * If the fit has to be done with the rolled back tracks, Rave or KFit is fed with a track where the
@@ -267,7 +267,7 @@ namespace Belle2 {
     /**
      * This shifts the position of tracks by the vector difference of mother B and production point of track from truth info
      */
-    B2Vector3D getRollBackPoca(ParticleAndWeight const& paw);
+    ROOT::Math::XYZVector getRollBackPoca(ParticleAndWeight const& paw);
   };
 
   /**

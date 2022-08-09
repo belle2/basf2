@@ -383,7 +383,7 @@ void ReaderSAD::addParticleToMCParticles(MCParticleGraph& graph, bool gaussSmear
   }
 
   //Set missing particle information
-  particle.setMomentum(TVector3(particleMomGeant4));
+  particle.setMomentum(ROOT::Math::XYZVector(particleMomGeant4[0], particleMomGeant4[1], particleMomGeant4[2]));
   particle.setProductionVertex(TVector3(particlePosGeant4));
   particle.setProductionTime(0.0);
   particle.setEnergy(sqrt(m_lostE * m_lostE + particle.getMass()*particle.getMass()));

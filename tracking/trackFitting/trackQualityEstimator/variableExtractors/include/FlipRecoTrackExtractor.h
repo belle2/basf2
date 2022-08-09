@@ -116,7 +116,8 @@ namespace Belle2 {
         auto svdcdc_charge_sign = svdcdc_recoTrack->getChargeSeed() > 0 ? 1 : -1;
         auto svdcdc_b_field = BFieldManager::getField(svdcdc_pos).Z() / Unit::T;
         const uint16_t svdcdc_NDF = 0xffff;
-        auto svdcdc_FitResult = TrackFitResult(svdcdc_pos, svdcdc_mom, svdcdc_cov, svdcdc_charge_sign, Const::pion, 0, svdcdc_b_field, 0, 0,
+        auto svdcdc_FitResult = TrackFitResult(ROOT::Math::XYZVector(svdcdc_pos), ROOT::Math::XYZVector(svdcdc_mom), svdcdc_cov,
+                                               svdcdc_charge_sign, Const::pion, 0, svdcdc_b_field, 0, 0,
                                                svdcdc_NDF);
 
         m_variables.at(m_prefix + "seed_pz_variance") = svdcdc_cov(5, 5);

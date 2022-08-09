@@ -147,9 +147,9 @@ namespace Belle2 {
       m_top.evt = evtMetaData->getEvent();
       m_top.run = evtMetaData->getRun();
 
-      TVector3 mom = trackFit->getMomentum();
-      m_top.p = mom.Mag();
-      m_top.cth = mom.CosTheta();
+      ROOT::Math::XYZVector mom = trackFit->getMomentum();
+      m_top.p = mom.R();
+      m_top.cth = cos(mom.Theta());
       m_top.phi = mom.Phi();
       m_top.pValue = trackFit->getPValue();
 

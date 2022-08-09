@@ -193,9 +193,9 @@ namespace Belle2 {
      * Return momentum.
      * @return The momentum of the MonteCarlo particle in GeV.
      */
-    TVector3 getMomentum() const
+    ROOT::Math::XYZVector getMomentum() const
     {
-      return TVector3(m_momentum_x, m_momentum_y, m_momentum_z);
+      return ROOT::Math::XYZVector(m_momentum_x, m_momentum_y, m_momentum_z);
     }
 
     /**
@@ -410,9 +410,9 @@ namespace Belle2 {
 
     /**
      * Set particle momentum.
-     * @param momentum The momentum of the MonteCarlo particle given as TVector3.
+     * @param momentum The momentum of the MonteCarlo particle given as XYZVector.
      */
-    void setMomentum(const TVector3& momentum)
+    void setMomentum(const ROOT::Math::XYZVector& momentum)
     {
       m_momentum_x = momentum.X(); m_momentum_y = momentum.Y(), m_momentum_z = momentum.Z();
     }

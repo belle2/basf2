@@ -155,7 +155,7 @@ void KoralW::storeParticle(MCParticleGraph& mcGraph, const float* mom, const flo
   part.setPDG(pdg);
   part.setFirstDaughter(0);
   part.setLastDaughter(0);
-  part.setMomentum(TVector3(mom[0], mom[1], mom[2]));
+  part.setMomentum(ROOT::Math::XYZVector(mom[0], mom[1], mom[2]));
   part.setEnergy(mom[3]);
   part.setMass(mom[4]);
   part.setProductionVertex(vtx[0]*Unit::mm, vtx[1]*Unit::mm, vtx[2]*Unit::mm);

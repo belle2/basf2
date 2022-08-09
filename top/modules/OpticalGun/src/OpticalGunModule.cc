@@ -232,7 +232,7 @@ namespace Belle2 {
       part->addStatus(MCParticle::c_StableInGenerator);
       part->setProductionVertex(point);
       part->setProductionTime(emissionTime);
-      part->setMomentum(momentum);
+      part->setMomentum(ROOT::Math::XYZVector(momentum));
       part->setEnergy(m_energy);
       part->setDecayVertex(polarization); // use this location temporary
     }

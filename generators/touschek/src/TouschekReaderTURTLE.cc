@@ -108,7 +108,7 @@ int TouschekReaderTURTLE::getParticles(int number, MCParticleGraph& graph)
     particle.setStatus(MCParticle::c_PrimaryParticle);
     particle.setPDG(m_pdg);
     particle.setMassFromPDG();
-    particle.setMomentum(TVector3(particleMomGeant4));
+    particle.setMomentum(ROOT::Math::XYZVector(particleMomGeant4[0], particleMomGeant4[1], particleMomGeant4[2]));
     particle.setProductionVertex(TVector3(particlePosGeant4));
     particle.setEnergy(sqrt(totalMom2 + particle.getMass()*particle.getMass()));
     particle.setProductionTime(0.0);

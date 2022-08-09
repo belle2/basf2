@@ -174,7 +174,7 @@ void V0findingPerformanceEvaluationModule::event()
 
     B2Vector3D MC_prodvtx = mcParticle.getVertex();
     TVector3 MC_vtx = mcParticle.getDecayVertex();
-    float MC_mom = mcParticle.getMomentum().Mag();
+    float MC_mom = mcParticle.getMomentum().R();
     float MC_mass = mcParticle.getMass();
     TVector3 MC_FL = MC_vtx - MC_prodvtx;
     float flightR = sqrt(MC_FL.X() * MC_FL.X() + MC_FL.Y() * MC_FL.Y());

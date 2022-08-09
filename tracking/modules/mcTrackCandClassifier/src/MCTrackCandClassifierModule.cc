@@ -226,12 +226,12 @@ void MCTrackCandClassifierModule::event()
       MCParticleInfo mcParticleInfo(mcParticle, m_magField);
 
       B2Vector3D decayVertex = mcParticle.getProductionVertex();
-      TVector3 mom = mcParticle.getMomentum();
+      ROOT::Math::XYZVector mom = mcParticle.getMomentum();
       double charge = mcParticle.getCharge();
       double omega = mcParticleInfo.getOmega();
-      double px = mom.Px();
-      double py = mom.Py();
-      double pt = mom.Pt();
+      double px = mom.x();
+      double py = mom.y();
+      double pt = mom.Rho();
       double x = decayVertex.X();
       double y = decayVertex.Y();
       double R = 1 / abs(omega); //cm

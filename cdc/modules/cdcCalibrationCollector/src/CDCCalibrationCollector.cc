@@ -303,7 +303,7 @@ const CDCWire& CDCCalibrationCollectorModule::getIntersectingWire(const TVector3
     const CDCWire& oneWire = layer.getWire(1);
     double newR = oneWire.getWirePos2DAtZ(xyz.z()).norm();
     double arcLength = helixFit.getArcLength2DAtCylindricalR(newR);
-    TVector3 xyzOnWire = helixFit.getPositionAtArcLength2D(arcLength);
+    TVector3 xyzOnWire = B2Vector3D(helixFit.getPositionAtArcLength2D(arcLength));
     crosspoint = Vector3D(xyzOnWire);
   }
 
@@ -319,7 +319,7 @@ void CDCCalibrationCollectorModule::buildEfficiencies(std::vector<unsigned short
     const double radiusofLayer = wireLayer.getRefCylindricalR();
     //simple extrapolation of fit
     const double arcLength = helixFit.getArcLength2DAtCylindricalR(radiusofLayer);
-    const TVector3 xyz = helixFit.getPositionAtArcLength2D(arcLength);
+    const TVector3 xyz = B2Vector3D(helixFit.getPositionAtArcLength2D(arcLength));
     if (!xyz.x()) continue;
     const CDCWire& wireIntersected = getIntersectingWire(xyz, wireLayer, helixFit);
     unsigned short crossedWire = wireIntersected.getEWire();

@@ -105,7 +105,7 @@ void CDCCosmicSelectorModule::event()
     //    std::cout <<" "<< std::endl;
     //    std::cout <<"vr,vx,vy,yz= "<< sqrt(vX*vX + vY*vY) <<" "<<vX <<" "<< vY <<" "<< vZ << std::endl;
 
-    const TVector3 momentum = m_P->getMomentum();
+    const ROOT::Math::XYZVector momentum = m_P->getMomentum();
     //(px,py) is momentum in frame rotated in phi wrt lab. frame
     const double pX0 = momentum.X();
     const double pY0 = momentum.Y();

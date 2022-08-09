@@ -107,11 +107,11 @@ namespace TreeFitter {
     Eigen::Matrix<double, 5, 6> jacobian = Eigen::Matrix<double, 5, 6>::Zero(5, 6);
 
     Belle2::Helix helix = Belle2::Helix(
-                            Belle2::B2Vector3D(
+                            ROOT::Math::XYZVector(
                               positionAndMom(0),
                               positionAndMom(1),
                               positionAndMom(2)),
-                            Belle2::B2Vector3D(
+                            ROOT::Math::XYZVector(
                               positionAndMom(3),
                               positionAndMom(4),
                               positionAndMom(5)),

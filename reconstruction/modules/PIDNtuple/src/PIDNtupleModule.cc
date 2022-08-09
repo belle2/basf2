@@ -139,12 +139,12 @@ void PIDNtupleModule::event()
     m_pid.clear();
     m_pid.evt = evtMetaData->getEvent();
     m_pid.run = evtMetaData->getRun();
-    TVector3 momentum = trackFit->getMomentum();
-    m_pid.p = momentum.Mag();
+    ROOT::Math::XYZVector momentum = trackFit->getMomentum();
+    m_pid.p = momentum.R();
     if (m_makeFlat) {
       if (gRandom->Rndm() * momDistribution(m_pid.p) > m_value) continue;
     }
-    m_pid.cth = momentum.CosTheta();
+    m_pid.cth = cos(momentum.Theta());
     m_pid.phi = momentum.Phi();
     m_pid.pValue = trackFit->getPValue();
     if (mcParticle) {

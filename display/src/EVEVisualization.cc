@@ -341,9 +341,9 @@ void EVEVisualization::addCDCTriggerTrack(const std::string& collectionName,
   const TString label = ObjectInfo::getIdentifier(&trgTrack);
 
   TVector3 track_pos = TVector3(0, 0, trgTrack.getZ0());
-  TVector3 track_mom = (trgTrack.getChargeSign() == 0) ?
-                       trgTrack.getDirection() * 1000 :
-                       trgTrack.getMomentum(1.5);
+  B2Vector3D track_mom = (trgTrack.getChargeSign() == 0) ?
+                         trgTrack.getDirection() * 1000 :
+                         trgTrack.getMomentum(1.5);
 
   TEveRecTrack rectrack;
   rectrack.fP.Set(track_mom);
@@ -407,14 +407,14 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
 
 
   TEveRecTrackD recTrack;
-  const TVector3& poca = fitResult->getPosition();
+  const B2Vector3D& poca = fitResult->getPosition();
   recTrack.fV.Set(poca);
 
-  const TVector3& poca_momentum = fitResult->getMomentum();
+  const B2Vector3D& poca_momentum = fitResult->getMomentum();
   if (std::isfinite(poca_momentum.Mag()))
     recTrack.fP.Set(poca_momentum);
   else //use 1TeV momentum for tracks without curvature
-    recTrack.fP.Set(fitResult->getHelix().getDirection() * 1000);
+    recTrack.fP.Set(B2Vector3D(fitResult->getHelix().getDirection() * 1000));
 
   recTrack.fSign = fitResult->getChargeSign();
   TEveTrack* eveTrack = new TEveTrack(&recTrack, m_gftrackpropagator);
@@ -1117,7 +1117,7 @@ EVEVisualization::MCTrack* EVEVisualization::addMCParticle(const MCParticle* par
   }
 
   if (!m_mcparticleTracks[particle].track) {
-    const TVector3& p = particle->getMomentum();
+    const B2Vector3D& p = particle->getMomentum();
     const B2Vector3D& vertex = particle->getProductionVertex();
     const int pdg = particle->getPDG();
     TParticle tparticle(pdg, particle->getStatus(),
@@ -1170,7 +1170,7 @@ EVEVisualization::MCTrack* EVEVisualization::addMCParticle(const MCParticle* par
 
         TEvePathMarkD refMark(TEvePathMarkD::kDaughter);
         refMark.fV.Set(B2Vector3D(daughter->getProductionVertex()));
-        refMark.fP.Set(daughter->getMomentum());
+        refMark.fP.Set(B2Vector3D(daughter->getMomentum()));
         refMark.fTime = daughter->getProductionTime();
         m_mcparticleTracks[particle].track->AddPathMark(refMark);
       }

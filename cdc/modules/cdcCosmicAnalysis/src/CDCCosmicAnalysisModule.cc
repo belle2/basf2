@@ -183,7 +183,7 @@ void CDCCosmicAnalysisModule::event()
       }
 
       Omega1 = fitresult->getOmega();
-      Mom1 = fitresult->getMomentum();
+      Mom1 = B2Vector3D(fitresult->getMomentum());
       eOm1 = sqrt(fitresult->getCovariance5()[2][2]);
       Z01 = fitresult->getZ0();
       eZ01 = sqrt(fitresult->getCovariance5()[3][3]);
@@ -207,7 +207,7 @@ void CDCCosmicAnalysisModule::event()
         ePhi02 *=  180 / M_PI;
       }
       Omega2 = fitresult->getOmega();
-      Mom2 = fitresult->getMomentum();
+      Mom2 = B2Vector3D(fitresult->getMomentum());
       eOm2 = sqrt(fitresult->getCovariance5()[2][2]);
       Z02 = fitresult->getZ0();
       eZ02 = sqrt(fitresult->getCovariance5()[3][3]);

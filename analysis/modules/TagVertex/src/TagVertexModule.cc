@@ -511,7 +511,7 @@ pair<B2Vector3D, TMatrixDSym> TagVertexModule::findConstraintBoost(double cut, d
 /** proper life time, i.e. in the rest system (in ps) */
 static double getProperLifeTime(const MCParticle* mc)
 {
-  double beta = mc->getMomentum().Mag() / mc->getEnergy();
+  double beta = mc->getMomentum().R() / mc->getEnergy();
   return 1e3 * mc->getLifetime() * sqrt(1 - pow(beta, 2));
 }
 
@@ -933,11 +933,11 @@ TrackFitResult TagVertexModule::getTrackWithTrueCoordinates(ParticleAndWeight co
 }
 
 // static
-B2Vector3D TagVertexModule::getTruePoca(ParticleAndWeight const& paw)
+ROOT::Math::XYZVector TagVertexModule::getTruePoca(ParticleAndWeight const& paw)
 {
   if (!paw.mcParticle) {
     B2ERROR("In TagVertexModule::getTruePoca: no MC particle set");
-    return B2Vector3D(0., 0., 0.);
+    return ROOT::Math::XYZVector(0., 0., 0.);
   }
 
   return DistanceTools::poca(paw.mcParticle->getProductionVertex(),
@@ -958,14 +958,14 @@ TrackFitResult TagVertexModule::getTrackWithRollBackCoordinates(ParticleAndWeigh
                         m_Bfield, 0, 0, tfr->getNDF());
 }
 
-B2Vector3D TagVertexModule::getRollBackPoca(ParticleAndWeight const& paw)
+ROOT::Math::XYZVector TagVertexModule::getRollBackPoca(ParticleAndWeight const& paw)
 {
   if (!paw.mcParticle) {
     B2ERROR("In TagVertexModule::getTruePoca: no MC particle set");
-    return B2Vector3D(0., 0., 0.);
+    return ROOT::Math::XYZVector(0., 0., 0.);
   }
 
-  return paw.particle->getTrackFitResult()->getPosition() - B2Vector3D(paw.mcParticle->getProductionVertex()) + m_mcTagV;
+  return paw.particle->getTrackFitResult()->getPosition() - paw.mcParticle->getProductionVertex() + ROOT::Math::XYZVector(m_mcTagV);
 }
 
 void TagVertexModule::resetReturnParams()

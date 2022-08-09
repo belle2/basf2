@@ -224,16 +224,16 @@ namespace Belle2 {
         const TrackFitResult* fitResult = mdstTrack->getTrackFitResultWithClosestMass(Const::pion);
         if (fitResult) {
           m_arich.pValue = fitResult->getPValue();
-          TVector3 trkPos = fitResult->getPosition();
+          ROOT::Math::XYZVector trkPos = fitResult->getPosition();
           m_arich.charge = fitResult->getChargeSign();
           m_arich.z0 = trkPos.Z();
-          m_arich.d0 = (trkPos.XYvector()).Mod();
+          m_arich.d0 = trkPos.Rho();
           m_arich.nCDC = fitResult->getHitPatternCDC().getNHits();
 #ifdef ALIGNMENT_USING_BHABHA
-          TVector3 trkMom = fitResult->getMomentum();
+          ROOT::Math::XYZVector trkMom = fitResult->getMomentum();
           const ECLCluster* eclTrack = mdstTrack->getRelated<ECLCluster>();
           if (eclTrack) {
-            m_arich.eop = eclTrack->getEnergy() / trkMom.Mag();
+            m_arich.eop = eclTrack->getEnergy() / trkMom.R();
             m_arich.e9e21 = eclTrack->getE9oE21();
           }
 #endif

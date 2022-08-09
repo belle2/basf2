@@ -154,18 +154,18 @@ namespace Belle2 {
             if (mm == 0) {
               phMPDG = mother->getPDG();
               phMvtx = B2Vector3D(mother->getVertex());
-              phMmom = mother->getMomentum();
+              phMmom = B2Vector3D(mother->getMomentum());
             }
             if (mm == 1) {
               phGMPDG = mother->getPDG();
               phGMvtx = B2Vector3D(mother->getVertex());
-              phGMmom = mother->getMomentum();
+              phGMmom = B2Vector3D(mother->getMomentum());
             }
             const MCParticle* pommother = mother->getMother();
             if (!pommother) {
               phPPDG = mother->getPDG();
               phPvtx = B2Vector3D(mother->getVertex());
-              phPmom = mother->getMomentum();
+              phPmom = B2Vector3D(mother->getMomentum());
             }
             mother = pommother;
             mm++;
@@ -198,18 +198,18 @@ namespace Belle2 {
             if (mm == 0) {
               phMPDG = mother->getPDG();
               phMvtx = B2Vector3D(mother->getVertex());
-              phMmom = mother->getMomentum();
+              phMmom = B2Vector3D(mother->getMomentum());
             }
             if (mm == 1) {
               phGMPDG = mother->getPDG();
               phGMvtx = B2Vector3D(mother->getVertex());
-              phGMmom = mother->getMomentum();
+              phGMmom = B2Vector3D(mother->getMomentum());
             }
             const MCParticle* pommother = mother->getMother();
             if (!pommother) {
               phPPDG = mother->getPDG();
               phPvtx = B2Vector3D(mother->getVertex());
-              phPmom = mother->getMomentum();
+              phPmom = B2Vector3D(mother->getMomentum());
             }
             mother = pommother;
             mm++;

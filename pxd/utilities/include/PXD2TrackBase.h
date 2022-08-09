@@ -152,7 +152,7 @@ namespace Belle2 {
 
     // Set track containers
     DBObjPtr<BeamSpot> beamSpotDB; // beam spot is required to correct d0/z0
-    auto ip = beamSpotDB->getIPPosition();
+    auto ip = ROOT::Math::XYZVector(beamSpotDB->getIPPosition());
     if (tfr1Ptr->getChargeSign() > 0) {
       m_track_p.setValues(*recoTracks[0], ip, recoTracksName, pxdInterceptsName, pxdTrackClustersName);
       m_track_m.setValues(*recoTracks[1], ip, recoTracksName, pxdInterceptsName, pxdTrackClustersName);

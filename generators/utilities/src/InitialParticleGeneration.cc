@@ -7,10 +7,8 @@
  **************************************************************************/
 
 #include <generators/utilities/InitialParticleGeneration.h>
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
-#include <Math/RotationY.h>
 
 namespace Belle2 {
 
@@ -20,7 +18,7 @@ namespace Belle2 {
   }
 
   TVector3 InitialParticleGeneration::generateVertex(const TVector3& initial, const TMatrixDSym& cov,
-                                                     MultivariateNormalGenerator& gen)
+                                                     MultivariateNormalGenerator& gen) const
   {
     if (m_event->hasGenerationFlags(BeamParameters::c_smearVertex)) {
       if (!gen.size()) gen.setMeanCov(initial, cov);
@@ -30,43 +28,42 @@ namespace Belle2 {
   }
 
   ROOT::Math::PxPyPzEVector InitialParticleGeneration::generateBeam(const ROOT::Math::PxPyPzEVector& initial, const TMatrixDSym& cov,
-      MultivariateNormalGenerator& gen)
+      MultivariateNormalGenerator& gen) const
   {
     //no smearing, nothing to do
     if (!(m_event->getGenerationFlags() & BeamParameters::c_smearBeam))
       return initial;
 
-    //init random generator if there is a change in beam parameters or at the beginning
-    if (gen.size() != 3) gen.setMeanCov(TVector3(0, 0, 0), cov);
-
-    //generate the actuall smearing delta vector (deltaE, deltaThX, deltaThY)
-    Eigen::VectorXd p = gen.generate();
-
-    // if we don't smear beam energy set the deltaE to zero
-    if (!m_event->hasGenerationFlags(BeamParameters::c_smearBeamEnergy))
-      p[0] = 0;
-
-    // if we don't smear beam direction set deltaThX and deltaThY to 0
-    if (!m_event->hasGenerationFlags(BeamParameters::c_smearBeamDirection)) {
-      p[1] = 0;
-      p[2] = 0;
-    }
 
     //Calculate initial parameters of the beam before smearing
     double E0   = initial.E();
     double thX0 = atan(initial.Px() / initial.Pz());
     double thY0 = atan(initial.Py() / initial.Pz());
 
-    //Apply smearing
-    double E   = E0   + p[0];
-    double thX = thX0 + p[1];
-    double thY = thY0 + p[2];
+    //init random generator if there is a change in beam parameters or at the beginning
+    if (gen.size() != 3) gen.setMeanCov(TVector3(E0, thX0, thY0), cov);
+
+    //generate the actual smeared vector (E, thX, thY)
+    Eigen::VectorXd p = gen.generate();
+
+    //if we don't smear beam energy set the E to initial value
+    if (!m_event->hasGenerationFlags(BeamParameters::c_smearBeamEnergy))
+      p[0] = E0;
+
+    //if we don't smear beam direction set thX and thY to initial values
+    if (!m_event->hasGenerationFlags(BeamParameters::c_smearBeamDirection)) {
+      p[1] = thX0;
+      p[2] = thY0;
+    }
+
+    //store smeared values
+    double E   = p[0];
+    double thX = p[1];
+    double thY = p[2];
 
     //Convert values back to 4-vector
-    int dir = (initial.Pz() > 0) ? 1 : -1;
-    double pz =  dir * sqrt(E * E - Const::electronMass * Const::electronMass) / sqrt(1 + pow(tan(thX), 2) + pow(tan(thY), 2));
-    return ROOT::Math::PxPyPzEVector(pz * tan(thX), pz * tan(thY), pz, E);
-
+    bool isHER = initial.Pz() > 0;
+    return BeamParameters::getFourVector(E, thX, thY, isHER);
   }
 
   MCInitialParticles& InitialParticleGeneration::generate()

@@ -75,7 +75,7 @@ def peel_mc_particle(mc_particle, key="{part_name}"):
             tan_lambda_truth=helix.getTanLambda(),
 
             # At the vertex position
-            pt_truth=momentum.Perp(),
+            pt_truth=momentum.Rho(),
             px_truth=momentum.X(),
             py_truth=momentum.Y(),
             pz_truth=momentum.Z(),
@@ -415,7 +415,7 @@ def peel_track_fit_result(track_fit_result, key="{part_name}"):
         mom = track_fit_result.getMomentum()
         pos = track_fit_result.getPosition()
 
-        pt_estimate = mom.Perp()
+        pt_estimate = mom.Rho()
 
         pt_variance = np.divide(
             mom.X() ** 2 * cov6(3, 3) + mom.Y() ** 2 * cov6(4, 4) - 2 * mom.X() * mom.Y() * cov6(3, 4),

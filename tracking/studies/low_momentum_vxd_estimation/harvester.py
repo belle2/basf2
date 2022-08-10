@@ -294,7 +294,7 @@ class VXDHarvester(QueueHarvester):
                                      track_charge=track_charge,
                                      path_length=path_length,
                                      mc_path_length=mc_path_length,
-                                     p_origin=mc_particle.getMomentum().Mag())
+                                     p_origin=mc_particle.getMomentum().R())
 
                     track_dict = dict(track_helix_perigee_x=track_helix.getPerigeeX(),
                                       track_helix_perigee_y=track_helix.getPerigeeY(),

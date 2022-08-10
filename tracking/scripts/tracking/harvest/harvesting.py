@@ -506,14 +506,14 @@ def test():
              pick=primaries_seen_in_detector,
              output_file_name="MCParticleOverview.root")
     def MCParticleOverview(mc_particle):
-        momentum_tvector3 = mc_particle.getMomentum()
+        momentum_vector = mc_particle.getMomentum()
         pdg_code = mc_particle.getPDG()
         secondary_process = mc_particle.getSecondaryPhysicsProcess()
 
         return dict(
             # Save divide not throwing an ZeroDivisionError
-            tan_lambda=np.divide(1.0, np.tan(momentum_tvector3.Theta())),
-            pt=momentum_tvector3.Pt(),
+            tan_lambda=np.divide(1.0, np.tan(momentum_vector.Theta())),
+            pt=momentum_vector.Rho(),
             secondary_process=secondary_process,
             is_secondary=secondary_process != 0,
             mass=mc_particle.getMass(),

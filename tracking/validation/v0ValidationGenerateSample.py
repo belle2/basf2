@@ -66,7 +66,7 @@ class V0Harvester(HarvestingModule):
         mc_theta = mc_vertex.Theta()
         mc_phi = mc_vertex.Phi()
         mc_m = mc.getMass()
-        mc_p = mc.getMomentum().Mag()
+        mc_p = mc.getMomentum().R()
 
         v0 = mc.getRelated("V0ValidationVertexs")
 

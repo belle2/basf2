@@ -165,7 +165,7 @@ def getHelixFromMCParticle(mc_particle):
     b_field = Belle2.BFieldManager.getField(position).Z() / Belle2.Unit.T
 
     # workaround for the position vector due to change of types. Can be removed once this is figured out.
-    seed_helix = Belle2.Helix(Belle2.B2Vector3D(position).GetTVector3(), momentum, charge_sign, b_field)
+    seed_helix = Belle2.Helix(position, momentum, charge_sign, b_field)
     return seed_helix
 
 

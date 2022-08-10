@@ -19,7 +19,7 @@
 #include <framework/core/SwitchDataStoreModule.h>
 #include <framework/core/MergeDataStoreModule.h>
 #include <framework/core/SteerRootInputModule.h>
-#include <framework/core/CheckMergingConsistencyModule.h>
+#include <framework/core/CreateConsistencyInfoModule.h>
 #include <framework/core/PyObjConvUtils.h>
 
 using namespace Belle2;
@@ -147,8 +147,8 @@ void Path::addIndependentMergePath(const PathPtr& independent_path, std::string 
   switchStart->setName("MergeDataStore ('' -> '" + ds_ID + "')");
   switchEnd->setName("MergeDataStore ('' <- '" + ds_ID + "')");
 
-  ModulePtr checkConsistency = ModuleManager::Instance().registerModule("CheckMergingConsistency");
-  static_cast<CheckMergingConsistencyModule&>(*checkConsistency).init(consistency_check, event_mixing);
+  ModulePtr fillConsistencyInfo = ModuleManager::Instance().registerModule("CreateConsistencyInfo");
+  static_cast<CreateConsistencyInfoModule&>(*fillConsistencyInfo).init(consistency_check, event_mixing);
 
   ModulePtr steerInput = ModuleManager::Instance().registerModule("SteerRootInput");
   static_cast<SteerRootInputModule&>(*steerInput).init(event_mixing, merge_same_file);
@@ -167,7 +167,7 @@ void Path::addIndependentMergePath(const PathPtr& independent_path, std::string 
   // do the merging
   addModule(switchEnd);
   // check events to be merged is consistent (typically charge)
-  addModule(checkConsistency);
+  addModule(fillConsistencyInfo);
   // decide which events have to be processed next
   addModule(steerInput);
   // the current combination of events might not be sensible or unphysical

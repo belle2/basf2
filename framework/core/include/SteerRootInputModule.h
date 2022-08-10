@@ -15,7 +15,12 @@
 #include <framework/dataobjects/MergedEventConsistency.h>
 
 namespace Belle2 {
-  /** Internal module used by Path.add_independent_merge_path(). Don't use it directly. */
+  /** Internal module used by Path.add_independent_merge_path(). Don't use it directly.
+  The module controls event flow for event embedding (reading two separate input files) and mixing (merging events from the same file).
+  The main decision is taken based on the event metadata (experiment, run, event number),
+  some additional input is read from MergedEventConsistency datastore object.
+  A valid combination is based on the return value of the event() method.
+  */
   class SteerRootInputModule : public Module {
 
   public:

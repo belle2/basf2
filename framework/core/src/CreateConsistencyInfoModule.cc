@@ -6,35 +6,35 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <framework/core/CheckMergingConsistencyModule.h>
+#include <framework/core/CreateConsistencyInfoModule.h>
 
 using namespace Belle2;
 
 //-----------------------------------------------------------------
 //                 Register module
 //-----------------------------------------------------------------
-REG_MODULE(CheckMergingConsistency);
+REG_MODULE(CreateConsistencyInfo);
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-CheckMergingConsistencyModule::CheckMergingConsistencyModule() : Module()
+CreateConsistencyInfoModule::CreateConsistencyInfoModule() : Module()
 {
   setDescription("This module checks if events that will be merged are consistent (otherwise events will be skipped later).");
 
   setPropertyFlags(c_ParallelProcessingCertified);
 }
 
-CheckMergingConsistencyModule::~CheckMergingConsistencyModule() = default;
+CreateConsistencyInfoModule::~CreateConsistencyInfoModule() = default;
 
-void CheckMergingConsistencyModule::init(const std::string& option, bool eventMixing)
+void CreateConsistencyInfoModule::init(const std::string& option, bool eventMixing)
 {
   m_option = option;
   m_eventMixing = eventMixing;
 }
 
-void CheckMergingConsistencyModule::initialize()
+void CreateConsistencyInfoModule::initialize()
 {
   m_mergedEventConsistency.registerInDataStore(DataStore::c_DontWriteOut);
   if (!m_EventExtraInfo_main.isOptional() or !m_EventExtraInfo_indep.isOptional()) {
@@ -46,7 +46,7 @@ void CheckMergingConsistencyModule::initialize()
   }
 }
 
-void CheckMergingConsistencyModule::event()
+void CreateConsistencyInfoModule::event()
 {
   m_mergedEventConsistency.create();
   m_mergedEventConsistency->setConsistent(true);

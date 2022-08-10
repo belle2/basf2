@@ -72,7 +72,7 @@ void SteerRootInputModule::initialize()
   }
 
   // Tell the InputController that we are controlling it
-  InputController::enableEventMerging();
+  InputController::enableEventMerging(this);
   // Tell the InputController/Environment how many events we want to process
   // These are UPPER thresholds. We use EventMetaData::setEndOfData() to end processing early if we're done
   // We don't know how many events will have to be skipped (inconsistent charge) so there is not much more we can do here

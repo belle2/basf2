@@ -22,13 +22,15 @@ std::pair<long, long> InputController::s_currentEntry = { 0, 0};
 std::pair<long, long> InputController::s_skippedEntries = { 0, 0};
 std::pair<const TChain*, const TChain*> InputController::s_chain = { nullptr, nullptr};
 bool InputController::s_doEventMerging = false;
+Module* InputController::s_steerRootInputModule = nullptr;
 
-void InputController::enableEventMerging()
+void InputController::enableEventMerging(Module* steerRootInputModule)
 {
   if (s_doEventMerging) {
     B2FATAL("Event merging is already enabled, can not merge twice in the same job, aborting");
   };
   s_doEventMerging = true;
+  s_steerRootInputModule = steerRootInputModule;
 }
 
 

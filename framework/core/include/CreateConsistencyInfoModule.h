@@ -21,20 +21,22 @@ namespace Belle2 {
    * If you want to merge two events with the 'MergeDataStoreModule',
    * it might be necessary to make sure that this combination of events make sense.
    * This module typically checks if the charge is consistent (otherwise events will be skipped later).
+   *
+   * The main output of the module is the MergedEventConsistency datastore object that is used by the SteerRootInput module
    */
-  class CheckMergingConsistencyModule : public Module {
+  class CreateConsistencyInfoModule : public Module {
 
   public:
 
     /**
      * Constructor
      */
-    CheckMergingConsistencyModule();
+    CreateConsistencyInfoModule();
 
     /** setter for Path. */
     void init(const std::string& option, bool eventMixing);
 
-    ~CheckMergingConsistencyModule();
+    ~CreateConsistencyInfoModule();
 
     virtual void initialize() override;
     virtual void event() override;

@@ -11,7 +11,10 @@
 #include <framework/core/Module.h>
 
 namespace Belle2 {
-  /** Internal module used by Path.add_independent_merge_path(). Don't use it directly. */
+  /** Internal module used by Path.add_independent_merge_path(). Don't use it directly.
+  The module is used to prepare two data stores. The first empty ("create_new") data store
+  is used for storage of the independent path input and the second is used to store the merged output.
+  The module triggers merging of the "mergeBack" data store objects.  */
   class MergeDataStoreModule : public Module {
 
   public:
@@ -28,8 +31,6 @@ namespace Belle2 {
     ~MergeDataStoreModule();
 
     virtual void initialize() override;
-    virtual void beginRun() override;
-    virtual void endRun() override;
     virtual void event() override;
     virtual void terminate() override;
 

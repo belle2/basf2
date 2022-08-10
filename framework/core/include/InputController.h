@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <framework/core/Module.h>
+
 #include <string>
 #include <utility>
 
@@ -33,7 +35,7 @@ namespace Belle2 {
     static bool getEventMerging() { return s_doEventMerging; }
 
     /** Set that we are merging events from two paths. */
-    static void enableEventMerging();
+    static void enableEventMerging(Module* steerRootInputModule);
 
     /** Set the file entry to be loaded the next time event() is called.
      *
@@ -100,6 +102,9 @@ namespace Belle2 {
 
     /** Are we merging events from two paths? */
     static bool s_doEventMerging;
+
+    /** Explicit pointer to steerRootInput */
+    static Module* s_steerRootInputModule;
 
     /** entry to be loaded the next time event() is called in an input module.
      *

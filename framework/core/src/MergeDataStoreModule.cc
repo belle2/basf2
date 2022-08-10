@@ -55,9 +55,6 @@ void MergeDataStoreModule::initialize()
   } else if (!m_mergeBack.empty()) {
     //if m_mergeBack is set, we need to register the objects/arrays there, too (if they are not registered yet)
     DataStore::Instance().copyEntriesTo(m_to, m_mergeBack, true);
-    // Why would we need this?!
-    //then copy
-    //DataStore::Instance().mergeContentsTo(m_to, m_mergeBack);
   }
 
   //switch
@@ -66,29 +63,10 @@ void MergeDataStoreModule::initialize()
 
 void MergeDataStoreModule::terminate()
 {
-  if (not m_createNew) {
-    //copy contents over
-    //DataStore::Instance().mergeContentsTo(m_from, {});
-  }
-  //nothing merged back. this is not really consistent anyway.
-
   //terminate() is called in reverse order.
   DataStore::Instance().switchID(m_from);
 }
 
-void MergeDataStoreModule::beginRun()
-{
-  // Why would we need this?!
-  // The main path decides when beginRun() is called but I don't think it is executed in case
-  // a new run starts for the independent path?
-  // TODO: Make sure this cannot cause any problems...
-  //event();
-}
-void MergeDataStoreModule::endRun()
-{
-  // Why would we need this?!
-  //event();
-}
 void MergeDataStoreModule::event()
 {
   if (m_createNew) {

@@ -1064,6 +1064,7 @@ void DataStore::SwitchableDataStoreContents::mergeContentsTo(const std::string& 
 
             // update the cache
             updateRelationsObjectCache(target);
+            delete fromArr;
           }
         } else {
           if (!target.ptr) {

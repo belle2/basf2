@@ -158,7 +158,7 @@ void SteerRootInputModule::event()
   if (nextEntries.first >= numEntries.first || nextEntries.second >= numEntries.second) {
     // Let's make this a warning since the EventProcessor also drops a warning that processing is stopped
     // but of course this behavior is expected in our case :)
-    B2WARNING("Reached end of file(s), so we're done. End processing.");
+    B2INFO("Reached end of file(s), so we're done. End processing.");
     m_processedLastEvent = true;
     // we need to set them to a valid number (doesn't matter what exactly it is)
     nextEntries = currEntries;

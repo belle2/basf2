@@ -33,7 +33,7 @@ namespace Belle2 {
     static bool getEventMerging() { return s_doEventMerging; }
 
     /** Set that we are merging events from two paths. */
-    static void enableEventMerging() { s_doEventMerging = true; };
+    static void enableEventMerging();
 
     /** Set the file entry to be loaded the next time event() is called.
      *

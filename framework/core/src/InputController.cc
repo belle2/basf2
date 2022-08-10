@@ -6,6 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <framework/core/InputController.h>
+#include <framework/logging/Logger.h>
 
 #include <TChain.h>
 #include <TFile.h>
@@ -21,6 +22,15 @@ std::pair<long, long> InputController::s_currentEntry = { 0, 0};
 std::pair<long, long> InputController::s_skippedEntries = { 0, 0};
 std::pair<const TChain*, const TChain*> InputController::s_chain = { nullptr, nullptr};
 bool InputController::s_doEventMerging = false;
+
+void InputController::enableEventMerging()
+{
+  if (s_doEventMerging) {
+    B2FATAL("Event merging is already enabled, can not merge twice in the same job, aborting");
+  };
+  s_doEventMerging = true;
+}
+
 
 void InputController::setChain(const TChain* chain, bool independentPath)
 {

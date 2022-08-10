@@ -896,9 +896,7 @@ void DataStore::SwitchableDataStoreContents::copyEntriesTo(const std::string& id
         if (mergeEntries) {
           // Skip Store-Arrays and Relations..
           if (m_entries[targetidx][c_Event][entryname].isArray
-              or m_entries[targetidx][c_Event][entryname].objClass == RelationContainer::Class()) {
-            skipEntries.push_back(entryname);
-            continue;
+              or m_entries[targetidx][c_Event][entryname].objClass == RelationContainer::Class()) { //do nothing
             // ..but not Store-Objects
           } else {
             // We have to create a new StoreEntry as the name of the key in the map changes
@@ -907,9 +905,9 @@ void DataStore::SwitchableDataStoreContents::copyEntriesTo(const std::string& id
             }
             m_entries[targetidx][c_Event][entryname + "_indepPath"] = StoreEntry(false, m_entries[targetidx][c_Event][entryname].objClass,
                                                                       entryname + "_indepPath", m_entries[targetidx][c_Event][entryname].dontWriteOut);
-            skipEntries.push_back(entryname);
-            continue;
           }
+          skipEntries.push_back(entryname);
+          continue;
         } else {
           B2WARNING("Independent path: entry '" << entryname << "' already exists in DataStore '" << id <<
                     "'! This will likely break something.");

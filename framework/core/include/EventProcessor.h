@@ -172,6 +172,9 @@ namespace Belle2 {
 
     /** Minimal time difference in seconds for metadata updates in event loop */
     double m_metadataUpdateInterval;
+
+    /** True if the SteerRootInputModule is in charge for event processing */
+    bool m_steerRootInputModuleOn = false;
   };
 
 }

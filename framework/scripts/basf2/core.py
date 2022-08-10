@@ -365,6 +365,9 @@ def _add_independent_merge_path(
         if not event_mixing:
             pybasf2.B2INFO("add_independent_merge_path: merge_same_file requires event_mixing, setting it to True")
         event_mixing = True
+    for module in skim_path.modules():
+        if module.type() == "RootInput":
+            module.param("isSecondaryInput", True)
     self._add_independent_merge_path(skim_path, ds_ID, merge_back_event, consistency_check, event_mixing, merge_same_file)
 
 

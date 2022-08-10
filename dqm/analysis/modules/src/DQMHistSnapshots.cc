@@ -13,7 +13,6 @@
 
 #include <framework/core/ModuleParam.templateDetails.h>
 #include <dqm/analysis/modules/DQMHistSnapshots.h>
-#include <daq/slc/base/StringUtil.h>
 #include <TROOT.h>
 #include <TClass.h>
 #include <TH1F.h>
@@ -84,9 +83,9 @@ void DQMHistSnapshotsModule::event()
       n = new SSNODE;
       n->histo = (TH1*) it->second->Clone();
 
-      StringList s = StringUtil::split(a.Data(), '/');
-      std::string dirname = s[0];
-      std::string hname = s[1];
+      auto s = StringSplit(it->first, '/');
+      auto dirname = s.at(0);
+      auto hname = s.at(1);
       std::string canvas_name = dirname + "/c_" + hname;
       n->canvas = findCanvas(canvas_name);
       n->stale = 0;

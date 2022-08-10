@@ -729,7 +729,6 @@ namespace Belle2 {
   }
 
 
-
   /** returns a ROOT::Math::XYZVector containing the same coordinates */
   template< typename DataType >
   ROOT::Math::XYZVector B2Vector3<DataType>::GetXYZVector() const

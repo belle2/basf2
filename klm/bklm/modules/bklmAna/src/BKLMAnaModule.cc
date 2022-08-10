@@ -217,7 +217,6 @@ void BKLMAnaModule::event()
       if (!crossed)
         continue;
 
-      ROOT::Math::XYZVector extMom = exthit->getMomentum();
       ROOT::Math::XYZVector extVec = exthit->getPosition();
       bool matched = false;
       m_totalYX->Fill(extVec.X(), extVec.Y());

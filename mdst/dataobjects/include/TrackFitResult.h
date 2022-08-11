@@ -316,5 +316,6 @@ namespace Belle2 {
        ver 2:                                     <------- incompatible with later version 2
        ver 1:
     */
+    friend class PostMergeUpdaterModule;
   };
 }

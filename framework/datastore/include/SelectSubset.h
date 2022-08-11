@@ -36,15 +36,15 @@ namespace Belle2 {
     /** Get accessor for reduced set. */
     virtual StoreAccessorBase* getSubSet() = 0;
 
-  protected:
-    SelectSubsetBase() { }
-    virtual ~SelectSubsetBase() { }
-
     /** Swap set and subset (+relations), and keep only the reduced set.
      *
      * Subset and associated relations will be empty afterwards.
      */
     void swapSetsAndDestroyOriginal();
+
+  protected:
+    SelectSubsetBase() { }
+    virtual ~SelectSubsetBase() { }
 
     /** array names we inherit relations from. */
     std::vector<std::string> m_inheritFromArrays;
@@ -389,16 +389,17 @@ namespace Belle2 {
       //TODO: change relation direction to set -> subset?
       const StoredClass* setObject1 = subsetObject1.template getRelatedFrom<StoredClass>(m_set->getName());
 
-      //get all objects in original set related to setObject1
-      const RelationVector<StoredClass>& relations = setObject1->template getRelationsTo<StoredClass>(m_set->getName());
-      for (unsigned int iRel = 0; iRel < relations.size(); iRel++) {
-        const StoredClass* setObject2 = relations.object(iRel);
-        const double weight = relations.weight(iRel);
-
-        //if setObject2 was selected into subset, inherit relation
-        const StoredClass* subsetObject2 = setObject2->template getRelatedTo<StoredClass>(m_subset->getName());
-        if (subsetObject2) {
-          subsetObject1.addRelationTo(subsetObject2, weight);
+      if (setObject1 != nullptr) {
+        //get all objects in original set related to setObject1
+        const RelationVector<StoredClass>& relations = setObject1->template getRelationsTo<StoredClass>(m_set->getName());
+        for (unsigned int iRel = 0; iRel < relations.size(); iRel++) {
+          const StoredClass* setObject2 = relations.object(iRel);
+          const double weight = relations.weight(iRel);
+          //if setObject2 was selected into subset, inherit relation
+          const StoredClass* subsetObject2 = setObject2->template getRelatedTo<StoredClass>(m_subset->getName());
+          if (subsetObject2) {
+            subsetObject1.addRelationTo(subsetObject2, weight);
+          }
         }
       }
     }

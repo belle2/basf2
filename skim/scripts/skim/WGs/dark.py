@@ -716,7 +716,7 @@ class InelasticDarkMatterWithDarkHiggs(BaseSkim):
         dr_cut = "[daughter(0, dr) > 0.2] or [daughter(1, dr) > 0.2]"
         vertex_fit_cut = "[daughter(0, chiProb) > 0.1] or [daughter(1, chiProb) > 0.1]"
         ma.reconstructDecay(
-            decay_str=f"beam:{skim_str} -> A0:{skim_str} chi2:{skim_str}",
+            decayString=f"beam:{skim_str} -> A0:{skim_str} chi2:{skim_str}",
             cut=f"[{dr_cut} and {vertex_fit_cut}]",
             path=path,
         )

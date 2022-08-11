@@ -367,9 +367,7 @@ CDCTriggerTSFModule::event()
                 for (int l = k; l < k + ncoin - 1; l++) {
                   filtered_hit[id_ncdchit_asic[i][j][l]] = 1;
                 }
-                //break loop
-                ncoin = 0;
-                k = 8;
+                break;
               }
             }
           }

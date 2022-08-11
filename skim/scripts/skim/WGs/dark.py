@@ -650,6 +650,8 @@ class InelasticDarkMatterWithDarkHiggs(BaseSkim):
     def addParticlesToPDG(self):
         """Adds the particle codes to the basf2 pdg instance """
         pdg.add_particle("chi2", 52, 0, 0, 0, 0)
+        # Abstract beam object to combine the two vertices (particles)
+        pdg.add_particle("beam", 9999, 0, 0, 0, 0)
 
     def load_standard_lists(self, path):
         stdE("all", path=path)
@@ -688,6 +690,12 @@ class InelasticDarkMatterWithDarkHiggs(BaseSkim):
             updateAllDaughters=True,
             path=path,
         )
+        ma.applyCuts(
+            list_name=f"A0:{skim_str}",
+            cut="chiProb > 0",
+            path=path,
+        )
+
         ma.reconstructDecay(
             decayString=f"chi2:{skim_str} -> e+:{skim_str} e-:{skim_str}",
             cut="pt > 0.1",
@@ -699,14 +707,18 @@ class InelasticDarkMatterWithDarkHiggs(BaseSkim):
             updateAllDaughters=True,
             path=path,
         )
+        ma.applyCuts(
+            list_name=f"chi2:{skim_str}",
+            cut="chiProb > 0",
+            path=path,
+        )
 
-        dr_cut = "dr >= 0.2"
-        ma.cutAndCopyList("A0:dr", f"A0:{skim_str}", f"[{dr_cut}]", path=path)
-        ma.cutAndCopyList("chi2:dr", f"chi2:{skim_str}", f"[{dr_cut}]", path=path)
+        dr_cut = "[daughter(0, dr) > 0.2] or [daughter(1, dr) > 0.2]"
+        vertex_fit_cut = "[daughter(0, chiProb) > 0.1] or [daughter(1, chiProb) > 0.1]"
+        ma.reconstructDecay(
+            decay_str=f"beam:{skim_str} -> A0:{skim_str} chi2:{skim_str}",
+            cut=f"[{dr_cut} and {vertex_fit_cut}]",
+            path=path,
+        )
 
-        dr_event_cut = "[nParticlesInList(A0:dr) > 0 or nParticlesInList(chi2:dr) > 0]"
-        idmdh_event_cuts = f"{dr_event_cut}"
-
-        path = self.skim_event_cuts(idmdh_event_cuts, path=path)
-
-        return [f"A0:{skim_str}", f"chi2:{skim_str}"]
+        return [f"beam:{skim_str}"]

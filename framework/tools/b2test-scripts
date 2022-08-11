@@ -114,9 +114,9 @@ def format_output(name, out, err):
     if options.quiet:
         return ""
     output = []
-    if out.strip():
+    if out and out.strip():
         output += ["=== stdout of %s ===\n" % name, out.decode(errors="replace")]
-    if err.strip():
+    if err and err.strip():
         output += ["=== stderr of %s ===\n" % name, err.decode(errors="replace")]
     if len(output):
         output.append("=== end %s ===\n" % name)

@@ -141,10 +141,12 @@ void TRGGRLUnpackerModule::fillTreeTRGGRLUnpacker(int* buf, int evt)
     }
   }
 //----------
-  rawstore->set_N_cluster_0(rawstore->get_N_cluster_0() + rawstore->get_N_cluster_1());
+  rawstore->set_N_cluster(rawstore->get_N_cluster_0() + rawstore->get_N_cluster_1());
   evtinfo.assign(rawstore);
   std::vector<int> index_ECL;
   std::vector<int> clkindex_ECL;
+  index_ECL.clear();
+  clkindex_ECL.clear();
   for (int i = 0; i < rawstore->get_N_cluster_0(); i++) {
     index_ECL.push_back(i); clkindex_ECL.push_back(0);
   }
@@ -165,14 +167,14 @@ void TRGGRLUnpackerModule::fillTreeTRGGRLUnpacker(int* buf, int evt)
   for (int i = 0; i < rawstore->get_N_cluster(); i++) {
     int index = index_ECL[i];
     int clkindex = clkindex_ECL[i];
-    evtinfo->set_clk_ECL(i, clkindex);
-    evtinfo->set_E_ECL(i, rawstore->get_E_ECL(index));
-    evtinfo->set_t_ECL(i, rawstore->get_t_ECL(index));
-    evtinfo->set_theta_ECL(i, rawstore->get_theta_ECL(index));
-    evtinfo->set_phi_ECL(i, rawstore->get_phi_ECL(index));
-    evtinfo->set_E_ECL(i, rawstore->get_E_ECL(index));
-    evtinfo->set_1GeV_ECL(i, rawstore->get_1GeV_ECL(index));
-    evtinfo->set_2GeV_ECL(i, rawstore->get_2GeV_ECL(index));
+    evtinfo->set_clk_ECL(index, clkindex);
+    evtinfo->set_E_ECL(index, rawstore->get_E_ECL(index));
+    evtinfo->set_t_ECL(index, rawstore->get_t_ECL(index));
+    evtinfo->set_theta_ECL(index, rawstore->get_theta_ECL(index));
+    evtinfo->set_phi_ECL(index, rawstore->get_phi_ECL(index));
+    evtinfo->set_E_ECL(index, rawstore->get_E_ECL(index));
+    evtinfo->set_1GeV_ECL(index, rawstore->get_1GeV_ECL(index));
+    evtinfo->set_2GeV_ECL(index, rawstore->get_2GeV_ECL(index));
   }
 
 //----------

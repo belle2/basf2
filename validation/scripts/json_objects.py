@@ -153,6 +153,7 @@ class Plot(JsonBase):
         contact=None,
         width=None,
         height=None,
+        issue=None,
     ):
         """
         Create a new Plot object and fill all members
@@ -170,6 +171,8 @@ class Plot(JsonBase):
         self.width = width
         #: height of the plot in pixels
         self.height = height
+        #: linked issues
+        self.issue = issue
 
 
 class NTuple(JsonBase):

@@ -75,7 +75,13 @@
     <b>Description: </b>
     {{ description }}
     {{ /if }}
-    <br>
+    {{#scriptfiles}}
+    {{#if name == rootfile+".py" }}
+    <b>Script: </b>
+    <code>{{name}}</code> -
+    <a href="../results/{{newest_revision}}/{{log_url}}" target="_blank">log</a>
+    {{/if}}
+    {{/scriptfiles}}
 
     <!-- If we have html content: -->
     <!------------------------------>
@@ -203,7 +209,7 @@
     <h2 class="persistent-header">Plot: {{ title }}</h2>
     <div class="object">
       <!-- todo: ../ should be removed for final deployment -->
-      <a target="_blank" href="../{{ plot_path }}{{ pdf_filename }}">
+      <a target="_blank" href="../{{ plot_path }}{{ png_filename }}">
         <img width="{{width}}" height="{{height}}" src="../{{ plot_path }}{{ png_filename }}">
       </a>
     </div>
@@ -227,6 +233,21 @@
   {{! if the warning has not been set, no pvalue is available either }}
   <span><strong>Contact: </strong>{{ contact }}</span><br>
   <span><strong>Check for: </strong>{{ check }}</span><br>
+  {{#if issue != null }}
+  <span>
+    <strong>Linked issues: </strong>
+    <a target="_blank" href="https://gitlab.desy.de/aprakash/dummy/-/issues/{{issue}}">{{issue}}</a> || 
+    <a target="_blank" href="../update_issue?file_path={{ plot_path }}{{ png_filename }}&id={{issue}}" target="_blank">Update with this plot</a>
+  </span>
+  <br>
+  {{else}}
+  <span><a href="../issue?file_path={{ plot_path }}{{ png_filename }}" target="_blank">Create issue</a></span><br>
+  {{/if}}
+  {{#scriptfiles}}
+  {{#if name == rootfile+".py" }}
+  <a href="../results/{{newest_revision}}/{{log_url}}" target="_blank">Logfile</a><br>
+  {{/if}}
+  {{/scriptfiles}}
   <!-- todo: share this plot -->
 </div>
 {{/partial}}

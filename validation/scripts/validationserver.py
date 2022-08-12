@@ -22,6 +22,7 @@ import webbrowser
 
 # 3rd
 import cherrypy
+import gitlab
 
 # ours
 import json_objects
@@ -29,7 +30,7 @@ from validationplots import create_plots
 import validationfunctions
 import validationpath
 
-g_plottingProcesses: Dict[str, Tuple[Process, Queue, Dict[str, Any]]] = ({})
+g_plottingProcesses: Dict[str, Tuple[Process, Queue, Dict[str, Any]]] = {}
 
 
 def get_revision_label_from_json_filename(json_filename: str) -> str:
@@ -63,9 +64,7 @@ def get_json_object_list(results_folder: str, json_file_name: str) -> List[str]:
             data = json.load(json_file)  # noqa
 
             # always use the folder name as label
-            found_rev_labels.append(
-                get_revision_label_from_json_filename(r_file)
-            )
+            found_rev_labels.append(get_revision_label_from_json_filename(r_file))
 
     return found_rev_labels
 
@@ -124,9 +123,7 @@ def warn_wrong_directory():
 
 
 # todo: limit the number of running plotting requests and terminate hanging ones
-def start_plotting_request(
-    revision_names: List[str], results_folder: str
-) -> str:
+def start_plotting_request(revision_names: List[str], results_folder: str) -> str:
     """
     Start a new comparison between the supplied revisions
 
@@ -166,6 +163,136 @@ def start_plotting_request(
     return rev_key
 
 
+# todo: cfg file location
+def create_gitlab_object():
+    """
+    Establish connection with Gitlab using a private access key and return
+    a Gitlab object that can be used to make API calls.
+
+    Returns:
+        gitlab object
+    """
+
+    gitlab_object = gitlab.Gitlab.from_config("belle2validation", ["../config/gl.cfg"])
+    gitlab_object.auth()
+
+    logging.info("Established connection with Gitlab")
+
+    return gitlab_object
+
+
+def get_project_object(gitlab_object, project_id):
+    """
+    Fetch Gitlab project associated with the project ID.
+
+    Returns:
+        gitlab project object
+    """
+
+    project = gitlab_object.projects.get(project_id, lazy=True)
+
+    return project
+
+
+def update_linked_issues(gitlab_object, cwd_folder, project_id):
+    """
+    Fetch linked issues and update the json file.
+    """
+
+    project = gitlab_object.projects.get(project_id, lazy=True)
+
+    # get list of available revision
+    rev_list = get_json_object_list(
+        validationpath.get_html_plots_folder(cwd_folder),
+        validationpath.file_name_comparison_json,
+    )
+
+    for r in rev_list:
+        comparison_json_path = os.path.join(
+            validationpath.get_html_plots_folder(cwd_folder),
+            r,
+            validationpath.file_name_comparison_json,
+        )
+        print(comparison_json_path)
+        comparison_json = deliver_json(comparison_json_path)
+        for package in comparison_json["packages"]:
+            for plotfile in package.get("plotfiles"):
+                for plot in plotfile.get("plots"):
+                    issues = project.issues.list(
+                        search="Relevant plot {}".format(plot["title"])
+                    )
+                    if len(issues) != 0:
+                        plot["issue"] = issues[0].iid
+
+        # json_objects.dump(comparison_json_path,comparison_json)
+        with open(comparison_json_path, "w") as jsonFile:
+            json.dump(comparison_json, jsonFile, indent=4)
+
+
+def upload_file_gitlab(file_path, project):
+    """
+    Upload the passed file to the Gitlab project.
+
+    Returns:
+        uploaded gitlab project file object
+    """
+
+    uploaded_file = project.upload(file_path.split("/")[-1], filepath=file_path)
+
+    return uploaded_file
+
+
+def create_gitlab_issue(title, description, uploaded_file, project):
+    """
+    Create a new project issue with the passed title and description, using
+    Gitlab API.
+
+    Returns:
+        isssue id
+    """
+
+    issue = project.issues.create({"title": title, "description": description})
+
+    issue.labels = ["validation_issue"]
+    issue.notes.create(
+        {"body": "See the [error plot]({})".format(uploaded_file["url"])}
+    )
+
+    issue.save()
+
+    logging.info(f"Created a new Gitlab issue - {issue.iid}")
+
+    return issue.iid
+
+
+# todo:add sw label as well?
+def update_gitlab_issue(issue_iid, uploaded_file, project, file_path):
+    """
+    Update an existing project issue with the passed plotfile.
+
+    Returns:
+        issue id
+    """
+
+    issue = project.issues.get(issue_iid)
+    plot_name = file_path.split("/")[-1].split(".")[0]
+    plot_package = file_path.split("/")[-2]
+    issue.notes.create(
+        {
+            "body": "Related observation in validation of {0} package, {1}. \
+        See the [error plot]({2})".format(
+                plot_package, plot_name, uploaded_file["url"]
+            )
+        }
+    )
+
+    issue.save()
+
+    logging.info(f"Updated existing Gitlab issue {issue.iid}")
+
+    return issue.iid
+
+
 class ValidationRoot:
 
     """
@@ -175,6 +302,9 @@ class ValidationRoot:
     creation of comparison plots.
 
     """
+
+    # Check if it is better to make this a session object variable
+    plot_path = None
 
     def __init__(self, working_folder):
         """
@@ -193,6 +323,9 @@ class ValidationRoot:
             os.environ["BELLE2_LOCAL_DIR"]
         )
 
+        # Gitlab object
+        self.gitlab_object = create_gitlab_object()
+
     @cherrypy.expose
     @cherrypy.tools.json_in()
     @cherrypy.tools.json_out()
@@ -204,7 +337,8 @@ class ValidationRoot:
         rev_list = cherrypy.request.json["revision_list"]
         logging.debug("Creating plots for revisions: " + str(rev_list))
         progress_key = start_plotting_request(
-            rev_list, validationpath.get_results_folder(self.working_folder),
+            rev_list,
+            validationpath.get_results_folder(self.working_folder),
         )
         return {"progress_key": progress_key}
 
@@ -377,9 +511,7 @@ class ValidationRoot:
 
         # check if this comparison actually exists
         if not os.path.isfile(path):
-            raise cherrypy.HTTPError(
-                404, f"Json Comparison file {path} does not exist"
-            )
+            raise cherrypy.HTTPError(404, f"Json Comparison file {path} does not exist")
 
         return deliver_json(path)
 
@@ -403,6 +535,95 @@ class ValidationRoot:
                 os.environ["BELLE2_LOCAL_DIR"]
             ),
         }
+
+    # Todo: change redirect link to production one
+    @cherrypy.expose
+    @cherrypy.tools.json_in()
+    @cherrypy.tools.json_out()
+    def create_issue(self, title, description):
+        """
+        Call the functions to create the issue and redirect
+        to the created Gitlab issue page.
+        """
+
+        # Create issue in the Gitlab project and save it
+        project = get_project_object(self.gitlab_object, 3318)
+        uploaded_file = upload_file_gitlab(ValidationRoot.plot_path, project)
+        plot_title = ValidationRoot.plot_path.split("/")[-1].split(".")[0]
+        description += "\n [Automated code, please do not delete]\n\
+            Relevant plot {}".format(
+            plot_title
+        )
+        issue_id = create_gitlab_issue(title, description, uploaded_file, project)
+        project.save()
+
+        # Update JSON with created issue id
+        comparison_json_path = os.path.join(
+            validationpath.get_html_plots_folder(self.working_folder),
+            ValidationRoot.plot_path.split("/")[-3],
+            "comparison.json",
+        )
+
+        comparison_json = deliver_json(comparison_json_path)
+        for package in comparison_json["packages"]:
+            if package["name"] == ValidationRoot.plot_path.split("/")[-2]:
+                for plotfile in package.get("plotfiles"):
+                    for plot in plotfile.get("plots"):
+                        if (
+                            plot["png_filename"]
+                            == ValidationRoot.plot_path.split("/")[-1]
+                        ):
+                            plot["issue"] = issue_id
+                            break
+
+        # json_objects.dump(comparison_json_path,comparison_json)
+        with open(comparison_json_path, "w") as jsonFile:
+            json.dump(comparison_json, jsonFile, indent=4)
+
+        raise cherrypy.HTTPRedirect(
+            "https://gitlab.desy.de/aprakash/dummy/-/issues/" + str(issue_id)
+        )
+
+    @cherrypy.expose
+    def issue(self, file_path):
+        """
+        Return a template issue creation interface
+        for the user to add title and description.
+        """
+        ValidationRoot.plot_path = os.path.join(
+            validationpath.get_html_folder(self.working_folder), file_path
+        )
+
+        return """<html>
+          <head></head>
+          <body>
+            <form method="get" action="create_issue">
+              <legend>Issue Info</legend>
+              <input type="text" name="title" placeholder="Title"/><br>
+              <textarea name="description" placeholder="Description"></textarea><br>
+              <button type="submit">Create</button>
+            </form>
+          </body>
+        </html>"""
+
+    @cherrypy.expose
+    def update_issue(self, id, file_path):
+        """
+        Update existing issue in Gitlab with current result plot
+        and redirect to the updated Gitlab issue page.
+        """
+        plot_path = os.path.join(
+            validationpath.get_html_folder(self.working_folder), file_path
+        )
+
+        project = get_project_object(self.gitlab_object, 3318)
+        uploaded_file = upload_file_gitlab(plot_path, project)
+        issue_id = update_gitlab_issue(id, uploaded_file, project, plot_path)
+        project.save()
+
+        raise cherrypy.HTTPRedirect(
+            "https://gitlab.desy.de/aprakash/dummy/-/issues/" + str(issue_id)
+        )
 
 
 def setup_gzip_compression(path, cherry_config):
@@ -435,16 +656,14 @@ def get_argument_parser():
     parser.add_argument(
         "-ip",
         "--ip",
-        help="The IP address on which the"
-        "server starts. Default is '127.0.0.1'.",
+        help="The IP address on which the" "server starts. Default is '127.0.0.1'.",
         type=str,
         default="127.0.0.1",
     )
     parser.add_argument(
         "-p",
         "--port",
-        help="The port number on which"
-        " the server starts. Default is '8000'.",
+        help="The port number on which" " the server starts. Default is '8000'.",
         type=str,
         default=8000,
     )
@@ -513,18 +732,14 @@ def run_server(
     static_folder = None
 
     if basepath["central"] is not None:
-        static_folder_central = os.path.join(
-            basepath["central"], *static_folder_list
-        )
+        static_folder_central = os.path.join(basepath["central"], *static_folder_list)
         if os.path.isdir(static_folder_central):
             static_folder = static_folder_central
 
     # check if there is also a collection of static files in the local release
     # this overwrites the usage of the central release
     if basepath["local"] is not None:
-        static_folder_local = os.path.join(
-            basepath["local"], *static_folder_list
-        )
+        static_folder_local = os.path.join(basepath["local"], *static_folder_list)
         if os.path.isdir(static_folder_local):
             static_folder = static_folder_local
 
@@ -616,7 +831,10 @@ def run_server(
         production_env = cmd_arguments.production
 
     cherrypy.config.update(
-        {"server.socket_host": ip, "server.socket_port": port, }
+        {
+            "server.socket_host": ip,
+            "server.socket_port": port,
+        }
     )
     if production_env:
         cherrypy.config.update({"environment": "production"})

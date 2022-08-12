@@ -9,9 +9,6 @@
 // Own include
 #include <dqm/analysis/modules/DQMHistAnalysisCDCMonObj.h>
 
-//DQM
-#include <dqm/core/DQMHistAnalysis.h>
-
 // CDC geometry
 #include <cdc/geometry/CDCGeometryPar.h>
 

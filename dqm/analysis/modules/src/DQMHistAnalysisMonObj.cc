@@ -9,9 +9,6 @@
 // Own include
 #include <dqm/analysis/modules/DQMHistAnalysisMonObj.h>
 
-//DQM
-#include <dqm/core/DQMHistAnalysis.h>
-
 #include <TH1F.h>
 
 using namespace std;

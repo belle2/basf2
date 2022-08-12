@@ -759,7 +759,8 @@ bool TagVertexModule::makeGeneralFitRave()
   return true;
 }
 
-bool TagVertexModule::makeGeneralFitKFit()
+
+analysis::VertexFitKFit TagVertexModule::doSingleKfit(vector<ParticleAndWeight>& particleAndWeights)
 {
   //initialize KFit
   analysis::VertexFitKFit kFit;
@@ -782,10 +783,7 @@ bool TagVertexModule::makeGeneralFitKFit()
     }
   }
 
-  //feed KFit with tracks without Kshorts
-  vector<ParticleAndWeight> particleAndWeights = getParticlesWithoutKS(m_tagParticles);
 
-  int nTracksAdded = 0;
   for (auto& pawi : particleAndWeights) {
     int addedOK = 1;
     if (m_useTruthInFit) {
@@ -813,7 +811,6 @@ bool TagVertexModule::makeGeneralFitKFit()
     }
 
     if (addedOK == 0) {
-      ++nTracksAdded;
       pawi.weight = 1.;
     } else {
       B2WARNING("TagVertexModule::makeGeneralFitKFit: failed to add a track");
@@ -821,12 +818,29 @@ bool TagVertexModule::makeGeneralFitKFit()
     }
   }
 
+
+  int nTracksAdded = kFit.getTrackCount();
+
   //perform fit if there are enough tracks
   if ((nTracksAdded < 2 && m_constraintType == "noConstraint") || nTracksAdded < 1)
-    return false;
+    return  analysis::VertexFitKFit();
 
   int isGoodFit = kFit.doFit();
-  if (isGoodFit != 0) return false;
+  if (isGoodFit != 0) return analysis::VertexFitKFit();
+
+  return kFit;
+}
+
+//uses m_tagMomentum, m_constraintCenter, m_constraintCov, m_tagParticles
+bool TagVertexModule::makeGeneralFitKFit()
+{
+  //feed KFit with tracks without Kshorts
+  vector<ParticleAndWeight> particleAndWeights = getParticlesWithoutKS(m_tagParticles);
+
+
+  analysis::VertexFitKFit kFit =  doSingleKfit(particleAndWeights);
+  if (!kFit.isFitted())
+    return false;
 
   //save the track info for later use
   //Tracks are sorted by weight, ie pushing the tracks with 0 weight (from KS) to the end of the list

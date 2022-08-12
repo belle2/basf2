@@ -20,6 +20,9 @@
 #include <analysis/VertexFitting/RaveInterface/RaveVertexFitter.h>
 #include <analysis/VertexFitting/RaveInterface/RaveKinematicVertexFitter.h>
 
+// kFit
+#include <analysis/VertexFitting/KFit/VertexFitKFit.h>
+
 // KFit
 #include <CLHEP/Geometry/Point3D.h>
 #include <CLHEP/Matrix/SymMatrix.h>
@@ -170,6 +173,9 @@ namespace Belle2 {
     /** performs the fit using the standard algorithm - using all tracks in RoE
     The user can specify a request on the PXD hits left by the tracks*/
     std::vector<const Particle*> getTagTracks_standardAlgorithm(const Particle* Breco, int nPXDHits) const;
+
+
+    analysis::VertexFitKFit doSingleKfit(std::vector<ParticleAndWeight>& particleAndWeights);
 
     /**
      * Get a list of pions from a list of pions removing the Kshorts

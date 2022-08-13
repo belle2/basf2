@@ -17,7 +17,7 @@ Validation of KLM time cabledelay calibration.
 import basf2
 from prompt import ValidationSettings
 import ROOT
-from ROOT.Belle2 import KLMCalibrationChecker, BKLMElementNumbers, KLMElementNumbers
+from ROOT.Belle2 import KLMCalibrationChecker
 import sys
 import subprocess
 import math
@@ -83,7 +83,7 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
     ROOT.gStyle.SetOptStat(0)
 
     # Path to the database.txt file.
-    database_file = f'{job_path}/KLMTime/outputdb/database.txt'
+    database_file = os.path.join(f'{job_path}/KLMTime/outputdb/', 'database.txt')
 
     # Check the list of runs from the file database.txt.
     exp_run_dict = {}
@@ -138,29 +138,25 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
 
             tree = input_file.Get("cabledelay")
             assert isinstance(tree, ROOT.TTree) == 1
-            bklm = KLMElementNumbers.c_BKLM
-            eklm = KLMElementNumbers.c_EKLM
-            first_rpc = BKLMElementNumbers.c_FirstRPCLayer
             myC = TCanvas("myC")
 
-            if (f'subdetector=={bklm} && layer>={first_rpc}'):
-                tree.Draw("timeDelay>>barrel_RPC")
-                barrel_RPC.Fit("gaus")
-                barrel_RPC.GetXaxis().SetTitle("T_{cable} (ns)")
-                barrel_RPC.GetYaxis().SetTitle("Entries")
-                myC.Print("barrel_RPC.png")
-            if (f'subdetector=={bklm} && layer<{first_rpc}'):
-                tree.Draw("timeDelay>>barrel_scintillator")
-                barrel_scintillator.Fit("gaus")
-                barrel_scintillator.GetXaxis().SetTitle("T_{cable} (ns)")
-                barrel_scintillator.GetYaxis().SetTitle("Entries")
-                myC.Print("barrel_scintillator.png")
-            if (f'subdetector=={eklm}'):
-                tree.Draw("timeDelay>>endcap_scintillator")
-                endcap_scintillator.Fit("gaus")
-                endcap_scintillator.GetXaxis().SetTitle("T_{cable} (ns)")
-                endcap_scintillator.GetYaxis().SetTitle("Entries")
-                myC.Print("endcap_scintillator.png")
+            tree.Draw("timeDelay>>barrel_RPC", "subdetector==1 & layer>=3")
+            barrel_RPC.Fit("gaus")
+            barrel_RPC.GetXaxis().SetTitle("T_{cable} (ns)")
+            barrel_RPC.GetYaxis().SetTitle("Entries")
+            myC.Print("barrel_RPC.png")
+
+            tree.Draw("timeDelay>>barrel_scintillator", "subdetector==1 & layer<3")
+            barrel_scintillator.Fit("gaus")
+            barrel_scintillator.GetXaxis().SetTitle("T_{cable} (ns)")
+            barrel_scintillator.GetYaxis().SetTitle("Entries")
+            myC.Print("barrel_scintillator.png")
+
+            tree.Draw("timeDelay>>endcap_scintillator", "subdetector==2")
+            endcap_scintillator.Fit("gaus")
+            endcap_scintillator.GetXaxis().SetTitle("T_{cable} (ns)")
+            endcap_scintillator.GetYaxis().SetTitle("Entries")
+            myC.Print("endcap_scintillator.png")
 
             # Write out histograms
             fout = TFile("KLMTimeCableDelay.root", "recreate")

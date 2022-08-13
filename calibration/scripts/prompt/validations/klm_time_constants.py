@@ -17,7 +17,7 @@ Validation of KLM time constants calibration.
 import basf2
 from prompt import ValidationSettings
 import ROOT
-from ROOT.Belle2 import KLMCalibrationChecker, BKLMElementNumbers, KLMElementNumbers
+from ROOT.Belle2 import KLMCalibrationChecker
 import sys
 import subprocess
 import math
@@ -83,7 +83,7 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
     ROOT.gStyle.SetOptStat(0)
 
     # Path to the database.txt file.
-    database_file = f'{job_path}/KLMTime/outputdb/database.txt'
+    database_file = os.path.join(f'{job_path}/KLMTime/outputdb/', 'database.txt')
 
     # Check the list of runs from the file database.txt.
     exp_run_dict = {}
@@ -132,48 +132,38 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
             gStyle.SetOptStat(1111111)
             gStyle.SetOptFit(1111)
 
-            barrel_RPCPhi = TH2F("barrel_RPCPhi", "time constants for Barrel RPC phi readout", 100, 30000, 65000, 100, 0.008, 0.011)
-            barrel_scintillator = TH2F(
-                "barrel_scintillator",
-                "time constants for Barrel scintillator",
-                100,
-                30000,
-                65000,
-                100,
-                0.081,
-                0.082)
-            endcap_scintillator = TH2F(
-                "endcap_scintillator",
-                "time constants for endcap scintillator",
-                100,
-                0,
-                16000,
-                100,
-                0.069,
-                0.075)
+            barrel_RPCPhi = TH2F("barrel_RPCPhi",
+                                 "time constants for Barrel RPC phi readout", 100, 30000, 65000, 100, 0.004, 0.011)
+            barrel_RPCZ = TH2F("barrel_RPCZ",
+                               "time constants for Barrel RPC Z readout", 100, 30000, 65000, 100, 0.0, 0.0015)
+            barrel_scintillator = TH2F("barrel_scintillator",
+                                       "time constants for Barrel scintillator", 100, 30000, 65000, 100, 0.075, 0.09)
+            endcap_scintillator = TH2F("endcap_scintillator",
+                                       "time constants for endcap scintillator", 100, 0, 16000, 100, 0.069, 0.075)
 
             tree = input_file.Get("constants")
             assert isinstance(tree, ROOT.TTree) == 1
-            bklm = KLMElementNumbers.c_BKLM
-            eklm = KLMElementNumbers.c_EKLM
-            first_rpc = BKLMElementNumbers.c_FirstRPCLayer
             myC = TCanvas("myC")
 
-            if (f'subdetector=={bklm} && layer>={first_rpc}'):
-                tree.Draw("delayRPCPhi:channelNumber>>barrel_RPCPhi", "", "colz")
-                barrel_RPCPhi.GetXaxis().SetTitle("Channel number")
-                barrel_RPCPhi.GetYaxis().SetTitle("Time Delay constants")
-                myC.Print("barrel_RPCPhi.png")
-            if (f'subdetector=={bklm} && layer<{first_rpc}'):
-                tree.Draw("delayBKLM:channelNumber>>barrel_scintillator", "", "colz")
-                barrel_scintillator.GetXaxis().SetTitle("Channel number")
-                barrel_scintillator.GetYaxis().SetTitle("Time Delay constants")
-                myC.Print("barrel_scintillator.png")
-            if (f'subdetector=={eklm}'):
-                tree.Draw("delayEKLM:channelNumber>>endcap_scintillator", "", "colz")
-                endcap_scintillator.GetXaxis().SetTitle("Channel number")
-                endcap_scintillator.GetYaxis().SetTitle("Time Delay constants")
-                myC.Print("endcap_scintillator.png")
+            tree.Draw("delayRPCPhi:channelNumber>>barrel_RPCPhi", "subdetector==1 & layer>=3", "colz")
+            barrel_RPCPhi.GetXaxis().SetTitle("Channel number")
+            barrel_RPCPhi.GetYaxis().SetTitle("Time Delay constants")
+            myC.Print("barrel_RPCPhi.png")
+
+            tree.Draw("delayRPCZ:channelNumber>>barrel_RPCZ", "subdetector==1 & layer>=3", "colz")
+            barrel_RPCZ.GetXaxis().SetTitle("Channel number")
+            barrel_RPCZ.GetYaxis().SetTitle("Time Delay constants")
+            myC.Print("barrel_RPCZ.png")
+
+            tree.Draw("delayBKLM:channelNumber>>barrel_scintillator", "subdetector==1 & layer<3", "colz")
+            barrel_scintillator.GetXaxis().SetTitle("Channel number")
+            barrel_scintillator.GetYaxis().SetTitle("Time Delay constants")
+            myC.Print("barrel_scintillator.png")
+
+            tree.Draw("delayEKLM:channelNumber>>endcap_scintillator", "subdetector==2", "colz")
+            endcap_scintillator.GetXaxis().SetTitle("Channel number")
+            endcap_scintillator.GetYaxis().SetTitle("Time Delay constants")
+            myC.Print("endcap_scintillator.png")
 
             fout = TFile("KLMTimeConstants.root", "recreate")
             barrel_RPCPhi.Write()

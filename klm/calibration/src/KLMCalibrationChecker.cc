@@ -19,7 +19,6 @@
 #include <klm/dbobjects/KLMStripEfficiency.h>
 #include <klm/dbobjects/KLMTimeCableDelay.h>
 #include <klm/dbobjects/KLMTimeConstants.h>
-#include <klm/dbobjects/KLMTimeResolution.h>
 
 /* Belle II headers. */
 #include <framework/database/Database.h>
@@ -488,17 +487,17 @@ void KLMCalibrationChecker::checkTimeCableDelay()
   double timeDelay;
   TFile* timeCableDelayResults =
     new TFile(m_TimeCableDelayResultsFile.c_str(), "recreate");
-  TTree* cabledelayTree = new TTree("cabledelay", "KLM timecabledelay data");
-  cabledelayTree->Branch("experiment", &m_experiment, "experiment/I");
-  cabledelayTree->Branch("run", &m_run, "run/I");
-  cabledelayTree->Branch("subdetector", &subdetector, "subdetector/I");
-  cabledelayTree->Branch("section", &section, "section/I");
-  cabledelayTree->Branch("sector", &sector, "sector/I");
-  cabledelayTree->Branch("layer", &layer, "layer/I");
-  cabledelayTree->Branch("plane", &plane, "plane/I");
-  cabledelayTree->Branch("strip", &strip, "strip/I");
-  cabledelayTree->Branch("channelNumber", &channelNumber, "channelNumber/I");
-  cabledelayTree->Branch("timeDelay", &timeDelay, "timeDelay/D");
+  TTree* cableDelayTree = new TTree("cabledelay", "KLM timecabledelay data");
+  cableDelayTree->Branch("experiment", &m_experiment, "experiment/I");
+  cableDelayTree->Branch("run", &m_run, "run/I");
+  cableDelayTree->Branch("subdetector", &subdetector, "subdetector/I");
+  cableDelayTree->Branch("section", &section, "section/I");
+  cableDelayTree->Branch("sector", &sector, "sector/I");
+  cableDelayTree->Branch("layer", &layer, "layer/I");
+  cableDelayTree->Branch("plane", &plane, "plane/I");
+  cableDelayTree->Branch("strip", &strip, "strip/I");
+  cableDelayTree->Branch("channelNumber", &channelNumber, "channelNumber/I");
+  cableDelayTree->Branch("timeDelay", &timeDelay, "timeDelay/D");
   KLMChannelIndex klmStrips(KLMChannelIndex::c_IndexLevelStrip);
   for (KLMChannelIndex& klmStrip : klmStrips) {
     subdetector = klmStrip.getSubdetector();
@@ -511,10 +510,10 @@ void KLMCalibrationChecker::checkTimeCableDelay()
                                  subdetector, section, sector, layer, plane, strip);
     timeDelay = timeCableDelay->getTimeDelay(channel);
     channelNumber = m_ElementNumbers->channelNumber(subdetector, section, sector, layer, plane, strip);
-    cabledelayTree->Fill();
+    cableDelayTree->Fill();
   }
-  cabledelayTree->Write();
-  delete cabledelayTree;
+  cableDelayTree->Write();
+  delete cableDelayTree;
   delete timeCableDelayResults;
   /* Reset the database. Needed to avoid mess if we call this method multiple times with different GTs. */
   resetDatabase();
@@ -535,7 +534,7 @@ void KLMCalibrationChecker::checkTimeConstants()
   float delayEKLM, delayBKLM, delayRPCPhi, delayRPCZ;
   TFile* timeConstantsResults =
     new TFile(m_TimeConstantsResultsFile.c_str(), "recreate");
-  TTree* constantsTree = new TTree("constants", "KLM timeConstants data.");
+  TTree* constantsTree = new TTree("constants", "KLM timeConstants data");
   constantsTree->Branch("experiment", &m_experiment, "experiment/I");
   constantsTree->Branch("run", &m_run, "run/I");
   constantsTree->Branch("subdetector", &subdetector, "subdetector/I");
@@ -560,14 +559,10 @@ void KLMCalibrationChecker::checkTimeConstants()
     strip = klmStrip.getStrip();
     channelNumber = m_ElementNumbers->channelNumber(subdetector, section, sector, layer, plane, strip);
     module = m_ElementNumbers->moduleNumber(subdetector, section, sector, layer);
-    int c_EKLM = 1;
-    int c_BKLM = 2;
-    int c_RPCPhi = 3;
-    int c_RPCZ = 4;
-    delayEKLM = timeConstants->getDelay(c_EKLM);
-    delayBKLM = timeConstants->getDelay(c_BKLM);
-    delayRPCPhi = timeConstants->getDelay(c_RPCPhi);
-    delayRPCZ = timeConstants->getDelay(c_RPCZ);
+    delayEKLM = timeConstants->getDelay(KLMTimeConstants::c_EKLM);
+    delayBKLM = timeConstants->getDelay(KLMTimeConstants::c_BKLM);
+    delayRPCPhi = timeConstants->getDelay(KLMTimeConstants::c_RPCPhi);
+    delayRPCZ = timeConstants->getDelay(KLMTimeConstants::c_RPCZ);
     constantsTree->Fill();
   }
   constantsTree->Write();

@@ -15,6 +15,7 @@ The embedding software takes the first file and removes the object associated wi
 Assuming the skims are prepared, the removal of the control channel/ROE is arranged by code: `udst_purge_list.py` script. E.g.
 
 .. code-block:: shell
+
 	python3 analysis/scripts/udst_purge_list.py --listName "B+:BplusToKplusJpsiMuMu"  --charge 'pos' --fileIn /home/glazov/belle/data/skims_moriond/skim_BplusToKplusJpsiMuMu_bucket17.root
 	python3 analysis/scripts/udst_purge_list.py --isSignal --listName "B+:BplusToKplusNuNu"  --charge 'pos' --fileIn /home/glazov/belle/data/skims_moriond/sig/skim_sig_71_Bplus2Kplus.udst.root
 

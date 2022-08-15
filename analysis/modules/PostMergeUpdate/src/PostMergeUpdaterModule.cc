@@ -25,7 +25,7 @@ namespace Belle2 {
 
   PostMergeUpdaterModule::PostMergeUpdaterModule() : Module()
   {
-    setDescription("Synchronize parts of the evnets post merge/embedding.");
+    setDescription("Synchronize parts of the evnets post merge/embedding. Used in the signal embedding pipeline. Uses kinematic information for the tag / simulated decay stored in eventExtraInfo.");
     addParam("Mixing", m_mixing, "Mixing (true) or embedding (false) corrections", false);
     addParam("isCharged", m_isCharged, "Charged (true) or neutral (false) B mesons", true);
   }
@@ -33,7 +33,7 @@ namespace Belle2 {
   void PostMergeUpdaterModule::initialize()
   {
     m_mergedArrayIndices.isRequired("MergedArrayIndices");
-    m_eventExtraInfo.isRequired("EventExtraInfo_indepPath"); // indepPath suffix is hardwired for no
+    m_eventExtraInfo.isRequired("EventExtraInfo_indepPath"); // indepPath suffix is hardwired for the second part of the event
     m_eventExtraInfo_orig.isRequired("EventExtraInfo"); // original extra info
     m_trackFits.isOptional();
     m_tracks.isOptional();
@@ -53,7 +53,7 @@ namespace Belle2 {
       and m_eventExtraInfo->hasExtraInfo("PY")
       and m_eventExtraInfo->hasExtraInfo("PZ")
     ) {
-      // We will rotate the second tag (simulated) B in the direction of the reconstructed:
+      // For embedding, we will rotate the simulated B in the direction of the reconstructed tag
       B2Vector3D tag3v = B2Vector3D(m_eventExtraInfo_orig->getExtraInfo("PX"),
                                     m_eventExtraInfo_orig->getExtraInfo("PY"),
                                     m_eventExtraInfo_orig->getExtraInfo("PZ")
@@ -64,21 +64,16 @@ namespace Belle2 {
                                     m_eventExtraInfo->getExtraInfo("PZ")
                                    );
 
-      // std::cout << " VV1: " << tag3v.X() << " " << tag3v.Y() << " "<<tag3v.Z();
-      // std::cout << " VV2: " << sec3v.X() << " " << sec3v.Y() << " "<<sec3v.Z();
-
+      // For mixing, we want to get an opposite direction, the secondary ROE should point in the direction of the primary TAG
       if (m_mixing) {
-        // We want in fact get opposite direction, secondary ROE should point in the direction of primary TAG
         PCmsLabTransform T;
 
         const int iPDG =  m_isCharged ? 521 : 511 ;
         const double mB = TDatabasePDG::Instance()->GetParticle(iPDG)->Mass();
         double E = sqrt(mB * mB + sec3v.Mag2());
         ROOT::Math::PxPyPzEVector sec4v(sec3v.X(), sec3v.Y(), sec3v.Z(), E);
-
-        // std::cout << " mb " <<  mB;
-
         ROOT::Math::PxPyPzEVector secCMS = T.labToCms(sec4v);
+
         // relection:
         ROOT::Math::PxPyPzEVector secRoeCMS(-secCMS.X(), -secCMS.Y(), -secCMS.Z(), secCMS.E());
         ROOT::Math::PxPyPzEVector sec4roe = T.cmsToLab(secRoeCMS);
@@ -86,7 +81,6 @@ namespace Belle2 {
         // update sec3v direction:
         sec3v.SetXYZ(sec4roe.X(), sec4roe.Y(), sec4roe.Z());
       }
-      // std::cout << " VV2roe: " << sec3v.X() << " " << sec3v.Y() << " "<<sec3v.Z();
 
 
       B2Vector3D cros = tag3v.Unit().Cross(sec3v.Unit());
@@ -95,20 +89,16 @@ namespace Belle2 {
       // Rotation to make secondary B point as tag B
       rot.Rotate(-acos(dot), cros);
 
-      // Test that rotation does what expected:
+      // Closure test that rotation does what expected:
 
       B2Vector3D test = rot * sec3v;
-
-      // std::cout << " VV2rot: " << test.X() << " " << test.Y() << " "<<test.Z() << "\n";
-
-
       double smallValue = 1e-12;
       if ((abs(sin(test.Phi() - tag3v.Phi())) > smallValue) or (abs(test.Theta() - tag3v.Theta()) > smallValue)) {
         B2ERROR("Loss of accuracy during rotation" << LogVar("Delta phi", abs(sin(test.Phi() - tag3v.Phi())))
                 << LogVar("Delta Theta", abs(test.Theta() - tag3v.Theta())));
       }
     } else {
-      B2ERROR("No vertex info, can not update tracks");
+      B2ERROR("No momentum information provided for the tag/simulated particle list, can not update tracks");
     }
     return rot;
   }
@@ -124,14 +114,10 @@ namespace Belle2 {
         double yv2 = m_eventExtraInfo->getExtraInfo("IPY");
         double zv2 = m_eventExtraInfo->getExtraInfo("IPZ");
         const B2Vector3D origSpot(xv2, yv2, zv2);
+
         // Now vertex from DB:
         static DBObjPtr<Belle2::BeamSpot> beamSpotDB;
         const B2Vector3D beamSpot = beamSpotDB->getIPPosition();
-
-        /*
-        std::cout << " VV1: " << origSpot.X() << " " << origSpot.Y() << " "<<origSpot.Z() << "\n";
-        std::cout << " VV2: " << beamSpot.X() << " " << beamSpot.Y() << " "<<beamSpot.Z() << "\n";
-        */
 
         const TRotation rot = tag_vertex_rotation();
         const double bz = BFieldManager::getField(beamSpot).Z() / Unit::T;
@@ -154,14 +140,6 @@ namespace Belle2 {
             // New helix
             Helix helix(position, momentum, charge, bz);
 
-            /*
-            std::cout << " Orig " <<  m_trackFits[t_idx]->m_tau[TrackFitResult::iD0] <<
-              "," <<  m_trackFits[t_idx]->m_tau[TrackFitResult::iPhi0] <<
-              "," <<  m_trackFits[t_idx]->m_tau[TrackFitResult::iOmega] <<
-              "," <<  m_trackFits[t_idx]->m_tau[TrackFitResult::iZ0] <<
-              "," <<  m_trackFits[t_idx]->m_tau[TrackFitResult::iTanLambda] << " " << helixO.getMomentum(bz).Mag()
-                << "\n";
-            */
             // Store back in the mdst:
             m_trackFits[t_idx]->m_tau[TrackFitResult::iD0]        = helix.getD0();
             m_trackFits[t_idx]->m_tau[TrackFitResult::iPhi0]      = helix.getPhi0();
@@ -169,14 +147,6 @@ namespace Belle2 {
             m_trackFits[t_idx]->m_tau[TrackFitResult::iZ0]        = helix.getZ0();
             m_trackFits[t_idx]->m_tau[TrackFitResult::iTanLambda] = helix.getTanLambda();
 
-            /*
-            std::cout << " Upd " <<  m_trackFits[t_idx]->m_tau[TrackFitResult::iD0] <<
-              "," <<  m_trackFits[t_idx]->m_tau[TrackFitResult::iPhi0] <<
-              "," <<  m_trackFits[t_idx]->m_tau[TrackFitResult::iOmega] <<
-              "," <<  m_trackFits[t_idx]->m_tau[TrackFitResult::iZ0] <<
-              "," <<  m_trackFits[t_idx]->m_tau[TrackFitResult::iTanLambda] << " " << helix.getMomentum(bz).Mag()
-                << "\n";
-            */
           }
         }
         // also ECL clusters:
@@ -222,10 +192,11 @@ namespace Belle2 {
 
             // Rotate (no boost for now)
             B2Vector3D momTag = rot * mom;
+
             // New helix
             Helix h(vertexTag, momTag, charge, bz);
 
-            m_trackFits[t_idx]->m_tau[TrackFitResult::iD0]          = h.getD0() + helix.getD0(); // some smear
+            m_trackFits[t_idx]->m_tau[TrackFitResult::iD0]          = h.getD0() + helix.getD0(); // some smearing
             m_trackFits[t_idx]->m_tau[TrackFitResult::iPhi0]        = h.getPhi0();
             m_trackFits[t_idx]->m_tau[TrackFitResult::iZ0]          = h.getZ0() + helix.getZ0();
             m_trackFits[t_idx]->m_tau[TrackFitResult::iTanLambda]   = h.getTanLambda();

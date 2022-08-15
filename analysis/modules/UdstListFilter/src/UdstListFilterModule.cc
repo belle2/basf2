@@ -66,9 +66,10 @@ namespace Belle2 {
 
   UdstListFilterModule::UdstListFilterModule() : Module()
   {
-    setDescription("Filter udst file content based on a particle list");
-    addParam("listName", m_listName, "name of particle list", string(""));
-    addParam("keepNotInList", m_reverse, "keep mdst objects which are not used in the particle list", false);
+    setDescription("Filter udst file content based on a particle list. As a result of the module, all object which are (not) accociated with the list are removed. The module is used for signal embedding.");
+    addParam("listName", m_listName, "name of particle list.", string(""));
+    addParam("keepNotInList", m_reverse,
+             "if yes, keep mdst objects which are not used in the particle list, otherwise keep objects which are used in the list.", false);
   }
 
   void UdstListFilterModule::initialize()

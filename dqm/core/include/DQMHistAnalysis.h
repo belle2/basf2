@@ -13,7 +13,7 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <dqm/dataobjects/MonitoringObject.h>
+#include <dqm/core/MonitoringObject.h>
 #include <dqm/analysis/HistDelta.h>
 #include <TH1.h>
 
@@ -106,12 +106,19 @@ namespace Belle2 {
     static TH1* findHist(const std::string& dirname,
                          const std::string& histname);
     /**
-     * Find histogram.
+     * Find histogram in specific TDirectory (e.g. ref file).
      * @param histdir  The TDirectory of the directory.
      * @param histname The name of the histogram.
      * @return The found histogram, or nullptr if not found.
      */
     static TH1* findHist(const TDirectory* histdir, const TString& histname);
+
+    /**
+     * Find histogram in corresponding canvas.
+     * @param hname Name of the histogram (dir+name)
+     * @return The pointer to the histogram, or nullptr if not found.
+     */
+    TH1* findHistInCanvas(const std::string& hname);
 
     /**
      * Find MonitoringObject.
@@ -176,9 +183,16 @@ namespace Belle2 {
     DQMHistAnalysisModule();
     virtual ~DQMHistAnalysisModule() {};
 
+    /**
+     * Helper function for string token split
+     * @param s String to split
+     * @param delim delimiter
+     * @return vector of strings
+     */
+    std::vector <std::string> StringSplit(const std::string& s, const char delim);
+
     // Data members
   private:
-
   };
 } // end namespace Belle2
 

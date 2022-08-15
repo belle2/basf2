@@ -9,7 +9,7 @@
 #pragma once
 
 /* DQM headers. */
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 
 /* Belle 2 headers. */
 #include <framework/database/DBObjPtr.h>

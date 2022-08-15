@@ -9,9 +9,6 @@
 // Own include
 #include <dqm/analysis/modules/DQMHistAnalysisARICHMonObj.h>
 
-//DQM
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
-
 #include <TF1.h>
 #include <TH1F.h>
 #include <TH3.h>

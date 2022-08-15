@@ -9,9 +9,6 @@
 // Own include
 #include <dqm/analysis/modules/DQMHistAnalysisMiraBelle.h>
 
-//DQM
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
-
 #include <TFile.h>
 #include <TF1.h>
 #include <TH1F.h>

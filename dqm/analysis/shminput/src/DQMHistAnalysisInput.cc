@@ -11,9 +11,8 @@
 //-
 
 
-#include <dqm/analysis/modules/DQMHistAnalysisInput.h>
+#include <dqm/analysis/shminput/DQMHistAnalysisInput.h>
 
-#include <daq/slc/base/StringUtil.h>
 #include <ctime>
 
 #include <TROOT.h>
@@ -114,16 +113,16 @@ void DQMHistAnalysisInputModule::event()
     h->SetName(a);
     B2DEBUG(1, "DQMHistAnalysisInput: get histo " << a.Data());
 
-    if (StringUtil::split(a.Data(), '/').size() <= 1) continue;
+    auto split_result = StringSplit(a.Data(), '/');
+    if (split_result.size() <= 1) continue;
 
-    std::string dir_name = StringUtil::split(a.Data(), '/')[0];
+    auto dirname = split_result[0];
 
     hs.push_back(h);
     if (std::string(h->GetName()) == std::string("DQMInfo/expno")) expno = h->GetTitle();
     if (std::string(h->GetName()) == std::string("DQMInfo/runno")) runno = h->GetTitle();
     if (std::string(h->GetName()) == std::string("DQMInfo/rtype")) rtype = h->GetTitle();
     if (m_autocanvas) {
-      StringList s = StringUtil::split(a.Data(), '/');
 
       bool give_canvas = false;
       if (m_exclfolders.size() == 0) { //If none specified, canvases for all histograms
@@ -134,7 +133,7 @@ void DQMHistAnalysisInputModule::event()
           in_excl_folder = true;
         } else {
           for (auto& excl_folder : m_exclfolders) {
-            if (excl_folder == s[0]) {
+            if (excl_folder == dirname) {
               in_excl_folder = true;
               break;
             }
@@ -143,7 +142,7 @@ void DQMHistAnalysisInputModule::event()
 
         if (in_excl_folder) {
           for (auto& wanted_folder : m_acfolders) {
-            B2DEBUG(1, "==" << wanted_folder << "==" << s[0] << "==");
+            B2DEBUG(1, "==" << wanted_folder << "==" << dirname << "==");
             if (wanted_folder == std::string(h->GetName())) {
               give_canvas = true;
               break;
@@ -159,9 +158,8 @@ void DQMHistAnalysisInputModule::event()
         a.ReplaceAll("/", "_");
         std::string name = a.Data();
         if (m_cs.find(name) == m_cs.end()) {
-          if (s.size() > 1) {
-            std::string dirname = s[0];
-            std::string hname = s[1];
+          if (split_result.size() > 1) {
+            std::string hname = split_result[1];
             if ((dirname + "/" + hname) == "softwaretrigger/skim") hname = "skim_hlt";
             TCanvas* c = new TCanvas((dirname + "/c_" + hname).c_str(), ("c_" + hname).c_str());
             m_cs.insert(std::pair<std::string, TCanvas*>(name, c));

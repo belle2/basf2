@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include "dqm/analysis/modules/DQMHistAnalysisPXDER.h"
+#include <dqm/analysis/modules/DQMHistAnalysisPXDER.h>
 
 #include <pxd/geometry/SensorInfo.h>
 #include <vxd/geometry/SensorInfoBase.h>
@@ -14,13 +14,10 @@
 
 #include <boost/format.hpp>
 
-#include <TClass.h>
+#include <TROOT.h>
 #include <TKey.h>
 #include <TDirectory.h>
 #include <TFile.h>
-#include <TROOT.h>
-
-#include <memory>
 
 using namespace std;
 using boost::format;

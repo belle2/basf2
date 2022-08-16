@@ -17,6 +17,7 @@
 #include <mdst/dataobjects/Track.h>
 #include <analysis/VertexFitting/RaveInterface/RaveVertexFitter.h>
 
+#include <Math/Vector3D.h>
 #include <TVector3.h>
 #include <vector>
 
@@ -124,7 +125,7 @@ namespace Belle2 {
     if (tfr1Ptr->getChargeSign() * tfr2Ptr->getChargeSign() >= 0) return false;
 
     // Setup Rave vertex fitter
-    auto bField = BFieldManager::getField(TVector3(0, 0, 0)).Z() / Unit::T;
+    auto bField = BFieldManager::getFieldInTesla(ROOT::Math::XYZVector(0, 0, 0)).Z();
     B2DEBUG(20, "B Field = " << bField << " T");
     analysis::RaveSetup::initialize(1, bField);
     analysis::RaveVertexFitter rvf;

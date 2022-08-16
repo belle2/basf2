@@ -104,8 +104,8 @@ void CDCCosmicAnalysisModule::initialize()
 
 void CDCCosmicAnalysisModule::beginRun()
 {
-  B2Vector3D pos(0, 0, 0);
-  B2Vector3D bfield = BFieldManager::getFieldInTesla(pos);
+  ROOT::Math::XYZVector pos(0, 0, 0);
+  ROOT::Math::XYZVector bfield = BFieldManager::getFieldInTesla(pos);
   if (bfield.Z() > 0.5) {
     m_bField = true;
     B2INFO("CDCCosmicAnalysis: Magnetic field is ON");
@@ -113,7 +113,7 @@ void CDCCosmicAnalysisModule::beginRun()
     m_bField = false;
     B2INFO("CDCCosmicAnalysis: Magnetic field is OFF");
   }
-  B2INFO("CDCCosmicAnalysis: BField at (0,0,0)  = " << bfield.Mag());
+  B2INFO("CDCCosmicAnalysis: BField at (0,0,0)  = " << bfield.R());
 }
 
 void CDCCosmicAnalysisModule::event()

@@ -21,7 +21,7 @@ namespace Belle2 {
   public :
 
     /// Constructor
-    MCParticleInfo(const MCParticle& the_mcParticle, const TVector3& the_magField);
+    MCParticleInfo(const MCParticle& the_mcParticle, const ROOT::Math::XYZVector& the_magField);
 
     /// Getter for x component of momentum.
     double getPx() { return m_mcParticle.getMomentum().x(); };

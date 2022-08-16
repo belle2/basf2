@@ -396,16 +396,16 @@ namespace Belle2 {
     {
       static DBObjPtr<BeamSpot> beamSpotDB;
 
-      B2Vector3D mom = particle->getMomentum();
+      ROOT::Math::XYZVector mom = particle->getMomentum();
 
-      B2Vector3D r = B2Vector3D(particle->getVertex()) - beamSpotDB->getIPPosition();
+      ROOT::Math::XYZVector r = particle->getVertex() - ROOT::Math::XYZVector(beamSpotDB->getIPPosition());
 
-      B2Vector3D Bfield = BFieldManager::getInstance().getFieldInTesla(beamSpotDB->getIPPosition());
+      ROOT::Math::XYZVector Bfield = BFieldManager::getInstance().getFieldInTesla(ROOT::Math::XYZVector(beamSpotDB->getIPPosition()));
 
-      B2Vector3D curvature = - Bfield * Const::speedOfLight * particle->getCharge(); //Curvature of the track
-      double T = TMath::Sqrt(mom.Perp2() - 2.0 * curvature * r.Cross(mom) + curvature.Mag2() * r.Perp2());
+      ROOT::Math::XYZVector curvature = - Bfield * Const::speedOfLight * particle->getCharge(); //Curvature of the track
+      double T = TMath::Sqrt(mom.Perp2() - 2.0 * curvature.Dot(r.Cross(mom)) + curvature.Mag2() * r.Perp2());
 
-      return TMath::Abs((-2 * r.Cross(mom).z() + curvature.Mag() * r.Perp2()) / (T + mom.Perp()));
+      return TMath::Abs((-2 * r.Cross(mom).z() + curvature.R() * r.Perp2()) / (T + mom.Rho()));
     }
 
     double ArmenterosLongitudinalMomentumAsymmetry(const Particle* part)

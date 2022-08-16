@@ -305,7 +305,7 @@ namespace {
               float arcLength2D = -chi / omega;
               ROOT::Math::XYZVector tangential = helix.getUnitTangentialAtArcLength2D(arcLength2D);
 
-              float actualChi = ROOT::Math::VectorUtil::DeltaPhi(tangential, tangentialAtPerigee);
+              float actualChi = ROOT::Math::VectorUtil::DeltaPhi(tangentialAtPerigee, tangential);
               EXPECT_ANGLE_NEAR(chi, actualChi, absError);
               EXPECT_FLOAT_EQ(tangentialAtPerigee.Theta(), tangential.Theta());
               EXPECT_FLOAT_EQ(1, tangential.R());
@@ -336,7 +336,7 @@ namespace {
               float arcLength2D = -chi / omega;
               ROOT::Math::XYZVector extrapolatedMomentum = helix.getMomentumAtArcLength2D(arcLength2D, nominalBz);
 
-              float actualChi = ROOT::Math::VectorUtil::DeltaPhi(extrapolatedMomentum, momentumAtPerigee);
+              float actualChi = ROOT::Math::VectorUtil::DeltaPhi(momentumAtPerigee, extrapolatedMomentum);
               EXPECT_ANGLE_NEAR(chi, actualChi, absError);
               EXPECT_FLOAT_EQ(momentumAtPerigee.Theta(), extrapolatedMomentum.Theta());
               EXPECT_FLOAT_EQ(momentumAtPerigee.R(), extrapolatedMomentum.R());

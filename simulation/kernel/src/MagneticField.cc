@@ -33,9 +33,9 @@ namespace Belle2 {
       //Get the magnetic field vector from the central magnetic field map (Geant4 uses [mm] as a length unit)
       const B2Vector3D point = B2Vector3D{Point} * pos_conversion;
       // get the field in Geant4 units
-      B2Vector3D magField = BFieldManager::getField(point) * mag_conversion;
+      ROOT::Math::XYZVector magField = BFieldManager::getField(ROOT::Math::XYZVector(point)) * mag_conversion;
       // and set it
-      magField.GetXYZ(Bfield);
+      magField.GetCoordinates(Bfield);
     }
 
   }

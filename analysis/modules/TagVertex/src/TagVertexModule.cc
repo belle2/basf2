@@ -113,7 +113,7 @@ TagVertexModule::TagVertexModule() : Module(),
 void TagVertexModule::initialize()
 {
   // magnetic field
-  m_Bfield = BFieldManager::getFieldInTesla(m_BeamSpotCenter).Z();
+  m_Bfield = BFieldManager::getFieldInTesla(ROOT::Math::XYZVector(m_BeamSpotCenter)).Z();
   // RAVE setup
   analysis::RaveSetup::initialize(1, m_Bfield);
   B2INFO("TagVertexModule : magnetic field = " << m_Bfield);

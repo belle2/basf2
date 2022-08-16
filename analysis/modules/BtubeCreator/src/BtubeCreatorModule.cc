@@ -63,7 +63,7 @@ void BtubeCreatorModule::initialize()
   m_plist.isRequired(m_listName);
 
   // magnetic field
-  m_Bfield = BFieldManager::getFieldInTesla(B2Vector3D(0, 0, 0)).Z();
+  m_Bfield = BFieldManager::getFieldInTesla(ROOT::Math::XYZVector(0, 0, 0)).Z();
 
   m_BeamSpotCenter = m_beamSpotDB->getIPPosition();
   m_beamSpotCov.ResizeTo(3, 3);

@@ -36,7 +36,7 @@ namespace {
     const double z = 1.678;
 
     const int charge = -1;
-    const double bfield = Belle2::BFieldManager::getFieldInTesla(Belle2::B2Vector3D(0, 0, 0)).Z();
+    const double bfield = Belle2::BFieldManager::getFieldInTesla(ROOT::Math::XYZVector(0, 0, 0)).Z();
     const double alpha = 1.0 / (bfield * Belle2::Const::speedOfLight) * 1E4;
     const double aq = charge / alpha;
 
@@ -90,7 +90,7 @@ namespace {
 
     const Eigen::Matrix<double, 1, 6> positionAndMom_ = (Eigen::Matrix<double, 1, 6>() << x, y, z, px, py, pz).finished();
     const int charge = -1;
-    const double bfield = Belle2::BFieldManager::getFieldInTesla(Belle2::B2Vector3D(0, 0, 0)).Z();
+    const double bfield = Belle2::BFieldManager::getFieldInTesla(ROOT::Math::XYZVector(0, 0, 0)).Z();
 
     Belle2::Helix helix = Belle2::Helix(ROOT::Math::XYZVector(x, y, z), ROOT::Math::XYZVector(px, py, pz), charge, bfield);
 

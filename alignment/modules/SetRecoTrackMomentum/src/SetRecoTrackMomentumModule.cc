@@ -44,7 +44,7 @@ void SetRecoTrackMomentumModule::initialize()
 void SetRecoTrackMomentumModule::event()
 {
   // In automatic mode, do nothing if B-field > 0 at origin
-  if (m_automatic && BFieldManager::getInstance().getField(B2Vector3D(0., 0., 0.)).Mag() > 1.e-14) {
+  if (m_automatic && BFieldManager::getInstance().getField(0., 0., 0.).R() > 1.e-14) {
     return;
   }
 

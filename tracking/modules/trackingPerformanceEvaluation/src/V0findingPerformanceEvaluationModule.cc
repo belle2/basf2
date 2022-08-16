@@ -151,7 +151,7 @@ void V0findingPerformanceEvaluationModule::beginRun()
 void V0findingPerformanceEvaluationModule::event()
 {
 
-  B2Vector3D magField = BFieldManager::getField(0, 0, 0) / Unit::T;
+  ROOT::Math::XYZVector magField = BFieldManager::getField(0, 0, 0) / Unit::T;
 
   B2DEBUG(29, "+++++ 1. loop on MCParticles");
   for (const MCParticle& mcParticle : m_MCParticles) {

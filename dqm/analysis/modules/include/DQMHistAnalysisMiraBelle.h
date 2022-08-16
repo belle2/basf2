@@ -15,12 +15,6 @@
 #include <dqm/dataobjects/DQMFileMetaData.h>
 #include <dqm/core/MonitoringObject.h>
 
-#include <vector>
-
-#include <TCanvas.h>
-#include <TLine.h>
-#include <TH2Poly.h>
-
 namespace Belle2 {
 
   /**

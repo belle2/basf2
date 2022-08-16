@@ -9,13 +9,13 @@
 // Own include
 #include <dqm/analysis/modules/DQMHistAnalysisMiraBelle.h>
 
-#include <TFile.h>
+//#include <TFile.h>
 #include <TF1.h>
-#include <TH1F.h>
-#include <TH2F.h>
+//#include <TH1F.h>
+//#include <TH2F.h>
 #include <TCanvas.h>
 #include <TLine.h>
-#include <TClass.h>
+//#include <TClass.h>
 #include <TROOT.h>
 
 #include <fstream>

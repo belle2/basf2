@@ -20,11 +20,7 @@
 #include <dqm/core/DQMHistAnalysis.h>
 #include <vxd/dataobjects/VxdID.h>
 
-#include <vector>
-#include <array>
 #include <TF1.h>
-#include "TF1Convolution.h"
-#include <TCanvas.h>
 #include <TLine.h>
 #include <TGraphErrors.h>
 #include <TFile.h>

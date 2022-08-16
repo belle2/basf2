@@ -13,7 +13,6 @@
 
 // Monitoring
 #include <dqm/dataobjects/DQMFileMetaData.h>
-#include <dqm/core/MonitoringObject.h>
 
 namespace Belle2 {
 

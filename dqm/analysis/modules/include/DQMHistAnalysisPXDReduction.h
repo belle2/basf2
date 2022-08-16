@@ -20,11 +20,9 @@
 #include <dqm/core/DQMHistAnalysis.h>
 #include <vxd/dataobjects/VxdID.h>
 
-#include <TH2F.h>
-#include <TCanvas.h>
 #include <TLine.h>
 
-#include <vector>
+//#include <vector>
 
 namespace Belle2 {
   /*! DQM Histogram Analysis for PXD Reduction */

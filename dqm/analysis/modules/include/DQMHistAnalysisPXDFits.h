@@ -16,7 +16,6 @@
 
 #include <TF1.h>
 #include <TH2F.h>
-#include <TCanvas.h>
 
 namespace Belle2 {
   /*! Class definition for the output module of Sequential ROOT I/O */

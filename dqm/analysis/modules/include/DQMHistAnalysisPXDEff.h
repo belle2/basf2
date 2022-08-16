@@ -21,7 +21,6 @@
 #include <vxd/dataobjects/VxdID.h>
 
 #include <TEfficiency.h>
-#include <TCanvas.h>
 #include <TH2F.h>
 
 namespace Belle2 {

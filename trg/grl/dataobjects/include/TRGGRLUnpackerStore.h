@@ -385,18 +385,25 @@ namespace Belle2 {
 
     /**m_theta_ECL leaf*/
     void set_theta_ECL(int i, int theta_ECL)  { m_theta_ECL[i] = theta_ECL;}
+    void Addto_theta_ECL(int theta_ECL)  { m_theta_ECL.push_back(theta_ECL);}
     /**m_phi_ECL leaf*/
     void set_phi_ECL(int i, int phi_ECL) { m_phi_ECL[i] = phi_ECL;}
+    void Addto_phi_ECL(int phi_ECL) { m_phi_ECL.push_back(phi_ECL) ;}
     /**m_t_ECL leaf*/
     void set_t_ECL(int i, int t_ECL)  { m_t_ECL[i] = t_ECL;}
+    void Addto_t_ECL(int t_ECL)  { m_t_ECL.push_back(t_ECL) ;}
     /**m_E_ECL leaf*/
     void set_E_ECL(int i, int E_ECL)  { m_E_ECL[i] = E_ECL;}
+    void Addto_E_ECL(int E_ECL)  { m_E_ECL.push_back(E_ECL) ;}
     /**m_clk_ECL leaf*/
     void set_clk_ECL(int i, int clk_ECL) { m_clk_ECL[i] = clk_ECL; }
+    void Addto_clk_ECL(int clk_ECL) { m_clk_ECL.push_back(clk_ECL); }
     /**m_1GeV_flag_ECL leaf*/
     void set_1GeV_ECL(int i, int c1GeV_ECL)  { m_1GeV_ECL[i] = c1GeV_ECL; }
+    void Addto_1GeV_ECL(int c1GeV_ECL)  { m_1GeV_ECL.push_back(c1GeV_ECL); }
     /**m_2GeV_flag_ECL leaf*/
     void set_2GeV_ECL(int i, int c2GeV_ECL)  { m_2GeV_ECL[i] = c2GeV_ECL; }
+    void Addto_2GeV_ECL(int c2GeV_ECL)  { m_2GeV_ECL.push_back(c2GeV_ECL) ; }
 
     /**#wire hit in SL0*/
     void set_wire_tsf0(int wire_tsf0) { m_wire_tsf0 = wire_tsf0; }
@@ -512,6 +519,17 @@ namespace Belle2 {
     void set_b2ldly(int b2ldly)  { m_b2ldly = b2ldly;}
     /**m_maxrvc leafs*/
     void set_maxrvc(int maxrvc)  { m_maxrvc = maxrvc;}
+    /**clear vectors*/
+    void ClearVectors()
+    {
+      m_E_ECL.clear();
+      m_t_ECL.clear();
+      m_clk_ECL.clear();
+      m_theta_ECL.clear();
+      m_phi_ECL.clear();
+      m_1GeV_ECL.clear();
+      m_2GeV_ECL.clear();
+    }
 
 
   private:

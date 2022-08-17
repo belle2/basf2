@@ -16,7 +16,6 @@
 #include <TStyle.h>
 #include <TLatex.h>
 #include <vxd/geometry/GeoCache.h>
-#include <TKey.h>
 
 #include <RooDataHist.h>
 #include <RooAbsPdf.h>

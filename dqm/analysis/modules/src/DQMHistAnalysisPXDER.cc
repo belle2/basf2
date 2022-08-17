@@ -15,9 +15,6 @@
 #include <boost/format.hpp>
 
 #include <TROOT.h>
-#include <TKey.h>
-#include <TDirectory.h>
-#include <TFile.h>
 
 using namespace std;
 using boost::format;

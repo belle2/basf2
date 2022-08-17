@@ -12,19 +12,20 @@
 
 #pragma once
 
+#include <dqm/core/DQMHistAnalysis.h>
+
 #ifdef _BELLE2_EPICS
 // EPICS
 #include "cadef.h"
 #endif
 
-#include <dqm/core/DQMHistAnalysis.h>
 #include <vxd/dataobjects/VxdID.h>
 
+#include <TFile.h>
+#include <TH2.h>
 #include <TF1.h>
 #include <TLine.h>
 #include <TGraphErrors.h>
-#include <TFile.h>
-#include <TH2.h>
 
 #include <RooRealVar.h>
 #include <RooWorkspace.h>

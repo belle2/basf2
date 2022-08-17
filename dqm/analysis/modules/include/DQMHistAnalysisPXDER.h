@@ -9,8 +9,7 @@
 #pragma once
 
 #include <dqm/core/DQMHistAnalysis.h>
-
-#include "TFile.h"
+#include <TFile.h>
 
 namespace Belle2 {
   /*! PXD DQM AnalysisModule */

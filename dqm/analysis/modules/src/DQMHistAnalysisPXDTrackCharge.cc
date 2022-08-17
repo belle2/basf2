@@ -224,7 +224,8 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
       m_hTrackedClusters->SetLineColor(kBlue);
       m_hTrackedClusters->Draw("hist");
 
-      TH1* href2 = GetHisto("ref/" + m_histogramDirectoryName + "/" + name);
+      // get ref histogra, assumes no m_histogramDirectoryName directory in ref file
+      TH1* href2 = findHist(m_refFile, name);
 
       if (href2) {
         href2->SetLineStyle(3);// 2 or 3
@@ -280,7 +281,8 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
         m_monObj->setVariable(("trackcharge_" + (std::string)m_PXDModules[i]).c_str(), ml->getValV(), ml->getError());
       }
 
-      TH1* hist2 = GetHisto("ref/" + m_histogramDirectoryName + "/" + name);
+      // get ref histogram, assumes no m_histogramDirectoryName directory in ref file
+      TH1* hist2 = findHist(name);
 
       if (hist2) {
 //         B2INFO("Draw Normalized " << hist2->GetName());
@@ -488,103 +490,4 @@ void DQMHistAnalysisPXDTrackChargeModule::terminate()
 #endif
   if (m_refFile) delete m_refFile;
 
-}
-
-TH1* DQMHistAnalysisPXDTrackChargeModule::GetHisto(TString histoname)
-{
-  TH1* hh1 = nullptr;
-  gROOT->cd();
-//   hh1 = findHist(histoname.Data());
-  // cppcheck-suppress knownConditionTrueFalse
-  if (hh1 == NULL) {
-    B2DEBUG(20, "findHisto failed " << histoname << " not in memfile");
-
-    // first search reference root file ... if ther is one
-    if (m_refFile && m_refFile->IsOpen()) {
-      TDirectory* d = m_refFile;
-      TString myl = histoname;
-      TString tok;
-      Ssiz_t from = 0;
-      B2DEBUG(20, myl);
-      while (myl.Tokenize(tok, from, "/")) {
-        TString dummy;
-        Ssiz_t f;
-        f = from;
-        if (myl.Tokenize(dummy, f, "/")) { // check if its the last one
-          auto e = d->GetDirectory(tok);
-          if (e) {
-            B2DEBUG(20, "Cd Dir " << tok << " from " << d->GetPath());
-            d = e;
-          } else {
-            B2DEBUG(20, "cd failed " << tok << " from " << d->GetPath());
-          }
-        } else {
-          break;
-        }
-      }
-      TObject* obj = d->FindObject(tok);
-      if (obj != NULL) {
-        if (obj->IsA()->InheritsFrom("TH1")) {
-          B2DEBUG(20, "Histo " << histoname << " found in ref file");
-          hh1 = (TH1*)obj;
-        } else {
-          B2DEBUG(20, "Histo " << histoname << " found in ref file but wrong type");
-        }
-      } else {
-        // seems find will only find objects, not keys, thus get the object on first access
-        TIter next(d->GetListOfKeys());
-        TKey* key;
-        while ((key = (TKey*)next())) {
-          TObject* obj2 = key->ReadObj() ;
-          if (obj2->InheritsFrom("TH1")) {
-            if (obj2->GetName() == tok) {
-              hh1 = (TH1*)obj2;
-              B2DEBUG(20, "Histo " << histoname << " found as key -> readobj");
-              break;
-            }
-          }
-        }
-        if (hh1 == NULL) B2DEBUG(20, "Histo " << histoname << " NOT found in ref file " << tok);
-      }
-    }
-
-    if (hh1 == NULL) {
-      B2DEBUG(20, "Histo " << histoname << " not in memfile or ref file");
-
-      TDirectory* d = gROOT;
-      TString myl = histoname;
-      TString tok;
-      Ssiz_t from = 0;
-      while (myl.Tokenize(tok, from, "/")) {
-        TString dummy;
-        Ssiz_t f;
-        f = from;
-        if (myl.Tokenize(dummy, f, "/")) { // check if its the last one
-          auto e = d->GetDirectory(tok);
-          if (e) {
-            B2DEBUG(20, "Cd Dir " << tok);
-            d = e;
-          } else B2DEBUG(20, "cd failed " << tok);
-          d->cd();
-        } else {
-          break;
-        }
-      }
-      TObject* obj = d->FindObject(tok);
-      if (obj != NULL) {
-        if (obj->IsA()->InheritsFrom("TH1")) {
-          B2DEBUG(20, "Histo " << histoname << " found in mem");
-          hh1 = (TH1*)obj;
-        }
-      } else {
-        B2DEBUG(20, "Histo " << histoname << " NOT found in mem");
-      }
-    }
-  }
-
-  if (hh1 == NULL) {
-    B2DEBUG(20, "Histo " << histoname << " not found");
-  }
-
-  return hh1;
 }

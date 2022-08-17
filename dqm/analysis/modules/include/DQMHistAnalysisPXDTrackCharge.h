@@ -73,14 +73,6 @@ namespace Belle2 {
     void terminate(void) override final;
 
   private:
-
-    /**
-     * Get histogram by its name.
-     * @param histoname The name of the histogram.
-     * @return The pointer to the histogram, or nullptr if not found.
-     */
-    TH1* GetHisto(TString histoname);
-
     // Data members
 
     //! name of histogram directory

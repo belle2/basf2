@@ -98,11 +98,6 @@ namespace Photospp {
       }
     }
 
-    hep.vhep[i][0] = 0;
-    hep.vhep[i][1] = 0;
-    hep.vhep[i][2] = 0;
-    hep.vhep[i][3] = 0;
-
     hep.qedrad[i] = 1;
 
   }

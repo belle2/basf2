@@ -93,7 +93,7 @@ void BFieldComponent3d::initialize()
       for (int i = 0; i < m_mapSize[0]; i++, r += m_gridPitch[0]) { // r
         if (!(r >= m_errRegionR[0] && r < m_errRegionR[1])) { it += m_mapSize[1];  continue;}
         for (int j = 0;  j < m_mapSize[1]; j++) { // phi
-          B2Vector3F& B = *it;
+          ROOT::Math::XYZVector& B = *it;
           B.SetX(B.x() * m_errB[0]);
           B.SetY(B.y() * m_errB[1]);
           B.SetZ(B.z() * m_errB[2]);
@@ -109,7 +109,7 @@ void BFieldComponent3d::initialize()
   B2DEBUG(100, Form("BField3d:: final map region & pitch: r [%.2e,%.2e] %.2e, phi %.2e, z [%.2e,%.2e] %.2e",
                     m_mapRegionR[0], m_mapRegionR[1], m_gridPitch[0], m_gridPitch[1],
                     m_mapRegionZ[0], m_mapRegionZ[1], m_gridPitch[2]));
-  B2DEBUG(100, "Memory consumption: " << m_bmap.size()*sizeof(B2Vector3F) / (1024 * 1024.) << " Mb");
+  B2DEBUG(100, "Memory consumption: " << m_bmap.size()*sizeof(ROOT::Math::XYZVector) / (1024 * 1024.) << " Mb");
 }
 
 namespace {
@@ -184,7 +184,7 @@ namespace {
   }
 }
 
-B2Vector3D BFieldComponent3d::calculate(const B2Vector3D& point) const
+ROOT::Math::XYZVector BFieldComponent3d::calculate(const ROOT::Math::XYZVector& point) const
 {
   auto getPhiIndexWeight = [this](double y, double x, double & wphi) -> unsigned int {
     double phi = fast_atan2_minimax<4>(y, x);
@@ -195,7 +195,7 @@ B2Vector3D BFieldComponent3d::calculate(const B2Vector3D& point) const
     return iphi;
   };
 
-  B2Vector3D B(0, 0, 0);
+  ROOT::Math::XYZVector B(0, 0, 0);
 
   // If both '3d' and 'Beamline' components are defined in xml file,
   // '3d' component returns zero field where 'Beamline' component is defined.
@@ -237,7 +237,7 @@ B2Vector3D BFieldComponent3d::calculate(const B2Vector3D& point) const
     unsigned int iphi = getPhiIndexWeight(ay, point.x(), wphi);
 
     // Get B-field values from map
-    B2Vector3D b = interpolate(ir, iphi, iz, wr, wphi, wz); // in cylindrical system
+    ROOT::Math::XYZVector b = interpolate(ir, iphi, iz, wr, wphi, wz); // in cylindrical system
     double norm = 1 / r;
     double s = ay * norm, c = point.x() * norm;
     // Flip sign of By if y<0
@@ -256,8 +256,8 @@ void BFieldComponent3d::terminate()
 {
 }
 
-B2Vector3D BFieldComponent3d::interpolate(unsigned int ir, unsigned int iphi, unsigned int iz,
-                                          double wr1, double wphi1, double wz1) const
+ROOT::Math::XYZVector BFieldComponent3d::interpolate(unsigned int ir, unsigned int iphi, unsigned int iz,
+                                                     double wr1, double wphi1, double wz1) const
 {
   const unsigned int strideZ = m_mapSize[0] * m_mapSize[1];
   const unsigned int strideR = m_mapSize[1];
@@ -275,7 +275,7 @@ B2Vector3D BFieldComponent3d::interpolate(unsigned int ir, unsigned int iphi, un
   const double w10 = wphi0 * wr1;
   const double w01 = wphi1 * wr0;
   const double w11 = wphi1 * wr1;
-  const vector<B2Vector3F>& B = m_bmap;
+  const vector<ROOT::Math::XYZVector>& B = m_bmap;
   return
     (B[j000] * w00 + B[j001] * w01 + B[j010] * w10 + B[j011] * w11) * wz0 +
     (B[j100] * w00 + B[j101] * w01 + B[j110] * w10 + B[j111] * w11) * wz1;

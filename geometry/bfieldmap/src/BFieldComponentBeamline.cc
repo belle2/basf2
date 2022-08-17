@@ -355,7 +355,7 @@ namespace Belle2 {
       struct cs_t {double c, s;};
       vector<cs_t> cs(nrphi);
       vector<xy_t> pc;
-      vector<B2Vector3D> tbc;
+      vector<ROOT::Math::XYZVector> tbc;
       pc.reserve(nrphi);
       char cbuf[256]; IN.getline(cbuf, 256);
       double rmax = 0;
@@ -451,10 +451,10 @@ namespace Belle2 {
 
       m_triInterpol.init(pc, ts, 0.1);
 
-      vector<B2Vector3F> bc(m_nxy * m_nz);
+      vector<ROOT::Math::XYZVector> bc(m_nxy * m_nz);
       unsigned int count = 0;
       for (int i = 0; i < nrphi; i++) {
-        if (ip[i]) bc[count++] = B2Vector3F(tbc[i]);
+        if (ip[i]) bc[count++] = ROOT::Math::XYZVector(tbc[i]);
       }
 
       for (int i = 1; i < m_nz; ++i) {
@@ -520,7 +520,7 @@ namespace Belle2 {
      * [T]. Returns false if the space point lies outside the valid
      * region.
      */
-    [[nodiscard]] bool inRange(const B2Vector3D& v) const
+    [[nodiscard]] bool inRange(const ROOT::Math::XYZVector& v) const
     {
       if (std::abs(v.z()) > m_zmax) return false;
       double R2 = v.x() * v.x() + v.y() * v.y();
@@ -537,9 +537,9 @@ namespace Belle2 {
      * [T]. Returns a zero vector (0,0,0) if the space point lies
      * outside the region described by the component.
      */
-    [[nodiscard]] B2Vector3D interpolateField(const B2Vector3D& v) const
+    [[nodiscard]] ROOT::Math::XYZVector interpolateField(const ROOT::Math::XYZVector& v) const
     {
-      B2Vector3D res = {0, 0, 0};
+      ROOT::Math::XYZVector res = {0, 0, 0};
       double R2 = v.x() * v.x() + v.y() * v.y();
       if (R2 > m_rmax * m_rmax) return res;
       double wz1;
@@ -554,8 +554,8 @@ namespace Belle2 {
         m_triInterpol.weights(it, xy, w0, w1, w2);
         auto t = m_triInterpol.getTriangles().begin() + it;
         int j0 = t->j0, j1 = t->j1, j2 = t->j2;
-        const B2Vector3F* B = m_B.data() + m_nxy * iz;
-        B2Vector3D b = (B[j0] * w0 + B[j1] * w1 + B[j2] * w2) * wz0;
+        const ROOT::Math::XYZVector* B = m_B.data() + m_nxy * iz;
+        ROOT::Math::XYZVector b = (B[j0] * w0 + B[j1] * w1 + B[j2] * w2) * wz0;
         B += m_nxy; // next z-slice
         b += (B[j0] * w0 + B[j1] * w1 + B[j2] * w2) * wz1;
         res = b;
@@ -579,8 +579,8 @@ namespace Belle2 {
         int j11 = j01 + nr1;
 
         double w00 = wr0 * wphi0, w01 = wphi0 * wr1, w10 = wphi1 * wr0, w11 = wphi1 * wr1;
-        const B2Vector3F* B = m_B.data() + m_nxy * iz;
-        B2Vector3D b = (B[j00] * w00 + B[j01] * w01 + B[j10] * w10 + B[j11] * w11) * wz0;
+        const ROOT::Math::XYZVector* B = m_B.data() + m_nxy * iz;
+        ROOT::Math::XYZVector b = (B[j00] * w00 + B[j01] * w01 + B[j10] * w10 + B[j11] * w11) * wz0;
         B += m_nxy; // next z-slice
         b += (B[j00] * w00 + B[j01] * w01 + B[j10] * w10 + B[j11] * w11) * wz1;
         res = b;
@@ -590,7 +590,7 @@ namespace Belle2 {
     }
   protected:
     /** Buffer for the magnetic field map */
-    vector<B2Vector3F> m_B;
+    vector<ROOT::Math::XYZVector> m_B;
     /** Object to locate point in a triangular mesh */
     TriangularInterpolation m_triInterpol;
     /** Number of field points in XY plane */
@@ -643,29 +643,29 @@ namespace Belle2 {
     if (m_her) delete m_her;
   }
 
-  bool BFieldComponentBeamline::isInRange(const B2Vector3D& p) const
+  bool BFieldComponentBeamline::isInRange(const ROOT::Math::XYZVector& p) const
   {
     if (!m_ler || !m_her) return false;
     double s = m_sinBeamCrossAngle, c = m_cosBeamCrossAngle;
-    B2Vector3D v = -p; // invert coordinates to match ANSYS one
+    ROOT::Math::XYZVector v = -p; // invert coordinates to match ANSYS one
     double xc = v.x() * c, zs = v.z() * s, zc = v.z() * c, xs = v.x() * s;
-    B2Vector3D hv{xc - zs, v.y(), zc + xs};
-    B2Vector3D lv{xc + zs, v.y(), zc - xs};
+    ROOT::Math::XYZVector hv{xc - zs, v.y(), zc + xs};
+    ROOT::Math::XYZVector lv{xc + zs, v.y(), zc - xs};
     return m_ler->inRange(lv) || m_her->inRange(hv);
   }
 
-  B2Vector3D BFieldComponentBeamline::calculate(const B2Vector3D& p) const
+  ROOT::Math::XYZVector BFieldComponentBeamline::calculate(const ROOT::Math::XYZVector& p) const
   {
-    B2Vector3D res;
+    ROOT::Math::XYZVector res;
     double s = m_sinBeamCrossAngle, c = m_cosBeamCrossAngle;
-    B2Vector3D v = -p; // invert coordinates to match ANSYS one
+    ROOT::Math::XYZVector v = -p; // invert coordinates to match ANSYS one
     double xc = v.x() * c, zs = v.z() * s, zc = v.z() * c, xs = v.x() * s;
-    B2Vector3D hv{xc - zs, v.y(), zc + xs};
-    B2Vector3D lv{xc + zs, v.y(), zc - xs};
-    B2Vector3D hb = m_her->interpolateField(hv);
-    B2Vector3D lb = m_ler->interpolateField(lv);
-    B2Vector3D rhb{hb.x()* c + hb.z()* s, hb.y(),  hb.z()* c - hb.x()* s};
-    B2Vector3D rlb{lb.x()* c - lb.z()* s, lb.y(),  lb.z()* c + lb.x()* s};
+    ROOT::Math::XYZVector hv{xc - zs, v.y(), zc + xs};
+    ROOT::Math::XYZVector lv{xc + zs, v.y(), zc - xs};
+    ROOT::Math::XYZVector hb = m_her->interpolateField(hv);
+    ROOT::Math::XYZVector lb = m_ler->interpolateField(lv);
+    ROOT::Math::XYZVector rhb{hb.x()* c + hb.z()* s, hb.y(),  hb.z()* c - hb.x()* s};
+    ROOT::Math::XYZVector rlb{lb.x()* c - lb.z()* s, lb.y(),  lb.z()* c + lb.x()* s};
 
     double mhb = std::abs(rhb.x()) + std::abs(rhb.y()) + std::abs(rhb.z());
     double mlb = std::abs(rlb.x()) + std::abs(rlb.y()) + std::abs(rlb.z());

@@ -11,7 +11,6 @@
 #include <vector>
 #include <Math/Vector3D.h>
 #include <framework/logging/Logger.h>
-#include <framework/geometry/B2Vector3.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/dbobjects/MagneticField.h>
@@ -82,7 +81,7 @@ namespace Belle2 {
   inline ROOT::Math::XYZVector BFieldManager::calculate(const ROOT::Math::XYZVector& pos) const
   {
     if (!m_magfield) B2FATAL("Could not load magnetic field configuration from database");
-    return ROOT::Math::XYZVector(m_magfield->getField(B2Vector3D(pos)));
+    return m_magfield->getField(pos);
   };
 
   inline void BFieldManager::getField(const double* pos, double* field)

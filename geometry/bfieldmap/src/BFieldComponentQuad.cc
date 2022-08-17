@@ -344,16 +344,16 @@ double BFieldComponentQuad::getAperture(double s, std::vector<ApertPoint>::const
   return p1.r + (p2.r - p1.r) / (p2.s - p1.s) * (s - p1.s);
 }
 
-B2Vector3D BFieldComponentQuad::calculate(const B2Vector3D& point) const
+ROOT::Math::XYZVector BFieldComponentQuad::calculate(const ROOT::Math::XYZVector& point) const
 {
   const double sa = sin(0.0415), ca = cos(0.0415);
   //assume point is given in [cm]
-  B2Vector3D B(0, 0, 0);
+  ROOT::Math::XYZVector B(0, 0, 0);
 
-  const B2Vector3D& v{point};
+  const ROOT::Math::XYZVector& v{point};
   double xc = v.x() * ca, zs = v.z() * sa, zc = v.z() * ca, xs = v.x() * sa;
-  B2Vector3D vh{(xc - zs), -v.y(), -(zc + xs)}; // to the HER beamline frame
-  B2Vector3D vl{(xc + zs), -v.y(), -(zc - xs)}; // to the LER beamline frame
+  ROOT::Math::XYZVector vh{(xc - zs), -v.y(), -(zc + xs)}; // to the HER beamline frame
+  ROOT::Math::XYZVector vl{(xc + zs), -v.y(), -(zc - xs)}; // to the LER beamline frame
 
   double r2h = vh.Perp2(), r2l = vl.Perp2();
 

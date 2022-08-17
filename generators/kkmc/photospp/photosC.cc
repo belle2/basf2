@@ -365,7 +365,7 @@ namespace Photospp {
           SUMVEC[J - i] = SUMVEC[J - i] + hep.phep[I - i][J - i];
         }
         if (hep.jmohep[I - i][2 - i] == 0) {
-          fprintf(PHLUN, "%4i %7i %s %4i %s Stable %9.2f %9.2f %9.2f %9.2f %9.2f\n" ,  I, hep.idhep[I - i], X3, hep.jmohep[I - i][1 - i], X7,
+          fprintf(PHLUN, "%4i %7i %s %4i %s Stable %9.2f %9.2f %9.2f %9.2f %9.2f\n",  I, hep.idhep[I - i], X3, hep.jmohep[I - i][1 - i], X7,
                   hep.phep[I - i][1 - i], hep.phep[I - i][2 - i], hep.phep[I - i][3 - i], hep.phep[I - i][4 - i], hep.phep[I - i][5 - i]);
         } else {
           fprintf(PHLUN, "%4i %7i %4i - %4i %s Stable %9.2f %9.2f %9.2f %9.2f %9.2f\n", I, hep.idhep[I - i], hep.jmohep[I - i][1 - i],
@@ -374,7 +374,7 @@ namespace Photospp {
         }
       } else {
         if (hep.jmohep[I - i][2 - i] == 0) {
-          fprintf(PHLUN, "%4i %7i %s %4i %s %4i - %4i %9.2f %9.2f %9.2f %9.2f %9.2f\n" ,  I, hep.idhep[I - i], X3, hep.jmohep[I - i][1 - i],
+          fprintf(PHLUN, "%4i %7i %s %4i %s %4i - %4i %9.2f %9.2f %9.2f %9.2f %9.2f\n",  I, hep.idhep[I - i], X3, hep.jmohep[I - i][1 - i],
                   X2, hep.jdahep[I - i][1 - i], hep.jdahep[I - i][2 - i], hep.phep[I - i][1 - i], hep.phep[I - i][2 - i], hep.phep[I - i][3 - i],
                   hep.phep[I - i][4 - i], hep.phep[I - i][5 - i]);
         } else {
@@ -388,6 +388,14 @@ namespace Photospp {
                          SUMVEC[3 - i]);
     fprintf(PHLUN, "%s  Vector Sum: %9.2f %9.2f %9.2f %9.2f %9.2f\n", X23, SUMVEC[1 - i], SUMVEC[2 - i], SUMVEC[3 - i], SUMVEC[4 - i],
             SUMVEC[5 - i]);
+
+    fprintf(PHLUN, " Vertices:\n");
+    fprintf(PHLUN, " Nr   Type   Vx   Vy   Vz   T\n");
+    for (I = 1; I <= hep.nhep; I++) {
+      fprintf(PHLUN, " %2i %7.2f %7.2f %7.2f %7.2f\n", I, hep.vhep[I - i][1 - i], hep.vhep[I - i][2 - i], hep.vhep[I - i][3 - i],
+              hep.vhep[I - i][4 - i]);
+    }
+
 
 
 
@@ -755,9 +763,13 @@ namespace Photospp {
         //--   Photon mother and vertex...
         MOTHER = hep.jmohep[I - i][1 - i];
         hep.jdahep[MOTHER - i][2 - i] = I;
-        for (J = 1; J <= 4; J++) {
-          hep.vhep[I - i][J - i] = hep.vhep[I - 1 - i][J - i];
-        }
+
+        // TP: This copies vertex position from mothers to daughters
+        //     overwriting daughters position (if set)
+        //for( J=1;J<=4;J++){
+        //  hep.vhep[I-i][J-i]=hep.vhep[I-1-i][J-i];
+        //}
+
       }
     }
     //      write(*,*) 'at po dzialaniu '
@@ -949,7 +961,7 @@ namespace Photospp {
         } else {
 
           EN = sqrt(pho.phep[I - i][5 - i] * pho.phep[I - i][5 - i] + P2);
-          if (IPRINT == 1) fprintf(PHLUN, "CORRECTING ENERGY OF %6i: %14.9f =>% 14.9f\n", I , pho.phep[I - i][4 - i], EN);
+          if (IPRINT == 1) fprintf(PHLUN, "CORRECTING ENERGY OF %6i: %14.9f =>% 14.9f\n", I, pho.phep[I - i][4 - i], EN);
 
           pho.phep[I - i][4 - i] = EN;
           E = E + pho.phep[I - i][4 - i];
@@ -1644,6 +1656,7 @@ namespace Photospp {
     pho.jdahep[1 - i][1 - i] = 3;
     pho.jdahep[1 - i][2 - i] = 3 + LAST - FIRST;
     for (I = 1; I <= 5; I++) pho.phep[1 - i][I - i] = hep.phep[IP - i][I - i];
+    for (I = 1; I <= 4; I++) pho.vhep[1 - i][I - i] = hep.vhep[IP - i][I - i];
 
     // let-s take in eventual second mother
     IP2 = hep.jmohep[hep.jdahep[IP - i][1 - i] - i][2 - i];
@@ -1653,9 +1666,12 @@ namespace Photospp {
       pho.jdahep[2 - i][2 - i] = 3 + LAST - FIRST;
       for (I = 1; I <= 5; I++)
         pho.phep[2 - i][I - i] = hep.phep[IP2 - i][I - i];
+      for (I = 1; I <= 4; I++)
+        pho.vhep[2 - i][I - i] = hep.vhep[IP2 - i][I - i];
     } else {
       pho.idhep[2 - i] = 0;
       for (I = 1; I <= 5; I++)  pho.phep[2 - i][I - i] = 0.0;
+      for (I = 1; I <= 4; I++)  pho.vhep[2 - i][I - i] = 0.0;
     }
 
     // let-s take in daughters
@@ -1664,7 +1680,7 @@ namespace Photospp {
       pho.jmohep[3 + LL - i][1 - i] = hep.jmohep[FIRST + LL - i][1 - i];
       if (hep.jmohep[FIRST + LL - i][1 - i] == IP) pho.jmohep[3 + LL - i][1 - i] = 1;
       for (I = 1; I <= 5; I++) pho.phep[3 + LL - i][I - i] = hep.phep[FIRST + LL - i][I - i];
-
+      for (I = 1; I <= 4; I++) pho.vhep[3 + LL - i][I - i] = hep.vhep[FIRST + LL - i][I - i];
     }
     if (hep.nhep > nhep0) {
       // let-s take in illegitimate daughters
@@ -1674,7 +1690,7 @@ namespace Photospp {
         pho.jmohep[NA + LL - i][1 - i] = hep.jmohep[nhep0 + LL - i][1 - i];
         if (hep.jmohep[nhep0 + LL - i][1 - i] == IP) pho.jmohep[NA + LL - i][1 - i] = 1;
         for (I = 1; I <= 5; I++) pho.phep[NA + LL - i][I - i] = hep.phep[nhep0 + LL - i][I - i];
-
+        for (I = 1; I <= 4; I++) pho.vhep[NA + LL - i][I - i] = hep.vhep[nhep0 + LL - i][I - i];
       }
       //--        there is hep.nhep-nhep0 daugters more.
       pho.jdahep[1 - i][2 - i] = 3 + LAST - FIRST + hep.nhep - nhep0;
@@ -1805,6 +1821,7 @@ namespace Photospp {
     for (LL = 0; LL <= LAST - FIRST; LL++) {
       hep.idhep[FIRST + LL - i] = pho.idhep[3 + LL - i];
       for (I = 1; I <= 5; I++) hep.phep[FIRST + LL - i][I - i] = pho.phep[3 + LL - i][I - i];
+      for (I = 1; I <= 4; I++) hep.vhep[FIRST + LL - i][I - i] = pho.vhep[3 + LL - i][I - i];
     }
 
     // let-s take newcomers to the end of HEPEVT.
@@ -1817,6 +1834,7 @@ namespace Photospp {
       hep.jdahep[nhep0 + LL - i][1 - i] = 0;
       hep.jdahep[nhep0 + LL - i][2 - i] = 0;
       for (I = 1; I <= 5; I++) hep.phep[nhep0 + LL - i][I - i] = pho.phep[NA + LL - i][I - i];
+      for (I = 1; I <= 4; I++) hep.vhep[nhep0 + LL - i][I - i] = pho.vhep[NA + LL - i][I - i];
     }
     hep.nhep = hep.nhep + pho.nhep - pho.nevhep;
     PHLUPA(20);

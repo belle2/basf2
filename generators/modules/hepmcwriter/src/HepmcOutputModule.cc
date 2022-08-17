@@ -74,7 +74,7 @@ void HepMCOutputModule::event()
     }
 
     ROOT::Math::XYZVector mom = mcPart.getMomentum();
-    B2Vector3D vert = mcPart.getVertex();
+    ROOT::Math::XYZVector vert = mcPart.getVertex();
 
     int isthep = 1;
     if (mcPart.getFirstDaughter() > 0) isthep = 2;

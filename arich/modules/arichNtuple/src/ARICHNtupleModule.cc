@@ -246,12 +246,12 @@ namespace Belle2 {
           m_arich.PDG = particle->getPDG();
           m_arich.primary = particle->getStatus(MCParticle::c_PrimaryParticle);
           m_arich.seen = particle->hasSeenInDetector(Const::ARICH);
-          B2Vector3D prodVertex = particle->getProductionVertex();
-          m_arich.rhoProd = prodVertex.Perp();
+          ROOT::Math::XYZVector prodVertex = particle->getProductionVertex();
+          m_arich.rhoProd = prodVertex.Rho();
           m_arich.zProd = prodVertex.Z();
           m_arich.phiProd = prodVertex.Phi();
-          TVector3 decVertex = particle->getDecayVertex();
-          m_arich.rhoDec = decVertex.Perp();
+          ROOT::Math::XYZVector decVertex = particle->getDecayVertex();
+          m_arich.rhoDec = decVertex.Rho();
           m_arich.zDec = decVertex.Z();
           m_arich.phiDec = decVertex.Phi();
 
@@ -317,12 +317,12 @@ namespace Belle2 {
             if (mother) m_arich.motherPDG = mother->getPDG();
             m_arich.primary = particle->getStatus(MCParticle::c_PrimaryParticle);
             m_arich.seen = particle->hasSeenInDetector(Const::ARICH);
-            B2Vector3D prodVertex = particle->getProductionVertex();
-            m_arich.rhoProd = prodVertex.Perp();
+            ROOT::Math::XYZVector prodVertex = particle->getProductionVertex();
+            m_arich.rhoProd = prodVertex.Rho();
             m_arich.zProd = prodVertex.Z();
             m_arich.phiProd = prodVertex.Phi();
-            TVector3 decVertex = particle->getDecayVertex();
-            m_arich.rhoDec = decVertex.Perp();
+            ROOT::Math::XYZVector decVertex = particle->getDecayVertex();
+            m_arich.rhoDec = decVertex.Rho();
             m_arich.zDec = decVertex.Z();
             m_arich.phiDec = decVertex.Phi();
 

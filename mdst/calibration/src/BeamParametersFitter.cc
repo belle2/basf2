@@ -295,7 +295,7 @@ void BeamParametersFitter::fillVertexData(
   double covarianceXX, double covarianceYY)
 {
   setupDatabase();
-  m_BeamParameters.setVertex(m_BeamSpot->getIPPosition());
+  m_BeamParameters.setVertex(ROOT::Math::XYZVector(m_BeamSpot->getIPPosition()));
   TMatrixDSym beamSize = m_BeamSpot->getSizeCovMatrix();
   double xScale, yScale;
   if (covarianceXX < 0)

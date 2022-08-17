@@ -391,7 +391,7 @@ void TrackFinderMCTruthRecoTracksModule::event()
 
     MCParticle* aMcParticlePtr = m_MCParticles[iPart];
     // Ignore particles that didn't propagate significantly, they cannot make tracks.
-    if ((aMcParticlePtr->getDecayVertex() - B2Vector3D(aMcParticlePtr->getProductionVertex())).Mag() < 1 * Unit::cm) {
+    if ((aMcParticlePtr->getDecayVertex() - aMcParticlePtr->getProductionVertex()).R() < 1 * Unit::cm) {
       B2DEBUG(20, "Particle that did not propagate significantly cannot make track.");
       continue;
     }

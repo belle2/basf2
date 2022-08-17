@@ -40,7 +40,7 @@ void BeamParameters::setHER(double energy, double angleX, double angleY, const s
   setCovMatrix(m_covHER, cov, false);
 }
 
-void BeamParameters::setVertex(const TVector3& vertex, const std::vector<double>& cov)
+void BeamParameters::setVertex(const ROOT::Math::XYZVector& vertex, const std::vector<double>& cov)
 {
   setVertex(vertex);
   setCovMatrix(m_covVertex, cov, true);

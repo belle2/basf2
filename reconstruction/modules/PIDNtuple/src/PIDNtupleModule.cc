@@ -151,12 +151,12 @@ void PIDNtupleModule::event()
       m_pid.PDG = mcParticle->getPDG();
       if (mother) m_pid.motherPDG = mother->getPDG();
       m_pid.primary = mcParticle->getStatus(MCParticle::c_PrimaryParticle);
-      B2Vector3D prodVertex = mcParticle->getProductionVertex();
-      m_pid.rhoProd = prodVertex.Perp();
+      ROOT::Math::XYZVector prodVertex = mcParticle->getProductionVertex();
+      m_pid.rhoProd = prodVertex.Rho();
       m_pid.zProd = prodVertex.Z();
       m_pid.phiProd = prodVertex.Phi();
-      TVector3 decVertex = mcParticle->getDecayVertex();
-      m_pid.rhoDec = decVertex.Perp();
+      ROOT::Math::XYZVector decVertex = mcParticle->getDecayVertex();
+      m_pid.rhoDec = decVertex.Rho();
       m_pid.zDec = decVertex.Z();
       m_pid.phiDec = decVertex.Phi();
     }

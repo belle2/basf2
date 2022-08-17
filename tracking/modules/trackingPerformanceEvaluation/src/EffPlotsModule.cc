@@ -555,7 +555,7 @@ void EffPlotsModule::event()
     MCParticleInfo mcParticleInfo_dau0(*m_MCDaughter0, magField);
     MCParticleInfo mcParticleInfo_dau1(*m_MCDaughter1, magField);
 
-    const TVector3& MC_vtx = mcParticle.getDecayVertex();
+    const ROOT::Math::XYZVector& MC_vtx = mcParticle.getDecayVertex();
 
     float MC_transDist = sqrt(MC_vtx.X() * MC_vtx.X() + MC_vtx.Y() * MC_vtx.Y());
     float MC_pt = mcParticle.getMomentum().Rho();

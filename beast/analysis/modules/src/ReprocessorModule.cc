@@ -105,7 +105,7 @@ void ReprocessorModule::event()
           particle->setPDG(PDG);
           particle->setMassFromPDG();
           particle->setMomentum(ROOT::Math::XYZVector(Momentum));
-          particle->setProductionVertex(ProductionVertex);
+          particle->setProductionVertex(ROOT::Math::XYZVector(ProductionVertex));
           particle->setProductionTime(0.0);
           particle->setEnergy(energy);
           particle->setValidVertex(true);
@@ -128,7 +128,7 @@ void ReprocessorModule::event()
           particle->setPDG(PDG);
           particle->setMassFromPDG();
           particle->setMomentum(ROOT::Math::XYZVector(Momentum));
-          particle->setProductionVertex(ProductionVertex);
+          particle->setProductionVertex(ROOT::Math::XYZVector(ProductionVertex));
           particle->setProductionTime(0.0);
           particle->setEnergy(energy);
           particle->setValidVertex(true);

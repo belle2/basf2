@@ -88,7 +88,7 @@ void PrintTauTauMCParticlesModule::printTree(const MCParticle& mc, int level)
     return;
   }
   const ROOT::Math::XYZVector& p = mc.getMomentum();
-  const B2Vector3D& v = mc.getVertex();
+  const ROOT::Math::XYZVector& v = mc.getVertex();
   B2INFO(boost::format("%3d %s%5d%s%20tp:(%10.3e, %10.3e, %10.3e) v:(%10.3e, %10.3e, %10.3e), t:%10.3e,%10.3e, s:%d, c:%d")
          % mc.getIndex() % indent % mc.getPDG() % name
          % p.X() % p.Y() % p.Z()

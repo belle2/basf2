@@ -114,7 +114,7 @@ namespace Belle2 {
     }
 
     /** Set the vertex position */
-    void setVertex(const B2Vector3D& vertex)
+    void setVertex(const ROOT::Math::XYZVector& vertex)
     {
       m_vertex = vertex;
     }
@@ -132,7 +132,7 @@ namespace Belle2 {
     const ROOT::Math::PxPyPzEVector& getLER() const { return m_ler; }
 
     /** Get the position of the collision */
-    const B2Vector3D& getVertex() const { return m_vertex; }
+    const ROOT::Math::XYZVector& getVertex() const { return m_vertex; }
 
     /** Get collison time */
     double getTime() const {return m_time;}
@@ -179,7 +179,7 @@ namespace Belle2 {
     /** LER 4vector */
     ROOT::Math::PxPyPzEVector m_ler;
     /** collision position */
-    B2Vector3D m_vertex;
+    ROOT::Math::XYZVector m_vertex;
     /** collision time */
     double m_time = 0;
     /** Boost from Lab into CMS. (calculated on first use, not saved to file) */
@@ -199,7 +199,7 @@ namespace Belle2 {
   private:
 
     /** ROOT Dictionary */
-    ClassDef(MCInitialParticles, 4);
+    ClassDef(MCInitialParticles, 5);
   };
 
   inline void MCInitialParticles::calculateBoost() const

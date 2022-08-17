@@ -172,11 +172,11 @@ void V0findingPerformanceEvaluationModule::event()
 
     MCParticleInfo mcParticleInfo(mcParticle, magField);
 
-    B2Vector3D MC_prodvtx = mcParticle.getVertex();
-    TVector3 MC_vtx = mcParticle.getDecayVertex();
+    ROOT::Math::XYZVector MC_prodvtx = mcParticle.getVertex();
+    ROOT::Math::XYZVector MC_vtx = mcParticle.getDecayVertex();
     float MC_mom = mcParticle.getMomentum().R();
     float MC_mass = mcParticle.getMass();
-    TVector3 MC_FL = MC_vtx - MC_prodvtx;
+    ROOT::Math::XYZVector MC_FL = MC_vtx - MC_prodvtx;
     float flightR = sqrt(MC_FL.X() * MC_FL.X() + MC_FL.Y() * MC_FL.Y());
     m_h1_MCParticle_R->Fill(flightR);
 

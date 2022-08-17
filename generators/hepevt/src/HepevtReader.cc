@@ -194,7 +194,7 @@ void HepevtReader::readParticle(MCParticleGraph::GraphParticle& particle)
       particle.setPDG(static_cast<int>(fields[8]));
       particle.setFirstDaughter(0);
       particle.setLastDaughter(0);
-      particle.setProductionVertex(TVector3(&fields[0])*Unit::mm);
+      particle.setProductionVertex(ROOT::Math::XYZVector(fields[0], fields[1], fields[2])*Unit::mm);
       particle.setMomentum(ROOT::Math::XYZVector(fields[3], fields[4], fields[5]));
       particle.setMass(fields[6]);
       particle.setEnergy(fields[7]);
@@ -208,7 +208,7 @@ void HepevtReader::readParticle(MCParticleGraph::GraphParticle& particle)
       particle.setMomentum(ROOT::Math::XYZVector(fields[6], fields[7], fields[8]));
       //particle.setEnergy(fields[9]);
       particle.setMass(fields[10]);
-      particle.setProductionVertex(TVector3(&fields[11])*Unit::mm);
+      particle.setProductionVertex(ROOT::Math::XYZVector(fields[11], fields[12], fields[13])*Unit::mm);
       particle.setProductionTime(fields[14]*Unit::mm / Const::speedOfLight);
       particle.setValidVertex(true);
       {

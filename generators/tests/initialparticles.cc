@@ -135,8 +135,10 @@ namespace {
     }
     auto cov = beamparams.getCovVertex();
     auto pos = beamparams.getVertex();
+    EXPECT_NEAR(mean.getMean(0), pos.x(), 1e-4);
+    EXPECT_NEAR(mean.getMean(1), pos.y(), 1e-4);
+    EXPECT_NEAR(mean.getMean(2), pos.z(), 1e-4);
     for (int i = 0; i < 3; ++i) {
-      EXPECT_NEAR(mean.getMean(i), pos(i), 1e-4);
       for (int j = 0; j < 3; ++j) {
         EXPECT_NEAR(mean.getCovariance(i, j), cov(i, j), 1e-6);
       }
@@ -216,7 +218,7 @@ namespace {
     MCInitialParticles& initial = generator.generate();
     ROOT::Math::PxPyPzEVector her = initial.getHER();
     ROOT::Math::PxPyPzEVector ler = initial.getLER();
-    TVector3 vertex = initial.getVertex();
+    ROOT::Math::XYZVector vertex = initial.getVertex();
     for (int i = 0; i < 10; ++i) {
       initial = generator.generate();
       EXPECT_EQ(her, initial.getHER());

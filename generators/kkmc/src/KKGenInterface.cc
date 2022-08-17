@@ -150,10 +150,10 @@ int KKGenInterface::simulateEvent(MCParticleGraph& graph, TVector3 vertex)
     int moID = 0;
     char buf[200];
     sprintf(buf, "IntB: %3d %4u %8d %4d %4d %4d %9.4f %9.4f %9.4f %9.4f",
-            p->getIndex() ,  p->getStatus() ,  p->getPDG() ,  moID ,
-            p->getFirstDaughter() ,  p->getLastDaughter() ,
-            p->get4Vector().Px() ,  p->get4Vector().Py() ,
-            p->get4Vector().Pz() ,  p->get4Vector().E());
+            p->getIndex(),  p->getStatus(),  p->getPDG(),  moID,
+            p->getFirstDaughter(),  p->getLastDaughter(),
+            p->get4Vector().Px(),  p->get4Vector().Py(),
+            p->get4Vector().Pz(),  p->get4Vector().E());
     B2DEBUG(100, buf);
 
   }
@@ -248,9 +248,9 @@ void KKGenInterface::updateGraphParticle(int index, MCParticleGraph::GraphPartic
   gParticle->set4Vector(p4);
 
   //set vertex including smearing (if user requested)
-  TVector3 pProductionVertex(hepevt_.vhep[index - 1][0]*Unit::mm,
-                             hepevt_.vhep[index - 1][1]*Unit::mm,
-                             hepevt_.vhep[index - 1][2]*Unit::mm);
+  ROOT::Math::XYZVector pProductionVertex(hepevt_.vhep[index - 1][0]*Unit::mm,
+                                          hepevt_.vhep[index - 1][1]*Unit::mm,
+                                          hepevt_.vhep[index - 1][2]*Unit::mm);
   if (!gParticle->hasStatus(MCParticle::c_Initial)) {
     pProductionVertex = pProductionVertex + vertex;
   }

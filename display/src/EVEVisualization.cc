@@ -1117,8 +1117,8 @@ EVEVisualization::MCTrack* EVEVisualization::addMCParticle(const MCParticle* par
   }
 
   if (!m_mcparticleTracks[particle].track) {
-    const B2Vector3D& p = particle->getMomentum();
-    const B2Vector3D& vertex = particle->getProductionVertex();
+    const ROOT::Math::XYZVector& p = particle->getMomentum();
+    const ROOT::Math::XYZVector& vertex = particle->getProductionVertex();
     const int pdg = particle->getPDG();
     TParticle tparticle(pdg, particle->getStatus(),
                         (particle->getMother() ? particle->getMother()->getIndex() : 0), 0, particle->getFirstDaughter(), particle->getLastDaughter(),
@@ -1127,7 +1127,7 @@ EVEVisualization::MCTrack* EVEVisualization::addMCParticle(const MCParticle* par
     TEveMCTrack mctrack;
     mctrack = tparticle;
     mctrack.fTDecay = particle->getDecayTime();
-    mctrack.fVDecay.Set(particle->getDecayVertex());
+    mctrack.fVDecay.Set(B2Vector3D(particle->getDecayVertex()));
     mctrack.fDecayed = !boost::math::isinf(mctrack.fTDecay);
     mctrack.fIndex = particle->getIndex();
     m_mcparticleTracks[particle].track = new TEveTrack(&mctrack, m_trackpropagator);
@@ -1180,7 +1180,7 @@ EVEVisualization::MCTrack* EVEVisualization::addMCParticle(const MCParticle* par
       if ((TMath::Nint(particle->getCharge()) == 0 or !particle->hasStatus(MCParticle::c_StoppedInDetector))
           and mctrack.fDecayed) {
         TEvePathMarkD decayMark(TEvePathMarkD::kDecay);
-        decayMark.fV.Set(particle->getDecayVertex());
+        decayMark.fV.Set(B2Vector3D(particle->getDecayVertex()));
         m_mcparticleTracks[particle].track->AddPathMark(decayMark);
       }
     }

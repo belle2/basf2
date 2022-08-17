@@ -178,7 +178,7 @@ int EvtGenInterface::simulateDecay(MCParticleGraph& graph,
   int pdg;
   EvtId id;
   ROOT::Math::PxPyPzEVector momentum = parent.get4Vector();
-  B2Vector3D vertex = parent.getVertex();
+  ROOT::Math::XYZVector vertex = parent.getVertex();
   m_pinit.set(momentum.E(), momentum.X(), momentum.Y(), momentum.Z());
   m_logCaptureDebug.start();
   // we want to decay the particle so the decay time in the tree needs to be lower
@@ -267,10 +267,10 @@ void EvtGenInterface::updateGraphParticle(EvtParticle* eParticle, MCParticleGrap
 
   EvtVector4R Evtpos = eParticle->get4Pos();
 
-  TVector3 pVertex(Evtpos.get(1)*Unit::mm, Evtpos.get(2)*Unit::mm, Evtpos.get(3)*Unit::mm);
+  ROOT::Math::XYZVector pVertex(Evtpos.get(1)*Unit::mm, Evtpos.get(2)*Unit::mm, Evtpos.get(3)*Unit::mm);
   pVertex = pVertex + pPrimaryVertex;
 
-  gParticle->setProductionVertex(pVertex(0), pVertex(1), pVertex(2));
+  gParticle->setProductionVertex(pVertex.x(), pVertex.y(), pVertex.z());
   gParticle->setProductionTime((Evtpos.get(0)*Unit::mm / Const::speedOfLight) + timeOffset);
   gParticle->setValidVertex(true);
 

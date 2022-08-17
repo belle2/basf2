@@ -214,9 +214,9 @@ namespace Belle2 {
      *         If the particle crosses the simulation volume boundary,
      *         it is set to the crossing position.
      */
-    TVector3 getDecayVertex() const
+    ROOT::Math::XYZVector getDecayVertex() const
     {
-      return TVector3(m_decayVertex_x, m_decayVertex_y, m_decayVertex_z);
+      return ROOT::Math::XYZVector(m_decayVertex_x, m_decayVertex_y, m_decayVertex_z);
     }
 
     /**
@@ -389,9 +389,9 @@ namespace Belle2 {
 
     /**
      * Set production vertex position.
-     * @param vertex The position of the production vertex given as TVector3.
+     * @param vertex The position of the production vertex given as XYZVector.
      */
-    void setProductionVertex(const TVector3& vertex)
+    void setProductionVertex(const ROOT::Math::XYZVector& vertex)
     {
       m_productionVertex_x = vertex.X(); m_productionVertex_y = vertex.Y(), m_productionVertex_z = vertex.Z();
     }
@@ -440,9 +440,9 @@ namespace Belle2 {
 
     /**
      * Set decay vertex.
-     * @param vertex The position of the decay vertex given as TVector3.
+     * @param vertex The position of the decay vertex given as XYZVector.
      */
-    void setDecayVertex(const TVector3& vertex)
+    void setDecayVertex(const ROOT::Math::XYZVector& vertex)
     {
       m_decayVertex_x = vertex.X(); m_decayVertex_y = vertex.Y(), m_decayVertex_z = vertex.Z();
     }

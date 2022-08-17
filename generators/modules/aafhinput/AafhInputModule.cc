@@ -110,7 +110,7 @@ void AafhInputModule::event()
   ROOT::Math::LorentzRotation boost = initial.getCMSToLab();
 
   // vertex.
-  TVector3 vertex = initial.getVertex();
+  ROOT::Math::XYZVector vertex = initial.getVertex();
 
   MCParticleGraph mpg;
 
@@ -121,7 +121,7 @@ void AafhInputModule::event()
   for (size_t i = 0; i < mpg.size(); ++i) {
     mpg[i].set4Vector(boost * mpg[i].get4Vector());
 
-    B2Vector3D v3 = mpg[i].getProductionVertex();
+    ROOT::Math::XYZVector v3 = mpg[i].getProductionVertex();
     v3 = v3 + vertex;
     mpg[i].setProductionVertex(v3);
     mpg[i].setValidVertex(true);

@@ -167,7 +167,7 @@ void KoralW::storeParticle(MCParticleGraph& mcGraph, const float* mom, const flo
 
   //set vertex, TF
   if (!isInitial) {
-    B2Vector3D v3 = part.getProductionVertex();
+    ROOT::Math::XYZVector v3 = part.getProductionVertex();
     v3 = v3 + vertex;
     part.setProductionVertex(v3);
     part.setValidVertex(true);

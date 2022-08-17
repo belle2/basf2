@@ -307,7 +307,7 @@ namespace {
     {
       Particle p2({ 0.0 , 1.0, 0.0, 1.0 }, 11);
       p2.setPValue(0.5);
-      p2.setVertex(B2Vector3D(1.0, 0.0, 2.0));
+      p2.setVertex(XYZVector(1.0, 0.0, 2.0));
 
       UseReferenceFrame<RestFrame> dummy(&p2);
       EXPECT_FLOAT_EQ(0.0, particleDX(&p));
@@ -4842,7 +4842,7 @@ namespace {
       MCParticle mcKs;
       mcKs.setPDG(Const::Kshort.getPDGCode());
       mcKs.setDecayVertex(4.0, 5.0, 0.0);
-      mcKs.setProductionVertex(B2Vector3D(1.0, 2.0, 3.0));
+      mcKs.setProductionVertex(1.0, 2.0, 3.0);
       mcKs.setMassFromPDG();
       mcKs.setMomentum(1.164, 1.55200, 0);
       mcKs.setStatus(MCParticle::c_PrimaryParticle);

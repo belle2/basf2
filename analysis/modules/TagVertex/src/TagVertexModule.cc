@@ -348,7 +348,7 @@ pair<B2Vector3D, TMatrixDSym> TagVertexModule::findConstraint(const Particle* Br
   analysis::RaveSetup::getInstance()->setBeamSpot(m_BeamSpotCenter, beamSpotCov);
 
   double pmag = Breco->getMomentumMagnitude();
-  double xmag = (B2Vector3D(Breco->getVertex()) - m_BeamSpotCenter).Mag();
+  double xmag = (Breco->getVertex() - m_BeamSpotCenter).R();
 
 
   TMatrixDSym TerrMatrix = Breco->getMomentumVertexErrorMatrix();
@@ -546,8 +546,8 @@ void TagVertexModule::BtagMCVertex(const Particle* Breco)
 
   //both matched -> use closest vertex dist as Reco
   if (isReco(mcBs[0]) && isReco(mcBs[1])) {
-    double dist0 = (mcBs[0]->getDecayVertex() - B2Vector3D(Breco->getVertex())).Mag2();
-    double dist1 = (mcBs[1]->getDecayVertex() - B2Vector3D(Breco->getVertex())).Mag2();
+    double dist0 = (mcBs[0]->getDecayVertex() - Breco->getVertex()).Mag2();
+    double dist1 = (mcBs[1]->getDecayVertex() - Breco->getVertex()).Mag2();
     if (dist0 > dist1)
       swap(mcBs[0], mcBs[1]);
   }
@@ -852,7 +852,7 @@ void TagVertexModule::deltaT(const Particle* Breco)
   double c = Const::speedOfLight / 1000.; // cm ps-1
 
   //Reconstructed DeltaL & DeltaT in the boost direction
-  B2Vector3D dVert = B2Vector3D(Breco->getVertex()) - m_tagV; //reconstructed vtxReco - vtxTag
+  ROOT::Math::XYZVector dVert = Breco->getVertex() - m_tagV; //reconstructed vtxReco - vtxTag
   double dl = dVert.Dot(boostDir);
   m_deltaT  = dl / (bg * c);
 

@@ -192,7 +192,7 @@ void BKLMAnaModule::event()
     const TrackFitResult* fitres = track->getTrackFitResultWithClosestMass(Belle2::Const::muon);
     double mom = fitres->getMomentum().R();
     //double  pt = fitres->getTransverseMomentum();
-    B2Vector3D p3 = fitres->getMomentum();
+    ROOT::Math::XYZVector p3 = fitres->getMomentum();
     double trkphi = p3.Phi() * TMath::RadToDeg();
     double trktheta = p3.Theta() * TMath::RadToDeg();
     if (trkphi < 0)

@@ -246,7 +246,7 @@ void BeamBkgGeneratorModule::event()
     transMatrix.LocalToMasterVect(particleMomSADfar, particleMomGeant4); // momentum
     // apply a new set of coordinates
     part->setMomentum(ROOT::Math::XYZVector(particleMomGeant4[0], particleMomGeant4[1], particleMomGeant4[2]));
-    part->setProductionVertex(TVector3(particlePosGeant4));
+    part->setProductionVertex(ROOT::Math::XYZVector(particlePosGeant4[0], particlePosGeant4[1], particlePosGeant4[2]));
   }
 }
 

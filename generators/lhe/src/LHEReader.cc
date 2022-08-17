@@ -69,7 +69,7 @@ int LHEReader::getEvent(MCParticleGraph& graph, double& eventWeight)
         x = r * p4.Px() / p4.P();
         y = r * p4.Py() / p4.P();
         z = r * p4.Pz() / p4.P();
-        p.setDecayVertex(TVector3(x, y, z));
+        p.setDecayVertex(x, y, z);
         t = (r / Const::speedOfLight) * (p4.E() / p4.P());
         p.setDecayTime(t);
         p.setValidVertex(true);
@@ -77,7 +77,7 @@ int LHEReader::getEvent(MCParticleGraph& graph, double& eventWeight)
 
       if (mother > 0) {
         if (graph[mother - 1].getPDG() == m_pdgDisplaced) {
-          p.setProductionVertex(TVector3(x, y, z));
+          p.setProductionVertex(x, y, z);
           p.setProductionTime(t);
           p.setValidVertex(true);
         }

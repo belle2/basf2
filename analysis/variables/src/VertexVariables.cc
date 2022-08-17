@@ -56,14 +56,14 @@ namespace Belle2 {
     {
       auto* mcparticle = part->getMCParticle();
       if (!mcparticle) return realNaN;
-      return mcparticle->getDecayVertex().Perp();
+      return mcparticle->getDecayVertex().Rho();
     }
 
     B2Vector3D getMcDecayVertexFromIP(const MCParticle* mcparticle)
     {
       static DBObjPtr<BeamSpot> beamSpotDB;
       const auto& frame = ReferenceFrame::GetCurrent();
-      return frame.getVertex(ROOT::Math::XYZVector(mcparticle->getDecayVertex() - beamSpotDB->getIPPosition()));
+      return frame.getVertex(mcparticle->getDecayVertex() - ROOT::Math::XYZVector(beamSpotDB->getIPPosition()));
     }
 
     double mcDecayVertexFromIPX(const Particle* part)

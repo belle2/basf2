@@ -411,7 +411,7 @@ void BBBrem::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg,
 
   //set the production vertex of non initial particles
   if (!isInitial) {
-    B2Vector3D v3 = part.getProductionVertex();
+    ROOT::Math::XYZVector v3 = part.getProductionVertex();
     v3 = v3 + vertex;
     part.setProductionVertex(v3);
     part.setValidVertex(true);

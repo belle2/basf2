@@ -161,6 +161,15 @@ namespace Belle2 {
      */
     template<class value_type> bool setMeanCov(const TVector3& mean,
                                                const TMatrixTBase<value_type>& cov);
+
+    /** set the mean and covariance for the distribution.
+     * @param mean Vector of mean values
+     * @param cov Matrix containing the covariance values
+     * @return true if covariance could be decomposited, false otherwise
+     */
+    template<class value_type> bool setMeanCov(const ROOT::Math::XYZVector& mean,
+                                               const TMatrixTBase<value_type>& cov);
+
   private:
     /** Member to store the mean values of the distribution */
     Eigen::VectorXd m_mean;
@@ -190,6 +199,16 @@ namespace Belle2 {
     for (int i = 0; i < 3; ++i) {
       tmean[i] = mean[i];
     }
+    return setMeanCov(tmean, cov);
+  }
+
+  template<class value_type> bool MultivariateNormalGenerator::setMeanCov(
+    const ROOT::Math::XYZVector& mean, const TMatrixTBase<value_type>& cov)
+  {
+    TVectorT<value_type> tmean(3);
+    tmean[0] = mean.x();
+    tmean[1] = mean.y();
+    tmean[2] = mean.z();
     return setMeanCov(tmean, cov);
   }
 }

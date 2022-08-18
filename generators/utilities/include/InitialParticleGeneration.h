@@ -52,7 +52,7 @@ namespace Belle2 {
      * @param force if true the vertex will be regenerated even if vertex smearing
      *              was already applied.
      */
-    TVector3 updateVertex(bool force = false);
+    ROOT::Math::XYZVector updateVertex(bool force = false);
 
     /** Return reference to nominal beam parameters */
     const BeamParameters& getBeamParameters() const { return *m_beamParams; }
@@ -79,7 +79,8 @@ namespace Belle2 {
      * @param cov covariance of the vertex position
      * @param gen multivariate normal generator to be used
      */
-    TVector3 generateVertex(const TVector3& initial, const TMatrixDSym& cov, MultivariateNormalGenerator& gen);
+    ROOT::Math::XYZVector generateVertex(const ROOT::Math::XYZVector& initial, const TMatrixDSym& cov,
+                                         MultivariateNormalGenerator& gen);
     /** generate 4 vector for one beam
      * @param initial beam
      * @param cov covariance of the beam momentum (E, theta_x, theta_y)

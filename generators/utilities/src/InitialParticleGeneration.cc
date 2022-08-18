@@ -19,12 +19,12 @@ namespace Belle2 {
     m_event.registerInDataStore();
   }
 
-  TVector3 InitialParticleGeneration::generateVertex(const TVector3& initial, const TMatrixDSym& cov,
-                                                     MultivariateNormalGenerator& gen)
+  ROOT::Math::XYZVector InitialParticleGeneration::generateVertex(const ROOT::Math::XYZVector& initial, const TMatrixDSym& cov,
+      MultivariateNormalGenerator& gen)
   {
     if (m_event->hasGenerationFlags(BeamParameters::c_smearVertex)) {
       if (!gen.size()) gen.setMeanCov(initial, cov);
-      return gen.generateVec3();
+      return ROOT::Math::XYZVector(gen.generateVec3());
     }
     return initial;
   }
@@ -91,7 +91,7 @@ namespace Belle2 {
     m_event->setGenerationFlags(m_beamParams->getGenerationFlags() & allowedFlags);
     ROOT::Math::PxPyPzEVector her = generateBeam(m_beamParams->getHER(), m_beamParams->getCovHER(), m_generateHER);
     ROOT::Math::PxPyPzEVector ler = generateBeam(m_beamParams->getLER(), m_beamParams->getCovLER(), m_generateLER);
-    TVector3 vtx = generateVertex(m_beamParams->getVertex(), m_beamParams->getCovVertex(), m_generateVertex);
+    ROOT::Math::XYZVector vtx = generateVertex(m_beamParams->getVertex(), m_beamParams->getCovVertex(), m_generateVertex);
     m_event->set(her, ler, vtx);
     //Check if we want to go to CMS, if so boost both
     if (m_beamParams->hasGenerationFlags(BeamParameters::c_generateCMS)) {
@@ -104,7 +104,7 @@ namespace Belle2 {
     return *m_event;
   }
 
-  TVector3 InitialParticleGeneration::updateVertex(bool force)
+  ROOT::Math::XYZVector InitialParticleGeneration::updateVertex(bool force)
   {
     if (!m_beamParams.isValid()) {
       B2FATAL("Cannot generate beam without valid BeamParameters");

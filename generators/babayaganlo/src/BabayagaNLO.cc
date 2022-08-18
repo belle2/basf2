@@ -328,7 +328,8 @@ void BabayagaNLO::init()
 }
 
 
-void BabayagaNLO::generateEvent(MCParticleGraph& mcGraph, double ecm, TVector3 vertex, ROOT::Math::LorentzRotation boost)
+void BabayagaNLO::generateEvent(MCParticleGraph& mcGraph, double ecm, ROOT::Math::XYZVector vertex,
+                                ROOT::Math::LorentzRotation boost)
 {
   //Generate event
   int mode = 1;
@@ -484,7 +485,7 @@ void BabayagaNLO::applySettings()
 }
 
 
-void BabayagaNLO::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, TVector3 vertex,
+void BabayagaNLO::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, ROOT::Math::XYZVector vertex,
                                 ROOT::Math::LorentzRotation boost, bool isVirtual, bool isInitial, bool isISRFSR)
 {
 

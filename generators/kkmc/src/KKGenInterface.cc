@@ -119,7 +119,7 @@ void KKGenInterface::set_beam_info(ROOT::Math::PxPyPzEVector P4_LER, double Espr
 
 }
 
-int KKGenInterface::simulateEvent(MCParticleGraph& graph, TVector3 vertex)
+int KKGenInterface::simulateEvent(MCParticleGraph& graph, ROOT::Math::XYZVector vertex)
 {
   B2DEBUG(20, "Start simulation of KKGen Interface.");
   int status = 0;
@@ -164,7 +164,7 @@ int KKGenInterface::simulateEvent(MCParticleGraph& graph, TVector3 vertex)
 
 
 
-int KKGenInterface::addParticles2Graph(MCParticleGraph& graph, TVector3 vertex)
+int KKGenInterface::addParticles2Graph(MCParticleGraph& graph, ROOT::Math::XYZVector vertex)
 {
   // KKMC generates at least five particles:
   // beam (e+ e-), intermediate gamma/Z, f+ f- (f=mu, tau, ...)
@@ -197,7 +197,7 @@ int KKGenInterface::addParticles2Graph(MCParticleGraph& graph, TVector3 vertex)
 }
 
 
-void KKGenInterface::updateGraphParticle(int index, MCParticleGraph::GraphParticle* gParticle, TVector3 vertex)
+void KKGenInterface::updateGraphParticle(int index, MCParticleGraph::GraphParticle* gParticle, ROOT::Math::XYZVector vertex)
 {
   if (index < 1 || index > hepevt_.nhep)
     return;

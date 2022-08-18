@@ -173,7 +173,7 @@ void Phokhara::init(const std::string& paramFile)
 }
 
 
-double Phokhara::generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, ROOT::Math::LorentzRotation boost)
+double Phokhara::generateEvent(MCParticleGraph& mcGraph, ROOT::Math::XYZVector vertex, ROOT::Math::LorentzRotation boost)
 {
 
   //Generate event
@@ -329,7 +329,7 @@ void Phokhara::applySettings()
 }
 
 
-void Phokhara::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, TVector3 vertex,
+void Phokhara::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, ROOT::Math::XYZVector vertex,
                              ROOT::Math::LorentzRotation boost, bool isVirtual, bool isInitial)
 {
 

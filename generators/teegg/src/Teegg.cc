@@ -156,7 +156,7 @@ void Teegg::init()
 }
 
 
-void Teegg::generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, ROOT::Math::LorentzRotation boost)
+void Teegg::generateEvent(MCParticleGraph& mcGraph, ROOT::Math::XYZVector vertex, ROOT::Math::LorentzRotation boost)
 {
   //Generate event
   int mode = 1;
@@ -278,7 +278,8 @@ void Teegg::applySettings()
 }
 
 
-void Teegg::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, TVector3 vertex, ROOT::Math::LorentzRotation boost,
+void Teegg::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, ROOT::Math::XYZVector vertex,
+                          ROOT::Math::LorentzRotation boost,
                           bool isVirtual, bool isInitial)
 {
   // Create particle

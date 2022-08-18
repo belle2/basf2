@@ -77,7 +77,7 @@ void BBBrem::init(double cmsEnergy, double minPhotonEFrac, bool unweighted, doub
 }
 
 
-double BBBrem::generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, ROOT::Math::LorentzRotation boost)
+double BBBrem::generateEvent(MCParticleGraph& mcGraph, ROOT::Math::XYZVector vertex, ROOT::Math::LorentzRotation boost)
 {
 
   if (m_unweighted) {
@@ -379,7 +379,8 @@ void BBBrem::calcOutgoingLeptonsAndWeight()
 }
 
 
-void BBBrem::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, TVector3 vertex, ROOT::Math::LorentzRotation boost,
+void BBBrem::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, ROOT::Math::XYZVector vertex,
+                           ROOT::Math::LorentzRotation boost,
                            bool isVirtual, bool isInitial)
 {
 

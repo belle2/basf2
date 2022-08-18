@@ -104,7 +104,7 @@ void KoralW::init(const std::string& dataPath, const std::string& userDataFile)
 }
 
 
-void KoralW::generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, ROOT::Math::LorentzRotation boost)
+void KoralW::generateEvent(MCParticleGraph& mcGraph, ROOT::Math::XYZVector vertex, ROOT::Math::LorentzRotation boost)
 {
   kw_make_();
 
@@ -131,7 +131,7 @@ void KoralW::term()
 //                       Protected methods
 //=========================================================================
 
-void KoralW::storeParticle(MCParticleGraph& mcGraph, const float* mom, const float* vtx, int pdg, TVector3 vertex,
+void KoralW::storeParticle(MCParticleGraph& mcGraph, const float* mom, const float* vtx, int pdg, ROOT::Math::XYZVector vertex,
                            ROOT::Math::LorentzRotation boost, bool isVirtual, bool isInitial)
 {
   // //Create particle

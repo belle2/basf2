@@ -113,7 +113,7 @@ void BHWide::init()
 }
 
 
-void BHWide::generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, ROOT::Math::LorentzRotation boost)
+void BHWide::generateEvent(MCParticleGraph& mcGraph, ROOT::Math::XYZVector vertex, ROOT::Math::LorentzRotation boost)
 {
   //Generate event
   int mode = 0;
@@ -184,7 +184,8 @@ void BHWide::applySettings()
 }
 
 
-void BHWide::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, TVector3 vertex, ROOT::Math::LorentzRotation boost,
+void BHWide::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, ROOT::Math::XYZVector vertex,
+                           ROOT::Math::LorentzRotation boost,
                            bool isVirtual, bool isInitial)
 {
   //  //Create particle

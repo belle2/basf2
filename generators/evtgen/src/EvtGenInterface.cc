@@ -109,7 +109,8 @@ int EvtGenInterface::setup(const std::string& DECFileName, const std::string& pa
 }
 
 
-int EvtGenInterface::simulateEvent(MCParticleGraph& graph, ROOT::Math::PxPyPzEVector pParentParticle, TVector3 pPrimaryVertex,
+int EvtGenInterface::simulateEvent(MCParticleGraph& graph, ROOT::Math::PxPyPzEVector pParentParticle,
+                                   ROOT::Math::XYZVector pPrimaryVertex,
                                    int inclusiveType, const std::string& inclusiveParticle)
 {
   EvtId inclusiveParticleID, inclusiveAntiParticleID;
@@ -198,7 +199,7 @@ int EvtGenInterface::simulateDecay(MCParticleGraph& graph,
   return iPart;
 }
 
-int EvtGenInterface::addParticles2Graph(EvtParticle* top, MCParticleGraph& graph, TVector3 pPrimaryVertex,
+int EvtGenInterface::addParticles2Graph(EvtParticle* top, MCParticleGraph& graph, ROOT::Math::XYZVector pPrimaryVertex,
                                         MCParticleGraph::GraphParticle* parent, double timeOffset)
 {
   //Fill top particle in the tree & starting the queue:
@@ -253,7 +254,7 @@ int EvtGenInterface::addParticles2Graph(EvtParticle* top, MCParticleGraph& graph
 
 
 void EvtGenInterface::updateGraphParticle(EvtParticle* eParticle, MCParticleGraph::GraphParticle* gParticle,
-                                          TVector3 pPrimaryVertex, double timeOffset)
+                                          ROOT::Math::XYZVector pPrimaryVertex, double timeOffset)
 {
   //updating the GraphParticle information from the EvtParticle information
 

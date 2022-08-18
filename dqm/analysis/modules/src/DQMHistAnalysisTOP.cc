@@ -105,26 +105,6 @@ void DQMHistAnalysisTOPModule::beginRun()
   m_IsNullRun = (m_RunTypeString == "null");
 }
 
-TH1* DQMHistAnalysisTOPModule::find_histo_in_canvas(const std::string& histo_name)
-{
-  auto s = StringSplit(histo_name, '/');
-  auto dirname = s.at(0);
-  auto hname = s.at(1);
-  std::string canvas_name = dirname + "/c_" + hname;
-
-  auto cobj = findCanvas(canvas_name);
-  if (cobj == nullptr) return nullptr;
-
-  TIter nextkey(((TCanvas*)cobj)->GetListOfPrimitives());
-  TObject* obj{};
-  while ((obj = dynamic_cast<TObject*>(nextkey()))) {
-    if (obj->IsA()->InheritsFrom("TH1")) {
-      if (obj->GetName() == histo_name)
-        return  dynamic_cast<TH1*>(obj);
-    }
-  }
-  return nullptr;
-}
 
 void DQMHistAnalysisTOPModule::event()
 {
@@ -133,8 +113,6 @@ void DQMHistAnalysisTOPModule::event()
     string hname2 = str(format("TOP/bad_hits_per_event%1%") % (i));;
     TH1* h1 = findHist(hname1);
     TH1* h2 = findHist(hname2);
-    //TH1* h1 = find_histo_in_canvas(hname1);
-    //TH1* h2 = find_histo_in_canvas(hname2);
     if (h1 != NULL) {
       m_h_goodHitsMean->SetBinContent(i, h1->GetMean());
       m_h_goodHitsRMS->SetBinContent(i, h1->GetRMS());
@@ -177,7 +155,6 @@ void DQMHistAnalysisTOPModule::event()
   //addHist("", m_h_goodHitsMean->GetName(), m_h_goodHitsMean);
 
   TCanvas* c1 = findCanvas("TOP/c_hitsPerEvent");
-  //TH1* h1=find_histo_in_canvas("TOP/hitsPerEvent");
   if (c1 != NULL) {
     c1->SetName("TOP/c_hitsPerEvent_top");
   }

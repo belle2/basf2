@@ -10,7 +10,7 @@
 // Description : Baseclass for DQM histogram analysis module
 //-
 
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 #include <boost/algorithm/string.hpp>
 #include <TROOT.h>
 #include <TClass.h>
@@ -33,7 +33,7 @@ DQMHistAnalysisModule::MonObjList DQMHistAnalysisModule::g_monObj;
 DQMHistAnalysisModule::DQMHistAnalysisModule() : Module()
 {
   //Set module properties
-  setDescription("Histgram Analysis module");
+  setDescription("Histogram Analysis module");
 }
 
 
@@ -85,47 +85,13 @@ TH1* DQMHistAnalysisModule::findHist(const std::string& histname)
 {
   if (g_hist.find(histname) != g_hist.end()) {
     if (g_hist[histname]) {
-      //Want to search elsewhere if null-pointer saved in map
       return g_hist[histname];
     } else {
       B2ERROR("Histogram " << histname << " listed as being in memfile but points to nowhere.");
     }
   }
   B2INFO("Histogram " << histname << " not in memfile.");
-
-  //Histogram not in list, search in memory for it
-  gROOT->cd();
-
-  //Following the path to the histogram
-  TDirectory* d = gROOT;
-  TString myl = histname;
-  TString tok;
-  Ssiz_t from = 0;
-  while (myl.Tokenize(tok, from, "/")) {
-    TString dummy;
-    Ssiz_t f;
-    f = from;
-    if (myl.Tokenize(dummy, f, "/")) { // check if its the last one
-      auto e = d->GetDirectory(tok);
-      if (e) {
-        B2INFO("Cd Dir " << tok);
-        d = e;
-      }
-      d->cd();
-    } else {
-      break;
-    }
-  }
-
-  // This code assumes that the histograms address does NOT change between initialization and any later event
-  // This assumption seems to be reasonable for TFiles and in-memory objects
-  // BUT this means => Analysis moules MUST NEVER create a histogram with already existing name NOR delete any histogram
-  TH1* found_hist = findHist(d, tok);
-  if (found_hist) {
-    g_hist[histname] = found_hist;//Can't use addHist as we want to overwrite invalid entries
-  }
-  return found_hist;
-
+  return nullptr;
 }
 
 TH1* DQMHistAnalysisModule::findHist(const std::string& dirname, const std::string& histname)
@@ -136,12 +102,34 @@ TH1* DQMHistAnalysisModule::findHist(const std::string& dirname, const std::stri
   return findHist(histname);
 }
 
+TH1* DQMHistAnalysisModule::findHistInCanvas(const std::string& histo_name)
+{
+  // parse the dir+histo name and create the corresponding canvas name
+  auto s = StringSplit(histo_name, '/');
+  auto dirname = s.at(0);
+  auto hname = s.at(1);
+  std::string canvas_name = dirname + "/c_" + hname;
+
+  auto cobj = findCanvas(canvas_name);
+  if (cobj == nullptr) return nullptr;
+
+  TIter nextkey(((TCanvas*)cobj)->GetListOfPrimitives());
+  TObject* obj{};
+  while ((obj = dynamic_cast<TObject*>(nextkey()))) {
+    if (obj->IsA()->InheritsFrom("TH1")) {
+      if (obj->GetName() == histo_name)
+        return  dynamic_cast<TH1*>(obj);
+    }
+  }
+  return nullptr;
+}
+
+
 TH1* DQMHistAnalysisModule::findHist(const TDirectory* histdir, const TString& histname)
 {
   TObject* obj = histdir->FindObject(histname);
   if (obj != NULL) {
     if (obj->IsA()->InheritsFrom("TH1")) {
-      B2INFO("Histogram " << histname << " found in mem");
       return (TH1*)obj;
     }
   } else {

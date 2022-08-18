@@ -9,7 +9,7 @@
 #pragma once
 
 //DQM
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/database/DBArray.h>
 #include <framework/database/DBObjPtr.h>

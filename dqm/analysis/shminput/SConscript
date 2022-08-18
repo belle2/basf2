@@ -3,8 +3,9 @@ Import('env')
 if "daq" not in env["AVAILABLE_PACKAGES"]:
     env["CONTINUE"] = False
 
-env['LIBS'] = ['framework', '$ROOT_LIBS']
+env['LIBS'] = ['framework', 'dqm', 'daq']
 
 env['SUBLIB'] = True
+env.Append(LIBPATH=['$MODDIR'])
 
 Return('env')

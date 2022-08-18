@@ -86,6 +86,7 @@ ma.variablesToNtuple(decayString='B0:jpsiks',
 
 ma.summaryOfLists(particleLists=['B0:jpsiks'], path=cp_val_path)
 
+cp_val_path.add_module('Progress')
 # Process the events
 b2.process(cp_val_path)
 

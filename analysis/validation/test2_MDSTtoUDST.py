@@ -32,6 +32,7 @@ input.param('inputFileName', '../DSTtoMDST.mdst.root')
 main.add_module(input)
 outputUdst('../MDSTtoUDST.udst.root', path=main)
 
+main.add_module('Progress')
 basf2.process(main)
 
 # Print call statistics

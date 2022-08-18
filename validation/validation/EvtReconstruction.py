@@ -49,6 +49,7 @@ main.add_module("Profile")
 main.add_module("RootOutput", outputFileName="../EvtRec.root")
 add_mdst_output(main, True, "../EvtRec_mdst.root")
 
+main.add_module('Progress')
 process(main)
 
 # Print call statistics

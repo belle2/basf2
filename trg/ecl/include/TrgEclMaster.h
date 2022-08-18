@@ -71,19 +71,19 @@ namespace Belle2 {
     /** Get Event timing */
     //    void getEventTiming(int option);
     /** Set Cluster*/
-    void setClusterMethod(int cluster) {_Clustering = cluster;}
+    void setClusterMethod(int cluster) {m_Clustering = cluster;}
     /** Set the limit # of Cluster*/
-    void setClusterLimit(int limit) {_ClusterLimit = limit;}
+    void setClusterLimit(int limit) {m_ClusterLimit = limit;}
     /** Set Bhabha*/
-    void setBhabhaMethod(int bhabha) {_Bhabha = bhabha;}
+    void setBhabhaMethod(int bhabha) {m_Bhabha = bhabha;}
     /** Set Cluster*/
-    void setEventTimingMethod(int EventTiming) {_EventTiming = EventTiming;}
+    void setEventTimingMethod(int EventTiming) {m_EventTiming = EventTiming;}
     /** Set Trigger Decision window size*/
-    void setTimeWindow(int timewindow) {TimeWindow = timewindow;}
+    void setTimeWindow(int timewindow) {m_TimeWindow = timewindow;}
     /** Set Trigger Decision overlap window size*/
-    void setOverlapWindow(int overlapwindow) {OverlapWindow = overlapwindow;}
+    void setOverlapWindow(int overlapwindow) {m_OverlapWindow = overlapwindow;}
     /** set # of considered TC in energy weighted Timing method */
-    void setNofTopTC(int noftoptc) {_NofTopTC = noftoptc;}
+    void setNofTopTC(int noftoptc) {m_NofTopTC = noftoptc;}
     /** make LowMultiTriggerBit **/
     void makeLowMultiTriggerBit(std::vector<int>, std::vector<double>);
 
@@ -102,43 +102,43 @@ namespace Belle2 {
     /** Set Total Energy*/
     double setTotalEnergy(std::vector<double>);
     //! Get ECL Trigger bit
-    int getTriggerbit(int i) {return _Triggerbit[i];}
+    int getTriggerbit(int i) {return m_Triggerbit[i];}
     //! Get Low Multiplicity Trigger Bit
-    int getLowmultibit() {return _Lowmultibit;}
+    int getLowmultibit() {return m_Lowmultibit;}
     //! set 2D Bhabha Energy Threshold
     void set2DBhabhaThreshold(const std::vector<double>& i2DBhabhaThresholdFWD,
                               const std::vector<double>& i2DBhabhaThresholdBWD)
     {
-      _2DBhabhaThresholdFWD = i2DBhabhaThresholdFWD;
-      _2DBhabhaThresholdBWD = i2DBhabhaThresholdBWD;
+      m_2DBhabhaThresholdFWD = i2DBhabhaThresholdFWD;
+      m_2DBhabhaThresholdBWD = i2DBhabhaThresholdBWD;
     }
     //! set 3D selection Bhabha Energy Threshold
     void set3DBhabhaSelectionThreshold(const std::vector<double>& i3DBhabhaSelectionThreshold)
     {
-      _3DBhabhaSelectionThreshold = i3DBhabhaSelectionThreshold;
+      m_3DBhabhaSelectionThreshold = i3DBhabhaSelectionThreshold;
     };
     //! set 3D veto Bhabha Energy Threshold
     void set3DBhabhaVetoThreshold(const std::vector<double>& i3DBhabhaVetoThreshold)
     {
-      _3DBhabhaVetoThreshold = i3DBhabhaVetoThreshold;
+      m_3DBhabhaVetoThreshold = i3DBhabhaVetoThreshold;
     };
 
     //! set 3D selection Bhabha Energy Angle
     void set3DBhabhaSelectionAngle(const std::vector<double>& i3DBhabhaSelectionAngle)
     {
-      _3DBhabhaSelectionAngle = i3DBhabhaSelectionAngle;
+      m_3DBhabhaSelectionAngle = i3DBhabhaSelectionAngle;
     };
     //! set 3D veto Bhabha Energy Angle
     void set3DBhabhaVetoAngle(const std::vector<double>& i3DBhabhaVetoAngle)
     {
-      _3DBhabhaVetoAngle = i3DBhabhaVetoAngle;
+      m_3DBhabhaVetoAngle = i3DBhabhaVetoAngle;
     };
     //! set mumu bit Threshold
-    void setmumuThreshold(int mumuThreshold) {_mumuThreshold = mumuThreshold; }
+    void setmumuThreshold(int mumuThreshold) {m_mumuThreshold = mumuThreshold; }
     //! set mumu bit Angle selection
     void setmumuAngle(const std::vector<double>& imumuAngle)
     {
-      _mumuAngle = imumuAngle;
+      m_mumuAngle = imumuAngle;
     }
     //! set 3D Bhabha addtion Angle selection
     void set3DBhabhaAddAngleCut(const std::vector<double>&  i3DBhabhaAddAngleCut)
@@ -189,22 +189,22 @@ namespace Belle2 {
     //! set the number of cluster exceeding 300 MeV
     void setn300MeVClusterThreshold(int n300MeVCluster)
     {
-      _n300MeVCluster = n300MeVCluster;
+      m_n300MeVCluster = n300MeVCluster;
     }
     //! set mumu bit Threshold
     void setECLBurstThreshold(int ECLBurstThreshold)
     {
-      _ECLBurstThreshold = (double) ECLBurstThreshold;
+      m_ECLBurstThreshold = (double) ECLBurstThreshold;
     }
     //! set Total Energy Theshold (low, high, lum)
     void setTotalEnergyThreshold(const std::vector<double>& iTotalEnergy)
     {
-      _TotalEnergy = iTotalEnergy;
+      m_TotalEnergy = iTotalEnergy;
     }
     //! set Low Multiplicity Threshold
     void setLowMultiplicityThreshold(const std::vector<double>& iLowMultiThreshold)
     {
-      _LowMultiThreshold = iLowMultiThreshold;
+      m_LowMultiThreshold = iLowMultiThreshold;
     }
     //! set theta ID region (low and high) of 3DBhabhaVeto InTrack for gg selection
     void set3DBhabhaVetoInTrackThetaRegion(const std::vector<int>& i3DBhabhaVetoInTrackThetaRegion)
@@ -220,25 +220,25 @@ namespace Belle2 {
   private:
 
     /** Hit TC Energy */
-    std::vector<std::vector<double>>  TCEnergy;
+    std::vector<std::vector<double>>  m_TCEnergy;
     /** Hit TC Timing */
-    std::vector<std::vector<double>>  TCTiming;
+    std::vector<std::vector<double>>  m_TCTiming;
     /** Hit TC Beam Background tag */
-    std::vector<std::vector<int>>  TCBeamBkgTag;
+    std::vector<std::vector<int>>  m_TCBeamBkgTag;
 
     /** Hit TC Energy in time window */
-    std::vector<int>  HitTCId;
+    std::vector<int>  m_HitTCId;
     /** Hit TC Energy in time window */
-    std::vector<double>  TCHitEnergy;
+    std::vector<double>  m_TCHitEnergy;
     /** Hit TC Timing in time window*/
-    std::vector<double>  TCHitTiming;
+    std::vector<double>  m_TCHitTiming;
     /** Hit TC Beam Background tag in time window */
-    std::vector<int>  TCHitBeamBkgTag;
+    std::vector<int>  m_TCHitBeamBkgTag;
 
     /**  Phi ring sum */
-    std::vector< std::vector<double>>  PhiRingSum;
+    std::vector< std::vector<double>>  m_PhiRingSum;
     /**  Theta ring sum */
-    std::vector<std::vector<std::vector<double>>> ThetaRingSum;
+    std::vector<std::vector<std::vector<double>>> m_ThetaRingSum;
 
     /** Hit TC Energy in time window */
     //   std::vector<double> ClusterEnergy;
@@ -246,45 +246,45 @@ namespace Belle2 {
     //    std::vector<double>  ClusterTiming;
 
     /** TRG Decision Time window */
-    double TimeWindow;
+    double m_TimeWindow;
     /** TRG Decision overlap window */
-    double OverlapWindow;
+    double m_OverlapWindow;
 
     /** clutering option*/
-    int _Clustering;
+    int m_Clustering;
     /** Bhabha option*/
-    int _Bhabha;
+    int m_Bhabha;
     /** EventTiming option*/
-    int _EventTiming;
+    int m_EventTiming;
     /** # of considered TC in energy weighted Timing method */
-    int _NofTopTC;
+    int m_NofTopTC;
     /** The limit number of Cluster */
-    int _ClusterLimit;
+    int m_ClusterLimit;
     //! ECL Trigger  bit
-    int _Triggerbit[4];
+    int m_Triggerbit[4];
     //!  Low Multiplicity bit
-    int _Lowmultibit;
+    int m_Lowmultibit;
     //!  Bhabha Prescale Factor
-    int _PrescaleFactor;
+    int m_PrescaleFactor;
     //! Bhabha Prescale Countor
-    int _PrescaleCounter;
+    int m_PrescaleCounter;
 
     //! 2D Bhabha Energy Threshold
-    std::vector<double> _2DBhabhaThresholdFWD;
+    std::vector<double> m_2DBhabhaThresholdFWD;
     //! 2D Bhabha Energy Threshold
-    std::vector<double> _2DBhabhaThresholdBWD;
+    std::vector<double> m_2DBhabhaThresholdBWD;
     //! 3D Selection Bhabha Energy Threshold
-    std::vector<double> _3DBhabhaSelectionThreshold;
+    std::vector<double> m_3DBhabhaSelectionThreshold;
     //! 3D Veto Bhabha Energy Threshold
-    std::vector<double> _3DBhabhaVetoThreshold;
+    std::vector<double> m_3DBhabhaVetoThreshold;
     //! 3D Selection Bhabha Energy Angle
-    std::vector<double> _3DBhabhaSelectionAngle;
+    std::vector<double> m_3DBhabhaSelectionAngle;
     //! 3D Veto Bhabha Energy Angle
-    std::vector<double> _3DBhabhaVetoAngle;
+    std::vector<double> m_3DBhabhaVetoAngle;
     //! mumu bit Energy Threshold
-    double _mumuThreshold;
+    double m_mumuThreshold;
     //! mumu bit  Angle
-    std::vector<double> _mumuAngle;
+    std::vector<double> m_mumuAngle;
     //! Angle selection of additional Bhabha addition in CM frame
     std::vector<double> m_3DBhabhaAddAngleCut;
     //! tau b2b 2 cluster angle cut (degree)
@@ -317,30 +317,30 @@ namespace Belle2 {
     //! taub2b3 cluster energy high cut in lab for all clusters (GeV)
     double m_taub2b3CLEHighCut;
     //! The number of Cluster exceeding 300 MeV
-    int _n300MeVCluster;
+    int m_n300MeVCluster;
     //!ECL Burst Bit Threshold
-    double _ECLBurstThreshold;
+    double m_ECLBurstThreshold;
     //! Total Energy Theshold (low, high, lum)
-    std::vector<double> _TotalEnergy;
+    std::vector<double> m_TotalEnergy;
     //! Low Multiplicity Threshold
-    std::vector<double> _LowMultiThreshold;
+    std::vector<double> m_LowMultiThreshold;
     //! Theta region (low, high) of 3D Bhabha Veto InTrack
     std::vector<int> m_3DBhabhaVetoInTrackThetaRegion;
     //! energy threshold(low, high) for quality flag (GeV)
     std::vector<double> m_EventTimingQualityThresholds;
 
     /** Mapping object */
-    TrgEclMapping* obj_map;
+    TrgEclMapping* m_obj_map;
     /**  Cluster object */
-    TrgEclCluster* obj_cluster;
+    TrgEclCluster* m_obj_cluster;
     /**  EventTiming object */
-    TrgEclTiming* obj_timing;
+    TrgEclTiming* m_obj_timing;
     /**  Bhabha object */
-    TrgEclBhabha* obj_bhabha;
+    TrgEclBhabha* m_obj_bhabha;
     /**  Beam Backgroud veto object */
-    TrgEclBeamBKG* obj_beambkg;
+    TrgEclBeamBKG* m_obj_beambkg;
     /**  Beam Backgroud veto object */
-    TrgEclDataBase* obj_database;
+    TrgEclDataBase* m_obj_database;
 
   };
 //

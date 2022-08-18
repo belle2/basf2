@@ -39,6 +39,7 @@ re.add_reconstruction(path=main, reconstruct_cdst='rawFormat')
 # finally add cdst output
 main.add_module('RootOutput', outputFileName='mixed.cdst.root')
 
+main.add_module('Progress')
 # process events and print call statistics
 b2.process(path=main)
 print(b2.statistics)

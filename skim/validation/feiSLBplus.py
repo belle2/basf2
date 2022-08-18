@@ -38,4 +38,5 @@ ma.inputMdstList(
 )
 skim(path)
 
+path.add_module('Progress')
 b2.process(path)

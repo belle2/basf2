@@ -48,7 +48,7 @@ using namespace Belle2;
 /** shortcut for NaN of double type */
 static const double    realNaN = std::numeric_limits<double>::quiet_NaN();
 /** vector with NaN entries */
-static const B2Vector3D  vecNaN(realNaN, realNaN, realNaN);
+static const ROOT::Math::XYZVector vecNaN(realNaN, realNaN, realNaN);
 /** 3x3 matrix with NaN entries */
 static const TMatrixDSym matNaN(3, (double [])
 {
@@ -286,7 +286,7 @@ bool TagVertexModule::doVertexFit(const Particle* Breco)
   else if (m_constraintType == "tube")  tie(m_constraintCenter, m_constraintCov) = findConstraintBTube(Breco, 1000 * cut);
   else if (m_constraintType == "boost") tie(m_constraintCenter, m_constraintCov) = findConstraintBoost(cut * 200000.);
   else if (m_constraintType == "breco") tie(m_constraintCenter, m_constraintCov) = findConstraint(Breco, cut * 2000.);
-  else if (m_constraintType == "noConstraint") m_constraintCenter = B2Vector3D(); //zero vector
+  else if (m_constraintType == "noConstraint") m_constraintCenter = ROOT::Math::XYZVector(); //zero vector
   else  {
     B2ERROR("TagVertex: Invalid constraintType selected");
     return false;
@@ -338,7 +338,7 @@ bool TagVertexModule::doVertexFit(const Particle* Breco)
   return ok;
 }
 
-pair<B2Vector3D, TMatrixDSym> TagVertexModule::findConstraint(const Particle* Breco, double cut) const
+pair<ROOT::Math::XYZVector, TMatrixDSym> TagVertexModule::findConstraint(const Particle* Breco, double cut) const
 {
   if (Breco->getPValue() < 0.) return make_pair(vecNaN, matNaN);
 
@@ -402,7 +402,7 @@ pair<B2Vector3D, TMatrixDSym> TagVertexModule::findConstraint(const Particle* Br
   return make_pair(m_BeamSpotCenter, toSymMatrix(Tube));
 }
 
-pair<B2Vector3D, TMatrixDSym> TagVertexModule::findConstraintBTube(const Particle* Breco, double cut)
+pair<ROOT::Math::XYZVector, TMatrixDSym> TagVertexModule::findConstraintBTube(const Particle* Breco, double cut)
 {
   //Use Breco as the creator of the B tube.
   if ((Breco->getVertexErrorMatrix()(2, 2)) == 0.0) {
@@ -483,10 +483,10 @@ pair<B2Vector3D, TMatrixDSym> TagVertexModule::findConstraintBTube(const Particl
   m_pvCov.ResizeTo(pv);
   m_pvCov = pv;
 
-  return make_pair(B2Vector3D(constraintCenter), toSymMatrix(pvNew));
+  return make_pair(constraintCenter, toSymMatrix(pvNew));
 }
 
-pair<B2Vector3D, TMatrixDSym> TagVertexModule::findConstraintBoost(double cut, double shiftAlongBoost) const
+pair<ROOT::Math::XYZVector, TMatrixDSym> TagVertexModule::findConstraintBoost(double cut, double shiftAlongBoost) const
 {
   //make a long error matrix along boost direction
   TMatrixD longerror(3, 3); longerror(2, 2) = cut * cut;
@@ -498,14 +498,14 @@ pair<B2Vector3D, TMatrixDSym> TagVertexModule::findConstraintBoost(double cut, d
   TMatrixD Tube = TMatrixD(beamSpotCov) + longerrorRotated;
 
   // Standard algorithm needs no shift
-  B2Vector3D constraintCenter = m_BeamSpotCenter;
+  ROOT::Math::XYZVector constraintCenter = m_BeamSpotCenter;
 
   // The constraint used in the Single Track Fit needs to be shifted in the boost direction.
   if (shiftAlongBoost > -1000) {
-    constraintCenter +=  shiftAlongBoost * boostDir;
+    constraintCenter +=  shiftAlongBoost * ROOT::Math::XYZVector(boostDir);
   }
 
-  return make_pair(constraintCenter,   toSymMatrix(Tube));
+  return make_pair(constraintCenter, toSymMatrix(Tube));
 }
 
 /** proper life time, i.e. in the rest system (in ps) */
@@ -678,7 +678,7 @@ void TagVertexModule::fillParticles(vector<ParticleAndWeight>& particleAndWeight
   }
 }
 
-void TagVertexModule::fillTagVinfo(const B2Vector3D& tagVpos, const TMatrixDSym& tagVposErr)
+void TagVertexModule::fillTagVinfo(const ROOT::Math::XYZVector& tagVpos, const TMatrixDSym& tagVposErr)
 {
   m_tagV = tagVpos;
 
@@ -749,7 +749,7 @@ bool TagVertexModule::makeGeneralFitRave()
   fillParticles(particleAndWeights);
 
   //if the fit is good, save the infos related to the vertex
-  fillTagVinfo(rFit.getPos(0), rFit.getCov(0));
+  fillTagVinfo(ROOT::Math::XYZVector(rFit.getPos(0)), rFit.getCov(0));
 
   //fill quality variables
   m_tagVNDF = rFit.getNdf(0);
@@ -847,7 +847,7 @@ void TagVertexModule::deltaT(const Particle* Breco)
 {
 
   B2Vector3D boost = PCmsLabTransform().getBoostVector();
-  B2Vector3D boostDir = boost.Unit();
+  ROOT::Math::XYZVector boostDir = ROOT::Math::XYZVector(boost.Unit());
   double bg = boost.Mag() / sqrt(1 - boost.Mag2());
   double c = Const::speedOfLight / 1000.; // cm ps-1
 
@@ -857,7 +857,7 @@ void TagVertexModule::deltaT(const Particle* Breco)
   m_deltaT  = dl / (bg * c);
 
   //Truth DeltaL & approx DeltaT in the boost direction
-  B2Vector3D MCdVert = m_mcVertReco - m_mcTagV;   //truth vtxReco - vtxTag
+  ROOT::Math::XYZVector MCdVert = m_mcVertReco - m_mcTagV;   //truth vtxReco - vtxTag
   double MCdl = MCdVert.Dot(boostDir);
   m_mcDeltaT = MCdl / (bg * c);
 
@@ -866,7 +866,7 @@ void TagVertexModule::deltaT(const Particle* Breco)
   if (m_mcLifeTimeReco  == -1 || m_mcTagLifeTime == -1)
     m_mcDeltaTau =  realNaN;
 
-  TVectorD bVec = toVec(boostDir);
+  TVectorD bVec = toVec(B2Vector3D(boostDir));
 
   //TagVertex error in boost dir
   m_tagVlErr = sqrt(m_tagVErrMatrix.Similarity(bVec));
@@ -881,7 +881,7 @@ void TagVertexModule::deltaT(const Particle* Breco)
   m_truthTagVl = m_mcTagV.Dot(boostDir);
 
   // calculate tagV component and error in the direction orthogonal to the boost
-  B2Vector3D oboost = getUnitOrthogonal(boostDir);
+  B2Vector3D oboost = getUnitOrthogonal(B2Vector3D(boostDir));
   TVectorD oVec = toVec(oboost);
 
   //TagVertex error in boost-orthogonal dir

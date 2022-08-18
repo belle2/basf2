@@ -233,7 +233,7 @@ void VXDDedxPIDModule::event()
     }
 
     //used for PXD/SVD hits
-    const HelixHelper helixAtOrigin(B2Vector3D(trackPos), B2Vector3D(trackMom), dedxTrack->m_charge);
+    const HelixHelper helixAtOrigin(trackPos, trackMom, dedxTrack->m_charge);
 
     if (m_usePXD) {
       const std::vector<PXDCluster*>& pxdClusters = recoTrack->getPXDHitList();
@@ -334,10 +334,10 @@ double VXDDedxPIDModule::getTraversedLength(const PXDCluster* hit, const HelixHe
 
   const TVector3 localPos(hit->getU(), hit->getV(), 0.0); //z-component is height over the center of the detector plane
   const TVector3& globalPos = sensor.pointToGlobal(localPos);
-  const TVector3& localMomentum = helix->momentum(helix->pathLengthToPoint(globalPos));
+  const ROOT::Math::XYZVector& localMomentum = helix->momentum(helix->pathLengthToPoint(ROOT::Math::XYZVector(globalPos)));
 
   const TVector3& sensorNormal = sensor.vectorToGlobal(TVector3(0.0, 0.0, 1.0));
-  const double angle = sensorNormal.Angle(localMomentum); //includes theta and phi components
+  const double angle = ROOT::Math::VectorUtil::Angle(sensorNormal, localMomentum); //includes theta and phi components
 
   //I'm assuming there's only one hit per sensor, there are _very_ rare exceptions to that (most likely curlers)
   return TMath::Min(sensor.getWidth(), sensor.getThickness() / fabs(cos(angle)));
@@ -359,11 +359,11 @@ double VXDDedxPIDModule::getTraversedLength(const SVDCluster* hit, const HelixHe
     a = sensor.pointToGlobal(TVector3(-0.5 * sensor.getWidth(v), v, 0.0));
     b = sensor.pointToGlobal(TVector3(+0.5 * sensor.getWidth(v), v, 0.0));
   }
-  const double pathLength = helix->pathLengthToLine(a, b);
-  const TVector3& localMomentum = helix->momentum(pathLength);
+  const double pathLength = helix->pathLengthToLine(ROOT::Math::XYZVector(a), ROOT::Math::XYZVector(b));
+  const ROOT::Math::XYZVector& localMomentum = helix->momentum(pathLength);
 
   const TVector3& sensorNormal = sensor.vectorToGlobal(TVector3(0.0, 0.0, 1.0));
-  const double angle = sensorNormal.Angle(localMomentum); //includes theta and phi components
+  const double angle = ROOT::Math::VectorUtil::Angle(sensorNormal, localMomentum); //includes theta and phi components
 
   return TMath::Min(sensor.getWidth(), sensor.getThickness() / fabs(cos(angle)));
 }

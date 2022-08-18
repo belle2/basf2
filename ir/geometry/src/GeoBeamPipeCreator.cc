@@ -1548,6 +1548,7 @@ namespace Belle2 {
       G4LogicalVolume* logi_PXDMountFwd_s4 = new G4LogicalVolume(geo_PXDMountFwd_s4, mat_PXDMountFwd_s, "logi_PXDMountFwd_name_s4");
       new G4PVPlacement(transform_PXDMountFwd_s, G4ThreeVector(-PXDMountFwd_L1, 0, PXDMountFwd_Z1 + PXDMountFwd_L2), logi_PXDMountFwd_s4,
                         "phys_PXDMountFwd_name_s4", &topVolume, false, 0);
+      delete transform_PXDMountFwd_s;
       //----------
       //- PXDMountFixtureFwd
       prep = "PXDMountFixtureFwd.";
@@ -1706,6 +1707,7 @@ namespace Belle2 {
       G4LogicalVolume* logi_PXDMountBwd_s4 = new G4LogicalVolume(geo_PXDMountBwd_s4, mat_PXDMountBwd_s, "logi_PXDMountBwd_name_s4");
       new G4PVPlacement(transform_PXDMountBwd_s, G4ThreeVector(-PXDMountBwd_L1, 0, -PXDMountBwd_Z1 - PXDMountBwd_L2),
                         logi_PXDMountBwd_s4, "phys_PXDMountBwd_name_s4", &topVolume, false, 0);
+      delete transform_PXDMountBwd_s;
 
       //----------
       //- PXDMountFixtureBwd
@@ -1794,19 +1796,33 @@ namespace Belle2 {
       // for dose simulation
       //---------------------------
       int Index_sensi = 11;
-      logi_Lv3AuCoat->SetSensitiveDetector(new BkgSensitiveDetector("IR", Index_sensi++));
-      logi_Lv1TaFwd->SetSensitiveDetector(new BkgSensitiveDetector("IR", Index_sensi++));
-      logi_Lv1TaBwd->SetSensitiveDetector(new BkgSensitiveDetector("IR", Index_sensi++));
-      logi_Lv1TaLERUp->SetSensitiveDetector(new BkgSensitiveDetector("IR", Index_sensi++));
-      logi_Lv1SUSLERUp->SetSensitiveDetector(new BkgSensitiveDetector("IR", Index_sensi++));
-      logi_Lv1TaHERDwn->SetSensitiveDetector(new BkgSensitiveDetector("IR", Index_sensi++));
-      logi_Lv1SUSHERDwn->SetSensitiveDetector(new BkgSensitiveDetector("IR", Index_sensi++));
-      logi_Lv1TaHERUp->SetSensitiveDetector(new BkgSensitiveDetector("IR", Index_sensi++));
-      logi_Lv1SUSHERUp->SetSensitiveDetector(new BkgSensitiveDetector("IR", Index_sensi++));
-      logi_Lv1TaLERDwn->SetSensitiveDetector(new BkgSensitiveDetector("IR", Index_sensi++));
-      logi_Lv1SUSLERDwn->SetSensitiveDetector(new BkgSensitiveDetector("IR", Index_sensi++));
-      logi_CuFlangeFwd->SetSensitiveDetector(new BkgSensitiveDetector("IR", Index_sensi++));
-      logi_CuFlangeBwd->SetSensitiveDetector(new BkgSensitiveDetector("IR", Index_sensi++));
+      BkgSensitiveDetector* tmpBkgSensitiveDetector = new BkgSensitiveDetector("IR", Index_sensi++);
+      logi_Lv3AuCoat->SetSensitiveDetector(tmpBkgSensitiveDetector);
+      tmpBkgSensitiveDetector = new BkgSensitiveDetector("IR", Index_sensi++);
+      logi_Lv1TaFwd->SetSensitiveDetector(tmpBkgSensitiveDetector);
+      tmpBkgSensitiveDetector = new BkgSensitiveDetector("IR", Index_sensi++);
+      logi_Lv1TaBwd->SetSensitiveDetector(tmpBkgSensitiveDetector);
+      tmpBkgSensitiveDetector = new BkgSensitiveDetector("IR", Index_sensi++);
+      logi_Lv1TaLERUp->SetSensitiveDetector(tmpBkgSensitiveDetector);
+      tmpBkgSensitiveDetector = new BkgSensitiveDetector("IR", Index_sensi++);
+      logi_Lv1SUSLERUp->SetSensitiveDetector(tmpBkgSensitiveDetector);
+      tmpBkgSensitiveDetector = new BkgSensitiveDetector("IR", Index_sensi++);
+      logi_Lv1TaHERDwn->SetSensitiveDetector(tmpBkgSensitiveDetector);
+      tmpBkgSensitiveDetector = new BkgSensitiveDetector("IR", Index_sensi++);
+      logi_Lv1SUSHERDwn->SetSensitiveDetector(tmpBkgSensitiveDetector);
+      tmpBkgSensitiveDetector = new BkgSensitiveDetector("IR", Index_sensi++);
+      logi_Lv1TaHERUp->SetSensitiveDetector(tmpBkgSensitiveDetector);
+      tmpBkgSensitiveDetector = new BkgSensitiveDetector("IR", Index_sensi++);
+      logi_Lv1SUSHERUp->SetSensitiveDetector(tmpBkgSensitiveDetector);
+      tmpBkgSensitiveDetector = new BkgSensitiveDetector("IR", Index_sensi++);
+      logi_Lv1TaLERDwn->SetSensitiveDetector(tmpBkgSensitiveDetector);
+      tmpBkgSensitiveDetector = new BkgSensitiveDetector("IR", Index_sensi++);
+      logi_Lv1SUSLERDwn->SetSensitiveDetector(tmpBkgSensitiveDetector);
+      tmpBkgSensitiveDetector = new BkgSensitiveDetector("IR", Index_sensi++);
+      logi_CuFlangeFwd->SetSensitiveDetector(tmpBkgSensitiveDetector);
+      tmpBkgSensitiveDetector = new BkgSensitiveDetector("IR", Index_sensi++);
+      logi_CuFlangeBwd->SetSensitiveDetector(tmpBkgSensitiveDetector);
+      delete tmpBkgSensitiveDetector;
 
       //m_sensitive.push_back((SensitiveDetector*)(new BkgSensitiveDetector("IR", 11)));
       //logi_Lv3AuCoat->SetSensitiveDetector(m_sensitive.back());

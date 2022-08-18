@@ -6,8 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef VXD_SENSORINFO_H
-#define VXD_SENSORINFO_H
+#pragma once
 
 #include <vxd/dataobjects/VxdID.h>
 #include <float.h>
@@ -400,4 +399,3 @@ namespace Belle2 {
     }
   }
 } //Belle2 namespace
-#endif

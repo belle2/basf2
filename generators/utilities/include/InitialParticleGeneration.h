@@ -7,8 +7,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef GENERATORS_UTILITIES_INITIALPARTICLEGENERATION_H
-#define GENERATORS_UTILITIES_INITIALPARTICLEGENERATION_H
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/database/DBObjPtr.h>
@@ -105,4 +103,3 @@ namespace Belle2 {
 
 
 } //Belle2 namespace
-#endif // GENERATORS_UTILITIES_INITIALPARTICLEGENERATION_H

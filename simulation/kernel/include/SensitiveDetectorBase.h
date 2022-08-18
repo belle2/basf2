@@ -6,8 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef SENSITIVEDETECTOR_H_
-#define SENSITIVEDETECTOR_H_
+#pragma once
 
 #include <framework/datastore/RelationArray.h>
 #include <simulation/kernel/UserInfo.h>
@@ -99,5 +98,3 @@ namespace Belle2 {
 
   }  // end namespace Simulation
 } // end namespace Belle2
-
-#endif /* SENSITIVEDETECTOR_H_ */

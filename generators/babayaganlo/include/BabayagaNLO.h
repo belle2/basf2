@@ -6,8 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef BABAYAGANLO_H
-#define BABAYAGANLO_H
+#pragma once
 
 #include <mdst/dataobjects/MCParticleGraph.h>
 #include <Math/LorentzRotation.h>
@@ -254,6 +253,3 @@ namespace Belle2 {
     double m_xpar[100];  /**< Double parameters for BabayagaNLO. */
   };
 }
-
-
-#endif /* BABAYAGANLO_H */

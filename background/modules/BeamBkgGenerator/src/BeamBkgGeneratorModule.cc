@@ -196,7 +196,7 @@ void BeamBkgGeneratorModule::event()
 
   // transform to Belle II (flip sign of y and s, rotate)
 
-  TVector3 position(m_sad.x * Unit::m, -m_sad.y * Unit::m, -m_sad.s * Unit::m);
+  ROOT::Math::XYZVector position(m_sad.x * Unit::m, -m_sad.y * Unit::m, -m_sad.s * Unit::m);
   position = m_rotation * position;
 
   double pz = sqrt(m_sad.E * m_sad.E - m_sad.px * m_sad.px - m_sad.py * m_sad.py);

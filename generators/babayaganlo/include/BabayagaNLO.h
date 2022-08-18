@@ -11,6 +11,7 @@
 
 #include <mdst/dataobjects/MCParticleGraph.h>
 #include <Math/LorentzRotation.h>
+#include <Math/Vector3D.h>
 #include <utility>
 
 namespace Belle2 {

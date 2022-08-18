@@ -9,6 +9,8 @@
 #include <generators/modules/aafhinput/AafhInputModule.h>
 #include <framework/logging/Logger.h>
 
+#include <Math/Vector3D.h>
+
 using namespace Belle2;
 
 //-----------------------------------------------------------------

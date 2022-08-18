@@ -14,16 +14,13 @@
 #define TRGCDC_SHORT_NAMES
 
 #include <iostream>
+#include <cmath>
+
 #include "trg/trg/Debug.h"
 #include "trg/cdc/Fitter3D.h"
 #include "trg/cdc/Segment.h"
 #include "trg/cdc/TRGCDCTrack.h"
 #include "trg/cdc/Link.h"
-#include <cmath>
-
-#include <framework/dataobjects/EventMetaData.h>
-#include "cdc/dataobjects/CDCSimHit.h"
-#include "cdc/geometry/CDCGeometryPar.h"
 #include "trg/trg/Time.h"
 #include "trg/trg/Signal.h"
 #include "trg/trg/Utilities.h"
@@ -35,7 +32,6 @@
 #include "trg/cdc/SegmentHit.h"
 #include "trg/cdc/TrackMC.h"
 #include "trg/cdc/Relation.h"
-#include "mdst/dataobjects/MCParticle.h"
 #include "trg/cdc/FrontEnd.h"
 #include "trg/cdc/Merger.h"
 #include "trg/cdc/LUT.h"
@@ -48,6 +44,13 @@
 #include "trg/cdc/JSignalData.h"
 #include "trg/cdc/FpgaUtility.h"
 #include "trg/cdc/HandleRoot.h"
+
+#include "cdc/dataobjects/CDCSimHit.h"
+#include "cdc/geometry/CDCGeometryPar.h"
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/geometry/B2Vector3.h>
+#include "mdst/dataobjects/MCParticle.h"
+
 
 using namespace std;
 namespace Belle2 {

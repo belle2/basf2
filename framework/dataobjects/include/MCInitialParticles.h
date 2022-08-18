@@ -15,8 +15,6 @@
 #include <Math/Vector3D.h>
 #include <Math/Vector4D.h>
 
-#include <framework/geometry/B2Vector3.h>
-
 namespace Belle2 {
 
   /** This class contains the initial state for the given event.
@@ -90,7 +88,7 @@ namespace Belle2 {
      * @param ler 4vector of the low energy beam
      * @param vertex position of the actual collision vertex
      */
-    void set(const ROOT::Math::PxPyPzEVector& her, const ROOT::Math::PxPyPzEVector& ler, const B2Vector3D& vertex)
+    void set(const ROOT::Math::PxPyPzEVector& her, const ROOT::Math::PxPyPzEVector& ler, const ROOT::Math::XYZVector& vertex)
     {
       m_her = her;
       m_ler = ler;

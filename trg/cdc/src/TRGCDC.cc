@@ -57,6 +57,7 @@
 #include "trg/cdc/Link.h"
 #include "trg/cdc/EventTime.h"
 #include <framework/gearbox/Const.h>
+#include <framework/geometry/B2Vector3.h>
 #include <TObjString.h>
 
 #define NOT_USE_SOCKETLIB

@@ -15,6 +15,8 @@
 
 #include <framework/core/Module.h>
 
+#include <Math/Vector3D.h>
+
 #include <string>
 
 namespace Belle2 {

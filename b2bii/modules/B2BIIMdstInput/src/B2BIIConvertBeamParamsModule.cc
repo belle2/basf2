@@ -16,6 +16,7 @@
 #include <framework/database/EventDependency.h>
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/dbobjects/BeamParameters.h>
+#include <framework/geometry/B2Vector3.h>
 #include <framework/utilities/FileSystem.h>
 #include <mdst/dbobjects/BeamSpot.h>
 #include <mdst/dbobjects/CollisionBoostVector.h>

@@ -7,6 +7,7 @@
  **************************************************************************/
 
 #include <generators/modules/trepsinput/TrepsInputModule.h>
+#include <framework/geometry/B2Vector3.h>
 #include <string.h>
 #include <string>
 #include <boost/filesystem.hpp>

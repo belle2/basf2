@@ -23,6 +23,7 @@
 
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <framework/gearbox/Unit.h>
+#include <framework/geometry/B2Vector3.h>
 
 #include <fstream>
 #include <cmath>

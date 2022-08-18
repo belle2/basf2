@@ -11,10 +11,8 @@
 #include <framework/gearbox/Const.h>
 #include <framework/core/FrameworkExceptions.h>
 #include <framework/datastore/RelationsObject.h>
-#include <framework/geometry/B2Vector3.h>
 
 #include <TClonesArray.h>
-#include <TVector3.h>
 #include <Math/Vector3D.h>
 #include <Math/Vector4D.h>
 

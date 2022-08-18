@@ -10,6 +10,8 @@
 
 #include <framework/datastore/StoreArray.h>
 
+#include <Math/Vector3D.h>
+
 using namespace std;
 using namespace Belle2;
 

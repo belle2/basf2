@@ -18,6 +18,8 @@
 #include <TVector3.h>
 #include <TMath.h>
 #include <TTree.h>
+#include <Math/Vector3D.h>
+#include <Math/VectorUtil.h>
 
 //..mdst
 #include <mdst/dataobjects/MCParticle.h>

@@ -17,6 +17,7 @@
 #include <simulation/monopoles/MonopoleConstants.h>
 
 #include <framework/geometry/BFieldManager.h>
+#include <framework/geometry/B2Vector3.h>
 #include <framework/dataobjects/Helix.h>
 
 #include <TRandom.h>

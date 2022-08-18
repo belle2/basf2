@@ -8,6 +8,7 @@
 
 #include "cdc/modules/cdcCosmicAnalysis/CDCCosmicAnalysisModule.h"
 #include <framework/geometry/BFieldManager.h>
+#include <framework/geometry/B2Vector3.h>
 #include <framework/gearbox/Const.h>
 #include <framework/datastore/RelationArray.h>
 

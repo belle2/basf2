@@ -11,6 +11,8 @@
 #include <simulation/kernel/SensitiveDetectorBase.h>
 #include <G4EmSaturation.hh>
 
+#include <TVector3.h>
+
 namespace Belle2 {
   /** Namespace to encapsulate code needed for the QCSMONITOR detector */
   namespace qcsmonitor {

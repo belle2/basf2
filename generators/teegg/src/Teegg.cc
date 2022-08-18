@@ -16,6 +16,7 @@
 
 #include <TDatabasePDG.h>
 #include <Math/Vector4D.h>
+#include <TMath.h>
 #include <TRandom3.h>
 
 using namespace std;

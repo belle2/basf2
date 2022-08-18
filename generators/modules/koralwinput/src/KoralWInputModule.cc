@@ -14,6 +14,8 @@
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
 
+#include <Math/Vector3D.h>
+
 using namespace std;
 using namespace Belle2;
 

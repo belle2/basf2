@@ -13,6 +13,7 @@
 
 /* ROOT headers. */
 #include <Math/LorentzRotation.h>
+#include <Math/Vector3D.h>
 
 /* C++ headers. */
 #include <string>

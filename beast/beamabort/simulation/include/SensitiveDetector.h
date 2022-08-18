@@ -10,6 +10,8 @@
 
 #include <simulation/kernel/SensitiveDetectorBase.h>
 
+#include <TVector3.h>
+
 namespace Belle2 {
   /** Namespace to encapsulate code needed for the BEAMABORT detector */
   namespace beamabort {

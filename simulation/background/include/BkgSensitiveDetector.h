@@ -11,6 +11,8 @@
 
 #include <simulation/kernel/SensitiveDetectorBase.h>
 
+#include <TVector3.h>
+
 namespace Belle2 {
 
   //! The Class for BeamBackground Sensitive Detector

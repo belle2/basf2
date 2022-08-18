@@ -10,7 +10,6 @@
 #define SENSITIVEDETECTOR_H_
 
 #include <framework/datastore/RelationArray.h>
-#include <mdst/dataobjects/MCParticle.h>
 #include <simulation/kernel/UserInfo.h>
 #include <G4VSensitiveDetector.hh>
 class G4Step;

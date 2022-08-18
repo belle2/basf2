@@ -9,6 +9,7 @@
 #pragma once
 
 #include <Eigen/Dense>
+#include <Math/Vector3D.h>
 #include <TRandom.h>
 #include <TVectorT.h>
 #include <TVector3.h>

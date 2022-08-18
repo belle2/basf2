@@ -23,7 +23,9 @@
 
 #include <algorithm>
 #include <TMatrixFSym.h>
+#include <Math/Vector3D.h>
 #include <Math/Vector4D.h>
+#include <Math/VectorUtil.h>
 
 #include <vector>
 

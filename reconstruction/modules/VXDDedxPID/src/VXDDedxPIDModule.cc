@@ -15,6 +15,7 @@
 
 #include <genfit/MaterialEffects.h>
 
+#include <Math/VectorUtil.h>
 #include <TH2F.h>
 
 #include <memory>

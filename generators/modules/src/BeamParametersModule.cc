@@ -9,6 +9,8 @@
 #include <generators/modules/BeamParametersModule.h>
 #include <framework/database/Database.h>
 
+#include <Math/Vector3D.h>
+
 using namespace Belle2;
 
 //-----------------------------------------------------------------

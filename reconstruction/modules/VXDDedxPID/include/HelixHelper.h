@@ -8,9 +8,9 @@
 
 #pragma once
 
-#include <TVector3.h>
 #include <Math/Functor.h>
 #include <Math/BrentMinimizer1D.h>
+#include <Math/Vector3D.h>
 
 #include <cmath>
 

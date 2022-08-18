@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include <TVector3.h>
 #include <mdst/dataobjects/MCParticle.h>
 
 namespace Belle2 {

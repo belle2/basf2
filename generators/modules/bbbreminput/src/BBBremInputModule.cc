@@ -14,6 +14,8 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 
+#include <Math/Vector3D.h>
+
 using namespace std;
 using namespace Belle2;
 

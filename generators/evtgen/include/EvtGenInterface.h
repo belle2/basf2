@@ -17,6 +17,7 @@
 
 #include <framework/utilities/IOIntercept.h>
 
+#include <Math/Vector3D.h>
 #include <string>
 
 namespace Belle2 {

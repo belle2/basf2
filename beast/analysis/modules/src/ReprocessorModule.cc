@@ -11,6 +11,8 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <framework/logging/Logger.h>
 
+#include <TVector3.h>
+
 //c++
 #include <boost/foreach.hpp>
 #include <string>

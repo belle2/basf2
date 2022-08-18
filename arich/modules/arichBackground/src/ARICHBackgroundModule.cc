@@ -27,6 +27,7 @@
 // framework aux
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
+#include <framework/geometry/B2Vector3.h>
 
 using namespace std;
 using namespace boost;

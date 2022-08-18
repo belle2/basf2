@@ -8,6 +8,7 @@
 
 #include <tracking/dataobjects/hitXPDerivate.h>
 #include <tracking/dataobjects/MCParticleInfo.h>
+#include <framework/geometry/B2Vector3.h>
 
 using namespace Belle2;
 

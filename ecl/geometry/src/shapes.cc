@@ -791,6 +791,7 @@ namespace Belle2 {
               in.str(t[i]); in.seekg(0, ios_base::beg);
               in >> trap.t[i - 1];
             }
+            shapes.push_back(shape);
             delete shape;
           } else if (t.size() == 13) {
             shape = new quadrilateral_barrel_t();
@@ -803,6 +804,7 @@ namespace Belle2 {
               in.str(t[i]); in.seekg(0, ios_base::beg);
               in >> trap.t[i - 1];
             }
+            shapes.push_back(shape);
             delete shape;
           } else if (t.size() == 22) {
             shape = new pent_t();
@@ -816,9 +818,9 @@ namespace Belle2 {
               in >> pent.t[i - 1];
             }
             pent.adjust();
+            shapes.push_back(shape);
             delete shape;
           }
-          shapes.push_back(shape);
         }
       }
 

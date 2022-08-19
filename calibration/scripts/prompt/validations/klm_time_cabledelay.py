@@ -83,7 +83,7 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
     ROOT.gStyle.SetOptStat(0)
 
     # Path to the database.txt file.
-    database_file = os.path.join(f'{job_path}/KLMTime/outputdb/', 'database.txt')
+    database_file = os.path.join(f'{job_path}', 'KLMTime', 'outputdb', 'database.txt')
 
     # Check the list of runs from the file database.txt.
     exp_run_dict = {}

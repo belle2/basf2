@@ -271,6 +271,10 @@ void Belle2::ECL::GeoECLCreator::backward(G4LogicalVolume& _top)
                                   false, (1152 + 6624) / 16 + indx, 0);
       if (overlap)pv->CheckOverlaps(npoints);
     }
+
+    for (shape_t* shape : cryst) {
+      delete shape;
+    }
   }
 
   if (b_preamplifier) {

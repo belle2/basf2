@@ -128,7 +128,7 @@ TH1* DQMHistAnalysisModule::findHistInFile(TFile* file, const std::string& histn
 {
   // find histogram by name in file, histname CAN contain directory!
   // will return nullptr if file is zeroptr, not found or not correct type
-  if (file) {
+  if (file && file->IsOpen()) {
     auto obj = file->Get(histname.data());
     if (obj != nullptr) {
       // check class type

@@ -269,6 +269,10 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
       new G4PVPlacement(twc, wrapped_crystals[s - cryst.begin()], suf("ECLForwardWrappedCrystal_Physical", indx), crystalvolume_logical,
                         false, indx, overlap);
     }
+
+    for (shape_t* shape : cryst) {
+      delete shape;
+    }
   }
 
   if (b_preamplifier) {

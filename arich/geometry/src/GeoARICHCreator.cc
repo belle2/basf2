@@ -307,8 +307,8 @@ namespace Belle2 {
       const std::vector<double> wedge2 = supportPar.getWedge(2);
       G4Material* wedge1Material = Materials::get(supportPar.getWedgeMaterial(1));
       G4Material* wedge2Material = Materials::get(supportPar.getWedgeMaterial(2));
-      G4AssemblyVolume* assemblyWedge1;
-      G4AssemblyVolume* assemblyWedge2;
+      G4AssemblyVolume* assemblyWedge1 = new G4AssemblyVolume();
+      G4AssemblyVolume* assemblyWedge2 = new G4AssemblyVolume();
       makeJoint(wedge1Material, wedge1, assemblyWedge1);
       makeJoint(wedge2Material, wedge2, assemblyWedge2);
 
@@ -427,6 +427,9 @@ namespace Belle2 {
       }
 
       m_config.useBasf2Units();
+
+      delete assemblyWedge1;
+      delete assemblyWedge2;
 
       return;
 

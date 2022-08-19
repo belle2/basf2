@@ -54,6 +54,8 @@ namespace Belle2 {
 
     GeoBeamPipeCreator::GeoBeamPipeCreator()
     {
+      m_transform_PXDMount_s = new G4RotationMatrix;
+      m_transform_PXDMount_s -> rotateX(M_PI / 2);
     }
 
     GeoBeamPipeCreator::~GeoBeamPipeCreator()
@@ -63,6 +65,7 @@ namespace Belle2 {
         delete sensitive;
       }
       m_sensitive.clear();
+      delete m_transform_PXDMount_s;
     }
 
     void GeoBeamPipeCreator::createGeometry(G4LogicalVolume& topVolume, GeometryTypes)
@@ -1533,22 +1536,19 @@ namespace Belle2 {
 
       G4Material* mat_PXDMountFwd_s = Materials::get("Cu");
 
-      G4RotationMatrix* transform_PXDMountFwd_s = new G4RotationMatrix;
-      transform_PXDMountFwd_s -> rotateX(M_PI / 2);
       G4LogicalVolume* logi_PXDMountFwd_s1 = new G4LogicalVolume(geo_PXDMountFwd_s1, mat_PXDMountFwd_s, "logi_PXDMountFwd_name_s1");
-      new G4PVPlacement(transform_PXDMountFwd_s, G4ThreeVector(+PXDMountFwd_L1, 0, PXDMountFwd_Z1 + PXDMountFwd_D1 - PXDMountFwd_L2),
+      new G4PVPlacement(m_transform_PXDMount_s, G4ThreeVector(+PXDMountFwd_L1, 0, PXDMountFwd_Z1 + PXDMountFwd_D1 - PXDMountFwd_L2),
                         logi_PXDMountFwd_s1, "phys_PXDMountFwd_name_s1", &topVolume, false, 0);
       G4LogicalVolume* logi_PXDMountFwd_s2 = new G4LogicalVolume(geo_PXDMountFwd_s2, mat_PXDMountFwd_s, "logi_PXDMountFwd_name_s2");
-      new G4PVPlacement(transform_PXDMountFwd_s, G4ThreeVector(+PXDMountFwd_L1, 0, PXDMountFwd_Z1 + PXDMountFwd_L2), logi_PXDMountFwd_s2,
+      new G4PVPlacement(m_transform_PXDMount_s, G4ThreeVector(+PXDMountFwd_L1, 0, PXDMountFwd_Z1 + PXDMountFwd_L2), logi_PXDMountFwd_s2,
                         "phys_PXDMountFwd_name_s2", &topVolume, false, 0);
 
       G4LogicalVolume* logi_PXDMountFwd_s3 = new G4LogicalVolume(geo_PXDMountFwd_s3, mat_PXDMountFwd_s, "logi_PXDMountFwd_name_s3");
-      new G4PVPlacement(transform_PXDMountFwd_s, G4ThreeVector(-PXDMountFwd_L1, 0, PXDMountFwd_Z1 + PXDMountFwd_D1 - PXDMountFwd_L2),
+      new G4PVPlacement(m_transform_PXDMount_s, G4ThreeVector(-PXDMountFwd_L1, 0, PXDMountFwd_Z1 + PXDMountFwd_D1 - PXDMountFwd_L2),
                         logi_PXDMountFwd_s3, "phys_PXDMountFwd_name_s3", &topVolume, false, 0);
       G4LogicalVolume* logi_PXDMountFwd_s4 = new G4LogicalVolume(geo_PXDMountFwd_s4, mat_PXDMountFwd_s, "logi_PXDMountFwd_name_s4");
-      new G4PVPlacement(transform_PXDMountFwd_s, G4ThreeVector(-PXDMountFwd_L1, 0, PXDMountFwd_Z1 + PXDMountFwd_L2), logi_PXDMountFwd_s4,
+      new G4PVPlacement(m_transform_PXDMount_s, G4ThreeVector(-PXDMountFwd_L1, 0, PXDMountFwd_Z1 + PXDMountFwd_L2), logi_PXDMountFwd_s4,
                         "phys_PXDMountFwd_name_s4", &topVolume, false, 0);
-      delete transform_PXDMountFwd_s;
       //----------
       //- PXDMountFixtureFwd
       prep = "PXDMountFixtureFwd.";
@@ -1692,22 +1692,20 @@ namespace Belle2 {
 
       G4Material* mat_PXDMountBwd_s = Materials::get("Cu");
 
-      G4RotationMatrix* transform_PXDMountBwd_s = new G4RotationMatrix;
-      transform_PXDMountBwd_s -> rotateX(M_PI / 2);
       G4LogicalVolume* logi_PXDMountBwd_s1 = new G4LogicalVolume(geo_PXDMountBwd_s1, mat_PXDMountBwd_s, "logi_PXDMountBwd_name_s1");
-      new G4PVPlacement(transform_PXDMountBwd_s, G4ThreeVector(+PXDMountBwd_L1, 0, -PXDMountBwd_Z1 - PXDMountBwd_D1  + PXDMountBwd_L2),
+      new G4PVPlacement(m_transform_PXDMount_s, G4ThreeVector(+PXDMountBwd_L1, 0, -PXDMountBwd_Z1 - PXDMountBwd_D1  + PXDMountBwd_L2),
                         logi_PXDMountBwd_s1, "phys_PXDMountBwd_name_s1", &topVolume, false, 0);
       G4LogicalVolume* logi_PXDMountBwd_s2 = new G4LogicalVolume(geo_PXDMountBwd_s2, mat_PXDMountBwd_s, "logi_PXDMountBwd_name_s2");
-      new G4PVPlacement(transform_PXDMountBwd_s, G4ThreeVector(+PXDMountBwd_L1, 0, -PXDMountBwd_Z1 - PXDMountBwd_L2),
+      new G4PVPlacement(m_transform_PXDMount_s, G4ThreeVector(+PXDMountBwd_L1, 0, -PXDMountBwd_Z1 - PXDMountBwd_L2),
                         logi_PXDMountBwd_s2, "phys_PXDMountBwd_name_s2", &topVolume, false, 0);
 
       G4LogicalVolume* logi_PXDMountBwd_s3 = new G4LogicalVolume(geo_PXDMountBwd_s3, mat_PXDMountBwd_s, "logi_PXDMountBwd_name_s3");
-      new G4PVPlacement(transform_PXDMountBwd_s, G4ThreeVector(-PXDMountBwd_L1, 0, -PXDMountBwd_Z1 - PXDMountBwd_D1 + PXDMountBwd_L2),
+      new G4PVPlacement(m_transform_PXDMount_s, G4ThreeVector(-PXDMountBwd_L1, 0, -PXDMountBwd_Z1 - PXDMountBwd_D1 + PXDMountBwd_L2),
                         logi_PXDMountBwd_s3, "phys_PXDMountBwd_name_s3", &topVolume, false, 0);
       G4LogicalVolume* logi_PXDMountBwd_s4 = new G4LogicalVolume(geo_PXDMountBwd_s4, mat_PXDMountBwd_s, "logi_PXDMountBwd_name_s4");
-      new G4PVPlacement(transform_PXDMountBwd_s, G4ThreeVector(-PXDMountBwd_L1, 0, -PXDMountBwd_Z1 - PXDMountBwd_L2),
+      new G4PVPlacement(m_transform_PXDMount_s, G4ThreeVector(-PXDMountBwd_L1, 0, -PXDMountBwd_Z1 - PXDMountBwd_L2),
                         logi_PXDMountBwd_s4, "phys_PXDMountBwd_name_s4", &topVolume, false, 0);
-      delete transform_PXDMountBwd_s;
+//       delete m_transform_PXDMount_s;
 
       //----------
       //- PXDMountFixtureBwd
@@ -1798,28 +1796,40 @@ namespace Belle2 {
       int Index_sensi = 11;
       BkgSensitiveDetector* tmpBkgSensitiveDetector = new BkgSensitiveDetector("IR", Index_sensi++);
       logi_Lv3AuCoat->SetSensitiveDetector(tmpBkgSensitiveDetector);
+      delete tmpBkgSensitiveDetector;
       tmpBkgSensitiveDetector = new BkgSensitiveDetector("IR", Index_sensi++);
       logi_Lv1TaFwd->SetSensitiveDetector(tmpBkgSensitiveDetector);
+      delete tmpBkgSensitiveDetector;
       tmpBkgSensitiveDetector = new BkgSensitiveDetector("IR", Index_sensi++);
       logi_Lv1TaBwd->SetSensitiveDetector(tmpBkgSensitiveDetector);
+      delete tmpBkgSensitiveDetector;
       tmpBkgSensitiveDetector = new BkgSensitiveDetector("IR", Index_sensi++);
       logi_Lv1TaLERUp->SetSensitiveDetector(tmpBkgSensitiveDetector);
+      delete tmpBkgSensitiveDetector;
       tmpBkgSensitiveDetector = new BkgSensitiveDetector("IR", Index_sensi++);
       logi_Lv1SUSLERUp->SetSensitiveDetector(tmpBkgSensitiveDetector);
+      delete tmpBkgSensitiveDetector;
       tmpBkgSensitiveDetector = new BkgSensitiveDetector("IR", Index_sensi++);
       logi_Lv1TaHERDwn->SetSensitiveDetector(tmpBkgSensitiveDetector);
+      delete tmpBkgSensitiveDetector;
       tmpBkgSensitiveDetector = new BkgSensitiveDetector("IR", Index_sensi++);
       logi_Lv1SUSHERDwn->SetSensitiveDetector(tmpBkgSensitiveDetector);
+      delete tmpBkgSensitiveDetector;
       tmpBkgSensitiveDetector = new BkgSensitiveDetector("IR", Index_sensi++);
       logi_Lv1TaHERUp->SetSensitiveDetector(tmpBkgSensitiveDetector);
+      delete tmpBkgSensitiveDetector;
       tmpBkgSensitiveDetector = new BkgSensitiveDetector("IR", Index_sensi++);
       logi_Lv1SUSHERUp->SetSensitiveDetector(tmpBkgSensitiveDetector);
+      delete tmpBkgSensitiveDetector;
       tmpBkgSensitiveDetector = new BkgSensitiveDetector("IR", Index_sensi++);
       logi_Lv1TaLERDwn->SetSensitiveDetector(tmpBkgSensitiveDetector);
+      delete tmpBkgSensitiveDetector;
       tmpBkgSensitiveDetector = new BkgSensitiveDetector("IR", Index_sensi++);
       logi_Lv1SUSLERDwn->SetSensitiveDetector(tmpBkgSensitiveDetector);
+      delete tmpBkgSensitiveDetector;
       tmpBkgSensitiveDetector = new BkgSensitiveDetector("IR", Index_sensi++);
       logi_CuFlangeFwd->SetSensitiveDetector(tmpBkgSensitiveDetector);
+      delete tmpBkgSensitiveDetector;
       tmpBkgSensitiveDetector = new BkgSensitiveDetector("IR", Index_sensi++);
       logi_CuFlangeBwd->SetSensitiveDetector(tmpBkgSensitiveDetector);
       delete tmpBkgSensitiveDetector;
@@ -1838,8 +1848,6 @@ namespace Belle2 {
       //logi_Lv1TaHERUp->SetSensitiveDetector(m_sensitive.back());
       //m_sensitive.push_back((SensitiveDetector*)(new BkgSensitiveDetector("IR", 17)));
       //logi_Lv1TaLERDwn->SetSensitiveDetector(m_sensitive.back());
-
-
 
       //-
       //----------

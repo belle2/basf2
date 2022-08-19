@@ -18,6 +18,8 @@
 #include <string>
 #include <vector>
 
+#include <G4tgbRotationMatrix.hh>
+
 class G4LogicalVolume;
 
 namespace Belle2 {
@@ -95,6 +97,14 @@ namespace Belle2 {
       std::vector<SensitiveDetector*> m_sensitive;
 
       BeamPipeGeo m_config; /**< geometry parameters object */
+
+    private:
+      /** Member to hold rotation matrix to avoid memory leak.
+       *  Creating the pointer where it's actually needed and deleting it in createGeometry caused
+       *  segmentation violation and memory access errors, so the easiest way to circumvent this issue
+       *  is to create this member variable, define it in the constructor, and delete it in the destructor
+       */
+      G4RotationMatrix* m_transform_PXDMount_s = nullptr;
     };
 
   }

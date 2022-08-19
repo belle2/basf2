@@ -50,7 +50,7 @@ void DQMHistAnalysisPXDERModule::initialize()
 {
   m_refFile = NULL;
   if (m_refFileName != "") {
-    m_refFile = new TFile(m_refFileName.data());
+    m_refFile = new TFile(m_refFileName.data());// default is read only
   }
 
   gROOT->cd(); // this seems to be important, or strange things happen
@@ -332,7 +332,7 @@ int DQMHistAnalysisPXDERModule::SetFlag(int Type, int bin, const double* pars, d
   hist = findHist(m_histogramDirectoryName, name_hist);
   if (!hist) return -1;
   // assumes that ref file has no sub dirs
-  if (m_refFile) refhist = findHist(m_refFile, name_refhist);
+  refhist = findHistInFile(m_refFile, name_refhist);
   if (!refhist) return -1;
 
   // What happens if they are TH1I, TH1D and not TH1F

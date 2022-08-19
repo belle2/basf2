@@ -68,7 +68,7 @@ void DQMHistAnalysisPXDTrackChargeModule::initialize()
 
   m_refFile = NULL;
   if (m_refFileName != "") {
-    m_refFile = new TFile(m_refFileName.data());
+    m_refFile = new TFile(m_refFileName.data());// default is read only
   }
 
   m_monObj = getMonitoringObject("pxd");
@@ -223,8 +223,8 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
       m_hTrackedClusters->SetLineColor(kBlue);
       m_hTrackedClusters->Draw("hist");
 
-      // get ref histogra, assumes no m_histogramDirectoryName directory in ref file
-      TH1* href2 = findHist(m_refFile, name);
+      // get ref histogram, assumes no m_histogramDirectoryName directory in ref file
+      auto href2 = findHistInFile(m_refFile, name);
 
       if (href2) {
         href2->SetLineStyle(3);// 2 or 3
@@ -281,27 +281,18 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
       }
 
       // get ref histogram, assumes no m_histogramDirectoryName directory in ref file
-      TH1* hist2 = findHist(name);
+      auto hist2 = findHistInFile(m_refFile, name);
 
       if (hist2) {
-//         B2INFO("Draw Normalized " << hist2->GetName());
+        B2DEBUG(20, "Draw Normalized " << hist2->GetName());
         hist2->SetLineStyle(3);// 2 or 3
         hist2->SetLineColor(kBlack);
-
-//         TIter nextkey(canvas->GetListOfPrimitives());
-//         TObject* obj = NULL;
-//         while ((obj = (TObject*)nextkey())) {
-//           if (obj->IsA()->InheritsFrom("TH1")) {
-//             if (string(obj->GetName()) == string(hist2->GetName())) {
-//               delete obj;
-//             }
-//           }
-//         }
 
         canvas->cd();
 
         // if draw normalized
         TH1* h = (TH1*)hist2->Clone(); // Annoying ... Maybe an memory leak? TODO
+        // would it work to scale it each time again?
         if (abs(hist2->GetEntries()) > 0) h->Scale(hh1->GetEntries() / hist2->GetEntries());
 
         h->SetStats(kFALSE);

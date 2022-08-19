@@ -239,7 +239,7 @@ def run_test_py(argument, prepare_step=False):
                 result = False
                 message = "exited with return code %d" % process.returncode
                 extra = format_output(name, process.stdout, process.stderr)
-        elif not prepare_step:
+        else:
             log_tests = [compare_log(release_dir, name, process.stdout, 'out', 1, options.diff_lines),
                          compare_log(release_dir, name, process.stderr, 'err', 0, options.diff_lines)]
             logs_failed = sum(0 if e is None else len(e) for e in log_tests)

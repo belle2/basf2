@@ -10,6 +10,9 @@
 
 /* Belle 2 headers. */
 #include <mdst/dataobjects/MCParticleGraph.h>
+#include <generators/utilities/ConditionalGaussGenerator.h>
+
+#include <Math/LorentzRotation.h>
 
 /* C++ headers. */
 #include <string>
@@ -46,14 +49,11 @@ extern pydat2_type pydat2_;
 
 extern "C" {
   void kk_init_(const char*, const char*, const char*, int*, const char*);
-  void kk_begin_run_(double*);
+  void kk_begin_run_(double*, double*);
   void kk_init_seed_();
   void kk_term_(double*, double*);
   void kk_event_(int*);
-  void kk_getbeam_(double*, double*, double*, double*,
-                   double*, double*, double*, double*);
-  void kk_putbeam_(double*, double*, double*, double*,
-                   double*, double*, double*, double*);
+  void kk_shifttaudecayvtx_();
   int pycomp_(int&);
 
 }
@@ -96,13 +96,12 @@ namespace Belle2 {
     /**
      * Setup for beams information.
      */
-    void set_beam_info(ROOT::Math::PxPyPzEVector P4_LER, double Espread_LER, ROOT::Math::PxPyPzEVector P4_HER,
-                       double Espread_HER);
+    void set_beam_info(double Ecms0, double Ecms0Spread);
 
     /**
      * Simulate the events.
      */
-    int simulateEvent(MCParticleGraph& graph, TVector3 vertex);
+    int simulateEvent(MCParticleGraph& graph, const ConditionalGaussGenerator& lorentzGenerator, TVector3 vertex);
 
     /**
      * Terminate the generator.

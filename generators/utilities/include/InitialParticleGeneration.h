@@ -16,6 +16,10 @@
 #include <framework/dbobjects/BeamParameters.h>
 #include <framework/dataobjects/MCInitialParticles.h>
 
+#include <generators/utilities/ConditionalGaussGenerator.h>
+
+#include <TMatrixDSym.h>
+
 namespace Belle2 {
 
   /** Generate Collision.
@@ -36,6 +40,9 @@ namespace Belle2 {
 
     /** Generate a new event */
     MCInitialParticles& generate();
+
+
+    TVector3 getVertexConditional();
 
     /** Update the vertex position:
      *
@@ -68,6 +75,15 @@ namespace Belle2 {
       m_allowedFlags = allowedFlags | MCInitialParticles::c_generateCMS;
     }
 
+
+    ConditionalGaussGenerator initConditionalGenerator(const ROOT::Math::PxPyPzEVector& pHER,  const ROOT::Math::PxPyPzEVector& pLER,
+                                                       const TMatrixDSym& covLER, const TMatrixDSym& covHER);
+
+    double getNominalEcms()       { return m_beamParams->getMass(); }
+    double getNominalEcmsSpread() { return  m_generateLorentzTransformation.getX0spread(); }
+
+    const ConditionalGaussGenerator& getLorentzGenerator() { return m_generateLorentzTransformation; }
+
   private:
 
     /**
@@ -75,6 +91,10 @@ namespace Belle2 {
      * @param[in] allowedFlags Allowed flags.
      */
     MCInitialParticles& generate(int allowedFlags);
+
+
+    TMatrixDSym adjustCovMatrix(TMatrixDSym cov) const;
+
 
     /** generate the vertex
      * @param initial nominal vertex position
@@ -99,6 +119,10 @@ namespace Belle2 {
     MultivariateNormalGenerator m_generateLER;
     /** Generator for Vertex */
     MultivariateNormalGenerator m_generateVertex;
+
+    /** Generator of the Lorentz transformation */
+    ConditionalGaussGenerator m_generateLorentzTransformation;
+
     /** Allowed generation flags */
     int m_allowedFlags;
   };

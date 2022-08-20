@@ -99,6 +99,27 @@ namespace Belle2 {
       resetBoost();
     }
 
+    void setByLorentzTransformation(double Ecms, double bX, double bY, double bZ, double angleXZ, double angleYZ,
+                                    const B2Vector3D& vertex)
+    {
+      if (m_labToCMS) delete m_labToCMS;
+      if (m_CMSToLab) delete m_CMSToLab;
+
+      m_invariantMass = Ecms;
+      m_CMSToLab      = new ROOT::Math::LorentzRotation();
+      m_labToCMS      = new ROOT::Math::LorentzRotation();
+      *m_CMSToLab     = cmsToLab(bX, bY, bZ, angleXZ, angleYZ);
+      *m_labToCMS     = m_CMSToLab->Inverse();
+
+      const double me = 0.5e-3;
+      double p = sqrt(Ecms * Ecms / 4 - me * me);
+      m_her = (*m_CMSToLab) * ROOT::Math::PxPyPzEVector(0.0, 0.0,  p, Ecms / 2);
+      m_ler = (*m_CMSToLab) * ROOT::Math::PxPyPzEVector(0.0, 0.0, -p, Ecms / 2);
+
+      m_vertex = vertex;
+      m_validFlag = true;
+    }
+
     /** Set the High Energy Beam 4-momentum */
     void setHER(const ROOT::Math::PxPyPzEVector& her)
     {
@@ -168,6 +189,8 @@ namespace Belle2 {
      * @param separator separation string to be put between flags */
     std::string getGenerationFlagString(const std::string& separator = " ") const;
 
+    static ROOT::Math::LorentzRotation cmsToLab(double bX, double bY, double bZ, double angleXZ, double angleYZ);
+
   private:
 
     /** Calculate the boost if necessary */
@@ -233,6 +256,10 @@ namespace Belle2 {
     //cache derived quantities
     m_CMSToLab = new ROOT::Math::LorentzRotation(m_labToCMS->Inverse());
   }
+
+
+
+
 
   inline void MCInitialParticles::resetBoost()
   {

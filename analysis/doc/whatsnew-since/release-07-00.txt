@@ -9,6 +9,7 @@ Variables
    and `pidWeightedProbabilityExpert`.
  * Added the variable `hasCorrectROECombination` to check if the correct combination of the particle that is the basis of
    the ROE object and the particle that is loaded from the ROE.
+ * Extended the variable `useAlternativeDaughterHypothesis` to variables calculated from daughters' 4-momentum, e.g. `cosHelicityAngleMomentum`.
 
 Modules
 +++++++

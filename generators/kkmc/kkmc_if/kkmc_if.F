@@ -14,8 +14,8 @@ CCCCCC
       integer ijetset
       common /KK_pythia/ ijetset
       
-      double precision Pb1, Pb2, BoostV, cosA, sinA, ctau
-      common /KK_cntl/ Pb1(4), Pb2(4), BoostV(3), cosA, sinA, ctau, xpar
+      double precision ctau
+      common /KK_cntl/ ctau, xpar
       double precision dum(4)
 
       integer m_Read_PythiaFile
@@ -30,11 +30,6 @@ C   Input environment
 
       open(1,FILE=DatX_u,STATUS='old',ACTION='read')
 
-C   Input beam momentum for boost
-C      read(1,*) Pb1(1), Pb1(2), Pb1(3), Pb1(4)
-C      read(1,*) Pb2(1), Pb2(2), Pb2(3), Pb2(4)
-C      Print *,'KK P(e+)= ',Pb1
-C      Print *,'KK P(e-)= ',Pb2
 C###### Dummy (for backward compatibility)
       read(1,*,err=99) ctau, dum(2), dum(3), dum(4)
       read(1,*) dum(1), dum(2), dum(3), dum(4)
@@ -54,9 +49,6 @@ C   Input flag for long lived particle (1:no decay, 0:decay)
 
       close(1)  ! end of input-file open
 
-      Print *,'KK P(e+)= ',Pb1
-      Print *,'KK P(e-)= ',Pb2
-
 C   Random seed init for init
       Print *,'KK init random seed for init by ',IRAND1
       CALL PseuMar_Initialize(IRAND1,0,0)
@@ -65,10 +57,6 @@ C   Random seed init for init
 C   KK initialize
       CALL KK2f_ReaDataX(DatX_d, 1,imax,xpar)
       CALL KK2f_ReaDataX(DatX_u, 0,imax,xpar)
-C      xpar(1)=sqrt((Pb1(4)+Pb2(4))**2-(Pb1(1)+Pb2(1))**2
-C     &            -(Pb1(2)+Pb2(2))**2-(Pb1(3)+Pb2(3))**2)
-C      Print *,'KK CMS energy changes to ',xpar(1),' (GeV)'
-C      CALL KK2f_Initialize(xpar)                  ! initialize generator
 
 C   Pythia initialize
 c      call KK_Pythia_output_table  ! output default table (for tempolary use)
@@ -97,7 +85,7 @@ C      call KK_Boost_flush
       end
 
 
-
+CCCCCC
       subroutine KK_begin_run(Ecms, Espread)
       implicit         none
       double precision Ecms, Espread
@@ -105,11 +93,8 @@ C      call KK_Boost_flush
       parameter (imax = 10000)
       double precision xpar(imax)
 
-      integer iflong, IRAND1
-
-      double precision Pb1, Pb2, BoostV, cosA, sinA, ctau
-      common /KK_cntl/ Pb1(4), Pb2(4), BoostV(3), cosA, sinA, ctau, xpar
-      double precision dum(4)
+      double precision ctau
+      common /KK_cntl/ ctau, xpar
 
       xpar(1)= Ecms
       xpar(2)= Espread
@@ -119,6 +104,7 @@ C      call KK_Boost_flush
 
 
       end
+
 
 CCCCCC
       subroutine KK_init_seed
@@ -139,6 +125,7 @@ C      CALL RMARIN(IRAND2,0,0)
 
       end
 
+
 CCCCCC
       subroutine KK_term(xSecPb,xErrPb)
       implicit         none
@@ -153,6 +140,7 @@ C      call TAUFIF(2)                              ! TAUOLA fifo
 
       end
 
+      
 CCCCCC
       subroutine KK_event ( status )
       implicit         none
@@ -177,16 +165,6 @@ C      save /hepevt/
 c
      
 c
-      double precision p(4)
-      integer i
-
-      integer imax
-      parameter (imax = 10000)
-      double precision xpar(imax)
-
-
-      double precision Pb1, Pb2, BoostV, cosA, sinA, ctau
-      common /KK_cntl/ Pb1(4), Pb2(4), BoostV(3), cosA, sinA, ctau, xpar
       integer ijetset
       common /KK_pythia/ ijetset
 
@@ -225,8 +203,8 @@ CCCCCC
       integer itau,i,j
       double precision p, betagamma, flen, rvec(1), vtx(4), vtx0(4)
 
-      double precision Pb1, Pb2, BoostV, cosA, sinA, ctau
-      common /KK_cntl/ Pb1(4), Pb2(4), BoostV(3), cosA, sinA, ctau, xpar
+      double precision ctau
+      common /KK_cntl/ ctau, xpar
 c  HepEvt
       INCLUDE 'KK2f/HepEvt.fi'
       
@@ -251,6 +229,7 @@ c     +              flen, (phep(j,i),j=1,5), (vtx0(j),j=1,4)
       return
       end
 
+      
 CCCCCC
       subroutine KK_Shift_Daughters_Vtx (id, vtx)
       implicit none
@@ -272,6 +251,8 @@ c  HepEvt
 
       return
       end
+
+
 CCCCCC
       subroutine KK_Shift_Daughters_Vtx2(id, vtx)
       implicit none
@@ -282,6 +263,7 @@ CCCCCC
 
       return
       end
+
 
 CCCCCC
       subroutine KK_Shift_Vtx (id, vtx)
@@ -297,6 +279,7 @@ c  HepEvt
 
       return
       end
+
 
 CCCCCC
       subroutine KK_RandExp (rvec, len)
@@ -316,6 +299,7 @@ CCCCCC
 
       return
       end
+
 
 CCCCCC
       subroutine KK_Pythia_output_table
@@ -339,6 +323,7 @@ c     output default pythia parameter table
 
       return
       end
+
 
 CCCCCC
       subroutine KK_select_decay_channel (id)

@@ -17,6 +17,7 @@
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ReferenceFrame.h>
 #include <analysis/utility/EvtPDLUtil.h>
+#include <analysis/utility/ParticleCopy.h>
 #include <analysis/ClusterUtility/ClusterUtils.h>
 #include <analysis/variables/VariableFormulaConstructor.h>
 
@@ -2830,6 +2831,9 @@ namespace Belle2 {
 
           const auto& frame = ReferenceFrame::GetCurrent();
 
+          // Create a dummy particle from the given particle to overwrite its kinematics
+          Particle* dummy = ParticleCopy::copyParticle(particle);
+
           // Sum of the 4-momenta of all the daughters with the new mass assumptions
           ROOT::Math::PxPyPzMVector pSum(0, 0, 0, 0);
 
@@ -2851,16 +2855,20 @@ namespace Belle2 {
                 double p_y = dauMom.Py();
                 double p_z = dauMom.Pz();
                 dauMom.SetCoordinates(p_x, p_y, p_z, massesToBeReplaced[iReplace]);
+
+                // overwrite the daughter's kinematics
+                const_cast<Particle*>(dummy->getDaughter(iDau))->set4Vector(ROOT::Math::PxPyPzEVector(dauMom));
                 break;
               }
             }
             pSum += dauMom;
           } // End of loop over number of daughter
 
-          // Make a dummy particle out of the sum of the 4-momenta of the selected daughters
-          Particle sumOfDaughters(ROOT::Math::PxPyPzEVector(pSum), 100); // 100 is one of the special numbers
+          // overwrite the particle's kinematics
+          dummy->set4Vector(ROOT::Math::PxPyPzEVector(pSum));
 
-          auto var_result = var->function(&sumOfDaughters);
+          auto var_result = var->function(dummy);
+
           // Calculate the variable on the dummy particle
           if (std::holds_alternative<double>(var_result))
           {

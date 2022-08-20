@@ -82,7 +82,9 @@ int KKGenInterface::setup(const std::string& KKdefaultFileName, const std::strin
 void KKGenInterface::set_beam_info(double Ecms0, double Ecms0Spread)
 {
   if (Ecms0 > 0. && Ecms0Spread >= 0.) {
-    kk_begin_run_(&Ecms0, &Ecms0Spread);
+    // KKMC requires spread of energy of a single beam in CMS system
+    double E0spread = Ecms0Spread / std::sqrt(2);
+    kk_begin_run_(&Ecms0, &E0spread);
   } else {
     B2DEBUG(100, "Wrong beam info");
   }
@@ -99,8 +101,6 @@ int KKGenInterface::simulateEvent(MCParticleGraph& graph, const ConditionalGauss
   double EcmsNow = hepevt_.phep[0][3] * 2; // TODO put assertion or write it more general
 
   Eigen::VectorXd               transVec = lorentzGenerator.generate(EcmsNow);
-
-
   ROOT::Math::LorentzRotation   rot =  MCInitialParticles::cmsToLab(transVec[1], transVec[2], transVec[3], transVec[4], transVec[5]);
 
   for (int i = 0; i < hepevt_.nhep; ++i) {

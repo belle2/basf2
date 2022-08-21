@@ -7,7 +7,7 @@
  **************************************************************************/
 //+
 // File : DQMHistAnalysisPXDCM.h
-// Description : DAQM Analysis for PXD Common Modes
+// Description : DQM Analysis for PXD Common Modes
 //-
 
 #pragma once
@@ -20,10 +20,7 @@
 #include <dqm/core/DQMHistAnalysis.h>
 #include <vxd/dataobjects/VxdID.h>
 
-#include <vector>
-#include <map>
 #include <TH2.h>
-#include <TCanvas.h>
 #include <TLine.h>
 
 namespace Belle2 {

@@ -14,7 +14,6 @@
 #include <dqm/analysis/modules/DQMHistAnalysisPXDTrackCharge.h>
 #include <TROOT.h>
 #include <TStyle.h>
-#include <TClass.h>
 #include <TLatex.h>
 #include <vxd/geometry/GeoCache.h>
 #include <TKey.h>

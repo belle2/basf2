@@ -11,10 +11,6 @@
 #include <dqm/core/DQMHistAnalysis.h>
 
 #include "TFile.h"
-#include "TH1I.h"
-#include "TH1F.h"
-
-#include <vector>
 
 namespace Belle2 {
   /*! PXD DQM AnalysisModule */

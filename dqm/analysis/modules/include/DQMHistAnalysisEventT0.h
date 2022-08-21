@@ -14,15 +14,9 @@
 
 #include <dqm/core/DQMHistAnalysis.h>
 
-#include <TFile.h>
-#include <TMath.h>
-#include <TCanvas.h>
-#include <TH1.h>
-#include <TF1.h>
-
 namespace Belle2 {
 
-  /** Class definition for the output module of Sequential ROOT I/O */
+  /** Class definition */
   class DQMHistAnalysisEventT0Module : public DQMHistAnalysisModule {
 
     // Public functions

@@ -110,7 +110,7 @@ void DQMHistAnalysisInputTestModule::PlotDelta(void)
     auto c = new TCanvas();
     c->Divide(3, 3);
     c->cd(1);
-    auto h = getHist(name);
+    auto h = findHist(name);
     if (h) h->Draw("hist");
 
     // for testing, we use low level access to histograms here

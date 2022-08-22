@@ -87,14 +87,7 @@ namespace Belle2 {
 
     /**
      * Get histogram from list (no other search).
-     * @param histname The name of the histogram.
-     * @return The found histogram, or nullptr if not found.
-     */
-    static TH1* getHist(const std::string& histname);
-
-    /**
-     * Find histogram.
-     * @param histname The name of the histogram.
+     * @param histname The name of the histogram (incl dir).
      * @return The found histogram, or nullptr if not found.
      */
     static TH1* findHist(const std::string& histname);

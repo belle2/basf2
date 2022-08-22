@@ -117,29 +117,16 @@ TCanvas* DQMHistAnalysisModule::findCanvas(TString canvas_name)
   return nullptr;
 }
 
-TH1* DQMHistAnalysisModule::getHist(const std::string& histname)
-{
-  if (g_hist.find(histname) != g_hist.end()) {
-    if (g_hist[histname]) {
-      return g_hist[histname];
-    } else {
-      B2ERROR("Histogram " << histname << " listed as being in memfile but nullptr.");
-    }
-  }
-  B2INFO("Histogram " << histname << " not in list.");
-  return nullptr;
-}
-
 TH1* DQMHistAnalysisModule::findHist(const std::string& histname)
 {
   if (g_hist.find(histname) != g_hist.end()) {
     if (g_hist[histname]) {
       return g_hist[histname];
     } else {
-      B2ERROR("Histogram " << histname << " listed as being in memfile but points to nowhere.");
+      B2ERROR("Histogram " << histname << " in histogram list but nullptr.");
     }
   }
-  B2INFO("Histogram " << histname << " not in memfile.");
+  B2INFO("Histogram " << histname << " not in list.");
   return nullptr;
 }
 

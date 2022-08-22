@@ -19,7 +19,7 @@ from b2test_utils import clean_working_directory
 
 
 class TutorialsTest(unittest.TestCase):
-    """Test to run all tutorials. Will fail if no tutorial directory is found."""
+    """Test to run all B2A9XX tutorials. Will fail if no tutorial directory is found."""
 
     #: list of the broken tutorials (to be removed when they are individually fixed)
     broken_tutorials = []
@@ -32,7 +32,7 @@ class TutorialsTest(unittest.TestCase):
         """
         Test supported tutorials.
         """
-        all_tutorials = sorted(glob.glob(find_file('analysis/examples/tutorials/') + "/*.py"))
+        all_tutorials = sorted(glob.glob(find_file('analysis/examples/tutorials/') + "/B2A9*.py"))
         for tutorial in all_tutorials:
             filename = os.path.basename(tutorial)
             if filename not in self.broken_tutorials:

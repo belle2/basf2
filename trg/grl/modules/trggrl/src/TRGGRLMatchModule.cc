@@ -1449,10 +1449,10 @@ void TRGGRLMatchModule::inner_tracking(StoreArray<CDCTriggerSegmentHit> tslist,
   IT0_36b_temp[1] = IT0_36b[33];
   IT0_36b_temp[2] = IT0_36b[34];
   IT0_36b_temp[3] = IT0_36b[35];
-  IT0_36b_temp[36] = IT0_36b[0];
-  IT0_36b_temp[37] = IT0_36b[1];
-  IT0_36b_temp[38] = IT0_36b[2];
-  IT0_36b_temp[39] = IT0_36b[3];
+  IT0_36b_temp[40] = IT0_36b[0];
+  IT0_36b_temp[41] = IT0_36b[1];
+  IT0_36b_temp[42] = IT0_36b[2];
+  IT0_36b_temp[43] = IT0_36b[3];
 
   for (int i = 4; i < 40; i++) {
     if (ecl_phimap[i - 4] and (IT0_36b_temp[i - 4] or IT0_36b_temp[i - 3] or IT0_36b_temp[i - 2] or IT0_36b_temp[i - 1]

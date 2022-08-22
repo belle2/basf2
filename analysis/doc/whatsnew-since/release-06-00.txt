@@ -5,7 +5,7 @@ PID Calibration Weight Tools
 ++++++++++++++++++++++++++++
  * Added the module ``scripts/pidDataUtils.py`` to provide a set of tools for preparing and analyzing data with weights
  * Added the script ``scripts/pidTrainWeights.py`` to train a set of calibration weights on a dataset
- * Added an example for training a set of weights and using them in an analysis in ``examples/pid_calibration``
+ * Added an example for training a set of weights and using them in an analysis in ``analysis/examples/PIDCalibration``
 
 Variables
 +++++++++

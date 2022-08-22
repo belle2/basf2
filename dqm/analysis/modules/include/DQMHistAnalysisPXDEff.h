@@ -12,17 +12,17 @@
 
 #pragma once
 
+#include <dqm/core/DQMHistAnalysis.h>
+
 #ifdef _BELLE2_EPICS
 // EPICS
 #include "cadef.h"
 #endif
 
-#include <dqm/core/DQMHistAnalysis.h>
 #include <vxd/dataobjects/VxdID.h>
 
-#include <TEfficiency.h>
-#include <TCanvas.h>
 #include <TH2F.h>
+#include <TEfficiency.h>
 
 namespace Belle2 {
   /*! DQM Histogram Analysis for PXD Efficiency */

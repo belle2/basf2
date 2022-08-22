@@ -162,7 +162,7 @@ void BKLMSimHistogrammerModule::event()
     if (hits2D[i]->getSubdetector() != KLMElementNumbers::c_BKLM)
       continue;
     int scaledTag = -1;
-    TVector3 gHitPos = hits2D[i]->getPosition();
+    ROOT::Math::XYZVector gHitPos = hits2D[i]->getPosition();
     RelationVector<BKLMHit1d> related1DHits = hits2D[i]->getRelationsTo<BKLMHit1d>();
     for (const auto& hit1d : related1DHits) {
       RelationVector<KLMDigit> bklmDigits = hit1d.getRelationsTo<KLMDigit>();
@@ -192,7 +192,7 @@ void BKLMSimHistogrammerModule::event()
     return;
   for (int i = 0; i < n2DHits; i++) {
     KLMHit2d* hit2D = hits2D[i];
-    TVector3 gHitPos = hit2D->getPosition();
+    ROOT::Math::XYZVector gHitPos = hit2D->getPosition();
     if (hit2D->inRPC()) {
       m_hSimHitPhiRPC->Fill(gHitPos.Phi(), m_weight);
       m_hSimHitThetaRPC->Fill(gHitPos.Theta(), m_weight);

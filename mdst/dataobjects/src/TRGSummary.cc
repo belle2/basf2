@@ -82,7 +82,7 @@ unsigned int TRGSummary::getInputBitNumber(const std::string& name) const
   static DBObjPtr<TRGGDLDBInputBits> inputBits;
 
   if (not inputBits) {
-    B2ERROR("The mapping of input trigger names does not exist in the given globaltags");
+    B2WARNING("The mapping of input trigger names does not exist in the given globaltags");
     throw std::runtime_error("No input trigger map in the given globaltags");
   }
 
@@ -92,7 +92,7 @@ unsigned int TRGSummary::getInputBitNumber(const std::string& name) const
     }
   }
 
-  B2ERROR("The requested input trigger name does not exist" << LogVar("name", name));
+  B2WARNING("The requested input trigger name does not exist" << LogVar("name", name));
   throw std::invalid_argument("The requested input trigger name does not exist: " + name);
 }
 
@@ -104,7 +104,7 @@ unsigned int TRGSummary::getOutputBitNumber(const std::string& name) const
   static DBObjPtr<TRGGDLDBFTDLBits> ftdlBits;
 
   if (not ftdlBits) {
-    B2ERROR("The mapping of output trigger names does not exist in the given globaltags");
+    B2WARNING("The mapping of output trigger names does not exist in the given globaltags");
     throw std::runtime_error("No input trigger map in the given globaltags");
   }
 
@@ -114,7 +114,7 @@ unsigned int TRGSummary::getOutputBitNumber(const std::string& name) const
     }
   }
 
-  B2ERROR("The requested output trigger name does not exist" << LogVar("name", name));
+  B2WARNING("The requested output trigger name does not exist" << LogVar("name", name));
   // Instead of returning a magic number, let's throw an exception:
   // this will help us to distinguish "trigger not fired" cases
   // from "trigger not found" at analysis level.

@@ -15,6 +15,7 @@
 #include <framework/core/Module.h>
 #include <dqm/core/MonitoringObject.h>
 #include <dqm/analysis/HistDelta.h>
+#include <TFile.h>
 #include <TH1.h>
 
 #include <string>
@@ -97,6 +98,7 @@ namespace Belle2 {
      * @return The found histogram, or nullptr if not found.
      */
     static TH1* findHist(const std::string& histname);
+
     /**
      * Find histogram.
      * @param dirname  The name of the directory.
@@ -105,13 +107,14 @@ namespace Belle2 {
      */
     static TH1* findHist(const std::string& dirname,
                          const std::string& histname);
+
     /**
-     * Find histogram in specific TDirectory (e.g. ref file).
-     * @param histdir  The TDirectory of the directory.
-     * @param histname The name of the histogram.
+     * Find histogram in specific TFile (e.g. ref file).
+     * @param file  The TFile to search.
+     * @param histname The name of the histogram, can incl directory
      * @return The found histogram, or nullptr if not found.
      */
-    static TH1* findHist(const TDirectory* histdir, const TString& histname);
+    static TH1* findHistInFile(TFile* file, const std::string& histname);
 
     /**
      * Find histogram in corresponding canvas.

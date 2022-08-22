@@ -124,18 +124,25 @@ TH1* DQMHistAnalysisModule::findHistInCanvas(const std::string& histo_name)
   return nullptr;
 }
 
-
-TH1* DQMHistAnalysisModule::findHist(const TDirectory* histdir, const TString& histname)
+TH1* DQMHistAnalysisModule::findHistInFile(TFile* file, const std::string& histname)
 {
-  TObject* obj = histdir->FindObject(histname);
-  if (obj != NULL) {
-    if (obj->IsA()->InheritsFrom("TH1")) {
-      return (TH1*)obj;
+  // find histogram by name in file, histname CAN contain directory!
+  // will return nullptr if file is zeroptr, not found or not correct type
+  if (file && file->IsOpen()) {
+    auto obj = file->Get(histname.data());
+    if (obj != nullptr) {
+      // check class type
+      if (obj->IsA()->InheritsFrom("TH1")) {
+        B2DEBUG(20, "Histogram " << histname << " found in file");
+        return dynamic_cast<TH1*>(obj);
+      } else {
+        B2INFO("Found Object " << histname << " in file is not a histogram");
+      }
+    } else {
+      B2INFO("Histogram " << histname << " not found in file");
     }
-  } else {
-    B2INFO("Histogram " << histname << " NOT found in mem");
   }
-  return NULL;
+  return nullptr;
 }
 
 MonitoringObject* DQMHistAnalysisModule::findMonitoringObject(const std::string& objName)

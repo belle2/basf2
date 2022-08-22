@@ -12,19 +12,20 @@
 
 #pragma once
 
+#include <dqm/core/DQMHistAnalysis.h>
+
 #ifdef _BELLE2_EPICS
 // EPICS
 #include "cadef.h"
 #endif
 
-#include <dqm/core/DQMHistAnalysis.h>
 #include <vxd/dataobjects/VxdID.h>
 
+#include <TFile.h>
+#include <TH2.h>
 #include <TF1.h>
 #include <TLine.h>
 #include <TGraphErrors.h>
-#include <TFile.h>
-#include <TH2.h>
 
 #include <RooRealVar.h>
 #include <RooWorkspace.h>
@@ -73,14 +74,6 @@ namespace Belle2 {
     void terminate(void) override final;
 
   private:
-
-    /**
-     * Get histogram by its name.
-     * @param histoname The name of the histogram.
-     * @return The pointer to the histogram, or nullptr if not found.
-     */
-    TH1* GetHisto(TString histoname);
-
     // Data members
 
     //! name of histogram directory

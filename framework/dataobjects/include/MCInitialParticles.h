@@ -99,6 +99,16 @@ namespace Belle2 {
       resetBoost();
     }
 
+    /** Initialize the event values from CMS energy and parameters of the Lorentz transformation between LAB and CMS.
+     *  In addition the vertex is also initialized.
+     * @param Ecms     centre-of-mass energy of the collision
+     * @param bX       x-component of the boost vector, i.e. of (pHER + pLER) / (eHER + eLER), where pHER & pLER are momentum 3-vectors
+     * @param bY       y-component of the boost vector, i.e. of (pHER + pLER) / (eHER + eLER), where pHER & pLER are momentum 3-vectors
+     * @param bZ       z-component of the boost vector, i.e. of (pHER + pLER) / (eHER + eLER), where pHER & pLER are momentum 3-vectors
+     * @param angleXZ  angle in the XZ plane of the collision axis in the CM system obtained by pure boost
+     * @param angleYZ  angle in the YZ plane of the collision axis in the CM system obtained by pure boost
+     * @param vertex   position of the actual collision vertex
+     */
     void setByLorentzTransformation(double Ecms, double bX, double bY, double bZ, double angleXZ, double angleYZ,
                                     const B2Vector3D& vertex)
     {
@@ -189,6 +199,15 @@ namespace Belle2 {
      * @param separator separation string to be put between flags */
     std::string getGenerationFlagString(const std::string& separator = " ") const;
 
+
+    /** Return the LorentzRotation from CMS to LAB based on the following parameters
+     * @param Ecms     centre-of-mass energy of the collision
+     * @param bX       x-component of the boost vector, i.e. of (pHER + pLER) / (eHER + eLER), where pHER & pLER are momentum 3-vectors
+     * @param bY       y-component of the boost vector, i.e. of (pHER + pLER) / (eHER + eLER), where pHER & pLER are momentum 3-vectors
+     * @param bZ       z-component of the boost vector, i.e. of (pHER + pLER) / (eHER + eLER), where pHER & pLER are momentum 3-vectors
+     * @param angleXZ  angle in the XZ plane of the collision axis in the CM system obtained by pure boost
+     * @param angleYZ  angle in the YZ plane of the collision axis in the CM system obtained by pure boost
+     */
     static ROOT::Math::LorentzRotation cmsToLab(double bX, double bY, double bZ, double angleXZ, double angleYZ);
 
   private:

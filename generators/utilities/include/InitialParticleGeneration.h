@@ -41,7 +41,7 @@ namespace Belle2 {
     /** Generate a new event */
     MCInitialParticles& generate();
 
-
+    /** Generate vertex position and possibly update the generator of Lorentz transformation */
     TVector3 getVertexConditional();
 
     /** Update the vertex position:
@@ -75,13 +75,17 @@ namespace Belle2 {
       m_allowedFlags = allowedFlags | MCInitialParticles::c_generateCMS;
     }
 
-
+    /** Initialize the conditional generator using HER & LER 4-vectors and HER & LER covariance matrices describing spread */
     ConditionalGaussGenerator initConditionalGenerator(const ROOT::Math::PxPyPzEVector& pHER,  const ROOT::Math::PxPyPzEVector& pLER,
                                                        const TMatrixDSym& covLER, const TMatrixDSym& covHER);
 
+    /** Get the CMS energy of collisions */
     double getNominalEcms()       { return m_beamParams->getMass(); }
+
+    /** Get spread of CMS collision energy calculated from beam parameters */
     double getNominalEcmsSpread() { return  m_generateLorentzTransformation.getX0spread(); }
 
+    /** Get the generator for the Lorentz transformation */
     const ConditionalGaussGenerator& getLorentzGenerator() { return m_generateLorentzTransformation; }
 
   private:
@@ -92,7 +96,7 @@ namespace Belle2 {
      */
     MCInitialParticles& generate(int allowedFlags);
 
-
+    /** adjust smearing covariance matrix based on the generation flags */
     TMatrixDSym adjustCovMatrix(TMatrixDSym cov) const;
 
 

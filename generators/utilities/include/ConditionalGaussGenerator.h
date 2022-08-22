@@ -12,24 +12,38 @@
 
 namespace Belle2 {
 
+  /** Class implementing n-dimensional random number generator from Gaussian distribution
+   *  where the first component of the vector is generated first (using some external source)
+   *  and the remaining components are generated based on the value of the first component.
+   *  The obtained numbers have identical statistical behaviour like when all components
+   *  are generated simultaneously */
   class ConditionalGaussGenerator {
 
   public:
 
+    /** dummy constructor without arguments  */
     ConditionalGaussGenerator() {}
+
+    /** constructor which takes vector of central values and covariance matrix as input */
     ConditionalGaussGenerator(Eigen::VectorXd mu, Eigen::MatrixXd covMat);
 
+    /** generate random vector */
     Eigen::VectorXd generate(double x0) const;
 
+    /** get the spread of first component which can be used by external generator */
     double getX0spread()         const { return sqrt(m_covMat(0, 0)); }
+
+    /** get the vector including central values of the distribution */
     Eigen::VectorXd getMu()      const { return m_mu; }
+
+    /** get the covariance matrix describing n-dimensional Gaussian distribution */
     Eigen::MatrixXd getCovMat()  const { return m_covMat; }
   private:
-    Eigen::VectorXd m_mu;
-    Eigen::MatrixXd m_covMat;
+    Eigen::VectorXd m_mu;          ///< central values of the distribution
+    Eigen::MatrixXd m_covMat;      ///< covariance matrix of the distribution
 
-    Eigen::MatrixXd m_vBaseMat;
-    std::vector<Eigen::VectorXd> m_cOrt;
-    Eigen::VectorXd m_v0norm;
+    Eigen::MatrixXd m_vBaseMat;          ///< transformation matrix between eigen-system of m_covMat and nominal system
+    std::vector<Eigen::VectorXd> m_cOrt; ///< array of vectors describing free degrees of freedom of random generator
+    Eigen::VectorXd m_v0norm;            ///< vector which scales with dx0
   };
 }

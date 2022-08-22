@@ -17,91 +17,133 @@
 
 namespace Belle2 {
 
+  /** sqrt for double */
   inline double sqrt(double a) { return std::sqrt(a); }
+
+  /** tan for double */
   inline double tan(double a)  { return std::tan(a); }
+
+  /** atan for double */
   inline double atan(double a) { return std::atan(a); }
 
-
+  /** Simple structure implementing dual numbers which are used for exact evaluation of the derivatives, see
+   * https://en.wikipedia.org/wiki/Automatic_differentiation#Automatic_differentiation_using_dual_numbers */
   struct DualNumber {
-    double x, dx;
+    double x;  ///< nominal value of dual number
+    double dx; ///< differential value of dual number, should be 1 if derivative is calculated
+
+    /** constructor allowing to set the values */
     DualNumber(double X, double dX) : x(X), dx(dX) {}
+
+    /** constructor setting values to zero */
     DualNumber() : x(0), dx(0) {}
   };
 
 
+  /** addition of dual numbers */
   inline DualNumber operator+(DualNumber a, DualNumber b)
   {
     return DualNumber(a.x + b.x, a.dx + b.dx);
   }
 
+
+  /** addition of dual number and double */
   inline DualNumber operator+(DualNumber a, double b)
   {
     return DualNumber(a.x + b, a.dx);
   }
 
+
+  /** subtraction of dual number and double */
   inline DualNumber operator-(DualNumber a, double b)
   {
     return DualNumber(a.x - b, a.dx);
   }
 
+
+  /** subtraction of double and dual number */
   inline DualNumber operator-(double a, DualNumber b)
   {
     return DualNumber(a - b.x, -b.dx);
   }
 
 
+  /** division of double and dual number */
   inline DualNumber operator/(double a, DualNumber b)
   {
     return DualNumber(a / b.x, - a / (b.x * b.x) * b.dx);
   }
 
+
+  /** division of two dual numbers */
   inline DualNumber operator/(DualNumber a, DualNumber b)
   {
     return DualNumber(a.x / b.x, (a.dx * b.x - a.x * b.dx) / (b.x * b.x));
   }
 
 
+  /** subtraction of two dual numbers */
   inline DualNumber operator-(DualNumber a, DualNumber b)
   {
     return DualNumber(a.x - b.x, a.dx - b.dx);
   }
 
+
+  /** multiplication of two dual numbers */
   inline DualNumber operator*(DualNumber a, DualNumber b)
   {
     return DualNumber(a.x * b.x, a.x * b.dx + b.x * a.dx);
   }
 
+
+  /** multiplication of double and dual number */
   inline DualNumber operator*(double a, DualNumber b)
   {
     return DualNumber(a * b.x, a * b.dx);
   }
 
+
+  /** sqrt of dual number */
   inline DualNumber sqrt(DualNumber a)
   {
     return  DualNumber(std::sqrt(a.x), 1. / (2 * std::sqrt(a.x)) * a.dx);
   }
 
+
+  /** atan of dual number */
   inline DualNumber atan(DualNumber a)
   {
     return  DualNumber(std::atan(a.x),  1. / (1 + a.x * a.x) * a.dx);
   }
 
+
+  /** tan of dual number */
   inline DualNumber tan(DualNumber a)
   {
     return  DualNumber(std::tan(a.x), (1.0 + std::tan(a.x) * std::tan(a.x)) * a.dx);
   }
 
 
+  /** 3-vector with members of arbitrary type, especially members can be dual numbers */
   template<typename T>
   struct GeneralVector {
-    T el[3];
+    T el[3]; ///< elements of the vector
+
+    /** constructor allowing to set the components of vector  */
     GeneralVector(T x, T y, T z) { el[0] = x; el[1] = y; el[2] = z; }
+
+    /** L2 norm of the vector squared  */
     T norm2() const { return (el[0] * el[0] + el[1] * el[1] + el[2] * el[2]); }
 
+    /** angle in the XZ projection of the vector  */
     T angleX() const { return atan(el[0] / el[2]); }
+
+    /** angle in the YZ projection of the vector  */
     T angleY() const { return atan(el[1] / el[2]); }
   };
 
+
+  /** addition of two general vectors */
   template<typename T>
   GeneralVector<T> operator+(GeneralVector<T> a, GeneralVector<T> b)
   {
@@ -109,6 +151,7 @@ namespace Belle2 {
   }
 
 
+  /** dot product of two general vectors */
   template<typename T>
   T dot(GeneralVector<T> a, GeneralVector<T> b)
   {
@@ -116,15 +159,18 @@ namespace Belle2 {
   }
 
 
+  /** product of scalar and general vector */
   template<typename T>
   GeneralVector<T> operator*(T a, GeneralVector<T> b)
   {
     return GeneralVector<T>(a * b.el[0], a * b.el[1], a * b.el[2]);
   }
 
-  // electron mass
+  /** electron mass */
   static const double me = 0.510998950e-3;
 
+
+  /** get CMS energy from HER & LER momentum 3-vectors  */
   template<typename T>
   T getEcms(GeneralVector<T> p1, GeneralVector<T> p2)
   {
@@ -135,6 +181,7 @@ namespace Belle2 {
   }
 
 
+  /** get boost vector from HER & LER momentum 3-vectors  */
   template<typename T>
   GeneralVector<T> getBoost(GeneralVector<T> p1, GeneralVector<T> p2)
   {
@@ -145,6 +192,7 @@ namespace Belle2 {
   }
 
 
+  /** get collision axis angles in CM frame from HER & LER momentum 3-vectors  */
   template<typename T>
   std::pair<T, T> getAnglesCMS(GeneralVector<T> p1, GeneralVector<T> p2)
   {
@@ -160,6 +208,7 @@ namespace Belle2 {
   }
 
 
+  /** get 4-momentum from energy and angles of beam */
   template<typename T>
   GeneralVector<T> getFourVector(T energy, T angleX, T angleY, bool isHER)
   {
@@ -173,6 +222,7 @@ namespace Belle2 {
   }
 
 
+  /** get gradient matrix of (eH, thXH, thYH, eL, thXL, thYL) -> (eCMS, boostX, boostY, boostY, angleXZ, angleYZ) transformation */
   inline Eigen::MatrixXd getGradientMatrix(double eH, double thXH, double thYH,
                                            double eL, double thXL, double thYL)
   {
@@ -206,6 +256,7 @@ namespace Belle2 {
   }
 
 
+  /** get vector including (Ecms, boostX, boostY, boostZ, angleXZ, angleYZ) from beam energies and angles */
   inline Eigen::VectorXd getCentralValues(double eH, double thXH, double thYH,
                                           double eL, double thXL, double thYL)
   {
@@ -231,6 +282,7 @@ namespace Belle2 {
   }
 
 
+  /** transform covariance matrix to the variables  (Ecms, boostX, boostY, boostZ, angleXZ, angleYZ) */
   inline Eigen::MatrixXd transformCov(Eigen::MatrixXd covHER, Eigen::MatrixXd covLER, Eigen::MatrixXd grad)
   {
 

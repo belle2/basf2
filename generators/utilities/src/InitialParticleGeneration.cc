@@ -55,6 +55,7 @@ namespace Belle2 {
   }
 
 
+  /** transform matrix from ROOT to Eigen format */
   static Eigen::MatrixXd toEigen(TMatrixDSym m)
   {
     Eigen::MatrixXd mEig(m.GetNrows(), m.GetNcols());

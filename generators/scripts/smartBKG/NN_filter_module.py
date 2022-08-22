@@ -66,6 +66,16 @@ class NNFilterModule(b2.Module):
         global_tag="SmartBKG_GATGAP",
         payload="GATGAPgen.pth"
     ):
+        """
+        Initialise the class.
+        :param model_file:  TODO
+        :param model_config:  TODO
+        :param preproc_config:  TODO
+        :param threshold:  TODO
+        :param extra_info_var:  TODO
+        :param global_tag:  TODO
+        :param payload:  TODO
+        """
         super().__init__()
         self.model_file = model_file
         self.model_config = model_config

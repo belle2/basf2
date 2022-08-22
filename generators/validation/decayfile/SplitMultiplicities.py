@@ -25,11 +25,18 @@ import basf2
 
 class SplitMultiplicities(basf2.Module):
     def __init__(self, listname, pdgcode):
+        """
+        Initialise the class.
+        :param listname: TODO
+        :param pdgcode: TODO
+        """
         super().__init__()
         self.listname = listname
         self.pdgcode = pdgcode
 
     def event(self):
+        """ Event function """
+
         # set counters to 0
         gen_counter = 0
         Bp_counter = 0

@@ -29,6 +29,14 @@ class GATModule(torch.nn.Module):
         in_feats_glob,
         use_gap=False,
     ):
+        """
+        Initialise the class.
+        :param in_feats:  TODO
+        :param units:  TODO
+        :param num_heads:  TODO
+        :param in_feats_glob:  TODO
+        :param use_gap:  TODO
+        """
         super().__init__()
         self.gat = dglnn.GATConv(in_feats, units, num_heads)
         out_feats = units * num_heads
@@ -87,6 +95,16 @@ class GATGAPModel(torch.nn.Module):
         n_layers=5,
         use_gap=False
     ):
+        """
+        Initialise the class.
+        :param units: TODO
+        :param num_features: TODO
+        :param num_pdg: TODO
+        :param emb_size: TODO
+        :param attention_heads: TODO
+        :param n_layers: TODO
+        :param use_gap: TODO
+        """
         super().__init__()
         self.pdg_embedding = torch.nn.Embedding(num_pdg + 1, emb_size)
         in_feats = num_features + emb_size

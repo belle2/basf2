@@ -14,12 +14,12 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 #include <framework/particledb/EvtGenDatabasePDG.h>
-#include <mdst/dataobjects/MCParticleGraph.h>
-
 #include <framework/dataobjects/MCInitialParticles.h>
+#include <mdst/dataobjects/MCParticleGraph.h>
 
 /* ROOT headers. */
 #include <THashList.h>
+#include <Math/LorentzRotation.h>
 
 /* C++ headers. */
 #include <cmath>

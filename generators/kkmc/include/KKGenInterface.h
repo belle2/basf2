@@ -12,8 +12,6 @@
 #include <mdst/dataobjects/MCParticleGraph.h>
 #include <generators/utilities/ConditionalGaussGenerator.h>
 
-#include <Math/LorentzRotation.h>
-
 /* C++ headers. */
 #include <string>
 #include <unordered_map>

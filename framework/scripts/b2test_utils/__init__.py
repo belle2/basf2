@@ -384,7 +384,7 @@ def temporary_set_environment(**environ):
     Temporarily set the process environment variables.
     Inspired by https://stackoverflow.com/a/34333710
 
-    >>> with set_env(BELLE2_TEMP_DIR='/tmp/belle2'):
+    >>> with temporary_set_environment(BELLE2_TEMP_DIR='/tmp/belle2'):
     ...   "BELLE2_TEMP_DIR" in os.environ
     True
 

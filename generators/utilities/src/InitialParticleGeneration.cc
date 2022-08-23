@@ -69,7 +69,7 @@ namespace Belle2 {
 
   // init random number generator which generates random boost based on the beam parameters
   ConditionalGaussGenerator InitialParticleGeneration::initConditionalGenerator(const ROOT::Math::PxPyPzEVector& pHER,
-      const ROOT::Math::PxPyPzEVector& pLER, const TMatrixDSym& covLER, const TMatrixDSym& covHER)
+      const ROOT::Math::PxPyPzEVector& pLER, const TMatrixDSym& covHER, const TMatrixDSym& covLER)
   {
     //Calculate initial parameters of the HER beam before smearing
     double E0her   = pHER.E();

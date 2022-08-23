@@ -77,7 +77,7 @@ namespace Belle2 {
 
     /** Initialize the conditional generator using HER & LER 4-vectors and HER & LER covariance matrices describing spread */
     ConditionalGaussGenerator initConditionalGenerator(const ROOT::Math::PxPyPzEVector& pHER,  const ROOT::Math::PxPyPzEVector& pLER,
-                                                       const TMatrixDSym& covLER, const TMatrixDSym& covHER);
+                                                       const TMatrixDSym& covHER, const TMatrixDSym& covLER);
 
     /** Get the CMS energy of collisions */
     double getNominalEcms()       { return m_beamParams->getMass(); }

@@ -20,6 +20,8 @@
 /* ROOT headers. */
 #include <THashList.h>
 #include <Math/LorentzRotation.h>
+#include <Math/Boost.h>
+#include <Math/Vector3D.h>
 
 /* C++ headers. */
 #include <cmath>
@@ -97,16 +99,30 @@ int KKGenInterface::simulateEvent(MCParticleGraph& graph, const ConditionalGauss
   int status = 0;
   kk_event_(&status);
 
+  ROOT::Math::PxPyPzEVector pHERorg(hepevt_.phep[0][0], hepevt_.phep[0][1], hepevt_.phep[0][2], hepevt_.phep[0][3]);
+  ROOT::Math::PxPyPzEVector pLERorg(hepevt_.phep[1][0], hepevt_.phep[1][1], hepevt_.phep[1][2], hepevt_.phep[1][3]);
+  ROOT::Math::PxPyPzEVector pTotOrg = pHERorg + pLERorg;
 
-  double EcmsNow = hepevt_.phep[0][3] * 2; // TODO put assertion or write it more general
+  // KKMC allows generation of events with E-spread of beams, where
+  // without spread both energies are equal and momenta aligned along z-asis
+  // When spread it on, the system is no more CMS, so we transform to it
+  ROOT::Math::LorentzRotation rotKKMC(ROOT::Math::Boost(pTotOrg.BoostToCM()));
 
+  // CMS energy from KKMC used for conditional generator
+  double EcmsNow = pTotOrg.M();
+
+  // Calculate Lorentz transformation to LAB for this event
   Eigen::VectorXd               transVec = lorentzGenerator.generate(EcmsNow);
   ROOT::Math::LorentzRotation   rot =  MCInitialParticles::cmsToLab(transVec[1], transVec[2], transVec[3], transVec[4], transVec[5]);
+
+  // Total Lorentz transformation
+  ROOT::Math::LorentzRotation rotTot = rot * rotKKMC;
 
   for (int i = 0; i < hepevt_.nhep; ++i) {
     ROOT::Math::PxPyPzEVector p4cms(hepevt_.phep[i][0], hepevt_.phep[i][1], hepevt_.phep[i][2], hepevt_.phep[i][3]);
 
-    ROOT::Math::PxPyPzEVector p4lab = rot * p4cms;
+    // transform to LAB
+    ROOT::Math::PxPyPzEVector p4lab = rotTot * p4cms;
 
     hepevt_.phep[i][0] = p4lab.Px();
     hepevt_.phep[i][1] = p4lab.Py();

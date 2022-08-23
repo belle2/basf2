@@ -391,8 +391,8 @@ def temporary_set_environment(**environ):
     >>> "BELLE2_TEMP_DIR" in os.environ
     False
 
-    :type environ: dict[str, unicode]
-    :param environ: Environment variables to set
+    Arguments:
+        environ(dict): Dictionary of environment variables to set
     """
     old_environ = dict(os.environ)
     os.environ.update(environ)

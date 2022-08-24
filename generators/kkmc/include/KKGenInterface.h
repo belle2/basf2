@@ -10,7 +10,7 @@
 
 /* Belle 2 headers. */
 #include <mdst/dataobjects/MCParticleGraph.h>
-#include <generators/utilities/ConditionalGaussGenerator.h>
+#include <framework/utilities/ConditionalGaussGenerator.h>
 
 /* C++ headers. */
 #include <string>

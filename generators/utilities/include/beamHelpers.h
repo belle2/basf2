@@ -8,10 +8,13 @@
 
 #pragma once
 
+#include <framework/gearbox/Const.h>
+
 #include <cmath>
 #include <tuple>
 #include <utility>
 #include <vector>
+
 #include <Eigen/Dense>
 
 
@@ -167,7 +170,7 @@ namespace Belle2 {
   }
 
   /** electron mass */
-  static const double me = 0.510998950e-3;
+  static const double me = Const::electron.getMass();
 
 
   /** get CMS energy from HER & LER momentum 3-vectors  */
@@ -283,7 +286,7 @@ namespace Belle2 {
 
 
   /** transform covariance matrix to the variables  (Ecms, boostX, boostY, boostZ, angleXZ, angleYZ) */
-  inline Eigen::MatrixXd transformCov(Eigen::MatrixXd covHER, Eigen::MatrixXd covLER, Eigen::MatrixXd grad)
+  inline Eigen::MatrixXd transformCov(const Eigen::MatrixXd& covHER, const Eigen::MatrixXd& covLER, const Eigen::MatrixXd& grad)
   {
 
     Eigen::MatrixXd cov = Eigen::MatrixXd::Zero(6, 6);

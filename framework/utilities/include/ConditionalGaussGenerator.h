@@ -8,6 +8,7 @@
 
 #pragma once
 #include <vector>
+#include <cmath>
 #include <Eigen/Dense>
 
 namespace Belle2 {
@@ -25,13 +26,13 @@ namespace Belle2 {
     ConditionalGaussGenerator() {}
 
     /** constructor which takes vector of central values and covariance matrix as input */
-    ConditionalGaussGenerator(Eigen::VectorXd mu, Eigen::MatrixXd covMat);
+    ConditionalGaussGenerator(const Eigen::VectorXd& mu, const Eigen::MatrixXd& covMat);
 
     /** generate random vector */
     Eigen::VectorXd generate(double x0) const;
 
     /** get the spread of first component which can be used by external generator */
-    double getX0spread()         const { return sqrt(m_covMat(0, 0)); }
+    double getX0spread()         const { return std::sqrt(m_covMat(0, 0)); }
 
     /** get the vector including central values of the distribution */
     Eigen::VectorXd getMu()      const { return m_mu; }

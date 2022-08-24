@@ -8,7 +8,7 @@
 
 #include <generators/kkmc/KKGenInterface.h>
 #include <generators/modules/kkgeninput/KKGenInputModule.h>
-#include <generators/utilities/ConditionalGaussGenerator.h>
+#include <framework/utilities/ConditionalGaussGenerator.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 #include <framework/utilities/FileSystem.h>
 

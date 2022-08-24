@@ -6,27 +6,26 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <generators/utilities/ConditionalGaussGenerator.h>
-#include <cmath>
+#include <framework/utilities/ConditionalGaussGenerator.h>
 #include <TRandom.h>
 
-using namespace std;
 using namespace Belle2;
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
 
 
-static vector<VectorXd> toVectors(MatrixXd mat)
+/** transform matrix into vector of columns */
+static std::vector<VectorXd> toVectors(const MatrixXd& mat)
 {
-  vector<VectorXd> vList;
+  std::vector<VectorXd> vList;
   for (int j = 0; j < mat.cols(); ++j)
     vList.push_back(mat.col(j));
 
   return vList;
 }
 
-
-static MatrixXd toMatrix(vector<VectorXd> vList)
+/** transform vector of vectors (of columns) into single matrix */
+static MatrixXd toMatrix(const std::vector<VectorXd>& vList)
 {
   if (vList.size() == 0)
     return MatrixXd();
@@ -38,15 +37,15 @@ static MatrixXd toMatrix(vector<VectorXd> vList)
   return mat;
 }
 
-
-static vector<VectorXd> getOrtogonalSpace(VectorXd v0)
+/** get the vectors defining linear span orthogonal to vector v0 */
+static std::vector<VectorXd> getOrthogonalSpace(VectorXd v0)
 {
   if (v0.dot(v0) == 0)
     return toVectors(MatrixXd::Identity(v0.rows(), v0.rows()));
 
   VectorXd v0Norm = v0.normalized();
 
-  vector<VectorXd> vList;
+  std::vector<VectorXd> vList;
   vList.push_back(v0Norm);
 
   while (int(vList.size()) < v0.rows()) {
@@ -69,7 +68,7 @@ static vector<VectorXd> getOrtogonalSpace(VectorXd v0)
 }
 
 
-ConditionalGaussGenerator::ConditionalGaussGenerator(VectorXd mu, MatrixXd covMat) : m_mu(mu), m_covMat(covMat)
+ConditionalGaussGenerator::ConditionalGaussGenerator(const VectorXd& mu, const MatrixXd& covMat) : m_mu(mu), m_covMat(covMat)
 {
 
   Eigen::SelfAdjointEigenSolver<MatrixXd> sol(m_covMat);
@@ -77,7 +76,7 @@ ConditionalGaussGenerator::ConditionalGaussGenerator(VectorXd mu, MatrixXd covMa
   MatrixXd vecs = sol.eigenvectors();
 
 
-  vector<VectorXd> vBase;
+  std::vector<VectorXd> vBase;
   //keep only vectors with positive eigenvalue
   for (int i = 0; i < vals.rows(); ++i)
     if (vals[i] > 0) {
@@ -95,7 +94,7 @@ ConditionalGaussGenerator::ConditionalGaussGenerator(VectorXd mu, MatrixXd covMa
   VectorXd v0 = m_vBaseMat.row(0);
 
   // get the orthogonal space
-  m_cOrt = getOrtogonalSpace(v0);
+  m_cOrt = getOrthogonalSpace(v0);
 
   m_v0norm =  v0.dot(v0) > 0 ?  v0 / v0.dot(v0) : v0; //normalize, or keep it zero
 

@@ -16,7 +16,7 @@
 #include <framework/dbobjects/BeamParameters.h>
 #include <framework/dataobjects/MCInitialParticles.h>
 
-#include <generators/utilities/ConditionalGaussGenerator.h>
+#include <framework/utilities/ConditionalGaussGenerator.h>
 
 #include <TMatrixDSym.h>
 

@@ -639,6 +639,20 @@ namespace Photospp {
       for (K = 1; K <= 4; K++) {
         hep.phep[L - i][K - i] = RR[K - i];
       }
+
+      // same for vertex
+
+      for (K = 1; K <= 4; K++) {
+        PP[K - i] = hep.vhep[L - i][K - i];
+      }
+
+      PHORO2(tofrom.th1, PP);
+      PHORO3(tofrom.fi1, PP);
+      bostdq(-1, tofrom.QQ, PP, RR);
+
+      for (K = 1; K <= 4; K++) {
+        hep.vhep[L - i][K - i] = RR[K - i];
+      }
     }
     return;
   }
@@ -1740,6 +1754,20 @@ namespace Photospp {
       for (J = 1; J <= 3; J++) pho.phep[I - i][J - i] = pho.phep[I - i][J - i] + BET[J - i] * (pho.phep[I - i][4 - i] + PB / (GAM + 1.0));
 
       pho.phep[I - i][4 - i] = GAM * pho.phep[I - i][4 - i] + PB;
+
+      for (J = 1; J <= 3; J++) BET[J - i] = -pho.phep[1 - i][J - i] / pho.phep[1 - i][5 - i];
+      GAM = pho.phep[1 - i][4 - i] / pho.phep[1 - i][5 - i];
+      for (I = pho.jdahep[1 - i][1 - i]; I <= pho.jdahep[1 - i][2 - i]; I++) {
+        PB = BET[1 - i] * pho.vhep[I - i][1 - i] + BET[2 - i] * pho.vhep[I - i][2 - i] + BET[3 - i] * pho.vhep[I - i][3 - i];
+        for (J = 1; J <= 3; J++) pho.vhep[I - i][J - i] = pho.vhep[I - i][J - i] + BET[J - i] * (pho.vhep[I - i][4 - i] + PB / (GAM + 1.0));
+        pho.vhep[I - i][4 - i] = GAM * pho.vhep[I - i][4 - i] + PB;
+      }
+      //--    Finally boost mother as well
+      I = 1;
+      PB = BET[1 - i] * pho.vhep[I - i][1 - i] + BET[2 - i] * pho.vhep[I - i][2 - i] + BET[3 - i] * pho.vhep[I - i][3 - i];
+      for (J = 1; J <= 3; J++) pho.vhep[I - i][J - i] = pho.vhep[I - i][J - i] + BET[J - i] * (pho.vhep[I - i][4 - i] + PB / (GAM + 1.0));
+
+      pho.vhep[I - i][4 - i] = GAM * pho.vhep[I - i][4 - i] + PB;
     }
 
 
@@ -1811,6 +1839,21 @@ namespace Photospp {
         for (K = 1; K <= 3;
              K++) pho.phep[NN - i][K - i] = pho.phep[NN - i][K - i] - BET[K - i] * (pho.phep[NN - i][4 - i] + PB / (GAM + 1.0));
         pho.phep[NN - i][4 - i] = GAM * pho.phep[NN][4 - i] + PB;
+      }
+
+      // same for vertex
+      for (J = pho.jdahep[1 - i][1 - i]; J <= pho.jdahep[1 - i][2 - i]; J++) {
+        PB = -BET[1 - i] * pho.vhep[J - i][1 - i] - BET[2 - i] * pho.vhep[J - i][2 - i] - BET[3 - i] * pho.vhep[J - i][3 - i];
+        for (K = 1; K <= 3; K++) pho.vhep[J - i][K - i] = pho.vhep[J - i][K - i] - BET[K - i] * (pho.vhep[J - i][4 - i] + PB / (GAM + 1.0));
+        pho.vhep[J - i][4 - i] = GAM * pho.vhep[J - i][4 - i] + PB;
+      }
+
+      //--   ...boost photon, or whatever else has shown up
+      for (NN = pho.nevhep + 1; NN <= pho.nhep; NN++) {
+        PB = -BET[1 - i] * pho.vhep[NN - i][1 - i] - BET[2 - i] * pho.vhep[NN - i][2 - i] - BET[3 - i] * pho.vhep[NN - i][3 - i];
+        for (K = 1; K <= 3;
+             K++) pho.vhep[NN - i][K - i] = pho.vhep[NN - i][K - i] - BET[K - i] * (pho.vhep[NN - i][4 - i] + PB / (GAM + 1.0));
+        pho.vhep[NN - i][4 - i] = GAM * pho.vhep[NN][4 - i] + PB;
       }
     }
     PHCORK(0);   // we have to use it because it clears input
@@ -2738,7 +2781,7 @@ label51:
         }
         //double life=darkr.SpecialLife;
         double life = darkr.SpecialLife * (-log(Photos::randomDouble()));
-
+        // life = pho.phep[pho.nhep-i][4]; // this is helpful for test. Instead of vertex we get momentum
         // here was missing if(darkr.ifspecial==1)   zbw:16.09.2021
         if (darkr.ifspecial == 1) {
           for (int K = 1; K <= 4; ++K) {

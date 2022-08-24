@@ -22,7 +22,10 @@ class ExamplesTest(b2tua.ExamplesTest):
         """
         b2tu.skip_test_if_light(self)  # simulation doesn't work in light releaes
 
-        self._test_examples_dir('analysis/examples/simulations/')
+        # list of broken examples (to be removed when they are individually fixed)
+        broken_sim_egs = ['B2A105-SimulateAndReconstruct-withBeamBkg.py']  # no beam background files on bamboo
+
+        self._test_examples_dir('analysis/examples/simulations/', broken_sim_egs)
 
 
 if __name__ == '__main__':

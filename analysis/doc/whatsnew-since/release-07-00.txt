@@ -1,3 +1,11 @@
+Changes in the analysis package in light-2209-calico
+----------------------------------------------------
+
+Variables
++++++++++
+ * Extended the variable `useAlternativeDaughterHypothesis` to variables calculated from daughters' 4-momentum, e.g. `cosHelicityAngleMomentum`.
+
+
 Changes in the analysis package in light-2207-bengal
 ----------------------------------------------------
 

@@ -14,6 +14,7 @@
 
 #include <framework/core/Module.h>
 #include <dqm/core/MonitoringObject.h>
+#include <dqm/analysis/HistObject.h>
 #include <dqm/analysis/HistDelta.h>
 #include <TFile.h>
 #include <TH1.h>
@@ -32,7 +33,7 @@ namespace Belle2 {
     /**
      * The type of list of histograms.
      */
-    typedef std::map<std::string, TH1*> HistList;
+    typedef std::map<std::string, HistObject> HistList;
     /**
      * The type of list of MonitoringObjects.
      */
@@ -88,18 +89,20 @@ namespace Belle2 {
     /**
      * Get histogram from list (no other search).
      * @param histname The name of the histogram (incl dir).
+     * @param only_updated req only updated hists, return nullptr otherwise
      * @return The found histogram, or nullptr if not found.
      */
-    static TH1* findHist(const std::string& histname);
+    static TH1* findHist(const std::string& histname, bool only_updated = false);
 
     /**
      * Find histogram.
      * @param dirname  The name of the directory.
      * @param histname The name of the histogram.
+     * @param only_updated req only updated hists, return nullptr otherwise
      * @return The found histogram, or nullptr if not found.
      */
     static TH1* findHist(const std::string& dirname,
-                         const std::string& histname);
+                         const std::string& histname, bool only_updated = false);
 
     /**
      * Find histogram in specific TFile (e.g. ref file).
@@ -141,26 +144,33 @@ namespace Belle2 {
     static MonitoringObject* getMonitoringObject(const std::string& histname);
 
     /**
-     * Clear and reset the list of histograms.
+     * Reset the list of histograms.
      */
-    static void resetHist() { g_hist = std::map<std::string, TH1*>(); }
+    static void initHistListBeforeEvent(void);
+
+    /**
+     * Clears the list of histograms.
+     */
+    static void clearHistList(void);
 
     /**
      * Get Delta histogram.
      * @param fullname directory+name of histogram
      * @param n index of delta histogram, 0 is most recent one
+     * @param only_updated req only updated deltas, return nullptr otherwise
      * @return delta histogram or nullptr
      */
-    TH1* getDelta(const std::string& fullname, int n = 0);
+    TH1* getDelta(const std::string& fullname, int n = 0, bool only_updated = true);
 
     /**
      * Get Delta histogram.
      * @param dirname directory
      * @param histname name of histogram
      * @param n index of delta histogram, 0 is most recent one
+     * @param only_updated req only updated deltas, return nullptr otherwise
      * @return delta histogram or nullptr
      */
-    TH1* getDelta(const std::string& dirname, const std::string& histname, int n = 0);
+    TH1* getDelta(const std::string& dirname, const std::string& histname, int n = 0, bool only_updated = true);
 
     /**
      * Add Delta histogram parameters.

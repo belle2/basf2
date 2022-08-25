@@ -46,13 +46,15 @@ void DQMHistAnalysisModule::addHist(const std::string& dirname, const std::strin
   } else {
     fullname = histname;
   }
-  g_hist.insert(HistList::value_type(fullname, h));
+  g_hist[fullname].update(h);
 
-  // check if delta histogram update needed
-  auto it = g_delta.find(fullname);
-  if (it != g_delta.end()) {
-    B2INFO("Found Delta" << fullname);
-    it->second->update(h); // update
+  if (g_hist[fullname].isUpdated()) {
+    // only if histogram changed, check if delta histogram update needed
+    auto it = g_delta.find(fullname);
+    if (it != g_delta.end()) {
+      B2DEBUG(20, "Found Delta" << fullname);
+      it->second->update(h); // update
+    }
   }
 }
 
@@ -67,7 +69,7 @@ void DQMHistAnalysisModule::addDeltaPar(const std::string& dirname, const std::s
   g_delta[fullname] = new HistDelta(t, p, a);
 }
 
-TH1* DQMHistAnalysisModule::getDelta(const std::string& dirname, const std::string& histname, int n)
+TH1* DQMHistAnalysisModule::getDelta(const std::string& dirname, const std::string& histname, int n, bool updated)
 {
   std::string fullname;
   if (dirname.size() > 0) {
@@ -75,14 +77,14 @@ TH1* DQMHistAnalysisModule::getDelta(const std::string& dirname, const std::stri
   } else {
     fullname = histname;
   }
-  return getDelta(fullname, n);
+  return getDelta(fullname, n, updated);
 }
 
-TH1* DQMHistAnalysisModule::getDelta(const std::string& fullname, int n)
+TH1* DQMHistAnalysisModule::getDelta(const std::string& fullname, int n, bool updated)
 {
   auto it = g_delta.find(fullname);
   if (it != g_delta.end()) {
-    return it->second->getDelta(n);
+    return it->second->getDelta(n, updated);
   }
   return nullptr;
 }
@@ -117,11 +119,12 @@ TCanvas* DQMHistAnalysisModule::findCanvas(TString canvas_name)
   return nullptr;
 }
 
-TH1* DQMHistAnalysisModule::findHist(const std::string& histname)
+TH1* DQMHistAnalysisModule::findHist(const std::string& histname, bool was_updated)
 {
   if (g_hist.find(histname) != g_hist.end()) {
-    if (g_hist[histname]) {
-      return g_hist[histname];
+    if (was_updated && !g_hist[histname].isUpdated()) return nullptr;
+    if (g_hist[histname].getHist()) {
+      return g_hist[histname].getHist();
     } else {
       B2ERROR("Histogram " << histname << " in histogram list but nullptr.");
     }
@@ -130,12 +133,12 @@ TH1* DQMHistAnalysisModule::findHist(const std::string& histname)
   return nullptr;
 }
 
-TH1* DQMHistAnalysisModule::findHist(const std::string& dirname, const std::string& histname)
+TH1* DQMHistAnalysisModule::findHist(const std::string& dirname, const std::string& histname, bool updated)
 {
   if (dirname.size() > 0) {
-    return findHist(dirname + "/" + histname);
+    return findHist(dirname + "/" + histname, updated);
   }
-  return findHist(histname);
+  return findHist(histname, updated);
 }
 
 TH1* DQMHistAnalysisModule::findHistInCanvas(const std::string& histo_name)
@@ -202,3 +205,17 @@ std::vector <std::string> DQMHistAnalysisModule::StringSplit(const std::string& 
   return out;
 }
 
+void DQMHistAnalysisModule::initHistListBeforeEvent(void)
+{
+  for (auto h : g_hist) {
+    h.second.resetBeforeEvent();
+  }
+  for (auto d : g_delta) {
+    d.second->set_notUpdated();
+  }
+}
+
+void DQMHistAnalysisModule::clearHistList(void)
+{
+  g_hist.clear();
+}

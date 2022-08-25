@@ -235,9 +235,9 @@ HitLevelInfoWriterModule::fillTrack(const TrackFitResult* fitResult)
   }
 
   ROOT::Math::XYZVector trackPos = fitResult->getPosition();
-  m_vx0 = trackPos.x();
-  m_vy0 = trackPos.y();
-  m_vz0 = trackPos.z();
+  m_vx0 = trackPos.X();
+  m_vy0 = trackPos.Y();
+  m_vz0 = trackPos.Z();
 
   m_d0 = fitResult->getD0();
   m_z0 = fitResult->getZ0();

@@ -230,9 +230,9 @@ namespace Belle2 {
         return result;
 
       result = 0.0;
-      result += TMath::Power(part->getPx() - mcp->getMomentum().x(), 2.0) / part->getMomentumVertexErrorMatrix()(0, 0);
-      result += TMath::Power(part->getPy() - mcp->getMomentum().y(), 2.0) / part->getMomentumVertexErrorMatrix()(1, 1);
-      result += TMath::Power(part->getPz() - mcp->getMomentum().z(), 2.0) / part->getMomentumVertexErrorMatrix()(2, 2);
+      result += TMath::Power(part->getPx() - mcp->getMomentum().X(), 2.0) / part->getMomentumVertexErrorMatrix()(0, 0);
+      result += TMath::Power(part->getPy() - mcp->getMomentum().Y(), 2.0) / part->getMomentumVertexErrorMatrix()(1, 1);
+      result += TMath::Power(part->getPz() - mcp->getMomentum().Z(), 2.0) / part->getMomentumVertexErrorMatrix()(2, 2);
 
       return result;
     }
@@ -405,7 +405,7 @@ namespace Belle2 {
       ROOT::Math::XYZVector curvature = - Bfield * Const::speedOfLight * particle->getCharge(); //Curvature of the track
       double T = TMath::Sqrt(mom.Perp2() - 2.0 * curvature.Dot(r.Cross(mom)) + curvature.Mag2() * r.Perp2());
 
-      return TMath::Abs((-2 * r.Cross(mom).z() + curvature.R() * r.Perp2()) / (T + mom.Rho()));
+      return TMath::Abs((-2 * r.Cross(mom).Z() + curvature.R() * r.Perp2()) / (T + mom.Rho()));
     }
 
     double ArmenterosLongitudinalMomentumAsymmetry(const Particle* part)

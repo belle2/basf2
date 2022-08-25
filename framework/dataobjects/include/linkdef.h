@@ -79,7 +79,7 @@
   code="{for (const auto& [key, value] : onfile.m_pointSets) {                \
            std::vector<ROOT::Math::XYZVector> tmp;                            \
            for (const auto& vec : value)                                      \
-             tmp.push_back(ROOT::Math::XYZVector(vec.x(), vec.y(), vec.z())); \
+             tmp.push_back(ROOT::Math::XYZVector(vec.X(), vec.Y(), vec.Z())); \
            m_pointSets[key] = tmp;                                            \
          }                                                                    \
         }"                                                                    \

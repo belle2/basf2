@@ -78,7 +78,7 @@ std::string HTML::getString(const ROOT::Math::XYZVector& vec, int precision)
   std::stringstream stream;
   stream.precision(precision);
 
-  stream << std::fixed << "(" << vec.x() << ", " <<  vec.y() << ", " <<  vec.z() << ")";
+  stream << std::fixed << "(" << vec.X() << ", " <<  vec.Y() << ", " <<  vec.Z() << ")";
   return stream.str();
 }
 
@@ -92,8 +92,8 @@ std::string HTML::getStringConvertToUnit(const ROOT::Math::XYZVector& vec, int p
     displayedUnitType = "\x0b5m";
 
 
-  stream << std::fixed << "(" << Unit::convertValueToUnit(vec.x(), unitType) << ", "
-         <<  Unit::convertValueToUnit(vec.y(), unitType) << ", " <<  Unit::convertValueToUnit(vec.z(), unitType)
+  stream << std::fixed << "(" << Unit::convertValueToUnit(vec.X(), unitType) << ", "
+         <<  Unit::convertValueToUnit(vec.Y(), unitType) << ", " <<  Unit::convertValueToUnit(vec.Z(), unitType)
          << ") " << displayedUnitType;
 
 

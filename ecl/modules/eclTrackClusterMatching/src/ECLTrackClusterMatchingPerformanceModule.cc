@@ -136,9 +136,9 @@ void ECLTrackClusterMatchingPerformanceModule::event()
       m_trackProperties.phi_gen = mcParticle.getMomentum().Phi();
       m_trackProperties.ptot_gen = mcParticle.getMomentum().R();
       m_trackProperties.pt_gen = mcParticle.getMomentum().Rho();
-      m_trackProperties.px_gen = mcParticle.getMomentum().x();
-      m_trackProperties.py_gen = mcParticle.getMomentum().y();
-      m_trackProperties.pz_gen = mcParticle.getMomentum().z();
+      m_trackProperties.px_gen = mcParticle.getMomentum().X();
+      m_trackProperties.py_gen = mcParticle.getMomentum().Y();
+      m_trackProperties.pz_gen = mcParticle.getMomentum().Z();
       m_trackProperties.x_gen = mcParticle.getVertex().X();
       m_trackProperties.y_gen = mcParticle.getVertex().Y();
       m_trackProperties.z_gen = mcParticle.getVertex().Z();
@@ -167,9 +167,9 @@ void ECLTrackClusterMatchingPerformanceModule::event()
         m_trackProperties.phi = mom.Phi();
         m_trackProperties.ptot = mom.R();
         m_trackProperties.pt = mom.Rho();
-        m_trackProperties.px = mom.x();
-        m_trackProperties.py = mom.y();
-        m_trackProperties.pz = mom.z();
+        m_trackProperties.px = mom.X();
+        m_trackProperties.py = mom.Y();
+        m_trackProperties.pz = mom.Z();
         m_trackProperties.x = fitResult->getPosition().X();
         m_trackProperties.y = fitResult->getPosition().Y();
         m_trackProperties.z = fitResult->getPosition().Z();

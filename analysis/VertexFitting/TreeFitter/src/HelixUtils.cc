@@ -155,12 +155,12 @@ namespace TreeFitter {
     for (int jin = 0; jin < 6; ++jin) {
       postmp.SetCoordinates(positionAndMom(0), positionAndMom(1), positionAndMom(2));
       momtmp.SetCoordinates(positionAndMom(3), positionAndMom(4), positionAndMom(5));
-      if (jin == 0) postmp.SetX(postmp.x() + delta);
-      if (jin == 1) postmp.SetY(postmp.y() + delta);
-      if (jin == 2) postmp.SetZ(postmp.z() + delta);
-      if (jin == 3) momtmp.SetX(momtmp.x() + delta);
-      if (jin == 4) momtmp.SetY(momtmp.y() + delta);
-      if (jin == 5) momtmp.SetZ(momtmp.z() + delta);
+      if (jin == 0) postmp.SetX(postmp.X() + delta);
+      if (jin == 1) postmp.SetY(postmp.Y() + delta);
+      if (jin == 2) postmp.SetZ(postmp.Z() + delta);
+      if (jin == 3) momtmp.SetX(momtmp.X() + delta);
+      if (jin == 4) momtmp.SetY(momtmp.Y() + delta);
+      if (jin == 5) momtmp.SetZ(momtmp.Z() + delta);
 
       helixPlusDelta = Belle2::Helix(postmp, momtmp, charge, Bz);
       jacobian(iD0, jin)        = (helixPlusDelta.getD0()        - helix.getD0())        / delta ;
@@ -190,12 +190,12 @@ namespace TreeFitter {
     for (int jin = 0; jin < 6; ++jin) {
       postmp.SetCoordinates(positionAndMom(0), positionAndMom(1), positionAndMom(2));
       momtmp.SetCoordinates(positionAndMom(3), positionAndMom(4), positionAndMom(5));
-      if (jin == 0) postmp.SetX(postmp.x() + delta);
-      if (jin == 1) postmp.SetY(postmp.y() + delta);
-      if (jin == 2) postmp.SetZ(postmp.z() + delta);
-      if (jin == 3) momtmp.SetX(momtmp.x() + delta);
-      if (jin == 4) momtmp.SetY(momtmp.y() + delta);
-      if (jin == 5) momtmp.SetZ(momtmp.z() + delta);
+      if (jin == 0) postmp.SetX(postmp.X() + delta);
+      if (jin == 1) postmp.SetY(postmp.Y() + delta);
+      if (jin == 2) postmp.SetZ(postmp.Z() + delta);
+      if (jin == 3) momtmp.SetX(momtmp.X() + delta);
+      if (jin == 4) momtmp.SetY(momtmp.Y() + delta);
+      if (jin == 5) momtmp.SetZ(momtmp.Z() + delta);
 
       helixPlusDelta = Belle2::Helix(postmp, momtmp, charge, Bz);
       jacobian(iD0, jin)        = (helixPlusDelta.getD0()        - helix.getD0())        / delta ;
@@ -360,13 +360,13 @@ namespace TreeFitter {
     for (int n = 1 - ncirc; n <= 1 + ncirc ; ++n) {
       double l = (dphi + n * TMath::TwoPi()) / omega ;
       double tmpz = (z0 + l * tandip) ;
-      if (first || fabs(tmpz - point.z()) < fabs(z - point.z())) {
+      if (first || fabs(tmpz - point.Z()) < fabs(z - point.Z())) {
         first = false ;
         z = tmpz ;
         flt = l / cosdip ;
       }
     }
-    return sqrt(sqr(x - point.x()) + sqr(y - point.y()) + sqr(z - point.z())) ;
+    return sqrt(sqr(x - point.X()) + sqr(y - point.Y()) + sqr(z - point.Z())) ;
   }
 
   void HelixUtils::getJacobianToCartesianFrameworkHelix(Eigen::Matrix<double, 5, 6>& jacobian,

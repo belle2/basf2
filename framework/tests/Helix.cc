@@ -129,11 +129,11 @@ namespace {
       // Generate a random put orthogonal pair of vectors in the r-phi plane
       ROOT::Math::XYVector d(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
       ROOT::Math::XYVector pt(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
-      d.SetCoordinates(d.X(), -d.X() * pt.x() / pt.y());
+      d.SetCoordinates(d.X(), -d.X() * pt.X() / pt.Y());
 
       // Add a random z component
       ROOT::Math::XYZVector position(d.X(), d.Y(), generator.Uniform(-1, 1));
-      ROOT::Math::XYZVector momentum(pt.x(), pt.y(), generator.Uniform(-1, 1));
+      ROOT::Math::XYZVector momentum(pt.X(), pt.Y(), generator.Uniform(-1, 1));
 
       // Set up class for testing
       Helix helix(position, momentum, charge, bField);

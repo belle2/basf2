@@ -82,9 +82,9 @@ void ECLMatchingPerformanceExpertModule::event()
       m_trackProperties.phi = mom.Phi();
       m_trackProperties.ptot = mom.R();
       m_trackProperties.pt = mom.Rho();
-      m_trackProperties.px = mom.x();
-      m_trackProperties.py = mom.y();
-      m_trackProperties.pz = mom.z();
+      m_trackProperties.px = mom.X();
+      m_trackProperties.py = mom.Y();
+      m_trackProperties.pz = mom.Z();
       m_trackProperties.x = fitResult->getPosition().X();
       m_trackProperties.y = fitResult->getPosition().Y();
       m_trackProperties.z = fitResult->getPosition().Z();

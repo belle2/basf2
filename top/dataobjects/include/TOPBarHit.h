@@ -56,20 +56,20 @@ namespace Belle2 {
     {
       m_moduleID = moduleID;
       m_pdg = PDG;
-      m_x0 = (float) origin.x();
-      m_y0 = (float) origin.y();
-      m_z0 = (float) origin.z();
-      m_x = (float) impact.x();
-      m_y = (float) impact.y();
-      m_z = (float) impact.z();
-      m_px = (float) momentum.x();
-      m_py = (float) momentum.y();
-      m_pz = (float) momentum.z();
+      m_x0 = (float) origin.X();
+      m_y0 = (float) origin.Y();
+      m_z0 = (float) origin.Z();
+      m_x = (float) impact.X();
+      m_y = (float) impact.Y();
+      m_z = (float) impact.Z();
+      m_px = (float) momentum.X();
+      m_py = (float) momentum.Y();
+      m_pz = (float) momentum.Z();
       m_time = (float) time;
       m_length = (float) length;
-      m_xloc = (float) impactLoc.x();
-      m_yloc = (float) impactLoc.y();
-      m_zloc = (float) impactLoc.z();
+      m_xloc = (float) impactLoc.X();
+      m_yloc = (float) impactLoc.Y();
+      m_zloc = (float) impactLoc.Z();
       m_theta = (float) theta;
       m_phi = (float) phi;
     }

@@ -522,8 +522,8 @@ namespace Belle2 {
      */
     [[nodiscard]] bool inRange(const ROOT::Math::XYZVector& v) const
     {
-      if (std::abs(v.z()) > m_zmax) return false;
-      double R2 = v.x() * v.x() + v.y() * v.y();
+      if (std::abs(v.Z()) > m_zmax) return false;
+      double R2 = v.X() * v.X() + v.Y() * v.Y();
       if (R2 > m_rmax * m_rmax) return false;
       return true;
     }
@@ -540,15 +540,15 @@ namespace Belle2 {
     [[nodiscard]] ROOT::Math::XYZVector interpolateField(const ROOT::Math::XYZVector& v) const
     {
       ROOT::Math::XYZVector res = {0, 0, 0};
-      double R2 = v.x() * v.x() + v.y() * v.y();
+      double R2 = v.X() * v.X() + v.Y() * v.Y();
       if (R2 > m_rmax * m_rmax) return res;
       double wz1;
-      int iz = zIndexAndWeight(v.z(), wz1);
+      int iz = zIndexAndWeight(v.Z(), wz1);
       if (iz < 0) return res;
       double wz0 = 1 - wz1;
 
       if (R2 < m_rj2) { // triangular interpolation
-        xy_t xy = {v.x(), std::abs(v.y())};
+        xy_t xy = {v.X(), std::abs(v.Y())};
         double w0, w1, w2;
         short int it = m_triInterpol.findTriangle(xy);
         m_triInterpol.weights(it, xy, w0, w1, w2);
@@ -560,7 +560,7 @@ namespace Belle2 {
         b += (B[j0] * w0 + B[j1] * w1 + B[j2] * w2) * wz1;
         res = b;
       } else {// r-phi grid
-        double r = sqrt(R2), phi = atan2(std::abs(v.y()), v.x());
+        double r = sqrt(R2), phi = atan2(std::abs(v.Y()), v.X());
         double fr = (r - m_rj) * m_idr;
         double fphi = phi * m_idphi;
 
@@ -585,7 +585,7 @@ namespace Belle2 {
         b += (B[j00] * w00 + B[j01] * w01 + B[j10] * w10 + B[j11] * w11) * wz1;
         res = b;
       }
-      if (v.y() < 0) res.SetY(-res.y());
+      if (v.Y() < 0) res.SetY(-res.Y());
       return res;
     }
   protected:
@@ -648,9 +648,9 @@ namespace Belle2 {
     if (!m_ler || !m_her) return false;
     double s = m_sinBeamCrossAngle, c = m_cosBeamCrossAngle;
     ROOT::Math::XYZVector v = -p; // invert coordinates to match ANSYS one
-    double xc = v.x() * c, zs = v.z() * s, zc = v.z() * c, xs = v.x() * s;
-    ROOT::Math::XYZVector hv{xc - zs, v.y(), zc + xs};
-    ROOT::Math::XYZVector lv{xc + zs, v.y(), zc - xs};
+    double xc = v.X() * c, zs = v.Z() * s, zc = v.Z() * c, xs = v.X() * s;
+    ROOT::Math::XYZVector hv{xc - zs, v.Y(), zc + xs};
+    ROOT::Math::XYZVector lv{xc + zs, v.Y(), zc - xs};
     return m_ler->inRange(lv) || m_her->inRange(hv);
   }
 
@@ -659,16 +659,16 @@ namespace Belle2 {
     ROOT::Math::XYZVector res;
     double s = m_sinBeamCrossAngle, c = m_cosBeamCrossAngle;
     ROOT::Math::XYZVector v = -p; // invert coordinates to match ANSYS one
-    double xc = v.x() * c, zs = v.z() * s, zc = v.z() * c, xs = v.x() * s;
-    ROOT::Math::XYZVector hv{xc - zs, v.y(), zc + xs};
-    ROOT::Math::XYZVector lv{xc + zs, v.y(), zc - xs};
+    double xc = v.X() * c, zs = v.Z() * s, zc = v.Z() * c, xs = v.X() * s;
+    ROOT::Math::XYZVector hv{xc - zs, v.Y(), zc + xs};
+    ROOT::Math::XYZVector lv{xc + zs, v.Y(), zc - xs};
     ROOT::Math::XYZVector hb = m_her->interpolateField(hv);
     ROOT::Math::XYZVector lb = m_ler->interpolateField(lv);
-    ROOT::Math::XYZVector rhb{hb.x()* c + hb.z()* s, hb.y(),  hb.z()* c - hb.x()* s};
-    ROOT::Math::XYZVector rlb{lb.x()* c - lb.z()* s, lb.y(),  lb.z()* c + lb.x()* s};
+    ROOT::Math::XYZVector rhb{hb.X()* c + hb.Z()* s, hb.Y(),  hb.Z()* c - hb.X()* s};
+    ROOT::Math::XYZVector rlb{lb.X()* c - lb.Z()* s, lb.Y(),  lb.Z()* c + lb.X()* s};
 
-    double mhb = std::abs(rhb.x()) + std::abs(rhb.y()) + std::abs(rhb.z());
-    double mlb = std::abs(rlb.x()) + std::abs(rlb.y()) + std::abs(rlb.z());
+    double mhb = std::abs(rhb.X()) + std::abs(rhb.Y()) + std::abs(rhb.Z());
+    double mlb = std::abs(rlb.X()) + std::abs(rlb.Y()) + std::abs(rlb.Z());
 
     if (mhb < 1e-10) res = rlb;
     else if (mlb < 1e-10) res = rhb;

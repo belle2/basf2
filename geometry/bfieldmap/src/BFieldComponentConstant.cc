@@ -14,7 +14,7 @@ using namespace Belle2;
 ROOT::Math::XYZVector BFieldComponentConstant::calculate(const ROOT::Math::XYZVector& point) const
 {
   if ((maxRadius4BField > 0.0 && maxRadius4BField < point.Rho()) ||
-      (point.z() < minZ4BField  || point.z() > maxZ4BField)) return ROOT::Math::XYZVector(0, 0, 0);
+      (point.Z() < minZ4BField  || point.Z() > maxZ4BField)) return ROOT::Math::XYZVector(0, 0, 0);
   return ROOT::Math::XYZVector(m_magneticField[0], m_magneticField[1], m_magneticField[2]);
 }
 

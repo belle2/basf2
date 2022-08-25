@@ -382,7 +382,7 @@ pair<ROOT::Math::XYZVector, TMatrixDSym> TagVertexModule::findConstraint(const P
 
   // Get expected pBtag 4-momentum using transverse-momentum conservation
   ROOT::Math::XYZVector BvertDiff = pmag * (Breco->getVertex() - BRecoRes->getVertex()).Unit();
-  ROOT::Math::PxPyPzMVector pBrecEstimate(BvertDiff.x(), BvertDiff.y(), BvertDiff.z(), Breco->getPDGMass());
+  ROOT::Math::PxPyPzMVector pBrecEstimate(BvertDiff.X(), BvertDiff.Y(), BvertDiff.Z(), Breco->getPDGMass());
   ROOT::Math::PxPyPzMVector pBtagEstimate = PCmsLabTransform::labToCms(pBrecEstimate);
   pBtagEstimate.SetPxPyPzE(-pBtagEstimate.px(), -pBtagEstimate.py(), -pBtagEstimate.pz(), pBtagEstimate.E());
   pBtagEstimate = PCmsLabTransform::cmsToLab(pBtagEstimate);
@@ -442,8 +442,8 @@ pair<ROOT::Math::XYZVector, TMatrixDSym> TagVertexModule::findConstraintBTube(co
     B2DEBUG(10, "Brec decay vertex after fit: " << printVector(tubecreatorBCopy->getVertex()));
     B2DEBUG(10, "Brec direction before fit: " << printVector(float(1. / Breco->getP()) * Breco->getMomentum()));
     B2DEBUG(10, "Brec direction after fit: " << printVector(float(1. / tubecreatorBCopy->getP()) * tubecreatorBCopy->getMomentum()));
-    B2DEBUG(10, "IP position: " << printVector(ROOT::Math::XYZVector(m_BeamSpotCenter.x(), m_BeamSpotCenter.y(),
-                                               m_BeamSpotCenter.z())));
+    B2DEBUG(10, "IP position: " << printVector(ROOT::Math::XYZVector(m_BeamSpotCenter.X(), m_BeamSpotCenter.Y(),
+                                               m_BeamSpotCenter.Z())));
     B2DEBUG(10, "IP covariance: " << printMatrix(m_BeamSpotCov));
     B2DEBUG(10, "Brec primary vertex: " << printVector(tubecreatorBCopy->getVertex()));
     B2DEBUG(10, "Brec PV covariance: " << printMatrix(pv));
@@ -1008,7 +1008,7 @@ std::string TagVertexModule::printVector(const ROOT::Math::XYZVector& vec)
 {
   std::ostringstream oss;
   int w = 14;
-  oss << "(" << std::setw(w) << vec.x() << ", " << std::setw(w) << vec.y() << ", " << std::setw(w) << vec.z() << ")" << std::endl;
+  oss << "(" << std::setw(w) << vec.X() << ", " << std::setw(w) << vec.Y() << ", " << std::setw(w) << vec.Z() << ")" << std::endl;
   return oss.str();
 }
 

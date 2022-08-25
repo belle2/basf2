@@ -94,7 +94,7 @@ class DBInterface(unittest.TestCase):
         # try looping over this and keep track about the number of elements
         for i, e in enumerate(bplist):
             # make sure the vertex is what we put in
-            self.assertEqual(int(e.getVertex().x()), i)
+            self.assertEqual(int(e.getVertex().X()), i)
             # and that it's in general equal to the original one
             self.assertEqual(e, override_array[i])
             # and itself :D

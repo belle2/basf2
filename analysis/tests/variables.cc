@@ -344,11 +344,11 @@ namespace {
     // Generate a random put orthogonal pair of vectors in the r-phi plane
     ROOT::Math::Cartesian2D d(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
     ROOT::Math::Cartesian2D pt(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
-    d.SetXY(d.X(), -(d.X()*pt.x()) / pt.y());
+    d.SetXY(d.X(), -(d.X()*pt.X()) / pt.Y());
 
     // Add a random z component
     ROOT::Math::XYZVector position(d.X(), d.Y(), generator.Uniform(-1, 1));
-    ROOT::Math::XYZVector momentum(pt.x(), pt.y(), generator.Uniform(-1, 1));
+    ROOT::Math::XYZVector momentum(pt.X(), pt.Y(), generator.Uniform(-1, 1));
 
     auto CDCValue = static_cast<unsigned long long int>(0x300000000000000);
 
@@ -384,7 +384,7 @@ namespace {
     Track* savedTrack2 = myTracks.appendNew(secondTrack);
     myParticles.appendNew(savedTrack2, Const::ChargedStable(11));
     myV0s.appendNew(V0(std::pair(savedTrack, myResults[0]), std::pair(savedTrack2, myResults[1])));
-    const PxPyPzEVector v0Momentum(2 * momentum.x(), 2 * momentum.y(), 2 * momentum.z(), (momentum * 2).R());
+    const PxPyPzEVector v0Momentum(2 * momentum.X(), 2 * momentum.Y(), 2 * momentum.Z(), (momentum * 2).R());
     auto v0particle = myParticles.appendNew(v0Momentum, 22,
                                             Particle::c_Unflavored, Particle::c_V0, 0);
     v0particle->appendDaughter(0, false);
@@ -4201,10 +4201,10 @@ namespace {
     // Generate a random put orthogonal pair of vectors in the r-phi plane
     ROOT::Math::Cartesian2D d(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
     ROOT::Math::Cartesian2D pt(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
-    d.SetXY(d.X(), -(d.X()*pt.x()) / pt.y());
+    d.SetXY(d.X(), -(d.X()*pt.X()) / pt.Y());
     // Add a random z component
     ROOT::Math::XYZVector position(d.X(), d.Y(), generator.Uniform(-1, 1));
-    ROOT::Math::XYZVector momentum(pt.x(), pt.y(), generator.Uniform(-1, 1));
+    ROOT::Math::XYZVector momentum(pt.X(), pt.Y(), generator.Uniform(-1, 1));
 
     auto CDCValue = static_cast<unsigned long long int>(0x300000000000000);
     tfrs.appendNew(position, momentum, cov6, charge, Const::electron, pValue, bField, CDCValue, 16777215, 0);
@@ -4453,10 +4453,10 @@ namespace {
     // Generate a random put orthogonal pair of vectors in the r-phi plane
     ROOT::Math::Cartesian2D d(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
     ROOT::Math::Cartesian2D pt(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
-    d.SetXY(d.X(), -(d.X()*pt.x()) / pt.y());
+    d.SetXY(d.X(), -(d.X()*pt.X()) / pt.Y());
     // Add a random z component
     ROOT::Math::XYZVector position(d.X(), d.Y(), generator.Uniform(-1, 1));
-    ROOT::Math::XYZVector momentum(pt.x(), pt.y(), generator.Uniform(-1, 1));
+    ROOT::Math::XYZVector momentum(pt.X(), pt.Y(), generator.Uniform(-1, 1));
 
     auto CDCValue = static_cast<unsigned long long int>(0x300000000000000);
     tfrs.appendNew(position, momentum, cov6, charge, Const::electron, pValue, bField, CDCValue, 16777215, 0);

@@ -206,9 +206,9 @@ namespace Belle2 {
     const ROOT::Math::XYZVector& mean, const TMatrixTBase<value_type>& cov)
   {
     TVectorT<value_type> tmean(3);
-    tmean[0] = mean.x();
-    tmean[1] = mean.y();
-    tmean[2] = mean.z();
+    tmean[0] = mean.X();
+    tmean[1] = mean.Y();
+    tmean[2] = mean.Z();
     return setMeanCov(tmean, cov);
   }
 }

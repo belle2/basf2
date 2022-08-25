@@ -97,12 +97,12 @@ namespace {
     for (int jin = 0; jin < 6; ++jin) {
       postmp.SetCoordinates(positionAndMom_(0), positionAndMom_(1), positionAndMom_(2));
       momtmp.SetCoordinates(positionAndMom_(3), positionAndMom_(4), positionAndMom_(5));
-      if (jin == 0) postmp.SetX(postmp.x() + delta);
-      if (jin == 1) postmp.SetY(postmp.y() + delta);
-      if (jin == 2) postmp.SetZ(postmp.z() + delta);
-      if (jin == 3) momtmp.SetX(momtmp.x() + delta);
-      if (jin == 4) momtmp.SetY(momtmp.y() + delta);
-      if (jin == 5) momtmp.SetZ(momtmp.z() + delta);
+      if (jin == 0) postmp.SetX(postmp.X() + delta);
+      if (jin == 1) postmp.SetY(postmp.Y() + delta);
+      if (jin == 2) postmp.SetZ(postmp.Z() + delta);
+      if (jin == 3) momtmp.SetX(momtmp.X() + delta);
+      if (jin == 4) momtmp.SetY(momtmp.Y() + delta);
+      if (jin == 5) momtmp.SetZ(momtmp.Z() + delta);
 
       Belle2::Helix helixPlusDelta(postmp, momtmp, charge, bfield);
 

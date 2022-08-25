@@ -425,10 +425,10 @@ void CDCDedxPIDModule::event()
         if (phidiff > -3.1416 && (phidiff < 0 || phidiff > 3.1416)) doca *= -1;
 
         // The opening angle of the track momentum direction
-        const double px = pocaMom.x();
-        const double py = pocaMom.y();
-        const double wx = pocaOnWire.x();
-        const double wy = pocaOnWire.y();
+        const double px = pocaMom.X();
+        const double py = pocaMom.Y();
+        const double wx = pocaOnWire.X();
+        const double wy = pocaOnWire.Y();
         const double cross = wx * py - wy * px;
         const double dot   = wx * px + wy * py;
         double entAng = atan2(cross, dot);

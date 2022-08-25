@@ -68,7 +68,7 @@ namespace Belle2 {
 #if defined(MCP_DBL_CMP) || defined(MCP_VEC3_CMP) || defined(MCP_VEC4_CMP)
 #error Macro already defined, cannot continue
 #endif
-#define MCP_DBL_CMP(a,b,x) ((a.x()==b.x())||(std::abs(a.x()-b.x())<1e-10))
+#define MCP_DBL_CMP(a,b,x) ((a.X()==b.X())||(std::abs(a.X()-b.X())<1e-10))
 #define MCP_VEC3_CMP(a,b) (MCP_DBL_CMP(a,b,X) && MCP_DBL_CMP(a,b,Y) && MCP_DBL_CMP(a,b,Z))
 #define MCP_VEC4_CMP(a,b) (MCP_VEC3_CMP(a,b) && MCP_DBL_CMP(a,b,E))
       return MCP_VEC4_CMP(m_her, b.m_her) && MCP_VEC4_CMP(m_ler, b.m_ler) && MCP_VEC3_CMP(m_vertex, b.m_vertex)

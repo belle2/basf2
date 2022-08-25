@@ -119,7 +119,7 @@ namespace Belle2 {
     ROOT::Math::PxPyPzEVector get4Momentum() const
     {
       const ROOT::Math::XYZVector momentum = getMomentum();
-      return ROOT::Math::PxPyPzEVector(momentum.x(), momentum.y(), momentum.z(), getEnergy());
+      return ROOT::Math::PxPyPzEVector(momentum.X(), momentum.Y(), momentum.Z(), getEnergy());
     }
 
     /** Getter for the Energy at the closest approach of the track in the r/phi projection.

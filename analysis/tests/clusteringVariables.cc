@@ -82,9 +82,9 @@ namespace {
         int charge = (i % 2 == 0) ? +1 : -1;
         ROOT::Math::Cartesian2D d(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
         ROOT::Math::Cartesian2D pt(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
-        d.SetXY(d.X(), -(d.X()*pt.x()) / pt.y());
+        d.SetXY(d.X(), -(d.X()*pt.X()) / pt.Y());
         ROOT::Math::XYZVector position(d.X(), d.Y(), generator.Uniform(-1, 1));
-        ROOT::Math::XYZVector momentum(pt.x(), pt.y(), generator.Uniform(-1, 1));
+        ROOT::Math::XYZVector momentum(pt.X(), pt.Y(), generator.Uniform(-1, 1));
         trackFits.appendNew(position, momentum, cov6, charge, Const::pion, 0.5, 1.5, CDCValue, 16777215, 0);
         tracks[i]->setTrackFitResultIndex(Const::pion, i);
       }
@@ -689,9 +689,9 @@ namespace {
       int charge = (i % 2 == 0) ? +1 : -1;
       ROOT::Math::Cartesian2D d(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
       ROOT::Math::Cartesian2D pt(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
-      d.SetXY(d.X(), -(d.X()*pt.x()) / pt.y());
+      d.SetXY(d.X(), -(d.X()*pt.X()) / pt.Y());
       ROOT::Math::XYZVector position(d.X(), d.Y(), generator.Uniform(-1, 1));
-      ROOT::Math::XYZVector momentum(pt.x(), pt.y(), generator.Uniform(-1, 1));
+      ROOT::Math::XYZVector momentum(pt.X(), pt.Y(), generator.Uniform(-1, 1));
       trackFits.appendNew(position, momentum, cov6, charge, Const::muon, 0.5, 1.5, CDCValue, 16777215, 0);
       tracks[i]->setTrackFitResultIndex(Const::muon, i);
     }

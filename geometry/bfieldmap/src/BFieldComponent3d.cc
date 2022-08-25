@@ -94,9 +94,9 @@ void BFieldComponent3d::initialize()
         if (!(r >= m_errRegionR[0] && r < m_errRegionR[1])) { it += m_mapSize[1];  continue;}
         for (int j = 0;  j < m_mapSize[1]; j++) { // phi
           ROOT::Math::XYZVector& B = *it;
-          B.SetX(B.x() * m_errB[0]);
-          B.SetY(B.y() * m_errB[1]);
-          B.SetZ(B.z() * m_errB[2]);
+          B.SetX(B.X() * m_errB[0]);
+          B.SetY(B.Y() * m_errB[1]);
+          B.SetZ(B.Z() * m_errB[2]);
         }
       }
     }
@@ -204,7 +204,7 @@ ROOT::Math::XYZVector BFieldComponent3d::calculate(const ROOT::Math::XYZVector& 
     return B;
   }
 
-  double z = point.z();
+  double z = point.Z();
   // Check if the point lies inside the magnetic field boundaries
   if (z < m_mapRegionZ[0] || z > m_mapRegionZ[1]) return B;
 
@@ -232,18 +232,18 @@ ROOT::Math::XYZVector BFieldComponent3d::calculate(const ROOT::Math::XYZVector& 
     wr -= ir;
 
     // Calculate the lower index of the point in the Phi grid
-    double ay = std::abs(point.y());
+    double ay = std::abs(point.Y());
     double wphi;
-    unsigned int iphi = getPhiIndexWeight(ay, point.x(), wphi);
+    unsigned int iphi = getPhiIndexWeight(ay, point.X(), wphi);
 
     // Get B-field values from map
     ROOT::Math::XYZVector b = interpolate(ir, iphi, iz, wr, wphi, wz); // in cylindrical system
     double norm = 1 / r;
-    double s = ay * norm, c = point.x() * norm;
+    double s = ay * norm, c = point.X() * norm;
     // Flip sign of By if y<0
-    const double sgny = (point.y() >= 0) - (point.y() < 0);
+    const double sgny = (point.Y() >= 0) - (point.Y() < 0);
     // in cartesian system
-    B.SetXYZ(-(b.x() * c - b.y() * s), -sgny * (b.x() * s + b.y() * c), b.z());
+    B.SetXYZ(-(b.X() * c - b.Y() * s), -sgny * (b.X() * s + b.Y() * c), b.Z());
   } else {
     // Get B-field values from map in cartesian system assuming phi=0, so Bx = Br and By = Bphi
     B = interpolate(0, 0, iz, 0, 0, wz);

@@ -49,7 +49,7 @@ ROOT::Math::PxPyPzEVector KLMCluster::getMomentum() const
 {
   ROOT::Math::XYZVector p3(m_globalX, m_globalY, m_globalZ);
   p3 = p3.Unit() * m_p;
-  return ROOT::Math::PxPyPzEVector(p3.x(), p3.y(), p3.z(), getEnergy());
+  return ROOT::Math::PxPyPzEVector(p3.X(), p3.Y(), p3.Z(), getEnergy());
 }
 
 bool KLMCluster::getAssociatedEclClusterFlag() const

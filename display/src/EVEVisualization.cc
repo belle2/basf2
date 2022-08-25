@@ -1090,7 +1090,7 @@ void EVEVisualization::addSimHit(const TVector3& v, const MCParticle* particle)
   MCTrack* track = addMCParticle(particle);
   if (!track)
     return; //hide hits from this particle
-  track->simhits->SetNextPoint(v.x(), v.y(), v.z());
+  track->simhits->SetNextPoint(v.X(), v.Y(), v.Z());
 }
 
 EVEVisualization::MCTrack* EVEVisualization::addMCParticle(const MCParticle* particle)
@@ -1122,8 +1122,8 @@ EVEVisualization::MCTrack* EVEVisualization::addMCParticle(const MCParticle* par
     const int pdg = particle->getPDG();
     TParticle tparticle(pdg, particle->getStatus(),
                         (particle->getMother() ? particle->getMother()->getIndex() : 0), 0, particle->getFirstDaughter(), particle->getLastDaughter(),
-                        p.x(), p.y(), p.z(), particle->getEnergy(),
-                        vertex.x(), vertex.y(), vertex.z(), particle->getProductionTime());
+                        p.X(), p.Y(), p.Z(), particle->getEnergy(),
+                        vertex.X(), vertex.Y(), vertex.Z(), particle->getProductionTime());
     TEveMCTrack mctrack;
     mctrack = tparticle;
     mctrack.fTDecay = particle->getDecayTime();
@@ -1349,7 +1349,7 @@ void EVEVisualization::addVertex(const genfit::GFRaveVertex* vertex)
   //sadly, setting a title for a TEveGeoShape doesn't result in a popup...
   vertexPoint->SetTitle(ObjectInfo::getTitle(vertex));
   vertexPoint->SetMainColor(c_recoHitColor);
-  vertexPoint->SetNextPoint(v.x(), v.y(), v.z());
+  vertexPoint->SetNextPoint(v.X(), v.Y(), v.Z());
 
   TMatrixDSymEigen eigen_values(vertex->getCov());
   TEveGeoShape* det_shape = new TEveGeoShape(ObjectInfo::getInfo(vertex) + " Error");
@@ -1381,7 +1381,7 @@ void EVEVisualization::addVertex(const genfit::GFRaveVertex* vertex)
 
   // rotate and translate -------------------------------------------------------
   TGeoGenTrans det_trans(v(0), v(1), v(2), pseudo_res_0, pseudo_res_1, pseudo_res_2,
-                         &det_rot); //Puts the ellipsoid at the position of the vertex, v(0)=v.x(), operator () overloaded.
+                         &det_rot); //Puts the ellipsoid at the position of the vertex, v(0)=v.X(), operator () overloaded.
   det_shape->SetTransMatrix(det_trans);
   // finished rotating and translating ------------------------------------------
 
@@ -1456,17 +1456,17 @@ void EVEVisualization::addKLMCluster(const KLMCluster* cluster)
     dir.SetMag((layerDistanceCm + layerThicknessCm) / perp.Dot(dir));
   } else {
     //endcap
-    b = TVector3(startPos.x(), startPos.y(), 0).Unit();
+    b = TVector3(startPos.X(), startPos.Y(), 0).Unit();
     a = startPos.Cross(b).Unit();
     double endcapStartZ = 284;
-    if (startPos.z() < 0)
+    if (startPos.Z() < 0)
       endcapStartZ = -189.5;
 
-    double scaleFac = endcapStartZ / startPos.z();
+    double scaleFac = endcapStartZ / startPos.Z();
     startPos.SetMag(startPos.Mag() * scaleFac);
 
     dir = startPos.Unit();
-    dir.SetMag((layerDistanceCm + layerThicknessCm) / fabs(dir.z()));
+    dir.SetMag((layerDistanceCm + layerThicknessCm) / fabs(dir.Z()));
   }
 
   for (int i = 0; i < cluster->getLayers(); i++) {
@@ -1588,7 +1588,7 @@ void EVEVisualization::addRecoHit(const SVDCluster* hit, TEveStraightLineSet* li
     b = sensor.pointToGlobal(TVector3(+0.5 * sensor.getWidth(v), v, 0.0));
   }
 
-  lines->AddLine(a.x(), a.y(), a.z(), b.x(), b.y(), b.z());
+  lines->AddLine(a.X(), a.Y(), a.Z(), b.X(), b.Y(), b.Z());
   m_shownRecohits.insert(hit);
 }
 
@@ -1598,7 +1598,7 @@ void EVEVisualization::addRecoHit(const CDCHit* hit, TEveStraightLineSet* lines)
   const TVector3& wire_pos_f = cdcgeo.wireForwardPosition(WireID(hit->getID()));
   const TVector3& wire_pos_b = cdcgeo.wireBackwardPosition(WireID(hit->getID()));
 
-  lines->AddLine(wire_pos_f.x(), wire_pos_f.y(), wire_pos_f.z(), wire_pos_b.x(), wire_pos_b.y(), wire_pos_b.z());
+  lines->AddLine(wire_pos_f.X(), wire_pos_f.Y(), wire_pos_f.Z(), wire_pos_b.X(), wire_pos_b.Y(), wire_pos_b.Z());
   m_shownRecohits.insert(hit);
 
 }
@@ -1622,7 +1622,7 @@ void EVEVisualization::addCDCHit(const CDCHit* hit, bool showTriggerHits)
   const TVector3 yaxis = xaxis.Cross(zaxis);
 
   // move to z=0
-  const TVector3 midPoint = wire_pos_f - zaxis * (wire_pos_f.z() / zaxis.z());
+  const TVector3 midPoint = wire_pos_f - zaxis * (wire_pos_f.Z() / zaxis.Z());
 
   cov_shape->SetShape(new TGeoTube(std::max(0., (double)(driftLength - driftLengthRes)), driftLength + driftLengthRes,
                                    lengthOfWireSection));
@@ -1733,18 +1733,18 @@ void EVEVisualization::addCDCTriggerSegmentHit(const std::string& collectionName
           TVector3 pos_f = TVector3(cos(phif) * r, sin(phif) * r, fz);
           TVector3 pos_b = TVector3(cos(phib) * r, sin(phib) * r, bz);
           TVector3 zaxis = pos_b - pos_f;
-          corners[ir][iphi] = pos_f - zaxis * (pos_f.z() / zaxis.z());
+          corners[ir][iphi] = pos_f - zaxis * (pos_f.Z() / zaxis.Z());
         }
       }
 
-      shape->AddLine(corners[0][0].x(), corners[0][0].y(), 0,
-                     corners[0][1].x(), corners[0][1].y(), 0);
-      shape->AddLine(corners[0][1].x(), corners[0][1].y(), 0,
-                     corners[1][1].x(), corners[1][1].y(), 0);
-      shape->AddLine(corners[1][1].x(), corners[1][1].y(), 0,
-                     corners[1][0].x(), corners[1][0].y(), 0);
-      shape->AddLine(corners[1][0].x(), corners[1][0].y(), 0,
-                     corners[0][0].x(), corners[0][0].y(), 0);
+      shape->AddLine(corners[0][0].X(), corners[0][0].Y(), 0,
+                     corners[0][1].X(), corners[0][1].Y(), 0);
+      shape->AddLine(corners[0][1].X(), corners[0][1].Y(), 0,
+                     corners[1][1].X(), corners[1][1].Y(), 0);
+      shape->AddLine(corners[1][1].X(), corners[1][1].Y(), 0,
+                     corners[1][0].X(), corners[1][0].Y(), 0);
+      shape->AddLine(corners[1][0].X(), corners[1][0].Y(), 0,
+                     corners[0][0].X(), corners[0][0].Y(), 0);
     }
   }
 
@@ -1836,7 +1836,7 @@ void EVEVisualization::showUserData(const DisplayData& displayData)
     text->SetTitle(labelPair.first.c_str());
     text->SetMainColor(kGray + 1);
     const ROOT::Math::XYZVector& p = labelPair.second;
-    text->PtrMainTrans()->SetPos(p.x(), p.y(), p.z());
+    text->PtrMainTrans()->SetPos(p.X(), p.Y(), p.Z());
     addToGroup("DisplayData", text);
   }
 
@@ -1846,7 +1846,7 @@ void EVEVisualization::showUserData(const DisplayData& displayData)
     points->SetMarkerStyle(7);
     points->SetMainColor(kGreen);
     for (const auto& p : pointPair.second) {
-      points->SetNextPoint(p.x(), p.y(), p.z());
+      points->SetNextPoint(p.X(), p.Y(), p.Z());
     }
     addToGroup("DisplayData", points);
   }
@@ -1855,7 +1855,7 @@ void EVEVisualization::showUserData(const DisplayData& displayData)
   for (const auto& arrow : displayData.m_arrows) {
     const ROOT::Math::XYZVector pos = arrow.start;
     const ROOT::Math::XYZVector dir = arrow.end - pos;
-    TEveArrow* eveArrow = new TEveArrow(dir.x(), dir.y(), dir.z(), pos.x(), pos.y(), pos.z());
+    TEveArrow* eveArrow = new TEveArrow(dir.X(), dir.Y(), dir.Z(), pos.X(), pos.Y(), pos.Z());
     eveArrow->SetName(arrow.name.c_str());
     eveArrow->SetTitle(arrow.name.c_str());
     int arrowColor = arrow.color;
@@ -1871,21 +1871,21 @@ void EVEVisualization::showUserData(const DisplayData& displayData)
     //place label in middle of arrow, with some slight offset
     // orthogonal direction is arbitrary, set smallest component zero
     ROOT::Math::XYZVector orthogonalDir;
-    if (std::abs(dir.x()) < std::abs(dir.y())) {
-      if (std::abs(dir.x()) < std::abs(dir.z())) {
-        orthogonalDir.SetCoordinates(0, dir.z(), -dir.y());
+    if (std::abs(dir.X()) < std::abs(dir.Y())) {
+      if (std::abs(dir.X()) < std::abs(dir.Z())) {
+        orthogonalDir.SetCoordinates(0, dir.Z(), -dir.Y());
       } else {
-        orthogonalDir.SetCoordinates(dir.y(), -dir.x(), 0);
+        orthogonalDir.SetCoordinates(dir.Y(), -dir.X(), 0);
       }
     } else {
-      if (std::abs(dir.y()) < std::abs(dir.z())) {
-        orthogonalDir.SetCoordinates(-dir.z(), 0, dir.x());
+      if (std::abs(dir.Y()) < std::abs(dir.Z())) {
+        orthogonalDir.SetCoordinates(-dir.Z(), 0, dir.X());
       } else {
-        orthogonalDir.SetCoordinates(dir.y(), -dir.x(), 0);
+        orthogonalDir.SetCoordinates(dir.Y(), -dir.X(), 0);
       }
     }
     const ROOT::Math::XYZVector& labelPos = pos + 0.5 * dir + 0.1 * orthogonalDir;
-    text->PtrMainTrans()->SetPos(labelPos.x(), labelPos.y(), labelPos.z());
+    text->PtrMainTrans()->SetPos(labelPos.X(), labelPos.Y(), labelPos.Z());
     eveArrow->AddElement(text);
     addToGroup("DisplayData", eveArrow);
   }

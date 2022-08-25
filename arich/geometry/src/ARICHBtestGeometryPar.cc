@@ -99,8 +99,8 @@ namespace Belle2 {
   void ARICHBtestGeometryPar::setTrackingShift(const TVector3& v)
   {
     m_trackingShift = v;
-    B2INFO("ARICHBtestGeometryPar::setTrackingShift=" << m_trackingShift.x() << ","  << m_trackingShift.y() << ","  <<
-           m_trackingShift.z());
+    B2INFO("ARICHBtestGeometryPar::setTrackingShift=" << m_trackingShift.X() << ","  << m_trackingShift.Y() << ","  <<
+           m_trackingShift.Z());
 
   }
 
@@ -113,8 +113,8 @@ namespace Belle2 {
   void ARICHBtestGeometryPar::setRotationCenter(const TVector3& v)
   {
     m_rotationCenter = v;
-    B2INFO("ARICHBtestGeometryPar::setRotationCenter=" << m_rotationCenter.x() << ","  << m_rotationCenter.y() << ","  <<
-           m_rotationCenter.z());
+    B2INFO("ARICHBtestGeometryPar::setRotationCenter=" << m_rotationCenter.X() << ","  << m_rotationCenter.Y() << ","  <<
+           m_rotationCenter.Z());
 
   }
 
@@ -160,7 +160,7 @@ namespace Belle2 {
   void ARICHBtestGeometryPar::setOffset(const TVector3& v)
   {
     m_offset = v;
-    B2INFO("ARICHBtestGeometryPar::setOffset=" << m_offset.x() << ","  << m_offset.y() << ","  <<  m_offset.z());
+    B2INFO("ARICHBtestGeometryPar::setOffset=" << m_offset.X() << ","  << m_offset.Y() << ","  <<  m_offset.Z());
 
   }
 

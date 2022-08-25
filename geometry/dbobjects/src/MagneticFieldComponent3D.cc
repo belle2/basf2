@@ -107,7 +107,7 @@ namespace Belle2 {
       return std::make_tuple(index, weight);
     };
 
-    const double z = pos.z();
+    const double z = pos.Z();
     const double r2 = pos.Perp2();
 
     // Calculate the lower index of the point in the Z grid
@@ -121,19 +121,19 @@ namespace Belle2 {
     const auto ir = getIndexWeight(r - m_minR, 0);
 
     // Calculate the lower index of the point in the Phi grid
-    const double ay = std::abs(pos.y());
-    const auto iphi = getIndexWeight(fast_atan2_minimax<4>(ay, pos.x()), 1);
+    const double ay = std::abs(pos.Y());
+    const auto iphi = getIndexWeight(fast_atan2_minimax<4>(ay, pos.X()), 1);
 
     // Get B-field values from map in cylindrical coordinates
     ROOT::Math::XYZVector b = interpolate(get<0>(ir), get<0>(iphi), get<0>(iz), get<1>(ir), get<1>(iphi), get<1>(iz));
     // and convert it to cartesian
     const double norm = 1 / r;
     const double s = ay * norm;
-    const double c = pos.x() * norm;
+    const double c = pos.X() * norm;
     // Flip sign of By if y<0
-    const double sgny = (pos.y() >= 0) - (pos.y() < 0);
+    const double sgny = (pos.Y() >= 0) - (pos.Y() < 0);
     // in cartesian system
-    return ROOT::Math::XYZVector(-(b.x() * c - b.y() * s), -sgny * (b.x() * s + b.y() * c), b.z());
+    return ROOT::Math::XYZVector(-(b.X() * c - b.Y() * s), -sgny * (b.X() * s + b.Y() * c), b.Z());
   }
 
   ROOT::Math::XYZVector MagneticFieldComponent3D::interpolate(unsigned int ir, unsigned int iphi, unsigned int iz,

@@ -380,27 +380,27 @@ void AlignDQMModule::FillHelixParametersAndCorrelations(const TrackFitResult* tf
 
 void AlignDQMModule::FillPositionSensors(TVector3 residual_um, TVector3 position, int sensorIndex)
 {
-  float positionU_mm = position.x() / Unit::mm;
-  float positionV_mm = position.y() / Unit::mm;
+  float positionU_mm = position.X() / Unit::mm;
+  float positionV_mm = position.Y() / Unit::mm;
 
   m_ResMeanPosUVSensCounts[sensorIndex]->Fill(positionU_mm, positionV_mm);
-  m_ResMeanUPosUVSens[sensorIndex]->Fill(positionU_mm, positionV_mm, residual_um.x());
-  m_ResMeanVPosUVSens[sensorIndex]->Fill(positionU_mm, positionV_mm, residual_um.y());
-  m_ResUPosUSens[sensorIndex]->Fill(positionU_mm, residual_um.x());
-  m_ResUPosVSens[sensorIndex]->Fill(positionV_mm, residual_um.x());
-  m_ResVPosUSens[sensorIndex]->Fill(positionU_mm, residual_um.y());
-  m_ResVPosVSens[sensorIndex]->Fill(positionV_mm, residual_um.y());
+  m_ResMeanUPosUVSens[sensorIndex]->Fill(positionU_mm, positionV_mm, residual_um.X());
+  m_ResMeanVPosUVSens[sensorIndex]->Fill(positionU_mm, positionV_mm, residual_um.Y());
+  m_ResUPosUSens[sensorIndex]->Fill(positionU_mm, residual_um.X());
+  m_ResUPosVSens[sensorIndex]->Fill(positionV_mm, residual_um.X());
+  m_ResVPosUSens[sensorIndex]->Fill(positionU_mm, residual_um.Y());
+  m_ResVPosVSens[sensorIndex]->Fill(positionV_mm, residual_um.Y());
 }
 
 void AlignDQMModule::FillLayers(TVector3 residual_um, float phi_deg, float theta_deg, int layerIndex)
 {
   m_ResMeanPhiThetaLayerCounts[layerIndex]->Fill(phi_deg, theta_deg);
-  m_ResMeanUPhiThetaLayer[layerIndex]->Fill(phi_deg, theta_deg, residual_um.x());
-  m_ResMeanVPhiThetaLayer[layerIndex]->Fill(phi_deg, theta_deg, residual_um.y());
-  m_ResUPhiLayer[layerIndex]->Fill(phi_deg, residual_um.x());
-  m_ResVPhiLayer[layerIndex]->Fill(phi_deg, residual_um.y());
-  m_ResUThetaLayer[layerIndex]->Fill(theta_deg, residual_um.x());
-  m_ResVThetaLayer[layerIndex]->Fill(theta_deg, residual_um.y());
+  m_ResMeanUPhiThetaLayer[layerIndex]->Fill(phi_deg, theta_deg, residual_um.X());
+  m_ResMeanVPhiThetaLayer[layerIndex]->Fill(phi_deg, theta_deg, residual_um.Y());
+  m_ResUPhiLayer[layerIndex]->Fill(phi_deg, residual_um.X());
+  m_ResVPhiLayer[layerIndex]->Fill(phi_deg, residual_um.Y());
+  m_ResUThetaLayer[layerIndex]->Fill(theta_deg, residual_um.X());
+  m_ResVThetaLayer[layerIndex]->Fill(theta_deg, residual_um.Y());
 }
 
 TH1F* AlignDQMModule::Create(string name, string title, int nbinsx, double xlow, double xup, string xTitle, string yTitle)

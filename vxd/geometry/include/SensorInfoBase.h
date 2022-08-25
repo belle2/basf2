@@ -236,8 +236,8 @@ namespace Belle2 {
        */
       bool inside(const TVector3& local) const
       {
-        double nw = local.z() / getThickness() + 0.5;
-        return inside(local.x(), local.y()) && 0 <= nw && nw <= 1;
+        double nw = local.Z() / getThickness() + 0.5;
+        return inside(local.X(), local.Y()) && 0 <= nw && nw <= 1;
       }
 
       /** Force a position to be inside the active area
@@ -349,13 +349,13 @@ namespace Belle2 {
 
     inline void SensorInfoBase::forceInside(TVector3& local) const
     {
-      double u = local.x();
-      double v = local.y();
+      double u = local.X();
+      double v = local.Y();
       double thickness = getThickness() / 2.0;
       forceInside(u, v);
       local.SetX(u);
       local.SetY(v);
-      local.SetZ(std::min(thickness, std::max(-thickness, local.z())));
+      local.SetZ(std::min(thickness, std::max(-thickness, local.Z())));
     }
 
     inline TVector3 SensorInfoBase::pointToGlobal(const TVector3& local, bool reco) const

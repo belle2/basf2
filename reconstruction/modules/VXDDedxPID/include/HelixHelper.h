@@ -43,18 +43,18 @@ namespace Belle2 {
       const ROOT::Math::XYZVector& dirInPoca = momentum_in_poca.Unit();
 
       //determine the angle phi, distribute it from -pi to pi
-      m_phi = atan2(dirInPoca.y(), dirInPoca.x());
+      m_phi = atan2(dirInPoca.Y(), dirInPoca.X());
 
       //determine sign of d0
       //calculate the sign of the projection of pt(dirInPoca) at d0(poca)
-      const double d0Sign = TMath::Sign(1., poca.x() * dirInPoca.x()
-                                        + poca.y() * dirInPoca.y());
+      const double d0Sign = TMath::Sign(1., poca.X() * dirInPoca.X()
+                                        + poca.Y() * dirInPoca.Y());
 
       //Now set the helix parameters
       m_d0 = d0Sign * poca.Rho();
       m_omega = 1 / R * charge;
-      m_z0 = poca.z();
-      m_cotTheta = dirInPoca.z() / dirInPoca.Rho();
+      m_z0 = poca.Z();
+      m_cotTheta = dirInPoca.Z() / dirInPoca.Rho();
     }
 
     /** returns the path length (along the helix) to the helix point closest to p.

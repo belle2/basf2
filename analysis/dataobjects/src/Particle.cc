@@ -362,9 +362,9 @@ Particle::Particle(const MCParticle* mcParticle) :
 
   // mass and momentum
   m_mass = mcParticle->getMass();
-  m_px = mcParticle->getMomentum().x();
-  m_py = mcParticle->getMomentum().y();
-  m_pz = mcParticle->getMomentum().z();
+  m_px = mcParticle->getMomentum().X();
+  m_py = mcParticle->getMomentum().Y();
+  m_pz = mcParticle->getMomentum().Z();
   // production vertex
   // TODO: good only for FS particles, for composite we must use decay vertex
   setVertex(mcParticle->getVertex());
@@ -522,7 +522,7 @@ double Particle::getCosHelicity(const Particle* mother) const
       PxPyPzEVector pDaughter1 = boost * getDaughter(1)->get4Vector();
 
       XYZVector pDaughterNormal(pDaughter0.Vect().Cross(pDaughter1.Vect()));
-      pDaughter.SetPxPyPzE(pDaughterNormal.x(), pDaughterNormal.y(), pDaughterNormal.z(), 0); // energy doesn't matter
+      pDaughter.SetPxPyPzE(pDaughterNormal.X(), pDaughterNormal.Y(), pDaughterNormal.Z(), 0); // energy doesn't matter
     }
   }
 
@@ -993,9 +993,9 @@ const Particle* Particle::getParticleFromGeneralizedIndexString(const std::strin
 void Particle::setMomentumPositionErrorMatrix(const TrackFitResult* trackFit)
 {
   // set momentum
-  m_px = trackFit->getMomentum().x();
-  m_py = trackFit->getMomentum().y();
-  m_pz = trackFit->getMomentum().z();
+  m_px = trackFit->getMomentum().X();
+  m_py = trackFit->getMomentum().Y();
+  m_pz = trackFit->getMomentum().Z();
 
   // set position at which the momentum is given (= POCA)
   setVertex(trackFit->getPosition());

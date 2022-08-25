@@ -139,7 +139,7 @@ namespace TestUtilities {
                                           const ROOT::Math::XYZVector& vertex)
     {
       auto* particleDescription = particleDescriptor->getMother();
-      ROOT::Math::XYZVector tmomentum(momentum.x(), momentum.y(), momentum.z());
+      ROOT::Math::XYZVector tmomentum(momentum.X(), momentum.Y(), momentum.Z());
       const float pValue = 0.5;
       const float bField = 1.5;
       TMatrixDSym cov6(6);

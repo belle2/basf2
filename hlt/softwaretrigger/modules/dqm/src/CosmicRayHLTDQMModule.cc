@@ -145,9 +145,9 @@ void CosmicRayHLTDQMModule::event()
       h_z0->Fill(trackFit->getZ0());
       h_phi0->Fill(trackFit->getPhi0());
       h_ncdchits->Fill(trackFit->getHitPatternCDC().getNHits());
-      h_p[0]->Fill((trackFit->getMomentum()).x());
-      h_p[1]->Fill((trackFit->getMomentum()).y());
-      h_p[2]->Fill((trackFit->getMomentum()).z());
+      h_p[0]->Fill((trackFit->getMomentum()).X());
+      h_p[1]->Fill((trackFit->getMomentum()).Y());
+      h_p[2]->Fill((trackFit->getMomentum()).Z());
       h_p[3]->Fill((trackFit->getMomentum()).R());
       h_p[4]->Fill((trackFit->getMomentum()).Rho());
       h_pValue->Fill(trackFit->getPValue());

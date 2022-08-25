@@ -22,7 +22,7 @@ namespace Belle2 {
     {
       TEveVector v;
       ROOT::Math::XYZVector bfield = BFieldManager::getField(x, y, z) / Unit::T;
-      v.Set(bfield.x(), bfield.y(), bfield.z());
+      v.Set(bfield.X(), bfield.Y(), bfield.Z());
       v.fZ *= -1; //Eve has inverted B field convention
       v.fZ -= 1e-6; //field must not be zero!
 

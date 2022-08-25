@@ -22,7 +22,7 @@ from ROOT import TVector3
 import simulation
 import reconstruction
 
-b2.set_random_seed(41)
+b2.set_random_seed(42)
 
 
 class CheckRelationBremClusterTestModule(b2.Module):

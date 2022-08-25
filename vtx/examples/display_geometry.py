@@ -14,23 +14,20 @@
 # This steering file displays the Belle II upgrade detector geometry and perfoms the
 # simulation and standard reconstruction.
 #
-# Usage: basf2 display_geometry.py -- --vtx=VTX-CMOS-5layer-Discs
+# Usage: basf2 display_geometry.py -- --vtx=VTX-CMOS-5layer
 #
 ##############################################################################
 
 import argparse
-import os
 import basf2 as b2
 import simulation as sim
-import reconstruction as rec
 
-from ROOT import Belle2
 
 import ROOT
 ROOT.gROOT.SetBatch(0)
 
 ap = argparse.ArgumentParser()
-ap.add_argument("--vtx", default="VTX-CMOS-5layer-Discs", help="VTX geometry variant from xml")
+ap.add_argument("--vtx", default="VTX-CMOS-5layer", help="VTX geometry variant from xml")
 args = vars(ap.parse_args())
 
 print("INFO: Display for " + args['vtx'])

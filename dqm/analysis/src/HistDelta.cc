@@ -5,7 +5,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include "dqm/analysis/HistDelta.h"
+#include <dqm/analysis/HistDelta.h>
 #include <string>
 #include <TROOT.h>
 
@@ -37,11 +37,22 @@ void HistDelta::update(TH1* currentHist)
     m_lastHist->Reset();
   }
   // now check if need to update m_deltaHists
+  bool need_update = false;
+  switch (m_type) {
+    case 1:
+      // default case, look at the entries in the histogram
+      need_update = currentHist->GetEntries() - m_lastHist->GetEntries() >= m_parameter;
+      break;
+    case 2:
+      // here we misuse underflow as event counter in some histograms, e.g. PXD
+      need_update = currentHist->GetBinContent(0) - m_lastHist->GetBinContent(0) >= m_parameter;
+      break;
+    default:
+      // any unsupported types map to case 0, and will disable delta for this hist
+      break;
+  }
 
-  // start with the simple case, we may add other types later
-  double last_entries = m_lastHist->GetEntries();
-  double current_entries = currentHist->GetEntries();
-  if (current_entries - last_entries >= m_parameter) {
+  if (need_update) {
     gROOT->cd();
     TH1* delta = (TH1*)currentHist->Clone();
     delta->Add(m_lastHist, -1.);
@@ -60,8 +71,8 @@ void HistDelta::update(TH1* currentHist)
   }
   /// else {
   /// not (yet) enough data for update
-  /// we will NOT cover the case of initial sampling in this code
-  /// but leave it up to the user code
+  /// special case of initial sampling is not covered in this code
+  /// -> leave it up to the user code
   /// e.g. if getDelta(0) returns a nullptr, the user code writer
   /// should decide if it is useful to use the basic histogram
   /// }

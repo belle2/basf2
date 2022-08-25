@@ -100,6 +100,8 @@ namespace Belle2 {
     VariablesTTree<Filter<argsB ...> > m_nodeB;
   public:
     /// Constructor
+    // member var m_tree is initialized in VariablesTTree<>(tree), which is not recognized by cppcheck
+    // cppcheck-suppress uninitMemberVar
     explicit VariablesTTree(TTree* tree): VariablesTTree<>(tree),
       m_nodeA(tree), m_nodeB(tree)
     {};

@@ -13,7 +13,7 @@ using namespace std;
 void Belle2::ECL::shapeFitter(short int* id, int* f, int* f1, int* fg41, int* fg43, int* fg31, int* fg32, int* fg33, int* y,
                               int* ttrig2, int* n16,  int* lar, int* ltr, int* lq, int* hi2)
 {
-  static long long int k_np[16] = {
+  static const long long int k_np[16] = {
     65536,
     32768,
     21845,

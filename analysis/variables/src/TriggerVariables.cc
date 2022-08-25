@@ -120,29 +120,20 @@ namespace Belle2 {
       }
     }
 
-    Manager::FunctionPtr L1PSNMBit(const std::vector<std::string>& arguments)
+    double L1PSNMBit(const Particle*, const std::vector<double>& arguments)
     {
       if (arguments.size() == 1) {
-        int testBit;
+        int testBit = std::lround(arguments[0]);
+
+        StoreObjPtr<TRGSummary> trg;
+        if (!trg)
+          return std::numeric_limits<double>::quiet_NaN();
         try {
-          testBit = Belle2::convertString<int>(arguments[0]);
-        } catch (const std::invalid_argument&) {
-          B2FATAL("Invalid argument for L1PSNMBit function. The argument must be an integer representing the PSNM trigger bit.");
+          return trg->testPsnm(testBit);
+        } catch (const std::exception&) {
+          // Something went wrong, return NaN.
+          return std::numeric_limits<double>::quiet_NaN();
         }
-        auto func = [testBit](const Particle*) -> double {
-          StoreObjPtr<TRGSummary> trg;
-          if (!trg)
-            return std::numeric_limits<double>::quiet_NaN();
-          try
-          {
-            return trg->testPsnm(testBit);
-          } catch (const std::exception&)
-          {
-            // Something went wrong, return NaN.
-            return std::numeric_limits<double>::quiet_NaN();
-          }
-        };
-        return func;
       } else {
         B2FATAL("Wrong number of arguments for L1PSNMBit function. The only argument must be the number of the PSNM trigger bit.");
       }
@@ -171,29 +162,20 @@ namespace Belle2 {
       }
     }
 
-    Manager::FunctionPtr L1FTDLBit(const std::vector<std::string>& arguments)
+    double L1FTDLBit(const Particle*, const std::vector<double>& arguments)
     {
       if (arguments.size() == 1) {
-        int testBit;
+        int testBit = std::lround(arguments[0]);
+
+        StoreObjPtr<TRGSummary> trg;
+        if (!trg)
+          return std::numeric_limits<double>::quiet_NaN();
         try {
-          testBit = Belle2::convertString<int>(arguments[0]);
-        } catch (const std::invalid_argument&) {
-          B2FATAL("Invalid argument for L1FTDLBit function. The argument must be an integer representing the FTDL trigger bit.");
+          return trg->testFtdl(testBit);
+        } catch (const std::exception&) {
+          // Something went wrong, return NaN.
+          return std::numeric_limits<double>::quiet_NaN();
         }
-        auto func = [testBit](const Particle*) -> double {
-          StoreObjPtr<TRGSummary> trg;
-          if (!trg)
-            return std::numeric_limits<double>::quiet_NaN();
-          try
-          {
-            return trg->testFtdl(testBit);
-          } catch (const std::exception&)
-          {
-            // Something went wrong, return NaN.
-            return std::numeric_limits<double>::quiet_NaN();
-          }
-        };
-        return func;
       } else {
         B2FATAL("Wrong number of arguments for L1FTDLBit function. The only argument must be the number of the FTDL trigger bit.");
       }
@@ -222,29 +204,20 @@ namespace Belle2 {
       }
     }
 
-    Manager::FunctionPtr L1InputBit(const std::vector<std::string>& arguments)
+    double L1InputBit(const Particle*, const std::vector<double>& arguments)
     {
       if (arguments.size() == 1) {
-        int testBit;
+        int testBit = std::lround(arguments[0]);
+
+        StoreObjPtr<TRGSummary> trg;
+        if (!trg)
+          return std::numeric_limits<double>::quiet_NaN();
         try {
-          testBit = Belle2::convertString<int>(arguments[0]);
-        } catch (const std::invalid_argument&) {
-          B2FATAL("Invalid argument for L1InputBit function. The argument must be an integer representing the input trigger bit.");
+          return trg->testInput(testBit);
+        } catch (const std::exception&) {
+          // Something went wrong, return NaN.
+          return std::numeric_limits<double>::quiet_NaN();
         }
-        auto func = [testBit](const Particle*) -> double {
-          StoreObjPtr<TRGSummary> trg;
-          if (!trg)
-            return std::numeric_limits<double>::quiet_NaN();
-          try
-          {
-            return trg->testInput(testBit);
-          } catch (const std::exception&)
-          {
-            // Something went wrong, return NaN.
-            return std::numeric_limits<double>::quiet_NaN();
-          }
-        };
-        return func;
       } else {
         B2FATAL("Wrong number of arguments for L1Input function. The only argument must be the number of the input trigger bit.");
       }
@@ -274,24 +247,17 @@ namespace Belle2 {
       }
     }
 
-    Manager::FunctionPtr L1PSNMBitPrescale(const std::vector<std::string>& arguments)
+    double L1PSNMBitPrescale(const Particle*, const std::vector<double>& arguments)
     {
       if (arguments.size() == 1) {
-        int testBit;
-        try {
-          testBit = Belle2::convertString<int>(arguments[0]);
-        } catch (const std::invalid_argument&) {
-          B2FATAL("Invalid argument for L1PSNMBitPrescale function. The argument must be an integer representing the PSNM trigger bit.");
-        }
-        auto func = [testBit](const Particle*) -> double {
-          if (testBit < 0 or testBit >= (int)TRGSummary::c_trgWordSize * (int)TRGSummary::c_ntrgWords)
-            return std::numeric_limits<double>::quiet_NaN();
-          static DBObjPtr<TRGGDLDBPrescales> prescales;
-          if (!prescales.isValid())
-            return std::numeric_limits<double>::quiet_NaN();
-          return prescales->getprescales(testBit);
-        };
-        return func;
+        int testBit = std::lround(arguments[0]);
+
+        if (testBit < 0 or testBit >= (int)TRGSummary::c_trgWordSize * (int)TRGSummary::c_ntrgWords)
+          return std::numeric_limits<double>::quiet_NaN();
+        static DBObjPtr<TRGGDLDBPrescales> prescales;
+        if (!prescales.isValid())
+          return std::numeric_limits<double>::quiet_NaN();
+        return prescales->getprescales(testBit);
       } else {
         B2FATAL("Wrong number of arguments for L1BitPrescale function. The only argument must be the number of the PSNM trigger bit.");
       }
@@ -405,16 +371,38 @@ namespace Belle2 {
     REGISTER_METAVARIABLE("L1Prescale(name)", L1PSNMPrescale,
                           "[Eventbased] Returns the PSNM (prescale and mask) prescale of the trigger bit with the given name.",
                           Manager::VariableDataType::c_double);
-    REGISTER_METAVARIABLE("L1PSNMBit(i)", L1PSNMBit,
-                          "[Eventbased] Returns the PSNM (Prescale And Mask, after prescale) status of i-th trigger bit.",
-                          Manager::VariableDataType::c_double);
-    REGISTER_METAVARIABLE("L1FTDLBit(i)", L1FTDLBit,
-                          "[Eventbased] Returns the FTDL (Final Trigger Decision Logic, before prescale) status of i-th trigger bit.",
-                          Manager::VariableDataType::c_double);
-    REGISTER_METAVARIABLE("L1InputBit(i)", L1InputBit,
-                          "[Eventbased] Returns the input bit status of the i-th input trigger bit.", Manager::VariableDataType::c_double);
-    REGISTER_METAVARIABLE("L1PSNMBitPrescale(i)", L1PSNMBitPrescale,
-                          "[Eventbased] Returns the PSNM (prescale and mask) prescale of i-th trigger bit.", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("L1PSNMBit(i)", L1PSNMBit,
+                      R"DOC(
+[Eventbased] Returns the PSNM (Prescale And Mask, after prescale) status of i-th trigger bit.
+
+.. warning::
+  It is recommended to use this variable only for debugging and to use :b2:var:`L1PSNM`
+  with the explicit trigger bit name for physics analyses or performance studies.
+)DOC");
+    REGISTER_VARIABLE("L1FTDLBit(i)", L1FTDLBit,
+                      R"DOC(
+[Eventbased] Returns the FTDL (Final Trigger Decision Logic, before prescale) status of i-th trigger bit.
+
+.. warning::
+  It is recommended to use this variable only for debugging and to use :b2:var:`L1FTDL`
+  with the explicit trigger bit name for physics analyses or performance studies.
+)DOC");
+    REGISTER_VARIABLE("L1InputBit(i)", L1InputBit,
+                      R"DOC(
+[Eventbased] Returns the input bit status of the i-th input trigger bit.
+
+.. warning::
+  It is recommended to use this variable only for debugging and to use :b2:var:`L1Input`
+  with the explicit trigger bit name for physics analyses or performance studies.
+)DOC");
+    REGISTER_VARIABLE("L1PSNMBitPrescale(i)", L1PSNMBitPrescale,
+                      R"DOC(
+[Eventbased] Returns the PSNM (prescale and mask) prescale of i-th trigger bit.
+
+.. warning::
+  It is recommended to use this variable only for debugging and to use :b2:var:`L1Prescale`
+  with the explicit trigger bit name for physics analyses or performance studies.
+)DOC");
     REGISTER_VARIABLE("L1TimeType", L1TimeType,
                       "[Eventbased] Returns ETimingType time type.");
     REGISTER_VARIABLE("L1TimeQuality", L1TimeQuality,

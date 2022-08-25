@@ -7,19 +7,15 @@
  **************************************************************************/
 
 #include <tracking/modules/pxdDataReduction/ROIGeneratorModule.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreArray.h>
-#include <tracking/dataobjects/ROIid.h>
 
-using namespace std;
 using namespace Belle2;
 
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
 
-REG_MODULE(ROIGenerator)
+REG_MODULE(ROIGenerator);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -35,42 +31,34 @@ ROIGeneratorModule::ROIGeneratorModule() : Module()
   addParam("nROIs", m_nROIs, "number of generated ROIs", 1);
 
   addParam("TrigDivider", m_divider, "Generates one ROI every TrigDivider events", 2);
-  addParam("Layer"      , m_layer  , "on layer", 1);
-  addParam("Ladder"     , m_ladder , " ladder " , 1);
-  addParam("Sensor"     , m_sensor , " sensor " , 1);
+  addParam("Layer", m_layer, "on layer", 1);
+  addParam("Ladder", m_ladder, " ladder ", 1);
+  addParam("Sensor", m_sensor, " sensor ", 1);
 
-  addParam("MinU"       , m_minU   , " min U (pixel column hopefully) ", 0);
-  addParam("MaxU"       , m_maxU   , " max U (pixel column hopefully) ", 250 - 1);
+  addParam("MinU", m_minU, " min U (pixel column hopefully) ", 0);
+  addParam("MaxU", m_maxU, " max U (pixel column hopefully) ", 250 - 1);
 
 
-  addParam("MinV"       , m_minV   , " min V (pixel column hopefully) ", 0);
-  addParam("MaxV"       , m_maxV   , " max v (pixel column hopefully) ", 768 - 1);
+  addParam("MinV", m_minV, " min V (pixel column hopefully) ", 0);
+  addParam("MaxV", m_maxV, " max v (pixel column hopefully) ", 768 - 1);
 
-  addParam("Random"       , m_random   , "dont use fix position, move pseudo randomly", false);
+  addParam("Random", m_random, "dont use fix position, move pseudo randomly", false);
 }
 
 void ROIGeneratorModule::initialize()
 {
-  StoreObjPtr<EventMetaData> eventMetaData;
-  eventMetaData.isRequired();
+  m_eventMetaData.isRequired();
 
-  StoreArray<ROIid> roiIDs;
-  roiIDs.registerInDataStore(m_ROIListName); // does not report error if ROIid exists
+  m_ROIs.registerInDataStore(m_ROIListName); // does not report error if ROIid exists
 }
 
 void ROIGeneratorModule::event()
 {
-
-  StoreArray<ROIid> ROIList(m_ROIListName);
-
-  StoreObjPtr<EventMetaData> eventMetaDataPtr;
-  int tNr = eventMetaDataPtr->getEvent(); // trigger number
+  int tNr = m_eventMetaData->getEvent(); // trigger number
 
   // Only if divider tells us to...
   if (m_divider != 0 && (tNr % m_divider) != 0)
     return ;
-
-  //  ROIList.create(true);
 
   ROIid tmp_ROIid;
 
@@ -137,7 +125,7 @@ void ROIGeneratorModule::event()
   tmp_ROIid.setMaxVid(maxV);
   tmp_ROIid.setSensorID(sensorID);
 
-  ROIList.appendNew(tmp_ROIid);
+  m_ROIs.appendNew(tmp_ROIid);
 
   if (m_nROIs > 1) {
     // ... plus additional ones for debugging.
@@ -157,7 +145,7 @@ void ROIGeneratorModule::event()
       tmp_ROIid.setMaxVid(maxV);
       tmp_ROIid.setSensorID(sensorID);
 
-      ROIList.appendNew(tmp_ROIid);
+      m_ROIs.appendNew(tmp_ROIid);
     }
   }
 }

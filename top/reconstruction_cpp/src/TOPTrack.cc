@@ -37,12 +37,12 @@ namespace Belle2 {
       Const::EDetector myDetID = Const::EDetector::TOP;
       const auto* geo = TOPGeometryPar::Instance()->getGeometry();
       int numModules = geo->getNumModules();
-      int pdgCode = abs(chargedStable.getPDGCode());
+      int pdgCode = std::abs(chargedStable.getPDGCode());
 
       RelationVector<ExtHit> extHits = track.getRelationsWith<ExtHit>();
       double tmin = 1e10; // some large time
       for (const auto& extHit : extHits) {
-        if (abs(extHit.getPdgCode()) != pdgCode) continue;
+        if (std::abs(extHit.getPdgCode()) != pdgCode) continue;
         if (extHit.getDetectorID() != myDetID) continue;
         if (extHit.getCopyID() < 1 or extHit.getCopyID() > numModules) continue;
         if (extHit.getTOF() < tmin) {
@@ -69,7 +69,7 @@ namespace Belle2 {
         return;
       }
 
-      auto chargedStable = Const::chargedStableSet.find(abs(extHit->getPdgCode()));
+      auto chargedStable = Const::chargedStableSet.find(std::abs(extHit->getPdgCode()));
       if (chargedStable == Const::invalidParticle) {
         B2ERROR("TOPTrack: extrapolation hypothesis of ExtHit is not ChargedStable");
         return;
@@ -110,7 +110,7 @@ namespace Belle2 {
       // set track parameters and helix
 
       m_moduleID = m_extHit->getCopyID();
-      m_momentum = m_extHit->getMomentum().Mag();
+      m_momentum = m_extHit->getMomentum().R();
       m_charge = fitResult->getChargeSign();
       m_TOFLength = m_extHit->getTOF() * Const::speedOfLight * getBeta(chargedStable);
       m_valid = setHelix(m_alignment->getRotation(m_moduleID), m_alignment->getTranslation(m_moduleID));
@@ -168,9 +168,9 @@ namespace Belle2 {
 
       const auto* geo = TOPGeometryPar::Instance()->getGeometry();
       const auto& module = geo->getModule(m_moduleID);
-      auto globalPosition = m_extHit->getPosition();
+      auto globalPosition = m_extHit->getPositionTVector3();
       auto position = module.pointGlobalToNominal(globalPosition);
-      auto momentum = module.momentumGlobalToNominal(m_extHit->getMomentum());
+      auto momentum = module.momentumGlobalToNominal(m_extHit->getMomentumTVector3());
       double Bz = BFieldManager::getField(globalPosition).Z();
       m_helix.set(position, momentum, m_charge, Bz);
       m_helix.setTransformation(rotation, translation);
@@ -204,12 +204,12 @@ namespace Belle2 {
         double t = m_helix.getDistanceToPlane(points[i], normals[i]);
         if (isnan(t)) return false;
         auto r = m_helix.getPosition(t);
-        if (abs(r.X()) > bar.A / 2) {
+        if (std::abs(r.X()) > bar.A / 2) {
           auto k = (r.X() > 0) ? 3 : 2;
           t = m_helix.getDistanceToPlane(points[k], normals[k]);
           if (isnan(t)) return false;
           r = m_helix.getPosition(t);
-          if (r.Z() >= bar.zL and abs(r.Y()) > bar.B / 2) return false;
+          if (r.Z() >= bar.zL and std::abs(r.Y()) > bar.B / 2) return false;
         }
         lengths.push_back(t);
         positions.push_back(r);
@@ -251,7 +251,7 @@ namespace Belle2 {
 
       // set track length in quartz and full length from IP to the average emission point
 
-      m_length = abs(lengths[1] - lengths[0]);
+      m_length = std::abs(lengths[1] - lengths[0]);
       double length = (lengths[0] + lengths[1]) / 2;
       m_trackLength = m_TOFLength + length;
 
@@ -301,7 +301,7 @@ namespace Belle2 {
             }
             t = (t1 + t2) / 2;
           }
-          if (abs(r.X()) > prism.A / 2) { // intersection on the side surface
+          if (std::abs(r.X()) > prism.A / 2) { // intersection on the side surface
             auto k = (r.X() > 0) ? 3 : 2;
             t = m_helix.getDistanceToPlane(points[k], normals[k]);
             if (isnan(t)) return false;

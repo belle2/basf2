@@ -20,8 +20,6 @@
 /* Google Test headers. */
 #include <gtest/gtest.h>
 
-using namespace std;
-
 namespace Belle2 {
 
   /** Test class for the KLMMuidLikelihood object. */

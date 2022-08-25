@@ -21,8 +21,8 @@ namespace Belle2 {
     class FourHitFilter : public BasePathFilter {
     public:
       /// Return the weight based on the ThreeHitVariables.
-      /// Returns NAN if m_fourHitVariables.getCircleRadiusDifference() of the hit triplet is larger than m_param_CircleRadiusDifferenceCut
-      /// Returns NAN if m_fourHitVariables.getCircleCenterPositionDifference() of the hit triplet is larger than m_param_CircleCenterPositionDifferenceCut
+      /// Returns NAN if m_fourHitVariables.getCircleRadiusDifference() of the hit triplet is larger than m_CircleRadiusDifferenceCut
+      /// Returns NAN if m_fourHitVariables.getCircleCenterPositionDifference() of the hit triplet is larger than m_CircleCenterPositionDifferenceCut
       /// Returns 1/m_fourHitVariables.getCircleRadiusDifference() else
       TrackFindingCDC::Weight operator()(const BasePathFilter::Object& pair) override;
       /// Expose the parameters.
@@ -33,9 +33,9 @@ namespace Belle2 {
 
     private:
       /// Cut on difference of the two circle radii estimated from two triplets
-      double m_param_CircleRadiusDifferenceCut = 10.;
+      double m_CircleRadiusDifferenceCut = 10.;
       /// Cut on difference of the two circle center estimated from two triplets
-      double m_param_CircleCenterPositionDifferenceCut = 10.;
+      double m_CircleCenterPositionDifferenceCut = 10.;
 
       /// Construct empty ThreeHitVariables instance
       FourHitVariables m_fourHitVariables;

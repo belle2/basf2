@@ -48,6 +48,7 @@ namespace Belle2 {
         double zL = 0; /**< minimal z */
         double zR = 0; /**< maximal z */
         double reflectivity = 0; /**< surface reflectivity */
+        double sigmaAlpha = 0; /**< surface roughness parameter */
 
         /**
          * default constructor
@@ -167,6 +168,12 @@ namespace Belle2 {
        */
       const Prism& getPrism() const {return m_prism;}
 
+      /**
+       * Sets the mirror center-of-curvature
+       * @param xc center of curvature in x
+       * @param yc center of curvature in y
+       */
+      void setMirrorCenter(double xc, double yc);
 
     protected:
 

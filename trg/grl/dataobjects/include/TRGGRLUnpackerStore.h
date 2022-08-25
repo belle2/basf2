@@ -150,6 +150,17 @@ namespace Belle2 {
     /**m_2GeV_flag_ECL leaf*/
     std::vector<int> m_2GeV_ECL = std::vector<int>(30, 0);
 
+    /**#wire hit in SL0*/
+    int m_wire_tsf0;
+    /**#wire hit in SL2*/
+    int m_wire_tsf2;
+    /**#wire hit in SL4*/
+    int m_wire_tsf4;
+    /**#wire hit in SL1*/
+    int m_wire_tsf1;
+    /**#wire hit in SL3*/
+    int m_wire_tsf3;
+
     /**m_map_TSF0 integer leaf*/
     int m_map_TSF0_int[2];
     /**m_map_TSF2 integer leaf*/
@@ -254,7 +265,7 @@ namespace Belle2 {
     /**m_maxrvc leafs*/
     int m_maxrvc;
     /** the class title*/
-    ClassDef(TRGGRLUnpackerStore, 1);
+    ClassDef(TRGGRLUnpackerStore, 2);
 
   };
 

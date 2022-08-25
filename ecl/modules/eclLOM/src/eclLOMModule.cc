@@ -18,7 +18,7 @@ using namespace std;
 using namespace Belle2;
 using namespace ECL;
 
-REG_MODULE(ECLLOM)
+REG_MODULE(ECLLOM);
 
 
 ECLLOMModule::ECLLOMModule()

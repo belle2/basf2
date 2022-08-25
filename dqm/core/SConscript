@@ -1,0 +1,9 @@
+Import('env')
+
+env['LIBS'] = [
+    'framework',
+    'boost_regex',
+    '$ROOT_LIBS'
+]
+
+Return('env')

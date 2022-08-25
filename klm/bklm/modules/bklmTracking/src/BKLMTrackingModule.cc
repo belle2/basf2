@@ -18,12 +18,11 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace Belle2::bklm;
 using namespace CLHEP;
 
-REG_MODULE(BKLMTracking)
+REG_MODULE(BKLMTracking);
 
 BKLMTrackingModule::BKLMTrackingModule() : Module(),
   m_effiYX(nullptr),
@@ -51,7 +50,7 @@ BKLMTrackingModule::BKLMTrackingModule() : Module(),
            "[bool], do the BKLMTrack fitting in global system (multi-sectors track) or local system (sector by sector) (default is false, local sys.)",
            false);
   addParam("StudyEffiMode", m_studyEffi, "[bool], run in efficieny study mode (default is false)", false);
-  addParam("outputName", m_outPath , "[string],  output file name containing efficiencies plots ", string("bklmEffi.root"));
+  addParam("outputName", m_outPath, "[string],  output file name containing efficiencies plots ", std::string("bklmEffi.root"));
 }
 
 BKLMTrackingModule::~BKLMTrackingModule()
@@ -124,7 +123,7 @@ void BKLMTrackingModule::event()
     for (int iSection = 0; iSection < 2; iSection++) {
       for (int iSector = 0; iSector < 8; iSector++) {
         for (int iLayer = 0; iLayer < 15; iLayer++) {
-          runTracking(1, iSection, iSector , iLayer);
+          runTracking(1, iSection, iSector, iLayer);
           if (m_storeTracks.getEntries() > 0)
             thereIsATrack = true;
           generateEffi(iSection, iSector, iLayer);
@@ -183,7 +182,8 @@ void BKLMTrackingModule::runTracking(int mode, int iSection, int iSector, int iL
         continue;
       if (!m_globalFit && !sameSector(hits2D[hi], hits2D[hj]))
         continue;
-      if (sameSector(hits2D[hi], hits2D[hj]) && abs(hits2D[hi]->getLayer() - hits2D[hj]->getLayer()) < 3)
+      if (sameSector(hits2D[hi], hits2D[hj]) &&
+          std::abs(hits2D[hi]->getLayer() - hits2D[hj]->getLayer()) < 3)
         continue;
 
       std::list<KLMHit2d*> sectorHitList;
@@ -344,10 +344,10 @@ bool BKLMTrackingModule::findClosestRecoTrack(BKLMTrack* bklmTrk, RecoTrack*& cl
   double oldAngle = INFINITY;
   closestTrack = nullptr;
   //TVector3 poca = TVector3(0, 0, 0);
-  TVector3 firstBKLMHitPosition(0, 0, 0);
   //bklmHits are already sorted by layer
   //possible two hits in one layer?
-  firstBKLMHitPosition = bklmHits[0]->getPosition();
+  ROOT::Math::XYZVector hitPosition = bklmHits[0]->getPosition();
+  TVector3 firstBKLMHitPosition(hitPosition.X(), hitPosition.Y(), hitPosition.Z());
 
   TMatrixDSym cov(6);
   TVector3 pos(0, 0, 0);
@@ -400,7 +400,7 @@ bool BKLMTrackingModule::findClosestRecoTrack(BKLMTrack* bklmTrk, RecoTrack*& cl
 void BKLMTrackingModule::generateEffi(int iSection, int iSector, int iLayer)
 {
 
-  set<int> m_pointUsed;
+  std::set<int> m_pointUsed;
   m_pointUsed.clear();
   if (m_storeTracks.getEntries() < 1)
     return;

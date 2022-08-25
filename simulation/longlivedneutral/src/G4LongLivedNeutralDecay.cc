@@ -59,7 +59,7 @@ G4bool G4LongLivedNeutralDecay::IsApplicable(const G4ParticleDefinition& aPartic
 }
 
 
-G4double G4LongLivedNeutralDecay::GetMeanLifeTime(const G4Track& aTrack  ,
+G4double G4LongLivedNeutralDecay::GetMeanLifeTime(const G4Track& aTrack,
                                                   G4ForceCondition*)
 {
   const G4DynamicParticle* dynamicParticle = aTrack.GetDynamicParticle();
@@ -189,7 +189,7 @@ G4VParticleChange* G4LongLivedNeutralDecay::DecayIt(const G4Track& aTrack, const
     currentPosition = aTrack.GetPosition();
     // create a new track object
     G4Track* secondary = new G4Track(products->PopProducts(),
-                                     finalGlobalTime ,
+                                     finalGlobalTime,
                                      currentPosition);
     // switch on good for tracking flag
     secondary->SetGoodForTrackingFlag();

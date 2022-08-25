@@ -8,7 +8,6 @@
 
 #include <framework/database/DBStoreEntry.h>
 #include <framework/database/DBAccessorBase.h>
-#include <framework/database/IntraRunDependency.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/logging/Logger.h>
 #include <iomanip>

@@ -19,7 +19,7 @@ using namespace std;
 using namespace Belle2;
 
 
-REG_MODULE(ProgressBar)
+REG_MODULE(ProgressBar);
 
 ProgressBarModule::ProgressBarModule() : Module(), m_evtNr(0), m_nTotal(0), m_startTime(0), m_lastPrint(0), m_isTTY{false}
 {

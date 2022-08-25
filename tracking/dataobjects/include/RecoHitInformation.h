@@ -89,6 +89,8 @@ namespace Belle2 {
       c_ECLtoCDCCKF,
       c_CDCtoSVDCKF,
       c_SVDtoPXDCKF,
+      // SVDHough track finder
+      c_SVDHough,
       // track finders for VTX, both CKF based and non-CKF based
       c_VTXTrackFinder,
       c_VTXtoCDCCKF,

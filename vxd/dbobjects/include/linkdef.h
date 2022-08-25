@@ -26,7 +26,7 @@
 #pragma link C++ class Belle2::VXDAlignmentPar+; // checksum=0x6561a487, version=5
 #pragma link C++ class Belle2::VXDEnvelopePar+; // checksum=0x79a2a95e, version=5
 #pragma link C++ class Belle2::VXDRotationSolidPar+; // checksum=0xbefece69, version=5
-#pragma link C++ class Belle2::VXDPolyConePar+; // checksum=0x36fbd3c2, version=5
+#pragma link C++ class Belle2::VXDPolyConePar+; // checksum=0xd4ee1194, version=6
 #pragma link C++ class Belle2::VXDPolyConePlanePar+; // checksum=0x8be0e92, implicit, version=5
 #pragma link C++ class Belle2::VXDGeoRadiationSensorsPar+; // checksum=0x909367db, version=5
 #pragma link C++ class Belle2::VXDGeoRadiationSensorsPositionPar+; // checksum=0x6a535fbb, implicit, version=5

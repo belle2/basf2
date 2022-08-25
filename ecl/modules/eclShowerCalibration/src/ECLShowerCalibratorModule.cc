@@ -18,8 +18,8 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(ECLShowerCalibrator)
-REG_MODULE(ECLShowerCalibratorPureCsI)
+REG_MODULE(ECLShowerCalibrator);
+REG_MODULE(ECLShowerCalibratorPureCsI);
 
 //-----------------------------------------------------------------
 //                 Implementation

@@ -9,7 +9,6 @@
 #include "tracking/vxdCaTracking/FourHitFilters.h"
 #include <math.h>
 
-using namespace std;
 using namespace Belle2;
 
 /// TODO: evtly do a 'nan'-check for return values

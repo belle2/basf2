@@ -214,7 +214,7 @@ namespace Belle2 {
     /// @param id2: second id
     /// @param id3: third id
     /// @return If any of the id1, id2 or id3 is undefined 0 is returned, else the compact id of the triplet
-    secTripletID_t getCompactID(const FullSecID& id1, const FullSecID& id2 ,
+    secTripletID_t getCompactID(const FullSecID& id1, const FullSecID& id2,
                                 const FullSecID& id3) const
     {
 
@@ -248,7 +248,7 @@ namespace Belle2 {
 
     /// Returns the compact id of the quadruplet of FullSecID id1 id2 id3 id4
     /// If any of the id1, id2, id3 or id4 is undefined 0 is returned.
-    secQuadrupletID_t getCompactID(const FullSecID& id1, const FullSecID& id2 ,
+    secQuadrupletID_t getCompactID(const FullSecID& id1, const FullSecID& id2,
                                    const FullSecID& id3, const FullSecID& id4)
     const
     {

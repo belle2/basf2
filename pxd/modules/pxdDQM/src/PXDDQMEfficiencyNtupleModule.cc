@@ -19,7 +19,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(PXDDQMEfficiencyNtuple)
+REG_MODULE(PXDDQMEfficiencyNtuple);
 
 //-----------------------------------------------------------------
 //                 Implementation

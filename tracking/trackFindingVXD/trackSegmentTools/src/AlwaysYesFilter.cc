@@ -19,7 +19,7 @@ void AlwaysYesFilter::checkSpacePoints(const SectorFriendship* thisFriendship, C
 {
   for (auto& aVector : compatibilityTable) {
     for (auto& aValue : aVector) {
-      B2DEBUG(1000, "there are currently " << thisFriendship->checkCombinationsAlive() << " alive");
+      B2DEBUG(29, "there are currently " << thisFriendship->checkCombinationsAlive() << " alive");
       aValue++;
     }
   }

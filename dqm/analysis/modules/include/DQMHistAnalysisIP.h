@@ -19,7 +19,7 @@
 
 #include <framework/core/Module.h>
 
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 
 #include <TCanvas.h>
 #include <TLine.h>
@@ -76,8 +76,10 @@ namespace Belle2 {
 
     /** The drawing canvas. */
     TCanvas* m_c1 = nullptr;
-    /** The line for the fitting result. */
+    /** The line for the mean result. */
     TLine* m_line = nullptr;
+    /** The line for the median result. */
+    TLine* m_line2 = nullptr;
 
     /** last histogram */
     TH1* m_h_last = nullptr;
@@ -88,9 +90,9 @@ namespace Belle2 {
     /** flag if to export to EPICS */
     bool m_useEpics;
     /** number of EPICS PVs */
-    static const int m_parameters = 2;
+    static const int m_parameters = 3;
 #ifdef _BELLE2_EPICS
-    chid mychid[m_parameters];// hard limit max 2 parameters
+    chid mychid[m_parameters];// hard limit max parameters
 #endif
   };
 } // end namespace Belle2

@@ -135,7 +135,6 @@ def getFastBDTCategories():
     Helper function for getting the FastBDT categories.
     It's necessary for removing top-level ROOT imports.
     '''
-    import ROOT  # noqa
     fastBDTCategories = basf2_mva.FastBDTOptions()
     fastBDTCategories.m_nTrees = 500
     fastBDTCategories.m_nCuts = 8
@@ -150,7 +149,6 @@ def getFastBDTCombiner():
     Helper function for getting the FastBDT combiner.
     It's necessary for removing top-level ROOT imports.
     '''
-    import ROOT  # noqa
     fastBDTCombiner = basf2_mva.FastBDTOptions()
     fastBDTCombiner.m_nTrees = 500
     fastBDTCombiner.m_nCuts = 8
@@ -165,7 +163,6 @@ def getMlpFANNCombiner():
     Helper function for getting the MLP FANN combiner.
     It's necessary for removing top-level ROOT imports.
     '''
-    import ROOT  # noqa
     mlpFANNCombiner = basf2_mva.FANNOptions()
     mlpFANNCombiner.m_max_epochs = 10000
     mlpFANNCombiner.m_hidden_layers_architecture = "3*N"
@@ -1138,15 +1135,6 @@ def flavorTagger(
         if eventLevel(mode, weightFiles, categories, roe_path):
             combinerLevel(mode, weightFiles, categories, variablesCombinerLevel, categoriesCombinationCode, roe_path)
 
-        # Removes EventExtraInfos and ParticleExtraInfos of the EventParticleLists
-        particleListsToRemoveExtraInfo = []
-        for category in categories:
-            particleList = AvailableCategories[category].particleList
-            if particleList not in particleListsToRemoveExtraInfo:
-                particleListsToRemoveExtraInfo.append(particleList)
-
-        ma.removeExtraInfo(particleListsToRemoveExtraInfo, False, roe_path)
-
         path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
     elif mode == 'Expert':
@@ -1175,15 +1163,6 @@ def flavorTagger(
             flavorTaggerInfoFiller.param('trackPointers', False)
             roe_path.add_module(flavorTaggerInfoFiller)  # Add FlavorTag Info filler to roe_path
             add_default_FlavorTagger_aliases()
-
-        # Removes EventExtraInfos and ParticleExtraInfos of the EventParticleLists
-        particleListsToRemoveExtraInfo = []
-        for category in categories:
-            particleList = AvailableCategories[category].particleList
-            if particleList not in particleListsToRemoveExtraInfo:
-                particleListsToRemoveExtraInfo.append(particleList)
-
-        ma.removeExtraInfo(particleListsToRemoveExtraInfo, True, roe_path)
 
         path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 

@@ -213,7 +213,7 @@ void LogSystem::printErrorSummary()
 
   // ok, only errors and warnings in the error summary
   std::vector<std::pair<LogMessage, unsigned int>> messages;
-  for (auto && value : m_messageLog) {
+  for (auto&& value : m_messageLog) {
     if (value.first.getLogLevel() < LogConfig::c_Warning) continue;
     messages.emplace_back(std::move(value));
   }

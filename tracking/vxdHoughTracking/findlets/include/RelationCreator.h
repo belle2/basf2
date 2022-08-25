@@ -36,7 +36,8 @@ namespace Belle2 {
       ~RelationCreator() = default;
 
       /// Expose the parameters of the subfindlet
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final {
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final
+      {
         m_relationFilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed("relation", prefix));
       };
 

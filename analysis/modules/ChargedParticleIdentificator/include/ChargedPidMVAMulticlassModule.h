@@ -12,6 +12,8 @@
 #include <framework/core/Module.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/database/DBObjPtr.h>
+#include <analysis/DecayDescriptor/DecayDescriptor.h>
+#include <framework/datastore/StoreArray.h>
 
 // MVA
 #include <mva/interface/Expert.h>
@@ -98,12 +100,14 @@ namespace Belle2 {
     }
 
   private:
-
     /**
-     * The input list of ParticleList names.
+     * StoreArray of Particles
      */
-    std::vector<std::string> m_particle_lists;
-
+    StoreArray<Particle> m_particles;
+    /**
+     * The input list of decay strings to which MVA weights will be applied.
+     */
+    std::vector<std::string> m_decayStrings;
     /**
      * The name of the database payload object with the MVA weights.
      */

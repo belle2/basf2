@@ -27,6 +27,7 @@
 #include <reconstruction/dbobjects/CDCDedxWireGain.h>
 //#include <cdc/dbobjects/CDCEDepToADCConversions.h>
 #include <cdc/dbobjects/CDCCrossTalkLibrary.h>
+#include <cdc/dbobjects/CDCCorrToThresholds.h>
 
 //C++/C standard lib elements.
 #include <string>
@@ -177,6 +178,9 @@ namespace Belle2 {
     std::string m_MCParticlesToSimHitsName;    /**< Relation for origin of incoming SimHits. */
     std::string m_SimHitsTOCDCHitsName;      /**< Relation for outgoing CDCHits. */
 
+    std::string m_OptionalFirstMCParticlesToHitsName;      /**< Relation name for optional matching of up to first three MCParticles. */
+    std::string m_OptionalAllMCParticlesToHitsName;      /**< Relation name for optional matching of all MCParticles. */
+
     bool m_useSimpleDigitization;            /**< Use float Gaussian Smearing instead of proper digitization. */
     //--- Paramters for simple digitization -------------------------------------------------------------------------------------
     double m_fraction;          /**< Fraction of the first Gaussian used to smear drift length */
@@ -222,7 +226,7 @@ namespace Belle2 {
     double m_addFudgeFactorForSigma; /**< additional fudge factor for space resol. */
     double m_totalFudgeFactor = 1.;  /**< total fudge factor for space resol. */
 
-    bool m_gasGainSmearing = false;  /**< Swtich for gas gain smearing */
+    bool m_gasGainSmearing = true;  /**< Swtich for gas gain smearing */
     double m_effWForGasGainSmearing = 0.0266;  /**< Effective energy (keV) for one electron prod. for gas gain smearing */
     double m_thetaOfPolya = 0.5;     /**< theta of Polya function for gas gain smearing */
     bool m_extraADCSmearing = false; /**< Swtich for extra ADC smearing */
@@ -243,6 +247,8 @@ namespace Belle2 {
     bool m_align;             /**< A switch to control alignment */
     bool m_correctForWireSag;    /**< A switch to control wire sag */
     bool m_treatNegT0WiresAsGood;    /**< A switch for negative-t0 wires */
+    bool m_matchFirstMCParticles;    /**< A switch to match first three MCParticles, not just the one with smallest drift time */
+    bool m_matchAllMCParticles;    /**< A switch to match all particles to a hit, regardless wether they produced a hit or not */
 //    float m_eventTime;         /**< It is a timing of event, which includes a time jitter due to the trigger system */
 
     bool m_useDB4FEE;             /**< Fetch FEE params from DB */
@@ -269,6 +275,7 @@ namespace Belle2 {
     int  m_debugLevel      ;   /**< Debug level */
     int  m_debugLevel4XTalk;   /**< Debug level for crosstalk */
     DBObjPtr<CDCCrossTalkLibrary>* m_xTalkFromDB = nullptr; /*!< Pointer to cross-talk from DB. */
+    DBObjPtr<CDCCorrToThresholds>* m_corrToThresholdFromDB = nullptr; /*!< Pointer to threshold correction from DB. */
 
     StoreObjPtr<SimClockState> m_simClockState; /**< generated hardware clock state */
     bool m_synchronization = true; /**< Flag to switch on/off timing synchronization */

@@ -22,7 +22,7 @@ from ROOT import TVector3
 import simulation
 import reconstruction
 
-b2.set_random_seed(41)
+b2.set_random_seed(42)
 
 
 class CheckRelationBremClusterTestModule(b2.Module):
@@ -45,9 +45,9 @@ class CheckRelationBremClusterTestModule(b2.Module):
                 # is there a relation to our secondary cluster?
                 bremCluster = cluster.getRelated("ECLClusters")
 
-        bad_events = [3]
+        bad_events = [1]
         if (eventMetaData.getEvent() in bad_events):
-            # the check fails on  some events. Instead of finding new settings,
+            # the check fails on some events. Instead of finding new settings,
             # check if the bremCluster is None only for the bad_events
             assert(not bremCluster)
         else:

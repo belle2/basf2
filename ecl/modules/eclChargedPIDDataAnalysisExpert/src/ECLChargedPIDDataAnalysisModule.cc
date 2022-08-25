@@ -23,7 +23,7 @@ using namespace Belle2;
 //                 Register the Module
 //-----------------------------------------------------------------
 
-REG_MODULE(ECLChargedPIDDataAnalysis)
+REG_MODULE(ECLChargedPIDDataAnalysis);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -389,8 +389,8 @@ void ECLChargedPIDDataAnalysisModule::event()
       n1_eclShowerR->push_back(i1shower->getR());
       n1_eclShowerHypothesisId->push_back(i1shower->getHypothesisId());
       // get shower Zernike moments
-      n1_eclShowerAbsZernike40->push_back(i1shower->getAbsZernike40());
-      n1_eclShowerAbsZernike51->push_back(i1shower->getAbsZernike51());
+      n1_eclShowerAbsZernike40->push_back(i1shower->getAbsZernikeMoment(4, 0));
+      n1_eclShowerAbsZernike51->push_back(i1shower->getAbsZernikeMoment(5, 1));
       // get E/p
       n1_eclEoP->push_back((i1shower->getEnergy()) / (atrkF->getMomentum().Mag()));
       n1_eclShowerMultip++;
@@ -404,8 +404,8 @@ void ECLChargedPIDDataAnalysisModule::event()
       n2_eclShowerR->push_back(i2shower->getR());
       n2_eclShowerHypothesisId->push_back(i2shower->getHypothesisId());
       // get shower Zernike moments
-      n2_eclShowerAbsZernike40->push_back(i2shower->getAbsZernike40());
-      n2_eclShowerAbsZernike51->push_back(i2shower->getAbsZernike51());
+      n2_eclShowerAbsZernike40->push_back(i2shower->getAbsZernikeMoment(4, 0));
+      n2_eclShowerAbsZernike51->push_back(i2shower->getAbsZernikeMoment(5, 1));
       // get E/p
       n2_eclEoP->push_back((i2shower->getEnergy()) / (atrkF->getMomentum().Mag()));
       n2_eclShowerMultip++;

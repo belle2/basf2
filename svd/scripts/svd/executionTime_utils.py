@@ -48,6 +48,8 @@ class SVDExtraEventStatisticsModule(PerEventStatisticsGetterModule):
         self.svdstrips = Belle2.PyStoreArray("SVDShaperDigits")
         #: StoreArray of ZS5  SVDShaperDigits
         self.svdZS5strips = Belle2.PyStoreArray("SVDShaperDigitsZS5")
+        #: StoreArray of Tracks
+        self.tracks = Belle2.PyStoreArray("Tracks")
 
     def initialize(self):
         """
@@ -63,6 +65,8 @@ class SVDExtraEventStatisticsModule(PerEventStatisticsGetterModule):
         self.svd_strips = np.zeros(1, dtype=np.int32)
         #: array storing the number of ZS5  SVDShaperDigits
         self.svd_ZS5strips = np.zeros(1, dtype=np.int32)
+        #: array storing the number of tracks
+        self.svd_tracks = np.zeros(1, dtype=np.int32)
 
         #: branch address assignment for SVDSpacePoints
         self.statistics.Branch('svdSPs', self.svd_sps[0:], "svdSPs/I")
@@ -72,19 +76,26 @@ class SVDExtraEventStatisticsModule(PerEventStatisticsGetterModule):
         self.statistics.Branch('svdStrips', self.svd_strips[0:], "svdStrips/I")
         #: branch address assignment for ZS5 SVDShaperDigits
         self.statistics.Branch('svdZS5strips', self.svd_ZS5strips[0:], "svdZS5strips/I")
+        #: branch address assignment for tracks
+        self.statistics.Branch('tracks', self.svd_tracks[0:], "tracks/I")
 
-        # register the StoreArray for the SVD clusters
         self.svdSPs.isRequired()
         self.svdclusters.isRequired()
         self.svdstrips.isRequired()
-        self.svdZS5strips.isRequired()
+
+        self.svdZS5strips.isOptional()
+        self.tracks.isOptional()
 
     def event(self):
         """ event """
 
         self.svd_sps[0] = self.svdSPs.getEntries()
-
         self.svd_clusters[0] = self.svdclusters.getEntries()
         self.svd_strips[0] = self.svdstrips.getEntries()
-        self.svd_ZS5strips[0] = self.svdZS5strips.getEntries()
+
+        if self.svdZS5strips.isOptional():
+            self.svd_ZS5strips[0] = self.svdZS5strips.getEntries()
+        if self.tracks.isOptional():
+            self.svd_tracks[0] = self.tracks.getEntries()
+
         super().event()

@@ -79,7 +79,7 @@ namespace {
   TEST_F(SpecificKinematicVariablesTest, REC_MissM2)
   {
     StoreArray<Particle> myParticles;
-    EXPECT_FLOAT_EQ(0.15092255, REC_MissM2(myParticles[2])); // B-meson
+    EXPECT_FLOAT_EQ(0.15092236, REC_MissM2(myParticles[2])); // B-meson
   }
 
 }

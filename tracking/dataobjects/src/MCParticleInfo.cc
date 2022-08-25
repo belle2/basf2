@@ -9,7 +9,6 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <tracking/dataobjects/MCParticleInfo.h>
 
-using namespace std;
 using namespace Belle2;
 
 MCParticleInfo::MCParticleInfo(const MCParticle& the_mcParticle, const TVector3& the_magField)

@@ -11,8 +11,6 @@
 
 import basf2
 
-from ROOT import Belle2
-
 from geometry import check_components
 
 from svd import add_svd_reconstruction
@@ -79,7 +77,9 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                        trackFitHypotheses=None, addClusterExpertModules=True,
                        use_second_cdc_hits=False, add_muid_hits=False, reconstruct_cdst=None,
                        event_abort=default_event_abort, use_random_numbers_for_hlt_prescale=True,
-                       pxd_filtering_offline=False, useVTX=False, useVTXClusterShapes=True):
+                       pxd_filtering_offline=False, append_full_grid_cdc_eventt0=False,
+                       legacy_ecl_charged_pid=False,
+                       useVTX=False, useVTXClusterShapes=True):
     """
     This function adds the standard reconstruction modules to a path.
     Consists of clustering, tracking and the PID modules essentially in this structure:
@@ -118,9 +118,18 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
         generated numbers, otherwise are applied using an internal counter.
     :param pxd_filtering_offline: If True, PXD data reduction (ROI filtering) is applied during the track reconstruction.
         The reconstructed SVD/CDC tracks are used to define the ROIs and reject all PXD clusters outside of these.
+    :param append_full_grid_cdc_eventt0: If True, the module FullGridChi2TrackTimeExtractor is added to the path
+                                      and provides the CDC temporary EventT0.
+    :param legacy_ecl_charged_pid: Bool denoting whether to use the legacy EoP based charged particleID in the ECL (true) or
+      MVA based charged particle ID (false).
     :param useVTX: If true, the VTX reconstruction is performed.
     :param useVTXClusterShapes: If true, use cluster shape corrections for hit position finding.
     """
+
+    # By default, the FullGrid module is not used in the reconstruction chain.
+    # It is needed for detectors that perform post-tracking calibration with respect to CDC EventT0 using cDST
+    if reconstruct_cdst == 'rawFormat':
+        append_full_grid_cdc_eventt0 = True
 
     add_prefilter_reconstruction(path,
                                  components=components,
@@ -135,6 +144,8 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                                  event_abort=event_abort,
                                  use_random_numbers_for_hlt_prescale=use_random_numbers_for_hlt_prescale,
                                  pxd_filtering_offline=pxd_filtering_offline,
+                                 append_full_grid_cdc_eventt0=append_full_grid_cdc_eventt0,
+                                 legacy_ecl_charged_pid=legacy_ecl_charged_pid,
                                  useVTX=useVTX, useVTXClusterShapes=useVTXClusterShapes)
 
     # Add the modules calculating the software trigger cuts (but not performing them)
@@ -151,12 +162,24 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
         add_skim_software_trigger(path)
 
 
-def add_prefilter_reconstruction(path, components=None, add_modules_for_trigger_calculation=True,
-                                 skipGeometryAdding=False, trackFitHypotheses=None, use_second_cdc_hits=False,
-                                 add_muid_hits=False, reconstruct_cdst=None, addClusterExpertModules=True,
-                                 pruneTracks=True, event_abort=default_event_abort,
-                                 use_random_numbers_for_hlt_prescale=True, pxd_filtering_offline=False,
-                                 useVTX=False, useVTXClusterShapes=True):
+def add_prefilter_reconstruction(
+        path,
+        components=None,
+        add_modules_for_trigger_calculation=True,
+        skipGeometryAdding=False,
+        trackFitHypotheses=None,
+        use_second_cdc_hits=False,
+        add_muid_hits=False,
+        reconstruct_cdst=None,
+        addClusterExpertModules=True,
+        pruneTracks=True,
+        event_abort=default_event_abort,
+        use_random_numbers_for_hlt_prescale=True,
+        pxd_filtering_offline=False,
+        append_full_grid_cdc_eventt0=False,
+        legacy_ecl_charged_pid=False,
+        useVTX=False,
+        useVTXClusterShapes=True):
     """
     This function adds only the reconstruction modules required to calculate HLT filter decision to a path.
     Consists of essential tracking and the functionality provided by :func:`add_prefilter_posttracking_reconstruction()`.
@@ -187,9 +210,16 @@ def add_prefilter_reconstruction(path, components=None, add_modules_for_trigger_
         post-filter reconstruction is also run).
     :param pxd_filtering_offline: If True, PXD data reduction (ROI filtering) is applied during the track reconstruction.
         The reconstructed SVD/CDC tracks are used to define the ROIs and reject all PXD clusters outside of these.
+    :param append_full_grid_cdc_eventt0: If True, the module FullGridChi2TrackTimeExtractor is added to the path
+                                      and provides the CDC temporary EventT0.
+    :param legacy_ecl_charged_pid: Bool denoting whether to use the legacy EoP based charged particleID in the ECL (true) or
+      MVA based charged particle ID (false).
     :param useVTX: If true, the VTX reconstruction is performed.
     :param useVTXClusterShapes: If true, use cluster shape corrections for hit position finding.
     """
+
+    # Always avoid the top-level 'import ROOT'.
+    from ROOT import Belle2  # noqa
 
     # Check components.
     check_components(components)
@@ -211,6 +241,7 @@ def add_prefilter_reconstruction(path, components=None, add_modules_for_trigger_
                                           trackFitHypotheses=trackFitHypotheses,
                                           use_second_cdc_hits=use_second_cdc_hits,
                                           pxd_filtering_offline=pxd_filtering_offline,
+                                          append_full_grid_cdc_eventt0=append_full_grid_cdc_eventt0,
                                           useVTX=useVTX)
 
     # Statistics summary
@@ -236,6 +267,7 @@ def add_prefilter_reconstruction(path, components=None, add_modules_for_trigger_
                                                       pruneTracks=pruneTracks,
                                                       add_muid_hits=add_muid_hits,
                                                       addClusterExpertModules=addClusterExpertModules,
+                                                      legacy_ecl_charged_pid=legacy_ecl_charged_pid,
                                                       useVTX=useVTX)
         # if you don't need the software trigger result, it's enough to add only
         # these two modules of the pre-filter post-tracking reconstruction
@@ -261,6 +293,7 @@ def add_prefilter_reconstruction(path, components=None, add_modules_for_trigger_
                                                   pruneTracks=pruneTracks,
                                                   add_muid_hits=add_muid_hits,
                                                   addClusterExpertModules=addClusterExpertModules,
+                                                  legacy_ecl_charged_pid=legacy_ecl_charged_pid,
                                                   useVTX=useVTX)
 
     #
@@ -273,6 +306,7 @@ def add_prefilter_reconstruction(path, components=None, add_modules_for_trigger_
                                                   pruneTracks=pruneTracks,
                                                   add_muid_hits=add_muid_hits,
                                                   addClusterExpertModules=addClusterExpertModules,
+                                                  legacy_ecl_charged_pid=legacy_ecl_charged_pid,
                                                   useVTX=useVTX)
 
 
@@ -303,7 +337,10 @@ def add_cosmics_reconstruction(
         add_muid_hits=False,
         reconstruct_cdst=False,
         posttracking=True,
-        useVTX=False):
+        eventt0_combiner_mode="prefer_cdc",
+        legacy_ecl_charged_pid=False,
+        useVTX=False
+        ):
     """
     This function adds the standard reconstruction modules for cosmic data to a path.
     Consists of tracking and the functionality provided by :func:`add_prefilter_posttracking_reconstruction()`,
@@ -328,7 +365,9 @@ def add_cosmics_reconstruction(
 
     :param reconstruct_cdst: run only the minimal reconstruction needed to produce the cdsts (raw+tracking+dE/dx)
     :param posttracking: run reconstruction for outer detectors.
-
+    :param eventt0_combiner_mode: Mode to combine the t0 values of the sub-detectors
+    :param legacy_ecl_charged_pid: Bool denoting whether to use the legacy EoP based charged particleID in the ECL (true) or
+      MVA based charged particle ID (false).
     :param useVTX: If true, the VTX reconstruction is performed.
     """
 
@@ -370,11 +409,14 @@ def add_cosmics_reconstruction(
                                                       addClusterExpertModules=addClusterExpertModules,
                                                       add_muid_hits=add_muid_hits,
                                                       cosmics=True,
+                                                      eventt0_combiner_mode=eventt0_combiner_mode,
+                                                      legacy_ecl_charged_pid=legacy_ecl_charged_pid,
                                                       useVTX=useVTX)
 
 
 def add_mc_reconstruction(path, components=None, pruneTracks=True, addClusterExpertModules=True,
-                          use_second_cdc_hits=False, add_muid_hits=False, useVTX=False, useVTXClusterShapes=True):
+                          use_second_cdc_hits=False, add_muid_hits=False, legacy_ecl_charged_pid=False,
+                          useVTX=False, useVTXClusterShapes=True):
     """
     This function adds the standard reconstruction modules with MC tracking
     to a path.
@@ -382,6 +424,8 @@ def add_mc_reconstruction(path, components=None, pruneTracks=True, addClusterExp
     @param components list of geometry components to include reconstruction for, or None for all components.
     @param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
     :param add_muid_hits: Add the found KLM hits to the RecoTrack. Make sure to refit the track afterwards.
+    :param legacy_ecl_charged_pid: Bool denoting whether to use the legacy EoP based charged particleID in the ECL (true) or
+      MVA based charged particle ID (false).
     :param useVTX: If true, the VTX reconstruction is performed.
     :param useVTXClusterShapes: If true, use cluster shape corrections for hit position finding.
     """
@@ -406,6 +450,7 @@ def add_mc_reconstruction(path, components=None, pruneTracks=True, addClusterExp
                                               pruneTracks=pruneTracks,
                                               add_muid_hits=add_muid_hits,
                                               addClusterExpertModules=addClusterExpertModules,
+                                              legacy_ecl_charged_pid=legacy_ecl_charged_pid,
                                               useVTX=useVTX)
 
 
@@ -424,9 +469,17 @@ def add_prefilter_pretracking_reconstruction(path, components=None):
     path.add_module('StatisticsSummary').set_name('Sum_Clustering')
 
 
-def add_prefilter_posttracking_reconstruction(path, components=None, pruneTracks=True, addClusterExpertModules=True,
-                                              add_muid_hits=False, cosmics=False, for_cdst_analysis=False,
-                                              add_eventt0_combiner_for_cdst=False, useVTX=False):
+def add_prefilter_posttracking_reconstruction(path,
+                                              components=None,
+                                              pruneTracks=True,
+                                              addClusterExpertModules=True,
+                                              add_muid_hits=False,
+                                              cosmics=False,
+                                              for_cdst_analysis=False,
+                                              add_eventt0_combiner_for_cdst=False,
+                                              eventt0_combiner_mode="prefer_svd",
+                                              legacy_ecl_charged_pid=False,
+                                              useVTX=False):
     """
     This function adds the standard reconstruction modules after tracking
     to a path.
@@ -444,6 +497,9 @@ def add_prefilter_posttracking_reconstruction(path, components=None, pruneTracks
            for_cdst_analysis is False. This is useful for validation purposes for avoiding to run the full
            add_reconstruction(). Note that, with the default settings (for_cdst_analysis=False and
            add_eventt0_combiner_for_cdst=False), the EventT0Combiner module is added to the path.
+    :param eventt0_combiner_mode: Mode to combine the t0 values of the sub-detectors
+    :param legacy_ecl_charged_pid: Bool denoting whether to use the legacy EoP based charged particleID in the ECL (true) or
+      MVA based charged particle ID (false).
     :param useVTX: use VTX instead of VXD
     """
 
@@ -461,7 +517,7 @@ def add_prefilter_posttracking_reconstruction(path, components=None, pruneTracks
     # but be lenient and add it if requested.
     # By default, since for_cdst_analysis is False, the module is added by this function.
     if not for_cdst_analysis or add_eventt0_combiner_for_cdst:
-        path.add_module("EventT0Combiner")
+        path.add_module("EventT0Combiner", combinationLogic=eventt0_combiner_mode)
 
     # only add the OnlineEventT0Creator if not preparing cDST
     if not for_cdst_analysis:
@@ -481,7 +537,7 @@ def add_prefilter_posttracking_reconstruction(path, components=None, pruneTracks
 
     add_ecl_cluster_properties_modules(path, components)
 
-    add_ecl_chargedpid_module(path, components)
+    add_ecl_chargedpid_module(path, components, legacy_ecl_charged_pid)
 
     add_pid_module(path, components)
 
@@ -743,15 +799,20 @@ def add_ecl_track_brem_finder(path, components=None):
         path.add_module('ECLTrackBremFinder')
 
 
-def add_ecl_chargedpid_module(path, components=None):
+def add_ecl_chargedpid_module(path, components=None, legacyMode=False):
     """
     Add the ECL charged PID module to the path.
 
     :param path: The path to add the modules to.
     :param components: The components to use or None to use all standard components.
+    :param legacyMode: Uses the simple E/p based charged PID instead of the MVA based charged PID.
     """
     if components is None or 'ECL' in components:
-        path.add_module('ECLChargedPID')
+        # charged PID
+        if legacyMode:
+            path.add_module('ECLChargedPID')
+        else:
+            path.add_module('ECLChargedPIDMVA')
 
 
 def add_ecl_mc_matcher_module(path, components=None):
@@ -792,7 +853,7 @@ def add_dedx_modules(path, components=None, useVTX=False):
         path.add_module('VXDDedxPID')
 
 
-def prepare_cdst_analysis(path, components=None, mc=False, add_eventt0_combiner=False, useVTX=False):
+def prepare_cdst_analysis(path, components=None, mc=False, add_eventt0_combiner=False, legacy_ecl_charged_pid=False, useVTX=False):
     """
     Adds to a (analysis) path all the modules needed to analyse a cDST file in the raw+tracking format
     for collisions/cosmics data or in the digits+tracking format for MC data.
@@ -803,6 +864,8 @@ def prepare_cdst_analysis(path, components=None, mc=False, add_eventt0_combiner=
     :param add_eventt0_combiner: If True, it adds the EventT0Combiner module when the post-tracking
       reconstruction is run. This must NOT be used during the calibration, but it may be necessary
       for validation purposes or for the user analyses.
+    :param legacy_ecl_charged_pid: Bool denoting whether to use the legacy EoP based charged particleID in the ECL (true) or
+      MVA based charged particle ID (false).
     :param useVTX: use VTX instead of VXD
     """
     # Add the unpackers only if not running on MC, otherwise check the components and simply add
@@ -837,7 +900,8 @@ def prepare_cdst_analysis(path, components=None, mc=False, add_eventt0_combiner=
     add_prefilter_posttracking_reconstruction(path,
                                               components=components,
                                               for_cdst_analysis=True,
-                                              add_eventt0_combiner_for_cdst=add_eventt0_combiner)
+                                              add_eventt0_combiner_for_cdst=add_eventt0_combiner,
+                                              legacy_ecl_charged_pid=legacy_ecl_charged_pid)
 
 
 def prepare_user_cdst_analysis(path, components=None, mc=False):

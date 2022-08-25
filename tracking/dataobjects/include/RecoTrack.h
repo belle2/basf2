@@ -30,6 +30,7 @@ namespace Belle2 {
   class RecoTrackGenfitAccess;
 
   BELLE2_DEFINE_EXCEPTION(NoTrackFitResult, "No track fit result available for this hit (e.g. DAF has removed it).")
+  BELLE2_DEFINE_EXCEPTION(NoStateOnPlaneFound, "No measured state on plane for any track point found.")
 
   /** This is the Reconstruction Event-Data Model Track.
    *
@@ -770,6 +771,28 @@ namespace Belle2 {
       m_qualityIndicator = qualityIndicator;
     }
 
+    /// Get the 1st flipping quality attached to this RecoTrack as a reference for flipping.
+    float getFlipQualityIndicator() const
+    {
+      return m_flipqualityIndicator;
+    }
+
+    /// Set the 1st flipping quality attached to this RecoTrack.
+    void setFlipQualityIndicator(const float qualityIndicator)
+    {
+      m_flipqualityIndicator = qualityIndicator;
+    }
+    /// Get the 2nd flipping quality attached to this RecoTrack as a reference for flipping.
+    float get2ndFlipQualityIndicator() const
+    {
+      return m_2ndFlipqualityIndicator;
+    }
+
+    /// Set the 2nd flipping quality attached to this RecoTrack.
+    void set2ndFlipQualityIndicator(const float qualityIndicator)
+    {
+      m_2ndFlipqualityIndicator = qualityIndicator;
+    }
     /**
      * Delete all fitted information for all representations.
      *
@@ -817,6 +840,10 @@ namespace Belle2 {
     MatchingStatus m_matchingStatus = MatchingStatus::c_undefined;
     /// Quality index for classification of fake vs. MC-matched Tracks.
     float m_qualityIndicator = NAN;
+    /// Quality index for flipping.
+    float m_flipqualityIndicator = NAN;
+    /// Quality index for flipping.
+    float m_2ndFlipqualityIndicator = NAN;
 
     /**
      * Add a generic hit with the given parameters for the reco hit information.
@@ -934,7 +961,7 @@ namespace Belle2 {
     }
 
     /** Making this class a ROOT class.*/
-    ClassDefOverride(RecoTrack, 10);
+    ClassDefOverride(RecoTrack, 12);
   };
 
   /**

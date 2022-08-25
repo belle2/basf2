@@ -98,7 +98,7 @@ namespace Belle2 {
     /// Constructor out of different parts
     template <class ...T>
     explicit ZMQModuleMessage(T&& ... arguments) :
-      m_messageParts( {ZMQMessageHelper::createZMQMessage(std::forward<T>(arguments)) ... })
+      m_messageParts({ZMQMessageHelper::createZMQMessage(std::forward<T>(arguments)) ... })
     {
     }
 

@@ -38,15 +38,23 @@ class GATModule(torch.nn.Module):
         :param use_gap:  TODO
         """
         super().__init__()
+        #: TODO
         self.gat = dglnn.GATConv(in_feats, units, num_heads)
         out_feats = units * num_heads
+        #: TODO
         self.fc = torch.nn.Linear(in_feats_glob + out_feats, units)
+        #: TODO
         self.use_gap = use_gap
         if self.use_gap:
+            #: TODO
             self.gap_gate = torch.nn.Linear(out_feats, 1)
+            #: TODO
             self.gap = GlobalAttentionPooling(self.gap_gate)
 
     def forward(self, graph, feat, feat_glob=None):
+        """
+        TODO
+        """
         h = F.leaky_relu(self.gat(graph, feat)).flatten(1)
         hg = feat_glob
         if not self.use_gap:
@@ -106,8 +114,10 @@ class GATGAPModel(torch.nn.Module):
         :param use_gap: TODO
         """
         super().__init__()
+        #: TODO
         self.pdg_embedding = torch.nn.Embedding(num_pdg + 1, emb_size)
         in_feats = num_features + emb_size
+        #: TODO
         self.gat_layers = torch.nn.ModuleList()
         in_feats_glob = 0
         for i in range(n_layers):
@@ -123,9 +133,13 @@ class GATGAPModel(torch.nn.Module):
             in_feats = units * attention_heads
             in_feats_glob = units
 
+        #: TODO
         self.fc_output = torch.nn.Linear(units, 1)
 
     def forward(self, graph):
+        """
+        TODO
+        """
         h_pdg = graph.ndata["x_pdg"]
         h_feat = graph.ndata["x_feature"]
         h_pdg = self.pdg_embedding(h_pdg.long())

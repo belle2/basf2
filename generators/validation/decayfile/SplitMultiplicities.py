@@ -24,6 +24,9 @@ import basf2
 
 
 class SplitMultiplicities(basf2.Module):
+    """
+    Module to determine the multiplicities of a particle of a certain pdg code
+    """
     def __init__(self, listname, pdgcode):
         """
         Initialise the class.
@@ -31,7 +34,9 @@ class SplitMultiplicities(basf2.Module):
         :param pdgcode: TODO
         """
         super().__init__()
+        #: Particle list name
         self.listname = listname
+        #: pdg code to be studied
         self.pdgcode = pdgcode
 
     def event(self):

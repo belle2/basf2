@@ -28,6 +28,7 @@ void HistDelta::set(int t, int p, unsigned int a)
 
 void HistDelta::update(TH1* currentHist)
 {
+  m_updated = false;
   if (currentHist == nullptr) return; // this wont make sense
   gROOT->cd(); // make sure we dont accidentally write the histograms to a open file
   // cover first update after start
@@ -35,6 +36,7 @@ void HistDelta::update(TH1* currentHist)
     m_lastHist = (TH1*)currentHist->Clone();
     m_lastHist->SetName(TString(currentHist->GetName()) + "_last");
     m_lastHist->Reset();
+    m_updated = true;
   }
   // now check if need to update m_deltaHists
 
@@ -42,7 +44,7 @@ void HistDelta::update(TH1* currentHist)
   double last_entries = m_lastHist->GetEntries();
   double current_entries = currentHist->GetEntries();
   if (current_entries - last_entries >= m_parameter) {
-    gROOT->cd();
+    m_updated = true;
     TH1* delta = (TH1*)currentHist->Clone();
     delta->Add(m_lastHist, -1.);
 
@@ -72,10 +74,12 @@ void HistDelta::reset(void)
   // m_deltaHists.clear(); // loop and delete? to be checked what is left in memory
   // by intention, we may not want to delete old m_deltaHists, thus having them from m_lastHist run? tbd
   if (m_lastHist) m_lastHist->Reset();
+  m_updated = true;
 }
 
-TH1* HistDelta::getDelta(unsigned int n)
+TH1* HistDelta::getDelta(unsigned int n, bool only_updated)
 {
+  if (only_updated && !m_updated) return nullptr;// not updated, but requested
   if (n >= m_deltaHists.size()) return nullptr;
   return m_deltaHists.at(n);
 }

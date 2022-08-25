@@ -39,7 +39,7 @@ REG_MODULE(ECLChargedPIDMVA);
 ECLChargedPIDMVAModule::ECLChargedPIDMVAModule() : Module()
 {
   setDescription("This module implements charged particle identification using ECL-related observables via a multiclass MVA. For each track a set of relevant ECL variables(shower shape, PSD etc.) are fed to the MVA method which is stored in a conditions database payload. The MVA output variables are then used to construct a likelihood from pdfs also stored in the payload. The likelihood is then stored in the ECLPidLikelihood object.");
-
+  setPropertyFlags(c_ParallelProcessingCertified);
   addParam("payloadName",
            m_payload_name,
            "The name of the database payload object with the MVA weights.",

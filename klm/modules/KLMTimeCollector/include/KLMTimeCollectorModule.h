@@ -88,10 +88,7 @@ namespace Belle2 {
       KLMChannelNumber channelID, std::multimap<unsigned int, ExtHit>&);
 
     /** Save position difference betwen matched kLMHit and ExtHit. */
-    void storeDistDiff(TVector3&);
-
-    /** Debug flag. Not used currently. */
-    bool m_Debug;
+    void storeDistDiff(ROOT::Math::XYZVector&);
 
     /** Use event T0 or not. */
     bool m_useEvtT0;

@@ -121,8 +121,8 @@ void DriftLengthBasedEventTimeExtractor::apply(std::vector<RecoTrack*>& recoTrac
     EventT0::EventT0Component eventT0Component(extractedEventT0, NAN, Const::CDC, "drift length");
     m_eventT0->setEventT0(eventT0Component);
     m_wasSuccessful = true;
-    B2DEBUG(50, "Drift length gave a result of " << extractedEventT0);
+    B2DEBUG(25, "Drift length gave a result of " << extractedEventT0);
   } else {
-    B2DEBUG(50, "Extracted event t0 is nan.");
+    B2DEBUG(25, "Extracted event t0 is nan.");
   }
 }

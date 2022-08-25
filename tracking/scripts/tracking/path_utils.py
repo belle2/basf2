@@ -295,6 +295,42 @@ def add_prune_tracks(path, components=None, reco_tracks="RecoTracks"):
     path.add_module("PruneGenfitTracks")
 
 
+def add_flipping_of_recoTracks(path, fit_tracks=True, reco_tracks="RecoTracks", trackFitHypotheses=None):
+    """
+    This function adds the mva based selections and the flipping of the recoTracks
+
+    :param path: The path to add the tracking reconstruction modules to
+    :param fit_tracks: fit the flipped recotracks or not
+    :param reco_tracks: Name of the StoreArray where the reco tracks should be flipped
+    :param trackFitHypotheses: Which pdg hypothesis to fit. Defaults to [211, 321, 2212].
+    """
+
+    path.add_module("FlipQuality", recoTracksStoreArrayName=reco_tracks,
+                    identifier='TRKTrackFlipAndRefit_MVA1_weightfile',
+                    indexOfFlippingMVA=1).set_name("FlipQuality_1stMVA")
+
+    reco_tracks_flipped = "RecoTracks_flipped"
+    path.add_module("RecoTracksReverter", inputStoreArrayName=reco_tracks,
+                    outputStoreArrayName=reco_tracks_flipped)
+    if fit_tracks:
+        path.add_module("DAFRecoFitter", recoTracksStoreArrayName=reco_tracks_flipped).set_name("Combined_DAFRecoFitter_flipped")
+        path.add_module("IPTrackTimeEstimator",
+                        recoTracksStoreArrayName=reco_tracks_flipped, useFittedInformation=False)
+    path.add_module("TrackCreator", trackColName="Tracks_flipped",
+                    trackFitResultColName="TrackFitResults_flipped",
+                    recoTrackColName=reco_tracks_flipped,
+                    pdgCodes=[
+                        211,
+                        321,
+                        2212] if not trackFitHypotheses else trackFitHypotheses).set_name("TrackCreator_flipped")
+    path.add_module("FlipQuality", recoTracksStoreArrayName=reco_tracks,
+                    identifier='TRKTrackFlipAndRefit_MVA2_weightfile',
+                    indexOfFlippingMVA=2).set_name("FlipQuality_2ndMVA")
+    path.add_module("FlippedRecoTracksMerger",
+                    inputStoreArrayName=reco_tracks,
+                    inputStoreArrayNameFlipped=reco_tracks_flipped)
+
+
 def add_pxd_track_finding(path, components, input_reco_tracks, output_reco_tracks, use_mc_truth=False,
                           add_both_directions=False, temporary_reco_tracks="PXDRecoTracks", **kwargs):
     """Add the pxd track finding to the path"""

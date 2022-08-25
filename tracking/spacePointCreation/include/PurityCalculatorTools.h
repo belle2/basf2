@@ -53,19 +53,19 @@ namespace Belle2 { // make seperate sub-namespace for this?
     // CAUTION: getting all TrueHits here (i.e. from all StoreArrays)
     Belle2::RelationVector<TrueHitType> trueHits = spacePoint->getRelationsTo<TrueHitType>("ALL");
     std::vector<std::pair<int, double> > mcParticles;
-    B2DEBUG(4999, "Found " << trueHits.size() << " TrueHits related to SpacePoint " << spacePoint->getArrayIndex());
+    B2DEBUG(29, "Found " << trueHits.size() << " TrueHits related to SpacePoint " << spacePoint->getArrayIndex());
 
     for (size_t iTH = 0; iTH < trueHits.size(); ++iTH) {
-      B2DEBUG(4999, "Trying to get MCParticles from TrueHit " << trueHits[iTH]->getArrayIndex() <<
+      B2DEBUG(29, "Trying to get MCParticles from TrueHit " << trueHits[iTH]->getArrayIndex() <<
               " from Array " << trueHits[iTH]->getArrayName());
       Belle2::MCParticle* mcPart = trueHits[iTH]->template getRelatedFrom<Belle2::MCParticle>("ALL");
 
       int mcPartId = -1; // default value for MCPartId (not found)
       if (mcPart != nullptr) {
         mcPartId = mcPart->getArrayIndex();
-        B2DEBUG(4999, "TrueHit is related to MCParticle " << mcPartId);
+        B2DEBUG(29, "TrueHit is related to MCParticle " << mcPartId);
       } else {
-        B2DEBUG(1, "Found no MCParticle related to TrueHit " << trueHits[iTH]->getArrayIndex() <<
+        B2DEBUG(20, "Found no MCParticle related to TrueHit " << trueHits[iTH]->getArrayIndex() <<
                 " from Array " << trueHits[iTH]->getArrayName());
       }
       mcParticles.push_back(std::make_pair(mcPartId, trueHits.weight(iTH)));
@@ -76,7 +76,7 @@ namespace Belle2 { // make seperate sub-namespace for this?
     auto newEnd = std::unique(mcParticles.begin(), mcParticles.end(),
     [](const std::pair<int, double>& a, const std::pair<int, double>& b) { return a.first == b.first; }
                              );
-    if (newEnd != mcParticles.end()) B2DEBUG(1,
+    if (newEnd != mcParticles.end()) B2DEBUG(20,
                                                "More than one TrueHits (related to one SpacePoint) are related to the same MCParticle!");
     mcParticles.resize(std::distance(mcParticles.begin(), newEnd));
 
@@ -108,16 +108,16 @@ namespace Belle2 { // make seperate sub-namespace for this?
   {
     if (spacePoint->getType() == Belle2::VXD::SensorInfoBase::PXD) {
       clusterCtr[0]++;
-      B2DEBUG(4999, "SpacePoint contains PXDCluster");
+      B2DEBUG(29, "SpacePoint contains PXDCluster");
     } else {
       std::pair<bool, bool> setClusters = spacePoint->getIfClustersAssigned();
       if (setClusters.first) {
         clusterCtr[1]++;
-        B2DEBUG(4999, "SpacePoint contains U SVDCluster");
+        B2DEBUG(29, "SpacePoint contains U SVDCluster");
       }
       if (setClusters.second) {
         clusterCtr[2]++;
-        B2DEBUG(4999, "SpacePoint contains V SVDCluster");
+        B2DEBUG(29, "SpacePoint contains V SVDCluster");
       }
     }
   }
@@ -151,7 +151,7 @@ namespace Belle2 { // make seperate sub-namespace for this?
     unsigned nClusters = 0; // NOTE: only needed for DEBUG output -> remove?
 
     for (const Belle2::SpacePoint* spacePoint : spacePoints) {
-      B2DEBUG(4999, "Now processing SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName());
+      B2DEBUG(29, "Now processing SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName());
       increaseClusterCounters(spacePoint, totalClusters);
 
       nClusters += spacePoint->getNClustersAssigned();
@@ -159,7 +159,7 @@ namespace Belle2 { // make seperate sub-namespace for this?
       std::vector<std::pair<int, double> > mcParticles;
       if (spacePoint->getType() == VXD::SensorInfoBase::PXD) mcParticles = getMCParticles<PXDTrueHit>(spacePoint);
       else if (spacePoint->getType() == VXD::SensorInfoBase::SVD) mcParticles = getMCParticles<SVDTrueHit>(spacePoint);
-      else if (spacePoint->getType() == VXD::SensorInfoBase::VXD) {B2DEBUG(100, "found generic spacePoint, treating it as virtualIP");}
+      else if (spacePoint->getType() == VXD::SensorInfoBase::VXD) {B2DEBUG(25, "found generic spacePoint, treating it as virtualIP");}
       else B2FATAL("Unknown DetectorType (" << spacePoint->getType() << ") in createPurityInfos! Skipping this SpacePoint " <<
                      spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName());
 
@@ -170,7 +170,7 @@ namespace Belle2 { // make seperate sub-namespace for this?
         }
       }
     }
-    B2DEBUG(4999, "container contained " << spacePoints.size() << " SpacePoint with " << nClusters << " Clusters");
+    B2DEBUG(29, "container contained " << spacePoints.size() << " SpacePoint with " << nClusters << " Clusters");
 
     // create MCVXDPurityInfos and add them to the return vector
     std::vector<Belle2::MCVXDPurityInfo> purityInfos;

@@ -26,7 +26,7 @@ namespace Belle2 {
     template <class ACDCHitCollection>
     void CDCMCHitCollectionLookUp<ACDCHitCollection>::clear()
     {
-      B2DEBUG(100, "Clearing CDCMCHitCollectionLookUp<ACDCHitCollection>");
+      B2DEBUG(25, "Clearing CDCMCHitCollectionLookUp<ACDCHitCollection>");
     }
 
     template <class ACDCHitCollection>

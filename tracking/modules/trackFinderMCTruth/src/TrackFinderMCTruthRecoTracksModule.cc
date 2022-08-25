@@ -8,23 +8,12 @@
 
 #include <tracking/modules/trackFinderMCTruth/TrackFinderMCTruthRecoTracksModule.h>
 
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/gearbox/Const.h>
-#include <mdst/dataobjects/MCParticle.h>
-#include <cdc/dataobjects/CDCHit.h>
-#include <cdc/dataobjects/CDCSimHit.h>
 #include <cdc/geometry/CDCGeometryPar.h>
-#include <pxd/dataobjects/PXDTrueHit.h>
-#include <pxd/dataobjects/PXDCluster.h>
-#include <vtx/dataobjects/VTXTrueHit.h>
-#include <vtx/dataobjects/VTXCluster.h>
-#include <svd/dataobjects/SVDTrueHit.h>
-#include <svd/dataobjects/SVDCluster.h>
 #include <top/dataobjects/TOPBarHit.h>
-#include <tracking/dataobjects/RecoTrack.h>
 #include <simulation/monopoles/MonopoleConstants.h>
 
 #include <framework/geometry/BFieldManager.h>
@@ -227,17 +216,15 @@ TrackFinderMCTruthRecoTracksModule::TrackFinderMCTruthRecoTracksModule() : Modul
 
 void TrackFinderMCTruthRecoTracksModule::initialize()
 {
-  StoreArray<MCParticle> mcparticles;
-  if (mcparticles.isOptional()) {
+  if (m_MCParticles.isOptional()) {
     m_mcParticlesPresent = true;
 
     //output store arrays have to be registered in initialize()
-    StoreArray<RecoTrack> recoTracks(m_recoTracksStoreArrayName);
-    recoTracks.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered);
+    m_RecoTracks.registerInDataStore(m_recoTracksStoreArrayName, DataStore::c_ErrorIfAlreadyRegistered);
 
-    recoTracks.registerRelationTo(mcparticles);
+    m_RecoTracks.registerRelationTo(m_MCParticles);
 
-    RecoTrack::registerRequiredRelations(recoTracks);
+    RecoTrack::registerRequiredRelations(m_RecoTracks);
 
     // build a bit mask with all properties a MCParticle should have to lead to the creation of a track candidate
     m_particleProperties = 0;
@@ -353,86 +340,74 @@ void TrackFinderMCTruthRecoTracksModule::event()
   B2DEBUG(20, "*******   MCTrackFinderModule processing event number: " << eventCounter << " *******");
 
   //all the input containers. First: MCParticles
-  StoreArray<MCParticle> mcParticles;
-  const int nMcParticles = mcParticles.getEntries();
+  const int nMcParticles = m_MCParticles.getEntries();
   B2DEBUG(20, "MCTrackFinder: total Number of MCParticles: " << nMcParticles);
 
   //VTX trueHits
-  StoreArray<VTXTrueHit> vtxTrueHits;
-  const int nVTXHits = vtxTrueHits.getEntries();
+  const int nVTXHits = m_VTXTrueHits.getEntries();
   B2DEBUG(20, "MCTrackFinder: Number of VTXTrueHits: " << nVTXHits);
 
-  RelationArray mcPartToVTXTrueHits(mcParticles, vtxTrueHits);
+  RelationArray mcPartToVTXTrueHits(m_MCParticles, m_VTXTrueHits);
   const int nMcPartToVTXHits = mcPartToVTXTrueHits.getEntries();
   B2DEBUG(20, "MCTrackFinder: Number of relations between MCParticles and VTXHits: " << nMcPartToVTXHits);
 
   //VTX clusters
-  StoreArray<VTXCluster> vtxClusters;
-  const int nVTXClusters = vtxClusters.getEntries();
+  const int nVTXClusters = m_VTXClusters.getEntries();
   B2DEBUG(20, "MCTrackFinder: Number of VTXClusters: " << nVTXClusters);
 
-  RelationArray vtxClusterToMCParticle(vtxClusters, mcParticles);
+  RelationArray vtxClusterToMCParticle(m_VTXClusters, m_MCParticles);
   const int nVtxClusterToMCPart = vtxClusterToMCParticle.getEntries();
   B2DEBUG(20, "MCTrackFinder: Number of relations between VTXCluster and MCParticles: " << nVtxClusterToMCPart);
 
   //PXD trueHits
-  StoreArray<PXDTrueHit> pxdTrueHits;
-  const int nPXDHits = pxdTrueHits.getEntries();
+  const int nPXDHits = m_PXDTrueHits.getEntries();
   B2DEBUG(20, "MCTrackFinder: Number of PXDTrueHits: " << nPXDHits);
 
-  RelationArray mcPartToPXDTrueHits(mcParticles, pxdTrueHits);
+  RelationArray mcPartToPXDTrueHits(m_MCParticles, m_PXDTrueHits);
   const int nMcPartToPXDHits = mcPartToPXDTrueHits.getEntries();
   B2DEBUG(20, "MCTrackFinder: Number of relations between MCParticles and PXDHits: " << nMcPartToPXDHits);
 
   //PXD clusters
-  StoreArray<PXDCluster> pxdClusters;
-  const int nPXDClusters = pxdClusters.getEntries();
+  const int nPXDClusters = m_PXDClusters.getEntries();
   B2DEBUG(20, "MCTrackFinder: Number of PXDClusters: " << nPXDClusters);
 
-  RelationArray pxdClusterToMCParticle(pxdClusters, mcParticles);
+  RelationArray pxdClusterToMCParticle(m_PXDClusters, m_MCParticles);
   const int nPxdClusterToMCPart = pxdClusterToMCParticle.getEntries();
   B2DEBUG(20, "MCTrackFinder: Number of relations between PXDCluster and MCParticles: " << nPxdClusterToMCPart);
 
   //SVD truehits
-  StoreArray<SVDTrueHit> svdTrueHits;
-  const int nSVDHits = svdTrueHits.getEntries();
+  const int nSVDHits = m_SVDTrueHits.getEntries();
   B2DEBUG(20, "MCTrackFinder: Number of SVDDHits: " << nSVDHits);
 
-  RelationArray mcPartToSVDTrueHits(mcParticles, svdTrueHits);
+  RelationArray mcPartToSVDTrueHits(m_MCParticles, m_SVDTrueHits);
   const int nMcPartToSVDHits = mcPartToSVDTrueHits.getEntries();
   B2DEBUG(20, "MCTrackFinder: Number of relations between MCParticles and SVDHits: " << nMcPartToSVDHits);
 
   //SVD clusters
-  StoreArray<SVDCluster> svdClusters;
-  const int nSVDClusters = svdClusters.getEntries();
+  const int nSVDClusters = m_SVDClusters.getEntries();
   B2DEBUG(20, "MCTrackFinder: Number of SVDClusters: " << nSVDClusters);
 
-  RelationArray svdClusterToMCParticle(svdClusters, mcParticles);
+  RelationArray svdClusterToMCParticle(m_SVDClusters, m_MCParticles);
   const int nSvdClusterToMCPart = svdClusterToMCParticle.getEntries();
   B2DEBUG(20, "MCTrackFinder: Number of relations between SVDCluster and MCParticles: " << nSvdClusterToMCPart);
 
   //CDC
-  StoreArray<CDCHit> cdcHits;
-  const int nCDCHits = cdcHits.getEntries();
+  const int nCDCHits = m_CDCHits.getEntries();
   B2DEBUG(20, "MCTrackFinder: Number of CDCHits: " << nCDCHits);
 
-  RelationArray mcPartToCDCHits(mcParticles, cdcHits);
+  RelationArray mcPartToCDCHits(m_MCParticles, m_CDCHits);
   const int nMcPartToCDCHits = mcPartToCDCHits.getEntries();
   B2DEBUG(20, "MCTrackFinder: Number of relations between MCParticles and CDCHits: " << nMcPartToCDCHits);
 
-  StoreArray<CDCSimHit> cdcSimHits("");
-  const int nCDCSimHits = cdcSimHits.getEntries();
+  const int nCDCSimHits = m_CDCSimHits.getEntries();
   B2DEBUG(20, "MCTrackFinder: Number of CDCSimHits: " << nCDCSimHits);
 
-  RelationArray cdcSimHitToHitRel(cdcSimHits, cdcHits);
+  RelationArray cdcSimHitToHitRel(m_CDCSimHits, m_CDCHits);
   const int nCdcSimHitToHitRel = cdcSimHitToHitRel.getEntries();
   B2DEBUG(20, "MCTrackFinder: Number of relations between CDCSimHit and CDCHits: " << nCdcSimHitToHitRel);
 
   // prepare rejection of CDC/PXD/SVD/VTX hits from higher order loops
   const double Bz = BFieldManager::getField(0, 0, 0).Z() / Unit::T;
-
-  //register StoreArray which will be filled by this module
-  StoreArray<RecoTrack> recoTracks(m_recoTracksStoreArrayName);
 
   // loop over MCParticles. And check several user selected properties. Make a track candidate only if MCParticle has properties wanted by user options.
   std::set<int> alreadyConsumedMCParticles;
@@ -440,7 +415,7 @@ void TrackFinderMCTruthRecoTracksModule::event()
     if (alreadyConsumedMCParticles.count(iPart)) continue;
     alreadyConsumedMCParticles.insert(iPart);
 
-    MCParticle* aMcParticlePtr = mcParticles[iPart];
+    MCParticle* aMcParticlePtr = m_MCParticles[iPart];
     // Ignore particles that didn't propagate significantly, they cannot make tracks.
     if ((aMcParticlePtr->getDecayVertex() - B2Vector3D(aMcParticlePtr->getProductionVertex())).Mag() < 1 * Unit::cm) {
       B2DEBUG(20, "Particle that did not propagate significantly cannot make track.");
@@ -926,7 +901,7 @@ void TrackFinderMCTruthRecoTracksModule::event()
     }
 
     //Now create TrackCandidate
-    int counter = recoTracks.getEntries();
+    int counter = m_RecoTracks.getEntries();
     B2DEBUG(20, "We came pass all filter of the MCPartile and hit properties. TrackCandidate " << counter <<
             " will be created from the MCParticle with index: " << iPart << " (PDG: " << aMcParticlePtr->getPDG() << ")");
 
@@ -1002,7 +977,7 @@ void TrackFinderMCTruthRecoTracksModule::event()
       }
 
 
-      RecoTrack* newRecoTrack = recoTracks.appendNew(position, momentum, charge);
+      RecoTrack* newRecoTrack = m_RecoTracks.appendNew(position, momentum, charge);
       if (m_setTimeSeed) {
         newRecoTrack->setTimeSeed(time);
       }
@@ -1021,7 +996,7 @@ void TrackFinderMCTruthRecoTracksModule::event()
 
 
         if (detectorInformation == Const::CDC) {
-          const CDCHit* cdcHit = cdcHits[hitID];
+          const CDCHit* cdcHit = m_CDCHits[hitID];
           const CDCSimHit* aCDCSimHitPtr = cdcHit->getRelatedFrom<CDCSimHit>();
 
           //now determine the correct sign to resolve the left right ambiguity in the fitter
@@ -1039,13 +1014,13 @@ void TrackFinderMCTruthRecoTracksModule::event()
           }
           B2DEBUG(20, "CDC hit " << hitID << " has reft/right sign " << isRightHit);
         } else if (detectorInformation == Const::VTX) {
-          const VTXCluster* vtxCluster = vtxClusters[hitID];
+          const VTXCluster* vtxCluster = m_VTXClusters[hitID];
           newRecoTrack->addVTXHit(vtxCluster, hitCounter, hitOriginMCFinderType);
         } else if (detectorInformation == Const::PXD) {
-          const PXDCluster* pxdCluster = pxdClusters[hitID];
+          const PXDCluster* pxdCluster = m_PXDClusters[hitID];
           newRecoTrack->addPXDHit(pxdCluster, hitCounter, hitOriginMCFinderType);
         } else if (detectorInformation == Const::SVD) {
-          const SVDCluster* svdCluster = svdClusters[hitID];
+          const SVDCluster* svdCluster = m_SVDClusters[hitID];
           newRecoTrack->addSVDHit(svdCluster, hitCounter, hitOriginMCFinderType);
         }
         ++hitCounter;

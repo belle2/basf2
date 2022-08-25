@@ -78,7 +78,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                        use_second_cdc_hits=False, add_muid_hits=False, reconstruct_cdst=None,
                        event_abort=default_event_abort, use_random_numbers_for_hlt_prescale=True,
                        pxd_filtering_offline=False, append_full_grid_cdc_eventt0=False,
-                       legacy_ecl_charged_pid=True,
+                       legacy_ecl_charged_pid=False,
                        useVTX=False, useVTXClusterShapes=True):
     """
     This function adds the standard reconstruction modules to a path.
@@ -177,7 +177,7 @@ def add_prefilter_reconstruction(
         use_random_numbers_for_hlt_prescale=True,
         pxd_filtering_offline=False,
         append_full_grid_cdc_eventt0=False,
-        legacy_ecl_charged_pid=True,
+        legacy_ecl_charged_pid=False,
         useVTX=False,
         useVTXClusterShapes=True):
     """
@@ -338,7 +338,7 @@ def add_cosmics_reconstruction(
         reconstruct_cdst=False,
         posttracking=True,
         eventt0_combiner_mode="prefer_cdc",
-        legacy_ecl_charged_pid=True,
+        legacy_ecl_charged_pid=False,
         useVTX=False
         ):
     """
@@ -478,7 +478,7 @@ def add_prefilter_posttracking_reconstruction(path,
                                               for_cdst_analysis=False,
                                               add_eventt0_combiner_for_cdst=False,
                                               eventt0_combiner_mode="prefer_svd",
-                                              legacy_ecl_charged_pid=True,
+                                              legacy_ecl_charged_pid=False,
                                               useVTX=False):
     """
     This function adds the standard reconstruction modules after tracking
@@ -853,7 +853,7 @@ def add_dedx_modules(path, components=None, useVTX=False):
         path.add_module('VXDDedxPID')
 
 
-def prepare_cdst_analysis(path, components=None, mc=False, add_eventt0_combiner=False, legacy_ecl_charged_pid=True, useVTX=False):
+def prepare_cdst_analysis(path, components=None, mc=False, add_eventt0_combiner=False, legacy_ecl_charged_pid=False, useVTX=False):
     """
     Adds to a (analysis) path all the modules needed to analyse a cDST file in the raw+tracking format
     for collisions/cosmics data or in the digits+tracking format for MC data.

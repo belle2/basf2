@@ -23,7 +23,7 @@ using namespace CDCTriggerUnpacker;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(CDCTriggerUnpacker)
+REG_MODULE(CDCTriggerUnpacker);
 
 //-----------------------------------------------------------------
 //                 Implementation

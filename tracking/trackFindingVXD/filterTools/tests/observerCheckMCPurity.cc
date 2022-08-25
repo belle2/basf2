@@ -37,25 +37,25 @@ namespace ObserverCheckMCPurityTests {
 
 /// check the initializer:
     // before initialize: all containers should be empty:
-    EXPECT_EQ(0 , ObserverCheckMCPurity::s_results.size());
-    EXPECT_EQ(0 , ObserverCheckMCPurity::s_wasAccepted.size());
-    EXPECT_EQ(0 , ObserverCheckMCPurity::s_wasUsed.size());
+    EXPECT_EQ(0, ObserverCheckMCPurity::s_results.size());
+    EXPECT_EQ(0, ObserverCheckMCPurity::s_wasAccepted.size());
+    EXPECT_EQ(0, ObserverCheckMCPurity::s_wasUsed.size());
 
     testObserver.initialize< CircleRadius<SpacePoint>, ClosedRange<double, double>>(CircleRadius<SpacePoint>(),
         ClosedRange<double, double>());
 
     // after initialize: now the containers are not empty any more:
-    EXPECT_EQ(1 , ObserverCheckMCPurity::s_results.size());
-    EXPECT_EQ(1 , ObserverCheckMCPurity::s_wasAccepted.size());
-    EXPECT_EQ(1 , ObserverCheckMCPurity::s_wasUsed.size());
+    EXPECT_EQ(1, ObserverCheckMCPurity::s_results.size());
+    EXPECT_EQ(1, ObserverCheckMCPurity::s_wasAccepted.size());
+    EXPECT_EQ(1, ObserverCheckMCPurity::s_wasUsed.size());
 
 
     testObserver.terminate();
 
     // after terminate: all containers should be empty:
-    EXPECT_EQ(0 , ObserverCheckMCPurity::s_results.size());
-    EXPECT_EQ(0 , ObserverCheckMCPurity::s_wasAccepted.size());
-    EXPECT_EQ(0 , ObserverCheckMCPurity::s_wasUsed.size());
+    EXPECT_EQ(0, ObserverCheckMCPurity::s_results.size());
+    EXPECT_EQ(0, ObserverCheckMCPurity::s_wasAccepted.size());
+    EXPECT_EQ(0, ObserverCheckMCPurity::s_wasUsed.size());
   }
 
 

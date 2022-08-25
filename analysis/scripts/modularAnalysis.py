@@ -1295,14 +1295,82 @@ def applyEventCuts(cut, path):
 
             applyEventCuts("[nTracks > 5] and [isContinuumEvent], path=mypath)
 
-    Warning:
-        You must use square braces ``[`` and ``]`` for conditional statements.
+    .. warning::
+      Only event-based variables are allowed in this function
+      and only square brackets ``[`` and ``]`` for conditional statements.
 
     Parameters:
         cut (str): Events that do not pass these selection criteria are skipped
         path (basf2.Path): modules are added to this path
     """
+    import b2parser
+    from variables import variables
 
+    def find_vars(t: tuple, var_list: list, meta_list: list) -> None:
+        """ Recursive helper function to find variable names """
+        if not isinstance(t, tuple):
+            return
+        if t[0] == b2parser.B2ExpressionParser.node_types['IdentifierNode']:
+            var_list += [t[1]]
+            return
+        if t[0] == b2parser.B2ExpressionParser.node_types['FunctionNode']:
+            meta_list.append(list(t[1:]))
+            return
+        for i in t:
+            if isinstance(i, tuple):
+                find_vars(i, var_list, meta_list)
+    event_var_id = '[Eventbased]'
+    metavar_ids = ['formula', 'abs',
+                   'cos', 'acos',
+                   'tan', 'atan',
+                   'sin', 'asin',
+                   'exp', 'log', 'log10',
+                   'min', 'max']
+    parsed_cut = b2parser.parse(cut)
+    var_list = []
+    meta_list = []
+    find_vars(parsed_cut, var_list=var_list, meta_list=meta_list)
+    if len(var_list) == 0 and len(meta_list) == 0:
+        B2WARNING(f'Cut string "{cut}" has no variables for applyEventCuts helper function!')
+    for var_string in var_list:
+        # Get the variable and get rid of aliases
+        var = variables.getVariable(var_string)
+        # Throw an error message if the variable's description doesn't contain the event-based marker
+        if event_var_id not in var.description:
+            B2ERROR(f'Variable {var_string} is not an event-based variable! Please check your inputs to the applyEventCuts method!')
+    for meta_string_list in meta_list:
+        var_list_temp = []
+        while meta_string_list[0] in metavar_ids:
+            # remove special meta variable
+            meta_string_list.pop(0)
+            for meta_string in meta_string_list[0].split(","):
+                find_vars(b2parser.parse(meta_string), var_list_temp, meta_string_list)
+            if len(meta_string_list) > 0:
+                meta_string_list.pop(0)
+            if len(meta_string_list) == 0:
+                break
+            if len(meta_string_list) > 1:
+                meta_list += meta_string_list[1:]
+            if isinstance(meta_string_list[0], list):
+                meta_string_list = [element for element in meta_string_list[0]]
+        for var_string in var_list_temp:
+            # Get the variable and get rid of aliases
+            var = variables.getVariable(var_string)
+            # Throw an error message if the variable's description doesn't contain the event-based marker
+            if event_var_id not in var.description:
+                B2ERROR(f'Variable {var_string} is not an event-based variable!'
+                        ' Please check your inputs to the applyEventCuts method!')
+        if len(meta_string_list) == 0:
+            continue
+        elif len(meta_string_list) == 1:
+            var = variables.getVariable(meta_string_list[0])
+        else:
+            var = variables.getVariable(meta_string_list[0], meta_string_list[1].split(","))
+        # Check if the variable's description contains event-based marker
+        if event_var_id in var.description:
+            continue
+        # Throw an error message if non event-based variable is used
+        B2ERROR(f'Variable {var.name} is not an event-based variable! Please check your inputs to the applyEventCuts method!')
     eselect = register_module('VariableToReturnValue')
     eselect.param('variable', 'passesEventCut(' + cut + ')')
     path.add_module(eselect)
@@ -3223,8 +3291,8 @@ def tagCurlTracks(particleLists,
       .. _BN1079: https://belle.kek.jp/secured/belle_note/gn1079/bn1079.pdf
 
 
-    The module loops over all particles in a given list that meet the preselection **ptCut** and assigns them to
-    bundles based on the response of the chosen **selector** and the required minimum response set by the
+    The module loops over all particles in a given list with a transverse momentum below the pre-selection **ptCut**
+    and assigns them to bundles based on the response of the chosen **selector** and the required minimum response set by the
     **responseCut**. Once all particles are assigned they are ranked by 25dr^2+dz^2. All but the lowest are tagged
     with extraInfo(isCurl=1) to allow for later removal by cutting the list or removing these from ROE as
     applicable.
@@ -3240,7 +3308,9 @@ def tagCurlTracks(particleLists,
     @param selectorType:  string name of selector to use. The available options are 'cut' and 'mva'.
                           It is strongly recommended to used the 'mva' selection. The 'cut' selection
                           is based on BN1079 and is only calibrated for Belle data.
-    @param ptCut:         pre-selection cut on transverse momentum.
+
+    @param ptCut:         Pre-selection cut on transverse momentum. Only tracks below that are considered as curler candidates.
+
     @param expert_train:  flag to set training mode if selector has a training mode (mva).
     @param expert_filename: set file name of produced training ntuple (mva).
     @param path:          module is added to this path.
@@ -3378,12 +3448,9 @@ def applyChargedPidMVA(particleLists, path, trainingMode, chargeIndependent=Fals
     iDet = 0
     for detID in Const.PIDDetectors.c_set:
 
-        # At the moment, SVD is excluded.
-        if detID == Const.EDetector.SVD:
-            B2WARNING("The ChargedPidMVA training currently does not include the SVD.")
-            continue
-
         detName = Const.parseDetectors(detID)
+
+        vm.addAlias(f"missingLogL_{detName}", f"pidMissingProbabilityExpert({detName})")
 
         for pdgIdSig, info in stdChargedMap.items():
 

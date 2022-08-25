@@ -106,7 +106,7 @@ namespace Belle2 {
 
   public:
     /// Set description
-    ToCDCCKFModule() : TrackFindingCDC::FindletModule<CKFToCDCFindlet>( {"CDCWireHitVector"})
+    ToCDCCKFModule() : TrackFindingCDC::FindletModule<CKFToCDCFindlet>({"CDCWireHitVector"})
     {
       setDescription("Combinatorical Kalman Filter used for extrapolating SVD tracks into "
                      "CDC and create merged tracks.");
@@ -122,7 +122,7 @@ namespace Belle2 {
 
   public:
     /// Set description
-    ToCDCFromEclCKFModule() : TrackFindingCDC::FindletModule<CKFToCDCFromEclFindlet>( {"CDCWireHitVector"})
+    ToCDCFromEclCKFModule() : TrackFindingCDC::FindletModule<CKFToCDCFromEclFindlet>({"CDCWireHitVector"})
     {
       setDescription("Combinatorical Kalman Filter used for extrapolating ECL showers into "
                      "CDC and create merged tracks.");

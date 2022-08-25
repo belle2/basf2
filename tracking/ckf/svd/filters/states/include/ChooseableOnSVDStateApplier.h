@@ -19,5 +19,5 @@ namespace Belle2 {
                                             TrackFindingCDC::ChooseableFilter<SVDStateFilterFactory>>>;
                                             /// Alias to apply the () operator to all items filtered by CKF SVD layer states
                                             using ChooseableOnSVDStateApplier = LayerToggledApplier<CKFToSVDState, LimitedOnStateApplier<CKFToSVDState,
-                                                TrackFindingCDC::ChooseableFilter<SVDStateFilterFactory>>>;
+                                                  TrackFindingCDC::ChooseableFilter<SVDStateFilterFactory>>>;
 }

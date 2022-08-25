@@ -12,7 +12,6 @@
 #include <framework/geometry/B2Vector3.h>
 #include <cmath>
 using namespace Belle2;
-using namespace std;
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -29,8 +28,8 @@ SVDEventT0EstimatorModule::SVDEventT0EstimatorModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified);
 
   //* Definition of input parameters */
-  addParam("RecoTracks", m_recoTracksName, "Name of the StoreArray with the input RecoTracks", string(""));
-  addParam("EventT0", m_eventT0Name, "Name of the StoreObjPtr with the input EventT0", string(""));
+  addParam("RecoTracks", m_recoTracksName, "Name of the StoreArray with the input RecoTracks", std::string(""));
+  addParam("EventT0", m_eventT0Name, "Name of the StoreObjPtr with the input EventT0", std::string(""));
   addParam("ptMinSelection", m_ptSelection, "Cut on minimum transverse momentum pt for RecoTrack selection", m_ptSelection);
   addParam("absPzMinSelection", m_absPzSelection,
            "Cut on minimum absolute value of the longitudinal momentum, abs(pz), for RecoTrack selection",
@@ -68,7 +67,7 @@ void SVDEventT0EstimatorModule::event()
   for (const auto& recoTrack : m_recoTracks) {
     const B2Vector3D& p = recoTrack.getMomentumSeed();
     if (p.Perp() < m_ptSelection || std::fabs(p.Z()) < m_absPzSelection) continue;
-    const vector<SVDCluster* >& svdClusters = recoTrack.getSVDHitList();
+    const std::vector<SVDCluster* >& svdClusters = recoTrack.getSVDHitList();
     B2DEBUG(20, "FITTED TRACK:   NUMBER OF SVD HITS = " << svdClusters.size());
     for (const SVDCluster* svdCluster : svdClusters) {
       clsTimeSum += svdCluster->getClsTime();

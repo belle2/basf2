@@ -21,6 +21,7 @@ from tracking.path_utils import (  # noqa
     add_hit_preparation_modules,
     add_mc_matcher,
     add_prune_tracks,
+    add_flipping_of_recoTracks,
     add_pxd_cr_track_finding,
     add_pxd_track_finding,
     add_svd_track_finding,
@@ -49,6 +50,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
                                 use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False,
                                 add_cdcTrack_QI=True, add_vxdTrack_QI=False, add_recoTrack_QI=False,
                                 pxd_filtering_offline=False, append_full_grid_cdc_eventt0=False,
+                                flip_recoTrack=True,
                                 useVTX=False, use_vtx_to_cdc_ckf=True, useVTXClusterShapes=True):
     """
     This function adds the **standard tracking reconstruction** modules
@@ -108,6 +110,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
         The reconstructed SVD/CDC tracks are used to define the ROIs and reject all PXD clusters outside of these.
     :param append_full_grid_cdc_eventt0: If True, the module FullGridChi2TrackTimeExtractor is added to the path
                                       and provides the CDC temporary EventT0.
+    :param flip_recoTrack: if true, add the recoTracks flipping function in the postfilter
     :param useVTX: If true, the VTX reconstruction is performed.
     :param use_vtx_to_cdc_ckf: if true, add VTX to CDC CKF module.
     :param useVTXClusterShapes: use the VTX cluster shapes
@@ -140,7 +143,8 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
                                            pruneTracks=pruneTracks,
                                            fit_tracks=fit_tracks,
                                            reco_tracks=reco_tracks,
-                                           prune_temporary_tracks=prune_temporary_tracks)
+                                           prune_temporary_tracks=prune_temporary_tracks,
+                                           flip_recoTrack=flip_recoTrack)
 
 
 def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdding=False,
@@ -247,7 +251,7 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
 
 
 def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=False, fit_tracks=True, reco_tracks="RecoTracks",
-                                           prune_temporary_tracks=True):
+                                           prune_temporary_tracks=True, flip_recoTrack=True):
     """
     This function adds the tracking reconstruction modules not required to calculate HLT filter
     decision to a path.
@@ -259,15 +263,19 @@ def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=Fa
     :param reco_tracks: Name of the StoreArray where the reco tracks should be stored
     :param prune_temporary_tracks: If false, store all information of the single CDC and VXD tracks before merging.
         If true, prune them.
+    :param flip_recoTrack: if true, add the recoTracks flipping function in the postfilter
     """
 
     if fit_tracks:
         add_postfilter_track_fit(path, components=components, pruneTracks=pruneTracks, reco_tracks=reco_tracks)
 
-    if prune_temporary_tracks or pruneTracks:
-        path.add_module("PruneRecoHits")
+    if flip_recoTrack:
+        add_flipping_of_recoTracks(path, reco_tracks="RecoTracks")
 
     path.add_module('TrackTimeEstimator')
+
+    if prune_temporary_tracks or pruneTracks:
+        path.add_module("PruneRecoHits")
 
 
 def add_time_extraction(path, append_full_grid_cdc_eventt0=False, components=None):

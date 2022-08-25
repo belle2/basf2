@@ -89,7 +89,11 @@ def add_mdst_dump(path, print_untested=False):
             "getProduction", "getTime", "getParentLfn", "getGeneratedWeight",
             "isEndOfRun"
         ], array=False),
-        DataStorePrinter("Track", ["getNumberOfFittedHypotheses", "getQualityIndicator", "getTrackTime"], {
+
+        DataStorePrinter("Track", [
+            "getNumberOfFittedHypotheses", "getQualityIndicator", "isFlippedAndRefitted",
+            "getTrackTime", "wasRefined"
+            ], {
             "getTrackFitResult": charged_stables,
             "getTrackFitResultWithClosestMass": charged_stables,
             "getRelationsWith": ["ECLClusters", "KLMClusters", "MCParticles", "PIDLikelihoods"],
@@ -101,7 +105,7 @@ def add_mdst_dump(path, print_untested=False):
             "getPosition", "getMomentum", "get4Momentum", "getEnergy", "getTransverseMomentum",
             "getCovariance6", "getParticleType", "getChargeSign", "getPValue", "getD0", "getPhi0",
             "getPhi", "getOmega", "getZ0", "getTanLambda", "getCotTheta",
-            "getTau", "getCov", "getCovariance5", "getHitPatternCDC", "getHitPatternVXD", "getNDF", "getChi2"
+            "getTau", "getCov", "getCovariance5", "getHitPatternCDC", "getHitPatternVXD", "getNDF", "getChi2",
         ]),
         DataStorePrinter("EventLevelTrackingInfo", [
             "getNCDCHitsNotAssigned", "getNCDCHitsNotAssignedPostCleaning",

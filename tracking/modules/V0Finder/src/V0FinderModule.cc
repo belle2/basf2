@@ -128,7 +128,7 @@ void V0FinderModule::initialize()
 
 void V0FinderModule::event()
 {
-  B2DEBUG(200, m_tracks.getEntries() << " tracks in event.");
+  B2DEBUG(29, m_tracks.getEntries() << " tracks in event.");
 
   // Group tracks into positive and negative tracks.
   std::vector<const Track*> tracksPlus;
@@ -151,7 +151,7 @@ void V0FinderModule::event()
 
   // Reject boring events.
   if (tracksPlus.empty() || tracksMinus.empty()) {
-    B2DEBUG(200, "No interesting track pairs. tracksPlus " << tracksPlus.size() << ", tracksMinus " << tracksMinus.size());
+    B2DEBUG(29, "No interesting track pairs. tracksPlus " << tracksPlus.size() << ", tracksMinus " << tracksMinus.size());
     return;
   }
 

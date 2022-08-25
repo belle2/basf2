@@ -23,7 +23,7 @@ namespace Belle2 {
 
     /** construtor, starts with max for min and min for max (will later be replaced by valid entries). */
     MinMax() :
-      m_minMax( {std::numeric_limits< double >::max(), -std::numeric_limits< double >::max()}) {}
+      m_minMax({std::numeric_limits< double >::max(), -std::numeric_limits< double >::max()}) {}
 
     /// reset to start values.
     void reset() { m_minMax = {std::numeric_limits< double >::max(), -std::numeric_limits< double >::max()}; }

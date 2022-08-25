@@ -75,9 +75,6 @@ namespace Belle2 {
     /** Calculate the Adler-32 checksum of a given file */
     static std::string calculateAdler32(const std::string& filename);
 
-    /** Calculate the Fletcher-32 checksum of a given file */
-    static std::string calculateFletcher32(const std::string& filename);
-
     /**
      * Load a shared library.
      *

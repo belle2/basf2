@@ -41,7 +41,7 @@ namespace {
     DualNumber x4(4, 1);
 
     EXPECT_NEAR(sqrt(x4).x,  2,    1e-15);  // value of sqrt(x) for x = 4
-    EXPECT_NEAR(sqrt(x4).dx, 1. / 4, 1e-15); // derivative of tan(x) for x = 0
+    EXPECT_NEAR(sqrt(x4).dx, 1. / 4, 1e-15); // derivative of sqrt(x) for x = 4
 
 
     //derivative of product
@@ -61,8 +61,11 @@ namespace {
   {
     GeneralVector<DualNumber> r(DualNumber(1, 1), DualNumber(1, 0), DualNumber(1, 0));
 
-    EXPECT_NEAR((-1.0 /  sqrt(r.norm2())).x, -1. / sqrt(3),     1e-15); // 1/r       for r=(1,1,1)
-    EXPECT_NEAR((-1.0 /  sqrt(r.norm2())).dx, 1. / (3 * sqrt(3)), 1e-15); // grad 1/r  for r=(1,1,1), x-component
+    EXPECT_NEAR((-1.0 /  sqrt(r.norm2())).x, -1. / sqrt(3),       1e-15); //      -1/r   for r=(1,1,1)
+    EXPECT_NEAR((-1.0 /  sqrt(r.norm2())).dx, 1. / (3 * sqrt(3)), 1e-15); // grad -1/r   for r=(1,1,1), x-component
+
+    EXPECT_NEAR(dot(r, r).x,  r.norm2().x, 1e-15); //      dot(r,r) == |r|^2
+    EXPECT_NEAR(dot(r, r).dx, 2.,          1e-15); // grad dot(r,r) == 2 for r =(1,1,1), x-component
   }
 
 }

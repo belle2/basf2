@@ -18,7 +18,7 @@ using namespace Belle2;
 
 namespace {
   struct PointRThetaPhi { double r; double theta; double phi; };
-  struct PointXYZ { double x; double y; double z; };
+  struct PointXYZ { double X; double Y; double Z; };
   std::vector<PointRThetaPhi> test_vectors(const std::vector<double>& R = {1}, int nTheta = 3, int nPhi = 4, bool prune = true)
   {
     std::vector<PointRThetaPhi> result;

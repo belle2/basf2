@@ -214,9 +214,16 @@ void DQMHistAnalysisModule::initHistListBeforeEvent(void)
   for (auto d : g_delta) {
     d.second->setNotUpdated();
   }
+
+  g_canvasup.clear();
 }
 
 void DQMHistAnalysisModule::clearHistList(void)
 {
   g_hist.clear();
+}
+
+void  DQMHistAnalysisModule::UpdateCanvas(std::string name, bool updated)
+{
+  g_canvasup[name] = updated;
 }

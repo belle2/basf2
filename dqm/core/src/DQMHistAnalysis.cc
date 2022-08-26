@@ -212,7 +212,7 @@ void DQMHistAnalysisModule::initHistListBeforeEvent(void)
     h.second.resetBeforeEvent();
   }
   for (auto d : g_delta) {
-    d.second->set_notUpdated();
+    d.second->setNotUpdated();
   }
 }
 

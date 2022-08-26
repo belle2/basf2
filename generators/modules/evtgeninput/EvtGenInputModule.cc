@@ -81,7 +81,7 @@ MCInitialParticles  EvtGenInputModule::createBeamParticle(double minMass, double
     const MCInitialParticles initial = m_initial.generate();
 
     // check if we fullfill the mass window
-    if (initial.getMass() >= minMass && initial.getMass() < maxMass)
+    if (minMass <= initial.getMass() && initial.getMass() < maxMass)
       return initial;
   }
 
@@ -120,11 +120,8 @@ void EvtGenInputModule::event()
   }
   //end initialization
 
-  //clear existing MCParticles
-  mpg.clear();
-
   //generate event.
-  int nPart =  m_Ievtgen.simulateEvent(mpg,  initial, m_inclusiveType, m_inclusiveParticle);
+  int nPart =  m_Ievtgen.simulateEvent(initial, m_inclusiveType, m_inclusiveParticle);
 
   B2DEBUG(10, "EvtGen: generated event with " << nPart << " particles.");
 }

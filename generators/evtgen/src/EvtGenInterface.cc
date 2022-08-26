@@ -109,7 +109,7 @@ int EvtGenInterface::setup(const std::string& DECFileName, const std::string& pa
 }
 
 
-int EvtGenInterface::simulateEvent(MCParticleGraph& graph,  MCInitialParticles initial, int inclusiveType,
+int EvtGenInterface::simulateEvent(MCInitialParticles initial, int inclusiveType,
                                    const std::string& inclusiveParticle)
 {
   EvtId inclusiveParticleID, inclusiveAntiParticleID;
@@ -122,7 +122,7 @@ int EvtGenInterface::simulateEvent(MCParticleGraph& graph,  MCInitialParticles i
   ROOT::Math::PxPyPzEVector herCMS = initial.getBoostedHER();
   ROOT::Math::XYZVector pPrimaryVertex = initial.getVertex();
 
-  m_pinit.set(pParentParticle.E(), pParentParticle.X(), pParentParticle.Y(), pParentParticle.Z());
+  EvtVector4R pinit(pParentParticle.E(), pParentParticle.X(), pParentParticle.Y(), pParentParticle.Z());
 
   if (inclusiveType != 0) {
     inclusiveParticleID = EvtPDL::getId(inclusiveParticle);
@@ -138,7 +138,7 @@ int EvtGenInterface::simulateEvent(MCParticleGraph& graph,  MCInitialParticles i
   bool we_got_inclusive_particle = false;
   do {
     m_logCaptureDebug.start();
-    m_parent = EvtParticleFactory::particleFactory(m_ParentParticle, m_pinit);
+    m_parent = EvtParticleFactory::particleFactory(m_ParentParticle, pinit);
 
 
     // spin-density matrix for Vector particle produced in e+e-
@@ -180,7 +180,7 @@ int EvtGenInterface::simulateEvent(MCParticleGraph& graph,  MCInitialParticles i
   } while (!we_got_inclusive_particle);
 
   //  B2INFO("after generate Decay.");
-
+  MCParticleGraph graph;
   int iPart = addParticles2Graph(m_parent, graph, pPrimaryVertex, NULL);
   graph.generateList("", MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
 
@@ -196,14 +196,14 @@ int EvtGenInterface::simulateDecay(MCParticleGraph& graph,
   EvtId id;
   ROOT::Math::PxPyPzEVector momentum = parent.get4Vector();
   B2Vector3D vertex = parent.getVertex();
-  m_pinit.set(momentum.E(), momentum.X(), momentum.Y(), momentum.Z());
+  EvtVector4R pinit(momentum.E(), momentum.X(), momentum.Y(), momentum.Z());
   m_logCaptureDebug.start();
   // we want to decay the particle so the decay time in the tree needs to be lower
   // than whatever the daughters will get
   parent.setDecayTime(-std::numeric_limits<float>::infinity());
   pdg = parent.getPDG();
   id = EvtPDL::evtIdFromStdHep(pdg);
-  m_parent = EvtParticleFactory::particleFactory(id, m_pinit);
+  m_parent = EvtParticleFactory::particleFactory(id, pinit);
   if (pdg == 10022) // Virtual photon
     m_parent->setVectorSpinDensity();
   else

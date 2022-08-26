@@ -234,7 +234,7 @@ namespace Belle2 {
     // now rotate CMS such that incoming e- is parallel to z-axis
     const ROOT::Math::XYZVector zaxis(0., 0., 1.);
     ROOT::Math::XYZVector rotaxis = zaxis.Cross(m_boostedHER.Vect()) / m_boostedHER.P();
-    double rotangle = TMath::ASin(rotaxis.R());
+    double rotangle = asin(rotaxis.R());
     const ROOT::Math::LorentzRotation rotation(ROOT::Math::AxisAngle(rotaxis, -rotangle));
     *m_labToCMS = rotation * (*m_labToCMS);
 

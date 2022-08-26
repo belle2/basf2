@@ -69,7 +69,7 @@ void DQMHistAnalysisModule::addDeltaPar(const std::string& dirname, const std::s
   g_delta[fullname] = new HistDelta(t, p, a);
 }
 
-TH1* DQMHistAnalysisModule::getDelta(const std::string& dirname, const std::string& histname, int n, bool updated)
+TH1* DQMHistAnalysisModule::getDelta(const std::string& dirname, const std::string& histname, int n, bool onlyIfUpdated)
 {
   std::string fullname;
   if (dirname.size() > 0) {
@@ -77,14 +77,14 @@ TH1* DQMHistAnalysisModule::getDelta(const std::string& dirname, const std::stri
   } else {
     fullname = histname;
   }
-  return getDelta(fullname, n, updated);
+  return getDelta(fullname, n, onlyIfUpdated);
 }
 
-TH1* DQMHistAnalysisModule::getDelta(const std::string& fullname, int n, bool updated)
+TH1* DQMHistAnalysisModule::getDelta(const std::string& fullname, int n, bool onlyIfUpdated)
 {
   auto it = g_delta.find(fullname);
   if (it != g_delta.end()) {
-    return it->second->getDelta(n, updated);
+    return it->second->getDelta(n, onlyIfUpdated);
   }
   return nullptr;
 }

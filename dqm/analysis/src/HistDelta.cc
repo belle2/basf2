@@ -5,7 +5,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include "dqm/analysis/HistDelta.h"
+#include <dqm/analysis/HistDelta.h>
 #include <string>
 #include <TROOT.h>
 
@@ -77,9 +77,9 @@ void HistDelta::reset(void)
   m_updated = true;
 }
 
-TH1* HistDelta::getDelta(unsigned int n, bool only_updated)
+TH1* HistDelta::getDelta(unsigned int n, bool onlyIfUpdated)
 {
-  if (only_updated && !m_updated) return nullptr;// not updated, but requested
+  if (onlyIfUpdated && !m_updated) return nullptr;// not updated, but requested
   if (n >= m_deltaHists.size()) return nullptr;
   return m_deltaHists.at(n);
 }

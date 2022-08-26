@@ -42,7 +42,7 @@ namespace Belle2 {
 
     /** Set not-updated yet status
      */
-    void set_notUpdated(void) {m_updated = false;};
+    void setNotUpdated(void) {m_updated = false;};
 
     /** Check if update of delta histogram is necessary
      * @param hist pointer to histogram
@@ -55,9 +55,9 @@ namespace Belle2 {
 
     /** Get Delta Histogram
      * @param n number of delta into the past, 0 is most recent one
-     * @param only_updated req only updated deltas, return nullptr otherwise
+     * @param onlyIfUpdated req only updated deltas, return nullptr otherwise
      * @return Found histogram or nullptr
      */
-    TH1* getDelta(unsigned int n = 0, bool only_updated = true);
+    TH1* getDelta(unsigned int n = 0, bool onlyIfUpdated = true);
   };
 }

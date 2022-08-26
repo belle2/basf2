@@ -17,7 +17,7 @@ namespace Belle2 {
   class HistObject {
   public:
     TH1* m_hist{};/**< Pointer to histogram */
-    bool m_updated = true; /**< flag if update since last event */
+    bool m_updated = false; /**< flag if update since last event */
     double m_entries = -1; /**< entries in previous/current for update check */
   public:
 

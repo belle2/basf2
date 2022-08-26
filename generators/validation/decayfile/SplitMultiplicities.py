@@ -30,8 +30,8 @@ class SplitMultiplicities(basf2.Module):
     def __init__(self, listname, pdgcode):
         """
         Initialise the class.
-        :param listname: TODO
-        :param pdgcode: TODO
+        :param listname: particle list name
+        :param pdgcode: pdg code to be studied
         """
         super().__init__()
         #: Particle list name

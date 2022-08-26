@@ -207,7 +207,8 @@ std::vector <std::string> DQMHistAnalysisModule::StringSplit(const std::string& 
 
 void DQMHistAnalysisModule::initHistListBeforeEvent(void)
 {
-  for (auto h : g_hist) {
+  for (auto& h : g_hist) {
+    // attention, we need the reference, otherwise we work on a copy
     h.second.resetBeforeEvent();
   }
   for (auto d : g_delta) {

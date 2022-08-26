@@ -30,6 +30,7 @@ REG_MODULE(DQMHistAnalysis);
 DQMHistAnalysisModule::HistList DQMHistAnalysisModule::g_hist;
 DQMHistAnalysisModule::MonObjList DQMHistAnalysisModule::g_monObj;
 DQMHistAnalysisModule::DeltaList DQMHistAnalysisModule::g_delta;
+DQMHistAnalysisModule::CanvasUpdatedList DQMHistAnalysisModule::g_canvasup;
 
 
 DQMHistAnalysisModule::DQMHistAnalysisModule() : Module()

@@ -6,23 +6,25 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 //+
-// File : DQMHistAnalysisPlotOnly.h
-// Description : Module for DQM Histogram analysis
+// File : DQMHistAnalysisInputSrv.h
+// Description : Input module for DQM Histogram analysis
 //-
 
 #pragma once
 
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/StoreObjPtr.h>
+
+#include <daq/dqm/DqmMemFile.h>
+#include <dqm/core/DQMHistAnalysis.h>
+//#include <THttpServer.h>
 
 #include <string>
-#include <TCanvas.h>
 
 namespace Belle2 {
+  /*! Class definition for the output module of Sequential ROOT I/O */
 
-  /**
-   * The module to plot a list of histograms into canvases.
-   */
-  class DQMHistAnalysisPlotOnlyModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisInputSrvModule : public DQMHistAnalysisModule {
 
     // Public functions
   public:
@@ -30,12 +32,12 @@ namespace Belle2 {
     /**
      * Constructor.
      */
-    DQMHistAnalysisPlotOnlyModule();
+    DQMHistAnalysisInputSrvModule();
 
     /**
      * Destructor.
      */
-    virtual ~DQMHistAnalysisPlotOnlyModule();
+    virtual ~DQMHistAnalysisInputSrvModule();
 
     /**
      * Initializer.
@@ -64,20 +66,24 @@ namespace Belle2 {
 
     // Data members
   private:
+    /** Hist memory */
+    DqmMemFile* m_memory = nullptr;
+    /** Path to input hist memory. */
+    std::string m_mempath;
+    /** Size of the input hist memory. */
+    int m_memsize;
+    /** The refresh interval in ms. */
+    int m_interval;
 
-    /** Parameter list for histograms */
-    std::vector< std::vector<std::string>> m_histlist;
+    /** The metadata for each event. */
+    StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
 
-    /**
-     * Get histogram by its name.
-     * @param a The name of the histogram.
-     * @return The found histogram, nullptr if not found.
-     */
-    TH1* GetHisto(TString a);
-
-    /** Parameter list for histograms */
-    std::map< std::string, TCanvas*> m_canvasList;
-
+    /** Exp number */
+    unsigned int m_expno = 0;
+    /** Run number */
+    unsigned int m_runno = 0;
+    /** Event number */
+    unsigned int m_count = 0;
   };
 } // end namespace Belle2
 

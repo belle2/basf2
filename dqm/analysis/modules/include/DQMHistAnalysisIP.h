@@ -19,7 +19,7 @@
 
 #include <framework/core/Module.h>
 
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 
 #include <TCanvas.h>
 #include <TLine.h>

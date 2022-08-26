@@ -3448,12 +3448,9 @@ def applyChargedPidMVA(particleLists, path, trainingMode, chargeIndependent=Fals
     iDet = 0
     for detID in Const.PIDDetectors.c_set:
 
-        # At the moment, SVD is excluded.
-        if detID == Const.EDetector.SVD:
-            B2WARNING("The ChargedPidMVA training currently does not include the SVD.")
-            continue
-
         detName = Const.parseDetectors(detID)
+
+        vm.addAlias(f"missingLogL_{detName}", f"pidMissingProbabilityExpert({detName})")
 
         for pdgIdSig, info in stdChargedMap.items():
 

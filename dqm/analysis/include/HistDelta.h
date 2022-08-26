@@ -23,7 +23,7 @@ namespace Belle2 {
     unsigned int m_amountDeltas{}; /**< amount of past histograms, at least 1*/
     TH1* m_lastHist{};/**< Pointer to last histogram state for check */
     std::vector<TH1*> m_deltaHists;/**< vector of histograms (max m_amountDeltas) */
-    bool m_updated{};/** if any delta was updated in this event */
+    bool m_updated{};/**< if any delta was updated in this event */
   public:
 
     /** Construktor
@@ -36,7 +36,7 @@ namespace Belle2 {
     /** Parameter setter
      * @param t type
      * @param p parameter for type
-     * @param a amount of deletas in the past
+     * @param a amount of deltas in the past
      */
     void set(int t, int p, unsigned int a);
 

@@ -45,7 +45,7 @@ namespace {
 
     // some random central values
     Eigen::VectorXd mu(6);
-    mu << 3., 0., -2,  7, -5, -1;
+    mu << 3, 0, -2,  7, -5, -1; // cppcheck-suppress constStatement
 
     // init the generator
     MultivariateNormalGenerator gen(mu, cov);
@@ -74,12 +74,12 @@ namespace {
   {
     //some random cov matrix
     Eigen::MatrixXd cov(2, 2);
-    cov <<  9., -4.,
-        -4.,  4.;
+    cov <<  9, -4,
+        -4,  4; // cppcheck-suppress constStatement
 
     // some mean
     Eigen::VectorXd mu(2);
-    mu << 5., 9.;
+    mu << 5., 9.; // cppcheck-suppress constStatement
 
     // init the generator
     ConditionalGaussGenerator gen(mu, cov);
@@ -119,7 +119,7 @@ namespace {
 
     // some random central values
     Eigen::VectorXd mu(6);
-    mu << 3., 0., -2,  7, -5, -1;
+    mu << 3, 0, -2,  7, -5, -1; // cppcheck-suppress constStatement
 
     // init the generator
     ConditionalGaussGenerator gen(mu, cov);

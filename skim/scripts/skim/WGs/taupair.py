@@ -40,7 +40,7 @@ def tauskim_particle_selection(label, path):
     for g in gammaDetectorLocation.keys():
         gammaForPi0Cuts = gammaDetectorLocation[g]
         gammaForPi0Cuts += ' and abs(clusterTiming) < 200'
-        gammaForPi0Cuts += ' and -0.8660 < cosTheta < 0.9563'
+        gammaForPi0Cuts += ' and thetaInCDCAcceptance'
         gammaForPi0Cuts += ' and clusterNHits > 1.5'
         gammaForPi0Cuts += ' and [[minC2TDist > 40] or [E > 0.4]]'  # new
         gammaForPi0 = f'gamma:looseForPi0{label}{g}'
@@ -85,7 +85,7 @@ def tauskim_particle_selection(label, path):
     gammaCuts = 'E > 0.2'
     gammaCuts += ' and [[minC2TDist > 40] or [E > 0.4]]'
     gammaCuts += ' and abs(clusterTiming) < 200'
-    gammaCuts += ' and -0.8660 < cosTheta < 0.9563'
+    gammaCuts += ' and thetaInCDCAcceptance'
     gammaCuts += ' and clusterNHits > 1.5'
     gammaCuts += f' and isDescendantOfList(pi0:{label}) == 0'
     ma.cutAndCopyList(f'gamma:{label}', 'gamma:all', gammaCuts, path=path)
@@ -135,10 +135,10 @@ class TauLFV(BaseSkim):
 
         ma.reconstructDecay("K_S0:taulfv -> pi+:all pi-:all", "0.3 < M < 0.7", path=path)
 
-        gammaCuts = "E > 0.20 and clusterNHits > 1.5 and -0.8660 < cosTheta < 0.9563"
+        gammaCuts = "E > 0.20 and clusterNHits > 1.5 and thetaInCDCAcceptance"
         ma.cutAndCopyList("gamma:taulfv", "gamma:all", gammaCuts, path=path)
 
-        gammaLooseCuts = "E > 0.1 and -0.8660 < cosTheta < 0.9563 and clusterNHits > 1.5"
+        gammaLooseCuts = "E > 0.1 and thetaInCDCAcceptance and clusterNHits > 1.5"
         ma.cutAndCopyLists("gamma:taulfvloose", "gamma:all", gammaLooseCuts, path=path)
         # pi0
         ma.reconstructDecay("pi0:taulfv -> gamma:taulfvloose gamma:taulfvloose", "0.115 < M < 0.152", path=path)

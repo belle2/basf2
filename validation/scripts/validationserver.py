@@ -19,6 +19,7 @@ import logging
 import sys
 import queue
 import webbrowser
+import re
 
 # 3rd
 import cherrypy
@@ -163,6 +164,19 @@ def start_plotting_request(revision_names: List[str], results_folder: str) -> st
     return rev_key
 
 
+# todo: remove this, once we have a way to handle access token.
+def check_gitlab_config():
+    expected_gl_config = os.path.join(os.getcwd(), "config/gl.cfg")
+    if not os.path.exists(expected_gl_config):
+        print(
+            f"ERROR: Expected to find config folder with Gitlab config,"
+            f" but {expected_gl_config} doesn't exist. "
+            f"Gitlab features will not work."
+        )
+
+    return os.path.exists(expected_gl_config)
+
+
 # todo: cfg file location
 def create_gitlab_object():
     """
@@ -194,12 +208,35 @@ def get_project_object(gitlab_object, project_id):
     return project
 
 
-def update_linked_issues(gitlab_object, cwd_folder, project_id):
+def search_project_issues(gitlab_object, search_term):
     """
-    Fetch linked issues and update the json file.
+    Search in the Gitlab for the issues that contain the
+    key phrase.
+
+    Returns:
+        gitlab project issues
     """
 
-    project = gitlab_object.projects.get(project_id, lazy=True)
+    issues = gitlab_object.issues.list(search=search_term, lazy=True)
+
+    return issues
+
+
+def update_linked_issues(gitlab_object, cwd_folder):
+    """
+    Fetch linked issues and update the comparison json files.
+    """
+
+    # collect list of issues validation server has worked with
+    search_key = "Automated code, please do not delete"
+    issues = search_project_issues(gitlab_object, search_key)
+
+    # find out the plots linked to the issues
+    plot_issues = {}
+    pattern = "Relevant plot (\\w+)"
+    for issue in issues:
+        match = re.search(pattern, issue.description)
+        plot_issues[match.groups()[0]] = issue.iid
 
     # get list of available revision
     rev_list = get_json_object_list(
@@ -213,18 +250,13 @@ def update_linked_issues(gitlab_object, cwd_folder, project_id):
             r,
             validationpath.file_name_comparison_json,
         )
-        print(comparison_json_path)
         comparison_json = deliver_json(comparison_json_path)
         for package in comparison_json["packages"]:
             for plotfile in package.get("plotfiles"):
                 for plot in plotfile.get("plots"):
-                    issues = project.issues.list(
-                        search="Relevant plot {}".format(plot["title"])
-                    )
-                    if len(issues) != 0:
-                        plot["issue"] = issues[0].iid
+                    if plot["title"] in plot_issues.keys():
+                        plot["issue"] = plot_issues[plot["title"]]
 
-        # json_objects.dump(comparison_json_path,comparison_json)
         with open(comparison_json_path, "w") as jsonFile:
             json.dump(comparison_json, jsonFile, indent=4)
 
@@ -306,7 +338,7 @@ class ValidationRoot:
     # Check if it is better to make this a session object variable
     plot_path = None
 
-    def __init__(self, working_folder):
+    def __init__(self, working_folder, gitlab_object):
         """
         class initializer, which takes the path to the folders containing the
         validation run results and plots (aka comparison)
@@ -323,8 +355,8 @@ class ValidationRoot:
             os.environ["BELLE2_LOCAL_DIR"]
         )
 
-        # Gitlab object
-        self.gitlab_object = create_gitlab_object()
+        #: Gitlab object
+        self.gitlab_object = gitlab_object
 
     @cherrypy.expose
     @cherrypy.tools.json_in()
@@ -550,8 +582,8 @@ class ValidationRoot:
         project = get_project_object(self.gitlab_object, 3318)
         uploaded_file = upload_file_gitlab(ValidationRoot.plot_path, project)
         plot_title = ValidationRoot.plot_path.split("/")[-1].split(".")[0]
-        description += "\n [Automated code, please do not delete]\n\
-            Relevant plot {}".format(
+        description += "\n\n---\n\n:robot: Automated code, please do not delete\n\n\
+            Relevant plot {}\n\n---".format(
             plot_title
         )
         issue_id = create_gitlab_issue(title, description, uploaded_file, project)
@@ -576,7 +608,6 @@ class ValidationRoot:
                             plot["issue"] = issue_id
                             break
 
-        # json_objects.dump(comparison_json_path,comparison_json)
         with open(comparison_json_path, "w") as jsonFile:
             json.dump(comparison_json, jsonFile, indent=4)
 
@@ -593,6 +624,9 @@ class ValidationRoot:
         ValidationRoot.plot_path = os.path.join(
             validationpath.get_html_folder(self.working_folder), file_path
         )
+
+        if not self.gitlab_object:
+            return "ERROR: Gitlab integration not set up, config file is missing."
 
         return """<html>
           <head></head>
@@ -612,6 +646,10 @@ class ValidationRoot:
         Update existing issue in Gitlab with current result plot
         and redirect to the updated Gitlab issue page.
         """
+
+        if not self.gitlab_object:
+            return "ERROR: Gitlab integration not set up, config file is missing."
+
         plot_path = os.path.join(
             validationpath.get_html_folder(self.working_folder), file_path
         )
@@ -845,8 +883,16 @@ def run_server(
         webbrowser.open("http://" + ip + ":" + str(port))
 
     if not dry_run:
+        # gitlab toggle
+        gitlab_object = None
+        if check_gitlab_config():
+            gitlab_object = create_gitlab_object()
+            update_linked_issues(gitlab_object, cwd_folder)
+
         cherrypy.quickstart(
-            ValidationRoot(working_folder=cwd_folder), "/", cherry_config
+            ValidationRoot(working_folder=cwd_folder, gitlab_object=gitlab_object),
+            "/",
+            cherry_config,
         )
 
 

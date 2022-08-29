@@ -80,14 +80,14 @@ namespace Belle2 {
      * @param gen multivariate normal generator to be used
      */
     ROOT::Math::XYZVector generateVertex(const ROOT::Math::XYZVector& initial, const TMatrixDSym& cov,
-                                         MultivariateNormalGenerator& gen);
+                                         MultivariateNormalGenerator& gen) const;
     /** generate 4 vector for one beam
      * @param initial beam
      * @param cov covariance of the beam momentum (E, theta_x, theta_y)
      * @param gen multivariate normal generator to be used
      */
     ROOT::Math::PxPyPzEVector generateBeam(const ROOT::Math::PxPyPzEVector& initial, const TMatrixDSym& cov,
-                                           MultivariateNormalGenerator& gen);
+                                           MultivariateNormalGenerator& gen) const;
     /** Datastore object containing the nominal beam parameters */
     DBObjPtr<BeamParameters> m_beamParams;
     /** Datastore object containing the generated event */

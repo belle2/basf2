@@ -133,22 +133,22 @@ namespace Photospp {
     // ---------------------------------------------------------------------
     if (KEY == 1) {
       bostd3(PRM, PNEUTR, PNEUTR);
-      bostd3(PRM, PNU , PNU);
-      bostd3(PRM, PAA , PAA);
-      bostd3(PRM, PE , PE);
-      bostd3(PRM, PP , PP);
+      bostd3(PRM, PNU, PNU);
+      bostd3(PRM, PAA, PAA);
+      bostd3(PRM, PE, PE);
+      bostd3(PRM, PP, PP);
     } else if (KEY == 2) {
       rotod2(PRM, PNEUTR, PNEUTR);
-      rotod2(PRM, PNU , PNU);
-      rotod2(PRM, PAA , PAA);
-      rotod2(PRM, PE  , PE);
-      rotod2(PRM, PP  , PP);
+      rotod2(PRM, PNU, PNU);
+      rotod2(PRM, PAA, PAA);
+      rotod2(PRM, PE, PE);
+      rotod2(PRM, PP, PP);
     } else if (KEY == 3) {
       rotod3(PRM, PNEUTR, PNEUTR);
-      rotod3(PRM, PNU , PNU);
-      rotod3(PRM, PAA , PAA);
-      rotod3(PRM, PE  , PE);
-      rotod3(PRM, PP  , PP);
+      rotod3(PRM, PNU, PNU);
+      rotod3(PRM, PAA, PAA);
+      rotod3(PRM, PE, PE);
+      rotod3(PRM, PP, PP);
     } else {
       printf(" STOP IN LOTRA. WRONG KEYTRA");
       exit(-1);
@@ -545,9 +545,9 @@ namespace Photospp {
     PARNEU = GNEU - sqrt(GNEU * GNEU - 1.0);
 
     // 2) REDUCTIEV BOOSTS
-    bostd3(PARNEU, VEC , VEC);
+    bostd3(PARNEU, VEC, VEC);
     bostd3(PARNEU, PNEUTR, PNEUTR);
-    bostd3(PARCH, PAA , PAA);
+    bostd3(PARCH, PAA, PAA);
     spaj(2, PNEUTR, PAA, PP, PE);
 
     // TIME FOR THE PHOTON that is electron pair

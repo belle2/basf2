@@ -149,6 +149,13 @@ namespace Photospp {
     /** Get index of last daughter */
     int getDaughterRangeEnd();
 
+    /** Set vertex for this particle */
+    void setVertexPosition(double vx, double vy, double vz, double t);
+
+    /** Get vertex position of this particle */
+    void getVertexPosition(double* vx, double* vy, double* vz, double* t);
+
+
   private:
 
     /** Set index of first daughter */
@@ -177,6 +184,9 @@ namespace Photospp {
 
     /** Momentum */
     double m_px, m_py, m_pz, m_e;
+
+    /** Vertex */
+    double m_vx, m_vy, m_vz, m_t;
 
     /** Mass saved at generation step */
     double m_generated_mass;

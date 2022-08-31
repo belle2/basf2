@@ -43,7 +43,7 @@ namespace Belle2 {
 
     // Register the creator
     /** Creator creates the BEAMABORT geometry */
-    geometry::CreatorFactory <BeamabortCreator> BeamabortFactory("BeamabortCreator");
+    geometry::CreatorFactory <BeamabortCreator> BeamabortFactory("BEAMABORTCreator");
 
     BeamabortCreator::BeamabortCreator(): m_sensitive(0)
     {}

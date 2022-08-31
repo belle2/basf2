@@ -1194,7 +1194,7 @@ def main():
     parser = get_argument_parser()
     args = parser.parse_args()
 
-    sampleRegistry = read_registry_yaml(args.sampleRegistryYaml, args.mc)
+    sampleRegistry = read_registry_yaml(args.sampleRegistryYaml, args.mcri, args.mcrd)
 
     outputDirectory = get_output_directory(args, sampleRegistry)
     outputDirectory.mkdir(parents=True, exist_ok=True)

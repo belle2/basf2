@@ -198,15 +198,7 @@ void BeamabortStudyModule::event()
 void BeamabortStudyModule::getXMLData()
 {
   GearDir content = GearDir("/Detector/DetectorComponent[@name=\"BEAMABORT\"]/Content/");
-  /*
-  //get the location of the tubes
-  BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {
 
-    PINCenter.push_back(TVector3(activeParams.getLength("z_beamabort"), activeParams.getLength("r_beamabort"),
-                                 activeParams.getLength("Phi")));
-    nPIN++;
-  }
-  */
   m_WorkFunction = content.getDouble("WorkFunction");
   m_FanoFactor = content.getDouble("FanoFactor");
 

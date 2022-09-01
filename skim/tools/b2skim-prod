@@ -1008,7 +1008,8 @@ def write_json_files(sampleRegistry, args, outputDirectory):
 
         for sampleLabel, sampleInfo in sampleRegistry.items():
             # additional mcType name needed for mcrd filename
-            mcType_outname = sampleRegistry[sampleLabel]["mcType"].rstrip("BGx1")
+            if args.mcrd_campaign:
+                mcType_outname = sampleRegistry[sampleLabel]["mcType"].rstrip("BGx1")
 
             # Skip taupair sample if the combined skim is not to be produced on taupair
             if (

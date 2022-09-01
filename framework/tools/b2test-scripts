@@ -60,12 +60,13 @@ from nbconvert.preprocessors.execute import CellExecutionError
 import argparse
 import re
 import datetime
+import tempfile
 import timeit
 import xml.etree.cElementTree as ET
 from collections import defaultdict
 from functools import partial
 from basf2 import find_file
-from b2test_utils import is_ci
+from b2test_utils import is_ci, temporary_set_environment
 
 # allow stopping tests with Ctrl+c
 import signal
@@ -455,19 +456,17 @@ if __name__ == "__main__":
 
     options = get_argument_parser().parse_args()
 
-    # prepare step
-    prepare_path = find_file("prepare_tests", "", silent=True)
-    if prepare_path == "":
-        parent_path = pathlib.Path(find_file('framework')).parent.absolute()
-        prepare_path = os.path.join(parent_path, "prepare_tests")
-        os.mkdir(prepare_path)
-    os.environ["BELLE2_PREPARE_PATH"] = str(prepare_path)
-    exit_code = executor(options, prepare_step=True)
-    if exit_code > 0:
-        shutil.rmtree(prepare_path)
-        sys.exit(exit_code)
+    # create a temporary directory where to store the files created during the prepare step
+    with tempfile.TemporaryDirectory() as prepare_path:
+        os.chmod(prepare_path, 0o744)  # necessary for the buildbot
+        # and temporary set the BELLE2_PREPARE_PATH variable
+        with temporary_set_environment(BELLE2_PREPARE_PATH=prepare_path):
 
-    # test step
-    exit_code = executor(options, prepare_step=False)
-    shutil.rmtree(prepare_path)
-    sys.exit(exit_code)
+            # prepare step
+            exit_code = executor(options, prepare_step=True)
+            if exit_code > 0:  # if everything is fine, do not exit immediately!
+                sys.exit(exit_code)
+
+            # test step
+            exit_code = executor(options, prepare_step=False)
+            sys.exit(exit_code)

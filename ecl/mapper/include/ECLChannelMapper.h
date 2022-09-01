@@ -18,7 +18,7 @@ namespace Belle2 {
      * Please note that (a) is recommended and (b) should be used only for
      * very specific rare cases (such as prepation of new ECLChannelMap payloads)
      */
-    class ECLChannelMapper {
+    class ECLChannelMapper final {
 
       /// initialization flag
       bool isInitialized;

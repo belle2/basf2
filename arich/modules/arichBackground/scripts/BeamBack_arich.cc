@@ -132,7 +132,7 @@ void BeamBack_arich(std::string path = "/gpfs/home/belle/mmanca/basf2/background
   Belle2::ARICHChannelHist* mapsNeutrons[9];
   Belle2::ARICHChannelHist* mapsDose[9];
 
-  TString tHist[9] = {"RBB", "BHWide", "Touschek_HER", "Touschek_LER", "Coulomb_HER", "Coulomb_LER", "twoPhoton", "brems", "total"};
+  const TString tHist[9] = {"RBB", "BHWide", "Touschek_HER", "Touschek_LER", "Coulomb_HER", "Coulomb_LER", "twoPhoton", "brems", "total"};
 
   for (int i = 0; i < 9; i++) {
     mapsPhotons[i] = new Belle2::ARICHChannelHist("photonFlux_" + tHist[i], "photons / cm^2 / s - " + tHist[i], 1);
@@ -149,8 +149,8 @@ void BeamBack_arich(std::string path = "/gpfs/home/belle/mmanca/basf2/background
   double flux_phot[420][8];
   double edep_board_all[420]; // sum of background from all sources
   double nflux_board_all[420];
-  double edep_hapd_all[420];
-  double nflux_hapd_all[420];
+  // double edep_hapd_all[420];
+  // double nflux_hapd_all[420];
   double phot_all[420];
 
   // hapd x,y positions
@@ -165,8 +165,8 @@ void BeamBack_arich(std::string path = "/gpfs/home/belle/mmanca/basf2/background
       nflux_hapd[i][j] = 0;
       flux_phot[i][j] = 0;
       origins[i][0] = 0.; origins[i][1] = 0.;
-      edep_board_all[i] = 0.; edep_hapd_all[i] = 0.;
-      nflux_board_all[i] = 0.; nflux_hapd_all[i] = 0.;
+      edep_board_all[i] = 0.; // edep_hapd_all[i] = 0.;
+      nflux_board_all[i] = 0.; // nflux_hapd_all[i] = 0.;
       phot_all[i] = 0.;
     }
   }
@@ -291,7 +291,7 @@ void BeamBack_arich(std::string path = "/gpfs/home/belle/mmanca/basf2/background
     }
   }
 
-  double nhapd[7] = {42., 48., 54., 60., 66., 72., 78.}; // 7 rings
+  const double nhapd[7] = {42., 48., 54., 60., 66., 72., 78.}; // 7 rings
 
   // This is important. nflux_board holds total flux of neutrons wighted by 1MeV equiv. factor in a given
   // time "time". Here this is transformed in flux/cm^2/year.
@@ -312,9 +312,9 @@ void BeamBack_arich(std::string path = "/gpfs/home/belle/mmanca/basf2/background
       flux_phot[i][j] = flux_phot[i][j] * 1.E+6 / 53.29 / time;  // photocathode size = 7.3x7.3cm
 
       edep_board_all[i] += edep_board[i][j];
-      edep_hapd_all[i] += edep_hapd[i][j];
+      // edep_hapd_all[i] += edep_hapd[i][j];
       nflux_board_all[i] += nflux_board[i][j];
-      nflux_hapd_all[i] += nflux_hapd[i][j];
+      // nflux_hapd_all[i] += nflux_hapd[i][j];
       phot_all[i] += flux_phot[i][j];
 
       avgeb[nrow][j] += edep_board[i][j] / nhapd[nrow];

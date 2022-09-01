@@ -15,7 +15,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(PrintBeamParameters)
+REG_MODULE(PrintBeamParameters);
 
 //-----------------------------------------------------------------
 //                 Implementation

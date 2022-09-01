@@ -89,7 +89,7 @@ namespace {
           name += experiment;
           query.push_back(Database::DBImportQuery("TNamed", new TNamed(name, name), iov));
 
-          new(array[experiment - 1]) TObject;
+          new (array[experiment - 1]) TObject;
           array[experiment - 1]->SetUniqueID(experiment);
           Database::Instance().storeData("TObjects", &array, iov);
 
@@ -624,7 +624,7 @@ namespace {
           name += experiment;
           query.push_back(Database::DBImportQuery("TNamed", new TNamed(name, name), iov));
 
-          new(array[experiment - 1]) TObject;
+          new (array[experiment - 1]) TObject;
           array[experiment - 1]->SetUniqueID(experiment);
           Database::Instance().storeData("TObjects", &array, iov);
 

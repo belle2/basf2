@@ -67,6 +67,7 @@ def getCommandLineOptions():
     """ Parses the command line options of the fei and returns the corresponding arguments. """
     # FEI defines own command line options, therefore we disable
     # the ROOT command line options, which otherwise interfere sometimes.
+    # Always avoid the top-level 'import ROOT'.
     import ROOT  # noqa
     ROOT.PyConfig.IgnoreCommandLineOptions = True
     parser = argparse.ArgumentParser()

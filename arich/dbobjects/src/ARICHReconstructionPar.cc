@@ -54,7 +54,7 @@ double ARICHReconstructionPar::getExpectedBackgroundHits(const std::vector<doubl
   }
 
   // parameters of fit of  pol3 to the number of nPads per ring with given theta and width 5mrad
-  double surf[4] = { -2.19669e-02, 3.59010e+01, -2.77441e+01, 1.43564e+02};
+  const double surf[4] = { -2.19669e-02, 3.59010e+01, -2.77441e+01, 1.43564e+02};
   double step = 0.005;
   double thc = minThc + step / 2.;
   double bkg = 0;

@@ -10,6 +10,8 @@
 
 #include <framework/database/DBAccessorBase.h>
 
+#include <Python.h>
+
 class TClass;
 class TObject;
 
@@ -59,5 +61,8 @@ namespace Belle2 {
      * protected method and we add a pure python method to wrap the object in
      * something to guarantee constness in framework/scripts/basf2.py */
     const TObject* _get(int i) const;
+
+    /** Get the intra-run boundaries, if any, as a python list. */
+    PyObject* getIntraRunBoundariesList() const;
   };
 }

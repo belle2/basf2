@@ -21,7 +21,7 @@ using namespace Belle2;
 //                 Register the Module
 //-----------------------------------------------------------------
 
-REG_MODULE(ECLChargedPIDDataAnalysisValidation)
+REG_MODULE(ECLChargedPIDDataAnalysisValidation);
 
 //-----------------------------------------------------------------
 //                 Implementation

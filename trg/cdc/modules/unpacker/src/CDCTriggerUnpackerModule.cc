@@ -23,7 +23,7 @@ using namespace CDCTriggerUnpacker;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(CDCTriggerUnpacker)
+REG_MODULE(CDCTriggerUnpacker);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -51,12 +51,12 @@ namespace Belle2 {
     /** Constructor */
     Merger(StoreArray<MergerBits>* inArrayPtr, const std::string& inName,
            unsigned inEventWidth, unsigned inOffset,
-           int inHeaderSize, const std::vector<int>& inNodeID,
+           int inHeaderSize, const std::vector<int>& inNodeID, const std::vector<int>& inNodeID_pcie40,
            unsigned inNInnerMergers, int& inDelay,
            int& inCnttrg,
            int inDebugLevel) :
       SubTrigger(inName, inEventWidth, inOffset,
-                 inHeaderSize, inNodeID, inDelay, inCnttrg, inDebugLevel),
+                 inHeaderSize, inNodeID, inNodeID_pcie40, inDelay, inCnttrg, inDebugLevel),
       arrayPtr(inArrayPtr),
       nInnerMergers(inNInnerMergers) {};
 
@@ -65,15 +65,25 @@ namespace Belle2 {
     /** number of merger units in the inner super layer than this one */
     unsigned nInnerMergers;
     /** reserve enough number of clocks (entries) in the Bitstream StoreArray */
-    void reserve(int subDetectorId, std::array<int, nFinesse> nWords) override
+    void reserve(int subDetectorId, std::array<int, nFinesse> nWords, bool pciedata) override
     {
-      if (subDetectorId != iNode) {
+      int iNode_i = 0;
+      int iFinesse_i = 0;
+      if (pciedata) {
+        iNode_i = iNode_pcie40;
+        iFinesse_i = iFinesse_pcie40;
+      } else {
+        iNode_i = iNode;
+        iFinesse_i = iFinesse;
+      }
+
+      if (subDetectorId != iNode_i) {
         return;
       }
-      if (nWords[iFinesse] < headerSize) {
+      if (nWords[iFinesse_i] < headerSize) {
         return;
       }
-      size_t nClocks = (nWords[iFinesse] - headerSize) / eventWidth;
+      size_t nClocks = (nWords[iFinesse_i] - headerSize) / eventWidth;
       size_t entries = arrayPtr->getEntries();
       if (entries == 0) {
         for (unsigned i = 0; i < nClocks; ++i) {
@@ -87,21 +97,32 @@ namespace Belle2 {
 
     /** Unpack function */
     void unpack(int subDetectorId,
-                std::array<int*, 4> data32tab,
-                std::array<int, 4> nWords) override
+                std::array<int*, 48> data32tab,
+                std::array<int, 48> nWords,
+                bool pciedata) override
     {
-      if (subDetectorId != iNode) {
+      int iNode_i = 0;
+      int iFinesse_i = 0;
+      if (pciedata) {
+        iNode_i = iNode_pcie40;
+        iFinesse_i = iFinesse_pcie40;
+      } else {
+        iNode_i = iNode;
+        iFinesse_i = iFinesse;
+      }
+
+      if (subDetectorId != iNode_i) {
         return;
       }
-      if (nWords[iFinesse] < headerSize) {
+      if (nWords[iFinesse_i] < headerSize) {
         B2DEBUG(20, "The module " << name << " does not have enough data (" <<
-                nWords[iFinesse] << "). Nothing will be unpacked.");
+                nWords[iFinesse_i] << "). Nothing will be unpacked.");
         // TODO: need to clear the output bitstream because we return early here
         return;
       }
       // make bitstream
       // loop over all clocks
-      for (int i = headerSize; i < nWords[iFinesse]; i += eventWidth) {
+      for (int i = headerSize; i < nWords[iFinesse_i]; i += eventWidth) {
         int iclock = (i - headerSize) / eventWidth;
         auto mergerClock = (*arrayPtr)[iclock];
         B2DEBUG(100, "clock " << iclock);
@@ -109,16 +130,16 @@ namespace Belle2 {
         for (unsigned j = offset; j < eventWidth; ++j) {
           int iMerger = (eventWidth - j - 1) / 8 + nInnerMergers;
           int pos = (eventWidth - j - 1) % 8;
-          dataWord word(data32tab[iFinesse][i + j]);
+          dataWord word(data32tab[iFinesse_i][i + j]);
           for (int k = 0; k < wordWidth; ++k) {
             mergerClock->m_signal[iMerger].set(pos * wordWidth + k, word[k]);
           }
         }
       }
       if (debugLevel >= 300) {
-        printBuffer(data32tab[iFinesse] + headerSize, eventWidth);
+        printBuffer(data32tab[iFinesse_i] + headerSize, eventWidth);
         B2DEBUG(20, "");
-        printBuffer(data32tab[iFinesse] + headerSize + eventWidth, eventWidth);
+        printBuffer(data32tab[iFinesse_i] + headerSize + eventWidth, eventWidth);
       }
       for (int i = 0; i < std::accumulate(nMergers.begin(), nMergers.end(), 0); ++i) {
         B2DEBUG(99, (*arrayPtr)[0]->m_signal[i].to_string());
@@ -132,11 +153,11 @@ namespace Belle2 {
     Tracker2D(StoreArray<TSFOutputBitStream>* inArrayPtr,
               StoreArray<T2DOutputBitStream>* outArrayPtr,
               const std::string& inName, unsigned inEventWidth, unsigned inOffset,
-              unsigned inHeaderSize, const std::vector<int>& inNodeID,
+              unsigned inHeaderSize, const std::vector<int>& inNodeID, const std::vector<int>& inNodeID_pcie40,
               unsigned inNumTS, int& inDelay,
               int& inCnttrg,
               int inDebugLevel) :
-      SubTrigger(inName, inEventWidth, inOffset / wordWidth, inHeaderSize, inNodeID,
+      SubTrigger(inName, inEventWidth, inOffset / wordWidth, inHeaderSize, inNodeID, inNodeID_pcie40,
                  inDelay, inCnttrg, inDebugLevel),
       inputArrayPtr(inArrayPtr), outputArrayPtr(outArrayPtr),
       iTracker(std::stoul(inName.substr(inName.length() - 1))),
@@ -161,11 +182,21 @@ namespace Belle2 {
      *
      *  @param nWords          Number of words of each FINESSE in the COPPER
      */
-    void reserve(int subDetectorId, std::array<int, nFinesse> nWords) override
+    void reserve(int subDetectorId, std::array<int, nFinesse> nWords, bool pciedata) override
     {
-      size_t nClocks = (nWords[iFinesse] - headerSize) / eventWidth;
+      int iNode_i = 0;
+      int iFinesse_i = 0;
+      if (pciedata) {
+        iNode_i = iNode_pcie40;
+        iFinesse_i = iFinesse_pcie40;
+      } else {
+        iNode_i = iNode;
+        iFinesse_i = iFinesse;
+      }
+
+      size_t nClocks = (nWords[iFinesse_i] - headerSize) / eventWidth;
       size_t entries = inputArrayPtr->getEntries();
-      if (subDetectorId == iNode) {
+      if (subDetectorId == iNode_i) {
         if (entries == 0) {
           for (unsigned i = 0; i < nClocks; ++i) {
             TSFOutputBitStream* inputClock = inputArrayPtr->appendNew();
@@ -195,10 +226,21 @@ namespace Belle2 {
      *  @param nWords          Number of words of each FINESSE in the COPPER
      */
     void unpack(int subDetectorId,
-                std::array<int*, 4> data32tab,
-                std::array<int, 4> nWords) override
+                std::array<int*, 48> data32tab,
+                std::array<int, 48> nWords,
+                bool pciedata) override
     {
-      if (subDetectorId != iNode) {
+      int iNode_i = 0;
+      int iFinesse_i = 0;
+      if (pciedata) {
+        iNode_i = iNode_pcie40;
+        iFinesse_i = iFinesse_pcie40;
+      } else {
+        iNode_i = iNode;
+        iFinesse_i = iFinesse;
+      }
+
+      if (subDetectorId != iNode_i) {
         return;
       }
       // Recently, the content of the last clock appears at the beginning.
@@ -209,7 +251,7 @@ namespace Belle2 {
       std::vector<halfDataWord> counters;
       counters.reserve(inputArrayPtr->getEntries());
       for (int iclock = 0; iclock < inputArrayPtr->getEntries(); ++iclock) {
-        counters.emplace_back(data32tab[iFinesse]
+        counters.emplace_back(data32tab[iFinesse_i]
                               [headerSize + eventWidth * iclock] & 0xffff);
         B2DEBUG(100, "iclock " << iclock << " --> " << counters.at(iclock).to_ulong() << " : " << std::hex << counters.at(iclock));
       }
@@ -255,7 +297,7 @@ namespace Belle2 {
       // get event body information
       // make bitstream
       // loop over all clocks
-      for (int i = headerSize; i < nWords[iFinesse]; i += eventWidth) {
+      for (int i = headerSize; i < nWords[iFinesse_i]; i += eventWidth) {
         int iclock = (i - headerSize) / eventWidth - ccShift;
         if (iclock < 0) {
           iclock += inputArrayPtr->getEntries();
@@ -266,12 +308,12 @@ namespace Belle2 {
         outputClock->m_signal[iTracker].fill(zero_val);
         B2DEBUG(90, "unpacker clock " << iclock);
         if (debugLevel >= 300) {
-          printBuffer(data32tab[iFinesse] + headerSize + eventWidth * iclock,
+          printBuffer(data32tab[iFinesse_i] + headerSize + eventWidth * iclock,
                       eventWidth);
         }
         // get the clock counters
         std::array<dataWord, 2> ccword({
-          data32tab[iFinesse][i + 2], data32tab[iFinesse][i + 3]
+          data32tab[iFinesse_i][i + 2], data32tab[iFinesse_i][i + 3]
         });
         // fill input
         // Careful! this iTSF is (8 - iSL) / 2
@@ -320,7 +362,7 @@ namespace Belle2 {
             for (unsigned pos = 0; pos < numTS * lenTS; ++pos) {
               const int j = (offsetBitWidth + pos + iTSF * numTS * lenTS) / wordWidth;
               const int k = (offsetBitWidth + pos + iTSF * numTS * lenTS) % wordWidth;
-              dataWord word(data32tab[iFinesse][i + j]);
+              dataWord word(data32tab[iFinesse_i][i + j]);
               // MSB (leftmost) in firmware -> smallest index in Bitstream's
               // std::array (due to XSIM) -> largest index in std::bitset
               // so the index is reversed in this assignment
@@ -345,7 +387,7 @@ namespace Belle2 {
             for (unsigned pos = 0; pos < TSFWidth; ++pos) {
               const int j = (offsetBitWidth + pos + iTSF * TSFWidth) / wordWidth;
               const int k = (offsetBitWidth + pos + iTSF * TSFWidth) % wordWidth;
-              dataWord word(data32tab[iFinesse][i + j]);
+              dataWord word(data32tab[iFinesse_i][i + j]);
               inputClock->m_signal[nAxialTSF - 1 - iTSF][iTracker][pos] =
                 std_logic(word[wordWidth - 1 - k]);
             }
@@ -365,7 +407,7 @@ namespace Belle2 {
           for (unsigned pos = 0; pos < 732; ++pos) {
             const int j = (offsetBitWidth + pos + outputOffset) / wordWidth;
             const int k = (offsetBitWidth + pos + outputOffset) % wordWidth;
-            dataWord word(data32tab[iFinesse][i + j]);
+            dataWord word(data32tab[iFinesse_i][i + j]);
             outputClock->m_signal[iTracker][clockCounterWidth + oldtrackWidth + pos]
               = std_logic(word[wordWidth - 1 - k]);
           }
@@ -380,7 +422,7 @@ namespace Belle2 {
           for (unsigned pos = 0; pos < T2DOutputWidth; ++pos) {
             const int j = (pos + outputOffset) / wordWidth;
             const int k = (pos + outputOffset) % wordWidth;
-            dataWord word(data32tab[iFinesse][i + j]);
+            dataWord word(data32tab[iFinesse_i][i + j]);
             outputClock->m_signal[iTracker][clockCounterWidth + pos]
               = std_logic(word[wordWidth - 1 - k]);
           }
@@ -397,10 +439,10 @@ namespace Belle2 {
     /** Constructor */
     Neuro(StoreArray<NNBitStream>* arrPtr,
           const std::string& inName, unsigned inEventWidth, unsigned inOffset,
-          unsigned inHeaderSize, const std::vector<int>& inNodeID, int& inDelay,
+          unsigned inHeaderSize, const std::vector<int>& inNodeID, const std::vector<int>& inNodeID_pcie40, int& inDelay,
           int& inCnttrg,
           int inDebugLevel) :
-      SubTrigger(inName, inEventWidth, inOffset / wordWidth, inHeaderSize, inNodeID,
+      SubTrigger(inName, inEventWidth, inOffset / wordWidth, inHeaderSize, inNodeID, inNodeID_pcie40,
                  inDelay, inCnttrg, inDebugLevel),
       ArrayPtr(arrPtr),
       iTracker(std::stoul(inName.substr(inName.length() - 1))),
@@ -413,11 +455,21 @@ namespace Belle2 {
     /** Offset bit width */
     unsigned offsetBitWidth;
 
-    void reserve(int subDetectorId, std::array<int, nFinesse> nWords) override
+    void reserve(int subDetectorId, std::array<int, nFinesse> nWords, bool pciedata) override
     {
-      size_t nClocks = (nWords[iFinesse] - headerSize) / eventWidth;
+      int iNode_i = 0;
+      int iFinesse_i = 0;
+      if (pciedata) {
+        iNode_i = iNode_pcie40;
+        iFinesse_i = iFinesse_pcie40;
+      } else {
+        iNode_i = iNode;
+        iFinesse_i = iFinesse;
+      }
+
+      size_t nClocks = (nWords[iFinesse_i] - headerSize) / eventWidth;
       size_t entries = ArrayPtr->getEntries();
-      if (subDetectorId == iNode) {
+      if (subDetectorId == iNode_i) {
         if (entries == 0) {
           for (unsigned i = 0; i < nClocks; ++i) {
             NNBitStream* nnclock = ArrayPtr->appendNew();
@@ -435,26 +487,37 @@ namespace Belle2 {
 
     void unpack(int subDetectorId,
                 std::array<int*, nFinesse> data32tab,
-                std::array<int, nFinesse> nWords) override
+                std::array<int, nFinesse> nWords,
+                bool pciedata) override
     {
-      if (subDetectorId != iNode) {
+      int iNode_i = 0;
+      int iFinesse_i = 0;
+      if (pciedata) {
+        iNode_i = iNode_pcie40;
+        iFinesse_i = iFinesse_pcie40;
+      } else {
+        iNode_i = iNode;
+        iFinesse_i = iFinesse;
+      }
+
+      if (subDetectorId != iNode_i) {
         return;
       }
       // make bitstream
       // loop over all clocks
-      for (int i = headerSize; i < nWords[iFinesse]; i += eventWidth) {
+      for (int i = headerSize; i < nWords[iFinesse_i]; i += eventWidth) {
         int iclock = (i - headerSize) / eventWidth;
         auto nnclock = (*ArrayPtr)[iclock];
         B2DEBUG(20, "clock " << iclock);
         if (debugLevel >= 300) {
-          printBuffer(data32tab[iFinesse] + headerSize + eventWidth * iclock,
+          printBuffer(data32tab[iFinesse_i] + headerSize + eventWidth * iclock,
                       eventWidth);
         }
         // fill output
         for (unsigned pos = 0; pos < NN_WIDTH; ++pos) {
           const int j = (offsetBitWidth + pos) / wordWidth;
           const int k = (offsetBitWidth + pos) % wordWidth;
-          std::bitset<wordWidth> word(data32tab[iFinesse][i + j]);
+          std::bitset<wordWidth> word(data32tab[iFinesse_i][i + j]);
           nnclock->m_signal[iTracker][pos] = std_logic(word[wordWidth - 1 - k]);
         }
         if (debugLevel >= 100) {
@@ -502,6 +565,15 @@ CDCTriggerUnpackerModule::CDCTriggerUnpackerModule() : Module(), m_rawTriggers("
   };
   addParam("2DNodeId", m_tracker2DNodeID,
            "list of COPPER and HSLB ID of 2D tracker", defaultTracker2DNodeID);
+  NodeList defaultTracker2DNodeID_pcie40 = {
+    {0x10000001, 0},
+    {0x10000001, 1},
+    {0x10000001, 2},
+    {0x10000001, 3}
+  };
+  addParam("2DNodeId_pcie40", m_tracker2DNodeID_pcie40,
+           "list of PCIe40 ch ID of 2D tracker", defaultTracker2DNodeID_pcie40);
+
   NodeList defaultNeuroNodeID = {
     {0x11000005, 0},
     {0x11000005, 1},
@@ -510,6 +582,15 @@ CDCTriggerUnpackerModule::CDCTriggerUnpackerModule() : Module(), m_rawTriggers("
   };
   addParam("NeuroNodeId", m_neuroNodeID,
            "list of COPPER and HSLB ID of neurotrigger", defaultNeuroNodeID);
+  NodeList defaultNeuroNodeID_pcie40 = {
+    {0x10000001, 8},
+    {0x10000001, 9},
+    {0x10000001, 10},
+    {0x10000001, 11}
+  };
+  addParam("NeuroNodeId_pcie40", m_neuroNodeID_pcie40,
+           "list of PCIe40 ch ID of neurotrigger", defaultNeuroNodeID_pcie40);
+
   addParam("headerSize", m_headerSize,
            "number of words (number of bits / 32) of the B2L header", 3);
   addParam("alignFoundTime", m_alignFoundTime,
@@ -572,7 +653,7 @@ void CDCTriggerUnpackerModule::initialize()
         new Merger(&m_mergerBits,
                    "Merger" + std::to_string(iSL), mergerWidth * nMergers[8] / wordWidth,
                    mergerWidth * (nMergers[8] - nMergers[iSL]) / wordWidth, m_headerSize,
-                   m_mergerNodeID[iSL / 2], nInnerMergers,
+                   m_mergerNodeID[iSL / 2], m_mergerNodeID[iSL / 2], nInnerMergers,
                    m_mergerDelay, m_mergerCnttrg,
                    m_debugLevel);
       m_subTrigger.push_back(dynamic_cast<SubTrigger*>(m_merger));
@@ -596,7 +677,7 @@ void CDCTriggerUnpackerModule::initialize()
       Tracker2D* m_tracker2d =
         new Tracker2D(&m_bitsTo2D, &m_bits2DTo3D,
                       "Tracker2D" + std::to_string(iTracker), datasize_2D, 82, m_headerSize,
-                      m_tracker2DNodeID[iTracker], m_n2DTS,
+                      m_tracker2DNodeID[iTracker], m_tracker2DNodeID_pcie40[iTracker], m_n2DTS,
                       m_2DFinderDelay, m_2DFinderCnttrg,
                       m_debugLevel);
       m_subTrigger.push_back(dynamic_cast<SubTrigger*>(m_tracker2d));
@@ -605,7 +686,7 @@ void CDCTriggerUnpackerModule::initialize()
       Neuro* m_neuro =
         new Neuro(&m_bitsNN,
                   "Neuro" + std::to_string(iTracker), 64, 0, m_headerSize,
-                  m_neuroNodeID[iTracker], m_NeuroDelay, m_NeuroCnttrg,  m_debugLevel);
+                  m_neuroNodeID[iTracker], m_neuroNodeID_pcie40[iTracker], m_NeuroDelay, m_NeuroCnttrg,  m_debugLevel);
       m_subTrigger.push_back(dynamic_cast<SubTrigger*>(m_neuro));
     }
   }
@@ -664,6 +745,12 @@ void CDCTriggerUnpackerModule::event()
 
   // loop over all COPPERs
   for (auto& rawTRG : m_rawTriggers) {
+
+    // Check PCIe40 data or Copper data
+    if (rawTRG.GetMaxNumOfCh(0) == 48) { m_pciedata = true; }
+    else if (rawTRG.GetMaxNumOfCh(0) == 4) { m_pciedata = false; }
+    else { B2FATAL("CDCTriggerUnpackerModule: Invalid value of GetMaxNumOfCh from raw data: " << LogVar("Number of ch: ", rawTRG.GetMaxNumOfCh(0))); }
+
     const int subDetectorId = rawTRG.GetNodeID(0);
     // const int iNode = (subDetectorId & 0xFFFFFF);
     // number of entries in the rawTRG object.
@@ -679,7 +766,7 @@ void CDCTriggerUnpackerModule::event()
       std::array<int*, nFinesse> data32tab;
       nWords.fill(0);
 
-      for (int iFinesse = 0; iFinesse < nFinesse; ++iFinesse) {
+      for (int iFinesse = 0; iFinesse < rawTRG.GetMaxNumOfCh(0); ++iFinesse) {
         nWords[iFinesse] = rawTRG.GetDetectorNwords(j, iFinesse);
         if (nWords[iFinesse] == 0) {
           continue;
@@ -689,10 +776,10 @@ void CDCTriggerUnpackerModule::event()
 
       for (auto trg : m_subTrigger) {
         // only unpack when there are enough words in the event
-        if (trg->getHeaders(subDetectorId, data32tab, nWords)) {
-          trg->reserve(subDetectorId, nWords);
+        if (trg->getHeaders(subDetectorId, data32tab, nWords, m_pciedata)) {
+          trg->reserve(subDetectorId, nWords, m_pciedata);
           B2DEBUG(99, "starting to unpack a subTrigger, subDetectorId" << std::hex << subDetectorId);
-          trg->unpack(subDetectorId, data32tab, nWords);
+          trg->unpack(subDetectorId, data32tab, nWords, m_pciedata);
           setReturnValue(1);
         }
       }

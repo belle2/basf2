@@ -14,7 +14,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(EKLMDataChecker)
+REG_MODULE(EKLMDataChecker);
 
 EKLMDataCheckerModule::EKLMDataCheckerModule() :
   Module(),

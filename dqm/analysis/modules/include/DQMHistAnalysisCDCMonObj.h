@@ -9,22 +9,15 @@
 #pragma once
 
 //DQM
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
-#include <framework/datastore/StoreArray.h>
+#include <dqm/core/DQMHistAnalysis.h>
+
 #include <framework/database/DBArray.h>
 #include <framework/database/DBObjPtr.h>
 #include <cdc/dataobjects/WireID.h>
 #include <cdc/dbobjects/CDCChannelMap.h>
 #include <cdc/dbobjects/CDCGeometry.h>
 
-#include <vector>
-
-#include <TCanvas.h>
-#include <TLine.h>
-#include <TH1F.h>
-#include <TH2F.h>
 #include <TH2Poly.h>
-#include <TString.h>
 
 
 namespace Belle2 {
@@ -110,6 +103,10 @@ namespace Belle2 {
     TH1D* m_hADCs[300]; /**< ADC histograms with track associated hits (0-299) */
     TH1D* m_hTDCs[300]; /**< TDC histograms with track associated hits (0-299) */
     TH1D* m_hHits[56]; /**< hit histograms for each layer (0-55) */
+
+    TH2Poly* h2p = nullptr; /**< bad wires in xy view */
+    TH2F* hBadChannel = nullptr; /**< bad channel map;wire;layer */
+    TH2F* hBadChannelBC = nullptr; /**< bad channel map per board/channel;board;channel */
 
     std::vector<std::pair<int, int>> m_badChannels = {}; /**< bad wires list */
     std::map<WireID, std::pair<int, int>> m_chMap = {}; /**< Channel map retrieved  */

@@ -17,7 +17,6 @@
 
 namespace Belle2 {
 
-  using namespace std;
   using Eigen::VectorXd;
   using Eigen::MatrixXd;
 
@@ -28,7 +27,7 @@ namespace Belle2 {
     const int N = Size - 1;
     assert(N % 2 == 0);
 
-    vector<vector<double>> coef(Size);
+    std::vector<std::vector<double>> coef(Size);
     for (auto& el : coef) el.resize(Size);
 
 

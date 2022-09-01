@@ -315,7 +315,7 @@ def printPrimaryMCParticles(path, **kwargs):
 
 
 def printMCParticles(onlyPrimaries=False, maxLevel=-1, path=None, *,
-                     showProperties=False, showMomenta=False, showVertices=False, showStatus=False):
+                     showProperties=False, showMomenta=False, showVertices=False, showStatus=False, suppressPrint=False):
     """
     Prints all MCParticles or just primary MCParticles up to specified level. -1 means no limit.
 
@@ -413,6 +413,12 @@ def printMCParticles(onlyPrimaries=False, maxLevel=-1, path=None, *,
                 ├── K*+ (323) → …
                 ╰── pi- (-211)
 
+    The same information will be stored in the branch ``__MCDecayString__`` of
+    TTree created by `VariablesToNtuple` or `VariablesToEventBasedTree` module.
+    This branch is automatically created when `PrintMCParticles` modules is called.
+    Printing the information on the log message can be suppressed if ``suppressPrint``
+    is True, while the branch ``__MCDecayString__``. This option helps to reduce the
+    size of the log message.
 
     Parameters:
         onlyPrimaries (bool): If True show only primary particles, that is particles coming from
@@ -423,6 +429,8 @@ def printMCParticles(onlyPrimaries=False, maxLevel=-1, path=None, *,
         showVertices (bool): if True show production vertex and production time of all particles
         showStatus (bool): if True show some status information on the particles.
             For secondary particles this includes creation process.
+        suppressPrint (bool): if True printing the information on the log message is suppressed.
+            Even if True, the branch ``__MCDecayString__`` is created.
     """
 
     return path.add_module(
@@ -433,6 +441,7 @@ def printMCParticles(onlyPrimaries=False, maxLevel=-1, path=None, *,
         showMomenta=showMomenta,
         showVertices=showVertices,
         showStatus=showStatus,
+        suppressPrint=suppressPrint,
     )
 
 
@@ -1286,14 +1295,82 @@ def applyEventCuts(cut, path):
 
             applyEventCuts("[nTracks > 5] and [isContinuumEvent], path=mypath)
 
-    Warning:
-        You must use square braces ``[`` and ``]`` for conditional statements.
+    .. warning::
+      Only event-based variables are allowed in this function
+      and only square brackets ``[`` and ``]`` for conditional statements.
 
     Parameters:
         cut (str): Events that do not pass these selection criteria are skipped
         path (basf2.Path): modules are added to this path
     """
+    import b2parser
+    from variables import variables
 
+    def find_vars(t: tuple, var_list: list, meta_list: list) -> None:
+        """ Recursive helper function to find variable names """
+        if not isinstance(t, tuple):
+            return
+        if t[0] == b2parser.B2ExpressionParser.node_types['IdentifierNode']:
+            var_list += [t[1]]
+            return
+        if t[0] == b2parser.B2ExpressionParser.node_types['FunctionNode']:
+            meta_list.append(list(t[1:]))
+            return
+        for i in t:
+            if isinstance(i, tuple):
+                find_vars(i, var_list, meta_list)
+    event_var_id = '[Eventbased]'
+    metavar_ids = ['formula', 'abs',
+                   'cos', 'acos',
+                   'tan', 'atan',
+                   'sin', 'asin',
+                   'exp', 'log', 'log10',
+                   'min', 'max']
+    parsed_cut = b2parser.parse(cut)
+    var_list = []
+    meta_list = []
+    find_vars(parsed_cut, var_list=var_list, meta_list=meta_list)
+    if len(var_list) == 0 and len(meta_list) == 0:
+        B2WARNING(f'Cut string "{cut}" has no variables for applyEventCuts helper function!')
+    for var_string in var_list:
+        # Get the variable and get rid of aliases
+        var = variables.getVariable(var_string)
+        # Throw an error message if the variable's description doesn't contain the event-based marker
+        if event_var_id not in var.description:
+            B2ERROR(f'Variable {var_string} is not an event-based variable! Please check your inputs to the applyEventCuts method!')
+    for meta_string_list in meta_list:
+        var_list_temp = []
+        while meta_string_list[0] in metavar_ids:
+            # remove special meta variable
+            meta_string_list.pop(0)
+            for meta_string in meta_string_list[0].split(","):
+                find_vars(b2parser.parse(meta_string), var_list_temp, meta_string_list)
+            if len(meta_string_list) > 0:
+                meta_string_list.pop(0)
+            if len(meta_string_list) == 0:
+                break
+            if len(meta_string_list) > 1:
+                meta_list += meta_string_list[1:]
+            if isinstance(meta_string_list[0], list):
+                meta_string_list = [element for element in meta_string_list[0]]
+        for var_string in var_list_temp:
+            # Get the variable and get rid of aliases
+            var = variables.getVariable(var_string)
+            # Throw an error message if the variable's description doesn't contain the event-based marker
+            if event_var_id not in var.description:
+                B2ERROR(f'Variable {var_string} is not an event-based variable!'
+                        ' Please check your inputs to the applyEventCuts method!')
+        if len(meta_string_list) == 0:
+            continue
+        elif len(meta_string_list) == 1:
+            var = variables.getVariable(meta_string_list[0])
+        else:
+            var = variables.getVariable(meta_string_list[0], meta_string_list[1].split(","))
+        # Check if the variable's description contains event-based marker
+        if event_var_id in var.description:
+            continue
+        # Throw an error message if non event-based variable is used
+        B2ERROR(f'Variable {var.name} is not an event-based variable! Please check your inputs to the applyEventCuts method!')
     eselect = register_module('VariableToReturnValue')
     eselect.param('variable', 'passesEventCut(' + cut + ')')
     path.add_module(eselect)
@@ -1718,7 +1795,7 @@ def printList(list_name, full, path):
     path.add_module(prlist)
 
 
-def variablesToNtuple(decayString, variables, treename='variables', filename='ntuple.root', path=None):
+def variablesToNtuple(decayString, variables, treename='variables', filename='ntuple.root', path=None, basketsize=1600):
     """
     Creates and fills a flat ntuple with the specified variables from the VariableManager.
     If a decayString is provided, then there will be one entry per candidate (for particle in list of candidates).
@@ -1730,6 +1807,7 @@ def variablesToNtuple(decayString, variables, treename='variables', filename='nt
         treename (str): name of the ntuple tree
         filename (str): which is used to store the variables
         path (basf2.Path): the basf2 path where the analysis is processed
+        basketsize (int): size of baskets in the output ntuple in bytes
     """
 
     output = register_module('VariablesToNtuple')
@@ -1738,6 +1816,7 @@ def variablesToNtuple(decayString, variables, treename='variables', filename='nt
     output.param('variables', variables)
     output.param('fileName', filename)
     output.param('treeName', treename)
+    output.param('basketSize', basketsize)
     path.add_module(output)
 
 
@@ -1976,6 +2055,8 @@ def reconstructMCDecay(
     Finds and creates a ``ParticleList`` from given decay string.
     ``ParticleList`` of daughters with sub-decay is created.
 
+    Only the particles made from MCParticle, which can be loaded by `fillParticleListFromMC`, are accepted as daughters.
+
     Only signal particle, which means :b2:var:`isSignal` is equal to 1, is stored. One can use the decay string grammar
     to change the behavior of :b2:var:`isSignal`. One can find detailed information in :ref:`DecayString`.
 
@@ -1983,6 +2064,13 @@ def reconstructMCDecay(
         If one uses same sub-decay twice, same particles are registered to a ``ParticleList``. For example,
         ``K_S0:pi0pi0 =direct=> [pi0:gg =direct=> gamma:MC gamma:MC] [pi0:gg =direct=> gamma:MC gamma:MC]``.
         One can skip the second sub-decay, ``K_S0:pi0pi0 =direct=> [pi0:gg =direct=> gamma:MC gamma:MC] pi0:gg``.
+
+    .. tip::
+        It is recommended to use only primary particles as daughter particles unless you want to explicitly study the secondary
+        particles. The behavior of MC-matching for secondary particles from a stable particle decay is not guaranteed.
+        Please consider to use `fillParticleListFromMC` with ``skipNonPrimary=True`` to load daughter particles.
+        Moreover, it is recommended to load ``K_S0`` and ``Lambda0`` directly from MCParticle by `fillParticleListFromMC` rather
+        than reconstructing from two pions or a proton-pion pair, because their direct daughters can be the secondary particle.
 
 
     @param decayString :ref:`DecayString` specifying what kind of the decay should be reconstructed
@@ -3203,8 +3291,8 @@ def tagCurlTracks(particleLists,
       .. _BN1079: https://belle.kek.jp/secured/belle_note/gn1079/bn1079.pdf
 
 
-    The module loops over all particles in a given list that meet the preselection **ptCut** and assigns them to
-    bundles based on the response of the chosen **selector** and the required minimum response set by the
+    The module loops over all particles in a given list with a transverse momentum below the pre-selection **ptCut**
+    and assigns them to bundles based on the response of the chosen **selector** and the required minimum response set by the
     **responseCut**. Once all particles are assigned they are ranked by 25dr^2+dz^2. All but the lowest are tagged
     with extraInfo(isCurl=1) to allow for later removal by cutting the list or removing these from ROE as
     applicable.
@@ -3220,7 +3308,9 @@ def tagCurlTracks(particleLists,
     @param selectorType:  string name of selector to use. The available options are 'cut' and 'mva'.
                           It is strongly recommended to used the 'mva' selection. The 'cut' selection
                           is based on BN1079 and is only calibrated for Belle data.
-    @param ptCut:         pre-selection cut on transverse momentum.
+
+    @param ptCut:         Pre-selection cut on transverse momentum. Only tracks below that are considered as curler candidates.
+
     @param expert_train:  flag to set training mode if selector has a training mode (mva).
     @param expert_filename: set file name of produced training ntuple (mva).
     @param path:          module is added to this path.
@@ -3358,12 +3448,9 @@ def applyChargedPidMVA(particleLists, path, trainingMode, chargeIndependent=Fals
     iDet = 0
     for detID in Const.PIDDetectors.c_set:
 
-        # At the moment, SVD is excluded.
-        if detID == Const.EDetector.SVD:
-            B2WARNING("The ChargedPidMVA training currently does not include the SVD.")
-            continue
-
         detName = Const.parseDetectors(detID)
+
+        vm.addAlias(f"missingLogL_{detName}", f"pidMissingProbabilityExpert({detName})")
 
         for pdgIdSig, info in stdChargedMap.items():
 
@@ -3427,12 +3514,15 @@ def applyChargedPidMVA(particleLists, path, trainingMode, chargeIndependent=Fals
         decayDescriptor = Belle2.DecayDescriptor()
         for name in plSet:
             if not decayDescriptor.init(name):
-                raise ValueError("Invalid paritlceLists")
-
-            pdg = abs(decayDescriptor.getMother().getPDGCode())
-            if pdg not in binaryHypoPDGCodes:
-                B2WARNING("Given ParticleList: ", name, " (", pdg, ") is neither signal (", binaryHypoPDGCodes[0],
-                          ") nor background (", binaryHypoPDGCodes[1], ").")
+                raise ValueError(f"Invalid particle list {name} in applyChargedPidMVA!")
+            pdgs = [abs(decayDescriptor.getMother().getPDGCode())]
+            daughter_pdgs = decayDescriptor.getSelectionPDGCodes()
+            if len(daughter_pdgs) > 0:
+                pdgs = daughter_pdgs
+            for pdg in pdgs:
+                if pdg not in binaryHypoPDGCodes:
+                    B2WARNING("Given ParticleList: ", name, " (", pdg, ") is neither signal (", binaryHypoPDGCodes[0],
+                              ") nor background (", binaryHypoPDGCodes[1], ").")
 
         chargedpid = register_module("ChargedPidMVA")
         chargedpid.set_name(f"ChargedPidMVA_{binaryHypoPDGCodes[0]}_vs_{binaryHypoPDGCodes[1]}_{mode}")
@@ -3450,45 +3540,120 @@ def applyChargedPidMVA(particleLists, path, trainingMode, chargeIndependent=Fals
     path.add_module(chargedpid)
 
 
-def calculateTrackIsolation(list_name, path, *detectors, use2DRhoPhiDist=False, alias=None):
+def calculateTrackIsolation(decay_string, path, *detectors, reference_list_name=None, highest_prob_mass_for_ext=False):
     """
-    Given a list of charged stable particles, compute variables that quantify "isolation" of the associated tracks.
+    Given an input decay string, compute variables that quantify track-based "isolation" of the charged
+    stable particles in the decay chain.
 
-    Currently, a proxy for isolation is defined as the 3D distance (or optionally, a 2D distance projecting on r-phi)
-    of each particle's track to its closest neighbour at a given detector entry surface.
+    Note:
+        Currently, a proxy for isolation is defined as the distance
+        of each particle's track to its closest neighbour, defined as the segment connecting the two tracks
+        intersection points on a given cylindrical surface.
+        The calculation relies on the track helix extrapolation.
+
+    The definition of distance and the number of distances that are calculated per sub-detector is based on
+    the following recipe:
+
+    - CDC: as the segmentation is very coarse along z,
+           the distance is defined as the cord length on the (rho=R, phi) plane.
+           A total of 9 distances are calculated: the cylindrical surfaces are defined at R values
+           that correspond to the positions of the 9 CDC wire superlayers.
+    - TOP: as there is no segmentation along z,
+           the distance is defined as the cord length on the (rho=R, phi) plane.
+           Only one distance at the TOP entry radius is calculated.
+    - ARICH: as there is no segmentation along z,
+             the distance is defined as the distance on the (rho, phi) plane at fixed z=Z.
+             Only one distance at the ARICH photon detector Z entry coordinate is calculated.
+    - ECL: the distance is defined on the (rho=R, phi, z) surface in the barrel,
+           on the (rho, phi, z=Z) surface in the endcaps.
+           Two distances are calculated: one at the ECL entry radius R (barrel), entry Z (endcaps),
+           and one at R, Z corresponding roughly to the mid-point of the longitudinal size of the crystals.
+    - KLM: the distance is defined on the (rho=R, phi, z) surface in the barrel,
+           on the (rho, phi, z=Z) surface in the endcaps.
+           Only one distance at the KLM first strip entry radius R (barrel), Z (endcaps) is calculated.
 
     Parameters:
-        list_name (str): name of the input ParticleList.
-                         It must be a list of charged stable particles as defined in ``Const::chargedStableSet``.
-                         The charge-conjugate ParticleList will be also processed automatically.
-        path (basf2.Path): the module is added to this path.
-        use2DRhoPhiDist (Optional[bool]): if true, will calculate the pair-wise track distance
-                                          as the cord length on the (rho, phi) projection.
-                                          By default, a 3D distance is calculated.
-        alias (Optional[str]): An alias to the extraInfo variable computed by the `TrackIsoCalculator` module.
-                               Please note, for each input detector a variable is calculated,
-                               and the detector's name is appended to the alias to distinguish them.
-        *detectors: detectors at whose entry surface track isolation variables will be calculated.
-                    Choose among: "CDC", "PID", "ECL", "KLM" (NB: 'PID' indicates TOP+ARICH entry surface.)
+        decay_string (str): name of the input decay string with selected charged stable daughters,
+                            for example: ``Lambda0:merged -> ^p+ ^pi-``.
+                            Alternatively, it can be a particle list for charged stable particles
+                            as defined in ``Const::chargedStableSet``, for example: ``mu+:all``.
+                            The charge-conjugate particle list will be also processed automatically.
+        path (basf2.Path): path to which module(s) will be added.
+        *detectors: detectors for which track isolation variables will be calculated.
+                    Choose among: "CDC", "TOP", "ARICH", "ECL", "KLM"
+        reference_list_name (Optional[str]): name of the input charged stable particle list for the reference tracks.
+                                             By default, the ``:all`` ParticleList of the same type
+                                             of the selected particle in ``decay_string`` is used.
+                                             The charge-conjugate particle list will be also processed automatically.
+        highest_prob_mass_for_hex (Optional[bool]): if this option is set, the helix extrapolation for the particles
+                                                    will use the track fit result for the most
+                                                    probable mass hypothesis, namely, the one that gives the highest
+                                                    chi2Prob of the fit.
+
+    Returns:
+        list(str): a list of aliases for the calculated distance variables.
 
     """
 
-    from variables import variables
+    import variables.utils as vu
+    from ROOT import Belle2, TDatabasePDG
 
-    det_choices = ("CDC", "PID", "ECL", "KLM")
+    decayDescriptor = Belle2.DecayDescriptor()
+    if not decayDescriptor.init(decay_string):
+        B2FATAL(f"Invalid particle list {decay_string} in calculateTrackIsolation!")
+    no_reference_list_name = not reference_list_name
+
+    det_choices = ["CDC", "TOP", "ARICH", "ECL", "KLM"]
     if any(d not in det_choices for d in detectors):
-        B2ERROR("Your input detector list: ", detectors, " contains an invalid choice. Please select among: ", det_choices)
+        B2FATAL("Your input detector list: ", detectors, " contains an invalid choice. Please select among: ", det_choices)
 
+    det_labels = []
     for det in detectors:
-        path.add_module("TrackIsoCalculator",
-                        particleList=list_name,
-                        detectorInnerSurface=det,
-                        use2DRhoPhiDist=use2DRhoPhiDist)
-        if isinstance(alias, str):
-            if not use2DRhoPhiDist:
-                variables.addAlias(f"{alias}{det}", f"extraInfo(dist3DToClosestTrkAt{det}Surface)")
+        if det == "CDC":
+            det_labels.extend([f"{det}{ilayer}" for ilayer in range(9)])
+        elif det == "ECL":
+            det_labels.extend([f"{det}{ilayer}" for ilayer in range(2)])
+        else:
+            det_labels.append(f"{det}0")
+
+    # The module allows only one daughter to be selected at a time,
+    # that's why here we preprocess the input decay string.
+    select_symbol = '^'
+    processed_decay_strings = []
+    if select_symbol in decay_string:
+        splitted_ds = decay_string.split(select_symbol)
+        for i in range(decay_string.count(select_symbol)):
+            tmp = list(splitted_ds)
+            tmp.insert(i+1, select_symbol)
+            processed_decay_strings += [''.join(tmp)]
+    else:
+        processed_decay_strings += [decay_string]
+
+    for processed_dec in processed_decay_strings:
+        if no_reference_list_name:
+            decayDescriptor.init(processed_dec)
+            daughter_pdgs = decayDescriptor.getSelectionPDGCodes()
+            if len(daughter_pdgs) > 0:
+                reference_list_name = f'{TDatabasePDG.Instance().GetParticle(abs(daughter_pdgs[0])).GetName()}:all'
             else:
-                variables.addAlias(f"{alias}{det}", f"extraInfo(dist2DRhoPhiToClosestTrkAt{det}Surface)")
+                reference_list_name = f'{processed_dec.split(":")[0]}:all'
+
+        for det in det_labels:
+            trackiso = path.add_module("TrackIsoCalculator",
+                                       decayString=processed_dec,
+                                       detectorSurface=det,
+                                       particleListReference=reference_list_name,
+                                       useHighestProbMassForExt=highest_prob_mass_for_ext)
+            trackiso.set_name(f"TrackIsoCalculator{det}_{processed_dec}_VS_{reference_list_name}")
+
+    # Use a special suffix to identify variables in case the helix extrapolation is done
+    # using the best fit mass hypothesis.
+    extra_suffix = "" if not highest_prob_mass_for_ext else "__useHighestProbMassForExt"
+
+    aliases = vu.create_aliases(
+        [f"distToClosestTrkAt{det}_VS_{reference_list_name}{extra_suffix}" for det in det_labels], "extraInfo({variable})")
+
+    return aliases
 
 
 def calculateDistance(list_name, decay_string, mode='vertextrack', path=None):

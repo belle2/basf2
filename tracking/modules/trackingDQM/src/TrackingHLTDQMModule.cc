@@ -14,14 +14,13 @@
 
 using namespace Belle2;
 using namespace Belle2::HistogramFactory;
-using namespace std;
 using boost::format;
 
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
 
-REG_MODULE(TrackingHLTDQM)
+REG_MODULE(TrackingHLTDQM);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -30,8 +29,7 @@ REG_MODULE(TrackingHLTDQM)
 TrackingHLTDQMModule::TrackingHLTDQMModule() : DQMHistoModuleBase()
 {
   setPropertyFlags(c_ParallelProcessingCertified);
-  setDescription("Data Quality Monitoring of the tracking run on HLT. "
-                );
+  setDescription("Data Quality Monitoring of the tracking run on HLT. ");
 }
 
 //------------------------------------------------------------------
@@ -77,7 +75,7 @@ void TrackingHLTDQMModule::defineHisto()
   originalDirectory->cd();
 
   for (auto change : m_histogramParameterChanges)
-    ProcessHistogramParameterChange(get<0>(change), get<1>(change), get<2>(change));
+    ProcessHistogramParameterChange(std::get<0>(change), std::get<1>(change), std::get<2>(change));
 }
 
 void TrackingHLTDQMModule::event()
@@ -122,7 +120,7 @@ void TrackingHLTDQMModule::event()
         } //time overflow
       }// loop on RawFTSW
     } //RawFTSW is valid
-  }  else
+  } else
     m_trackingErrorFlags->Fill(0.0);
 
 }

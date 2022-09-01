@@ -171,21 +171,21 @@ void KLMTriggerModule::endRun()
 
 }
 
-AXIS_NAME(KLM_type, int);// cppcheck-suppress  noExplicitConstructor
-AXIS_NAME(section_t, int);// cppcheck-suppress  noExplicitConstructor
-AXIS_NAME(sector_t, int);// cppcheck-suppress  noExplicitConstructor
-AXIS_NAME(layer_t, int);// cppcheck-suppress  noExplicitConstructor
-AXIS_NAME(layer_count, int);// cppcheck-suppress  noExplicitConstructor
-AXIS_NAME(layer_mask, int);// cppcheck-suppress  noExplicitConstructor
-AXIS_NAME(n_triggered, int);// cppcheck-suppress  noExplicitConstructor
-AXIS_NAME(sector_mask, int);// cppcheck-suppress  noExplicitConstructor
-AXIS_NAME(sector_mask_or, int);// cppcheck-suppress  noExplicitConstructor
+AXIS_NAME(KLM_type, int);
+AXIS_NAME(section_t, int);
+AXIS_NAME(sector_t, int);
+AXIS_NAME(layer_t, int);
+AXIS_NAME(layer_count, int);
+AXIS_NAME(layer_mask, int);
+AXIS_NAME(n_triggered, int);
+AXIS_NAME(sector_mask, int);
+AXIS_NAME(sector_mask_or, int);
 
-AXIS_NAME(n_sections_trig, int);// cppcheck-suppress  noExplicitConstructor
-AXIS_NAME(back2back_t, int);// cppcheck-suppress  noExplicitConstructor
-AXIS_NAME(isectors_t, int);// cppcheck-suppress  noExplicitConstructor
-AXIS_NAME(TriggerCut, int);// cppcheck-suppress  noExplicitConstructor
-AXIS_NAME(vetoCut, int);// cppcheck-suppress  noExplicitConstructor
+AXIS_NAME(n_sections_trig, int);
+AXIS_NAME(back2back_t, int);
+AXIS_NAME(isectors_t, int);
+AXIS_NAME(TriggerCut, int);
+AXIS_NAME(vetoCut, int);
 
 int to_i_sector(int KLM_type_, int section_)
 {
@@ -206,7 +206,7 @@ int to_i_sector(int KLM_type_, int section_)
 template <typename T>
 int to_i_sector(const T& e)
 {
-  return to_i_sector(KLM_type(e) , section_t(e));
+  return to_i_sector(KLM_type(e), section_t(e));
 }
 
 
@@ -234,7 +234,7 @@ bool sectors_adjacent(int e1, int e2)
 }
 
 template <typename CONTAINER_T>
-auto to_sector_bit_mask(const CONTAINER_T& container, TriggerCut TriggerCut_ , vetoCut vetoCut_ = 0)
+auto to_sector_bit_mask(const CONTAINER_T& container, TriggerCut TriggerCut_, vetoCut vetoCut_ = 0)
 {
   int ret = 0;
   auto back = container.back();
@@ -248,7 +248,7 @@ auto to_sector_bit_mask(const CONTAINER_T& container, TriggerCut TriggerCut_ , v
       bitcount_or >= TriggerCut_
       && bitcount_back < vetoCut_
       && bitcount < vetoCut_
-      && (sectors_adjacent(sector_t(e) , sector_t(back)))
+      && (sectors_adjacent(sector_t(e), sector_t(back)))
     ) {
       ret |= (1 << sector_t(e));
       ret |= (1024);
@@ -314,24 +314,24 @@ void KLMTriggerModule::event()
   }
                                         );
 
-  m_KLMTrgSummary->setBKLM_n_trg_sectors(first_or_default(summery2, KLM_type(KLMElementNumbers::c_BKLM), 0 , n_sections_trig{}));
-  m_KLMTrgSummary->setEKLM_n_trg_sectors(first_or_default(summery2, KLM_type(KLMElementNumbers::c_EKLM), 0 , n_sections_trig{}));
+  m_KLMTrgSummary->setBKLM_n_trg_sectors(first_or_default(summery2, KLM_type(KLMElementNumbers::c_BKLM), 0, n_sections_trig{}));
+  m_KLMTrgSummary->setEKLM_n_trg_sectors(first_or_default(summery2, KLM_type(KLMElementNumbers::c_EKLM), 0, n_sections_trig{}));
 
-  m_KLMTrgSummary->setSector_mask_Backward_Barrel(first_or_default(n_triggered_sectors2, isectors_t(i_backward_bklm), 0 , sector_mask{}));
-  m_KLMTrgSummary->setSector_mask_Forward_Barrel(first_or_default(n_triggered_sectors2, isectors_t(i_forward_bklm) , 0 , sector_mask{}));
-  m_KLMTrgSummary->setSector_mask_Backward_Endcap(first_or_default(n_triggered_sectors2, isectors_t(i_backward_eklm), 0 , sector_mask{}));
-  m_KLMTrgSummary->setSector_mask_Forward_Endcap(first_or_default(n_triggered_sectors2, isectors_t(i_forward_eklm) , 0 , sector_mask{}));
+  m_KLMTrgSummary->setSector_mask_Backward_Barrel(first_or_default(n_triggered_sectors2, isectors_t(i_backward_bklm), 0, sector_mask{}));
+  m_KLMTrgSummary->setSector_mask_Forward_Barrel(first_or_default(n_triggered_sectors2, isectors_t(i_forward_bklm), 0, sector_mask{}));
+  m_KLMTrgSummary->setSector_mask_Backward_Endcap(first_or_default(n_triggered_sectors2, isectors_t(i_backward_eklm), 0, sector_mask{}));
+  m_KLMTrgSummary->setSector_mask_Forward_Endcap(first_or_default(n_triggered_sectors2, isectors_t(i_forward_eklm), 0, sector_mask{}));
 
-  m_KLMTrgSummary->setSector_mask_OR_Backward_Barrel(first_or_default(n_triggered_sectors2, isectors_t(i_backward_bklm), 0 ,
+  m_KLMTrgSummary->setSector_mask_OR_Backward_Barrel(first_or_default(n_triggered_sectors2, isectors_t(i_backward_bklm), 0,
                                                      sector_mask_or{}));
-  m_KLMTrgSummary->setSector_mask_OR_Forward_Barrel(first_or_default(n_triggered_sectors2, isectors_t(i_forward_bklm) , 0 ,
+  m_KLMTrgSummary->setSector_mask_OR_Forward_Barrel(first_or_default(n_triggered_sectors2, isectors_t(i_forward_bklm), 0,
                                                     sector_mask_or{}));
-  m_KLMTrgSummary->setSector_mask_OR_Backward_Endcap(first_or_default(n_triggered_sectors2, isectors_t(i_backward_eklm), 0 ,
+  m_KLMTrgSummary->setSector_mask_OR_Backward_Endcap(first_or_default(n_triggered_sectors2, isectors_t(i_backward_eklm), 0,
                                                      sector_mask_or{}));
-  m_KLMTrgSummary->setSector_mask_OR_Forward_Endcap(first_or_default(n_triggered_sectors2, isectors_t(i_forward_eklm) , 0 ,
+  m_KLMTrgSummary->setSector_mask_OR_Forward_Endcap(first_or_default(n_triggered_sectors2, isectors_t(i_forward_eklm), 0,
                                                     sector_mask_or{}));
 
-  m_KLMTrgSummary->setBKLM_back_to_back_flag(first_or_default(summery1, KLM_type(KLMElementNumbers::c_BKLM), 0 , back2back_t{}));
-  m_KLMTrgSummary->setEKLM_back_to_back_flag(first_or_default(summery1, KLM_type(KLMElementNumbers::c_EKLM), 0 , back2back_t{}));
+  m_KLMTrgSummary->setBKLM_back_to_back_flag(first_or_default(summery1, KLM_type(KLMElementNumbers::c_BKLM), 0, back2back_t{}));
+  m_KLMTrgSummary->setEKLM_back_to_back_flag(first_or_default(summery1, KLM_type(KLMElementNumbers::c_EKLM), 0, back2back_t{}));
 
 }

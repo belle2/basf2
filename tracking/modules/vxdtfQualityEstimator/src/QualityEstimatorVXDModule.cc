@@ -19,7 +19,7 @@
 using namespace Belle2;
 
 
-REG_MODULE(QualityEstimatorVXD)
+REG_MODULE(QualityEstimatorVXD);
 
 QualityEstimatorVXDModule::QualityEstimatorVXDModule() : Module()
 {

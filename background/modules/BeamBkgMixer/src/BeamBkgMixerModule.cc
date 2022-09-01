@@ -229,7 +229,7 @@ void BeamBkgMixerModule::initialize()
       B2ERROR("Unknown beam background type found in 'scaleFactors': " << type << "\n"
               "Possible are: " + m_bgTypes.getBGTypes());
     for (auto& bkg : m_backgrounds) {
-      if (bkg.type.find(type) != std::string::npos)
+      if (bkg.tag == m_bgTypes.getTag(type))
         bkg.scaleFactor *= std::get<1>(scaleFactor);
     }
   }
@@ -279,6 +279,7 @@ void BeamBkgMixerModule::initialize()
     if (realTime >= 1000.0) {realTime /= 1000.0; unit = " s";}
 
     B2INFO("BeamBkgMixer: " << bkg.type <<
+           " tag=" << bkg.tag <<
            " files=" << bkg.numFiles <<
            " events=" << bkg.numEvents <<
            " realTime=" << realTime << unit <<

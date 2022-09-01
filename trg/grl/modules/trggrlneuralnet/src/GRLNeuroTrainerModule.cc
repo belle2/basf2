@@ -1,3 +1,11 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
+
 #include "trg/grl/modules/trggrlneuralnet/GRLNeuroTrainerModule.h"
 #ifdef HAS_OPENMP
 #include <parallel_fann.hpp>
@@ -33,7 +41,7 @@ using namespace std;
 
 //this line registers the module with the framework and actually makes it available
 //in steering files or the the module list (basf2 -m).
-REG_MODULE(GRLNeuroTrainer)
+REG_MODULE(GRLNeuroTrainer);
 
 GRLNeuroTrainerModule::GRLNeuroTrainerModule() : Module()
 {
@@ -178,12 +186,12 @@ GRLNeuroTrainerModule::initialize()
   h_ncdcs_sig.push_back(new TH1D("h_ncdcs_sig", "h_ncdcs_sig", 10, 0, 10));
   h_ncdci_sig.push_back(new TH1D("h_ncdci_sig", "h_ncdci_sig", 10, 0, 10));
   h_ncdc_sig.push_back(new TH1D("h_ncdc_sig", "h_ncdc_sig", 10, 0, 10));
-  h_necl_sig.push_back(new TH1D("h_necl_sig"  , "h_necl_sig" , 10, 0, 10));
-  h_ncdcf_bg.push_back(new TH1D("h_ncdcf_bg"  , "h_ncdcf_bg" , 10, 0, 10));
-  h_ncdcs_bg.push_back(new TH1D("h_ncdcs_bg"  , "h_ncdcs_bg" , 10, 0, 10));
-  h_ncdci_bg.push_back(new TH1D("h_ncdci_bg"  , "h_ncdci_bg" , 10, 0, 10));
+  h_necl_sig.push_back(new TH1D("h_necl_sig", "h_necl_sig", 10, 0, 10));
+  h_ncdcf_bg.push_back(new TH1D("h_ncdcf_bg", "h_ncdcf_bg", 10, 0, 10));
+  h_ncdcs_bg.push_back(new TH1D("h_ncdcs_bg", "h_ncdcs_bg", 10, 0, 10));
+  h_ncdci_bg.push_back(new TH1D("h_ncdci_bg", "h_ncdci_bg", 10, 0, 10));
   h_ncdc_bg.push_back(new TH1D("h_ncdc_bg", "h_ncdc_bg", 10, 0, 10));
-  h_necl_bg.push_back(new TH1D("h_necl_bg"    , "h_necl_bg"  , 10, 0, 10));
+  h_necl_bg.push_back(new TH1D("h_necl_bg", "h_necl_bg", 10, 0, 10));
 
   //..Trigger ThetaID for each trigger cell. Could be replaced by getMaxThetaId() for newer MC
   TrgEclMapping* trgecl_obj = new TrgEclMapping();
@@ -299,6 +307,7 @@ GRLNeuroTrainerModule::event()
       if (i2 < 0) i2 = i2 + 36;
       int i3 = i;
       int i4 = i + 1;
+      // cppcheck-suppress knownConditionTrueFalse
       if (i4 > 36) i4 = i4 - 36;
       int i5 = i + 2;
       if (i5 > 36) i5 = i5 - 36;
@@ -322,6 +331,7 @@ GRLNeuroTrainerModule::event()
       if (i2 < 0) i2 = i2 + 36;
       int i3 = i;
       int i4 = i + 1;
+      // cppcheck-suppress knownConditionTrueFalse
       if (i4 > 36) i4 = i4 - 36;
       int i5 = i + 2;
       if (i5 > 36) i5 = i5 - 36;

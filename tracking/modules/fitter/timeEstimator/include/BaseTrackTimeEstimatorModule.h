@@ -8,6 +8,7 @@
 #pragma once
 
 #include <framework/gearbox/Const.h>
+#include <tracking/dataobjects/RecoTrack.h>
 
 #include <framework/core/Module.h>
 #include <string>
@@ -36,6 +37,8 @@ namespace Belle2 {
   private:
     /** StoreArray name of the input and output reco tracks. */
     std::string m_param_recoTracksStoreArrayName = "RecoTracks";
+    /** RecoTracks StoreArray */
+    StoreArray<RecoTrack> m_recoTracks;
 
     /**
      * Whether to use the information in the measurements (after fit)

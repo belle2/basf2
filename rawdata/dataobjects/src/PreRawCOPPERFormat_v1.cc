@@ -908,7 +908,7 @@ int PreRawCOPPERFormat_v1::CopyReducedBuffer(int n, int* buf_to)
       //copy B2LFEE trailer(CRC info)
       buf_to[ pos_nwords_to ] =
         finesse_buf[ finesse_nwords - SIZE_B2LHSLB_TRAILER
-                     - (SIZE_B2LFEE_TRAILER - POS_CHKSUM_B2LFEE) ];
+                                    - (SIZE_B2LFEE_TRAILER - POS_CHKSUM_B2LFEE) ];
       pos_nwords_to++;
 
       // check CRC data
@@ -1043,7 +1043,7 @@ int PreRawCOPPERFormat_v1::CheckCRC16(int n, int finesse_num)
 
   if ((unsigned short)(*buf & 0xFFFF) != temp_crc16) {
     printf("PRE CRC16 error : B2LCRC16 %x Calculated CRC16 %x : Nwords of FINESSE buf %d\n",
-           *buf , temp_crc16, GetFINESSENwords(n, finesse_num));
+           *buf, temp_crc16, GetFINESSENwords(n, finesse_num));
     int* temp_buf = GetFINESSEBuffer(n, finesse_num);
     for (int k = 0; k <  GetFINESSENwords(n, finesse_num); k++) {
       printf("%.8x ", temp_buf[ k ]);
@@ -1077,7 +1077,7 @@ int* PreRawCOPPERFormat_v1::PackDetectorBuf(int* packed_buf_nwords,
 
   int poswords_to = 0;
   int* detector_buf[ 4 ] = { detector_buf_1st, detector_buf_2nd, detector_buf_3rd, detector_buf_4th };
-  int nwords[ 4 ] = { nwords_1st, nwords_2nd, nwords_3rd, nwords_4th };
+  const int nwords[ 4 ] = { nwords_1st, nwords_2nd, nwords_3rd, nwords_4th };
 
   // calculate the event length
   int length_nwords = tmp_header.GetHdrNwords() + SIZE_COPPER_HEADER + SIZE_COPPER_TRAILER + tmp_trailer.GetTrlNwords();

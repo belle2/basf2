@@ -486,8 +486,8 @@ CalibrationAlgorithm::EResult eclTimeShiftsAlgorithm::calibrate()
          that have the payload with the same revision number */
       int IOV_exp_high = m_ECLCrateTimeOffset.getIoV().getExperimentHigh() ;
       int IOV_run_high = m_ECLCrateTimeOffset.getIoV().getRunHigh() ;
-      B2INFO("IOV_exp_high = " << IOV_exp_high);
-      B2INFO("IOV_run_high = " << IOV_run_high);
+      B2INFO(LogVar("IOV_exp_high", IOV_exp_high));
+      B2INFO(LogVar("IOV_run_high", IOV_run_high));
       if (IOV_run_high == -1) {
         B2INFO("IOV_run_high is -1 so stop looping over all runs");
         break;

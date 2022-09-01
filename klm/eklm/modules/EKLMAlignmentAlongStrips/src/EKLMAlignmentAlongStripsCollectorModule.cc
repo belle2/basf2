@@ -18,7 +18,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(EKLMAlignmentAlongStripsCollector)
+REG_MODULE(EKLMAlignmentAlongStripsCollector);
 
 EKLMAlignmentAlongStripsCollectorModule::
 EKLMAlignmentAlongStripsCollectorModule() :
@@ -59,7 +59,7 @@ void EKLMAlignmentAlongStripsCollectorModule::collect()
   int i, j, n, n2, vol;
   double l;
   const HepGeom::Transform3D* tr;
-  TVector3 hitPosition;
+  ROOT::Math::XYZVector hitPosition;
   HepGeom::Point3D<double> hitGlobal, hitLocal;
   std::multimap<int, ExtHit*> mapExtHit;
   std::multimap<int, ExtHit*>::iterator it, it2, itLower, itUpper;

@@ -22,7 +22,7 @@ using namespace ECL;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(ECLFillCellIdMapping)
+REG_MODULE(ECLFillCellIdMapping);
 
 //-----------------------------------------------------------------
 //                 Implementation

@@ -478,13 +478,17 @@ TVector3 CDCCRTestModule::getTriggerHitPosition(RecoTrack* track)
   TVector3 trigpos(m_TriggerPos.at(0), m_TriggerPos.at(1), m_TriggerPos.at(2));
   TVector3 trigDir(m_TriggerPlaneDirection.at(0), m_TriggerPlaneDirection.at(1), m_TriggerPlaneDirection.at(2));
   const genfit::AbsTrackRep* trackRepresentation = track->getCardinalRepresentation();
-  genfit::MeasuredStateOnPlane mop = track->getMeasuredStateOnPlaneClosestTo(trigpos, trackRepresentation);
   TVector3 pos(-200, 200, 200);
   try {
+    genfit::MeasuredStateOnPlane mop = track->getMeasuredStateOnPlaneClosestTo(trigpos, trackRepresentation);
     double l = mop.extrapolateToPlane(genfit::SharedPlanePtr(new genfit::DetPlane(trigpos, trigDir)));
     if (fabs(l) < 1000) pos = mop.getPos();
   } catch (const genfit::Exception& er) {
     B2WARNING("extrapolate to Trigger counter failure" << er.what());
+  } catch (const std::runtime_error& er) {
+    B2WARNING("Runtime error encountered: " << er.what());
+  } catch (...) {
+    B2WARNING("Undefined exception encountered.");
   }
   return pos;
 }

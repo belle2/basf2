@@ -19,12 +19,12 @@ using namespace vxdHoughTracking;
 
 void TwoHitVirtualIPFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "cosRZCut"), m_param_cosRZCut,
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "cosRZCut"), m_cosRZCut,
                                 "Cut on the absolute value of cosine between the vectors (oHit - cHit) and (cHit - iHit).",
-                                m_param_cosRZCut);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "circleIPDistanceCut"), m_param_circleIPDistanceCut,
+                                m_cosRZCut);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "circleIPDistanceCut"), m_circleIPDistanceCut,
                                 "Cut on the difference between circle radius and circle center to check whether the circle is compatible with passing through the IP.",
-                                m_param_circleIPDistanceCut);
+                                m_circleIPDistanceCut);
 }
 
 void TwoHitVirtualIPFilter::beginRun()
@@ -59,13 +59,13 @@ TwoHitVirtualIPFilter::operator()(const BasePathFilter::Object& pair)
   // filter expects hits from outer to inner
   m_threeHitVariables.setHits(lastHitPos, currentHitPos, m_virtualIPPosition);
 
-  if (m_threeHitVariables.getCosAngleRZSimple() < m_param_cosRZCut) {
+  if (m_threeHitVariables.getCosAngleRZSimple() < m_cosRZCut) {
     return NAN;
   }
 
   const double circleDistanceIP = m_threeHitVariables.getCircleDistanceIP();
 
-  if (circleDistanceIP > m_param_circleIPDistanceCut) {
+  if (circleDistanceIP > m_circleIPDistanceCut) {
     return NAN;
   }
 

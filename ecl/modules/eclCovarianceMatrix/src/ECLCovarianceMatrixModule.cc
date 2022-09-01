@@ -24,8 +24,8 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(ECLCovarianceMatrix)
-REG_MODULE(ECLCovarianceMatrixPureCsI)
+REG_MODULE(ECLCovarianceMatrix);
+REG_MODULE(ECLCovarianceMatrixPureCsI);
 
 //-----------------------------------------------------------------
 //                 Implementation

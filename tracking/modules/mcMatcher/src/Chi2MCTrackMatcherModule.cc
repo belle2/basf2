@@ -24,7 +24,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(Chi2MCTrackMatcher)
+REG_MODULE(Chi2MCTrackMatcher);
 
 
 

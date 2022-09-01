@@ -1535,7 +1535,8 @@ void EVEVisualization::addEKLMHit2d(const KLMHit2d* eklm2dhit)
 {
   const double du = 2.0;
   const double dv = 2.0;
-  TVector3 o = eklm2dhit->getPosition();
+  ROOT::Math::XYZVector hitPosition = eklm2dhit->getPosition();
+  TVector3 o(hitPosition.X(), hitPosition.Y(), hitPosition.Z());
   TVector3 u(1.0, 0.0, 0.0);
   TVector3 v(0.0, 1.0, 0.0);
   TEveBox* eklmbox = boxCreator(o, u, v, du, dv, 4.0);
@@ -1566,7 +1567,7 @@ void EVEVisualization::addROI(const ROIid* roi)
   TVector3 globalB = aSensorInfo.pointToGlobal(localB);
   TVector3 globalC = aSensorInfo.pointToGlobal(localC);
 
-  TEveBox* ROIbox = boxCreator((globalB + globalC) * 0.5 , globalB - globalA, globalC - globalA, 1, 1, 0.01);
+  TEveBox* ROIbox = boxCreator((globalB + globalC) * 0.5, globalB - globalA, globalC - globalA, 1, 1, 0.01);
 
   ROIbox->SetName(ObjectInfo::getIdentifier(roi));
   ROIbox->SetMainColor(kSpring - 9);
@@ -1815,7 +1816,7 @@ void EVEVisualization::addTOPDigits(const StoreArray<TOPDigit>& digits)
 
     //bar is a bit thicker so we can mouse over without getting the geometry
     auto* moduleBox = boxCreator(centerPos3D, channelX, channelY,
-                                 3.0 * topmod.getBarThickness(), topmod.getBarWidth() , topmod.getBarLength());
+                                 3.0 * topmod.getBarThickness(), topmod.getBarWidth(), topmod.getBarLength());
     moduleBox->SetMainColor(kAzure + 10);
     double weight = double(modCountPair.second) / maxcount;
     moduleBox->SetMainTransparency(90 - weight * 50);

@@ -83,24 +83,34 @@ VTXResultFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
     return std::make_unique<TrackFindingCDC::NoneFilter<BaseVTXResultFilter>>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "all") {
     return std::make_unique<TrackFindingCDC::AllFilter<BaseVTXResultFilter>>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "recording") {
     return std::make_unique<RecordingVTXResultFilter>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "recording_with_relations") {
     return std::make_unique<RecordingVTXSeededResultFilter>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "mva") {
     return std::make_unique<MVAVTXResultFilter>("ckf_CDCToVTXResult");
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "mva_with_relations") {
     return std::make_unique<MVAVTXSeededResultFilter>("ckf_SeededCDCToVTXResult");
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "truth") {
     return std::make_unique<ChooseableTruthVTXResultFilter>("truth");
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "truth_teacher") {
     return std::make_unique<ChooseableTruthVTXResultFilter>("truth_teacher");
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "truth_vtx_cdc_relation") {
     return std::make_unique<ChooseableTruthVTXResultFilter>("truth_vtx_cdc_relation");
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "size") {
     return std::make_unique<SizeVTXResultFilter>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "weight") {
     return std::make_unique<WeightVTXResultFilter>();
   } else {

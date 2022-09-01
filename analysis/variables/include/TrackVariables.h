@@ -230,6 +230,13 @@ namespace Belle2 {
 
     /** helper function to get the position on the Helix */
     B2Vector3D getPositionOnHelix(const Particle* part, const std::vector<double>& pars);
+
+    /** 1 if the track that has been flipped and refitted in the refining step */
+    double isTrackFlippedAndRefitted(const Particle* part);
+
+    /** return the SVD Track time */
+    double getTrackTime(const Particle* part);
+
   }
 } // Belle2 namespace
 

@@ -11,19 +11,18 @@
 #include <framework/datastore/RelationArray.h>
 #include <genfit/MaterialEffects.h>
 
-using namespace std;
 using namespace Belle2;
 
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(PXDROIFinder)
+REG_MODULE(PXDROIFinder);
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-PXDROIFinderModule::PXDROIFinderModule() : Module() , m_ROIinfo()
+PXDROIFinderModule::PXDROIFinderModule() : Module(), m_ROIinfo()
 {
   //Set module properties
   setDescription("This module performs the reduction of the PXD data output");
@@ -51,17 +50,12 @@ PXDROIFinderModule::PXDROIFinderModule() : Module() , m_ROIinfo()
 
 void PXDROIFinderModule::initialize()
 {
-  StoreArray<RecoTrack> trackList(m_recoTracksListName);
+  m_RecoTracks.isOptional(m_recoTracksListName);
+  m_ROIs.registerInDataStore(m_ROIListName, DataStore::c_ErrorIfAlreadyRegistered);
+  m_PXDIntercepts.registerInDataStore(m_PXDInterceptListName, DataStore::c_ErrorIfAlreadyRegistered);
 
-  StoreArray<ROIid> ROIList(m_ROIListName);
-  ROIList.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered);
-
-  StoreArray<PXDIntercept> PXDInterceptList(m_PXDInterceptListName);
-  PXDInterceptList.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered);
-
-  trackList.registerRelationTo(PXDInterceptList);
-  PXDInterceptList.registerRelationTo(ROIList);
-
+  m_RecoTracks.registerRelationTo(m_PXDIntercepts);
+  m_PXDIntercepts.registerRelationTo(m_ROIs);
 
   if (!genfit::MaterialEffects::getInstance()->isInitialized()) {
     B2FATAL("Material effects not set up.  Please use SetupGenfitExtrapolationModule.");
@@ -72,15 +66,15 @@ void PXDROIFinderModule::initialize()
 void PXDROIFinderModule::beginRun()
 {
 
-  B2DEBUG(1, "||| PXDROIFinder Parameters:");
-  B2DEBUG(1, "    tolerance: phi = " << m_tolerancePhi);
-  B2DEBUG(1, "                z = " << m_toleranceZ);
-  B2DEBUG(1, "    n sigma:    u = " << m_numSigmaTotU);
-  B2DEBUG(1, "                v = " << m_numSigmaTotV);
-  B2DEBUG(1, "    systematic: u = " << m_sigmaSystU);
-  B2DEBUG(1, "                v = " << m_sigmaSystV);
-  B2DEBUG(1, "    max width:  u = " << m_maxWidthU);
-  B2DEBUG(1, "                v = " << m_maxWidthV);
+  B2DEBUG(29, "||| PXDROIFinder Parameters:");
+  B2DEBUG(29, "    tolerance: phi = " << m_tolerancePhi);
+  B2DEBUG(29, "                z = " << m_toleranceZ);
+  B2DEBUG(29, "    n sigma:    u = " << m_numSigmaTotU);
+  B2DEBUG(29, "                v = " << m_numSigmaTotV);
+  B2DEBUG(29, "    systematic: u = " << m_sigmaSystU);
+  B2DEBUG(29, "                v = " << m_sigmaSystV);
+  B2DEBUG(29, "    max width:  u = " << m_maxWidthU);
+  B2DEBUG(29, "                v = " << m_maxWidthV);
 
   m_ROIinfo.sigmaSystU = m_sigmaSystU;
   m_ROIinfo.sigmaSystV = m_sigmaSystV;
@@ -101,31 +95,17 @@ void PXDROIFinderModule::beginRun()
 
 void PXDROIFinderModule::event()
 {
+  B2DEBUG(29, "%%%%%%%% Number of RecoTracks in the events =  " << m_RecoTracks.getEntries());
 
-  StoreArray<PXDIntercept> PXDInterceptList(m_PXDInterceptListName);
-
-  StoreArray<ROIid> ROIList(m_ROIListName);
-
-  StoreArray<RecoTrack> trackList(m_recoTracksListName);
-  B2DEBUG(1, "%%%%%%%% Number of RecoTracks in the events =  " << trackList.getEntries());
-
-  RelationArray recoTrackToPXDIntercepts(trackList, PXDInterceptList);
+  RelationArray recoTrackToPXDIntercepts(m_RecoTracks, m_PXDIntercepts);
   recoTrackToPXDIntercepts.create();
 
-  RelationArray PXDInterceptsToROIids(PXDInterceptList, ROIList);
+  RelationArray PXDInterceptsToROIids(m_PXDIntercepts, m_ROIs);
   PXDInterceptsToROIids.create();
 
-  //  timespec time1, time2, time3;
+  if (m_thePXDInterceptor) m_thePXDInterceptor->fillInterceptList(&m_PXDIntercepts, m_RecoTracks, &recoTrackToPXDIntercepts);
 
-  //  clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &time1);
-
-  if (m_thePXDInterceptor) m_thePXDInterceptor->fillInterceptList(&PXDInterceptList, trackList, &recoTrackToPXDIntercepts);
-
-  //clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &time2);
-
-  if (m_thePixelTranslator) m_thePixelTranslator->fillRoiIDList(&PXDInterceptList, &ROIList);
-
-  // clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &time3);
+  if (m_thePixelTranslator) m_thePixelTranslator->fillRoiIDList(&m_PXDIntercepts, &m_ROIs);
 
 }
 

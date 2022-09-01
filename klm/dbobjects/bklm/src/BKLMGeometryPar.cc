@@ -14,7 +14,6 @@
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;
-using namespace std;
 
 BKLMGeometryPar::BKLMGeometryPar(const GearDir& content)
 {

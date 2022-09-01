@@ -29,7 +29,6 @@
 /* ROOT headers. */
 #include <TRandom3.h>
 
-using namespace std;
 using namespace Belle2::bklm;
 
 SensitiveDetector::SensitiveDetector(const G4String& name) :
@@ -202,8 +201,8 @@ void SensitiveDetector::convertHitToRPCStrips(const CLHEP::Hep3Vector& localPosi
   while (--n > 0) {
     phiStrip += nextStrip;
     if ((phiStrip >= pMin) && (phiStrip <= pMax)) {
-      phiStripLower = min(phiStrip, phiStripLower);
-      phiStripUpper = max(phiStrip, phiStripUpper);
+      phiStripLower = std::min(phiStrip, phiStripLower);
+      phiStripUpper = std::max(phiStrip, phiStripUpper);
     }
     nextStrip = (nextStrip > 0 ? -(1 + nextStrip) : 1 - nextStrip);
   }
@@ -216,8 +215,8 @@ void SensitiveDetector::convertHitToRPCStrips(const CLHEP::Hep3Vector& localPosi
   while (--n > 0) {
     zStrip += nextStrip;
     if ((zStrip >= zMin) && (zStrip <= zMax)) {
-      zStripLower = min(zStrip, zStripLower);
-      zStripUpper = max(zStrip, zStripUpper);
+      zStripLower = std::min(zStrip, zStripLower);
+      zStripUpper = std::max(zStrip, zStripUpper);
     }
     nextStrip = (nextStrip > 0 ? -(1 + nextStrip) : 1 - nextStrip);
   }

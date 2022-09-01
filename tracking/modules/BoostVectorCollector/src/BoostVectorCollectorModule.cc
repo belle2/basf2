@@ -12,14 +12,13 @@
 #include <mdst/dataobjects/PIDLikelihood.h>
 
 using namespace Belle2;
-using namespace std;
 
 #include <iostream>
 
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(BoostVectorCollector)
+REG_MODULE(BoostVectorCollector);
 
 //-----------------------------------------------------------------
 //                 Implementation

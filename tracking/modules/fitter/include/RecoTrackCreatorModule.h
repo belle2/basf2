@@ -8,6 +8,9 @@
 #pragma once
 
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
+#include <tracking/dataobjects/RecoTrack.h>
+#include <mdst/dataobjects/MCParticle.h>
 #include <string>
 
 namespace Belle2 {
@@ -45,6 +48,10 @@ namespace Belle2 {
     std::string m_param_eklmHitsStoreArrayName = "";
     /** StoreArray name of the output reco hit information. */
     std::string m_param_recoHitInformationStoreArrayName = "";
+
+    StoreArray<genfit::TrackCand> m_TrackCandidates; /**< genfit::TrackCand StoreArray */
+    StoreArray<RecoTrack> m_RecoTracks; /**< RecoTracks StoreArray */
+    StoreArray<MCParticle> m_MCParticles; /**< MCParticles StoreArray */
   };
 }
 

@@ -22,7 +22,15 @@ using namespace std;
 
 namespace Belle2 {
 
-  REG_MODULE(TOPWaveformQualityPlotter)
+  //-----------------------------------------------------------------
+  ///                 Register module
+  //-----------------------------------------------------------------
+
+  REG_MODULE(TOPWaveformQualityPlotter);
+
+  //-----------------------------------------------------------------
+  //                 Implementation
+  //-----------------------------------------------------------------
 
   TOPWaveformQualityPlotterModule::TOPWaveformQualityPlotterModule()
     : HistoModule()
@@ -82,7 +90,6 @@ namespace Belle2 {
     m_pixelID->Fill(v.getPixelID());
 
     if (m_hitmap.find(scrodid) == m_hitmap.end()) {
-      // cppcheck-suppress stlFindInsert
       m_hitmap[scrodid] = new TH2F((string("scrod ") + to_string(scrodid) + string("Hitmap")).c_str(),
                                    (string("scrod ") + to_string(scrodid) + string("carrier vs. asic;asic;carrier")).c_str(), 4, 0, 4, 4, 0, 4);
     }

@@ -158,7 +158,7 @@ void Cluster::probability(double probabilities[],
 void Cluster::printArray() const
 {
 
-  string detectorName[Const::ClusterDetectors::c_size] = {"ECL", "KLM"};
+  const string detectorName[Const::ClusterDetectors::c_size] = {"ECL", "KLM"};
   string hline("-------");
   for (unsigned i = 0; i < Const::Cluster::c_SetSize; i++)
     hline += "-----------";
@@ -207,7 +207,7 @@ void Cluster::printArray() const
 
 std::string Cluster::getInfoHTML() const
 {
-  string detectorName[Const::ClusterDetectors::c_size] = {"ECL", "KLM"};
+  const string detectorName[Const::ClusterDetectors::c_size] = {"ECL", "KLM"};
 
   std::stringstream stream;
   stream << std::setprecision(4);

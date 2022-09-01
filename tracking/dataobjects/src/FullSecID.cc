@@ -18,7 +18,6 @@
 
 
 
-using namespace std;
 using namespace Belle2;
 
 
@@ -43,7 +42,7 @@ const int FullSecID::SectorMask = MaxSector;
 
 FullSecID::FullSecID(std::string sid)
 {
-  vector<string> stringSegments;
+  std::vector<std::string> stringSegments;
   boost::split(stringSegments, sid, boost::is_any_of("_"));
 
   unsigned int LayerID = stringSegments[0][0] -
@@ -55,7 +54,7 @@ FullSecID::FullSecID(std::string sid)
 //   unsigned int SubLayerID = stringSegments[0][1] - '0';
   unsigned int UniID =  std::stoi(stringSegments[1]);   // C++03: atoi(stringSegments[1].c_str());
   unsigned int sectorNumber = std::stoi(stringSegments[2]);   //  atoi(stringSegments[2].c_str());
-  B2DEBUG(1000, "FullSecID-constructor: Value before converting: " << sid << ", after converting: layerID " << LayerID <<
+  B2DEBUG(29, "FullSecID-constructor: Value before converting: " << sid << ", after converting: layerID " << LayerID <<
           ", subLayerID " << SubLayerID << ", UniID " << UniID << ", secID " << sectorNumber);
   assert(LayerID < MaxLayer + 1);
   assert(SubLayerID < MaxSubLayer + 1);
@@ -77,7 +76,7 @@ FullSecID::FullSecID(VxdID vxdID, bool subLayerID, unsigned int sectorNumber):
   unsigned int SubLayerID = subLayerID; // converting to int
   unsigned int UniID = vxdID;
 
-  B2DEBUG(175, "FullSecID-constructor: LayerID " << LayerID << ", MaxLayer " << MaxLayer << ", SubLayerID " << SubLayerID <<
+  B2DEBUG(28, "FullSecID-constructor: LayerID " << LayerID << ", MaxLayer " << MaxLayer << ", SubLayerID " << SubLayerID <<
           ", MaxSubLayer " << MaxSubLayer << ", UniID " << UniID << ", MaxVxdID " << MaxVxdID << ", sectorNumber " << sectorNumber <<
           ", MaxSector " << MaxSector);
   assert(LayerID < MaxLayer + 1);
@@ -97,7 +96,7 @@ FullSecID::FullSecID(VxdID vxdID, bool subLayerID, unsigned int sectorNumber):
 FullSecID::FullSecID(unsigned int layerID, bool subLayerID, unsigned int sensorID, unsigned int sectorNumber)
 {
   unsigned int SubLayerID = subLayerID; // converting to int
-  B2DEBUG(175, "FullSecID-constructor: LayerID " << layerID << ", MaxLayer " << MaxLayer << ", SubLayerID " << subLayerID <<
+  B2DEBUG(28, "FullSecID-constructor: LayerID " << layerID << ", MaxLayer " << MaxLayer << ", SubLayerID " << subLayerID <<
           ", MaxSubLayer " << MaxSubLayer << ", UniID " << sensorID << ", MaxVxdID " << MaxVxdID << ", sectorNumber " << sectorNumber <<
           ", MaxSector " << MaxSector);
   assert(layerID < MaxLayer + 1);
@@ -109,7 +108,7 @@ FullSecID::FullSecID(unsigned int layerID, bool subLayerID, unsigned int sensorI
   SubLayerID <<= SubLayerBitShift;
   sensorID <<= VxdIDBitShift;
   m_fullSecID = layerID | SubLayerID | sensorID | sectorNumber;
-  B2DEBUG(175, " m_fullSecID/binary: " << m_fullSecID << "/" << std::bitset<32>(m_fullSecID) << "\n, secID/binary: " << sectorNumber
+  B2DEBUG(28, " m_fullSecID/binary: " << m_fullSecID << "/" << std::bitset<32>(m_fullSecID) << "\n, secID/binary: " << sectorNumber
           << "/" << std::bitset<32>(sectorNumber) << ", layerID-binary: " << std::bitset<32>(layerID) << "\n, SubLayerID-binary: " <<
           std::bitset<32>(SubLayerID)  << ", sensorID-binary: " << std::bitset<32>(sensorID));
 }
@@ -139,7 +138,7 @@ std::string FullSecID::getFullSecString() const
 //   unsigned int SubLayerID = stringSegments[0][1] - '0';
 //   unsigned int UniID =  atoi(stringSegments[1].c_str());   // C++ 11: std::stoi( stringSegments[1] )
 //   unsigned int sectorNumber = atoi(stringSegments[2].c_str());
-//   B2DEBUG(1000, "FullSecID-constructor: Value before converting: " << sid << ", after converting: layerID " << LayerID << ", subLayerID " << SubLayerID << ", UniID " << UniID << ", secID " << sectorNumber);
+//   B2DEBUG(29, "FullSecID-constructor: Value before converting: " << sid << ", after converting: layerID " << LayerID << ", subLayerID " << SubLayerID << ", UniID " << UniID << ", secID " << sectorNumber);
 //   assert(LayerID < MaxLayer + 1);
 //   assert(SubLayerID < MaxSubLayer + 1);
 //   assert(UniID < MaxVxdID + 1);
@@ -159,7 +158,7 @@ std::string FullSecID::getFullSecString() const
 //   unsigned int SubLayerID = subLayerID; // converting to int
 //   unsigned int UniID = vxdID;
 //
-//   B2DEBUG(175, "FullSecID-constructor: LayerID " << LayerID << ", MaxLayer " << MaxLayer << ", SubLayerID " << SubLayerID << ", MaxSubLayer " << MaxSubLayer << ", UniID " << UniID << ", MaxVxdID " << MaxVxdID << ", sectorNumber " << sectorNumber << ", MaxSector " << MaxSector);
+//   B2DEBUG(28, "FullSecID-constructor: LayerID " << LayerID << ", MaxLayer " << MaxLayer << ", SubLayerID " << SubLayerID << ", MaxSubLayer " << MaxSubLayer << ", UniID " << UniID << ", MaxVxdID " << MaxVxdID << ", sectorNumber " << sectorNumber << ", MaxSector " << MaxSector);
 //   assert(LayerID < MaxLayer + 1);
 //   assert(SubLayerID < MaxSubLayer + 1);
 //   assert(UniID < MaxVxdID + 1);
@@ -175,7 +174,7 @@ std::string FullSecID::getFullSecString() const
 // FullSecID::FullSecID(unsigned int layerID, bool subLayerID, unsigned int sensorID, unsigned int sectorNumber)
 // {
 //   unsigned int SubLayerID = subLayerID; // converting to int
-//   B2DEBUG(175, "FullSecID-constructor: LayerID " << layerID << ", MaxLayer " << MaxLayer << ", SubLayerID " << subLayerID << ", MaxSubLayer " << MaxSubLayer << ", UniID " << sensorID << ", MaxVxdID " << MaxVxdID << ", sectorNumber " << sectorNumber << ", MaxSector " << MaxSector);
+//   B2DEBUG(28, "FullSecID-constructor: LayerID " << layerID << ", MaxLayer " << MaxLayer << ", SubLayerID " << subLayerID << ", MaxSubLayer " << MaxSubLayer << ", UniID " << sensorID << ", MaxVxdID " << MaxVxdID << ", sectorNumber " << sectorNumber << ", MaxSector " << MaxSector);
 //   assert(layerID < MaxLayer + 1);
 //   assert(SubLayerID < MaxSubLayer + 1);
 //   assert(sensorID < MaxVxdID + 1);
@@ -185,7 +184,7 @@ std::string FullSecID::getFullSecString() const
 //   SubLayerID <<= SubLayerBitShift;
 //   sensorID <<= VxdIDBitShift;
 //   m_fullSecID = layerID | SubLayerID | sensorID | sectorNumber; // should be the same as below
-//   B2DEBUG(175, " m_fullSecID/binary: " << m_fullSecID << "/" << std::bitset<32>(m_fullSecID) << "\n, secID/binary: " << sectorNumber << "/" << std::bitset<32>(sectorNumber) << ", layerID-binary: " << std::bitset<32>(layerID) << "\n, SubLayerID-binary: " << std::bitset<32>(SubLayerID)  << ", sensorID-binary: " << std::bitset<32>(sensorID))
+//   B2DEBUG(28, " m_fullSecID/binary: " << m_fullSecID << "/" << std::bitset<32>(m_fullSecID) << "\n, secID/binary: " << sectorNumber << "/" << std::bitset<32>(sectorNumber) << ", layerID-binary: " << std::bitset<32>(layerID) << "\n, SubLayerID-binary: " << std::bitset<32>(SubLayerID)  << ", sensorID-binary: " << std::bitset<32>(sensorID))
 // }
 //
 // std::string FullSecID::getFullSecString() const

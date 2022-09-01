@@ -46,7 +46,7 @@
 using namespace Belle2;
 using namespace ECL;
 
-REG_MODULE(ECLDQM)
+REG_MODULE(ECLDQM);
 
 ECLDQMModule::ECLDQMModule()
   : HistoModule(),

@@ -26,7 +26,7 @@ AssignParameterVisitor::AssignParameterVisitor(ModuleParamList* moduleParamList,
 template <class T>
 void AssignParameterVisitor::operator()(const T& t) const
 {
-  B2DEBUG(200, "Received parameter of type " << ModuleParam<T>::TypeInfo());
+  B2DEBUG(28, "Received parameter of type " << ModuleParam<T>::TypeInfo());
   m_moduleParamList->getParameter<T>(m_paramName).setDefaultValue(t);
 }
 

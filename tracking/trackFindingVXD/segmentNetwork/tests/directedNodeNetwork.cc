@@ -56,7 +56,7 @@ namespace DirectedNodeNetworkTests {
   /** helper function: returns a pxdCluster with given sensorID and local coordinates */
   PXDCluster providePXDCluster(double u, double v, VxdID aVxdID, double uError = 0.1, double vError = 0.1)
   {
-    return PXDCluster(aVxdID, u, v, uError, vError, 0, 0, 1, 1, 1, 1 , 1, 1);
+    return PXDCluster(aVxdID, u, v, uError, vError, 0, 0, 1, 1, 1, 1, 1, 1);
   }
 
   /** Test class demonstrating the behavior of TCNetworkContainer.

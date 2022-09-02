@@ -9,7 +9,7 @@
 #pragma once
 
 /* DQM headers. */
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 
 /* Belle 2 headers. */
 #include <framework/database/DBObjPtr.h>
@@ -21,11 +21,12 @@
 
 /* ROOT headers. */
 #include <TCanvas.h>
+#include <TFile.h>
 #include <TH1.h>
 #include <TH2F.h>
 #include <TLatex.h>
-#include <TText.h>
 #include <TLine.h>
+#include <TText.h>
 
 /* C++ headers. */
 #include <vector>
@@ -136,6 +137,12 @@ namespace Belle2 {
 
     /** Minimal number of processed events for error messages. */
     double m_MinProcessedEventsForMessages;
+
+    /** Reference Histogram Root file name */
+    std::string m_refFileName;
+
+    /** The pointer to the reference file */
+    TFile* m_refFile = nullptr;
 
     /** Vector of dead barrel modules. */
     std::vector<uint16_t> m_DeadBarrelModules;

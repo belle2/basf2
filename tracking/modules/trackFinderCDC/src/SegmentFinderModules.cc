@@ -23,41 +23,41 @@ REG_MODULE(TFCDC_SegmentOrienter);
 REG_MODULE(TFCDC_SegmentCreatorMCTruth);
 
 TFCDC_SegmentFinderFacetAutomatonModule::TFCDC_SegmentFinderFacetAutomatonModule()
-  : Super( {"CDCWireHitClusterVector", "CDCSegment2DVector"})
+  : Super({"CDCWireHitClusterVector", "CDCSegment2DVector"})
 {
 }
 
 TFCDC_FacetCreatorModule::TFCDC_FacetCreatorModule()
-  : Super( {"CDCWireHitClusterVector", "CDCFacetVector"})
+  : Super({"CDCWireHitClusterVector", "CDCFacetVector"})
 {
 }
 
 TFCDC_SegmentCreatorFacetAutomatonModule::TFCDC_SegmentCreatorFacetAutomatonModule()
-  : Super( {"CDCFacetVector", "CDCSegment2DVector"})
+  : Super({"CDCFacetVector", "CDCSegment2DVector"})
 {
 }
 
 TFCDC_SegmentLinkerModule::TFCDC_SegmentLinkerModule()
-  : Super( {"CDCSegment2DVector"})
+  : Super({"CDCSegment2DVector"})
 {
 }
 
 TFCDC_SegmentOrienterModule::TFCDC_SegmentOrienterModule()
-  : Super( {"CDCSegment2DVector"})
+  : Super({"CDCSegment2DVector"})
 {
 }
 
 TFCDC_SegmentFitterModule::TFCDC_SegmentFitterModule()
-  : Super( {"CDCSegment2DVector"})
+  : Super({"CDCSegment2DVector"})
 {
 }
 
 TFCDC_SegmentRejecterModule::TFCDC_SegmentRejecterModule()
-  : Super( {"CDCSegment2DVector"})
+  : Super({"CDCSegment2DVector"})
 {
 }
 
 TFCDC_SegmentCreatorMCTruthModule::TFCDC_SegmentCreatorMCTruthModule()
-  : Super( {"CDCWireHitVector", "CDCSegment2DVector"})
+  : Super({"CDCWireHitVector", "CDCSegment2DVector"})
 {
 }

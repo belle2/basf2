@@ -16,7 +16,6 @@
 /* C++ headers. */
 #include <cmath>
 
-using namespace std;
 using namespace Belle2;
 
 BKLMSimulationPar::BKLMSimulationPar(const GearDir& content)
@@ -49,13 +48,13 @@ void BKLMSimulationPar::read(const GearDir& content)
   GearDir phiContent(content);
   phiContent.append("/RPCStripMultiplicity/Phi");
   m_NPhiDiv = phiContent.getNumberNodes("/Division");
-  int nDiv = min(phiContent.getNumberNodes("/Division"), c_NDIV + 1);
+  int nDiv = std::min(phiContent.getNumberNodes("/Division"), c_NDIV + 1);
   for (int div = 0; div < nDiv; ++div) {
     sprintf(name, "/Division[@id=\"%d\"]", div);
     GearDir divContent(phiContent);
     divContent.append(name);
     m_NPhiMultiplicity[div] = divContent.getNumberNodes("/Weight");
-    int nWeight = min(divContent.getNumberNodes("/Weight"), c_MAX_NHIT - 1);
+    int nWeight = std::min(divContent.getNumberNodes("/Weight"), c_MAX_NHIT - 1);
     weight[0] = 0.0;
     for (int j = 1; j <= nWeight; ++j) {
       sprintf(name, "/Weight[@multiplicity=\"%d\"]", j);
@@ -70,13 +69,13 @@ void BKLMSimulationPar::read(const GearDir& content)
 
   GearDir zContent(content);
   zContent.append("/RPCStripMultiplicity/Z");
-  nDiv = min(zContent.getNumberNodes("/Division"), c_NDIV + 1);
+  nDiv = std::min(zContent.getNumberNodes("/Division"), c_NDIV + 1);
   m_NZDiv = zContent.getNumberNodes("/Division");
   for (int div = 0; div < nDiv; ++div) {
     sprintf(name, "/Division[@id=\"%d\"]", div);
     GearDir divContent(zContent);
     divContent.append(name);
-    int nWeight = min(divContent.getNumberNodes("/Weight"), c_MAX_NHIT - 1);
+    int nWeight = std::min(divContent.getNumberNodes("/Weight"), c_MAX_NHIT - 1);
     m_NZMultiplicity[div] = divContent.getNumberNodes("/Weight");
     weight[0] = 0.0;
     for (int j = 1; j <= nWeight; ++j) {

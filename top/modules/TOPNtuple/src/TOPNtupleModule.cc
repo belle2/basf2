@@ -186,8 +186,8 @@ namespace Belle2 {
 
       if (extHit) {
         int moduleID = extHit->getCopyID();
-        TVector3 position = extHit->getPosition();
-        TVector3 momentum = extHit->getMomentum();
+        TVector3 position = extHit->getPositionTVector3();
+        TVector3 momentum = extHit->getMomentumTVector3();
         if (geo->isModuleIDValid(moduleID)) {
           const auto& module = geo->getModule(moduleID);
           position = module.pointToLocal(position);

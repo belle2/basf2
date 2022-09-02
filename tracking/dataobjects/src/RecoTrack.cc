@@ -362,7 +362,7 @@ bool RecoTrack::wasFitSuccessful(const genfit::AbsTrackRep* representation) cons
       m_genfitTrack.getFittedState(i, representation);
       return true;
     } catch (const genfit::Exception& exception) {
-      B2DEBUG(100, "Can not get mSoP because of: " << exception.what());
+      B2DEBUG(29, "Can not get mSoP because of: " << exception.what());
     }
   }
 
@@ -597,7 +597,7 @@ const genfit::MeasuredStateOnPlane& RecoTrack::getMeasuredStateOnPlaneFromFirstH
     try {
       return m_genfitTrack.getFittedState(i, representation);
     } catch (const genfit::Exception& exception) {
-      B2DEBUG(50, "Can not get mSoP because of: " << exception.what());
+      B2DEBUG(28, "Can not get mSoP because of: " << exception.what());
     }
   }
 
@@ -611,7 +611,7 @@ const genfit::MeasuredStateOnPlane& RecoTrack::getMeasuredStateOnPlaneFromLastHi
     try {
       return m_genfitTrack.getFittedState(i, representation);
     } catch (const genfit::Exception& exception) {
-      B2DEBUG(50, "Can not get mSoP because of: " << exception.what());
+      B2DEBUG(28, "Can not get mSoP because of: " << exception.what());
     }
   }
 

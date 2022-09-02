@@ -34,7 +34,7 @@ int main(int argc, char** argv)
 {
   unsigned int buf[400000];
   int infn = fileno(stdin);
-  printf("infn = %d\n", infn);
+  printf("infn = %u\n", infn);
 
   int nrec = 0;
   for (;;) {

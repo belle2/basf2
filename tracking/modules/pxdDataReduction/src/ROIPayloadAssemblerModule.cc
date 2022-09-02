@@ -14,7 +14,6 @@
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
 
-using namespace std;
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -81,7 +80,7 @@ void ROIPayloadAssemblerModule::event()
     }
   }
 
-  map<VxdID, set<ROIrawID, ROIrawID>> mapOrderedROIraw;
+  std::map<VxdID, std::set<ROIrawID, ROIrawID>> mapOrderedROIraw;
 
   if (accepted) {
     // skip the preprocessing if the event is not accepted to save CPU time
@@ -150,7 +149,7 @@ void ROIPayloadAssemblerModule::event()
           }
         } else {
           ROIrawID roiraw; /**< 64 bit union containing a single ROI info to be sent to ONSEN*/
-          B2INFO("Nr ROI on DHHID " << it.second.begin()->getDHHID() << endl <<
+          B2INFO("Nr ROI on DHHID " << it.second.begin()->getDHHID() << std::endl <<
                  " exceeds limit CutNrROIs, thus full sensor ROI is created.");
           const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(it.first);
           const int nPixelsU = aSensorInfo.getUCells();

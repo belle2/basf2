@@ -42,6 +42,7 @@ try:
         elif os.environ['BELLE2_MAX_BUILDS'] != 'LOAD':
             num_jobs = min(num_cpus, int(os.environ['BELLE2_MAX_BUILDS']))
     SetOption('num_jobs', num_jobs)
+    print(f'Number of parallel builds: {num_jobs}')
 except:
     pass
 

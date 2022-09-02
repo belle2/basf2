@@ -267,7 +267,7 @@ namespace Belle2 {
 
           rmin_sensitive_middle = (geo.getInnerWall(0)).getRmax();
           rmax_sensitive_middle = fieldLayer.getR();
-          zback_sensitive_middle = epLayerBwd.getZbwd();
+          zback_sensitive_middle = epLayerBwd.getZfwd();
           zfor_sensitive_middle = epLayerFwd.getZbwd();
 
           rmin_sensitive_right = epLayerFwd.getRmax();

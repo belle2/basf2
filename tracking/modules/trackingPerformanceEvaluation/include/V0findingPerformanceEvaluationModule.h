@@ -10,12 +10,13 @@
 
 #include <framework/core/Module.h>
 #include <tracking/modules/trackingPerformanceEvaluation/PerformanceEvaluationBaseClass.h>
+#include <tracking/dataobjects/V0ValidationVertex.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 #include <TH1F.h>
 #include <TH2F.h>
 #include <TH3F.h>
 
-#include <mdst/dataobjects/MCParticle.h>
 
 // forward declarations
 namespace Belle2 {
@@ -72,6 +73,9 @@ namespace Belle2 {
     /* user-defined parameters */
     std::string m_MCParticlesName; /**< MCParticle StoreArray name */
     std::string m_V0sName; /**< MCTrackCand StoreArray name */
+
+    StoreArray<MCParticle> m_MCParticles; /**< MCParticles StoreArray */
+    StoreArray<V0ValidationVertex> m_V0ValidationVertices;  /**< V0ValidationVertices StoreArray */
 
     /* list of histograms filled per MCParticle found in the event */
 

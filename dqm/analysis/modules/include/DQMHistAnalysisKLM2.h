@@ -120,7 +120,7 @@ namespace Belle2 {
     /** Histogram for EKLM sector efficiency. */
     TCanvas* m_c_eff_eklm_sector = NULL;
 
-    /** Monitoring Object*/
+    /** Monitoring object. */
     MonitoringObject* m_monObj {};
 
 

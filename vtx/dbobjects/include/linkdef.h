@@ -6,7 +6,7 @@
 #pragma link C++ nestedclasses;
 
 #pragma link C++ class Belle2::VTXSensorInfoPar+; // checksum=0x37669170, version=8
-#pragma link C++ class Belle2::VTXGeometryPar+; // checksum=0xfec29491, version=5
+#pragma link C++ class Belle2::VTXGeometryPar+; // checksum=0x72affcdf, version=6
 
 #pragma link C++ class Belle2::VTXClusterOffsetPar+; // checksum=0xa1314638, version=2
 #pragma link C++ class Belle2::VTXGainMapPar+; // checksum=0x19ddb146, version=3

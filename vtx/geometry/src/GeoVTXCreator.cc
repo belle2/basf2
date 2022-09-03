@@ -179,11 +179,11 @@ namespace Belle2 {
                               (envelopeParams.getNodes("InnerPoints/point").size() > 0)
                              );
 
-      for (const GearDir point : envelopeParams.getNodes("InnerPoints/point")) {
+      for (const GearDir& point : envelopeParams.getNodes("InnerPoints/point")) {
         pair<double, double> ZXPoint(point.getLength("z"), point.getLength("x"));
         envelope.getInnerPoints().push_back(ZXPoint);
       }
-      for (const GearDir point : envelopeParams.getNodes("OuterPoints/point")) {
+      for (const GearDir& point : envelopeParams.getNodes("OuterPoints/point")) {
         pair<double, double> ZXPoint(point.getLength("z"), point.getLength("x"));
         envelope.getOuterPoints().push_back(ZXPoint);
       }
@@ -598,10 +598,10 @@ namespace Belle2 {
       if (!parameters.getBuildSupport()) return supportAssembly;
 
       // Create the RotationSolids
-      double minZ(0), maxZ(0);
       const std::vector<VXDRotationSolidPar>& RotationSolids = parameters.getRotationSolids();
       for (const VXDRotationSolidPar& component : RotationSolids) {
 
+        double minZ(0), maxZ(0);
         string name = component.getName();
         string material = component.getMaterial();
 

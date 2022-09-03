@@ -293,8 +293,8 @@ class BtoXll_LFV(BaseSkim):
                            checkForDuplicates=False,
                            path=path)
 
-        # Apply event cuts R2 < 0.5 and nTracks >= 3
-        path = self.skim_event_cuts('foxWolframR2 < 0.5 and nTracks >= 3', path=path)
+        # Apply event cuts R2 < 0.7 and nTracks >= 3
+        path = self.skim_event_cuts('foxWolframR2 < 0.7 and nTracks >= 3', path=path)
 
         # Apply electron cut p > 0.395 GeV, electronID > 0.1 + fairTrack
         # Apply muon cuts p > 0.395 GeV, muonID > 0.5 + fairTrack

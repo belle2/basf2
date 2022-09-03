@@ -23,7 +23,7 @@ from stdCharged import stdE, stdK, stdMu, stdPi
 from stdPhotons import stdPhotons
 from variables import variables as vm
 
-__liaison__ = "Trevor Shillington <trshillington@hep.physics.mcgill.ca>"
+__liaison__ = "Rahul Tiwary <rahul.tiwary@tifr.res.in>"
 _VALIDATION_SAMPLE = "mdst14.root"
 
 
@@ -36,7 +36,7 @@ class BtoXgamma(BaseSkim):
 
     Event-level cuts:
 
-    * :math:`\\text{foxWolframR2} < 0.5` constructed using tracks with
+    * :math:`\\text{foxWolframR2} < 0.7` constructed using tracks with
       :math:`p_T>0.1\\,\\text{GeV}` and clusters with :math:`E>0.1\\,\\text{GeV}`.
     * :math:`n_{\\text{tracks}} \\geq 3`
 
@@ -127,7 +127,7 @@ class BtoXll(BaseSkim):
 
       Event-level cuts:
 
-      * :math:`\\text{foxWolframR2} < 0.5` constructed using tracks with
+      * :math:`\\text{foxWolframR2} < 0.7` constructed using tracks with
         :math:`p_T>0.1\\,\\text{GeV}` and clusters with :math:`E>0.1\\,\\text{GeV}`.
       * :math:`n_{\\text{tracks}} \\geq 3`
 
@@ -241,7 +241,7 @@ class BtoXll_LFV(BaseSkim):
 
     Event-level cuts:
 
-    * :math:`\\text{foxWolframR2} < 0.5` constructed using tracks with
+    * :math:`\\text{foxWolframR2} < 0.7` constructed using tracks with
       :math:`p_T>0.1\\,\\text{GeV}` and clusters with :math:`E>0.1\\,\\text{GeV}`.
     * :math:`n_{\\text{tracks}} \\geq 3`
 

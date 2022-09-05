@@ -31,7 +31,7 @@ from validationplots import create_plots
 import validationfunctions
 import validationpath
 
-g_plottingProcesses: Dict[str, Tuple[Process, Queue, Dict[str, Any]]] = {}
+g_plottingProcesses: Dict[str, Tuple[Process, Queue, Dict[str, Any]]] = ({})
 
 
 def get_revision_label_from_json_filename(json_filename: str) -> str:
@@ -47,7 +47,9 @@ def get_revision_label_from_json_filename(json_filename: str) -> str:
     return last_folder
 
 
-def get_json_object_list(results_folder: str, json_file_name: str) -> List[str]:
+def get_json_object_list(
+    results_folder: str, json_file_name: str
+) -> List[str]:
     """
     Searches one folder's sub-folder for json files of a
     specific name and returns a combined list of the
@@ -65,7 +67,9 @@ def get_json_object_list(results_folder: str, json_file_name: str) -> List[str]:
             data = json.load(json_file)  # noqa
 
             # always use the folder name as label
-            found_rev_labels.append(get_revision_label_from_json_filename(r_file))
+            found_rev_labels.append(
+                get_revision_label_from_json_filename(r_file)
+            )
 
     return found_rev_labels
 
@@ -123,8 +127,10 @@ def warn_wrong_directory():
         )
 
 
-# todo: limit the number of running plotting requests and terminate hanging ones
-def start_plotting_request(revision_names: List[str], results_folder: str) -> str:
+# todo: limit the number of running plotting requests & terminate hanging ones
+def start_plotting_request(
+    revision_names: List[str], results_folder: str
+) -> str:
     """
     Start a new comparison between the supplied revisions
 
@@ -165,8 +171,8 @@ def start_plotting_request(revision_names: List[str], results_folder: str) -> st
 
 
 # todo: remove this, once we have a way to handle access token.
-def check_gitlab_config():
-    expected_gl_config = os.path.join(os.getcwd(), "config/gl.cfg")
+def check_gitlab_config(config_path):
+    expected_gl_config = os.path.join(config_path, "config/gl.cfg")
     if not os.path.exists(expected_gl_config):
         print(
             f"ERROR: Expected to find config folder with Gitlab config,"
@@ -187,7 +193,9 @@ def create_gitlab_object():
         gitlab object
     """
 
-    gitlab_object = gitlab.Gitlab.from_config("belle2validation", ["../config/gl.cfg"])
+    gitlab_object = gitlab.Gitlab.from_config(
+        "belle2validation", ["../config/gl.cfg"]
+    )
     gitlab_object.auth()
 
     logging.info("Established connection with Gitlab")
@@ -233,7 +241,7 @@ def update_linked_issues(gitlab_object, cwd_folder):
 
     # find out the plots linked to the issues
     plot_issues = {}
-    pattern = "Relevant plot (\\w+)"
+    pattern = r"Relevant plot (\w+)"
     for issue in issues:
         match = re.search(pattern, issue.description)
         plot_issues[match.groups()[0]] = issue.iid
@@ -269,7 +277,9 @@ def upload_file_gitlab(file_path, project):
         uploaded gitlab project file object
     """
 
-    uploaded_file = project.upload(file_path.split("/")[-1], filepath=file_path)
+    uploaded_file = project.upload(
+        file_path.split("/")[-1], filepath=file_path
+    )
 
     return uploaded_file
 
@@ -543,7 +553,9 @@ class ValidationRoot:
 
         # check if this comparison actually exists
         if not os.path.isfile(path):
-            raise cherrypy.HTTPError(404, f"Json Comparison file {path} does not exist")
+            raise cherrypy.HTTPError(
+                404, f"Json Comparison file {path} does not exist"
+            )
 
         return deliver_json(path)
 
@@ -586,7 +598,9 @@ class ValidationRoot:
             Relevant plot {}\n\n---".format(
             plot_title
         )
-        issue_id = create_gitlab_issue(title, description, uploaded_file, project)
+        issue_id = create_gitlab_issue(
+            title, description, uploaded_file, project
+        )
         project.save()
 
         # Update JSON with created issue id
@@ -628,17 +642,7 @@ class ValidationRoot:
         if not self.gitlab_object:
             return "ERROR: Gitlab integration not set up, config file is missing."
 
-        return """<html>
-          <head></head>
-          <body>
-            <form method="get" action="create_issue">
-              <legend>Issue Info</legend>
-              <input type="text" name="title" placeholder="Title"/><br>
-              <textarea name="description" placeholder="Description"></textarea><br>
-              <button type="submit">Create</button>
-            </form>
-          </body>
-        </html>"""
+        raise cherrypy.HTTPRedirect("/static/validation_issue.html")
 
     @cherrypy.expose
     def update_issue(self, id, file_path):
@@ -694,14 +698,16 @@ def get_argument_parser():
     parser.add_argument(
         "-ip",
         "--ip",
-        help="The IP address on which the" "server starts. Default is '127.0.0.1'.",
+        help="The IP address on which the"
+        "server starts. Default is '127.0.0.1'.",
         type=str,
         default="127.0.0.1",
     )
     parser.add_argument(
         "-p",
         "--port",
-        help="The port number on which" " the server starts. Default is '8000'.",
+        help="The port number on which"
+        " the server starts. Default is '8000'.",
         type=str,
         default=8000,
     )
@@ -770,14 +776,18 @@ def run_server(
     static_folder = None
 
     if basepath["central"] is not None:
-        static_folder_central = os.path.join(basepath["central"], *static_folder_list)
+        static_folder_central = os.path.join(
+            basepath["central"], *static_folder_list
+        )
         if os.path.isdir(static_folder_central):
             static_folder = static_folder_central
 
     # check if there is also a collection of static files in the local release
     # this overwrites the usage of the central release
     if basepath["local"] is not None:
-        static_folder_local = os.path.join(basepath["local"], *static_folder_list)
+        static_folder_local = os.path.join(
+            basepath["local"], *static_folder_list
+        )
         if os.path.isdir(static_folder_local):
             static_folder = static_folder_local
 
@@ -885,12 +895,14 @@ def run_server(
     if not dry_run:
         # gitlab toggle
         gitlab_object = None
-        if check_gitlab_config():
+        if check_gitlab_config(cwd_folder):
             gitlab_object = create_gitlab_object()
             update_linked_issues(gitlab_object, cwd_folder)
 
         cherrypy.quickstart(
-            ValidationRoot(working_folder=cwd_folder, gitlab_object=gitlab_object),
+            ValidationRoot(
+                working_folder=cwd_folder, gitlab_object=gitlab_object
+            ),
             "/",
             cherry_config,
         )

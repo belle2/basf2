@@ -62,15 +62,15 @@
        the other half shell is very close to the endflange of the next half we
        have to cut 5 boxes from each endflange. The dimensions in z will be
        determined automatically from the endflanges above -->
-  <!-- <Cutout description="Boxes to be cout out of endflange cones to make space for modules"> -->
-  <!--   <count>5</count> -->
-  <!--   <width unit="mm">17.073</width> -->
-  <!--   <height unit="mm">2.520</height> -->
-  <!--   <rphi unit="mm"> 13.680</rphi> -->
-  <!--   <shift unit="mm">-3.084</shift> -->
-  <!--   <startPhi unit="deg">-135.000</startPhi> -->
-  <!--   <deltaPhi unit="deg">45.000</deltaPhi> -->
-  <!-- </Cutout> -->
+  <Cutout description="Boxes to be cout out of endflange cones to make space for modules">
+    <count>5</count>
+    <width unit="mm">17.073</width>
+    <height unit="mm">2.520</height>
+    <rphi unit="mm"> 13.680</rphi>
+    <shift unit="mm">-3.084</shift>
+    <startPhi unit="deg">-135.000</startPhi>
+    <deltaPhi unit="deg">45.000</deltaPhi>
+  </Cutout>
 
   <!-- Finally we define the carbon tubes for air cooling. There is one tube
        for each ladder in the first layer and they are positioned to blow
@@ -96,14 +96,46 @@
       <minPhi unit="deg">-89.95</minPhi>
       <maxPhi unit="deg"> 89.95</maxPhi>
       <OuterPoints>
-	<point><z unit="mm">-360.000</z><x unit="mm">152.000</x></point>
+	<point><z unit="mm">-325.000</z><x unit="mm">152.000</x></point>
 	<point><z unit="mm"> 525.000</z><x unit="mm">152.000</x></point>
       </OuterPoints>
       <InnerPoints>
-	<point><z unit="mm">-360.000</z><x unit="mm">151.000</x></point>
+	<point><z unit="mm">-325.000</z><x unit="mm">151.000</x></point>
 	<point><z unit="mm"> 525.000</z><x unit="mm">151.000</x></point>
       </InnerPoints>
     </RotationSolid>
+    <!-- <RotationSolid> -->
+    <!--   <Name>BackwardRing</Name> -->
+    <!--   <Color>#ccc</Color> -->
+    <!--   <Material>Al</Material> -->
+    <!--   <!-\- chosen start and end angle leaves 200µm of tolerance at narrowest point -\-> -->
+    <!--   <minPhi unit="deg">-89.95</minPhi> -->
+    <!--   <maxPhi unit="deg"> 89.95</maxPhi> -->
+    <!--   <OuterPoints> -->
+    <!-- 	<point><z unit="mm">-400.000</z><x unit="mm">154.000</x></point> -->
+    <!-- 	<point><z unit="mm">-360.000</z><x unit="mm">154.000</x></point> -->
+    <!--   </OuterPoints> -->
+    <!--   <InnerPoints> -->
+    <!-- 	<point><z unit="mm">-400.000</z><x unit="mm">148.000</x></point> -->
+    <!-- 	<point><z unit="mm">-360.000</z><x unit="mm">148.000</x></point> -->
+    <!--   </InnerPoints> -->
+    <!-- </RotationSolid> -->
+    <!-- <RotationSolid> -->
+    <!--   <Name>ForwardRing</Name> -->
+    <!--   <Color>#ccc</Color> -->
+    <!--   <Material>Al</Material> -->
+    <!--   <!-\- chosen start and end angle leaves 200µm of tolerance at narrowest point -\-> -->
+    <!--   <minPhi unit="deg">-89.95</minPhi> -->
+    <!--   <maxPhi unit="deg"> 89.95</maxPhi> -->
+    <!--   <OuterPoints> -->
+    <!-- 	<point><z unit="mm">525.000</z><x unit="mm">154.000</x></point> -->
+    <!-- 	<point><z unit="mm">560.000</z><x unit="mm">154.000</x></point> -->
+    <!--   </OuterPoints> -->
+    <!--   <InnerPoints> -->
+    <!-- 	<point><z unit="mm">525.000</z><x unit="mm">148.000</x></point> -->
+    <!-- 	<point><z unit="mm">560.000</z><x unit="mm">148.000</x></point> -->
+    <!--   </InnerPoints> -->
+    <!-- </RotationSolid> -->
   </HalfShell>
 
 </Support>

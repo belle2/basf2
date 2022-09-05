@@ -368,16 +368,16 @@ namespace Belle2 {
       vtxGeometryPar.setCutOutStartPhi(support.getAngle("Cutout/startPhi"));
       vtxGeometryPar.setCutOutDeltaPhi(support.getAngle("Cutout/deltaPhi"));
 
-      //Create Carbon cooling tubes
-      vtxGeometryPar.setNTubes(support.getInt("CarbonTubes/count"));
-      vtxGeometryPar.setTubesMinZ(support.getLength("CarbonTubes/minZ"));
-      vtxGeometryPar.setTubesMaxZ(support.getLength("CarbonTubes/maxZ"));
-      vtxGeometryPar.setTubesMinR(support.getLength("CarbonTubes/innerRadius"));
-      vtxGeometryPar.setTubesMaxR(support.getLength("CarbonTubes/outerRadius"));
-      vtxGeometryPar.setTubesRPhi(support.getLength("CarbonTubes/rphi"));
-      vtxGeometryPar.setTubesStartPhi(support.getAngle("CarbonTubes/startPhi"));
-      vtxGeometryPar.setTubesDeltaPhi(support.getAngle("CarbonTubes/deltaPhi"));
-      vtxGeometryPar.setTubesMaterial(support.getString("CarbonTubes/Material", "Carbon"));
+      // //Create Carbon cooling tubes
+      // vtxGeometryPar.setNTubes(support.getInt("CarbonTubes/count"));
+      // vtxGeometryPar.setTubesMinZ(support.getLength("CarbonTubes/minZ"));
+      // vtxGeometryPar.setTubesMaxZ(support.getLength("CarbonTubes/maxZ"));
+      // vtxGeometryPar.setTubesMinR(support.getLength("CarbonTubes/innerRadius"));
+      // vtxGeometryPar.setTubesMaxR(support.getLength("CarbonTubes/outerRadius"));
+      // vtxGeometryPar.setTubesRPhi(support.getLength("CarbonTubes/rphi"));
+      // vtxGeometryPar.setTubesStartPhi(support.getAngle("CarbonTubes/startPhi"));
+      // vtxGeometryPar.setTubesDeltaPhi(support.getAngle("CarbonTubes/deltaPhi"));
+      // vtxGeometryPar.setTubesMaterial(support.getString("CarbonTubes/Material", "Carbon"));
 
       return;
     }
@@ -694,29 +694,29 @@ namespace Belle2 {
       }
 
 
-      //Create Carbon cooling tubes
-      {
-        int nTubes    = parameters.getNTubes();
-        double minZ   = parameters.getTubesMinZ() / Unit::mm;
-        double maxZ   = parameters.getTubesMaxZ() / Unit::mm;
-        double minR   = parameters.getTubesMinR() / Unit::mm;
-        double maxR   = parameters.getTubesMaxR() / Unit::mm;
-        double sizeZ  = (maxZ - minZ) / 2.;
-        double shiftX = parameters.getTubesRPhi() / Unit::mm;
-        double shiftY = 0;
-        double shiftZ = minZ + sizeZ;
-        double phi0   = parameters.getTubesStartPhi();
-        double dphi   = parameters.getTubesDeltaPhi();
-        string material = parameters.getTubesMaterial();
+      // //Create Carbon cooling tubes
+      // {
+      //   int nTubes    = parameters.getNTubes();
+      //   double minZ   = parameters.getTubesMinZ() / Unit::mm;
+      //   double maxZ   = parameters.getTubesMaxZ() / Unit::mm;
+      //   double minR   = parameters.getTubesMinR() / Unit::mm;
+      //   double maxR   = parameters.getTubesMaxR() / Unit::mm;
+      //   double sizeZ  = (maxZ - minZ) / 2.;
+      //   double shiftX = parameters.getTubesRPhi() / Unit::mm;
+      //   double shiftY = 0;
+      //   double shiftZ = minZ + sizeZ;
+      //   double phi0   = parameters.getTubesStartPhi();
+      //   double dphi   = parameters.getTubesDeltaPhi();
+      //   string material = parameters.getTubesMaterial();
 
-        G4Tubs* tube = new G4Tubs("CarbonTube", minR, maxR, sizeZ, 0, 2 * M_PI);
-        G4LogicalVolume* tubeVol = new G4LogicalVolume(tube, geometry::Materials::get(material), "CarbonTube");
-        geometry::setColor(*tubeVol, "#000");
-        for (int i = 0; i < nTubes; ++i) {
-          G4Transform3D placement = G4RotateZ3D(phi0 + i * dphi) * G4Translate3D(shiftX, shiftY, shiftZ);
-          supportAssembly.add(tubeVol, placement);
-        }
-      }
+      //   G4Tubs* tube = new G4Tubs("CarbonTube", minR, maxR, sizeZ, 0, 2 * M_PI);
+      //   G4LogicalVolume* tubeVol = new G4LogicalVolume(tube, geometry::Materials::get(material), "CarbonTube");
+      //   geometry::setColor(*tubeVol, "#000");
+      //   for (int i = 0; i < nTubes; ++i) {
+      //     G4Transform3D placement = G4RotateZ3D(phi0 + i * dphi) * G4Translate3D(shiftX, shiftY, shiftZ);
+      //     supportAssembly.add(tubeVol, placement);
+      //   }
+      // }
 
       return supportAssembly;
     }

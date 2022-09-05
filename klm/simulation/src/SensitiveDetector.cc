@@ -14,6 +14,7 @@
 #include <klm/dataobjects/bklm/BKLMStatus.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dbobjects/eklm/EKLMSimulationParameters.h>
+#include <klm/eklm/geometry/GeometryData.h>
 
 /* Belle 2 headers. */
 #include <simulation/background/BkgSensitiveDetector.h>
@@ -59,6 +60,13 @@ SensitiveDetector::SensitiveDetector(
 
 bool SensitiveDetector::stepEKLM(G4Step* aStep, G4TouchableHistory*)
 {
+  /* Once-only initializations (constructor is called too early for these). */
+  if (m_FirstCall) {
+    m_FirstCall = false;
+    const EKLM::GeometryData* geometryData = &EKLM::GeometryData::Instance();
+    //if (geometryData->beamBackgroundStudy())
+    //  m_BkgSensitiveDetector = m_GeoPar->getBkgSensitiveDetector();
+  }
   const int stripLevel = 1;
   int section, layer, sector, plane, strip, stripGlobal;
   HepGeom::Point3D<double> gpos, lpos;
@@ -114,7 +122,7 @@ bool SensitiveDetector::stepEKLM(G4Step* aStep, G4TouchableHistory*)
 
 G4bool SensitiveDetector::stepBKLM(G4Step* step, G4TouchableHistory* history)
 {
-  // Once-only initializations (constructor is called too early for these)
+  /* Once-only initializations (constructor is called too early for these). */
   if (m_FirstCall) {
     m_FirstCall = false;
     m_GeoPar = bklm::GeometryPar::instance();

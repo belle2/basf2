@@ -234,6 +234,12 @@ Here is a list of trigger variables:
 
 .. b2-variables::
    :group: L1 Trigger
+.. tip::
+      Please see :ref:`trigger-and-tsim <variables_trigger>` for differences 
+   between L1Input, L1FTDL, and L1 PSNM and further details. Note that it is 
+   recomended to store the L1 information using the trigger bit name 
+   (e.g.: ``L1PSNM(yyy)``) since the trigger bit number may change across 
+   different data taking periods.
 
 .. b2-variables::
    :group: Software Trigger

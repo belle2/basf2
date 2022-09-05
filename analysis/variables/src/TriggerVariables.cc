@@ -404,9 +404,11 @@ namespace Belle2 {
   with the explicit trigger bit name for physics analyses or performance studies.
 )DOC");
     REGISTER_VARIABLE("L1TimeType", L1TimeType,
-                      "[Eventbased] Returns ETimingType time type.");
+                      "[Eventbased] Returns kind of detector which determines the Level1 trigger timing.
+0:ECL, 1:TOP, 2:SELF(timing of PSNM bit), 3:CDC, 5:delayed bhabha, 7: random, 13:poisson.");
     REGISTER_VARIABLE("L1TimeQuality", L1TimeQuality,
-                      "[Eventbased] Returns ETimingQuality time quality.");
+                      "[Eventbased] Returns expected Level1 timing resolution.This flag will be used for SVD 3-point sampling in future.
+0:None; 1:Coarse (sigma > x ns); 2:FINE (sigma < x ns); x has been set to ~5ns before LS1 but can be changed in future");
     REGISTER_VARIABLE("isPoissonTriggerInInjectionVeto", isPoissonInInjectionVeto,
                       "[Eventbased] Returns 1 if the poisson random trigger is within the injection veto window.");
     //-------------------------------------------------------------------------

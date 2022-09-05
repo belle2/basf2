@@ -234,6 +234,7 @@ Here is a list of trigger variables:
 
 .. b2-variables::
    :group: L1 Trigger
+
 .. tip::
       Please see :ref:`Trigger and TSIM <trigger-and-tsim>` for differences 
    between L1Input, L1FTDL, and L1 PSNM and further details. Note that it is 

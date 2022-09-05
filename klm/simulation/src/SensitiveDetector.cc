@@ -64,8 +64,8 @@ bool SensitiveDetector::stepEKLM(G4Step* aStep, G4TouchableHistory*)
   if (m_FirstCall) {
     m_FirstCall = false;
     const EKLM::GeometryData* geometryData = &EKLM::GeometryData::Instance();
-    //if (geometryData->beamBackgroundStudy())
-    //  m_BkgSensitiveDetector = m_GeoPar->getBkgSensitiveDetector();
+    if (geometryData->beamBackgroundStudy())
+      m_BkgSensitiveDetector = new BkgSensitiveDetector("EKLM");
   }
   const int stripLevel = 1;
   int section, layer, sector, plane, strip, stripGlobal;
@@ -127,7 +127,7 @@ G4bool SensitiveDetector::stepBKLM(G4Step* step, G4TouchableHistory* history)
     m_FirstCall = false;
     m_GeoPar = bklm::GeometryPar::instance();
     if (m_GeoPar->doBeamBackgroundStudy())
-      m_BkgSensitiveDetector = m_GeoPar->getBkgSensitiveDetector();
+      m_BkgSensitiveDetector = new BkgSensitiveDetector("BKLM");
     if (!m_SimPar.isValid())
       B2FATAL("BKLM simulation parameters are not available.");
     m_HitTimeMax = m_SimPar->getHitTimeMax();

@@ -6,7 +6,7 @@
 			 and BP endflange -->
 	<OuterPoints>
 		<point><z unit="mm">-400.000</z><x unit="mm">155.000</x></point>
-		<point><z unit="mm"> 560.000</z><x unit="mm">155.000</x></point>
+		<point><z unit="mm"> 525.000</z><x unit="mm">155.000</x></point>
 	</OuterPoints>
 	<InnerPoints>
 		<point><z unit="mm">-400.000</z><x unit="mm"> 91.000</x></point>
@@ -29,6 +29,6 @@
 		<point><z unit="mm"> 449.860</z><x unit="mm"> 81.000</x></point>
 		<point><z unit="mm"> 459.860</z><x unit="mm"> 81.000</x></point>
 		<point><z unit="mm"> 460.000</z><x unit="mm"> 104.650</x></point>
-		<point><z unit="mm"> 560.000</z><x unit="mm"> 104.650</x></point>
+		<point><z unit="mm"> 525.000</z><x unit="mm"> 104.650</x></point>
 	</InnerPoints>
 </Envelope>

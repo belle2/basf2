@@ -7,13 +7,13 @@
  **************************************************************************/
 
 /* Own header. */
-#include <klm/bklm/simulation/SensitiveDetector.h>
+#include <klm/simulation/SensitiveDetector.h>
 
 /* KLM headers. */
-#include <klm/bklm/geometry/GeometryPar.h>
-#include <klm/bklm/geometry/Module.h>
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
 #include <klm/dataobjects/bklm/BKLMStatus.h>
+#include <klm/dataobjects/KLMElementNumbers.h>
+#include <klm/dbobjects/eklm/EKLMSimulationParameters.h>
 
 /* Belle 2 headers. */
 #include <simulation/background/BkgSensitiveDetector.h>
@@ -29,10 +29,12 @@
 /* ROOT headers. */
 #include <TRandom3.h>
 
-using namespace Belle2::bklm;
+using namespace Belle2::KLM;
 
-SensitiveDetector::SensitiveDetector(const G4String& name) :
+SensitiveDetector::SensitiveDetector(
+  const G4String& name, KLMSubdetectorNumber subdetector) :
   SensitiveDetectorBase(name, Const::KLM),
+  m_Subdetector(subdetector),
   m_FirstCall(true),
   m_BkgSensitiveDetector(nullptr),
   m_GeoPar(nullptr)
@@ -40,23 +42,82 @@ SensitiveDetector::SensitiveDetector(const G4String& name) :
   if (!m_SimPar.isValid())
     B2FATAL("BKLM simulation parameters are not available.");
   m_HitTimeMax = m_SimPar->getHitTimeMax();
+  DBObjPtr<EKLMSimulationParameters> simPar;
+  if (!simPar.isValid())
+    B2FATAL("EKLM simulation parameters are not available.");
+  m_ThresholdHitTime = simPar->getHitTimeThreshold();
   m_MCParticles.isOptional();
-  m_SimHits.registerInDataStore();
-  m_SimHitPositions.registerInDataStore();
-  m_MCParticlesToSimHits.registerInDataStore();
-  registerMCParticleRelation(m_MCParticlesToSimHits);
-  m_SimHitPositions.registerRelationTo(m_SimHits);
+  m_BKLMSimHits.registerInDataStore();
+  m_EKLMSimHits.registerInDataStore();
+  m_BKLMSimHitPositions.registerInDataStore();
+  m_MCParticlesToBKLMSimHits.registerInDataStore();
+  m_MCParticlesToEKLMSimHits.registerInDataStore();
+  registerMCParticleRelation(m_MCParticlesToBKLMSimHits);
+  registerMCParticleRelation(m_MCParticlesToEKLMSimHits);
+  m_BKLMSimHitPositions.registerRelationTo(m_BKLMSimHits);
 }
 
-//-----------------------------------------------------
-// Method invoked for every step in sensitive detector
-//-----------------------------------------------------
-G4bool SensitiveDetector::step(G4Step* step, G4TouchableHistory* history)
+bool SensitiveDetector::stepEKLM(G4Step* aStep, G4TouchableHistory*)
+{
+  const int stripLevel = 1;
+  int section, layer, sector, plane, strip, stripGlobal;
+  HepGeom::Point3D<double> gpos, lpos;
+  G4TouchableHandle hist = aStep->GetPreStepPoint()->GetTouchableHandle();
+  section = hist->GetVolume(stripLevel + 6)->GetCopyNo();
+  layer = hist->GetVolume(stripLevel + 5)->GetCopyNo();
+  sector = hist->GetVolume(stripLevel + 4)->GetCopyNo();
+  plane = hist->GetVolume(stripLevel + 3)->GetCopyNo();
+  strip = hist->GetVolume(stripLevel)->GetCopyNo();
+  stripGlobal = m_ElementNumbers->stripNumber(
+                  section, layer, sector, plane, strip);
+  const G4double eDep = aStep->GetTotalEnergyDeposit();
+  /* Do not record hits without deposited energy. */
+  if (eDep <= 0)
+    return false;
+  const G4Track& track = * aStep->GetTrack();
+  const G4double hitTime = track.GetGlobalTime();
+  /* No time cut for background studies. */
+  if (hitTime > m_ThresholdHitTime) {
+    B2INFO("EKLMSensitiveDetector: "
+           " ALL HITS WITH TIME > hitTimeThreshold ARE DROPPED!!");
+    return false;
+  }
+  /* Hit position. */
+  gpos = 0.5 * (aStep->GetPostStepPoint()->GetPosition() +
+                aStep->GetPreStepPoint()->GetPosition());
+  lpos = hist->GetHistory()->GetTopTransform().TransformPoint(gpos);
+  /* Create step hit and store in to DataStore */
+  EKLMSimHit* hit = m_EKLMSimHits.appendNew();
+  CLHEP::Hep3Vector trackMomentum = track.GetMomentum();
+  hit->setMomentum(ROOT::Math::PxPyPzEVector(trackMomentum.x(), trackMomentum.y(),
+                                             trackMomentum.z(), track.GetTotalEnergy()));
+  hit->setTrackID(track.GetTrackID());
+  hit->setParentTrackID(track.GetParentID());
+  hit->setLocalPosition(lpos.x() / CLHEP::mm * Unit::mm,
+                        lpos.y() / CLHEP::mm * Unit::mm,
+                        lpos.z() / CLHEP::mm * Unit::mm);
+  hit->setPosition(gpos.x() / CLHEP::mm * Unit::mm,
+                   gpos.y() / CLHEP::mm * Unit::mm,
+                   gpos.z() / CLHEP::mm * Unit::mm);
+  hit->setEnergyDeposit(eDep);
+  hit->setPDG(track.GetDefinition()->GetPDGEncoding());
+  hit->setTime(hitTime);
+  hit->setStrip(strip);
+  hit->setPlane(plane);
+  hit->setSector(sector);
+  hit->setLayer(layer);
+  hit->setSection(section);
+  hit->setVolumeID(stripGlobal);
+  m_MCParticlesToEKLMSimHits.add(track.GetTrackID(), hit->getArrayIndex());
+  return true;
+}
+
+G4bool SensitiveDetector::stepBKLM(G4Step* step, G4TouchableHistory* history)
 {
   // Once-only initializations (constructor is called too early for these)
   if (m_FirstCall) {
     m_FirstCall = false;
-    m_GeoPar = GeometryPar::instance();
+    m_GeoPar = bklm::GeometryPar::instance();
     if (m_GeoPar->doBeamBackgroundStudy())
       m_BkgSensitiveDetector = m_GeoPar->getBkgSensitiveDetector();
     if (!m_SimPar.isValid())
@@ -103,7 +164,7 @@ G4bool SensitiveDetector::step(G4Step* step, G4TouchableHistory* history)
     if (time > m_HitTimeMax)
       return false;
     const CLHEP::Hep3Vector globalPosition = 0.5 * (preStep->GetPosition() + postStep->GetPosition()) / CLHEP::cm; // in cm
-    const Module* m = m_GeoPar->findModule(section, sector, layer);
+    const bklm::Module* m = m_GeoPar->findModule(section, sector, layer);
     const CLHEP::Hep3Vector localPosition = m->globalToLocal(globalPosition);
     if (postStep->GetProcessDefinedStep() != 0) {
       if (postStep->GetProcessDefinedStep()->GetProcessType() == fDecay)
@@ -124,9 +185,9 @@ G4bool SensitiveDetector::step(G4Step* step, G4TouchableHistory* history)
           moduleIDZ, BKLMElementNumbers::c_ZPlane);
         BKLMElementNumbers::setStripInModule(moduleIDZ, zStripLower);
         BKLMStatus::setMaximalStrip(moduleIDZ, zStripUpper);
-        BKLMSimHit* simHit = m_SimHits.appendNew(moduleIDZ, propagationTimes.z(), time, eDep);
-        m_MCParticlesToSimHits.add(trackID, simHit->getArrayIndex());
-        BKLMSimHitPosition* simHitPosition = m_SimHitPositions.appendNew(globalPosition.x(), globalPosition.y(), globalPosition.z());
+        BKLMSimHit* simHit = m_BKLMSimHits.appendNew(moduleIDZ, propagationTimes.z(), time, eDep);
+        m_MCParticlesToBKLMSimHits.add(trackID, simHit->getArrayIndex());
+        BKLMSimHitPosition* simHitPosition = m_BKLMSimHitPositions.appendNew(globalPosition.x(), globalPosition.y(), globalPosition.z());
         simHitPosition->addRelationTo(simHit);
       }
       if (phiStripLower > 0) {
@@ -134,9 +195,9 @@ G4bool SensitiveDetector::step(G4Step* step, G4TouchableHistory* history)
           moduleID, BKLMElementNumbers::c_PhiPlane);
         BKLMElementNumbers::setStripInModule(moduleID, phiStripLower);
         BKLMStatus::setMaximalStrip(moduleID, phiStripUpper);
-        BKLMSimHit* simHit = m_SimHits.appendNew(moduleID, propagationTimes.y(), time, eDep);
-        m_MCParticlesToSimHits.add(trackID, simHit->getArrayIndex());
-        BKLMSimHitPosition* simHitPosition = m_SimHitPositions.appendNew(globalPosition.x(), globalPosition.y(), globalPosition.z());
+        BKLMSimHit* simHit = m_BKLMSimHits.appendNew(moduleID, propagationTimes.y(), time, eDep);
+        m_MCParticlesToBKLMSimHits.add(trackID, simHit->getArrayIndex());
+        BKLMSimHitPosition* simHitPosition = m_BKLMSimHitPositions.appendNew(globalPosition.x(), globalPosition.y(), globalPosition.z());
         simHitPosition->addRelationTo(simHit);
       }
     } else {
@@ -153,10 +214,10 @@ G4bool SensitiveDetector::step(G4Step* step, G4TouchableHistory* history)
         BKLMElementNumbers::setPlaneInModule(
           moduleID, BKLMElementNumbers::c_ZPlane);
       }
-      BKLMSimHit* simHit = m_SimHits.appendNew(moduleID, propagationTime, time,
-                                               eDep);
-      m_MCParticlesToSimHits.add(trackID, simHit->getArrayIndex());
-      BKLMSimHitPosition* simHitPosition = m_SimHitPositions.appendNew(globalPosition.x(), globalPosition.y(), globalPosition.z());
+      BKLMSimHit* simHit = m_BKLMSimHits.appendNew(moduleID, propagationTime, time,
+                                                   eDep);
+      m_MCParticlesToBKLMSimHits.add(trackID, simHit->getArrayIndex());
+      BKLMSimHitPosition* simHitPosition = m_BKLMSimHitPositions.appendNew(globalPosition.x(), globalPosition.y(), globalPosition.z());
       simHitPosition->addRelationTo(simHit);
     }
     return true;
@@ -164,8 +225,9 @@ G4bool SensitiveDetector::step(G4Step* step, G4TouchableHistory* history)
   return false;
 }
 
-void SensitiveDetector::convertHitToRPCStrips(const CLHEP::Hep3Vector& localPosition, const Module* m,
-                                              int& phiStripLower, int& phiStripUpper, int& zStripLower, int& zStripUpper)
+void SensitiveDetector::convertHitToRPCStrips(
+  const CLHEP::Hep3Vector& localPosition, const bklm::Module* m,
+  int& phiStripLower, int& phiStripUpper, int& zStripLower, int& zStripUpper)
 {
   double phiStripD = m->getPhiStrip(localPosition);
   int phiStrip = int(phiStripD);
@@ -221,4 +283,12 @@ void SensitiveDetector::convertHitToRPCStrips(const CLHEP::Hep3Vector& localPosi
     nextStrip = (nextStrip > 0 ? -(1 + nextStrip) : 1 - nextStrip);
   }
   return;
+}
+
+bool SensitiveDetector::step(G4Step* step, G4TouchableHistory* history)
+{
+  if (m_Subdetector == KLMElementNumbers::c_BKLM)
+    return stepBKLM(step, history);
+  else
+    return stepEKLM(step, history);
 }

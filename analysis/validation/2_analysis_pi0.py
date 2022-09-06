@@ -76,6 +76,7 @@ create_validation_histograms(
     description=r"$\pi^0$ MC mass distribution",
 )
 
+main.add_module('Progress')
 basf2.process(main)
 print(basf2.statistics)
 

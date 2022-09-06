@@ -110,8 +110,7 @@ add_simulation(main, bkgfiles=bg, bkgOverlay=True, usePXDDataReduction=False, fo
 main.add_module(Histogrammer())
 
 # Show progress of processing
-progress = b2.register_module('Progress')
-main.add_module(progress)
+main.add_module('Progress')
 
 # Process events
 b2.process(main)

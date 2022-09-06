@@ -9,7 +9,7 @@
 #pragma once
 
 /* DQM headers. */
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 
 /* Belle 2 headers. */
 #include <framework/database/DBObjPtr.h>
@@ -21,11 +21,12 @@
 
 /* ROOT headers. */
 #include <TCanvas.h>
+#include <TFile.h>
 #include <TH1.h>
 #include <TH2F.h>
 #include <TLatex.h>
-#include <TText.h>
 #include <TLine.h>
+#include <TText.h>
 
 /* C++ headers. */
 #include <vector>
@@ -116,13 +117,6 @@ namespace Belle2 {
      */
     void fillMaskedChannelsHistogram(const std::string& histName);
 
-    /**
-     * Find TCanvas that matches a given name.
-     * @param[in]  canvasName  Name of the desired TCanvas.
-     * @param[out] TCanvas*    Matching TCanvas.
-     */
-    TCanvas* findCanvas(const std::string& canvasName);
-
     /** Number of processed events. */
     double m_ProcessedEvents;
 
@@ -132,6 +126,9 @@ namespace Belle2 {
     /** Threshold for hot channels. */
     int m_ThresholdForHot;
 
+    /** Threshold for log scale. */
+    int m_ThresholdForLog;
+
     /** Minimal number of hits for flagging. */
     int m_MinHitsForFlagging;
 
@@ -140,6 +137,12 @@ namespace Belle2 {
 
     /** Minimal number of processed events for error messages. */
     double m_MinProcessedEventsForMessages;
+
+    /** Reference Histogram Root file name */
+    std::string m_refFileName;
+
+    /** The pointer to the reference file */
+    TFile* m_refFile = nullptr;
 
     /** Vector of dead barrel modules. */
     std::vector<uint16_t> m_DeadBarrelModules;
@@ -158,6 +161,15 @@ namespace Belle2 {
 
     /** TText for names in plane histograms. */
     TText m_PlaneText;
+
+    /** Histogram from DQMInfo with run type. */
+    TH1* m_RunType = nullptr;
+
+    /** String with run type. */
+    TString m_RunTypeString;
+
+    /** Run type flag for null runs. */
+    bool m_IsNullRun;
 
     /** KLM channel array index. */
     const KLMChannelArrayIndex* m_ChannelArrayIndex;

@@ -30,7 +30,7 @@ using namespace csi;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(CsIDigitizer)
+REG_MODULE(CsIDigitizer);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -516,16 +516,16 @@ Signal CsIDigitizerModule::firstOrderResponse(double _gain, Signal _u, double _y
   int n_delay = (int) round(_delay / _dt);
   Signal::iterator it = _u.begin();
   double _u_0 = _u.front();
-  _u.insert(it , n_delay, _u_0);
+  _u.insert(it, n_delay, _u_0);
   _u.resize(n);
 
   // Apply that input to the good old Runge-Kutta 4 routine.
   for (int i = 0, j = 0; i < (n - 1); i++) {
     j = i + 1;
-    k[0] = f(i      , _u[i], _u[j], y[i]                   , invtau);
+    k[0] = f(i, _u[i], _u[j], y[i], invtau);
     k[1] = f(i + 0.5, _u[i], _u[j], y[i] + 0.5 * _dt * k[0], invtau);
     k[2] = f(i + 0.5, _u[i], _u[j], y[i] + 0.5 * _dt * k[1], invtau);
-    k[3] = f(j      , _u[i], _u[j], y[i] +       _dt * k[2], invtau);
+    k[3] = f(j, _u[i], _u[j], y[i] +       _dt * k[2], invtau);
 
     y.push_back(y[i] + _dt * invSix * (k[0] + 2 * k[1] + 2 * k[2] + k[3]));
   }

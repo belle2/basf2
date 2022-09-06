@@ -11,10 +11,9 @@
 #include <framework/dataobjects/Helix.h>
 #include <framework/geometry/BFieldManager.h>
 
-using namespace std;
 using namespace Belle2;
 
-REG_MODULE(RadiusTrackTimeEstimator)
+REG_MODULE(RadiusTrackTimeEstimator);
 
 RadiusTrackTimeEstimatorModule::RadiusTrackTimeEstimatorModule() : BaseTrackTimeEstimatorModule()
 {

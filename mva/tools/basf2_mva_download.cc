@@ -46,6 +46,6 @@ int main(int argc, char* argv[])
     return 1;
   }
 
-  Belle2::MVA::download(db_identifier, identifier, experiment, run, event);
+  Belle2::MVA::Utility::download(db_identifier, identifier, experiment, run, event);
 
 }

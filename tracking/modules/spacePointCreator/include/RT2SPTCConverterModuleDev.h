@@ -10,10 +10,13 @@
 
 #include <framework/core/Module.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
-
+#include <tracking/spacePointCreation/SpacePointTrackCand.h>
 #include <tracking/trackFindingVXD/sectorMapTools/NoKickRTSel.h>
+#include <svd/dataobjects/SVDCluster.h>
+#include <mdst/dataobjects/MCParticle.h>
+#include <svd/dataobjects/SVDTrueHit.h>
+#include <pxd/dataobjects/PXDTrueHit.h>
 
-#include <boost/optional.hpp>
 #include <bitset>
 
 namespace Belle2 {
@@ -82,14 +85,22 @@ namespace Belle2 {
 
     std::string m_SVDClusterName; /**< SVDCluster collection name */
 
-    boost::optional<std::string> m_pxdSpacePointsStoreArrayName; /**< PXD SpacePoints collection names */
-    boost::optional<std::string> m_svdSpacePointsStoreArrayName; /**< Non SingleCluster SVD SpacePoints collection names */
+    std::optional<std::string> m_pxdSpacePointsStoreArrayName; /**< PXD SpacePoints collection names */
+    std::optional<std::string> m_svdSpacePointsStoreArrayName; /**< Non SingleCluster SVD SpacePoints collection names */
 
     std::string m_SVDSingleClusterSPName; /**< Single Cluster SVD SpacePoints collection name */
 
     std::string m_RecoTracksName; /**< Name of collection of RecoTrack StoreArray */
 
     std::string m_SPTCName; /**< Name of collection under which SpacePointTrackCands will be stored in the StoreArray */
+
+    StoreArray<SpacePoint> m_PXDSpacePoints; /**< PXDSpacePoints StoreArray */
+    StoreArray<SpacePoint> m_SVDSpacePoints; /**< SVDSpacePoints StoreArray */
+    StoreArray<RecoTrack> m_RecoTracks; /**< RecoTracks StoreArray */
+    StoreArray<SpacePointTrackCand> m_SpacePointTrackCands; /**< SpacePointTrackCands StoreArray */
+    StoreArray<MCParticle> m_MCParticles; /**< MCParticles StoreArray */
+    StoreArray<SVDTrueHit> m_SVDTrueHit; /**< SVDTrueHits StoreArray */
+    StoreArray<SVDCluster> m_SVDClusters; /**< SVDClusters StoreArray */
 
     // parameters
     bool m_ignorePXDHits; /**< PXD hits will be ignored when creating the SP track candidate */

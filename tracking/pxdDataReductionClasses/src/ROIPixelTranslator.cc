@@ -12,7 +12,6 @@
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
 
-using namespace std;
 using namespace Belle2;
 
 ROIPixelTranslator::ROIPixelTranslator(double user_sigmaSystU, double user_sigmaSystV, double user_numSigmaTotU,
@@ -45,18 +44,18 @@ ROIPixelTranslator::fillRoiIDList(StoreArray<PXDIntercept>* listOfIntercepts,
                                   StoreArray<ROIid>* ROIidList)
 {
 
-  VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
+  const VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
 
   for (int i = 0; i < listOfIntercepts->getEntries(); i++) {
 
-    B2DEBUG(10, "  --->> a NEW INTERCEPT!");
+    B2DEBUG(21, "  --->> a NEW INTERCEPT!");
 
 
     const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo((*listOfIntercepts)[i]->getSensorID());
 
-    double widthTotU = std::min(m_maxWidthU ,
+    double widthTotU = std::min(m_maxWidthU,
                                 sqrt((*listOfIntercepts)[i]->getSigmaU() * (*listOfIntercepts)[i]->getSigmaU() + m_sigmaSystU * m_sigmaSystU) * m_numSigmaTotU);
-    double widthTotV = std::min(m_maxWidthV ,
+    double widthTotV = std::min(m_maxWidthV,
                                 sqrt((*listOfIntercepts)[i]->getSigmaV() * (*listOfIntercepts)[i]->getSigmaV() + m_sigmaSystV * m_sigmaSystV) * m_numSigmaTotV);
 
     double minU = (*listOfIntercepts)[i]->getCoorU() - widthTotU / 2 ;
@@ -74,32 +73,32 @@ ROIPixelTranslator::fillRoiIDList(StoreArray<PXDIntercept>* listOfIntercepts,
     double topRight_uID = aSensorInfo.getUCellID(maxU, maxV, false);
     double topRight_vID = aSensorInfo.getVCellID(maxV, false);
 
-    B2DEBUG(10, "  LAYER = " << VxdID((*listOfIntercepts)[i]->getSensorID()).getLayerNumber()
+    B2DEBUG(21, "  LAYER = " << VxdID((*listOfIntercepts)[i]->getSensorID()).getLayerNumber()
             << " LADDER = " << VxdID((*listOfIntercepts)[i]->getSensorID()).getLadderNumber()
             << " SENSOR = " << VxdID((*listOfIntercepts)[i]->getSensorID()).getSensorNumber()
            );
 
-    B2DEBUG(10, "  nPixels (U,V) = (" << nPixelsU << "," << nPixelsV << ")");
+    B2DEBUG(21, "  nPixels (U,V) = (" << nPixelsU << "," << nPixelsV << ")");
 
-    B2DEBUG(10, "  widthU = " << maxU - minU
+    B2DEBUG(21, "  widthU = " << maxU - minU
             << "  minU = "  << minU
             << "  maxU = "  << maxU
             << "  lengthU = " << aSensorInfo.getUSize((*listOfIntercepts)[i]->getCoorV())
            );
 
-    B2DEBUG(10, "  widthV = " << maxV - minV
+    B2DEBUG(21, "  widthV = " << maxV - minV
             << "  minV = " << minV
             << "  maxV = " << maxV
             << "  lengthV = " << aSensorInfo.getVSize());
 
-    B2DEBUG(10, "  bottom left pixel (U,V) = (" << bottomLeft_uID << "," << bottomLeft_vID << ")");
-    B2DEBUG(10, "  top right pixel (U,V) = (" << topRight_uID << "," << topRight_vID << ")");
+    B2DEBUG(21, "  bottom left pixel (U,V) = (" << bottomLeft_uID << "," << bottomLeft_vID << ")");
+    B2DEBUG(21, "  top right pixel (U,V) = (" << topRight_uID << "," << topRight_vID << ")");
 
 
     //check that the pixel belong to the sensor
     bool inside = true;
     if (bottomLeft_uID > nPixelsU || topRight_uID < firstPixelID || bottomLeft_vID > nPixelsV || topRight_vID < firstPixelID) {
-      B2DEBUG(5, "  OOOPS: this pixel does NOT belong to the sensor");
+      B2DEBUG(20, "  OOOPS: this pixel does NOT belong to the sensor");
       inside = false;
     }
 

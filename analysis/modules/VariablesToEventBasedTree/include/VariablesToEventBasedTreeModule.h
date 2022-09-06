@@ -19,6 +19,8 @@
 
 namespace Belle2 {
 
+  class StringWrapper;
+
   /** Module to calculate variables specified by the user for a given ParticleList
    *  and save them into a TTree. The Tree is event-based, meaning that the variables of each candidate for each event
    *  are saved in an array in a branch of the Tree.
@@ -71,10 +73,14 @@ namespace Belle2 {
     int m_production{ -1};           /**< production ID (to distinguish MC samples) */
     unsigned int m_ncandidates{ 0};  /**< number of candidates in this event */
     float m_weight{0.0};             /**< weight of this event */
-    /** Values corresponding to given variables. */
-    std::vector<std::vector<double>> m_values;
-    /** Values corresponding to given event variables. */
-    std::vector<double> m_event_values;
+    /** Values of type double corresponding to given variables. */
+    std::vector<std::vector<double>> m_valuesDouble;
+    /** Values of type int corresponding to given variables. */
+    std::vector<std::vector<int>> m_valuesInt;
+    /** Values of type double corresponding to given event variables. */
+    std::vector<double> m_event_valuesDouble;
+    /** Values of type int corresponding to given event variables. */
+    std::vector<int> m_event_valuesInt;
 
     /** Tuple of variable name and a map of integer values and inverse sampling rate. E.g. (signal, {1: 0, 0:10}) selects all signal candidates and every 10th background candidate. */
     std::tuple<std::string, std::map<int, unsigned int>> m_sampling;
@@ -89,5 +95,7 @@ namespace Belle2 {
     /** event metadata (get event number etc) */
     StoreObjPtr<EventMetaData> m_eventMetaData;
 
+    std::string m_MCDecayString; /**< MC decay string to be filled */
+    StoreObjPtr<StringWrapper> m_stringWrapper; /**< string wrapper storing the MCDecayString */
   };
 } // end namespace Belle2

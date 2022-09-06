@@ -13,7 +13,6 @@
 
 #include <tracking/dataobjects/RecoTrack.h>
 
-using namespace std;
 using namespace Belle2;
 
 bool CDCStateTruthVarSet::extract(const BaseCDCStateFilter::Object* pair)

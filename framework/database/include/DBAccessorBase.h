@@ -129,6 +129,9 @@ namespace Belle2 {
       addCallback([ = ](const std::string&) {(*object.*callback)();});
     }
 
+    /** Return the globaltag name (or testing payloads path) this object is loaded from */
+    const std::string& getGlobaltag() const { ensureAttached(); return m_entry->getGlobaltag(); }
+
     /** Return current revision of the object */
     unsigned int getRevision() const { ensureAttached(); return m_entry->getRevision(); }
 
@@ -140,6 +143,15 @@ namespace Belle2 {
 
     /** Get the filename this object is loaded from */
     const std::string& getFilename() const { ensureAttached(); return m_entry->getFilename(); }
+
+    /** Check wether this conditions object has some intra-run dependencies. */
+    bool isIntraRunDependent() const { ensureAttached(); return m_entry->isIntraRunDependent(); }
+
+    /**
+     * Get the intra-run boundaries, if any.
+     * If the intra-run dependency is by event number, the event numbers used as boundaries are returned.
+     */
+    const std::vector<unsigned int> getIntraRunBoundaries() const { ensureAttached(); return m_entry->getIntraRunBoundaries(); }
 
     /** Check whether this conditions object is required (at least one user declared it as required) */
     bool isRequired() const { ensureAttached(); return m_entry->isRequired(); }

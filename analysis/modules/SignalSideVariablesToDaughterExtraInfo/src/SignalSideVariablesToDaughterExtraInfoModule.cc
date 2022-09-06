@@ -18,7 +18,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SignalSideVariablesToDaughterExtraInfo)
+REG_MODULE(SignalSideVariablesToDaughterExtraInfo);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -73,12 +73,19 @@ void SignalSideVariablesToDaughterExtraInfoModule::event()
 
   StoreObjPtr<RestOfEvent> roe("RestOfEvent");
   if (roe.isValid()) {
-    auto* signalSide = roe->getRelated<Particle>();
+    auto* signalSide = roe->getRelatedFrom<Particle>();
     Particle* daughter = plist->getParticle(0);
 
     const unsigned int nVars = m_functions.size();
     for (unsigned int iVar = 0; iVar < nVars; iVar++) {
-      double value = m_functions[iVar](signalSide);
+      double value = std::numeric_limits<double>::quiet_NaN();
+      if (std::holds_alternative<double>(m_functions[iVar](signalSide))) {
+        value = std::get<double>(m_functions[iVar](signalSide));
+      } else if (std::holds_alternative<int>(m_functions[iVar](signalSide))) {
+        value = std::get<int>(m_functions[iVar](signalSide));
+      } else if (std::holds_alternative<bool>(m_functions[iVar](signalSide))) {
+        value = std::get<bool>(m_functions[iVar](signalSide));
+      }
       if (daughter->hasExtraInfo(m_extraInfoNames[iVar])) {
         double current = daughter->getExtraInfo(m_extraInfoNames[iVar]);
         if (m_overwrite == -1) {

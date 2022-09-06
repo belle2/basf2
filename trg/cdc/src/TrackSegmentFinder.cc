@@ -46,7 +46,7 @@ namespace Belle2 {
                                                      bool logicLUTFlag)
     :
     TRGBoard("", TRGClock("", 0, 0), TRGClock("", 0, 0), TRGClock("", 0, 0),
-            TRGClock("", 0, 0)),
+             TRGClock("", 0, 0)),
     _cdc(TRGCDC),
     m_logicLUTFlag(logicLUTFlag),
     m_makeRootFile(makeRootFile),
@@ -193,193 +193,6 @@ namespace Belle2 {
   }
 
 
-  void TRGCDCTrackSegmentFinder::simulateBoard(void)
-  {
-
-    //... Clear signal bundle...
-    //    if(_tisb){
-    //      for(unsigned i=0;i<_tisb->size();i++)
-    //        delete (* _tisb)[i];
-    //      delete _tisb;
-    //    }
-    if (_tosbE) {
-      for (unsigned i = 0; i < _tosbE->size(); i++)
-        delete(* _tosbE)[i];
-      delete _tosbE;
-    }
-    if (_tosbT) {
-      for (unsigned i = 0; i < _tosbT->size(); i++)
-        delete(* _tosbT)[i];
-      delete _tosbT;
-    }
-
-    //... Clock..
-    const TRGClock& dClock = TRGCDC::getTRGCDC()->dataClock();
-
-    //... Make input signal bundle
-    TRGSignalVector inputv(name() + "inputMerger", dClock);
-    // const string ni= name()+"InputSignalBundle";
-    //    _tisb = new TRGSignalBundle(ni, dClock);
-
-    //TRGSignalVector *inputM= new TRGSignalVector(*( (*(*this)[0]->output())[0]));
-    vector <TRGSignalVector*> inputM;
-    vector <TRGSignalVector*> findOUTTrack;
-    vector <TRGSignalVector*> findOUTEvt;
-    vector <int> tmpCTimeListE;
-    vector <int> changeTimeListE;
-    vector <int> tmpCTimeListT;
-    vector <int> changeTimeListT;
-    inputM.resize((*this).size());
-    //yi for(unsigned i=0;i<(*this).size();i++){
-    for (unsigned i = 0; i < nInput(); i++) {
-      //yi    inputM[i] = new TRGSignalVector(*( (*(*this)[i]->output())[0]));
-      inputM[i] = new TRGSignalVector(* (* input(i)->signal())[0]);
-    }
-
-    //    TRGSignalVector *inputM= new TRGSignalVector(*( (*(*this)[0]->output())[0]));
-
-    for (unsigned i = 0; i < inputM[0]->size(); i++) {
-
-      TRGSignal msig = (*(inputM[0]))[i];
-      inputv += msig;
-    }
-
-    vector<TRGSignalVector*> separateTS;
-    TRGSignalVector* clockCounter = new TRGSignalVector(inputv[236]);
-    for (int i = 0; i < 8; i++)
-      clockCounter->push_back(inputv[236 + i]);
-    separateTS.resize(16);
-    //separateTS.resize((*this).size()*16);
-    int nTS = separateTS.size();
-    findOUTTrack.resize(nTS);
-    findOUTEvt.resize(nTS);
-    if (type() == outerType) {
-      for (int i = 0; i < nTS; i++) {
-        separateTS[i] = new TRGSignalVector(inputv[i + 208]);
-        /// HitMap
-        if (i == 0)
-          separateTS[i]->push_back(inputv[255]);
-        else
-          separateTS[i]->push_back(inputv[i - 1]);
-        separateTS[i]->push_back(inputv[i]);
-        if (i == nTS)
-          separateTS[i]->push_back(inputv[255]);
-        else
-          separateTS[i]->push_back(inputv[i + 1]);
-        if (i == 0)
-          separateTS[i]->push_back(inputv[255]);
-        else
-          separateTS[i]->push_back(inputv[i + 15]);
-        separateTS[i]->push_back(inputv[i + 16]);
-        separateTS[i]->push_back(inputv[i + 32]);
-        if (i == 0)
-          separateTS[i]->push_back(inputv[255]);
-        else
-          separateTS[i]->push_back(inputv[i + 47]);
-        separateTS[i]->push_back(inputv[i + 48]);
-        if (i == 0)
-          separateTS[i]->push_back(inputv[255]);
-        else
-          separateTS[i]->push_back(inputv[i + 63]);
-        separateTS[i]->push_back(inputv[i + 64]);
-        if (i == nTS)
-          separateTS[i]->push_back(inputv[255]);
-        else
-          separateTS[i]->push_back(inputv[i + 65]);
-
-        /// priority timing
-        separateTS[i]->push_back(inputv[4 * i + 80]);
-        separateTS[i]->push_back(inputv[4 * i + 81]);
-        separateTS[i]->push_back(inputv[4 * i + 82]);
-        separateTS[i]->push_back(inputv[4 * i + 83]);
-        /// fastest timing
-        separateTS[i]->push_back(inputv[4 * i + 144]);
-        separateTS[i]->push_back(inputv[4 * i + 145]);
-        separateTS[i]->push_back(inputv[4 * i + 146]);
-        separateTS[i]->push_back(inputv[4 * i + 147]);
-        /// clock counter part
-        const TRGSignalVector& cc = dClock.clockCounter();
-        //      cc.dump();
-        separateTS[i]->push_back(cc[0]);
-        separateTS[i]->push_back(cc[1]);
-        separateTS[i]->push_back(cc[2]);
-        separateTS[i]->push_back(cc[3]);
-        separateTS[i]->push_back(cc[4]);
-
-      }
-      // Board Type Check Start.(for future)
-      for (int i = 0; i < nTS; i++) {
-        findOUTTrack[i] = findTSHit(separateTS[i], i)[0];
-        vector<int> tt = findOUTTrack[i]->stateChanges();
-        if (tt.size())
-          tmpCTimeListT.insert(tmpCTimeListT.end(), tt.begin(), tt.end());
-
-        findOUTEvt[i] = findTSHit(separateTS[i], i)[1];
-        vector<int> ee = findOUTEvt[i]->stateChanges();
-        if (ee.size())
-          tmpCTimeListE.insert(tmpCTimeListE.end(), ee.begin(), ee.end());
-
-        //...iw for debug...
-        // dbgIn.push_back(separateTS[i]);
-        // dbgOut.push_back(findOUTTrack[i]);
-      }
-
-      for (unsigned i = 0; i < tmpCTimeListT.size(); i++) {
-        bool nomatch = true;
-        for (unsigned j = 0; j < changeTimeListT.size(); j++) {
-          if (tmpCTimeListT[i] == changeTimeListT[j]) {
-            nomatch = false;
-            break;
-          }
-        }
-        if (nomatch) changeTimeListT.push_back(tmpCTimeListT[i]);
-      }
-
-      TRGSignalVector* trackerOut = packerOuterTracker(findOUTTrack,
-                                                       changeTimeListT, 6);
-      (*trackerOut).insert((*trackerOut).end(), (*clockCounter).begin(),
-                           (*clockCounter).end());
-      trackerOut->name("TSF TrackerOut");
-
-      const string noT = name() + "OutputSignalBundleTracker";
-      _tosbT =  new TRGSignalBundle(noT, dClock);
-      _tosbT->push_back(trackerOut);
-      if (_tosbT) {
-        (*_tosbT)[0]->name(noT);
-        for (unsigned i = 0; i < (*(*_tosbT)[0]).size(); i++)
-          (*(*_tosbT)[0])[i].name(noT + ":bit" + TRGUtilities::itostring(i));
-        //      _tosbT->dump("","");
-      }
-
-      for (unsigned i = 0; i < tmpCTimeListE.size(); i++) {
-        bool nomatch = true;
-        for (unsigned j = 0; j < changeTimeListE.size(); j++) {
-          if (tmpCTimeListE[i] == changeTimeListE[j]) {
-            nomatch = false;
-            break;
-          }
-        }
-        if (nomatch) changeTimeListE.push_back(tmpCTimeListE[i]);
-      }
-
-      TRGSignalVector* evtOut = packerOuterEvt(findOUTEvt, changeTimeListE, 6);
-      (*evtOut).insert((*evtOut).end(), (*clockCounter).begin(),
-                       (*clockCounter).end());
-
-      const string noE = name() + "OutputSignalBundleEvt";
-      _tosbE =  new TRGSignalBundle(noE, dClock);
-      _tosbE->push_back(evtOut);
-      if (_tosbE) {
-        (*_tosbE)[0]->name(noE);
-        for (unsigned i = 0; i < (*(*_tosbE)[0]).size(); i++)
-          (*(*_tosbE)[0])[i].name(noE + ":bit" + TRGUtilities::itostring(i));
-        //      _tosbE->dump("","");
-      }
-      // Board Type Check End.
-    }
-
-  }
-
   vector <TRGSignalVector*>
   TSFinder::findTSHit(TRGSignalVector* eachInput, int tsid)
   {
@@ -494,7 +307,8 @@ namespace Belle2 {
     result.push_back(resultT);
     result.push_back(resultE);
 
-    delete [] LUTValue;
+    // cppcheck-suppress uninitdata
+    delete[] LUTValue;
     delete Hitmap;
 
     return result;
@@ -506,7 +320,7 @@ namespace Belle2 {
                                const unsigned maxHit)
   {
     TRGSignalVector* result =
-      new TRGSignalVector("", (* hitList[0]).clock() , 21 * maxHit);
+      new TRGSignalVector("", (* hitList[0]).clock(), 21 * maxHit);
 
     for (unsigned ci = 0; ci < cList.size(); ci++) {
       unsigned cntHit = 0;
@@ -541,7 +355,7 @@ namespace Belle2 {
   {
 
     //TRGSignalVector * result = new TRGSignalVector("",(*hitList[0]).clock() ,N+9*maxHit);
-    TRGSignalVector* result = new TRGSignalVector("", (*hitList[0]).clock() ,
+    TRGSignalVector* result = new TRGSignalVector("", (*hitList[0]).clock(),
                                                   hitList.size() + 9 * maxHit);
 
     for (unsigned ci = 0; ci < cList.size(); ci++) {
@@ -720,7 +534,7 @@ namespace Belle2 {
           tsPatternInformation[6] = priorityPhis[1];
           tsPatternInformation[7] = priorityLRs[2];
           tsPatternInformation[8] = priorityPhis[2];
-          new(hitPatternInformation[nHitTSs++]) TVectorD(tsPatternInformation);
+          new (hitPatternInformation[nHitTSs++]) TVectorD(tsPatternInformation);
         }
         //cout<<ts.name()<<" has "<<nHitWires<<" hit wires."<<endl;
       }
@@ -858,7 +672,7 @@ namespace Belle2 {
         t_particleEfficiency[0] = tsEfficiency[iEfficiency][0];
         t_particleEfficiency[1] = tsEfficiency[iEfficiency][1];
         t_particleEfficiency[2] = tsEfficiency[iEfficiency][2];
-        new(particleEfficiency[iEfficiency]) TVectorD(t_particleEfficiency);
+        new (particleEfficiency[iEfficiency]) TVectorD(t_particleEfficiency);
       }
 
     } // End of no MC information
@@ -883,7 +697,7 @@ namespace Belle2 {
             tempTSInformation[0] = iSuperLayer;
             tempTSInformation[1] = ts.localId();
             tempTSInformation[2] = ts.wires()[iWire]->signal().stateChanges()[iHit];
-            new(tsInformation[iHitTS++]) TVectorD(tempTSInformation);
+            new (tsInformation[iHitTS++]) TVectorD(tempTSInformation);
             //cout<<ts.wires()[iWire]->signal().stateChanges()[iHit]<<", ";
             //iHit++;
           }
@@ -1025,7 +839,7 @@ namespace Belle2 {
             //for(unsigned iWire=0; iWire<15; iWire++){
             for (unsigned iWire = 0; iWire < 21; iWire++)
               t_nnPatternInformation[iWire + 2] = wireTime[iWire];
-            new(nnPatternInformation[indexSaving++]) TVectorD(t_nnPatternInformation);
+            new (nnPatternInformation[indexSaving++]) TVectorD(t_nnPatternInformation);
           } else {
             //t_nnPatternInformation.ResizeTo(13);
             t_nnPatternInformation.ResizeTo(17);
@@ -1034,7 +848,7 @@ namespace Belle2 {
             //for(unsigned iWire=0; iWire<11; iWire++){
             for (unsigned iWire = 0; iWire < 15; iWire++)
               t_nnPatternInformation[iWire + 2] = wireTime[iWire];
-            new(nnPatternInformation[indexSaving++]) TVectorD(t_nnPatternInformation);
+            new (nnPatternInformation[indexSaving++]) TVectorD(t_nnPatternInformation);
           }
 
         } // End of if priority cell is hit
@@ -1347,7 +1161,8 @@ namespace Belle2 {
     result.push_back(resultT);
     result.push_back(resultE);
 
-    delete [] LUTValue;
+    // cppcheck-suppress uninitdata
+    delete[] LUTValue;
     delete Hitmap;
 
     return result;
@@ -2571,7 +2386,7 @@ namespace Belle2 {
   {
 
     TRGSignalVector* result =
-      new TRGSignalVector("", (* hitList[0]).clock() , 21 * maxHit);
+      new TRGSignalVector("", (* hitList[0]).clock(), 21 * maxHit);
 
     for (unsigned ci = 0; ci < cList.size(); ci++) {
       unsigned cntHit = 0;
@@ -2759,7 +2574,8 @@ namespace Belle2 {
     result.push_back(resultT);
     result.push_back(resultE);
 
-    delete [] LUTValue;
+    // cppcheck-suppress uninitdata
+    delete[] LUTValue;
     delete Hitmap;
 
     return result;
@@ -2983,7 +2799,8 @@ namespace Belle2 {
     result.push_back(resultT);
     result.push_back(resultE);
 
-    delete [] LUTValue;
+    // cppcheck-suppress uninitdata
+    delete[] LUTValue;
     delete Hitmap;
 
     return result;

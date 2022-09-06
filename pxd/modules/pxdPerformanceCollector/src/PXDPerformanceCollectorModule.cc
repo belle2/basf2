@@ -29,7 +29,7 @@ using namespace Belle2::PXD;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(PXDPerformanceCollector)
+REG_MODULE(PXDPerformanceCollector);
 
 //-----------------------------------------------------------------
 //                 Implementation

@@ -11,10 +11,12 @@
 #include <framework/gearbox/Const.h>
 #include <framework/core/FrameworkExceptions.h>
 #include <framework/datastore/RelationsObject.h>
+#include <framework/geometry/B2Vector3.h>
 
 #include <TClonesArray.h>
 #include <TVector3.h>
-#include <TLorentzVector.h>
+#include <Math/Vector3D.h>
+#include <Math/Vector4D.h>
 
 #include <cmath>
 #include <climits>
@@ -176,15 +178,15 @@ namespace Belle2 {
      * Return production vertex position, shorthand for getProductionVertex().
      * @return The production vertex of the MonteCarlo particle in cm.
      */
-    TVector3 getVertex() const { return getProductionVertex(); }
+    ROOT::Math::XYZVector getVertex() const { return getProductionVertex(); }
 
     /**
      * Return production vertex position.
      * @return The production vertex of the MonteCarlo particle in cm.
      */
-    TVector3 getProductionVertex() const
+    ROOT::Math::XYZVector getProductionVertex() const
     {
-      return TVector3(m_productionVertex_x, m_productionVertex_y, m_productionVertex_z);
+      return ROOT::Math::XYZVector(m_productionVertex_x, m_productionVertex_y, m_productionVertex_z);
     }
 
     /**
@@ -200,9 +202,9 @@ namespace Belle2 {
      * Return 4Vector of particle.
      * @return The 4-vector of the MonteCarlo particle.
      */
-    TLorentzVector get4Vector() const
+    ROOT::Math::PxPyPzEVector get4Vector() const
     {
-      TLorentzVector vec; vec.SetXYZM(m_momentum_x, m_momentum_y, m_momentum_z, m_mass); return vec;
+      return ROOT::Math::PxPyPzEVector(m_momentum_x, m_momentum_y, m_momentum_z, m_energy);
     }
 
 
@@ -264,6 +266,9 @@ namespace Belle2 {
      */
     std::vector<Belle2::MCParticle*> getDaughters() const;
     //Need namespace qualifier because ROOT CINT has troubles otherwise
+
+    /** Return i-th daughter */
+    const MCParticle* getDaughter(int i) const;
 
     /** Return number of daughter MCParticles. */
     int getNDaughters() const;
@@ -428,7 +433,10 @@ namespace Belle2 {
      * Sets the 4Vector of particle.
      * @param p4 4Vector
      */
-    void set4Vector(const TLorentzVector& p4) { setMomentum(p4.Vect()); m_energy = p4.Energy(); }
+    void set4Vector(const ROOT::Math::PxPyPzEVector& p4)
+    {
+      m_momentum_x = p4.px(); m_momentum_y = p4.py(); m_momentum_z = p4.pz(); m_energy = p4.energy();
+    }
 
     /**
      * Set decay vertex.
@@ -499,6 +507,16 @@ namespace Belle2 {
 
     /** Return a short summary of this object's contents in HTML format. */
     virtual std::string getInfoHTML() const override;
+
+    /**
+    * Explores the decay tree of the MC particle and returns the (grand^n)daughter identified by a generalized index.
+    * The generalized index consists of a colon-separated list of daughter indexes, starting from the root particle:
+    * 0:1:3 identifies the fourth daughter (3) of the second daughter (1) of the first daughter (0) of the mother particle.
+    * This method mirrors the method used in the Particle class.
+    * @param generalizedIndex the generalized index of the particle to be returned
+    * @return a particle in the decay tree of the root particle.
+    */
+    const MCParticle* getParticleFromGeneralizedIndexString(const std::string& generalizedIndex) const;
 
   protected:
 

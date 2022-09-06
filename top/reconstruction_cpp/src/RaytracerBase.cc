@@ -15,14 +15,16 @@ namespace Belle2 {
   namespace TOP {
 
     RaytracerBase::BarSegment::BarSegment(const TOPGeoBarSegment& bar, double zLeft):
-      A(bar.getWidth()), B(bar.getThickness()), zL(zLeft), reflectivity(bar.getSurfaceReflectivity(3.0))
+      A(bar.getWidth()), B(bar.getThickness()), zL(zLeft), reflectivity(bar.getSurfaceReflectivity(3.0)),
+      sigmaAlpha(bar.getSigmaAlpha())
     {
       zR = zL + bar.getFullLength();
     }
 
 
     RaytracerBase::BarSegment::BarSegment(const TOPGeoModule& module):
-      A(module.getBarWidth()), B(module.getBarThickness()), reflectivity(module.getSurfaceReflectivity(3.0))
+      A(module.getBarWidth()), B(module.getBarThickness()), reflectivity(module.getSurfaceReflectivity(3.0)),
+      sigmaAlpha(module.getSigmaAlpha())
 
     {
       zL = -module.getBarLength() / 2;
@@ -91,6 +93,22 @@ namespace Belle2 {
       }
     }
 
+    void RaytracerBase::setMirrorCenter(double xc, double yc)
+    {
+      m_mirror.xc = xc;
+      m_mirror.yc = yc;
+
+      double zc = m_mirror.zc;
+      double R = m_mirror.R;
+      double zb = zc + R;
+      double Ah = m_bars.back().A / 2;
+      double Bh = m_bars.back().B / 2;
+      zb = std::min(zb, zc + sqrt(pow(R, 2) - pow(xc - Ah, 2) - pow(yc - Bh, 2)));
+      zb = std::min(zb, zc + sqrt(pow(R, 2) - pow(xc + Ah, 2) - pow(yc - Bh, 2)));
+      zb = std::min(zb, zc + sqrt(pow(R, 2) - pow(xc - Ah, 2) - pow(yc + Bh, 2)));
+      zb = std::min(zb, zc + sqrt(pow(R, 2) - pow(xc + Ah, 2) - pow(yc + Bh, 2)));
+      m_mirror.zb = zb;
+    }
 
 
   } // TOP

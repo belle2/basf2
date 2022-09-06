@@ -90,7 +90,7 @@ int main(int argc, char* argv[])
     std::cerr << "Unknown method " << general_options.m_method << std::endl;
   }
 
-  Belle2::MVA::teacher(general_options, *specific_options[general_options.m_method], meta_options);
+  Belle2::MVA::Utility::teacher(general_options, *specific_options[general_options.m_method], meta_options);
 
   return 0;
 

@@ -88,11 +88,23 @@ namespace Belle2 {
 
     /**
      * Set the 3D (clusterTheta, p, charge) grid representing the categories for which weightfiles are defined.
-     * @param h the 3D histogram.
+     * @param clusterThetaBins array of clusterTheta bin edges
+     * @param nClusterThetaBins number of clusterTheta bins
+     * @param pBins array of p bin edges
+     * @param nPBins number of p bins
+     * @param chargeBins array of charge bin edges
+     * @param nChargeBins number of charge bins
     */
-    void setWeightCategories(TH3F* h)
+    void setWeightCategories(const double* clusterThetaBins, const int nClusterThetaBins,
+                             const double* pBins, const int nPBins,
+                             const double* chargeBins, const int nChargeBins)
     {
-      m_categories = h;
+
+      m_categories = std::make_unique<TH3F>("clustertheta_p_charge_binsgrid",
+                                            ";ECL cluster #theta;p_{lab}; Q",
+                                            nClusterThetaBins, clusterThetaBins,
+                                            nPBins, pBins,
+                                            nChargeBins, chargeBins);
     }
 
     /**
@@ -240,6 +252,16 @@ namespace Belle2 {
 
 
     /**
+     * Get the raw pointer to the 3D (clusterTheta, p, charge) grid representing the categories for which weightfiles are defined.
+     * Used just to view the stored data.
+     */
+    const TH3F* getWeightCategories() const
+    {
+      return m_categories.get();
+    }
+
+
+    /**
      * Given a particle mass hypothesis' pdgId,
      * get the list of (serialized) MVA weightfiles stored in the payload, one for each (clusterTheta, p, charge) category.
      * @param pdg the particle mass hypothesis' pdgId.
@@ -309,7 +331,7 @@ namespace Belle2 {
       int nbins_th = m_categories->GetXaxis()->GetNbins(); // nr. of clusterTheta (visible) bins, along X.
       int nbins_p = m_categories->GetYaxis()->GetNbins(); // nr. of p (visible) bins, along Y.
 
-      int glob_bin_idx = findBin(m_categories, clusterTheta / m_ang_unit.GetVal(), p / m_energy_unit.GetVal(), charge);
+      int glob_bin_idx = findBin(clusterTheta / m_ang_unit.GetVal(), p / m_energy_unit.GetVal(), charge);
       m_categories->GetBinXYZ(glob_bin_idx, idx_theta, idx_p, idx_charge);
 
       // The index of the linearised 3D (clusterTheta, p, charge) m_categories.
@@ -405,20 +427,19 @@ namespace Belle2 {
 
 
     /**
-     * Find global bin index of a 3D histogram for the given (x, y, z) values.
+     * Find global bin index of the 3D categories histogram for the given (x, y, z) values.
      * This method had to be re-implemented b/c ROOT has no const version of TH1::FindBin() :(
-     * @param h 3D histogram.
      * @param x value along the x axis.
      * @param y value along the y axis.
      * @param z value along the z axis.
      * @return the global linearised bin index.
     */
-    int findBin(const TH3F* h, const double& x, const double& y, const double& z) const
+    int findBin(const double& x, const double& y, const double& z) const
     {
 
-      int nbinsx_vis = h->GetXaxis()->GetNbins();
-      int nbinsy_vis = h->GetYaxis()->GetNbins();
-      int nbinsz_vis = h->GetZaxis()->GetNbins();
+      int nbinsx_vis = m_categories->GetXaxis()->GetNbins();
+      int nbinsy_vis = m_categories->GetYaxis()->GetNbins();
+      int nbinsz_vis = m_categories->GetZaxis()->GetNbins();
 
       double xx = x;
       double yy = y;
@@ -426,19 +447,19 @@ namespace Belle2 {
 
       // If x, y, z are outside of the 3D grid (visible) range, set their value to
       // fall in the last (first) bin before (after) overflow (underflow).
-      if (x < h->GetXaxis()->GetBinLowEdge(1)) { xx = h->GetXaxis()->GetBinCenter(1); }
-      if (x >= h->GetXaxis()->GetBinLowEdge(nbinsx_vis + 1)) { xx = h->GetXaxis()->GetBinCenter(nbinsx_vis); }
-      if (y < h->GetYaxis()->GetBinLowEdge(1)) { yy = h->GetYaxis()->GetBinCenter(1); }
-      if (y >= h->GetYaxis()->GetBinLowEdge(nbinsy_vis + 1)) { yy = h->GetYaxis()->GetBinCenter(nbinsy_vis); }
-      if (z < h->GetZaxis()->GetBinLowEdge(1)) { zz = h->GetZaxis()->GetBinCenter(1); }
-      if (z >= h->GetZaxis()->GetBinLowEdge(nbinsz_vis + 1)) { zz = h->GetZaxis()->GetBinCenter(nbinsz_vis); }
+      if (x < m_categories->GetXaxis()->GetBinLowEdge(1)) { xx = m_categories->GetXaxis()->GetBinCenter(1); }
+      if (x >= m_categories->GetXaxis()->GetBinLowEdge(nbinsx_vis + 1)) { xx = m_categories->GetXaxis()->GetBinCenter(nbinsx_vis); }
+      if (y < m_categories->GetYaxis()->GetBinLowEdge(1)) { yy = m_categories->GetYaxis()->GetBinCenter(1); }
+      if (y >= m_categories->GetYaxis()->GetBinLowEdge(nbinsy_vis + 1)) { yy = m_categories->GetYaxis()->GetBinCenter(nbinsy_vis); }
+      if (z < m_categories->GetZaxis()->GetBinLowEdge(1)) { zz = m_categories->GetZaxis()->GetBinCenter(1); }
+      if (z >= m_categories->GetZaxis()->GetBinLowEdge(nbinsz_vis + 1)) { zz = m_categories->GetZaxis()->GetBinCenter(nbinsz_vis); }
 
-      int nbinsx = h->GetXaxis()->GetNbins() + 2;
-      int nbinsy = h->GetYaxis()->GetNbins() + 2;
+      int nbinsx = m_categories->GetXaxis()->GetNbins() + 2;
+      int nbinsy = m_categories->GetYaxis()->GetNbins() + 2;
 
-      int j = h->GetXaxis()->FindBin(xx);
-      int i = h->GetYaxis()->FindBin(yy);
-      int k = h->GetZaxis()->FindBin(zz);
+      int j = m_categories->GetXaxis()->FindBin(xx);
+      int i = m_categories->GetYaxis()->FindBin(yy);
+      int k = m_categories->GetZaxis()->FindBin(zz);
 
       return j + nbinsx * (i + nbinsy * k);
     }
@@ -455,7 +476,7 @@ namespace Belle2 {
      * A 3D (clusterTheta, p, charge) histogram whose bins represent the categories for which XML weight files are defined.
       * It is used to lookup the correct file in the payload, given a reconstructed set of (clusterTheta, p, charge).
      */
-    TH3F* m_categories = nullptr;
+    std::unique_ptr<TH3F> m_categories;
 
 
     /**
@@ -496,7 +517,8 @@ namespace Belle2 {
     };
 
 
-    ClassDef(ChargedPidMVAWeights, 7);
+    ClassDef(ChargedPidMVAWeights, 8);
+    /**< 8. Use unique_ptr for m_categories. */
     /**< 7. Use double instead of float in tuple. */
     /**< 6. Introduce charge bin in the parametrisation. */
     /**< 5. remove 2D grid dependence on pdgId, add multi-class support, define enum for valid training modes */

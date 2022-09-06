@@ -69,18 +69,19 @@ namespace Belle2 {
 
     Chi2MinimumFinder1D& Chi2MinimumFinder1D::add(const Chi2MinimumFinder1D& other)
     {
-      if (other.getXmin() !=  m_xmin or other.getXmax() !=  m_xmax or
-          other.getBinCenters().size() != m_x.size()) {
-        B2ERROR("Chi2MinimumFinder1D::add: finders with different ranges or binning "
-                "can't be added");
-        return *this;
+      if (m_x.empty()) {
+        *this = other;
+      } else if (other.getBinCenters().size() == m_x.size() and other.getXmin() == m_xmin and other.getXmax() == m_xmax) {
+        const auto& chi2 = other.getChi2Values();
+        for (unsigned i = 0; i < m_chi2.size(); i++) {
+          m_chi2[i] += chi2[i];
+        }
+        m_entries += other.getEntries();
+        m_searched = false;
+      } else {
+        B2ERROR("Chi2MinimumFinder1D::add: finders with different ranges or binning can't be added");
       }
-      const auto& chi2 = other.getChi2Values();
-      for (unsigned i = 0; i < m_chi2.size(); i++) {
-        m_chi2[i] += chi2[i];
-      }
-      m_entries += other.getEntries();
-      m_searched = false;
+
       return *this;
     }
 

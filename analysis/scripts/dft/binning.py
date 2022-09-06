@@ -224,13 +224,13 @@ def transform_to_probability_sf(value, sig_back_tuple, signal_fraction):
     p_signal = transform_to_probability(value, sig_back_tuple[0])
     p_background = transform_to_probability(value, sig_back_tuple[1])
     # print('Warning function %s is not tested yet' % transform_to_probability_sf.__name__)
-    # function transform to probability actually just evluates the pdf a given point
+    # function transform to probability actually just evaluates the pdf at a given point
 
     return trafo_to_prob_sf_func(p_signal, p_background, signal_fraction)
 
 
 def transform_array_to_probability_sf(arr, sig_back_tuple, signal_fraction):
-    """ transformation to probability. if smother output ("not peaky") is required, please implement spline
+    """ transformation to probability. if smoother output ("not peaky") is required, please implement spline
     interpolation
     :param arr: array to transform
     :param sig_back_tuple: np.array, signal pdf, background pdf of the trained classifier

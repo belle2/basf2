@@ -23,6 +23,7 @@ import basf2
 from tracking.validation.tolerate_missing_key_formatter import TolerateMissingKeyFormatter
 
 from tracking.validation.utilities import getObjectList
+from tracking.validation.utilities import getHelixFromMCParticle
 
 Belle2.RecoTrack.getRightLeftInformation["Belle2::CDCHit"]
 ROOT.gSystem.Load("libtracking")
@@ -54,7 +55,7 @@ def format_crop_keys(peel_func):
 @format_crop_keys
 def peel_mc_particle(mc_particle, key="{part_name}"):
     if mc_particle:
-        helix = get_helix_from_mc_particle(mc_particle)
+        helix = getHelixFromMCParticle(mc_particle)
         momentum = mc_particle.getMomentum()
         vertex = mc_particle.getVertex()
         charge = mc_particle.getCharge()
@@ -333,6 +334,7 @@ def peel_quality_indicators(reco_track, key="{part_name}"):
 def peel_trackfinder(reco_track, key="{part_name}"):
     used_CDCTrackFinder = False
     used_VXDTrackFinder = False
+    used_SVDHough = False
     used_SVDtoCDCCKF = False
     used_ECLtoCDCCKF = False
     used_CDCtoSVDCKF = False
@@ -343,6 +345,7 @@ def peel_trackfinder(reco_track, key="{part_name}"):
             svd_tf = info.getFoundByTrackFinder()
             used_VXDTrackFinder = svd_tf == Belle2.RecoHitInformation.c_VXDTrackFinder
             used_CDCtoSVDCKF = svd_tf == Belle2.RecoHitInformation.c_CDCtoSVDCKF
+            used_SVDHough = svd_tf == Belle2.RecoHitInformation.c_SVDHough
 
         if reco_track.getNumberOfCDCHits() > 0:
             info = get_reco_hit_information(reco_track, reco_track.getCDCHitList()[0])
@@ -354,6 +357,7 @@ def peel_trackfinder(reco_track, key="{part_name}"):
     crops = dict(
         foundby_CDCTrackFinder=used_CDCTrackFinder,
         foundby_VXDTrackFinder=used_VXDTrackFinder,
+        foundby_SVDHough=used_SVDHough,
         foundby_SVDtoCDCCKF=used_SVDtoCDCCKF,
         foundby_CDCtoSVDCKF=used_CDCtoSVDCKF,
         foundby_ECLtoCDCCKF=used_ECLtoCDCCKF,
@@ -630,17 +634,6 @@ def peel_module_statistics(modules=None, key="{part_name}"):
 
     return module_stats
 
-#: create a dictionary for MCParticle information
-
-
-def get_helix_from_mc_particle(mc_particle):
-    position = mc_particle.getVertex()
-    momentum = mc_particle.getMomentum()
-    charge_sign = (-1 if mc_particle.getCharge() < 0 else 1)
-    b_field = Belle2.BFieldManager.getField(position).Z() / Belle2.Unit.T
-
-    seed_helix = Belle2.Helix(position, momentum, charge_sign, b_field)
-    return seed_helix
 
 #: create a dictionary for RecoTrack's seed values
 

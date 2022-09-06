@@ -13,7 +13,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(SVDDQMHitTime)
+REG_MODULE(SVDDQMHitTime);
 
 //---------------------------------
 SVDDQMHitTimeModule::SVDDQMHitTimeModule(): HistoModule()

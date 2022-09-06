@@ -8,15 +8,12 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-
 import os
 import json
 import tempfile
 import numpy as np
 import tensorflow as tf
 import pandas
-
-# was still important for some shared libraries at some point
 
 from basf2_mva_python_interface.tensorflow import State
 
@@ -29,8 +26,8 @@ from dft.TfData import TfDataBasf2, TfDataBasf2Stub
 def get_tensorflow_model(number_of_features, parameters):
     """
     generates the tensorflow model
-    :param number_of_features: int, number of features is handled separately
-    :param parameters:
+    :param int number_of_features: number of features is handled separately
+    :param dictionary parameters: additional parameters passed to tensorflow_dnn_model.DefaultModel
     :return:
     """
 
@@ -64,7 +61,6 @@ def get_tensorflow_model(number_of_features, parameters):
     mlp = tfm.MultilayerPerceptron.from_list(layers)
     model = tfm.DefaultModel(mlp, lr_dec_rate=lr_dec_rate, lr_init=lr_init, mom_init=mom_init, wd_coeffs=wd_coeffs,
                              min_epochs=min_epochs, max_epochs=max_epochs, stop_epochs=stop_epochs)
-
     return model
 
 
@@ -95,10 +91,6 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     # postprocessing parameters, from dictionary
     transform_to_probability = parameters.get('transform_to_probability', False)
 
-    # initialize session
-    tf.reset_default_graph()
-    gpu_options = tf.GPUOptions(allow_growth=True)
-
     # set random state
     if seed:
         print('Seed: ', seed)
@@ -106,11 +98,10 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
 
     # mask cuda devices
     os.environ['CUDA_VISIBLE_DEVICES'] = cuda_mask
-    session = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options))
-
-    # initialize model
-    x = tf.placeholder(tf.float32, [None, number_of_features])
-    y = tf.placeholder(tf.float32, [None, 1])
+    gpus = tf.config.list_physical_devices('GPU')
+    if gpus:
+        for gpu in gpus:
+            tf.config.experimental.set_memory_growth(gpu, True)
 
     # using a stub data set since there is no data available at this state
     stub_data_set = TfDataBasf2Stub(batch_size, number_of_features, number_of_events, training_fraction)
@@ -120,9 +111,9 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     save_name = os.path.join(save_dir.name, 'mymodel')
 
     model = get_tensorflow_model(number_of_features, parameters)
-    training = tfm.Trainer(model, stub_data_set, session, tensorboard_dir, save_name, input_placeholders=[x, y])
+    training = tfm.Trainer(model, stub_data_set, tensorboard_dir, save_name)
 
-    state = State(x, y, session=session)
+    state = State(model)
 
     # training object is required in partial fit
     state.training = training
@@ -149,10 +140,10 @@ def apply(state, X):
     if len(X) > chunk_size:
         results = list()
         for i in range(0, len(X), chunk_size):
-            results.append(state.session.run(state.activation, feed_dict={state.x: X[i: i + chunk_size]}))
+            results.append(state.model(X).numpy().flatten())
         r = np.concatenate(results).flatten()
     else:
-        r = state.session.run(state.activation, feed_dict={state.x: X}).flatten()
+        r = state.model(X).numpy().flatten()
     if state.transform_to_probability:
         binning.transform_array_to_sf(r, state.sig_back_tuple, signal_fraction=.5)
 
@@ -164,17 +155,14 @@ def load(obj):
     Load Tensorflow estimator into state
     """
     # tensorflow operations
-    tf.reset_default_graph()
-    config = tf.ConfigProto()
-    config.gpu_options.allow_growth = True
-    session = tf.Session(config=config)
+    gpus = tf.config.list_physical_devices('GPU')
+    if gpus:
+        for gpu in gpus:
+            tf.config.experimental.set_memory_growth(gpu, True)
 
     parameters = json.loads(obj[0])
 
     number_of_features = parameters.pop('number_of_features')
-
-    x = tf.placeholder(tf.float32, [None, number_of_features])
-    y = tf.placeholder(tf.float32, [None, 1])
 
     class DataStub:
         """
@@ -184,8 +172,7 @@ def load(obj):
         batches = 1
 
     model = get_tensorflow_model(number_of_features, parameters)
-    model.initialize(DataStub(), [x, y])
-    saver = tf.train.Saver()
+    model.initialize(DataStub())
 
     # tensorflow is a moving target, file loading and saving of mid-level api changes rapidly. so we use the legacy here
     with tempfile.TemporaryDirectory() as path:
@@ -193,13 +180,11 @@ def load(obj):
                 os.path.join(path, obj[1] + '.index'), 'w+b') as file2:
             file1.write(bytes(obj[2]))
             file2.write(bytes(obj[3]))
-        tf.train.update_checkpoint_state(path, obj[1])
-        saver.restore(session, os.path.join(path, obj[1]))
 
-    # load and initialize required objects
-    state = State(x, y, session=session)
-    state.activation = model.mlp.output
+        checkpoint = tf.train.Checkpoint(model)
+        checkpoint.restore(os.path.join(path, obj[1]))
 
+    state = State(model)
     # preprocessing parameters
     state.binning_parameters = obj[4]
 
@@ -213,12 +198,11 @@ def load(obj):
     return state
 
 
-def begin_fit(state, Xtest, Stest, ytest, wtest):
+def begin_fit(state, Xtest, Stest, ytest, wtest, nBatches):
     """
     use test sets for monitoring
     """
     # TODO: split this set to define an independent test set for transformations to probability
-
     state.Xvalid = Xtest[:len(Xtest) // 2]
     state.yvalid = ytest[:len(ytest) // 2]
 
@@ -228,7 +212,7 @@ def begin_fit(state, Xtest, Stest, ytest, wtest):
     return state
 
 
-def partial_fit(state, X, S, y, w, epoch):
+def partial_fit(state, X, S, y, w, epoch, batch):
     """
     returns fractions of training and testing dataset, also uses weights
     :param X: unprocessed training dataset
@@ -236,8 +220,8 @@ def partial_fit(state, X, S, y, w, epoch):
     :return: bool, True == continue, False == stop iterations
     """
 
-    # training is performed in a single epoch
-    if epoch > 0:
+    # the epochs and batches are handled internally by the Trainer. This is all done within 1 external epoch and 1 external batch.
+    if epoch > 0 or batch > 0:
         raise RuntimeError
 
     # preprocessing
@@ -246,7 +230,7 @@ def partial_fit(state, X, S, y, w, epoch):
     binning.transform_ndarray(X, state.binning_parameters)
     binning.transform_ndarray(state.Xvalid, state.binning_parameters)
 
-    if np.all(np.isnan(X)):
+    if np.any(np.isnan(X)):
         raise ValueError('NaN values in Dataset. Preprocessing transformations failed.')
 
     # replace stub dataset
@@ -267,7 +251,8 @@ def end_fit(state):
     :return:
     """
     filename = state.training.save_name
-    with open(filename + '.data-00000-of-00001', 'rb') as file1, open(filename + '.index', 'rb') as file2:
+    # postfix -2 is needed (current state gets postfix -1)
+    with open(filename + '-2.data-00000-of-00001', 'rb') as file1, open(filename + '-2.index', 'rb') as file2:
         data1 = file1.read()
         data2 = file2.read()
     binning_parameters = state.binning_parameters
@@ -277,8 +262,7 @@ def end_fit(state):
     state.transform_to_probability = False
 
     # sample pdfs of trained model on test_dataset, return test df
-    state.get_from_collection()
-    y_hat = state(*state.Xtest)
+    y_hat = state.model(state.Xtest).numpy().flatten()
     test_df = pandas.DataFrame.from_dict({'y': state.ytest.reshape(-1), 'y_hat': y_hat.reshape(-1)})
     (sig_pdf, back_pdf) = binning.get_signal_background_pdf(test_df)
     seed = state.seed

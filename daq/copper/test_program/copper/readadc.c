@@ -36,7 +36,6 @@ void show_event(unsigned int *head, int len)
 unsigned int xor(unsigned int *start, int wordlen)
 {
     unsigned int ret = 0;
-    int i;
     while (wordlen--) {
 	ret ^= *(start++);
     }
@@ -70,7 +69,6 @@ main(int argc, char ** argv)
     int ret, i = 0;
     int fd;
     int maxevent = 0;
-    fd_set rfds, efds;
     int ch;
 
     while ((ch = getopt(argc, argv, "c:")) != -1) {
@@ -166,7 +164,7 @@ main(int argc, char ** argv)
 	    }
 	}
 
-	printf("%8d # of data = %4d,%4d,%4d,%4d, xor=%08x\n",
+	printf("%8d # of data = %4u,%4u,%4u,%4u, xor=%08x\n",
 	    event,
 	    buffer[9], buffer[10], buffer[11], buffer[12],
 	    xor((unsigned int *) buffer, ret / 4));

@@ -51,6 +51,9 @@ if __name__ == "__main__":
         "old: TagVmcOBoost --> new: mcTagVOBoost\n"
         "old: mcDeltaL --> new: mcDeltaBoost\n"
 	"old: L1TimQuality --> new: L1TimeQuality\n"
+
+        "The following variables have been renamed since release-06:\n"
+        "old: beamBackgroundProbabilityMVA --> new: beamBackgroundSuppression\n"
     )
     if args.pager:
         with Pager(r'Available variables in Variable\:\:Manager'):

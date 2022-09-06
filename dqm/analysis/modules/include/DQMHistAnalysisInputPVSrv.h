@@ -15,7 +15,7 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 //#include <THttpServer.h>
 
 #include <string>
@@ -49,17 +49,39 @@ namespace Belle2 {
     // Public functions
   public:
 
-    //! Constructor / Destructor
+    /**
+     * Constructor.
+     */
     DQMHistAnalysisInputPVSrvModule();
+
+    /**
+     * Destructor.
+     */
     virtual ~DQMHistAnalysisInputPVSrvModule();
 
-    //! Module functions to be called from main process
+    /**
+     * Definition of the histograms.
+     */
     virtual void initialize() override;
 
-    //! Module functions to be called from event process
+    /**
+     * Called when entering a new run.
+     */
     virtual void beginRun() override;
+
+    /**
+     * This method is called for each event.
+     */
     virtual void event() override;
+
+    /**
+     * This method is called if the current run ends.
+     */
     virtual void endRun() override;
+
+    /**
+     * This method is called at the end of the event processing.
+     */
     virtual void terminate() override;
 
     // Data members

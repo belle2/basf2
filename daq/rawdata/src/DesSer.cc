@@ -101,7 +101,7 @@ int* DesSer::getNewBuffer(int nwords, int* delete_flag)
 void DesSer::initialize(bool close_listen)
 {
   printf("[DEBUG] DesSer: initialize() started.\n"); fflush(stdout);
-  signal(SIGPIPE , SIG_IGN);
+  signal(SIGPIPE, SIG_IGN);
 
   //
   // initialize Rx part from DeSerializer**.cc
@@ -187,7 +187,7 @@ void DesSer::fillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl, RawDataBlo
   if (rawdblk->GetNumEntries() == 1) {
     if (total_send_nwords != (rawdblk->GetBuffer(0))[ 0 ] + 8) {
       char err_buf[500];
-      sprintf(err_buf, "Length error. total length %d rawdblk length %d. Exting...\n" ,
+      sprintf(err_buf, "Length error. total length %d rawdblk length %d. Exting...\n",
               total_send_nwords, (rawdblk->GetBuffer(0))[ 0 ]);
       printData(rawdblk->GetBuffer(0), rawdblk->TotalBufNwords());
       print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -210,7 +210,7 @@ void DesSer::fillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl, RawDataBlo
 
     //Error if you cannot find any COPPER block
     if (i == (rawdblk->GetNumEntries() - 1)) {
-      printf("[DEBUG] i= %d : num entries %d : Tot words %d\n", i , rawdblk->GetNumEntries(), rawdblk->TotalBufNwords());
+      printf("[DEBUG] i= %d : num entries %d : Tot words %d\n", i, rawdblk->GetNumEntries(), rawdblk->TotalBufNwords());
       printData(rawdblk->GetBuffer(0), rawdblk->TotalBufNwords());
 
       char err_buf[500] = "[FATAL] CORRUPTED DATA: No COPPER blocks in RawDataBlock. Exiting...";
@@ -262,7 +262,7 @@ int DesSer::sendByWriteV(RawDataBlockFormat* rawdblk)
         continue;
       } else {
         char err_buf[500];
-        sprintf(err_buf, "[WARNING] WRITEV error.(%s) : sent %d bytes, header %d bytes body %d trailer %d\n" ,
+        sprintf(err_buf, "[WARNING] WRITEV error.(%s) : sent %d bytes, header %lu bytes body %lu trailer %lu\n",
                 strerror(errno), n, iov[0].iov_len, iov[1].iov_len, iov[2].iov_len);
 #ifdef NONSTOP
         m_run_error = 1;
@@ -468,7 +468,7 @@ void DesSer::Accept(bool close_listen)
     m_status.setOutputPort(ntohs(sock_listen.sin_port));
     m_status.setOutputAddress(sock_listen.sin_addr.s_addr);
     //    B2INFO("Accepted " << (int)ntohs(sock_listen.sin_port) << " " << (int)sock_listen.sin_addr.s_addr);
-    printf("Accepted. port %d address %u\n", (int)ntohs(sock_listen.sin_port), (int)sock_listen.sin_addr.s_addr); fflush(stdout);
+    printf("Accepted. port %d address %d\n", (int)ntohs(sock_listen.sin_port), (int)sock_listen.sin_addr.s_addr); fflush(stdout);
   }
 
   return;
@@ -582,7 +582,7 @@ void DesSer::pauseRun()
 
 
 
-void DesSer::callCheckRunPause(string& err_str)
+void DesSer::callCheckRunPause(const string& err_str)
 {
 #ifdef NONSTOP_DEBUG
   printf("\033[34m");
@@ -629,7 +629,7 @@ int DesSer::CheckConnection(int socket)
         usleep(10000);
         eagain_cnt++;
       } else {
-        printf("ERROR %d errno %d err %s\n", socket , errno, strerror(errno)); fflush(stdout);
+        printf("ERROR %d errno %d err %s\n", socket, errno, strerror(errno)); fflush(stdout);
         close(socket);
         return -1;
       }
@@ -661,7 +661,7 @@ int DesSer::CheckConnection(int socket)
           usleep(10000);
           eagain_cnt++;
         } else {
-          printf("ERROR %d errno %d err %s\n", socket , errno, strerror(errno)); fflush(stdout);
+          printf("ERROR %d errno %d err %s\n", socket, errno, strerror(errno)); fflush(stdout);
           close(socket);
           return -1;
         }

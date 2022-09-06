@@ -27,9 +27,9 @@ namespace Belle2 {
     static std::string form(const std::string& string, ...);
     static std::string toupper(const std::string& str);
     static std::string tolower(const std::string& str);
-    static int atoi(const std::string str);
-    static double atof(const std::string str);
-    static long long atoll(const std::string str);
+    static int atoi(const std::string& str);
+    static double atof(const std::string& str);
+    static long long atoll(const std::string& str);
     static bool find(const std::string& s, const std::string& str);
     static bool isdigit(const std::string& s);
 

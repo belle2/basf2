@@ -14,7 +14,6 @@
 
 #include <tracking/dataobjects/RecoTrack.h>
 
-using namespace std;
 using namespace Belle2;
 
 bool CDCfromEclPathTruthVarSet::extract(const BaseCDCPathFilter::Object* path)

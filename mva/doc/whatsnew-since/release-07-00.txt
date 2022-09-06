@@ -1,0 +1,6 @@
+Changes in the mva package since release-07-00
+----------------------------------------------
+ * Updated the argument ``overwriteExistingExtraInfo`` of ``MVAExpert`` and ``MVAMultipleExperts`` modules so that
+   one can more flexibly choose to keep or overwrite existing information. Instead of a boolean users should now 
+   pass one of (-1/0/1/2). An existing extra info with the same name will be overwritten if the new value is
+   lower / will never be overwritten / will be overwritten if the new value is higher / will always be overwritten (option = -1/0/1/2).

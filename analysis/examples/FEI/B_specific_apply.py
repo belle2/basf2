@@ -23,8 +23,7 @@ import modularAnalysis as ma
 path = b2.create_path()
 
 # Load input ROOT file
-ma.inputMdst(environmentType='default',
-             filename=b2.find_file('mdst14.root', 'validation', False),
+ma.inputMdst(filename=b2.find_file('mdst14.root', 'validation', False),
              path=path)
 
 # Max 12 tracks per event - this avoids much computing time.
@@ -61,7 +60,7 @@ ma.buildRestOfEvent('B+:sig', path=path)
 clean_roe_mask = (
     'CleanROE',
     'dr < 2 and abs(dz) < 4',
-    'clusterE9E25 > 0.9 and clusterTiming < 50 and E > 0.9 and trackMatchType==0')
+    'clusterE9E25 > 0.9 and clusterTiming < 50 and E > 0.9 and clusterTrackMatch==0')
 ma.appendROEMasks('B+:sig', [clean_roe_mask], path=path)
 ma.applyCuts('B+:sig', 'roeDeltae(CleanROE) < 2.0 and roeMbc(CleanROE) > 4.8', path=path)
 

@@ -11,7 +11,7 @@
 using namespace Belle2;
 
 
-REG_MODULE(TrackQETrainingDataCollector)
+REG_MODULE(TrackQETrainingDataCollector);
 
 TrackQETrainingDataCollectorModule::TrackQETrainingDataCollectorModule() : Module()
 {

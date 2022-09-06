@@ -73,7 +73,7 @@ namespace Belle2 {
         int PDGEncoding = particle->GetPDGEncoding();
 
         TVector3 TPosition(worldPosition.x() * Unit::mm, worldPosition.y() * Unit::mm, worldPosition.z() * Unit::mm);
-        TVector3 TMomentum(momentum.x() * Unit::MeV, momentum.y() * Unit::MeV , momentum.z() * Unit::MeV);
+        TVector3 TMomentum(momentum.x() * Unit::MeV, momentum.y() * Unit::MeV, momentum.z() * Unit::MeV);
 
         // write the hit in datastore"
         StoreArray<ARICHAeroHit> aeroHits;

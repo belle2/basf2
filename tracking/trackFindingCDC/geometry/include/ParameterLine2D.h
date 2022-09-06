@@ -67,7 +67,7 @@ namespace Belle2 {
                                                 const EForwardBackward orientation)
       {
         return ParameterLine2D(Vector2D(0.0, intercept),
-                               Vector2D(orientation, orientation * slope));
+                               Vector2D(orientation, static_cast<double>(orientation) * slope));
       }
 
       /// Static constructor for a line between to points

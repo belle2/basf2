@@ -155,12 +155,11 @@ int UDPSocket::bind()
 size_t UDPSocket::write(const void* buf, size_t count)
 {
   size_t c = 0;
-  int ret;
   while (c < count) {
     errno = 0;
-    ret = sendto(m_fd, ((unsigned char*)buf + c),
-                 (count - c), 0,
-                 (struct sockaddr*)&m_addr, sizeof(m_addr));
+    int ret = sendto(m_fd, ((unsigned char*)buf + c),
+                     (count - c), 0,
+                     (struct sockaddr*)&m_addr, sizeof(m_addr));
     if (ret <= 0) {
       switch (errno) {
         case EINTR: continue;
@@ -181,12 +180,11 @@ size_t UDPSocket::write(const void* buf, size_t count)
 size_t UDPSocket::read(void* buf, size_t count)
 {
   size_t c = 0;
-  int ret;
   socklen_t addrlen = sizeof(m_remote_addr);
   while (true) {
     errno = 0;
-    ret = recvfrom(m_fd, ((unsigned char*)buf + c), (count - c), 0,
-                   (struct sockaddr*)&m_remote_addr, &addrlen);
+    int ret = recvfrom(m_fd, ((unsigned char*)buf + c), (count - c), 0,
+                       (struct sockaddr*)&m_remote_addr, &addrlen);
     if (ret <= 0) {
       switch (errno) {
         case EINTR: continue;

@@ -12,7 +12,7 @@ from sphinx.locale import _
 from sphinx.util.logging import getLogger
 
 
-__version__ = '0.5.2'
+__version__ = '1.0.0alpha1'
 __version_full__ = __version__
 
 logger = getLogger(__name__)
@@ -31,8 +31,9 @@ def config_initiated(app, config):
             _('The canonical_url option is deprecated, use the html_baseurl option from Sphinx instead.')
         )
 
-
 # See http://www.sphinx-doc.org/en/stable/theming.html#distribute-your-theme-as-a-python-package
+
+
 def setup(app):
     if python_version[0] < 3:
         logger.warning("Python 2 is deprecated with sphinx_rtd_theme, update to Python 3")

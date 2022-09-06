@@ -589,7 +589,7 @@ void Hough3DFinder::runFinderVersion2(const vector<double>& trackVariables, vect
   // z=0 wireDiff
   //double meanWireDiff[4] = { 3.08452, 2.61314, 2.84096, 3.06938 };
   // mean wire diff
-  double meanWireDiff[4] = { 3.68186, 3.3542, 3.9099, 4.48263 };
+  const double meanWireDiff[4] = { 3.68186, 3.3542, 3.9099, 4.48263 };
   for (int iLayer = 0; iLayer < 4; iLayer++) {
     if ((*m_geoCandidatesIndex)[iLayer].size() == 0) {
       //cout<<"No St Candidate in GeoFinder"<<endl;

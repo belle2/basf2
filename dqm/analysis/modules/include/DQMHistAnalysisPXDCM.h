@@ -7,23 +7,21 @@
  **************************************************************************/
 //+
 // File : DQMHistAnalysisPXDCM.h
-// Description : DAQM Analysis for PXD Common Modes
+// Description : DQM Analysis for PXD Common Modes
 //-
 
 #pragma once
+
+#include <dqm/core/DQMHistAnalysis.h>
 
 #ifdef _BELLE2_EPICS
 // EPICS
 #include "cadef.h"
 #endif
 
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
 #include <vxd/dataobjects/VxdID.h>
 
-#include <vector>
-#include <map>
 #include <TH2.h>
-#include <TCanvas.h>
 #include <TLine.h>
 
 namespace Belle2 {
@@ -34,19 +32,37 @@ namespace Belle2 {
     // Public functions
   public:
 
-    //! Constructor
+    /**
+     * Constructor.
+     */
     DQMHistAnalysisPXDCMModule();
-    //! Destructor
-    ~DQMHistAnalysisPXDCMModule();
-  private:
 
-    //! Module functions to be called from main process
+    /**
+     * Destructor.
+     */
+    ~DQMHistAnalysisPXDCMModule();
+
+    /**
+     * Initializer.
+     */
     void initialize(void) override final;
 
-    //! Module functions to be called from event process
+    /**
+     * Called when entering a new run.
+     */
     void beginRun(void) override final;
+
+    /**
+     * This method is called for each event.
+     */
     void event(void) override final;
+
+    /**
+     * This method is called at the end of the event processing.
+     */
     void terminate(void) override final;
+
+  private:
 
     // Data members
     //! name of histogram directory
@@ -77,6 +93,14 @@ namespace Belle2 {
     double m_errorOutsideFull{};
     /** threshold level/line for outside fraction */
     int m_upperLineFull{};
+
+    //! Module list for mask
+    std::vector <std::string> m_par_module_list;
+    //! Double-gate list for mask
+    std::vector <std::vector<int>> m_par_gate_list;
+
+    //! Module wise gate masking in CM plot and alarm
+    std::map <VxdID, std::vector<int>> m_masked_gates;
 
     //! IDs of all PXD Modules to iterate over
     std::vector<VxdID> m_PXDModules;

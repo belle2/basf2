@@ -8,13 +8,12 @@
 
 #pragma once
 
-#include <mdst/dataobjects/MCParticle.h>
-
-#include <TLorentzVector.h>
+#include <Math/Vector4D.h>
 
 #include <vector>
 
 namespace Belle2 {
+  class MCParticle;
   class Particle;
 
   namespace Variable {
@@ -210,7 +209,7 @@ namespace Belle2 {
     /**
      * Helper function: return total 4-momentum of all daughter neutrinos, recursively down decay tree
      */
-    TLorentzVector MCInvisibleP4(const MCParticle* mcparticle);
+    ROOT::Math::PxPyPzEVector MCInvisibleP4(const MCParticle* mcparticle);
 
     /**
      * return cosThetaBetweenParticleAndNominalB using B momentum with all (grand^n)daughter neutrino momenta subtracted
@@ -274,14 +273,14 @@ namespace Belle2 {
 
     /**
      * return number of steps to i-th daughter from the particle at generator level.
-     * return NaN, if no MCParticle is associated to the particle or the i-th daughter.
-     * return NaN, if i-th daughter does not exist.
+     * return 0, if no MCParticle is associated to the particle or the i-th daughter.
+     * return 0, if i-th daughter does not exist.
      */
     int genNStepsToDaughter(const Particle* particle, const std::vector<double>& arguments);
 
     /**
      * return number of missing daughters having assigned PDG codes
-     * return NaN, if the particle does not have related MC Particle
+     * return 0, if the particle does not have related MC Particle
      */
     int genNMissingDaughter(const Particle* particle, const std::vector<double>& arguments);
 
@@ -325,6 +324,14 @@ namespace Belle2 {
      * correspond to the track's mcmatch (== the particle)
      */
     double particleClusterBestMCPDGCode(const Particle*);
+
+    /**
+     * returns the sum of weights of all MCParticle for the Particle ->
+     * ECLCluster -> MCParticles relations. For charged particles,
+     * the track from which the Particle was created, must be matched to
+     * an ECLCluster
+     */
+    double particleClusterTotalMCMatchWeight(const Particle*);
 
     /**
      * returns 1 for crossfeed in reconstruction of a B meson, 0 for no crossfeed and

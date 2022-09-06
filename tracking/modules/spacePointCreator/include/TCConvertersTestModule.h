@@ -34,11 +34,11 @@ namespace Belle2 {
 
     TCConvertersTestModule(); /**< constructor */
 
-    void initialize() override; /*<< initialize: check if all required StoreArrays are present, initialize counters, etc. */
+    void initialize() override; /**< initialize: check if all required StoreArrays are present, initialize counters, etc. */
 
     void event() override; /**< event: event-wise jobs */
 
-    void terminate() override; /** terminate: print some summary information */
+    void terminate() override; /**< terminate: print some summary information */
 
     /** typedef to imitate a genfit::TrackCandHit */
     typedef std::tuple<int, int, int, double> trackCandHit;

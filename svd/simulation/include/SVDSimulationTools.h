@@ -149,7 +149,7 @@ namespace Belle2 {
     public:
       /** Constructor takes waveform function. */
       WaveGenerator(WaveformShape waveform = w_betaprime):
-        m_samples( {{0, 0, 0, 0, 0, 0}}), m_waveform(waveform)
+        m_samples({{0, 0, 0, 0, 0, 0}}), m_waveform(waveform)
       {}
       /** Set waveform */
       void setWaveform(WaveformShape waveform) { m_waveform = waveform; }

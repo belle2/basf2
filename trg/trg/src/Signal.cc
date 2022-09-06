@@ -503,7 +503,7 @@ namespace Belle2 {
       } else {
         _history.erase(_history.begin());
       }
-      if (_history.end()->time() < _clock->max()) {
+      if (_history.back().time() < _clock->max()) {
         TRGTime t0(_clock->max(), false, * _clock);
         _history.push_back(t0);
       } else {

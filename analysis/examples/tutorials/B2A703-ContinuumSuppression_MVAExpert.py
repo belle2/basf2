@@ -29,7 +29,6 @@
 import basf2 as b2
 import modularAnalysis as ma
 import sys
-import os
 
 
 # --I/O----------------------------------------------------------------------------------------
@@ -51,8 +50,7 @@ outfile = 'MVAExpert_fullNTuple_' + step + '.root'
 # Perform analysis.
 main = b2.create_path()
 
-ma.inputMdst(environmentType='default',
-             filename=input_file,
+ma.inputMdst(filename=input_file,
              path=main)
 
 ma.fillParticleList(decayString='gamma:all',

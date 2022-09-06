@@ -51,9 +51,8 @@ retry:
     }
 
     // Put the message in ring buffer
-    int irb = 0;
     for (;;) {
-      irb = rbuf->insq((int*)buf, *recsize);
+      int irb = rbuf->insq((int*)buf, *recsize);
       if (irb >= 0) break;
       //      usleep(100);
       usleep(20);

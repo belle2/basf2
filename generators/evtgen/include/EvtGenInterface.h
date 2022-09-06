@@ -41,9 +41,13 @@ namespace Belle2 {
     /**
      * Constructor.
      */
-    EvtGenInterface(): m_parent(0), m_Generator(0), m_pinit(0, 0, 0, 0),
+    EvtGenInterface():
+      m_parent(0),
+      m_Generator(0),
+      m_pinit(0, 0, 0, 0),
       m_ParentInitialized(false),
-      m_logCapture("EvtGen", LogConfig::c_Debug, LogConfig::c_Warning, 100, 100) {}
+      m_logCaptureDebug("EvtGen", LogConfig::c_Debug, LogConfig::c_Warning, 20, 20)
+    {}
 
     /**
      * Destructor.
@@ -55,7 +59,7 @@ namespace Belle2 {
               const std::string& userFileName = std::string(""), bool coherentMixing = true);
 
     /** Generate a single event */
-    int simulateEvent(MCParticleGraph& graph, TLorentzVector pParentParticle,
+    int simulateEvent(MCParticleGraph& graph, ROOT::Math::PxPyPzEVector pParentParticle,
                       TVector3 pPrimaryVertex, int inclusiveType, const std::string& inclusiveParticle);
 
     /** Simulate a particle decay. */
@@ -78,7 +82,7 @@ namespace Belle2 {
     EvtVector4R m_pinit;        /**<Variable needed for initial momentum. */
     EvtId m_ParentParticle;     /**<Variable needed for parent particle ID. */
     bool m_ParentInitialized;   /**< Whether parent particle is initialized. */
-    IOIntercept::OutputToLogMessages m_logCapture; /**< Capture evtgen log and transform into basf2 logging. */
+    IOIntercept::OutputToLogMessages m_logCaptureDebug; /**< Capture EvtGen log and transform into basf2 logging as B2DEBUG messages. */
   }; //! end of EvtGen Interface
 
 } //! end of Belle2 namespace

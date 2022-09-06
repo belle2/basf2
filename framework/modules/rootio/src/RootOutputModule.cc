@@ -39,7 +39,7 @@ using namespace RootIOUtilities;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(RootOutput)
+REG_MODULE(RootOutput);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -53,16 +53,16 @@ RootOutputModule::RootOutputModule() : Module(), m_file(nullptr), m_tree{0}, m_e
   setPropertyFlags(c_Output);
 
   //Parameter definition
-  addParam("outputFileName"  , m_outputFileName, "Name of the output file. Can be overridden using the -o argument to basf2.",
+  addParam("outputFileName", m_outputFileName, "Name of the output file. Can be overridden using the -o argument to basf2.",
            string("RootOutput.root"));
-  addParam("ignoreCommandLineOverride"  , m_ignoreCommandLineOverride,
+  addParam("ignoreCommandLineOverride", m_ignoreCommandLineOverride,
            "Ignore override of file name via command line argument -o. Useful if you have multiple output modules in one path.", false);
   addParam("compressionLevel", m_compressionLevel,
            "0 for no, 1 for low, 9 for high compression. Level 1 usually reduces size by >50%, higher levels have no noticeable effect. On typical hard disks, disabling compression reduces write time by 10-20 %, but almost doubles read time, so you probably should leave this turned on.",
            m_compressionLevel);
   addParam("compressionAlgorithm", m_compressionAlgorithm,
            "Set the Compression algorithm. Recommended values are 0 for default, 1 for zlib and 4 for lz4\n\n"
-           ".. versionadded:: release-03-00-00" , m_compressionAlgorithm);
+           ".. versionadded:: release-03-00-00", m_compressionAlgorithm);
   addParam("splitLevel", m_splitLevel,
            "Branch split level: determines up to which depth object members will be saved in separate sub-branches in the tree. For arrays or objects with custom streamers, -1 is used instead to ensure the streamers are used. The default (99) usually gives the highest read performance with RootInput.",
            99);

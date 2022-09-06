@@ -37,7 +37,6 @@ int main(int argc, char** argv)
   RingBuffer* rbuf = new RingBuffer(argv[1]);
   char* evbuf = new char[MAXEVTSIZE];
 
-  int eof = 0;
   for (;;) {
     // Get a record from ringbuf
     int size;
@@ -49,7 +48,6 @@ int main(int argc, char** argv)
     EvtMessage* msg = new EvtMessage(evbuf);
     if (msg->type() == MSG_TERMINATE) {
       printf("EoF found. Exitting.....\n");
-      eof = 1;
     }
 
     // Put the record in a file

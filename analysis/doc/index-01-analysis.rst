@@ -140,6 +140,11 @@ Advanced Topics
 
 .. toctree:: MVA
 
+.. toctree:: Priors
+
+.. toctree:: KsSelector
+
+.. toctree:: PIDCalibrationWeights
 
 .. _analysismodules:
 

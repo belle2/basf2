@@ -52,7 +52,7 @@ namespace Belle2 {
     /** returns version of TRGECLModule.*/
     std::string version(void) const;
 
-  private: // Parameters
+  private: //! Parameters
 
     /** Debug level.*/
     int _debugLevel;
@@ -60,8 +60,8 @@ namespace Belle2 {
     /** Config. file name.*/
     std::string _configFilename;
 
-    /// A pointer to a TRGECL;*/
-    //    TrgEcl* _ecl; */
+    //! A pointer to a TRGECL
+    //!    TrgEcl* _ecl; */
 
   protected:
     //! Input array name.
@@ -118,6 +118,8 @@ namespace Belle2 {
     double _mumuThreshold;
     //! mumu bit  Angle
     std::vector<double> _mumuAngle;
+    //! Angle selection of additional Bhabha veto in CM frame
+    std::vector<double> m_3DBhabhaAddAngleCut;
     //! The number of Cluster exceeding 300 MeV
     int _n300MeVCluster;
     //!ECL Burst Bit Threshold
@@ -126,20 +128,37 @@ namespace Belle2 {
     std::vector<double> _TotalEnergy;
     //! Low Multiplicity Threshold
     std::vector<double> _LowMultiThreshold;
-    // Theta region (low, high) of 3D Bhabha Veto InTrack
+    //! Theta region (low, high) of 3D Bhabha Veto InTrack
     std::vector<int> m_3DBhabhaVetoInTrackThetaRegion;
-    // Energy threshold(low, high) of event timing quality flag (GeV)
+    //! Energy threshold(low, high) of event timing quality flag (GeV)
     std::vector<double> m_EventTimingQualityThresholds;
     //! taub2b 2 cluster angle cut (degree)
-    // (dphi low, dphi high, theta_sum low, theta_sum high)
+    //! (dphi low, dphi high, theta_sum low, theta_sum high)
     std::vector<int> m_taub2bAngleCut;
     //! taub2b total energy (TC theta ID =1-17) (GeV)
     double m_taub2bEtotCut;
     //! taub2b Cluster energy selection (GeV)
     double m_taub2bClusterECut1;
+    //! taub2b Cluster energy selection (GeV)
     double m_taub2bClusterECut2;
-    //! The number of Cluster exceeding 300 MeV
-
+    //! taub2b2 total energy cut (GeV)
+    double m_taub2b2EtotCut;
+    //! taub2b2 two Cluster angle cut (degree)
+    std::vector<int> m_taub2b2AngleCut;
+    //! taub2b2 cluster energy cut for endcap cluster (GeV)
+    double m_taub2b2CLEEndcapCut;
+    //! taub2b2 cluster energy cut (GeV)
+    double m_taub2b2CLECut;
+    //! taub2b3 total energy cut in lab (GeV)
+    double m_taub2b3EtotCut;
+    //! taub2b3 two Cluster angle cut in cms (degree)
+    std::vector<int> m_taub2b3AngleCut;
+    //! taub2b3 cluster energy cut in lab for one of b2b clusters (GeV)
+    double m_taub2b3CLEb2bCut;
+    //! taub2b3 cluster energy low cut in lab for all clusters (GeV)
+    double m_taub2b3CLELowCut;
+    //! taub2b3 cluster energy high cut in lab for all clusters (GeV)
+    double m_taub2b3CLEHighCut;
     /** output for TRGECLHit */
     StoreArray<TRGECLHit> m_TRGECLHit;
     /** output for TRGECLTrg */

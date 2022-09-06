@@ -1284,7 +1284,7 @@ def applyCuts(list_name, cut, path):
     path.add_module(pselect)
 
 
-def applyEventCuts(cut, path):
+def applyEventCuts(cut, path, metavariables=None):
     """
     Removes events that do not pass the ``cut`` (given selection criteria).
 
@@ -1302,6 +1302,7 @@ def applyEventCuts(cut, path):
     Parameters:
         cut (str): Events that do not pass these selection criteria are skipped
         path (basf2.Path): modules are added to this path
+        metavariables (list(str)): List of meta variables to be considered in decomposition of cut
     """
     import b2parser
     from variables import variables
@@ -1325,7 +1326,10 @@ def applyEventCuts(cut, path):
                    'tan', 'atan',
                    'sin', 'asin',
                    'exp', 'log', 'log10',
-                   'min', 'max']
+                   'min', 'max',
+                   'isNAN']
+    if metavariables:
+        metavar_ids += metavariables
     parsed_cut = b2parser.parse(cut)
     var_list = []
     meta_list = []

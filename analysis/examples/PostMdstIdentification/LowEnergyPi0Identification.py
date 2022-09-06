@@ -22,8 +22,6 @@ from variables import variables
 
 # Arguments.
 parser = argparse.ArgumentParser()
-parser.add_argument('input_file', default=None, help='Input file.')
-parser.add_argument('output_file', default=None, help='Output file.')
 parser.add_argument('--belle1', action='store_true',
                     help='Belle 1 data analysis.')
 arguments = parser.parse_args()
@@ -32,7 +30,8 @@ arguments = parser.parse_args()
 analysis_path = basf2.create_path()
 
 # Load input file.
-ma.inputMdst(arguments.input_file, path=analysis_path)
+ma.inputMdst(filename=basf2.find_file("mdst14.root", "validation"),
+             path=analysis_path)
 
 # Reconstruction of photons.
 gamma_list = 'gamma:all'
@@ -60,7 +59,8 @@ variables.addAlias('identification', 'extraInfo(lowEnergyPi0Identification)')
 pi0_vars = vc.kinematics + ['InvM', 'identification']
 
 # Output file.
-ma.variablesToNtuple('pi0:gamma', pi0_vars, filename=arguments.output_file, treename='t1', path=analysis_path)
+filename = 'pi0_identification.root'
+ma.variablesToNtuple('pi0:gamma', pi0_vars, filename=filename, treename='t1', path=analysis_path)
 
 # Progress.
 analysis_path.add_module('Progress')

@@ -117,7 +117,7 @@ Name                    Description
 *Xyz***Base**           a class whose main purpose is to serve as a base class for derived classes
 Abc*Xyz*                Classes derived from *Xyz***Base**
 *Xyz***Error**          an exception class
-====================== ==========================================================================
+======================  ==========================================================================
 
 .. _class_naming_conventions:
 

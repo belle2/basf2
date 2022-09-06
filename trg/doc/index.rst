@@ -13,6 +13,7 @@ C++ source code. By default, TSIM is performed event by event (“fast
 simulation” mode), and clock by clock behavior is not perfectly
 simulated (“full simulation” mode).
 
+.. _trigger_bits:
 
 Trigger Bits
 ------------

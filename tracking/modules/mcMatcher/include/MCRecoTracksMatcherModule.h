@@ -133,10 +133,10 @@ namespace Belle2 {
 
   private: //Parameters
     //! Parameter : RecoTracks StoreArray name from the pattern recognition
-    std::string m_PRRecoTracksStoreArrayName;
+    std::string m_prRecoTracksStoreArrayName;
 
     //! Parameter : RecoTracks StoreArray name from the MC recognition
-    std::string m_MCRecoTracksStoreArrayName;
+    std::string m_mcRecoTracksStoreArrayName;
 
     //! Parameter : Tracks StoreArray
     std::string m_TracksStoreArrayName;

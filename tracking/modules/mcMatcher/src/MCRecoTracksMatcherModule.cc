@@ -149,13 +149,13 @@ MCRecoTracksMatcherModule::MCRecoTracksMatcherModule()
 
   //Parameter definition
   // Inputs
-  addParam("PRRecoTracksStoreArrayName",
-           m_PRRecoTracksStoreArrayName,
+  addParam("prRecoTracksStoreArrayName",
+           m_prRecoTracksStoreArrayName,
            "Name of the collection containing the tracks as generate a patter recognition algorithm to be evaluated ",
            std::string(""));
 
-  addParam("MCRecoTracksStoreArrayName",
-           m_MCRecoTracksStoreArrayName,
+  addParam("mcRecoTracksStoreArrayName",
+           m_mcRecoTracksStoreArrayName,
            "Name of the collection containing the reference tracks as generate by a Monte-Carlo-Tracker (e.g. MCTrackFinder)",
            std::string("MCGFTrackCands"));
 
@@ -212,8 +212,8 @@ void MCRecoTracksMatcherModule::initialize()
 
     // Require both RecoTrack arrays and the MCParticles to be present in the DataStore
     m_MCParticles.isRequired();
-    m_PRRecoTracks.isRequired(m_PRRecoTracksStoreArrayName);
-    m_MCRecoTracks.isRequired(m_MCRecoTracksStoreArrayName);
+    m_PRRecoTracks.isRequired(m_prRecoTracksStoreArrayName);
+    m_MCRecoTracks.isRequired(m_mcRecoTracksStoreArrayName);
 
     // Purity relation - for each PRTrack to store the purest MCTrack
     m_PRRecoTracks.registerRelationTo(m_MCRecoTracks);
@@ -244,12 +244,6 @@ void MCRecoTracksMatcherModule::initialize()
       m_CDCHits.isOptional();
     }
   }
-
-//   if (m_useFittedTracks) {
-//     m_Tracks.isRequired(m_TracksStoreArrayName);
-//   } else {
-//     m_Tracks.isOptional(m_TracksStoreArrayName);
-//   }
 }
 
 void MCRecoTracksMatcherModule::event()

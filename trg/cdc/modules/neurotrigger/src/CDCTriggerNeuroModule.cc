@@ -64,7 +64,7 @@ CDCTriggerNeuroModule::CDCTriggerNeuroModule() : Module()
            "option on how to obtain the event time. When left blank, the value "
            "is loaded from the Conditions Database. Possibilities are: "
            "'etf_only', 'fastestpriority', 'zero', 'etf_or_fastestpriority', "
-           "'etf_or_zero', 'etf_or_fastest2d', 'fastest2d', 'etfcc' for the unpacked etf in the corresponding cc, 'etfcc_or_fastestpriority', 'etfcc_or_zero', 'etfhwin' for the recalculated time used in hw input. Last two options are only available for neurotrackinputode.",
+           "'etf_or_zero', 'etf_or_fastest2d', 'fastest2d','min_etf_fastestpriority' (take the smaller one), 'etfcc' for the unpacked etf in the corresponding cc, 'etfcc_or_fastestpriority', 'etfcc_or_zero', 'etfhwin' for the recalculated time used in hw input. Last two options are only available for neurotrackinputode.",
            string(""));
   addParam("writeMLPinput", m_writeMLPinput,
            "if true, the MLP input vector will be written to the datastore "
@@ -147,6 +147,22 @@ CDCTriggerNeuroModule::event()
     // get the hit pattern (depends on phase space sector)
     unsigned long hitPattern =
       m_NeuroTrigger.getInputPattern(geoSectors[0], *m_tracks2D[itrack], m_neuroTrackInputMode);
+    // check, if enough axials are there. first, we select the axial bits from the
+    // hitpattern (341 = int('101010101',base=2)) and then check if the number of
+    // ones is equal or greater than 4.
+    bool tmpvalid = true;
+    if ((hitPattern & 341) != 341 && // this is an ugly workaround, because popcount is only
+        (hitPattern & 341) != 340 && // available with c++20 and newer
+        (hitPattern & 341) != 337 &&
+        (hitPattern & 341) != 325 &&
+        (hitPattern & 341) != 277 &&
+        (hitPattern & 341) != 85) {
+      B2DEBUG(250, "Not enough axial hits (<4), setting track invalid!");
+      tmpvalid = false;;
+    }
+    // get the complete hit pattern for debug purposes
+    unsigned long chitPattern =
+      m_NeuroTrigger.getCompleteHitPattern(geoSectors[0], *m_tracks2D[itrack], m_neuroTrackInputMode);
     // get the pure driftthreshold vector
     unsigned long puredriftth =
       m_NeuroTrigger.getPureDriftThreshold(geoSectors[0], *m_tracks2D[itrack], m_neuroTrackInputMode);
@@ -178,7 +194,8 @@ CDCTriggerNeuroModule::event()
     double z = (zIndex >= 0) ? target[zIndex] : 0.;
     int thetaIndex = m_NeuroTrigger[isector].thetaIndex();
     double cot = (thetaIndex >= 0) ? cos(target[thetaIndex]) / sin(target[thetaIndex]) : 0.;
-    bool valtrack = (m_neuroTrackInputMode) ? m_tracks2D[itrack]->getValidStereoBit() : true;
+    // old version: bool valtrack = (m_neuroTrackInputMode) ? m_tracks2D[itrack]->getValidStereoBit() : true;
+    bool valtrack = (m_neuroTrackInputMode) ? tmpvalid : true;
     std::vector<unsigned> tsvector(9, 0);
     for (unsigned i = 0; i < hitIds.size(); ++i) {
       tsvector[m_segmentHits[hitIds[i]]->getISuperLayer()] = m_segmentHits[hitIds[i]]->getLeftRight();

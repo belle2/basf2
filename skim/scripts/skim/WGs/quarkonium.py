@@ -181,6 +181,9 @@ class CharmoniumPsi(BaseSkim):
 
     def build_lists(self, path):
 
+        # Electron list. Exclude TOP
+        ma.fillParticleList('e+:loosepid', 'electronID_noTOP > 0.1', path=path)
+
         # Mass cuts.
         jpsi_mass_cut = '2.85 < M < 3.3'
         psi2s_mass_cut = '3.45 < M < 3.9'

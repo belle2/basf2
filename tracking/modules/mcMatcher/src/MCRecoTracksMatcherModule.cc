@@ -11,6 +11,8 @@
 #include <pxd/dataobjects/PXDCluster.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <cdc/dataobjects/CDCHit.h>
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/TrackFitResult.h>
 
 #include <map>
 
@@ -147,50 +149,60 @@ MCRecoTracksMatcherModule::MCRecoTracksMatcherModule()
 
   //Parameter definition
   // Inputs
-  addParam("prRecoTracksStoreArrayName",
-           m_param_prRecoTracksStoreArrayName,
+  addParam("PRRecoTracksStoreArrayName",
+           m_PRRecoTracksStoreArrayName,
            "Name of the collection containing the tracks as generate a patter recognition algorithm to be evaluated ",
            std::string(""));
 
-  addParam("mcRecoTracksStoreArrayName",
-           m_param_mcRecoTracksStoreArrayName,
+  addParam("MCRecoTracksStoreArrayName",
+           m_MCRecoTracksStoreArrayName,
            "Name of the collection containing the reference tracks as generate by a Monte-Carlo-Tracker (e.g. MCTrackFinder)",
            std::string("MCGFTrackCands"));
 
+  addParam("TracksStoreArrayName",
+           m_TracksStoreArrayName,
+           "Name of the Tracks StoreArray to be used when checking fitted tracks.",
+           std::string(""));
+
   // Hit content to be evaluated
   addParam("UsePXDHits",
-           m_param_usePXDHits,
+           m_usePXDHits,
            "Set true if PXDHits or PXDClusters should be used in the matching in case they are present",
            true);
 
   addParam("UseSVDHits",
-           m_param_useSVDHits,
+           m_useSVDHits,
            "Set true if SVDHits or SVDClusters should be used in the matching in case they are present",
            true);
 
   addParam("UseCDCHits",
-           m_param_useCDCHits,
+           m_useCDCHits,
            "Set true if CDCHits should be used in the matching in case they are present",
            true);
 
   addParam("UseOnlyAxialCDCHits",
-           m_param_useOnlyAxialCDCHits,
+           m_useOnlyAxialCDCHits,
            "Set true if only the axial CDCHits should be used",
            false);
 
   addParam("MinimalPurity",
-           m_param_minimalPurity,
+           m_minimalPurity,
            "Minimal purity of a PRTrack to be considered matchable to a MCTrack. "
            "This number encodes how many correct hits are minimally need to compensate for a false hits. "
            "The default 2.0 / 3.0 suggests that for each background hit can be compensated by two correct hits.",
            2.0 / 3.0);
 
   addParam("MinimalEfficiency",
-           m_param_minimalEfficiency,
+           m_minimalEfficiency,
            "Minimal efficiency of a MCTrack to be considered matchable to a PRTrack. "
            "This number encodes which fraction of the true hits must at least be in the reconstructed track. "
            "The default 0.05 suggests that at least 5% of the true hits should have been picked up.",
            0.05);
+
+  addParam("useFittedTracks",
+           m_useFittedTracks,
+           "Use fitted tracks for matching and include the charge of the fitted track into the matching checks?",
+           m_useFittedTracks);
 }
 
 void MCRecoTracksMatcherModule::initialize()
@@ -200,8 +212,8 @@ void MCRecoTracksMatcherModule::initialize()
 
     // Require both RecoTrack arrays and the MCParticles to be present in the DataStore
     m_MCParticles.isRequired();
-    m_PRRecoTracks.isRequired(m_param_prRecoTracksStoreArrayName);
-    m_MCRecoTracks.isRequired(m_param_mcRecoTracksStoreArrayName);
+    m_PRRecoTracks.isRequired(m_PRRecoTracksStoreArrayName);
+    m_MCRecoTracks.isRequired(m_MCRecoTracksStoreArrayName);
 
     // Purity relation - for each PRTrack to store the purest MCTrack
     m_PRRecoTracks.registerRelationTo(m_MCRecoTracks);
@@ -218,20 +230,26 @@ void MCRecoTracksMatcherModule::initialize()
     // Announce optional store arrays to the hits or clusters in case they should be used
     // We make them optional in case of limited detector setup.
     // PXD
-    if (m_param_usePXDHits) {
+    if (m_usePXDHits) {
       m_PXDClusters.isOptional();
     }
 
     // SVD
-    if (m_param_useSVDHits) {
+    if (m_useSVDHits) {
       m_SVDClusters.isOptional();
     }
 
     // CDC
-    if (m_param_useCDCHits) {
+    if (m_useCDCHits) {
       m_CDCHits.isOptional();
     }
   }
+
+//   if (m_useFittedTracks) {
+//     m_Tracks.isRequired(m_TracksStoreArrayName);
+//   } else {
+//     m_Tracks.isOptional(m_TracksStoreArrayName);
+//   }
 }
 
 void MCRecoTracksMatcherModule::event()
@@ -275,17 +293,17 @@ void MCRecoTracksMatcherModule::event()
   std::map<DetId, int> nHits_by_detId;
 
   // PXD
-  if (m_param_usePXDHits) {
+  if (m_usePXDHits) {
     nHits_by_detId[Const::PXD] = m_PXDClusters.getEntries();
   }
 
   // SVD
-  if (m_param_useSVDHits) {
+  if (m_useSVDHits) {
     nHits_by_detId[Const::SVD] = m_SVDClusters.getEntries();
   }
 
   // CDC
-  if (m_param_useCDCHits) {
+  if (m_useCDCHits) {
     nHits_by_detId[Const::CDC] = m_CDCHits.getEntries();
   }
 
@@ -319,7 +337,7 @@ void MCRecoTracksMatcherModule::event()
     for (HitId hitId = 0; hitId < nHits; ++hitId) {
       DetHitIdPair detId_hitId_pair(detId, hitId);
 
-      if (m_param_useOnlyAxialCDCHits and detId == Const::CDC) {
+      if (m_useOnlyAxialCDCHits and detId == Const::CDC) {
         StoreArray<CDCHit> cdcHits;
         const CDCHit* cdcHit = cdcHits[hitId];
         if (cdcHit->getISuperLayer() % 2 != 0) {
@@ -427,7 +445,7 @@ void MCRecoTracksMatcherModule::event()
     Purity bestPurity = purityMatrix.row(0)(mcId);
 
     // Reject efficiency smaller than the minimal one
-    if (bestWeightedEfficiency < m_param_minimalEfficiency) {
+    if (bestWeightedEfficiency < m_minimalEfficiency) {
       bestWeightedEfficiency = 0;
     }
 
@@ -440,7 +458,7 @@ void MCRecoTracksMatcherModule::event()
       Purity currentPurity = purityRow(mcId);
 
       // Reject efficiency smaller than the minimal one
-      if (currentWeightedEfficiency < m_param_minimalEfficiency) {
+      if (currentWeightedEfficiency < m_minimalEfficiency) {
         currentWeightedEfficiency = 0;
       }
 
@@ -519,7 +537,7 @@ void MCRecoTracksMatcherModule::event()
     const Purity& purity = mostPureMCId.purity;
 
     // GHOST
-    if (not(purity > 0) or not(purity >= m_param_minimalPurity)) {
+    if (not(purity > 0) or not(purity >= m_minimalPurity)) {
       prRecoTrack->setMatchingStatus(RecoTrack::MatchingStatus::c_ghost);
 
       B2DEBUG(23, "Stored PRTrack " << prId << " as ghost because of too low purity");
@@ -556,6 +574,33 @@ void MCRecoTracksMatcherModule::event()
 
     // MATCHED
     if (prId == mostWeightEfficientPRId) {
+      double MCParticleTrackCharge = mcParticle->getCharge();
+      double foundTrackCharge = prRecoTrack->getChargeSeed();
+      if (m_useFittedTracks) {
+        const RelationVector<Track> fittedTracks = prRecoTrack->getRelationsFrom<Track>(m_TracksStoreArrayName);
+        int nPositiveCharges = 0;
+        int nNegativeCharges = 0;
+        if (fittedTracks.size() > 0) {
+          for (const auto& fittedTrack : fittedTracks) {
+            const RelationVector<TrackFitResult> trackFitResults = fittedTrack.getRelationsFrom<TrackFitResult>();
+            if (trackFitResults.size() > 0) {
+              for (const auto& trackFitResult : trackFitResults) {
+                trackFitResult.getChargeSign() > 0 ? nPositiveCharges++ : nNegativeCharges++;
+              }
+            }
+          }
+        }
+        if (nPositiveCharges > 0 and nNegativeCharges > 0) {
+          B2DEBUG(23,
+                  "There are different charges attributed to the same track, this shouldn't happen. Continue with the majority of positive or negative charges");
+        }
+        foundTrackCharge = nPositiveCharges > nNegativeCharges ? 1 : -1;
+      }
+
+      if (foundTrackCharge != MCParticleTrackCharge) {
+        continue; // TODO we need something better here...
+      }
+
       // Setup the relation purity relation
       prRecoTrack->setMatchingStatus(RecoTrack::MatchingStatus::c_matched);
       prRecoTrack->addRelationTo(mcRecoTrack, purity);
@@ -574,7 +619,7 @@ void MCRecoTracksMatcherModule::event()
     // Pattern recognition track fails the minimal efficiency requirement to be matched.
     // We might want to introduce a different classification here, if we see problems
     // with too many ghosts and want to investigate the specific source of the mismatch.
-    if (not(weightedEfficiency >= m_param_minimalEfficiency)) {
+    if (not(weightedEfficiency >= m_minimalEfficiency)) {
       prRecoTrack->setMatchingStatus(RecoTrack::MatchingStatus::c_ghost);
       B2DEBUG(23, "Stored PRTrack " << prId << " as ghost because of too low efficiency.");
       ++nGhost;
@@ -636,7 +681,7 @@ void MCRecoTracksMatcherModule::event()
     // which in turn better describes a MCTrack different form this.
     // Setup the relation with negative weighted efficiency for this case.
     bool isMergedMCRecoTrack =
-      weightedEfficiency >= m_param_minimalEfficiency and
+      weightedEfficiency >= m_minimalEfficiency and
       (prRecoTrack->getMatchingStatus() == RecoTrack::MatchingStatus::c_matched or
        prRecoTrack->getMatchingStatus() == RecoTrack::MatchingStatus::c_clone);
 

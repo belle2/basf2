@@ -132,23 +132,29 @@ namespace Belle2 {
     void event() final;
 
   private: //Parameters
-    //! Parameter : RecoTracks store array name from the patter recognition
-    std::string m_param_prRecoTracksStoreArrayName;
+    //! Parameter : RecoTracks StoreArray name from the pattern recognition
+    std::string m_PRRecoTracksStoreArrayName;
 
-    //! Parameter : RecoTracks store array name from the mc recognition
-    std::string m_param_mcRecoTracksStoreArrayName;
+    //! Parameter : RecoTracks StoreArray name from the MC recognition
+    std::string m_MCRecoTracksStoreArrayName;
+
+    //! Parameter : Tracks StoreArray
+    std::string m_TracksStoreArrayName;
 
     //! Parameter : Switch whether PXDHits should be used in the matching
-    bool m_param_usePXDHits;
+    bool m_usePXDHits;
 
     //! Parameter : Switch whether SVDHits should be used in the matching
-    bool m_param_useSVDHits;
+    bool m_useSVDHits;
 
     //! Parameter : Switch whether CDCHits should be used in the matching
-    bool m_param_useCDCHits;
+    bool m_useCDCHits;
 
     //! Parameter : Switch whether only axial CDCHits should be used
-    bool m_param_useOnlyAxialCDCHits;
+    bool m_useOnlyAxialCDCHits;
+
+    //! Use fitted tracks for matching to be able to check the fitted charge
+    bool m_useFittedTracks = true;
 
     /*!
      *  Parameter : Minimal purity of a PRTrack to be considered matchable to a MCTrack.
@@ -156,7 +162,7 @@ namespace Belle2 {
      *  This number encodes how many correct hits are minimally need to compensate for a false hits.
      *  The default 2. / 3. suggests that for each background hit can be compensated by two correct hits.
      */
-    double m_param_minimalPurity;
+    double m_minimalPurity;
 
     /*!
      *  Parameter : Minimal efficiency for a MCTrack to be considered matchable to a PRTrack
@@ -164,7 +170,7 @@ namespace Belle2 {
      *  This number encodes which fraction of the true hits must at least be in the reconstructed track.
      *  The default 0.05 suggests that at least 5% of the true hits should have been picked up.
      */
-    double m_param_minimalEfficiency;
+    double m_minimalEfficiency;
 
     StoreArray<MCParticle>  m_MCParticles;  /**< StoreArray containing MCParticles */
     StoreArray<RecoTrack>   m_PRRecoTracks; /**< StoreArray containing PR RecoTracks */

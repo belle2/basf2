@@ -140,7 +140,7 @@ CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
           hEventT0nosync->Write();
           pfx->Write();
 
-          if (tfr->Status() != 0 && tfr->Status() != 4 && tfr->Status() != 4000) {
+          if (tfr.Get() == nullptr || (tfr->Status() != 0 && tfr->Status() != 4 && tfr->Status() != 4000)) {
             f->Close();
             B2FATAL("Fit to the histogram failed in SVDCoGTimeCalibrationAlgorithm. "
                     << "Check the 2-D histogram to clarify the reason.");

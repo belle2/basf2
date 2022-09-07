@@ -158,7 +158,7 @@ def main():
                 )
             )
         elif len(df.columns) == 9:
-            # If nine components to LPN, then we're dealing with the old data LPN schema,
+            # If nine components to LPN, then we're dealing with the new data LPN schema,
             # which includes an additional GeneralSkimName component
             columns = dict(
                 enumerate(
@@ -332,7 +332,7 @@ def main():
                     "mcType": MCEventType,
                     "mcBackground": args.bg,
                     "inputDataLevel": "mdst",
-                    "runNumber": runNumber,
+                    "runNumbers": runNumber,
                 }
 
     to_yaml(DataBlocks, args.output)

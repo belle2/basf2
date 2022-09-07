@@ -68,7 +68,7 @@ to create these YAML files from a list of LPNs.
         mcType: mixed
         mcBackground: BGx1
         inputDataLevel: mdst
-        runNumber: r00000
+        runNumbers: r00000
 
     MC12b_charged:
         sampleLabel: MC12_chargedBGx1
@@ -85,7 +85,7 @@ to create these YAML files from a list of LPNs.
         mcType: charged
         mcBackground: BGx1
         inputDataLevel: mdst
-        runNumber: 0
+        runNumbers: 0
 
 To produce JSON files for a list of combined skims, pass this tool the YAML file and the
 names of the skims. The other required arguments include the skim campaign,
@@ -223,21 +223,7 @@ def verify_registry(sampleRegistry, mcri, mcrd):
         sampleRegistry (dict): The input data/MC registry as a dict.
         mcri/mcrd (bool): Are these JSON files being produced for MCri/MCrd skims?
     """
-    expectedMCriEntries = [
-        "sampleLabel",
-        "LPNPrefix",
-        "inputReleaseNumber",
-        "inputDBGlobalTag",
-        "mcCampaign",
-        "prodNumber",
-        "experimentNumber",
-        "beamEnergy",
-        "inputDataLevel",
-        "mcType",
-        "mcBackground",
-        "runNumber",
-    ]
-    expectedMCrdEntries = [
+    expectedMCEntries = [
         "sampleLabel",
         "LPNPrefix",
         "inputReleaseNumber",
@@ -251,7 +237,9 @@ def verify_registry(sampleRegistry, mcri, mcrd):
         "mcBackground",
         "runNumbers",
     ]
+
     expectedDataEntries = [
+        "sampleLabel,",
         "LPNPrefix",
         "inputReleaseNumber",
         "inputDBGlobalTag",
@@ -261,21 +249,15 @@ def verify_registry(sampleRegistry, mcri, mcrd):
         "beamEnergy",
         "inputDataLevel",
         "runNumbers",
+        "generalSkimName",
     ]
 
     missingEntries = []
-    if mcri:
+    if mcri or mcrd:
         missingEntries = [
             (sampleLabel, expectedEntry)
             for (sampleLabel, sampleInfo) in sampleRegistry.items()
-            for expectedEntry in expectedMCriEntries
-            if expectedEntry not in sampleInfo.keys()
-        ]
-    elif mcrd:
-        missingEntries = [
-            (sampleLabel, expectedEntry)
-            for (sampleLabel, sampleInfo) in sampleRegistry.items()
-            for expectedEntry in expectedMCrdEntries
+            for expectedEntry in expectedMCEntries
             if expectedEntry not in sampleInfo.keys()
         ]
     else:
@@ -467,8 +449,8 @@ def get_lpn_list(sampleInfo, mcri, mcrd):
                 sampleInfo["inputDBGlobalTag"]
             ).zfill(8)
 
-        if not str(sampleInfo["runNumber"]).startswith("r"):
-            sampleInfo["runNumber"] = "r" + str(sampleInfo["runNumber"]).zfill(5)
+        if not str(sampleInfo["runNumbers"]).startswith("r"):
+            sampleInfo["runNumbers"] = "r" + str(sampleInfo["runNumbers"]).zfill(5)
 
         LPNList = [
             str(
@@ -480,7 +462,7 @@ def get_lpn_list(sampleInfo, mcri, mcrd):
                     prodNumber,
                     sampleInfo["experimentNumber"],
                     sampleInfo["beamEnergy"],
-                    sampleInfo["runNumber"],
+                    sampleInfo["runNumbers"],
                     sampleInfo["mcType"],
                     sampleInfo["inputDataLevel"],
                 )

@@ -46,6 +46,7 @@ add_simulation(main, components=['CDC'], bkgfiles=bg)
 simpleoutput = b2.register_module('RootOutput')
 simpleoutput.param('outputFileName', '../CDCOutputGen.root')
 main.add_module(simpleoutput)
+main.add_module('Progress')
 # generate events
 b2.process(main)
 

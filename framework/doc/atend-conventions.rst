@@ -180,6 +180,45 @@ other classes should be derived.
 Try to pass function parameters by value, const reference, or const pointer, especially
 if they are not meant to be changed in the function.
 
+Order of class members
+----------------------
+
+It is advisable to order the data members in the following order:
+
+1. ``std::string`` (has size of 32 bytes on 64 bit PCs as we usually use)
+
+2. ``double`` and ``long`` / ``unsigned long`` and pointers (have size of 8 bytes)
+
+3. ``float`` and ``int`` / ``unsigned int`` (have size of 4 bytes)
+
+4.  ``short`` / ``unsigned short`` (have size of 2 bytes)
+
+5. ``bool`` (has size of 1 byte)
+
+The reason for this order is how processors and memory work. Modern PCs usually have a
+so-called cache that holds data (data cache) and instructions (instruction cache) that
+either are used often, or expected to be used in the next O(100) clock cycles. The
+content of the cache is retrieved from memory in *cache lines* of up to 64 bytes. Thus
+the data should be ordered such that the bytes in the cache lines are filled.
+Although a ``bool`` technically can be represented by a single bit, it occupies a
+byte in memory as memory addresses are based on units of 1 byte, thus the smallest
+addressable chunk of memory is a byte but not a bit.
+
+In a simple example of a cache line of 16 bytes these should either be filled by two
+``double`` or four ``float`` or ``int``. Having a ``double`` followed by a ``bool``
+followed by another ``double`` would create 7 empty bytes that cannot be filled
+properly, and the second ``double`` would end up in the next cache line, potentially
+causing a `cache miss <https://www.geeksforgeeks.org/types-of-cache-misses/>`_.
+Cache misses can significantly slow down a program, as retrieving data from cache only
+costs a few CPU clock cycles, while retrieving data from RAM usually costs O(100) CPU
+clock cycles.
+
+Additionally, ordering the data types as described above will lead to a smaller memory
+footprint of the class, which is critical for basf2 on the HLT.
+
+Because usually classes contain several data members, there is no clear rule where to add
+classes as data members in other classes, usually it would be at position 1, 2, or 3.
+
 Initialisation
 --------------
 

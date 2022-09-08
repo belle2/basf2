@@ -30,35 +30,14 @@ settings = ValidationSettings(name='KLM time cabledelay',
                               description=__doc__,
                               download_files=['stdout'],
                               expert_config={
-                                  "chunk_size": 100
+                                  "chunk_size": 100,
+                                  "LowerTimeBoundaryRPC": -800.0,
+                                  "UpperTimeBoundaryRPC": -600.0,
+                                  "LowerTimeBoundaryScintilltorsBKLM": -4800.0,
+                                  "UpperTimeBoundaryScintilltorsBKLM": -4400.0,
+                                  "LowerTimeBoundaryScintilltorsEKLM": -4900.0,
+                                  "UpperTimeBoundaryScintilltorsEKLM": -4500.0,
                               })
-
-
-def save_graph_to_root(graph_name):
-    '''
-    Save a TGraph in a ROOT file.
-    '''
-    graph = ROOT.gPad.GetPrimitive('Graph')
-    assert isinstance(graph, ROOT.TGraph) == 1
-    graph.SetName(graph_name)
-    graph.Write()
-
-
-def save_graph_to_pdf(canvas, root_file, graph_name, exp, chunk):
-    '''
-    Save a drawn TGraph in a PDF file.
-    '''
-    graph = root_file.Get(graph_name)
-    assert isinstance(graph, ROOT.TGraph) == 1
-    graph.SetMarkerStyle(ROOT.EMarkerStyle.kFullDotSmall)
-    graph.SetMarkerColor(ROOT.EColor.kAzure + 10)
-    graph.GetXaxis().SetTitle(f'Exp. {exp} -- Run number')
-    graph.GetYaxis().SetTitle('time (ns)')
-    graph.SetMinimum(0.)
-    graph.SetMaximum(1.)
-    graph.Draw('AP')
-    ROOT.gPad.SetGridy()
-    canvas.SaveAs(f'time_cabledelay_exp{exp}_chunk{chunk}_{graph_name}.pdf')
 
 
 def run_validation(job_path, input_data_path, requested_iov, expert_config):
@@ -71,7 +50,14 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
 
     # Grab the expert configurations.
     expert_config = json.loads(expert_config)
+    print(expert_config)
     chunk_size = expert_config['chunk_size']
+    LowerTimeBoundaryRPC = expert_config['LowerTimeBoundaryRPC']
+    UpperTimeBoundaryRPC = expert_config['UpperTimeBoundaryRPC']
+    LowerTimeBoundaryScintilltorsBKLM = expert_config['LowerTimeBoundaryScintilltorsBKLM']
+    UpperTimeBoundaryScintilltorsBKLM = expert_config['UpperTimeBoundaryScintilltorsBKLM']
+    LowerTimeBoundaryScintilltorsEKLM = expert_config['LowerTimeBoundaryScintilltorsEKLM']
+    UpperTimeBoundaryScintilltorsEKLM = expert_config['UpperTimeBoundaryScintilltorsEKLM']
 
     # Ignore the ROOT command line options.
     ROOT.PyConfig.IgnoreCommandLineOptions = True  # noqa
@@ -132,9 +118,11 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
 
             gStyle.SetOptStat(1111111)
             gStyle.SetOptFit(1111)
-            barrel_RPC = TH1F("barrel_RPC", "time cable delay for Barrel RPC", 100, -800, -620)
-            barrel_scintillator = TH1F("barrel_scintillator", "time cable delay for Barrel scintillator", 100, -4800, -4450)
-            endcap_scintillator = TH1F("endcap_scintillator", "time cable delay for endcap scintillator", 100, -4900, -4500)
+            barrel_RPC = TH1F("barrel_RPC", "time cable delay for Barrel RPC", 100, LowerTimeBoundaryRPC, UpperTimeBoundaryRPC)
+            barrel_scintillator = TH1F("barrel_scintillator", "time cable delay for Barrel scintillator",
+                                       100, LowerTimeBoundaryScintilltorsBKLM, UpperTimeBoundaryScintilltorsBKLM)
+            endcap_scintillator = TH1F("endcap_scintillator", "time cable delay for endcap scintillator",
+                                       100, LowerTimeBoundaryScintilltorsEKLM, UpperTimeBoundaryScintilltorsEKLM)
 
             tree = input_file.Get("cabledelay")
             assert isinstance(tree, ROOT.TTree) == 1

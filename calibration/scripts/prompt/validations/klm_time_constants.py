@@ -34,33 +34,6 @@ settings = ValidationSettings(name='KLM time constants',
                               })
 
 
-def save_graph_to_root(graph_name):
-    '''
-    Save a TGraph in a ROOT file.
-    '''
-    graph = ROOT.gPad.GetPrimitive('Graph')
-    assert isinstance(graph, ROOT.TGraph) == 1
-    graph.SetName(graph_name)
-    graph.Write()
-
-
-def save_graph_to_pdf(canvas, root_file, graph_name, exp, chunk):
-    '''
-    Save a drawn TGraph in a PDF file.
-    '''
-    graph = root_file.Get(graph_name)
-    assert isinstance(graph, ROOT.TGraph) == 1
-    graph.SetMarkerStyle(ROOT.EMarkerStyle.kFullDotSmall)
-    graph.SetMarkerColor(ROOT.EColor.kAzure + 10)
-    graph.GetXaxis().SetTitle(f'Exp. {exp} -- Run number')
-    graph.GetYaxis().SetTitle('time (ns)')
-    graph.SetMinimum(0.)
-    graph.SetMaximum(1.)
-    graph.Draw('AP')
-    ROOT.gPad.SetGridy()
-    canvas.SaveAs(f'time_constants_exp{exp}_chunk{chunk}_{graph_name}.pdf')
-
-
 def run_validation(job_path, input_data_path, requested_iov, expert_config):
     '''
     Run the validation.
@@ -133,9 +106,9 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
             gStyle.SetOptFit(1111)
 
             barrel_RPCPhi = TH2F("barrel_RPCPhi",
-                                 "time constants for Barrel RPC phi readout", 100, 30000, 65000, 100, 0.004, 0.011)
+                                 "time constants for Barrel RPC phi readout", 100, 30000, 65000, 100, 0.004, 0.015)
             barrel_RPCZ = TH2F("barrel_RPCZ",
-                               "time constants for Barrel RPC Z readout", 100, 30000, 65000, 100, 0.0, 0.0015)
+                               "time constants for Barrel RPC Z readout", 100, 30000, 65000, 100, 0.0, 0.0025)
             barrel_scintillator = TH2F("barrel_scintillator",
                                        "time constants for Barrel scintillator", 100, 30000, 65000, 100, 0.075, 0.09)
             endcap_scintillator = TH2F("endcap_scintillator",

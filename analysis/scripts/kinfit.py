@@ -106,6 +106,52 @@ def fitKinematic3C(
     path.add_module(orca)
 
 
+def fitKinematic2C(
+        list_name,
+        fitterEngine='NewFitterGSL',
+        constraint='HardBeam',
+        daughtersUpdate=True,
+        addUnmeasuredPhotonAlongBeam="",
+        path=None,
+):
+    """
+    Perform 2C momentum constraint kinematic fit. The photon with unmeasured energy and theta
+    has to be the first particle in the decay string. If 'addUnmeasuredPhotonAlongBeam' is set to
+    'HER' or 'LER', both phi and theta (treated as measured) of this photon are then used. Concurrently,
+    an additional unmeasured photon along HER/LER will be taken into account in the fit, which means
+    the momentum is only constrained in the plane perpendicular to one of the beams.
+
+    @param list_name    name of the input ParticleList
+    @param fitterEngine which fitter engine to use? 'NewFitterGSL' or 'OPALFitterGSL'
+    @param constraint       HardBeam or RecoilMass
+    @param daughtersUpdate make copy of the daughters and update them after the vertex fit
+    @param addUnmeasuredPhotonAlongBeam add an unmeasured photon along beam if 'HER' or 'LER' is set
+    @param path         modules are added to this path
+    """
+
+    # Parameter check
+    assert addUnmeasuredPhotonAlongBeam in ["", "LER", "HER"]
+
+    orca = register_module('ParticleKinematicFitter')
+    orca.set_name('ParticleKinematicFitter_' + list_name)
+    orca.param('debugFitter', False)
+    orca.param('orcaTracer', 'None')
+    orca.param('orcaFitterEngine', fitterEngine)
+    orca.param('orcaConstraint', constraint)  # beam parameters automatically taken from database
+    orca.param('listName', list_name)
+    orca.param('updateDaughters', daughtersUpdate)
+    orca.param('add3CPhoton', True)
+    if addUnmeasuredPhotonAlongBeam == "":
+        orca.param('liftPhotonTheta', True)
+    else:
+        orca.param('addUnmeasuredPhoton', True)
+        if addUnmeasuredPhotonAlongBeam == "HER":
+            orca.param('fixUnmeasuredToHER', True)
+        else:  # should be LER
+            orca.param('fixUnmeasuredToLER', True)
+    path.add_module(orca)
+
+
 def MassfitKinematic1CRecoil(
     list_name,
     recoilMass,

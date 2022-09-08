@@ -23,10 +23,10 @@ namespace Belle2 {
   using namespace TOP;
 
   //-----------------------------------------------------------------
-  //                 Register module
+  ///                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPAligner)
+  REG_MODULE(TOPAligner);
 
 
   //-----------------------------------------------------------------
@@ -234,7 +234,7 @@ namespace Belle2 {
         resMsg += " ";
         resMsg += par;
       }
-      B2DEBUG(100, resMsg);
+      B2DEBUG(20, resMsg);
 
     }
 

@@ -18,9 +18,9 @@
 namespace Belle2 {
 
   class ECLDigit;
-  class ECLCalDigit;
   class Track;
   class ECLCrystalCalib;
+  class ECLCluster;
   class EventMetaData;
   class TRGSummary;
 
@@ -64,7 +64,8 @@ namespace Belle2 {
     StoreArray<ECLDigit> m_eclDigitArray; /**< Required input array of eclDigits */
     StoreObjPtr<EventMetaData> m_evtMetaData; /**< DataStore EventMetaData */
     StoreObjPtr<TRGSummary> m_TRGResults; /**< DataStore TRGSummary */
-    StoreArray<ECLCalDigit> m_eclCalDigitArray; /**< DataStore TRGSummary */
+    StoreArray<ECLCluster> m_eclClusterArray; /**< Required input array of ECLClusters */
+
 
     /** Some other useful quantities */
     double cotThetaLabMin{0.0};  /**< m_thetaLabMinDeg converted to cotangent */
@@ -80,9 +81,13 @@ namespace Belle2 {
     DBObjPtr<ECLCrystalCalib> m_ElectronicsCalib;
     std::vector<float> ElectronicsCalib; /**< vector obtained from DB object */
 
-    /** Existing single crystal calibration from DB; will be updated by CAF */
+    /** Existing single muon pair calibration from DB; will be updated by CAF */
     DBObjPtr<ECLCrystalCalib> m_MuMuECalib;
     std::vector<float> MuMuECalib; /**< vector obtained from DB object */
+
+    /** Existing single single calibration from DB is used to find expected E */
+    DBObjPtr<ECLCrystalCalib> m_CrystalEnergy;
+    std::vector<float> CrystalEnergy; /**< vector obtained from DB object */
 
   };
 }

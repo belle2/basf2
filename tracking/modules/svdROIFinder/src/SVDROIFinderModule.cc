@@ -11,13 +11,12 @@
 #include <framework/datastore/RelationArray.h>
 #include <genfit/MaterialEffects.h>
 
-using namespace std;
 using namespace Belle2;
 
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SVDROIFinder)
+REG_MODULE(SVDROIFinder);
 
 //-----------------------------------------------------------------
 //                 Implementation

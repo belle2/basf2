@@ -40,10 +40,10 @@ using namespace std;
 namespace Belle2 {
 
   //-----------------------------------------------------------------
-  //                 Register module
+  ///                Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(ARICHNtuple)
+  REG_MODULE(ARICHNtuple);
 
   //-----------------------------------------------------------------
   //                 Implementation
@@ -82,8 +82,8 @@ namespace Belle2 {
 
     m_tree->Branch("charge", &m_arich.charge, "charge/S");
     m_tree->Branch("pValue", &m_arich.pValue, "pValue/F");
-    m_tree->Branch("d0", &m_arich.z0, "pValue/F");
-    m_tree->Branch("z0", &m_arich.d0, "pValue/F");
+    m_tree->Branch("d0", &m_arich.z0, "d0/F");
+    m_tree->Branch("z0", &m_arich.d0, "z0/F");
 
 #ifdef ALIGNMENT_USING_BHABHA
     m_tree->Branch("eop", &m_arich.eop, "eop/F");
@@ -246,7 +246,7 @@ namespace Belle2 {
           m_arich.PDG = particle->getPDG();
           m_arich.primary = particle->getStatus(MCParticle::c_PrimaryParticle);
           m_arich.seen = particle->hasSeenInDetector(Const::ARICH);
-          TVector3 prodVertex = particle->getProductionVertex();
+          B2Vector3D prodVertex = particle->getProductionVertex();
           m_arich.rhoProd = prodVertex.Perp();
           m_arich.zProd = prodVertex.Z();
           m_arich.phiProd = prodVertex.Phi();
@@ -317,7 +317,7 @@ namespace Belle2 {
             if (mother) m_arich.motherPDG = mother->getPDG();
             m_arich.primary = particle->getStatus(MCParticle::c_PrimaryParticle);
             m_arich.seen = particle->hasSeenInDetector(Const::ARICH);
-            TVector3 prodVertex = particle->getProductionVertex();
+            B2Vector3D prodVertex = particle->getProductionVertex();
             m_arich.rhoProd = prodVertex.Perp();
             m_arich.zProd = prodVertex.Z();
             m_arich.phiProd = prodVertex.Phi();

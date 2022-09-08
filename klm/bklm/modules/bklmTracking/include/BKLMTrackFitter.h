@@ -10,7 +10,7 @@
 
 /* KLM headers. */
 #include <klm/bklm/geometry/GeometryPar.h>
-#include <klm/dataobjects/bklm/BKLMHit2d.h>
+#include <klm/dataobjects/KLMHit2d.h>
 
 /* CLHEP headers. */
 #include <CLHEP/Matrix/SymMatrix.h>
@@ -33,26 +33,26 @@ namespace Belle2 {
     ~BKLMTrackFitter();
 
     //! do fit and returns chi square of the fit.
-    double fit(std::list<BKLMHit2d*>& listTrackPoint);
+    double fit(std::list<KLMHit2d*>& listTrackPoint);
 
     //! Distance from track to a hit in the plane of the module
-    double distanceToHit(BKLMHit2d* hit,
+    double distanceToHit(KLMHit2d* hit,
                          double& error,
                          double& sigma);
 
     //! Distance from track to a hit in the global system
-    double globalDistanceToHit(BKLMHit2d* hit,
+    double globalDistanceToHit(KLMHit2d* hit,
                                double& error,
                                double& sigma);
 
     //! do fit in the y-x plane or z-x plane
-    double fit1dSectorTrack(std::list< BKLMHit2d* > hitList,
+    double fit1dSectorTrack(std::list< KLMHit2d* > hitList,
                             CLHEP::HepVector&  eta,
                             CLHEP::HepSymMatrix&  error,
                             int depDir,    int indDir);
 
     //! do fit in the global system
-    double fit1dTrack(std::list< BKLMHit2d* > hitList,
+    double fit1dTrack(std::list< KLMHit2d* > hitList,
                       CLHEP::HepVector&  eta,
                       CLHEP::HepSymMatrix&  error,
                       int depDir,    int indDir);

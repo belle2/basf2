@@ -61,7 +61,7 @@ namespace Belle2::KlongId {
   }
 
   /** return if MCparticle is beambkg */
-  int mcParticleIsBeamBKG(Belle2::MCParticle* part)
+  int mcParticleIsBeamBKG(const Belle2::MCParticle* part)
   {
     if (part == nullptr) {
       return 1;

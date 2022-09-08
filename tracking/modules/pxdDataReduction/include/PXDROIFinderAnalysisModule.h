@@ -13,6 +13,11 @@
 #pragma once
 
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
+#include <mdst/dataobjects/MCParticle.h>
+#include <tracking/dataobjects/RecoTrack.h>
+#include <tracking/dataobjects/ROIid.h>
+#include <tracking/dataobjects/PXDIntercept.h>
 #include <string>
 #include <TFile.h>
 #include <TH1F.h>
@@ -38,13 +43,20 @@ namespace Belle2 {
 
 
   private:
+
     /**
-     *Initializes the Module.
+     * Initializes the Module.
      */
     void initialize() override final;
 
+    /**
+     * Called when entering a new run.
+     */
     void beginRun() override final;
 
+    /**
+     * This method is called for each event.
+     */
     void event() override final;
 
     /**
@@ -52,7 +64,12 @@ namespace Belle2 {
      */
     void terminate() override final;
 
-    std::string m_recoTrackListName; /**< Track list name */
+    StoreArray<RecoTrack> m_recoTracks; /**< RecoTrack StoreArray */
+    StoreArray<ROIid> m_ROIs; /**< ROIid StoreArray */
+    StoreArray<PXDIntercept> m_PXDIntercepts; /**< PXDIntercept StoreArray */
+    StoreArray<MCParticle> m_MCParticles; /**< MCParticle StoreArray */
+
+    std::string m_recoTrackListName; /**< RecoTrack list name */
     std::string m_PXDInterceptListName; /**< Intercept list name */
     std::string m_ROIListName; /**< ROI list name */
 

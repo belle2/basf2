@@ -29,10 +29,10 @@ using namespace std;
 namespace Belle2 {
   using namespace TOP;
   //-----------------------------------------------------------------
-  //                 Register the Module
+  ///                 Register the Module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPPDFDebugger)
+  REG_MODULE(TOPPDFDebugger);
 
 
   //-----------------------------------------------------------------
@@ -125,8 +125,8 @@ namespace Belle2 {
       // add this vector of vector of triplets to the TOPPDFCollection
       TOPPDFCollection* topPDFColl = m_pdfCollection.appendNew();
       const auto& module = geo->getModule(trk.getModuleID());
-      topPDFColl->setLocalPositionMomentum(module.pointToLocal(trk.getExtHit()->getPosition()),
-                                           module.momentumToLocal(trk.getExtHit()->getMomentum()),
+      topPDFColl->setLocalPositionMomentum(module.pointToLocal(trk.getExtHit()->getPositionTVector3()),
+                                           module.momentumToLocal(trk.getExtHit()->getMomentumTVector3()),
                                            trk.getModuleID());
 
       TOPPixelLikelihood* topPLkhs = m_pixelData.appendNew();

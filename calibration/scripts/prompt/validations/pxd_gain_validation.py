@@ -13,19 +13,16 @@ Validation of PXD gain calibration.
 '''
 
 
-import basf2
 from prompt import ValidationSettings
-import ROOT
 import sys
 import subprocess
-import math
 from glob import glob
 
 
 #: Tells the automated system some details of this script
 settings = ValidationSettings(name='PXD gain calibration',
                               description=__doc__,
-                              download_files=['PXDPerformanceCollectorValidation.root', 'stdout'],
+                              download_files=['PXDPerformanceVariablesCollectorValidation.root'],
                               expert_config={})
 
 
@@ -45,6 +42,11 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
                     "--exp", f"{exp}", "--runs", f"{run}-9999",
                     "-o", f"conditions_gain_e{exp}_r{run}.root"]
         subprocess.run(cmds + cmds_add, check=True)
+
+    root_files = glob(f"{job_path}/*PXD*Gain*/*/algorithm_output/PXDPerformanceVariablesCollectorValidation.root")
+    for root_file in root_files:
+        cmds = ["b2pxd-val", "-i", root_file]
+        subprocess.run(cmds, check=True)
 
 
 if __name__ == "__main__":

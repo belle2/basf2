@@ -9,7 +9,7 @@
 #pragma once
 
 #include <framework/logging/Logger.h>
-#include <cdc/dataobjects/TDCCountTranslatorBase.h>
+#include <cdc/translators/TDCCountTranslatorBase.h>
 
 #include <TVector3.h>
 

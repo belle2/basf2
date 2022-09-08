@@ -81,34 +81,46 @@ CDCStateFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
     return std::make_unique<TrackFindingCDC::NoneFilter<BaseCDCStateFilter>>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "all") {
     return std::make_unique<TrackFindingCDC::AllFilter<BaseCDCStateFilter>>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "rough") {
     return std::make_unique<RoughCDCStateFilter>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "rough_eclSeed") {
     return std::make_unique<RoughCDCfromEclStateFilter>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "mc_truth") {
     return std::make_unique<MCTruthCDCStateFilter>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "mc_truth_eclSeed") {
     return std::make_unique<MCTruthEclSeedFilter>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "extrapolate_and_update") {
     return std::make_unique<ExtrapolateAndUpdateCDCStateFilter>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "distance") {
     return std::make_unique<DistanceCDCStateFilter>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "recording") {
     return std::make_unique<RecordingCDCStateFilter>("CDCStateFilter.root");
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "rough_and_recording") {
     return std::make_unique<AndCDCStateFilter>(
              std::make_unique<RecordingCDCStateFilter>("CDCStateFilter.root"),
              std::make_unique<RoughCDCStateFilter>()
            );
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "recording_eclSeed") {
     return std::make_unique<RecordingCDCfromEclStateFilter>("CDCfromECLStateFilter.root");
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "rough_and_recording_eclSeed") {
     return std::make_unique<AndCDCStateFilter>(
              std::make_unique<RecordingCDCfromEclStateFilter>("CDCfromECLStateFilter.root"),
              std::make_unique<RoughCDCfromEclStateFilter>()
            );
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "distance_and_recording_eclSeed") {
     return std::make_unique<AndCDCStateFilter>(
              std::make_unique<RecordingCDCfromEclStateFilter>("CDCfromECLStateFilter.root"),

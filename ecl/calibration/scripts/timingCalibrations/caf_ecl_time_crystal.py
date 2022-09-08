@@ -11,7 +11,7 @@
 """ECL timing calibration that performs the crystal calibrations, one for  the whole set of runs."""
 
 from prompt import CalibrationSettings
-from reconstruction import *
+from reconstruction import prepare_cdst_analysis
 from caf.utils import IoV
 
 
@@ -97,11 +97,8 @@ def get_calibrations(input_data, **kwargs):
     basf2.B2INFO(f"Total number of files actually used as input = {len(input_files_physics)}")
 
     ###################################################
-    import basf2
     from basf2 import register_module, create_path
-    import ROOT
     from ROOT import Belle2
-    from ROOT.Belle2 import TestCalibrationAlgorithm
     from caf.framework import Collection
 
     ###################################################

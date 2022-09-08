@@ -14,7 +14,7 @@
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 #include <TH1.h>
 #include <TCanvas.h>
 #include <time.h>
@@ -42,24 +42,41 @@ namespace Belle2 {
     // Public functions
   public:
 
-    //! Constructor / Destructor
+    /**
+     * Constructor.
+     */
     DQMHistDeltaHistoModule();
+
+    /**
+     * Destructor.
+     */
     virtual ~DQMHistDeltaHistoModule();
 
-    //! Module functions to be called from main process
+    /**
+     * Initializer.
+     */
     virtual void initialize() override;
 
-    //! Module functions to be called from event process
-    virtual void beginRun() override;
-    virtual void event() override;
-    virtual void endRun() override;
-    virtual void terminate() override;
     /**
-     * Find canvas by name
-     * @param s Name of the canvas
-     * @return The pointer to the canvas, or nullptr if not found.
+     * Called when entering a new run.
      */
-    TCanvas* find_canvas(TString s);
+    virtual void beginRun() override;
+
+    /**
+     * This method is called for each event.
+     */
+    virtual void event() override;
+
+    /**
+     * This method is called if the current run ends.
+     */
+    virtual void endRun() override;
+
+    /**
+     * This method is called at the end of the event processing.
+     */
+    virtual void terminate() override;
+
     /**
      * Clear content of SSNODE
      * @param n Pointer to the SSNODE

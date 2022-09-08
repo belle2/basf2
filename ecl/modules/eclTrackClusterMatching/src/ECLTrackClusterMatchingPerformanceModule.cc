@@ -21,7 +21,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(ECLTrackClusterMatchingPerformance)
+REG_MODULE(ECLTrackClusterMatchingPerformance);
 
 ECLTrackClusterMatchingPerformanceModule::ECLTrackClusterMatchingPerformanceModule() :
   Module(), m_trackProperties()

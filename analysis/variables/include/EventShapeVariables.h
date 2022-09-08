@@ -22,12 +22,12 @@ namespace Belle2 {
     /**
      * Returns the ratio of the i-th to the 0-th order Fox Wolfram moments. The order can go up to 8th.
      */
-    Manager::FunctionPtr foxWolframR(const std::vector<std::string>& arguments);
+    double foxWolframR(const Particle*, const std::vector<double>& index);
 
     /**
      * Returns the i-th  order Fox Wolfram moments. The order can go up to 8th.
      */
-    Manager::FunctionPtr foxWolframH(const std::vector<std::string>& arguments);
+    double foxWolframH(const Particle*, const std::vector<double>& index);
 
     /**
      * Returns the ratio of the i-th order cleo cone with respect to either the thrust axis or the z axis (i.e. collision axis).

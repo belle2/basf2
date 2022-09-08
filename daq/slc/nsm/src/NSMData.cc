@@ -65,7 +65,7 @@ NSMData::NSMData(const NSMData& data)
   }
   const DBField::NameList& name_v(data.getFieldNames());
   for (DBField::NameList::const_iterator it = name_v.begin();
-       it != name_v.end(); it++) {
+       it != name_v.end(); ++it) {
     const std::string& name(*it);
     const DBField::Property& pro(data.getProperty(name));
     add(name, pro);
@@ -88,6 +88,22 @@ NSMData::~NSMData()
     free(m_pdata);
     m_pdata = NULL;
   }
+}
+
+const NSMData& NSMData::operator=(const NSMData& data)
+{
+  AbstractDBObject::operator=(data);
+  m_allocated = data.m_allocated;
+  m_pdata = data.m_pdata;
+  m_size = data.m_size;
+  m_offset = data.m_offset;
+  m_format = data.m_format;
+  m_revision = data.m_revision;
+  m_data_v_m = data.m_data_v_m;
+  m_empty = data.m_empty;
+  m_com = data.m_com;
+  m_tstamp = data.m_tstamp;
+  return *this;
 }
 
 void NSMData::reset()
@@ -334,7 +350,7 @@ void NSMData::writeObject(Writer& writer) const
   const DBField::NameList& name_v(getFieldNames());
   writer.writeInt(name_v.size());
   for (DBField::NameList::const_iterator it = name_v.begin();
-       it != name_v.end(); it++) {
+       it != name_v.end(); ++it) {
     const std::string& name(*it);
     writer.writeString(name);
     const DBField::Property& pro(getProperty(name));
@@ -371,11 +387,11 @@ void NSMData::print(const std::string& name_in) const
   search(map, name_in);
   size_t length = 0;
   for (NameValueList::iterator it = map.begin();
-       it != map.end(); it++) {
+       it != map.end(); ++it) {
     if (it->name.size() > length) length = it->name.size();
   }
   for (NameValueList::iterator it = map.begin();
-       it != map.end(); it++) {
+       it != map.end(); ++it) {
     printf(StringUtil::form("%%-%ds : %%s\n", length).c_str(),
            it->name.c_str(), it->value.c_str());
   }
@@ -386,14 +402,13 @@ void NSMData::search(NSMData::NameValueList& map,
 {
   const DBField::NameList& name_v(getFieldNames());
   for (DBField::NameList::const_iterator it = name_v.begin();
-       it != name_v.end(); it++) {
+       it != name_v.end(); ++it) {
     const std::string& name(*it);
     const DBField::Property& pro(getProperty(name));
     size_t length = pro.getLength();
     std::string name_out = name_in;
     if (name_in.size() > 0) name_out += ".";
     name_out += name;
-    std::string pvtype;
     if (length > 0) {
       if (pro.getType() == DBField::OBJECT) {
         const NSMDataList& data_v(getObjects(name));
@@ -450,7 +465,7 @@ void NSMData::printPV(const std::string& name_in) const
 {
   const DBField::NameList& name_v(getFieldNames());
   for (DBField::NameList::const_iterator it = name_v.begin();
-       it != name_v.end(); it++) {
+       it != name_v.end(); ++it) {
     const std::string& name(*it);
     const DBField::Property& pro(getProperty(name));
     size_t length = pro.getLength();

@@ -19,14 +19,14 @@ const float eps = 1E-6;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(DistanceCalculator)
+REG_MODULE(DistanceCalculator);
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
 DistanceCalculatorModule::DistanceCalculatorModule() : Module(),
-  m_distanceCovMatrix(0)
+  m_distanceCovMatrix(3)
 {
   // Set module properties
   setDescription("Calculates distance between two vertices, distance of closest approach between a vertex and a track, distance of closest approach between two tracks, distance of closest approach between a vertex/track and Btube");

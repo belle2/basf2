@@ -127,7 +127,6 @@ void MonitorDataCOPPERModule::event()
   //StoreArray<RawDataBlock> raw_dblkarray;
   StoreArray<RawECL> raw_dblkarray;
 
-  int utime = 0;
   int ncpr = raw_dblkarray.getEntries();
   timeval prev_tv;
   prev_tv = m_tv;
@@ -140,7 +139,7 @@ void MonitorDataCOPPERModule::event()
 
       if (j == 0 && i == 0) {
         temp_rawcopper.GetTTTimeVal(i, &m_tv);
-        utime = temp_rawcopper.GetTTUtime(i);
+        //int utime = temp_rawcopper.GetTTUtime(i);
         if (m_loop == 0) {
           m_start_time = (double)m_tv.tv_sec;
         }

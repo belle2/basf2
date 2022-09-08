@@ -18,15 +18,40 @@ namespace Belle2 {
    */
   class PhysicsObjectsMiraBelleModule : public HistoModule {
   public:
-    /** Constructor, for setting module description and parameters. */
+
+    /**
+     * Constructor.
+     */
     PhysicsObjectsMiraBelleModule();
 
+    /**
+     * Initializer.
+     */
     void initialize() override;
+
+    /**
+     * Called when entering a new run.
+     */
     void beginRun() override;
+
+    /**
+     * This method is called for each event.
+     */
     void event() override;
+
+    /**
+     * This method is called if the current run ends.
+     */
     void endRun() override;
+
+    /**
+     * This method is called at the end of the event processing.
+     */
     void terminate() override;
 
+    /**
+     * Definition of the histograms.
+     */
     void defineHisto() override;
 
   private:
@@ -63,16 +88,21 @@ namespace Belle2 {
     TH1F* m_h_D0 = nullptr;/**< histogram for D0 of muon track */
     TH1F* m_h_Z0 = nullptr;/**< histogram for Z0 of muon track */
     TH1F* m_h_theta = nullptr;/**< histogram for theta of muon track */
+    TH1F* m_h_theta_lab = nullptr;/**< histogram for theta of muon track in lab frame */
     TH1F* m_h_Phi0 = nullptr;/**< histogram for phi of muon track */
     TH1F* m_h_Pt = nullptr;/**< histogram for Pt of muon track */
     TH1F* m_h_Mom = nullptr;/**< histogram for Momentum of muon track */
     TH1F* m_h_dPhicms = nullptr;/**< histogram for phi difference between mu+ and mu- in CMS */
+    TH1F* m_h_dThetacms = nullptr;/**< histogram for theta difference between mu+ and mu- in CMS */
 
     /** Trigger identifier string used to select events for the histograms */
     std::string m_triggerIdentifier = "";
 
     /** Name of the mu+ particle list */
     std::string m_muPListName = "";
+
+    /** Name of the mu+mu- (Upsilon) particle list */
+    std::string m_mumuPListName = "";
 
   };
 }

@@ -13,7 +13,6 @@
 
 #include <framework/core/ModuleParam.templateDetails.h>
 #include <dqm/analysis/modules/DQMHistSnapshots.h>
-#include <daq/slc/base/StringUtil.h>
 #include <TROOT.h>
 #include <TClass.h>
 #include <TH1F.h>
@@ -25,7 +24,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(DQMHistSnapshots)
+REG_MODULE(DQMHistSnapshots);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -63,19 +62,6 @@ DQMHistSnapshotsModule::SSNODE* DQMHistSnapshotsModule::find_snapshot(TString a)
   return NULL;
 }
 
-TCanvas* DQMHistSnapshotsModule::find_canvas(TString canvas_name)
-{
-  TIter nextkey(gROOT->GetListOfCanvases());
-  TObject* obj = NULL;
-
-  while ((obj = (TObject*)nextkey())) {
-    if (obj->IsA()->InheritsFrom("TCanvas")) {
-      if (obj->GetName() == canvas_name)
-        return (TCanvas*)obj;
-    }
-  }
-  return NULL;
-}
 
 void DQMHistSnapshotsModule::event()
 {
@@ -97,11 +83,11 @@ void DQMHistSnapshotsModule::event()
       n = new SSNODE;
       n->histo = (TH1*) it->second->Clone();
 
-      StringList s = StringUtil::split(a.Data(), '/');
-      std::string dirname = s[0];
-      std::string hname = s[1];
+      auto s = StringSplit(it->first, '/');
+      auto dirname = s.at(0);
+      auto hname = s.at(1);
       std::string canvas_name = dirname + "/c_" + hname;
-      n->canvas = find_canvas(canvas_name);
+      n->canvas = findCanvas(canvas_name);
       n->stale = 0;
 
       m_ssnode.push_back(n);

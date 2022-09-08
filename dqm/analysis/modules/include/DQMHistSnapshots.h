@@ -16,7 +16,7 @@
 // #include "cantProceed.h"
 #endif
 
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 #include <TH1.h>
 #include <TCanvas.h>
 #include <time.h>
@@ -41,30 +41,47 @@ namespace Belle2 {
     // Public functions
   public:
 
-    //! Constructor / Destructor
+    /**
+     * Constructor.
+     */
     DQMHistSnapshotsModule();
+
+    /**
+     * Destructor.
+     */
     virtual ~DQMHistSnapshotsModule();
 
-    //! Module functions to be called from main process
+    /**
+     * Initializer.
+     */
     virtual void initialize() override;
 
-    //! Module functions to be called from event process
+    /**
+     * Called when entering a new run.
+     */
     virtual void beginRun() override;
+
+    /**
+     * This method is called for each event.
+     */
     virtual void event() override;
+
+    /**
+     * This method is called if the current run ends.
+     */
     virtual void endRun() override;
+
+    /**
+     * This method is called at the end of the event processing.
+     */
     virtual void terminate() override;
+
     /**
      * Find a snapshot by the histogram's name.
      * @param a The name of the hisotgram in the snapshot.
      * @return The node struct for the snapshot, or nullptr if not found.
      */
     SSNODE* find_snapshot(TString a);
-    /**
-     * Find canvas by name
-     * @param cname Name of the canvas
-     * @return The pointer to the canvas, or nullptr if not found.
-     */
-    TCanvas* find_canvas(TString cname);
 
     // Data members
   private:

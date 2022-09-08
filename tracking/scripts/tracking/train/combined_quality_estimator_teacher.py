@@ -426,7 +426,7 @@ class GenerateSimTask(Basf2PathTask):
         else:
             runNo = 0
             raise ValueError(
-                f"Simulating events with experiment_number {self.experiment_number} is not implemented yet.")
+                f"Simulating events with experiment number {self.experiment_number} is not implemented yet.")
         path.add_module(
             "EventInfoSetter", evtNumList=[self.n_events], runList=[runNo], expList=[self.experiment_number]
         )

@@ -145,7 +145,7 @@ class BaseFEISkim(BaseSkim):
         ma.fillParticleList(decayString="pi+:FEI_cleaned",
                             cut=CleanedTrackCuts, path=path)
         ma.fillParticleList(decayString="gamma:FEI_cleaned",
-                            cut=CleanedClusterCuts, path=path)
+                            cut=CleanedClusterCuts, path=path, loadPhotonBeamBackgroundMVA=False)
 
         ma.buildEventKinematics(inputListNames=["pi+:FEI_cleaned",
                                                 "gamma:FEI_cleaned"],
@@ -176,7 +176,7 @@ class BaseFEISkim(BaseSkim):
     @staticmethod
     @_hash_dict
     @lru_cache()
-    def run_fei_for_skims(FEIChannelArgs, FEIPrefix, *, path):
+    def run_fei_for_skims(FEIChannelArgs, FEIPrefix, analysisGlobaltag, *, path):
         """Reconstruct hadronic and semileptonic :math:`B^0` and :math:`B^+` tags using
         the generically trained FEI.
 
@@ -187,7 +187,9 @@ class BaseFEISkim(BaseSkim):
             path (`basf2.Path`): The skim path to be processed.
         """
         # Run FEI
-        b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
+        if analysisGlobaltag is None:
+            b2.B2FATAL("The analysis globaltag is not set in the FEI skim.")
+        b2.conditions.prepend_globaltag(analysisGlobaltag)
         particles = fei.get_default_channels(**FEIChannelArgs)
         configuration = fei.config.FeiConfiguration(
             prefix=FEIPrefix,
@@ -239,7 +241,7 @@ class BaseFEISkim(BaseSkim):
         # any other skim.
         self._ConditionalPath = path
 
-        self.run_fei_for_skims(self.FEIChannelArgs, self.FEIPrefix, path=path)
+        self.run_fei_for_skims(self.FEIChannelArgs, self.FEIPrefix, self.analysisGlobaltag, path=path)
 
 
 def _FEI_skim_header(ParticleNames):

@@ -56,7 +56,7 @@ environmentType = "default"
 
 
 # load input ROOT file
-ma.inputMdst(environmentType='default',
+ma.inputMdst(environmentType=environmentType,
              filename=b2.find_file('analysis/mdst11_BGx1_b2jpsiks.root', 'validation', False),
              path=cp_val_path)
 

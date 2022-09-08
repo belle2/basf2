@@ -18,14 +18,12 @@
 #include <TVector3.h>
 #include "TMath.h"
 
-
-using namespace std;
 using namespace Belle2;
 
 
-REG_MODULE(StudyMaterialEffects)
+REG_MODULE(StudyMaterialEffects);
 
-StudyMaterialEffectsModule::StudyMaterialEffectsModule() : Module(), m_tree("materialEffectsStudyOutput" , DataStore::c_Persistent)
+StudyMaterialEffectsModule::StudyMaterialEffectsModule() : Module(), m_tree("materialEffectsStudyOutput", DataStore::c_Persistent)
 {
   setDescription("StudyMaterialEffects- should be used with single track pGuns and without magnetic field.");
 

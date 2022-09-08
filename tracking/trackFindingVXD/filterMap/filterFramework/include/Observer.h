@@ -16,7 +16,7 @@ namespace Belle2 {
   public:
     /// exemplary draft for a notify-function of an observer
     template<class T, class someRangeType, class someHitType>
-    static void notify(T , double,  someRangeType, const someHitType&, const someHitType&) {};
+    static void notify(T, double,  someRangeType, const someHitType&, const someHitType&) {};
 
     /** An empty constructor for an empty class */
     explicit Observer() {};

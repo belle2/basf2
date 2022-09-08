@@ -21,14 +21,18 @@
 #include <fstream>
 #include <math.h>
 
+#include <cdc/dataobjects/WireID.h>
+#include <cdc/geometry/CDCGeometryPar.h>
+
 using namespace std;
 using namespace Belle2;
+using namespace CDC;
 
 //-----------------------------------------------------------------
 //                 Register module
 //-----------------------------------------------------------------
 
-REG_MODULE(CDCDQM)
+REG_MODULE(CDCDQM);
 
 CDCDQMModule::CDCDQMModule() : HistoModule()
 {
@@ -52,11 +56,9 @@ void CDCDQMModule::defineHisto()
   m_hNEvents = new TH1F("hNEvents", "hNEvents", 10, 0, 10);
   m_hNEvents->GetXaxis()->SetBinLabel(1, "number of events");
   m_hOcc = new TH1F("hOcc", "hOccupancy", 150, 0, 1.5);
-  m_hADC = new TH2F("hADC", "hADC", 300, 0, 300, 1000, 0, 1000);
-  m_hADCTOTCut = new TH2F("hADCTOTCut", "hADCTOTCut", 300, 0, 300, 1000, 0, 1000);
+  m_hADC = new TH2F("hADC", "hADC", 300, 0, 300, 200, 0, 1000);
   m_hTDC = new TH2F("hTDC", "hTDC", 300, 0, 300, 1000, 4200, 5200);
   m_hHit = new TH2F("hHit", "hHit", 56, 0, 56, 400, 0, 400);
-
   oldDir->cd();
 }
 
@@ -66,14 +68,22 @@ void CDCDQMModule::initialize()
   m_cdcHits.isOptional();
   m_cdcRawHits.isOptional();
   m_trgSummary.isOptional();
+
+  if (!m_Tracks.isOptional()) {
+    B2WARNING("Missing Tracks array");
+    return;
+  }
 }
 
 void CDCDQMModule::beginRun()
 {
+  if (!m_RecoTracks.isOptional()) {
+    B2DEBUG(22, "Missing recoTracks array in beginRun() ");
+    return;
+  }
 
   m_hNEvents->Reset();
   m_hADC->Reset();
-  m_hADCTOTCut->Reset();
   m_hTDC->Reset();
   m_hHit->Reset();
   m_hOcc->Reset();
@@ -81,6 +91,7 @@ void CDCDQMModule::beginRun()
 
 void CDCDQMModule::event()
 {
+  static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
   const int nWires = 14336;
   setReturnValue(1);
   if (!m_trgSummary.isValid() || (m_trgSummary->getTimType() == Belle2::TRGSummary::TTYP_RAND)) {
@@ -94,24 +105,49 @@ void CDCDQMModule::event()
   }
   m_nEvents += 1;
   m_hOcc->Fill(static_cast<float>(m_cdcHits.getEntries()) / nWires);
-  for (const auto& raw : m_cdcRawHits) {
-    int bid = raw.getBoardId();
-    int adc = raw.getFADC();
-    int tdc = raw.getTDC();
-    int tot = raw.getTOT();
-    m_hADC->Fill(bid, adc);
-    if (tot > 4) {
-      m_hADCTOTCut->Fill(bid, adc);
-    }
 
-    if (adc > 50 && tot > 1) {
-      m_hTDC->Fill(bid, tdc);
-    }
-  }
   for (const auto& hit : m_cdcHits) {
     int lay = hit.getICLayer();
     int wire = hit.getIWire();
     m_hHit->Fill(lay, wire);
+  }
+
+  // ADC vs layer 2D histogram with only good track related hits
+  for (const auto& b2track : m_Tracks) {
+    const Belle2::TrackFitResult* fitresult = b2track.getTrackFitResultWithClosestMass(Const::pion);
+    if (!fitresult) {
+      B2WARNING("No track fit result found.");
+      continue;
+    }
+
+    Belle2::RecoTrack* track = b2track.getRelatedTo<Belle2::RecoTrack>(m_recoTrackArrayName);
+    if (!track) {
+      B2WARNING("Can not access RecoTrack of this Belle2::Track");
+      continue;
+    }
+    const genfit::FitStatus* fs = track->getTrackFitStatus();
+    if (!fs) continue;
+    int ndf = fs->getNdf();
+    if (ndf < 20) continue; // require high NDF track
+
+    // Fill histograms of ADC/TDC if hits are associated with track
+    for (const RecoHitInformation::UsedCDCHit* hit : track->getCDCHitList()) {
+      const genfit::TrackPoint* tp = track->getCreatedTrackPoint(track->getRecoHitInformation(hit));
+      if (!tp) continue;
+      UChar_t lay = hit->getICLayer();
+      UShort_t IWire = hit->getIWire();
+      UShort_t adc = hit->getADCCount();
+      unsigned short tdc = hit->getTDCCount();
+      unsigned short tot = hit->getTOT();
+      WireID wireid(lay, IWire);
+      unsigned short bid = cdcgeo.getBoardID(wireid);
+      if (tot > 4) {
+        m_hADC->Fill(bid, adc);
+      }
+      if (adc > 50 && tot > 1) {
+        m_hTDC->Fill(bid, tdc);
+      }
+    }
   }
 }
 

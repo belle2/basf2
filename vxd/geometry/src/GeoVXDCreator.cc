@@ -306,7 +306,7 @@ namespace Belle2 {
         if (p.getFlipV()) reflection = reflection * G4ReflectY3D();
         if (p.getFlipW()) reflection = reflection * G4ReflectZ3D();
 
-        G4VSolid* sensorShape = createTrapezoidal(name, s.getWidth() , s.getWidth2() , s.getLength() ,
+        G4VSolid* sensorShape = createTrapezoidal(name, s.getWidth(), s.getWidth2(), s.getLength(),
                                                   s.getHeight());
         G4Material* sensorMaterial = Materials::get(s.getMaterial());
         if (m_onlyActiveMaterial) {
@@ -345,7 +345,7 @@ namespace Belle2 {
 
         //Now create all the other components and place the Sensor
         GeoVXDAssembly assembly;
-        if (!m_onlyActiveMaterial) assembly = createSubComponents(name, s, s.getComponents() , false, true);
+        if (!m_onlyActiveMaterial) assembly = createSubComponents(name, s, s.getComponents(), false, true);
 
         G4RotationMatrix rotation(0, -M_PI / 2.0, -M_PI / 2.0);
         G4Transform3D sensorAlign = getAlignment(parameters.getAlignment(sensorID));
@@ -496,7 +496,7 @@ namespace Belle2 {
         //Now create all the other components and place the Sensor
         if (!vxdGeometryPar.getGlobalParams().getOnlyActiveMaterial()) {
           VXDGeoSensorPar& s = it->second;
-          readSubComponents(s.getComponents() , GearDir(content, "Components/"), vxdGeometryPar);
+          readSubComponents(s.getComponents(), GearDir(content, "Components/"), vxdGeometryPar);
         }
         // Read alignment for sensor
         string pathSensor = (boost::format("Align[@component='%1%']/") % sensorID).str();
@@ -516,7 +516,7 @@ namespace Belle2 {
       return;
     }
 
-    void GeoVXDCreator::readSubComponents(const std::vector<VXDGeoPlacementPar>& placements , const GearDir& componentsDir,
+    void GeoVXDCreator::readSubComponents(const std::vector<VXDGeoPlacementPar>& placements, const GearDir& componentsDir,
                                           VXDGeometryPar& vxdGeometryPar)
     {
       for (const VXDGeoPlacementPar& p : placements) {

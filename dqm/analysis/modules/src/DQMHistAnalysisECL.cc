@@ -18,7 +18,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(DQMHistAnalysisECL)
+REG_MODULE(DQMHistAnalysisECL);
 
 DQMHistAnalysisECLModule::DQMHistAnalysisECLModule()
   : DQMHistAnalysisModule()
@@ -144,6 +144,8 @@ void DQMHistAnalysisECLModule::event()
   c_quality_analysis->SetLogy();
   TH1* h_quality = findHist("ECL/quality");
   if (h_quality != NULL) {
+    h_quality->SetFillColor(kPink - 4);
+    h_quality->SetDrawOption("hist");
     h_quality->SetMinimum(0.1);
     h_quality->Draw("hist");
   }
@@ -158,6 +160,7 @@ void DQMHistAnalysisECLModule::event()
   TH1* h_quality_other = findHist("ECL/quality_other");
   if (h_quality_other != NULL) {
     h_quality_other->SetMinimum(0.1);
+    h_quality_other->SetFillColor(kPink - 4);
     h_quality_other->Draw("hist");
   }
   c_quality_other_analysis->Draw();
@@ -328,7 +331,7 @@ void DQMHistAnalysisECLModule::event()
         double yval = (h_time_crate_Thr1GeV->GetMean() > 0) ?
                       h_time_crate_Thr1GeV->GetMean() - 2 * h_time_crate_Thr1GeV->GetMeanError() :
                       h_time_crate_Thr1GeV->GetMean() + 2 * h_time_crate_Thr1GeV->GetMeanError();
-        if (abs(yval) > m_CrateTimeOffsetsMax) colRed = true;
+        if (fabs(yval) > m_CrateTimeOffsetsMax) colRed = true;
       } else m_low.push_back(i + 1);
     }
   }

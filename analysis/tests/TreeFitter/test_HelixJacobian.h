@@ -36,11 +36,11 @@ namespace {
     const double z = 1.678;
 
     const int charge = -1;
-    const double bfield = Belle2::BFieldManager::getField(TVector3(0, 0, 0)).Z() / Belle2::Unit::T;
+    const double bfield = Belle2::BFieldManager::getFieldInTesla(Belle2::B2Vector3D(0, 0, 0)).Z();
     const double alpha = 1.0 / (bfield * Belle2::Const::speedOfLight) * 1E4;
     const double aq = charge / alpha;
 
-    Belle2::Helix helix = Belle2::Helix(TVector3(x, y, z), TVector3(px, py, pz), charge, bfield);
+    Belle2::Helix helix = Belle2::Helix(Belle2::B2Vector3D(x, y, z), Belle2::B2Vector3D(px, py, pz), charge, bfield);
 
     const double pt = std::sqrt(px * px + py * py);
     const double omega = aq / pt;
@@ -77,8 +77,8 @@ namespace {
     Eigen::Matrix<double, 5, 6> jacobian_numerical = Eigen::Matrix<double, 5, 6>::Zero(5, 6);
     Eigen::Matrix<double, 5, 6> jacobian_analytical = Eigen::Matrix<double, 5, 6>::Zero(5, 6);
 
-    TVector3 postmp;
-    TVector3 momtmp;
+    Belle2::B2Vector3D postmp;
+    Belle2::B2Vector3D momtmp;
 
     //random start values to ensure x and p vector are not orthogonal/parallel
     const double px = 0.523214;
@@ -90,9 +90,9 @@ namespace {
 
     const Eigen::Matrix<double, 1, 6> positionAndMom_ = (Eigen::Matrix<double, 1, 6>() << x, y, z, px, py, pz).finished();
     const int charge = -1;
-    const double bfield = Belle2::BFieldManager::getField(TVector3(0, 0, 0)).Z() / Belle2::Unit::T;
+    const double bfield = Belle2::BFieldManager::getFieldInTesla(Belle2::B2Vector3D(0, 0, 0)).Z();
 
-    Belle2::Helix helix = Belle2::Helix(TVector3(x, y, z), TVector3(px, py, pz), charge, bfield);
+    Belle2::Helix helix = Belle2::Helix(Belle2::B2Vector3D(x, y, z), Belle2::B2Vector3D(px, py, pz), charge, bfield);
 
     for (int jin = 0; jin < 6; ++jin) {
       for (int i = 0; i < 3; ++i) {

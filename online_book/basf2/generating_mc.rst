@@ -337,7 +337,6 @@ easily get all the relevant information: :ref:`b2help-particles`.
      .. literalinclude:: steering_files/067_generate_mc.py
         :language: python
         :linenos:
-        :emphasize-lines: 17-21
 
 
 .. admonition:: Question

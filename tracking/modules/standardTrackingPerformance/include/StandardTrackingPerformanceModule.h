@@ -11,6 +11,10 @@
 #include <framework/core/Module.h>
 #include <tracking/modules/standardTrackingPerformance/ParticleProperties.h>
 
+#include <framework/datastore/StoreArray.h>
+#include <mdst/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/Track.h>
+
 // forward declarations
 class TTree;
 class TFile;
@@ -48,6 +52,8 @@ namespace Belle2 {
 
     TFile* m_outputFile; /**< output root file */
     TTree* m_dataTree; /**< root tree with all output data. Tree will be written to the output root file */
+
+    StoreArray<MCParticle> m_MCParticles; /**< MCParticles StoreArray */
 
     /** vector with all interesting charged stable MCParticles in the event */
     std::vector<const MCParticle*> m_interestingChargedStableMcParcticles;
@@ -109,7 +115,7 @@ namespace Belle2 {
     void findChargedStableMcParticles();
 
     /** Find a MCParticle of a decay chain specified by the user (not implemented yet). */
-    void findSignalMCParticles(const StoreArray< MCParticle >& mcParticles);
+    void findSignalMCParticles();
 
     /**
      * Add all charged stable particles to a vector which originate from.

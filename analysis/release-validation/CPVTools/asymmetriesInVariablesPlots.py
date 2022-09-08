@@ -33,7 +33,7 @@ from ROOT import Belle2
 import sys
 import basf2 as b2
 import flavorTagger as ft
-from inputVariablesPlots import variablesPlotParamsDict
+from inputVariablesPlots import variablesPlotParamsDict, categories
 
 import numpy as np
 import matplotlib as mpl
@@ -90,7 +90,8 @@ particleConditions = {'e+:inRoe': ['e', " mcPDG > 0 ", " mcPDG < 0 "], 'mu+:inRo
 if not b2.find_file('AsymmetriesInVariablesPlots', silent=True):
     os.mkdir('./AsymmetriesInVariablesPlots')
 
-for (particleList, category, combinerVariable) in ft.eventLevelParticleLists:
+
+for (particleList, category, _) in ft.getEventLevelParticleLists(categories):
 
     # if category != "KinLepton":
     #    continue
@@ -117,16 +118,16 @@ for (particleList, category, combinerVariable) in ft.eventLevelParticleLists:
     trulyUsedInputVariables = []
     for iVariable in tree.GetListOfBranches():
 
-        managerVariableName = str(Belle2.invertMakeROOTCompatible(iVariable.GetName()))
+        managerVariableName = str(Belle2.MakeROOTCompatible.invertMakeROOTCompatible(iVariable.GetName()))
 
-        if managerVariableName in ft.variables[category] or managerVariableName == 'distance' or\
+        if managerVariableName in ft.getTrainingVariables(category) or managerVariableName == 'distance' or\
                 managerVariableName == 'z0' or managerVariableName == 'ImpactXY' or\
                 managerVariableName == 'y' or managerVariableName == 'OBoost':
             if managerVariableName in categoryInputVariables:
                 continue
 
             categoryInputVariables.append(managerVariableName)
-            if managerVariableName in ft.variables[category]:
+            if managerVariableName in ft.getTrainingVariables(category):
                 allInputVariables.append((category, managerVariableName))
                 trulyUsedInputVariables.append((category, managerVariableName))
 
@@ -190,11 +191,11 @@ for (particleList, category, combinerVariable) in ft.eventLevelParticleLists:
         if category == "KinLepton" or category == "IntermediateKinLepton":
             particleList = 'lepton+:inRoe'
 
-        negativeHistogram = ROOT.TH1F("negative" + category + str(Belle2.makeROOTCompatible(inputVariable)), "",
+        negativeHistogram = ROOT.TH1F("negative" + category + str(Belle2.MakeROOTCompatible.makeROOTCompatible(inputVariable)), "",
                                       nBins,
                                       limXmin,
                                       limXmax)
-        positiveHistogram = ROOT.TH1F("positive" + category + str(Belle2.makeROOTCompatible(inputVariable)), "",
+        positiveHistogram = ROOT.TH1F("positive" + category + str(Belle2.MakeROOTCompatible.makeROOTCompatible(inputVariable)), "",
                                       nBins,
                                       limXmin,
                                       limXmax)
@@ -209,9 +210,9 @@ for (particleList, category, combinerVariable) in ft.eventLevelParticleLists:
                   factorMultiplication +
                   ">> negative" +
                   category +
-                  str(Belle2.makeROOTCompatible(inputVariable)), additionalCond +
+                  str(Belle2.MakeROOTCompatible.makeROOTCompatible(inputVariable)), additionalCond +
                   "abs(" +
-                  Belle2.makeROOTCompatible(targetVariable) +
+                  Belle2.MakeROOTCompatible.makeROOTCompatible(targetVariable) +
                   ") > 0 && " +
                   particleConditions[particleList][1])
 
@@ -219,9 +220,9 @@ for (particleList, category, combinerVariable) in ft.eventLevelParticleLists:
                   factorMultiplication +
                   ">> positive" +
                   category +
-                  str(Belle2.makeROOTCompatible(inputVariable)), additionalCond +
+                  str(Belle2.MakeROOTCompatible.makeROOTCompatible(inputVariable)), additionalCond +
                   "abs(" +
-                  Belle2.makeROOTCompatible(targetVariable) +
+                  Belle2.MakeROOTCompatible.makeROOTCompatible(targetVariable) +
                   ") > 0 && " +
                   particleConditions[particleList][2])
 
@@ -384,7 +385,7 @@ for (particleList, category, combinerVariable) in ft.eventLevelParticleLists:
         ax2.tick_params(axis='x', labelsize=40)
         ax2.set_xlabel(xLabel, fontsize=50)
         plt.savefig('./AsymmetriesInVariablesPlots/' + category + '/' + category +
-                    "_" + str(Belle2.makeROOTCompatible(inputVariable)) + '.pdf')
+                    "_" + str(Belle2.MakeROOTCompatible.makeROOTCompatible(inputVariable)) + '.pdf')
         fig1.clear()
 
         negativeHistogram.Delete()
@@ -392,8 +393,8 @@ for (particleList, category, combinerVariable) in ft.eventLevelParticleLists:
 
 totalNumberOfVariables = 0
 
-for category in ft.variables:
-    totalNumberOfVariables += len(ft.variables[category])
+for category in ft.variables_fict:
+    totalNumberOfVariables += len(ft.getTrainingVariables(category))
 
 print("Total number of variables = ", totalNumberOfVariables)
 

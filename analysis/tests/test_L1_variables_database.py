@@ -28,7 +28,7 @@ def check_file(input_file_name, trigger_variables):
     first event in ``input_file_name`` on the validation server"""
     input_file = b2tu.require_file(input_file_name, '')
     pa = b2.Path()
-    ma.inputMdst("default", input_file, path=pa)
+    ma.inputMdst(input_file, path=pa)
     ma.printVariableValues("", trigger_variables, path=pa)
     b2tu.safe_process(pa, 10)
 

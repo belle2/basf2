@@ -20,13 +20,13 @@
 
 //ECL
 #include <ecl/dataobjects/ECLDigit.h>
-#include <ecl/dataobjects/ECLCalDigit.h>
 #include <ecl/geometry/ECLNeighbours.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 
 //MDST
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TRGSummary.h>
+#include <mdst/dataobjects/ECLCluster.h>
 
 using namespace std;
 using namespace Belle2;
@@ -36,7 +36,7 @@ using namespace ECL;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(eclMuMuECollector)
+REG_MODULE(eclMuMuECollector);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -45,7 +45,7 @@ REG_MODULE(eclMuMuECollector)
 //-----------------------------------------------------------------------------------------------------
 
 eclMuMuECollectorModule::eclMuMuECollectorModule() : CalibrationCollectorModule(), m_ECLExpMuMuE("ECLExpMuMuE"),
-  m_ElectronicsCalib("ECLCrystalElectronics"), m_MuMuECalib("ECLCrystalEnergyMuMu")
+  m_ElectronicsCalib("ECLCrystalElectronics"), m_MuMuECalib("ECLCrystalEnergyMuMu"), m_CrystalEnergy("ECLCrystalEnergy")
 {
   // Set module properties
   setDescription("Calibration Collector Module for ECL single crystal energy calibration using muons");
@@ -74,7 +74,7 @@ void eclMuMuECollectorModule::prepare()
   auto TrkPerCrysID = new TH1F("TrkPerCrysID", "track extrapolations per crystalID;crystal ID", 8736, 0, 8736);
   registerObject<TH1F>("TrkPerCrysID", TrkPerCrysID);
 
-  auto EnVsCrysID = new TH2F("EnVsCrysID", "Normalized energy for each crystal;crystal ID;E/Expected", 8736, 0, 8736, 120, 0.1, 2.5);
+  auto EnVsCrysID = new TH2F("EnVsCrysID", "Normalized energy for each crystal;crystal ID;E/Expected", 8736, 0, 8736, 240, 0.1, 2.5);
   registerObject<TH2F>("EnVsCrysID", EnVsCrysID);
 
   auto ExpEvsCrys = new TH1F("ExpEvsCrys", "Sum expected energy vs crystal ID;crystal ID;Energy (GeV)", 8736, 0, 8736);
@@ -151,6 +151,7 @@ void eclMuMuECollectorModule::prepare()
   if (m_ECLExpMuMuE.hasChanged()) {ExpMuMuE = m_ECLExpMuMuE->getCalibVector();}
   if (m_ElectronicsCalib.hasChanged()) {ElectronicsCalib = m_ElectronicsCalib->getCalibVector();}
   if (m_MuMuECalib.hasChanged()) {MuMuECalib = m_MuMuECalib->getCalibVector();}
+  if (m_CrystalEnergy.hasChanged()) {CrystalEnergy = m_CrystalEnergy->getCalibVector();}
 
   /** Write out a few for quality control */
   for (int ic = 1; ic < 9000; ic += 1000) {
@@ -169,6 +170,7 @@ void eclMuMuECollectorModule::prepare()
   /** Required data objects */
   m_trackArray.isRequired();
   m_eclDigitArray.isRequired();
+  if (m_measureTrueEnergy) {m_eclClusterArray.isRequired();}
 
 }
 
@@ -208,6 +210,11 @@ void eclMuMuECollectorModule::collect()
     newConst = true;
     B2INFO("ECLCrystalEnergyMuMu has changed, exp = " << m_evtMetaData->getExperiment() << "  run = " << m_evtMetaData->getRun());
     MuMuECalib = m_MuMuECalib->getCalibVector();
+  }
+  if (m_CrystalEnergy.hasChanged()) {
+    newConst = true;
+    B2INFO("ECLCrystalEnergy has changed, exp = " << m_evtMetaData->getExperiment() << "  run = " << m_evtMetaData->getRun());
+    CrystalEnergy = m_CrystalEnergy->getCalibVector();
   }
 
   if (newConst) {
@@ -260,8 +267,8 @@ void eclMuMuECollectorModule::collect()
   if (iTrack[0] == -1 || iTrack[1] == -1) { return; }
 
   /** Quit if the invariant mass of the two tracks is too low */
-  TLorentzVector mu0 = m_trackArray[iTrack[0]]->getTrackFitResult(Const::ChargedStable(211))->get4Momentum();
-  TLorentzVector mu1 = m_trackArray[iTrack[1]]->getTrackFitResult(Const::ChargedStable(211))->get4Momentum();
+  ROOT::Math::PxPyPzEVector mu0 = m_trackArray[iTrack[0]]->getTrackFitResult(Const::ChargedStable(211))->get4Momentum();
+  ROOT::Math::PxPyPzEVector mu1 = m_trackArray[iTrack[1]]->getTrackFitResult(Const::ChargedStable(211))->get4Momentum();
   if ((mu0 + mu1).M() < m_minPairMass) { return; }
 
   //------------------------------------------------------------------------
@@ -269,7 +276,7 @@ void eclMuMuECollectorModule::collect()
   int extCrysID[2] = { -1, -1};
   Const::EDetector eclID = Const::EDetector::ECL;
   for (int imu = 0; imu < 2; imu++) {
-    TVector3 temppos[2] = {};
+    ROOT::Math::XYZVector temppos[2] = {};
     int IDEnter = -99;
     for (auto& extHit : m_trackArray[iTrack[imu]]->getRelationsTo<ExtHit>()) {
       int pdgCode = extHit.getPdgCode();
@@ -287,7 +294,7 @@ void eclMuMuECollectorModule::collect()
         temppos[1] = extHit.getPosition();
 
         /** Keep track of this crystal if the track length is long enough. Note that if minTrackLength is less than half the crystal length, we will keep only the first extrapolation due to break */
-        double trackLength = (temppos[1] - temppos[0]).Mag();
+        double trackLength = (temppos[1] - temppos[0]).R();
         if (trackLength > m_minTrackLength) {extCrysID[imu] = temp0;}
         break;
       }
@@ -298,31 +305,40 @@ void eclMuMuECollectorModule::collect()
   if (extCrysID[0] == -1 && extCrysID[1] == -1) { return; }
 
   //------------------------------------------------------------------------
-  /** Record ECL digit amplitude as a function of CrysID */
-  memset(&EperCrys[0], 0, EperCrys.size()*sizeof EperCrys[0]);
+  /** Record ECL energy for each crystal */
+  std::fill(EperCrys.begin(), EperCrys.end(), 0); // clear array
 
   //..Record crystals with high energies to diagnose cable swaps
   const double highEnergyThresh = 0.18; // GeV
   std::vector<int> highECrys; // crystalIDs of crystals with high energy
 
+  //..For data, use muon pair calibration; for expected energies, use ECLCrystalEnergy
   for (auto& eclDigit : m_eclDigitArray) {
     int crysID = eclDigit.getCellId() - 1;
     getObjectPtr<TH2F>("RawDigitAmpvsCrys")->Fill(crysID + 0.001, eclDigit.getAmp());
 
     /** MuMuECalib is negative if the previous iteration of the algorithm was unable to calculate a value. In this case, the input value has been stored with a minus sign */
-    EperCrys[crysID] = eclDigit.getAmp() * abs(MuMuECalib[crysID]) * ElectronicsCalib[crysID];
+    float calib =  abs(MuMuECalib[crysID]);
+    if (m_measureTrueEnergy) {calib = CrystalEnergy[crysID];}
+    EperCrys[crysID] = eclDigit.getAmp() * calib * ElectronicsCalib[crysID];
     if (EperCrys[crysID] > highEnergyThresh) {highECrys.push_back(crysID);}
     if (EperCrys[crysID] > 0.01) {
       getObjectPtr<TH2F>("RawDigitTimevsCrys")->Fill(crysID + 0.001, eclDigit.getTimeFit());
     }
   }
 
-  /** Overwrite using ECLCalDigits if we are using these events to determine MC deposited energy */
+  //------------------------------------------------------------------------
+  //..For expected energies, get the max energies crystals from the cluster. This is
+  // safer than converting the ECLDigit, since it does not require that the ECLCrystalEnergy
+  // payload used now is the same as was used when the event was generated.
   if (m_measureTrueEnergy) {
-
-    for (auto& eclCalDigit : m_eclCalDigitArray) {
-      int tempCrysID = eclCalDigit.getCellId() - 1;
-      EperCrys[tempCrysID] = eclCalDigit.getEnergy();
+    for (int ic = 0; ic < m_eclClusterArray.getEntries(); ic++) {
+      if (m_eclClusterArray[ic]->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
+        int crysID = m_eclClusterArray[ic]->getMaxECellId() - 1;
+        float undoCorrection = m_eclClusterArray[ic]->getEnergyRaw() / m_eclClusterArray[ic]->getEnergy(
+                                 ECLCluster::EHypothesisBit::c_nPhotons);
+        EperCrys[crysID] = undoCorrection * m_eclClusterArray[ic]->getEnergyHighestCrystal();
+      }
     }
   }
 

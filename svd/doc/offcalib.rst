@@ -5,6 +5,8 @@ SVD Offline Calibration
 
 Here we briefly describe the so-called offline calibrations.
 
+.. _svdtimecalib:
+
 Hit Time Calibration
 ---------------------
 

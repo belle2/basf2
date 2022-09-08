@@ -18,5 +18,5 @@ namespace Belle2 {
                                             LimitedOnStateApplier<CKFToPXDState, TrackFindingCDC::ChooseableFilter<PXDStateFilterFactory>>>;
                                             /// Alias to apply the () operator to all items filtered by CKF PXD layer states
                                             using ChooseableOnPXDStateApplier =
-                                            LayerToggledApplier<CKFToPXDState, LimitedOnStateApplier<CKFToPXDState, TrackFindingCDC::ChooseableFilter<PXDStateFilterFactory>>>;
+                                              LayerToggledApplier<CKFToPXDState, LimitedOnStateApplier<CKFToPXDState, TrackFindingCDC::ChooseableFilter<PXDStateFilterFactory>>>;
 }

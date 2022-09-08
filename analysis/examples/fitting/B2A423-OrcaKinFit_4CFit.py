@@ -41,8 +41,7 @@ from stdPhotons import stdPhotons
 mypath = b2.create_path()
 
 # load input ROOT file
-inputMdst(environmentType='default',
-          filename=b2.find_file('Y4SEventToetaY1S-evtgen_100.root', 'examples', False),
+inputMdst(filename=b2.find_file('Y4SEventToetaY1S-evtgen_100.root', 'examples', False),
           path=mypath)
 
 # Creates a list of good photon and mu
@@ -75,11 +74,9 @@ u4svars = vc.inv_mass + vc.kinematics + vc.mc_truth +\
     vu.create_aliases_for_selected(muvars, 'Upsilon(4S) -> eta [Upsilon -> ^mu+ ^mu-]') + \
     vu.create_aliases_for_selected(gvars, 'Upsilon(4S) -> [eta -> ^gamma ^gamma] Upsilon')
 
-u4svars_4c = u4svars + vu.create_aliases(['OrcaKinFitProb',
-                                          'OrcaKinFitChi2',
-                                          'OrcaKinFitErrorCode'], 'extraInfo({variable})', "")
+u4svars_4c = u4svars + ['OrcaKinFitProb', 'OrcaKinFitChi2', 'OrcaKinFitErrorCode']
 
-u4svars_def = u4svars + vu.create_aliases(['chiProb'], 'extraInfo({variable})', "")
+u4svars_def = u4svars + ['chiProb']
 
 
 # Saving variables to ntuple

@@ -14,13 +14,12 @@
 #include <iostream>
 #include <TVector3.h>
 
-using namespace std;
 using namespace Belle2;
 
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SVDROIFinderAnalysisData)
+REG_MODULE(SVDROIFinderAnalysisData);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -99,7 +98,7 @@ SVDROIFinderAnalysisDataModule::SVDROIFinderAnalysisDataModule() : Module()
 
   addParam("rootFileName", m_rootFileName,
            "fileName used for . Will be ignored if parameter 'writeToRoot' is false (standard)",
-           string("svdDataRedAnalysisData"));
+           std::string("svdDataRedAnalysisData"));
 
   addParam("recoTrackListName", m_recoTrackListName,
            "name of the input collection of RecoTracks", std::string(""));
@@ -230,7 +229,7 @@ void SVDROIFinderAnalysisDataModule::initialize()
 void SVDROIFinderAnalysisDataModule::event()
 {
 
-  B2DEBUG(1, "  ++++++++++++++ SVDROIFinderAnalysisDataModule");
+  B2DEBUG(21, "  ++++++++++++++ SVDROIFinderAnalysisDataModule");
 
   int nGoodROIs = 0;
   int nOkROIs = 0;
@@ -304,11 +303,11 @@ void SVDROIFinderAnalysisDataModule::event()
 
     float edgeStripsU = m_edgeU / pitchU;
     float edgeStripsV = m_edgeV / pitchV;
-    B2DEBUG(10, "good U in range " << edgeStripsU << ", " << nStripsU - edgeStripsU);
-    B2DEBUG(10, "good V in range " << edgeStripsV << ", " << nStripsV - edgeStripsV);
+    B2DEBUG(21, "good U in range " << edgeStripsU << ", " << nStripsU - edgeStripsU);
+    B2DEBUG(21, "good V in range " << edgeStripsV << ", " << nStripsV - edgeStripsV);
 
-    B2DEBUG(10, "U check: " << abs(centerROIU - centerSensorU) << " < (good) " << centerSensorU - edgeStripsU);
-    B2DEBUG(10, "V check: " << abs(centerROIV - centerSensorV) << " < (good) " << centerSensorV - edgeStripsV);
+    B2DEBUG(21, "U check: " << abs(centerROIU - centerSensorU) << " < (good) " << centerSensorU - edgeStripsU);
+    B2DEBUG(21, "V check: " << abs(centerROIV - centerSensorV) << " < (good) " << centerSensorV - edgeStripsV);
 
     if ((abs(centerROIU - centerSensorU) > centerSensorU - edgeStripsU)
         || (abs(centerROIV - centerSensorV) > centerSensorV - edgeStripsV))

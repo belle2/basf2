@@ -19,13 +19,12 @@
 #include <vxd/geometry/GeoCache.h>
 
 
-using namespace std;
 using namespace Belle2;
 
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SVDROIFinderAnalysis)
+REG_MODULE(SVDROIFinderAnalysis);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -196,7 +195,7 @@ SVDROIFinderAnalysisModule::SVDROIFinderAnalysisModule() : Module()
 
   addParam("rootFileName", m_rootFileName,
            "fileName used for . Will be ignored if parameter 'writeToRoot' is false (standard)",
-           string("svdDataRedAnalysis"));
+           std::string("svdDataRedAnalysis"));
 
   addParam("recoTrackListName", m_recoTrackListName,
            "name of the input collection of RecoTracks", std::string(""));
@@ -392,7 +391,7 @@ void SVDROIFinderAnalysisModule::event()
   NtrackHit = 0;
   Ntrack = 0;
 
-  B2DEBUG(1, "  ++++++++++++++ SVDROIFinderAnalysisModule");
+  B2DEBUG(21, "  ++++++++++++++ SVDROIFinderAnalysisModule");
 
   int nROIs = 0;
 
@@ -464,7 +463,7 @@ void SVDROIFinderAnalysisModule::event()
 
     Ntrack++;
 
-    B2DEBUG(1, "Number of RecoTracks = " << recoTracks_MCParticle.size() << " and SVDShaperDigits = " << svdDigits_MCParticle.size() <<
+    B2DEBUG(21, "Number of RecoTracks = " << recoTracks_MCParticle.size() << " and SVDShaperDigits = " << svdDigits_MCParticle.size() <<
             " related to this MCParticle");
 
     //retrieve general informations of MCParticle

@@ -17,6 +17,10 @@ using namespace Belle2;
 
 int main(int argc, char** argv)
 {
+  if (argc < 2) {
+    printf("Wrong number of arguments\n");
+    return 1;
+  }
   RFConf conf(argv[1]);
 
   // Creation of event server instance. evs contains the instance
@@ -30,5 +34,5 @@ int main(int argc, char** argv)
   evs->SetNodeInfo(nsm.GetNodeInfo());
 
   evs->server();
-
+  return 0;
 }

@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 
 #include <TCanvas.h>
 #include <TH1.h>
@@ -26,33 +26,52 @@ namespace Belle2 {
     // Public functions
   public:
 
-    //! Constructor / Destructor
+    /**
+     * Constructor.
+     */
     DQMHistAnalysisTOPModule();
+
+    /**
+     * Destructor.
+     */
     virtual ~DQMHistAnalysisTOPModule();
 
-    //! Module functions to be called from main process
+    /**
+     * Initializer.
+     */
     virtual void initialize() override;
 
-    //! Module functions to be called from event process
+    /**
+     * Called when entering a new run.
+     */
     virtual void beginRun() override;
-    virtual void event() override;
-    virtual void endRun() override;
-    virtual void terminate() override;
 
     /**
-     * Find histogram corresponding to canvas.
-     * @param hname Name of the histogram
-     * @return The pointer to the histogram, or nullptr if not found.
+     * This method is called for each event.
      */
-    TH1* find_histo_in_canvas(TString hname);
+    virtual void event() override;
+
     /**
-     * Find canvas by name
-     * @param cname Name of the canvas
-     * @return The pointer to the canvas, or nullptr if not found.
+     * This method is called if the current run ends.
      */
-    TCanvas* find_canvas(TString cname);
+    virtual void endRun() override;
+
+    /**
+     * This method is called at the end of the event processing.
+     */
+    virtual void terminate() override;
+
     //! Data members
   private:
+    /** Histogram from DQMInfo with run type. */
+    TH1* m_RunType = nullptr;
+
+    /** String with run type. */
+    TString m_RunTypeString;
+
+    /** Run type flag for null runs. */
+    bool m_IsNullRun;
+
     /** Canvas for the mean of the good hits. */
     TCanvas* m_c_goodHitsMean = nullptr;
     /** Canvas for the RMS of the good hits. */

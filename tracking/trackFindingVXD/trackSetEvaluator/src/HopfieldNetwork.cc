@@ -63,10 +63,10 @@ unsigned short HopfieldNetwork::doHopfield(
   std::iota(sequenceVector.begin(), sequenceVector.end(), 0);
 
   //The following block will be evaluated to empty, if LOG_NO_B2DEBUG is defined:
-  B2DEBUG(100, "sequenceVector with length " << sequenceVector.size());
-  B2DEBUG(100, "Entries are from begin to end:");
-  for (auto && entry : sequenceVector) {
-    B2DEBUG(100, std::to_string(entry) + ", ");
+  B2DEBUG(29, "sequenceVector with length " << sequenceVector.size());
+  B2DEBUG(29, "Entries are from begin to end:");
+  for (auto&& entry : sequenceVector) {
+    B2DEBUG(29, std::to_string(entry) + ", ");
   }
 
   //Store all values of c for protocolling:
@@ -95,12 +95,12 @@ unsigned short HopfieldNetwork::doHopfield(
 
     //Determine maximum change in weights:
     c = (x - xOld).cwiseAbs().maxCoeff();
-    B2DEBUG(10, "c value is " << c << " at iteration " << iIterations);
+    B2DEBUG(21, "c value is " << c << " at iteration " << iIterations);
     cValues.at(iIterations) = c;
 
     if (iIterations + 1 == nIterations) {
       B2INFO("Hopfield reached maximum number of iterations without convergence. cValues are:");
-      for (auto && entry : cValues) {
+      for (auto&& entry : cValues) {
         B2INFO(std::to_string(entry));
       }
       break;

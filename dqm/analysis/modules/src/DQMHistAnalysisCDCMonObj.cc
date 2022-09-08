@@ -9,29 +9,15 @@
 // Own include
 #include <dqm/analysis/modules/DQMHistAnalysisCDCMonObj.h>
 
-//DQM
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
-
 // CDC geometry
 #include <cdc/geometry/CDCGeometryPar.h>
 
-#include <TH1.h>
-#include <TH1F.h>
-#include <TH2F.h>
-#include <TH2Poly.h>
+#include <TROOT.h>
 #include <TEllipse.h>
 #include <TF1.h>
-#include <TCanvas.h>
 #include <TLine.h>
-#include <TClass.h>
-#include <TROOT.h>
-#include <TString.h>
-#include <TFile.h>
 #include <TStyle.h>
 
-#include <fstream>
-#include <vector>
-#include <algorithm>
 #include <numeric>
 
 using namespace std;
@@ -51,7 +37,6 @@ DQMHistAnalysisCDCMonObjModule::DQMHistAnalysisCDCMonObjModule()
   setPropertyFlags(c_ParallelProcessingCertified);
   for (int i = 0; i < 300; i++) {
     m_hADCs[i] = nullptr;
-    m_hADCTOTCuts[i] = nullptr;
     m_hTDCs[i] = nullptr;
   }
   for (int i = 0; i < 56; i++) m_hHits[i] = nullptr;
@@ -206,11 +191,16 @@ std::pair<int, int> DQMHistAnalysisCDCMonObjModule::getBoardChannel(unsigned sho
 void DQMHistAnalysisCDCMonObjModule::endRun()
 {
   B2DEBUG(20, "end run");
-  m_hfastTDC = (TH1F*)findHist("CDC/fast_tdc");
   m_hADC = (TH2F*)findHist("CDC/hADC");
-  m_hADCTOTCut = (TH2F*)findHist("CDC/hADCTOTCut");
   m_hTDC = (TH2F*)findHist("CDC/hTDC");
   m_hHit = (TH2F*)findHist("CDC/hHit");
+
+  if (m_hADC == nullptr) {
+    m_monObj->setVariable("comment", "No ADC histograms of CDC in file");
+    B2INFO("Histogram named m_hADC is not found.");
+    return;
+  }
+
   TF1* fitFunc[300] = {};
   for (int i = 0; i < 300; ++i) {
     fitFunc[i] = new TF1(Form("f%d", i), "[0]+[6]*x+[1]*(exp([2]*(x-[3]))/(1+exp(-([4]-x)/[5])))",
@@ -220,7 +210,7 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
     fitFunc[i]->SetParLimits(5, 0, 50.0);
   }
 
-  int neve = m_hfastTDC->GetEntries();
+  int neve = m_hTDC->GetEntries();
   if (neve == 0)neve = 1;
 
   B2DEBUG(20, "adc related");
@@ -232,12 +222,10 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
 
   std::vector<float> means = {};
   for (int i = 0; i < 300; ++i) {
-    m_hADCTOTCuts[i] = m_hADCTOTCut->ProjectionY(Form("hADCTOTCut%d", i), i + 1, i + 1, "");
-    m_hADCTOTCuts[i]->SetTitle(Form("hADCTOTCut%d", i));
     m_hADCs[i] = m_hADC->ProjectionY(Form("hADC%d", i), i + 1, i + 1, "");
     m_hADCs[i]->SetTitle(Form("hADC%d", i));
     float n = static_cast<float>(m_hADCs[i]->GetEntries());
-    if (m_hADCs[i]->GetEntries() == 0) {
+    if (m_hADCs[i]->Integral(0, m_hADCs[i]->GetNbinsX()) == 0) {
       nDeadADC += 1;
       hADC0->SetBinContent(i + 1, -0.1);
     } else {
@@ -251,15 +239,15 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
       means.push_back(m);
       hADCMean->SetBinContent(i + 1, m);
       hADCMean->SetBinError(i + 1, 0);
-      double overflow = m_hADCs[i]->GetBinContent(1001);
+      double overflow = m_hADCs[i]->GetBinContent(m_hADCs[i]->GetNbinsX() + 1);
       hADC1000->SetBinContent(i + 1, overflow / (overflow + n));
       hADC0->SetBinContent(i + 1, bin1 / (overflow + n));
-      /// for some reason, GetEntries() does not include overflow???
+      /// for some reason, GetEntries() does not include overflow in kekcc???
     }
   }
   // TDC related
   B2DEBUG(20, "tdc related");
-  int nDeadTDC = 1; // bid 0 always empty
+  int nDeadTDC = -1; // bid 0 always empty
   TH1F* hTDCEdge = new TH1F("hTDCEdge", "TDC edge;board;tdc edge [nsec]", 300, 0, 300);
   TH1F* hTDCSlope = new TH1F("hTDCSlope", "TDC slope;board;tdc slope [nsec]", 300, 0, 300);
   std::vector<float> tdcEdges = {};
@@ -267,7 +255,7 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   for (int i = 0; i < 300; ++i) {
     m_hTDCs[i] = m_hTDC->ProjectionY(Form("hTDC%d", i), i + 1, i + 1);
     m_hTDCs[i]->SetTitle(Form("hTDC%d", i));
-    if (m_hTDCs[i]->GetEntries() == 0 || m_hTDCs[i] == nullptr) {
+    if (m_hTDCs[i]->Integral(0, m_hTDCs[i]->GetNbinsX()) == 0 || m_hTDCs[i] == nullptr) {
       nDeadTDC += 1;
       tdcEdges.push_back(0);
       tdcSlopes.push_back(0);
@@ -311,7 +299,7 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
         nhitSumL += m_hHits[i]->GetBinContent(j + 1);
       }
       if (neve > 0) {
-        hHitPerLayer->SetBinContent(i + 1, static_cast<float>(nhitSumL / neve));
+        hHitPerLayer->SetBinContent(i + 1, static_cast<float>(1.0 * nhitSumL / neve));
       } else hHitPerLayer->SetBinContent(i + 1, static_cast<float>(nhitSumL));
       hHitPerLayer->SetBinError(i + 1, 0);
       nHits += nhitSumL;
@@ -320,21 +308,21 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
 
   // Bad wires related
   B2DEBUG(20, "bad wire related");
-  TH2F* hBadChannel = new TH2F("hbadch", "bad channel map;wire;layer", 400, 0, 400, 56, 0, 56);
+  hBadChannel = new TH2F("hbadch", "bad channel map;wire;layer", 400, 0, 400, 56, 0, 56);
   for (int i = 0; i < 400; ++i) {
     for (int j = 0; j < 56; ++j) {
       hBadChannel->Fill(i, j, -1);
     }
   }
 
-  TH2F* hBadChannelBC = new TH2F("hbadchBC", "bad channel map per board/channel;board;channel", 300, 0, 300, 48, 0, 48);
+  hBadChannelBC = new TH2F("hbadchBC", "bad channel map per board/channel;board;channel", 300, 0, 300, 48, 0, 48);
   for (int i = 0; i < 300; ++i) {
     for (int j = 0; j < 48; ++j) {
       hBadChannelBC->Fill(i, j, -1);
     }
   }
 
-  TH2Poly* h2p = new TH2Poly();
+  h2p = new TH2Poly();
   configureBins(h2p);
   h2p->SetTitle("bad wires in xy view");
   h2p->GetXaxis()->SetTitle("X [cm]");
@@ -396,11 +384,9 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
 
   for (int i = 0; i < 300; i++) {
     m_cADC->cd(i + 1);
-    m_hADCTOTCuts[i]->SetFillColor(42);
-    Double_t max = m_hADCTOTCuts[i]->GetMaximum();
+    Double_t max = m_hADCs[i]->GetMaximum();
     m_hADCs[i]->GetYaxis()->SetRangeUser(0, 3 * max);
     m_hADCs[i]->Draw("hist");
-    m_hADCTOTCuts[i]->Draw("hist same");
 
     m_cTDC->cd(i + 1);
     m_hTDCs[i]->Draw("hist");
@@ -435,9 +421,9 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   m_monObj->setVariable("adcMean", std::accumulate(means.begin(), means.end(), 0.0) / means.size());
   m_monObj->setVariable("nDeadADC", nDeadADC);
   m_monObj->setVariable("nBadADC", nBadADC); //???? n_0/n_tot>0.9
-  m_monObj->setVariable("tdcEdge", std::accumulate(tdcEdges.begin(), tdcEdges.end(), 0.0) / tdcEdges.size());
+  m_monObj->setVariable("tdcEdge", std::accumulate(tdcEdges.begin(), tdcEdges.end(), 0.0) / (tdcEdges.size() - 1 - nDeadTDC));
   m_monObj->setVariable("nDeadTDC", nDeadTDC);
-  m_monObj->setVariable("tdcSlope", std::accumulate(tdcSlopes.begin(), tdcSlopes.end(), 0.0) / tdcSlopes.size());
+  m_monObj->setVariable("tdcSlope", std::accumulate(tdcSlopes.begin(), tdcSlopes.end(), 0.0) / (tdcSlopes.size() - 1 - nDeadTDC));
 
   delete hADCMean;
   delete hADC1000;
@@ -445,9 +431,6 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   delete hTDCEdge;
   delete hTDCSlope;
   delete hHitPerLayer;
-  delete hBadChannel;
-  delete hBadChannelBC;
-  delete h2p;
 
 }
 

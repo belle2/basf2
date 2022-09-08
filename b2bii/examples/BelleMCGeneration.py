@@ -14,7 +14,12 @@
 import basf2
 from generators import add_evtgen_generator
 
+# Use B2BII local cache
+basf2.conditions.metadata_providers = ["/sw/belle/b2bii/database/conditions/b2bii.sqlite"]
+basf2.conditions.payload_locations = ["/sw/belle/b2bii/database/conditions/"]
+
 # Use B2BII global tag.
+basf2.conditions.override_globaltags()
 basf2.conditions.prepend_globaltag('B2BII_MC')
 
 # Path.

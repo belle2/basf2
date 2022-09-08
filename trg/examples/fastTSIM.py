@@ -13,7 +13,6 @@
 
 import basf2 as b2
 from simulation import add_simulation
-from L1trigger import add_trigger_simulation
 
 # b2.set_log_level(b2.LogLevel.DEBUG)
 
@@ -34,10 +33,8 @@ babayaganlo.param('VPUncertainty', True)
 main.add_module(babayaganlo)
 
 
+# trigger simulation is included by default
 add_simulation(main, simulateT0jitter=True, usePXDDataReduction=False, forceSetPXDDataReduction=True)
-
-# add trigger
-add_trigger_simulation(main, components=["CDC", "ECL", "KLM", "GRL", "GDL"])
 
 for m in main.modules():
     if m.name() == "TRGGDL":

@@ -13,11 +13,9 @@ Validation of the Beam Spot calibration
 '''
 
 
-import basf2
 from prompt import ValidationSettings
 import ROOT
 import sys
-import subprocess
 import json
 
 import numpy as np
@@ -25,7 +23,6 @@ import scipy.linalg as la
 import scipy.stats
 import matplotlib.pyplot as plt
 
-import re
 import os
 from glob import glob
 from math import sqrt, frexp, asin

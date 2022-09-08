@@ -12,19 +12,17 @@
 
 #pragma once
 
+#include <dqm/core/DQMHistAnalysis.h>
+
 #ifdef _BELLE2_EPICS
 // EPICS
 #include "cadef.h"
 #endif
 
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
 #include <vxd/dataobjects/VxdID.h>
-
-#include <TH2F.h>
-#include <TCanvas.h>
 #include <TLine.h>
 
-#include <vector>
+//#include <vector>
 
 namespace Belle2 {
   /*! DQM Histogram Analysis for PXD Reduction */
@@ -34,19 +32,37 @@ namespace Belle2 {
     // Public functions
   public:
 
-    //! Constructor
+    /**
+     * Constructor.
+     */
     DQMHistAnalysisPXDReductionModule();
-    //! Destructor
-    ~DQMHistAnalysisPXDReductionModule();
-  private:
 
-    //! Module functions to be called from main process
+    /**
+     * Destructor.
+     */
+    ~DQMHistAnalysisPXDReductionModule();
+
+    /**
+     * Initializer.
+     */
     void initialize(void) override final;
 
-    //! Module functions to be called from event process
+    /**
+     * Called when entering a new run.
+     */
     void beginRun(void) override final;
+
+    /**
+     * This method is called for each event.
+     */
     void event(void) override final;
+
+    /**
+     * This method is called at the end of the event processing.
+     */
     void terminate(void) override final;
+
+  private:
 
     // Data members
     //! name of histogram directory

@@ -123,7 +123,7 @@ def reconstructB2JpsiKs_mu(belleOrBelle2Flag='Belle2'):
 
     # reconstruct J/psi -> mu+ mu- decay using standard muon list and perform MC association
     ma.fillParticleList(decayString='mu+:all', cut='', path=cp_val_path)
-    ma.reconstructDecay(decayString='J/psi:mumu -> mu+:all mu-:all', cut='dM<0.11', path=cp_val_path)
+    ma.reconstructDecay(decayString='J/psi:mumu -> mu+:all mu-:all', cut='abs(dM) < 0.11', path=cp_val_path)
     ma.matchMCTruth(list_name='J/psi:mumu', path=cp_val_path)
 
     if belleOrBelle2Flag == "Belle":
@@ -132,16 +132,16 @@ def reconstructB2JpsiKs_mu(belleOrBelle2Flag='Belle2'):
         ma.matchMCTruth(list_name='K_S0:mdst', path=cp_val_path)
 
         # reconstruct B0 -> J/psi Ks decay
-        ma.reconstructDecay(decayString='B0:sig -> J/psi:mumu  K_S0:mdst', cut='Mbc > 5.2 and abs(deltaE)<0.15', path=cp_val_path)
+        ma.reconstructDecay(decayString='B0:sig -> J/psi:mumu  K_S0:mdst', cut='Mbc > 5.2 and abs(deltaE) < 0.15', path=cp_val_path)
 
     if belleOrBelle2Flag == "Belle2":
 
         # reconstruct Ks from standard pi+ particle list
         ma.fillParticleList(decayString='pi+:all', cut='', path=cp_val_path)
-        ma.reconstructDecay(decayString='K_S0:pipi -> pi+:all pi-:all', cut='dM<0.25', path=cp_val_path)
+        ma.reconstructDecay(decayString='K_S0:pipi -> pi+:all pi-:all', cut='abs(dM) < 0.25', path=cp_val_path)
 
         # reconstruct B0 -> J/psi Ks decay
-        ma.reconstructDecay(decayString='B0:sig -> J/psi:mumu K_S0:pipi', cut='Mbc > 5.2 and abs(deltaE)<0.15', path=cp_val_path)
+        ma.reconstructDecay(decayString='B0:sig -> J/psi:mumu K_S0:pipi', cut='Mbc > 5.2 and abs(deltaE) < 0.15', path=cp_val_path)
 
 
 def reconstructB2nunubar():
@@ -149,7 +149,8 @@ def reconstructB2nunubar():
     Defines the procedure to create a B0 list for the benchmark channel 'B0 -> nu_tau anti-nu_tau'
     """
 
-    ma.findMCDecay(list_name='B0:sig', decay='B0 -> nu_tau anti-nu_tau', writeOut=True, path=cp_val_path)
+    ma.fillParticleListFromMC('nu_tau:MC', '', path=cp_val_path)
+    ma.reconstructMCDecay('B0:sig -> nu_tau:MC anti-nu_tau:MC', '', writeOut=True, path=cp_val_path)
 
 
 def mcMatchAndBuildROE(belleOrBelle2Flag='Belle2'):
@@ -163,20 +164,7 @@ def mcMatchAndBuildROE(belleOrBelle2Flag='Belle2'):
     ma.matchMCTruth(list_name='B0:sig', path=cp_val_path)
 
     # build the rest of the event associated to the B0
-    if belleOrBelle2Flag == "Belle":
-        target_list_name = 'B0:sig'
-        ma.fillParticleList('pi+:mdst', '', path=cp_val_path)
-        ma.fillParticleList('gamma:mdst', '', path=cp_val_path)
-        # ma.fillParticleList('K_L0:mdst', '', path=cp_val_path)
-        inputParticlelists = ['pi+:mdst', 'gamma:mdst']
-        roeBuilder = b2.register_module('RestOfEventBuilder')
-        roeBuilder.set_name('ROEBuilder_' + target_list_name)
-        roeBuilder.param('particleList', target_list_name)
-        roeBuilder.param('particleListsInput', inputParticlelists)
-        cp_val_path.add_module(roeBuilder)
-
-    if belleOrBelle2Flag == "Belle2":
-        ma.buildRestOfEvent(target_list_name='B0:sig', inputParticlelists=[], path=cp_val_path)
+    ma.buildRestOfEvent(target_list_name='B0:sig', path=cp_val_path)
 
 
 def applyCPVTools(mode='Expert'):
@@ -212,13 +200,13 @@ def applyCPVTools(mode='Expert'):
             samplerFileId=str(fileNumber),
             path=cp_val_path)
 
-        # # Preliminar DNN Identifier has to be set by hand when validating
+        # # Preliminarily, DNN Identifier has to be set by hand when validating
         # # The standard name should be however
         # This is temporary till the DNN gets retrained.
         dnnIdentifier = "FlavorTagger_" + belleOrBelle2Flag + "_B2nunubarBGx1OptimizedForDataDNN"
         if belleOrBelle2Flag == "Belle":
             dnnIdentifier = "FlavorTagger_" + belleOrBelle2Flag + "_B2nunubarBGx1DNN"
-        b2.conditions.append_globaltag("analysis_tools_release-03-02-00")
+        b2.conditions.append_globaltag("analysis_tools_release-04-00")
         DeepFlavorTagger.DeepFlavorTagger('B0:sig',
                                           mode='expert',
                                           working_dir='',
@@ -229,7 +217,7 @@ def applyCPVTools(mode='Expert'):
 
         if doVertex:
             if decayChannel == "JPsiKs":
-                # vx.raveFit(list_name='B0:sig', conf_level=0.0, decay_string='B0:sig -> [J/psi:mumu -> ^mu+ ^mu-] K_S0',
+                # vx.kFit(list_name='B0:sig', conf_level=0.0, decay_string='B0:sig -> [J/psi:mumu -> ^mu+ ^mu-] K_S0',
                 #         constraint='', path=cp_val_path)
                 vx.treeFit(list_name='B0:sig', conf_level=-2, path=cp_val_path)
             vx.TagV(list_name='B0:sig', MCassociation='breco', path=cp_val_path)

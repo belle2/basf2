@@ -21,9 +21,9 @@ namespace Belle2 {
   TEST_F(BeamSpotTest, Basic)
   {
     BeamSpot bs;
-    EXPECT_EQ(bs.getIPPosition().X() , 0.);
-    EXPECT_EQ(bs.getIPPosition().Y() , 0.);
-    EXPECT_EQ(bs.getIPPosition().Z() , 0.);
+    EXPECT_EQ(bs.getIPPosition().X(), 0.);
+    EXPECT_EQ(bs.getIPPosition().Y(), 0.);
+    EXPECT_EQ(bs.getIPPosition().Z(), 0.);
 
     std::function<float (int, int)> sizeElement = [ & sizeElement](int i, int j) {
       return j >= i ? (i + 1) + 10 * (j + 1) : sizeElement(j, i) ;
@@ -47,27 +47,27 @@ namespace Belle2 {
     bs.setIP(position, positionError);
 
     TVector3 testPosition = bs.getIPPosition();
-    EXPECT_EQ(testPosition.X() , 1.);
-    EXPECT_EQ(testPosition.Y() , 2.);
-    EXPECT_EQ(testPosition.Z() , 3.);
+    EXPECT_EQ(testPosition.X(), 1.);
+    EXPECT_EQ(testPosition.Y(), 2.);
+    EXPECT_EQ(testPosition.Z(), 3.);
 
     TMatrixDSym testError = bs.getIPPositionCovMatrix();
     for (int i = 0; i < 3; i++)
       for (int j = 0; j < 3; j++)
-        EXPECT_EQ(testError(i, j) , errorElement(i, j));
+        EXPECT_EQ(testError(i, j), errorElement(i, j));
 
     TMatrixDSym testSize = bs.getSizeCovMatrix();
     for (int i = 0; i < 3; i++)
       for (int j = 0; j < 3; j++)
-        EXPECT_EQ(testSize(i, j) , sizeElement(i, j));
+        EXPECT_EQ(testSize(i, j), sizeElement(i, j));
 
 
     TMatrixDSym testCovVertex = bs.getCovVertex();
     for (int i = 0; i < 3; i++)
       for (int j = 0; j < 3; j++)
-        EXPECT_EQ(testCovVertex(i, j) , (sizeElement(i, j) + errorElement(i, j)));
+        EXPECT_EQ(testCovVertex(i, j), (sizeElement(i, j) + errorElement(i, j)));
 
-    EXPECT_EQ(bs.getGlobalUniqueID() , 1);
+    EXPECT_EQ(bs.getGlobalUniqueID(), 1);
     BeamSpot bs2(bs);
     EXPECT_EQ(bs == bs2, true);
 

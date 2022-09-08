@@ -7,21 +7,18 @@
  **************************************************************************/
 #include <tracking/modules/BoostVectorCollector/BoostVectorCollectorModule.h>
 
+#include <framework/geometry/B2Vector3.h>
 #include <analysis/dataobjects/ParticleList.h>
-#include <analysis/utility/ReferenceFrame.h>
-#include <mdst/dataobjects/TrackFitResult.h>
-
 #include <mdst/dataobjects/PIDLikelihood.h>
 
 using namespace Belle2;
-using namespace std;
 
 #include <iostream>
 
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(BoostVectorCollector)
+REG_MODULE(BoostVectorCollector);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -95,8 +92,8 @@ void BoostVectorCollectorModule::collect()
   m_mu1_pid = part1->getPIDLikelihood()->getProbability(Const::ChargedStable(13), Const::ChargedStable(11));
 
   // get 3-vectors of the mu/e momenta
-  m_mu0_p = part0->getMomentum();
-  m_mu1_p = part1->getMomentum();
+  m_mu0_p = B2Vector3D(part0->getMomentum());
+  m_mu1_p = B2Vector3D(part1->getMomentum());
 
 
   getObjectPtr<TTree>("events")->Fill();

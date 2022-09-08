@@ -7,8 +7,6 @@
  **************************************************************************/
 
 #include <tracking/modules/pruneRecoTracks/PruneRecoTracksModule.h>
-#include <framework/datastore/StoreArray.h>
-#include <tracking/dataobjects/RecoTrack.h>
 
 using namespace Belle2;
 
@@ -31,21 +29,17 @@ PruneRecoTracksModule::PruneRecoTracksModule() :
 
 void PruneRecoTracksModule::initialize()
 {
-  StoreArray<RecoTrack> recoTracks(m_storeArrayName);
+  if (m_RecoTracks.isOptional(m_storeArrayName)) {
+    m_RecoHitInformations.isRequired();
 
-  if (recoTracks.isOptional()) {
-    StoreArray<RecoHitInformation> recoHitInformation;
-    recoHitInformation.isRequired();
-
-    m_subsetOfUnprunedRecoHitInformation.registerSubset(recoHitInformation, DataStore::c_DontWriteOut);
+    m_subsetOfUnprunedRecoHitInformation.registerSubset(m_RecoHitInformations, DataStore::c_DontWriteOut);
   }
 }
 
 void PruneRecoTracksModule::event()
 {
-  Belle2::StoreArray<RecoTrack> tracks(m_storeArrayName);
-  if (tracks.getEntries() > 0) {
-    for (auto& t : tracks) {
+  if (m_RecoTracks.getEntries() > 0) {
+    for (auto& t : m_RecoTracks) {
       t.prune();
     }
 

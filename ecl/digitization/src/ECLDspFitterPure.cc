@@ -53,7 +53,7 @@ void Belle2::ECL::initParams(EclConfigurationPure::fitparamspure_t& params,
     }
   }
 
-  double kdt = 0.001 / (EclConfigurationPure::m_tickPure / EclConfigurationPure::m_ndtPure) ; // df / dtau = df / dt * dt / dtau
+  double kdt = 0.001 / (EclConfigurationPure::getTickPure() / EclConfigurationPure::m_ndtPure) ; // df / dtau = df / dt * dt / dtau
 
   params.c002 = 0;
   for (int h = 0; h < 16; h++) {
@@ -133,7 +133,7 @@ void Belle2::ECL::initParams(EclConfigurationPure::fitparamspure_t& params,
   }
 }
 
-void Belle2::ECL::DSPFitterPure(const EclConfigurationPure::fitparamspure_t& f  , const int* FitA, const int ttrig, int& amp,
+void Belle2::ECL::DSPFitterPure(const EclConfigurationPure::fitparamspure_t& f, const int* FitA, const int ttrig, int& amp,
                                 double& time, double& chi2, int& iter)
 {
   int baseline = accumulate(FitA, FitA + 16, 0) / 16;
@@ -160,7 +160,7 @@ void Belle2::ECL::DSPFitterPure(const EclConfigurationPure::fitparamspure_t& f  
     k001 += f.c001[i]     * y[i];
   }
 
-  double a[] = {   2 * f.c200[dt], f.c110[dt], f.c101[dt] ,
+  double a[] = {   2 * f.c200[dt], f.c110[dt], f.c101[dt],
                    f.c110[dt],   2 * f.c020[dt], f.c011[dt],
                    f.c101[dt],   f.c011[dt],   2 * f.c002
                };

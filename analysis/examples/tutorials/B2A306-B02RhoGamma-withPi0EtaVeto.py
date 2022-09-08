@@ -42,10 +42,10 @@ my_path = b2.create_path()
 
 # writePi0EtaVeto uses a payload in analysis global tag.
 b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
+b2.conditions.prepend_globaltag("pi0veto_systematics_preliminary")
 
 # load input ROOT file
-ma.inputMdst(environmentType='default',
-             filename=b2.find_file('B2rhogamma_rho2pipi.root', 'examples', False),
+ma.inputMdst(filename=b2.find_file('B2rhogamma_rho2pipi.root', 'examples', False),
              path=my_path)
 
 ma.fillParticleList(decayString='gamma:highE',
@@ -84,10 +84,24 @@ ma.buildRestOfEvent(target_list_name='B0',
 #        Each payload is optimized for different soft-photon selection criteria.
 #        If one wants to use one's own payload and soft-photon criteria, please use arguments,
 #        pi0PayloadNameOverride, pi0SoftPhotonCutOverride, etaPayloadNameOverride, etaSoftPhotonCutOverride,
+mode = 'standard'
+threshold = 0.30
+suffix = '30'
 ma.writePi0EtaVeto(particleList='B0',
                    decayString='B0 -> rho0 ^gamma',
-                   mode='standard',
+                   mode=mode,
                    path=my_path)
+
+# Perform addPi0VetoEfficiencySystematics
+# Data/MC ratio will be provided as extraInfo related with particleList for a given threshold.
+tableName = 'Pi0VetoEfficiencySystematics_Mar2022'
+ma.addPi0VetoEfficiencySystematics(particleList='B0',
+                                   decayString='B0 -> rho0 ^gamma',
+                                   tableName=tableName,
+                                   threshold=threshold,
+                                   mode=mode,
+                                   suffix=suffix,
+                                   path=my_path)
 
 # Then one can obtain the pi0/eta probability by the variables, `pi0Prob(arg)` and `etaProb`.
 # The argument corresponds to the mode which you set in writPieEtaVeto function.
@@ -223,7 +237,12 @@ b_vars = vc.kinematics + \
                                    decay_string='B0 -> ^rho0 gamma') + \
     vu.create_aliases_for_selected(list_of_variables=pi_vars,
                                    decay_string='B0 -> [rho0 -> ^pi+ ^pi-] gamma') + \
-    ['pi0Prob(standard)', 'etaProb(standard)', 'extraInfo(pi0veto)']
+    ['pi0Prob(standard)', 'etaProb(standard)', 'extraInfo(pi0veto)'] + \
+    [f'extraInfo(Pi0VetoEfficiencySystematics_{mode}{suffix}_data_MC_ratio)',
+     f'extraInfo(Pi0VetoEfficiencySystematics_{mode}{suffix}_data_MC_uncertainty_stat)',
+     f'extraInfo(Pi0VetoEfficiencySystematics_{mode}{suffix}_data_MC_uncertainty_sys)',
+     f'extraInfo(Pi0VetoEfficiencySystematics_{mode}{suffix}_data_MC_uncertainty_total)',
+     f'extraInfo(Pi0VetoEfficiencySystematics_{mode}{suffix}_threshold)']
 
 
 # Saving variables to ntuple

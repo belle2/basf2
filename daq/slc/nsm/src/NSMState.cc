@@ -10,3 +10,9 @@
 using namespace Belle2;
 
 const NSMState NSMState::ONLINE_S(1, "ONLINE");
+
+const NSMState& NSMState::operator=(const NSMState& state)
+{
+  Enum::operator=(state);
+  return *this;
+}

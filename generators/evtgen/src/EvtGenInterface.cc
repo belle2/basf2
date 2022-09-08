@@ -28,8 +28,6 @@
 #include <EvtGenBase/EvtPDL.hh>
 #include <EvtGenBase/EvtRandom.hh>
 
-#include <TLorentzVector.h>
-
 using namespace std;
 using namespace Belle2;
 
@@ -48,7 +46,9 @@ EvtGenInterface::~EvtGenInterface()
 
 EvtGen* EvtGenInterface::createEvtGen(const std::string& DECFileName, const bool coherentMixing)
 {
-  IOIntercept::OutputToLogMessages initLogCapture("EvtGen", LogConfig::c_Debug, LogConfig::c_Debug, 100, 100);
+  // Tauola prints normal things to stderr.. oh well.
+  IOIntercept::OutputToLogMessages initLogCapture("EvtGen", LogConfig::c_Info, LogConfig::c_Info);
+  initLogCapture.setIndent("  ");
   initLogCapture.start();
   EvtRandom::setRandomEngine(&EvtGenInterface::m_eng);
 
@@ -83,10 +83,11 @@ EvtGen* EvtGenInterface::createEvtGen(const std::string& DECFileName, const bool
 int EvtGenInterface::setup(const std::string& DECFileName, const std::string& parentParticle,
                            const std::string& userFileName, const bool coherentMixing)
 {
-  B2DEBUG(150, "Begin initialisation of EvtGen Interface.");
+  B2DEBUG(20, "Begin initialisation of EvtGen Interface.");
 
-  //tauola prints normal things to stderr.. oh well.
-  IOIntercept::OutputToLogMessages initLogCapture("EvtGen", LogConfig::c_Debug, LogConfig::c_Debug, 100, 100);
+  // Tauola prints normal things to stderr.. oh well.
+  IOIntercept::OutputToLogMessages initLogCapture("EvtGen", LogConfig::c_Info, LogConfig::c_Info);
+  initLogCapture.setIndent("  ");
   initLogCapture.start();
   if (!m_Generator) {
     m_Generator = createEvtGen(DECFileName, coherentMixing);
@@ -102,13 +103,13 @@ int EvtGenInterface::setup(const std::string& DECFileName, const std::string& pa
   }
   initLogCapture.finish();
 
-  B2DEBUG(150, "End initialisation of EvtGen Interface.");
+  B2DEBUG(20, "End initialisation of EvtGen Interface.");
 
   return 0;
 }
 
 
-int EvtGenInterface::simulateEvent(MCParticleGraph& graph, TLorentzVector pParentParticle, TVector3 pPrimaryVertex,
+int EvtGenInterface::simulateEvent(MCParticleGraph& graph, ROOT::Math::PxPyPzEVector pParentParticle, TVector3 pPrimaryVertex,
                                    int inclusiveType, const std::string& inclusiveParticle)
 {
   EvtId inclusiveParticleID, inclusiveAntiParticleID;
@@ -131,11 +132,11 @@ int EvtGenInterface::simulateEvent(MCParticleGraph& graph, TLorentzVector pParen
 
   bool we_got_inclusive_particle = false;
   do {
-    m_logCapture.start();
+    m_logCaptureDebug.start();
     m_parent = EvtParticleFactory::particleFactory(m_ParentParticle, m_pinit);
     m_parent->setVectorSpinDensity();
     m_Generator->generateDecay(m_parent);
-    m_logCapture.finish();
+    m_logCaptureDebug.finish();
 
     if (inclusiveType != 0) {
       EvtParticle* p = m_parent;
@@ -176,10 +177,10 @@ int EvtGenInterface::simulateDecay(MCParticleGraph& graph,
 {
   int pdg;
   EvtId id;
-  TLorentzVector momentum = parent.get4Vector();
-  TVector3 vertex = parent.getVertex();
+  ROOT::Math::PxPyPzEVector momentum = parent.get4Vector();
+  B2Vector3D vertex = parent.getVertex();
   m_pinit.set(momentum.E(), momentum.X(), momentum.Y(), momentum.Z());
-  m_logCapture.start();
+  m_logCaptureDebug.start();
   // we want to decay the particle so the decay time in the tree needs to be lower
   // than whatever the daughters will get
   parent.setDecayTime(-std::numeric_limits<float>::infinity());
@@ -191,7 +192,7 @@ int EvtGenInterface::simulateDecay(MCParticleGraph& graph,
   else
     m_parent->setDiagonalSpinDensity();
   m_Generator->generateDecay(m_parent);
-  m_logCapture.finish();
+  m_logCaptureDebug.finish();
   int iPart = addParticles2Graph(m_parent, graph, vertex, &parent, parent.getProductionTime());
   m_parent->deleteTree();
   return iPart;
@@ -261,7 +262,7 @@ void EvtGenInterface::updateGraphParticle(EvtParticle* eParticle, MCParticleGrap
   gParticle->setPDG(EvtPDL::getStdHep(eParticle->getId()));
 
   EvtVector4R EvtP4 = eParticle->getP4Lab();
-  TLorentzVector p4(EvtP4.get(1), EvtP4.get(2), EvtP4.get(3), EvtP4.get(0));
+  ROOT::Math::PxPyPzEVector p4(EvtP4.get(1), EvtP4.get(2), EvtP4.get(3), EvtP4.get(0));
   gParticle->set4Vector(p4);
 
   EvtVector4R Evtpos = eParticle->get4Pos();

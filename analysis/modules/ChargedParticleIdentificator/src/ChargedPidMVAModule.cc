@@ -19,7 +19,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(ChargedPidMVA)
+REG_MODULE(ChargedPidMVA);
 
 ChargedPidMVAModule::ChargedPidMVAModule() : Module()
 {
@@ -36,8 +36,8 @@ ChargedPidMVAModule::ChargedPidMVAModule() : Module()
            "The input background mass hypothesis' pdgId.",
            int(0));
   addParam("particleLists",
-           m_particle_lists,
-           "The input list of ParticleList names.",
+           m_decayStrings,
+           "The input list of decay strings, where the mother particle string should correspond to a full name of a particle list. One can select to run on daughters instead of mother particle, e.g. ['Lambda0 -> ^p+ ^pi-'].",
            std::vector<std::string>());
   addParam("payloadName",
            m_payload_name,
@@ -63,7 +63,6 @@ void ChargedPidMVAModule::initialize()
   m_event_metadata.isRequired();
 
   m_weightfiles_representation = std::make_unique<DBObjPtr<ChargedPidMVAWeights>>(m_payload_name);
-
 }
 
 
@@ -99,32 +98,44 @@ void ChargedPidMVAModule::event()
 {
 
   B2DEBUG(11, "EVENT: " << m_event_metadata->getEvent());
-
-  for (const auto& name : m_particle_lists) {
-
-    StoreObjPtr<ParticleList> pList(name);
-    if (!pList) { B2FATAL("ParticleList: " << name << " could not be found. Aborting..."); }
+  for (auto decayString : m_decayStrings) {
+    DecayDescriptor decayDescriptor;
+    decayDescriptor.init(decayString);
+    auto pl_name = decayDescriptor.getMother()->getFullName();
+    unsigned short m_nSelectedDaughters = decayDescriptor.getSelectionNames().size();
+    StoreObjPtr<ParticleList> pList(pl_name);
+    if (!pList) { B2FATAL("ParticleList: " << pl_name << " could not be found. Aborting..."); }
 
     // Need to get an absolute value in order to check if in Const::ChargedStable.
-    int pdg = abs(pList->getPDGCode());
-
-    // Check if this ParticleList is made up of legit Const::ChargedStable particles.
-    if (!(*m_weightfiles_representation.get())->isValidPdg(pdg)) {
-      B2FATAL("PDG: " << pList->getPDGCode() << " of ParticleList: " << pList->getParticleListName() <<
-              " is not that of a valid particle in Const::chargedStableSet! Aborting...");
-    }
-
-    // Skip if this ParticleList does not match any of the input (S, B) hypotheses.
-    if (pdg != m_sig_pdg && pdg != m_bkg_pdg) {
-      continue;
+    std::vector<int> pdgs;
+    if (m_nSelectedDaughters == 0)
+      pdgs.push_back(pList->getPDGCode());
+    else
+      pdgs = decayDescriptor.getSelectionPDGCodes();
+    for (auto pdg : pdgs) {
+      // Check if this ParticleList is made up of legit Const::ChargedStable particles.
+      if (!(*m_weightfiles_representation.get())->isValidPdg(abs(pdg))) {
+        B2FATAL("PDG: " << pdg << " of ParticleList: " << pl_name <<
+                " is not that of a valid particle in Const::chargedStableSet! Aborting...");
+      }
     }
 
     B2DEBUG(11, "ParticleList: " << pList->getParticleListName() << " - N = " << pList->getListSize() << " particles.");
+    const auto nTargetParticles = (m_nSelectedDaughters == 0) ? pList->getListSize() : pList->getListSize() *
+                                  m_nSelectedDaughters;
+    std::vector<const Particle*> targetParticles;
+    if (m_nSelectedDaughters > 0) {
+      for (unsigned int iPart(0); iPart < pList->getListSize(); ++iPart) {
+        auto* iParticle = pList->getParticle(iPart);
+        auto daughters = decayDescriptor.getSelectionParticles(iParticle);
+        for (auto* iDaughter : daughters) {
+          targetParticles.push_back(iDaughter);
+        }
+      }
+    }
+    for (unsigned int ipart(0); ipart < nTargetParticles; ++ipart) {
 
-    for (unsigned int ipart(0); ipart < pList->getListSize(); ++ipart) {
-
-      Particle* particle = pList->getParticle(ipart);
-
+      const Particle* particle = (m_nSelectedDaughters == 0) ? pList->getParticle(ipart) : targetParticles[ipart];
       B2DEBUG(11, "\tParticle [" << ipart << "]");
 
       // Check that the particle has a valid relation set between track and ECL cluster.
@@ -169,7 +180,17 @@ void ChargedPidMVAModule::event()
 
         auto varobj = m_variables.at(index).at(ivar);
 
-        auto var = varobj->function(particle);
+        double var = -999.0;
+        auto var_result = varobj->function(particle);
+        if (std::holds_alternative<double>(var_result)) {
+          var = std::get<double>(var_result);
+        } else if (std::holds_alternative<int>(var_result)) {
+          var = std::get<int>(var_result);
+        } else if (std::holds_alternative<bool>(var_result)) {
+          var = std::get<bool>(var_result);
+        } else {
+          B2ERROR("Variable '" << varobj->name << "' has wrong data type! It must be one of double, integer, or bool.");
+        }
 
         // Manual imputation value of -999 for NaN (undefined) variables.
         var = (std::isnan(var)) ? -999.0 : var;
@@ -187,7 +208,17 @@ void ChargedPidMVAModule::event()
 
         auto specobj = m_spectators.at(index).at(ispec);
 
-        auto spec = specobj->function(particle);
+        double spec = std::numeric_limits<double>::quiet_NaN();
+        auto spec_result = specobj->function(particle);
+        if (std::holds_alternative<double>(spec_result)) {
+          spec = std::get<double>(spec_result);
+        } else if (std::holds_alternative<int>(spec_result)) {
+          spec = std::get<int>(spec_result);
+        } else if (std::holds_alternative<bool>(spec_result)) {
+          spec = std::get<bool>(spec_result);
+        } else {
+          B2ERROR("Variable '" << specobj->name << "' has wrong data type! It must be one of double, integer, or bool.");
+        }
 
         B2DEBUG(12, "\t\tspec[" << ispec << "] : " << specobj->name << " = " << spec);
 
@@ -201,7 +232,7 @@ void ChargedPidMVAModule::event()
         std::unique_ptr<Variable::Cut> cut = Variable::Cut::compile(cutstr);
 
         if (!cut->check(particle)) {
-          B2WARNING("\tParticle didn't pass MVA category cut, skip MVA application...");
+          B2DEBUG(11, "\t\tParticle didn't pass MVA category cut, skip MVA application...");
           continue;
         }
 
@@ -213,7 +244,7 @@ void ChargedPidMVAModule::event()
       B2DEBUG(12, "\tExtraInfo: " << m_score_varname);
 
       // Store the MVA score as a new particle object property.
-      particle->writeExtraInfo(m_score_varname, score);
+      m_particles[particle->getArrayIndex()]->writeExtraInfo(m_score_varname, score);
 
     }
 

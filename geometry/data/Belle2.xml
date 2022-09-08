@@ -30,8 +30,8 @@
   <xi:include href="../arich/ARICH-Materials.xml"/>
   <xi:include href="../arich/ARICH-Materials-Aerogel.xml"/>
   <xi:include href="../ecl/ECL-Materials.xml"/>
-  <xi:include href="../klm/bklm/BKLM-Materials.xml"/>
-  <xi:include href="../klm/eklm/EKLMMaterials.xml"/>
+  <xi:include href="../klm/BKLMMaterials.xml"/>
+  <xi:include href="../klm/EKLMMaterials.xml"/>
   <xi:include href="../beast/bgo/BGO-Materials.xml" />
   <xi:include href="../beast/microtpc/MICROTPC-Materials.xml"/>
   <xi:include href="../beast/pindiode/PINDIODE-Materials.xml"/>
@@ -131,6 +131,11 @@
   </DetectorComponent>
   <DetectorComponent name="CLAWS" isDefault="false">
     <xi:include href="../beast/claws/CLAWS3.xml" xpointer="xpointer(/DetectorComponent/*)" />
+  </DetectorComponent>
+
+  <!-- CDC without SL0 -->
+  <DetectorComponent name="CDCReduced" isDefault="false">
+    <xi:include href="../cdc/CDCReduced.xml" xpointer="xpointer(/DetectorComponent/*)" />
   </DetectorComponent>
 
 

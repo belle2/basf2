@@ -42,6 +42,7 @@ try:
         elif os.environ['BELLE2_MAX_BUILDS'] != 'LOAD':
             num_jobs = min(num_cpus, int(os.environ['BELLE2_MAX_BUILDS']))
     SetOption('num_jobs', num_jobs)
+    print(f'Number of parallel builds: {num_jobs}')
 except:
     pass
 
@@ -223,10 +224,7 @@ elif option == 'clang':
     if not clang_dir:
         print('clang compiler not found.')
         Exit(1)
-    # clang has trouble with c-files under SL5 due to a problem with the glibc.
-    # https://llvm.org/bugs/show_bug.cgi?id=5960
-    # So we compile c files with gcc and only c++ with clang for now
-    # global_env['CC'] = 'clang'
+    global_env['CC'] = 'clang'
     global_env['CXX'] = 'clang++'
     # enable a few extra warnings warnings but disable the missing braces warning, because it can lead
     # to false positives in conjuction with std::array : https://llvm.org/bugs/show_bug.cgi?id=21629

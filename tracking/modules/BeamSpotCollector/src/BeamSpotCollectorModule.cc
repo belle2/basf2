@@ -12,14 +12,13 @@
 #include <mdst/dataobjects/TrackFitResult.h>
 
 using namespace Belle2;
-using namespace std;
 
 #include <iostream>
 
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(BeamSpotCollector)
+REG_MODULE(BeamSpotCollector);
 
 //-----------------------------------------------------------------
 //                 Implementation

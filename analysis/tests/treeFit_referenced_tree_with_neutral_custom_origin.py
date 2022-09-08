@@ -28,10 +28,10 @@ class TestTreeFits(unittest.TestCase):
 
         inputfile = b2test_utils.require_file(
             'analysis/1000_B_DstD0Kpipi0_skimmed.root', 'validation', py_case=self)
-        ma.inputMdst('default', inputfile, path=main)
+        ma.inputMdst(inputfile, path=main)
 
-        ma.fillParticleList('pi+:a', 'pidProbabilityExpert(211, ALL) > 0.5', path=main)
-        ma.fillParticleList('K+:a', 'pidProbabilityExpert(321, ALL) > 0.5', path=main)
+        ma.fillParticleList('pi+:a', 'pionID > 0.5', path=main)
+        ma.fillParticleList('K+:a', 'kaonID > 0.5', path=main)
 
         ma.fillParticleList('gamma:a', 'E > 0.08', path=main)
         ma.reconstructDecay('pi0:a -> gamma:a gamma:a', '0.125 < InvM < 0.145', 0, path=main)

@@ -46,6 +46,7 @@ class RunningTagUpdaterError(Exception):
     variables in `extra_vars` to be shown to the user for additional information
     """
     #: Initialize the class.
+
     def __init__(self, description, **extra_vars):
         super().__init__(description)
         #: extra keyword arguments given to the exception constructor
@@ -71,6 +72,7 @@ class RunningTagUpdater:
     6. Close all payloads to be updated in the running tag that are open just
        before the validity in the staging tag.
     """
+
     def __init__(self, db, running, staging, valid_from, mode, dry_run=False):
         """Initialize the class
 

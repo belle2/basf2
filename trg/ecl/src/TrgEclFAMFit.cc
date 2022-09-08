@@ -73,8 +73,8 @@ TrgEclFAMFit::setup(int eventId)
   // prepare coefficient for fitting
   //
 
-  _DataBase -> getCoeffSigPDF(CoeffSigPDF0 ,  CoeffSigPDF1);
-  _DataBase -> getCoeffNoise(0,  CoeffNoise31 , CoeffNoise32, CoeffNoise33);
+  _DataBase -> getCoeffSigPDF(CoeffSigPDF0,  CoeffSigPDF1);
+  _DataBase -> getCoeffNoise(0,  CoeffNoise31, CoeffNoise32, CoeffNoise33);
 
   EventId = eventId;
   //
@@ -129,6 +129,7 @@ TrgEclFAMFit::FAMFit01(std::vector<std::vector<double>> digiEnergy, std::vector<
         TCFitSample[iFitSample] = digiEnergy[iTCIdm][iReplace] * 1000.0;
         if (0) {
           if (pedFlag == 1 && iFitSample < 4) {
+            // cppcheck-suppress uninitdata
             TCFitSample[iFitSample] = preped[iFitSample];
             pedFlag = 0;
           }

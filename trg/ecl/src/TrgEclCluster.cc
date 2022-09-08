@@ -34,10 +34,8 @@
 
 #include <framework/datastore/StoreArray.h>
 
-
 #include <trg/ecl/TrgEclCluster.h>
 #include "trg/ecl/dataobjects/TRGECLCluster.h"
-
 
 using namespace std;
 using namespace Belle2;
@@ -95,9 +93,8 @@ TrgEclCluster::~TrgEclCluster()
 {
   delete _TCMap;
 }
-
-
-
+//
+//
 //
 int
 TrgEclCluster::getICNFwBr(void)
@@ -137,7 +134,6 @@ TrgEclCluster::getBwICNCluster(int ICNId, int location)
   return _BwCluster[ICNId][location];
 
 }
-
 //
 //
 //
@@ -167,9 +163,11 @@ TrgEclCluster::setICN(const std::vector<int>& tcid)
   _icnfwbrbw[0] = setForwardICN();
   _icnfwbrbw[2] = setBackwardICN();
 
-
   return;
 }
+//
+//
+//
 void
 TrgEclCluster::setICN(const std::vector<int>& tcid,
                       const std::vector<double>& tcenergy,
@@ -187,6 +185,9 @@ TrgEclCluster::setICN(const std::vector<int>& tcid,
 
   return;
 }
+//
+//
+//
 void
 TrgEclCluster::save(int m_nEvent)
 {
@@ -228,6 +229,9 @@ TrgEclCluster::save(int m_nEvent)
 
 
 }
+//
+//
+//
 void TrgEclCluster::setBarrelICN(int Method)
 {
 
@@ -270,99 +274,30 @@ void TrgEclCluster::setBarrelICN(int Method)
   int tc_upper_left = 0;
 
   for (int iii = 0 ; iii < 432 ; iii++) {
+
     if (TCFire[iii] == 0) { continue; }
 
-    if (iii < 12) {
-      tc_upper      = TCFire[iii + 420] ;
-      tc_upper_right = TCFire[iii + 419] ;
-      tc_right      = TCFire[iii - 1] ;
-      tc_lower_right = TCFire[iii + 11] ;
-      tc_lower      = TCFire[iii + 12] ;
-      tc_lower_left = TCFire[iii + 13] ;
-      tc_left = TCFire[iii + 1] ;
-      tc_upper_left = TCFire[iii + 421] ;
-      if (iii % 12 == 0) {
-        tc_upper_right = 0;
-        tc_right      = 0;
-        tc_lower_right = 0;
-
-      }
-      if (iii % 12 == 11) {
-        tc_lower_left = 0;
-        tc_left = 0;
-        tc_upper_left = 0;
-
-      }
-    }
-    if (iii > 11 && iii < 420) {
-      tc_upper      = TCFire[iii - 12] ;
-      // cppcheck-suppress negativeContainerIndex
-      tc_upper_right = TCFire[iii - 13] ;
-      tc_right      = TCFire[iii - 1] ;
-      tc_lower_right = TCFire[iii + 11] ;
-      tc_lower      = TCFire[iii + 12] ;
-      tc_lower_left = TCFire[iii + 13] ;
-      tc_left = TCFire[iii + 1] ;
-      tc_upper_left = TCFire[iii - 11] ;
-      if (iii % 12 == 0) {
-        tc_upper_right = 0;
-        tc_right      = 0;
-        tc_lower_right = 0;
-
-      }
-      if (iii % 12 == 11) {
-        tc_lower_left = 0;
-        tc_left = 0;
-        tc_upper_left = 0;
-
-      }
-
-    }
-    if (iii > 419) {
-      tc_upper      = TCFire[iii - 12] ;
-      tc_upper_right = TCFire[iii - 13] ;
-      tc_right      = TCFire[iii - 1] ;
-      // cppcheck-suppress negativeContainerIndex
-      tc_lower_right = TCFire[iii - 421] ;
-      tc_lower      = TCFire[iii - 420] ;
-      tc_lower_left = TCFire[iii  - 419];
-      tc_left = TCFire[iii + 1] ;
-      tc_upper_left = TCFire[iii  - 11] ;
-      if (iii % 12 == 0) {
-        tc_upper_right = 0;
-        tc_right      = 0;
-        tc_lower_right = 0;
-      }
-      if (iii % 12 == 11) {
-        tc_lower_left = 0;
-        tc_left = 0;
-        tc_upper_left = 0;
-
-      }
-    }
-
-
-    TempCluster[0] = iii + 80 + 1; //middle of ICN
-    TempCluster[1] = tc_upper; // upper
-    TempCluster[2] = tc_upper_right; //right
-    TempCluster[3] = tc_right; //right
-    TempCluster[4] = tc_lower_right; //lower
-    TempCluster[5] = tc_lower; //lower
-    TempCluster[6] = tc_lower_left; //lower
-    TempCluster[7] = tc_left; //lower
-    TempCluster[8] = tc_upper_left; //lower right;
-
+    setBarrelICNsub(iii,
+                    TCFire,
+                    tc_upper,
+                    tc_upper_right,
+                    tc_right,
+                    tc_lower_right,
+                    tc_lower,
+                    tc_lower_left,
+                    tc_left,
+                    tc_upper_left);
 
     if (!(tc_upper != 0 || tc_left != 0)) {
       if (!(tc_lower != 0 && tc_lower_left != 0)) {
 
-        if (Method == 1) { //for cluster method2(Consider TC energy in oderto find the center of cluster)
-
+        if (Method == 1) {
+          // for cluster method2(Consider TC energy in oderto find the center of cluster)
           int maxTCid = 0;
           double maxTCEnergy = 0;
           for (int iTC = 0; iTC < 9; iTC++) { //find center of Cluster
             if (TempCluster[iTC] == 0) {continue;}
-            if (maxTCEnergy <       TCFireEnergy[TempCluster[iTC] - 81]) {
+            if (maxTCEnergy < TCFireEnergy[TempCluster[iTC] - 81]) {
               maxTCEnergy = TCFireEnergy[TempCluster[iTC] - 81];
               maxTCid = TempCluster[iTC];
             }
@@ -380,20 +315,15 @@ void TrgEclCluster::setBarrelICN(int Method)
             TempCluster[7] = TCFire[maxTCid + 1 - 81 ] ;
             TempCluster[8] = TCFire[maxTCid + 421 - 81 ] ;
 
-
             if ((maxTCid - 81) % 12 == 0) {
-
               TempCluster[2] = 0 ;
               TempCluster[3] = 0 ;
               TempCluster[4] = 0 ;
-
             }
             if ((maxTCid - 81) % 12 == 11) {
-
               TempCluster[6] = 0 ;
               TempCluster[7] = 0 ;
               TempCluster[8] = 0 ;
-
             }
           }
           if (maxTCid > 92 && maxTCid < 501) {
@@ -409,19 +339,15 @@ void TrgEclCluster::setBarrelICN(int Method)
             TempCluster[8] = TCFire[maxTCid - 11 - 81] ;
 
             if ((maxTCid - 81) % 12 == 0) {
-              TempCluster[2] = 0 ;
-              TempCluster[3] = 0 ;
-              TempCluster[4] = 0 ;
-
+              TempCluster[2] = 0;
+              TempCluster[3] = 0;
+              TempCluster[4] = 0;
             }
             if ((maxTCid - 81) % 12 == 11) {
-
-              TempCluster[6] = 0 ;
-              TempCluster[7] = 0 ;
-              TempCluster[8] = 0 ;
-
+              TempCluster[6] = 0;
+              TempCluster[7] = 0;
+              TempCluster[8] = 0;
             }
-
           }
           if (maxTCid > 500) {
             TempCluster[1] = TCFire[maxTCid - 12 - 81] ;
@@ -433,26 +359,17 @@ void TrgEclCluster::setBarrelICN(int Method)
             TempCluster[6] = TCFire[maxTCid - 419 - 81] ;
             TempCluster[7] = TCFire[maxTCid + 1 - 81] ;
             TempCluster[8] = TCFire[maxTCid - 11 - 81] ;
-
-
-
             if ((maxTCid - 81) % 12 == 0) {
               TempCluster[2] = 0 ;
               TempCluster[3] = 0 ;
               TempCluster[4] = 0 ;
-
             }
             if ((maxTCid - 81) % 12 == 11) {
-
               TempCluster[6] = 0 ;
               TempCluster[7] = 0 ;
               TempCluster[8] = 0 ;
-
             }
-
           }
-
-
         }
 
         for (int iNearTC = 1; iNearTC < 9; iNearTC ++) {
@@ -480,9 +397,6 @@ void TrgEclCluster::setBarrelICN(int Method)
           clusterpositionX += TCFireEnergy[TempCluster[iNearTC] - 81] * TCFirePosition[TempCluster[iNearTC] - 81][0];
           clusterpositionY += TCFireEnergy[TempCluster[iNearTC] - 81] * TCFirePosition[TempCluster[iNearTC] - 81][1];
           clusterpositionZ += TCFireEnergy[TempCluster[iNearTC] - 81] * TCFirePosition[TempCluster[iNearTC] - 81][2];
-
-
-
         }
         //
         maxTCId = TempCluster[0];
@@ -513,6 +427,9 @@ void TrgEclCluster::setBarrelICN(int Method)
   _BRNofCluster = MaxTCId[0].size();
 
 }
+//
+//
+//
 void
 TrgEclCluster::setForwardICN(int Method)
 {
@@ -546,10 +463,6 @@ TrgEclCluster::setForwardICN(int Method)
   Sort2D.clear();
   Sort1D.clear();
 
-
-
-
-
   TCFire.clear();
   TCFireEnergy.clear();
   TCFireTiming.clear();
@@ -571,8 +484,6 @@ TrgEclCluster::setForwardICN(int Method)
     TCFirePosition[TCId[ihit] - 1][0] = (_TCMap->getTCPosition(TCId[ihit])).X();
     TCFirePosition[TCId[ihit] - 1][1] = (_TCMap->getTCPosition(TCId[ihit])).Y();
     TCFirePosition[TCId[ihit] - 1][2] = (_TCMap->getTCPosition(TCId[ihit])).Z();
-
-
 
     //------------------------------------
     // To rearrange the hitted map
@@ -620,8 +531,11 @@ TrgEclCluster::setForwardICN(int Method)
         continue;
       }
     }
-    for (int iinit = 0; iinit < 9; iinit ++) {TempCluster[iinit] = 0;}
-    if (TCFire[iii] == 0) { continue; }
+    for (int iinit = 0; iinit < 9; iinit ++)
+      TempCluster[iinit] = 0;
+    if (TCFire[iii] == 0)
+      continue;
+    // cppcheck-suppress knownConditionTrueFalse
     if (iii < 32) { // most inner
       if (iii == 0) {
         TempCluster[0] = TCFire[iii];
@@ -665,7 +579,7 @@ TrgEclCluster::setForwardICN(int Method)
         }
       }
 
-    } else if (iii > 31 && iii < 64) {
+    } else if (iii < 64) {
       if (iii == 32) {
         TempCluster[0] = TCFire[iii];
         TempCluster[1] = TCFire[63]; // up
@@ -736,12 +650,8 @@ TrgEclCluster::setForwardICN(int Method)
       if (!(TempCluster[1] != 0 || TempCluster[7] != 0)) {
         if (!(TempCluster[5] != 0 && TempCluster[6] != 0)) {
           icn_flag = 1;
-
-
         }
       }
-
-
 
     } else {
       if (iii == 64) {
@@ -850,7 +760,7 @@ TrgEclCluster::setForwardICN(int Method)
 
           }
 
-        } else if (kkk > 31 && kkk < 64) {
+        } else if (kkk < 64) {
           if (kkk == 32) {
             TempCluster[0] = TCFire[kkk];
             TempCluster[1] = TCFire[63]; // up
@@ -1170,7 +1080,7 @@ void TrgEclCluster::setBackwardICN(int Method)
         TempCluster[7] = TCFire[iii + 32]; // left
         TempCluster[8] = TCFire[iii + 31]; //top left
       }
-    } else if (iii > 31) {
+    } else {
       if (iii == 32) {
         TempCluster[0] = TCFire[32];
         TempCluster[1] = TCFire[63]; // top
@@ -1266,7 +1176,7 @@ void TrgEclCluster::setBackwardICN(int Method)
               TempCluster[7] = TCFire[kkk + 32]; // left
               TempCluster[8] = TCFire[kkk + 31]; //top left
             }
-          } else if (kkk > 31) {
+          } else {
             if (kkk == 32) {
               TempCluster[0] = TCFire[32];
               TempCluster[1] = TCFire[63]; // top
@@ -1390,7 +1300,6 @@ void TrgEclCluster::setBackwardICN(int Method)
 
   _BWDNofCluster = MaxTCId[2].size();
 }
-
 //
 //
 //
@@ -1410,7 +1319,6 @@ TrgEclCluster::setBarrelICN()
       TCFire[TCId[ihit] - 81] = TCId[ihit];
     }
   }
-
   //
   //
   //
@@ -1426,84 +1334,16 @@ TrgEclCluster::setBarrelICN()
   for (int iii = 0 ; iii < 432 ; iii++) {
     if (TCFire[iii] == 0) { continue; }
 
-    if (iii < 12) {
-      tc_upper      = TCFire[iii + 420] ;
-      tc_upper_right = TCFire[iii + 419] ;
-      tc_right      = TCFire[iii - 1] ;
-      tc_lower_right = TCFire[iii + 11] ;
-      tc_lower      = TCFire[iii + 12] ;
-      tc_lower_left = TCFire[iii + 13] ;
-      tc_left = TCFire[iii + 1] ;
-      tc_upper_left = TCFire[iii + 421] ;
-      if (iii % 12 == 0) {
-        tc_upper_right = 0;
-        tc_right      = 0;
-        tc_lower_right = 0;
-
-      }
-      if (iii % 12 == 11) {
-        tc_lower_left = 0;
-        tc_left = 0;
-        tc_upper_left = 0;
-
-      }
-    }
-    if (iii > 11 && iii < 420) {
-      tc_upper      = TCFire[iii - 12] ;
-      // cppcheck-suppress negativeContainerIndex
-      tc_upper_right = TCFire[iii - 13] ;
-      tc_right      = TCFire[iii - 1] ;
-      tc_lower_right = TCFire[iii + 11] ;
-      tc_lower      = TCFire[iii + 12] ;
-      tc_lower_left = TCFire[iii + 13] ;
-      tc_left = TCFire[iii + 1] ;
-      tc_upper_left = TCFire[iii - 11] ;
-      if (iii % 12 == 0) {
-        tc_upper_right = 0;
-        tc_right      = 0;
-        tc_lower_right = 0;
-
-      }
-      if (iii % 12 == 11) {
-        tc_lower_left = 0;
-        tc_left = 0;
-        tc_upper_left = 0;
-
-      }
-
-    }
-    if (iii > 419) {
-      tc_upper      = TCFire[iii - 12] ;
-      tc_upper_right = TCFire[iii - 13] ;
-      tc_right      = TCFire[iii - 1] ;
-      // cppcheck-suppress negativeContainerIndex
-      tc_lower_right = TCFire[iii - 421] ;
-      tc_lower      = TCFire[iii - 420] ;
-      tc_lower_left = TCFire[iii  - 419];
-      tc_left = TCFire[iii + 1] ;
-      tc_upper_left = TCFire[iii  - 11] ;
-      if (iii % 12 == 0) {
-        tc_upper_right = 0;
-        tc_right      = 0;
-        tc_lower_right = 0;
-      }
-      if (iii % 12 == 11) {
-        tc_lower_left = 0;
-        tc_left = 0;
-        tc_upper_left = 0;
-
-      }
-    }
-
-    TempCluster[0] = iii + 80 + 1; //middle of ICN
-    TempCluster[1] = tc_upper; // upper
-    TempCluster[2] = tc_upper_right; //right
-    TempCluster[3] = tc_right; //right
-    TempCluster[4] = tc_lower_right; //lower
-    TempCluster[5] = tc_lower; //lower
-    TempCluster[6] = tc_lower_left; //lower
-    TempCluster[7] = tc_left; //lower
-    TempCluster[8] = tc_upper_left; //lower right;
+    setBarrelICNsub(iii,
+                    TCFire,
+                    tc_upper,
+                    tc_upper_right,
+                    tc_right,
+                    tc_lower_right,
+                    tc_lower,
+                    tc_lower_left,
+                    tc_left,
+                    tc_upper_left);
 
     if (!(tc_upper != 0 || tc_left != 0)) {
       if (!(tc_lower != 0 && tc_lower_left != 0)) {
@@ -1528,6 +1368,80 @@ TrgEclCluster::setBarrelICN()
   }
   return _BRICN;
 
+}
+//
+//
+//
+void
+TrgEclCluster::setBarrelICNsub(int iii,
+                               std::vector<int> TCFire,
+                               int& tc_upper,
+                               int& tc_upper_right,
+                               int& tc_right,
+                               int& tc_lower_right,
+                               int& tc_lower,
+                               int& tc_lower_left,
+                               int& tc_left,
+                               int& tc_upper_left)
+{
+  // take into account TCId jump at boundary between FAM-9 and FAM-44
+  int offset_upper = 0;
+  int offset_lower = 0;
+  if (iii <= 11) {
+    // FAM-9
+    offset_upper = 432;
+    offset_lower =   0;
+  } else if (iii <= 419) {
+    // FAM-10 to FAM-43
+    offset_upper = 0;
+    offset_lower = 0;
+  } else {
+    // FAM-44
+    offset_upper = 0;
+    offset_lower = -432;
+  }
+
+  // take into account TC at boundary near endcaps
+  if (iii % 12 == 0) {
+    // TC at most forward side
+    tc_upper       = TCFire[iii -  12 + offset_upper];
+    tc_upper_right = 0;
+    tc_right       = 0;
+    tc_lower_right = 0;
+    tc_lower       = TCFire[iii +  12 + offset_lower];
+    tc_lower_left  = TCFire[iii +  13 + offset_lower];
+    tc_left        = TCFire[iii +   1];
+    tc_upper_left  = TCFire[iii -  11 + offset_upper];
+  } else if (iii % 12 == 11) {
+    // TC at most backward side
+    tc_upper       = TCFire[iii -  12 + offset_upper];
+    tc_upper_right = TCFire[iii -  13 + offset_upper];
+    tc_right       = TCFire[iii -   1];
+    tc_lower_right = TCFire[iii +  11 + offset_lower];
+    tc_lower       = TCFire[iii +  12 + offset_lower];
+    tc_lower_left  = 0;
+    tc_left        = 0;
+    tc_upper_left  = 0;
+  } else {
+    tc_upper       = TCFire[iii -  12 + offset_upper];
+    tc_upper_right = TCFire[iii -  13 + offset_upper];
+    tc_right       = TCFire[iii -   1];
+    tc_lower_right = TCFire[iii +  11 + offset_lower];
+    tc_lower       = TCFire[iii +  12 + offset_lower];
+    tc_lower_left  = TCFire[iii +  13 + offset_lower];
+    tc_left        = TCFire[iii +   1];
+    tc_upper_left  = TCFire[iii -  11 + offset_upper];
+  }
+
+  TempCluster[0] = iii + 80 + 1; //middle of ICN
+  TempCluster[1] = tc_upper; // upper
+  TempCluster[2] = tc_upper_right; //right
+  TempCluster[3] = tc_right; //right
+  TempCluster[4] = tc_lower_right; //lower
+  TempCluster[5] = tc_lower; //lower
+  TempCluster[6] = tc_lower_left; //lower
+  TempCluster[7] = tc_left; //lower
+  TempCluster[8] = tc_upper_left; //lower right;
 }
 //
 //
@@ -1775,7 +1689,7 @@ int TrgEclCluster::setBackwardICN()
         TempCluster[7] = TCFire[iii + 32]; // left
         TempCluster[8] = TCFire[iii + 31]; //top left
       }
-    } else if (iii > 31) {
+    } else {
       if (iii == 32) {
         TempCluster[0] = TCFire[32];
         TempCluster[1] = TCFire[63]; // top
@@ -1838,10 +1752,12 @@ int TrgEclCluster::setBackwardICN()
 //
 //
 //
-//
 int TrgEclCluster::getNofExceedCluster()
 {
-  int ncluster = ClusterEnergy[0].size() + ClusterEnergy[1].size() + ClusterEnergy[2].size();
+  int ncluster =
+    ClusterEnergy[0].size() +
+    ClusterEnergy[1].size() +
+    ClusterEnergy[2].size();
   if (ncluster > _LimitNCluster) {
     return ncluster;
   } else {

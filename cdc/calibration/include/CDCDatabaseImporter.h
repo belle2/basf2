@@ -31,11 +31,7 @@ namespace Belle2 {
     /**
      * Constructor
      */
-    CDCDatabaseImporter(int fexp, int frun, int lexp, int lrun):
-      m_firstExperiment(fexp), m_firstRun(frun),
-      m_lastExperiment(lexp), m_lastRun(lrun)
-    {
-    }
+    CDCDatabaseImporter(int fexp, int frun, int lexp, int lrun);
 
 
     /**
@@ -71,6 +67,15 @@ namespace Belle2 {
      * Get edep-to-adc params. from the database and print.
      */
     void printEDepToADC();
+
+    /**
+     * Import corrtothreshold to the data base.
+     */
+    void importCorrToThreshold(std::string fileName);
+    /**
+     * Get corrtothreshold from the database and print.
+     */
+    void printCorrToThreshold();
 
     /**
      * Import t0 table to the data base.
@@ -212,6 +217,12 @@ namespace Belle2 {
     /// Do some basic testing of the CDCCrossTalkLibrary
     void testCDCCrossTalkLibrary(bool spotChecks = false) const;
 
+    /// import CDClayerTimeCut
+    void importCDClayerTimeCut(const std::string& jsonFileName) const;
+
+    /// Print content of CDClayerTimeCut
+    void printCDClayerTimeCut() const;
+
   private:
 
     /**
@@ -221,6 +232,10 @@ namespace Belle2 {
     int m_firstRun; /**< First run. */
     int m_lastExperiment; /**< Last experiment */
     int m_lastRun; /**< Last run. */
+
+    ushort m_firstLayerOffset = 0;      /**< Offset of first layer in case some CDC layers are removed */
+    ushort m_superLayerOffset = 0;      /**< Offset of first super layer in case some CDC super layers are removed */
+    ushort m_nSenseWires      = 14336;  /**< Number of sense wires in the CDC */
 
   };
 

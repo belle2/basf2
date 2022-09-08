@@ -28,7 +28,7 @@ For each candidate in the given `ParticleList`_, there will be one entry in the 
 In other words, this produces a candidate-based ROOT file.
 Here is an example of use:
 
-.. _ParticleList: https://b2-master.belle2.org/software/development/classBelle2_1_1ParticleList.html
+.. _ParticleList: https://software.belle2.org/development/classBelle2_1_1ParticleList.html
 
 .. code-block:: python
  

@@ -310,7 +310,7 @@ std::string RawCOPPER::getInfoHTML() const
   return s.str();
 }
 
-void RawCOPPER::CompareHeaderValue(int n, const unsigned int (&input_val)[MAX_PCIE40_CH] , vector<vector< unsigned int>>& result)
+void RawCOPPER::CompareHeaderValue(int n, const unsigned int (&input_val)[MAX_PCIE40_CH], vector<vector< unsigned int>>& result)
 {
   CheckVersionSetBuffer();
   m_access->CompareHeaderValue(n, input_val, result);

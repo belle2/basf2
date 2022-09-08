@@ -218,6 +218,8 @@ namespace Belle2 {
     void nextMetadataProvider();
     /** List of available metadata providers (which haven't been tried yet) */
     std::vector<std::string> m_metadataConfigurations;
+    /** Name of the currently used metadata provider */
+    std::string m_currentProvider;
     /** List of globaltags to be used */
     std::vector<std::string> m_globalTags;
     /** Set of usable globaltag states to be handed to the metadata providers */

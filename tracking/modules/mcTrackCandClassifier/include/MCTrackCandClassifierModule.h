@@ -9,6 +9,13 @@
 #pragma once
 
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
+#include <pxd/dataobjects/PXDCluster.h>
+#include <svd/dataobjects/SVDCluster.h>
+#include <tracking/dataobjects/MCParticleInfo.h>
+#include <vxd/dataobjects/VXDTrueHit.h>
+#include <genfit/TrackCand.h>
+
 #include <string>
 #include <TFile.h>
 #include <TList.h>
@@ -16,8 +23,6 @@
 #include <TH3F.h>
 #include <time.h>
 
-#include <tracking/dataobjects/MCParticleInfo.h>
-#include <vxd/dataobjects/VXDTrueHit.h>
 
 namespace Belle2 {
 
@@ -115,6 +120,14 @@ namespace Belle2 {
     TH1F* m_h1_nBad1dInfo = nullptr; /**< Histogram */
 
   private:
+
+    StoreArray<PXDCluster> m_PXDClusters; /**< PXDClusters StoreArray */
+    StoreArray<SVDCluster> m_SVDClusters; /**< SVDClusters StoreArray */
+    StoreArray<MCParticle> m_MCParticles; /**< MCParticles StoreArray */
+    StoreArray<genfit::TrackCand> m_GenfitMCTrackCands; /**< MC Genfit TrackCands StoreArray */
+    StoreArray<genfit::TrackCand> m_GenfitIdealMCTrackCands; /**< Ideal Genfit TrackCands StoreArray */
+
+    B2Vector3D m_magField; /**< magnetic field needed set particle info */
 
     /** Function to get semiplane.
      * @param vertex: Vertex position

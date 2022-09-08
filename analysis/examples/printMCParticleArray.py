@@ -23,10 +23,14 @@ import basf2
 import modularAnalysis as ma
 
 path = basf2.Path()
-ma.inputMdst(environmentType='default',
-             filename=basf2.find_file('mdst14.root', 'validation', True),
+ma.inputMdst(filename=basf2.find_file('mdst14.root', 'validation', True),
              path=path)
 ma.printMCParticles(path=path)
+
+# The printed information can be stored in TTree via VariablesToNtuple module
+# The branch __MCDecayString__ is automatically created if printMCParticles is called
+ma.variablesToNtuple(decayString="", variables=[], path=path)
+
 basf2.process(path)
 
 # @endcond

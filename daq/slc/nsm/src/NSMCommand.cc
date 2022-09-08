@@ -29,6 +29,12 @@ const NSMCommand NSMCommand::DBLISTSET(405, "DBLISTSET");
 const NSMCommand NSMCommand::DBLISTGET(406, "DBLISTGET");
 const NSMCommand NSMCommand::LOGLIST(407, "LOGLIST");
 
+const NSMCommand& NSMCommand::operator=(const NSMCommand& command)
+{
+  Enum::operator=(command);
+  return *this;
+}
+
 const NSMCommand& NSMCommand::operator=(const std::string& label)
 {
   if (label == LOG.getLabel()) *this = LOG;

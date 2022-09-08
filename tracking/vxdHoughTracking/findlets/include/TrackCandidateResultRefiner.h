@@ -48,11 +48,11 @@ namespace Belle2 {
     private:
       /// Identifier which estimation method to use. Valid identifiers are:
       /// mcInfo, circleFit, tripletFit, helixFit
-      std::string m_param_EstimationMethod = "tripletFit";
+      std::string m_EstimationMethod = "tripletFit";
       /// sets the name of the expected StoreArray containing MCRecoTracks. Only required for MCInfo method
-      std::string m_param_MCRecoTracksStoreArrayName = "MCRecoTracks";
+      std::string m_MCRecoTracksStoreArrayName = "MCRecoTracks";
       /// Only required for MCInfo method
-      bool m_param_MCStrictQualityEstimator = true;
+      bool m_MCStrictQualityEstimator = true;
       /// pointer to the selected QualityEstimator
       std::unique_ptr<QualityEstimatorBase> m_estimator;
 
@@ -60,14 +60,14 @@ namespace Belle2 {
       TrackCandidateOverlapResolver m_overlapResolver;
 
       /// Cut on the quality estimator and only further propagate SPTCs with three hits that are above this value
-      double m_param_minQualitiyIndicatorSize3 = 0.001;
+      double m_minQualitiyIndicatorSize3 = 0.5;
       /// Cut on the quality estimator and only further propagate SPTCs with four hits that are above this value
-      double m_param_minQualitiyIndicatorSize4 = 0.001;
+      double m_minQualitiyIndicatorSize4 = 0.5;
       /// Cut on the quality estimator and only further propagate SPTCs with five hits that are above this value
-      double m_param_minQualitiyIndicatorSize5 = 0.001;
+      double m_minQualitiyIndicatorSize5 = 0.5;
 
       /// Accept nHits for each size at maximum
-      uint m_param_maxNumberOfEachPathLength = 10;
+      uint m_maxNumberOfEachPathLength = 15;
     };
 
   }

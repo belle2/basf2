@@ -140,9 +140,6 @@ namespace Belle2 {
     struct hit_t { double e, t; };
     map<int, hit_t> a;
 
-    struct thit_t { int tid, hid; };
-    vector<thit_t> tr;
-
     for (const ECLHit& t : m_eclHits) {
       double txtal = t.getTimeAve();
       // timing cut, +-8ns, (almost) same as ECL in SensitiveDetector.cc

@@ -48,7 +48,7 @@ namespace Belle2 {
 
     /** this function is needed by the Filters.h but has no task for this observer */
     template <class Var, class Range, typename ... types >
-    static bool initialize(Var , Range, const types& ...)
+    static bool initialize(Var, Range, const types& ...)
     {
       return true;
     }
@@ -161,7 +161,7 @@ namespace Belle2 {
                               const RangeType& range)
     {
       // store the data retrieved:
-      FilterInfo info(Var().name() , double(fResult), range.contains(fResult), true);
+      FilterInfo info(Var().name(), double(fResult), range.contains(fResult), true);
       s_observerInfo.addFilterInfo(info);
     }
   };

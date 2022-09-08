@@ -7,6 +7,9 @@
  **************************************************************************/
 #include <ecl/calibration/eclLeakageAlgorithm.h>
 #include <ecl/dbobjects/ECLLeakageCorrections.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/DataStore.h>
 
 
 #include "TH1D.h"
@@ -14,6 +17,7 @@
 #include "TTree.h"
 #include "TFile.h"
 #include "TDirectory.h"
+#include "TProfile.h"
 #include <iostream>
 
 using namespace std;
@@ -111,6 +115,7 @@ std::vector<double> eclLeakageFitParameters(TH1F* h, const double& target)
 
 /**-------------------------------------------------------------------------------------*/
 //..Novosibirsk; H. Ikeda et al. / NIM A 441 (2000) 401-426
+// cppcheck-suppress constParameter ; TF1 fit functions cannot have const parameters
 double eclLeakageNovo(Double_t* x, Double_t* par)
 {
 
@@ -221,6 +226,8 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
       B2INFO("  " << ie << " " << generatedE[ireg][ie] << " GeV");
     }
   }
+  B2INFO("Low energy threshold = " << m_lowEnergyThreshold);
+  B2INFO("No nCrys threshold = " << m_noNCrysThreshold);
 
   //..Energy per thetaID (in MeV, for use in titles etc)
   int iEnergiesMeV[nEnergies][nThetaID];
@@ -285,6 +292,37 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
 
   const int treeEntries = tree->GetEntries();
   B2INFO("eclLeakageAlgorithm entries = " << treeEntries);
+
+  //-----------------------------------------------------------------------------------
+  //..Get current payload to help validate the new payload
+
+  //..Set event, run, exp number
+  const auto exprun =  getRunList();
+  const int iEvt = 1;
+  const int iRun = exprun[0].second;
+  const int iExp = exprun[0].first;
+  StoreObjPtr<EventMetaData> evtPtr;
+  DataStore::Instance().setInitializeActive(true);
+  evtPtr.registerInDataStore();
+  DataStore::Instance().setInitializeActive(false);
+  evtPtr.construct(iEvt, iRun, iExp);
+  DBStore& dbstore = DBStore::Instance();
+  dbstore.update();
+
+  //..Existing payload
+  DBObjPtr<ECLLeakageCorrections> existingCorrections("ECLLeakageCorrections");
+  TH2F existingThetaCorrection = existingCorrections->getThetaCorrections();
+  existingThetaCorrection.SetName("existingThetaCorrection");
+  TH2F existingPhiCorrection = existingCorrections->getPhiCorrections();
+  existingPhiCorrection.SetName("existingPhiCorrection");
+  TH2F existingCrysCorrection = existingCorrections->getnCrystalCorrections();
+  existingCrysCorrection.SetName("existingnCrystalCorrection");
+
+  //..Write out the correction histograms
+  histfile->cd();
+  existingThetaCorrection.Write();
+  existingPhiCorrection.Write();
+  existingCrysCorrection.Write();
 
   //====================================================================================
   //====================================================================================
@@ -421,6 +459,13 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
   std::vector<int> statusELabUncorr; // status of failed fits
   int payloadStatus = 0; // Overall status of payload determination
 
+  //..Record fit status
+  TH1F* statusOfhELabUncorr = new TH1F("statusOfhELabUncorr",
+                                       "status of hELabUncorr fits for each thetaID/energy. 0 = good, 1 = redo fit, 2 = lowStat, 3 = lowProb, 4 = peakAtLimit, 5 = sigmaAtLimit",
+                                       6, 0,
+                                       6);
+
+
   //..Fit each histogram
   for (int thID = firstUsefulThID; thID <= lastUsefulThID; thID++) {
     TString sthID = std::to_string(thID);
@@ -431,6 +476,7 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
       int fitStatus = 2;
       double entries = hEnergy->Integral();
       int nIter = 0; // keep track of attempts to fit this histogram
+      double genE = iEnergiesMeV[ie][thID] / 1000.;
       bool fitHist = entries > minEntries;
 
       //..Possibly iterate fit starting from this point
@@ -470,11 +516,16 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
 
       //-----------------------------------------------------------------------------------
       //..Record failures and fit results.
-      //  Mark payload as failed if low stats or a fit at limit.
-      if (fitStatus >= 2) {
+      //  Mark payload as failed if energy is above low-energy threshold.
+      statusOfhELabUncorr->Fill(fitStatus + 0.000001);
+      if (fitStatus == 2 or fitStatus >= 4) {
         statusELabUncorr.push_back(fitStatus);
         failedELabUncorr.push_back(hEnergy->GetName());
-        if (fitStatus == 2 or fitStatus == 4) {payloadStatus = 1;} // failed
+        if (genE > m_lowEnergyThreshold) {
+          payloadStatus = 1; // algorithm failed
+        } else {
+          peak = -1.; // fix up later
+        }
       }
       peakUncorr[ie][thID] = peak;
       etaUncorr[ie][thID] = eta;
@@ -487,16 +538,53 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
     }
   }
 
+  //..Write out summary of fit status
+  histfile->cd();
+  statusOfhELabUncorr->Write();
+
   //-----------------------------------------------------------------------------------
-  //..Quit now if one of these fits failed, since we will not get a payload.
+  //..Quit now if one of the high-energy fits failed, since we will not get a payload.
+  int nbadFit = statusELabUncorr.size();
+  if (nbadFit > 0) {B2ERROR("hELabUncorr fit failures (one histogram per energy/thetaID):");}
+  for (int ibad = 0; ibad < nbadFit; ibad++) {
+    int badStat = statusELabUncorr[ibad];
+    B2ERROR(" histogram " << failedELabUncorr[ibad].Data() << " status " << badStat << " " << statusString[badStat].Data());
+  }
   if (payloadStatus != 0) {
     B2ERROR("ecLeakageAlgorithm: fit to hELabUncorr failed. ");
-    const int nbad = statusELabUncorr.size();
-    for (int ibad = 0; ibad < nbad; ibad++) {
-      int badStat = statusELabUncorr[ibad];
-      B2ERROR(" histogram " << failedELabUncorr[ibad].Data() << " status " << badStat << " " << statusString[badStat].Data());
-    }
+    histfile->Close();
     return c_Failure;
+  }
+
+  //-----------------------------------------------------------------------------------
+  //..Fix up any failed (low-energy) fits by using a neighbouring thetaID
+  for (int thID = firstUsefulThID; thID <= lastUsefulThID; thID++) {
+    for (int ie = 0; ie < nEnergies; ie++) {
+      if (peakUncorr[ie][thID] < 0.) {
+        if (thID > 40) {
+          for (int nextID = thID - 1; thID >= firstUsefulThID; thID--) {
+            if (peakUncorr[ie][nextID] > 0.) {
+              peakUncorr[ie][thID] = peakUncorr[ie][nextID];
+              break;
+            }
+          }
+        } else {
+          for (int nextID = thID + 1; thID <= lastUsefulThID; thID++) {
+            if (peakUncorr[ie][nextID] > 0.) {
+              peakUncorr[ie][thID] = peakUncorr[ie][nextID];
+              break;
+            }
+          }
+        }
+      }
+
+      //..If we were unable to get a successful fit from a neighbour, give up
+      if (peakUncorr[ie][thID] < 0.) {
+        B2ERROR("ecLeakageAlgorithm: unable to correct hELabUncorr for thetaID " << thID << " ie " << ie);
+        histfile->Close();
+        return c_Failure;
+      }
+    }
   }
 
   //====================================================================================
@@ -509,7 +597,7 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
   //-----------------------------------------------------------------------------------
   //..Histograms to store the energy
   const int nDir = 3;
-  TString dirName[nDir] = {"theta", "phiMech", "phiNoMech"};
+  const TString dirName[nDir] = {"theta", "phiMech", "phiNoMech"};
 
   TH1F* eFracPosition[nEnergies][nThetaID][nDir][nPositions]; // the histograms
   std::vector<TString> failedeFracPosition; // names of hists with failed fits
@@ -534,7 +622,7 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
 
   //..And some summary histograms
   TH1F* statusOfeFracPosition = new TH1F("statusOfeFracPosition",
-                                         "status of eFrac fits for each position. 0 = good, 1 = redo fit, 2 = lowStat, 3 = lowProb, 4 = peakAtLimit, 5 = sigmaAtLimit", 6, 0,
+                                         "eFrac fit status: -2 noData, -1 lowE, 0 good, 1 redo fit, 2 lowStat, 3 lowProb, 4 peakAtLimit, 5 sigmaAtLimit", 8, -2,
                                          6);
   TH1F* probOfeFracPosition = new TH1F("probOfeFracPosition", "fit probability of eFrac fits for each position;probability", 100, 0,
                                        1);
@@ -572,6 +660,7 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
 
   for (int thID = firstUsefulThID; thID <= lastUsefulThID; thID++) {
     for (int ie = 0; ie < nEnergies; ie++) {
+      double genE = iEnergiesMeV[ie][thID] / 1000.;
       for (int idir = 0; idir < nDir; idir++) {
         for (int ipos = 0; ipos < nPositions; ipos++) {
           TH1F* hEnergy = (TH1F*)eFracPosition[ie][thID][idir][ipos];
@@ -583,10 +672,11 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
           double corrUnc = 0.05; // arbitrary uncertainty
           double prob = -1.;
           int fitStatus = 2; // low stats
+          if (genE < m_lowEnergyThreshold) {fitStatus = -1;} // low energy, don't fit, use default peak value
           if (hEnergy->GetEntries() < 0.5) {fitStatus = -2;} // unused, eg barrel pos=2
           int nIter = 0; // keep track of attempts to fit this histogram
           double entries = hEnergy->Integral();
-          bool fitHist = entries > minEntries;
+          bool fitHist = entries > minEntries and genE >= m_lowEnergyThreshold;
 
           //..Possibly iterate fit starting from this point
           while (fitHist) {
@@ -659,7 +749,7 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
           probOfeFracPosition->Fill(prob);
           maxOfeFracPosition->Fill(hEnergy->GetMaximum());
 
-          //..Summary histogram for successful fits
+          //..Summary histogram for successful fits. Note that fitStatus<0 also has prob<0.
           if (prob > 0 and fitStatus <= 3) {
             if (idir == 0) {
               thetaCorSummary->Fill(correction);
@@ -682,9 +772,9 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
 
   //-----------------------------------------------------------------------------------
   //..Summarize position fit results
-  B2INFO("eclLeakageAlgorithm: " << nHistToFit << " position histograms to fit");
-  int nbadFit = statuseFracPosition.size();
-  B2INFO("Failed fits: " << nbadFit);
+  B2INFO("eclLeakageAlgorithm: " << nHistToFit << " eFracPosition histograms to fit");
+  nbadFit = statuseFracPosition.size();
+  B2INFO("eFracPosition failed fits: " << nbadFit);
   for (int ibad = 0; ibad < nbadFit; ibad++) {
     int badStat = statuseFracPosition[ibad];
     B2ERROR(" histogram " << failedeFracPosition[ibad].Data() << " status " << badStat << " " << statusString[badStat].Data());
@@ -746,15 +836,23 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
   std::vector<TString> failedEPos; // names of hists with failed fits
   std::vector<int> statusEPos; // status of failed fits
 
+  //..Record fit status
+  TH1F* statusOfhEPos = new TH1F("statusOfhEPos",
+                                 "status of hEPos fits for each thetaID/energy: -2 noData, -1 lowE, 0 good, 1 redo fit, 2 lowStat, 3 lowProb, 4 peakAtLimit, 5 sigmaAtLimit",
+                                 8, -2,
+                                 6);
+
   for (int thID = firstUsefulThID; thID <= lastUsefulThID; thID++) {
     TString sthID = std::to_string(thID);
     for (int ie = 0; ie < nEnergies; ie++) {
+      double genE = iEnergiesMeV[ie][thID] / 1000.;
       TH1F* hEnergy = (TH1F*)hEPos[ie][thID];
-      double eta = 0.;
-      int fitStatus = 2;
+      double eta = 0.4; // arbitrary but typical
+      int fitStatus = 2; // 2 = low stats
+      if (genE < m_lowEnergyThreshold or genE < m_noNCrysThreshold) {fitStatus = -1;} // low energy, don't fit
       double entries = hEnergy->Integral();
       int nIter = 0; // keep track of attempts to fit this histogram
-      bool fitHist = entries > minEntries;
+      bool fitHist = entries > minEntries and genE >= m_lowEnergyThreshold and genE >= m_noNCrysThreshold;
 
       //..Possibly iterate fit starting from this point
       while (fitHist) {
@@ -794,12 +892,15 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
       //-----------------------------------------------------------------------------------
       //..Record failures and fit results.
       //  Mark payload as failed if low stats or a fit at limit.
+      statusOfhEPos->Fill(fitStatus + 0.00001);
+      nbadFit = statusEPos.size();
+      if (nbadFit > 0) {B2ERROR("hEPos fit failures (one histogram per energy/thetaID after position correction):");}
       if (fitStatus >= 2) {
         statusEPos.push_back(fitStatus);
         failedEPos.push_back(hEnergy->GetName());
-        if (fitStatus == 2 or fitStatus == 4) {payloadStatus = 1;} // failed
+        if (fitStatus == 2 or fitStatus >= 4) { payloadStatus = 1; }
       }
-      etaEpos[ie][thID] = eta;
+      etaEpos[ie][thID] = eta; // value for low-energy cases is never used
 
       //..Write to disk
       if (entries > minEntries) {
@@ -808,6 +909,17 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
       }
     }
   }
+
+  //..Write status summary to disk
+  histfile->cd();
+  statusOfhEPos->Write();
+
+  if (payloadStatus != 0) {
+    B2ERROR("ecLeakageAlgorithm: fit to hEPos failed. ");
+    histfile->Close();
+    return c_Failure;
+  }
+
 
   //====================================================================================
   //====================================================================================
@@ -861,8 +973,14 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
   //  values of nCrys without a successful fit
   int maxNCry[nEnergies][nThetaID];
 
+  //..Keep track of fit status
+  TH1F* statusOfePosnCry = new TH1F("statusOfePosnCry",
+                                    "ePosnCry fit status: -2 noData, -1 lowE, 0 good, 1 redo fit, 2 lowStat, 3 lowProb, 4 peakAtLimit, 5 sigmaAtLimit", 8, -2,
+                                    6);
+
   for (int thID = firstUsefulThID; thID <= lastUsefulThID; thID++) {
     for (int ie = 0; ie < nEnergies; ie++) {
+      double genE = iEnergiesMeV[ie][thID] / 1000.;
       double maxIntegral = 0;
       maxNCry[ie][thID] = 0;
       for (int in = 0; in <= maxN; in++) {
@@ -875,7 +993,13 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
         double corrUnc = 0.05; // arbitrary uncertainty
         int nIter = 0; // keep track of attempts to fit this histogram
         double entries = hEnergy->Integral();
-        bool fitHist = entries > minEntries;
+        int fitStatus = -2; // low stats
+        if (genE < m_lowEnergyThreshold or genE < m_noNCrysThreshold) {
+          fitStatus = -1; // low energy
+          correction = 1.; // for low energy, nCrys correction = 1
+          corrUnc = 0.;
+        }
+        bool fitHist = entries > minEntries and genE >= m_lowEnergyThreshold and genE >= m_noNCrysThreshold;
 
         //..nCrys with most entries
         if (entries > maxIntegral) {
@@ -930,7 +1054,7 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
           //..Check fit quality  0 = good, 1 = redo fit, 2 = lowStat, 3 = lowProb,
           //  4 = peakAtLimit, 5 = sigmaAtLimit, 6 = etaAtLimit.
           double dEta = min((etaMax - eta), (eta - etaMin));
-          int fitStatus = eclLeakageFitQuality(fitLow, fitHigh, peak, effSigma, dEta, prob);
+          fitStatus = eclLeakageFitQuality(fitLow, fitHigh, peak, effSigma, dEta, prob);
 
           //..If the fit probability is low, refit using a smaller range (fracEnt)
           if ((fitStatus == 1 or fitStatus == 3) and nIter == 0) {
@@ -945,11 +1069,21 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
         }
 
         //..Store the correction for this position
+        statusOfePosnCry->Fill(fitStatus + 0.00001);
         nCrysCorrection[ie][thID][in] = correction;
         nCrysCorrectionUnc[ie][thID][in] = corrUnc;
       }
+
+      //..Write histogram for maximum nCrys to disk
+      histfile->cd();
+      int highestN = maxNCry[ie][thID];
+      ePosnCry[ie][thID][highestN]->Write();
     }
   }
+
+  //..Write out fit status summary
+  histfile->cd();
+  statusOfePosnCry->Write();
 
   //-----------------------------------------------------------------------------------
   //..Now fix up corrections for nCrys values that did not have a successful fit.
@@ -958,11 +1092,12 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
   for (int thID = firstUsefulThID; thID <= lastUsefulThID; thID++) {
     for (int ie = 0; ie < nEnergies; ie++) {
 
-      //..If the most likely value of nCrys does not have a successful correction
-      //  mark the algorithm as failed
+      //..If the most likely value of nCrys does not have a successful correction,
+      //  mark the algorithm as failed. Recall that low-energy cases always have correction = 1.
       int highestN = maxNCry[ie][thID];
       if (nCrysCorrection[ie][thID][highestN] <= 0) {
         B2ERROR("eclLeakageAlgorithm: no nCrys correction for ie " << ie << " thetaID " << thID);
+        histfile->Close();
         return c_Failure;
       }
 
@@ -1130,9 +1265,9 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
   //-----------------------------------------------------------------------------------
   //..One histogram of new and original reconstructed energy after leakage correction
   //  per generated energy per region. Also uncorrected.
-  const int nResType = 4;
-  TString resName[nResType] = {"Uncorrected", "Original", "Corrected measured", "Corrected true"};
-  TString regName[nLeakReg] = {"forward", "barrel", "backward"};
+  const int nResType = 5;
+  const TString resName[nResType] = {"Uncorrected", "Original", "Corrected no nCrys", "Corrected measured", "Corrected true"};
+  const TString regName[nLeakReg] = {"forward", "barrel", "backward"};
   TH1F* energyResolution[nLeakReg][nEnergies][nResType];
 
   //..Base number of bins on a typical thetaID for each region
@@ -1184,9 +1319,38 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
     float corrTrue = posCor * nCrysCor;
 
     //-----------------------------------------------------------------------------------
+    //..Find position-dependent correction (only) using measured energy. The correction is
+    //  a function of corrected energy, so will need to iterate
+    float corrNonCrys = 0.96; // typical correction as starting point
+    for (int iter = 0; iter < 2; iter++) {
+
+
+      //..Energy points that bracket this value
+      float energyRaw = t_energyFrac * generatedE[t_region][t_energyBin];
+      float logEnergy = log(energyRaw / corrNonCrys);
+      int ie0 = 0; // lower energy point
+      if (logEnergy < leakLogE[t_region][0]) {
+        ie0 = 0;
+      } else if (logEnergy > leakLogE[t_region][nEnergies - 1]) {
+        ie0 = nEnergies - 2;
+      } else {
+        while (logEnergy > leakLogE[t_region][ie0 + 1]) {ie0++;}
+      }
+
+      //..Corrections from lower and upper energy points
+      float cor0 = positionCorrection[ie0][t_thetaID][0][t_thetaBin] * positionCorrection[ie0][t_thetaID][t_phiMech + 1][t_phiBin];
+      float cor1 = positionCorrection[ie0 + 1][t_thetaID][0][t_thetaBin] * positionCorrection[ie0 + 1][t_thetaID][t_phiMech +
+                   1][t_phiBin];
+
+      //..Interpolate in logE
+      corrNonCrys = cor0 + (cor1 - cor0) * (logEnergy - leakLogE[t_region][ie0]) / (leakLogE[t_region][ie0 + 1] -
+                    leakLogE[t_region][ie0]);
+    }
+
+    //-----------------------------------------------------------------------------------
     //..Find correction using measured energy. The correction is a function of corrected
     //  energy, so will need to iterate
-    float corrMeasured = 0.95; // typical correction as starting point
+    float corrMeasured = 0.96; // typical correction as starting point
     for (int iter = 0; iter < 2; iter++) {
 
 
@@ -1216,9 +1380,10 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
     //-----------------------------------------------------------------------------------
     //..Fill the histograms
     energyResolution[t_region][t_energyBin][0]->Fill(t_energyFrac); // uncorrected
-    energyResolution[t_region][t_energyBin][1]->Fill(t_origEnergyFrac); // original
-    energyResolution[t_region][t_energyBin][2]->Fill(t_energyFrac / corrMeasured); // corrected, measured energy
-    energyResolution[t_region][t_energyBin][3]->Fill(t_energyFrac / corrTrue); // corrected, true energy
+    energyResolution[t_region][t_energyBin][1]->Fill(t_origEnergyFrac); // original payload
+    energyResolution[t_region][t_energyBin][2]->Fill(t_energyFrac / corrNonCrys); // no nCrys, measured energy
+    energyResolution[t_region][t_energyBin][3]->Fill(t_energyFrac / corrMeasured); // corrected, measured energy
+    energyResolution[t_region][t_energyBin][4]->Fill(t_energyFrac / corrTrue); // corrected, true energy
   }
 
   //-----------------------------------------------------------------------------------
@@ -1307,13 +1472,14 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
 
   //-----------------------------------------------------------------------------------
   //..Summarize resolution
-  int nresBins = nEnergies * nLeakReg * (nResType + 1); // +1 to add an empty bin after each set of 4
+  int nresBins = nEnergies * nLeakReg * (nResType + 1); // +1 to add an empty bin after each set
   TH1F* peakSummary = new TH1F("peakSummary", "Peak E/Etrue for each method, region, energy;Energy energy point", nresBins, 0,
                                nEnergies);
   TH1F* resolutionSummary = new TH1F("resolutionSummary", "Resolution/peak for each method, region, energy;Energy energy point",
                                      nresBins, 0, nEnergies);
 
   B2INFO("Resolution divided by peak for each energy bin and region " << nResType << " ways");
+  for (int ires = 0; ires < nResType; ires++) {B2INFO(" " << resName[ires]);}
   ix = 0;
   for (int ie = 0; ie < nEnergies; ie++) {
     B2INFO("  energy point " << ie);

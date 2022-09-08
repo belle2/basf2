@@ -9,17 +9,10 @@
 #pragma once
 
 //DQM
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 
 // Monitoring
 #include <dqm/dataobjects/DQMFileMetaData.h>
-#include <dqm/dataobjects/MonitoringObject.h>
-
-#include <vector>
-
-#include <TCanvas.h>
-#include <TLine.h>
-#include <TH2Poly.h>
 
 namespace Belle2 {
 
@@ -68,13 +61,6 @@ namespace Belle2 {
      * Clean-up, close files, summarize statistics, etc.
      */
     virtual void terminate() override;
-
-    /**
-    * Find canvas by name
-    * @param cname Name of the canvas
-    * @return The pointer to the canvas, or nullptr if not found.
-    */
-    TCanvas* find_canvas(TString cname);
 
   protected:
     bool m_debug;/**<debug*/

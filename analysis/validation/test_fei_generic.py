@@ -25,10 +25,7 @@ import glob
 import fei
 import basf2 as b2
 import modularAnalysis as ma
-import basf2_mva
 import ROOT
-
-basf2_mva.loadRootDictionary()
 
 tempdir = tempfile.mkdtemp()
 os.chdir(tempdir)
@@ -43,8 +40,7 @@ particles = fei.get_unittest_channels()
 # Construct path for production of mcParticlesCount.root at stage -1
 path = b2.create_path()
 
-ma.inputMdst(environmentType='default',
-             filename=b2.find_file('mdst14.root', 'validation', False),
+ma.inputMdst(filename=b2.find_file('mdst14.root', 'validation', False),
              path=path)
 
 maxTracks = 12
@@ -67,7 +63,7 @@ assert len(glob.glob('mcParticlesCount.root')) == 1
 
 # Construct path for production of stage 0 training data
 path = b2.create_path()
-ma.inputMdstList('default', ['./RootOutput.root'], path)
+ma.inputMdstList(['./RootOutput.root'], path)
 
 maxTracks = 12
 empty_path = b2.create_path()
@@ -109,7 +105,7 @@ assert len(glob.glob('K+*.xml')) == 1
 
 # Construct path for production of stage 1 training data
 path = b2.create_path()
-ma.inputMdstList('default', ['./RootOutput.root'], path)
+ma.inputMdstList(['./RootOutput.root'], path)
 
 maxTracks = 12
 empty_path = b2.create_path()
@@ -145,7 +141,7 @@ assert len(glob.glob('pi0*.xml')) == 1
 
 # Construct path for production of stage 3 training data (stage 2 is skipped)
 path = b2.create_path()
-ma.inputMdstList('default', ['./RootOutput.root'], path)
+ma.inputMdstList(['./RootOutput.root'], path)
 
 maxTracks = 12
 empty_path = b2.create_path()
@@ -187,8 +183,7 @@ assert len(glob.glob('training_input*.root')) == 4
 
 # Construct path for stage 6 preparing evaluation (stages 4 and 5 skipped, input evaluated from stage 0 on)
 path = b2.create_path()
-ma.inputMdst(environmentType='default',
-             filename=b2.find_file('mdst14.root', 'validation', False),
+ma.inputMdst(filename=b2.find_file('mdst14.root', 'validation', False),
              path=path)
 
 maxTracks = 12

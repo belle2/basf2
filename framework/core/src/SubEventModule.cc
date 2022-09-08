@@ -21,7 +21,7 @@ using namespace Belle2;
 
 //REG_MODLUE needed for --execute-path functionality
 //Note: should not appear in module list since we're not in the right directory
-REG_MODULE(SubEvent)
+REG_MODULE(SubEvent);
 
 
 SubEventModule::SubEventModule(): Module(), EventProcessor()

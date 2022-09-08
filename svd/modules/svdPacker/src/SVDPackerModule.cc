@@ -32,7 +32,7 @@ using namespace Belle2::SVD;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SVDPacker)
+REG_MODULE(SVDPacker);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -371,7 +371,8 @@ void SVDPackerModule::binPrintout(unsigned int nwords)
   B2INFO("\nbinary printout:");
   for (unsigned int j = 0; j < nwords; j++) {
 
-    uint32_t ulFlag = 1 << (sizeof(data_words[j]) * 8 - 1);
+    uint32_t ulFlag = 1;
+    ulFlag <<= (sizeof(data_words[j]) * 8 - 1);
     for (; ulFlag > 0; ulFlag >>= 1)
       printf("%d", (data_words[j] & ulFlag) ? 1 : 0);
 

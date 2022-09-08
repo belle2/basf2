@@ -24,7 +24,7 @@ namespace {
   {
     // trivial decay descriptor == particle name
     DecayDescriptor dd;
-    bool initok = dd.init("K+");
+    bool initok = dd.init(std::string{"K+"});
     EXPECT_EQ(initok, true);
     ASSERT_NE(dd.getMother(), nullptr);
     EXPECT_EQ(dd.getMother()->getName(), "K+");
@@ -37,7 +37,7 @@ namespace {
   TEST(DecayDescriptorTest, NormalBehaviour)
   {
     DecayDescriptor dd;
-    bool initok = dd.init("B0:cand -> K+:loose pi-:loose");
+    bool initok = dd.init(std::string{"B0:cand -> K+:loose pi-:loose"});
 
     EXPECT_EQ(initok, true);
 
@@ -71,7 +71,7 @@ namespace {
   {
     DecayDescriptor dd;
     bool initok = dd.init(
-                    "B0:cand -> [D0:dau1 -> K+:grandau pi-:grandau] [pi0:dau2 -> gamma:grandau [gamma:converted -> e+:gtgrandau e-:gtgrandau]]"
+                    std::string{"B0:cand -> [D0:dau1 -> K+:grandau pi-:grandau] [pi0:dau2 -> gamma:grandau [gamma:converted -> e+:gtgrandau e-:gtgrandau]]"}
                   );
     EXPECT_EQ(initok, true);
     ASSERT_NE(dd.getMother(), nullptr);
@@ -113,21 +113,21 @@ namespace {
   {
     // =direct=> means ignore intermediate resonances
     DecayDescriptor dd1;
-    bool initok = dd1.init("B0:candidates =direct=> K+:loose pi-:loose gamma:clean");
+    bool initok = dd1.init(std::string{"B0:candidates =direct=> K+:loose pi-:loose gamma:clean"});
     EXPECT_EQ(initok, true);
     EXPECT_EQ(dd1.isIgnoreRadiatedPhotons(), true);
     EXPECT_EQ(dd1.isIgnoreIntermediate(), false);
 
     // =norad=> means ignore photons
     DecayDescriptor dd2;
-    initok = dd2.init("B0:candidates =norad=> K+:loose pi-:loose gamma:clean");
+    initok = dd2.init(std::string{"B0:candidates =norad=> K+:loose pi-:loose gamma:clean"});
     EXPECT_EQ(initok, true);
     EXPECT_EQ(dd2.isIgnoreRadiatedPhotons(), false);
     EXPECT_EQ(dd2.isIgnoreIntermediate(), true);
 
     // =exact=> means ignore intermediate resonances *and* photons
     DecayDescriptor dd3;
-    initok = dd3.init("B0:candidates =exact=> K+:loose pi-:loose gamma:clean");
+    initok = dd3.init(std::string{"B0:candidates =exact=> K+:loose pi-:loose gamma:clean"});
     EXPECT_EQ(initok, true);
     EXPECT_EQ(dd3.isIgnoreRadiatedPhotons(), false);
     EXPECT_EQ(dd3.isIgnoreIntermediate(), false);
@@ -138,7 +138,7 @@ namespace {
   {
     // ... means accept missing massive
     DecayDescriptor dd1;
-    bool initok = dd1.init("B0:candidates -> K+:loose gamma:clean ...");
+    bool initok = dd1.init(std::string{"B0:candidates -> K+:loose gamma:clean ..."});
     EXPECT_EQ(initok, true);
     EXPECT_EQ(dd1.isIgnoreRadiatedPhotons(), true);
     EXPECT_EQ(dd1.isIgnoreIntermediate(), true);
@@ -149,7 +149,7 @@ namespace {
 
     // ?nu means accept missing neutrino
     DecayDescriptor dd2;
-    initok = dd2.init("B0:candidates -> K+:loose pi-:loose ?nu");
+    initok = dd2.init(std::string{"B0:candidates -> K+:loose pi-:loose ?nu"});
     EXPECT_EQ(initok, true);
     EXPECT_EQ(dd2.isIgnoreRadiatedPhotons(), true);
     EXPECT_EQ(dd2.isIgnoreIntermediate(), true);
@@ -160,7 +160,7 @@ namespace {
 
     // !nu does not change anything. It is reserved for future updates.
     DecayDescriptor dd3;
-    initok = dd3.init("B0:candidates -> K+:loose pi-:loose !nu");
+    initok = dd3.init(std::string{"B0:candidates -> K+:loose pi-:loose !nu"});
     EXPECT_EQ(initok, true);
     EXPECT_EQ(dd3.isIgnoreRadiatedPhotons(), true);
     EXPECT_EQ(dd3.isIgnoreIntermediate(), true);
@@ -171,7 +171,7 @@ namespace {
 
     // ?gamma means ignore missing gamma
     DecayDescriptor dd4;
-    initok = dd4.init("B0:candidates -> K+:loose pi-:loose ?gamma");
+    initok = dd4.init(std::string{"B0:candidates -> K+:loose pi-:loose ?gamma"});
     EXPECT_EQ(initok, true);
     EXPECT_EQ(dd4.isIgnoreRadiatedPhotons(), true);
     EXPECT_EQ(dd4.isIgnoreIntermediate(), true);
@@ -182,7 +182,7 @@ namespace {
 
     // !gamma does not change anything. It is reserved for future updates.
     DecayDescriptor dd5;
-    initok = dd5.init("B0:candidates -> K+:loose pi-:loose !gamma");
+    initok = dd5.init(std::string{"B0:candidates -> K+:loose pi-:loose !gamma"});
     EXPECT_EQ(initok, true);
     EXPECT_EQ(dd5.isIgnoreRadiatedPhotons(), true);
     EXPECT_EQ(dd5.isIgnoreIntermediate(), true);
@@ -193,7 +193,7 @@ namespace {
 
     // ... ?nu ?gamma means accept missing massive
     DecayDescriptor dd6;
-    initok = dd6.init("B0:candidates -> e-:loose ... ?nu ?gamma");
+    initok = dd6.init(std::string{"B0:candidates -> e-:loose ... ?nu ?gamma"});
     EXPECT_EQ(initok, true);
     EXPECT_EQ(dd6.isIgnoreRadiatedPhotons(), true);
     EXPECT_EQ(dd6.isIgnoreIntermediate(), true);
@@ -204,7 +204,7 @@ namespace {
 
     // ?addbrems means ignore photon added by Brems-correction tools (modularAnalysis.correctBrems / modularAnalysis.correctBremsBelle)
     DecayDescriptor dd7;
-    initok = dd7.init("B0:candidates -> K+:loose pi-:loose ?addbrems");
+    initok = dd7.init(std::string{"B0:candidates -> K+:loose pi-:loose ?addbrems"});
     EXPECT_EQ(initok, true);
     EXPECT_EQ(dd7.isIgnoreRadiatedPhotons(), true);
     EXPECT_EQ(dd7.isIgnoreIntermediate(), true);
@@ -219,7 +219,7 @@ namespace {
   {
     // @ means unspecified particle, for example @Xsd -> K+ pi-
     DecayDescriptor dd1;
-    bool initok = dd1.init("@Xsd:candidates -> K+:loose pi-:loose");
+    bool initok = dd1.init(std::string{"@Xsd:candidates -> K+:loose pi-:loose"});
     EXPECT_EQ(initok, true);
     ASSERT_NE(dd1.getMother(), nullptr);
     EXPECT_EQ(dd1.getMother()->getName(), "Xsd");
@@ -228,43 +228,40 @@ namespace {
 
     // Both selectors, @ and ^, can be used at the same time
     DecayDescriptor dd2;
-    initok = dd2.init("^@Xsd:candidates -> K+:loose pi-:loose");
+    initok = dd2.init(std::string{"^@Xsd:candidates -> K+:loose pi-:loose"});
     EXPECT_EQ(initok, true);
     EXPECT_EQ(dd2.getMother()->getName(), "Xsd");
     EXPECT_EQ(dd2.getMother()->isUnspecified(), true);
     EXPECT_EQ(dd2.getMother()->isSelected(), true);
 
     DecayDescriptor dd3;
-    initok = dd3.init("@^Xsd:candidates -> K+:loose pi-:loose");
+    initok = dd3.init(std::string{"@^Xsd:candidates -> K+:loose pi-:loose"});
     EXPECT_EQ(initok, true);
     EXPECT_EQ(dd3.getMother()->getName(), "Xsd");
     EXPECT_EQ(dd3.getMother()->isUnspecified(), true);
     EXPECT_EQ(dd3.getMother()->isSelected(), true);
 
-
     // @ can be attached to a daughter
     DecayDescriptor dd4;
-    initok = dd4.init("B0:Xsdee -> @Xsd e+:loose e-:loose");
+    initok = dd4.init(std::string{"B0:Xsdee -> @Xsd e+:loose e-:loose"});
     EXPECT_EQ(initok, true);
-
     ASSERT_NE(dd4.getMother(), nullptr);
     EXPECT_EQ(dd4.getMother()->isUnspecified(), false);
     EXPECT_EQ(dd4.getMother()->isSelected(), false);
-
     EXPECT_EQ(dd4.getDaughter(0)->getMother()->getName(), "Xsd");
     EXPECT_EQ(dd4.getDaughter(0)->getMother()->isUnspecified(), true);
     EXPECT_EQ(dd4.getDaughter(0)->getMother()->isSelected(), false);
 
     // Both selectors, @ and ^, can be used at the same time
     DecayDescriptor dd5;
-    initok = dd5.init("B0:Xsdee -> ^@Xsd e+:loose e-:loose");
+    initok = dd5.init(std::string{"B0:Xsdee -> ^@Xsd e+:loose e-:loose"});
     EXPECT_EQ(initok, true);
     EXPECT_EQ(dd5.getDaughter(0)->getMother()->getName(), "Xsd");
     EXPECT_EQ(dd5.getDaughter(0)->getMother()->isUnspecified(), true);
     EXPECT_EQ(dd5.getDaughter(0)->getMother()->isSelected(), true);
 
     DecayDescriptor dd6;
-    initok = dd6.init("B0:Xsdee -> @^Xsd e+:loose e-:loose");
+    initok = dd6.init(std::string{"B0:Xsdee -> @^Xsd e+:loose e-:loose"});
     EXPECT_EQ(initok, true);
     EXPECT_EQ(dd6.getDaughter(0)->getMother()->getName(), "Xsd");
     EXPECT_EQ(dd6.getDaughter(0)->getMother()->isUnspecified(), true);
@@ -276,9 +273,8 @@ namespace {
   {
     // ... means accept missing massive
     DecayDescriptor dd1;
-    bool initok = dd1.init("B0:candidates =direct=> [D-:pi =norad=> pi-:loose ... ?gamma] e+:loose ?nu ?addbrems");
+    bool initok = dd1.init(std::string{"B0:candidates =direct=> [D-:pi =norad=> pi-:loose ... ?gamma] e+:loose ?nu ?addbrems"});
     EXPECT_EQ(initok, true);
-
     EXPECT_EQ(dd1.isIgnoreRadiatedPhotons(), true);
     EXPECT_EQ(dd1.isIgnoreIntermediate(), false);
     EXPECT_EQ(dd1.isIgnoreMassive(), false);
@@ -301,38 +297,51 @@ namespace {
   TEST(DecayDescriptorTest, SelectionParticles)
   {
     DecayDescriptor dd1;
-    bool initok = dd1.init("B0:B2Dzpipi -> [D0 -> ^K+:loose pi-:loose] pi+:loose pi-:loose");
+    bool initok = dd1.init(std::string{"B0:B2Dzpipi -> [D0 -> ^K+:loose pi-:loose] pi+:loose pi-:loose"});
     EXPECT_EQ(initok, true);
     std::vector<std::string> names = dd1.getSelectionNames();
+    std::vector<int> pdgs = dd1.getSelectionPDGCodes();
     ASSERT_EQ(names.size(), 1);
     EXPECT_EQ(names[0], "B0_D0_K");
+    ASSERT_EQ(pdgs.size(), 1);
+    EXPECT_EQ(pdgs[0], 321);
 
     // add another selection particle to an already existing decay descriptor
     // not sure exactly who is using this feature, but might as well test it.
-    initok = dd1.init("B0:B2Dzpipi -> [D0 -> K+:loose ^pi-:loose] pi+:loose pi-:loose");
+    initok = dd1.init(std::string{"B0:B2Dzpipi -> [D0 -> K+:loose ^pi-:loose] pi+:loose pi-:loose"});
     EXPECT_EQ(initok, true);
     names = dd1.getSelectionNames();
+    pdgs = dd1.getSelectionPDGCodes();
     ASSERT_EQ(names.size(), 2);
     EXPECT_EQ(names[0], "B0_D0_K");
     EXPECT_EQ(names[1], "B0_D0_pi");
+    ASSERT_EQ(pdgs.size(), 2);
+    EXPECT_EQ(pdgs[0], 321);
+    EXPECT_EQ(pdgs[1], -211);
 
     // more complex decay string with multiple particles of the same type
     DecayDescriptor dd2;
-    initok = dd2.init("vpho:complex -> [D0 -> ^K+:loose pi-:loose] ^e+:loose ^e-:loose ^gamma:loose");
+    initok = dd2.init(std::string{"vpho:complex -> [D0 -> ^K+:loose pi-:loose] ^e+:loose ^e-:loose ^gamma:loose"});
     EXPECT_EQ(initok, true);
     names = dd2.getSelectionNames();
+    pdgs = dd2.getSelectionPDGCodes();
     ASSERT_EQ(names.size(), 4);
     EXPECT_EQ(names[0], "vpho_D0_K");
     EXPECT_EQ(names[1], "vpho_e0");
     EXPECT_EQ(names[2], "vpho_e1");
     EXPECT_EQ(names[3], "vpho_gamma");
+    ASSERT_EQ(pdgs.size(), 4);
+    EXPECT_EQ(pdgs[0], 321);
+    EXPECT_EQ(pdgs[1], -11);
+    EXPECT_EQ(pdgs[2], 11);
+    EXPECT_EQ(pdgs[3], 22);
   }
 
   TEST(DecayDescriptorTest, MisIDandDecayInFlightGrammar)
   {
     // MisID is ignored for a daughter which has (misID) in the head
     DecayDescriptor dd1;
-    bool initok = dd1.init("B0:sig -> (misID)K+:loose pi-:loose");
+    bool initok = dd1.init(std::string{"B0:sig -> (misID)K+:loose pi-:loose"});
     EXPECT_EQ(initok, true);
     ASSERT_NE(dd1.getMother(), nullptr);
     EXPECT_EQ(dd1.getMother()->getName(), "B0");
@@ -348,7 +357,7 @@ namespace {
     EXPECT_EQ(dd1.getDaughter(1)->getMother()->isIgnoreDecayInFlight(), false);
 
     DecayDescriptor dd2;
-    initok = dd2.init("B0:sig -> K+:loose (misID)pi-:loose");
+    initok = dd2.init(std::string{"B0:sig -> K+:loose (misID)pi-:loose"});
     EXPECT_EQ(initok, true);
     ASSERT_NE(dd2.getDaughter(0), nullptr);
     EXPECT_EQ(dd2.getDaughter(0)->getMother()->getName(), "K+");
@@ -360,7 +369,7 @@ namespace {
     EXPECT_EQ(dd2.getDaughter(1)->getMother()->isIgnoreDecayInFlight(), false);
 
     DecayDescriptor dd3;
-    initok = dd3.init("B0:sig -> (misID)K+:loose (misID)pi-:loose");
+    initok = dd3.init(std::string{"B0:sig -> (misID)K+:loose (misID)pi-:loose"});
     EXPECT_EQ(initok, true);
     ASSERT_NE(dd3.getDaughter(0), nullptr);
     EXPECT_EQ(dd3.getDaughter(0)->getMother()->getName(), "K+");
@@ -373,7 +382,7 @@ namespace {
 
     // DecayInFlight is ignored for a daughter which has (decay) in the head
     DecayDescriptor dd4;
-    initok = dd4.init("B0:sig -> (decay)K+:loose pi-:loose");
+    initok = dd4.init(std::string{"B0:sig -> (decay)K+:loose pi-:loose"});
     EXPECT_EQ(initok, true);
     ASSERT_NE(dd4.getDaughter(0), nullptr);
     EXPECT_EQ(dd4.getDaughter(0)->getMother()->getName(), "K+");
@@ -385,7 +394,7 @@ namespace {
     EXPECT_EQ(dd4.getDaughter(1)->getMother()->isIgnoreDecayInFlight(), false);//
 
     DecayDescriptor dd5;
-    initok = dd5.init("B0:sig -> K+:loose (decay)pi-:loose");
+    initok = dd5.init(std::string{"B0:sig -> K+:loose (decay)pi-:loose"});
     EXPECT_EQ(initok, true);
     ASSERT_NE(dd5.getDaughter(0), nullptr);
     EXPECT_EQ(dd5.getDaughter(0)->getMother()->getName(), "K+");
@@ -397,7 +406,7 @@ namespace {
     EXPECT_EQ(dd5.getDaughter(1)->getMother()->isIgnoreDecayInFlight(), true);
 
     DecayDescriptor dd6;
-    initok = dd6.init("B0:sig -> (decay)K+:loose (decay)pi-:loose");
+    initok = dd6.init(std::string{"B0:sig -> (decay)K+:loose (decay)pi-:loose"});
     EXPECT_EQ(initok, true);
     ASSERT_NE(dd6.getDaughter(0), nullptr);
     EXPECT_EQ(dd6.getDaughter(0)->getMother()->getName(), "K+");
@@ -410,7 +419,7 @@ namespace {
 
     // @, ^, (misID), and (decay) can be used at the same time
     DecayDescriptor dd7;
-    initok = dd7.init("B0:sig -> (misID)(decay)K+:loose (decay)(misID)pi-:loose");
+    initok = dd7.init(std::string{"B0:sig -> (misID)(decay)K+:loose (decay)(misID)pi-:loose"});
     EXPECT_EQ(initok, true);
     ASSERT_NE(dd7.getDaughter(0), nullptr);
     EXPECT_EQ(dd7.getDaughter(0)->getMother()->getName(), "K+");
@@ -426,7 +435,7 @@ namespace {
     EXPECT_EQ(dd7.getDaughter(1)->getMother()->isIgnoreDecayInFlight(), true);
 
     DecayDescriptor dd8;
-    initok = dd8.init("B0:sig -> ^(misID)K+:loose (decay)@pi-:loose");
+    initok = dd8.init(std::string{"B0:sig -> ^(misID)K+:loose (decay)@pi-:loose"});
     EXPECT_EQ(initok, true);
     ASSERT_NE(dd8.getDaughter(0), nullptr);
     EXPECT_EQ(dd8.getDaughter(0)->getMother()->getName(), "K+");
@@ -442,7 +451,7 @@ namespace {
     EXPECT_EQ(dd8.getDaughter(1)->getMother()->isIgnoreDecayInFlight(), true);
 
     DecayDescriptor dd9;
-    initok = dd9.init("B0:sig -> ^@(misID)(decay)K+:loose (decay)@^(misID)pi-:loose");
+    initok = dd9.init(std::string{"B0:sig -> ^@(misID)(decay)K+:loose (decay)@^(misID)pi-:loose"});
     EXPECT_EQ(initok, true);
     ASSERT_NE(dd9.getDaughter(0), nullptr);
     EXPECT_EQ(dd9.getDaughter(0)->getMother()->getName(), "K+");
@@ -463,31 +472,31 @@ namespace {
   {
     // use of illegal characters in labels
     DecayDescriptor dd1;
-    bool initok = dd1.init("B0:lab[el -> K+:loose pi-:loose");
+    bool initok = dd1.init(std::string{"B0:lab[el -> K+:loose pi-:loose"});
     EXPECT_EQ(initok, false);
     EXPECT_EQ(dd1.getMother()->getName(), "");
     EXPECT_EQ(dd1.getMother()->getLabel(), "");
 
     DecayDescriptor dd2;
-    initok = dd2.init("B0:lab^el -> K+:loose pi-:loose");
+    initok = dd2.init(std::string{"B0:lab^el -> K+:loose pi-:loose"});
     EXPECT_EQ(initok, false);
     EXPECT_EQ(dd2.getMother()->getName(), "");
     EXPECT_EQ(dd2.getMother()->getLabel(), "");
 
     DecayDescriptor dd3;
-    initok = dd3.init("B0:lab]el -> K+:loose pi-:loose");
+    initok = dd3.init(std::string{"B0:lab]el -> K+:loose pi-:loose"});
     EXPECT_EQ(initok, false);
     EXPECT_EQ(dd3.getMother()->getName(), "");
     EXPECT_EQ(dd3.getMother()->getLabel(), "");
 
     DecayDescriptor dd4;
-    initok = dd4.init("B0:lab>el -> K+:loose pi-:loose");
+    initok = dd4.init(std::string{"B0:lab>el -> K+:loose pi-:loose"});
     EXPECT_EQ(initok, false);
     EXPECT_EQ(dd4.getMother()->getName(), "");
     EXPECT_EQ(dd4.getMother()->getLabel(), "");
 
     DecayDescriptor dd5;
-    initok = dd5.init("B0:lab:el -> K+:loose pi-:loose");
+    initok = dd5.init(std::string{"B0:lab:el -> K+:loose pi-:loose"});
     EXPECT_EQ(initok, false);
     EXPECT_EQ(dd5.getMother()->getName(), "");
     EXPECT_EQ(dd5.getMother()->getLabel(), "");
@@ -500,7 +509,7 @@ namespace {
     // use of unicode characters in labels
     const std::string weird = "⨔π⁰=🖼🔰";
     DecayDescriptor dd1;
-    bool initok = dd1.init("B0:" + weird + " -> K+:💩😜 pi-:💯🍆💦");
+    bool initok = dd1.init(std::string{"B0:" + weird + " -> K+:💩😜 pi-:💯🍆💦"});
     ASSERT_EQ(initok, true);
     EXPECT_EQ(dd1.getMother()->getName(), "B0");
     EXPECT_EQ(dd1.getMother()->getLabel(), weird);
@@ -514,35 +523,35 @@ namespace {
   TEST(DecayDescriptorTest, BadGrammarTest)
   {
     DecayDescriptor dd1;
-    bool initok = dd1.init("B0:label ---> K+:loose pi-:loose");
+    bool initok = dd1.init(std::string{"B0:label ---> K+:loose pi-:loose"});
     EXPECT_EQ(initok, false);
 
     DecayDescriptor dd2;
-    initok = dd2.init("B0:label > K+:loose pi-:loose");
+    initok = dd2.init(std::string{"B0:label > K+:loose pi-:loose"});
     EXPECT_EQ(initok, false);
 
     DecayDescriptor dd3;
-    initok = dd3.init("B0:label -> K+::loose pi-:loose");
+    initok = dd3.init(std::string{"B0:label -> K+::loose pi-:loose"});
     EXPECT_EQ(initok, false);
 
     DecayDescriptor dd4;
-    initok = dd4.init("B0:label K+:loose pi-:loose");
+    initok = dd4.init(std::string{"B0:label K+:loose pi-:loose"});
     EXPECT_EQ(initok, false);
 
     DecayDescriptor dd5;
-    initok = dd5.init("B0:label <- K+:loose pi-:loose");
+    initok = dd5.init(std::string{"B0:label <- K+:loose pi-:loose"});
     EXPECT_EQ(initok, false);
 
     DecayDescriptor dd6;
-    initok = dd6.init("B0:label => K+:loose pi-:loose");
+    initok = dd6.init(std::string{"B0:label => K+:loose pi-:loose"});
     EXPECT_EQ(initok, false);
 
     DecayDescriptor dd7;
-    initok = dd7.init("B0:label --> K+:loose pi-:loose");
+    initok = dd7.init(std::string{"B0:label --> K+:loose pi-:loose"});
     EXPECT_EQ(initok, false);
 
     DecayDescriptor dd8;
-    initok = dd8.init("B0:label ==> K+:loose pi-:loose");
+    initok = dd8.init(std::string{"B0:label ==> K+:loose pi-:loose"});
     EXPECT_EQ(initok, false);
   }
 
@@ -555,7 +564,7 @@ namespace {
     DataStore::Instance().setInitializeActive(false);
 
     // mock up a composite Belle2::Particle
-    TLorentzVector zeroes(0, 0, 0, 0);
+    ROOT::Math::PxPyPzEVector zeroes(0, 0, 0, 0);
     Particle* Kp = particles.appendNew(Particle(zeroes, 321));    // 0
     Particle* pim1 = particles.appendNew(Particle(zeroes, -211)); // 1
     Particle* pim2 = particles.appendNew(Particle(zeroes, -211)); // 2
@@ -570,7 +579,7 @@ namespace {
 
     // ---
     DecayDescriptor dd;
-    bool initok = dd.init("B0:B2Dzpipi -> [D0 -> K+:loose ^pi-:loose] ^pi+:loose pi-:loose");
+    bool initok = dd.init(std::string{"B0:B2Dzpipi -> [D0 -> K+:loose ^pi-:loose] ^pi+:loose pi-:loose"});
     ASSERT_EQ(initok, true);
 
     std::vector<const Particle*> selectionparticles = dd.getSelectionParticles(B0);
@@ -593,7 +602,7 @@ namespace {
   TEST(DecayDescriptorTest, HierarchyDefinitionTest)
   {
     DecayDescriptor dd;
-    bool initok = dd.init("B+ -> [ D+ -> ^K+ pi0 ] ^pi0");
+    bool initok = dd.init(std::string{"B+ -> [ D+ -> ^K+ pi0 ] ^pi0"});
     EXPECT_EQ(initok, true);
 
     auto selected_hierarchies = dd.getHierarchyOfSelected();

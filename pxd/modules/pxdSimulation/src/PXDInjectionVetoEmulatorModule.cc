@@ -20,7 +20,7 @@ using namespace std;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(PXDInjectionVetoEmulator)
+REG_MODULE(PXDInjectionVetoEmulator);
 
 //-----------------------------------------------------------------
 //                 Implementation

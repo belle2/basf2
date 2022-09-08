@@ -38,10 +38,10 @@ namespace Belle2 {
   using namespace TOP;
 
   //-----------------------------------------------------------------
-  //                 Register module
+  ///                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPNtuple)
+  REG_MODULE(TOPNtuple);
 
   //-----------------------------------------------------------------
   //                 Implementation
@@ -158,7 +158,7 @@ namespace Belle2 {
         if (mother) m_top.motherPDG = mother->getPDG();
         m_top.primary = mcParticle->getStatus(MCParticle::c_PrimaryParticle);
         m_top.seen = mcParticle->hasSeenInDetector(Const::TOP);
-        TVector3 prodVertex = mcParticle->getProductionVertex();
+        B2Vector3D prodVertex = mcParticle->getProductionVertex();
         m_top.rhoProd = prodVertex.Perp();
         m_top.zProd = prodVertex.Z();
         m_top.phiProd = prodVertex.Phi();
@@ -186,8 +186,8 @@ namespace Belle2 {
 
       if (extHit) {
         int moduleID = extHit->getCopyID();
-        TVector3 position = extHit->getPosition();
-        TVector3 momentum = extHit->getMomentum();
+        TVector3 position = extHit->getPositionTVector3();
+        TVector3 momentum = extHit->getMomentumTVector3();
         if (geo->isModuleIDValid(moduleID)) {
           const auto& module = geo->getModule(moduleID);
           position = module.pointToLocal(position);

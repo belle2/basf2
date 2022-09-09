@@ -268,11 +268,8 @@ Here is a list of trigger variables:
 .. tip::
   Please see the `Trigger Bits section
   <https://software.belle2.org/development/sphinx/trg/doc/index.html#trigger-bits>`__
-  for differences between L1Input, L1FTDL, and L1PSNM and further details.
-  Note that it is recommended to store the L1 information using the trigger
-  bit name(e.g.: ``L1PSNM(yyy)``) since the trigger bit number may change
-  across different data taking periods.
-
+  for further details.
+  
 .. b2-variables::
    :group: Software Trigger
 

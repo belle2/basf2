@@ -5,6 +5,11 @@ Variables
 +++++++++
  * Extended the variable `useAlternativeDaughterHypothesis` to variables calculated from daughters' 4-momentum, e.g. `cosHelicityAngleMomentum`.
 
+Modular Analysis Function
++++++++++++++++++++++++++
+ * Added a check to the `applyEventCuts` function to make sure that only event-based variables are used in the
+   selection. The decomposition of meta variables can be tricky, so a new argument ``metavariables`` is added to extend
+   the list of meta variables which should be decomposed and should themselves be ignored in the check.
 
 Changes in the analysis package in light-2207-bengal
 ----------------------------------------------------

@@ -460,15 +460,15 @@ void DQMHistoModuleBase::FillHitNumbers(int nPXD, int nSVD, int nCDC)
 
 void DQMHistoModuleBase::FillMomentumAngles(const TrackFitResult* tfr)
 {
-  TVector3 mom = tfr->getMomentum();
+  const TVector3 mom = tfr->getMomentum();
 
-  float px = mom.Px();
-  float py = mom.Py();
-  float pz = mom.Pz();
+  // don't fill NAN
+  if (std::isnan(mom.X()) or std::isnan(mom.Y()) or std::isnan(mom.Z())) {
+    return;
+  }
 
-  float Phi = atan2(py, px);
-  float pxy = sqrt(px * px + py * py);
-  float Theta = atan2(pxy, pz);
+  float Phi = mom.Phi();
+  float Theta = mom.Theta();
 
   m_MomPhi->Fill(Phi / Unit::deg);
   m_MomTheta->Fill(Theta / Unit::deg);
@@ -477,7 +477,12 @@ void DQMHistoModuleBase::FillMomentumAngles(const TrackFitResult* tfr)
 
 void DQMHistoModuleBase::FillMomentumCoordinates(const TrackFitResult* tfr)
 {
-  TVector3 mom = tfr->getMomentum();
+  const TVector3 mom = tfr->getMomentum();
+
+  // don't fill NAN
+  if (std::isnan(mom.X()) or std::isnan(mom.Y()) or std::isnan(mom.Z())) {
+    return;
+  }
 
   m_MomX->Fill(mom.Px());
   m_MomY->Fill(mom.Py());
@@ -500,12 +505,18 @@ void DQMHistoModuleBase::FillHelixParametersAndCorrelations(const TrackFitResult
 
 void DQMHistoModuleBase::FillTrackFitStatus(const genfit::FitStatus* tfs)
 {
+  // don't fill NAN or INF
+  if (std::isinf(std::abs(tfs->getChi2())) or std::isnan(tfs->getChi2()) or std::isinf(std::abs(tfs->getNdf()))
+      or std::isnan(tfs->getNdf())) {
+    return;
+  }
+
   float NDF = tfs->getNdf();
   m_NDF->Fill(NDF);
-
-  m_Chi2->Fill(tfs->getChi2());
-  if (NDF) {
-    float Chi2NDF = tfs->getChi2() / NDF;
+  float chi2 = tfs->getChi2();
+  m_Chi2->Fill(chi2);
+  if (NDF > 0) {
+    float Chi2NDF = chi2 / NDF;
     m_Chi2NDF->Fill(Chi2NDF);
   }
 

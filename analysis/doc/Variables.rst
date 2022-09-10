@@ -230,36 +230,6 @@ Here is a list of variables for acceptance cuts:
 Trigger
 ~~~~~~~
 
-Trigger bits are pre-defined selection criteria implemented in the
-trigger system. Thus only 1 (fired) or 0 (not fired) could be assigned
-to each trigger bit. There are three kinds of trigger bits: input trigger bits (L1Input),
-output trigger bits (L1FTDL), and prescaled trigger bits (L1PSNM). 
-Input trigger bits are predefined selections from each
-sub-detector, with adjustment of the delay and width, in order to fix
-latency on GDL. For example, ``ty_0`` is one of the input trigger bits
-meaning the number of neuro 3D tracks is one. Output bits are the
-outputs of GDL, combining different input trigger bits for final
-decision. For example, ``yyy`` is one of the output trigger bits meaning
-``(ty_2 or ty_3) and !veto``. Prescaled trigger bits are output trigger
-bits after prescaling and masking. Sometimes we want to keep only part
-of events fired a certain trigger bit, for example, we want to keep only
-1% of Bhabha events. A prescale factor of 100 is then assigned to ``bha_3D``
-(Bhabha selected in 3D criteria). If at least one of the prescaled
-output bits is fired in an event, the event is triggered.
-
-It is recommended to use prescaled trigger bits (L1PSNM) or un-prescaled
-trigger bits (L1FTDL) for your analysis. The different prescales are set
-to the different output trigger bits in each run. In run-independent MC,
-configuration of the prescales in TSIM can be different from data, so L1
-FTDL is recommended. In run-dependent MC, configuration of the prescales
-in TSIM is consistent with data, so L1PSNM is recommended.
-
-Details of the trigger bit definitions could be
-found on `the dedicated Confluence page
-<https://confluence.desy.de/display/BI/TriggerBitTable>`__
-or `the dedicated Belle II notes
-<https://docs.belle2.org/search?ln=en&p=%22Trigger+Summary%22&f=&action_search=Search&c=Belle+II+Notes>`__.
-
 Here is a list of trigger variables:
 
 .. b2-variables::

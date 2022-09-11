@@ -481,6 +481,8 @@ void EKLM::GeometryData::initializeFromGearbox(const GearDir* gearDir)
   ShieldDetailGeometry shieldDetailGeometry;
   GearDir gd(*gearDir);
   gd.append("/EKLM");
+  /* Beam-background study. */
+  m_BeamBackgroundStudy = gd.getBool("BeamBackgroundStudy");
   /* Numbers of elements. */
   m_NSections = gd.getInt("NSections");
   m_ElementNumbers->checkSection(m_NSections);

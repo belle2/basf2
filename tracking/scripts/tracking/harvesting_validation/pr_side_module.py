@@ -598,7 +598,7 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
 
     #: Charge dependent histograms
     #: Hit efficiency in each sub detector by the true tan lambda value
-    save_hit_efficiency_by_tanlambda_profile = refiners.save_profiles(
+    save_hit_efficiency_by_tanlambda_profile_groupbyCharge = refiners.save_profiles(
         #: \cond
         filter_on="is_matchedPrimary",
         select={

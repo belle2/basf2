@@ -30,7 +30,7 @@ import variables.utils as vu
 cp_val_path = b2.Path()
 
 inputFile = b2.find_file(filename='analysis/mdst11_BGx1_b2jpsiks.root', data_type='validation')
-ma.inputMdst(environmentType='default', filename=inputFile, path=cp_val_path)
+ma.inputMdst(filename=inputFile, path=cp_val_path)
 
 # Reconstruction of signal side and MC match
 ma.fillParticleList(decayString='pi+:all', cut='', path=cp_val_path)
@@ -86,6 +86,7 @@ ma.variablesToNtuple(decayString='B0:jpsiks',
 
 ma.summaryOfLists(particleLists=['B0:jpsiks'], path=cp_val_path)
 
+cp_val_path.add_module('Progress')
 # Process the events
 b2.process(cp_val_path)
 

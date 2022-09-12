@@ -22,11 +22,12 @@
 
 using namespace Belle2;
 
-REG_MODULE(DQMHistAnalysisKLM)
+REG_MODULE(DQMHistAnalysisKLM);
 
 DQMHistAnalysisKLMModule::DQMHistAnalysisKLMModule()
   : DQMHistAnalysisModule(),
     m_ProcessedEvents{0},
+    m_IsNullRun{false},
     m_ChannelArrayIndex{&(KLMChannelArrayIndex::Instance())},
     m_SectorArrayIndex{&(KLMSectorArrayIndex::Instance())},
     m_ElementNumbers{&(KLMElementNumbers::Instance())},
@@ -38,10 +39,14 @@ DQMHistAnalysisKLMModule::DQMHistAnalysisKLMModule()
   addParam("ThresholdForHot", m_ThresholdForHot,
            "Threshold Y for hot channels: if a channel has an occupancy Y times larger than the average, it will be marked as hot (but not masked).",
            10);
+  addParam("ThresholdForLog", m_ThresholdForLog,
+           "Threshold Z for log scale view: if a channel has an occupancy Z times larger than the average, canvas shifts to log scale.",
+           20);
   addParam("MinHitsForFlagging", m_MinHitsForFlagging, "Minimal number of hits in a channel required to flag it as 'Masked' or 'Hot'",
            50);
   addParam("MinProcessedEventsForMessages", m_MinProcessedEventsForMessagesInput,
            "Minimal number of processed events required to print error messages", 10000.);
+  addParam("RefHistoFile", m_refFileName, "Reference histogram file name", std::string("KLM_DQM_REF_BEAM.root"));
 
   m_MinProcessedEventsForMessages = m_MinProcessedEventsForMessagesInput;
   m_2DHitsLine.SetLineColor(kRed);
@@ -66,10 +71,25 @@ void DQMHistAnalysisKLMModule::initialize()
     B2FATAL("The threshold used for hot channels is larger than the one for masked channels."
             << LogVar("Threshold for hot channels", m_ThresholdForHot)
             << LogVar("Threshold for masked channels", m_ThresholdForMasked));
+
+  if (m_refFileName != "") {
+    m_refFile = TFile::Open(m_refFileName.data(), "READ");
+  }
+
+  //search for reference
+  if (m_refFile && m_refFile->IsOpen()) {
+    B2INFO("KLM DQMHistAnalysis: reference root file (" << m_refFileName << ") FOUND, able to read ref histograms");
+
+  } else
+    B2WARNING("KLM DQMHistAnalysis: reference root file (" << m_refFileName << ") not found, or closed");
 }
 
 void DQMHistAnalysisKLMModule::terminate()
 {
+  if (m_refFile) {
+    m_refFile->Close();
+    delete m_refFile;
+  }
 }
 
 void DQMHistAnalysisKLMModule::beginRun()
@@ -81,6 +101,10 @@ void DQMHistAnalysisKLMModule::beginRun()
   m_DeadBarrelModules.clear();
   m_DeadEndcapModules.clear();
   m_MaskedChannels.clear();
+
+  m_RunType = findHist("DQMInfo/rtype");
+  m_RunTypeString = m_RunType ? m_RunType->GetTitle() : "";
+  m_IsNullRun = (m_RunTypeString == "null");
 }
 
 void DQMHistAnalysisKLMModule::endRun()
@@ -117,6 +141,23 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
   histogram->SetStats(false);
   histogram->Draw();
   n = histogram->GetXaxis()->GetNbins();
+
+  TH1* ref_histogram = nullptr;
+  float ref_average = 0;
+  if (m_refFile && m_refFile->IsOpen()) {
+    ref_histogram = (TH1*)m_refFile->Get(histogram->GetName());
+    if (!ref_histogram) {
+      B2WARNING("Unable to find " << histogram->GetName() << "in reference file.");
+    }
+  }
+
+  if (ref_histogram != nullptr) {
+    for (i = 1; i <= n; i++) {
+      double nHitsPerModuleRef = ref_histogram->GetBinContent(i);
+      ref_average = ref_average + nHitsPerModuleRef;
+    }
+  }
+
   for (i = 1; i <= n; i++) {
     uint16_t channelIndex = std::round(histogram->GetBinCenter(i));
     uint16_t channelNumber = m_ChannelArrayIndex->getNumber(channelIndex);
@@ -154,15 +195,7 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
       m_ElectronicsMap->getElectronicsChannel(channel);
     if (electronicsChannel == nullptr)
       B2FATAL("Incomplete KLM electronics map.");
-    str = "No data from HSLB ";
-    if (channelSubdetector == KLMElementNumbers::c_BKLM) {
-      str += BKLMElementNumbers::getHSLBName(electronicsChannel->getCopper(),
-                                             electronicsChannel->getSlot());
-    } else {
-      str += EKLMElementNumbers::getHSLBName(electronicsChannel->getCopper(),
-                                             electronicsChannel->getSlot());
-    }
-    str += ", lane " + std::to_string(electronicsChannel->getLane());
+    str = "No data from lane " + std::to_string(electronicsChannel->getLane());
     latex.DrawLatexNDC(x, y, str.c_str());
     y -= 0.05;
     /* Store the module number, used later in processPlaneHistogram
@@ -184,6 +217,7 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
   if (activeModuleChannels == 0)
     return;
   average /= activeModuleChannels;
+  ref_average /= activeModuleChannels;
   for (i = 1; i <= n; ++i) {
     uint16_t channelIndex = std::round(histogram->GetBinCenter(i));
     uint16_t channelNumber = m_ChannelArrayIndex->getNumber(channelIndex);
@@ -210,21 +244,29 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
         B2FATAL("Incomplete BKLM electronics map.");
       if (channelStatus == "Masked")
         histogram->SetBinContent(i, 0);
-      str = channelStatus + " channel: HSLB ";
-      if (channelSubdetector == KLMElementNumbers::c_BKLM) {
-        str += BKLMElementNumbers::getHSLBName(electronicsChannel->getCopper(),
-                                               electronicsChannel->getSlot());
-      } else {
-        str += EKLMElementNumbers::getHSLBName(electronicsChannel->getCopper(),
-                                               electronicsChannel->getSlot());
-      }
-      str += (", lane " + std::to_string(electronicsChannel->getLane()) +
-              ", axis " + std::to_string(electronicsChannel->getAxis()) +
-              ", channel " + std::to_string(electronicsChannel->getChannel()));
+      str = channelStatus + " channel: ";
+      str += ("L" + std::to_string(electronicsChannel->getLane()) +
+              " A" + std::to_string(electronicsChannel->getAxis()) +
+              " Ch" + std::to_string(electronicsChannel->getChannel()));
       latex.DrawLatexNDC(x, y, str.c_str());
       y -= 0.05;
     }
   }
+
+  if (histogram->GetMaximum()*n > histogram->Integral()*m_ThresholdForLog && average * activeModuleChannels > m_MinHitsForFlagging) {
+    canvas->SetLogy();
+  } else if (ref_histogram != nullptr) {
+    if (ref_histogram->GetMaximum()*n > ref_histogram->Integral()*m_ThresholdForLog
+        && ref_average * activeModuleChannels > m_MinHitsForFlagging) {
+      canvas->SetLogy();
+    } else {
+      canvas->SetLogy(0);
+    }
+
+  } else {
+    canvas->SetLogy(0);
+  }
+
   canvas->Modified();
 }
 
@@ -336,9 +378,11 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
         latex.DrawLatexNDC(xAlarm, yAlarm, alarm.c_str());
         yAlarm -= 0.05;
       }
-      alarm = "Call the KLM experts immediately!";
-      latex.DrawLatexNDC(xAlarm, yAlarm, alarm.c_str());
-      canvas->Pad()->SetFillColor(kRed);
+      if (m_IsNullRun == false) {
+        alarm = "Call the KLM experts immediately!";
+        latex.DrawLatexNDC(xAlarm, yAlarm, alarm.c_str());
+        canvas->Pad()->SetFillColor(kRed);
+      }
     }
   } else {
     /* First draw the vertical lines and the sector names. */
@@ -372,28 +416,16 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
         latex.DrawLatexNDC(xAlarm, yAlarm, alarm.c_str());
         yAlarm -= 0.05;
       }
-      alarm = "Call the KLM experts immediately!";
-      latex.DrawLatexNDC(xAlarm, yAlarm, alarm.c_str());
-      canvas->Pad()->SetFillColor(kRed);
+      if (m_IsNullRun == false) {
+        alarm = "Call the KLM experts immediately!";
+        latex.DrawLatexNDC(xAlarm, yAlarm, alarm.c_str());
+        canvas->Pad()->SetFillColor(kRed);
+      }
     }
   }
   canvas->Modified();
   canvas->Update();
 }
-
-TCanvas* DQMHistAnalysisKLMModule::findCanvas(const std::string& canvasName)
-{
-  TIter nextkey(gROOT->GetListOfCanvases());
-  TObject* obj = nullptr;
-  while ((obj = dynamic_cast<TObject*>(nextkey()))) {
-    if (obj->IsA()->InheritsFrom("TCanvas")) {
-      if (obj->GetName() == canvasName)
-        return dynamic_cast<TCanvas*>(obj);
-    }
-  }
-  return nullptr;
-}
-
 
 void DQMHistAnalysisKLMModule::event()
 {

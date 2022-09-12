@@ -33,7 +33,7 @@
 #include "trg/cdc/Segment.h"
 #include "trg/cdc/SegmentHit.h"
 #include "trg/cdc/Circle.h"
-#include "trg/cdc/Track.h"
+#include "trg/cdc/TRGCDCTrack.h"
 #include "trg/cdc/Link.h"
 #include "trg/cdc/Relation.h"
 #include "trg/cdc/Fitter3DUtility.h"
@@ -45,7 +45,7 @@ using namespace std;
 namespace Belle2 {
 
   TRGCDCHough3DFinder::TRGCDCHough3DFinder(const TRGCDC& TRGCDC, bool makeRootFile, int finderMode)
-    : _cdc(TRGCDC), m_makeRootFile(makeRootFile) , m_finderMode(finderMode)
+    : _cdc(TRGCDC), m_makeRootFile(makeRootFile), m_finderMode(finderMode)
   {
 
     m_fileFinder3D = 0;

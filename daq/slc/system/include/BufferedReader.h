@@ -28,8 +28,8 @@ namespace Belle2 {
     size_t count() const { return m_pos; }
     size_t size() const { return m_size; }
     void copy(const void*, size_t);
-    virtual size_t read(void*, size_t);
-    virtual bool available() { return true; }
+    size_t read(void*, size_t) override;
+    bool available() override { return true; }
 
   public:
     const BufferedReader& operator = (const BufferedReader&);

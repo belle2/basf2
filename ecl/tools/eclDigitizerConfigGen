@@ -9,68 +9,105 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-##########################################################################
-#                                                                        #
-# Program that records covariance matrices and other                     #
-# parameters in ECL-WF.root file that is used by ECLDigitizer            #
-# module in ECL simulation                                               #
-# (based on ecldigitconfigfile.cc)                                       #
-#                                                                        #
-# USAGE: see printUsageInfo function for usage information               #
-##########################################################################
-
-import sys
-import os
-import ROOT
-from ROOT import Belle2
-from array import array
-
-def printUsageInfo():
-    """
-    Print usage information
-    """
-    print("""
-eclDigitizerConfigGen: Script to generate ECL-WF.root file used by ECLDigitizer module
+"""
+Script that records covariance matrices and other parameters in ECL-WF.root
+file used by ECLDigitizer module.  The parameters are also saved into three
+payloads in the localdb directory.
 
 Usage: eclDigitizerConfigGen covmat_path tid_path
   covmat_path    Path to files with inverse covariance matrices, for example
                  ~avbobrov/eclshaper_sp/file/run02320_2_feb20_noise
   tid_path       Path to files with time shift data, for example
                  ~avbobrov/eclshaper_sp/file/tid
-""")
+"""
+
+import argparse
+import sys, os
+import ROOT
+from ROOT import Belle2
+from ROOT.Belle2 import Database
+from array import array
+import basf2 as b2
+
+################################################
+# PARAMETERS
+
+# Instead of getting the number of parameter groups from
+# CIdToEclData.txt, create 8736 groups, one group for each
+# ECL channel.
+USE_8736_PARAMETERS = False
+
+# Use same signal shape parameters ni all parameter groups.
+USE_DEFAULT_SIGNAL_SHAPE = True
+
+# Experiment and run to access ECLChannelMap
+CHANNEL_MAP_EXP = 20
+CHANNEL_MAP_RUN = 20
+
+# Interval of validity for the output payloads
+FIRST_EXP = 0
+FIRST_RUN = 0
+LAST_EXP = -1
+LAST_RUN = -1
+################################################
 
 def main():
     """
     """
 
-    if len(sys.argv) < 3:
-        printUsageInfo()
-        exit(2)
+    parser = argparse.ArgumentParser(
+        description="Script that records covariance matrices and other " +
+        "parameters in ECL-WF.root file used by ECLDigitizer module. The " +
+        "parameters are also saved into three payloads in the localdb directory.")
+    parser.add_argument('covmat_path', type=str,
+        help='Path to files with inverse covariance matrices, for example ' +
+        '~avbobrov/eclshaper_sp/file/run02320_2_feb20_noise')
+    parser.add_argument('tid_path', type=str,
+        help='Path to files with time shift data, for example ' +
+        '~avbobrov/eclshaper_sp/file/tid')
+    # parser.add_argument('firstExp', type=int, nargs='?',
+    #     help='Minimum experiment number in the interval of validity. Default is 0')
+    # parser.add_argument('firstRun', type=int, nargs='?',
+    #     help='Minimum run number in the interval of validity. Default is 0')
+    # parser.add_argument('lastExp', type=int, nargs='?',
+    #     help='Maximum experiment number in the interval of validity. Default is -1')
+    # parser.add_argument('lastRun', type=int, nargs='?',
+    #     help='Maximum run number in the interval of validity. Default is -1')
+    # parser.add_argument('--groups', type=int, default=217,
+    #     help='Number of groups of parameters. Default is 217, max is 8736')
+    args = parser.parse_args()
 
+    #=== Configure ConditionsDB
+    b2.conditions.reset()
+    b2.conditions.prepend_globaltag('online')
+    setExpRun(CHANNEL_MAP_EXP, CHANNEL_MAP_RUN)
     #=== Load ECL channel mapper
     mapper = Belle2.ECL.ECLChannelMapper()
-    mapper.initFromFile()
+    mapper.initFromDB()
     #=== Load mapping to 217 groups of Cell IDs with similar covariance matrices
-    f = open(Belle2.FileSystem.findFile('/data/ecl/CIdToEclData.txt'), 'r')
     groups = []
-    for line in f.readlines():
-        if len(line.strip()) == 0: continue
-        cid0, group = [int(x) for x in line.split()]
-        new_len = group + 1
-        while new_len > len(groups): groups.append(list())
-        groups[group].append(cid0 + 1)
+    if USE_8736_PARAMETERS:
+        groups = [[x + 1] for x in range(8736)]
+    else:
+        f = open(Belle2.FileSystem.findFile('/data/ecl/CIdToEclData.txt'), 'r')
+        for line in f.readlines():
+            if len(line.strip()) == 0: continue
+            cid0, group = [int(x) for x in line.split()]
+            new_len = group + 1
+            while new_len > len(groups): groups.append(list())
+            groups[group].append(cid0 + 1)
 
     #=== Load covariance matrix data
 
     # Folder with inverse covariance matrices and waveform parameters
-    PATH_PREFIX = sys.argv[1]#'/home/belle/avbobrov/eclshaper_sp/file/run02320_2_feb20_noise'
+    PATH_PREFIX = args.covmat_path # '/home/belle/avbobrov/eclshaper_sp/file/run02320_2_feb20_noise'
     # Folder with time shift data
-    PATH_PREFIX_TID = sys.argv[2]#'/home/belle/avbobrov/eclshaper_sp/file/tid'
+    PATH_PREFIX_TID = args.tid_path # '/home/belle/avbobrov/eclshaper_sp/file/tid'
 
     # Cell ID-indexed list (0..8735) of ECLWaveformData objects
     # (waveform parameters and inv cov matrices)
     wf_data_by_cid = [None] * 8736
-    # Shaper ID-indexed list (0..8736) of ECLWFAlgoParams objects
+    # Shaper ID-indexed list (0..8735) of ECLWFAlgoParams objects
     # (fit algorithm parameters)
     algo_params_by_cid = [None] * 8736
 
@@ -101,7 +138,6 @@ def main():
 
     #=== Data saving
 
-    f_out = ROOT.TFile('ECL-WF.root', 'recreate')
     t1 = ROOT.TTree("EclWF", "Waveform and covariance matrix")
     t2 = ROOT.TTree("EclAlgo", "Fitting algorithm parameters")
     t3 = ROOT.TTree("EclNoise", "Electronic noise matrix")
@@ -115,7 +151,7 @@ def main():
     t2.Branch("Algopars", Belle2.ECLWFAlgoParams())
     ncellId2 = array('i', [0])
     cellId2  = array('i', [1] * 8736)
-    t2.Branch("ncellId", ncellId2, "ncellId/I");
+    t2.Branch("ncellId", ncellId2, "ncellId/I")
     t2.Branch("cellId", cellId2, 'cellId[ncellId]/I')
 
     t3.Branch("NoiseM", Belle2.ECLNoiseData())
@@ -157,6 +193,14 @@ def main():
     t3.SetBranchAddress("NoiseM", ROOT.AddressOf(noise_data))
     t3.Fill()
 
+    #==== Save data, both to localdb and to ECL-WF.root
+
+    db = Database.Instance()
+    db.storeData('ECLWFParameters' , t1, Belle2.IntervalOfValidity(FIRST_EXP, FIRST_RUN, LAST_EXP, LAST_RUN))
+    db.storeData('ECLWFAlgoParams' , t2, Belle2.IntervalOfValidity(FIRST_EXP, FIRST_RUN, LAST_EXP, LAST_RUN))
+    db.storeData('ECLWFNoiseParams', t3, Belle2.IntervalOfValidity(FIRST_EXP, FIRST_RUN, LAST_EXP, LAST_RUN))
+
+    f_out = ROOT.TFile('ECL-WF.root', 'recreate')
     t1.Write()
     t2.Write()
     t3.Write()
@@ -184,12 +228,10 @@ def readShaperDSPConfig(dir_path, shaper_id, board_id):
             a = getRow(idx)
             b = getCol(idx)
             wf_data.setMatrixElement(idx, raw_matr[a][b])
-        default_pars = [None, 0.5, 0.6483, 0.4017, 0.3741, 0.8494, 0.00144547, 4.7071, 0.8156, 0.5556, 0.2752]
         # Store shape parameters
         for idx in range(wf_data.c_nParams):
             # FIXME: There are 11 parameters, not sure where the last one supposed to go.
             wf_data.setWaveformPar(idx, raw_pars[channel][idx+1])
-            # wf_data.setWaveformPar(idx, default_pars[idx+1])
         wf_data_list.append(wf_data)
 
     dsp_utils = Belle2.ECL.ECLDspUtilities
@@ -222,10 +264,12 @@ def adjustParameters(path, wf_data_list):
     default_parameters = [0.5, 0.648324, 0.401711, 0.374167, 0.849417, 0.00144548, 4.70722, 0.815639, 0.555605, 0.2752]
     timeshifts = [float(x) for x in open(path).readlines()]
     for wf_data, shift in zip(wf_data_list, timeshifts):
-        # t0 = wf_data.getWaveformPar(0)
-        # wf_data.setWaveformPar(0, t0 + shift - 72./2304.)
-        for i, par in enumerate(default_parameters):
-            wf_data.setWaveformPar(i, par)
+        t0 = wf_data.getWaveformPar(0)
+        wf_data.setWaveformPar(0, t0 + shift - 72./2304.)
+        if USE_DEFAULT_SIGNAL_SHAPE:
+            # NOTE: In case the same shape parameters are used for all channels, set these parameters
+            for i, par in enumerate(default_parameters):
+                wf_data.setWaveformPar(i, par)
     return wf_data_list
 
 
@@ -251,7 +295,7 @@ def getRow(a, row_count=16):
     if a >= row_count * (row_count + 1) // 2:
         return -1
     row = -1
-    for i in range(16):
+    for i in range(row_count):
         max_a_at_row = (i + 1) * (i + 2) // 2
         if a < max_a_at_row:
             row = i
@@ -334,6 +378,28 @@ def copperIDToCrateID(cpr_id):
     """
     if cpr_id <= 18: return [cpr_id * 2 - 1, cpr_id * 2]
     return [cpr_id + 18, cpr_id + 26]
+
+################################################
+# DATABASE CONFIGURATION
+
+def setExpRun(exp, run):
+    """Configure ConditionDB for the specific exp and run number
+    """
+    Belle2.DataStore.Instance().setInitializeActive(True)
+    evtPtr = Belle2.PyStoreObj('EventMetaData')
+    evtPtr.registerInDataStore()
+    evtPtr.assign(Belle2.EventMetaData(1, run, exp), True)
+    Belle2.DataStore.Instance().setInitializeActive(False)
+    Belle2.DBStore.Instance().update()
+
+def iovToString(iov):
+    """Convert IntervalOfValidity to string
+    """
+    exp_min = iov.getExperimentLow()
+    exp_max = iov.getExperimentHigh()
+    run_min = iov.getRunLow()
+    run_max = iov.getRunHigh()
+    return '(%d, %d, %d, %d)' % (exp_min, run_min, exp_max, run_max)
 
 ################################################
 # ECL NOISE DATA

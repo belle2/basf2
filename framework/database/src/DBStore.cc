@@ -10,6 +10,8 @@
 #include <framework/database/Database.h>
 #include <framework/logging/Logger.h>
 
+#include <boost/none.hpp>
+
 #include <TClass.h>
 
 namespace Belle2 {
@@ -55,7 +57,7 @@ namespace Belle2 {
     if (m_manualEvent) {
       Database::DBQuery query(name, required);
       if (Database::Instance().getData(*m_manualEvent, query)) {
-        dbEntry.updatePayload(query.revision, query.iov, query.filename, query.checksum, *m_manualEvent);
+        dbEntry.updatePayload(query.revision, query.iov, query.filename, query.checksum, query.globaltag, *m_manualEvent);
       }
       if (dbEntry.isIntraRunDependent()) m_intraRunDependencies.insert(&dbEntry);
     }
@@ -63,7 +65,7 @@ namespace Belle2 {
     else if (m_storeEvent.isValid()) {
       Database::DBQuery query(name, required);
       if (Database::Instance().getData(*m_storeEvent, query)) {
-        dbEntry.updatePayload(query.revision, query.iov, query.filename, query.checksum, *m_storeEvent);
+        dbEntry.updatePayload(query.revision, query.iov, query.filename, query.checksum, query.globaltag, *m_storeEvent);
       }
       if (dbEntry.isIntraRunDependent()) m_intraRunDependencies.insert(&dbEntry);
     }
@@ -84,7 +86,7 @@ namespace Belle2 {
     StoreObjPtr<EventMetaData> event;
     m_storeEvent = event;
     // Clear the m_manualEvent to indicate that we now want to use the DataStore event numbers
-    m_manualEvent = boost::none;
+    m_manualEvent = std::nullopt;
     performUpdate(*m_storeEvent);
   }
 
@@ -128,7 +130,7 @@ namespace Belle2 {
     // Update DBStore entries
     for (auto& query : entries) {
       auto& dbEntry = m_dbEntries.find(query.name)->second;
-      dbEntry.updatePayload(query.revision, query.iov, query.filename, query.checksum, event);
+      dbEntry.updatePayload(query.revision, query.iov, query.filename, query.checksum, query.globaltag, event);
       if (dbEntry.isIntraRunDependent()) m_intraRunDependencies.insert(&dbEntry);
     }
   }
@@ -184,7 +186,7 @@ namespace Belle2 {
     // because probably this is after resetting the DataStore (BII-1262)
     StoreObjPtr<EventMetaData> event;
     m_storeEvent = event;
-    m_manualEvent = boost::none;
+    m_manualEvent = std::nullopt;
   }
 
   void DBStore::addConstantOverride(const std::string& name, TObject* obj, bool oneRun)

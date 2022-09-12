@@ -14,7 +14,7 @@ using namespace std;
 using namespace Belle2;
 using namespace CDC;
 
-REG_MODULE(CDCRecoTrackFilter)
+REG_MODULE(CDCRecoTrackFilter);
 
 CDCRecoTrackFilterModule::CDCRecoTrackFilterModule() : Module()
 {

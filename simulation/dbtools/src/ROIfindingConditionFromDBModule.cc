@@ -10,7 +10,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(ROIfindingConditionFromDB)
+REG_MODULE(ROIfindingConditionFromDB);
 
 ROIfindingConditionFromDBModule::ROIfindingConditionFromDBModule() : Module(), m_roiParameters()
 {

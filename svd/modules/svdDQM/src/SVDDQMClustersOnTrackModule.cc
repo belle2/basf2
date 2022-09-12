@@ -28,7 +28,7 @@ using namespace SoftwareTrigger;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SVDDQMClustersOnTrack)
+REG_MODULE(SVDDQMClustersOnTrack);
 
 
 //-----------------------------------------------------------------
@@ -71,7 +71,7 @@ void SVDDQMClustersOnTrackModule::defineHisto()
     B2FATAL("Missing geometry for VXD, check steering file.");
   }
   if (gTools->getNumberOfSVDLayers() == 0) {
-    B2WARNING("Missing geometry for SVD, SVD-DQM is skiped.");
+    B2WARNING("Missing geometry for SVD, SVD-DQM is skipped.");
     return;
   }
 
@@ -241,20 +241,14 @@ void SVDDQMClustersOnTrackModule::initialize()
 
 void SVDDQMClustersOnTrackModule::beginRun()
 {
-  StoreObjPtr<EventMetaData> evtMetaData;
-  m_expNumber = evtMetaData->getExperiment();
-  m_runNumber = evtMetaData->getRun();
-
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   if (gTools->getNumberOfSVDLayers() == 0) return;
 
-  // Add experiment and run number to the title of selected histograms (CR shifter plots)
-  TString runID = TString::Format(" ~ Exp%d Run%d", m_expNumber, m_runNumber);
+  //reset histograms
   TObject* obj;
   TIter nextH(m_histoList);
   while ((obj = nextH()))
     if (obj->InheritsFrom("TH1")) {
-      ((TH1F*)obj)->SetTitle(obj->GetTitle() + runID);
       ((TH1F*)obj)->Reset();
     }
 }
@@ -274,6 +268,10 @@ void SVDDQMClustersOnTrackModule::event()
       if (m_svdEventInfo->getModeByte().getTriggerBin() != m_tb)
         return;
   }
+
+  StoreObjPtr<EventMetaData> evtMetaData;
+  m_expNumber = evtMetaData->getExperiment();
+  m_runNumber = evtMetaData->getRun();
 
   // get EventT0 if present and valid
   double eventT0 = -1000;
@@ -295,6 +293,17 @@ void SVDDQMClustersOnTrackModule::event()
 
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   if (gTools->getNumberOfSVDLayers() == 0) return;
+
+  // Add experiment and run number to the title of selected histograms (CR shifter plots)
+  TString runID = TString::Format(" ~ Exp%d Run%d", m_expNumber, m_runNumber);
+  TObject* obj;
+  TIter nextH(m_histoList);
+  while ((obj = nextH()))
+    if (obj->InheritsFrom("TH1")) {
+      if (((TString)obj->GetTitle()).Contains(runID) == false) {
+        ((TH1F*)obj)->SetTitle(obj->GetTitle() + runID);
+      }
+    }
 
   for (const Track& track : m_tracks) {
 

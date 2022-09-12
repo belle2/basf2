@@ -43,7 +43,7 @@ namespace Belle2 {
       const TVector3& dirInPoca = momentum_in_poca.Unit();
 
       //determine the angle phi, distribute it from -pi to pi
-      m_phi = atan2(dirInPoca.y() , dirInPoca.x());
+      m_phi = atan2(dirInPoca.y(), dirInPoca.x());
 
       //determine sign of d0
       //calculate the sign of the projection of pt(dirInPoca) at d0(poca)

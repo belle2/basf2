@@ -10,14 +10,16 @@
 
 #include <framework/core/Module.h>
 #include <tracking/modules/trackingPerformanceEvaluation/PerformanceEvaluationBaseClass.h>
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/MCParticle.h>
+#include <tracking/dataobjects/MCParticleInfo.h>
+#include <tracking/dataobjects/RecoTrack.h>
 
 #include <TList.h>
 #include <TH1F.h>
 #include <TH2F.h>
 #include <TH3F.h>
 
-#include <mdst/dataobjects/MCParticle.h>
-#include <tracking/dataobjects/MCParticleInfo.h>
 
 // forward declarations
 namespace Belle2 {
@@ -32,18 +34,39 @@ namespace Belle2 {
 
   public:
 
+    /**
+     * Constructor.
+     */
     TrackingPerformanceEvaluationModule();
 
+    /**
+     * Destructor.
+     */
     ~TrackingPerformanceEvaluationModule();
 
+    /**
+     * Initializer.
+     */
     void initialize() override;
 
+    /**
+     * Called when entering a new run.
+     */
     void beginRun() override;
 
+    /**
+     * This method is called for each event.
+     */
     void event() override;
 
+    /**
+     * This method is called if the current run ends.
+     */
     void endRun() override;
 
+    /**
+     * This method is called at the end of the event processing.
+     */
     void terminate() override;
 
   private:
@@ -67,6 +90,11 @@ namespace Belle2 {
     std::string m_RecoTracksName; /**< RecoTrack StoreArray name */
     std::string m_TracksName; /**< Track StoreArray name */
     int m_ParticleHypothesis;  /**< Particle Hypothesis for the track fit (default: 211) */
+
+    StoreArray<MCParticle> m_MCParticles; /**< MCParticles StoreArray */
+    StoreArray<RecoTrack> m_PRRecoTracks; /**< PR RecoTracks StoreArray */
+    StoreArray<RecoTrack> m_MCRecoTracks; /**< MC RecoTracks StoreArray */
+    StoreArray<Track> m_Tracks;           /**< Tracks StoreArray */
 
     /* list of histograms filled per MCParticle found in the event */
 

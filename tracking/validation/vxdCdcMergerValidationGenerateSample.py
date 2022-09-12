@@ -59,6 +59,7 @@ def run():
 
     path.add_module(VxdCdcMergerHarvester())
 
+    path.add_module('Progress')
     basf2.process(path)
     print(basf2.statistics)
 

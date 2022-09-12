@@ -12,7 +12,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(SVDTrackingEventLevelMdstInfoFiller)
+REG_MODULE(SVDTrackingEventLevelMdstInfoFiller);
 
 SVDTrackingEventLevelMdstInfoFillerModule::SVDTrackingEventLevelMdstInfoFillerModule() : Module()
 {

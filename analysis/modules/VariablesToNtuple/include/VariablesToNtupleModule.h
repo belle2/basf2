@@ -21,6 +21,8 @@
 
 namespace Belle2 {
 
+  class StringWrapper;
+
   /** Module to calculate variables specified by the user for a given ParticleList
    *  and save them into a ROOT TTree.
    *  The ntuple is candidate-based, meaning the variables of each candidate are saved in a separate
@@ -55,6 +57,8 @@ namespace Belle2 {
     std::string m_fileName;
     /** Name of the TTree. */
     std::string m_treeName;
+    /** Size of TBaskets in the output ROOT file in bytes. */
+    int m_basketsize;
 
     /** ROOT file for output. */
     std::shared_ptr<TFile> m_file{nullptr};
@@ -67,10 +71,12 @@ namespace Belle2 {
     int m_production{ -1};           /**< production ID (to distinguish MC samples) */
     int m_candidate{ -1};            /**< candidate counter */
     unsigned int m_ncandidates{0};   /**< total n candidates */
-    /** Variable branch addresses */
-    std::vector<double> m_branchAddresses;
-    /** List of function pointers corresponding to given variables. */
-    std::vector<Variable::Manager::FunctionPtr> m_functions;
+    /** Branch addresses of variables of type double */
+    std::vector<double> m_branchAddressesDouble;
+    /** Branch addresses of variables of type int (or bool) */
+    std::vector<int> m_branchAddressesInt;
+    /** List of pairs of function pointers and respective data type corresponding to given variables. */
+    std::vector<std::pair<Variable::Manager::FunctionPtr, Variable::Manager::VariableDataType>> m_functions;
 
     /** Tuple of variable name and a map of integer values and inverse sampling rate. E.g. (signal, {1: 0, 0:10}) selects all signal candidates and every 10th background candidate. */
     std::tuple<std::string, std::map<int, unsigned int>> m_sampling;
@@ -83,5 +89,7 @@ namespace Belle2 {
     std::map<int, unsigned long int> m_sampling_counts; /**< Current number of samples with this value */
     StoreObjPtr<EventMetaData> m_eventMetaData; /**< the event information */
 
+    std::string m_MCDecayString; /**< MC decay string to be filled */
+    StoreObjPtr<StringWrapper> m_stringWrapper; /**< string wrapper storing the MCDecayString */
   };
 } // end namespace Belle2

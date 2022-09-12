@@ -18,10 +18,13 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <ecl/dbobjects/ECLDigitWaveformParametersForMC.h>
 #include <framework/database/DBObjPtr.h>
+#include <framework/database/DBArray.h>
 
 //ECL
 #include <ecl/digitization/EclConfiguration.h>
 #include <ecl/utility/ECLChannelMapper.h>
+
+class TTree;
 
 namespace Belle2 {
 
@@ -101,19 +104,24 @@ namespace Belle2 {
       fitparams_t::int_array_24x16_t;  /**<  weighting coefficients amplitude calculation. Time is fixed by trigger */
     using uint_pair_t        = std::pair<unsigned int, unsigned int>; /**< a pair of unsigned ints */
 
-    /** ffsets for storages of ECL channels */
+    /** Indices in arrays with info on ECL channels */
     struct crystallinks_t {
+      /** Index in EclAlgo tree */
       short unsigned int idn;
+      /** Index in EclNoise tree */
       short unsigned int inoise;
+      /** Index of associated (waveform parameters, fit parameters) pair */
       short unsigned int ifunc;
+      /** Index in m_ss */
       short unsigned int iss;
     };
 
+    /** Lookup table for ECL channels. */
     std::vector<crystallinks_t> m_tbl;
 
     /** Fit algorihtm parameters shared by group of crystals */
     std::vector<algoparams_t> m_idn; /**< parameters that needs for waveform fit */
-    std::vector<fitparams_t> m_fitparams; /**<  */
+    std::vector<fitparams_t> m_fitparams; /**< Pairs of (waveform parameters, fit parameters) */
     std::vector<ECLNoiseData> m_noise; /**< parameters for correlated noise simulation */
     std::vector<signalsample_t> m_ss; /**< tabulated shape line */
     std::vector<signalsample_t> m_ss_HadronShapeSimulations; /**< tabulated shape line for hadron shape simulations */
@@ -144,6 +152,15 @@ namespace Belle2 {
 
     /** dbobject for hadron signal shapes*/
     DBObjPtr<ECLDigitWaveformParametersForMC> m_waveformParametersMC;
+    /** dbobject for CellID-specific signal shapes */
+    DBObjPtr<TTree> m_waveformParameters;
+    /** dbobject for shape fitting algo parameters */
+    DBObjPtr<TTree> m_algoParameters;
+    /** dbobject for electronics noise covariance matrix */
+    DBObjPtr<TTree> m_noiseParameters;
+
+    /** Always load waveform parameters at least once */
+    bool m_loadOnce = true;
 
     /** callback hadron signal shapes from database*/
     void callbackHadronSignalShapes();
@@ -193,5 +210,15 @@ namespace Belle2 {
     bool m_trigTime; /**< Use trigger time from beam background overlay */
     std::string m_eclWaveformsName;   /**< name of background waveforms storage*/
     bool m_dspDataTest; /**< DSP data usage flag */
+    /** If true, use m_waveformParameters, m_algoParameters, m_noiseParameters.
+     *  If false, use the data from ecl/data/ECL-WF.root or ECL-WF-BG.root
+     */
+    bool m_useWaveformParameters;
+    /** Normalization coefficient for ECL signal shape.
+     *  If positive, use same static value for all ECL channels.
+     *  If negative, calculate it dynamically at beginRun().
+     *  (for default shape parameters, the static value is 27.7221)
+     */
+    double m_unitscale;
   };
 }//Belle2

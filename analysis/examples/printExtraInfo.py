@@ -12,7 +12,7 @@ import basf2
 import modularAnalysis as ma
 
 main = basf2.create_path()
-ma.inputMdst("default", basf2.find_file("analysis/tests/mdst.root"), path=main)
+ma.inputMdst(basf2.find_file("analysis/tests/mdst.root"), path=main)
 
 # load the pions and write a something to extra info
 ma.fillParticleList('pi+:example', '', path=main)

@@ -20,8 +20,6 @@
 using namespace Belle2;
 using namespace std;
 
-static DqmMasterCallback* s_dqmmaster = NULL;
-
 static int m_running = 0;
 
 //-----------------------------------------------------------------
@@ -29,6 +27,7 @@ static int m_running = 0;
 //-----------------------------------------------------------------
 void* RunDqmMasterLogger(void*)
 {
+  return nullptr;
 }
 
 DqmMasterCallback::DqmMasterCallback(ConfigFile& config)
@@ -128,7 +127,6 @@ void DqmMasterCallback::stop()
     while ((key = (TKey*)next())) {
       TH1* hist = (TH1*)key->ReadObj();
       printf("HistTitle %s : entries = %f\n", hist->GetName(), hist->GetEntries());
-      TH1* cpyhst = (TH1*)hist->Clone();
     }
 
     // Close TFile
@@ -156,7 +154,6 @@ void DqmMasterCallback::stop()
     while ((erkey = (TKey*)ernext())) {
       TH1* hist = (TH1*)erkey->ReadObj();
       printf("HistTitle %s : entries = %f\n", hist->GetName(), hist->GetEntries());
-      TH1* cpyhst = (TH1*)hist->Clone();
     }
 
     // Close TFile

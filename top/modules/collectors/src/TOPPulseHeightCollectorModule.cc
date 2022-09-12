@@ -15,10 +15,10 @@ using namespace std;
 namespace Belle2 {
 
   //-----------------------------------------------------------------
-  //                 Register module
+  ///                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPPulseHeightCollector)
+  REG_MODULE(TOPPulseHeightCollector);
 
   //-----------------------------------------------------------------
   //                 Implementation

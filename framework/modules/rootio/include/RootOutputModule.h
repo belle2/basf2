@@ -18,10 +18,9 @@
 #include <TFile.h>
 #include <TTree.h>
 
+#include <optional>
 #include <string>
 #include <vector>
-
-#include <boost/optional.hpp>
 
 namespace Belle2 {
   /** Write objects from DataStore into a ROOT file.
@@ -154,7 +153,7 @@ namespace Belle2 {
 
     /** Maximum output file size in MB. If not set we don't split. Otherwise we split
      * if the event tree in output file has reached the given size in MB */
-    boost::optional<uint64_t> m_outputSplitSize{boost::none};
+    std::optional<uint64_t> m_outputSplitSize{std::nullopt};
 
     //then those for purely internal use:
 

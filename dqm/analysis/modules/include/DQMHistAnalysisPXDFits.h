@@ -12,11 +12,10 @@
 
 #pragma once
 
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 
-#include <TF1.h>
 #include <TH2F.h>
-#include <TCanvas.h>
+#include <TF1.h>
 
 namespace Belle2 {
   /*! Class definition for the output module of Sequential ROOT I/O */
@@ -27,19 +26,37 @@ namespace Belle2 {
     // Public functions
   public:
 
-    //! Constructor
+    /**
+     * Constructor.
+     */
     DQMHistAnalysisPXDFitsModule();
 
-  private:
-
-    //! Module functions to be called from main process
+    /**
+     * Initializer.
+     */
     void initialize() override final;
 
-    //! Module functions to be called from event process
+    /**
+     * Called when entering a new run.
+     */
     void beginRun() override final;
+
+    /**
+     * This method is called for each event.
+     */
     void event() override final;
+
+    /**
+     * This method is called if the current run ends.
+     */
     void endRun() override final;
+
+    /**
+     * This method is called at the end of the event processing.
+     */
     void terminate() override final;
+
+  private:
 
     /** Histogram doirectory */
     std::string m_histogramDirectoryName;

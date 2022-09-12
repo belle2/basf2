@@ -28,13 +28,13 @@ namespace Belle2 {
     virtual ~PostgreSQLInterface() {}
 
   public:
-    virtual void connect();
-    virtual bool isConnected();
-    virtual void execute_imp(const char* command);
-    virtual void close();
-    virtual void clear();
-    virtual DBRecordList loadRecords();
-    virtual bool checkTable(const std::string& tablename);
+    void connect() override;
+    bool isConnected() override;
+    void execute_imp(const char* command) override;
+    void close() override;
+    void clear() override;
+    DBRecordList loadRecords() override;
+    bool checkTable(const std::string& tablename) override;
     virtual DBFieldTypeList getTableContents(const std::string& tablename);
 
   private:

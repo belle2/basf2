@@ -8,9 +8,6 @@
 
 #pragma once
 
-/* KLM headers. */
-#include <klm/dbobjects/bklm/BKLMADCThreshold.h>
-
 namespace Belle2 {
 
   /**
@@ -45,11 +42,6 @@ namespace Belle2 {
      * Import BKLM simulation parameters into the database
      */
     void importSimulationPar();
-
-    /**
-     * Import BKLM scintillator ADC parameters into the database
-     */
-    void importADCThreshold(BKLMADCThreshold* inputThreshold);
 
   private:
 

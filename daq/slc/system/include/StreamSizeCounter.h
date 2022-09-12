@@ -19,8 +19,8 @@ namespace Belle2 {
     virtual ~StreamSizeCounter() {}
 
   public:
-    virtual size_t write(const void*, size_t);
-    virtual bool available() { return true; }
+    size_t write(const void*, size_t) override;
+    bool available() override { return true; }
     void reset() { m_count = 0; }
     int count() const { return m_count; }
 

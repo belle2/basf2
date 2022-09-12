@@ -1266,19 +1266,19 @@ void TRGTOPDQMModule::event()
 
       grlInfoAvailable = true;
 
-      int grlTimeL1 = grlEventInfo->m_coml1 - grlEventInfo->m_revoclk;
+      int grlTimeL1 = grlEventInfo->get_coml1() - grlEventInfo->get_revoclk();
 
-      grlTOPL1 = (grlEventInfo->m_TOPL1_count + grlTimeL1 - 0.5) * (-clk127To1ns);
+      grlTOPL1 = (grlEventInfo->get_TOPL1_count() + grlTimeL1 - 0.5) * (-clk127To1ns);
 
       // Slot number -> phi (11.25 + i * 22.5)
       // 16 slots @ 22.5 deg = 360 deg
       for (int i = 0; i < 16; i++) {
         grlCDCSlots[i] = false;
-        if (grlEventInfo->m_slot_CDC[i]) {
+        if (grlEventInfo->get_slot_CDC(i)) {
           grlCDCSlots[i] = true;
         }
         grlTOPSlots[i] = false;
-        if (grlEventInfo->m_slot_TOP[i]) {
+        if (grlEventInfo->get_slot_TOP(i)) {
           grlTOPSlots[i] = true;
         }
       }

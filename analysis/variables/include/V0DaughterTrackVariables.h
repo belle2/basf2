@@ -8,10 +8,11 @@
 
 #pragma once
 
-#include <analysis/dataobjects/Particle.h>
 #include <framework/gearbox/Const.h>
+#include <framework/geometry/B2Vector3.h>
 
 namespace Belle2 {
+  class Particle;
 
   namespace Variable {
 
@@ -34,6 +35,11 @@ namespace Belle2 {
      * returns the number of PXD and SVD hits associated to this track
      */
     double v0DaughterTrackNVXDHits(const Particle* part, const std::vector<double>& daughterID);
+
+    /**
+     * returns the number of track hits removed in V0Finder
+     */
+    double v0DaughterTrackNRemovedHits(const Particle* part, const std::vector<double>& daughterID);
 
     /**
      * returns the first activated SVD layer associated to the track
@@ -275,7 +281,7 @@ namespace Belle2 {
     /**
      * helper function that returns the estimated 3-momentum of the two-track system assuming it's a converted photon
      */
-    TVector3 convertedPhoton3Momentum(const Particle* gamma, const std::vector<double>& daughterIndices);
+    B2Vector3D convertedPhoton3Momentum(const Particle* gamma, const std::vector<double>& daughterIndices);
 
     /**
      * returns the estimated x-component of momentum of the two-track system assuming it's a converted photon

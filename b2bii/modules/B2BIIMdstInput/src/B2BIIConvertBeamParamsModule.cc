@@ -137,10 +137,10 @@ namespace Belle2 {
 
     CollisionBoostVector collisionBoostVector;
     CollisionInvariantMass collisionInvM;
-    TLorentzVector cms = beamParams.getLER() + beamParams.getHER();
-    collisionBoostVector.setBoost(cms.BoostVector(), TMatrixTSym<double>(3));
+    ROOT::Math::PxPyPzEVector cms = beamParams.getLER() + beamParams.getHER();
+    collisionBoostVector.setBoost(B2Vector3D(-cms.BoostToCM()), TMatrixTSym<double>(3));
     //note: maybe we could use Belle::BeamEnergy::E_beam_corr(), Belle::BeamEnergy::E_beam_err()
-    collisionInvM.setMass(cms.M(), 0.0 , 0.0);
+    collisionInvM.setMass(cms.M(), 0.0, 0.0);
 
     // Boost vector and invariant mass are not intra-run dependent, store now
     if (m_storeCollisionBoostVector)

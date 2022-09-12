@@ -35,8 +35,7 @@ mypath = b2.create_path()
 b2.set_log_level(b2.LogLevel.WARNING)
 
 # Input file(s).
-inputMdst(environmentType='default',
-          filename=b2.find_file('darkphotonmumu_mdst.root', 'examples', False),
+inputMdst(filename=b2.find_file('darkphotonmumu_mdst.root', 'examples', False),
           path=mypath)
 
 # use standard final state particle lists for muons
@@ -61,12 +60,13 @@ z0vars = vc.inv_mass + vc.kinematics + vc.mc_kinematics + vc.mc_truth + \
     vu.create_aliases_for_selected(muvars, 'Z0 -> ^mu+ ^mu-')
 
 z0uvars = z0vars + \
-    vu.create_aliases(['OrcaKinFitProb',
-                       'OrcaKinFitChi2',
-                       'OrcaKinFitErrorCode',
-                       'OrcaKinFitUnmeasuredTheta',
-                       'OrcaKinFitUnmeasuredPhi',
-                       'OrcaKinFitUnmeasuredE'], 'extraInfo({variable})', "")
+    ['OrcaKinFitProb',
+     'OrcaKinFitChi2',
+     'OrcaKinFitErrorCode',
+     'OrcaKinFitUnmeasuredTheta',
+     'OrcaKinFitUnmeasuredPhi',
+     'OrcaKinFitUnmeasuredE'
+     ]
 
 # Saving variables to ntuple
 output_file = 'B2A421-Orcakinfit_1CFit.root'

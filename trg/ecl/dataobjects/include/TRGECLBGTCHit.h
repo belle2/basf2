@@ -36,21 +36,18 @@ namespace Belle2 {
 
     // Empty constructor
     // Recommended for ROOT IO
-    TRGECLBGTCHit()
+    TRGECLBGTCHit(): m_edep(0), m_TimeAve(0)
     {
       m_TCId = 0;
-      m_edep = 0;
-      m_TimeAve = 0;
     }
     //! Useful Constructor
     TRGECLBGTCHit(
       int TCId,
       double edep,
-      double TimeAve)
+      double TimeAve):
+      m_edep(edep), m_TimeAve(TimeAve)
     {
       m_TCId = TCId;
-      m_edep = edep;
-      m_TimeAve = TimeAve;
     }
 
   private:

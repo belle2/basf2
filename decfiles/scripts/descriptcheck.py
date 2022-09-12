@@ -97,7 +97,6 @@ def cleanList(stringA, list_base):
 
     while inlist(tag1, list_base):
         start_index = 0
-        end_index = -1
         for i in range(len(list_base)):
             if isinstance(list_base[i], list):
                 list_base[i] = cleanList(stringA, list_base[i])

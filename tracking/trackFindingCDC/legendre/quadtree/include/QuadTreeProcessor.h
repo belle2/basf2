@@ -258,7 +258,7 @@ namespace Belle2 {
        * This function is called by fillGivenTree and fills the items into the corresponding children.
        * For this the user-defined method isInNode is called.
        */
-      void fillChildren(QuadTree* node, std::vector<Item*>& items)
+      void fillChildren(QuadTree* node, const std::vector<Item*>& items)
       {
         const size_t neededSize = 2 * items.size();
         for (QuadTree& child : node->getChildren()) {

@@ -22,7 +22,6 @@ import unittest
 import glob
 import shutil
 from typing import Optional, List, Dict
-import stat
 from pathlib import Path
 
 # 3rd
@@ -55,14 +54,14 @@ def _touch_file_with_root(path: str) -> None:
 
 
 def _touch_file_with_subprocess(path: str) -> None:
-    subprocess.run(["touch", path])
+    subprocess.run(["touch", path]).check_returncode()
 
 
 def _touch_file_with_subprocess_and_root(path: str) -> None:
     filename = Path(path).name
     working_dir = Path(path).parent
-    cmd = ["root", "-x", "-l", "-q", "-e", f"TFile f(\"{filename}\", \"NEW\"); f.Close();"]
-    subprocess.run(cmd, cwd=working_dir)
+    cmd = ["root", "-x", "-l", "-q", "-e", f"TFile f(\"{filename}\", \"NEW\"); if (not f.IsOpen()) gSystem->Exit(1);"]
+    subprocess.run(cmd, cwd=working_dir).check_returncode()
 
 
 def _touch_file_test(method, path: str, **kwargs):
@@ -154,8 +153,8 @@ class SteeringFileTest(unittest.TestCase):
         working_dir = find_file(shutil.copytree(original_dir, "working_dir"))
         _permission_report(working_dir)
         # Add write permissions for user to this directory
-        # os.chmod(working_dir, stat.S_IRUSR)
-        # _permission_report(working_dir)
+        os.chmod(working_dir, 0o744)
+        _permission_report(working_dir)
         all_egs = sorted(glob.glob(working_dir + "/*.py"))
         for eg in all_egs:
             filename = os.path.basename(eg)

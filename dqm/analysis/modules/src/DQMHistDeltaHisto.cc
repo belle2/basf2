@@ -13,7 +13,6 @@
 
 #include <framework/core/ModuleParam.templateDetails.h>
 #include <dqm/analysis/modules/DQMHistDeltaHisto.h>
-#include <daq/slc/base/StringUtil.h>
 #include <TROOT.h>
 #include <TClass.h>
 
@@ -23,7 +22,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(DQMHistDeltaHisto)
+REG_MODULE(DQMHistDeltaHisto);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -64,20 +63,6 @@ void DQMHistDeltaHistoModule::beginRun()
       hq.pop();
     }
   }
-}
-
-TCanvas* DQMHistDeltaHistoModule::find_canvas(TString canvas_name)
-{
-  TIter nextkey(gROOT->GetListOfCanvases());
-  TObject* obj = nullptr;
-
-  while ((obj = dynamic_cast<TObject*>(nextkey()))) {
-    if (obj->IsA()->InheritsFrom("TCanvas")) {
-      if (obj->GetName() == canvas_name)
-        return dynamic_cast<TCanvas*>(obj);
-    }
-  }
-  return nullptr;
 }
 
 void DQMHistDeltaHistoModule::clear_node(SSNODE* n)
@@ -128,15 +113,14 @@ void DQMHistDeltaHistoModule::event()
         }
       }
     }
-    TString a = histoname;
-    StringList s = StringUtil::split(a.Data(), '/');
-    std::string dirname = s[0];
-    std::string hname = s[1];
+    auto s = StringSplit(histoname, '/');
+    auto dirname = s.at(0);
+    auto hname = s.at(1);
     std::string canvas_name = dirname + "/c_" + hname;
-    TCanvas* c = find_canvas(canvas_name);
+    TCanvas* c = findCanvas(canvas_name);
     if (c == nullptr) continue;
     TH1* h_diff = hq.back()->diff_histo;
-    h_diff->SetName((a + "_diff").Data());
+    h_diff->SetName((histoname + "_diff").data());
     if (h_diff->Integral() != 0) h_diff->Scale(hh->Integral() / h_diff->Integral());
     c->cd();
     h_diff->SetLineColor(kRed);

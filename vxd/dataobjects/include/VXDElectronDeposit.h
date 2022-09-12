@@ -52,15 +52,15 @@ namespace Belle2 {
      */
     VXDElectronDeposit(float fraction, float electrons)
     {
-      const unsigned int intfrac = std::round(std::max(0.f, fraction) * c_MaxFraction);
+      const unsigned int intfrac = std::round(std::max(0.f, fraction) * static_cast<float>(c_MaxFraction));
       const unsigned int intelec = std::round(std::max(0.f, electrons));
-      m_packed = std::min(intfrac, (unsigned int) c_MaxFraction)
-                 + (std::min(intelec, (unsigned int) c_MaxElectrons) << c_FractionBits);
+      m_packed = std::min(intfrac, static_cast<unsigned int>(c_MaxFraction))
+                 + (std::min(intelec, static_cast<unsigned int>(c_MaxElectrons)) << c_FractionBits);
     }
     /** get the fraction along the path */
     float getFraction() const
     {
-      return (m_packed & c_MaxFraction) * 1.0 / c_MaxFraction;
+      return (m_packed & c_MaxFraction) * 1.0 / static_cast<float>(c_MaxFraction);
     }
     /** get the number of deposited electrons */
     unsigned int getElectrons() const

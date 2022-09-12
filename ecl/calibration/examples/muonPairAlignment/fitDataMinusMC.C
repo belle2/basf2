@@ -48,6 +48,7 @@ std::vector<int> eclRegion;
 int regionToFit;
 double templateDiff[6][1792];
 std::vector<double> dataMCDiff;
+// cppcheck-suppress constParameter ; TF1 fit functions cannot have const parameters
 double fitTemplates (double *x, double *par) {
     int ix = x[0];
     double y = 0.;
@@ -59,7 +60,7 @@ double fitTemplates (double *x, double *par) {
     return y;
 }
 
-TString regionName[3] = {"forward", "barrel", "backward"};
+const TString regionName[3] = {"forward", "barrel", "backward"};
 
 //----------------------------------------------------------------------
 //..Main
@@ -279,7 +280,7 @@ void fitDataMinusMC () {
     
     //---------------------------------------------------------------------
     //..difference after fit for three ECL regions separately
-    TString regName[5] = {"foward", "forgap", "barrel", "backgap", "backward"};
+    const TString regName[5] = {"foward", "forgap", "barrel", "backgap", "backward"};
     TH1F *differencesAfterReg[5];
     for(int iecl = 0; iecl<5; iecl++) {
         TString name = "differencesAfterReg_";

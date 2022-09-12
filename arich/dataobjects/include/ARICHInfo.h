@@ -22,6 +22,7 @@ namespace Belle2 {
     /*! Recommended for ROOT IO */
     ARICHInfo():
       m_trgtype(0),
+      m_pciedata(false),
       m_thscan_mode(0),
       m_vth_thscan(0.0)
     {
@@ -39,6 +40,9 @@ namespace Belle2 {
 
     //! Set the trigger type
     void settrgtype(int trgtype) { m_trgtype = trgtype; }
+
+    //! Set the readout type
+    void setpciedata(bool pciedata) { m_pciedata = pciedata; }
 
     //! Set the threshold scan mode flag
     void setthscan_mode(bool mode) { m_thscan_mode = mode; }
@@ -58,6 +62,9 @@ namespace Belle2 {
     //! Get the trigger type
     int gettrgtype() const { return m_trgtype; }
 
+    //! Get the readout type
+    bool getpciedata() const { return m_pciedata; }
+
     //! Get the threshold scan mode flag
     bool getthscan_mode() const { return m_thscan_mode; }
 
@@ -76,6 +83,7 @@ namespace Belle2 {
   private:
 
     int m_trgtype = 0;            /**< trigger type */
+    bool m_pciedata = false;    /**< PCIe40 readout data (true), or Copper data (false) */
     bool m_thscan_mode = false;  /**< Flag of threshold scan run  */
     double m_vth_thscan = 0;            /**< vth value for thscan mode */
     int m_n_track = 0;            /**< number of tracks of this event */
@@ -84,7 +92,7 @@ namespace Belle2 {
 
 
 
-    ClassDef(ARICHInfo, 3); /**< the class title */
+    ClassDef(ARICHInfo, 4); /**< the class title */
 
   };
 

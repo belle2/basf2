@@ -26,7 +26,7 @@ using namespace Belle2::CDC;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(CDCTrigger2DFinder)
+REG_MODULE(CDCTrigger2DFinder);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -110,7 +110,7 @@ CDCTrigger2DFinderModule::CDCTrigger2DFinderModule() : Module()
 
   addParam("suppressClone", m_suppressClone,
            "Switch to send only the first found track and suppress the "
-           "subsequent clones." , false);
+           "subsequent clones.", false);
 }
 
 void

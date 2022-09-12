@@ -52,7 +52,7 @@ namespace Belle2 {
     std::string version() const;
 
     /** Read data from TRG copper.*/
-    virtual void readCOPPEREvent(RawTRG*, int, int);
+    virtual void readCOPPEREvent(RawTRG*, int, int, int);
 
     /** Unpacker main function.*/
     virtual void checkBuffer(int*, int);

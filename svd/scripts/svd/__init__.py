@@ -10,7 +10,6 @@
 ##########################################################################
 
 import basf2 as b2
-import sys
 
 
 def add_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False, applyMasking=False):
@@ -220,7 +219,7 @@ def add_rel5_svd_reconstruction(path, isROIsimulation=False, applyMasking=False)
         svdTrackingEventLevelMdstInfoFiller = b2.register_module('SVDTrackingEventLevelMdstInfoFiller')
         svdTrackingEventLevelMdstInfoFiller.set_name(nameSVDTrackingEventLevelMdstInfoFiller)
         svdTrackingEventLevelMdstInfoFiller.param('EventLevelTrackingInfoName', nameEventTrackingInfo)
-        svdTrackingEventLevelMdstInfoFiller.param('svdClustersName', clustersName)
+        svdTrackingEventLevelMdstInfoFiller.param('svdClustersName', clusterName)
         path.add_module(svdTrackingEventLevelMdstInfoFiller)
 
     # Add SVDSpacePointCreator
@@ -249,9 +248,9 @@ def add_svd_simulation(path, useConfigFromDB=False, daqMode=2, relativeShift=9):
 
     if not useConfigFromDB:
         if daqMode != 2 and daqMode != 1 and daqMode != 3:
-            print("OOPS the acquisition mode that you want to simulate is not available.")
-            print("Please choose among daqMode = 2 (6-sample) and daqMode = 1 (3-sample). Exiting now.")
-            sys.exit()
+            message = 'OOPS the acquisition mode that you want to simulate is not available.\n' \
+                      'Please choose among daqMode = 2 (6-sample) and daqMode = 1 (3-sample).'
+            b2.B2FATAL(message)
 
         # TODO add check of relative shift value
         svdevtinfoset.param("daqMode", daqMode)
@@ -285,8 +284,7 @@ def add_svd_unpacker_simulate3sampleDAQ(path, latencyShift=-1, relativeShift=-1)
     """
 
     if relativeShift != -1 and latencyShift != -1:
-        print("OOPS please choose only one between relativeShift and latencyShift. Exiting now.")
-        sys.exit(1)
+        b2.B2FATAL("OOPS please choose only one between relativeShift and latencyShift. Exiting now.")
 
     unpacker = b2.register_module('SVDUnpacker')
     unpacker.param("SVDEventInfo", "SVDEventInfoOriginal")
@@ -302,7 +300,7 @@ def add_svd_unpacker_simulate3sampleDAQ(path, latencyShift=-1, relativeShift=-1)
     else:
         emulator.param("chooseStartingSample", True)
         if latencyShift < 0 or latencyShift > 3:
-            B2FATAL("the latencyShift must be an integer >=0 and <= 3")
+            b2.B2FATAL("the latencyShift must be an integer >=0 and <= 3")
         else:
             emulator.param("StartingSample", latencyShift)
 
@@ -311,7 +309,7 @@ def add_svd_unpacker_simulate3sampleDAQ(path, latencyShift=-1, relativeShift=-1)
     else:
         emulator.param("chooseRelativeShift", True)
         if relativeShift < 0 or relativeShift > 12:
-            B2FATAL("the relativeShift must be an integer >=0 and <= 12")
+            b2.B2FATAL("the relativeShift must be an integer >=0 and <= 12")
         else:
             emulator.param("relativeShift", relativeShift)
 

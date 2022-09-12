@@ -25,7 +25,11 @@
 #include <svd/calibration/SVDPulseShapeCalibrations.h>
 #include <svd/calibration/SVDNoiseCalibrations.h>
 #include <svd/calibration/SVDClustering.h>
+#include <svd/calibration/SVDMCClusterPositionFudgeFactor.h>
+#include <svd/calibration/SVDMCClusterTimeFudgeFactor.h>
 #include <svd/dbobjects/SVDRecoConfiguration.h>
+
+#include <TMath.h>
 
 namespace Belle2 {
 
@@ -136,7 +140,8 @@ namespace Belle2 {
       DBObjPtr<SVDRecoConfiguration> m_recoConfig; /**< SVD Reconstruction Configuration payload*/
       SVDNoiseCalibrations m_NoiseCal; /**<SVDNoise calibrations db object*/
       SVDClustering m_ClusterCal; /**<SVDCluster calibrations db object*/
-
+      SVDMCClusterPositionFudgeFactor m_mcPositionFudgeFactor; /**<SVDMCClusterPositionFudgeFactor db object*/
+      SVDMCClusterTimeFudgeFactor m_mcTimeFudgeFactor; /**<SVDMCClusterTimeFudgeFactor db object*/
 
       /**
        * returns the position of the cluster after
@@ -153,7 +158,17 @@ namespace Belle2 {
       /**
        * writes the relations of the SVDClusters with the other StoreArrays
        */
-      void writeClusterRelations(Belle2::SVD::RawCluster& rawCluster);
+      void writeClusterRelations(const Belle2::SVD::RawCluster& rawCluster);
+
+      /**
+       * alter the cluster position (applied on MC to match resolution measured on data)
+       */
+      void alterClusterPosition();
+
+      /**
+       * alter the cluster time (applied on MC to match resolution measured on data)
+       */
+      void alterClusterTime();
 
     };// end class declarations
 

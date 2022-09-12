@@ -84,7 +84,7 @@ namespace Belle2 {
 
     /** Default constructor for the ROOT IO. */
     SVDRecoDigit() : SVDRecoDigit(
-        0, true, 0, 0.0, 10.0, 0.0, 100.0, std::vector<double>( {1.0}), 100.0
+        0, true, 0, 0.0, 10.0, 0.0, 100.0, std::vector<double>({1.0}), 100.0
     )
     { }
 

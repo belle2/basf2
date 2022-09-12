@@ -5,14 +5,15 @@
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
+
 import basf2
-import ROOT
 from softwaretrigger import constants
 import modularAnalysis
 import stdV0s
 import vertex
 from geometry import check_components
 import reconstruction
+from softwaretrigger.reconstruction_utils import bToCharmHLTSkim
 
 
 def add_online_dqm(path, run_type, dqm_environment, components, dqm_mode, create_hlt_unit_histograms=False):
@@ -29,9 +30,9 @@ def add_online_dqm(path, run_type, dqm_environment, components, dqm_mode, create
                           dqm_mode=dqm_mode, create_hlt_unit_histograms=create_hlt_unit_histograms)
     elif run_type == constants.RunTypes.cosmic:
         add_cosmic_dqm(path, components=components, dqm_environment=dqm_environment,
-                       dqm_mode=dqm_mode)
+                       dqm_mode=dqm_mode, create_hlt_unit_histograms=create_hlt_unit_histograms)
     else:
-        basf2.B2FATAL("Run type {} not supported.".format(run_type))
+        basf2.B2FATAL(f"Run type {run_type} not supported.")
 
     if dqm_mode in ["dont_care", "all_events"]:
         path.add_module('DelayDQM', title=dqm_environment, histogramDirectoryName='DAQ')
@@ -170,7 +171,8 @@ def add_skim_software_trigger(path, store_array_debug_prescale=0):
         modularAnalysis.reconstructDecay('D*+:ch' + str(chID) + ' -> D0:ch' + str(chID) + ' pi+:all', Dst_Cut, dmID=chID, path=path)
         Dst_List.append('D*+:ch' + str(chID))
     modularAnalysis.copyLists(outputListName='D*+:d0pi', inputListNames=Dst_List, path=path)
-    modularAnalysis.fillParticleList("pi+:offip", '[abs(d0) > 1 and abs(z0) > 2] and [nSVDHits >=3 or nCDCHits >= 20]', path=path)
+    modularAnalysis.fillParticleList("pi+:offip", '[abs(z0) > 10] and [nSVDHits >=3 or nCDCHits >= 20]', path=path)
+    bToCharmHLTSkim(path)
 
     path.add_module("SoftwareTrigger", baseIdentifier="skim",
                     preScaleStoreDebugOutputToDataStore=store_array_debug_prescale)
@@ -194,7 +196,6 @@ def add_pre_filter_reconstruction(path, run_type, components, **kwargs):
             path,
             skipGeometryAdding=True,
             pruneTracks=False,
-            add_trigger_calculation=False,
             components=components,
             event_abort=hlt_event_abort,
             **kwargs)
@@ -239,6 +240,10 @@ def hlt_event_abort(module, condition, error_flag):
     Create a discard path suitable for HLT processing, i.e. set an error flag and
     keep only the metadata.
     """
+
+    # Always avoid the top-level 'import ROOT'.
+    import ROOT  # noqa
+
     p = basf2.Path()
     p.add_module("EventErrorFlag", errorFlag=error_flag)
     add_store_only_metadata_path(p)

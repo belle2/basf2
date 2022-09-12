@@ -26,6 +26,8 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/EventLevelClusteringInfo.h>
 
+#include <Math/Vector4D.h>
+
 #include <cmath>
 #include <stack>
 
@@ -33,13 +35,24 @@
 
 namespace Belle2 {
   namespace Variable {
-    double beamBackgroundProbabilityMVA(const Particle* particle)
+    double beamBackgroundSuppression(const Particle* particle)
     {
-      if (particle->hasExtraInfo("beamBackgroundProbabilityMVA")) {
-        return particle->getExtraInfo("beamBackgroundProbabilityMVA");
+      if (particle->hasExtraInfo("beamBackgroundSuppression")) {
+        return particle->getExtraInfo("beamBackgroundSuppression");
       } else {
-        B2WARNING("The extraInfo beamBackgroundProbabilityMVA is not registered! \n"
-                  "This variable is only available for photons, and you either have to run the function getBeamBackgroundProbabilityMVA or turn the argument loadPhotonBeamBackgroundMVA to True when using fillParticleList.");
+        B2WARNING("The extraInfo beamBackgroundSuppression is not registered! \n"
+                  "This variable is only available for photons, and you either have to run the function getBeamBackgroundProbability or turn the argument loadPhotonBeamBackgroundMVA to True when using fillParticleList.");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+    }
+
+    double hadronicSplitOffSuppression(const Particle* particle)
+    {
+      if (particle->hasExtraInfo("hadronicSplitOffSuppression")) {
+        return particle->getExtraInfo("hadronicSplitOffSuppression");
+      } else {
+        B2WARNING("The extraInfo hadronicSplitOffSuppression is not registered! \n"
+                  "This variable is only available for photons, and you either have to run the function getHadronicSplitOffProbability or turn the argument loadPhotonHadronicSplitOffMVA to True when using fillParticleList.");
         return std::numeric_limits<float>::quiet_NaN();
       }
     }
@@ -70,8 +83,6 @@ namespace Belle2 {
       }
       return std::numeric_limits<float>::quiet_NaN();
     }
-
-
 
     double eclClusterNumberOfHadronDigits(const Particle* particle)
     {
@@ -143,7 +154,7 @@ namespace Belle2 {
         {
           const Particle* listParticle = particleList->getParticle(i);
           if (listParticle and listParticle->getTrack() and listParticle->getTrack()->getArrayIndex() == trackID) {
-            result = var->function(listParticle);
+            result = std::get<double>(var->function(listParticle));
             break;
           }
         }
@@ -172,7 +183,6 @@ namespace Belle2 {
       return std::numeric_limits<float>::quiet_NaN();
     }
 
-
     double eclClusterErrorE(const Particle* particle)
     {
 
@@ -200,7 +210,7 @@ namespace Belle2 {
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
         ClusterUtils clutls;
-        TLorentzVector p4Cluster = clutls.GetCluster4MomentumFromCluster(cluster, particle->getECLClusterEHypothesisBit());
+        ROOT::Math::PxPyPzEVector p4Cluster = clutls.GetCluster4MomentumFromCluster(cluster, particle->getECLClusterEHypothesisBit());
 
         return frame.getMomentum(p4Cluster).E();
       }
@@ -258,7 +268,7 @@ namespace Belle2 {
           return cellID - 1;
         } else {
           int closestinlist = lastCellIDperThetaID[std::distance(lastCellIDperThetaID.begin(), std::lower_bound(lastCellIDperThetaID.begin(),
-                                                                 lastCellIDperThetaID.end(), cellID)) - 1];
+                                                                                                             lastCellIDperThetaID.end(), cellID)) - 1];
           return cellID - closestinlist - 1;
         }
       }
@@ -310,7 +320,7 @@ namespace Belle2 {
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
         ClusterUtils clutls;
-        TLorentzVector p4Cluster = clutls.Get4MomentumFromCluster(cluster, particle->getECLClusterEHypothesisBit());
+        ROOT::Math::PxPyPzEVector p4Cluster = clutls.Get4MomentumFromCluster(cluster, particle->getECLClusterEHypothesisBit());
 
         return frame.getMomentum(p4Cluster).Theta();
       }
@@ -344,7 +354,7 @@ namespace Belle2 {
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
         ClusterUtils clutls;
-        TLorentzVector p4Cluster = clutls.Get4MomentumFromCluster(cluster, particle->getECLClusterEHypothesisBit());
+        ROOT::Math::PxPyPzEVector p4Cluster = clutls.Get4MomentumFromCluster(cluster, particle->getECLClusterEHypothesisBit());
 
         return frame.getMomentum(p4Cluster).Phi();
       }
@@ -745,7 +755,7 @@ namespace Belle2 {
     double eclClusterOnlyInvariantMass(const Particle* part)
     {
       int nDaughters = part->getNDaughters();
-      TLorentzVector sum;
+      ROOT::Math::PxPyPzEVector sum;
 
       if (nDaughters < 1) {
         return part->getMass();
@@ -762,7 +772,7 @@ namespace Belle2 {
             const ECLCluster::EHypothesisBit clusterBit = current->getECLClusterEHypothesisBit();
             nClusterDaughters ++;
             ClusterUtils clutls;
-            TLorentzVector p4Cluster = clutls.Get4MomentumFromCluster(cluster, clusterBit);
+            ROOT::Math::PxPyPzEVector p4Cluster = clutls.Get4MomentumFromCluster(cluster, clusterBit);
             sum += p4Cluster;
           } else {
             const std::vector<Particle*> daughters = current->getDaughters();
@@ -812,13 +822,13 @@ namespace Belle2 {
         if (!(photonlist.isValid()))
         {
           B2WARNING("The provided particle list " << photonlistname << " does not exist."
-          " Therefore, the variable photonHasOverlap can not be calculated. Returning NaN.");
+                    " Therefore, the variable photonHasOverlap can not be calculated. Returning NaN.");
           return std::numeric_limits<double>::quiet_NaN();
         }
         if (photonlist->getPDGCode() != Const::photon.getPDGCode())
         {
           B2WARNING("The list " << photonlistname << " does not contain photons."
-          " Therefore, the variable photonHasOverlap can not be calculated reliably. Returning NaN.");
+                    " Therefore, the variable photonHasOverlap can not be calculated reliably. Returning NaN.");
           return std::numeric_limits<double>::quiet_NaN();
         }
 
@@ -826,13 +836,13 @@ namespace Belle2 {
         if (!(tracklist.isValid()))
         {
           B2WARNING("The provided particle list " << tracklistname << " does not exist."
-          " Therefore, the variable photonHasOverlap can not be calculated. Returning NaN.");
+                    " Therefore, the variable photonHasOverlap can not be calculated. Returning NaN.");
           return std::numeric_limits<double>::quiet_NaN();
         }
         if (!Const::chargedStableSet.contains(Const::ParticleType(abs(tracklist->getPDGCode()))))
         {
           B2WARNING("The list " << tracklistname << " does not contain charged final state particles."
-          " Therefore, the variable photonHasOverlap can not be calculated reliably. Returning NaN.");
+                    " Therefore, the variable photonHasOverlap can not be calculated reliably. Returning NaN.");
           return std::numeric_limits<double>::quiet_NaN();
         }
 
@@ -910,7 +920,8 @@ Returns an integer code for the ECL region of a cluster.
     | Lower limit: :math:`-250.0`
     | Upper limit: :math:`250.0`
     | Precision: :math:`10` bit
-)DOC");
+..
+)DOC","cm");
 
 
     REGISTER_VARIABLE("minC2TDist", eclClusterIsolation, R"DOC(
@@ -931,12 +942,13 @@ It is defined as the distance between this intersection and the track hit positi
     | Lower limit: :math:`0.0`
     | Upper limit: :math:`250.0`
     | Precision: :math:`10` bit
-)DOC");
+..
+)DOC","cm");
     REGISTER_VARIABLE("minC2TDistID", eclClusterIsolationID, "Nearest track array index");
-    REGISTER_VARIABLE("minC2TDistVar(variable,particleList=pi-:all)", eclClusterIsolationVar, R"DOC(
+    REGISTER_METAVARIABLE("minC2TDistVar(variable,particleList=pi-:all)", eclClusterIsolationVar, R"DOC(
 Returns variable value for the nearest track to the given ECL cluster. First argument is a variable name, e.g. nCDCHits. 
 The second argument is the particle list name which will be used to pick up the nearest track, default is pi-:all.
-)DOC");
+)DOC", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("clusterE", eclClusterE, R"DOC(
 Returns ECL cluster's energy corrected for leakage and background.
 
@@ -977,23 +989,24 @@ will used mass constrained :math:`\pi^{0}` s anyhow.
     | Upper limit: :math:`3.0` (:math:`e^3 = 20.08553\,` GeV)
     | Precision: :math:`18` bit
     | This value can be changed to a different reference frame with :b2:var:`useCMSFrame`.
-)DOC");
+..
+)DOC","GeV");
     REGISTER_VARIABLE("clusterErrorE", eclClusterErrorE, R"DOC(
 Returns ECL cluster's uncertainty on energy
 (from background level and energy dependent tabulation).
-)DOC");
+)DOC","GeV");
     REGISTER_VARIABLE("clusterErrorPhi", eclClusterErrorPhi, R"DOC(
 Returns ECL cluster's uncertainty on :math:`\phi`
 (from background level and energy dependent tabulation).
-)DOC");
+)DOC","rad");
     REGISTER_VARIABLE("clusterErrorTheta", eclClusterErrorTheta, R"DOC(
 Returns ECL cluster's uncertainty on :math:`\theta`
 (from background level and energy dependent tabulation).
-)DOC");
+)DOC","rad");
 
     REGISTER_VARIABLE("clusterR", eclClusterR, R"DOC(
 Returns ECL cluster's centroid distance from :math:`(0,0,0)`.
-)DOC");
+)DOC","cm");
     REGISTER_VARIABLE("clusterPhi", eclClusterPhi, R"DOC(
 Returns ECL cluster's azimuthal angle :math:`\phi`
 (this is not generally equal to a photon azimuthal angle).
@@ -1024,7 +1037,8 @@ as function of true photon energy, true photon direction and beam background lev
     | Lower limit: :math:`-\pi`
     | Upper limit: :math:`\pi`
     | Precision: :math:`16` bit
-)DOC");
+..
+)DOC","rad");
     REGISTER_VARIABLE("clusterConnectedRegionID", eclClusterConnectedRegionID, R"DOC(
 Returns ECL cluster's connected region ID.
 )DOC");
@@ -1058,7 +1072,8 @@ as function of true photon energy, true photon direction and beam background lev
     | Lower limit: :math:`0.0`
     | Upper limit: :math:`\pi`
     | Precision: :math:`16` bit
-)DOC");
+..
+)DOC","rad");
     REGISTER_VARIABLE("clusterTiming", eclClusterTiming, R"DOC(
 Returns the time of the ECL cluster. It is calculated as the Photon timing minus the Event t0.
 Photon timing is given by the fitted time of the recorded waveform of the highest energy crystal in the
@@ -1074,7 +1089,8 @@ documentation for `clusterHasFailedTiming`). (For MC, the calibrations and corre
     | Lower limit: :math:`-1000.0`
     | Upper limit: :math:`1000.0`
     | Precision: :math:`12` bit
-)DOC");
+..
+)DOC","ns");
     REGISTER_VARIABLE("clusterHasFailedTiming", eclClusterHasFailedTiming, R"DOC(
 Status bit for if the ECL cluster's timing fit failed. Photon timing is given by the fitted time
 of the recorded waveform of the highest energetic crystal in a cluster; however, that fit can fail and so
@@ -1104,7 +1120,8 @@ We remove such clusters in most physics photon lists.
     (from previous or later bunch collisions) that can easily be rejected by timing cuts.
     However, these events create large ECL clusters that can overlap with other ECL clusters
     and it is not clear that a simple rejection is the correction strategy.
-)DOC");
+..
+)DOC","ns");
     REGISTER_VARIABLE("clusterHasFailedErrorTiming", eclClusterHasFailedErrorTiming, R"DOC(
 Status bit for if the ECL cluster's timing uncertainty calculation failed. Photon timing is given by the fitted time
 of the recorded waveform of the highest energetic crystal in a cluster; however, that fit can fail and so
@@ -1123,7 +1140,8 @@ Returns energy of the highest energetic crystal in the ECL cluster after reweigh
     | Lower limit: :math:`-5` (:math:`e^{-5} = 0.00674\,` GeV)
     | Upper limit: :math:`3.0` (:math:`e^3 = 20.08553\,` GeV)
     | Precision: :math:`18` bit
-)DOC");
+..
+)DOC","GeV");
     REGISTER_VARIABLE("clusterCellID", eclClusterCellId,
                       "Returns cellId of the crystal with highest energy in the ECLCluster.");
     REGISTER_VARIABLE("clusterThetaID", eclClusterThetaId,
@@ -1217,7 +1235,8 @@ to a plane perpendicular to the shower axis.
     | Lower limit: :math:`0.0`
     | Upper limit: :math:`40.0`
     | Precision: :math:`10` bit
-)DOC");
+..
+)DOC",":math:`\\text{cm}^2`");
     REGISTER_VARIABLE("clusterLAT", eclClusterLAT, R"DOC(
 Returns lateral energy distribution (shower variable). It is defined as following:
 
@@ -1274,14 +1293,41 @@ Returns number of charged tracks matched to this cluster.
 Status bit to indicate if cluster has digits with waveforms that passed energy and :math:`\chi^2`
 thresholds for computing PSD variables.
 )DOC");
-    REGISTER_VARIABLE("beamBackgroundProbabilityMVA", beamBackgroundProbabilityMVA, R"DOC(
-Returns MVA classifier that uses shower shape variables to distinguish true clusters from beam background clusters. 
+    REGISTER_VARIABLE("beamBackgroundSuppression", beamBackgroundSuppression, R"DOC(
+Returns the output of an MVA classifier that uses shower-related variables to distinguish true photon clusters from beam background clusters.
+The classes are: 
 
     - 1 for true photon clusters
     - 0 for beam background clusters
 
-The variables used in the training (in decreasing order of significance): clusterTiming, clusterE, clusterTheta, 
-clusterZernikeMVA,  clusterE1E9, clusterLat, clusterSecondMoment and clusterPhi. )DOC");
+The MVA has been trained using samples of signal photons and beam background photons coming from MC. The features used are (in decreasing order of significance): 
+
+    - `clusterTiming`
+    - `clusterPulseShapeDiscriminationMVA`
+    - `clusterE`
+    - `clusterTheta`
+    - `clusterZernikeMVA`
+    - `clusterE1E9`
+    - `clusterLAT`
+    - `clusterSecondMoment`    
+)DOC");
+    REGISTER_VARIABLE("hadronicSplitOffSuppression", hadronicSplitOffSuppression, R"DOC(
+Returns the output of an MVA classifier that uses shower-related variables to distinguish true photon clusters from hadronic splitoff clusters.
+The classes are: 
+
+    - 1 for true photon clusters
+    - 0 for hadronic splitoff clusters
+
+The MVA has been trained using samples of signal photons and hadronic splitoff photons coming from MC. The features used are (in decreasing order of significance): 
+
+    - `clusterPulseShapeDiscriminationMVA`
+    - `minC2TDist`
+    - `clusterZernikeMVA`
+    - `clusterE`
+    - `clusterLAT`
+    - `clusterE1E9`
+    - `clusterSecondMoment`
+)DOC");
     REGISTER_VARIABLE("clusterKlId", eclClusterKlId, R"DOC(
 Returns MVA classifier that uses ECL clusters variables to discriminate Klong clusters from em background.
     
@@ -1318,22 +1364,22 @@ Returns 1.0 if the cluster has the 'neutral hadrons' hypothesis (historically ca
 0.0 if not, and NaN if no cluster is associated to the particle.
 )DOC");
     REGISTER_VARIABLE("eclExtTheta", eclExtTheta, R"DOC(
-Returns extrapolated :math:`\theta`.
-)DOC");
+Returns extrapolated :math:`\theta` of particle track associated to the cluster (if any). Requires module ECLTrackCalDigitMatch to be executed.
+)DOC","rad");
     REGISTER_VARIABLE("eclExtPhi", eclExtPhi, R"DOC(
-Returns extrapolated :math:`\phi`.
-)DOC");
+Returns extrapolated :math:`\phi` of particle track associated to the cluster (if any). Requires module ECLTrackCalDigitMatch to be executed..
+)DOC","rad");
     REGISTER_VARIABLE("eclExtPhiId", eclExtPhiId, R"DOC(
-Returns extrapolated :math:`\phi` ID.
+Returns extrapolated :math:`\phi` ID of particle track associated to the cluster (if any). Requires module ECLTrackCalDigitMatch to be executed..
 )DOC");
     REGISTER_VARIABLE("weightedAverageECLTime", weightedAverageECLTime, R"DOC(
 Returns ECL weighted average time of all clusters (neutrals) and matched clusters (charged) of daughters
 (of any generation) of the provided particle.
-)DOC");
+)DOC", "ns");
     REGISTER_VARIABLE("maxWeightedDistanceFromAverageECLTime", maxWeightedDistanceFromAverageECLTime, R"DOC(
 Returns maximum weighted distance between time of the cluster of a photon and the ECL average time, amongst
 the clusters (neutrals) and matched clusters (charged) of daughters (of all generations) of the provided particle.
-)DOC");
+)DOC", "ns");
     REGISTER_VARIABLE("clusterMdstIndex", eclClusterMdstIndex, R"DOC(
 StoreArray index(0 - based) of the MDST ECLCluster (useful for track-based particles matched to a cluster).
 )DOC");
@@ -1360,14 +1406,17 @@ StoreArray index(0 - based) of the MDST ECLCluster (useful for track-based parti
 
     REGISTER_VARIABLE("nRejectedECLShowersFWDEndcap", nRejectedECLShowersFWDEndcap, R"DOC(
 [Eventbased] Returns the number of showers in the ECL that do not become clusters, from the forward endcap.
+If the number exceeds 255 (uint8_t maximum value) the variable is set to 255.
 )DOC");
 
     REGISTER_VARIABLE("nRejectedECLShowersBarrel", nRejectedECLShowersBarrel, R"DOC(
 [Eventbased] Returns the number of showers in the ECL that do not become clusters, from the barrel.
+If the number exceeds 255 (uint8_t maximum value) the variable is set to 255.
 )DOC");
 
     REGISTER_VARIABLE("nRejectedECLShowersBWDEndcap", nRejectedECLShowersBWDEndcap, R"DOC(
 [Eventbased] Returns the number of showers in the ECL that do not become clusters, from the backward endcap.
+If the number exceeds 255 (uint8_t maximum value) the variable is set to 255.
 )DOC");
 
     REGISTER_VARIABLE("eclClusterOnlyInvariantMass", eclClusterOnlyInvariantMass, R"DOC(
@@ -1375,9 +1424,9 @@ StoreArray index(0 - based) of the MDST ECLCluster (useful for track-based parti
 cluster-matched tracks using the cluster 4-momenta.
 
 Used for ECL-based dark sector physics and debugging track-cluster matching.
-)DOC");
+)DOC","GeV/:math:`\\text{c}^2`");
 
-    REGISTER_VARIABLE("photonHasOverlap(cutString, photonlistname, tracklistname)", photonHasOverlap, R"DOC(
+    REGISTER_METAVARIABLE("photonHasOverlap(cutString, photonlistname, tracklistname)", photonHasOverlap, R"DOC(
       Returns true if the connected ECL region of the particle's cluster is shared by another particle's cluster.
       Neutral and charged cluster are considered.
       A cut string can be provided to ignore cluster that do not satisfy the given criteria.
@@ -1386,12 +1435,12 @@ Used for ECL-based dark sector physics and debugging track-cluster matching.
       However, one can customize the name of the ParticleLists via additional arguments.
       If no argument or only a cut string is provided and ``gamma:all`` or ``e-:all`` does not exist
       or if the variable is requested for a particle that is not a photon, NaN is returned.
-      )DOC");
+      )DOC", Manager::VariableDataType::c_double);
 
     REGISTER_VARIABLE("clusterUncorrE", eclClusterUncorrectedE, R"DOC(
 [Expert] [Calibration] Returns ECL cluster's uncorrected energy. That is, before leakage corrections.
 This variable should only be used for study of the ECL. Please see :b2:var:`clusterE`.
-)DOC");
+)DOC","GeV");
 
   }
 }

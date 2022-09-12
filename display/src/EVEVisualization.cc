@@ -26,7 +26,6 @@
 
 #include <vxd/geometry/GeoCache.h>
 #include <klm/dataobjects/bklm/BKLMSimHitPosition.h>
-#include <klm/dataobjects/bklm/BKLMHit2d.h>
 #include <klm/bklm/geometry/GeometryPar.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/dataobjects/CDCRecoHit.h>
@@ -1118,7 +1117,7 @@ EVEVisualization::MCTrack* EVEVisualization::addMCParticle(const MCParticle* par
 
   if (!m_mcparticleTracks[particle].track) {
     const TVector3& p = particle->getMomentum();
-    const TVector3& vertex = particle->getProductionVertex();
+    const B2Vector3D& vertex = particle->getProductionVertex();
     const int pdg = particle->getPDG();
     TParticle tparticle(pdg, particle->getStatus(),
                         (particle->getMother() ? particle->getMother()->getIndex() : 0), 0, particle->getFirstDaughter(), particle->getLastDaughter(),
@@ -1169,7 +1168,7 @@ EVEVisualization::MCTrack* EVEVisualization::addMCParticle(const MCParticle* par
         const MCParticle* daughter = StoreArray<MCParticle>()[iDaughter - 1];
 
         TEvePathMarkD refMark(TEvePathMarkD::kDaughter);
-        refMark.fV.Set(daughter->getProductionVertex());
+        refMark.fV.Set(B2Vector3D(daughter->getProductionVertex()));
         refMark.fP.Set(daughter->getMomentum());
         refMark.fTime = daughter->getProductionTime();
         m_mcparticleTracks[particle].track->AddPathMark(refMark);
@@ -1483,7 +1482,7 @@ void EVEVisualization::addKLMCluster(const KLMCluster* cluster)
   }
 }
 
-void EVEVisualization::addBKLMHit2d(const BKLMHit2d* bklm2dhit)
+void EVEVisualization::addBKLMHit2d(const KLMHit2d* bklm2dhit)
 {
   //TVector3 globalPosition=  bklm2dhit->getGlobalPosition();
   bklm::GeometryPar*  m_GeoPar = Belle2::bklm::GeometryPar::instance();
@@ -1491,9 +1490,9 @@ void EVEVisualization::addBKLMHit2d(const BKLMHit2d* bklm2dhit)
 
   CLHEP::Hep3Vector global;
   //+++ global coordinates of the hit
-  global[0] = bklm2dhit->getGlobalPosition()[0];
-  global[1] = bklm2dhit->getGlobalPosition()[1];
-  global[2] = bklm2dhit->getGlobalPosition()[2];
+  global[0] = bklm2dhit->getPositionX();
+  global[1] = bklm2dhit->getPositionY();
+  global[2] = bklm2dhit->getPositionZ();
 
   //+++ local coordinates of the hit
   CLHEP::Hep3Vector local = module->globalToLocal(global);
@@ -1526,11 +1525,12 @@ void EVEVisualization::addBKLMHit2d(const BKLMHit2d* bklm2dhit)
   addObject(bklm2dhit, bklmbox);
 }
 
-void EVEVisualization::addEKLMHit2d(const EKLMHit2d* eklm2dhit)
+void EVEVisualization::addEKLMHit2d(const KLMHit2d* eklm2dhit)
 {
   const double du = 2.0;
   const double dv = 2.0;
-  TVector3 o = eklm2dhit->getPosition();
+  ROOT::Math::XYZVector hitPosition = eklm2dhit->getPosition();
+  TVector3 o(hitPosition.X(), hitPosition.Y(), hitPosition.Z());
   TVector3 u(1.0, 0.0, 0.0);
   TVector3 v(0.0, 1.0, 0.0);
   TEveBox* eklmbox = boxCreator(o, u, v, du, dv, 4.0);
@@ -1561,7 +1561,7 @@ void EVEVisualization::addROI(const ROIid* roi)
   TVector3 globalB = aSensorInfo.pointToGlobal(localB);
   TVector3 globalC = aSensorInfo.pointToGlobal(localC);
 
-  TEveBox* ROIbox = boxCreator((globalB + globalC) * 0.5 , globalB - globalA, globalC - globalA, 1, 1, 0.01);
+  TEveBox* ROIbox = boxCreator((globalB + globalC) * 0.5, globalB - globalA, globalC - globalA, 1, 1, 0.01);
 
   ROIbox->SetName(ObjectInfo::getIdentifier(roi));
   ROIbox->SetMainColor(kSpring - 9);
@@ -1810,7 +1810,7 @@ void EVEVisualization::addTOPDigits(const StoreArray<TOPDigit>& digits)
 
     //bar is a bit thicker so we can mouse over without getting the geometry
     auto* moduleBox = boxCreator(centerPos3D, channelX, channelY,
-                                 3.0 * topmod.getBarThickness(), topmod.getBarWidth() , topmod.getBarLength());
+                                 3.0 * topmod.getBarThickness(), topmod.getBarWidth(), topmod.getBarLength());
     moduleBox->SetMainColor(kAzure + 10);
     double weight = double(modCountPair.second) / maxcount;
     moduleBox->SetMainTransparency(90 - weight * 50);

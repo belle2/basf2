@@ -13,7 +13,7 @@
 
 #include <HepMC/IO_GenEvent.h>
 
-#include <TLorentzVector.h>
+#include <Math/Vector4D.h>
 
 using namespace std;
 using namespace Belle2;
@@ -125,13 +125,12 @@ int HepMCReader::getEvent(MCParticleGraph& graph, double& eventWeight)
       }
     }
 
-    //boost particles to lab frame:
-    TLorentzVector p4 = p.get4Vector();
     if (m_wrongSignPz) { // this means we have to mirror Pz
+      ROOT::Math::PxPyPzEVector p4 = p.get4Vector();
       p4.SetPz(-1.0 * p4.Pz());
+      p.set4Vector(p4);
     }
-    p4 = m_labboost * p4;
-    p.set4Vector(p4);
+
 
     ////check if particle should be made virtual according to steering options:
     if (i < m_nVirtual || isVirtual) {
@@ -173,5 +172,3 @@ int HepMCReader::countEvents(const std::string& filename)
   B2INFO("Counted " << count  << " events in  " << filename << ".");
   return count;
 }
-
-

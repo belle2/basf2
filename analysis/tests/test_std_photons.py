@@ -28,12 +28,11 @@ class TestStdPhotons(unittest.TestCase):
             std_function(path=testpath)
 
         # verify that we load only the list-creating modules
-        # the beam background MVA information is added to the photon lists by default
         self.assertEqual(
-            len(testpath.modules()), len(set(expected_lists)) + 2 if listtype == 'all' else len(set(expected_lists)) + 4,
+            len(testpath.modules()), len(set(expected_lists)) + 1 if listtype == 'all' else len(set(expected_lists)) + 3,
             "List %s doesn't work with function %s" % (listtype, std_function.__name__))
         self.assertTrue(all((module.type() == "ParticleLoader") or (module.type() == "ParticleListManipulator")
-                            or (module.type() == "ParticleSelector") or (module.type() == "MVAExpert")
+                            or (module.type() == "ParticleSelector")
                             for module in testpath.modules()))
 
         #

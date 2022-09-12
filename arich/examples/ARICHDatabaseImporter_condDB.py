@@ -30,7 +30,7 @@ aopRootF = options.aopRootF
 home = os.environ['BELLE2_LOCAL_DIR']
 
 # More information about use_local_database please find here:
-# https://b2-master.belle2.org/software/development/sphinx/framework/doc/index-03-framework.html?highlight=use_local_database#basf2.use_local_database
+# https://software.belle2.org/development/sphinx/framework/doc/index-03-framework.html?highlight=use_local_database#basf2.use_local_database
 b2.use_local_database()
 # use_local_database("./ARICHdata/centraldb/database.txt", "./ARICHdata/centraldb/", False, LogLevel.ERROR, False)
 # use_local_database("./ARICH_db_Test/centraldb/database.txt", "", False, LogLevel.ERROR, False)

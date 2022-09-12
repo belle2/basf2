@@ -63,6 +63,9 @@ namespace Belle2 {
 
       /// max. number of signal-like hits in ASIC for background check
       size_t m_nsignal_max{4};
+
+      /// max. number of logged error messages for number of hits per ASIC check
+      size_t m_max_asic_error_messages {1};
     };
   }
 }

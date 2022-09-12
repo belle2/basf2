@@ -62,6 +62,12 @@ namespace Belle2 {
     void setInvalid() {m_valid = false;}
 
     /**
+     * Sets chi2 value at minimum
+     * @param minChi2 value at minimum
+     */
+    void setMinChi2(double minChi2) {m_minChi2 = minChi2;}
+
+    /**
      * Returns slot number used to determine t0
      * @return slot number (1-based)
      */
@@ -78,6 +84,12 @@ namespace Belle2 {
      * @return uncertainty [ns]
      */
     double getError() const {return m_err;}
+
+    /**
+     * Returns chi2 value at minimum
+     * @return chi2 at minimum
+     */
+    double getMinChi2() const {return m_minChi2;}
 
     /**
      * Returns number of photons used to find minimum
@@ -126,8 +138,9 @@ namespace Belle2 {
     TH1F m_hits;  /**< time distribution of hits */
     float m_assumedMass = 0; /**< particle mass used in reconstruction */
     bool m_valid = false; /**< status: true if time zero is successfully determined */
+    float m_minChi2 = 0; /**< chi2 value at minimum */
 
-    ClassDef(TOPTimeZero, 3); /**< ClassDef */
+    ClassDef(TOPTimeZero, 4); /**< ClassDef */
 
   };
 

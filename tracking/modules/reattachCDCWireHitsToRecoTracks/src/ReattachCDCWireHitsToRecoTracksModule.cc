@@ -19,7 +19,7 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-REG_MODULE(ReattachCDCWireHitsToRecoTracks)
+REG_MODULE(ReattachCDCWireHitsToRecoTracks);
 
 ReattachCDCWireHitsToRecoTracksModule::ReattachCDCWireHitsToRecoTracksModule() :
   Module()

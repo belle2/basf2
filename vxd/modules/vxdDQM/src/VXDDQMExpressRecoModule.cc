@@ -35,7 +35,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(VXDDQMExpressReco)
+REG_MODULE(VXDDQMExpressReco);
 
 
 //-----------------------------------------------------------------
@@ -360,7 +360,7 @@ void VXDDQMExpressRecoModule::event()
           }
           if (iCont == 0) continue;
           float possi = info.getUCellPosition(digitSVD1.getCellID());
-          TVector3 rLocal1(possi, 0 , 0);
+          TVector3 rLocal1(possi, 0, 0);
           TVector3 ral1 = info.pointToGlobal(rLocal1);
           iIsU1 = 1;
           fPosSPU1 = ral1.Phi() / TMath::Pi() * 180;
@@ -413,7 +413,7 @@ void VXDDQMExpressRecoModule::event()
         auto info = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID1));
         if (clusterSVD1.isUCluster()) {
           if (fCharge1 < m_CutCorrelationSigUSVD * 200) continue;  // in electrons
-          TVector3 rLocal1(clusterSVD1.getPosition(), 0 , 0);
+          TVector3 rLocal1(clusterSVD1.getPosition(), 0, 0);
           TVector3 ral1 = info.pointToGlobal(rLocal1);
           iIsU1 = 1;
           fPosSPU1 = ral1.Phi() / TMath::Pi() * 180;
@@ -484,7 +484,7 @@ void VXDDQMExpressRecoModule::event()
             }
             if (iCont == 0) continue;
             float possi = info.getUCellPosition(digitSVD2.getCellID());
-            TVector3 rLocal2(possi, 0 , 0);
+            TVector3 rLocal2(possi, 0, 0);
             TVector3 ral2 = info.pointToGlobal(rLocal2);
             iIsU2 = 1;
             fPosSPU2 = ral2.Phi() / TMath::Pi() * 180;
@@ -534,7 +534,7 @@ void VXDDQMExpressRecoModule::event()
           auto info = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID2));
           if (clusterSVD2.isUCluster()) {
             if (fCharge2 < m_CutCorrelationSigUSVD * 200) continue;  // in electrons
-            TVector3 rLocal2(clusterSVD2.getPosition(), 0 , 0);
+            TVector3 rLocal2(clusterSVD2.getPosition(), 0, 0);
             TVector3 ral2 = info.pointToGlobal(rLocal2);
             iIsU2 = 1;
             fPosSPU2 = ral2.Phi() / TMath::Pi() * 180;

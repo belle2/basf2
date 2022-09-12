@@ -29,10 +29,10 @@ path = b2.Path()
 skim = BtoD0h_Kshh(validation=True, udstOutput=False)
 
 ma.inputMdstList(
-    "default",
     b2.find_file(skim.validation_sample, data_type="validation"),
     path=path,
 )
 skim(path)
 
+path.add_module('Progress')
 b2.process(path)

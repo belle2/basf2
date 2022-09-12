@@ -78,5 +78,8 @@ namespace Belle2 {
     DBObjPtr<TOPCalChannelRQE> m_channelRQE; /**< channel relative quantum effi. */
     DBObjPtr<TOPCalChannelThresholdEff> m_thresholdEff; /**< channel threshold effi. */
 
+    // other
+    unsigned m_errorCount = 0; /**< error count */
+
   };
 }

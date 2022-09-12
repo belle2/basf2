@@ -23,13 +23,13 @@ using boost::format;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(PXDRawDQMChips)
+REG_MODULE(PXDRawDQMChips);
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-PXDRawDQMChipsModule::PXDRawDQMChipsModule() : HistoModule() , m_storeRawHits()
+PXDRawDQMChipsModule::PXDRawDQMChipsModule() : HistoModule(), m_storeRawHits()
 {
   //Set module properties
   setDescription("Monitor raw PXD");

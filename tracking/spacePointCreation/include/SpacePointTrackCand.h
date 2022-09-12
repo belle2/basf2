@@ -108,7 +108,7 @@ namespace Belle2 {
      * Checks the equality of the pointers to the contained SpacePoints (pdg-code and charge estimate are not compared!)
      * NOTE: returns false if both TrackCands do not contain any SpacePoints
      */
-    bool operator == (const SpacePointTrackCand& rhs);
+    bool operator == (const SpacePointTrackCand& rhs) const;
 
 
     /**
@@ -256,7 +256,7 @@ namespace Belle2 {
      * print the Track Candidate in its "full beauty".
      * NOTE: prints some parts to stdout, since for printing the state seed the print method form TVectorD is invoked!
      */
-    void print(int debuglevel = 150, const Option_t* = "") const;
+    void print(int debuglevel = 25, const Option_t* = "") const;
 
     /**
      * get the refereeStatus as a string (easier to read than an unsigned short int)

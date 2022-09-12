@@ -17,9 +17,9 @@ using namespace vxdHoughTracking;
 
 void FiveHitFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "helixFitPocaDCut"), m_param_helixFitPocaDCut,
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "helixFitPocaDCut"), m_helixFitPocaDCut,
                                 "Cut on the POCA difference in xy with the POCA obtained from a .",
-                                m_param_helixFitPocaDCut);
+                                m_helixFitPocaDCut);
 }
 
 TrackFindingCDC::Weight

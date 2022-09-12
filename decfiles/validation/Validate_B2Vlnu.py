@@ -39,4 +39,5 @@ create_validation_histograms(
     ],
     description='B2Vlnu Validation to check generator level distributions',
 )
+path.add_module('Progress')
 basf2.process(path)

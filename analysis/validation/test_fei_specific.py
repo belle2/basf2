@@ -25,10 +25,7 @@ import glob
 import fei
 import basf2 as b2
 import modularAnalysis as ma
-import basf2_mva
 import ROOT
-
-basf2_mva.loadRootDictionary()
 
 tempdir = tempfile.mkdtemp()
 os.chdir(tempdir)
@@ -42,8 +39,7 @@ particles = fei.get_unittest_channels(specific=True)
 
 # Construct path for reconstruction of signal side B-meson
 sig_path = b2.create_path()
-ma.inputMdst(environmentType='default',
-             filename=b2.find_file('mdst14.root', 'validation', False),
+ma.inputMdst(filename=b2.find_file('mdst14.root', 'validation', False),
              path=sig_path)
 ma.fillParticleList('mu+:sig', 'muonID > 0.5 and dr < 1 and abs(dz) < 2', writeOut=True, path=sig_path)
 ma.reconstructDecay('tau+:sig -> mu+:sig', '', 1, writeOut=True, path=sig_path)
@@ -66,6 +62,7 @@ path.add_path(sig_path)
 path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
 assert feistate.stage == 0  # corresponds to stage -1, since increased by 1 after creating path
+path.add_module('Progress')
 print(path)
 b2.process(path, max_event=10000)
 assert len(glob.glob('mcParticlesCount.root')) == 1
@@ -83,6 +80,7 @@ path.add_path(sig_path)
 path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
 assert feistate.stage == 1  # corresponds to stage 0, since increased by 1 after creating path
+path.add_module('Progress')
 print(path)
 b2.process(path, max_event=10000)
 
@@ -119,6 +117,7 @@ path.add_path(sig_path)
 path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
 assert feistate.stage == 2  # corresponds to stage 1, since increased by 1 after creating path
+path.add_module('Progress')
 print(path)
 b2.process(path, max_event=10000)
 
@@ -149,6 +148,7 @@ path.add_path(sig_path)
 path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
 assert feistate.stage == 4  # corresponds to stage 3, since increased by 1 after creating path
+path.add_module('Progress')
 print(path)
 b2.process(path, max_event=10000)
 
@@ -186,6 +186,7 @@ path.add_path(sig_path)
 path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
 assert feistate.stage == 7  # corresponds to stage 6, since increased by 1 after creating path
+path.add_module('Progress')
 print(path)
 b2.process(path, max_event=10000)
 

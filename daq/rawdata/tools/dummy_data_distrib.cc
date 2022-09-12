@@ -146,14 +146,12 @@ int fillDataContents(int* buf, int nwords_per_fee, unsigned int node_id, int ncp
   offset += NW_SEND_HEADER;
 
   for (int k = 0; k < ncpr; k++) {
-    int top_pos = offset;
     //
     // RawHeader
     //
     int cpr_nwords = NW_RAW_HEADER +
                      (NW_B2L_HEADER + NW_B2L_TRAILER + nwords_per_fee) * nhslb
                      + NW_RAW_TRAILER;
-    int finesse_nwords = nwords_per_fee + NW_B2L_HEADER + NW_B2L_TRAILER;
     unsigned int ctime = CTIME_VAL;
     unsigned int utime = 0x98765432;
 
@@ -222,7 +220,6 @@ inline void addEvent(int* buf, int nwords_per_fee, unsigned int event, int ncpr,
 //inline void addEvent(int* buf, int nwords, unsigned int event)
 {
   int offset = 0;
-  int prev_offset;
   buf[ offset + 4 ] = event;
   offset += NW_SEND_HEADER;
 
@@ -230,7 +227,6 @@ inline void addEvent(int* buf, int nwords_per_fee, unsigned int event, int ncpr,
     int nwords = buf[ offset ];
     int posback_xorchksum = 2;
     int pos_xorchksum = offset + nwords - posback_xorchksum;
-    prev_offset = offset;
     if (buf[ offset + 4 ] != CTIME_VAL) {
       printf("[FATAL] data-production error 2 0x%.x", buf[ offset + 4 ]);
       fflush(stdout);
@@ -266,8 +262,6 @@ inline void addEvent(int* buf, int nwords_per_fee, unsigned int event, int ncpr,
 #endif
     }
     offset += NW_RAW_TRAILER;
-    unsigned int xor_chksum = 0;
-    unsigned int xor_chksum2 = 0;
   }
 
 }
@@ -352,7 +346,7 @@ int main(int argc, char** argv)
   int nconn = 0;
 
   while (1) {
-    int nready = poll(client, maxi + 1, -1);
+    //int nready = poll(client, maxi + 1, -1);
     if (client[0].revents & POLLRDNORM) {
       printf("Accepting..."); fflush(stdout);
       int connfd = accept(listenfd, (struct sockaddr*) NULL, NULL);
@@ -403,9 +397,9 @@ int main(int argc, char** argv)
     //  }
 
     for (int i = 1 ; i <= NUM_CLIENTS ; i++) {
-      int ret = 0;
-      if ((ret = write(client[i].fd, buff, total_words * sizeof(int))) <= 0) {
-        printf("[FATAL] Return value %d\n", ret);
+      int Ret = 0;
+      if ((Ret = write(client[i].fd, buff, total_words * sizeof(int))) <= 0) {
+        printf("[FATAL] Return value %d\n", Ret);
         fflush(stdout);
         exit(1);
       }
@@ -417,14 +411,14 @@ int main(int argc, char** argv)
     if (cnt % 10000 == 1) {
       if (cnt > start_cnt) {
         double cur_time = getTimeSec();
-        printf("run %d evt %lld time %.1lf dataflow %.1lf MB/s rate %.2lf kHz : so far dataflow %.1lf MB/s rate %.2lf kHz size %d\n",
+        printf("run %d evt %llu time %.1lf dataflow %.1lf MB/s rate %.2lf kHz : so far dataflow %.1lf MB/s rate %.2lf kHz size %d\n",
                run_no,
                cnt,
                cur_time - init_time,
                NUM_CLIENTS * (cnt - prev_cnt)*total_words * sizeof(int) / 1000000. / (cur_time - prev_time),
-               (cnt - prev_cnt) / (cur_time - prev_time) / 1000. ,
+               (cnt - prev_cnt) / (cur_time - prev_time) / 1000.,
                NUM_CLIENTS * (cnt - start_cnt)*total_words * sizeof(int) / 1000000. / (cur_time - init_time),
-               (cnt - start_cnt) / (cur_time - init_time) / 1000. , total_words);
+               (cnt - start_cnt) / (cur_time - init_time) / 1000., total_words);
 
         fflush(stdout);
         prev_time = cur_time;

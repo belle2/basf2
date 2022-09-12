@@ -14,7 +14,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SVDDQMEfficiency)
+REG_MODULE(SVDDQMEfficiency);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -135,7 +135,7 @@ void SVDDQMEfficiencyModule::event()
         }
 
 
-        if (resid < maxResid) {
+        if (abs(resid) < maxResid) {
           if (m_svdClusters[cls]->isUCluster()) {
             foundU = true;
           } else

@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
 # Author: The Belle II Collaboration                                     #
@@ -9,14 +6,11 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-import basf2_mva
-
 import tempfile
-
 import numpy as np
 
-import ROOT
-from ROOT import Belle2
+from basf2 import B2WARNING
+import basf2_mva
 
 
 def tree2dict(tree, tree_columns, dict_columns=None):
@@ -44,17 +38,64 @@ def tree2dict(tree, tree_columns, dict_columns=None):
 
 def calculate_roc_auc(p, t):
     """
-    Calculates the area under the receiver oeprating characteristic curve (AUC ROC)
+    Deprecated name of ``calculate_auc_efficiency_vs_purity``
+
     @param p np.array filled with the probability output of a classifier
     @param t np.array filled with the target (0 or 1)
     """
-    N = len(t)
-    T = np.sum(t)
+    B2WARNING(
+        "\033[93mcalculate_roc_auc\033[00m has been deprecated and will be removed in future.\n"
+        "This change has been made as calculate_roc_auc returned the area under the efficiency-purity curve\n"
+        "not the efficiency-background retention curve as expected by users.\n"
+        "Please replace calculate_roc_auc with:\n\n"
+        "\033[96mcalculate_auc_efficiency_vs_purity(probability, target[, weight])\033[00m:"
+        " the current definition of calculate_roc_auc\n"
+        "\033[96mcalculate_auc_efficiency_vs_background_retention(probability, target[, weight])\033[00m:"
+        " what is commonly known as roc auc\n")
+    return calculate_auc_efficiency_vs_purity(p, t)
+
+
+def calculate_auc_efficiency_vs_purity(p, t, w=None):
+    """
+    Calculates the area under the efficiency-purity curve
+    @param p np.array filled with the probability output of a classifier
+    @param t np.array filled with the target (0 or 1)
+    @param w None or np.array filled with weights
+    """
+    if w is None:
+        w = np.ones(t.shape)
+
+    wt = w * t
+
+    N = np.sum(w)
+    T = np.sum(wt)
+
     index = np.argsort(p)
-    efficiency = (T - np.cumsum(t[index])) / float(T)
-    purity = (T - np.cumsum(t[index])) / (N - np.cumsum(np.ones(N)))
+    efficiency = (T - np.cumsum(wt[index])) / float(T)
+    purity = (T - np.cumsum(wt[index])) / (N - np.cumsum(w[index]))
     purity = np.where(np.isnan(purity), 0, purity)
     return np.abs(np.trapz(purity, efficiency))
+
+
+def calculate_auc_efficiency_vs_background_retention(p, t, w=None):
+    """
+    Calculates the area under the efficiency-background_retention curve (AUC ROC)
+    @param p np.array filled with the probability output of a classifier
+    @param t np.array filled with the target (0 or 1)
+    @param w None or np.array filled with weights
+    """
+    if w is None:
+        w = np.ones(t.shape)
+
+    wt = w * t
+
+    N = np.sum(w)
+    T = np.sum(wt)
+
+    index = np.argsort(p)
+    efficiency = (T - np.cumsum(wt[index])) / float(T)
+    background_retention = (N - T - np.cumsum((np.abs(1 - t) * w)[index])) / float(N - T)
+    return np.abs(np.trapz(efficiency, background_retention))
 
 
 def calculate_flatness(f, p, w=None):
@@ -96,10 +137,14 @@ class Method(object):
         Load a method stored under the given identifier
         @param identifier identifying the method
         """
+        # Always avoid the top-level 'import ROOT'.
+        import ROOT  # noqa
+        # Initialize all the available interfaces
+        ROOT.Belle2.MVA.AbstractInterface.initSupportedInterfaces()
         #: Identifier of the method
         self.identifier = identifier
         #: Weightfile of the method
-        self.weightfile = basf2_mva.Weightfile.load(self.identifier)
+        self.weightfile = ROOT.Belle2.MVA.Weightfile.load(self.identifier)
         #: General options of the method
         self.general_options = basf2_mva.GeneralOptions()
         self.general_options.load(self.weightfile.getXMLTree())
@@ -110,7 +155,7 @@ class Method(object):
         # 1. Ownership of the unique_ptr returned by getOptions()
         # 2. Some kind of object slicing, although pyroot identifies the correct type
         # 3. Bug in pyroot
-        # interfaces = basf2_mva.AbstractInterface.getSupportedInterfaces()
+        # interfaces = ROOT.Belle2.MVA.AbstractInterface.getSupportedInterfaces()
         # self.interface = interfaces[self.general_options.m_method]
         # self.specific_options = self.interface.getOptions()
 
@@ -147,7 +192,7 @@ class Method(object):
         #: List of variables sorted by their importance
         self.variables = list(sorted(variables, key=lambda v: self.importances.get(v, 0.0)))
         #: List of the variable importances calculated by the method, but with the root compatible variable names
-        self.root_variables = [Belle2.makeROOTCompatible(v) for v in self.variables]
+        self.root_variables = [ROOT.Belle2.MakeROOTCompatible.makeROOTCompatible(v) for v in self.variables]
         #: Dictionary of the variables sorted by their importance but with root compatoble variable names
         self.root_importances = {k: importances[k] for k in self.root_variables}
         #: Description of the method as a xml string returned by basf2_mva.info
@@ -155,16 +200,20 @@ class Method(object):
         #: List of spectators
         self.spectators = [str(v) for v in self.general_options.m_spectators]
         #: List of spectators with root compatible names
-        self.root_spectators = [Belle2.makeROOTCompatible(v) for v in self.spectators]
+        self.root_spectators = [ROOT.Belle2.MakeROOTCompatible.makeROOTCompatible(v) for v in self.spectators]
 
     def train_teacher(self, datafiles, treename, general_options=None, specific_options=None):
         """
         Train a new method using this method as a prototype
         @param datafiles the training datafiles
         @param treename the name of the tree containing the training data
-        @param general_options general options given to basf2_mva.teacher (if None the options of this method are used)
-        @param specific_options specific options given to basf2_mva.teacher (if None the options of this method are used)
+        @param general_options general options given to basf2_mva.teacher
+          (if None the options of this method are used)
+        @param specific_options specific options given to basf2_mva.teacher
+          (if None the options of this method are used)
         """
+        # Always avoid the top-level 'import ROOT'.
+        import ROOT  # noqa
         if isinstance(datafiles, str):
             datafiles = [datafiles]
         if general_options is None:
@@ -189,11 +238,12 @@ class Method(object):
         @param datafiles the datafiles
         @param treename the name of the tree containing the data
         """
+        import ROOT  # noqa
         if isinstance(datafiles, str):
             datafiles = [datafiles]
         with tempfile.TemporaryDirectory() as tempdir:
             identifier = tempdir + "/weightfile.xml"
-            basf2_mva.Weightfile.save(self.weightfile, identifier)
+            ROOT.Belle2.MVA.Weightfile.save(self.weightfile, identifier)
 
             rootfilename = tempdir + '/expert.root'
             basf2_mva.expert(basf2_mva.vector(identifier),
@@ -205,7 +255,23 @@ class Method(object):
 
             expert_target = identifier + '_' + self.general_options.m_target_variable
             stripped_expert_target = self.identifier + '_' + self.general_options.m_target_variable
-            d = tree2dict(roottree,
-                          [Belle2.makeROOTCompatible(identifier), Belle2.makeROOTCompatible(expert_target)],
-                          [self.identifier, stripped_expert_target])
-        return d[self.identifier], d[stripped_expert_target]
+
+            output_names = [self.identifier]
+            branch_names = [
+                    ROOT.Belle2.MakeROOTCompatible.makeROOTCompatible(identifier),
+                    ]
+            if self.general_options.m_nClasses > 2:
+                output_names = [self.identifier+f'_{i}' for i in range(self.general_options.m_nClasses)]
+                branch_names = [
+                    ROOT.Belle2.MakeROOTCompatible.makeROOTCompatible(
+                        identifier +
+                        f'_{i}') for i in range(
+                        self.general_options.m_nClasses)]
+
+            d = tree2dict(
+                roottree,
+                [*branch_names, ROOT.Belle2.MakeROOTCompatible.makeROOTCompatible(expert_target)],
+                [*output_names, stripped_expert_target])
+
+        return (d[self.identifier] if self.general_options.m_nClasses <= 2 else np.array([d[x]
+                for x in output_names]).T), d[stripped_expert_target]

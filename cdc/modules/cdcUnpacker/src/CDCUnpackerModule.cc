@@ -25,7 +25,7 @@ using namespace CDC;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(CDCUnpacker)
+REG_MODULE(CDCUnpacker);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -129,28 +129,29 @@ void CDCUnpackerModule::event()
     B2DEBUG(99, LogVar("nEntries of rawCDC[i]", nEntriesRawCDC));
     for (int j = 0; j < nEntriesRawCDC; ++j) {
       int trigType = m_rawCDCs[i]->GetTRGType(j); // Get event type of L1 trigger.
-      int nWords[4];
-      nWords[0] = m_rawCDCs[i]->Get1stDetectorNwords(j);
-      nWords[1] = m_rawCDCs[i]->Get2ndDetectorNwords(j);
-      nWords[2] = m_rawCDCs[i]->Get3rdDetectorNwords(j);
-      nWords[3] = m_rawCDCs[i]->Get4thDetectorNwords(j);
+      int nWords[48];
+      int* data32tab[48];
+      int MaxNumOfCh = m_rawCDCs[i]->GetMaxNumOfCh(j);
+      string readoutName;
+      if (MaxNumOfCh == 4) readoutName = "COPPER";
+      else if (MaxNumOfCh == 48) readoutName = "PCIe40";
+      else
+        B2FATAL("CDC UnpackerModule: Invalid value of GetMaxNumOfCh from raw data: " << LogVar("Number of ch: ",
+                m_rawCDCs[i]->GetMaxNumOfCh(j)));
 
-      int* data32tab[4];
-      data32tab[0] = (int*)m_rawCDCs[i]->Get1stDetectorBuffer(j);
-      data32tab[1] = (int*)m_rawCDCs[i]->Get2ndDetectorBuffer(j);
-      data32tab[2] = (int*)m_rawCDCs[i]->Get3rdDetectorBuffer(j);
-      data32tab[3] = (int*)m_rawCDCs[i]->Get4thDetectorBuffer(j);
-
-
+      for (int k = 0; k < MaxNumOfCh; ++k) {
+        nWords[k] = m_rawCDCs[i]->GetDetectorNwords(j, k);
+        data32tab[k] = (int*)m_rawCDCs[i]->GetDetectorBuffer(j, k);
+      }
 
       //
-      // Search Data from Finess A to D (0->3).
+      // Search Data from Finess 0->MaxNumOfCh (4/48 for COPPER/PCIe40).
       //
 
-      for (int iFiness = 0; iFiness < 4; ++iFiness) {
+      for (int iFiness = 0; iFiness < MaxNumOfCh; ++iFiness) {
         int* ibuf = data32tab[iFiness];
         const int nWord = nWords[iFiness];
-        B2DEBUG(99, LogVar("nWords (from COPPER header)", nWord));
+        B2DEBUG(99, LogVar("nWords (from " + readoutName + " header)", nWord));
 
         if (m_enablePrintOut == true) {
           B2INFO("CDCUnpacker : Print out CDC data block.");
@@ -181,12 +182,12 @@ void CDCUnpackerModule::event()
 
         if (dataLength != (nWord - c_headearWords)) {
           if (m_dataSizeError == false) {
-            B2ERROR("Inconsistent data size between COPPER and CDC FEE."
+            B2ERROR("Inconsistent data size between " + readoutName + " and CDC FEE."
                     << LogVar("data length", dataLength) << LogVar("nWord", nWord)
                     << LogVar("Node ID", iNode) << LogVar("Finness ID", iFiness));
             m_dataSizeError = true;
           } else {
-            B2WARNING("Inconsistent data size between COPPER and CDC FEE."
+            B2WARNING("Inconsistent data size between " + readoutName + " and CDC FEE."
                       << LogVar("data length", dataLength) << LogVar("nWord", nWord)
                       << LogVar("Node ID", iNode) << LogVar("Finness ID", iFiness));
           }

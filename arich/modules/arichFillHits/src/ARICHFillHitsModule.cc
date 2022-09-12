@@ -27,10 +27,10 @@ using namespace std;
 namespace Belle2 {
 
   //-----------------------------------------------------------------
-  //                 Register module
+  ///                Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(ARICHFillHits)
+  REG_MODULE(ARICHFillHits);
 
   //-----------------------------------------------------------------
   //                 Implementation
@@ -42,7 +42,7 @@ namespace Belle2 {
     setDescription("Fills ARICHHits collection from ARICHDigits");
     setPropertyFlags(c_ParallelProcessingCertified);
     addParam("bitMask", m_bitMask, "hit bit mask (8 bits/channel)", (uint8_t)0xFF);
-    addParam("maxApdHits" , m_maxApdHits , "Remove hits with more than MaxApdHits per APD chip", (uint8_t)18);
+    addParam("maxApdHits", m_maxApdHits, "Remove hits with more than MaxApdHits per APD chip", (uint8_t)18);
     addParam("maxHapdHits", m_maxHapdHits, "Remove hits with more than MaxHapdHits per HAPD", (uint8_t)100);
     addParam("MagFieldCorrection", m_bcorrect, "Apply hit position correction due to non-perp. mag. field", 0);
     addParam("fillAll", m_fillall, "Make hits for all active channels (useful for likelihood PDF studies)", 0);

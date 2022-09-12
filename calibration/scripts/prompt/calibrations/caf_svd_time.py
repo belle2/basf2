@@ -30,7 +30,7 @@ from tracking import add_tracking_reconstruction
 from caf.framework import Calibration
 from caf import strategies
 from caf.utils import IoV
-from prompt import CalibrationSettings, input_data_filters
+from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 from prompt.utils import filter_by_max_events_per_run
 
 b2.set_log_level(b2.LogLevel.INFO)
@@ -44,14 +44,14 @@ settings = CalibrationSettings(name="caf_svd_time",
                                description=__doc__,
                                input_data_formats=["raw"],
                                input_data_names=["hadron_calib"],
-                               input_data_filters={"hadron_calib": [input_data_filters["Data Tag"]["hadron_calib"],
-                                                                    input_data_filters["Beam Energy"]["4S"],
-                                                                    input_data_filters["Beam Energy"]["Continuum"],
-                                                                    input_data_filters["Run Type"]["physics"],
-                                                                    input_data_filters["Magnet"]["On"]]},
+                               input_data_filters={"hadron_calib": [INPUT_DATA_FILTERS["Data Tag"]["hadron_calib"],
+                                                                    INPUT_DATA_FILTERS["Beam Energy"]["4S"],
+                                                                    INPUT_DATA_FILTERS["Beam Energy"]["Continuum"],
+                                                                    INPUT_DATA_FILTERS["Run Type"]["physics"],
+                                                                    INPUT_DATA_FILTERS["Magnet"]["On"]]},
                                depends_on=[],
                                expert_config={
-                                   "max_events_per_run": 10000,
+                                   "max_events_per_run": 50000,
                                    "isMC": False,
                                })
 
@@ -181,14 +181,16 @@ def create_svd_clusterizer(name="ClusterReconstruction",
     return cluster
 
 
-def create_pre_collector_path(clusterizers, isMC=False, is_validation=False):
+def create_pre_collector_path(clusterizers, isMC=False, max_events_per_run=10000, is_validation=False):
     """
     Create a basf2 path that runs a common reconstruction path and also runs several SVDSimpleClusterizer
     modules with different configurations. This way they re-use the same reconstructed objects.
 
     Parameters:
-        clusterizers (list[pybasf2.Module]): All the differently configured SVDSimpleClusterizer modules.
-        They should output to different datastore objects.
+        clusterizers (list[pybasf2.Module]): All the differently configured
+            SVDSimpleClusterizer modules. They should output to different datastore objects.
+        max_events_per_run (int, optional): Max events read per run. Defaults to 10000.
+        is_validation (bool, optional): Is used to produce the validation plots. Defaults to False.
 
     returns:
         pybasf2.Path
@@ -198,7 +200,7 @@ def create_pre_collector_path(clusterizers, isMC=False, is_validation=False):
 
     # Read from file only what is needed
     if not isMC:
-        path.add_module("RootInput", branchNames=HLT_INPUT_OBJECTS)
+        path.add_module("RootInput", branchNames=HLT_INPUT_OBJECTS, entrySequences=[f'0:{max_events_per_run}'])
     else:
         path.add_module("RootInput")
 
@@ -217,7 +219,7 @@ def create_pre_collector_path(clusterizers, isMC=False, is_validation=False):
 
     if not isMC:
         # run tracking reconstruction
-        add_tracking_reconstruction(path)
+        add_tracking_reconstruction(path, append_full_grid_cdc_eventt0=True)
         path = remove_module(path, "V0Finder")
         if not is_validation:
             b2.set_module_parameters(path, 'SVDClusterizer', returnClusterRawTime=True)
@@ -355,7 +357,7 @@ def get_calibrations(input_data, **kwargs):
 
     pre_collector_path = create_pre_collector_path(
         clusterizers=[cog6, cog3, els3],
-        isMC=isMC)
+        isMC=isMC, max_events_per_run=max_events_per_run)
     pre_collector_path.add_module(coll_cog6)
     pre_collector_path.add_module(coll_cog3)
     # We leave the coll_els3 to be the one "managed" by the CAF
@@ -449,7 +451,7 @@ def get_calibrations(input_data, **kwargs):
         clusterizers=[val_cog6, val_cog6_onTracks,
                       val_cog3, val_cog3_onTracks,
                       val_els3, val_els3_onTracks],
-        isMC=isMC, is_validation=True)
+        isMC=isMC, max_events_per_run=max_events_per_run, is_validation=True)
     val_pre_collector_path.add_module(val_coll_cog6)
     val_pre_collector_path.add_module(val_coll_cog3)
 

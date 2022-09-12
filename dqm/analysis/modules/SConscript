@@ -2,12 +2,15 @@ import os
 
 Import('env')
 
-env['LIBS'] = ['framework', 'daq', 'boost_regex',
+env['LIBS'] = ['framework', 'dqm',
                'arich', 'cdc', 'dqm_dataobjects',
 	       'klm_dataobjects', 'klm_dbobjects', 
 	       'svd_dataobjects', 'cdc_dataobjects',
                'vxd', 'vxd_dataobjects',
-               'RooFit', 'RooFitCore', 'ca', 'Com']
+               'RooFit', 'RooFitCore', 'ca', 'Com',
+	       '$ROOT_LIBS']
+
+env['SUBLIB'] = True
 
 # this check is not completely save if new options are added with clang
 if os.environ['BELLE2_OPTION'] == 'clang':

@@ -17,6 +17,10 @@ using namespace Belle2;
 
 int main(int argc, char** argv)
 {
+  if (argc < 3) {
+    printf("Wrong number of arguments\n");
+    return 1;
+  }
   SocketSend sock(argv[1], (unsigned short)atoi(argv[2]));
 
   sleep(10);
@@ -28,4 +32,5 @@ int main(int argc, char** argv)
     printf("data sent (%d), ret=%d\n", count++, is);
     sleep(1);
   }
+  return 0;
 }

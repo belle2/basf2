@@ -68,6 +68,7 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
         convertBeamParameters (bool): Convert beam parameters or use information stored in Belle II database.
         generatorLevelReconstruction (bool): Enables to bypass skims and corrections applied in B2BIIFixMdst.
         generatorLevelMCMatching (bool): Enables to switch MCTruth matching to generator-level particles.
+            This is recommended for analyses with gammas in the final state.
         path (basf2.Path): Path to add modules in.
         entrySequences (list(str)): The number sequences (e.g. 23:42,101) defining
             the entries which are processed for each inputFileName.
@@ -105,12 +106,15 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
     b2bii.setB2BII()
 
     if enableLocalDB is True:
-        b2.B2WARNING("B2BII is accessing the payloads from the local database.\n"
-                     "This is the recommended procedure and significantly faster than using the global database.\n"
-                     "Only if you need the latest payloads of the flavor tagging or the FEI,\n"
-                     "you should turn off this feature and set enableLocalDB to True.")
         b2.conditions.metadata_providers = ["/sw/belle/b2bii/database/conditions/b2bii.sqlite"]
         b2.conditions.payload_locations = ["/sw/belle/b2bii/database/conditions/"]
+    else:
+        b2.B2WARNING(
+            "B2BII is accessing the payloads from the conditions database.\n"
+            "The recommended procedure is to use the offline database and it is significantly\n"
+            "faster than using the global database.\n"
+            "If you need the payloads which are not included in the current offline database,\n"
+            "please contact b2bii librarian.")
 
     input = b2.register_module('B2BIIMdstInput')
     if inputBelleMDSTFile is not None:

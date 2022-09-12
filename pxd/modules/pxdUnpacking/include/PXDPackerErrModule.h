@@ -113,8 +113,8 @@ namespace Belle2 {
         //
         c_FAKE_NO_FAKE_DATA = __uint128_t(1) << Belle2::PXD::PXDError::c_nrFAKE_NO_FAKE_DATA,
         c_UNUSABLE_DATA = __uint128_t(1) << Belle2::PXD::PXDError::c_nrUNUSABLE_DATA,
-        c_DHH_END_ERRORBITS  = __uint128_t(1) << Belle2::PXD::PXDError::c_nrDHH_END_ERRORBITS ,
-        c_DHH_MISC_ERROR  = __uint128_t(1) << Belle2::PXD::PXDError::c_nrDHH_MISC_ERROR ,
+        c_DHH_END_ERRORBITS  = __uint128_t(1) << Belle2::PXD::PXDError::c_nrDHH_END_ERRORBITS,
+        c_DHH_MISC_ERROR  = __uint128_t(1) << Belle2::PXD::PXDError::c_nrDHH_MISC_ERROR,
         //
       };
 
@@ -185,7 +185,7 @@ namespace Belle2 {
 
       /** Pack one DHC (several DHE) stored in one RawPXD object.
        */
-      void pack_dhc(int dhc_id, int dhe_mask, int* dhe_ids);
+      void pack_dhc(int dhc_id, int dhe_mask, int* dhe_ids, bool send_all = true, bool send_roi = false);
 
       /** Pack one DHE (several DHP) to buffer.
        */
@@ -213,7 +213,7 @@ namespace Belle2 {
       bool isErrorIn(uint32_t enr);
 
       /** Store start of Vxd Detector related digits */
-      std::map <VxdID , int> startOfVxdID;
+      std::map <VxdID, int> startOfVxdID;
 
       /** temporary hitmap buffer for pixel to raw data conversion */
       unsigned char halfladder_pixmap[PACKER_NUM_ROWS][PACKER_NUM_COLS] = {0};

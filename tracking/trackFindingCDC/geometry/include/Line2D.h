@@ -81,7 +81,7 @@ namespace Belle2 {
                                        const double intercept,
                                        const EForwardBackward orientation)
       {
-        return Line2D(intercept * orientation, slope * orientation, -orientation);
+        return Line2D(intercept * static_cast<double>(orientation), slope * static_cast<double>(orientation), -orientation);
       }
 
       /// Constructs a line through the two given points
@@ -184,8 +184,8 @@ namespace Belle2 {
                              const double intercept,
                              const EForwardBackward orientation)
       {
-        setN0(intercept * orientation);
-        setN1(slope * orientation);
+        setN0(intercept * static_cast<double>(orientation));
+        setN1(slope * static_cast<double>(orientation));
         setN2(-orientation);
         normalize();
       }

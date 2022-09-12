@@ -20,54 +20,11 @@ class State(object):
     Tensorflow state
     """
 
-    def __init__(self, x=None, y=None, activation=None, cost=None, optimizer=None, session=None, **kwargs):
+    def __init__(self, model=None, **kwargs):
         """ Constructor of the state object """
-        #: feature matrix placeholder
-        self.x = x
-        #: target placeholder
-        self.y = y
-        #: activation function
-        self.activation = activation
-        #: cost function
-        self.cost = cost
-        #: optimizer used to minimize cost function
-        self.optimizer = optimizer
-        #: tensorflow session
-        self.session = session
-        #: array to save keys for collection
-        self.collection_keys = ['x', 'y', 'activation', 'cost', 'optimizer']
 
-        # other possible things to save into a tensorflow collection
-        for key, value in kwargs.items():
-            self.collection_keys.append(key)
-            setattr(self, key, value)
-
-    def add_to_collection(self):
-        """ Add the stored members to the current tensorflow collection """
-        try:
-            import tensorflow as tf
-        except ImportError:
-            print("Please install tensorflow: pip3 install tensorflow")
-            sys.exit(1)
-
-        for key in self.collection_keys:
-            tf.add_to_collection(key, getattr(self, key))
-
-        return self.collection_keys
-
-    def get_from_collection(self, collection_keys=None):
-        """ Get members from the current tensorflow collection """
-        try:
-            import tensorflow as tf
-        except ImportError:
-            print("Please install tensorflow: pip3 install tensorflow")
-            sys.exit(1)
-
-        if collection_keys is not None:
-            self.collection_keys = collection_keys
-
-        for key in self.collection_keys:
-            setattr(self, key, tf.get_collection(key)[0])
+        #: tensorflow model inheriting from tf.Module
+        self.model = model
 
 
 def feature_importance(state):
@@ -87,31 +44,36 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
         print("Please install tensorflow: pip3 install tensorflow")
         sys.exit(1)
 
-    x = tf.placeholder("float", [None, number_of_features])
-    y = tf.placeholder("float", [None, 1])
-    w = tf.placeholder("float", [None, 1])
-    W = tf.Variable(tf.zeros([number_of_features, 1]))
-    b = tf.Variable(tf.zeros([1]))
+    gpus = tf.config.list_physical_devices('GPU')
+    if gpus:
+        for gpu in gpus:
+            tf.config.experimental.set_memory_growth(gpu, True)
 
-    x_clean = tf.select(tf.is_nan(x), tf.ones_like(x) * 0., x)
-    activation = tf.nn.sigmoid(tf.matmul(x_clean, W) + b)
+    class my_model(tf.Module):
 
-    epsilon = 1e-5
-    cost = -tf.reduce_sum(y * w * tf.log(activation + epsilon) + (1 - y) * w * tf.log(1 - activation + epsilon)) / tf.reduce_sum(w)
+        def __init__(self, **kwargs):
 
-    learning_rate = 0.001
-    global_step = tf.Variable(0, name='global_step', trainable=False)
-    optimizer = tf.train.GradientDescentOptimizer(learning_rate).minimize(cost, global_step=global_step)
+            super().__init__(**kwargs)
 
-    init = tf.global_variables_initializer()
+            self.W = tf.Variable(tf.ones(shape=(number_of_features, 1)), name="W")
+            self.b = tf.Variable(tf.ones(shape=(1, 1)), name="b")
 
-    config = tf.ConfigProto()
-    config.gpu_options.allow_growth = True
-    session = tf.Session(config=config)
-    session.run(init)
+            self.optimizer = tf.optimizers.SGD(0.01)
 
-    state = State(x, y, activation, cost, optimizer, session)
-    state.w = w
+        @tf.function(input_signature=[tf.TensorSpec(shape=[None, number_of_features], dtype=tf.float32)])
+        def __call__(self, x):
+            return tf.nn.sigmoid(tf.matmul(self.clean_nans(x), self.W) + self.b)
+
+        def clean_nans(self, x):
+            return tf.where(tf.math.is_nan(x), tf.zeros_like(x), x)
+
+        def loss(self, predicted_y, target_y, w):
+            # cross entropy
+            epsilon = 1e-5
+            diff_from_truth = tf.where(target_y == 1., predicted_y, 1. - predicted_y)
+            return - tf.reduce_sum(w * tf.math.log(diff_from_truth + epsilon)) / tf.reduce_sum(w)
+
+    state = State(model=my_model())
     return state
 
 
@@ -125,26 +87,25 @@ def load(obj):
         print("Please install tensorflow: pip3 install tensorflow")
         sys.exit(1)
 
-    tf.reset_default_graph()
-    config = tf.ConfigProto()
-    config.gpu_options.allow_growth = True
-    session = tf.Session(config=config)
-    saver = tf.train.import_meta_graph(obj[0])
-    with tempfile.TemporaryDirectory() as path:
-        with open(os.path.join(path, obj[1] + '.data-00000-of-00001'), 'w+b') as file1, open(
-                os.path.join(path, obj[1] + '.index'), 'w+b') as file2:
-            file1.write(bytes(obj[2]))
-            file2.write(bytes(obj[3]))
-        tf.train.update_checkpoint_state(path, obj[1])
-        saver.restore(session, os.path.join(path, obj[1]))
-    state = State(session=session)
-    if len(obj) > 4:
-        state.get_from_collection(obj[4])
-        for i, extra in enumerate(obj[5:]):
-            setattr(state, 'extra_{}'.format(i), extra)
-    else:
-        state.get_from_collection()
+    gpus = tf.config.list_physical_devices('GPU')
+    if gpus:
+        for gpu in gpus:
+            tf.config.experimental.set_memory_growth(gpu, True)
 
+    with tempfile.TemporaryDirectory() as path:
+
+        # recreate the expected folder structure
+        for subfolder in ['variables', 'assets']:
+            os.makedirs(os.path.join(path, subfolder))
+
+        file_names = obj[0]
+        for file_index, file_name in enumerate(file_names):
+            with open(f'{path}/{file_name}', 'w+b') as file:
+                file.write(bytes(obj[1][file_index]))
+
+        model = tf.saved_model.load(path)
+
+    state = State(model=model)
     return state
 
 
@@ -152,33 +113,29 @@ def apply(state, X):
     """
     Apply estimator to passed data.
     """
-    r = state.session.run(state.activation, feed_dict={state.x: X}).flatten()
+    try:
+        import tensorflow as tf
+    except ImportError:
+        print("Please install tensorflow: pip3 install tensorflow")
+        sys.exit(1)
+
+    r = state.model(tf.convert_to_tensor(np.atleast_2d(X), dtype=tf.float32)).numpy()
+    if r.shape[1] == 1:
+        r = r[:, 0]  # cannot use squeeze because we might have output of shape [1,X classes]
     return np.require(r, dtype=np.float32, requirements=['A', 'W', 'C', 'O'])
 
 
-def begin_fit(state, Xtest, Stest, ytest, wtest):
+def begin_fit(state, Xtest, Stest, ytest, wtest, nBatches):
     """
     Returns just the state object
     """
+    state.nBatches = nBatches
     return state
 
 
-def partial_fit(state, X, S, y, w, epoch):
+def partial_fit(state, X, S, y, w, epoch, batch):
     """
-    Pass received data to tensorflow session
-    """
-    state.session.run(state.optimizer, feed_dict={state.x: X, state.y: y, state.w: w})
-    avg_cost = state.session.run(state.cost, feed_dict={state.x: X, state.y: y, state.w: w})
-    if epoch % 1000 == 0:
-        print("Epoch:", '%04d' % (epoch), "cost=", "{:.9f}".format(avg_cost))
-    if epoch == 100000:
-        return False
-    return True
-
-
-def end_fit(state):
-    """
-    Store tensorflow session in a graph
+    Pass batches of received data to tensorflow
     """
     try:
         import tensorflow as tf
@@ -186,13 +143,55 @@ def end_fit(state):
         print("Please install tensorflow: pip3 install tensorflow")
         sys.exit(1)
 
-    keys = state.add_to_collection()
-    saver = tf.train.Saver()
+    with tf.GradientTape() as tape:
+        avg_cost = state.model.loss(state.model(X), y, w)
+        grads = tape.gradient(avg_cost, state.model.trainable_variables)
+
+    state.model.optimizer.apply_gradients(zip(grads, state.model.trainable_variables))
+
+    if batch == 0 and epoch == 0:
+        state.avg_costs = [avg_cost]
+    elif batch != state.nBatches-1:
+        state.avg_costs.append(avg_cost)
+    else:
+        # end of the epoch, print summary results, reset the avg_costs and update the counter
+        print(f"Epoch: {epoch:04d} cost= {np.mean(state.avg_costs):.9f}")
+        state.avg_costs = [avg_cost]
+
+    if epoch == 100000:
+        return False
+    return True
+
+
+def end_fit(state):
+    """
+    Store tensorflow model in a graph
+    """
+    try:
+        import tensorflow as tf
+    except ImportError:
+        print("Please install tensorflow: pip3 install tensorflow")
+        sys.exit(1)
     with tempfile.TemporaryDirectory() as path:
-        filename = saver.save(state.session, os.path.join(path, 'mymodel'))
-        with open(filename + str('.data-00000-of-00001'), 'rb') as file1, open(filename + str('.index'), 'rb') as file2:
-            data1 = file1.read()
-            data2 = file2.read()
-    meta_graph = saver.export_meta_graph()
+
+        tf.saved_model.save(state.model, path)
+        # tf.saved_model.save creates:
+        # path/saved_model.pb
+        # path/variables/variables.index
+        # path/variables/variables.data-00000-of-00001
+        # path/assets/*  - This contains additional assets stored in the model.
+
+        file_names = ['saved_model.pb',
+                      'variables/variables.index',
+                      'variables/variables.data-00000-of-00001']
+
+        # we dont know what, if anything, is saved in assets/
+        assets_path = os.path.join(path, 'assets/')
+        file_names.extend([f'assets/{f.name}' for f in os.scandir(assets_path) if os.path.isfile(os.path.join(assets_path, f))])
+
+        files = []
+        for file_name in file_names:
+            with open(os.path.join(path, file_name), 'rb') as file:
+                files.append(file.read())
     del state
-    return [meta_graph, os.path.basename(filename), data1, data2, keys]
+    return [file_names, files]

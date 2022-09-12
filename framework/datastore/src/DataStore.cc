@@ -527,7 +527,7 @@ void DataStore::addRelation(const TObject* fromObject, StoreEntry*& fromEntry, i
 
   // add relation
   TClonesArray& relations = relContainer->elements();
-  new(relations.AddrAt(relations.GetLast() + 1)) RelationElement(fromIndex, toIndex, weight);
+  new (relations.AddrAt(relations.GetLast() + 1)) RelationElement(fromIndex, toIndex, weight);
 
   std::shared_ptr<RelationIndexContainer<TObject, TObject>> relIndex =
                                                            RelationIndexManager::Instance().getIndexIfExists<TObject, TObject>(relationsName, c_Event);

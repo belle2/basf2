@@ -14,16 +14,15 @@ import basf2_mva
 import basf2_mva_util
 import time
 
-from basf2_mva_python_interface.contrib_keras import State
+from basf2_mva_python_interface.keras import State
 
 
-from keras.layers import Input, Dense, Dropout
-from keras.layers.normalization import BatchNormalization
-from keras.models import Model
-from keras.optimizers import Adam
-from keras.losses import binary_crossentropy
-from keras.activations import sigmoid, tanh
-from keras.callbacks import Callback
+from tensorflow.keras.layers import Input, Dense, Dropout, BatchNormalization
+from tensorflow.keras.models import Model
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.losses import binary_crossentropy
+from tensorflow.keras.activations import sigmoid, tanh
+from tensorflow.keras.callbacks import Callback
 
 
 old_time = time.time()
@@ -54,7 +53,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     return state
 
 
-def begin_fit(state, Xtest, Stest, ytest, wtest):
+def begin_fit(state, Xtest, Stest, ytest, wtest, nBatches):
     """
     Returns just the state object
     """
@@ -64,9 +63,9 @@ def begin_fit(state, Xtest, Stest, ytest, wtest):
     return state
 
 
-def partial_fit(state, X, S, y, w, epoch):
+def partial_fit(state, X, S, y, w, epoch, batch):
     """
-    Pass received data to tensorflow session
+    Pass received data to tensorflow
     """
     class TestCallback(Callback):
 
@@ -100,12 +99,12 @@ if __name__ == "__main__":
                  'daughter(0, dz)', 'daughter(1, dz)',
                  'daughter(0, chiProb)', 'daughter(1, chiProb)', 'daughter(2, chiProb)',
                  'daughter(0, kaonID)', 'daughter(0, pionID)',
-                 'daughterInvariantMass(0, 1)', 'daughterInvariantMass(0, 2)', 'daughterInvariantMass(1, 2)']
+                 'daughterInvM(0, 1)', 'daughterInvM(0, 2)', 'daughterInvM(1, 2)']
     general_options.m_variables = basf2_mva.vector(*variables)
     general_options.m_target_variable = "isSignal"
 
     specific_options = basf2_mva.PythonOptions()
-    specific_options.m_framework = "contrib_keras"
+    specific_options.m_framework = "keras"
     specific_options.m_steering_file = 'mva/examples/keras/simple_deep.py'
     specific_options.m_normalize = True
     specific_options.m_training_fraction = 0.9
@@ -114,11 +113,12 @@ if __name__ == "__main__":
     basf2_mva.teacher(general_options, specific_options)
     training_stop = time.time()
     training_time = training_stop - training_start
+
     method = basf2_mva_util.Method(general_options.m_identifier)
     inference_start = time.time()
     test_data = ["test.root"] * 10
     p, t = method.apply_expert(basf2_mva.vector(*test_data), general_options.m_treename)
     inference_stop = time.time()
     inference_time = inference_stop - inference_start
-    auc = basf2_mva_util.calculate_roc_auc(p, t)
-    print("Tensorflow", training_time, inference_time, auc)
+    auc = basf2_mva_util.calculate_auc_efficiency_vs_background_retention(p, t)
+    print("Tensorflow.keras", training_time, inference_time, auc)

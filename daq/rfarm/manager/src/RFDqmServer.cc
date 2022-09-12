@@ -74,7 +74,7 @@ int RFDqmServer::Configure(NSMmsg*, NSMcontext*)
 
 }
 
-int RFDqmServer::UnConfigure(NSMmsg* nsmm, NSMcontext* nsmc)
+int RFDqmServer::UnConfigure(NSMmsg* /*nsmm*/, NSMcontext* /*nsmc*/)
 {
 
   // Wait 10 sec. for basf2 completion
@@ -82,15 +82,13 @@ int RFDqmServer::UnConfigure(NSMmsg* nsmm, NSMcontext* nsmc)
   sleep(10);
 
   // Store histograms in the file (make sure all event processes are stopped already)
-  char blank[] = "";
-  char* merger = m_conf->getconf("dqmserver", "merger");
-  char* topdir = m_conf->getconf("system", "execdir_base");
-  char* nodebase = m_conf->getconf("processor", "nodebase");
-  char* nnodes = m_conf->getconf("processor", "nnodes");
-  char* startnode = m_conf->getconf("processor", "idbase");
-  char* badlist = m_conf->getconf("processor", "badlist");
-  if (badlist == NULL)
-    badlist = blank;
+  m_conf->getconf("dqmserver", "merger");
+  m_conf->getconf("system", "execdir_base");
+  m_conf->getconf("processor", "nodebase");
+  m_conf->getconf("processor", "nnodes");
+  m_conf->getconf("processor", "idbase");
+  m_conf->getconf("processor", "badlist");
+
 
   /* Should be done at STOP
   char outfile[1024];
@@ -118,7 +116,7 @@ int RFDqmServer::UnConfigure(NSMmsg* nsmm, NSMcontext* nsmc)
   return 0;
 }
 
-int RFDqmServer::Start(NSMmsg* msgm, NSMcontext* msgc)
+int RFDqmServer::Start(NSMmsg* msgm, NSMcontext* /*msgc*/)
 {
   m_expno = msgm->pars[0];
   m_runno = msgm->pars[1];
@@ -126,7 +124,7 @@ int RFDqmServer::Start(NSMmsg* msgm, NSMcontext* msgc)
   return 0;
 }
 
-int RFDqmServer::Stop(NSMmsg* msg, NSMcontext*)
+int RFDqmServer::Stop(NSMmsg* /*msg*/, NSMcontext*)
 {
   // Wait 10 sec. for basf2 completion
   printf("DqmServer : waiting 10 sec. for basf2 completion\n");
@@ -151,14 +149,14 @@ int RFDqmServer::Stop(NSMmsg* msg, NSMcontext*)
     // Double fork to avoid zombie
     int dblpid = fork();
     if (dblpid == 0) {
-      int pid_dqmmerge = m_proc->Execute(merger, outfile, nodebase, topdir, nnodes, startnode, badlist);
+      m_proc->Execute(merger, outfile, nodebase, topdir, nnodes, startnode, badlist);
       exit(0);
     }
     exit(0); // Exit mother of double fork
   }
   // Wait for the completion of mother
   int status;
-  pid_t done = waitpid(colpid, &status, 0);
+  waitpid(colpid, &status, 0);
 
   printf("DqmServer : Stopped.\n");
 

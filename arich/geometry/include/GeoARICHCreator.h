@@ -148,7 +148,7 @@ namespace Belle2 {
       G4LogicalVolume* buildDetectorSupportPlate(const ARICHGeometryConfig& detectorGeo);
 
       //! build joints of the ARICH support structure
-      G4AssemblyVolume* makeJoint(G4Material* supportMaterial, const std::vector<double>& pars);
+      void makeJoint(G4Material* supportMaterial, const std::vector<double>& pars, G4AssemblyVolume* assemblyWedge);
 
       //! get refractive index of the material
       double getAvgRINDEX(G4Material* material);

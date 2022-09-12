@@ -16,7 +16,6 @@
 import argparse
 import basf2
 import modularAnalysis as ma
-import pdg
 import variables.collections as vc
 from variables import variables
 
@@ -38,10 +37,8 @@ gamma_list = 'gamma:all'
 ma.fillParticleList(gamma_list, '', path=analysis_path)
 
 # Reconstruction of pi0.
-mass_pi0 = pdg.get('pi0').Mass()
 mass_window = 0.02
-mass_cut = str(mass_pi0 - mass_window) + ' < M and M < ' + \
-           str(mass_pi0 + mass_window)
+mass_cut = f'abs(dM) < {mass_window}'
 ma.cutAndCopyList('gamma:pi0', gamma_list, 'E > 0.02', path=analysis_path)
 # Belle 1 has pi0:mdst, but reconstruct pi0 again to avoid preliminary cuts.
 pi0_list = 'pi0:gamma'

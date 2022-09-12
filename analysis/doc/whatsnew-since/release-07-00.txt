@@ -1,10 +1,18 @@
 Changes in the analysis package in light-2209-calico
 ----------------------------------------------------
 
+MVA-based pi0 identification
+++++++++++++++++++++++++++++
+ * New function :func:`modularAnalysis.lowEnergyPi0Identification` providing MVA-based pi0 identification is added.
+ * Example of its usage is added as ``analysis/examples/PostMdstIdentification/LowEnergyPi0Identification.py`` .
+
 Variables
 +++++++++
  * Extended the variable `useAlternativeDaughterHypothesis` to variables calculated from daughters' 4-momentum, e.g. `cosHelicityAngleMomentum`.
 
+Modules
++++++++
+ * New modules :b2:mod:`LowEnergyPi0VetoExpert` and :b2:mod:`LowEnergyPi0IdentificationExpert` for MVA-based pi0 identification are added.
 
 Changes in the analysis package in light-2207-bengal
 ----------------------------------------------------

@@ -2996,6 +2996,42 @@ def writePi0EtaVeto(
     path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
 
+def lowEnergyPi0Identification(pi0List, gammaList, payloadNameSuffix,
+                               path=None):
+    """
+    Calculate low-energy pi0 identification.
+    The result is stored as ExtraInfo ``lowEnergyPi0Identification``.
+
+    @param pi0List              Pi0 list.
+    @param gammaList            Gamma list. First, an energy cut E > 0.2 is applied
+                                to the photons from this list. Then, all possible combinations with a pi0
+                                daughter photon are formed except the one corresponding to
+                                the reconstructed pi0. The maximum low-energy pi0 veto value is calculated
+                                for such photon pairs and used as one of the input variables for
+                                the identification classifier.
+    @param payloadNameSuffix    Payload name suffix. The weight payloads are stored in
+                                the analysis global tag and have the following names:\n
+                                  * ``'LowEnergyPi0Veto' + payloadNameSuffix``
+                                  * ``'LowEnergyPi0Identification' + payloadNameSuffix``\n
+                                The possible suffixes are:\n
+                                  * ``'Belle1'`` for Belle data.
+                                  * ``'Belle2Release5'`` for Belle II release 5 data (MC14, proc12, buckets 16 - 25).\n
+    @param path                 Module path.
+    """
+    basf2.conditions.prepend_globaltag(getAnalysisGlobaltag())
+    # Select photons with higher energy for formation of veto combinations.
+    cutAndCopyList('gamma:pi0veto', gammaList, 'E > 0.2', path=path)
+    import b2bii
+    payload_name = 'LowEnergyPi0Veto' + payloadNameSuffix
+    path.add_module('LowEnergyPi0VetoExpert', identifier=payload_name,
+                    VetoPi0Daughters=True, GammaListName='gamma:pi0veto',
+                    Pi0ListName=pi0List, Belle1=b2bii.isB2BII())
+    payload_name = 'LowEnergyPi0Identification' + payloadNameSuffix
+    path.add_module('LowEnergyPi0IdentificationExpert',
+                    identifier=payload_name, Pi0ListName=pi0List,
+                    Belle1=b2bii.isB2BII())
+
+
 def getBeamBackgroundProbability(particleList, path=None):
     """
     Assign a probability to each ECL cluster as being signal like (1) compared to beam background like (0)

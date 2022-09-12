@@ -121,8 +121,10 @@ namespace Belle2 {
     double tgraph_v0(double trkAngle) const
     {
       TGraph* g = new TGraph(m_x.size(), &m_x[0], &m_y[0]);
+      double returnvalue = g->Eval(trkAngle);
+      delete g;
 
-      return g->Eval(trkAngle);
+      return returnvalue;
     };
 
     /** current function ID */

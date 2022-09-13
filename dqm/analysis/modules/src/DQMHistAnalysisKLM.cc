@@ -109,7 +109,7 @@ double DQMHistAnalysisKLMModule::getProcessedEvents()
 }
 
 void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
-  int subdetector, int section, int sector,
+  int subdetector, int section, int sector, int index,
   TH1* histogram, TCanvas* canvas, TLatex& latex)
 {
   double x = 0.15;
@@ -238,6 +238,36 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
     canvas->SetLogy();
   }
   canvas->Modified();
+  /* Drawing dividing lines */
+  int divisions; int shift;
+  int bin = 1;
+  double xLine;
+  if (subdetector == 1) {
+    if (index == 0) {
+      divisions = 7;
+      shift = 1;
+    } else {
+      divisions = 8;
+      shift = 8;
+    }
+    for (int k = 0; k < divisions; k++) {
+      xLine = histogram->GetXaxis()->GetBinLowEdge(bin);
+      m_PlaneLine.DrawLine(xLine, gPad->GetUymin(), xLine, gPad->GetUymax());
+      bin += BKLMElementNumbers::getNStrips(section, sector, k + shift, 0) + BKLMElementNumbers::getNStrips(section, sector, k + shift,
+             1);
+    }
+  } else {
+    if ((section == 2) && (index == 0 || index == 1))
+      divisions = 5;
+    else
+      divisions = 4;
+    for (int k = 0; k < divisions; k++) {
+      xLine = histogram->GetXaxis()->GetBinLowEdge(bin);
+      m_PlaneLine.DrawLine(xLine, gPad->GetUymin(), xLine, gPad->GetUymax());
+      bin += EKLMElementNumbers::getNStripsSector();
+    }
+  }
+  canvas->Modified();
 }
 
 void DQMHistAnalysisKLMModule::processSpatial2DHitEndcapHistogram(
@@ -298,9 +328,6 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
   const std::string& histName, TLatex& latex)
 {
   std::string name, alarm;
-  const double histMinNDC = 0.1;
-  const double histMaxNDC = 0.9;
-  const double histRangeNDC = histMaxNDC - histMinNDC;
   int moduleSubdetector, moduleSection, moduleSector, moduleLayer;
   double xAlarm = 0.15;
   double yAlarm = 0.8;
@@ -320,20 +347,21 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
   histogram->Draw();
   if (histName.find("bklm") != std::string::npos) {
     /* First draw the vertical lines and the sector names. */
-    const double maximalSector = BKLMElementNumbers::getMaximalSectorGlobalNumber();
+    const int maximalLayer = BKLMElementNumbers::getMaximalLayerNumber();
     for (int sector = 0; sector < BKLMElementNumbers::getMaximalSectorGlobalNumber(); ++sector) {
-      double xLineNDC = histMinNDC + (histRangeNDC * sector) / maximalSector;
-      double xTextNDC = histMinNDC + (histRangeNDC * (sector + 0.5)) / maximalSector;
-      double yTextNDC = histMinNDC + 0.98 * histRangeNDC;
+      int bin = maximalLayer * sector + 1;
+      double xLine = histogram->GetXaxis()->GetBinLowEdge(bin);
+      double xText = histogram->GetXaxis()->GetBinLowEdge(bin + maximalLayer / 2);
+      double yText = gPad->GetUymin() + 0.98 * (gPad->GetUymax() - gPad->GetUymin());
       if (sector > 0)
-        m_PlaneLine.DrawLineNDC(xLineNDC, histMinNDC, xLineNDC, histMaxNDC);
+        m_PlaneLine.DrawLine(xLine, gPad->GetUymin(), xLine, gPad->GetUymax());
       name = "B";
       if (sector < 8)
         name += "B";
       else
         name += "F";
       name += std::to_string(sector % 8);
-      m_PlaneText.DrawTextNDC(xTextNDC, yTextNDC, name.c_str());
+      m_PlaneText.DrawText(xText, yText, name.c_str());
     }
     /* Then, color the canvas with red if there is a dead module
      * and write an error message. */
@@ -357,12 +385,14 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
   } else {
     /* First draw the vertical lines and the sector names. */
     const double maximalLayer = EKLMElementNumbers::getMaximalLayerGlobalNumber();
+    const double maxPlane = EKLMElementNumbers::getMaximalPlaneNumber() * EKLMElementNumbers::getMaximalSectorNumber();
     for (int layerGlobal = 1; layerGlobal <= maximalLayer; ++layerGlobal) {
-      double xLineNDC = histMinNDC + (histRangeNDC * layerGlobal) / maximalLayer;
-      double xTextNDC = histMinNDC + (histRangeNDC * (layerGlobal - 0.5)) / maximalLayer;
-      double yTextNDC = histMinNDC + 0.98 * histRangeNDC;
+      int bin = maxPlane * layerGlobal + 1;
+      double xLine = histogram->GetXaxis()->GetBinLowEdge(bin);
+      double xText = histogram->GetXaxis()->GetBinLowEdge(bin - maxPlane / 2);
+      double yText = gPad->GetUymin() + 0.98 * (gPad->GetUymax() - gPad->GetUymin());
       if (layerGlobal < maximalLayer)
-        m_PlaneLine.DrawLineNDC(xLineNDC, histMinNDC, xLineNDC, histMaxNDC);
+        m_PlaneLine.DrawLine(xLine, gPad->GetUymin(), xLine, gPad->GetUymax());
       int section, layer;
       m_EklmElementNumbers->layerNumberToElementNumbers(
         layerGlobal, &section, &layer);
@@ -371,7 +401,7 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
       else
         name = "F";
       name += std::to_string(layer);
-      m_PlaneText.DrawTextNDC(xTextNDC, yTextNDC, name.c_str());
+      m_PlaneText.DrawText(xText, yText, name.c_str());
     }
     /* Then, color the canvas with red if there is a dead module
      * and write an error message. */
@@ -442,7 +472,7 @@ void DQMHistAnalysisKLMModule::event()
       }
       analyseChannelHitHistogram(
         klmSector.getSubdetector(), klmSector.getSection(),
-        klmSector.getSector(), histogram, canvas, latex);
+        klmSector.getSector(), j, histogram, canvas, latex);
     }
   }
   /* Temporary change the color palette. */

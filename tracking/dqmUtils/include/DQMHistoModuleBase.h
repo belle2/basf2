@@ -305,6 +305,7 @@ namespace Belle2 {
     TH1F* m_Tracks = nullptr;
 
   private:
+    /** Check a variable for whether or not it is NAN or INF */
     inline bool checkVariableForNANOrINF(const double var)
     {
       return std::isnan(var) or std::isinf(std::abs(var));

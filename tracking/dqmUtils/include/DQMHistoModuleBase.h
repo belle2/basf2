@@ -308,7 +308,7 @@ namespace Belle2 {
     /** Check a variable for whether or not it is NAN or INF */
     inline bool checkVariableForNANOrINF(const double var)
     {
-      return std::isnan(var) or std::isinf(std::abs(var));
+      return std::isnan(var) or std::isinf(var);
     }
   };
 }

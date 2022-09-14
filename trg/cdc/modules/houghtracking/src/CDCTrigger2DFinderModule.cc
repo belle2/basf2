@@ -64,11 +64,11 @@ CDCTrigger2DFinderModule::CDCTrigger2DFinderModule() : Module()
 
   addParam("minHits", m_minHits,
            "Minimum hits from different super layers required in a peak cell.",
-           (unsigned)(20));
+           (unsigned)(4));
   addParam("minHitsShort", m_minHitsShort,
            "Minimum hits required required in a peak cell for a short track"
            " (must be in the first minHitsShort super layers).",
-           (unsigned)(20));
+           (unsigned)(4));
   addParam("minCells", m_minCells,
            "Peaks with less than minCells connected cells are ignored.",
            (unsigned)(2));
@@ -113,7 +113,7 @@ CDCTrigger2DFinderModule::CDCTrigger2DFinderModule() : Module()
            "subsequent clones.", false);
 
   addParam("usehitpattern", m_usehitpattern,
-           "Switch to use hit pattern inside TSF ", true);
+           "Switch to use hit pattern inside TSF ", false);
 }
 
 void

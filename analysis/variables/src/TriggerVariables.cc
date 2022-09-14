@@ -363,9 +363,9 @@ namespace Belle2 {
     REGISTER_METAVARIABLE("L1PSNM(name)", L1PSNM,
                           R"DOC(
 [Eventbased] Returns the PSNM (Prescale And Mask, after prescale) status (1 or 0) of the output trigger bit with the given name. 
-For some trigger bits, we set a prescale factor to reduce the numbers. 
+For some output trigger bits, we assign a prescale factor to reduce the number of triggered events. 
 For example, we want to keep only 1% of Bhabha events. A prescale factor of 100 is then assigned to ``bha_3D`` (Bhabha selected in 3D criteria). 
-The different prescale factors are set to the different output trigger bits in each run. 
+Prescale factor of a given output trigger bit could be different in different datasets. 
 It is recommended to use prescaled trigger bits (L1PSNM) or un-prescaled trigger bits (L1FTDL) for your analysis. 
 In run-independent MC, configuration of the prescales in TSIM (trigger simulation) can be different from data, so L1 FTDL is recommended. 
 In run-dependent MC, configuration of the prescales in TSIM is consistent with data, so L1PSNM is recommended.
@@ -378,7 +378,7 @@ In run-dependent MC, configuration of the prescales in TSIM is consistent with d
                           Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("L1Input(name)", L1Input,
                           R"DOC(
-[Eventbased] Returns the input bit status of the trigger bit with the given name. Input trigger bits are predefined selections from each sub-detector, with adjustment of the delay and width, in order to fix latency on GDL. For example, ``ty_0/1/2/3`` is one of the input trigger bits meaning the number of neuro 3D tracks is one/two/three/more than three. While ``yyy`` is one of the output trigger bits meaning ``(ty_2 or ty_3) and !veto``.
+[Eventbased] Returns the input bit status of the trigger bit with the given name. Input trigger bits are predefined selections from each sub-detector, with adjustment of the delay and width, in order to fix latency on GDL. For example, ``ty_0/1/2/3`` is one of the input trigger bits meaning the number of neuro 3D tracks is one/two/three/more than three.
 )DOC", 
                           Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("L1Prescale(name)", L1PSNMPrescale,

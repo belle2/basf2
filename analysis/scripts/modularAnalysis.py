@@ -1435,30 +1435,6 @@ def combineAllParticles(inputParticleLists, outputList, cut='', writeOut=False, 
     path.add_module(pmake)
 
 
-def makeInvisible(
-        motherParticleList,
-        decayStringTarget,
-        covMatrix=10000,
-        eraseFourMomentum=True,
-        path=None):
-    """
-    This module makes one Particle in the decay invisible to the treefitter module.
-
-    @param motherParticleList name of the mother particleList
-    @param decayStringTarget  select the daughter which will be made invisible
-    @param covMatrix          sets the value of the diagonal covariance matrix of the target Particle
-    @param eraseFourMomentum  if true, the four-momemtum of the invisible particle will be set to zero
-    @param path               module is added to this path
-    """
-
-    pmake = register_module('InvisibleMaker')
-    pmake.set_name('InvisibleMaker_' + motherParticleList)
-    pmake.param('motherParticleList', motherParticleList)
-    pmake.param('decayStringTarget', decayStringTarget)
-    pmake.param('dummyCovMatrix', covMatrix)
-    path.add_module(pmake)
-
-
 def reconstructMissingKlongDecayExpert(decayString,
                                        cut,
                                        dmID=0,

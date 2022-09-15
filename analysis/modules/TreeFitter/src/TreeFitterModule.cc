@@ -85,12 +85,16 @@ TreeFitterModule::TreeFitterModule() : Module(), m_nCandidatesBeforeFit(-1), m_n
   addParam("inflationFactorCovZ", m_inflationFactorCovZ,
            "Inflate the covariance of the beamspot by this number so that the 3d beam constraint becomes weaker in Z.And: thisnumber->infinity : dim(beamspot constr) 3d->2d.",
            1);
+  addParam("treatAsInvisible", m_treatAsInvisible,
+           "Type::[string]. Decay string to select one particle that will be ignored in the fit.", {});
 }
 
 void TreeFitterModule::initialize()
 {
   m_plist.isRequired(m_particleList);
   StoreArray<Particle>().isRequired();
+  StoreArray<Belle2::Particle> particles;
+  particles.isRequired();
   m_nCandidatesBeforeFit = 0;
   m_nCandidatesAfter = 0;
 
@@ -100,6 +104,16 @@ void TreeFitterModule::initialize()
       m_massConstraintList.push_back(particletemp->PdgCode());
     }
   }
+
+  if (!m_treatAsInvisible.empty()) {
+    bool valid = m_pDDescriptorInvisibles.init(m_treatAsInvisible);
+    if (!valid)
+      B2ERROR("TreeFitterModule::initialize Invalid Decay Descriptor: " << m_treatAsInvisible);
+
+    size_t countSelection = std::count(m_treatAsInvisible.begin(), m_treatAsInvisible.end(), '^');
+    if (countSelection != 1)
+      B2ERROR("TreeFitterModule::please select exactly one particle to ignore: " << m_treatAsInvisible);
+  }
 }
 
 void TreeFitterModule::beginRun()
@@ -108,6 +122,8 @@ void TreeFitterModule::beginRun()
 
 void TreeFitterModule::event()
 {
+  StoreArray<Particle> particles;
+
   if (!m_plist) {
     B2ERROR("ParticleList " << m_particleList << " not found");
     return;
@@ -117,11 +133,23 @@ void TreeFitterModule::event()
   const unsigned int n = m_plist->getListSize();
   m_nCandidatesBeforeFit += n;
 
+  TMatrixFSym dummyCovMatrix(7);
+  for (int row = 0; row < 7; ++row) { //diag
+    dummyCovMatrix(row, row) = 10000;
+  }
+
   for (unsigned i = 0; i < n; i++) {
     Belle2::Particle* particle = m_plist->getParticle(i);
 
     if (m_updateDaughters == true) {
       ParticleCopy::copyDaughters(particle);
+    }
+
+    if (!m_treatAsInvisible.empty()) {
+      std::vector<const Particle*> selParticlesTarget = m_pDDescriptorInvisibles.getSelectionParticles(particle);
+      Particle* targetD = particles[selParticlesTarget[0]->getArrayIndex()];
+      targetD->writeExtraInfo("treeFitterTreatMeAsInvisible", 1);
+      targetD->setMomentumVertexErrorMatrix(dummyCovMatrix);
     }
 
     try {

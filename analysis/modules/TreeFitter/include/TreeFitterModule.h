@@ -13,6 +13,8 @@
 
 #include <framework/datastore/StoreObjPtr.h>
 
+#include <analysis/DecayDescriptor/DecayDescriptor.h>
+
 namespace Belle2 {
   class Particle;
 
@@ -129,5 +131,12 @@ namespace Belle2 {
 
     /** inflate beamspot covariance of z by this number */
     int m_inflationFactorCovZ;
+
+    /** decay string to select one particle that will be treated as invisible */
+    std::string  m_treatAsInvisible;
+
+    /** Decay descriptor of the invisible particles */
+    DecayDescriptor m_pDDescriptorInvisibles;
+
   };
 }

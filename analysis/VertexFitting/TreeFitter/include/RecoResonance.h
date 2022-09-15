@@ -55,7 +55,7 @@ namespace TreeFitter {
     virtual void addToConstraintList(constraintlist& list, int depth) const override;
 
   private:
-    /** has mass cosntraint */
+    /** has mass constraint */
     bool m_massconstraint;
 
 

@@ -143,7 +143,7 @@ namespace Belle2 {
     void addROEToParticleList(RestOfEvent* roe, int mdstIndex, int pdgCode = 0, bool isSelfConjugatedParticle = true);
 
     /**
-    * Load dummy object as Particle of specified type to StoreArray<Particle> and adds it to the ParticleList
+    * Loads dummy object as Particle of specified type to StoreArray<Particle> and adds it to the ParticleList
     */
     void dummyToParticles();
 
@@ -199,7 +199,7 @@ namespace Belle2 {
 
     int m_dummyMDSTIndex;  /**< mdst index for dummy particles */
     double m_dummyCovMatrix;  /** diag value of cov matrix for dummy particles */
-    bool m_dummyTreatAsInvisble; /** should treeFitter treat the particle as invisble? */
+    bool m_dummyTreatAsInvisible; /** should treeFitter treat the particle as invisible? */
 
     bool m_enforceFitHypothesis =
       false; /**<If true, a Particle is only created if a track fit with the particle hypothesis passed to the ParticleLoader is available. */

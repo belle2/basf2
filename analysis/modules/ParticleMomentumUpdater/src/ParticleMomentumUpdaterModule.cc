@@ -1,12 +1,10 @@
 /**************************************************************************
-* BASF2 (Belle Analysis Framework 2)                                     *
-* Copyright(C) 2010 - Belle II Collaboration                             *
-*                                                                        *
-* Author: The Belle II Collaboration                                     *
-* Contributors: Lukas Bierwirth                                          *
-*                                                                        *
-* This software is provided "as is" without any warranty.                *
-**************************************************************************/
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 #include <iostream>
 
@@ -41,9 +39,6 @@ ParticleMomentumUpdaterModule::ParticleMomentumUpdaterModule() : Module()
   addParam("decayStringDaughters", m_decayStringDaughters,
            "DecayString specifying the daughter particles used to replace the momentum of the target particle by p(beam)-p(daughters)",
            std::string(""));
-  addParam("copyDaughters", m_copyDaughters,
-           "Create Copy of daughters? Yes or no.",
-           false);
 }
 
 void ParticleMomentumUpdaterModule::initialize()
@@ -84,9 +79,6 @@ void ParticleMomentumUpdaterModule::event()
   for (unsigned int i = 0; i < numParticles; i++) {
     Particle* iParticle = plist->getParticle(i);
 
-    if (m_copyDaughters)
-      ParticleCopy::copyDaughters(iParticle);
-
     std::vector<const Particle*> selParticlesTarget = m_pDDescriptorTarget.getSelectionParticles(iParticle);
     std::vector<const Particle*> selParticlesDaughters = m_pDDescriptorDaughters.getSelectionParticles(iParticle);
 
@@ -96,7 +88,10 @@ void ParticleMomentumUpdaterModule::event()
     }
 
     Particle* targetP = particles[selParticlesTarget[0]->getArrayIndex()];
-    targetP->set4Vector(boost4Vector - daughters4Vector);
+    Particle* daughterCopy = Belle2::ParticleCopy::copyParticle(targetP);
+    daughterCopy->set4Vector(boost4Vector - daughters4Vector);
+    iParticle->removeDaughter(targetP);
+    iParticle->appendDaughter(daughterCopy);
   }
 }
 

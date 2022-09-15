@@ -88,9 +88,9 @@ ParticleLoaderModule::ParticleLoaderModule() : Module()
            "mdst index to use for dummy particle", 0);
 
   addParam("dummyCovMatrix", m_dummyCovMatrix,
-           "Diagonal value of covariance matrix to use for dummy particle", -1.);
+           "Diagonal value of covariance matrix to use for dummy particle", 10000.);
 
-  addParam("dummyTreatAsInvisible", m_dummyTreatAsInvisble,
+  addParam("dummyTreatAsInvisible", m_dummyTreatAsInvisible,
            "Should treeFitter treat the particle as invisible?", true);
 
 }
@@ -195,7 +195,7 @@ void ParticleLoaderModule::initialize()
         B2INFO("   -> MDST source: RestOfEvents");
         m_ROE2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle);
       } else if (m_useDummy) {
-        B2INFO("   -> MDST source: Dummy");
+        B2INFO("   -> MDST source: No MDST source");
         m_Dummies2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle);
       } else if (m_useMCParticles) {
         B2INFO("   -> MDST source: MCParticles");
@@ -305,7 +305,7 @@ void ParticleLoaderModule::dummyToParticles()
 
   TMatrixFSym covariance(7);
   for (int row = 0; row < 7; ++row) { //diag
-    covariance(row, row) = m_dummyCovMatrix; //TODO value
+    covariance(row, row) = m_dummyCovMatrix;
   }
 
   Particle* newPart = nullptr;
@@ -315,17 +315,17 @@ void ParticleLoaderModule::dummyToParticles()
 
   ROOT::Math::PxPyPzEVector zero4Vector = {0., 0., 0., 0.};
 
-  newPart = m_particles.appendNew(zero4Vector, pdgCode, isFlavored, Particle::EParticleSourceObject::c_Undefined,
+  newPart = m_particles.appendNew(zero4Vector, pdgCode, isFlavored, Particle::EParticleSourceObject::c_NoMDSTSource,
                                   m_dummyMDSTIndex); //TODO mdst Index?
   if (m_dummyCovMatrix > 0.) newPart->setMomentumVertexErrorMatrix(covariance);
-  if (m_dummyTreatAsInvisble) newPart->writeExtraInfo("treeFitterTreatMeAsInvisible", 1);
+  if (m_dummyTreatAsInvisible) newPart->writeExtraInfo("treeFitterTreatMeAsInvisible", 1);
   plist->addParticle(newPart);
 
   if (!isSelfConjugatedParticle) {
-    newAntiPart = m_particles.appendNew(zero4Vector, -pdgCode, isFlavored, Particle::EParticleSourceObject::c_Undefined,
+    newAntiPart = m_particles.appendNew(zero4Vector, -pdgCode, isFlavored, Particle::EParticleSourceObject::c_NoMDSTSource,
                                         m_dummyMDSTIndex);
     if (m_dummyCovMatrix > 0.) newAntiPart->setMomentumVertexErrorMatrix(covariance);
-    if (m_dummyTreatAsInvisble) newAntiPart->writeExtraInfo("treeFitterTreatMeAsInvisible", 1);
+    if (m_dummyTreatAsInvisible) newAntiPart->writeExtraInfo("treeFitterTreatMeAsInvisible", 1);
     plist->addParticle(newAntiPart);
   }
 

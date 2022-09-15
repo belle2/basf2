@@ -1497,7 +1497,7 @@ def reconstructMissingKlongDecayExpert(decayString,
     path.add_module(rmake)
 
 
-def setBeamConstrainedMomentum(particleList, decayStringTarget, decayStringDaughters, copyDaughters=False, path=None):
+def setBeamConstrainedMomentum(particleList, decayStringTarget, decayStringDaughters, path=None):
     """
     Replace the four-momentum of the target Particle by p(beam) - p(selected daughters)
 
@@ -1511,7 +1511,6 @@ def setBeamConstrainedMomentum(particleList, decayStringTarget, decayStringDaugh
     mod.param('particleList', particleList)
     mod.param('decayStringTarget', decayStringTarget)
     mod.param('decayStringDaughters', decayStringDaughters)
-    mod.param('copyDaughters', copyDaughters)
     path.add_module(mod)
 
 

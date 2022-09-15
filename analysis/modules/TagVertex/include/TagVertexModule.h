@@ -181,12 +181,9 @@ namespace Belle2 {
     analysis::VertexFitKFit doSingleKfit(std::vector<ParticleAndWeight>& particleAndWeights);
 
     /**
-     * Get a list of pions from a list of pions removing the Kshorts
-     * Warning: this assumes all the particles are pions, which is fine are all the particles
-     * are reconstructed as pions in the TagV module.
+     * Get a list of particles with attached weight and associated MC particle
      */
-    std::vector<ParticleAndWeight> getParticlesWithoutKS(const std::vector<const Particle*>& tagParticles,
-                                                         double massWindowWidth = 0.01) const;
+    std::vector<ParticleAndWeight> getParticlesAndWeights(const std::vector<const Particle*>& tagParticles) const;
 
     /** TO DO: tag side vertex fit in the case of semileptonic tag side decay */
     //bool makeSemileptonicFit(Particle *Breco);

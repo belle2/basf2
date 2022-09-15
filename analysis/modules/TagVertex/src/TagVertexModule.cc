@@ -614,49 +614,24 @@ std::vector<const Particle*> TagVertexModule::getTagTracks_standardAlgorithm(con
 }
 
 
-vector<ParticleAndWeight> TagVertexModule::getParticlesWithoutKS(const vector<const Particle*>& tagParticles,
-    double massWindowWidth) const
+vector<ParticleAndWeight> TagVertexModule::getParticlesAndWeights(const vector<const Particle*>& tagParticles) const
 {
   vector<ParticleAndWeight> particleAndWeights;
 
-  ParticleAndWeight particleAndWeight;
-  particleAndWeight.mcParticle = 0;
-  particleAndWeight.weight = -1111.;
+  for (const Particle* particle : tagParticles) {
+    if (!particle) continue;
+    ROOT::Math::PxPyPzEVector mom = particle->get4Vector();
+    if (!isfinite(mom.mag2())) continue;
 
-  // remove tracks from KS
-  for (unsigned i = 0; i < tagParticles.size(); ++i) {
-    const Particle* particle1 = tagParticles.at(i);
-    if (!particle1) continue;
-    ROOT::Math::PxPyPzEVector mom1 = particle1->get4Vector();
-    if (!isfinite(mom1.mag2())) continue;
-
-    //is from Ks decay?
-    bool isKsDau = false;
-    for (unsigned j = 0; j < tagParticles.size(); ++j) {
-      if (i == j) continue;
-      const Particle* particle2 = tagParticles.at(j);
-      if (!particle2) continue;
-      ROOT::Math::PxPyPzEVector mom2 = particle2->get4Vector();
-      if (!isfinite(mom2.mag2())) continue;
-
-      if (particle1->getCharge() + particle2->getCharge() != 0.0) continue; //opposite charge check
-
-      double mass = (mom1 + mom2).M();
-      if (abs(mass - Const::K0Mass) < massWindowWidth) {
-        isKsDau = true;
-        break;
-      }
-    }
-    //if from Ks decay, skip
-    if (isKsDau) continue;
-
-    particleAndWeight.particle = particle1;
+    ParticleAndWeight particleAndWeight;
+    particleAndWeight.mcParticle = 0;
+    particleAndWeight.weight = -1111.;
+    particleAndWeight.particle = particle;
 
     if (m_useMCassociation == "breco" || m_useMCassociation == "internal")
-      particleAndWeight.mcParticle = particle1->getRelatedTo<MCParticle>();
+      particleAndWeight.mcParticle = particle->getRelatedTo<MCParticle>();
 
     particleAndWeights.push_back(particleAndWeight);
-
   }
 
   return particleAndWeights;
@@ -710,7 +685,7 @@ bool TagVertexModule::makeGeneralFitRave()
   analysis::RaveVertexFitter rFit;
 
   //feed rave with tracks without Kshorts
-  vector<ParticleAndWeight> particleAndWeights = getParticlesWithoutKS(m_tagParticles);
+  vector<ParticleAndWeight> particleAndWeights = getParticlesAndWeights(m_tagParticles);
 
   for (const auto& pw : particleAndWeights) {
     try {
@@ -860,7 +835,7 @@ static int getLargestChi2ID(const analysis::VertexFitKFit& kFit)
 bool TagVertexModule::makeGeneralFitKFit()
 {
   //feed KFit with tracks without Kshorts
-  vector<ParticleAndWeight> particleAndWeights = getParticlesWithoutKS(m_tagParticles);
+  vector<ParticleAndWeight> particleAndWeights = getParticlesAndWeights(m_tagParticles);
 
   analysis::VertexFitKFit kFit;
 

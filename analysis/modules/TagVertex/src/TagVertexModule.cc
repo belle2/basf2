@@ -41,6 +41,7 @@
 #include <TVector.h>
 #include <TRotation.h>
 #include <Math/Vector4D.h>
+#include <iostream>
 
 using namespace std;
 using namespace Belle2;
@@ -78,6 +79,7 @@ TagVertexModule::TagVertexModule() : Module(),
   m_deltaT(0), m_deltaTErr(0), m_mcDeltaTau(0), m_mcDeltaT(0),
   m_shiftZ(0), m_FitType(0), m_tagVl(0),
   m_truthTagVl(0), m_tagVlErr(0), m_tagVol(0), m_truthTagVol(0), m_tagVolErr(0), m_tagVNDF(0), m_tagVChi2(0), m_tagVChi2IP(0),
+  m_kFitReqReducedChi2(5),
   m_verbose(true)
 {
   // Set module properties
@@ -104,6 +106,8 @@ TagVertexModule::TagVertexModule() : Module(),
            "Minimum number of PXD hits for a track to be used in the vertex fit", 0);
   addParam("fitAlgorithm", m_fitAlgo,
            "Fitter used for the tag vertex fit: Rave or KFit", string("Rave"));
+  addParam("kFitReqReducedChi2", m_kFitReqReducedChi2,
+           "The required chi2/ndf to accept the kFit result, if it is higher, iteration procedure is applied", 5.0);
   addParam("useTruthInFit", m_useTruthInFit,
            "Use the true track parameters in the vertex fit", false);
   addParam("useRollBack", m_useRollBack,
@@ -609,6 +613,7 @@ std::vector<const Particle*> TagVertexModule::getTagTracks_standardAlgorithm(con
   return fitParticles;
 }
 
+
 vector<ParticleAndWeight> TagVertexModule::getParticlesWithoutKS(const vector<const Particle*>& tagParticles,
     double massWindowWidth) const
 {
@@ -633,6 +638,9 @@ vector<ParticleAndWeight> TagVertexModule::getParticlesWithoutKS(const vector<co
       if (!particle2) continue;
       ROOT::Math::PxPyPzEVector mom2 = particle2->get4Vector();
       if (!isfinite(mom2.mag2())) continue;
+
+      if (particle1->getCharge() + particle2->getCharge() != 0.0) continue; //opposite charge check
+
       double mass = (mom1 + mom2).M();
       if (abs(mass - Const::K0Mass) < massWindowWidth) {
         isKsDau = true;
@@ -831,16 +839,57 @@ analysis::VertexFitKFit TagVertexModule::doSingleKfit(vector<ParticleAndWeight>&
   return kFit;
 }
 
+
+static int getLargestChi2ID(const analysis::VertexFitKFit& kFit)
+{
+  int largest_chi2_trackid = -1;
+  double largest_track_chi2 = -1;
+  for (int i = 0; i < kFit.getTrackCount(); ++i) {
+    double track_chi2 = kFit.getTrackCHIsq(i);
+    if (track_chi2 > largest_track_chi2) {
+      largest_track_chi2 = track_chi2;
+      largest_chi2_trackid = i;
+    }
+  }
+  return largest_chi2_trackid;
+}
+
+
+
 //uses m_tagMomentum, m_constraintCenter, m_constraintCov, m_tagParticles
 bool TagVertexModule::makeGeneralFitKFit()
 {
   //feed KFit with tracks without Kshorts
   vector<ParticleAndWeight> particleAndWeights = getParticlesWithoutKS(m_tagParticles);
 
+  analysis::VertexFitKFit kFit;
 
-  analysis::VertexFitKFit kFit =  doSingleKfit(particleAndWeights);
-  if (!kFit.isFitted())
-    return false;
+
+  // iterative procedure which removes tracks with high chi2
+  for (int iteration_counter = 0; iteration_counter < 100; ++iteration_counter) {
+    analysis::VertexFitKFit kFitTemp =  doSingleKfit(particleAndWeights);
+    if (!kFitTemp.isFitted())
+      return false;
+
+    double reduced_chi2 =  kFitTemp.getCHIsq() / kFitTemp.getNDF();
+    int nTracks = kFitTemp.getTrackCount();
+
+    if (nTracks != int(particleAndWeights.size()))
+      B2FATAL("TagVertexModule: Different number of tracks in kFit and particles");
+
+    if (reduced_chi2 <= m_kFitReqReducedChi2 || nTracks <= 1) {
+      kFit = kFitTemp;
+      break;
+    } else { // remove matricle with highest chi2/ndf and continue
+      int badTrackID =  getLargestChi2ID(kFitTemp);
+      if (0 <= badTrackID && badTrackID < int(particleAndWeights.size()))
+        particleAndWeights.erase(particleAndWeights.begin() + badTrackID);
+      else
+        B2FATAL("TagVertexModule: Obtained badTrackID is not within limits");
+    }
+
+  }
+
 
   //save the track info for later use
   //Tracks are sorted by weight, ie pushing the tracks with 0 weight (from KS) to the end of the list

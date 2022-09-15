@@ -143,6 +143,7 @@ namespace Belle2 {
     double m_tagVChi2;            /**< chi^2 value of the tag vertex fit result */
     double m_tagVChi2IP;          /**< IP component of the chi^2 of the tag vertex fit result */
     std::string m_fitAlgo;        /**< Algorithm used for the tag fit (Rave or KFit) */
+    double m_kFitReqReducedChi2;  /**< The required chi2/ndf to accept the kFit result, if it is higher, iteration procedure is applied */
     bool m_verbose;               /**< choose if you want to print extra infos */
     TMatrixDSym m_pvCov;          /**< covariance matrix of the PV (useful with tube and KFit) */
     ROOT::Math::PxPyPzEVector m_tagMomentum; /**< B tag momentum computed from fully reconstructed B sig */
@@ -175,6 +176,8 @@ namespace Belle2 {
     std::vector<const Particle*> getTagTracks_standardAlgorithm(const Particle* Breco, int nPXDHits) const;
 
 
+    /** performs single KFit on particles stored in particleAndWeights
+    this function can be iterated several times unit chi2/ndf of the resulting fit is sufficient */
     analysis::VertexFitKFit doSingleKfit(std::vector<ParticleAndWeight>& particleAndWeights);
 
     /**

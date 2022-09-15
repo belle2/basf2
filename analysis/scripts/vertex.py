@@ -298,6 +298,7 @@ def TagV(
     reqPXDHits=0,
     maskName='all',
     fitAlgorithm='Rave',
+    kFitReqReducedChi2=5.0,
     useTruthInFit=False,
     useRollBack=False,
     path=None,
@@ -327,6 +328,7 @@ def TagV(
               If the fit fails, attempt again with the standard option;
 
         fitAlgorithm (str):     Fitter used for the tag vertex fit: Rave (default) or KFit
+        kFitReqReducedChi2 (float): The required chi2/ndf to accept the kFit result, if it is higher, iteration procedure is applied
         askMCInfo (bool): True when requesting MC Information from the tracks performing the vertex fit
         reqPXDHits (int): minimum N PXD hits for a track (default is 0)
         maskName (str): get particles from a specified ROE mask
@@ -357,6 +359,7 @@ def TagV(
     tvfit.param('askMCInformation', askMCInfo)
     tvfit.param('reqPXDHits', reqPXDHits)
     tvfit.param('fitAlgorithm', fitAlgorithm)
+    tvfit.param('kFitReqReducedChi2', kFitReqReducedChi2)
     tvfit.param('useTruthInFit', useTruthInFit)
     tvfit.param('useRollBack', useRollBack)
     path.add_module(tvfit)

@@ -1284,7 +1284,7 @@ def applyCuts(list_name, cut, path):
     path.add_module(pselect)
 
 
-def applyEventCuts(cut, path):
+def applyEventCuts(cut, path, metavariables=None):
     """
     Removes events that do not pass the ``cut`` (given selection criteria).
 
@@ -1302,6 +1302,7 @@ def applyEventCuts(cut, path):
     Parameters:
         cut (str): Events that do not pass these selection criteria are skipped
         path (basf2.Path): modules are added to this path
+        metavariables (list(str)): List of meta variables to be considered in decomposition of cut
     """
     import b2parser
     from variables import variables
@@ -1325,7 +1326,10 @@ def applyEventCuts(cut, path):
                    'tan', 'atan',
                    'sin', 'asin',
                    'exp', 'log', 'log10',
-                   'min', 'max']
+                   'min', 'max',
+                   'isNAN']
+    if metavariables:
+        metavar_ids += metavariables
     parsed_cut = b2parser.parse(cut)
     var_list = []
     meta_list = []
@@ -2994,6 +2998,42 @@ def writePi0EtaVeto(
                                   {'extraInfo(' + EtaExtraInfoName + ')': EtaExtraInfoName + suffix}, path=roe_path)
 
     path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
+
+
+def lowEnergyPi0Identification(pi0List, gammaList, payloadNameSuffix,
+                               path=None):
+    """
+    Calculate low-energy pi0 identification.
+    The result is stored as ExtraInfo ``lowEnergyPi0Identification``.
+
+    @param pi0List              Pi0 list.
+    @param gammaList            Gamma list. First, an energy cut E > 0.2 is applied
+                                to the photons from this list. Then, all possible combinations with a pi0
+                                daughter photon are formed except the one corresponding to
+                                the reconstructed pi0. The maximum low-energy pi0 veto value is calculated
+                                for such photon pairs and used as one of the input variables for
+                                the identification classifier.
+    @param payloadNameSuffix    Payload name suffix. The weight payloads are stored in
+                                the analysis global tag and have the following names:\n
+                                  * ``'LowEnergyPi0Veto' + payloadNameSuffix``
+                                  * ``'LowEnergyPi0Identification' + payloadNameSuffix``\n
+                                The possible suffixes are:\n
+                                  * ``'Belle1'`` for Belle data.
+                                  * ``'Belle2Release5'`` for Belle II release 5 data (MC14, proc12, buckets 16 - 25).\n
+    @param path                 Module path.
+    """
+    basf2.conditions.prepend_globaltag(getAnalysisGlobaltag())
+    # Select photons with higher energy for formation of veto combinations.
+    cutAndCopyList('gamma:pi0veto', gammaList, 'E > 0.2', path=path)
+    import b2bii
+    payload_name = 'LowEnergyPi0Veto' + payloadNameSuffix
+    path.add_module('LowEnergyPi0VetoExpert', identifier=payload_name,
+                    VetoPi0Daughters=True, GammaListName='gamma:pi0veto',
+                    Pi0ListName=pi0List, Belle1=b2bii.isB2BII())
+    payload_name = 'LowEnergyPi0Identification' + payloadNameSuffix
+    path.add_module('LowEnergyPi0IdentificationExpert',
+                    identifier=payload_name, Pi0ListName=pi0List,
+                    Belle1=b2bii.isB2BII())
 
 
 def getBeamBackgroundProbability(particleList, path=None):

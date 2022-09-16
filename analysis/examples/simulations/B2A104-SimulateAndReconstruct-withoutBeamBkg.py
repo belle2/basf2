@@ -14,9 +14,8 @@
 #                                                                        #
 # This tutorial demonstrates how to perform detector simulation and      #
 # reconstruction (track finding+track fitting+ecl reconstruction+...)    #
-# on a previously generated events.                                      #
+# on previously generated events without beam background mixing.         #
 #                                                                        #
-# See simulation examples for more details                               #
 #                                                                        #
 # The processed events are saved to the output ROOT file that            #
 # now contain in addition to the generated particles                     #
@@ -24,23 +23,17 @@
 # reconstructed MDST objects (Track/ECLCluster/KLMCluster/...).          #
 #                                                                        #
 ##########################################################################
+
 import basf2 as b2
-import mdst as mdst
+import modularAnalysis as ma
 import simulation as si
 import reconstruction as re
-import modularAnalysis as ma
 
-# We previously generated events but we want to simulate them with the
-# currently best values, not whatever was valid back then. So we have to
-# disable reuse of the same globaltag from when the events were generated
-b2.conditions.disable_globaltag_replay()
-
-# create path
+# create a path
 my_path = b2.create_path()
 
 # load input ROOT file
-ma.inputMdst(filename=b2.find_file('B2pi0D_D2hh_D2hhh_B2munu_evtgen.root', 'examples', False),
-             path=my_path)
+ma.inputMdst(filename=b2.find_file('B2A101-Y4SEventGeneration-evtgen.root'), path=my_path)
 
 # simulation
 si.add_simulation(path=my_path)
@@ -49,9 +42,9 @@ si.add_simulation(path=my_path)
 re.add_reconstruction(path=my_path)
 
 # dump in MDST format
-mdst.add_mdst_output(path=my_path,
-                     mc=True,
-                     filename='B2pi0D_D2hh_D2hhh_B2munu.root')
+re.add_mdst_output(path=my_path,
+                   mc=True,
+                   filename='B2A101-Y4SEventGeneration-gsim-BKGx0.root')
 
 # Show progress of processing
 my_path.add_module('ProgressBar')

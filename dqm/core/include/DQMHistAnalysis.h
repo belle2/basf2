@@ -44,6 +44,10 @@ namespace Belle2 {
      */
     typedef std::map<std::string, HistDelta*> DeltaList;
 
+    /**
+     * The type of list of canvas updated status.
+     */
+    typedef std::map<std::string, bool> CanvasUpdatedList;
 
   private:
     /**
@@ -59,6 +63,11 @@ namespace Belle2 {
      * The list of Delta Histograms and settings.
      */
     static DeltaList g_delta;
+
+    /**
+     * The list of canvas updated status.
+     */
+    static CanvasUpdatedList g_canvasup;
 
   public:
     /**
@@ -78,6 +87,12 @@ namespace Belle2 {
      * @return The list of the delta histograms.
      */
     static const DeltaList& getDeltaList() { return g_delta;};
+
+    /**
+     * Get the list of the canvas update status.
+     * @return The list of the canvases.
+     */
+    static const CanvasUpdatedList& getCanvasUpdatedList() { return g_canvasup;};
 
     /**
      * Find canvas by name
@@ -181,6 +196,13 @@ namespace Belle2 {
      * @param a amount of histograms in the past
      */
     void addDeltaPar(const std::string& dirname, const std::string& histname, int t, int p, unsigned int a);
+
+    /**
+     * Mark canvas as updated (or not)
+     * @param name name of Canvas
+     * @param updated was updated
+     */
+    void UpdateCanvas(std::string name, bool updated = true);
 
     // Public functions
   public:

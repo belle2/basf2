@@ -30,6 +30,7 @@ REG_MODULE(DQMHistAnalysis);
 DQMHistAnalysisModule::HistList DQMHistAnalysisModule::g_hist;
 DQMHistAnalysisModule::MonObjList DQMHistAnalysisModule::g_monObj;
 DQMHistAnalysisModule::DeltaList DQMHistAnalysisModule::g_delta;
+DQMHistAnalysisModule::CanvasUpdatedList DQMHistAnalysisModule::g_canvasup;
 
 
 DQMHistAnalysisModule::DQMHistAnalysisModule() : Module()
@@ -214,9 +215,16 @@ void DQMHistAnalysisModule::initHistListBeforeEvent(void)
   for (auto d : g_delta) {
     d.second->setNotUpdated();
   }
+
+  g_canvasup.clear();
 }
 
 void DQMHistAnalysisModule::clearHistList(void)
 {
   g_hist.clear();
+}
+
+void  DQMHistAnalysisModule::UpdateCanvas(std::string name, bool updated)
+{
+  g_canvasup[name] = updated;
 }

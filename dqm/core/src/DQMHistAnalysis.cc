@@ -29,26 +29,62 @@ REG_MODULE(DQMHistAnalysis);
 
 DQMHistAnalysisModule::HistList DQMHistAnalysisModule::g_hist;
 DQMHistAnalysisModule::MonObjList DQMHistAnalysisModule::g_monObj;
+DQMHistAnalysisModule::DeltaList DQMHistAnalysisModule::g_delta;
+
 
 DQMHistAnalysisModule::DQMHistAnalysisModule() : Module()
 {
   //Set module properties
-  setDescription("Histogram Analysis module");
-}
-
-
-DQMHistAnalysisModule::~DQMHistAnalysisModule()
-{
-
+  setDescription("Histogram Analysis module base class");
 }
 
 void DQMHistAnalysisModule::addHist(const std::string& dirname, const std::string& histname, TH1* h)
 {
+  std::string fullname;
   if (dirname.size() > 0) {
-    g_hist.insert(HistList::value_type(dirname + "/" + histname, h));
+    fullname = dirname + "/" + histname;
   } else {
-    g_hist.insert(HistList::value_type(histname, h));
+    fullname = histname;
   }
+  g_hist.insert(HistList::value_type(fullname, h));
+
+  // check if delta histogram update needed
+  auto it = g_delta.find(fullname);
+  if (it != g_delta.end()) {
+    B2INFO("Found Delta" << fullname);
+    it->second->update(h); // update
+  }
+}
+
+void DQMHistAnalysisModule::addDeltaPar(const std::string& dirname, const std::string& histname, int t, int p, unsigned int a)
+{
+  std::string fullname;
+  if (dirname.size() > 0) {
+    fullname = dirname + "/" + histname;
+  } else {
+    fullname = histname;
+  }
+  g_delta[fullname] = new HistDelta(t, p, a);
+}
+
+TH1* DQMHistAnalysisModule::getDelta(const std::string& dirname, const std::string& histname, int n)
+{
+  std::string fullname;
+  if (dirname.size() > 0) {
+    fullname = dirname + "/" + histname;
+  } else {
+    fullname = histname;
+  }
+  return getDelta(fullname, n);
+}
+
+TH1* DQMHistAnalysisModule::getDelta(const std::string& fullname, int n)
+{
+  auto it = g_delta.find(fullname);
+  if (it != g_delta.end()) {
+    return it->second->getDelta(n);
+  }
+  return nullptr;
 }
 
 MonitoringObject* DQMHistAnalysisModule::getMonitoringObject(const std::string& objName)
@@ -87,10 +123,10 @@ TH1* DQMHistAnalysisModule::findHist(const std::string& histname)
     if (g_hist[histname]) {
       return g_hist[histname];
     } else {
-      B2ERROR("Histogram " << histname << " listed as being in memfile but points to nowhere.");
+      B2ERROR("Histogram " << histname << " in histogram list but nullptr.");
     }
   }
-  B2INFO("Histogram " << histname << " not in memfile.");
+  B2INFO("Histogram " << histname << " not in list.");
   return nullptr;
 }
 

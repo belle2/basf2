@@ -14,6 +14,7 @@
 
 #include <framework/core/Module.h>
 #include <dqm/core/MonitoringObject.h>
+#include <dqm/analysis/HistDelta.h>
 #include <TFile.h>
 #include <TH1.h>
 
@@ -37,6 +38,10 @@ namespace Belle2 {
      */
     typedef std::map<std::string, MonitoringObject*> MonObjList;
 
+    /**
+     * The type of list of delta settings and histograms.
+     */
+    typedef std::map<std::string, HistDelta*> DeltaList;
 
 
   private:
@@ -49,6 +54,10 @@ namespace Belle2 {
      */
     static MonObjList g_monObj;
 
+    /**
+     * The list of Delta Histograms and settings.
+     */
+    static DeltaList g_delta;
 
   public:
     /**
@@ -64,6 +73,12 @@ namespace Belle2 {
     static const MonObjList& getMonObjList() { return g_monObj;};
 
     /**
+     * Get the list of the delta histograms.
+     * @return The list of the delta histograms.
+     */
+    static const DeltaList& getDeltaList() { return g_delta;};
+
+    /**
      * Find canvas by name
      * @param cname Name of the canvas
      * @return The pointer to the canvas, or nullptr if not found.
@@ -71,8 +86,8 @@ namespace Belle2 {
     TCanvas* findCanvas(TString cname);
 
     /**
-     * Find histogram.
-     * @param histname The name of the histogram.
+     * Get histogram from list (no other search).
+     * @param histname The name of the histogram (incl dir).
      * @return The found histogram, or nullptr if not found.
      */
     static TH1* findHist(const std::string& histname);
@@ -121,6 +136,7 @@ namespace Belle2 {
     /**
      * Get MonitoringObject with given name (new object is created if non-existing)
      * @param histname name of MonitoringObject to get
+     * @return The MonitoringObject
      */
     static MonitoringObject* getMonitoringObject(const std::string& histname);
 
@@ -129,12 +145,39 @@ namespace Belle2 {
      */
     static void resetHist() { g_hist = std::map<std::string, TH1*>(); }
 
+    /**
+     * Get Delta histogram.
+     * @param fullname directory+name of histogram
+     * @param n index of delta histogram, 0 is most recent one
+     * @return delta histogram or nullptr
+     */
+    TH1* getDelta(const std::string& fullname, int n = 0);
+
+    /**
+     * Get Delta histogram.
+     * @param dirname directory
+     * @param histname name of histogram
+     * @param n index of delta histogram, 0 is most recent one
+     * @return delta histogram or nullptr
+     */
+    TH1* getDelta(const std::string& dirname, const std::string& histname, int n = 0);
+
+    /**
+     * Add Delta histogram parameters.
+     * @param dirname directory
+     * @param histname name of histogram
+     * @param t type of delta histogramming
+     * @param p numerical parameter depnding on type, e.g. number of entries
+     * @param a amount of histograms in the past
+     */
+    void addDeltaPar(const std::string& dirname, const std::string& histname, int t, int p, unsigned int a);
+
     // Public functions
   public:
 
     //! Constructor / Destructor
     DQMHistAnalysisModule();
-    virtual ~DQMHistAnalysisModule();
+    virtual ~DQMHistAnalysisModule() {};
 
     /**
      * Helper function for string token split

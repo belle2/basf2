@@ -18,11 +18,12 @@ namespace Belle2 {
    */
   class HistDelta {
   public:
-    int m_type; /**< type of delta algo, 0=disable */
-    int m_parameter; /**< parameter depending on algo, e.g. nr of entries or events */
-    unsigned int m_amountDeltas; /**< amount of past histograms, at least 1*/
-    TH1* m_lastHist;/**< Pointer to last histogram state for check */
+    int m_type{}; /**< type of delta algo, 0=disable */
+    int m_parameter{}; /**< parameter depending on algo, e.g. nr of entries or events */
+    unsigned int m_amountDeltas{}; /**< amount of past histograms, at least 1*/
+    TH1* m_lastHist{};/**< Pointer to last histogram state for check */
     std::vector<TH1*> m_deltaHists;/**< vector of histograms (max m_amountDeltas) */
+    bool m_updated{};/**< if any delta was updated in this event */
   public:
 
     /** Construktor
@@ -35,9 +36,13 @@ namespace Belle2 {
     /** Parameter setter
      * @param t type
      * @param p parameter for type
-     * @param a amount of deletas in the past
+     * @param a amount of deltas in the past
      */
     void set(int t, int p, unsigned int a);
+
+    /** Set not-updated yet status
+     */
+    void setNotUpdated(void) {m_updated = false;};
 
     /** Check if update of delta histogram is necessary
      * @param hist pointer to histogram
@@ -49,10 +54,10 @@ namespace Belle2 {
     void reset(void);
 
     /** Get Delta Histogram
-     * @param n number of delta into teh past, 0 is most recent one
+     * @param n number of delta into the past, 0 is most recent one
+     * @param onlyIfUpdated req only updated deltas, return nullptr otherwise
      * @return Found histogram or nullptr
      */
-    TH1* getDelta(unsigned int n = 0);
+    TH1* getDelta(unsigned int n = 0, bool onlyIfUpdated = true);
   };
-
 }

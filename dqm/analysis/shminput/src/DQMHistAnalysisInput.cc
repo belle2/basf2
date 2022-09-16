@@ -73,10 +73,13 @@ void DQMHistAnalysisInputModule::initialize()
 void DQMHistAnalysisInputModule::beginRun()
 {
   B2INFO("DQMHistAnalysisInput: beginRun called.");
+  clearHistList();
 }
 
 void DQMHistAnalysisInputModule::event()
 {
+  initHistListBeforeEvent();
+
   sleep(m_interval);
   std::vector<TH1*> hs;
   char mbstr[100];
@@ -198,7 +201,6 @@ void DQMHistAnalysisInputModule::event()
   B2INFO("DQMHistAnalysisInput: " << m_memname + ": Exp " + expno + ", Run " + runno + ", RunType " + rtype + ", Last Updated " +
          mmt.AsString());
 
-  resetHist();
   for (size_t i = 0; i < hs.size(); i++) {
     TH1* h = hs[i];
     addHist("", h->GetName(), h);

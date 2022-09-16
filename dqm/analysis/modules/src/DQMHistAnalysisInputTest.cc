@@ -52,6 +52,7 @@ void DQMHistAnalysisInputTestModule::initialize()
 void DQMHistAnalysisInputTestModule::beginRun()
 {
   B2INFO("DQMHistAnalysisInputTest: beginRun called. Run: " << m_runno);
+  clearHistList();
 
   m_count = 0;
   m_testHisto->Reset();
@@ -64,6 +65,8 @@ void DQMHistAnalysisInputTestModule::event()
 
   B2INFO("DQMHistAnalysisInputTest: event called.");
 
+  initHistListBeforeEvent();
+
   if (m_count > m_events) {
     m_eventMetaDataPtr.create();
     m_eventMetaDataPtr->setEndOfData();
@@ -73,8 +76,6 @@ void DQMHistAnalysisInputTestModule::event()
   // change mean from 100 -> 900 over the full "run"
   m_func->SetParameter(1, 100 + m_count * 800. / m_events);
   m_testHisto->FillRandom("mygaus", 500);
-
-  resetHist();
 
   addHist("test", m_testHisto->GetName(), m_testHisto);
 

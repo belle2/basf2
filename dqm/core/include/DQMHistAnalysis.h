@@ -14,6 +14,7 @@
 
 #include <framework/core/Module.h>
 #include <dqm/core/MonitoringObject.h>
+#include <dqm/analysis/HistObject.h>
 #include <dqm/analysis/HistDelta.h>
 #include <TFile.h>
 #include <TH1.h>
@@ -32,7 +33,7 @@ namespace Belle2 {
     /**
      * The type of list of histograms.
      */
-    typedef std::map<std::string, TH1*> HistList;
+    typedef std::map<std::string, HistObject> HistList;
     /**
      * The type of list of MonitoringObjects.
      */
@@ -43,6 +44,10 @@ namespace Belle2 {
      */
     typedef std::map<std::string, HistDelta*> DeltaList;
 
+    /**
+     * The type of list of canvas updated status.
+     */
+    typedef std::map<std::string, bool> CanvasUpdatedList;
 
   private:
     /**
@@ -58,6 +63,11 @@ namespace Belle2 {
      * The list of Delta Histograms and settings.
      */
     static DeltaList g_delta;
+
+    /**
+     * The list of canvas updated status.
+     */
+    static CanvasUpdatedList g_canvasup;
 
   public:
     /**
@@ -79,6 +89,12 @@ namespace Belle2 {
     static const DeltaList& getDeltaList() { return g_delta;};
 
     /**
+     * Get the list of the canvas update status.
+     * @return The list of the canvases.
+     */
+    static const CanvasUpdatedList& getCanvasUpdatedList() { return g_canvasup;};
+
+    /**
      * Find canvas by name
      * @param cname Name of the canvas
      * @return The pointer to the canvas, or nullptr if not found.
@@ -88,18 +104,20 @@ namespace Belle2 {
     /**
      * Get histogram from list (no other search).
      * @param histname The name of the histogram (incl dir).
+     * @param onlyIfUpdated req only updated hists, return nullptr otherwise
      * @return The found histogram, or nullptr if not found.
      */
-    static TH1* findHist(const std::string& histname);
+    static TH1* findHist(const std::string& histname, bool onlyIfUpdated = false);
 
     /**
      * Find histogram.
      * @param dirname  The name of the directory.
      * @param histname The name of the histogram.
+     * @param onlyIfUpdated req only updated hists, return nullptr otherwise
      * @return The found histogram, or nullptr if not found.
      */
     static TH1* findHist(const std::string& dirname,
-                         const std::string& histname);
+                         const std::string& histname, bool onlyIfUpdated = false);
 
     /**
      * Find histogram in specific TFile (e.g. ref file).
@@ -141,26 +159,33 @@ namespace Belle2 {
     static MonitoringObject* getMonitoringObject(const std::string& histname);
 
     /**
-     * Clear and reset the list of histograms.
+     * Reset the list of histograms.
      */
-    static void resetHist() { g_hist = std::map<std::string, TH1*>(); }
+    static void initHistListBeforeEvent(void);
+
+    /**
+     * Clears the list of histograms.
+     */
+    static void clearHistList(void);
 
     /**
      * Get Delta histogram.
      * @param fullname directory+name of histogram
      * @param n index of delta histogram, 0 is most recent one
+     * @param onlyIfUpdated req only updated deltas, return nullptr otherwise
      * @return delta histogram or nullptr
      */
-    TH1* getDelta(const std::string& fullname, int n = 0);
+    TH1* getDelta(const std::string& fullname, int n = 0, bool onlyIfUpdated = true);
 
     /**
      * Get Delta histogram.
      * @param dirname directory
      * @param histname name of histogram
      * @param n index of delta histogram, 0 is most recent one
+     * @param onlyIfUpdated req only updated deltas, return nullptr otherwise
      * @return delta histogram or nullptr
      */
-    TH1* getDelta(const std::string& dirname, const std::string& histname, int n = 0);
+    TH1* getDelta(const std::string& dirname, const std::string& histname, int n = 0, bool onlyIfUpdated = true);
 
     /**
      * Add Delta histogram parameters.
@@ -171,6 +196,13 @@ namespace Belle2 {
      * @param a amount of histograms in the past
      */
     void addDeltaPar(const std::string& dirname, const std::string& histname, int t, int p, unsigned int a);
+
+    /**
+     * Mark canvas as updated (or not)
+     * @param name name of Canvas
+     * @param updated was updated
+     */
+    void UpdateCanvas(std::string name, bool updated = true);
 
     // Public functions
   public:

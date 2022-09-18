@@ -73,16 +73,20 @@ namespace Belle2 {
     ~BBBrem() {};
 
     /** Initializes the generator.
-     * @cmsEnergy The center of mass energy in [GeV].
-     * @minPhotonEFrac The minimum photon energy fraction. The min. photon energy is this fraction * beam energy.
-     * @unweighted Set to true to generate unweighted events (e.g. for detector simulation), set to false for weighted events.
-     * @maxWeight The maximum weight. Only required in the case of unweighted events.
+     * @param cmsEnergy The center of mass energy in [GeV].
+     * @param minPhotonEFrac The minimum photon energy fraction. The min. photon energy is this fraction * beam energy.
+     * @param unweighted Set to true to generate unweighted events (e.g. for detector simulation), set to false for weighted events.
+     * @param maxWeight The maximum weight. Only required in the case of unweighted events.
+     * @param densitymode TODO
+     * @param densityparameter TODO
      */
     void init(double cmsEnergy, double minPhotonEFrac, bool unweighted = true, double maxWeight = 2000.0, int densitymode = 1,
               double densityparameter = 1.68e-17);
 
     /** Generates one single event.
      * @param mcGraph Reference to the MonteCarlo graph into which the generated particles will be stored.
+     * @param vertex Production vertex.
+     * @param boost Lorentz boost vector.
      * @return Returns the weight of the event.
      */
     double generateEvent(MCParticleGraph& mcGraph, ROOT::Math::XYZVector vertex, ROOT::Math::LorentzRotation boost);
@@ -154,10 +158,10 @@ namespace Belle2 {
     /** Store a single generated particle into the MonteCarlo graph.
      * @param mcGraph Reference to the MonteCarlo graph into which the particle should be stored.
      * @param mom The 3-momentum of the particle in [GeV].
-     * @param vtx The vertex of the particle in [mm].
      * @param pdg The PDG code of the particle.
+     * @param vertex The vertex of the particle in [mm].
+     * @param boost Lorentz boost vector.
      * @param isVirtual If the particle is a virtual particle, such as the incoming particles, set this to true.
-     *
      * @param isInitial If the particle is a initial particle for ISR, set this to true.
      */
     void storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, ROOT::Math::XYZVector vertex,

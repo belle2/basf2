@@ -50,7 +50,8 @@ namespace TreeFitter {
   {
     if (particle) {
       for (auto daughter : particle->getDaughters()) {
-        addDaughter(daughter, config, forceFitAll);
+        if (not daughter->hasExtraInfo("treeFitterTreatMeAsInvisible"))
+          addDaughter(daughter, config, forceFitAll);
       }
     } else {
       B2ERROR("Trying to create an InternalParticle from NULL. This should never happen.");

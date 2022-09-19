@@ -101,7 +101,7 @@ class BaseFEISkim(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, Full Event Interpretation"
 
-    FEIPrefix = "FEIv4_2021_MC14_release_05_01_12"
+    FEIPrefix = "FEIv4_2022_MC15_light-2205-abys"
     """Prefix label for the FEI training used in the FEI skims."""
 
     FEIChannelArgs = {}

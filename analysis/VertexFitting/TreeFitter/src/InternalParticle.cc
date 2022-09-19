@@ -50,7 +50,7 @@ namespace TreeFitter {
   {
     if (particle) {
       for (auto daughter : particle->getDaughters()) {
-        if (not daughter->hasExtraInfo("treeFitterTreatMeAsInvisible"))
+        if (not particle->hasExtraInfo("treeFitterTreatMeAsInvisible"))
           addDaughter(daughter, config, forceFitAll);
       }
     } else {

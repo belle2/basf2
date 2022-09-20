@@ -139,7 +139,7 @@ if tags.has('light'):  # noqa
 # now we need to exclude everything in the build dir except for the tools_doc
 # sub dir but there's no negative exclusion pattern so do it manually
 exclude_patterns.remove("build")
-exclude_patterns += ['build/html', 'build/latex', 'build/json', 'build/Linux*']
+exclude_patterns += ['build/html', 'build/latex', 'build/json', 'build/Linux*', 'build/belle2_tools']
 # Ignore jupyter notebooks by default, we only want the ones meant for documentation
 exclude_patterns += ['**/*.ipynb', '*.ipynb']
 

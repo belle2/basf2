@@ -198,8 +198,8 @@ namespace Belle2 {
     int m_trackHypothesis; /**< pdg code for track hypothesis that should be used to create the particle */
 
     int m_dummyMDSTIndex;  /**< mdst index for dummy particles */
-    double m_dummyCovMatrix;  /** diag value of cov matrix for dummy particles */
-    bool m_dummyTreatAsInvisible; /** should treeFitter treat the particle as invisible? */
+    double m_dummyCovMatrix;  /**< diag value of cov matrix for dummy particles */
+    bool m_dummyTreatAsInvisible; /**< should treeFitter treat the particle as invisible? */
 
     bool m_enforceFitHypothesis =
       false; /**<If true, a Particle is only created if a track fit with the particle hypothesis passed to the ParticleLoader is available. */

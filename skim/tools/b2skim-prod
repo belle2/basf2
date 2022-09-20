@@ -266,7 +266,6 @@ def verify_registry(sampleRegistry, mcri, mcrd):
             for (sampleLabel, sampleInfo) in sampleRegistry.items()
             for expectedEntry in expectedDataEntries
             if expectedEntry not in sampleInfo.keys()
-
         ]
 
     if missingEntries:

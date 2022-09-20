@@ -293,7 +293,7 @@ def TagV(
     MCassociation='',
     confidenceLevel=0.,
     trackFindingType="standard_PXD",
-    constraintType="IP",
+    constraintType="Tube",
     askMCInfo=False,
     reqPXDHits=0,
     maskName='all',

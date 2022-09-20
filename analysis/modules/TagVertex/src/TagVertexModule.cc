@@ -94,7 +94,7 @@ TagVertexModule::TagVertexModule() : Module(),
            "'': no MC association. breco: use standard Breco MC association. internal: use internal MC association", string("breco"));
   addParam("constraintType", m_constraintType,
            "Choose the type of the constraint: noConstraint, IP (tag tracks constrained to be within the beam spot), tube (long tube along the BTag line of flight, only for fully reconstruced B rec), boost (long tube along the Upsilon(4S) boost direction), (breco)",
-           string("IP"));
+           string("Tube"));
   addParam("trackFindingType", m_trackFindingType,
            "Choose how to reconstruct the tracks on the tag side: standard, standard_PXD",
            string("standard_PXD"));
@@ -105,7 +105,7 @@ TagVertexModule::TagVertexModule() : Module(),
   addParam("reqPXDHits", m_reqPXDHits,
            "Minimum number of PXD hits for a track to be used in the vertex fit", 0);
   addParam("fitAlgorithm", m_fitAlgo,
-           "Fitter used for the tag vertex fit: Rave or KFit", string("Rave"));
+           "Fitter used for the tag vertex fit: Rave or KFit", string("KFit"));
   addParam("kFitReqReducedChi2", m_kFitReqReducedChi2,
            "The required chi2/ndf to accept the kFit result, if it is higher, iteration procedure is applied", 5.0);
   addParam("useTruthInFit", m_useTruthInFit,
@@ -865,7 +865,6 @@ bool TagVertexModule::makeGeneralFitKFit()
     }
 
   }
-  TMatrixDSym m = CLHEPToROOT::getTMatrixDSym(kFit.getVertexError());
 
   //save the track info for later use
   //Tracks are sorted by weight, ie pushing the tracks with 0 weight (from KS) to the end of the list

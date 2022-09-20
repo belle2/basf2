@@ -22,7 +22,7 @@
 #include <TCanvas.h>
 
 namespace Belle2 {
-  /*! DQM Histogram Analysis for PXD DAQ */
+  /*! DQM Delta Histogram Test code and example */
 
   class DQMHistAnalysisDeltaTestModule : public DQMHistAnalysisModule {
 

@@ -77,7 +77,7 @@ REG_MODULE(TagVertex);
 TagVertexModule::TagVertexModule() : Module(),
   m_Bfield(0), m_fitTruthStatus(0), m_rollbackStatus(0), m_fitPval(0), m_mcTagLifeTime(-1), m_mcPDG(0), m_mcLifeTimeReco(-1),
   m_deltaT(0), m_deltaTErr(0), m_mcDeltaTau(0), m_mcDeltaT(0),
-  m_shiftZ(0), m_FitType(0), m_tagVl(0),
+  m_FitType(0), m_tagVl(0),
   m_truthTagVl(0), m_tagVlErr(0), m_tagVol(0), m_truthTagVol(0), m_tagVolErr(0), m_tagVNDF(0), m_tagVChi2(0), m_tagVChi2IP(0),
   m_kFitReqReducedChi2(5),
   m_verbose(true)
@@ -280,16 +280,17 @@ bool TagVertexModule::doVertexFit(const Particle* Breco)
   double bg = beta / sqrt(1 - beta * beta);
 
   //TODO: What's the origin of these numbers?
-  double cut = 8.717575e-02 * bg;
-  m_shiftZ = 4.184436e+02 * bg *  0.0001;
+  double tauB = 1.519; //B0 lifetime in ps
+  double c = Const::speedOfLight / 1000.; // cm ps-1
+  double lB0  = tauB * bg * c;
 
   //tube length here set to 20 * 2 * c tau beta gamma ~= 0.5 cm, should be enough to not bias the decay
   //time but should still help getting rid of some pions from kshorts
   m_constraintCov.ResizeTo(3, 3);
-  if (m_constraintType == "IP")         tie(m_constraintCenter, m_constraintCov) = findConstraintBoost(cut);
-  else if (m_constraintType == "tube")  tie(m_constraintCenter, m_constraintCov) = findConstraintBTube(Breco, 1000 * cut);
-  else if (m_constraintType == "boost") tie(m_constraintCenter, m_constraintCov) = findConstraintBoost(cut * 200000.);
-  else if (m_constraintType == "breco") tie(m_constraintCenter, m_constraintCov) = findConstraint(Breco, cut * 2000.);
+  if (m_constraintType == "IP")         tie(m_constraintCenter, m_constraintCov) = findConstraintBoost(2 * lB0);
+  else if (m_constraintType == "tube")  tie(m_constraintCenter, m_constraintCov) = findConstraintBTube(Breco, 200 * lB0);
+  else if (m_constraintType == "boost") tie(m_constraintCenter, m_constraintCov) = findConstraintBoost(200 * lB0);
+  else if (m_constraintType == "breco") tie(m_constraintCenter, m_constraintCov) = findConstraint(Breco, 200 * lB0);
   else if (m_constraintType == "noConstraint") m_constraintCenter = B2Vector3D(); //zero vector
   else  {
     B2ERROR("TagVertex: Invalid constraintType selected");
@@ -327,7 +328,7 @@ bool TagVertexModule::doVertexFit(const Particle* Breco)
   }
 
   if ((ok == false || (m_fitPval <= 0. && m_fitAlgo == "Rave")) && m_constraintType != "noConstraint") {
-    tie(m_constraintCenter, m_constraintCov) = findConstraintBoost(cut * 200000.);
+    tie(m_constraintCenter, m_constraintCov) = findConstraintBoost(200 * lB0);
     ok = (m_constraintCenter != vecNaN);
     if (ok) {
       m_tagParticles = getTagTracks_standardAlgorithm(Breco, m_reqPXDHits);
@@ -490,11 +491,16 @@ pair<B2Vector3D, TMatrixDSym> TagVertexModule::findConstraintBTube(const Particl
   return make_pair(B2Vector3D(constraintCenter), toSymMatrix(pvNew));
 }
 
-pair<B2Vector3D, TMatrixDSym> TagVertexModule::findConstraintBoost(double cut, double shiftAlongBoost) const
+pair<B2Vector3D, TMatrixDSym> TagVertexModule::findConstraintBoost(double cut) const
 {
+  double d = 20e-4; //average transverse distance flown by B0
+
   //make a long error matrix along boost direction
   TMatrixD longerror(3, 3); longerror(2, 2) = cut * cut;
+  longerror(0, 0) = longerror(1, 1) = d * d;
+
   B2Vector3D boostDir = PCmsLabTransform().getBoostVector().Unit();
+
   TMatrixD longerrorRotated = rotateTensor(boostDir, longerror);
 
   //Extend error of BeamSpotCov matrix in the boost direction
@@ -503,11 +509,6 @@ pair<B2Vector3D, TMatrixDSym> TagVertexModule::findConstraintBoost(double cut, d
 
   // Standard algorithm needs no shift
   B2Vector3D constraintCenter = m_BeamSpotCenter;
-
-  // The constraint used in the Single Track Fit needs to be shifted in the boost direction.
-  if (shiftAlongBoost > -1000) {
-    constraintCenter +=  shiftAlongBoost * boostDir;
-  }
 
   return make_pair(constraintCenter,   toSymMatrix(Tube));
 }
@@ -864,7 +865,7 @@ bool TagVertexModule::makeGeneralFitKFit()
     }
 
   }
-
+  TMatrixDSym m = CLHEPToROOT::getTMatrixDSym(kFit.getVertexError());
 
   //save the track info for later use
   //Tracks are sorted by weight, ie pushing the tracks with 0 weight (from KS) to the end of the list

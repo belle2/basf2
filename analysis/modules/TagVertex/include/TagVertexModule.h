@@ -130,7 +130,6 @@ namespace Belle2 {
     B2Vector3D m_BeamSpotCenter;    /**< Beam spot position */
     TMatrixDSym m_BeamSpotCov;    /**< size of the beam spot == covariance matrix on the beam spot position */
     bool m_mcInfo;                /**< true if user wants to retrieve MC information out from the tracks used in the fit */
-    double m_shiftZ;              /**< parameter for testing the systematic error from the IP measurement*/
     DBObjPtr<BeamSpot> m_beamSpotDB;/**< Beam spot database object*/
     int m_FitType;                /**< fit algo used  */
     double m_tagVl;               /**< tagV component in the boost direction  */
@@ -159,7 +158,7 @@ namespace Belle2 {
     std::pair<B2Vector3D, TMatrixDSym> findConstraint(const Particle* Breco, double cut) const;
 
     /** calculate the standard constraint for the vertex fit on the tag side*/
-    std::pair<B2Vector3D, TMatrixDSym> findConstraintBoost(double cut, double shiftAlongBoost = -2000.) const;
+    std::pair<B2Vector3D, TMatrixDSym> findConstraintBoost(double cut) const;
 
     /** calculate constraint for the vertex fit on the tag side using the B tube (cylinder along
     the expected BTag line of flights */

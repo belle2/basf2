@@ -7,6 +7,7 @@
  **************************************************************************/
 #pragma once
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
 
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
@@ -138,5 +139,7 @@ namespace Belle2 {
     /** Decay descriptor of the invisible particles */
     DecayDescriptor m_pDDescriptorInvisibles;
 
+    /** StoreArray of Particles */
+    StoreArray<Particle> m_particles;
   };
 }

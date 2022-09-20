@@ -163,7 +163,8 @@ namespace TreeFitter {
       } else { // Got gammas -> composite particle
         rc = new RecoComposite(particle, mother, config, true);
       }
-    } else if (particle->hasExtraInfo("treeFitterTreatMeAsInvisible")) { // dummy particles with invisible flag
+    } else if (particle->hasExtraInfo("treeFitterTreatMeAsInvisible")
+               && particle->getExtraInfo("treeFitterTreatMeAsInvisible") == 1) { // dummy particles with invisible flag
       rc = new RecoResonance(particle, mother, config);
 
     } else if (particle->getMdstArrayIndex() ||

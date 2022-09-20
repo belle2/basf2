@@ -49,9 +49,10 @@ namespace TreeFitter {
     m_automatic_vertex_constraining(config.m_automatic_vertex_constraining)
   {
     if (particle) {
-      for (auto daughter : particle->getDaughters()) {
-        if (not particle->hasExtraInfo("treeFitterTreatMeAsInvisible"))
+      if (not particle->hasExtraInfo("treeFitterTreatMeAsInvisible") and particle->getExtraInfo("treeFitterTreatMeAsInvisible") != 1) {
+        for (auto daughter : particle->getDaughters()) {
           addDaughter(daughter, config, forceFitAll);
+        }
       }
     } else {
       B2ERROR("Trying to create an InternalParticle from NULL. This should never happen.");

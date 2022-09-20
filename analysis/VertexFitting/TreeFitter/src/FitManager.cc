@@ -298,7 +298,8 @@ namespace TreeFitter {
   {
     const bool updateableMother = updateCand(cand, isTreeHead);
 
-    if (updateableMother and not cand.hasExtraInfo("bremsCorrected") and not cand.hasExtraInfo("treeFitterTreatMeAsInvisible")) {
+    if (updateableMother and not cand.hasExtraInfo("bremsCorrected") and not cand.hasExtraInfo("treeFitterTreatMeAsInvisible")
+        and cand.getExtraInfo("treeFitterTreatMeAsInvisible") != 1) {
       const int ndaughters = cand.getNDaughters();
       for (int i = 0; i < ndaughters; i++) {
         auto* daughter = const_cast<Belle2::Particle*>(cand.getDaughter(i));

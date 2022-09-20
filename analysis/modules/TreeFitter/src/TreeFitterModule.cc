@@ -93,8 +93,6 @@ void TreeFitterModule::initialize()
 {
   m_plist.isRequired(m_particleList);
   StoreArray<Particle>().isRequired();
-  StoreArray<Belle2::Particle> particles;
-  particles.isRequired();
   m_nCandidatesBeforeFit = 0;
   m_nCandidatesAfter = 0;
 
@@ -122,8 +120,6 @@ void TreeFitterModule::beginRun()
 
 void TreeFitterModule::event()
 {
-  StoreArray<Particle> particles;
-
   if (!m_plist) {
     B2ERROR("ParticleList " << m_particleList << " not found");
     return;
@@ -147,7 +143,7 @@ void TreeFitterModule::event()
 
     if (!m_treatAsInvisible.empty()) {
       std::vector<const Particle*> selParticlesTarget = m_pDDescriptorInvisibles.getSelectionParticles(particle);
-      Particle* targetD = particles[selParticlesTarget[0]->getArrayIndex()];
+      Particle* targetD = m_particles[selParticlesTarget[0]->getArrayIndex()];
       targetD->writeExtraInfo("treeFitterTreatMeAsInvisible", 1);
       targetD->setMomentumVertexErrorMatrix(dummyCovMatrix);
     }

@@ -94,7 +94,7 @@ TagVertexModule::TagVertexModule() : Module(),
            "'': no MC association. breco: use standard Breco MC association. internal: use internal MC association", string("breco"));
   addParam("constraintType", m_constraintType,
            "Choose the type of the constraint: noConstraint, IP (tag tracks constrained to be within the beam spot), tube (long tube along the BTag line of flight, only for fully reconstruced B rec), boost (long tube along the Upsilon(4S) boost direction), (breco)",
-           string("Tube"));
+           string("tube"));
   addParam("trackFindingType", m_trackFindingType,
            "Choose how to reconstruct the tracks on the tag side: standard, standard_PXD",
            string("standard_PXD"));

@@ -90,8 +90,7 @@ void ParticleMomentumUpdaterModule::event()
     Particle* targetP = particles[selParticlesTarget[0]->getArrayIndex()];
     Particle* daughterCopy = Belle2::ParticleCopy::copyParticle(targetP);
     daughterCopy->set4Vector(boost4Vector - daughters4Vector);
-    iParticle->removeDaughter(targetP);
-    iParticle->appendDaughter(daughterCopy);
+    iParticle->replaceDaughter(targetP, daughterCopy);
   }
 }
 

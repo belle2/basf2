@@ -394,7 +394,7 @@ namespace Belle2 {
     /**
      * Replace index of given daughter with new daughter
      * @param oldDaughter pointer to the daughter that will be removed
-     * @param oldDaughter pointer to the particle that will be added as a daughter
+     * @param newDaughter pointer to the particle that will be added as a daughter
      */
     void replaceDaughter(const Particle* oldDaughter, const Particle* newDaughter);
 

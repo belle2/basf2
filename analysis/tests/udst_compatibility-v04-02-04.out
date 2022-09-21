@@ -13,6 +13,7 @@ Untested method Particle::isMostLikelyTrackFitResult
 Untested method Particle::overlapsWith
 Untested method Particle::removeDaughter
 Untested method Particle::removeExtraInfo
+Untested method Particle::replaceDaughter
 Untested method Particle::set4Vector
 Untested method Particle::setExtraInfo
 Untested method Particle::setJacobiMatrix

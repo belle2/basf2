@@ -118,6 +118,36 @@ def check_plotting_status(progress_key: str):
     return last_status
 
 
+"""
+Gitlab Integration
+
+Under here are functions that enable the validationserver to
+interact directly with the Gitlab project page to track and
+update issues.
+
+Requirement:
+Config file with project information and access token in the local
+machine.
+
+A check is performed to see if the config file exists and all of
+Gitlab functionalities are enabled/disabled accordingly.
+
+When the server is being set up, a Gitlab object is created, which
+will be used subsequently to make all the API calls.
+
+As a final server initialization step, the project is queried to
+check if any of the current results are linked to existing issues
+and the result files are updated accordingly.
+
+The create/issue functionality is accessible from the plot
+container. All the relevant pages are part of the
+validationserver cherry object.
+
+Function to upload files to Gitlab helps with pushing error plots
+to the project.
+"""
+
+
 # todo: remove this, once we're certain that the bug was fixed!
 def warn_wrong_directory():
     if not os.getcwd().endswith("html"):
@@ -689,7 +719,9 @@ def setup_gzip_compression(path, cherry_config):
 
 
 def get_argument_parser():
-    """Prepare a parser for all the known command line arguments"""
+    """
+    Prepare a parser for all the known command line arguments
+    """
 
     # Set up the command line parser
     parser = argparse.ArgumentParser()

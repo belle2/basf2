@@ -80,6 +80,8 @@ namespace Belle2 {
 
     bool m_writeOut;                     /**< toggle Particle List btw. transient/writeOut */
 
+    bool m_ignoreMotherFlavor; /**< flag whether flavor of mother particle should be ignored */
+
     /**
      * This vector holds unique identifiers (vector of ints) of all particles
      * that are already included in the ParticleList. It is used to prevent
@@ -97,7 +99,7 @@ namespace Belle2 {
      * Example: B+ -> (anti-D0 -> K+ pi-) pi+
      * idSequence: (521, 2, -421, 2, 321, K+ mdstArrayIndex, -211, pi- mdstArrayIndex, 211, pi+ mdstArrayIndex)
      */
-    void fillUniqueIdentifier(const Particle* p, std::vector<int>& idSequence);
+    void fillUniqueIdentifier(const Particle* p, std::vector<int>& idSequence, bool ignoreMotherFlavor);
 
     /**
      * Compares input idSequence to all sequences already included in the list.

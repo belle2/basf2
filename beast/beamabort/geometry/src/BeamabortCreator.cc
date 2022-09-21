@@ -45,19 +45,14 @@ namespace Belle2 {
     /** Creator creates the BEAMABORT geometry */
     geometry::CreatorFactory <BeamabortCreator> BeamabortFactory("BEAMABORTCreator");
 
-    BeamabortCreator::BeamabortCreator(): m_sensitive(0)
+    BeamabortCreator::BeamabortCreator()
     {}
 
     BeamabortCreator::~BeamabortCreator()
-    {
-      if (m_sensitive) delete m_sensitive;
-    }
+    {}
 
     void BeamabortCreator::createGeometry(G4LogicalVolume& topVolume, GeometryTypes)
     {
-
-      m_sensitive = new SensitiveDetector();
-
       //get parameters from .xml file
       std::string prep = "Active.";
 
@@ -168,13 +163,15 @@ namespace Belle2 {
       G4double dy_ba = 4.5 / 2. * CLHEP::mm;
       G4double dz_ba = 0.5 / 2. * CLHEP::mm;
       G4Box* s_BEAMABORT = new G4Box("s_BEAMABORT", dx_ba, dy_ba, dz_ba);
-      G4LogicalVolume* l_BEAMABORT = new G4LogicalVolume(s_BEAMABORT, geometry::Materials::get("Diamond"),
-                                                         "l_BEAMABORT", 0, m_sensitive);
+      G4LogicalVolume* l_BEAMABORT = new G4LogicalVolume(s_BEAMABORT, geometry::Materials::get("Diamond"), "l_BEAMABORT");
       l_BEAMABORT->SetVisAttributes(orange);
 
       //Lets limit the Geant4 stepsize inside the volume
       l_BEAMABORT->SetUserLimits(new G4UserLimits(stepSize));
       l_BEAMABORT->SetVisAttributes(orange);
+
+      // make the volume sensitive if the beam background study flag is enabled
+      if (m_config.getParameter("BeamBackgroundStudy")) l_BEAMABORT->SetSensitiveDetector(new SensitiveDetector());
 
       for (unsigned int i = 0; i < dimz; i++) {
 

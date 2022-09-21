@@ -91,9 +91,6 @@ namespace Belle2 {
       }
 
     protected:
-      /**  SensitiveDetector BEAMABORT */
-      SensitiveDetector* m_sensitive;
-
       BeamabortGeo m_config; /**< geometry parameters object */
     };
 

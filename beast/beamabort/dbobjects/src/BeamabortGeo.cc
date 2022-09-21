@@ -18,6 +18,7 @@ void BeamabortGeo::initialize(const GearDir& content)
   //------------------------------
 
   addParameter("stepSize", content.getWithUnit("stepSize"));
+  addParameter("BeamBackgroundStudy", content.getInt("BeamBackgroundStudy"));
   addParameter("divisions", content.getInt("divisions"));
   addParameter("foo", content.getBool("foo"));
   addArray("bar", content.getArray("bar"));

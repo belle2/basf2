@@ -29,7 +29,7 @@ ParticleMomentumUpdaterModule::ParticleMomentumUpdaterModule() : Module()
 {
 
   //Set module properties
-  setDescription("This module replaces the momentum of the particles in the selected target particle list by p(beam) - p(selected daughters)");
+  setDescription("This module replaces the momentum of the particles in the selected target particle list by p(beam) - p(selected daughters). The momentum of the mother particle will not be changed.");
   setPropertyFlags(c_ParallelProcessingCertified);
   //Parameter definition
   addParam("particleList", m_particleList, "Name of particle list with reconstructed particles.");
@@ -47,17 +47,15 @@ void ParticleMomentumUpdaterModule::initialize()
   StoreArray<Belle2::Particle> particles;
   particles.isRequired();
 
-  size_t countSelection = std::count(m_decayStringTarget.begin(), m_decayStringTarget.end(), '^');
-  if (countSelection != 1)
-    B2ERROR("ParticleMomentumUpdaterModule::please select exactly one target: " << m_decayStringDaughters);
-
-  bool valid = m_pDDescriptorDaughters.init(m_decayStringDaughters);
+  bool valid = m_pDDescriptorTarget.init(m_decayStringDaughters);
   if (!valid)
-    B2ERROR("ParticleMomentumUpdaterModule::initialize Invalid Decay Descriptor: " << m_decayStringDaughters);
+    B2ERROR("ParticleMomentumUpdaterModule::initialize invalid Decay Descriptor: " << m_decayStringDaughters);
 
-  valid = m_pDDescriptorTarget.init(m_decayStringTarget);
+  valid = m_pDDescriptorDaughters.init(m_decayStringTarget);
   if (!valid)
-    B2ERROR("ParticleMomentumUpdaterModule::initialize Invalid Decay Descriptor: " << m_decayStringTarget);
+    B2ERROR("ParticleMomentumUpdaterModule::initialize invalid Decay Descriptor: " << m_decayStringTarget);
+  else if (m_pDDescriptorTarget.getSelectionPDGCodes().size() != 1)
+    B2ERROR("ParticleMomentumUpdaterModule::please select exactly one target: " << m_decayStringTarget);
 }
 
 void ParticleMomentumUpdaterModule::event()
@@ -90,8 +88,7 @@ void ParticleMomentumUpdaterModule::event()
     Particle* targetP = particles[selParticlesTarget[0]->getArrayIndex()];
     Particle* daughterCopy = Belle2::ParticleCopy::copyParticle(targetP);
     daughterCopy->set4Vector(boost4Vector - daughters4Vector);
-    iParticle->removeDaughter(targetP);
-    iParticle->appendDaughter(daughterCopy);
+    //iParticle->replaceDaughter(targetP, daughterCopy);
   }
 }
 

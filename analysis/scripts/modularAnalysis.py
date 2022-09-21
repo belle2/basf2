@@ -1475,13 +1475,14 @@ def reconstructMissingKlongDecayExpert(decayString,
 
 def setBeamConstrainedMomentum(particleList, decayStringTarget, decayStringDaughters, path=None):
     """
-    Replace the four-momentum of the target Particle by p(beam) - p(selected daughters)
+    Replace the four-momentum of the target Particle by p(beam) - p(selected daughters).
+    The momentum of the mother Particle will not be changed.
 
     @param particleList         mother Particlelist
     @param decayStringTarget    target Particle whose momentum will be updated
     @param decayStringDaughters selected daughters
-    @param copyDaughters        make a unique copy of the mother's decay chain for each mother Particle
     """
+
     mod = register_module('ParticleMomentumUpdater')
     mod.set_name('ParticleMomentumUpdater' + particleList)
     mod.param('particleList', particleList)

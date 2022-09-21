@@ -107,9 +107,7 @@ void TreeFitterModule::initialize()
     bool valid = m_pDDescriptorInvisibles.init(m_treatAsInvisible);
     if (!valid)
       B2ERROR("TreeFitterModule::initialize Invalid Decay Descriptor: " << m_treatAsInvisible);
-
-    size_t countSelection = std::count(m_treatAsInvisible.begin(), m_treatAsInvisible.end(), '^');
-    if (countSelection != 1)
+    else if (m_pDDescriptorInvisibles.getSelectionPDGCodes().size() != 1)
       B2ERROR("TreeFitterModule::please select exactly one particle to ignore: " << m_treatAsInvisible);
   }
 }
@@ -144,8 +142,10 @@ void TreeFitterModule::event()
     if (!m_treatAsInvisible.empty()) {
       std::vector<const Particle*> selParticlesTarget = m_pDDescriptorInvisibles.getSelectionParticles(particle);
       Particle* targetD = m_particles[selParticlesTarget[0]->getArrayIndex()];
-      targetD->writeExtraInfo("treeFitterTreatMeAsInvisible", 1);
-      targetD->setMomentumVertexErrorMatrix(dummyCovMatrix);
+      Particle* daughterCopy = Belle2::ParticleCopy::copyParticle(targetD);
+      daughterCopy->writeExtraInfo("treeFitterTreatMeAsInvisible", 1);
+      daughterCopy->setMomentumVertexErrorMatrix(dummyCovMatrix);
+      //particle->replaceDaughter(targetD, daughterCopy);
     }
 
     try {

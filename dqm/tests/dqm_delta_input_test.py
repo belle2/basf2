@@ -22,7 +22,9 @@ b2.set_log_level(b2.LogLevel.INFO)
 main = b2.create_path()
 
 # Modules
-main.add_module('DQMHistAnalysisInputTest', Events=30)
-main.add_module('DQMHistAnalysisDeltaTest', useEpics=False)
+main.add_module('DQMHistAnalysisInputTest', Events=30, ConfigFiles=["test1.json", "test2.json"])
+main.add_module('DQMHistAnalysisDeltaTest', histogramDirectoryName="test", histogramName="testHist2", useEpics=False)
+
+
 # Process all events
 b2.process(main)

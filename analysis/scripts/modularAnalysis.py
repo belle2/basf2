@@ -746,6 +746,7 @@ def mergeListsWithBestDuplicate(outputListName,
                                 variable,
                                 preferLowest=True,
                                 writeOut=False,
+                                ignoreMotherFlavor=False,
                                 path=None):
     """
     Merge input ParticleLists into one output ParticleList. Only the best
@@ -758,6 +759,7 @@ def mergeListsWithBestDuplicate(outputListName,
     @param variable      variable to determine best duplicate
     @param preferLowest  whether lowest or highest value of variable should be preferred
     @param writeOut      whether RootOutput module should save the created ParticleList
+    @param ignoreMotherFlavor whether the flavor of the mother particle is ignored when trying to find duplicates
     @param path          modules are added to this path
     """
 
@@ -768,6 +770,7 @@ def mergeListsWithBestDuplicate(outputListName,
     pmanipulate.param('variable', variable)
     pmanipulate.param('preferLowest', preferLowest)
     pmanipulate.param('writeOut', writeOut)
+    pmanipulate.param('ignoreMotherFlavor', ignoreMotherFlavor)
     path.add_module(pmanipulate)
 
 

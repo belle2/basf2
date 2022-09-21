@@ -49,7 +49,7 @@ namespace TreeFitter {
     m_automatic_vertex_constraining(config.m_automatic_vertex_constraining)
   {
     if (particle) {
-      if (not particle->hasExtraInfo("treeFitterTreatMeAsInvisible") and particle->getExtraInfo("treeFitterTreatMeAsInvisible") != 1) {
+      if (not(particle->hasExtraInfo("treeFitterTreatMeAsInvisible") and particle->getExtraInfo("treeFitterTreatMeAsInvisible") == 1)) {
         for (auto daughter : particle->getDaughters()) {
           addDaughter(daughter, config, forceFitAll);
         }

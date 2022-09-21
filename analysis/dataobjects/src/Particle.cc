@@ -726,6 +726,21 @@ void Particle::removeDaughter(const Particle* daughter, const bool updateType)
     m_particleSource = c_Undefined;
 }
 
+void Particle::replaceDaughter(const Particle* oldDaughter, const Particle* newDaughter)
+{
+  if (getNDaughters() == 0)
+    return;
+
+  for (unsigned i = 0; i < getNDaughters(); i++) {
+    if (m_daughterIndices[i] == oldDaughter->getArrayIndex()) {
+      auto ite_index =  m_daughterIndices.erase(m_daughterIndices.begin() + i);
+      m_daughterIndices.insert(ite_index, newDaughter->getArrayIndex());
+      auto ite_property =  m_daughterProperties.erase(m_daughterProperties.begin() + i);
+      m_daughterProperties.insert(ite_property, Particle::PropertyFlags::c_Ordinary);
+    }
+  }
+}
+
 bool Particle::overlapsWith(const Particle* oParticle) const
 {
   // obtain vectors of daughter final state particles

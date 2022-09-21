@@ -145,7 +145,7 @@ void TreeFitterModule::event()
       Particle* daughterCopy = Belle2::ParticleCopy::copyParticle(targetD);
       daughterCopy->writeExtraInfo("treeFitterTreatMeAsInvisible", 1);
       daughterCopy->setMomentumVertexErrorMatrix(dummyCovMatrix);
-      //particle->replaceDaughter(targetD, daughterCopy);
+      particle->replaceDaughter(targetD, daughterCopy);
     }
 
     try {

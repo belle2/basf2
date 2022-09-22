@@ -186,6 +186,9 @@ namespace Belle2 {
     /** Electronics map. */
     DBObjPtr<KLMElectronicsMap> m_ElectronicsMap;
 
+    /** Monitoring object. */
+    MonitoringObject* m_monObj {};
+
   };
 
 }

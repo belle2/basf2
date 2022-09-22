@@ -67,6 +67,8 @@ DQMHistAnalysisKLMModule::~DQMHistAnalysisKLMModule()
 
 void DQMHistAnalysisKLMModule::initialize()
 {
+  m_monObj = getMonitoringObject("klm");
+
   if (m_ThresholdForHot > m_ThresholdForMasked)
     B2FATAL("The threshold used for hot channels is larger than the one for masked channels."
             << LogVar("Threshold for hot channels", m_ThresholdForHot)
@@ -109,6 +111,21 @@ void DQMHistAnalysisKLMModule::beginRun()
 
 void DQMHistAnalysisKLMModule::endRun()
 {
+  int hist_max_bin; double max_position;
+  TH1* time_rpc = findHist("KLM/time_rpc");
+  hist_max_bin = time_rpc->GetMaximumBin();
+  max_position = time_rpc->GetXaxis()->GetBinCenter(hist_max_bin);
+  m_monObj->setVariable("RPC_Time_Peak", max_position);
+
+  TH1* time_scint_bklm = findHist("KLM/time_scintillator_bklm");
+  hist_max_bin = time_scint_bklm->GetMaximumBin();
+  max_position = time_scint_bklm->GetXaxis()->GetBinCenter(hist_max_bin);
+  m_monObj->setVariable("BKLM_Scint_Time_Peak", max_position);
+
+  TH1* time_scint_eklm = findHist("KLM/time_scintillator_bklm");
+  hist_max_bin = time_scint_eklm->GetMaximumBin();
+  max_position = time_scint_eklm->GetXaxis()->GetBinCenter(hist_max_bin);
+  m_monObj->setVariable("EKLM_Scint_Time_Peak", max_position);
 }
 
 double DQMHistAnalysisKLMModule::getProcessedEvents()

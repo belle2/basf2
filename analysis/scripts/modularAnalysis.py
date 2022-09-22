@@ -1479,8 +1479,10 @@ def setBeamConstrainedMomentum(particleList, decayStringTarget, decayStringDaugh
     The momentum of the mother Particle will not be changed.
 
     @param particleList         mother Particlelist
-    @param decayStringTarget    target Particle whose momentum will be updated
-    @param decayStringDaughters selected daughters
+    @param decayStringTarget    DecayString specifying the target particle whose momentum
+                                will be updated
+    @param decayStringDaughters DecayString specifying the daughter particles used to replace
+                                the momentum of the target particle by p(beam)-p(daughters)
     """
 
     mod = register_module('ParticleMomentumUpdater')

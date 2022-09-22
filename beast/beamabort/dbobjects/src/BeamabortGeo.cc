@@ -6,7 +6,6 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <framework/gearbox/GearDir.h>
 #include <beast/beamabort/dbobjects/BeamabortGeo.h>
 
 using namespace Belle2;

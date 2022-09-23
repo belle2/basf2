@@ -113,19 +113,25 @@ void DQMHistAnalysisKLMModule::endRun()
 {
   int hist_max_bin; double max_position;
   TH1* time_rpc = findHist("KLM/time_rpc");
-  hist_max_bin = time_rpc->GetMaximumBin();
-  max_position = time_rpc->GetXaxis()->GetBinCenter(hist_max_bin);
-  m_monObj->setVariable("RPC_Time_Peak", max_position);
+  if (time_rpc) {
+    hist_max_bin = time_rpc->GetMaximumBin();
+    max_position = time_rpc->GetXaxis()->GetBinCenter(hist_max_bin);
+    m_monObj->setVariable("RPC_Time_Peak", max_position);
+  }
 
   TH1* time_scint_bklm = findHist("KLM/time_scintillator_bklm");
-  hist_max_bin = time_scint_bklm->GetMaximumBin();
-  max_position = time_scint_bklm->GetXaxis()->GetBinCenter(hist_max_bin);
-  m_monObj->setVariable("BKLM_Scint_Time_Peak", max_position);
+  if (time_scint_bklm) {
+    hist_max_bin = time_scint_bklm->GetMaximumBin();
+    max_position = time_scint_bklm->GetXaxis()->GetBinCenter(hist_max_bin);
+    m_monObj->setVariable("BKLM_Scint_Time_Peak", max_position);
+  }
 
   TH1* time_scint_eklm = findHist("KLM/time_scintillator_bklm");
-  hist_max_bin = time_scint_eklm->GetMaximumBin();
-  max_position = time_scint_eklm->GetXaxis()->GetBinCenter(hist_max_bin);
-  m_monObj->setVariable("EKLM_Scint_Time_Peak", max_position);
+  if (time_scint_eklm) {
+    hist_max_bin = time_scint_eklm->GetMaximumBin();
+    max_position = time_scint_eklm->GetXaxis()->GetBinCenter(hist_max_bin);
+    m_monObj->setVariable("EKLM_Scint_Time_Peak", max_position);
+  }
 }
 
 double DQMHistAnalysisKLMModule::getProcessedEvents()

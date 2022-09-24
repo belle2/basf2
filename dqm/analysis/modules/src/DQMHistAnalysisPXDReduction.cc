@@ -100,8 +100,8 @@ void DQMHistAnalysisPXDReductionModule::initialize()
 //   m_line3->SetLineColor(1);
 //   m_line3->SetLineWidth(3);
 
-
 #ifdef _BELLE2_EPICS
+  m_useEpics |= m_useEpicsRO; // implicit
   if (m_useEpics) {
     if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
     mychid.resize(2);

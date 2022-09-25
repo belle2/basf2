@@ -68,14 +68,14 @@ namespace Belle2 {
     std::string m_histogramDirectoryName;
     //! prefix for EPICS PVs
     std::string m_pvPrefix;
-    //! low warn level for alarm
-    double m_lowarnlevel;
-    //! low error level for alarm
-    double m_loerrorlevel;
-    //! high warn level for alarm
-    double m_hiwarnlevel;
-    //! high error level for alarm
-    double m_hierrorlevel;
+    //! low warn limit for alarm
+    double m_lowarnlimit;
+    //! low error limit for alarm
+    double m_loerrorlimit;
+    //! high warn limit for alarm
+    double m_hiwarnlimit;
+    //! high error limit for alarm
+    double m_hierrorlimit;
     /** Update entry intervall */
     int m_minEntries = 1000;
 

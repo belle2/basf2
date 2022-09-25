@@ -37,10 +37,10 @@ DQMHistAnalysisPXDReductionModule::DQMHistAnalysisPXDReductionModule()
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:Red:"));
   addParam("useEpics", m_useEpics, "Whether to update EPICS PVs.", false);
   addParam("useEpicsRO", m_useEpicsRO, "useEpics ReadOnly", false);
-  addParam("LowWarnLevel", m_lowarnlevel, "Mean Reduction Low Warn Level for alarms", 0.99);
-  addParam("LowErrorLevel", m_loerrorlevel, "Mean Reduction Low Level for alarms", 0.90);
-  addParam("HighWarnLevel", m_hiwarnlevel, "Mean Reduction High Warn Level for alarms", 1.01);
-  addParam("HighErrorLevel", m_hierrorlevel, "Mean Reduction High Level for alarms", 1.10);
+  addParam("lowarnlimit", m_lowarnlimit, "Mean Reduction Low Warn limit for alarms", 0.99);
+  addParam("LowErrorlimit", m_loerrorlimit, "Mean Reduction Low limit for alarms", 0.90);
+  addParam("HighWarnlimit", m_hiwarnlimit, "Mean Reduction High Warn limit for alarms", 1.01);
+  addParam("HighErrorlimit", m_hierrorlimit, "Mean Reduction High limit for alarms", 1.10);
   addParam("minEntries", m_minEntries, "minimum number of new entries for last time slot", 1000);
   B2DEBUG(1, "DQMHistAnalysisPXDReduction: Constructor done.");
 }
@@ -131,22 +131,22 @@ void DQMHistAnalysisPXDReductionModule::beginRun()
       if (!std::isnan(tPvData.lower_alarm_limit)
           && tPvData.lower_alarm_limit > 0.0) {
         //m_hLoErrorLine->SetBinContent(i + 1, tPvData.lower_alarm_limit);
-        m_loerrorlevel = tPvData.lower_alarm_limit;
+        m_loerrorlimit = tPvData.lower_alarm_limit;
       }
       if (!std::isnan(tPvData.lower_warning_limit)
           && tPvData.lower_warning_limit > 0.0) {
         //m_hLoWarnLine->SetBinContent(i + 1, tPvData.lower_warning_limit);
-        m_lowarnlevel = tPvData.lower_warning_limit;
+        m_lowarnlimit = tPvData.lower_warning_limit;
       }
       if (!std::isnan(tPvData.upper_alarm_limit)
           && tPvData.upper_alarm_limit > 0.0) {
         //m_hHiErrorLine->SetBinContent(i + 1, tPvData.upper_alarm_limit);
-        m_hierrorlevel = tPvData.upper_alarm_limit;
+        m_hierrorlimit = tPvData.upper_alarm_limit;
       }
       if (!std::isnan(tPvData.upper_warning_limit)
           && tPvData.upper_warning_limit > 0.0) {
         //m_hHiWarnLine->SetBinContent(i + 1, tPvData.upper_warning_limit);
-        m_hiwarnlevel = tPvData.upper_warning_limit;
+        m_hiwarnlimit = tPvData.upper_warning_limit;
       }
     } else {
       SEVCHK(r, "ca_get or ca_pend_io failure");
@@ -184,26 +184,29 @@ void DQMHistAnalysisPXDReductionModule::event()
 
   m_cReduction->cd();
 
+  double value = ireductioncnt > 0 ? ireduction / ireductioncnt : 0;
+
   int status = 0;
 // not enough Entries
   if (ireductioncnt < 15) { // still have to see how to handle masked modules
     status = 0; // Grey
     m_cReduction->Pad()->SetFillColor(kGray);// Magenta or Gray
   } else {
-    status = 1; // White
-    /// FIXME: absolute numbers or relative numbers and what is the accpetable limit?
-//   if (value > m_up_err_limit || value < m_low_err_limit ) {
-//     m_cReduction->Pad()->SetFillColor(kRed);// Red
-//   } else if (value >  m_up_warn_limit ||  value < m_low_warn_limit ) {
-//     m_cReduction->Pad()->SetFillColor(kYellow);// Yellow
+    if (value > m_hierrorlimit || value < m_loerrorlimit) {
+      m_cReduction->Pad()->SetFillColor(kRed);// Red
+      status = 4;
+    } else if (value >  m_hiwarnlimit ||  value < m_lowarnlimit) {
+      m_cReduction->Pad()->SetFillColor(kYellow);// Yellow
+      status = 3;
+    } else {
+      m_cReduction->Pad()->SetFillColor(kGreen);// Green
+      status = 2;
 //   } else {
-//     m_cReduction->Pad()->SetFillColor(kGreen);// Green
-//   } else {
-    m_cReduction->Pad()->SetFillColor(kWhite);// White
-//   }
+// we wont use white anymore here
+//    m_cReduction->Pad()->SetFillColor(kWhite);// White
+//    status = 1; // White
+    }
   }
-
-  double value = ireductioncnt > 0 ? ireduction / ireductioncnt : 0;
 
   if (m_hReduction) {
     m_hReduction->Draw("");

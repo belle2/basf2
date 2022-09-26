@@ -218,7 +218,7 @@ void SegmentCreatorFacetAutomaton::apply(
       if (m_param_searchReversed) {
         std::vector<const CDCFacet*> reverseFacetPath = getFacetPath(segment->reversed(), checkRelations);
         if (reverseFacetPath.size() == facetPath.size()) {
-          B2DEBUG(100, "Successful constructed REVERSE");
+          B2DEBUG(25, "Successful constructed REVERSE");
           outputSegments.push_back(CDCSegment2D::condense(reverseFacetPath));
           reverseSegment = &outputSegments.back();
 
@@ -236,7 +236,7 @@ void SegmentCreatorFacetAutomaton::apply(
       const CDCSegment2D* aliasSegment = nullptr;
       std::vector<const CDCFacet*> aliasFacetPath = getFacetPath(segment->getAlias(), checkRelations);
       if (aliasFacetPath.size() == facetPath.size()) {
-        B2DEBUG(100, "Successful constructed alias");
+        B2DEBUG(25, "Successful constructed alias");
         outputSegments.push_back(CDCSegment2D::condense(aliasFacetPath));
         aliasSegment = &outputSegments.back();
 
@@ -249,7 +249,7 @@ void SegmentCreatorFacetAutomaton::apply(
         std::vector<const CDCFacet*> reverseAliasFacetPath =
           getFacetPath(segment->reversed().getAlias(), checkRelations);
         if (reverseAliasFacetPath.size() == facetPath.size()) {
-          B2DEBUG(100, "Successful constructed REVERSE alias");
+          B2DEBUG(25, "Successful constructed REVERSE alias");
           outputSegments.push_back(CDCSegment2D::condense(reverseAliasFacetPath));
           reverseAliasSegment = &outputSegments.back();
           if (aliasSegment != nullptr) {

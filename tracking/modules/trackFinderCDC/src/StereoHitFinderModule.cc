@@ -15,16 +15,16 @@ REG_MODULE(TFCDC_MonopoleStereoHitFinder);
 REG_MODULE(TFCDC_MonopoleStereoHitFinderQuadratic);
 
 TFCDC_StereoHitFinderModule::TFCDC_StereoHitFinderModule()
-  : Super( {"CDCWireHitVector", "CDCTrackVector"})
+  : Super({"CDCWireHitVector", "CDCTrackVector"})
 {
 }
 
 TFCDC_MonopoleStereoHitFinderQuadraticModule::TFCDC_MonopoleStereoHitFinderQuadraticModule()
-  : Super( {"CDCWireHitVector", "CDCMonopoleTrackVector"})
+  : Super({"CDCWireHitVector", "CDCMonopoleTrackVector"})
 {
 }
 
 TFCDC_MonopoleStereoHitFinderModule::TFCDC_MonopoleStereoHitFinderModule()
-  : Super( {"CDCWireHitVector", "CDCMonopoleTrackVector"})
+  : Super({"CDCWireHitVector", "CDCMonopoleTrackVector"})
 {
 }

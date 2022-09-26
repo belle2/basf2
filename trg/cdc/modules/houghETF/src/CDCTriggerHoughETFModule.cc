@@ -28,7 +28,7 @@ using namespace Belle2::CDC;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(CDCTriggerHoughETF)
+REG_MODULE(CDCTriggerHoughETF);
 
 //-----------------------------------------------------------------
 //                 Implementation

@@ -52,7 +52,7 @@ namespace Belle2 {
       leafList += "_sup/";
       leafList += TBranchLeafType(m_element);
 
-      TBranch* branch = new TBranch(t, branchName.c_str() , & m_element, leafList.c_str());
+      TBranch* branch = new TBranch(t, branchName.c_str(), & m_element, leafList.c_str());
       t->GetListOfBranches()->Add(branch);
     }
 

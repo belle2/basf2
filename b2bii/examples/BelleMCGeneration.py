@@ -19,6 +19,7 @@ basf2.conditions.metadata_providers = ["/sw/belle/b2bii/database/conditions/b2bi
 basf2.conditions.payload_locations = ["/sw/belle/b2bii/database/conditions/"]
 
 # Use B2BII global tag.
+basf2.conditions.override_globaltags()
 basf2.conditions.prepend_globaltag('B2BII_MC')
 
 # Path.

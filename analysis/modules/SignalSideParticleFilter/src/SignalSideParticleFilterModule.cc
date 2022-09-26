@@ -60,7 +60,7 @@ void SignalSideParticleFilterModule::event()
 
   StoreObjPtr<RestOfEvent> roe("RestOfEvent");
   if (roe.isValid()) {
-    const Particle* particle = roe->getRelated<Particle>();
+    const Particle* particle = roe->getRelatedFrom<Particle>();
     if (particle) {
       if (m_cut->check(particle)) {
         for (auto& iParticleListName : m_particleLists) {

@@ -188,7 +188,7 @@ class BtoXll(BaseSkim):
         # Apply muon cuts p > 0.395 GeV, muonID > 0.5 + fairTrack
         fairTrack = 'dr < 0.5 and abs(dz) < 2'
 
-        ma.cutAndCopyList('e+:ewp', 'e+:all', 'p > 0.395 and electronID > 0.1 and ' + fairTrack, path=path)
+        ma.cutAndCopyList('e+:ewp', 'e+:all', 'p > 0.395 and electronID_noTOP > 0.1 and ' + fairTrack, path=path)
         ma.cutAndCopyList('mu+:ewp', 'mu+:all', 'p > 0.395 and muonID > 0.5 and ' + fairTrack, path=path)
 
         # Apply dilepton cut E_ll > 1.5 GeV (in CMS frame)
@@ -300,7 +300,7 @@ class BtoXll_LFV(BaseSkim):
         # Apply muon cuts p > 0.395 GeV, muonID > 0.5 + fairTrack
         fairTrack = 'dr < 0.5 and abs(dz) < 2'
 
-        ma.cutAndCopyList('e+:ewp', 'e+:all', 'p > 0.395 and electronID > 0.1 and ' + fairTrack, path=path)
+        ma.cutAndCopyList('e+:ewp', 'e+:all', 'p > 0.395 and electronID_noTOP > 0.1 and ' + fairTrack, path=path)
         ma.cutAndCopyList('mu+:ewp', 'mu+:all', 'p > 0.395 and muonID > 0.5 and ' + fairTrack, path=path)
 
         # Apply dilepton cut E_ll > 1.5 GeV (in CMS frame)

@@ -134,8 +134,8 @@ class TrackingInputValidation(basf2.Module):
         h_nPXDClusters = ValidationPlot('h_nPXDClusters')
         h_nPXDClusters.hist(self.nPXDClusters, bins=100, lower_bound=0, upper_bound=500)
         h_nPXDClusters.contact = self.contact
-        h_nPXDClusters.check = 'Average of 15000 +/- 2000 is expected'
-        h_nPXDClusters.description = 'Number of PXDClusters'
+        h_nPXDClusters.check = 'Average of 75 +/- 20 is expected'
+        h_nPXDClusters.description = 'Number of PXDClusters after ROI filtering'
         h_nPXDClusters.title = 'Number of PXDClusters per event'
         h_nPXDClusters.xlabel = 'Number of PXDClusters'
         h_nPXDClusters.ylabel = ''
@@ -144,8 +144,9 @@ class TrackingInputValidation(basf2.Module):
         h_nPXDSpacePoints = ValidationPlot('h_nPXDSpacePoints')
         h_nPXDSpacePoints.hist(self.nPXDSpacePoints, bins=100, lower_bound=0, upper_bound=500)
         h_nPXDSpacePoints.contact = self.contact
-        h_nPXDSpacePoints.check = 'Average of 15000 +/- 2000 is expected'
-        h_nPXDSpacePoints.description = 'Number of PXDSpacePoints'
+        h_nPXDSpacePoints.check = 'Average of 75 +/- 20 is expected'
+        h_nPXDSpacePoints.description = 'Number of PXDSpacePoints after ROI filtering. \
+                                         Should be the same as the number of PXDClusters'
         h_nPXDSpacePoints.title = 'Number of PXDSpacePoints per event'
         h_nPXDSpacePoints.xlabel = 'Number of PXDSpacePoints'
         h_nPXDSpacePoints.ylabel = ''

@@ -195,7 +195,7 @@ namespace TreeFitter {
           rc = new RecoResonance(particle, mother, config);
 
         } else {
-          rc = new RecoResonance(particle, mother, config);
+          rc = new RecoComposite(particle, mother, config);
         }
 
       } else {         // unfitted composites

@@ -852,7 +852,7 @@ bool TagVertexModule::makeGeneralFitKFit()
     if (nTracks != int(particleAndWeights.size()))
       B2FATAL("TagVertexModule: Different number of tracks in kFit and particles");
 
-    if (reduced_chi2 <= m_kFitReqReducedChi2 || nTracks <= 1) {
+    if (reduced_chi2 <= m_kFitReqReducedChi2 ||  nTracks <= 1  || (nTracks <= 2 && m_constraintType == "noConstraint")) {
       kFit = kFitTemp;
       break;
     } else { // remove particle with highest chi2/ndf and continue

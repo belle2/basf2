@@ -1013,6 +1013,7 @@ def flavorTagger(
       @param path                              Modules are added to this path
 
     """
+    basf2.conditions.prepend_globaltag('analysis_tools_light-2207-bengal')
 
     if mode != 'Sampler' and mode != 'Teacher' and mode != 'Expert':
         B2FATAL('flavorTagger: Wrong mode given: The available modes are "Sampler", "Teacher" or "Expert"')

@@ -620,7 +620,6 @@ vector<ParticleAndWeight> TagVertexModule::getParticlesAndWeights(const vector<c
   vector<ParticleAndWeight> particleAndWeights;
 
   for (const Particle* particle : tagParticles) {
-    if (!particle) continue;
     ROOT::Math::PxPyPzEVector mom = particle->get4Vector();
     if (!isfinite(mom.mag2())) continue;
 
@@ -856,7 +855,7 @@ bool TagVertexModule::makeGeneralFitKFit()
     if (reduced_chi2 <= m_kFitReqReducedChi2 || nTracks <= 1) {
       kFit = kFitTemp;
       break;
-    } else { // remove matricle with highest chi2/ndf and continue
+    } else { // remove particle with highest chi2/ndf and continue
       int badTrackID =  getLargestChi2ID(kFitTemp);
       if (0 <= badTrackID && badTrackID < int(particleAndWeights.size()))
         particleAndWeights.erase(particleAndWeights.begin() + badTrackID);
@@ -867,7 +866,7 @@ bool TagVertexModule::makeGeneralFitKFit()
   }
 
   //save the track info for later use
-  //Tracks are sorted by weight, ie pushing the tracks with 0 weight (from KS) to the end of the list
+  //Tracks are sorted by weight, i.e. pushing the tracks with 0 weight (from KS) to the end of the list
   fillParticles(particleAndWeights);
 
   //Save the infos related to the vertex

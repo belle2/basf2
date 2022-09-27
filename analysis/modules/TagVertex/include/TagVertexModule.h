@@ -176,7 +176,7 @@ namespace Belle2 {
 
 
     /** performs single KFit on particles stored in particleAndWeights
-    this function can be iterated several times unit chi2/ndf of the resulting fit is sufficient */
+    this function can be iterated several times until chi2/ndf of the resulting fit is sufficient */
     analysis::VertexFitKFit doSingleKfit(std::vector<ParticleAndWeight>& particleAndWeights);
 
     /**

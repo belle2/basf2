@@ -233,7 +233,6 @@ def treeFit(
     customOriginVertex=[0.001, 0, 0.0116],
     customOriginCovariance=[0.0048, 0, 0, 0, 0.003567, 0, 0, 0, 0.0400],
     originDimension=3,
-    beamConstraint=0,
     path=None,
 ):
     """
@@ -269,7 +268,6 @@ def treeFit(
             otherwise be set to {0, 0, 0} contact us if this causes any hardship/confusion.
         originDimension (int): If the origin or IP constraint (``customOriginVertex`` or ``ipConstraint``) are used,
             this specifies the dimension of the constraint (3D or 2D).
-        beamConstraint (int) PDG id of the particle whose four-momentum is contrained to the four-momentum of the initial state
         path (basf2.Path): modules are added to this path
     """
     treeFitter = register_module("TreeFitter")
@@ -287,7 +285,6 @@ def treeFit(
     treeFitter.param('customOriginVertex', customOriginVertex)
     treeFitter.param('customOriginCovariance', customOriginCovariance)
     treeFitter.param('originDimension', originDimension)
-    treeFitter.param('expertBeamConstraint', beamConstraint)
     path.add_module(treeFitter)
 
 

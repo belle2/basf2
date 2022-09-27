@@ -82,7 +82,7 @@ def loadStdPi0ForBToCharmless(path):
                       '[[daughter(1,clusterReg)==1 and daughter(1,E)> 0.0225] or ' +
                       '[daughter(1,clusterReg)==2 and daughter(1,E)> 0.020] or ' +
                       '[daughter(1,clusterReg)==3 and daughter(1,E)> 0.020]] and ' +
-                      'M > 0.105 and M < 0.150 ',
+                      'M > 0.105 and M < 0.160 ',
                       path=path)
     kFit('pi0:charmlessFit', 0.0, fit_type='mass', path=path)
 

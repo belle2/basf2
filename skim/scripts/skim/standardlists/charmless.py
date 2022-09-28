@@ -71,7 +71,7 @@ def loadStdPi0ForBToCharmless(path):
     the neutral group (avoiding ECL timing cuts) for winter 2020. We require the energy of the photons
     to be larger than :math:`22.5~{\\rm MeV}` in the forward end cap, :math:`20~{\\rm MeV}` in the barrel,
     and :math:`20~{\\rm MeV}` in the backward end cap. For the :math:`\\pi^{0}`, we require the mass to be
-    :math:`105 < M < 150~{\\rm MeV}/c^2` and a massKFit to converge.
+    :math:`105 < M < 160~{\\rm MeV}/c^2` and a massKFit to converge.
     """
     stdPhotons('all', path=path)
     ma.reconstructDecay('pi0:all -> gamma:all gamma:all', '', 1, True, path=path)

@@ -18,6 +18,9 @@
 
 namespace Belle2 {
 
+  /**
+   * Utility class to calculate the Klong kinematics
+   */
   struct KlongCalculatorUtils {
     /**
      * Calculate kinematics of two body B decays containing a K_L0.

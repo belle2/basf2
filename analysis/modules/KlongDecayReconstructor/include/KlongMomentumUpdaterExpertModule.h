@@ -19,6 +19,10 @@
 #include <string>
 
 namespace Belle2 {
+
+  /**
+   * Calculate and update the two body B decay kinematics
+   */
   class KlongMomentumUpdaterExpertModule : public Module {
 
   public:

@@ -1015,6 +1015,9 @@ def flavorTagger(
     """
     basf2.conditions.prepend_globaltag('analysis_tools_light-2207-bengal')
 
+    if (not isinstance(particleLists, list)):
+        particleLists = [particleLists]  # in case user inputs a particle list as string
+
     if mode != 'Sampler' and mode != 'Teacher' and mode != 'Expert':
         B2FATAL('flavorTagger: Wrong mode given: The available modes are "Sampler", "Teacher" or "Expert"')
 

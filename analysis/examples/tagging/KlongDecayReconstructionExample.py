@@ -61,7 +61,7 @@ ma.matchMCTruth('B0', path=main)
 
 kFit(list_name='B0', conf_level=-1, fit_type='vertex', constraint='iptube',
      decay_string='B0 -> [J/psi -> ^mu- ^mu+] K_L0',
-     daughtersUpdate=False,  # if true, kinematics of J/psi -> mu- mu- will be updated
+     daughtersUpdate=False,  # if true, kinematics of J/psi -> mu- mu+ will be updated
      path=main)
 
 # By the vertex fit, the kinematics of B-meson is changed.

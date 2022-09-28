@@ -995,7 +995,14 @@ def flavorTagger(
       @param categories                        Categories used for flavor tagging. By default all are used.
       @param maskName                          Gets ROE particles from a specified ROE mask.
                                                ``FTDefaultMask`` (default): tentative mask definition that will be created
-                                               automatically.
+                                               automatically. The definition is as follows,
+
+                                               - Track (pion): thetaInCDCAcceptance and dr<1 and abs(dz)<3
+                                               - ECL-cluster (gamma): thetaInCDCAcceptance and clusterNHits>1.5 and \
+                                               [[clusterReg==1 and E>0.08] or [clusterReg==2 and E>0.03] or \
+                                               [clusterReg==3 and E>0.06]] \
+                                               (Same with gamma:pi0eff30_May2020 and gamma:pi0eff40_May2020)
+
                                                ``all``: all ROE particles are used.
                                                Or one can give any mask name defined before calling this function.
       @param saveCategoriesInfo                Sets to save information of individual categories.
@@ -1008,7 +1015,7 @@ def flavorTagger(
                                                want to parallelize the sampling, you can run several sampling scripts in
                                                parallel. By changing this parameter you will not overwrite an older sample.
       @param prefix                            Prefix of weight files.
-                                               ``MC15ri_light-2207-bengal_0``(default): Weight files trained for MC15ri samples.
+                                               ``MC15ri_light-2207-bengal_0`` (default): Weight files trained for MC15ri samples.
                                                ``''``: Weight files trained for MC13 samples.
       @param path                              Modules are added to this path
 

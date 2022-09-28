@@ -7,51 +7,56 @@
  **************************************************************************/
 
 // Own include
-#include <analysis/modules/KlongDecayReconstructor/KlongDecayCalculatorExpertModule.h>
+#include <analysis/modules/KlongDecayReconstructor/KlongMomentumUpdaterExpertModule.h>
+#include <analysis/modules/KlongDecayReconstructor/KlongCalculatorUtils.h>
 
 // framework aux
 #include <framework/logging/Logger.h>
 
+// dataobjects
 #include <analysis/dataobjects/Particle.h>
 
-using namespace std;
+// utilities
+#include <analysis/utility/ParticleCopy.h>
+
 using namespace Belle2;
 
 //-----------------------------------------------------------------
 //                 Register module
 //-----------------------------------------------------------------
 
-REG_MODULE(KlongDecayCalculatorExpert);
+REG_MODULE(KlongMomentumUpdaterExpert);
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-KlongDecayCalculatorExpertModule::KlongDecayCalculatorExpertModule() : Module()
+KlongMomentumUpdaterExpertModule::KlongMomentumUpdaterExpertModule() : Module()
 {
   // set module description (e.g. insert text)
-  setDescription("This module is used to employ kinematic constraints to determine the momentum of Klongs for two body B decays containing a K_L0 and something else. The module creates a list of K_L0 candidates whose K_L0 momentum is reconstructed by combining the reconstructed direction (from either the ECL or KLM) of the K_L0 and kinematic constraints of the initial state.");
+  setDescription("This module calculates and updates the kinematics of two body B decays including one Klong");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   // Add parameters
-  addParam("listName", m_listName, "name of particle list", string(""));
+  addParam("listName", m_listName, "name of particle list", std::string(""));
   addParam("writeOut", m_writeOut,
-           "If true, the output ParticleList will be saved by RootOutput. If false, it will be ignored when writing the file.", false);
+           "If true, the output ParticleList will be saved by RootOutput. If false, it will be ignored when writing the file.",
+           false);
 }
 
-void KlongDecayCalculatorExpertModule::initialize()
+void KlongMomentumUpdaterExpertModule::initialize()
 {
   // Particle list with name m_listName has to exist
   m_plist.isRequired(m_listName);
 }
 
-void KlongDecayCalculatorExpertModule::event()
+void KlongMomentumUpdaterExpertModule::event()
 {
 
   unsigned int n = m_plist->getListSize();
   for (unsigned i = 0; i < n; i++) {
     Particle* particle = m_plist->getParticle(i);
-
+    double m_b = particle->getPDGMass();
     const std::vector<Particle*> daughters = particle->getDaughters();
 
     if (daughters.size() < 2)
@@ -60,30 +65,29 @@ void KlongDecayCalculatorExpertModule::event()
     if (daughters.size() > 3)
       B2FATAL("Higher multiplicity (>2) missing momentum decays not implemented yet!");
 
+    ROOT::Math::PxPyPzEVector BMomentum;
+    ROOT::Math::PxPyPzEVector KMomentum;
+    int idx = 0;
+    bool is_physical = KlongCalculatorUtils::calculateBtoKlongX(BMomentum, KMomentum, daughters, m_b, idx);
 
-    ROOT::Math::PxPyPzEVector klDaughters;
-    int nKlong = 0;
+    if (!is_physical) {
+      B2ERROR("Recalculation of two body B-decay with Klong gives unphysical results. "
+              "Update of kinematics is skipped!");
+      continue;
+    }
+
+    // Set 4-vector to B-meson
+    particle->set4Vector(BMomentum);
+
+    // Set 4-vector to Klong
     for (auto daughter : daughters) {
       if (daughter->getPDGCode() == Const::Klong.getPDGCode()) {
-        klDaughters += daughter->get4Vector();
-        nKlong++;
+        auto copyKlong = ParticleCopy::copyParticle(daughter);
+        copyKlong->set4Vector(KMomentum);
+        copyKlong->writeExtraInfo("permID", idx);
+        particle->replaceDaughter(daughter, copyKlong);
       }
     }
-    if (nKlong != 1)
-      B2FATAL("The number of K_L0 is required to be 1!");
-
-    ROOT::Math::PxPyPzEVector pDaughters;
-    for (auto daughter : daughters) {
-      if (daughter->getPDGCode() != Const::Klong.getPDGCode()) {
-        pDaughters += daughter->get4Vector();
-      }
-    }
-
-    double m_b = particle->getPDGMass();
-    ROOT::Math::PxPyPzEVector mom = pDaughters + klDaughters;
-    mom.SetE(TMath::Sqrt(mom.P2() + m_b * m_b));
-    if (!isnan(mom.P()))
-      particle->set4Vector(mom);
 
   }
 

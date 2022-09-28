@@ -43,22 +43,6 @@ namespace Belle2 {
      */
     virtual void event() override;
 
-
-    /**
-     * Calculate kinematics of two body B decays containing a K_L0.
-     * @param BMomentum 4-vector of B-meson that will be updated by this function
-     * @param KMomentum 4-vector of Klong that will be updated by this function
-     * @param daughters Original daughters of the B-meson
-     * @param m_b PDG-mass of the B-meson
-     * @param idx Array index of the other daughter. This will be assigned to the extraInfo, permID, of Klong.
-     * @return true if the kinematics is physical
-     */
-    bool calculateBtoKlongX(ROOT::Math::PxPyPzEVector& BMomentum,
-                            ROOT::Math::PxPyPzEVector& KMomentum,
-                            const std::vector<Particle*> daughters,
-                            double m_b,
-                            int& idx);
-
   private:
 
     StoreObjPtr<ParticleList> m_koutputList; /**< Klong output particle list */

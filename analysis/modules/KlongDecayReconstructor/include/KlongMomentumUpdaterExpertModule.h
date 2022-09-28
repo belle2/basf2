@@ -19,14 +19,14 @@
 #include <string>
 
 namespace Belle2 {
-  class KlongDecayCalculatorExpertModule : public Module {
+  class KlongMomentumUpdaterExpertModule : public Module {
 
   public:
 
     /**
      * Constructor
      */
-    KlongDecayCalculatorExpertModule();
+    KlongMomentumUpdaterExpertModule();
 
     /**
      * Initialize the Module.
@@ -49,5 +49,3 @@ namespace Belle2 {
   };
 
 } // Belle2 namespace
-
-//#endif

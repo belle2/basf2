@@ -854,24 +854,33 @@ bool ParticleVertexFitterModule::makeKVertexMother(analysis::VertexFitKFit& kv,
       daughter->setMomentumVertexErrorMatrix(CLHEPToROOT::getTMatrixFSym(kv.getTrackError(iChild)));
     }
 
-    // then, calculate other daughters (= intermediate) kinematics
+    // then, update other particles that have a fit-child in decay
+    std::function<bool(Particle*)> funcUpdateMomentum =
+    [&funcUpdateMomentum, fitChildren](Particle * part) {
 
-    std::function<void(Particle*)> funcUpdateMomentum = [&funcUpdateMomentum](Particle * part) {
+      if (part->getNDaughters() == 0) {
+        // check if part is included in fitChildren
+        if (std::find(fitChildren.begin(), fitChildren.end(), part) != fitChildren.end())
+          return true;
+        else
+          return false;
+      }
 
-      if (part->getNDaughters() == 0)
-        return;
+      bool includeFitChildren = false;
 
       // Update daughters' momentum
       for (auto daughter : part->getDaughters())
-        funcUpdateMomentum(daughter);
+        includeFitChildren = funcUpdateMomentum(daughter) || includeFitChildren;
 
-      // Using updated daughters, update part's momentum
-      ROOT::Math::PxPyPzEVector sum4Vector;
-      for (auto daughter : part->getDaughters())
-        sum4Vector += daughter->get4Vector();
-      part->set4Vector(sum4Vector);
+      if (includeFitChildren) {
+        // Using updated daughters, update part's momentum
+        ROOT::Math::PxPyPzEVector sum4Vector;
+        for (auto daughter : part->getDaughters())
+          sum4Vector += daughter->get4Vector();
+        part->set4Vector(sum4Vector);
+      }
 
-      return;
+      return includeFitChildren;
     };
 
     // Update all daughters

@@ -15,6 +15,8 @@ Modules
 +++++++
  * New modules :b2:mod:`LowEnergyPi0VetoExpert` and :b2:mod:`LowEnergyPi0IdentificationExpert` for MVA-based pi0
    identification are added.
+ * The default argument of :func:`flavorTagger.flavorTagger` is updated so that the weight files trained with MC15ri will be used as default.
+   If one wants to use the previous weight files, the arguments should be set as follows, ``maskName='all'`` and ``prefix=''``.
 
 Modular Analysis Function
 +++++++++++++++++++++++++

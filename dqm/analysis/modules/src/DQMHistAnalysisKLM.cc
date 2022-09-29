@@ -19,7 +19,6 @@
 
 /* C++ headers. */
 #include <algorithm>
-#include <iostream>
 
 using namespace Belle2;
 

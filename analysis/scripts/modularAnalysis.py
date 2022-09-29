@@ -1519,7 +1519,7 @@ def updateKlongKinematicsExpert(particleList,
                                 writeOut=False,
                                 path=None):
     """
-    Calculates and updates the kinematics of B->K_L0 + something else with same method with
+    Calculates and updates the kinematics of B->K_L0 + something else with same method as
     `reconstructMissingKlongDecayExpert`. This helps to revert the kinematics after the vertex fitting.
 
     @param particleList input ParticleList of B meson that decays to K_L0 + X
@@ -1528,7 +1528,7 @@ def updateKlongKinematicsExpert(particleList,
     """
 
     mod = register_module('KlongMomentumUpdaterExpert')
-    mod.set_name('KlongModentumUpdaterExpert_' + particleList)
+    mod.set_name('KlongMomentumUpdaterExpert_' + particleList)
     mod.param('listName', particleList)
     mod.param('writeOut', writeOut)
     path.add_module(mod)

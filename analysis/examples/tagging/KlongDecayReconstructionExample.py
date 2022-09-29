@@ -64,7 +64,7 @@ kFit(list_name='B0', conf_level=-1, fit_type='vertex', constraint='iptube',
      daughtersUpdate=False,  # if true, kinematics of J/psi -> mu- mu+ will be updated
      path=main)
 
-# By the vertex fit, the kinematics of B-meson is changed.
+# The vertex fit changes the kinematics of the B-meson.
 # Re-calculate the kinematics with the same method
 ma.updateKlongKinematicsExpert('B0', path=main)
 

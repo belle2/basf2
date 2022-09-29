@@ -242,6 +242,13 @@ namespace Belle2 {
     Manager::FunctionPtr daughterAngle(const std::vector<std::string>& arguments);
 
     /**
+     * Returns function which returns the angle between two daughters at different frames.
+     * Two arguments are required. Each argument should be the daughter indices or the combination of daughter
+     * indices and the frame definition.
+     */
+    Manager::FunctionPtr daughterAngleInDifferentFrames(const std::vector<std::string>& arguments);
+
+    /**
      * Returns function which returns the angle between MC particles matched to daughters:
      * If two indices given: returns the angle between the MC momenta of the two given daughters.
      * If three indices given: Variable returns the angle between the MC momentum of the third particle and a vector

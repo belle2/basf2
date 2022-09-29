@@ -181,6 +181,25 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr useDaughterRestFrame(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        const std::string generalizedIndex = arguments[1];
+        auto func = [var, generalizedIndex](const Particle * particle) -> double {
+          const Particle* dauPart = particle->getParticleFromGeneralizedIndexString(generalizedIndex);
+          if (!dauPart)
+            return std::numeric_limits<float>::quiet_NaN();
+          UseReferenceFrame<RestFrame> frame(dauPart);
+          double result = std::get<double>(var->function(particle));
+          return result;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function useDaughterRestFrame.");
+      }
+    }
+
     Manager::FunctionPtr extraInfo(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 1) {
@@ -2994,6 +3013,10 @@ Specifying the lab frame is useful in some corner-cases. For example:
 		      "It is strongly recommended to pass a ParticleList that contains at most only one Particle in each event. "
 		      "When more than one Particle is present in the ParticleList, only the first Particle in the list is used for "
 		      "computing the rest frame and a warning is thrown. If the given ParticleList is empty in an event, it returns NaN.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("useDaughterRestFrame(variable, daughterIndex)", useDaughterRestFrame,
+                      "Returns the value of the variable in the rest frame of the selected daughter particle.\n"
+		      "The daughter is identified via generalized daughter index, e.g. ``0:1`` identifies the second daughter (1) "
+		      "of the first daughter (0). If the daughter index is invalid, it returns NaN.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("passesCut(cut)", passesCut,
                       "Returns 1 if particle passes the cut otherwise 0.\n"
                       "Useful if you want to write out if a particle would have passed a cut or not.", Manager::VariableDataType::c_bool);

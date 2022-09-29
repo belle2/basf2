@@ -15,7 +15,6 @@
 
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
-#include <mdst/dataobjects/KLMCluster.h>
 
 // decay descriptor
 #include <analysis/DecayDescriptor/DecayDescriptorParticle.h>

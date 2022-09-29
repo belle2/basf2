@@ -15,12 +15,16 @@ Modules
 +++++++
  * New modules :b2:mod:`LowEnergyPi0VetoExpert` and :b2:mod:`LowEnergyPi0IdentificationExpert` for MVA-based pi0
    identification are added.
+ * New module :b2:mod:`KlongMomentumUpdaterExpert` to calculate and update the two-body B-meson decay including a
+   Klong is added. New function :func:`modularAnalysis.updateKlongKinematicsExpert` is also added.
 
 Modular Analysis Function
 +++++++++++++++++++++++++
  * Added a check to the `applyEventCuts` function to make sure that only event-based variables are used in the
    selection. The decomposition of meta variables can be tricky, so a new argument ``metavariables`` is added to extend
    the list of meta variables which should be decomposed and should themselves be ignored in the check.
+ * With the :func:`vertex.kFit`, the daughters' kinematics are updated after the vertex fit, even when fit daughters are
+   selected using ``decay_string`` and ``daughtersUpdate=True``.
 
 Changes in the analysis package in light-2207-bengal
 ----------------------------------------------------

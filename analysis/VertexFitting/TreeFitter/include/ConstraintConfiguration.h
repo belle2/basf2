@@ -18,19 +18,19 @@ namespace TreeFitter {
     /** constructor */
     ConstraintConfiguration() :
       m_massConstraintType(false),
-      m_massConstraintListPDG({}),
-                            m_fixedToMotherVertexListPDG({}),
-                            m_geoConstraintListPDG({}),
-                            m_removeConstraintList({}),
-                            m_automatic_vertex_constraining(false),
-                            m_ipConstraint(false),
-                            m_customOrigin(false),
-                            m_customOriginVertex({}),
-                            m_customOriginCovariance({}),
-                            m_originDimension(3),
-                            m_headOfTreePDG(0),
-                            m_beamConstraint(0),
-                            m_inflationFactorCovZ(1)
+      m_massConstraintListPDG( {}),
+                             m_fixedToMotherVertexListPDG({}),
+                             m_geoConstraintListPDG({}),
+                             m_removeConstraintList({}),
+                             m_automatic_vertex_constraining(false),
+                             m_ipConstraint(false),
+                             m_customOrigin(false),
+                             m_customOriginVertex({}),
+                             m_customOriginCovariance({}),
+                             m_originDimension(3),
+                             m_headOfTreePDG(0),
+                             m_beamConstraintPDG(0),
+                             m_inflationFactorCovZ(1)
     {};
 
     /** constructor */
@@ -45,7 +45,7 @@ namespace TreeFitter {
                             const std::vector<double>& customOriginVertex,
                             const std::vector<double>& customOriginCovariance,
                             const int& originDimension,
-                            const int& beamConstraint = 0,
+                            const int& beamConstraintPDG = 0,
                             const int& inflationFactorCovZ = 1
                            ) :
       m_massConstraintType(massConstraintType),
@@ -60,7 +60,7 @@ namespace TreeFitter {
       m_customOriginCovariance(customOriginCovariance),
       m_originDimension(originDimension),
       m_headOfTreePDG(0),
-      m_beamConstraint(beamConstraint),
+      m_beamConstraintPDG(beamConstraintPDG),
       m_inflationFactorCovZ(inflationFactorCovZ)
     {}
 
@@ -101,7 +101,7 @@ namespace TreeFitter {
     mutable int m_headOfTreePDG;
 
     /** PDG code to beam constraint */
-    const int m_beamConstraint;
+    const int m_beamConstraintPDG;
 
     /** inflate covariance of z by this number -> iptube  */
     const int m_inflationFactorCovZ;

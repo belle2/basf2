@@ -61,7 +61,7 @@ namespace TreeFitter {
     m_massconstraint = std::find(config.m_massConstraintListPDG.begin(), config.m_massConstraintListPDG.end(),
                                  std::abs(m_particle->getPDGCode())) != config.m_massConstraintListPDG.end();
 
-    m_beamconstraint = (std::abs(m_particle->getPDGCode()) == config.m_beamConstraint);
+    m_beamconstraint = (std::abs(m_particle->getPDGCode()) == config.m_beamConstraintPDG);
 
     if (!m_automatic_vertex_constraining) {
       // if this is a hadronically decaying resonance it is useful to constraint the decay vertex to its mothers decay vertex.

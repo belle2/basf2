@@ -10,6 +10,7 @@ Variables
 +++++++++
  * Extended the variable `useAlternativeDaughterHypothesis` to variables calculated from daughters' 4-momentum, e.g.
    `cosHelicityAngleMomentum`.
+ * New metavariable `useDaughterRestFrame` to calculate a variable at the rest frame of the given daughters is added.
 
 Modules
 +++++++

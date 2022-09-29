@@ -1,0 +1,28 @@
+# BelleII collaboration chargedbsgamma DECAY.DEC
+# Based on EvtGen DECAY.DEC and Belle chargedrare DECAY.DEC
+#
+# Changes
+#
+# Oct. 2022, P. Goldenzweig (pablo.goldenzweig@kit.edu)
+#   First commit.
+#   Includes b -> s gamma decays in DECAY_BELLE2.DEC.
+
+
+Decay Upsilon(4S)
+0.500000000   B+sig  B-                                    VSS;
+0.500000000   B-sig  B+                                    VSS;
+Enddecay
+
+Decay B+sig
+0.000039180   K*+  gamma                                   SVP_HELAMP 1.0 0.0 1.0 0.0; #[BF update - PG 04/2022]
+0.000043800   K_1+  gamma                                  SVP_HELAMP 1.0 0.0 1.0 0.0; #[BF update - PG 04/2022]
+0.000013770   K_2*+  gamma                                 HELAMP 1.0 0.0 1.0 0.0;     #[BF update - PG 04/2022]
+0.000000980   rho+  gamma                                  SVP_HELAMP 1.0 0.0 1.0 0.0; #[BF update - PG 04/2022]
+0.000009700   K'_1+  gamma                                 SVP_HELAMP 1.0 0.0 1.0 0.0; #[BF update - PG 04/2022]
+0.000027100   K'*+  gamma                                  SVP_HELAMP 1.0 0.0 1.0 0.0; #[BF update - PG 04/2022]
+0.000066700   K''*+  gamma                                 SVP_HELAMP 1.0 0.0 1.0 0.0; #[BF update - PG 04/2022]
+0.000147770   Xsu  gamma                                   BTOXSGAMMA 2;               #BF = 3.49e-4 - Sum of exclusive b -> s gamma modes. #[BF update - PG 04/2022]
+Enddecay
+CDecay B-sig
+
+End

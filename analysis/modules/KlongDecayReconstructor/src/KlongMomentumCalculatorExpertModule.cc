@@ -8,7 +8,6 @@
 
 // Own include
 #include <analysis/modules/KlongDecayReconstructor/KlongMomentumCalculatorExpertModule.h>
-#include <analysis/modules/KlongDecayReconstructor/KlongCalculatorUtils.h>
 
 // framework aux
 #include <framework/logging/Logger.h>
@@ -22,6 +21,7 @@
 // utilities
 #include <analysis/DecayDescriptor/ParticleListName.h>
 #include <analysis/utility/ParticleCopy.h>
+#include <analysis/utility/KlongCalculatorUtils.h>
 
 #include <Math/Vector4D.h>
 

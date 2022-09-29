@@ -8,7 +8,6 @@
 
 // Own include
 #include <analysis/modules/KlongDecayReconstructor/KlongMomentumUpdaterExpertModule.h>
-#include <analysis/modules/KlongDecayReconstructor/KlongCalculatorUtils.h>
 
 // framework aux
 #include <framework/logging/Logger.h>
@@ -18,6 +17,7 @@
 
 // utilities
 #include <analysis/utility/ParticleCopy.h>
+#include <analysis/utility/KlongCalculatorUtils.h>
 
 using namespace Belle2;
 

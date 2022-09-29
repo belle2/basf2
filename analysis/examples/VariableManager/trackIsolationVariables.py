@@ -101,11 +101,11 @@ if __name__ == "__main__":
     replacement = re.compile('[^a-zA-Z0-9]+')
     trackiso_vars = []
     for det in det_labels:
-        alias = f"distToClosestTrkAt{det}_VS_{ref}"
-        # replace all non-safe characters for alias name with _ (but remove from the end)
-        alias_safe = replacement.sub("_", alias).strip("_")
-        vm.addAlias(alias_safe, f"minET2ETDist({det}, {ref}, 0)")
-        trackiso_vars += [alias_safe]
+        alias_dist = replacement.sub("_", f"minET2ETDist_{det}_VS_{ref}").strip("_")
+        alias_mcPDG = replacement.sub("_", f"minET2ETDist_mcPDG_{det}_VS_{ref}").strip("_")
+        vm.addAlias(alias_dist, f"minET2ETDist({det}, {ref}, 0)")
+        vm.addAlias(alias_mcPDG, f"minET2ETDistVar(mcPDG, {det}, {ref})")
+        trackiso_vars.extend([alias_dist, alias_mcPDG])
 
     # Reconstruct the J/psi decay.
     jpsimumu = "J/psi:mumu -> mu+:muons mu-:muons"
@@ -130,11 +130,11 @@ if __name__ == "__main__":
     for det in det_labels:
         # Use a special suffix to identify variables in case the helix extrapolation is done
         # using the best fit mass hypothesis.
-        alias = f"distToClosestTrkAt{det}_VS_{ref}__useHighestProbMassForExt"
-        # replace all non-safe characters for alias name with _ (but remove from the end)
-        alias_safe = replacement.sub("_", alias).strip("_")
-        vm.addAlias(alias_safe, f"minET2ETDist({det}, {ref})")
-        trackiso_vars_highestprobmass += [alias_safe]
+        alias_dist = replacement.sub("_", f"minET2ETDist_{det}_VS_{ref}__useHighestProbMassForExt").strip("_")
+        alias_mcPDG = replacement.sub("_", f"minET2ETDist_mcPDG_{det}_VS_{ref}").strip("_")
+        vm.addAlias(alias_dist, f"minET2ETDist({det}, {ref})")
+        vm.addAlias(alias_mcPDG, f"minET2ETDistVar(mcPDG, {det}, {ref})")
+        trackiso_vars.extend([alias_dist, alias_mcPDG])
 
     variables_jpsi = vc.kinematics + ["daughterDiffOfPhi(0, 1)"]
     variables_jpsi += vu.create_aliases(variables_jpsi, "useCMSFrame({variable})", "CMS")

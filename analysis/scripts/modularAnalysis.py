@@ -3625,10 +3625,11 @@ def calculateTrackIsolation(decay_string, path, *detectors, reference_list_name=
                                              By default, the ``:all`` ParticleList of the same type
                                              of the selected particle in ``decay_string`` is used.
                                              The charge-conjugate particle list will be also processed automatically.
-        highest_prob_mass_for_hex (Optional[bool]): if this option is set, the helix extrapolation for the particles
+        highest_prob_mass_for_hex (Optional[bool]): if this option is set to True, the helix extrapolation for the particles
                                                     will use the track fit result for the most
                                                     probable mass hypothesis, namely, the one that gives the highest
-                                                    chi2Prob of the fit.
+                                                    chi2Prob of the fit. Otherwise, it uses the mass hypothesis that
+                                                    corresponds to the particle lists PDG.
 
     """
 

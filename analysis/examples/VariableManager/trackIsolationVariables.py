@@ -18,6 +18,7 @@ For each particle's track in the input charged stable particle list,
 calculate the minimal distance to the other candidates' tracks at a given detector surface.
 """
 
+import re
 import argparse
 
 
@@ -59,7 +60,7 @@ if __name__ == "__main__":
 
     import basf2 as b2
     import modularAnalysis as ma
-    from variables import variables
+    from variables import variables as vm
     import variables.utils as vu
     import variables.collections as vc
 
@@ -78,13 +79,33 @@ if __name__ == "__main__":
     ref = f"{args.std_charged_ref}+:presel"
     ma.fillParticleList(ref, f"{base_trk_selection}", path=path)
 
+    det_labels = []
+    for det in args.detectors:
+        if det == "CDC":
+            det_labels.extend([f"{det}{ilayer}" for ilayer in range(9)])
+        elif det == "ECL":
+            det_labels.extend([f"{det}{ilayer}" for ilayer in range(2)])
+        else:
+            det_labels.append(f"{det}0")
+
     # Mode 1: calculate the track isolation variables
     # directly on the muons particle list.
-    trackiso_vars = ma.calculateTrackIsolation("mu+:muons",
-                                               path,
-                                               *args.detectors,
-                                               reference_list_name=ref,
-                                               highest_prob_mass_for_ext=False)
+    # Change the default behaviour, by not using the most probable mass hypothesis for the extrapolation.
+    ma.calculateTrackIsolation("mu+:muons",
+                               path,
+                               *args.detectors,
+                               reference_list_name=ref,
+                               highest_prob_mass_for_ext=False)
+
+    # Create aliases for the distance variables (Mode 1).
+    replacement = re.compile('[^a-zA-Z0-9]+')
+    trackiso_vars = []
+    for det in det_labels:
+        alias = f"distToClosestTrkAt{det}_VS_{ref}"
+        # replace all non-safe characters for alias name with _ (but remove from the end)
+        alias_safe = replacement.sub("_", alias).strip("_")
+        vm.addAlias(alias_safe, f"minET2ETDist({det}, {ref}, 0)")
+        trackiso_vars += [alias_safe]
 
     # Reconstruct the J/psi decay.
     jpsimumu = "J/psi:mumu -> mu+:muons mu-:muons"
@@ -98,12 +119,22 @@ if __name__ == "__main__":
 
     # Mode 2: calculate the track isolation variables
     # on the selected muon daughters in the decay.
-    # This time, use the mass hypotheiss w/ highest probability for the track extrapolation.
+    # By default, the module use the mass hypotheiss w/ highest probability for the track extrapolation.
     trackiso_vars_highestprobmass = ma.calculateTrackIsolation("J/psi:mumu -> ^mu+ ^mu-",
                                                                path,
                                                                *args.detectors,
-                                                               reference_list_name=ref,
-                                                               highest_prob_mass_for_ext=True)
+                                                               reference_list_name=ref)
+
+    # Create aliases for the distance variables (Mode 2).
+    trackiso_vars_highestprobmass = []
+    for det in det_labels:
+        # Use a special suffix to identify variables in case the helix extrapolation is done
+        # using the best fit mass hypothesis.
+        alias = f"distToClosestTrkAt{det}_VS_{ref}__useHighestProbMassForExt"
+        # replace all non-safe characters for alias name with _ (but remove from the end)
+        alias_safe = replacement.sub("_", alias).strip("_")
+        vm.addAlias(alias_safe, f"minET2ETDist({det}, {ref})")
+        trackiso_vars_highestprobmass += [alias_safe]
 
     variables_jpsi = vc.kinematics + ["daughterDiffOfPhi(0, 1)"]
     variables_jpsi += vu.create_aliases(variables_jpsi, "useCMSFrame({variable})", "CMS")
@@ -139,10 +170,10 @@ if __name__ == "__main__":
         "J/psi:mumu -> ^mu+:muons ^mu-:muons",
         use_names=True)
 
-    variables.addAlias("nReferenceTracks", f"nCleanedTracks({base_trk_selection})")
+    vm.addAlias("nReferenceTracks", f"nCleanedTracks({base_trk_selection})")
     aliases_event = ["nReferenceTracks"]
 
-    variables.printAliases()
+    vm.printAliases()
 
     # Saving variables to ntuple
     ma.variablesToNtuple(decayString="J/psi:mumu",

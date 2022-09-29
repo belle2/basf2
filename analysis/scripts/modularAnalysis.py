@@ -3580,7 +3580,7 @@ def applyChargedPidMVA(particleLists, path, trainingMode, chargeIndependent=Fals
     path.add_module(chargedpid)
 
 
-def calculateTrackIsolation(decay_string, path, *detectors, reference_list_name=None, highest_prob_mass_for_ext=False):
+def calculateTrackIsolation(decay_string, path, *detectors, reference_list_name=None, highest_prob_mass_for_ext=True):
     """
     Given an input decay string, compute variables that quantify track-based "isolation" of the charged
     stable particles in the decay chain.
@@ -3630,12 +3630,8 @@ def calculateTrackIsolation(decay_string, path, *detectors, reference_list_name=
                                                     probable mass hypothesis, namely, the one that gives the highest
                                                     chi2Prob of the fit.
 
-    Returns:
-        list(str): a list of aliases for the calculated distance variables.
-
     """
 
-    import variables.utils as vu
     from ROOT import Belle2, TDatabasePDG
 
     decayDescriptor = Belle2.DecayDescriptor()
@@ -3670,6 +3666,7 @@ def calculateTrackIsolation(decay_string, path, *detectors, reference_list_name=
         processed_decay_strings += [decay_string]
 
     for processed_dec in processed_decay_strings:
+
         if no_reference_list_name:
             decayDescriptor.init(processed_dec)
             daughter_pdgs = decayDescriptor.getSelectionPDGCodes()
@@ -3685,15 +3682,6 @@ def calculateTrackIsolation(decay_string, path, *detectors, reference_list_name=
                                        particleListReference=reference_list_name,
                                        useHighestProbMassForExt=highest_prob_mass_for_ext)
             trackiso.set_name(f"TrackIsoCalculator{det}_{processed_dec}_VS_{reference_list_name}")
-
-    # Use a special suffix to identify variables in case the helix extrapolation is done
-    # using the best fit mass hypothesis.
-    extra_suffix = "" if not highest_prob_mass_for_ext else "__useHighestProbMassForExt"
-
-    aliases = vu.create_aliases(
-        [f"distToClosestTrkAt{det}_VS_{reference_list_name}{extra_suffix}" for det in det_labels], "extraInfo({variable})")
-
-    return aliases
 
 
 def calculateDistance(list_name, decay_string, mode='vertextrack', path=None):

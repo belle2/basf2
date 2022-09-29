@@ -1,7 +1,8 @@
-# EventType: 1263736002
+# EventType: 1263752002
 # Descriptor: [B- -> [D**0 -> [D*+(D*0) -> [D0 -> K- pi+ (K- pi+ pi0) (K- pi+ pi+ pi-)] pi+]] l nu]cc
 # NickName: Bu_Dstst0lnu
 # Documentation: B0 -> D**+ e(mu) nu, D**0 -> (D*+)(D*0) -> D0 pi+(pi0)(gamma), D0 -> K- pi+ (K- pi+ pi0) (K- pi+ pi+ pi-), background mode for inclusive tagging R(D(*))
+# Dominant channel: B- -> D_10(-> D*+(-> D0(-> K- pi+ pi0) pi+) pi-) l- anti-nu
 # Tested: Yes
 # PhysicsWG: SL
 # Responsible: Tia Crane

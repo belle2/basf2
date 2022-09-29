@@ -1,7 +1,8 @@
 # EventType: 1263732000
 # Descriptor: [B- -> [D0 -> K- pi+ (K- pi+ pi0) (K- pi+ pi+ pi-)] e(mu) nu]cc
 # NickName: Bu_D0taunu
-# Documentation: B- -> D0 e(mu) nu, D0 -> K- pi+ (K- pi+ pi0) (K- pi+ pi+ pi-), signal mode for inclusive tagging R(D(*))
+# Documentation: B- -> D0 e(mu) nu, D0 -> K- pi+ (K- pi+ pi0) (K- pi+ pi+ pi-), signal mode for inclusive tagging R(D(*)).
+# Dominant channel: B- -> D0(-> K- pi+ pi0) l- anti-nu
 # Tested: Yes
 # PhysicsWG: SL
 # Responsible: Tia Crane

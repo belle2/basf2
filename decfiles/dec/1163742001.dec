@@ -1,7 +1,8 @@
-# EventType: 1163732000
+# EventType: 1163742001
 # Descriptor: [B0 -> [D*+ -> [D*0 -> [D0 -> K- pi+ (K- pi+ pi0) (K- pi+ pi+ pi-)] pi0(gamma)] l nu]cc
 # NickName: Bd_Dst+lnu
-# Documentation: B0 -> D*0 e(mu) nu, D*+ -> D0 pi+, D0 -> K- pi+ (K- pi+ pi0) (K- pi+ pi+ pi-), background mode for inclusive tagging R(D(*))
+# Documentation: B0 -> D*0 e(mu) nu, D*+ -> D0 pi+, D0 -> K- pi+ (K- pi+ pi0) (K- pi+ pi+ pi-), background mode for inclusive tagging R(D(*)).
+# Dominant channel: anti-B0 -> D*+(-> D0(->K- pi+ pi0) pi+) l- anti-nu
 # Tested: Yes
 # PhysicsWG: SL
 # Responsible: Tia Crane

@@ -19,6 +19,7 @@
 
 /* C++ headers. */
 #include <algorithm>
+#include <iostream>
 
 using namespace Belle2;
 
@@ -238,11 +239,14 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
     canvas->SetLogy();
   }
   canvas->Modified();
+  canvas->Update();
+
   /* Drawing dividing lines */
-  int divisions; int shift;
+  int divisions;
   int bin = 1;
   double xLine;
   if (subdetector == 1) {
+    int shift;
     if (index == 0) {
       divisions = 7;
       shift = 1;
@@ -251,10 +255,10 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
       shift = 8;
     }
     for (int k = 0; k < divisions; k++) {
-      xLine = histogram->GetXaxis()->GetBinLowEdge(bin);
-      m_PlaneLine.DrawLine(xLine, gPad->GetUymin(), xLine, gPad->GetUymax());
-      bin += BKLMElementNumbers::getNStrips(section, sector, k + shift, 0) + BKLMElementNumbers::getNStrips(section, sector, k + shift,
-             1);
+      xLine = (histogram->GetXaxis()->GetBinLowEdge(bin) - canvas->GetX1()) / (canvas->GetX2() - canvas->GetX1());
+      m_PlaneLine.DrawLineNDC(xLine, 0.1, xLine, 0.9);
+      bin += BKLMElementNumbers::getNStrips(section, sector, k + shift, 0)
+             + BKLMElementNumbers::getNStrips(section, sector, k + shift, 1);
     }
   } else {
     if ((section == 2) && (index == 0 || index == 1))
@@ -262,12 +266,13 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
     else
       divisions = 4;
     for (int k = 0; k < divisions; k++) {
-      xLine = histogram->GetXaxis()->GetBinLowEdge(bin);
-      m_PlaneLine.DrawLine(xLine, gPad->GetUymin(), xLine, gPad->GetUymax());
+      xLine = (histogram->GetXaxis()->GetBinLowEdge(bin) - canvas->GetX1()) / (canvas->GetX2() - canvas->GetX1());
+      m_PlaneLine.DrawLineNDC(xLine, 0.1, xLine, 0.9);
       bin += EKLMElementNumbers::getNStripsSector();
     }
   }
   canvas->Modified();
+  canvas->Update();
 }
 
 void DQMHistAnalysisKLMModule::processSpatial2DHitEndcapHistogram(

@@ -991,17 +991,18 @@ def flavorTagger(
                                                :math:`B^0_{\\rm sig}\\to J/\\psi (\\to \\mu^+ \\mu^-) K_s (\\to \\pi^+ \\pi^-)`.
                                                BGx1 stays for events simulated with background.
       @param workingDirectory                  Path to the directory containing the FlavorTagging/ folder.
-      @param combinerMethods                   MVAs for the combiner: ``TMVA-FBDT`` or ``FANN-MLP``. Both used by default.
+      @param combinerMethods                   MVAs for the combiner: ``TMVA-FBDT` (default).
+                                               ``FANN-MLP`` is available only with ``prefix=''`` (MC13 weight files).
       @param categories                        Categories used for flavor tagging. By default all are used.
       @param maskName                          Gets ROE particles from a specified ROE mask.
                                                ``FTDefaultMask`` (default): tentative mask definition that will be created
-                                               automatically. The definition is as follows,
+                                               automatically. The definition is as follows:
 
                                                - Track (pion): thetaInCDCAcceptance and dr<1 and abs(dz)<3
                                                - ECL-cluster (gamma): thetaInCDCAcceptance and clusterNHits>1.5 and \
                                                [[clusterReg==1 and E>0.08] or [clusterReg==2 and E>0.03] or \
                                                [clusterReg==3 and E>0.06]] \
-                                               (Same with gamma:pi0eff30_May2020 and gamma:pi0eff40_May2020)
+                                               (Same as gamma:pi0eff30_May2020 and gamma:pi0eff40_May2020)
 
                                                ``all``: all ROE particles are used.
                                                Or one can give any mask name defined before calling this function.

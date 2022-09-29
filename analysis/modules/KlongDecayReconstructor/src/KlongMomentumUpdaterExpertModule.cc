@@ -56,7 +56,7 @@ void KlongMomentumUpdaterExpertModule::event()
   unsigned int n = m_plist->getListSize();
   for (unsigned i = 0; i < n; i++) {
     Particle* particle = m_plist->getParticle(i);
-    double m_b = particle->getPDGMass();
+    const double m_b = particle->getPDGMass();
     const std::vector<Particle*> daughters = particle->getDaughters();
 
     if (daughters.size() < 2)

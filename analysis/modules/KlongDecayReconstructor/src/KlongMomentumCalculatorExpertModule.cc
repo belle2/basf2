@@ -126,7 +126,7 @@ void KlongMomentumCalculatorExpertModule::event()
   while (m_generator->loadNext()) {
 
     Particle particle = m_generator->getCurrentParticle();
-    double m_b = particle.getPDGMass();
+    const double m_b = particle.getPDGMass();
     const std::vector<Particle*> daughters = particle.getDaughters();
 
     if (daughters.size() < 2)

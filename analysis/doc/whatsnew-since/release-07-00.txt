@@ -11,12 +11,12 @@ Modules
 +++++++
 
 * Added the new module :b2:mod:`ParticleMomentumUpdater` which is also available via the
-  function `modularAnalysis.setBeamConstrainedMomentum`. It lets you replace the momentum
+  function :func:`modularAnalysis.setBeamConstrainedMomentum`. It lets you replace the momentum
   of one particle in your decay chain by p(beam)-p(selected particles).
 
-* The module :b2:mod:`ParticleLoadeModule` has a new option to create particles which do
+* The module :b2:mod:`ParticleLoaderModule` has a new option to create particles which do
   not have a mdst source. It is also available via the convenience function 
-  `modularAnalysis.`fillParticleListFromDummy`.
+  :func:`modularAnalysis.fillParticleListFromDummy`.
 
 
 Dataobjects
@@ -26,7 +26,7 @@ Dataobjects
   of a Particle with another Particle while keeping the original order of the daughters.
   This is important to ensure the decay string will work correctly after replacing a daughter.
 
-* Added a new Particle source `NoMDSTSource` to Particle. It can be used for Particles 
+* Added a new Particle source ``NoMDSTSource`` to Particle. It can be used for Particles 
   that do not come from any mdst source.
 
 

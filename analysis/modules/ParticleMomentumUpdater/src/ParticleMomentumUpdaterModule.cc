@@ -47,11 +47,11 @@ void ParticleMomentumUpdaterModule::initialize()
   StoreArray<Belle2::Particle> particles;
   particles.isRequired();
 
-  bool valid = m_pDDescriptorTarget.init(m_decayStringDaughters);
+  bool valid = m_pDDescriptorDaughters.init(m_decayStringDaughters);
   if (!valid)
     B2ERROR("ParticleMomentumUpdaterModule::initialize invalid Decay Descriptor: " << m_decayStringDaughters);
 
-  valid = m_pDDescriptorDaughters.init(m_decayStringTarget);
+  valid = m_pDDescriptorTarget.init(m_decayStringTarget);
   if (!valid)
     B2ERROR("ParticleMomentumUpdaterModule::initialize invalid Decay Descriptor: " << m_decayStringTarget);
   else if (m_pDDescriptorTarget.getSelectionPDGCodes().size() != 1)

@@ -22,6 +22,14 @@ namespace Belle2 {
   public:
     //! Default constructor
     PXDGeometryPar() {}
+    //! Destructor
+    ~PXDGeometryPar()
+    {
+      for (PXDSensorInfoPar* pxdSensor : m_SensorInfo) {
+        delete pxdSensor;
+      }
+      m_SensorInfo.clear();
+    }
     /** build support */
     bool getBuildSupport() const { return (m_nCutouts > 0); }
     /** get number of cutouts */

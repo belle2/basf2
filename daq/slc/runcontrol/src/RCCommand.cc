@@ -22,6 +22,12 @@ const RCCommand RCCommand::ABORT(108, "RC_ABORT");
 const RCCommand RCCommand::BOOT(109, "RC_BOOT");
 const RCCommand RCCommand::STATUS(110, "RC_STATUS");
 
+const RCCommand& RCCommand::operator=(const RCCommand& command)
+{
+  NSMCommand::operator=(command);
+  return *this;
+}
+
 const RCCommand& RCCommand::operator=(const std::string& label)
 {
   if (NSMCommand::operator=(label) != Enum::UNKNOWN) return *this;

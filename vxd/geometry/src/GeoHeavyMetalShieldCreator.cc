@@ -26,6 +26,7 @@
 
 // Shapes
 #include <G4Box.hh>
+#include <G4Trd.hh>
 #include <G4Polycone.hh>
 #include <G4SubtractionSolid.hh>
 
@@ -53,7 +54,9 @@ namespace Belle2 {
           shield.getAngle("minPhi", 0),
           shield.getAngle("maxPhi", 2 * M_PI),
           (shield.getNodes("Cutout").size() > 0),
-          shield.getLength("Cutout/width", 0.),
+          //shield.getLength("Cutout/width", 0.),
+          shield.getLength("Cutout/width1", 0.),
+          shield.getLength("Cutout/width2", 0.),
           shield.getLength("Cutout/height", 0.),
           shield.getLength("Cutout/depth", 0.)
         );
@@ -111,7 +114,9 @@ namespace Belle2 {
 
         // Cutouts (if present)
         if (shield.getDoCutOut()) {
-          double sizeX  = shield.getCutOutWidth() / Unit::mm / 2.;
+          //double sizeX  = shield.getCutOutWidth() / Unit::mm / 2.;
+          double sizeX1  = shield.getCutOutWidth1() / Unit::mm / 2.;
+          double sizeX2  = shield.getCutOutWidth2() / Unit::mm / 2.;
           double sizeY  = shield.getCutOutHeight() / Unit::mm / 2.;
           double depth2 = shield.getCutOutDepth() / Unit::mm / 2.;
           double sizeZ  = (maxZ - minZ) / 2.;
@@ -121,8 +126,9 @@ namespace Belle2 {
           G4ThreeVector origin1(0, 0, sign * (minAbsZ + sizeZ));
           G4ThreeVector origin2(0, 0, sign * (minAbsZ + depth2));
 
-          G4Box* box1 = new G4Box("Cutout", sizeX, sizeY, sizeZ);
-          G4Box* box2 = new G4Box("Cutout", 100 / Unit::mm, sizeY, depth2);
+          //G4Box* box1 = new G4Box("Cutout", sizeX, sizeY, sizeZ);
+          G4Trd* box1 = new G4Trd("Cutout1", sizeX1, sizeX2, sizeY, sizeY, sizeZ);
+          G4Box* box2 = new G4Box("Cutout2", 100 / Unit::mm, sizeY, depth2);
 
           geoShield = new G4SubtractionSolid(name + " IR Shield", geoShield, box1, G4Translate3D(origin1));
           geoShield = new G4SubtractionSolid(name + " IR Shield", geoShield, box2, G4Translate3D(origin2));

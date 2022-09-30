@@ -39,6 +39,8 @@ DQMHistAnalysisKLM2Module::~DQMHistAnalysisKLM2Module()
 
 void DQMHistAnalysisKLM2Module::initialize()
 {
+  m_monObj = getMonitoringObject("klm");
+
   gROOT->cd();
   m_c_eff_bklm = new TCanvas("KLMEfficiencyDQM/c_eff_bklm_plane");
   m_c_eff_eklm = new TCanvas("KLMEfficiencyDQM/c_eff_eklm_plane");
@@ -88,6 +90,50 @@ void DQMHistAnalysisKLM2Module::beginRun()
 
 void DQMHistAnalysisKLM2Module::endRun()
 {
+  std::string name;
+
+  // Looping over the sectors
+  for (int bin = 0; bin < m_eff_bklm_sector->GetXaxis()->GetNbins(); bin++) {
+    name = "eff_B";
+    if (bin < 8)
+      name += "B";
+    else
+      name += "F";
+    name += std::to_string(bin % 8);
+    m_monObj->setVariable(name, m_eff_bklm_sector->GetBinContent(bin + 1));
+  }
+
+  for (int bin = 0; bin < m_eff_eklm_sector->GetXaxis()->GetNbins(); bin++) {
+    name = "eff_E";
+    if (bin < 4)
+      name += "B";
+    else
+      name += "F";
+    name += std::to_string(bin % 4);
+    m_monObj->setVariable(name, m_eff_eklm_sector->GetBinContent(bin + 1));
+  }
+
+  // Looping over the planes
+  for (int layer = 0; layer < m_eff_bklm->GetXaxis()->GetNbins(); layer++) {
+    name = "eff_B";
+    if (layer / 15 < 8) {
+      name += "B";
+    } else {
+      name += "F";
+    }
+    name += std::to_string(int(layer / 15) % 8) + "_layer" + std::to_string(1 + (layer % 15));
+    m_monObj->setVariable(name, m_eff_bklm->GetBinContent(layer + 1));
+  }
+  for (int layer = 0; layer < m_eff_eklm->GetXaxis()->GetNbins(); layer++) {
+    name = "eff_E";
+    if (layer / 8 < 12)
+      name += "B" + std::to_string(layer / 8 + 1);
+    else
+      name += "F" + std::to_string(layer / 8 - 11);
+    name +=  + "_num" + std::to_string(((layer) % 8) + 1);
+    m_monObj->setVariable(name, m_eff_eklm->GetBinContent(layer + 1));
+
+  }
 }
 
 

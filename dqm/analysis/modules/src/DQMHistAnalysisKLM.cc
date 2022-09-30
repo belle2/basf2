@@ -46,6 +46,7 @@ DQMHistAnalysisKLMModule::DQMHistAnalysisKLMModule()
            50);
   addParam("MinProcessedEventsForMessages", m_MinProcessedEventsForMessagesInput,
            "Minimal number of processed events required to print error messages", 10000.);
+  addParam("RefHistoFile", m_refFileName, "Reference histogram file name", std::string("KLM_DQM_REF_BEAM.root"));
 
   m_MinProcessedEventsForMessages = m_MinProcessedEventsForMessagesInput;
   m_2DHitsLine.SetLineColor(kRed);
@@ -66,15 +67,31 @@ DQMHistAnalysisKLMModule::~DQMHistAnalysisKLMModule()
 
 void DQMHistAnalysisKLMModule::initialize()
 {
+  m_monObj = getMonitoringObject("klm");
+
   if (m_ThresholdForHot > m_ThresholdForMasked)
     B2FATAL("The threshold used for hot channels is larger than the one for masked channels."
             << LogVar("Threshold for hot channels", m_ThresholdForHot)
             << LogVar("Threshold for masked channels", m_ThresholdForMasked));
 
+  if (m_refFileName != "") {
+    m_refFile = TFile::Open(m_refFileName.data(), "READ");
+  }
+
+  //search for reference
+  if (m_refFile && m_refFile->IsOpen()) {
+    B2INFO("KLM DQMHistAnalysis: reference root file (" << m_refFileName << ") FOUND, able to read ref histograms");
+
+  } else
+    B2WARNING("KLM DQMHistAnalysis: reference root file (" << m_refFileName << ") not found, or closed");
 }
 
 void DQMHistAnalysisKLMModule::terminate()
 {
+  if (m_refFile) {
+    m_refFile->Close();
+    delete m_refFile;
+  }
 }
 
 void DQMHistAnalysisKLMModule::beginRun()
@@ -94,6 +111,27 @@ void DQMHistAnalysisKLMModule::beginRun()
 
 void DQMHistAnalysisKLMModule::endRun()
 {
+  int hist_max_bin; double max_position;
+  TH1* time_rpc = findHist("KLM/time_rpc");
+  if (time_rpc) {
+    hist_max_bin = time_rpc->GetMaximumBin();
+    max_position = time_rpc->GetXaxis()->GetBinCenter(hist_max_bin);
+    m_monObj->setVariable("RPC_Time_Peak", max_position);
+  }
+
+  TH1* time_scint_bklm = findHist("KLM/time_scintillator_bklm");
+  if (time_scint_bklm) {
+    hist_max_bin = time_scint_bklm->GetMaximumBin();
+    max_position = time_scint_bklm->GetXaxis()->GetBinCenter(hist_max_bin);
+    m_monObj->setVariable("BKLM_Scint_Time_Peak", max_position);
+  }
+
+  TH1* time_scint_eklm = findHist("KLM/time_scintillator_bklm");
+  if (time_scint_eklm) {
+    hist_max_bin = time_scint_eklm->GetMaximumBin();
+    max_position = time_scint_eklm->GetXaxis()->GetBinCenter(hist_max_bin);
+    m_monObj->setVariable("EKLM_Scint_Time_Peak", max_position);
+  }
 }
 
 double DQMHistAnalysisKLMModule::getProcessedEvents()
@@ -126,6 +164,23 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
   histogram->SetStats(false);
   histogram->Draw();
   n = histogram->GetXaxis()->GetNbins();
+
+  TH1* ref_histogram = nullptr;
+  float ref_average = 0;
+  if (m_refFile && m_refFile->IsOpen()) {
+    ref_histogram = (TH1*)m_refFile->Get(histogram->GetName());
+    if (!ref_histogram) {
+      B2WARNING("Unable to find " << histogram->GetName() << "in reference file.");
+    }
+  }
+
+  if (ref_histogram != nullptr) {
+    for (i = 1; i <= n; i++) {
+      double nHitsPerModuleRef = ref_histogram->GetBinContent(i);
+      ref_average = ref_average + nHitsPerModuleRef;
+    }
+  }
+
   for (i = 1; i <= n; i++) {
     uint16_t channelIndex = std::round(histogram->GetBinCenter(i));
     uint16_t channelNumber = m_ChannelArrayIndex->getNumber(channelIndex);
@@ -163,15 +218,7 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
       m_ElectronicsMap->getElectronicsChannel(channel);
     if (electronicsChannel == nullptr)
       B2FATAL("Incomplete KLM electronics map.");
-    str = "No data from HSLB ";
-    if (channelSubdetector == KLMElementNumbers::c_BKLM) {
-      str += BKLMElementNumbers::getHSLBName(electronicsChannel->getCopper(),
-                                             electronicsChannel->getSlot());
-    } else {
-      str += EKLMElementNumbers::getHSLBName(electronicsChannel->getCopper(),
-                                             electronicsChannel->getSlot());
-    }
-    str += ", lane " + std::to_string(electronicsChannel->getLane());
+    str = "No data from lane " + std::to_string(electronicsChannel->getLane());
     latex.DrawLatexNDC(x, y, str.c_str());
     y -= 0.05;
     /* Store the module number, used later in processPlaneHistogram
@@ -193,6 +240,7 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
   if (activeModuleChannels == 0)
     return;
   average /= activeModuleChannels;
+  ref_average /= activeModuleChannels;
   for (i = 1; i <= n; ++i) {
     uint16_t channelIndex = std::round(histogram->GetBinCenter(i));
     uint16_t channelNumber = m_ChannelArrayIndex->getNumber(channelIndex);
@@ -219,24 +267,29 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
         B2FATAL("Incomplete BKLM electronics map.");
       if (channelStatus == "Masked")
         histogram->SetBinContent(i, 0);
-      str = channelStatus + " channel: HSLB ";
-      if (channelSubdetector == KLMElementNumbers::c_BKLM) {
-        str += BKLMElementNumbers::getHSLBName(electronicsChannel->getCopper(),
-                                               electronicsChannel->getSlot());
-      } else {
-        str += EKLMElementNumbers::getHSLBName(electronicsChannel->getCopper(),
-                                               electronicsChannel->getSlot());
-      }
-      str += (", lane " + std::to_string(electronicsChannel->getLane()) +
-              ", axis " + std::to_string(electronicsChannel->getAxis()) +
-              ", channel " + std::to_string(electronicsChannel->getChannel()));
+      str = channelStatus + " channel: ";
+      str += ("L" + std::to_string(electronicsChannel->getLane()) +
+              " A" + std::to_string(electronicsChannel->getAxis()) +
+              " Ch" + std::to_string(electronicsChannel->getChannel()));
       latex.DrawLatexNDC(x, y, str.c_str());
       y -= 0.05;
     }
   }
+
   if (histogram->GetMaximum()*n > histogram->Integral()*m_ThresholdForLog && average * activeModuleChannels > m_MinHitsForFlagging) {
     canvas->SetLogy();
+  } else if (ref_histogram != nullptr) {
+    if (ref_histogram->GetMaximum()*n > ref_histogram->Integral()*m_ThresholdForLog
+        && ref_average * activeModuleChannels > m_MinHitsForFlagging) {
+      canvas->SetLogy();
+    } else {
+      canvas->SetLogy(0);
+    }
+
+  } else {
+    canvas->SetLogy(0);
   }
+
   canvas->Modified();
 }
 

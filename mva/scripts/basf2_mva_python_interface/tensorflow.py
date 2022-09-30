@@ -125,14 +125,15 @@ def apply(state, X):
     return np.require(r, dtype=np.float32, requirements=['A', 'W', 'C', 'O'])
 
 
-def begin_fit(state, Xtest, Stest, ytest, wtest):
+def begin_fit(state, Xtest, Stest, ytest, wtest, nBatches):
     """
     Returns just the state object
     """
+    state.nBatches = nBatches
     return state
 
 
-def partial_fit(state, X, S, y, w, epoch):
+def partial_fit(state, X, S, y, w, epoch, batch):
     """
     Pass batches of received data to tensorflow
     """
@@ -148,9 +149,15 @@ def partial_fit(state, X, S, y, w, epoch):
 
     state.model.optimizer.apply_gradients(zip(grads, state.model.trainable_variables))
 
-    # epoch = i_epoch * nBatches + iBatch
-    if epoch % 1000 == 0:
-        print(f"Epoch: {epoch:04d} cost= {avg_cost:.9f}")
+    if batch == 0 and epoch == 0:
+        state.avg_costs = [avg_cost]
+    elif batch != state.nBatches-1:
+        state.avg_costs.append(avg_cost)
+    else:
+        # end of the epoch, print summary results, reset the avg_costs and update the counter
+        print(f"Epoch: {epoch:04d} cost= {np.mean(state.avg_costs):.9f}")
+        state.avg_costs = [avg_cost]
+
     if epoch == 100000:
         return False
     return True

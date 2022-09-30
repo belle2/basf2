@@ -7,11 +7,9 @@
  **************************************************************************/
 
 #include <tracking/modules/pxdDataReduction/PXDRawHitFilterModule.h>
-#include <tracking/dataobjects/ROIid.h>
 #include <map>
 
 using namespace Belle2;
-using namespace std;
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -41,24 +39,21 @@ PXDRawHitFilterModule::PXDRawHitFilterModule() : Module()
 
 void PXDRawHitFilterModule::initialize()
 {
+  m_ROIs.isRequired(m_ROIidsName);
+  m_PXDRawHits.isRequired(m_PXDRawHitsName);   /**< The PXDRawHits to be filtered */
 
-  StoreArray<ROIid> roiIDs;
-  roiIDs.isRequired(m_ROIidsName);
-
-  StoreArray<PXDRawHit> PXDRawHits(m_PXDRawHitsName);   /**< The PXDRawHits to be filtered */
-  PXDRawHits.isRequired();
   if (m_PXDRawHitsName == m_PXDRawHitsInsideROIName) {
-    m_selectorIN.registerSubset(PXDRawHits);
+    m_selectorIN.registerSubset(m_PXDRawHits);
   } else {
-    m_selectorIN.registerSubset(PXDRawHits, m_PXDRawHitsInsideROIName);
+    m_selectorIN.registerSubset(m_PXDRawHits, m_PXDRawHitsInsideROIName);
     m_selectorIN.inheritAllRelations();
   }
 
   if (m_CreateOutside) {
     if (m_PXDRawHitsName == m_PXDRawHitsOutsideROIName) {
-      m_selectorOUT.registerSubset(PXDRawHits);
+      m_selectorOUT.registerSubset(m_PXDRawHits);
     } else {
-      m_selectorOUT.registerSubset(PXDRawHits, m_PXDRawHitsOutsideROIName);
+      m_selectorOUT.registerSubset(m_PXDRawHits, m_PXDRawHitsOutsideROIName);
       m_selectorOUT.inheritAllRelations();
     }
   }
@@ -66,13 +61,10 @@ void PXDRawHitFilterModule::initialize()
 
 void PXDRawHitFilterModule::event()
 {
-  StoreArray<PXDRawHit> PXDRawHits(m_PXDRawHitsName);   /**< The PXDRawHits to be filtered */
-  StoreArray<ROIid> ROIids_store_array(m_ROIidsName); /**< The ROIs */
+  std::multimap< VxdID, ROIid > ROIids;
 
-  multimap< VxdID, ROIid > ROIids;
-
-  for (auto ROI : ROIids_store_array)
-    ROIids.insert(pair<VxdID, ROIid> (ROI.getSensorID(), ROI));
+  for (auto ROI : m_ROIs)
+    ROIids.insert(std::pair<VxdID, ROIid> (ROI.getSensorID(), ROI));
 
   m_selectorIN.select([ROIids](const PXDRawHit * thePxdRawHit) {
     auto ROIidsRange = ROIids.equal_range(thePxdRawHit->getSensorID()) ;

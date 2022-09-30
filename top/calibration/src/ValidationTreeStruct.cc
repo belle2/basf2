@@ -27,6 +27,11 @@ namespace Belle2 {
       for (auto& x : numActiveCalibrated) x = 0;
       for (auto& x : thrEffi) x = 0;
       for (auto& x : asicShifts) x = 0;
+      svdOffset = 0;
+      svdSigma = 0;
+      cdcOffset = 0;
+      cdcSigma = 0;
+      fillPatternOffset = 0;
       numMerged = 0;
     }
 

@@ -28,18 +28,31 @@ namespace Belle2 {
     /**
      * Setter
      * @param offset value to be set
+     * @param fraction fraction of reconstructed buckets which are matched with filled ones
      */
-    void set(int offset)
+    void set(int offset, double fraction = 0)
     {
       m_offset = offset;
+      m_fraction = fraction;
       m_calibrated = true;
     }
 
     /**
-     * Getter
+     * Switch calibration status to uncalibrated
+     */
+    void setUnusable() {m_calibrated = false;}
+
+    /**
+     * Getter for offset
      * @return offset
      */
     int get() const {return m_offset;}
+
+    /**
+     * Getter for fraction
+     * @return fraction of reconstructed buckets matched with filled ones
+     */
+    double getFraction() const {return m_fraction;}
 
     /**
      * Is calibrated?
@@ -50,9 +63,10 @@ namespace Belle2 {
   private:
 
     int m_offset = 0; /**< offset [RF clock] */
+    float m_fraction = 0; /**< fraction of reconstructed buckets matched with filled ones */
     bool m_calibrated = false; /**< calibration status */
 
-    ClassDef(TOPCalFillPatternOffset, 1); /**< ClassDef */
+    ClassDef(TOPCalFillPatternOffset, 2); /**< ClassDef */
 
   };
 

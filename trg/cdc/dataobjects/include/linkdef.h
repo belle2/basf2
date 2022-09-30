@@ -11,7 +11,7 @@
 #pragma link C++ class bitset <639>+; // checksum=0x88f24d, version=2
 #pragma link C++ class bitset <256>+; // checksum=0x88f1ea, version=2
 #pragma link C++ class Belle2::CDCTriggerSegmentHit+; // checksum=0x89ed4679, version=4
-#pragma link C++ class Belle2::CDCTriggerTrack+; // checksum=0xdde6f688, version=12
+#pragma link C++ class Belle2::CDCTriggerTrack+; // checksum=0xa5ae9350, version=13
 #pragma link C++ class Belle2::CDCTriggerMLP+; // checksum=0x2d137aa, version=7
 #pragma link C++ class Belle2::CDCTriggerMLPData+; // checksum=0x48969a58, version=1
 #pragma link C++ class Belle2::CDCTriggerMLPInput+; // checksum=0x6fd59940, version=1

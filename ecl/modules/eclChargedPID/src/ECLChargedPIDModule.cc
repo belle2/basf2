@@ -101,8 +101,8 @@ void ECLChargedPIDModule::event()
     m_variables[ECLChargedPidPDFs::InputVar::c_E9E21] = (mostEnergeticShower) ? mostEnergeticShower->getE9oE21() : -1.0;
     m_variables[ECLChargedPidPDFs::InputVar::c_E] = (mostEnergeticShower) ? maxEnergy : -1.0;
     m_variables[ECLChargedPidPDFs::InputVar::c_EoP] = (mostEnergeticShower) ? maxEnergy / p : -1.0;
-    m_variables[ECLChargedPidPDFs::InputVar::c_Z40] = (mostEnergeticShower) ? mostEnergeticShower->getAbsZernike40() : -999.0;
-    m_variables[ECLChargedPidPDFs::InputVar::c_Z51] = (mostEnergeticShower) ? mostEnergeticShower->getAbsZernike51() : -999.0;
+    m_variables[ECLChargedPidPDFs::InputVar::c_Z40] = (mostEnergeticShower) ? mostEnergeticShower->getAbsZernikeMoment(4, 0) : -999.0;
+    m_variables[ECLChargedPidPDFs::InputVar::c_Z51] = (mostEnergeticShower) ? mostEnergeticShower->getAbsZernikeMoment(5, 1) : -999.0;
     m_variables[ECLChargedPidPDFs::InputVar::c_ZMVA] = (mostEnergeticShower) ? mostEnergeticShower->getZernikeMVA() : -999.0;
     m_variables[ECLChargedPidPDFs::InputVar::c_PSDMVA] = (mostEnergeticShower) ? mostEnergeticShower->getPulseShapeDiscriminationMVA() :
                                                          -999.0;

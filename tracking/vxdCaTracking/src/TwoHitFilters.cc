@@ -8,7 +8,6 @@
 
 #include "tracking/vxdCaTracking/TwoHitFilters.h"
 
-using namespace std;
 using namespace Belle2;
 
 

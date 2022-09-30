@@ -18,7 +18,6 @@
 #include <iostream>
 #include <fstream>
 #include <iomanip>
-using std::endl;
 
 using Eigen::VectorXd;
 using Eigen::MatrixXd;
@@ -127,7 +126,7 @@ static std::vector<TTree*> getTrees(TString tag, TFile* f)
 
   std::vector<TTree*> treeVec;
 
-  for (const auto && obj : *l) {
+  for (const auto&& obj : *l) {
     TString n = obj->GetName();
 
     TString trDir = tag + "/events/" + TString(obj->GetName()) + "/events_1";
@@ -263,7 +262,8 @@ void printToFile(const std::vector<CalibrationData>&  CalResults, TString outFil
   //Store info to the text file
   std::ofstream finalOut(outFileName);
   finalOut <<
-           "t1   t2      exp1   run1     exp2   run2     state     Ecms   EcmsUnc     pull   shift   shiftUnc     spread   spreadUnc" << endl;
+           "t1   t2      exp1   run1     exp2   run2     state     Ecms   EcmsUnc     pull   shift   shiftUnc     spread   spreadUnc" <<
+           std::endl;
 
   for (auto cal : CalResults) {
 
@@ -289,7 +289,7 @@ void printToFile(const std::vector<CalibrationData>&  CalResults, TString outFil
       finalOut <<  std::setprecision(8) <<  s << " " << e << " " << exp1 << " " << run1 << " " << exp2 << " " << run2  << " " << j << " "
                <<  1e3 * cnt << "   " << 1e3 * cntUnc << "   " <<   pull <<
                " " << 1e3 * shift << "    " << 1e3 *
-               shiftUnc << "   " << 1e3 * spread << "   " << 1e3 * spreadUnc <<  endl;
+               shiftUnc << "   " << 1e3 * spread << "   " << 1e3 * spreadUnc <<  std::endl;
 
     }
 
@@ -430,7 +430,7 @@ CalibrationAlgorithm::EResult InvariantMassAlgorithm::calibrate()
   B2INFO("Number of main calibration blocks " << evtsMuMuBlocks.size());
 
   std::ofstream BonlyOut("BonlyEcmsCalib.txt");
-  BonlyOut << "t1    t2   exp1   run1      exp2   run2      Ecms   EcmsUnc    spread   spreadUnc" << endl;
+  BonlyOut << "t1    t2   exp1   run1      exp2   run2      Ecms   EcmsUnc    spread   spreadUnc" << std::endl;
 
   std::vector<std::vector<CalibrationData>> CalResultsBlocks;
   //calibrate each run-type block separately
@@ -484,7 +484,7 @@ CalibrationAlgorithm::EResult InvariantMassAlgorithm::calibrate()
       double run2 = calibMuMu.subIntervals.back().rbegin()->first.run;
 
       BonlyOut <<  std::setprecision(8) <<  s << " " << e << " " << exp1 << " " << run1 << " " << exp2 << " " << run2  << " " <<
-               1e3 * resB[0] << "  " << 1e3 * resB[1] << " " <<  1e3 * resB[2] << "  " << 1e3 * resB[3] <<  endl;
+               1e3 * resB[0] << "  " << 1e3 * resB[1] << " " <<  1e3 * resB[2] << "  " << 1e3 * resB[3] <<  std::endl;
 
 
 

@@ -229,6 +229,7 @@ void TreeFitterModule::plotFancyASCII()
   B2INFO("\033[40;97m      (_)                 (_)                                                   \033[0m");
   B2INFO("\033[40;97m                                                                                \033[0m");
   B2INFO("\033[1;35m============= TREEFIT STATISTICS ===============================================\033[0m");
+  B2INFO("\033[1;39mTarget particle list: " << m_particleList <<  "\033[0m");
   B2INFO("\033[1;39mCandidates before fit: " << m_nCandidatesBeforeFit << "\033[0m");
   B2INFO("\033[1;39mCandidates after fit:  " << m_nCandidatesAfter << "\033[0m");
   B2INFO("\033[1;39mA total of " << m_nCandidatesBeforeFit - m_nCandidatesAfter <<
@@ -237,6 +238,6 @@ void TreeFitterModule::plotFancyASCII()
          "% of candidates survived the fit.\033[0m");
   B2INFO("\033[1;39m" << 100. - (double)m_nCandidatesAfter / (double)m_nCandidatesBeforeFit * 100.0 <<
          "% of candidates did not.\033[0m");
-  B2INFO("\033[1;39mYou choose to drop all candidates with pValue < " << m_confidenceLevel << ".\033[0m");
+  B2INFO("\033[1;39mYou chose to drop all candidates with pValue < " << m_confidenceLevel << ".\033[0m");
   B2INFO("\033[1;35m================================================================================\033[0m");
 }

@@ -30,3 +30,43 @@ Dataobjects
   that do not come from any mdst source.
 
 
+Changes in the analysis package in light-2209-calico
+----------------------------------------------------
+
+MVA-based pi0 identification
+++++++++++++++++++++++++++++
+ * New function :func:`modularAnalysis.lowEnergyPi0Identification` providing MVA-based pi0 identification is added.
+ * Example of its usage is added as ``analysis/examples/PostMdstIdentification/LowEnergyPi0Identification.py``.
+
+Variables
++++++++++
+ * Extended the variable `useAlternativeDaughterHypothesis` to variables calculated from daughters' 4-momentum, e.g.
+   `cosHelicityAngleMomentum`.
+
+Modules
++++++++
+ * New modules :b2:mod:`LowEnergyPi0VetoExpert` and :b2:mod:`LowEnergyPi0IdentificationExpert` for MVA-based pi0
+   identification are added.
+
+Modular Analysis Function
++++++++++++++++++++++++++
+ * Added a check to the `applyEventCuts` function to make sure that only event-based variables are used in the
+   selection. The decomposition of meta variables can be tricky, so a new argument ``metavariables`` is added to extend
+   the list of meta variables which should be decomposed and should themselves be ignored in the check.
+
+Changes in the analysis package in light-2207-bengal
+----------------------------------------------------
+
+Variables
++++++++++
+ * Added the variables of the PID probability with the calibration weights, `weightedElectronID`, `weightedMuonID`,
+   `weightedPionID`, `weightedKaonID`, `weightedProtonID`, and `weightedDeuteronID`.
+   Also, the expert PID variables were added, `pidWeightedLogLikelihoodValueExpert`, `pidWeightedPairProbabilityExpert`,
+   and `pidWeightedProbabilityExpert`.
+ * Added the variable `hasCorrectROECombination` to check if the correct combination of the particle that is the basis of
+   the ROE object and the particle that is loaded from the ROE.
+
+Modules
++++++++
+ * Fixed a bug in the :func:`modularAnalysis.fillParticleListFromROE`. The relationship of the pdg code between the loaded
+   particle and the source particle was inconsistent when the loaded particle was not a self-conjugated particle.

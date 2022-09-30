@@ -463,7 +463,7 @@ int DeSerializerModule::CheckConnection(int socket)
           usleep(10000);
           eagain_cnt++;
         } else {
-          printf("ERROR %d errno %d err %s\n", socket , errno, strerror(errno)); fflush(stdout);
+          printf("ERROR %d errno %d err %s\n", socket, errno, strerror(errno)); fflush(stdout);
           close(socket);
           return -1;
         }

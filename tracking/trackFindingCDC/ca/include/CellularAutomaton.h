@@ -99,7 +99,7 @@ namespace Belle2 {
 
         // Throw if this cell has already been traversed in this recursion cycle
         if (cell.hasCycleFlag()) {
-          B2DEBUG(100, "Cycle detected");
+          B2DEBUG(25, "Cycle detected");
           throw (CycleException());
         }
 

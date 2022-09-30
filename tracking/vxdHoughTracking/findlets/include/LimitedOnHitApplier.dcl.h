@@ -24,7 +24,7 @@ namespace Belle2 {
     * (a) uses a filter for the () operator, which is configurable
     * (b) does only allow for the best N candidates in the child hits. All other hits will be deleted.
     *
-    * If m_param_useNHits is 0, all hits are used.
+    * If m_useNHits is 0, all hits are used.
     */
     template <class AHit, class AFilter>
     class LimitedOnHitApplier : public OnHitApplier<AHit> {
@@ -51,7 +51,7 @@ namespace Belle2 {
 
     private:
       /// Parameter how many objects should pass maximal
-      int m_param_useNHits = 0;
+      int m_useNHits = 0;
 
       /// Filter to decide on the hits
       AFilter m_filter;

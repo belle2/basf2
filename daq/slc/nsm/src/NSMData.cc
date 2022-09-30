@@ -90,6 +90,22 @@ NSMData::~NSMData()
   }
 }
 
+const NSMData& NSMData::operator=(const NSMData& data)
+{
+  AbstractDBObject::operator=(data);
+  m_allocated = data.m_allocated;
+  m_pdata = data.m_pdata;
+  m_size = data.m_size;
+  m_offset = data.m_offset;
+  m_format = data.m_format;
+  m_revision = data.m_revision;
+  m_data_v_m = data.m_data_v_m;
+  m_empty = data.m_empty;
+  m_com = data.m_com;
+  m_tstamp = data.m_tstamp;
+  return *this;
+}
+
 void NSMData::reset()
 {
   AbstractDBObject::reset();

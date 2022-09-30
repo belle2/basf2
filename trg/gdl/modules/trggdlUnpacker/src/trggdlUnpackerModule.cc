@@ -15,8 +15,6 @@
 //---------------------------------------------------------------
 // Description : TRG GDL Unpacker Module
 //---------------------------------------------------------------
-// 1.00 : 2017/07/26 : First version
-//---------------------------------------------------------------
 
 #include <trg/gdl/modules/trggdlUnpacker/trggdlUnpackerModule.h>
 
@@ -201,7 +199,7 @@ void TRGGDLUnpackerModule::event()
             }
           }
 
-        } else if (m_pciedata) {
+        } else {
 
           unsigned pcie40id = raw_trgarray[i]->GetNodeID(j);
           if (pcie40id == 0x10000001) {

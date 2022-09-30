@@ -45,6 +45,11 @@ namespace Belle2 {
     NSMData(const NSMData& data);
     virtual ~NSMData();
 
+    /**
+     * Operator =.
+     */
+    const NSMData& operator=(const NSMData& data);
+
   private:
     NSMData(void* pdata, const NSMData& data);
     NSMData(void* pdata, const std::string& dataname,

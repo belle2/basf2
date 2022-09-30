@@ -17,7 +17,7 @@
 #endif
 
 //DQM
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 
 
 //ARICH
@@ -188,7 +188,7 @@ namespace Belle2 {
     TLine* m_line_limit_low_shifter[n_eff_shifter] = {}; /**<lower limit line for the simplified efficiency histogram*/
     TLine* m_line_limit_high_shifter[n_eff_shifter] = {}; /**<upper limit line for the simplified efficiency histogram*/
     double m_limit_low_shifter[n_eff_shifter] = {
-      0.80, 0.80, 0.80, 0.80, 0.80, 0.80, 0.40, 0.05, 0.35, 0.80, 0.20, 0.40, 0.00, 0.70
+      0.80, 0.80, 0.80, 0.80, 0.80, 0.80, 0.35, 0.05, 0.25, 0.80, 0.20, 0.40, 0.00, 0.70
     }; /**<lower limit value in each bin*/
     double m_limit_high_shifter[n_eff_shifter] = {
       0.95, 0.95, 0.95, 0.95, 1.00, 1.00, 0.50, 0.20, 0.55, 1.00, 0.40, 0.70, 1.00, 0.90

@@ -1027,14 +1027,11 @@ namespace Belle2 {
 
       auto func = [detLayer, referenceListName, extraSuffix](const Particle * part) -> double {
         std::string extraInfo = "distToClosestTrkAt" + detLayer + "_VS_" + referenceListName + extraSuffix;
-        if (part->hasExtraInfo(extraInfo))
+        if (!part->hasExtraInfo(extraInfo))
         {
-          return part->getExtraInfo(extraInfo);
-        } else
-        {
-          B2WARNING("Couldn't get a result for minET2ETDist. Have you forgotten to run the TrackIsoCalculator module on your particle list?");
+          return std::numeric_limits<float>::quiet_NaN();
         }
-        return std::numeric_limits<float>::quiet_NaN();
+        return part->getExtraInfo(extraInfo);
       };
 
       return func;
@@ -1048,11 +1045,11 @@ namespace Belle2 {
         return nullptr;
       }
 
-      std::string variableName = arguments[0];
-      std::string detLayer = arguments[1];
-      std::string referenceListName = arguments[2];
+      std::string detLayer = arguments[0];
+      std::string referenceListName = arguments[1];
+      std::string variableName = arguments[2];
 
-      auto func = [variableName, detLayer, referenceListName](const Particle * part) -> double {
+      auto func = [detLayer, referenceListName, variableName](const Particle * part) -> double {
 
         StoreObjPtr<ParticleList> refPartList(referenceListName);
         if (!refPartList.isValid())
@@ -1064,7 +1061,6 @@ namespace Belle2 {
         std::string extraInfo = "idxOfClosestPartAt" + detLayer + "In_" + referenceListName;
         if (!part->hasExtraInfo(extraInfo))
         {
-          B2WARNING("Couldn't get a result for minET2ETDist. Have you forgotten to run the TrackIsoCalculator module on your particle list?");
           return std::numeric_limits<float>::quiet_NaN();
         }
 
@@ -1242,11 +1238,11 @@ if 0, it is assumed the mass hypothesis matching the particle lists' PDG.
 )DOC",
 			  Manager::VariableDataType::c_double);
 
-    REGISTER_METAVARIABLE("minET2ETDistVar(variableName, detLayer, referenceListName)", particleDistToClosestExtTrkVar,
+    REGISTER_METAVARIABLE("minET2ETDistVar(detLayer, referenceListName, variableName)", particleDistToClosestExtTrkVar,
 			  R"DOC(Returns the value of the variable for the nearest particle in the input particle list at the given detector surface, according to the definition of `minET2ETDist`.
-The first argument is a variable name, e.g. `nCDCHits`.
-The second argument is the detector surface where to look at the nearest neighbour.
-The third argument is the reference particle list name used to pick up the nearest track helix.
+The first argument is the detector surface where to look at the nearest neighbour.
+The second argument is the reference particle list name used to pick up the nearest track helix.
+The third argument is a variable name, e.g. `nCDCHits`.
 
 .. note::
     This variables requires to run the TrackIsolation module first.

@@ -117,9 +117,10 @@ namespace Belle2 {
 
     /** Set parameters and get some network independent parameters. */
     void initialize(const Parameters& p);
+    void initialize(const NeuroTriggerParameters& p);
 
     /** Get indices for sector ranges in parameter lists. */
-    std::vector<unsigned> getRangeIndices(const Parameters& p, unsigned isector);
+    std::vector<unsigned> getRangeIndices(const NeuroTriggerParameters& p, unsigned isector);
 
     /** Save MLPs to file.
      * @param filename name of the TFile to write to

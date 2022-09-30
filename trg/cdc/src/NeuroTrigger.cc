@@ -225,6 +225,18 @@ NeuroTrigger::initialize(const Parameters& p)
   // load some values from the geometry that will be needed for the input
   setConstants();
 }
+void
+NeuroTrigger::initialize(const NeuroTriggerParameters& p)
+{
+  // load parameters from config file
+
+  // check configuration for consistency
+}
+
+vector<unsigned>
+NeuroTrigger::getRangeIndices(const NeuroTriggerParameters& p, unsigned isector)
+{
+}
 
 vector<unsigned>
 NeuroTrigger::getRangeIndices(const Parameters& p, unsigned isector)

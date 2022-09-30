@@ -1,35 +1,3 @@
-Changes in the analysis package
--------------------------------
-
-TreeFitter
-++++++++++
-
-* Added the argument ``treatAsInvisible`` to ignore particles in the fit. 
-
-
-Modules
-+++++++
-
-* Added the new module :b2:mod:`ParticleMomentumUpdater` which is also available via the
-  function :func:`modularAnalysis.setBeamConstrainedMomentum`. It lets you replace the momentum
-  of one particle in your decay chain by p(beam)-p(selected particles).
-
-* The module :b2:mod:`ParticleLoaderModule` has a new option to create particles which do
-  not have a mdst source. It is also available via the convenience function 
-  :func:`modularAnalysis.fillParticleListFromDummy`.
-
-
-Dataobjects
-+++++++++++
-
-* Added a ``replaceDaughter`` method to Particle. It allows you to replace the daughter
-  of a Particle with another Particle while keeping the original order of the daughters.
-  This is important to ensure the decay string will work correctly after replacing a daughter.
-
-* Added a new Particle source ``NoMDSTSource`` to Particle. It can be used for Particles 
-  that do not come from any mdst source.
-
-
 Changes in the analysis package in light-2209-calico
 ----------------------------------------------------
 
@@ -47,12 +15,28 @@ Modules
 +++++++
  * New modules :b2:mod:`LowEnergyPi0VetoExpert` and :b2:mod:`LowEnergyPi0IdentificationExpert` for MVA-based pi0
    identification are added.
+ * Added the new module :b2:mod:`ParticleMomentumUpdater` which is also available via the
+   function :func:`modularAnalysis.setBeamConstrainedMomentum`. It lets you replace the momentum
+   of one particle in your decay chain by p(beam)-p(selected particles).
+ * The module :b2:mod:`ParticleLoader` has a new option to create particles which do
+   not have a mdst source. It is also available via the convenience function 
+   :func:`modularAnalysis.fillParticleListFromDummy`.
 
 Modular Analysis Function
 +++++++++++++++++++++++++
  * Added a check to the `applyEventCuts` function to make sure that only event-based variables are used in the
    selection. The decomposition of meta variables can be tricky, so a new argument ``metavariables`` is added to extend
    the list of meta variables which should be decomposed and should themselves be ignored in the check.
+ * Added the argument ``treatAsInvisible`` in :func:`vertex.treeFit` to ignore particles in the fit. 
+
+Particle dataobject
++++++++++++++++++++
+ * Added a ``replaceDaughter`` method to Particle. It allows you to replace the daughter
+   of a Particle with another Particle while keeping the original order of the daughters.
+   This is important to ensure the decay string will work correctly after replacing a daughter.
+ * Added a new Particle source ``NoMDSTSource`` to Particle. It can be used for Particles 
+   that do not come from any mdst source.
+
 
 Changes in the analysis package in light-2207-bengal
 ----------------------------------------------------

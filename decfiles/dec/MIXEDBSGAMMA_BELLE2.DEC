@@ -1,22 +1,20 @@
-# BelleII collaboration mixedbsgamma DECAY.DEC
-# Based on EvtGen DECAY.DEC and Belle mixedrare DECAY.DEC
+# EventType: 1190001004?
+# Descriptor: 
+# NickName: Bd_sgamma
+# Documentation: semi-inclusive b -> s gamma
+# Tested: Yes
+# PhysicsWG: TDCPV
+# Responsible: Yuma Uematsu
+# Email: uematsu@hep.phys.s.u-tokyo.ac.jp
+# Cuts: None
+# Date: 20220930
 #
-# Changes
 #
-# Oct. 2022, P. Goldenzweig (pablo.goldenzweig@kit.edu)
-#   First commit.
-#   Includes b -> s gamma decays in DECAY_BELLE2.DEC.
-
-
-Alias MyB0 B0
-Alias Myanti-B0 anti-B0
-ChargeConj MyB0 Myanti-B0
-
 Decay Upsilon(4S)
-1.000000000   MyB0  Myanti-B0  B0  anti-B0                 VSS_BMIX dm;
+1.000000000   B0sig  anti-B0sig  B0  anti-B0			   VSS_BMIX dm;
 Enddecay
 
-Decay MyB0
+Decay B0sig
 0.000041770   K*0  gamma                                   SVP_HELAMP 1.0 0.0 1.0 0.0; #[BF update - PG 04/2022]
 0.000000440   omega  gamma                                 SVP_HELAMP 1.0 0.0 1.0 0.0; #[BF update - PG 04/2022]
 0.000000860   rho0  gamma                                  SVP_HELAMP 1.0 0.0 1.0 0.;  #[BF update - PG 04/2022]
@@ -26,6 +24,6 @@ Decay MyB0
 0.000001700   K''*0  gamma                                 SVP_HELAMP 1.0 0.0 1.0 0.0; #Upper limit is 2e-3. #[Comment - PG 04/2022]
 0.000242360   Xsd  gamma                                   BTOXSGAMMA 2 ;              #BF = 3.49e-4 - Sum of exclusive b -> s gamma modes. #[PDG2022]
 Enddecay
-CDecay Myanti-B0
+CDecay anti-B0sig
 
 End

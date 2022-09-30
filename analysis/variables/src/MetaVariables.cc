@@ -3316,8 +3316,8 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                            the first daughter of the fourth daughter.
 
                       )DOC", Manager::VariableDataType::c_double);
-    REGISTER_METAVARIABLE("daughterAngleInDifferentFrames(daughterIndex1[+daughterIndex1-1 ... +daughterIndex1-n]@Frame, daughterIndex2[+daughterIndex2-1 ... +daughterIndex2-n]@Frame)",
-			  daughterAngleInDifferentFrames, R"DOC(
+    REGISTER_METAVARIABLE("daughterAngleInDifferentFrames(daughterIndex1[+daughterIndex1-1 ... +daughterIndex1-n]@Frame, daughterIndex2[+daughterIndex2-1 ... +daughterIndex2-n]@Frame)", daughterAngleInDifferentFrames,
+			  R"DOC(
                        Returns the angle in between any pair of particles belonging to the same decay tree at different frames.
                        The unit of the angle is ``rad``.
 

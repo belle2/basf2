@@ -3596,7 +3596,7 @@ def calculateTrackIsolation(
         of each particle's track to its closest neighbour, defined as the segment connecting the two tracks
         intersection points on a given cylindrical surface.
         The calculation relies on the track helix extrapolation.
-        The distance variable defined in the `VariableManager` is named :doc:`minET2ETDist`.
+        The distance variable defined in the `VariableManager` is named `minET2ETDist`.
 
     The definition of distance and the number of distances that are calculated per sub-detector is based on
     the following recipe:
@@ -3633,9 +3633,9 @@ def calculateTrackIsolation(
                                              of the selected particle in ``decay_string`` is used.
                                              The charge-conjugate particle list will be also processed automatically.
         vars_for_nearest_part (Optional[list(str)]): a list of variables to calculate for the nearest particle in the reference
-                                                    list at each detector surface. It uses the metavariable :doc:`minET2ETDistVar`.
-                                                    If unset, only the distances to the nearest neighbour
-                                                    per detector are calculated.
+                                                     list at each detector surface. It uses the metavariable `minET2ETDistVar`.
+                                                     If unset, only the distances to the nearest neighbour
+                                                     per detector are calculated.
         highest_prob_mass_for_hex (Optional[bool]): if this option is set to True (default), the helix extrapolation
                                                     for the particles will use the track fit result for the most
                                                     probable mass hypothesis, namely, the one that gives the highest

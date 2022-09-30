@@ -44,8 +44,7 @@ for pname, pdgId in zip(pdg.to_names(chargedStableList), chargedStableList):
                                                 path,
                                                 *detectors)
 
-    ma.printList(plist, full=True, path=path)
-    ma.printVariableValues(plist, track_iso_vars[pdg], path=path)
+    ma.printVariableValues(plist, track_iso_vars[pdgId], path=path)
     ma.variablesToNtuple(plist,
                          track_iso_vars[pdgId],
                          treename=pname,
@@ -69,7 +68,6 @@ for v0_type, v0_function, v0_decay in zip(v0_types, v0_functions, v0_decays):
         ntup_vars_aliases += vu.create_aliases_for_selected(list_of_variables=ivars,
                                                             decay_string=v0_type+v0_decay)
 
-    ma.printList(v0_type, full=True, path=path)
     ma.printVariableValues(v0_type, ntup_vars_aliases, path=path)
     ma.variablesToNtuple(v0_type,
                          ntup_vars_aliases,

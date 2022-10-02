@@ -287,8 +287,8 @@ void DQMHistAnalysisTOPModule::event()
 void DQMHistAnalysisTOPModule::endRun()
 {
   B2DEBUG(20, "DQMHistAnalysisTOP : endRun called");
-  /* add TopMiraBelle*/
 
+  /** add TopMiraBelle*/
   TH2F* hRawTime = (TH2F*)findHist("TOP/window_vs_slot");
   double TotalRaw(0), TotalBadRaw(0), vRateBadRaw(0);
   if (hRawTime != nullptr) TotalRaw = hRawTime->GetEntries();

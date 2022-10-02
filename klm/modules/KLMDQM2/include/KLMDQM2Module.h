@@ -227,6 +227,9 @@ namespace Belle2 {
     /** Directory for KLM DQM histograms in ROOT file. */
     std::string m_HistogramDirectoryName;
 
+    /** Software Trigger Name.  */
+    std::string m_SoftwareTriggerName;
+
     /*******************************************/
     /*******************************************/
     //OUTPUT RELATED

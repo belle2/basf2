@@ -378,6 +378,31 @@ def print_belle2_environment():
             print(f'  {key}={value}')
 
 
+@contextmanager
+def temporary_set_environment(**environ):
+    """
+    Temporarily set the process environment variables.
+    Inspired by https://stackoverflow.com/a/34333710
+
+    >>> with temporary_set_environment(BELLE2_TEMP_DIR='/tmp/belle2'):
+    ...   "BELLE2_TEMP_DIR" in os.environ
+    True
+
+    >>> "BELLE2_TEMP_DIR" in os.environ
+    False
+
+    Arguments:
+        environ(dict): Dictionary of environment variables to set
+    """
+    old_environ = dict(os.environ)
+    os.environ.update(environ)
+    try:
+        yield
+    finally:
+        os.environ.clear()
+        os.environ.update(old_environ)
+
+
 def is_ci() -> bool:
     """
     Returns true if we are running a test on our CI system (currently bamboo).

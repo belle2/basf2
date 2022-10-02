@@ -50,7 +50,7 @@ namespace Belle2 {
     void setNLO(int NLO) { m_NLO = NLO; }
 
     /** Sets Full NLO mode
-      * @param full NLO : No(0), Yes(1)
+      * @param FullNLO NLO : No(0), Yes(1)
     */
     void setFullNLO(int FullNLO) { m_fullNLO = FullNLO; }
 
@@ -95,7 +95,7 @@ namespace Belle2 {
     void setProtonFF(int protonff) { m_protonff = protonff; }
 
     /** Sets Chi production
-      * @param chi_sw: Radiative return(0), Chi production(1), Radiative return + Chi production (2)
+      * @param chisw: Radiative return(0), Chi production(1), Radiative return + Chi production (2)
     */
     void setChiSW(int chisw) { m_chi_sw = chisw; }
 

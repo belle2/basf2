@@ -70,7 +70,16 @@ def argparser():
                         nargs="+",
                         default=[getAnalysisGlobaltag()],
                         help="List of names of conditions DB global tag(s) to append on top of GT replay.\n"
-                        "NB: these GTs will have lowest priority.\n"
+                        "NB: these GTs will have lowest priority over GT replay.\n"
+                        "The order of the sequence passed determines the priority of the GTs, w/ the highest coming first.\n"
+                        "Pass a space-separated list of names.")
+    parser.add_argument("--global_tag_prepend",
+                        type=str,
+                        nargs="+",
+                        default=None,
+                        help="List of names of conditions DB global tag(s) to prepend to GT replay.\n"
+                        "NB: these GTs will have highest priority over GT replay.\n"
+                        "The order of the sequence passed determines the priority of the GTs, w/ the highest coming first.\n"
                         "Pass a space-separated list of names.")
     parser.add_argument("-d", "--debug",
                         dest="debug",
@@ -95,6 +104,11 @@ if __name__ == '__main__':
     for tag in args.global_tag_append:
         basf2.conditions.append_globaltag(tag)
     print(f"Appending GTs:\n{args.global_tag_append}")
+
+    if args.global_tag_prepend:
+        for tag in reversed(args.global_tag_prepend):
+            basf2.conditions.prepend_globaltag(tag)
+        print(f"Prepending GTs:\n{args.global_tag_prepend}")
 
     # ------------
     # Create path.

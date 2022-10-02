@@ -1,0 +1,6 @@
+Import('env')
+env['LIBS'] = ['mva', 'mva_dataobjects',
+               'analysis_dataobjects', 'analysis',
+               'framework',
+               '$ROOT_LIBS']
+Return('env')

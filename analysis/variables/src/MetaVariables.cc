@@ -17,6 +17,7 @@
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ReferenceFrame.h>
 #include <analysis/utility/EvtPDLUtil.h>
+#include <analysis/utility/ParticleCopy.h>
 #include <analysis/ClusterUtility/ClusterUtils.h>
 #include <analysis/variables/VariableFormulaConstructor.h>
 
@@ -2830,6 +2831,9 @@ namespace Belle2 {
 
           const auto& frame = ReferenceFrame::GetCurrent();
 
+          // Create a dummy particle from the given particle to overwrite its kinematics
+          Particle* dummy = ParticleCopy::copyParticle(particle);
+
           // Sum of the 4-momenta of all the daughters with the new mass assumptions
           ROOT::Math::PxPyPzMVector pSum(0, 0, 0, 0);
 
@@ -2851,16 +2855,20 @@ namespace Belle2 {
                 double p_y = dauMom.Py();
                 double p_z = dauMom.Pz();
                 dauMom.SetCoordinates(p_x, p_y, p_z, massesToBeReplaced[iReplace]);
+
+                // overwrite the daughter's kinematics
+                const_cast<Particle*>(dummy->getDaughter(iDau))->set4Vector(ROOT::Math::PxPyPzEVector(dauMom));
                 break;
               }
             }
             pSum += dauMom;
           } // End of loop over number of daughter
 
-          // Make a dummy particle out of the sum of the 4-momenta of the selected daughters
-          Particle sumOfDaughters(ROOT::Math::PxPyPzEVector(pSum), 100); // 100 is one of the special numbers
+          // overwrite the particle's kinematics
+          dummy->set4Vector(ROOT::Math::PxPyPzEVector(pSum));
 
-          auto var_result = var->function(&sumOfDaughters);
+          auto var_result = var->function(dummy);
+
           // Calculate the variable on the dummy particle
           if (std::holds_alternative<double>(var_result))
           {
@@ -3361,10 +3369,10 @@ daughter (3) of the second daughter (1) of the first daughter (0) of the mother 
 Returns a ``variable`` calculated using new mass hypotheses for (some of) the particle's daughters.
 
 .. warning::
-    ``variable`` can only be a function of the particle 4-momentum, which is re-calculated as the sum of the daughters' 4-momenta.
+    ``variable`` can only be a function of the particle 4-momentum, which is re-calculated as the sum of the daughters' 4-momenta, and the daughters' 4-momentum.
     This means that if you made a kinematic fit without updating the daughters' momenta, the result of this variable will not reflect the effect of the kinematic fit.
-    Also, the track fit is not performed again: the variable only re-calculates the 4-vectors using different mass assumptions. The alternative mass assumption is
-    used only internally by the variable, and is not stored in the datastore (i.e the daughters are not permanently changed).
+    Also, the track fit is not performed again: the variable only re-calculates the 4-vectors using different mass assumptions.
+    In the variable, a copy of the given particle is created with daughters' alternative mass assumption (i.e. the original particle and daughters are not changed).
 
 .. warning::
     Generalized daughter indexes are not supported (yet!): this variable can be used only on first-generation daughters.

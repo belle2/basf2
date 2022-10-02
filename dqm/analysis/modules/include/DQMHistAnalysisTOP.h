@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 
 #include <TCanvas.h>
 #include <TH1.h>
@@ -61,12 +61,6 @@ namespace Belle2 {
      */
     virtual void terminate() override;
 
-    /**
-     * Find histogram corresponding to canvas.
-     * @param hname Name of the histogram
-     * @return The pointer to the histogram, or nullptr if not found.
-     */
-    TH1* find_histo_in_canvas(const std::string& hname);
     //! Data members
   private:
     /** Histogram from DQMInfo with run type. */

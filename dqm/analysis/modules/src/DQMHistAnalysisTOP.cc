@@ -173,7 +173,7 @@ void DQMHistAnalysisTOPModule::event()
   double badRatio(0.0);
   int totalBadEvts(0);
   int totalEvts(0);
-  if (hBoolEvtMonitor != nullprt) {
+  if (hBoolEvtMonitor != nullptr) {
     totalEvts = hBoolEvtMonitor->GetEntries();
     totalBadEvts = hBoolEvtMonitor->GetBinContent(2);
   }
@@ -183,7 +183,7 @@ void DQMHistAnalysisTOPModule::event()
   m_text2->AddText(Form("fraction of deviating hits: %.4f %%", badRatio * 100.0));
 
   TCanvas* c3 = findCanvas("TOP/c_BoolEvtMonitor");
-  if (c3 != nullprt) {
+  if (c3 != nullptr) {
     c3->cd();
     if (badRatio > 0.0001 && m_IsNullRun == false) c3->Pad()->SetFillColor(kRed);
     else c3->Pad()->SetFillColor(kWhite);

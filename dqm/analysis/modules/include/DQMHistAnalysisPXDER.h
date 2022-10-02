@@ -8,13 +8,8 @@
 
 #pragma once
 
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
-
-#include "TFile.h"
-#include "TH1I.h"
-#include "TH1F.h"
-
-#include <vector>
+#include <dqm/core/DQMHistAnalysis.h>
+#include <TFile.h>
 
 namespace Belle2 {
   /*! PXD DQM AnalysisModule */
@@ -221,17 +216,12 @@ namespace Belle2 {
        */
 //     int SetFlag(int Type, int bin, double* pars, double ratio, TH1I* hist, TH1I* refhist, TH1I* flaghist);
 
+    /** Histogram Directory name */
+    std::string m_histogramDirectoryName;
     /** Reference Histogram Root file name */
     std::string m_refFileName;
     /** The pointer to the reference file */
     TFile* m_refFile = nullptr;
-
-    /**
-     * Get a histogram by name (DEPRECATED), better use function from base class!
-     * @param histoname The name of the histogram.
-     * @return The pointer to the histogram, or nullptr if not found.
-     */
-    TH1* GetHisto(TString histoname);
 
   };
 

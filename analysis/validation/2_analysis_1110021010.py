@@ -65,5 +65,6 @@ create_validation_histograms(
     ]
 )
 
+main.add_module('Progress')
 basf2.process(main)
 print(basf2.statistics)

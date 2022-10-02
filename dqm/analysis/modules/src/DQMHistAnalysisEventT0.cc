@@ -7,7 +7,7 @@
  **************************************************************************/
 //+
 // File : DQMHistAnalysisEventT0.cc
-// Description : module for DQM histogram analysis of SVD sensors occupancies
+// Description : module for trigger jitter/EventT0 DQM histogram analysis
 //-
 
 
@@ -15,11 +15,8 @@
 
 #include <TROOT.h>
 #include <TStyle.h>
-#include <TString.h>
-#include <TFitResult.h>
-
+#include <TF1.h>
 #include <TMath.h>
-#include <iostream>
 
 using namespace std;
 using namespace Belle2;

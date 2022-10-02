@@ -51,6 +51,7 @@ output = basf2.register_module('RootOutput')
 output.param('outputFileName', '../GenericB_GENSIMRECtoDST.dst.root')
 main.add_module(output)
 
+main.add_module('Progress')
 # Go!
 basf2.process(main)
 

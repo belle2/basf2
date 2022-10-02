@@ -13,30 +13,31 @@
 #include <string>
 
 namespace Belle2 {
+
+  /** The evtgen model to produce non-resonant B-> Xs nu nubar decay sample.
+    *
+    * In this model, kinematics of two neutrinos is not carefully considered. Di-neutrino just decay by EvtGenKine::PhaseSpace
+    *
+    * This model adopts the Fermi motion model which is used for EvtBtoXsll model.
+    *
+    * The momentums of b-quark and spectator quark are determined by the Fermi motion model.
+    * The decay of b-quark is determined by dGdsb probability density function from [arXiv:1509.06248v2].
+    *
+    * This model requires 6 parameters: m_ms, m_mq, m_pf, m_mxmin, m_mb_prob, m_ms_prob.
+    * m_mb_prob and m_ms_prob are used to calculate dGdsb. m_mb_prob=4.68 and m_ms_prob=0.1 are used in [arXiv:0902.0160].
+    * In [arXiv:hep-ph/9603237], m_mb_prob=4.8 and m_ms_prob=0.2 are used for B->Xs l l decay.
+    * m_ms and m_mq are masses of s-quark and the spectator quark for the Fermi motion model. They are related with the kinematics of Xs.
+    * m_pf is the Fermi motion momentum used in the Fermi motion model.
+    * m_mxmin is the minimum mass of Xs.
+    *
+    * You can use the model as follows:
+    *
+    * Decay MyB-
+    * 1.0 anti-Xsu anti-nu_e nu_e           BTOXSNUNU_FERMI 0.2 0.0 0.461 1.1 4.8 0.2;
+    * Enddecay
+    */
   class EvtBtoXsnunu_FERMI : public  EvtDecayIncoherent {
 
-    /** The evtgen model to produce non-resonant B-> Xs nu nubar decay sample.
-     *
-     * In this model, kinematics of two neutrinos is not carefully considered. Di-neutrino just decay by EvtGenKine::PhaseSpace
-     *
-     * This model adopts the Fermi motion model which is used for EvtBtoXsll model.
-     *
-     * The momentums of b-quark and spectator quark are determined by the Fermi motion model.
-     * The decay of b-quark is determined by dGdsb probability density function from [arXiv:1509.06248v2].
-     *
-     * This model requires 6 parameters: m_ms, m_mq, m_pf, m_mxmin, m_mb_prob, m_ms_prob.
-     * m_mb_prob and m_ms_prob are used to calculate dGdsb. m_mb_prob=4.68 and m_ms_prob=0.1 are used in [arXiv:0902.0160].
-     * In [arXiv:hep-ph/9603237], m_mb_prob=4.8 and m_ms_prob=0.2 are used for B->Xs l l decay.
-     * m_ms and m_mq are masses of s-quark and the spectator quark for the Fermi motion model. They are related with the kinematics of Xs.
-     * m_pf is the Fermi motion momentum used in the Fermi motion model.
-     * m_mxmin is the minimum mass of Xs.
-     *
-     * You can use the model as follows:
-     *
-     * Decay MyB-
-     * 1.0 anti-Xsu anti-nu_e nu_e           BTOXSNUNU_FERMI 0.2 0.0 0.461 1.1 4.8 0.2;
-     * Enddecay
-     */
 
   public:
 

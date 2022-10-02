@@ -255,8 +255,8 @@ namespace Belle2 {
         double zback_sensitive_right, zfor_sensitive_right;
 
         if (iSLayer == 0) {
-          const auto& epLayerBwd = endplate.getEndPlateLayer(0);
-          const auto& epLayerFwd = endplate.getEndPlateLayer(nEPLayer / 2);
+          const auto& epLayerBwd = endplate.getEndPlateLayer(1);
+          const auto& epLayerFwd = endplate.getEndPlateLayer((nEPLayer / 2) + 1);
           const auto& senseLayer = geo.getSenseLayer(iSLayer);
           const auto& fieldLayer = geo.getFieldLayer(iSLayer);
 
@@ -267,7 +267,7 @@ namespace Belle2 {
 
           rmin_sensitive_middle = (geo.getInnerWall(0)).getRmax();
           rmax_sensitive_middle = fieldLayer.getR();
-          zback_sensitive_middle = epLayerBwd.getZbwd();
+          zback_sensitive_middle = epLayerBwd.getZfwd();
           zfor_sensitive_middle = epLayerFwd.getZbwd();
 
           rmin_sensitive_right = epLayerFwd.getRmax();

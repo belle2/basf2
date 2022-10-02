@@ -20,7 +20,7 @@
 
 """
 <header>
-    <input>charged.cdst.root</input>
+    <input>../charged.cdst.root</input>
     <output>MCvalidation.root</output>
     <description>Determining multiplicities of different particles on generator level</description>
 </header>
@@ -99,7 +99,7 @@ def add_aliases(alias_dict={}):
 
 
 # read input file
-ma.inputMdstList('charged.cdst.root', path)
+ma.inputMdstList('../charged.cdst.root', path)
 
 # pick one charged track per event needed for the SplitMultiplicities module
 ma.fillParticleList('pi+:sel', '',  path=path)

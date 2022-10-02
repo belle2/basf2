@@ -257,14 +257,14 @@ GRLNeuroTrainerModule::event()
 
   //full track
   for (int i = 0; i < 36; i++) {
-    if (GRLStore->m_phi_CDC[i]) {
+    if (GRLStore->get_phi_CDC(i)) {
       map_cdcf[i] = 1;
     }
   }
 
   //short track
   for (int i = 0; i < 64; i++) {
-    if (GRLStore->m_map_ST2[i]) {
+    if (GRLStore->get_map_ST2(i)) {
       int j = i * (36. / 64.);
       map_cdcs[j] = 1;
     }
@@ -272,7 +272,7 @@ GRLNeuroTrainerModule::event()
 
   //inner track
   for (int i = 0; i < 64; i++) {
-    if (GRLStore->m_map_TSF0[i]) {
+    if (GRLStore->get_map_TSF0(i)) {
       int j = i * (36. / 64.);
       int j1 = i - 4;
       if (j1 < 0) j1 = j1 + 64;
@@ -288,11 +288,11 @@ GRLNeuroTrainerModule::event()
       int j7 = i + 2;
       if (j7 > 63) j7 = j7 - 64;
       if (
-        (GRLStore->m_map_TSF1[j1] || GRLStore->m_map_TSF1[j2] || GRLStore->m_map_TSF1[j3] || GRLStore->m_map_TSF1[j4]
-         || GRLStore->m_map_TSF1[j5])
+        (GRLStore->get_map_TSF1(j1) || GRLStore->get_map_TSF1(j2) || GRLStore->get_map_TSF1(j3) || GRLStore->get_map_TSF1(j4)
+         || GRLStore->get_map_TSF1(j5))
         &&
-        (GRLStore->m_map_TSF2[j3] || GRLStore->m_map_TSF2[j4] || GRLStore->m_map_TSF2[j5] || GRLStore->m_map_TSF2[j6]
-         || GRLStore->m_map_TSF2[j7])
+        (GRLStore->get_map_TSF2(j3) || GRLStore->get_map_TSF2(j4) || GRLStore->get_map_TSF2(j5) || GRLStore->get_map_TSF2(j6)
+         || GRLStore->get_map_TSF2(j7))
       )
         map_cdci[j] = 1;
     }

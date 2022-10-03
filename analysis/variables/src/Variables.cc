@@ -1233,7 +1233,7 @@ The third optional argument is an integer ("boolean") flag: if 1 (the default, i
 if 0, it is assumed the mass hypothesis matching the particle lists' PDG was used.
 
 .. note::
-    This variable requires to run the `TrackIsolation` module first.
+    This variable requires to run the ``TrackIsolation`` module first.
     Note that the input parameters of this metafunction must correspond to the ones set for the module configuration!
 )DOC",
 			  Manager::VariableDataType::c_double);
@@ -1245,7 +1245,7 @@ The second argument is the reference particle list name used to pick up the near
 The third argument is a variable name, e.g. `nCDCHits`.
 
 .. note::
-    This variable requires to run the `TrackIsolation` module first.
+    This variable requires to run the ``TrackIsolation`` module first.
     Note that the input parameters of this metafunction must correspond to the ones set for the module configuration!
 )DOC",
 			  Manager::VariableDataType::c_double);

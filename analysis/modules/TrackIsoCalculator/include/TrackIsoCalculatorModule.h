@@ -125,9 +125,14 @@ namespace Belle2 {
     std::unordered_map<std::string, bool> m_isSurfaceInDet;
 
     /**
-     * The name of the distance variable to be added to each particle as extraInfo.
+     * The name of the variable representing the minimum distance to the extrapoleted tracks of reference particles, to be added to each particle as extraInfo.
      */
-    std::string m_extraInfoName;
+    std::string m_extraInfoNameDist;
+
+    /**
+     * The name of the variable representing the mdst array index of the closest particle, to be added to each particle as extraInfo.
+     */
+    std::string m_extraInfoNameRefPartIdx;
 
     /**
      * Map that associates to each detector its valid cylindrical surface layer's boundaries.

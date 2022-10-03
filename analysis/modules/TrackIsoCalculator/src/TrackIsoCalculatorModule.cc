@@ -75,10 +75,11 @@ void TrackIsoCalculatorModule::initialize()
   }
 
   // Define the name of the variable to be stored as extraInfo.
-  m_extraInfoName = "distToClosestTrkAt" + m_detSurface + "_VS_" + m_pListReferenceName;
+  m_extraInfoNameDist = "distToClosestTrkAt" + m_detSurface + "_VS_" + m_pListReferenceName;
   if (m_useHighestProbMassForExt) {
-    m_extraInfoName += "__useHighestProbMassForExt";
+    m_extraInfoNameDist += "__useHighestProbMassForExt";
   }
+  m_extraInfoNameRefPartIdx = "idxOfClosestPartAt" + m_detSurface + "In_" + m_pListReferenceName;
 
   m_isSurfaceInDet.insert({"CDC", m_detSurface.find("CDC") != std::string::npos});
   m_isSurfaceInDet.insert({"TOP", m_detSurface.find("TOP") != std::string::npos});
@@ -108,13 +109,13 @@ void TrackIsoCalculatorModule::event()
       for (auto* iDaughter : m_decaydescriptor.getSelectionParticles(iParticle)) {
         // Check if the distance for this target particle has been set already,
         // e.g. by a previous instance of this module.
-        if (iDaughter->hasExtraInfo(m_extraInfoName)) {
+        if (iDaughter->hasExtraInfo(m_extraInfoNameDist)) {
           continue;
         }
         targetParticles.insert({iDaughter->getMdstArrayIndex(), iDaughter});
       }
     } else {
-      if (iParticle->hasExtraInfo(m_extraInfoName)) {
+      if (iParticle->hasExtraInfo(m_extraInfoNameDist)) {
         continue;
       }
       targetParticles.insert({iParticle->getMdstArrayIndex(), iParticle});
@@ -173,28 +174,38 @@ void TrackIsoCalculatorModule::event()
     auto iMdstIdx = targetParticle.first;
     auto iParticle = targetParticle.second;
 
-    std::vector<double> iDistances;
+    // Save the distances and the mdst indexes of the reference particles.
+    std::vector<std::pair<double, unsigned int>> iDistancesAndRefMdstIdxs;
     for (const auto& [mdstIdxs, dist] : particleMdstIdxPairsToDist) {
       if (mdstIdxs.first == iMdstIdx) {
         if (!std::isnan(dist) && dist >= 0) {
-          iDistances.push_back(dist);
+          iDistancesAndRefMdstIdxs.push_back(std::make_pair(dist, mdstIdxs.second));
         }
       }
     }
 
-    if (!iDistances.size()) {
+    if (!iDistancesAndRefMdstIdxs.size()) {
       continue;
     }
 
-    const auto minDist = *std::min_element(std::begin(iDistances), std::end(iDistances));
+    const auto minDist = *std::min_element(std::begin(iDistancesAndRefMdstIdxs), std::end(iDistancesAndRefMdstIdxs),
+    [](const auto & l, const auto & r) {return l.first < r.first;});
+
+    auto jParticle = m_pListReference->getParticleWithMdstIdx(minDist.second);
 
     B2DEBUG(10, "Particle w/ mdstIndex[" << iMdstIdx << "] (PDG = "
-            << iParticle->getPDGCode() << "). Closest charged partner at "
-            << m_detSurface << " surface is found at D = " << minDist << " [cm]"
+            << iParticle->getPDGCode() << "). Closest charged particle w/ mdstIndex[" << minDist.second << "] (PDG = "
+            << jParticle->getPDGCode() << ") at "
+            << m_detSurface << " surface is found at D = " << minDist.first << " [cm]"
             << "\n"
-            << "Storing ExtraInfo w/ name: " << m_extraInfoName);
+            << "Storing ExtraInfo w/ name: "
+            << "\n"
+            << m_extraInfoNameDist << ","
+            << "\n"
+            << m_extraInfoNameRefPartIdx);
 
-    m_particles[iParticle->getArrayIndex()]->addExtraInfo(m_extraInfoName, minDist);
+    m_particles[iParticle->getArrayIndex()]->addExtraInfo(m_extraInfoNameDist, minDist.first);
+    m_particles[iParticle->getArrayIndex()]->writeExtraInfo(m_extraInfoNameRefPartIdx, minDist.second);
 
   }
 

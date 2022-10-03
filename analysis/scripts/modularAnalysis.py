@@ -3580,16 +3580,23 @@ def applyChargedPidMVA(particleLists, path, trainingMode, chargeIndependent=Fals
     path.add_module(chargedpid)
 
 
-def calculateTrackIsolation(decay_string, path, *detectors, reference_list_name=None, highest_prob_mass_for_ext=False):
+def calculateTrackIsolation(
+        decay_string,
+        path,
+        *detectors,
+        reference_list_name=None,
+        vars_for_nearest_part=[],
+        highest_prob_mass_for_ext=True):
     """
     Given an input decay string, compute variables that quantify track-based "isolation" of the charged
     stable particles in the decay chain.
 
     Note:
-        Currently, a proxy for isolation is defined as the distance
+        Currently, a proxy for isolation can be defined using the distance
         of each particle's track to its closest neighbour, defined as the segment connecting the two tracks
         intersection points on a given cylindrical surface.
         The calculation relies on the track helix extrapolation.
+        The distance variable defined in the `VariableManager` is named `minET2ETDist`.
 
     The definition of distance and the number of distances that are calculated per sub-detector is based on
     the following recipe:
@@ -3625,17 +3632,23 @@ def calculateTrackIsolation(decay_string, path, *detectors, reference_list_name=
                                              By default, the ``:all`` ParticleList of the same type
                                              of the selected particle in ``decay_string`` is used.
                                              The charge-conjugate particle list will be also processed automatically.
-        highest_prob_mass_for_hex (Optional[bool]): if this option is set, the helix extrapolation for the particles
-                                                    will use the track fit result for the most
+        vars_for_nearest_part (Optional[list(str)]): a list of variables to calculate for the nearest particle in the reference
+                                                     list at each detector surface. It uses the metavariable `minET2ETDistVar`.
+                                                     If unset, only the distances to the nearest neighbour
+                                                     per detector are calculated.
+        highest_prob_mass_for_hex (Optional[bool]): if this option is set to True (default), the helix extrapolation
+                                                    for the particles will use the track fit result for the most
                                                     probable mass hypothesis, namely, the one that gives the highest
-                                                    chi2Prob of the fit.
+                                                    chi2Prob of the fit. Otherwise, it uses the mass hypothesis that
+                                                    corresponds to the particle lists PDG.
 
     Returns:
-        list(str): a list of aliases for the calculated distance variables.
+        dict(int, list(str)): a dictionary mapping the PDG code of each reference particle list
+                              and the associated isolation metavariables.
 
     """
 
-    import variables.utils as vu
+    import pdg
     from ROOT import Belle2, TDatabasePDG
 
     decayDescriptor = Belle2.DecayDescriptor()
@@ -3669,14 +3682,18 @@ def calculateTrackIsolation(decay_string, path, *detectors, reference_list_name=
     else:
         processed_decay_strings += [decay_string]
 
+    reference_lists_to_vars = {}
+
     for processed_dec in processed_decay_strings:
         if no_reference_list_name:
             decayDescriptor.init(processed_dec)
-            daughter_pdgs = decayDescriptor.getSelectionPDGCodes()
-            if len(daughter_pdgs) > 0:
-                reference_list_name = f'{TDatabasePDG.Instance().GetParticle(abs(daughter_pdgs[0])).GetName()}:all'
+            selected_daughter_pdgs = decayDescriptor.getSelectionPDGCodes()
+            if len(selected_daughter_pdgs) > 0:
+                reference_list_name = f'{TDatabasePDG.Instance().GetParticle(abs(selected_daughter_pdgs[-1])).GetName()}:all'
             else:
                 reference_list_name = f'{processed_dec.split(":")[0]}:all'
+
+        ref_pdg = pdg.from_name(reference_list_name.split(":")[0])
 
         for det in det_labels:
             trackiso = path.add_module("TrackIsoCalculator",
@@ -3686,14 +3703,19 @@ def calculateTrackIsolation(decay_string, path, *detectors, reference_list_name=
                                        useHighestProbMassForExt=highest_prob_mass_for_ext)
             trackiso.set_name(f"TrackIsoCalculator{det}_{processed_dec}_VS_{reference_list_name}")
 
-    # Use a special suffix to identify variables in case the helix extrapolation is done
-    # using the best fit mass hypothesis.
-    extra_suffix = "" if not highest_prob_mass_for_ext else "__useHighestProbMassForExt"
+        # Metavariables for the distances to the closest reference tracks at each detector surface.
+        # Always calculate them.
+        # Ensure the flag for the mass hypothesis of the fit is set.
+        trackiso_vars = [f"minET2ETDist({d}, {reference_list_name}, {int(highest_prob_mass_for_ext)})" for d in det_labels]
+        # Optionally, calculate the input variables for the nearest neighbour in the reference list.
+        if vars_for_nearest_part:
+            trackiso_vars.extend(
+                [f"minET2ETDistVar({d}, {reference_list_name}, {v})" for d in det_labels for v in vars_for_nearest_part])
+        trackiso_vars.sort()
 
-    aliases = vu.create_aliases(
-        [f"distToClosestTrkAt{det}_VS_{reference_list_name}{extra_suffix}" for det in det_labels], "extraInfo({variable})")
+        reference_lists_to_vars[ref_pdg] = trackiso_vars
 
-    return aliases
+    return reference_lists_to_vars
 
 
 def calculateDistance(list_name, decay_string, mode='vertextrack', path=None):

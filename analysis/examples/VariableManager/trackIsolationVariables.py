@@ -18,6 +18,7 @@ For each particle's track in the input charged stable particle list,
 calculate the minimal distance to the other candidates' tracks at a given detector surface.
 """
 
+
 import argparse
 
 
@@ -59,9 +60,13 @@ if __name__ == "__main__":
 
     import basf2 as b2
     import modularAnalysis as ma
-    from variables import variables
+    import stdV0s as stdv0
+    from variables import variables as vm
     import variables.utils as vu
     import variables.collections as vc
+    import pdg
+    from ROOT import Belle2
+    Const = Belle2.Const
 
     # Create path. Register necessary modules to this path.
     path = b2.create_path()
@@ -69,24 +74,17 @@ if __name__ == "__main__":
     # Add input data and ParticleLoader modules to the path.
     ma.inputMdst(filename=b2.find_file("mdst14.root", "validation"), path=path)
 
+    # -------------------------------------------------------------------
+
+    # ---------
+    # EXAMPLE 1
+    # ---------
+
     # Fill a particle list of muons, with some quality selection.
     base_trk_selection = "[dr < 3] and [abs(dz) < 5] and [thetaInCDCAcceptance] and [pt > 0.1]"
     ma.fillParticleList("mu+:muons", f"{base_trk_selection} and [muonID > 0.5]", path=path)
 
-    # Fill a reference charged stable particle list to calculate the distances against.
-    # Generally, this list should have a very loose selection applied (if none at all).
-    ref = f"{args.std_charged_ref}+:presel"
-    ma.fillParticleList(ref, f"{base_trk_selection}", path=path)
-
-    # Mode 1: calculate the track isolation variables
-    # directly on the muons particle list.
-    trackiso_vars = ma.calculateTrackIsolation("mu+:muons",
-                                               path,
-                                               *args.detectors,
-                                               reference_list_name=ref,
-                                               highest_prob_mass_for_ext=False)
-
-    # Reconstruct the J/psi decay.
+    # Reconstruct a J/psi decay.
     jpsimumu = "J/psi:mumu -> mu+:muons mu-:muons"
     jpsi_cuts = [
         "[2.8 < M < 3.3]",
@@ -96,60 +94,105 @@ if __name__ == "__main__":
 
     ma.reconstructDecay(jpsimumu, jpsi_cut, path=path)
 
-    # Mode 2: calculate the track isolation variables
-    # on the selected muon daughters in the decay.
-    # This time, use the mass hypotheiss w/ highest probability for the track extrapolation.
-    trackiso_vars_highestprobmass = ma.calculateTrackIsolation("J/psi:mumu -> ^mu+ ^mu-",
-                                                               path,
-                                                               *args.detectors,
-                                                               reference_list_name=ref,
-                                                               highest_prob_mass_for_ext=True)
+    # Fill a reference charged stable particle list to calculate the distances against.
+    # Generally, this list should have a very loose selection applied (if none at all).
+    ref = f"{args.std_charged_ref}+:ref"
+    ref_pdg = pdg.from_name(f"{args.std_charged_ref}+")
+    ma.fillParticleList(ref, f"{base_trk_selection}", path=path)
 
+    # Calculate the track isolation variables
+    # on the muon daughters in the decay.
+    # Use the default setting where the module takes the mass hypothesis w/ highest probability for the track extrapolation.
+    # The helper returns a dictionary w/ the list of metavariables for each of the reference particle lists (using PDG as key).
+    # In this case, we pass explicitly a particle list of our choice.
+    trackiso_vars_mu = ma.calculateTrackIsolation("J/psi:mumu -> ^mu+ ^mu-",
+                                                  path,
+                                                  *args.detectors,
+                                                  vars_for_nearest_part=vc.mc_variables,
+                                                  # Calculate also the chosen variables for the nearest particle at each layer.
+                                                  reference_list_name=ref)
+
+    # Variables and aliases for the J/psi candidates.
     variables_jpsi = vc.kinematics + ["daughterDiffOfPhi(0, 1)"]
     variables_jpsi += vu.create_aliases(variables_jpsi, "useCMSFrame({variable})", "CMS")
     variables_jpsi += vc.inv_mass
-    variables_mu = vc.kinematics + ["theta", "phi", "clusterE"] + trackiso_vars + trackiso_vars_highestprobmass + [
-        "inARICHAcceptance",
-        "inCDCAcceptance",
-        "inECLAcceptance",
-        "inKLMAcceptance",
-        "inTOPAcceptance",
-        "ptInBECLAcceptance",
-        "ptInBKLMAcceptance",
-        "ptInTOPAcceptance",
-        "thetaInARICHAcceptance",
-        "thetaInBECLAcceptance",
-        "thetaInBKLMAcceptance",
-        "thetaInCDCAcceptance",
-        "thetaInECLAcceptance",
-        "thetaInEECLAcceptance",
-        "thetaInEKLMAcceptance",
-        "thetaInKLMAcceptance",
-        "thetaInKLMOverlapAcceptance",
-        "thetaInTOPAcceptance"
-    ]
+    aliases_jpsi = vu.create_aliases_for_selected(variables_jpsi,
+                                                  "^J/psi:mumu -> mu+ mu-",
+                                                  prefix=["jpsi"])
 
-    aliases_jpsimumu = vu.create_aliases_for_selected(
-        variables_jpsi,
-        "^J/psi:mumu -> mu+:muons mu-:muons",
-        prefix=["jpsi"])
+    # Variables and aliases for the J/psi daughters.
+    # Since we passed explicitly a reference list, we use its associated PDG code to get the list of metavariables.
+    variables_mu = vc.kinematics + ["theta", "phi", "clusterE", "nCDCHits"] + trackiso_vars_mu[ref_pdg]
+    aliases_mu = vu.create_aliases_for_selected(variables_mu,
+                                                "J/psi:mumu -> ^mu+ ^mu-",
+                                                use_names=True)
 
-    aliases_mu = vu.create_aliases_for_selected(
-        variables_mu,
-        "J/psi:mumu -> ^mu+:muons ^mu-:muons",
-        use_names=True)
-
-    variables.addAlias("nReferenceTracks", f"nCleanedTracks({base_trk_selection})")
+    # Variables and aliases for the event.
+    vm.addAlias("nReferenceTracks", f"nCleanedTracks({base_trk_selection})")
     aliases_event = ["nReferenceTracks"]
-
-    variables.printAliases()
 
     # Saving variables to ntuple
     ma.variablesToNtuple(decayString="J/psi:mumu",
-                         variables=aliases_event+aliases_jpsimumu+aliases_mu,
+                         variables=aliases_event+aliases_jpsi+aliases_mu,
                          treename="jpsimumu",
                          filename="TrackIsolationVariables.root",
                          path=path)
+
+    # ---------
+    # EXAMPLE 2
+    # ---------
+
+    # Reconstruct standard Lambda0 -> p+ pi- decays.
+    stdv0.stdLambdas(path=path)
+
+    # Calculate the track isolation variables
+    # on the proton and pion daughters in the decay.
+    #
+    # In this configuration, the mass hypothesis for the extrapolation is the one matching each particle's PDG.
+    #
+    # Note that no reference list is passed: it will use by default the `:all` ParticleList of the same type
+    # of the selected particle(s) in the decay string.
+    trackiso_vars_p_pi = ma.calculateTrackIsolation("Lambda0:merged -> ^p+ ^pi-",
+                                                    path,
+                                                    *args.detectors,
+                                                    vars_for_nearest_part=vc.mc_variables,
+                                                    # Calculate also the chosen variables for the nearest particle at each layer.
+                                                    highest_prob_mass_for_ext=False)
+
+    # Variables and aliases for the Lambda0 candidates.
+    variables_lambda0 = vc.kinematics + ["daughterDiffOfPhi(0, 1)"]
+    variables_lambda0 += vu.create_aliases(variables_lambda0, "useCMSFrame({variable})", "CMS")
+    variables_lambda0 += vc.inv_mass
+    aliases_lambda0 = vu.create_aliases_for_selected(variables_lambda0,
+                                                     "^Lambda0:merged -> p+ pi-",
+                                                     prefix=["lambda0"])
+
+    # Variables and aliases for the Lambda0 daughters.
+    # - Protons
+    variables_p = vc.kinematics + \
+        ["theta", "phi", "clusterE", "nCDCHits"] + \
+        trackiso_vars_p_pi[Const.proton.getPDGCode()]  # Use the proton PDG to get the associated list of metavariables.
+    aliases_p = vu.create_aliases_for_selected(variables_p,
+                                               "Lambda0:merged -> ^p+ pi-",
+                                               use_names=True)
+    # - Pions
+    variables_pi = vc.kinematics + \
+        ["theta", "phi", "clusterE", "nCDCHits"] + \
+        trackiso_vars_p_pi[Const.pion.getPDGCode()]  # Use the pion PDG to get the associated list of metavariables.
+    aliases_pi = vu.create_aliases_for_selected(variables_pi,
+                                                "Lambda0:merged -> p+ ^pi-",
+                                                use_names=True)
+
+    # Saving variables to ntuple
+    ma.variablesToNtuple(decayString="Lambda0:merged",
+                         variables=aliases_lambda0+aliases_p+aliases_pi,
+                         treename="lambda0ppi",
+                         filename="TrackIsolationVariables.root",
+                         path=path)
+
+    # -------------------------------------------------------------------
+
+    vm.printAliases()
 
     # Optionally activate debug mode for the TrackIsoCalculator module(s).
     if args.debug:

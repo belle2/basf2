@@ -378,7 +378,7 @@ In run-dependent MC, configuration of the prescales in TSIM is consistent with d
                           Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("L1Input(name)", L1Input,
                           R"DOC(
-[Eventbased] Returns the input bit status of the trigger bit with the given name. Input trigger bits are predefined selections from each sub-detector, with adjustment of the delay and width, in order to fix latency on GDL. For example, ``ty_0/1/2/3`` is one of the input trigger bits meaning the number of neuro 3D tracks is one/two/three/more than three.
+[Eventbased] Returns the input bit status (1 or 0) of the trigger bit with the given name. Input trigger bits are predefined selections from each sub-detector, with adjustment of the delay and width, in order to fix latency on GDL. For example, ``ty_0/1/2/3`` is one of the input trigger bits meaning the number of neuro 3D tracks is one/two/three/more than three.
 )DOC", 
                           Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("L1Prescale(name)", L1PSNMPrescale,
@@ -388,7 +388,7 @@ In run-dependent MC, configuration of the prescales in TSIM is consistent with d
                           Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("L1PSNMBit(i)", L1PSNMBit,
                       R"DOC(
-[Eventbased] Returns the PSNM (Prescale And Mask, after prescale) status of i-th trigger bit.
+[Eventbased] Returns the PSNM (Prescale And Mask, after prescale) status (1 or 0) of i-th trigger bit.
 
 .. warning::
   It is recommended to use this variable only for debugging and to use :b2:var:`L1PSNM`
@@ -396,7 +396,7 @@ In run-dependent MC, configuration of the prescales in TSIM is consistent with d
 )DOC");
     REGISTER_VARIABLE("L1FTDLBit(i)", L1FTDLBit,
                       R"DOC(
-[Eventbased] Returns the FTDL (Final Trigger Decision Logic, before prescale) status of i-th trigger bit.
+[Eventbased] Returns the FTDL (Final Trigger Decision Logic, before prescale) status (1 or 0) of i-th trigger bit.
 
 .. warning::
   It is recommended to use this variable only for debugging and to use :b2:var:`L1FTDL`
@@ -404,7 +404,7 @@ In run-dependent MC, configuration of the prescales in TSIM is consistent with d
 )DOC");
     REGISTER_VARIABLE("L1InputBit(i)", L1InputBit,
                       R"DOC(
-[Eventbased] Returns the input bit status of the i-th input trigger bit.
+[Eventbased] Returns the input bit status (1 or 0) of the i-th input trigger bit.
 
 .. warning::
   It is recommended to use this variable only for debugging and to use :b2:var:`L1Input`

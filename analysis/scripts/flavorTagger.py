@@ -1021,7 +1021,6 @@ def flavorTagger(
       @param path                              Modules are added to this path
 
     """
-    basf2.conditions.prepend_globaltag('analysis_tools_light-2207-bengal')
 
     if (not isinstance(particleLists, list)):
         particleLists = [particleLists]  # in case user inputs a particle list as string

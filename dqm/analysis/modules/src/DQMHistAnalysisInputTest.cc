@@ -155,6 +155,7 @@ void DQMHistAnalysisInputTestModule::event()
   if (m_count > m_events) {
     m_eventMetaDataPtr.create();
     m_eventMetaDataPtr->setEndOfData();
+    B2INFO("DQMHistAnalysisInputTest: max event number reached, set EndOfData");
     return;
   }
 
@@ -249,17 +250,19 @@ void DQMHistAnalysisInputTestModule::PlotDelta(void)
 
 void DQMHistAnalysisInputTestModule::endRun()
 {
-  B2INFO("Histo");
+  B2INFO("DQMHistAnalysisInputTest: endRun called. Run: " << m_runno);
+
+  B2INFO("DQMHistAnalysisInputTest: endRun: Histos");
   for (auto a : getHistList()) {
     B2INFO(a.first);
   }
+  // The following will produce errors, as the histograms may not exist in endRun
   PlotDelta();
-
-  B2INFO("DQMHistAnalysisInputTest : endRun called");
+  B2INFO("DQMHistAnalysisInputTest: endRun: done");
 }
 
 
 void DQMHistAnalysisInputTestModule::terminate()
 {
-  B2DEBUG(20, "terminate called");
+  B2INFO("DQMHistAnalysisInputTest: terminate called. Run: " << m_runno);
 }

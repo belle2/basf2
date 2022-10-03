@@ -10,7 +10,7 @@ Variables
 +++++++++
  * Extended the variable `useAlternativeDaughterHypothesis` to variables calculated from daughters' 4-momentum, e.g.
    `cosHelicityAngleMomentum`.
- * Added metavariable to retrieve the distance to closest neighbour at a detector surface (based on track helix extrapolation): `minET2ETDist`.
+ * Added metavariable to retrieve the distance to the closest neighbour at a detector surface (based on track helix extrapolation): `minET2ETDist`.
  * Added metavariable to retrieve any variable associated to the closest neighbour at a detector surface from the reference particle list: `minET2ETDistVar`.
 
 Modules

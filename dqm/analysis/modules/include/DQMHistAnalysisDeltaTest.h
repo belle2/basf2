@@ -64,12 +64,13 @@ namespace Belle2 {
     // Data members
     //! name of histogram directory
     std::string m_histogramDirectoryName;
+    //! name of histogram
+    std::string m_histogramName;
     //! prefix for EPICS PVs
     std::string m_pvPrefix;
 
     //! Final Canvas
     TCanvas* m_cTest = nullptr;
-
 
     /** Monitoring Object */
     MonitoringObject* m_monObj {};

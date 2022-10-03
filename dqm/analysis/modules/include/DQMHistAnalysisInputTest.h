@@ -20,7 +20,7 @@
 namespace Belle2 {
 
   /**
-   * Class to read histograms from a root file for offline testing of analysis modules.
+   * Class to dynamically fill histograms from a config file for offline testing of analysis modules.
    */
 
   class DQMHistAnalysisInputTestModule : public DQMHistAnalysisModule {
@@ -67,6 +67,9 @@ namespace Belle2 {
     /** Global EventMetaData for run number and event number. */
     StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
 
+    /** List of config files */
+    std::vector<std::string> m_configs{};
+
     /** Exp number. */
     unsigned int m_expno;
 
@@ -79,11 +82,27 @@ namespace Belle2 {
     /** Evt number. */
     unsigned int m_count{};
 
-    /** the test histogram */
-    TH1* m_testHisto{};
+    /** Fill skip modulo. */
+    unsigned int m_nonfillmod{0};
 
-    /** function for filling histo */
-    TF1* m_func{};
+    /** list of test histogram */
+    std::vector <TH1*> m_testHisto{};
+
+    /** according list of function for filling histo */
+    std::vector <TF1*> m_func{};
+
+    /** according parameter list for function definition */
+    std::vector <std::vector <double>> m_fpar{};
+
+    /** according list of fills per "event" */
+    std::vector <unsigned int> m_fill{};
+
+    /** according list of underflow fills per "event" */
+    std::vector <unsigned int> m_underflow{};
+
+    /** keeping a list of histo Names  */
+    std::vector <std::string> m_myNames{};
+
   };
 } // end namespace Belle2
 

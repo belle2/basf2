@@ -40,10 +40,36 @@ Decay anti-B0sig
 0.003620000   D_0*+sig  e-   anti-nu_e                  LLSW 0.68 -0.2 0.3;
 0.004010000   D'_1+sig  e-   anti-nu_e                  LLSW 0.68 -0.2 0.3;
 0.003470000   D_2*+sig  e-   anti-nu_e                  LLSW 0.71 -1.6 -0.5 2.9;
+
+0.000460000   D*+sig  pi0  e-  anti-nu_e                      GOITY_ROBERTS;
+0.000460000   D+sig  pi0  e-  anti-nu_e                       GOITY_ROBERTS;
+
+0.000210000   D+sig  pi+  pi-  e-  anti-nu_e                  PHSP;
+0.000140000   D+sig  pi0  pi0  e-  anti-nu_e                  PHSP;
+
+0.001050000   D*+sig  pi+  pi-  e-  anti-nu_e                 PHSP;
+0.000700000   D*+sig  pi0  pi0  e-  anti-nu_e                 PHSP;
+
+0.002170000   D+sig  eta  e-  anti-nu_e                       PHSP;
+0.002170000   D*+sig  eta  e-  anti-nu_e                      PHSP;
+
+
 0.007040000   D_1+sig   mu-  anti-nu_mu                 LLSW 0.71 -1.6 -0.5 2.9;
 0.003620000   D_0*+sig  mu-  anti-nu_mu                 LLSW 0.68 -0.2 0.3;
 0.004010000   D'_1+sig  mu-  anti-nu_mu                 LLSW 0.68 -0.2 0.3;
 0.003470000   D_2*+sig  mu-  anti-nu_mu                 LLSW 0.71 -1.6 -0.5 2.9;
+
+0.000460000   D*+sig  pi0  mu-  anti-nu_mu                    GOITY_ROBERTS;
+0.000460000   D+sig  pi0  mu-  anti-nu_mu                     GOITY_ROBERTS;
+
+0.000210000   D+sig  pi+  pi-  mu-  anti-nu_mu                PHSP;
+0.000140000   D+sig  pi0  pi0  mu-  anti-nu_mu                PHSP;
+
+0.001050000   D*+sig  pi+  pi-  mu-  anti-nu_mu               PHSP;
+0.000700000   D*+sig  pi0  pi0  mu-  anti-nu_mu               PHSP;
+
+0.002170000   D+sig  eta  mu-  anti-nu_mu                     PHSP;
+0.002170000   D*+sig  eta  mu-  anti-nu_mu                    PHSP;
 Enddecay
 CDecay B0sig
 

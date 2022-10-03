@@ -50,6 +50,11 @@ namespace Belle2 {
     void beginRun(void) override final;
 
     /**
+     * Called when run ends.
+     */
+    void endRun(void) override final;
+
+    /**
      * This method is called for each event.
      */
     void event(void) override final;

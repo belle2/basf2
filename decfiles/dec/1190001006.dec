@@ -1,5 +1,5 @@
 # EventType: 1190001006
-# Descriptor: 
+# Descriptor: [B0 -> K*0/omega/rho0/K_10/K'_10/K_2*0/K''*0/Xsd gamma]cc, BFs are taken from DECAY_BELLE2.DEC
 # NickName: Bd_sgamma
 # Documentation: semi-inclusive b -> s gamma
 # Tested: Yes

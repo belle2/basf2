@@ -14,5 +14,7 @@
 #pragma link C++ class Belle2::ChargedPidMVAWeights+; // checksum=0x828942cb, version=8
 #pragma link C++ enum Belle2::ChargedPidMVAWeights::ChargedPidMVATrainingMode+; //implicit
 #pragma link C++ class Belle2::PIDCalibrationWeight+; // checksum=0x45237beb, version=1
+#pragma link C++ class Belle2::PIDDetectorWeights+; // checksum=0xeee8b270, version=3
+#pragma link C++ class Belle2::PIDDetectorWeights::WeightsTable+; // checksum=0x284bab5, version=1
 
 #endif

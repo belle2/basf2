@@ -45,6 +45,7 @@ extensions = [
     'sphinxarg.ext',
     'basf2ext',
     'nbsphinx',
+    'sphinxcontrib.programoutput',
     'IPython.sphinxext.ipython_console_highlighting',
 ]
 

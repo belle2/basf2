@@ -32,6 +32,8 @@ Modular Analysis Function
    If one wants to use the previous weight files, the arguments should be set as follows: ``maskName='all'`` and ``prefix=''``.
  * With the :func:`vertex.kFit`, the daughters' kinematics are updated after the vertex fit, even when fit daughters are
    selected using ``decay_string`` and ``daughtersUpdate=True``.
+ * The new argument ``ignoreMotherFlavor`` has been added to the function `mergeListsWithBestDuplicate`. It allows to ignore the
+   flavor of the mother particle when identifying duplicates.
 
 Changes in the analysis package in light-2207-bengal
 ----------------------------------------------------

@@ -41,7 +41,6 @@
 #include <TVector.h>
 #include <TRotation.h>
 #include <Math/Vector4D.h>
-#include <iostream>
 
 using namespace std;
 using namespace Belle2;

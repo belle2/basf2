@@ -17,6 +17,8 @@ Modules
 +++++++
  * New modules :b2:mod:`LowEnergyPi0VetoExpert` and :b2:mod:`LowEnergyPi0IdentificationExpert` for MVA-based pi0
    identification are added.
+ * New module :b2:mod:`KlongMomentumUpdaterExpert` to calculate and update the two-body B-meson decay including a
+   Klong is added. New function :func:`modularAnalysis.updateKlongKinematicsExpert` is also added.
 
 Modular Analysis Function
 +++++++++++++++++++++++++
@@ -28,6 +30,8 @@ Modular Analysis Function
    Users can then create aliases in their own steering script: see ``analysis/examples/VariableManager/trackIsolationVariables.py`` for an example.
  * The default argument of :func:`flavorTagger.flavorTagger` is updated so that the weight files trained with MC15ri will be used as default.
    If one wants to use the previous weight files, the arguments should be set as follows: ``maskName='all'`` and ``prefix=''``.
+ * With the :func:`vertex.kFit`, the daughters' kinematics are updated after the vertex fit, even when fit daughters are
+   selected using ``decay_string`` and ``daughtersUpdate=True``.
 
 Changes in the analysis package in light-2207-bengal
 ----------------------------------------------------

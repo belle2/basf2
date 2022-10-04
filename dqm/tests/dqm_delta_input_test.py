@@ -16,7 +16,9 @@ argv = sys.argv
 
 # Set the log level to show only error and fatal messages
 # b2.set_log_level(b2.LogLevel.ERROR)
-b2.set_log_level(b2.LogLevel.INFO)
+# b2.set_log_level(b2.LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.DEBUG)
+b2.set_debug_level(20)
 
 # Create main path
 main = b2.create_path()

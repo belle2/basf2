@@ -78,6 +78,11 @@ void DQMHistAnalysisDeltaTestModule::beginRun()
   B2DEBUG(1, "DQMHistAnalysisDeltaTest: beginRun called.");
 }
 
+void DQMHistAnalysisDeltaTestModule::endRun()
+{
+  B2DEBUG(1, "DQMHistAnalysisDeltaTest: endRun called.");
+}
+
 void DQMHistAnalysisDeltaTestModule::event()
 {
   double data_Test1 = 0.0;
@@ -195,5 +200,7 @@ void DQMHistAnalysisDeltaTestModule::event()
 void DQMHistAnalysisDeltaTestModule::terminate()
 {
   B2DEBUG(1, "DQMHistAnalysisDeltaTest: terminate called");
+  // MiraBelle export code should run at end of Run
+  // but it still "remembers" the state from last event call.
 }
 

@@ -11,8 +11,7 @@ Variables
  * Extended the variable `useAlternativeDaughterHypothesis` to variables calculated from daughters' 4-momentum, e.g.
    `cosHelicityAngleMomentum`.
  * New metavariable `useDaughterRestFrame` to calculate a variable at the rest frame of the given daughters is added.
- * New variable `daughterAngleInDifferentFrames` that returns the angle between two daughters' system in different
-   frames is added. 
+ * New variable `cosHelicityAngleForQuasiTwoBodyDecay` is added for the angular analysis on the quasi-two-body decay.
 
 Modules
 +++++++

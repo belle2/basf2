@@ -1234,81 +1234,6 @@ namespace Belle2 {
       }
     }
 
-    Manager::FunctionPtr daughterAngleInDifferentFrames(const std::vector<std::string>& arguments)
-    {
-      if (arguments.size() == 2) {
-
-        auto func = [arguments](const Particle * particle) -> double {
-          if (!particle)
-            return std::numeric_limits<double>::quiet_NaN();
-
-          ROOT::Math::PxPyPzEVector first, second;
-
-          for (unsigned int i = 0; i < 2; i++)
-          {
-            auto arg = arguments[i];
-
-            std::string targetName, frameName;
-            if (arg.find('@') == std::string::npos) { // not include '@'
-              targetName = arg;
-            } else {
-              targetName = arg.substr(0, arg.find('@'));
-              frameName = arg.substr(arg.find('@') + 1);
-            }
-
-            std::vector<std::string> targetVector;
-            boost::split(targetVector, targetName, boost::is_any_of("+")); // split with '+'
-            ROOT::Math::PxPyPzEVector target4Vector(0, 0, 0, 0);
-            for (auto index : targetVector) {
-              boost::algorithm::trim(index); // remove spaces
-
-              const Particle* dauPart = particle->getParticleFromGeneralizedIndexString(index);
-              if (dauPart)
-                target4Vector += dauPart->get4Vector();
-              else
-                return std::numeric_limits<float>::quiet_NaN();
-            }
-
-            std::unique_ptr<ReferenceFrame> frame;
-            std::string frameName_upper = boost::algorithm::to_upper_copy(frameName);
-            if (frameName_upper == "LAB" or frameName_upper == "") {
-              frame.reset(new LabFrame());
-            } else if (frameName_upper == "CMS") {
-              frame.reset(new CMSFrame());
-            } else if (frameName_upper == "REST") {
-              frame.reset(new RestFrame(particle));
-            } else {
-              // otherwise, use the daughters' rest frame
-              std::vector<std::string> frameVector;
-              boost::split(frameVector, frameName, boost::is_any_of("+"));
-              ROOT::Math::PxPyPzEVector frame4Vector(0, 0, 0, 0);
-              for (auto index : frameVector) {
-                boost::algorithm::trim(index); // remove spaces
-
-                const Particle* dauPart = particle->getParticleFromGeneralizedIndexString(index);
-                if (dauPart)
-                  frame4Vector +=  dauPart->get4Vector();
-                else
-                  return std::numeric_limits<float>::quiet_NaN();
-              }
-              Particle frameParticle(frame4Vector, 0);
-              frame.reset(new RestFrame(&frameParticle));
-            }
-
-            if (i == 0)
-              first = frame->getMomentum(target4Vector);
-            else
-              second = frame->getMomentum(target4Vector);
-          }
-
-          return B2Vector3D(first.Vect()).Angle(B2Vector3D(second.Vect()));
-        };
-        return func;
-      } else {
-        B2FATAL("Wrong number of arguments for meta function daughterAngleInDifferentFrames");
-      }
-    }
-
     double grandDaughterDecayAngle(const Particle* particle, const std::vector<double>& arguments)
     {
       if (arguments.size() == 2) {
@@ -3314,33 +3239,6 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                            second daughter.
                            ``daughterAngle(0:0, 3:0)`` will return the angle between the first daughter of the first daughter, and
                            the first daughter of the fourth daughter.
-
-                      )DOC", Manager::VariableDataType::c_double);
-    REGISTER_METAVARIABLE("daughterAngleInDifferentFrames(daughterIndex1[+daughterIndex1-1 ... +daughterIndex1-n]@Frame, daughterIndex2[+daughterIndex2-1 ... +daughterIndex2-n]@Frame)", daughterAngleInDifferentFrames,
-			  R"DOC(
-                       Returns the angle in between any pair of particles belonging to the same decay tree at different frames.
-                       The unit of the angle is ``rad``.
-
-                       Each argument has to be daughter indices or a combination of daughter indices and the frame definition.
-                       
-                       The daughter index is used to identify particle via generalized index (e.g. ``0``, ``0:1:3``, ...).  
-                       If two or more indices separated by a plus``+`` are provided, a vector of the sum of the daughters is
-                       used.
-
-                       The frame definition can be selected from
-
-                       - ``LAB``: LAB frame. If no frame name is specified, it is used as default.
-                       - ``CMS``: CMS frame.
-                       - ``Rest``: Rest frame of the given particle.
-                       - Daughters' rest frame identified via generalized daughter indices.
-
-                       The daughter indices as the target system and the frame name have to be separated with ``@``. For example,
-                       ``0:1+3@Rest`` identifies the target system as the sum of the second daughter (1) of the first daughter
-                       (0) and the fourth daughter (3) in the rest frame of the given particle.
-
-                       .. tip::
-                           ``daughterAngleInDifferentFrames('0@Rest', '3@1+2')`` will return the angle between the first daughter in
-                           the mother's rest frame and the fourth daughter at the rest frame of the sum of second and third daughters
 
                       )DOC", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("mcDaughterAngle(daughterIndex_1, daughterIndex_2, [daughterIndex_3])", mcDaughterAngle,

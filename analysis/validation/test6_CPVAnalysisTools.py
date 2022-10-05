@@ -54,7 +54,7 @@ ft.flavorTagger(
     weightFiles='B2nunubarBGx1',
     path=cp_val_path)
 
-vx.treeFit(list_name='B0:jpsiks', ipConstraint=True, path=cp_val_path)
+vx.treeFit(list_name='B0:jpsiks', conf_level=1e-10, ipConstraint=True, path=cp_val_path)
 vx.TagV(list_name='B0:jpsiks', MCassociation='breco', constraintType='tube', path=cp_val_path)
 
 # Select variables that will be stored to ntuple

@@ -27,7 +27,7 @@ namespace Belle2 {
   /** Class to represent a complete set to describe a Neurotrigger.
    */
   template <class T>
-  class NNTParam : public TObject {
+  class NNTParam {
     /** this is a typewrapper class for the parameters for the neurotrigger. for every parameter, it can also store the information wether the parameter was aleady set or if it is locked.
      * */
   public:
@@ -37,7 +37,9 @@ namespace Belle2 {
       m_value = xvalue;
       m_set = true;
     }
+
     operator T() const { return m_value;}
+
     T operator= (const T t)
     {
       if (!m_locked) {
@@ -46,6 +48,7 @@ namespace Belle2 {
       } else {
         throw std::invalid_argument("parameter is read only! (locked)");
       }
+      return *this;
     }
     NNTParam operator()() const {return m_value;}
 
@@ -62,10 +65,12 @@ namespace Belle2 {
 
   class NeuroTriggerParameters : public TObject {
   public:
-    NeuroTriggerParameters::NeuroTriggerParameters() {};
-    NeuroTriggerParameters::NeuroTriggerParameters(std::string filename);
+    NeuroTriggerParameters() {};
+    NeuroTriggerParameters(std::string& filename);
     virtual ~NeuroTriggerParameters() {};
-    int to_intTiming(std::string& text)
+    // unfortunately i am to dumb to make the typewrapper class work for strings,
+    // so the workaround are those translate functions
+    const int to_intTiming(const std::string& text)
     {
       if (text == "fastestpriority") {return 0;}
       else if (text == "fastest2d") {return 1;}
@@ -73,9 +78,14 @@ namespace Belle2 {
       else if (text == "etf_or_fastestpriority") {return 3;}
       else if (text == "etf_or_fastest2d") {return 4;}
       else if (text == "etf_only") {return 5;}
+      else if (text == "etfcc") {return 6;}
+      else if (text == "etfhwin") {return 7;}
+      else if (text == "etfcc_or_fastestpriority") {return 8;}
+      else if (text == "min_etf_fastestpriority") {return 9;}
+      else if (text == "min_etfcc_fastestpriority") {return 10;}
       else {return -1;}
     }
-    std::string to_strTiming(unsigned& i)
+    const std::string to_strTiming(const unsigned& i)
     {
       if (i == 0) {return "fastestpriority";}
       else if (i == 1) {return "fastest2d";}
@@ -83,14 +93,26 @@ namespace Belle2 {
       else if (i == 3) {return "etf_or_fastestpriority";}
       else if (i == 4) {return "etf_or_fastest2d";}
       else if (i == 5) {return "etf_only";}
+      else if (i == 6) {return "etfcc";}
+      else if (i == 7) {return "etfhwin";}
+      else if (i == 8) {return "etfcc_or_fastestpriority";}
+      else if (i == 9) {
+        return "min_etf_fastestpriority";
+      } else if (i == 10) {return "min_etfcc_fastestpriority";}
       else {return "invalid";}
     }
-    std::string et_option() {return to_strTiming(ETOption);}
-    void loadconfigtxt(std::string& filename);
-    void saveconfigtxt(std::string& filename);
-    void loadconfigroot(std::string& filename);
-    void saveconfigroot(std::string& filename);
-  private:
+
+
+    const std::string et_option() {return to_strTiming(ETOption);}
+    void loadconfigtxt(const std::string& filename);
+    void saveconfigtxt(const std::string& filename);
+    template<typename X>
+    std::string print2dArray(const std::string& name, std::vector<std::vector<NNTParam<X>>> vecvec);
+    template<typename X>
+    std::string print1dArray(const std::string& name, std::vector<NNTParam<X>> vecvec);
+
+    //void loadconfigroot(std::string& filename);
+    //void saveconfigroot(std::string& filename);
     /** Network parameters **/
     NNTParam<unsigned> nInput;
     NNTParam<unsigned> nHidden;
@@ -107,15 +129,57 @@ namespace Belle2 {
     std::vector<std::vector<NNTParam<float>>> thetaRangeTrain;
     std::vector<std::vector<NNTParam<float>>> invptRangeTrain;
     std::vector<NNTParam<unsigned short>> maxHitsperSL;
-    std::vector<NNTParam<float>>
-                              std::vector<NNTParam<float>>
-                              std::vector<NNTParam<float>> outputScale;
+    std::vector<NNTParam<float>> outputScale;
     std::vector<NNTParam<unsigned long>> SLPattern;
     std::vector<NNTParam<unsigned long>> SLPatternMask;
     NNTParam<unsigned> ETOption;
     std::vector<NNTParam<unsigned>> precision;
+  private:
+    template<typename X>
+    bool checkarr(std::vector<std::vector<NNTParam<X>>> vec);
+    template<typename X>
+    bool checkarr(std::vector<NNTParam<X>> vec);
+
+    template<typename X>
+    std::vector<std::vector<NNTParam<X>>> read2dArray(std::string keyx, bool locked)
+    {
+      std::vector<std::vector<NNTParam<X>>> retarr;
+      std::string key = keyx;
+      // parse the brackets here to fill the vector: [[1,2], 3,4]]
+      key = key.substr(key.find("[") + 1, std::string::npos); // without outer brackets: [1,2], [3,4]
+      for (std::size_t ipos = 0; ipos != std::string::npos; ipos = key.find("[", ipos + 1)) {
+        std::string pairstr = key.substr(ipos + 1, key.find("]", ipos + 1) - ipos - 1); // this shopuld be 1,2 now
+        std::vector<NNTParam<X>> newpair;
+        std::size_t jpos;
+        for (jpos = 0; jpos != std::string::npos; jpos = pairstr.find(",", jpos)) {
+          if (!(jpos == 0)) {jpos++;}
+          newpair.push_back(NNTParam<X>(std::stof(pairstr.substr(jpos, pairstr.find(",") - jpos))));
+          if (locked) {newpair.back().lock();}
+        }
+        //newpair.push_back(NNTParam<X>(std::stof(pairstr.substr(jpos, pairstr.length()-jpos))));
+        //if (locked) {newpair.back().lock();}
+        retarr.push_back(newpair);
+      }
+      return retarr;
+    }
+
+    template<typename X>
+    std::vector<NNTParam<X>> read1dArray(std::string keyx, bool locked)
+    {
+      std::string key = keyx;
+      // parse the brackets here to fill the vector: [[1,2], 3,4]]
+      std::string pairstr = key.substr(1, key.find("]", 1) - 1); // this shopuld be 1,2 now
+      std::vector<NNTParam<X>> newpair;
+      std::size_t jpos;
+      for (jpos = 0; jpos != std::string::npos; jpos = pairstr.find(",", jpos)) {
+        if (!(jpos == 0)) {jpos++;}
+        newpair.push_back(NNTParam<X>(std::stof(pairstr.substr(jpos, pairstr.find(",") - jpos))));
+        if (locked) {newpair.back().lock();}
+      }
+      return newpair;
+    }
 
   };
 }
 
-
+#endif

@@ -13,7 +13,6 @@
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
 #include <analysis/VertexFitting/TreeFitter/HelixUtils.h>
 #include <framework/logging/Logger.h>
-#include <framework/dbobjects/BeamParameters.h>
 #include <mdst/dataobjects/Track.h>
 
 using std::vector;
@@ -259,35 +258,13 @@ namespace TreeFitter {
 
     const Eigen::Matrix<double, 4, 1> fitMomE = fitparams.getStateVector().segment(momindex, 4);
 
-    const Belle2::DBObjPtr<Belle2::BeamParameters> beamparams;
-
-    const ROOT::Math::PxPyPzEVector her = beamparams->getHER();
-    const ROOT::Math::PxPyPzEVector ler = beamparams->getLER();
-    const ROOT::Math::PxPyPzEVector cms = her + ler;
-
-    Eigen::Matrix<double, 4, 1> beamMomE = Eigen::Matrix<double, 4, 1>::Zero();
-    beamMomE(0) = cms.X();
-    beamMomE(1) = cms.Y();
-    beamMomE(2) = cms.Z();
-    beamMomE(3) = cms.E();
-
-    p.getResiduals() = beamMomE - fitMomE;
+    p.getResiduals() = m_config->m_beamMomE - fitMomE;
 
     for (int row = 0; row < 4; ++row) {
       p.getH()(row, momindex + row) = -1;
     }
 
-    const TMatrixDSym HERcoma = beamparams->getCovHER();
-    const TMatrixDSym LERcoma = beamparams->getCovLER();
-
-    const double covE = (HERcoma(0, 0) + LERcoma(0, 0)); //TODO
-    Eigen::Matrix<double, 4, 4>  momEcomaInv = Eigen::Matrix<double, 4, 4>::Zero();
-    for (size_t i = 0; i < 4; ++i) {
-      momEcomaInv(i, i) =
-        covE; //TODO Set this strange diagonal value, since the zero momentum in y would lead to a completely unconstrained pY... get back to this at some point
-    }
-
-    p.getV() =  momEcomaInv;
+    p.getV() =  m_config->m_beamCovariance;
 
     return ErrCode(ErrCode::Status::success) ;
   }
@@ -386,6 +363,7 @@ namespace TreeFitter {
       list.push_back(Constraint(this, Constraint::mass, depth, 1, 3));
     }
     if (m_beamconstraint) {
+      assert(m_config);
       list.push_back(Constraint(this, Constraint::beam, depth, 4, 3));
     }
 

@@ -12,6 +12,7 @@
 #include <analysis/dataobjects/ParticleList.h>
 
 #include <framework/datastore/StoreObjPtr.h>
+#include <analysis/VertexFitting/TreeFitter/ConstraintConfiguration.h>
 
 namespace Belle2 {
   class Particle;
@@ -132,5 +133,11 @@ namespace Belle2 {
 
     /** inflate beamspot covariance of z by this number */
     int m_inflationFactorCovZ;
+
+    /** beam four-momentum */
+    Eigen::Matrix<double, 4, 1> m_beamMomE;
+
+    /** beam covariance matrix */
+    Eigen::Matrix<double, 4, 4>m_beamCovariance;
   };
 }

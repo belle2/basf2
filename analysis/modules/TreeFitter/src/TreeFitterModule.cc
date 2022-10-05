@@ -14,10 +14,11 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/particledb/EvtGenDatabasePDG.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/dbobjects/BeamParameters.h>
 
 #include <analysis/utility/ParticleCopy.h>
 
-#include <analysis/VertexFitting/TreeFitter/ConstraintConfiguration.h>
 #include <analysis/VertexFitting/TreeFitter/FitParameterDimensionException.h>
 
 using namespace Belle2;
@@ -103,6 +104,25 @@ void TreeFitterModule::initialize()
       m_massConstraintList.push_back(particletemp->PdgCode());
     }
   }
+
+  const Belle2::DBObjPtr<Belle2::BeamParameters> beamparams;
+  const ROOT::Math::PxPyPzEVector her = beamparams->getHER();
+  const ROOT::Math::PxPyPzEVector ler = beamparams->getLER();
+  const ROOT::Math::PxPyPzEVector cms = her + ler;
+
+  m_beamMomE(0) = cms.X();
+  m_beamMomE(1) = cms.Y();
+  m_beamMomE(2) = cms.Z();
+  m_beamMomE(3) = cms.E();
+
+  const TMatrixDSym HERcoma = beamparams->getCovHER();
+  const TMatrixDSym LERcoma = beamparams->getCovLER();
+
+  const double covE = (HERcoma(0, 0) + LERcoma(0, 0));
+  for (size_t i = 0; i < 4; ++i) {
+    m_beamCovariance(i, i) =
+      covE; //TODO Set this strange diagonal value, since the zero momentum in y would lead to a completely unconstrained pY... get back to this at some point
+  }
 }
 
 void TreeFitterModule::beginRun()
@@ -169,6 +189,8 @@ bool TreeFitterModule::fitTree(Belle2::Particle* head)
     m_customOriginCovariance,
     m_originDimension,
     m_beamConstraint,
+    m_beamMomE,
+    m_beamCovariance,
     m_inflationFactorCovZ
   );
 

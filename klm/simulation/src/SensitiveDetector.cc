@@ -58,7 +58,7 @@ SensitiveDetector::SensitiveDetector(
   m_BKLMSimHitPositions.registerRelationTo(m_BKLMSimHits);
 }
 
-bool SensitiveDetector::stepEKLM(G4Step* aStep, G4TouchableHistory*)
+bool SensitiveDetector::stepEKLM(G4Step* aStep, G4TouchableHistory* history)
 {
   /* Once-only initializations (constructor is called too early for these). */
   if (m_FirstCall) {
@@ -67,6 +67,12 @@ bool SensitiveDetector::stepEKLM(G4Step* aStep, G4TouchableHistory*)
     if (geometryData->beamBackgroundStudy())
       m_BkgSensitiveDetector = new BkgSensitiveDetector("EKLM");
   }
+
+  // Record a BeamBackHit for any particle
+  if (m_BkgSensitiveDetector != nullptr) {
+    m_BkgSensitiveDetector->step(aStep, history);
+  }
+
   const int stripLevel = 1;
   int section, layer, sector, plane, strip, stripGlobal;
   HepGeom::Point3D<double> gpos, lpos;

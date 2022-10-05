@@ -10,6 +10,8 @@ Variables
 +++++++++
  * Extended the variable `useAlternativeDaughterHypothesis` to variables calculated from daughters' 4-momentum, e.g.
    `cosHelicityAngleMomentum`.
+ * Added metavariable to retrieve the distance to the closest neighbour at a detector surface (based on track helix extrapolation): `minET2ETDist`.
+ * Added metavariable to retrieve any variable associated to the closest neighbour at a detector surface from the reference particle list: `minET2ETDistVar`.
 
 Modules
 +++++++
@@ -21,6 +23,8 @@ Modules
  * The module :b2:mod:`ParticleLoader` has a new option to create particles which do
    not have a mdst source. It is also available via the convenience function 
    :func:`modularAnalysis.fillParticleListFromDummy`.
+ * New module :b2:mod:`KlongMomentumUpdaterExpert` to calculate and update the two-body B-meson decay including a
+   Klong is added. New function :func:`modularAnalysis.updateKlongKinematicsExpert` is also added.
 
 Modular Analysis Function
 +++++++++++++++++++++++++
@@ -37,6 +41,15 @@ Particle dataobject
  * Added a new Particle source ``NoMDSTSource`` to Particle. It can be used for Particles 
    that do not come from any mdst source.
 
+ * Updated the `calculateTrackIsolation` helper. Now, it returns a list of metavariables (`minET2ETDist`, optionally `minET2ETDistVar` as well)
+   correctly configured according to the helper input options.
+   Users can then create aliases in their own steering script: see ``analysis/examples/VariableManager/trackIsolationVariables.py`` for an example.
+ * The default argument of :func:`flavorTagger.flavorTagger` is updated so that the weight files trained with MC15ri will be used as default.
+   If one wants to use the previous weight files, the arguments should be set as follows: ``maskName='all'`` and ``prefix=''``.
+ * With the :func:`vertex.kFit`, the daughters' kinematics are updated after the vertex fit, even when fit daughters are
+   selected using ``decay_string`` and ``daughtersUpdate=True``.
+ * The new argument ``ignoreMotherFlavor`` has been added to the function `mergeListsWithBestDuplicate`. It allows to ignore the
+   flavor of the mother particle when identifying duplicates.
 
 Changes in the analysis package in light-2207-bengal
 ----------------------------------------------------

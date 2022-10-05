@@ -20,14 +20,18 @@ argv = sys.argv
 b2.set_log_level(b2.LogLevel.DEBUG)
 b2.set_debug_level(20)
 
+configs = [b2.find_file("dqm/tests/ipmon.json")]
+
 # Create main path
 main = b2.create_path()
 
 # Modules
-main.add_module('DQMHistAnalysisInputTest', Events=30, ConfigFiles=[
-        b2.find_file("dqm/tests/test1.json"), b2.find_file("dqm/tests/test2.json")])
-main.add_module('DQMHistAnalysisDeltaTest', histogramDirectoryName="test", histogramName="testHist2", useEpics=False)
+main.add_module('DQMHistAnalysisInputTest', Events=30, ConfigFiles=configs)
+main.add_module('DQMHistAnalysisIP', HistoDirectory="test", HistoName="ip_x", MonitorPrefix="ip", useEpics=False)
+main.add_module('DQMHistAnalysisIP', HistoDirectory="test", HistoName="ip_y", MonitorPrefix="ip", useEpics=False)
+main.add_module('DQMHistAnalysisIP', HistoDirectory="test", HistoName="ip_z", MonitorPrefix="ip", useEpics=False)
 
+# main.add_module('DQMHistAnalysisOutputImages');
 
 # Process all events
 b2.process(main)

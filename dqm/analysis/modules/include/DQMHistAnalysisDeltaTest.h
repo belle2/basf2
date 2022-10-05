@@ -22,7 +22,7 @@
 #include <TCanvas.h>
 
 namespace Belle2 {
-  /*! DQM Histogram Analysis for PXD DAQ */
+  /*! DQM Delta Histogram Test code and example */
 
   class DQMHistAnalysisDeltaTestModule : public DQMHistAnalysisModule {
 
@@ -48,6 +48,11 @@ namespace Belle2 {
      * Called when entering a new run.
      */
     void beginRun(void) override final;
+
+    /**
+     * Called when run ends.
+     */
+    void endRun(void) override final;
 
     /**
      * This method is called for each event.

@@ -105,6 +105,10 @@ void TreeFitterModule::initialize()
     }
   }
 
+}
+
+void TreeFitterModule::beginRun()
+{
   const Belle2::DBObjPtr<Belle2::BeamParameters> beamparams;
   const ROOT::Math::PxPyPzEVector her = beamparams->getHER();
   const ROOT::Math::PxPyPzEVector ler = beamparams->getLER();
@@ -123,10 +127,6 @@ void TreeFitterModule::initialize()
     m_beamCovariance(i, i) =
       covE; //TODO Set this strange diagonal value, since the zero momentum in y would lead to a completely unconstrained pY... get back to this at some point
   }
-}
-
-void TreeFitterModule::beginRun()
-{
 }
 
 void TreeFitterModule::event()

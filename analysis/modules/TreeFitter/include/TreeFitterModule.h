@@ -138,6 +138,6 @@ namespace Belle2 {
     Eigen::Matrix<double, 4, 1> m_beamMomE;
 
     /** beam covariance matrix */
-    Eigen::Matrix<double, 4, 4>m_beamCovariance;
+    Eigen::Matrix<double, 4, 4> m_beamCovariance;
   };
 }

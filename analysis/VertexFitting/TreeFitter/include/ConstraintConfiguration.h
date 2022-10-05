@@ -111,10 +111,10 @@ namespace TreeFitter {
     const int m_beamConstraintPDG;
 
     /** Beam four-momentum */
-    Eigen::Matrix<double, 4, 1>m_beamMomE;
+    Eigen::Matrix<double, 4, 1> m_beamMomE;
 
     /** Beam Covariance */
-    Eigen::Matrix<double, 4, 4>m_beamCovariance;
+    Eigen::Matrix<double, 4, 4> m_beamCovariance;
 
     /** inflate covariance of z by this number -> iptube  */
     const int m_inflationFactorCovZ;

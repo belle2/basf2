@@ -70,7 +70,7 @@ namespace Belle2 {
     virtual ~NeuroTriggerParameters() {};
     // unfortunately i am to dumb to make the typewrapper class work for strings,
     // so the workaround are those translate functions
-    const int to_intTiming(const std::string& text)
+    int to_intTiming(const std::string& text)
     {
       if (text == "fastestpriority") {return 0;}
       else if (text == "fastest2d") {return 1;}
@@ -115,7 +115,6 @@ namespace Belle2 {
     //void saveconfigroot(std::string& filename);
     /** Network parameters **/
     NNTParam<unsigned> nInput;
-    NNTParam<unsigned> nHidden;
     NNTParam<unsigned> nOutput;
     NNTParam<unsigned> nMLP;
     NNTParam<bool> targetZ;
@@ -128,6 +127,7 @@ namespace Belle2 {
     std::vector<std::vector<NNTParam<float>>> phiRangeTrain;
     std::vector<std::vector<NNTParam<float>>> thetaRangeTrain;
     std::vector<std::vector<NNTParam<float>>> invptRangeTrain;
+    std::vector<std::vector<NNTParam<float>>> nHidden;
     std::vector<NNTParam<unsigned short>> maxHitsperSL;
     std::vector<NNTParam<float>> outputScale;
     std::vector<NNTParam<unsigned long>> SLPattern;
@@ -141,43 +141,10 @@ namespace Belle2 {
     bool checkarr(std::vector<NNTParam<X>> vec);
 
     template<typename X>
-    std::vector<std::vector<NNTParam<X>>> read2dArray(std::string keyx, bool locked)
-    {
-      std::vector<std::vector<NNTParam<X>>> retarr;
-      std::string key = keyx;
-      // parse the brackets here to fill the vector: [[1,2], 3,4]]
-      key = key.substr(key.find("[") + 1, std::string::npos); // without outer brackets: [1,2], [3,4]
-      for (std::size_t ipos = 0; ipos != std::string::npos; ipos = key.find("[", ipos + 1)) {
-        std::string pairstr = key.substr(ipos + 1, key.find("]", ipos + 1) - ipos - 1); // this shopuld be 1,2 now
-        std::vector<NNTParam<X>> newpair;
-        std::size_t jpos;
-        for (jpos = 0; jpos != std::string::npos; jpos = pairstr.find(",", jpos)) {
-          if (!(jpos == 0)) {jpos++;}
-          newpair.push_back(NNTParam<X>(std::stof(pairstr.substr(jpos, pairstr.find(",") - jpos))));
-          if (locked) {newpair.back().lock();}
-        }
-        //newpair.push_back(NNTParam<X>(std::stof(pairstr.substr(jpos, pairstr.length()-jpos))));
-        //if (locked) {newpair.back().lock();}
-        retarr.push_back(newpair);
-      }
-      return retarr;
-    }
+    std::vector<std::vector<NNTParam<X>>> read2dArray(std::string keyx, bool locked);
 
     template<typename X>
-    std::vector<NNTParam<X>> read1dArray(std::string keyx, bool locked)
-    {
-      std::string key = keyx;
-      // parse the brackets here to fill the vector: [[1,2], 3,4]]
-      std::string pairstr = key.substr(1, key.find("]", 1) - 1); // this shopuld be 1,2 now
-      std::vector<NNTParam<X>> newpair;
-      std::size_t jpos;
-      for (jpos = 0; jpos != std::string::npos; jpos = pairstr.find(",", jpos)) {
-        if (!(jpos == 0)) {jpos++;}
-        newpair.push_back(NNTParam<X>(std::stof(pairstr.substr(jpos, pairstr.find(",") - jpos))));
-        if (locked) {newpair.back().lock();}
-      }
-      return newpair;
-    }
+    std::vector<NNTParam<X>> read1dArray(std::string keyx, bool locked);
 
   };
 }

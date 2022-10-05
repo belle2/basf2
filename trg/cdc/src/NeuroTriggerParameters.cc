@@ -21,7 +21,6 @@ void
 NeuroTriggerParameters::loadconfigtxt(const std::string& filename)
 {
   // now loading confile
-  //std::cout << "now in loadconfig.txt" << std::endl;
   std::ifstream confile;
   try {
     confile.open(filename, std::ifstream::in);
@@ -34,7 +33,6 @@ NeuroTriggerParameters::loadconfigtxt(const std::string& filename)
     std::cout << "ERROR! While opening file: " << filename << std::endl;
     exit(EXIT_FAILURE);
   }
-  //std::cout << "loaded file" << std::endl;
   while (std::getline(confile, line_all)) {
     // remove comments
     std::size_t hashtag = line_all.find('#');
@@ -50,30 +48,21 @@ NeuroTriggerParameters::loadconfigtxt(const std::string& filename)
     //if (line.find('==') != std::string::npos) {
     //    locked = true;
     //}
-    //std::cout << "test1" << std::endl;
     if (line.find('=') == std::string::npos) {
       continue;
     }
-    //std::cout << "test2" << std::endl;
+    line.erase(std::remove(line.begin(), line.end(), ' '), line.end()); // remove whitespaces in whole string
     par = line.substr(0, line.find('='));
-    std::cout << "here: " << par << std::endl;
     std::string l;
     l = line.substr(line.find("=") + 1, 1);
     if (l  == "=") {
       locked = true;
-      std::cout <<  "locked is set to true!!!!" << std::endl;
     }
-    //std::cout << "test3, found locked: " << locked << std::endl;
-    par.erase(std::remove(par.begin(), par.end(), ' '), par.end()); // remove whitespaces in whole string
-    key = line.substr((line.find('"') + 1), (line.find('"', line.find('"') + 1) - 1 - line.find('"')));
-    //std::cout << "parameter: " << par << std::endl;
-    //std::cout << "unprocessed key: " << key << std::endl;
+    key = (locked) ? line.substr((line.find('=') + 2), line.length() - line.find('=') - 2) : line.substr((line.find('=') + 1),
+          line.length() - line.find('=') - 1);
     if (par == "nInput")         {
       nInput = std::stoul(key);
       if (locked) {nInput.lock();}
-    } else if (par == "nHidden")        {
-      nHidden = std::stoul(key);
-      if (locked) {nHidden.lock();}
     } else if (par == "nOutput")        {
       nOutput = std::stoul(key);
       if (locked) {nOutput.lock();}
@@ -104,6 +93,8 @@ NeuroTriggerParameters::loadconfigtxt(const std::string& filename)
       thetaRangeTrain = read2dArray<float>(key, locked);
     } else if (par == "invptRangeTrain")    {
       invptRangeTrain = read2dArray<float>(key, locked);
+    } else if (par == "nHidden")    {
+      nHidden = read2dArray<float>(key, locked);
     } else if (par == "maxHitsperSL")    {
       maxHitsperSL = read1dArray<unsigned short>(key, locked);
     } else if (par == "outputScale")    {
@@ -139,7 +130,6 @@ void NeuroTriggerParameters::saveconfigtxt(const std::string& filename)
   savestream << "########################################################" << std::endl;
   savestream << "### Neurotrigger configuration file created by basf2 ###" << std::endl;
   savestream << "########################################################" << std::endl << std::endl;
-  if (nHidden.isSet()) {savestream << "nHidden " << (nHidden.isLocked() ? "== " : "= ") << nHidden << std::endl;}
   if (nOutput.isSet()) {savestream << "nOutput " << (nOutput.isLocked() ? "== " : "= ") << nOutput << std::endl;}
   if (nInput.isSet()) {savestream << "nInput " << (nInput.isLocked() ? "== " : "= ") << nInput << std::endl;}
   if (nMLP.isSet()) {savestream << "nMLP " << (nMLP.isLocked() ? "== " : "= ") << nMLP << std::endl;}
@@ -154,6 +144,7 @@ void NeuroTriggerParameters::saveconfigtxt(const std::string& filename)
   if (checkarr(phiRangeTrain)) {savestream << print2dArray<float>("phiRangeTrain", phiRangeTrain);}
   if (checkarr(thetaRangeTrain)) {savestream << print2dArray<float>("thetaRangeTrain", thetaRangeTrain);}
   if (checkarr(invptRangeTrain)) {savestream << print2dArray<float>("invptRangeTrain", invptRangeTrain);}
+  if (checkarr(nHidden)) {savestream << print2dArray<float>("nHidden", nHidden);}
   if (checkarr(maxHitsperSL)) {savestream << print1dArray<unsigned short>("maxHitsperSL", maxHitsperSL);}
   if (checkarr(outputScale)) {savestream << print1dArray<float>("outputScale", outputScale);}
   if (checkarr(SLPattern)) {savestream << print1dArray<unsigned long>("SLPattern", SLPattern);}
@@ -197,3 +188,42 @@ std::string NeuroTriggerParameters::print1dArray(const std::string& name, std::v
   savestream << "]" << std::endl;
   return savestream.str();
 }
+template<typename X>
+std::vector<std::vector<NNTParam<X>>> NeuroTriggerParameters::read2dArray(std::string keyx, bool locked)
+{
+  std::vector<std::vector<NNTParam<X>>> retarr;
+  std::string key = keyx;
+  // parse the brackets here to fill the vector: [[1,2], 3,4]]
+  key = key.substr(key.find("[") + 1, std::string::npos); // without outer brackets: [1,2], [3,4]
+  for (std::size_t ipos = 0; ipos != std::string::npos; ipos = key.find("[", ipos + 1)) {
+    std::string pairstr = key.substr(ipos + 1, key.find("]", ipos + 1) - ipos - 1); // this shopuld be 1,2 now
+    std::vector<NNTParam<X>> newpair;
+    std::size_t jpos;
+    for (jpos = 0; jpos != std::string::npos; jpos = pairstr.find(",", jpos)) {
+      if (!(jpos == 0)) {jpos++;}
+      newpair.push_back(NNTParam<X>(std::stof(pairstr.substr(jpos, pairstr.find(",") - jpos))));
+      if (locked) {newpair.back().lock();}
+    }
+    //newpair.push_back(NNTParam<X>(std::stof(pairstr.substr(jpos, pairstr.length()-jpos))));
+    //if (locked) {newpair.back().lock();}
+    retarr.push_back(newpair);
+  }
+  return retarr;
+}
+
+template<typename X>
+std::vector<NNTParam<X>> NeuroTriggerParameters::read1dArray(std::string keyx, bool locked)
+{
+  std::string key = keyx;
+  // parse the brackets here to fill the vector: [[1,2], 3,4]]
+  std::string pairstr = key.substr(1, key.find("]", 1) - 1); // this shopuld be 1,2 now
+  std::vector<NNTParam<X>> newpair;
+  std::size_t jpos;
+  for (jpos = 0; jpos != std::string::npos; jpos = pairstr.find(",", jpos)) {
+    if (!(jpos == 0)) {jpos++;}
+    newpair.push_back(NNTParam<X>(std::stof(pairstr.substr(jpos, pairstr.find(",") - jpos))));
+    if (locked) {newpair.back().lock();}
+  }
+  return newpair;
+}
+

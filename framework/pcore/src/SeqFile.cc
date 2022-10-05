@@ -17,8 +17,6 @@
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/format.hpp>
-#include <TUrl.h>
-
 
 using namespace Belle2;
 using namespace std;
@@ -33,9 +31,10 @@ SeqFile::SeqFile(const std::string& filename, const std::string& rwflag, char* s
     return;
   }
   bool readonly = rwflag.find('w') == std::string::npos;
-  //CAF use URL input style and add a prefix that need to be removed for sroot files
-  TUrl filename_url = TUrl(m_filename.c_str());
-  m_filename = filename_url.GetFile();
+  // CAF use URL input style and add a prefix that need to be removed for sroot files
+  if (filename.compare(0, 7, "file://") == 0) {
+    m_filename = filename.substr(7, filename.size() - 7);
+  }
   // is the file already compressed?
   m_compressed = m_filename.size() > 3 && m_filename.compare(m_filename.size() - 3, 3, ".gz") == 0;
   // strip .gz suffix to add it at the end automatically and correctly for subsequent files

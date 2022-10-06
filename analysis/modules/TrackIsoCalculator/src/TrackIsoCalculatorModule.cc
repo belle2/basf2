@@ -41,7 +41,7 @@ TrackIsoCalculatorModule::TrackIsoCalculatorModule() : Module()
   addParam("payloadName",
            m_payloadName,
            "The name of the database payload object with the PID detector weights.",
-           std::string("CPIDDetectorWeights"));
+           std::string("PIDDetectorWeights"));
   addParam("excludePIDDetWeights",
            m_excludePIDDetWeights,
            "If set to true, will not use the PID detector weights for the score definition.",
@@ -298,7 +298,13 @@ double TrackIsoCalculatorModule::getIsoScore(const Particle* iParticle)
   auto p = iParticle->getP();
   auto theta = std::get<double>(Variable::Manager::Instance().getVariable("theta")->function(iParticle));
 
-  auto detWeight = (*m_DBWeights.get())->getWeight(hypo, det, p, theta); // Note that can be NaN.
+  auto detWeight = (*m_DBWeights.get())->getWeight(hypo, det, p, theta);
+
+  // If w < 0, the detector has detrimental impact on PID:
+  // set the value is set to zero to prevent the detector from contributing to the score.
+  // NB: NaN should stay NaN.
+  detWeight = (detWeight < 0 || std::isnan(detWeight)) ? detWeight : 0.0;
+
   if (m_excludePIDDetWeights) {
     detWeight = 1.;
   }

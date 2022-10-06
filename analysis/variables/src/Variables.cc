@@ -47,6 +47,8 @@
 
 #include <iostream>
 #include <cmath>
+#include <boost/algorithm/string.hpp>
+
 
 using namespace std;
 
@@ -1074,6 +1076,54 @@ namespace Belle2 {
     }
 
 
+    Manager::FunctionPtr particleExtTrkIsoScoreVar(const std::vector<std::string>& arguments)
+    {
+
+      if (arguments.size() < 3) {
+        B2ERROR("Wrong number of arguments (at least 3 required) for meta variable minET2ETIsoScore");
+        return nullptr;
+      }
+
+      std::string referenceListName = arguments[0];
+      bool useHighestProbMassForExt(true);
+      try {
+        useHighestProbMassForExt = static_cast<bool>(Belle2::convertString<int>(arguments[1]));
+      } catch (std::invalid_argument& e) {
+        B2ERROR("Second argument must be an integer flag.");
+        return nullptr;
+      }
+      std::string extraSuffix = (useHighestProbMassForExt) ? "__useHighestProbMassForExt" : "";
+
+      std::vector<std::string> detectorNames(arguments.begin() + 2, arguments.end());
+
+      auto func = [&](const Particle * part) -> double {
+
+        StoreObjPtr<ParticleList> refPartList(referenceListName);
+        if (!refPartList.isValid())
+        {
+          B2FATAL("Invalid Listname " << referenceListName << " given to minET2ETIsoScore!");
+        }
+
+        double scoreSum(0.0);
+        for (auto& detName : detectorNames)
+        {
+          std::string extraInfo = "trkIsoScore" + detName + "_VS_" + referenceListName;
+          if (!part->hasExtraInfo(extraInfo)) {
+            return std::numeric_limits<float>::quiet_NaN();
+          }
+          auto scoreDet = part->getExtraInfo(extraInfo);
+          if (std::isnan(scoreDet)) {
+            return std::numeric_limits<float>::quiet_NaN();
+          }
+          scoreSum += scoreDet;
+        }
+        return scoreSum;
+
+      };
+
+      return func;
+    }
+
     VARIABLE_GROUP("Kinematics");
     REGISTER_VARIABLE("p", particleP, "momentum magnitude", "GeV/c");
     REGISTER_VARIABLE("E", particleE, "energy", "GeV");
@@ -1243,6 +1293,18 @@ if 0, it is assumed the mass hypothesis matching the particle lists' PDG was use
 The first argument is the detector surface where to look at the nearest neighbour.
 The second argument is the reference particle list name used to pick up the nearest track helix.
 The third argument is a variable name, e.g. `nCDCHits`.
+
+.. note::
+    This variable requires to run the ``TrackIsolation`` module first.
+    Note that the input parameters of this metafunction must correspond to the ones set for the module configuration!
+)DOC",
+			  Manager::VariableDataType::c_double);
+
+    REGISTER_METAVARIABLE("minET2ETIsoScore(referenceListName, useHighestProbMassForExt, detectorList)", particleExtTrkIsoScoreVar,
+			  R"DOC(Returns the particle isolation score based on the number of neighbouring extrapolated tracks across the input detectors, according to the definition of `minET2ETDist`.
+The first argument is the reference particle list name used to pick up the nearest track helix.
+The second argument is an integer ("boolean") flag: if 1, it is assumed the extrapolation was done with the most probable mass hypothesis for the track fit.
+The following arguments are a list of detector names. At least one must be chosen.
 
 .. note::
     This variable requires to run the ``TrackIsolation`` module first.

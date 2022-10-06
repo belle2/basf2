@@ -27,6 +27,7 @@ def argparser():
     """
 
     import stdCharged as stdc
+    # from modularAnalysis import getAnalysisGlobaltag
 
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawTextHelpFormatter)
@@ -40,6 +41,22 @@ def argparser():
                         default=["CDC", "TOP", "ARICH", "ECL", "KLM"],
                         choices=["CDC", "TOP", "ARICH", "ECL", "KLM"],
                         help="List of detectors at whose entry surface track isolation variables will be calculated.\n"
+                        "Pass a space-separated list of names.")
+    parser.add_argument("--global_tag_append",
+                        type=str,
+                        nargs="+",
+                        default=["binary_pid_det_weights_for_trackiso_release_6"],  # TMP!!!
+                        help="List of names of conditions DB global tag(s) to append on top of GT replay.\n"
+                        "NB: these GTs will have lowest priority over GT replay.\n"
+                        "The order of the sequence passed determines the priority of the GTs, w/ the highest coming first.\n"
+                        "Pass a space-separated list of names.")
+    parser.add_argument("--global_tag_prepend",
+                        type=str,
+                        nargs="+",
+                        default=None,
+                        help="List of names of conditions DB global tag(s) to prepend to GT replay.\n"
+                        "NB: these GTs will have highest priority over GT replay.\n"
+                        "The order of the sequence passed determines the priority of the GTs, w/ the highest coming first.\n"
                         "Pass a space-separated list of names.")
     parser.add_argument("-d", "--debug",
                         action="store",
@@ -67,6 +84,15 @@ if __name__ == "__main__":
     import pdg
     from ROOT import Belle2
     Const = Belle2.Const
+
+    for tag in args.global_tag_append:
+        b2.conditions.append_globaltag(tag)
+    print(f"Appending GTs:\n{args.global_tag_append}")
+
+    if args.global_tag_prepend:
+        for tag in reversed(args.global_tag_prepend):
+            b2.conditions.prepend_globaltag(tag)
+        print(f"Prepending GTs:\n{args.global_tag_prepend}")
 
     # Create path. Register necessary modules to this path.
     path = b2.create_path()

@@ -3711,6 +3711,9 @@ def calculateTrackIsolation(
         trackiso_vars = [
             f"minET2ETDist({d_layer}, {reference_list_name}, {int(highest_prob_mass_for_ext)})"
             for d in detectors for d_layer in det_and_layers[d]]
+        # Track isolation score.
+        trackiso_vars += [f"minET2ETIsoScore({reference_list_name}, {int(highest_prob_mass_for_ext)}, {','.join(detectors)})"]
+
         # Optionally, calculate the input variables for the nearest neighbour in the reference list.
         if vars_for_nearest_part:
             trackiso_vars.extend(

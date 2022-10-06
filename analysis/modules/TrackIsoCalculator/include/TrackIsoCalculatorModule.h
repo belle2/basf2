@@ -87,10 +87,6 @@ namespace Belle2 {
      */
     void event() override;
 
-    /**
-     * Module terminate().
-     */
-    void terminate() override;
 
   private:
 
@@ -117,28 +113,40 @@ namespace Belle2 {
     /**
      * The name of the detector at whose inner (cylindrical) surface we extrapolate each track's polar and azimuthal angle.
      */
-    std::string m_detSurface;
+    std::string m_detName;
 
     /**
-     * Associate the detector flag to a boolean flag to quickly tell which detector it belongs too.
+     * Map that associates to each detector layer the name of the variable
+     * representing the distance to the closest particle in the reference list,
+     * based on the track helix extrapolation.
+     * Each variable is added as particle extraInfo.
      */
-    std::unordered_map<std::string, bool> m_isSurfaceInDet;
+    std::unordered_map<std::string, std::string>  m_detLayerToDistVariable;
 
     /**
-     * The name of the variable representing the minimum distance to the extrapoleted tracks of reference particles, to be added to each particle as extraInfo.
+     * Map that associates to each detector layer the name of the variable
+     * representing the  mdst array index of the closest particle in the reference list.
+     * Each variable is added as particle extraInfo.
      */
-    std::string m_extraInfoNameDist;
+    std::unordered_map<std::string, std::string>  m_detLayerToRefPartIdxVariable;
+    //std::string m_extraInfoNameRefPartIdx;
 
     /**
-     * The name of the variable representing the mdst array index of the closest particle, to be added to each particle as extraInfo.
+     * Map that associates to each detector its list of valid layers.
      */
-    std::string m_extraInfoNameRefPartIdx;
+    std::unordered_map<std::string, std::vector<int>> m_detToLayers = {
+      {"CDC", {0, 1, 2, 3, 4, 5, 6, 7, 8}},
+      {"TOP", {0}},
+      {"ARICH", {0}},
+      {"ECL", {0, 1}},
+      {"KLM", {0}}
+    };
 
     /**
-     * Map that associates to each detector its valid cylindrical surface layer's boundaries.
+     * Map that associates to each detector layer its valid cylindrical surface's boundaries.
      * Values are taken from the B2 TDR.
      */
-    std::unordered_map<std::string, DetSurfCylBoundaries> m_detSurfBoundaries = {
+    std::unordered_map<std::string, DetSurfCylBoundaries> m_detLayerToSurfBoundaries = {
       {"CDC0", DetSurfCylBoundaries(16.8, 150.0, -75.0, 0.0, 0.29, 2.61, 3.14)},
       {"CDC1", DetSurfCylBoundaries(25.7, 150.0, -75.0, 0.0, 0.29, 2.61, 3.14)},
       {"CDC2", DetSurfCylBoundaries(36.52, 150.0, -75.0, 0.0, 0.29, 2.61, 3.14)},
@@ -183,9 +191,9 @@ namespace Belle2 {
 
     /**
      * Calculate the distance between the points where the two input
-     * extrapolated track helices cross the given detector's cylindrical surface.
+     * extrapolated track helices cross the given detector layer's cylindrical surface.
      */
-    double getDistAtDetSurface(const Particle* iParticle, const Particle* jParticle);
+    double getDistAtDetSurface(const Particle* iParticle, const Particle* jParticle, const std::string& detLayerName);
 
     /**
      * Check whether input particle list and reference list are of a valid charged stable particle.

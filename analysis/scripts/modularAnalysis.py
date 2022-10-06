@@ -3656,18 +3656,20 @@ def calculateTrackIsolation(
         B2FATAL(f"Invalid particle list {decay_string} in calculateTrackIsolation!")
     no_reference_list_name = not reference_list_name
 
-    det_choices = ["CDC", "TOP", "ARICH", "ECL", "KLM"]
-    if any(d not in det_choices for d in detectors):
-        B2FATAL("Your input detector list: ", detectors, " contains an invalid choice. Please select among: ", det_choices)
-
-    det_labels = []
-    for det in detectors:
-        if det == "CDC":
-            det_labels.extend([f"{det}{ilayer}" for ilayer in range(9)])
-        elif det == "ECL":
-            det_labels.extend([f"{det}{ilayer}" for ilayer in range(2)])
-        else:
-            det_labels.append(f"{det}0")
+    det_and_layers = {
+        "CDC": list(range(9)),
+        "TOP": [0],
+        "ARICH": [0],
+        "ECL": [0, 1],
+        "KLM": [0],
+    }
+    if any(d not in det_and_layers for d in detectors):
+        B2FATAL(
+            "Your input detector list: ",
+            detectors,
+            " contains an invalid choice. Please select among: ",
+            list(
+                det_and_layers.keys()))
 
     # The module allows only one daughter to be selected at a time,
     # that's why here we preprocess the input decay string.
@@ -3695,10 +3697,10 @@ def calculateTrackIsolation(
 
         ref_pdg = pdg.from_name(reference_list_name.split(":")[0])
 
-        for det in det_labels:
+        for det in detectors:
             trackiso = path.add_module("TrackIsoCalculator",
                                        decayString=processed_dec,
-                                       detectorSurface=det,
+                                       detectorName=det,
                                        particleListReference=reference_list_name,
                                        useHighestProbMassForExt=highest_prob_mass_for_ext)
             trackiso.set_name(f"TrackIsoCalculator{det}_{processed_dec}_VS_{reference_list_name}")
@@ -3706,11 +3708,14 @@ def calculateTrackIsolation(
         # Metavariables for the distances to the closest reference tracks at each detector surface.
         # Always calculate them.
         # Ensure the flag for the mass hypothesis of the fit is set.
-        trackiso_vars = [f"minET2ETDist({d}, {reference_list_name}, {int(highest_prob_mass_for_ext)})" for d in det_labels]
+        trackiso_vars = [
+            f"minET2ETDist({d_layer}, {reference_list_name}, {int(highest_prob_mass_for_ext)})"
+            for d in detectors for d_layer in det_and_layers[d]]
         # Optionally, calculate the input variables for the nearest neighbour in the reference list.
         if vars_for_nearest_part:
             trackiso_vars.extend(
-                [f"minET2ETDistVar({d}, {reference_list_name}, {v})" for d in det_labels for v in vars_for_nearest_part])
+                [f"minET2ETDistVar({d}, {reference_list_name}, {v})"
+                 for d in detectors for d_layer in det_and_layers[d] for v in vars_for_nearest_part])
         trackiso_vars.sort()
 
         reference_lists_to_vars[ref_pdg] = trackiso_vars

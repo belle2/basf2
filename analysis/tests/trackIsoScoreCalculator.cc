@@ -9,6 +9,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
 #include <framework/gearbox/Unit.h>
+#include <framework/utilities/TestHelpers.h>
 
 #include <analysis/dbobjects/PIDDetectorWeights.h>
 
@@ -46,40 +47,87 @@ namespace Belle2 {
      */
     std::string m_dummyFile = "dummyFile.root";
 
+
   protected:
 
     /**
-     * Create a ROOT::TTree for the detector weights w/ just one row.
-     * This replicates the structure of the serialised csv weights file in the payload.
+     * Create a ROOT::TTree for the detector weights w/ a few entries.
+     * This replicates the structure of the CSV weights file that are serialised in the payload.
      */
     void createDummyTTree()
     {
-      ROOT::RDataFrame rdf(1);
 
-      auto pdgId = static_cast<double>(m_testHypo.getPDGCode());
-      std::string regLabel = "Barrel";
+      unsigned int nEntries(6);
 
-      rdf.Define("pdgId", [&]() { return pdgId; })
-      .Define("p_min", []() { return 1.0; })
-      .Define("p_max", []() { return 1.5; })
-      .Define("theta_min", []() { return 0.56; })
-      .Define("theta_max", []() { return 2.23; })
-      .Define("p_bin_idx", [&]() { return 1.0; })
-      .Define("theta_bin_idx", [&]() { return 1.0; })
-      .Define("reg_label", [&]() { return regLabel; })
-      .Define("indiv_s_SVD", []() { return 0.2; })
-      .Define("ablat_s_SVD", []() { return 0.; })
-      .Define("indiv_s_CDC", []() { return 0.886; })
-      .Define("ablat_s_CDC", []() { return -0.084; })
-      .Define("indiv_s_TOP", []() { return 0.; })
-      .Define("ablat_s_TOP", []() { return 0.; })
-      .Define("indiv_s_ARICH", []() { return 0.; })
-      .Define("ablat_s_ARICH", []() { return 0.; })
-      .Define("indiv_s_ECL", []() { return 0.959; })
-      .Define("ablat_s_ECL", []() { return -0.118; })
-      .Define("indiv_s_KLM", []() { return 0.2; })
-      .Define("ablat_s_KLM", []() { return 0.; })
+      ROOT::RDataFrame rdf(nEntries);
+
+      std::vector<double> pdgIds(nEntries, static_cast<double>(m_testHypo.getPDGCode()));
+      std::vector<double> pMinEdges = {1.0, 1.0, 1.0, 1.5, 1.5, 1.5};
+      std::vector<double> pMaxEdges = {1.5, 1.5, 1.5, 3.0, 3.0, 3.0};
+      std::vector<double> thetaMinEdges = {0.22, 0.56, 2.23, 0.22, 0.56, 2.23};
+      std::vector<double> thetaMaxEdges = {0.56, 2.23, 2.71, 0.56, 2.23, 2.71};
+      std::vector<double> pBinIdxs = {1.0, 1.0, 1.0, 2.0, 2.0, 2.0};
+      std::vector<double> thetaBinIdxs = {1.0, 2.0, 3.0, 1.0, 2.0, 3.0};
+      std::vector<std::string> regLabels = {"FWD", "Barrel", "BWD", "FWD", "Barrel", "BWD"};
+      std::vector<double> weights_SVD = {0., 0., -0.003, 0.031, 0.017, 0.077};
+      std::vector<double> weights_CDC = {-0.061, -0.084, -0.162, -0.073, -0.073, -0.05, -0.121};
+      std::vector<double> weights_TOP = {0., 0., 0., 0., 0., 0.};
+      std::vector<double> weights_ARICH = {0., 0., 0., -0.004, 0., 0.};
+      std::vector<double> weights_ECL = {-0.062, -0.118, -0.136, -0.22, -0.255, -0.377};
+      std::vector<double> weights_KLM = {0., 0., 0.006, -0.003, 0.003, 0.002};
+
+      unsigned int iEntry(0);
+      rdf.Define("pdgId", [&]() { auto x = pdgIds[iEntry]; return x; })
+      .Define("p_min", [&]() { auto x = pMinEdges[iEntry]; return x; })
+      .Define("p_max", [&]() { auto x = pMaxEdges[iEntry]; return x; })
+      .Define("theta_min", [&]() { auto x = thetaMinEdges[iEntry]; return x; })
+      .Define("theta_max", [&]() { auto x = thetaMaxEdges[iEntry]; return x; })
+      .Define("p_bin_idx", [&]() { auto x = pBinIdxs[iEntry]; return x; })
+      .Define("theta_bin_idx", [&]() { auto x = thetaBinIdxs[iEntry]; return x; })
+      .Define("reg_label", [&]() { auto x = regLabels[iEntry]; return x; })
+      .Define("ablat_s_SVD", [&]() { auto x = weights_SVD[iEntry]; return x; })
+      .Define("ablat_s_CDC", [&]() { auto x = weights_CDC[iEntry]; return x; })
+      .Define("ablat_s_TOP", [&]() { auto x = weights_TOP[iEntry]; return x; })
+      .Define("ablat_s_ARICH", [&]() { auto x = weights_ARICH[iEntry]; return x; })
+      .Define("ablat_s_ECL", [&]() { auto x = weights_ECL[iEntry]; return x; })
+      .Define("ablat_s_KLM", [&]() { auto x = weights_KLM[iEntry]; ++iEntry; return x; }) // Only the last call in the chain must increment the entry counter!
       .Snapshot("tree", m_dummyFile);
+
+    };
+
+    /**
+     * Create a ROOT::TTree  with a "broken" bin edges structure, i.e. non-contiguous bin edges.
+     * This will throw a FATAL error, and indicate the CSV weights file has problems.
+     */
+    void createDummyBrokenTTree()
+    {
+
+      unsigned int nEntries(6);
+
+      ROOT::RDataFrame rdf(nEntries);
+
+      std::vector<double> pdgIds(nEntries, static_cast<double>(m_testHypo.getPDGCode()));
+      std::vector<double> pMinEdges = {1.0, 1.0, 1.0, 1.5, 1.5, 1.5};
+      std::vector<double> pMaxEdges = {1.8, 1.8, 1.8, 3.0, 3.0, 3.0}; // note the non-contiguous edges wrt. pMinEdges
+      std::vector<double> thetaMinEdges = {0.22, 0.56, 2.23, 0.22, 0.56, 2.23};
+      std::vector<double> thetaMaxEdges = {0.56, 2.23, 2.71, 0.56, 2.23, 2.71};
+      std::vector<double> pBinIdxs = {1.0, 1.0, 1.0, 2.0, 2.0, 2.0};
+      std::vector<double> thetaBinIdxs = {1.0, 2.0, 3.0, 1.0, 2.0, 3.0};
+
+      // Tell snapshot to update file.
+      ROOT::RDF::RSnapshotOptions opt;
+      opt.fMode = "UPDATE";
+
+      unsigned int iEntry(0);
+      rdf.Define("pdgId", [&]() { auto x = pdgIds[iEntry]; return x; })
+      .Define("p_min", [&]() { auto x = pMinEdges[iEntry]; return x; })
+      .Define("p_max", [&]() { auto x = pMaxEdges[iEntry]; return x; })
+      .Define("theta_min", [&]() { auto x = thetaMinEdges[iEntry]; return x; })
+      .Define("theta_max", [&]() { auto x = thetaMaxEdges[iEntry]; return x; })
+      .Define("p_bin_idx", [&]() { auto x = pBinIdxs[iEntry]; return x; })
+      .Define("theta_bin_idx", [&]() { auto x = thetaBinIdxs[iEntry]; ++iEntry; return x; })
+      .Snapshot("tree_broken", m_dummyFile, "", opt);
+
     };
 
     /**
@@ -88,6 +136,7 @@ namespace Belle2 {
     void SetUp() override
     {
       createDummyTTree();
+      createDummyBrokenTTree();
     }
 
     /**
@@ -112,17 +161,31 @@ namespace Belle2 {
 
     PIDDetectorWeights dbrep("tree", m_dummyFile);
 
+    // Test for correct overriding of distance thresholds.
     auto newThresh = 30.;
     dbrep.setDistThreshold(m_detector, m_layer, newThresh);
     EXPECT_EQ(newThresh, dbrep.getDistThreshold(m_detector, m_layer));
 
-    auto pdg = dbrep.getWeightsRDF().Take<double>("pdgId").GetValue()[0];
-    EXPECT_EQ(pdg, m_testHypo.getPDGCode());
+    // Test for correct filling of the RDataFrame.
+    auto pdgIds = dbrep.getWeightsRDF().Take<double>("pdgId").GetValue();
+    for (const auto& pdgId : pdgIds) {
+      EXPECT_EQ(pdgId, m_testHypo.getPDGCode());
+    }
 
+    // Retrieve weight for a (p, theta) pair in the available weights range.
     auto p = 1.23; // GeV/c
     auto theta = 1.34; // rad
     auto weight = dbrep.getWeight(m_testHypo, m_detector, p, theta);
     EXPECT_EQ(weight, -0.118);
+
+    // Test for weight in case of out-of-range p and/or theta values.
+    p = 1.46;
+    theta = 0.12;
+    weight = dbrep.getWeight(m_testHypo, m_detector, p, theta);
+    EXPECT_TRUE(std::isnan(weight));
+
+    // Trigger a FATAL if reading an ill-defined source table.
+    EXPECT_B2FATAL(PIDDetectorWeights("tree_broken", m_dummyFile));
 
   }
 

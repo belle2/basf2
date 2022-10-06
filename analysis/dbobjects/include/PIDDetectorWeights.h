@@ -46,7 +46,7 @@ namespace Belle2 {
 
       /** Set of p bins edges. */
       std::set<double> m_pBinEdges;
-      /** * Set of theta bins edges. One for each std charged hypothesis. */
+      /** * Set of theta bins edges. */
       std::set<double> m_thetaBinEdges;
 
       /** Number of p bins. */
@@ -65,7 +65,7 @@ namespace Belle2 {
 
     private:
 
-      ClassDef(WeightsTable, 1);
+      ClassDef(WeightsTable, 1); /** Needed for sub-class schema evolution. */
     };
 
     /**
@@ -104,8 +104,8 @@ namespace Belle2 {
     /**
      * Override the threshold value per detctor layer for the distance to closest ext. helix
      * that is used to define locally isolated particles at that layer.
-     * @param det
-     * @param layer
+     * @param det the input PID detector.
+     * @param layer the input detector layer.
      * @param thresh the distance threshold in [cm].
      */
     void setDistThreshold(Const::EDetector det, const int layer, const double thresh)
@@ -126,8 +126,8 @@ namespace Belle2 {
     /**
      * Get the threshold value per detctor layer for the distance to closest ext. helix
      * that is used to define locally isolated particles at that layer.
-     * @param det
-     * @param layer
+     * @param det the input PID detector.
+     * @param layer the input detector layer.
      */
     double getDistThreshold(Const::EDetector det, const int layer)
     {
@@ -137,10 +137,10 @@ namespace Belle2 {
 
     /**
      * Lookup the weight from the internal map structures.
-     * @param hypo
-     * @param det
-     * @param p
-     * @param theta
+     * @param hypo the input std charged particle.
+     * @param det the input PID detector.
+     * @param p the particle momentum in [GeV/c].
+     * @param theta the particle polar angle in [rad].
      */
     double getWeight(Const::ChargedStable hypo, Const::EDetector det, const double p, const double theta);
 

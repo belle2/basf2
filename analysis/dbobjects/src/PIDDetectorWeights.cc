@@ -32,7 +32,7 @@ void PIDDetectorWeights::fillWeightsTablePerHypoFromRDF()
       auto pMaxEdges = filteredRDF.Take<double>("p_max").GetValue();
       // Get the bin indexes.
       auto pBinIdxs = filteredRDF.Take<double>("p_bin_idx").GetValue();
-      // Convert to a set and take the union
+      // Convert to a set and take the union. This way duplicates are removed.
       std::set<double> pMinEdges_set(std::begin(pMinEdges), std::end(pMinEdges));
       std::set<double> pMaxEdges_set(std::begin(pMaxEdges), std::end(pMaxEdges));
       std::set<double> pBinEdges;
@@ -41,9 +41,17 @@ void PIDDetectorWeights::fillWeightsTablePerHypoFromRDF()
                      std::inserter(pBinEdges, std::begin(pBinEdges)));
       // Store the set of bin edges into the internal tabular structure for this particle hypothesis.
       weightsTable.m_pBinEdges = pBinEdges;
-
       // Store the nr. of p bins. Used for bin idx linearisation.
       weightsTable.m_nPBins = pBinEdges.size() - 1;
+      // Check thqt the min, max bin edges have no gaps.
+      // Revert to a std::vector for easy index-based iteration.
+      std::vector<double> pMinEdgesVec(std::begin(pMinEdges_set), std::end(pMinEdges_set));
+      std::vector<double> pMaxEdgesVec(std::begin(pMaxEdges_set), std::end(pMaxEdges_set));
+      for (unsigned int iEdgeIdx(0); iEdgeIdx < pMaxEdgesVec.size() - 1; ++iEdgeIdx) {
+        if (pMaxEdgesVec[iEdgeIdx] != pMinEdgesVec[iEdgeIdx + 1]) {
+          B2FATAL("The p bins in the weights table are not contiguous. Please check the input CSV file.");
+        }
+      }
 
       auto thetaMinEdges = filteredRDF.Take<double>("theta_min").GetValue();
       auto thetaMaxEdges = filteredRDF.Take<double>("theta_max").GetValue();
@@ -56,13 +64,22 @@ void PIDDetectorWeights::fillWeightsTablePerHypoFromRDF()
                      std::inserter(thetaBinEdges, std::begin(thetaBinEdges)));
       weightsTable.m_thetaBinEdges = thetaBinEdges;
       weightsTable.m_nThetaBins = thetaBinEdges.size() - 1;
+      std::vector<double> thetaMinEdgesVec(std::begin(thetaMinEdges_set), std::end(thetaMinEdges_set));
+      std::vector<double> thetaMaxEdgesVec(std::begin(thetaMaxEdges_set), std::end(thetaMaxEdges_set));
+      for (unsigned int iEdge(0); iEdge < thetaMaxEdgesVec.size() - 1; ++iEdge) {
+        if (thetaMaxEdgesVec[iEdge] != thetaMinEdgesVec[iEdge + 1]) {
+          B2FATAL("The theta bins in the weights table are not contiguous. Please check the input CSV file.");
+        }
+      }
 
       // Get the p, theta bin index columns and zip them together.
       std::vector<std::tuple<double, double>> pAndThetaIdxs;
       std::transform(std::begin(pBinIdxs), std::end(pBinIdxs),
                      std::begin(thetaBinIdxs),
       std::back_inserter(pAndThetaIdxs), [](const auto & pIdx, const auto & thetaIdx) { return std::make_tuple(pIdx, thetaIdx); });
-      // And now, fill a unordered_map with the linearised (p, theta) bin index as key and the vector index as value for fast lookup.
+
+      // Fill a std::unordered_map with the linearised (p, theta) bin index as key and the vector index
+      // (i.e. the filtered RDataFrame row idx) as value for fast lookup.
       unsigned int iRow(0);
       for (const auto& tup : pAndThetaIdxs) {
         double linBinIdx = (std::get<0>(tup) - 1.0) + (std::get<1>(tup) - 1.0) * weightsTable.m_nPBins;
@@ -119,10 +136,12 @@ double PIDDetectorWeights::getWeight(Const::ChargedStable hypo, Const::EDetector
 
   if (!weightsTable->m_linBinIdxsToRowIdxs.count(linBinIdx)) {
     // Out-of-bin range p or theta
-    B2WARNING("p = " << p
-              << " [GeV/c], theta = " << theta
-              << " [rad] - Either is outside of bin range. Bin indexes: ("
-              <<  pBinIdx << ", " << thetaBinIdx << ").");
+    B2DEBUG(11, "\n"
+            << "p = " << p << " [GeV/c], theta = " << theta << " [rad].\n"
+            << "Bin indexes: (" <<  pBinIdx << ", " << thetaBinIdx << ").\n"
+            << "Either input value is outside of bin range for PID detector weights:\n"
+            << "p : [" << *weightsTable->m_pBinEdges.begin() << ", " << *weightsTable->m_pBinEdges.rbegin() << "],\n"
+            << "theta: [" << *weightsTable->m_thetaBinEdges.begin() << ", " << *weightsTable->m_thetaBinEdges.rbegin() << "]");
     return std::numeric_limits<float>::quiet_NaN();
   }
 

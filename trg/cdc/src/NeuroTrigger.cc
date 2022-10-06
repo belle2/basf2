@@ -7,6 +7,7 @@
  **************************************************************************/
 #include <framework/logging/Logger.h>
 #include <trg/cdc/NeuroTrigger.h>
+#include <trg/cdc/NeuroTriggerParameters.h>
 #include <trg/cdc/dataobjects/CDCTriggerMLPData.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <framework/gearbox/Const.h>
@@ -228,14 +229,217 @@ NeuroTrigger::initialize(const Parameters& p)
 void
 NeuroTrigger::initialize(const NeuroTriggerParameters& p)
 {
-  // load parameters from config file
+  // check parameters
+  bool okay = true;
+  // ensure that length of lists matches number of sectors
+  if (p.nHidden.size() != 1 && p.nHidden.size() != p.nMLP) {
+    B2ERROR("Number of nHidden lists should be 1 or " << p.nMLP);
+    okay = false;
+  }
+  if (p.outputScale.size() != 1 && p.outputScale.size() != p.nMLP) {
+    B2ERROR("Number of outputScale lists should be 1 or " << p.nMLP);
+    okay = false;
+  }
+  bool rangeProduct = (p.phiRangeUse.size() * p.invptRangeUse.size() * p.thetaRangeUse.size() * p.SLpattern.size() == p.nMLP);
+  if (!rangeProduct) {
+    if (p.phiRangeUse.size() != 1 && p.phiRangeUse.size() != p.nMLP) {
+      B2ERROR("Number of phiRangeUse.lists should be 1 or " << p.nMLP);
+      okay = false;
+    }
+    if (p.invptRangeUse.size() != 1 && p.invptRangeUse.size() != p.nMLP) {
+      B2ERROR("Number of invptRangeUse.lists should be 1 or " << p.nMLP);
+      okay = false;
+    }
+    if (p.thetaRangeUse.size() != 1 && p.thetaRangeUse.size() != p.nMLP) {
+      B2ERROR("Number of thetaRangeUse.lists should be 1 or " << p.nMLP);
+      okay = false;
+    }
+    if (p.SLpattern.size() != 1 && p.SLpattern.size() != p.nMLP) {
+      B2ERROR("Number of SLpattern lists should be 1 or " << p.nMLP);
+      okay = false;
+    }
+  }
+  // ensure that length of maxHitsPerSL and SLpatternMask lists matches SLpattern
+  if (p.maxHitsPerSL.size() != 1 && p.maxHitsPerSL.size() != p.SLpattern.size()) {
+    B2ERROR("Number of maxHitsPerSL lists should be 1 or " << p.SLpattern.size());
+    okay = false;
+  }
+  if (p.SLpatternMask.size() != 1 && p.SLpatternMask.size() != p.SLpattern.size()) {
+    B2ERROR("Number of SLpatternMask lists should be 1 or " << p.SLpattern.size());
+    okay = false;
+  }
+  // ensure that number of target nodes is valid
+  unsigned short nTarget = int(p.targetZ) + int(p.targetTheta);
+  if (nTarget < 1) {
+    B2ERROR("No outputs! Turn on either targetZ or targetTheta.");
+    okay = false;
+  }
+  // ensure that sector ranges are valid
+  for (unsigned iPhi = 0; iPhi < p.phiRangeUse.size(); ++iPhi) {
+    if (p.phiRangeUse[iPhi].size() != 2) {
+      B2ERROR("phiRangeUse.should be exactly 2 values");
+      okay = false;
+      continue;
+    }
+    if (p.phiRangeUse[iPhi][0] >= p.phiRangeUse[iPhi][1]) {
+      B2ERROR("phiRangeUse.0] should be smaller than phiRangeUse.1]");
+      okay = false;
+    }
+    if (p.phiRangeUse[iPhi][0] < -360. || p.phiRangeUse[iPhi][1] > 360. ||
+        (p.phiRangeUse[iPhi][1] - p.phiRangeUse[iPhi][0]) > 360.) {
+      B2ERROR("phiRangeUse.should be in [-360, 360], with maximal width of 360");
+      okay = false;
+    }
+  }
+  for (unsigned iPt = 0; iPt < p.invptRangeUse.size(); ++iPt) {
+    if (p.invptRangeUse[iPt].size() != 2) {
+      B2ERROR("invptRangeUse.should be exactly 2 values");
+      okay = false;
+    }
+    if (p.invptRangeUse[iPt][0] >= p.invptRangeUse[iPt][1]) {
+      B2ERROR("invptRangeUse.0] should be smaller than invptRangeUse.1]");
+      okay = false;
+    }
+  }
+  for (unsigned iTheta = 0; iTheta < p.thetaRangeUse.size(); ++iTheta) {
+    if (p.thetaRangeUse[iTheta].size() != 2) {
+      B2ERROR("thetaRangeUse.should be exactly 2 values");
+      okay = false;
+      continue;
+    }
+    if (p.thetaRangeUse[iTheta][0] >= p.thetaRangeUse[iTheta][1]) {
+      B2ERROR("thetaRangeUse.0] should be smaller than thetaRangeUse.1]");
+      okay = false;
+    }
+    if (p.thetaRangeUse[iTheta][0] < 0. || p.thetaRangeUse[iTheta][1] > 180.) {
+      B2ERROR("thetaRangeUse.should be in [0, 180]");
+      okay = false;
+    }
+  }
+  for (unsigned iScale = 0; iScale < p.outputScale.size(); ++iScale) {
+    if (p.outputScale[iScale].size() != 2 * nTarget) {
+      B2ERROR("outputScale should be exactly " << 2 * nTarget << " values");
+      okay = false;
+    }
+  }
+  // ensure that train sectors are valid
+  if (p.phiRangeUse.size() != p.phiRangeTrain.size()) {
+    B2ERROR("Number of phiRangeUse.lists and phiRangeTrain lists should be equal.");
+    okay = false;
+  } else {
+    for (unsigned iPhi = 0; iPhi < p.phiRangeUse.size(); ++iPhi) {
+      if (p.phiRangeTrain[iPhi].size() != 2) {
+        B2ERROR("phiRangeTrain should be exactly 2 values.");
+        okay = false;
+      } else if (p.phiRangeTrain[iPhi][0] > p.phiRangeUse[iPhi][0] ||
+                 p.phiRangeTrain[iPhi][1] < p.phiRangeUse[iPhi][1]) {
+        B2ERROR("phiRangeTrain should be wider than phiRangeUse.or equal.");
+        okay = false;
+      }
+    }
+  }
+  if (p.invptRangeUse.size() != p.invptRangeTrain.size()) {
+    B2ERROR("Number of invptRangeUse.lists and invptRangeTrain lists should be equal.");
+    okay = false;
+  } else {
+    for (unsigned iPt = 0; iPt < p.invptRangeUse.size(); ++iPt) {
+      if (p.invptRangeTrain[iPt].size() != 2) {
+        B2ERROR("invptRangeTrain should be exactly 2 values.");
+        okay = false;
+      } else if (p.invptRangeTrain[iPt][0] > p.invptRangeUse[iPt][0] ||
+                 p.invptRangeTrain[iPt][1] < p.invptRangeUse[iPt][1]) {
+        B2ERROR("invptRangeTrain should be wider than invptRangeUse.or equal.");
+        okay = false;
+      }
+    }
+  }
+  if (p.thetaRangeUse.size() != p.thetaRangeTrain.size()) {
+    B2ERROR("Number of thetaRangeUse.lists and thetaRangeTrain lists should be equal.");
+    okay = false;
+  } else {
+    for (unsigned iTheta = 0; iTheta < p.thetaRangeUse.size(); ++iTheta) {
+      if (p.thetaRangeTrain[iTheta].size() != 2) {
+        B2ERROR("thetaRangeTrain should be exactly 2 values.");
+        okay = false;
+      } else if (p.thetaRangeTrain[iTheta][0] > p.thetaRangeUse[iTheta][0] ||
+                 p.thetaRangeTrain[iTheta][1] < p.thetaRangeUse[iTheta][1]) {
+        B2ERROR("thetaRangeTrain should be wider than thetaRangeUse.or equal.");
+        okay = false;
+      }
+    }
+  }
 
+  if (!okay) return;
+
+  // initialize MLPs
+  m_MLPs.clear();
+  for (unsigned iMLP = 0; iMLP < p.nMLP; ++iMLP) {
+    //get indices for sector parameters
+    vector<unsigned> indices = getRangeIndices(p, iMLP);
+    //get number of nodes for each layer
+    unsigned short maxHits = (p.maxHitsPerSL.size() == 1) ? p.maxHitsPerSL[0] : p.maxHitsPerSL[indices[3]];
+    unsigned long SLpattern = p.SLpattern[indices[3]];
+    unsigned long SLpatternMask = (p.SLpatternMask.size() == 1) ? p.SLpatternMask[0] : p.SLpatternMask[indices[3]];
+    unsigned short nInput = 27 * maxHits;
+    vector<NNTParam<float>> nHidden = (p.nHidden.size() == 1) ? p.nHidden[0] : p.nHidden[iMLP];
+    vector<unsigned short> nNodes = {nInput};
+    for (unsigned iHid = 0; iHid < nHidden.size(); ++iHid) {
+      if (p.multiplyHidden) {
+        nNodes.push_back(nHidden[iHid] * nNodes[0]);
+      } else {
+        nNodes.push_back(nHidden[iHid]);
+      }
+    }
+    nNodes.push_back(nTarget);
+    unsigned short targetVars = int(p.targetZ) + (int(p.targetTheta) << 1);
+    //get sector ranges (initially train ranges)
+    vector<float> phiRange = p.tcastvector<float>(p.phiRangeTrain)[indices[0]];
+    vector<float> invptRange = p.tcastvector<float>(p.invptRangeTrain)[indices[1]];
+    vector<float> thetaRange = p.tcastvector<float>(p.thetaRangeTrain)[indices[2]];
+    B2DEBUG(50, "Ranges for sector " << iMLP
+            << ": phiRange [" << phiRange[0] << ", " << phiRange[1]
+            << "], invptRange [" << invptRange[0] << ", " << invptRange[1]
+            << "], thetaRange [" << thetaRange[0] << ", " << thetaRange[1]
+            << "], SLpattern " << SLpattern);
+    //get scaling values
+    vector<float> outputScale = (p.outputScale.size() == 1) ? p.tcastvector<float>(p.outputScale)[0] : p.tcastvector<float>
+                                (p.outputScale)[iMLP];
+    //convert phi and theta from degree to radian
+    phiRange[0] *= Unit::deg;
+    phiRange[1] *= Unit::deg;
+    thetaRange[0] *= Unit::deg;
+    thetaRange[1] *= Unit::deg;
+    if (p.targetTheta) {
+      outputScale[2 * int(p.targetZ)] *= Unit::deg;
+      outputScale[2 * int(p.targetZ) + 1] *= Unit::deg;
+    }
+    //create new MLP
+    m_MLPs.push_back(CDCTriggerMLP(nNodes, targetVars, outputScale,
+                                   phiRange, invptRange, thetaRange,
+                                   maxHits, SLpattern, SLpatternMask, p.tMax, p.T0fromHits,
+                                   p.et_option()));
+  }
+  // load some values from the geometry that will be needed for the input
+  setConstants();
   // check configuration for consistency
 }
 
 vector<unsigned>
 NeuroTrigger::getRangeIndices(const NeuroTriggerParameters& p, unsigned isector)
 {
+  std::vector<unsigned> indices = {0, 0, 0, 0};
+  if (p.phiRangeUse.size() * p.invptRangeUse.size() * p.thetaRangeUse.size() * p.SLpattern.size() == p.nMLP) {
+    indices[0] = isector % p.phiRangeUse.size();
+    indices[1] = (isector / p.phiRangeUse.size()) % p.invptRangeUse.size();
+    indices[2] = (isector / (p.phiRangeUse.size() * p.invptRangeUse.size())) % p.thetaRangeUse.size();
+    indices[3] = isector / (p.phiRangeUse.size() * p.invptRangeUse.size() * p.thetaRangeUse.size());
+  } else {
+    indices[0] = (p.phiRangeUse.size() == 1) ? 0 : isector;
+    indices[1] = (p.invptRangeUse.size() == 1) ? 0 : isector;
+    indices[2] = (p.thetaRangeUse.size() == 1) ? 0 : isector;
+    indices[3] = (p.SLpattern.size() == 1) ? 0 : isector;
+  }
+  return indices;
 }
 
 vector<unsigned>

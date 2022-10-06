@@ -75,6 +75,12 @@ NeuroTriggerParameters::loadconfigtxt(const std::string& filename)
     } else if (par == "targetTheta")    {
       targetTheta = std::stoi(key);
       if (locked) {targetTheta.lock();}
+    } else if (par == "multiplyHidden")    {
+      multiplyHidden = std::stoi(key);
+      if (locked) {multiplyHidden.lock();}
+    } else if (par == "T0fromHits")    {
+      T0fromHits = std::stoi(key);
+      if (locked) {T0fromHits.lock();}
     } else if (par == "tMax")           {
       tMax = std::stoul(key);
       if (locked) {tMax.lock();}
@@ -95,14 +101,14 @@ NeuroTriggerParameters::loadconfigtxt(const std::string& filename)
       invptRangeTrain = read2dArray<float>(key, locked);
     } else if (par == "nHidden")    {
       nHidden = read2dArray<float>(key, locked);
-    } else if (par == "maxHitsperSL")    {
-      maxHitsperSL = read1dArray<unsigned short>(key, locked);
+    } else if (par == "maxHitsPerSL")    {
+      maxHitsPerSL = read1dArray<unsigned short>(key, locked);
     } else if (par == "outputScale")    {
-      outputScale = read1dArray<float>(key, locked);
-    } else if (par == "SLPattern")    {
-      SLPattern = read1dArray<unsigned long>(key, locked);
-    } else if (par == "SLPatternMask")    {
-      SLPatternMask = read1dArray<unsigned long>(key, locked);
+      outputScale = read2dArray<float>(key, locked);
+    } else if (par == "SLpattern")    {
+      SLpattern = read1dArray<unsigned long>(key, locked);
+    } else if (par == "SLpatternMask")    {
+      SLpatternMask = read1dArray<unsigned long>(key, locked);
     } else if (par == "precision")    {
       precision = read1dArray<unsigned>(key, locked);
     }
@@ -135,6 +141,8 @@ void NeuroTriggerParameters::saveconfigtxt(const std::string& filename)
   if (nMLP.isSet()) {savestream << "nMLP " << (nMLP.isLocked() ? "== " : "= ") << nMLP << std::endl;}
   if (targetZ.isSet()) {savestream << "targetZ " << (targetZ.isLocked() ? "== " : "= ") << targetZ << std::endl;}
   if (targetTheta.isSet()) {savestream << "targetTheta " << (targetTheta.isLocked() ? "== " : "= ") << targetTheta << std::endl;}
+  if (multiplyHidden.isSet()) {savestream << "multiplyHidden " << (multiplyHidden.isLocked() ? "== " : "= ") << multiplyHidden << std::endl;}
+  if (T0fromHits.isSet()) {savestream << "T0fromHits " << (T0fromHits.isLocked() ? "== " : "= ") << T0fromHits << std::endl;}
   if (tMax.isSet()) {savestream << "tMax " << (tMax.isLocked() ? "== " : "= ") << tMax << std::endl;}
   if (ETOption.isSet()) {savestream << "ETOption " << (ETOption.isLocked() ? "== " : "= ") << ETOption << std::endl;}
 
@@ -145,10 +153,10 @@ void NeuroTriggerParameters::saveconfigtxt(const std::string& filename)
   if (checkarr(thetaRangeTrain)) {savestream << print2dArray<float>("thetaRangeTrain", thetaRangeTrain);}
   if (checkarr(invptRangeTrain)) {savestream << print2dArray<float>("invptRangeTrain", invptRangeTrain);}
   if (checkarr(nHidden)) {savestream << print2dArray<float>("nHidden", nHidden);}
-  if (checkarr(maxHitsperSL)) {savestream << print1dArray<unsigned short>("maxHitsperSL", maxHitsperSL);}
-  if (checkarr(outputScale)) {savestream << print1dArray<float>("outputScale", outputScale);}
-  if (checkarr(SLPattern)) {savestream << print1dArray<unsigned long>("SLPattern", SLPattern);}
-  if (checkarr(SLPatternMask)) {savestream << print1dArray<unsigned long>("SLPatternMask", SLPatternMask);}
+  if (checkarr(maxHitsPerSL)) {savestream << print1dArray<unsigned short>("maxHitsPerSL", maxHitsPerSL);}
+  if (checkarr(outputScale)) {savestream << print2dArray<float>("outputScale", outputScale);}
+  if (checkarr(SLpattern)) {savestream << print1dArray<unsigned long>("SLpattern", SLpattern);}
+  if (checkarr(SLpatternMask)) {savestream << print1dArray<unsigned long>("SLpatternMask", SLpatternMask);}
   if (checkarr(precision)) {savestream << print1dArray<unsigned>("precision", precision);}
   savestream.close();
 }
@@ -226,4 +234,25 @@ std::vector<NNTParam<X>> NeuroTriggerParameters::read1dArray(std::string keyx, b
   }
   return newpair;
 }
-
+template<typename X>
+std::vector<std::vector<X>> NeuroTriggerParameters::tcastvector(const std::vector<std::vector<NNTParam<X>>> vec) const
+{
+  std::vector<std::vector<X>> ret;
+  for (auto x : vec) {
+    std::vector<X> line;
+    for (auto y : x) {
+      line.push_back((X) y);
+    }
+    ret.push_back(line);
+  }
+  return ret;
+}
+template<typename X>
+std::vector<X> NeuroTriggerParameters::tcastvector(const std::vector<NNTParam<X>> vec) const
+{
+  std::vector<std::vector<X>> ret;
+  for (auto x : vec) {
+    ret.push_back((X) x);
+  }
+  return ret;
+}

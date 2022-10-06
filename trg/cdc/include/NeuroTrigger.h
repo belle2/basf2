@@ -9,6 +9,7 @@
 #define NEUROTRIGGER_H
 #pragma once
 #include <string>
+#include <trg/cdc/NeuroTriggerParameters.h>
 #include <trg/cdc/dataobjects/CDCTriggerMLP.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -121,6 +122,7 @@ namespace Belle2 {
 
     /** Get indices for sector ranges in parameter lists. */
     std::vector<unsigned> getRangeIndices(const NeuroTriggerParameters& p, unsigned isector);
+    std::vector<unsigned> getRangeIndices(const Parameters& p, unsigned isector);
 
     /** Save MLPs to file.
      * @param filename name of the TFile to write to

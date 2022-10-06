@@ -70,7 +70,7 @@ namespace Belle2 {
     virtual ~NeuroTriggerParameters() {};
     // unfortunately i am to dumb to make the typewrapper class work for strings,
     // so the workaround are those translate functions
-    int to_intTiming(const std::string& text)
+    int to_intTiming(const std::string& text) const
     {
       if (text == "fastestpriority") {return 0;}
       else if (text == "fastest2d") {return 1;}
@@ -85,7 +85,7 @@ namespace Belle2 {
       else if (text == "min_etfcc_fastestpriority") {return 10;}
       else {return -1;}
     }
-    const std::string to_strTiming(const unsigned& i)
+    const std::string to_strTiming(const unsigned& i) const
     {
       if (i == 0) {return "fastestpriority";}
       else if (i == 1) {return "fastest2d";}
@@ -103,13 +103,17 @@ namespace Belle2 {
     }
 
 
-    const std::string et_option() {return to_strTiming(ETOption);}
+    const std::string et_option() const {return to_strTiming(ETOption);}
     void loadconfigtxt(const std::string& filename);
     void saveconfigtxt(const std::string& filename);
     template<typename X>
     std::string print2dArray(const std::string& name, std::vector<std::vector<NNTParam<X>>> vecvec);
     template<typename X>
     std::string print1dArray(const std::string& name, std::vector<NNTParam<X>> vecvec);
+    template<typename X>
+    std::vector<std::vector<X>> tcastvector(const std::vector<std::vector<NNTParam<X>>> vec) const;
+    template<typename X>
+    std::vector<X> tcastvector(const std::vector<NNTParam<X>> vec) const;
 
     //void loadconfigroot(std::string& filename);
     //void saveconfigroot(std::string& filename);
@@ -119,6 +123,8 @@ namespace Belle2 {
     NNTParam<unsigned> nMLP;
     NNTParam<bool> targetZ;
     NNTParam<bool> targetTheta;
+    NNTParam<bool> multiplyHidden;
+    NNTParam<bool> T0fromHits;
     NNTParam<unsigned> tMax;
     //multiplynhidden was removed, because it is not used
     std::vector<std::vector<NNTParam<float>>> phiRangeUse;
@@ -128,10 +134,10 @@ namespace Belle2 {
     std::vector<std::vector<NNTParam<float>>> thetaRangeTrain;
     std::vector<std::vector<NNTParam<float>>> invptRangeTrain;
     std::vector<std::vector<NNTParam<float>>> nHidden;
-    std::vector<NNTParam<unsigned short>> maxHitsperSL;
-    std::vector<NNTParam<float>> outputScale;
-    std::vector<NNTParam<unsigned long>> SLPattern;
-    std::vector<NNTParam<unsigned long>> SLPatternMask;
+    std::vector<std::vector<NNTParam<float>>> outputScale;
+    std::vector<NNTParam<unsigned short>> maxHitsPerSL;
+    std::vector<NNTParam<unsigned long>> SLpattern;
+    std::vector<NNTParam<unsigned long>> SLpatternMask;
     NNTParam<unsigned> ETOption;
     std::vector<NNTParam<unsigned>> precision;
   private:

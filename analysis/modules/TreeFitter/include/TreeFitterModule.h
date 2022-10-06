@@ -7,12 +7,15 @@
  **************************************************************************/
 #pragma once
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
 
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <analysis/VertexFitting/TreeFitter/ConstraintConfiguration.h>
+
+#include <analysis/DecayDescriptor/DecayDescriptor.h>
 
 namespace Belle2 {
   class Particle;
@@ -83,7 +86,7 @@ namespace Belle2 {
     int m_massConstraintType;
 
     /** PDG code of particle to be constrained to the beam 4-momentum */
-    int m_beamConstraint;
+    int m_beamConstraintPDG;
 
     /** Use x-y-z beamspot constraint.
      * The Beamspot will be treated as the mother of the particle you feed,
@@ -133,6 +136,15 @@ namespace Belle2 {
 
     /** inflate beamspot covariance of z by this number */
     int m_inflationFactorCovZ;
+
+    /** decay string to select one particle that will be treated as invisible */
+    std::string  m_treatAsInvisible;
+
+    /** Decay descriptor of the invisible particles */
+    DecayDescriptor m_pDDescriptorInvisibles;
+
+    /** StoreArray of Particles */
+    StoreArray<Particle> m_particles;
 
     /** beam four-momentum */
     Eigen::Matrix<double, 4, 1> m_beamMomE;

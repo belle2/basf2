@@ -486,6 +486,10 @@ def correctBrems(outputList,
     @param path          The module is added to this path
     """
 
+    import b2bii
+    if b2bii.isB2BII():
+        B2ERROR("The BremsFinder can only be run over Belle II data.")
+
     bremscorrector = register_module('BremsFinder')
     bremscorrector.set_name('bremsCorrector_' + outputList)
     bremscorrector.param('inputList', inputList)
@@ -712,6 +716,11 @@ def scaleTrackMomenta(inputListNames, scale=float('nan'), payloadName="", scalin
         scalingFactorName (str): name of scaling factor variable in the payload.
         path (basf2.Path): module is added to this path
     """
+
+    import b2bii
+    if b2bii.isB2BII():
+        B2ERROR("The tracking momentum scaler can only be run over Belle II data.")
+
     trackingmomentum = register_module('TrackingMomentum')
     trackingmomentum.param('particleLists', inputListNames)
     trackingmomentum.param('scale', scale)
@@ -1084,6 +1093,11 @@ def fillConvertedPhotonsList(decayString, cut, writeOut=False, path=None):
         path (basf2.Path): modules are added to this path
 
     """
+
+    import b2bii
+    if b2bii.isB2BII():
+        B2ERROR('For Belle converted photons are available in the pre-defined list "gamma:v0mdst".')
+
     pload = register_module('ParticleLoader')
     pload.set_name('ParticleLoader_' + decayString)
     pload.param('decayStrings', [decayString])
@@ -2758,6 +2772,10 @@ def oldwritePi0EtaVeto(
     @param path       modules are added to this path
     """
 
+    import b2bii
+    if b2bii.isB2BII():
+        B2ERROR("The old pi0 / eta veto is not suitable for Belle analyses.")
+
     import os
     import basf2_mva
 
@@ -2895,6 +2913,10 @@ def writePi0EtaVeto(
     @param etaSoftPhotonCutOverride specify the soft photon selection criteria of eta veto only if one wants to use non-default one.
                                     (default is None)
     """
+
+    import b2bii
+    if b2bii.isB2BII():
+        B2ERROR("The pi0 / eta veto is not suitable for Belle analyses.")
 
     renameSuffix = False
 
@@ -3064,6 +3086,11 @@ def getBeamBackgroundProbability(particleList, path=None):
     @param particleList     The input ParticleList, must be a photon list
     @param path       modules are added to this path
     """
+
+    import b2bii
+    if b2bii.isB2BII():
+        B2ERROR("The beam background probability is not trained for Belle data.")
+
     basf2.conditions.prepend_globaltag(getAnalysisGlobaltag())
     path.add_module('MVAExpert',
                     listNames=particleList,
@@ -3077,6 +3104,11 @@ def getHadronicSplitOffProbability(particleList, path=None,):
     @param particleList     The input ParticleList, must be a photon list
     @param path       modules are added to this path
     """
+
+    import b2bii
+    if b2bii.isB2BII():
+        B2ERROR("The hadronic splitoff probability is not trained for Belle data.")
+
     basf2.conditions.prepend_globaltag(getAnalysisGlobaltag())
     path.add_module('MVAExpert',
                     listNames=particleList,
@@ -3449,6 +3481,10 @@ def applyChargedPidMVA(particleLists, path, trainingMode, chargeIndependent=Fals
         binaryHypoPDGCodes (tuple(int, int), ``optional``): the pdgIds of the signal, background mass hypothesis.
           Required only for binary PID mode.
     """
+
+    import b2bii
+    if b2bii.isB2BII():
+        B2ERROR("Charged PID via MVA is not available for Belle data.")
 
     from ROOT import Belle2
     from variables import variables as vm
@@ -3854,6 +3890,10 @@ def correctEnergyBias(inputListNames, tableName, path=None):
         path (basf2.Path): module is added to this path
     """
 
+    import b2bii
+    if b2bii.isB2BII():
+        B2ERROR("The energy bias cannot be corrected with this tool for Belle data.")
+
     correctenergybias = register_module('EnergyBiasCorrection')
     correctenergybias.param('particleLists', inputListNames)
     correctenergybias.param('tableName', tableName)
@@ -3869,6 +3909,10 @@ def addPhotonEfficiencyRatioVariables(inputListNames, tableName, path=None):
         tableName : taken from database with appropriate name
         path (basf2.Path): module is added to this path
     """
+
+    import b2bii
+    if b2bii.isB2BII():
+        B2ERROR("For Belle data the photon data/MC detection efficiency ratio is not avaialble with this tool.")
 
     photon_efficiency_correction = register_module('PhotonEfficiencySystematics')
     photon_efficiency_correction.param('particleLists', inputListNames)
@@ -3896,6 +3940,10 @@ def addPi0VetoEfficiencySystematics(particleList, decayString, tableName, thresh
     * Pi0VetoEfficiencySystematics_{mode}{suffix}_threshold                 : threshold of the pi0 veto
     """
 
+    import b2bii
+    if b2bii.isB2BII():
+        B2ERROR("For Belle data the pi0 veto data/MC efficiency ratio weights are not available via this tool.")
+
     pi0veto_efficiency_correction = register_module('Pi0VetoEfficiencySystematics')
     pi0veto_efficiency_correction.param('particleLists', particleList)
     pi0veto_efficiency_correction.param('decayString', decayString)
@@ -3913,6 +3961,11 @@ def getAnalysisGlobaltag(timeout=180) -> str:
     Parameters:
         timeout: Seconds to wait for b2conditionsdb-recommend
     """
+
+    import b2bii
+    if b2bii.isB2BII():
+        B2ERROR("The getAnalysisGlobaltag function cannot be used for Belle data.")
+
     # b2conditionsdb-recommend relies on a different repository, so it's better to protect
     # this function against potential failures of check_output.
     try:

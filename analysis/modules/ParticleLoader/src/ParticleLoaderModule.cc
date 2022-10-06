@@ -304,7 +304,6 @@ void ParticleLoaderModule::dummyToParticles()
   plist.create();
   plist->initialize(pdgCode, dummyListName);
 
-  // TODO check self conjugation
   if (!isSelfConjugatedParticle) {
     StoreObjPtr<ParticleList> antiPlist(antiDummyListName);
     antiPlist.create();
@@ -325,7 +324,7 @@ void ParticleLoaderModule::dummyToParticles()
   ROOT::Math::PxPyPzEVector zero4Vector = {0., 0., 0., 0.};
 
   newPart = m_particles.appendNew(zero4Vector, pdgCode, isFlavored, Particle::EParticleSourceObject::c_NoMDSTSource,
-                                  m_dummyMDSTIndex); //TODO mdst Index?
+                                  m_dummyMDSTIndex);
   if (m_dummyCovMatrix > 0.) newPart->setMomentumVertexErrorMatrix(covariance);
   if (m_dummyTreatAsInvisible) newPart->writeExtraInfo("treeFitterTreatMeAsInvisible", 1);
   plist->addParticle(newPart);

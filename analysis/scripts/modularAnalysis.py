@@ -1158,7 +1158,9 @@ def fillParticleListFromDummy(decayString,
                               writeOut=False,
                               path=None):
     """
-    Creates a ParticleList filled with one Particle and one anti-Particle. The four-momentum is set to zero.
+    Creates a ParticleList and fills it with dummy Particles. For self-conjugated Particles one dummy
+    Particle is created, for Particles that are not self-conjugated one Particle and one anti-Particle is
+    created. The four-momentum is set to zero.
 
     The type of the particles to be loaded is specified via the decayString module parameter.
 

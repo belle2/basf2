@@ -925,7 +925,7 @@ Returns NaN for data.
 )DOC","ms");
 
     REGISTER_VARIABLE("timeSinceLastInjectionClockTicks", timeSinceLastInjectionClockTicks,
-      "[Eventbased] Time since the last injected bunch passed by the detector.","ms")
+      "[Eventbased] Time since the last injected bunch passed by the detector.","clock ticks")
 
     REGISTER_VARIABLE("timeSinceLastInjectionMicroSeconds", timeSinceLastInjectionMicroSeconds,
       "[Eventbased] Time since the last injected bunch passed by the detector.","ms")

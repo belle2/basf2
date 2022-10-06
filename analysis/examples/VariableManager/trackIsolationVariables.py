@@ -32,16 +32,21 @@ def argparser():
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawTextHelpFormatter)
 
-    parser.add_argument("--std_charged_ref", type=str, choices=stdc._chargednames, default="pi",
+    parser.add_argument("--std_charged_ref",
+                        type=str,
+                        choices=stdc._chargednames,
+                        default="pi",
                         help="The base name of the reference standard charged particle list\n"
-                        "against which to calculate the distance.")
+                        "that will be considered for the distance calculation.\n"
+                        "Default: %(default)s.")
     parser.add_argument("--detectors",
                         type=str,
                         nargs="+",
                         default=["CDC", "TOP", "ARICH", "ECL", "KLM"],
                         choices=["CDC", "TOP", "ARICH", "ECL", "KLM"],
                         help="List of detectors at whose entry surface track isolation variables will be calculated.\n"
-                        "Pass a space-separated list of names.")
+                        "Pass a space-separated list of names.\n"
+                        "Default: %(default)s.")
     parser.add_argument("--global_tag_append",
                         type=str,
                         nargs="+",
@@ -49,7 +54,8 @@ def argparser():
                         help="List of names of conditions DB global tag(s) to append on top of GT replay.\n"
                         "NB: these GTs will have lowest priority over GT replay.\n"
                         "The order of the sequence passed determines the priority of the GTs, w/ the highest coming first.\n"
-                        "Pass a space-separated list of names.")
+                        "Pass a space-separated list of names.\n"
+                        "Default: %(default)s.")
     parser.add_argument("--global_tag_prepend",
                         type=str,
                         nargs="+",

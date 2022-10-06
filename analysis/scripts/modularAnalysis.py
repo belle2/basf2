@@ -3592,11 +3592,12 @@ def calculateTrackIsolation(
     stable particles in the decay chain.
 
     Note:
-        Currently, a proxy for isolation can be defined using the distance
+        An "isolation score" can be defined using the distance
         of each particle's track to its closest neighbour, defined as the segment connecting the two tracks
         intersection points on a given cylindrical surface.
-        The calculation relies on the track helix extrapolation.
-        The distance variable defined in the `VariableManager` is named `minET2ETDist`.
+        The calculation relies on track helices extrapolation.
+        The distance variables defined in the `VariableManager` is named `minET2ETDist`,
+        the isolation scores are named `minET2ETIsoScore`.
 
     The definition of distance and the number of distances that are calculated per sub-detector is based on
     the following recipe:
@@ -3627,7 +3628,7 @@ def calculateTrackIsolation(
                             The charge-conjugate particle list will be also processed automatically.
         path (basf2.Path): path to which module(s) will be added.
         *detectors: detectors for which track isolation variables will be calculated.
-                    Choose among: "CDC", "TOP", "ARICH", "ECL", "KLM"
+                    Choose among: ``{'CDC', 'TOP', 'ARICH', 'ECL', 'KLM'}``.
         reference_list_name (Optional[str]): name of the input charged stable particle list for the reference tracks.
                                              By default, the ``:all`` ParticleList of the same type
                                              of the selected particle in ``decay_string`` is used.
@@ -3709,7 +3710,7 @@ def calculateTrackIsolation(
         # Always calculate them.
         # Ensure the flag for the mass hypothesis of the fit is set.
         trackiso_vars = [
-            f"minET2ETDist({d_layer}, {reference_list_name}, {int(highest_prob_mass_for_ext)})"
+            f"minET2ETDist({d}, {d_layer}, {reference_list_name}, {int(highest_prob_mass_for_ext)})"
             for d in detectors for d_layer in det_and_layers[d]]
         # Track isolation score.
         trackiso_vars += [f"minET2ETIsoScore({reference_list_name}, {int(highest_prob_mass_for_ext)}, {','.join(detectors)})"]
@@ -3717,8 +3718,10 @@ def calculateTrackIsolation(
         # Optionally, calculate the input variables for the nearest neighbour in the reference list.
         if vars_for_nearest_part:
             trackiso_vars.extend(
-                [f"minET2ETDistVar({d}, {reference_list_name}, {v})"
-                 for d in detectors for d_layer in det_and_layers[d] for v in vars_for_nearest_part])
+                [
+                    f"minET2ETDistVar({d}, {d_layer}, {reference_list_name}, {v})"
+                    for d in detectors for d_layer in det_and_layers[d] for v in vars_for_nearest_part
+                ])
         trackiso_vars.sort()
 
         reference_lists_to_vars[ref_pdg] = trackiso_vars

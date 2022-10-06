@@ -237,6 +237,7 @@ void TrackIsoCalculatorModule::event()
       }
 
       if (!iDistancesAndRefMdstIdxs.size()) {
+        B2DEBUG(12, "The container of distances is empty...");
         continue;
       }
 
@@ -263,9 +264,9 @@ void TrackIsoCalculatorModule::event()
       }
       m_particles[iParticle->getArrayIndex()]->writeExtraInfo(m_detLayerToRefPartIdxVariable[iDetLayer], minDist.second);
 
-    } // loop over input particle list.
+    } // end loop over input particle list.
 
-  } // loop over detector layers.
+  } // end loop over detector layers.
 
   // Store the isolation score per target particle for the given detector.
   for (const auto& targetParticle : targetParticles) {
@@ -312,9 +313,12 @@ double TrackIsoCalculatorModule::getIsoScore(const Particle* iParticle)
   unsigned int n(0);
   for (const auto& iLayer : m_detToLayers[m_detName]) {
     auto iDetLayer = m_detName + std::to_string(iLayer);
+    auto distVar = m_detLayerToDistVariable[iDetLayer];
     auto threshDist = (*m_DBWeights.get())->getDistThreshold(det, iLayer);
-    if (iParticle->getExtraInfo(m_detLayerToDistVariable[iDetLayer]) < threshDist) {
-      n++;
+    if (iParticle->hasExtraInfo(distVar)) {
+      if (iParticle->getExtraInfo(distVar) < threshDist) {
+        n++;
+      }
     }
   }
 

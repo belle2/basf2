@@ -205,6 +205,7 @@ def outputUdst(filename, particleLists=None, includeArrays=None, path=None, data
         see `udst.add_skimmed_udst_output` for a function that does.
 
     """
+
     import udst
     udst.add_udst_output(
         path=path, filename=filename, particleLists=particleLists,
@@ -226,6 +227,7 @@ def outputIndex(filename, path, includeArrays=None, keepParents=False, mc=True):
         in the output index file. Useful if you are only adding more information to another index file
     @param bool mc whether the input data is MC or not
     """
+
     if includeArrays is None:
         includeArrays = []
 
@@ -268,6 +270,7 @@ def setupEventInfo(noEvents, path):
         noEvents (int): number of events to be generated
         path (basf2.Path): modules are added to this path
     """
+
     evtnumbers = register_module('EventInfoSetter')
     evtnumbers.param('evtNumList', [noEvents])
     evtnumbers.param('runList', [0])
@@ -311,6 +314,7 @@ def printPrimaryMCParticles(path, **kwargs):
     This is equivalent to `printMCParticles(onlyPrimaries=True, path=path) <printMCParticles>` and additional
     keyword arguments are just forwarded to that function
     """
+
     return printMCParticles(onlyPrimaries=True, path=path, **kwargs)
 
 
@@ -645,6 +649,7 @@ def cutAndCopyLists(outputListName, inputListNames, cut, writeOut=False, path=No
         writeOut (bool): whether RootOutput module should save the created ParticleList
         path (basf2.Path): modules are added to this path
     """
+
     pmanipulate = register_module('ParticleListManipulator')
     pmanipulate.set_name('PListCutAndCopy_' + outputListName)
     pmanipulate.param('outputListName', outputListName)
@@ -680,6 +685,7 @@ def cutAndCopyList(outputListName, inputListName, cut, writeOut=False, path=None
         writeOut (bool): whether RootOutput module should save the created ParticleList
         path (basf2.Path): modules are added to this path
     """
+
     cutAndCopyLists(outputListName, [inputListName], cut, writeOut, path)
 
 
@@ -702,7 +708,6 @@ def removeTracksForTrackingEfficiencyCalculation(inputListNames, fraction, path=
 
 def scaleTrackMomenta(inputListNames, scale=float('nan'), payloadName="", scalingFactorName="SF", path=None):
     """
-
     Scale momenta of the particles according to a scaling factor scale.
     This scaling factor can either be given as constant number or as the name of the payload which contains
     the variable scale factors.
@@ -742,6 +747,7 @@ def smearTrackMomenta(inputListNames, payloadName="", smearingFactorName="smear"
         smearingFactorName (str): name of smearing factor variable in the payload.
         path (basf2.Path): module is added to this path
     """
+
     trackingmomentum = register_module('TrackingMomentum')
     trackingmomentum.param('particleLists', inputListNames)
     trackingmomentum.param('payloadName', payloadName)
@@ -1321,6 +1327,7 @@ def applyEventCuts(cut, path, metavariables=None):
         path (basf2.Path): modules are added to this path
         metavariables (list(str)): List of meta variables to be considered in decomposition of cut
     """
+
     import b2parser
     from variables import variables
 
@@ -1560,6 +1567,7 @@ def replaceMass(replacerName, particleLists=None, pdgCode=22, path=None):
     @param pdgCode PDG   code for mass reference
     @param path          modules are added to this path
     """
+
     if particleLists is None:
         particleLists = []
 
@@ -1881,6 +1889,7 @@ def variablesToHistogram(decayString,
         prefixDecayString (bool): If True the decayString will be prepended to the directory name to allow for more
             programmatic naming of the structure in the file.
     """
+
     if variables_2d is None:
         variables_2d = []
     output = register_module('VariablesToHistogram')
@@ -1981,6 +1990,7 @@ def variableToSignalSideExtraInfo(particleList, varToExtraInfo, path):
         varToExtraInfo (dict[str,str]):  Dictionary of Variables (key) and extraInfo names (value).
         path (basf2.Path):               modules are added to this path
     """
+
     mod = register_module('SignalSideVariablesToExtraInfo')
     mod.set_name('SigSideVarToExtraInfo_' + particleList)
     mod.param('particleListName', particleList)
@@ -2031,6 +2041,7 @@ def removeExtraInfo(particleLists=None, removeEventExtraInfo=False, path=None):
     """
     Removes the ExtraInfo of the given particleLists. If specified (removeEventExtraInfo = True) also the EventExtraInfo is removed.
     """
+
     if particleLists is None:
         particleLists = []
     mod = register_module('ExtraInfoRemover')
@@ -2053,6 +2064,7 @@ def signalSideParticleFilter(particleList, selection, roe_path, deadEndPath):
     @param for_each roe path in which this filter is executed
     @param deadEndPath empty path that ends execution of or_each roe path for the current ROE object.
     """
+
     mod = register_module('SignalSideParticleFilter')
     mod.set_name('SigSideParticleFilter_' + particleList)
     mod.param('particleLists', [particleList])
@@ -2075,6 +2087,7 @@ def signalSideParticleListsFilter(particleLists, selection, roe_path, deadEndPat
     @param for_each roe path in which this filter is executed
     @param deadEndPath empty path that ends execution of or_each roe path for the current ROE object.
     """
+
     mod = register_module('SignalSideParticleFilter')
     mod.set_name('SigSideParticleFilter_' + particleLists[0])
     mod.param('particleLists', particleLists)
@@ -2154,6 +2167,7 @@ def findMCDecay(
     @param writeOut  Whether `RootOutput` module should save the created ``outputList``
     @param path      modules are added to this path
     """
+
     B2WARNING("This function is not fully tested and maintained."
               "Please consider to use reconstructMCDecay() instead.")
 
@@ -2250,6 +2264,7 @@ def buildRestOfEvent(target_list_name, inputParticlelists=None,
                               the following: [e-, mu-, pi-, K-, p+, d+]
     @param path               modules are added to this path
     """
+
     if inputParticlelists is None:
         inputParticlelists = []
     fillParticleList('pi+:all', '', path=path)
@@ -2279,6 +2294,7 @@ def buildNestedRestOfEvent(target_list_name, maskName='all', path=None):
     @param mask_name             name of the ROEMask to be used
     @param path                  modules are added to this path
     """
+
     roeBuilder = register_module('RestOfEventBuilder')
     roeBuilder.set_name('NestedROEBuilder_' + target_list_name)
     roeBuilder.param('particleList', target_list_name)
@@ -2296,6 +2312,7 @@ def buildRestOfEventFromMC(target_list_name, inputParticlelists=None, path=None)
                               target_list_name are excluded from ROE object
     @param path               modules are added to this path
     """
+
     if inputParticlelists is None:
         inputParticlelists = []
     if (len(inputParticlelists) == 0):
@@ -2379,6 +2396,7 @@ def appendROEMasks(list_name, mask_tuples, path=None):
     @param mask_tuples           array of ROEMask list tuples to be appended
     @param path                  modules are added to this path
     """
+
     compatible_masks = []
     for mask in mask_tuples:
         # add empty KLM-based selection if it's absent:
@@ -2435,6 +2453,7 @@ def updateROEMasks(list_name, mask_tuples, path):
     @param mask_tuples           array of ROEMask list tuples to be appended
     @param path                  modules are added to this path
     """
+
     compatible_masks = []
     for mask in mask_tuples:
         # add empty KLM-based selection if it's absent:
@@ -2582,6 +2601,7 @@ def updateROEUsingV0Lists(target_particle_list, mask_names, default_cleanup=True
     @param fitter                string, that represent a fitter choice: "treefit" for TreeFitter and "kfit" for KFit
     @param path                  modules are added to this path
     """
+
     roe_path = create_path()
     deadEndPath = create_path()
     signalSideParticleFilter(target_particle_list, '', roe_path, deadEndPath)
@@ -2635,6 +2655,7 @@ def printROEInfo(mask_names=None, full_print=False,
     @param full_print         print out particles in mask
     @param path               modules are added to this path
     """
+
     if mask_names is None:
         mask_names = []
     printMask = register_module('RestOfEventPrinter')
@@ -2685,6 +2706,7 @@ def inclusiveBtagReconstruction(upsilon_list_name, bsig_list_name, btag_list_nam
     @param btag_list_name Name of the Bsig ParticleList
     @param input_lists_names List of names of the ParticleLists which are used to reconstruct Btag from
     """
+
     btag = register_module('InclusiveBtagReconstruction')
     btag.set_name('InclusiveBtagReconstruction_' + bsig_list_name)
     btag.param('upsilonListName', upsilon_list_name)
@@ -2701,6 +2723,7 @@ def selectDaughters(particle_list_name, decay_string, path):
     @param particle_list_name input particle list
     @param decay_string  for selecting the Daughters to be preserved
     """
+
     seld = register_module('SelectDaughters')
     seld.set_name('SelectDaughters_' + particle_list_name)
     seld.param('listName', particle_list_name)
@@ -2716,6 +2739,7 @@ def markDuplicate(particleList, prioritiseV0, path):
     @param particleList input particle list
     @param prioritiseV0 if true, give V0s a higher priority
     """
+
     markdup = register_module('DuplicateVertexMarker')
     markdup.param('particleList', particleList)
     markdup.param('prioritiseV0', prioritiseV0)
@@ -2987,9 +3011,7 @@ def writePi0EtaVeto(
     Pi0ExtraInfoName = dictPi0ExtraInfoName[mode]
     EtaExtraInfoName = dictEtaExtraInfoName[mode]
 
-    """
-    pi0 veto
-    """
+    # pi0 veto
     if pi0PayloadNameOverride is not None:
         Pi0PayloadName = pi0PayloadNameOverride
     if pi0SoftPhotonCutOverride is None:
@@ -3017,9 +3039,7 @@ def writePi0EtaVeto(
     variableToSignalSideExtraInfo('pi0:Pi0Veto' + ListName,
                                   {'extraInfo(' + Pi0ExtraInfoName + ')': Pi0ExtraInfoName + suffix}, path=roe_path)
 
-    """
-    eta veto
-    """
+    # eta veto
     if etaPayloadNameOverride is not None:
         EtaPayloadName = etaPayloadNameOverride
     if etaSoftPhotonCutOverride is None:
@@ -3066,6 +3086,7 @@ def lowEnergyPi0Identification(pi0List, gammaList, payloadNameSuffix,
                                   * ``'Belle2Release5'`` for Belle II release 5 data (MC14, proc12, buckets 16 - 25).\n
     @param path                 Module path.
     """
+
     basf2.conditions.prepend_globaltag(getAnalysisGlobaltag())
     # Select photons with higher energy for formation of veto combinations.
     cutAndCopyList('gamma:pi0veto', gammaList, 'E > 0.2', path=path)
@@ -3139,6 +3160,7 @@ def buildEventKinematics(inputListNames=None, default_cleanup=True, custom_cuts=
                               which would result in a standard predefined selection cuts
     @param path               modules are added to this path
     """
+
     if inputListNames is None:
         inputListNames = []
     trackCuts = 'pt > 0.1'
@@ -3196,6 +3218,7 @@ def buildEventKinematicsFromMC(inputListNames=None, selectionCut='', path=None):
     @param selectionCut       optional selection cuts
     @param path               Path to append the eventKinematics module to.
     """
+
     if inputListNames is None:
         inputListNames = []
     if (len(inputListNames) == 0):
@@ -3283,6 +3306,7 @@ def buildEventShape(inputListNames=None,
                               is quite time consuming, instead of using it consider sanitizing
                               the lists you are passing to the function.
     """
+
     if inputListNames is None:
         inputListNames = []
     trackCuts = 'pt > 0.1'
@@ -3340,6 +3364,7 @@ def labelTauPairMC(printDecayInfo=False, path=None, TauolaBelle=False, mapping_m
     @param mapping_minus: if None, the map is the default one, else the path for the map is given by the user for tau-
     @param mapping_plus: if None, the map is the default one, else the path for the map is given by the user for tau+
     """
+
     from basf2 import find_file
     if not TauolaBelle:
 
@@ -3828,6 +3853,7 @@ def addInclusiveDstarReconstruction(decayString, slowPionCut, DstarCut, path):
     @param DstarCut Cut applied to the output D* list
     @param path the module is added to this path
     """
+
     incl_dstar = register_module("InclusiveDstarReconstruction")
     incl_dstar.param("decayString", decayString)
     incl_dstar.param("slowPionCut", slowPionCut)
@@ -3843,7 +3869,7 @@ def scaleError(outputListName, inputListName,
                d0MomThr=0.500000,
                z0MomThr=0.500000,
                path=None):
-    '''
+    """
     This module creates a new charged particle list.
     The helix errors of the new particles are scaled by constant factors.
     Two sets of five scale factors are defined for tracks with and without a PXD hit.
@@ -3864,7 +3890,8 @@ def scaleError(outputListName, inputListName,
     @param d0MomThr d0 best resolution is kept constant below this momentum
     @param z0MomThr z0 best resolution is kept constant below this momentum
 
-    '''
+    """
+
     scale_error = register_module("HelixErrorScaler")
     scale_error.set_name('ScaleError_' + inputListName)
     scale_error.param('inputListName', inputListName)
@@ -4000,6 +4027,7 @@ def getNbarIDMVA(particleList, path=None, ):
     @param particleList     The input ParticleList
     @param path             modules are added to this path
     """
+
     from variables import variables
     variables.addAlias('V1', 'clusterHasPulseShapeDiscrimination')
     variables.addAlias('V2', 'clusterE')
@@ -4043,6 +4071,7 @@ def reconstructDecayWithNeutralHadron(decayString, cut, allowGamma=False, path=N
     @param allowGamma whether allow the selected particle to be ``gamma``
     @param path The path to put in the module
     """
+
     reconstructDecay(decayString, cut, path=path, **kwargs)
     module = register_module('NeutralHadron4MomentumCalculator')
     module.set_name('NeutralHadron4MomentumCalculator_' + decayString)

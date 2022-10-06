@@ -129,10 +129,10 @@ namespace Belle2 {
      * @param det the input PID detector.
      * @param layer the input detector layer.
      */
-    double getDistThreshold(Const::EDetector det, const int layer)
+    double getDistThreshold(Const::EDetector det, int layer) const
     {
       auto detAndLayer = std::make_pair(Const::parseDetectors(det), layer);
-      return m_distThreshPerDetLayer[detAndLayer];
+      return m_distThreshPerDetLayer.at(detAndLayer);
     };
 
     /**
@@ -142,7 +142,7 @@ namespace Belle2 {
      * @param p the particle momentum in [GeV/c].
      * @param theta the particle polar angle in [rad].
      */
-    double getWeight(Const::ChargedStable hypo, Const::EDetector det, const double p, const double theta);
+    double getWeight(Const::ChargedStable hypo, Const::EDetector det, double p, double theta) const;
 
   private:
 

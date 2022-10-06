@@ -110,10 +110,10 @@ void PIDDetectorWeights::fillWeightsTablePerHypoFromRDF()
 }
 
 
-double PIDDetectorWeights::getWeight(Const::ChargedStable hypo, Const::EDetector det, const double p, const double theta)
+double PIDDetectorWeights::getWeight(Const::ChargedStable hypo, Const::EDetector det, double p, double theta) const
 {
 
-  const auto weightsTable = &m_weightsTablePerHypo[hypo.getPDGCode()];
+  const auto weightsTable = &m_weightsTablePerHypo.at(hypo.getPDGCode());
 
   if (weightsTable->m_isEmpty) {
     // Weights not available for this pdgId.
@@ -145,8 +145,8 @@ double PIDDetectorWeights::getWeight(Const::ChargedStable hypo, Const::EDetector
     return std::numeric_limits<float>::quiet_NaN();
   }
 
-  auto rowIdx = weightsTable->m_linBinIdxsToRowIdxs[linBinIdx];
+  auto rowIdx = weightsTable->m_linBinIdxsToRowIdxs.at(linBinIdx);
 
-  return weightsTable->m_weightsPerDet[Const::parseDetectors(det)].at(rowIdx);
+  return weightsTable->m_weightsPerDet.at(Const::parseDetectors(det)).at(rowIdx);
 
 };

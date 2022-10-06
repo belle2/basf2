@@ -234,25 +234,3 @@ std::vector<NNTParam<X>> NeuroTriggerParameters::read1dArray(std::string keyx, b
   }
   return newpair;
 }
-template<typename X>
-std::vector<std::vector<X>> NeuroTriggerParameters::tcastvector(const std::vector<std::vector<NNTParam<X>>> vec) const
-{
-  std::vector<std::vector<X>> ret;
-  for (auto x : vec) {
-    std::vector<X> line;
-    for (auto y : x) {
-      line.push_back((X) y);
-    }
-    ret.push_back(line);
-  }
-  return ret;
-}
-template<typename X>
-std::vector<X> NeuroTriggerParameters::tcastvector(const std::vector<NNTParam<X>> vec) const
-{
-  std::vector<std::vector<X>> ret;
-  for (auto x : vec) {
-    ret.push_back((X) x);
-  }
-  return ret;
-}

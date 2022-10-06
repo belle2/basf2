@@ -111,9 +111,29 @@ namespace Belle2 {
     template<typename X>
     std::string print1dArray(const std::string& name, std::vector<NNTParam<X>> vecvec);
     template<typename X>
-    std::vector<std::vector<X>> tcastvector(const std::vector<std::vector<NNTParam<X>>> vec) const;
+    std::vector<std::vector<X>> tcastvector(const std::vector<std::vector<NNTParam<X>>> vec) const
+    {
+      std::vector<std::vector<X>> ret;
+      for (auto x : vec) {
+        std::vector<X> line;
+        for (auto y : x) {
+          line.push_back((X) y);
+        }
+        ret.push_back(line);
+      }
+      return ret;
+    }
+
     template<typename X>
-    std::vector<X> tcastvector(const std::vector<NNTParam<X>> vec) const;
+    std::vector<X> tcastvector(const std::vector<NNTParam<X>> vec) const
+    {
+      std::vector<std::vector<X>> ret;
+      for (auto x : vec) {
+        ret.push_back((X) x);
+      }
+      return ret;
+    }
+
 
     //void loadconfigroot(std::string& filename);
     //void saveconfigroot(std::string& filename);

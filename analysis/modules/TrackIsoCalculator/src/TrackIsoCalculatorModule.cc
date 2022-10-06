@@ -11,6 +11,8 @@
 
 #include <cmath>
 #include <iomanip>
+#include <boost/algorithm/string.hpp>
+
 
 using namespace Belle2;
 
@@ -36,6 +38,14 @@ TrackIsoCalculatorModule::TrackIsoCalculatorModule() : Module()
            m_useHighestProbMassForExt,
            "If this option is set, the helix extrapolation for the target and reference particles will use the track fit result for the most probable mass hypothesis, namely, the one that gives the highest chi2Prob of the fit.",
            bool(false));
+  addParam("payloadName",
+           m_payloadName,
+           "The name of the database payload object with the PID detector weights.",
+           std::string("CPIDDetectorWeights"));
+  addParam("excludePIDDetWeights",
+           m_excludePIDDetWeights,
+           "If set to true, will not use the PID detector weights for the score definition.",
+           bool(false));
 }
 
 TrackIsoCalculatorModule::~TrackIsoCalculatorModule()
@@ -45,6 +55,8 @@ TrackIsoCalculatorModule::~TrackIsoCalculatorModule()
 void TrackIsoCalculatorModule::initialize()
 {
   m_event_metadata.isRequired();
+
+  m_DBWeights = std::make_unique<DBObjPtr<PIDDetectorWeights>>(m_payloadName);
 
   bool valid = m_decaydescriptor.init(m_decayString);
   if (!valid) {
@@ -82,6 +94,12 @@ void TrackIsoCalculatorModule::initialize()
     B2INFO("Will use track fit result for the most probable mass hypothesis in helix extrapolation.");
   }
 
+  // Ensure we use uppercase detector labels.
+  boost::to_upper(m_detName);
+
+  // The total number of layers of this detector.
+  m_nLayers = m_detToLayers[m_detName].size();
+
   // Define the name(s) of the variables for this detector to be stored as extraInfo.
   for (const auto& iLayer : m_detToLayers[m_detName]) {
 
@@ -96,6 +114,11 @@ void TrackIsoCalculatorModule::initialize()
     m_detLayerToDistVariable.insert(std::make_pair(iDetLayer, distVarName));
     m_detLayerToRefPartIdxVariable.insert(std::make_pair(iDetLayer, refPartIdxVarName));
 
+  }
+  // Isolation score variable per detector.
+  m_isoScoreVariable = "trkIsoScore" + m_detName + "_VS_" + m_pListReferenceName;
+  if (m_useHighestProbMassForExt) {
+    m_isoScoreVariable += "__useHighestProbMassForExt";
   }
 
 }
@@ -244,7 +267,52 @@ void TrackIsoCalculatorModule::event()
 
   } // loop over detector layers.
 
+  // Store the isolation score per target particle for the given detector.
+  for (const auto& targetParticle : targetParticles) {
+
+    auto iMdstIdx = targetParticle.first;
+    auto iParticle = targetParticle.second;
+
+    auto score = this->getIsoScore(iParticle);
+    m_particles[iParticle->getArrayIndex()]->writeExtraInfo(m_isoScoreVariable, score);
+
+    B2DEBUG(11, "\n"
+            << "Particle w/ mdstIndex[" << iMdstIdx << "] (PDG = " << iParticle->getPDGCode() << ").\n"
+            << "Track isolation score in the " << m_detName << ": s = "
+            << score << "\n"
+            << "Storing extraInfo variable:\n"
+            << m_isoScoreVariable);
+
+  }
+
   B2DEBUG(11, "Finished processing EVENT: " << m_event_metadata->getEvent());
+
+}
+
+
+double TrackIsoCalculatorModule::getIsoScore(const Particle* iParticle)
+{
+
+  auto hypo = Const::ChargedStable(std::abs(iParticle->getPDGCode()));
+  auto det = this->getDetEnum(m_detName);
+  auto p = iParticle->getP();
+  auto theta = std::get<double>(Variable::Manager::Instance().getVariable("theta")->function(iParticle));
+
+  auto detWeight = (*m_DBWeights.get())->getWeight(hypo, det, p, theta); // Note that can be NaN.
+  if (m_excludePIDDetWeights) {
+    detWeight = 1.;
+  }
+
+  unsigned int n(0);
+  for (const auto& iLayer : m_detToLayers[m_detName]) {
+    auto iDetLayer = m_detName + std::to_string(iLayer);
+    auto threshDist = (*m_DBWeights.get())->getDistThreshold(det, iLayer);
+    if (iParticle->getExtraInfo(m_detLayerToDistVariable[iDetLayer]) < threshDist) {
+      n++;
+    }
+  }
+
+  return 1. - (-detWeight * (n / m_nLayers));
 
 }
 

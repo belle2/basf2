@@ -12,12 +12,16 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/logging/LogConfig.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/gearbox/Const.h>
+#include <framework/database/DBObjPtr.h>
+
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/VariableManager/Utility.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
-#include <framework/datastore/StoreArray.h>
+#include <analysis/dbobjects/PIDDetectorWeights.h>
 
 
 namespace Belle2 {
@@ -116,6 +120,11 @@ namespace Belle2 {
     std::string m_detName;
 
     /**
+     * The number of layers for the input detector.
+     */
+    unsigned int m_nLayers;
+
+    /**
      * Map that associates to each detector layer the name of the variable
      * representing the distance to the closest particle in the reference list,
      * based on the track helix extrapolation.
@@ -129,7 +138,13 @@ namespace Belle2 {
      * Each variable is added as particle extraInfo.
      */
     std::unordered_map<std::string, std::string>  m_detLayerToRefPartIdxVariable;
-    //std::string m_extraInfoNameRefPartIdx;
+
+    /**
+     * The name of the variable
+     * representing the track isolation score in this detector.
+     * Added as particle extraInfo.
+     */
+    std::string m_isoScoreVariable;
 
     /**
      * Map that associates to each detector its list of valid layers.
@@ -190,15 +205,63 @@ namespace Belle2 {
     bool m_useHighestProbMassForExt;
 
     /**
+     * Exclude the PID detector weights for the isolation score definition.
+     */
+    bool m_excludePIDDetWeights;
+
+    /**
+     * The name of the database payload object with the MVA weights.
+     */
+    std::string m_payloadName;
+
+    /**
+     * Interface to get the database payload with the PID detector weights.
+     */
+    std::unique_ptr<DBObjPtr<PIDDetectorWeights>> m_DBWeights;
+
+    /**
      * Calculate the distance between the points where the two input
      * extrapolated track helices cross the given detector layer's cylindrical surface.
      */
     double getDistAtDetSurface(const Particle* iParticle, const Particle* jParticle, const std::string& detLayerName);
 
     /**
+     * Define a semi-continuous variable to quantify the isolation of a standard charged particle
+     in the given detector with $N$ layers.
+     * The definition is based on the counting of layers $n$ where a nearby track extrapolated helix is found,
+     * as well as on the weight that each sub-detector has on the PID for the given particle hypothesis:
+
+     s = 1 - (-w * (n/N))
+
+     * The distance to closest track helix extrapolation defined in getDistAtDetSurface is used,
+     * taking thresholds from the CDB payload.
+     *
+     * Note that the PID detector weighting can be optionally switched off, namely, w is set to 1.
+     */
+    double getIsoScore(const Particle* iParticle);
+
+    /**
      * Check whether input particle list and reference list are of a valid charged stable particle.
      */
     bool onlySelectedStdChargedInDecay();
+
+    /**
+     * Get the enum type for this detector name.
+     */
+    /**
+     * The enum type of the detector.
+     */
+    Const::EDetector getDetEnum(const std::string& detName)
+    {
+
+      if (detName == "CDC") return Const::CDC;
+      else if (detName == "TOP") return Const::TOP;
+      else if (detName == "ARICH") return Const::ARICH;
+      else if (detName == "ECL") return Const::ECL;
+      else if (detName == "KLM") return Const::KLM;
+      else B2FATAL("Unknown detector component: " << detName);
+
+    };
 
   };
 }

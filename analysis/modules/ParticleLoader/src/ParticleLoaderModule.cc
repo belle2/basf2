@@ -293,7 +293,8 @@ void ParticleLoaderModule::dummyToParticles()
 {
   if (m_Dummies2Plists.empty()) // nothing to do
     return;
-  // Multiple particle lists are not supported
+  if (m_Dummies2Plists.size() != 1)
+    B2ERROR("ParticleLoaderModule::dummyToParticles Multiple particle lists are not supported!");
   auto dummy2Plist = m_Dummies2Plists[0];
   string dummyListName = get<c_PListName>(dummy2Plist);
   string antiDummyListName = get<c_AntiPListName>(dummy2Plist);

@@ -125,7 +125,8 @@ void TreeFitterModule::beginRun()
   const double covE = (HERcoma(0, 0) + LERcoma(0, 0));
   for (size_t i = 0; i < 4; ++i) {
     m_beamCovariance(i, i) =
-      covE; //TODO Set this strange diagonal value, since the zero momentum in y would lead to a completely unconstrained pY... get back to this at some point
+      covE;
+    // TODO Currently, we do not get a full covariance matrix from beamparams, and the py value is zero, which means there is no constraint on py. Therefore, we approximate it by a diagonal matrix using the energy value for all components. This is based on the assumption that the components of the beam four-momentum are independent and of comparable size.
   }
 }
 

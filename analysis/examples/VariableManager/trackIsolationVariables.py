@@ -56,7 +56,6 @@ def argparser():
     parser.add_argument("--global_tag_append",
                         type=str,
                         nargs="+",
-                        # default=["binary_pid_det_weights_for_trackiso_release_6"],  # TMP!!!
                         default=[getAnalysisGlobaltag()],
                         help="List of names of conditions DB global tag(s) to append on top of GT replay.\n"
                         "NB: these GTs will have lowest priority over GT replay.\n"

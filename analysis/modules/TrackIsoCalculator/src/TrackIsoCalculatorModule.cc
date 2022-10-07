@@ -281,8 +281,8 @@ void TrackIsoCalculatorModule::event()
 
     B2DEBUG(11, "\n"
             << "Particle w/ mdstIndex[" << iMdstIdx << "] (PDG = " << iParticle->getPDGCode() << ").\n"
-            << "Track isolation score in the " << m_detName << ": s = "
-            << score << "\n"
+            << "Isolation score in the " << m_detName << ": s = " << score
+            << "\n"
             << "Storing extraInfo variable:\n"
             << m_isoScoreVariable);
 
@@ -301,7 +301,7 @@ double TrackIsoCalculatorModule::getIsoScore(const Particle* iParticle) const
   auto p = iParticle->getP();
   auto theta = std::get<double>(Variable::Manager::Instance().getVariable("theta")->function(iParticle));
 
-  double detWeight(1.0);
+  double detWeight(-1.0);
   if (!m_excludePIDDetWeights) {
     detWeight = (*m_DBWeights.get())->getWeight(hypo, det, p, theta);
     // If w < 0, the detector has detrimental impact on PID:
@@ -326,7 +326,15 @@ double TrackIsoCalculatorModule::getIsoScore(const Particle* iParticle) const
     B2DEBUG(12, "\nNo close-enough neighbours to this particle in the " << m_detName << " were found.");
   }
 
-  return -detWeight * (n / m_nLayers);
+  if (n > m_nLayers) {
+    B2FATAL("\nTotal layers in " << m_detName << ": N=" << m_nLayers
+            << "\n"
+            << "Layers w/ a close-enough particle: n=" << n
+            << "\n"
+            << "n > N ?? Abort...");
+  }
+
+  return 1. - (-detWeight * (n / m_nLayers));
 
 }
 

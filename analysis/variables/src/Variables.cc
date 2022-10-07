@@ -1117,7 +1117,11 @@ namespace Belle2 {
           }
           scoreSum += scoreDet;
         }
-        return 1. - scoreSum;
+
+        // Normalise sum of scores between [0, 1]
+        auto minScore = 0.;
+        auto maxScore = detectorNames.size();
+        return (scoreSum - minScore) / (maxScore - minScore);
 
       };
 

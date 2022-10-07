@@ -254,11 +254,13 @@ namespace Belle2 {
      * has on the PID of the given particle hypothesis:
 
      \f{equation}{
-       s_{d} = -w_{d} \cdot \left(\frac{n_{d}}{N_{d}}\right).
+       s_{d} = 1 - \left(-w_{d} \cdot \frac{n_{d}}{N_{d}}\right).
      \f}
 
      * The distance to closest track helix extrapolation defined in `double getDistAtDetSurface()` is used.
      * Note that if the PID detector weighting is switched off, \f$w_{d} = 1\f$.
+     *
+     * The per-detector score is normalised in \f$s_{d}\in [0, 1]\f$: values closer to 1 indicate well-isolated particles.
      */
     double getIsoScore(const Particle* iParticle) const;
 

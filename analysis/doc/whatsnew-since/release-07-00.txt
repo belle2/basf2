@@ -25,6 +25,8 @@ Modules
    :func:`modularAnalysis.fillParticleListFromDummy`.
  * New module :b2:mod:`KlongMomentumUpdaterExpert` to calculate and update the two-body B-meson decay including a
    Klong is added. New function :func:`modularAnalysis.updateKlongKinematicsExpert` is also added.
+ * The new expert argument ``expertBeamConstraintPDG`` has been added to the :b2:mod:`TreeFitter`. It allows the user to constrain 
+   the four-momentum of a Particle to the four-momentum of the initial e+e- state.
 
 Modular Analysis Function
 +++++++++++++++++++++++++

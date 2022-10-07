@@ -1151,6 +1151,38 @@ def fillParticleListFromROE(decayString,
         applyCuts(decayDescriptor.getMother().getFullName(), cut, path)
 
 
+def fillParticleListFromDummy(decayString,
+                              mdstIndex=0,
+                              covMatrix=10000.,
+                              treatAsInvisible=True,
+                              writeOut=False,
+                              path=None):
+    """
+    Creates a ParticleList and fills it with dummy Particles. For self-conjugated Particles one dummy
+    Particle is created, for Particles that are not self-conjugated one Particle and one anti-Particle is
+    created. The four-momentum is set to zero.
+
+    The type of the particles to be loaded is specified via the decayString module parameter.
+
+    @param decayString             specifies type of Particles and determines the name of the ParticleList
+    @param mdstIndex               sets the mdst index of Particles
+    @param covMatrix               sets the value of the diagonal covariance matrix of Particles
+    @param treatAsInvisible        whether treeFitter should treat the Particles as invisible
+    @param writeOut                whether RootOutput module should save the created ParticleList
+    @param path                    modules are added to this path
+    """
+
+    pload = register_module('ParticleLoader')
+    pload.set_name('ParticleLoader_' + decayString)
+    pload.param('decayStrings', [decayString])
+    pload.param('useDummy', True)
+    pload.param('dummyMDSTIndex', mdstIndex)
+    pload.param('dummyCovMatrix', covMatrix)
+    pload.param('dummyTreatAsInvisible', treatAsInvisible)
+    pload.param('writeOut', writeOut)
+    path.add_module(pload)
+
+
 def fillParticleListFromMC(decayString,
                            cut,
                            addDaughters=False,
@@ -1516,6 +1548,26 @@ def reconstructMissingKlongDecayExpert(decayString,
     rmake.param('writeOut', writeOut)
     rmake.param('recoList', recoList)
     path.add_module(rmake)
+
+
+def setBeamConstrainedMomentum(particleList, decayStringTarget, decayStringDaughters, path=None):
+    """
+    Replace the four-momentum of the target Particle by p(beam) - p(selected daughters).
+    The momentum of the mother Particle will not be changed.
+
+    @param particleList         mother Particlelist
+    @param decayStringTarget    DecayString specifying the target particle whose momentum
+                                will be updated
+    @param decayStringDaughters DecayString specifying the daughter particles used to replace
+                                the momentum of the target particle by p(beam)-p(daughters)
+    """
+
+    mod = register_module('ParticleMomentumUpdater')
+    mod.set_name('ParticleMomentumUpdater' + particleList)
+    mod.param('particleList', particleList)
+    mod.param('decayStringTarget', decayStringTarget)
+    mod.param('decayStringDaughters', decayStringDaughters)
+    path.add_module(mod)
 
 
 def updateKlongKinematicsExpert(particleList,

@@ -254,7 +254,7 @@ namespace Belle2 {
      * has on the PID of the given particle hypothesis:
 
      \f{equation}{
-       s_{d} = 1 - \left(-w_{d} \cdot \frac{n_{d}}{N_{d}} \right).
+       s_{d} = -w_{d} \cdot \left(\frac{n_{d}}{N_{d}}\right).
      \f}
 
      * The distance to closest track helix extrapolation defined in `double getDistAtDetSurface()` is used.

@@ -239,7 +239,7 @@ void TrackIsoCalculatorModule::event()
       }
 
       if (!iDistancesAndRefMdstIdxs.size()) {
-        B2DEBUG(12, "The container of distances is empty...");
+        B2DEBUG(12, "The container of distances is empty. Perhaps the target and reference lists contain the same exact particles?");
         continue;
       }
 
@@ -323,10 +323,10 @@ double TrackIsoCalculatorModule::getIsoScore(const Particle* iParticle) const
   }
 
   if (!n) {
-    B2WARNING("No close-enough neighbours to this particle in the " << m_detName << " were found");
+    B2DEBUG(12, "\nNo close-enough neighbours to this particle in the " << m_detName << " were found.");
   }
 
-  return 1. - (-detWeight * (n / m_nLayers));
+  return -detWeight * (n / m_nLayers);
 
 }
 

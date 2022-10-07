@@ -1026,19 +1026,18 @@ namespace Belle2 {
       std::string detLayer = arguments[1];
       std::string referenceListName = arguments[2];
       std::string extraSuffix = (useHighestProbMassForExt) ? "__useHighestProbMassForExt" : "";
+      // Distance to closets neighbour at this detector layer.
+      std::string extraInfo = "distToClosestTrkAt" + detName + detLayer + "_VS_" + referenceListName + extraSuffix;
 
-      auto func = [&](const Particle * part) -> double {
-        std::string extraInfo = "distToClosestTrkAt" + detName + detLayer + "_VS_" + referenceListName + extraSuffix;
-        if (!part->hasExtraInfo(extraInfo))
-        {
-          return std::numeric_limits<float>::quiet_NaN();
-        }
-        return part->getExtraInfo(extraInfo);
+      auto func = [ = ](const Particle * part) -> double {
+        auto dist = (part->hasExtraInfo(extraInfo)) ? part->getExtraInfo(extraInfo) : std::numeric_limits<float>::quiet_NaN();
+        return dist;
       };
 
       return func;
     }
 
+// Track helix extrapolation-based isolation --------------------------------------------------
 
     Manager::FunctionPtr particleDistToClosestExtTrkVar(const std::vector<std::string>& arguments)
     {
@@ -1051,8 +1050,10 @@ namespace Belle2 {
       std::string detLayer = arguments[1];
       std::string referenceListName = arguments[2];
       std::string variableName = arguments[3];
+      // Mdst array index of the particle that is closest to the particle in question.
+      std::string extraInfo = "idxOfClosestPartAt" + detName + detLayer + "In_" + referenceListName;
 
-      auto func = [&](const Particle * part) -> double {
+      auto func = [ = ](const Particle * part) -> double {
 
         StoreObjPtr<ParticleList> refPartList(referenceListName);
         if (!refPartList.isValid())
@@ -1060,8 +1061,6 @@ namespace Belle2 {
           B2FATAL("Invalid Listname " << referenceListName << " given to minET2ETDistVar!");
         }
 
-        // Mdst array index of the particle that is closest to the particle in question.
-        std::string extraInfo = "idxOfClosestPartAt" + detName + detLayer + "In_" + referenceListName;
         if (!part->hasExtraInfo(extraInfo))
         {
           return std::numeric_limits<float>::quiet_NaN();
@@ -1097,7 +1096,7 @@ namespace Belle2 {
 
       std::vector<std::string> detectorNames(arguments.begin() + 2, arguments.end());
 
-      auto func = [&](const Particle * part) -> double {
+      auto func = [ = ](const Particle * part) -> double {
 
         StoreObjPtr<ParticleList> refPartList(referenceListName);
         if (!refPartList.isValid())
@@ -1118,7 +1117,7 @@ namespace Belle2 {
           }
           scoreSum += scoreDet;
         }
-        return scoreSum;
+        return 1. - scoreSum;
 
       };
 
@@ -1306,9 +1305,11 @@ The definition is based on the track helices extrapolation.
 			  Manager::VariableDataType::c_double);
 
     REGISTER_METAVARIABLE("minET2ETIsoScore(referenceListName, useHighestProbMassForExt, detectorList)", particleExtTrkIsoScoreVar,
-			  R"DOC(Returns the particle isolation score based on:
+			  R"DOC(Returns the particle's isolation score based on:
 * The number of detector layers where a close-enough neighbour to this particle is found, according to the distance definition of `minET2ETDist` and a set of thresholds defined in the ``TrackIsolation`` module.
 * A set of per-detector weights quantifying the impact of each detector on the PID for this particle type.
+
+The score is normalised in [0, 1], where values closer to 1 indicates a well-isolated particle.
 
 .. note::
     The detector weights are considered for the score definition only if ``excludePIDDetWeights=false`` in the ``TrackIsolation`` module configuration.

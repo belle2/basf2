@@ -3587,7 +3587,7 @@ def calculateTrackIsolation(
         reference_list_name=None,
         vars_for_nearest_part=[],
         highest_prob_mass_for_ext=True,
-        exclude_pid_det_weights=True):
+        exclude_pid_det_weights=False):
     """
     Given an input decay string, compute variables that quantify track-based "isolation" of the charged
     stable particles in the decay chain.
@@ -3718,7 +3718,6 @@ def calculateTrackIsolation(
             for d in detectors for d_layer in det_and_layers[d]]
         # Track isolation score.
         trackiso_vars += [f"minET2ETIsoScore({reference_list_name}, {int(highest_prob_mass_for_ext)}, {','.join(detectors)})"]
-
         # Optionally, calculate the input variables for the nearest neighbour in the reference list.
         if vars_for_nearest_part:
             trackiso_vars.extend(

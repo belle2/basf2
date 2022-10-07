@@ -12,10 +12,11 @@
 # @cond
 
 """
-Example script to calculate track isolation variables.
+Example script to calculate isolation variables per particle.
 
-For each particle's track in the input charged stable particle list,
-calculate the minimal distance to the other candidates' tracks at a given detector surface.
+For each particle in the input charged stable particle list,
+calculate the distance to the closest candidate in the reference list at a given detector layer surface.
+The calculation of the distance is based on the particles' track helices extrapolation.
 """
 
 
@@ -27,7 +28,7 @@ def argparser():
     """
 
     import stdCharged as stdc
-    # from modularAnalysis import getAnalysisGlobaltag
+    from modularAnalysis import getAnalysisGlobaltag
 
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawTextHelpFormatter)
@@ -44,13 +45,19 @@ def argparser():
                         nargs="+",
                         default=["CDC", "TOP", "ARICH", "ECL", "KLM"],
                         choices=["CDC", "TOP", "ARICH", "ECL", "KLM"],
-                        help="List of detectors at whose entry surface track isolation variables will be calculated.\n"
+                        help="List of detectors at whose entry surface the isolation variables will be calculated.\n"
                         "Pass a space-separated list of names.\n"
+                        "Default: %(default)s.")
+    parser.add_argument("--use_pid_det_weights",
+                        action="store_true",
+                        default=False,
+                        help="Include the PID detector weights (taken from the CDB) in the isolation score calculation.\n"
                         "Default: %(default)s.")
     parser.add_argument("--global_tag_append",
                         type=str,
                         nargs="+",
-                        default=["binary_pid_det_weights_for_trackiso_release_6"],  # TMP!!!
+                        # default=["binary_pid_det_weights_for_trackiso_release_6"],  # TMP!!!
+                        default=[getAnalysisGlobaltag()],
                         help="List of names of conditions DB global tag(s) to append on top of GT replay.\n"
                         "NB: these GTs will have lowest priority over GT replay.\n"
                         "The order of the sequence passed determines the priority of the GTs, w/ the highest coming first.\n"
@@ -142,7 +149,9 @@ if __name__ == "__main__":
                                                   *args.detectors,
                                                   vars_for_nearest_part=vc.mc_variables,
                                                   # Calculate also the chosen variables for the nearest particle at each layer.
-                                                  reference_list_name=ref)
+                                                  reference_list_name=ref,
+                                                  # Include/exclude the PID detector weights in the score calculation.
+                                                  exclude_pid_det_weights=not args.use_pid_det_weights)
 
     # Variables and aliases for the J/psi candidates.
     variables_jpsi = vc.kinematics + ["daughterDiffOfPhi(0, 1)"]
@@ -189,7 +198,8 @@ if __name__ == "__main__":
                                                     *args.detectors,
                                                     vars_for_nearest_part=vc.mc_variables,
                                                     # Calculate also the chosen variables for the nearest particle at each layer.
-                                                    highest_prob_mass_for_ext=False)
+                                                    highest_prob_mass_for_ext=False,
+                                                    exclude_pid_det_weights=not args.use_pid_det_weights)
 
     # Variables and aliases for the Lambda0 candidates.
     variables_lambda0 = vc.kinematics + ["daughterDiffOfPhi(0, 1)"]

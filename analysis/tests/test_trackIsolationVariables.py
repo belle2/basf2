@@ -42,7 +42,8 @@ for pname, pdgId in zip(pdg.to_names(chargedStableList), chargedStableList):
 
     track_iso_vars = ma.calculateTrackIsolation(plist,
                                                 path,
-                                                *detectors)
+                                                *detectors,
+                                                exclude_pid_det_weights=True)
 
     ma.printVariableValues(plist, track_iso_vars[pdgId], path=path)
     ma.variablesToNtuple(plist,
@@ -61,7 +62,8 @@ for v0_type, v0_function, v0_decay in zip(v0_types, v0_functions, v0_decays):
 
     track_iso_vars = ma.calculateTrackIsolation(v0_type+v0_decay,
                                                 path,
-                                                *detectors)
+                                                *detectors,
+                                                exclude_pid_det_weights=True)
 
     ntup_vars_aliases = []
     for ivars in track_iso_vars.values():

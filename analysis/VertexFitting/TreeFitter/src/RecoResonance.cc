@@ -13,8 +13,16 @@
 
 namespace TreeFitter {
 
-  RecoResonance::RecoResonance(Belle2::Particle* particle, const ParticleBase* mother)
-    : RecoComposite(particle, mother) {}
+  RecoResonance::RecoResonance(Belle2::Particle* particle,
+                               const ParticleBase* mother,
+                               const ConstraintConfiguration& config
+                              ) :
+    RecoComposite(particle, mother, config),
+    m_massconstraint(false)
+  {
+    m_massconstraint = std::find(config.m_massConstraintListPDG.begin(), config.m_massConstraintListPDG.end(),
+                                 std::abs(m_particle->getPDGCode())) != config.m_massConstraintListPDG.end();
+  }
 
   ErrCode RecoResonance::initParticleWithMother([[gnu::unused]] FitParams& fitparams)
   {
@@ -58,5 +66,15 @@ namespace TreeFitter {
   std::string RecoResonance::parname(int index) const
   {
     return ParticleBase::parname(index + 4);
+  }
+
+  void RecoResonance::addToConstraintList(constraintlist& list,
+                                          int depth) const
+  {
+    list.push_back(Constraint(this, Constraint::resonance, depth, dimM()));
+
+    if (m_massconstraint) {
+      list.push_back(Constraint(this, Constraint::mass, depth, 1, 3));
+    }
   }
 }

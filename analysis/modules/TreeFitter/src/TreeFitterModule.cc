@@ -85,6 +85,8 @@ TreeFitterModule::TreeFitterModule() : Module(), m_nCandidatesBeforeFit(-1), m_n
   addParam("inflationFactorCovZ", m_inflationFactorCovZ,
            "Inflate the covariance of the beamspot by this number so that the 3d beam constraint becomes weaker in Z.And: thisnumber->infinity : dim(beamspot constr) 3d->2d.",
            1);
+  addParam("treatAsInvisible", m_treatAsInvisible,
+           "Type::[string]. Decay string to select one particle that will be ignored in the fit.", {});
 }
 
 void TreeFitterModule::initialize()
@@ -99,6 +101,14 @@ void TreeFitterModule::initialize()
       TParticlePDG* particletemp = TDatabasePDG::Instance()->GetParticle((containedParticle).c_str());
       m_massConstraintList.push_back(particletemp->PdgCode());
     }
+  }
+
+  if (!m_treatAsInvisible.empty()) {
+    bool valid = m_pDDescriptorInvisibles.init(m_treatAsInvisible);
+    if (!valid)
+      B2ERROR("TreeFitterModule::initialize Invalid Decay Descriptor: " << m_treatAsInvisible);
+    else if (m_pDDescriptorInvisibles.getSelectionPDGCodes().size() != 1)
+      B2ERROR("TreeFitterModule::please select exactly one particle to ignore: " << m_treatAsInvisible);
   }
 }
 
@@ -117,11 +127,25 @@ void TreeFitterModule::event()
   const unsigned int n = m_plist->getListSize();
   m_nCandidatesBeforeFit += n;
 
+  TMatrixFSym dummyCovMatrix(7);
+  for (int row = 0; row < 7; ++row) { //diag
+    dummyCovMatrix(row, row) = 10000;
+  }
+
   for (unsigned i = 0; i < n; i++) {
     Belle2::Particle* particle = m_plist->getParticle(i);
 
     if (m_updateDaughters == true) {
       ParticleCopy::copyDaughters(particle);
+    }
+
+    if (!m_treatAsInvisible.empty()) {
+      std::vector<const Particle*> selParticlesTarget = m_pDDescriptorInvisibles.getSelectionParticles(particle);
+      Particle* targetD = m_particles[selParticlesTarget[0]->getArrayIndex()];
+      Particle* daughterCopy = Belle2::ParticleCopy::copyParticle(targetD);
+      daughterCopy->writeExtraInfo("treeFitterTreatMeAsInvisible", 1);
+      daughterCopy->setMomentumVertexErrorMatrix(dummyCovMatrix);
+      particle->replaceDaughter(targetD, daughterCopy);
     }
 
     try {

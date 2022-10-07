@@ -1,0 +1,29 @@
+# EventType: 1190001006
+# Descriptor: [B0 -> K*0/omega/rho0/K_10/K'_10/K_2*0/K''*0/Xsd gamma]cc, BFs are taken from DECAY_BELLE2.DEC
+# NickName: Bd_sgamma
+# Documentation: semi-inclusive b -> s gamma
+# Tested: Yes
+# PhysicsWG: TDCPV
+# Responsible: Yuma Uematsu
+# Email: uematsu@hep.phys.s.u-tokyo.ac.jp
+# Cuts: None
+# Date: 20220930
+#
+#
+Decay Upsilon(4S)
+1.000000000   B0sig  anti-B0sig  B0  anti-B0			   VSS_BMIX dm;
+Enddecay
+
+Decay B0sig
+0.000041770   K*0  gamma                                   SVP_HELAMP 1.0 0.0 1.0 0.0; #[BF update - PG 04/2022]
+0.000000440   omega  gamma                                 SVP_HELAMP 1.0 0.0 1.0 0.0; #[BF update - PG 04/2022]
+0.000000860   rho0  gamma                                  SVP_HELAMP 1.0 0.0 1.0 0.;  #[BF update - PG 04/2022]
+0.000043000   K_10  gamma                                  SVP_HELAMP 1.0 0.0 1.0 0.0; #Upper limit is 5.8e-5. #[Comment - PG 04/2022]
+0.000006500   K'_10  gamma                                 SVP_HELAMP 1.0 0.0 1.0 0.0; #Upper limit is 1.2e-6. #[Comment - PG 04/2022]
+0.000012370   K_2*0  gamma                                 HELAMP 1.0 0.0 1.0 0.0;     #[BF update - PG 04/2022]
+0.000001700   K''*0  gamma                                 SVP_HELAMP 1.0 0.0 1.0 0.0; #Upper limit is 2e-3. #[Comment - PG 04/2022]
+0.000242360   Xsd  gamma                                   BTOXSGAMMA 2 ;              #BF = 3.49e-4 - Sum of exclusive b -> s gamma modes. #[PDG2022]
+Enddecay
+CDecay anti-B0sig
+
+End

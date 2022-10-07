@@ -1289,7 +1289,7 @@ The definition is based on the track helices extrapolation.
   if 0, it is assumed the mass hypothesis matching the particle lists' PDG was used.
 
 .. note::
-    This variable requires to run the ``TrackIsolation`` module first.
+    This variable requires to run the ``TrackIsoCalculator`` module first.
     Note that the choice of input parameters of this metafunction must correspond to the settings used to configure the module!
 )DOC",
 			  Manager::VariableDataType::c_double);
@@ -1303,20 +1303,20 @@ The definition is based on the track helices extrapolation.
 * The fourth argument is a variable name, e.g. `nCDCHits`.
 
 .. note::
-    This variable requires to run the ``TrackIsolation`` module first.
+    This variable requires to run the ``TrackIsoCalculator`` module first.
     Note that the choice of input parameters of this metafunction must correspond to the settings used to configure the module!
 )DOC",
 			  Manager::VariableDataType::c_double);
 
     REGISTER_METAVARIABLE("minET2ETIsoScore(referenceListName, useHighestProbMassForExt, detectorList)", particleExtTrkIsoScoreVar,
 			  R"DOC(Returns the particle's isolation score based on:
-* The number of detector layers where a close-enough neighbour to this particle is found, according to the distance definition of `minET2ETDist` and a set of thresholds defined in the ``TrackIsolation`` module.
+* The number of detector layers where a close-enough neighbour to this particle is found, according to the distance definition of `minET2ETDist` and a set of thresholds defined in the ``TrackIsoCalculator`` module.
 * A set of per-detector weights quantifying the impact of each detector on the PID for this particle type.
 
 The score is normalised in [0, 1], where values closer to 1 indicates a well-isolated particle.
 
 .. note::
-    The detector weights are considered for the score definition only if ``excludePIDDetWeights=false`` in the ``TrackIsolation`` module configuration.
+    The detector weights are considered for the score definition only if ``excludePIDDetWeights=false`` in the ``TrackIsoCalculator`` module configuration.
 
 * The first argument is the reference particle list name used to search for the nearest neighbour.
 * The second argument is an integer ("boolean") flag: if 1, it is assumed the extrapolation was done with the most probable mass hypothesis for the track fit;
@@ -1324,7 +1324,7 @@ The score is normalised in [0, 1], where values closer to 1 indicates a well-iso
 * The remaining arguments are a comma-separated list of detector names. At least one must be chosen among {CDC, TOP, ARICH, ECL, KLM}.
 
 .. note::
-    This variable requires to run the ``TrackIsolation`` module first.
+    This variable requires to run the ``TrackIsoCalculator`` module first.
     Note that the choice of input parameters of this metafunction must correspond to the settings used to configure the module!
 )DOC",
 			  Manager::VariableDataType::c_double);

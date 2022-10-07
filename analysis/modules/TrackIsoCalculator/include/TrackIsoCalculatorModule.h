@@ -244,22 +244,23 @@ namespace Belle2 {
      * Calculate the distance between the points where the two input
      * extrapolated track helices cross the given detector layer's cylindrical surface.
      */
-    double getDistAtDetSurface(const Particle* iParticle, const Particle* jParticle, const std::string& detLayerName);
+    double getDistAtDetSurface(const Particle* iParticle, const Particle* jParticle, const std::string& detLayerName) const;
 
     /**
      * Define a semi-continuous variable to quantify the isolation of a standard charged particle
-     in the given detector with $N$ layers.
-     * The definition is based on the counting of layers $n$ where a nearby track extrapolated helix is found,
-     * as well as on the weight that each sub-detector has on the PID for the given particle hypothesis:
+     * in the given detector \f$d\f$ with \f$N_{d}\f$ layers in total.
+     * The definition of the score is based on the counting of layers \f$n_{d}\f$ where a close-enough particle is found,
+     * and also (if `m_excludePIDDetWeights = true`) on the weight \f$w_{d}\f$ that each sub-detector
+     * has on the PID of the given particle hypothesis:
 
-     s = 1 - (-w * (n/N))
+     \f{equation}{
+       s_{d} = 1 - \left(-w_{d} \cdot \frac{n_{d}}{N_{d}} \right).
+     \f}
 
-     * The distance to closest track helix extrapolation defined in getDistAtDetSurface is used,
-     * taking thresholds from the CDB payload.
-     *
-     * Note that the PID detector weighting can be optionally switched off, namely, w is set to 1.
+     * The distance to closest track helix extrapolation defined in `double getDistAtDetSurface()` is used.
+     * Note that if the PID detector weighting is switched off, \f$w_{d} = 1\f$.
      */
-    double getIsoScore(const Particle* iParticle);
+    double getIsoScore(const Particle* iParticle) const;
 
     /**
      * Get the threshold value per detctor layer for the distance to closest ext. helix
@@ -281,10 +282,7 @@ namespace Belle2 {
     /**
      * Get the enum type for this detector name.
      */
-    /**
-     * The enum type of the detector.
-     */
-    Const::EDetector getDetEnum(const std::string& detName)
+    Const::EDetector getDetEnum(const std::string& detName) const
     {
 
       if (detName == "CDC") return Const::CDC;

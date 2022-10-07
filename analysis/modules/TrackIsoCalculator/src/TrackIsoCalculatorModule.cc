@@ -293,7 +293,7 @@ void TrackIsoCalculatorModule::event()
 }
 
 
-double TrackIsoCalculatorModule::getIsoScore(const Particle* iParticle)
+double TrackIsoCalculatorModule::getIsoScore(const Particle* iParticle) const
 {
 
   auto hypo = Const::ChargedStable(std::abs(iParticle->getPDGCode()));
@@ -311,9 +311,9 @@ double TrackIsoCalculatorModule::getIsoScore(const Particle* iParticle)
   }
 
   unsigned int n(0);
-  for (const auto& iLayer : m_detToLayers[m_detName]) {
+  for (const auto& iLayer : m_detToLayers.at(m_detName)) {
     auto iDetLayer = m_detName + std::to_string(iLayer);
-    auto distVar = m_detLayerToDistVariable[iDetLayer];
+    auto distVar = m_detLayerToDistVariable.at(iDetLayer);
     auto threshDist = this->getDistThreshold(det, iLayer);
     if (iParticle->hasExtraInfo(distVar)) {
       if (iParticle->getExtraInfo(distVar) < threshDist) {
@@ -333,18 +333,18 @@ double TrackIsoCalculatorModule::getIsoScore(const Particle* iParticle)
 
 double TrackIsoCalculatorModule::getDistAtDetSurface(const Particle* iParticle,
                                                      const Particle* jParticle,
-                                                     const std::string& detLayerName)
+                                                     const std::string& detLayerName) const
 {
 
   // Radius and z boundaries of the cylinder describing this detector's surface.
-  const auto rho = m_detLayerToSurfBoundaries[detLayerName].m_rho;
-  const auto zfwd = m_detLayerToSurfBoundaries[detLayerName].m_zfwd;
-  const auto zbwd = m_detLayerToSurfBoundaries[detLayerName].m_zbwd;
+  const auto rho = m_detLayerToSurfBoundaries.at(detLayerName).m_rho;
+  const auto zfwd = m_detLayerToSurfBoundaries.at(detLayerName).m_zfwd;
+  const auto zbwd = m_detLayerToSurfBoundaries.at(detLayerName).m_zbwd;
   // Polar angle boundaries between barrel and endcaps.
-  const auto th_fwd = m_detLayerToSurfBoundaries[detLayerName].m_th_fwd;
-  const auto th_fwd_brl = m_detLayerToSurfBoundaries[detLayerName].m_th_fwd_brl;
-  const auto th_bwd_brl = m_detLayerToSurfBoundaries[detLayerName].m_th_bwd_brl;
-  const auto th_bwd = m_detLayerToSurfBoundaries[detLayerName].m_th_bwd;
+  const auto th_fwd = m_detLayerToSurfBoundaries.at(detLayerName).m_th_fwd;
+  const auto th_fwd_brl = m_detLayerToSurfBoundaries.at(detLayerName).m_th_fwd_brl;
+  const auto th_bwd_brl = m_detLayerToSurfBoundaries.at(detLayerName).m_th_bwd_brl;
+  const auto th_bwd = m_detLayerToSurfBoundaries.at(detLayerName).m_th_bwd;
 
   std::string nameExtTheta = "helixExtTheta(" + std::to_string(rho) + "," + std::to_string(zfwd) + "," + std::to_string(zbwd) + ")";
   if (m_useHighestProbMassForExt) {

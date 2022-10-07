@@ -179,6 +179,27 @@ namespace Belle2 {
     };
 
     /**
+     * Threshold values for the distance (in [cm]) to closest ext. helix to define isolated particles.
+     * One for each detector layer.
+     */
+    std::map<std::pair<std::string, int>, double> m_distThreshPerDetLayer = {
+      { {Const::parseDetectors(Const::CDC), 0}, 5.0 },
+      { {Const::parseDetectors(Const::CDC), 1}, 5.0 },
+      { {Const::parseDetectors(Const::CDC), 2}, 5.0 },
+      { {Const::parseDetectors(Const::CDC), 3}, 5.0 },
+      { {Const::parseDetectors(Const::CDC), 4}, 5.0 },
+      { {Const::parseDetectors(Const::CDC), 5}, 5.0 },
+      { {Const::parseDetectors(Const::CDC), 6}, 5.0 },
+      { {Const::parseDetectors(Const::CDC), 7}, 5.0 },
+      { {Const::parseDetectors(Const::CDC), 8}, 5.0 },
+      { {Const::parseDetectors(Const::TOP), 0}, 22.0 },
+      { {Const::parseDetectors(Const::ARICH), 0}, 10.0 },
+      { {Const::parseDetectors(Const::ECL), 0}, 36.0 },
+      { {Const::parseDetectors(Const::ECL), 1}, 36.0 },
+      { {Const::parseDetectors(Const::KLM), 0}, 20.0 }
+    };
+
+    /**
      * The event information. Used for debugging purposes.
      */
     StoreObjPtr<EventMetaData> m_event_metadata;
@@ -239,6 +260,18 @@ namespace Belle2 {
      * Note that the PID detector weighting can be optionally switched off, namely, w is set to 1.
      */
     double getIsoScore(const Particle* iParticle);
+
+    /**
+     * Get the threshold value per detctor layer for the distance to closest ext. helix
+     * that is used to define locally isolated particles at that layer.
+     * @param det the input PID detector.
+     * @param layer the input detector layer.
+     */
+    double getDistThreshold(Const::EDetector det, int layer) const
+    {
+      auto detAndLayer = std::make_pair(Const::parseDetectors(det), layer);
+      return m_distThreshPerDetLayer.at(detAndLayer);
+    };
 
     /**
      * Check whether input particle list and reference list are of a valid charged stable particle.

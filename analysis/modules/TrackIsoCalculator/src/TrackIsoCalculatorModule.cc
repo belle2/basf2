@@ -56,7 +56,9 @@ void TrackIsoCalculatorModule::initialize()
 {
   m_event_metadata.isRequired();
 
-  m_DBWeights = std::make_unique<DBObjPtr<PIDDetectorWeights>>(m_payloadName);
+  if (!m_excludePIDDetWeights) {
+    m_DBWeights = std::make_unique<DBObjPtr<PIDDetectorWeights>>(m_payloadName);
+  }
 
   bool valid = m_decaydescriptor.init(m_decayString);
   if (!valid) {
@@ -299,27 +301,29 @@ double TrackIsoCalculatorModule::getIsoScore(const Particle* iParticle)
   auto p = iParticle->getP();
   auto theta = std::get<double>(Variable::Manager::Instance().getVariable("theta")->function(iParticle));
 
-  auto detWeight = (*m_DBWeights.get())->getWeight(hypo, det, p, theta);
-
-  // If w < 0, the detector has detrimental impact on PID:
-  // set the value is set to zero to prevent the detector from contributing to the score.
-  // NB: NaN should stay NaN.
-  detWeight = (detWeight < 0 || std::isnan(detWeight)) ? detWeight : 0.0;
-
-  if (m_excludePIDDetWeights) {
-    detWeight = 1.;
+  double detWeight(1.0);
+  if (!m_excludePIDDetWeights) {
+    detWeight = (*m_DBWeights.get())->getWeight(hypo, det, p, theta);
+    // If w < 0, the detector has detrimental impact on PID:
+    // set the value is set to zero to prevent the detector from contributing to the score.
+    // NB: NaN should stay NaN.
+    detWeight = (detWeight < 0 || std::isnan(detWeight)) ? detWeight : 0.0;
   }
 
   unsigned int n(0);
   for (const auto& iLayer : m_detToLayers[m_detName]) {
     auto iDetLayer = m_detName + std::to_string(iLayer);
     auto distVar = m_detLayerToDistVariable[iDetLayer];
-    auto threshDist = (*m_DBWeights.get())->getDistThreshold(det, iLayer);
+    auto threshDist = this->getDistThreshold(det, iLayer);
     if (iParticle->hasExtraInfo(distVar)) {
       if (iParticle->getExtraInfo(distVar) < threshDist) {
         n++;
       }
     }
+  }
+
+  if (!n) {
+    B2WARNING("No close-enough neighbours to this particle in the " << m_detName << " were found");
   }
 
   return 1. - (-detWeight * (n / m_nLayers));

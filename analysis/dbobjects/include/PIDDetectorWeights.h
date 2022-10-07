@@ -34,38 +34,35 @@ namespace Belle2 {
      */
     class WeightsTable {
     public:
-      /** Default constructor */
+
       WeightsTable() :
         m_isEmpty(false),
         m_nPBins(0),
         m_nThetaBins(0)
-      {};
+      {}; /**< Default constructor */
 
-      /** Flag to indicate whether the internal containers wwere filled. */
-      bool m_isEmpty;
+      bool m_isEmpty; /**< * Flag to indicate whether the internal containers wwere filled. */
 
-      /** Set of p bins edges. */
-      std::set<double> m_pBinEdges;
-      /** * Set of theta bins edges. */
-      std::set<double> m_thetaBinEdges;
+      std::set<double> m_pBinEdges; /**< Set of p bins edges. */
+      std::set<double> m_thetaBinEdges; /**< Set of theta bins edges. */
 
-      /** Number of p bins. */
-      int m_nPBins;
-      /** Number of theta bins. */
-      int m_nThetaBins;
+      int m_nPBins; /**< Number of p bins. */
+      int m_nThetaBins; /**< Number of theta bins. */
 
-      /** Map the linearised index of the (p, theta) bin indexes to the row index in the (filtered) table.
-      * Used for fast lookup in the event loop.
+      /**
+       * Map the linearised index of the (p, theta) bin indexes to the row index in the (filtered) table.
+       * Used for fast lookup in the event loop.
       */
       std::unordered_map<double, unsigned int> m_linBinIdxsToRowIdxs;
-      /** Vector of weights, one for each detector.
+      /**
+       * Map each detector to its vector of weights.
        * By construction, the size of each vector is equal to the number of rows in the (filtered) table.
        */
       std::map<std::string, std::vector<double>> m_weightsPerDet;
 
     private:
 
-      ClassDef(WeightsTable, 1); /** Needed for sub-class schema evolution. */
+      ClassDef(WeightsTable, 1); /**< Needed for sub-class schema evolution. */
     };
 
     /**
@@ -92,7 +89,7 @@ namespace Belle2 {
 
     /**
      * Constructor from ROOT file w/ TTree of weights.
-     * @param  weightROOTFileName the path to the ROOT file containing the TTree w/ detector weights per std charged particle hypothesis,
+     * @param  weightsROOTFileName the path to the ROOT file containing the TTree w/ detector weights per std charged particle hypothesis,
      * in bins of p and theta.
     */
     PIDDetectorWeights(const std::string& treeName, const std::string& weightsROOTFileName) :
@@ -102,37 +99,12 @@ namespace Belle2 {
     };
 
     /**
-     * Override the threshold value per detctor layer for the distance to closest ext. helix
-     * that is used to define locally isolated particles at that layer.
-     * @param det the input PID detector.
-     * @param layer the input detector layer.
-     * @param thresh the distance threshold in [cm].
-     */
-    void setDistThreshold(Const::EDetector det, const int layer, const double thresh)
-    {
-      auto detAndLayer = std::make_pair(Const::parseDetectors(det), layer);
-      m_distThreshPerDetLayer[detAndLayer] = thresh;
-    };
-
-    /**
      * Get the RDataFrame of detector weights.
      * To be used for testing/debugging only when creating the payload.
      */
     ROOT::RDataFrame getWeightsRDF() const
     {
       return m_weightsRDataFrame;
-    };
-
-    /**
-     * Get the threshold value per detctor layer for the distance to closest ext. helix
-     * that is used to define locally isolated particles at that layer.
-     * @param det the input PID detector.
-     * @param layer the input detector layer.
-     */
-    double getDistThreshold(Const::EDetector det, int layer) const
-    {
-      auto detAndLayer = std::make_pair(Const::parseDetectors(det), layer);
-      return m_distThreshPerDetLayer.at(detAndLayer);
     };
 
     /**
@@ -160,27 +132,6 @@ namespace Belle2 {
     ROOT::RDataFrame m_weightsRDataFrame = ROOT::RDataFrame(1); //!
 
     /**
-     * Threshold values for the distance (in [cm]) to closest ext. helix to define isolated particles.
-     * One for each detector layer.
-     */
-    std::map<std::pair<std::string, int>, double> m_distThreshPerDetLayer = {
-      { {Const::parseDetectors(Const::CDC), 0}, 5.0 },
-      { {Const::parseDetectors(Const::CDC), 1}, 5.0 },
-      { {Const::parseDetectors(Const::CDC), 2}, 5.0 },
-      { {Const::parseDetectors(Const::CDC), 3}, 5.0 },
-      { {Const::parseDetectors(Const::CDC), 4}, 5.0 },
-      { {Const::parseDetectors(Const::CDC), 5}, 5.0 },
-      { {Const::parseDetectors(Const::CDC), 6}, 5.0 },
-      { {Const::parseDetectors(Const::CDC), 7}, 5.0 },
-      { {Const::parseDetectors(Const::CDC), 8}, 5.0 },
-      { {Const::parseDetectors(Const::TOP), 0}, 22.0 },
-      { {Const::parseDetectors(Const::ARICH), 0}, 10.0 },
-      { {Const::parseDetectors(Const::ECL), 0}, 36.0 },
-      { {Const::parseDetectors(Const::ECL), 1}, 36.0 },
-      { {Const::parseDetectors(Const::KLM), 0}, 20.0 }
-    };
-
-    /**
      * The names of the per-detector weight columns in the RDataFrame
      */
     std::map<std::string, std::string> m_weightNames = {
@@ -196,8 +147,7 @@ namespace Belle2 {
      */
     void fillWeightsTablePerHypoFromRDF();
 
-
-    ClassDef(PIDDetectorWeights, 3); /**< ClassDef as this is a TObject */
+    ClassDef(PIDDetectorWeights, 4); /**< ClassDef as this is a TObject */
 
   };
 

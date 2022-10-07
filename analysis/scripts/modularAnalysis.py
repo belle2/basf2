@@ -3586,16 +3586,16 @@ def calculateTrackIsolation(
         *detectors,
         reference_list_name=None,
         vars_for_nearest_part=[],
-        highest_prob_mass_for_ext=True):
+        highest_prob_mass_for_ext=True,
+        exclude_pid_det_weights=True):
     """
     Given an input decay string, compute variables that quantify track-based "isolation" of the charged
     stable particles in the decay chain.
 
     Note:
         An "isolation score" can be defined using the distance
-        of each particle's track to its closest neighbour, defined as the segment connecting the two tracks
-        intersection points on a given cylindrical surface.
-        The calculation relies on track helices extrapolation.
+        of each particle to its closest neighbour, defined as the segment connecting the two
+        extrapolated track helices intersection points on a given cylindrical surface.
         The distance variables defined in the `VariableManager` is named `minET2ETDist`,
         the isolation scores are named `minET2ETIsoScore`.
 
@@ -3642,6 +3642,9 @@ def calculateTrackIsolation(
                                                     probable mass hypothesis, namely, the one that gives the highest
                                                     chi2Prob of the fit. Otherwise, it uses the mass hypothesis that
                                                     corresponds to the particle lists PDG.
+        exclude_pid_det_weights (Optional[bool]): if this option is set to False (default), the isolation score
+                                                  calculation will take into account the weight that each detector has on the PID
+                                                  for the particle species of interest.
 
     Returns:
         dict(int, list(str)): a dictionary mapping the PDG code of each reference particle list
@@ -3703,7 +3706,8 @@ def calculateTrackIsolation(
                                        decayString=processed_dec,
                                        detectorName=det,
                                        particleListReference=reference_list_name,
-                                       useHighestProbMassForExt=highest_prob_mass_for_ext)
+                                       useHighestProbMassForExt=highest_prob_mass_for_ext,
+                                       excludePIDDetWeights=exclude_pid_det_weights)
             trackiso.set_name(f"TrackIsoCalculator{det}_{processed_dec}_VS_{reference_list_name}")
 
         # Metavariables for the distances to the closest reference tracks at each detector surface.

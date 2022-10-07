@@ -161,11 +161,6 @@ namespace Belle2 {
 
     PIDDetectorWeights dbrep("tree", m_dummyFile);
 
-    // Test for correct overriding of distance thresholds.
-    auto newThresh = 30.;
-    dbrep.setDistThreshold(m_detector, m_layer, newThresh);
-    EXPECT_EQ(newThresh, dbrep.getDistThreshold(m_detector, m_layer));
-
     // Test for correct filling of the RDataFrame.
     auto pdgIds = dbrep.getWeightsRDF().Take<double>("pdgId").GetValue();
     for (const auto& pdgId : pdgIds) {

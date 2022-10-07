@@ -131,12 +131,13 @@ namespace Belle2 {
     /**
      * Returns reconstructed absolute bunch number within the ring
      * @param offset offset [RF clock ticks] (to be calibrated)
+     * @param RFBucketsPerRevolution number of RF buckets per beam revolution
      * @return bunch number w.r.t revolution marker
      */
-    int getAbsoluteBunchNo(int offset) const
+    int getAbsoluteBunchNo(int offset, unsigned RFBucketsPerRevolution = 5120) const
     {
-      int bn = (m_recBunchNo + m_revo9Counter * 4 - offset) % 5120;
-      if (bn < 0) bn += 5120;
+      int bn = (m_recBunchNo + m_revo9Counter * 4 - offset) % RFBucketsPerRevolution;
+      if (bn < 0) bn += RFBucketsPerRevolution;
       return bn;
     }
 

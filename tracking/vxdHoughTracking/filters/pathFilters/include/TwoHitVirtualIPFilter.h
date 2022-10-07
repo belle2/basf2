@@ -21,8 +21,8 @@ namespace Belle2 {
     class TwoHitVirtualIPFilter : public BasePathFilter {
     public:
       /// Return the weight based on the ThreeHitVariables.
-      /// Returns NAN if m_threeHitVariables.getCosAngleRZSimple() of the hit triplet is smaller than m_param_cosRZCut
-      /// Returns NAN if m_threeHitVariables.getCircleDistanceIP() of the hit triplet is larger than m_param_circleIPDistanceCut
+      /// Returns NAN if m_threeHitVariables.getCosAngleRZSimple() of the hit triplet is smaller than m_cosRZCut
+      /// Returns NAN if m_threeHitVariables.getCircleDistanceIP() of the hit triplet is larger than m_circleIPDistanceCut
       /// Returns 1/m_threeHitVariables.getCircleDistanceIP() else
       TrackFindingCDC::Weight operator()(const BasePathFilter::Object& pair) override;
       /// Expose the parameters.
@@ -35,10 +35,10 @@ namespace Belle2 {
       /// virtual IP vector
       B2Vector3D m_virtualIPPosition;
       /// cut for cosine in RZ between the two vectors (oHit - cHit) and (cHit - iHit)
-      double m_param_cosRZCut = 0.95;
+      double m_cosRZCut = 0.95;
       /// cut on the difference between circle radius and circle center position in the x-y plane
       /// to check if the track is compatible with passing through the IP
-      double m_param_circleIPDistanceCut = 2.0;
+      double m_circleIPDistanceCut = 2.0;
 
       /// Construct empty ThreeHitVariables instance
       ThreeHitVariables m_threeHitVariables;

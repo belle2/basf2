@@ -82,8 +82,8 @@ namespace Belle2 {
 
     m_tree->Branch("charge", &m_arich.charge, "charge/S");
     m_tree->Branch("pValue", &m_arich.pValue, "pValue/F");
-    m_tree->Branch("d0", &m_arich.z0, "pValue/F");
-    m_tree->Branch("z0", &m_arich.d0, "pValue/F");
+    m_tree->Branch("d0", &m_arich.z0, "d0/F");
+    m_tree->Branch("z0", &m_arich.d0, "z0/F");
 
 #ifdef ALIGNMENT_USING_BHABHA
     m_tree->Branch("eop", &m_arich.eop, "eop/F");

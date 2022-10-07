@@ -66,6 +66,7 @@ add_reconstruction(main)
 # memory profile
 main.add_module(register_module("Profile"))
 
+main.add_module('Progress')
 # do not output to save storage space
 process(main)
 

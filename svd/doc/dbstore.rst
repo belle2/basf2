@@ -47,6 +47,27 @@ In simulation, sensors are grouped by type (L3, origami, backward, forward) and 
 
 Check `ChargeSimulation@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDChargeSimulationCalibrations&perpage=25&>`_ all revisions available in the Conditions Database. Revision **4** is used for experiment 0 and 1003.
 
+
+.. _svdfudgeposition:
+
+.. cpp:class:: SVDMCClusterPositionFudgeFactor
+
+	       Parameter to fudge position reconstruction in simulation, to match resolution measured in data, with sensor-side granularity_:
+
+	       #. fudge factor: width of the gaussian from which we draw a random number to be added to the reconstructed cluster position, depends on the track incident angle
+
+Check `MCPositionFudge@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDMCClusterPositionFudgeFactor&perpage=25&>`_ all revisions available in the Conditions Database. Revision **5** is used for experiment 0 and 1003.
+
+.. _svdfudgetime:
+
+.. cpp:class:: SVDMCClusterTimeFudgeFactor
+
+	       Parameter to fudge time reconstruction in simulation, to match resolution measured in data, with sensor-side granularity_:
+
+	       #. fudge factor: width of the gaussian from which we draw a random number to be added to the reconstructed cluster time
+
+Check `MCTimeFudge@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDMCClusterTimeFudgeFactor&perpage=25&>`_ all revisions available in the Conditions Database. Revision **3** is used for experiment 0 and 1003, and run-dependent MC.
+
 The local calibrations wrappers  :ref:`SVDNoiseCalibrations<svdnoisecal>`, :ref:`SVDPulseShapeCalibrations<svdpulsecal>` and :ref:`SVDFADCMaskedStrips<svdmaskedcal>` are also used in the digitizer.
 
 Local Calibrations
@@ -103,7 +124,7 @@ Reconstruction Calibrations
 
 	       Stores the position error formulas for the ``CoGOnly`` algorithm, with the same granularity_ as simulation objects
 
-Check `CoGOnlyErr@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDCoGOnlyPositionError&perpage=25&>`_ all revisions available in the Conditions Database.  Revision **2** is used for exp 0, 1003 and data reconstruction.
+Check `CoGOnlyErr@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDCoGOnlyPositionError&perpage=25&>`_ all revisions available in the Conditions Database.  Revision **5** is used for exp 0, 1003 and data reconstruction.
 
 .. _svdcogonlycal:
 
@@ -112,6 +133,7 @@ Check `CoGOnlyErr@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDCoGOnlyPosit
 	       Stores the position error scaling factors for the ``CoGOnly`` algorithm, with the same granularity_ as simulation objects
 
 Check `CoGOnlySF@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDCoGOnlyErrorScaleFactors&perpage=25&>`_ all revisions available in the Conditions Database. Revision **2** (scale factors = 1) is used for exp 0, 1003 and data reconstruction.
+While revision **6** (scale factors != 1) is used for data.
 
 .. _svdolddefaultcal:
 

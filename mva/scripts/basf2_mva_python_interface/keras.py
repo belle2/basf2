@@ -14,6 +14,7 @@ from tensorflow.keras.layers import Dense, Input
 from tensorflow.keras.models import Model, load_model
 from tensorflow.keras.losses import binary_crossentropy
 import tensorflow as tf
+from basf2 import B2WARNING
 
 
 class State(object):
@@ -95,17 +96,25 @@ def apply(state, X):
     return np.require(r, dtype=np.float32, requirements=['A', 'W', 'C', 'O'])
 
 
-def begin_fit(state, Xtest, Stest, ytest, wtest):
+def begin_fit(state, Xtest, Stest, ytest, wtest, nBatches):
     """
     Returns just the state object
     """
     return state
 
 
-def partial_fit(state, X, S, y, w, epoch):
+def partial_fit(state, X, S, y, w, epoch, batch):
     """
     Pass received data to tensorflow.keras session
     """
+    if epoch > 0:
+        B2WARNING("The keras training interface has been called with specific_options.m_nIterations > 1."
+                  " In the default implementation this should not be done as keras handles the number of epochs internally.")
+
+    if batch > 0:
+        B2WARNING("The keras training interface has been called with specific_options.m_mini_batch_size > 1."
+                  " In the default implementation this should not be done as keras handles the number of batches internally.")
+
     state.model.fit(X, y, batch_size=100, epochs=10)
     return False
 

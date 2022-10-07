@@ -12,7 +12,6 @@
 #include <framework/geometry/B2Vector3.h>
 #include <cmath>
 using namespace Belle2;
-using namespace std;
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -29,8 +28,8 @@ SVDEventT0EstimatorModule::SVDEventT0EstimatorModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified);
 
   //* Definition of input parameters */
-  addParam("RecoTracks", m_recoTracksName, "Name of the StoreArray with the input RecoTracks", string(""));
-  addParam("EventT0", m_eventT0Name, "Name of the StoreObjPtr with the input EventT0", string(""));
+  addParam("RecoTracks", m_recoTracksName, "Name of the StoreArray with the input RecoTracks", std::string(""));
+  addParam("EventT0", m_eventT0Name, "Name of the StoreObjPtr with the input EventT0", std::string(""));
   addParam("ptMinSelection", m_ptSelection, "Cut on minimum transverse momentum pt for RecoTrack selection", m_ptSelection);
   addParam("absPzMinSelection", m_absPzSelection,
            "Cut on minimum absolute value of the longitudinal momentum, abs(pz), for RecoTrack selection",
@@ -57,33 +56,43 @@ void SVDEventT0EstimatorModule::initialize()
 void SVDEventT0EstimatorModule::event()
 {
 
-  double evtT0 = NAN;
-  double evtT0_err = NAN;
-  double clsTime_sum = 0;
-  double clsTime_err_sum = 0;
-  double quality = NAN;
-  int N_cls = 0;
+  double evtT0 = std::numeric_limits<double>::quiet_NaN();
+  double evtT0Err = std::numeric_limits<double>::quiet_NaN();
+  double clsTimeSum = 0;
+  double clsTimeErrSum = 0;
+  double quality = std::numeric_limits<double>::quiet_NaN();
+  int numberOfSVDClusters = 0;
 
   // loop on recotracks
   for (const auto& recoTrack : m_recoTracks) {
     const B2Vector3D& p = recoTrack.getMomentumSeed();
     if (p.Perp() < m_ptSelection || std::fabs(p.Z()) < m_absPzSelection) continue;
-    const vector<SVDCluster* >& svdClusters = recoTrack.getSVDHitList();
+    const std::vector<SVDCluster* >& svdClusters = recoTrack.getSVDHitList();
     B2DEBUG(20, "FITTED TRACK:   NUMBER OF SVD HITS = " << svdClusters.size());
     for (const SVDCluster* svdCluster : svdClusters) {
-      clsTime_sum += svdCluster->getClsTime();
-      clsTime_err_sum += (svdCluster->getClsTimeSigma() * svdCluster->getClsTimeSigma());
+      clsTimeSum += svdCluster->getClsTime();
+      clsTimeErrSum += (svdCluster->getClsTimeSigma() * svdCluster->getClsTimeSigma());
     }
-    N_cls += svdClusters.size();
+    numberOfSVDClusters += svdClusters.size();
   }
-  if (N_cls > 1) {
-    quality = N_cls;
-    evtT0 = clsTime_sum / N_cls;
-    evtT0_err = std::sqrt(clsTime_err_sum / (N_cls * (N_cls - 1)));
-  }
-  EventT0::EventT0Component evtT0_comp(evtT0, evtT0_err, Const::SVD, m_algorithm, quality);
-  if (m_eventT0.isValid()) {
-    m_eventT0->addTemporaryEventT0(evtT0_comp);
-    m_eventT0->setEventT0(evtT0_comp);
-  }
+  // do nothing if no clusters associated to tracks, or if EventT0 is not valid
+  if ((numberOfSVDClusters == 0) || !(m_eventT0.isValid()))
+    return;
+
+  // otherwise, eventT0 is the average of cluster times
+  // using clusters associated to selected tracks
+  evtT0 = clsTimeSum / numberOfSVDClusters;
+  quality = numberOfSVDClusters;
+
+  // now compute the error
+  if (numberOfSVDClusters > 1)
+    evtT0Err = std::sqrt(clsTimeErrSum / (numberOfSVDClusters * (numberOfSVDClusters - 1)));
+  else
+    evtT0Err = std::sqrt(clsTimeErrSum);
+
+  // and finally set a temporary EventT0
+  EventT0::EventT0Component evtT0Component(evtT0, evtT0Err, Const::SVD, m_algorithm, quality);
+  m_eventT0->addTemporaryEventT0(evtT0Component);
+  m_eventT0->setEventT0(evtT0Component);
+
 }

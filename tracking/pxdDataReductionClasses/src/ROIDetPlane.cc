@@ -13,7 +13,6 @@
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;
-using namespace std;
 
 
 ROIDetPlane::ROIDetPlane(const VxdID& vxdID) : ROIDetPlane(vxdID, 10.0, 0.4999999 * M_PI)

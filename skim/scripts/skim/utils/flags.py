@@ -36,8 +36,8 @@ class InitialiseSkimFlag(b2.Module):
             skims (skim.core.BaseSkim): Skim to initialise event flag for.
         """
 
-        from variables import variables as vm
-        from ROOT import Belle2
+        from ROOT import Belle2  # noqa
+        from variables import variables as vm  # noqa
 
         super().__init__()
         self.skims = skims
@@ -58,7 +58,6 @@ class InitialiseSkimFlag(b2.Module):
         """
         Initialise flags to zero.
         """
-
         self.EventExtraInfo.create()
         for skim in self.skims:
             self.EventExtraInfo.addExtraInfo(skim.flag, 0)
@@ -84,37 +83,37 @@ class UpdateSkimFlag(b2.Module):
             skim (skim.core.BaseSkim): Skim to update event flag for.
         """
 
-        from ROOT import Belle2
+        from ROOT import Belle2  # noqa
 
         super().__init__()
         self.skim = skim
         self.EventExtraInfo = Belle2.PyStoreObj("EventExtraInfo")
+        self.ListObjects = []
 
     def initialize(self):
         """
-        Check EventExtraInfo has been registered previously. This registration should be
-        done by InitialiseSkimFlag.
+        Check EventExtraInfo and all the necessary ParticleLists have been registered previously.
+        The registration of EventExtraInfo should be done by InitialiseSkimFlag.
         """
+        from ROOT import Belle2  # noqa
+
         self.EventExtraInfo.isRequired()
+        self.ListObjects = [Belle2.PyStoreObj(lst) for lst in self.skim.SkimLists]
+        for ListObject in self.ListObjects:
+            ListObject.isRequired()
 
     def event(self):
         """
         Check if at least one skim list is non-empty; if so, update the skim flag to 1.
         """
+        flag = 0
+        for ListObject in self.ListObjects:
+            if not ListObject.isValid():
+                b2.B2FATAL(
+                    f"Error in UpdateSkimFlag for {self.skim}: particle lists not built. "
+                    "Did you add this module to the pre-skim path rather than the post-skim path?"
+                )
+            elif ListObject.getListSize() > 0:
+                flag = 1
 
-        from ROOT import Belle2
-
-        ListObjects = [Belle2.PyStoreObj(lst) for lst in self.skim.SkimLists]
-
-        # Check required skim lists have been built on this path
-        if any([not ListObj.isValid() for ListObj in ListObjects]):
-            b2.B2FATAL(
-                f"Error in UpdateSkimFlag for {self.skim}: particle lists not built. "
-                "Did you add this module to the pre-skim path rather than the post-skim path?"
-            )
-
-        nCandidates = sum(ListObj.getListSize() for ListObj in ListObjects)
-
-        # Override ExtraInfo flag if at least one candidate from any list passed
-        if nCandidates > 0:
-            self.EventExtraInfo.setExtraInfo(self.skim.flag, 1)
+        self.EventExtraInfo.setExtraInfo(self.skim.flag, flag)

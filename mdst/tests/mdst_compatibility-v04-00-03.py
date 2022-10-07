@@ -36,10 +36,21 @@ CHANGES since release-04-00-03:
 - TrackFitResult:
   + ndf
   + chi2
+  + remove the const classifier of TrackFitResults and add a function to update the contents
+  + updateTrackFitResult
+  + mask
 - ECLCluster:
   + getMinTrkDistanceID
 - EventLevelTriggerTimeInfo
   *  added new storage element for information from the Trigger Timing Distribution (TTD)
+- Track:
+  + statusBitmap and getStatusBit
+  + getTrackTime added
+  + wasRefined
+  + isFlippedAndRefitted
+  + getTrackFitResultByName
+  + getTrackFitResultsByName
+  + getTrackFitResultWithClosestMassByName
 """
 
 from basf2 import create_path, process, set_random_seed, find_file

@@ -74,7 +74,6 @@ TreeFitterModule::TreeFitterModule() : Module(), m_nCandidatesBeforeFit(-1), m_n
   addParam("updateAllDaughters", m_updateDaughters,
            "Type::[bool]. Update all daughters (vertex position and momenta) in the tree. If not set only the 4-momenta for the head of the tree will be updated. We also update the vertex position of the daughters regardless of what you put here, because otherwise the default when the particle list is created is {0,0,0}.",
            false);
-  //
   addParam("expertBeamConstraintPDG", m_beamConstraintPDG,
            "Type int, default 0. The 4-momentum of particles with the given PDG will be constrained to the 4-momentum of the initial e+e- system.",
            0);
@@ -89,6 +88,8 @@ TreeFitterModule::TreeFitterModule() : Module(), m_nCandidatesBeforeFit(-1), m_n
   addParam("inflationFactorCovZ", m_inflationFactorCovZ,
            "Inflate the covariance of the beamspot by this number so that the 3d beam constraint becomes weaker in Z.And: thisnumber->infinity : dim(beamspot constr) 3d->2d.",
            1);
+  addParam("treatAsInvisible", m_treatAsInvisible,
+           "Type::[string]. Decay string to select one particle that will be ignored in the fit.", {});
 }
 
 void TreeFitterModule::initialize()
@@ -105,6 +106,13 @@ void TreeFitterModule::initialize()
     }
   }
 
+  if (!m_treatAsInvisible.empty()) {
+    bool valid = m_pDDescriptorInvisibles.init(m_treatAsInvisible);
+    if (!valid)
+      B2ERROR("TreeFitterModule::initialize Invalid Decay Descriptor: " << m_treatAsInvisible);
+    else if (m_pDDescriptorInvisibles.getSelectionPDGCodes().size() != 1)
+      B2ERROR("TreeFitterModule::please select exactly one particle to ignore: " << m_treatAsInvisible);
+  }
 }
 
 void TreeFitterModule::beginRun()
@@ -141,11 +149,25 @@ void TreeFitterModule::event()
   const unsigned int n = m_plist->getListSize();
   m_nCandidatesBeforeFit += n;
 
+  TMatrixFSym dummyCovMatrix(7);
+  for (int row = 0; row < 7; ++row) { //diag
+    dummyCovMatrix(row, row) = 10000;
+  }
+
   for (unsigned i = 0; i < n; i++) {
     Belle2::Particle* particle = m_plist->getParticle(i);
 
     if (m_updateDaughters == true) {
       ParticleCopy::copyDaughters(particle);
+    }
+
+    if (!m_treatAsInvisible.empty()) {
+      std::vector<const Particle*> selParticlesTarget = m_pDDescriptorInvisibles.getSelectionParticles(particle);
+      Particle* targetD = m_particles[selParticlesTarget[0]->getArrayIndex()];
+      Particle* daughterCopy = Belle2::ParticleCopy::copyParticle(targetD);
+      daughterCopy->writeExtraInfo("treeFitterTreatMeAsInvisible", 1);
+      daughterCopy->setMomentumVertexErrorMatrix(dummyCovMatrix);
+      particle->replaceDaughter(targetD, daughterCopy);
     }
 
     try {
@@ -232,6 +254,7 @@ void TreeFitterModule::plotFancyASCII()
   B2INFO("\033[40;97m      (_)                 (_)                                                   \033[0m");
   B2INFO("\033[40;97m                                                                                \033[0m");
   B2INFO("\033[1;35m============= TREEFIT STATISTICS ===============================================\033[0m");
+  B2INFO("\033[1;39mTarget particle list: " << m_particleList <<  "\033[0m");
   B2INFO("\033[1;39mCandidates before fit: " << m_nCandidatesBeforeFit << "\033[0m");
   B2INFO("\033[1;39mCandidates after fit:  " << m_nCandidatesAfter << "\033[0m");
   B2INFO("\033[1;39mA total of " << m_nCandidatesBeforeFit - m_nCandidatesAfter <<
@@ -240,6 +263,6 @@ void TreeFitterModule::plotFancyASCII()
          "% of candidates survived the fit.\033[0m");
   B2INFO("\033[1;39m" << 100. - (double)m_nCandidatesAfter / (double)m_nCandidatesBeforeFit * 100.0 <<
          "% of candidates did not.\033[0m");
-  B2INFO("\033[1;39mYou choose to drop all candidates with pValue < " << m_confidenceLevel << ".\033[0m");
+  B2INFO("\033[1;39mYou chose to drop all candidates with pValue < " << m_confidenceLevel << ".\033[0m");
   B2INFO("\033[1;35m================================================================================\033[0m");
 }

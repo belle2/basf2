@@ -137,6 +137,7 @@ class Method(object):
         Load a method stored under the given identifier
         @param identifier identifying the method
         """
+        # Always avoid the top-level 'import ROOT'.
         import ROOT  # noqa
         # Initialize all the available interfaces
         ROOT.Belle2.MVA.AbstractInterface.initSupportedInterfaces()
@@ -211,6 +212,7 @@ class Method(object):
         @param specific_options specific options given to basf2_mva.teacher
           (if None the options of this method are used)
         """
+        # Always avoid the top-level 'import ROOT'.
         import ROOT  # noqa
         if isinstance(datafiles, str):
             datafiles = [datafiles]

@@ -232,5 +232,10 @@ namespace Belle2 {
     {
       return std::find_if(V.begin(), V.end(), [&P](const T & aValue) { return (aValue < P.second && aValue >= P.first);}) != V.end();
     }
+
+  private:
+    StoreArray<SpacePointTrackCand> m_inputSpacePointTrackCands; /**< Input SpacePointTrackCands StoreArray */
+    StoreArray<SpacePointTrackCand> m_optionalOutputSpacePointTrackCands; /**< Optional output SpacePointTrackCands StoreArray */
+    StoreArray<SpacePointTrackCand> m_curlingSpacePointTrackCands; /**< Curling SpacePointTrackCands StoreArray */
   };
 }

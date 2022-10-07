@@ -43,7 +43,6 @@ namespace Belle2 {
      */
     virtual void event() override;
 
-
   private:
 
     StoreObjPtr<ParticleList> m_koutputList; /**< Klong output particle list */

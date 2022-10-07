@@ -44,5 +44,5 @@ void TrackSelector::apply(std::vector<RecoTrack*>& tracks)
   // limit to the maximum number of tracks
   tracks.resize(maximalNumberOfElements);
 
-  B2DEBUG(50, "Limited number of selected tracks: " << tracks.size());
+  B2DEBUG(25, "Limited number of selected tracks: " << tracks.size());
 }

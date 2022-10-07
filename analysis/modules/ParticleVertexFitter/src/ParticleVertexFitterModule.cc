@@ -146,7 +146,8 @@ void ParticleVertexFitterModule::event()
     Particle* particle = m_plist->getParticle(i);
     m_hasCovMatrix = false;
     if (m_updateDaughters == true) {
-      if (m_decayString.empty()) ParticleCopy::copyDaughters(particle);
+      if (m_decayString.empty() || m_vertexFitter == "KFit")
+        ParticleCopy::copyDaughters(particle);
       else B2ERROR("Daughters update works only when all daughters are selected. Daughters will not be updated");
     }
 
@@ -836,7 +837,58 @@ bool ParticleVertexFitterModule::makeKVertexMother(analysis::VertexFitKFit& kv,
       daughters[iChild]->setMomentumVertexErrorMatrix(
         CLHEPToROOT::getTMatrixFSym(kv.getTrackError(iChild)));
     }
+
+  } else if (m_updateDaughters == true) { // if decayString is not empty
+    // first, update only the fit children
+    std::vector<const Particle*> fitChildren = m_decaydescriptor.getSelectionParticles(mother);
+
+    unsigned track_count = kv.getTrackCount();
+    if (fitChildren.size() != track_count)
+      return false;
+
+    for (unsigned iChild = 0; iChild < track_count; iChild++) {
+      auto daughter = const_cast<Particle*>(fitChildren[iChild]);
+
+      daughter->set4Vector(CLHEPToROOT::getLorentzVector(kv.getTrackMomentum(iChild)));
+      daughter->setVertex(CLHEPToROOT::getXYZVector(kv.getTrackPosition(iChild)));
+      daughter->setMomentumVertexErrorMatrix(CLHEPToROOT::getTMatrixFSym(kv.getTrackError(iChild)));
+    }
+
+    // then, update other particles that have a fit-child in decay
+    std::function<bool(Particle*)> funcUpdateMomentum =
+    [&funcUpdateMomentum, fitChildren](Particle * part) {
+
+      if (part->getNDaughters() == 0) {
+        // check if part is included in fitChildren
+        if (std::find(fitChildren.begin(), fitChildren.end(), part) != fitChildren.end())
+          return true;
+        else
+          return false;
+      }
+
+      bool includeFitChildren = false;
+
+      // Update daughters' momentum
+      for (auto daughter : part->getDaughters())
+        includeFitChildren = funcUpdateMomentum(daughter) || includeFitChildren;
+
+      if (includeFitChildren) {
+        // Using updated daughters, update part's momentum
+        ROOT::Math::PxPyPzEVector sum4Vector;
+        for (auto daughter : part->getDaughters())
+          sum4Vector += daughter->get4Vector();
+        part->set4Vector(sum4Vector);
+      }
+
+      return includeFitChildren;
+    };
+
+    // Update all daughters
+    for (auto daughter : mother->getDaughters())
+      funcUpdateMomentum(daughter);
+
   }
+
 
   return true;
 }

@@ -726,6 +726,20 @@ void Particle::removeDaughter(const Particle* daughter, const bool updateType)
     m_particleSource = c_Undefined;
 }
 
+void Particle::replaceDaughter(const Particle* oldDaughter, const Particle* newDaughter)
+{
+  int index = oldDaughter->getArrayIndex();
+
+  for (unsigned i = 0; i < getNDaughters(); i++) {
+    if (m_daughterIndices[i] == index) {
+      auto ite_index =  m_daughterIndices.erase(m_daughterIndices.begin() + i);
+      m_daughterIndices.insert(ite_index, newDaughter->getArrayIndex());
+      auto ite_property =  m_daughterProperties.erase(m_daughterProperties.begin() + i);
+      m_daughterProperties.insert(ite_property, Particle::PropertyFlags::c_Ordinary);
+    }
+  }
+}
+
 bool Particle::overlapsWith(const Particle* oParticle) const
 {
   // obtain vectors of daughter final state particles
@@ -847,7 +861,7 @@ const TrackFitResult* Particle::getTrackFitResult() const
 {
   // if the particle is related to a TrackFitResult then return this
   auto* selfrelated = this->getRelatedTo<TrackFitResult>();
-  if (selfrelated)
+  if (selfrelated && !isnan(selfrelated->getPValue()))
     return selfrelated;
 
   // if not get the TFR with closest mass to this particle

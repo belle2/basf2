@@ -22,7 +22,6 @@
 
 #include <vector>
 
-using namespace std;
 using namespace Belle2;
 
 REG_MODULE(SVDOverlapResolver);
@@ -32,12 +31,12 @@ SVDOverlapResolverModule::SVDOverlapResolverModule() : Module()
   setDescription("Module checks for overlaps of SpacePointTrackCands");
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  addParam("NameSpacePointTrackCands", m_nameSpacePointTrackCands, "Name of expected StoreArray.", string(""));
+  addParam("NameSpacePointTrackCands", m_nameSpacePointTrackCands, "Name of expected StoreArray.", std::string(""));
 
-  addParam("NameSVDClusters", m_nameSVDClusters, "Name of expected StoreArray.", string(""));
+  addParam("NameSVDClusters", m_nameSVDClusters, "Name of expected StoreArray.", std::string(""));
 
   addParam("ResolveMethod", m_resolveMethod, "Strategy used to resolve overlaps. Currently implemented are \"greedy\" and "
-           " \"hopfield\" ", string("greedy"));
+           " \"hopfield\" ", std::string("greedy"));
 
   addParam("minActivityState", m_minActivityState, "Sets the minimal value of activity for acceptance. (0,1)",
            float(0.7));
@@ -60,7 +59,7 @@ void SVDOverlapResolverModule::event()
   unsigned short nHits = m_svdClusters.getEntries();
 
   //Create subset of active Candidates
-  vector<SpacePointTrackCand*> activeCandidates;
+  std::vector<SpacePointTrackCand*> activeCandidates;
   auto requiredSpace = m_spacePointTrackCands.getEntries();
   if (m_estimatedActiveCandidates < m_spacePointTrackCands.getEntries()) {
     requiredSpace = m_estimatedActiveCandidates;
@@ -76,7 +75,7 @@ void SVDOverlapResolverModule::event()
   }
 
   //now fill the cluster/track matrix:
-  vector<vector<unsigned short> > svdHitRelatedTracks(nHits);
+  std::vector<std::vector<unsigned short> > svdHitRelatedTracks(nHits);
   //TODO: Check if one saves time by reserving some space for each single of those vectors;
   for (unsigned short iCand = 0; iCand < nActiveCandidates; ++iCand) {
 

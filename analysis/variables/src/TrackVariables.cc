@@ -468,7 +468,19 @@ namespace Belle2 {
     {
       return getHelixParameterPullAtIndex(part, 4);
     }
+    double getTrackTime(const Particle* part)
+    {
+      const Track* track = part->getTrack();
+      if (!track) return realNaN;
+      return track->getTrackTime();
+    }
 
+    double isTrackFlippedAndRefitted(const Particle* part)
+    {
+      auto track = part->getTrack();
+      if (!track) return realNaN;
+      return track->isFlippedAndRefitted() ? 1 : 0;
+    }
 
     VARIABLE_GROUP("Tracking");
     REGISTER_VARIABLE("d0Pull", getHelixD0Pull,     R"DOC(
@@ -759,5 +771,16 @@ there was a track in the event missed by the tracking, or the track finding was
 
 Returns NaN if there is no event-level tracking information available.
     )DOC");
+
+    REGISTER_VARIABLE("isTrackFlippedAndRefitted", isTrackFlippedAndRefitted, R"DOC(
+Returns 1 if the charged final state particle comes from a track that has been flipped and refitted
+at the end of the reconstruction chain, in particular after the outer detector reconstruction.
+    )DOC");
+
+    REGISTER_VARIABLE("trackTime", getTrackTime, R"DOC(
+Returns the track time, computed as the difference 
+between the average of the SVD clusters time associated to the track and the SVD event T0.
+Return NaN if SVD eventT0 is NaN, or if no SVD Hits are attached to the track.
+    )DOC", "ns");
   }
 }

@@ -54,6 +54,7 @@ output.param('branchNames', ['MCParticles', 'MCInitialParticles', 'Tracks', 'Tra
                              'TOPLikelihoods', 'TOPBarHits', 'ExtHits', 'TOPRecBunch'])
 main.add_module(output)
 
+main.add_module('Progress')
 b2.process(main)
 
 # Print call statistics

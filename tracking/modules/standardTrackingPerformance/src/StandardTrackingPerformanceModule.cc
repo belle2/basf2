@@ -8,7 +8,6 @@
 
 #include <tracking/modules/standardTrackingPerformance/StandardTrackingPerformanceModule.h>
 
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/RelationVector.h>
@@ -17,9 +16,6 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <genfit/TrackPoint.h>
 #include <genfit/KalmanFitterInfo.h>
-
-#include <mdst/dataobjects/MCParticle.h>
-#include <mdst/dataobjects/Track.h>
 
 #include <pxd/reconstruction/PXDRecoHit.h>
 #include <svd/reconstruction/SVDRecoHit.h>
@@ -55,16 +51,7 @@ StandardTrackingPerformanceModule::StandardTrackingPerformanceModule() :
 void StandardTrackingPerformanceModule::initialize()
 {
   // MCParticles and Tracks needed for this module
-  StoreArray<MCParticle> mcParticles;
-  mcParticles.isRequired();
-  StoreArray<Track> tracks;
-  tracks.isRequired();
-
-  StoreArray<RecoTrack> recoTracks(m_recoTracksStoreArrayName);
-  recoTracks.isRequired();
-
-  StoreArray<TrackFitResult> trackFitResults;
-  trackFitResults.isRequired();
+  m_MCParticles.isRequired();
 
   m_outputFile = new TFile(m_outputFileName.c_str(), "RECREATE");
   TDirectory* oldDir = gDirectory;
@@ -82,23 +69,20 @@ void StandardTrackingPerformanceModule::event()
   unsigned long runNumber = eventMetaData->getRun();
   unsigned long expNumber = eventMetaData->getExperiment();
 
-  B2DEBUG(99,
+  B2DEBUG(29,
           "Processes experiment " << expNumber << " run " << runNumber << " event " << eventNumber);
-
-  StoreArray<RecoTrack> recoTracks(m_recoTracksStoreArrayName);
-  StoreArray<MCParticle> mcParticles;
 
   m_nGeneratedChargedStableMcParticles = 0;
   m_nReconstructedChargedStableTracks = 0;
   m_nFittedChargedStabletracks = 0;
 
-  for (MCParticle& mcParticle : mcParticles) {
+  for (MCParticle& mcParticle : m_MCParticles) {
     // check status of mcParticle
     if (isPrimaryMcParticle(mcParticle) && isChargedStable(mcParticle) && mcParticle.hasStatus(MCParticle::c_StableInGenerator)) {
       setVariablesToDefaultValue();
 
       int pdgCode = mcParticle.getPDG();
-      B2DEBUG(99, "Primary MCParticle has PDG code " << pdgCode);
+      B2DEBUG(29, "Primary MCParticle has PDG code " << pdgCode);
 
       m_nGeneratedChargedStableMcParticles++;
 
@@ -271,11 +255,11 @@ void StandardTrackingPerformanceModule::writeData()
   }
 }
 
-void StandardTrackingPerformanceModule::findSignalMCParticles(const StoreArray<MCParticle>& mcParticles)
+void StandardTrackingPerformanceModule::findSignalMCParticles()
 {
   std::sort(m_signalDaughterPDGs.begin(), m_signalDaughterPDGs.end());
 
-  for (const MCParticle& mcParticle : mcParticles) {
+  for (const MCParticle& mcParticle : m_MCParticles) {
     // continue if mcParticle is not a B meson
     if (abs(mcParticle.getPDG()) != 511 && abs(mcParticle.getPDG()) != 521)
       continue;
@@ -336,7 +320,7 @@ void StandardTrackingPerformanceModule::addChargedStable(const MCParticle& mcPar
   // charged stable particle is added to the interesting particle vector
   if (isChargedStable(mcParticle) && isPrimaryMcParticle(mcParticle)
       && mcParticle.hasStatus(MCParticle::c_StableInGenerator)) {
-//   B2DEBUG(99,
+//   B2DEBUG(29,
 //          "Found a charged stable particle. Add it to interesting MCParticles. PDG(" << mcParticle->getPDG() << ").");
     m_interestingChargedStableMcParcticles.push_back(&mcParticle);
     return;

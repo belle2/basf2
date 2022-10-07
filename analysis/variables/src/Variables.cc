@@ -23,6 +23,7 @@
 
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/EventExtraInfo.h>
 #include <analysis/dataobjects/EventShapeContainer.h>
 
@@ -38,6 +39,7 @@
 #include <framework/geometry/B2Vector3.h>
 #include <framework/geometry/BFieldManager.h>
 #include <framework/gearbox/Const.h>
+#include <framework/utilities/Conversion.h>
 
 #include <Math/Vector4D.h>
 #include <TRandom.h>
@@ -1003,6 +1005,75 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr particleDistToClosestExtTrk(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() != 2 && arguments.size() != 3) {
+        B2ERROR("Wrong number of arguments (2 or 3 required) for meta variable minET2ETDist");
+        return nullptr;
+      }
+      bool useHighestProbMassForExt(true);
+      if (arguments.size() == 3) {
+        try {
+          useHighestProbMassForExt = static_cast<bool>(Belle2::convertString<int>(arguments[2]));
+        } catch (std::invalid_argument& e) {
+          B2ERROR("Third (optional) argument of particleDistToClosestExtTrk must be an integer flag.");
+          return nullptr;
+        }
+      }
+
+      std::string detLayer = arguments[0];
+      std::string referenceListName = arguments[1];
+      std::string extraSuffix = (useHighestProbMassForExt) ? "__useHighestProbMassForExt" : "";
+
+      auto func = [detLayer, referenceListName, extraSuffix](const Particle * part) -> double {
+        std::string extraInfo = "distToClosestTrkAt" + detLayer + "_VS_" + referenceListName + extraSuffix;
+        if (!part->hasExtraInfo(extraInfo))
+        {
+          return std::numeric_limits<float>::quiet_NaN();
+        }
+        return part->getExtraInfo(extraInfo);
+      };
+
+      return func;
+    }
+
+
+    Manager::FunctionPtr particleDistToClosestExtTrkVar(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() != 3) {
+        B2ERROR("Wrong number of arguments (3 required) for meta variable minET2ETDistVar");
+        return nullptr;
+      }
+
+      std::string detLayer = arguments[0];
+      std::string referenceListName = arguments[1];
+      std::string variableName = arguments[2];
+
+      auto func = [detLayer, referenceListName, variableName](const Particle * part) -> double {
+
+        StoreObjPtr<ParticleList> refPartList(referenceListName);
+        if (!refPartList.isValid())
+        {
+          B2FATAL("Invalid Listname " << referenceListName << " given to minET2ETDistVar!");
+        }
+
+        // Mdst array index of refernce particle that is closest to the particle in question.
+        std::string extraInfo = "idxOfClosestPartAt" + detLayer + "In_" + referenceListName;
+        if (!part->hasExtraInfo(extraInfo))
+        {
+          return std::numeric_limits<float>::quiet_NaN();
+        }
+
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(variableName);
+
+        auto refPart = refPartList->getParticleWithMdstIdx(part->getExtraInfo(extraInfo));
+        return std::get<double>(var->function(refPart));
+      };
+
+      return func;
+    }
+
+
     VARIABLE_GROUP("Kinematics");
     REGISTER_VARIABLE("p", particleP, "momentum magnitude", "GeV/c");
     REGISTER_VARIABLE("E", particleE, "energy", "GeV");
@@ -1025,7 +1096,7 @@ namespace Belle2 {
                       "returns the (i,j)-th element of the MomentumVertex Covariance Matrix (7x7).\n"
                       "Order of elements in the covariance matrix is: px, py, pz, E, x, y, z.", "GeV/c, GeV/c, GeV/c, GeV, cm, cm, cm");
     REGISTER_VARIABLE("momDevChi2", momentumDeviationChi2, R"DOC(
-momentum deviation :math:`\chi^2` value calculated as :math:`\chi^2 = \sum_i (p_i - mc(p_i))^2/\sigma(p_i)^2`, 
+momentum deviation :math:`\chi^2` value calculated as :math:`\chi^2 = \sum_i (p_i - mc(p_i))^2/\sigma(p_i)^2`,
 where :math:`\sum` runs over i = px, py, pz and :math:`mc(p_i)` is the mc truth value and :math:`\sigma(p_i)` is the estimated error of i-th component of momentum vector
 )DOC");
     REGISTER_VARIABLE("theta", particleTheta, "polar angle", "rad");
@@ -1035,7 +1106,6 @@ where :math:`\sum` runs over i = px, py, pz and :math:`mc(p_i)` is the mc truth 
     REGISTER_VARIABLE("phi", particlePhi, "momentum azimuthal angle", "rad");
     REGISTER_VARIABLE("phiErr", particlePhiErr, "error of momentum azimuthal angle", "rad");
     REGISTER_VARIABLE("PDG", particlePDGCode, "PDG code");
-
     REGISTER_VARIABLE("cosAngleBetweenMomentumAndVertexVectorInXYPlane",
                       cosAngleBetweenMomentumAndVertexVectorInXYPlane,
                       "cosine of the angle between momentum and vertex vector (vector connecting ip and fitted vertex) of this particle in xy-plane");
@@ -1155,6 +1225,30 @@ Note that this is context-dependent variable and can take different values depen
                       "candidate in the best candidate selection.");
     REGISTER_VARIABLE("eventRandom", eventRandom,
                       "[Eventbased] Returns a random number between 0 and 1 for this event. Can be used, e.g. for applying an event prescale.");
+    REGISTER_METAVARIABLE("minET2ETDist(detLayer, referenceListName, useHighestProbMassForExt=1)", particleDistToClosestExtTrk,
+                          R"DOC(Returns the distance in [cm] at the given detector surface between the particle's extrapolated helix and the nearest extrapolated helix of particles from the reference list.
+The first argument is the detector surface where to look at the nearest neighbour.
+The second argument is the reference particle list name used to pick up the nearest track helix.
+The third optional argument is an integer ("boolean") flag: if 1 (the default, if nothing is set), it is assumed the extrapolation was done with the most probable mass hypothesis for the track fit;
+if 0, it is assumed the mass hypothesis matching the particle lists' PDG was used.
+
+.. note::
+    This variable requires to run the ``TrackIsolation`` module first.
+    Note that the input parameters of this metafunction must correspond to the ones set for the module configuration!
+)DOC",
+			  Manager::VariableDataType::c_double);
+
+    REGISTER_METAVARIABLE("minET2ETDistVar(detLayer, referenceListName, variableName)", particleDistToClosestExtTrkVar,
+			  R"DOC(Returns the value of the variable for the nearest particle in the input particle list at the given detector surface, according to the definition of `minET2ETDist`.
+The first argument is the detector surface where to look at the nearest neighbour.
+The second argument is the reference particle list name used to pick up the nearest track helix.
+The third argument is a variable name, e.g. `nCDCHits`.
+
+.. note::
+    This variable requires to run the ``TrackIsolation`` module first.
+    Note that the input parameters of this metafunction must correspond to the ones set for the module configuration!
+)DOC",
+			  Manager::VariableDataType::c_double);
 
   }
 }

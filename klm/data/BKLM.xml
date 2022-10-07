@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <BKLM xmlns:xi="http://www.w3.org/2001/XInclude">
   <xi:include href="BKLMSimulationPar.xml"/>
-  <BeamBackgroundStudy desc="Flag to use additional sensitive-detector object to record beam-bkg hits">false</BeamBackgroundStudy>
+  <BeamBackgroundStudy desc="Flag to use additional sensitive-detector object to record beam-background hits">false</BeamBackgroundStudy>
   <Rotation desc="Rotation about z axis of the BKLM with respect to the Detector"  unit="mrad">0.0</Rotation>
   <OffsetZ  desc="Offset of the BKLM along z with respect to the IP" unit="cm">47.0</OffsetZ>
   <Phi desc="Starting azimuthal angle of the BKLM polygon" unit="deg">-22.5</Phi>

@@ -1282,6 +1282,7 @@ Note that this is context-dependent variable and can take different values depen
     REGISTER_METAVARIABLE("minET2ETDist(detName, detLayer, referenceListName, useHighestProbMassForExt=1)", particleDistToClosestExtTrk,
                           R"DOC(Returns the distance in [cm] between the particle and the nearest particle in the reference list at the given detector layer surface.
 The definition is based on the track helices extrapolation.
+
 * The first argument is the name of the detector to consider.
 * The second argument is the detector layer on whose surface we search for the nearest neighbour.
 * The third argument is the reference particle list name used to search for the nearest neighbour.
@@ -1297,6 +1298,7 @@ The definition is based on the track helices extrapolation.
     REGISTER_METAVARIABLE("minET2ETDistVar(detName, detLayer, referenceListName, variableName)", particleDistToClosestExtTrkVar,
 			  R"DOC(Returns the value of the variable for the nearest neighbour to this particle as taken from the reference list at the given detector layer surface.
 , according to the distance definition of `minET2ETDist`.
+
 * The first argument is the name of the detector to consider.
 * The second argument is the detector layer on whose surface we search for the nearest neighbour.
 * The third argument is the reference particle list name used to search for the nearest neighbour.
@@ -1310,6 +1312,7 @@ The definition is based on the track helices extrapolation.
 
     REGISTER_METAVARIABLE("minET2ETIsoScore(referenceListName, useHighestProbMassForExt, detectorList)", particleExtTrkIsoScoreVar,
 			  R"DOC(Returns the particle's isolation score based on:
+
 * The number of detector layers where a close-enough neighbour to this particle is found, according to the distance definition of `minET2ETDist` and a set of thresholds defined in the ``TrackIsoCalculator`` module.
 * A set of per-detector weights quantifying the impact of each detector on the PID for this particle type.
 

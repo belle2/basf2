@@ -22,7 +22,7 @@ Modules
 
 Database Objects
 ++++++++++++++++
- * New database object class `PIDDetectorWeights` to store PID detector weights per std charged particle binned in p and theta.
+ * New database object class ``PIDDetectorWeights`` to store PID detector weights per standard charged particle, binned in p and theta.
 
 Modular Analysis Function
 +++++++++++++++++++++++++

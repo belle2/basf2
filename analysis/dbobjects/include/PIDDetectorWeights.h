@@ -89,8 +89,8 @@ namespace Belle2 {
 
     /**
      * Constructor from ROOT file w/ TTree of weights.
-     * @param  weightsROOTFileName the path to the ROOT file containing the TTree w/ detector weights per std charged particle hypothesis,
-     * in bins of p and theta.
+     * @param treeName the name of the TTree with detector weights per std charged particle hypothesis, in bins of p and theta.
+     * @param weightsROOTFileName the path to the ROOT file containing the TTree.
     */
     PIDDetectorWeights(const std::string& treeName, const std::string& weightsROOTFileName) :
       m_weightsRDataFrame(treeName, weightsROOTFileName)

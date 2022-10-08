@@ -1245,6 +1245,7 @@ class CorrelationMatrix(Plotter):
         bckgrd_corr = numpy.corrcoef(numpy.vstack([data[column][bckgrd_mask] for column in columns])) * 100
 
         signal_heatmap = self.signal_axis.pcolor(signal_corr, cmap=plt.cm.RdBu, vmin=-100.0, vmax=100.0)
+        self.bckgrd_axis.pcolor(bckgrd_corr, cmap=plt.cm.RdBu, vmin=-100.0, vmax=100.0)
 
         self.signal_axis.invert_yaxis()
         self.signal_axis.xaxis.tick_top()

@@ -115,6 +115,7 @@ main = b2.create_path()
 main.add_module(root_input)
 main.add_module(phokhara_evtgen)
 
+main.add_module('Progress')
 # Run.
 b2.process(main)
 

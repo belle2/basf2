@@ -39,6 +39,8 @@ DQMHistAnalysisTOPModule::~DQMHistAnalysisTOPModule() { }
 
 void DQMHistAnalysisTOPModule::initialize()
 {
+  m_monObj = getMonitoringObject("top");
+
   gROOT->cd();
   B2DEBUG(20, "DQMHistAnalysisTOP: initialized.");
 
@@ -105,26 +107,6 @@ void DQMHistAnalysisTOPModule::beginRun()
   m_IsNullRun = (m_RunTypeString == "null");
 }
 
-TH1* DQMHistAnalysisTOPModule::find_histo_in_canvas(const std::string& histo_name)
-{
-  auto s = StringSplit(histo_name, '/');
-  auto dirname = s.at(0);
-  auto hname = s.at(1);
-  std::string canvas_name = dirname + "/c_" + hname;
-
-  auto cobj = findCanvas(canvas_name);
-  if (cobj == nullptr) return nullptr;
-
-  TIter nextkey(((TCanvas*)cobj)->GetListOfPrimitives());
-  TObject* obj{};
-  while ((obj = dynamic_cast<TObject*>(nextkey()))) {
-    if (obj->IsA()->InheritsFrom("TH1")) {
-      if (obj->GetName() == histo_name)
-        return  dynamic_cast<TH1*>(obj);
-    }
-  }
-  return nullptr;
-}
 
 void DQMHistAnalysisTOPModule::event()
 {
@@ -133,16 +115,14 @@ void DQMHistAnalysisTOPModule::event()
     string hname2 = str(format("TOP/bad_hits_per_event%1%") % (i));;
     TH1* h1 = findHist(hname1);
     TH1* h2 = findHist(hname2);
-    //TH1* h1 = find_histo_in_canvas(hname1);
-    //TH1* h2 = find_histo_in_canvas(hname2);
-    if (h1 != NULL) {
+    if (h1 != nullptr) {
       m_h_goodHitsMean->SetBinContent(i, h1->GetMean());
       m_h_goodHitsRMS->SetBinContent(i, h1->GetRMS());
     } else {
       m_h_goodHitsMean->SetBinContent(i, 0);
       m_h_goodHitsRMS->SetBinContent(i, 0);
     }
-    if (h2 != NULL) {
+    if (h2 != nullptr) {
       m_h_badHitsMean->SetBinContent(i, h2->GetMean());
       m_h_badHitsRMS->SetBinContent(i, h2->GetRMS());
     } else {
@@ -155,7 +135,7 @@ void DQMHistAnalysisTOPModule::event()
   double exRatio(0.0);
   double totalraw(0.0);
   double totalbadraw(0.0);
-  if (hraw != NULL) {
+  if (hraw != nullptr) {
     totalraw = hraw->GetEntries();
     for (int i = 1; i <= 16; i++) {
       for (int j = 1; j <= 512; j++) {
@@ -174,19 +154,13 @@ void DQMHistAnalysisTOPModule::event()
     m_text1->AddText("<0.1% good, 0.1-1% recoverable.");
   }
 
-  //addHist("", m_h_goodHitsMean->GetName(), m_h_goodHitsMean);
-
   TCanvas* c1 = findCanvas("TOP/c_hitsPerEvent");
-  //TH1* h1=find_histo_in_canvas("TOP/hitsPerEvent");
-  if (c1 != NULL) {
+  if (c1 != nullptr) {
     c1->SetName("TOP/c_hitsPerEvent_top");
   }
-  //if (h1!=NULL) {
-  //  h1->SetName("TOP/hitsPerEvent_top");
-  //}
 
   TCanvas* c2 = findCanvas("TOP/c_window_vs_slot");
-  if (c2 != NULL) {
+  if (c2 != nullptr) {
     c2->cd();
     if (exRatio > 0.01 && m_IsNullRun == false) c2->Pad()->SetFillColor(kRed);
     else c2->Pad()->SetFillColor(kWhite);
@@ -199,7 +173,7 @@ void DQMHistAnalysisTOPModule::event()
   double badRatio(0.0);
   int totalBadEvts(0);
   int totalEvts(0);
-  if (hBoolEvtMonitor != NULL) {
+  if (hBoolEvtMonitor != nullptr) {
     totalEvts = hBoolEvtMonitor->GetEntries();
     totalBadEvts = hBoolEvtMonitor->GetBinContent(2);
   }
@@ -209,7 +183,7 @@ void DQMHistAnalysisTOPModule::event()
   m_text2->AddText(Form("fraction of deviating hits: %.4f %%", badRatio * 100.0));
 
   TCanvas* c3 = findCanvas("TOP/c_BoolEvtMonitor");
-  if (c3 != NULL) {
+  if (c3 != nullptr) {
     c3->cd();
     if (badRatio > 0.0001 && m_IsNullRun == false) c3->Pad()->SetFillColor(kRed);
     else c3->Pad()->SetFillColor(kWhite);
@@ -222,21 +196,21 @@ void DQMHistAnalysisTOPModule::event()
   double Ntotal_good_hits_asics(0.0);
   double Ntotal_bad_hits_asics(0.0);
   for (int module = 1; module <= 16; module++) {
-    string hnameTmp1 = str(format("TOP/good_hits_xy_%1%") % (module));;
+    string hnameTmp1 = str(format("TOP/good_hits_xy_%1%") % (module));
     TH1* h2DTmp1 = findHist(hnameTmp1);
-    if (h2DTmp1 != NULL)   Ntotal_good_hits_xy += h2DTmp1->Integral();
+    if (h2DTmp1 != nullptr)   Ntotal_good_hits_xy += h2DTmp1->Integral();
 
-    string hnameTmp2 = str(format("TOP/bad_hits_xy_%1%") % (module));;
+    string hnameTmp2 = str(format("TOP/bad_hits_xy_%1%") % (module));
     TH1* h2DTmp2 = findHist(hnameTmp2);
-    if (h2DTmp2 != NULL) Ntotal_bad_hits_xy += h2DTmp2->Integral();
+    if (h2DTmp2 != nullptr) Ntotal_bad_hits_xy += h2DTmp2->Integral();
 
-    string hnameTmp3 = str(format("TOP/good_hits_asics_%1%") % (module));;
+    string hnameTmp3 = str(format("TOP/good_hits_asics_%1%") % (module));
     TH1* h2DTmp3 = findHist(hnameTmp3);
-    if (h2DTmp3 != NULL) Ntotal_good_hits_asics += h2DTmp3->Integral();
+    if (h2DTmp3 != nullptr) Ntotal_good_hits_asics += h2DTmp3->Integral();
 
-    string hnameTmp4 = str(format("TOP/bad_hits_asics_%1%") % (module));;
+    string hnameTmp4 = str(format("TOP/bad_hits_asics_%1%") % (module));
     TH1* h2DTmp4 = findHist(hnameTmp4);
-    if (h2DTmp4 != NULL) Ntotal_bad_hits_asics += h2DTmp4->Integral();
+    if (h2DTmp4 != nullptr) Ntotal_bad_hits_asics += h2DTmp4->Integral();
   }
 
   // reset the maximum z-axis of 16 2D plots: 3 times of average for good hits; 30 times of average for bad hits
@@ -244,7 +218,7 @@ void DQMHistAnalysisTOPModule::event()
     m_c_good_hits_xy_[i]->Clear();
     m_c_good_hits_xy_[i]->cd();
     TH2F* h2Dscale_xy = (TH2F*)findHist(Form("TOP/good_hits_xy_%d", i));
-    if (h2Dscale_xy != NULL && Ntotal_good_hits_xy > 0) {
+    if (h2Dscale_xy != nullptr && Ntotal_good_hits_xy > 0) {
       h2Dscale_xy->GetZaxis()->SetRangeUser(0, Ntotal_good_hits_xy / 2500.0);
       h2Dscale_xy->SetDrawOption("COLZ");
       h2Dscale_xy->Draw("COLZ");
@@ -257,7 +231,7 @@ void DQMHistAnalysisTOPModule::event()
     m_c_bad_hits_xy_[i]->Clear();
     m_c_bad_hits_xy_[i]->cd();
     TH2F* h2Dscale_xy = (TH2F*)findHist(Form("TOP/bad_hits_xy_%d", i));
-    if (h2Dscale_xy != NULL && Ntotal_bad_hits_xy > 0) {
+    if (h2Dscale_xy != nullptr && Ntotal_bad_hits_xy > 0) {
       h2Dscale_xy->GetZaxis()->SetRangeUser(0, Ntotal_bad_hits_xy / 250.0);
       h2Dscale_xy->SetDrawOption("COLZ");
       h2Dscale_xy->Draw("COLZ");
@@ -269,7 +243,7 @@ void DQMHistAnalysisTOPModule::event()
     m_c_good_hits_asics_[i]->Clear();
     m_c_good_hits_asics_[i]->cd();
     TH2F* h2Dscale_asics = (TH2F*)findHist(Form("TOP/good_hits_asics_%d", i));
-    if (h2Dscale_asics != NULL && Ntotal_good_hits_asics > 0) {
+    if (h2Dscale_asics != nullptr && Ntotal_good_hits_asics > 0) {
       h2Dscale_asics->GetZaxis()->SetRangeUser(0, Ntotal_good_hits_asics / 2500.0);
       h2Dscale_asics->SetDrawOption("COLZ");
       h2Dscale_asics->Draw("COLZ");
@@ -281,7 +255,7 @@ void DQMHistAnalysisTOPModule::event()
     m_c_bad_hits_asics_[i]->Clear();
     m_c_bad_hits_asics_[i]->cd();
     TH2F* h2Dscale_asics = (TH2F*)findHist(Form("TOP/bad_hits_asics_%d", i));
-    if (h2Dscale_asics != NULL && Ntotal_bad_hits_asics > 0) {
+    if (h2Dscale_asics != nullptr && Ntotal_bad_hits_asics > 0) {
       h2Dscale_asics->GetZaxis()->SetRangeUser(0, Ntotal_bad_hits_asics / 250.0);
       h2Dscale_asics->SetDrawOption("COLZ");
       h2Dscale_asics->Draw("COLZ");
@@ -313,6 +287,43 @@ void DQMHistAnalysisTOPModule::event()
 void DQMHistAnalysisTOPModule::endRun()
 {
   B2DEBUG(20, "DQMHistAnalysisTOP : endRun called");
+
+  /** add TopMiraBelle*/
+  TH2F* hRawTime = (TH2F*)findHist("TOP/window_vs_slot");
+  double TotalRaw(0), TotalBadRaw(0), vRateBadRaw(0);
+  if (hRawTime != nullptr) TotalRaw = hRawTime->GetEntries();
+
+  for (int i = 1; i <= 16; i++) {
+    string vname = str(format("RateBadRaw_slot%1%") % (i));
+    double ivRateBadRaw(0);
+    if (hRawTime != nullptr) {
+      double iTotalRaw(0), iTotalBadRaw(0);
+      for (int j = 1; j <= 512; j++) {
+        double nhRaw = hRawTime->GetBinContent(i, j);
+        if (j < 215 || j > 235) {
+          iTotalBadRaw += nhRaw ;
+        }
+        iTotalRaw += nhRaw;
+      }
+      if (iTotalRaw != 0) ivRateBadRaw = iTotalBadRaw * 1.0 / iTotalRaw;
+      TotalBadRaw += iTotalBadRaw;
+    }
+    m_monObj->setVariable(vname, ivRateBadRaw);
+  }
+  if (TotalRaw != 0) vRateBadRaw = TotalBadRaw * 1.0 / TotalRaw;
+  m_monObj->setVariable("RateBadRaw_all", vRateBadRaw);
+
+  for (int i = 1; i <= 16; i++) {
+    string hname1 = str(format("TOP/good_hits_per_event%1%") % (i));
+    string vname1 = str(format("GoodHitsPerEvent_slot%1%") % (i));
+    TH1* h1 = findHist(hname1);
+    double vGoodHits(0);
+    if (h1 != nullptr) {
+      vGoodHits =  h1->GetMean();
+    }
+    m_monObj->setVariable(vname1, vGoodHits);
+  }
+
 }
 
 

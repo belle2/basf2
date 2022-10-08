@@ -14,7 +14,7 @@
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 #include <TH1.h>
 #include <TCanvas.h>
 #include <time.h>

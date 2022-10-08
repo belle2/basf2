@@ -12,7 +12,7 @@
 
 #pragma once
 
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 #include <svd/dataobjects/SVDSummaryPlots.h>
 
 #include <TFile.h>

@@ -64,7 +64,7 @@ namespace TreeFitter {
 
     /** we know the max sizes of the matrices
      *  we assume the tree is smaller than MAX_MATRIX_SIZE parameters
-     *  and the largest constraint is the track constraint with 5
+     *  and the largest constraint is the track constraint with 7
      *
      *  -> Eigen puts this on the stack
      *

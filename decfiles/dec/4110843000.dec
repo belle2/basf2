@@ -1,0 +1,29 @@
+# EventType: 4110843000
+# Descriptor: [vpho_gammaXb_omegaY(1S)_ll]
+# NickName: vpho_gammaXb_omegaY(1S)_ll
+# Cuts: None
+# Documentation:
+# PhysicsWG: Quarkonium
+# Tested: Yes
+# Responsible: Yang Li
+# Email: y_li21@m.fudan.edu.cn
+# Date: 20221008
+
+Decay vpho
+1.0 Xb gamma PHSP;
+Enddecay
+
+Decay Xb
+1.0 omega Upsilon PHSP;
+Enddecay
+
+Decay Upsilon
+0.5 e+ e- VLL;
+0.5 mu+ mu- VLL;
+Enddecay
+
+Decay omega
+1.0 pi+ pi- pi0 OMEGA_DALITZ;
+Enddecay
+
+End

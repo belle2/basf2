@@ -44,6 +44,7 @@ namespace TreeFitter {
                                     ) :
     ParticleBase(particle, mother, &config),// config pointer here to allow final states not to have it
     m_massconstraint(false),
+    m_beamconstraint(false),
     m_lifetimeconstraint(false),
     m_isconversion(false),
     m_automatic_vertex_constraining(config.m_automatic_vertex_constraining)
@@ -58,6 +59,8 @@ namespace TreeFitter {
 
     m_massconstraint = std::find(config.m_massConstraintListPDG.begin(), config.m_massConstraintListPDG.end(),
                                  std::abs(m_particle->getPDGCode())) != config.m_massConstraintListPDG.end();
+
+    m_beamconstraint = (std::abs(m_particle->getPDGCode()) == config.m_beamConstraintPDG);
 
     if (!m_automatic_vertex_constraining) {
       // if this is a hadronically decaying resonance it is useful to constraint the decay vertex to its mothers decay vertex.
@@ -247,6 +250,26 @@ namespace TreeFitter {
   }
 
 
+  ErrCode InternalParticle::projectBeamConstraint(const FitParams& fitparams,
+                                                  Projection& p) const
+  {
+
+    const int momindex = momIndex() ;
+
+    const Eigen::Matrix<double, 4, 1> fitMomE = fitparams.getStateVector().segment(momindex, 4);
+
+    p.getResiduals() = m_config->m_beamMomE - fitMomE;
+
+    for (int row = 0; row < 4; ++row) {
+      p.getH()(row, momindex + row) = -1;
+    }
+
+    p.getV() =  m_config->m_beamCovariance;
+
+    return ErrCode(ErrCode::Status::success) ;
+  }
+
+
   ErrCode InternalParticle::projectConstraint(const Constraint::Type type,
                                               const FitParams& fitparams,
                                               Projection& p) const
@@ -261,6 +284,9 @@ namespace TreeFitter {
         break;
       case Constraint::kinematic:
         status |= projectKineConstraint(fitparams, p);
+        break;
+      case Constraint::beam:
+        status |= projectBeamConstraint(fitparams, p);
         break;
       default:
         status |= ParticleBase::projectConstraint(type, fitparams, p);
@@ -335,6 +361,10 @@ namespace TreeFitter {
     }
     if (m_massconstraint) {
       list.push_back(Constraint(this, Constraint::mass, depth, 1, 3));
+    }
+    if (m_beamconstraint) {
+      assert(m_config);
+      list.push_back(Constraint(this, Constraint::beam, depth, 4, 3));
     }
 
   }

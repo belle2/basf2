@@ -3660,17 +3660,18 @@ def calculateTrackIsolation(
         *detectors,
         reference_list_name=None,
         vars_for_nearest_part=[],
-        highest_prob_mass_for_ext=True):
+        highest_prob_mass_for_ext=True,
+        exclude_pid_det_weights=False):
     """
     Given an input decay string, compute variables that quantify track-based "isolation" of the charged
     stable particles in the decay chain.
 
     Note:
-        Currently, a proxy for isolation can be defined using the distance
-        of each particle's track to its closest neighbour, defined as the segment connecting the two tracks
-        intersection points on a given cylindrical surface.
-        The calculation relies on the track helix extrapolation.
-        The distance variable defined in the `VariableManager` is named `minET2ETDist`.
+        An "isolation score" can be defined using the distance
+        of each particle to its closest neighbour, defined as the segment connecting the two
+        extrapolated track helices intersection points on a given cylindrical surface.
+        The distance variables defined in the `VariableManager` is named `minET2ETDist`,
+        the isolation scores are named `minET2ETIsoScore`.
 
     The definition of distance and the number of distances that are calculated per sub-detector is based on
     the following recipe:
@@ -3701,7 +3702,7 @@ def calculateTrackIsolation(
                             The charge-conjugate particle list will be also processed automatically.
         path (basf2.Path): path to which module(s) will be added.
         *detectors: detectors for which track isolation variables will be calculated.
-                    Choose among: "CDC", "TOP", "ARICH", "ECL", "KLM"
+                    Choose among: ``{'CDC', 'TOP', 'ARICH', 'ECL', 'KLM'}``.
         reference_list_name (Optional[str]): name of the input charged stable particle list for the reference tracks.
                                              By default, the ``:all`` ParticleList of the same type
                                              of the selected particle in ``decay_string`` is used.
@@ -3715,6 +3716,9 @@ def calculateTrackIsolation(
                                                     probable mass hypothesis, namely, the one that gives the highest
                                                     chi2Prob of the fit. Otherwise, it uses the mass hypothesis that
                                                     corresponds to the particle lists PDG.
+        exclude_pid_det_weights (Optional[bool]): if this option is set to False (default), the isolation score
+                                                  calculation will take into account the weight that each detector has on the PID
+                                                  for the particle species of interest.
 
     Returns:
         dict(int, list(str)): a dictionary mapping the PDG code of each reference particle list
@@ -3730,18 +3734,20 @@ def calculateTrackIsolation(
         B2FATAL(f"Invalid particle list {decay_string} in calculateTrackIsolation!")
     no_reference_list_name = not reference_list_name
 
-    det_choices = ["CDC", "TOP", "ARICH", "ECL", "KLM"]
-    if any(d not in det_choices for d in detectors):
-        B2FATAL("Your input detector list: ", detectors, " contains an invalid choice. Please select among: ", det_choices)
-
-    det_labels = []
-    for det in detectors:
-        if det == "CDC":
-            det_labels.extend([f"{det}{ilayer}" for ilayer in range(9)])
-        elif det == "ECL":
-            det_labels.extend([f"{det}{ilayer}" for ilayer in range(2)])
-        else:
-            det_labels.append(f"{det}0")
+    det_and_layers = {
+        "CDC": list(range(9)),
+        "TOP": [0],
+        "ARICH": [0],
+        "ECL": [0, 1],
+        "KLM": [0],
+    }
+    if any(d not in det_and_layers for d in detectors):
+        B2FATAL(
+            "Your input detector list: ",
+            detectors,
+            " contains an invalid choice. Please select among: ",
+            list(
+                det_and_layers.keys()))
 
     # The module allows only one daughter to be selected at a time,
     # that's why here we preprocess the input decay string.
@@ -3769,22 +3775,30 @@ def calculateTrackIsolation(
 
         ref_pdg = pdg.from_name(reference_list_name.split(":")[0])
 
-        for det in det_labels:
+        for det in detectors:
             trackiso = path.add_module("TrackIsoCalculator",
                                        decayString=processed_dec,
-                                       detectorSurface=det,
+                                       detectorName=det,
                                        particleListReference=reference_list_name,
-                                       useHighestProbMassForExt=highest_prob_mass_for_ext)
+                                       useHighestProbMassForExt=highest_prob_mass_for_ext,
+                                       excludePIDDetWeights=exclude_pid_det_weights)
             trackiso.set_name(f"TrackIsoCalculator{det}_{processed_dec}_VS_{reference_list_name}")
 
         # Metavariables for the distances to the closest reference tracks at each detector surface.
         # Always calculate them.
         # Ensure the flag for the mass hypothesis of the fit is set.
-        trackiso_vars = [f"minET2ETDist({d}, {reference_list_name}, {int(highest_prob_mass_for_ext)})" for d in det_labels]
+        trackiso_vars = [
+            f"minET2ETDist({d}, {d_layer}, {reference_list_name}, {int(highest_prob_mass_for_ext)})"
+            for d in detectors for d_layer in det_and_layers[d]]
+        # Track isolation score.
+        trackiso_vars += [f"minET2ETIsoScore({reference_list_name}, {int(highest_prob_mass_for_ext)}, {','.join(detectors)})"]
         # Optionally, calculate the input variables for the nearest neighbour in the reference list.
         if vars_for_nearest_part:
             trackiso_vars.extend(
-                [f"minET2ETDistVar({d}, {reference_list_name}, {v})" for d in det_labels for v in vars_for_nearest_part])
+                [
+                    f"minET2ETDistVar({d}, {d_layer}, {reference_list_name}, {v})"
+                    for d in detectors for d_layer in det_and_layers[d] for v in vars_for_nearest_part
+                ])
         trackiso_vars.sort()
 
         reference_lists_to_vars[ref_pdg] = trackiso_vars

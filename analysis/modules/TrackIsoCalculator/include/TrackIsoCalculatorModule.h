@@ -258,7 +258,7 @@ namespace Belle2 {
      \f}
 
      * The distance to closest track helix extrapolation defined in `double getDistAtDetSurface()` is used.
-     * Note that if the PID detector weighting is switched off, \f$w_{d} = 1\f$.
+     * Note that if the PID detector weighting is switched off, \f$w_{d} = -1\f$.
      *
      * The per-detector score is normalised in \f$s_{d}\in [0, 1]\f$: values closer to 1 indicate well-isolated particles.
      */

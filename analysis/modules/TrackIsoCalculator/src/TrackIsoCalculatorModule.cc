@@ -304,8 +304,8 @@ double TrackIsoCalculatorModule::getIsoScore(const Particle* iParticle) const
   double detWeight(-1.0);
   if (!m_excludePIDDetWeights) {
     detWeight = (*m_DBWeights.get())->getWeight(hypo, det, p, theta);
-    // If w < 0, the detector has detrimental impact on PID:
-    // set the value is set to zero to prevent the detector from contributing to the score.
+    // If w > 0, the detector has detrimental impact on PID:
+    // the value is set to zero to prevent the detector from contributing to the score.
     // NB: NaN should stay NaN.
     detWeight = (detWeight < 0 || std::isnan(detWeight)) ? detWeight : 0.0;
   }

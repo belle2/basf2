@@ -3356,7 +3356,7 @@ def labelTauPairMC(printDecayInfo=False, path=None, TauolaBelle=False, mapping_m
 
     @param printDecayInfo:  If true, prints ID and prong of each tau lepton in the event.
     @param path:        module is added to this path
-    @param TauolaBelle: if False, TauDecayMarker is set. If True, TauDecayMode is set.
+    @param TauolaBelle: if False, TauDecayMode is set. If True, TauDecayMarker is set.
     @param mapping_minus: if None, the map is the default one, else the path for the map is given by the user for tau-
     @param mapping_plus: if None, the map is the default one, else the path for the map is given by the user for tau+
     """

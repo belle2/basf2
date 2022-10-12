@@ -1,8 +1,8 @@
-# EventType: 1163344002
-# Descriptor: [B0 -> [D**+ -> [D*0(D*+) -> [D0 -> K- pi+ (K- pi+ pi0)] pi0(gamma)(pi+)] pi+(pi0)] [tau -> l nu nu] nu]cc
+# EventType: 1163342002
+# Descriptor: [B0 -> [D**+ -> [D*0(D*+) -> [D0 -> K- pi+ pi+ pi-] pi+(gamma)(pi0)] pi+(pi0)] [tau -> l nu nu] nu]cc
 # NickName: Bd_Dstst+taunu
-# Documentation: B0 -> D**+ tau nu, D**+ -> (D*0)(D*+) -> D0 pi+(pi0)(gamma), D0 -> K- pi+ (K- pi+ pi0), tau -> e(mu) nu nu, background mode for inclusive tagging R(D(*)).
-# Dominate channel: anti-B0 -> D'_1+(->D*0(->D0(->K- pi+ pi0) pi0) pi+) tau-(->l- nu anti-nu) anti-nu
+# Documentation: B0 -> D**+ tau nu, D**+ -> (D*0)(D*+) -> D0 pi+(pi0)(gamma), D0 -> K- pi+ pi+ pi-, tau -> e(mu) nu nu, background mode for inclusive tagging R(D(*)).
+# Dominate channel: anti-B0 -> D'_1+(->D*0(->D0(->anti-K*0sig(->K+  pi-) pi+  pi-) pi0) pi+) tau-(->l- nu anti-nu) anti-nu
 # Tested: Yes
 # PhysicsWG: SL
 # Responsible: Tia Crane
@@ -85,10 +85,24 @@ CDecay D*-sig
 
 
 Decay D0sig
-0.039500000   K-  pi+                                      PHSP;
-0.144000000   K-  pi+  pi0                                 D_DALITZ;
+0.008800000   K-  pi+  pi+  pi-                            PHSP;
+0.005328000   K-  rho0  pi+                                PHSP;
+0.024000000   anti-K*0sig  pi+  pi-                           PHSP;
+0.016000000   K_1-sig  pi+                                    SVS;
 Enddecay
 CDecay anti-D0sig
+
+
+Decay K*0sig
+1.0 K+  pi-                                      VSS;
+Enddecay
+CDecay anti-K*0sig
+
+
+Decay K_1-sig
+1.0   K+  pi+  pi-                                 PHSP;
+Enddecay
+CDecay K_1+sig
 
 
 Decay tau-sig

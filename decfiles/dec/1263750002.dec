@@ -1,8 +1,8 @@
-# EventType: 1263752002
-# Descriptor: [B- -> [D**0 -> [D*+(D*0) -> [D0 -> K- pi+ (K- pi+ pi0)] pi+(pi0)(gamma)] pi-(pi0)] l nu]cc
+# EventType: 1263750002
+# Descriptor: [B- -> [D**0 -> [D*+(D*0) -> [D0 -> K- pi+ pi+ pi-] pi+(pi0)(gamma)] pi-(pi0)] l nu]cc
 # NickName: Bu_Dstst0lnu
-# Documentation: B0 -> D**+ e(mu) nu, D**0 -> (D*+)(D*0) -> D0 pi+(pi0)(gamma), D0 -> K- pi+ (K- pi+ pi0), background mode for inclusive tagging R(D(*))
-# Dominant channel: B- -> D_10(-> D*+(-> D0(-> K- pi+ pi0) pi+) pi-) l- anti-nu
+# Documentation: B0 -> D**+ e(mu) nu, D**0 -> (D*+)(D*0) -> D0 pi+(pi0)(gamma), D0 -> K- pi+ pi+ pi-, background mode for inclusive tagging R(D(*))
+# Dominant channel: B- -> D_10(-> D*+(-> D0(->anti-K*0sig(->K+ pi-) pi+ pi-) pi+) pi-) l- anti-nu
 # Tested: Yes
 # PhysicsWG: SL
 # Responsible: Tia Crane
@@ -111,10 +111,24 @@ CDecay D*-sig
 
 
 Decay D0sig
-0.039500000   K-  pi+                                      PHSP;
-0.144000000   K-  pi+  pi0                                 D_DALITZ;
+0.008800000   K-  pi+  pi+  pi-                            PHSP;
+0.005328000   K-  rho0  pi+                                PHSP;
+0.024000000   anti-K*0sig  pi+  pi-                           PHSP;
+0.016000000   K_1-sig  pi+                                    SVS;
 Enddecay
 CDecay anti-D0sig
+
+
+Decay K*0sig
+1.0 K+  pi-                                      VSS;
+Enddecay
+CDecay anti-K*0sig
+
+
+Decay K_1-sig
+1.0   K+  pi+  pi-                                 PHSP;
+Enddecay
+CDecay K_1+sig
 
 
 End

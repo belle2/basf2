@@ -1,8 +1,8 @@
 # EventType: 1163342001
-# Descriptor: [B0 -> [D*+ -> [D0 -> K- pi+ (K- pi+ pi0) (K- pi+ pi+ pi-)] pi+] [tau -> l nu nu] nu]cc
+# Descriptor: [B0 -> [D*+ -> [D0 -> K- pi+ (K- pi+ pi0)] pi-] [tau -> l nu nu] nu]cc
 # NickName: Bd_Dst+taunu
-# Documentation: B0 -> D*+ tau nu, D*+ -> D0 pi+, D0 -> K- pi+ (K- pi+ pi0) (K- pi+ pi+ pi-), tau -> e(mu) nu nu, background mode for inclusive tagging R(D(*)).
-# Dominant channel: anti-B0 -> D*+(-> D0(->K- pi+ pi0) pi+) tau-(-> l- nu anti-nu) anti-nu
+# Documentation: B0 -> D*+ tau nu, D*+ -> D0 pi+, D0 -> K- pi+ (K- pi+ pi0), tau -> e(mu) nu nu, background mode for inclusive tagging R(D(*)).
+# Dominant channel: anti-B0 -> D*+(->D0(->K- pi+ pi0) pi+) tau-(-> l- nu anti-nu) anti-nu
 # Tested: Yes
 # PhysicsWG: SL
 # Responsible: Tia Crane
@@ -31,7 +31,6 @@ CDecay D*-sig
 Decay D0sig
 0.039500000   K-  pi+                                      PHSP;
 0.144000000   K-  pi+  pi0                                 D_DALITZ;
-0.008800000   K-  pi+  pi+  pi-                            PHSP;
 Enddecay
 CDecay anti-D0sig
 

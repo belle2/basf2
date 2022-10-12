@@ -1,0 +1,54 @@
+# EventType: 1263732001
+# Descriptor: [B- -> [D*0 -> [D0 -> K- pi+ pi+ pi-] pi0(gamma)] l nu]cc
+# NickName: Bu_Dst0lnu
+# Documentation: B- -> D*0 e(mu) nu, D*0 -> D0 pi0(gamma), D0 -> K- pi+ pi+ pi-, background mode for inclusive tagging R(D(*)).
+# Dominant channel: B- -> D*0(-> D0(->anti-K*0sig(->K+ pi-) pi+ pi-) pi0) l- anti-nu
+# Tested: Yes
+# PhysicsWG: SL
+# Responsible: Tia Crane
+# Email: tcrane@hawaii.edu 
+# Cuts: None
+# Date: 20220914
+
+yesPhotos
+
+Decay Upsilon(4S)
+0.5 B+ B-sig VSS;
+0.5 B- B+sig VSS;
+Enddecay
+
+Decay B-sig
+0.054900000   D*0sig  e-  anti-nu_e                           BGL 0.02596 -0.06049 0.01311 0.01713 0.00753 -0.09346;
+0.054900000   D*0sig  mu-  anti-nu_mu                         BGL 0.02596 -0.06049 0.01311 0.01713 0.00753 -0.09346;
+Enddecay
+CDecay B+sig
+
+
+Decay D*0sig
+0.647000000   D0sig  pi0                                      VSS;
+0.353000000   D0sig  gamma                                    VSP_PWAVE;
+Enddecay
+CDecay anti-D*0sig
+
+
+Decay D0sig
+0.008800000   K-  pi+  pi+  pi-                            PHSP;
+0.005328000   K-  rho0  pi+                                PHSP;
+0.024000000   anti-K*0sig  pi+  pi-                           PHSP;
+0.016000000   K_1-sig  pi+                                    SVS;
+Enddecay
+CDecay anti-D0sig
+
+
+Decay K*0sig
+1.0 K+  pi-                                      VSS;
+Enddecay
+CDecay anti-K*0sig
+
+
+Decay K_1-sig
+1.0   K+  pi+  pi-                                 PHSP;
+Enddecay
+CDecay K_1+sig
+
+End

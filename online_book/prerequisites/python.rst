@@ -26,7 +26,7 @@ Python
     **Objectives**:
 
       * Get more familiar with python
-      * Understand how to manipulate and plot data with ``root_pandas``
+      * Understand how to manipulate and plot data with ``pandas``
 
 High Energy Physics (HEP) analyses are too complex to be done with pen, paper
 and calculator. They usually are not even suited for spreadsheet programs like
@@ -354,7 +354,7 @@ Pandas Tutorial and Python Data Analysis
 This section aims to answer the question *"How can I process tabular data?"*
 
 
-We will use the `root_pandas <https://github.com/scikit-hep/root_pandas>`_
+We will use the `uproot <https://github.com/scikit-hep/uproot5>`_
 package to read TTrees from ROOT files.
 
 Now, the previous sentence may have not been familiar to you at all. If so, read
@@ -380,7 +380,7 @@ Importing ROOT files
 ^^^^^^^^^^^^^^^^^^^^
 
 In this section we will learn how to import a ROOT file as a Pandas DataFrame
-using the ``root_pandas`` library.
+using the ``uproot`` library. No ROOT installation is necessary for this to work!
 
 Pandas provides high-performance, easy-to-use data structures and data analysis
 tools for Python, see `here
@@ -389,53 +389,88 @@ tools for Python, see `here
 .. admonition:: Exercise
   :class: exercise stacked
 
-  Start a new notebook and import ``root_pandas``.
+  Start a new notebook and import ``uproot``.
 
 .. admonition:: Solution
   :class: solution toggle
 
   .. code:: ipython3
 
-    import root_pandas
+    import uproot
 
-You can load in an example dataframe using the ``read_root`` function from the ``root_pandas`` package.
+You can load in an example file using the ``open`` function from the ``uproot`` package.
 
 .. code:: ipython3
   :linenos:
 
   file_path = "https://rebrand.ly/00vvyzg"
-  df = root_pandas.read_root(file_path)
+  file = uproot.open(file_path)
 
-This code imports the ``pandas_tutorial_ntuple.root`` root file as a dataframe ``df``. You are welcome to import your own root files, but be aware that the variables and outputs will appear differently to this tutorial.
+This code imports the ``pandas_tutorial_ntuple.root`` root file as a file object ``file``.
+For speed it is beneficial to download the file first and pass the path to your local copy to ``uproot.open``.
+You are welcome to import your own root files, but be aware that the variables and outputs will appear differently to this tutorial.
 
-.. admonition:: Alternatives to ``root_pandas`` (optional)
+The ``keys`` method lists the tree(s) in that file. ``file`` behaves much like a dictionary in that you can access the trees like you would access values in a dictionary.
+
+.. code:: ipython3
+
+  print(file.keys())
+  tree = file["b0phiKs"]
+
+.. admonition:: Shortcut to reading trees
+
+  If you already know the contents of the file, ie. the name of the tree you want to read (in our case ``"b0phiKs"``), you can get it in one go by passing the name of the tree after a colon to the ``open`` method.
+
+  .. code:: ipython3
+
+    tree = uproot.open(file_path + ":b0phiKs")
+
+.. admonition:: Automatic closing of open file
+
+  In a python script it is good practice to open files in a ``with``-block. Uproot supports this too.
+
+  .. code:: python3
+
+    with uproot.open(file_path + ":b0phiKs") as tree:
+      ...
+  
+  This construct guarantees that the file will be closed properly, even if the program crashes due to exceptions.
+
+Uproot is only responsible for reading and writing ROOT files, it does not contain any functionality to perform computations on the data. For this, we need to read
+the data into a pandas DataFrame. In uproot, there are two different ways to do this.
+
+The first option is to load all events at once with the ``arrays`` method:
+
+.. code:: ipython3
+
+  df = tree.arrays(library="pd")
+
+The ``library="pd"`` parameter tells uproot that we want to get back a pandas DataFrame. If you rather not work with pandas, uproot also supports `numpy <https://numpy.org/doc/stable/>`_ (``"np"``) and 
+`awkward array <https://awkward-array.readthedocs.io/en/stable/>`_ (``"ak"``).  
+
+Note that this loads the entire tree into memory at once, so keep that in mind when trying to load very large files. If you run into memory problems,
+the second option to load data from a tree is with the ``iterate`` method, discussed in section :ref:`large_files`.
+
+.. admonition:: TL;DR
+
+  load a tree
+
+  .. code:: ipython3
+
+    tree = uproot.open(filename + ":" + treename)
+    df = tree.arrays(library="pd")
+  
+  or
+
+  .. code:: python3
+
+    with tree as uproot.open(filename + ":" + treename):
+      df = tree.arrays(library="pd")
+
+.. admonition:: Note about speed
   :class: toggle
 
-  ``root_pandas`` needs ROOT to be installed but there is an alternative called
-  `uproot <https://github.com/scikit-hep/uproot4>`_ which can load root files into
-  pandas dataframes without requiring ROOT. This means it's a bit simpler to
-  install on your personal machine.
-
-  With ``uproot`` version 4 or above, line 2 of the above snippet becomes
-
-  .. code-block::
-
-    df = uproot.open(file_path)["b0phiKs"].arrays(library="pd")
-
-  If loading from the remote file path doesn't work, download the file to
-  your machine first (e.g., using ``wget``).
-
-  Here, ``b0phiKs`` is the branch name of the file that contains the data
-  (``root_pandas``) guessed it for us automatically, in ``uproot`` we need to
-  specify it explicitly.
-
-  With ``uproot`` version 3 or below, line 2 of the snippet reads
-
-  .. code-block::
-
-    df = uproot.open(file_path)["b0phiKs"].pandas.df()
-
-  but we definitely recommend you to update to ``uproot4``.
+  blah
 
 Investigating your DataFrame
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -495,13 +530,13 @@ A useful feature to quickly summarize your data is to use the ``descibe`` method
 
   ``df.describe`` has the great ability to summarize each of your columns/variables. When using it, a table is printed with rows of 'count', 'mean', 'std', 'min', '25%', '50%', '75%' and 'max'.
 
-* ``count``, the number of entries
-* ``mean``, the average of all entries
-* ``std``, the standard deviation of the column
-* ``min``, and ``max``: the smallest and largest value of the column
-* ``25%``, ``50%``, ``75%``: the value where only 25%, 50% or 75% of the entries in the column have
-  a smaller value. For example if we have 100 entries in the dataframe the 25% quantile is the 25th smallest value.
-  The 50% quantile is also known as the median.
+  * ``count``, the number of entries
+  * ``mean``, the average of all entries
+  * ``std``, the standard deviation of the column
+  * ``min``, and ``max``: the smallest and largest value of the column
+  * ``25%``, ``50%``, ``75%``: the value where only 25%, 50% or 75% of the entries in the column have
+    a smaller value. For example if we have 100 entries in the dataframe the 25% quantile is the 25th smallest value.
+    The 50% quantile is also known as the median.
 
 You can also display the values of the DataFrame sorted by a specific column:
 
@@ -688,15 +723,15 @@ In this section we will answer *"How can I plot data?"* and demonstrate the
 In previous example workshops the simple decay mode :math:`B^0\to \phi K_S^0`,
 where :math:`\phi \to K^+ K^-` and :math:`K_S^0 \to \pi^+ \pi^-` was
 reconstructed. Now we will use these candidates to plot example
-distributions. This time we use the ``root_pandas`` package to read the data
+distributions. This time we use the ``uproot`` package to read the data
 
 .. code:: ipython3
   :linenos:
 
-  import root_pandas
+  import uproot
 
   file_path = "https://rebrand.ly/00vvyzg"
-  df = root_pandas.read_root(file_path).astype(float)
+  df = uproot.open(file_path + ":b0phiKs").arrays(library="pd")
   df.B0_isSignal = df.B0_isSignal.astype(bool)
   df.describe()
 
@@ -915,26 +950,25 @@ Importing the style is as easy as "one, two, ...
   You should be able to generate the picture simply by copy-pasting the code
   example given.
 
+.. _large_files:
 
-Dealing with large files in a jupyter notebook (optional)
----------------------------------------------------------
+Dealing with large / many files (optional)
+------------------------------------------
 
-If your files are quite large you may start to find your jupyter notebook kernel
+If your files are quite large you may start to find your programm or jupyter notebook kernel
 crashing - there are a few ways in which we can mitigate this.
 
 - "Chunk" your data
 - Only import the columns (variables) that you will use/need.
-- Add any cuts you can
 
-To import the file using chunking there are some slight differences in the code:
+To import the file using chunking, instead of loading the tree with the ``arrays`` method, we can iterate over chunks of the tree with the ``iterate`` method.
 
 .. code:: ipython3
 
-   df_chunk = root_pandas.read_root(
-       ['filePath/fileName'], columns=Y4S_columns, chunksize=100
-   )
+  for df in tree.iterate(Y4S_columns, step_size=100_000, library="pd"):
+    ...
 
-Here I have defined which columns I wish to be included in the following string:
+Here I have defined which columns I wish to be included in the following list:
 
 .. code:: ipython3
 
@@ -943,34 +977,30 @@ Here I have defined which columns I wish to be included in the following string:
 .. admonition:: Exercise
   :class: exercise stacked
 
-  Load your dataframe as chunks.
+  Load your dataframe as chunks of 100000 events.
 
 .. admonition:: Solution
   :class: solution toggle
 
   .. code:: ipython3
 
-    files = ["https://rebrand.ly/00vvyzg"]
-    df_chunk=root_pandas.read_root(files, columns=Y4S_columns, chunksize=100000)
+    file = "https://rebrand.ly/00vvyzg"
+    tree = uproot.open(file + ":b0phiKs")
+    for df_chunk in tree.iterate(Y4S_columns, step_size=100_000, library="pd"):
+      ...
 
 Now the data is loaded as chunks, we "loop" over or run through all the chunks
-and piece them together. This is the point at which we can add our cuts to
-reduce the loaded, chunked file more.
+and perform selection and further processing on those chunks instead of the whole dataset at once.
 
-.. code:: ipython3
-  :linenos:
+You can read more about the many features of the ``iterate`` method in the `documentation <https://uproot.readthedocs.io/en/latest/uproot.behaviors.TTree.TTree.html#iterate>`_.
 
-  import pandas as pd
+If you want to process many files, uproot offers the function ``uproot.iterate`` so you don't have to loop manually over all files. It has a similar interface to the tree methods ``arrays`` and ``itereate``, 
+except it also accepts a list of files or a wildcard expression:
 
+.. code:: python3
 
-  cut = "(B0_mbc > 5.2)"  # Define our cut
-
-  df_list = []
-  for chunk in df_chunk:
-      chunk = chunk.query(cut)  # Implement our cut!
-      df_list.append(chunk)
-  df = pd.concat(df_list)  # Concatenate our chunks into a dataframe!
-
+  for df_chunk in uproot.iterate("data/signal*.root:tree", columns, step_size=100_000, library="pd"):
+    ...
 
 Your journey continues
 ----------------------

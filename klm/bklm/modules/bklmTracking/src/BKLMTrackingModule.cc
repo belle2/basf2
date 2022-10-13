@@ -79,7 +79,7 @@ void BKLMTrackingModule::initialize()
   if (m_studyEffi)
     B2INFO("BKLMTrackingModule:: this module is running in efficiency study mode!");
 
-  m_file =     new TFile(m_outPath.c_str(), "recreate");
+  m_file = new TFile(m_outPath.c_str(), "recreate");
   TString hname;
   std::string labelFB[2] = {"BB", "BF"};
   int Nbin = 16;

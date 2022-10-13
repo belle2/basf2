@@ -3939,7 +3939,7 @@ def addPhotonEfficiencyRatioVariables(inputListNames, tableName, path=None):
 
     import b2bii
     if b2bii.isB2BII():
-        B2ERROR("For Belle data the photon data/MC detection efficiency ratio is not avaialble with this tool.")
+        B2ERROR("For Belle data the photon data/MC detection efficiency ratio is not available with this tool.")
 
     photon_efficiency_correction = register_module('PhotonEfficiencySystematics')
     photon_efficiency_correction.param('particleLists', inputListNames)

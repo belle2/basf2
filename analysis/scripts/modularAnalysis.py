@@ -3316,14 +3316,23 @@ def buildEventShape(inputListNames=None,
 
     gammaCuts = 'E > 0.05'
     gammaCuts += ' and thetaInCDCAcceptance'
-    gammaCuts += ' and abs(clusterTiming) < 200'
+    if not b2bii.isB2BII():
+        gammaCuts += ' and abs(clusterTiming) < 200'
     if (custom_cuts is not None):
         trackCuts, gammaCuts = custom_cuts
 
     if not inputListNames:
         B2INFO("Creating particle lists pi+:evtshape and gamma:evtshape to get the event shape variables.")
         fillParticleList('pi+:evtshape', '', path=path)
-        fillParticleList('gamma:evtshape', '', loadPhotonBeamBackgroundMVA=False, loadPhotonHadronicSplitOffMVA=False, path=path)
+        if b2bii.isB2BII():
+            copyList('gamma:evtshape', 'gamma:mdst', path=path)
+        else:
+            fillParticleList(
+                'gamma:evtshape',
+                '',
+                loadPhotonBeamBackgroundMVA=False,
+                loadPhotonHadronicSplitOffMVA=False,
+                path=path)
         particleLists = ['pi+:evtshape', 'gamma:evtshape']
 
         if default_cleanup:

@@ -3170,7 +3170,8 @@ def buildEventKinematics(inputListNames=None, default_cleanup=True, custom_cuts=
 
     gammaCuts = 'E > 0.05'
     gammaCuts += ' and thetaInCDCAcceptance'
-    gammaCuts += ' and abs(clusterTiming) < 200'
+    if not b2bii.isB2BII():
+        gammaCuts += ' and abs(clusterTiming) < 200'
     if (custom_cuts is not None):
         trackCuts, gammaCuts = custom_cuts
 
@@ -3178,7 +3179,10 @@ def buildEventKinematics(inputListNames=None, default_cleanup=True, custom_cuts=
         from stdCharged import stdMostLikely
         stdMostLikely(chargedPIDPriors, '_evtkin', path=path)
         inputListNames = ['%s:mostlikely_evtkin' % ptype for ptype in ['K+', 'p+', 'e+', 'mu+', 'pi+']]
-        fillParticleList('gamma:evtkin', '', loadPhotonBeamBackgroundMVA=False, loadPhotonHadronicSplitOffMVA=False, path=path)
+        if b2bii.isB2BII():
+            copyList('gamma:evtkin', 'gamma:mdst', path=path)
+        else:
+            fillParticleList('gamma:evtkin', '', loadPhotonBeamBackgroundMVA=False, loadPhotonHadronicSplitOffMVA=False, path=path)
         inputListNames += ['gamma:evtkin']
         if default_cleanup:
             B2INFO("Using default cleanup in EventKinematics module.")
@@ -3190,7 +3194,10 @@ def buildEventKinematics(inputListNames=None, default_cleanup=True, custom_cuts=
     if not inputListNames:
         B2INFO("Creating particle lists pi+:evtkin and gamma:evtkin to get the global kinematics of the event.")
         fillParticleList('pi+:evtkin', '', path=path)
-        fillParticleList('gamma:evtkin', '', loadPhotonBeamBackgroundMVA=False, loadPhotonHadronicSplitOffMVA=False, path=path)
+        if b2bii.isB2BII():
+            copyList('gamma:evtshape', 'gamma:mdst', path=path)
+        else:
+            fillParticleList('gamma:evtkin', '', loadPhotonBeamBackgroundMVA=False, loadPhotonHadronicSplitOffMVA=False, path=path)
         particleLists = ['pi+:evtkin', 'gamma:evtkin']
         if default_cleanup:
             if (custom_cuts is not None):

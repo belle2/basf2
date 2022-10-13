@@ -8,20 +8,24 @@
 # Responsible: Yang Li
 # Email: y_li21@m.fudan.edu.cn
 # Date: 20221008
+# parameter of Xb: pdg.add_particle('Xb',1111553,10.60435,1.2e-3,0.0,1.0,0.1, 0, 0)
+
+Alias Xbsig Xb
+Alias chi_b2sig chi_b2
 
 Decay vpho
-1.0 Xb gamma PHSP;
+1.0 Xbsig gamma PHSP;
 Enddecay
 
-Decay Xb
-1.0 pi+ pi- chi_b2 PHSP;
+Decay Xbsig
+1.0 pi+ pi- chi_b2sig PHSP;
 Enddecay
 
-Decay chi_b2
-1.0 gamma Upsilon PHSP;
+Decay chi_b2sig
+1.0 gamma Upsilonsig PHSP;
 Enddecay
 
-Decay Upsilon
+Decay Upsilonsig
 0.5 e+ e- VLL;
 0.5 mu+ mu- VLL;
 Enddecay

@@ -172,6 +172,8 @@ class Plot(JsonBase):
         #: height of the plot in pixels
         self.height = height
         #: linked issues
+        if not issue:
+            issue = []
         self.issue = issue
 
 

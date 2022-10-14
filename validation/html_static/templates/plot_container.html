@@ -233,16 +233,24 @@
   {{! if the warning has not been set, no pvalue is available either }}
   <span><strong>Contact: </strong>{{ contact }}</span><br>
   <span><strong>Check for: </strong>{{ check }}</span><br>
-  {{#if issue != null }}
+  {{#if issue.length==0 }}
   <span>
-    <strong>Linked issues: </strong>
-    <a target="_blank" href="https://gitlab.desy.de/aprakash/dummy/-/issues/{{issue}}">{{issue}}</a> || 
-    <a target="_blank" href="../update_issue?file_path={{ plot_path }}{{ png_filename }}&id={{issue}}" target="_blank">Update with this plot</a>
+    <a href="../issue?file_path={{ plot_path }}{{ png_filename }}&rev_label={{ newest_revision}}" target="_blank">Create issue</a>
   </span>
-  <br>
   {{else}}
-  <span><a href="../issue?file_path={{ plot_path }}{{ png_filename }}" target="_blank">Create issue</a></span><br>
+  <span>
+    <strong>Linked issues &darr</strong>
+    <ul style="margin:auto">
+      {{#issue:i}}
+      <li>
+        <a target="_blank" href="../issue_redirect?iid={{ issue[i] }}">{{issue[i]}}</a> || 
+        <a target="_blank" href="../update_issue?file_path={{ plot_path }}{{ png_filename }}&id={{issue[i]}}&rev_label={{ newest_revision}}" target="_blank">Update with this plot</a>
+      </li>
+      {{/issue}}
+    </ul>
+  </span>
   {{/if}}
+  <br>
   {{#scriptfiles}}
   {{#if name == rootfile+".py" }}
   <a href="../results/{{newest_revision}}/{{log_url}}" target="_blank">Logfile</a><br>

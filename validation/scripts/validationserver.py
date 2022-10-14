@@ -20,6 +20,8 @@ import sys
 import queue
 import webbrowser
 import re
+import collections
+import configparser
 
 # 3rd
 import cherrypy
@@ -118,36 +120,6 @@ def check_plotting_status(progress_key: str):
     return last_status
 
 
-"""
-Gitlab Integration
-
-Under here are functions that enable the validationserver to
-interact directly with the Gitlab project page to track and
-update issues.
-
-Requirement:
-Config file with project information and access token in the local
-machine.
-
-A check is performed to see if the config file exists and all of
-Gitlab functionalities are enabled/disabled accordingly.
-
-When the server is being set up, a Gitlab object is created, which
-will be used subsequently to make all the API calls.
-
-As a final server initialization step, the project is queried to
-check if any of the current results are linked to existing issues
-and the result files are updated accordingly.
-
-The create/issue functionality is accessible from the plot
-container. All the relevant pages are part of the
-validationserver cherry object.
-
-Function to upload files to Gitlab helps with pushing error plots
-to the project.
-"""
-
-
 # todo: remove this, once we're certain that the bug was fixed!
 def warn_wrong_directory():
     if not os.getcwd().endswith("html"):
@@ -200,40 +172,91 @@ def start_plotting_request(
     return rev_key
 
 
-# todo: remove this, once we have a way to handle access token.
-def check_gitlab_config(config_path):
-    expected_gl_config = os.path.join(config_path, "config/gl.cfg")
-    if not os.path.exists(expected_gl_config):
-        print(
-            f"ERROR: Expected to find config folder with Gitlab config,"
-            f" but {expected_gl_config} doesn't exist. "
-            f"Gitlab features will not work."
-        )
+"""
+Gitlab Integration
 
-    return os.path.exists(expected_gl_config)
+Under here are functions that enable the validationserver to
+interact directly with the Gitlab project page to track and
+update issues.
+
+Requirement:
+Config file with project information and access token in the local
+machine. This is expected to be in the validation/config folder, in
+the same root directory as the html_static files.
+
+A check is performed to see if the config file exists with all the
+relevant details and all of Gitlab functionalities are enabled/disabled
+accordingly.
+
+When the server is being set up, a Gitlab object is created, which
+will be used subsequently to make all the API calls.
+
+As a final server initialization step, the project is queried to
+check if any of the current results are linked to existing issues
+and the result files are updated accordingly.
+
+The create/update issue functionality is accessible from the plot
+container. All the relevant pages are part of the
+validationserver cherry object.
+
+Issues created by the validation server will contain a block of
+automated code at the end of description and can be easily
+filtered from the GitLab issues page using the search string
+"Automated code, please do not delete". Relevant plots will be
+listed as a note in the issue page, along with the revision label.
+
+Function to upload files to Gitlab helps with pushing error plots
+to the project.
+"""
 
 
-# todo: cfg file location
-def create_gitlab_object():
+def get_gitlab_config(
+    config_path: str
+) -> configparser.ConfigParser:
+    """
+    Parse the configuration file to be used to authenticate
+    GitLab API and retrieve relevant project info.
+
+    Returns:
+        gitlab configparser object
+    """
+
+    gitlab_config = configparser.ConfigParser()
+    gitlab_config.read(config_path)
+
+    return gitlab_config
+
+
+def create_gitlab_object(config_path: str) -> gitlab.Gitlab:
     """
     Establish connection with Gitlab using a private access key and return
-    a Gitlab object that can be used to make API calls.
+    a Gitlab object that can be used to make API calls. Default config
+    from the passed ini file will be used.
 
     Returns:
         gitlab object
     """
 
     gitlab_object = gitlab.Gitlab.from_config(
-        "belle2validation", ["../config/gl.cfg"]
+        config_files=[config_path]
     )
-    gitlab_object.auth()
-
-    logging.info("Established connection with Gitlab")
+    try:
+        gitlab_object.auth()
+        logging.info("Established connection with Gitlab")
+    except gitlab.exceptions.GitlabAuthenticationError:
+        gitlab_object = None
+        logging.warning(
+            "Issue with authenticating GitLab. "
+            "Please ensure access token is correct and valid. "
+            "GitLab Integration will be disabled."
+        )
 
     return gitlab_object
 
 
-def get_project_object(gitlab_object, project_id):
+def get_project_object(
+    gitlab_object: gitlab.Gitlab, project_id: str
+) -> 'gitlab.project':
     """
     Fetch Gitlab project associated with the project ID.
 
@@ -246,23 +269,34 @@ def get_project_object(gitlab_object, project_id):
     return project
 
 
-def search_project_issues(gitlab_object, search_term):
+def search_project_issues(
+    gitlab_object: gitlab.Gitlab, search_term: str
+) -> 'list[gitlab.issues]':
     """
-    Search in the Gitlab for the issues that contain the
+    Search in the Gitlab for open issues that contain the
     key phrase.
 
     Returns:
         gitlab project issues
     """
 
-    issues = gitlab_object.issues.list(search=search_term, lazy=True)
+    issues = gitlab_object.issues.list(
+        search=search_term,
+        state='opened',
+        lazy=True,
+    )
 
     return issues
 
 
-def update_linked_issues(gitlab_object, cwd_folder):
+def update_linked_issues(
+    gitlab_object: gitlab.Gitlab, cwd_folder: str
+) -> None:
     """
     Fetch linked issues and update the comparison json files.
+
+    Returns:
+        None
     """
 
     # collect list of issues validation server has worked with
@@ -270,11 +304,12 @@ def update_linked_issues(gitlab_object, cwd_folder):
     issues = search_project_issues(gitlab_object, search_key)
 
     # find out the plots linked to the issues
-    plot_issues = {}
-    pattern = r"Relevant plot (\w+)"
+    plot_issues = collections.defaultdict(list)
+    pattern = r"Relevant plot: (\w+)"
     for issue in issues:
         match = re.search(pattern, issue.description)
-        plot_issues[match.groups()[0]] = issue.iid
+        if match:
+            plot_issues[match.groups()[0]].append(issue.iid)
 
     # get list of available revision
     rev_list = get_json_object_list(
@@ -294,12 +329,16 @@ def update_linked_issues(gitlab_object, cwd_folder):
                 for plot in plotfile.get("plots"):
                     if plot["title"] in plot_issues.keys():
                         plot["issue"] = plot_issues[plot["title"]]
+                    else:
+                        plot["issue"] = []
 
         with open(comparison_json_path, "w") as jsonFile:
             json.dump(comparison_json, jsonFile, indent=4)
 
 
-def upload_file_gitlab(file_path, project):
+def upload_file_gitlab(
+    file_path: str, project: 'gitlab.project'
+) -> Dict[str, str]:
     """
     Upload the passed file to the Gitlab project.
 
@@ -314,13 +353,18 @@ def upload_file_gitlab(file_path, project):
     return uploaded_file
 
 
-def create_gitlab_issue(title, description, uploaded_file, project):
+def create_gitlab_issue(
+    title: str,
+    description: str,
+    uploaded_file: Dict[str, str],
+    project: 'gitlab.project'
+) -> str:
     """
     Create a new project issue with the passed title and description, using
     Gitlab API.
 
     Returns:
-        isssue id
+        created isssue id
     """
 
     issue = project.issues.create({"title": title, "description": description})
@@ -337,13 +381,18 @@ def create_gitlab_issue(title, description, uploaded_file, project):
     return issue.iid
 
 
-# todo:add sw label as well?
-def update_gitlab_issue(issue_iid, uploaded_file, project, file_path):
+def update_gitlab_issue(
+    issue_iid: str,
+    uploaded_file: Dict[str, str],
+    project: 'gitlab.project',
+    file_path: str,
+    rev_label: str
+) -> None:
     """
     Update an existing project issue with the passed plotfile.
 
     Returns:
-        issue id
+        None
     """
 
     issue = project.issues.get(issue_iid)
@@ -351,9 +400,9 @@ def update_gitlab_issue(issue_iid, uploaded_file, project, file_path):
     plot_package = file_path.split("/")[-2]
     issue.notes.create(
         {
-            "body": "Related observation in validation of {0} package, {1}. \
-        See the [error plot]({2})".format(
-                plot_package, plot_name, uploaded_file["url"]
+            "body": "Related observation in validation of `{0}` package, `{1}`\
+             plot in `{2}` build. See the [error plot]({3})".format(
+                plot_package, plot_name, rev_label, uploaded_file["url"]
             )
         }
     )
@@ -361,8 +410,6 @@ def update_gitlab_issue(issue_iid, uploaded_file, project, file_path):
     issue.save()
 
     logging.info(f"Updated existing Gitlab issue {issue.iid}")
-
-    return issue.iid
 
 
 class ValidationRoot:
@@ -375,13 +422,11 @@ class ValidationRoot:
 
     """
 
-    # Check if it is better to make this a session object variable
-    plot_path = None
-
-    def __init__(self, working_folder, gitlab_object):
+    def __init__(self, working_folder, gitlab_object, gitlab_config):
         """
         class initializer, which takes the path to the folders containing the
-        validation run results and plots (aka comparison)
+        validation run results and plots (aka comparison), gitlab object and
+        config
         """
 
         #: html folder that contains plots etc.
@@ -397,6 +442,13 @@ class ValidationRoot:
 
         #: Gitlab object
         self.gitlab_object = gitlab_object
+
+        #: Gitlab config
+        self.gitlab_config = gitlab_config
+
+        #: placeholder variables for path and revision label for issue creation
+        self.plot_path = None
+        self.revision_label = None
 
     @cherrypy.expose
     @cherrypy.tools.json_in()
@@ -610,7 +662,6 @@ class ValidationRoot:
             ),
         }
 
-    # Todo: change redirect link to production one
     @cherrypy.expose
     @cherrypy.tools.json_in()
     @cherrypy.tools.json_out()
@@ -620,13 +671,17 @@ class ValidationRoot:
         to the created Gitlab issue page.
         """
 
+        default_section = self.gitlab_config['global']['default']
+        project_id = self.gitlab_config[default_section]['project_id']
         # Create issue in the Gitlab project and save it
-        project = get_project_object(self.gitlab_object, 3318)
-        uploaded_file = upload_file_gitlab(ValidationRoot.plot_path, project)
-        plot_title = ValidationRoot.plot_path.split("/")[-1].split(".")[0]
+        project = get_project_object(self.gitlab_object, project_id)
+        uploaded_file = upload_file_gitlab(self.plot_path, project)
+        plot_title = self.plot_path.split("/")[-1].split(".")[0]
         description += "\n\n---\n\n:robot: Automated code, please do not delete\n\n\
-            Relevant plot {}\n\n---".format(
-            plot_title
+            Relevant plot: {0}\n\n\
+            Revision label: {1}\n\n---".format(
+            plot_title,
+            self.revision_label
         )
         issue_id = create_gitlab_issue(
             title, description, uploaded_file, project
@@ -636,65 +691,94 @@ class ValidationRoot:
         # Update JSON with created issue id
         comparison_json_path = os.path.join(
             validationpath.get_html_plots_folder(self.working_folder),
-            ValidationRoot.plot_path.split("/")[-3],
+            self.plot_path.split("/")[-3],
             "comparison.json",
         )
 
         comparison_json = deliver_json(comparison_json_path)
         for package in comparison_json["packages"]:
-            if package["name"] == ValidationRoot.plot_path.split("/")[-2]:
+            if package["name"] == self.plot_path.split("/")[-2]:
                 for plotfile in package.get("plotfiles"):
                     for plot in plotfile.get("plots"):
                         if (
                             plot["png_filename"]
-                            == ValidationRoot.plot_path.split("/")[-1]
+                            == self.plot_path.split("/")[-1]
                         ):
-                            plot["issue"] = issue_id
+                            plot["issue"].append(issue_id)
                             break
 
         with open(comparison_json_path, "w") as jsonFile:
             json.dump(comparison_json, jsonFile, indent=4)
 
+        issue_url = self.gitlab_config[default_section]['project_url'] \
+            + "/-/issues/" \
+            + str(issue_id)
         raise cherrypy.HTTPRedirect(
-            "https://gitlab.desy.de/aprakash/dummy/-/issues/" + str(issue_id)
+            issue_url
         )
 
     @cherrypy.expose
-    def issue(self, file_path):
+    def issue(self, file_path, rev_label):
         """
         Return a template issue creation interface
         for the user to add title and description.
         """
-        ValidationRoot.plot_path = os.path.join(
+        self.plot_path = os.path.join(
             validationpath.get_html_folder(self.working_folder), file_path
         )
 
+        self.revision_label = rev_label
+
         if not self.gitlab_object:
-            return "ERROR: Gitlab integration not set up, config file is missing."
+            return "ERROR: Gitlab integration not set up, verify config file."
 
         raise cherrypy.HTTPRedirect("/static/validation_issue.html")
 
     @cherrypy.expose
-    def update_issue(self, id, file_path):
+    def issue_redirect(self, iid):
+        """
+        Redirect to the Gitlab issue page.
+        """
+        default_section = self.gitlab_config['global']['default']
+        if not self.gitlab_config[default_section]['project_url']:
+            return "ERROR: Gitlab integration not set up, verify config file."
+
+        issue_url = self.gitlab_config[default_section]['project_url'] \
+            + "/-/issues/" \
+            + str(iid)
+        raise cherrypy.HTTPRedirect(
+                issue_url
+            )
+
+    @cherrypy.expose
+    def update_issue(self, id, file_path, rev_label):
         """
         Update existing issue in Gitlab with current result plot
         and redirect to the updated Gitlab issue page.
         """
 
         if not self.gitlab_object:
-            return "ERROR: Gitlab integration not set up, config file is missing."
+            return "ERROR: Gitlab integration not set up, verify config file."
 
         plot_path = os.path.join(
             validationpath.get_html_folder(self.working_folder), file_path
         )
 
-        project = get_project_object(self.gitlab_object, 3318)
+        default_section = self.gitlab_config['global']['default']
+        project_id = self.gitlab_config[default_section]['project_id']
+        project = get_project_object(self.gitlab_object, project_id)
         uploaded_file = upload_file_gitlab(plot_path, project)
-        issue_id = update_gitlab_issue(id, uploaded_file, project, plot_path)
+        update_gitlab_issue(
+            id, uploaded_file, project, plot_path, rev_label
+        )
         project.save()
 
+        issue_url = self.gitlab_config[default_section]['project_url'] \
+            + "/-/issues/" \
+            + str(id)
+
         raise cherrypy.HTTPRedirect(
-            "https://gitlab.desy.de/aprakash/dummy/-/issues/" + str(issue_id)
+            issue_url
         )
 
 
@@ -924,16 +1008,29 @@ def run_server(
     if open_site:
         webbrowser.open("http://" + ip + ":" + str(port))
 
+    config_path = os.path.join(static_folder, '../config/gl.cfg')
+
     if not dry_run:
         # gitlab toggle
         gitlab_object = None
-        if check_gitlab_config(cwd_folder):
-            gitlab_object = create_gitlab_object()
-            update_linked_issues(gitlab_object, cwd_folder)
+        gitlab_config = None
+        if not os.path.exists(config_path):
+            logging.warning(
+                f"ERROR: Expected to find config folder with Gitlab config,"
+                f" but {config_path} doesn't exist. "
+                f"Gitlab features will not work."
+            )
+        else:
+            gitlab_config = get_gitlab_config(config_path)
+            gitlab_object = create_gitlab_object(config_path)
+            if gitlab_object:
+                update_linked_issues(gitlab_object, cwd_folder)
 
         cherrypy.quickstart(
             ValidationRoot(
-                working_folder=cwd_folder, gitlab_object=gitlab_object
+                working_folder=cwd_folder,
+                gitlab_object=gitlab_object,
+                gitlab_config=gitlab_config,
             ),
             "/",
             cherry_config,

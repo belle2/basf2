@@ -29,8 +29,6 @@ class TestTreeFits(unittest.TestCase):
         # file
         basf2.conditions.disable_globaltag_replay()
 
-        basf2.set_random_seed('123456')
-
         main = basf2.create_path()
 
         inputfile = b2test_utils.require_file('analysis/tests/150_noBKG_DtoPiNuNu.root', py_case=self)

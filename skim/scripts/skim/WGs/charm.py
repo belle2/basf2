@@ -910,3 +910,63 @@ class EarlyData_DstToD0Pi_D0ToHpHmPi0(BaseSkim):
             DstList.append("D*+:HpHmPi0" + str(chID))
 
         return DstList
+
+
+@fancy_skim_header
+class DstToD0Pi_D0ToVGamma(BaseSkim):
+    """
+    Cut criteria are not finally decided, and could be changed. Please check the
+    code in the master branch to get up-to-date information.
+    """
+
+    __authors__ = ["Jaeyoung Kim"]
+    __description__ = "A select of DstToD0Pi_D0ToVGamma, V is the vector meson, including phi, rho0, anti-K*0 and omega."
+    __contact__ = __liaison__
+    __category__ = "physics, charm"
+
+    NoisyModules = ["ParticleLoader", "RootOutput"]
+
+    def load_standard_lists(self, path):
+        stdK("loose", path=path)
+        stdPi("loose", path=path)
+        loadStdSkimPhoton(path=path)
+        loadStdSkimPi0(path=path)
+
+    def build_lists(self, path):
+        omegacut = "abs(dM) < 0.045"
+        phicut = "abs(dM) < 0.03"
+        rhocut = "abs(dM) < 0.3675"
+        antiKstarcut = "abs(dM) < 0.33"
+
+        D0cuts = "abs(dM) < 0.225 and useCMSFrame(p) > 2"
+        Dstcuts = "massDifference(0) < 0.160"
+
+        DstList = []
+
+        # Omega mode
+        ma.reconstructDecay(decayString="omega:myOmega -> pi+:loose pi-:loose pi0:skim", cut=omegacut, path=path)
+        ma.reconstructDecay(decayString="D0:ch1 -> omega:myOmega gamma:loose", cut=D0cuts, path=path)
+        ma.reconstructDecay(decayString="D*+:ch1 -> D0:ch1 pi+:loose", cut=Dstcuts, dmID=1, path=path)
+
+        # Phi mode
+        ma.reconstructDecay(decayString="phi:myPhi -> K+:loose K-:loose", cut=phicut, path=path)
+        ma.reconstructDecay(decayString="D0:ch2 -> phi:myPhi gamma:loose", cut=D0cuts,  path=path)
+        ma.reconstructDecay(decayString="D*+:ch2 -> D0:ch2 pi+:loose", cut=Dstcuts, dmID=2, path=path)
+
+        # Rho0 mode
+        ma.reconstructDecay(decayString="rho0:myRho -> pi+:loose pi-:loose", cut=rhocut, path=path)
+        ma.reconstructDecay(decayString="D0:ch3 -> rho0:myRho gamma:loose", cut=D0cuts,  path=path)
+        ma.reconstructDecay(decayString="D*+:ch3 -> D0:ch3 pi+:loose", cut=Dstcuts, dmID=3, path=path)
+
+        # anti-K*0 mode
+        ma.reconstructDecay(decayString="anti-K*0:myantiKstar -> K-:loose pi+:loose", cut=antiKstarcut, path=path)
+        ma.reconstructDecay(decayString="D0:ch4 -> anti-K*0:myantiKstar gamma:loose", cut=D0cuts,  path=path)
+        ma.reconstructDecay(decayString="D*+:ch4 -> D0:ch4 pi+:loose", cut=Dstcuts, dmID=4, path=path)
+
+        ma.copyLists(outputListName="D*+:all", inputListNames=["D*+:ch1", "D*+:ch2", "D*+:ch3", "D*+:ch4"], path=path)
+
+        ma.applyEventCuts("nParticlesInList(D*+:all) > 0", path=path)
+
+        DstList.append("D*+:all")
+
+        return DstList

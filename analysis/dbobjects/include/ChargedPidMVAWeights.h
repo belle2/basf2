@@ -252,6 +252,17 @@ namespace Belle2 {
 
 
     /**
+     * Store the map associating variable aliases to variable names knowm to VariableManager.
+     *
+     * @param aliases the map of (alias, VM variable) pairs.
+     */
+    void storeAliases(const std::map<std::string, std::string>& aliases)
+    {
+      m_aliases = std::make_unique<std::map<std::string, std::string>>(aliases);
+    }
+
+
+    /**
      * Get the raw pointer to the 3D (clusterTheta, p, charge) grid representing the categories for which weightfiles are defined.
      * Used just to view the stored data.
      */
@@ -517,7 +528,14 @@ namespace Belle2 {
     };
 
 
-    ClassDef(ChargedPidMVAWeights, 8);
+    /**
+     * A map that associates variable aliases to variable names known to VariableManager.
+     */
+    std::unique_ptr<std::map<std::string, std::string>> m_aliases;
+
+
+    ClassDef(ChargedPidMVAWeights, 9);
+    /**< 9. Add map of variable aliases and original basf2 vars. */
     /**< 8. Use unique_ptr for m_categories. */
     /**< 7. Use double instead of float in tuple. */
     /**< 6. Introduce charge bin in the parametrisation. */

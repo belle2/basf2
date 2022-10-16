@@ -257,15 +257,22 @@ void ChargedPidMVAMulticlassModule::registerAliases()
   auto aliases = (*m_weightfiles_representation.get())->getAliases();
 
   if (aliases) {
-    B2INFO("Setting aliases read from the payload class...");
+
+    if (aliases->empty()) {
+      B2ERROR("The aliases map is empty.");
+      return;
+    }
+
+    B2INFO("Setting aliases for the ChargedPidMVA algorithm read from the payload.");
     for (const auto& [alias, variable] : *aliases) {
+      B2DEBUG(10, alias << " --> " << variable);
       if (alias != variable) {
-        std::cout << alias << " --> " << variable << std::endl;
         if (!Variable::Manager::Instance().addAlias(alias, variable)) {
           B2ERROR("Something went wrong with setting alias: " << alias << " for variable: " << variable);
         }
       }
     }
+
     return;
   }
 

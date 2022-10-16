@@ -251,11 +251,37 @@ void ChargedPidMVAMulticlassModule::event()
 }
 
 
+void ChargedPidMVAMulticlassModule::registerAliases()
+{
+
+  auto aliases = (*m_weightfiles_representation.get())->getAliases();
+
+  if (aliases) {
+    B2INFO("Setting aliases read from the payload class...");
+    for (const auto& [alias, variable] : *aliases) {
+      if (alias != variable) {
+        std::cout << alias << " --> " << variable << std::endl;
+        if (!Variable::Manager::Instance().addAlias(alias, variable)) {
+          B2ERROR("Something went wrong with setting alias: " << alias << " for variable: " << variable);
+        }
+      }
+    }
+    return;
+  }
+
+  // Manually set aliases - for bw compatibility
+
+}
+
+
 void ChargedPidMVAMulticlassModule::initializeMVA()
 {
 
   B2INFO("Run: " << m_event_metadata->getRun() <<
          ". Load supported MVA interfaces for multi-class charged particle identification...");
+
+  // Set the necessary variable aliases from the payload.
+  this->registerAliases();
 
   // The supported methods have to be initialized once (calling it more than once is safe).
   MVA::AbstractInterface::initSupportedInterfaces();

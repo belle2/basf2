@@ -157,5 +157,10 @@ namespace Belle2 {
      */
     VariablesLists m_spectators;
 
+    /**
+     * Set variable aliases neeeded by th MVA.
+     */
+    void registerAliases();
+
   };
 }

@@ -165,5 +165,10 @@ namespace Belle2 {
      */
     std::vector<std::string> m_classes;
 
+    /**
+     * Set variable aliases neeeded by th MVA.
+     */
+    void registerAliases();
+
   };
 }

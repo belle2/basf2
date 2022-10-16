@@ -318,6 +318,15 @@ namespace Belle2 {
 
 
     /**
+     * Get the raw pointer to the map of aliases.
+     */
+    const std::map<std::string, std::string>* getAliases() const
+    {
+      return m_aliases.get();
+    }
+
+
+    /**
      * Get the index of the XML weight file, for a given reconstructed pair (clusterTheta, p, charge).
      * The index is obtained by linearising the 3D `m_categories` histogram.
      * The same index can be used to look up the correct MVAExpert, Dataset and Cut in the application module,

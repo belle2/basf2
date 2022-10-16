@@ -3503,7 +3503,7 @@ def applyChargedPidMVA(particleLists, path, trainingMode, chargeIndependent=Fals
     """
 
     from ROOT import Belle2
-    from variables import variables as vm
+    # from variables import variables as vm
 
     TrainingMode = Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode
     Const = Belle2.Const
@@ -3557,55 +3557,55 @@ def applyChargedPidMVA(particleLists, path, trainingMode, chargeIndependent=Fals
         {"pName": "d", "pFullName": "deuteron", "pNameBkg": "pi", "pdgIdBkg": Const.pion.getPDGCode()},
     }
 
-    # Set aliases to be consistent with the variable names in the MVA weightfiles.
-    vm.addAlias("__event__", "evtNum")
-    iDet = 0
-    for detID in Const.PIDDetectors.c_set:
+    # # Set aliases to be consistent with the variable names in the MVA weightfiles.
+    # vm.addAlias("__event__", "evtNum")
+    # iDet = 0
+    # for detID in Const.PIDDetectors.c_set:
 
-        detName = Const.parseDetectors(detID)
+    #     detName = Const.parseDetectors(detID)
 
-        vm.addAlias(f"missingLogL_{detName}", f"pidMissingProbabilityExpert({detName})")
+    #     vm.addAlias(f"missingLogL_{detName}", f"pidMissingProbabilityExpert({detName})")
 
-        for pdgIdSig, info in stdChargedMap.items():
+    #     for pdgIdSig, info in stdChargedMap.items():
 
-            if binaryHypoPDGCodes == (0, 0):
+    #         if binaryHypoPDGCodes == (0, 0):
 
-                pFullName = info["pFullName"]
+    #             pFullName = info["pFullName"]
 
-                # MULTI-CLASS training mode.
-                # Aliases for sub-detector likelihood ratios.
-                alias = f"{pFullName}ID_{detName}"
-                orig = f"pidProbabilityExpert({pdgIdSig}, {detName})"
-                vm.addAlias(alias, orig)
-                # Aliases for Log-transformed sub-detector likelihood ratios.
-                epsilon = 1e-8  # To avoid singularities due to limited numerical precision.
-                alias_trf = f"{pFullName}ID_{detName}_LogTransfo"
-                orig_trf = f"formula(-1. * log10(formula(((1. - {orig}) + {epsilon}) / ({orig} + {epsilon}))))"
-                vm.addAlias(alias_trf, orig_trf)
-                # Create only once an alias for the Log-transformed likelihood ratio for all detectors combination.
-                # This is just a spectator, but it needs to be defined still..
-                if iDet == 0:
-                    alias_trf = f"{pFullName}ID_LogTransfo"
-                    orig_trf = f"formula(-1. * log10(formula(((1. - {pFullName}ID) + {epsilon}) / ({pFullName}ID + {epsilon}))))"
-                    vm.addAlias(alias_trf, orig_trf)
+    #             # MULTI-CLASS training mode.
+    #             # Aliases for sub-detector likelihood ratios.
+    #             alias = f"{pFullName}ID_{detName}"
+    #             orig = f"pidProbabilityExpert({pdgIdSig}, {detName})"
+    #             vm.addAlias(alias, orig)
+    #             # Aliases for Log-transformed sub-detector likelihood ratios.
+    #             epsilon = 1e-8  # To avoid singularities due to limited numerical precision.
+    #             alias_trf = f"{pFullName}ID_{detName}_LogTransfo"
+    #             orig_trf = f"formula(-1. * log10(formula(((1. - {orig}) + {epsilon}) / ({orig} + {epsilon}))))"
+    #             vm.addAlias(alias_trf, orig_trf)
+    #             # Create only once an alias for the Log-transformed likelihood ratio for all detectors combination.
+    #             # This is just a spectator, but it needs to be defined still..
+    #             if iDet == 0:
+    #                 alias_trf = f"{pFullName}ID_ALL_LogTransfo"
+    #                 orig_trf = f"formula(-1. * log10(formula(((1. - {pFullName}ID) + {epsilon}) / ({pFullName}ID + {epsilon}))))"
+    #                 vm.addAlias(alias_trf, orig_trf)
 
-            else:
+    #         else:
 
-                pName, pNameBkg, pdgIdBkg = info["pName"], info["pNameBkg"], info["pdgIdBkg"]
+    #             pName, pNameBkg, pdgIdBkg = info["pName"], info["pNameBkg"], info["pdgIdBkg"]
 
-                # BINARY training mode.
-                # Aliases for deltaLL(s, b) of sub-detectors.
-                alias = f"deltaLogL_{pName}_{pNameBkg}_{detName}"
-                orig = f"pidDeltaLogLikelihoodValueExpert({pdgIdSig}, {pdgIdBkg}, {detName})"
-                vm.addAlias(alias, orig)
-                # Create only once an alias for deltaLL(s, b) for all detectors combination.
-                # This is just a spectator, but it needs to be defined still..
-                if iDet == 0:
-                    alias = f"deltaLogL_{pName}_{pNameBkg}_ALL"
-                    orig = f"pidDeltaLogLikelihoodValueExpert({pdgIdSig}, {pdgIdBkg}, ALL)"
-                    vm.addAlias(alias, orig)
+    #             # BINARY training mode.
+    #             # Aliases for deltaLL(s, b) of sub-detectors.
+    #             alias = f"deltaLogL_{pName}_{pNameBkg}_{detName}"
+    #             orig = f"pidDeltaLogLikelihoodValueExpert({pdgIdSig}, {pdgIdBkg}, {detName})"
+    #             vm.addAlias(alias, orig)
+    #             # Create only once an alias for deltaLL(s, b) for all detectors combination.
+    #             # This is just a spectator, but it needs to be defined still..
+    #             if iDet == 0:
+    #                 alias = f"deltaLogL_{pName}_{pNameBkg}_ALL"
+    #                 orig = f"pidDeltaLogLikelihoodValueExpert({pdgIdSig}, {pdgIdBkg}, ALL)"
+    #                 vm.addAlias(alias, orig)
 
-        iDet += 1
+    #     iDet += 1
 
     if binaryHypoPDGCodes == (0, 0):
 

@@ -926,17 +926,17 @@ class DstToD0Pi_D0ToVGamma(BaseSkim):
         * Use :math:`\\gamma` from `stdPi0s.loadStdSkimPhoton`
         * Use :math:`\\pi^{0}` from `stdPi0s.loadStdSkimPi0`
         * Cut on :math:`\\phi`:
-          "abs(dM) < 0.03"
+          ``abs(dM) < 0.03``
         * Cut on :math:`\\rho^{0}`:
-          "abs(dM) < 0.3675"
+          ``abs(dM) < 0.3675``
         * Cut on :math:`\\bar K^{*0}`:
-          "abs(dM) < 0.33"
+          ``abs(dM) < 0.33``
         * Cut on :math:`\\omega`:
-          "abs(dM) < 0.045"
+          ``abs(dM) < 0.045``
         * Cut on :math:`D^{0}`:
-          "abs(dM) < 0.225 and useCMSFrame(p) > 2"
+          ``abs(dM) < 0.225 and useCMSFrame(p) > 2``
         * Cut on :math:`D^{*+}`:
-          "massDifference(0) < 0.160"
+          ``massDifference(0) < 0.160``
         * For more details, please check the source code of this skim.
 
     """

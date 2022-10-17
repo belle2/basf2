@@ -1799,39 +1799,45 @@ namespace Belle2 {
       // for dose simulation
       //---------------------------
 
-      // The following implementation leads to memory leak!
+      int Index_sensi = 11;
+      m_sensitive.push_back((SensitiveDetector*)(new BkgSensitiveDetector("IR", Index_sensi++)));
+      logi_Lv3AuCoat->SetSensitiveDetector(m_sensitive.back());
 
-      //int Index_sensi = 11;
-      //logi_Lv3AuCoat->SetSensitiveDetector(new BkgSensitiveDetector("IR", Index_sensi++));
-      //logi_Lv1TaFwd->SetSensitiveDetector(new BkgSensitiveDetector("IR", Index_sensi++));
-      //logi_Lv1TaBwd->SetSensitiveDetector(new BkgSensitiveDetector("IR", Index_sensi++));
-      //logi_Lv1TaLERUp->SetSensitiveDetector(new BkgSensitiveDetector("IR", Index_sensi++));
-      //logi_Lv1SUSLERUp->SetSensitiveDetector(new BkgSensitiveDetector("IR", Index_sensi++));
-      //logi_Lv1TaHERDwn->SetSensitiveDetector(new BkgSensitiveDetector("IR", Index_sensi++));
-      //logi_Lv1SUSHERDwn->SetSensitiveDetector(new BkgSensitiveDetector("IR", Index_sensi++));
-      //logi_Lv1TaHERUp->SetSensitiveDetector(new BkgSensitiveDetector("IR", Index_sensi++));
-      //logi_Lv1SUSHERUp->SetSensitiveDetector(new BkgSensitiveDetector("IR", Index_sensi++));
-      //logi_Lv1TaLERDwn->SetSensitiveDetector(new BkgSensitiveDetector("IR", Index_sensi++));
-      //logi_Lv1SUSLERDwn->SetSensitiveDetector(new BkgSensitiveDetector("IR", Index_sensi++));
-      //logi_CuFlangeFwd->SetSensitiveDetector(new BkgSensitiveDetector("IR", Index_sensi++));
-      //logi_CuFlangeBwd->SetSensitiveDetector(new BkgSensitiveDetector("IR", Index_sensi++));
+      m_sensitive.push_back((SensitiveDetector*)(new BkgSensitiveDetector("IR", Index_sensi++)));
+      logi_Lv1TaFwd->SetSensitiveDetector(m_sensitive.back());
 
-      //m_sensitive.push_back((SensitiveDetector*)(new BkgSensitiveDetector("IR", 11)));
-      //logi_Lv3AuCoat->SetSensitiveDetector(m_sensitive.back());
-      //m_sensitive.push_back((SensitiveDetector*)(new BkgSensitiveDetector("IR", 12)));
-      //logi_Lv1TaFwd->SetSensitiveDetector(m_sensitive.back());
-      //m_sensitive.push_back((SensitiveDetector*)(new BkgSensitiveDetector("IR", 13)));
-      //logi_Lv1TaBwd->SetSensitiveDetector(m_sensitive.back());
-      //m_sensitive.push_back((SensitiveDetector*)(new BkgSensitiveDetector("IR", 14)));
-      //logi_Lv1TaLERUp->SetSensitiveDetector(m_sensitive.back());
-      //m_sensitive.push_back((SensitiveDetector*)(new BkgSensitiveDetector("IR", 15)));
-      //logi_Lv1TaHERDwn->SetSensitiveDetector(m_sensitive.back());
-      //m_sensitive.push_back((SensitiveDetector*)(new BkgSensitiveDetector("IR", 16)));
-      //logi_Lv1TaHERUp->SetSensitiveDetector(m_sensitive.back());
-      //m_sensitive.push_back((SensitiveDetector*)(new BkgSensitiveDetector("IR", 17)));
-      //logi_Lv1TaLERDwn->SetSensitiveDetector(m_sensitive.back());
+      m_sensitive.push_back((SensitiveDetector*)(new BkgSensitiveDetector("IR", Index_sensi++)));
+      logi_Lv1TaBwd->SetSensitiveDetector(m_sensitive.back());
 
+      m_sensitive.push_back((SensitiveDetector*)(new BkgSensitiveDetector("IR", Index_sensi++)));
+      logi_Lv1TaLERUp->SetSensitiveDetector(m_sensitive.back());
 
+      m_sensitive.push_back((SensitiveDetector*)(new BkgSensitiveDetector("IR", Index_sensi++)));
+      logi_Lv1SUSLERUp->SetSensitiveDetector(m_sensitive.back());
+
+      m_sensitive.push_back((SensitiveDetector*)(new BkgSensitiveDetector("IR", Index_sensi++)));
+      logi_Lv1TaHERDwn->SetSensitiveDetector(m_sensitive.back());
+
+      m_sensitive.push_back((SensitiveDetector*)(new BkgSensitiveDetector("IR", Index_sensi++)));
+      logi_Lv1SUSHERDwn->SetSensitiveDetector(m_sensitive.back());
+
+      m_sensitive.push_back((SensitiveDetector*)(new BkgSensitiveDetector("IR", Index_sensi++)));
+      logi_Lv1TaHERUp->SetSensitiveDetector(m_sensitive.back());
+
+      m_sensitive.push_back((SensitiveDetector*)(new BkgSensitiveDetector("IR", Index_sensi++)));
+      logi_Lv1SUSHERUp->SetSensitiveDetector(m_sensitive.back());
+
+      m_sensitive.push_back((SensitiveDetector*)(new BkgSensitiveDetector("IR", Index_sensi++)));
+      logi_Lv1TaLERDwn->SetSensitiveDetector(m_sensitive.back());
+
+      m_sensitive.push_back((SensitiveDetector*)(new BkgSensitiveDetector("IR", Index_sensi++)));
+      logi_Lv1SUSLERDwn->SetSensitiveDetector(m_sensitive.back());
+
+      m_sensitive.push_back((SensitiveDetector*)(new BkgSensitiveDetector("IR", Index_sensi++)));
+      logi_CuFlangeFwd->SetSensitiveDetector(m_sensitive.back());
+
+      m_sensitive.push_back((SensitiveDetector*)(new BkgSensitiveDetector("IR", Index_sensi++)));
+      logi_CuFlangeBwd->SetSensitiveDetector(m_sensitive.back());
 
       //-
       //----------

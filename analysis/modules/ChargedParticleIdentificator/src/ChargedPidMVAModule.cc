@@ -260,7 +260,7 @@ void ChargedPidMVAModule::registerAliases()
   if (aliases) {
 
     if (aliases->empty()) {
-      B2ERROR("The aliases map is empty.");
+      B2ERROR("The aliases container in the payload is empty.");
       return;
     }
 

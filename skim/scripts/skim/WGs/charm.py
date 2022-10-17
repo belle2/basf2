@@ -38,7 +38,7 @@ from stdPi0s import loadStdSkimPi0
 from stdV0s import stdKshorts
 
 
-__liaison__ = "Guanda Gong <gonggd@mail.ustc.edu.cn>"
+__liaison__ = "Kaikai He <20214008001@stu.suda.edu.cn>"
 _VALIDATION_SAMPLE = "mdst14.root"
 
 
@@ -915,8 +915,30 @@ class EarlyData_DstToD0Pi_D0ToHpHmPi0(BaseSkim):
 @fancy_skim_header
 class DstToD0Pi_D0ToVGamma(BaseSkim):
     """
-    Cut criteria are not finally decided, and could be changed. Please check the
-    code in the master branch to get up-to-date information.
+    **Decay Modes**:
+        * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to \\phi \\gamma`
+        * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to \\rho^{0} \\gamma`
+        * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to \\bar K^{*0} \\gamma`
+        * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to \\omega \\gamma`
+
+    **Selection Criteria**:
+        * Use charged tracks from the loose lists in `stdCharged` to reconstruct D^{0}
+        * Use :math:`\\gamma` from `stdPi0s.loadStdSkimPhoton`
+        * Use :math:`\\pi^{0}` from `stdPi0s.loadStdSkimPi0`
+        * Cut on :math:`\\phi`:
+          "abs(dM) < 0.03"
+        * Cut on :math:`\\rho^{0}`:
+          "abs(dM) < 0.3675"
+        * Cut on :math:`\\bar K^{*0}`:
+          "abs(dM) < 0.33"
+        * Cut on :math:`\\omega`:
+          "abs(dM) < 0.045"
+        * Cut on :math:`D^{0}`:
+          "abs(dM) < 0.225 and useCMSFrame(p) > 2"
+        * Cut on :math:`D^{*+}`:
+          "massDifference(0) < 0.160"
+        * For more details, please check the source code of this skim.
+
     """
 
     __authors__ = ["Jaeyoung Kim"]
@@ -925,6 +947,7 @@ class DstToD0Pi_D0ToVGamma(BaseSkim):
     __category__ = "physics, charm"
 
     NoisyModules = ["ParticleLoader", "RootOutput"]
+    ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
         stdK("loose", path=path)
@@ -965,7 +988,8 @@ class DstToD0Pi_D0ToVGamma(BaseSkim):
 
         ma.copyLists(outputListName="D*+:all", inputListNames=["D*+:ch1", "D*+:ch2", "D*+:ch3", "D*+:ch4"], path=path)
 
-        ma.applyEventCuts("nParticlesInList(D*+:all) > 0", path=path)
+        eventCuts = "nParticlesInList(D*+:all) > 0"
+        path = self.skim_event_cuts(eventCuts, path=path)
 
         DstList.append("D*+:all")
 

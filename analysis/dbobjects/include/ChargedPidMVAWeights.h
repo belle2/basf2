@@ -255,7 +255,7 @@ namespace Belle2 {
     /**
      * Store the map associating variable aliases to variable names knowm to VariableManager.
      *
-     * @param a map of (alias, VM variable) pairs. NB: it is supposed to contain all the aliases for each category.
+     * @param aliases a map of (alias, VM variable) pairs. NB: it is supposed to contain all the aliases for every category.
      */
     void storeAliases(const VariablesByAlias& aliases)
     {
@@ -539,7 +539,7 @@ namespace Belle2 {
 
 
     /**
-     * A map that associate variable aliases to variable names known to VariableManager.
+     * A map that associates variable aliases used in the MVA training to variable names known to the VariableManager.
      */
     VariablesByAlias m_aliases;
 

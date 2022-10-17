@@ -923,7 +923,7 @@ class DstToD0Pi_D0ToVGamma(BaseSkim):
 
     **Selection Criteria**:
         * Use charged tracks from the loose lists in `stdCharged` to reconstruct D^{0}
-        * Use :math:`\\gamma` from `stdPi0s.loadStdSkimPhoton`
+        * Use :math:`\\gamma` from `stdPhotons.loadStdSkimPhoton`
         * Use :math:`\\pi^{0}` from `stdPi0s.loadStdSkimPi0`
         * Cut on :math:`\\phi`:
           ``abs(dM) < 0.03``

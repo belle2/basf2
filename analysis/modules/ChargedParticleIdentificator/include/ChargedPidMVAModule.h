@@ -158,6 +158,23 @@ namespace Belle2 {
     VariablesLists m_spectators;
 
     /**
+     * Map with standard charged particles' info. For convenience.
+     */
+    std::map<int, std::tuple<std::string, std::string, std::string, int>> m_stdChargedInfo = {
+      { Const::electron.getPDGCode(), std::make_tuple("e", "electron", "pi", Const::pion.getPDGCode()) },
+      { Const::muon.getPDGCode(), std::make_tuple("mu", "muon", "pi", Const::pion.getPDGCode()) },
+      { Const::pion.getPDGCode(), std::make_tuple("pi", "pion", "K", Const::kaon.getPDGCode()) },
+      { Const::kaon.getPDGCode(), std::make_tuple("K", "kaon", "pi", Const::pion.getPDGCode()) },
+      { Const::proton.getPDGCode(), std::make_tuple("p", "proton", "pi", Const::pion.getPDGCode()) },
+      { Const::deuteron.getPDGCode(), std::make_tuple("d", "deuteron", "pi", Const::pion.getPDGCode()) }
+    };
+
+    /**
+     * Set variable aliases neeeded by th MVA. Fallback to this if no aliases map in payload.
+     */
+    void registerAliasesLegacy();
+
+    /**
      * Set variable aliases neeeded by th MVA.
      */
     void registerAliases();

@@ -34,6 +34,7 @@ namespace Belle2 {
   class ChargedPidMVAWeights : public TObject {
 
     typedef std::unordered_map<int, std::vector<std::string> > WeightfilesByParticle; /**< Typedef */
+    typedef std::map<std::string, std::string> VariablesByAlias; /**< Typedef */
 
   public:
 
@@ -254,11 +255,11 @@ namespace Belle2 {
     /**
      * Store the map associating variable aliases to variable names knowm to VariableManager.
      *
-     * @param aliases the map of (alias, VM variable) pairs.
+     * @param a map of (alias, VM variable) pairs. NB: it is supposed to contain all the aliases for each category.
      */
-    void storeAliases(const std::map<std::string, std::string>& aliases)
+    void storeAliases(const VariablesByAlias& aliases)
     {
-      m_aliases = std::make_unique<std::map<std::string, std::string>>(aliases);
+      m_aliases = VariablesByAlias(aliases);
     }
 
 
@@ -318,11 +319,11 @@ namespace Belle2 {
 
 
     /**
-     * Get the raw pointer to the map of aliases.
+     * Get the map of unique aliases.
      */
-    const std::map<std::string, std::string>* getAliases() const
+    const VariablesByAlias* getAliases() const
     {
-      return m_aliases.get();
+      return &m_aliases;
     }
 
 
@@ -538,12 +539,13 @@ namespace Belle2 {
 
 
     /**
-     * A map that associates variable aliases to variable names known to VariableManager.
+     * A map that associate variable aliases to variable names known to VariableManager.
      */
-    std::unique_ptr<std::map<std::string, std::string>> m_aliases;
+    VariablesByAlias m_aliases;
 
 
-    ClassDef(ChargedPidMVAWeights, 9);
+    ClassDef(ChargedPidMVAWeights, 10);
+    /**< 10. Map of aliases should not be a unique_ptr to avoid issues when creating a ROOT dictionary. */
     /**< 9. Add map of variable aliases and original basf2 vars. */
     /**< 8. Use unique_ptr for m_categories. */
     /**< 7. Use double instead of float in tuple. */

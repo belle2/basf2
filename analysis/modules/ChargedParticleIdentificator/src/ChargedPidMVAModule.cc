@@ -252,32 +252,78 @@ void ChargedPidMVAModule::event()
 }
 
 
+void ChargedPidMVAModule::registerAliasesLegacy()
+{
+
+  std::map<std::string, std::string> aliasesLegacy;
+
+  aliasesLegacy.insert(std::make_pair("__event__", "evtNum"));
+
+  for (unsigned int iDet(0); iDet < Const::PIDDetectorSet::set().size(); ++iDet) {
+
+    Const::EDetector det = Const::PIDDetectorSet::set()[iDet];
+    auto detName = Const::parseDetectors(det);
+
+    aliasesLegacy.insert(std::make_pair("missingLogL_" + detName, "pidMissingProbabilityExpert(" + detName + ")"));
+
+    for (auto& [pdgId, info] : m_stdChargedInfo) {
+
+      std::string alias = "deltaLogL_" + std::get<0>(info) + "_" + std::get<2>(info) + "_" + detName;
+      std::string var = "pidDeltaLogLikelihoodValueExpert(" + std::to_string(pdgId) + ", " + std::to_string(std::get<3>
+                        (info)) + "," + detName + ")";
+
+      aliasesLegacy.insert(std::make_pair(alias, var));
+
+      if (iDet == 0) {
+        alias = "deltaLogL_" + std::get<0>(info) + "_" + std::get<2>(info) + "_ALL";
+        var = "pidDeltaLogLikelihoodValueExpert(" + std::to_string(pdgId) + ", " + std::to_string(std::get<3>(info)) + ", ALL)";
+        aliasesLegacy.insert(std::make_pair(alias, var));
+      }
+
+    }
+
+  }
+
+  B2INFO("Setting hard-coded aliases for the ChargedPidMVA algorithm.");
+
+  std::string debugStr("\n");
+  for (const auto& [alias, variable] : aliasesLegacy) {
+    debugStr += (alias + " --> " + variable + "\n");
+    if (!Variable::Manager::Instance().addAlias(alias, variable)) {
+      B2ERROR("Something went wrong with setting alias: " << alias << " for variable: " << variable);
+    }
+  }
+  B2DEBUG(10, debugStr);
+
+}
+
+
 void ChargedPidMVAModule::registerAliases()
 {
 
   auto aliases = (*m_weightfiles_representation.get())->getAliases();
 
-  if (aliases) {
-
-    if (aliases->empty()) {
-      B2ERROR("The aliases container in the payload is empty.");
-      return;
-    }
+  if (!aliases->empty()) {
 
     B2INFO("Setting aliases for the ChargedPidMVA algorithm read from the payload.");
+
+    std::string debugStr("\n");
     for (const auto& [alias, variable] : *aliases) {
-      B2DEBUG(10, alias << " --> " << variable);
       if (alias != variable) {
+        debugStr += (alias + " --> " + variable + "\n");
         if (!Variable::Manager::Instance().addAlias(alias, variable)) {
           B2ERROR("Something went wrong with setting alias: " << alias << " for variable: " << variable);
         }
       }
     }
+    B2DEBUG(10, debugStr);
 
     return;
+
   }
 
   // Manually set aliases - for bw compatibility
+  this->registerAliasesLegacy();
 
 }
 

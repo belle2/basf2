@@ -45,6 +45,11 @@ The default payloads are created using scripts in the directory
    * - ``ImportTimeWindow.py``
      - ``ImportTimeWindow``
 
+Note that the script ``ImportGeometry.py`` creates a testing geometry
+configuration (payload ``GeoConfiguration``) containing KLM only.
+The complete geometry can be created by
+the script ``geometry/examples/create_geometry_payloads.py``.
+
 Channel status
 ~~~~~~~~~~~~~~
 

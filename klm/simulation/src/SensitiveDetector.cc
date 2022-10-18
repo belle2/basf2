@@ -13,7 +13,6 @@
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
 #include <klm/dataobjects/bklm/BKLMStatus.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
-#include <klm/dbobjects/eklm/EKLMSimulationParameters.h>
 #include <klm/eklm/geometry/GeometryData.h>
 
 /* Belle 2 headers. */
@@ -43,10 +42,6 @@ SensitiveDetector::SensitiveDetector(
   if (!m_SimPar.isValid())
     B2FATAL("BKLM simulation parameters are not available.");
   m_HitTimeMax = m_SimPar->getHitTimeMax();
-  DBObjPtr<EKLMSimulationParameters> simPar;
-  if (!simPar.isValid())
-    B2FATAL("EKLM simulation parameters are not available.");
-  m_ThresholdHitTime = simPar->getHitTimeThreshold();
   m_MCParticles.isOptional();
   m_BKLMSimHits.registerInDataStore();
   m_EKLMSimHits.registerInDataStore();
@@ -90,12 +85,8 @@ bool SensitiveDetector::stepEKLM(G4Step* aStep, G4TouchableHistory* history)
     return false;
   const G4Track& track = * aStep->GetTrack();
   const G4double hitTime = track.GetGlobalTime();
-  /* No time cut for background studies. */
-  if (hitTime > m_ThresholdHitTime) {
-    B2INFO("EKLMSensitiveDetector: "
-           " ALL HITS WITH TIME > hitTimeThreshold ARE DROPPED!!");
+  if (hitTime > m_HitTimeMax)
     return false;
-  }
   /* Hit position. */
   gpos = 0.5 * (aStep->GetPostStepPoint()->GetPosition() +
                 aStep->GetPreStepPoint()->GetPosition());
@@ -134,9 +125,6 @@ G4bool SensitiveDetector::stepBKLM(G4Step* step, G4TouchableHistory* history)
     m_GeoPar = bklm::GeometryPar::instance();
     if (m_GeoPar->doBeamBackgroundStudy())
       m_BkgSensitiveDetector = new BkgSensitiveDetector("BKLM");
-    if (!m_SimPar.isValid())
-      B2FATAL("BKLM simulation parameters are not available.");
-    m_HitTimeMax = m_SimPar->getHitTimeMax();
     if (!gRandom)
       B2FATAL("gRandom is not initialized; please set up gRandom first");
   }

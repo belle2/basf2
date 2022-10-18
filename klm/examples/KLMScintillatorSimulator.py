@@ -9,7 +9,7 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# EKLM ADC study.
+# KLM scintillator-simulator output study.
 
 import basf2
 
@@ -23,13 +23,13 @@ eventinfosetter.param('evtNumList', [1])
 # XML reader
 xmldata = basf2.register_module('Gearbox')
 
-# EKLM ADC
-eklmadc = basf2.register_module('EKLMADC')
+# KLM scintillator simulator.
+eklmadc = basf2.register_module('KLMScintillatorSimulator')
 eklmadc.param('Mode', 'Shape')
 eklmadc.param('OutputFile', 'FPGA.root')
 # For generation of the histograms for strips.
 # eklmadc.param('Mode', 'Strips')
-# eklmadc.param('OutputFile', 'EKLMADC.root')
+# eklmadc.param('OutputFile', 'KLMScintillatorSimulator.root')
 
 # Create main path
 main = basf2.create_path()

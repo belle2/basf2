@@ -34,16 +34,6 @@ void BKLMDatabaseImporter::setIOV(int experimentLow, int runLow,
   m_RunHigh = runHigh;
 }
 
-void BKLMDatabaseImporter::importGeometryPar()
-{
-  GearDir content(Gearbox::getInstance().getDetectorComponent("KLM"));
-  BKLMGeometryPar bklmGeometryPar(content);
-  IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
-                         m_ExperimentHigh, m_RunHigh);
-  Database::Instance().storeData("BKLMGeometryPar", &bklmGeometryPar, iov);
-
-}
-
 void BKLMDatabaseImporter::importSimulationPar()
 {
   GearDir content(Gearbox::getInstance().getDetectorComponent("KLM"), "BKLM/SimulationParameters");

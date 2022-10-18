@@ -19,7 +19,7 @@ Optionally, binary PID can be stored, by testing one (or more) pair of (S,B) mas
 
 Usage:
 
-basf2 (-i /PATH/TO/MDST/FILE.root) analysis/examples/PostMdstIdentification/ChargedPidMVAModule.py -- [OPTIONS]
+basf2 [-i /PATH/TO/MDST/FILE.root] analysis/examples/PostMdstIdentification/ChargedPidMVAModule.py -- [OPTIONS]
 
 Input: *_mdst_*.root
 Output: *_ntup_*.root

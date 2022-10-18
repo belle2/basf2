@@ -3503,7 +3503,6 @@ def applyChargedPidMVA(particleLists, path, trainingMode, chargeIndependent=Fals
     """
 
     from ROOT import Belle2
-    # from variables import variables as vm
 
     TrainingMode = Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode
     Const = Belle2.Const

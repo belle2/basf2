@@ -544,8 +544,7 @@ namespace Belle2 {
     VariablesByAlias m_aliases;
 
 
-    ClassDef(ChargedPidMVAWeights, 10);
-    /**< 10. Map of aliases should not be a unique_ptr to avoid issues when creating a ROOT dictionary. */
+    ClassDef(ChargedPidMVAWeights, 9);
     /**< 9. Add map of variable aliases and original basf2 vars. */
     /**< 8. Use unique_ptr for m_categories. */
     /**< 7. Use double instead of float in tuple. */

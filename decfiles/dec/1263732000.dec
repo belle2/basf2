@@ -1,6 +1,6 @@
 # EventType: 1263732000
 # Descriptor: [B- -> [D0 -> K- pi+ (K- pi+ pi0)] e(mu) nu]cc
-# NickName: Bu_D0taunu
+# NickName: Bu_D0lnu
 # Documentation: B- -> D0 e(mu) nu, D0 -> K- pi+ (K- pi+ pi0), signal mode for inclusive tagging R(D(*)).
 # Dominant channel: B- -> D0(-> K- pi+ pi0) l- anti-nu
 # Tested: Yes

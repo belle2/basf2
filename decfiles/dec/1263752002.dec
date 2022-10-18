@@ -33,6 +33,7 @@ Decay Upsilon(4S)
 0.5 B- B+sig VSS;
 Enddecay
 
+
 Decay B-sig
 0.007570000   D_10sig  e-  anti-nu_e                          LLSW 0.71 -1.6 -0.5 2.9;
 0.003890000   D_0*0sig  e-  anti-nu_e                         LLSW 0.68 -0.2 0.3;;

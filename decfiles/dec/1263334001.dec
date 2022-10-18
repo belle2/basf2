@@ -17,9 +17,9 @@ Decay Upsilon(4S)
 0.5 B- B+sig VSS;
 Enddecay
 
+
 Decay B-sig
 1.0   D*0  tau-  anti-nu_tau                       HQET3 0.912 1.205 1.15 1.404 0.854;
-
 Enddecay
 CDecay B+sig
 
@@ -43,5 +43,6 @@ Decay tau-sig
 0.173937 mu-          anti-nu_mu     nu_tau TAULNUNU;
 Enddecay
 CDecay tau+sig
+
 
 End

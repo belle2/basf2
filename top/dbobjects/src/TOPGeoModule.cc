@@ -11,8 +11,11 @@
 #include <framework/logging/Logger.h>
 #include <math.h>
 #include <iostream>
+#include <Math/RotationZ.h>
+
 
 using namespace std;
+using namespace ROOT::Math;
 
 namespace Belle2 {
 
@@ -25,6 +28,9 @@ namespace Belle2 {
     m_rotationNominal = 0;
     m_rotationNominalInverse = 0;
     m_translationNominal = 0;
+
+    m_transform = 0;
+    m_transformNominal = 0;
   }
 
   TOPGeoModule& TOPGeoModule::operator=(const TOPGeoModule& module)
@@ -43,6 +49,7 @@ namespace Belle2 {
       m_pmtArray = module.getPMTArray();
       m_arrayDisplacement = module.getPMTArrayDisplacement();
       m_moduleDisplacement = module.getModuleDisplacement();
+
       if (m_rotation) delete m_rotation;
       if (m_rotationInverse) delete m_rotationInverse;
       if (m_translation) delete m_translation;
@@ -55,6 +62,11 @@ namespace Belle2 {
       m_rotationNominal = 0;
       m_rotationNominalInverse = 0;
       m_translationNominal = 0;
+
+      if (m_transform) delete m_transform;
+      if (m_transformNominal) delete m_transformNominal;
+      m_transform = 0;
+      m_transformNominal = 0;
     }
     return *this;
   }
@@ -67,6 +79,9 @@ namespace Belle2 {
     if (m_rotationNominal) delete m_rotationNominal;
     if (m_rotationNominalInverse) delete m_rotationNominalInverse;
     if (m_translationNominal) delete m_translationNominal;
+
+    if (m_transform) delete m_transform;
+    if (m_transformNominal) delete m_transformNominal;
   }
 
   void TOPGeoModule::setTransformation() const
@@ -83,6 +98,11 @@ namespace Belle2 {
     m_rotation =  new TRotation(Rot);
     m_rotationInverse = new TRotation(Rot.Inverse());
     m_translation = new TVector3(Rphi * translation);
+
+
+    RotationZ Rz(m_phi - M_PI / 2);
+    m_transformNominal = new Transform3D(Rz, Rz * XYZVector(0, m_radius, getZc() * s_unit));
+    m_transform = new Transform3D(*m_transformNominal * m_moduleDisplacement.getTransformation());
   }
 
 
@@ -162,6 +182,56 @@ namespace Belle2 {
     if (!m_rotation) setTransformation();
     return (*m_rotationNominalInverse) * momentum;
   }
+
+
+  XYZPoint TOPGeoModule::pointToGlobal(const XYZPoint& point) const
+  {
+    if (not m_transform) setTransformation();
+    return *m_transform * point;
+  }
+
+  XYZVector TOPGeoModule::momentumToGlobal(const XYZVector& momentum) const
+  {
+    if (not m_transform) setTransformation();
+    return *m_transform * momentum;
+  }
+
+  XYZPoint TOPGeoModule::pointToLocal(const XYZPoint& point) const
+  {
+    if (not m_transform) setTransformation();
+    return m_transform->ApplyInverse(point);
+  }
+
+  XYZVector TOPGeoModule::momentumToLocal(const XYZVector& momentum) const
+  {
+    if (not m_transform) setTransformation();
+    return m_transform->ApplyInverse(momentum);
+  }
+
+  XYZPoint TOPGeoModule::pointNominalToGlobal(const XYZPoint& point) const
+  {
+    if (not m_transformNominal) setTransformation();
+    return *m_transformNominal * point;
+  }
+
+  XYZVector TOPGeoModule::momentumNominalToGlobal(const XYZVector& momentum) const
+  {
+    if (not m_transformNominal) setTransformation();
+    return *m_transformNominal * momentum;
+  }
+
+  XYZPoint TOPGeoModule::pointGlobalToNominal(const XYZPoint& point) const
+  {
+    if (not m_transformNominal) setTransformation();
+    return m_transformNominal->ApplyInverse(point);
+  }
+
+  XYZVector TOPGeoModule::momentumGlobalToNominal(const XYZVector& momentum) const
+  {
+    if (not m_transformNominal) setTransformation();
+    return m_transformNominal->ApplyInverse(momentum);
+  }
+
 
   bool TOPGeoModule::isConsistent() const
   {

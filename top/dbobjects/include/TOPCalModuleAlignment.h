@@ -10,6 +10,7 @@
 #include <TObject.h>
 #include <TVector3.h>
 #include <TRotation.h>
+#include <Math/Transform3D.h>
 #include <vector>
 
 namespace Belle2 {
@@ -207,6 +208,7 @@ namespace Belle2 {
     /**
      * Returns the rotation from local to nominal frame
      * Transformation is: rotation first then translation.
+     * @param moduleID module ID (1-based)
      * @return rotation
      */
     const TRotation& getRotation(int moduleID) const;
@@ -214,9 +216,18 @@ namespace Belle2 {
     /**
      * Returns the translation from local to nominal frame
      * Transformation is: rotation first then translation.
+     * @param moduleID module ID (1-based)
      * @return translation
      */
     const TVector3& getTranslation(int moduleID) const;
+
+    /**
+     * Returns transformation from local to nominal frame.
+     * Transformation is: rotation first then translation.
+     * @param moduleID module ID (1-based)
+     * @return transformation
+     */
+    const ROOT::Math::Transform3D& getTransformation(int moduleID) const;
 
     /**
      * Returns true if all modules are calibrated
@@ -263,6 +274,9 @@ namespace Belle2 {
     mutable std::vector<TRotation> m_rotations; //! do not write out
     /** cache for translations (from local to nominal) */
     mutable std::vector<TVector3> m_translations; //! do not write out
+
+    /** cache for transformations (from local to nominal) */
+    mutable std::vector<ROOT::Math::Transform3D> m_transforms; //! do not write out
 
     ClassDef(TOPCalModuleAlignment, 3); /**< ClassDef */
 

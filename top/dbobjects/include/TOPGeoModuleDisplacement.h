@@ -11,6 +11,7 @@
 #include <top/dbobjects/TOPGeoBase.h>
 #include <TVector3.h>
 #include <TRotation.h>
+#include <Math/Transform3D.h>
 
 namespace Belle2 {
 
@@ -98,6 +99,13 @@ namespace Belle2 {
      * @return translation vector
      */
     TVector3 getTranslation() const {return TVector3(m_x, m_y, m_z);}
+
+    /**
+     * Returns transformation from local to nominal frame.
+     * Translation is always given in basf2 units.
+     * @return transformation (rotation and then a translation)
+     */
+    ROOT::Math::Transform3D getTransformation() const;
 
     /**
      * Check for consistency of data members

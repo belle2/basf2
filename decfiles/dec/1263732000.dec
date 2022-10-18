@@ -8,7 +8,7 @@
 # Responsible: Tia Crane
 # Email: tcrane@hawaii.edu 
 # Cuts: None
-# Date: 20221012
+# Date: 20221018
 
 yesPhotos
 
@@ -19,8 +19,8 @@ Enddecay
 
 
 Decay B-sig
-0.023100000   D0  e-  anti-nu_e                            BGL 0.0126 -0.094 0.34 -0.1 0.0115 -0.057 0.12 0.4;
-0.023100000   D0  mu-  anti-nu_mu                          BGL 0.0126 -0.094 0.34 -0.1 0.0115 -0.057 0.12 0.4;
+0.023100000   D0sig  e-  anti-nu_e                            BGL 0.0126 -0.094 0.34 -0.1 0.0115 -0.057 0.12 0.4;
+0.023100000   D0sig  mu-  anti-nu_mu                          BGL 0.0126 -0.094 0.34 -0.1 0.0115 -0.057 0.12 0.4;
 Enddecay
 CDecay B+sig
 

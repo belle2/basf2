@@ -8,7 +8,7 @@
 # Responsible: Tia Crane
 # Email: tcrane@hawaii.edu 
 # Cuts: None
-# Date: 20221012
+# Date: 20221018
 
 yesPhotos
 
@@ -19,7 +19,7 @@ Enddecay
 
 
 Decay B-sig
-1.0   D*0  tau-  anti-nu_tau                       HQET3 0.912 1.205 1.15 1.404 0.854;
+1.0   D*0sig  tau-  anti-nu_tau                       HQET3 0.912 1.205 1.15 1.404 0.854;
 Enddecay
 CDecay B+sig
 

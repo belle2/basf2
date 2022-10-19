@@ -4026,7 +4026,7 @@ def getAnalysisGlobaltag(timeout=180) -> str:
         B2FATAL(f'A {te} exception was raised during the call of getAnalysisGlobaltag(). '
                 'The function took too much time to retrieve the requested information '
                 'from the versioning repository.\n'
-                'Plase try to re-run your job. In case of persistent failures, there may '
+                'Please try to re-run your job. In case of persistent failures, there may '
                 'be issues with the DESY collaborative services, so please contact the experts.')
     except subprocess.CalledProcessError as ce:
         B2FATAL(f'A {ce} exception was raised during the call of getAnalysisGlobaltag(). '

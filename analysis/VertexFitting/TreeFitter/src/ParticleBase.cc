@@ -163,6 +163,10 @@ namespace TreeFitter {
       } else { // Got gammas -> composite particle
         rc = new RecoComposite(particle, mother, config, true);
       }
+    } else if (particle->hasExtraInfo("treeFitterTreatMeAsInvisible")
+               && particle->getExtraInfo("treeFitterTreatMeAsInvisible") == 1) { // dummy particles with invisible flag
+      rc = new RecoResonance(particle, mother, config);
+
     } else if (particle->getMdstArrayIndex() ||
                particle->getTrack() ||
                particle->getECLCluster() ||
@@ -176,7 +180,7 @@ namespace TreeFitter {
         rc = new RecoKlong(particle, mother);
 
       } else if (isAResonance(particle)) {
-        rc = new RecoResonance(particle, mother);
+        rc = new RecoResonance(particle, mother, config);
 
       }  else {
         rc = new InternalParticle(particle, mother, config, forceFitAll);
@@ -188,10 +192,10 @@ namespace TreeFitter {
       if (false) {   // fitted composites //JFK::eventually implement prefitting mechanic to prefit composites with other fitters
         if (isAResonance(particle)) {
 
-          rc = new RecoResonance(particle, mother);
+          rc = new RecoResonance(particle, mother, config);
 
         } else {
-          rc = new RecoComposite(particle, mother);
+          rc = new RecoComposite(particle, mother, config);
         }
 
       } else {         // unfitted composites

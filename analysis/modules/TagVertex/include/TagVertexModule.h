@@ -20,6 +20,9 @@
 #include <analysis/VertexFitting/RaveInterface/RaveVertexFitter.h>
 #include <analysis/VertexFitting/RaveInterface/RaveKinematicVertexFitter.h>
 
+// kFit
+#include <analysis/VertexFitting/KFit/VertexFitKFit.h>
+
 // KFit
 #include <CLHEP/Geometry/Point3D.h>
 #include <CLHEP/Matrix/SymMatrix.h>
@@ -130,7 +133,6 @@ namespace Belle2 {
     ROOT::Math::XYZVector m_BeamSpotCenter;    /**< Beam spot position */
     TMatrixDSym m_BeamSpotCov;    /**< size of the beam spot == covariance matrix on the beam spot position */
     bool m_mcInfo;                /**< true if user wants to retrieve MC information out from the tracks used in the fit */
-    double m_shiftZ;              /**< parameter for testing the systematic error from the IP measurement*/
     DBObjPtr<BeamSpot> m_beamSpotDB;/**< Beam spot database object*/
     int m_FitType;                /**< fit algo used  */
     double m_tagVl;               /**< tagV component in the boost direction  */
@@ -143,6 +145,7 @@ namespace Belle2 {
     double m_tagVChi2;            /**< chi^2 value of the tag vertex fit result */
     double m_tagVChi2IP;          /**< IP component of the chi^2 of the tag vertex fit result */
     std::string m_fitAlgo;        /**< Algorithm used for the tag fit (Rave or KFit) */
+    double m_kFitReqReducedChi2;  /**< The required chi2/ndf to accept the kFit result, if it is higher, iteration procedure is applied */
     bool m_verbose;               /**< choose if you want to print extra infos */
     TMatrixDSym m_pvCov;          /**< covariance matrix of the PV (useful with tube and KFit) */
     ROOT::Math::PxPyPzEVector m_tagMomentum; /**< B tag momentum computed from fully reconstructed B sig */
@@ -158,7 +161,7 @@ namespace Belle2 {
     std::pair<ROOT::Math::XYZVector, TMatrixDSym> findConstraint(const Particle* Breco, double cut) const;
 
     /** calculate the standard constraint for the vertex fit on the tag side*/
-    std::pair<ROOT::Math::XYZVector, TMatrixDSym> findConstraintBoost(double cut, double shiftAlongBoost = -2000.) const;
+    std::pair<ROOT::Math::XYZVector, TMatrixDSym> findConstraintBoost(double cut) const;
 
     /** calculate constraint for the vertex fit on the tag side using the B tube (cylinder along
     the expected BTag line of flights */
@@ -174,13 +177,15 @@ namespace Belle2 {
     The user can specify a request on the PXD hits left by the tracks*/
     std::vector<const Particle*> getTagTracks_standardAlgorithm(const Particle* Breco, int nPXDHits) const;
 
+
+    /** performs single KFit on particles stored in particleAndWeights
+    this function can be iterated several times until chi2/ndf of the resulting fit is sufficient */
+    analysis::VertexFitKFit doSingleKfit(std::vector<ParticleAndWeight>& particleAndWeights);
+
     /**
-     * Get a list of pions from a list of pions removing the Kshorts
-     * Warning: this assumes all the particles are pions, which is fine are all the particles
-     * are reconstructed as pions in the TagV module.
+     * Get a list of particles with attached weight and associated MC particle
      */
-    std::vector<ParticleAndWeight> getParticlesWithoutKS(const std::vector<const Particle*>& tagParticles,
-                                                         double massWindowWidth = 0.01) const;
+    std::vector<ParticleAndWeight> getParticlesAndWeights(const std::vector<const Particle*>& tagParticles) const;
 
     /** TO DO: tag side vertex fit in the case of semileptonic tag side decay */
     //bool makeSemileptonicFit(Particle *Breco);

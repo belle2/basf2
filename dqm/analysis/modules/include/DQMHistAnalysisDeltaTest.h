@@ -22,7 +22,7 @@
 #include <TCanvas.h>
 
 namespace Belle2 {
-  /*! DQM Histogram Analysis for PXD DAQ */
+  /*! DQM Delta Histogram Test code and example */
 
   class DQMHistAnalysisDeltaTestModule : public DQMHistAnalysisModule {
 
@@ -50,6 +50,11 @@ namespace Belle2 {
     void beginRun(void) override final;
 
     /**
+     * Called when run ends.
+     */
+    void endRun(void) override final;
+
+    /**
      * This method is called for each event.
      */
     void event(void) override final;
@@ -64,12 +69,13 @@ namespace Belle2 {
     // Data members
     //! name of histogram directory
     std::string m_histogramDirectoryName;
+    //! name of histogram
+    std::string m_histogramName;
     //! prefix for EPICS PVs
     std::string m_pvPrefix;
 
     //! Final Canvas
     TCanvas* m_cTest = nullptr;
-
 
     /** Monitoring Object */
     MonitoringObject* m_monObj {};

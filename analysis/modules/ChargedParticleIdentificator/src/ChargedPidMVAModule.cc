@@ -268,15 +268,15 @@ void ChargedPidMVAModule::registerAliasesLegacy()
 
     for (auto& [pdgId, info] : m_stdChargedInfo) {
 
-      std::string alias = "deltaLogL_" + std::get<0>(info) + "_" + std::get<2>(info) + "_" + detName;
-      std::string var = "pidDeltaLogLikelihoodValueExpert(" + std::to_string(pdgId) + ", " + std::to_string(std::get<3>
+      std::string alias = "deltaLogL_" + std::get<0>(info) + "_" + std::get<1>(info) + "_" + detName;
+      std::string var = "pidDeltaLogLikelihoodValueExpert(" + std::to_string(pdgId) + ", " + std::to_string(std::get<2>
                         (info)) + "," + detName + ")";
 
       aliasesLegacy.insert(std::make_pair(alias, var));
 
       if (iDet == 0) {
-        alias = "deltaLogL_" + std::get<0>(info) + "_" + std::get<2>(info) + "_ALL";
-        var = "pidDeltaLogLikelihoodValueExpert(" + std::to_string(pdgId) + ", " + std::to_string(std::get<3>(info)) + ", ALL)";
+        alias = "deltaLogL_" + std::get<0>(info) + "_" + std::get<1>(info) + "_ALL";
+        var = "pidDeltaLogLikelihoodValueExpert(" + std::to_string(pdgId) + ", " + std::to_string(std::get<2>(info)) + ", ALL)";
         aliasesLegacy.insert(std::make_pair(alias, var));
       }
 

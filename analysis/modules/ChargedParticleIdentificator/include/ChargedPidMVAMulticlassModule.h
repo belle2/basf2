@@ -168,13 +168,13 @@ namespace Belle2 {
     /**
      * Map with standard charged particles' info. For convenience.
      */
-    std::map<int, std::pair<std::string, std::string>> m_stdChargedInfo = {
-      { Const::electron.getPDGCode(), std::make_pair("e", "electron") },
-      { Const::muon.getPDGCode(), std::make_pair("mu", "muon") },
-      { Const::pion.getPDGCode(), std::make_pair("pi", "pion") },
-      { Const::kaon.getPDGCode(), std::make_pair("K", "kaon") },
-      { Const::proton.getPDGCode(), std::make_pair("p", "proton") },
-      { Const::deuteron.getPDGCode(), std::make_pair("d", "deuteron") }
+    std::map<int, std::string> m_stdChargedInfo = {
+      { Const::electron.getPDGCode(), "electron" },
+      { Const::muon.getPDGCode(), "muon" },
+      { Const::pion.getPDGCode(), "pion" },
+      { Const::kaon.getPDGCode(), "kaon" },
+      { Const::proton.getPDGCode(), "proton" },
+      { Const::deuteron.getPDGCode(), "deuteron" }
     };
 
     /**

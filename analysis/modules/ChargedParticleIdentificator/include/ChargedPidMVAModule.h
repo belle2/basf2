@@ -160,13 +160,13 @@ namespace Belle2 {
     /**
      * Map with standard charged particles' info. For convenience.
      */
-    std::map<int, std::tuple<std::string, std::string, std::string, int>> m_stdChargedInfo = {
-      { Const::electron.getPDGCode(), std::make_tuple("e", "electron", "pi", Const::pion.getPDGCode()) },
-      { Const::muon.getPDGCode(), std::make_tuple("mu", "muon", "pi", Const::pion.getPDGCode()) },
-      { Const::pion.getPDGCode(), std::make_tuple("pi", "pion", "K", Const::kaon.getPDGCode()) },
-      { Const::kaon.getPDGCode(), std::make_tuple("K", "kaon", "pi", Const::pion.getPDGCode()) },
-      { Const::proton.getPDGCode(), std::make_tuple("p", "proton", "pi", Const::pion.getPDGCode()) },
-      { Const::deuteron.getPDGCode(), std::make_tuple("d", "deuteron", "pi", Const::pion.getPDGCode()) }
+    std::map<int, std::tuple<std::string, std::string, int>> m_stdChargedInfo = {
+      { Const::electron.getPDGCode(), std::make_tuple("e", "pi", Const::pion.getPDGCode()) },
+      { Const::muon.getPDGCode(), std::make_tuple("mu", "pi", Const::pion.getPDGCode()) },
+      { Const::pion.getPDGCode(), std::make_tuple("pi", "K", Const::kaon.getPDGCode()) },
+      { Const::kaon.getPDGCode(), std::make_tuple("K", "pi", Const::pion.getPDGCode()) },
+      { Const::proton.getPDGCode(), std::make_tuple("p", "pi", Const::pion.getPDGCode()) },
+      { Const::deuteron.getPDGCode(), std::make_tuple("d", "pi", Const::pion.getPDGCode()) }
     };
 
     /**

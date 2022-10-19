@@ -266,9 +266,9 @@ void ChargedPidMVAMulticlassModule::registerAliasesLegacy()
 
     aliasesLegacy.insert(std::make_pair("missingLogL_" + detName, "pidMissingProbabilityExpert(" + detName + ")"));
 
-    for (auto& [pdgId, info] : m_stdChargedInfo) {
+    for (auto& [pdgId, fullName] : m_stdChargedInfo) {
 
-      std::string alias = info.second + "ID_" + detName;
+      std::string alias = fullName + "ID_" + detName;
       std::string var = "pidProbabilityExpert(" + std::to_string(pdgId) + ", " + detName + ")";
       std::string aliasLogTrf = alias + "_LogTransfo";
       std::string varLogTrf = "formula(-1. * log10(formula(((1. - " + alias + ") + " + epsilon + ") / (" + alias + " + " + epsilon +
@@ -278,8 +278,8 @@ void ChargedPidMVAMulticlassModule::registerAliasesLegacy()
       aliasesLegacy.insert(std::make_pair(aliasLogTrf, varLogTrf));
 
       if (iDet == 0) {
-        aliasLogTrf = info.second + "ID_LogTransfo";
-        varLogTrf = "formula(-1. * log10(formula(((1. - " + info.second + "ID) + " + epsilon + ") / (" + info.second + "ID + " + epsilon +
+        aliasLogTrf = fullName + "ID_LogTransfo";
+        varLogTrf = "formula(-1. * log10(formula(((1. - " + fullName + "ID) + " + epsilon + ") / (" + fullName + "ID + " + epsilon +
                     "))))";
         aliasesLegacy.insert(std::make_pair(aliasLogTrf, varLogTrf));
       }

@@ -116,7 +116,7 @@ namespace Belle2 {
       track->addRelationTo(&mcParticle);
 
       const Const::ChargedStable& chargedStable = Const::pion;
-      double pmom = barHit->getMomentum().Mag();
+      double pmom = barHit->getMomentum().R();
       double mass = chargedStable.getMass();
       double beta = pmom / sqrt(pmom * pmom + mass * mass);
       double tof = barHit->getLength() / beta / Const::speedOfLight;
@@ -126,8 +126,8 @@ namespace Belle2 {
                                        EXT_ENTER,
                                        false,
                                        tof,
-                                       barHit->getPosition(),
-                                       barHit->getMomentum(),
+                                       barHit->getPositionTVector3(),
+                                       barHit->getMomentumTVector3(),
                                        cov);
       track->addRelationTo(extHit);
     }

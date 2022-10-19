@@ -23,7 +23,7 @@
 #pragma link C++ class Belle2::TOPTriggerDigit+; // checksum=0x1b8ad25b, version=1
 #pragma link C++ class Belle2::TOPTriggerMCInfo+; // checksum=0x75ce1ae2, version=1
 #pragma link C++ class Belle2::TOPPull+; // checksum=0x6aabd603, version=2
-#pragma link C++ class Belle2::TOPPDFCollection+; // checksum=0xa97488a7, version=3
+#pragma link C++ class Belle2::TOPPDFCollection+; // checksum=0x988e24cb, version=4
 #pragma link C++ class Belle2::TOPPixelLikelihood+; // checksum=0x3ac6e98b, version=3
 #pragma link C++ class Belle2::TOPAsicMask+; // checksum=0xacc40676, version=1
 #pragma link C++ class Belle2::TOPAssociatedPDF+; // checksum=0xc79734f7, version=2

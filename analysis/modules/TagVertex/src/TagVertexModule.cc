@@ -842,7 +842,7 @@ bool TagVertexModule::makeGeneralFitKFit()
   // iterative procedure which removes tracks with high chi2
   for (int iteration_counter = 0; iteration_counter < 100; ++iteration_counter) {
     analysis::VertexFitKFit kFitTemp =  doSingleKfit(particleAndWeights);
-    if (!kFitTemp.isFitted())
+    if (!kFitTemp.isFitted() || isnan(kFitTemp.getCHIsq()))
       return false;
 
     double reduced_chi2 =  kFitTemp.getCHIsq() / kFitTemp.getNDF();

@@ -74,6 +74,8 @@ Variables
    and `pidWeightedProbabilityExpert`.
  * Added the variable `hasCorrectROECombination` to check if the correct combination of the particle that is the basis of
    the ROE object and the particle that is loaded from the ROE.
+ * Added the variable `nMCDaughters` which returns the number of daughters of the MC-matched MCParticle or a MCParticle
+   obtained with e.g. the `genUpsilon4S` metavariable.
 
 Modules
 +++++++

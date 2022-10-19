@@ -4034,7 +4034,7 @@ def getAnalysisGlobaltag(timeout=180) -> str:
                 'the experts.')
 
 
-def getNbarIDMVA(particleList, path=None, ):
+def getNbarIDMVA(particleList, path=None):
     """
     This function can give a score to predict if it is a anti-n0.
     It is not used to predict n0.
@@ -4043,6 +4043,10 @@ def getNbarIDMVA(particleList, path=None, ):
     @param particleList     The input ParticleList
     @param path             modules are added to this path
     """
+
+    import b2bii
+    if b2bii.isB2BII():
+        B2ERROR("The MVA-based anti-neutron PID is only available for Belle II data.")
 
     from variables import variables
     variables.addAlias('V1', 'clusterHasPulseShapeDiscrimination')

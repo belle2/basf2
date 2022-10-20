@@ -4039,7 +4039,7 @@ def getAnalysisGlobaltag(timeout=180) -> str:
                 'the experts.')
 
 
-def getAnalysisGlobaltagB2BII(timeout=180) -> str:
+def getAnalysisGlobaltagB2BII() -> str:
     """
     Get recommended global tag for B2BII analysis.
     """

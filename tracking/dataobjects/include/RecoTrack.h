@@ -19,6 +19,8 @@
 #include <optional>
 #include <string>
 #include <vector>
+#include <cmath>
+#include <iostream>
 
 namespace genfit {
   class TrackCand;
@@ -494,6 +496,27 @@ namespace Belle2 {
     /// Return the time seed stored in the reco track. ATTENTION: This is not the fitted time.
     double getTimeSeed() const { return m_genfitTrack.getTimeSeed(); }
 
+    /// Return the track time of the outgoing arm
+    double getTimeOutgoingArm()
+    {
+      if (!m_calculateArmTime) calculateArmTime("RecoTracks");
+      return m_outgoingArmTime;
+    }
+
+    /// Return the track time of the ingoing arm
+    double getTimeIngoingArm()
+    {
+      if (!m_calculateArmTime) calculateArmTime("RecoTracks");
+      return m_ingoingArmTime;
+    }
+
+    /// Return the difference between the track times of the ingoing and outgoing arms
+    double getTimeInOutArmDifference()
+    {
+      if (!m_calculateArmTime) calculateArmTime("RecoTracks");
+      return m_inOutArmTimeDiff;
+    }
+
     /// Return the position, the momentum and the charge of the first measured state on plane or - if unfitted - the seeds.
     std::tuple<TVector3, TVector3, short> extractTrackState() const;
 
@@ -597,6 +620,18 @@ namespace Belle2 {
       * Also, set the flags of the corresponding RecoHitInformation to pruned. Only to be used in the prune module.
       */
     void prune();
+
+    /**
+     * This function calculate the track time of the ingoing anf outgoing arms and their difference.
+     * If they do not exists than they are set to NAN by default
+     */
+    void calculateArmTime(const std::string& storeArrayNameOfRecoTracks = "");
+
+    /**
+     * This function return the arm direction of the track as a std::string:
+     * "OUT" (ex: PXD-SVD-CDC) "IN" (ex: CDC-SVD-PXD)
+     */
+    std::string trackArmDirection(float pre = NAN, float post = NAN);
 
     /// Return a list of measurements and track points, which can be used e.g. to extrapolate. You are not allowed to modify or delete them!
     const std::vector<genfit::TrackPoint*>& getHitPointsWithMeasurement() const
@@ -804,6 +839,14 @@ namespace Belle2 {
     float m_flipqualityIndicator = NAN;
     /// Quality index for flipping.
     float m_2ndFlipqualityIndicator = NAN;
+    /// Track time of the outgoing arm
+    float m_outgoingArmTime = NAN;
+    /// Track time of the ingoing arm
+    float m_ingoingArmTime = NAN;
+    /// Difference of the track times of the ingoing and outgoing arms
+    float m_inOutArmTimeDiff = NAN;
+    /// Run calculateArmTime()
+    bool m_calculateArmTime = false;
 
     /**
      * Add a generic hit with the given parameters for the reco hit information.
@@ -921,7 +964,7 @@ namespace Belle2 {
     }
 
     /** Making this class a ROOT class.*/
-    ClassDefOverride(RecoTrack, 11);
+    ClassDefOverride(RecoTrack, 12);
   };
 
   /**

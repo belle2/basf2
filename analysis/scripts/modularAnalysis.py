@@ -3087,7 +3087,12 @@ def lowEnergyPi0Identification(pi0List, gammaList, payloadNameSuffix,
     @param path                 Module path.
     """
 
-    basf2.conditions.prepend_globaltag(getAnalysisGlobaltag())
+    import b2bii
+    if b2bii.isB2BII():
+        tag = getAnalysisGlobaltagB2BII()
+    else:
+        tag = getAnalysisGlobaltag()
+    basf2.conditions.prepend_globaltag(tag)
     # Select photons with higher energy for formation of veto combinations.
     cutAndCopyList('gamma:pi0veto', gammaList, 'E > 0.2', path=path)
     import b2bii
@@ -4007,7 +4012,7 @@ def getAnalysisGlobaltag(timeout=180) -> str:
 
     import b2bii
     if b2bii.isB2BII():
-        B2ERROR("The getAnalysisGlobaltag function cannot be used for Belle data.")
+        B2ERROR("The getAnalysisGlobaltag() function cannot be used for Belle data.")
 
     # b2conditionsdb-recommend relies on a different repository, so it's better to protect
     # this function against potential failures of check_output.
@@ -4032,6 +4037,17 @@ def getAnalysisGlobaltag(timeout=180) -> str:
         B2FATAL(f'A {ce} exception was raised during the call of getAnalysisGlobaltag(). '
                 'Please try to re-run your job. In case of persistent failures, please contact '
                 'the experts.')
+
+
+def getAnalysisGlobaltagB2BII(timeout=180) -> str:
+    """
+    Get recommended global tag for B2BII analysis.
+    """
+
+    import b2bii
+    if not b2bii.isB2BII():
+        B2ERROR('The getAnalysisGlobaltagB2BII() function cannot be used for Belle II data.')
+    return 'analysis_b2bii'
 
 
 def getNbarIDMVA(particleList, path=None, ):

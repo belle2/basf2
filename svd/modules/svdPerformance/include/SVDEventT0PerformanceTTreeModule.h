@@ -94,6 +94,9 @@ namespace Belle2 {
     int m_run = -99; /**< run number */
     int m_event = -99; /**< event number */
 
+    int m_eclTCEmax = -99;  /**< ECal TC Emax  */
+    int m_eclTCid = -99;  /**< ECal TC id  */
+
   };
 }
 

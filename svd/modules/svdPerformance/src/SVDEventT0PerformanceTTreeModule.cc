@@ -28,6 +28,7 @@
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <framework/datastore/RelationArray.h>
+#include <trg/ecl/dataobjects/TRGECLUnpackerStore.h>
 
 using namespace Belle2;
 using namespace std;
@@ -106,6 +107,8 @@ void SVDEventT0PerformanceTTreeModule::initialize()
   m_t->Branch("clsTime", &m_svdClTime);
   m_t->Branch("clsTimeErr", &m_svdClTimeErr);
   m_t->Branch("trueTime", &m_svdTrueTime);
+  m_t->Branch("eclTCEmax", &m_eclTCEmax, "eclTCEmax/i");
+  m_t->Branch("eclTCid", &m_eclTCid, "eclTCid/i");
 
 
 
@@ -122,6 +125,8 @@ void SVDEventT0PerformanceTTreeModule::event()
   m_cdcEventT0Err = -99;
   m_topEventT0 = -99;
   m_topEventT0Err = -99;
+  m_eclTCEmax = -99;
+  m_eclTCid = -99;
 
   StoreObjPtr<EventMetaData> evtMetaData;
   m_exp = evtMetaData->getExperiment();
@@ -286,6 +291,18 @@ void SVDEventT0PerformanceTTreeModule::event()
     }
   }
 
+  // ECL TC E_max in an event
+  StoreArray<TRGECLUnpackerStore> TRGECLData;
+  m_eclTCEmax    = 0; // most energetic TC energy
+  m_eclTCid      = 0; // TCID for most energetic TC
+  for (auto& trg_hit : TRGECLData) {
+    int hit_win   = trg_hit.getHitWin();
+    if (hit_win != 3 and hit_win != 4) { continue; }
+    if (trg_hit.getTCEnergy() > m_eclTCEmax) {
+      m_eclTCid      = trg_hit.getTCId();
+      m_eclTCEmax    = trg_hit.getTCEnergy();
+    }
+  }
 
   m_t->Fill();
 

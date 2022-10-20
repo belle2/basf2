@@ -13,5 +13,6 @@ env['LIBS'] = [
     'cdc_dataobjects',
     'svd_dbobjects',
     'hlt',
+    'trg_ecl_dataobjects',
     ]
 Return('env')

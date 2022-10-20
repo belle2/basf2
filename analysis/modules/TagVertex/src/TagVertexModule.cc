@@ -849,7 +849,7 @@ bool TagVertexModule::makeGeneralFitKFit()
     int nTracks = kFitTemp.getTrackCount();
 
     if (nTracks != int(particleAndWeights.size()))
-      B2FATAL("TagVertexModule: Different number of tracks in kFit and particles");
+      B2ERROR("TagVertexModule: Different number of tracks in kFit and particles");
 
     if (reduced_chi2 <= m_kFitReqReducedChi2 ||  nTracks <= 1  || (nTracks <= 2 && m_constraintType == "noConstraint")) {
       kFit = kFitTemp;
@@ -859,7 +859,7 @@ bool TagVertexModule::makeGeneralFitKFit()
       if (0 <= badTrackID && badTrackID < int(particleAndWeights.size()))
         particleAndWeights.erase(particleAndWeights.begin() + badTrackID);
       else
-        B2FATAL("TagVertexModule: Obtained badTrackID is not within limits");
+        B2ERROR("TagVertexModule: Obtained badTrackID is not within limits");
     }
 
   }

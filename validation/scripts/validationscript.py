@@ -158,6 +158,9 @@ class Script:
         elif self.status == ScriptStatus.cached:
             string_status = "cached"
 
+        input_file_names = [ip.split('/')[-1] for ip in self.input_files]
+        output_file_names = [op.split('/')[-1] for op in self.output_files]
+
         return json_objects.Script(
             self.name_not_sanitized,
             self.path,
@@ -165,6 +168,8 @@ class Script:
             log_url=os.path.join(self.package, self.name_not_sanitized)
             + ".log",
             return_code=self.returncode,
+            input=input_file_names,
+            output=output_file_names,
         )
 
     def get_recursive_dependencies(self, scripts, level=0):

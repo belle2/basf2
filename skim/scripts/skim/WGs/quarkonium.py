@@ -11,7 +11,9 @@
 
 """ Skim list building functions for quarkonium analyses: bottomonium, charmonium, resonance """
 
+import basf2
 import modularAnalysis as ma
+from ROOT import Belle2
 from skim import BaseSkim, fancy_skim_header
 from stdCharged import stdMu
 from stdPhotons import stdPhotons
@@ -178,8 +180,29 @@ class CharmoniumPsi(BaseSkim):
 
     def build_lists(self, path):
 
-        # Electron list. Exclude TOP
-        ma.fillParticleList('e+:loosepid_noTOP', 'electronID_noTOP > 0.1', path=path)
+        # Electron list (TOP is excluded).
+        ma.fillParticleList('e+:loosepid_noTOP', 'electronID_noTOP > 0.1',
+                            path=path)
+
+        # Apply charged PID MVA.
+        basf2.conditions.prepend_globaltag('chargedpidmva_rel6_v1')
+        ma.fillParticleList('e+:charged_pid', '', path=path)
+        ma.fillParticleList('mu+:charged_pid', '', path=path)
+        ma.applyChargedPidMVA(
+            particleLists=['e+:charged_pid', 'mu+:charged_pid'],
+            path=path,
+            trainingMode=Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode.c_Multiclass,
+            chargeIndependent=False)
+        ma.fillParticleList('e+:charged_pid',
+                            'pidChargedBDTScore(e, ALL) > 0.1', path=path)
+        ma.fillParticleList('mu+:charged_pid',
+                            'pidChargedBDTScore(mu, ALL) > 0.1', path=path)
+
+        # Lists with both standard and MVA-based PID.
+        ma.copyLists('e+:merged', ['e+:loosepid_noTOP', 'e+:charged_pid'],
+                     path=path)
+        ma.copyLists('mu+:merged', ['mu+:loosepid', 'mu+:charged_pid'],
+                     path=path)
 
         # Mass cuts.
         jpsi_mass_cut = '2.85 < M < 3.3'
@@ -191,15 +214,14 @@ class CharmoniumPsi(BaseSkim):
         # The recommeneded list for further reconstruction is J/psi:eebrems.
         # The estimated ratio of efficiencies in B decays in release 5.1.5 is
         # 1.00 (J/psi:eebrems) : 0.95 (J/psi:eebrems2) : 0.82 (J/psi:ee).
-        ma.correctBremsBelle('e+:brems', 'e+:loosepid_noTOP', 'gamma:all',
-                             angleThreshold=0.05,
-                             path=path)
-        ma.correctBrems('e+:brems2', 'e+:loosepid_noTOP', 'gamma:all', path=path)
+        ma.correctBremsBelle('e+:brems', 'e+:merged', 'gamma:all',
+                             angleThreshold=0.05, path=path)
+        ma.correctBrems('e+:brems2', 'e+:merged', 'gamma:all', path=path)
 
         # Reconstruct J/psi or psi(2S).
-        ma.reconstructDecay('J/psi:ee -> e+:loosepid_noTOP e-:loosepid_noTOP',
+        ma.reconstructDecay('J/psi:ee -> e+:merged e-:merged',
                             jpsi_mass_cut, path=path)
-        ma.reconstructDecay('psi(2S):ee -> e+:loosepid_noTOP e-:loosepid_noTOP',
+        ma.reconstructDecay('psi(2S):ee -> e+:merged e-:merged',
                             psi2s_mass_cut, path=path)
 
         ma.reconstructDecay('J/psi:eebrems -> e+:brems e-:brems',
@@ -212,9 +234,9 @@ class CharmoniumPsi(BaseSkim):
         ma.reconstructDecay('psi(2S):eebrems2 -> e+:brems2 e-:brems2',
                             psi2s_mass_cut, path=path)
 
-        ma.reconstructDecay('J/psi:mumu -> mu+:loosepid mu-:loosepid',
+        ma.reconstructDecay('J/psi:mumu -> mu+:merged mu-:merged',
                             jpsi_mass_cut, path=path)
-        ma.reconstructDecay('psi(2S):mumu -> mu+:loosepid mu-:loosepid',
+        ma.reconstructDecay('psi(2S):mumu -> mu+:merged mu-:merged',
                             psi2s_mass_cut, path=path)
 
         # Return the lists.
@@ -228,9 +250,9 @@ class CharmoniumPsi(BaseSkim):
         # must be made here rather than at the top of the file.
         from validation_tools.metadata import create_validation_histograms
 
-        # [Y(3S) -> pi+pi- [Y(1S,2S) -> mu+mu-]] decay
-        ma.reconstructDecay('J/psi:mumu_test -> mu+:loosepid mu-:loosepid', '', path=path)
-        ma.reconstructDecay('J/psi:ee_test -> e+:loosepid_noTOP e-:loosepid_noTOP', '', path=path)
+        # Reconstruct J/psi -> e+ e- and J/psi -> mu+ mu- decays.
+        ma.reconstructDecay('J/psi:mumu_test -> mu+:merged mu-:merged', '', path=path)
+        ma.reconstructDecay('J/psi:ee_test -> e+:merged e-:merged', '', path=path)
         ma.copyList('J/psi:ll', 'J/psi:mumu_test', path=path)
         ma.copyList('J/psi:ll', 'J/psi:ee_test', path=path)
 

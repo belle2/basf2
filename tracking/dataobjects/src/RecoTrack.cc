@@ -16,6 +16,8 @@
 #include <genfit/RKTrackRep.h>
 #include <genfit/MplTrackRep.h>
 #include <simulation/monopoles/MonopoleConstants.h>
+#include <svd/reconstruction/SVDRecoHit2D.h>
+#include <svd/dataobjects/SVDCluster.h>
 
 using namespace Belle2;
 
@@ -636,4 +638,62 @@ std::string RecoTrack::getInfoHTML() const
   out << "<br>";
 
   return out.str();
+}
+
+void RecoTrack::calculateArmTime(const std::string& storeArrayNameOfRecoTracks)
+{
+  m_calculateArmTime = true;
+  StoreArray<RecoTrack> recoTracks(storeArrayNameOfRecoTracks);
+  std::vector<RecoHitInformation*> recoHits = recoTracks[0]->getRecoHitInformations(true);
+  bool svdDONE = false;
+  float detIDpre = NAN;
+  float detID = NAN; //0: PXD, 1: SVD, 2: CDC, 3: other
+  float detIDpost = NAN;
+  int nSVD = 0;
+  float clsTimeSum = 0;
+  std::string arm = "";
+  for (int i = 0; i < (int)recoHits.size(); i ++) {
+    RecoHitInformation::RecoHitDetector foundin = recoHits[i]->getTrackingDetector();
+    if (foundin == RecoHitInformation::RecoHitDetector::c_PXD) detID = 0;
+    else if (foundin == RecoHitInformation::RecoHitDetector::c_SVD) detID = 1;
+    else if (foundin == RecoHitInformation::RecoHitDetector::c_CDC) detID = 2;
+    else detID = 3;
+    if (!svdDONE && detID != 1) detIDpre = detID;
+    RelationVector<SVDCluster> svdClusters = recoHits[i]->getRelationsTo<SVDCluster>();
+    if (detID == 1) {
+      clsTimeSum += svdClusters[0]->getClsTime();
+      nSVD += 1;
+      svdDONE = true;
+    } else {
+      if (svdDONE) {
+        detIDpost = detID;
+        arm = trackArmDirection(detIDpre, detIDpost);
+        if (arm == "IN") m_ingoingArmTime = clsTimeSum / nSVD;
+        if (arm == "OUT") m_outgoingArmTime = clsTimeSum / nSVD;
+        svdDONE = false;
+        detIDpre = detIDpost;
+        detIDpost = NAN;
+        clsTimeSum = 0;
+        nSVD = 0;
+      }
+    }
+  }
+  m_inOutArmTimeDiff = m_ingoingArmTime - m_outgoingArmTime;
+}
+
+std::string RecoTrack::trackArmDirection(float pre, float post)
+{
+  std::string armDirection = "OUT";
+  if (pre == 0 && post == 2) armDirection = "OUT";
+  else if (std::isnan(pre) && post == 2) armDirection = "OUT";
+  else if (pre == 0 && std::isnan(post)) armDirection = "OUT";
+  else if (pre == 2 && post == 0) armDirection = "IN";
+  else if (std::isnan(pre) && post == 0) armDirection = "IN";
+  else if (pre == 2 && std::isnan(post)) armDirection = "IN";
+  else {
+    //TO DO
+    B2INFO("SVD-only? PXD-SVD-PXD??? --- use layer information to determine if the track arm is outgoing or ingoing! Considered --> 'OUT'");
+    armDirection = "OUT";
+  }
+  return armDirection;
 }

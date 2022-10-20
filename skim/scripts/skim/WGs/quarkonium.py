@@ -176,7 +176,7 @@ class CharmoniumPsi(BaseSkim):
 
     def load_standard_lists(self, path):
         stdMu('loosepid', path=path)
-        stdPhotons("all", path=path)
+        stdPhotons('all', path=path)
 
     def build_lists(self, path):
 
@@ -186,6 +186,11 @@ class CharmoniumPsi(BaseSkim):
 
         # Apply charged PID MVA.
         basf2.conditions.prepend_globaltag('chargedpidmva_rel6_v1')
+        epsilon = 1e-8
+        for p in ['electron', 'muon', 'pion', 'kaon']:
+            alias = f'{p}ID_ALL_LogTransfo'
+            orig = f'formula(-1. * log10(formula(((1. - {p}ID) + {epsilon}) / ({p}ID + {epsilon}))))'
+            v.addAlias(alias, orig)
         ma.fillParticleList('e+:charged_pid', '', path=path)
         ma.fillParticleList('mu+:charged_pid', '', path=path)
         ma.applyChargedPidMVA(
@@ -194,9 +199,9 @@ class CharmoniumPsi(BaseSkim):
             trainingMode=Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode.c_Multiclass,
             chargeIndependent=False)
         ma.fillParticleList('e+:charged_pid',
-                            'pidChargedBDTScore(e, ALL) > 0.1', path=path)
+                            'pidChargedBDTScore(11, ALL) > 0.1', path=path)
         ma.fillParticleList('mu+:charged_pid',
-                            'pidChargedBDTScore(mu, ALL) > 0.1', path=path)
+                            'pidChargedBDTScore(13, ALL) > 0.1', path=path)
 
         # Lists with both standard and MVA-based PID.
         ma.copyLists('e+:merged', ['e+:loosepid_noTOP', 'e+:charged_pid'],

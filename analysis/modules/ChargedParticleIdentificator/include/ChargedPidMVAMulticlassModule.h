@@ -178,12 +178,12 @@ namespace Belle2 {
     };
 
     /**
-     * Set variable aliases neeeded by the MVA. Fallback to this if no aliases map found in payload.
+     * Set variable aliases needed by the MVA. Fallback to this if no aliases map found in payload.
      */
     void registerAliasesLegacy();
 
     /**
-     * Set variable aliases neeeded by the MVA. Read from payload.
+     * Set variable aliases needed by the MVA. Read from payload.
      */
     void registerAliases();
 

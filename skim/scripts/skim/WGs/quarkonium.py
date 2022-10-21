@@ -185,29 +185,32 @@ class CharmoniumPsi(BaseSkim):
                             path=path)
 
         # Apply charged PID MVA.
-        basf2.conditions.prepend_globaltag('chargedpidmva_rel6_v1')
-        epsilon = 1e-8
-        for p in ['electron', 'muon', 'pion', 'kaon']:
-            alias = f'{p}ID_ALL_LogTransfo'
-            orig = f'formula(-1. * log10(formula(((1. - {p}ID) + {epsilon}) / ({p}ID + {epsilon}))))'
-            v.addAlias(alias, orig)
-        ma.fillParticleList('e+:charged_pid', '', path=path)
-        ma.fillParticleList('mu+:charged_pid', '', path=path)
-        ma.applyChargedPidMVA(
-            particleLists=['e+:charged_pid', 'mu+:charged_pid'],
-            path=path,
-            trainingMode=Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode.c_Multiclass,
-            chargeIndependent=False)
-        ma.fillParticleList('e+:charged_pid',
-                            'pidChargedBDTScore(11, ALL) > 0.1', path=path)
-        ma.fillParticleList('mu+:charged_pid',
-                            'pidChargedBDTScore(13, ALL) > 0.1', path=path)
+        charged_pid_mva_enabled = False
+        if charged_pid_mva_enabled:
+            basf2.conditions.prepend_globaltag('chargedpidmva_rel6_v1')
+            epsilon = 1e-8
+            for p in ['electron', 'muon', 'pion', 'kaon']:
+                alias = f'{p}ID_ALL_LogTransfo'
+                orig = f'formula(-1. * log10(formula(((1. - {p}ID) + {epsilon}) / ({p}ID + {epsilon}))))'
+                v.addAlias(alias, orig)
+            ma.fillParticleList('e+:charged_pid', '', path=path)
+            ma.fillParticleList('mu+:charged_pid', '', path=path)
+            ma.applyChargedPidMVA(
+                particleLists=['e+:charged_pid', 'mu+:charged_pid'],
+                path=path,
+                trainingMode=Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode.c_Multiclass,
+                chargeIndependent=False)
+            ma.fillParticleList('e+:charged_pid',
+                                'pidChargedBDTScore(11, ALL) > 0.1', path=path)
+            ma.fillParticleList('mu+:charged_pid',
+                                'pidChargedBDTScore(13, ALL) > 0.1', path=path)
 
         # Lists with both standard and MVA-based PID.
-        ma.copyLists('e+:merged', ['e+:loosepid_noTOP', 'e+:charged_pid'],
-                     path=path)
-        ma.copyLists('mu+:merged', ['mu+:loosepid', 'mu+:charged_pid'],
-                     path=path)
+        ma.copyList('e+:merged', 'e+:loosepid_noTOP', path=path)
+        ma.copyList('mu+:merged', 'mu+:loosepid', path=path)
+        if charged_pid_mva_enabled:
+            ma.copyList('e+:merged', 'e+:charged_pid', path=path)
+            ma.copyList('mu+:merged', 'mu+:charged_pid', path=path)
 
         # Mass cuts.
         jpsi_mass_cut = '2.85 < M < 3.3'

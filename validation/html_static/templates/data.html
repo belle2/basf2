@@ -55,23 +55,27 @@
   <!-- Looping over all packages -->
   <!-------------------------------------------------------------------------->
   {{#packages}}
-  <ul class="tree">
-    <li><a href="#">{{ name }}</a>
+  <ul>
+    <li id="{{name}}">{{ name }}
       <ul>
       <!-- Looping over all the scriptfiles in a package and checking if they have output files -->
       <!-------------------------------------------------------------------------->
       {{#scriptfiles}}
       {{ #if output }}
-        <li><a href="#">{{ name }}</a>
+        <li>{{ name }}
           <ul>
             {{ #output:i }}
-            <li><a href="#">{{ output[i] }}</a></li>
+            <li>
+              <a href="../results/current/{{output[i]}}" target="_blank" download>{{ output[i] }}</a> || 
+              <a href="../retrieve_file_metadata?filename=../results/current/{{output[i]}}" target="_blank">metadata</a>
+            </li>
             {{/output}}
           </ul>
       {{/if}}
       {{/scriptfiles}}
       </ul>
     </li>
+    <script>hideEmpty('{{name}}');</script>
   </ul>
   {{/packages}}
   {{^packages}}
@@ -79,24 +83,14 @@
   {{/packages}}
   <a href="#" onclick="toggleDataFilesView();return false;">Back</a>
 </div>
-<!-- LooScript to handle the expand/collapse of the file list -->
+<!-- Script to handle hide empty package lists -->
 <!-------------------------------------------------------------------------->
 <script type="text/javascript">
-  var tree = document.querySelectorAll('ul.tree a:not(:last-child)');
-  var count = 0;
-  for(var i = 0; i < tree.length; i++){
-    tree[i].addEventListener('click', function(e) {
-      var parent = e.target.parentElement;
-      var classList = parent.classList;
-      if(classList.contains("open")) {
-        classList.remove('open');
-        var opensubs = parent.querySelectorAll(':scope .open');
-        for(var i = 0; i < opensubs.length; i++){
-          opensubs[i].classList.remove('open');
-        }
-      } else {
-          classList.add('open');
-      }
-    });
+  function hideEmpty(package) {
+    var li = document.getElementById(package);
+    var count = li.getElementsByTagName("ul").length;
+    if(count===1){
+      li.style.display = 'none';
+    }
   }
 </script>

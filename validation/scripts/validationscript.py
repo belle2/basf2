@@ -158,8 +158,9 @@ class Script:
         elif self.status == ScriptStatus.cached:
             string_status = "cached"
 
-        input_file_names = [ip.split('/')[-1] for ip in self.input_files]
-        output_file_names = [op.split('/')[-1] for op in self.output_files]
+        # filter for simulated files
+        input_file_names = [ip.split('/')[-1] for ip in self.input_files if '../' in ip]
+        output_file_names = [op.split('/')[-1] for op in self.output_files if '../' in op]
 
         return json_objects.Script(
             self.name_not_sanitized,

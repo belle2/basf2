@@ -76,8 +76,9 @@ REG_MODULE(TagVertex);
 TagVertexModule::TagVertexModule() : Module(),
   m_Bfield(0), m_fitTruthStatus(0), m_rollbackStatus(0), m_fitPval(0), m_mcTagLifeTime(-1), m_mcPDG(0), m_mcLifeTimeReco(-1),
   m_deltaT(0), m_deltaTErr(0), m_mcDeltaTau(0), m_mcDeltaT(0),
-  m_shiftZ(0), m_FitType(0), m_tagVl(0),
+  m_FitType(0), m_tagVl(0),
   m_truthTagVl(0), m_tagVlErr(0), m_tagVol(0), m_truthTagVol(0), m_tagVolErr(0), m_tagVNDF(0), m_tagVChi2(0), m_tagVChi2IP(0),
+  m_kFitReqReducedChi2(5),
   m_verbose(true)
 {
   // Set module properties
@@ -92,7 +93,7 @@ TagVertexModule::TagVertexModule() : Module(),
            "'': no MC association. breco: use standard Breco MC association. internal: use internal MC association", string("breco"));
   addParam("constraintType", m_constraintType,
            "Choose the type of the constraint: noConstraint, IP (tag tracks constrained to be within the beam spot), tube (long tube along the BTag line of flight, only for fully reconstruced B rec), boost (long tube along the Upsilon(4S) boost direction), (breco)",
-           string("IP"));
+           string("tube"));
   addParam("trackFindingType", m_trackFindingType,
            "Choose how to reconstruct the tracks on the tag side: standard, standard_PXD",
            string("standard_PXD"));
@@ -103,7 +104,9 @@ TagVertexModule::TagVertexModule() : Module(),
   addParam("reqPXDHits", m_reqPXDHits,
            "Minimum number of PXD hits for a track to be used in the vertex fit", 0);
   addParam("fitAlgorithm", m_fitAlgo,
-           "Fitter used for the tag vertex fit: Rave or KFit", string("Rave"));
+           "Fitter used for the tag vertex fit: Rave or KFit", string("KFit"));
+  addParam("kFitReqReducedChi2", m_kFitReqReducedChi2,
+           "The required chi2/ndf to accept the kFit result, if it is higher, iteration procedure is applied", 5.0);
   addParam("useTruthInFit", m_useTruthInFit,
            "Use the true track parameters in the vertex fit", false);
   addParam("useRollBack", m_useRollBack,
@@ -276,16 +279,17 @@ bool TagVertexModule::doVertexFit(const Particle* Breco)
   double bg = beta / sqrt(1 - beta * beta);
 
   //TODO: What's the origin of these numbers?
-  double cut = 8.717575e-02 * bg;
-  m_shiftZ = 4.184436e+02 * bg *  0.0001;
+  double tauB = 1.519; //B0 lifetime in ps
+  double c = Const::speedOfLight / 1000.; // cm ps-1
+  double lB0  = tauB * bg * c;
 
   //tube length here set to 20 * 2 * c tau beta gamma ~= 0.5 cm, should be enough to not bias the decay
   //time but should still help getting rid of some pions from kshorts
   m_constraintCov.ResizeTo(3, 3);
-  if (m_constraintType == "IP")         tie(m_constraintCenter, m_constraintCov) = findConstraintBoost(cut);
-  else if (m_constraintType == "tube")  tie(m_constraintCenter, m_constraintCov) = findConstraintBTube(Breco, 1000 * cut);
-  else if (m_constraintType == "boost") tie(m_constraintCenter, m_constraintCov) = findConstraintBoost(cut * 200000.);
-  else if (m_constraintType == "breco") tie(m_constraintCenter, m_constraintCov) = findConstraint(Breco, cut * 2000.);
+  if (m_constraintType == "IP")         tie(m_constraintCenter, m_constraintCov) = findConstraintBoost(2 * lB0);
+  else if (m_constraintType == "tube")  tie(m_constraintCenter, m_constraintCov) = findConstraintBTube(Breco, 200 * lB0);
+  else if (m_constraintType == "boost") tie(m_constraintCenter, m_constraintCov) = findConstraintBoost(200 * lB0);
+  else if (m_constraintType == "breco") tie(m_constraintCenter, m_constraintCov) = findConstraint(Breco, 200 * lB0);
   else if (m_constraintType == "noConstraint") m_constraintCenter = B2Vector3D(); //zero vector
   else  {
     B2ERROR("TagVertex: Invalid constraintType selected");
@@ -323,7 +327,7 @@ bool TagVertexModule::doVertexFit(const Particle* Breco)
   }
 
   if ((ok == false || (m_fitPval <= 0. && m_fitAlgo == "Rave")) && m_constraintType != "noConstraint") {
-    tie(m_constraintCenter, m_constraintCov) = findConstraintBoost(cut * 200000.);
+    tie(m_constraintCenter, m_constraintCov) = findConstraintBoost(200 * lB0);
     ok = (m_constraintCenter != vecNaN);
     if (ok) {
       m_tagParticles = getTagTracks_standardAlgorithm(Breco, m_reqPXDHits);
@@ -486,11 +490,16 @@ pair<B2Vector3D, TMatrixDSym> TagVertexModule::findConstraintBTube(const Particl
   return make_pair(B2Vector3D(constraintCenter), toSymMatrix(pvNew));
 }
 
-pair<B2Vector3D, TMatrixDSym> TagVertexModule::findConstraintBoost(double cut, double shiftAlongBoost) const
+pair<B2Vector3D, TMatrixDSym> TagVertexModule::findConstraintBoost(double cut) const
 {
+  double d = 20e-4; //average transverse distance flown by B0
+
   //make a long error matrix along boost direction
   TMatrixD longerror(3, 3); longerror(2, 2) = cut * cut;
+  longerror(0, 0) = longerror(1, 1) = d * d;
+
   B2Vector3D boostDir = PCmsLabTransform().getBoostVector().Unit();
+
   TMatrixD longerrorRotated = rotateTensor(boostDir, longerror);
 
   //Extend error of BeamSpotCov matrix in the boost direction
@@ -499,11 +508,6 @@ pair<B2Vector3D, TMatrixDSym> TagVertexModule::findConstraintBoost(double cut, d
 
   // Standard algorithm needs no shift
   B2Vector3D constraintCenter = m_BeamSpotCenter;
-
-  // The constraint used in the Single Track Fit needs to be shifted in the boost direction.
-  if (shiftAlongBoost > -1000) {
-    constraintCenter +=  shiftAlongBoost * boostDir;
-  }
 
   return make_pair(constraintCenter,   toSymMatrix(Tube));
 }
@@ -609,46 +613,24 @@ std::vector<const Particle*> TagVertexModule::getTagTracks_standardAlgorithm(con
   return fitParticles;
 }
 
-vector<ParticleAndWeight> TagVertexModule::getParticlesWithoutKS(const vector<const Particle*>& tagParticles,
-    double massWindowWidth) const
+
+vector<ParticleAndWeight> TagVertexModule::getParticlesAndWeights(const vector<const Particle*>& tagParticles) const
 {
   vector<ParticleAndWeight> particleAndWeights;
 
-  ParticleAndWeight particleAndWeight;
-  particleAndWeight.mcParticle = 0;
-  particleAndWeight.weight = -1111.;
+  for (const Particle* particle : tagParticles) {
+    ROOT::Math::PxPyPzEVector mom = particle->get4Vector();
+    if (!isfinite(mom.mag2())) continue;
 
-  // remove tracks from KS
-  for (unsigned i = 0; i < tagParticles.size(); ++i) {
-    const Particle* particle1 = tagParticles.at(i);
-    if (!particle1) continue;
-    ROOT::Math::PxPyPzEVector mom1 = particle1->get4Vector();
-    if (!isfinite(mom1.mag2())) continue;
-
-    //is from Ks decay?
-    bool isKsDau = false;
-    for (unsigned j = 0; j < tagParticles.size(); ++j) {
-      if (i == j) continue;
-      const Particle* particle2 = tagParticles.at(j);
-      if (!particle2) continue;
-      ROOT::Math::PxPyPzEVector mom2 = particle2->get4Vector();
-      if (!isfinite(mom2.mag2())) continue;
-      double mass = (mom1 + mom2).M();
-      if (abs(mass - Const::K0Mass) < massWindowWidth) {
-        isKsDau = true;
-        break;
-      }
-    }
-    //if from Ks decay, skip
-    if (isKsDau) continue;
-
-    particleAndWeight.particle = particle1;
+    ParticleAndWeight particleAndWeight;
+    particleAndWeight.mcParticle = 0;
+    particleAndWeight.weight = -1111.;
+    particleAndWeight.particle = particle;
 
     if (m_useMCassociation == "breco" || m_useMCassociation == "internal")
-      particleAndWeight.mcParticle = particle1->getRelatedTo<MCParticle>();
+      particleAndWeight.mcParticle = particle->getRelatedTo<MCParticle>();
 
     particleAndWeights.push_back(particleAndWeight);
-
   }
 
   return particleAndWeights;
@@ -702,7 +684,7 @@ bool TagVertexModule::makeGeneralFitRave()
   analysis::RaveVertexFitter rFit;
 
   //feed rave with tracks without Kshorts
-  vector<ParticleAndWeight> particleAndWeights = getParticlesWithoutKS(m_tagParticles);
+  vector<ParticleAndWeight> particleAndWeights = getParticlesAndWeights(m_tagParticles);
 
   for (const auto& pw : particleAndWeights) {
     try {
@@ -759,7 +741,8 @@ bool TagVertexModule::makeGeneralFitRave()
   return true;
 }
 
-bool TagVertexModule::makeGeneralFitKFit()
+
+analysis::VertexFitKFit TagVertexModule::doSingleKfit(vector<ParticleAndWeight>& particleAndWeights)
 {
   //initialize KFit
   analysis::VertexFitKFit kFit;
@@ -782,10 +765,7 @@ bool TagVertexModule::makeGeneralFitKFit()
     }
   }
 
-  //feed KFit with tracks without Kshorts
-  vector<ParticleAndWeight> particleAndWeights = getParticlesWithoutKS(m_tagParticles);
 
-  int nTracksAdded = 0;
   for (auto& pawi : particleAndWeights) {
     int addedOK = 1;
     if (m_useTruthInFit) {
@@ -813,7 +793,6 @@ bool TagVertexModule::makeGeneralFitKFit()
     }
 
     if (addedOK == 0) {
-      ++nTracksAdded;
       pawi.weight = 1.;
     } else {
       B2WARNING("TagVertexModule::makeGeneralFitKFit: failed to add a track");
@@ -821,15 +800,72 @@ bool TagVertexModule::makeGeneralFitKFit()
     }
   }
 
+
+  int nTracksAdded = kFit.getTrackCount();
+
   //perform fit if there are enough tracks
   if ((nTracksAdded < 2 && m_constraintType == "noConstraint") || nTracksAdded < 1)
-    return false;
+    return  analysis::VertexFitKFit();
 
   int isGoodFit = kFit.doFit();
-  if (isGoodFit != 0) return false;
+  if (isGoodFit != 0) return analysis::VertexFitKFit();
+
+  return kFit;
+}
+
+
+static int getLargestChi2ID(const analysis::VertexFitKFit& kFit)
+{
+  int largest_chi2_trackid = -1;
+  double largest_track_chi2 = -1;
+  for (int i = 0; i < kFit.getTrackCount(); ++i) {
+    double track_chi2 = kFit.getTrackCHIsq(i);
+    if (track_chi2 > largest_track_chi2) {
+      largest_track_chi2 = track_chi2;
+      largest_chi2_trackid = i;
+    }
+  }
+  return largest_chi2_trackid;
+}
+
+
+
+//uses m_tagMomentum, m_constraintCenter, m_constraintCov, m_tagParticles
+bool TagVertexModule::makeGeneralFitKFit()
+{
+  //feed KFit with tracks without Kshorts
+  vector<ParticleAndWeight> particleAndWeights = getParticlesAndWeights(m_tagParticles);
+
+  analysis::VertexFitKFit kFit;
+
+
+  // iterative procedure which removes tracks with high chi2
+  for (int iteration_counter = 0; iteration_counter < 100; ++iteration_counter) {
+    analysis::VertexFitKFit kFitTemp =  doSingleKfit(particleAndWeights);
+    if (!kFitTemp.isFitted())
+      return false;
+
+    double reduced_chi2 =  kFitTemp.getCHIsq() / kFitTemp.getNDF();
+    int nTracks = kFitTemp.getTrackCount();
+
+    if (nTracks != int(particleAndWeights.size()))
+      B2FATAL("TagVertexModule: Different number of tracks in kFit and particles");
+
+    if (reduced_chi2 <= m_kFitReqReducedChi2 ||  nTracks <= 1  || (nTracks <= 2 && m_constraintType == "noConstraint")) {
+      kFit = kFitTemp;
+      break;
+    } else { // remove particle with highest chi2/ndf and continue
+      int badTrackID =  getLargestChi2ID(kFitTemp);
+      if (0 <= badTrackID && badTrackID < int(particleAndWeights.size()))
+        particleAndWeights.erase(particleAndWeights.begin() + badTrackID);
+      else
+        B2FATAL("TagVertexModule: Obtained badTrackID is not within limits");
+    }
+
+  }
 
   //save the track info for later use
-  //Tracks are sorted by weight, ie pushing the tracks with 0 weight (from KS) to the end of the list
+  //Tracks are sorted by weight, i.e. pushing the tracks with 0 weight (from KS) to the end of the list
   fillParticles(particleAndWeights);
 
   //Save the infos related to the vertex

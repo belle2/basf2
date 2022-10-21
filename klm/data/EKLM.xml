@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <EKLM>
 	<!-- Simulation. -->
-	<SensitiveDetector>
-		<HitTimeThreshold desc="All hits with larger time will be dropped at SensitiveDetector level" unit="ns">1000000000</HitTimeThreshold>
-	</SensitiveDetector>
+        <BeamBackgroundStudy desc="Flag to use additional sensitive-detector object to record beam-background hits">false</BeamBackgroundStudy>
 	<!-- Geometry. -->
 	<Mode desc="0 -- normal operation, 1 -- bg study">0</Mode>
 	<!-- Numbers of elements. -->

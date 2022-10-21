@@ -39,6 +39,8 @@ DQMHistAnalysisKLM2Module::~DQMHistAnalysisKLM2Module()
 
 void DQMHistAnalysisKLM2Module::initialize()
 {
+  m_monObj = getMonitoringObject("klm");
+
   gROOT->cd();
   m_c_eff_bklm = new TCanvas("KLMEfficiencyDQM/c_eff_bklm_plane");
   m_c_eff_eklm = new TCanvas("KLMEfficiencyDQM/c_eff_eklm_plane");
@@ -88,6 +90,50 @@ void DQMHistAnalysisKLM2Module::beginRun()
 
 void DQMHistAnalysisKLM2Module::endRun()
 {
+  std::string name;
+
+  // Looping over the sectors
+  for (int bin = 0; bin < m_eff_bklm_sector->GetXaxis()->GetNbins(); bin++) {
+    name = "eff_B";
+    if (bin < 8)
+      name += "B";
+    else
+      name += "F";
+    name += std::to_string(bin % 8);
+    m_monObj->setVariable(name, m_eff_bklm_sector->GetBinContent(bin + 1));
+  }
+
+  for (int bin = 0; bin < m_eff_eklm_sector->GetXaxis()->GetNbins(); bin++) {
+    name = "eff_E";
+    if (bin < 4)
+      name += "B";
+    else
+      name += "F";
+    name += std::to_string(bin % 4);
+    m_monObj->setVariable(name, m_eff_eklm_sector->GetBinContent(bin + 1));
+  }
+
+  // Looping over the planes
+  for (int layer = 0; layer < m_eff_bklm->GetXaxis()->GetNbins(); layer++) {
+    name = "eff_B";
+    if (layer / 15 < 8) {
+      name += "B";
+    } else {
+      name += "F";
+    }
+    name += std::to_string(int(layer / 15) % 8) + "_layer" + std::to_string(1 + (layer % 15));
+    m_monObj->setVariable(name, m_eff_bklm->GetBinContent(layer + 1));
+  }
+  for (int layer = 0; layer < m_eff_eklm->GetXaxis()->GetNbins(); layer++) {
+    name = "eff_E";
+    if (layer / 8 < 12)
+      name += "B" + std::to_string(layer / 8 + 1);
+    else
+      name += "F" + std::to_string(layer / 8 - 11);
+    name +=  + "_num" + std::to_string(((layer) % 8) + 1);
+    m_monObj->setVariable(name, m_eff_eklm->GetBinContent(layer + 1));
+
+  }
 }
 
 
@@ -96,10 +142,6 @@ void DQMHistAnalysisKLM2Module::processPlaneHistogram(
   const std::string& histName, TH1* histogram)
 {
   std::string name;
-  const double histMinNDC = 0.1;
-  const double histMaxNDC = 0.9;
-  const double histRangeNDC = histMaxNDC - histMinNDC;
-
   TCanvas* canvas = findCanvas("KLMEfficiencyDQM/c_" + histName);
   if (canvas == NULL) {
     B2ERROR("KLMDQM2 histogram canvas KLMEfficiencyDQM/c_" << histName << " is not found.");
@@ -109,33 +151,39 @@ void DQMHistAnalysisKLM2Module::processPlaneHistogram(
   canvas->cd();
   histogram->SetStats(false);
   histogram->Draw();
+  double histMin = gPad->GetUymin();
+  double histMax = gPad->GetUymax();
+  double histRange = histMax - histMin;
   if (histName.find("bklm") != std::string::npos) {
     /* First draw the vertical lines and the sector names. */
-    const double maximalSector = BKLMElementNumbers::getMaximalSectorGlobalNumber();
+    const int maximalLayer = BKLMElementNumbers::getMaximalLayerNumber();
     for (int sector = 0; sector < BKLMElementNumbers::getMaximalSectorGlobalNumber(); ++sector) {
-      double xLineNDC = histMinNDC + (histRangeNDC * sector) / maximalSector;
-      double xTextNDC = histMinNDC + (histRangeNDC * (sector + 0.5)) / maximalSector;
-      double yTextNDC = histMinNDC + 0.98 * histRangeNDC;
+      int bin = maximalLayer * sector + 1;
+      double xLine = histogram->GetXaxis()->GetBinLowEdge(bin);
+      double xText = histogram->GetXaxis()->GetBinLowEdge(bin + maximalLayer / 2);
+      double yText = histMin + 0.98 * histRange;
       if (sector > 0)
-        m_PlaneLine.DrawLineNDC(xLineNDC, histMinNDC, xLineNDC, histMaxNDC);
+        m_PlaneLine.DrawLine(xLine, histMin, xLine, histMin + histRange);
       name = "B";
       if (sector < 8)
         name += "B";
       else
         name += "F";
       name += std::to_string(sector % 8);
-      m_PlaneText.DrawTextNDC(xTextNDC, yTextNDC, name.c_str());
+      m_PlaneText.DrawText(xText, yText, name.c_str());
     }
 
   } else {
     /* First draw the vertical lines and the sector names. */
     const double maximalLayer = EKLMElementNumbers::getMaximalLayerGlobalNumber();
+    const double maxPlane = EKLMElementNumbers::getMaximalPlaneNumber() * EKLMElementNumbers::getMaximalSectorNumber();
     for (int layerGlobal = 1; layerGlobal <= maximalLayer; ++layerGlobal) {
-      double xLineNDC = histMinNDC + (histRangeNDC * layerGlobal) / maximalLayer;
-      double xTextNDC = histMinNDC + (histRangeNDC * (layerGlobal - 0.5)) / maximalLayer;
-      double yTextNDC = histMinNDC + 0.98 * histRangeNDC;
+      int bin = maxPlane * layerGlobal + 1;
+      double xLine = histogram->GetXaxis()->GetBinLowEdge(bin);
+      double xText = histogram->GetXaxis()->GetBinLowEdge(bin - maxPlane / 2);
+      double yText = histMin + 0.98 * histRange;
       if (layerGlobal < maximalLayer)
-        m_PlaneLine.DrawLineNDC(xLineNDC, histMinNDC, xLineNDC, histMaxNDC);
+        m_PlaneLine.DrawLine(xLine, histMin, xLine, histMin + histRange);
       int section, layer;
       m_EklmElementNumbers->layerNumberToElementNumbers(
         layerGlobal, &section, &layer);
@@ -144,11 +192,11 @@ void DQMHistAnalysisKLM2Module::processPlaneHistogram(
       else
         name = "F";
       name += std::to_string(layer);
-      m_PlaneText.DrawTextNDC(xTextNDC, yTextNDC, name.c_str());
+      m_PlaneText.DrawText(xText, yText, name.c_str());
     }
-    canvas->Modified();
-    canvas->Update();
   }
+  canvas->Modified();
+  canvas->Update();
 }
 
 void DQMHistAnalysisKLM2Module::event()

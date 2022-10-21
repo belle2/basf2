@@ -166,6 +166,20 @@ Particle* ParticleList::getParticle(unsigned i, bool includingAntiList) const
   return nullptr;
 }
 
+Particle* ParticleList::getParticleWithMdstIdx(unsigned int mdstIdx, bool includingAntiList) const
+{
+  const unsigned int n = this->getListSize(includingAntiList);
+  for (unsigned i = 0; i < n; i++) {
+
+    auto particle = this->getParticle(i, includingAntiList);
+
+    if (particle->getMdstArrayIndex() == mdstIdx) {
+      return particle;
+    }
+  }
+  return nullptr;
+}
+
 unsigned ParticleList::getListSize(bool includingAntiList) const
 {
   unsigned size = 0;
@@ -269,4 +283,3 @@ ParticleList& ParticleList::getAntiParticleList() const
   }
   return **m_antiList;
 }
-

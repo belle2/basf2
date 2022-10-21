@@ -34,6 +34,9 @@ namespace TreeFitter {
     /** project kinematical constraint */
     ErrCode projectKineConstraint(const FitParams&, Projection&) const;
 
+    /** project beam four momentum constraint */
+    ErrCode projectBeamConstraint(const FitParams&, Projection&) const;
+
     /** enforce conservation of momentum sum*/
     virtual void forceP4Sum(FitParams&) const override;
 
@@ -91,6 +94,9 @@ namespace TreeFitter {
 
     /** has mass constraint */
     bool m_massconstraint ;
+
+    /** has beam constraint */
+    bool m_beamconstraint ;
 
     /** shares vertex with mother, that means decay vertex = productionvertex */
     bool m_shares_vertex_with_mother;

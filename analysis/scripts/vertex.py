@@ -233,6 +233,7 @@ def treeFit(
     customOriginVertex=[0.001, 0, 0.0116],
     customOriginCovariance=[0.0048, 0, 0, 0, 0.003567, 0, 0, 0, 0.0400],
     originDimension=3,
+    treatAsInvisible='',
     path=None,
 ):
     """
@@ -268,6 +269,7 @@ def treeFit(
             otherwise be set to {0, 0, 0} contact us if this causes any hardship/confusion.
         originDimension (int): If the origin or IP constraint (``customOriginVertex`` or ``ipConstraint``) are used,
             this specifies the dimension of the constraint (3D or 2D).
+        treatAsInvisible (str): Decay string to select one particle that will be treated as invisible in the fit.
         path (basf2.Path): modules are added to this path
     """
     treeFitter = register_module("TreeFitter")
@@ -285,6 +287,7 @@ def treeFit(
     treeFitter.param('customOriginVertex', customOriginVertex)
     treeFitter.param('customOriginCovariance', customOriginCovariance)
     treeFitter.param('originDimension', originDimension)
+    treeFitter.param('treatAsInvisible', treatAsInvisible)
     path.add_module(treeFitter)
 
 
@@ -293,11 +296,12 @@ def TagV(
     MCassociation='',
     confidenceLevel=0.,
     trackFindingType="standard_PXD",
-    constraintType="IP",
+    constraintType="tube",
     askMCInfo=False,
     reqPXDHits=0,
     maskName='all',
-    fitAlgorithm='Rave',
+    fitAlgorithm='KFit',
+    kFitReqReducedChi2=5.0,
     useTruthInFit=False,
     useRollBack=False,
     path=None,
@@ -326,7 +330,8 @@ def TagV(
           * standard_PXD: **default**, same as above but consider only tracks with at least 1 PXD hit.
               If the fit fails, attempt again with the standard option;
 
-        fitAlgorithm (str):     Fitter used for the tag vertex fit: Rave (default) or KFit
+        fitAlgorithm (str):     Fitter used for the tag vertex fit: Rave or KFit (default)
+        kFitReqReducedChi2 (float): The required chi2/ndf to accept the kFit result, if it is higher, iteration procedure is applied
         askMCInfo (bool): True when requesting MC Information from the tracks performing the vertex fit
         reqPXDHits (int): minimum N PXD hits for a track (default is 0)
         maskName (str): get particles from a specified ROE mask
@@ -357,6 +362,7 @@ def TagV(
     tvfit.param('askMCInformation', askMCInfo)
     tvfit.param('reqPXDHits', reqPXDHits)
     tvfit.param('fitAlgorithm', fitAlgorithm)
+    tvfit.param('kFitReqReducedChi2', kFitReqReducedChi2)
     tvfit.param('useTruthInFit', useTruthInFit)
     tvfit.param('useRollBack', useRollBack)
     path.add_module(tvfit)

@@ -44,7 +44,6 @@ Modular Analysis Function
    selection. The decomposition of meta variables can be tricky, so a new argument ``metavariables`` is added to extend
    the list of meta variables which should be decomposed and should themselves be ignored in the check.
  * Added the argument ``treatAsInvisible`` in :func:`vertex.treeFit` to ignore particles in the fit. 
- * Updated the `calculateTrackIsolation` helper. Now, it returns a list of metavariables (`minET2ETDist`, optionally `minET2ETDistVar` as well)
  * Updated the `calculateTrackIsolation` helper. Now, it returns a list of metavariables (`minET2ETDist`, `minET2ETIsoScore`, optionally `minET2ETDistVar` as well)
    correctly configured according to the helper input options.
    Users can then create aliases in their own steering script: see ``analysis/examples/VariableManager/trackIsolationVariables.py`` for an example.

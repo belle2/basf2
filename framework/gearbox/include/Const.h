@@ -67,6 +67,9 @@ namespace Belle2 {
     class DetectorSet {
     public:
 
+      /**
+       * Iterator.
+       */
       class Iterator {
 
       public:

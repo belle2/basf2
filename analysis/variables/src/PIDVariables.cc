@@ -301,9 +301,10 @@ namespace Belle2 {
           return std::numeric_limits<float>::quiet_NaN();
 
         double LogL = 0;
-        for (unsigned int index = 0; index < Const::PIDDetectorSet::set().size(); ++index)
+        for (Const::DetectorSet::Iterator it = Const::PIDDetectorSet::set().begin();
+             it != Const::PIDDetectorSet::set().end(); ++it)
         {
-          Const::EDetector detector = Const::PIDDetectorSet::set()[index];
+          Const::EDetector detector = *it;
           if (detectorSet.contains(detector))
             LogL += pid->getLogL(hypType, detector) * weightMatrix.getWeight(hypType.getPDGCode(), detector);
         }
@@ -349,8 +350,9 @@ namespace Belle2 {
           const int index_pdg = pdgIter.getIndex();
 
           LogL[index_pdg] = 0;
-          for (unsigned int index_det = 0; index_det < Const::PIDDetectorSet::set().size(); ++index_det) {
-            Const::EDetector detector = Const::PIDDetectorSet::set()[index_det];
+          for (Const::DetectorSet::Iterator it = Const::PIDDetectorSet::set().begin();
+               it != Const::PIDDetectorSet::set().end(); ++it) {
+            Const::EDetector detector = *it;
 
             if (detectorSet.contains(detector))
               LogL[index_pdg] += pid->getLogL(pdgIter, detector) * weightMatrix.getWeight(pdgIter.getPDGCode(), detector);
@@ -413,9 +415,10 @@ namespace Belle2 {
           return std::numeric_limits<float>::quiet_NaN();
 
         double LogL_hypType(0), LogL_testType(0);
-        for (unsigned int index = 0; index < Const::PIDDetectorSet::set().size(); ++index)
+        for (Const::DetectorSet::Iterator it = Const::PIDDetectorSet::set().begin();
+             it != Const::PIDDetectorSet::set().end(); ++it)
         {
-          Const::EDetector detector = Const::PIDDetectorSet::set()[index];
+          Const::EDetector detector = *it;
           if (detectorSet.contains(detector)) {
             LogL_hypType += pid->getLogL(hypType, detector) * weightMatrix.getWeight(hypType.getPDGCode(), detector);
             LogL_testType += pid->getLogL(testType, detector) * weightMatrix.getWeight(testType.getPDGCode(), detector);
@@ -677,10 +680,10 @@ namespace Belle2 {
 
       auto func = [hypType, detectorSet](const Particle * part) -> double {
         auto name = "pidChargedBDTScore_" + std::to_string(hypType.getPDGCode());
-        for (size_t iDet(0); iDet < detectorSet.size(); ++iDet)
+        for (Const::DetectorSet::Iterator it = detectorSet.begin();
+             it != detectorSet.end(); ++it)
         {
-          auto det = detectorSet[iDet];
-          name += "_" + std::to_string(det);
+          name += "_" + std::to_string(*it);
         }
         return (part->hasExtraInfo(name)) ? part->getExtraInfo(name) : std::numeric_limits<float>::quiet_NaN();
       };
@@ -715,10 +718,10 @@ namespace Belle2 {
 
       auto func = [hypType, testType, detectorSet](const Particle * part) -> double {
         auto name = "pidPairChargedBDTScore_" + std::to_string(hypType.getPDGCode()) + "_VS_" + std::to_string(testType.getPDGCode());
-        for (size_t iDet(0); iDet < detectorSet.size(); ++iDet)
+        for (Const::DetectorSet::Iterator it = detectorSet.begin();
+             it != detectorSet.end(); ++it)
         {
-          auto det = detectorSet[iDet];
-          name += "_" + std::to_string(det);
+          name += "_" + std::to_string(*it);
         }
         return (part->hasExtraInfo(name)) ? part->getExtraInfo(name) : std::numeric_limits<float>::quiet_NaN();
       };

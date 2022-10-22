@@ -127,7 +127,7 @@ namespace Belle2 {
          */
         uint16_t getSetBit() const
         {
-          return m_Index;
+          return m_SetBit;
         }
 
       private:

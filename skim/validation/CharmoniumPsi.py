@@ -35,4 +35,5 @@ ma.inputMdstList(
 skim(path)
 
 path.add_module('Progress')
-b2.process(path)
+b2.process(path, max_event=20000)
+print(b2.statistics)

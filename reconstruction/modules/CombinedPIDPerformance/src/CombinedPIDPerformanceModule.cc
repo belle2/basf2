@@ -91,7 +91,7 @@ void CombinedPIDPerformanceModule::initialize()
   }
 
   // create the efficiency and fake rate objects for hadrons
-  for (unsigned int i = 0; i < chargedSet.size() + 3; ++i) {
+  for (unsigned int i = 0; i < detset.size(); ++i) {
     m_piK_Efficiencies.push_back(createEfficiency(TString::Format("epik_%d", i), "#pi efficiency;p  [GeV/c];Efficiency", m_nbins,
                                                   m_pLow,
                                                   m_pHigh, m_histoList));
@@ -121,7 +121,7 @@ void CombinedPIDPerformanceModule::initialize()
   }
 
   // create the efficiency and fake rate objects for electrons
-  for (unsigned int i = 0; i < electronSet.size() + 2; ++i) {
+  for (unsigned int i = 0; i < edetset.size(); ++i) {
     m_epi_Efficiencies.push_back(createEfficiency(TString::Format("eepi_%d", i), "e efficiency;p  [GeV/c];Efficiency", m_nbins, m_pLow,
                                                   m_pHigh, m_histoList));
 
@@ -131,17 +131,20 @@ void CombinedPIDPerformanceModule::initialize()
   }
 
   // create the efficiency and fake rate objects for muons
-  for (unsigned int i = 0; i < muonSet.size(); ++i) {
-    m_mpi_Efficiencies.push_back(createEfficiency(TString::Format("empi_%d", i), "#mu efficiency;p  [GeV/c];Efficiency", m_nbins,
-                                                  m_pLow,
-                                                  m_pHigh, m_histoList));
-
-    m_mpi_FakeRates.push_back(createEfficiency(TString::Format("fmpi_%d", i), "#mu fake rate;p  [GeV/c];Fake Rate", m_nbins, m_pLow,
-                                               m_pHigh, m_histoList));
+  for (Const::DetectorSet::Iterator it = muonSet.begin();
+       it != muonSet.end(); ++it) {
+    m_mpi_Efficiencies.push_back(
+      createEfficiency(TString::Format("empi_%d", it.getIndex()),
+                       "#mu efficiency;p  [GeV/c];Efficiency",
+                       m_nbins, m_pLow, m_pHigh, m_histoList));
+    m_mpi_FakeRates.push_back(
+      createEfficiency(TString::Format("fmpi_%d", it.getIndex()),
+                       "#mu fake rate;p  [GeV/c];Fake Rate",
+                       m_nbins, m_pLow, m_pHigh, m_histoList));
   }
 
   // color the fake rate objects red here for simplicity later
-  for (unsigned int i = 0; i < chargedSet.size() + 3; ++i) {
+  for (unsigned int i = 0; i < detset.size(); ++i) {
     m_piK_FakeRates[i]->SetMarkerColor(kRed);
     m_piK_FakeRates[i]->SetLineColor(kRed);
     m_Kpi_FakeRates[i]->SetMarkerColor(kRed);
@@ -152,14 +155,15 @@ void CombinedPIDPerformanceModule::initialize()
     m_pK_FakeRates[i]->SetLineColor(kRed);
     m_dpi_FakeRates[i]->SetMarkerColor(kRed);
     m_dpi_FakeRates[i]->SetLineColor(kRed);
-    if (i < electronSet.size() + 2) {
-      m_epi_FakeRates[i]->SetMarkerColor(kRed);
-      m_epi_FakeRates[i]->SetLineColor(kRed);
-    }
-    if (i < muonSet.size()) {
-      m_mpi_FakeRates[i]->SetMarkerColor(kRed);
-      m_mpi_FakeRates[i]->SetLineColor(kRed);
-    }
+  }
+  for (unsigned int i = 0; i < edetset.size(); ++i) {
+    m_epi_FakeRates[i]->SetMarkerColor(kRed);
+    m_epi_FakeRates[i]->SetLineColor(kRed);
+  }
+  for (Const::DetectorSet::Iterator it = muonSet.begin();
+       it != muonSet.end(); ++it) {
+    m_mpi_FakeRates[it.getIndex()]->SetMarkerColor(kRed);
+    m_mpi_FakeRates[it.getIndex()]->SetLineColor(kRed);
   }
 }
 
@@ -216,12 +220,13 @@ void CombinedPIDPerformanceModule::fillEfficiencyHistos(const TrackFitResult* tr
   bool pass; // used to pass or fail events based on coverage
 
   // fill rocs, efficiencies, and fake rates for hadrons
-  for (unsigned int i = 0; i < chargedSet.size() + 3; ++i) {
+  Const::DetectorSet::Iterator it = chargedSet.begin();
+  for (unsigned int i = 0; i < detset.size(); ++i) {
     float pidval = -1.0;
     int detnum = detset[i];
 
     Const::DetectorSet det;
-    if (i < chargedSet.size()) det = chargedSet[i];
+    if (i < chargedSet.size()) det = *it;
     if (i == chargedSet.size()) { // Combined dE/dx
       if (m_mdstType == "BelleII") det += Const::SVD;
       det += Const::CDC;
@@ -308,15 +313,17 @@ void CombinedPIDPerformanceModule::fillEfficiencyHistos(const TrackFitResult* tr
       pass = (pid->getDeltaLogL(Const::deuteron, Const::pion, det) > 0) ? true : false;
       m_dpi_Efficiencies[i]->Fill(pass, trackFit->getMomentum().Mag());
     }
+    ++it;
   } // end of loop for hadrons
 
   // fill rocs, efficiencies, and fake rates for electrons
-  for (unsigned int i = 0; i <= electronSet.size() + 1; ++i) {
+  it = electronSet.begin();
+  for (unsigned int i = 0; i <= edetset.size() + 1; ++i) {
     float pidval = -1.0;
     int detnum = edetset[i];
 
     Const::DetectorSet det;
-    if (i < electronSet.size()) det = electronSet[i];
+    if (i < electronSet.size()) det = *it;
     if (i == electronSet.size()) { // Combined dE/dx
       if (m_mdstType == "BelleII") det += Const::SVD;
       det += Const::CDC;
@@ -348,12 +355,14 @@ void CombinedPIDPerformanceModule::fillEfficiencyHistos(const TrackFitResult* tr
       pidval = pidvalue(logl_pi_e, logl_e);
       h_ROC[0][detnum]->Fill(0.0, pidval, trackFit->getMomentum().Mag()); // pion faking electron
     }
+    ++it;
   } // end of loop for electrons
 
   // fill rocs, efficiencies, and fake rates for muons
-  for (unsigned int i = 0; i < muonSet.size(); ++i) {
+  for (it = muonSet.begin(); it != muonSet.end(); ++it) {
+    int i = it.getIndex();
     float pidval = -1.0;
-    Const::EDetector det = muonSet[i];
+    Const::EDetector det = *it;
 
     // get pid LogL values for electrons and pions
     double logl_mu = 0, logl_pi_mu = 0;
@@ -416,8 +425,8 @@ bool CombinedPIDPerformanceModule::pidavail(const PIDLikelihood* pidl, Const::De
   // returns true if at least one detector in the detectors is available.
 
   bool avail = false;
-  for (unsigned int i = 0; i < dets.size(); ++i) {
-    if (pidl->isAvailable(dets[i])) {
+  for (Const::DetectorSet::Iterator it = dets.begin(); it != dets.end(); ++it) {
+    if (pidl->isAvailable(*it)) {
       avail = true;
     }
   }

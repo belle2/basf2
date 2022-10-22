@@ -185,7 +185,7 @@ class CharmoniumPsi(BaseSkim):
                             path=path)
 
         # Apply charged PID MVA.
-        charged_pid_mva_enabled = False
+        charged_pid_mva_enabled = True
         if charged_pid_mva_enabled:
             basf2.conditions.prepend_globaltag('chargedpidmva_rel6_v1')
             epsilon = 1e-8

@@ -52,7 +52,7 @@ float Cluster::getLogL(const Const::Cluster& cluster,
   float result = 0;
   for (Const::DetectorSet::Iterator it = Const::ClusterDetectorSet::set().begin();
        it != Const::ClusterDetectorSet::set().end(); ++it) {
-    if (set.contains(*it))
+    if (set.contains(it))
       result += m_logl[it.getIndex()][cluster.getIndex()];
   }
   return result;

@@ -122,6 +122,14 @@ namespace Belle2 {
           return m_Index;
         }
 
+        /**
+         * Get set bit.
+         */
+        uint16_t getSetBit() const
+        {
+          return m_Index;
+        }
+
       private:
 
         /** Index. */
@@ -193,6 +201,15 @@ namespace Belle2 {
        * @param set  The other set of detector IDs.
        */
       bool contains(const DetectorSet& set) const {return (m_bits & set.m_bits) == set.m_bits;}
+
+      /**
+       * Check whether this set contains detector specified by iterator.
+       * @param[in] it Iterator.
+       */
+      bool contains(const Iterator& it) const
+      {
+        return (m_bits & it.getSetBit()) != 0;
+      }
 
       /**
        * Getter for the index of a given detector in this set.

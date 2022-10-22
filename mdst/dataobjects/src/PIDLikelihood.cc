@@ -57,7 +57,7 @@ float PIDLikelihood::getLogL(const Const::ChargedStable& part,
   float result = 0;
   for (Const::DetectorSet::Iterator it = Const::PIDDetectorSet::set().begin();
        it != Const::PIDDetectorSet::set().end(); ++it) {
-    if (set.contains(*it))
+    if (set.contains(it))
       result += m_logl[it.getIndex()][part.getIndex()];
   }
   return result;

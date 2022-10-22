@@ -51,20 +51,16 @@ ChargedPidMVAMulticlassModule::~ChargedPidMVAMulticlassModule() = default;
 
 void ChargedPidMVAMulticlassModule::initialize()
 {
-
   m_event_metadata.isRequired();
-
   m_weightfiles_representation = std::make_unique<DBObjPtr<ChargedPidMVAWeights>>(m_payload_name);
+  /* Initialize MVA if the payload has changed and now. */
+  (*m_weightfiles_representation.get()).addCallback([this]() { initializeMVA(); });
+  initializeMVA();
 }
 
 
 void ChargedPidMVAMulticlassModule::beginRun()
 {
-
-  // Retrieve the payload from the DB.
-  (*m_weightfiles_representation.get()).addCallback([this]() { initializeMVA(); });
-  initializeMVA();
-
 }
 
 

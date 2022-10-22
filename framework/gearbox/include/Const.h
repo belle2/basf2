@@ -73,13 +73,13 @@ namespace Belle2 {
 
         /**
          * Constructor.
-         * @param[in] detectorSetBits Bits in DetectorSet.
          * @param[in] index           Index.
+         * @param[in] detectorSetBits Bits in DetectorSet.
          * @param[in] setBit          Set bit.
          */
-        Iterator(const uint16_t* detectorSetBits, int index, uint16_t setBit) :
-          m_DetectorSetBits(detectorSetBits),
+        Iterator(int index, uint16_t detectorSetBits, uint16_t setBit) :
           m_Index(index),
+          m_DetectorSetBits(detectorSetBits),
           m_SetBit(setBit)
         {
         }
@@ -124,11 +124,11 @@ namespace Belle2 {
 
       private:
 
-        /** Bits in DetectorSet. */
-        const uint16_t* m_DetectorSetBits;
-
         /** Index. */
         int m_Index;
+
+        /** Bits in DetectorSet. */
+        uint16_t m_DetectorSetBits;
 
         /** Set bit. */
         uint16_t m_SetBit;

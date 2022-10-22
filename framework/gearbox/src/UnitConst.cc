@@ -182,7 +182,7 @@ Const::DetectorSet::Iterator& Const::DetectorSet::Iterator::operator++()
       m_SetBit = invalidDetector;
       return *this;
     }
-    if ((*m_DetectorSetBits & m_SetBit) != 0)
+    if ((m_DetectorSetBits & m_SetBit) != 0)
       break;
   }
   m_Index++;
@@ -207,14 +207,14 @@ Const::DetectorSet::Iterator Const::DetectorSet::begin() const
   while ((m_bits & setBit) == 0) {
     setBit = setBit << 1;
     if (setBit >= 0x1000)
-      return Const::DetectorSet::Iterator(&m_bits, invalidDetector, 0);
+      return Const::DetectorSet::Iterator(0, m_bits, invalidDetector);
   }
-  return Const::DetectorSet::Iterator(&m_bits, setBit, 0);
+  return Const::DetectorSet::Iterator(0, m_bits, setBit);
 }
 
 Const::DetectorSet::Iterator Const::DetectorSet::end() const
 {
-  return Const::DetectorSet::Iterator(&m_bits, invalidDetector, 0);
+  return Const::DetectorSet::Iterator(0, m_bits, invalidDetector);
 }
 
 Const::DetectorSet operator + (const Const::DetectorSet& firstSet, const Const::DetectorSet& secondSet)

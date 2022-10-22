@@ -59,20 +59,11 @@ ChargedPidMVAModule::~ChargedPidMVAModule() = default;
 
 void ChargedPidMVAModule::initialize()
 {
-
   m_event_metadata.isRequired();
-
   m_weightfiles_representation = std::make_unique<DBObjPtr<ChargedPidMVAWeights>>(m_payload_name);
-}
-
-
-void ChargedPidMVAModule::beginRun()
-{
-
-  // Retrieve the payload from the DB.
+  /* Initialize MVA if the payload has changed and now. */
   (*m_weightfiles_representation.get()).addCallback([this]() { initializeMVA(); });
   initializeMVA();
-
   if (!(*m_weightfiles_representation.get())->isValidPdg(m_sig_pdg)) {
     B2FATAL("PDG: " << m_sig_pdg <<
             " of the signal mass hypothesis is not that of a valid particle in Const::chargedStableSet! Aborting...");
@@ -91,6 +82,11 @@ void ChargedPidMVAModule::beginRun()
       m_score_varname += "_" + std::to_string(Const::PIDDetectors::set()[iDet]);
     }
   }
+}
+
+
+void ChargedPidMVAModule::beginRun()
+{
 }
 
 

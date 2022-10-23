@@ -81,7 +81,7 @@ def add_mdst_dump(path, print_untested=False):
     pid_detectors = []
     it = Const.PIDDetectors.c_set.begin()
     while True:
-        pid_detectors.append(it.getDetector())
+        pid_detectors.append(Const.PIDDetectorSet(it.getDetector()))
         it.increment()
         if it == Const.PIDDetectors.c_set.end():
             break

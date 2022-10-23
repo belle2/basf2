@@ -245,7 +245,7 @@ namespace Belle2 {
       /**
        * String for printing in python.
        */
-      std::string __repr__() const;
+      std::string __str__() const;
 
     private:
 

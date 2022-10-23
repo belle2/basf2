@@ -100,11 +100,27 @@ namespace Belle2 {
         Iterator& operator++();
 
         /**
+         * Increment.
+         */
+        void increment()
+        {
+          ++(*this);
+        }
+
+        /**
          * Operator *.
          */
-        EDetector operator*()
+        EDetector operator*() const
         {
-          return getDetector(m_SetBit);
+          return DetectorSet::getDetector(m_SetBit);
+        }
+
+        /**
+         * Get detector.
+         */
+        EDetector getDetector() const
+        {
+          return *(*this);
         }
 
         /**

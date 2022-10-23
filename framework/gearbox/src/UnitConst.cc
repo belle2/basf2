@@ -290,7 +290,7 @@ size_t Const::DetectorSet::size() const
   return size;
 }
 
-std::string Const::DetectorSet::__repr__() const
+std::string Const::DetectorSet::__str__() const
 {
   std::string result = "<set: ";
   const std::string detectorNames[] = {"invalidDetector", "PXD", "SVD", "CDC", "TOP", "ARICH", "ECL", "KLM", "IR", "TRG", "DAQ", "BEAST", "TEST"};

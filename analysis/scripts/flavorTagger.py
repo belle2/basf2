@@ -90,6 +90,38 @@ def set_FlavorTagger_pid_aliases():
     """
     This function adds the pid aliases needed by the flavor tagger.
     """
+    variables.variables.addAlias('eid_TOP', 'pidPairProbabilityExpert(11, 211, TOP)')
+    variables.variables.addAlias('eid_ARICH', 'pidPairProbabilityExpert(11, 211, ARICH)')
+    variables.variables.addAlias('eid_ECL', 'pidPairProbabilityExpert(11, 211, ECL)')
+
+    variables.variables.addAlias('muid_TOP', 'pidPairProbabilityExpert(13, 211, TOP)')
+    variables.variables.addAlias('muid_ARICH', 'pidPairProbabilityExpert(13, 211, ARICH)')
+    variables.variables.addAlias('muid_KLM', 'pidPairProbabilityExpert(13, 211, KLM)')
+
+    variables.variables.addAlias('piid_TOP', 'pidPairProbabilityExpert(211, 321, TOP)')
+    variables.variables.addAlias('piid_ARICH', 'pidPairProbabilityExpert(211, 321, ARICH)')
+
+    variables.variables.addAlias('Kid_TOP', 'pidPairProbabilityExpert(321, 211, TOP)')
+    variables.variables.addAlias('Kid_ARICH', 'pidPairProbabilityExpert(321, 211, ARICH)')
+
+    if getBelleOrBelle2() == "Belle":
+        variables.variables.addAlias('eid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, CDC, SVD), 0.5)')
+        variables.variables.addAlias('muid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(13, 211, CDC, SVD), 0.5)')
+        variables.variables.addAlias('piid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(211, 321, CDC, SVD), 0.5)')
+        variables.variables.addAlias('pi_vs_edEdxid', 'ifNANgiveX(pidPairProbabilityExpert(211, 11, CDC, SVD), 0.5)')
+        variables.variables.addAlias('Kid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(321, 211, CDC, SVD), 0.5)')
+    else:
+        variables.variables.addAlias('eid_dEdx', 'pidPairProbabilityExpert(11, 211, CDC)')
+        variables.variables.addAlias('muid_dEdx', 'pidPairProbabilityExpert(13, 211, CDC)')
+        variables.variables.addAlias('piid_dEdx', 'pidPairProbabilityExpert(211, 321, CDC)')
+        variables.variables.addAlias('pi_vs_edEdxid', 'pidPairProbabilityExpert(211, 11, CDC)')
+        variables.variables.addAlias('Kid_dEdx', 'pidPairProbabilityExpert(321, 211, CDC)')
+
+
+def set_FlavorTagger_pid_aliases_legacy():
+    """
+    This function adds the pid aliases needed by the flavor tagger trained for MC13.
+    """
     variables.variables.addAlias('eid_TOP', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, TOP), 0.5)')
     variables.variables.addAlias('eid_ARICH', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, ARICH), 0.5)')
     variables.variables.addAlias('eid_ECL', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, ECL), 0.5)')
@@ -1093,7 +1125,12 @@ def flavorTagger(
     B2INFO(' ')
 
     setInteractionWithDatabase(downloadFromDatabaseIfNotFound, uploadToDatabaseAfterTraining)
-    set_FlavorTagger_pid_aliases()
+
+    if prefix == '':
+        set_FlavorTagger_pid_aliases_legacy()
+    else:
+        set_FlavorTagger_pid_aliases()
+
     setInputVariablesWithMask()
     if prefix != '':
         weightFiles = prefix + '_' + weightFiles

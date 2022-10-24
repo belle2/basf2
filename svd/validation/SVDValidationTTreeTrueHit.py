@@ -66,7 +66,6 @@ class SVDValidationTTreeTrueHit(b2.Module):
         svdtruehits = Belle2.PyStoreArray('SVDTrueHits')
         for truehit in svdtruehits:
             clusters = truehit.getRelationsFrom('SVDClusters')
-            self.data.reconstructed = 1
 
             if len(clusters) == 0:
                 self.data.reconstructed = 0
@@ -93,6 +92,7 @@ class SVDValidationTTreeTrueHit(b2.Module):
                 self.tree.Fill()
             else:
                 for cluster in clusters:
+                    self.data.reconstructed = 1
                     # Sensor identification
                     sensorID = truehit.getSensorID()
                     self.data.sensor_id = int(sensorID)

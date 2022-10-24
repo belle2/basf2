@@ -75,13 +75,14 @@ namespace Belle2 {
      * particle source enumerators
      */
     enum EParticleSourceObject {
-      c_Undefined  = 0,
-      c_Track      = 1,
-      c_ECLCluster = 2,
-      c_KLMCluster = 3,
-      c_V0         = 4,
-      c_MCParticle = 5,
-      c_Composite  = 6
+      c_Undefined     = 0,
+      c_Track         = 1,
+      c_ECLCluster    = 2,
+      c_KLMCluster    = 3,
+      c_V0            = 4,
+      c_MCParticle    = 5,
+      c_Composite     = 6,
+      c_NoMDSTSource  = 7
     };
 
     /** describes flavor type, see getFlavorType(). */

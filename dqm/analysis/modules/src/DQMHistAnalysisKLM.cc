@@ -153,8 +153,8 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
   double x = 0.15;
   double y = 0.85;
   int i, n;
-  std::map<uint16_t, double> moduleHitMap;
-  std::map<uint16_t, double>::iterator it;
+  std::map<KLMModuleNumber, double> moduleHitMap;
+  std::map<KLMModuleNumber, double>::iterator it;
   double average = 0;
   int channelSubdetector, channelSection, channelSector;
   int layer, plane, strip;
@@ -182,8 +182,9 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
   }
 
   for (i = 1; i <= n; i++) {
-    uint16_t channelIndex = std::round(histogram->GetBinCenter(i));
-    uint16_t channelNumber = m_ChannelArrayIndex->getNumber(channelIndex);
+    KLMChannelNumber channelIndex = std::round(histogram->GetBinCenter(i));
+    KLMChannelNumber channelNumber =
+      m_ChannelArrayIndex->getNumber(channelIndex);
     double nHitsPerModule = histogram->GetBinContent(i);
     average = average + nHitsPerModule;
     m_ElementNumbers->channelNumberToElementNumbers(
@@ -193,17 +194,19 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
         (channelSection != section) ||
         (channelSector != sector))
       B2FATAL("Inconsistent element numbers.");
-    uint16_t module = m_ElementNumbers->moduleNumber(
-                        subdetector, section, sector, layer);
+    KLMModuleNumber module = m_ElementNumbers->moduleNumber(
+                               subdetector, section, sector, layer);
     it = moduleHitMap.find(module);
-    if (it == moduleHitMap.end())
-      moduleHitMap.insert(std::pair<uint16_t, double>(module, nHitsPerModule));
-    else
+    if (it == moduleHitMap.end()) {
+      moduleHitMap.insert(std::pair<KLMModuleNumber, double>(
+                            module, nHitsPerModule));
+    } else {
       it->second += nHitsPerModule;
+    }
   }
   unsigned int activeModuleChannels = 0;
   for (it = moduleHitMap.begin(); it != moduleHitMap.end(); ++it) {
-    uint16_t moduleNumber = it->first;
+    KLMModuleNumber moduleNumber = it->first;
     if (it->second != 0) {
       activeModuleChannels += m_ElementNumbers->getNChannelsModule(moduleNumber);
       continue;
@@ -211,9 +214,9 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
     m_ElementNumbers->moduleNumberToElementNumbers(
       moduleNumber, &channelSubdetector, &channelSection, &channelSector, &layer);
     /* Channel with plane = 1, strip = 1 exists for any BKLM or EKLM module. */
-    uint16_t channel = m_ElementNumbers->channelNumber(
-                         channelSubdetector, channelSection, channelSector,
-                         layer, 1, 1);
+    KLMChannelNumber channel =
+      m_ElementNumbers->channelNumber(
+        channelSubdetector, channelSection, channelSector, layer, 1, 1);
     const KLMElectronicsChannel* electronicsChannel =
       m_ElectronicsMap->getElectronicsChannel(channel);
     if (electronicsChannel == nullptr)
@@ -224,15 +227,16 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
     /* Store the module number, used later in processPlaneHistogram
      * to color the canvas with red and to raise up an alarm. */
     if (channelSubdetector == KLMElementNumbers::c_BKLM) {
-      std::vector<uint16_t>::iterator ite = std::find(m_DeadBarrelModules.begin(),
-                                                      m_DeadBarrelModules.end(),
-                                                      moduleNumber);
+      std::vector<KLMModuleNumber>::iterator ite =
+        std::find(m_DeadBarrelModules.begin(),
+                  m_DeadBarrelModules.end(),
+                  moduleNumber);
       if (ite == m_DeadBarrelModules.end())
         m_DeadBarrelModules.push_back(moduleNumber);
     } else {
-      std::vector<uint16_t>::iterator ite = std::find(m_DeadEndcapModules.begin(),
-                                                      m_DeadEndcapModules.end(),
-                                                      moduleNumber);
+      std::vector<KLMModuleNumber>::iterator ite = std::find(m_DeadEndcapModules.begin(),
+                                                             m_DeadEndcapModules.end(),
+                                                             moduleNumber);
       if (ite == m_DeadEndcapModules.end())
         m_DeadEndcapModules.push_back(moduleNumber);
     }
@@ -242,8 +246,9 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
   average /= activeModuleChannels;
   ref_average /= activeModuleChannels;
   for (i = 1; i <= n; ++i) {
-    uint16_t channelIndex = std::round(histogram->GetBinCenter(i));
-    uint16_t channelNumber = m_ChannelArrayIndex->getNumber(channelIndex);
+    KLMChannelNumber channelIndex = std::round(histogram->GetBinCenter(i));
+    KLMChannelNumber channelNumber =
+      m_ChannelArrayIndex->getNumber(channelIndex);
     double nHits = histogram->GetBinContent(i);
     m_ElementNumbers->channelNumberToElementNumbers(
       channelNumber, &channelSubdetector, &channelSection, &channelSector,
@@ -251,9 +256,10 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
     std::string channelStatus = "Normal";
     if ((nHits > average * m_ThresholdForMasked) && (nHits > m_MinHitsForFlagging)) {
       channelStatus = "Masked";
-      std::vector<uint16_t>::iterator ite = std::find(m_MaskedChannels.begin(),
-                                                      m_MaskedChannels.end(),
-                                                      channelNumber);
+      std::vector<KLMModuleNumber>::iterator ite =
+        std::find(m_MaskedChannels.begin(),
+                  m_MaskedChannels.end(),
+                  channelNumber);
       if (ite == m_MaskedChannels.end())
         m_MaskedChannels.push_back(channelNumber);
       B2DEBUG(20, "KLM@MaskMe " << channelNumber);
@@ -328,7 +334,7 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
 }
 
 void DQMHistAnalysisKLMModule::processSpatial2DHitEndcapHistogram(
-  uint16_t section, TH2F* histogram, TCanvas* canvas)
+  KLMSectionNumber section, TH2F* histogram, TCanvas* canvas)
 {
   canvas->Clear();
   canvas->cd();
@@ -363,16 +369,16 @@ void DQMHistAnalysisKLMModule::fillMaskedChannelsHistogram(
   if (m_MaskedChannels.size() > 0) {
     int channelSubdetector, channelSection, channelSector;
     int layer, plane, strip;
-    for (uint16_t channel : m_MaskedChannels) {
+    for (KLMChannelNumber channel : m_MaskedChannels) {
       m_ElementNumbers->channelNumberToElementNumbers(
         channel, &channelSubdetector, &channelSection, &channelSector,
         &layer, &plane, &strip);
-      uint16_t sectorNumber;
+      KLMSectorNumber sectorNumber;
       if (channelSubdetector == KLMElementNumbers::c_BKLM)
         sectorNumber = m_ElementNumbers->sectorNumberBKLM(channelSection, channelSector);
       else
         sectorNumber = m_ElementNumbers->sectorNumberEKLM(channelSection, channelSector);
-      uint16_t sectorIndex = m_SectorArrayIndex->getIndex(sectorNumber);
+      KLMSectorNumber sectorIndex = m_SectorArrayIndex->getIndex(sectorNumber);
       histogram->Fill(sectorIndex);
     }
   }
@@ -425,7 +431,7 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
     if (m_DeadBarrelModules.size() == 0) {
       canvas->Pad()->SetFillColor(kWhite);
     } else if (m_ProcessedEvents >= m_MinProcessedEventsForMessages) {
-      for (uint16_t module : m_DeadBarrelModules) {
+      for (KLMModuleNumber module : m_DeadBarrelModules) {
         m_ElementNumbers->moduleNumberToElementNumbers(
           module, &moduleSubdetector, &moduleSection, &moduleSector, &moduleLayer);
         alarm = "No data from " + m_ElementNumbers->getSectorDAQName(moduleSubdetector, moduleSection, moduleSector);
@@ -465,7 +471,7 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
     if (m_DeadEndcapModules.size() == 0) {
       canvas->Pad()->SetFillColor(kWhite);
     } else if (m_ProcessedEvents >= m_MinProcessedEventsForMessages) {
-      for (uint16_t module : m_DeadEndcapModules) {
+      for (KLMModuleNumber module : m_DeadEndcapModules) {
         m_ElementNumbers->moduleNumberToElementNumbers(
           module, &moduleSubdetector, &moduleSection, &moduleSector, &moduleLayer);
         alarm = "No data from " + m_ElementNumbers->getSectorDAQName(moduleSubdetector, moduleSection, moduleSector);
@@ -536,9 +542,9 @@ void DQMHistAnalysisKLMModule::event()
   gStyle->SetPalette(kLightTemperature);
   klmIndex.setIndexLevel(KLMChannelIndex::c_IndexLevelSection);
   for (KLMChannelIndex& klmSection : klmIndex) {
-    uint16_t subdetector = klmSection.getSubdetector();
+    KLMSubdetectorNumber subdetector = klmSection.getSubdetector();
     if (subdetector == KLMElementNumbers::c_EKLM) {
-      uint16_t section = klmSection.getSection();
+      KLMSubdetectorNumber section = klmSection.getSection();
       int maximalLayerNumber = m_EklmElementNumbers->getMaximalDetectorLayerNumber(section);
       for (int j = 1; j <= maximalLayerNumber; ++j) {
         str = "spatial_2d_hits_subdetector_" + std::to_string(subdetector) +

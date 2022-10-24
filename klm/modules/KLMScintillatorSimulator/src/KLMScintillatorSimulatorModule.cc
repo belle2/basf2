@@ -7,7 +7,7 @@
  **************************************************************************/
 
 /* Own header. */
-#include <klm/eklm/modules/EKLMADC/EKLMADCModule.h>
+#include <klm/modules/KLMScintillatorSimulator/KLMScintillatorSimulatorModule.h>
 
 /* KLM headers. */
 #include <klm/eklm/geometry/GeometryData.h>
@@ -21,11 +21,11 @@
 
 using namespace Belle2;
 
-REG_MODULE(EKLMADC)
+REG_MODULE(KLMScintillatorSimulator)
 
 static const char MemErr[] = "Memory allocation error.";
 
-EKLMADCModule::EKLMADCModule() :
+KLMScintillatorSimulatorModule::KLMScintillatorSimulatorModule() :
   Module(),
   m_fout(nullptr),
   m_SciSimPar(nullptr),
@@ -34,17 +34,18 @@ EKLMADCModule::EKLMADCModule() :
 {
   setDescription("Standalone generation and studies of ADC output.");
   setPropertyFlags(c_ParallelProcessingCertified);
-  addParam("OutputFile", m_out, "Output file.", std::string("EKLMADC.root"));
+  addParam("OutputFile", m_out, "Output file.",
+           std::string("KLMScintillatorSimulator.root"));
   addParam("Mode", m_mode, "Mode (\"Shape\" or \"Strips\").",
            std::string("Strips"));
 }
 
-EKLMADCModule::~EKLMADCModule()
+KLMScintillatorSimulatorModule::~KLMScintillatorSimulatorModule()
 {
 }
 
-void EKLMADCModule::generateHistogram(const char* name, double l, double d,
-                                      int npe)
+void KLMScintillatorSimulatorModule::generateHistogram(
+  const char* name, double l, double d, int npe)
 {
   int j;
   double t, s;
@@ -76,7 +77,7 @@ void EKLMADCModule::generateHistogram(const char* name, double l, double d,
   delete h;
 }
 
-void EKLMADCModule::initialize()
+void KLMScintillatorSimulatorModule::initialize()
 {
   /* cppcheck-suppress variableScope */
   char str[32];
@@ -118,19 +119,19 @@ void EKLMADCModule::initialize()
   delete m_fout;
 }
 
-void EKLMADCModule::beginRun()
+void KLMScintillatorSimulatorModule::beginRun()
 {
 }
 
-void EKLMADCModule::event()
+void KLMScintillatorSimulatorModule::event()
 {
 }
 
-void EKLMADCModule::endRun()
+void KLMScintillatorSimulatorModule::endRun()
 {
 }
 
-void EKLMADCModule::terminate()
+void KLMScintillatorSimulatorModule::terminate()
 {
   delete m_SciSimPar;
 }

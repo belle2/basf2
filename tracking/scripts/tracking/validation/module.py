@@ -472,7 +472,12 @@ class TrackingValidationModule(basf2.Module):
         mc_matched_primaries = np.logical_and(self.mc_primaries, self.mc_matches)
 
         charge_asymmetry = np.average(self.mc_charge_asymmetry, weights=self.mc_charge_asymmetry_weights)
-        charge_efficiency = np.average(self.mc_charge_matches, weights=mc_matched_primaries)
+        if len(mc_matched_primaries) > 0 and sum(mc_matched_primaries) > 0:
+            charge_efficiency = np.average(self.mc_charge_matches, weights=mc_matched_primaries)
+            hit_efficiency = np.average(self.mc_hit_efficiencies, weights=mc_matched_primaries)
+        else:
+            charge_efficiency = float('nan')
+            hit_efficiency = float('nan')
         finding_charge_efficiency = np.average(self.mc_charge_matches, weights=self.mc_primaries)
         finding_efficiency = np.average(self.mc_matches, weights=self.mc_primaries)
         fake_rate = 1.0 - np.mean(self.pr_clones_and_matches)
@@ -482,8 +487,6 @@ class TrackingValidationModule(basf2.Module):
                                           weights=self.pr_clones_and_matches)
         else:
             clone_rate = float('nan')
-
-        hit_efficiency = np.average(self.mc_hit_efficiencies, weights=mc_matched_primaries)
 
         figures_of_merit = ValidationFiguresOfMerit('%s_figures_of_merit'
                                                     % name)

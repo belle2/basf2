@@ -20,6 +20,7 @@ import basf2
 import ROOT
 from ROOT import Belle2
 from ROOT import TNamed
+from ROOT.Math import XYZVector
 import math
 import numpy
 
@@ -163,7 +164,7 @@ class KLMK0LPlotModule(basf2.Module):
         functions.Add(TNamed('Contact', contact))
         functions.Add(TNamed('MetaOptions', 'shifter'))
         #: Average vertex.
-        self.vertex_k_av = ROOT.TVector3(0, 0, 0)
+        self.vertex_k_av = XYZVector(0, 0, 0)
         #: Vertex list.
         self.vertex = []
         #: Average momentum.
@@ -204,7 +205,7 @@ class KLMK0LPlotModule(basf2.Module):
             klm_clusters = mc_particle.getRelationsFrom('KLMClusters')
             self.hist_nkl.Fill(len(klm_clusters))
             for klm_cluster in klm_clusters:
-                vertex_k = klm_cluster.getClusterPosition() - vertex
+                vertex_k = XYZVector(klm_cluster.getClusterPosition()) - vertex
                 self.vertex.append(vertex_k)
                 self.vertex_k_av = self.vertex_k_av + vertex_k
                 self.momentum.append(klm_cluster.getMomentumMag())
@@ -216,7 +217,7 @@ class KLMK0LPlotModule(basf2.Module):
                 self.hist_yres.Fill(vertex_k.Y())
                 self.hist_zres.Fill(vertex_k.Z())
                 self.hist_tres.Fill(time_k - time)
-                self.hist_pres.Fill(four_momentum_k.P() - momentum.Mag())
+                self.hist_pres.Fill(four_momentum_k.P() - momentum.R())
                 self.hist_ptres.Fill(four_momentum_k.Theta() - momentum.Theta())
                 self.hist_ppres.Fill(four_momentum_k.Phi() - momentum.Phi())
 

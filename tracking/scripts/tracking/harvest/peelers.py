@@ -83,7 +83,7 @@ def peel_mc_particle(mc_particle, key="{part_name}"):
             y_truth=vertex.Y(),
             z_truth=vertex.Z(),
 
-            decay_vertex_radius_truth=decay_vertex.Mag(),
+            decay_vertex_radius_truth=decay_vertex.R(),
             decay_vertex_x_truth=decay_vertex.X(),
             decay_vertex_y_truth=decay_vertex.Y(),
             decay_vertex_z_truth=decay_vertex.Z(),

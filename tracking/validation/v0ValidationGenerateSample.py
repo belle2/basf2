@@ -62,7 +62,7 @@ class V0Harvester(HarvestingModule):
         :return: dict with the variables of interest.
         """
         mc_vertex = mc.getDecayVertex()
-        mc_perp = mc_vertex.Perp()
+        mc_perp = mc_vertex.Rho()
         mc_theta = mc_vertex.Theta()
         mc_phi = mc_vertex.Phi()
         mc_m = mc.getMass()

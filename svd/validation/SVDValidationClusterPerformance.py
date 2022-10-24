@@ -290,8 +290,8 @@ pu.plotRegions(
     granules=pu.granulesLayersTypes,
     tree=treeTH,
     expr='strip_dir',
-    cutALL=pu.cut_U,
-    cut=pu.cut_U + pu.cut_reco,
+    cutALL=pu.cut_notV,
+    cut=pu.cut_notV + pu.cut_reco,
     descr='Definition: (number of clusters related to at least TrueHit) / (number of best Truehits)',
     check='Efficiency should be close to 1 in all bins. Note that only one TrueHit (the best one, \
         i.e. the one with the largest energy deposit) is counted\
@@ -307,8 +307,8 @@ pu.plotRegions(
     granules=pu.granulesLayersTypes,
     tree=treeTH,
     expr='strip_dir',
-    cutALL=pu.cut_V,
-    cut=pu.cut_V + pu.cut_reco,
+    cutALL=pu.cut_notU,
+    cut=pu.cut_notU + pu.cut_reco,
     descr='Definition: (number of clusters related to at least TrueHit) / (number of best Truehits)',
     check='Efficiency should be close to 1 in all bins. Note that only one TrueHit (the best one, \
         i.e. the one with the largest energy deposit) is counted\

@@ -151,5 +151,9 @@ namespace Belle2 {
 
     /** StoreArray of Particles */
     StoreArray<Particle> m_particles;
+
+    /** Helper function to replace grand daughters */
+    void replaceDaughterRecursively(Particle* particle, Particle* oldP, Particle* newP);
+
   };
 }

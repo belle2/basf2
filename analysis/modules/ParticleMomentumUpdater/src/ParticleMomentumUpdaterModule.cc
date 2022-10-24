@@ -86,9 +86,13 @@ void ParticleMomentumUpdaterModule::event()
     }
 
     Particle* targetP = particles[selParticlesTarget[0]->getArrayIndex()];
-    Particle* daughterCopy = Belle2::ParticleCopy::copyParticle(targetP);
-    daughterCopy->set4Vector(boost4Vector - daughters4Vector);
-    iParticle->replaceDaughter(targetP, daughterCopy);
+    if (targetP == iParticle) {
+      iParticle->set4Vector(boost4Vector - daughters4Vector);
+    } else {
+      Particle* daughterCopy = Belle2::ParticleCopy::copyParticle(targetP);
+      daughterCopy->set4Vector(boost4Vector - daughters4Vector);
+      replaceDaughterRecursively(iParticle, targetP, daughterCopy);
+    }
   }
 }
 
@@ -96,3 +100,11 @@ void ParticleMomentumUpdaterModule::terminate()
 {
 }
 
+void ParticleMomentumUpdaterModule::replaceDaughterRecursively(Particle* particle, Particle* oldP, Particle* newP)
+{
+  particle->replaceDaughter(oldP, newP);
+  for (auto& daughter : particle->getDaughters()) {
+    daughter->replaceDaughter(oldP, newP);
+    replaceDaughterRecursively(daughter, oldP, newP);
+  }
+}

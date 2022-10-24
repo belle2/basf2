@@ -47,6 +47,8 @@ cut_matched = R.TCut('matched==1')  # (cluster) matched to TrueHit
 cut_reco = R.TCut('reconstructed==1')  # (trueHit) matched to Cluster
 cut_U = R.TCut('strip_dir==0')  # U_P
 cut_V = R.TCut('strip_dir==1')  # V_N
+cut_notV = R.TCut('strip_dir!=1')  # not V (U or a true Hit)
+cut_notU = R.TCut('strip_dir!=0')  # not U (V or a true Hit)
 cut_size1 = R.TCut('(cluster_size==1)')
 cut_size2 = R.TCut('(cluster_size==2)')
 cut_size3plus = R.TCut('(cluster_size>2)')

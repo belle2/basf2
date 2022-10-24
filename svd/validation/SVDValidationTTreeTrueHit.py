@@ -33,6 +33,7 @@ gROOT.ProcessLine('struct EventDataTrueHit {\
     int sensor;\
     int sensor_type;\
     int strip_dir;\
+    int reconstructed;\
     };')
 
 from ROOT import EventDataTrueHit  # noqa
@@ -65,7 +66,10 @@ class SVDValidationTTreeTrueHit(b2.Module):
         svdtruehits = Belle2.PyStoreArray('SVDTrueHits')
         for truehit in svdtruehits:
             clusters = truehit.getRelationsFrom('SVDClusters')
+            self.data.reconstructed = 1
+
             if len(clusters) == 0:
+                self.data.reconstructed = 0
                 # Sensor identification
                 sensorID = truehit.getSensorID()
                 self.data.sensor_id = int(sensorID)

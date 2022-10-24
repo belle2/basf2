@@ -25,10 +25,6 @@ class TestTreeFits(unittest.TestCase):
 
         testFile = tempfile.NamedTemporaryFile()
 
-        # we want to use the latest grated globaltag, not the old one from the
-        # file
-        basf2.conditions.disable_globaltag_replay()
-
         main = basf2.create_path()
 
         ma.inputMdst(b2test_utils.require_file('analysis/tests/100_noBKG_B0ToPiPiPi0.root'), path=main)

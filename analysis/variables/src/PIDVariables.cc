@@ -301,10 +301,8 @@ namespace Belle2 {
           return std::numeric_limits<float>::quiet_NaN();
 
         double LogL = 0;
-        for (Const::DetectorSet::Iterator it = Const::PIDDetectorSet::set().begin();
-             it != Const::PIDDetectorSet::set().end(); ++it)
+        for (const Const::EDetector& detector : Const::PIDDetectorSet::set())
         {
-          Const::EDetector detector = *it;
           if (detectorSet.contains(detector))
             LogL += pid->getLogL(hypType, detector) * weightMatrix.getWeight(hypType.getPDGCode(), detector);
         }
@@ -350,10 +348,7 @@ namespace Belle2 {
           const int index_pdg = pdgIter.getIndex();
 
           LogL[index_pdg] = 0;
-          for (Const::DetectorSet::Iterator it = Const::PIDDetectorSet::set().begin();
-               it != Const::PIDDetectorSet::set().end(); ++it) {
-            Const::EDetector detector = *it;
-
+          for (const Const::EDetector& detector : Const::PIDDetectorSet::set()) {
             if (detectorSet.contains(detector))
               LogL[index_pdg] += pid->getLogL(pdgIter, detector) * weightMatrix.getWeight(pdgIter.getPDGCode(), detector);
           }
@@ -415,10 +410,8 @@ namespace Belle2 {
           return std::numeric_limits<float>::quiet_NaN();
 
         double LogL_hypType(0), LogL_testType(0);
-        for (Const::DetectorSet::Iterator it = Const::PIDDetectorSet::set().begin();
-             it != Const::PIDDetectorSet::set().end(); ++it)
+        for (const Const::EDetector& detector : Const::PIDDetectorSet::set())
         {
-          Const::EDetector detector = *it;
           if (detectorSet.contains(detector)) {
             LogL_hypType += pid->getLogL(hypType, detector) * weightMatrix.getWeight(hypType.getPDGCode(), detector);
             LogL_testType += pid->getLogL(testType, detector) * weightMatrix.getWeight(testType.getPDGCode(), detector);
@@ -680,10 +673,9 @@ namespace Belle2 {
 
       auto func = [hypType, detectorSet](const Particle * part) -> double {
         auto name = "pidChargedBDTScore_" + std::to_string(hypType.getPDGCode());
-        for (Const::DetectorSet::Iterator it = detectorSet.begin();
-             it != detectorSet.end(); ++it)
+        for (const Const::EDetector& detector : detectorSet)
         {
-          name += "_" + std::to_string(*it);
+          name += "_" + std::to_string(detector);
         }
         return (part->hasExtraInfo(name)) ? part->getExtraInfo(name) : std::numeric_limits<float>::quiet_NaN();
       };
@@ -718,10 +710,9 @@ namespace Belle2 {
 
       auto func = [hypType, testType, detectorSet](const Particle * part) -> double {
         auto name = "pidPairChargedBDTScore_" + std::to_string(hypType.getPDGCode()) + "_VS_" + std::to_string(testType.getPDGCode());
-        for (Const::DetectorSet::Iterator it = detectorSet.begin();
-             it != detectorSet.end(); ++it)
+        for (const Const::EDetector& detector : detectorSet)
         {
-          name += "_" + std::to_string(*it);
+          name += "_" + std::to_string(detector);
         }
         return (part->hasExtraInfo(name)) ? part->getExtraInfo(name) : std::numeric_limits<float>::quiet_NaN();
       };

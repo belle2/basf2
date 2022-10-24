@@ -11,7 +11,7 @@
 
 """
 <header>
-  <contact>G. Caria, gcaria@student.unimelb.edu.au</contact>
+  <contact>SVD Software Group, svd-software@belle2.org</contact>
   <description>
     This module is used for the SVD validation.
     It gets information about truehits and  clusters, saving

@@ -228,24 +228,24 @@ class CharmoniumPsi(BaseSkim):
 
         # Reconstruct J/psi or psi(2S).
         ma.reconstructDecay('J/psi:ee -> e+:merged e-:merged',
-                            jpsi_mass_cut, path=path)
+                            jpsi_mass_cut, dmID=1, path=path)
         ma.reconstructDecay('psi(2S):ee -> e+:merged e-:merged',
-                            psi2s_mass_cut, path=path)
+                            psi2s_mass_cut, dmID=1, path=path)
 
         ma.reconstructDecay('J/psi:eebrems -> e+:brems e-:brems',
-                            jpsi_mass_cut, path=path)
+                            jpsi_mass_cut, dmID=1, path=path)
         ma.reconstructDecay('psi(2S):eebrems -> e+:brems e-:brems',
-                            psi2s_mass_cut, path=path)
+                            psi2s_mass_cut, dmID=1, path=path)
 
         ma.reconstructDecay('J/psi:eebrems2 -> e+:brems2 e-:brems2',
-                            jpsi_mass_cut, path=path)
+                            jpsi_mass_cut, dmID=1, path=path)
         ma.reconstructDecay('psi(2S):eebrems2 -> e+:brems2 e-:brems2',
-                            psi2s_mass_cut, path=path)
+                            psi2s_mass_cut, dmID=1, path=path)
 
         ma.reconstructDecay('J/psi:mumu -> mu+:merged mu-:merged',
-                            jpsi_mass_cut, path=path)
+                            jpsi_mass_cut, dmID=2, path=path)
         ma.reconstructDecay('psi(2S):mumu -> mu+:merged mu-:merged',
-                            psi2s_mass_cut, path=path)
+                            psi2s_mass_cut, dmID=2, path=path)
 
         # Return the lists.
         return ['J/psi:ee', 'psi(2S):ee',

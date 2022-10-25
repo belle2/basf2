@@ -106,8 +106,9 @@ class SVDValidationTTreeSimhit(b2.Module):
                     continue
                 self.data.simhit_dEdx = energy / length
                 # A reasonable cut to see a nice Landau distribution
-                if self.data.simhit_dEdx > 0.015:
-                    continue
+                # remove this cut to be sensitive to delta rays
+                # if self.data.simhit_dEdx > 0.015:
+                #    continue
                 # Fill tree
                 self.file.cd()
                 self.tree.Fill()

@@ -4264,8 +4264,7 @@ namespace {
     // Likelihoods for all detectors but SVD
     auto* lAllNoSVD = likelihood.appendNew();
 
-    for (unsigned int iDet(0); iDet < Const::PIDDetectors::c_size; iDet++) {
-      const auto det =  Const::PIDDetectors::c_set[iDet];
+    for (const auto& det : Const::PIDDetectorSet::set()) {
       for (const auto& hypo : Const::chargedStableSet) {
         if (det != Const::SVD) {
           lAllNoSVD->setLogLikelihood(det, hypo, lAll->getLogL(hypo, det));

@@ -37,7 +37,7 @@ namespace Belle2 {
     DecayDescriptor m_pDDescriptorTarget;
 
     /** Helper function to replace grand daughters */
-    void replaceDaughterRecursively(Particle* particle, Particle* oldP, Particle* newP);
+    bool replaceDaughterRecursively(Particle* particle, Particle* oldP, Particle* newP);
 
   public:
     /** Constructor. */

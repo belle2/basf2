@@ -726,7 +726,7 @@ void Particle::removeDaughter(const Particle* daughter, const bool updateType)
     m_particleSource = c_Undefined;
 }
 
-void Particle::replaceDaughter(const Particle* oldDaughter, const Particle* newDaughter)
+bool Particle::replaceDaughter(const Particle* oldDaughter, const Particle* newDaughter)
 {
   int index = oldDaughter->getArrayIndex();
 
@@ -736,8 +736,10 @@ void Particle::replaceDaughter(const Particle* oldDaughter, const Particle* newD
       m_daughterIndices.insert(ite_index, newDaughter->getArrayIndex());
       auto ite_property =  m_daughterProperties.erase(m_daughterProperties.begin() + i);
       m_daughterProperties.insert(ite_property, Particle::PropertyFlags::c_Ordinary);
+      return true;
     }
   }
+  return false;
 }
 
 bool Particle::overlapsWith(const Particle* oParticle) const

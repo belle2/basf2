@@ -153,7 +153,7 @@ namespace Belle2 {
     StoreArray<Particle> m_particles;
 
     /** Helper function to replace grand daughters */
-    void replaceDaughterRecursively(Particle* particle, Particle* oldP, Particle* newP);
+    bool replaceDaughterRecursively(Particle* particle, Particle* oldP, Particle* newP);
 
   };
 }

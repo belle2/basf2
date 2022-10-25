@@ -55,7 +55,7 @@ void ParticleMomentumUpdaterModule::initialize()
   if (!valid)
     B2ERROR("ParticleMomentumUpdaterModule::initialize invalid Decay Descriptor: " << m_decayStringTarget);
   else if (m_pDDescriptorTarget.getSelectionPDGCodes().size() != 1)
-    B2ERROR("ParticleMomentumUpdaterModule::please select exactly one target: " << m_decayStringTarget);
+    B2ERROR("ParticleMomentumUpdaterModule::initialize please select exactly one target: " << m_decayStringTarget);
 }
 
 void ParticleMomentumUpdaterModule::event()
@@ -91,20 +91,27 @@ void ParticleMomentumUpdaterModule::event()
     } else {
       Particle* daughterCopy = Belle2::ParticleCopy::copyParticle(targetP);
       daughterCopy->set4Vector(boost4Vector - daughters4Vector);
-      replaceDaughterRecursively(iParticle, targetP, daughterCopy);
+      bool isReplaced = replaceDaughterRecursively(iParticle, targetP, daughterCopy);
+      if (!isReplaced)
+        B2ERROR("ParticleMomentumUpdaterModule::event No target particle found for " << m_decayStringTarget);
     }
   }
+}
+
+bool ParticleMomentumUpdaterModule::replaceDaughterRecursively(Particle* particle, Particle* oldP, Particle* newP)
+{
+  bool isReplaced = particle->replaceDaughter(oldP, newP);
+  if (isReplaced)
+    return true;
+  for (auto& daughter : particle->getDaughters()) {
+    isReplaced = replaceDaughterRecursively(daughter, oldP, newP);
+    if (isReplaced)
+      return true;
+  }
+  return false;
 }
 
 void ParticleMomentumUpdaterModule::terminate()
 {
 }
 
-void ParticleMomentumUpdaterModule::replaceDaughterRecursively(Particle* particle, Particle* oldP, Particle* newP)
-{
-  particle->replaceDaughter(oldP, newP);
-  for (auto& daughter : particle->getDaughters()) {
-    daughter->replaceDaughter(oldP, newP);
-    replaceDaughterRecursively(daughter, oldP, newP);
-  }
-}

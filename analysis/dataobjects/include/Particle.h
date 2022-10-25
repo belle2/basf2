@@ -396,7 +396,7 @@ namespace Belle2 {
      * @param oldDaughter pointer to the daughter that will be removed
      * @param newDaughter pointer to the particle that will be added as a daughter
      */
-    void replaceDaughter(const Particle* oldDaughter, const Particle* newDaughter);
+    bool replaceDaughter(const Particle* oldDaughter, const Particle* newDaughter);
 
     // getters
 

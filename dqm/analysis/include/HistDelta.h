@@ -22,6 +22,7 @@ namespace Belle2 {
     int m_parameter{}; /**< parameter depending on algo, e.g. nr of entries or events */
     unsigned int m_amountDeltas{}; /**< amount of past histograms, at least 1*/
     TH1* m_lastHist{};/**< Pointer to last histogram state for check */
+    int m_lastValue{}; /**< last value for comparison, depending on type */
     std::vector<TH1*> m_deltaHists;/**< vector of histograms (max m_amountDeltas) */
     bool m_updated{};/**< if any delta was updated in this event */
   public:

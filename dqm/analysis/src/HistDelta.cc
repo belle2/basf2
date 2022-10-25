@@ -6,6 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <dqm/analysis/HistDelta.h>
+#include <dqm/core/DQMHistAnalysis.h>
 #include <string>
 #include <TROOT.h>
 
@@ -17,6 +18,7 @@ HistDelta::HistDelta(int t, int p, unsigned int a)
   m_parameter = p;
   m_amountDeltas = a;
   m_lastHist = nullptr;
+  m_lastValue = 0;
 };
 
 void HistDelta::set(int t, int p, unsigned int a)
@@ -48,6 +50,11 @@ void HistDelta::update(TH1* currentHist)
     case 2:
       // here we misuse underflow as event counter in some histograms, e.g. PXD
       need_update = currentHist->GetBinContent(0) - m_lastHist->GetBinContent(0) >= m_parameter;
+      break;
+    case 3:
+      // use event processed counter
+      need_update = DQMHistAnalysisModule::getEventProcessed() - m_lastValue >= m_parameter;
+      if (need_update) m_lastValue = DQMHistAnalysisModule::getEventProcessed(); // update last value
       break;
     default:
       // any unsupported types map to case 0, and will disable delta for this hist

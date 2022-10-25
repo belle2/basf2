@@ -53,19 +53,19 @@ namespace Belle2 {
     )
     {
       m_moduleID = moduleID;
-      m_xe = (float) emissionPoint.x();
-      m_ye = (float) emissionPoint.y();
-      m_ze = (float) emissionPoint.z();
-      m_pxe = (float) emissionMom.x();
-      m_pye = (float) emissionMom.y();
-      m_pze = (float) emissionMom.z();
+      m_xe = (float) emissionPoint.X();
+      m_ye = (float) emissionPoint.Y();
+      m_ze = (float) emissionPoint.Z();
+      m_pxe = (float) emissionMom.X();
+      m_pye = (float) emissionMom.Y();
+      m_pze = (float) emissionMom.Z();
       m_te = (float) emissionTime;
-      m_xd = (float) detectionPoint.x();
-      m_yd = (float) detectionPoint.y();
-      m_zd = (float) detectionPoint.z();
-      m_pxd = (float) detectionMom.x();
-      m_pyd = (float) detectionMom.y();
-      m_pzd = (float) detectionMom.z();
+      m_xd = (float) detectionPoint.X();
+      m_yd = (float) detectionPoint.Y();
+      m_zd = (float) detectionPoint.Z();
+      m_pxd = (float) detectionMom.X();
+      m_pyd = (float) detectionMom.Y();
+      m_pzd = (float) detectionMom.Z();
       m_td = (float) detectionTime;
       m_length = (float) length;
       m_energy = (float) energy_eV;

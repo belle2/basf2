@@ -11,9 +11,9 @@
 
 using namespace Belle2;
 
-MCParticleInfo::MCParticleInfo(const MCParticle& the_mcParticle, const TVector3& the_magField)
+MCParticleInfo::MCParticleInfo(const MCParticle& the_mcParticle, const ROOT::Math::XYZVector& the_magField)
   : m_mcParticle(the_mcParticle)
-  , m_myBz(the_magField.Mag())
+  , m_myBz(the_magField.R())
   , m_charge(the_mcParticle.getCharge())
 {
   // set units to: cm, GeV/c

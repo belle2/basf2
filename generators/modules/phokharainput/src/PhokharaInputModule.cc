@@ -164,7 +164,7 @@ void PhokharaInputModule::event()
   ROOT::Math::LorentzRotation boost = initial.getCMSToLab();
 
   // vertex
-  TVector3 vertex = initial.getVertex();
+  ROOT::Math::XYZVector vertex = initial.getVertex();
 
   m_mcGraph.clear();
   if (m_BeamEnergySpread) {

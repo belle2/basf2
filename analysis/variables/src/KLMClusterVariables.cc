@@ -93,7 +93,7 @@ namespace Belle2::Variable {
     if (!cluster) {
       return std::numeric_limits<double>::quiet_NaN();
     }
-    return cluster->getClusterPosition().x();
+    return cluster->getClusterPosition().X();
   }
 
 
@@ -103,7 +103,7 @@ namespace Belle2::Variable {
     if (!cluster) {
       return std::numeric_limits<double>::quiet_NaN();
     }
-    return cluster->getClusterPosition().y();
+    return cluster->getClusterPosition().Y();
   }
 
 
@@ -113,7 +113,7 @@ namespace Belle2::Variable {
     if (!cluster) {
       return std::numeric_limits<double>::quiet_NaN();
     }
-    return cluster->getClusterPosition().z();
+    return cluster->getClusterPosition().Z();
   }
 
 

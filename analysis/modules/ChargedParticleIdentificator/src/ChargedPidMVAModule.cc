@@ -87,8 +87,8 @@ void ChargedPidMVAModule::beginRun()
   if (m_ecl_only) {
     m_score_varname += "_" + std::to_string(Const::ECL);
   } else {
-    for (size_t iDet(0); iDet < Const::PIDDetectors::set().size(); ++iDet) {
-      m_score_varname += "_" + std::to_string(Const::PIDDetectors::set()[iDet]);
+    for (const Const::EDetector& det : Const::PIDDetectorSet::set()) {
+      m_score_varname += "_" + std::to_string(det);
     }
   }
 }
@@ -259,10 +259,10 @@ void ChargedPidMVAModule::registerAliasesLegacy()
 
   aliasesLegacy.insert(std::make_pair("__event__", "evtNum"));
 
-  for (unsigned int iDet(0); iDet < Const::PIDDetectorSet::set().size(); ++iDet) {
+  for (Const::DetectorSet::Iterator it = Const::PIDDetectorSet::set().begin();
+       it != Const::PIDDetectorSet::set().end(); ++it) {
 
-    Const::EDetector det = Const::PIDDetectorSet::set()[iDet];
-    auto detName = Const::parseDetectors(det);
+    auto detName = Const::parseDetectors(*it);
 
     aliasesLegacy.insert(std::make_pair("missingLogL_" + detName, "pidMissingProbabilityExpert(" + detName + ")"));
 
@@ -274,7 +274,7 @@ void ChargedPidMVAModule::registerAliasesLegacy()
 
       aliasesLegacy.insert(std::make_pair(alias, var));
 
-      if (iDet == 0) {
+      if (it.getIndex() == 0) {
         alias = "deltaLogL_" + std::get<0>(info) + "_" + std::get<1>(info) + "_ALL";
         var = "pidDeltaLogLikelihoodValueExpert(" + std::to_string(pdgId) + ", " + std::to_string(std::get<2>(info)) + ", ALL)";
         aliasesLegacy.insert(std::make_pair(alias, var));

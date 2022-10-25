@@ -34,9 +34,9 @@ const PxPyPzEVector ClusterUtils::Get4MomentumFromCluster(const ECLCluster* clus
 {
 
   // Get particle direction from vertex and reconstructed cluster position.
-  XYZVector direction(cluster->getClusterPosition().x() - vertex.x(),
-                      cluster->getClusterPosition().y() - vertex.y(),
-                      cluster->getClusterPosition().z() - vertex.z());
+  XYZVector direction(cluster->getClusterPosition().X() - vertex.X(),
+                      cluster->getClusterPosition().Y() - vertex.Y(),
+                      cluster->getClusterPosition().Z() - vertex.Z());
 
   // Always ignore mass here (even for neutral hadrons) therefore the magnitude
   // of the momentum is equal to the cluster energy under this hypo.
@@ -198,7 +198,7 @@ const XYZVector ClusterUtils::GetIPPosition()
   if (!m_beamSpotDB) {
     B2WARNING("Beamspot not available, using (0, 0, 0) as IP position instead.");
     return XYZVector(0.0, 0.0, 0.0);
-  } else return XYZVector(m_beamSpotDB->getIPPosition().x(), m_beamSpotDB->getIPPosition().y(), m_beamSpotDB->getIPPosition().z());
+  } else return XYZVector(m_beamSpotDB->getIPPosition().X(), m_beamSpotDB->getIPPosition().Y(), m_beamSpotDB->getIPPosition().Z());
 }
 
 // -----------------------------------------------------------------------------

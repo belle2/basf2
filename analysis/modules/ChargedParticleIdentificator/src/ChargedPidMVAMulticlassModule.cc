@@ -232,8 +232,8 @@ void ChargedPidMVAMulticlassModule::event()
         if (m_ecl_only) {
           score_varname += "_" + std::to_string(Const::ECL);
         } else {
-          for (size_t iDet(0); iDet < Const::PIDDetectors::set().size(); ++iDet) {
-            score_varname += "_" + std::to_string(Const::PIDDetectors::set()[iDet]);
+          for (const Const::EDetector& det : Const::PIDDetectorSet::set()) {
+            score_varname += "_" + std::to_string(det);
           }
         }
 
@@ -259,10 +259,10 @@ void ChargedPidMVAMulticlassModule::registerAliasesLegacy()
 
   aliasesLegacy.insert(std::make_pair("__event__", "evtNum"));
 
-  for (unsigned int iDet(0); iDet < Const::PIDDetectorSet::set().size(); ++iDet) {
+  for (Const::DetectorSet::Iterator it = Const::PIDDetectorSet::set().begin();
+       it != Const::PIDDetectorSet::set().end(); ++it) {
 
-    Const::EDetector det = Const::PIDDetectorSet::set()[iDet];
-    auto detName = Const::parseDetectors(det);
+    auto detName = Const::parseDetectors(*it);
 
     aliasesLegacy.insert(std::make_pair("missingLogL_" + detName, "pidMissingProbabilityExpert(" + detName + ")"));
 
@@ -277,7 +277,7 @@ void ChargedPidMVAMulticlassModule::registerAliasesLegacy()
       aliasesLegacy.insert(std::make_pair(alias, var));
       aliasesLegacy.insert(std::make_pair(aliasLogTrf, varLogTrf));
 
-      if (iDet == 0) {
+      if (it.getIndex() == 0) {
         aliasLogTrf = fullName + "ID_LogTransfo";
         varLogTrf = "formula(-1. * log10(formula(((1. - " + fullName + "ID) + " + epsilon + ") / (" + fullName + "ID + " + epsilon +
                     "))))";

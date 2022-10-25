@@ -88,22 +88,22 @@ namespace Belle2 {
 
 
     /**
-     * Set the 3D (clusterTheta, p, charge) grid representing the categories for which weightfiles are defined.
-     * @param clusterThetaBins array of clusterTheta bin edges
-     * @param nClusterThetaBins number of clusterTheta bins
+     * Set the 3D (theta, p, charge) grid representing the categories for which weightfiles are defined.
+     * @param thetaBins array of theta bin edges
+     * @param nThetaBins number of theta bins
      * @param pBins array of p bin edges
      * @param nPBins number of p bins
      * @param chargeBins array of charge bin edges
      * @param nChargeBins number of charge bins
     */
-    void setWeightCategories(const double* clusterThetaBins, const int nClusterThetaBins,
+    void setWeightCategories(const double* thetaBins, const int nThetaBins,
                              const double* pBins, const int nPBins,
                              const double* chargeBins, const int nChargeBins)
     {
 
-      m_categories = std::make_unique<TH3F>("clustertheta_p_charge_binsgrid",
-                                            ";ECL cluster #theta;p_{lab}; Q",
-                                            nClusterThetaBins, clusterThetaBins,
+      m_categories = std::make_unique<TH3F>("theta_p_charge_binsgrid",
+                                            ";#theta_{lab};p_{lab};Q",
+                                            nThetaBins, thetaBins,
                                             nPBins, pBins,
                                             nChargeBins, chargeBins);
     }
@@ -113,8 +113,8 @@ namespace Belle2 {
      * store the list of MVA weight files (one for each category) into the payload.
      *
      * @param pdg the particle mass hypothesis' pdgId.
-     * @param filepaths a list of xml (root) file paths for several (clusterTheta, p, charge) categories.
-     * @param categoryBinCentres a list of <double, double, double> representing the (clusterTheta, p, charge) bin centres.
+     * @param filepaths a list of xml (root) file paths for several (theta, p, charge) categories.
+     * @param categoryBinCentres a list of <double, double, double> representing the (theta, p, charge) bin centres.
      *        Used to check consistency of the xml vector indexing w/ the linearised TH3 category map.
      */
     void storeMVAWeights(const int pdg, const std::vector<std::string>& filepaths,
@@ -138,7 +138,7 @@ namespace Belle2 {
         auto h_idx = getMVAWeightIdx(theta_bin_centre, p_bin_centre, charge_bin_centre);
         if (idx != h_idx) {
           B2FATAL("xml file:\n" << path << "\nindex in input vector:\n" << idx << "\ndoes not correspond to:\n" << h_idx <<
-                  "\n, i.e. the linearised index of the 3D bin centered in (clusterTheta, p, charge) = (" << theta_bin_centre << ", " << p_bin_centre
+                  "\n, i.e. the linearised index of the 3D bin centered in (theta, p, charge) = (" << theta_bin_centre << ", " << p_bin_centre
                   << ", " <<
                   charge_bin_centre <<
                   ")\nPlease check how the input xml file list is being filled.");
@@ -171,8 +171,8 @@ namespace Belle2 {
      * store the list of MVA weight files (one for each category) into the payload.
      * Uses the special value of pdg=0 reserved for multi-class mode.
      *
-     * @param filepaths a list of xml (root) file paths for several (clusterTheta, p, charge) categories.
-     * @param categoryBinCentres a list of <double, double, double> representing the (clusterTheta, p, charge) bin centres.
+     * @param filepaths a list of xml (root) file paths for several (theta, p, charge) categories.
+     * @param categoryBinCentres a list of <double, double, double> representing the (theta, p, charge) bin centres.
      *        Used to check consistency of the xml vector indexing w/ the linearised TH3 category map.
      */
     void storeMVAWeightsMultiClass(const std::vector<std::string>& filepaths,
@@ -187,9 +187,9 @@ namespace Belle2 {
      * store the list of selection cuts (one for each category) into the payload.
      *
      * @param pdg the particle mass hypothesis' pdgId.
-     * @param cutfiles a list of text files w/ cut strings, for each (clusterTheta, p, charge) category.
+     * @param cutfiles a list of text files w/ cut strings, for each (theta, p, charge) category.
      *        The format of the cut must comply with the `GeneralCut` syntax.
-     * @param categoryBinCentres a list of <double, double, double> representing the (clusterTheta, p, charge) bin centres.
+     * @param categoryBinCentres a list of <double, double, double> representing the (theta, p, charge) bin centres.
      *        Used to check consistency of the xml vector indexing w/ the linearised TH3 category map.
      */
     void storeCuts(const int pdg, const std::vector<std::string>& cutfiles,
@@ -212,7 +212,7 @@ namespace Belle2 {
         auto h_idx = getMVAWeightIdx(theta_bin_centre, p_bin_centre, charge_bin_centre);
         if (idx != h_idx) {
           B2FATAL("Cut file:\n" << cutfile << "\nindex in input vector:\n" << idx << "\ndoes not correspond to:\n" << h_idx <<
-                  "\n, i.e. the linearised index of the 3D bin centered in (clusterTheta, p, charge) = (" << theta_bin_centre << ", " << p_bin_centre
+                  "\n, i.e. the linearised index of the 3D bin centered in (theta, p, charge) = (" << theta_bin_centre << ", " << p_bin_centre
                   << ", " <<
                   charge_bin_centre <<
                   ")\nPlease check how the input cut file list is being filled.");
@@ -240,9 +240,9 @@ namespace Belle2 {
      * store the list of selection cuts (one for each category) into the payload.
      * Uses the special value of pdg=0 reserved for multi-class mode.
      *
-     * @param cutfiles a list of text files w/ cut strings, for each (clusterTheta, p, charge) category.
+     * @param cutfiles a list of text files w/ cut strings, for each (theta, p, charge) category.
      *        The format of the cut must comply with the `GeneralCut` syntax.
-     * @param categoryBinCentres a list of <double, double, double> representing the (clusterTheta, p, charge) bin centres.
+     * @param categoryBinCentres a list of <double, double, double> representing the (theta, p, charge) bin centres.
      *        Used to check consistency of the xml vector indexing w/ the linearised TH3 category map.
      */
     void storeCutsMultiClass(const std::vector<std::string>& cutfiles,
@@ -264,7 +264,7 @@ namespace Belle2 {
 
 
     /**
-     * Get the raw pointer to the 3D (clusterTheta, p, charge) grid representing the categories for which weightfiles are defined.
+     * Get the raw pointer to the 3D (theta, p, charge) grid representing the categories for which weightfiles are defined.
      * Used just to view the stored data.
      */
     const TH3F* getWeightCategories() const
@@ -275,7 +275,7 @@ namespace Belle2 {
 
     /**
      * Given a particle mass hypothesis' pdgId,
-     * get the list of (serialized) MVA weightfiles stored in the payload, one for each (clusterTheta, p, charge) category.
+     * get the list of (serialized) MVA weightfiles stored in the payload, one for each (theta, p, charge) category.
      * @param pdg the particle mass hypothesis' pdgId.
      */
     const std::vector<std::string>* getMVAWeights(const int pdg) const
@@ -286,7 +286,7 @@ namespace Belle2 {
 
     /**
      * For the multi-class mode,
-     * get the list of (serialized) MVA weightfiles stored in the payload, one for each (clusterTheta, p, charge) category.
+     * get the list of (serialized) MVA weightfiles stored in the payload, one for each (theta, p, charge) category.
      * Uses the special value of pdg=0 reserved for multi-class mode.
      */
     const std::vector<std::string>* getMVAWeightsMulticlass() const
@@ -297,7 +297,7 @@ namespace Belle2 {
 
     /**
      * Given a particle mass hypothesis' pdgId,
-     * get the list of selection cuts stored in the payload, one for each (clusterTheta, p, charge) category.
+     * get the list of selection cuts stored in the payload, one for each (theta, p, charge) category.
      * @param pdg the particle mass hypothesis' pdgId.
      * @param pdg the particle mass hypothesis' pdgId.
      */
@@ -309,7 +309,7 @@ namespace Belle2 {
 
     /**
      * For the multi-class mode,
-     * get the list of selection cuts stored in the payload, one for each (clusterTheta, p, charge) category.
+     * get the list of selection cuts stored in the payload, one for each (theta, p, charge) category.
      * Uses the special value of pdg=0 reserved for multi-class mode.
      */
     const std::vector<std::string>* getCutsMulticlass() const
@@ -328,41 +328,41 @@ namespace Belle2 {
 
 
     /**
-     * Get the index of the XML weight file, for a given reconstructed pair (clusterTheta, p, charge).
+     * Get the index of the XML weight file, for a given reconstructed pair (theta, p, charge).
      * The index is obtained by linearising the 3D `m_categories` histogram.
      * The same index can be used to look up the correct MVAExpert, Dataset and Cut in the application module,
      * hence we believe it's more useful to return the index rather than a pointer to the weightfile itself.
-     * The function also retrieves the (clusterTheta, p, charge) bin coordinates.
-     * @param clusterTheta the particle polar angle (from the ECL cluster) in [rad].
+     * The function also retrieves the (theta, p, charge) bin coordinates.
+     * @param theta the particle polar angle (from the track) in [rad].
      * @param p the particle momentum (from the track) in [GeV/c].
      * @param charge the particle charge (from the track).
-     * @param[out] idx_theta the index of the (clusterTheta, p, charge) bin along the theta (X) axis.
-     * @param[out] idx_p the index of the (clusterTheta, p, charge) bin along the p (Y) axis.
-     * @param[out] idx_charge the index of the (clusterTheta, p, charge) bin along the charge (Z) axis.
+     * @param[out] idx_theta the index of the (theta, p, charge) bin along the theta (X) axis.
+     * @param[out] idx_p the index of the (theta, p, charge) bin along the p (Y) axis.
+     * @param[out] idx_charge the index of the (theta, p, charge) bin along the charge (Z) axis.
      * @return the index of the weightfile of interest from the array of weightfiles.
      */
-    unsigned int getMVAWeightIdx(const double& clusterTheta, const double& p, const double& charge, int& idx_theta, int& idx_p,
+    unsigned int getMVAWeightIdx(const double& theta, const double& p, const double& charge, int& idx_theta, int& idx_p,
                                  int& idx_charge) const
     {
 
       if (!m_categories) {
-        B2FATAL("No (clusterTheta, p, charge) TH3 grid was found in the DB payload. Most likely, you are using a GT w/ an old payload which is no longer compatible with the DB object class implementation. This should not happen! Abort...");
+        B2FATAL("No (theta, p, charge) TH3 grid was found in the DB payload. Most likely, you are using a GT w/ an old payload which is no longer compatible with the DB object class implementation. This should not happen! Abort...");
       }
 
-      int nbins_th = m_categories->GetXaxis()->GetNbins(); // nr. of clusterTheta (visible) bins, along X.
+      int nbins_th = m_categories->GetXaxis()->GetNbins(); // nr. of theta (visible) bins, along X.
       int nbins_p = m_categories->GetYaxis()->GetNbins(); // nr. of p (visible) bins, along Y.
 
-      int glob_bin_idx = findBin(clusterTheta / m_ang_unit.GetVal(), p / m_energy_unit.GetVal(), charge);
+      int glob_bin_idx = findBin(theta / m_ang_unit.GetVal(), p / m_energy_unit.GetVal(), charge);
       m_categories->GetBinXYZ(glob_bin_idx, idx_theta, idx_p, idx_charge);
 
-      // The index of the linearised 3D (clusterTheta, p, charge) m_categories.
+      // The index of the linearised 3D (theta, p, charge) m_categories.
       // The unit offset is b/c ROOT sets global bin idx also for overflows and underflows.
       return (idx_theta - 1) + nbins_th * ((idx_p - 1) + nbins_p * (idx_charge - 1));
     }
 
 
     /**
-     * Overloaded method, to be used if not interested in knowing the 3D (clusterTheta, p, charge) bin coordinates.
+     * Overloaded method, to be used if not interested in knowing the 3D (theta, p, charge) bin coordinates.
      */
     unsigned int getMVAWeightIdx(const double& theta, const double& p, const double& charge) const
     {
@@ -374,21 +374,21 @@ namespace Belle2 {
     /**
      * Read and dump the payload content from the internal 'matrioska' maps into an XML weightfile for the given set of inputs.
      * Useful for debugging.
-     * @param clusterTheta the particle polar angle (from the ECL cluster) in [rad].
+     * @param theta the particle polar angle (from the track) in [rad].
      * @param p the particle momentum (from the track) in [GeV/c].
      * @param charge the particle charge (from the track).
      * @param pdg the particle mass hypothesis' pdgId.
      * @param dump_all dump all information
      */
-    void dumpPayload(const double& clusterTheta, const double& p, const double& charge, const int pdg, bool dump_all = false) const
+    void dumpPayload(const double& theta, const double& p, const double& charge, const int pdg, bool dump_all = false) const
     {
 
       B2INFO("Dumping payload content for:");
-      B2INFO("clusterTheta = " << clusterTheta << " [rad], p = " << p << " [GeV/c], charge = " << charge);
+      B2INFO("theta = " << theta << " [rad], p = " << p << " [GeV/c], charge = " << charge);
 
       if (m_categories) {
-        std::string filename = "db_payload_chargedpidmva__clustertheta_p_charge_categories.root";
-        B2INFO("\tWriting ROOT file w/ (clusterTheta, p, charge) TH3F grid that defines categories:" << filename);
+        std::string filename = "db_payload_chargedpidmva__theta_p_charge_categories.root";
+        B2INFO("\tWriting ROOT file w/ (theta, p, charge) TH3F grid that defines categories:" << filename);
         auto f = std::make_unique<TFile>(filename.c_str(), "RECREATE");
         m_categories->Write();
         f->Close();
@@ -400,7 +400,7 @@ namespace Belle2 {
 
         if (!dump_all && pdg != pdgId) continue;
 
-        auto idx = getMVAWeightIdx(clusterTheta, p, charge);
+        auto idx = getMVAWeightIdx(theta, p, charge);
 
         auto serialized_weightfile = weights.at(idx);
 
@@ -494,8 +494,8 @@ namespace Belle2 {
 
 
     /**
-     * A 3D (clusterTheta, p, charge) histogram whose bins represent the categories for which XML weight files are defined.
-      * It is used to lookup the correct file in the payload, given a reconstructed set of (clusterTheta, p, charge).
+     * A 3D (theta, p, charge) histogram whose bins represent the categories for which XML weight files are defined.
+      * It is used to lookup the correct file in the payload, given a reconstructed set of (theta, p, charge).
      */
     std::unique_ptr<TH3F> m_categories;
 
@@ -503,7 +503,7 @@ namespace Belle2 {
     /**
      * For each charged particle mass hypothesis' pdgId,
      * this map contains a list of (serialized) Weightfile objects to be stored in the payload.
-     * Each weightfile in the list corresponds to a (clusterTheta, p, charge) category.
+     * Each weightfile in the list corresponds to a (theta, p, charge) category.
      * The indexing in each vector must reflect the one of the corresponding 'linearised' TH3F histogram contained in the m_grids map.
      *
      * The dummy pdgId=0 key is reserved for multi-class, where a unique signal hypothesis is not defined.

@@ -14,8 +14,10 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 
-//MDST
-#include <mdst/dataobjects/ECLCluster.h>
+// FRAMEWORK
+#include <framework/logging/LogConfig.h>
+#include <framework/logging/LogSystem.h>
+
 
 using namespace Belle2;
 
@@ -138,37 +140,29 @@ void ChargedPidMVAModule::event()
       const Particle* particle = (m_nSelectedDaughters == 0) ? pList->getParticle(ipart) : targetParticles[ipart];
       B2DEBUG(11, "\tParticle [" << ipart << "]");
 
-      // Check that the particle has a valid relation set between track and ECL cluster.
-      // Otherwise, skip to next.
-      const ECLCluster* eclCluster = particle->getECLCluster();
-      if (!eclCluster) {
-        B2DEBUG(11, "\t\tParticle has invalid Track-ECLCluster relation, skip MVA application...");
-        continue;
-      }
-
       // Retrieve the index for the correct MVA expert and dataset,
-      // given reconstructed (clusterTheta, p, charge)
-      auto clusterTheta = eclCluster->getTheta();
+      // given the reconstructed (theta, p, charge)
+      auto theta = std::get<double>(Variable::Manager::Instance().getVariable("theta")->function(particle));
       auto p = particle->getP();
       // Set a dummy charge of zero to pick charge-independent payloads, if requested.
       auto charge = (!m_charge_independent) ? particle->getCharge() : 0.0;
       int idx_theta, idx_p, idx_charge;
-      auto index = (*m_weightfiles_representation.get())->getMVAWeightIdx(clusterTheta, p, charge, idx_theta, idx_p, idx_charge);
+      auto index = (*m_weightfiles_representation.get())->getMVAWeightIdx(theta, p, charge, idx_theta, idx_p, idx_charge);
 
       // Get the cut defining the MVA category under exam (this reflects the one used in the training).
       const auto cuts   = (*m_weightfiles_representation.get())->getCuts(m_sig_pdg);
       const auto cutstr = (!cuts->empty()) ? cuts->at(index) : "";
 
-      B2DEBUG(11, "\t\tclusterTheta    = " << clusterTheta << " [rad]");
-      B2DEBUG(11, "\t\tp               = " << p << " [GeV/c]");
+      B2DEBUG(11, "\t\ttheta = " << theta << " [rad]");
+      B2DEBUG(11, "\t\tp = " << p << " [GeV/c]");
       if (!m_charge_independent) {
-        B2DEBUG(11, "\t\tcharge          = " << charge);
+        B2DEBUG(11, "\t\tcharge = " << charge);
       }
       B2DEBUG(11, "\t\tBrems corrected = " << particle->hasExtraInfo("bremsCorrectedPhotonEnergy"));
-      B2DEBUG(11, "\t\tWeightfile idx  = " << index << " - (clusterTheta, p, charge) = (" << idx_theta << ", " << idx_p <<  ", " <<
+      B2DEBUG(11, "\t\tWeightfile idx = " << index << " - (theta, p, charge) = (" << idx_theta << ", " << idx_p << ", " <<
               idx_charge << ")");
       if (!cutstr.empty()) {
-        B2DEBUG(11, "\tCategory cut: " << cutstr);
+        B2DEBUG(11, "\t\tCategory cut = " << cutstr);
       }
 
       // Fill the MVA::SingleDataset w/ variables and spectators.
@@ -201,28 +195,33 @@ void ChargedPidMVAModule::event()
 
       }
 
-      B2DEBUG(12, "\tMVA spectators:");
+      // Check spectators only when in debug mode.
+      if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 12)) {
 
-      auto nspecs = m_spectators.at(index).size();
-      for (unsigned int ispec(0); ispec < nspecs; ++ispec) {
+        B2DEBUG(12, "\tMVA spectators:");
 
-        auto specobj = m_spectators.at(index).at(ispec);
+        auto nspecs = m_spectators.at(index).size();
+        for (unsigned int ispec(0); ispec < nspecs; ++ispec) {
 
-        double spec = std::numeric_limits<double>::quiet_NaN();
-        auto spec_result = specobj->function(particle);
-        if (std::holds_alternative<double>(spec_result)) {
-          spec = std::get<double>(spec_result);
-        } else if (std::holds_alternative<int>(spec_result)) {
-          spec = std::get<int>(spec_result);
-        } else if (std::holds_alternative<bool>(spec_result)) {
-          spec = std::get<bool>(spec_result);
-        } else {
-          B2ERROR("Variable '" << specobj->name << "' has wrong data type! It must be one of double, integer, or bool.");
+          auto specobj = m_spectators.at(index).at(ispec);
+
+          double spec = std::numeric_limits<double>::quiet_NaN();
+          auto spec_result = specobj->function(particle);
+          if (std::holds_alternative<double>(spec_result)) {
+            spec = std::get<double>(spec_result);
+          } else if (std::holds_alternative<int>(spec_result)) {
+            spec = std::get<int>(spec_result);
+          } else if (std::holds_alternative<bool>(spec_result)) {
+            spec = std::get<bool>(spec_result);
+          } else {
+            B2ERROR("Variable '" << specobj->name << "' has wrong data type! It must be one of double, integer, or bool.");
+          }
+
+          B2DEBUG(12, "\t\tspec[" << ispec << "] : " << specobj->name << " = " << spec);
+
+          m_datasets.at(index)->m_spectators[ispec] = spec;
+
         }
-
-        B2DEBUG(12, "\t\tspec[" << ispec << "] : " << specobj->name << " = " << spec);
-
-        m_datasets.at(index)->m_spectators[ispec] = spec;
 
       }
 

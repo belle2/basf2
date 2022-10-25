@@ -517,6 +517,13 @@ namespace Belle2 {
       return m_inOutArmTimeDiff;
     }
 
+    /// Return track arm direction, 0: outgoing, 1: ingoing, 2: not classified
+    int getTrackArmDirection()
+    {
+      if (!m_calculateArmTime) calculateArmTime("RecoTracks");
+      return m_trackArmDirection;
+    }
+
     /// Return the position, the momentum and the charge of the first measured state on plane or - if unfitted - the seeds.
     std::tuple<TVector3, TVector3, short> extractTrackState() const;
 
@@ -845,6 +852,8 @@ namespace Belle2 {
     float m_ingoingArmTime = NAN;
     /// Difference of the track times of the ingoing and outgoing arms
     float m_inOutArmTimeDiff = NAN;
+    /// Track arm direction 0: ougoing, 1: ingoing, 2: not classified
+    int m_trackArmDirection = 2;
     /// Run calculateArmTime()
     bool m_calculateArmTime = false;
 
@@ -964,7 +973,7 @@ namespace Belle2 {
     }
 
     /** Making this class a ROOT class.*/
-    ClassDefOverride(RecoTrack, 12);
+    ClassDefOverride(RecoTrack, 13);
   };
 
   /**

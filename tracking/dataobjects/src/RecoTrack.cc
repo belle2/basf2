@@ -652,6 +652,7 @@ void RecoTrack::calculateArmTime(const std::string& storeArrayNameOfRecoTracks)
   int nSVD = 0;
   float clsTimeSum = 0;
   std::string arm = "";
+  bool trackArmTimeDONE = false;
   for (int i = 0; i < (int)recoHits.size(); i ++) {
     RecoHitInformation::RecoHitDetector foundin = recoHits[i]->getTrackingDetector();
     if (foundin == RecoHitInformation::RecoHitDetector::c_PXD) detID = 0;
@@ -660,6 +661,7 @@ void RecoTrack::calculateArmTime(const std::string& storeArrayNameOfRecoTracks)
     else detID = 3;
     if (!svdDONE && detID != 1) detIDpre = detID;
     RelationVector<SVDCluster> svdClusters = recoHits[i]->getRelationsTo<SVDCluster>();
+    //B2INFO("detID: "<<detID<<"; detIDpre: "<<detIDpre<<"; svdDONE: "<<svdDONE);
     if (detID == 1) {
       clsTimeSum += svdClusters[0]->getClsTime();
       nSVD += 1;
@@ -667,14 +669,44 @@ void RecoTrack::calculateArmTime(const std::string& storeArrayNameOfRecoTracks)
     } else {
       if (svdDONE) {
         detIDpost = detID;
+        //B2INFO("detIDpre: "<<detIDpre<<"; detIDpost: "<<detIDpost);
         arm = trackArmDirection(detIDpre, detIDpost);
-        if (arm == "IN") m_ingoingArmTime = clsTimeSum / nSVD;
-        if (arm == "OUT") m_outgoingArmTime = clsTimeSum / nSVD;
+        if (arm == "IN") {
+          m_ingoingArmTime = clsTimeSum / nSVD;
+          m_trackArmDirection = 1;
+        }
+        if (arm == "OUT") {
+          m_outgoingArmTime = clsTimeSum / nSVD;
+          m_trackArmDirection = 0;
+        }
+        //B2INFO("arm: "<<arm<<"; detIDpre: "<<detIDpre<<"; detIDpost: "<<detIDpost<<"\n");
         svdDONE = false;
         detIDpre = detIDpost;
         detIDpost = NAN;
         clsTimeSum = 0;
         nSVD = 0;
+        trackArmTimeDONE = true;
+      }
+    }
+    if (!trackArmTimeDONE && (i == (int)recoHits.size() - 1)) {
+      if (svdDONE) {
+        //B2INFO("detIDpre: "<<detIDpre<<"; detIDpost: "<<detIDpost);
+        arm = trackArmDirection(detIDpre, detIDpost);
+        if (arm == "IN") {
+          m_ingoingArmTime = clsTimeSum / nSVD;
+          m_trackArmDirection = 1;
+        }
+        if (arm == "OUT") {
+          m_outgoingArmTime = clsTimeSum / nSVD;
+          m_trackArmDirection = 0;
+        }
+        //B2INFO("arm: "<<arm<<"; detIDpre: "<<detIDpre<<"; detIDpost: "<<detIDpost<<"\n");
+        svdDONE = false;
+        detIDpre = detIDpost;
+        detIDpost = NAN;
+        clsTimeSum = 0;
+        nSVD = 0;
+        trackArmTimeDONE = true;
       }
     }
   }

@@ -118,8 +118,9 @@ void ChargedPidMVAMulticlassModule::event()
       B2DEBUG(11, "\tParticle [" << ipart << "]");
 
       // Retrieve the index for the correct MVA expert and dataset,
-      // given the reconstructed (theta, p, charge)
-      auto theta = std::get<double>(Variable::Manager::Instance().getVariable("theta")->function(particle));
+      // given the reconstructed (clusterTheta(theta), p, charge)
+      auto* thVar = Variable::Manager::Instance().getVariable("conditionalVariableSelector(clusterTrackMatch == 1, clusterTheta, theta)");
+      auto theta = std::get<double>(thVar->function(particle));
       auto p = particle->getP();
       // Set a dummy charge of zero to pick charge-independent payloads, if requested.
       auto charge = (!m_charge_independent) ? particle->getCharge() : 0.0;
@@ -130,6 +131,7 @@ void ChargedPidMVAMulticlassModule::event()
       const auto cuts   = (*m_weightfiles_representation.get())->getCutsMulticlass();
       const auto cutstr = (!cuts->empty()) ? cuts->at(index) : "";
 
+      B2DEBUG(11, "\t\tclusterTheta(theta) = " << theta << " [rad]");
       B2DEBUG(11, "\t\ttheta = " << theta << " [rad]");
       B2DEBUG(11, "\t\tp = " << p << " [GeV/c]");
       if (!m_charge_independent) {

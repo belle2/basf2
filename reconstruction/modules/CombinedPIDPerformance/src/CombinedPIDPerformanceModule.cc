@@ -318,7 +318,7 @@ void CombinedPIDPerformanceModule::fillEfficiencyHistos(const TrackFitResult* tr
 
   // fill rocs, efficiencies, and fake rates for electrons
   it = electronSet.begin();
-  for (unsigned int i = 0; i <= edetset.size() + 1; ++i) {
+  for (unsigned int i = 0; i < edetset.size(); ++i) {
     float pidval = -1.0;
     int detnum = edetset[i];
 

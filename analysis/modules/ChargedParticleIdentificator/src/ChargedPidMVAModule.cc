@@ -37,7 +37,7 @@ ChargedPidMVAModule::ChargedPidMVAModule() : Module()
            int(0));
   addParam("particleLists",
            m_decayStrings,
-           "The input list of decay strings, where the mother particle string should correspond to a full name of a particle list. One can select to run on daughters instead of mother particle, e.g. ['Lambda0 -> ^p+ ^pi-'].",
+           "The input list of DecayStrings, where each selected (^) daughter should correspond to a standard charged ParticleList, e.g. ['Lambda0:sig -> ^p+ ^pi-', 'J/psi:sig -> ^mu+ ^mu-']. One can also directly pass a list of standard charged ParticleLists, e.g. ['e+:my_electrons', 'pi+:my_pions']. Note that charge-conjugated ParticleLists will automatically be included.",
            std::vector<std::string>());
   addParam("payloadName",
            m_payload_name,

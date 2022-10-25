@@ -3545,10 +3545,10 @@ def applyChargedPidMVA(particleLists, path, trainingMode, chargeIndependent=Fals
 
     The module can perform either 'binary' PID between input S, B particle mass hypotheses according to the following scheme:
 
-    - e (11) vs. pi (211)
-    - mu (13) vs. pi (211)
-    - pi (211) vs. K (321)
-    - K (321) vs. pi (211)
+    * e (11) vs. pi (211)
+    * mu (13) vs. pi (211)
+    * pi (211) vs. K (321)
+    * K (321) vs. pi (211)
 
     , or 'global' PID, namely "one-vs-others" separation. The latter exploits an MVA algorithm trained in multi-class mode,
     and it's the default behaviour. Currently, the multi-class training separates the following standard charged hypotheses:
@@ -3560,8 +3560,11 @@ def applyChargedPidMVA(particleLists, path, trainingMode, chargeIndependent=Fals
         it is necessary to append the latest analysis global tag (GT) to the steering script.
 
     Parameters:
-        particleLists (list(str)): list of names of ParticleList objects for charged stable particles.
-                                   The charge-conjugate ParticleLists will be also processed automatically.
+        particleLists (list(str)): the input list of DecayStrings, where each selected (^) daughter should correspond to a
+                                   standard charged ParticleList, e.g. ``['Lambda0:sig -> ^p+ ^pi-', 'J/psi:sig -> ^mu+ ^mu-']``.
+                                   One can also directly pass a list of standard charged ParticleLists,
+                                   e.g. ``['e+:my_electrons', 'pi+:my_pions']``.
+                                   Note that charge-conjugated ParticleLists will automatically be included.
         path (basf2.Path): the module is added to this path.
         trainingMode (``Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode``): enum identifier of the training mode.
           Needed to pick up the correct payload from the DB. Available choices:

@@ -440,32 +440,44 @@ namespace Belle2 {
 
     double electronID(const Particle* part)
     {
-      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(11, ALL)")->function(part));
+      static Manager::FunctionPtr pidFunction =
+        pidProbabilityExpert({"11", "ALL"});
+      return std::get<double>(pidFunction(part));
     }
 
     double muonID(const Particle* part)
     {
-      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(13, ALL)")->function(part));
+      static Manager::FunctionPtr pidFunction =
+        pidProbabilityExpert({"13", "ALL"});
+      return std::get<double>(pidFunction(part));
     }
 
     double pionID(const Particle* part)
     {
-      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(211, ALL)")->function(part));
+      static Manager::FunctionPtr pidFunction =
+        pidProbabilityExpert({"211", "ALL"});
+      return std::get<double>(pidFunction(part));
     }
 
     double kaonID(const Particle* part)
     {
-      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(321, ALL)")->function(part));
+      static Manager::FunctionPtr pidFunction =
+        pidProbabilityExpert({"321", "ALL"});
+      return std::get<double>(pidFunction(part));
     }
 
     double protonID(const Particle* part)
     {
-      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(2212, ALL)")->function(part));
+      static Manager::FunctionPtr pidFunction =
+        pidProbabilityExpert({"2212", "ALL"});
+      return std::get<double>(pidFunction(part));
     }
 
     double deuteronID(const Particle* part)
     {
-      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(1000010020, ALL)")->function(part));
+      static Manager::FunctionPtr pidFunction =
+        pidProbabilityExpert({"1000010020", "ALL"});
+      return std::get<double>(pidFunction(part));
     }
 
     double binaryPID(const Particle* part, const std::vector<double>& arguments)

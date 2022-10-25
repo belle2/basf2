@@ -151,7 +151,7 @@ void ChargedPidMVAMulticlassModule::event()
 
         auto varobj = m_variables.at(index).at(ivar);
 
-        double var = -999.0;
+        double var = std::numeric_limits<double>::quiet_NaN();
         auto var_result = varobj->function(particle);
         if (std::holds_alternative<double>(var_result)) {
           var = std::get<double>(var_result);
@@ -162,9 +162,6 @@ void ChargedPidMVAMulticlassModule::event()
         } else {
           B2ERROR("Variable '" << varobj->name << "' has wrong data type! It must be one of double, integer, or bool.");
         }
-
-        // Manual imputation value of -999 for NaN (undefined) variables. Needed by TMVA.
-        var = (std::isnan(var)) ? -999.0 : var;
 
         B2DEBUG(11, "\t\tvar[" << ivar << "] : " << varobj->name << " = " << var);
 

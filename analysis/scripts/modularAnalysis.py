@@ -167,8 +167,9 @@ With:
         # n.b. slightly unfortunate syntax: the MagneticField is a member of the
         # Belle2 namespace but will be set to the Belle 1 values
         from ROOT import Belle2  # reduced scope of potentially-misbehaving import
+        from ROOT.Math import XYZVector
         belle1_field = Belle2.MagneticField()
-        belle1_field.addComponent(Belle2.MagneticFieldComponentConstant(Belle2.B2Vector3D(0, 0, 1.5 * Belle2.Unit.T)))
+        belle1_field.addComponent(Belle2.MagneticFieldComponentConstant(XYZVector(0, 0, 1.5 * Belle2.Unit.T)))
         Belle2.DBStore.Instance().addConstantOverride("MagneticField", belle1_field, False)
         # also set the MC matching for Belle 1
         setAnalysisConfigParams({'mcMatchingVersion': 'Belle'}, path)

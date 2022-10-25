@@ -17,12 +17,12 @@ namespace Belle2 {
     m_event.registerInDataStore();
   }
 
-  TVector3 InitialParticleGeneration::generateVertex(const TVector3& initial, const TMatrixDSym& cov,
-                                                     MultivariateNormalGenerator& gen) const
+  ROOT::Math::XYZVector InitialParticleGeneration::generateVertex(const ROOT::Math::XYZVector& initial, const TMatrixDSym& cov,
+      MultivariateNormalGenerator& gen) const
   {
     if (m_event->hasGenerationFlags(BeamParameters::c_smearVertex)) {
       if (!gen.size()) gen.setMeanCov(initial, cov);
-      return gen.generateVec3();
+      return ROOT::Math::XYZVector(gen.generateVec3());
     }
     return initial;
   }
@@ -37,11 +37,11 @@ namespace Belle2 {
 
     //Calculate initial parameters of the beam before smearing
     double E0   = initial.E();
-    double thX0 = atan(initial.Px() / initial.Pz());
-    double thY0 = atan(initial.Py() / initial.Pz());
+    double thX0 = atan(initial.X() / initial.Z());
+    double thY0 = atan(initial.Y() / initial.Z());
 
     //init random generator if there is a change in beam parameters or at the beginning
-    if (gen.size() != 3) gen.setMeanCov(TVector3(E0, thX0, thY0), cov);
+    if (gen.size() != 3) gen.setMeanCov(ROOT::Math::XYZVector(E0, thX0, thY0), cov);
 
     //generate the actual smeared vector (E, thX, thY)
     Eigen::VectorXd p = gen.generate();
@@ -62,7 +62,7 @@ namespace Belle2 {
     double thY = p[2];
 
     //Convert values back to 4-vector
-    bool isHER = initial.Pz() > 0;
+    bool isHER = initial.Z() > 0;
     return BeamParameters::getFourVector(E, thX, thY, isHER);
   }
 
@@ -87,7 +87,7 @@ namespace Belle2 {
     m_event->setGenerationFlags(m_beamParams->getGenerationFlags() & allowedFlags);
     ROOT::Math::PxPyPzEVector her = generateBeam(m_beamParams->getHER(), m_beamParams->getCovHER(), m_generateHER);
     ROOT::Math::PxPyPzEVector ler = generateBeam(m_beamParams->getLER(), m_beamParams->getCovLER(), m_generateLER);
-    TVector3 vtx = generateVertex(m_beamParams->getVertex(), m_beamParams->getCovVertex(), m_generateVertex);
+    ROOT::Math::XYZVector vtx = generateVertex(m_beamParams->getVertex(), m_beamParams->getCovVertex(), m_generateVertex);
     m_event->set(her, ler, vtx);
     //Check if we want to go to CMS, if so boost both
     if (m_beamParams->hasGenerationFlags(BeamParameters::c_generateCMS)) {
@@ -100,7 +100,7 @@ namespace Belle2 {
     return *m_event;
   }
 
-  TVector3 InitialParticleGeneration::updateVertex(bool force)
+  ROOT::Math::XYZVector InitialParticleGeneration::updateVertex(bool force)
   {
     if (!m_beamParams.isValid()) {
       B2FATAL("Cannot generate beam without valid BeamParameters");

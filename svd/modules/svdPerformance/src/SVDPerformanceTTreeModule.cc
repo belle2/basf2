@@ -183,7 +183,7 @@ void SVDPerformanceTTreeModule::event()
     if (tfr) {
       m_svdTrkd0 = tfr->getD0();
       m_svdTrkz0 = tfr->getZ0();
-      m_svdTrkpT = tfr->getMomentum().Perp();
+      m_svdTrkpT = tfr->getMomentum().Rho();
       ROOT::Math::PxPyPzEVector pStar = tfr->get4Momentum();
       ROOT::Math::BoostZ boost(3. / 11);
       pStar = boost(pStar);

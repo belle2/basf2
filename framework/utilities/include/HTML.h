@@ -10,9 +10,8 @@
 #include <TMatrixFBasefwd.h>
 #include <TMatrixDBasefwd.h>
 
+#include <Math/Vector3D.h>
 #include <string>
-
-class TVector3;
 
 namespace Belle2 {
   /** return information on objects in a nice format.
@@ -40,7 +39,7 @@ namespace Belle2 {
      * @param vec the vector to be printend
      * @param precision The amount of digits to use
      */
-    std::string getString(const TVector3& vec, int precision = 2);
+    std::string getString(const ROOT::Math::XYZVector& vec, int precision = 2);
 
     /** get a string with vector coordinates: (x, y, z). (uses fixed-length output).
      * converts floating point value from standard framework unit to given unit.
@@ -49,13 +48,13 @@ namespace Belle2 {
      * @param precision The amount of digits to use
      * @param unitType Defines the unit to convert the vector values from standard framework unit.
      */
-    std::string getStringConvertToUnit(const TVector3& vec, int precision = 2,
+    std::string getStringConvertToUnit(const ROOT::Math::XYZVector& vec, int precision = 2,
                                        const std::string& unitType = "cm");
 
     /** get a string with a unit type to convert a vector, so that it is easily readable.
      * valid unit types are (um, cm) for now. the maximum of the vector entries defines the unit.
      */
-    std::string chooseUnitOfLength(const TVector3& vec);
+    std::string chooseUnitOfLength(const ROOT::Math::XYZVector& vec);
 
     /** Create hexdump of given buffer.
      *

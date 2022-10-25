@@ -7,6 +7,8 @@
  **************************************************************************/
 #include <framework/dataobjects/Helix.h>
 
+#include <Math/VectorUtil.h>
+#include <Math/Vector2D.h>
 #include <TVector3.h>
 #include <TRandom3.h>
 
@@ -50,11 +52,11 @@ namespace Belle2::TestHelpers {
 }
 
 namespace {
-  Belle2::Helix helixFromCenter(const TVector3& center, const float& radius, const float& tanLambda)
+  Belle2::Helix helixFromCenter(const ROOT::Math::XYZVector& center, const float& radius, const float& tanLambda)
   {
     double omega = 1 / radius;
     double phi0 = center.Phi() + copysign(M_PI / 2.0, radius);
-    double d0 = copysign(center.Perp(), radius) - radius;
+    double d0 = copysign(center.Rho(), radius) - radius;
     double z0 = center.Z();
 
     return Belle2::Helix(d0, phi0, omega, z0, tanLambda);
@@ -91,24 +93,24 @@ namespace {
     //std::vector<float> d0s {0.5};
     std::vector<float> chis = linspace(-5 * M_PI / 6, 5 * M_PI / 6, 11);
 
-    std::vector<TVector3> bys = {
-      TVector3(-2.0, 0.5, 0.0),
-      TVector3(-1.0, 0.5, 0.0),
-      TVector3(0.0, 0.5, 0.0),
-      TVector3(1.0, 0.5, 0.0),
-      TVector3(2.0, 0.5, 0.0),
+    std::vector<ROOT::Math::XYZVector> bys = {
+      ROOT::Math::XYZVector(-2.0, 0.5, 0.0),
+      ROOT::Math::XYZVector(-1.0, 0.5, 0.0),
+      ROOT::Math::XYZVector(0.0, 0.5, 0.0),
+      ROOT::Math::XYZVector(1.0, 0.5, 0.0),
+      ROOT::Math::XYZVector(2.0, 0.5, 0.0),
 
-      TVector3(-2.0, 0.0, 0.0),
-      TVector3(-1.0, 0.0, 0.0),
-      TVector3(0.0, 0.0, 0.0),
-      TVector3(1.0, 0.0, 0.0),
-      TVector3(2.0, 0.0, 0.0),
+      ROOT::Math::XYZVector(-2.0, 0.0, 0.0),
+      ROOT::Math::XYZVector(-1.0, 0.0, 0.0),
+      ROOT::Math::XYZVector(0.0, 0.0, 0.0),
+      ROOT::Math::XYZVector(1.0, 0.0, 0.0),
+      ROOT::Math::XYZVector(2.0, 0.0, 0.0),
 
-      TVector3(-2.0, -1.0, 0.0),
-      TVector3(-1.0, -1.0, 0.0),
-      TVector3(0.0, -1.0, 0.0),
-      TVector3(1.0, -1.0, 0.0),
-      TVector3(2.0, -1.0, 0.0),
+      ROOT::Math::XYZVector(-2.0, -1.0, 0.0),
+      ROOT::Math::XYZVector(-1.0, -1.0, 0.0),
+      ROOT::Math::XYZVector(0.0, -1.0, 0.0),
+      ROOT::Math::XYZVector(1.0, -1.0, 0.0),
+      ROOT::Math::XYZVector(2.0, -1.0, 0.0),
     };
 
   };
@@ -125,13 +127,13 @@ namespace {
       short int charge = generator.Uniform(-1, 1) > 0 ? 1 : -1;
 
       // Generate a random put orthogonal pair of vectors in the r-phi plane
-      TVector2 d(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
-      TVector2 pt(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
-      d.Set(d.X(), -d.X() * pt.Px() / pt.Py());
+      ROOT::Math::XYVector d(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
+      ROOT::Math::XYVector pt(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
+      d.SetCoordinates(d.X(), -d.X() * pt.X() / pt.Y());
 
       // Add a random z component
-      TVector3 position(d.X(), d.Y(), generator.Uniform(-1, 1));
-      TVector3 momentum(pt.Px(), pt.Py(), generator.Uniform(-1, 1));
+      ROOT::Math::XYZVector position(d.X(), d.Y(), generator.Uniform(-1, 1));
+      ROOT::Math::XYZVector momentum(pt.X(), pt.Y(), generator.Uniform(-1, 1));
 
       // Set up class for testing
       Helix helix(position, momentum, charge, bField);
@@ -141,14 +143,14 @@ namespace {
       EXPECT_ALL_NEAR(momentum, helix.getMomentum(bField), absError);
 
       // Test getter for transverse momentum
-      EXPECT_NEAR(momentum.Perp(), helix.getTransverseMomentum(bField), absError);
+      EXPECT_NEAR(momentum.Rho(), helix.getTransverseMomentum(bField), absError);
 
       // Test getter of kappa
-      EXPECT_NEAR(charge / momentum.Perp(), helix.getKappa(bField), absError);
+      EXPECT_NEAR(charge / momentum.Rho(), helix.getKappa(bField), absError);
 
       // Test getter of d0
       // Check absolute value of d0
-      EXPECT_NEAR(position.Perp(), fabs(helix.getD0()), absError);
+      EXPECT_NEAR(position.Rho(), fabs(helix.getD0()), absError);
 
       // Check sign of d0
       EXPECT_SAME_SIGN(position.Cross(momentum).Z(), helix.getD0());
@@ -175,9 +177,9 @@ namespace {
   {
     // This tests the assumption that the sign of d0 is given by the sign of position x momentum as a two dimensional cross product.
 
-    const TVector3 position(1, 0, 0);
-    const TVector3 momentum(0, 1, 0);
-    const TVector3 oppositeMomentum(0, -1, 0);
+    const ROOT::Math::XYZVector position(1, 0, 0);
+    const ROOT::Math::XYZVector momentum(0, 1, 0);
+    const ROOT::Math::XYZVector oppositeMomentum(0, -1, 0);
     const float charge = 1;
     const float bField = nominalBz;
 
@@ -205,14 +207,14 @@ namespace {
      *  heading in the negative y direction initially
      */
 
-    TVector3 center(0.0, -2.0, 0.0);
+    ROOT::Math::XYZVector center(0.0, -2.0, 0.0);
     float radius = -1;
     // Keep it flat
     float tanLambda = 0;
 
     Helix helix = helixFromCenter(center, radius, tanLambda);
 
-    TVector3 actualCenter = helix.getPerigee() * ((1 / helix.getOmega() + helix.getD0()) / helix.getD0());
+    ROOT::Math::XYZVector actualCenter = helix.getPerigee() * ((1 / helix.getOmega() + helix.getD0()) / helix.getD0());
     EXPECT_NEAR(center.X(), actualCenter.X(), absError);
     EXPECT_NEAR(center.Y(), actualCenter.Y(), absError);
   }
@@ -225,7 +227,7 @@ namespace {
      *  heading in the negative y direction initially
      */
 
-    TVector3 center(0.0, -2.0, 0.0);
+    ROOT::Math::XYZVector center(0.0, -2.0, 0.0);
     float radius = -1;
     // Keep it flat
     float tanLambda = 0;
@@ -239,34 +241,34 @@ namespace {
     {
       // Start point
       float arcLength2D = 0;
-      TVector3 position = helix.getPositionAtArcLength2D(arcLength2D);
-      TVector3 tangential = helix.getUnitTangentialAtArcLength2D(arcLength2D);
+      ROOT::Math::XYZVector position = helix.getPositionAtArcLength2D(arcLength2D);
+      ROOT::Math::XYZVector tangential = helix.getUnitTangentialAtArcLength2D(arcLength2D);
 
-      EXPECT_ALL_NEAR(TVector3(0.0, -1.0, 0.0), position, absError);
+      EXPECT_ALL_NEAR(ROOT::Math::XYZVector(0.0, -1.0, 0.0), position, absError);
       EXPECT_ANGLE_NEAR(-M_PI, tangential.Phi(), absError);
     }
 
     {
       float arcLength2D = M_PI / 2;
-      TVector3 position = helix.getPositionAtArcLength2D(arcLength2D);
-      TVector3 tangential = helix.getUnitTangentialAtArcLength2D(arcLength2D);
-      EXPECT_ALL_NEAR(TVector3(-1.0, -2.0, 0.0), position, absError);
+      ROOT::Math::XYZVector position = helix.getPositionAtArcLength2D(arcLength2D);
+      ROOT::Math::XYZVector tangential = helix.getUnitTangentialAtArcLength2D(arcLength2D);
+      EXPECT_ALL_NEAR(ROOT::Math::XYZVector(-1.0, -2.0, 0.0), position, absError);
       EXPECT_ANGLE_NEAR(-M_PI / 2, tangential.Phi(), absError);
     }
 
     {
       float arcLength2D = M_PI;
-      TVector3 position = helix.getPositionAtArcLength2D(arcLength2D);
-      TVector3 tangential = helix.getUnitTangentialAtArcLength2D(arcLength2D);
-      EXPECT_ALL_NEAR(TVector3(0.0, -3.0, 0.0), position, absError);
+      ROOT::Math::XYZVector position = helix.getPositionAtArcLength2D(arcLength2D);
+      ROOT::Math::XYZVector tangential = helix.getUnitTangentialAtArcLength2D(arcLength2D);
+      EXPECT_ALL_NEAR(ROOT::Math::XYZVector(0.0, -3.0, 0.0), position, absError);
       EXPECT_ANGLE_NEAR(0, tangential.Phi(), absError);
     }
 
     {
       float arcLength2D = 3 * M_PI / 2 ;
-      TVector3 position = helix.getPositionAtArcLength2D(arcLength2D);
-      TVector3 tangential = helix.getUnitTangentialAtArcLength2D(arcLength2D);
-      EXPECT_ALL_NEAR(TVector3(1.0, -2.0, 0.0), position, absError);
+      ROOT::Math::XYZVector position = helix.getPositionAtArcLength2D(arcLength2D);
+      ROOT::Math::XYZVector tangential = helix.getUnitTangentialAtArcLength2D(arcLength2D);
+      EXPECT_ALL_NEAR(ROOT::Math::XYZVector(1.0, -2.0, 0.0), position, absError);
       EXPECT_ANGLE_NEAR(M_PI / 2, tangential.Phi(), absError);
     }
   }
@@ -283,10 +285,10 @@ namespace {
           Helix helix(d0, phi0, omega, z0, tanLambda);
           TEST_CONTEXT("Failed for " << helix);
 
-          TVector3 tangentialAtPerigee = helix.getUnitTangentialAtArcLength2D(0.0);
+          ROOT::Math::XYZVector tangentialAtPerigee = helix.getUnitTangentialAtArcLength2D(0.0);
 
           EXPECT_ANGLE_NEAR(phi0, tangentialAtPerigee.Phi(), absError);
-          EXPECT_FLOAT_EQ(1.0, tangentialAtPerigee.Mag());
+          EXPECT_FLOAT_EQ(1.0, tangentialAtPerigee.R());
           EXPECT_FLOAT_EQ(tanLambda, 1 / tan(tangentialAtPerigee.Theta()));
 
           for (const float chi : chis) {
@@ -296,17 +298,17 @@ namespace {
               float arcLength2D = chi;
 
               // Tangential vector shall not change along the line
-              TVector3 tangential = helix.getUnitTangentialAtArcLength2D(arcLength2D);
+              ROOT::Math::XYZVector tangential = helix.getUnitTangentialAtArcLength2D(arcLength2D);
               EXPECT_ALL_NEAR(tangentialAtPerigee, tangential, absError);
 
             } else {
               float arcLength2D = -chi / omega;
-              TVector3 tangential = helix.getUnitTangentialAtArcLength2D(arcLength2D);
+              ROOT::Math::XYZVector tangential = helix.getUnitTangentialAtArcLength2D(arcLength2D);
 
-              float actualChi = tangential.DeltaPhi(tangentialAtPerigee);
+              float actualChi = ROOT::Math::VectorUtil::DeltaPhi(tangentialAtPerigee, tangential);
               EXPECT_ANGLE_NEAR(chi, actualChi, absError);
               EXPECT_FLOAT_EQ(tangentialAtPerigee.Theta(), tangential.Theta());
-              EXPECT_FLOAT_EQ(1, tangential.Mag());
+              EXPECT_FLOAT_EQ(1, tangential.R());
 
             }
 
@@ -328,16 +330,16 @@ namespace {
           if (omega != 0) {
 
             Helix helix(d0, phi0, omega, z0, tanLambda);
-            TVector3 momentumAtPerigee = helix.getMomentum(nominalBz);
+            ROOT::Math::XYZVector momentumAtPerigee = helix.getMomentum(nominalBz);
             for (const float chi : chis) {
 
               float arcLength2D = -chi / omega;
-              TVector3 extrapolatedMomentum = helix.getMomentumAtArcLength2D(arcLength2D, nominalBz);
+              ROOT::Math::XYZVector extrapolatedMomentum = helix.getMomentumAtArcLength2D(arcLength2D, nominalBz);
 
-              float actualChi = extrapolatedMomentum.DeltaPhi(momentumAtPerigee);
+              float actualChi = ROOT::Math::VectorUtil::DeltaPhi(momentumAtPerigee, extrapolatedMomentum);
               EXPECT_ANGLE_NEAR(chi, actualChi, absError);
               EXPECT_FLOAT_EQ(momentumAtPerigee.Theta(), extrapolatedMomentum.Theta());
-              EXPECT_FLOAT_EQ(momentumAtPerigee.Mag(), extrapolatedMomentum.Mag());
+              EXPECT_FLOAT_EQ(momentumAtPerigee.R(), extrapolatedMomentum.R());
             }
           }
         }
@@ -359,9 +361,9 @@ namespace {
         for (const float omega : omegas) {
 
           Helix helix(d0, phi0, omega, z0, tanLambda);
-          TVector3 perigee = helix.getPerigee();
+          ROOT::Math::XYZVector perigee = helix.getPerigee();
 
-          TVector3 tangentialAtPerigee = helix.getUnitTangentialAtArcLength2D(0.0);
+          ROOT::Math::XYZVector tangentialAtPerigee = helix.getUnitTangentialAtArcLength2D(0.0);
           TEST_CONTEXT("Failed for " << helix);
 
           //continue;
@@ -372,24 +374,24 @@ namespace {
             // In the cases where omega is 0 (straight line case) chi become undefined.
             // Use chi sample as transverse travel distance instead.
             float expectedArcLength2D = omega != 0 ? -chi / omega : chi;
-            TVector3 pointOnHelix = helix.getPositionAtArcLength2D(expectedArcLength2D);
+            ROOT::Math::XYZVector pointOnHelix = helix.getPositionAtArcLength2D(expectedArcLength2D);
 
-            float cylindricalR = pointOnHelix.Perp();
+            float cylindricalR = pointOnHelix.Rho();
             float arcLength2D = helix.getArcLength2DAtCylindricalR(cylindricalR);
 
             // Only the absolute value is returned.
             EXPECT_NEAR(fabs(expectedArcLength2D), arcLength2D, absError);
 
             // Also check it the extrapolation lies in the forward direction.
-            TVector3 secantVector = pointOnHelix - perigee;
+            ROOT::Math::XYZVector secantVector = pointOnHelix - perigee;
 
             if (expectedArcLength2D == 0) {
-              EXPECT_NEAR(0, secantVector.Mag(), absError);
+              EXPECT_NEAR(0, secantVector.R(), absError);
             } else {
-              TVector2 secantVectorXY = secantVector.XYvector();
+              ROOT::Math::XYVector secantVectorXY(secantVector.X(), secantVector.Y());
 
-              TVector2 tangentialXY = tangentialAtPerigee.XYvector();
-              float coalignment = secantVectorXY * tangentialXY ;
+              ROOT::Math::XYVector tangentialXY(tangentialAtPerigee.X(), tangentialAtPerigee.Y());
+              float coalignment = secantVectorXY.Dot(tangentialXY);
 
               bool extrapolationIsForward = coalignment > 0;
               bool expectedIsForward = expectedArcLength2D > 0;
@@ -405,7 +407,7 @@ namespace {
   TEST_F(HelixTest, ExtrapolationToNormalPlane)
   {
     {
-      TVector3 center(0.0, 2.0, 0.0);
+      ROOT::Math::XYZVector center(0.0, 2.0, 0.0);
       float radius = -1;
       // Keep it flat
       float tanLambda = 0;
@@ -421,7 +423,7 @@ namespace {
     }
 
     {
-      TVector3 center(0.0, 2.0, 0.0);
+      ROOT::Math::XYZVector center(0.0, 2.0, 0.0);
       float radius = -1;
       // Keep it flat
       float tanLambda = 0;
@@ -437,7 +439,7 @@ namespace {
     }
 
     {
-      TVector3 center(0.0, 2.0, 0.0);
+      ROOT::Math::XYZVector center(0.0, 2.0, 0.0);
       float radius = 1;
       // Keep it flat
       float tanLambda = 0;
@@ -453,7 +455,7 @@ namespace {
     }
 
     {
-      TVector3 center(0.0, 2.0, 0.0);
+      ROOT::Math::XYZVector center(0.0, 2.0, 0.0);
       float radius = 1;
       // Keep it flat
       float tanLambda = 0;
@@ -487,8 +489,8 @@ namespace {
 
             for (const float chi : chis) {
               float arcLength2D = -chi / omega;
-              TVector3 position = expectedHelix.getPositionAtArcLength2D(arcLength2D);
-              TVector3 momentum = expectedHelix.getMomentumAtArcLength2D(arcLength2D, nominalBz);
+              ROOT::Math::XYZVector position = expectedHelix.getPositionAtArcLength2D(arcLength2D);
+              ROOT::Math::XYZVector momentum = expectedHelix.getMomentumAtArcLength2D(arcLength2D, nominalBz);
               int chargeSign = expectedHelix.getChargeSign();
 
               EXPECT_NEAR(tanLambda, 1 / tan(momentum.Theta()), absError);
@@ -519,7 +521,7 @@ namespace {
   {
     float tanLambda = 3;
 
-    TVector3 center(0.0, -2.0, 0.0);
+    ROOT::Math::XYZVector center(0.0, -2.0, 0.0);
     float radius = -1;
 
     Helix helix = helixFromCenter(center, radius, tanLambda);
@@ -527,24 +529,24 @@ namespace {
     EXPECT_ANGLE_NEAR(-M_PI, helix.getPhi0(), absError);
     EXPECT_NEAR(-1, helix.getOmega(), absError);
     {
-      TVector3 position(0.0, 0.0, 0.0);
+      ROOT::Math::XYZVector position(0.0, 0.0, 0.0);
       float newD0 = helix.getDr(position);
       EXPECT_NEAR(-1, newD0, absError);
     }
 
     {
-      TVector3 position(2.0, -2.0, 0.0);
+      ROOT::Math::XYZVector position(2.0, -2.0, 0.0);
       float newD0 = helix.getDr(position);
       EXPECT_NEAR(-1, newD0, absError);
     }
     {
-      TVector3 position(-2.0, -2.0, 0.0);
+      ROOT::Math::XYZVector position(-2.0, -2.0, 0.0);
       float newD0 = helix.getDr(position);
       EXPECT_NEAR(-1, newD0, absError);
     }
 
     {
-      TVector3 position(1.0, -1.0, 0.0);
+      ROOT::Math::XYZVector position(1.0, -1.0, 0.0);
       float newD0 = helix.getDr(position);
       EXPECT_NEAR(-(sqrt(2) - 1) , newD0, absError);
     }
@@ -561,24 +563,24 @@ namespace {
           Helix helix(d0, phi0, omega, z0, tanLambda);
           TEST_CONTEXT("Failed for " << helix);
 
-          EXPECT_NEAR(d0, helix.getDr(TVector3(0.0, 0.0, 0.0)), absError);
+          EXPECT_NEAR(d0, helix.getDr(ROOT::Math::XYZVector(0.0, 0.0, 0.0)), absError);
 
           for (const float chi : chis) {
             for (const float newD0 : d0s) {
               // In the line case use the chi value directly as the arc length
 
               float arcLength2D = omega == 0 ? chi : -chi / omega;
-              TVector3 positionOnHelix = helix.getPositionAtArcLength2D(arcLength2D);
+              ROOT::Math::XYZVector positionOnHelix = helix.getPositionAtArcLength2D(arcLength2D);
 
-              TVector3 tangentialToHelix = helix.getUnitTangentialAtArcLength2D(arcLength2D);
+              ROOT::Math::XYZVector tangentialToHelix = helix.getUnitTangentialAtArcLength2D(arcLength2D);
 
-              TVector3 perpendicularToHelix = tangentialToHelix;
-              perpendicularToHelix.RotateZ(M_PI / 2.0);
+              ROOT::Math::XYZVector perpendicularToHelix = tangentialToHelix;
+              perpendicularToHelix = ROOT::Math::VectorUtil::RotateZ(perpendicularToHelix, M_PI / 2.0);
               // Normalize the xy part
               perpendicularToHelix *= 1 / perpendicularToHelix.Perp();
 
-              TVector3 displacementFromHelix = perpendicularToHelix * newD0;
-              TVector3 testPosition = positionOnHelix + displacementFromHelix;
+              ROOT::Math::XYZVector displacementFromHelix = perpendicularToHelix * newD0;
+              ROOT::Math::XYZVector testPosition = positionOnHelix + displacementFromHelix;
 
               TEST_CONTEXT("Failed for chi " << chi);
               TEST_CONTEXT("Failed for position on helix " << positionOnHelix);
@@ -598,7 +600,7 @@ namespace {
 
   TEST_F(HelixTest, PassiveMoveExplicit)
   {
-    TVector3 center(0.0, 1.0, 0.0);
+    ROOT::Math::XYZVector center(0.0, 1.0, 0.0);
     float radius = -1;
     float tanLambda = 3;
 
@@ -613,7 +615,7 @@ namespace {
 
     // Vector by which the coordinate system should move.
     // (To the right of the circle)
-    TVector3 by(1.0, 1.0, 0.0);
+    ROOT::Math::XYZVector by(1.0, 1.0, 0.0);
 
     float arcLength2D = helix.passiveMoveBy(by);
 
@@ -652,18 +654,18 @@ namespace {
               // In the line case use the chi value directly as the arc length
 
               float expectedArcLength2D = omega == 0 ? chi : -chi / omega;
-              TVector3 positionOnHelix = helix.getPositionAtArcLength2D(expectedArcLength2D);
-              TVector3 tangentialToHelix = helix.getUnitTangentialAtArcLength2D(expectedArcLength2D);
+              ROOT::Math::XYZVector positionOnHelix = helix.getPositionAtArcLength2D(expectedArcLength2D);
+              ROOT::Math::XYZVector tangentialToHelix = helix.getUnitTangentialAtArcLength2D(expectedArcLength2D);
 
-              TVector3 perpendicularToHelix = tangentialToHelix;
-              perpendicularToHelix.RotateZ(M_PI / 2.0);
+              ROOT::Math::XYZVector perpendicularToHelix = tangentialToHelix;
+              perpendicularToHelix = ROOT::Math::VectorUtil::RotateZ(perpendicularToHelix, M_PI / 2.0);
               // Normalize the xy part
-              perpendicularToHelix *= 1 / perpendicularToHelix.Perp();
+              perpendicularToHelix *= 1 / perpendicularToHelix.Rho();
 
-              TVector3 displacementFromHelix = -perpendicularToHelix * newD0;
-              TVector3 testPosition = positionOnHelix + displacementFromHelix;
+              ROOT::Math::XYZVector displacementFromHelix = -perpendicularToHelix * newD0;
+              ROOT::Math::XYZVector testPosition = positionOnHelix + displacementFromHelix;
 
-              TVector3 expectedPerigee = -displacementFromHelix;
+              ROOT::Math::XYZVector expectedPerigee = -displacementFromHelix;
 
               TEST_CONTEXT("Failed for chi " << chi);
               TEST_CONTEXT("Failed for position on helix " << positionOnHelix);
@@ -686,13 +688,13 @@ namespace {
 
   TEST_F(HelixTest, calcPassiveMoveByJacobian_identity)
   {
-    TVector3 center(0.0, 1.0, 0.0);
+    ROOT::Math::XYZVector center(0.0, 1.0, 0.0);
     float radius = -1;
     float tanLambda = 3;
 
     Helix helix = helixFromCenter(center, radius, tanLambda);
 
-    TMatrixD noMoveJacobian = helix.calcPassiveMoveByJacobian(TVector3(0.0, 0.0, 0.0));
+    TMatrixD noMoveJacobian = helix.calcPassiveMoveByJacobian(ROOT::Math::XYZVector(0.0, 0.0, 0.0));
 
     EXPECT_NEAR(1.0, noMoveJacobian(0, 0), 1e-7);
     EXPECT_NEAR(0.0, noMoveJacobian(0, 1), 1e-7);
@@ -709,13 +711,13 @@ namespace {
 
   TEST_F(HelixTest, calcPassiveMoveByJacobian_orthogonalToPhi0)
   {
-    TVector3 center(0.0, 1.0, 0.0);
+    ROOT::Math::XYZVector center(0.0, 1.0, 0.0);
     float radius = -1;
     float tanLambda = 3;
 
     Helix helix = helixFromCenter(center, radius, tanLambda);
 
-    TMatrixD moveByOneJacobian = helix.calcPassiveMoveByJacobian(TVector3(0.0, -1.0, 0.0));
+    TMatrixD moveByOneJacobian = helix.calcPassiveMoveByJacobian(ROOT::Math::XYZVector(0.0, -1.0, 0.0));
 
     EXPECT_NEAR(1.0, moveByOneJacobian(iD0, iD0), 1e-7);
     EXPECT_NEAR(0.0, moveByOneJacobian(iD0, iPhi0), 1e-7);
@@ -733,14 +735,14 @@ namespace {
 
   TEST_F(HelixTest, calcPassiveMoveByJacobian_parallelToPhi0_compare_opposite_transformation)
   {
-    TVector3 center(0.0, 1.0, 0.0);
+    ROOT::Math::XYZVector center(0.0, 1.0, 0.0);
     float radius = -1;
     float tanLambda = 3;
 
     Helix helix = helixFromCenter(center, radius, tanLambda);
 
-    TMatrixD moveByPlusTwoXJacobian = helix.calcPassiveMoveByJacobian(TVector3(2.0, 0.0, 0.0));
-    TMatrixD moveByMinusTwoXJacobian = helix.calcPassiveMoveByJacobian(TVector3(-2.0, 0.0, 0.0));
+    TMatrixD moveByPlusTwoXJacobian = helix.calcPassiveMoveByJacobian(ROOT::Math::XYZVector(2.0, 0.0, 0.0));
+    TMatrixD moveByMinusTwoXJacobian = helix.calcPassiveMoveByJacobian(ROOT::Math::XYZVector(-2.0, 0.0, 0.0));
 
     EXPECT_NEAR(1.0, moveByPlusTwoXJacobian(iOmega, iOmega), 1e-7);
     EXPECT_NEAR(0.0, moveByPlusTwoXJacobian(iOmega, iPhi0), 1e-7);
@@ -772,8 +774,8 @@ namespace {
 
   TEST_F(HelixTest, calcPassiveMoveByJacobian_roundtrip)
   {
-    for (const TVector3& by : bys) {
-      TVector3 center(0.0, 1.0, 0.0);
+    for (const auto& by : bys) {
+      ROOT::Math::XYZVector center(0.0, 1.0, 0.0);
       float radius = -1;
       float tanLambda = 3;
 
@@ -804,13 +806,13 @@ namespace {
 
   TEST_F(HelixTest, calcPassiveMoveByJacobian_parallelToPhi0)
   {
-    TVector3 center(1.0, 0.0, 0.0);
+    ROOT::Math::XYZVector center(1.0, 0.0, 0.0);
     float radius = -1;
     float tanLambda = 3;
 
     Helix helix = helixFromCenter(center, radius, tanLambda);
 
-    TMatrixD moveByTwoYJacobian = helix.calcPassiveMoveByJacobian(TVector3(0.0, 2.0, 0.0));
+    TMatrixD moveByTwoYJacobian = helix.calcPassiveMoveByJacobian(ROOT::Math::XYZVector(0.0, 2.0, 0.0));
 
     // Hand caluclated intermediate quantities;
     double deltaParallel = 2;
@@ -840,13 +842,13 @@ namespace {
 
   TEST_F(HelixTest, calcPassiveMoveByJacobian_consistency_of_expansion)
   {
-    TVector3 center(0.0, 1.0, 0.0);
+    ROOT::Math::XYZVector center(0.0, 1.0, 0.0);
     float radius = -1;
     float tanLambda = 3;
 
     Helix helix = helixFromCenter(center, radius, tanLambda);
 
-    for (const TVector3& by : bys) {
+    for (const auto& by : bys) {
       TMatrixD jacobian = helix.calcPassiveMoveByJacobian(by);
       TMatrixD jacobianWithExpansion = helix.calcPassiveMoveByJacobian(by, 10000);
 
@@ -878,17 +880,17 @@ namespace {
     helixParams[3] = -0.000317335;
     helixParams[4] = 1.34536;
 
-    TVector3 momentum(-0.768755, -0.356297, 1.13994);
-    TVector3 position(-1.60794, 3.46933, -0.000317335);
+    ROOT::Math::XYZVector momentum(-0.768755, -0.356297, 1.13994);
+    ROOT::Math::XYZVector position(-1.60794, 3.46933, -0.000317335);
 
     // Note: The helix parameters already have small mismatches that can be fixed as follows
     // helixParams[1] = std::atan2(static_cast<double>(momentum.Y()), static_cast<double>(momentum.X()));
-    // helixParams[0] = static_cast<double>(position.Perp());
+    // helixParams[0] = static_cast<double>(position.Rho());
 
     const double bZ = 1.5;
 
     // Test if the cartesian coordinates are at the perigee
-    EXPECT_NEAR(0.0, momentum.XYvector() * position.XYvector(), 1e-6);
+    EXPECT_NEAR(0.0, momentum.X() * position.X() + momentum.Y() * position.Y(), 1e-6);
 
     Helix helix(helixParams[0], helixParams[1], helixParams[2], helixParams[3], helixParams[4]);
 
@@ -899,8 +901,8 @@ namespace {
 
   TEST_F(HelixTest, omegaForUnitMomentum)
   {
-    TVector3 expectedMomentum(1.0, 0.0, 0.0);
-    TVector3 expectedPosition(0.0, 1.0, 0.0);
+    ROOT::Math::XYZVector expectedMomentum(1.0, 0.0, 0.0);
+    ROOT::Math::XYZVector expectedPosition(0.0, 1.0, 0.0);
     const double expectedCharge = 1;
     const double bZ = 1.5;
 

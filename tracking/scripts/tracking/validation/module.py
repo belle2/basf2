@@ -292,7 +292,7 @@ class TrackingValidationModule(basf2.Module):
                 mcHelix = getHelixFromMCParticle(mcParticle)
                 omega_truth = mcHelix.getOmega()
                 tan_lambda_truth = mcHelix.getTanLambda()
-                pt_truth = mcParticle.getMomentum().Perp()
+                pt_truth = mcParticle.getMomentum().Rho()
                 d0_truth = mcHelix.getD0()
                 z0_truth = mcHelix.getZ0()
 
@@ -348,7 +348,7 @@ class TrackingValidationModule(basf2.Module):
                 z0_estimate = prTrackFitResult.getZ0()
 
                 momentum = prTrackFitResult.getMomentum()
-                pt_estimate = momentum.Perp()
+                pt_estimate = momentum.Rho()
 
             # store properties of the seed
             self.pr_seed_tan_lambdas.append(seed_tan_lambda)
@@ -431,7 +431,7 @@ class TrackingValidationModule(basf2.Module):
                 continue
 
             momentum = mcParticle.getMomentum()
-            pt = momentum.Perp()
+            pt = momentum.Rho()
             tan_lambda = np.divide(1.0, math.tan(momentum.Theta()))  # Avoid zero division exception
             d0 = mcHelix.getD0()
             det_hit_ids = get_det_hit_ids(mcTrackCand)
@@ -472,7 +472,12 @@ class TrackingValidationModule(basf2.Module):
         mc_matched_primaries = np.logical_and(self.mc_primaries, self.mc_matches)
 
         charge_asymmetry = np.average(self.mc_charge_asymmetry, weights=self.mc_charge_asymmetry_weights)
-        charge_efficiency = np.average(self.mc_charge_matches, weights=mc_matched_primaries)
+        if len(mc_matched_primaries) > 0 and sum(mc_matched_primaries) > 0:
+            charge_efficiency = np.average(self.mc_charge_matches, weights=mc_matched_primaries)
+            hit_efficiency = np.average(self.mc_hit_efficiencies, weights=mc_matched_primaries)
+        else:
+            charge_efficiency = float('nan')
+            hit_efficiency = float('nan')
         finding_charge_efficiency = np.average(self.mc_charge_matches, weights=self.mc_primaries)
         finding_efficiency = np.average(self.mc_matches, weights=self.mc_primaries)
         fake_rate = 1.0 - np.mean(self.pr_clones_and_matches)
@@ -482,8 +487,6 @@ class TrackingValidationModule(basf2.Module):
                                           weights=self.pr_clones_and_matches)
         else:
             clone_rate = float('nan')
-
-        hit_efficiency = np.average(self.mc_hit_efficiencies, weights=mc_matched_primaries)
 
         figures_of_merit = ValidationFiguresOfMerit('%s_figures_of_merit'
                                                     % name)

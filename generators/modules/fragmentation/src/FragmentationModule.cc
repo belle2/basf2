@@ -362,7 +362,7 @@ int FragmentationModule::addParticleToPYTHIA(const MCParticle& mcParticle)
 
   //get some basic kinematics
   const double mass   = mcParticle.getMass();
-  const TVector3& p   = mcParticle.getMomentum();
+  const ROOT::Math::XYZVector& p   = mcParticle.getMomentum();
   const double energy = sqrt(mass * mass + p.Mag2());
 
   //add this (anti)quark to the m_PythiaEvent

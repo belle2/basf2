@@ -362,9 +362,9 @@ Particle::Particle(const MCParticle* mcParticle) :
 
   // mass and momentum
   m_mass = mcParticle->getMass();
-  m_px = mcParticle->getMomentum().Px();
-  m_py = mcParticle->getMomentum().Py();
-  m_pz = mcParticle->getMomentum().Pz();
+  m_px = mcParticle->getMomentum().X();
+  m_py = mcParticle->getMomentum().Y();
+  m_pz = mcParticle->getMomentum().Z();
   // production vertex
   // TODO: good only for FS particles, for composite we must use decay vertex
   setVertex(mcParticle->getVertex());
@@ -522,7 +522,7 @@ double Particle::getCosHelicity(const Particle* mother) const
       PxPyPzEVector pDaughter1 = boost * getDaughter(1)->get4Vector();
 
       XYZVector pDaughterNormal(pDaughter0.Vect().Cross(pDaughter1.Vect()));
-      pDaughter.SetPxPyPzE(pDaughterNormal.x(), pDaughterNormal.y(), pDaughterNormal.z(), 0); // energy doesn't matter
+      pDaughter.SetPxPyPzE(pDaughterNormal.X(), pDaughterNormal.Y(), pDaughterNormal.Z(), 0); // energy doesn't matter
     }
   }
 
@@ -1007,12 +1007,12 @@ const Particle* Particle::getParticleFromGeneralizedIndexString(const std::strin
 void Particle::setMomentumPositionErrorMatrix(const TrackFitResult* trackFit)
 {
   // set momentum
-  m_px = trackFit->getMomentum().Px();
-  m_py = trackFit->getMomentum().Py();
-  m_pz = trackFit->getMomentum().Pz();
+  m_px = trackFit->getMomentum().X();
+  m_py = trackFit->getMomentum().Y();
+  m_pz = trackFit->getMomentum().Z();
 
   // set position at which the momentum is given (= POCA)
-  setVertex(XYZVector(trackFit->getPosition().x(), trackFit->getPosition().y(), trackFit->getPosition().z()));
+  setVertex(trackFit->getPosition());
 
   // set Chi^2 probability
   m_pValue = trackFit->getPValue();
@@ -1229,14 +1229,14 @@ std::string Particle::getInfoHTML() const
   stream << " <b>mass</b>=" << m_mass;
   stream << "<br>";
 
-  stream << " <b>momentum</b>=" << HTML::getString(B2Vector3D(getPx(), getPy(), getPz()));
+  stream << " <b>momentum</b>=" << HTML::getString(ROOT::Math::XYZVector(getPx(), getPy(), getPz()));
   stream << " <b>p</b>=" << getP();
   stream << "<br>";
 
   stream << " <b>momentum scaling factor</b>=" << m_momentumScale;
   stream << "<br>";
 
-  stream << " <b>position</b>=" << HTML::getString(B2Vector3D(m_x, m_y, m_z));
+  stream << " <b>position</b>=" << HTML::getString(ROOT::Math::XYZVector(m_x, m_y, m_z));
   stream << "<br>";
 
   stream << " <b>p-value of fit</b> (if done): ";

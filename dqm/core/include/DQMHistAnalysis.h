@@ -69,6 +69,20 @@ namespace Belle2 {
      */
     static CanvasUpdatedList g_canvasup;
 
+    /**
+     * Number of Events processed to fill histograms.
+     * Attention: histograms are updates asynchronously
+     * Thus the number for a specific histogram may be lower or
+     * higher. If you need precise number, you must fill
+     * it in the histogram itself (e.g. underflow bin)
+     */
+    inline static int m_EventProcessed = 0;
+
+    /**
+     * The Run type.
+     */
+    inline static std::string m_RunType = "";
+
   public:
     /**
      * Get the list of the histograms.
@@ -93,6 +107,30 @@ namespace Belle2 {
      * @return The list of the canvases.
      */
     static const CanvasUpdatedList& getCanvasUpdatedList() { return g_canvasup;};
+
+    /**
+     * Get the Run Type.
+     * @return Run type string.
+     */
+    static const std::string& getRunType(void) { return m_RunType;};
+
+    /**
+     * Get the number of processed events. (Attention, asynch histogram updates!)
+     * @return Processed events.
+     */
+    static int getEventProcessed(void) { return m_EventProcessed;};
+
+    /**
+     * Set the Run Type.
+     * @par t Run type string.
+     */
+    void setRunType(std::string& t) {m_RunType = t;};
+
+    /**
+     * Set the number of processed events. (Attention, asynch histogram updates!)
+     * @par e Processed events.
+     */
+    void setEventProcessed(int e) {m_EventProcessed = e;};
 
     /**
      * Find canvas by name
@@ -203,6 +241,11 @@ namespace Belle2 {
      * @param updated was updated
      */
     void UpdateCanvas(std::string name, bool updated = true);
+
+    /**
+     * Extract event processed from daq histogram, called from input module
+     */
+    void ExtractEvent(void);
 
     // Public functions
   public:

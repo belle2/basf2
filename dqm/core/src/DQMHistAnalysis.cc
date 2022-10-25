@@ -87,6 +87,7 @@ TH1* DQMHistAnalysisModule::getDelta(const std::string& fullname, int n, bool on
   if (it != g_delta.end()) {
     return it->second->getDelta(n, onlyIfUpdated);
   }
+  B2WARNING("Delta hist " << fullname << " not found");
   return nullptr;
 }
 
@@ -146,6 +147,10 @@ TH1* DQMHistAnalysisModule::findHistInCanvas(const std::string& histo_name)
 {
   // parse the dir+histo name and create the corresponding canvas name
   auto s = StringSplit(histo_name, '/');
+  if (s.size() != 2) {
+    B2ERROR("findHistInCanvas: histoname not valid (missing dir?), should be 'dirname/histname': " << histo_name);
+    return nullptr;
+  }
   auto dirname = s.at(0);
   auto hname = s.at(1);
   std::string canvas_name = dirname + "/c_" + hname;
@@ -224,7 +229,14 @@ void DQMHistAnalysisModule::clearHistList(void)
   g_hist.clear();
 }
 
-void  DQMHistAnalysisModule::UpdateCanvas(std::string name, bool updated)
+void DQMHistAnalysisModule::UpdateCanvas(std::string name, bool updated)
 {
   g_canvasup[name] = updated;
 }
+
+void DQMHistAnalysisModule::ExtractEvent(void)
+{
+  auto hnevt = findHist("DAQ/Nevent");
+  m_EventProcessed = hnevt ? hnevt->GetEntries() : 0;
+}
+

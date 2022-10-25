@@ -121,8 +121,8 @@ void FillTrackFitNtupleModule::event()
       trk_px[pdgIter] = fitResult->getMomentum().X();
       trk_py[pdgIter] = fitResult->getMomentum().Y();
       trk_pz[pdgIter] = fitResult->getMomentum().Z();
-      trk_p[pdgIter] = fitResult->getMomentum().Mag();
-      trk_pt[pdgIter] = fitResult->getMomentum().Pt();
+      trk_p[pdgIter] = fitResult->getMomentum().R();
+      trk_pt[pdgIter] = fitResult->getMomentum().Rho();
       trk_theta[pdgIter] = fitResult->getMomentum().Theta() * TMath::RadToDeg();
       trk_phi[pdgIter] = fitResult->getMomentum().Phi() * TMath::RadToDeg();
       trk_charge[pdgIter] = fitResult->getChargeSign();

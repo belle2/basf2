@@ -15,6 +15,8 @@
 
 #include <framework/core/Module.h>
 
+#include <Math/Vector3D.h>
+
 #include <string>
 
 namespace Belle2 {
@@ -67,7 +69,7 @@ namespace Belle2 {
     std::string m_inclusiveParticle; /**< inclusive Particle */
     int m_maxTries; /**< Maximum number of tries for generating the parent particle */
     EvtId m_parentId; /**< EvtGen Id of the parent particle we want to generate */
-    TVector3 m_PrimaryVertex; /**< primary vertex incl. spread */
+    ROOT::Math::XYZVector m_PrimaryVertex; /**< primary vertex incl. spread */
 
   private:
 

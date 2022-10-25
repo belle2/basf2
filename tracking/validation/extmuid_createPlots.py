@@ -306,7 +306,7 @@ def draw_likelihoods(file_chain):
                 rchisq = -1.0
                 if ndof > 0:
                     rchisq = chisq / ndof
-                p = momentum.Mag()
+                p = momentum.R()
                 theta = momentum.Theta() * 180.0 / np.pi
                 phi = momentum.Phi() * 180.0 / np.pi
                 if phi < 0.0:

@@ -190,9 +190,9 @@ void BKLMAnaModule::event()
     // load the muon fit hypothesis or the hypothesis which is the clostes in mass to a muon
     // the tracking will not always fit a muon hypothesis
     const TrackFitResult* fitres = track->getTrackFitResultWithClosestMass(Belle2::Const::muon);
-    double mom = fitres->getMomentum().Mag();
+    double mom = fitres->getMomentum().R();
     //double  pt = fitres->getTransverseMomentum();
-    B2Vector3D p3 = fitres->getMomentum();
+    ROOT::Math::XYZVector p3 = fitres->getMomentum();
     double trkphi = p3.Phi() * TMath::RadToDeg();
     double trktheta = p3.Theta() * TMath::RadToDeg();
     if (trkphi < 0)

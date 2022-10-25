@@ -31,6 +31,7 @@
 #include <TPad.h>
 #include <TROOT.h>
 #include <TStyle.h>
+#include <Math/VectorUtil.h>
 
 #include <geometry/Materials.h>
 #include <G4Material.hh>
@@ -233,9 +234,9 @@ namespace Belle2 {
             originpe_y = mother->getVertex().Y();
             originpe_z = mother->getVertex().Z();
             originpe->Fill();
-            TVector3 momentum = mother->getMomentum();
-            if (m_BkgType.at(m_BkgType.size() - 3) == 'L') momentum.RotateY(0.0415);
-            else if (m_BkgType.at(m_BkgType.size() - 3) == 'H') momentum.RotateY(-0.0415);
+            ROOT::Math::XYZVector momentum = mother->getMomentum();
+            if (m_BkgType.at(m_BkgType.size() - 3) == 'L') ROOT::Math::VectorUtil::RotateY(momentum, 0.0415);
+            else if (m_BkgType.at(m_BkgType.size() - 3) == 'H') ROOT::Math::VectorUtil::RotateY(momentum, -0.0415);
             double px = momentum.X();
             double py = momentum.Y();
             double pt = sqrt(px * px + py * py);

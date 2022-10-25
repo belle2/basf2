@@ -11,6 +11,8 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <framework/logging/Logger.h>
 
+#include <TVector3.h>
+
 //c++
 #include <boost/foreach.hpp>
 #include <string>
@@ -104,8 +106,8 @@ void ReprocessorModule::event()
           particle->setStatus(MCParticle::c_PrimaryParticle);
           particle->setPDG(PDG);
           particle->setMassFromPDG();
-          particle->setMomentum(Momentum);
-          particle->setProductionVertex(ProductionVertex);
+          particle->setMomentum(ROOT::Math::XYZVector(Momentum));
+          particle->setProductionVertex(ROOT::Math::XYZVector(ProductionVertex));
           particle->setProductionTime(0.0);
           particle->setEnergy(energy);
           particle->setValidVertex(true);
@@ -127,8 +129,8 @@ void ReprocessorModule::event()
           particle->setStatus(MCParticle::c_PrimaryParticle);
           particle->setPDG(PDG);
           particle->setMassFromPDG();
-          particle->setMomentum(Momentum);
-          particle->setProductionVertex(ProductionVertex);
+          particle->setMomentum(ROOT::Math::XYZVector(Momentum));
+          particle->setProductionVertex(ROOT::Math::XYZVector(ProductionVertex));
           particle->setProductionTime(0.0);
           particle->setEnergy(energy);
           particle->setValidVertex(true);

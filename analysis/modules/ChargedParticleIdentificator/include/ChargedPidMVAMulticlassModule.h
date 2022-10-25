@@ -165,5 +165,27 @@ namespace Belle2 {
      */
     std::vector<std::string> m_classes;
 
+    /**
+     * Map with standard charged particles' info. For convenience.
+     */
+    std::map<int, std::string> m_stdChargedInfo = {
+      { Const::electron.getPDGCode(), "electron" },
+      { Const::muon.getPDGCode(), "muon" },
+      { Const::pion.getPDGCode(), "pion" },
+      { Const::kaon.getPDGCode(), "kaon" },
+      { Const::proton.getPDGCode(), "proton" },
+      { Const::deuteron.getPDGCode(), "deuteron" }
+    };
+
+    /**
+     * Set variable aliases needed by the MVA. Fallback to this if no aliases map found in payload.
+     */
+    void registerAliasesLegacy();
+
+    /**
+     * Set variable aliases needed by the MVA. Read from payload.
+     */
+    void registerAliases();
+
   };
 }

@@ -48,7 +48,7 @@ using namespace Belle2;
 /** shortcut for NaN of double type */
 static const double    realNaN = std::numeric_limits<double>::quiet_NaN();
 /** vector with NaN entries */
-static const B2Vector3D  vecNaN(realNaN, realNaN, realNaN);
+static const ROOT::Math::XYZVector vecNaN(realNaN, realNaN, realNaN);
 /** 3x3 matrix with NaN entries */
 static const TMatrixDSym matNaN(3, (double [])
 {
@@ -116,7 +116,7 @@ TagVertexModule::TagVertexModule() : Module(),
 void TagVertexModule::initialize()
 {
   // magnetic field
-  m_Bfield = BFieldManager::getFieldInTesla(m_BeamSpotCenter).Z();
+  m_Bfield = BFieldManager::getFieldInTesla(ROOT::Math::XYZVector(m_BeamSpotCenter)).Z();
   // RAVE setup
   analysis::RaveSetup::initialize(1, m_Bfield);
   B2INFO("TagVertexModule : magnetic field = " << m_Bfield);
@@ -290,7 +290,7 @@ bool TagVertexModule::doVertexFit(const Particle* Breco)
   else if (m_constraintType == "tube")  tie(m_constraintCenter, m_constraintCov) = findConstraintBTube(Breco, 200 * lB0);
   else if (m_constraintType == "boost") tie(m_constraintCenter, m_constraintCov) = findConstraintBoost(200 * lB0);
   else if (m_constraintType == "breco") tie(m_constraintCenter, m_constraintCov) = findConstraint(Breco, 200 * lB0);
-  else if (m_constraintType == "noConstraint") m_constraintCenter = B2Vector3D(); //zero vector
+  else if (m_constraintType == "noConstraint") m_constraintCenter = ROOT::Math::XYZVector(); //zero vector
   else  {
     B2ERROR("TagVertex: Invalid constraintType selected");
     return false;
@@ -342,7 +342,7 @@ bool TagVertexModule::doVertexFit(const Particle* Breco)
   return ok;
 }
 
-pair<B2Vector3D, TMatrixDSym> TagVertexModule::findConstraint(const Particle* Breco, double cut) const
+pair<ROOT::Math::XYZVector, TMatrixDSym> TagVertexModule::findConstraint(const Particle* Breco, double cut) const
 {
   if (Breco->getPValue() < 0.) return make_pair(vecNaN, matNaN);
 
@@ -352,7 +352,7 @@ pair<B2Vector3D, TMatrixDSym> TagVertexModule::findConstraint(const Particle* Br
   analysis::RaveSetup::getInstance()->setBeamSpot(m_BeamSpotCenter, beamSpotCov);
 
   double pmag = Breco->getMomentumMagnitude();
-  double xmag = (B2Vector3D(Breco->getVertex()) - m_BeamSpotCenter).Mag();
+  double xmag = (Breco->getVertex() - m_BeamSpotCenter).R();
 
 
   TMatrixDSym TerrMatrix = Breco->getMomentumVertexErrorMatrix();
@@ -386,7 +386,7 @@ pair<B2Vector3D, TMatrixDSym> TagVertexModule::findConstraint(const Particle* Br
 
   // Get expected pBtag 4-momentum using transverse-momentum conservation
   ROOT::Math::XYZVector BvertDiff = pmag * (Breco->getVertex() - BRecoRes->getVertex()).Unit();
-  ROOT::Math::PxPyPzMVector pBrecEstimate(BvertDiff.x(), BvertDiff.y(), BvertDiff.z(), Breco->getPDGMass());
+  ROOT::Math::PxPyPzMVector pBrecEstimate(BvertDiff.X(), BvertDiff.Y(), BvertDiff.Z(), Breco->getPDGMass());
   ROOT::Math::PxPyPzMVector pBtagEstimate = PCmsLabTransform::labToCms(pBrecEstimate);
   pBtagEstimate.SetPxPyPzE(-pBtagEstimate.px(), -pBtagEstimate.py(), -pBtagEstimate.pz(), pBtagEstimate.E());
   pBtagEstimate = PCmsLabTransform::cmsToLab(pBtagEstimate);
@@ -406,7 +406,7 @@ pair<B2Vector3D, TMatrixDSym> TagVertexModule::findConstraint(const Particle* Br
   return make_pair(m_BeamSpotCenter, toSymMatrix(Tube));
 }
 
-pair<B2Vector3D, TMatrixDSym> TagVertexModule::findConstraintBTube(const Particle* Breco, double cut)
+pair<ROOT::Math::XYZVector, TMatrixDSym> TagVertexModule::findConstraintBTube(const Particle* Breco, double cut)
 {
   //Use Breco as the creator of the B tube.
   if ((Breco->getVertexErrorMatrix()(2, 2)) == 0.0) {
@@ -446,8 +446,8 @@ pair<B2Vector3D, TMatrixDSym> TagVertexModule::findConstraintBTube(const Particl
     B2DEBUG(10, "Brec decay vertex after fit: " << printVector(tubecreatorBCopy->getVertex()));
     B2DEBUG(10, "Brec direction before fit: " << printVector(float(1. / Breco->getP()) * Breco->getMomentum()));
     B2DEBUG(10, "Brec direction after fit: " << printVector(float(1. / tubecreatorBCopy->getP()) * tubecreatorBCopy->getMomentum()));
-    B2DEBUG(10, "IP position: " << printVector(ROOT::Math::XYZVector(m_BeamSpotCenter.x(), m_BeamSpotCenter.y(),
-                                               m_BeamSpotCenter.z())));
+    B2DEBUG(10, "IP position: " << printVector(ROOT::Math::XYZVector(m_BeamSpotCenter.X(), m_BeamSpotCenter.Y(),
+                                               m_BeamSpotCenter.Z())));
     B2DEBUG(10, "IP covariance: " << printMatrix(m_BeamSpotCov));
     B2DEBUG(10, "Brec primary vertex: " << printVector(tubecreatorBCopy->getVertex()));
     B2DEBUG(10, "Brec PV covariance: " << printMatrix(pv));
@@ -487,10 +487,10 @@ pair<B2Vector3D, TMatrixDSym> TagVertexModule::findConstraintBTube(const Particl
   m_pvCov.ResizeTo(pv);
   m_pvCov = pv;
 
-  return make_pair(B2Vector3D(constraintCenter), toSymMatrix(pvNew));
+  return make_pair(constraintCenter, toSymMatrix(pvNew));
 }
 
-pair<B2Vector3D, TMatrixDSym> TagVertexModule::findConstraintBoost(double cut) const
+pair<ROOT::Math::XYZVector, TMatrixDSym> TagVertexModule::findConstraintBoost(double cut) const
 {
   double d = 20e-4; //average transverse distance flown by B0
 
@@ -507,15 +507,15 @@ pair<B2Vector3D, TMatrixDSym> TagVertexModule::findConstraintBoost(double cut) c
   TMatrixD Tube = TMatrixD(beamSpotCov) + longerrorRotated;
 
   // Standard algorithm needs no shift
-  B2Vector3D constraintCenter = m_BeamSpotCenter;
+  ROOT::Math::XYZVector constraintCenter = m_BeamSpotCenter;
 
-  return make_pair(constraintCenter,   toSymMatrix(Tube));
+  return make_pair(constraintCenter, toSymMatrix(Tube));
 }
 
 /** proper life time, i.e. in the rest system (in ps) */
 static double getProperLifeTime(const MCParticle* mc)
 {
-  double beta = mc->getMomentum().Mag() / mc->getEnergy();
+  double beta = mc->getMomentum().R() / mc->getEnergy();
   return 1e3 * mc->getLifetime() * sqrt(1 - pow(beta, 2));
 }
 
@@ -550,8 +550,8 @@ void TagVertexModule::BtagMCVertex(const Particle* Breco)
 
   //both matched -> use closest vertex dist as Reco
   if (isReco(mcBs[0]) && isReco(mcBs[1])) {
-    double dist0 = (mcBs[0]->getDecayVertex() - B2Vector3D(Breco->getVertex())).Mag2();
-    double dist1 = (mcBs[1]->getDecayVertex() - B2Vector3D(Breco->getVertex())).Mag2();
+    double dist0 = (mcBs[0]->getDecayVertex() - Breco->getVertex()).Mag2();
+    double dist1 = (mcBs[1]->getDecayVertex() - Breco->getVertex()).Mag2();
     if (dist0 > dist1)
       swap(mcBs[0], mcBs[1]);
   }
@@ -660,7 +660,7 @@ void TagVertexModule::fillParticles(vector<ParticleAndWeight>& particleAndWeight
   }
 }
 
-void TagVertexModule::fillTagVinfo(const B2Vector3D& tagVpos, const TMatrixDSym& tagVposErr)
+void TagVertexModule::fillTagVinfo(const ROOT::Math::XYZVector& tagVpos, const TMatrixDSym& tagVposErr)
 {
   m_tagV = tagVpos;
 
@@ -731,7 +731,7 @@ bool TagVertexModule::makeGeneralFitRave()
   fillParticles(particleAndWeights);
 
   //if the fit is good, save the infos related to the vertex
-  fillTagVinfo(rFit.getPos(0), rFit.getCov(0));
+  fillTagVinfo(ROOT::Math::XYZVector(rFit.getPos(0)), rFit.getCov(0));
 
   //fill quality variables
   m_tagVNDF = rFit.getNdf(0);
@@ -842,14 +842,14 @@ bool TagVertexModule::makeGeneralFitKFit()
   // iterative procedure which removes tracks with high chi2
   for (int iteration_counter = 0; iteration_counter < 100; ++iteration_counter) {
     analysis::VertexFitKFit kFitTemp =  doSingleKfit(particleAndWeights);
-    if (!kFitTemp.isFitted())
+    if (!kFitTemp.isFitted() || isnan(kFitTemp.getCHIsq()))
       return false;
 
     double reduced_chi2 =  kFitTemp.getCHIsq() / kFitTemp.getNDF();
     int nTracks = kFitTemp.getTrackCount();
 
     if (nTracks != int(particleAndWeights.size()))
-      B2FATAL("TagVertexModule: Different number of tracks in kFit and particles");
+      B2ERROR("TagVertexModule: Different number of tracks in kFit and particles");
 
     if (reduced_chi2 <= m_kFitReqReducedChi2 ||  nTracks <= 1  || (nTracks <= 2 && m_constraintType == "noConstraint")) {
       kFit = kFitTemp;
@@ -859,7 +859,7 @@ bool TagVertexModule::makeGeneralFitKFit()
       if (0 <= badTrackID && badTrackID < int(particleAndWeights.size()))
         particleAndWeights.erase(particleAndWeights.begin() + badTrackID);
       else
-        B2FATAL("TagVertexModule: Obtained badTrackID is not within limits");
+        B2ERROR("TagVertexModule: Obtained badTrackID is not within limits");
     }
 
   }
@@ -883,17 +883,17 @@ void TagVertexModule::deltaT(const Particle* Breco)
 {
 
   B2Vector3D boost = PCmsLabTransform().getBoostVector();
-  B2Vector3D boostDir = boost.Unit();
+  ROOT::Math::XYZVector boostDir = ROOT::Math::XYZVector(boost.Unit());
   double bg = boost.Mag() / sqrt(1 - boost.Mag2());
   double c = Const::speedOfLight / 1000.; // cm ps-1
 
   //Reconstructed DeltaL & DeltaT in the boost direction
-  B2Vector3D dVert = B2Vector3D(Breco->getVertex()) - m_tagV; //reconstructed vtxReco - vtxTag
+  ROOT::Math::XYZVector dVert = Breco->getVertex() - m_tagV; //reconstructed vtxReco - vtxTag
   double dl = dVert.Dot(boostDir);
   m_deltaT  = dl / (bg * c);
 
   //Truth DeltaL & approx DeltaT in the boost direction
-  B2Vector3D MCdVert = m_mcVertReco - m_mcTagV;   //truth vtxReco - vtxTag
+  ROOT::Math::XYZVector MCdVert = m_mcVertReco - m_mcTagV;   //truth vtxReco - vtxTag
   double MCdl = MCdVert.Dot(boostDir);
   m_mcDeltaT = MCdl / (bg * c);
 
@@ -902,7 +902,7 @@ void TagVertexModule::deltaT(const Particle* Breco)
   if (m_mcLifeTimeReco  == -1 || m_mcTagLifeTime == -1)
     m_mcDeltaTau =  realNaN;
 
-  TVectorD bVec = toVec(boostDir);
+  TVectorD bVec = toVec(B2Vector3D(boostDir));
 
   //TagVertex error in boost dir
   m_tagVlErr = sqrt(m_tagVErrMatrix.Similarity(bVec));
@@ -917,7 +917,7 @@ void TagVertexModule::deltaT(const Particle* Breco)
   m_truthTagVl = m_mcTagV.Dot(boostDir);
 
   // calculate tagV component and error in the direction orthogonal to the boost
-  B2Vector3D oboost = getUnitOrthogonal(boostDir);
+  B2Vector3D oboost = getUnitOrthogonal(B2Vector3D(boostDir));
   TVectorD oVec = toVec(oboost);
 
   //TagVertex error in boost-orthogonal dir
@@ -969,11 +969,11 @@ TrackFitResult TagVertexModule::getTrackWithTrueCoordinates(ParticleAndWeight co
 }
 
 // static
-B2Vector3D TagVertexModule::getTruePoca(ParticleAndWeight const& paw)
+ROOT::Math::XYZVector TagVertexModule::getTruePoca(ParticleAndWeight const& paw)
 {
   if (!paw.mcParticle) {
     B2ERROR("In TagVertexModule::getTruePoca: no MC particle set");
-    return B2Vector3D(0., 0., 0.);
+    return ROOT::Math::XYZVector(0., 0., 0.);
   }
 
   return DistanceTools::poca(paw.mcParticle->getProductionVertex(),
@@ -994,14 +994,14 @@ TrackFitResult TagVertexModule::getTrackWithRollBackCoordinates(ParticleAndWeigh
                         m_Bfield, 0, 0, tfr->getNDF());
 }
 
-B2Vector3D TagVertexModule::getRollBackPoca(ParticleAndWeight const& paw)
+ROOT::Math::XYZVector TagVertexModule::getRollBackPoca(ParticleAndWeight const& paw)
 {
   if (!paw.mcParticle) {
     B2ERROR("In TagVertexModule::getTruePoca: no MC particle set");
-    return B2Vector3D(0., 0., 0.);
+    return ROOT::Math::XYZVector(0., 0., 0.);
   }
 
-  return paw.particle->getTrackFitResult()->getPosition() - B2Vector3D(paw.mcParticle->getProductionVertex()) + m_mcTagV;
+  return paw.particle->getTrackFitResult()->getPosition() - paw.mcParticle->getProductionVertex() + ROOT::Math::XYZVector(m_mcTagV);
 }
 
 void TagVertexModule::resetReturnParams()
@@ -1044,7 +1044,7 @@ std::string TagVertexModule::printVector(const ROOT::Math::XYZVector& vec)
 {
   std::ostringstream oss;
   int w = 14;
-  oss << "(" << std::setw(w) << vec.x() << ", " << std::setw(w) << vec.y() << ", " << std::setw(w) << vec.z() << ")" << std::endl;
+  oss << "(" << std::setw(w) << vec.X() << ", " << std::setw(w) << vec.Y() << ", " << std::setw(w) << vec.Z() << ")" << std::endl;
   return oss.str();
 }
 

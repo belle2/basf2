@@ -17,6 +17,9 @@ from variables import variables as vm
 from ROOT import TFile
 
 
+basf2.set_random_seed('aSeed')
+
+
 class TestTreeFits(unittest.TestCase):
     """The unit test case for TreeFitter"""
 

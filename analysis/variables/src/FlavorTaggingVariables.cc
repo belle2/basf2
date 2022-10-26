@@ -1945,8 +1945,9 @@ namespace Belle2 {
           if (!iParticle) continue;
 
           if (categoryName == "MaximumPstar") {
-            bool targetFlag = std::get<bool>(manager.getVariable("hasHighestProbInCat(pi+:inRoe, isRightTrack(MaximumPstar))")->function(
-                                               iParticle));
+            static Manager::FunctionPtr selectionFunction =
+            hasHighestProbInCat({"pi+:inRoe", "isRightTrack(MaximumPstar)"});
+            bool targetFlag = std::get<bool>(selectionFunction(iParticle));
             if (targetFlag) {
               particlesHaveMCAssociated = true;
               ++nTargets;
@@ -2019,7 +2020,9 @@ namespace Belle2 {
           if (!iParticle) continue;
 
           if (categoryName == "MaximumPstar") {
-            if (std::get<bool>(manager.getVariable("hasHighestProbInCat(pi+:inRoe, isRightTrack(MaximumPstar))")->function(iParticle)))
+            static Manager::FunctionPtr selectionFunction =
+            hasHighestProbInCat({"pi+:inRoe", "isRightTrack(MaximumPstar)"});
+            if (std::get<bool>(selectionFunction(iParticle)))
               targetParticles.push_back(iParticle);
           } else if (std::get<int>(manager.getVariable("isRightTrack(" + trackTargetName + ")")->function(iParticle))) {
             targetParticles.push_back(iParticle);

@@ -363,7 +363,7 @@ namespace Belle2 {
                       Cosine of the helicity angle between the momentum of the provided particle and the momentum of the first selected
                       daughter (i-th) in the reference frame of the sum of two selected daughters (i-th + j-th).
 
-                      The variable is supposed to use for the analysis of the quasi-two-body decay. The number of daughters of the given 
+                      The variable is supposed to be used for the analysis of a quasi-two-body decay. The number of daughters of the given 
                       particle must be three. Otherwise, the variable returns NaN.
 
                       For example, in the decay :math:`\bar{B}^0 \to D^+ K^- K^{*0}`, if the provided particle is :math:`\bar{B}^0` and

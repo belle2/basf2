@@ -111,8 +111,6 @@ void ChargedPidMVAMulticlassModule::event()
 
       const Particle* particle = (m_nSelectedDaughters > 0) ? targetParticles[ipart] : pList->getParticle(ipart);
 
-      B2DEBUG(11, "\tParticle [" << ipart << "]");
-
       // Retrieve the index for the correct MVA expert and dataset,
       // given the reconstructed (clusterTheta(theta), p, charge)
       auto* thVar = Variable::Manager::Instance().getVariable("conditionalVariableSelector(clusterTrackMatch == 1, clusterTheta, theta)");
@@ -127,17 +125,29 @@ void ChargedPidMVAMulticlassModule::event()
       const auto cuts   = (*m_weightfiles_representation.get())->getCutsMulticlass();
       const auto cutstr = (!cuts->empty()) ? cuts->at(index) : "";
 
-      B2DEBUG(11, "\t\tclusterTheta(theta) = " << theta << " [rad]");
-      B2DEBUG(11, "\t\ttheta = " << theta << " [rad]");
-      B2DEBUG(11, "\t\tp = " << p << " [GeV/c]");
-      if (!m_charge_independent) {
-        B2DEBUG(11, "\t\tcharge = " << charge);
-      }
-      B2DEBUG(11, "\t\tBrems corrected = " << particle->hasExtraInfo("bremsCorrectedPhotonEnergy"));
-      B2DEBUG(11, "\t\tWeightfile idx = " << index << " - (theta, p, charge) = (" << idx_theta << ", " << idx_p << ", " <<
-              idx_charge << ")");
-      if (!cutstr.empty()) {
-        B2DEBUG(11, "\t\tCategory cut = " << cutstr);
+      if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 11)) {
+
+        auto* matchVar = Variable::Manager::Instance().getVariable("clusterTrackMatch");
+        auto hasMatch = std::isnormal(std::get<double>(matchVar->function(particle)));
+
+        std::string debugStr = "\n";
+        debugStr += ("Particle [" + std::to_string(ipart) + "]\n");
+        debugStr += ("Has ECL cluster match? " + std::to_string(hasMatch) + "\n");
+        std::string whichTheta = (hasMatch) ? "clusterTheta" : "theta";
+        debugStr += (whichTheta + " = " + std::to_string(theta) + " [rad]\n");
+        debugStr += ("p = " + std::to_string(p) + " [GeV/c]\n");
+        if (!m_charge_independent) {
+          debugStr += ("charge = " + std::to_string(charge) + "\n");
+        }
+        debugStr += ("Is brems corrected ? " + std::to_string(particle->hasExtraInfo("bremsCorrected")) + "\n");
+        debugStr += ("Weightfile idx = " + std::to_string(index) + " - (" + whichTheta + ", p, charge) = (" + std::to_string(
+                       idx_theta) + ", " + std::to_string(idx_p) + ", " +
+                     std::to_string(idx_charge) + ")\n");
+        if (!cutstr.empty()) {
+          debugStr += ("Category cut: " + cutstr + "\n");
+        }
+        B2DEBUG(11, debugStr);
+
       }
 
       // Fill the MVA::SingleDataset w/ variables and spectators.

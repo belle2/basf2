@@ -234,6 +234,12 @@ void DQMHistAnalysisModule::UpdateCanvas(std::string name, bool updated)
   g_canvasup[name] = updated;
 }
 
+void DQMHistAnalysisModule::ExtractRunType(void)
+{
+  auto runtype = findHist("DQMInfo/rtype");
+  m_RunType = runtype ? runtype->GetTitle() : "";
+}
+
 void DQMHistAnalysisModule::ExtractEvent(void)
 {
   auto hnevt = findHist("DAQ/Nevent");

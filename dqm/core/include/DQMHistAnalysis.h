@@ -243,6 +243,11 @@ namespace Belle2 {
     void UpdateCanvas(std::string name, bool updated = true);
 
     /**
+     * Extract Run Type from histogram title, called from input module
+     */
+    void ExtractRunType(void);
+
+    /**
      * Extract event processed from daq histogram, called from input module
      */
     void ExtractEvent(void);

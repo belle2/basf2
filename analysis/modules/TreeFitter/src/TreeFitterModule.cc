@@ -146,16 +146,16 @@ void TreeFitterModule::event()
   }
 
   std::vector<unsigned int> toRemove;
-  const unsigned int n = m_plist->getListSize();
-  m_nCandidatesBeforeFit += n;
+  const unsigned int nParticles = m_plist->getListSize();
+  m_nCandidatesBeforeFit += nParticles;
 
   TMatrixFSym dummyCovMatrix(7);
   for (int row = 0; row < 7; ++row) { //diag
     dummyCovMatrix(row, row) = 10000;
   }
 
-  for (unsigned i = 0; i < n; i++) {
-    Belle2::Particle* particle = m_plist->getParticle(i);
+  for (unsigned iPart = 0; iPart < nParticles; iPart++) {
+    Belle2::Particle* particle = m_plist->getParticle(iPart);
 
     if (m_updateDaughters == true) {
       ParticleCopy::copyDaughters(particle);
@@ -177,6 +177,20 @@ void TreeFitterModule::event()
       B2ERROR(e.what());
     }
 
+    // revert the momentum scaling factor to 1
+    if (m_updateDaughters == true) {
+
+      std::function<void(Particle*)> funcUpdateMomentumScaling =
+      [&funcUpdateMomentumScaling](Particle * part) {
+        part->setMomentumScalingFactor(1.0);
+        for (auto daughter : part->getDaughters()) {
+          funcUpdateMomentumScaling(daughter);
+        }
+      };
+
+      funcUpdateMomentumScaling(particle);
+    }
+
     if (particle->getPValue() < m_confidenceLevel) {
       toRemove.push_back(particle->getArrayIndex());
     }
@@ -184,6 +198,8 @@ void TreeFitterModule::event()
   }
   m_plist->removeParticles(toRemove);
   m_nCandidatesAfter += m_plist->getListSize();
+
+
 }
 
 

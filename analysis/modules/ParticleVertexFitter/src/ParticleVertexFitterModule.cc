@@ -143,10 +143,12 @@ void ParticleVertexFitterModule::event()
   if ((m_vertexFitter == "Rave") && (m_withConstraint == "ipprofile" || m_withConstraint == "iptube"
                                      || m_withConstraint == "mother" || m_withConstraint == "iptubecut" || m_withConstraint == "btube"))
     analysis::RaveSetup::getInstance()->setBeamSpot(m_BeamSpotCenter, m_beamSpotCov);
+
   std::vector<unsigned int> toRemove;
-  unsigned int n = m_plist->getListSize();
-  for (unsigned i = 0; i < n; i++) {
-    Particle* particle = m_plist->getParticle(i);
+  unsigned int nParticles = m_plist->getListSize();
+
+  for (unsigned iPart = 0; iPart < nParticles; iPart++) {
+    Particle* particle = m_plist->getParticle(iPart);
     m_hasCovMatrix = false;
     if (m_updateDaughters == true) {
       if (m_decayString.empty() || m_vertexFitter == "KFit")
@@ -168,6 +170,7 @@ void ParticleVertexFitterModule::event()
         }
       }
     }
+
     bool hasTube = true;
     if (m_withConstraint == "btube") {
       Btube* Ver = particle->getRelatedTo<Btube>();
@@ -187,6 +190,23 @@ void ParticleVertexFitterModule::event()
       particle->setPValue(-1);
     if (particle->getPValue() < m_confidenceLevel)
       toRemove.push_back(particle->getArrayIndex());
+
+
+    // revert the momentum scaling factor to 1
+    if (m_updateDaughters == true) {
+
+      std::function<void(Particle*)> funcUpdateMomentumScaling =
+      [&funcUpdateMomentumScaling](Particle * part) {
+        part->setMomentumScalingFactor(1.0);
+        for (auto daughter : part->getDaughters()) {
+          funcUpdateMomentumScaling(daughter);
+        }
+      };
+
+      funcUpdateMomentumScaling(particle);
+    }
+
+
   }
   m_plist->removeParticles(toRemove);
 
@@ -895,8 +915,12 @@ bool ParticleVertexFitterModule::makeKVertexMother(analysis::VertexFitKFit& kv,
       if (includeFitChildren) {
         // Using updated daughters, update part's momentum
         ROOT::Math::PxPyPzEVector sum4Vector;
-        for (auto daughter : part->getDaughters())
-          sum4Vector += daughter->get4Vector();
+        for (auto daughter : part->getDaughters()) {
+          auto copy = ParticleCopy::copyParticle(daughter);
+          copy->setMomentumScalingFactor(1.0);
+
+          sum4Vector += copy->get4Vector();
+        }
 
         part->set4Vector(sum4Vector);
       }

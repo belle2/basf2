@@ -208,8 +208,8 @@ void EVEVisualization::addTrackCandidate(const std::string& collectionName,
 
 
   //track seeds
-  TVector3 track_pos = recoTrack.getPositionSeed();
-  TVector3 track_mom = recoTrack.getMomentumSeed();
+  const B2Vector3D& track_pos = recoTrack.getPositionSeed();
+  const B2Vector3D& track_mom = recoTrack.getMomentumSeed();
 
   TEveStraightLineSet* lines = new TEveStraightLineSet("RecoHits for " + label);
   lines->SetMainColor(c_recoTrackColor);

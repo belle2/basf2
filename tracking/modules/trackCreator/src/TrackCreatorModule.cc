@@ -103,8 +103,8 @@ void TrackCreatorModule::event()
       // Otherwise fits them with the default fitter.
       B2DEBUG(25, "Trying to fit with PDG = " << pdg);
       B2DEBUG(25, "PDG hypothesis: " << pdg << "\tMomentum cut: " << m_trackFitMomentumRange->getMomentumRange(
-                pdg) << "\tSeed p: " << recoTrack.getMomentumSeed().Mag());
-      if (recoTrack.getMomentumSeed().Mag() <= m_trackFitMomentumRange->getMomentumRange(pdg)) {
+                pdg) << "\tSeed p: " << recoTrack.getMomentumSeed().R());
+      if (recoTrack.getMomentumSeed().R() <= m_trackFitMomentumRange->getMomentumRange(pdg)) {
         trackFitter.fit(recoTrack, Const::ParticleType(abs(pdg)));
       }
     }

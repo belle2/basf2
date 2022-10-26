@@ -147,7 +147,7 @@ void FillTrackFitNtupleModule::event()
     Float_t buffer[] = {event_num, event_run, event_exp, event_prod,
                         nhits, ncdc, npxd, nsvd,
                         (Float_t)recoTrack->getPositionSeed().X(), (Float_t)recoTrack->getPositionSeed().Y(), (Float_t)recoTrack->getPositionSeed().Z(),
-                        (Float_t)recoTrack->getMomentumSeed().X(), (Float_t)recoTrack->getMomentumSeed().Y(), (Float_t)recoTrack->getMomentumSeed().Z(), (Float_t)recoTrack->getMomentumSeed().Mag(), (Float_t)recoTrack->getMomentumSeed().Perp(),
+                        (Float_t)recoTrack->getMomentumSeed().X(), (Float_t)recoTrack->getMomentumSeed().Y(), (Float_t)recoTrack->getMomentumSeed().Z(), (Float_t)recoTrack->getMomentumSeed().R(), (Float_t)recoTrack->getMomentumSeed().Rho(),
                         (Float_t)(recoTrack->getMomentumSeed().Theta()* TMath::RadToDeg()), (Float_t)(recoTrack->getMomentumSeed().Phi()* TMath::RadToDeg()), (Float_t)recoTrack->getChargeSeed(),
                         nhits_pid[Const::pion], ncdc_pid[Const::pion], npxd_pid[Const::pion], nsvd_pid[Const::pion],
                         nhits_pid[Const::kaon], ncdc_pid[Const::kaon], npxd_pid[Const::kaon], nsvd_pid[Const::kaon],

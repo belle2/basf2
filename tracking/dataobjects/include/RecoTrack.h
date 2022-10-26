@@ -16,6 +16,8 @@
 
 #include <tracking/dataobjects/RecoHitInformation.h>
 
+#include <Math/Vector3D.h>
+
 #include <optional>
 #include <string>
 #include <vector>
@@ -143,7 +145,7 @@ namespace Belle2 {
        * @param storeArrayNameOfEKLMHits The name of the store array where the related pxd hits are stored.
        * @param storeArrayNameOfRecoHitInformation The name of the store array where the related hit information are stored.
        */
-    RecoTrack(const TVector3& seedPosition, const TVector3& seedMomentum, const short int seedCharge,
+    RecoTrack(const ROOT::Math::XYZVector& seedPosition, const ROOT::Math::XYZVector& seedMomentum, const short int seedCharge,
               const std::string& storeArrayNameOfCDCHits = "",
               const std::string& storeArrayNameOfSVDHits = "",
               const std::string& storeArrayNameOfPXDHits = "",
@@ -191,8 +193,8 @@ namespace Belle2 {
      * Append a new RecoTrack to the given store array and copy its general properties, but not the hits themself.
      * The position, momentum, charge etc. are set to the given parameters.
      */
-    RecoTrack* copyToStoreArrayUsing(StoreArray<RecoTrack>& storeArray, const TVector3& position,
-                                     const TVector3& momentum, short charge,
+    RecoTrack* copyToStoreArrayUsing(StoreArray<RecoTrack>& storeArray, const ROOT::Math::XYZVector& position,
+                                     const ROOT::Math::XYZVector& momentum, short charge,
                                      const TMatrixDSym& covariance, double timeSeed) const;
 
     /**
@@ -469,17 +471,17 @@ namespace Belle2 {
 
     // Seed Helix Functionality
     /// Return the position seed stored in the reco track. ATTENTION: This is not the fitted position.
-    TVector3 getPositionSeed() const
+    ROOT::Math::XYZVector getPositionSeed() const
     {
       const TVectorD& seed = m_genfitTrack.getStateSeed();
-      return TVector3(seed(0), seed(1), seed(2));
+      return ROOT::Math::XYZVector(seed(0), seed(1), seed(2));
     }
 
     /// Return the momentum seed stored in the reco track. ATTENTION: This is not the fitted momentum.
-    TVector3 getMomentumSeed() const
+    ROOT::Math::XYZVector getMomentumSeed() const
     {
       const TVectorD& seed = m_genfitTrack.getStateSeed();
-      return TVector3(seed(3), seed(4), seed(5));
+      return ROOT::Math::XYZVector(seed(3), seed(4), seed(5));
     }
 
     /// Return the state seed in the form posX, posY, posZ, momX, momY, momZ. ATTENTION: This is not the fitted state.
@@ -495,12 +497,12 @@ namespace Belle2 {
     double getTimeSeed() const { return m_genfitTrack.getTimeSeed(); }
 
     /// Return the position, the momentum and the charge of the first measured state on plane or - if unfitted - the seeds.
-    std::tuple<TVector3, TVector3, short> extractTrackState() const;
+    std::tuple<ROOT::Math::XYZVector, ROOT::Math::XYZVector, short> extractTrackState() const;
 
     /// Set the position and momentum seed of the reco track. ATTENTION: This is not the fitted position or momentum.
-    void setPositionAndMomentum(const TVector3& positionSeed, const TVector3& momentumSeed)
+    void setPositionAndMomentum(const ROOT::Math::XYZVector& positionSeed, const ROOT::Math::XYZVector& momentumSeed)
     {
-      m_genfitTrack.setStateSeed(positionSeed, momentumSeed);
+      m_genfitTrack.setStateSeed(XYZToTVector(positionSeed), XYZToTVector(momentumSeed));
       deleteFittedInformation();
     }
 
@@ -590,7 +592,7 @@ namespace Belle2 {
     /** Return genfit's MasuredStateOnPlane, that is closest to the given point
      * useful for extrapolation of measurements other locations
      */
-    const genfit::MeasuredStateOnPlane& getMeasuredStateOnPlaneClosestTo(const TVector3& closestPoint,
+    const genfit::MeasuredStateOnPlane& getMeasuredStateOnPlaneClosestTo(const ROOT::Math::XYZVector& closestPoint,
         const genfit::AbsTrackRep* representation = nullptr);
 
     /** Prune the genfit track, e.g. remove all track points with measurements, but the first and the last one.
@@ -919,6 +921,8 @@ namespace Belle2 {
         B2DEBUG(100, "Dirty flag is set. The result may not be in sync with the latest changes. Refit the track to be sure.");
       }
     }
+
+    static constexpr auto XYZToTVector = [](const ROOT::Math::XYZVector& a) {return TVector3(a.X(), a.Y(), a.Z());};
 
     /** Making this class a ROOT class.*/
     ClassDefOverride(RecoTrack, 11);

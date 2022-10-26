@@ -41,15 +41,15 @@ bool CDCStateBasicVarSet::extract(const BaseCDCStateFilter::Object* pair)
   var<named("wire_x")>() = wirePos.x();
   var<named("wire_y")>() = wirePos.y();
 
-  TVector3 seedPos = seedRecoTrack->getPositionSeed();
-  TVector3 seedMom = seedRecoTrack->getMomentumSeed();
+  ROOT::Math::XYZVector seedPos = seedRecoTrack->getPositionSeed();
+  ROOT::Math::XYZVector seedMom = seedRecoTrack->getMomentumSeed();
   var<named("seed_theta")>() = seedMom.Theta() * 180. / M_PI;
-  var<named("seed_r")>() = seedPos.Perp();
+  var<named("seed_r")>() = seedPos.Rho();
   var<named("seed_z")>() = seedPos.Z();
   var<named("seed_x")>() = seedPos.X();
   var<named("seed_y")>() = seedPos.Y();
-  var<named("seed_p")>() = seedMom.Mag();
-  var<named("seed_pt")>() = seedMom.Perp();
+  var<named("seed_p")>() = seedMom.R();
+  var<named("seed_pt")>() = seedMom.Rho();
   var<named("seed_pz")>() = seedMom.Z();
   var<named("seed_px")>() = seedMom.X();
   var<named("seed_py")>() = seedMom.Y();

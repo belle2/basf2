@@ -29,14 +29,25 @@ import tracking as trk
 import simulation as sim
 import glob
 # import sys
-# import argparse
+import argparse
 # import os
 
 # useSimulation = True
 useSimulation = False
 
+b2.set_log_level(b2.LogLevel.DEBUG)
+b2.set_debug_level(40)
+
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument("--fileDir", default="./",
+                    help="Output File Dir")
+parser.add_argument("--fileTag", default="test",
+                    help="Output File Tag")
+args = parser.parse_args()
+b2.B2INFO(f"Steering file args = {args}")
+
 # set this string to identify the output rootfiles
-ftag = "_test"
+ftag = "_" + args.fileTag
 
 main = b2.create_path()
 
@@ -120,7 +131,7 @@ skimfilter.if_value('=1', filter_path, b2.AfterConditionPath.CONTINUE)
 
 # fill TTrees
 # main.add_module('SVDPerformanceTTree', outputFileName="SVDPerformanceTree"+str(tag)+".root")
-main.add_module('SVDEventT0PerformanceTTree', outputFileName="SVDEventT0PerformanceTTree"+str(ftag)+".root")
+main.add_module('SVDEventT0PerformanceTTree', outputFileName=str(args.fileDir)+"SVDEventT0PerformanceTTree"+str(ftag)+".root")
 
 # # write everything
 # main.add_module('OverlapResiduals', ExpertLevel=True)

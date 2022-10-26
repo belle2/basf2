@@ -350,7 +350,7 @@ def submit_jobs(skims, samples, nEventsPerSample, DryRun, *, CombinedSkimDefinit
 
             #arguments = [*bsub_arguments, *basf2_arguments]
             command = " ".join([quote(str(arg)) for arg in bsub_arguments])
-            command += " \" " + " ulimit -v 10000000 && ulimit -m 2090000 && ulimit -a && " + " ".join([quote(str(arg)) for arg in basf2_arguments]) + " \" "
+            command += " \" " + " ulimit -v 10000000 && ulimit -a && " + " ".join([quote(str(arg)) for arg in basf2_arguments]) + " \" "
             if DryRun:
                 #print(" ".join([quote(str(arg)) for arg in arguments]) + "\n")
                 print(command + "\n")

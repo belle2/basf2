@@ -11,7 +11,6 @@
 //ANALYSIS
 #include <mva/interface/Interface.h>
 #include <mva/methods/TMVA.h>
-#include <analysis/VariableManager/Utility.h>
 #include <analysis/dataobjects/Particle.h>
 
 //MDST
@@ -128,10 +127,6 @@ void ChargedPidMVAMulticlassModule::event()
       int idx_theta, idx_p, idx_charge;
       auto index = (*m_weightfiles_representation.get())->getMVAWeightIdx(clusterTheta, p, charge, idx_theta, idx_p, idx_charge);
 
-      // Get the cut defining the MVA category under exam (this reflects the one used in the training).
-      const auto cuts   = (*m_weightfiles_representation.get())->getCutsMulticlass();
-      const auto cutstr = (!cuts->empty()) ? cuts->at(index) : "";
-
       B2DEBUG(11, "\t\tclusterTheta    = " << clusterTheta << " [rad]");
       B2DEBUG(11, "\t\tp               = " << p << " [GeV/c]");
       if (!m_charge_independent) {
@@ -140,9 +135,6 @@ void ChargedPidMVAMulticlassModule::event()
       B2DEBUG(11, "\t\tBrems corrected = " << particle->hasExtraInfo("bremsCorrectedPhotonEnergy"));
       B2DEBUG(11, "\t\tWeightfile idx  = " << index << " - (clusterTheta, p, charge) = (" << idx_theta << ", " << idx_p << ", " <<
               idx_charge << ")");
-      if (!cutstr.empty()) {
-        B2DEBUG(11, "\t\tCategory cut    = " << cutstr);
-      }
 
       // Fill the MVA::SingleDataset w/ variables and spectators.
 
@@ -200,11 +192,9 @@ void ChargedPidMVAMulticlassModule::event()
       }
 
       // Compute MVA score only if particle fulfils category selection.
-      if (!cutstr.empty()) {
+      if (m_cuts[index] != nullptr) {
 
-        std::unique_ptr<Variable::Cut> cut = Variable::Cut::compile(cutstr);
-
-        if (!cut->check(particle)) {
+        if (!m_cuts[index]->check(particle)) {
           B2DEBUG(11, "\t\tParticle didn't pass MVA category cut, skip MVA application...");
           continue;
         }
@@ -408,4 +398,16 @@ void ChargedPidMVAMulticlassModule::initializeMVA()
 
     }
   }
+  // Compile cuts.
+  const std::vector<std::string>* cuts =
+    (*m_weightfiles_representation.get())->getCutsMulticlass();
+  unsigned int nMVAWeightIndices =
+    (*m_weightfiles_representation.get())->getNMVAWeightIndices();
+  m_cuts.resize(nMVAWeightIndices);
+  if (cuts->empty()) {
+    for (unsigned int i = 0; i < nMVAWeightIndices; ++i)
+      m_cuts[i] = nullptr;
+  }
+  for (unsigned int i = 0; i < nMVAWeightIndices; ++i)
+    m_cuts[i] = Variable::Cut::compile((*cuts)[i]);
 }

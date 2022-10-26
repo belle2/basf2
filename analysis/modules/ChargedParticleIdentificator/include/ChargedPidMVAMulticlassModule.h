@@ -22,6 +22,7 @@
 // ANALYSIS
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/VariableManager/Manager.h>
+#include <analysis/VariableManager/Utility.h>
 #include <analysis/dbobjects/ChargedPidMVAWeights.h>
 
 namespace Belle2 {
@@ -169,6 +170,9 @@ namespace Belle2 {
      * List of MVA class names.
      */
     std::vector<std::string> m_classes;
+
+    /** Cuts. */
+    std::vector<std::unique_ptr<Variable::Cut>> m_cuts;
 
     /**
      * Map with standard charged particles' info. For convenience.

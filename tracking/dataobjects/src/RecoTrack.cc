@@ -650,6 +650,7 @@ void RecoTrack::calculateArmTime()
   float detIDpost = NAN;
   int nSVD = 0;
   float clsTimeSum = 0;
+  float clsTimeSigma2Sum = 0;
   std::string arm = "";
   bool trackArmTimeDONE = false;
   for (int i = 0; i < (int)recoHits.size(); i ++) {
@@ -665,14 +666,23 @@ void RecoTrack::calculateArmTime()
     RelationVector<SVDCluster> svdClusters = recoHits[i]->getRelationsTo<SVDCluster>();
     if (detID == 1) {
       clsTimeSum += svdClusters[0]->getClsTime();
+      clsTimeSigma2Sum += svdClusters[0]->getClsTimeSigma() * svdClusters[0]->getClsTimeSigma();
       nSVD += 1;
       svdDONE = true;
     } else {
       if (svdDONE && nSVD != 0) {
         detIDpost = detID;
         arm = trackArmDirection(detIDpre, detIDpost);
-        if (arm == "IN") m_ingoingArmTime = clsTimeSum / nSVD;
-        if (arm == "OUT") m_outgoingArmTime = clsTimeSum / nSVD;
+        if (arm == "IN") {
+          m_ingoingArmTime = clsTimeSum / nSVD;
+          m_ingoingArmTimeError = std::sqrt(clsTimeSigma2Sum / (nSVD * (nSVD - 1)));
+          m_hasIngoingArmTime = true;
+        }
+        if (arm == "OUT") {
+          m_outgoingArmTime = clsTimeSum / nSVD;
+          m_outgoingArmTimeError = std::sqrt(clsTimeSigma2Sum / (nSVD * (nSVD - 1)));
+          m_hasOutgoingArmTime = true;
+        }
         svdDONE = false;
         detIDpre = detIDpost;
         detIDpost = NAN;
@@ -683,12 +693,21 @@ void RecoTrack::calculateArmTime()
     }
     if (!trackArmTimeDONE && (i == (int)recoHits.size() - 1) && nSVD != 0) {
       arm = trackArmDirection(detIDpre, detIDpost);
-      if (arm == "IN") m_ingoingArmTime = clsTimeSum / nSVD;
-      if (arm == "OUT") m_outgoingArmTime = clsTimeSum / nSVD;
-      // It will not reset all variables because it is run only at the last recoHit
+      if (arm == "IN") {
+        m_ingoingArmTime = clsTimeSum / nSVD;
+        m_ingoingArmTimeError = std::sqrt(clsTimeSigma2Sum / (nSVD * (nSVD - 1)));
+        m_hasIngoingArmTime = true;
+      }
+      if (arm == "OUT") {
+        m_outgoingArmTime = clsTimeSum / nSVD;
+        m_outgoingArmTimeError = std::sqrt(clsTimeSigma2Sum / (nSVD * (nSVD - 1)));
+        m_hasIngoingArmTime = true;
+      }// It will not reset all variables because it is run only at the last recoHit
     }
   }
   m_inOutArmTimeDiff = m_ingoingArmTime - m_outgoingArmTime;
+  m_inOutArmTimeDiffError = std::sqrt(m_ingoingArmTimeError * m_ingoingArmTimeError + m_outgoingArmTimeError *
+                                      m_outgoingArmTimeError);
 }
 
 std::string RecoTrack::trackArmDirection(float pre, float post)

@@ -51,13 +51,13 @@ namespace Belle2 {
 
       // cut on POCA
       m_pocaPosition = fit->getPosition();
-      if (m_pocaPosition.Perp() > m_dr) return false;
+      if (m_pocaPosition.Rho() > m_dr) return false;
       if (fabs(m_pocaPosition.Z()) > m_dz) return false;
 
       // momentum/energy cut
       m_pocaMomentum = fit->getMomentum();
       if (m_sampleType == c_cosmics) {
-        if (m_pocaMomentum.Mag() < m_minMomentum) return false;
+        if (m_pocaMomentum.R() < m_minMomentum) return false;
       } else if (m_sampleType == c_dimuon or m_sampleType == c_bhabha) {
         ROOT::Math::PxPyPzMVector lorentzLab(m_pocaMomentum.X(), m_pocaMomentum.Y(), m_pocaMomentum.Z(), m_chargedStable.getMass());
         PCmsLabTransform T;

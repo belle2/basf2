@@ -104,10 +104,15 @@ namespace Belle2 {
      * StoreArray of Particles
      */
     StoreArray<Particle> m_particles;
+
     /**
-     * The input list of decay strings to which MVA weights will be applied.
+     * The input list of DecayStrings, where each selected (^) daughter should correspond to a standard charged ParticleList,
+     * e.g. `['Lambda0:sig -> ^p+ ^pi-', 'J/psi:sig -> ^mu+ ^mu-']`. One can also directly pass a list of
+     * standard charged ParticleLists, e.g. `['e+:my_electrons', 'pi+:my_pions']`.
+     * Note that charge-conjugated ParticleLists will automatically be included.
      */
     std::vector<std::string> m_decayStrings;
+
     /**
      * The name of the database payload object with the MVA weights.
      */

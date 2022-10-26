@@ -52,7 +52,7 @@ namespace {
       b0momentum = T.rotateCmsToLab() * b0momentum;
       PxPyPzEVector pimomentum(0.1, 0, 2.5, sqrt(0.139 * 0.139 + 2.5 * 2.5));
       PxPyPzEVector emomentum(0., 0, 1., 1.);
-      B2Vector3D ipposition(0, 0, 0);
+      ROOT::Math::XYZVector ipposition(0, 0, 0);
       factory.produceParticle(string("^B0 -> pi- e+"), b0momentum, ipposition);
       myParticles[0]->set4Vector(pimomentum); //pion
       myParticles[1]->set4Vector(emomentum);  //electron

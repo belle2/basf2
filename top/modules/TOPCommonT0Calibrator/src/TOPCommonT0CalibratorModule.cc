@@ -223,7 +223,7 @@ namespace Belle2 {
       m_theta = localMomentum.Theta();
       m_phi = localMomentum.Phi();
       const auto& pocaPosition = m_selector.getPOCAPosition();
-      m_pocaR = pocaPosition.Perp();
+      m_pocaR = pocaPosition.Rho();
       m_pocaZ = pocaPosition.Z();
       m_pocaX = pocaPosition.X();
       m_pocaY = pocaPosition.Y();

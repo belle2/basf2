@@ -29,7 +29,7 @@ TrackFitResult::TrackFitResult() :
   memset(m_cov5, 0, sizeof(m_cov5));
 }
 
-TrackFitResult::TrackFitResult(const TVector3& position, const TVector3& momentum,
+TrackFitResult::TrackFitResult(const ROOT::Math::XYZVector& position, const ROOT::Math::XYZVector& momentum,
                                const TMatrixDSym& covariance, const short int charge,
                                const Const::ParticleType& particleType, const float pValue,
                                const float bField,

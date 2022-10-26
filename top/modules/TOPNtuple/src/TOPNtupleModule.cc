@@ -147,9 +147,9 @@ namespace Belle2 {
       m_top.evt = evtMetaData->getEvent();
       m_top.run = evtMetaData->getRun();
 
-      TVector3 mom = trackFit->getMomentum();
-      m_top.p = mom.Mag();
-      m_top.cth = mom.CosTheta();
+      ROOT::Math::XYZVector mom = trackFit->getMomentum();
+      m_top.p = mom.R();
+      m_top.cth = cos(mom.Theta());
       m_top.phi = mom.Phi();
       m_top.pValue = trackFit->getPValue();
 
@@ -158,12 +158,12 @@ namespace Belle2 {
         if (mother) m_top.motherPDG = mother->getPDG();
         m_top.primary = mcParticle->getStatus(MCParticle::c_PrimaryParticle);
         m_top.seen = mcParticle->hasSeenInDetector(Const::TOP);
-        B2Vector3D prodVertex = mcParticle->getProductionVertex();
-        m_top.rhoProd = prodVertex.Perp();
+        ROOT::Math::XYZVector prodVertex = mcParticle->getProductionVertex();
+        m_top.rhoProd = prodVertex.Rho();
         m_top.zProd = prodVertex.Z();
         m_top.phiProd = prodVertex.Phi();
-        TVector3 decVertex = mcParticle->getDecayVertex();
-        m_top.rhoDec = decVertex.Perp();
+        ROOT::Math::XYZVector decVertex = mcParticle->getDecayVertex();
+        m_top.rhoDec = decVertex.Rho();
         m_top.zDec = decVertex.Z();
         m_top.phiDec = decVertex.Phi();
       }

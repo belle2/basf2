@@ -469,10 +469,10 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, 
 
   string carrierName = (have_electrons) ? "electron" : "hole";
   B2DEBUG(29,
-          "Drifting " << carriers << " " << carrierName << "s at position (" << position.x() << ", " << position.y() << ", " << position.z()
+          "Drifting " << carriers << " " << carrierName << "s at position (" << position.X() << ", " << position.Y() << ", " << position.Z()
           << ").");
-  B2DEBUG(29, "@@@ driftCharge: drifting " << carriers << " " << carrierName << "s at position (" << position.x() << ", " <<
-          position.y() << ", " << position.z()
+  B2DEBUG(29, "@@@ driftCharge: drifting " << carriers << " " << carrierName << "s at position (" << position.X() << ", " <<
+          position.Y() << ", " << position.Z()
           << ").");
 
   // Get references to current sensor/info for ease of use

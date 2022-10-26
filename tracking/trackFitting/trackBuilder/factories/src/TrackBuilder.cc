@@ -120,7 +120,7 @@ bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack,
     const uint32_t hitPatternVXDInitializer = getHitPatternVXDInitializer(recoTrack);
 
     const auto newTrackFitResult = trackFitResults.appendNew(
-                                     poca, dirInPoca, cov, charge, particleType, pValue, Bz,
+                                     ROOT::Math::XYZVector(poca), ROOT::Math::XYZVector(dirInPoca), cov, charge, particleType, pValue, Bz,
                                      hitPatternCDCInitializer, hitPatternVXDInitializer, nDF
                                    );
 

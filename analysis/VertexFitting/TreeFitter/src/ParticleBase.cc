@@ -535,7 +535,7 @@ namespace TreeFitter {
 
   double ParticleBase::bFieldOverC()
   {
-    return (Belle2::BFieldManager::getField(Belle2::B2Vector3D(0, 0, 0)).Z() * Belle2::Const::speedOfLight);
+    return (Belle2::BFieldManager::getField(0, 0, 0).Z() * Belle2::Const::speedOfLight);
   }
 
   ErrCode ParticleBase::initTau(FitParams& fitparams) const

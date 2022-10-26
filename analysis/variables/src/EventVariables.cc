@@ -313,7 +313,7 @@ namespace Belle2 {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getMissingMomentum().x();
+      double missing = evtShape->getMissingMomentum().X();
       return missing;
     }
 
@@ -324,7 +324,7 @@ namespace Belle2 {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getMissingMomentum().y();
+      double missing = evtShape->getMissingMomentum().Y();
       return missing;
     }
 
@@ -335,7 +335,7 @@ namespace Belle2 {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getMissingMomentum().z();
+      double missing = evtShape->getMissingMomentum().Z();
       return missing;
     }
 
@@ -379,7 +379,7 @@ namespace Belle2 {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getMissingMomentumCMS().x();
+      double missing = evtShape->getMissingMomentumCMS().X();
       return missing;
     }
 
@@ -390,7 +390,7 @@ namespace Belle2 {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getMissingMomentumCMS().y();
+      double missing = evtShape->getMissingMomentumCMS().Y();
       return missing;
     }
 
@@ -401,7 +401,7 @@ namespace Belle2 {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getMissingMomentumCMS().z();
+      double missing = evtShape->getMissingMomentumCMS().Z();
       return missing;
     }
 

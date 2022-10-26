@@ -205,16 +205,16 @@ void PhaseSpaceAnalysisModule::getValuesForRoot(Belle2::MCParticle* mcParticle, 
 {
   B2DEBUG(25, "Collecting values for MCParticle " << mcParticle->getArrayIndex());
   // collect all the momentum
-  const TVector3 momentum = mcParticle->getMomentum();
+  const ROOT::Math::XYZVector momentum = mcParticle->getMomentum();
   rootVariables.MomX.push_back(momentum.X());
   rootVariables.MomY.push_back(momentum.Y());
   rootVariables.MomZ.push_back(momentum.Z());
 
-  rootVariables.pT.push_back(momentum.Pt());
+  rootVariables.pT.push_back(momentum.Rho());
   rootVariables.Eta.push_back(momentum.Eta());
 
-  B2DEBUG(25, "TVector3 momentum: (" << momentum.X() << "," << momentum.Y() << "," << momentum.Z() << \
-          "). This leads to p_T = " << momentum.Pt() << " and eta = " << momentum.Eta());
+  B2DEBUG(25, "XYZVector momentum: (" << momentum.X() << "," << momentum.Y() << "," << momentum.Z() << \
+          "). This leads to p_T = " << momentum.Rho() << " and eta = " << momentum.Eta());
 
   const B2Vector3D vertex = mcParticle->getVertex();
   rootVariables.VertX.push_back(vertex.Y());

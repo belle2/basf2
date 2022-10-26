@@ -130,7 +130,7 @@ void SegmentNetworkAnalyzerModule::analyzeCombination(const Belle2::Segment<Bell
   if (signal) {
     const MCParticle* part = m_mcParticles[mcId.first];
     pdg = part->getPDG();
-    pT = part->getMomentum().Pt();
+    pT = part->getMomentum().Rho();
   }
 
   m_rootVariables.pdg.push_back(pdg);

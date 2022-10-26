@@ -70,7 +70,7 @@ void ECLChargedPIDModule::event()
     const auto relShowers = track.getRelationsTo<ECLShower>();
     if (relShowers.size() == 0) continue;
 
-    const double p     = fitRes->getMomentum().Mag();
+    const double p     = fitRes->getMomentum().R();
     const double theta = fitRes->getMomentum().Theta();
     const auto charge  = fitRes->getChargeSign();
 

@@ -22,7 +22,7 @@ the beam parameters are available for the given run and 0 if not.
 The following command plots the x position of the beam spot after opening the
 conditions.root file in root::
 
-  conditions->Draw("BeamParameters.m_vertex.x():run", "BeamParameters_valid", "*")
+  conditions->Draw("BeamParameters.m_vertex.X():run", "BeamParameters_valid", "*")
 
 """
 

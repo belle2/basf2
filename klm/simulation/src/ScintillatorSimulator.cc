@@ -235,7 +235,7 @@ void KLM::ScintillatorSimulator::simulate(
     /* Poisson mean for number of photons. */
     double nPhotons = hit->getEnergyDeposit() * m_DigPar->getNPEperMeV();
     /* Fill histograms. */
-    double sipmDistance = 0.5 * stripLength - hit->getLocalPosition().x();
+    double sipmDistance = 0.5 * stripLength - hit->getLocalPosition().X();
     double time = hit->getTime() +
                   sipmDistance / m_DigPar->getFiberLightSpeed();
     if (m_MCTime < 0)

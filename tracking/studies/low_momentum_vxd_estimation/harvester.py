@@ -9,6 +9,7 @@
 from tracking.harvest.harvesting import HarvestingModule
 from tracking.harvest import refiners
 from ROOT import Belle2
+from ROOT.Math import XYZVector
 import numpy as np
 
 from tracking.ipython_tools.wrapper import QueueHarvester
@@ -223,7 +224,7 @@ class VXDHarvester(QueueHarvester):
                         track_position = track_cand.getPosSeed()
                         track_charge = track_cand.getChargeSeed()
 
-                    b_field = Belle2.BFieldManager.getField(track_position).Z() / Belle2.Unit.T
+                    b_field = Belle2.BFieldManager.getField(XYZVector(track_position)).Z() / Belle2.Unit.T
                     track_helix = Belle2.Helix(track_position, track_momentum, int(track_charge), b_field)
 
                     cluster_charge = tools.getCalibratedCharge(cluster)
@@ -294,7 +295,7 @@ class VXDHarvester(QueueHarvester):
                                      track_charge=track_charge,
                                      path_length=path_length,
                                      mc_path_length=mc_path_length,
-                                     p_origin=mc_particle.getMomentum().Mag())
+                                     p_origin=mc_particle.getMomentum().R())
 
                     track_dict = dict(track_helix_perigee_x=track_helix.getPerigeeX(),
                                       track_helix_perigee_y=track_helix.getPerigeeY(),

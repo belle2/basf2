@@ -128,11 +128,11 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
     # we need magnetic field which is different than default.
     # shamelessly copied from analysis/scripts/modularAnalysis.py:inputMdst
     from ROOT import Belle2  # reduced scope of potentially-misbehaving import
+    from ROOT.Math import XYZVector
     field = Belle2.MagneticField()
     field.addComponent(
         Belle2.MagneticFieldComponentConstant(
-            Belle2.B2Vector3D(
-                0, 0, 1.5 * Belle2.Unit.T)))
+            XYZVector(0, 0, 1.5 * Belle2.Unit.T)))
     Belle2.DBStore.Instance().addConstantOverride("MagneticField", field, False)
 
     if (not generatorLevelReconstruction):

@@ -6,11 +6,11 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef BABAYAGANLO_H
-#define BABAYAGANLO_H
+#pragma once
 
 #include <mdst/dataobjects/MCParticleGraph.h>
 #include <Math/LorentzRotation.h>
+#include <Math/Vector3D.h>
 #include <utility>
 
 namespace Belle2 {
@@ -180,7 +180,7 @@ namespace Belle2 {
      * @param vertex Production vertex.
      * @param boost Lorentz boost vector.
      */
-    void generateEvent(MCParticleGraph& mcGraph, double ecm, TVector3 vertex, ROOT::Math::LorentzRotation boost);
+    void generateEvent(MCParticleGraph& mcGraph, double ecm, ROOT::Math::XYZVector vertex, ROOT::Math::LorentzRotation boost);
 
     /** Returns weight */
     double getSDif() {return m_sDif;};
@@ -248,7 +248,8 @@ namespace Belle2 {
      * @param isInitial If the particle is a initial particle for ISR, set this to true.
      * @param isISRFSR If the particle is from ISR or FSR, set this to true.
      */
-    void storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, TVector3 vertex, ROOT::Math::LorentzRotation boost,
+    void storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, ROOT::Math::XYZVector vertex,
+                       ROOT::Math::LorentzRotation boost,
                        bool isVirtual = false, bool isInitial = false, bool isISRFSR = false);
 
   private:
@@ -257,6 +258,3 @@ namespace Belle2 {
     double m_xpar[100];  /**< Double parameters for BabayagaNLO. */
   };
 }
-
-
-#endif /* BABAYAGANLO_H */

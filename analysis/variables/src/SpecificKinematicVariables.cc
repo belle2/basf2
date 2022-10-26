@@ -141,7 +141,7 @@ namespace Belle2 {
         //Construct the B0 p 3-vector with the current phi by summing the 3 components.
 
         XYZVector B0_p3_Dframe(B0_px_Dframe + B0_py_Dframe + B0_pz_Dframe);
-        PxPyPzEVector B0_p4_Dframe(B0_p3_Dframe.x(), B0_p3_Dframe.y(), B0_p3_Dframe.z(), E_B);
+        PxPyPzEVector B0_p4_Dframe(B0_p3_Dframe.X(), B0_p3_Dframe.Y(), B0_p3_Dframe.Z(), E_B);
 
         //This is the polar angle of B0.
 

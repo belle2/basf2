@@ -228,9 +228,8 @@ void ChargedPidMVAMulticlassModule::event()
         if (m_ecl_only) {
           score_varname += "_" + std::to_string(Const::ECL);
         } else {
-          for (Const::DetectorSet::Iterator it = Const::PIDDetectorSet::set().begin();
-               it != Const::PIDDetectorSet::set().end(); ++it) {
-            score_varname += "_" + std::to_string(*it);
+          for (const Const::EDetector& det : Const::PIDDetectorSet::set()) {
+            score_varname += "_" + std::to_string(det);
           }
         }
 
@@ -259,8 +258,7 @@ void ChargedPidMVAMulticlassModule::registerAliasesLegacy()
   for (Const::DetectorSet::Iterator it = Const::PIDDetectorSet::set().begin();
        it != Const::PIDDetectorSet::set().end(); ++it) {
 
-    Const::EDetector det = *it;
-    auto detName = Const::parseDetectors(det);
+    auto detName = Const::parseDetectors(*it);
 
     aliasesLegacy.insert(std::make_pair("missingLogL_" + detName, "pidMissingProbabilityExpert(" + detName + ")"));
 

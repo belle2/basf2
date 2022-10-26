@@ -20,6 +20,7 @@
 #include <framework/utilities/IOIntercept.h>
 
 #include <boost/filesystem.hpp>
+#include <Math/Vector3D.h>
 
 #include <stdio.h>
 
@@ -84,7 +85,7 @@ void KKGenInputModule::event()
 
   //generate an MCInitialEvent (for vertex smearing)
   const MCInitialParticles& initial = m_initial.generate();
-  TVector3 vertex = initial.getVertex();
+  ROOT::Math::XYZVector vertex = initial.getVertex();
 
   mpg.clear();
   int nPart =  m_Ikkgen.simulateEvent(mpg, vertex);

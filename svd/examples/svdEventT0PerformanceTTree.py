@@ -14,6 +14,12 @@
 # Example Script to use SVDEventT0PerformanceTTree and OverlapResidual Modules
 # on simulation or real data
 #
+# Use: basf2 -i /pnfs/desy.de/belle/belle2/TMP/belle/Raw/e0016/physics/r00610/sub00/physics.0016.00610.HLT1.f00000.root
+#      svd/examples/svdEventT0PerformanceTTree.py
+#      basf2 -i /pnfs/desy.de/belle/belle2/TMP/belle/Raw/e0024/physics/r01726/sub01/physics.0024.01726.HLT1.f00000.root
+#      svd/examples/svdEventT0PerformanceTTree.py
+#
+#
 ###################################################################################
 
 import basf2 as b2
@@ -22,11 +28,15 @@ import rawdata as raw
 import tracking as trk
 import simulation as sim
 import glob
+# import sys
+# import argparse
+# import os
 
-useSimulation = True
+# useSimulation = True
+useSimulation = False
 
 # set this string to identify the output rootfiles
-tag = "_test"
+ftag = "_test"
 
 main = b2.create_path()
 
@@ -34,8 +44,9 @@ b2.set_random_seed(1)
 
 if useSimulation:
     # options for simulation:
-    expList = [1003]
-    numEvents = 2000
+    # expList = [1003]
+    expList = [0]
+    numEvents = 20
     bkgFiles = glob.glob('/sw/belle2/bkg/*.root')  # Phase3 background
     bkgFiles = None  # uncomment to remove  background
     simulateJitter = False
@@ -60,10 +71,23 @@ else:
     b2conditions.reset()
     b2conditions.override_globaltags()
     b2conditions.globaltags = ["online"]
+    b2conditions.prepend_globaltag("staging_online")
+    # b2conditions.append_globaltag("svd_data_rel7")
+    # b2conditions.append_globaltag("patch_main_release-07_noTOP")
+    b2conditions.prepend_globaltag("patch_main_release-07")
+
+    MCTracking = False
 
     # input root files
-    main.add_module('RootInput', branchNames=['RawPXDs', 'RawSVDs', 'RawCDCs'])
-    raw.add_unpackers(main, components=['PXD', 'SVD', 'CDC'])
+    # main.add_module('RootInput', branchNames=['RawPXDs', 'RawSVDs', 'RawCDCs', 'RawECLs'])
+    # raw.add_unpackers(main, components=['PXD', 'SVD', 'CDC', 'ECL'])
+
+    main.add_module('RootInput', entrySequences=['0:100'])
+
+    main.add_module("Gearbox")
+    main.add_module('Geometry', useDB=True)
+
+    raw.add_unpackers(main)
 
     # change ZS to 5
     # for moda in main.modules():
@@ -96,7 +120,7 @@ skimfilter.if_value('=1', filter_path, b2.AfterConditionPath.CONTINUE)
 
 # fill TTrees
 # main.add_module('SVDPerformanceTTree', outputFileName="SVDPerformanceTree"+str(tag)+".root")
-main.add_module('SVDEventT0PerformanceTTree', outputFileName="SVDEventT0PerformanceTTree"+str(tag)+".root")
+main.add_module('SVDEventT0PerformanceTTree', outputFileName="SVDEventT0PerformanceTTree"+str(ftag)+".root")
 
 # # write everything
 # main.add_module('OverlapResiduals', ExpertLevel=True)

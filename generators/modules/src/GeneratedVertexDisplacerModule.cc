@@ -100,7 +100,7 @@ void GeneratedVertexDisplacerModule::displace(MCParticle& particle, float lifeti
   ROOT::Math::PxPyPzEVector* displacementVector = new ROOT::Math::PxPyPzEVector();
   getDisplacement(particle, lifetime, *displacementVector);
 
-  B2Vector3D newDecayVertex = particle.getProductionVertex();
+  ROOT::Math::XYZVector newDecayVertex = particle.getProductionVertex();
   newDecayVertex.SetX(newDecayVertex.X() + displacementVector->X());
   newDecayVertex.SetY(newDecayVertex.Y() + displacementVector->Y());
   newDecayVertex.SetZ(newDecayVertex.Z() + displacementVector->Z());
@@ -128,7 +128,7 @@ void GeneratedVertexDisplacerModule::displaceDaughter(ROOT::Math::PxPyPzEVector&
 
     // getDaughters returns a copied list, need to change parameters of the original particle in the MCParticle StoreArray.
     MCParticle& mcp = *m_mcparticles[daughter_mcpArrayIndex];
-    mcp.setProductionVertex(B2Vector3D(mcp.getProductionVertex() + motherDisplacementVector.Vect()));
+    mcp.setProductionVertex(mcp.getProductionVertex() + motherDisplacementVector.Vect());
     mcp.setProductionTime(mcp.getProductionTime() + motherDisplacementVector.T());
     mcp.setValidVertex(true);
 

@@ -269,7 +269,7 @@ namespace Belle2 {
         auto helix = trkfit->getHelix();
         double arcLength = helix.getArcLength2DAtCylindricalR(120);
         const auto& result = helix.getPositionAtArcLength2D(arcLength);
-        return result.z();
+        return result.Z();
       }
 
       double extrapTrackToTOPtheta(const Particle* particle)

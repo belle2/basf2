@@ -186,7 +186,7 @@ TrackFitResult* V0Fitter::buildTrackFitResult(const genfit::Track& track, const 
   }
 
   TrackFitResult* v0TrackFitResult
-    = m_trackFitResults.appendNew(msop.getPos(), msop.getMom(),
+    = m_trackFitResults.appendNew(ROOT::Math::XYZVector(msop.getPos()), ROOT::Math::XYZVector(msop.getMom()),
                                   msop.get6DCov(), msop.getCharge(),
                                   trackHypothesis,
                                   track.getFitStatus()->getPVal(),

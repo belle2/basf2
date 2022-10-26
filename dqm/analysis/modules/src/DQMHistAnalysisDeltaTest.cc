@@ -7,7 +7,7 @@
  **************************************************************************/
 //+
 // File : DQMHistAnalysisDeltaTest.cc
-// Description : Analysis of PXD Reduction
+// Description : Test Module for Delta Histogram Access
 //-
 
 
@@ -33,6 +33,7 @@ DQMHistAnalysisDeltaTestModule::DQMHistAnalysisDeltaTestModule()
 
   //Parameter definition
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("test"));
+  addParam("histogramName", m_histogramName, "Name of Histogram", std::string("testHist"));
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:TEST"));
   addParam("useEpics", m_useEpics, "Whether to update EPICS PVs.", false);
   B2DEBUG(1, "DQMHistAnalysisDeltaTest: Constructor done.");
@@ -77,39 +78,67 @@ void DQMHistAnalysisDeltaTestModule::beginRun()
   B2DEBUG(1, "DQMHistAnalysisDeltaTest: beginRun called.");
 }
 
+void DQMHistAnalysisDeltaTestModule::endRun()
+{
+  B2DEBUG(1, "DQMHistAnalysisDeltaTest: endRun called.");
+}
+
 void DQMHistAnalysisDeltaTestModule::event()
 {
   double data_Test1 = 0.0;
   double data_Test2 = 0.0;
 
   m_cTest->Clear();
-  m_cTest->Divide(2, 2);
+  m_cTest->Divide(3, 2);
 
   // more handy to have it as a full name, but find/get functions
   // can work with one or two parameters
-  std::string name = m_histogramDirectoryName + "/testHisto";
+  std::string fullname = m_histogramDirectoryName + "/" + m_histogramName;
 
   // get basic histogram (run integrated up)
-  m_cTest->cd(1);
-  auto hh1 = findHist(m_histogramDirectoryName, "testHisto");
+  auto hh1 = findHist(m_histogramDirectoryName, m_histogramName, false);// even if no update
   if (hh1) {
-    hh1->Draw("hist");
+    m_cTest->cd(1);
+    auto a = (TH1*)hh1->DrawClone("hist");
+    a->SetTitle("Hist always");
     data_Test2 = hh1->GetMean();
   }
 
+  auto hh2 = findHist(m_histogramDirectoryName, m_histogramName, true);// only if updated
+  if (hh2) {
+    m_cTest->cd(2);
+    auto a = (TH1*)hh2->DrawClone("hist");
+    a->SetTitle("Hist only if updated");
+  }
+
   // get most recent delta
-  m_cTest->cd(2);
-  auto hd1 = getDelta(m_histogramDirectoryName, "testHisto");
+  auto hd2 = getDelta(m_histogramDirectoryName, m_histogramName, 0, false);// even if no update
+  if (hd2) {
+    m_cTest->cd(4);
+    auto a = (TH1*)hd2->DrawClone("hist");
+    a->SetTitle("Delta always");
+  }
+
+  // get most recent delta
+  auto hd1 = getDelta(m_histogramDirectoryName, m_histogramName, 0, true);// only if updated
   if (hd1) {
-    hd1->Draw("hist");
+    m_cTest->cd(5);
+    auto a = (TH1*)hd1->DrawClone("hist");
+    a->SetTitle("Delta only if updated");
     data_Test1 = hd1->GetMean();
-  } else {
+  }
+
+  UpdateCanvas(m_cTest->GetName(), hd1 != nullptr);
+
+  if (!hd2) {
     // Depending on you analysis, you want to see/plot
     // the histogram even before the first condition for update is met
     // thus, no delta histogram is available
     if (hh1) {
+      m_cTest->cd(3);
       auto a = (TH1*)hh1->DrawClone("hist");
       a->SetLineColor(2);
+      a->SetTitle("initial sampling");
     }
     // but, as the statistics is low, we dont want to have it updated yet (e.g. in EPICS)
     // data_Test1=hd1->GetMean(); //< thus, do not uncomment
@@ -117,9 +146,9 @@ void DQMHistAnalysisDeltaTestModule::event()
 
   // plot all delta histograms, thus make recent shifts more visible
   // it would be nicer to plot oldest first, left as exercise for reader
-  m_cTest->cd(3);
+  m_cTest->cd(6);
   for (int i = 0; i < 99; i++) {
-    auto h = getDelta(name, i);
+    auto h = getDelta(fullname, i, false);
     if (h == nullptr) break;
     if (i == 0) {
       h->Draw("hist");
@@ -130,11 +159,14 @@ void DQMHistAnalysisDeltaTestModule::event()
   }
 
   // I see no reason to access that histogram, but just as low-level example.
-  m_cTest->cd(4);
-  auto it = getDeltaList().find(name);
+  m_cTest->cd(7);
+  auto it = getDeltaList().find(m_histogramName);
   if (it != getDeltaList().end()) {
     auto h = it->second->m_lastHist;
-    if (h) h->Draw("hist");
+    if (h) {
+      auto a = (TH1*)h->DrawClone("hist");
+      a->SetTitle("last update histogram");
+    }
   }
 
   m_cTest->cd(0);
@@ -142,7 +174,7 @@ void DQMHistAnalysisDeltaTestModule::event()
 
   TString fn;
   static int plot_count = 0;
-  fn.Form("ana_testHist_Delta_%d.png", plot_count++);
+  fn.Form("ana_%s_Delta_%d.png", m_histogramName.data(), plot_count++);
   m_cTest->Print(fn);
 
   // actually, we would prefer to only update the epics variable
@@ -168,5 +200,7 @@ void DQMHistAnalysisDeltaTestModule::event()
 void DQMHistAnalysisDeltaTestModule::terminate()
 {
   B2DEBUG(1, "DQMHistAnalysisDeltaTest: terminate called");
+  // MiraBelle export code should run at end of Run
+  // but it still "remembers" the state from last event call.
 }
 

@@ -34,6 +34,7 @@ namespace Belle2 {
   class ChargedPidMVAWeights : public TObject {
 
     typedef std::unordered_map<int, std::vector<std::string> > WeightfilesByParticle; /**< Typedef */
+    typedef std::map<std::string, std::string> VariablesByAlias; /**< Typedef */
 
   public:
 
@@ -252,6 +253,17 @@ namespace Belle2 {
 
 
     /**
+     * Store the map associating variable aliases to variable names knowm to VariableManager.
+     *
+     * @param aliases a map of (alias, VM variable) pairs. NB: it is supposed to contain all the aliases for every category.
+     */
+    void storeAliases(const VariablesByAlias& aliases)
+    {
+      m_aliases = VariablesByAlias(aliases);
+    }
+
+
+    /**
      * Get the raw pointer to the 3D (clusterTheta, p, charge) grid representing the categories for which weightfiles are defined.
      * Used just to view the stored data.
      */
@@ -303,6 +315,15 @@ namespace Belle2 {
     const std::vector<std::string>* getCutsMulticlass() const
     {
       return getCuts(0);
+    }
+
+
+    /**
+     * Get the map of unique aliases.
+     */
+    const VariablesByAlias* getAliases() const
+    {
+      return &m_aliases;
     }
 
 
@@ -517,7 +538,14 @@ namespace Belle2 {
     };
 
 
-    ClassDef(ChargedPidMVAWeights, 8);
+    /**
+     * A map that associates variable aliases used in the MVA training to variable names known to the VariableManager.
+     */
+    VariablesByAlias m_aliases;
+
+
+    ClassDef(ChargedPidMVAWeights, 9);
+    /**< 9. Add map of variable aliases and original basf2 vars. */
     /**< 8. Use unique_ptr for m_categories. */
     /**< 7. Use double instead of float in tuple. */
     /**< 6. Introduce charge bin in the parametrisation. */

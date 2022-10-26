@@ -127,6 +127,7 @@ namespace TreeFitter {
     switch (m_type) {
       case beamspot:     rc = "beamspot";   break;
       case beamenergy:   rc = "beamenergy"; break;
+      case beam:         rc = "beam"; break;
       case origin:       rc = "origin"; break;
       case composite:    rc = "composite";  break;
       case resonance:    rc = "resonance";  break;

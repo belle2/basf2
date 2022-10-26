@@ -19,7 +19,9 @@
 /* ROOT headers. */
 #include <TMinuit.h>
 #include <TVectorD.h>
+#include <Math/Vector3D.h>
 #include <Math/Vector4D.h>
+#include <Math/VectorUtil.h>
 #include <Math/RotationY.h>
 
 using namespace Belle2;
@@ -76,7 +78,7 @@ static void fcn(int& npar, double* grad, double& fval, double* par, int iflag)
   pHER = getMomentum(par[0], par[1], par[2], false);
   pLER = getMomentum(par[3], par[4], par[5], true);
   ROOT::Math::PxPyPzEVector pBeam = pHER + pLER;
-  B2Vector3D beamBoost = pBeam.BoostToCM();
+  ROOT::Math::XYZVector beamBoost = pBeam.BoostToCM();
   TVectorD boostDifference(3);
   boostDifference[0] = beamBoost.X() - s_BoostVector.X();
   boostDifference[1] = beamBoost.Y() - s_BoostVector.Y();
@@ -85,8 +87,8 @@ static void fcn(int& npar, double* grad, double& fval, double* par, int iflag)
   double invariantMass = pBeam.M();
   double massChi2 = pow((invariantMass - s_InvariantMass) /
                         s_InvariantMassError, 2);
-  double angleHER = B2Vector3D(pHER.Vect()).Angle(s_DirectionHER);
-  double angleLER = B2Vector3D(pLER.Vect()).Angle(s_DirectionLER);
+  double angleHER = ROOT::Math::VectorUtil::Angle(pHER.Vect(), s_DirectionHER);
+  double angleLER = ROOT::Math::VectorUtil::Angle(pLER.Vect(), s_DirectionLER);
   double angleChi2 = pow(angleHER / s_AngleError, 2) +
                      pow(angleLER / s_AngleError, 2);
   fval = boostChi2 + massChi2 + angleChi2;
@@ -295,7 +297,7 @@ void BeamParametersFitter::fillVertexData(
   double covarianceXX, double covarianceYY)
 {
   setupDatabase();
-  m_BeamParameters.setVertex(m_BeamSpot->getIPPosition());
+  m_BeamParameters.setVertex(ROOT::Math::XYZVector(m_BeamSpot->getIPPosition()));
   TMatrixDSym beamSize = m_BeamSpot->getSizeCovMatrix();
   double xScale, yScale;
   if (covarianceXX < 0)

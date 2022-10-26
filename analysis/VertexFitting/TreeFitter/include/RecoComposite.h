@@ -17,9 +17,6 @@ namespace TreeFitter {
 
   public:
     /** constructor */
-    RecoComposite(Belle2::Particle* bc, const ParticleBase* mother) ;
-
-    /** constructor */
     RecoComposite(Belle2::Particle* bc, const ParticleBase* mother, const ConstraintConfiguration& config,
                   bool massconstraint = false);
 

@@ -14,10 +14,11 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/particledb/EvtGenDatabasePDG.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/dbobjects/BeamParameters.h>
 
 #include <analysis/utility/ParticleCopy.h>
 
-#include <analysis/VertexFitting/TreeFitter/ConstraintConfiguration.h>
 #include <analysis/VertexFitting/TreeFitter/FitParameterDimensionException.h>
 
 using namespace Belle2;
@@ -73,7 +74,9 @@ TreeFitterModule::TreeFitterModule() : Module(), m_nCandidatesBeforeFit(-1), m_n
   addParam("updateAllDaughters", m_updateDaughters,
            "Type::[bool]. Update all daughters (vertex position and momenta) in the tree. If not set only the 4-momenta for the head of the tree will be updated. We also update the vertex position of the daughters regardless of what you put here, because otherwise the default when the particle list is created is {0,0,0}.",
            false);
-  //
+  addParam("expertBeamConstraintPDG", m_beamConstraintPDG,
+           "Type int, default 0. The 4-momentum of particles with the given PDG will be constrained to the 4-momentum of the initial e+e- system.",
+           0);
   addParam("expertMassConstraintType", m_massConstraintType,
            "Type::[int]. False(0): use particles parameters in mass constraint; True: use sum of daughter parameters for mass constraint. WAARNING not even guaranteed that it works.",
            0);
@@ -85,6 +88,8 @@ TreeFitterModule::TreeFitterModule() : Module(), m_nCandidatesBeforeFit(-1), m_n
   addParam("inflationFactorCovZ", m_inflationFactorCovZ,
            "Inflate the covariance of the beamspot by this number so that the 3d beam constraint becomes weaker in Z.And: thisnumber->infinity : dim(beamspot constr) 3d->2d.",
            1);
+  addParam("treatAsInvisible", m_treatAsInvisible,
+           "Type::[string]. Decay string to select one particle that will be ignored in the fit.", {});
 }
 
 void TreeFitterModule::initialize()
@@ -100,10 +105,37 @@ void TreeFitterModule::initialize()
       m_massConstraintList.push_back(particletemp->PdgCode());
     }
   }
+
+  if (!m_treatAsInvisible.empty()) {
+    bool valid = m_pDDescriptorInvisibles.init(m_treatAsInvisible);
+    if (!valid)
+      B2ERROR("TreeFitterModule::initialize Invalid Decay Descriptor: " << m_treatAsInvisible);
+    else if (m_pDDescriptorInvisibles.getSelectionPDGCodes().size() != 1)
+      B2ERROR("TreeFitterModule::please select exactly one particle to ignore: " << m_treatAsInvisible);
+  }
 }
 
 void TreeFitterModule::beginRun()
 {
+  const Belle2::DBObjPtr<Belle2::BeamParameters> beamparams;
+  const ROOT::Math::PxPyPzEVector her = beamparams->getHER();
+  const ROOT::Math::PxPyPzEVector ler = beamparams->getLER();
+  const ROOT::Math::PxPyPzEVector cms = her + ler;
+
+  m_beamMomE(0) = cms.X();
+  m_beamMomE(1) = cms.Y();
+  m_beamMomE(2) = cms.Z();
+  m_beamMomE(3) = cms.E();
+
+  const TMatrixDSym HERcoma = beamparams->getCovHER();
+  const TMatrixDSym LERcoma = beamparams->getCovLER();
+
+  const double covE = (HERcoma(0, 0) + LERcoma(0, 0));
+  for (size_t i = 0; i < 4; ++i) {
+    m_beamCovariance(i, i) =
+      covE;
+    // TODO Currently, we do not get a full covariance matrix from beamparams, and the py value is zero, which means there is no constraint on py. Therefore, we approximate it by a diagonal matrix using the energy value for all components. This is based on the assumption that the components of the beam four-momentum are independent and of comparable size.
+  }
 }
 
 void TreeFitterModule::event()
@@ -117,11 +149,25 @@ void TreeFitterModule::event()
   const unsigned int n = m_plist->getListSize();
   m_nCandidatesBeforeFit += n;
 
+  TMatrixFSym dummyCovMatrix(7);
+  for (int row = 0; row < 7; ++row) { //diag
+    dummyCovMatrix(row, row) = 10000;
+  }
+
   for (unsigned i = 0; i < n; i++) {
     Belle2::Particle* particle = m_plist->getParticle(i);
 
     if (m_updateDaughters == true) {
       ParticleCopy::copyDaughters(particle);
+    }
+
+    if (!m_treatAsInvisible.empty()) {
+      std::vector<const Particle*> selParticlesTarget = m_pDDescriptorInvisibles.getSelectionParticles(particle);
+      Particle* targetD = m_particles[selParticlesTarget[0]->getArrayIndex()];
+      Particle* daughterCopy = Belle2::ParticleCopy::copyParticle(targetD);
+      daughterCopy->writeExtraInfo("treeFitterTreatMeAsInvisible", 1);
+      daughterCopy->setMomentumVertexErrorMatrix(dummyCovMatrix);
+      particle->replaceDaughter(targetD, daughterCopy);
     }
 
     try {
@@ -165,6 +211,9 @@ bool TreeFitterModule::fitTree(Belle2::Particle* head)
     m_customOriginVertex,
     m_customOriginCovariance,
     m_originDimension,
+    m_beamConstraintPDG,
+    m_beamMomE,
+    m_beamCovariance,
     m_inflationFactorCovZ
   );
 

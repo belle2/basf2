@@ -8,6 +8,7 @@
 
 #include <tracking/dataobjects/hitXPDerivate.h>
 #include <tracking/dataobjects/MCParticleInfo.h>
+#include <framework/geometry/B2Vector3.h>
 
 using namespace Belle2;
 
@@ -29,16 +30,16 @@ hitXPDerivate::hitXPDerivate(const SVDTrueHit& hit, const SVDCluster& cluster, c
   m_momentumLocalExit = hit.getExitMomentum(); /** local momentum at exitpoint */
   m_PDGID = particle.getPDG(); /** PDGID */
   m_position0 = B2Vector3D(particle.getVertex()); /** position at IP */
-  m_momentum0 = particle.getMomentum(); /** momentum at IP */
+  m_momentum0 = B2Vector3D(particle.getMomentum()); /** momentum at IP */
   m_time = hit.getGlobalTime(); /** time of the hit */
   m_sensorSensor = hit.getSensorID().getSensorNumber(); /** sensor number */
   m_sensorLayer = hit.getSensorID().getLayerNumber(); /** layer number */
   m_sensorLadder = hit.getSensorID().getLadderNumber(); /** ladder number */
-  m_info_d0 = MCParticleInfo(particle, TVector3(0, 0, 1.5)).getD0(); /** d0 from particle info */
-  m_info_z0 = MCParticleInfo(particle, TVector3(0, 0, 1.5)).getZ0(); /** z0 from particle info */
-  m_info_phi0 = MCParticleInfo(particle, TVector3(0, 0, 1.5)).getPhi(); /** phi0 from particle info */
-  m_info_tanlambda = MCParticleInfo(particle, TVector3(0, 0, 1.5)).getOmega(); /** omega from particle info */
-  m_info_omega = tan(MCParticleInfo(particle, TVector3(0, 0, 1.5)).getLambda()); /** omega from particle info */
+  m_info_d0 = MCParticleInfo(particle, ROOT::Math::XYZVector(0, 0, 1.5)).getD0(); /** d0 from particle info */
+  m_info_z0 = MCParticleInfo(particle, ROOT::Math::XYZVector(0, 0, 1.5)).getZ0(); /** z0 from particle info */
+  m_info_phi0 = MCParticleInfo(particle, ROOT::Math::XYZVector(0, 0, 1.5)).getPhi(); /** phi0 from particle info */
+  m_info_tanlambda = MCParticleInfo(particle, ROOT::Math::XYZVector(0, 0, 1.5)).getOmega(); /** omega from particle info */
+  m_info_omega = tan(MCParticleInfo(particle, ROOT::Math::XYZVector(0, 0, 1.5)).getLambda()); /** omega from particle info */
   m_clusterU = cluster.isUCluster(); /** flag of u-cluser */
   m_clusterV = cluster.isUCluster() ? 0 : 1; /** return 1 if it is an V cluster. flag of v cluster */
   m_reconstructed = false; /** flag of reconstructed */
@@ -63,17 +64,19 @@ hitXPDerivate::hitXPDerivate(const PXDTrueHit& hit, const MCParticle& particle, 
   m_momentumLocalExit = hit.getExitMomentum(); /** local momentum at exitpoint */
   m_PDGID = particle.getPDG(); /** PDGID */
   m_position0 = B2Vector3D(particle.getVertex()); /** position at IP */
-  m_momentum0 = particle.getMomentum(); /** momentum at IP */
+  m_momentum0 = B2Vector3D(particle.getMomentum()); /** momentum at IP */
   m_time = hit.getGlobalTime(); /** time of the hit */
   m_sensorSensor = hit.getSensorID().getSensorNumber(); /** sensor number */
   m_sensorLayer = hit.getSensorID().getLayerNumber(); /** layer number */
   m_sensorLadder = hit.getSensorID().getLadderNumber(); /** ladder number */
-  m_info_d0 = MCParticleInfo(particle, TVector3(0, 0, 1.5)).getD0(); /** d0 from particle info DO NOT USE, use the get */
-  m_info_z0 = MCParticleInfo(particle, TVector3(0, 0, 1.5)).getZ0(); /** z0 from particle info DO NOT USE, use the get */
-  m_info_phi0 = MCParticleInfo(particle, TVector3(0, 0, 1.5)).getPhi(); /** phi0 from particle info DO NOT USE, use the get */
-  m_info_tanlambda = MCParticleInfo(particle, TVector3(0, 0, 1.5)).getOmega(); /** omega from particle info DO NOT USE, use the get */
-  m_info_omega = tan(MCParticleInfo(particle, TVector3(0, 0,
-                                                       1.5)).getLambda()); /** omega from particle info DO NOT USE, use the get */
+  m_info_d0 = MCParticleInfo(particle, ROOT::Math::XYZVector(0, 0, 1.5)).getD0(); /** d0 from particle info DO NOT USE, use the get */
+  m_info_z0 = MCParticleInfo(particle, ROOT::Math::XYZVector(0, 0, 1.5)).getZ0(); /** z0 from particle info DO NOT USE, use the get */
+  m_info_phi0 = MCParticleInfo(particle, ROOT::Math::XYZVector(0, 0,
+                               1.5)).getPhi(); /** phi0 from particle info DO NOT USE, use the get */
+  m_info_tanlambda = MCParticleInfo(particle, ROOT::Math::XYZVector(0, 0,
+                                    1.5)).getOmega(); /** omega from particle info DO NOT USE, use the get */
+  m_info_omega = tan(MCParticleInfo(particle, ROOT::Math::XYZVector(0, 0,
+                                    1.5)).getLambda()); /** omega from particle info DO NOT USE, use the get */
   m_reconstructed = false; /** flag of reconstructed */
   m_charge = particle.getCharge(); /** charge of the particle */
 }

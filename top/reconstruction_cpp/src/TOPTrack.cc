@@ -171,7 +171,7 @@ namespace Belle2 {
       auto globalPosition = m_extHit->getPositionTVector3();
       auto position = module.pointGlobalToNominal(globalPosition);
       auto momentum = module.momentumGlobalToNominal(m_extHit->getMomentumTVector3());
-      double Bz = BFieldManager::getField(globalPosition).Z();
+      double Bz = BFieldManager::getField(ROOT::Math::XYZVector(globalPosition)).Z();
       m_helix.set(position, momentum, m_charge, Bz);
       m_helix.setTransformation(rotation, translation);
 

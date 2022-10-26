@@ -226,8 +226,8 @@ void SVDEventT0PerformanceTTreeModule::event()
         m_svdTrkPhi.push_back(tfr->getMomentum().Phi());
         m_svdTrkd0.push_back(tfr->getD0());
         m_svdTrkz0.push_back(tfr->getZ0());
-        m_svdTrkp.push_back(tfr->getMomentum().Mag());
-        m_svdTrkpT.push_back(tfr->getMomentum().Perp());
+        m_svdTrkp.push_back(tfr->getMomentum().R());
+        m_svdTrkpT.push_back(tfr->getMomentum().Rho());
         m_svdTrkPValue.push_back(tfr->getPValue());
         m_svdTrkCharge.push_back(tfr->getChargeSign());
         m_svdTrkNDF.push_back(tfr->getNDF());

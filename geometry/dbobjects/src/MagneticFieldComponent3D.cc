@@ -82,7 +82,7 @@ namespace {
 
 
 namespace Belle2 {
-  B2Vector3D MagneticFieldComponent3D::getField(const B2Vector3D& pos) const
+  ROOT::Math::XYZVector MagneticFieldComponent3D::getField(const ROOT::Math::XYZVector& pos) const
   {
     using std::get;
 
@@ -107,7 +107,7 @@ namespace Belle2 {
       return std::make_tuple(index, weight);
     };
 
-    const double z = pos.z();
+    const double z = pos.Z();
     const double r2 = pos.Perp2();
 
     // Calculate the lower index of the point in the Z grid
@@ -121,23 +121,23 @@ namespace Belle2 {
     const auto ir = getIndexWeight(r - m_minR, 0);
 
     // Calculate the lower index of the point in the Phi grid
-    const double ay = std::abs(pos.y());
-    const auto iphi = getIndexWeight(fast_atan2_minimax<4>(ay, pos.x()), 1);
+    const double ay = std::abs(pos.Y());
+    const auto iphi = getIndexWeight(fast_atan2_minimax<4>(ay, pos.X()), 1);
 
     // Get B-field values from map in cylindrical coordinates
-    B2Vector3D b = interpolate(get<0>(ir), get<0>(iphi), get<0>(iz), get<1>(ir), get<1>(iphi), get<1>(iz));
+    ROOT::Math::XYZVector b = interpolate(get<0>(ir), get<0>(iphi), get<0>(iz), get<1>(ir), get<1>(iphi), get<1>(iz));
     // and convert it to cartesian
     const double norm = 1 / r;
     const double s = ay * norm;
-    const double c = pos.x() * norm;
+    const double c = pos.X() * norm;
     // Flip sign of By if y<0
-    const double sgny = (pos.y() >= 0) - (pos.y() < 0);
+    const double sgny = (pos.Y() >= 0) - (pos.Y() < 0);
     // in cartesian system
-    return B2Vector3D(-(b.x() * c - b.y() * s), -sgny * (b.x() * s + b.y() * c), b.z());
+    return ROOT::Math::XYZVector(-(b.X() * c - b.Y() * s), -sgny * (b.X() * s + b.Y() * c), b.Z());
   }
 
-  B2Vector3D MagneticFieldComponent3D::interpolate(unsigned int ir, unsigned int iphi, unsigned int iz,
-                                                   double wr1, double wphi1, double wz1) const
+  ROOT::Math::XYZVector MagneticFieldComponent3D::interpolate(unsigned int ir, unsigned int iphi, unsigned int iz,
+                                                              double wr1, double wphi1, double wz1) const
   {
     const unsigned int strideZ = m_mapSize[0] * m_mapSize[1];
     const unsigned int strideR = m_mapSize[1];
@@ -157,7 +157,7 @@ namespace Belle2 {
     const double w10 = wphi0 * wr1;
     const double w01 = wphi1 * wr0;
     const double w11 = wphi1 * wr1;
-    const std::vector<B2Vector3F>& B = m_bmap;
+    const std::vector<ROOT::Math::XYZVector>& B = m_bmap;
     return
       (B[j000] * w00 + B[j001] * w01 + B[j010] * w10 + B[j011] * w11) * wz0 +
       (B[j100] * w00 + B[j101] * w01 + B[j110] * w10 + B[j111] * w11) * wz1;

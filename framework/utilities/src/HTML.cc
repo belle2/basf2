@@ -12,7 +12,6 @@
 
 #include <TMatrixFBase.h>
 #include <TMatrixD.h>
-#include <TVector3.h>
 
 #include <framework/gearbox/Unit.h>
 
@@ -74,16 +73,16 @@ std::string HTML::getString(const TMatrixDBase& matrix, int precision, bool colo
   return stream.str();
 }
 
-std::string HTML::getString(const TVector3& vec, int precision)
+std::string HTML::getString(const ROOT::Math::XYZVector& vec, int precision)
 {
   std::stringstream stream;
   stream.precision(precision);
 
-  stream << std::fixed << "(" << vec.x() << ", " <<  vec.y() << ", " <<  vec.z() << ")";
+  stream << std::fixed << "(" << vec.X() << ", " <<  vec.Y() << ", " <<  vec.Z() << ")";
   return stream.str();
 }
 
-std::string HTML::getStringConvertToUnit(const TVector3& vec, int precision, const std::string& unitType)
+std::string HTML::getStringConvertToUnit(const ROOT::Math::XYZVector& vec, int precision, const std::string& unitType)
 {
   std::stringstream stream;
   stream.precision(precision);
@@ -93,18 +92,18 @@ std::string HTML::getStringConvertToUnit(const TVector3& vec, int precision, con
     displayedUnitType = "\x0b5m";
 
 
-  stream << std::fixed << "(" << Unit::convertValueToUnit(vec.x(), unitType) << ", "
-         <<  Unit::convertValueToUnit(vec.y(), unitType) << ", " <<  Unit::convertValueToUnit(vec.z(), unitType)
+  stream << std::fixed << "(" << Unit::convertValueToUnit(vec.X(), unitType) << ", "
+         <<  Unit::convertValueToUnit(vec.Y(), unitType) << ", " <<  Unit::convertValueToUnit(vec.Z(), unitType)
          << ") " << displayedUnitType;
 
 
   return stream.str();
 }
-std::string HTML::chooseUnitOfLength(const TVector3& vec)
+std::string HTML::chooseUnitOfLength(const ROOT::Math::XYZVector& vec)
 {
   double xyz [3];
   std::string unitType;
-  vec.GetXYZ(xyz);
+  vec.GetCoordinates(xyz);
   double max = 0;
 
   for (auto entry : xyz)

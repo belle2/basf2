@@ -34,7 +34,7 @@ DQMHistAnalysisEventT0Module::DQMHistAnalysisEventT0Module()
   : DQMHistAnalysisModule()
 {
   //Parameter definition
-  addParam("min_nEntries", m_nEntriesMin, "minimum numeber of entries to process the histogram", m_nEntriesMin);
+  addParam("min_nEntries", m_nEntriesMin, "minimum number of entries to process the histogram", m_nEntriesMin);
   addParam("prefixCanvas", m_prefixCanvas, "prefix to be added to canvas filename when saved as pdf", std::string("c"));
   addParam("printCanvas", m_printCanvas, "if True prints pdf of the analysis canvas", bool(false));
 }

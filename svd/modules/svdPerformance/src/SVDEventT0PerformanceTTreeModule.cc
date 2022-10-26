@@ -59,6 +59,7 @@ void SVDEventT0PerformanceTTreeModule::initialize()
   recoTracks.isOptional();
   m_clusters.isRequired();
   m_EventT0.isOptional();
+  m_TRGECLData.isOptional();
 
   TDirectory::TContext context;
 
@@ -107,8 +108,8 @@ void SVDEventT0PerformanceTTreeModule::initialize()
   m_t->Branch("clsTime", &m_svdClTime);
   m_t->Branch("clsTimeErr", &m_svdClTimeErr);
   m_t->Branch("trueTime", &m_svdTrueTime);
-  m_t->Branch("eclTCEmax", &m_eclTCEmax, "eclTCEmax/i");
-  m_t->Branch("eclTCid", &m_eclTCid, "eclTCid/i");
+  m_t->Branch("eclTCEmax", &m_eclTCEmax, "eclTCEmax/I");
+  m_t->Branch("eclTCid", &m_eclTCid, "eclTCid/I");
 
 
 
@@ -292,12 +293,15 @@ void SVDEventT0PerformanceTTreeModule::event()
   }
 
   // ECL TC E_max in an event
-  StoreArray<TRGECLUnpackerStore> TRGECLData;
-  m_eclTCEmax    = 0; // most energetic TC energy
-  m_eclTCid      = 0; // TCID for most energetic TC
-  for (auto& trg_hit : TRGECLData) {
+  // StoreArray<TRGECLUnpackerStore> m_TRGECLData;
+  // m_TRGECLData.isOptional();
+  // m_TRGECLData.isRequired();
+  // m_eclTCEmax    = 0; // most energetic TC energy
+  // m_eclTCid      = 0; // TCID for most energetic TC
+  for (const auto& trg_hit : m_TRGECLData) {
     int hit_win   = trg_hit.getHitWin();
-    if (hit_win != 3 and hit_win != 4) { continue; }
+    B2DEBUG(40, "hit_win = " << hit_win);
+    if (hit_win != 3 && hit_win != 4) { continue; }
     if (trg_hit.getTCEnergy() > m_eclTCEmax) {
       m_eclTCid      = trg_hit.getTCId();
       m_eclTCEmax    = trg_hit.getTCEnergy();

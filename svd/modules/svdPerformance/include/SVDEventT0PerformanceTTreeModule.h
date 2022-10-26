@@ -19,6 +19,9 @@
 
 namespace Belle2 {
 
+  /** Forward declarations */
+  class TRGECLUnpackerStore;
+
   /**
    *The module is used to create a TTree to study SVD EventT0.
    */
@@ -40,6 +43,7 @@ namespace Belle2 {
     //datastore
     StoreObjPtr<EventT0> m_EventT0; /**< event T0 */
     StoreArray<SVDCluster> m_clusters; /**< svd clusters */
+    StoreArray<TRGECLUnpackerStore> m_TRGECLData; /**< TRGECLUnpackerStore */
 
     //rootfile
     std::string m_rootFileName = "";   /**< root file name */

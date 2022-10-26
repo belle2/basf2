@@ -503,6 +503,13 @@ namespace Belle2 {
       return m_outgoingArmTime;
     }
 
+    /// Return the error of the track time of the outgoing arm
+    double getOutgoingArmTimeError()
+    {
+      if (!m_calculateArmTime) calculateArmTime();
+      return m_outgoingArmTimeError;
+    }
+
     /// Return the track time of the ingoing arm
     double getIngoingArmTime()
     {
@@ -510,11 +517,37 @@ namespace Belle2 {
       return m_ingoingArmTime;
     }
 
+    /// Return the error of the track time of the ingoing arm
+    double getIngoingArmTimeError()
+    {
+      if (!m_calculateArmTime) calculateArmTime();
+      return m_ingoingArmTimeError;
+    }
+
     /// Return the difference between the track times of the ingoing and outgoing arms
     double getInOutArmTimeDifference()
     {
       if (!m_calculateArmTime) calculateArmTime();
       return m_inOutArmTimeDiff;
+    }
+
+    /// Return the error of the difference between the track times of the ingoing and outgoing arms
+    double getInOutArmTimeDifferenceError()
+    {
+      if (!m_calculateArmTime) calculateArmTime();
+      return m_inOutArmTimeDiffError;
+    }
+
+    /// Check if the ingoing arm time is set
+    bool hasIngoingArmTime()
+    {
+      return m_hasIngoingArmTime;
+    }
+
+    /// Check if the outgoing arm time is set
+    bool hasOutgoingArmTime()
+    {
+      return m_hasOutgoingArmTime;
     }
 
     /// Return the position, the momentum and the charge of the first measured state on plane or - if unfitted - the seeds.
@@ -841,12 +874,22 @@ namespace Belle2 {
     float m_2ndFlipqualityIndicator = NAN;
     /// Track time of the outgoing arm
     float m_outgoingArmTime = NAN;
+    /// Error of the track time of the outgoing arm
+    float m_outgoingArmTimeError = NAN;
     /// Track time of the ingoing arm
     float m_ingoingArmTime = NAN;
+    /// Error of the track time of the ingoing arm
+    float m_ingoingArmTimeError = NAN;
     /// Difference of the track times of the ingoing and outgoing arms
     float m_inOutArmTimeDiff = NAN;
-    /// Run calculateArmTime()
+    /// Error of the difference of the track times of the ingoing and outgoing arms
+    float m_inOutArmTimeDiffError = NAN;
+    /// Internal storage of calculateArmTime() is set
     bool m_calculateArmTime = false;
+    /// Internal storage of the final ingoing arm time is set
+    bool m_hasIngoingArmTime = false;
+    /// Internal storage of the final outgoing arm time is set
+    bool m_hasOutgoingArmTime = false;
 
     /**
      * Add a generic hit with the given parameters for the reco hit information.
@@ -964,7 +1007,7 @@ namespace Belle2 {
     }
 
     /** Making this class a ROOT class.*/
-    ClassDefOverride(RecoTrack, 14);
+    ClassDefOverride(RecoTrack, 12);
   };
 
   /**

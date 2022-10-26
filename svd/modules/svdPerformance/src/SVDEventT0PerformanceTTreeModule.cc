@@ -28,7 +28,12 @@
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <framework/datastore/RelationArray.h>
+
+// Unpackers
 #include <trg/ecl/dataobjects/TRGECLUnpackerStore.h>
+
+// OnlineEventT0
+#include <hlt/dataobjects/OnlineEventT0.h>
 
 using namespace Belle2;
 using namespace std;
@@ -78,8 +83,14 @@ void SVDEventT0PerformanceTTreeModule::initialize()
   m_t->Branch("svdEventT0Err", &m_svdEventT0Err, "svdEventT0Err/F");
   m_t->Branch("cdcEventT0", &m_cdcEventT0, "cdcEventT0/F");
   m_t->Branch("cdcEventT0Err", &m_cdcEventT0Err, "cdcEventT0Err/F");
+  m_t->Branch("cdcOnlineEventT0", &m_cdcOnlineEventT0, "cdcOnlineEventT0/F");
+  m_t->Branch("cdcOnlineEventT0Err", &m_cdcOnlineEventT0Err, "cdcOnlineEventT0Err/F");
   m_t->Branch("topEventT0", &m_topEventT0, "topEventT0/F");
   m_t->Branch("topEventT0Err", &m_topEventT0Err, "topEventT0Err/F");
+  m_t->Branch("topOnlineEventT0", &m_topOnlineEventT0, "topOnlineEventT0/F");
+  m_t->Branch("topOnlineEventT0Err", &m_topOnlineEventT0Err, "topOnlineEventT0Err/F");
+  m_t->Branch("eclOnlineEventT0", &m_eclOnlineEventT0, "eclOnlineEventT0/F");
+  m_t->Branch("eclOnlineEventT0Err", &m_eclOnlineEventT0Err, "eclOnlineEventT0Err/F");
   m_t->Branch("totTracks", &m_nTracks, "totTracks/i");
   m_t->Branch("TB", &m_svdTB, "TB/i");
   m_t->Branch("trkNumb", &m_trkNumber);
@@ -126,6 +137,10 @@ void SVDEventT0PerformanceTTreeModule::event()
   m_cdcEventT0Err = -99;
   m_topEventT0 = -99;
   m_topEventT0Err = -99;
+  m_topOnlineEventT0 = -99;
+  m_topOnlineEventT0Err = -99;
+  m_eclOnlineEventT0 = -99;
+  m_eclOnlineEventT0Err = -99;
   m_eclTCEmax = -99;
   m_eclTCid = -99;
 
@@ -160,6 +175,28 @@ void SVDEventT0PerformanceTTreeModule::event()
         m_topEventT0Err = evtT0List_TOP.back().eventT0Uncertainty;
       }
     }
+
+  StoreArray<OnlineEventT0> onlineEventT0;
+  for (auto& evt : onlineEventT0) {
+    if (evt.getOnlineEventT0Detector() == Const::EDetector::CDC) {
+      B2DEBUG(40, "OnlineEventT0 given by CDC");
+      m_cdcOnlineEventT0    = evt.getOnlineEventT0();
+      m_cdcOnlineEventT0Err = evt.getOnlineEventT0Uncertainty();
+    }
+
+    if (evt.getOnlineEventT0Detector() == Const::EDetector::ECL) {
+      B2DEBUG(40, "OnlineEventT0 given by ECL");
+      m_eclOnlineEventT0    = evt.getOnlineEventT0();
+      m_eclOnlineEventT0Err = evt.getOnlineEventT0Uncertainty();
+    }
+
+    if (evt.getOnlineEventT0Detector() == Const::EDetector::TOP) {
+      B2DEBUG(40, "OnlineEventT0 given by TOP");
+      m_topOnlineEventT0    = evt.getOnlineEventT0();
+      m_topOnlineEventT0Err = evt.getOnlineEventT0Uncertainty();
+    }
+  }
+
 
   // clear all vectors
   m_trkNumber.clear();
@@ -292,12 +329,6 @@ void SVDEventT0PerformanceTTreeModule::event()
     }
   }
 
-  // ECL TC E_max in an event
-  // StoreArray<TRGECLUnpackerStore> m_TRGECLData;
-  // m_TRGECLData.isOptional();
-  // m_TRGECLData.isRequired();
-  // m_eclTCEmax    = 0; // most energetic TC energy
-  // m_eclTCid      = 0; // TCID for most energetic TC
   for (const auto& trg_hit : m_TRGECLData) {
     int hit_win   = trg_hit.getHitWin();
     B2DEBUG(40, "hit_win = " << hit_win);

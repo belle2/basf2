@@ -981,7 +981,7 @@ namespace Belle2 {
         double output = 0.0;
 
         if (requestedVariable == "cosTPTOFast")
-          output = std::get<double>(Variable::Manager::Instance().getVariable("cosTPTO")->function(TargetFastParticle));
+          output = cosTPTO(TargetFastParticle);
 
         ROOT::Math::PxPyPzEVector momSlowPion = PCmsLabTransform::labToCms(particle->get4Vector());  //Momentum of Slow Pion in CMS-System
         if (momSlowPion == momSlowPion)   // FIXME

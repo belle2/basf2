@@ -224,10 +224,6 @@ namespace Belle2 {
         // Strip trailing newline.
         cut.erase(std::remove(cut.begin(), cut.end(), '\n'), cut.end());
 
-        // Conditional expression separator must use square brackets in basf2.
-        std::replace(cut.begin(), cut.end(), '(', '[');
-        std::replace(cut.begin(), cut.end(), ')', ']');
-
         m_cuts[pdg].push_back(cut);
 
         ++idx;

@@ -640,11 +640,10 @@ std::string RecoTrack::getInfoHTML() const
   return out.str();
 }
 
-void RecoTrack::calculateArmTime(const std::string& storeArrayNameOfRecoTracks)
+void RecoTrack::calculateArmTime()
 {
   m_calculateArmTime = true;
-  StoreArray<RecoTrack> recoTracks(storeArrayNameOfRecoTracks);
-  std::vector<RecoHitInformation*> recoHits = recoTracks[0]->getRecoHitInformations(true);
+  std::vector<RecoHitInformation*> recoHits = getRecoHitInformations(true);
   bool svdDONE = false;
   float detIDpre = NAN;
   float detID = NAN; //0: PXD, 1: SVD, 2: CDC, 3: other
@@ -659,27 +658,21 @@ void RecoTrack::calculateArmTime(const std::string& storeArrayNameOfRecoTracks)
     else if (foundin == RecoHitInformation::RecoHitDetector::c_SVD) detID = 1;
     else if (foundin == RecoHitInformation::RecoHitDetector::c_CDC) detID = 2;
     else detID = 3;
-    if (!svdDONE && detID != 1) detIDpre = detID;
+    if (!svdDONE && detID != 1) {
+      detIDpre = detID;
+      trackArmTimeDONE = false;
+    }
     RelationVector<SVDCluster> svdClusters = recoHits[i]->getRelationsTo<SVDCluster>();
-    //B2INFO("detID: "<<detID<<"; detIDpre: "<<detIDpre<<"; svdDONE: "<<svdDONE);
     if (detID == 1) {
       clsTimeSum += svdClusters[0]->getClsTime();
       nSVD += 1;
       svdDONE = true;
     } else {
-      if (svdDONE) {
+      if (svdDONE && nSVD != 0) {
         detIDpost = detID;
-        //B2INFO("detIDpre: "<<detIDpre<<"; detIDpost: "<<detIDpost);
         arm = trackArmDirection(detIDpre, detIDpost);
-        if (arm == "IN") {
-          m_ingoingArmTime = clsTimeSum / nSVD;
-          m_trackArmDirection = 1;
-        }
-        if (arm == "OUT") {
-          m_outgoingArmTime = clsTimeSum / nSVD;
-          m_trackArmDirection = 0;
-        }
-        //B2INFO("arm: "<<arm<<"; detIDpre: "<<detIDpre<<"; detIDpost: "<<detIDpost<<"\n");
+        if (arm == "IN") m_ingoingArmTime = clsTimeSum / nSVD;
+        if (arm == "OUT") m_outgoingArmTime = clsTimeSum / nSVD;
         svdDONE = false;
         detIDpre = detIDpost;
         detIDpost = NAN;
@@ -688,26 +681,11 @@ void RecoTrack::calculateArmTime(const std::string& storeArrayNameOfRecoTracks)
         trackArmTimeDONE = true;
       }
     }
-    if (!trackArmTimeDONE && (i == (int)recoHits.size() - 1)) {
-      if (svdDONE) {
-        //B2INFO("detIDpre: "<<detIDpre<<"; detIDpost: "<<detIDpost);
-        arm = trackArmDirection(detIDpre, detIDpost);
-        if (arm == "IN") {
-          m_ingoingArmTime = clsTimeSum / nSVD;
-          m_trackArmDirection = 1;
-        }
-        if (arm == "OUT") {
-          m_outgoingArmTime = clsTimeSum / nSVD;
-          m_trackArmDirection = 0;
-        }
-        //B2INFO("arm: "<<arm<<"; detIDpre: "<<detIDpre<<"; detIDpost: "<<detIDpost<<"\n");
-        svdDONE = false;
-        detIDpre = detIDpost;
-        detIDpost = NAN;
-        clsTimeSum = 0;
-        nSVD = 0;
-        trackArmTimeDONE = true;
-      }
+    if (!trackArmTimeDONE && (i == (int)recoHits.size() - 1) && nSVD != 0) {
+      arm = trackArmDirection(detIDpre, detIDpost);
+      if (arm == "IN") m_ingoingArmTime = clsTimeSum / nSVD;
+      if (arm == "OUT") m_outgoingArmTime = clsTimeSum / nSVD;
+      // It will not reset all variables because it is run only at the last recoHit
     }
   }
   m_inOutArmTimeDiff = m_ingoingArmTime - m_outgoingArmTime;

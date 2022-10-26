@@ -497,31 +497,24 @@ namespace Belle2 {
     double getTimeSeed() const { return m_genfitTrack.getTimeSeed(); }
 
     /// Return the track time of the outgoing arm
-    double getTimeOutgoingArm()
+    double getOutgoingArmTime()
     {
-      if (!m_calculateArmTime) calculateArmTime("RecoTracks");
+      if (!m_calculateArmTime) calculateArmTime();
       return m_outgoingArmTime;
     }
 
     /// Return the track time of the ingoing arm
-    double getTimeIngoingArm()
+    double getIngoingArmTime()
     {
-      if (!m_calculateArmTime) calculateArmTime("RecoTracks");
+      if (!m_calculateArmTime) calculateArmTime();
       return m_ingoingArmTime;
     }
 
     /// Return the difference between the track times of the ingoing and outgoing arms
-    double getTimeInOutArmDifference()
+    double getInOutArmTimeDifference()
     {
-      if (!m_calculateArmTime) calculateArmTime("RecoTracks");
+      if (!m_calculateArmTime) calculateArmTime();
       return m_inOutArmTimeDiff;
-    }
-
-    /// Return track arm direction, 0: outgoing, 1: ingoing, 2: not classified
-    int getTrackArmDirection()
-    {
-      if (!m_calculateArmTime) calculateArmTime("RecoTracks");
-      return m_trackArmDirection;
     }
 
     /// Return the position, the momentum and the charge of the first measured state on plane or - if unfitted - the seeds.
@@ -632,7 +625,7 @@ namespace Belle2 {
      * This function calculate the track time of the ingoing anf outgoing arms and their difference.
      * If they do not exists than they are set to NAN by default
      */
-    void calculateArmTime(const std::string& storeArrayNameOfRecoTracks = "");
+    void calculateArmTime();
 
     /**
      * This function return the arm direction of the track as a std::string:
@@ -852,8 +845,6 @@ namespace Belle2 {
     float m_ingoingArmTime = NAN;
     /// Difference of the track times of the ingoing and outgoing arms
     float m_inOutArmTimeDiff = NAN;
-    /// Track arm direction 0: ougoing, 1: ingoing, 2: not classified
-    int m_trackArmDirection = 2;
     /// Run calculateArmTime()
     bool m_calculateArmTime = false;
 
@@ -973,7 +964,7 @@ namespace Belle2 {
     }
 
     /** Making this class a ROOT class.*/
-    ClassDefOverride(RecoTrack, 13);
+    ClassDefOverride(RecoTrack, 14);
   };
 
   /**

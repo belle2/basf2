@@ -558,7 +558,9 @@ namespace Belle2 {
     double electronID_noTOP(const Particle* part)
     {
       // Excluding TOP for electron ID. This variable is temporary. BII-8444
-      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(11, SVD, CDC, ARICH, ECL, KLM)")->function(part));
+      static Manager::FunctionPtr pidFunction =
+        pidProbabilityExpert({"11", "SVD", "CDC", "ARICH", "ECL", "KLM"});
+      return std::get<double>(pidFunction(part));
     }
 
     double binaryElectronID_noTOP(const Particle* part, const std::vector<double>& arguments)
@@ -581,7 +583,9 @@ namespace Belle2 {
     double electronID_noSVD_noTOP(const Particle* part)
     {
       // Excluding SVD and TOP for electron ID. This variable is temporary. BII-8444, BII-8760.
-      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(11, CDC, ARICH, ECL, KLM)")->function(part));
+      static Manager::FunctionPtr pidFunction =
+        pidProbabilityExpert({"11", "CDC", "ARICH", "ECL", "KLM"});
+      return std::get<double>(pidFunction(part));
     }
 
     double binaryElectronID_noSVD_noTOP(const Particle* part, const std::vector<double>& arguments)

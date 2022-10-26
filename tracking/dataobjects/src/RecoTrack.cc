@@ -16,7 +16,6 @@
 #include <genfit/RKTrackRep.h>
 #include <genfit/MplTrackRep.h>
 #include <simulation/monopoles/MonopoleConstants.h>
-#include <svd/reconstruction/SVDRecoHit2D.h>
 #include <svd/dataobjects/SVDCluster.h>
 
 using namespace Belle2;

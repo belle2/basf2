@@ -76,6 +76,9 @@ namespace Belle2 {
     /** Run number. */
     unsigned int m_runno;
 
+    /** Run type. */
+    std::string m_runtype;
+
     /** total number of events for run. */
     unsigned int m_events;
 

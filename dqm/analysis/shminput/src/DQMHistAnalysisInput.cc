@@ -13,10 +13,10 @@
 
 #include <dqm/analysis/shminput/DQMHistAnalysisInput.h>
 
-#include <ctime>
-
 #include <TROOT.h>
 #include <TKey.h>
+
+#include <ctime>
 
 using namespace Belle2;
 
@@ -218,6 +218,7 @@ void DQMHistAnalysisInputModule::event()
 
   //setExpNr(m_expno); // redundant access from MetaData
   //setRunNr(m_runno); // redundant access from MetaData
+  // ExtractRunType();// Run Type is processed above already, just take it
   setRunType(rtype);
   ExtractEvent();
 

@@ -614,7 +614,9 @@ namespace Belle2 {
         const PIDLikelihood* pid = part->getPIDLikelihood();
         if (!pid) return std::numeric_limits<float>::quiet_NaN();
         if (pid->getLogL(Const::kaon, Const::ARICH) > pid->getLogL(Const::pion, Const::ARICH)) {
-          return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(211, SVD, CDC, TOP, ECL, KLM)")->function(part));
+          static Manager::FunctionPtr pidFunction =
+            pidProbabilityExpert({"211", "SVD", "CDC", "TOP", "ECL", "KLM"});
+          return std::get<double>(pidFunction(part));
         }
       }
       return pionID(part);
@@ -629,7 +631,9 @@ namespace Belle2 {
         const PIDLikelihood* pid = part->getPIDLikelihood();
         if (!pid) return std::numeric_limits<float>::quiet_NaN();
         if (pid->getLogL(Const::kaon, Const::ARICH) > pid->getLogL(Const::pion, Const::ARICH)) {
-          return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(321, SVD, CDC, TOP, ECL, KLM)")->function(part));
+          static Manager::FunctionPtr pidFunction =
+            pidProbabilityExpert({"321", "SVD", "CDC", "TOP", "ECL", "KLM"});
+          return std::get<double>(pidFunction(part));
         }
       }
       return kaonID(part);

@@ -87,6 +87,8 @@ namespace Belle2 {
     float m_eventT0Err = -99; /**< final event T0 error */
     float m_svdEventT0 = -99; /**< SVD event T0 */
     float m_svdEventT0Err = -99; /**< SVD event T0 Error */
+    float m_svdOnlineEventT0 = -99; /**< SVD online event T0 error */
+    float m_svdOnlineEventT0Err = -99; /**< SVD online event T0 error */
     float m_cdcEventT0 = -99; /**< CDC event T0 */
     float m_cdcEventT0Err = -99; /**< CDC event T0 Error */
     float m_cdcOnlineEventT0 = -99; /**< CDC online event T0 error */
@@ -97,15 +99,14 @@ namespace Belle2 {
     float m_topOnlineEventT0Err = -99; /**< TOP online event T0 error */
     float m_eclOnlineEventT0 = -99; /**< ECL online event T0 error */
     float m_eclOnlineEventT0Err = -99; /**< ECL online event T0 error */
+    int m_eclTCEmax = -99;  /**< ECal TC Emax  */
+    int m_eclTCid = -99;  /**< ECal TC id  */
     int m_nTracks = 0; /**< number of tracks in the event*/
     int m_svdTB = -1; /**< trigger bin */
     float m_trueEventT0 = -99; /**< true event t0 */
     int m_exp = -99; /**< experiment number */
     int m_run = -99; /**< run number */
     int m_event = -99; /**< event number */
-
-    int m_eclTCEmax = -99;  /**< ECal TC Emax  */
-    int m_eclTCid = -99;  /**< ECal TC id  */
 
   };
 }

@@ -81,6 +81,8 @@ void SVDEventT0PerformanceTTreeModule::initialize()
   m_t->Branch("eventT0Err", &m_eventT0Err, "eventT0Err/F");
   m_t->Branch("svdEventT0", &m_svdEventT0, "svdEventT0/F");
   m_t->Branch("svdEventT0Err", &m_svdEventT0Err, "svdEventT0Err/F");
+  m_t->Branch("svdOnlineEventT0", &m_svdOnlineEventT0, "svdOnlineEventT0/F");
+  m_t->Branch("svdOnlineEventT0Err", &m_svdOnlineEventT0Err, "svdOnlineEventT0Err/F");
   m_t->Branch("cdcEventT0", &m_cdcEventT0, "cdcEventT0/F");
   m_t->Branch("cdcEventT0Err", &m_cdcEventT0Err, "cdcEventT0Err/F");
   m_t->Branch("cdcOnlineEventT0", &m_cdcOnlineEventT0, "cdcOnlineEventT0/F");
@@ -91,6 +93,8 @@ void SVDEventT0PerformanceTTreeModule::initialize()
   m_t->Branch("topOnlineEventT0Err", &m_topOnlineEventT0Err, "topOnlineEventT0Err/F");
   m_t->Branch("eclOnlineEventT0", &m_eclOnlineEventT0, "eclOnlineEventT0/F");
   m_t->Branch("eclOnlineEventT0Err", &m_eclOnlineEventT0Err, "eclOnlineEventT0Err/F");
+  m_t->Branch("eclTCEmax", &m_eclTCEmax, "eclTCEmax/I");
+  m_t->Branch("eclTCid", &m_eclTCid, "eclTCid/I");
   m_t->Branch("totTracks", &m_nTracks, "totTracks/i");
   m_t->Branch("TB", &m_svdTB, "TB/i");
   m_t->Branch("trkNumb", &m_trkNumber);
@@ -119,8 +123,6 @@ void SVDEventT0PerformanceTTreeModule::initialize()
   m_t->Branch("clsTime", &m_svdClTime);
   m_t->Branch("clsTimeErr", &m_svdClTimeErr);
   m_t->Branch("trueTime", &m_svdTrueTime);
-  m_t->Branch("eclTCEmax", &m_eclTCEmax, "eclTCEmax/I");
-  m_t->Branch("eclTCid", &m_eclTCid, "eclTCid/I");
 
 
 
@@ -133,8 +135,12 @@ void SVDEventT0PerformanceTTreeModule::event()
   m_eventT0Err = -99;
   m_svdEventT0 = -99;
   m_svdEventT0Err = -99;
+  m_svdOnlineEventT0 = -99;
+  m_svdOnlineEventT0Err = -99;
   m_cdcEventT0 = -99;
   m_cdcEventT0Err = -99;
+  m_cdcOnlineEventT0 = -99;
+  m_cdcOnlineEventT0Err = -99;
   m_topEventT0 = -99;
   m_topEventT0Err = -99;
   m_topOnlineEventT0 = -99;
@@ -178,6 +184,12 @@ void SVDEventT0PerformanceTTreeModule::event()
 
   StoreArray<OnlineEventT0> onlineEventT0;
   for (auto& evt : onlineEventT0) {
+    if (evt.getOnlineEventT0Detector() == Const::EDetector::SVD) {
+      B2DEBUG(40, "OnlineEventT0 given by SVD");
+      m_svdOnlineEventT0    = evt.getOnlineEventT0();
+      m_svdOnlineEventT0Err = evt.getOnlineEventT0Uncertainty();
+    }
+
     if (evt.getOnlineEventT0Detector() == Const::EDetector::CDC) {
       B2DEBUG(40, "OnlineEventT0 given by CDC");
       m_cdcOnlineEventT0    = evt.getOnlineEventT0();

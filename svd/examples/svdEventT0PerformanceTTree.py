@@ -81,8 +81,8 @@ else:
     b2conditions.prepend_globaltag("staging_online")
     # b2conditions.append_globaltag("svd_data_rel7")
     # b2conditions.append_globaltag("patch_main_release-07_noTOP")
+    b2conditions.prepend_globaltag("data_reprocessing_prompt")
     b2conditions.prepend_globaltag("patch_main_release-07")
-    # b2conditions.prepend_globaltag("data_reprocessing_prompt")
 
     MCTracking = False
 

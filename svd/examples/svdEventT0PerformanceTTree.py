@@ -14,11 +14,7 @@
 # Example Script to use SVDEventT0PerformanceTTree and OverlapResidual Modules
 # on simulation or real data
 #
-# Use: basf2 -i /pnfs/desy.de/belle/belle2/TMP/belle/Raw/e0016/physics/r00610/sub00/physics.0016.00610.HLT1.f00000.root
-#      svd/examples/svdEventT0PerformanceTTree.py
-#      basf2 -i /pnfs/desy.de/belle/belle2/TMP/belle/Raw/e0024/physics/r01726/sub01/physics.0024.01726.HLT1.f00000.root
-#      svd/examples/svdEventT0PerformanceTTree.py
-#
+# Use: basf2 -i <RAWDATAFILE> script -- --fileDir temp/ --fileTag test
 #
 ###################################################################################
 
@@ -35,8 +31,8 @@ import argparse
 # useSimulation = True
 useSimulation = False
 
-b2.set_log_level(b2.LogLevel.DEBUG)
-b2.set_debug_level(40)
+# b2.set_log_level(b2.LogLevel.DEBUG)
+# b2.set_debug_level(40)
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("--fileDir", default="./",
@@ -86,6 +82,7 @@ else:
     # b2conditions.append_globaltag("svd_data_rel7")
     # b2conditions.append_globaltag("patch_main_release-07_noTOP")
     b2conditions.prepend_globaltag("patch_main_release-07")
+    # b2conditions.prepend_globaltag("data_reprocessing_prompt")
 
     MCTracking = False
 
@@ -93,7 +90,8 @@ else:
     # main.add_module('RootInput', branchNames=['RawPXDs', 'RawSVDs', 'RawCDCs', 'RawECLs'])
     # raw.add_unpackers(main, components=['PXD', 'SVD', 'CDC', 'ECL'])
 
-    main.add_module('RootInput', entrySequences=['0:100'])
+    # main.add_module('RootInput', entrySequences=[str(args.startEvt)+":"+str(args.endEvt)])
+    main.add_module('RootInput')
 
     main.add_module("Gearbox")
     main.add_module('Geometry', useDB=True)

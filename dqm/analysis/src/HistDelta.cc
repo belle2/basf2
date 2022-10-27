@@ -12,7 +12,7 @@
 
 using namespace Belle2;
 
-HistDelta::HistDelta(int t, int p, unsigned int a)
+HistDelta::HistDelta(DeltaType t, int p, unsigned int a)
 {
   m_type = t;
   m_parameter = p;
@@ -21,7 +21,7 @@ HistDelta::HistDelta(int t, int p, unsigned int a)
   m_lastValue = 0;
 };
 
-void HistDelta::set(int t, int p, unsigned int a)
+void HistDelta::set(DeltaType t, int p, unsigned int a)
 {
   m_type = t;
   m_parameter = p;
@@ -43,21 +43,23 @@ void HistDelta::update(TH1* currentHist)
   // now check if need to update m_deltaHists
   bool need_update = false;
   switch (m_type) {
-    case 1:
+    case Entries:
       // default case, look at the entries in the histogram
       need_update = currentHist->GetEntries() - m_lastHist->GetEntries() >= m_parameter;
       break;
-    case 2:
+    case Underflow:
       // here we misuse underflow as event counter in some histograms, e.g. PXD
       need_update = currentHist->GetBinContent(0) - m_lastHist->GetBinContent(0) >= m_parameter;
       break;
-    case 3:
+    case Events:
       // use event processed counter
       need_update = DQMHistAnalysisModule::getEventProcessed() - m_lastValue >= m_parameter;
       if (need_update) m_lastValue = DQMHistAnalysisModule::getEventProcessed(); // update last value
       break;
     default:
-      // any unsupported types map to case 0, and will disable delta for this hist
+      // any unsupported types map to case 0(Disabled), and will disable delta for this hist
+      [[fallthrough]];
+    case Disabled:
       break;
   }
 

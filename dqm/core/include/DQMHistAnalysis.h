@@ -233,7 +233,7 @@ namespace Belle2 {
      * @param p numerical parameter depnding on type, e.g. number of entries
      * @param a amount of histograms in the past
      */
-    void addDeltaPar(const std::string& dirname, const std::string& histname, int t, int p, unsigned int a);
+    void addDeltaPar(const std::string& dirname, const std::string& histname,  HistDelta::DeltaType t, int p, unsigned int a);
 
     /**
      * Mark canvas as updated (or not)

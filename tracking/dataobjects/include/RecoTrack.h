@@ -891,7 +891,7 @@ namespace Belle2 {
     bool m_hasOutgoingArmTime = false;
 
     /**
-     * Add a generic hit with the given parameters for the reco hit information.
+     * Add a generic hit with the given parameters for the reco hit information and reset track time information.
      * @param hit a generic hit.
      * @param params for the constructor of the reco hit information.
      * @return true if the hit was new.
@@ -907,6 +907,16 @@ namespace Belle2 {
       RecoHitInformation* newRecoHitInformation = recoHitInformations.appendNew(hit, params...);
 
       addHitWithHitInformation(hit, newRecoHitInformation);
+
+      m_isArmTimeComputed = false;
+      m_hasIngoingArmTime = false;
+      m_hasOutgoingArmTime = false;
+      m_outgoingArmTime = NAN;
+      m_ingoingArmTime = NAN;
+      m_inOutArmTimeDiff = NAN;
+      m_outgoingArmTimeError = NAN;
+      m_ingoingArmTimeError = NAN;
+      m_inOutArmTimeDiffError = NAN;
 
       return true;
     }

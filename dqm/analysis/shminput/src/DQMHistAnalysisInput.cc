@@ -73,10 +73,13 @@ void DQMHistAnalysisInputModule::initialize()
 void DQMHistAnalysisInputModule::beginRun()
 {
   B2INFO("DQMHistAnalysisInput: beginRun called.");
+  clearHistList();
 }
 
 void DQMHistAnalysisInputModule::event()
 {
+  initHistListBeforeEvent();
+
   sleep(m_interval);
   std::vector<TH1*> hs;
   char mbstr[100];
@@ -97,15 +100,18 @@ void DQMHistAnalysisInputModule::event()
 
   file->cd();
   TIter next(file->GetListOfKeys());
-  TKey* key = NULL;
+  TKey* key = nullptr;
 
   now = time(0);
   strftime(mbstr, sizeof(mbstr), "%c", localtime(&now));
   B2INFO("[" << mbstr << "] before input loop");
 
   while ((key = (TKey*)next())) {
-    TH1* h = (TH1*)key->ReadObj();
-    if (h == NULL) continue; // would be strange, but better check
+    auto obj = key->ReadObj();
+    if (obj == nullptr) continue; // would be strange, but better check
+    if (!key->IsA()->InheritsFrom("TH1")) continue; //
+    TH1* h = (TH1*)obj; // we are sure its a TH1
+
     if (m_remove_empty && h->GetEntries() == 0) continue;
     // Remove ":" from folder name, workaround!
     TString a = h->GetName();
@@ -113,10 +119,10 @@ void DQMHistAnalysisInputModule::event()
     h->SetName(a);
     B2DEBUG(1, "DQMHistAnalysisInput: get histo " << a.Data());
 
+    // the following lines prevent any histogram outside a directory to be processed
     auto split_result = StringSplit(a.Data(), '/');
     if (split_result.size() <= 1) continue;
-
-    auto dirname = split_result[0];
+    auto dirname = split_result.at(0); // extract dirname, get hist name is in histogram itself
 
     hs.push_back(h);
     if (std::string(h->GetName()) == std::string("DQMInfo/expno")) expno = h->GetTitle();
@@ -158,24 +164,28 @@ void DQMHistAnalysisInputModule::event()
         a.ReplaceAll("/", "_");
         std::string name = a.Data();
         if (m_cs.find(name) == m_cs.end()) {
+          // no canvas exists yet, create one
           if (split_result.size() > 1) {
-            std::string hname = split_result[1];
+            std::string hname = split_result.at(1);
             if ((dirname + "/" + hname) == "softwaretrigger/skim") hname = "skim_hlt";
             TCanvas* c = new TCanvas((dirname + "/c_" + hname).c_str(), ("c_" + hname).c_str());
             m_cs.insert(std::pair<std::string, TCanvas*>(name, c));
           } else {
+            // but this case is explicity excluded above?
             std::string hname = a.Data();
             TCanvas* c = new TCanvas(("c_" + hname).c_str(), ("c_" + hname).c_str());
             m_cs.insert(std::pair<std::string, TCanvas*>(name, c));
           }
         }
-        TCanvas* c = m_cs[name];
+        TCanvas* c = m_cs[name]; // access already created canvas
         B2DEBUG(1, "DQMHistAnalysisInput: new canvas " << c->GetName());
         c->cd();
         if (h->GetDimension() == 1) {
+          // assume users are expecting non-0-suppressed axis
           if (h->GetMinimum() > 0) h->SetMinimum(0);
           h->Draw("hist");
         } else if (h->GetDimension() == 2) {
+          // ... but not in 2d
           h->Draw("colz");
         }
         c->Update();
@@ -198,7 +208,6 @@ void DQMHistAnalysisInputModule::event()
   B2INFO("DQMHistAnalysisInput: " << m_memname + ": Exp " + expno + ", Run " + runno + ", RunType " + rtype + ", Last Updated " +
          mmt.AsString());
 
-  resetHist();
   for (size_t i = 0; i < hs.size(); i++) {
     TH1* h = hs[i];
     addHist("", h->GetName(), h);

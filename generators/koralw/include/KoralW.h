@@ -89,8 +89,9 @@ namespace Belle2 {
      * @param mom The 3-momentum of the particle in [GeV].
      * @param vtx The vertex of the particle in [mm].
      * @param pdg The PDG code of the particle.
+     * @param vertex The vertex of the particle in [mm].
+     * @param boost Lorentz boost vector.
      * @param isVirtual If the particle is a virtual particle, such as the incoming particles, set this to true.
-     *
      * @param isInitial If the particle is a initial particle for ISR, set this to true.
      */
     void storeParticle(MCParticleGraph& mcGraph, const float* mom, const float* vtx, int pdg, TVector3 vertex,

@@ -101,7 +101,7 @@ class BaseFEISkim(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, Full Event Interpretation"
 
-    FEIPrefix = "FEIv4_2021_MC14_release_05_01_12"
+    FEIPrefix = "FEIv4_2022_MC15_light-2205-abys"
     """Prefix label for the FEI training used in the FEI skims."""
 
     FEIChannelArgs = {}
@@ -295,8 +295,8 @@ class feiHadronicB0(BaseFEISkim):
     """
     Tag side :math:`B` cuts:
 
-    * :math:`M_{\\text{bc}} > 5.24~{\\rm GeV}`
-    * :math:`|\\Delta E| < 0.2~{\\rm GeV}`
+    * :math:`M_{\\text{bc}} > 5.2~{\\rm GeV}`
+    * :math:`|\\Delta E| < 0.3~{\\rm GeV}`
     * :math:`\\text{signal probability} > 0.001` (omitted for decay mode 23)
 
     All available FEI :math:`B^0` hadronic tags are reconstructed. From `Thomas Keck's
@@ -324,8 +324,8 @@ class feiHadronicB0(BaseFEISkim):
     }
 
     def build_lists(self, path):
-        ma.applyCuts("B0:generic", "Mbc>5.24", path=path)
-        ma.applyCuts("B0:generic", "abs(deltaE)<0.200", path=path)
+        ma.applyCuts("B0:generic", "Mbc>5.2", path=path)
+        ma.applyCuts("B0:generic", "abs(deltaE)<0.300", path=path)
         ma.applyCuts("B0:generic", "sigProb>0.001 or extraInfo(dmID)==23", path=path)
 
         return ["B0:generic"]
@@ -358,11 +358,11 @@ class feiHadronicB0(BaseFEISkim):
                 ('d0_M', 100, 0.0, 3.0, 'Mass of zeroth daughter (D* or D)', __liaison__,
                  'Mass of zeroth daughter of tag B (either a $D^{*}$ or a D)', 'Peaks at 1.86 GeV and 2.00 GeV',
                  'm(D^{(*)}) [GeV]', 'Candidates', 'shifter'),
-                ('deltaE', 40, -0.2, 0.2, '#Delta E', __liaison__,
+                ('deltaE', 40, -0.3, 0.3, '#Delta E', __liaison__,
                  '$\\Delta E$ of event', 'Peak around zero', '#Delta E [GeV]', 'Candidates', 'shifter'),
                 ('Mbc', 40, 5.2, 5.3, 'Mbc', __liaison__,
                  'Beam-constrained mass of event', 'Peaking around B mass (5.28 GeV)', 'M_{bc} [GeV]', 'Candidates', 'shifter')],
-            variables_2d=[('deltaE', 100, -0.2, 0.2, 'Mbc', 100, 5.2, 5.3, 'Mbc vs deltaE', __liaison__,
+            variables_2d=[('deltaE', 100, -0.3, 0.3, 'Mbc', 100, 5.2, 5.3, 'Mbc vs deltaE', __liaison__,
                            'Plot of the $\\Delta E$ of the event against the beam constrained mass',
                            'Peak of $\\Delta E$ around zero, and $M_{bc}$ around B mass (5.28 GeV)',
                            '#Delta E [GeV]', 'M_{bc} [GeV]', 'colz'),
@@ -379,8 +379,8 @@ class feiHadronicBplus(BaseFEISkim):
     """
     Tag side :math:`B` cuts:
 
-    * :math:`M_{\\text{bc}} > 5.24~{\\rm GeV}`
-    * :math:`|\\Delta E| < 0.2~{\\rm GeV}`
+    * :math:`M_{\\text{bc}} > 5.2~{\\rm GeV}`
+    * :math:`|\\Delta E| < 0.3~{\\rm GeV}`
     * :math:`\\text{signal probability} > 0.001` (omitted for decay mode 25)
 
     All available FEI :math:`B^+` hadronic tags are reconstructed.
@@ -404,8 +404,8 @@ class feiHadronicBplus(BaseFEISkim):
     }
 
     def build_lists(self, path):
-        ma.applyCuts("B+:generic", "Mbc>5.24", path=path)
-        ma.applyCuts("B+:generic", "abs(deltaE)<0.200", path=path)
+        ma.applyCuts("B+:generic", "Mbc>5.2", path=path)
+        ma.applyCuts("B+:generic", "abs(deltaE)<0.300", path=path)
         ma.applyCuts("B+:generic", "sigProb>0.001 or extraInfo(dmID)==25", path=path)
 
         return ["B+:generic"]
@@ -438,11 +438,11 @@ class feiHadronicBplus(BaseFEISkim):
                 ('d0_M', 100, 0.0, 3.0, 'Mass of zeroth daughter (D* or D)', __liaison__,
                  'Mass of zeroth daughter of tag B (either a $D^{*}$ or a D)', 'Peaks at 1.86 GeV and 2.00 GeV',
                  'm(D^{(*)}) [GeV]', 'Candidates', 'shifter'),
-                ('deltaE', 40, -0.2, 0.2, '#Delta E', __liaison__,
+                ('deltaE', 40, -0.3, 0.3, '#Delta E', __liaison__,
                  '$\\Delta E$ of event', 'Peak around zero', '#Delta E [GeV]', 'Candidates', 'shifter'),
                 ('Mbc', 40, 5.2, 5.3, 'Mbc', __liaison__,
                  'Beam-constrained mass of event', 'Peak around B mass (5.28 GeV)', 'M_{bc} [GeV]', 'Candidates', 'shifter')],
-            variables_2d=[('deltaE', 100, -0.2, 0.2, 'Mbc', 100, 5.2, 5.3, 'Mbc vs deltaE', __liaison__,
+            variables_2d=[('deltaE', 100, -0.3, 0.3, 'Mbc', 100, 5.2, 5.3, 'Mbc vs deltaE', __liaison__,
                            'Plot of the $\\Delta E$ of the event against the beam constrained mass',
                            'Peak of $\\Delta E$ around zero, and $M_{bc}$ around B mass (5.28 GeV)',
                            '#Delta E [GeV]', 'M_{bc} [GeV]', 'colz'),
@@ -615,8 +615,8 @@ class feiHadronic(BaseFEISkim):
     """
     Tag side :math:`B` cuts:
 
-    * :math:`M_{\\text{bc}} > 5.24~{\\rm GeV}`
-    * :math:`|\\Delta E| < 0.2~{\\rm GeV}`
+    * :math:`M_{\\text{bc}} > 5.2~{\\rm GeV}`
+    * :math:`|\\Delta E| < 0.3~{\\rm GeV}`
     * :math:`\\text{signal probability} > 0.001` (omitted for decay mode 23 for
       :math:`B^+`, and decay mode 25 for :math:`B^0`)
 
@@ -649,8 +649,8 @@ class feiHadronic(BaseFEISkim):
         HadronicBLists = ["B0:feiHadronic", "B+:feiHadronic"]
 
         for BList in HadronicBLists:
-            ma.applyCuts(BList, "Mbc>5.24", path=path)
-            ma.applyCuts(BList, "abs(deltaE)<0.200", path=path)
+            ma.applyCuts(BList, "Mbc>5.2", path=path)
+            ma.applyCuts(BList, "abs(deltaE)<0.300", path=path)
 
         ma.applyCuts("B+:feiHadronic", "sigProb>0.001 or extraInfo(dmID)==25", path=path)
         ma.applyCuts("B0:feiHadronic", "sigProb>0.001 or extraInfo(dmID)==23", path=path)

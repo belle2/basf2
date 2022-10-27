@@ -19,7 +19,7 @@ Optionally, binary PID can be stored, by testing one (or more) pair of (S,B) mas
 
 Usage:
 
-basf2 -i /PATH/TO/MDST/FILE.root analysis/examples/PostMdstIdentification/ChargedPidMVAModule.py -- [OPTIONS]
+basf2 [-i /PATH/TO/MDST/FILE.root] analysis/examples/PostMdstIdentification/ChargedPidMVAModule.py -- [OPTIONS]
 
 Input: *_mdst_*.root
 Output: *_ntup_*.root
@@ -81,6 +81,12 @@ def argparser():
                         "NB: these GTs will have highest priority over GT replay.\n"
                         "The order of the sequence passed determines the priority of the GTs, w/ the highest coming first.\n"
                         "Pass a space-separated list of names.")
+    parser.add_argument("--append_testing_payloads",
+                        type=str,
+                        default=None,
+                        help="Path to a text file with local test payloads.\n"
+                        "NB: these will have higher priority than any payload in the GT(s).\n"
+                        "Use ONLY for testing.")
     parser.add_argument("-d", "--debug",
                         dest="debug",
                         action="store",
@@ -109,6 +115,10 @@ if __name__ == '__main__':
         for tag in reversed(args.global_tag_prepend):
             basf2.conditions.prepend_globaltag(tag)
         print(f"Prepending GTs:\n{args.global_tag_prepend}")
+
+    if args.append_testing_payloads:
+        basf2.conditions.append_testing_payloads(args.append_testing_payloads)
+        print(f"Appending testing payloads (will have highest priority!)):\n{args.append_testing_payloads}")
 
     # ------------
     # Create path.

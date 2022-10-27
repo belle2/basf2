@@ -34,7 +34,10 @@ namespace Belle2 {
     /**
      * Destructor
      */
-    ~ECLHadronComponentEmissionFunction() {};
+    ~ECLHadronComponentEmissionFunction()
+    {
+      delete m_HadronComponentEmissionFunction;
+    };
 
     /** Return hadron component emission function tgraph
      * @return hadron component emission function tgraph

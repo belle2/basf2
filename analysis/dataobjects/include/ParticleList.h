@@ -288,6 +288,14 @@ namespace Belle2 {
     Particle* getParticle(unsigned i, bool includingAntiList = true) const;
 
     /**
+     * Returns the particle from the list matching the given mdst array index, if any is found.
+     * @param mdstIdx mdst array index
+     * @param includingAntiList consider anti-particle list as well?
+     * @return pointer to Particle or NULL if no match is found.
+     */
+    Particle* getParticleWithMdstIdx(unsigned int mdstIdx, bool includingAntiList = true) const;
+
+    /**
      * Returns the number of flavor-specific particles or self-conjugated particles in this list or its anti-particle list
      *
      * @param K ParticleType - Particle or SelfConjugatedParticle

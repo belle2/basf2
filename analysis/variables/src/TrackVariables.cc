@@ -431,8 +431,8 @@ namespace Belle2 {
 
       const Belle2::UncertainHelix measHelix = trackfit->getUncertainHelix();
       const TMatrixDSym measCovariance = measHelix.getCovariance();
-      const B2Vector3D mcProdVertex = mcparticle->getVertex();
-      const B2Vector3D mcMomentum = mcparticle->getMomentum();
+      const ROOT::Math::XYZVector mcProdVertex = mcparticle->getVertex();
+      const ROOT::Math::XYZVector mcMomentum = mcparticle->getMomentum();
 
       const double BzAtProdVertex = Belle2::BFieldManager::getFieldInTesla(mcProdVertex).Z();
       const double mcParticleCharge = mcparticle->getCharge();

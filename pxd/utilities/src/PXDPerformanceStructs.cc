@@ -46,7 +46,7 @@ namespace Belle2 {
       auto intersec = statePtr -> getPos();
       auto localPoint = sensorInfo.pointToLocal(intersec, true);
       auto intersec_p = statePtr -> getMom();
-      auto local_p = sensorInfo.vectorToLocal(intersec_p, true);
+      auto local_p = sensorInfo.vectorToLocal(ROOT::Math::XYZVector(intersec_p), true);
 
       //inside = sensorInfo.inside(localPoint.X(), localPoint.Y(), 0., 0.);
       inside = sensorInfo.inside(localPoint.X(), localPoint.Y());

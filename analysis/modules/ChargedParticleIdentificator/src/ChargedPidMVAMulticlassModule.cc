@@ -29,7 +29,7 @@ ChargedPidMVAMulticlassModule::ChargedPidMVAMulticlassModule() : Module()
 
   addParam("particleLists",
            m_decayStrings,
-           "The input list of decay strings, where the mother particle string should correspond to a full name of a particle list. One can select to run on daughters instead of mother particle, e.g. ['Lambda0 -> ^p+ ^pi-'].",
+           "The input list of DecayStrings, where each selected (^) daughter should correspond to a standard charged ParticleList, e.g. ['Lambda0:sig -> ^p+ ^pi-', 'J/psi:sig -> ^mu+ ^mu-']. One can also directly pass a list of standard charged ParticleLists, e.g. ['e+:my_electrons', 'pi+:my_pions']. Note that charge-conjugated ParticleLists will automatically be included.",
            std::vector<std::string>());
   addParam("payloadName",
            m_payload_name,
@@ -51,20 +51,16 @@ ChargedPidMVAMulticlassModule::~ChargedPidMVAMulticlassModule() = default;
 
 void ChargedPidMVAMulticlassModule::initialize()
 {
-
   m_event_metadata.isRequired();
-
   m_weightfiles_representation = std::make_unique<DBObjPtr<ChargedPidMVAWeights>>(m_payload_name);
+  /* Initialize MVA if the payload has changed and now. */
+  (*m_weightfiles_representation.get()).addCallback([this]() { initializeMVA(); });
+  initializeMVA();
 }
 
 
 void ChargedPidMVAMulticlassModule::beginRun()
 {
-
-  // Retrieve the payload from the DB.
-  (*m_weightfiles_representation.get()).addCallback([this]() { initializeMVA(); });
-  initializeMVA();
-
 }
 
 
@@ -232,8 +228,8 @@ void ChargedPidMVAMulticlassModule::event()
         if (m_ecl_only) {
           score_varname += "_" + std::to_string(Const::ECL);
         } else {
-          for (size_t iDet(0); iDet < Const::PIDDetectors::set().size(); ++iDet) {
-            score_varname += "_" + std::to_string(Const::PIDDetectors::set()[iDet]);
+          for (const Const::EDetector& det : Const::PIDDetectorSet::set()) {
+            score_varname += "_" + std::to_string(det);
           }
         }
 
@@ -250,12 +246,96 @@ void ChargedPidMVAMulticlassModule::event()
   }
 }
 
+void ChargedPidMVAMulticlassModule::registerAliasesLegacy()
+{
+
+  std::string epsilon("1e-8");
+
+  std::map<std::string, std::string> aliasesLegacy;
+
+  aliasesLegacy.insert(std::make_pair("__event__", "evtNum"));
+
+  for (Const::DetectorSet::Iterator it = Const::PIDDetectorSet::set().begin();
+       it != Const::PIDDetectorSet::set().end(); ++it) {
+
+    auto detName = Const::parseDetectors(*it);
+
+    aliasesLegacy.insert(std::make_pair("missingLogL_" + detName, "pidMissingProbabilityExpert(" + detName + ")"));
+
+    for (auto& [pdgId, fullName] : m_stdChargedInfo) {
+
+      std::string alias = fullName + "ID_" + detName;
+      std::string var = "pidProbabilityExpert(" + std::to_string(pdgId) + ", " + detName + ")";
+      std::string aliasLogTrf = alias + "_LogTransfo";
+      std::string varLogTrf = "formula(-1. * log10(formula(((1. - " + alias + ") + " + epsilon + ") / (" + alias + " + " + epsilon +
+                              "))))";
+
+      aliasesLegacy.insert(std::make_pair(alias, var));
+      aliasesLegacy.insert(std::make_pair(aliasLogTrf, varLogTrf));
+
+      if (it.getIndex() == 0) {
+        aliasLogTrf = fullName + "ID_LogTransfo";
+        varLogTrf = "formula(-1. * log10(formula(((1. - " + fullName + "ID) + " + epsilon + ") / (" + fullName + "ID + " + epsilon +
+                    "))))";
+        aliasesLegacy.insert(std::make_pair(aliasLogTrf, varLogTrf));
+      }
+
+    }
+
+  }
+
+  B2INFO("Setting hard-coded aliases for the ChargedPidMVA algorithm.");
+
+  std::string debugStr("\n");
+  for (const auto& [alias, variable] : aliasesLegacy) {
+    debugStr += (alias + " --> " + variable + "\n");
+    if (!Variable::Manager::Instance().addAlias(alias, variable)) {
+      B2ERROR("Something went wrong with setting alias: " << alias << " for variable: " << variable);
+    }
+  }
+  B2DEBUG(10, debugStr);
+
+}
+
+
+void ChargedPidMVAMulticlassModule::registerAliases()
+{
+
+  auto aliases = (*m_weightfiles_representation.get())->getAliases();
+
+  if (!aliases->empty()) {
+
+    B2INFO("Setting aliases for the ChargedPidMVA algorithm read from the payload.");
+
+    std::string debugStr("\n");
+    for (const auto& [alias, variable] : *aliases) {
+      if (alias != variable) {
+        debugStr += (alias + " --> " + variable + "\n");
+        if (!Variable::Manager::Instance().addAlias(alias, variable)) {
+          B2ERROR("Something went wrong with setting alias: " << alias << " for variable: " << variable);
+        }
+      }
+    }
+    B2DEBUG(10, debugStr);
+
+    return;
+
+  }
+
+  // Manually set aliases - for bw compatibility
+  this->registerAliasesLegacy();
+
+}
+
 
 void ChargedPidMVAMulticlassModule::initializeMVA()
 {
 
   B2INFO("Run: " << m_event_metadata->getRun() <<
          ". Load supported MVA interfaces for multi-class charged particle identification...");
+
+  // Set the necessary variable aliases from the payload.
+  this->registerAliases();
 
   // The supported methods have to be initialized once (calling it more than once is safe).
   MVA::AbstractInterface::initSupportedInterfaces();

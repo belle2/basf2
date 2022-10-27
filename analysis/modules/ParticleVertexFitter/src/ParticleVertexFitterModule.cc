@@ -193,7 +193,8 @@ void ParticleVertexFitterModule::event()
 
 
     // revert the momentum scaling factor to 1
-    if (m_updateDaughters == true) {
+    if (m_updateDaughters == true and m_decayString.empty()) {
+      // if decayString is not empty, fit particles have already been updated in makeKVertexMother
 
       std::function<void(Particle*)> funcUpdateMomentumScaling =
       [&funcUpdateMomentumScaling](Particle * part) {
@@ -916,10 +917,12 @@ bool ParticleVertexFitterModule::makeKVertexMother(analysis::VertexFitKFit& kv,
         // Using updated daughters, update part's momentum
         ROOT::Math::PxPyPzEVector sum4Vector;
         for (auto daughter : part->getDaughters()) {
-          auto copy = ParticleCopy::copyParticle(daughter);
-          copy->setMomentumScalingFactor(1.0);
 
-          sum4Vector += copy->get4Vector();
+          // if daughter is in fitChildren = momentum is updated, the scaling factor is reverted to 1
+          if (std::find(fitChildren.begin(), fitChildren.end(), daughter) != fitChildren.end())
+            daughter->setMomentumScalingFactor(1.0);
+
+          sum4Vector += daughter->get4Vector();
         }
 
         part->set4Vector(sum4Vector);

@@ -46,11 +46,11 @@ KLMDQM2Module::KLMDQM2Module() :
   m_AllExtHitsEKLMSector{nullptr}
 {
   // Set module properties
-  setDescription(R"DOC("Additional Module for KLMDQM plots after HLT filters
+  setDescription(R"DOC(Additional Module for KLMDQM plots after HLT filters
 
-    An additional module developed to display plane efficiencies for the KLM dduring runs (i.e. for online analyses). 
-    This module would be called after HLT filter in order to use mumu-tight skim to select reasonable events. 
-    The output histograms would be plane efficiences = MatchedDigits/AllExtits.
+    An additional module developed to display plane efficiencies for the KLM during runs (i.e. for online analyses).
+    This module would be called after HLT filter in order to use mumu-tight skim to select reasonable events.
+    The output histograms would be plane efficiencies = MatchedDigits/AllExtits.
     )DOC");
 
   // Parameter definitions

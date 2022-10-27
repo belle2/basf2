@@ -31,12 +31,12 @@
 #pragma link C++ class Belle2::RecoHitInformation+; // checksum=0xcf616f27, version=6
 #pragma link C++ class Belle2::BremHit+; // checksum=0x56052b3a, version=1
 #pragma link C++ class Belle2::SectorMapConfig+; // checksum=0x4ef40736, version=2
-#pragma link C++ class Belle2::hitXP+; // checksum=0xdd9d6ff4, version=1
-#pragma link C++ class Belle2::hitXPDerivate+; // checksum=0xfa2e4b3c, version=1
+#pragma link C++ class Belle2::hitXP+; // checksum=0x30c07c0a, version=2
+#pragma link C++ class Belle2::hitXPDerivate+; // checksum=0x4d515752, version=2
 #pragma link C++ class std::vector<Belle2::hitXP>+; // checksum=0x26380ecc, version=6
 #pragma link C++ class std::vector<Belle2::hitXPDerivate>+; // checksum=0x82b91048, version=6
 
-#pragma link C++ class Belle2::SpacePointInfo+; // checksum=0xa7b6f75a, version=1
+#pragma link C++ class Belle2::SpacePointInfo+; // checksum=0xb7462bee, version=2
 #pragma link C++ class Belle2::FilterInfo+; // checksum=0xc33c4990, version=1
 #pragma link C++ class std::vector<Belle2::FilterInfo>+; // checksum=0x4718205b, version=6
 #pragma link C++ class std::vector<Belle2::SpacePointInfo>+; // checksum=0x8273c275, version=6

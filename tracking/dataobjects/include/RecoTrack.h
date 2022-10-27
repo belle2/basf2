@@ -922,6 +922,7 @@ namespace Belle2 {
       }
     }
 
+    /** Anonymous helper function to convert XYZVector to TVector3 */
     static constexpr auto XYZToTVector = [](const ROOT::Math::XYZVector& a) {return TVector3(a.X(), a.Y(), a.Z());};
 
     /** Making this class a ROOT class.*/

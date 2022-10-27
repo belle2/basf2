@@ -183,7 +183,7 @@ bool NoKickRTSel::segmentSelector(hitXP hit1, hitXP hit2, std::vector<double> se
       B2DEBUG(20, "Min=" << selCut.at(0));
       B2DEBUG(20, "Max=" << selCut.at(1));
       B2DEBUG(20, "deltaPar=" << deltaPar);
-      B2DEBUG(20, "momentum=" << hit1.m_momentum0.Mag());
+      B2DEBUG(20, "momentum=" << hit1.m_momentum0.R());
       return false;
     }
   }

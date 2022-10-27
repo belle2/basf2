@@ -9,9 +9,9 @@
 
 using namespace Belle2;
 
-double hitXP::omega(TVector3 xx, TVector3 p, double charge) const
+double hitXP::omega(ROOT::Math::XYZVector xx, ROOT::Math::XYZVector p, double charge) const
 {
-  TVector3 x(0.01 * xx.X(), 0.01 * xx.Y(), 0.01 * xx.Z());
+  ROOT::Math::XYZVector x(0.01 * xx.X(), 0.01 * xx.Y(), 0.01 * xx.Z());
   double Bz = 1.5;
   double Bze = Bz * charge * 0.299792458;
   double aux = Bze / sqrt(p.X() * p.X() + p.Y() * p.Y());
@@ -20,17 +20,17 @@ double hitXP::omega(TVector3 xx, TVector3 p, double charge) const
 }
 
 
-double hitXP::tanLambda(TVector3 xx, TVector3 p) const
+double hitXP::tanLambda(ROOT::Math::XYZVector xx, ROOT::Math::XYZVector p) const
 {
-  TVector3 x(0.01 * xx.X(), 0.01 * xx.Y(), 0.01 * xx.Z());
+  ROOT::Math::XYZVector x(0.01 * xx.X(), 0.01 * xx.Y(), 0.01 * xx.Z());
   double aux = p.Z() / sqrt(p.X() * p.X() + p.Y() * p.Y());
   return aux;
 }
 
 
-double hitXP::d0(TVector3 xx, TVector3 p, double charge) const
+double hitXP::d0(ROOT::Math::XYZVector xx, ROOT::Math::XYZVector p, double charge) const
 {
-  TVector3 x(0.01 * xx.X(), 0.01 * xx.Y(), 0.01 * xx.Z());
+  ROOT::Math::XYZVector x(0.01 * xx.X(), 0.01 * xx.Y(), 0.01 * xx.Z());
   double Bz = 1.5;
   double Bze = Bz * charge * 0.299792458;
   double aux = sqrt((p.Y() / (Bze) + x.X()) * (p.Y() / (Bze) + x.X()) + (x.Y() - p.X() / (Bze)) * (x.Y() - p.X() / (Bze))) - sqrt((
@@ -42,9 +42,9 @@ double hitXP::d0(TVector3 xx, TVector3 p, double charge) const
   return aux;
 }
 
-double hitXP::phi0(const TVector3& xx, TVector3 p, double charge) const
+double hitXP::phi0(const ROOT::Math::XYZVector& xx, ROOT::Math::XYZVector p, double charge) const
 {
-  TVector3 x(0.01 * xx.X(), 0.01 * xx.Y(), 0.01 * xx.Z());
+  ROOT::Math::XYZVector x(0.01 * xx.X(), 0.01 * xx.Y(), 0.01 * xx.Z());
   double Bz = 1.5;
   double Bze = Bz * charge * 0.299792458;
   double aux;
@@ -58,9 +58,9 @@ double hitXP::phi0(const TVector3& xx, TVector3 p, double charge) const
   return aux;
 }
 
-double hitXP::z0(TVector3 xx, TVector3 p, double charge) const
+double hitXP::z0(ROOT::Math::XYZVector xx, ROOT::Math::XYZVector p, double charge) const
 {
-  TVector3 x(0.01 * xx.X(), 0.01 * xx.Y(), 0.01 * xx.Z());
+  ROOT::Math::XYZVector x(0.01 * xx.X(), 0.01 * xx.Y(), 0.01 * xx.Z());
   double Bz = 1.5;
   double Bze = Bz * charge * 0.299792458;
   double aux;

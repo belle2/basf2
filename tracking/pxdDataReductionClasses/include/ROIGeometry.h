@@ -37,7 +37,7 @@ namespace Belle2 {
     void fillPlaneList(double toleranceZ, double tolerancePhi); /**< fill the list of planes*/
 
     /** Append to selectedPlanes those in the internal list for which a sensor is near the RecoTrack position */
-    void appendSelectedPlanes(std::list<ROIDetPlane>* selectedPlanes, TVector3 recoTrackPosition, int layer);
+    void appendSelectedPlanes(std::list<ROIDetPlane>* selectedPlanes, ROOT::Math::XYZVector recoTrackPosition, int layer);
 
   };
 }

@@ -10,7 +10,7 @@
 #define SVD_SENSORINFO_H
 
 #include <vxd/geometry/SensorInfoBase.h>
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 
 namespace Belle2 {
   /** Namespace to encapsulate code needed for simulation and reconstrucion of the SVD */
@@ -194,13 +194,13 @@ namespace Belle2 {
        * @param point Desired position in local coordinates.
        * @return The E field vector in local coordinates.
        */
-      const TVector3 getEField(const TVector3& point) const;
+      const ROOT::Math::XYZVector getEField(const ROOT::Math::XYZVector& point) const;
 
       /** Get B field value from the field map.
        * @param point Desired position in local coordinates.
        * @return The B field vector in local coordinates.
        */
-      const TVector3& getBField(const TVector3& point) const;
+      const ROOT::Math::XYZVector& getBField(const ROOT::Math::XYZVector& point) const;
 
       /** Return Hall factor for the corresponding carrier type.
        * @param carrier electron or hole, SVD::SensorInfo::CarrierType
@@ -219,7 +219,7 @@ namespace Belle2 {
        * @param point The point in local coordinates.
        * @result The vector of drift velocity in local coordinates.
        */
-      const TVector3 getVelocity(CarrierType carrier, const TVector3& point) const;
+      const ROOT::Math::XYZVector getVelocity(CarrierType carrier, const ROOT::Math::XYZVector& point) const;
 
       /** Calculate Lorentz shift along a given coordinate in a magnetic field at a given position.
         * This method can only be used for a completely reconstructed 2D cluster.
@@ -228,7 +228,7 @@ namespace Belle2 {
         * @param vCoord v coordinate where the shift is required
         * @return TVector with Lorentz shift along u and v at the given position.
         */
-      const TVector3& getLorentzShift(double uCoord, double vCoord) const;
+      const ROOT::Math::XYZVector& getLorentzShift(double uCoord, double vCoord) const;
 
       /** Calculate mean Lorentz shift along a given coordinate, with B-field averaged
        * along the corresponding strip.

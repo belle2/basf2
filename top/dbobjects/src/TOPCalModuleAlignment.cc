@@ -277,21 +277,6 @@ namespace Belle2 {
 
   void TOPCalModuleAlignment::setTransformations() const
   {
-    // old TODO: rm
-    for (int i = 0; i < c_numModules; i++) {
-      TRotation rot;
-      TVector3 vec;
-      if (m_status[i] == c_Calibrated) {
-        rot.RotateX(m_alpha[i]).RotateY(m_beta[i]).RotateZ(m_gamma[i]);
-        vec.SetXYZ(m_x[i], m_y[i], m_z[i]);
-      }
-      m_rotations.push_back(rot);
-      m_translations.push_back(vec);
-    }
-    m_rotations.push_back(TRotation());   // for invalid module ID
-    m_translations.push_back(TVector3()); // for invalid module ID
-    // end old
-
     for (int i = 0; i < c_numModules; i++) {
       Transform3D T;
       if (m_status[i] == c_Calibrated) {
@@ -304,28 +289,6 @@ namespace Belle2 {
       m_transforms.push_back(T);
     }
     m_transforms.push_back(Transform3D()); // for invalid module ID
-  }
-
-  const TRotation& TOPCalModuleAlignment::getRotation(int moduleID) const
-  {
-    if (m_rotations.empty()) setTransformations();
-    unsigned module = moduleID - 1;
-    if (module >= c_numModules) {
-      B2ERROR("Invalid module number, returning identity rotation (" << ClassName() << ")");
-      return m_rotations[c_numModules];
-    }
-    return m_rotations[module];
-  }
-
-  const TVector3& TOPCalModuleAlignment::getTranslation(int moduleID) const
-  {
-    if (m_translations.empty()) setTransformations();
-    unsigned module = moduleID - 1;
-    if (module >= c_numModules) {
-      B2ERROR("Invalid module number, returning null vector (" << ClassName() << ")");
-      return m_translations[c_numModules];
-    }
-    return m_translations[module];
   }
 
   const Transform3D& TOPCalModuleAlignment::getTransformation(int moduleID) const

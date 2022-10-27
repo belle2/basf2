@@ -171,8 +171,8 @@ namespace Belle2 {
 
       const auto* geo = TOPGeometryPar::Instance()->getGeometry();
       const auto& module = geo->getModule(m_moduleID);
-      auto globalPosition = m_extHit->getPositionTVector3();
-      auto position = module.pointGlobalToNominal(static_cast<XYZPoint>(m_extHit->getPosition()));
+      auto globalPosition = m_extHit->getPosition();
+      auto position = module.pointGlobalToNominal(static_cast<XYZPoint>(globalPosition));
       auto momentum = module.momentumGlobalToNominal(m_extHit->getMomentum());
       double Bz = BFieldManager::getField(globalPosition).Z();
       m_helix.set(position, momentum, m_charge, Bz);

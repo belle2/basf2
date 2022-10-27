@@ -257,7 +257,7 @@ namespace Belle2 {
       int subdet = tophit->getSubDet();
       if (subdet != 5) continue;
 
-      TVector3 pos = tophit->getPosition();
+      auto pos = tophit->getPosition();
       double phi = pos.XYvector().Phi_0_2pi(pos.XYvector().Phi()) / 3.14159265358979 * 180.;
       int barID = int (phi / 22.5 + 0.5);
       if (barID == 16) {

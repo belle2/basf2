@@ -98,7 +98,7 @@ pu.plotter(
     granules=pu.granulesTD,
     tree=treeRT,
     expr='cluster_UUTimeDiff',
-    cut=pu.cut_U+"",
+    cut=pu.cut_U,
     descr='Time difference between clusters belonging to the neighbour layers.\
     Distribution for signal clusters.',
     check='Signal peaks around 0.',
@@ -116,7 +116,7 @@ pu.plotter(
     granules=pu.granulesTD,
     tree=treeRT,
     expr='cluster_VVTimeDiff',
-    cut=pu.cut_V+"",
+    cut=pu.cut_V,
     descr='Time difference between clusters belonging to the neighbour layers.\
     Distribution for signal clusters.',
     check='Signal peaks around 0.',

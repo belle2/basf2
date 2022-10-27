@@ -157,7 +157,7 @@ class SVDValidationTTreeCluster(b2.Module):
 
             self.data.matched = 1
             # We want only clusters with at least one associated TrueHit
-            # but, to compute purity, we need to store also some informations
+            # but, to compute purity, we need to store also some information
             # for clusters not related to true hits
             if len(cluster_truehits) == 0:
                 self.data.matched = 0

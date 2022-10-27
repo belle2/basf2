@@ -84,7 +84,7 @@ pu.plotter(
     tree=treeC,
     expr='cluster_position - truehit_position',
     cut=pu.cut_size1 + pu.cut_matched,
-    descr='Definition: (reconstructed position of the cluster) - (position of the TrueHit).\
+    descr='Definition: (reconstructed position of the cluster) - (position of the best TrueHit).\
     Distribution for signal clusters.',
     check='Distribution peak around 0.',
     isShifter=False)
@@ -102,7 +102,7 @@ pu.plotter(
     tree=treeC,
     expr='cluster_position - truehit_position',
     cut=pu.cut_size2 + pu.cut_matched,
-    descr='Definition: (reconstructed position of the cluster) - (position of the TrueHit).\
+    descr='Definition: (reconstructed position of the cluster) - (position of the best TrueHit).\
     Distribution for signal clusters.',
     check='Distribution peak around 0.',
     isShifter=False)
@@ -120,7 +120,7 @@ pu.plotter(
     tree=treeC,
     expr='cluster_position - truehit_position',
     cut=pu.cut_size3plus + pu.cut_matched,
-    descr='Definition: (reconstructed position of the cluster) - (position of the TrueHit).\
+    descr='Definition: (reconstructed position of the cluster) - (position of the best TrueHit).\
     Distribution for signal clusters.',
     check='Distribution peak around 0.',
     isShifter=False)
@@ -210,7 +210,7 @@ pu.plotter(
     tree=treeC,
     expr='cluster_clsTime - truehit_time',
     cut=pu.cut_matched,
-    descr='Definition: (reconstructed time of the cluster) - (time of the TrueHit)\
+    descr='Definition: (reconstructed time of the cluster) - (time of the best TrueHit)\
     for all signal clusters.',
     check='Distribution peak around 0.',
     isShifter=False)
@@ -228,7 +228,7 @@ pu.plotter(
     tree=treeC,
     expr='cluster_charge',
     cut=pu.cut_matched,
-    descr='Reconstructed charge of the cluster related to one TrueHit.\
+    descr='Reconstructed charge of the cluster related to at least one TrueHit.\
     Distribution for signal clusters.',
     check='Distribution peaks around 20-40 ke.',
     isShifter=True)
@@ -245,7 +245,7 @@ pu.plotter(
     tree=treeC,
     expr='cluster_snr',
     cut=pu.cut_matched,
-    descr='Signal/Noise ratio of the cluster related to one TrueHit. Distribution for signal clusters.',
+    descr='Signal/Noise ratio of the clusters related to at least one TrueHit.',
     check='Distribution peaks around 20.',
     isShifter=True)
 
@@ -278,7 +278,7 @@ pu.plotter(
     tree=treeC,
     expr='cluster_size',
     cut=pu.cut_matched,
-    descr='Number of strips in the Cluster related to at least one TrueHit. Distribution for signal clusters.',
+    descr='Number of strips in the Cluster related to at least one TrueHit.',
     check='Distribution peaks in range 2-3.',
     isShifter=False)
 
@@ -292,7 +292,7 @@ pu.plotRegions(
     expr='strip_dir',
     cutALL=pu.cut_notV,
     cut=pu.cut_notV + pu.cut_reco,
-    descr='Definition: (number of clusters related to at least TrueHit) / (number of best Truehits)',
+    descr='Definition: (number of clusters related to at least one TrueHit) / (number of best TrueHits)',
     check='Efficiency should be close to 1 in all bins. Note that only one TrueHit (the best one, \
         i.e. the one with the largest energy deposit) is counted\
         in case one cluster is related to more than one TrueHit (e.g. in case of delta rays).',
@@ -309,7 +309,7 @@ pu.plotRegions(
     expr='strip_dir',
     cutALL=pu.cut_notU,
     cut=pu.cut_notU + pu.cut_reco,
-    descr='Definition: (number of clusters related to at least TrueHit) / (number of best Truehits)',
+    descr='Definition: (number of clusters related to at least one TrueHit) / (number of best TrueHits)',
     check='Efficiency should be close to 1 in all bins. Note that only one TrueHit (the best one, \
         i.e. the one with the largest energy deposit) is counted\
         in case one cluster is related to more than one TrueHit (e.g. in case of delta rays).',

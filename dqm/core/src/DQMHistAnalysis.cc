@@ -59,7 +59,7 @@ void DQMHistAnalysisModule::addHist(const std::string& dirname, const std::strin
   }
 }
 
-void DQMHistAnalysisModule::addDeltaPar(const std::string& dirname, const std::string& histname, HistDelta::DeltaType t, int p,
+void DQMHistAnalysisModule::addDeltaPar(const std::string& dirname, const std::string& histname, HistDelta::EDeltaType t, int p,
                                         unsigned int a)
 {
   std::string fullname;

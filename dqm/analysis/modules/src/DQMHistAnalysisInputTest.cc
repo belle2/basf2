@@ -128,7 +128,7 @@ void DQMHistAnalysisInputTestModule::initialize()
         m_fill.push_back(fill);
         m_underflow.push_back(underflow);
 
-        if (dtype > 0) addDeltaPar(dir, name, HistDelta::DeltaType(dtype), parameter, amount); // only if we want delta for this one
+        if (dtype > 0) addDeltaPar(dir, name, HistDelta::EDeltaType(dtype), parameter, amount); // only if we want delta for this one
       }
     }
   }

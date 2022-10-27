@@ -18,8 +18,8 @@ namespace Belle2 {
    */
   class HistDelta {
   public:
-    enum DeltaType { Disabled = 0, Entries = 1, Underflow = 2, Events = 3};
-    DeltaType m_type{}; /**< type of delta algo, 0=disable */
+    enum EDeltaType { c_Disabled = 0, c_Entries = 1, c_Underflow = 2, c_Events = 3};
+    EDeltaType m_type{}; /**< type of delta algo */
     int m_parameter{}; /**< parameter depending on algo, e.g. nr of entries or events */
     unsigned int m_amountDeltas{}; /**< amount of past histograms, at least 1*/
     TH1* m_lastHist{};/**< Pointer to last histogram state for check */
@@ -33,14 +33,14 @@ namespace Belle2 {
      * @param p parameter for type
      * @param a amount of deletas in the past
      */
-    HistDelta(DeltaType t = Disabled, int p = 0, unsigned int a = 0);
+    HistDelta(EDeltaType t = c_Disabled, int p = 0, unsigned int a = 0);
 
     /** Parameter setter
      * @param t type
      * @param p parameter for type
      * @param a amount of deltas in the past
      */
-    void set(DeltaType t, int p, unsigned int a);
+    void set(EDeltaType t, int p, unsigned int a);
 
     /** Set not-updated yet status
      */

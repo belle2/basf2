@@ -361,19 +361,6 @@ namespace Belle2 {
     }
 
     /**
-     * Get number of MVA weight indices.
-     */
-    unsigned int getNMVAWeightIndices() const
-    {
-      if (!m_categories) {
-        B2FATAL("No (clusterTheta, p, charge) TH3 grid was found in the DB payload. Most likely, you are using a GT w/ an old payload which is no longer compatible with the DB object class implementation. This should not happen! Abort...");
-      }
-      return m_categories->GetXaxis()->GetNbins() *
-             m_categories->GetYaxis()->GetNbins() *
-             m_categories->GetZaxis()->GetNbins();
-    }
-
-    /**
      * Overloaded method, to be used if not interested in knowing the 3D (clusterTheta, p, charge) bin coordinates.
      */
     unsigned int getMVAWeightIdx(const double& theta, const double& p, const double& charge) const

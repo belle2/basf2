@@ -39,6 +39,7 @@ namespace Belle2 {
 
     typedef std::vector<std::unique_ptr<MVA::Expert> > ExpertsList; /**< Typedef */
     typedef std::vector<std::unique_ptr<MVA::SingleDataset> > DatasetsList; /**< Typedef */
+    typedef std::vector<std::unique_ptr<Variable::Cut>> CutsList; /**< Typedef */
     typedef std::vector< std::vector<const Variable::Manager::Var*> > VariablesLists; /**< Typedef */
 
   public:
@@ -137,7 +138,7 @@ namespace Belle2 {
     /**
      * Interface to get the database payload with the MVA weight files.
      * The payload class has a method to retrieve the correct weightfile representation
-     * given a reconstructed particle's (clusterTheta, p).
+     * given a reconstructed particle's (clusterTheta, p, charge).
      */
     std::unique_ptr<DBObjPtr<ChargedPidMVAWeights>> m_weightfiles_representation;
 
@@ -155,6 +156,12 @@ namespace Belle2 {
     DatasetsList m_datasets;
 
     /**
+     * List of Cut objects.
+     * One Cut to be stored for each training category.
+     */
+    CutsList m_cuts;
+
+    /**
      * List of lists of feature variables.
      * One list of lists to be stored for each xml file found in the database, i.e. for each training category.
      */
@@ -170,9 +177,6 @@ namespace Belle2 {
      * List of MVA class names.
      */
     std::vector<std::string> m_classes;
-
-    /** Cuts. */
-    std::vector<std::unique_ptr<Variable::Cut>> m_cuts;
 
     /**
      * Map with standard charged particles' info. For convenience.

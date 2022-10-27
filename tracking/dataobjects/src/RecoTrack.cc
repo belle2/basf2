@@ -18,6 +18,8 @@
 #include <simulation/monopoles/MonopoleConstants.h>
 #include <svd/dataobjects/SVDCluster.h>
 
+#include <cmath>
+
 using namespace Belle2;
 
 RecoTrack::RecoTrack(const TVector3& seedPosition, const TVector3& seedMomentum, const short int seedCharge,
@@ -639,67 +641,61 @@ std::string RecoTrack::getInfoHTML() const
   return out.str();
 }
 
-void RecoTrack::calculateArmTime()
+void RecoTrack::estimateArmTime()
 {
-  m_calculateArmTime = true;
-  std::vector<RecoHitInformation*> recoHits = getRecoHitInformations(true);
-  bool svdDONE = false;
-  float detIDpre = NAN;
-  float detID = NAN; //0: PXD, 1: SVD, 2: CDC, 3: other
-  float detIDpost = NAN;
+  m_isArmTimeComputed = true;
+  const std::vector<RecoHitInformation*>& recoHits = getRecoHitInformations(true);
+  bool svdDone = false;
+  RecoHitInformation::RecoHitDetector und = RecoHitInformation::RecoHitDetector::c_undefinedTrackingDetector;
+  RecoHitInformation::RecoHitDetector SVD = RecoHitInformation::RecoHitDetector::c_SVD;
+  RecoHitInformation::RecoHitDetector detIDpre = und;
+  RecoHitInformation::RecoHitDetector detIDpost = und;
   int nSVD = 0;
-  float clsTimeSum = 0;
-  float clsTimeSigma2Sum = 0;
-  std::string arm = "";
-  bool trackArmTimeDONE = false;
-  for (int i = 0; i < (int)recoHits.size(); i ++) {
-    RecoHitInformation::RecoHitDetector foundin = recoHits[i]->getTrackingDetector();
-    if (foundin == RecoHitInformation::RecoHitDetector::c_PXD) detID = 0;
-    else if (foundin == RecoHitInformation::RecoHitDetector::c_SVD) detID = 1;
-    else if (foundin == RecoHitInformation::RecoHitDetector::c_CDC) detID = 2;
-    else detID = 3;
-    if (!svdDONE && detID != 1) {
-      detIDpre = detID;
-      trackArmTimeDONE = false;
+  float clusterTimeSum = 0;
+  float clusterTimeSigma2Sum = 0;
+  bool trackArmTimeDone = false;
+  for (const auto& recoHit : recoHits) {
+    RecoHitInformation::RecoHitDetector foundin = recoHit->getTrackingDetector();
+    if (!svdDone && foundin != SVD) {
+      detIDpre = foundin;
+      trackArmTimeDone = false;
     }
-    RelationVector<SVDCluster> svdClusters = recoHits[i]->getRelationsTo<SVDCluster>();
-    if (detID == 1) {
-      clsTimeSum += svdClusters[0]->getClsTime();
-      clsTimeSigma2Sum += svdClusters[0]->getClsTimeSigma() * svdClusters[0]->getClsTimeSigma();
+    if (foundin == SVD) {
+      RelationVector<SVDCluster> svdClusters = recoHit->getRelationsTo<SVDCluster>();
+      clusterTimeSum += svdClusters[0]->getClsTime();
+      clusterTimeSigma2Sum += svdClusters[0]->getClsTimeSigma() * svdClusters[0]->getClsTimeSigma();
       nSVD += 1;
-      svdDONE = true;
+      svdDone = true;
     } else {
-      if (svdDONE && nSVD != 0) {
-        detIDpost = detID;
-        arm = trackArmDirection(detIDpre, detIDpost);
-        if (arm == "IN") {
-          m_ingoingArmTime = clsTimeSum / nSVD;
-          m_ingoingArmTimeError = std::sqrt(clsTimeSigma2Sum / (nSVD * (nSVD - 1)));
+      if (svdDone && nSVD > 1) {
+        detIDpost = foundin;
+        if (!isOutgoingArm(detIDpre, detIDpost)) {
+          m_ingoingArmTime = clusterTimeSum / nSVD;
+          m_ingoingArmTimeError = std::sqrt(clusterTimeSigma2Sum / (nSVD * (nSVD - 1)));
           m_hasIngoingArmTime = true;
         }
-        if (arm == "OUT") {
-          m_outgoingArmTime = clsTimeSum / nSVD;
-          m_outgoingArmTimeError = std::sqrt(clsTimeSigma2Sum / (nSVD * (nSVD - 1)));
+        if (isOutgoingArm(detIDpre, detIDpost)) {
+          m_outgoingArmTime = clusterTimeSum / nSVD;
+          m_outgoingArmTimeError = std::sqrt(clusterTimeSigma2Sum / (nSVD * (nSVD - 1)));
           m_hasOutgoingArmTime = true;
         }
-        svdDONE = false;
+        svdDone = false;
         detIDpre = detIDpost;
-        detIDpost = NAN;
-        clsTimeSum = 0;
+        detIDpost = und;
+        clusterTimeSum = 0;
         nSVD = 0;
-        trackArmTimeDONE = true;
+        trackArmTimeDone = true;
       }
     }
-    if (!trackArmTimeDONE && (i == (int)recoHits.size() - 1) && nSVD != 0) {
-      arm = trackArmDirection(detIDpre, detIDpost);
-      if (arm == "IN") {
-        m_ingoingArmTime = clsTimeSum / nSVD;
-        m_ingoingArmTimeError = std::sqrt(clsTimeSigma2Sum / (nSVD * (nSVD - 1)));
+    if (!trackArmTimeDone && (recoHit == recoHits.back()) && nSVD > 1) {
+      if (!isOutgoingArm(detIDpre, detIDpost)) {
+        m_ingoingArmTime = clusterTimeSum / nSVD;
+        m_ingoingArmTimeError = std::sqrt(clusterTimeSigma2Sum / (nSVD * (nSVD - 1)));
         m_hasIngoingArmTime = true;
       }
-      if (arm == "OUT") {
-        m_outgoingArmTime = clsTimeSum / nSVD;
-        m_outgoingArmTimeError = std::sqrt(clsTimeSigma2Sum / (nSVD * (nSVD - 1)));
+      if (isOutgoingArm(detIDpre, detIDpost)) {
+        m_outgoingArmTime = clusterTimeSum / nSVD;
+        m_outgoingArmTimeError = std::sqrt(clusterTimeSigma2Sum / (nSVD * (nSVD - 1)));
         m_hasIngoingArmTime = true;
       }// It will not reset all variables because it is run only at the last recoHit
     }
@@ -709,19 +705,22 @@ void RecoTrack::calculateArmTime()
                                       m_outgoingArmTimeError);
 }
 
-std::string RecoTrack::trackArmDirection(float pre, float post)
+bool RecoTrack::isOutgoingArm(RecoHitInformation::RecoHitDetector pre, RecoHitInformation::RecoHitDetector post)
 {
-  std::string armDirection = "OUT";
-  if (pre == 0 && post == 2) armDirection = "OUT";
-  else if (std::isnan(pre) && post == 2) armDirection = "OUT";
-  else if (pre == 0 && std::isnan(post)) armDirection = "OUT";
-  else if (pre == 2 && post == 0) armDirection = "IN";
-  else if (std::isnan(pre) && post == 0) armDirection = "IN";
-  else if (pre == 2 && std::isnan(post)) armDirection = "IN";
+  RecoHitInformation::RecoHitDetector und = RecoHitInformation::RecoHitDetector::c_undefinedTrackingDetector;
+  RecoHitInformation::RecoHitDetector PXD = RecoHitInformation::RecoHitDetector::c_PXD;
+  RecoHitInformation::RecoHitDetector CDC = RecoHitInformation::RecoHitDetector::c_CDC;
+  bool armDirection = true;
+  if (pre == PXD && post == CDC) armDirection = true;
+  else if (pre == und && post == CDC) armDirection = true;
+  else if (pre == PXD && post == und) armDirection = true;
+  else if (pre == CDC && post == PXD) armDirection = false;
+  else if (pre == und && post == PXD) armDirection = false;
+  else if (pre == CDC && post == und) armDirection = false;
   else {
     //TO DO
     B2INFO("SVD-only? PXD-SVD-PXD??? --- use layer information to determine if the track arm is outgoing or ingoing! Considered --> 'OUT'");
-    armDirection = "OUT";
+    armDirection = true;
   }
   return armDirection;
 }

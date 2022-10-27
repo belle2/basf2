@@ -19,8 +19,6 @@
 #include <optional>
 #include <string>
 #include <vector>
-#include <cmath>
-#include <iostream>
 
 namespace genfit {
   class TrackCand;
@@ -497,44 +495,44 @@ namespace Belle2 {
     double getTimeSeed() const { return m_genfitTrack.getTimeSeed(); }
 
     /// Return the track time of the outgoing arm
-    double getOutgoingArmTime()
+    float getOutgoingArmTime()
     {
-      if (!m_calculateArmTime) calculateArmTime();
+      if (!m_isArmTimeComputed) estimateArmTime();
       return m_outgoingArmTime;
     }
 
     /// Return the error of the track time of the outgoing arm
-    double getOutgoingArmTimeError()
+    float getOutgoingArmTimeError()
     {
-      if (!m_calculateArmTime) calculateArmTime();
+      if (!m_isArmTimeComputed) estimateArmTime();
       return m_outgoingArmTimeError;
     }
 
     /// Return the track time of the ingoing arm
-    double getIngoingArmTime()
+    float getIngoingArmTime()
     {
-      if (!m_calculateArmTime) calculateArmTime();
+      if (!m_isArmTimeComputed) estimateArmTime();
       return m_ingoingArmTime;
     }
 
     /// Return the error of the track time of the ingoing arm
-    double getIngoingArmTimeError()
+    float getIngoingArmTimeError()
     {
-      if (!m_calculateArmTime) calculateArmTime();
+      if (!m_isArmTimeComputed) estimateArmTime();
       return m_ingoingArmTimeError;
     }
 
     /// Return the difference between the track times of the ingoing and outgoing arms
-    double getInOutArmTimeDifference()
+    float getInOutArmTimeDifference()
     {
-      if (!m_calculateArmTime) calculateArmTime();
+      if (!m_isArmTimeComputed) estimateArmTime();
       return m_inOutArmTimeDiff;
     }
 
     /// Return the error of the difference between the track times of the ingoing and outgoing arms
-    double getInOutArmTimeDifferenceError()
+    float getInOutArmTimeDifferenceError()
     {
-      if (!m_calculateArmTime) calculateArmTime();
+      if (!m_isArmTimeComputed) estimateArmTime();
       return m_inOutArmTimeDiffError;
     }
 
@@ -655,16 +653,17 @@ namespace Belle2 {
     void prune();
 
     /**
-     * This function calculate the track time of the ingoing anf outgoing arms and their difference.
-     * If they do not exists than they are set to NAN by default
+     * This function calculate the track time of the ingoing and outgoing arms and their difference.
+     * If they do not exists they are set to NAN by default
      */
-    void calculateArmTime();
+    void estimateArmTime();
 
     /**
-     * This function return the arm direction of the track as a std::string:
-     * "OUT" (ex: PXD-SVD-CDC) "IN" (ex: CDC-SVD-PXD)
+     * This function returns true if the arm direction is Outgoing
+     * and false if the arm direction is Ingoing
      */
-    std::string trackArmDirection(float pre = NAN, float post = NAN);
+    bool isOutgoingArm(RecoHitInformation::RecoHitDetector pre = RecoHitInformation::RecoHitDetector::c_undefinedTrackingDetector,
+                       RecoHitInformation::RecoHitDetector post = RecoHitInformation::RecoHitDetector::c_undefinedTrackingDetector);
 
     /// Return a list of measurements and track points, which can be used e.g. to extrapolate. You are not allowed to modify or delete them!
     const std::vector<genfit::TrackPoint*>& getHitPointsWithMeasurement() const
@@ -884,8 +883,8 @@ namespace Belle2 {
     float m_inOutArmTimeDiff = NAN;
     /// Error of the difference of the track times of the ingoing and outgoing arms
     float m_inOutArmTimeDiffError = NAN;
-    /// Internal storage of calculateArmTime() is set
-    bool m_calculateArmTime = false;
+    /// true if the arms times are already computed, false otherwise
+    bool m_isArmTimeComputed = false;
     /// Internal storage of the final ingoing arm time is set
     bool m_hasIngoingArmTime = false;
     /// Internal storage of the final outgoing arm time is set

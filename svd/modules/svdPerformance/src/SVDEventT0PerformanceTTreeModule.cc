@@ -130,25 +130,25 @@ void SVDEventT0PerformanceTTreeModule::initialize()
 
 void SVDEventT0PerformanceTTreeModule::event()
 {
-  m_trueEventT0 = -999;
-  m_eventT0 = -99;
-  m_eventT0Err = -99;
-  m_svdEventT0 = -99;
-  m_svdEventT0Err = -99;
-  m_svdOnlineEventT0 = -99;
-  m_svdOnlineEventT0Err = -99;
-  m_cdcEventT0 = -99;
-  m_cdcEventT0Err = -99;
-  m_cdcOnlineEventT0 = -99;
-  m_cdcOnlineEventT0Err = -99;
-  m_topEventT0 = -99;
-  m_topEventT0Err = -99;
-  m_topOnlineEventT0 = -99;
-  m_topOnlineEventT0Err = -99;
-  m_eclOnlineEventT0 = -99;
-  m_eclOnlineEventT0Err = -99;
-  m_eclTCEmax = -99;
-  m_eclTCid = -99;
+  m_trueEventT0         = std::numeric_limits<float>::quiet_NaN();
+  m_eventT0             = std::numeric_limits<float>::quiet_NaN();
+  m_eventT0Err          = std::numeric_limits<float>::quiet_NaN();
+  m_svdEventT0          = std::numeric_limits<float>::quiet_NaN();
+  m_svdEventT0Err       = std::numeric_limits<float>::quiet_NaN();
+  m_svdOnlineEventT0    = std::numeric_limits<float>::quiet_NaN();
+  m_svdOnlineEventT0Err = std::numeric_limits<float>::quiet_NaN();
+  m_cdcEventT0          = std::numeric_limits<float>::quiet_NaN();
+  m_cdcEventT0Err       = std::numeric_limits<float>::quiet_NaN();
+  m_cdcOnlineEventT0    = std::numeric_limits<float>::quiet_NaN();
+  m_cdcOnlineEventT0Err = std::numeric_limits<float>::quiet_NaN();
+  m_topEventT0          = std::numeric_limits<float>::quiet_NaN();
+  m_topEventT0Err       = std::numeric_limits<float>::quiet_NaN();
+  m_topOnlineEventT0    = std::numeric_limits<float>::quiet_NaN();
+  m_topOnlineEventT0Err = std::numeric_limits<float>::quiet_NaN();
+  m_eclOnlineEventT0    = std::numeric_limits<float>::quiet_NaN();
+  m_eclOnlineEventT0Err = std::numeric_limits<float>::quiet_NaN();
+  m_eclTCEmax           = std::numeric_limits<int>::quiet_NaN();
+  m_eclTCid             = std::numeric_limits<int>::quiet_NaN();
 
   StoreObjPtr<EventMetaData> evtMetaData;
   m_exp = evtMetaData->getExperiment();
@@ -337,7 +337,7 @@ void SVDEventT0PerformanceTTreeModule::event()
             m_trueEventT0 = mcParticle_1[0]->getProductionTime();
         }
       } else
-        m_svdTrueTime.push_back(-99);
+        m_svdTrueTime.push_back(std::numeric_limits<float>::quiet_NaN());
     }
   }
 

@@ -719,7 +719,7 @@ bool RecoTrack::isOutgoingArm(RecoHitInformation::RecoHitDetector pre, RecoHitIn
   else if (pre == CDC && post == und) armDirection = false;
   else {
     //TO DO
-    B2INFO("SVD-only? PXD-SVD-PXD??? --- use layer information to determine if the track arm is outgoing or ingoing! Considered --> 'OUT'");
+    B2WARNING("SVD-only? PXD-SVD-PXD??? --- use layer information to determine if the track arm is outgoing or ingoing! Considered --> 'OUT'");
     armDirection = true;
   }
   return armDirection;

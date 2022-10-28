@@ -646,7 +646,7 @@ void RecoTrack::estimateArmTime()
   m_isArmTimeComputed = true;
   const std::vector<RecoHitInformation*>& recoHits = getRecoHitInformations(true);
   bool svdDone = false;
-  RecoHitInformation::RecoHitDetector und = RecoHitInformation::RecoHitDetector::c_undefinedTrackingDetector;
+  static RecoHitInformation::RecoHitDetector und = RecoHitInformation::RecoHitDetector::c_undefinedTrackingDetector;
   RecoHitInformation::RecoHitDetector SVD = RecoHitInformation::RecoHitDetector::c_SVD;
   RecoHitInformation::RecoHitDetector detIDpre = und;
   RecoHitInformation::RecoHitDetector detIDpost = und;
@@ -654,6 +654,8 @@ void RecoTrack::estimateArmTime()
   float clusterTimeSum = 0;
   float clusterTimeSigma2Sum = 0;
   bool trackArmTimeDone = false;
+
+  // loop over the recoHits of the RecoTrack
   for (const auto& recoHit : recoHits) {
     RecoHitInformation::RecoHitDetector foundin = recoHit->getTrackingDetector();
     if (!svdDone && foundin != SVD) {
@@ -667,14 +669,14 @@ void RecoTrack::estimateArmTime()
       nSVD += 1;
       svdDone = true;
     } else {
+      // Compute the track arm times using SVD cluster times
       if (svdDone && nSVD > 1) {
         detIDpost = foundin;
         if (!isOutgoingArm(detIDpre, detIDpost)) {
           m_ingoingArmTime = clusterTimeSum / nSVD;
           m_ingoingArmTimeError = std::sqrt(clusterTimeSigma2Sum / (nSVD * (nSVD - 1)));
           m_hasIngoingArmTime = true;
-        }
-        if (isOutgoingArm(detIDpre, detIDpost)) {
+        } else {
           m_outgoingArmTime = clusterTimeSum / nSVD;
           m_outgoingArmTimeError = std::sqrt(clusterTimeSigma2Sum / (nSVD * (nSVD - 1)));
           m_hasOutgoingArmTime = true;
@@ -687,19 +689,24 @@ void RecoTrack::estimateArmTime()
         trackArmTimeDone = true;
       }
     }
+
+    // When the last recoHit is SVD, it does not enter in the else{} of if (detID == SVD) {...} else {...}
+    // where the track arm times are calculated, so they are calculated here.
+    // It will not reset all variables because it is run only at the last recoHit
     if (!trackArmTimeDone && (recoHit == recoHits.back()) && nSVD > 1) {
       if (!isOutgoingArm(detIDpre, detIDpost)) {
         m_ingoingArmTime = clusterTimeSum / nSVD;
         m_ingoingArmTimeError = std::sqrt(clusterTimeSigma2Sum / (nSVD * (nSVD - 1)));
         m_hasIngoingArmTime = true;
-      }
-      if (isOutgoingArm(detIDpre, detIDpost)) {
+      } else {
         m_outgoingArmTime = clusterTimeSum / nSVD;
         m_outgoingArmTimeError = std::sqrt(clusterTimeSigma2Sum / (nSVD * (nSVD - 1)));
         m_hasIngoingArmTime = true;
-      }// It will not reset all variables because it is run only at the last recoHit
+      }
     }
   }
+
+  // Compute the difference of ingoing arm time and outgoing arm time
   m_inOutArmTimeDiff = m_ingoingArmTime - m_outgoingArmTime;
   m_inOutArmTimeDiffError = std::sqrt(m_ingoingArmTimeError * m_ingoingArmTimeError + m_outgoingArmTimeError *
                                       m_outgoingArmTimeError);
@@ -707,20 +714,23 @@ void RecoTrack::estimateArmTime()
 
 bool RecoTrack::isOutgoingArm(RecoHitInformation::RecoHitDetector pre, RecoHitInformation::RecoHitDetector post)
 {
-  RecoHitInformation::RecoHitDetector und = RecoHitInformation::RecoHitDetector::c_undefinedTrackingDetector;
+  // The detector sequences considered are:
+  // outgoing arm: PXD-SVD-CDC, PXD-SVD, SVD-CDC
+  // ingoing arm: CDC-SVD-PXD, CDC-SVD, SVD-PXD
+  static RecoHitInformation::RecoHitDetector und = RecoHitInformation::RecoHitDetector::c_undefinedTrackingDetector;
   RecoHitInformation::RecoHitDetector PXD = RecoHitInformation::RecoHitDetector::c_PXD;
   RecoHitInformation::RecoHitDetector CDC = RecoHitInformation::RecoHitDetector::c_CDC;
-  bool armDirection = true;
-  if (pre == PXD && post == CDC) armDirection = true;
-  else if (pre == und && post == CDC) armDirection = true;
-  else if (pre == PXD && post == und) armDirection = true;
-  else if (pre == CDC && post == PXD) armDirection = false;
-  else if (pre == und && post == PXD) armDirection = false;
-  else if (pre == CDC && post == und) armDirection = false;
+  bool isOutgoing = true;
+  if (pre == PXD && post == CDC) isOutgoing = true;
+  else if (pre == und && post == CDC) isOutgoing = true;
+  else if (pre == PXD && post == und) isOutgoing = true;
+  else if (pre == CDC && post == PXD) isOutgoing = false;
+  else if (pre == und && post == PXD) isOutgoing = false;
+  else if (pre == CDC && post == und) isOutgoing = false;
   else {
     //TO DO
     B2WARNING("SVD-only? PXD-SVD-PXD??? --- use layer information to determine if the track arm is outgoing or ingoing! Considered --> 'OUT'");
-    armDirection = true;
+    isOutgoing = true;
   }
-  return armDirection;
+  return isOutgoing;
 }

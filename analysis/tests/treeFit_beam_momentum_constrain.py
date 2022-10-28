@@ -27,8 +27,7 @@ class TestTreeFits(unittest.TestCase):
 
         main = basf2.create_path()
 
-        inputfile = b2test_utils.require_file('analysis/tests/150_noBKG_DtoPiNuNu.root', py_case=self)
-        ma.inputMdst(inputfile, path=main)
+        ma.inputMdst(b2test_utils.require_file('analysis/tests/150_noBKG_DtoPiNuNu.root'), path=main)
         ma.fillParticleList('pi+:a', 'pionID > 0.5', path=main)
         ma.fillParticleList('K+:a', 'kaonID > 0.5', path=main)
 

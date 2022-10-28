@@ -18,6 +18,13 @@ namespace Belle2 {
    */
   class HistDelta {
   public:
+    /** enum definition for delta algo
+     * Disabled: nothing
+     * Entries: use nr histogram entries
+     * Underflow: use entries in histogram underflow bin
+     * Events: use nr processed events from framework (but: unreliable for
+     * normalization as the number of events for this specific histogram may differ)
+    */
     enum EDeltaType { c_Disabled = 0, c_Entries = 1, c_Underflow = 2, c_Events = 3};
     EDeltaType m_type{}; /**< type of delta algo */
     int m_parameter{}; /**< parameter depending on algo, e.g. nr of entries or events */

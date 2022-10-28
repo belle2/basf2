@@ -64,7 +64,6 @@ void SVDEventT0PerformanceTTreeModule::initialize()
   recoTracks.isOptional();
   m_clusters.isRequired();
   m_EventT0.isOptional();
-  m_TRGECLData.isOptional();
 
   TDirectory::TContext context;
 
@@ -341,7 +340,8 @@ void SVDEventT0PerformanceTTreeModule::event()
     }
   }
 
-  for (const auto& trg_hit : m_TRGECLData) {
+  StoreArray<TRGECLUnpackerStore> TRGECLData;
+  for (const auto& trg_hit : TRGECLData) {
     int hit_win   = trg_hit.getHitWin();
     B2DEBUG(40, "hit_win = " << hit_win);
     if (hit_win != 3 && hit_win != 4) { continue; }

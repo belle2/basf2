@@ -14,7 +14,7 @@
   <contact> SVD Software Group, svd-software@belle2.org </contact>
   <description>
     This module is used for the SVD validation.
-    It gets information about ShaperDigits and RecoDigits, saving
+    It gets information about RecoDigits, saving
     in a ttree in a ROOT file.
   </description>
 </header>
@@ -66,43 +66,55 @@ class SVDValidationTTreeRecoDigit(b2.Module):
                 self.tree.Branch(key, addressof(self.data, key), key + formstring)
 
     def event(self):
-        """Take digits from SVDRecoDigits with a truehit and save needed information"""
+        """Take digits from SVDRecoDigits with at least one truehit and save needed information"""
         digits = Belle2.PyStoreArray('SVDRecoDigits')
         shaperDigits = Belle2.PyStoreArray('SVDShaperDigits')
         for digit in digits:
             # get the true hit from the related SVDShaperDigit
+            # it works because there is a 1-to-1 correspondence between
+            # ShaperDigits and RecoDigits
             digit_truehits = shaperDigits[digit.getArrayIndex()].getRelationsTo('SVDTrueHits')
-            # We want only digits with exactly one associated TrueHit
-            if len(digit_truehits) != 1:
+
+            if len(digit_truehits) == 0:
                 continue
-            for truehit in digit_truehits:
-                # Sensor identification
-                sensorID = digit.getSensorID()
-                self.data.sensor_id = int(sensorID)
-                sensorNum = sensorID.getSensorNumber()
-                self.data.sensor = sensorNum
-                layerNum = sensorID.getLayerNumber()
-                self.data.layer = layerNum
-                if (layerNum == 3):
-                    sensorType = 1  # Barrel
+
+            # find the trueHit with highest energy deposit (the "best" match)
+            energy = 0
+            bestTrueHitIndex = 0
+
+            for i, trueHit in enumerate(digit_truehits):
+                if trueHit.getEnergyDep() > energy:
+                    energy = trueHit.getEnergyDep()
+                    bestTrueHitIndex = i
+            bestTrueHit = digit_truehits[bestTrueHitIndex]
+
+            # Sensor identification
+            sensorID = digit.getSensorID()
+            self.data.sensor_id = int(sensorID)
+            sensorNum = sensorID.getSensorNumber()
+            self.data.sensor = sensorNum
+            layerNum = sensorID.getLayerNumber()
+            self.data.layer = layerNum
+            if (layerNum == 3):
+                sensorType = 1  # Barrel
+            else:
+                if (sensorNum == 1):
+                    sensorType = 0
                 else:
-                    if (sensorNum == 1):
-                        sensorType = 0
-                    else:
-                        sensorType = 1
-                self.data.sensor_type = sensorType
-                ladderNum = sensorID.getLadderNumber()
-                self.data.ladder = ladderNum
-                if digit.isUStrip():
-                    self.data.strip_dir = 0
-                else:
-                    self.data.strip_dir = 1
-                self.data.recodigit_charge = digit.getCharge()
-                self.data.recodigit_time = digit.getTime()
-                self.data.truehit_time = truehit.getGlobalTime()
-                # Fill tree
-                self.file.cd()
-                self.tree.Fill()
+                    sensorType = 1
+            self.data.sensor_type = sensorType
+            ladderNum = sensorID.getLadderNumber()
+            self.data.ladder = ladderNum
+            if digit.isUStrip():
+                self.data.strip_dir = 0
+            else:
+                self.data.strip_dir = 1
+            self.data.recodigit_charge = digit.getCharge()
+            self.data.recodigit_time = digit.getTime()
+            self.data.truehit_time = bestTrueHit.getGlobalTime()
+            # Fill tree
+            self.file.cd()
+            self.tree.Fill()
 
     def terminate(self):
         """Close the output file. """

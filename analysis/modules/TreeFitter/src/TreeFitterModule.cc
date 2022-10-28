@@ -130,6 +130,7 @@ void TreeFitterModule::beginRun()
   const TMatrixDSym HERcoma = beamparams->getCovHER();
   const TMatrixDSym LERcoma = beamparams->getCovLER();
 
+  m_beamCovariance = Eigen::Matrix4d::Zero();
   const double covE = (HERcoma(0, 0) + LERcoma(0, 0));
   for (size_t i = 0; i < 4; ++i) {
     m_beamCovariance(i, i) =

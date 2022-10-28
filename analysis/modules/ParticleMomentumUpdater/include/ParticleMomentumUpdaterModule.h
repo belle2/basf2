@@ -36,9 +36,6 @@ namespace Belle2 {
     /** Decay descriptor of the target particles */
     DecayDescriptor m_pDDescriptorTarget;
 
-    /** Helper function to replace grand daughters */
-    bool replaceDaughterRecursively(Particle* particle, Particle* oldP, Particle* newP);
-
   public:
     /** Constructor. */
     ParticleMomentumUpdaterModule();

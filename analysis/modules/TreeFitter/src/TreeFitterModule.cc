@@ -167,7 +167,7 @@ void TreeFitterModule::event()
       Particle* daughterCopy = Belle2::ParticleCopy::copyParticle(targetD);
       daughterCopy->writeExtraInfo("treeFitterTreatMeAsInvisible", 1);
       daughterCopy->setMomentumVertexErrorMatrix(dummyCovMatrix);
-      bool isReplaced = replaceDaughterRecursively(particle, targetD, daughterCopy);
+      bool isReplaced = particle->replaceDaughterRecursively(targetD, daughterCopy);
       if (!isReplaced)
         B2ERROR("TreeFitterModule::event No target particle found for " << m_treatAsInvisible);
     }
@@ -267,17 +267,4 @@ void TreeFitterModule::plotFancyASCII()
          "% of candidates did not.\033[0m");
   B2INFO("\033[1;39mYou chose to drop all candidates with pValue < " << m_confidenceLevel << ".\033[0m");
   B2INFO("\033[1;35m================================================================================\033[0m");
-}
-
-bool TreeFitterModule::replaceDaughterRecursively(Particle* particle, Particle* oldP, Particle* newP)
-{
-  bool isReplaced = particle->replaceDaughter(oldP, newP);
-  if (isReplaced)
-    return true;
-  for (auto& daughter : particle->getDaughters()) {
-    isReplaced = replaceDaughterRecursively(daughter, oldP, newP);
-    if (isReplaced)
-      return true;
-  }
-  return false;
 }

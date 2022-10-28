@@ -392,11 +392,19 @@ namespace Belle2 {
     void removeDaughter(const Particle* daughter, const bool updateType = true);
 
     /**
-     * Replace index of given daughter with new daughter
+     * Replace index of given daughter with new daughter, return true if a replacement is made
      * @param oldDaughter pointer to the daughter that will be removed
      * @param newDaughter pointer to the particle that will be added as a daughter
      */
     bool replaceDaughter(const Particle* oldDaughter, const Particle* newDaughter);
+
+    /**
+     * Apply replaceDaughter to all Particles in the decay tree by looping recursively through
+     * it, return true if a replacement is made
+     * @param oldDaughter pointer to the daughter that will be removed
+     * @param newDaughter pointer to the particle that will be added as a daughter
+     */
+    bool replaceDaughterRecursively(const Particle* oldDaughter, const Particle* newDaughter);
 
     // getters
 

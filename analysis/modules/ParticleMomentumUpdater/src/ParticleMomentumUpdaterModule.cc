@@ -91,24 +91,11 @@ void ParticleMomentumUpdaterModule::event()
     } else {
       Particle* daughterCopy = Belle2::ParticleCopy::copyParticle(targetP);
       daughterCopy->set4Vector(boost4Vector - daughters4Vector);
-      bool isReplaced = replaceDaughterRecursively(iParticle, targetP, daughterCopy);
+      bool isReplaced = iParticle->replaceDaughterRecursively(targetP, daughterCopy);
       if (!isReplaced)
         B2ERROR("ParticleMomentumUpdaterModule::event No target particle found for " << m_decayStringTarget);
     }
   }
-}
-
-bool ParticleMomentumUpdaterModule::replaceDaughterRecursively(Particle* particle, Particle* oldP, Particle* newP)
-{
-  bool isReplaced = particle->replaceDaughter(oldP, newP);
-  if (isReplaced)
-    return true;
-  for (auto& daughter : particle->getDaughters()) {
-    isReplaced = replaceDaughterRecursively(daughter, oldP, newP);
-    if (isReplaced)
-      return true;
-  }
-  return false;
 }
 
 void ParticleMomentumUpdaterModule::terminate()

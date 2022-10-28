@@ -742,6 +742,20 @@ bool Particle::replaceDaughter(const Particle* oldDaughter, const Particle* newD
   return false;
 }
 
+bool Particle::replaceDaughterRecursively(const Particle* oldDaughter, const Particle* newDaughter)
+{
+  bool isReplaced = this->replaceDaughter(oldDaughter, newDaughter);
+  if (isReplaced)
+    return true;
+  for (auto& daughter : this->getDaughters()) {
+    isReplaced = daughter->replaceDaughterRecursively(oldDaughter, newDaughter);
+    if (isReplaced)
+      return true;
+  }
+  return false;
+}
+
+
 bool Particle::overlapsWith(const Particle* oParticle) const
 {
   // obtain vectors of daughter final state particles

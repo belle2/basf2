@@ -717,6 +717,7 @@ bool RecoTrack::isOutgoingArm(RecoHitInformation::RecoHitDetector pre, RecoHitIn
   // The detector sequences considered are:
   // outgoing arm: PXD-SVD-CDC, PXD-SVD, SVD-CDC
   // ingoing arm: CDC-SVD-PXD, CDC-SVD, SVD-PXD
+  // pre and post are defined w.r.t SVD, so they can be PXD, CDC or undefined if one of the two is missing
   static RecoHitInformation::RecoHitDetector und = RecoHitInformation::RecoHitDetector::c_undefinedTrackingDetector;
   RecoHitInformation::RecoHitDetector PXD = RecoHitInformation::RecoHitDetector::c_PXD;
   RecoHitInformation::RecoHitDetector CDC = RecoHitInformation::RecoHitDetector::c_CDC;

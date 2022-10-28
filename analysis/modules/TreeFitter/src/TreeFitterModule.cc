@@ -15,7 +15,6 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/particledb/EvtGenDatabasePDG.h>
 #include <framework/database/DBObjPtr.h>
-#include <framework/dbobjects/BeamParameters.h>
 
 #include <analysis/utility/ParticleCopy.h>
 
@@ -95,7 +94,7 @@ TreeFitterModule::TreeFitterModule() : Module(), m_nCandidatesBeforeFit(-1), m_n
 void TreeFitterModule::initialize()
 {
   m_plist.isRequired(m_particleList);
-  StoreArray<Particle>().isRequired();
+  m_particles.isRequired();
   m_nCandidatesBeforeFit = 0;
   m_nCandidatesAfter = 0;
 
@@ -117,19 +116,22 @@ void TreeFitterModule::initialize()
 
 void TreeFitterModule::beginRun()
 {
-  const Belle2::DBObjPtr<Belle2::BeamParameters> beamparams;
-  const ROOT::Math::PxPyPzEVector her = beamparams->getHER();
-  const ROOT::Math::PxPyPzEVector ler = beamparams->getLER();
-  const ROOT::Math::PxPyPzEVector cms = her + ler;
+  if (!m_beamparams.isValid())
+    B2FATAL("BeamParameters are not available!");
+
+  const ROOT::Math::PxPyPzEVector& her = m_beamparams->getHER();
+  const ROOT::Math::PxPyPzEVector& ler = m_beamparams->getLER();
+  const ROOT::Math::PxPyPzEVector& cms = her + ler;
 
   m_beamMomE(0) = cms.X();
   m_beamMomE(1) = cms.Y();
   m_beamMomE(2) = cms.Z();
   m_beamMomE(3) = cms.E();
 
-  const TMatrixDSym HERcoma = beamparams->getCovHER();
-  const TMatrixDSym LERcoma = beamparams->getCovLER();
+  const TMatrixDSym& HERcoma = m_beamparams->getCovHER();
+  const TMatrixDSym& LERcoma = m_beamparams->getCovLER();
 
+  m_beamCovariance = Eigen::Matrix4d::Zero();
   const double covE = (HERcoma(0, 0) + LERcoma(0, 0));
   for (size_t i = 0; i < 4; ++i) {
     m_beamCovariance(i, i) =

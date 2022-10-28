@@ -191,23 +191,6 @@ void ParticleVertexFitterModule::event()
     if (particle->getPValue() < m_confidenceLevel)
       toRemove.push_back(particle->getArrayIndex());
 
-
-    // revert the momentum scaling factor to 1
-    if (m_updateDaughters == true and m_decayString.empty()) {
-      // if decayString is not empty, fit particles have already been updated in makeKVertexMother
-
-      std::function<void(Particle*)> funcUpdateMomentumScaling =
-      [&funcUpdateMomentumScaling](Particle * part) {
-        part->setMomentumScalingFactor(1.0);
-        for (auto daughter : part->getDaughters()) {
-          funcUpdateMomentumScaling(daughter);
-        }
-      };
-
-      funcUpdateMomentumScaling(particle);
-    }
-
-
   }
   m_plist->removeParticles(toRemove);
 
@@ -863,6 +846,7 @@ bool ParticleVertexFitterModule::makeKVertexMother(analysis::VertexFitKFit& kv,
                                          kv.getTrackMomentum(iChild).z(),
                                          kv.getTrackMomentum(iChild).t());
       daughters[iChild]->set4Vector(i4Vector);
+      daughters[iChild]->setMomentumScalingFactor(1.0);
 
       daughters[iChild]->setVertex(
         CLHEPToROOT::getXYZVector(kv.getTrackPosition(iChild)));
@@ -890,6 +874,7 @@ bool ParticleVertexFitterModule::makeKVertexMother(analysis::VertexFitKFit& kv,
                                          kv.getTrackMomentum(iChild).z(),
                                          kv.getTrackMomentum(iChild).t());
       daughter->set4Vector(i4Vector);
+      daughter->setMomentumScalingFactor(1.0);
 
       daughter->setVertex(CLHEPToROOT::getXYZVector(kv.getTrackPosition(iChild)));
       daughter->setMomentumVertexErrorMatrix(CLHEPToROOT::getTMatrixFSym(kv.getTrackError(iChild)));
@@ -916,14 +901,8 @@ bool ParticleVertexFitterModule::makeKVertexMother(analysis::VertexFitKFit& kv,
       if (includeFitChildren) {
         // Using updated daughters, update part's momentum
         ROOT::Math::PxPyPzEVector sum4Vector;
-        for (auto daughter : part->getDaughters()) {
-
-          // if daughter is in fitChildren = momentum is updated, the scaling factor is reverted to 1
-          if (std::find(fitChildren.begin(), fitChildren.end(), daughter) != fitChildren.end())
-            daughter->setMomentumScalingFactor(1.0);
-
+        for (auto daughter : part->getDaughters())
           sum4Vector += daughter->get4Vector();
-        }
 
         part->set4Vector(sum4Vector);
       }
@@ -968,6 +947,7 @@ bool ParticleVertexFitterModule::makeKMassVertexMother(analysis::MassVertexFitKF
                                          kmv.getTrackMomentum(iChild).z(),
                                          kmv.getTrackMomentum(iChild).t());
       daughters[iChild]->set4Vector(i4Vector);
+      daughters[iChild]->setMomentumScalingFactor(1.0);
 
       daughters[iChild]->setVertex(
         CLHEPToROOT::getXYZVector(kmv.getTrackPosition(iChild)));
@@ -1008,6 +988,7 @@ bool ParticleVertexFitterModule::makeKMassPointingVertexMother(analysis::MassPoi
                                          kmpv.getTrackMomentum(iChild).z(),
                                          kmpv.getTrackMomentum(iChild).t());
       daughters[iChild]->set4Vector(i4Vector);
+      daughters[iChild]->setMomentumScalingFactor(1.0);
 
       daughters[iChild]->setVertex(
         CLHEPToROOT::getXYZVector(kmpv.getTrackPosition(iChild)));
@@ -1047,6 +1028,7 @@ bool ParticleVertexFitterModule::makeKMassMother(analysis::MassFitKFit& km,
                                          km.getTrackMomentum(iChild).z(),
                                          km.getTrackMomentum(iChild).t());
       daughters[iChild]->set4Vector(i4Vector);
+      daughters[iChild]->setMomentumScalingFactor(1.0);
 
       daughters[iChild]->setVertex(
         CLHEPToROOT::getXYZVector(km.getTrackPosition(iChild)));
@@ -1212,6 +1194,7 @@ bool ParticleVertexFitterModule::makeKRecoilMassMother(analysis::RecoilMassKFit&
                                          kf.getTrackMomentum(iChild).z(),
                                          kf.getTrackMomentum(iChild).t());
       daughters[iChild]->set4Vector(i4Vector);
+      daughters[iChild]->setMomentumScalingFactor(1.0);
 
       daughters[iChild]->setVertex(
         CLHEPToROOT::getXYZVector(kf.getTrackPosition(iChild)));

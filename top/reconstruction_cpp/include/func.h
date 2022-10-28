@@ -104,11 +104,12 @@ namespace Belle2 {
 
       /**
        * Replacement for a function TVector3::RotateUz which is not implemented in GenVector classes.
-       * @param vec vector to be rotated from frame S' [in] to the frame S [out]
-       * @param zAxis unit vector representing z-axis of frame S' expressed in coordinates of frame S
+       * @param vec vector to be rotated from frame S' [in] to frame S [out]
+       * @param z_Axis vector representing z-axis of the frame S' expressed in the coordinates of frame S
        */
-      inline void rotateUz(ROOT::Math::XYZVector& vec, const ROOT::Math::XYZVector& zAxis)
+      inline void rotateUz(ROOT::Math::XYZVector& vec, const ROOT::Math::XYZVector& z_Axis)
       {
+        auto zAxis = z_Axis.Unit();
         double cth = zAxis.Z();
         double sth = sqrt(1 - cth * cth);
         if (sth == 0) {

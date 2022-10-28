@@ -94,7 +94,7 @@ TreeFitterModule::TreeFitterModule() : Module(), m_nCandidatesBeforeFit(-1), m_n
 void TreeFitterModule::initialize()
 {
   m_plist.isRequired(m_particleList);
-  StoreArray<Particle>().isRequired();
+  m_particles.isRequired();
   m_nCandidatesBeforeFit = 0;
   m_nCandidatesAfter = 0;
 

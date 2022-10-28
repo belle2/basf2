@@ -356,7 +356,6 @@ namespace Belle2 {
       return (idx_theta - 1) + nbins_th * ((idx_p - 1) + nbins_p * (idx_charge - 1));
     }
 
-
     /**
      * Overloaded method, to be used if not interested in knowing the 3D bin coordinates.
      */

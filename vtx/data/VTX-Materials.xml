@@ -43,5 +43,11 @@
     </Components>
   </Material>
 
-  
+  <Material name="VTX-Carbon">
+    <state>Solid</state>
+    <density unit="g/cm3">1.5</density>
+    <Components>
+      <Element>C</Element>
+    </Components>
+  </Material>
 </Materials>

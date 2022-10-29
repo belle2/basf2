@@ -7,56 +7,56 @@
        define the endflange by its boundary points in the xz plane. The solid
        is created by rotating the created area around the z axis between the
        start and end angle. -->
-  <Endflange name="backward" description="Endflange in backwards direction (-z)">
-    <Material>VTX-Support</Material>
-    <minPhi unit="deg">-7.125</minPhi>
-    <maxPhi unit="deg">168.049</maxPhi>
-    <Plane>
-      <posZ unit="mm">-66.580</posZ>
-      <innerRadius unit="mm"> 21.080</innerRadius>
-      <outerRadius unit="mm"> 21.080</outerRadius>
-    </Plane>
-    <Plane>
-      <posZ unit="mm">-60.520</posZ>
-      <innerRadius unit="mm"> 14.940</innerRadius>
-      <outerRadius unit="mm"> 21.080</outerRadius>
-    </Plane>
-    <Plane>
-      <posZ unit="mm">-38.933</posZ>
-      <innerRadius unit="mm"> 14.940</innerRadius>
-      <outerRadius unit="mm"> 21.080</outerRadius>
-    </Plane>
-    <Plane>
-      <posZ unit="mm">-31.000</posZ>
-      <innerRadius unit="mm"> 14.940</innerRadius>
-      <outerRadius unit="mm"> 16.420</outerRadius>
-    </Plane>
-  </Endflange>
-  <Endflange name="forward" description="Endflange in forwards direction (+z)">
-    <Material>VTX-Support</Material>
-    <minPhi unit="deg">-7.125</minPhi>
-    <maxPhi unit="deg">168.049</maxPhi>
-    <Plane>
-      <posZ unit="mm">59.000</posZ>
-      <innerRadius unit="mm">14.940</innerRadius>
-      <outerRadius unit="mm">16.420</outerRadius>
-    </Plane>
-    <Plane>
-      <posZ unit="mm">73.981</posZ>
-      <innerRadius unit="mm">14.940</innerRadius>
-      <outerRadius unit="mm">21.080</outerRadius>
-    </Plane>
-    <Plane>
-      <posZ unit="mm">89.701</posZ>
-      <innerRadius unit="mm">14.940</innerRadius>
-      <outerRadius unit="mm">21.080</outerRadius>
-    </Plane>
-    <Plane>
-      <posZ unit="mm">105.000</posZ>
-      <innerRadius unit="mm">19.617</innerRadius>
-      <outerRadius unit="mm">21.080</outerRadius>
-    </Plane>
-  </Endflange>
+  <!-- <Endflange name="backward" description="Endflange in backwards direction (-z)"> -->
+  <!--   <Material>VTX-Support</Material> -->
+  <!--   <minPhi unit="deg">-7.125</minPhi> -->
+  <!--   <maxPhi unit="deg">168.049</maxPhi> -->
+  <!--   <Plane> -->
+  <!--     <posZ unit="mm">-66.580</posZ> -->
+  <!--     <innerRadius unit="mm"> 21.080</innerRadius> -->
+  <!--     <outerRadius unit="mm"> 21.080</outerRadius> -->
+  <!--   </Plane> -->
+  <!--   <Plane> -->
+  <!--     <posZ unit="mm">-60.520</posZ> -->
+  <!--     <innerRadius unit="mm"> 14.940</innerRadius> -->
+  <!--     <outerRadius unit="mm"> 21.080</outerRadius> -->
+  <!--   </Plane> -->
+  <!--   <Plane> -->
+  <!--     <posZ unit="mm">-38.933</posZ> -->
+  <!--     <innerRadius unit="mm"> 14.940</innerRadius> -->
+  <!--     <outerRadius unit="mm"> 21.080</outerRadius> -->
+  <!--   </Plane> -->
+  <!--   <Plane> -->
+  <!--     <posZ unit="mm">-31.000</posZ> -->
+  <!--     <innerRadius unit="mm"> 14.940</innerRadius> -->
+  <!--     <outerRadius unit="mm"> 16.420</outerRadius> -->
+  <!--   </Plane> -->
+  <!-- </Endflange> -->
+  <!-- <Endflange name="forward" description="Endflange in forwards direction (+z)"> -->
+  <!--   <Material>VTX-Support</Material> -->
+  <!--   <minPhi unit="deg">-7.125</minPhi> -->
+  <!--   <maxPhi unit="deg">168.049</maxPhi> -->
+  <!--   <Plane> -->
+  <!--     <posZ unit="mm">59.000</posZ> -->
+  <!--     <innerRadius unit="mm">14.940</innerRadius> -->
+  <!--     <outerRadius unit="mm">16.420</outerRadius> -->
+  <!--   </Plane> -->
+  <!--   <Plane> -->
+  <!--     <posZ unit="mm">73.981</posZ> -->
+  <!--     <innerRadius unit="mm">14.940</innerRadius> -->
+  <!--     <outerRadius unit="mm">21.080</outerRadius> -->
+  <!--   </Plane> -->
+  <!--   <Plane> -->
+  <!--     <posZ unit="mm">89.701</posZ> -->
+  <!--     <innerRadius unit="mm">14.940</innerRadius> -->
+  <!--     <outerRadius unit="mm">21.080</outerRadius> -->
+  <!--   </Plane> -->
+  <!--   <Plane> -->
+  <!--     <posZ unit="mm">105.000</posZ> -->
+  <!--     <innerRadius unit="mm">19.617</innerRadius> -->
+  <!--     <outerRadius unit="mm">21.080</outerRadius> -->
+  <!--   </Plane> -->
+  <!-- </Endflange> -->
   <!-- now we define the boxes we will cut out from the endlanges defined
        above. We have 8 ladders in the inner layer but since one ladder from
        the other half shell is very close to the endflange of the next half we
@@ -71,18 +71,39 @@
     <startPhi unit="deg">-135.000</startPhi>
     <deltaPhi unit="deg">45.000</deltaPhi>
   </Cutout>
+
   <!-- Finally we define the carbon tubes for air cooling. There is one tube
        for each ladder in the first layer and they are positioned to blow
        directly on the switcher chips of these modules -->
-  <CarbonTubes description="Carbon tubes for air cooling of Switchers">
-    <Material>VTX-CarbonTubes</Material>
-    <count>4</count>
-    <minZ unit="mm">-34.000</minZ>
-    <maxZ unit="mm"> 64.720</maxZ>
-    <innerRadius unit="mm">0.250</innerRadius>
-    <outerRadius unit="mm">0.500</outerRadius>
-    <rphi unit="mm">18.700</rphi>
-    <startPhi unit="deg">-1.748</startPhi>
-    <deltaPhi unit="deg">45.000</deltaPhi>
-  </CarbonTubes>
+  <!-- <CarbonTubes description="Carbon tubes for air cooling of Switchers"> -->
+  <!--   <Material>VTX-CarbonTubes</Material> -->
+  <!--   <count>4</count> -->
+  <!--   <minZ unit="mm">-34.000</minZ> -->
+  <!--   <maxZ unit="mm"> 64.720</maxZ> -->
+  <!--   <innerRadius unit="mm">0.250</innerRadius> -->
+  <!--   <outerRadius unit="mm">0.500</outerRadius> -->
+  <!--   <rphi unit="mm">18.700</rphi> -->
+  <!--   <startPhi unit="deg">-1.748</startPhi> -->
+  <!--   <deltaPhi unit="deg">45.000</deltaPhi> -->
+  <!-- </CarbonTubes> -->
+
+  <HalfShell>
+    <RotationSolid>
+      <Name>OuterCover</Name>
+      <Color>#666</Color>
+      <Material>VTX-Carbon</Material>
+      <!-- chosen start and end angle leaves 200µm of tolerance at narrowest point -->
+      <minPhi unit="deg">-89.95</minPhi>
+      <maxPhi unit="deg"> 89.95</maxPhi>
+      <OuterPoints>
+	<point><z unit="mm">-325.000</z><x unit="mm">152.000</x></point>
+	<point><z unit="mm"> 525.000</z><x unit="mm">152.000</x></point>
+      </OuterPoints>
+      <InnerPoints>
+	<point><z unit="mm">-325.000</z><x unit="mm">151.000</x></point>
+	<point><z unit="mm"> 525.000</z><x unit="mm">151.000</x></point>
+      </InnerPoints>
+    </RotationSolid>
+  </HalfShell>
+
 </Support>

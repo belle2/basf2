@@ -102,7 +102,7 @@ namespace Belle2 {
     {
 
       m_categories = std::make_unique<TH3F>("clustertheta_p_charge_binsgrid",
-                                            ";#theta_{clus};p_{lab};Q",
+                                            ";ECL cluster #theta;p_{lab};Q",
                                             nClusterThetaBins, clusterThetaBins,
                                             nPBins, pBins,
                                             nChargeBins, chargeBins);

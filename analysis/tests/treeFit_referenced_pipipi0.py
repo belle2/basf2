@@ -82,4 +82,5 @@ class TestTreeFits(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main()
+    with b2test_utils.clean_working_directory():
+        unittest.main()

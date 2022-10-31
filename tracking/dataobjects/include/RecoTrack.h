@@ -653,14 +653,18 @@ namespace Belle2 {
     void prune();
 
     /**
-     * This function calculate the track time of the ingoing and outgoing arms and their difference.
+     * This function calculates the track time of the ingoing and outgoing arms and their difference.
      * If they do not exists they are set to NAN by default
      */
     void estimateArmTime();
 
     /**
      * This function returns true if the arm direction is Outgoing
-     * and false if the arm direction is Ingoing
+     * and false if the arm direction is Ingoing.
+     * The detector sequences considered are:
+     * outgoing arm: PXD-SVD-CDC, PXD-SVD, SVD-CDC;
+     * ingoing arm: CDC-SVD-PXD, CDC-SVD, SVD-PXD;
+     * pre and post are defined w.r.t SVD, so they can be PXD, CDC or undefined if one of the two is missing
      */
     bool isOutgoingArm(RecoHitInformation::RecoHitDetector pre = RecoHitInformation::RecoHitDetector::c_undefinedTrackingDetector,
                        RecoHitInformation::RecoHitDetector post = RecoHitInformation::RecoHitDetector::c_undefinedTrackingDetector);
@@ -891,7 +895,7 @@ namespace Belle2 {
     bool m_hasOutgoingArmTime = false;
 
     /**
-     * Add a generic hit with the given parameters for the reco hit information and reset track time information.
+     * Add a generic hit with the given parameters for the reco hit information.
      * @param hit a generic hit.
      * @param params for the constructor of the reco hit information.
      * @return true if the hit was new.
@@ -908,6 +912,20 @@ namespace Belle2 {
 
       addHitWithHitInformation(hit, newRecoHitInformation);
 
+      return true;
+    }
+
+    /**
+     * Add the needed relations for adding a generic hit with the given hit information and reset track time information.
+     * @param hit The hit to add
+     * @param recoHitInformation The reco hit information of the hit.
+     */
+    template <class HitType>
+    void addHitWithHitInformation(const HitType* hit, RecoHitInformation* recoHitInformation)
+    {
+      hit->addRelationTo(this);
+      addRelationTo(recoHitInformation);
+
       m_isArmTimeComputed = false;
       m_hasIngoingArmTime = false;
       m_hasOutgoingArmTime = false;
@@ -917,20 +935,6 @@ namespace Belle2 {
       m_outgoingArmTimeError = NAN;
       m_ingoingArmTimeError = NAN;
       m_inOutArmTimeDiffError = NAN;
-
-      return true;
-    }
-
-    /**
-     * Add the needed relations for adding a generic hit with the given hit information.
-     * @param hit The hit to add
-     * @param recoHitInformation The reco hit information of the hit.
-     */
-    template <class HitType>
-    void addHitWithHitInformation(const HitType* hit, RecoHitInformation* recoHitInformation)
-    {
-      hit->addRelationTo(this);
-      addRelationTo(recoHitInformation);
 
       setDirtyFlag();
     }

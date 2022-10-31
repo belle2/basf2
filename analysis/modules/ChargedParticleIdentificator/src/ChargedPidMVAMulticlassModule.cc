@@ -126,12 +126,8 @@ void ChargedPidMVAMulticlassModule::event()
 
       const Particle* particle = (m_nSelectedDaughters > 0) ? targetParticles[ipart] : pList->getParticle(ipart);
 
-      std::string thVarStr = "";
-
-      if ((*m_weightfiles_representation.get())->hasImplicitNaNmasking()) {
-        thVarStr = "conditionalVariableSelector(clusterTrackMatch == 1, clusterTheta, helixExtTheta(125.0, 196.0, -102.0))";
-      } else {
-        // LEGACY TRAININGS: always require a track-cluster match, and always use clusterTheta.
+      if (!(*m_weightfiles_representation.get())->hasImplicitNaNmasking()) {
+        // LEGACY TRAININGS: always require a track-cluster match.
         const ECLCluster* eclCluster = particle->getECLCluster();
         if (!eclCluster) {
           if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 11)) {
@@ -139,13 +135,12 @@ void ChargedPidMVAMulticlassModule::event()
           }
           continue;
         }
-        thVarStr = "clusterTheta";
       }
 
       // Retrieve the index for the correct MVA expert and dataset,
-      // given the reconstructed (clusterTheta(eclHelixExtTheta), p, charge)
-      auto* thVar = Variable::Manager::Instance().getVariable(thVarStr);
-      auto theta = std::get<double>(thVar->function(particle));
+      // given the reconstructed (polar angle, p, charge)
+      auto thVarName = (*m_weightfiles_representation.get())->getThetaVarName();
+      auto theta = std::get<double>(Variable::Manager::Instance().getVariable(thVarName)->function(particle));
       auto p = particle->getP();
       // Set a dummy charge of zero to pick charge-independent payloads, if requested.
       auto charge = (!m_charge_independent) ? particle->getCharge() : 0.0;
@@ -158,14 +153,13 @@ void ChargedPidMVAMulticlassModule::event()
       debugStr[11] += "\n";
       debugStr[11] += ("Particle [" + std::to_string(ipart) + "]\n");
       debugStr[11] += ("Has ECL cluster match? " + std::to_string(hasMatch) + "\n");
-      std::string whichTheta = (hasMatch) ? "clusterTheta" : "eclHelixExtTheta";
-      debugStr[11] += (whichTheta + " = " + std::to_string(theta) + " [rad]\n");
+      debugStr[11] += ("polar angle: " + thVarName + " = " + std::to_string(theta) + " [rad]\n");
       debugStr[11] += ("p = " + std::to_string(p) + " [GeV/c]\n");
       if (!m_charge_independent) {
         debugStr[11] += ("charge = " + std::to_string(charge) + "\n");
       }
       debugStr[11] += ("Is brems corrected ? " + std::to_string(particle->hasExtraInfo("bremsCorrected")) + "\n");
-      debugStr[11] += ("Weightfile idx = " + std::to_string(index) + " - (" + whichTheta + ", p, charge) = (" + std::to_string(
+      debugStr[11] += ("Weightfile idx = " + std::to_string(index) + " - (polar angle, p, charge) = (" + std::to_string(
                          idx_theta) + ", " + std::to_string(idx_p) + ", " +
                        std::to_string(idx_charge) + ")\n");
       if (m_cuts.at(index)) {
@@ -180,7 +174,7 @@ void ChargedPidMVAMulticlassModule::event()
 
         if (!m_cuts.at(index)->check(particle)) {
           if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 11)) {
-            B2WARNING("Particle didn't pass MVA category cut, skip MVA application...");
+            B2WARNING("\nParticle [" << ipart << "] didn't pass MVA category cut, skip MVA application...");
           }
           continue;
         }

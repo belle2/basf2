@@ -44,6 +44,7 @@ namespace Belle2 {
     ChargedPidMVAWeights() :
       m_energy_unit("energyUnit", Unit::GeV),
       m_ang_unit("angularUnit", Unit::rad),
+      m_thetaVarName("clusterTheta"),
       m_implicitNaNmasking(false)
     {};
 
@@ -51,10 +52,13 @@ namespace Belle2 {
     /**
      * Specialized constructor.
      */
-    ChargedPidMVAWeights(const double& energyUnit, const double& angUnit, bool implictNaNmasking = false)
+    ChargedPidMVAWeights(const double& energyUnit, const double& angUnit,
+                         const std::string& thetaVarName = "clusterTheta",
+                         bool implictNaNmasking = false)
     {
       setEnergyUnit(energyUnit);
       setAngularUnit(angUnit);
+      m_thetaVarName = thetaVarName;
       m_implicitNaNmasking = implictNaNmasking;
     }
 
@@ -448,6 +452,14 @@ namespace Belle2 {
       return isValid;
     }
 
+    /**
+     * Get the name of the polar angle variable.
+     */
+    std::string getThetaVarName() const
+    {
+      return m_thetaVarName;
+    }
+
 
     /**
      * Check flag for implicit NaN masking.
@@ -505,8 +517,8 @@ namespace Belle2 {
 
     TParameter<double> m_energy_unit; /**< The energy unit used for defining the bins grid. */
     TParameter<double> m_ang_unit;    /**< The angular unit used for defining the bins grid. */
-
-
+    std::string
+    m_thetaVarName; /**< The name of the polar angle variable used in the MVA categorisation. Must be a string that can be parsed by the VariableManager. */
     bool m_implicitNaNmasking; /**< Flag to indicate whther the MVA variables have been NaN-masked directly in the weightfiles. */
 
 
@@ -562,7 +574,7 @@ namespace Belle2 {
 
 
     ClassDef(ChargedPidMVAWeights, 10);
-    /**< 10. Add boolean flag to check if implicit NaN masking is set in the input data. */
+    /**< 10. Add name of polar angle variable used for categorisation, and a boolean flag to check if implicit NaN masking is set in the input data. */
     /**< 9. Add map of variable aliases and original basf2 vars. */
     /**< 8. Use unique_ptr for m_categories. */
     /**< 7. Use double instead of float in tuple. */

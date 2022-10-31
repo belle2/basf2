@@ -714,10 +714,6 @@ void RecoTrack::estimateArmTime()
 
 bool RecoTrack::isOutgoingArm(RecoHitInformation::RecoHitDetector pre, RecoHitInformation::RecoHitDetector post)
 {
-  // The detector sequences considered are:
-  // outgoing arm: PXD-SVD-CDC, PXD-SVD, SVD-CDC
-  // ingoing arm: CDC-SVD-PXD, CDC-SVD, SVD-PXD
-  // pre and post are defined w.r.t SVD, so they can be PXD, CDC or undefined if one of the two is missing
   static RecoHitInformation::RecoHitDetector und = RecoHitInformation::RecoHitDetector::c_undefinedTrackingDetector;
   RecoHitInformation::RecoHitDetector PXD = RecoHitInformation::RecoHitDetector::c_PXD;
   RecoHitInformation::RecoHitDetector CDC = RecoHitInformation::RecoHitDetector::c_CDC;
@@ -730,7 +726,8 @@ bool RecoTrack::isOutgoingArm(RecoHitInformation::RecoHitDetector pre, RecoHitIn
   else if (pre == CDC && post == und) isOutgoing = false;
   else {
     //TO DO
-    B2WARNING("SVD-only? PXD-SVD-PXD??? --- use layer information to determine if the track arm is outgoing or ingoing! Considered --> 'OUT'");
+    B2DEBUG(50,
+            "SVD-only? PXD-SVD-PXD??? --- use layer information to determine if the track arm is outgoing or ingoing! Considered --> 'OUT'");
     isOutgoing = true;
   }
   return isOutgoing;

@@ -43,9 +43,20 @@ namespace Belle2 {
      */
     ChargedPidMVAWeights() :
       m_energy_unit("energyUnit", Unit::GeV),
-      m_ang_unit("angularUnit", Unit::rad)
+      m_ang_unit("angularUnit", Unit::rad),
+      m_implicitNaNmasking(false)
     {};
 
+
+    /**
+     * Specialized constructor.
+     */
+    ChargedPidMVAWeights(const double& energyUnit, const double& angUnit, bool implictNaNmasking = false)
+    {
+      setEnergyUnit(energyUnit);
+      setAngularUnit(angUnit);
+      m_implicitNaNmasking = implictNaNmasking;
+    }
 
     /**
      * Destructor.
@@ -85,7 +96,6 @@ namespace Belle2 {
      * Set the angular unit to ensure consistency w/ the one used to define the bins grid.
      */
     void setAngularUnit(const double& unit) { m_ang_unit.SetVal(unit); }
-
 
     /**
      * Set the 3D (clusterTheta, p, charge) grid representing the categories for which weightfiles are defined.
@@ -439,6 +449,15 @@ namespace Belle2 {
     }
 
 
+    /**
+     * Check flag for implicit NaN masking.
+     */
+    bool hasImplicitNaNmasking() const
+    {
+      return m_implicitNaNmasking;
+    }
+
+
   private:
 
 
@@ -486,6 +505,9 @@ namespace Belle2 {
 
     TParameter<double> m_energy_unit; /**< The energy unit used for defining the bins grid. */
     TParameter<double> m_ang_unit;    /**< The angular unit used for defining the bins grid. */
+
+
+    bool m_implicitNaNmasking; /**< Flag to indicate whther the MVA variables have been NaN-masked directly in the weightfiles. */
 
 
     /**
@@ -539,7 +561,8 @@ namespace Belle2 {
     VariablesByAlias m_aliases;
 
 
-    ClassDef(ChargedPidMVAWeights, 9);
+    ClassDef(ChargedPidMVAWeights, 10);
+    /**< 10. Add boolean flag to check if implicit NaN masking is set in the input data. */
     /**< 9. Add map of variable aliases and original basf2 vars. */
     /**< 8. Use unique_ptr for m_categories. */
     /**< 7. Use double instead of float in tuple. */

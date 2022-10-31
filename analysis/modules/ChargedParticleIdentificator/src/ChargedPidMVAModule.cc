@@ -154,10 +154,25 @@ void ChargedPidMVAModule::event()
 
       const Particle* particle = (m_nSelectedDaughters == 0) ? pList->getParticle(ipart) : targetParticles[ipart];
 
+      std::string thVarStr = "";
+
+      if ((*m_weightfiles_representation.get())->hasImplicitNaNmasking()) {
+        thVarStr = "conditionalVariableSelector(clusterTrackMatch == 1, clusterTheta, helixExtTheta(125.0, 196.0, -102.0))";
+      } else {
+        // LEGACY TRAININGS: always require a track-cluster match, and always use clusterTheta.
+        const ECLCluster* eclCluster = particle->getECLCluster();
+        if (!eclCluster) {
+          if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 11)) {
+            B2WARNING("\nParticle [" << ipart << "] has invalid Track-ECLCluster relation, skip MVA application...");
+          }
+          continue;
+        }
+        thVarStr = "clusterTheta";
+      }
+
       // Retrieve the index for the correct MVA expert and dataset,
       // given the reconstructed (clusterTheta(eclHelixExtTheta), p, charge)
-      auto* thVar =
-        Variable::Manager::Instance().getVariable("conditionalVariableSelector(clusterTrackMatch == 1, clusterTheta, helixExtTheta(125.0, 196.0, -102.0))");
+      auto* thVar = Variable::Manager::Instance().getVariable(thVarStr);
       auto theta = std::get<double>(thVar->function(particle));
       auto p = particle->getP();
       // Set a dummy charge of zero to pick charge-independent payloads, if requested.
@@ -220,6 +235,11 @@ void ChargedPidMVAModule::event()
           var = std::get<bool>(var_result);
         } else {
           B2ERROR("Variable '" << varobj->name << "' has wrong data type! It must be one of double, integer, or bool.");
+        }
+
+        if (!(*m_weightfiles_representation.get())->hasImplicitNaNmasking()) {
+          // LEGACY TRAININGS: manual imputation value of -999 for NaN (undefined) variables. Needed by TMVA.
+          var = (std::isnan(var)) ? -999.0 : var;
         }
 
         debugStr[11] += ("\tvar[" + std::to_string(ivar) + "] : " + varobj->name + " = " + std::to_string(var) + "\n");

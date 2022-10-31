@@ -127,8 +127,9 @@ void ChargedPidMVAMulticlassModule::event()
       const Particle* particle = (m_nSelectedDaughters > 0) ? targetParticles[ipart] : pList->getParticle(ipart);
 
       // Retrieve the index for the correct MVA expert and dataset,
-      // given the reconstructed (clusterTheta(theta), p, charge)
-      auto* thVar = Variable::Manager::Instance().getVariable("conditionalVariableSelector(clusterTrackMatch == 1, clusterTheta, theta)");
+      // given the reconstructed (clusterTheta(eclHelixExtTheta), p, charge)
+      auto* thVar =
+        Variable::Manager::Instance().getVariable("conditionalVariableSelector(clusterTrackMatch == 1, clusterTheta, helixExtTheta(125.0, 196.0, -102.0))");
       auto theta = std::get<double>(thVar->function(particle));
       auto p = particle->getP();
       // Set a dummy charge of zero to pick charge-independent payloads, if requested.
@@ -142,7 +143,7 @@ void ChargedPidMVAMulticlassModule::event()
       debugStr[11] += "\n";
       debugStr[11] += ("Particle [" + std::to_string(ipart) + "]\n");
       debugStr[11] += ("Has ECL cluster match? " + std::to_string(hasMatch) + "\n");
-      std::string whichTheta = (hasMatch) ? "clusterTheta" : "theta";
+      std::string whichTheta = (hasMatch) ? "clusterTheta" : "eclHelixExtTheta";
       debugStr[11] += (whichTheta + " = " + std::to_string(theta) + " [rad]\n");
       debugStr[11] += ("p = " + std::to_string(p) + " [GeV/c]\n");
       if (!m_charge_independent) {

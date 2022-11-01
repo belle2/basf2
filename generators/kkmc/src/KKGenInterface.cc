@@ -119,7 +119,7 @@ void KKGenInterface::set_beam_info(ROOT::Math::PxPyPzEVector P4_LER, double Espr
 
 }
 
-int KKGenInterface::simulateEvent(MCParticleGraph& graph, TVector3 vertex)
+int KKGenInterface::simulateEvent(MCParticleGraph& graph, ROOT::Math::XYZVector vertex)
 {
   B2DEBUG(20, "Start simulation of KKGen Interface.");
   int status = 0;
@@ -150,10 +150,10 @@ int KKGenInterface::simulateEvent(MCParticleGraph& graph, TVector3 vertex)
     int moID = 0;
     char buf[200];
     sprintf(buf, "IntB: %3d %4u %8d %4d %4d %4d %9.4f %9.4f %9.4f %9.4f",
-            p->getIndex() ,  p->getStatus() ,  p->getPDG() ,  moID ,
-            p->getFirstDaughter() ,  p->getLastDaughter() ,
-            p->get4Vector().Px() ,  p->get4Vector().Py() ,
-            p->get4Vector().Pz() ,  p->get4Vector().E());
+            p->getIndex(),  p->getStatus(),  p->getPDG(),  moID,
+            p->getFirstDaughter(),  p->getLastDaughter(),
+            p->get4Vector().Px(),  p->get4Vector().Py(),
+            p->get4Vector().Pz(),  p->get4Vector().E());
     B2DEBUG(100, buf);
 
   }
@@ -164,7 +164,7 @@ int KKGenInterface::simulateEvent(MCParticleGraph& graph, TVector3 vertex)
 
 
 
-int KKGenInterface::addParticles2Graph(MCParticleGraph& graph, TVector3 vertex)
+int KKGenInterface::addParticles2Graph(MCParticleGraph& graph, ROOT::Math::XYZVector vertex)
 {
   // KKMC generates at least five particles:
   // beam (e+ e-), intermediate gamma/Z, f+ f- (f=mu, tau, ...)
@@ -197,7 +197,7 @@ int KKGenInterface::addParticles2Graph(MCParticleGraph& graph, TVector3 vertex)
 }
 
 
-void KKGenInterface::updateGraphParticle(int index, MCParticleGraph::GraphParticle* gParticle, TVector3 vertex)
+void KKGenInterface::updateGraphParticle(int index, MCParticleGraph::GraphParticle* gParticle, ROOT::Math::XYZVector vertex)
 {
   if (index < 1 || index > hepevt_.nhep)
     return;
@@ -248,9 +248,9 @@ void KKGenInterface::updateGraphParticle(int index, MCParticleGraph::GraphPartic
   gParticle->set4Vector(p4);
 
   //set vertex including smearing (if user requested)
-  TVector3 pProductionVertex(hepevt_.vhep[index - 1][0]*Unit::mm,
-                             hepevt_.vhep[index - 1][1]*Unit::mm,
-                             hepevt_.vhep[index - 1][2]*Unit::mm);
+  ROOT::Math::XYZVector pProductionVertex(hepevt_.vhep[index - 1][0]*Unit::mm,
+                                          hepevt_.vhep[index - 1][1]*Unit::mm,
+                                          hepevt_.vhep[index - 1][2]*Unit::mm);
   if (!gParticle->hasStatus(MCParticle::c_Initial)) {
     pProductionVertex = pProductionVertex + vertex;
   }

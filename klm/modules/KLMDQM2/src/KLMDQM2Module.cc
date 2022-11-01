@@ -46,11 +46,11 @@ KLMDQM2Module::KLMDQM2Module() :
   m_AllExtHitsEKLMSector{nullptr}
 {
   // Set module properties
-  setDescription(R"DOC("Additional Module for KLMDQM plots after HLT filters
+  setDescription(R"DOC(Additional Module for KLMDQM plots after HLT filters
 
-    An additional module developed to display plane efficiencies for the KLM dduring runs (i.e. for online analyses). 
-    This module would be called after HLT filter in order to use mumu-tight skim to select reasonable events. 
-    The output histograms would be plane efficiences = MatchedDigits/AllExtits.
+    An additional module developed to display plane efficiencies for the KLM during runs (i.e. for online analyses).
+    This module would be called after HLT filter in order to use mumu-tight skim to select reasonable events.
+    The output histograms would be plane efficiencies = MatchedDigits/AllExtits.
     )DOC");
 
   // Parameter definitions
@@ -74,6 +74,9 @@ KLMDQM2Module::KLMDQM2Module() :
   addParam("histogramDirectoryName", m_HistogramDirectoryName,
            "Directory for KLM DQM histograms in ROOT file.",
            std::string("KLMEfficiencyDQM"));
+  addParam("SoftwareTriggerName", m_SoftwareTriggerName,
+           "Software Trigger for event selection",
+           std::string("software_trigger_cut&skim&accept_mumutight"));
 
 }
 
@@ -184,7 +187,7 @@ void KLMDQM2Module::beginRun()
 
 void KLMDQM2Module::event()
 {
-  if (triggerFlag()) {
+  if (triggerFlag() || m_SoftwareTriggerName == "") {
     unsigned int nMuons = m_MuonList->getListSize();
     for (unsigned int i = 0; i < nMuons; ++i) {
       const Particle* muon = m_MuonList->getParticle(i);
@@ -212,7 +215,7 @@ bool KLMDQM2Module::triggerFlag()
   bool passed = false;
   if (m_softwareTriggerResult) {
     try {
-      passed = (m_softwareTriggerResult->getResult("software_trigger_cut&skim&accept_mumutight") == SoftwareTriggerCutResult::c_accept) ?
+      passed = (m_softwareTriggerResult->getResult(m_SoftwareTriggerName) == SoftwareTriggerCutResult::c_accept) ?
                true : false;
     } catch (const std::out_of_range&) {
       passed = false;

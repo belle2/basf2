@@ -87,9 +87,9 @@ bool Belle2::TestHelpers::isNegative(double expected)
 }
 
 template<>
-bool Belle2::TestHelpers::allNear<TVector3>(const TVector3& expected,
-                                            const TVector3& actual,
-                                            double tolerance)
+bool Belle2::TestHelpers::allNear<ROOT::Math::XYZVector>(const ROOT::Math::XYZVector& expected,
+                                                         const ROOT::Math::XYZVector& actual,
+                                                         double tolerance)
 {
   bool xNear = std::fabs(expected.X() - actual.X()) < tolerance;
   bool yNear = std::fabs(expected.Y() - actual.Y()) < tolerance;

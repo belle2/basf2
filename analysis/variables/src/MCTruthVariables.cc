@@ -150,7 +150,7 @@ namespace Belle2 {
       const MCParticle* mcmother = mcparticle->getMother();
       if (!mcmother) return realNaN;
 
-      return mcmother->getMomentum().Mag();
+      return mcmother->getMomentum().R();
     }
 
     double genMotherIndex(const Particle* part)

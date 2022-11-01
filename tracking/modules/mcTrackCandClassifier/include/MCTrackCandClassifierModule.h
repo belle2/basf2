@@ -127,7 +127,7 @@ namespace Belle2 {
     StoreArray<genfit::TrackCand> m_GenfitMCTrackCands; /**< MC Genfit TrackCands StoreArray */
     StoreArray<genfit::TrackCand> m_GenfitIdealMCTrackCands; /**< Ideal Genfit TrackCands StoreArray */
 
-    B2Vector3D m_magField; /**< magnetic field needed set particle info */
+    ROOT::Math::XYZVector m_magField; /**< magnetic field needed set particle info */
 
     /** Function to get semiplane.
      * @param vertex: Vertex position

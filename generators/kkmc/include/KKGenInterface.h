@@ -102,7 +102,7 @@ namespace Belle2 {
     /**
      * Simulate the events.
      */
-    int simulateEvent(MCParticleGraph& graph, TVector3 vertex);
+    int simulateEvent(MCParticleGraph& graph, ROOT::Math::XYZVector vertex);
 
     /**
      * Terminate the generator.
@@ -114,13 +114,13 @@ namespace Belle2 {
     /**
      * Add particles to the MCParticleGraph.
      */
-    int addParticles2Graph(MCParticleGraph& graph, TVector3 vertex);
+    int addParticles2Graph(MCParticleGraph& graph, ROOT::Math::XYZVector vertex);
 
     /**
      * Update the MCParticleGraph.
      */
     void updateGraphParticle(int, MCParticleGraph::GraphParticle* gParticle,
-                             TVector3 vertex);
+                             ROOT::Math::XYZVector vertex);
 
     /**
      * Map between PYTHIA id and PDG codes.

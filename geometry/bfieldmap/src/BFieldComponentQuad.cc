@@ -344,42 +344,42 @@ double BFieldComponentQuad::getAperture(double s, std::vector<ApertPoint>::const
   return p1.r + (p2.r - p1.r) / (p2.s - p1.s) * (s - p1.s);
 }
 
-B2Vector3D BFieldComponentQuad::calculate(const B2Vector3D& point) const
+ROOT::Math::XYZVector BFieldComponentQuad::calculate(const ROOT::Math::XYZVector& point) const
 {
   const double sa = sin(0.0415), ca = cos(0.0415);
   //assume point is given in [cm]
-  B2Vector3D B(0, 0, 0);
+  ROOT::Math::XYZVector B(0, 0, 0);
 
-  const B2Vector3D& v{point};
-  double xc = v.x() * ca, zs = v.z() * sa, zc = v.z() * ca, xs = v.x() * sa;
-  B2Vector3D vh{(xc - zs), -v.y(), -(zc + xs)}; // to the HER beamline frame
-  B2Vector3D vl{(xc + zs), -v.y(), -(zc - xs)}; // to the LER beamline frame
+  const ROOT::Math::XYZVector& v{point};
+  double xc = v.X() * ca, zs = v.Z() * sa, zc = v.Z() * ca, xs = v.X() * sa;
+  ROOT::Math::XYZVector vh{(xc - zs), -v.Y(), -(zc + xs)}; // to the HER beamline frame
+  ROOT::Math::XYZVector vl{(xc + zs), -v.Y(), -(zc - xs)}; // to the LER beamline frame
 
   double r2h = vh.Perp2(), r2l = vl.Perp2();
 
   if (r2h < r2l) { /* the point is closer to HER*/
     if (r2h < m_maxr2) { /* within max radius */
-      double s = vh.z();
+      double s = vh.Z();
       int i = getRange(s, m_ranges_her);
       if (i < 0) return B;
       double r = getAperture(s, m_offset_ap_her[i]);
       if (r2h < r * r) {
         auto kt = m_offset_pp_her[i] + static_cast<unsigned int>(s - m_ranges_her[i + 1].r0);
-        double Bx = kt->getBx(vh.x(), vh.y());
-        double By = kt->getBy(vh.x(), vh.y());
+        double Bx = kt->getBx(vh.X(), vh.Y());
+        double By = kt->getBy(vh.X(), vh.Y());
         B.SetXYZ(Bx * ca, -By, -Bx * sa); // to the detector frame
       }
     }
   } else {      /* the point is closer to LER*/
     if (r2l < m_maxr2) { /* within max radius */
-      double s = vl.z();
+      double s = vl.Z();
       int i = getRange(s, m_ranges_ler);
       if (i < 0) return B;
       double r = getAperture(s, m_offset_ap_ler[i]);
       if (r2l < r * r) {
         auto kt = m_offset_pp_ler[i] + static_cast<unsigned int>(s - m_ranges_ler[i + 1].r0);
-        double Bx = kt->getBx(vl.x(), vl.y());
-        double By = kt->getBy(vl.x(), vl.y());
+        double Bx = kt->getBx(vl.X(), vl.Y());
+        double By = kt->getBy(vl.X(), vl.Y());
         B.SetXYZ(Bx * ca, -By, Bx * sa); // to the detector frame
       }
     }

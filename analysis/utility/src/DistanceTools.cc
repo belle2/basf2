@@ -14,10 +14,11 @@
 using namespace Belle2;
 
 
-B2Vector3D DistanceTools::poca(B2Vector3D const& trackPos, B2Vector3D const& trackP, B2Vector3D const& vtxPos)
+ROOT::Math::XYZVector DistanceTools::poca(ROOT::Math::XYZVector const& trackPos, ROOT::Math::XYZVector const& trackP,
+                                          ROOT::Math::XYZVector const& vtxPos)
 {
-  B2Vector3D trackDir(trackP.Unit());
-  B2Vector3D r(vtxPos - trackPos);
+  ROOT::Math::XYZVector trackDir(trackP.Unit());
+  ROOT::Math::XYZVector r(vtxPos - trackPos);
   return trackPos + r.Dot(trackDir) * trackDir;
 }
 

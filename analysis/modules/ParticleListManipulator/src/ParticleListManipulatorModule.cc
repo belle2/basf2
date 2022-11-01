@@ -57,6 +57,9 @@ ParticleListManipulatorModule::ParticleListManipulatorModule():
   addParam("writeOut", m_writeOut,
            "If true, the output ParticleList will be saved by RootOutput. If false, it will be ignored when writing the file.", false);
 
+  addParam("ignoreMotherFlavor", m_ignoreMotherFlavor,
+           "If true, the flavor of the mother particle is ignored.", false);
+
   // initializing the rest of private members
   m_pdgCode   = 0;
   m_isSelfConjugatedParticle = false;
@@ -153,7 +156,7 @@ void ParticleListManipulatorModule::event()
       const Particle* particle = m_particleList->getParticle(i);
 
       std::vector<int> idSeq;
-      fillUniqueIdentifier(particle, idSeq);
+      fillUniqueIdentifier(particle, idSeq, m_ignoreMotherFlavor);
       m_particlesInTheList.push_back(idSeq);
     }
   }
@@ -202,7 +205,7 @@ void ParticleListManipulatorModule::event()
     const Particle* part = m_particles[candidate.second];
 
     std::vector<int> idSeq;
-    fillUniqueIdentifier(part, idSeq);
+    fillUniqueIdentifier(part, idSeq, m_ignoreMotherFlavor);
     bool uniqueSeq = isUnique(idSeq);
 
     if (uniqueSeq) {
@@ -212,9 +215,10 @@ void ParticleListManipulatorModule::event()
   }
 }
 
-void ParticleListManipulatorModule::fillUniqueIdentifier(const Particle* p, std::vector<int>& idSequence)
+void ParticleListManipulatorModule::fillUniqueIdentifier(const Particle* p, std::vector<int>& idSequence, bool ignoreMotherFlavor)
 {
-  idSequence.push_back(p->getPDGCode());
+  if (ignoreMotherFlavor) idSequence.push_back(abs(p->getPDGCode()));
+  else idSequence.push_back(p->getPDGCode());
 
   if (p->getNDaughters() == 0) {
     idSequence.push_back(p->getMdstArrayIndex());
@@ -227,7 +231,7 @@ void ParticleListManipulatorModule::fillUniqueIdentifier(const Particle* p, std:
     });
     // this is not FSP (go one level down)
     for (const auto& daughter : daughters)
-      fillUniqueIdentifier(daughter, idSequence);
+      fillUniqueIdentifier(daughter, idSequence, false);
   }
 }
 

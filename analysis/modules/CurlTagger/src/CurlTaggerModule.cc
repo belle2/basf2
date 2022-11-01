@@ -39,7 +39,7 @@ CurlTaggerModule::CurlTaggerModule() : Module()
 {
   // Set module properties
   setDescription(
-    R"DOC("Curl Tagger is a tool designed to identify and tag extra tracks caused by low pt particles curling around the detector. For further documentation please see 'tagCurlTracks' in modularAnalysis.")DOC");
+    R"DOC(Curl Tagger is a tool designed to identify and tag extra tracks caused by low pt particles curling around the detector. For further documentation please see 'tagCurlTracks' in modularAnalysis.)DOC");
 
   // Parameter definitions
   addParam("particleLists", m_ParticleLists, "input particle lists to check for curls or use for training");

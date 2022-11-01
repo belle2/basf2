@@ -13,6 +13,7 @@ C++ source code. By default, TSIM is performed event by event (“fast
 simulation” mode), and clock by clock behavior is not perfectly
 simulated (“full simulation” mode).
 
+.. _trigger_bits:
 
 Trigger Bits
 ------------
@@ -21,7 +22,7 @@ Trigger bits are pre-defined selection criteria implemented in the
 trigger system. Thus only 1 (fired) or 0 (not fired) could be assigned
 to each trigger bit. Details of the trigger bit definitions could be
 found on `the dedicated Confluence page
-<https://confluence.desy.de/pages/viewpage.action?spaceKey=BI&title=TriggerBitTable>`__
+<https://confluence.desy.de/display/BI/TriggerBitTable>`__
 or `the dedicated Belle II notes
 <https://docs.belle2.org/search?ln=en&p=%22Trigger+Summary%22&f=&action_search=Search&c=Belle+II+Notes>`__.
 
@@ -62,7 +63,7 @@ in TSIM is consistent with data, so L1PSNM is recommended.
    available when producing the signal MC samples corresponding to a
    particular trigger configuration. However, some testing trigger bits
    might be limited in TSIM. The missing (not valid) trigger bits in TSIM
-   could be found on `this Confuence page
+   could be found on `this Confluence page
    <https://confluence.desy.de/display/BI/Invalid+trigger+bits>`__.
 
 .. _fig:gdl:
@@ -116,7 +117,7 @@ and apply correction and systematics to the true trigger efficiency.
 .. tip::
    For details of the trigger efficiency estimation and validation,
    please refer to the `trigger performance group
-   <https://confluence.desy.de/pages/viewpage.action?spaceKey=BI&title=Trigger+performance>`__.
+   <https://confluence.desy.de/display/BI/Trigger+performance>`__.
 
 
 Functions in ``L1trigger.py``

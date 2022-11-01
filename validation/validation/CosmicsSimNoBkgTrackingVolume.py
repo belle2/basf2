@@ -49,6 +49,7 @@ main.add_module(
     "RootOutput", outputFileName="../CosmicsSimNoBkgTrackingVolume.root"
 )
 
+main.add_module('Progress')
 process(main)
 
 # Print call statistics

@@ -650,7 +650,7 @@ void RecoTrack::estimateArmTime()
   RecoHitInformation::RecoHitDetector SVD = RecoHitInformation::RecoHitDetector::c_SVD;
   RecoHitInformation::RecoHitDetector detIDpre = und;
   RecoHitInformation::RecoHitDetector detIDpost = und;
-  int nSVD = 0;
+  int nSVDHits = 0;
   float clusterTimeSum = 0;
   float clusterTimeSigma2Sum = 0;
   bool trackArmTimeDone = false;
@@ -666,26 +666,26 @@ void RecoTrack::estimateArmTime()
       RelationVector<SVDCluster> svdClusters = recoHit->getRelationsTo<SVDCluster>();
       clusterTimeSum += svdClusters[0]->getClsTime();
       clusterTimeSigma2Sum += svdClusters[0]->getClsTimeSigma() * svdClusters[0]->getClsTimeSigma();
-      nSVD += 1;
+      nSVDHits += 1;
       svdDone = true;
     } else {
       // Compute the track arm times using SVD cluster times
-      if (svdDone && nSVD > 1) {
+      if (svdDone && nSVDHits > 1) {
         detIDpost = foundin;
         if (!isOutgoingArm(detIDpre, detIDpost)) {
-          m_ingoingArmTime = clusterTimeSum / nSVD;
-          m_ingoingArmTimeError = std::sqrt(clusterTimeSigma2Sum / (nSVD * (nSVD - 1)));
+          m_ingoingArmTime = clusterTimeSum / nSVDHits;
+          m_ingoingArmTimeError = std::sqrt(clusterTimeSigma2Sum / (nSVDHits * (nSVDHits - 1)));
           m_hasIngoingArmTime = true;
         } else {
-          m_outgoingArmTime = clusterTimeSum / nSVD;
-          m_outgoingArmTimeError = std::sqrt(clusterTimeSigma2Sum / (nSVD * (nSVD - 1)));
+          m_outgoingArmTime = clusterTimeSum / nSVDHits;
+          m_outgoingArmTimeError = std::sqrt(clusterTimeSigma2Sum / (nSVDHits * (nSVDHits - 1)));
           m_hasOutgoingArmTime = true;
         }
         svdDone = false;
         detIDpre = detIDpost;
         detIDpost = und;
         clusterTimeSum = 0;
-        nSVD = 0;
+        nSVDHits = 0;
         trackArmTimeDone = true;
       }
     }
@@ -693,14 +693,14 @@ void RecoTrack::estimateArmTime()
     // When the last recoHit is SVD, it does not enter in the else{} of if (detID == SVD) {...} else {...}
     // where the track arm times are calculated, so they are calculated here.
     // It will not reset all variables because it is run only at the last recoHit
-    if (!trackArmTimeDone && (recoHit == recoHits.back()) && nSVD > 1) {
+    if (!trackArmTimeDone && (recoHit == recoHits.back()) && nSVDHits > 1) {
       if (!isOutgoingArm(detIDpre, detIDpost)) {
-        m_ingoingArmTime = clusterTimeSum / nSVD;
-        m_ingoingArmTimeError = std::sqrt(clusterTimeSigma2Sum / (nSVD * (nSVD - 1)));
+        m_ingoingArmTime = clusterTimeSum / nSVDHits;
+        m_ingoingArmTimeError = std::sqrt(clusterTimeSigma2Sum / (nSVDHits * (nSVDHits - 1)));
         m_hasIngoingArmTime = true;
       } else {
-        m_outgoingArmTime = clusterTimeSum / nSVD;
-        m_outgoingArmTimeError = std::sqrt(clusterTimeSigma2Sum / (nSVD * (nSVD - 1)));
+        m_outgoingArmTime = clusterTimeSum / nSVDHits;
+        m_outgoingArmTimeError = std::sqrt(clusterTimeSigma2Sum / (nSVDHits * (nSVDHits - 1)));
         m_hasIngoingArmTime = true;
       }
     }

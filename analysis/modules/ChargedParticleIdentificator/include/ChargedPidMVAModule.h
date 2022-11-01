@@ -22,6 +22,8 @@
 // ANALYSIS
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/dbobjects/ChargedPidMVAWeights.h>
+#include <analysis/VariableManager/Utility.h>
+
 
 namespace Belle2 {
 
@@ -38,6 +40,7 @@ namespace Belle2 {
 
     typedef std::vector<std::unique_ptr<MVA::Expert> > ExpertsList; /**< Typedef */
     typedef std::vector<std::unique_ptr<MVA::SingleDataset> > DatasetsList; /**< Typedef */
+    typedef std::vector<std::unique_ptr<Variable::Cut>> CutsList; /**< Typedef */
     typedef std::vector< std::vector<const Variable::Manager::Var*> > VariablesLists; /**< Typedef */
 
   public:
@@ -134,21 +137,27 @@ namespace Belle2 {
     /**
      * Interface to get the database payload with the MVA weight files.
      * The payload class has a method to retrieve the correct weightfile representation
-     * given a reconstructed particle's (clusterTheta, p).
+     * given a reconstructed particle's (clusterTheta, p, charge).
      */
     std::unique_ptr<DBObjPtr<ChargedPidMVAWeights>> m_weightfiles_representation;
 
     /**
      * List of MVA::Expert objects.
-     * One Expert to be stored for each xml file found in the database for the given signal mass hypothesis.
+     * For the given signal mass hypothesis, one Expert to be stored for each xml file found in the database, i.e. for each training category.
      */
     ExpertsList m_experts;
 
     /**
      * List of MVA::SingleDataset objects.
-     * One DS to be stored for each xml file found in the database for the given signal mass hypothesis.
+     * For the given signal mass hypothesis, one DS to be stored for each xml file found in the database, i.e. for each training category.
      */
     DatasetsList m_datasets;
+
+    /**
+     * List of Cut objects.
+     * One Cut to be stored for each training category.
+     */
+    CutsList m_cuts;
 
     /**
      * List of lists of feature variables.

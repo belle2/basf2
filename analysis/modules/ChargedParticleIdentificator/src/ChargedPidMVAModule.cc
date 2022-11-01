@@ -60,10 +60,9 @@ ChargedPidMVAModule::~ChargedPidMVAModule() = default;
 void ChargedPidMVAModule::initialize()
 {
   m_event_metadata.isRequired();
+
   m_weightfiles_representation = std::make_unique<DBObjPtr<ChargedPidMVAWeights>>(m_payload_name);
-  /* Initialize MVA if the payload has changed and now. */
-  (*m_weightfiles_representation.get()).addCallback([this]() { initializeMVA(); });
-  initializeMVA();
+
   if (!(*m_weightfiles_representation.get())->isValidPdg(m_sig_pdg)) {
     B2FATAL("PDG: " << m_sig_pdg <<
             " of the signal mass hypothesis is not that of a valid particle in Const::chargedStableSet! Aborting...");
@@ -72,6 +71,10 @@ void ChargedPidMVAModule::initialize()
     B2FATAL("PDG: " << m_bkg_pdg <<
             " of the background mass hypothesis is not that of a valid particle in Const::chargedStableSet! Aborting...");
   }
+
+  /* Initialize MVA if the payload has changed and now. */
+  (*m_weightfiles_representation.get()).addCallback([this]() { initializeMVA(); });
+  initializeMVA();
 
   m_score_varname = "pidPairChargedBDTScore_" + std::to_string(m_sig_pdg) + "_VS_" + std::to_string(m_bkg_pdg);
 
@@ -163,8 +166,8 @@ void ChargedPidMVAModule::event()
       B2DEBUG(11, "\t\tBrems corrected = " << particle->hasExtraInfo("bremsCorrectedPhotonEnergy"));
       B2DEBUG(11, "\t\tWeightfile idx  = " << index << " - (clusterTheta, p, charge) = (" << idx_theta << ", " << idx_p <<  ", " <<
               idx_charge << ")");
-      if (!cutstr.empty()) {
-        B2DEBUG(11, "\tCategory cut: " << cutstr);
+      if (m_cuts.at(index)) {
+        B2DEBUG(11, "\t\tCategory cut    = " << m_cuts.at(index)->decompile());
       }
 
       // Fill the MVA::SingleDataset w/ variables and spectators.
@@ -223,11 +226,9 @@ void ChargedPidMVAModule::event()
       }
 
       // Compute MVA score only if particle fulfils category selection.
-      if (!cutstr.empty()) {
+      if (m_cuts.at(index)) {
 
-        std::unique_ptr<Variable::Cut> cut = Variable::Cut::compile(cutstr);
-
-        if (!cut->check(particle)) {
+        if (!m_cuts.at(index)->check(particle)) {
           B2DEBUG(11, "\t\tParticle didn't pass MVA category cut, skip MVA application...");
           continue;
         }
@@ -347,6 +348,7 @@ void ChargedPidMVAModule::initializeMVA()
   // to the number of available weightfiles for this pdgId.
   m_experts.resize(nfiles);
   m_datasets.resize(nfiles);
+  m_cuts.resize(nfiles);
   m_variables.resize(nfiles);
   m_spectators.resize(nfiles);
 
@@ -382,6 +384,13 @@ void ChargedPidMVAModule::initializeMVA()
     m_datasets[idx] = std::make_unique<MVA::SingleDataset>(general_options, v, 1.0, s);
 
     B2DEBUG(12, "\t\tdataset[" << idx << "] created successfully!");
+
+    // Compile cut for this category.
+    const auto cuts = (*m_weightfiles_representation.get())->getCuts(m_sig_pdg);
+    const auto cutstr = (!cuts->empty()) ? cuts->at(idx) : "";
+    m_cuts[idx] = (!cutstr.empty()) ? Variable::Cut::compile(cutstr) : nullptr;
+
+    B2DEBUG(12, "\t\tcut[" << idx << "] created successfully!");
 
   }
 

@@ -482,9 +482,13 @@ void ECLWaveformFitModule::Fit2hExtraPhoton(double& B, double& Ag, double& T, do
   double amax1 = 0; int jmax1 = 6;
   for (int j = 0; j < 31; j++)
     if (j < jmax - 3 || jmax + 4 < j) {
-      if (j == 0  && amax1 < fitA[j] && fitA[j + 1] < fitA[j]) { amax1 = fitA[j]; jmax1 = j;}
-      else if (j == 30 && amax1 < fitA[j] && fitA[j - 1] < fitA[j]) { amax1 = fitA[j]; jmax1 = j;}
-      else if (amax1 < fitA[j] && fitA[j + 1] < fitA[j] && fitA[j - 1] < fitA[j]) { amax1 = fitA[j]; jmax1 = j;}
+      if (j == 0) {
+        if (amax1 < fitA[j] && fitA[j + 1] < fitA[j]) { amax1 = fitA[j]; jmax1 = j;}
+      } else if (j == 30) {
+        if (amax1 < fitA[j] && fitA[j - 1] < fitA[j]) { amax1 = fitA[j]; jmax1 = j;}
+      } else {
+        if (amax1 < fitA[j] && fitA[j + 1] < fitA[j] && fitA[j - 1] < fitA[j]) { amax1 = fitA[j]; jmax1 = j;}
+      }
     }
 
   double sumB0 = 0; int jsum = 0;

@@ -11,7 +11,6 @@
 //ANALYSIS
 #include <mva/interface/Interface.h>
 #include <mva/methods/TMVA.h>
-#include <analysis/VariableManager/Utility.h>
 #include <analysis/dataobjects/Particle.h>
 
 //MDST
@@ -52,7 +51,9 @@ ChargedPidMVAMulticlassModule::~ChargedPidMVAMulticlassModule() = default;
 void ChargedPidMVAMulticlassModule::initialize()
 {
   m_event_metadata.isRequired();
+
   m_weightfiles_representation = std::make_unique<DBObjPtr<ChargedPidMVAWeights>>(m_payload_name);
+
   /* Initialize MVA if the payload has changed and now. */
   (*m_weightfiles_representation.get()).addCallback([this]() { initializeMVA(); });
   initializeMVA();
@@ -128,10 +129,6 @@ void ChargedPidMVAMulticlassModule::event()
       int idx_theta, idx_p, idx_charge;
       auto index = (*m_weightfiles_representation.get())->getMVAWeightIdx(clusterTheta, p, charge, idx_theta, idx_p, idx_charge);
 
-      // Get the cut defining the MVA category under exam (this reflects the one used in the training).
-      const auto cuts   = (*m_weightfiles_representation.get())->getCutsMulticlass();
-      const auto cutstr = (!cuts->empty()) ? cuts->at(index) : "";
-
       B2DEBUG(11, "\t\tclusterTheta    = " << clusterTheta << " [rad]");
       B2DEBUG(11, "\t\tp               = " << p << " [GeV/c]");
       if (!m_charge_independent) {
@@ -140,8 +137,8 @@ void ChargedPidMVAMulticlassModule::event()
       B2DEBUG(11, "\t\tBrems corrected = " << particle->hasExtraInfo("bremsCorrectedPhotonEnergy"));
       B2DEBUG(11, "\t\tWeightfile idx  = " << index << " - (clusterTheta, p, charge) = (" << idx_theta << ", " << idx_p << ", " <<
               idx_charge << ")");
-      if (!cutstr.empty()) {
-        B2DEBUG(11, "\t\tCategory cut    = " << cutstr);
+      if (m_cuts.at(index)) {
+        B2DEBUG(11, "\t\tCategory cut    = " << m_cuts.at(index)->decompile());
       }
 
       // Fill the MVA::SingleDataset w/ variables and spectators.
@@ -200,11 +197,9 @@ void ChargedPidMVAMulticlassModule::event()
       }
 
       // Compute MVA score only if particle fulfils category selection.
-      if (!cutstr.empty()) {
+      if (m_cuts.at(index)) {
 
-        std::unique_ptr<Variable::Cut> cut = Variable::Cut::compile(cutstr);
-
-        if (!cut->check(particle)) {
+        if (!m_cuts.at(index)->check(particle)) {
           B2DEBUG(11, "\t\tParticle didn't pass MVA category cut, skip MVA application...");
           continue;
         }
@@ -352,6 +347,7 @@ void ChargedPidMVAMulticlassModule::initializeMVA()
   // to the number of available weightfiles for this pdgId.
   m_experts.resize(nfiles);
   m_datasets.resize(nfiles);
+  m_cuts.resize(nfiles);
   m_variables.resize(nfiles);
   m_spectators.resize(nfiles);
 
@@ -388,6 +384,13 @@ void ChargedPidMVAMulticlassModule::initializeMVA()
 
     B2DEBUG(12, "\t\tdataset[" << idx << "] created successfully!");
 
+    // Compile cut for this category.
+    const auto cuts = (*m_weightfiles_representation.get())->getCutsMulticlass();
+    const auto cutstr = (!cuts->empty()) ? cuts->at(idx) : "";
+    m_cuts[idx] = (!cutstr.empty()) ? Variable::Cut::compile(cutstr) : nullptr;
+
+    B2DEBUG(12, "\t\tcut[" << idx << "] created successfully!");
+
     // Register class names only once.
     if (idx == 0) {
       // QUESTION: could this be made generic?
@@ -408,4 +411,5 @@ void ChargedPidMVAMulticlassModule::initializeMVA()
 
     }
   }
+
 }

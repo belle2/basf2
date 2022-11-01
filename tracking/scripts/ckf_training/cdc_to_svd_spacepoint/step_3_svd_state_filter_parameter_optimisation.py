@@ -11,12 +11,10 @@ def create_path(
 ):
     path = basf2.create_path()
     path.add_module("RootInput",
-                    inputFileNames=[f"{prefix}/{bkg}th/{inputfile}Bkg.root" for prefix in
-                                    ["/storage/b/fs5-mirror/jowagner/Data/event_samples_222222",
-                                     "/storage/c/nbraun/data/event_samples_12", ]])
+                    inputFileNames=["/path/to/the/output/file.root"])
 
     path.add_module("Gearbox")
-    path.add_module("Geometry", excludedComponents=["EKLM"])
+    path.add_module("Geometry")
     path.add_module("SetupGenfitExtrapolation")
 
     add_track_finding(path, reco_tracks="CDCRecoTracks", components=["CDC"], use_vxdtf2=True)

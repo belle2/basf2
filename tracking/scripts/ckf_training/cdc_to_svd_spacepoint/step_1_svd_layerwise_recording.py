@@ -5,15 +5,10 @@ import b2luigi
 from b2luigi.basf2_helper import Basf2PathTask
 
 
-def create_path(
-    bkg, inputfile, layer,
-    records1_fname, records2_fname, records3_fname,
-):
+def create_path(layer, records1_fname, records2_fname, records3_fname):
     path = basf2.create_path()
     path.add_module("RootInput",
-                    inputFileNames=[f"{prefix}/{bkg}th/{inputfile}Bkg.root" for prefix in
-                                    ["/storage/b/fs5-mirror/jowagner/Data/event_samples_222222",
-                                     "/storage/c/nbraun/data/event_samples_12", ]])
+                    inputFileName="/path/to/the/output/file.root")
 
     path.add_module("Gearbox")
     path.add_module("Geometry")
@@ -77,7 +72,6 @@ def create_path(
 
 
 class ReconstructionTask(Basf2PathTask):
-    inputfile = b2luigi.Parameter()
     layer = b2luigi.IntParameter
 
     def output(self):
@@ -86,10 +80,7 @@ class ReconstructionTask(Basf2PathTask):
 
     def create_path(self):
         return create_path(
-            inputfile=self.inputfile,
-            bkg=self.bkg,
             layer=self.layer,
-            tracking=self.tracking,
             records1_fname=self.get_output_fname("records1.root"),
             records2_fname=self.get_output_fname("records2.root"),
             records3_fname=self.get_output_fname("records3.root"),
@@ -101,7 +92,6 @@ class MainTask(b2luigi.WrapperTask):
         for layer in [3, 4, 5, 6, 7]:
             yield self.clone(
                 ReconstructionTask,
-                inputfile="EvtGen",
                 layer=layer,
             )
 

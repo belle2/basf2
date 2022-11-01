@@ -98,6 +98,12 @@ namespace Belle2 {
     /** Return overriden input file names, or empty vector if none were set */
     const std::vector<std::string>& getInputFilesOverride() const { return m_inputFilesOverride; }
 
+    /** Override secondary input file names for modules */
+    void setSecondaryInputFilesOverride(const std::vector<std::string>& names) { m_secondaryInputFilesOverride = names; }
+
+    /** Return overriden secondary input file names, or empty vector if none were set */
+    const std::vector<std::string>& getSecondaryInputFilesOverride() const { return m_secondaryInputFilesOverride; }
+
     /** Override output file name for modules */
     void setOutputFileOverride(const std::string& name) { m_outputFileOverride = name; }
 
@@ -317,6 +323,7 @@ namespace Belle2 {
     std::string m_steering;       /**< The content of the steering file. */
     unsigned int m_numberEventsOverride;   /**< Override number of events in the first run. */
     std::vector<std::string> m_inputFilesOverride; /**< Override input file names for input modules */
+    std::vector<std::string> m_secondaryInputFilesOverride; /**< Override secondary input file names for input modules */
     std::vector<std::string>
     m_entrySequencesOverride; /**< A number sequence (e.g. 23:42,101) defining the entries which are processed for each input file in m_inputFilesOverride.*/
     std::string m_outputFileOverride; /**< Override name of output file for output module */

@@ -279,6 +279,18 @@ namespace Belle2 {
     }
 
     /**
+     * Sets Lorentz vector including the momentum scaling factor
+     * @param p4 Lorentz vector
+     */
+    void set4VectorWithMomentumScaling(const ROOT::Math::PxPyPzEVector& p4)
+    {
+      m_px = p4.Px() / m_momentumScale;
+      m_py = p4.Py() / m_momentumScale;
+      m_pz = p4.Pz() / m_momentumScale;
+      m_mass = p4.M();
+    }
+
+    /**
      * Sets position (decay vertex)
      * @param vertex position
      */

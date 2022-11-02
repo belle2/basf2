@@ -179,20 +179,6 @@ void TreeFitterModule::event()
       B2ERROR(e.what());
     }
 
-    // revert the momentum scaling factor to 1
-    if (m_updateDaughters == true) {
-
-      std::function<void(Particle*)> funcUpdateMomentumScaling =
-      [&funcUpdateMomentumScaling](Particle * part) {
-        part->setMomentumScalingFactor(1.0);
-        for (auto daughter : part->getDaughters()) {
-          funcUpdateMomentumScaling(daughter);
-        }
-      };
-
-      funcUpdateMomentumScaling(particle);
-    }
-
     if (particle->getPValue() < m_confidenceLevel) {
       toRemove.push_back(particle->getArrayIndex());
     }
@@ -200,8 +186,6 @@ void TreeFitterModule::event()
   }
   m_plist->removeParticles(toRemove);
   m_nCandidatesAfter += m_plist->getListSize();
-
-
 }
 
 

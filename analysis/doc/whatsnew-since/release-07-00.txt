@@ -7,8 +7,9 @@ Modules
    The mother's momentum was calculated at the updated vertex position, however, the updated daughters' momentum was calculated at the original position.
    This caused the inconsistency in the momentum between the mother and the sum of daughters.
    Now the daughters' momentum is also calculated at the updated vertex position and the inconsistency is resolved.
- * The TreeFit and KFit reset the momentum scaling factors when daughters' kinematics are updated to avoid applying the factor twice.
-
+ * Changed the TreeFit and KFit compatible with the momentum scaling factor.
+   The daughters' kinematics as member variables of the Particle class are updated being divided by the momentum scaling factor.
+   Still, the vertex fitters do not change the momentum scaling factor. So that the kinematics variables return correct values.
 
 Changes in the analysis package in light-2209-calico
 ----------------------------------------------------

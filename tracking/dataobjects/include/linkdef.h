@@ -29,7 +29,7 @@
 #pragma link C++ class Belle2::SVDIntercept+; // checksum=0x14d0197f, version=4
 #pragma link C++ class Belle2::RecoTrack+; // checksum=0x80cdd6d7, version=11
 #pragma link C++ class Belle2::RecoHitInformation+; // checksum=0xcf616f27, version=6
-#pragma link C++ class Belle2::BremHit+; // checksum=0x56052b3a, version=1
+#pragma link C++ class Belle2::BremHit+; // checksum=0xc51e119f, version=2
 #pragma link C++ class Belle2::SectorMapConfig+; // checksum=0x4ef40736, version=2
 #pragma link C++ class Belle2::hitXP+; // checksum=0x30c07c0a, version=2
 #pragma link C++ class Belle2::hitXPDerivate+; // checksum=0x4d515752, version=2

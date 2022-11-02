@@ -44,12 +44,12 @@ void FixMergedObjectsModule::initialize()
   // event embedding
   const auto particleArrays{DataStore::Instance().getListOfArrays(Particle::Class(), DataStore::c_Event)};
   if (particleArrays.size() > 0)
-    B2WARNING("Some Particle arrays are found in the DataStore: they are likely invalid/broken after having used the vent embedding!"
+    B2WARNING("Some Particle arrays are found in the DataStore: they are likely invalid/broken after having used the event embedding!"
               << LogVar("Particle array names", boost::algorithm::join(particleArrays, " ")));
   const auto particleListObjects{DataStore::Instance().getListOfObjects(ParticleList::Class(), DataStore::c_Event)};
   if (particleListObjects.size() > 0)
     B2WARNING("Some ParticleList objects are found in the DataStore: they are likely invalid/broken after having used the event embedding!"
-              << LogVar("Particle array names", boost::algorithm::join(particleArrays, " ")));
+              << LogVar("ParticleList object names", boost::algorithm::join(particleArrays, " ")));
 }
 
 void FixMergedObjectsModule::event()

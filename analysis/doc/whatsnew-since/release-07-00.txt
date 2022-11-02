@@ -3,13 +3,13 @@ Changes in the analysis package in light-2210-devonrex
 
 Modules
 +++++++
- * Fixed a bug in the KFit when the daughters' kinematics are updated (``daughtersUpdate=True``).
-   The mother's momentum was calculated at the updated vertex position, however, the updated daughters' momentum was calculated at the original position.
-   This caused the inconsistency in the momentum between the mother and the sum of daughters.
-   Now the daughters' momentum is also calculated at the updated vertex position and the inconsistency is resolved.
- * Changed the TreeFit and KFit compatible with the momentum scaling factor.
-   The daughters' kinematics as member variables of the Particle class are updated being divided by the momentum scaling factor.
-   Still, the vertex fitters do not change the momentum scaling factor. So that the kinematics variables return correct values.
+ * Fixed a bug in KFit when the daughters' kinematics are updated (``daughtersUpdate=True``). The mother's momentum was calculated
+   at the updated vertex position, while the updated daughters' momenta were calculated at the original position. This caused an
+   inconsistency in the momentum between the mother and the sum of the daughters. Now the daughters' momenta are also calculated at
+   the updated vertex position and the inconsistency is resolved.
+ * Changed TreeFit and KFit to be compatible with the momentum scaling factor.
+   The daughters' kinematics as member variables of the Particle class are updated by being divided by the momentum scaling factor.
+   However, the vertex fitters do not change the momentum scaling factor. So, the kinematics variables now return correct values.
 
 Changes in the analysis package in light-2209-calico
 ----------------------------------------------------

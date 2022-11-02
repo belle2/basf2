@@ -845,7 +845,7 @@ bool ParticleVertexFitterModule::makeKVertexMother(analysis::VertexFitKFit& kv,
                                          kv.getTrackMomentum(iChild).y() + a * dx,
                                          kv.getTrackMomentum(iChild).z(),
                                          kv.getTrackMomentum(iChild).t());
-      daughters[iChild]->set4VectorWithMomentumScaling(i4Vector);
+      daughters[iChild]->set4VectorDividingByMomentumScaling(i4Vector);
 
       daughters[iChild]->setVertex(
         CLHEPToROOT::getXYZVector(kv.getTrackPosition(iChild)));
@@ -872,7 +872,7 @@ bool ParticleVertexFitterModule::makeKVertexMother(analysis::VertexFitKFit& kv,
                                          kv.getTrackMomentum(iChild).y() + a * dx,
                                          kv.getTrackMomentum(iChild).z(),
                                          kv.getTrackMomentum(iChild).t());
-      daughter->set4VectorWithMomentumScaling(i4Vector);
+      daughter->set4VectorDividingByMomentumScaling(i4Vector);
 
       daughter->setVertex(CLHEPToROOT::getXYZVector(kv.getTrackPosition(iChild)));
       daughter->setMomentumVertexErrorMatrix(CLHEPToROOT::getTMatrixFSym(kv.getTrackError(iChild)));
@@ -902,7 +902,7 @@ bool ParticleVertexFitterModule::makeKVertexMother(analysis::VertexFitKFit& kv,
         for (auto daughter : part->getDaughters())
           sum4Vector += daughter->get4Vector();
 
-        part->set4VectorWithMomentumScaling(sum4Vector);
+        part->set4VectorDividingByMomentumScaling(sum4Vector);
       }
 
       return includeFitChildren;
@@ -944,7 +944,7 @@ bool ParticleVertexFitterModule::makeKMassVertexMother(analysis::MassVertexFitKF
                                          kmv.getTrackMomentum(iChild).y() + a * dx,
                                          kmv.getTrackMomentum(iChild).z(),
                                          kmv.getTrackMomentum(iChild).t());
-      daughters[iChild]->set4VectorWithMomentumScaling(i4Vector);
+      daughters[iChild]->set4VectorDividingByMomentumScaling(i4Vector);
 
       daughters[iChild]->setVertex(
         CLHEPToROOT::getXYZVector(kmv.getTrackPosition(iChild)));
@@ -984,7 +984,7 @@ bool ParticleVertexFitterModule::makeKMassPointingVertexMother(analysis::MassPoi
                                          kmpv.getTrackMomentum(iChild).y() + a * dx,
                                          kmpv.getTrackMomentum(iChild).z(),
                                          kmpv.getTrackMomentum(iChild).t());
-      daughters[iChild]->set4VectorWithMomentumScaling(i4Vector);
+      daughters[iChild]->set4VectorDividingByMomentumScaling(i4Vector);
 
       daughters[iChild]->setVertex(
         CLHEPToROOT::getXYZVector(kmpv.getTrackPosition(iChild)));
@@ -1023,7 +1023,7 @@ bool ParticleVertexFitterModule::makeKMassMother(analysis::MassFitKFit& km,
                                          km.getTrackMomentum(iChild).y() + a * dx,
                                          km.getTrackMomentum(iChild).z(),
                                          km.getTrackMomentum(iChild).t());
-      daughters[iChild]->set4VectorWithMomentumScaling(i4Vector);
+      daughters[iChild]->set4VectorDividingByMomentumScaling(i4Vector);
 
       daughters[iChild]->setVertex(
         CLHEPToROOT::getXYZVector(km.getTrackPosition(iChild)));
@@ -1188,7 +1188,7 @@ bool ParticleVertexFitterModule::makeKRecoilMassMother(analysis::RecoilMassKFit&
                                          kf.getTrackMomentum(iChild).y() + a * dx,
                                          kf.getTrackMomentum(iChild).z(),
                                          kf.getTrackMomentum(iChild).t());
-      daughters[iChild]->set4VectorWithMomentumScaling(i4Vector);
+      daughters[iChild]->set4VectorDividingByMomentumScaling(i4Vector);
 
       daughters[iChild]->setVertex(
         CLHEPToROOT::getXYZVector(kf.getTrackPosition(iChild)));

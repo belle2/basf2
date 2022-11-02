@@ -279,10 +279,10 @@ namespace Belle2 {
     }
 
     /**
-     * Sets Lorentz vector including the momentum scaling factor
+     * Sets Lorentz vector dividing by the momentum scaling factor
      * @param p4 Lorentz vector
      */
-    void set4VectorWithMomentumScaling(const ROOT::Math::PxPyPzEVector& p4)
+    void set4VectorDividingByMomentumScaling(const ROOT::Math::PxPyPzEVector& p4)
     {
       m_px = p4.Px() / m_momentumScale;
       m_py = p4.Py() / m_momentumScale;

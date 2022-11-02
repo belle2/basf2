@@ -77,10 +77,17 @@ TrackMatchLookUp::extractMCToPRMatchInfo(const RecoTrack& mcRecoTrack,
   const RecoTrack* roundTripMCRecoTrack =
     prRecoTrack->getRelatedTo<RecoTrack>(m_mcTracksStoreArrayName);
 
+  bool wrongCharge = false;
+
+  if (roundTripMCRecoTrack->getChargeSeed() != mcRecoTrack.getChargeSeed())
+    wrongCharge == true;
+
   if (roundTripMCRecoTrack == &mcRecoTrack) {
-    return MCToPRMatchInfo::c_Matched;
+    if (wrongCharge) return MCToPRMatchInfo::c_WrongCharge;
+    else return MCToPRMatchInfo::c_Matched;
   } else {
-    return MCToPRMatchInfo::c_Merged;
+    if (wrongCharge) return MCToPRMatchInfo::c_MergedWrongCharge;
+    else return MCToPRMatchInfo::c_Merged;
   }
 }
 
@@ -99,9 +106,15 @@ TrackMatchLookUp::extractPRToMCMatchInfo(const RecoTrack& prRecoTrack,
   } else if (matchingStatus == RecoTrack::MatchingStatus::c_clone) {
     if (not mcRecoTrack) B2WARNING("Clone with no related Monte Carlo RecoTrack");
     return PRToMCMatchInfo::c_Clone;
+  }  else if (matchingStatus == RecoTrack::MatchingStatus::c_cloneWrongCharge) {
+    if (not mcRecoTrack) B2WARNING("Clone with no related Monte Carlo RecoTrack");
+    return PRToMCMatchInfo::c_CloneWrongCharge;
   } else if (matchingStatus == RecoTrack::MatchingStatus::c_matched) {
     if (not mcRecoTrack) B2WARNING("Match with no related Monte Carlo RecoTrack");
     return PRToMCMatchInfo::c_Matched;
+  }  else if (matchingStatus == RecoTrack::MatchingStatus::c_wrongCharge) {
+    if (not mcRecoTrack) B2WARNING("Match with no related Monte Carlo RecoTrack");
+    return PRToMCMatchInfo::c_WrongCharge;
   } else if (matchingStatus == RecoTrack::MatchingStatus::c_undefined) {
     return PRToMCMatchInfo::c_Invalid;
   }
@@ -168,6 +181,20 @@ const RecoTrack* TrackMatchLookUp::getMatchedMCRecoTrack(const RecoTrack& prReco
   }
 }
 
+const RecoTrack* TrackMatchLookUp::getWrongChargeMCRecoTrack(const RecoTrack& prRecoTrack) const
+{
+  assert(isPRRecoTrack(prRecoTrack));
+
+  float purity = NAN;
+  const RecoTrack* mcRecoTrack = getRelatedMCRecoTrack(prRecoTrack, purity);
+
+  if (extractPRToMCMatchInfo(prRecoTrack, mcRecoTrack, purity) == PRToMCMatchInfo::c_WrongCharge) {
+    return mcRecoTrack;
+  } else {
+    return nullptr;
+  }
+}
+
 const RecoTrack* TrackMatchLookUp::getMatchedPRRecoTrack(const RecoTrack& mcRecoTrack) const
 {
   assert(isMCRecoTrack(mcRecoTrack));
@@ -176,6 +203,20 @@ const RecoTrack* TrackMatchLookUp::getMatchedPRRecoTrack(const RecoTrack& mcReco
   const RecoTrack* prRecoTrack = getRelatedPRRecoTrack(mcRecoTrack, efficiency);
 
   if (extractMCToPRMatchInfo(mcRecoTrack, prRecoTrack, efficiency) == MCToPRMatchInfo::c_Matched) {
+    return prRecoTrack;
+  } else {
+    return nullptr;
+  }
+}
+
+const RecoTrack* TrackMatchLookUp::getWrongChargePRRecoTrack(const RecoTrack& mcRecoTrack) const
+{
+  assert(isMCRecoTrack(mcRecoTrack));
+
+  float efficiency = NAN;
+  const RecoTrack* prRecoTrack = getRelatedPRRecoTrack(mcRecoTrack, efficiency);
+
+  if (extractMCToPRMatchInfo(mcRecoTrack, prRecoTrack, efficiency) == MCToPRMatchInfo::c_WrongCharge) {
     return prRecoTrack;
   } else {
     return nullptr;

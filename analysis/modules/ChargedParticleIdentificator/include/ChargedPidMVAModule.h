@@ -137,7 +137,9 @@ namespace Belle2 {
     /**
      * Interface to get the database payload with the MVA weight files.
      * The payload class has a method to retrieve the correct weightfile representation
-     * given a reconstructed particle's (clusterTheta, p, charge).
+     * given a reconstructed particle's (polar angle, p, charge).
+     * Note that the theta of the track helix extraplolated at the ECL entry surface
+     * is used if the particle doesn't have an ECL cluster match.
      */
     std::unique_ptr<DBObjPtr<ChargedPidMVAWeights>> m_weightfiles_representation;
 

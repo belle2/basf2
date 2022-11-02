@@ -785,9 +785,9 @@ namespace Belle2 {
       const auto& prism = m_inverseRaytracer->getPrism();
       const auto& win = prism.unfoldedWindows[k];
       double dz = std::abs(prism.zD - prism.zFlat);
-      TVector3 rD(func::unfold(pixel.xc, nx, prism.A),
-                  pixel.yc * win.sy + win.y0 + win.ny * dz,
-                  pixel.yc * win.sz + win.z0 + win.nz * dz);
+      ROOT::Math::XYZPoint rD(func::unfold(pixel.xc, nx, prism.A),
+                              pixel.yc * win.sy + win.y0 + win.ny * dz,
+                              pixel.yc * win.sz + win.z0 + win.nz * dz);
 
       double L = 0;
       for (int iter = 0; iter < 100; iter++) {
@@ -801,7 +801,7 @@ namespace Belle2 {
     }
 
 
-    PDFConstructor::PrismSolution PDFConstructor::prismSolution(const TVector3& rD, double L)
+    PDFConstructor::PrismSolution PDFConstructor::prismSolution(const ROOT::Math::XYZPoint& rD, double L)
     {
       const auto& emi = m_track.getEmissionPoint(L);
 

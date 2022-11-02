@@ -29,7 +29,6 @@
 #include <mdst/dataobjects/Track.h>
 
 // root
-#include "TVector3.h"
 #include "TDirectory.h"
 
 // boost

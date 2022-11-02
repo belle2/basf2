@@ -9,7 +9,9 @@
 #pragma once
 
 #include <framework/datastore/RelationsObject.h>
-#include <TVector3.h>
+#include <Math/Vector3D.h>
+#include <Math/Point3D.h>
+
 
 namespace Belle2 {
 
@@ -42,11 +44,11 @@ namespace Belle2 {
      */
     TOPSimPhoton(
       int moduleID,
-      TVector3 emissionPoint,
-      TVector3 emissionMom,
+      ROOT::Math::XYZPoint emissionPoint,
+      ROOT::Math::XYZVector emissionMom,
       double emissionTime,
-      TVector3 detectionPoint,
-      TVector3 detectionMom,
+      ROOT::Math::XYZPoint detectionPoint,
+      ROOT::Math::XYZVector detectionMom,
       double detectionTime,
       double length,
       double energy_eV
@@ -81,14 +83,13 @@ namespace Belle2 {
      * Returns emission point
      * @return emission point
      */
-    TVector3 getEmissionPoint() const { TVector3 vec(m_xe, m_ye, m_ze); return vec; }
+    ROOT::Math::XYZPoint getEmissionPoint() const {return ROOT::Math::XYZPoint(m_xe, m_ye, m_ze);}
 
     /**
      * Returns emission momentum direction (unit vector)
      * @return emission direction vector
      */
-    TVector3 getEmissionDir() const
-    { TVector3 vec(m_pxe, m_pye, m_pze); return vec.Unit(); }
+    ROOT::Math::XYZVector getEmissionDir() const {return ROOT::Math::XYZVector(m_pxe, m_pye, m_pze).Unit();}
 
     /**
      * Returns emission time
@@ -100,14 +101,13 @@ namespace Belle2 {
      * Returns detection point
      * @return detection point
      */
-    TVector3 getDetectionPoint() const { TVector3 vec(m_xd, m_yd, m_zd); return vec; }
+    ROOT::Math::XYZPoint getDetectionPoint() const {return ROOT::Math::XYZPoint(m_xd, m_yd, m_zd);}
 
     /**
      * Returns detection momentum direction (unit vector)
      * @return detection direction
      */
-    TVector3 getDetectionDir() const
-    { TVector3 vec(m_pxd, m_pyd, m_pzd); return vec.Unit(); }
+    ROOT::Math::XYZVector getDetectionDir() const {return ROOT::Math::XYZVector(m_pxd, m_pyd, m_pzd).Unit();}
 
     /**
      * Returns detection time

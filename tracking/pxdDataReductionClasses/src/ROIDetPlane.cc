@@ -11,6 +11,7 @@
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
 #include <framework/logging/Logger.h>
+#include <framework/geometry/XYZVectorToTVector3Converter.h>
 
 using namespace Belle2;
 
@@ -34,7 +35,6 @@ ROIDetPlane::ROIDetPlane(const VxdID& vxdID, double toleranceZ, double tolerance
   ROOT::Math::XYZVector globaluVector = aSensorInfo.vectorToGlobal(uVector, true);
   ROOT::Math::XYZVector globalvVector = aSensorInfo.vectorToGlobal(vVector, true);
 
-  auto XYZToTVector = [](const ROOT::Math::XYZVector & a) {return TVector3(a.X(), a.Y(), a.Z());};
   setO(XYZToTVector(globalSensorPos));
   setUV(XYZToTVector(globaluVector), XYZToTVector(globalvVector));
 

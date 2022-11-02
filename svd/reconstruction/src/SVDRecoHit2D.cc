@@ -7,6 +7,7 @@
  **************************************************************************/
 
 #include <framework/logging/Logger.h>
+#include <framework/geometry/XYZVectorToTVector3Converter.h>
 #include <svd/reconstruction/SVDRecoHit2D.h>
 #include <svd/geometry/SensorInfo.h>
 #include <vxd/geometry/SensorPlane.h>
@@ -165,7 +166,6 @@ void SVDRecoHit2D::setDetectorPlane()
   ROOT::Math::XYZVector vGlobal = geometry.vectorToGlobal(ROOT::Math::XYZVector(0, 1, 0), true);
 
   //Construct the detector plane
-  auto XYZToTVector = [](const ROOT::Math::XYZVector & a) {return TVector3(a.X(), a.Y(), a.Z());};
   genfit::SharedPlanePtr detPlane(new genfit::DetPlane(XYZToTVector(origin), XYZToTVector(uGlobal), XYZToTVector(vGlobal),
                                                        new VXD::SensorPlane(m_sensorID, 20, 20)));
   setPlane(detPlane, m_sensorID);

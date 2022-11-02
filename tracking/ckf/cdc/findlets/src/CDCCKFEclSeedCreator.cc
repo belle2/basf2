@@ -15,6 +15,7 @@
 #include <framework/core/ModuleParamList.h>
 
 #include <framework/gearbox/Const.h>
+#include <framework/geometry/XYZVectorToTVector3Converter.h>
 
 using namespace Belle2;
 
@@ -222,8 +223,6 @@ void CDCCKFEclSeedCreator::apply(std::vector<CDCCKFPath>& seeds)
     cov(5, 5) = dpz2;
 
     // set properties of genfit objects
-    // anonymous helper function for ROOT::Math::XYZVector to TVector3 conversion
-    auto XYZToTVector = [](const ROOT::Math::XYZVector & a) {return TVector3(a.X(), a.Y(), a.Z());};
     genfit::SharedPlanePtr planeNeg(new genfit::DetPlane(XYZToTVector(pos), XYZToTVector(pos)));
     genfit::SharedPlanePtr planePos(new genfit::DetPlane(XYZToTVector(pos), XYZToTVector(pos)));
     msopNeg.setPosMomCov(XYZToTVector(pos), XYZToTVector(mompos), cov);

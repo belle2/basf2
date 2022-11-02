@@ -12,6 +12,7 @@
 #include <pxd/reconstruction/PXDPixelMasker.h>
 #include <mdst/dataobjects/Track.h>
 #include <framework/gearbox/Const.h>
+#include <framework/geometry/XYZVectorToTVector3Converter.h>
 
 #include "TDirectory.h"
 #include "TMatrixDSym.h"
@@ -243,12 +244,10 @@ PXDDQMEfficiencySelftrackModule::getTrackInterSec(const VXD::SensorInfoBase& pxd
     ROOT::Math::XYZVector uVec(1, 0, 0);
     ROOT::Math::XYZVector vVec(0, 1, 0);
 
-    // anonymous helper function to convert from XYZVector to TVector3
-    auto XYZToTVector = [](const ROOT::Math::XYZVector & a) {return TVector3(a.X(), a.Y(), a.Z());};
     genfit::DetPlane* sensorPlane = new genfit::DetPlane();
     sensorPlane->setO(XYZToTVector(pxdSensorInfo.pointToGlobal(zeroVec, m_useAlignment)));
-    sensorPlane->setUV(XYZToTVector(pxdSensorInfo.vectorToGlobal(uVec, m_useAlignment)), XYZToTVector(pxdSensorInfo.vectorToGlobal(vVec,
-                       m_useAlignment)));
+    sensorPlane->setUV(XYZToTVector(pxdSensorInfo.vectorToGlobal(uVec, m_useAlignment)),
+                       XYZToTVector(pxdSensorInfo.vectorToGlobal(vVec, m_useAlignment)));
 
     //boost pointer (will be deleted automatically ?!?!?)
     genfit::SharedPlanePtr sensorPlaneSptr(sensorPlane);

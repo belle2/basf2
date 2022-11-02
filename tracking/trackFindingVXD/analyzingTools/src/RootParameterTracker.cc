@@ -257,9 +257,9 @@ void RootParameterTracker::addParameters4IntAlgorithms(std::string tcTypeName, s
   if (data4AlgorithmOftcType == nullptr) {
     B2DEBUG(5, "RootParameterTracker::addParameters4IntAlgorithms(), algorithm " << algorithmName <<
             " not yet added to m_algoDataInt[tcType], doing it now...");
-    AnalyzingAlgorithm<int>* newAlgorithm = AnalyzingAlgorithmFactoryInt<int, AnalizerTCInfo, ROOT::Math::XYZVector>
-                                            (AlgoritmType::getTypeEnum(
-                                               algorithmName));
+    AnalyzingAlgorithm<int>* newAlgorithm =
+      AnalyzingAlgorithmFactoryInt<int, AnalizerTCInfo, ROOT::Math::XYZVector>(AlgoritmType::getTypeEnum(algorithmName));
+
     algorithms4tcType->push_back({
       algorithmName,
       {

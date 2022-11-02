@@ -7,6 +7,7 @@
  **************************************************************************/
 
 #include <framework/logging/Logger.h>
+#include <framework/geometry/XYZVectorToTVector3Converter.h>
 #include <pxd/reconstruction/PXDRecoHit.h>
 #include <pxd/reconstruction/PXDClusterPositionEstimator.h>
 #include <pxd/reconstruction/PXDGainCalibrator.h>
@@ -127,7 +128,6 @@ void PXDRecoHit::setDetectorPlane()
 
   //Construct the detector plane
   VXD::SensorPlane* finitePlane = new VXD::SensorPlane(m_sensorID, 20.0, 20.0);
-  auto XYZToTVector = [](const ROOT::Math::XYZVector & a) {return TVector3(a.X(), a.Y(), a.Z());};
   genfit::SharedPlanePtr detPlane(new genfit::DetPlane(XYZToTVector(origin), XYZToTVector(uGlobal), XYZToTVector(vGlobal),
                                                        finitePlane));
   setPlane(detPlane, m_sensorID);

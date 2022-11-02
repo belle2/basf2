@@ -8,6 +8,7 @@
 
 #include <pxd/utilities/PXDUtilities.h>
 #include <framework/logging/Logger.h>
+#include <framework/geometry/XYZVectorToTVector3Converter.h>
 #include <pxd/reconstruction/PXDPixelMasker.h>
 
 namespace Belle2 {
@@ -20,7 +21,6 @@ namespace Belle2 {
       // get sensor plane, always enable alignment.
       auto centerP = pxdSensorInfo.pointToGlobal(ROOT::Math::XYZVector(0, 0, 0), true);
       auto normalV = pxdSensorInfo.vectorToGlobal(ROOT::Math::XYZVector(0, 0, 1), true);
-      auto XYZToTVector = [](const ROOT::Math::XYZVector & a) {return TVector3(a.X(), a.Y(), a.Z());};
       genfit::SharedPlanePtr sensorPlaneSptr(new genfit::DetPlane(XYZToTVector(centerP), XYZToTVector(normalV)));
 
       // genfit track and measured state on plane

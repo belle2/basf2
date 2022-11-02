@@ -10,6 +10,7 @@
 #include <tracking/dqmUtils/DQMHistoModuleBase.h>
 
 #include <framework/datastore/StoreArray.h>
+#include <framework/geometry/XYZVectorToTVector3Converter.h>
 #include <vxd/geometry/GeoTools.h>
 #include <vxd/geometry/SensorInfoBase.h>
 

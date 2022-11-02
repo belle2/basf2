@@ -158,7 +158,5 @@ namespace Belle2 {
     int m_correlationIndex = 0;
     /** index of the sensor of the hit */
     int m_sensorIndex = 0;
-    /** Anonymous helper function to convert XYZVector to TVector3 */
-    static constexpr auto XYZToTVector = [](const ROOT::Math::XYZVector& a) {return TVector3(a.X(), a.Y(), a.Z());};
   };
 }

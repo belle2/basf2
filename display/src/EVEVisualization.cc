@@ -49,6 +49,7 @@
 #include <framework/dataobjects/DisplayData.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/ColorPalette.h>
+#include <framework/geometry/XYZVectorToTVector3Converter.h>
 
 #include <Math/VectorUtil.h>
 #include <TEveArrow.h>
@@ -1562,7 +1563,6 @@ void EVEVisualization::addROI(const ROIid* roi)
   ROOT::Math::XYZVector globalB = aSensorInfo.pointToGlobal(localB);
   ROOT::Math::XYZVector globalC = aSensorInfo.pointToGlobal(localC);
 
-  auto XYZToTVector = [](const ROOT::Math::XYZVector & a) {return TVector3(a.X(), a.Y(), a.Z());};
   TEveBox* ROIbox = boxCreator(XYZToTVector(globalB + globalC) * 0.5, XYZToTVector(globalB - globalA),
                                XYZToTVector(globalC - globalA), 1, 1, 0.01);
 

@@ -11,6 +11,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationsObject.h>
 #include <framework/core/FrameworkExceptions.h>
+#include <framework/geometry/XYZVectorToTVector3Converter.h>
 
 #include <genfit/Track.h>
 
@@ -921,9 +922,6 @@ namespace Belle2 {
         B2DEBUG(100, "Dirty flag is set. The result may not be in sync with the latest changes. Refit the track to be sure.");
       }
     }
-
-    /** Anonymous helper function to convert XYZVector to TVector3 */
-    static constexpr auto XYZToTVector = [](const ROOT::Math::XYZVector& a) {return TVector3(a.X(), a.Y(), a.Z());};
 
     /** Making this class a ROOT class.*/
     ClassDefOverride(RecoTrack, 11);

@@ -10,6 +10,7 @@
 
 #include <framework/core/Module.h>
 #include <trg/cdc/NeuroTrigger.h>
+#include <trg/cdc/NeuroTriggerParameters.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/database/DBObjPtr.h>
 #include <trg/cdc/dbobjects/CDCTriggerNeuroConfig.h>

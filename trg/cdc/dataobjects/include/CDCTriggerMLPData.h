@@ -26,6 +26,26 @@ namespace Belle2 {
       float relID[18];
       unsigned exPert;
       HeaderSet() {}
+      HeaderSet(std::vector<float> line)
+      {
+        if (line.size() == 19) {
+          exPert = line[0];
+          for (unsigned i = 1; i <= 19; i++) {
+            relID[i] = line[i];
+          }
+        } else {B2ERROR("ERROR! wrong lengthof relID vector!");}
+      }
+      void operator= (std::vector<float> line)
+      {
+        if (line.size() == 19) {
+          exPert = line[0];
+          for (unsigned i = 1; i <= 19; i++) {
+            relID[i] = line[i];
+          }
+        } else {B2ERROR("ERROR! wrong length of relID vector!");}
+
+
+      }
       HeaderSet(unsigned expert, std::vector<float> relevantID)
       {
         if (relevantID.size() == 18) {

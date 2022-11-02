@@ -42,67 +42,13 @@ namespace Belle2 {
     addParam("targetCollectionName", m_targetCollectionName,
              "Name of the MCParticle/RecoTrack collection used as target values.",
              std::string("MCParticles"));
-    addParam("IDHistName", m_idHistName,
-             "BaseName of the both the IDHistfile, where the ID Histograms will "
-             "be saved and the config file, where the configuration is written.",
+    addParam("configfile", m_configFileName,
+             "Name of the config file, where all the parameters and the IDHist configuration is written.",
              std::string("idHist"));
     addParam("MaxEvents", m_nPrepare,
              "amount of events used for creating the IDHist. If it is 0, "
              "all Events are used.",
              0);
-    addParam("nMLP", m_parameters.nMLP,
-             "Number of expert MLPs.", m_parameters.nMLP);
-    addParam("targetZ", m_parameters.targetZ,
-             "Train one output of MLP to give z.", true);
-    addParam("targetTheta", m_parameters.targetTheta,
-             "Train one output of MLP to give theta.", true);
-    addParam("phiRange", m_parameters.phiRange,
-             "Phi region in degree for which experts are trained. "
-             "1 value pair, nMLP value pairs or nPhi value pairs "
-             "with nPhi * nPt * nTheta * nPattern = nMLP.", m_parameters.phiRange);
-    addParam("invptRange", m_parameters.invptRange,
-             "Charge / Pt region in 1/GeV for which experts are trained. "
-             "1 value pair, nMLP value pairs or nPt value pairs "
-             "with nPhi * nPt * nTheta * nPattern = nMLP.", m_parameters.invptRange);
-    addParam("thetaRange", m_parameters.thetaRange,
-             "Theta region in degree for which experts are trained. "
-             "1 value pair, nMLP value pairs or nTheta value pairs "
-             "with nPhi * nPt * nTheta * nPattern = nMLP.", m_parameters.thetaRange);
-    addParam("phiRangeTrain", m_parameters.phiRangeTrain,
-             "Phi region in degree from which training events are taken. "
-             "Can be larger than phiRange to avoid edge effect.", m_parameters.phiRangeTrain);
-    addParam("invptRangeTrain", m_parameters.invptRangeTrain,
-             "Charge / Pt region in 1/GeV from which training events are taken. "
-             "Can be larger than phiRange to avoid edge effect.", m_parameters.invptRangeTrain);
-    addParam("thetaRangeTrain", m_parameters.thetaRangeTrain,
-             "Theta region in degree from which training events are taken. "
-             "Can be larger than phiRange to avoid edge effect.", m_parameters.thetaRangeTrain);
-    addParam("maxHitsPerSL", m_parameters.maxHitsPerSL,
-             "Maximum number of hits in a single SL. "
-             "1 value or same as SLpattern.", m_parameters.maxHitsPerSL);
-    addParam("SLpattern", m_parameters.SLpattern,
-             "Super layer pattern for which experts are trained. "
-             "1 value, nMLP values or nPattern values "
-             "with nPhi * nPt * nTheta * nPattern = nMLP.", m_parameters.SLpattern);
-    addParam("SLpatternMask", m_parameters.SLpatternMask,
-             "Super layer pattern mask for which experts are trained. "
-             "1 value or same as SLpattern.", m_parameters.SLpatternMask);
-    addParam("tMax", m_parameters.tMax,
-             "Maximal drift time (for scaling, unit: trigger timing bins).",
-             m_parameters.tMax);
-    addParam("relevantCut", m_relevantCut,
-             "Cut for preparation of relevant ID ranges.", 0.02);
-    addParam("cutSum", m_cutSum,
-             "If true, relevantCut is applied to the sum over hit counters, "
-             "otherwise directly on the hit counters.", false);
-    addParam("rescaleTarget", m_rescaleTarget,
-             "If true, set target values > outputScale to 1, "
-             "else skip them.", true);
-    addParam("outputScale", m_parameters.outputScale,
-             "Output scale for all networks (1 value list or nMLP value lists). "
-             "Output[i] of the MLP is scaled from [-1, 1] "
-             "to [outputScale[2*i], outputScale[2*i+1]]. "
-             "(units: z[cm] / theta[degree])", m_parameters.outputScale);
 
   }
 
@@ -114,7 +60,12 @@ namespace Belle2 {
      * the original structure of the training procedure in the old module.
      * Second, the dataset for the idhist data will be initialized and set up.
      */
-    m_NeuroTrigger.initialize(m_parameters);
+    if (m_configFileName != "") {
+      m_neuroParameters.loadconfigtxt(m_configFileName);
+      m_NeuroTrigger.initialize(m_neuroParameters);
+    } else {
+      B2ERROR("Configuration file is missing! Make sure to give the configuration file as a parameter.");
+    }
     m_trainSets_prepare.clear();
     CDC::CDCGeometryPar& cdc = CDC::CDCGeometryPar::Instance();
     for (unsigned iMLP = 0; iMLP < m_NeuroTrigger.nSectors(); ++iMLP) {
@@ -176,13 +127,13 @@ namespace Belle2 {
       float phi0 = m_tracks[itrack]->getPhi0();
       float invpt = m_tracks[itrack]->getKappa(1.5);
       float theta = atan2(1., m_tracks[itrack]->getCotTheta());
-      std::vector<int> sectors = m_NeuroTrigger.selectMLPs(phi0, invpt, theta);
+      std::vector<int> sectors = m_NeuroTrigger.selectMLPsTrain(phi0, invpt, theta);
       if (sectors.size() == 0) continue;
       // get target values
       std::vector<float> targetRaw = {};
-      if (m_parameters.targetZ)
+      if (m_neuroParameters.targetZ)
         targetRaw.push_back(zTarget);
-      if (m_parameters.targetTheta)
+      if (m_neuroParameters.targetTheta)
         targetRaw.push_back(thetaTarget);
       for (unsigned i = 0; i < sectors.size(); ++i) {
         int isector = sectors[i];
@@ -195,7 +146,7 @@ namespace Belle2 {
             target[itarget] /= fabs(target[itarget]);
           }
         }
-        if (!m_rescaleTarget && outOfRange) continue;
+        if (!m_neuroParameters.rescaleTarget && outOfRange) continue;
         //
         if (m_nPrepare == 0 || m_trainSets_prepare[isector].getTrackCounter() < m_nPrepare) {
           // get relative ids for all hits related to the MCParticle / RecoTrack
@@ -243,20 +194,56 @@ namespace Belle2 {
   CDCTriggerNeuroIDHistModule::terminate()
   {
     for (unsigned isector = 0; isector < m_trainSets_prepare.size(); ++isector) {
-      std::vector<float> reid = NeuroTrainer::getRelevantID(m_trainSets_prepare[isector], m_cutSum, m_relevantCut);
+      std::vector<float> reid = NeuroTrainer::getRelevantID(m_trainSets_prepare[isector], m_neuroParameters.cutSum,
+                                                            m_neuroParameters.relevantCut);
       m_NeuroTrigger[isector].setRelID(reid);
     }
-    std::ofstream gzipfile4(m_idHistName + ".gz", std::ios_base::app | std::ios_base::binary);
+    std::ofstream gzipfile4(m_configFileName + ".gz", std::ios_base::app | std::ios_base::binary);
     boost::iostreams::filtering_ostream outStream;
     outStream.push(boost::iostreams::gzip_compressor());
     outStream.push(gzipfile4);
     for (unsigned isector = 0; isector < m_NeuroTrigger.nSectors(); ++isector) {
       //std::vector<float> reid = m_NeuroTrigger[isector].getRelID();
       CDCTriggerMLPData::HeaderSet hset(isector, m_NeuroTrigger[isector].getRelID()); //, m_NeuroTrigger[isector].et_option);
-      std::cout << hset << std::endl;
+      std::vector<NNTParam<float>> expertline;
+      expertline.push_back(float(isector));
+      expertline.back().lock();
+      for (auto x : m_NeuroTrigger[isector].getRelID()) {
+        expertline.push_back(x);
+        expertline.back().lock();
+      }
+      m_neuroParameters.IDRanges.push_back(expertline);
+      B2DEBUG(15, hset);
       outStream << hset << std::endl;
     }
-    m_NeuroTrigger.save(m_idHistName + ".root", "MLPs");
+    m_configFileName = "IDTable_" + m_configFileName;
+    // lock the variables used in this module, that are not supposed be changed
+    // further down the training chain because of the danger of implications or
+    // wrong assumptions.
+    m_neuroParameters.relevantCut.lock();
+    m_neuroParameters.cutSum.lock();
+    // the IDRanges are set here; however, they can be altered manually in the
+    // configuration file to achieve potentially better results, eg. widen
+    // the range of the axial phi acceptance. This is why they are not to be "locked".
+    m_neuroParameters.nInput.lock();
+    m_neuroParameters.nOutput.lock();
+    m_neuroParameters.nMLP.lock();
+    for (auto x : m_neuroParameters.SLpattern) {
+      x.lock();
+    }
+    for (auto x : m_neuroParameters.SLpatternMask) {
+      x.lock();
+    }
+    for (auto x : m_neuroParameters.maxHitsPerSL) {
+      x.lock();
+    }
+    m_neuroParameters.multiplyHidden.lock();
+    m_neuroParameters.saveconfigtxt(m_configFileName);
+
+    m_neuroParameters.saveconfigtxt(m_configFileName);
+    // the *rangeTrain variables are used here, but just for obtaining the idranges.
+    // because they only have a very minor effect on those, they are not locked here.
+    m_NeuroTrigger.save(m_configFileName + ".root", "MLPs");
     //TODO: also write the config file to be directly able to start the training
   }
 

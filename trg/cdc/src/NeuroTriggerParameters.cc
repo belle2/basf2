@@ -66,6 +66,9 @@ NeuroTriggerParameters::loadconfigtxt(const std::string& filename)
     } else if (par == "nOutput")        {
       nOutput = std::stoul(key);
       if (locked) {nOutput.lock();}
+    } else if (par == "relevantCut")        {
+      relevantCut = std::stod(key);
+      if (locked) {relevantCut.lock();}
     } else if (par == "nMLP")           {
       nMLP = std::stoul(key);
       if (locked) {nMLP.lock();}
@@ -78,15 +81,20 @@ NeuroTriggerParameters::loadconfigtxt(const std::string& filename)
     } else if (par == "multiplyHidden")    {
       multiplyHidden = std::stoi(key);
       if (locked) {multiplyHidden.lock();}
-    } else if (par == "T0fromHits")    {
-      T0fromHits = std::stoi(key);
-      if (locked) {T0fromHits.lock();}
+    } else if (par == "rescaleTarget")    {
+      rescaleTarget = std::stoi(key);
+      if (locked) {rescaleTarget.lock();}
+    } else if (par == "cutSum")    {
+      cutSum = std::stoi(key);
+      if (locked) {cutSum.lock();}
     } else if (par == "tMax")           {
       tMax = std::stoul(key);
       if (locked) {tMax.lock();}
     } else if (par == "ETOption")       {
       ETOption = std::stoul(key);
       if (locked) {ETOption.lock();}
+    } else if (par == "IDRanges")    {
+      IDRanges = read2dArray<float>(key, locked);
     } else if (par == "phiRangeUse")    {
       phiRangeUse = read2dArray<float>(key, locked);
     } else if (par == "thetaRangeUse")    {
@@ -137,16 +145,19 @@ void NeuroTriggerParameters::saveconfigtxt(const std::string& filename)
   savestream << "### Neurotrigger configuration file created by basf2 ###" << std::endl;
   savestream << "########################################################" << std::endl << std::endl;
   if (nOutput.isSet()) {savestream << "nOutput " << (nOutput.isLocked() ? "== " : "= ") << nOutput << std::endl;}
+  if (cutSum.isSet()) {savestream << "cutSum " << (cutSum.isLocked() ? "== " : "= ") << cutSum << std::endl;}
+  if (relevantCut.isSet()) {savestream << "relevantCut " << (relevantCut.isLocked() ? "== " : "= ") << relevantCut << std::endl;}
+  if (rescaleTarget.isSet()) {savestream << "rescaleTarget " << (rescaleTarget.isLocked() ? "== " : "= ") << rescaleTarget << std::endl;}
   if (nInput.isSet()) {savestream << "nInput " << (nInput.isLocked() ? "== " : "= ") << nInput << std::endl;}
   if (nMLP.isSet()) {savestream << "nMLP " << (nMLP.isLocked() ? "== " : "= ") << nMLP << std::endl;}
   if (targetZ.isSet()) {savestream << "targetZ " << (targetZ.isLocked() ? "== " : "= ") << targetZ << std::endl;}
   if (targetTheta.isSet()) {savestream << "targetTheta " << (targetTheta.isLocked() ? "== " : "= ") << targetTheta << std::endl;}
   if (multiplyHidden.isSet()) {savestream << "multiplyHidden " << (multiplyHidden.isLocked() ? "== " : "= ") << multiplyHidden << std::endl;}
-  if (T0fromHits.isSet()) {savestream << "T0fromHits " << (T0fromHits.isLocked() ? "== " : "= ") << T0fromHits << std::endl;}
   if (tMax.isSet()) {savestream << "tMax " << (tMax.isLocked() ? "== " : "= ") << tMax << std::endl;}
   if (ETOption.isSet()) {savestream << "ETOption " << (ETOption.isLocked() ? "== " : "= ") << ETOption << std::endl;}
 
   if (checkarr(phiRangeUse)) {savestream << print2dArray<float>("phiRangeUse", phiRangeUse);}
+  if (checkarr(IDRanges)) {savestream << print2dArray<float>("IDRanges", IDRanges);}
   if (checkarr(thetaRangeUse)) {savestream << print2dArray<float>("thetaRangeUse", thetaRangeUse);}
   if (checkarr(invptRangeUse)) {savestream << print2dArray<float>("invptRangeUse", invptRangeUse);}
   if (checkarr(phiRangeTrain)) {savestream << print2dArray<float>("phiRangeTrain", phiRangeTrain);}

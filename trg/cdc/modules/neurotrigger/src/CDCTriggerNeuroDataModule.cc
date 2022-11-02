@@ -33,9 +33,6 @@ namespace Belle2 {
     addParam("hitCollectionName", m_hitCollectionName,
              "Name of the input StoreArray of CDCTriggerSegmentHits. Need to have a relation to inputtracks",
              std::string(""));
-    addParam("IDHistFileName", m_idHistFilename,
-             "Name of the IDHist file.",
-             std::string(""));
     addParam("inputCollectionName", m_inputCollectionName,
              "Name of the StoreArray holding the 2D input tracks.",
              std::string("CDCTriggerNNInput2DTracks"));
@@ -48,67 +45,17 @@ namespace Belle2 {
     addParam("EventTimeName", m_EventTimeName,
              "Name of the event time object.",
              std::string("CDCTriggerNeuroETFT0"));
-    addParam("nMLP", m_parameters.nMLP,
-             "Number of expert MLPs.",
-             m_parameters.nMLP);
-    addParam("phiRangeTrain", m_parameters.phiRangeTrain,
-             "Phi region in degree from which training events are taken. "
-             "Can be larger than phiRange to avoid edge effect.", m_parameters.phiRangeTrain);
-    addParam("invptRangeTrain", m_parameters.invptRangeTrain,
-             "Charge / Pt region in 1/GeV from which training events are taken. "
-             "Can be larger than phiRange to avoid edge effect.", m_parameters.invptRangeTrain);
-    addParam("thetaRangeTrain", m_parameters.thetaRangeTrain,
-             "Theta region in degree from which training events are taken. "
-             "Can be larger than phiRange to avoid edge effect.", m_parameters.thetaRangeTrain);
-    addParam("maxHitsPerSL", m_parameters.maxHitsPerSL,
-             "Maximum number of hits in a single SL. "
-             "1 value or same as SLpattern.", m_parameters.maxHitsPerSL);
-    addParam("SLpattern", m_parameters.SLpattern,
-             "Super layer pattern for which experts are trained. "
-             "1 value, nMLP values or nPattern values "
-             "with nPhi * nPt * nTheta * nPattern = nMLP.", m_parameters.SLpattern);
-    addParam("SLpatternMask", m_parameters.SLpatternMask,
-             "Super layer pattern mask for which experts are trained. "
-             "1 value or same as SLpattern.", m_parameters.SLpatternMask);
-    addParam("tMax", m_parameters.tMax,
-             "Maximal drift time (for scaling, unit: trigger timing bins).", m_parameters.tMax);
-    addParam("et_option", m_parameters.et_option,
-             "option on how to obtain the event time. Possibilities are: "
-             "'etf_only', 'fastestpriority', 'zero', 'etf_or_fastestpriority', "
-             "'etf_or_zero', 'etf_or_fastest2d', 'fastest2d'.",
-             m_parameters.et_option);
-    addParam("outputScale", m_parameters.outputScale,
-             "Output scale for all networks (1 value list or nMLP value lists). "
-             "Output[i] of the MLP is scaled from [-1, 1] "
-             "to [outputScale[2*i], outputScale[2*i+1]]. "
-             "(units: z[cm] / theta[degree])", m_parameters.outputScale);
-    addParam("rescaleTarget", m_rescaleTarget,
-             "If true, set target values > outputScale to 1, "
-             "else skip them.", true);
     addParam("NeuroTrackInputMode", m_neuroTrackInputMode,
              "When using real tracks, use neurotracks instead of 2dtracks as input to the neurotrigger",
              true);
-    addParam("phiRange", m_parameters.phiRange,
-             "Phi region in degree for which experts are trained. "
-             "1 value pair, nMLP value pairs or nPhi value pairs "
-             "with nPhi * nPt * nTheta * nPattern = nMLP.", m_parameters.phiRange);
-    addParam("invptRange", m_parameters.invptRange,
-             "Charge / Pt region in 1/GeV for which experts are trained. "
-             "1 value pair, nMLP value pairs or nPt value pairs "
-             "with nPhi * nPt * nTheta * nPattern = nMLP.", m_parameters.invptRange);
-    addParam("thetaRange", m_parameters.thetaRange,
-             "Theta region in degree for which experts are trained. "
-             "1 value pair, nMLP value pairs or nTheta value pairs "
-             "with nPhi * nPt * nTheta * nPattern = nMLP.", m_parameters.thetaRange);
-    addParam("gzipFilename", m_filename,
-             "Name of the gzip file, where the test samples will be loaded from.",
-             std::string("out.gz"));
-    addParam("targetZ", m_parameters.targetZ,
-             "Train one output of MLP to give z.", m_parameters.targetZ);
-    addParam("targetTheta", m_parameters.targetTheta,
-             "Train one output of MLP to give theta.", m_parameters.targetTheta);
     addParam("singleUse", m_singleUse,
              "Only use a track for a single expert", true);
+    addParam("configFileName", m_configFileName,
+             "Name of the configuration file. This File should be created by the CDCTriggerIDHistModule and will be extended in this module",
+             std::string(""));
+    addParam("gzipFilename", m_filename,
+             "Name of the gzip file, where the training samples will be saved.",
+             std::string("out.gz"));
 
 
 
@@ -130,10 +77,15 @@ namespace Belle2 {
       targets.isRequired(m_targetCollectionName);
     }
     // initialize the neurotrigger object, but use the parameters given in the module
-    m_NeuroTrigger.initialize(m_parameters);
+    if (m_configFileName != "") {
+      m_neuroParameters.loadconfigtxt(m_configFileName);
+      m_NeuroTrigger.initialize(m_neuroParameters);
+    } else {
+      B2ERROR("The Neurotrigger needs to be initialized by a configuration file! Make sure to give the configuration file as a parameter.");
+    }
     // in this version, we first need an idhistfile in prior to collect the training data.
-    // this idhistfile is created by running another steering file before.
-    m_NeuroTrigger.loadIDHist(m_idHistFilename);
+    // this idhistfile is created by running another steering file before
+    // and stored in the config file loaded in the previous step.
     m_trainSet.clear();
     CDC::CDCGeometryPar& cdc = CDC::CDCGeometryPar::Instance();
     // create an empty dataset of training data for each expert network
@@ -146,7 +98,7 @@ namespace Belle2 {
       }
     }
     // this one sets up the other root store arrays needed to collect training data
-    m_NeuroTrigger.initializeCollections(m_hitCollectionName, m_EventTimeName, m_parameters.et_option);
+    m_NeuroTrigger.initializeCollections(m_hitCollectionName, m_EventTimeName, m_neuroParameters.et_option());
     // consistency check of training parameters
     if (m_NeuroTrigger.nSectors() != m_trainSet.size()) {
       B2ERROR("Number of ID sets (" << m_trainSet.size() << ") should match " <<
@@ -229,13 +181,13 @@ namespace Belle2 {
       float phi0 = m_tracks[itrack]->getPhi0();
       float invpt = m_tracks[itrack]->getKappa(1.5);
       float theta = atan2(1., m_tracks[itrack]->getCotTheta());
-      std::vector<int> sectors = m_NeuroTrigger.selectMLPs(phi0, invpt, theta);
+      std::vector<int> sectors = m_NeuroTrigger.selectMLPsTrain(phi0, invpt, theta);
       if (sectors.size() == 0) continue;
       // get target values
       std::vector<float> targetRaw = {};
-      if (m_parameters.targetZ)
+      if (m_neuroParameters.targetZ)
         targetRaw.push_back(zTarget);
-      if (m_parameters.targetTheta)
+      if (m_neuroParameters.targetTheta)
         targetRaw.push_back(thetaTarget);
       for (unsigned i = 0; i < sectors.size(); ++i) {
         int isector = sectors[i];
@@ -252,12 +204,12 @@ namespace Belle2 {
             target[itarget] /= fabs(target[itarget]);
           }
         }
-        if (!m_rescaleTarget && outOfRange) continue;
+        if (!m_neuroParameters.rescaleTarget && outOfRange) continue;
         //
         // read out or determine event time
         //std::cout << "time: " << m_NeuroTrigger.m_T0 << std::endl;
         //std::cout << "getting event time" << std::endl;
-        m_NeuroTrigger.getEventTime(isector, *m_tracks[itrack], m_parameters.et_option, m_neuroTrackInputMode);
+        m_NeuroTrigger.getEventTime(isector, *m_tracks[itrack], m_neuroParameters.et_option(), m_neuroTrackInputMode);
         //std::cout << "time: " << m_NeuroTrigger.m_T0 << std::endl;
         // check hit pattern
         unsigned long hitPattern = m_NeuroTrigger.getInputPattern(isector, *m_tracks[itrack], m_neuroTrackInputMode);
@@ -295,7 +247,6 @@ namespace Belle2 {
         CDCTriggerMLPData::NeuroSet<27, 2> sample(m_NeuroTrigger.getInputVector(isector, hitIds).data(), target.data(),
                                                   evtmetadata->getExperiment(), evtmetadata->getRun(), evtmetadata->getSubrun(), evtmetadata->getEvent(), itrack, i);
         //check whether we already have enough samples
-        std::cout << sample << std::endl;
         m_trainSet[isector].addSample(sample);
         if ((m_trainSet)[isector].nSamples() % 1000 == 0) {
           B2DEBUG(50, m_trainSet[isector].nSamples() << " samples for training collected for sector " << isector);
@@ -317,6 +268,16 @@ namespace Belle2 {
     for (unsigned int i = 0; i < m_trainSet.size(); ++i) {
       ss << "expert " << i << " : " << m_trainSet[i].nSamples() << ", ";
     }
+    m_neuroParameters.ETOption.lock();
+    m_neuroParameters.rescaleTarget.lock();
+    m_neuroParameters.targetZ.lock();
+    m_neuroParameters.targetTheta.lock();
+    for (auto x : m_neuroParameters.maxHitsPerSL) {
+      x.lock();
+    }
+
+    m_neuroParameters.saveconfigtxt(m_configFileName);
+
     B2DEBUG(10, "Collected events: " << ss.str());
   }
 }

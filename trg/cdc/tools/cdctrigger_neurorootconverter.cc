@@ -7,6 +7,7 @@
  **************************************************************************/
 
 #include <trg/cdc/NeuroTrigger.h>
+#include <trg/cdc/NeuroTriggerParameters.h>
 #include <trg/cdc/dataobjects/CDCTriggerMLP.h>
 //#include <trg/cdc/dbobjects/CDCTriggerNeuroConfig.h>
 //#include <framework/database/DBObjPtr.h>
@@ -34,30 +35,13 @@ int main(int argc, char* argv[])
   // get arguments
   if (argc < 4) {
     std::cout << "Program needs at 3 arguments:" << std::endl
-              << " 1: parameter rootfile" << std::endl
-              << " 2: MLP weights from external training" << std::endl
+              << " 1: json weights" << std::endl
+              << " 2: configuration file name" << std::endl
               << " 3: output filename" << std::endl;
     return -1;
   }
-  NeuroTrigger::Parameters p;
-  p.nMLP = 5;
-  p.nHidden = {{81.}};
-  p.targetZ = true;
-  p.targetTheta = true;
-  p.multiplyHidden = false;
-  p.outputScale = {{ -100, 100, 10, 170}};
-  p.phiRange = {{0, 360}};
-  p.thetaRange = {{10, 170}};
-  p.invptRange = {{ -5, 5}};
-  p.phiRangeTrain = {{0, 360}};
-  p.thetaRangeTrain = {{10, 170}};
-  p.invptRangeTrain = {{ -5, 5}};
-  p.maxHitsPerSL = {1};
-  p.SLpattern = {511, 383, 479, 503, 509};
-  p.SLpatternMask = {170};
-  p.tMax = 256;
-  p.et_option = "fastestpriority";
-  p.T0fromHits = false;
+  std::string cfn = argv[2];
+  NeuroTriggerParameters p(cfn);
 
 
   NeuroTrigger m_nnt;
@@ -66,7 +50,7 @@ int main(int argc, char* argv[])
   //if (!m_nnt.load(argv[1], "MLPs")) {
   //    std::cout << "Error loading file: " << argv[1] << std::endl;
   //}
-  std::ifstream netfile(argv[2], std::ifstream::binary);
+  std::ifstream netfile(argv[1], std::ifstream::binary);
   nlohmann::json nets;
   netfile >> nets;
 

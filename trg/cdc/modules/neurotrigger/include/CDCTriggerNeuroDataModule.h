@@ -5,6 +5,7 @@
 
 #include <framework/core/Module.h>
 #include <trg/cdc/NeuroTrigger.h>
+#include <trg/cdc/NeuroTriggerParameters.h>
 #include <trg/cdc/dataobjects/CDCTriggerMLPData.h>
 #include <iostream>
 #include "boost/iostreams/filter/gzip.hpp"
@@ -45,23 +46,23 @@ namespace Belle2 {
     //module parameters
     /** Name of the StoreArray containing the input track segment hits. */
     std::string m_hitCollectionName;
-    /** name of the event time StoreObjPtr */
-    std::string m_EventTimeName;
     /** Name of the StoreArray containing the input 2D tracks. */
     std::string m_inputCollectionName;
     /** Switch between MCParticles or RecoTracks as targets. */
     bool m_trainOnRecoTracks;
     /** Name of the MCParticles/RecoTracks collection used as target values. */
     std::string m_targetCollectionName;
+    /** name of the event time StoreObjPtr */
+    std::string m_EventTimeName;
     /** Name of gzip file where the training data are saved. */
     std::string m_filename;
+    /** Name of the configuration file used in the module to load the neuroparamters. */
+    std::string m_configFileName;
     /** Name of file where ID Histograms are stored. */
     std::string m_idHistFilename;
     /** Parameters for the NeuroTrigger. */
-    NeuroTrigger::Parameters m_parameters;
+    NeuroTriggerParameters m_neuroParameters;
     /** Switch to rescale out of range target values or ignore them. */
-    bool m_rescaleTarget;
-    /** Use neurotracks instead of 2dtracks as input for the neurotrigger. */
     bool m_neuroTrackInputMode;
     /** counter for tracks */
     int m_trackcounter;

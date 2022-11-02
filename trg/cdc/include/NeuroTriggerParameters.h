@@ -144,9 +144,12 @@ namespace Belle2 {
     NNTParam<bool> targetZ;
     NNTParam<bool> targetTheta;
     NNTParam<bool> multiplyHidden;
-    NNTParam<bool> T0fromHits;
     NNTParam<unsigned> tMax;
-    //multiplynhidden was removed, because it is not used
+    NNTParam<bool> rescaleTarget;
+    NNTParam<bool> cutSum;
+    NNTParam<double> relevantCut;
+    NNTParam<unsigned> ETOption;
+
     std::vector<std::vector<NNTParam<float>>> phiRangeUse;
     std::vector<std::vector<NNTParam<float>>> thetaRangeUse;
     std::vector<std::vector<NNTParam<float>>> invptRangeUse;
@@ -158,8 +161,8 @@ namespace Belle2 {
     std::vector<NNTParam<unsigned short>> maxHitsPerSL;
     std::vector<NNTParam<unsigned long>> SLpattern;
     std::vector<NNTParam<unsigned long>> SLpatternMask;
-    NNTParam<unsigned> ETOption;
     std::vector<NNTParam<unsigned>> precision;
+    std::vector<std::vector<NNTParam<float>>> IDRanges;
   private:
     template<typename X>
     bool checkarr(std::vector<std::vector<NNTParam<X>>> vec);

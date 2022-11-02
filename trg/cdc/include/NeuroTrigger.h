@@ -106,7 +106,6 @@ namespace Belle2 {
       */
       std::string et_option = "etf_or_fastestpriority";
       /** DEPRECATED!! If true, determine event time from relevant hits if it is missing. */
-      bool T0fromHits = false;
 
     };
 
@@ -170,6 +169,15 @@ namespace Belle2 {
      * @return indices of the selected MLPs, empty if the track does not fit any sector
      */
     std::vector<int> selectMLPs(float phi0, float invpt, float theta);
+
+    /** Select all matching expert MLPs based on the given track parameters.
+     * If the sectors are overlapping, there may be more than one matching expert.
+     * During training this is intended, afterwards sectors should be redefined to be unique.
+     * For unique geometrical sectors, this function can still find several experts
+     * with different sector patterns.
+     * @return indices of the selected MLPs, empty if the track does not fit any sector
+     */
+    std::vector<int> selectMLPsTrain(float phi0, float invpt, float theta);
 
     /** Select one MLP from a list of sector indices.
      * The selected expert either matches the given sector pattern,

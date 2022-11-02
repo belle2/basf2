@@ -3,6 +3,7 @@
 #pragma once
 
 #include <trg/cdc/NeuroTrigger.h>
+#include <trg/cdc/NeuroTriggerParameters.h>
 #include <trg/cdc/NeuroTrainer.h>
 #include <framework/core/Module.h>
 #include <trg/cdc/dataobjects/CDCTriggerMLPData.h>
@@ -47,8 +48,13 @@ namespace Belle2 {
     bool m_cutSum;
     /** Parameters for the NeuroTrigger. */
     NeuroTrigger::Parameters m_parameters;
+    /** Parameters for the NeuroTrigger. */
+    NeuroTriggerParameters m_neuroParameters;
     /** base name for idhist file and config file */
     std::string m_idHistName;
+    /** name for the configuration file which holds all the parameters and
+     * the idhist tables for each expert */
+    std::string m_configFileName;
     /** Name of the MCParticles/RecoTracks collection used as target values. */
     std::string m_targetCollectionName;
     /** Switch between MCParticles or RecoTracks as targets. */

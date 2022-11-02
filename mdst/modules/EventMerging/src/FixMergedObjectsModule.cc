@@ -49,7 +49,7 @@ void FixMergedObjectsModule::initialize()
   const auto particleListObjects{DataStore::Instance().getListOfObjects(ParticleList::Class(), DataStore::c_Event)};
   if (particleListObjects.size() > 0)
     B2WARNING("Some ParticleList objects are found in the DataStore: they are likely invalid/broken after having used the event embedding!"
-              << LogVar("ParticleList object names", boost::algorithm::join(particleArrays, " ")));
+              << LogVar("ParticleList object names", boost::algorithm::join(particleListObjects, " ")));
 }
 
 void FixMergedObjectsModule::event()

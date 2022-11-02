@@ -8,7 +8,6 @@
 
 #include <tracking/dataobjects/RecoTrack.h>
 #include <framework/datastore/StoreArray.h>
-#include <vxd/dataobjects/VxdID.h>
 
 #include <framework/utilities/TestHelpers.h>
 #include <framework/gearbox/Const.h>

@@ -110,7 +110,7 @@ void TreeFitterModule::initialize()
     if (!valid)
       B2ERROR("TreeFitterModule::initialize Invalid Decay Descriptor: " << m_treatAsInvisible);
     else if (m_pDDescriptorInvisibles.getSelectionPDGCodes().size() != 1)
-      B2ERROR("TreeFitterModule::please select exactly one particle to ignore: " << m_treatAsInvisible);
+      B2ERROR("TreeFitterModule::initialize Please select exactly one particle to ignore: " << m_treatAsInvisible);
   }
 }
 
@@ -169,7 +169,9 @@ void TreeFitterModule::event()
       Particle* daughterCopy = Belle2::ParticleCopy::copyParticle(targetD);
       daughterCopy->writeExtraInfo("treeFitterTreatMeAsInvisible", 1);
       daughterCopy->setMomentumVertexErrorMatrix(dummyCovMatrix);
-      particle->replaceDaughter(targetD, daughterCopy);
+      bool isReplaced = particle->replaceDaughterRecursively(targetD, daughterCopy);
+      if (!isReplaced)
+        B2ERROR("TreeFitterModule::event No target particle found for " << m_treatAsInvisible);
     }
 
     try {

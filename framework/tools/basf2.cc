@@ -404,7 +404,7 @@ int main(int argc, char* argv[])
     }
 
     if (varMap.count("secondary-input")) {
-      const auto& names = varMap["input"].as<vector<string>>();
+      const auto& names = varMap["secondary-input"].as<vector<string>>();
       Environment::Instance().setSecondaryInputFilesOverride(names);
     }
 

@@ -14,7 +14,6 @@
 #include <vector>
 #include <genfit/WireTrackCandHit.h>
 
-
 using namespace std;
 
 namespace Belle2 {

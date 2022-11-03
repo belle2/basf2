@@ -42,8 +42,8 @@ namespace Belle2 {
       /** Initial chi-square value (internal use) */
       static constexpr double kInitialCHIsq = 1.0e+30;
 
-      /** Default magnetic field */
-      static constexpr double kDefaultMagneticField = 1.45638;
+      /** Default magnetic field when not set externally */
+      static constexpr double kDefaultMagneticField = 1.48436;
 
       /** Speed of light */
       static constexpr double kLightSpeed = 0.00299792458;

@@ -201,7 +201,8 @@ MCRecoTracksMatcherModule::MCRecoTracksMatcherModule()
 
   addParam("useFittedTracks",
            m_useFittedTracks,
-           "Use fitted tracks for matching and include the charge of the fitted track into the matching checks?",
+           "If true, it uses fitted tracks for matching. Note that the charge of the track can be different from\
+           the seed charge (that is provided by the pattern recognition) since the DAF can flip tracks.",
            m_useFittedTracks);
 }
 
@@ -516,7 +517,7 @@ void MCRecoTracksMatcherModule::event()
   }
 
   // Count the categories
-  int nMatched{}, nBackground{}, nClones{}, nGhost{};
+  int nMatched{}, nWrongCharge{}, nBackground{}, nClones{}, nClonesWrongCharge{}, nGhost{};
 
   // ### Classify the patter recognition tracks ###
   // Means saving the highest purity relation to the data store
@@ -535,6 +536,7 @@ void MCRecoTracksMatcherModule::event()
       prRecoTrack->setMatchingStatus(RecoTrack::MatchingStatus::c_ghost);
 
       B2DEBUG(23, "Stored PRTrack " << prId << " as ghost because of too low purity");
+      ++nGhost;
       continue;
     }
 
@@ -563,40 +565,46 @@ void MCRecoTracksMatcherModule::event()
     const Efficiency& weightedEfficiency = mostWeightEfficientPRId_for_mcId.weightedEfficiency;
     // const Efficiency& efficiency = mostWeightEfficientPRId_for_mcId.efficiency;
 
+    // find the true charge and reconstructed charge
+    double MCParticleTrackCharge = mcParticle->getCharge();
+    double foundTrackCharge = prRecoTrack->getChargeSeed();
+    if (m_useFittedTracks) {
+      const RelationVector<Track> fittedTracks = prRecoTrack->getRelationsFrom<Track>(m_TracksStoreArrayName);
+      int nPositiveCharges = 0;
+      int nNegativeCharges = 0;
+      if (fittedTracks.size() > 0) {
+        for (const auto& fittedTrack : fittedTracks) {
+          const RelationVector<TrackFitResult> trackFitResults = fittedTrack.getRelationsFrom<TrackFitResult>();
+          if (trackFitResults.size() > 0) {
+            for (const auto& trackFitResult : trackFitResults) {
+              trackFitResult.getChargeSign() > 0 ? nPositiveCharges++ : nNegativeCharges++;
+            }
+          }
+        }
+      }
+      if (nPositiveCharges > 0 and nNegativeCharges > 0) {
+        B2DEBUG(23,
+                "There are different charges attributed to the same track, this shouldn't happen. Continue with the majority of positive or negative charges");
+      }
+      foundTrackCharge = nPositiveCharges > nNegativeCharges ? 1 : -1;
+    }
+
     // Note : The matched category may also contain higher order clones recognisable by their low
     // absolute efficiency
 
     // MATCHED
-    if (prId == mostWeightEfficientPRId) {
-      double MCParticleTrackCharge = mcParticle->getCharge();
-      double foundTrackCharge = prRecoTrack->getChargeSeed();
-      if (m_useFittedTracks) {
-        const RelationVector<Track> fittedTracks = prRecoTrack->getRelationsFrom<Track>(m_TracksStoreArrayName);
-        int nPositiveCharges = 0;
-        int nNegativeCharges = 0;
-        if (fittedTracks.size() > 0) {
-          for (const auto& fittedTrack : fittedTracks) {
-            const RelationVector<TrackFitResult> trackFitResults = fittedTrack.getRelationsFrom<TrackFitResult>();
-            if (trackFitResults.size() > 0) {
-              for (const auto& trackFitResult : trackFitResults) {
-                trackFitResult.getChargeSign() > 0 ? nPositiveCharges++ : nNegativeCharges++;
-              }
-            }
-          }
+    {
+      if (prId == mostWeightEfficientPRId) {
+        if (foundTrackCharge != MCParticleTrackCharge) {
+          prRecoTrack->setMatchingStatus(RecoTrack::MatchingStatus::c_wrongCharge);
+          ++nWrongCharge;
+        } else {
+          prRecoTrack->setMatchingStatus(RecoTrack::MatchingStatus::c_matched);
+          ++nMatched;
         }
-        if (nPositiveCharges > 0 and nNegativeCharges > 0) {
-          B2DEBUG(23,
-                  "There are different charges attributed to the same track, this shouldn't happen. Continue with the majority of positive or negative charges");
-        }
-        foundTrackCharge = nPositiveCharges > nNegativeCharges ? 1 : -1;
       }
-
-      if (foundTrackCharge != MCParticleTrackCharge) {
-        continue; // TODO we need something better here...
-      }
-
       // Setup the relation purity relation
-      prRecoTrack->setMatchingStatus(RecoTrack::MatchingStatus::c_matched);
+      // regardless of the charge matching
       prRecoTrack->addRelationTo(mcRecoTrack, purity);
 
       // Add the mc matching relation
@@ -605,7 +613,6 @@ void MCRecoTracksMatcherModule::event()
       B2DEBUG(23, "Stored PRTrack " << prId << " as matched.");
       B2DEBUG(23, "MC Match prId " << prId << " to mcPartId " << mcParticle->getArrayIndex());
       B2DEBUG(23, "Purity rel: prId " << prId << " -> mcId " << mcId << " : " << purity);
-      ++nMatched;
       continue;
     }
 
@@ -622,7 +629,15 @@ void MCRecoTracksMatcherModule::event()
 
     // Final category
     // CLONE
+    if (foundTrackCharge != MCParticleTrackCharge) {
+      prRecoTrack->setMatchingStatus(RecoTrack::MatchingStatus::c_cloneWrongCharge);
+      ++nClonesWrongCharge;
+    } else {
+      prRecoTrack->setMatchingStatus(RecoTrack::MatchingStatus::c_clone);
+      ++nClones;
+    }
     // Setup the relation purity relation
+    // regardless whether the charge is correctly reconstructed or not
     prRecoTrack->setMatchingStatus(RecoTrack::MatchingStatus::c_clone);
     prRecoTrack->addRelationTo(mcRecoTrack, -purity);
     prRecoTrack->addRelationTo(mcParticle, -purity);
@@ -635,8 +650,11 @@ void MCRecoTracksMatcherModule::event()
   } // end for prId
 
 
+
   B2DEBUG(23, "Number of matches " << nMatched);
+  B2DEBUG(23, "Number of wrongCharge " << nWrongCharge);
   B2DEBUG(23, "Number of clones " << nClones);
+  B2DEBUG(23, "Number of clones wrongCharge" << nClonesWrongCharge);
   B2DEBUG(23, "Number of bkg " << nBackground);
   B2DEBUG(23, "Number of ghost " << nGhost);
 
@@ -662,7 +680,9 @@ void MCRecoTracksMatcherModule::event()
     // MATCHED
     if (mcId == mostPureMCId and
         (prRecoTrack->getMatchingStatus() == RecoTrack::MatchingStatus::c_matched or
-         prRecoTrack->getMatchingStatus() == RecoTrack::MatchingStatus::c_clone)) {
+         prRecoTrack->getMatchingStatus() == RecoTrack::MatchingStatus::c_wrongCharge or
+         prRecoTrack->getMatchingStatus() == RecoTrack::MatchingStatus::c_clone or
+         prRecoTrack->getMatchingStatus() == RecoTrack::MatchingStatus::c_cloneWrongCharge)) {
       // Setup the relation with positive weighted efficiency for this case.
       mcRecoTrack->addRelationTo(prRecoTrack, weightedEfficiency);
       mcParticle->addRelationTo(prRecoTrack, weightedEfficiency);
@@ -675,9 +695,11 @@ void MCRecoTracksMatcherModule::event()
     // which in turn better describes a MCTrack different form this.
     // Setup the relation with negative weighted efficiency for this case.
     bool isMergedMCRecoTrack =
-      weightedEfficiency >= m_minimalEfficiency and
+      (weightedEfficiency >= m_minimalEfficiency) and
       (prRecoTrack->getMatchingStatus() == RecoTrack::MatchingStatus::c_matched or
-       prRecoTrack->getMatchingStatus() == RecoTrack::MatchingStatus::c_clone);
+       prRecoTrack->getMatchingStatus() == RecoTrack::MatchingStatus::c_wrongCharge or
+       prRecoTrack->getMatchingStatus() == RecoTrack::MatchingStatus::c_clone or
+       prRecoTrack->getMatchingStatus() == RecoTrack::MatchingStatus::c_cloneWrongCharge);
 
     if (isMergedMCRecoTrack) {
       mcRecoTrack->addRelationTo(prRecoTrack, -weightedEfficiency);

@@ -38,15 +38,14 @@ void TrackTimeEstimatorModule::event()
       for (auto& track : m_tracks) {
         // Access related recoTrack
         const auto& recoTrack = track.getRelatedTo<RecoTrack>();
-        // Get SVD hits
-        const std::vector SVDHitsList = recoTrack->getSVDHitList();
-        if (SVDHitsList.size() > 0) {
-          float averageTime = 0;
-          for (auto const& hit : SVDHitsList) { // Compute average of ClsTime
-            averageTime += hit->getClsTime();
+        // if the outgoing arm exist, the track time is the difference of the outgoing arm time and the SVD EventT0
+        // otherwise, if the ingoing arm exist, the track time is the difference of the ingoing arm time and the SVD EventT0
+        if (recoTrack->hasOutgoingArmTime()) {
+          track.setTrackTime(recoTrack->getOutgoingArmTime() - svdBestT0.eventT0);
+        } else {
+          if (recoTrack->hasIngoingArmTime()) {
+            track.setTrackTime(recoTrack->getIngoingArmTime() - svdBestT0.eventT0);
           }
-          averageTime = averageTime / (SVDHitsList.size());
-          track.setTrackTime(averageTime - svdBestT0.eventT0);
         }
       }
     }

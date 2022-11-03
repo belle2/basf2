@@ -367,11 +367,14 @@ namespace Belle2 {
     EXPECT_TRUE(recoTrack->hasSVDHits());
 
     EXPECT_FALSE(recoTrack->hasOutgoingArmTime());
+    EXPECT_FALSE(recoTrack->hasIngoingArmTime());
 
     B2INFO("outgoing arm time: " << recoTrack->getOutgoingArmTime());
     B2INFO("ingoing arm time:  " << recoTrack->getIngoingArmTime());
     B2INFO("difference: " << recoTrack->getInOutArmTimeDifference());
+    EXPECT_NEAR(recoTrack->getIngoingArmTime(), recoTrack->getOutgoingArmTime(), 0.8);
 
     EXPECT_TRUE(recoTrack->hasOutgoingArmTime());
+    EXPECT_TRUE(recoTrack->hasIngoingArmTime());
   }
 }

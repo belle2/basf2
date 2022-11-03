@@ -29,9 +29,9 @@ namespace Belle2 {
       /// Name of the CDC hits store array.
       m_storeArrayNameOfCDCHits = "CDCHitsAreCool";
       /// Name of the SVD hits store array.
-      m_storeArrayNameOfSVDHits = "SVDClusters";
+      m_storeArrayNameOfSVDHits = "WhatAboutSVD";
       /// Name of the PXD hits store array.
-      m_storeArrayNameOfPXDHits = "PXDClusters";
+      m_storeArrayNameOfPXDHits = "PXDsILike";
       /// Name of the BKLM hits store array.
       m_storeArrayNameOfBKLMHits = "KeepBKLMsAlive";
       /// Name of the EKLM hits store array.

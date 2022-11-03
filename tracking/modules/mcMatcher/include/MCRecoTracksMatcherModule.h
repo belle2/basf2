@@ -61,18 +61,43 @@ namespace Belle2 {
    *  In the following a more detailed explaination is given for the matching and
    *  the classification of PRTracks and MCTracks.
    *
-   *  The PRTracks can be classified into four categories, which are described in the following
+   *  The PRTracks can be classified into six categories:
+   *
    *  - MATCHED
    *      - The highest efficiency PRTrack of the highest purity MCTrack to this PRTrack is the same as this PRTrack.
+   *      - In addition, the charge of the PRTrack and the one of the MCTrack are the same.
    *      - This means the PRTrack contains a high contribution of only one MCTrack and
-   *        is also the best of all PRTracks describing this MCTrack.
+   *        is also the best of all PRTracks describing this MCTrack (including the charge).
+   *      - The McTrackId property of matched PRTrack is set to the MCTrackId property of the MCTrack,
+   *        which is usually the index of the MCParticle in its corresponding StoreArray.
+   *      - Also the relation from PRTrack to MCParticle is added.
+   *      - The purity relation is setup from the PRTrack to the MCTrack with the (positive) purity as weight.
+   *
+   * - WRONG CHARGE
+   *      - The highest efficiency PRTrack of the highest purity MCTrack to this PRTrack is the same as this PRTrack.
+   *      - But, the charge of the PRTrack and the one of the MCTrack are NOT the same.
+   *      - This means the PRTrack contains a high contribution of only one MCTrack and
+   *        is also the best of all PRTracks describing this MCTrack, but the charge is wrong.
    *      - The McTrackId property of matched PRTrack is set to the MCTrackId property of the MCTrack,
    *        which is usually the index of the MCParticle in its corresponding StoreArray.
    *      - Also the relation from PRTrack to MCParticle is added.
    *      - The purity relation is setup from the PRTrack to the MCTrack with the (positive) purity as weight.
    *
    *  - CLONE
-   *      - The highest purity MCTrack as a different highest efficiency PRTrack than this track.
+   *      - The highest purity MCTrack has a different highest efficiency PRTrack than this track.
+   *      - Anyway, the charge of the PRTrack and the one of the MCTrack are the same.
+   *      - This means the PRTrack contains high contributions of only one MCTrack
+   *        but a different other PRTrack contains an even higher contribution to this MCTrack.
+   *      - Only if the relateClonesToMCParticles parameter is active
+   *        The McTrackId property of cloned PRTracks is set to the MCTrackId property of the MCTrack.
+   *        Else it will be set to -9.
+   *      - Also the relation from PRTrack to MCParticle is added, only if the relateClonesToMCParticles parameter is active.
+   *      - The purity relation is always setup from the PRTrack to the MCTrack with the _negative_ purity as weight,
+   *        to be able to distinguish them from the matched tracks.
+   *
+   *  - CLONE WRONG CHARGE
+   *      - The highest purity MCTrack has a different highest efficiency PRTrack than this track.
+   *      - Moreover, the charge of the PRTrack and the one of the MCTrack are NOT the same.
    *      - This means the PRTrack contains high contributions of only one MCTrack
    *        but a different other PRTrack contains an even higher contribution to this MCTrack.
    *      - Only if the relateClonesToMCParticles parameter is active
@@ -101,14 +126,30 @@ namespace Belle2 {
    *      - PRTracks classified as ghost are not entered in the purity RelationArray.
    *  .
    *
-   *  MCTracks are classified into three categories:
+   *  MCTracks are classified into five categories:
+   *
    *  - MATCHED
    *      - The highest purity MCTrack of the highest efficiency PRTrack of this MCTrack is the same as this MCTrack.
+   *      - In addition, the charge of the MCTrack and the one of the PRTrack are the same.
+   *      - This means the MCTrack is well described by a PRTrack and this PRTrack has only a significant contribution from this MCTrack.
+   *      - The efficiency relation is setup from the MCTrack to the PRTrack with the (positive) efficiency as weight.
+   *
+   *  - WRONG CHARGE
+   *      - The highest purity MCTrack of the highest efficiency PRTrack of this MCTrack is the same as this MCTrack.
+   *      - But, the charge of the MCTrack and the one of the PRTrack are NOT the same.
    *      - This means the MCTrack is well described by a PRTrack and this PRTrack has only a significant contribution from this MCTrack.
    *      - The efficiency relation is setup from the MCTrack to the PRTrack with the (positive) efficiency as weight.
    *
    *  - MERGED
    *      - The highest purity MCTrack of the highest efficiency PRTrack of this MCTrack is not the same as this MCTrack.
+   *      - Anyway, the charge of this MCTrack and the one of the PRTrack are the same.
+   *      - This means this MCTrack is mostly contained in a PRTrack, which in turn however better describes a MCTrack different form this.
+   *      - The efficiency relation is setup from the MCTrack to the PRTrack with the _negative_ efficiency as weight,
+   *        to be able to distinguish them from the matched tracks.
+   *
+   *  - MERGED WRONG CHARGE
+   *      - The highest purity MCTrack of the highest efficiency PRTrack of this MCTrack is not the same as this MCTrack.
+   *      - Moreover, the charge of this MCTrack and the one of the PRTrack are NOT the same.
    *      - This means this MCTrack is mostly contained in a PRTrack, which in turn however better describes a MCTrack different form this.
    *      - The efficiency relation is setup from the MCTrack to the PRTrack with the _negative_ efficiency as weight,
    *        to be able to distinguish them from the matched tracks.

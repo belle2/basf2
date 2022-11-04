@@ -14,26 +14,26 @@
 yesPhotos
 
 Decay Upsilon(4S)
-0.5 B+ B-sig VSS;
-0.5 B- B+sig VSS;
+0.5            B+ B-sig                                          VSS;
+0.5            B- B+sig                                          VSS;
 Enddecay
 
 Decay B-sig
-1.0   D0sig  tau-sig  anti-nu_tau                        HQET3 1.0541 1.128 1.0;
+1.0            D0sig  tau-sig  anti-nu_tau                       HQET3 1.0541 1.128 1.0;
 Enddecay
 CDecay B+sig
 
 
 Decay D0sig
-0.039500000   K-  pi+                                      PHSP;
-0.144000000   K-  pi+  pi0                                 D_DALITZ;
+0.039500000    K-  pi+                                           PHSP;
+0.144000000    K-  pi+  pi0                                      D_DALITZ;
 Enddecay
 CDecay anti-D0sig
 
 
 Decay tau-sig
-0.178175 e-           anti-nu_e      nu_tau TAULNUNU;
-0.173937 mu-          anti-nu_mu     nu_tau TAULNUNU;
+0.178175       e-           anti-nu_e      nu_tau                TAULNUNU;
+0.173937       mu-          anti-nu_mu     nu_tau                TAULNUNU;
 Enddecay
 CDecay tau+sig
 

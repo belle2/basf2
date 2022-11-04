@@ -495,48 +495,44 @@ namespace Belle2 {
     double getTimeSeed() const { return m_genfitTrack.getTimeSeed(); }
 
     /// Return the track time of the outgoing arm
-    float getOutgoingArmTime(int& nSVDHitsOutgoingArm)
+    float getOutgoingArmTime()
     {
-      int nSVDHitsIngoingArm = 0;
-      if (!m_isArmTimeComputed) estimateArmTime(nSVDHitsOutgoingArm, nSVDHitsIngoingArm);
+      if (!m_isArmTimeComputed) estimateArmTime();
       return m_outgoingArmTime;
     }
 
     /// Return the error of the track time of the outgoing arm
-    float getOutgoingArmTimeError(int& nSVDHitsOutgoingArm)
+    float getOutgoingArmTimeError()
     {
-      int nSVDHitsIngoingArm = 0;
-      if (!m_isArmTimeComputed) estimateArmTime(nSVDHitsOutgoingArm, nSVDHitsIngoingArm);
+      if (!m_isArmTimeComputed) estimateArmTime();
       return m_outgoingArmTimeError;
     }
 
     /// Return the track time of the ingoing arm
-    float getIngoingArmTime(int& nSVDHitsIngoingArm)
+    float getIngoingArmTime()
     {
-      int nSVDHitsOutgoingArm = 0;
-      if (!m_isArmTimeComputed) estimateArmTime(nSVDHitsOutgoingArm, nSVDHitsIngoingArm);
+      if (!m_isArmTimeComputed) estimateArmTime();
       return m_ingoingArmTime;
     }
 
     /// Return the error of the track time of the ingoing arm
-    float getIngoingArmTimeError(int& nSVDHitsIngoingArm)
+    float getIngoingArmTimeError()
     {
-      int nSVDHitsOutgoingArm = 0;
-      if (!m_isArmTimeComputed) estimateArmTime(nSVDHitsOutgoingArm, nSVDHitsIngoingArm);
+      if (!m_isArmTimeComputed) estimateArmTime();
       return m_ingoingArmTimeError;
     }
 
     /// Return the difference between the track times of the ingoing and outgoing arms
-    float getInOutArmTimeDifference(int& nSVDHitsOutgoingArm, int& nSVDHitsIngoingArm)
+    float getInOutArmTimeDifference()
     {
-      if (!m_isArmTimeComputed) estimateArmTime(nSVDHitsOutgoingArm, nSVDHitsIngoingArm);
+      if (!m_isArmTimeComputed) estimateArmTime();
       return m_inOutArmTimeDiff;
     }
 
     /// Return the error of the difference between the track times of the ingoing and outgoing arms
-    float getInOutArmTimeDifferenceError(int& nSVDHitsOutgoingArm, int& nSVDHitsIngoingArm)
+    float getInOutArmTimeDifferenceError()
     {
-      if (!m_isArmTimeComputed) estimateArmTime(nSVDHitsOutgoingArm, nSVDHitsIngoingArm);
+      if (!m_isArmTimeComputed) estimateArmTime();
       return m_inOutArmTimeDiffError;
     }
 
@@ -550,6 +546,18 @@ namespace Belle2 {
     bool hasOutgoingArmTime()
     {
       return m_hasOutgoingArmTime;
+    }
+
+    /// Return the number of clusters used to estimate the outgoing arm time
+    int getNSVDHitsOfOutgoingArm()
+    {
+      return m_nSVDHitsOfOutgoingArm;
+    }
+
+    /// Return the number of clusters used to estimate the ingoing arm time
+    int getNSVDHitsOfIngoingArm()
+    {
+      return m_nSVDHitsOfIngoingArm;
     }
 
     /// Return the position, the momentum and the charge of the first measured state on plane or - if unfitted - the seeds.
@@ -660,7 +668,7 @@ namespace Belle2 {
      * This function calculates the track time of the ingoing and outgoing arms and their difference.
      * If they do not exists they are set to NAN by default
      */
-    void estimateArmTime(int& nSVDHitsOutgoingArm, int& nSVDHitsIngoingArm);
+    void estimateArmTime();
 
     /**
      * This function returns true if the arm direction is Outgoing
@@ -897,6 +905,10 @@ namespace Belle2 {
     bool m_hasIngoingArmTime = false;
     /// Internal storage of the final outgoing arm time is set
     bool m_hasOutgoingArmTime = false;
+    /// Number of SVD clusters of the outgoing arm
+    int m_nSVDHitsOfOutgoingArm = 0;
+    /// Number of SVD clusters of the ingoing arm
+    int m_nSVDHitsOfIngoingArm = 0;
 
     /**
      * Add a generic hit with the given parameters for the reco hit information.
@@ -1024,7 +1036,7 @@ namespace Belle2 {
     }
 
     /** Making this class a ROOT class.*/
-    ClassDefOverride(RecoTrack, 12);
+    ClassDefOverride(RecoTrack, 13);
   };
 
   /**

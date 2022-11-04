@@ -641,14 +641,12 @@ std::string RecoTrack::getInfoHTML() const
   return out.str();
 }
 
-void RecoTrack::estimateArmTime(int& nSVDHitsOutgoingArm, int& nSVDHitsIngoingArm)
+void RecoTrack::estimateArmTime()
 {
   m_isArmTimeComputed = true;
   const std::vector<RecoHitInformation*>& recoHits = getRecoHitInformations(true);
   bool svdDone = false;
   int nSVDHits = 0;
-  nSVDHitsOutgoingArm = 0;
-  nSVDHitsIngoingArm = 0;
   static RecoHitInformation::RecoHitDetector und = RecoHitInformation::RecoHitDetector::c_undefinedTrackingDetector;
   RecoHitInformation::RecoHitDetector SVD = RecoHitInformation::RecoHitDetector::c_SVD;
   RecoHitInformation::RecoHitDetector detIDpre = und;
@@ -678,12 +676,12 @@ void RecoTrack::estimateArmTime(int& nSVDHitsOutgoingArm, int& nSVDHitsIngoingAr
           m_ingoingArmTime = clusterTimeSum / nSVDHits;
           m_ingoingArmTimeError = std::sqrt(clusterTimeSigma2Sum / (nSVDHits * (nSVDHits - 1)));
           m_hasIngoingArmTime = true;
-          nSVDHitsOutgoingArm = nSVDHits;
+          m_nSVDHitsOfIngoingArm = nSVDHits;
         } else {
           m_outgoingArmTime = clusterTimeSum / nSVDHits;
           m_outgoingArmTimeError = std::sqrt(clusterTimeSigma2Sum / (nSVDHits * (nSVDHits - 1)));
           m_hasOutgoingArmTime = true;
-          nSVDHitsIngoingArm = nSVDHits;
+          m_nSVDHitsOfOutgoingArm = nSVDHits;
         }
         svdDone = false;
         detIDpre = detIDpost;
@@ -702,12 +700,12 @@ void RecoTrack::estimateArmTime(int& nSVDHitsOutgoingArm, int& nSVDHitsIngoingAr
         m_ingoingArmTime = clusterTimeSum / nSVDHits;
         m_ingoingArmTimeError = std::sqrt(clusterTimeSigma2Sum / (nSVDHits * (nSVDHits - 1)));
         m_hasIngoingArmTime = true;
-        nSVDHitsOutgoingArm = nSVDHits;
+        m_nSVDHitsOfIngoingArm = nSVDHits;
       } else {
         m_outgoingArmTime = clusterTimeSum / nSVDHits;
         m_outgoingArmTimeError = std::sqrt(clusterTimeSigma2Sum / (nSVDHits * (nSVDHits - 1)));
-        m_hasIngoingArmTime = true;
-        nSVDHitsIngoingArm = nSVDHits;
+        m_hasOutgoingArmTime = true;
+        m_nSVDHitsOfOutgoingArm = nSVDHits;
       }
     }
   }

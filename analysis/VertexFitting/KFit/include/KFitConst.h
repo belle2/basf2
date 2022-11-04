@@ -46,8 +46,6 @@ namespace Belle2 {
       /** Default magnetic field when not set externally */
       static constexpr double kDefaultMagneticField = 1.5;
 
-      /** Speed of light */
-      static constexpr double kLightSpeed = 0.00299792458;
     };
 
   } // namespace analysis

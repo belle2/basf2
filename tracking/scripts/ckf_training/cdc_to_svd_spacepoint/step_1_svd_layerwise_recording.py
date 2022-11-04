@@ -8,7 +8,7 @@ from b2luigi.basf2_helper import Basf2PathTask
 def create_path(layer, records1_fname, records2_fname, records3_fname):
     path = basf2.create_path()
     path.add_module("RootInput",
-                    inputFileName="/path/to/the/output/file.root")
+                    inputFileName="/path/to/your/Trainingsample.root")
 
     path.add_module("Gearbox")
     path.add_module("Geometry")
@@ -33,8 +33,13 @@ def create_path(layer, records1_fname, records2_fname, records3_fname):
     path.add_module("CDCToSVDSpacePointCKF",
                     inputRecoTrackStoreArrayName="CDCRecoTracks",
                     outputRecoTrackStoreArrayName="VXDRecoTracks",
+                    outputRelationRecoTrackStoreArrayName="CDCRecoTracks",
                     hitFilter="sensor",
                     seedFilter="distance",
+
+                    relationCheckForDirection="backward",
+                    reverseSeed=False,
+                    writeOutDirection="backward",
 
                     firstHighFilter="truth",
                     firstEqualFilter="recording",
@@ -68,11 +73,11 @@ def create_path(layer, records1_fname, records2_fname, records3_fname):
 
                     enableOverlapResolving=False)
 
-    return path, {"max_event": 1000}
+    return path  # , {"max_event": 1000}
 
 
 class ReconstructionTask(Basf2PathTask):
-    layer = b2luigi.IntParameter
+    layer = b2luigi.IntParameter()
 
     def output(self):
         for record_fname in ["records1.root", "records2.root", "records3.root"]:
@@ -81,9 +86,9 @@ class ReconstructionTask(Basf2PathTask):
     def create_path(self):
         return create_path(
             layer=self.layer,
-            records1_fname=self.get_output_fname("records1.root"),
-            records2_fname=self.get_output_fname("records2.root"),
-            records3_fname=self.get_output_fname("records3.root"),
+            records1_fname=self.get_output_file_name("records1.root"),
+            records2_fname=self.get_output_file_name("records2.root"),
+            records3_fname=self.get_output_file_name("records3.root"),
         )
 
 
@@ -97,7 +102,8 @@ class MainTask(b2luigi.WrapperTask):
 
 
 if __name__ == "__main__":
-    b2luigi.set_setting("result_dir", "/path/to/where/you/want/to/store/the/output/")
-    b2luigi.set_setting("batch_system", "htcondor")
-    b2luigi.set_setting("env_script", "~/path/to/basf2/setup/script.sh")
-    b2luigi.process(MainTask, workers=5)
+    b2luigi.set_setting("result_dir", "/path/to/your/training/results")
+    # b2luigi.set_setting("batch_system", "htcondor")
+    b2luigi.set_setting("env_script", "/path/to/setup_basf2.sh")
+    # b2luigi.set_setting("executable", ["python3"])
+    b2luigi.process(MainTask(), workers=5, batch=False)

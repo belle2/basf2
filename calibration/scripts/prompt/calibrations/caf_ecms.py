@@ -16,8 +16,7 @@ from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 from prompt.calibrations.caf_boostvector import settings as boostvector
 from reconstruction import add_pid_module, add_ecl_modules, prepare_cdst_analysis
 
-from ROOT import TFile
-from basf2 import create_path, register_module, B2INFO
+from basf2 import create_path, register_module, get_file_metadata, B2INFO, B2WARNING
 import modularAnalysis as ma
 import vertex
 import stdCharged
@@ -258,14 +257,15 @@ def get_data_info(inData, kwargs):
 
 
 def is_cDST_file(fName):
-    """ Check if the file includes cDST branches """
-    f = TFile.Open(fName)
-    tr = f.Get('tree')
-    names = [b.GetFullName() for b in tr.GetListOfBranches()]
-    f.Close()
+    """ Check if the file is cDST based on the metadata """
 
-    isCDST = ('RawCDCs' in names) and ('RawKLMs' in names) and ('RawECLs' in names)
-    return isCDST
+    metaData = get_file_metadata(fName)
+    description = metaData.getDataDescription()
+    if 'dataLevel' not in description:
+        B2WARNING('The cdst/mdst info is not stored in file metadata')
+        return True
+
+    return (description['dataLevel'] == 'cdst')
 
 
 def get_calibrations(input_data, **kwargs):

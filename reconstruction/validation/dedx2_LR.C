@@ -76,7 +76,7 @@ void plot(const TString &input_filename)
     } else {
       hist->GetListOfFunctions()->Add(new TNamed("Check", "Peak towards 1"));
     }
-    hist->GetListOfFunctions()->Add(new TNamed("Contact","Jitendra Kumar: jkumar@andrew.cmu.edu"));
+    hist->GetListOfFunctions()->Add(new TNamed("Contact","Renu Garg: renu2@andrew.cmu.edu"));
     hist->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter,nostats,pvalue-warn=0.10,pvalue-error=0.005"));
     hist->SetMaximum(1.15*hist->GetMaximum());
     hist->Write();

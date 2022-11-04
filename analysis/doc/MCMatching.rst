@@ -369,13 +369,11 @@ MC mode       Decay channel                                    MC mode       Dec
 Track matching
 --------------
 
-Reconstructed tracks can be:
+A reconstructed track can be:
 
-* matched: the reconstructed track is matched to a true track and it is its the best description. 
-* clones: the reconstructed track is matched to a true track, but there exists another
-          reconstructed track tha better describes the true track (and that will therefore be matched)
-* fakes: the reconstructed track is not matched to any true track. It can be a beam-background track
-        or a track built out of noise hits in the detector, or a mixture of those two.
+1) **matched**, the reconstructed track is matched to a true track and it is its the best description. 
+2) **clone**, the reconstructed track is matched to a true track, but there is another reconstructed track that better describes the true track (this second reconstructed track will therefore be matched)
+3) **fake**, the reconstructed track is not matched to any true track. It can be a beam-background track or a track built out of noise hits in the detector, or a mixture of these two.
 
 .. note:: 
         In case of matched or clone tracks, the charge of the reconstructed track is **not checked** against the charge of the true track.

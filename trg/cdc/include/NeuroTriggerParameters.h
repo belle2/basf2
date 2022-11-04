@@ -53,9 +53,9 @@ namespace Belle2 {
     NNTParam operator()() const {return m_value;}
 
 
-    bool isSet() {return m_set;}
+    bool isSet() const {return m_set;}
     void lock() {m_locked = true;}
-    bool isLocked() {return m_locked;}
+    bool isLocked() const {return m_locked;}
 
   private:
     T m_value;

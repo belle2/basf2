@@ -74,58 +74,65 @@ NeuroTrigger::initialize(const NeuroTriggerParameters& p)
     okay = false;
   }
   // ensure that number of target nodes is valid
-  unsigned short nTarget = int(p.targetZ) + int(p.targetTheta);
-  if (nTarget < 1) {
-    B2ERROR("No outputs! Turn on either targetZ or targetTheta.");
-    okay = false;
+  if (p.targetZ.isSet() || p.targetTheta.isSet()) {
+    unsigned short nTarget = int(p.targetZ) + int(p.targetTheta);
+    if (nTarget < 1) {
+      B2ERROR("No outputs! Turn on either targetZ or targetTheta.");
+      okay = false;
+    }
   }
   // ensure that sector ranges are valid
   for (unsigned iPhi = 0; iPhi < p.phiRangeUse.size(); ++iPhi) {
     if (p.phiRangeUse[iPhi].size() != 2) {
-      B2ERROR("phiRangeUse.should be exactly 2 values");
+      B2ERROR("phiRangeUse should be exactly 2 values");
       okay = false;
       continue;
     }
     if (p.phiRangeUse[iPhi][0] >= p.phiRangeUse[iPhi][1]) {
-      B2ERROR("phiRangeUse.0] should be smaller than phiRangeUse.1]");
+      B2ERROR("phiRangeUse should be smaller than phiRangeUse");
       okay = false;
     }
     if (p.phiRangeUse[iPhi][0] < -360. || p.phiRangeUse[iPhi][1] > 360. ||
         (p.phiRangeUse[iPhi][1] - p.phiRangeUse[iPhi][0]) > 360.) {
-      B2ERROR("phiRangeUse.should be in [-360, 360], with maximal width of 360");
+      B2ERROR("phiRangeUse should be in [-360, 360], with maximal width of 360");
       okay = false;
     }
   }
   for (unsigned iPt = 0; iPt < p.invptRangeUse.size(); ++iPt) {
     if (p.invptRangeUse[iPt].size() != 2) {
-      B2ERROR("invptRangeUse.should be exactly 2 values");
+      B2ERROR("invptRangeUse should be exactly 2 values");
       okay = false;
     }
     if (p.invptRangeUse[iPt][0] >= p.invptRangeUse[iPt][1]) {
-      B2ERROR("invptRangeUse.0] should be smaller than invptRangeUse.1]");
+      B2ERROR("invptRangeUse should be smaller than invptRangeUse");
       okay = false;
     }
   }
   for (unsigned iTheta = 0; iTheta < p.thetaRangeUse.size(); ++iTheta) {
     if (p.thetaRangeUse[iTheta].size() != 2) {
-      B2ERROR("thetaRangeUse.should be exactly 2 values");
+      B2ERROR("thetaRangeUse should be exactly 2 values");
       okay = false;
       continue;
     }
     if (p.thetaRangeUse[iTheta][0] >= p.thetaRangeUse[iTheta][1]) {
-      B2ERROR("thetaRangeUse.0] should be smaller than thetaRangeUse.1]");
+      B2ERROR("thetaRangeUse should be smaller than thetaRangeUse");
       okay = false;
     }
     if (p.thetaRangeUse[iTheta][0] < 0. || p.thetaRangeUse[iTheta][1] > 180.) {
-      B2ERROR("thetaRangeUse.should be in [0, 180]");
+      B2ERROR("thetaRangeUse should be in [0, 180]");
       okay = false;
     }
   }
-  for (unsigned iScale = 0; iScale < p.outputScale.size(); ++iScale) {
-    if (p.outputScale[iScale].size() != 2 * nTarget) {
-      B2ERROR("outputScale should be exactly " << 2 * nTarget << " values");
-      okay = false;
+  int nTarget = (int) p.targetZ + (int) p.targetTheta;
+  if (p.outputScale.size() == p.nMLP || p.outputScale.size() == 1) {
+    for (unsigned iScale = 0; iScale < p.outputScale.size(); ++iScale) {
+      if (p.outputScale[iScale].size() != 2 * nTarget) {
+        B2ERROR("outputScale should be exactly " << 2 * nTarget << " values");
+        okay = false;
+      }
     }
+  } else {
+    B2ERROR("the size of outputscale should be 1 or match the number of experts");
   }
   // ensure that train sectors are valid
   if (p.phiRangeUse.size() != p.phiRangeTrain.size()) {
@@ -209,7 +216,7 @@ NeuroTrigger::initialize(const NeuroTriggerParameters& p)
             << "], thetaRange [" << thetaRangeUse[0] << ", " << thetaRangeUse[1]
             << "], SLpattern " << SLpattern);
     //get scaling values
-    vector<float> outputScale = (p.outputScale.size() == 1) ? p.tcastvector<float>(p.outputScale)[iMLP] : p.tcastvector<float>
+    vector<float> outputScale = (p.outputScale.size() == 1) ? p.tcastvector<float>(p.outputScale)[0] : p.tcastvector<float>
                                 (p.outputScale)[iMLP];
     //convert phi and theta from degree to radian
     phiRangeUse[0] *= Unit::deg;
@@ -231,11 +238,17 @@ NeuroTrigger::initialize(const NeuroTriggerParameters& p)
                                    maxHits, SLpattern, SLpatternMask, p.tMax,
                                    p.et_option()));
   }
-  for (auto exp : p.IDRanges) {
-    // first entry is the expert number, after that follow the idranges for all the superlayers
-    std::vector<float> irange = {exp.begin() + 1, exp.end()};
-    m_MLPs[static_cast<int>(exp[0])].setRelID(irange);
 
+  if (p.IDRanges.size() == p.nMLP) {
+    for (auto exp : p.IDRanges) {
+      // first entry is the expert number, after that follow the idranges for all the superlayers
+      std::vector<float> irange = {exp.begin() + 1, exp.end()};
+      m_MLPs[static_cast<int>(exp[0])].setRelID(irange);
+    }
+  } else if (p.IDRanges.size() == 0) {
+    B2WARNING("idranges have not been initialized yet, did you forget it?");
+  } else {
+    B2ERROR("number of idranges should match the number of experts!");
   }
   // load some values from the geometry that will be needed for the input
   setConstants();

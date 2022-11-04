@@ -21,6 +21,7 @@ import modularAnalysis as ma
 import vertex
 import stdCharged
 import stdPi0s
+import os
 
 
 #: Tells the automated system some details of this script
@@ -261,9 +262,11 @@ def is_cDST_file(fName):
 
     metaData = get_file_metadata(fName)
     description = metaData.getDataDescription()
+
+    # if dataLevel is missing, determine from file name
     if 'dataLevel' not in description:
         B2WARNING('The cdst/mdst info is not stored in file metadata')
-        return True
+        return ('cdst' in os.path.basename(fName))
 
     return (description['dataLevel'] == 'cdst')
 

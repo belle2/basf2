@@ -35,7 +35,7 @@ pu.plotter(
     name='dEdxForSimhits',
     title='dE/dx for SimHits',
     nbins=100,
-    xmin=1,
+    xmin=0,
     xmax=10,
     x_label='dE/dx (MeV/cm)',
     y_label='counts',

@@ -90,6 +90,38 @@ def set_FlavorTagger_pid_aliases():
     """
     This function adds the pid aliases needed by the flavor tagger.
     """
+    variables.variables.addAlias('eid_TOP', 'pidPairProbabilityExpert(11, 211, TOP)')
+    variables.variables.addAlias('eid_ARICH', 'pidPairProbabilityExpert(11, 211, ARICH)')
+    variables.variables.addAlias('eid_ECL', 'pidPairProbabilityExpert(11, 211, ECL)')
+
+    variables.variables.addAlias('muid_TOP', 'pidPairProbabilityExpert(13, 211, TOP)')
+    variables.variables.addAlias('muid_ARICH', 'pidPairProbabilityExpert(13, 211, ARICH)')
+    variables.variables.addAlias('muid_KLM', 'pidPairProbabilityExpert(13, 211, KLM)')
+
+    variables.variables.addAlias('piid_TOP', 'pidPairProbabilityExpert(211, 321, TOP)')
+    variables.variables.addAlias('piid_ARICH', 'pidPairProbabilityExpert(211, 321, ARICH)')
+
+    variables.variables.addAlias('Kid_TOP', 'pidPairProbabilityExpert(321, 211, TOP)')
+    variables.variables.addAlias('Kid_ARICH', 'pidPairProbabilityExpert(321, 211, ARICH)')
+
+    if getBelleOrBelle2() == "Belle":
+        variables.variables.addAlias('eid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, CDC, SVD), 0.5)')
+        variables.variables.addAlias('muid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(13, 211, CDC, SVD), 0.5)')
+        variables.variables.addAlias('piid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(211, 321, CDC, SVD), 0.5)')
+        variables.variables.addAlias('pi_vs_edEdxid', 'ifNANgiveX(pidPairProbabilityExpert(211, 11, CDC, SVD), 0.5)')
+        variables.variables.addAlias('Kid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(321, 211, CDC, SVD), 0.5)')
+    else:
+        variables.variables.addAlias('eid_dEdx', 'pidPairProbabilityExpert(11, 211, CDC)')
+        variables.variables.addAlias('muid_dEdx', 'pidPairProbabilityExpert(13, 211, CDC)')
+        variables.variables.addAlias('piid_dEdx', 'pidPairProbabilityExpert(211, 321, CDC)')
+        variables.variables.addAlias('pi_vs_edEdxid', 'pidPairProbabilityExpert(211, 11, CDC)')
+        variables.variables.addAlias('Kid_dEdx', 'pidPairProbabilityExpert(321, 211, CDC)')
+
+
+def set_FlavorTagger_pid_aliases_legacy():
+    """
+    This function adds the pid aliases needed by the flavor tagger trained for MC13.
+    """
     variables.variables.addAlias('eid_TOP', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, TOP), 0.5)')
     variables.variables.addAlias('eid_ARICH', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, ARICH), 0.5)')
     variables.variables.addAlias('eid_ECL', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, ECL), 0.5)')
@@ -944,7 +976,7 @@ def flavorTagger(
     mode='Expert',
     weightFiles='B2nunubarBGx1',
     workingDirectory='.',
-    combinerMethods=['TMVA-FBDT', 'FANN-MLP'],
+    combinerMethods=['TMVA-FBDT'],
     categories=[
         'Electron',
         'IntermediateElectron',
@@ -959,13 +991,13 @@ def flavorTagger(
         'FSC',
         'MaximumPstar',
         'KaonPion'],
-    maskName='all',
+    maskName='FTDefaultMask',
     saveCategoriesInfo=True,
     useOnlyLocalWeightFiles=False,
     downloadFromDatabaseIfNotFound=False,
     uploadToDatabaseAfterTraining=False,
     samplerFileId='',
-    prefix='',
+    prefix='MC15ri_light-2207-bengal_0',
     path=None,
 ):
     """
@@ -991,11 +1023,20 @@ def flavorTagger(
                                                :math:`B^0_{\\rm sig}\\to J/\\psi (\\to \\mu^+ \\mu^-) K_s (\\to \\pi^+ \\pi^-)`.
                                                BGx1 stays for events simulated with background.
       @param workingDirectory                  Path to the directory containing the FlavorTagging/ folder.
-      @param combinerMethods                   MVAs for the combiner: ``TMVA-FBDT`` or ``FANN-MLP``. Both used by default.
+      @param combinerMethods                   MVAs for the combiner: ``TMVA-FBDT` (default).
+                                               ``FANN-MLP`` is available only with ``prefix=''`` (MC13 weight files).
       @param categories                        Categories used for flavor tagging. By default all are used.
       @param maskName                          Gets ROE particles from a specified ROE mask.
-                                               ``all`` (default): all ROE particles are used.
-                                               ``_FTDefaultMask``: tentative mask definition that will be created automatically.
+                                               ``FTDefaultMask`` (default): tentative mask definition that will be created
+                                               automatically. The definition is as follows:
+
+                                               - Track (pion): thetaInCDCAcceptance and dr<1 and abs(dz)<3
+                                               - ECL-cluster (gamma): thetaInCDCAcceptance and clusterNHits>1.5 and \
+                                               [[clusterReg==1 and E>0.08] or [clusterReg==2 and E>0.03] or \
+                                               [clusterReg==3 and E>0.06]] \
+                                               (Same as gamma:pi0eff30_May2020 and gamma:pi0eff40_May2020)
+
+                                               ``all``: all ROE particles are used.
                                                Or one can give any mask name defined before calling this function.
       @param saveCategoriesInfo                Sets to save information of individual categories.
       @param useOnlyLocalWeightFiles           [Expert] Uses only locally saved weight files.
@@ -1007,9 +1048,14 @@ def flavorTagger(
                                                want to parallelize the sampling, you can run several sampling scripts in
                                                parallel. By changing this parameter you will not overwrite an older sample.
       @param prefix                            Prefix of weight files.
+                                               ``MC15ri_light-2207-bengal_0`` (default): Weight files trained for MC15ri samples.
+                                               ``''``: Weight files trained for MC13 samples.
       @param path                              Modules are added to this path
 
     """
+
+    if (not isinstance(particleLists, list)):
+        particleLists = [particleLists]  # in case user inputs a particle list as string
 
     if mode != 'Sampler' and mode != 'Teacher' and mode != 'Expert':
         B2FATAL('flavorTagger: Wrong mode given: The available modes are "Sampler", "Teacher" or "Expert"')
@@ -1079,9 +1125,15 @@ def flavorTagger(
     B2INFO(' ')
 
     setInteractionWithDatabase(downloadFromDatabaseIfNotFound, uploadToDatabaseAfterTraining)
-    set_FlavorTagger_pid_aliases()
+
+    if prefix == '':
+        set_FlavorTagger_pid_aliases_legacy()
+    else:
+        set_FlavorTagger_pid_aliases()
+
     setInputVariablesWithMask()
-    weightFiles = prefix + weightFiles
+    if prefix != '':
+        weightFiles = prefix + '_' + weightFiles
 
     # Create configuration lists and code-name for given category's list
     trackLevelParticleLists = []
@@ -1109,14 +1161,14 @@ def flavorTagger(
         categoriesCombinationCode = categoriesCombinationCode + '%02d' % code
 
     # Create default ROE-mask
-    if maskName == '_FTDefaultMask':
-        _FTDefaultMask = (
-            '_FTDefaultMask',
+    if maskName == 'FTDefaultMask':
+        FTDefaultMask = (
+            'FTDefaultMask',
             'thetaInCDCAcceptance and dr<1 and abs(dz)<3',
             'thetaInCDCAcceptance and clusterNHits>1.5 and [[E>0.08 and clusterReg==1] or [E>0.03 and clusterReg==2] or \
                             [E>0.06 and clusterReg==3]]')
         for name in particleLists:
-            ma.appendROEMasks(list_name=name, mask_tuples=[_FTDefaultMask], path=path)
+            ma.appendROEMasks(list_name=name, mask_tuples=[FTDefaultMask], path=path)
 
     # Start ROE-routine
     roe_path = basf2.create_path()

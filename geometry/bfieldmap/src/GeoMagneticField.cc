@@ -82,7 +82,7 @@ void GeoMagneticField::addConstantBField(const GearDir& component, MagneticField
   double RmaxValue = component.getLength("MaxR"); // stored in cm
   double ZminValue = component.getLength("MinZ"); // stored in cm
   double ZmaxValue = component.getLength("MaxZ"); // stored in cm
-  auto field = new MagneticFieldComponentConstant(B2Vector3D(xValue, yValue, zValue),
+  auto field = new MagneticFieldComponentConstant(ROOT::Math::XYZVector(xValue, yValue, zValue),
                                                   RminValue, RmaxValue, ZminValue, ZmaxValue);
   fieldmap.addComponent(field);
 }
@@ -105,7 +105,7 @@ void GeoMagneticField::add3dBField(const GearDir& component, MagneticField& fiel
     return;
   }
 
-  std::vector<B2Vector3F> bmap;
+  std::vector<ROOT::Math::XYZVector> bmap;
   bmap.reserve(mapSizeR * mapSizeZ * mapSizePhi);
   // Load B-field map file
   iostreams::filtering_istream fieldMapFile;

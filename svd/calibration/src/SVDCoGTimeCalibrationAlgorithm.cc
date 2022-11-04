@@ -98,6 +98,15 @@ CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
             gSystem->Unlink(Form("algorithm_6SampleCoG_output_rev_%d.root", cal_rev));
             return c_NotEnoughData;
           }
+          if (layer_num != 3 && hEventT0vsCoG->GetEntries() < m_minEntries / 10) {
+            B2INFO("Histogram: " << hEventT0vsCoG->GetName() <<
+                   " Entries (n. clusters): " << hEventT0vsCoG->GetEntries() <<
+                   " Entries required: " << m_minEntries / 10);
+            B2WARNING("Not enough data, adding one run to the collector");
+            f->Close();
+            gSystem->Unlink(Form("algorithm_6SampleCoG_output_rev_%d.root", cal_rev));
+            return c_NotEnoughData;
+          }
           for (int i = 1; i <= hEventT0vsCoG->GetNbinsX(); i++) {
             for (int j = 1; j <= hEventT0vsCoG->GetNbinsY(); j++) {
               if (hEventT0vsCoG->GetBinContent(i, j) < max(2, int(hEventT0vsCoG->GetEntries() * 0.001))) {
@@ -131,7 +140,7 @@ CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
           hEventT0nosync->Write();
           pfx->Write();
 
-          if (!tfr) {
+          if (tfr.Get() == nullptr || (tfr->Status() != 0 && tfr->Status() != 4 && tfr->Status() != 4000)) {
             f->Close();
             B2FATAL("Fit to the histogram failed in SVDCoGTimeCalibrationAlgorithm. "
                     << "Check the 2-D histogram to clarify the reason.");

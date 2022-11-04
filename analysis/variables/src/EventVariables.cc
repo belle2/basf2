@@ -313,7 +313,7 @@ namespace Belle2 {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getMissingMomentum().x();
+      double missing = evtShape->getMissingMomentum().X();
       return missing;
     }
 
@@ -324,7 +324,7 @@ namespace Belle2 {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getMissingMomentum().y();
+      double missing = evtShape->getMissingMomentum().Y();
       return missing;
     }
 
@@ -335,7 +335,7 @@ namespace Belle2 {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getMissingMomentum().z();
+      double missing = evtShape->getMissingMomentum().Z();
       return missing;
     }
 
@@ -379,7 +379,7 @@ namespace Belle2 {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getMissingMomentumCMS().x();
+      double missing = evtShape->getMissingMomentumCMS().X();
       return missing;
     }
 
@@ -390,7 +390,7 @@ namespace Belle2 {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getMissingMomentumCMS().y();
+      double missing = evtShape->getMissingMomentumCMS().Y();
       return missing;
     }
 
@@ -401,7 +401,7 @@ namespace Belle2 {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getMissingMomentumCMS().z();
+      double missing = evtShape->getMissingMomentumCMS().Z();
       return missing;
     }
 
@@ -894,7 +894,7 @@ Returns NaN for data.
                       "[Eventbased] Time since the previous trigger (127MHz=RF/4 clock).","clock ticks");
 
     REGISTER_VARIABLE("timeSincePrevTriggerMicroSeconds", timeSincePrevTriggerMicroSeconds,
-                      "[Eventbased] Time since the previous trigger.","ms");
+                      "[Eventbased] Time since the previous trigger.",":math:`\\mathrm{\\mu s}`");
 
     REGISTER_VARIABLE("triggeredBunchNumberTTD", triggeredBunchNumberTTD, R"DOC(
 [Eventbased] Number of triggered bunch ranging from 0-1279.
@@ -922,13 +922,13 @@ Returns NaN for data.
 [Eventbased] Time since the last injection pre-kick signal
 
 .. warning:: this returns the time without the delay until the injected bunch reaches the detector (which differs for HER/LER)
-)DOC","ms");
+)DOC",":math:`\\mathrm{\\mu s}`");
 
     REGISTER_VARIABLE("timeSinceLastInjectionClockTicks", timeSinceLastInjectionClockTicks,
-      "[Eventbased] Time since the last injected bunch passed by the detector.","ms")
+      "[Eventbased] Time since the last injected bunch passed by the detector.","clock ticks")
 
     REGISTER_VARIABLE("timeSinceLastInjectionMicroSeconds", timeSinceLastInjectionMicroSeconds,
-      "[Eventbased] Time since the last injected bunch passed by the detector.","ms")
+      "[Eventbased] Time since the last injected bunch passed by the detector.",":math:`\\mathrm{\\mu s}`")
 
     REGISTER_VARIABLE("injectionInHER", injectionInHER,
                   "[Eventbased] Returns 1 if injection was in HER, 0 otherwise.");

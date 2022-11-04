@@ -121,7 +121,7 @@ void ECLClusterPropertiesModule::computeDepth(const ECLShower& shower, double& l
   for (const auto& track : cluster->getRelationsFrom<Track>("", m_trackClusterRelationName)) {
     const TrackFitResult* fit = track.getTrackFitResultWithClosestMass(Const::pion);
     double cp = 0;
-    if (fit != 0) cp = fit->getMomentum().Mag();
+    if (fit != 0) cp = fit->getMomentum().R();
     if (cp > p) {
       selectedTrk = &track;
       p = cp;

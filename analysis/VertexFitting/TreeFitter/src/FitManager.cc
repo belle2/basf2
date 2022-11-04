@@ -273,11 +273,11 @@ namespace TreeFitter {
       p.SetPz(m_fitparams->getStateVector()(momindex + 2));
       if (pb.hasEnergy()) {
         p.SetE(m_fitparams->getStateVector()(momindex + 3));
-        cand.set4Vector(p);
+        cand.set4VectorDividingByMomentumScaling(p);
       } else {
         const double mass = cand.getPDGMass();
         p.SetE(std::sqrt(p.P2() + mass * mass));
-        cand.set4Vector(p);
+        cand.set4VectorDividingByMomentumScaling(p);
       }
       TMatrixFSym cov7b2(7);
       getCovFromPB(&pb, cov7b2);
@@ -298,7 +298,8 @@ namespace TreeFitter {
   {
     const bool updateableMother = updateCand(cand, isTreeHead);
 
-    if (updateableMother and not cand.hasExtraInfo("bremsCorrected")) {
+    if (updateableMother and not cand.hasExtraInfo("bremsCorrected") and
+        not(cand.hasExtraInfo("treeFitterTreatMeAsInvisible") and cand.getExtraInfo("treeFitterTreatMeAsInvisible") == 1)) {
       const int ndaughters = cand.getNDaughters();
       for (int i = 0; i < ndaughters; i++) {
         auto* daughter = const_cast<Belle2::Particle*>(cand.getDaughter(i));

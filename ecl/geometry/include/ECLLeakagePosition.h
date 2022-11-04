@@ -39,24 +39,24 @@ namespace Belle2 {
 
       /** Required geometry payloads */
       DBObjPtr<ECLCrystalCalib> m_ECLCrystalThetaEdge; /**< lower edges of crystals, theta */
-      std::vector<float> thetaEdge; /**< lower theta edges from DB object */
+      std::vector<float> m_thetaEdge; /**< lower theta edges from DB object */
 
       DBObjPtr<ECLCrystalCalib> m_ECLCrystalPhiEdge; /**< lower edges of crystals, phi */
-      std::vector<float> phiEdge; /**< lower phi edges from DB object */
+      std::vector<float> m_phiEdge; /**< lower phi edges from DB object */
 
       DBObjPtr<ECLCrystalCalib> m_ECLCrystalThetaWidth; /**< width in theta */
-      std::vector<float> thetaWidth; /**< crystal theta widths from DB object */
+      std::vector<float> m_thetaWidth; /**< crystal theta widths from DB object */
 
       DBObjPtr<ECLCrystalCalib> m_ECLCrystalPhiWidth; /**< width in phi */
-      std::vector<float> phiWidth; /**< crystal phi widths from DB object */
+      std::vector<float> m_phiWidth; /**< crystal phi widths from DB object */
 
-      ECL::ECLNeighbours* neighbours{nullptr}; /**< 8 nearest neighbours to crystal */
+      ECL::ECLNeighbours* m_neighbours{nullptr}; /**< 8 nearest neighbours to crystal */
 
-      std::vector<int> thetaIDofCrysID; /**< thetaID of each crystal ID */
-      std::vector<int> phiIDofCrysID; /**< phiID of each crystal ID */
-      std::vector<int> crysBetweenMech; /**< crystals between phi mechanical structure per thetaID*/
-      const int firstBarrelThetaID = 13; /**< first barrel thetaID */
-      const int lastBarrelThetaID = 58; /**< last barrel thetaID */
+      std::vector<int> m_thetaIDofCrysID; /**< thetaID of each crystal ID */
+      std::vector<int> m_phiIDofCrysID; /**< phiID of each crystal ID */
+      std::vector<int> m_crysBetweenMech; /**< crystals between phi mechanical structure per thetaID*/
+      const int m_firstBarrelThetaID = 13; /**< first barrel thetaID */
+      const int m_lastBarrelThetaID = 58; /**< last barrel thetaID */
 
     };
 

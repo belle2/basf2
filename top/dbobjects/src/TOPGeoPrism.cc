@@ -14,11 +14,12 @@
 #include <algorithm>
 
 using namespace std;
+using namespace ROOT::Math;
 
 namespace Belle2 {
 
-  TOPGeoPrism::UnfoldedWindow::UnfoldedWindow(const TVector2& orig, const TVector2& dir,
-                                              const TVector2& norm, const TVector2& slanted):
+  TOPGeoPrism::UnfoldedWindow::UnfoldedWindow(const XYVector& orig, const XYVector& dir,
+                                              const XYVector& norm, const XYVector& slanted):
     y0(orig.X()), z0(orig.Y()), sy(dir.X()), sz(dir.Y()), ny(norm.X()), nz(norm.Y())
   {
     nsy[0] = sy;
@@ -126,14 +127,14 @@ namespace Belle2 {
     double z = -(m_length - m_flatLength);
     double yUp = m_thickness / 2;
     double yDown = yUp - m_exitThickness;
-    TVector2 points[2] = {TVector2(yUp, z), TVector2(yDown, z)}; // points on upper and slanted surfaces
+    XYVector points[2] = {XYVector(yUp, z), XYVector(yDown, z)}; // points on upper and slanted surfaces
 
     double alpha = getAngle();
-    TVector2 normals[2] = {TVector2(1, 0), TVector2(-cos(alpha), sin(alpha))}; // normals of upper and slanted surfaces
+    XYVector normals[2] = {XYVector(1, 0), XYVector(-cos(alpha), sin(alpha))}; // normals of upper and slanted surfaces
 
-    TVector2 orig(0, z); // window origin
-    TVector2 surf(1, 0); // window surface direction (= upper surface normal)
-    TVector2 norm(0, -1); // window normal
+    XYVector orig(0, z); // window origin
+    XYVector surf(1, 0); // window surface direction (= upper surface normal)
+    XYVector norm(0, -1); // window normal
     auto slanted = normals[1]; // slanted surface normal
 
     reflect(points, normals, orig, surf, norm, slanted, 1, m_unfoldedWindows); // unfolding down
@@ -144,31 +145,31 @@ namespace Belle2 {
   }
 
 
-  void TOPGeoPrism::reflect(const TVector2* points, const TVector2* normals,
-                            const TVector2& orig, const TVector2& surf, const TVector2& norm,
-                            const TVector2& slanted, int k,
+  void TOPGeoPrism::reflect(const XYVector* points, const XYVector* normals,
+                            const XYVector& orig, const XYVector& surf, const XYVector& norm,
+                            const XYVector& slanted, int k,
                             std::vector<UnfoldedWindow>& result) const
   {
-    TVector2 rp[2] = {points[0], points[1]};
-    TVector2 n[2] = {normals[0], normals[1]};
+    XYVector rp[2] = {points[0], points[1]};
+    XYVector n[2] = {normals[0], normals[1]};
     auto r = orig;
     auto s = surf;
     auto q = norm;
     auto sl = slanted;
 
     while (rp[k].Y() < 0) {
-      r -= 2 * ((r - rp[k]) * n[k]) * n[k]; // reflect window origin
-      s -= 2 * (s * n[k]) * n[k];           // reflect window surface direction
-      q -= 2 * (q * n[k]) * n[k];           // reflect window normal
-      sl -= 2 * (sl * n[k]) * n[k];         // reflect slanted normal
+      r -= 2 * ((r - rp[k]).Dot(n[k])) * n[k]; // reflect window origin
+      s -= 2 * s.Dot(n[k]) * n[k];           // reflect window surface direction
+      q -= 2 * q.Dot(n[k]) * n[k];           // reflect window normal
+      sl -= 2 * sl.Dot(n[k]) * n[k];         // reflect slanted normal
       result.push_back(UnfoldedWindow(r, s, q, sl));
       if (result.size() > 100) {
         B2ERROR("TOPGeoPrism::reflect: too many reflections -> must be a bug");
         return;
       }
       int i = (k + 1) % 2; // index of opposite surface
-      rp[i] -= 2 * ((rp[i] - rp[k]) * n[k]) * n[k]; // reflect point on the opposite surface
-      n[i] -= 2 * (n[i] * n[k]) * n[k];             // reflect normal of opposite surface
+      rp[i] -= 2 * (rp[i] - rp[k]).Dot(n[k]) * n[k]; // reflect point on the opposite surface
+      n[i] -= 2 * n[i].Dot(n[k]) * n[k];             // reflect normal of opposite surface
       k = i; // toggle the reflection surface
     }
   }

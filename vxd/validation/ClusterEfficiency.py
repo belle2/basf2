@@ -164,14 +164,14 @@ class ClusterEfficiency(b2.Module):
             p = mcp.getMomentum()
             p_gen = None
             for i in momenta:
-                if abs(p.Mag() - i) < 0.05:
+                if abs(p.R() - i) < 0.05:
                     p_gen = i
                     break
 
             # meh, something strange with the momentum, ignore this one
             if p_gen is None:
                 b2.B2WARNING("Strange particle momentum: %f, expected one of %s" %
-                             (p.Mag(), ", ".join(str() for p in momenta)))
+                             (p.R(), ", ".join(str() for p in momenta)))
                 continue
 
             # and check all truehits

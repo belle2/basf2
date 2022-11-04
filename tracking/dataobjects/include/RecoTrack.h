@@ -496,6 +496,60 @@ namespace Belle2 {
     /// Return the time seed stored in the reco track. ATTENTION: This is not the fitted time.
     double getTimeSeed() const { return m_genfitTrack.getTimeSeed(); }
 
+    /// Return the track time of the outgoing arm
+    float getOutgoingArmTime()
+    {
+      if (!m_isArmTimeComputed) estimateArmTime();
+      return m_outgoingArmTime;
+    }
+
+    /// Return the error of the track time of the outgoing arm
+    float getOutgoingArmTimeError()
+    {
+      if (!m_isArmTimeComputed) estimateArmTime();
+      return m_outgoingArmTimeError;
+    }
+
+    /// Return the track time of the ingoing arm
+    float getIngoingArmTime()
+    {
+      if (!m_isArmTimeComputed) estimateArmTime();
+      return m_ingoingArmTime;
+    }
+
+    /// Return the error of the track time of the ingoing arm
+    float getIngoingArmTimeError()
+    {
+      if (!m_isArmTimeComputed) estimateArmTime();
+      return m_ingoingArmTimeError;
+    }
+
+    /// Return the difference between the track times of the ingoing and outgoing arms
+    float getInOutArmTimeDifference()
+    {
+      if (!m_isArmTimeComputed) estimateArmTime();
+      return m_inOutArmTimeDiff;
+    }
+
+    /// Return the error of the difference between the track times of the ingoing and outgoing arms
+    float getInOutArmTimeDifferenceError()
+    {
+      if (!m_isArmTimeComputed) estimateArmTime();
+      return m_inOutArmTimeDiffError;
+    }
+
+    /// Check if the ingoing arm time is set
+    bool hasIngoingArmTime()
+    {
+      return m_hasIngoingArmTime;
+    }
+
+    /// Check if the outgoing arm time is set
+    bool hasOutgoingArmTime()
+    {
+      return m_hasOutgoingArmTime;
+    }
+
     /// Return the position, the momentum and the charge of the first measured state on plane or - if unfitted - the seeds.
     std::tuple<TVector3, TVector3, short> extractTrackState() const;
 
@@ -599,6 +653,23 @@ namespace Belle2 {
       * Also, set the flags of the corresponding RecoHitInformation to pruned. Only to be used in the prune module.
       */
     void prune();
+
+    /**
+     * This function calculates the track time of the ingoing and outgoing arms and their difference.
+     * If they do not exists they are set to NAN by default
+     */
+    void estimateArmTime();
+
+    /**
+     * This function returns true if the arm direction is Outgoing
+     * and false if the arm direction is Ingoing.
+     * The detector sequences considered are:
+     * outgoing arm: PXD-SVD-CDC, PXD-SVD, SVD-CDC;
+     * ingoing arm: CDC-SVD-PXD, CDC-SVD, SVD-PXD;
+     * pre and post are defined w.r.t SVD, so they can be PXD, CDC or undefined if one of the two is missing
+     */
+    bool isOutgoingArm(RecoHitInformation::RecoHitDetector pre = RecoHitInformation::RecoHitDetector::c_undefinedTrackingDetector,
+                       RecoHitInformation::RecoHitDetector post = RecoHitInformation::RecoHitDetector::c_undefinedTrackingDetector);
 
     /// Return a list of measurements and track points, which can be used e.g. to extrapolate. You are not allowed to modify or delete them!
     const std::vector<genfit::TrackPoint*>& getHitPointsWithMeasurement() const
@@ -806,6 +877,24 @@ namespace Belle2 {
     float m_flipqualityIndicator = NAN;
     /// Quality index for flipping.
     float m_2ndFlipqualityIndicator = NAN;
+    /// Track time of the outgoing arm
+    float m_outgoingArmTime = NAN;
+    /// Error of the track time of the outgoing arm
+    float m_outgoingArmTimeError = NAN;
+    /// Track time of the ingoing arm
+    float m_ingoingArmTime = NAN;
+    /// Error of the track time of the ingoing arm
+    float m_ingoingArmTimeError = NAN;
+    /// Difference of the track times of the ingoing and outgoing arms
+    float m_inOutArmTimeDiff = NAN;
+    /// Error of the difference of the track times of the ingoing and outgoing arms
+    float m_inOutArmTimeDiffError = NAN;
+    /// true if the arms times are already computed, false otherwise
+    bool m_isArmTimeComputed = false;
+    /// Internal storage of the final ingoing arm time is set
+    bool m_hasIngoingArmTime = false;
+    /// Internal storage of the final outgoing arm time is set
+    bool m_hasOutgoingArmTime = false;
 
     /**
      * Add a generic hit with the given parameters for the reco hit information.
@@ -829,7 +918,7 @@ namespace Belle2 {
     }
 
     /**
-     * Add the needed relations for adding a generic hit with the given hit information.
+     * Add the needed relations for adding a generic hit with the given hit information and reset track time information.
      * @param hit The hit to add
      * @param recoHitInformation The reco hit information of the hit.
      */
@@ -838,6 +927,16 @@ namespace Belle2 {
     {
       hit->addRelationTo(this);
       addRelationTo(recoHitInformation);
+
+      m_isArmTimeComputed = false;
+      m_hasIngoingArmTime = false;
+      m_hasOutgoingArmTime = false;
+      m_outgoingArmTime = NAN;
+      m_ingoingArmTime = NAN;
+      m_inOutArmTimeDiff = NAN;
+      m_outgoingArmTimeError = NAN;
+      m_ingoingArmTimeError = NAN;
+      m_inOutArmTimeDiffError = NAN;
 
       setDirtyFlag();
     }
@@ -923,7 +1022,7 @@ namespace Belle2 {
     }
 
     /** Making this class a ROOT class.*/
-    ClassDefOverride(RecoTrack, 11);
+    ClassDefOverride(RecoTrack, 12);
   };
 
   /**

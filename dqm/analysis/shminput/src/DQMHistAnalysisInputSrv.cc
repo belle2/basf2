@@ -50,10 +50,13 @@ void DQMHistAnalysisInputSrvModule::initialize()
 void DQMHistAnalysisInputSrvModule::beginRun()
 {
   B2DEBUG(20, "DQMHistAnalysisInputSrv: beginRun called.");
+  clearHistList();
 }
 
 void DQMHistAnalysisInputSrvModule::event()
 {
+  initHistListBeforeEvent();
+
   std::vector<TH1*> h;
   TMemFile* file = m_memory->LoadMemFile();
   file->cd();
@@ -62,7 +65,6 @@ void DQMHistAnalysisInputSrvModule::event()
   while ((key = (TKey*)next())) {
     h.push_back((TH1*)key->ReadObj());
   }
-  resetHist();
   for (size_t i = 0; i < h.size(); i++) {
     addHist("", h[i]->GetName(), h[i]);
     B2DEBUG(2, "Found : " << h[i]->GetName() << " : " << h[i]->GetEntries());

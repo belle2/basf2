@@ -111,6 +111,7 @@ def add_prefilter_track_fit_and_track_creator(path, trackFitHypotheses=None,
         "Combined_DAFRecoFitter")
     # Add MVA classifier that uses information not included in the calculation of the fit p-value
     # to add a track quality indicator for classification of fake vs. MC-matched tracks
+
     if add_mva_quality_indicator:
         path.add_module("TrackQualityEstimatorMVA", collectEventFeatures=True)
     # create Belle2 Tracks from the genfit Tracks
@@ -126,12 +127,12 @@ def add_prefilter_track_fit_and_track_creator(path, trackFitHypotheses=None,
 
 def add_postfilter_track_fit(path, components=None, pruneTracks=False, reco_tracks="RecoTracks"):
     """
-    Helper function to add the modules not requred to calcualte HLT filter decision: performing
+    Helper function to add the modules not required to calcualte HLT filter decision: performing
     the V0 fit to the path.
 
     :param path: The path to add the tracking reconstruction modules to
     :param components: the list of geometry components in use or None for all components.
-    :param pruneTracks: Delete all hits expect the first and the last from the found tracks.
+    :param pruneTracks: Delete all hits except the first and the last from the found tracks.
     :param reco_tracks: Name of the StoreArray where the reco tracks should be stored
     """
 

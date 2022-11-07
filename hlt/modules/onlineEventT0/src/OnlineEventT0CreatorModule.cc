@@ -64,6 +64,15 @@ void OnlineEventT0CreatorModule::event()
     EventT0::EventT0Component c2) {return c1.quality < c2.quality;});
     m_onlineEventT0.appendNew(eclBestT0->eventT0, eclBestT0->eventT0Uncertainty, Const::EDetector::ECL);
   }
+  // check if a SVD hypothesis exists
+  auto svdHypos = m_eventT0->getTemporaryEventT0s(Const::EDetector::SVD);
+  if (svdHypos.size() == 0) {
+    B2DEBUG(20, "No SVD EventT0 available");
+  } else {
+    // get the most accurate SVD evenT0 (latest)
+    const auto& svdBestT0 = svdHypos.back();
+    m_onlineEventT0.appendNew(svdBestT0.eventT0, svdBestT0.eventT0Uncertainty, Const::EDetector::SVD);
+  }
   // check if a CDC hypothesis exists
   auto cdcHypos = m_eventT0->getTemporaryEventT0s(Const::EDetector::CDC);
   if (cdcHypos.size() == 0) {

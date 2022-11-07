@@ -19,29 +19,46 @@ class Saving2ndMVAData(harvesting.HarvestingModule):
     """ A dedicated module to save the variables using in flipping steps"""
 
     def __init__(self, name, contact=None, preInfo="", checkObj='RecoTracks', output_file_name='output.root'):
+        """Constructor"""
         super().__init__(foreach=checkObj, name=name, contact=contact, output_file_name=output_file_name)
+
+        #: Name of the Obj to be picked
         self.checkObj = checkObj
+
+        #: Name of  the StoreArray of the mc tracks
         self.mcRecoTracks = "MCRecoTracks"
+
+        #: Reference to the track match lookup object reading the relation information
         self.track_match_look_up = None
+
+        #: preInfo (maybe not needed?)
         self.preInfo = preInfo
+
+        #: Name of the output file
         self.outputname = output_file_name
 
     def initialize(self):
+        """Initialization at the start of the event processing"""
         super().initialize()
         self.track_match_look_up = Belle2.TrackMatchLookUp(self.mcRecoTracks, self.checkObj)
         output_tfile = ROOT.TFile(self.outputname, "RECREATE")
         self.outputname = output_tfile
 
     def prepare(self):
+        """preparation at the start of each event.
+           make sure the checkObj exist
+        """
+        super().prepare()
         checkDatas = Belle2.PyStoreArray(self.checkObj)
         if (not checkDatas):
             return False
-        super().prepare()
 
     def pick(self, recoTrack):
+        """pick every recoTrack"""
         return True
 
     def peel(self, recoTrack):
+        """store the information for each recoTrack"""
         track_match_look_up = self.track_match_look_up
         nan = float('nan')
         flipped_pz_estimate = nan
@@ -81,10 +98,21 @@ class Saving2ndMVAData(harvesting.HarvestingModule):
         flipped_x_estimate = nan
         quality_flip_indicator = nan
         isPrimary_misID = False
+        inGoingArmTime = nan
+        inGoingArmTimeError = nan
+        outGoingArmTime = nan
+        outGoingArmTimeError = nan
+        timeDiffInAndOutArms = nan
 
         if (recoTrack):
             mc_particle = track_match_look_up.getRelatedMCParticle(recoTrack)
             fit_result = track_match_look_up.getRelatedTrackFitResult(recoTrack)
+
+            inGoingArmTime = recoTrack.getIngoingArmTime()
+            inGoingArmTimeError = recoTrack.getIngoingArmTimeError()
+            outGoingArmTime = recoTrack.getOutgoingArmTime()
+            outGoingArmTimeError = recoTrack.getOutgoingArmTimeError()
+            timeDiffInAndOutArms = recoTrack.getInOutArmTimeDifference()
 
             if mc_particle and fit_result:
                 is_primary = bool(mc_particle.hasStatus(Belle2.MCParticle.c_PrimaryParticle))
@@ -104,7 +132,7 @@ class Saving2ndMVAData(harvesting.HarvestingModule):
                         mom = fit_result.getMomentum()
                         pos = fit_result.getPosition()
 
-                        pt_estimate = mom.Perp()
+                        pt_estimate = mom.Rho()
                         pt_variance = np.divide(mom.X() ** 2 * cov6(3, 3) + mom.Y() ** 2 * cov6(4, 4) -
                                                 2 * mom.X() * mom.Y() * cov6(3, 4), mom.Perp2())
                         pt_resolution = np.divide(pt_variance, pt_estimate)
@@ -193,8 +221,13 @@ class Saving2ndMVAData(harvesting.HarvestingModule):
             flipped_x_estimate=flipped_x_estimate,
             quality_flip_indicator=quality_flip_indicator,
             isPrimary_misID=isPrimary_misID,
+            inGoingArmTime=inGoingArmTime,
+            inGoingArmTimeError=inGoingArmTimeError,
+            outGoingArmTime=outGoingArmTime,
+            outGoingArmTimeError=outGoingArmTimeError,
+            timeDiffInAndOutArms=timeDiffInAndOutArms,
             )
         return crops
 
-    # def terminate(self):
+    #: save a tree of all the collected variables
     save_tree = refiners.save_tree(name="data")

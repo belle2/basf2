@@ -18,8 +18,8 @@ import tracking as trk
 from tracking.harvesting_validation.FlippingMVA.savingFlippingVariables import Saving1stMVAData
 from tracking.harvesting_validation.FlippingMVA.savingFlippingVariablesFor2ndMVA import Saving2ndMVAData
 
+from background import get_background_files
 import argparse
-import glob
 
 """
 generating BBbar MC samples for training and testing the track-flipping MVAs
@@ -84,10 +84,10 @@ if __name__ == "__main__":
             b2c.prepend_globaltag(gt)
 
     # add (or not) the beam background
-    bkgFiles = glob.glob('/sw/belle2/bkg/*.root')
+    bkgFiles = get_background_files()
 
     if args.exp == 1003:
-        bkgFiles = glob.glob('/group/belle2/dataprod/BGOverlay/early_phase3/release-05-01-15/overlay/phase31/BGx1/set0/*root')
+        bkgFiles = get_background_files()
 
     if args.no_bkg:
         bkgFiles = None

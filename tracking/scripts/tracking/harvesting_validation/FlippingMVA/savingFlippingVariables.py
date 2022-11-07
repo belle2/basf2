@@ -20,29 +20,46 @@ class Saving1stMVAData(harvesting.HarvestingModule):
     """ A dedicated module to save the variables using in flipping steps"""
 
     def __init__(self, name, contact=None, preInfo="", checkObj='RecoTracks', output_file_name='output.root'):
+        """Constructor"""
         super().__init__(foreach=checkObj, name=name, contact=contact, output_file_name=output_file_name)
+
+        #: Name of the Obj to be picked
         self.checkObj = checkObj
+
+        #: Name of  the StoreArray of the mc tracks
         self.mcRecoTracks = "MCRecoTracks"
+
+        #: Reference to the track match lookup object reading the relation information
         self.track_match_look_up = None
+
+        #: preInfo (maybe not needed?)
         self.preInfo = preInfo
+
+        #: Name of the output file
         self.outputname = output_file_name
 
     def initialize(self):
+        """Initialization at the start of the event processing"""
         super().initialize()
         self.track_match_look_up = Belle2.TrackMatchLookUp(self.mcRecoTracks, self.checkObj)
         output_tfile = ROOT.TFile(self.outputname, "RECREATE")
         self.outputname = output_tfile
 
     def prepare(self):
+        """preparation at the start of each event.
+           make sure the checkObj exist
+        """
         super().prepare()
         checkDatas = Belle2.PyStoreArray(self.checkObj)
         if (not checkDatas):
             return False
 
     def pick(self, recoTrack):
+        """pick every recoTrack"""
         return True
 
     def peel(self, recoTrack):
+        """store the information for each recoTrack"""
         track_match_look_up = self.track_match_look_up
         nan = float('nan')
         d0_variance = nan
@@ -78,11 +95,22 @@ class Saving1stMVAData(harvesting.HarvestingModule):
         last_cdc_layer = nan
         ndf_hits = nan
         isPrimary_misID = False
+        inGoingArmTime = nan
+        inGoingArmTimeError = nan
+        outGoingArmTime = nan
+        outGoingArmTimeError = nan
+        timeDiffInAndOutArms = nan
 
         if (recoTrack):
 
             mc_particle = track_match_look_up.getRelatedMCParticle(recoTrack)
             fit_result = track_match_look_up.getRelatedTrackFitResult(recoTrack)
+
+            inGoingArmTime = recoTrack.getIngoingArmTime()
+            inGoingArmTimeError = recoTrack.getIngoingArmTimeError()
+            outGoingArmTime = recoTrack.getOutgoingArmTime()
+            outGoingArmTimeError = recoTrack.getOutgoingArmTimeError()
+            timeDiffInAndOutArms = recoTrack.getInOutArmTimeDifference()
 
             if mc_particle and fit_result:
                 is_primary = bool(mc_particle.hasStatus(Belle2.MCParticle.c_PrimaryParticle))
@@ -121,7 +149,7 @@ class Saving1stMVAData(harvesting.HarvestingModule):
                 seed_x_estimate = seed_pos.X()
                 seed_y_estimate = seed_pos.Y()
 
-                seed_pt_estimate = seed_mom.Perp()
+                seed_pt_estimate = seed_mom.Rho()
                 seed_py_variance = seed_cov6(4, 4)
                 seed_d0_estimate = seed_fit_result.getD0()
                 seed_omega_variance = seed_fit_result.getCov()[9]
@@ -146,6 +174,7 @@ class Saving1stMVAData(harvesting.HarvestingModule):
 
                 n_hits = n_pxd_hits + n_svd_hits + n_cdc_hits
                 ndf_hits = 2 * n_pxd_hits + n_svd_hits + n_cdc_hits
+
         crops = dict(
             d0_variance=d0_variance,
             seed_pz_estimate=seed_pz_estimate,
@@ -180,8 +209,13 @@ class Saving1stMVAData(harvesting.HarvestingModule):
             last_cdc_layer=last_cdc_layer,
             ndf_hits=ndf_hits,
             isPrimary_misID=isPrimary_misID,
+            inGoingArmTime=inGoingArmTime,
+            inGoingArmTimeError=inGoingArmTimeError,
+            outGoingArmTime=outGoingArmTime,
+            outGoingArmTimeError=outGoingArmTimeError,
+            timeDiffInAndOutArms=timeDiffInAndOutArms,
             )
         return crops
 
-    # def terminate(self):
+    #: save a tree of all the collected variables
     save_tree = refiners.save_tree(name="data")

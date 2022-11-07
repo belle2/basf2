@@ -78,46 +78,51 @@ void SVDEventT0EstimatorModule::event()
 
     // selection on recoTracks
     if (p.Perp() < m_ptSelection || std::fabs(p.Z()) < m_absPzSelection) continue;
+
     // use outgoing/ingoing arm time to compute SVD EventT0
     // if both outgoing and ingoing are estimated we take the smaller
     // else if only outgoing or only ingoing is computed we use the only one available
     // the probability that the ingoing arm is an outgoing arm wrongly classified is higher than the probability that it is a real ingoing arm
-    if (recoTrack.hasOutgoingArmTime() && recoTrack.hasIngoingArmTime()) {
-      outgoingArmTime = recoTrack.getOutgoingArmTime();
-      ingoingArmTime = recoTrack.getIngoingArmTime();
-      outgoingArmTimeError = recoTrack.getOutgoingArmTimeError();
-      ingoingArmTimeError = recoTrack.getIngoingArmTimeError();
+    outgoingArmTime = recoTrack.getOutgoingArmTime();
+    ingoingArmTime = recoTrack.getIngoingArmTime();
+    outgoingArmTimeError = recoTrack.getOutgoingArmTimeError();
+    ingoingArmTimeError = recoTrack.getIngoingArmTimeError();
+    bool hasOutgoingArm = recoTrack.hasOutgoingArmTime();
+    bool hasIngoingArm = recoTrack.hasIngoingArmTime();
+
+    // check if it has both ingoing and outgoing arms
+    if (hasOutgoingArm && hasIngoingArm) {
+      // consider the smallest arm time
       if (outgoingArmTime <= ingoingArmTime) {
-        armTimeSum += outgoingArmTime;
+        armTimeSum += outgoingArmTime * recoTrack.getNSVDHitsOfOutgoingArm();
         armTimeErrSum += outgoingArmTimeError * outgoingArmTimeError;
         numberOfSVDClusters += recoTrack.getNSVDHitsOfOutgoingArm();
       } else {
-        armTimeSum += ingoingArmTime;
+        armTimeSum += ingoingArmTime * recoTrack.getNSVDHitsOfIngoingArm();
         armTimeErrSum += ingoingArmTimeError * ingoingArmTimeError;
         numberOfSVDClusters += recoTrack.getNSVDHitsOfIngoingArm();
       }
       numberOfRecoTracksUsed += 1;
-    } else if (recoTrack.hasOutgoingArmTime() && !recoTrack.hasIngoingArmTime()) {
-      armTimeSum += recoTrack.getOutgoingArmTime();
-      outgoingArmTimeError = recoTrack.getOutgoingArmTimeError();
+    } else if (hasOutgoingArm && !hasIngoingArm) { // check if it has only outgoing arm
+      armTimeSum += outgoingArmTime * recoTrack.getNSVDHitsOfOutgoingArm();
       armTimeErrSum += outgoingArmTimeError * outgoingArmTimeError;
-      numberOfSVDClusters += recoTrack.getNSVDHitsOfIngoingArm();
+      numberOfSVDClusters += recoTrack.getNSVDHitsOfOutgoingArm();
       numberOfRecoTracksUsed += 1;
-    } else if (!recoTrack.hasOutgoingArmTime() && recoTrack.hasIngoingArmTime()) {
-      armTimeSum += recoTrack.getIngoingArmTime();
-      ingoingArmTimeError = recoTrack.getIngoingArmTimeError();
+    } else if (!hasOutgoingArm && hasIngoingArm) { // check if it ahas only ingoing arm
+      armTimeSum += ingoingArmTime * recoTrack.getNSVDHitsOfIngoingArm();
       armTimeErrSum += ingoingArmTimeError * ingoingArmTimeError;
       numberOfSVDClusters += recoTrack.getNSVDHitsOfIngoingArm();
       numberOfRecoTracksUsed += 1;
     } else continue;
   }
 
+
   // do nothing if no recoTracks are used (no outgoing/ingoing arm time exists = no SVD clusters associated to tracks exist), or if EventT0 is not valid
   if ((numberOfRecoTracksUsed == 0) || !(m_eventT0.isValid())) return;
 
   // otherwise, eventT0 is the average of outgoing/ingoing arm time
   // that are estimated using SVD clusters associated to recoTracks
-  evtT0 = armTimeSum / numberOfRecoTracksUsed;
+  evtT0 = armTimeSum / numberOfSVDClusters;
   quality = numberOfSVDClusters;
 
   // now compute the error

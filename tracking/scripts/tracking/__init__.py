@@ -242,20 +242,20 @@ def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=Fa
     :param path: The path to add the tracking reconstruction modules to
     :param components: the list of geometry components in use or None for all components.
     :param pruneTracks: Delete all hits except the first and the last in the found tracks.
-    :param fit_tracks: If false, the V0 module module will no be executed
+    :param fit_tracks: If false, the V0 module will no be executed
     :param reco_tracks: Name of the StoreArray where the reco tracks should be stored
     :param prune_temporary_tracks: If false, store all information of the single CDC and VXD tracks before merging.
         If true, prune them.
     :param flip_recoTrack: if true, add the recoTracks flipping function in the postfilter
     """
 
-    if fit_tracks:
-        add_postfilter_track_fit(path, components=components, pruneTracks=pruneTracks, reco_tracks=reco_tracks)
-
     if flip_recoTrack:
         add_flipping_of_recoTracks(path, reco_tracks="RecoTracks")
 
     path.add_module('TrackTimeEstimator')
+
+    if fit_tracks:
+        add_postfilter_track_fit(path, components=components, pruneTracks=pruneTracks, reco_tracks=reco_tracks)
 
     if prune_temporary_tracks or pruneTracks:
         path.add_module("PruneRecoHits")

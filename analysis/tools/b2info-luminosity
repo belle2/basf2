@@ -176,7 +176,7 @@ class Luminosity:
         nAllRuns = len(self.df)
         if (args.good):
             self.df = self.df[self.df['quality']]
-            df['intLumi'] = self.df['lumi'].cumsum()
+            self.df['intLumi'] = self.df['lumi'].cumsum()
             b2.B2INFO(f"Selecting good runs: Good/Total: {len(self.df)}/{nAllRuns}")
         else:
             b2.B2INFO(f"No Selection on good runs (use --good)")

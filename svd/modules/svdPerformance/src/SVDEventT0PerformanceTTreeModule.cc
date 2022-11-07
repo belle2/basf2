@@ -90,6 +90,8 @@ void SVDEventT0PerformanceTTreeModule::initialize()
   m_t->Branch("topEventT0Err", &m_topEventT0Err, "topEventT0Err/F");
   m_t->Branch("topOnlineEventT0", &m_topOnlineEventT0, "topOnlineEventT0/F");
   m_t->Branch("topOnlineEventT0Err", &m_topOnlineEventT0Err, "topOnlineEventT0Err/F");
+  m_t->Branch("eclEventT0", &m_eclEventT0, "eclEventT0/F");
+  m_t->Branch("eclEventT0Err", &m_eclEventT0Err, "eclEventT0Err/F");
   m_t->Branch("eclOnlineEventT0", &m_eclOnlineEventT0, "eclOnlineEventT0/F");
   m_t->Branch("eclOnlineEventT0Err", &m_eclOnlineEventT0Err, "eclOnlineEventT0Err/F");
   m_t->Branch("eclTCEmax", &m_eclTCEmax, "eclTCEmax/I");
@@ -144,6 +146,8 @@ void SVDEventT0PerformanceTTreeModule::event()
   m_topEventT0Err       = std::numeric_limits<float>::quiet_NaN();
   m_topOnlineEventT0    = std::numeric_limits<float>::quiet_NaN();
   m_topOnlineEventT0Err = std::numeric_limits<float>::quiet_NaN();
+  m_eclEventT0          = std::numeric_limits<float>::quiet_NaN();
+  m_eclEventT0Err       = std::numeric_limits<float>::quiet_NaN();
   m_eclOnlineEventT0    = std::numeric_limits<float>::quiet_NaN();
   m_eclOnlineEventT0Err = std::numeric_limits<float>::quiet_NaN();
   m_eclTCEmax           = std::numeric_limits<int>::quiet_NaN();
@@ -178,6 +182,13 @@ void SVDEventT0PerformanceTTreeModule::event()
         //    There should only be at most one value in the list per event
         m_topEventT0 = evtT0List_TOP.back().eventT0 ;
         m_topEventT0Err = evtT0List_TOP.back().eventT0Uncertainty;
+      }
+
+      if (m_EventT0->hasTemporaryEventT0(Const::EDetector::ECL)) {
+        auto evtT0List_ECL = m_EventT0->getTemporaryEventT0s(Const::EDetector::ECL) ;
+        //    There is only one estimate of ECL EVentT0 for the moment
+        m_eclEventT0 = evtT0List_ECL.back().eventT0 ;
+        m_eclEventT0Err = evtT0List_ECL.back().eventT0Uncertainty;
       }
     }
 

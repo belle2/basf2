@@ -93,6 +93,8 @@ namespace Belle2 {
     float m_topEventT0Err = -99; /**< TOP event T0 error */
     float m_topOnlineEventT0 = -99; /**< TOP online event T0 error */
     float m_topOnlineEventT0Err = -99; /**< TOP online event T0 error */
+    float m_eclEventT0 = -99; /**< ECL event T0 */
+    float m_eclEventT0Err = -99; /**< ECL event T0 Error */
     float m_eclOnlineEventT0 = -99; /**< ECL online event T0 error */
     float m_eclOnlineEventT0Err = -99; /**< ECL online event T0 error */
     int m_eclTCEmax = -99;  /**< ECal TC Emax  */

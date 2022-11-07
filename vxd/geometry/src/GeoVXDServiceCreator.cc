@@ -109,8 +109,13 @@ namespace Belle2 {
         //Boxes are aligned to the side closer to the IP so we need the sign in
         //which to shift
         const int signZ = minZ < 0 ? -1 : +1;
-
-        G4VSolid* shape_envelope = new G4Tubs(name, minR, maxR, (maxZ - minZ) / 2.0, 0, 2 * M_PI);
+        double startPhiAngle = 0;
+        double deltaAngle = 2 * M_PI;
+        if (signZ > 0) {
+          startPhiAngle = 0.35; // Allow space for He3 tubes in forward envelope
+          deltaAngle = 2 * M_PI - startPhiAngle;
+        }
+        G4VSolid* shape_envelope = new G4Tubs(name, minR, maxR, (maxZ - minZ) / 2.0, startPhiAngle, deltaAngle);
         G4LogicalVolume* envelope = new G4LogicalVolume(shape_envelope, m_defaultMaterial, name);
         new G4PVPlacement(G4TranslateZ3D((minZ + maxZ) / 2.0), envelope, name, &topVolume, false, 1);
         //We have divisions slots with always to slots joining at phi=0

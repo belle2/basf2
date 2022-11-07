@@ -619,7 +619,7 @@ namespace Belle2 {
        * @param L emission position distance along particle trajectory
        * @return solution
        */
-      PrismSolution prismSolution(const TVector3& rD, double L);
+      PrismSolution prismSolution(const ROOT::Math::XYZPoint& rD, double L);
 
       /**
        * Returns the value of signal + deltaRay PDF normalized to the number of expected photons.

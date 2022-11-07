@@ -25,6 +25,7 @@
 #include <algorithm>
 
 using namespace std;
+using namespace ROOT::Math;
 
 namespace Belle2 {
   using namespace TOP;
@@ -125,8 +126,8 @@ namespace Belle2 {
       // add this vector of vector of triplets to the TOPPDFCollection
       TOPPDFCollection* topPDFColl = m_pdfCollection.appendNew();
       const auto& module = geo->getModule(trk.getModuleID());
-      topPDFColl->setLocalPositionMomentum(module.pointToLocal(trk.getExtHit()->getPositionTVector3()),
-                                           module.momentumToLocal(trk.getExtHit()->getMomentumTVector3()),
+      topPDFColl->setLocalPositionMomentum(module.pointToLocal(static_cast<XYZPoint>(trk.getExtHit()->getPosition())),
+                                           module.momentumToLocal(trk.getExtHit()->getMomentum()),
                                            trk.getModuleID());
 
       TOPPixelLikelihood* topPLkhs = m_pixelData.appendNew();

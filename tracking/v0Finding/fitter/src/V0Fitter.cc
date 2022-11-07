@@ -10,6 +10,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/geometry/XYZVectorToTVector3Converter.h>
+#include <framework/geometry/BFieldManager.h>
 #include <tracking/v0Finding/dataobjects/VertexVector.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/trackFitting/fitter/base/TrackFitter.h>
@@ -163,10 +164,8 @@ bool V0Fitter::extrapolateToVertex(genfit::MeasuredStateOnPlane& stPlus, genfit:
 
 double V0Fitter::getBzAtVertex(const ROOT::Math::XYZVector& vertexPosition)
 {
-  double Bx, By, Bz;
-  genfit::FieldManager::getInstance()->getFieldVal(vertexPosition.X(), vertexPosition.Y(), vertexPosition.Z(),
-                                                   Bx, By, Bz);
-  Bz = Bz / 10;
+  const double Bz = BFieldManager::getField(vertexPosition).Z() / Unit::T;
+
   return Bz;
 }
 

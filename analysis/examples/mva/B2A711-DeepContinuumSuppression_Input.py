@@ -196,9 +196,7 @@ print(basf2.statistics)
 # Shuffle Data. Use only if enough Ram is available
 try:
     with uproot.open(outfile) as outf:
-        trees = outf.keys()
-        assert len(trees) == 1
-        df = outf.arrays(library='pd')
+        df = outf['tree'].arrays(library='pd')
     df = df.sample(frac=1)
     with uproot.recreate(outfile) as outf:
         outf['tree'] = df

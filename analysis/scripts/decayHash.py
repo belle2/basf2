@@ -64,7 +64,8 @@ class DecayHashMap:
         self._string = {}
         #: Dict Int -> Reconstructed DecayTree
         self._forest = {}
-        for decayHash, decayHashExtended, decayString in ntuple:
+        for decayHash, decayHashExtended, decayString in zip(
+                ntuple['decayHash'], ntuple['decayHashExtended'], ntuple['decayString']):
             decayInt = ROOT.Belle2.DecayForest.decayHashFloatToInt(decayHash, decayHashExtended)
             if decayInt in self._string:
                 continue

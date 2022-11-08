@@ -84,7 +84,7 @@ void KKGenInputModule::event()
   StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
 
   //generate an MCInitialEvent (for vertex smearing)
-  TVector3 vertex = m_initial.getVertexConditional();
+  ROOT::Math::XYZVector vertex = m_initial.getVertexConditional();
 
   const ConditionalGaussGenerator& lorentzGenerator = m_initial.getLorentzGenerator();
 

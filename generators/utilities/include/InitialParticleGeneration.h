@@ -42,7 +42,7 @@ namespace Belle2 {
     MCInitialParticles& generate();
 
     /** Generate vertex position and possibly update the generator of Lorentz transformation */
-    TVector3 getVertexConditional();
+    ROOT::Math::XYZVector getVertexConditional();
 
     /** Update the vertex position:
      *

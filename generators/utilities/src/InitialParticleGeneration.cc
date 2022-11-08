@@ -169,7 +169,7 @@ namespace Belle2 {
 
 
   // it generates random Lorentz transformation based on the HER/LER smearing covariance matrices
-  TVector3 InitialParticleGeneration::getVertexConditional()
+  ROOT::Math::XYZVector InitialParticleGeneration::getVertexConditional()
   {
     if (!m_event) {
       m_event.create();
@@ -183,7 +183,7 @@ namespace Belle2 {
       m_generateVertex.reset();
     }
     m_event->setGenerationFlags(m_beamParams->getGenerationFlags() & m_allowedFlags);
-    TVector3 vtx = generateVertex(m_beamParams->getVertex(), m_beamParams->getCovVertex(), m_generateVertex);
+    ROOT::Math::XYZVector vtx = generateVertex(m_beamParams->getVertex(), m_beamParams->getCovVertex(), m_generateVertex);
 
     //TODO is m_event of type MCInitialParticles important?
     //Eigen::VectorXd collSys = m_generateLorentzTransformation.generate(Ecms);

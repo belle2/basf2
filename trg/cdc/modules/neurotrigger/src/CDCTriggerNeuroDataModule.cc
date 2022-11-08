@@ -134,8 +134,10 @@ namespace Belle2 {
         const std::vector<genfit::AbsTrackRep*>& reps = recoTrack->getRepresentations();
         bool foundValidRep = false;
         for (unsigned irep = 0; irep < reps.size() && !foundValidRep; ++irep) {
-          if (!recoTrack->wasFitSuccessful(reps[irep]))
+          if (!recoTrack->wasFitSuccessful(reps[irep])) {
             continue;
+          }
+
           // get state (position, momentum etc.) from hit closest to IP and
           // extrapolate to z-axis (may throw an exception -> continue to next representation)
           try {
@@ -183,6 +185,7 @@ namespace Belle2 {
       float theta = atan2(1., m_tracks[itrack]->getCotTheta());
       std::vector<int> sectors = m_NeuroTrigger.selectMLPsTrain(phi0, invpt, theta);
       if (sectors.size() == 0) continue;
+
       // get target values
       std::vector<float> targetRaw = {};
       if (m_neuroParameters.targetZ)
@@ -204,7 +207,9 @@ namespace Belle2 {
             target[itarget] /= fabs(target[itarget]);
           }
         }
-        if (!m_neuroParameters.rescaleTarget && outOfRange) continue;
+        if (!m_neuroParameters.rescaleTarget && outOfRange) {
+          continue;
+        }
         //
         // read out or determine event time
         //std::cout << "time: " << m_NeuroTrigger.m_T0 << std::endl;
@@ -212,15 +217,16 @@ namespace Belle2 {
         m_NeuroTrigger.getEventTime(isector, *m_tracks[itrack], m_neuroParameters.et_option(), m_neuroTrackInputMode);
         //std::cout << "time: " << m_NeuroTrigger.m_T0 << std::endl;
         // check hit pattern
-        unsigned long hitPattern = m_NeuroTrigger.getInputPattern(isector, *m_tracks[itrack], m_neuroTrackInputMode);
+        unsigned long hitPattern = m_NeuroTrigger.getCompleteHitPattern(isector, *m_tracks[itrack], m_neuroTrackInputMode); // xxxxx0xxx
         //std::cout << "hitpattern: " << hitPattern << std::endl;
-        unsigned long sectorPattern = m_NeuroTrigger[isector].getSLpattern();
-        unsigned long sectorPatternMask = m_NeuroTrigger[isector].getSLpatternMask();
+        unsigned long sectorPattern = m_NeuroTrigger[isector].getSLpattern(); // 010100010
+        unsigned long sectorPatternMask = m_NeuroTrigger[isector].getSLpatternMask(); // 010101010
         B2DEBUG(250, "hitPattern " << hitPattern << " sectorPattern " << sectorPattern);
         if (!m_singleUse && sectorPattern > 0 && (sectorPattern & hitPattern) != sectorPattern) {
           B2DEBUG(250, "hitPattern not matching " << (sectorPattern & hitPattern));
           continue;
         } else if (m_singleUse && sectorPattern > 0 && (sectorPattern) != (hitPattern & sectorPatternMask)) {
+          // 010100010 != 0x0x0x0x0
           B2DEBUG(250, "hitPattern not matching " << (sectorPatternMask & hitPattern));
           continue;
         }
@@ -243,7 +249,6 @@ namespace Belle2 {
         } else {
           hitIds = m_NeuroTrigger.selectHits(isector, *m_tracks[itrack]);
         }
-        std::cout << "hitids: " << hitIds.size() << std::endl;
         CDCTriggerMLPData::NeuroSet<27, 2> sample(m_NeuroTrigger.getInputVector(isector, hitIds).data(), target.data(),
                                                   evtmetadata->getExperiment(), evtmetadata->getRun(), evtmetadata->getSubrun(), evtmetadata->getEvent(), itrack, i);
         //check whether we already have enough samples

@@ -109,6 +109,8 @@ namespace Belle2 {
     boost::iostreams::filtering_ostream outStream;
     outStream.push(boost::iostreams::gzip_compressor());
     outStream.push(gzipfile4);
+    CDCTriggerMLPData::NeuroSet<27, 2> sample;
+    outStream << sample.headline << std::endl;
   }
   void
   CDCTriggerNeuroDataModule::event()
@@ -250,7 +252,8 @@ namespace Belle2 {
           hitIds = m_NeuroTrigger.selectHits(isector, *m_tracks[itrack]);
         }
         CDCTriggerMLPData::NeuroSet<27, 2> sample(m_NeuroTrigger.getInputVector(isector, hitIds).data(), target.data(),
-                                                  evtmetadata->getExperiment(), evtmetadata->getRun(), evtmetadata->getSubrun(), evtmetadata->getEvent(), itrack, i);
+                                                  evtmetadata->getExperiment(), evtmetadata->getRun(), evtmetadata->getSubrun(), evtmetadata->getEvent(), itrack, i,
+                                                  m_tracks.getEntries(), 0, 0, 0, 0, phi0, theta, invpt);
         //check whether we already have enough samples
         m_trainSet[isector].addSample(sample);
         if ((m_trainSet)[isector].nSamples() % 1000 == 0) {

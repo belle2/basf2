@@ -93,9 +93,29 @@ namespace Belle2 {
       int subrun;
       int evt;
       int track;
+      int ntracks;
+      float nnscalez;
+      float nnscaletheta;
+      int nnrawz;
+      int nnrawtheta;
+      float inphi;
+      float intheta;
       unsigned expert;
-      NeuroSet() {}
-      NeuroSet(float xin[inLen], float xout[outLen],  int xexp, int xrun, int xsubrun, int xevt, int xtrack, unsigned xexpert)
+      float ininvpt;
+      std::string headline;
+      NeuroSet()
+      {
+        headline = "Experiment\tRun\tSubrun\tEvent\tTrack\tnTracks\tExpert\tiNodes\toNodes\t";
+        for (unsigned i = 0; i < inLen / 3; ++i) {
+          headline += "SL" + std::to_string(i) + "-relID\t";
+          headline += "SL" + std::to_string(i) + "-driftT\t";
+          headline += "SL" + std::to_string(i) + "-alpha\t";
+        }
+        headline += "RecoZ\tRecoTheta\tScaleZ\tRawZ\tScaleTheta\tRawTheta\t2DPhi\t3DTheta\t2DinvPt\n";
+      }
+
+      NeuroSet(float xin[inLen], float xout[outLen],  int xexp, int xrun, int xsubrun, int xevt, int xtrack, unsigned xexpert,
+               int xntracks, int xnnrawz, int xnnrawtheta, float xnnscalez, float xnnscaletheta, float xinphi, float xintheta, float xininvpt)
       {
         for (unsigned i = 0; i < inLen; ++i) {
           input[i] = xin[i];
@@ -109,13 +129,33 @@ namespace Belle2 {
         evt = xevt;
         track = xtrack;
         expert = xexpert;
+
+        ntracks = xntracks;
+        nnscalez = xnnscalez;
+        nnscaletheta = xnnscaletheta;
+        nnrawz = xnnrawz;
+        nnrawtheta = xnnrawtheta;
+        inphi = xinphi;
+        intheta = xintheta;
+        ininvpt = xininvpt;
+        headline = "Experiment\tRun\tSubrun\tEvent\tTrack\tnTracks\tExpert\tiNodes\toNodes\t";
+        for (unsigned i = 0; i < inLen / 3; ++i) {
+          headline += "SL" + std::to_string(i) + "-relID\t";
+          headline += "SL" + std::to_string(i) + "-driftT\t";
+          headline += "SL" + std::to_string(i) + "-alpha\t";
+        }
+        headline += "RecoZ\tRecoTheta\tScaleZ\tRawZ\tScaleTheta\tRawTheta\t2DPhi\t3DTheta\t2DinvPt\n";
+
       }
       friend std::ostream& operator << (std::ostream& out, const NeuroSet& dset)
       {
-        out << dset.exp << '\t' << dset.run << '\t' << dset.subrun << '\t' << dset.evt << '\t' << dset.track << '\t' << dset.expert << '\t'
+        out << dset.exp << '\t' << dset.run << '\t' << dset.subrun << '\t' << dset.evt << '\t' << dset.track << '\t' << dset.ntracks << '\t'
+            << dset.expert << '\t'
             << inLen << '\t' << outLen << '\t';
         for (auto indata : dset.input) {out << indata << '\t';}
         for (auto outdata : dset.target) {out << outdata << '\t';}
+        out << dset.nnscalez << '\t' << dset.nnrawz << '\t' << dset.nnscaletheta << '\t' << dset.nnrawtheta << '\t' << dset.inphi << '\t' <<
+            dset.intheta << '\t' << dset.ininvpt << '\t';
         return out;
       }
       friend std::istream& operator >> (std::istream& in, NeuroSet& dset)
@@ -137,6 +177,9 @@ namespace Belle2 {
         help = "";
         std::getline(in, help, '\t');
         dset.track = std::stoi(help);
+        help = "";
+        std::getline(in, help, '\t');
+        dset.ntracks = std::stoi(help);
         help = "";
         std::getline(in, help, '\t');
         dset.expert = std::stoul(help);
@@ -171,6 +214,28 @@ namespace Belle2 {
             dset.target[i] = 0.;
           }
         }
+        help = "";
+        std::getline(in, help, '\t');
+        dset.nnscalez = std::stof(help);
+        help = "";
+        std::getline(in, help, '\t');
+        dset.nnrawz = std::stoi(help);
+        help = "";
+        std::getline(in, help, '\t');
+        dset.nnscaletheta = std::stof(help);
+        help = "";
+        std::getline(in, help, '\t');
+        dset.nnrawtheta = std::stoi(help);
+        help = "";
+        std::getline(in, help, '\t');
+        dset.inphi = std::stof(help);
+        help = "";
+        std::getline(in, help, '\t');
+        dset.intheta = std::stof(help);
+        help = "";
+        std::getline(in, help, '\t');
+        dset.ininvpt = std::stof(help);
+        help = "";
         return in;
       }
     };
@@ -259,7 +324,7 @@ namespace Belle2 {
     std::vector<int> tracklist;
 
     //! Needed to make the ROOT object storable
-    ClassDef(CDCTriggerMLPData, 2);
+    ClassDef(CDCTriggerMLPData, 3);
   };
 }
 #endif

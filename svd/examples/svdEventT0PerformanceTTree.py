@@ -105,6 +105,7 @@ else:
 trk.add_tracking_reconstruction(
     main,
     mcTrackFinding=MCTracking,
+    append_full_grid_cdc_eventt0=True,
     trackFitHypotheses=[211])  # ,
 #    skipHitPreparerAdding=True)
 
@@ -125,7 +126,6 @@ skimfilter.if_value('=1', filter_path, b2.AfterConditionPath.CONTINUE)
 '''
 
 # fill TTrees
-# main.add_module('SVDPerformanceTTree', outputFileName="SVDPerformanceTree"+str(tag)+".root")
 main.add_module('SVDEventT0PerformanceTTree', outputFileName=str(args.fileDir)+"SVDEventT0PerformanceTTree"+str(ftag)+".root")
 
 # # write everything

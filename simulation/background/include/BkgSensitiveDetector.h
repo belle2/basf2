@@ -6,10 +6,11 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef BACKSENSITIVEDETECTOR_H
-#define BACKSENSITIVEDETECTOR_H
+#pragma once
 
 #include <simulation/kernel/SensitiveDetectorBase.h>
+
+#include <TVector3.h>
 
 namespace Belle2 {
 
@@ -50,5 +51,3 @@ namespace Belle2 {
     int m_eclrepscale;      /**< replica (=sector) scale in ECL */
   }; // SensitiveDetector class
 } // end of namespace Belle2
-
-#endif /* BACKENSITIVEDETECTOR_H */

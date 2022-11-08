@@ -152,9 +152,9 @@ void ECLTrackClusterMatchingParametrizationExpertModule::event()
     }
     const TrackFitResult* fitResult = track.getTrackFitResultWithClosestMass(hypothesis);
 
-    double momentum = fitResult->getMomentum().Mag();
+    double momentum = fitResult->getMomentum().R();
     double pt = fitResult->getTransverseMomentum();
-    double theta = TMath::ACos(fitResult->getMomentum().CosTheta());
+    double theta = fitResult->getMomentum().Theta();
     if (m_useArray) {
       m_true_track_pdg_array->push_back(pdgCode);
       m_trackNo_array->push_back(i);

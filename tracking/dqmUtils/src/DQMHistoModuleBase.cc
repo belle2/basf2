@@ -460,7 +460,7 @@ void DQMHistoModuleBase::FillHitNumbers(int nPXD, int nSVD, int nCDC)
 
 void DQMHistoModuleBase::FillMomentumAngles(const TrackFitResult* tfr)
 {
-  const TVector3 mom = tfr->getMomentum();
+  const ROOT::Math::XYZVector mom = tfr->getMomentum();
 
   // don't fill NAN or INF
   if (checkVariableForNANOrINF(mom.X()) or checkVariableForNANOrINF(mom.Y()) or checkVariableForNANOrINF(mom.Z()) or
@@ -478,19 +478,19 @@ void DQMHistoModuleBase::FillMomentumAngles(const TrackFitResult* tfr)
 
 void DQMHistoModuleBase::FillMomentumCoordinates(const TrackFitResult* tfr)
 {
-  const TVector3 mom = tfr->getMomentum();
+  const ROOT::Math::XYZVector& mom = tfr->getMomentum();
 
   // don't fill NAN or INF, Mag is NAN/INF if any component is, no need to check
   if (checkVariableForNANOrINF(mom.X()) or checkVariableForNANOrINF(mom.Y()) or
-      checkVariableForNANOrINF(mom.Z()) or checkVariableForNANOrINF(mom.Pt())) {
+      checkVariableForNANOrINF(mom.Z()) or checkVariableForNANOrINF(mom.Rho())) {
     return;
   }
 
-  m_MomX->Fill(mom.Px());
-  m_MomY->Fill(mom.Py());
-  m_MomZ->Fill(mom.Pz());
-  m_Mom->Fill(mom.Mag());
-  m_MomPt->Fill(mom.Pt());
+  m_MomX->Fill(mom.X());
+  m_MomY->Fill(mom.Y());
+  m_MomZ->Fill(mom.Z());
+  m_Mom->Fill(mom.R());
+  m_MomPt->Fill(mom.Rho());
 }
 
 void DQMHistoModuleBase::FillHelixParametersAndCorrelations(const TrackFitResult* tfr)

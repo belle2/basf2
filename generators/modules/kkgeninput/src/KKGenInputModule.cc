@@ -21,6 +21,7 @@
 #include <framework/utilities/IOIntercept.h>
 
 #include <boost/filesystem.hpp>
+#include <Math/Vector3D.h>
 
 #include <stdio.h>
 

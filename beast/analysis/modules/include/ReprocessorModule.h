@@ -6,8 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef REPROCESSORMODULE_H
-#define REPROCESSORMODULE_H
+#pragma once
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <framework/core/Module.h>
@@ -98,5 +97,3 @@ namespace Belle2 {
 
   //  }
 }
-
-#endif /* REPROCESSORMODULE_H */

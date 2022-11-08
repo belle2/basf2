@@ -48,6 +48,7 @@
 #include <iostream>
 #include <cmath>
 
+
 using namespace std;
 
 namespace Belle2 {
@@ -232,9 +233,9 @@ namespace Belle2 {
         return result;
 
       result = 0.0;
-      result += TMath::Power(part->getPx() - mcp->getMomentum().Px(), 2.0) / part->getMomentumVertexErrorMatrix()(0, 0);
-      result += TMath::Power(part->getPy() - mcp->getMomentum().Py(), 2.0) / part->getMomentumVertexErrorMatrix()(1, 1);
-      result += TMath::Power(part->getPz() - mcp->getMomentum().Pz(), 2.0) / part->getMomentumVertexErrorMatrix()(2, 2);
+      result += TMath::Power(part->getPx() - mcp->getMomentum().X(), 2.0) / part->getMomentumVertexErrorMatrix()(0, 0);
+      result += TMath::Power(part->getPy() - mcp->getMomentum().Y(), 2.0) / part->getMomentumVertexErrorMatrix()(1, 1);
+      result += TMath::Power(part->getPz() - mcp->getMomentum().Z(), 2.0) / part->getMomentumVertexErrorMatrix()(2, 2);
 
       return result;
     }
@@ -398,16 +399,16 @@ namespace Belle2 {
     {
       static DBObjPtr<BeamSpot> beamSpotDB;
 
-      B2Vector3D mom = particle->getMomentum();
+      ROOT::Math::XYZVector mom = particle->getMomentum();
 
-      B2Vector3D r = B2Vector3D(particle->getVertex()) - beamSpotDB->getIPPosition();
+      ROOT::Math::XYZVector r = particle->getVertex() - ROOT::Math::XYZVector(beamSpotDB->getIPPosition());
 
-      B2Vector3D Bfield = BFieldManager::getInstance().getFieldInTesla(beamSpotDB->getIPPosition());
+      ROOT::Math::XYZVector Bfield = BFieldManager::getInstance().getFieldInTesla(ROOT::Math::XYZVector(beamSpotDB->getIPPosition()));
 
-      B2Vector3D curvature = - Bfield * Const::speedOfLight * particle->getCharge(); //Curvature of the track
-      double T = TMath::Sqrt(mom.Perp2() - 2.0 * curvature * r.Cross(mom) + curvature.Mag2() * r.Perp2());
+      ROOT::Math::XYZVector curvature = - Bfield * Const::speedOfLight * particle->getCharge(); //Curvature of the track
+      double T = TMath::Sqrt(mom.Perp2() - 2.0 * curvature.Dot(r.Cross(mom)) + curvature.Mag2() * r.Perp2());
 
-      return TMath::Abs((-2 * r.Cross(mom).z() + curvature.Mag() * r.Perp2()) / (T + mom.Perp()));
+      return TMath::Abs((-2 * r.Cross(mom).Z() + curvature.R() * r.Perp2()) / (T + mom.Rho()));
     }
 
     double ArmenterosLongitudinalMomentumAsymmetry(const Particle* part)
@@ -495,9 +496,9 @@ namespace Belle2 {
 
     double particleInvariantMassFromDaughtersDisplaced(const Particle* part)
     {
-      B2Vector3D vertex = part->getVertex();
+      ROOT::Math::XYZVector vertex = part->getVertex();
       if (part->getParticleSource() != Particle::EParticleSourceObject::c_V0
-          && vertex.Perp() < 0.5) return particleInvariantMassFromDaughters(part);
+          && vertex.Rho() < 0.5) return particleInvariantMassFromDaughters(part);
 
       const std::vector<Particle*> daughters = part->getDaughters();
       if (daughters.size() == 0) return particleInvariantMassFromDaughters(part);
@@ -1007,49 +1008,52 @@ namespace Belle2 {
 
     Manager::FunctionPtr particleDistToClosestExtTrk(const std::vector<std::string>& arguments)
     {
-      if (arguments.size() != 2 && arguments.size() != 3) {
-        B2ERROR("Wrong number of arguments (2 or 3 required) for meta variable minET2ETDist");
+      if (arguments.size() != 3 && arguments.size() != 4) {
+        B2ERROR("Wrong number of arguments (3 or 4 required) for meta variable minET2ETDist");
         return nullptr;
       }
       bool useHighestProbMassForExt(true);
-      if (arguments.size() == 3) {
+      if (arguments.size() == 4) {
         try {
-          useHighestProbMassForExt = static_cast<bool>(Belle2::convertString<int>(arguments[2]));
+          useHighestProbMassForExt = static_cast<bool>(Belle2::convertString<int>(arguments[3]));
         } catch (std::invalid_argument& e) {
-          B2ERROR("Third (optional) argument of particleDistToClosestExtTrk must be an integer flag.");
+          B2ERROR("Fourth (optional) argument of minET2ETDist must be an integer flag.");
           return nullptr;
         }
       }
 
-      std::string detLayer = arguments[0];
-      std::string referenceListName = arguments[1];
+      std::string detName = arguments[0];
+      std::string detLayer = arguments[1];
+      std::string referenceListName = arguments[2];
       std::string extraSuffix = (useHighestProbMassForExt) ? "__useHighestProbMassForExt" : "";
+      // Distance to closets neighbour at this detector layer.
+      std::string extraInfo = "distToClosestTrkAt" + detName + detLayer + "_VS_" + referenceListName + extraSuffix;
 
-      auto func = [detLayer, referenceListName, extraSuffix](const Particle * part) -> double {
-        std::string extraInfo = "distToClosestTrkAt" + detLayer + "_VS_" + referenceListName + extraSuffix;
-        if (!part->hasExtraInfo(extraInfo))
-        {
-          return std::numeric_limits<float>::quiet_NaN();
-        }
-        return part->getExtraInfo(extraInfo);
+      auto func = [ = ](const Particle * part) -> double {
+        auto dist = (part->hasExtraInfo(extraInfo)) ? part->getExtraInfo(extraInfo) : std::numeric_limits<float>::quiet_NaN();
+        return dist;
       };
 
       return func;
     }
 
+// Track helix extrapolation-based isolation --------------------------------------------------
 
     Manager::FunctionPtr particleDistToClosestExtTrkVar(const std::vector<std::string>& arguments)
     {
-      if (arguments.size() != 3) {
-        B2ERROR("Wrong number of arguments (3 required) for meta variable minET2ETDistVar");
+      if (arguments.size() != 4) {
+        B2ERROR("Wrong number of arguments (4 required) for meta variable minET2ETDistVar");
         return nullptr;
       }
 
-      std::string detLayer = arguments[0];
-      std::string referenceListName = arguments[1];
-      std::string variableName = arguments[2];
+      std::string detName = arguments[0];
+      std::string detLayer = arguments[1];
+      std::string referenceListName = arguments[2];
+      std::string variableName = arguments[3];
+      // Mdst array index of the particle that is closest to the particle in question.
+      std::string extraInfo = "idxOfClosestPartAt" + detName + detLayer + "In_" + referenceListName;
 
-      auto func = [detLayer, referenceListName, variableName](const Particle * part) -> double {
+      auto func = [ = ](const Particle * part) -> double {
 
         StoreObjPtr<ParticleList> refPartList(referenceListName);
         if (!refPartList.isValid())
@@ -1057,22 +1061,72 @@ namespace Belle2 {
           B2FATAL("Invalid Listname " << referenceListName << " given to minET2ETDistVar!");
         }
 
-        // Mdst array index of refernce particle that is closest to the particle in question.
-        std::string extraInfo = "idxOfClosestPartAt" + detLayer + "In_" + referenceListName;
         if (!part->hasExtraInfo(extraInfo))
         {
           return std::numeric_limits<float>::quiet_NaN();
         }
 
         const Variable::Manager::Var* var = Manager::Instance().getVariable(variableName);
-
         auto refPart = refPartList->getParticleWithMdstIdx(part->getExtraInfo(extraInfo));
+
         return std::get<double>(var->function(refPart));
       };
 
       return func;
     }
 
+
+    Manager::FunctionPtr particleExtTrkIsoScoreVar(const std::vector<std::string>& arguments)
+    {
+
+      if (arguments.size() < 3) {
+        B2ERROR("Wrong number of arguments (at least 3 required) for meta variable minET2ETIsoScore");
+        return nullptr;
+      }
+
+      std::string referenceListName = arguments[0];
+      bool useHighestProbMassForExt;
+      try {
+        useHighestProbMassForExt = static_cast<bool>(Belle2::convertString<int>(arguments[1]));
+      } catch (std::invalid_argument& e) {
+        B2ERROR("Second argument must be an integer flag.");
+        return nullptr;
+      }
+      std::string extraSuffix = (useHighestProbMassForExt) ? "__useHighestProbMassForExt" : "";
+
+      std::vector<std::string> detectorNames(arguments.begin() + 2, arguments.end());
+
+      auto func = [ = ](const Particle * part) -> double {
+
+        StoreObjPtr<ParticleList> refPartList(referenceListName);
+        if (!refPartList.isValid())
+        {
+          B2FATAL("Invalid Listname " << referenceListName << " given to minET2ETIsoScore!");
+        }
+
+        double scoreSum(0.0);
+        for (auto& detName : detectorNames)
+        {
+          std::string extraInfo = "trkIsoScore" + detName + "_VS_" + referenceListName + extraSuffix;
+          if (!part->hasExtraInfo(extraInfo)) {
+            return std::numeric_limits<float>::quiet_NaN();
+          }
+          auto scoreDet = part->getExtraInfo(extraInfo);
+          if (std::isnan(scoreDet)) {
+            return std::numeric_limits<float>::quiet_NaN();
+          }
+          scoreSum += scoreDet;
+        }
+
+        // Normalise sum of scores between [0, 1]
+        auto minScore = 0.;
+        auto maxScore = detectorNames.size();
+        return (scoreSum - minScore) / (maxScore - minScore);
+
+      };
+
+      return func;
+    }
 
     VARIABLE_GROUP("Kinematics");
     REGISTER_VARIABLE("p", particleP, "momentum magnitude", "GeV/c");
@@ -1225,28 +1279,56 @@ Note that this is context-dependent variable and can take different values depen
                       "candidate in the best candidate selection.");
     REGISTER_VARIABLE("eventRandom", eventRandom,
                       "[Eventbased] Returns a random number between 0 and 1 for this event. Can be used, e.g. for applying an event prescale.");
-    REGISTER_METAVARIABLE("minET2ETDist(detLayer, referenceListName, useHighestProbMassForExt=1)", particleDistToClosestExtTrk,
-                          R"DOC(Returns the distance in [cm] at the given detector surface between the particle's extrapolated helix and the nearest extrapolated helix of particles from the reference list.
-The first argument is the detector surface where to look at the nearest neighbour.
-The second argument is the reference particle list name used to pick up the nearest track helix.
-The third optional argument is an integer ("boolean") flag: if 1 (the default, if nothing is set), it is assumed the extrapolation was done with the most probable mass hypothesis for the track fit;
-if 0, it is assumed the mass hypothesis matching the particle lists' PDG was used.
+    REGISTER_METAVARIABLE("minET2ETDist(detName, detLayer, referenceListName, useHighestProbMassForExt=1)", particleDistToClosestExtTrk,
+                          R"DOC(Returns the distance in [cm] between the particle and the nearest particle in the reference list at the given detector layer surface.
+The definition is based on the track helices extrapolation.
+
+* The first argument is the name of the detector to consider.
+* The second argument is the detector layer on whose surface we search for the nearest neighbour.
+* The third argument is the reference particle list name used to search for the nearest neighbour.
+* The fourth (optional) argument is an integer ("boolean") flag: if 1 (the default, if nothing is set), it is assumed the extrapolation was done with the most probable mass hypothesis for the track fit;
+  if 0, it is assumed the mass hypothesis matching the particle lists' PDG was used.
 
 .. note::
-    This variable requires to run the ``TrackIsolation`` module first.
-    Note that the input parameters of this metafunction must correspond to the ones set for the module configuration!
+    This variable requires to run the ``TrackIsoCalculator`` module first.
+    Note that the choice of input parameters of this metafunction must correspond to the settings used to configure the module!
 )DOC",
 			  Manager::VariableDataType::c_double);
 
-    REGISTER_METAVARIABLE("minET2ETDistVar(detLayer, referenceListName, variableName)", particleDistToClosestExtTrkVar,
-			  R"DOC(Returns the value of the variable for the nearest particle in the input particle list at the given detector surface, according to the definition of `minET2ETDist`.
-The first argument is the detector surface where to look at the nearest neighbour.
-The second argument is the reference particle list name used to pick up the nearest track helix.
-The third argument is a variable name, e.g. `nCDCHits`.
+    REGISTER_METAVARIABLE("minET2ETDistVar(detName, detLayer, referenceListName, variableName)", particleDistToClosestExtTrkVar,
+			  R"DOC(Returns the value of the variable for the nearest neighbour to this particle as taken from the reference list at the given detector layer surface.
+, according to the distance definition of `minET2ETDist`.
+
+* The first argument is the name of the detector to consider.
+* The second argument is the detector layer on whose surface we search for the nearest neighbour.
+* The third argument is the reference particle list name used to search for the nearest neighbour.
+* The fourth argument is a variable name, e.g. `nCDCHits`.
 
 .. note::
-    This variable requires to run the ``TrackIsolation`` module first.
-    Note that the input parameters of this metafunction must correspond to the ones set for the module configuration!
+    This variable requires to run the ``TrackIsoCalculator`` module first.
+    Note that the choice of input parameters of this metafunction must correspond to the settings used to configure the module!
+)DOC",
+			  Manager::VariableDataType::c_double);
+
+    REGISTER_METAVARIABLE("minET2ETIsoScore(referenceListName, useHighestProbMassForExt, detectorList)", particleExtTrkIsoScoreVar,
+			  R"DOC(Returns the particle's isolation score based on:
+
+* The number of detector layers where a close-enough neighbour to this particle is found, according to the distance definition of `minET2ETDist` and a set of thresholds defined in the ``TrackIsoCalculator`` module.
+* A set of per-detector weights quantifying the impact of each detector on the PID for this particle type.
+
+The score is normalised in [0, 1], where values closer to 1 indicates a well-isolated particle.
+
+.. note::
+    The detector weights are considered for the score definition only if ``excludePIDDetWeights=false`` in the ``TrackIsoCalculator`` module configuration.
+
+* The first argument is the reference particle list name used to search for the nearest neighbour.
+* The second argument is an integer ("boolean") flag: if 1, it is assumed the extrapolation was done with the most probable mass hypothesis for the track fit;
+  if 0, it is assumed the mass hypothesis matching the particle lists' PDG was used.
+* The remaining arguments are a comma-separated list of detector names. At least one must be chosen among {CDC, TOP, ARICH, ECL, KLM}.
+
+.. note::
+    This variable requires to run the ``TrackIsoCalculator`` module first.
+    Note that the choice of input parameters of this metafunction must correspond to the settings used to configure the module!
 )DOC",
 			  Manager::VariableDataType::c_double);
 

@@ -12,10 +12,11 @@
 # @cond
 
 """
-Example script to calculate track isolation variables.
+Example script to calculate isolation variables per particle.
 
-For each particle's track in the input charged stable particle list,
-calculate the minimal distance to the other candidates' tracks at a given detector surface.
+For each particle in the input charged stable particle list,
+calculate the distance to the closest candidate in the reference list at a given detector layer surface.
+The calculation of the distance is based on the particles' track helices extrapolation.
 """
 
 
@@ -27,19 +28,47 @@ def argparser():
     """
 
     import stdCharged as stdc
+    from modularAnalysis import getAnalysisGlobaltag
 
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawTextHelpFormatter)
 
-    parser.add_argument("--std_charged_ref", type=str, choices=stdc._chargednames, default="pi",
+    parser.add_argument("--std_charged_ref",
+                        type=str,
+                        choices=stdc._chargednames,
+                        default="pi",
                         help="The base name of the reference standard charged particle list\n"
-                        "against which to calculate the distance.")
+                        "that will be considered for the distance calculation.\n"
+                        "Default: %(default)s.")
     parser.add_argument("--detectors",
                         type=str,
                         nargs="+",
                         default=["CDC", "TOP", "ARICH", "ECL", "KLM"],
                         choices=["CDC", "TOP", "ARICH", "ECL", "KLM"],
-                        help="List of detectors at whose entry surface track isolation variables will be calculated.\n"
+                        help="List of detectors at whose entry surface the isolation variables will be calculated.\n"
+                        "Pass a space-separated list of names.\n"
+                        "Default: %(default)s.")
+    parser.add_argument("--use_pid_det_weights",
+                        action="store_true",
+                        default=False,
+                        help="Include the PID detector weights (taken from the CDB) in the isolation score calculation.\n"
+                        "Default: %(default)s.")
+    parser.add_argument("--global_tag_append",
+                        type=str,
+                        nargs="+",
+                        default=[getAnalysisGlobaltag()],
+                        help="List of names of conditions DB global tag(s) to append on top of GT replay.\n"
+                        "NB: these GTs will have lowest priority over GT replay.\n"
+                        "The order of the sequence passed determines the priority of the GTs, w/ the highest coming first.\n"
+                        "Pass a space-separated list of names.\n"
+                        "Default: %(default)s.")
+    parser.add_argument("--global_tag_prepend",
+                        type=str,
+                        nargs="+",
+                        default=None,
+                        help="List of names of conditions DB global tag(s) to prepend to GT replay.\n"
+                        "NB: these GTs will have highest priority over GT replay.\n"
+                        "The order of the sequence passed determines the priority of the GTs, w/ the highest coming first.\n"
                         "Pass a space-separated list of names.")
     parser.add_argument("-d", "--debug",
                         action="store",
@@ -67,6 +96,15 @@ if __name__ == "__main__":
     import pdg
     from ROOT import Belle2
     Const = Belle2.Const
+
+    for tag in args.global_tag_append:
+        b2.conditions.append_globaltag(tag)
+    print(f"Appending GTs:\n{args.global_tag_append}")
+
+    if args.global_tag_prepend:
+        for tag in reversed(args.global_tag_prepend):
+            b2.conditions.prepend_globaltag(tag)
+        print(f"Prepending GTs:\n{args.global_tag_prepend}")
 
     # Create path. Register necessary modules to this path.
     path = b2.create_path()
@@ -110,7 +148,9 @@ if __name__ == "__main__":
                                                   *args.detectors,
                                                   vars_for_nearest_part=vc.mc_variables,
                                                   # Calculate also the chosen variables for the nearest particle at each layer.
-                                                  reference_list_name=ref)
+                                                  reference_list_name=ref,
+                                                  # Include/exclude the PID detector weights in the score calculation.
+                                                  exclude_pid_det_weights=not args.use_pid_det_weights)
 
     # Variables and aliases for the J/psi candidates.
     variables_jpsi = vc.kinematics + ["daughterDiffOfPhi(0, 1)"]
@@ -157,7 +197,8 @@ if __name__ == "__main__":
                                                     *args.detectors,
                                                     vars_for_nearest_part=vc.mc_variables,
                                                     # Calculate also the chosen variables for the nearest particle at each layer.
-                                                    highest_prob_mass_for_ext=False)
+                                                    highest_prob_mass_for_ext=False,
+                                                    exclude_pid_det_weights=not args.use_pid_det_weights)
 
     # Variables and aliases for the Lambda0 candidates.
     variables_lambda0 = vc.kinematics + ["daughterDiffOfPhi(0, 1)"]

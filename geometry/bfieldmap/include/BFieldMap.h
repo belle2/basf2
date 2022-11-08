@@ -10,7 +10,6 @@
 
 #include <geometry/bfieldmap/BFieldComponentAbs.h>
 
-#include <framework/geometry/B2Vector3.h>
 #include <framework/logging/Logger.h>
 
 #include <list>
@@ -42,7 +41,7 @@ namespace Belle2 {
      * @param point The space point in Cartesian coordinates.
      * @return A three vector of the magnetic field in [T] at the specified space point.
      */
-    B2Vector3D getBField(const B2Vector3D& point) const;
+    ROOT::Math::XYZVector getBField(const ROOT::Math::XYZVector& point) const;
   public:
 
     /**
@@ -99,9 +98,9 @@ namespace Belle2 {
   }
 
 
-  inline B2Vector3D BFieldMap::getBField(const B2Vector3D& point) const
+  inline ROOT::Math::XYZVector BFieldMap::getBField(const ROOT::Math::XYZVector& point) const
   {
-    B2Vector3D magFieldVec(0.0, 0.0, 0.0);
+    ROOT::Math::XYZVector magFieldVec(0.0, 0.0, 0.0);
     //Check that the point makes sense
     if (std::isnan(point.X()) || std::isnan(point.Y()) || std::isnan(point.Z())) {
       B2ERROR("Bfield requested for a position containing NaN, returning field 0");

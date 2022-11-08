@@ -19,6 +19,7 @@
   </description>
 </header>
 """
+from cmath import nan
 from collections import OrderedDict
 
 import basf2 as b2
@@ -35,6 +36,7 @@ gROOT.ProcessLine('struct EventDataRecoTrack {\
     int ladder;\
     int sensor_type;\
     int strip_dir;\
+    int matched;\
     int cluster_truehits_number;\
     float cluster_UVTimeDiff;\
     float cluster_UUTimeDiff;\
@@ -68,10 +70,11 @@ class SVDValidationTTreeRecoTrack(b2.Module):
                 self.tree.Branch(key, addressof(self.data, key), key + formstring)
 
     def event(self):
-        """Take clusters from SVDRecoTracks with a truehit and save needed information"""
+        """Take clusters from SVDRecoTracks with at least one truehit and save needed information"""
         tracks = Belle2.PyStoreArray('SVDRecoTracks')
         for track in tracks:
             clusters = track.getRelationsWith('SVDClusters')
+            clusters_number = len(clusters)
             dict_cluster = OrderedDict({'L3': [], 'L4': [], 'L5': [], 'L6': []})  # keys: layers, values: list of dicts
             # clusters are ordered acording layers and sides, so we can read two at once
             for i in range(0, len(clusters), 2):
@@ -80,10 +83,8 @@ class SVDValidationTTreeRecoTrack(b2.Module):
                 U_id = c_U.getSensorID()
                 sensorNum_U = U_id.getSensorNumber()
                 layer_U = U_id.getLayerNumber()
-                clusters_number = -1
                 if (layer_U == 3):
                     sensor_type_U = 1
-                    clusters_number = len(clusters)
                 else:
                     if (sensorNum_U == 1):
                         sensor_type_U = 0
@@ -94,11 +95,12 @@ class SVDValidationTTreeRecoTrack(b2.Module):
                              'ladder': U_id.getLadderNumber(),
                              'sensor_type': sensor_type_U,
                              'strip_dir': 0,
+                             'matched': 1 if len(cluster_U_truehits) > 0 else 0,
                              'cluster_truehits_number': len(cluster_U_truehits),
-                             'cluster_clsTime': c_U.getClsTime() if len(cluster_U_truehits) == 1 else -128,
-                             'cluster_UVTimeDiff': -128,
-                             'cluster_UUTimeDiff': -128,
-                             'cluster_VVTimeDiff': -128,
+                             'cluster_clsTime': c_U.getClsTime() if len(cluster_U_truehits) > 0 else nan,
+                             'cluster_UVTimeDiff': nan,
+                             'cluster_UUTimeDiff': nan,
+                             'cluster_VVTimeDiff': nan,
                              'clusters_number': clusters_number}
                 cluster_V_truehits = c_V.getRelationsTo('SVDTrueHits')  # SVDClustersToSVDTrueHits
                 V_id = c_V.getSensorID()
@@ -116,12 +118,13 @@ class SVDValidationTTreeRecoTrack(b2.Module):
                              'ladder': V_id.getLadderNumber(),
                              'sensor_type': sensor_type_V,
                              'strip_dir': 1,
+                             'matched': 1 if len(cluster_V_truehits) > 0 else 0,
                              'cluster_truehits_number': len(cluster_V_truehits),
-                             'cluster_clsTime': c_V.getClsTime() if len(cluster_V_truehits) == 1 else -128,
+                             'cluster_clsTime': c_V.getClsTime() if len(cluster_V_truehits) > 0 else nan,
                              'cluster_UVTimeDiff': c_U.getClsTime() - c_V.getClsTime()
-                             if (len(cluster_U_truehits) == 1) and (len(cluster_V_truehits) == 1) else -128,
-                             'cluster_UUTimeDiff': -128,
-                             'cluster_VVTimeDiff': -128,
+                             if (len(cluster_U_truehits) > 0) and (len(cluster_V_truehits) > 0) else nan,
+                             'cluster_UUTimeDiff': nan,
+                             'cluster_VVTimeDiff': nan,
                              'clusters_number': clusters_number}
                 #
                 if U_id.getLayerNumber() == 3:
@@ -151,8 +154,8 @@ class SVDValidationTTreeRecoTrack(b2.Module):
                         cluster_VVTimeDiff = \
                             layer[1][1]['cluster_clsTime'] - next_layer[1][1]['cluster_clsTime']
                         layer[1][0].update({'cluster_UUTimeDiff': cluster_UUTimeDiff})
-                        layer[1][0].update({'cluster_VVTimeDiff': -128})
-                        layer[1][1].update({'cluster_UUTimeDiff': -128})
+                        layer[1][0].update({'cluster_VVTimeDiff': nan})
+                        layer[1][1].update({'cluster_UUTimeDiff': nan})
                         layer[1][1].update({'cluster_VVTimeDiff': cluster_VVTimeDiff})
                     else:
                         # print("continue")
@@ -166,6 +169,7 @@ class SVDValidationTTreeRecoTrack(b2.Module):
                         self.data.ladder = c['ladder']
                         self.data.sensor_type = c['sensor_type']
                         self.data.strip_dir = c['strip_dir']
+                        self.data.matched = c['matched']
                         self.data.cluster_truehits_number = c['cluster_truehits_number']
                         self.data.cluster_UVTimeDiff = c['cluster_UVTimeDiff']
                         self.data.cluster_UUTimeDiff = c['cluster_UUTimeDiff']

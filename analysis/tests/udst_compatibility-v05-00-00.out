@@ -14,7 +14,9 @@ Untested method Particle::overlapsWith
 Untested method Particle::removeDaughter
 Untested method Particle::removeExtraInfo
 Untested method Particle::replaceDaughter
+Untested method Particle::replaceDaughterRecursively
 Untested method Particle::set4Vector
+Untested method Particle::set4VectorDividingByMomentumScaling
 Untested method Particle::setExtraInfo
 Untested method Particle::setJacobiMatrix
 Untested method Particle::setMomentumScalingFactor

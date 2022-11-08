@@ -37,7 +37,7 @@ class DBInterface(unittest.TestCase):
 
         # create a mock dbstore entry
         override_object = Belle2.BeamParameters()
-        vertex = ROOT.TVector3(1, 2, 3)
+        vertex = ROOT.Math.XYZVector(1, 2, 3)
         # sadly root does not handle the overloads correctly so we don't have an
         # overload without the covariance matrix
         override_object.setVertex(vertex, ROOT.std.vector("double")())
@@ -77,7 +77,7 @@ class DBInterface(unittest.TestCase):
         override_array = ROOT.TClonesArray("Belle2::BeamParameters")
         override_array.ExpandCreate(3)
         for i in range(override_array.GetEntriesFast()):
-            override_array[i].setVertex(ROOT.TVector3(i, i, i), ROOT.std.vector("double")())
+            override_array[i].setVertex(ROOT.Math.XYZVector(i, i, i), ROOT.std.vector("double")())
 
         # must be valid now
         Belle2.DBStore.Instance().addConstantOverride("BeamParameterList", override_array, False)
@@ -94,7 +94,7 @@ class DBInterface(unittest.TestCase):
         # try looping over this and keep track about the number of elements
         for i, e in enumerate(bplist):
             # make sure the vertex is what we put in
-            self.assertEqual(int(e.getVertex()[0]), i)
+            self.assertEqual(int(e.getVertex().X()), i)
             # and that it's in general equal to the original one
             self.assertEqual(e, override_array[i])
             # and itself :D
@@ -103,11 +103,11 @@ class DBInterface(unittest.TestCase):
             copy = Belle2.BeamParameters(e)
             self.assertEqual(e, copy)
             # unless we change the copy
-            copy.setVertex(ROOT.TVector3(1, 2, 3), ROOT.std.vector("double")())
+            copy.setVertex(ROOT.Math.XYZVector(1, 2, 3), ROOT.std.vector("double")())
             self.assertNotEqual(e, copy)
             # and check that modification is blocked
             with self.assertRaises(AttributeError):
-                e.setVertex(ROOT.TVector3(1, 2, 3), ROOT.std.vector("double")())
+                e.setVertex(ROOT.Math.XYZVector(1, 2, 3), ROOT.std.vector("double")())
 
         self.assertEqual(i + 1, len(bplist))
 

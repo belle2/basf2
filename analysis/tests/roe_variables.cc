@@ -70,7 +70,7 @@ namespace {
       PCmsLabTransform T;
 
       TestUtilities::TestParticleFactory factory;
-      B2Vector3D ipposition(0, 0, 0);
+      ROOT::Math::XYZVector ipposition(0, 0, 0);
       double halfEcms = T.getCMSEnergy() / 2;
 
       PxPyPzEVector e_momentum(0., 0,  halfEcms / 2,  halfEcms / 2);

@@ -14,8 +14,10 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 
-//MDST
-#include <mdst/dataobjects/ECLCluster.h>
+// FRAMEWORK
+#include <framework/logging/LogConfig.h>
+#include <framework/logging/LogSystem.h>
+
 
 using namespace Belle2;
 
@@ -37,7 +39,7 @@ ChargedPidMVAModule::ChargedPidMVAModule() : Module()
            int(0));
   addParam("particleLists",
            m_decayStrings,
-           "The input list of decay strings, where the mother particle string should correspond to a full name of a particle list. One can select to run on daughters instead of mother particle, e.g. ['Lambda0 -> ^p+ ^pi-'].",
+           "The input list of DecayStrings, where each selected (^) daughter should correspond to a standard charged ParticleList, e.g. ['Lambda0:sig -> ^p+ ^pi-', 'J/psi:sig -> ^mu+ ^mu-']. One can also directly pass a list of standard charged ParticleLists, e.g. ['e+:my_electrons', 'pi+:my_pions']. Note that charge-conjugated ParticleLists will automatically be included.",
            std::vector<std::string>());
   addParam("payloadName",
            m_payload_name,
@@ -59,19 +61,9 @@ ChargedPidMVAModule::~ChargedPidMVAModule() = default;
 
 void ChargedPidMVAModule::initialize()
 {
-
   m_event_metadata.isRequired();
 
   m_weightfiles_representation = std::make_unique<DBObjPtr<ChargedPidMVAWeights>>(m_payload_name);
-}
-
-
-void ChargedPidMVAModule::beginRun()
-{
-
-  // Retrieve the payload from the DB.
-  (*m_weightfiles_representation.get()).addCallback([this]() { initializeMVA(); });
-  initializeMVA();
 
   if (!(*m_weightfiles_representation.get())->isValidPdg(m_sig_pdg)) {
     B2FATAL("PDG: " << m_sig_pdg <<
@@ -82,50 +74,74 @@ void ChargedPidMVAModule::beginRun()
             " of the background mass hypothesis is not that of a valid particle in Const::chargedStableSet! Aborting...");
   }
 
+  /* Initialize MVA if the payload has changed and now. */
+  (*m_weightfiles_representation.get()).addCallback([this]() { initializeMVA(); });
+  initializeMVA();
+
   m_score_varname = "pidPairChargedBDTScore_" + std::to_string(m_sig_pdg) + "_VS_" + std::to_string(m_bkg_pdg);
 
   if (m_ecl_only) {
     m_score_varname += "_" + std::to_string(Const::ECL);
   } else {
-    for (size_t iDet(0); iDet < Const::PIDDetectors::set().size(); ++iDet) {
-      m_score_varname += "_" + std::to_string(Const::PIDDetectors::set()[iDet]);
+    for (const Const::EDetector& det : Const::PIDDetectorSet::set()) {
+      m_score_varname += "_" + std::to_string(det);
     }
   }
+}
+
+
+void ChargedPidMVAModule::beginRun()
+{
 }
 
 
 void ChargedPidMVAModule::event()
 {
 
+  // Debug strings per log level.
+  std::map<int, std::string> debugStr = {
+    {11, ""},
+    {12, ""}
+  };
+
   B2DEBUG(11, "EVENT: " << m_event_metadata->getEvent());
+
   for (auto decayString : m_decayStrings) {
+
     DecayDescriptor decayDescriptor;
     decayDescriptor.init(decayString);
-    auto pl_name = decayDescriptor.getMother()->getFullName();
+    auto pListName = decayDescriptor.getMother()->getFullName();
+
     unsigned short m_nSelectedDaughters = decayDescriptor.getSelectionNames().size();
-    StoreObjPtr<ParticleList> pList(pl_name);
-    if (!pList) { B2FATAL("ParticleList: " << pl_name << " could not be found. Aborting..."); }
+    StoreObjPtr<ParticleList> pList(pListName);
+
+    if (!pList) {
+      B2FATAL("ParticleList: " << pListName << " could not be found. Aborting...");
+    }
+
+    auto pListSize = pList->getListSize();
+
+    B2DEBUG(11, "ParticleList: " << pList->getParticleListName() << " - N = " << pListSize << " particles.");
+
+    const auto nTargetParticles = (m_nSelectedDaughters == 0) ? pListSize : pListSize * m_nSelectedDaughters;
 
     // Need to get an absolute value in order to check if in Const::ChargedStable.
     std::vector<int> pdgs;
-    if (m_nSelectedDaughters == 0)
+    if (m_nSelectedDaughters == 0) {
       pdgs.push_back(pList->getPDGCode());
-    else
+    } else {
       pdgs = decayDescriptor.getSelectionPDGCodes();
+    }
     for (auto pdg : pdgs) {
       // Check if this ParticleList is made up of legit Const::ChargedStable particles.
       if (!(*m_weightfiles_representation.get())->isValidPdg(abs(pdg))) {
-        B2FATAL("PDG: " << pdg << " of ParticleList: " << pl_name <<
+        B2FATAL("PDG: " << pdg << " of ParticleList: " << pListName <<
                 " is not that of a valid particle in Const::chargedStableSet! Aborting...");
       }
     }
-
-    B2DEBUG(11, "ParticleList: " << pList->getParticleListName() << " - N = " << pList->getListSize() << " particles.");
-    const auto nTargetParticles = (m_nSelectedDaughters == 0) ? pList->getListSize() : pList->getListSize() *
-                                  m_nSelectedDaughters;
     std::vector<const Particle*> targetParticles;
     if (m_nSelectedDaughters > 0) {
-      for (unsigned int iPart(0); iPart < pList->getListSize(); ++iPart) {
+      for (unsigned int iPart(0); iPart < pListSize; ++iPart) {
         auto* iParticle = pList->getParticle(iPart);
         auto daughters = decayDescriptor.getSelectionParticles(iParticle);
         for (auto* iDaughter : daughters) {
@@ -133,54 +149,77 @@ void ChargedPidMVAModule::event()
         }
       }
     }
+
     for (unsigned int ipart(0); ipart < nTargetParticles; ++ipart) {
 
       const Particle* particle = (m_nSelectedDaughters == 0) ? pList->getParticle(ipart) : targetParticles[ipart];
-      B2DEBUG(11, "\tParticle [" << ipart << "]");
 
-      // Check that the particle has a valid relation set between track and ECL cluster.
-      // Otherwise, skip to next.
-      const ECLCluster* eclCluster = particle->getECLCluster();
-      if (!eclCluster) {
-        B2DEBUG(11, "\t\tParticle has invalid Track-ECLCluster relation, skip MVA application...");
-        continue;
+      if (!(*m_weightfiles_representation.get())->hasImplicitNaNmasking()) {
+        // LEGACY TRAININGS: always require a track-cluster match.
+        const ECLCluster* eclCluster = particle->getECLCluster();
+        if (!eclCluster) {
+          if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 11)) {
+            B2WARNING("\nParticle [" << ipart << "] has invalid Track-ECLCluster relation, skip MVA application...");
+          }
+          continue;
+        }
       }
 
       // Retrieve the index for the correct MVA expert and dataset,
-      // given reconstructed (clusterTheta, p, charge)
-      auto clusterTheta = eclCluster->getTheta();
+      // given the reconstructed (polar angle, p, charge)
+      auto thVarName = (*m_weightfiles_representation.get())->getThetaVarName();
+      auto theta = std::get<double>(Variable::Manager::Instance().getVariable(thVarName)->function(particle));
       auto p = particle->getP();
       // Set a dummy charge of zero to pick charge-independent payloads, if requested.
       auto charge = (!m_charge_independent) ? particle->getCharge() : 0.0;
       int idx_theta, idx_p, idx_charge;
-      auto index = (*m_weightfiles_representation.get())->getMVAWeightIdx(clusterTheta, p, charge, idx_theta, idx_p, idx_charge);
+      auto index = (*m_weightfiles_representation.get())->getMVAWeightIdx(theta, p, charge, idx_theta, idx_p, idx_charge);
 
-      // Get the cut defining the MVA category under exam (this reflects the one used in the training).
-      const auto cuts   = (*m_weightfiles_representation.get())->getCuts(m_sig_pdg);
-      const auto cutstr = (!cuts->empty()) ? cuts->at(index) : "";
+      auto* matchVar = Variable::Manager::Instance().getVariable("clusterTrackMatch");
+      auto hasMatch = std::isnormal(std::get<double>(matchVar->function(particle)));
 
-      B2DEBUG(11, "\t\tclusterTheta    = " << clusterTheta << " [rad]");
-      B2DEBUG(11, "\t\tp               = " << p << " [GeV/c]");
+      debugStr[11] += "\n";
+      debugStr[11] += ("Particle [" + std::to_string(ipart) + "]\n");
+      debugStr[11] += ("Has ECL cluster match? " + std::to_string(hasMatch) + "\n");
+      debugStr[11] += ("polar angle: " + thVarName + " = " + std::to_string(theta) + " [rad]\n");
+      debugStr[11] += ("p = " + std::to_string(p) + " [GeV/c]\n");
       if (!m_charge_independent) {
-        B2DEBUG(11, "\t\tcharge          = " << charge);
+        debugStr[11] += ("charge = " + std::to_string(charge) + "\n");
       }
-      B2DEBUG(11, "\t\tBrems corrected = " << particle->hasExtraInfo("bremsCorrectedPhotonEnergy"));
-      B2DEBUG(11, "\t\tWeightfile idx  = " << index << " - (clusterTheta, p, charge) = (" << idx_theta << ", " << idx_p <<  ", " <<
-              idx_charge << ")");
-      if (!cutstr.empty()) {
-        B2DEBUG(11, "\tCategory cut: " << cutstr);
+      debugStr[11] += ("Is brems corrected ? " + std::to_string(particle->hasExtraInfo("bremsCorrected")) + "\n");
+      debugStr[11] += ("Weightfile idx = " + std::to_string(index) + " - (polar angle, p, charge) = (" + std::to_string(
+                         idx_theta) + ", " + std::to_string(idx_p) + ", " +
+                       std::to_string(idx_charge) + ")\n");
+      if (m_cuts.at(index)) {
+        debugStr[11] += ("Category cut: " + m_cuts.at(index)->decompile() + "\n");
+      }
+
+      B2DEBUG(11, debugStr[11]);
+      debugStr[11].clear();
+
+      // Don't even bother if particle does not fulfil the category selection.
+      if (m_cuts.at(index)) {
+
+        if (!m_cuts.at(index)->check(particle)) {
+          if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 11)) {
+            B2WARNING("\nParticle [" << ipart << "] didn't pass MVA category cut, skip MVA application...");
+          }
+          continue;
+        }
+
       }
 
       // Fill the MVA::SingleDataset w/ variables and spectators.
 
-      B2DEBUG(11, "\tMVA variables:");
+      debugStr[11] += "\n";
+      debugStr[11] += "MVA variables:\n";
 
       auto nvars = m_variables.at(index).size();
       for (unsigned int ivar(0); ivar < nvars; ++ivar) {
 
         auto varobj = m_variables.at(index).at(ivar);
 
-        double var = -999.0;
+        double var = std::numeric_limits<double>::quiet_NaN();
         auto var_result = varobj->function(particle);
         if (std::holds_alternative<double>(var_result)) {
           var = std::get<double>(var_result);
@@ -192,63 +231,156 @@ void ChargedPidMVAModule::event()
           B2ERROR("Variable '" << varobj->name << "' has wrong data type! It must be one of double, integer, or bool.");
         }
 
-        // Manual imputation value of -999 for NaN (undefined) variables.
-        var = (std::isnan(var)) ? -999.0 : var;
+        if (!(*m_weightfiles_representation.get())->hasImplicitNaNmasking()) {
+          // LEGACY TRAININGS: manual imputation value of -999 for NaN (undefined) variables. Needed by TMVA.
+          var = (std::isnan(var)) ? -999.0 : var;
+        }
 
-        B2DEBUG(11, "\t\tvar[" << ivar << "] : " << varobj->name << " = " << var);
+        debugStr[11] += ("\tvar[" + std::to_string(ivar) + "] : " + varobj->name + " = " + std::to_string(var) + "\n");
 
         m_datasets.at(index)->m_input[ivar] = var;
 
       }
 
-      B2DEBUG(12, "\tMVA spectators:");
+      B2DEBUG(11, debugStr[11]);
+      debugStr[11].clear();
 
-      auto nspecs = m_spectators.at(index).size();
-      for (unsigned int ispec(0); ispec < nspecs; ++ispec) {
+      // Check spectators only when in debug mode.
+      if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 12)) {
 
-        auto specobj = m_spectators.at(index).at(ispec);
+        debugStr[12] += "\n";
+        debugStr[12] += "MVA spectators:\n";
 
-        double spec = std::numeric_limits<double>::quiet_NaN();
-        auto spec_result = specobj->function(particle);
-        if (std::holds_alternative<double>(spec_result)) {
-          spec = std::get<double>(spec_result);
-        } else if (std::holds_alternative<int>(spec_result)) {
-          spec = std::get<int>(spec_result);
-        } else if (std::holds_alternative<bool>(spec_result)) {
-          spec = std::get<bool>(spec_result);
-        } else {
-          B2ERROR("Variable '" << specobj->name << "' has wrong data type! It must be one of double, integer, or bool.");
+        auto nspecs = m_spectators.at(index).size();
+        for (unsigned int ispec(0); ispec < nspecs; ++ispec) {
+
+          auto specobj = m_spectators.at(index).at(ispec);
+
+          double spec = std::numeric_limits<double>::quiet_NaN();
+          auto spec_result = specobj->function(particle);
+          if (std::holds_alternative<double>(spec_result)) {
+            spec = std::get<double>(spec_result);
+          } else if (std::holds_alternative<int>(spec_result)) {
+            spec = std::get<int>(spec_result);
+          } else if (std::holds_alternative<bool>(spec_result)) {
+            spec = std::get<bool>(spec_result);
+          } else {
+            B2ERROR("Variable '" << specobj->name << "' has wrong data type! It must be one of double, integer, or bool.");
+          }
+
+          debugStr[12] += ("\tspec[" + std::to_string(ispec) + "] : " + specobj->name + " = " + std::to_string(spec) + "\n");
+
+          m_datasets.at(index)->m_spectators[ispec] = spec;
+
         }
 
-        B2DEBUG(12, "\t\tspec[" << ispec << "] : " << specobj->name << " = " << spec);
-
-        m_datasets.at(index)->m_spectators[ispec] = spec;
+        B2DEBUG(12, debugStr[12]);
+        debugStr[12].clear();
 
       }
 
-      // Compute MVA score only if particle fulfils category selection.
-      if (!cutstr.empty()) {
+      // Compute MVA score.
 
-        std::unique_ptr<Variable::Cut> cut = Variable::Cut::compile(cutstr);
-
-        if (!cut->check(particle)) {
-          B2DEBUG(11, "\t\tParticle didn't pass MVA category cut, skip MVA application...");
-          continue;
-        }
-
-      }
+      debugStr[11] += "\n";
+      debugStr[12] += "\n";
+      debugStr[11] += "MVA response:\n";
 
       float score = m_experts.at(index)->apply(*m_datasets.at(index))[0];
 
-      B2DEBUG(11, "\tMVA score = " << score);
-      B2DEBUG(12, "\tExtraInfo: " << m_score_varname);
+      debugStr[11] += ("\tscore = " + std::to_string(score));
+      debugStr[12] += ("\textraInfo: " + m_score_varname + "\n");
 
       // Store the MVA score as a new particle object property.
       m_particles[particle->getArrayIndex()]->writeExtraInfo(m_score_varname, score);
 
+      B2DEBUG(11, debugStr[11]);
+      B2DEBUG(12, debugStr[12]);
+      debugStr[11].clear();
+      debugStr[12].clear();
+
     }
 
   }
+
+  // Clear the debug string map before next event.
+  debugStr.clear();
+
+}
+
+
+void ChargedPidMVAModule::registerAliasesLegacy()
+{
+
+  std::map<std::string, std::string> aliasesLegacy;
+
+  aliasesLegacy.insert(std::make_pair("__event__", "evtNum"));
+
+  for (Const::DetectorSet::Iterator it = Const::PIDDetectorSet::set().begin();
+       it != Const::PIDDetectorSet::set().end(); ++it) {
+
+    auto detName = Const::parseDetectors(*it);
+
+    aliasesLegacy.insert(std::make_pair("missingLogL_" + detName, "pidMissingProbabilityExpert(" + detName + ")"));
+
+    for (auto& [pdgId, info] : m_stdChargedInfo) {
+
+      std::string alias = "deltaLogL_" + std::get<0>(info) + "_" + std::get<1>(info) + "_" + detName;
+      std::string var = "pidDeltaLogLikelihoodValueExpert(" + std::to_string(pdgId) + ", " + std::to_string(std::get<2>
+                        (info)) + "," + detName + ")";
+
+      aliasesLegacy.insert(std::make_pair(alias, var));
+
+      if (it.getIndex() == 0) {
+        alias = "deltaLogL_" + std::get<0>(info) + "_" + std::get<1>(info) + "_ALL";
+        var = "pidDeltaLogLikelihoodValueExpert(" + std::to_string(pdgId) + ", " + std::to_string(std::get<2>(info)) + ", ALL)";
+        aliasesLegacy.insert(std::make_pair(alias, var));
+      }
+
+    }
+
+  }
+
+  B2INFO("Setting hard-coded aliases for the ChargedPidMVA algorithm.");
+
+  std::string debugStr("\n");
+  for (const auto& [alias, variable] : aliasesLegacy) {
+    debugStr += (alias + " --> " + variable + "\n");
+    if (!Variable::Manager::Instance().addAlias(alias, variable)) {
+      B2ERROR("Something went wrong with setting alias: " << alias << " for variable: " << variable);
+    }
+  }
+  B2DEBUG(10, debugStr);
+
+}
+
+
+void ChargedPidMVAModule::registerAliases()
+{
+
+  auto aliases = (*m_weightfiles_representation.get())->getAliases();
+
+  if (!aliases->empty()) {
+
+    B2INFO("Setting aliases for the ChargedPidMVA algorithm read from the payload.");
+
+    std::string debugStr("\n");
+    for (const auto& [alias, variable] : *aliases) {
+      if (alias != variable) {
+        debugStr += (alias + " --> " + variable + "\n");
+        if (!Variable::Manager::Instance().addAlias(alias, variable)) {
+          B2ERROR("Something went wrong with setting alias: " << alias << " for variable: " << variable);
+        }
+      }
+    }
+    B2DEBUG(10, debugStr);
+
+    return;
+
+  }
+
+  // Manually set aliases - for bw compatibility
+  this->registerAliasesLegacy();
+
 }
 
 
@@ -256,6 +388,9 @@ void ChargedPidMVAModule::initializeMVA()
 {
 
   B2INFO("Run: " << m_event_metadata->getRun() << ". Load supported MVA interfaces for binary charged particle identification...");
+
+  // Set the necessary variable aliases from the payload.
+  this->registerAliases();
 
   // The supported methods have to be initialized once (calling it more than once is safe).
   MVA::AbstractInterface::initSupportedInterfaces();
@@ -272,6 +407,7 @@ void ChargedPidMVAModule::initializeMVA()
   // to the number of available weightfiles for this pdgId.
   m_experts.resize(nfiles);
   m_datasets.resize(nfiles);
+  m_cuts.resize(nfiles);
   m_variables.resize(nfiles);
   m_spectators.resize(nfiles);
 
@@ -307,6 +443,13 @@ void ChargedPidMVAModule::initializeMVA()
     m_datasets[idx] = std::make_unique<MVA::SingleDataset>(general_options, v, 1.0, s);
 
     B2DEBUG(12, "\t\tdataset[" << idx << "] created successfully!");
+
+    // Compile cut for this category.
+    const auto cuts = (*m_weightfiles_representation.get())->getCuts(m_sig_pdg);
+    const auto cutstr = (!cuts->empty()) ? cuts->at(idx) : "";
+    m_cuts[idx] = (!cutstr.empty()) ? Variable::Cut::compile(cutstr) : nullptr;
+
+    B2DEBUG(12, "\t\tcut[" << idx << "] created successfully!");
 
   }
 

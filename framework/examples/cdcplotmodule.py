@@ -89,8 +89,8 @@ class CDCPlotModule(Module):
             # add simhit to the list corresponding to this particle
             idx = mcparts.index(mcpart)
             hitpos = hit.getPosWire()  # TVector3
-            trackhits_x[idx].append(hitpos.x())
-            trackhits_y[idx].append(hitpos.y())
+            trackhits_x[idx].append(hitpos.X())
+            trackhits_y[idx].append(hitpos.Y())
 
         npart = len(mcparts)
         if npart > 0:

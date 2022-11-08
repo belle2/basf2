@@ -9,7 +9,7 @@
 #pragma once
 
 #include <simulation/dataobjects/SimHitBase.h>
-#include <TVector2.h>
+#include <Math/Point2D.h>
 
 namespace Belle2 {
 
@@ -71,7 +71,7 @@ namespace Belle2 {
      * Returns local position of hit (in PMT frame)
      * @return local position
      */
-    TVector2 getPosition() const { return TVector2(m_x, m_y); }
+    ROOT::Math::XYPoint getPosition() const { return ROOT::Math::XYPoint(m_x, m_y); }
 
     /**
      * Returns local x position of hit (in PMT frame)

@@ -43,14 +43,14 @@ namespace Belle2 {
                TVector3 momentum)
     {
 
-      m_x = (float) position.x();
-      m_y = (float) position.y();
-      m_z = (float) position.z();
+      m_x = (float) position.X();
+      m_y = (float) position.Y();
+      m_z = (float) position.Z();
       m_momentum = (float) momentum.Mag();
       momentum = momentum.Unit();
-      m_dx = (float) momentum.x();
-      m_dy = (float) momentum.y();
-      m_dz = (float) momentum.z();
+      m_dx = (float) momentum.X();
+      m_dy = (float) momentum.Y();
+      m_dz = (float) momentum.Z();
 
     }
 

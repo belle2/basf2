@@ -22,23 +22,24 @@
 namespace Belle2 {
 
   /**
-   * Module EKLMADCModule.
+   * Module KLMScintillatorSimulatorModule.
    * @details
-   * Module for standalone generation and studies of ADC output.
+   * Module for standalone generation and studies of
+   * KLM scintillator-simulator output.
    */
-  class EKLMADCModule : public Module {
+  class KLMScintillatorSimulatorModule : public Module {
 
   public:
 
     /**
      * Constructor.
      */
-    EKLMADCModule();
+    KLMScintillatorSimulatorModule();
 
     /**
      * Destructor.
      */
-    ~EKLMADCModule();
+    ~KLMScintillatorSimulatorModule();
 
     /**
      * Initializer.

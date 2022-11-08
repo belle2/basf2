@@ -21,8 +21,8 @@ namespace Belle2 {
     virtual TEveVector GetField(Float_t x, Float_t y, Float_t z) const override
     {
       TEveVector v;
-
-      v.Set(BFieldManager::getField(x, y, z) / Unit::T);
+      ROOT::Math::XYZVector bfield = BFieldManager::getField(x, y, z) / Unit::T;
+      v.Set(bfield.X(), bfield.Y(), bfield.Z());
       v.fZ *= -1; //Eve has inverted B field convention
       v.fZ -= 1e-6; //field must not be zero!
 

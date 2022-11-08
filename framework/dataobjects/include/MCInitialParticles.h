@@ -15,8 +15,6 @@
 #include <Math/Vector3D.h>
 #include <Math/Vector4D.h>
 
-#include <framework/geometry/B2Vector3.h>
-
 namespace Belle2 {
 
   /** This class contains the initial state for the given event.
@@ -70,7 +68,7 @@ namespace Belle2 {
 #if defined(MCP_DBL_CMP) || defined(MCP_VEC3_CMP) || defined(MCP_VEC4_CMP)
 #error Macro already defined, cannot continue
 #endif
-#define MCP_DBL_CMP(a,b,x) ((a.x()==b.x())||(std::abs(a.x()-b.x())<1e-10))
+#define MCP_DBL_CMP(a,b,x) ((a.X()==b.X())||(std::abs(a.X()-b.X())<1e-10))
 #define MCP_VEC3_CMP(a,b) (MCP_DBL_CMP(a,b,X) && MCP_DBL_CMP(a,b,Y) && MCP_DBL_CMP(a,b,Z))
 #define MCP_VEC4_CMP(a,b) (MCP_VEC3_CMP(a,b) && MCP_DBL_CMP(a,b,E))
       return MCP_VEC4_CMP(m_her, b.m_her) && MCP_VEC4_CMP(m_ler, b.m_ler) && MCP_VEC3_CMP(m_vertex, b.m_vertex)
@@ -90,7 +88,7 @@ namespace Belle2 {
      * @param ler 4vector of the low energy beam
      * @param vertex position of the actual collision vertex
      */
-    void set(const ROOT::Math::PxPyPzEVector& her, const ROOT::Math::PxPyPzEVector& ler, const B2Vector3D& vertex)
+    void set(const ROOT::Math::PxPyPzEVector& her, const ROOT::Math::PxPyPzEVector& ler, const ROOT::Math::XYZVector& vertex)
     {
       m_her = her;
       m_ler = ler;
@@ -110,7 +108,7 @@ namespace Belle2 {
      * @param vertex   position of the actual collision vertex
      */
     void setByLorentzTransformation(double Ecms, double bX, double bY, double bZ, double angleXZ, double angleYZ,
-                                    const B2Vector3D& vertex)
+                                    const ROOT::Math::XYZVector& vertex)
     {
       if (m_labToCMS) delete m_labToCMS;
       if (m_CMSToLab) delete m_CMSToLab;
@@ -145,7 +143,7 @@ namespace Belle2 {
     }
 
     /** Set the vertex position */
-    void setVertex(const B2Vector3D& vertex)
+    void setVertex(const ROOT::Math::XYZVector& vertex)
     {
       m_vertex = vertex;
     }
@@ -163,7 +161,7 @@ namespace Belle2 {
     const ROOT::Math::PxPyPzEVector& getLER() const { return m_ler; }
 
     /** Get the position of the collision */
-    const B2Vector3D& getVertex() const { return m_vertex; }
+    const ROOT::Math::XYZVector& getVertex() const { return m_vertex; }
 
     /** Get collison time */
     double getTime() const {return m_time;}
@@ -221,7 +219,7 @@ namespace Belle2 {
     /** LER 4vector */
     ROOT::Math::PxPyPzEVector m_ler;
     /** collision position */
-    B2Vector3D m_vertex;
+    ROOT::Math::XYZVector m_vertex;
     /** collision time */
     double m_time = 0;
     /** Boost from Lab into CMS. (calculated on first use, not saved to file) */
@@ -241,7 +239,7 @@ namespace Belle2 {
   private:
 
     /** ROOT Dictionary */
-    ClassDef(MCInitialParticles, 4);
+    ClassDef(MCInitialParticles, 5);
   };
 
   inline void MCInitialParticles::calculateBoost() const

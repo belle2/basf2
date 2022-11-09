@@ -75,7 +75,6 @@ namespace Belle2 {
                                                 );
 
     ROOT::Math::XYZVector globalError;
-//     for (int i = 0; i < 3; i++) { globalError[i] = sqrt(abs(globalizedVariances[i])); }
     globalError.SetX(sqrt(abs(globalizedVariances.X())));
     globalError.SetY(sqrt(abs(globalizedVariances.Y())));
     globalError.SetZ(sqrt(abs(globalizedVariances.Z())));
@@ -150,7 +149,6 @@ namespace Belle2 {
                                                        true
                                                      );
     ROOT::Math::XYZVector globalErrorFor2D;
-//     for (int i = 0; i < 3; i++) { globalErrorFor2D[i] = sqrt(abs(globalizedVariancesFor2D[i])); }
     globalErrorFor2D.SetX(sqrt(abs(globalizedVariancesFor2D.X())));
     globalErrorFor2D.SetY(sqrt(abs(globalizedVariancesFor2D.Y())));
     globalErrorFor2D.SetZ(sqrt(abs(globalizedVariancesFor2D.Z())));
@@ -182,7 +180,6 @@ namespace Belle2 {
                                                        true
                                                      );
     ROOT::Math::XYZVector globalErrorFor1D;
-//     for (int i = 0; i < 3; i++) { globalErrorFor1D[i] = sqrt(abs(globalizedVariancesFor1D[i])); }
     globalErrorFor1D.SetX(sqrt(abs(globalizedVariancesFor1D.X())));
     globalErrorFor1D.SetY(sqrt(abs(globalizedVariancesFor1D.Y())));
     globalErrorFor1D.SetZ(sqrt(abs(globalizedVariancesFor1D.Z())));

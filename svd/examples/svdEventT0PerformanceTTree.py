@@ -28,9 +28,6 @@ import glob
 import argparse
 # import os
 
-# useSimulation = True
-useSimulation = False
-
 # b2.set_log_level(b2.LogLevel.DEBUG)
 # b2.set_debug_level(40)
 
@@ -39,17 +36,18 @@ parser.add_argument("--fileDir", default="./",
                     help="Output File Dir")
 parser.add_argument("--fileTag", default="test",
                     help="Output File Tag")
+parser.add_argument("--isMC", action="store_true",
+                    help="Use Simulation")
+parser.add_argument("--is3sample", action="store_true",
+                    help="Emulate SVD 3 samples")
 args = parser.parse_args()
 b2.B2INFO(f"Steering file args = {args}")
-
-# set this string to identify the output rootfiles
-ftag = "_" + args.fileTag
 
 main = b2.create_path()
 
 b2.set_random_seed(1)
 
-if useSimulation:
+if args.isMC:
     # options for simulation:
     # expList = [1003]
     expList = [0]
@@ -87,12 +85,13 @@ else:
     # main.add_module('RootInput', branchNames=['RawPXDs', 'RawSVDs', 'RawCDCs', 'RawECLs'])
     # raw.add_unpackers(main, components=['PXD', 'SVD', 'CDC', 'ECL'])
 
-    # main.add_module('RootInput', entrySequences=[str(args.startEvt)+":"+str(args.endEvt)])
+    # main.add_module('RootInput', entrySequences=['0:1000'])
     main.add_module('RootInput')
 
     main.add_module("Gearbox")
     main.add_module('Geometry', useDB=True)
 
+if not args.isMC:
     raw.add_unpackers(main)
 
     # change ZS to 5
@@ -108,6 +107,32 @@ trk.add_tracking_reconstruction(
     append_full_grid_cdc_eventt0=True,
     trackFitHypotheses=[211])  # ,
 #    skipHitPreparerAdding=True)
+
+
+if args.is3sample:
+    # emulate 3-sample DAQ for events
+    zsemulator = b2.register_module("SVD3SamplesEmulator")
+    zsemulator.param("outputSVDShaperDigits", "SVDShaperDigits3SampleAll")
+    zsemulator.param("outputSVDEventInfo", "SVDEventInfo3Sample")
+    zsemulator.param("chooseStartingSample", False)
+    zsemulator.param("chooseRelativeShift", True)
+    zsemulator.param("relativeShift", 7)
+    zsemulator.param("SVDShaperDigits", "SVDShaperDigits")
+    main.add_module(zsemulator)
+
+    zsonline = b2.register_module("SVDZeroSuppressionEmulator")
+    zsonline.param("ShaperDigits", "SVDShaperDigits3SampleAll")
+    zsonline.param("ShaperDigitsIN", "SVDShaperDigits3Sample")
+    main.add_module(zsonline)
+
+    #  clusterizer
+    clusterizer = b2.register_module('SVDClusterizer')
+    clusterizer.set_name("SVDClusterizer_3Sample")
+    clusterizer.param('ShaperDigits', "SVDShaperDigits3Sample")
+    clusterizer.param('Clusters', "SVDClusters3Sample")
+    clusterizer.param('EventInfo', "SVDEventInfo3Sample")
+    main.add_module(clusterizer)
+
 
 '''
 # skim mu+mu- events:
@@ -126,7 +151,13 @@ skimfilter.if_value('=1', filter_path, b2.AfterConditionPath.CONTINUE)
 '''
 
 # fill TTrees
-main.add_module('SVDEventT0PerformanceTTree', outputFileName=str(args.fileDir)+"SVDEventT0PerformanceTTree"+str(ftag)+".root")
+outputFileName = str(args.fileDir)+"SVDEventT0PerformanceTTree"
+if args.isMC:
+    outputFileName += "_MC"
+if args.is3sample:
+    outputFileName += "_emulated3sample"
+outputFileName += "_"+str(args.fileTag)
+main.add_module('SVDEventT0PerformanceTTree', outputFileName=outputFileName+".root")
 
 # # write everything
 # main.add_module('OverlapResiduals', ExpertLevel=True)

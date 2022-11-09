@@ -4,15 +4,6 @@
  *                                                                        *
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
- *                                                                        *
- * Algorithm that works with eclNOptimalCollector to find the number      *
- * of crystals to be summed to get the best energy resolution for each    *
- * test energy and for each group of crystals (8 groups per thetaID in    *
- * the barrel). Also finds the corresponding energy bias from beam        *
- * backgrounds, and the peak fraction of energy contained in the crystals.*
- *                                                                        *
- * Contact Chris Hearty hearty@physics.ubc.ca for questions or concerns   *
- *                                                                        *
  **************************************************************************/
 
 #pragma once
@@ -21,6 +12,14 @@
 
 namespace Belle2 {
   namespace ECL {
+
+    /** Algorithm that works with eclNOptimalCollector to find the number of
+     * crystals to be summed to get the best energy resolution for each test
+     * energy and for each group of crystals (8 groups per thetaID in the barrel).
+     * Also finds the corresponding energy bias from beam backgrounds, and the
+     * peak fraction of energy contained in the crystals.
+     *
+     * Contact Chris Hearty hearty@physics.ubc.ca for questions or concerns */
 
     /** Find optimal number of crystals to sum for cluster energy */
     class eclNOptimalAlgorithm : public CalibrationAlgorithm {

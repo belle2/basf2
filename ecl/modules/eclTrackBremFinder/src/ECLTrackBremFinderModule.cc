@@ -281,7 +281,6 @@ void ECLTrackBremFinderModule::event()
 
         const auto fitted_pos = ROOT::Math::XYZVector(fitted_state.getPos());
         const auto fitted_mom = ROOT::Math::XYZVector(fitted_state.getMom());
-        // const auto fitted_dir = ROOT::Math::XYZVector(fitted_state.getDir());
 
         const auto hit_theta = fitted_mom.Theta();
         const auto hit_phi = fitted_mom.Phi();

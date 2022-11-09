@@ -709,11 +709,6 @@ void RecoTrack::estimateArmTime()
       }
     }
   }
-
-  // Compute the difference of ingoing arm time and outgoing arm time
-  m_inOutArmTimeDiff = m_ingoingArmTime - m_outgoingArmTime;
-  m_inOutArmTimeDiffError = std::sqrt(m_ingoingArmTimeError * m_ingoingArmTimeError + m_outgoingArmTimeError *
-                                      m_outgoingArmTimeError);
 }
 
 bool RecoTrack::isOutgoingArm(RecoHitInformation::RecoHitDetector pre, RecoHitInformation::RecoHitDetector post)

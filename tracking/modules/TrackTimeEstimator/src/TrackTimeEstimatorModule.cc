@@ -40,12 +40,12 @@ void TrackTimeEstimatorModule::event()
         const auto& recoTrack = track.getRelatedTo<RecoTrack>();
         // if the outgoing arm exists, the track time is computed as the difference of the outgoing arm time and the SVD EventT0
         // otherwise, if the ingoing arm exists, the track time is computed as the difference of the ingoing arm time and the SVD EventT0
+        float outgoingArmTime = recoTrack->getOutgoingArmTime();
+        float ingoingArmTime = recoTrack->getIngoingArmTime();
         if (recoTrack->hasOutgoingArmTime()) {
-          track.setTrackTime(recoTrack->getOutgoingArmTime() - svdBestT0.eventT0);
-        } else {
-          if (recoTrack->hasIngoingArmTime()) {
-            track.setTrackTime(recoTrack->getIngoingArmTime() - svdBestT0.eventT0);
-          }
+          track.setTrackTime(outgoingArmTime - svdBestT0.eventT0);
+        } else if (recoTrack->hasIngoingArmTime()) {
+          track.setTrackTime(ingoingArmTime - svdBestT0.eventT0);
         }
       }
     }

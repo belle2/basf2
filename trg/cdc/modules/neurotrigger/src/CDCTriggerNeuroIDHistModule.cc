@@ -44,7 +44,7 @@ namespace Belle2 {
              std::string("MCParticles"));
     addParam("configfile", m_configFileName,
              "Name of the config file, where all the parameters and the IDHist configuration is written.",
-             std::string("idHist"));
+             std::string(""));
     addParam("MaxEvents", m_nPrepare,
              "amount of events used for creating the IDHist. If it is 0, "
              "all Events are used.",
@@ -193,18 +193,25 @@ namespace Belle2 {
   void
   CDCTriggerNeuroIDHistModule::terminate()
   {
-    for (unsigned isector = 0; isector < m_trainSets_prepare.size(); ++isector) {
-      std::vector<float> reid = NeuroTrainer::getRelevantID(m_trainSets_prepare[isector], m_neuroParameters.cutSum,
-                                                            m_neuroParameters.relevantCut);
-      m_NeuroTrigger[isector].setRelID(reid);
+
+    if (m_neuroParameters.IDRanges.size() > 0) {
+      if (m_neuroParameters.IDRanges[0].size() > 0) {
+        if (m_neuroParameters.IDRanges[0][0].isSet()) {
+          // the idranges are already set, print warning:
+          if (!m_neuroParameters.IDRanges[0][0].isLocked()) {
+            B2WARNING("ID ranges are already set in the config file, they will be updated now!");
+          } else {
+            B2ERROR("The ID ranges in the config file are already locked and cannot be updated!");
+            return;
+          }
+        }
+      }
     }
-    std::ofstream gzipfile4(m_configFileName + ".gz", std::ios_base::app | std::ios_base::binary);
-    boost::iostreams::filtering_ostream outStream;
-    outStream.push(boost::iostreams::gzip_compressor());
-    outStream.push(gzipfile4);
-    for (unsigned isector = 0; isector < m_NeuroTrigger.nSectors(); ++isector) {
-      //std::vector<float> reid = m_NeuroTrigger[isector].getRelID();
-      CDCTriggerMLPData::HeaderSet hset(isector, m_NeuroTrigger[isector].getRelID()); //, m_NeuroTrigger[isector].et_option);
+    for (unsigned isector = 0; isector < m_trainSets_prepare.size(); ++isector) {
+      CDCTriggerMLPData::HeaderSet hset(isector, NeuroTrainer::getRelevantID(
+                                          m_trainSets_prepare[isector],
+                                          m_neuroParameters.cutSum,
+                                          m_neuroParameters.relevantCut));
       std::vector<NNTParam<float>> expertline;
       expertline.push_back(float(isector));
       expertline.back().lock();
@@ -214,7 +221,6 @@ namespace Belle2 {
       }
       m_neuroParameters.IDRanges.push_back(expertline);
       B2DEBUG(15, hset);
-      outStream << hset << std::endl;
     }
     m_configFileName = "IDTable_" + m_configFileName;
     // lock the variables used in this module, that are not supposed be changed
@@ -243,7 +249,6 @@ namespace Belle2 {
     m_neuroParameters.saveconfigtxt(m_configFileName);
     // the *rangeTrain variables are used here, but just for obtaining the idranges.
     // because they only have a very minor effect on those, they are not locked here.
-    m_NeuroTrigger.save(m_configFileName + ".root", "MLPs");
     //TODO: also write the config file to be directly able to start the training
   }
 

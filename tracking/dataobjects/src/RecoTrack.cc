@@ -668,7 +668,7 @@ void RecoTrack::estimateArmTime()
       trackArmTimeDone = false;
     }
     if (foundin == SVD) {
-      RelationVector<SVDCluster> svdClusters = recoHit->getRelationsTo<SVDCluster>();
+      RelationVector<SVDCluster> svdClusters = recoHit->getRelationsTo<SVDCluster>(m_storeArrayNameOfSVDHits);
       clusterTimeSum += svdClusters[0]->getClsTime();
       clusterTimeSigma2Sum += svdClusters[0]->getClsTimeSigma() * svdClusters[0]->getClsTimeSigma();
       nSVDHits += 1;

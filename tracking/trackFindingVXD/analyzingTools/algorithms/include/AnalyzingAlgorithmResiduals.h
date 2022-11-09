@@ -121,7 +121,7 @@ namespace Belle2 {
     DataType calcData(const TCInfoType& aTC) override
     {
       const auto tcs = AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectPairOfTCs(aTC);
-      return tcs.refTC->momSeed.Theta() * 180.*TMath::InvPi() - tcs.testTC->momSeed.Theta() * 180.*TMath::InvPi();
+      return tcs.refTC->momSeed.Theta() * TMath::RadToDeg() - tcs.testTC->momSeed.Theta() * TMath::RadToDeg();
     }
   };
 
@@ -139,7 +139,7 @@ namespace Belle2 {
     DataType calcData(const TCInfoType& aTC) override
     {
       const auto tcs = AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectPairOfTCs(aTC);
-      return tcs.refTC->momSeed.Phi() * 180.*TMath::InvPi() - tcs.testTC->momSeed.Phi() * 180.*TMath::InvPi();
+      return tcs.refTC->momSeed.Phi() * TMath::RadToDeg() - tcs.testTC->momSeed.Phi() * TMath::RadToDeg();
     }
   };
 
@@ -157,7 +157,7 @@ namespace Belle2 {
     DataType calcData(const TCInfoType& aTC) override
     {
       const auto tcs = AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectPairOfTCs(aTC);
-      return ROOT::Math::VectorUtil::Angle(tcs.testTC->momSeed, tcs.refTC->momSeed) * 180.*TMath::InvPi();
+      return ROOT::Math::VectorUtil::Angle(tcs.testTC->momSeed, tcs.refTC->momSeed) * TMath::RadToDeg();
     }
   };
 
@@ -179,7 +179,7 @@ namespace Belle2 {
       refMom.SetZ(0.);
       VectorType testMom = tcs.testTC->momSeed;
       testMom.SetZ(0.);
-      return ROOT::Math::VectorUtil::Angle(testMom, refMom) * 180.*TMath::InvPi();
+      return ROOT::Math::VectorUtil::Angle(testMom, refMom) * TMath::RadToDeg();
     }
   };
 

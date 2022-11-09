@@ -225,7 +225,7 @@ void CDCCKFEclSeedCreator::apply(std::vector<CDCCKFPath>& seeds)
     // set properties of genfit objects
     genfit::SharedPlanePtr planeNeg(new genfit::DetPlane(XYZToTVector(pos), XYZToTVector(pos)));
     genfit::SharedPlanePtr planePos(new genfit::DetPlane(XYZToTVector(pos), XYZToTVector(pos)));
-    msopNeg.setPosMomCov(XYZToTVector(pos), XYZToTVector(mompos), cov);
+    msopNeg.setPosMomCov(XYZToTVector(pos), XYZToTVector(momneg), cov);
     msopNeg.setPlane(planeNeg);
     msopPos.setPosMomCov(XYZToTVector(pos), XYZToTVector(mompos), cov);
     msopPos.setPlane(planePos);

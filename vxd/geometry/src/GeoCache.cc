@@ -11,6 +11,7 @@
 #include <vxd/simulation/SensitiveDetectorBase.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
+#include <TMath.h>
 
 #include <stack>
 #include <memory>
@@ -372,9 +373,9 @@ namespace Belle2 {
       TGeoRotation rotation;
 
       translation.SetTranslation(dU, dV, dW);
-      rotation.RotateX(- dAlpha * 180. / M_PI);
-      rotation.RotateY(- dBeta  * 180. / M_PI);
-      rotation.RotateZ(- dGamma * 180. / M_PI);
+      rotation.RotateX(- dAlpha * TMath::RadToDeg());
+      rotation.RotateY(- dBeta  * TMath::RadToDeg());
+      rotation.RotateZ(- dGamma * TMath::RadToDeg());
 
       // Differential trafo (trans + rot)
       TGeoCombiTrans combi(translation, rotation);

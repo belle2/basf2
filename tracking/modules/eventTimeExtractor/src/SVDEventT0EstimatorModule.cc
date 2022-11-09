@@ -109,7 +109,7 @@ void SVDEventT0EstimatorModule::event()
       armTimeErrSum += outgoingArmTimeError * outgoingArmTimeError;
       numberOfSVDClusters += recoTrack.getNSVDHitsOfOutgoingArm();
       numberOfRecoTracksUsed += 1;
-    } else if (!hasOutgoingArm && hasIngoingArm) { // check if it ahas only ingoing arm
+    } else if (!hasOutgoingArm && hasIngoingArm) { // check if it has only ingoing arm
       armTimeSum += ingoingArmTime * recoTrack.getNSVDHitsOfIngoingArm();
       armTimeErrSum += ingoingArmTimeError * ingoingArmTimeError;
       numberOfSVDClusters += recoTrack.getNSVDHitsOfIngoingArm();

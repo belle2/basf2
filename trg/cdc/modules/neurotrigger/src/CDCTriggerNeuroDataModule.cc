@@ -27,11 +27,11 @@ namespace Belle2 {
   CDCTriggerNeuroDataModule::CDCTriggerNeuroDataModule() : Module()
   {
     setDescription(
-      "TODO"
+      "This module takes 2dtracks, track segments, and targettracks (either recotracks or mcparticles) as input and generates training data for the neurotrigger in a tab separated, gzip compressed file."
     );
     // parameters for saving / loading
     addParam("hitCollectionName", m_hitCollectionName,
-             "Name of the input StoreArray of CDCTriggerSegmentHits. Need to have a relation to inputtracks",
+             "Name of the input StoreArray of CDCTriggerSegmentHits. The Axials need to have a relation to inputtracks",
              std::string(""));
     addParam("inputCollectionName", m_inputCollectionName,
              "Name of the StoreArray holding the 2D input tracks.",
@@ -46,8 +46,8 @@ namespace Belle2 {
              "Name of the event time object.",
              std::string("CDCTriggerNeuroETFT0"));
     addParam("NeuroTrackInputMode", m_neuroTrackInputMode,
-             "When using real tracks, use neurotracks instead of 2dtracks as input to the neurotrigger",
-             true);
+             "When using real tracks, use neurotracks instead of 2dtracks as input to the neurotrigger. this is important to get the relations right.",
+             false);
     addParam("singleUse", m_singleUse,
              "Only use a track for a single expert", true);
     addParam("configFileName", m_configFileName,
@@ -197,10 +197,6 @@ namespace Belle2 {
       for (unsigned i = 0; i < sectors.size(); ++i) {
         int isector = sectors[i];
         std::vector<float> target = m_NeuroTrigger[isector].scaleTarget(targetRaw);
-        if (fabs(target[1]) < 0.0000000001) {
-          std::cout << "Problem, target too small!!!! target: " << target[0] << ", " << target[1] << " targetraw: " << targetRaw[0] << ", " <<
-                    targetRaw[1] << std::endl;
-        }
         // skip out of range targets or rescale them
         bool outOfRange = false;
         for (unsigned itarget = 0; itarget < target.size(); ++itarget) {
@@ -214,19 +210,19 @@ namespace Belle2 {
         }
         //
         // read out or determine event time
-        //std::cout << "time: " << m_NeuroTrigger.m_T0 << std::endl;
-        //std::cout << "getting event time" << std::endl;
         m_NeuroTrigger.getEventTime(isector, *m_tracks[itrack], m_neuroParameters.et_option(), m_neuroTrackInputMode);
-        //std::cout << "time: " << m_NeuroTrigger.m_T0 << std::endl;
         // check hit pattern
         unsigned long hitPattern = m_NeuroTrigger.getCompleteHitPattern(isector, *m_tracks[itrack], m_neuroTrackInputMode); // xxxxx0xxx
-        //std::cout << "hitpattern: " << hitPattern << std::endl;
+        // sectorpattern holds the absolut necessary SLs for the expert
         unsigned long sectorPattern = m_NeuroTrigger[isector].getSLpattern(); // 010100010
+        // sectorpatternmask holds the SLs, which are generally used to determine the right expert
         unsigned long sectorPatternMask = m_NeuroTrigger[isector].getSLpatternMask(); // 010101010
         B2DEBUG(250, "hitPattern " << hitPattern << " sectorPattern " << sectorPattern);
+        // if multiple experts should be trained with one track, the necessary SLs have to be in the hitpattern
         if (!m_singleUse && sectorPattern > 0 && (sectorPattern & hitPattern) != sectorPattern) {
           B2DEBUG(250, "hitPattern not matching " << (sectorPattern & hitPattern));
           continue;
+          // if one track should only be used for one expert, the absolute necessary SLs for this expert should match exactly the set within the hitpattern of the generally used SLs for determining the expert.
         } else if (m_singleUse && sectorPattern > 0 && (sectorPattern) != (hitPattern & sectorPatternMask)) {
           // 010100010 != 0x0x0x0x0
           B2DEBUG(250, "hitPattern not matching " << (sectorPatternMask & hitPattern));
@@ -251,6 +247,7 @@ namespace Belle2 {
         } else {
           hitIds = m_NeuroTrigger.selectHits(isector, *m_tracks[itrack]);
         }
+        // add a "sample" it is a full training set including some zeroes for the neurotrigger values (raw and scaled z and theta). Those are sometimes used in the training for reference, but cannot be added here without running *some* neuotrigger instance.
         CDCTriggerMLPData::NeuroSet<27, 2> sample(m_NeuroTrigger.getInputVector(isector, hitIds).data(), target.data(),
                                                   evtmetadata->getExperiment(), evtmetadata->getRun(), evtmetadata->getSubrun(), evtmetadata->getEvent(), itrack, i,
                                                   m_tracks.getEntries(), 0, 0, 0, 0, phi0, theta, invpt);
@@ -276,6 +273,7 @@ namespace Belle2 {
     for (unsigned int i = 0; i < m_trainSet.size(); ++i) {
       ss << "expert " << i << " : " << m_trainSet[i].nSamples() << ", ";
     }
+    // lock the parameters, which were used to obtain the training data, so they cannot be altered in the next steps.
     m_neuroParameters.ETOption.lock();
     m_neuroParameters.rescaleTarget.lock();
     m_neuroParameters.targetZ.lock();

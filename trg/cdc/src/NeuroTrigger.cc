@@ -187,6 +187,7 @@ NeuroTrigger::initialize(const NeuroTriggerParameters& p)
   m_MLPs.clear();
   for (unsigned iMLP = 0; iMLP < p.nMLP; ++iMLP) {
     //get indices for sector parameters
+    //this is important for cases, where we have experts specialized on different geometrical sectors as well as the pattern mask. since they are all in one array, we need the specific index of the expert. E.g. p.maxhitspersl cloud look like: [<expert-trained-on-slpattern0+thetabigger90>,<expert-trained-on-slpattern1+thetabigger90>,<expert-trained-on-slpattern0+thetasmaller90>,<expert-trained-on-slpattern1+thetasmaller90>]
     vector<unsigned> indices = getRangeIndices(p, iMLP);
     //get number of nodes for each layer
     unsigned short maxHits = (p.maxHitsPerSL.size() == 1) ? p.maxHitsPerSL[0] : p.maxHitsPerSL[indices[3]];
@@ -204,6 +205,7 @@ NeuroTrigger::initialize(const NeuroTriggerParameters& p)
     }
     nNodes.push_back(nTarget);
     unsigned short targetVars = int(p.targetZ) + (int(p.targetTheta) << 1);
+    // the parameters stored in the parameterset are not advanced enough to be vectors, they can only be single data types. the workaround was to make every variable contained in the (nested) vector an NNTParam. for the further use, those have to be converted to float vecors, which is done by the tcastvector function.
     vector<float> phiRangeUse = p.tcastvector<float>(p.phiRangeUse)[indices[0]];
     vector<float> invptRangeUse = p.tcastvector<float>(p.invptRangeUse)[indices[1]];
     vector<float> thetaRangeUse = p.tcastvector<float>(p.thetaRangeUse)[indices[2]];

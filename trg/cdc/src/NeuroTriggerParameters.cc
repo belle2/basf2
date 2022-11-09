@@ -58,6 +58,7 @@ NeuroTriggerParameters::loadconfigtxt(const std::string& filename)
     if (l  == "=") {
       locked = true;
     }
+    // now find the value that should be asigned to the "par"
     key = (locked) ? line.substr((line.find('=') + 2), line.length() - line.find('=') - 2) : line.substr((line.find('=') + 1),
           line.length() - line.find('=') - 1);
     if (par == "nInput")         {
@@ -125,6 +126,7 @@ NeuroTriggerParameters::loadconfigtxt(const std::string& filename)
 template<typename X>
 bool NeuroTriggerParameters::checkarr(std::vector<std::vector<NNTParam<X>>> vec)
 {
+  // check, if a vector is already set. this is done by just checking the first member of the vector.
   if (vec.size() < 1) {return false;}
   else if (vec[0].size() < 1) {return false;}
   else {return vec[0][0].isSet();}
@@ -133,12 +135,15 @@ bool NeuroTriggerParameters::checkarr(std::vector<std::vector<NNTParam<X>>> vec)
 template<typename X>
 bool NeuroTriggerParameters::checkarr(std::vector<NNTParam<X>> vec)
 {
+  // check, if a vector is already set. this is done by just checking the first member of the vector.
   if (vec.size() < 1) {return false;}
   else {return vec[0].isSet();}
 }
 
 void NeuroTriggerParameters::saveconfigtxt(const std::string& filename)
 {
+  // save all the configuration otions in a file, which can later be used to initialize a new parameter set.
+  // only paramters, that already have been set are saved. parameters which are locked, are written wit a "==".
   std::ofstream savestream;
   savestream.open(filename);
   savestream << "########################################################" << std::endl;
@@ -175,6 +180,7 @@ void NeuroTriggerParameters::saveconfigtxt(const std::string& filename)
 template<typename X>
 std::string NeuroTriggerParameters::print2dArray(const std::string& name, std::vector<std::vector<NNTParam<X>>> vecvec)
 {
+  // this is a class for piping the output of a 2d array to a string with brackets
   std::stringstream savestream;
   savestream << name << " " << (vecvec[0][0].isLocked() ? "== " : "= ") << "[";
   bool outcomma = false;
@@ -196,6 +202,7 @@ std::string NeuroTriggerParameters::print2dArray(const std::string& name, std::v
 template<typename X>
 std::string NeuroTriggerParameters::print1dArray(const std::string& name, std::vector<NNTParam<X>> vecvec)
 {
+  // this is a class for piping the output of a 1d array to a string with brackets
   std::stringstream savestream;
   savestream << name << " " << (vecvec[0].isLocked() ? "== " : "= ") << "[";
   bool incomma = false;
@@ -223,8 +230,6 @@ std::vector<std::vector<NNTParam<X>>> NeuroTriggerParameters::read2dArray(std::s
       newpair.push_back(NNTParam<X>(std::stof(pairstr.substr(jpos, pairstr.find(",") - jpos))));
       if (locked) {newpair.back().lock();}
     }
-    //newpair.push_back(NNTParam<X>(std::stof(pairstr.substr(jpos, pairstr.length()-jpos))));
-    //if (locked) {newpair.back().lock();}
     retarr.push_back(newpair);
   }
   return retarr;

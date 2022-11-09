@@ -340,7 +340,7 @@ namespace Belle2 {
     svdHits.appendNew(Belle2::VxdID("6.7.7"), true, 1.0, 0.01, 1.0, 0.1, 5.0e4, 5.0e4, 1, 50.0, 0.1, 0);
     svdHits.appendNew(Belle2::VxdID("5.7.4"), true, 1.0, 0.01, 1.1, 0.1, 5.0e4, 5.0e4, 1, 50.0, 0.1, 0);
 
-    TVector3 momentum(0.25, 0.25, 0.05);
+    ROOT::Math::XYZVector momentum(0.25, 0.25, 0.05);
 
     StoreArray<RecoTrack> recoTracks(m_storeArrayNameOfRecoTracks);
     RecoTrack* recoTrack = recoTracks.appendNew(m_recoTrack->getPositionSeed(), momentum,

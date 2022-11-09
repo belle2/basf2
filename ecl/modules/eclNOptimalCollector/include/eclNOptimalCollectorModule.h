@@ -4,15 +4,8 @@
  *                                                                        *
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
- *                                                                        *
- * Collector that runs on single photon MC samples to find the number     *
- * of crystals to be summed to get the best energy resolution for each    *
- * test energy and for each group of crystals (8 groups per thetaID in    *
- * the barrel). Also finds the corresponding energy bias from beam        *
- * backgrounds, and the peak fraction of energy contained in the crystals.*
- *                                                                        *
- * Contact Chris Hearty hearty@physics.ubc.ca for questions or concerns   *
  **************************************************************************/
+
 
 #pragma once
 
@@ -28,6 +21,14 @@ namespace Belle2 {
   namespace ECL {
     class ECLNeighbours;
   }
+
+  /** Collector that runs on single photon MC samples to find the number
+   * of crystals to be summed to get the best energy resolution for each
+   * test energy and for each group of crystals (8 groups per thetaID in
+   * the barrel). Also finds the corresponding energy bias from beam
+   * backgrounds, and the peak fraction of energy contained in the crystals.
+   *
+   * Contact Chris Hearty hearty@physics.ubc.ca for questions or concerns   */
 
   /** Calibration collector module that uses single photon MC sample to find optimal number of crystals to be used in cluster energy sum */
   class eclNOptimalCollectorModule : public CalibrationCollectorModule {

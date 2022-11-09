@@ -372,6 +372,7 @@ namespace Belle2 {
     B2INFO("ingoing arm time:  " << recoTrack->getIngoingArmTime());
     B2INFO("difference: " << recoTrack->getInOutArmTimeDifference());
     EXPECT_NEAR(recoTrack->getIngoingArmTime(), recoTrack->getOutgoingArmTime(), 0.8);
+    EXPECT_NEAR(recoTrack->getIngoingArmTime(), 1.05, 1E-5);
 
     EXPECT_TRUE(recoTrack->hasOutgoingArmTime());
     EXPECT_TRUE(recoTrack->hasIngoingArmTime());

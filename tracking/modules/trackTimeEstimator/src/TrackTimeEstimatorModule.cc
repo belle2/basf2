@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <tracking/modules/TrackTimeEstimator/TrackTimeEstimatorModule.h>
+#include <tracking/modules/trackTimeEstimator/TrackTimeEstimatorModule.h>
 #include <framework/logging/Logger.h>
 #include <framework/core/ModuleParam.templateDetails.h>
 
@@ -38,13 +38,22 @@ void TrackTimeEstimatorModule::event()
       for (auto& track : m_tracks) {
         // Access related recoTrack
         const auto& recoTrack = track.getRelatedTo<RecoTrack>();
-        // if the outgoing arm exists, the track time is computed as the difference of the outgoing arm time and the SVD EventT0
-        // otherwise, if the ingoing arm exists, the track time is computed as the difference of the ingoing arm time and the SVD EventT0
+        // If both outgoing and ingoing arms exist:
+        // 1) if the outgoing arm time is smaller than the ingoing arm time, the track time is computed as the difference of the outgoing arm time and the SVD EventT0;
+        // 2) otherwise the track time is computed as the difference of the ingoing arm time and the SVD EventT0.
+        // If only the outgoing arm exists, the track time is computed as the difference of the outgoing arm time and the SVD EventT0.
+        // If only the ingoing arm exists, the track time is computed as the difference of the ingoing arm time and the SVD EventT0.
         float outgoingArmTime = recoTrack->getOutgoingArmTime();
         float ingoingArmTime = recoTrack->getIngoingArmTime();
-        if (recoTrack->hasOutgoingArmTime()) {
+        if (recoTrack->hasOutgoingArmTime() && recoTrack->hasIngoingArmTime()) {
+          if (outgoingArmTime <= ingoingArmTime) {
+            track.setTrackTime(outgoingArmTime - svdBestT0.eventT0);
+          } else {
+            track.setTrackTime(ingoingArmTime - svdBestT0.eventT0);
+          }
+        } else if (recoTrack->hasOutgoingArmTime() && !recoTrack->hasIngoingArmTime()) {
           track.setTrackTime(outgoingArmTime - svdBestT0.eventT0);
-        } else if (recoTrack->hasIngoingArmTime()) {
+        } else if (!recoTrack->hasOutgoingArmTime() && recoTrack->hasIngoingArmTime()) {
           track.setTrackTime(ingoingArmTime - svdBestT0.eventT0);
         }
       }

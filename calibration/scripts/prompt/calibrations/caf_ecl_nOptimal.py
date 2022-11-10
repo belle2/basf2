@@ -26,6 +26,11 @@ settings = CalibrationSettings(name="ecl_nOptimal",
                                    ]
                                },
                                depends_on=[],
+
+                               # ..The expert_config settings should agree with the parameters of the jobs used
+                               #   to create the single_gamma_mc samples.
+                               #   Number of energy points, and the values of these for each of the three ECL regions.
+                               #   The mc samples include a reduced set of showers and CalDigits, with these names.
                                expert_config={"number_energies": 8,
                                               "forward_energies": [0.030, 0.050, 0.100, 0.200, 0.483, 1.166, 2.816, 6.800],
                                               "barrel_energies": [0.030, 0.050, 0.100, 0.200, 0.458, 1.049, 2.402, 5.500],

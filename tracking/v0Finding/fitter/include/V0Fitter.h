@@ -140,9 +140,6 @@ namespace Belle2 {
     bool extrapolateToVertex(genfit::MeasuredStateOnPlane& stPlus, genfit::MeasuredStateOnPlane& stMinus,
                              const ROOT::Math::XYZVector& vertexPosition, unsigned int& hasInnerHitStatus);
 
-    /// Getter for magnetic field in z direction at the vertex position.
-    double getBzAtVertex(const ROOT::Math::XYZVector& vertexPosition);
-
     /// Build TrackFitResult of V0 Track and set relation to genfit Track.
     TrackFitResult* buildTrackFitResult(const genfit::Track& track, const RecoTrack* recoTrack,
                                         const genfit::MeasuredStateOnPlane& msop, const double Bz,

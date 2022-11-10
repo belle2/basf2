@@ -162,14 +162,6 @@ bool V0Fitter::extrapolateToVertex(genfit::MeasuredStateOnPlane& stPlus, genfit:
   return true;
 }
 
-double V0Fitter::getBzAtVertex(const ROOT::Math::XYZVector& vertexPosition)
-{
-  const double Bz = BFieldManager::getFieldInTesla(vertexPosition).Z();
-
-  return Bz;
-}
-
-
 TrackFitResult* V0Fitter::buildTrackFitResult(const genfit::Track& track, const RecoTrack* recoTrack,
                                               const genfit::MeasuredStateOnPlane& msop, const double Bz,
                                               const Const::ParticleType& trackHypothesis,
@@ -458,11 +450,10 @@ bool V0Fitter::vertexFitWithRecoTracks(const Track* trackPlus, const Track* trac
     }
 
 
-    /// To build the trackFitResult, use the magnetic field at the origin;
+    /// To build the trackFitResult, use the magnetic field at the origin = (0, 0, 0);
     /// the helix is extrapolated to the IP in a constant magnetic field and material effects are neglected
     /// so that the vertexing tool executed on the MDST object will find again this vertex position
-    const ROOT::Math::XYZVector origin(0, 0, 0);
-    const double Bz = getBzAtVertex(origin);
+    const double Bz = BFieldManager::getFieldInTesla({0, 0, 0}).Z();
 
     int sharedInnermostCluster = checkSharedInnermostCluster(recoTrackPlus, recoTrackMinus);
 

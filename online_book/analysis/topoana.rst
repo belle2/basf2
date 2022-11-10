@@ -152,8 +152,8 @@ Generally, the functionalities of the program are as follows.
      files is entirely the same as that in the input root files.
 
 3. After processing the events, the program exports the obtained topology
- information at the sample level (topology maps) to the output plain text,
- tex source, and pdf files.
+   information at the sample level (topology maps) to the output plain text,
+   tex source, and pdf files.
 
 .. tip::
 
@@ -247,14 +247,14 @@ In the following we introduce the steps to get the input data to ``TopoAna``
 with the interface.
 
 1. Append the following statement at the beginning part of your python
- steering script
+   steering script
 
  .. code-block:: python
 
     from variables.MCGenTopo import mc_gen_topo
 
 2. Use the parameter function ``mc_gen_topo(n)`` as a list of variables in the
- steering function ``variablesToNtuple`` as follow
+   steering function ``variablesToNtuple`` as follow
 
  .. code-block:: python
 
@@ -283,7 +283,7 @@ After the following steps:
 2. ``cd test``
 
 3. Create a new python steering script named ``MCGenTopo.py``, and copy and
- paste the content of the script above into it.
+   paste the content of the script above into it.
 
 4. ``basf2 MCGenTopo.py``
 

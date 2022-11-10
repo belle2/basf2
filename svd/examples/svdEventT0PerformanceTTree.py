@@ -100,15 +100,6 @@ if not args.isMC:
     #        moda.param("svdShaperDigitListName", "SVDShaperDigitsZS3")
     # main.add_module("SVDZeroSuppressionEmulator",SNthreshold=5,ShaperDigits="SVDShaperDigitsZS3",ShaperDigitsIN="SVDShaperDigits")
 
-# now do reconstruction:
-trk.add_tracking_reconstruction(
-    main,
-    mcTrackFinding=MCTracking,
-    append_full_grid_cdc_eventt0=True,
-    trackFitHypotheses=[211])  # ,
-#    skipHitPreparerAdding=True)
-
-
 if args.is3sample:
     # emulate 3-sample DAQ for events
     zsemulator = b2.register_module("SVD3SamplesEmulator")
@@ -133,6 +124,13 @@ if args.is3sample:
     clusterizer.param('EventInfo', "SVDEventInfo3Sample")
     main.add_module(clusterizer)
 
+# now do reconstruction:
+trk.add_tracking_reconstruction(
+    main,
+    mcTrackFinding=MCTracking,
+    append_full_grid_cdc_eventt0=True,
+    trackFitHypotheses=[211])  # ,
+#    skipHitPreparerAdding=True)
 
 '''
 # skim mu+mu- events:

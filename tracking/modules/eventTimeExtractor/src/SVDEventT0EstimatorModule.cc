@@ -80,7 +80,7 @@ void SVDEventT0EstimatorModule::event()
     if (p.Perp() < m_ptSelection || std::fabs(p.Z()) < m_absPzSelection) continue;
 
     // use outgoing/ingoing arm time to compute SVD EventT0
-    // if both outgoing and ingoing are estimated we take the smaller
+    // if both outgoing and ingoing are estimated we take the smallest one
     // else if only outgoing or only ingoing is computed we use the only one available
     // the probability that the ingoing arm is an outgoing arm wrongly classified is higher than the probability that it is a real ingoing arm
     outgoingArmTime = recoTrack.getOutgoingArmTime();

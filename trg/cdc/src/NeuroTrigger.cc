@@ -579,47 +579,35 @@ NeuroTrigger::getEventTime(unsigned isector, const CDCTriggerTrack& track, std::
       m_T0 = 0;
     }
   } else if (et_option == "etfcc") {
-    if (!neuroinputmode) {
-      B2ERROR("cannot use 'etfcc' timing option without hw tracks!");
+    if (track.getHasETFTime()) {
+      m_T0 = track.getETF_unpacked();
+      m_hasT0 = true;
     } else {
-      if (track.getHasETFTime()) {
-        m_T0 = track.getETF_unpacked();
-        m_hasT0 = true;
-      } else {
-        m_T0 = 0;
-        m_hasT0 = false;
-      }
+      m_T0 = 0;
+      m_hasT0 = false;
     }
+
   } else if (et_option == "etfcc_or_zero") {
-    if (!neuroinputmode) {
-      B2ERROR("cannot use 'etfcc' timing option without hw tracks!");
+    if (track.getHasETFTime()) {
+      m_T0 = track.getETF_unpacked();
+      m_hasT0 = true;
     } else {
-      if (track.getHasETFTime()) {
-        m_T0 = track.getETF_unpacked();
-        m_hasT0 = true;
-      } else {
-        m_T0 = 0;
-        m_hasT0 = true;
-      }
-    }
-  } else if (et_option == "etfcc_or_fastestpriority") {
-    if (!neuroinputmode) {
-      B2ERROR("cannot use 'etfcc' timing option without hw tracks!");
-    } else {
-      if (track.getHasETFTime()) {
-        m_T0 = track.getETF_unpacked();
-        m_hasT0 = true;
-      } else {
-        getEventTime(isector, track, "fastestpriority", neuroinputmode);
-      }
-    }
-  } else if (et_option == "etfhwin") {
-    if (!neuroinputmode) {
-      B2ERROR("cannot use 'etfcc' timing option without hw tracks!");
-    } else {
-      m_T0 = track.getETF_recalced();
+      m_T0 = 0;
       m_hasT0 = true;
     }
+
+  } else if (et_option == "etfcc_or_fastestpriority") {
+    if (track.getHasETFTime()) {
+      m_T0 = track.getETF_unpacked();
+      m_hasT0 = true;
+    } else {
+      getEventTime(isector, track, "fastestpriority", neuroinputmode);
+    }
+
+  } else if (et_option == "etfhwin") {
+    m_T0 = track.getETF_recalced();
+    m_hasT0 = true;
+
   } else {
     B2ERROR("No valid parameter for et_option (" << et_option << " )!");
   }

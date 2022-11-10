@@ -164,7 +164,7 @@ bool V0Fitter::extrapolateToVertex(genfit::MeasuredStateOnPlane& stPlus, genfit:
 
 double V0Fitter::getBzAtVertex(const ROOT::Math::XYZVector& vertexPosition)
 {
-  const double Bz = BFieldManager::getField(vertexPosition).Z() / Unit::T;
+  const double Bz = BFieldManager::getFieldInTesla(vertexPosition).Z();
 
   return Bz;
 }

@@ -30,7 +30,7 @@ namespace Belle2 {
      * @param experimentHigh  highest experiment number of the validity range, -1 means no bound
      * @param runHigh         highest run number in the experiment with number experimentHigh of the validity range, -1 means no bound
      */
-    IntervalOfValidity(int experimentLow, int runLow, int experimentHigh , int runHigh);
+    IntervalOfValidity(int experimentLow, int runLow, int experimentHigh, int runHigh);
 
     /**
      * Destructor.

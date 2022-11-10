@@ -85,17 +85,38 @@ void TRGTOPUnpackerModule::event()
   StoreArray<RawTRG> raw_trgarray;
 
   for (int i = 0; i < raw_trgarray.getEntries(); i++) {
+
+    // Check PCIe40 data or Copper data
+    if (raw_trgarray[i]->GetMaxNumOfCh(0) == 48) { m_pciedata = true; }
+    else if (raw_trgarray[i]->GetMaxNumOfCh(0) == 4) { m_pciedata = false; }
+    else { B2FATAL("TRGTOPUnpackerModule: Invalid value of GetMaxNumOfCh from raw data: " << LogVar("Number of ch: ", raw_trgarray[i]->GetMaxNumOfCh(0))); }
+
+    int node_id = 0;
+    int ch_id_1 = 0;
+    int ch_id_2 = 1;
+    if (m_pciedata) {
+      node_id = 0x10000001;
+      ch_id_1 = 23;
+      ch_id_2 = 24;
+    } else {
+      node_id = 0x12000001;
+      ch_id_1 = 0;
+      ch_id_2 = 1;
+    }
+
     for (int j = 0; j < raw_trgarray[i]->GetNumEntries(); j++) {
 
       m_nodeId = raw_trgarray[i]->GetNodeID(j);
 
-      if (m_nodeId == 0x12000001) {
+      if (m_nodeId == node_id) {
 
         int numberOfChannels = raw_trgarray[i]->GetMaxNumOfCh(i);
 
         //  B2INFO("raw_trgarray.GetMaxNumOfCh() = " << numberOfChannels);
 
         for (int channel = 0; channel < numberOfChannels; channel++) {
+
+          if (channel != ch_id_1 && channel != ch_id_2) continue;
 
           m_nWords       = raw_trgarray[i]->GetDetectorNwords(j, channel);
 
@@ -152,7 +173,9 @@ void TRGTOPUnpackerModule::unpackT0Decisions(int* rdat, int channel)
   int numberOfWindows = -1;
 
   int dataFormatVersionExpected = -1;
+  // cppcheck-suppress variableScope
   int revoClockDeltaExpected = 4;
+  // cppcheck-suppress variableScope
   int cntr127DeltaExpected = 4;
 
   // 3 = 3:  header only
@@ -221,12 +244,9 @@ void TRGTOPUnpackerModule::unpackT0Decisions(int* rdat, int channel)
   int revoClockLast = -1;
   int cntr127Last = -1;
 
-  // error counter for possible data corruption
-  unsigned int errorCountEvent = 0;
-
   bool performBufferAnalysis = true;
   bool reportAllErrors = true;
-  bool reportSummaryErrors = true;
+  // bool reportSummaryErrors = true;
 
   // check if this event's buffer is a dummy buffer
   int counterDummyWindows = 0;
@@ -244,7 +264,7 @@ void TRGTOPUnpackerModule::unpackT0Decisions(int* rdat, int channel)
       testPattern = (rdat[index + 2] >> 29) & 0x7;
       if (testPattern & 0x1) performBufferAnalysis = false;
       if (testPattern & 0x2) reportAllErrors = false;
-      if (testPattern & 0x4) reportSummaryErrors = false;
+      // if (testPattern & 0x4) reportSummaryErrors = false;
     }
   }
 
@@ -556,10 +576,8 @@ void TRGTOPUnpackerModule::unpackT0Decisions(int* rdat, int channel)
             combinedT0Last = combinedT0;
             combinedT0RVC2GDLLast = combinedT0RVC2GDL;
           }
-        }
 
-        // retrieve slot-level decisions (limited info) for slots 1 through 8 as observed on the board used for slots 9 through 16
-        if (channel == 0) {
+          // retrieve slot-level decisions (limited info) for slots 1 through 8 as observed on the board used for slots 9 through 16
           for (int i = 0; i < 8; i++) {
 
             if (otherInformation[i] != otherInformationLast[i]) {
@@ -674,32 +692,6 @@ void TRGTOPUnpackerModule::unpackT0Decisions(int* rdat, int channel)
         }
       }
     }
-  }
-
-  // at this time any unexpected features in the data are lumped together
-  // this includes possibly corrupted data (checksum would be a better solution to diagnose such problem)
-  // AND incorrectly prepared (but not corrupted) data
-  if (reportSummaryErrors) {
-    if (errorCountEvent != 0) {
-      B2INFO("Number of instances of unexpected data diagnozed during unpacking = " << errorCountEvent);
-    }
-
-    /*
-    if (numberRvcJumps > 0) {
-      B2INFO("The number of rvc jumps = " << numberRvcJumps);
-      B2INFO("The window of the first rvc jump = " << windowRvcJumpFirst);
-      B2INFO("The number of clock cycles associated with the first rvc jump = " << clocksRvcJumpFirst);
-      B2INFO("The number of combined decisions = " << m_TRGTOPCombinedTimingArray.getEntries());
-    }
-
-    if (numberCntr127Jumps > 0) {
-      B2INFO("The number of cntr127 jumps = " << numberCntr127Jumps);
-      B2INFO("The window of the first cntr127 jump = " << windowCntr127JumpFirst);
-      B2INFO("The number of clock cycles associated with the first cntr127 jump = " << clocksCntr127JumpFirst);
-      B2INFO("The number of combined decisions = " << m_TRGTOPCombinedTimingArray.getEntries());
-    }
-    */
-
   }
 
 }

@@ -36,10 +36,10 @@ using namespace boost;
 namespace Belle2 {
 
   //-----------------------------------------------------------------
-  //                 Register the Module
+  ///                Register the Module
   //-----------------------------------------------------------------
 
-  REG_MODULE(ARICHDigitizer)
+  REG_MODULE(ARICHDigitizer);
 
 
   //-----------------------------------------------------------------
@@ -166,7 +166,7 @@ namespace Belle2 {
     // loop over produced photoelectrons. Apply suppression due to the reverse polarization crosstalk
     // among channels on the same chip, and produce hit bitmap (4 bits).
 
-    for (std::map<std::pair<int, int> , int>::iterator it = photoElectrons.begin(); it != photoElectrons.end(); ++it) {
+    for (std::map<std::pair<int, int>, int>::iterator it = photoElectrons.begin(); it != photoElectrons.end(); ++it) {
 
       std::pair<int, int> modch = it->first;
       double npe = double(it->second);
@@ -212,7 +212,8 @@ namespace Belle2 {
     hitGlob.SetMagPhi(r, phi);
     TVector2 shift = hit;
     hitGlob += shift.Rotate(phi);
-    TVector3 Bfield = BFieldManager::getField(m_geoPar->getMasterVolume().pointToGlobal(TVector3(hitGlob.X(), hitGlob.Y(), z)));
+    ROOT::Math::XYZVector Bfield = BFieldManager::getField(ROOT::Math::XYZVector(m_geoPar->getMasterVolume().pointToGlobal(TVector3(
+                                                             hitGlob.X(), hitGlob.Y(), z))));
     double cc = m_geoPar->getHAPDGeometry().getPhotocathodeApdDistance() / abs(Bfield.Z());
     shift.SetX(cc * Bfield.X());
     shift.SetY(cc * Bfield.Y());

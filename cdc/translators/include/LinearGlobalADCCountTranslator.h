@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <cdc/dataobjects/ADCCountTranslatorBase.h>
+#include <cdc/translators/ADCCountTranslatorBase.h>
 
 namespace Belle2 {
   namespace CDC {

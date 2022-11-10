@@ -14,7 +14,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(ECLChargedPID)
+REG_MODULE(ECLChargedPID);
 
 
 ECLChargedPIDModule::ECLChargedPIDModule() : Module()
@@ -70,7 +70,7 @@ void ECLChargedPIDModule::event()
     const auto relShowers = track.getRelationsTo<ECLShower>();
     if (relShowers.size() == 0) continue;
 
-    const double p     = fitRes->getMomentum().Mag();
+    const double p     = fitRes->getMomentum().R();
     const double theta = fitRes->getMomentum().Theta();
     const auto charge  = fitRes->getChargeSign();
 
@@ -101,8 +101,8 @@ void ECLChargedPIDModule::event()
     m_variables[ECLChargedPidPDFs::InputVar::c_E9E21] = (mostEnergeticShower) ? mostEnergeticShower->getE9oE21() : -1.0;
     m_variables[ECLChargedPidPDFs::InputVar::c_E] = (mostEnergeticShower) ? maxEnergy : -1.0;
     m_variables[ECLChargedPidPDFs::InputVar::c_EoP] = (mostEnergeticShower) ? maxEnergy / p : -1.0;
-    m_variables[ECLChargedPidPDFs::InputVar::c_Z40] = (mostEnergeticShower) ? mostEnergeticShower->getAbsZernike40() : -999.0;
-    m_variables[ECLChargedPidPDFs::InputVar::c_Z51] = (mostEnergeticShower) ? mostEnergeticShower->getAbsZernike51() : -999.0;
+    m_variables[ECLChargedPidPDFs::InputVar::c_Z40] = (mostEnergeticShower) ? mostEnergeticShower->getAbsZernikeMoment(4, 0) : -999.0;
+    m_variables[ECLChargedPidPDFs::InputVar::c_Z51] = (mostEnergeticShower) ? mostEnergeticShower->getAbsZernikeMoment(5, 1) : -999.0;
     m_variables[ECLChargedPidPDFs::InputVar::c_ZMVA] = (mostEnergeticShower) ? mostEnergeticShower->getZernikeMVA() : -999.0;
     m_variables[ECLChargedPidPDFs::InputVar::c_PSDMVA] = (mostEnergeticShower) ? mostEnergeticShower->getPulseShapeDiscriminationMVA() :
                                                          -999.0;

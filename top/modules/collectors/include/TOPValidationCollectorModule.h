@@ -23,6 +23,8 @@
 #include <top/dbobjects/TOPCalChannelMask.h>
 #include <top/dbobjects/TOPCalChannelThresholdEff.h>
 #include <top/dbobjects/TOPCalAsicShift.h>
+#include <top/dbobjects/TOPCalEventT0Offset.h>
+#include <top/dbobjects/TOPCalFillPatternOffset.h>
 
 #include <top/utilities/TrackSelector.h>
 #include <top/utilities/Chi2MinimumFinder1D.h>
@@ -106,6 +108,8 @@ namespace Belle2 {
     DBObjPtr<TOPCalChannelMask> m_channelMask; /**< list of dead/noisy channels */
     DBObjPtr<TOPCalChannelThresholdEff> m_thresholdEff; /**< channel threshold effi. */
     DBObjPtr<TOPCalAsicShift> m_asicShift; /**< ASIC shifts calibration constants */
+    DBObjPtr<TOPCalEventT0Offset> m_eventT0Offset; /**< detector components offsets w.r.t TOP */
+    DBObjPtr<TOPCalFillPatternOffset> m_fillPatternOffset; /**< fill pattern offset */
 
     // tree variables
     TOP::ValidationTreeStruct m_treeEntry; /**< tree entry */

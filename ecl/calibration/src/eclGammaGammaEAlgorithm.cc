@@ -21,6 +21,7 @@ using namespace ECL;
 
 /**-----------------------------------------------------------------------------------------------*/
 /** Novosibirsk function, plus constant H. Ikeda et al., Nuclear Instruments and Methods A 441 (2000) 401-426 */
+// cppcheck-suppress constParameter ; TF1 fit functions cannot have const parameters
 double eclGammaGammaNovoConst(double* x, double* par)
 {
   double qc = 0;

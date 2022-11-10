@@ -46,7 +46,9 @@ EvtGenInterface::~EvtGenInterface()
 
 EvtGen* EvtGenInterface::createEvtGen(const std::string& DECFileName, const bool coherentMixing)
 {
-  IOIntercept::OutputToLogMessages initLogCapture("EvtGen", LogConfig::c_Debug, LogConfig::c_Debug, 100, 100);
+  // Tauola prints normal things to stderr.. oh well.
+  IOIntercept::OutputToLogMessages initLogCapture("EvtGen", LogConfig::c_Info, LogConfig::c_Info);
+  initLogCapture.setIndent("  ");
   initLogCapture.start();
   EvtRandom::setRandomEngine(&EvtGenInterface::m_eng);
 
@@ -81,10 +83,11 @@ EvtGen* EvtGenInterface::createEvtGen(const std::string& DECFileName, const bool
 int EvtGenInterface::setup(const std::string& DECFileName, const std::string& parentParticle,
                            const std::string& userFileName, const bool coherentMixing)
 {
-  B2DEBUG(150, "Begin initialisation of EvtGen Interface.");
+  B2DEBUG(20, "Begin initialisation of EvtGen Interface.");
 
-  //tauola prints normal things to stderr.. oh well.
-  IOIntercept::OutputToLogMessages initLogCapture("EvtGen", LogConfig::c_Debug, LogConfig::c_Debug, 100, 100);
+  // Tauola prints normal things to stderr.. oh well.
+  IOIntercept::OutputToLogMessages initLogCapture("EvtGen", LogConfig::c_Info, LogConfig::c_Info);
+  initLogCapture.setIndent("  ");
   initLogCapture.start();
   if (!m_Generator) {
     m_Generator = createEvtGen(DECFileName, coherentMixing);
@@ -100,13 +103,14 @@ int EvtGenInterface::setup(const std::string& DECFileName, const std::string& pa
   }
   initLogCapture.finish();
 
-  B2DEBUG(150, "End initialisation of EvtGen Interface.");
+  B2DEBUG(20, "End initialisation of EvtGen Interface.");
 
   return 0;
 }
 
 
-int EvtGenInterface::simulateEvent(MCParticleGraph& graph, ROOT::Math::PxPyPzEVector pParentParticle, TVector3 pPrimaryVertex,
+int EvtGenInterface::simulateEvent(MCParticleGraph& graph, ROOT::Math::PxPyPzEVector pParentParticle,
+                                   ROOT::Math::XYZVector pPrimaryVertex,
                                    int inclusiveType, const std::string& inclusiveParticle)
 {
   EvtId inclusiveParticleID, inclusiveAntiParticleID;
@@ -129,11 +133,11 @@ int EvtGenInterface::simulateEvent(MCParticleGraph& graph, ROOT::Math::PxPyPzEVe
 
   bool we_got_inclusive_particle = false;
   do {
-    m_logCapture.start();
+    m_logCaptureDebug.start();
     m_parent = EvtParticleFactory::particleFactory(m_ParentParticle, m_pinit);
     m_parent->setVectorSpinDensity();
     m_Generator->generateDecay(m_parent);
-    m_logCapture.finish();
+    m_logCaptureDebug.finish();
 
     if (inclusiveType != 0) {
       EvtParticle* p = m_parent;
@@ -175,9 +179,9 @@ int EvtGenInterface::simulateDecay(MCParticleGraph& graph,
   int pdg;
   EvtId id;
   ROOT::Math::PxPyPzEVector momentum = parent.get4Vector();
-  B2Vector3D vertex = parent.getVertex();
+  ROOT::Math::XYZVector vertex = parent.getVertex();
   m_pinit.set(momentum.E(), momentum.X(), momentum.Y(), momentum.Z());
-  m_logCapture.start();
+  m_logCaptureDebug.start();
   // we want to decay the particle so the decay time in the tree needs to be lower
   // than whatever the daughters will get
   parent.setDecayTime(-std::numeric_limits<float>::infinity());
@@ -189,13 +193,13 @@ int EvtGenInterface::simulateDecay(MCParticleGraph& graph,
   else
     m_parent->setDiagonalSpinDensity();
   m_Generator->generateDecay(m_parent);
-  m_logCapture.finish();
+  m_logCaptureDebug.finish();
   int iPart = addParticles2Graph(m_parent, graph, vertex, &parent, parent.getProductionTime());
   m_parent->deleteTree();
   return iPart;
 }
 
-int EvtGenInterface::addParticles2Graph(EvtParticle* top, MCParticleGraph& graph, TVector3 pPrimaryVertex,
+int EvtGenInterface::addParticles2Graph(EvtParticle* top, MCParticleGraph& graph, ROOT::Math::XYZVector pPrimaryVertex,
                                         MCParticleGraph::GraphParticle* parent, double timeOffset)
 {
   //Fill top particle in the tree & starting the queue:
@@ -250,7 +254,7 @@ int EvtGenInterface::addParticles2Graph(EvtParticle* top, MCParticleGraph& graph
 
 
 void EvtGenInterface::updateGraphParticle(EvtParticle* eParticle, MCParticleGraph::GraphParticle* gParticle,
-                                          TVector3 pPrimaryVertex, double timeOffset)
+                                          ROOT::Math::XYZVector pPrimaryVertex, double timeOffset)
 {
   //updating the GraphParticle information from the EvtParticle information
 
@@ -264,10 +268,10 @@ void EvtGenInterface::updateGraphParticle(EvtParticle* eParticle, MCParticleGrap
 
   EvtVector4R Evtpos = eParticle->get4Pos();
 
-  TVector3 pVertex(Evtpos.get(1)*Unit::mm, Evtpos.get(2)*Unit::mm, Evtpos.get(3)*Unit::mm);
+  ROOT::Math::XYZVector pVertex(Evtpos.get(1)*Unit::mm, Evtpos.get(2)*Unit::mm, Evtpos.get(3)*Unit::mm);
   pVertex = pVertex + pPrimaryVertex;
 
-  gParticle->setProductionVertex(pVertex(0), pVertex(1), pVertex(2));
+  gParticle->setProductionVertex(pVertex.x(), pVertex.y(), pVertex.z());
   gParticle->setProductionTime((Evtpos.get(0)*Unit::mm / Const::speedOfLight) + timeOffset);
   gParticle->setValidVertex(true);
 

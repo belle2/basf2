@@ -147,7 +147,7 @@ void TrackExtrapolateG4e::initialize(double minPt, double minKE,
   m_tracks.registerRelationTo(m_extHits);
 
   // Save the magnetic field z component (gauss) at the origin
-  m_MagneticField = BFieldManager::getField(B2Vector3D(0, 0, 0)).Z() / Unit::T * CLHEP::tesla / CLHEP::gauss;
+  m_MagneticField = BFieldManager::getField(0, 0, 0).Z() / Unit::T * CLHEP::tesla / CLHEP::gauss;
 
   // Convert user cutoff values to geant4 units
   m_MinPt = std::max(0.0, minPt) * CLHEP::GeV;
@@ -221,7 +221,7 @@ void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMT
   m_MaxDt = maxDt;
 
   // Save the magnetic field z component (gauss) at the origin
-  m_MagneticField = BFieldManager::getField(B2Vector3D(0, 0, 0)).Z() / Unit::T * CLHEP::tesla / CLHEP::gauss;
+  m_MagneticField = BFieldManager::getField(0, 0, 0).Z() / Unit::T * CLHEP::tesla / CLHEP::gauss;
 
   // Convert from sigma to variance for hit-position uncertainty
   m_MaxDistSqInVariances = maxKLMTrackHitDistance * maxKLMTrackHitDistance;

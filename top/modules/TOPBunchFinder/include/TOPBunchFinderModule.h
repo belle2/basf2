@@ -22,9 +22,13 @@
 #include <framework/database/DBObjPtr.h>
 #include <top/dbobjects/TOPCalCommonT0.h>
 #include <top/dbobjects/TOPFrontEndSetting.h>
+#include <top/dbobjects/TOPCalEventT0Offset.h>
+#include <framework/dbobjects/BunchStructure.h>
+#include <top/dbobjects/TOPCalFillPatternOffset.h>
 
 #include <top/reconstruction_cpp/PDFConstructor.h>
 #include <top/utilities/Chi2MinimumFinder1D.h>
+#include <framework/gearbox/Const.h>
 
 
 namespace Belle2 {
@@ -67,6 +71,28 @@ namespace Belle2 {
   private:
 
     /**
+     * Structure to hold the time seed from a chosen detector component
+     */
+    struct TimeSeed {
+      double t0 = 0; /**< time seed */
+      double sigma = 0; /**< time resolution */
+      Const::EDetector detector = Const::TOP; /**< detector component */
+    };
+
+    /**
+     * Returns a time seed
+     * @return time seed
+     */
+    TimeSeed getTimeSeed();
+
+    /**
+     * Does reconstructed bunch number correspond to filled bucket
+     * @param bunchNo reconstructed relative bunch number
+     * @return true if filled
+     */
+    bool isBucketFilled(int bunchNo);
+
+    /**
      * Returns most probable charged stable particle according to dEdx
      * and predefined prior probabilities
      * @param track reconstructed track
@@ -102,12 +128,13 @@ namespace Belle2 {
     bool m_useMCTruth;    /**< use MC truth for mass instead of dEdx most probable */
     bool m_saveHistograms; /**< flag to save histograms */
     double m_tau; /**< first order filter time constant [events] */
-    bool m_fineSearch; /**< use fine search */
     bool m_correctDigits; /**< subtract bunch time in TOPDigits */
     bool m_subtractRunningOffset; /**< subtract running offset when running in HLT mode */
     int m_bunchesPerSSTclk; /**< number of bunches per SST clock */
     bool m_usePIDLikelihoods; /**< if true, use PIDLikelihoods (only on cdst files) */
     unsigned m_nTrackLimit; /**< maximum number of tracks (inclusive) to use three particle hypotheses in fine search */
+    bool m_useTimeSeed; /**< use CDC or SVD event T0 as seed */
+    bool m_useFillPattern; /**< use know fill pattern to enhance efficiency */
 
     // internal variables shared between events
     double m_bunchTimeSep = 0; /**< time between two bunches */
@@ -118,6 +145,8 @@ namespace Belle2 {
     unsigned m_processed = 0; /**< processed events */
     unsigned m_success = 0; /**< events with reconstructed bunch */
     int m_nodEdxCount = 0; /**< counter of tracks with no dEdx, reset at each event */
+    unsigned short m_revo9Counter = 0xFFFF; /**< number of system clocks since last revo9 marker */
+    bool m_isMC = false; /**< is Monte Carlo */
 
     // collections
     StoreArray<TOPDigit> m_topDigits; /**< collection of TOP digits */
@@ -131,6 +160,9 @@ namespace Belle2 {
     // database
     DBObjPtr<TOPCalCommonT0> m_commonT0;   /**< common T0 calibration constants */
     DBObjPtr<TOPFrontEndSetting> m_feSetting;  /**< front-end settings */
+    DBObjPtr<BunchStructure> m_bunchStructure;  /**< fill pattern */
+    OptionalDBObjPtr<TOPCalEventT0Offset> m_eventT0Offset; /**< detector components offsets w.r.t TOP */
+    OptionalDBObjPtr<TOPCalFillPatternOffset> m_fillPatternOffset; /**< fill pattern offset */
 
   };
 

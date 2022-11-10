@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 
+# disable doxygen check for this file
+# @cond
+
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
 # Author: The Belle II Collaboration                                     #

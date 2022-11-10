@@ -40,8 +40,8 @@ using namespace ECL;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(ECLShowerShape)
-REG_MODULE(ECLShowerShapePureCsI)
+REG_MODULE(ECLShowerShape);
+REG_MODULE(ECLShowerShapePureCsI);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -186,9 +186,6 @@ void ECLShowerShapeModule::setShowerShapeVariables(ECLShower* eclShower, const b
   if (hypothesisID == ECLShower::c_nPhotons) rho0 = m_zernike_n1_rho0;
   else if (hypothesisID == ECLShower::c_neutralHadron) rho0 = m_zernike_n2_rho0;
 
-  const double absZernike40 = computeAbsZernikeMoment(projectedECLDigits, sumEnergies, 4, 0, rho0);
-  const double absZernike51 = computeAbsZernikeMoment(projectedECLDigits, sumEnergies, 5, 1, rho0);
-
   const double secondMomentCorrection = getSecondMomentCorrection(showerTheta, showerPhi, hypothesisID);
   B2DEBUG(175, "Second moment angular correction: " << secondMomentCorrection << " (theta(rad)=" << showerTheta << ", phi(rad)=" <<
           showerPhi << ",hypothesisId=" << hypothesisID <<
@@ -199,12 +196,15 @@ void ECLShowerShapeModule::setShowerShapeVariables(ECLShower* eclShower, const b
   const double LATenergy    = computeLateralEnergy(projectedECLDigits, m_avgCrystalDimension);
 
   // Set shower shape variables.
-  eclShower->setAbsZernike40(absZernike40);
-  eclShower->setAbsZernike51(absZernike51);
   eclShower->setSecondMoment(secondMoment);
   eclShower->setLateralEnergy(LATenergy);
   eclShower->setE1oE9(computeE1oE9(*eclShower));
   if (eclShower->getE9oE21() < 1e-9) eclShower->setE9oE21(computeE9oE21(*eclShower));
+  for (unsigned int n = 1; n <= 5; n++) {
+    for (unsigned int m = 0; m <= n; m++) {
+      eclShower->setAbsZernikeMoment(n, m, computeAbsZernikeMoment(projectedECLDigits, sumEnergies, n, m, rho0));
+    }
+  }
 
   if (calculateZernikeMVA) {
     //Set Zernike moments that will be used in MVA calculation
@@ -213,17 +213,17 @@ void ECLShowerShapeModule::setShowerShapeVariables(ECLShower* eclShower, const b
     if (hypothesisID == ECLShower::c_nPhotons) indexOffset = (m_numZernikeMVAvariables / 2);
     else if (hypothesisID == ECLShower::c_neutralHadron) indexOffset = 0;
 
-    m_dataset->m_input[0 + indexOffset] = computeAbsZernikeMoment(projectedECLDigits, sumEnergies, 1, 1, rho0);
-    m_dataset->m_input[1 + indexOffset] = computeAbsZernikeMoment(projectedECLDigits, sumEnergies, 2, 0, rho0);
-    m_dataset->m_input[2 + indexOffset] = computeAbsZernikeMoment(projectedECLDigits, sumEnergies, 2, 2, rho0);
-    m_dataset->m_input[3 + indexOffset] = computeAbsZernikeMoment(projectedECLDigits, sumEnergies, 3, 1, rho0);
-    m_dataset->m_input[4 + indexOffset] = computeAbsZernikeMoment(projectedECLDigits, sumEnergies, 3, 3, rho0);
-    m_dataset->m_input[5 + indexOffset] = absZernike40;
-    m_dataset->m_input[6 + indexOffset] = computeAbsZernikeMoment(projectedECLDigits, sumEnergies, 4, 2, rho0);
-    m_dataset->m_input[7 + indexOffset] = computeAbsZernikeMoment(projectedECLDigits, sumEnergies, 4, 4, rho0);
-    m_dataset->m_input[8 + indexOffset] = absZernike51;
-    m_dataset->m_input[9 + indexOffset] = computeAbsZernikeMoment(projectedECLDigits, sumEnergies, 5, 3, rho0);
-    m_dataset->m_input[10 + indexOffset] = computeAbsZernikeMoment(projectedECLDigits, sumEnergies, 5, 5, rho0);
+    m_dataset->m_input[0 + indexOffset] = eclShower->getAbsZernikeMoment(1, 1);
+    m_dataset->m_input[1 + indexOffset] = eclShower->getAbsZernikeMoment(2, 0);
+    m_dataset->m_input[2 + indexOffset] = eclShower->getAbsZernikeMoment(2, 2);
+    m_dataset->m_input[3 + indexOffset] = eclShower->getAbsZernikeMoment(3, 1);
+    m_dataset->m_input[4 + indexOffset] = eclShower->getAbsZernikeMoment(3, 3);
+    m_dataset->m_input[5 + indexOffset] = eclShower->getAbsZernikeMoment(4, 0);
+    m_dataset->m_input[6 + indexOffset] = eclShower->getAbsZernikeMoment(4, 2);
+    m_dataset->m_input[7 + indexOffset] = eclShower->getAbsZernikeMoment(4, 4);
+    m_dataset->m_input[8 + indexOffset] = eclShower->getAbsZernikeMoment(5, 1);
+    m_dataset->m_input[9 + indexOffset] = eclShower->getAbsZernikeMoment(5, 3);
+    m_dataset->m_input[10 + indexOffset] = eclShower->getAbsZernikeMoment(5, 5);
     //Set zernikeMVA for N1 showers
     //This assumes that the N2 zernike moments have already been set in m_dataset!!!!
     if (hypothesisID == ECLShower::c_nPhotons) {
@@ -297,7 +297,7 @@ std::vector<ECLShowerShapeModule::ProjectedECLDigit> ECLShowerShapeModule::proje
   // Calculate axes that span the perpendicular plane.
   //---------------------------------------------------------------------
   //xPrimeDirection = showerdirection.cross(zAxis)
-  B2Vector3D xPrimeDirection = B2Vector3D(showerPosition.y(), -showerPosition.x(), 0.0);
+  B2Vector3D xPrimeDirection = B2Vector3D(showerPosition.Y(), -showerPosition.X(), 0.0);
   xPrimeDirection *= 1.0 / xPrimeDirection.Mag();
 
   B2Vector3D yPrimeDirection = xPrimeDirection.Cross(showerDirection);

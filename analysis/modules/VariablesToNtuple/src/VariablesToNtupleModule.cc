@@ -12,6 +12,7 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/VariableManager/Utility.h>
+#include <analysis/dataobjects/StringWrapper.h>
 
 // framework
 #include <framework/logging/Logger.h>
@@ -35,7 +36,7 @@ VariablesToNtupleModule::VariablesToNtupleModule() :
   Module(), m_tree("", DataStore::c_Persistent)
 {
   //Set module properties
-  setDescription("Calculate variables specified by the user for a given ParticleList and save them into a TNtuple. The TNtuple is candidate-based, meaning that the variables of each candidate are saved separate rows.");
+  setDescription("Calculate variables specified by the user for a given ParticleList and save them into a TNtuple. The TNtuple is candidate-based, meaning that the variables of each candidate are saved into separate rows.");
   setPropertyFlags(c_ParallelProcessingCertified | c_TerminateInAllProcesses);
 
   vector<string> emptylist;
@@ -48,6 +49,7 @@ VariablesToNtupleModule::VariablesToNtupleModule() :
 
   addParam("fileName", m_fileName, "Name of ROOT file for output.", string("VariablesToNtuple.root"));
   addParam("treeName", m_treeName, "Name of the NTuple in the saved file.", string("ntuple"));
+  addParam("basketSize", m_basketsize, "Size of baskets in Output NTuple in bytes.", 1600);
 
   std::tuple<std::string, std::map<int, unsigned int>> default_sampling{"", {}};
   addParam("sampling", m_sampling,
@@ -60,7 +62,6 @@ void VariablesToNtupleModule::initialize()
   m_eventMetaData.isRequired();
   if (not m_particleList.empty())
     StoreObjPtr<ParticleList>().isRequired(m_particleList);
-
 
   // Initializing the output root file
   if (m_fileName.empty()) {
@@ -107,6 +108,10 @@ void VariablesToNtupleModule::initialize()
     m_tree->get().Branch("__candidate__", &m_candidate, "__candidate__/I");
     m_tree->get().Branch("__ncandidates__", &m_ncandidates, "__ncandidates__/I");
   }
+
+  if (m_stringWrapper.isOptional("MCDecayString"))
+    m_tree->get().Branch("__MCDecayString__", &m_MCDecayString);
+
   for (const auto& variable : m_variables)
     if (Variable::isCounterVariable(variable)) {
       B2WARNING("The counter '" << variable
@@ -158,7 +163,7 @@ void VariablesToNtupleModule::initialize()
     }
     enumerate++;
   }
-  m_tree->get().SetBasketSize("*", 1600);
+  m_tree->get().SetBasketSize("*", m_basketsize);
 
   m_sampling_name = std::get<0>(m_sampling);
   m_sampling_rates = std::get<1>(m_sampling);
@@ -207,6 +212,11 @@ void VariablesToNtupleModule::event()
   m_run = m_eventMetaData->getRun();
   m_experiment = m_eventMetaData->getExperiment();
   m_production = m_eventMetaData->getProduction();
+
+  if (m_stringWrapper.isValid())
+    m_MCDecayString = m_stringWrapper->getString();
+  else
+    m_MCDecayString = "";
 
   if (m_particleList.empty()) {
     m_branchAddressesDouble[0] = getInverseSamplingRateWeight(nullptr);

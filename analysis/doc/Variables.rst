@@ -225,6 +225,8 @@ Here is a list of variables for acceptance cuts:
 .. b2-variables::
    :group: Acceptance
 
+.. _variables_trigger:
+
 Trigger
 ~~~~~~~
 
@@ -233,6 +235,11 @@ Here is a list of trigger variables:
 .. b2-variables::
    :group: L1 Trigger
 
+.. tip::
+  Please see the `Trigger Bits section
+  <https://software.belle2.org/development/sphinx/trg/doc/index.html#trigger-bits>`__
+  for further details.
+  
 .. b2-variables::
    :group: Software Trigger
 
@@ -498,7 +505,10 @@ They have a **[Calibration]** pretag.
 FEIVariables
 ~~~~~~~~~~~~
 
-As known by many analysts by using the ``isSignal`` flag for truth matching for the  tagging B meson from the FEI there is still a peak visible for the background in e.g. the :math:M_{bc}` distribution making it hard to determine e.g. a yield there.
+As known by many analysts by using the ``isSignal`` flag for truth matching
+for the  tagging B meson from the FEI there is still a peak visible for the
+background in e.g. the :math:`M_{\text{bc}}` distribution making it hard to
+determine e.g. a yield there.
 
 New variables seem to be found to address this problem.
 

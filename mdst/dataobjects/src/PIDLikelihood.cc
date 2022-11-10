@@ -55,9 +55,10 @@ float PIDLikelihood::getLogL(const Const::ChargedStable& part,
                              Const::PIDDetectorSet set) const
 {
   float result = 0;
-  for (unsigned int index = 0; index < Const::PIDDetectorSet::set().size(); ++index) {
-    if (set.contains(Const::PIDDetectorSet::set()[index]))
-      result += m_logl[index][part.getIndex()];
+  for (Const::DetectorSet::Iterator it = Const::PIDDetectorSet::set().begin();
+       it != Const::PIDDetectorSet::set().end(); ++it) {
+    if (set.contains(it))
+      result += m_logl[it.getIndex()][part.getIndex()];
   }
   return result;
 }
@@ -163,7 +164,7 @@ void PIDLikelihood::probability(double probabilities[],
 void PIDLikelihood::printArray() const
 {
 
-  string detectorName[Const::PIDDetectors::c_size] =
+  const string detectorName[Const::PIDDetectors::c_size] =
   {"SVD", "CDC", "TOP", "ARICH", "ECL", "KLM"};
   string hline("-------");
   for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; i++)
@@ -214,7 +215,7 @@ void PIDLikelihood::printArray() const
 
 std::string PIDLikelihood::getInfoHTML() const
 {
-  string detectorName[Const::PIDDetectors::c_size] = {"SVD", "CDC", "TOP", "ARICH", "ECL", "KLM"};
+  const string detectorName[Const::PIDDetectors::c_size] = {"SVD", "CDC", "TOP", "ARICH", "ECL", "KLM"};
 
   std::stringstream stream;
   stream << std::setprecision(4);
@@ -238,9 +239,10 @@ std::string PIDLikelihood::getInfoHTML() const
   }
   stream << "</tr></table></td></tr>";
 
-  for (unsigned k = 0; k < Const::PIDDetectors::c_size; k++) {
-    auto det = Const::PIDDetectorSet::set()[k];
-    stream << "<tr><td>" << detectorName[k] << "</td><td>";
+  for (Const::DetectorSet::Iterator it = Const::PIDDetectorSet::set().begin();
+       it != Const::PIDDetectorSet::set().end(); ++it) {
+    auto det = *it;
+    stream << "<tr><td>" << detectorName[it.getIndex()] << "</td><td>";
     if (!isAvailable(det)) {
       stream << "</td></tr>";
       continue;

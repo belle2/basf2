@@ -11,7 +11,7 @@
 
 """
 <header>
-  <contact>G. Caria, gcaria@student.unimelb.edu.au</contact>
+  <contact>SVD Software Group, svd-software@belle2.org</contact>
   <description>
     This module is used for the SVD validation.
     It gets information about truehits and  clusters, saving
@@ -102,10 +102,13 @@ class SVDValidationTTreeSimhit(b2.Module):
                 energy = simhit.getElectrons() * Belle2.Const.ehEnergy
                 self.data.simhit_length = length
                 self.data.simhit_energy = energy
+                if (length == 0):
+                    continue
                 self.data.simhit_dEdx = energy / length
                 # A reasonable cut to see a nice Landau distribution
-                if self.data.simhit_dEdx > 0.015:
-                    continue
+                # remove this cut to be sensitive to delta rays
+                # if self.data.simhit_dEdx > 0.015:
+                #    continue
                 # Fill tree
                 self.file.cd()
                 self.tree.Fill()

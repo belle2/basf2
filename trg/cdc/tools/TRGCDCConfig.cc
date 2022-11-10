@@ -30,7 +30,7 @@ using namespace Belle2;
 #define NOT_CONNECTED 99999
 
 int
-main(int argc, char* argv[])
+main(int argc, const char* argv[])
 {
 
   cout << NAME << " ... " << VERSION << endl;

@@ -19,7 +19,7 @@
 using namespace std;
 using namespace Belle2;
 
-REG_MODULE(ECLTrackClusterMatching)
+REG_MODULE(ECLTrackClusterMatching);
 
 ECLTrackClusterMatchingModule::ECLTrackClusterMatchingModule() : Module(),
   m_matchingParameterizations("ECLTrackClusterMatchingParameterizations"),
@@ -117,7 +117,7 @@ void ECLTrackClusterMatchingModule::event()
     // TEMPORARY FIX: require minimal number of CDC hits, otherwise exclude tracks from track-cluster matching procedure
     if (!(fitResult->getHitPatternCDC().getNHits() > m_minimalCDCHits)) continue;
     if (m_skipZeroChargeTracks && fitResult->getChargeSign() == 0) continue;
-    double theta = TMath::ACos(fitResult->getMomentum().CosTheta());
+    double theta = fitResult->getMomentum().Theta();
     double pt = fitResult->getTransverseMomentum();
     if (!m_angularDistanceMatching || pt < m_matchingPTThreshold || trackTowardsGap(theta)) {
 

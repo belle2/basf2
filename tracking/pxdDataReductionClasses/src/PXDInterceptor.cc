@@ -13,7 +13,6 @@
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
 
-using namespace std;
 using namespace Belle2;
 
 PXDInterceptor::PXDInterceptor(const ROIinfo* theROIinfo, double toleranceZ, double tolerancePhi):

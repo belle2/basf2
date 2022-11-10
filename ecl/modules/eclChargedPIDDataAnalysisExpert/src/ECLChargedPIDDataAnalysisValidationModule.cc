@@ -21,7 +21,7 @@ using namespace Belle2;
 //                 Register the Module
 //-----------------------------------------------------------------
 
-REG_MODULE(ECLChargedPIDDataAnalysisValidation)
+REG_MODULE(ECLChargedPIDDataAnalysisValidation);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -186,8 +186,8 @@ void ECLChargedPIDDataAnalysisValidationModule::event()
       for (const auto& track : particle.getRelationsFrom<Track>()) {
         const auto fitRes = track.getTrackFitResultWithClosestMass(Const::pion);
         if (!fitRes) continue;
-        if (fitRes->getMomentum().Mag() > p_max) {
-          p_max = fitRes->getMomentum().Mag();
+        if (fitRes->getMomentum().R() > p_max) {
+          p_max = fitRes->getMomentum().R();
           itrack_max = itrack;
         }
         itrack++;

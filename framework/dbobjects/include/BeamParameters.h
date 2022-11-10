@@ -145,7 +145,7 @@ namespace Belle2 {
      * @param vertex vertex position
      * @param cov entries of the covariance matrix.
      */
-    void setVertex(const TVector3& vertex, const std::vector<double>& cov);
+    void setVertex(const ROOT::Math::XYZVector& vertex, const std::vector<double>& cov);
 
     /** Get the covariance matrix of HER (E, theta_x, theta_y) where E is the
      * energy, theta_x is the horizontal angle between nominal direction and
@@ -160,15 +160,17 @@ namespace Belle2 {
     /** Get the covariance matrix of the vertex position */
     TMatrixDSym getCovVertex() const { return getCovMatrix(m_covVertex); }
 
-  private:
-
-    /** Calculate FourVector of a beam from energy and angle wrt the z-axis.
-     * Negative angles will be treated as angle = M_PI - fabs(angle)
+    /** Calculate FourVector of a beam from energy and angles in xz and yz planes.
+     * if isHER=true,  the angles are measured wrt +p
+     * if isHER=false, the angles are measured wrt -p, as is the standard convention for LER
      * @param energy beam energy
-     * @param angleX horizontal angle wrt z-axis
-     * @param angleY vertical angle wrt z-axis
+     * @param angleX horizontal angle wrt z-axis, i.e. angle measured in xz plane
+     * @param angleY vertical angle wrt z-axis, i.e. angle measured in yz plane
+     * @param isHER  isHER=true for HER, isHER=false for LER
      */
-    static ROOT::Math::PxPyPzEVector getFourVector(double energy, double angleX, double angleY);
+    static ROOT::Math::PxPyPzEVector getFourVector(double energy, double angleX, double angleY, bool isHER);
+
+  private:
 
     /** Set covariance matrix from vector of entries.
      *

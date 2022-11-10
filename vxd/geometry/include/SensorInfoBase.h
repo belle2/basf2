@@ -6,12 +6,12 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef VXD_SENSORINFO_H
-#define VXD_SENSORINFO_H
+#pragma once
 
 #include <vxd/dataobjects/VxdID.h>
 #include <float.h>
 
+#include <Math/Vector3D.h>
 #include <TGeoMatrix.h>
 #include <TVector3.h>
 
@@ -236,8 +236,8 @@ namespace Belle2 {
        */
       bool inside(const TVector3& local) const
       {
-        double nw = local.z() / getThickness() + 0.5;
-        return inside(local.x(), local.y()) && 0 <= nw && nw <= 1;
+        double nw = local.Z() / getThickness() + 0.5;
+        return inside(local.X(), local.Y()) && 0 <= nw && nw <= 1;
       }
 
       /** Force a position to be inside the active area
@@ -284,7 +284,7 @@ namespace Belle2 {
        * @param reco Use sensor position in reconstruction (true) or in nominal geometry (false)
        * @return vector in local coordinates
        */
-      TVector3 vectorToLocal(const TVector3& global, bool reco = false) const;
+      TVector3 vectorToLocal(const ROOT::Math::XYZVector& global, bool reco = false) const;
 
       /** Set the transformation matrix of the Sensor
        * @param transform Transformation matrix of the Sensor
@@ -349,13 +349,13 @@ namespace Belle2 {
 
     inline void SensorInfoBase::forceInside(TVector3& local) const
     {
-      double u = local.x();
-      double v = local.y();
+      double u = local.X();
+      double v = local.Y();
       double thickness = getThickness() / 2.0;
       forceInside(u, v);
       local.SetX(u);
       local.SetY(v);
-      local.SetZ(std::min(thickness, std::max(-thickness, local.z())));
+      local.SetZ(std::min(thickness, std::max(-thickness, local.Z())));
     }
 
     inline TVector3 SensorInfoBase::pointToGlobal(const TVector3& local, bool reco) const
@@ -388,15 +388,14 @@ namespace Belle2 {
       return TVector3(clocal);
     }
 
-    inline TVector3 SensorInfoBase::vectorToLocal(const TVector3& global, bool reco) const
+    inline TVector3 SensorInfoBase::vectorToLocal(const ROOT::Math::XYZVector& global, bool reco) const
     {
       double clocal[3];
       double cmaster[3];
-      global.GetXYZ(cmaster);
+      global.GetCoordinates(cmaster);
       if (reco) m_recoTransform.MasterToLocalVect(cmaster, clocal);
       else m_transform.MasterToLocalVect(cmaster, clocal);
       return TVector3(clocal);
     }
   }
 } //Belle2 namespace
-#endif

@@ -92,17 +92,38 @@ void TRGTOPUnpackerWaveformModule::event()
   StoreArray<RawTRG> raw_trgarray;
 
   for (int i = 0; i < raw_trgarray.getEntries(); i++) {
+
+    // Check PCIe40 data or Copper data
+    if (raw_trgarray[i]->GetMaxNumOfCh(0) == 48) { m_pciedata = true; }
+    else if (raw_trgarray[i]->GetMaxNumOfCh(0) == 4) { m_pciedata = false; }
+    else { B2FATAL("TRGTOPUnpackerModule: Invalid value of GetMaxNumOfCh from raw data: " << LogVar("Number of ch: ", raw_trgarray[i]->GetMaxNumOfCh(0))); }
+
+    int node_id = 0;
+    int ch_id_1 = 0;
+    int ch_id_2 = 1;
+    if (m_pciedata) {
+      node_id = 0x10000001;
+      ch_id_1 = 23;
+      ch_id_2 = 24;
+    } else {
+      node_id = 0x12000001;
+      ch_id_1 = 0;
+      ch_id_2 = 1;
+    }
+
     for (int j = 0; j < raw_trgarray[i]->GetNumEntries(); j++) {
 
       m_nodeId = raw_trgarray[i]->GetNodeID(j);
 
-      if (m_nodeId == 0x12000001) {
+      if (m_nodeId == node_id) {
 
         int numberOfChannels = raw_trgarray[i]->GetMaxNumOfCh(i);
 
         //  B2INFO("raw_trgarray.GetMaxNumOfCh() = " << numberOfChannels);
 
         for (int channel = 0; channel < numberOfChannels; channel++) {
+
+          if (channel != ch_id_1 && channel != ch_id_2) continue;
 
           m_nWords       = raw_trgarray[i]->GetDetectorNwords(j, channel);
 
@@ -223,9 +244,6 @@ void TRGTOPUnpackerWaveformModule::unpackWaveforms(int* rdat, int channel)
   //    B2INFO("Window size in 32bit words = " << windowSize);
   //  }
 
-  // various test patterns will be used to check the data
-  unsigned int testPattern;
-
   //  int revoClockLast = -1;
   //  int cntr127Last = -1;
 
@@ -233,7 +251,6 @@ void TRGTOPUnpackerWaveformModule::unpackWaveforms(int* rdat, int channel)
   //  unsigned int errorCountEvent = 0;
 
   // need to know when a new decision is made (there could be more than one TOP L1 timing decision stored in the same B2L buffer)
-  // cppcheck-suppress variableScope
   //  int t0CombinedDecisionLast = -1;
   //  int logLSumLast = -1;
   //  int logLSumNow = 0;
@@ -247,7 +264,8 @@ void TRGTOPUnpackerWaveformModule::unpackWaveforms(int* rdat, int channel)
   unsigned int testPatternDummyEvent = 0xbbbb;
   for (int iWindow = 0; iWindow < numberOfWindows; iWindow++) {
     int index = iWindow * windowSize + 3;
-    testPattern = (rdat[index] >> 16) & 0xffff;
+    // various test patterns will be used to check the data
+    unsigned int testPattern = (rdat[index] >> 16) & 0xffff;
     if (testPattern == testPatternDummyEvent) {
       counterDummyWindows++;
     }

@@ -310,7 +310,7 @@ void CDCCRTestModule::event()
     tanL = fitresult->getTanLambda();
     omega = fitresult->getOmega();
     phi0 = fitresult->getPhi0() * 180 / M_PI;
-    Pt = fitresult->getMomentum().Perp();
+    Pt = fitresult->getMomentum().Rho();
     m_hPhi0->Fill(phi0);
     m_hChi2->Fill(Chi2);
     if (Pt < m_MinimumPt) continue;

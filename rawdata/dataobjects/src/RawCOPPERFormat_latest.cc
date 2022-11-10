@@ -252,7 +252,7 @@ int RawCOPPERFormat_latest::GetOffset4thFINESSE(int n)
   return 0;
 }
 
-void RawCOPPERFormat_latest::CompareHeaderValue(int n, const unsigned int (&input_val)[MAX_PCIE40_CH] ,
+void RawCOPPERFormat_latest::CompareHeaderValue(int n, const unsigned int (&input_val)[MAX_PCIE40_CH],
                                                 std::vector<std::vector<unsigned int>>& summary_table)
 {
 

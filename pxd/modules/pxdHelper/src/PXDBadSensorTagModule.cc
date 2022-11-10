@@ -16,7 +16,7 @@ using namespace Belle2::PXD;
 using namespace Belle2::PXD::PXDError;
 
 
-REG_MODULE(PXDBadSensorTag)
+REG_MODULE(PXDBadSensorTag);
 
 
 PXDBadSensorTagModule::PXDBadSensorTagModule() :

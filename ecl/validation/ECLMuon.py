@@ -19,7 +19,7 @@
 """
 <header>
 <output>ECLMuonOutput.root</output>
-<contact>Elisa Manoni, elisa.manoni@pg.infn.it</contact>
+<contact>Priyanka Cheema, pche3675@uni.sydney.edu.au</contact>
 </header>
 """
 
@@ -76,5 +76,6 @@ ecldataanalysis.param('rootFileName', '../ECLMuonOutput.root')
 ecldataanalysis.param('doTracking', 1)
 main.add_module(ecldataanalysis)
 
+main.add_module('Progress')
 b2.process(main)
 # print(statistics)

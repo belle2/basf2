@@ -5,13 +5,9 @@
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
-import basf2
-import ROOT
-from ROOT import Belle2
-import numpy as np
 
-# circumvent BII-1264
-ROOT.gROOT.ProcessLine("#include <framework/utilities/MakeROOTCompatible.h>")
+import basf2
+import numpy as np
 
 
 class PerEventStatisticsGetterModule(basf2.Module):
@@ -44,13 +40,19 @@ class PerEventStatisticsGetterModule(basf2.Module):
         #: A flag to indicate that we have already added the Branches to the TTree (which we will do in the first event)
         self.branches_added = False
 
+        # Always avoid the top-level 'import ROOT'.
+        import ROOT  # noqa
+
         #: The event meta data
-        self.event_meta_data = Belle2.PyStoreObj("EventMetaData")
+        self.event_meta_data = ROOT.Belle2.PyStoreObj("EventMetaData")  # noqa
 
     def initialize(self):
         """
         Create the needed store object pointer in the DataStore and the TFile with the TTree.
         """
+        # Always avoid the top-level 'import ROOT'.
+        import ROOT  # noqa
+
         self.event_meta_data.isRequired()
 
         # try to avoid side effects ...
@@ -75,6 +77,9 @@ class PerEventStatisticsGetterModule(basf2.Module):
         """
         The event loop: Store the statistics as a new row in the TTree.
         """
+        # Always avoid the top-level 'import ROOT'.
+        import ROOT  # noqa
+
         # TTree reference (for shorter code)
         ttree = self.statistics
 
@@ -93,7 +98,7 @@ class PerEventStatisticsGetterModule(basf2.Module):
         if not self.branches_added:
 
             # make sure all this is only done in the output process
-            if Belle2.ProcHandler.parallelProcessingUsed() and not Belle2.ProcHandler.isOutputProcess():
+            if ROOT.Belle2.ProcHandler.parallelProcessingUsed() and not ROOT.Belle2.ProcHandler.isOutputProcess():
                 basf2.B2FATAL("PerEventStatisticsGetterModule can only be used in single processing mode or in the output process")
 
             self.ttree_inputs = np.zeros(len(module_stats), dtype=float)
@@ -102,7 +107,7 @@ class PerEventStatisticsGetterModule(basf2.Module):
             for i, stat in enumerate(module_stats):
                 # escape the module names in ROOT-safe manner. Otherwise weird stuff happens like
                 # sub-branches get created or the branch cannot be opened in the TBrowser
-                module_name = "{name}_{i}".format(name=Belle2.MakeROOTCompatible.makeROOTCompatible(stat.name), i=i)
+                module_name = "{name}_{i}".format(name=ROOT.Belle2.MakeROOTCompatible.makeROOTCompatible(stat.name), i=i)
                 # Create the branch. See initialize() for why it's [i:] and not [i]
                 ttree.Branch(module_name, self.ttree_inputs[i:], f"{module_name}/D")
 
@@ -127,6 +132,9 @@ class PerEventStatisticsGetterModule(basf2.Module):
         Write out the merged statistics to the ROOT file.
         This should only be called once, as we would end up with different versions otherwise.
         """
+        # Always avoid the top-level 'import ROOT'.
+        import ROOT  # noqa
+
         # Change the path a last time
         old = ROOT.gDirectory
         self.tfile.cd()

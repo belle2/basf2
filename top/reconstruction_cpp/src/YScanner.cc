@@ -11,7 +11,6 @@
 #include <top/geometry/TOPGeometryPar.h>
 #include <framework/logging/Logger.h>
 #include <cmath>
-#include <map>
 
 namespace Belle2 {
   namespace TOP {
@@ -30,10 +29,6 @@ namespace Belle2 {
       dLen_dx = dLen_d(sol, sol_dx);
       dLen_de = dLen_d(sol, sol_de);
       dLen_dL = dLen_d(sol, sol_dL);
-
-      dyD_dx = dyD_d(sol, sol_dx);
-      dyD_de = dyD_d(sol, sol_de);
-      dyD_dL = dyD_d(sol, sol_dL);
 
       dyB_dx = dyB_d(sol, sol_dx);
       dyB_de = dyB_d(sol, sol_de);
@@ -106,9 +101,11 @@ namespace Belle2 {
       m_meanE = 0;
       m_rmsE = 0;
       m_sigmaScat = 0;
-      m_aboveThreshold = false;
+      m_sigmaAlpha = 0;
       m_energyDistribution.clear();
-      m_quasyEnergyDistribution.clear();
+      m_quasyEnergyDistributions.clear();
+      m_quasyEnergyDistribution = nullptr;
+      m_aboveThreshold = false;
       m_results.clear();
       m_scanDone = false;
     }
@@ -131,7 +128,7 @@ namespace Belle2 {
 
       m_numPhotons = 370 * area / (2 * M_PI);
 
-      // set photon energy distribution convoluted with multiple scattering
+      // set multiple scattering and surface roughness sigmas in photon energy units
 
       const double radLength = 12.3; // quartz radiation length [cm]
       double thetaScat = 13.6e-3 / beta / momentum * sqrt(length / 2 / radLength); // r.m.s of multiple scattering angle
@@ -145,37 +142,11 @@ namespace Belle2 {
       double dndE = topgp->getPhaseIndexDerivative(m_meanE);
       double dEdTheta = n * sqrt(pow(beta * n, 2) - 1) / dndE;
       m_sigmaScat = std::abs(thetaScat * dEdTheta); // r.m.s of multiple scattering angle converted to photon energy
+      m_sigmaAlpha = std::abs(m_bars.back().sigmaAlpha * dEdTheta); // surface roughness converted to photon energy
 
-      double step = m_energyDistribution.step;
-      int ng = lround(3 * m_sigmaScat / step);
-      std::vector<double> gaus;
-      for (int i = 0; i <= ng; i++) {
-        double x = step * i / m_sigmaScat;
-        gaus.push_back(exp(-0.5 * x * x));
-      }
+      // set photon energy distribution convoluted with multiple scattering
 
-      m_quasyEnergyDistribution.set(m_energyDistribution.getX(-ng), step);
-      int N = m_energyDistribution.entries.size();
-      double sum = 0;
-      for (int k = -ng; k < N + ng; k++) {
-        double s = 0;
-        double se = 0;
-        double see = 0;
-        for (int i = -ng; i <= ng; i++) {
-          double p = gaus[std::abs(i)] * m_energyDistribution.getY(k - i);
-          double e = m_energyDistribution.getX(k - i);
-          s += p;
-          se += p * e;
-          see += p * e * e;
-        }
-        if (s > 0) {
-          se /= s;
-          see /= s;
-        }
-        m_quasyEnergyDistribution.entries.push_back(TableEntry(s, se, see));
-        sum += s;
-      }
-      for (auto& entry : m_quasyEnergyDistribution.entries) entry.y /= sum;
+      setQuasyEnergyDistribution(m_sigmaScat);
 
       m_aboveThreshold = true;
     }
@@ -210,14 +181,63 @@ namespace Belle2 {
     }
 
 
-    void YScanner::expand(unsigned col, double yB, double dydz, const Derivatives& D, bool doScan) const
+    void YScanner::setQuasyEnergyDistribution(double sigma) const
+    {
+      if (m_quasyEnergyDistributions.size() > 1000) {
+        m_quasyEnergyDistributions.clear();
+        B2ERROR("TOP::YScanner:setQuasyEnergyDistribution: unexpectedly large size of the std::map found, map cleared");
+      }
+
+      double step = m_energyDistribution.step;
+      int ng = lround(3 * sigma / step);
+      auto& quasyEnergyDistribution = m_quasyEnergyDistributions[ng];
+
+      if (quasyEnergyDistribution.entries.empty()) {
+        std::vector<double> gaus;
+        for (int i = 0; i <= ng; i++) {
+          double x = step * i / sigma;
+          gaus.push_back(exp(-0.5 * x * x));
+        }
+
+        quasyEnergyDistribution.set(m_energyDistribution.getX(-ng), step);
+        int N = m_energyDistribution.entries.size();
+        double sum = 0;
+        for (int k = -ng; k < N + ng; k++) {
+          double s = 0;
+          double se = 0;
+          double see = 0;
+          for (int i = -ng; i <= ng; i++) {
+            double p = gaus[std::abs(i)] * m_energyDistribution.getY(k - i);
+            double e = m_energyDistribution.getX(k - i);
+            s += p;
+            se += p * e;
+            see += p * e * e;
+          }
+          if (s > 0) {
+            se /= s;
+            see /= s;
+          }
+          quasyEnergyDistribution.entries.push_back(TableEntry(s, se, see));
+          sum += s;
+        }
+        for (auto& entry : quasyEnergyDistribution.entries) entry.y /= sum;
+      }
+
+      m_quasyEnergyDistribution = &quasyEnergyDistribution;
+    }
+
+
+    void YScanner::expand(unsigned col, double yB, double dydz, const Derivatives& D, int Ny, bool doScan) const
     {
       m_results.clear();
 
       if (D.dyB_de == 0) return;
 
-      double minE = m_quasyEnergyDistribution.getXmin();
-      double maxE = m_quasyEnergyDistribution.getXmax();
+      double sigma = sqrt(pow(m_sigmaScat, 2) + pow(m_sigmaAlpha, 2) * std::abs(Ny));
+      setQuasyEnergyDistribution(sigma);
+
+      double minE = m_quasyEnergyDistribution->getXmin();
+      double maxE = m_quasyEnergyDistribution->getXmax();
       double pixDx  = m_pixelPositions.get(col + 1).Dx;
       double dely = (std::abs(D.dyB_dL) * m_length + std::abs(D.dyB_dx) * pixDx) / 2;
       double y1 = yB - dely;
@@ -271,7 +291,7 @@ namespace Belle2 {
             auto& mask = masks[iDy];
             if (not mask) {
               double Dy = projection.Dy;
-              double step = m_quasyEnergyDistribution.step;
+              double step = m_quasyEnergyDistribution->step;
               mask = new EnergyMask(D.dyB_de, D.dyB_dL, D.dyB_dx, Dy, m_length, pixel.Dx, step);
             }
             projection.mask = mask;
@@ -345,11 +365,11 @@ namespace Belle2 {
 
       if (mask.empty()) {
         // direct mask calculation
-        for (size_t i = 0; i < m_quasyEnergyDistribution.entries.size(); i++) {
-          double E = m_quasyEnergyDistribution.getX(i);
+        for (size_t i = 0; i < m_quasyEnergyDistribution->entries.size(); i++) {
+          double E = m_quasyEnergyDistribution->getX(i);
           double m = energyMask->getMask(E - Ecp);
           if (m > 0) {
-            const auto& entry = m_quasyEnergyDistribution.entries[i];
+            const auto& entry = m_quasyEnergyDistribution->entries[i];
             double s = entry.y * m;
             result.sum += s;
             result.e0 += entry.x * s;
@@ -358,18 +378,18 @@ namespace Belle2 {
         }
       } else {
         // pre-calculated discrete mask w/ linear interpolation
-        int i0 = m_quasyEnergyDistribution.getIndex(Ecp);
-        double fract = -(Ecp - m_quasyEnergyDistribution.getX(i0)) / m_quasyEnergyDistribution.step;
+        int i0 = m_quasyEnergyDistribution->getIndex(Ecp);
+        double fract = -(Ecp - m_quasyEnergyDistribution->getX(i0)) / m_quasyEnergyDistribution->step;
         if (fract < 0) {
           i0++;
           fract += 1;
         }
-        int N = m_quasyEnergyDistribution.entries.size() - 1;
+        int N = m_quasyEnergyDistribution->entries.size() - 1;
         int M = mask.size() - 1;
         int i1 = std::max(i0 - M, 0);
         int i2 = std::min(i0 + M - 1, N);
         for (int i = i1; i <= i2; i++) {
-          const auto& entry = m_quasyEnergyDistribution.entries[i];
+          const auto& entry = m_quasyEnergyDistribution->entries[i];
           double m = mask[std::abs(i - i0)] * (1 - fract) + mask[std::abs(i - i0 + 1)] * fract;
           double s = entry.y * m;
           result.sum += s;

@@ -46,3 +46,11 @@ def add_cosmic_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
             # need to be behind add_common_dqm as intercepts are calculated there
             # disable d0 and z0 cut for cosmics
             path.add_module('PXDDQMEfficiency', histogramDirectoryName='PXDEFF', z0minCut=-9999, z0maxCut=9999, d0Cut=9999)
+
+    # KLM2 (requires mu+ particle list from add_analysis_dqm)
+    if (components is None or ('KLM' in components and 'CDC' in components)) and (dqm_mode in ["dont_care", "filtered"]):
+        path.add_module("KLMDQM2", MuonListName='mu+:all',
+                        MinimalMatchingDigits=12,
+                        MinimalMatchingDigitsOuterLayers=0,
+                        MinimalMomentumNoOuterLayers=4.0,
+                        SoftwareTriggerName="")

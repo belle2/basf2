@@ -117,17 +117,17 @@ namespace Belle2 {
     /** Fill cluster hitmap in IP angle range. */
     virtual void FillTRClusterHitmap(float phi_deg, float theta_deg, int layerIndex);
     /** Fill histograms with unbiased residuals in PXD sensors. */
-    virtual void FillUBResidualsPXD(TVector3 residual_um);
+    virtual void FillUBResidualsPXD(const TVector3& residual_um);
     /** Fill histograms with unbiased residuals in SVD sensors. */
-    virtual void FillUBResidualsSVD(TVector3 residual_um);
+    virtual void FillUBResidualsSVD(const TVector3& residual_um);
     /** Fill histograms with unbiased residuals for half-shells for PXD sensors. */
-    virtual void FillHalfShellsPXD(TVector3 globalResidual_um, bool isNotYang);
+    virtual void FillHalfShellsPXD(const TVector3& globalResidual_um, bool isNotYang);
     /** Fill histograms with unbiased residuals for half-shells for SVD sensors. */
-    virtual void FillHalfShellsSVD(TVector3 globalResidual_um, bool isNotMat);
+    virtual void FillHalfShellsSVD(const TVector3& globalResidual_um, bool isNotMat);
     /** Fill 1D histograms with unbiased residuals for individual sensors. */
-    virtual void FillUB1DResidualsSensor(TVector3 residual_um, int sensorIndex);
+    virtual void FillUB1DResidualsSensor(const TVector3& residual_um, int sensorIndex);
     /** Fill 2D histograms with unbiased residuals for individual sensors. */
-    virtual void FillUB2DResidualsSensor(TVector3 residual_um, int sensorIndex);
+    virtual void FillUB2DResidualsSensor(const TVector3& residual_um, int sensorIndex);
     /** @} */
 
   protected:
@@ -303,5 +303,12 @@ namespace Belle2 {
     TH1F* m_TracksVXDCDC = nullptr;
     /** Number of all finding tracks */
     TH1F* m_Tracks = nullptr;
+
+  private:
+    /** Check a variable for whether or not it is NAN or INF */
+    inline bool checkVariableForNANOrINF(const double var)
+    {
+      return std::isnan(var) or std::isinf(var);
+    }
   };
 }

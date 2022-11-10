@@ -16,7 +16,7 @@ namespace Belle2 {
 
   /** This variable returns the time difference among the U side clusters of the two space points */
   template <typename PointType>
-  class DISTANCEINTIME_U_NAME : public SelectionVariable< PointType , 2, double > {
+  class DISTANCEINTIME_U_NAME : public SelectionVariable< PointType, 2, double > {
   public:
 
     /** is expanded as "static const std:string name(void)" frunction which returns name of the Class */

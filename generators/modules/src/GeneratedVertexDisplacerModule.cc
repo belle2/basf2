@@ -27,7 +27,7 @@ GeneratedVertexDisplacerModule::GeneratedVertexDisplacerModule() : Module()
 {
   // Set module properties
   setDescription(
-    R"DOC(""Takes a list of PDG values and lifetime paramters to displaces the vertex of MCParticles with matching PDG value corresponding to the given lifetime parameter. Can be used betwenerator and the detector simulation.)DOC");
+    R"DOC(Takes a list of PDG values and lifetime paramters to displaces the vertex of MCParticles with matching PDG value corresponding to the given lifetime parameter. Can be used betwenerator and the detector simulation.)DOC");
 
   // Parameter definitions
   addParam("lifetimeOption", m_lifetimeOption,
@@ -100,7 +100,7 @@ void GeneratedVertexDisplacerModule::displace(MCParticle& particle, float lifeti
   ROOT::Math::PxPyPzEVector* displacementVector = new ROOT::Math::PxPyPzEVector();
   getDisplacement(particle, lifetime, *displacementVector);
 
-  B2Vector3D newDecayVertex = particle.getProductionVertex();
+  ROOT::Math::XYZVector newDecayVertex = particle.getProductionVertex();
   newDecayVertex.SetX(newDecayVertex.X() + displacementVector->X());
   newDecayVertex.SetY(newDecayVertex.Y() + displacementVector->Y());
   newDecayVertex.SetZ(newDecayVertex.Z() + displacementVector->Z());
@@ -128,7 +128,7 @@ void GeneratedVertexDisplacerModule::displaceDaughter(ROOT::Math::PxPyPzEVector&
 
     // getDaughters returns a copied list, need to change parameters of the original particle in the MCParticle StoreArray.
     MCParticle& mcp = *m_mcparticles[daughter_mcpArrayIndex];
-    mcp.setProductionVertex(B2Vector3D(mcp.getProductionVertex() + motherDisplacementVector.Vect()));
+    mcp.setProductionVertex(mcp.getProductionVertex() + motherDisplacementVector.Vect());
     mcp.setProductionTime(mcp.getProductionTime() + motherDisplacementVector.T());
     mcp.setValidVertex(true);
 

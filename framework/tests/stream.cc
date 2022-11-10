@@ -32,7 +32,7 @@ namespace {
     TClonesArray& relations = relCont->elements();
     //let's make this a bit larger (very small objects are never compressed)
     for (int i = 0; i < 100; i++)
-      new(relations.AddrAt(relations.GetLast() + 1)) RelationElement(0, i + 1, 42.0);
+      new (relations.AddrAt(relations.GetLast() + 1)) RelationElement(0, i + 1, 42.0);
 
     return relCont;
   }

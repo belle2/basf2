@@ -131,7 +131,7 @@ void Chi2MCTrackMatcherModule::event()
       if (mcParticle.getCharge() < 0) { charge_sign = -1;}
       UncertainHelix helix = trackFitResult->getUncertainHelix();
       auto b_field = BFieldManager::getField(helix.getPerigee()).Z() / Belle2::Unit::T;
-      auto mcParticleHelix = Helix(B2Vector3D(mcParticle.getVertex()), mcParticle.getMomentum(), charge_sign, b_field);
+      auto mcParticleHelix = Helix(mcParticle.getVertex(), mcParticle.getMomentum(), charge_sign, b_field);
       // initialize the curent chi2
       double chi2Cur;
       // Check which linear algebra system should be used and calculate chi2Cur

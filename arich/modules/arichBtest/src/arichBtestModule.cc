@@ -49,14 +49,14 @@ using namespace std;
 namespace Belle2 {
 
 
-//-----------------------------------------------------------------
-//                 Register the Module
-//-----------------------------------------------------------------
-  REG_MODULE(arichBtest)
+  //-----------------------------------------------------------------
+  ///                Register the Module
+  //-----------------------------------------------------------------
+  REG_MODULE(arichBtest);
 
-//-----------------------------------------------------------------
-//                 Implementation
-//-----------------------------------------------------------------
+  //-----------------------------------------------------------------
+  //                 Implementation
+  //-----------------------------------------------------------------
 
 
   arichBtestModule::arichBtestModule() : Module(), m_end(0), m_events(0), m_file(NULL), m_timestart(0), m_mwpc(NULL)
@@ -137,7 +137,7 @@ namespace Belle2 {
      for (int i=0;i<6;i++){
       for (int k=0;k<144;k++){
         TVector3 r = _arichgp->getChannelCenterGlob(i + 1, k);
-        dout  << r.x() << " " << r.y() << endl;
+        dout  << r.X() << " " << r.Y() << endl;
       }
      }
      dout.close();
@@ -271,7 +271,7 @@ namespace Belle2 {
     ARICHBtestGeometryPar* _arichbtgp = ARICHBtestGeometryPar::Instance();
     //-----------------------------------------------------
 
-    int bmask = 0xF;
+    unsigned int bmask = 0xF;
 
     for (int module = 0; module < 6; module++) {
       int istart = 19 * module;
@@ -303,7 +303,7 @@ namespace Belle2 {
 
               TVector3 rechit = _arichgp->getChannelCenterGlob(module + 1, channel);
               pair<double, double> poshapd(_arichbtgp->GetHapdChannelPosition(module * 144 + channelID));
-              m_tuple ->Fill(-poshapd.first, poshapd.second, rechit.x(), rechit.y(), module, channelID, rposx, rposy);
+              m_tuple ->Fill(-poshapd.first, poshapd.second, rechit.X(), rechit.Y(), module, channelID, rposx, rposy);
             }
           }
         }
@@ -372,20 +372,20 @@ namespace Belle2 {
     dir = dir.Unit();
 
 // end replace by fitter
-    if (dir.z() != 0) {
+    if (dir.Z() != 0) {
       for (int i = 0; i < 4; i++) {
         ARICHTracking* w = &m_mwpc[i];
-        double l = (w->reco[2] - r.z()) / dir.z() ;
+        double l = (w->reco[2] - r.Z()) / dir.Z() ;
         TVector3 rext = r + dir * l;
-        if (!w->status[0])  mwpc_residuals[i][0]->Fill(w->reco[0] - rext.y());
-        if (!w->status[1])  mwpc_residuals[i][1]->Fill(w->reco[1] - rext.x());
+        if (!w->status[0])  mwpc_residuals[i][0]->Fill(w->reco[0] - rext.Y());
+        if (!w->status[1])  mwpc_residuals[i][1]->Fill(w->reco[1] - rext.X());
 
         TAxis* axis =  mwpc_residualsz[i][1]->GetYaxis();
         for (int k = 0; k < axis->GetNbins(); k++) {
-          double ll = (w->reco[2] + axis->GetBinCenter(k + 1) - r.z()) / dir.z();
+          double ll = (w->reco[2] + axis->GetBinCenter(k + 1) - r.Z()) / dir.Z();
           TVector3 rextt = r + dir * ll;
-          mwpc_residualsz[i][0]->Fill(w->reco[0] - rextt.y(), axis->GetBinCenter(k + 1));
-          mwpc_residualsz[i][1]->Fill(w->reco[1] - rextt.x(), axis->GetBinCenter(k + 1));
+          mwpc_residualsz[i][0]->Fill(w->reco[0] - rextt.Y(), axis->GetBinCenter(k + 1));
+          mwpc_residualsz[i][1]->Fill(w->reco[1] - rextt.X(), axis->GetBinCenter(k + 1));
 
         }
       }
@@ -435,11 +435,11 @@ namespace Belle2 {
         //
         // end track rotation
         //----------------------------------------
-        r[1]  = -r.y();
-        dir[1] = -dir.y();
-        B2DEBUG(50, "-----------> " <<  rc.x() <<  " " << rc.y() << " " <<   rc.z() << "::::" << rrel.x() <<  " " << rrel.y() << " " <<
-                rrel.z()  << " ----> R " <<   r.x() <<  " " << r.y() << " " <<   r.z() << " ----> S " <<   dir.x() <<  " " << dir.y() << " " <<
-                dir.z());
+        r[1]  = -r.Y();
+        dir[1] = -dir.Y();
+        B2DEBUG(50, "-----------> " <<  rc.X() <<  " " << rc.Y() << " " <<   rc.Z() << "::::" << rrel.X() <<  " " << rrel.Y() << " " <<
+                rrel.Z()  << " ----> R " <<   r.X() <<  " " << r.Y() << " " <<   r.Z() << " ----> S " <<   dir.X() <<  " " << dir.Y() << " " <<
+                dir.Z());
 
         // Add new ARIHCAeroHit to datastore
         arichAeroHits.appendNew(particleId, r, dir);

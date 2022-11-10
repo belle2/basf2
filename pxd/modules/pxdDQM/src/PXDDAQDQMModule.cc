@@ -23,7 +23,7 @@ using boost::format;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(PXDDAQDQM)
+REG_MODULE(PXDDAQDQM);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -211,7 +211,7 @@ void PXDDAQDQMModule::event()
       }
       unsigned int cmask = dhc.getEndErrorInfo();
       for (int i = 0; i < 32; i++) {
-        unsigned int mask = (1 << i);
+        unsigned int mask = (1u << i);
         if ((cmask & mask) == mask) hDAQEndErrorDHC->Fill(dhc.getDHCID(), i);
       }
       if (hDAQDHCReduction[dhc.getDHCID()]) {

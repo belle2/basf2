@@ -26,8 +26,8 @@ namespace Belle2 {
       const double Q10 = +3.2584593;
       const double P11 = -9.7970465E-2;
 
-      static double P2[5] = { 7.3738883, 6.8650185,  3.0317993, 0.56316962, 4.3187787e-5 };
-      static double Q2[5] = { 7.3739609, 15.184908, 12.79553,   5.3542168,  1. };
+      static const double P2[5] = { 7.3738883, 6.8650185,  3.0317993, 0.56316962, 4.3187787e-5 };
+      static const double Q2[5] = { 7.3739609, 15.184908, 12.79553,   5.3542168,  1. };
 
       const double P30 = -1.2436854E-1;
       const double Q30 = +4.4091706E-1;
@@ -64,11 +64,11 @@ namespace Belle2 {
 
     TVector3 Refraction(const TVector3 s,  const double n)
     {
-      double x = s.x() / n;
-      double y = s.y() / n;
+      double x = s.X() / n;
+      double y = s.Y() / n;
 
       if (x * x + y * y > 1) return TVector3();
-      if (s.z() < 0) return  TVector3(x, y, -sqrt(1 - x * x - y * y));
+      if (s.Z() < 0) return  TVector3(x, y, -sqrt(1 - x * x - y * y));
       else   return  TVector3(x, y, sqrt(1 - x * x - y * y));
     }
     //---------------------------------------------------------------
@@ -103,11 +103,11 @@ namespace Belle2 {
       // Output:
       TVector3  fX, fY, fZ;// base vectors
 
-      double ss = 1 - r.y() * r.y();
+      double ss = 1 - r.Y() * r.Y();
       if (ss > 0) {
         ss = sqrt(ss);
         fZ = r;
-        fX = TVector3(fZ.z() / ss, 0, -fZ.x() / ss);
+        fX = TVector3(fZ.Z() / ss, 0, -fZ.X() / ss);
         fY = fZ.Cross(fX);
       } else {
         fZ = TVector3(0, 1, 0);
@@ -126,11 +126,11 @@ namespace Belle2 {
       // Output:
       TVector3  fX, fY, fZ;// base vectors
 
-      double ss = 1 - r.y() * r.y();
+      double ss = 1 - r.Y() * r.Y();
       if (ss > 0) {
         ss = sqrt(ss);
         fZ = r;
-        fX = TVector3(fZ.z() / ss, 0, -fZ.x() / ss);
+        fX = TVector3(fZ.Z() / ss, 0, -fZ.X() / ss);
         fY = fZ.Cross(fX);
       } else {
         fZ = TVector3(0, 1, 0);

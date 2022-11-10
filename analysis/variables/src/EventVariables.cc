@@ -105,6 +105,36 @@ namespace Belle2 {
       return mcps.getEntries();
     }
 
+    int nPrimaryMCParticles(const Particle*)
+    {
+      int n = 0;
+      StoreArray<MCParticle> mcps;
+      for (const auto& mcp : mcps)
+        if (mcp.isPrimaryParticle())
+          n++;
+      return n;
+    }
+
+    int nInitialPrimaryMCParticles(const Particle*)
+    {
+      int n = 0;
+      StoreArray<MCParticle> mcps;
+      for (const auto& mcp : mcps)
+        if (mcp.isInitial() and mcp.isPrimaryParticle())
+          n++;
+      return n;
+    }
+
+    int nVirtualPrimaryMCParticles(const Particle*)
+    {
+      int n = 0;
+      StoreArray<MCParticle> mcps;
+      for (const auto& mcp : mcps)
+        if (mcp.isVirtual() and mcp.isPrimaryParticle())
+          n++;
+      return n;
+    }
+
     int nTracks(const Particle*)
     {
       StoreArray<Track> tracks;
@@ -283,7 +313,7 @@ namespace Belle2 {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getMissingMomentum().x();
+      double missing = evtShape->getMissingMomentum().X();
       return missing;
     }
 
@@ -294,7 +324,7 @@ namespace Belle2 {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getMissingMomentum().y();
+      double missing = evtShape->getMissingMomentum().Y();
       return missing;
     }
 
@@ -305,7 +335,7 @@ namespace Belle2 {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getMissingMomentum().z();
+      double missing = evtShape->getMissingMomentum().Z();
       return missing;
     }
 
@@ -349,7 +379,7 @@ namespace Belle2 {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getMissingMomentumCMS().x();
+      double missing = evtShape->getMissingMomentumCMS().X();
       return missing;
     }
 
@@ -360,7 +390,7 @@ namespace Belle2 {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getMissingMomentumCMS().y();
+      double missing = evtShape->getMissingMomentumCMS().Y();
       return missing;
     }
 
@@ -371,7 +401,7 @@ namespace Belle2 {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getMissingMomentumCMS().z();
+      double missing = evtShape->getMissingMomentumCMS().Z();
       return missing;
     }
 
@@ -767,20 +797,20 @@ namespace Belle2 {
 [Eventbased] Returns number of track fits with zero charge.
 
 .. note::
-  Sometimes, track fits can have zero charge, if background or non IP originating tracks, for example, are fit from the IP. 
+  Sometimes, track fits can have zero charge, if background or non IP originating tracks, for example, are fit from the IP.
   These tracks are excluded from particle lists, but a large amount of charge zero
   fits may indicate problems with whole event constraints
   or abnominally high beam backgrounds and/or noisy events.
 )DOC");
 
     REGISTER_VARIABLE("belleECLEnergy", belleECLEnergy, R"DOC(
-[Eventbased][Legacy] Returns total energy in ECL in the event as used in Belle 1 analyses. 
+[Eventbased][Legacy] Returns total energy in ECL in the event as used in Belle 1 analyses.
 
 .. warning::
 
-  For Belle II use cases use either ``totalEnergyOfParticlesInList(gamma:all)``, 
+  For Belle II use cases use either ``totalEnergyOfParticlesInList(gamma:all)``,
   or (probably better) fill a photon list with some minimal cleanup cuts and use that instea
-  
+
   .. code-block:: python
 
     from variables import variables as vm
@@ -794,13 +824,19 @@ namespace Belle2 {
                       "[Eventbased] Returns number of KLM clusters in the event.");
     REGISTER_VARIABLE("nMCParticles", nMCParticles,
                       "[Eventbased] Returns number of MCParticles in the event.");
+    REGISTER_VARIABLE("nPrimaryMCParticles", nPrimaryMCParticles,
+                      "[Eventbased] Returns number of primary MCParticles in the event.");
+    REGISTER_VARIABLE("nInitialPrimaryMCParticles", nInitialPrimaryMCParticles,
+                      "[Eventbased] Returns number of initial primary MCParticles in the event.");
+    REGISTER_VARIABLE("nVirtualPrimaryMCParticles", nVirtualPrimaryMCParticles,
+                      "[Eventbased] Returns number of virtual primary MCParticles in the event.");
 
     REGISTER_VARIABLE("expNum", expNum, "[Eventbased] Returns the experiment number.");
     REGISTER_VARIABLE("evtNum", evtNum, "[Eventbased] Returns the event number.");
     REGISTER_VARIABLE("runNum", runNum, "[Eventbased] Returns the run number.");
     REGISTER_VARIABLE("productionIdentifier", productionIdentifier, R"DOC(
 [Eventbased] Production identifier.
-Uniquely identifies an MC sample by the (grid-jargon) production ID. 
+Uniquely identifies an MC sample by the (grid-jargon) production ID.
 This is useful when analysing large MC samples split between more than one production or combining different MC samples (e.g. combining all continuum samples).
 In such cases the event numbers are sequential *only within a production*, so experiment/run/event will restart with every new sample analysed.
 
@@ -858,7 +894,7 @@ Returns NaN for data.
                       "[Eventbased] Time since the previous trigger (127MHz=RF/4 clock).","clock ticks");
 
     REGISTER_VARIABLE("timeSincePrevTriggerMicroSeconds", timeSincePrevTriggerMicroSeconds,
-                      "[Eventbased] Time since the previous trigger.","ms");
+                      "[Eventbased] Time since the previous trigger.",":math:`\\mathrm{\\mu s}`");
 
     REGISTER_VARIABLE("triggeredBunchNumberTTD", triggeredBunchNumberTTD, R"DOC(
 [Eventbased] Number of triggered bunch ranging from 0-1279.
@@ -886,13 +922,13 @@ Returns NaN for data.
 [Eventbased] Time since the last injection pre-kick signal
 
 .. warning:: this returns the time without the delay until the injected bunch reaches the detector (which differs for HER/LER)
-)DOC","ms");
+)DOC",":math:`\\mathrm{\\mu s}`");
 
     REGISTER_VARIABLE("timeSinceLastInjectionClockTicks", timeSinceLastInjectionClockTicks,
-      "[Eventbased] Time since the last injected bunch passed by the detector.","ms")
+      "[Eventbased] Time since the last injected bunch passed by the detector.","clock ticks")
 
     REGISTER_VARIABLE("timeSinceLastInjectionMicroSeconds", timeSinceLastInjectionMicroSeconds,
-      "[Eventbased] Time since the last injected bunch passed by the detector.","ms")
+      "[Eventbased] Time since the last injected bunch passed by the detector.",":math:`\\mathrm{\\mu s}`")
 
     REGISTER_VARIABLE("injectionInHER", injectionInHER,
                   "[Eventbased] Returns 1 if injection was in HER, 0 otherwise.");
@@ -968,7 +1004,7 @@ Returns NaN for data.
 
     VARIABLE_GROUP("Event (cDST only)");
     REGISTER_VARIABLE("eventT0", eventT0, R"DOC(
-[Eventbased][Calibration] The Event t0, is the time of the event relative to the trigger time. 
+[Eventbased][Calibration] The Event t0, is the time of the event relative to the trigger time.
 
 .. note::
   The event time can be measured by several sub-detectors including the CDC, ECL, and TOP.

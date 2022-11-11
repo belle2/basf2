@@ -85,8 +85,8 @@ else:
     # main.add_module('RootInput', branchNames=['RawPXDs', 'RawSVDs', 'RawCDCs', 'RawECLs'])
     # raw.add_unpackers(main, components=['PXD', 'SVD', 'CDC', 'ECL'])
 
-    main.add_module('RootInput', entrySequences=['0:1000'])
-    # main.add_module('RootInput')
+    # main.add_module('RootInput', entrySequences=['0:1000'])
+    main.add_module('RootInput')
 
     main.add_module("Gearbox")
     main.add_module('Geometry', useDB=True)

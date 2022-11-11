@@ -196,7 +196,7 @@ namespace Belle2 {
       return m_qualityIndicator;
     }
 
-    /** Set track time computed as the difference between the outgoing/ingoing arm time and the SVD EventT0.
+    /** Set track time computed as the difference between the outgoing/ingoing arm time (computed with SVD hits) and the SVD EventT0.
      * If both outgoing and ingoing arms exist:
      * 1) if the outgoing arm time is smaller than the ingoing arm time, the track time is computed as the difference of the outgoing arm time and the SVD EventT0;
      * 2) otherwise the track time is computed as the difference of the ingoing arm time and the SVD EventT0.

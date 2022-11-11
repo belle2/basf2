@@ -40,17 +40,14 @@ int main(int argc, char* argv[])
               << " 3: output filename" << std::endl;
     return -1;
   }
-  std::string cfn = argv[2];
-  NeuroTriggerParameters p(cfn);
+  std::string jsonweights = argv[1];
+  std::string configfile = argv[2];
+  std::string outputfile = argv[3];
 
-
+  NeuroTriggerParameters p(configfile);
   NeuroTrigger m_nnt;
   m_nnt.initialize(p);
-  m_nnt.loadIDHist("IDHist.gz");
-  //if (!m_nnt.load(argv[1], "MLPs")) {
-  //    std::cout << "Error loading file: " << argv[1] << std::endl;
-  //}
-  std::ifstream netfile(argv[1], std::ifstream::binary);
+  std::ifstream netfile(jsonweights, std::ifstream::binary);
   nlohmann::json nets;
   netfile >> nets;
 
@@ -76,7 +73,7 @@ int main(int argc, char* argv[])
     std::cout << " writing " << weights.size() << " weights for expert " << expert << std::endl;
     m_nnt[expert].setWeights(weights);
   }
-  m_nnt.save(argv[3], "MLPs");
+  m_nnt.save(outputfile, "MLPs");
 
 
   return 0;

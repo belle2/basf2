@@ -2773,6 +2773,7 @@ namespace Belle2 {
         // and stores indexes and masses in two std::vectors
         std::vector<unsigned int>indexesToBeReplaced = {};
         std::vector<double>massesToBeReplaced = {};
+        std::vector<int>pdgsToBeReplaced = {};
 
         // Loop over the arguments to parse them
         for (unsigned int iCoord = 1; iCoord < arguments.size(); iCoord++) {
@@ -2814,6 +2815,7 @@ namespace Belle2 {
           double dauNewMass = TDatabasePDG::Instance()->GetParticle(pdgCode)->Mass() ;
           indexesToBeReplaced.push_back(dauIndex);
           massesToBeReplaced.push_back(dauNewMass);
+          pdgsToBeReplaced.push_back(pdgCode);
         } // End of parsing
 
         //----
@@ -2822,7 +2824,7 @@ namespace Belle2 {
 
         // Core function: creates a new particle from the original one changing
         // some of the daughters' masses
-        auto func = [var, indexesToBeReplaced, massesToBeReplaced](const Particle * particle) -> double {
+        auto func = [var, indexesToBeReplaced, massesToBeReplaced, pdgsToBeReplaced](const Particle * particle) -> double {
           if (particle == nullptr)
           {
             B2WARNING("Trying to access a particle that does not exist. Skipping");
@@ -2857,7 +2859,14 @@ namespace Belle2 {
                 dauMom.SetCoordinates(p_x, p_y, p_z, massesToBeReplaced[iReplace]);
 
                 // overwrite the daughter's kinematics
-                const_cast<Particle*>(dummy->getDaughter(iDau))->set4Vector(ROOT::Math::PxPyPzEVector(dauMom));
+                const_cast<Particle*>(dummy->getDaughter(iDau))->set4VectorDividingByMomentumScaling(ROOT::Math::PxPyPzEVector(dauMom));
+
+                const int charge = dummy->getCharge();
+                if (TDatabasePDG::Instance()->GetParticle(pdgsToBeReplaced[iReplace])->Charge() / 3.0 == charge)
+                  const_cast<Particle*>(dummy->getDaughter(iDau))->setPDGCode(pdgsToBeReplaced[iReplace]);
+                else
+                  const_cast<Particle*>(dummy->getDaughter(iDau))->setPDGCode(-1 * pdgsToBeReplaced[iReplace]);
+
                 break;
               }
             }

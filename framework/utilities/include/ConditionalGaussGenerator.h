@@ -28,7 +28,11 @@ namespace Belle2 {
     /** constructor which takes vector of central values and covariance matrix as input */
     ConditionalGaussGenerator(const Eigen::VectorXd& mu, const Eigen::MatrixXd& covMat);
 
-    /** generate random vector */
+    /** generate random vector based on the provided first component x0
+     *
+     * @param x0 the first component of the random vector
+     * @return the vector of the random numbers, it starts with x0
+     */
     Eigen::VectorXd generate(double x0) const;
 
     /** get the spread of first component which can be used by external generator */

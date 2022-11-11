@@ -62,11 +62,10 @@ namespace {
     }
 
     // check that mean vector and calculated cov agree with expectation
-    EXPECT_NEAR((muS - mu).squaredNorm(), 0.0,      1e-2);
-    EXPECT_NEAR((covS - cov).squaredNorm(), 0.0,      5e-2);
+    EXPECT_NEAR((muS  - mu).squaredNorm(), 0.0, 1e-2);
+    EXPECT_NEAR((covS - cov).squaredNorm(), 0.0, 5e-2);
 
   }
-
 
 
   /** Tests the conditional generator on 2D vector */
@@ -99,8 +98,8 @@ namespace {
     }
 
     // check that mean vector and calculated cov agree with expectation
-    EXPECT_NEAR((muS - mu).squaredNorm(), 0.0,      1e-3);
-    EXPECT_NEAR((covS - cov).squaredNorm(), 0.0,      1e-3);
+    EXPECT_NEAR((muS  - mu).squaredNorm(), 0.0, 1e-3);
+    EXPECT_NEAR((covS - cov).squaredNorm(), 0.0, 1e-3);
 
   }
 
@@ -139,8 +138,8 @@ namespace {
     }
 
     // check that mean vector and calculated cov agree with expectation
-    EXPECT_NEAR((muS - mu).squaredNorm(), 0.0,      1e-2);
-    EXPECT_NEAR((covS - cov).squaredNorm(), 0.0,      5e-2);
+    EXPECT_NEAR((muS  - mu).squaredNorm(), 0.0, 1e-2);
+    EXPECT_NEAR((covS - cov).squaredNorm(), 0.0, 5e-2);
 
   }
 

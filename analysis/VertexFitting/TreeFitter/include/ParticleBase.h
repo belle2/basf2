@@ -199,9 +199,6 @@ namespace TreeFitter {
      * */
     static bool isAResonance(Belle2::Particle* particle) ;
 
-    /** Bz/c  */
-    static double bFieldOverC();
-
     /** initialises tau as a length  */
     ErrCode initTau(FitParams& par) const ;
 

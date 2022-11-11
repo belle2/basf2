@@ -440,32 +440,44 @@ namespace Belle2 {
 
     double electronID(const Particle* part)
     {
-      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(11, ALL)")->function(part));
+      static Manager::FunctionPtr pidFunction =
+        pidProbabilityExpert({"11", "ALL"});
+      return std::get<double>(pidFunction(part));
     }
 
     double muonID(const Particle* part)
     {
-      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(13, ALL)")->function(part));
+      static Manager::FunctionPtr pidFunction =
+        pidProbabilityExpert({"13", "ALL"});
+      return std::get<double>(pidFunction(part));
     }
 
     double pionID(const Particle* part)
     {
-      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(211, ALL)")->function(part));
+      static Manager::FunctionPtr pidFunction =
+        pidProbabilityExpert({"211", "ALL"});
+      return std::get<double>(pidFunction(part));
     }
 
     double kaonID(const Particle* part)
     {
-      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(321, ALL)")->function(part));
+      static Manager::FunctionPtr pidFunction =
+        pidProbabilityExpert({"321", "ALL"});
+      return std::get<double>(pidFunction(part));
     }
 
     double protonID(const Particle* part)
     {
-      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(2212, ALL)")->function(part));
+      static Manager::FunctionPtr pidFunction =
+        pidProbabilityExpert({"2212", "ALL"});
+      return std::get<double>(pidFunction(part));
     }
 
     double deuteronID(const Particle* part)
     {
-      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(1000010020, ALL)")->function(part));
+      static Manager::FunctionPtr pidFunction =
+        pidProbabilityExpert({"1000010020", "ALL"});
+      return std::get<double>(pidFunction(part));
     }
 
     double binaryPID(const Particle* part, const std::vector<double>& arguments)
@@ -484,38 +496,49 @@ namespace Belle2 {
     double electronID_noSVD(const Particle* part)
     {
       // Excluding SVD for electron ID. This variable is temporary. BII-8760
-      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(11, CDC, TOP, ARICH, ECL, KLM)")->function(part));
+      static Manager::FunctionPtr pidFunction =
+        pidProbabilityExpert({"11", "CDC", "TOP", "ARICH", "ECL", "KLM"});
+      return std::get<double>(pidFunction(part));
     }
 
     double muonID_noSVD(const Particle* part)
     {
       // Excluding SVD for muon ID. This variable is temporary. BII-8760
-      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(13, CDC, TOP, ARICH, ECL, KLM)")->function(part));
+      static Manager::FunctionPtr pidFunction =
+        pidProbabilityExpert({"13", "CDC", "TOP", "ARICH", "ECL", "KLM"});
+      return std::get<double>(pidFunction(part));
     }
 
     double pionID_noSVD(const Particle* part)
     {
       // Excluding SVD for pion ID. This variable is temporary. BII-8760
-      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(211, CDC, TOP, ARICH, ECL, KLM)")->function(part));
+      static Manager::FunctionPtr pidFunction =
+        pidProbabilityExpert({"211", "CDC", "TOP", "ARICH", "ECL", "KLM"});
+      return std::get<double>(pidFunction(part));
     }
 
     double kaonID_noSVD(const Particle* part)
     {
       // Excluding SVD for kaon ID. This variable is temporary. BII-8760
-      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(321, CDC, TOP, ARICH, ECL, KLM)")->function(part));
+      static Manager::FunctionPtr pidFunction =
+        pidProbabilityExpert({"321", "CDC", "TOP", "ARICH", "ECL", "KLM"});
+      return std::get<double>(pidFunction(part));
     }
 
     double protonID_noSVD(const Particle* part)
     {
       // Excluding SVD for proton ID. This variable is temporary. BII-8760
-      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(2212, CDC, TOP, ARICH, ECL, KLM)")->function(part));
+      static Manager::FunctionPtr pidFunction =
+        pidProbabilityExpert({"2212", "CDC", "TOP", "ARICH", "ECL", "KLM"});
+      return std::get<double>(pidFunction(part));
     }
 
     double deuteronID_noSVD(const Particle* part)
     {
       // Excluding SVD for deuteron ID. This variable is temporary. BII-8760
-      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(1000010020, CDC, TOP, ARICH, ECL, KLM)")->function(
-                                part));
+      static Manager::FunctionPtr pidFunction =
+        pidProbabilityExpert({"1000010020", "CDC", "TOP", "ARICH", "ECL", "KLM"});
+      return std::get<double>(pidFunction(part));
     }
 
     double binaryPID_noSVD(const Particle* part, const std::vector<double>& arguments)
@@ -535,7 +558,9 @@ namespace Belle2 {
     double electronID_noTOP(const Particle* part)
     {
       // Excluding TOP for electron ID. This variable is temporary. BII-8444
-      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(11, SVD, CDC, ARICH, ECL, KLM)")->function(part));
+      static Manager::FunctionPtr pidFunction =
+        pidProbabilityExpert({"11", "SVD", "CDC", "ARICH", "ECL", "KLM"});
+      return std::get<double>(pidFunction(part));
     }
 
     double binaryElectronID_noTOP(const Particle* part, const std::vector<double>& arguments)
@@ -558,7 +583,9 @@ namespace Belle2 {
     double electronID_noSVD_noTOP(const Particle* part)
     {
       // Excluding SVD and TOP for electron ID. This variable is temporary. BII-8444, BII-8760.
-      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(11, CDC, ARICH, ECL, KLM)")->function(part));
+      static Manager::FunctionPtr pidFunction =
+        pidProbabilityExpert({"11", "CDC", "ARICH", "ECL", "KLM"});
+      return std::get<double>(pidFunction(part));
     }
 
     double binaryElectronID_noSVD_noTOP(const Particle* part, const std::vector<double>& arguments)
@@ -587,7 +614,9 @@ namespace Belle2 {
         const PIDLikelihood* pid = part->getPIDLikelihood();
         if (!pid) return std::numeric_limits<float>::quiet_NaN();
         if (pid->getLogL(Const::kaon, Const::ARICH) > pid->getLogL(Const::pion, Const::ARICH)) {
-          return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(211, SVD, CDC, TOP, ECL, KLM)")->function(part));
+          static Manager::FunctionPtr pidFunction =
+            pidProbabilityExpert({"211", "SVD", "CDC", "TOP", "ECL", "KLM"});
+          return std::get<double>(pidFunction(part));
         }
       }
       return pionID(part);
@@ -602,7 +631,9 @@ namespace Belle2 {
         const PIDLikelihood* pid = part->getPIDLikelihood();
         if (!pid) return std::numeric_limits<float>::quiet_NaN();
         if (pid->getLogL(Const::kaon, Const::ARICH) > pid->getLogL(Const::pion, Const::ARICH)) {
-          return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(321, SVD, CDC, TOP, ECL, KLM)")->function(part));
+          static Manager::FunctionPtr pidFunction =
+            pidProbabilityExpert({"321", "SVD", "CDC", "TOP", "ECL", "KLM"});
+          return std::get<double>(pidFunction(part));
         }
       }
       return kaonID(part);

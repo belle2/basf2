@@ -94,7 +94,7 @@ else:
 if not args.isMC:
     raw.add_unpackers(main)
 
-    # change ZS to 5
+    # change ListName
     for moda in main.modules():
         if moda.name() == 'SVDUnpacker':
             moda.param("svdShaperDigitListName", "SVDShaperDigits6Sample")

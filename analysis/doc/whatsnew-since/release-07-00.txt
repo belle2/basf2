@@ -1,3 +1,11 @@
+Changes in the analysis package in light-2212-foldex
+----------------------------------------------------
+
+Variables
++++++++++
+ * Extended the variable `cosTPTO` to be available both in a main path and for_each loop over ROEs.
+
+
 Changes in the analysis package in light-2210-devonrex
 ------------------------------------------------------
 

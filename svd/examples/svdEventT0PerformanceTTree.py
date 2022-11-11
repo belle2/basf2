@@ -94,11 +94,13 @@ else:
 if not args.isMC:
     raw.add_unpackers(main)
 
-    # change ListName
-    for moda in main.modules():
-        if moda.name() == 'SVDUnpacker':
-            moda.param("svdShaperDigitListName", "SVDShaperDigits6Sample")
-    # main.add_module("SVDZeroSuppressionEmulator",SNthreshold=5,ShaperDigits="SVDShaperDigitsZS3",ShaperDigitsIN="SVDShaperDigits")
+    if args.is3sample:
+        # change ListName
+        for moda in main.modules():
+            if moda.name() == 'SVDUnpacker':
+                moda.param("svdShaperDigitListName", "SVDShaperDigits6Sample")
+                moda.param("SVDEventInfo", "SVDEventInfo6Sample")
+        # main.add_module("SVDZeroSuppressionEmulator",SNthreshold=5,ShaperDigits="SVDShaperDigitsZS3",ShaperDigitsIN="SVDShaperDigits")
 
 if args.is3sample:
     # emulate 3-sample DAQ for events
@@ -108,7 +110,8 @@ if args.is3sample:
     zsemulator.param("chooseStartingSample", False)
     zsemulator.param("chooseRelativeShift", True)
     zsemulator.param("relativeShift", 7)
-    zsemulator.param("SVDShaperDigits", "SVDShaperDigits")
+    zsemulator.param("SVDShaperDigits", "SVDShaperDigits6Sample")
+    zsemulator.param("SVDEventInfo", "SVDEventInfo6Sample")
     main.add_module(zsemulator)
 
     zsonline = b2.register_module("SVDZeroSuppressionEmulator")
@@ -116,13 +119,13 @@ if args.is3sample:
     zsonline.param("ShaperDigitsIN", "SVDShaperDigits")
     main.add_module(zsonline)
 
-    #  clusterizer
-    clusterizer = b2.register_module('SVDClusterizer')
+    # #  clusterizer
+    # clusterizer = b2.register_module('SVDClusterizer')
     # clusterizer.set_name("SVDClusterizer_3Sample")
     # clusterizer.param('ShaperDigits', "SVDShaperDigits3Sample")
     # clusterizer.param('Clusters', "SVDClusters3Sample")
     # clusterizer.param('EventInfo', "SVDEventInfo3Sample")
-    main.add_module(clusterizer)
+    # main.add_module(clusterizer)
 
 # now do reconstruction:
 trk.add_tracking_reconstruction(

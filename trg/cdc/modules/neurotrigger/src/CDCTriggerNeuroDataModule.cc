@@ -53,6 +53,9 @@ namespace Belle2 {
     addParam("configFileName", m_configFileName,
              "Name of the configuration file. This File should be created by the CDCTriggerIDHistModule and will be extended in this module",
              std::string(""));
+    addParam("writeconfigFileName", m_writeconfigFileName,
+             "Name of the configuration file, which will be written. If left blank, the same file as the input configuration file is used and it will be overwritten.",
+             std::string(""));
     addParam("gzipFilename", m_filename,
              "Name of the gzip file, where the training samples will be saved.",
              std::string("out.gz"));
@@ -281,8 +284,12 @@ namespace Belle2 {
     for (auto x : m_neuroParameters.maxHitsPerSL) {
       x.lock();
     }
-
-    m_neuroParameters.saveconfigtxt(m_configFileName);
+    if (m_writeconfigFileName == "") {
+      m_neuroParameters.saveconfigtxt(m_configFileName);
+    } else {
+      std::cout << "write writeconfig now: " << m_writeconfigFileName << std::endl;
+      m_neuroParameters.saveconfigtxt(m_writeconfigFileName);
+    }
 
     B2DEBUG(10, "Collected events: " << ss.str());
   }

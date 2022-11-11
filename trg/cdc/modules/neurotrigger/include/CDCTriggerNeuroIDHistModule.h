@@ -52,9 +52,12 @@ namespace Belle2 {
     NeuroTriggerParameters m_neuroParameters;
     /** base name for idhist file and config file */
     std::string m_idHistName;
-    /** name for the configuration file which holds all the parameters and
+    /** name for the input configuration file which holds all the parameters and
      * the idhist tables for each expert */
     std::string m_configFileName;
+    /** name for the output configuration file which holds all the parameters and
+     * the idhist tables for each expert */
+    std::string m_writeconfigFileName;
     /** Name of the MCParticles/RecoTracks collection used as target values. */
     std::string m_targetCollectionName;
     /** Switch between MCParticles or RecoTracks as targets. */

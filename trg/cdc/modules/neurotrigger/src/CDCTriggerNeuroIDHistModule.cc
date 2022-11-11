@@ -42,8 +42,11 @@ namespace Belle2 {
     addParam("targetCollectionName", m_targetCollectionName,
              "Name of the MCParticle/RecoTrack collection used as target values.",
              std::string("MCParticles"));
-    addParam("configfile", m_configFileName,
+    addParam("writeconfigfile", m_writeconfigFileName,
              "Name of the config file, where all the parameters and the IDHist configuration is written.",
+             std::string(""));
+    addParam("configfile", m_configFileName,
+             "Name of the config file, where all the parameters and the IDHist configuration is read in from.",
              std::string(""));
     addParam("MaxEvents", m_nPrepare,
              "amount of events used for creating the IDHist. If it is 0, "
@@ -97,6 +100,10 @@ namespace Belle2 {
 
 
 
+    }
+    if (m_NeuroTrigger.nSectors() == 0) {
+      B2ERROR("No networks defined, please make sure to have a proper configuration file! Example file will be created here: ./neurotrigger_default.conf");
+      m_neuroParameters.saveconfigtxt("neurotrigger_default.conf");
     }
   }
 
@@ -207,6 +214,7 @@ namespace Belle2 {
         }
       }
     }
+    m_neuroParameters.IDRanges.clear();
     for (unsigned isector = 0; isector < m_trainSets_prepare.size(); ++isector) {
       CDCTriggerMLPData::HeaderSet hset(isector, NeuroTrainer::getRelevantID(
                                           m_trainSets_prepare[isector],
@@ -244,9 +252,14 @@ namespace Belle2 {
       x.lock();
     }
     m_neuroParameters.multiplyHidden.lock();
-    m_neuroParameters.saveconfigtxt(m_configFileName);
 
-    m_neuroParameters.saveconfigtxt(m_configFileName);
+    if (m_writeconfigFileName == "") {
+      m_neuroParameters.saveconfigtxt(m_configFileName);
+    } else {
+      m_neuroParameters.saveconfigtxt(m_writeconfigFileName);
+    }
+
+
     // the *rangeTrain variables are used here, but just for obtaining the idranges.
     // because they only have a very minor effect on those, they are not locked here.
     //TODO: also write the config file to be directly able to start the training

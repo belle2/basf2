@@ -58,8 +58,8 @@ namespace Belle2 {
     std::string m_filename;
     /** Name of the configuration file used in the module to load the neuroparamters. */
     std::string m_configFileName;
-    /** Name of file where ID Histograms are stored. */
-    std::string m_idHistFilename;
+    /** Name of the configuration file used in the module to write the neuroparamters. */
+    std::string m_writeconfigFileName;
     /** Parameters for the NeuroTrigger. */
     NeuroTriggerParameters m_neuroParameters;
     /** Switch to rescale out of range target values or ignore them. */

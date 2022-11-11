@@ -156,56 +156,56 @@ void NeuroTriggerParameters::saveconfigtxt(const std::string& filename)
   if (nInput.isSet()) {
     savestream << "nInput " << (nInput.isLocked() ? "== " : "= ") << nInput << std::endl;
     savestream  << std::endl;
-  } else {savestream << "# nInput = " << std::endl;}
+  } else {savestream << "nInput = 27" << std::endl;}
   savestream << "# number of output nodes " << std::endl;
   if (nOutput.isSet()) {
     savestream << "nOutput " << (nOutput.isLocked() ? "== " : "= ") << nOutput << std::endl;
     savestream  << std::endl;
-  } else {savestream << "# nOutput = " << std::endl;}
+  } else {savestream << "nOutput = 2" << std::endl;}
   savestream << "# If true, relevantCut is applied to the sum over hit counters, " << std::endl;
   savestream << "#  otherwise directly on the hit counters." << std::endl;
   if (cutSum.isSet()) {
     savestream << "cutSum " << (cutSum.isLocked() ? "== " : "= ") << cutSum << std::endl;
     savestream  << std::endl;
-  } else {savestream << "# cutSum = " << std::endl;}
+  } else {savestream << "cutSum = 0" << std::endl;}
   savestream << "# only used in the idhist module. it defines the how much of the idrange is cut off after making the histogram " <<
              std::endl;
   if (relevantCut.isSet()) {
     savestream << "relevantCut " << (relevantCut.isLocked() ? "== " : "= ") << relevantCut << std::endl;
     savestream  << std::endl;
-  } else {savestream << "# relevantCut = " << std::endl;}
+  } else {savestream << "relevantCut = 0.02" << std::endl;}
   savestream << "# flag to allow for target tracks lying out of the output range to be rescaled during training. " << std::endl;
   if (rescaleTarget.isSet()) {
     savestream << "rescaleTarget " << (rescaleTarget.isLocked() ? "== " : "= ") << rescaleTarget << std::endl;
     savestream  << std::endl;
-  } else {savestream << "# rescaleTarget = " << std::endl;}
+  } else {savestream << "rescaleTarget = 0" << std::endl;}
   savestream << "# Number of networks. For network specific parameters you can give " << std::endl;
   savestream << "#  either a list with values for each network, or a single value that will be used" << std::endl;
   savestream << "#  for all. The ranges are also valid if nPhi * nPt * nTheta * nPattern = nMLPs. " << std::endl;
   if (nMLP.isSet()) {
     savestream << "nMLP " << (nMLP.isLocked() ? "== " : "= ") << nMLP << std::endl;
     savestream  << std::endl;
-  } else {savestream << "# nMLP = " << std::endl;}
+  } else {savestream << "nMLP = 5" << std::endl;}
   savestream << "# train z as output " << std::endl;
   if (targetZ.isSet()) {
     savestream << "targetZ " << (targetZ.isLocked() ? "== " : "= ") << targetZ << std::endl;
     savestream  << std::endl;
-  } else {savestream << "# targetZ = " << std::endl;}
+  } else {savestream << "targetZ = 1" << std::endl;}
   savestream << "# train theta as output " << std::endl;
   if (targetTheta.isSet()) {
     savestream << "targetTheta " << (targetTheta.isLocked() ? "== " : "= ") << targetTheta << std::endl;
     savestream  << std::endl;
-  } else {savestream << "# targetTheta = " << std::endl;}
+  } else {savestream << "targetTheta = 1" << std::endl;}
   savestream << "# If true, multiply nHidden with number of input nodes. " << std::endl;
   if (multiplyHidden.isSet()) {
     savestream << "multiplyHidden " << (multiplyHidden.isLocked() ? "== " : "= ") << multiplyHidden << std::endl;
     savestream  << std::endl;
-  } else {savestream << "# multiplyHidden = " << std::endl;}
+  } else {savestream << "multiplyHidden = 0" << std::endl;}
   savestream << "# Maximal drift time, identical for all networks. " << std::endl;
   if (tMax.isSet()) {
     savestream << "tMax " << (tMax.isLocked() ? "== " : "= ") << tMax << std::endl;
     savestream  << std::endl;
-  } else {savestream << "# tMax = " << std::endl;}
+  } else {savestream << "tMax = 256" << std::endl;}
   savestream << "# Determine, how the event time should be obtained. The options are:" << std::endl;
   savestream << "# - fastestpriority" << std::endl;
   savestream << "# - fastest2d" << std::endl;
@@ -221,63 +221,70 @@ void NeuroTriggerParameters::saveconfigtxt(const std::string& filename)
   if (ETOption.isSet()) {
     savestream << "ETOption " << (ETOption.isLocked() ? "== " : "= ") << ETOption << std::endl;
     savestream  << std::endl;
-  } else {savestream << "# ETOption = " << std::endl;}
+  } else {savestream << "ETOption = 7" << std::endl;}
   savestream << "# Phi region for which MLP is used in degree for all networks. " << std::endl;
   if (checkarr(phiRangeUse)) {
     savestream << print2dArray<float>("phiRangeUse", phiRangeUse);
     savestream  << std::endl;
-  } else {savestream << "# phiRangeUse = " << std::endl;}
+  } else {savestream << "phiRangeUse = [[0, 360]]" << std::endl;}
   savestream << "# relative ID range of the relevant wire IDs of the track segments " << std::endl;
   savestream << "#  that are taken into consideration when determining the best fitting track segments. " << std::endl;
   if (checkarr(IDRanges)) {
     savestream << print2dArray<float>("IDRanges", IDRanges);
     savestream  << std::endl;
-  } else {savestream << "# IDRanges = " << std::endl;}
+  } else {
+    savestream << "IDRanges = [[0,-1.5,1.5,-7.5,-0.5,-1.5,1.5,0.5,7.5,-1.5,1.5,-8.5,0.5,-2.5,1.5,-0.5,10.5,-3.5,2.5],";
+    savestream <<             "[1,-1.5,1.5,-7.5,-0.5,-1.5,1.5,0.5,7.5,-1.5,1.5,-8.5,0.5,-2.5,1.5,-0.5,10.5,-3.5,2.5],";
+    savestream <<             "[2,-1.5,1.5,-7.5,-0.5,-1.5,1.5,0.5,7.5,-1.5,1.5,-8.5,0.5,-2.5,1.5,-0.5,10.5,-3.5,2.5],";
+    savestream <<             "[3,-1.5,1.5,-7.5,-0.5,-1.5,1.5,0.5,7.5,-1.5,1.5,-8.5,0.5,-2.5,1.5,-0.5,10.5,-3.5,2.5],";
+    savestream <<             "[4,-1.5,1.5,-7.5,-0.5,-1.5,1.5,0.5,7.5,-1.5,1.5,-8.5,0.5,-2.5,1.5,-0.5,10.5,-3.5,2.5]]";
+    savestream << std::endl;
+  }
   savestream << "# Theta region for which MLP is used in degree for all networks. " << std::endl;
   if (checkarr(thetaRangeUse)) {
     savestream << print2dArray<float>("thetaRangeUse", thetaRangeUse);
     savestream  << std::endl;
-  } else {savestream << "# thetaRangeUse = " << std::endl;}
+  } else {savestream << "thetaRangeUse = [[10, 170]]" << std::endl;}
   savestream << "# Charge / Pt region for which MLP is used in 1/GeV for all networks. " << std::endl;
   if (checkarr(invptRangeUse)) {
     savestream << print2dArray<float>("invptRangeUse", invptRangeUse);
     savestream  << std::endl;
-  } else {savestream << "# invptRangeUse = " << std::endl;}
+  } else {savestream << "invptRangeUse = [[-5, 5]]" << std::endl;}
   savestream << "# Phi region for which MLP is trained in degree for all networks. " << std::endl;
   savestream << "#   Can be larger than use range to avoid edge effects. " << std::endl;
   if (checkarr(phiRangeTrain)) {
     savestream << print2dArray<float>("phiRangeTrain", phiRangeTrain);
     savestream  << std::endl;
-  } else {savestream << "# phiRangeTrain = " << std::endl;}
+  } else {savestream << "phiRangeTrain = [[0, 360]]" << std::endl;}
   savestream << "# Theta region for which MLP is trained in degree for all networks. " << std::endl;
   savestream << "#   Can be larger than use range to avoid edge effects. " << std::endl;
   if (checkarr(thetaRangeTrain)) {
     savestream << print2dArray<float>("thetaRangeTrain", thetaRangeTrain);
     savestream  << std::endl;
-  } else {savestream << "# thetaRangeTrain = " << std::endl;}
+  } else {savestream << "thetaRangeTrain = [[10, 170]]" << std::endl;}
   savestream << "# charge/Pt region for which MLP is trained in degree for all networks. " << std::endl;
   savestream << "#   Can be larger than use range to avoid edge effects. " << std::endl;
   if (checkarr(invptRangeTrain)) {
     savestream << print2dArray<float>("invptRangeTrain", invptRangeTrain);
     savestream  << std::endl;
-  } else {savestream << "# invptRangeTrain = " << std::endl;}
+  } else {savestream << "invptRangeTrain = [[-5, 5]]" << std::endl;}
   savestream << "# Number of nodes in each hidden layer for all networks" << std::endl;
   savestream << "#  or factor to multiply with number of inputs." << std::endl;
   savestream << "#  The number of layers is derived from the shape." << std::endl;
   if (checkarr(nHidden)) {
     savestream << print2dArray<float>("nHidden", nHidden);
     savestream  << std::endl;
-  } else {savestream << "# nHidden = " << std::endl;}
+  } else {savestream << "nHidden = [[3]]" << std::endl;}
   savestream << "# Maximum number of hits in a single super layer for all networks. " << std::endl;
   if (checkarr(maxHitsPerSL)) {
     savestream << print1dArray<unsigned short>("maxHitsPerSL", maxHitsPerSL);
     savestream  << std::endl;
-  } else {savestream << "# maxHitsPerSL = " << std::endl;}
+  } else {savestream << "maxHitsPerSL = [1]" << std::endl;}
   savestream << "# Output scale for all networks. " << std::endl;
   if (checkarr(outputScale)) {
     savestream << print2dArray<float>("outputScale", outputScale);
     savestream  << std::endl;
-  } else {savestream << "# outputScale = " << std::endl;}
+  } else {savestream << "outputScale = [[-100, 100, 10, 170]]" << std::endl;}
   savestream << "# Super layer pattern for which MLP is trained for all networks." << std::endl;
   savestream << "#   Binary pattern of 9 * maxHitsPerSL bits (on/off for each hit)." << std::endl;
   savestream << "#   0 in bit <i>: hits from super layer <i> are not used." << std::endl;
@@ -286,7 +293,7 @@ void NeuroTriggerParameters::saveconfigtxt(const std::string& filename)
   if (checkarr(SLpattern)) {
     savestream << print1dArray<unsigned long>("SLpattern", SLpattern);
     savestream  << std::endl;
-  } else {savestream << "# SLPattern = " << std::endl;}
+  } else {savestream << "SLpattern = [511, 479, 495, 503, 509]" << std::endl;}
   savestream << "# Super layer pattern mask for which MLP is trained for all networks." << std::endl;
   savestream << "#   Binary pattern of 9 * maxHitsPerSL bits (on/off for each hit)." << std::endl;
   savestream << "#   0 in bit <i>: super layer <i> may or may not have a hit." << std::endl;
@@ -296,12 +303,12 @@ void NeuroTriggerParameters::saveconfigtxt(const std::string& filename)
   if (checkarr(SLpatternMask)) {
     savestream << print1dArray<unsigned long>("SLpatternMask", SLpatternMask);
     savestream  << std::endl;
-  } else {savestream << "# SLPatternMask = " << std::endl;}
+  } else {savestream << "SLpatternMask = [170]" << std::endl;}
   savestream << "# precision used for the hardware simulation " << std::endl;
   if (checkarr(precision)) {
     savestream << print1dArray<unsigned>("precision", precision);
     savestream  << std::endl;
-  } else {savestream << "# precision = " << std::endl;}
+  } else {savestream << "precision = [12, 8, 8, 12, 10, 10]" << std::endl;}
   savestream.close();
 }
 

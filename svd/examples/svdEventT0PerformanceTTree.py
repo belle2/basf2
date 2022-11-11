@@ -85,8 +85,8 @@ else:
     # main.add_module('RootInput', branchNames=['RawPXDs', 'RawSVDs', 'RawCDCs', 'RawECLs'])
     # raw.add_unpackers(main, components=['PXD', 'SVD', 'CDC', 'ECL'])
 
-    # main.add_module('RootInput', entrySequences=['0:1000'])
-    main.add_module('RootInput')
+    main.add_module('RootInput', entrySequences=['0:1000'])
+    # main.add_module('RootInput')
 
     main.add_module("Gearbox")
     main.add_module('Geometry', useDB=True)
@@ -95,16 +95,16 @@ if not args.isMC:
     raw.add_unpackers(main)
 
     # change ZS to 5
-    # for moda in main.modules():
-    #    if moda.name() == 'SVDUnpacker':
-    #        moda.param("svdShaperDigitListName", "SVDShaperDigitsZS3")
+    for moda in main.modules():
+        if moda.name() == 'SVDUnpacker':
+            moda.param("svdShaperDigitListName", "SVDShaperDigits6Sample")
     # main.add_module("SVDZeroSuppressionEmulator",SNthreshold=5,ShaperDigits="SVDShaperDigitsZS3",ShaperDigitsIN="SVDShaperDigits")
 
 if args.is3sample:
     # emulate 3-sample DAQ for events
     zsemulator = b2.register_module("SVD3SamplesEmulator")
     zsemulator.param("outputSVDShaperDigits", "SVDShaperDigits3SampleAll")
-    zsemulator.param("outputSVDEventInfo", "SVDEventInfo3Sample")
+    zsemulator.param("outputSVDEventInfo", "SVDEventInfo")
     zsemulator.param("chooseStartingSample", False)
     zsemulator.param("chooseRelativeShift", True)
     zsemulator.param("relativeShift", 7)
@@ -113,15 +113,15 @@ if args.is3sample:
 
     zsonline = b2.register_module("SVDZeroSuppressionEmulator")
     zsonline.param("ShaperDigits", "SVDShaperDigits3SampleAll")
-    zsonline.param("ShaperDigitsIN", "SVDShaperDigits3Sample")
+    zsonline.param("ShaperDigitsIN", "SVDShaperDigits")
     main.add_module(zsonline)
 
     #  clusterizer
     clusterizer = b2.register_module('SVDClusterizer')
-    clusterizer.set_name("SVDClusterizer_3Sample")
-    clusterizer.param('ShaperDigits', "SVDShaperDigits3Sample")
-    clusterizer.param('Clusters', "SVDClusters3Sample")
-    clusterizer.param('EventInfo', "SVDEventInfo3Sample")
+    # clusterizer.set_name("SVDClusterizer_3Sample")
+    # clusterizer.param('ShaperDigits', "SVDShaperDigits3Sample")
+    # clusterizer.param('Clusters', "SVDClusters3Sample")
+    # clusterizer.param('EventInfo', "SVDEventInfo3Sample")
     main.add_module(clusterizer)
 
 # now do reconstruction:

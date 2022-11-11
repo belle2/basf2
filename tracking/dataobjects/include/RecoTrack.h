@@ -561,6 +561,14 @@ namespace Belle2 {
       return m_nSVDHitsOfIngoingArm;
     }
 
+    /// Swap arm times, booleans and nSVDHits
+    void swapArms()
+    {
+      std::swap(m_outgoingArmTime, m_ingoingArmTime);
+      std::swap(m_hasOutgoingArmTime, m_hasIngoingArmTime);
+      std::swap(m_nSVDHitsOfOutgoingArm, m_nSVDHitsOfIngoingArm);
+    }
+
     /// Return the position, the momentum and the charge of the first measured state on plane or - if unfitted - the seeds.
     std::tuple<TVector3, TVector3, short> extractTrackState() const;
 

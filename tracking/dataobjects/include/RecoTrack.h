@@ -562,7 +562,7 @@ namespace Belle2 {
     }
 
     /// Swap arm times, booleans and nSVDHits
-    void swapArms()
+    void swapArmTimes()
     {
       std::swap(m_outgoingArmTime, m_ingoingArmTime);
       std::swap(m_hasOutgoingArmTime, m_hasIngoingArmTime);

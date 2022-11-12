@@ -119,6 +119,9 @@ namespace Belle2 {
     StoreArray<RecoTrack> m_recoTracks;
     /** list of output track segment hits */
     StoreArray<CDCTriggerSegmentHit> m_segmentHits;
+    /** relate all cdchtis to ts, not just opriority wire */
+    bool m_relateAllHits;
+
 
   };
 

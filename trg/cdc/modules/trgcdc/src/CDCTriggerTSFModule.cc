@@ -90,6 +90,10 @@ CDCTriggerTSFModule::CDCTriggerTSFModule() : Module::Module()
            m_outerRecoLRTableFilename,
            "Filename for the reconstructed left/right table for the outer super layers.",
            string("outerRecoLRTable.dat"));
+  addParam("relateAllHits",
+           m_relateAllHits,
+           "Flag to relate all cdchits to the TrackSegment, not just the priority hits.",
+           true);
 }
 
 void
@@ -475,8 +479,10 @@ CDCTriggerTSFModule::event()
           const TRGCDCWire* wire = (TRGCDCWire*)s[iw];
           if (wire->signal().active()) {
             // priority wire has relation weight 2
-            double weight = (wire == &(s.priority())) ? 2. : 1.;
-            if (weight == 2.) {tsHit->addRelationTo(m_cdcHits[wire->hit()->iCDCHit()], weight);}
+            double weight = (wire == &(s.priority())) ? 2. : 1.; // not sure if this is needed..
+            if (weight == 2. || m_relateAllHits) {
+              tsHit->addRelationTo(m_cdcHits[wire->hit()->iCDCHit()], weight);
+            }
           }
         }
         // relation to MCParticles (same as priority hit)
@@ -489,20 +495,18 @@ CDCTriggerTSFModule::event()
           const CDCSimHit* simHit = priorityHit->getRelatedFrom<CDCSimHit>();
           if (simHit && !simHit->getBackgroundTag()) {
             if (isl == 0) {
-              std::cout << its << " creating entry in TrueLUT for pattern: " << s.lutPattern() << " :  " << simHit->getLeftRightPassage() <<
-                        std::endl;
+              B2DEBUG(100, its << " creating entry in TrueLUT for pattern: " << s.lutPattern() << " :  " << simHit->getLeftRightPassage());
               innerTrueLRTable[s.lutPattern()][simHit->getLeftRightPassage()] += 1;
             } else {
               outerTrueLRTable[s.lutPattern()][simHit->getLeftRightPassage()] += 1;
-              std::cout << its << " creating entry in TrueLUT for pattern: " << s.lutPattern() << " :  " << simHit->getLeftRightPassage() <<
-                        std::endl;
+              B2DEBUG(100, its << " creating entry in TrueLUT for pattern: " << s.lutPattern() << " :  " << simHit->getLeftRightPassage());
             }
           } else {
             if (isl == 0) {
-              std::cout << its  << " creating bghit in TrueLUT for pattern: " << s.lutPattern() << std::endl;
+              B2DEBUG(100, its  << " creating bghit in TrueLUT for pattern: " << s.lutPattern());
               innerTrueLRTable[s.lutPattern()][2] += 1;
             }  else {
-              std::cout << its  << " creating bghit in TrueLUT for pattern: " << s.lutPattern() << std::endl;
+              B2DEBUG(100, its  << " creating bghit in TrueLUT for pattern: " << s.lutPattern());
               outerTrueLRTable[s.lutPattern()][2] += 1;
             }
           }
@@ -513,7 +517,7 @@ CDCTriggerTSFModule::event()
           // so wee need to loop over them:
           unsigned lrflag = 2; // see explanation below
           for (int ireco = 0; ireco < m_recoTracks.getEntries(); ++ireco) {
-            //        std::cout << "recotrack " << ireco << " of " << m_recoTracks.getEntries() << std::endl;
+            //        std::cout << "recotrack " << ireco << " of " << m_recoTracks.getEntries());
             RecoTrack* recoTrack = m_recoTracks[ireco];
             // since there is no relation between recotracks and the tshits yet, we need to create them first.
             // within the recotrack class, there is a function which returns the hitids of the cdchits used
@@ -543,14 +547,14 @@ CDCTriggerTSFModule::event()
                   if (recoTrack->getRightLeftInformation(cdcHits[iHit]) ==  3) lrflag = 0;
                   if (recoTrack->getRightLeftInformation(cdcHits[iHit]) ==  2) lrflag = 1;
                   innerRecoLRTable[s.lutPattern()][lrflag] += 1;
-                  std::cout << its << " creating entry in recoLUT for pattern: " << s.lutPattern() << " :  " << lrflag << " (recotrack " << ireco <<
-                            "), hit: " << iHit << std::endl;
+                  B2DEBUG(100, its << " creating entry in recoLUT for pattern: " << s.lutPattern() << " :  " << lrflag << " (recotrack " << ireco <<
+                          "), hit: " << iHit);
                 } else {
                   if (recoTrack->getRightLeftInformation(cdcHits[iHit]) ==  3) lrflag = 0;
                   if (recoTrack->getRightLeftInformation(cdcHits[iHit]) ==  2) lrflag = 1;
                   outerRecoLRTable[s.lutPattern()][lrflag] += 1;
-                  std::cout << its << " creating entry in recoLUT for pattern: " << s.lutPattern() << " :  " << lrflag << " (recotrack " << ireco <<
-                            "), hit: " << iHit << std::endl;
+                  B2DEBUG(100, its << " creating entry in recoLUT for pattern: " << s.lutPattern() << " :  " << lrflag << " (recotrack " << ireco <<
+                          "), hit: " << iHit);
                 }
                 //break;
               }
@@ -558,10 +562,10 @@ CDCTriggerTSFModule::event()
             if (lrflag == 2) {
 
               if (isl == 0) {
-                std::cout << its << " creating bghit in recoLUT for pattern: " << s.lutPattern() << " (recotrack " << ireco << ")" << std::endl;
+                B2DEBUG(100, its << " creating bghit in recoLUT for pattern: " << s.lutPattern() << " (recotrack " << ireco << ")");
                 innerRecoLRTable[s.lutPattern()][2] += 1;
               } else {
-                std::cout << its << " creating bghit in recoLUT for pattern: " << s.lutPattern() << " (recotrack " << ireco << ")" << std::endl;
+                B2DEBUG(100, its << " creating bghit in recoLUT for pattern: " << s.lutPattern() << " (recotrack " << ireco << ")");
                 outerRecoLRTable[s.lutPattern()][2] += 1;
 
               }

@@ -29,7 +29,7 @@
 //}
 using namespace Belle2;
 
-int main(int argc, char* argv[])
+int main(int argc, const char* argv[])
 {
 
   // get arguments

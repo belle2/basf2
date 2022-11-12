@@ -324,7 +324,7 @@ namespace Belle2 {
     std::vector<int> tracklist;
 
     //! Needed to make the ROOT object storable
-    ClassDef(CDCTriggerMLPData, 3);
+    ClassDef(CDCTriggerMLPData, 2);
   };
 }
 #endif

@@ -12,6 +12,8 @@
 
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <framework/gearbox/Unit.h>
+#include <framework/geometry/B2Vector3.h>
+
 
 #include <iostream>
 #include <cmath>
@@ -151,7 +153,7 @@ namespace Belle2 {
             reps[irep]->extrapolateToLine(state, TVector3(0, 0, -1000), TVector3(0, 0, 2000));
             // flip tracks if necessary, such that trigger tracks and reco tracks
             // point in the same direction
-            if (state.getMom().Dot(m_tracks[itrack]->getDirection()) < 0) {
+            if (state.getMom().Dot(B2Vector3D(m_tracks[itrack]->getDirection())) < 0) {
               state.setPosMom(state.getPos(), -state.getMom());
               state.setChargeSign(-state.getCharge());
             }

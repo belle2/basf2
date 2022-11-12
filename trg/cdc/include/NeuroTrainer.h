@@ -17,6 +17,8 @@
 #include <framework/gearbox/Unit.h>
 #include <cmath>
 #include <TFile.h>
+#include <framework/geometry/B2Vector3.h>
+
 
 using namespace Belle2;
 namespace NeuroTrainer {
@@ -50,7 +52,7 @@ namespace NeuroTrainer {
             reps[irep]->extrapolateToLine(state, TVector3(0, 0, -1000), TVector3(0, 0, 2000));
             // flip tracks if necessary, such that trigger tracks and reco tracks
             // point in the same direction
-            if (state.getMom().Dot(twodtrack->getDirection()) < 0) {
+            if (state.getMom().Dot(B2Vector3D(twodtrack->getDirection())) < 0) {
               state.setPosMom(state.getPos(), -state.getMom());
               state.setChargeSign(-state.getCharge());
             }
@@ -74,7 +76,7 @@ namespace NeuroTrainer {
         isvalid = 0;
       } else {
         phi0Target = mcTrack->getMomentum().Phi();
-        invptTarget = mcTrack->getCharge() / mcTrack->getMomentum().Pt();
+        invptTarget = mcTrack->getCharge() / mcTrack->getMomentum().Rho();
         thetaTarget = mcTrack->getMomentum().Theta();
         zTarget = mcTrack->getProductionVertex().Z();
       }

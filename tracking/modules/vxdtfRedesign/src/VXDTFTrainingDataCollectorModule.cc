@@ -16,7 +16,6 @@
 
 #include <TRandom.h>
 
-using namespace std;
 using namespace Belle2;
 
 REG_MODULE(VXDTFTrainingDataCollector);
@@ -36,7 +35,8 @@ VXDTFTrainingDataCollectorModule::VXDTFTrainingDataCollectorModule() :
                    c_TerminateInAllProcesses);
 
   addParam("SpacePointTrackCandsName", m_PARAMSpacePointTrackCandsName,
-           "the name of the storeArray containing the SpacePointTrackCands used for extracting and collecting the training data.", string(""));
+           "the name of the storeArray containing the SpacePointTrackCands used for extracting and collecting the training data.",
+           std::string(""));
 
   addParam("NameTag", m_PARAMNameTag, "A name tag that will be attached to the name of the output file. If left empty (\"\") a "
            "random number will be attached!", std::string(""));
@@ -106,7 +106,7 @@ void VXDTFTrainingDataCollectorModule::event()
   for (auto& dataCollector : m_secMapTrainers) {
     unsigned nTCsProcessed = dataCollector.processTracks();
 
-    B2DEBUG(5,
+    B2DEBUG(20,
             "VXDTFTrainingDataCollectorModule, event " << thisEvent <<
             " with mapTrainer " << dataCollector.getConfig().secMapName <<
             ": number of TCs processed: " << nTCsProcessed <<

@@ -88,6 +88,10 @@ namespace Belle2 {
     /** filename for the table which contains the number of reconstructed left/right
      *  for each pattern in the outer super layers */
     std::string m_outerRecoLRTableFilename;
+    /** remove hits with lower ADC than cut threshold. True:enable False:disable */
+    bool m_adcflag;
+    /** threshold for the adc cut. Default: -1 */
+    int m_adccut;
 
   private:
     /** structure to hold pointers to all wires in the CDC */

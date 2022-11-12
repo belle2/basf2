@@ -8,6 +8,9 @@
 
 #pragma once
 
+/* KLM headers. */
+#include <klm/dataobjects/KLMElementNumberDefinitions.h>
+
 /* ROOT headers. */
 #include <TObject.h>
 
@@ -42,19 +45,19 @@ namespace Belle2 {
      * Get time resolution.
      * @param[in] channel Channel number.
      */
-    float getTimeResolution(uint16_t channel) const;
+    float getTimeResolution(KLMChannelNumber channel) const;
 
     /**
      * Set time resolution.
      * @param[in] channel    Channel number.
      * @param[in] resolution Resolution.
      */
-    void setTimeResolution(uint16_t channel, float resolution);
+    void setTimeResolution(KLMChannelNumber channel, float resolution);
 
   private:
 
     /** Time resolution. */
-    std::map<uint16_t, float> m_TimeResolution ;
+    std::map<KLMChannelNumber, float> m_TimeResolution;
 
     /** Class version. */
     ClassDef(Belle2::KLMTimeResolution, 1);

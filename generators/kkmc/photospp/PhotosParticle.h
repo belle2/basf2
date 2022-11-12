@@ -215,6 +215,12 @@ namespace Photospp {
     /** Set the energy component of the four vector */
     virtual void setE(double e) = 0;
 
+    /** Set vertex for this particle */
+    virtual void setVertexPosition(double vx, double vy, double vz, double t) = 0;
+
+    /** Get vertex position of this particle */
+    virtual void getVertexPosition(double* vx, double* vy, double* vz, double* t) = 0;
+
     /** Set the mothers of this particle via a vector of PhotosParticle */
     virtual void setMothers(std::vector<PhotosParticle*> mothers) = 0;
 

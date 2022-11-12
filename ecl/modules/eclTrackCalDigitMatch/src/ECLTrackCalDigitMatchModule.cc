@@ -140,8 +140,8 @@ void ECLTrackCalDigitMatchModule::event()
 
     B2DEBUG(50, lHelixRadius << " " << lFWD << " " << lBWD << " -> " << l);
 
-    TVector3 posHelix = h.getPositionAtArcLength2D(l);
-    const double exttheta = atan2(posHelix.Perp(), posHelix.Z());
+    ROOT::Math::XYZVector posHelix = h.getPositionAtArcLength2D(l);
+    const double exttheta = atan2(posHelix.Rho(), posHelix.Z());
     const double extphi = atan2(posHelix.Y(), posHelix.X());
 
     // check if the extrapolation reaches the requested radius

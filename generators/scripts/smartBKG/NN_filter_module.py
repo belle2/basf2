@@ -66,12 +66,28 @@ class NNFilterModule(b2.Module):
         global_tag="SmartBKG_GATGAP",
         payload="GATGAPgen.pth"
     ):
+        """
+        Initialise the class.
+        :param model_file:  TODO
+        :param model_config:  TODO
+        :param preproc_config:  TODO
+        :param threshold:  TODO
+        :param extra_info_var:  TODO
+        :param global_tag:  TODO
+        :param payload:  TODO
+        """
         super().__init__()
+        #: TODO
         self.model_file = model_file
+        #: TODO
         self.model_config = model_config
+        #: TODO
         self.preproc_config = preproc_config
+        #: TODO
         self.threshold = threshold
+        #: TODO
         self.extra_info_var = extra_info_var
+        #: TODO
         self.payload = payload
 
         # set additional database conditions for trained neural network
@@ -92,17 +108,18 @@ class NNFilterModule(b2.Module):
             self.model_file = accessor.getFilename()
         trained_parameters = torch.load(self.model_file, map_location=DEVICE)
 
-        # build model with trained parameters
+        #: model with trained parameters
         self.model = GATGAPModel(**self.model_config)
         self.model.load_state_dict(trained_parameters['model_state_dict'])
 
-        # Create a StoreArray to save weights to
+        #: StoreArray to save weights to
         self.EventExtraInfo = Belle2.PyStoreObj('EventExtraInfo')
         if not self.EventExtraInfo.isValid():
             self.EventExtraInfo.registerInDataStore()
 
-        # Store generated variables as node features in a graph
+        #: generated variables
         self.gen_vars = defaultdict(list)
+        #: node features
         self.out_features = self.preproc_config['features']
         if 'PDG' in self.preproc_config['features']:
             self.out_features.remove('PDG')

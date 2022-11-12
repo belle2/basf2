@@ -287,7 +287,6 @@ inline void addEvent(int* buf, int nwords_per_fee, unsigned int event, int ncpr,
 //inline void addEvent(int* buf, int nwords, unsigned int event)
 {
   int offset = 0;
-  int prev_offset;
   buf[ offset + 4 ] = event;
   offset += NW_SEND_HEADER;
 
@@ -295,7 +294,6 @@ inline void addEvent(int* buf, int nwords_per_fee, unsigned int event, int ncpr,
     int nwords = buf[ offset ];
     int posback_xorchksum = 2;
     int pos_xorchksum = offset + nwords - posback_xorchksum;
-    prev_offset = offset;
     if (buf[ offset + 4 ] != 0x12345601) {
       printf("[FATAL] data-production error 2 0x%.x", buf[ offset + 4 ]);
       fflush(stdout);
@@ -360,8 +358,6 @@ inline void addEvent(int* buf, int nwords_per_fee, unsigned int event, int ncpr,
     }
 
     offset += NW_COPPER_TRAILER + NW_RAW_TRAILER;
-    unsigned int xor_chksum = 0;
-    unsigned int xor_chksum2 = 0;
 
     buf[ pos_xorchksum ] ^= buf[ pos_xorchksum_cpr ];
 
@@ -517,9 +513,9 @@ int main(int argc, char** argv)
                cnt,
                cur_time - init_time,
                (cnt - prev_cnt)*total_words * sizeof(int) / 1000000. / (cur_time - prev_time),
-               (cnt - prev_cnt) / (cur_time - prev_time) / 1000. ,
+               (cnt - prev_cnt) / (cur_time - prev_time) / 1000.,
                (cnt - start_cnt)*total_words * sizeof(int) / 1000000. / (cur_time - init_time),
-               (cnt - start_cnt) / (cur_time - init_time) / 1000. , total_words);
+               (cnt - start_cnt) / (cur_time - init_time) / 1000., total_words);
 
         fflush(stdout);
         prev_time = cur_time;

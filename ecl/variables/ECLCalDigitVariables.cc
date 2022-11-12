@@ -488,8 +488,8 @@ namespace Belle2 {
         }
 
         if (!edgeExtHit) return std::numeric_limits<double>::quiet_NaN();
-        const TVector3& extHitPosition = edgeExtHit->getPosition();
-        const TVector3& trackPointing = edgeExtHit->getMomentum();
+        const TVector3& extHitPosition = edgeExtHit->getPositionTVector3();
+        const TVector3& trackPointing = edgeExtHit->getMomentumTVector3();
 
         geometry->Mapping(edgeExtHit->getCopyID() - 1);
         const int thetaID = geometry->GetThetaID();

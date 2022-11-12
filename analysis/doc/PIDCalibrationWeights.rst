@@ -24,8 +24,8 @@ saving out only the information necessary for training. This is done with severa
 methods that are provided in the ``pidDataUtils`` module.
 
 1. Read your data into a DataFrame. We provide a ``read_root()`` method to do
-   this (it is just a wrapper around the root_pandas method of the same name,
-   but it can read several files and automatically concatenate them all
+   this (it is just a wrapper around the uproot.concatenate method,
+   which can read several files and automatically concatenate them all
    together.) You can use whatever method you like, though. All that is required
    is that your DataFrame **must** contain momentum ('p'), cosine-theta
    ('cosTheta'), phi ('phi'), and detector log-likelihood data for any particles
@@ -192,6 +192,42 @@ and theta bins, and contribution metrics. Feel free to analyze these however you
 like; however, there exists a Python package that expects DataFrames with these 
 specific columns and produces a wide range of plots. It is ``pidplots``, which 
 can be found `here <https://gitlab.desy.de/connor.hainje/pidanalysis>`_.
+
+
+PID calibration weights on the basf2 path
+-----------------------------------------
+
+The PID calibration weights can be registered in the database to utilize them on
+the basf2 path. The module :b2:mod:`PIDCalibrationWeightCreator` can produce the
+dbobject PIDCalibrationWeight with a unique name of the weight matrix.
+One can find an example of the usage of the module in
+``analysis/examples/PIDCalibration/02_SamplePIDAnalysis.py``.
+
+By loading the data object, the basf2 variables, such as
+:b2:var:`weightedElectronID`, provide the weighted PID probability from the
+original likelihood and the given data object. One can specify the name of the
+weight matrix in the argument of the variables.
+
+.. code-block:: python
+
+   import basf2 as b2
+   import modularAnalysis as ma
+
+   # create path
+   my_path = b2.create_path()
+
+   # load the local dbobject
+   localDB = 'localdb/database.txt'
+   b2.conditions.append_testing_payloads(localDB)
+   # or use the central global tag including the dbobject
+
+   ma.fillParticleList('pi+:all', cut='', path=my_path)
+
+   matrixName = "PIDCalibrationWeight_Example"
+   ma.variablesToNtuple('pi+:all', ['pionID', 'weightedPionID('+matrixName+')'], path=my_path)
+
+
+
 
 
 pidDataUtils Functions

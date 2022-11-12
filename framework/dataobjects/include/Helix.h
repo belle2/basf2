@@ -9,7 +9,7 @@
 
 #include <framework/datastore/RelationsObject.h>
 
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 #include <TMatrixDfwd.h>
 
 #include <cmath>
@@ -68,8 +68,8 @@ namespace Belle2 {
      *  @param bZ            Magnetic field to be used for the calculation of the curvature.
      *                       It is assumed, that the B-field is homogeneous parallel to the z axis.
      */
-    Helix(const TVector3& position,
-          const TVector3& momentum,
+    Helix(const ROOT::Math::XYZVector& position,
+          const ROOT::Math::XYZVector& momentum,
           const short int charge,
           const double bZ);
 
@@ -108,7 +108,7 @@ namespace Belle2 {
     double getPerigeeZ() const;
 
     /** Getter for the perigee position. */
-    TVector3 getPerigee() const;
+    ROOT::Math::XYZVector getPerigee() const;
 
     /** Calculates the x momentum of the particle at the perigee point.
      *  @param bZ            Z component of the magnetic field in Tesla
@@ -131,13 +131,13 @@ namespace Belle2 {
      *  of the magnetic field along the z-axis to give back the momentum.
      *  @param bZ            Magnetic field at the perigee.
      */
-    TVector3 getMomentum(const double bZ) const;
+    ROOT::Math::XYZVector getMomentum(const double bZ) const;
 
     /** Getter for unit vector of momentum at the perigee position
      *
      * This is mainly useful cases where curvature is zero (pT is infinite)
      */
-    TVector3 getDirection() const;
+    ROOT::Math::XYZVector getDirection() const;
 
     /** Getter for the absolute value of the transverse momentum at the perigee.
      *
@@ -206,7 +206,7 @@ namespace Belle2 {
      *
      *  @param arcLength2D       Two dimensional arc length to be traversed.
      */
-    TVector3 getPositionAtArcLength2D(const double& arcLength2D) const;
+    ROOT::Math::XYZVector getPositionAtArcLength2D(const double& arcLength2D) const;
 
     /** Calculates the tangential vector to the helix curve at the given two dimensional arc length.
      *
@@ -218,27 +218,27 @@ namespace Belle2 {
      *  @param arcLength2D       Two dimensional arc length to be traversed.
      *  @return                  Tangential vector normalised to unit transverse component / cylindrical radius.
      */
-    TVector3 getTangentialAtArcLength2D(const double& arcLength2D) const;
+    ROOT::Math::XYZVector getTangentialAtArcLength2D(const double& arcLength2D) const;
 
     /** Calculates the unit tangential vector to the helix curve at the given two dimensional arc length.
      *
      *  @param arcLength2D       Two dimensional arc length to be traversed.
      */
-    TVector3 getUnitTangentialAtArcLength2D(const double& arcLength2D) const;
+    ROOT::Math::XYZVector getUnitTangentialAtArcLength2D(const double& arcLength2D) const;
 
     /** Calculates the momentum vector at the given two dimensional arc length.
      *
      *  @param arcLength2D       Two dimensional arc length to be traversed.
      *  @param bz                Magnetic field strength in the z direction.
      */
-    TVector3 getMomentumAtArcLength2D(const double& arcLength2D, const double& bz) const;
+    ROOT::Math::XYZVector getMomentumAtArcLength2D(const double& arcLength2D, const double& bz) const;
 
     /** Moves origin of the coordinate system (passive transformation) by the given vector. Updates the helix inplace.
      *
      *  @param by            Vector by which the origin of the coordinate system should be moved.
      *  @return              The double value is the two dimensional arc length, which has the be traversed from the old perigee to the new.
      */
-    double passiveMoveBy(const TVector3& by)
+    double passiveMoveBy(const ROOT::Math::XYZVector& by)
     { return passiveMoveBy(by.X(), by.Y(), by.Z()); }
 
     /** Moves origin of the coordinate system (passive transformation) orthogonal to the z axis by the given vector. Updates the helix inplace.
@@ -264,7 +264,7 @@ namespace Belle2 {
      *                         In other applications the parameter should remain at its default value.
      *  @return                The jacobian matrix containing the derivatives of the five helix parameters after the move relative the orignal parameters.
      */
-    TMatrixD calcPassiveMoveByJacobian(const TVector3& by, const double expandBelowChi = M_PI / 8) const;
+    TMatrixD calcPassiveMoveByJacobian(const ROOT::Math::XYZVector& by, const double expandBelowChi = M_PI / 8) const;
 
 
   protected:
@@ -401,8 +401,8 @@ namespace Belle2 {
 
     /** Cartesian to Perigee conversion.
      */
-    void setCartesian(const TVector3& position,
-                      const TVector3& momentum,
+    void setCartesian(const ROOT::Math::XYZVector& position,
+                      const ROOT::Math::XYZVector& momentum,
                       const short int charge,
                       const double bZ);
 

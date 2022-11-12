@@ -16,12 +16,6 @@
 
 namespace TreeFitter {
 
-  RecoComposite::RecoComposite(Belle2::Particle* particle, const ParticleBase* mother)
-    : ParticleBase(particle, mother), m_params(), m_hasEnergy(true)
-  {
-    updateParams();
-  }
-
   RecoComposite::RecoComposite(Belle2::Particle* particle, const ParticleBase* mother, const ConstraintConfiguration& config,
                                bool massConstraint)
     : ParticleBase(particle, mother, &config), m_params(), m_hasEnergy(true), m_massconstraint(massConstraint)

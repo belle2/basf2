@@ -223,7 +223,7 @@ void Root2RawModule::event()
   hdr.SetNodeID(0);
   hdr.SetExpRunWord(rhdr.GetExpRunSubrun());
 
-  int* hdrbuf = hdr.GetBuffer();
+  //  int* hdrbuf = hdr.GetBuffer();
   //  printf ( "%8.8x %8.8x %8.8x %8.8x ", *hdrbuf, *(hdrbuf+1), *(hdrbuf+2), *(hdrbuf+3) );
   //  printf ( "%8.8x %8.8x %8.8x %8.8x\n", *(hdrbuf+4), *(hdrbuf+5), *(hdrbuf+6), *(hdrbuf+7) );
 
@@ -231,7 +231,7 @@ void Root2RawModule::event()
   memcpy(evtbuf, hdr.GetBuffer(), hdr.GetHdrNwords()*sizeof(int));
   memcpy(databuf, trl.GetBuffer(), trl.GetTrlNwords()*sizeof(int));
 
-  int is = write(m_file, evtbuf, nwords * sizeof(int));
+  write(m_file, evtbuf, nwords * sizeof(int));
   //  databuf = evtbuf+ hdr.GetHdrNwords();
   //  int datanwords = nwords - hdr.GetHdrNwords() - trl.GetTrlNwords();
   //  int is = write ( m_file, databuf, datanwords*sizeof(int) );

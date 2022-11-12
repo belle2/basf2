@@ -244,9 +244,6 @@ void TRGTOPUnpackerWaveformModule::unpackWaveforms(int* rdat, int channel)
   //    B2INFO("Window size in 32bit words = " << windowSize);
   //  }
 
-  // various test patterns will be used to check the data
-  unsigned int testPattern;
-
   //  int revoClockLast = -1;
   //  int cntr127Last = -1;
 
@@ -254,7 +251,6 @@ void TRGTOPUnpackerWaveformModule::unpackWaveforms(int* rdat, int channel)
   //  unsigned int errorCountEvent = 0;
 
   // need to know when a new decision is made (there could be more than one TOP L1 timing decision stored in the same B2L buffer)
-  // cppcheck-suppress variableScope
   //  int t0CombinedDecisionLast = -1;
   //  int logLSumLast = -1;
   //  int logLSumNow = 0;
@@ -268,7 +264,8 @@ void TRGTOPUnpackerWaveformModule::unpackWaveforms(int* rdat, int channel)
   unsigned int testPatternDummyEvent = 0xbbbb;
   for (int iWindow = 0; iWindow < numberOfWindows; iWindow++) {
     int index = iWindow * windowSize + 3;
-    testPattern = (rdat[index] >> 16) & 0xffff;
+    // various test patterns will be used to check the data
+    unsigned int testPattern = (rdat[index] >> 16) & 0xffff;
     if (testPattern == testPatternDummyEvent) {
       counterDummyWindows++;
     }

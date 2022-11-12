@@ -142,8 +142,8 @@ SectorMapComparer::compareTrees(TTree* t_first, TTree* t_second, bool unmatchedE
     TString leafName = l_first->GetName();
     if (leafName.Contains("FullSecID")) continue;
 
-    double min = std::min(t_first->GetMinimum(leafName) , t_second->GetMinimum(leafName));
-    double max = std::max(t_first->GetMaximum(leafName) , t_second->GetMaximum(leafName));
+    double min = std::min(t_first->GetMinimum(leafName), t_second->GetMinimum(leafName));
+    double max = std::max(t_first->GetMaximum(leafName), t_second->GetMaximum(leafName));
     double range = std::fabs(min - max);
     // TODO: make this configurable
     int Nbins = 100;
@@ -159,7 +159,7 @@ SectorMapComparer::compareTrees(TTree* t_first, TTree* t_second, bool unmatchedE
 
     m_histo_map_first[ leafName.Data() ] = TH1F(leafName + "_first", leafName, Nbins, min, max);
     m_histo_map_first[ leafName.Data() ].SetDirectory(nullptr);
-    m_histo_map_second[ leafName.Data() ] = TH1F(leafName + "_second", leafName , Nbins, min, max);
+    m_histo_map_second[ leafName.Data() ] = TH1F(leafName + "_second", leafName, Nbins, min, max);
     m_histo_map_second[ leafName.Data() ].SetDirectory(nullptr);
     m_histo_map_diff[ leafName.Data() ] = TH1F(leafName + "_diff", "difference " + leafName + " (SM1 - SM2)", Nbins, -0.2 * range,
                                                0.2 * range);

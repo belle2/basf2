@@ -78,7 +78,7 @@ void TimeExtractionUtils::addEventT0WithQuality(const std::vector<RecoTrack*>& r
                                                 std::vector<EventT0::EventT0Component>& eventT0WithQualityIndex)
 {
   if (not eventT0->hasEventT0()) {
-    B2DEBUG(50, "No event t0 is set. Not testing.");
+    B2DEBUG(25, "No event t0 is set. Not testing.");
     return;
   }
 
@@ -87,11 +87,11 @@ void TimeExtractionUtils::addEventT0WithQuality(const std::vector<RecoTrack*>& r
   const double quality = chi2_with_ndf.second;
 
   if (std::isnan(quality)) {
-    B2DEBUG(50, "The calculated quality is nan. Not using this EventT0 of " << eventT0->getEventT0());
+    B2DEBUG(25, "The calculated quality is nan. Not using this EventT0 of " << eventT0->getEventT0());
     return;
   }
 
-  B2DEBUG(50, "The iteration gave a result of " << quality << " for " << eventT0->getEventT0());
+  B2DEBUG(25, "The iteration gave a result of " << quality << " for " << eventT0->getEventT0());
   EventT0::EventT0Component eventT0Component = *(eventT0->getEventT0Component());
   eventT0Component.quality = quality;
   eventT0WithQualityIndex.emplace_back(eventT0Component);
@@ -164,7 +164,7 @@ std::pair<double, double> TimeExtractionUtils::getExtractedTimeAndUncertaintyWit
     }
 
     if (d2chi2da2 > 20) {
-      B2DEBUG(50, "Track with bad second derivative");
+      B2DEBUG(25, "Track with bad second derivative");
       continue;
     }
 
@@ -248,7 +248,7 @@ std::pair<double, double> TimeExtractionUtils::getChi2Derivatives(const RecoTrac
     }
     return {dchi2da, d2chi2da2};
   } catch (...) {
-    B2DEBUG(50, "Failed time extraction - skipping track");
+    B2DEBUG(25, "Failed time extraction - skipping track");
     return {NAN, NAN};
   }
 }
@@ -301,7 +301,7 @@ bool TimeExtractionUtils::buildFullCovarianceMatrix(const RecoTrack& recoTrack,
     const genfit::TrackPoint* tp = hitPoints[i];
     const genfit::KalmanFitterInfo* fi = tp->getKalmanFitterInfo();
     if (!fi) {
-      B2DEBUG(50, "Missing KalmanFitterInfo - skipping track");
+      B2DEBUG(25, "Missing KalmanFitterInfo - skipping track");
       return false;
     }
 
@@ -315,7 +315,7 @@ bool TimeExtractionUtils::buildFullCovarianceMatrix(const RecoTrack& recoTrack,
       const genfit::TrackPoint* tpNext = hitPoints[i + 1];
       const genfit::KalmanFitterInfo* fiNext = tpNext->getKalmanFitterInfo();
       if (!fiNext) {
-        B2DEBUG(50, "Missing next KalmanFitterInfo - skipping track");
+        B2DEBUG(25, "Missing next KalmanFitterInfo - skipping track");
         return false;
       }
 

@@ -44,22 +44,17 @@ void HitXPModule::initialize()
 {
 
   /** iniziialize store array and relations */
+  m_MCParticles.isRequired();
+  StoreArray<RecoTrack> storeRecoTracks("");
   StoreArray<SVDCluster> storeClusters("");
   StoreArray<SVDTrueHit> storeTrueHits("");
-  StoreArray<MCParticle> storeMCParticles("");
-  StoreArray<RecoTrack> recoTracks("");
-
-
+  storeRecoTracks.isRequired();
   storeClusters.isRequired();
   storeTrueHits.isRequired();
-  storeMCParticles.isRequired();
-  recoTracks.isRequired();
-
 
   RelationArray relClusterTrueHits(storeClusters, storeTrueHits);
-  RelationArray relClusterMCParticles(storeClusters, storeMCParticles);
-  RelationArray recoTracksToMCParticles(recoTracks, storeMCParticles);
-
+  RelationArray relClusterMCParticles(storeClusters, m_MCParticles);
+  RelationArray recoTracksToMCParticles(storeRecoTracks, m_MCParticles);
 
 
   /** inizialize output TFile (ttree, with own-class (hitXP) branch)
@@ -158,14 +153,12 @@ void HitXPModule::beginRun() {}
 
 void HitXPModule::event()
 {
-  StoreArray<MCParticle> MCParticles;
-
   m_eventNumber = m_eventIterator;
   m_EeventNumber = m_eventIterator; //------------External Tree---------//
   m_eventIterator = m_eventIterator + 1;
 
 
-  for (const MCParticle& particle : MCParticles) {
+  for (const MCParticle& particle : m_MCParticles) {
     m_Eprimary = particle.getStatus();
     for (const SVDTrueHit& hit : particle.getRelationsTo<SVDTrueHit>()) {
       if (hit.getRelationsFrom<SVDCluster>().size() > 0) {

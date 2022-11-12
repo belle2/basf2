@@ -23,7 +23,7 @@ using namespace Belle2;
 
 CprErrorMessage::CprErrorMessage()
 {
-  openlog("", LOG_PERROR , LOG_LOCAL0);
+  openlog("", LOG_PERROR, LOG_LOCAL0);
 }
 
 CprErrorMessage::~CprErrorMessage()
@@ -43,7 +43,6 @@ void CprErrorMessage::PrintError(const int shmflag, RunInfoBuffer* nsm_status, s
 void CprErrorMessage::PrintError(const int shmflag, RunInfoBuffer* nsm_status, char* err_message,
                                  const char* file, const char* func_name, const int line)
 {
-  string err_str = err_message;
   if (shmflag > 0) {
     nsm_status->reportError(RunInfoBuffer::CPRFIFO_FULL);//need to implement error flag
   }

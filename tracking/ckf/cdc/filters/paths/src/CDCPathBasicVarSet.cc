@@ -14,7 +14,6 @@
 #include <tracking/trackFindingCDC/topology/CDCWire.h>
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 
-using namespace std;
 using namespace Belle2;
 
 bool CDCPathBasicVarSet::extract(const BaseCDCPathFilter::Object* path)

@@ -11,7 +11,6 @@
 #include <framework/dataobjects/Helix.h>
 #include <framework/geometry/BFieldManager.h>
 
-using namespace std;
 using namespace Belle2;
 
 REG_MODULE(RadiusTrackTimeEstimator);
@@ -43,7 +42,7 @@ double RadiusTrackTimeEstimatorModule::estimateFlightLengthUsingSeedInformation(
   const TVector3& position = recoTrack.getPositionSeed();
 
   const double bZ = BFieldManager::getField(0, 0, 0).Z() / Unit::T;
-  const Helix h(position, momentum, charge, bZ);
+  const Helix h(ROOT::Math::XYZVector(position), ROOT::Math::XYZVector(momentum), charge, bZ);
   const double arcLengthOfIntersection = h.getArcLength2DAtCylindricalR(m_param_radiusForExtrapolation);
   const double s = arcLengthOfIntersection * hypot(1, h.getTanLambda());
   return s;

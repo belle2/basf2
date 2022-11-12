@@ -130,7 +130,7 @@ void CDCT0CalibrationCollectorModule::collect()
 
     if (Pval < m_PvalCut || ndf < m_ndfCut) continue;
     //cut at Pt
-    if (fitresult->getMomentum().Perp() < m_MinimumPt) continue;
+    if (fitresult->getMomentum().Rho() < m_MinimumPt) continue;
     //reject events don't have eventT0
     if (m_EventT0Extraction) {
       // event with is fail to extract t0 will be exclude from analysis

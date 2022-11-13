@@ -169,7 +169,7 @@ void eclee5x5CollectorModule::prepare()
   /** Required data objects */
   m_eclClusterArray.isRequired();
   m_eclCalDigitArray.isRequired();
-  m_eclDigitArray.isRequired();
+  if (!m_useCalDigits) {m_eclDigitArray.isRequired();}
   m_evtMetaData.isRequired();
 
   /**----------------------------------------------------------------------------------------*/

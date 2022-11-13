@@ -286,7 +286,7 @@ class TDCPV_ccs(BaseSkim):
         vm.addAlias('E_ECL_TDCPV', 'formula(E_ECL_pi_TDCPV+E_ECL_gamma_TDCPV)')
 
         btotcpvcuts = '5.2 < Mbc < 5.29 and abs(deltaE) < 0.5'
-        btotcpvcuts_KL = '5.05 < Mbc < 5.29 and abs(deltaE) < 0.5'
+        btotcpvcuts_KL = 'abs(deltaE) < 0.5'
 
         bd_ccs_Channels = ['J/psi:ee K_S0:merged',
                            'J/psi:mumu K_S0:merged',
@@ -314,7 +314,7 @@ class TDCPV_ccs(BaseSkim):
 
         b0toJPsiKL_List = []
         for chID, channel in enumerate(bd_ccs_KL_Channels):
-            ma.reconstructDecay('B0:TDCPV_JPsiKL' + str(chID) + ' -> ' + channel, btotcpvcuts_KL, chID, path=path)
+            ma.reconstructMissingKlongDecayExpert('B0:TDCPV_JPsiKL' + str(chID) + ' -> ' + channel, btotcpvcuts_KL, chID, path=path)
             b0toJPsiKL_List.append('B0:TDCPV_JPsiKL' + str(chID))
 
         ma.fillParticleList(decayString='pi+:TDCPV_eventshape',

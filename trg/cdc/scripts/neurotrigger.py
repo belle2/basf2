@@ -269,7 +269,7 @@ def add_neurotrigger_hw(path, nntweightfile=None, debug_level=4, debugout=False,
     if 'et_option' in kwargs:
         nnt.param('et_option', kwargs['et_option'])
     else:
-        nnt.param('et_option', 'etf_or_fastestpriority')
+        nnt.param('et_option', 'etfhwin')
 
     if 'EventTimeName' in kwargs:
         nnt.param('EventTimeName', kwargs['EventTimeName'])
@@ -300,6 +300,8 @@ def add_neuro_simulation(path, nntweightfile=None, **kwargs):
                     outputCollectionName=sim2dtracks_swts)
     if nntweightfile is not None:
         nnt.param('filename', Belle2.FileSystem.findFile(nntweightfile))
+        if 'et_option' in kwargs:
+            nnt.param('et_option', kwargs['et_option'])
     nnt.param('inputCollectionName', sim2dtracks_swts)
     nnt.param('outputCollectionName', simneurotracks_swtssw2d)
     nnt.param('hitCollectionName', simsegmenthits)

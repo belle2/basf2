@@ -33,5 +33,6 @@ BeginX
  2903            1e0      IRCHL3PI
  2904            0e0      IFKPIPI
  2905            0e0      IFCURR4PI
+ 2909            0e0      CHCONJUGATE = 1: swap JAK1/JAK2 for alternate events
 ********************************************************************************
 EndX

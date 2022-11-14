@@ -234,6 +234,9 @@ CDCTriggerNeuroModule::event()
     NNtrack->setRawPhi0(std::stoi(intphi.str()));
     NNtrack->setRawZ(std::stoi(intz.str()));
     NNtrack->setRawTheta(std::stoi(inttheta.str()));
+    NNtrack->setHasETFTime(m_tracks2D[itrack]->getHasETFTime());
+    NNtrack->setETF_unpacked(m_tracks2D[itrack]->getETF_unpacked());
+    NNtrack->setETF_recalced(m_tracks2D[itrack]->getETF_recalced());
 
     m_tracks2D[itrack]->addRelationTo(NNtrack);
     if (m_neuroTrackInputMode) {

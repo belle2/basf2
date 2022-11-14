@@ -150,7 +150,7 @@ CDCTriggerHoughETFModule::CDCTriggerHoughETFModule() : Module()
 
   addParam("offset", m_offset,
            "Set certain time offset for ETFHough simulation"
-           "Default as 0", 0);
+           "Default as -10", -10);
 }
 
 void

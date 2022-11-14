@@ -96,22 +96,26 @@ void SVDEventT0EstimatorModule::event()
       // consider the smallest arm time
       if (outgoingArmTime <= ingoingArmTime) {
         armTimeSum += outgoingArmTime * recoTrack.getNSVDHitsOfOutgoingArm();
-        armTimeErrSum += outgoingArmTimeError * outgoingArmTimeError;
+        armTimeErrSum += outgoingArmTimeError * outgoingArmTimeError * recoTrack.getNSVDHitsOfOutgoingArm() *
+                         recoTrack.getNSVDHitsOfOutgoingArm();
         numberOfSVDClusters += recoTrack.getNSVDHitsOfOutgoingArm();
       } else {
         armTimeSum += ingoingArmTime * recoTrack.getNSVDHitsOfIngoingArm();
-        armTimeErrSum += ingoingArmTimeError * ingoingArmTimeError;
+        armTimeErrSum += ingoingArmTimeError * ingoingArmTimeError * recoTrack.getNSVDHitsOfIngoingArm() *
+                         recoTrack.getNSVDHitsOfIngoingArm();
         numberOfSVDClusters += recoTrack.getNSVDHitsOfIngoingArm();
       }
       numberOfRecoTracksUsed += 1;
     } else if (hasOutgoingArm && !hasIngoingArm) { // check if it has only outgoing arm
       armTimeSum += outgoingArmTime * recoTrack.getNSVDHitsOfOutgoingArm();
-      armTimeErrSum += outgoingArmTimeError * outgoingArmTimeError;
+      armTimeErrSum += outgoingArmTimeError * outgoingArmTimeError * recoTrack.getNSVDHitsOfOutgoingArm() *
+                       recoTrack.getNSVDHitsOfOutgoingArm();
       numberOfSVDClusters += recoTrack.getNSVDHitsOfOutgoingArm();
       numberOfRecoTracksUsed += 1;
     } else if (!hasOutgoingArm && hasIngoingArm) { // check if it has only ingoing arm
       armTimeSum += ingoingArmTime * recoTrack.getNSVDHitsOfIngoingArm();
-      armTimeErrSum += ingoingArmTimeError * ingoingArmTimeError;
+      armTimeErrSum += ingoingArmTimeError * ingoingArmTimeError * recoTrack.getNSVDHitsOfIngoingArm() *
+                       recoTrack.getNSVDHitsOfIngoingArm();
       numberOfSVDClusters += recoTrack.getNSVDHitsOfIngoingArm();
       numberOfRecoTracksUsed += 1;
     } else continue;
@@ -127,8 +131,8 @@ void SVDEventT0EstimatorModule::event()
   quality = numberOfSVDClusters;
 
   // now compute the error
-  if (numberOfRecoTracksUsed > 1)
-    evtT0Err = std::sqrt(armTimeErrSum / (numberOfRecoTracksUsed * (numberOfRecoTracksUsed - 1)));
+  if (numberOfSVDClusters > 1)
+    evtT0Err = std::sqrt(armTimeErrSum / (numberOfSVDClusters * (numberOfSVDClusters - 1)));
   else
     evtT0Err = std::sqrt(armTimeErrSum);
 

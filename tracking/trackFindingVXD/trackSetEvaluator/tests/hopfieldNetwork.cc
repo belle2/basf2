@@ -78,7 +78,7 @@ TEST_F(HopfieldNetworkTest, TestPerformance)
   bool finished = hopfieldNetwork.doHopfield(m_trackCandidateInfos);
   int countCorrectTracksSurvived  = 0;
   int countWrongTracksSurvived    = 0;
-  for (auto && info : m_trackCandidateInfos) {
+  for (auto&& info : m_trackCandidateInfos) {
     B2INFO("TrackIndex: " << info.trackIndex << ", Neuron Value: " << info.activityState);
     if (info.trackIndex <  myTrueTracks && info.activityState > 0.7) countCorrectTracksSurvived++;
     if (info.trackIndex >= myTrueTracks && info.activityState > 0.7) countWrongTracksSurvived++;

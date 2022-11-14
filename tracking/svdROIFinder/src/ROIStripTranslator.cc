@@ -11,7 +11,6 @@
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
 
-using namespace std;
 using namespace Belle2;
 
 ROIStripTranslator::ROIStripTranslator(double user_sigmaSystU, double user_sigmaSystV, double user_numSigmaTotU,

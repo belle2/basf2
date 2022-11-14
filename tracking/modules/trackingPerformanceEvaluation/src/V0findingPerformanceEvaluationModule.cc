@@ -9,7 +9,6 @@
 #include <tracking/modules/trackingPerformanceEvaluation/V0findingPerformanceEvaluationModule.h>
 
 #include <tracking/dataobjects/MCParticleInfo.h>
-#include <tracking/dataobjects/V0ValidationVertex.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationVector.h>
@@ -23,7 +22,6 @@
 #include <root/TAxis.h>
 #include <root/TObject.h>
 
-#include <boost/foreach.hpp>
 #include <vector>
 
 using namespace Belle2;
@@ -53,11 +51,8 @@ V0findingPerformanceEvaluationModule::~V0findingPerformanceEvaluationModule()
 
 void V0findingPerformanceEvaluationModule::initialize()
 {
-  StoreArray<MCParticle> mcParticles;
-  mcParticles.isRequired(m_MCParticlesName);
-
-  StoreArray<V0ValidationVertex> v0ValidationVertices;
-  v0ValidationVertices.isRequired(m_V0sName);
+  m_MCParticles.isRequired(m_MCParticlesName);
+  m_V0ValidationVertices.isRequired(m_V0sName);
 
   //create list of histograms to be saved in the rootfile
   m_histoList = new TList;
@@ -156,12 +151,10 @@ void V0findingPerformanceEvaluationModule::beginRun()
 void V0findingPerformanceEvaluationModule::event()
 {
 
-  StoreArray<MCParticle> mcParticles(m_MCParticlesName);
+  ROOT::Math::XYZVector magField = BFieldManager::getField(0, 0, 0) / Unit::T;
 
-  B2Vector3D magField = BFieldManager::getField(0, 0, 0) / Unit::T;
-
-  B2DEBUG(99, "+++++ 1. loop on MCParticles");
-  BOOST_FOREACH(MCParticle & mcParticle, mcParticles) {
+  B2DEBUG(29, "+++++ 1. loop on MCParticles");
+  for (const MCParticle& mcParticle : m_MCParticles) {
 
     if (! isV0(mcParticle))
       continue;
@@ -174,16 +167,16 @@ void V0findingPerformanceEvaluationModule::event()
       continue;
 
     int pdgCode = mcParticle.getPDG();
-    B2DEBUG(99, "MCParticle has PDG code " << pdgCode);
+    B2DEBUG(29, "MCParticle has PDG code " << pdgCode);
     m_MCParticlePDGcode->Fill(mcParticle.getPDG());
 
     MCParticleInfo mcParticleInfo(mcParticle, magField);
 
-    B2Vector3D MC_prodvtx = mcParticle.getVertex();
-    TVector3 MC_vtx = mcParticle.getDecayVertex();
-    float MC_mom = mcParticle.getMomentum().Mag();
+    ROOT::Math::XYZVector MC_prodvtx = mcParticle.getVertex();
+    ROOT::Math::XYZVector MC_vtx = mcParticle.getDecayVertex();
+    float MC_mom = mcParticle.getMomentum().R();
     float MC_mass = mcParticle.getMass();
-    TVector3 MC_FL = MC_vtx - MC_prodvtx;
+    ROOT::Math::XYZVector MC_FL = MC_vtx - MC_prodvtx;
     float flightR = sqrt(MC_FL.X() * MC_FL.X() + MC_FL.Y() * MC_FL.Y());
     m_h1_MCParticle_R->Fill(flightR);
 
@@ -236,13 +229,9 @@ void V0findingPerformanceEvaluationModule::event()
   }
 
 
-  B2DEBUG(99, "+++++ 2. loop on V0s");
+  B2DEBUG(29, "+++++ 2. loop on V0s");
 
-
-  StoreArray<V0ValidationVertex> V0s(m_V0sName);
-
-
-  BOOST_FOREACH(V0ValidationVertex & v0, V0s) {
+  for (const V0ValidationVertex& v0 : m_V0ValidationVertices) {
 
     int nMCParticles = 0;
 

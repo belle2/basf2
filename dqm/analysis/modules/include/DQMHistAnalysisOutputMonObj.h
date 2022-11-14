@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 #include <dqm/dataobjects/DQMFileMetaData.h>
 #include <string>
 #include <TBranch.h>

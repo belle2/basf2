@@ -70,9 +70,9 @@ class printCrystals(basf2.Module):
             pos = self.obj_eclgeometrypar.getCrystalPos(idx)
             theta = pos.theta()
             phi = pos.phi()
-            x = pos.x()
-            y = pos.y()
-            z = pos.z()
+            x = pos.X()
+            y = pos.Y()
+            z = pos.Z()
 
             self.obj_eclgeometrypar.Mapping(idx)
             thetaid = int(self.obj_eclgeometrypar.GetThetaID())

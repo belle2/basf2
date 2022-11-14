@@ -1,0 +1,30 @@
+# EventType: 1111440001
+# Descriptor: [B0 -> J/psi [-> mu+ mu-] pi- K+]
+# NickName: Bd_JpsipiK_mumu
+# Documentation: B -> charmonium decays.
+# Tested: Yes
+# PhysicsWG: Charmonium
+# Responsible: Kirill Chilikin
+# Email: chilikin@lebedev.ru
+# Cuts: None
+# Date: 20220601
+#
+# This decay model is intended for phase-space-dependent efficiency
+# determination. All exclusive decays have the PHSP distributuion.
+# Do not use it for one-dimensional analyses without proper reweighting.
+
+Decay Upsilon(4S)
+1.0 B0sig anti-B0sig B0 anti-B0 VSS_BMIX dm;
+Enddecay
+
+Decay B0sig
+1.0 J/psisig pi- K+ PHOTOS PHSP;
+Enddecay
+
+CDecay anti-B0sig
+
+Decay J/psisig
+1.0 mu+ mu- PHOTOS PHSP;
+Enddecay
+
+End

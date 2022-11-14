@@ -148,95 +148,95 @@ void TRGGRLDQMModule::event()
   StoreObjPtr<TRGGRLUnpackerStore> evtinfo("TRGGRLUnpackerStore");
   if (!evtinfo) return;
 
-  int N_track = evtinfo->m_N_track;
+  int N_track = evtinfo->get_N_track();
   int bin = h_N_track->GetBinContent(N_track + 1);
   h_N_track->SetBinContent(N_track + 1, bin + 1);
 
   for (int i = 0; i < 36; i++) {
-    if (evtinfo->m_phi_i[i]) {
+    if (evtinfo->get_phi_i(i)) {
       h_phi_i->Fill(5 + i * 10);
     }
-    if (evtinfo->m_phi_CDC[i]) {
+    if (evtinfo->get_phi_CDC(i)) {
       h_phi_CDC->Fill(5 + i * 10);
     }
   }
   for (int i = 0; i < 8; i++) {
-    if (evtinfo->m_sector_CDC[i]) {
+    if (evtinfo->get_sector_CDC(i)) {
       h_sector_CDC->Fill(i * 45);
     }
-    if (evtinfo->m_sector_KLM[i]) {
+    if (evtinfo->get_sector_KLM(i)) {
       h_sector_KLM->Fill(i * 45);
     }
   }
   for (int i = 0; i < 16; i++) {
-    if (evtinfo->m_slot_CDC[i]) {
+    if (evtinfo->get_slot_CDC(i)) {
       h_slot_CDC->Fill(11.25 + i * 22.5);
     }
-    if (evtinfo->m_slot_TOP[i]) {
+    if (evtinfo->get_slot_TOP(i)) {
       h_slot_TOP->Fill(11.25 + i * 22.5);
     }
   }
 
-  int N_cluster = evtinfo->m_N_cluster;
+  int N_cluster = evtinfo->get_N_cluster();
   for (int i = 0; i < N_cluster; i++) {
-    h_E_ECL->Fill(evtinfo->m_E_ECL[i] * 0.005 + 0.0025);
-    h_theta_ECL->Fill(evtinfo->m_theta_ECL[i] * 1.40625 + 1.40625 * 0.5);
-    h_phi_ECL->Fill(evtinfo->m_phi_ECL[i] * 1.40625 + 1.40625 * 0.5);
+    h_E_ECL->Fill(evtinfo->get_E_ECL(i) * 0.005 + 0.0025);
+    h_theta_ECL->Fill(evtinfo->get_theta_ECL(i) * 1.40625 + 1.40625 * 0.5);
+    h_phi_ECL->Fill(evtinfo->get_phi_ECL(i) * 1.40625 + 1.40625 * 0.5);
   }
 
-  int timeL1 = evtinfo->m_coml1 - evtinfo->m_revoclk;
+  int timeL1 = evtinfo->get_coml1() - evtinfo->get_revoclk();
 
-  if (evtinfo->m_CDCL1_count != 0) {
-    h_CDCL1->Fill((evtinfo->m_CDCL1_count + timeL1 - 0.5) * (-7.8));
+  if (evtinfo->get_CDCL1_count() != 0) {
+    h_CDCL1->Fill((evtinfo->get_CDCL1_count() + timeL1 - 0.5) * (-7.8));
   }
-  if (evtinfo->m_ECLL1_count != 0) {
-    h_ECLL1->Fill((evtinfo->m_ECLL1_count + timeL1 - 0.5) * (-7.8));
+  if (evtinfo->get_ECLL1_count() != 0) {
+    h_ECLL1->Fill((evtinfo->get_ECLL1_count() + timeL1 - 0.5) * (-7.8));
   }
-  if (evtinfo->m_ECLL1_count != 0 && evtinfo->m_N_cluster_1 != 0) {
-    h_ECLL1_2nd->Fill((evtinfo->m_ECLL1_count + timeL1 - 0.5) * (-7.8) + 7.8 * 16);
+  if (evtinfo->get_ECLL1_count() != 0 && evtinfo->get_N_cluster_1() != 0) {
+    h_ECLL1_2nd->Fill((evtinfo->get_ECLL1_count() + timeL1 - 0.5) * (-7.8) + 7.8 * 16);
   }
-  if (evtinfo->m_TOPL1_count != 0) {
-    h_TOPL1->Fill((evtinfo->m_TOPL1_count + timeL1 - 0.5) * (-7.8));
+  if (evtinfo->get_TOPL1_count() != 0) {
+    h_TOPL1->Fill((evtinfo->get_TOPL1_count() + timeL1 - 0.5) * (-7.8));
   }
-  if (evtinfo->m_KLML1_count != 0) {
-    h_KLML1->Fill((evtinfo->m_KLML1_count + timeL1 - 0.5) * (-7.8));
+  if (evtinfo->get_KLML1_count() != 0) {
+    h_KLML1->Fill((evtinfo->get_KLML1_count() + timeL1 - 0.5) * (-7.8));
   }
-  if (evtinfo->m_CDC3DL1_count != 0) {
-    h_CDC3DL1->Fill((evtinfo->m_CDC3DL1_count + timeL1 - 0.5) * (-7.8));
+  if (evtinfo->get_CDC3DL1_count() != 0) {
+    h_CDC3DL1->Fill((evtinfo->get_CDC3DL1_count() + timeL1 - 0.5) * (-7.8));
   }
-  if (evtinfo->m_CDCNNL1_count != 0) {
-    h_CDCNNL1->Fill((evtinfo->m_CDCNNL1_count + timeL1 - 0.5) * (-7.8));
+  if (evtinfo->get_CDCNNL1_count() != 0) {
+    h_CDCNNL1->Fill((evtinfo->get_CDCNNL1_count() + timeL1 - 0.5) * (-7.8));
   }
-  if (evtinfo->m_TSFL1_count != 0) {
-    h_TSFL1->Fill((evtinfo->m_TSFL1_count + timeL1 - 0.5) * (-7.8));
+  if (evtinfo->get_TSFL1_count() != 0) {
+    h_TSFL1->Fill((evtinfo->get_TSFL1_count() + timeL1 - 0.5) * (-7.8));
   }
   if (timeL1 != 0) {
     h_B2LL1->Fill((timeL1 - 0.5) * (-7.8));
   }
 
   for (int i = 0; i < 64; i++) {
-    if (evtinfo->m_map_ST[i]) {
+    if (evtinfo->get_map_ST(i)) {
       h_map_ST->Fill(2.8 + i * 360.0 / 64.0);
     }
-    if (evtinfo->m_map_ST2[i]) {
+    if (evtinfo->get_map_ST2(i)) {
       h_map_ST2->Fill(2.8 + i * 360.0 / 64.0);
     }
-    if (evtinfo->m_map_veto[i]) {
+    if (evtinfo->get_map_veto(i)) {
       h_map_veto->Fill(2.8 + i * 360.0 / 64.0);
     }
-    if (evtinfo->m_map_TSF0[i]) {
+    if (evtinfo->get_map_TSF0(i)) {
       h_map_TSF0->Fill(2.8 + i * 360.0 / 64.0);
     }
-    if (evtinfo->m_map_TSF2[i]) {
+    if (evtinfo->get_map_TSF2(i)) {
       h_map_TSF2->Fill(2.8 + i * 360.0 / 64.0);
     }
-    if (evtinfo->m_map_TSF4[i]) {
+    if (evtinfo->get_map_TSF4(i)) {
       h_map_TSF4->Fill(2.8 + i * 360.0 / 64.0);
     }
-    if (evtinfo->m_map_TSF1[i]) {
+    if (evtinfo->get_map_TSF1(i)) {
       h_map_TSF1->Fill(2.8 + i * 360.0 / 64.0);
     }
-    if (evtinfo->m_map_TSF3[i]) {
+    if (evtinfo->get_map_TSF3(i)) {
       h_map_TSF3->Fill(2.8 + i * 360.0 / 64.0);
     }
   }

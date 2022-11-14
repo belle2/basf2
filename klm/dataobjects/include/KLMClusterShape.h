@@ -10,8 +10,12 @@
 /* Belle 2 headers. */
 #include <framework/datastore/RelationsObject.h>
 
+/* ROOT headers. */
 #include <Math/Vector3D.h>
 #include <TMatrixT.h>
+
+/* C++ headers. */
+#include <cmath>
 
 namespace Belle2 {
 
@@ -44,23 +48,22 @@ namespace Belle2 {
 
     //Define get functions to obtain private information
 
-
     /**Get principal axis eigenvector. */
     double getVariance1() const
     {
-      return abs(m_primaryVec[3]);
+      return std::abs(m_primaryVec[3]);
     }
 
     /**Get secondary axis eigenvector. */
     double getVariance2() const
     {
-      return abs(m_secondaryVec[3]);
+      return std::abs(m_secondaryVec[3]);
     }
 
     /**Get tertiary axis eigenvector. */
     double getVariance3() const
     {
-      return abs(m_tertiaryVec[3]);
+      return std::abs(m_tertiaryVec[3]);
     }
 
     /**Get eigenvectors. */
@@ -80,7 +83,6 @@ namespace Belle2 {
       return m_nHits;
     }
 
-
     /**Set eigenvectors and eigenvalues. */
     void setEigen(TMatrixT<double> eigenList);
 
@@ -89,8 +91,6 @@ namespace Belle2 {
     {
       m_nHits = nHits;
     }
-
-
 
   private:
 

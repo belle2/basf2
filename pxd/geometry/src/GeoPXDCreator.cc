@@ -297,7 +297,8 @@ namespace Belle2 {
           endflange.getAngle("minPhi", 0),
           endflange.getAngle("maxPhi", 2 * M_PI),
           (endflange.getNodes("Cutout").size() > 0),
-          endflange.getLength("Cutout/width", 0.),
+          endflange.getLength("Cutout/width1", 0.),
+          endflange.getLength("Cutout/width2", 0.),
           endflange.getLength("Cutout/height", 0.),
           endflange.getLength("Cutout/depth", 0.)
         );

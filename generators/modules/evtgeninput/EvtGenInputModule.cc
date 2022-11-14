@@ -44,7 +44,7 @@ EvtGenInputModule::EvtGenInputModule() : Module(),
            "particle from the beam energies which fits inside the mass window "
            "before giving up", 100000);
 
-  m_PrimaryVertex = TVector3(0., 0., 0.);
+  m_PrimaryVertex = ROOT::Math::XYZVector(0., 0., 0.);
 
 }
 

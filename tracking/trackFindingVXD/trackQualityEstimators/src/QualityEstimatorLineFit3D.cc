@@ -73,8 +73,8 @@ double QualityEstimatorLineFit3D::estimateQuality(std::vector<SpacePoint const*>
   interceptZ = detValZ * (- sumWziXi * sumWziXiZi  +  sumWziXi2 * sumWziZi);
 
   for (const SpacePoint* aHit : measurements) {  // chi2 of xy-fit and of xz-fit can be combined by adding their values
-    chi2 += pow(((aHit->getPosition().Y() - slopeY * aHit->getPosition().X() - interceptY) / aHit->getPositionError().Y()) , 2)
-            + pow(((aHit->getPosition().Z() - slopeZ * aHit->getPosition().X() - interceptZ) / aHit->getPositionError().Z()) , 2);
+    chi2 += pow(((aHit->getPosition().Y() - slopeY * aHit->getPosition().X() - interceptY) / aHit->getPositionError().Y()), 2)
+            + pow(((aHit->getPosition().Z() - slopeZ * aHit->getPosition().X() - interceptZ) / aHit->getPositionError().Z()), 2);
   }
   m_results.chiSquared = chi2;
 

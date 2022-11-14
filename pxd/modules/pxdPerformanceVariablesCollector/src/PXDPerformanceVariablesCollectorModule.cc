@@ -281,7 +281,7 @@ void PXDPerformanceVariablesCollectorModule::collectDeltaIP()
 
   // Use beam spot info for the interaction point
   DBObjPtr<BeamSpot> beamSpotDB;
-  auto ip = beamSpotDB->getIPPosition();
+  auto ip = ROOT::Math::XYZVector(beamSpotDB->getIPPosition());
   auto vertex = ip;
 
   const Particle* part0 = mother->getDaughter(0);

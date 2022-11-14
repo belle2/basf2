@@ -13,7 +13,6 @@
 #include <vxd/geometry/GeoTools.h>
 #include <vxd/geometry/SensorInfoBase.h>
 
-using namespace std;
 using namespace Belle2;
 
 void DQMEventProcessorBase::Run()
@@ -92,11 +91,11 @@ TString DQMEventProcessorBase::ConstructMessage(const TrackFitResult* trackFitRe
   return Form("%s: track %3i, Mom: %f, %f, %f, Pt: %f, Mag: %f, Hits: PXD %i SVD %i CDC %i Suma %i\n",
               m_histoModule->getName().c_str(),
               m_iTrack,
-              (float)trackFitResult->getMomentum().Px(),
-              (float)trackFitResult->getMomentum().Py(),
-              (float)trackFitResult->getMomentum().Pz(),
-              (float)trackFitResult->getMomentum().Pt(),
-              (float)trackFitResult->getMomentum().Mag(),
+              (float)trackFitResult->getMomentum().x(),
+              (float)trackFitResult->getMomentum().y(),
+              (float)trackFitResult->getMomentum().z(),
+              (float)trackFitResult->getMomentum().Rho(),
+              (float)trackFitResult->getMomentum().R(),
               nPXDClusters, nSVDClusters, nCDCHits, nPXDClusters + nSVDClusters + nCDCHits
              );
 }

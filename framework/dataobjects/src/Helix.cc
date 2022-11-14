@@ -13,6 +13,7 @@
 #include <boost/math/special_functions/sinc.hpp>
 #include <boost/math/tools/precision.hpp>
 
+#include <Math/VectorUtil.h>
 #include <TMatrixD.h>
 
 #include <cassert>
@@ -29,8 +30,8 @@ Helix::Helix():
 {
 }
 
-Helix::Helix(const TVector3& position,
-             const TVector3& momentum,
+Helix::Helix(const ROOT::Math::XYZVector& position,
+             const ROOT::Math::XYZVector& momentum,
              const short int charge,
              const double bZ)
 {
@@ -65,9 +66,9 @@ double Helix::getPerigeeZ() const
   return getZ0();
 }
 
-TVector3 Helix::getPerigee() const
+ROOT::Math::XYZVector Helix::getPerigee() const
 {
-  return TVector3(getPerigeeX(), getPerigeeY(), getPerigeeZ());
+  return ROOT::Math::XYZVector(getPerigeeX(), getPerigeeY(), getPerigeeZ());
 }
 
 double Helix::getMomentumX(const double bZ) const
@@ -85,14 +86,14 @@ double Helix::getMomentumZ(const double bZ) const
   return getTanLambda() * getTransverseMomentum(bZ);
 }
 
-TVector3 Helix:: getMomentum(const double bZ) const
+ROOT::Math::XYZVector Helix:: getMomentum(const double bZ) const
 {
-  return TVector3(getMomentumX(bZ), getMomentumY(bZ), getMomentumZ(bZ));
+  return ROOT::Math::XYZVector(getMomentumX(bZ), getMomentumY(bZ), getMomentumZ(bZ));
 }
 
-TVector3 Helix::getDirection() const
+ROOT::Math::XYZVector Helix::getDirection() const
 {
-  return TVector3(getCosPhi0(), getSinPhi0(), getTanLambda());
+  return ROOT::Math::XYZVector(getCosPhi0(), getSinPhi0(), getTanLambda());
 }
 
 double Helix::getTransverseMomentum(const double bZ) const
@@ -197,7 +198,7 @@ double Helix::getArcLength2DAtNormalPlane(const double& byX, const double& byY,
 }
 
 
-TVector3 Helix::getPositionAtArcLength2D(const double& arcLength2D) const
+ROOT::Math::XYZVector Helix::getPositionAtArcLength2D(const double& arcLength2D) const
 {
   /*
     /   \     /                      \     /                              \
@@ -233,15 +234,15 @@ TVector3 Helix::getPositionAtArcLength2D(const double& arcLength2D) const
   const double z = fma((double)arcLength2D, getTanLambda(),  getZ0());
 
   // Unrotated position
-  TVector3 position(x, y, z);
+  ROOT::Math::XYZVector position(x, y, z);
 
   // Rotate to the right phi0 position
-  position.RotateZ(getPhi0());
+  position = ROOT::Math::VectorUtil::RotateZ(position, getPhi0());
 
   return position;
 }
 
-TVector3 Helix::getTangentialAtArcLength2D(const double& arcLength2D) const
+ROOT::Math::XYZVector Helix::getTangentialAtArcLength2D(const double& arcLength2D) const
 {
   const double omega = getOmega();
   const double phi0 = getPhi0();
@@ -253,22 +254,22 @@ TVector3 Helix::getTangentialAtArcLength2D(const double& arcLength2D) const
   const double ty = sin(chi + phi0);
   const double tz = tanLambda;
 
-  TVector3 tangential(tx, ty, tz);
+  ROOT::Math::XYZVector tangential(tx, ty, tz);
   return tangential;
 }
 
-TVector3 Helix::getUnitTangentialAtArcLength2D(const double& arcLength2D) const
+ROOT::Math::XYZVector Helix::getUnitTangentialAtArcLength2D(const double& arcLength2D) const
 {
-  TVector3 unitTangential = getTangentialAtArcLength2D(arcLength2D);
+  ROOT::Math::XYZVector unitTangential = getTangentialAtArcLength2D(arcLength2D);
   const double norm = hypot(1, getTanLambda());
   const double invNorm = 1 / norm;
   unitTangential *= invNorm;
   return unitTangential;
 }
 
-TVector3 Helix::getMomentumAtArcLength2D(const double& arcLength2D, const double& bz) const
+ROOT::Math::XYZVector Helix::getMomentumAtArcLength2D(const double& arcLength2D, const double& bz) const
 {
-  TVector3 momentum = getTangentialAtArcLength2D(arcLength2D);
+  ROOT::Math::XYZVector momentum = getTangentialAtArcLength2D(arcLength2D);
   const double pr = getTransverseMomentum(bz);
   momentum *= pr;
 
@@ -297,7 +298,7 @@ double Helix::passiveMoveBy(const double& byX,
   return arcLength2D;
 }
 
-TMatrixD Helix::calcPassiveMoveByJacobian(const TVector3& by, const double expandBelowChi) const
+TMatrixD Helix::calcPassiveMoveByJacobian(const ROOT::Math::XYZVector& by, const double expandBelowChi) const
 {
   TMatrixD jacobian(5, 5);
   calcPassiveMoveByJacobian(by.X(), by.Y(), jacobian, expandBelowChi);
@@ -584,8 +585,8 @@ double Helix::calcArcLength2DAtDeltaCylindricalRAndDr(const double& deltaCylindr
   return calcArcLength2DFromSecantLength(secantLength);
 }
 
-void Helix::setCartesian(const TVector3& position,
-                         const TVector3& momentum,
+void Helix::setCartesian(const ROOT::Math::XYZVector& position,
+                         const ROOT::Math::XYZVector& momentum,
                          const short int charge,
                          const double bZ)
 {

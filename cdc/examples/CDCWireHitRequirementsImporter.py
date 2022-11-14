@@ -20,7 +20,7 @@ from ROOT.Belle2 import CDCDatabaseImporter
 
 # Input json file containing the CDCWireHitRequirements
 # N.B. In the json file, -1 as upper limit means unbound.
-INPUT = FileSystem.findFile("cdc/data/CDCWireHitRequirements_example.json")
+INPUT = FileSystem.findFile("data/cdc/CDCWireHitRequirements_example.json")
 
 # Specify the exp and run where iov is valid.
 # N.B. -1 means unbound.
@@ -28,7 +28,7 @@ expFirst = 0
 expLast = -1
 runFirst = 0
 runLast = -1
-basf2.use_local_database("localdb/database.txt", "localdb")
+basf2.conditions.testing_payloads = ["localdb/database.txt"]
 
 main = basf2.create_path()
 

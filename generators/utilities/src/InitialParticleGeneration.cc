@@ -7,10 +7,11 @@
  **************************************************************************/
 
 #include <generators/utilities/InitialParticleGeneration.h>
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
+#include <generators/utilities/beamHelpers.h>
+#include <cmath>
+#include <Eigen/Dense>
 
-#include <Math/RotationY.h>
 
 namespace Belle2 {
 
@@ -19,55 +20,117 @@ namespace Belle2 {
     m_event.registerInDataStore();
   }
 
-  TVector3 InitialParticleGeneration::generateVertex(const TVector3& initial, const TMatrixDSym& cov,
-                                                     MultivariateNormalGenerator& gen)
+  ROOT::Math::XYZVector InitialParticleGeneration::generateVertex(const ROOT::Math::XYZVector& initial, const TMatrixDSym& cov,
+      MultivariateNormalGenerator& gen) const
   {
     if (m_event->hasGenerationFlags(BeamParameters::c_smearVertex)) {
       if (!gen.size()) gen.setMeanCov(initial, cov);
-      return gen.generateVec3();
+      return ROOT::Math::XYZVector(gen.generateVec3());
     }
     return initial;
   }
 
-  ROOT::Math::PxPyPzEVector InitialParticleGeneration::generateBeam(const ROOT::Math::PxPyPzEVector& initial, const TMatrixDSym& cov,
-      MultivariateNormalGenerator& gen)
+
+  TMatrixDSym InitialParticleGeneration::adjustCovMatrix(TMatrixDSym cov) const
   {
-    if (!(m_event->getGenerationFlags() & BeamParameters::c_smearBeam)) {
-      //no smearing, nothing to do
+    // no smearing
+    if (!m_beamParams->hasGenerationFlags(BeamParameters::c_smearBeam))
+      return TMatrixDSym(3);
+
+    // don't smear energy
+    if (!m_beamParams->hasGenerationFlags(BeamParameters::c_smearBeamEnergy)) {
+      for (int i = 0; i < 3; ++i)
+        cov(i, 0) = cov(0, i) = 0;
+    }
+
+    // don't smear angles
+    if (!m_beamParams->hasGenerationFlags(BeamParameters::c_smearBeamDirection)) {
+      for (int i = 1; i < 3; ++i)
+        for (int j = 1; j < 3; ++j)
+          cov(i, j) = cov(j, i) = 0;
+    }
+
+    return cov;
+
+  }
+
+
+  /** transform matrix from ROOT to Eigen format */
+  static Eigen::MatrixXd toEigen(TMatrixDSym m)
+  {
+    Eigen::MatrixXd mEig(m.GetNrows(), m.GetNcols());
+    for (int i = 0; i < m.GetNrows(); ++i)
+      for (int j = 0; j < m.GetNcols(); ++j)
+        mEig(i, j) = m(i, j);
+
+    return mEig;
+  }
+
+
+  // init random number generator which generates random boost based on the beam parameters
+  ConditionalGaussGenerator InitialParticleGeneration::initConditionalGenerator(const ROOT::Math::PxPyPzEVector& pHER,
+      const ROOT::Math::PxPyPzEVector& pLER, const TMatrixDSym& covHER, const TMatrixDSym& covLER)
+  {
+    //Calculate initial parameters of the HER beam before smearing
+    double E0her   = pHER.E();
+    double thX0her = std::atan(pHER.Px() / pHER.Pz());
+    double thY0her = std::atan(pHER.Py() / pHER.Pz());
+
+    //Calculate initial parameters of the LER beam before smearing
+    double E0ler   = pLER.E();
+    double thX0ler = std::atan(pLER.Px() / pLER.Pz());
+    double thY0ler = std::atan(pLER.Py() / pLER.Pz());
+
+    // calculate gradient of transformation (EH, thXH, thYH, EL, thXL, thYL) ->  (Ecms, bX, bY, bZ, angleCmsX, angleCmsY)
+    Eigen::MatrixXd grad = getGradientMatrix(E0her, thX0her, thY0her, E0ler, thX0ler, thY0ler);
+    Eigen::VectorXd mu   = getCentralValues(E0her, thX0her, thY0her, E0ler, thX0ler, thY0ler);
+
+    // calculate covariance smearing matrix in the (Ecms, bX, bY, bZ, angleCmsX, angleCmsY) coordinate system
+    Eigen::MatrixXd covT = transformCov(toEigen(adjustCovMatrix(covHER)), toEigen(adjustCovMatrix(covLER)), grad);
+
+    // return random number generator which allows to generate Lorentz transformation parameters based on the cmsEnergy
+    return ConditionalGaussGenerator(mu, covT);
+
+  }
+
+
+  ROOT::Math::PxPyPzEVector InitialParticleGeneration::generateBeam(const ROOT::Math::PxPyPzEVector& initial, const TMatrixDSym& cov,
+      MultivariateNormalGenerator& gen) const
+  {
+    //no smearing, nothing to do
+    if (!(m_event->getGenerationFlags() & BeamParameters::c_smearBeam))
       return initial;
-    }
-    if (gen.size() != 3) gen.setMeanCov(TVector3(initial.E(), 0, 0), cov);
-    // generate the beam parameters: energy and horizontal angle and vertical
-    // angle with respect to nominal direction
-    // p[0] = energy
-    // p[1] = horizontal angle
-    // p[2] = vertical angle
+
+
+    //Calculate initial parameters of the beam before smearing
+    double E0   = initial.E();
+    double thX0 = std::atan(initial.Px() / initial.Pz());
+    double thY0 = std::atan(initial.Py() / initial.Pz());
+
+    //init random generator if there is a change in beam parameters or at the beginning
+    if (gen.size() != 3) gen.setMeanCov(ROOT::Math::XYZVector(E0, thX0, thY0), cov);
+
+    //generate the actual smeared vector (E, thX, thY)
     Eigen::VectorXd p = gen.generate();
-    // if we don't smear beam energy set it to nominal values
-    if (!m_event->hasGenerationFlags(BeamParameters::c_smearBeamEnergy)) {
-      p[0] = initial.E();
-    }
-    // if we don't smear beam direction set angles to 0
+
+    //if we don't smear beam energy set the E to initial value
+    if (!m_event->hasGenerationFlags(BeamParameters::c_smearBeamEnergy))
+      p[0] = E0;
+
+    //if we don't smear beam direction set thX and thY to initial values
     if (!m_event->hasGenerationFlags(BeamParameters::c_smearBeamDirection)) {
-      p[1] = 0;
-      p[2] = 0;
+      p[1] = thX0;
+      p[2] = thY0;
     }
-    // calculate Lorentzvector from p
-    const double pz = std::sqrt(p[0] * p[0] - Const::electronMass * Const::electronMass);
-    // Rotate around theta_x and theta_y. Same as result.RotateX(p[1]);
-    // result.RotateY(p[2]) but as we know it's a 0,0,pz vector this can be
-    // optimized.
-    const double sx = sin(p[1]);
-    const double cx = cos(p[1]);
-    const double sy = sin(p[2]);
-    const double cy = cos(p[2]);
-    const double px = sy * cx * pz;
-    const double py = -sx * pz;
-    ROOT::Math::PxPyPzEVector result(px, py, cx * cy * pz, p[0]);
-    // And rotate into the direction of the nominal beam
-    ROOT::Math::RotationY rotateY(initial.Theta());
-    result = rotateY(result);
-    return result;
+
+    //store smeared values
+    double E   = p[0];
+    double thX = p[1];
+    double thY = p[2];
+
+    //Convert values back to 4-vector
+    bool isHER = initial.Z() > 0;
+    return BeamParameters::getFourVector(E, thX, thY, isHER);
   }
 
   MCInitialParticles& InitialParticleGeneration::generate()
@@ -91,7 +154,7 @@ namespace Belle2 {
     m_event->setGenerationFlags(m_beamParams->getGenerationFlags() & allowedFlags);
     ROOT::Math::PxPyPzEVector her = generateBeam(m_beamParams->getHER(), m_beamParams->getCovHER(), m_generateHER);
     ROOT::Math::PxPyPzEVector ler = generateBeam(m_beamParams->getLER(), m_beamParams->getCovLER(), m_generateLER);
-    TVector3 vtx = generateVertex(m_beamParams->getVertex(), m_beamParams->getCovVertex(), m_generateVertex);
+    ROOT::Math::XYZVector vtx = generateVertex(m_beamParams->getVertex(), m_beamParams->getCovVertex(), m_generateVertex);
     m_event->set(her, ler, vtx);
     //Check if we want to go to CMS, if so boost both
     if (m_beamParams->hasGenerationFlags(BeamParameters::c_generateCMS)) {
@@ -104,7 +167,35 @@ namespace Belle2 {
     return *m_event;
   }
 
-  TVector3 InitialParticleGeneration::updateVertex(bool force)
+
+  // it generates random Lorentz transformation based on the HER/LER smearing covariance matrices
+  ROOT::Math::XYZVector InitialParticleGeneration::getVertexConditional()
+  {
+    if (!m_event) {
+      m_event.create();
+    }
+    if (!m_beamParams.isValid()) {
+      B2FATAL("Cannot generate beam without valid BeamParameters");
+    }
+    if (m_beamParams.hasChanged()) {
+      m_generateLorentzTransformation = initConditionalGenerator(m_beamParams->getHER(),  m_beamParams->getLER(),
+                                                                 m_beamParams->getCovHER(), m_beamParams->getCovLER());
+      m_generateVertex.reset();
+    }
+    m_event->setGenerationFlags(m_beamParams->getGenerationFlags() & m_allowedFlags);
+    ROOT::Math::XYZVector vtx = generateVertex(m_beamParams->getVertex(), m_beamParams->getCovVertex(), m_generateVertex);
+
+    //TODO is m_event of type MCInitialParticles important?
+    //Eigen::VectorXd collSys = m_generateLorentzTransformation.generate(Ecms);
+    //m_event->set(her, ler, vtx);
+    //m_event->setByLorentzTransformation(collSys[0], collSys[1], collSys[2], collSys[3], collSys[4], collSys[5], vtx);
+
+    return vtx;
+  }
+
+
+
+  ROOT::Math::XYZVector InitialParticleGeneration::updateVertex(bool force)
   {
     if (!m_beamParams.isValid()) {
       B2FATAL("Cannot generate beam without valid BeamParameters");

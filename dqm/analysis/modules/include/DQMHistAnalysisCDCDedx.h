@@ -22,7 +22,7 @@
 #include "TH1.h"
 #include "TH2D.h"
 
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 
 namespace Belle2 {
 

@@ -72,5 +72,6 @@ ecldataanalysis.param('rootFileName', '../ECLBkgOutput.root')
 ecldataanalysis.param('doTracking', 1)
 main.add_module(ecldataanalysis)
 
+main.add_module('Progress')
 b2.process(main)
 # print(statistics)

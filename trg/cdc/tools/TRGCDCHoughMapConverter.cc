@@ -26,7 +26,7 @@ using namespace Belle2;
 #define VERSION       "version 0.00[2015/07/23]"
 
 int
-main(int argc, char* argv[])
+main(int argc, const char* argv[])
 {
 
   cout << NAME << " ... " << VERSION << endl;

@@ -13,7 +13,10 @@ Untested method Particle::isMostLikelyTrackFitResult
 Untested method Particle::overlapsWith
 Untested method Particle::removeDaughter
 Untested method Particle::removeExtraInfo
+Untested method Particle::replaceDaughter
+Untested method Particle::replaceDaughterRecursively
 Untested method Particle::set4Vector
+Untested method Particle::set4VectorDividingByMomentumScaling
 Untested method Particle::setExtraInfo
 Untested method Particle::setJacobiMatrix
 Untested method Particle::setMomentumScalingFactor
@@ -822,7 +825,7 @@ Particle#6:
   getAcoplanarity(): nan
   getCharge(): 0
   getCosHelicity(): -0.64592
-  getCosHelicityDaughter(0): -0.442569
+  getCosHelicityDaughter(0): -0.442572
   getDaughter(0): -> Particles#5
   getDaughter(1): -> Particles#3
   getDaughterIndices(): size(2)
@@ -2109,7 +2112,7 @@ Particle#7:
   getAcoplanarity(): nan
   getCharge(): 0
   getCosHelicity(): -0.11513
-  getCosHelicityDaughter(0): -0.969922
+  getCosHelicityDaughter(0): -0.969923
   getDaughter(0): -> Particles#6
   getDaughter(1): -> Particles#0
   getDaughterIndices(): size(3)
@@ -3265,7 +3268,7 @@ Particle#7:
     -1.222089e-07  1.119013e-06 -3.838498e-09 -4.776088e-07 
      7.409999e-09 -3.838498e-09  1.251622e-06  8.363132e-08 
      1.246792e-06 -4.776088e-07  8.363132e-08  1.297594e-06 
-  getMomentumMagnitude(): 0.558803
+  getMomentumMagnitude(): 0.558804
   getMomentumVertexErrorMatrix(): 
      1.323645e-06 -1.222089e-07  7.409999e-09  1.246792e-06 -2.235135e-07 -6.395441e-07  1.642836e-07 
     -1.222089e-07  1.119013e-06 -3.838498e-09 -4.776088e-07 -6.812158e-07 -1.949174e-06 -5.111066e-08 
@@ -3276,7 +3279,7 @@ Particle#7:
      1.642836e-07 -5.111066e-08 -2.777047e-06 -1.342499e-09 -1.509592e-08 -4.243736e-08  7.641618e-06 
   getNDaughters(): 0
   getName(): pi+
-  getP(): 0.558803
+  getP(): 0.558804
   getPDGCode(): 211
   getPDGCodeUsedForFit(): 211
   getPDGMass(): 0.13957
@@ -4579,7 +4582,7 @@ Particle#17:
   getAcoplanarity(): nan
   getCharge(): -1
   getCosHelicity(): 0.968225
-  getCosHelicityDaughter(0): -0.991568
+  getCosHelicityDaughter(0): -0.991567
   getDaughter(0): -> Particles#13
   getDaughter(1): -> Particles#2
   getDaughterIndices(): size(2)
@@ -4852,7 +4855,7 @@ Particle#19:
   getAcoplanarity(): nan
   getCharge(): 0
   getCosHelicity(): 0.864864
-  getCosHelicityDaughter(0): -0.860502
+  getCosHelicityDaughter(0): -0.860573
   getDaughter(0): -> Particles#17
   getDaughter(1): -> Particles#6
   getDaughterIndices(): size(2)
@@ -4991,7 +4994,7 @@ Particle#20:
   getAcoplanarity(): nan
   getCharge(): 0
   getCosHelicity(): 0.103753
-  getCosHelicityDaughter(0): -0.9903
+  getCosHelicityDaughter(0): -0.990299
   getDaughter(0): -> Particles#13
   getDaughter(1): -> Particles#2
   getDaughterIndices(): size(3)
@@ -5131,7 +5134,7 @@ Particle#21:
 	# of daughters = 3
   getAcoplanarity(): nan
   getCharge(): 0
-  getCosHelicity(): 0.0519248
+  getCosHelicity(): 0.0519247
   getCosHelicityDaughter(0): -0.997131
   getDaughter(0): -> Particles#15
   getDaughter(1): -> Particles#2
@@ -5273,7 +5276,7 @@ Particle#22:
   getAcoplanarity(): nan
   getCharge(): 0
   getCosHelicity(): -0.638687
-  getCosHelicityDaughter(0): -0.990805
+  getCosHelicityDaughter(0): -0.990804
   getDaughter(0): -> Particles#13
   getDaughter(1): -> Particles#8
   getDaughterIndices(): size(3)

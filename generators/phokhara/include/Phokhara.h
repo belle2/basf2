@@ -6,11 +6,11 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef PHOKHARA_H
-#define PHOKHARA_H
+#pragma once
 
 #include <mdst/dataobjects/MCParticleGraph.h>
 #include <Math/LorentzRotation.h>
+#include <Math/Vector3D.h>
 #include <utility>
 
 namespace Belle2 {
@@ -50,7 +50,7 @@ namespace Belle2 {
     void setNLO(int NLO) { m_NLO = NLO; }
 
     /** Sets Full NLO mode
-      * @param full NLO : No(0), Yes(1)
+      * @param FullNLO NLO : No(0), Yes(1)
     */
     void setFullNLO(int FullNLO) { m_fullNLO = FullNLO; }
 
@@ -95,7 +95,7 @@ namespace Belle2 {
     void setProtonFF(int protonff) { m_protonff = protonff; }
 
     /** Sets Chi production
-      * @param chi_sw: Radiative return(0), Chi production(1), Radiative return + Chi production (2)
+      * @param chisw: Radiative return(0), Chi production(1), Radiative return + Chi production (2)
     */
     void setChiSW(int chisw) { m_chi_sw = chisw; }
 
@@ -187,7 +187,7 @@ namespace Belle2 {
      * @param vertex generated vertex.
      * @param boost generated boost.
      */
-    double generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, ROOT::Math::LorentzRotation boost);
+    double generateEvent(MCParticleGraph& mcGraph, ROOT::Math::XYZVector vertex, ROOT::Math::LorentzRotation boost);
 
     /**
      * Terminates the generator.
@@ -251,7 +251,8 @@ namespace Belle2 {
      * @param isVirtual If the particle is a virtual particle, such as the incoming particles, set this to true.
      * @param isInitial If the particle is a initial particle for ISR, set this to true.
      */
-    void storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, TVector3 vertex, ROOT::Math::LorentzRotation boost,
+    void storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, ROOT::Math::XYZVector vertex,
+                       ROOT::Math::LorentzRotation boost,
                        bool isVirtual = false, bool isInitial = false);
 
   private:
@@ -260,6 +261,3 @@ namespace Belle2 {
     double m_xpar[100];  /**< Double parameters for PHOKHARA */
   };
 }
-
-
-#endif /* PHOKHARA_H */

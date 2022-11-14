@@ -34,7 +34,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(TRGGRLMatch)
+REG_MODULE(TRGGRLMatch);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -700,6 +700,7 @@ void TRGGRLMatchModule::make_veto_map(StoreArray<CDCTriggerTrack> track2Dlist, s
     _w = abs(_w);
 
     int L;
+    // cppcheck-suppress knownConditionTrueFalse
     if (_w >= 0 && _w <= 8) { L = _phi; }
     else if (_w >= 9 && _w <= 15) {
       if (charge < 0) { L = _phi + 1; }
@@ -722,6 +723,7 @@ void TRGGRLMatchModule::make_veto_map(StoreArray<CDCTriggerTrack> track2Dlist, s
     }
 
     int R;
+    // cppcheck-suppress knownConditionTrueFalse
     if (_w >= 0 && _w <= 8) { R = _phi; }
     else if (_w >= 9 && _w <= 15) {
       if (charge < 0) { R = _phi; }
@@ -1438,18 +1440,27 @@ void TRGGRLMatchModule::inner_tracking(StoreArray<CDCTriggerSegmentHit> tslist,
                             or IT0_36b[N36(i + 9)] or IT0_36b[N36(i + 27)])) or i2io ;
   }
   //inner-ecl matching at endcap
-  bool IT0_36b_temp[36 * 2];
-  for (int i = 0; i < 36; i++) {
-    IT0_36b_temp[i]   = IT0_36b[i];
-    IT0_36b_temp[i + 36] = IT0_36b[i];
+
+  bool IT0_36b_temp[44] = {false};
+  for (int i = 4; i < 40; i++) {
+    IT0_36b_temp[i] = IT0_36b[i - 4];
   }
-  for (int i = 0; i < 36; i++) {
-    if (ecl_phimap[i] and
-        (IT0_36b_temp[i + 36] or IT0_36b_temp[i + 36 + 1] or IT0_36b_temp[i + 36 + 2] or IT0_36b_temp[i + 36 + 3]
-         or IT0_36b_temp[i + 36 + 4] or
-         IT0_36b_temp[i + 36 - 1] or IT0_36b_temp[i + 36 - 2] or IT0_36b_temp[i + 36 - 3] or IT0_36b_temp[i + 36 - 4])
-       )iecl++;
+  IT0_36b_temp[0] = IT0_36b[32];
+  IT0_36b_temp[1] = IT0_36b[33];
+  IT0_36b_temp[2] = IT0_36b[34];
+  IT0_36b_temp[3] = IT0_36b[35];
+  IT0_36b_temp[40] = IT0_36b[0];
+  IT0_36b_temp[41] = IT0_36b[1];
+  IT0_36b_temp[42] = IT0_36b[2];
+  IT0_36b_temp[43] = IT0_36b[3];
+
+  for (int i = 4; i < 40; i++) {
+    if (ecl_phimap[i - 4] and (IT0_36b_temp[i - 4] or IT0_36b_temp[i - 3] or IT0_36b_temp[i - 2] or IT0_36b_temp[i - 1]
+                               or IT0_36b_temp[i] or IT0_36b_temp[i + 1] or IT0_36b_temp[i + 2] or IT0_36b_temp[i + 3] or IT0_36b_temp[i + 4])) {
+      iecl++;
+    }
   }
+
 
   //std::cout << "sector map " ;
   //for (int i = 0; i < 4; i++) {

@@ -8,8 +8,13 @@
 
 #include <top/dbobjects/TOPCalModuleAlignment.h>
 #include <framework/logging/Logger.h>
+#include <Math/RotationX.h>
+#include <Math/RotationY.h>
+#include <Math/RotationZ.h>
+#include <Math/Translation3D.h>
 
 using namespace std;
+using namespace ROOT::Math;
 
 namespace Belle2 {
 
@@ -22,6 +27,7 @@ namespace Belle2 {
     }
     m_alpha[module] = alpha;
     m_errAlpha[module] = errAlpha;
+    m_transforms.clear();
   }
 
   void TOPCalModuleAlignment::setBeta(int moduleID, double beta, double errBeta)
@@ -33,6 +39,7 @@ namespace Belle2 {
     }
     m_beta[module] = beta;
     m_errBeta[module] = errBeta;
+    m_transforms.clear();
   }
 
   void TOPCalModuleAlignment::setGamma(int moduleID, double gamma, double errGamma)
@@ -44,6 +51,7 @@ namespace Belle2 {
     }
     m_gamma[module] = gamma;
     m_errGamma[module] = errGamma;
+    m_transforms.clear();
   }
 
   void TOPCalModuleAlignment::setX(int moduleID, double x, double errX)
@@ -55,6 +63,7 @@ namespace Belle2 {
     }
     m_x[module] = x;
     m_errX[module] = errX;
+    m_transforms.clear();
   }
 
   void TOPCalModuleAlignment::setY(int moduleID, double y, double errY)
@@ -66,6 +75,7 @@ namespace Belle2 {
     }
     m_y[module] = y;
     m_errY[module] = errY;
+    m_transforms.clear();
   }
 
   void TOPCalModuleAlignment::setZ(int moduleID, double z, double errZ)
@@ -77,6 +87,7 @@ namespace Belle2 {
     }
     m_z[module] = z;
     m_errZ[module] = errZ;
+    m_transforms.clear();
   }
 
   void TOPCalModuleAlignment::setCalibrated(int moduleID)
@@ -87,6 +98,7 @@ namespace Belle2 {
       return;
     }
     m_status[module] = c_Calibrated;
+    m_transforms.clear();
   }
 
   void TOPCalModuleAlignment::setUnusable(int moduleID)
@@ -97,6 +109,7 @@ namespace Belle2 {
       return;
     }
     m_status[module] = c_Unusable;
+    m_transforms.clear();
   }
 
   double TOPCalModuleAlignment::getAlpha(int moduleID) const
@@ -265,39 +278,28 @@ namespace Belle2 {
   void TOPCalModuleAlignment::setTransformations() const
   {
     for (int i = 0; i < c_numModules; i++) {
-      TRotation rot;
-      TVector3 vec;
+      Transform3D T;
       if (m_status[i] == c_Calibrated) {
-        rot.RotateX(m_alpha[i]).RotateY(m_beta[i]).RotateZ(m_gamma[i]);
-        vec.SetXYZ(m_x[i], m_y[i], m_z[i]);
+        RotationX Rx(m_alpha[i]);
+        RotationY Ry(m_beta[i]);
+        RotationZ Rz(m_gamma[i]);
+        Translation3D t(m_x[i], m_y[i], m_z[i]);
+        T = Transform3D(Rz * Ry * Rx, t);
       }
-      m_rotations.push_back(rot);
-      m_translations.push_back(vec);
+      m_transforms.push_back(T);
     }
-    m_rotations.push_back(TRotation());   // for invalid module ID
-    m_translations.push_back(TVector3()); // for invalid module ID
+    m_transforms.push_back(Transform3D()); // for invalid module ID
   }
 
-  const TRotation& TOPCalModuleAlignment::getRotation(int moduleID) const
+  const Transform3D& TOPCalModuleAlignment::getTransformation(int moduleID) const
   {
-    if (m_rotations.empty()) setTransformations();
+    if (m_transforms.empty()) setTransformations();
     unsigned module = moduleID - 1;
     if (module >= c_numModules) {
-      B2ERROR("Invalid module number, returning identity rotation (" << ClassName() << ")");
-      return m_rotations[c_numModules];
+      B2ERROR("Invalid module number, returning identity transformation (" << ClassName() << ")");
+      return m_transforms[c_numModules];
     }
-    return m_rotations[module];
-  }
-
-  const TVector3& TOPCalModuleAlignment::getTranslation(int moduleID) const
-  {
-    if (m_translations.empty()) setTransformations();
-    unsigned module = moduleID - 1;
-    if (module >= c_numModules) {
-      B2ERROR("Invalid module number, returning null vector (" << ClassName() << ")");
-      return m_translations[c_numModules];
-    }
-    return m_translations[module];
+    return m_transforms[module];
   }
 
 

@@ -17,10 +17,10 @@
 
 #pragma link C++ class Belle2::EventLevelClusteringInfo+; // checksum=0x9b632f9, version=1
 
-#pragma link C++ class Belle2::Track+; // checksum=0x320e0cd9, version=4
+#pragma link C++ class Belle2::Track+; // checksum=0x1388f8ff, version=6
 #pragma link C++ class Belle2::HitPatternCDC+; // checksum=0x8d86d89e, version=-1
 #pragma link C++ class Belle2::HitPatternVXD+; // checksum=0x5599d6f5, version=-1
-#pragma link C++ class Belle2::TrackFitResult+; // checksum=0x4a60bf60, version=8
+#pragma link C++ class Belle2::TrackFitResult+; // checksum=0x87046527, version=9
 #pragma link C++ class Belle2::V0+; // checksum=0xeecaa9c4, version=3
 #pragma link C++ class pair<Belle2::TrackFitResult*, Belle2::TrackFitResult*>+; // checksum=0x62cc1b16, version=-1
 #pragma link C++ class pair<Belle2::Track*, Belle2::Track*>+; // checksum=0x43730546, version=-1
@@ -130,9 +130,9 @@
   const double omega = onfile.m_tau[2];         \
   const double tanLambda = onfile.m_tau[4];         \
   const Belle2::Helix helix(d0,0, omega, 0, tanLambda);	    \
-  const TVector3 position = helix.getPerigee();	\
+  const ROOT::Math::XYZVector position = helix.getPerigee();	\
   /* Attention! Using a hardcoded 1.5 here. */ \
-  const TVector3 momentum = helix.getMomentum(bZ);          \
+  const ROOT::Math::XYZVector momentum = helix.getMomentum(bZ);          \
   const int charge = helix.getChargeSign();		      \
   							\
   const double alpha =  1.0 / (bZ * TMath::C()) * 1E11;     \

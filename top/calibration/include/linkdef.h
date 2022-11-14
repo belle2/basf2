@@ -17,5 +17,7 @@
 #pragma link C++ class Belle2::TOP::TOPChannelMaskAlgorithm-;
 #pragma link C++ class Belle2::TOP::ValidationTreeStruct-;
 #pragma link C++ class Belle2::TOP::TOPValidationAlgorithm-;
+#pragma link C++ class Belle2::TOP::TOPEventT0OffsetAlgorithm-;
+#pragma link C++ class Belle2::TOP::TOPFillPatternOffsetAlgorithm-;
 
 #endif

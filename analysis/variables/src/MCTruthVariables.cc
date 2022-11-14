@@ -150,7 +150,7 @@ namespace Belle2 {
       const MCParticle* mcmother = mcparticle->getMother();
       if (!mcmother) return realNaN;
 
-      return mcmother->getMomentum().Mag();
+      return mcmother->getMomentum().R();
     }
 
     double genMotherIndex(const Particle* part)
@@ -346,6 +346,14 @@ namespace Belle2 {
       const auto& frame = ReferenceFrame::GetCurrent();
       ROOT::Math::PxPyPzEVector mcpP4 = mcparticle->get4Vector();
       return frame.getMomentum(mcpP4).Phi();
+    }
+
+    double mcParticleNDaughters(const Particle* part)
+    {
+      const MCParticle* mcparticle = part->getMCParticle();
+
+      if (!mcparticle) return realNaN;
+      return mcparticle->getNDaughters();
     }
 
     double particleMCRecoilMass(const Particle* part)
@@ -925,6 +933,8 @@ namespace Belle2 {
     REGISTER_VARIABLE("mcTheta", particleMCMatchTheta,
                       "The theta of matched MCParticle, NaN if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).",
                       "rad");
+    REGISTER_VARIABLE("nMCDaughters", mcParticleNDaughters,
+                      "The number of daughters of the matched MCParticle, NaN if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).");
     REGISTER_VARIABLE("mcRecoilMass", particleMCRecoilMass,
                       "The mass recoiling against the particles attached as particle's daughters calculated using MC truth values.",
                       "GeV/:math:`\\text{c}^2`");

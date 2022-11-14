@@ -114,7 +114,7 @@ void SVDClusterizerModule::beginRun()
     if (!m_recoConfig.isValid())
       B2FATAL("no valid configuration found for SVD reconstruction");
     else
-      B2INFO("SVDRecoConfiguration: from now on we are using " << m_recoConfig->get_uniqueID());
+      B2DEBUG(20, "SVDRecoConfiguration: from now on we are using " << m_recoConfig->get_uniqueID());
 
     m_timeRecoWith6SamplesAlgorithm = m_recoConfig->getTimeRecoWith6Samples();
     m_timeRecoWith3SamplesAlgorithm = m_recoConfig->getTimeRecoWith3Samples();

@@ -1,8 +1,8 @@
-# EventType: 1263752002
-# Descriptor: [B- -> [D**0 -> [D*+(D*0) -> [D0 -> K- pi+ (K- pi+ pi0)] pi+(pi0)(gamma)] pi-(pi0)] l nu]cc
+# EventType: 1263750002
+# Descriptor: [B- -> [D**0 -> [D*+(D*0) -> [D0 -> K- pi+ pi+ pi-] pi+(pi0)(gamma)] pi-(pi0)] l nu]cc
 # NickName: Bu_Dstst0lnu
-# Documentation: B0 -> D**+ e(mu) nu, D**0 -> (D*+)(D*0) -> D0 pi+(pi0)(gamma), D0 -> K- pi+ (K- pi+ pi0), background mode for inclusive tagging R(D(*))
-# Dominant channel: B- -> D_10(-> D*+(-> D0(-> K- pi+ pi0) pi+) pi-) l- anti-nu
+# Documentation: B0 -> D**+ e(mu) nu, D**0 -> (D*+)(D*0) -> D0 pi+(pi0)(gamma), D0 -> K- pi+ pi+ pi-, background mode for inclusive tagging R(D(*))
+# Dominant channel: B- -> D_10(-> D*+(-> D0(->a1+(-> rho0 pi+) K-) pi+) pi-) l- anti-nu
 # Tested: Yes
 # PhysicsWG: SL
 # Responsible: Tia Crane
@@ -26,6 +26,18 @@ Alias D_2*0sig D_2*0
 Alias anti-D_2*0sig anti-D_2*0
 ChargeConj D_2*0sig anti-D_2*0sig
 
+Alias K*0sig K*0
+Alias anti-K*0sig anti-K*0
+ChargeConj K*0sig anti-K*0sig
+
+Alias K_1-sig K_1-
+Alias K_1+sig K_1+
+ChargeConj K_1-sig K_1+sig
+
+Alias a_1-sig a_1-
+Alias a_1+sig a_1+
+ChargeConj a_1-sig a_1+sig
+
 yesPhotos
 
 Decay Upsilon(4S)
@@ -33,9 +45,8 @@ Decay Upsilon(4S)
 0.5            B- B+sig                                          VSS;
 Enddecay
 
-
 Decay B-sig
-0.007570000    D_10sig  e-  anti-nu_e                            LLSW 0.71 -1.6 -0.5 2.9;
+0.007570000 D_10sig  e-  anti-nu_e                               LLSW 0.71 -1.6 -0.5 2.9;
 0.003890000    D_0*0sig  e-  anti-nu_e                           LLSW 0.68 -0.2 0.3;;
 0.004310000    D'_10sig  e-  anti-nu_e                           LLSW 0.68 -0.2 0.3;;
 0.003730000    D_2*0sig  e-  anti-nu_e                           LLSW 0.71 -1.6 -0.5 2.9;
@@ -112,10 +123,33 @@ CDecay D*-sig
 
 
 Decay D0sig
-0.039500000    K-  pi+                                           PHSP;
-0.144000000    K-  pi+  pi0                                      D_DALITZ;
+0.005328       K-  rho0  pi+                                     PHSP;
+0.0158         anti-K*0sig  rho0                                 SVV_HELAMP  1.0 0.0 1.0 0.0 1.0 0.0;
+0.043          a_1+sig  K-                                       SVS;
+0.016          K_1-sig  pi+                                      SVS;
+0.0088         K-  pi+  pi+  pi-                                 PHSP;
 Enddecay
 CDecay anti-D0sig
+
+
+Decay K_1+sig
+0.140000000    rho0  K+                                          VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
+0.106700000    K*0sig  pi+                                       VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
+0.144400000    K+  pi+  pi-                                      PHSP;
+Enddecay
+CDecay K_1-sig
+
+
+Decay K*0sig
+1.0            K+  pi-                                           VSS;
+Enddecay
+CDecay anti-K*0sig
+
+
+Decay a_1+sig
+1.0            rho0  pi+                                         VVS_PWAVE .9788 0.0 0.0 0.0 .0212 0.0;
+Enddecay
+CDecay a_1-sig
 
 
 End

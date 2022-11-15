@@ -646,11 +646,11 @@ void RecoTrack::estimateArmTime()
   m_isArmTimeComputed = true;
   const std::vector<RecoHitInformation*>& recoHits = getRecoHitInformations(true);
   bool svdDone = false;
+  int nSVDHits = 0;
   static RecoHitInformation::RecoHitDetector und = RecoHitInformation::RecoHitDetector::c_undefinedTrackingDetector;
   RecoHitInformation::RecoHitDetector SVD = RecoHitInformation::RecoHitDetector::c_SVD;
   RecoHitInformation::RecoHitDetector detIDpre = und;
   RecoHitInformation::RecoHitDetector detIDpost = und;
-  int nSVDHits = 0;
   float clusterTimeSum = 0;
   float clusterTimeSigma2Sum = 0;
   bool trackArmTimeDone = false;
@@ -676,10 +676,12 @@ void RecoTrack::estimateArmTime()
           m_ingoingArmTime = clusterTimeSum / nSVDHits;
           m_ingoingArmTimeError = std::sqrt(clusterTimeSigma2Sum / (nSVDHits * (nSVDHits - 1)));
           m_hasIngoingArmTime = true;
+          m_nSVDHitsOfIngoingArm = nSVDHits;
         } else {
           m_outgoingArmTime = clusterTimeSum / nSVDHits;
           m_outgoingArmTimeError = std::sqrt(clusterTimeSigma2Sum / (nSVDHits * (nSVDHits - 1)));
           m_hasOutgoingArmTime = true;
+          m_nSVDHitsOfOutgoingArm = nSVDHits;
         }
         svdDone = false;
         detIDpre = detIDpost;
@@ -698,18 +700,15 @@ void RecoTrack::estimateArmTime()
         m_ingoingArmTime = clusterTimeSum / nSVDHits;
         m_ingoingArmTimeError = std::sqrt(clusterTimeSigma2Sum / (nSVDHits * (nSVDHits - 1)));
         m_hasIngoingArmTime = true;
+        m_nSVDHitsOfIngoingArm = nSVDHits;
       } else {
         m_outgoingArmTime = clusterTimeSum / nSVDHits;
         m_outgoingArmTimeError = std::sqrt(clusterTimeSigma2Sum / (nSVDHits * (nSVDHits - 1)));
-        m_hasIngoingArmTime = true;
+        m_hasOutgoingArmTime = true;
+        m_nSVDHitsOfOutgoingArm = nSVDHits;
       }
     }
   }
-
-  // Compute the difference of ingoing arm time and outgoing arm time
-  m_inOutArmTimeDiff = m_ingoingArmTime - m_outgoingArmTime;
-  m_inOutArmTimeDiffError = std::sqrt(m_ingoingArmTimeError * m_ingoingArmTimeError + m_outgoingArmTimeError *
-                                      m_outgoingArmTimeError);
 }
 
 bool RecoTrack::isOutgoingArm(RecoHitInformation::RecoHitDetector pre, RecoHitInformation::RecoHitDetector post)

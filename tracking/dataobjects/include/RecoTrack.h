@@ -526,14 +526,15 @@ namespace Belle2 {
     float getInOutArmTimeDifference()
     {
       if (!m_isArmTimeComputed) estimateArmTime();
-      return m_inOutArmTimeDiff;
+      return m_ingoingArmTime - m_outgoingArmTime;
     }
 
     /// Return the error of the difference between the track times of the ingoing and outgoing arms
     float getInOutArmTimeDifferenceError()
     {
       if (!m_isArmTimeComputed) estimateArmTime();
-      return m_inOutArmTimeDiffError;
+      return std::sqrt(m_ingoingArmTimeError * m_ingoingArmTimeError + m_outgoingArmTimeError *
+                       m_outgoingArmTimeError);
     }
 
     /// Check if the ingoing arm time is set
@@ -546,6 +547,26 @@ namespace Belle2 {
     bool hasOutgoingArmTime()
     {
       return m_hasOutgoingArmTime;
+    }
+
+    /// Return the number of clusters used to estimate the outgoing arm time
+    int getNSVDHitsOfOutgoingArm()
+    {
+      return m_nSVDHitsOfOutgoingArm;
+    }
+
+    /// Return the number of clusters used to estimate the ingoing arm time
+    int getNSVDHitsOfIngoingArm()
+    {
+      return m_nSVDHitsOfIngoingArm;
+    }
+
+    /// Swap arm times, booleans and nSVDHits
+    void swapArmTimes()
+    {
+      std::swap(m_outgoingArmTime, m_ingoingArmTime);
+      std::swap(m_hasOutgoingArmTime, m_hasIngoingArmTime);
+      std::swap(m_nSVDHitsOfOutgoingArm, m_nSVDHitsOfIngoingArm);
     }
 
     /// Return the position, the momentum and the charge of the first measured state on plane or - if unfitted - the seeds.
@@ -883,16 +904,16 @@ namespace Belle2 {
     float m_ingoingArmTime = NAN;
     /// Error of the track time of the ingoing arm
     float m_ingoingArmTimeError = NAN;
-    /// Difference of the track times of the ingoing and outgoing arms
-    float m_inOutArmTimeDiff = NAN;
-    /// Error of the difference of the track times of the ingoing and outgoing arms
-    float m_inOutArmTimeDiffError = NAN;
     /// true if the arms times are already computed, false otherwise
     bool m_isArmTimeComputed = false;
     /// Internal storage of the final ingoing arm time is set
     bool m_hasIngoingArmTime = false;
     /// Internal storage of the final outgoing arm time is set
     bool m_hasOutgoingArmTime = false;
+    /// Number of SVD clusters of the outgoing arm
+    int m_nSVDHitsOfOutgoingArm = 0;
+    /// Number of SVD clusters of the ingoing arm
+    int m_nSVDHitsOfIngoingArm = 0;
 
     /**
      * Add a generic hit with the given parameters for the reco hit information.
@@ -931,10 +952,8 @@ namespace Belle2 {
       m_hasOutgoingArmTime = false;
       m_outgoingArmTime = NAN;
       m_ingoingArmTime = NAN;
-      m_inOutArmTimeDiff = NAN;
       m_outgoingArmTimeError = NAN;
       m_ingoingArmTimeError = NAN;
-      m_inOutArmTimeDiffError = NAN;
 
       setDirtyFlag();
     }
@@ -1020,7 +1039,7 @@ namespace Belle2 {
     }
 
     /** Making this class a ROOT class.*/
-    ClassDefOverride(RecoTrack, 12);
+    ClassDefOverride(RecoTrack, 13);
   };
 
   /**

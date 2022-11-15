@@ -96,25 +96,25 @@ void SVDEventT0EstimatorModule::event()
       if (outgoingArmTime <= ingoingArmTime) {
         armTimeSum += outgoingArmTime * recoTrack.getNSVDHitsOfOutgoingArm();
         armTimeErrSum += outgoingArmTimeError * outgoingArmTimeError * recoTrack.getNSVDHitsOfOutgoingArm() *
-                         recoTrack.getNSVDHitsOfOutgoingArm();
+                         (recoTrack.getNSVDHitsOfOutgoingArm() - 1);
         numberOfSVDClusters += recoTrack.getNSVDHitsOfOutgoingArm();
       } else {
         armTimeSum += ingoingArmTime * recoTrack.getNSVDHitsOfIngoingArm();
         armTimeErrSum += ingoingArmTimeError * ingoingArmTimeError * recoTrack.getNSVDHitsOfIngoingArm() *
-                         recoTrack.getNSVDHitsOfIngoingArm();
+                         (recoTrack.getNSVDHitsOfIngoingArm() - 1);
         numberOfSVDClusters += recoTrack.getNSVDHitsOfIngoingArm();
       }
       numberOfRecoTracksUsed += 1;
     } else if (hasOutgoingArm && !hasIngoingArm) { // check if it has only outgoing arm
       armTimeSum += outgoingArmTime * recoTrack.getNSVDHitsOfOutgoingArm();
       armTimeErrSum += outgoingArmTimeError * outgoingArmTimeError * recoTrack.getNSVDHitsOfOutgoingArm() *
-                       recoTrack.getNSVDHitsOfOutgoingArm();
+                       (recoTrack.getNSVDHitsOfOutgoingArm() - 1);
       numberOfSVDClusters += recoTrack.getNSVDHitsOfOutgoingArm();
       numberOfRecoTracksUsed += 1;
     } else if (!hasOutgoingArm && hasIngoingArm) { // check if it has only ingoing arm
       armTimeSum += ingoingArmTime * recoTrack.getNSVDHitsOfIngoingArm();
       armTimeErrSum += ingoingArmTimeError * ingoingArmTimeError * recoTrack.getNSVDHitsOfIngoingArm() *
-                       recoTrack.getNSVDHitsOfIngoingArm();
+                       (recoTrack.getNSVDHitsOfIngoingArm() - 1);
       numberOfSVDClusters += recoTrack.getNSVDHitsOfIngoingArm();
       numberOfRecoTracksUsed += 1;
     } else continue;

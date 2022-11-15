@@ -394,7 +394,7 @@ indicator for the quality of the B mesons we have reconstructed.
         import matplotlib.pyplot as plt
         import uproot
         
-        df = uproot.open('B_charged_hadronic.root:variables').arrays(['Mbc'], library='pd')
+        df = uproot.open('B_charged_hadronic.root:variables').arrays(['Mbc', 'SigProb', 'FEIProbRank'], library='pd')
 
         fig, ax = plt.subplots()
 

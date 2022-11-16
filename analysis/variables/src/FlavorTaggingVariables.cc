@@ -106,9 +106,9 @@ namespace Belle2 {
         roe = &(*roeobject);
       } else {
         roe = getRelatedROEObject(part);
+        if (!roe)
+          return 0;
       }
-      if (!roe)
-        return 0;
 
       std::vector<ROOT::Math::XYZVector> p3_cms_roe;
       static const double P_MAX(3.2);
@@ -180,10 +180,9 @@ namespace Belle2 {
         } else
         {
           roe = getRelatedROEObject(particle);
+          if (!roe)
+            return 0;
         }
-
-        if (!roe)
-          return 0;
 
         std::vector<ROOT::Math::XYZVector> p3_cms_roe;
         // static const double P_MAX(3.2);

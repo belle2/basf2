@@ -15,6 +15,7 @@
 
 import argparse
 import basf2
+import b2biiConversion
 import modularAnalysis as ma
 import variables.collections as vc
 from variables import variables
@@ -29,12 +30,19 @@ arguments = parser.parse_args()
 analysis_path = basf2.create_path()
 
 # Load input file.
-ma.inputMdst(filename=basf2.find_file("mdst14.root", "validation"),
-             path=analysis_path)
+if arguments.belle1:
+    b2biiConversion.convertBelleMdstToBelleIIMdst(
+        basf2.find_file('analysis/mdstBelle1_exp65_charged.root', 'validation'),
+        path=analysis_path)
+else:
+    ma.inputMdst(filename=basf2.find_file("mdst14.root", "validation"),
+                 path=analysis_path)
 
 # Reconstruction of photons.
-gamma_list = 'gamma:all'
-ma.fillParticleList(gamma_list, '', path=analysis_path)
+gamma_list = 'gamma:mdst'
+if not arguments.belle1:
+    gamma_list = 'gamma:all'
+    ma.fillParticleList(gamma_list, '', path=analysis_path)
 
 # Reconstruction of pi0.
 mass_window = 0.02
@@ -44,7 +52,7 @@ ma.cutAndCopyList('gamma:pi0', gamma_list, 'E > 0.02', path=analysis_path)
 pi0_list = 'pi0:gamma'
 ma.reconstructDecay('pi0:gamma -> gamma:pi0 gamma:pi0', mass_cut,
                     path=analysis_path)
-if (arguments.belle1):
+if arguments.belle1:
     payload_name_suffix = 'Belle1'
 else:
     payload_name_suffix = 'Belle2Release5'

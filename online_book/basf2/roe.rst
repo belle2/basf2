@@ -299,11 +299,14 @@ Quick plots
 
      .. code-block:: python
 
-        import root_pandas
+        import uproot
         import matplotlib.pyplot as plt
 
         plt.style.use('belle2')
-        df = root_pandas.read_root('Bd2JpsiKS.root')
+        
+        var_list = ['roeM__bo__bc', 'roeM__bomy_mask__bc', 'nROE_Charged__bo__bc', 'nROE_Charged__bomy_mask__bc']
+        df = uproot.open('Bd2JpsiKS.root:tree').arrays(var_list, library='pd')
+        
         m_bins = 50
         m_range = (0, 10)
         fig, ax = plt.subplots(1,2, figsize=(15, 7))
@@ -328,11 +331,14 @@ Quick plots
 
      .. code-block:: python
 
-        import root_pandas
+        import uproot
         import matplotlib.pyplot as plt
 
         plt.style.use('belle2')
-        df = root_pandas.read_root('Bd2JpsiKS.root')
+        
+        var_list = ['roeM__bo__bc', 'roeM__bomy_mask__bc', 'nROE_Charged__bo__bc', 'nROE_Charged__bomy_mask__bc']
+        df = uproot.open('Bd2JpsiKS.root:tree').arrays(var_list, library='pd')
+        
         m_bins = 50
         m_range = (0, 10)
         fig, ax = plt.subplots(1,2, figsize=(15, 7))

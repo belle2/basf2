@@ -219,22 +219,22 @@ void CDCDedxPIDModule::event()
         const MCParticle* mother = mcpart->getMother();
         dedxTrack->m_motherPDG = mother ? mother->getPDG() : 0;
 
-        const TVector3 trueMomentum = mcpart->getMomentum();
-        dedxTrack->m_pTrue = trueMomentum.Mag();
-        dedxTrack->m_cosThetaTrue = trueMomentum.CosTheta();
+        const ROOT::Math::XYZVector trueMomentum = mcpart->getMomentum();
+        dedxTrack->m_pTrue = trueMomentum.R();
+        dedxTrack->m_cosThetaTrue = cos(trueMomentum.Theta());
       }
     } else {
       dedxTrack->m_pdg = -999;
     }
 
     // get momentum (at origin) from fit result
-    const TVector3& trackMom = fitResult->getMomentum();
-    dedxTrack->m_p = trackMom.Mag();
+    const ROOT::Math::XYZVector& trackMom = fitResult->getMomentum();
+    dedxTrack->m_p = trackMom.R();
     bool nomom = (dedxTrack->m_p != dedxTrack->m_p);
     double costh = std::cos(std::atan(1 / fitResult->getCotTheta()));
     int charge = 1;
     if (!nomom) {
-      costh = trackMom.CosTheta();
+      costh = cos(trackMom.Theta());
       charge = fitResult->getChargeSign();
     }
     dedxTrack->m_cosTheta = costh;
@@ -425,10 +425,10 @@ void CDCDedxPIDModule::event()
         if (phidiff > -3.1416 && (phidiff < 0 || phidiff > 3.1416)) doca *= -1;
 
         // The opening angle of the track momentum direction
-        const double px = pocaMom.x();
-        const double py = pocaMom.y();
-        const double wx = pocaOnWire.x();
-        const double wy = pocaOnWire.y();
+        const double px = pocaMom.X();
+        const double py = pocaMom.Y();
+        const double wx = pocaOnWire.X();
+        const double wy = pocaOnWire.Y();
         const double cross = wx * py - wy * px;
         const double dot   = wx * px + wy * py;
         double entAng = atan2(cross, dot);

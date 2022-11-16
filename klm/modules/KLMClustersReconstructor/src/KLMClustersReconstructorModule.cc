@@ -184,7 +184,7 @@ clusterFound:;
         p = 0;
     }*/
     klmCluster = m_KLMClusters.appendNew(
-                   hitPos.x(), hitPos.y(), hitPos.z(), minTime, nLayers,
+                   hitPos.X(), hitPos.Y(), hitPos.Z(), minTime, nLayers,
                    innermostLayer, p);
     for (it = klmClusterHits.begin(); it != klmClusterHits.end(); ++it)
       klmCluster->addRelationTo(*it);

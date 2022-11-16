@@ -226,12 +226,12 @@ void MCTrackCandClassifierModule::event()
       MCParticleInfo mcParticleInfo(mcParticle, m_magField);
 
       B2Vector3D decayVertex = mcParticle.getProductionVertex();
-      TVector3 mom = mcParticle.getMomentum();
+      ROOT::Math::XYZVector mom = mcParticle.getMomentum();
       double charge = mcParticle.getCharge();
       double omega = mcParticleInfo.getOmega();
-      double px = mom.Px();
-      double py = mom.Py();
-      double pt = mom.Pt();
+      double px = mom.x();
+      double py = mom.y();
+      double pt = mom.Rho();
       double x = decayVertex.X();
       double y = decayVertex.Y();
       double R = 1 / abs(omega); //cm
@@ -242,7 +242,7 @@ void MCTrackCandClassifierModule::event()
       double Cx = x + alpha * py; //cm
       double Cy = y - alpha * px; //cm
 
-      TVector3 center(Cx, Cy, 0);
+      ROOT::Math::XYZVector center(Cx, Cy, 0);
 
       //recover Clusters and loop on them
       int Nhits = mcTrackCand.getNHits();
@@ -343,7 +343,7 @@ void MCTrackCandClassifierModule::event()
             nBarrel++;
         }
 
-        TVector3 globalHit = aSensorInfo.pointToGlobal(TVector3(uCoor, vCoor, 0), true);
+        ROOT::Math::XYZVector globalHit = aSensorInfo.pointToGlobal(ROOT::Math::XYZVector(uCoor, vCoor, 0), true);
         double hitRadius = theDistance(center, globalHit);
 
         bool accepted1 = true;
@@ -356,7 +356,7 @@ void MCTrackCandClassifierModule::event()
           B2DEBUG(21, "     semiplane: REJECTED, next track");
         }
 
-        double dR = compute_dR(thetaMS, theDistance(TVector3(0, 0, 0), globalHit));
+        double dR = compute_dR(thetaMS, theDistance(ROOT::Math::XYZVector(0, 0, 0), globalHit));
         m_h1_dR->Fill(dR);
         m_h1_dRoverR->Fill(dR * abs(omega));
         m_h1_distOVERdR->Fill((hitRadius - abs(1 / omega)) / dR);
@@ -386,11 +386,11 @@ void MCTrackCandClassifierModule::event()
 
         if (accepted2 && accepted1 && accepted3 && accepted4) {
           nGoodTrueHits ++;
-          m_h1_hitDistance_accepted->Fill(theDistance(TVector3(0, 0, 0), globalHit));
+          m_h1_hitDistance_accepted->Fill(theDistance(ROOT::Math::XYZVector(0, 0, 0), globalHit));
           m_h1_hitRadius_accepted->Fill(hitRadius);
         } else {
           nBadTrueHits ++;
-          m_h1_hitDistance_rejected->Fill(theDistance(TVector3(0, 0, 0), globalHit));
+          m_h1_hitDistance_rejected->Fill(theDistance(ROOT::Math::XYZVector(0, 0, 0), globalHit));
           m_h1_hitRadius_rejected->Fill(hitRadius);
           if (m_removeBadHits)
             firstRejectedHit = cluster;
@@ -501,9 +501,9 @@ void MCTrackCandClassifierModule::terminate()
 }
 
 
-double MCTrackCandClassifierModule::semiPlane(TVector3 vertex, TVector3 center, TVector3 hit)
+double MCTrackCandClassifierModule::semiPlane(ROOT::Math::XYZVector vertex, ROOT::Math::XYZVector center, ROOT::Math::XYZVector hit)
 {
-  TVector3 err = center - vertex;
+  ROOT::Math::XYZVector err = center - vertex;
 
   double semiPlane = err.Y() / err.X() * hit.X() + err.Y() / err.X() * vertex.x() - vertex.Y();
 
@@ -531,7 +531,7 @@ bool MCTrackCandClassifierModule::isInSemiPlane(double semiPlane, double omega)
 }
 
 
-double MCTrackCandClassifierModule::theDistance(TVector3 center, TVector3 hit)
+double MCTrackCandClassifierModule::theDistance(ROOT::Math::XYZVector center, ROOT::Math::XYZVector hit)
 {
   double xSquared = TMath::Power(center.X() - hit.X(), 2);
   double ySquared = TMath::Power(center.Y() - hit.Y(), 2);

@@ -8,6 +8,7 @@
 
 #include <pxd/utilities/PXDUtilities.h>
 #include <framework/logging/Logger.h>
+#include <framework/geometry/XYZVectorToTVector3Converter.h>
 #include <pxd/reconstruction/PXDPixelMasker.h>
 
 namespace Belle2 {
@@ -18,9 +19,9 @@ namespace Belle2 {
       RecoTrack& recoTrack, double lambda)
     {
       // get sensor plane, always enable alignment.
-      auto centerP = pxdSensorInfo.pointToGlobal(TVector3(0, 0, 0), true);
-      auto normalV = pxdSensorInfo.vectorToGlobal(TVector3(0, 0, 1), true);
-      genfit::SharedPlanePtr sensorPlaneSptr(new genfit::DetPlane(centerP, normalV));
+      auto centerP = pxdSensorInfo.pointToGlobal(ROOT::Math::XYZVector(0, 0, 0), true);
+      auto normalV = pxdSensorInfo.vectorToGlobal(ROOT::Math::XYZVector(0, 0, 1), true);
+      genfit::SharedPlanePtr sensorPlaneSptr(new genfit::DetPlane(XYZToTVector(centerP), XYZToTVector(normalV)));
 
       // genfit track and measured state on plane
       const genfit::Track& gfTrack = RecoTrackGenfitAccess::getGenfitTrack(recoTrack);
@@ -33,7 +34,7 @@ namespace Belle2 {
         B2DEBUG(20, "extrapolation to plane failed! Lambda = " << lambda);
         return std::shared_ptr<TrackState>(nullptr);
       }
-      auto intersec = pxdSensorInfo.pointToLocal(statePtr->getPos(), true);
+      auto intersec = pxdSensorInfo.pointToLocal(ROOT::Math::XYZVector(statePtr->getPos()), true);
 
       // check if the intersection is inside (no tolerance).
       double tolerance = 0.0;

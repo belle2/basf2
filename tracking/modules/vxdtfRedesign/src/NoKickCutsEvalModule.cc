@@ -112,7 +112,7 @@ void NoKickCutsEvalModule::event()
     if (XP8.size() > 0) {
       for (int i = 0; (i + 1) < (int)XP8.size(); i++) {
         for (int par = 0; par < c_nbinpar; par++) {
-          int p = (int)((XP8.at(i).m_momentum0.Mag() - c_pmin) / c_pwidth);
+          int p = (int)((XP8.at(i).m_momentum0.R() - c_pmin) / c_pwidth);
           if (p > c_nbinp - 1 || p < 0) {
             m_pCounter++;
             continue;

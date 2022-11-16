@@ -7,9 +7,13 @@
  **************************************************************************/
 
 #include <top/reconstruction_cpp/ModuleAlignment.h>
-#include <TVector3.h>
-#include <TRotation.h>
+#include <Math/RotationX.h>
+#include <Math/RotationY.h>
+#include <Math/RotationZ.h>
+#include <Math/Translation3D.h>
+#include <Math/Transform3D.h>
 #include <TDecompChol.h>
+
 
 namespace Belle2 {
   namespace TOP {
@@ -110,10 +114,12 @@ namespace Belle2 {
 
     double ModuleAlignment::getLogL(const std::vector<double>& par, bool& ok)
     {
-      TVector3 translation(par[0], par[1], par[2]);
-      TRotation rotation;
-      rotation.RotateX(par[3]).RotateY(par[4]).RotateZ(par[5]);
-      ok = m_track->overrideTransformation(rotation, translation);
+      ROOT::Math::Translation3D t(par[0], par[1], par[2]);
+      ROOT::Math::RotationX Rx(par[3]);
+      ROOT::Math::RotationY Ry(par[4]);
+      ROOT::Math::RotationZ Rz(par[5]);
+      ROOT::Math::Transform3D T(Rz * Ry * Rx, t);
+      ok = m_track->overrideTransformation(T);
       if (not ok) return 0;
 
       PDFConstructor pdfConstructor(*m_track, m_hypothesis, m_opt);

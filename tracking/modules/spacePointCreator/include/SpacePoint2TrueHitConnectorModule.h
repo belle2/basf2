@@ -395,7 +395,7 @@ namespace Belle2 {
 
     /** get the local (.first) and global (.second) position of a TrueHit (passed by index) */
     template<typename TrueHitType>
-    std::pair<TVector3, TVector3> getTrueHitPositions(TrueHitType* trueHit);
+    std::pair<ROOT::Math::XYZVector, ROOT::Math::XYZVector> getTrueHitPositions(TrueHitType* trueHit);
 
     /** initialize the root file that is used for output */
     void initializeRootFile();

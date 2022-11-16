@@ -15,6 +15,8 @@
 #include <framework/datastore/StoreArray.h>
 #include <svd/dataobjects/SVDRecoDigit.h>
 
+#include <TMath.h>
+
 using namespace std;
 
 namespace Belle2 {

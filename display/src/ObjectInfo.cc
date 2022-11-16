@@ -59,7 +59,7 @@ TString ObjectInfo::getInfo(const TObject* obj)
   if (auto relObj = dynamic_cast<const RelationsObject*>(obj)) {
     return relObj->getInfoHTML();
   } else if (auto vertex = dynamic_cast<const genfit::GFRaveVertex*>(obj)) {
-    return "<b>V</b>=" + HTML::getString(vertex->getPos()) + "<br>" +
+    return "<b>V</b>=" + HTML::getString(ROOT::Math::XYZVector(vertex->getPos())) + "<br>" +
            TString::Format("pVal=%e", TMath::Prob(vertex->getChi2(), vertex->getNdf()));
   }
   return callStringMethod(obj, "getInfoHTML");

@@ -167,8 +167,9 @@ With:
         # n.b. slightly unfortunate syntax: the MagneticField is a member of the
         # Belle2 namespace but will be set to the Belle 1 values
         from ROOT import Belle2  # reduced scope of potentially-misbehaving import
+        from ROOT.Math import XYZVector
         belle1_field = Belle2.MagneticField()
-        belle1_field.addComponent(Belle2.MagneticFieldComponentConstant(Belle2.B2Vector3D(0, 0, 1.5 * Belle2.Unit.T)))
+        belle1_field.addComponent(Belle2.MagneticFieldComponentConstant(XYZVector(0, 0, 1.5 * Belle2.Unit.T)))
         Belle2.DBStore.Instance().addConstantOverride("MagneticField", belle1_field, False)
         # also set the MC matching for Belle 1
         setAnalysisConfigParams({'mcMatchingVersion': 'Belle'}, path)
@@ -3545,10 +3546,10 @@ def applyChargedPidMVA(particleLists, path, trainingMode, chargeIndependent=Fals
 
     The module can perform either 'binary' PID between input S, B particle mass hypotheses according to the following scheme:
 
-    - e (11) vs. pi (211)
-    - mu (13) vs. pi (211)
-    - pi (211) vs. K (321)
-    - K (321) vs. pi (211)
+    * e (11) vs. pi (211)
+    * mu (13) vs. pi (211)
+    * pi (211) vs. K (321)
+    * K (321) vs. pi (211)
 
     , or 'global' PID, namely "one-vs-others" separation. The latter exploits an MVA algorithm trained in multi-class mode,
     and it's the default behaviour. Currently, the multi-class training separates the following standard charged hypotheses:
@@ -3560,8 +3561,11 @@ def applyChargedPidMVA(particleLists, path, trainingMode, chargeIndependent=Fals
         it is necessary to append the latest analysis global tag (GT) to the steering script.
 
     Parameters:
-        particleLists (list(str)): list of names of ParticleList objects for charged stable particles.
-                                   The charge-conjugate ParticleLists will be also processed automatically.
+        particleLists (list(str)): the input list of DecayStrings, where each selected (^) daughter should correspond to a
+                                   standard charged ParticleList, e.g. ``['Lambda0:sig -> ^p+ ^pi-', 'J/psi:sig -> ^mu+ ^mu-']``.
+                                   One can also directly pass a list of standard charged ParticleLists,
+                                   e.g. ``['e+:my_electrons', 'pi+:my_pions']``.
+                                   Note that charge-conjugated ParticleLists will automatically be included.
         path (basf2.Path): the module is added to this path.
         trainingMode (``Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode``): enum identifier of the training mode.
           Needed to pick up the correct payload from the DB. Available choices:
@@ -3660,14 +3664,17 @@ def applyChargedPidMVA(particleLists, path, trainingMode, chargeIndependent=Fals
         for name in plSet:
             if not decayDescriptor.init(name):
                 raise ValueError(f"Invalid particle list {name} in applyChargedPidMVA!")
+            msg = f"Input ParticleList: {name}"
             pdgs = [abs(decayDescriptor.getMother().getPDGCode())]
             daughter_pdgs = decayDescriptor.getSelectionPDGCodes()
             if len(daughter_pdgs) > 0:
                 pdgs = daughter_pdgs
-            for pdg in pdgs:
-                if pdg not in binaryHypoPDGCodes:
-                    B2WARNING("Given ParticleList: ", name, " (", pdg, ") is neither signal (", binaryHypoPDGCodes[0],
-                              ") nor background (", binaryHypoPDGCodes[1], ").")
+            for idaughter, pdg in enumerate(pdgs):
+                if abs(pdg) not in binaryHypoPDGCodes:
+                    if daughter_pdgs:
+                        msg = f"Selected daughter {idaughter} in ParticleList: {name}"
+                    B2WARNING(
+                        f"{msg} (PDG={pdg}) is neither signal ({binaryHypoPDGCodes[0]}) nor background ({binaryHypoPDGCodes[1]}).")
 
         chargedpid = register_module("ChargedPidMVA")
         chargedpid.set_name(f"ChargedPidMVA_{binaryHypoPDGCodes[0]}_vs_{binaryHypoPDGCodes[1]}_{mode}")
@@ -3694,8 +3701,8 @@ def calculateTrackIsolation(
         highest_prob_mass_for_ext=True,
         exclude_pid_det_weights=False):
     """
-    Given an input decay string, compute variables that quantify track-based "isolation" of the charged
-    stable particles in the decay chain.
+    Given an input decay string, compute variables that quantify track helix-based isolation of the charged
+    stable particles in the input decay chain.
 
     Note:
         An "isolation score" can be defined using the distance
@@ -3707,23 +3714,30 @@ def calculateTrackIsolation(
     The definition of distance and the number of distances that are calculated per sub-detector is based on
     the following recipe:
 
-    - CDC: as the segmentation is very coarse along z,
-           the distance is defined as the cord length on the (rho=R, phi) plane.
-           A total of 9 distances are calculated: the cylindrical surfaces are defined at R values
-           that correspond to the positions of the 9 CDC wire superlayers.
-    - TOP: as there is no segmentation along z,
-           the distance is defined as the cord length on the (rho=R, phi) plane.
-           Only one distance at the TOP entry radius is calculated.
-    - ARICH: as there is no segmentation along z,
-             the distance is defined as the distance on the (rho, phi) plane at fixed z=Z.
-             Only one distance at the ARICH photon detector Z entry coordinate is calculated.
-    - ECL: the distance is defined on the (rho=R, phi, z) surface in the barrel,
-           on the (rho, phi, z=Z) surface in the endcaps.
-           Two distances are calculated: one at the ECL entry radius R (barrel), entry Z (endcaps),
-           and one at R, Z corresponding roughly to the mid-point of the longitudinal size of the crystals.
-    - KLM: the distance is defined on the (rho=R, phi, z) surface in the barrel,
-           on the (rho, phi, z=Z) surface in the endcaps.
-           Only one distance at the KLM first strip entry radius R (barrel), Z (endcaps) is calculated.
+    * **CDC**: as the segmentation is very coarse along :math:`z`,
+      the distance is defined as the cord length on the :math:`(\\rho=R, \\phi)` plane.
+      A total of 9 distances are calculated: the cylindrical surfaces are defined at radiuses
+      that correspond to the positions of the 9 CDC wire superlayers: :math:`R_{i}^{\\mathrm{CDC}}~(i \\in \\{0,...,8\\})`.
+
+    * **TOP**: as there is no segmentation along :math:`z`,
+      the distance is defined as the cord length on the :math:`(\\rho=R, \\phi)` plane.
+      Only one distance at the TOP entry radius :math:`R_{0}^{\\mathrm{TOP}}` is calculated.
+
+    * **ARICH**: as there is no segmentation along :math:`z`,
+      the distance is defined as the distance on the :math:`(\\rho=R, \\phi)` plane at fixed :math:`z=Z`.
+      Only one distance at the ARICH photon detector entry coordinate :math:`Z_{0}^{\\mathrm{ARICH}}` is calculated.
+
+    * **ECL**: the distance is defined on the :math:`(\\rho=R, \\phi, z)` surface in the barrel,
+      on the :math:`(\\rho, \\phi, z=Z)` surface in the endcaps.
+      Two distances are calculated: one at the ECL entry surface :math:`R_{0}^{\\mathrm{ECL}}` (barrel),
+      :math:`Z_{0}^{\\mathrm{ECL}}` (endcaps), and one at :math:`R_{1}^{\\mathrm{ECL}}` (barrel),
+      :math:`Z_{1}^{\\mathrm{ECL}}` (endcaps), corresponding roughly to the mid-point
+      of the longitudinal size of the crystals.
+
+    * **KLM**: the distance is defined on the :math:`(\\rho=R, \\phi, z)` surface in the barrel,
+      on the :math:`(\\rho, \\phi, z=Z)` surface in the endcaps.
+      Only one distance at the KLM first strip entry surface :math:`R_{0}^{\\mathrm{KLM}}` (barrel),
+      :math:`Z_{0}^{\\mathrm{KLM}}` (endcaps) is calculated.
 
     Parameters:
         decay_string (str): name of the input decay string with selected charged stable daughters,
@@ -3752,8 +3766,7 @@ def calculateTrackIsolation(
                                                   for the particle species of interest.
 
     Returns:
-        dict(int, list(str)): a dictionary mapping the PDG code of each reference particle list
-                              and the associated isolation metavariables.
+        dict(int, list(str)): a dictionary mapping the PDG of each reference particle list to its isolation variables.
 
     """
 

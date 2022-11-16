@@ -192,7 +192,7 @@ namespace Belle2 {
       if (!particle)
         return std::numeric_limits<float>::quiet_NaN();
 
-      B2Vector3F v0Vertex = particle->getVertex();
+      ROOT::Math::XYZVector v0Vertex = particle->getVertex();
 
       const Particle* daug = particle->getDaughter(daughterID[0]);
 
@@ -215,7 +215,7 @@ namespace Belle2 {
       if (!particle)
         return std::numeric_limits<float>::quiet_NaN();
 
-      B2Vector3F v0Vertex = particle->getVertex();
+      ROOT::Math::XYZVector v0Vertex = particle->getVertex();
 
       const Particle* daug = particle->getDaughter(daughterID[0]);
 
@@ -255,8 +255,8 @@ namespace Belle2 {
       if (!trackFit) { return std::numeric_limits<double>::quiet_NaN(); }
 
       // MC information
-      const B2Vector3D mcProdVertex   = mcparticle->getVertex();
-      const B2Vector3D mcMomentum     = mcparticle->getMomentum();
+      const ROOT::Math::XYZVector mcProdVertex   = mcparticle->getVertex();
+      const ROOT::Math::XYZVector mcMomentum     = mcparticle->getMomentum();
       const double mcParticleCharge = mcparticle->getCharge();
       const double BzAtProdVertex = BFieldManager::getFieldInTesla(mcProdVertex).Z();
       Helix mcHelix = Helix(mcProdVertex, mcMomentum, mcParticleCharge, BzAtProdVertex);

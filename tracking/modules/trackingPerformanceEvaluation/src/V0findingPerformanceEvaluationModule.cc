@@ -113,11 +113,11 @@ void V0findingPerformanceEvaluationModule::initialize()
 
   //histograms to produce efficiency plots
   Double_t bins_pt[9 + 1] = {0, 0.05, 0.1, 0.15, 0.2, 0.3, 0.5, 1, 2, 3.5}; //GeV/c
-  Double_t bins_theta[10 + 1] = {0, 0.25, 0.5, 0.75, 0.75 + 0.32, 0.75 + 2 * 0.32, 0.75 + 3 * 0.32, 0.75 + 4 * 0.32, 0.75 + 5 * 0.32, 2.65, TMath::Pi()};
+  Double_t bins_theta[10 + 1] = {0, 0.25, 0.5, 0.75, 0.75 + 0.32, 0.75 + 2 * 0.32, 0.75 + 3 * 0.32, 0.75 + 4 * 0.32, 0.75 + 5 * 0.32, 2.65, M_PI};
   Double_t bins_phi[14 + 1];
-  Double_t width_phi = 2 * TMath::Pi() / 14;
+  Double_t width_phi = 2 * M_PI / 14;
   for (int bin = 0; bin < 14 + 1; bin++)
-    bins_phi[bin] = - TMath::Pi() + bin * width_phi;
+    bins_phi[bin] = - M_PI + bin * width_phi;
 
   m_h1_MCParticle_R = createHistogram1D("h1nMCParticleVSr", "entry per MCParticles", 50, 0, 20, "transverse L", m_histoList);
 
@@ -151,7 +151,7 @@ void V0findingPerformanceEvaluationModule::beginRun()
 void V0findingPerformanceEvaluationModule::event()
 {
 
-  B2Vector3D magField = BFieldManager::getField(0, 0, 0) / Unit::T;
+  ROOT::Math::XYZVector magField = BFieldManager::getField(0, 0, 0) / Unit::T;
 
   B2DEBUG(29, "+++++ 1. loop on MCParticles");
   for (const MCParticle& mcParticle : m_MCParticles) {
@@ -172,11 +172,11 @@ void V0findingPerformanceEvaluationModule::event()
 
     MCParticleInfo mcParticleInfo(mcParticle, magField);
 
-    B2Vector3D MC_prodvtx = mcParticle.getVertex();
-    TVector3 MC_vtx = mcParticle.getDecayVertex();
-    float MC_mom = mcParticle.getMomentum().Mag();
+    ROOT::Math::XYZVector MC_prodvtx = mcParticle.getVertex();
+    ROOT::Math::XYZVector MC_vtx = mcParticle.getDecayVertex();
+    float MC_mom = mcParticle.getMomentum().R();
     float MC_mass = mcParticle.getMass();
-    TVector3 MC_FL = MC_vtx - MC_prodvtx;
+    ROOT::Math::XYZVector MC_FL = MC_vtx - MC_prodvtx;
     float flightR = sqrt(MC_FL.X() * MC_FL.X() + MC_FL.Y() * MC_FL.Y());
     m_h1_MCParticle_R->Fill(flightR);
 
@@ -195,7 +195,7 @@ void V0findingPerformanceEvaluationModule::event()
 
     for (int v0 = 0; v0 < (int)V0s_toMCParticle.size(); v0++) {
 
-      TVector3 V0_vtx = V0s_toMCParticle[v0]->getVertexPosition();
+      ROOT::Math::XYZVector V0_vtx = V0s_toMCParticle[v0]->getVertexPosition();
       float V0_mom = V0s_toMCParticle[v0]->getFittedMomentum();
       float V0_chi2 = V0s_toMCParticle[v0]->getVertexChi2();
       float V0_mass = V0s_toMCParticle[v0]->getFittedInvariantMass();

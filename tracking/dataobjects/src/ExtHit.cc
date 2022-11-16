@@ -38,7 +38,7 @@ ExtHit::ExtHit() :
 
 // Constructor with initial values
 ExtHit::ExtHit(int pdgCode, Const::EDetector detectorID, int copyID, ExtHitStatus status, bool backwardPropagation, double tof,
-               const TVector3& position, const TVector3& momentum, const TMatrixDSym& covariance) :
+               const ROOT::Math::XYZPoint& position, const ROOT::Math::XYZVector& momentum, const TMatrixDSym& covariance) :
   RelationsObject(),
   m_PdgCode(pdgCode),
   m_DetectorID(detectorID),

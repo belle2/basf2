@@ -21,8 +21,8 @@ namespace {
 
   TEST(UncertainHelixTest, CartesianCovarianceRoundtripWithPerigeeOnOrigin)
   {
-    TVector3 expectedMomentum(1.0, 0.0, 0.0);
-    TVector3 expectedPosition(0.0, 0.0, 0.0);
+    ROOT::Math::XYZVector expectedMomentum(1.0, 0.0, 0.0);
+    ROOT::Math::XYZVector expectedPosition(0.0, 0.0, 0.0);
     const double expectedCharge = -1;
     const double bZ = 2;
     const double pValue = 0.5;
@@ -43,8 +43,8 @@ namespace {
                                   expectedCov6,
                                   pValue);
 
-    const TVector3 position = uncertainHelix.getPerigee();
-    const TVector3 momentum = uncertainHelix.getMomentum(bZ);
+    const ROOT::Math::XYZVector position = uncertainHelix.getPerigee();
+    const ROOT::Math::XYZVector momentum = uncertainHelix.getMomentum(bZ);
     const double charge = uncertainHelix.getChargeSign();
     const TMatrixDSym cov6 = uncertainHelix.getCartesianCovariance(bZ);
 
@@ -68,8 +68,8 @@ namespace {
 
   TEST(UncertainHelixTest, CartesianCovarianceRoundtripAtPerigeeBesidesOrigin)
   {
-    TVector3 expectedMomentum(1.0, 0.0, 0.0);
-    TVector3 expectedPosition(0.0, 1.0, 0.0);
+    ROOT::Math::XYZVector expectedMomentum(1.0, 0.0, 0.0);
+    ROOT::Math::XYZVector expectedPosition(0.0, 1.0, 0.0);
     const double expectedCharge = -1;
     const double bZ = 2;
     const double pValue = 0.5;
@@ -97,8 +97,8 @@ namespace {
                                   expectedCov6,
                                   pValue);
 
-    const TVector3 position = uncertainHelix.getPerigee();
-    const TVector3 momentum = uncertainHelix.getMomentum(bZ);
+    const ROOT::Math::XYZVector position = uncertainHelix.getPerigee();
+    const ROOT::Math::XYZVector momentum = uncertainHelix.getMomentum(bZ);
     const double charge = uncertainHelix.getChargeSign();
     const TMatrixDSym cov6 = uncertainHelix.getCartesianCovariance(bZ);
 
@@ -147,8 +147,8 @@ namespace {
 
   TEST(UncertainHelixTest, CartesianCovarianceRoundtripAtPerigeeBesidesOriginIndividualCoordinates)
   {
-    TVector3 expectedMomentum(1.0, 0.0, 0.0);
-    TVector3 expectedPosition(0.0, 1.0, 0.0);
+    ROOT::Math::XYZVector expectedMomentum(1.0, 0.0, 0.0);
+    ROOT::Math::XYZVector expectedPosition(0.0, 1.0, 0.0);
     const double expectedCharge = -1;
     const double bZ = 2;
     const double pValue = 0.5;
@@ -168,8 +168,8 @@ namespace {
                                     expectedCov6,
                                     pValue);
 
-      const TVector3 position = uncertainHelix.getPerigee();
-      const TVector3 momentum = uncertainHelix.getMomentum(bZ);
+      const ROOT::Math::XYZVector position = uncertainHelix.getPerigee();
+      const ROOT::Math::XYZVector momentum = uncertainHelix.getMomentum(bZ);
       const double charge = uncertainHelix.getChargeSign();
       const TMatrixDSym cov6 = uncertainHelix.getCartesianCovariance(bZ);
 
@@ -236,8 +236,8 @@ namespace {
 
       UncertainHelix uncertainHelix(d0, phi0, omega, z0, tanLambda, expectedCov5, pValue);
 
-      const TVector3 position = uncertainHelix.getPerigee();
-      const TVector3 momentum = uncertainHelix.getMomentum(bZ);
+      const ROOT::Math::XYZVector position = uncertainHelix.getPerigee();
+      const ROOT::Math::XYZVector momentum = uncertainHelix.getMomentum(bZ);
       const double charge = uncertainHelix.getChargeSign();
       const TMatrixDSym cov6 = uncertainHelix.getCartesianCovariance(bZ);
 
@@ -317,8 +317,8 @@ namespace {
                                   expectedCov5,
                                   pValue);
 
-    const TVector3 position = uncertainHelix.getPerigee();
-    const TVector3 momentum = uncertainHelix.getMomentum(bZ);
+    const ROOT::Math::XYZVector position = uncertainHelix.getPerigee();
+    const ROOT::Math::XYZVector momentum = uncertainHelix.getMomentum(bZ);
     const double charge = uncertainHelix.getChargeSign();
     const TMatrixDSym cov6 = uncertainHelix.getCartesianCovariance(bZ);
 
@@ -395,8 +395,8 @@ namespace {
 
     UncertainHelix uncertainHelix(d0, phi0, omega, z0, tanLambda, expectedCov5, pValue);
 
-    const TVector3 position = uncertainHelix.getPerigee();
-    const TVector3 momentum = uncertainHelix.getMomentum(bZ);
+    const ROOT::Math::XYZVector position = uncertainHelix.getPerigee();
+    const ROOT::Math::XYZVector momentum = uncertainHelix.getMomentum(bZ);
     const double charge = uncertainHelix.getChargeSign();
     const TMatrixDSym cov6 = uncertainHelix.getCartesianCovariance(bZ);
 
@@ -441,7 +441,7 @@ namespace {
   TEST(UncertainHelixTest, MoveInCartesianVersusMoveInPerigeeCoordinates)
   {
     // Move of the coordinate system
-    TVector3 moveBy(0.5, -1, 0.5);
+    ROOT::Math::XYZVector moveBy(0.5, -1, 0.5);
 
     double d0 = 1;
     double phi0 = 0;
@@ -462,13 +462,13 @@ namespace {
 
     UncertainHelix uncertainHelix(d0, phi0, omega, z0, tanLambda, initialCov5, pValue);
 
-    const TVector3 position = uncertainHelix.getPerigee();
-    const TVector3 momentum = uncertainHelix.getMomentum(bZ);
+    const ROOT::Math::XYZVector position = uncertainHelix.getPerigee();
+    const ROOT::Math::XYZVector momentum = uncertainHelix.getMomentum(bZ);
     const double charge = uncertainHelix.getChargeSign();
     const TMatrixDSym cov6 = uncertainHelix.getCartesianCovariance(bZ);
 
     // Execute the move in cartesian coordinates
-    const TVector3 movedPosition = position - moveBy;
+    const ROOT::Math::XYZVector movedPosition = position - moveBy;
     UncertainHelix movedUncertainHelix(movedPosition,
                                        momentum,
                                        charge,

@@ -416,9 +416,9 @@ void CDCDigitizerModule::event()
       fwp = fwpAlign;
 
       if (m_correctForWireSag) {
-        double zpos = m_posWire.z();
-        double bckYSag = bwp.y();
-        double forYSag = fwp.y();
+        double zpos = m_posWire.Z();
+        double bckYSag = bwp.Y();
+        double forYSag = fwp.Y();
 
         //        CDCGeometryPar::EWirePosition set = m_align ?
         //                                            CDCGeometryPar::c_Aligned : CDCGeometryPar::c_Base;
@@ -486,7 +486,7 @@ void CDCDigitizerModule::event()
 
     //Sum ADC count
     const double stepLength  = m_aCDCSimHit->getStepLength() * Unit::cm;
-    const double costh = m_momentum.z() / m_momentum.Mag();
+    const double costh = m_momentum.Z() / m_momentum.Mag();
     double hitdE = m_aCDCSimHit->getEnergyDep();
     if (m_cdcgp->getMaterialDefinitionMode() != 2) {  // for non wire-by-wire mode
       static EDepInGas& edpg = EDepInGas::getInstance();

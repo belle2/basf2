@@ -75,7 +75,7 @@ def peel_mc_particle(mc_particle, key="{part_name}"):
             tan_lambda_truth=helix.getTanLambda(),
 
             # At the vertex position
-            pt_truth=momentum.Perp(),
+            pt_truth=momentum.Rho(),
             px_truth=momentum.X(),
             py_truth=momentum.Y(),
             pz_truth=momentum.Z(),
@@ -83,7 +83,7 @@ def peel_mc_particle(mc_particle, key="{part_name}"):
             y_truth=vertex.Y(),
             z_truth=vertex.Z(),
 
-            decay_vertex_radius_truth=decay_vertex.Mag(),
+            decay_vertex_radius_truth=decay_vertex.R(),
             decay_vertex_x_truth=decay_vertex.X(),
             decay_vertex_y_truth=decay_vertex.Y(),
             decay_vertex_z_truth=decay_vertex.Z(),
@@ -473,7 +473,7 @@ def peel_track_fit_result(track_fit_result, key="{part_name}"):
         mom = track_fit_result.getMomentum()
         pos = track_fit_result.getPosition()
 
-        pt_estimate = mom.Perp()
+        pt_estimate = mom.Rho()
 
         pt_variance = np.divide(
             mom.X() ** 2 * cov6(3, 3) + mom.Y() ** 2 * cov6(4, 4) - 2 * mom.X() * mom.Y() * cov6(3, 4),
@@ -707,7 +707,7 @@ def get_seed_track_fit_result(reco_track):
     # It does not matter, which particle we put in here, so we just use a pion
     particle_type = Belle2.Const.pion
     p_value = float('nan')
-    b_field = Belle2.BFieldManager.getField(position).Z() / Belle2.Unit.T
+    b_field = Belle2.BFieldManager.getField(ROOT.Math.XYZVector(position)).Z() / Belle2.Unit.T
     cdc_hit_pattern = 0
     svd_hit_pattern = 0
     # the value 0xFFFF will cause the TrackFitResult::getNDF() to return -1

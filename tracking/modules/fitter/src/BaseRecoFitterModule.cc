@@ -129,17 +129,15 @@ void BaseRecoFitterModule::event()
         //Calculate probability
         double pValue = recoTrack.getTrackFitStatus(trackRep)->getPVal();
         B2DEBUG(28, "       pValue of the fit: " << pValue);
-        const genfit::MeasuredStateOnPlane& mSoPAtFirstHit = recoTrack.getMeasuredStateOnPlaneFromFirstHit(trackRep);
-        B2DEBUG(28, "Charge after fit " << mSoPAtFirstHit.getCharge());
-        B2DEBUG(28, "Position after fit " << mSoPAtFirstHit.getPos().X() << " " << mSoPAtFirstHit.getPos().Y() << " " <<
-                mSoPAtFirstHit.getPos().Z());
-        B2DEBUG(28, "Momentum after fit " << mSoPAtFirstHit.getMom().X() << " " << mSoPAtFirstHit.getMom().Y() << " " <<
-                mSoPAtFirstHit.getMom().Z());
+        const genfit::MeasuredStateOnPlane& mSoP = recoTrack.getMeasuredStateOnPlaneFromFirstHit(trackRep);
+        B2DEBUG(28, "Charge after fit " << mSoP.getCharge());
+        B2DEBUG(28, "Position after fit " << mSoP.getPos().X() << " " << mSoP.getPos().Y() << " " << mSoP.getPos().Z());
+        B2DEBUG(28, "Momentum after fit " << mSoP.getMom().X() << " " << mSoP.getMom().Y() << " " << mSoP.getMom().Z());
 
-        // Get the charge from the measuredStateOnPlane at the last hit. If this charge, which is the charge after the track
-        // fit, is not equal to the charge seed of the RecoTrack, flip the track and reorder the hits.
-        if (m_param_flipTrackIfFittedChargeNEQSeedCharge and recoTrack.getChargeSeed() != mSoPAtFirstHit.getCharge()) {
-          recoTrack.flipTrackDirectionAndCharge(mSoPAtFirstHit);
+        // Get the charge from the measuredStateOnPlane at the last hit. If this charge, which is the charge after the track fit,
+        // is not equal to the charge seed of the RecoTrack, flip the track and reorder the hits.
+        if (m_param_flipTrackIfFittedChargeNEQSeedCharge and recoTrack.getChargeSeed() != mSoP.getCharge()) {
+          recoTrack.flipTrackDirectionAndCharge(mSoP);
         }
       } else {
         B2DEBUG(28, "       fit failed!");

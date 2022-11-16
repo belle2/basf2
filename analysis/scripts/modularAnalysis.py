@@ -1910,8 +1910,8 @@ def variablesToNtuple(decayString, variables, treename='variables', filename='nt
         filename (str): which is used to store the variables
         path (basf2.Path): the basf2 path where the analysis is processed
         basketsize (int): size of baskets in the output ntuple in bytes
-        signalSideParticleList (str): The name of signal-side ParticleList.
-                                      Only valid is the module is called in a for_each loop over RestOfEvent.
+        signalSideParticleList (str): The name of the signal-side ParticleList.
+                                      Only valid if the module is called in a for_each loop over the RestOfEvent.
     """
 
     output = register_module('VariablesToNtuple')

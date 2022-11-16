@@ -97,12 +97,18 @@ class Saving2ndMVAData(harvesting.HarvestingModule):
         flipped_py_variance = nan
         flipped_x_estimate = nan
         quality_flip_indicator = nan
+        quality_2ndflip_indicator = nan
         isPrimary_misID = False
+        ismatched = False
+        isprimary = False
+        charge_truth = nan
+        track_charge = nan
         inGoingArmTime = nan
         inGoingArmTimeError = nan
         outGoingArmTime = nan
         outGoingArmTimeError = nan
-        timeDiffInAndOutArms = nan
+        InOutArmTimeDifference = nan
+        InOutArmTimeDifferenceError = nan
 
         if (recoTrack):
             mc_particle = track_match_look_up.getRelatedMCParticle(recoTrack)
@@ -112,13 +118,16 @@ class Saving2ndMVAData(harvesting.HarvestingModule):
             inGoingArmTimeError = recoTrack.getIngoingArmTimeError()
             outGoingArmTime = recoTrack.getOutgoingArmTime()
             outGoingArmTimeError = recoTrack.getOutgoingArmTimeError()
-            timeDiffInAndOutArms = recoTrack.getInOutArmTimeDifference()
+            InOutArmTimeDifference = recoTrack.getInOutArmTimeDifference()
+            InOutArmTimeDifferenceError = recoTrack.getInOutArmTimeDifferenceError()
 
+            ismatched = track_match_look_up.isMatchedPRRecoTrack(recoTrack)
             if mc_particle and fit_result:
-                is_primary = bool(mc_particle.hasStatus(Belle2.MCParticle.c_PrimaryParticle))
-                if is_primary:
+                isprimary = bool(mc_particle.hasStatus(Belle2.MCParticle.c_PrimaryParticle))
+                charge_truth = mc_particle.getCharge()
+                if isprimary:
                     track_charge = fit_result.getChargeSign()
-                    if mc_particle.getCharge() != track_charge:
+                    if charge_truth != track_charge:
                         isPrimary_misID = True
 
             recoTrack_flipped = recoTrack.getRelated("RecoTracks_flipped")
@@ -182,6 +191,7 @@ class Saving2ndMVAData(harvesting.HarvestingModule):
                         flipped_p_value = fit_result_flipped.getPValue()
 
                         quality_flip_indicator = recoTrack.getFlipQualityIndicator()
+                        quality_2ndflip_indicator = recoTrack.get2ndFlipQualityIndicator()
 
         crops = dict(
             flipped_pz_estimate=flipped_pz_estimate,
@@ -220,12 +230,18 @@ class Saving2ndMVAData(harvesting.HarvestingModule):
             flipped_py_variance=flipped_py_variance,
             flipped_x_estimate=flipped_x_estimate,
             quality_flip_indicator=quality_flip_indicator,
+            quality_2ndflip_indicator=quality_2ndflip_indicator,
             isPrimary_misID=isPrimary_misID,
+            ismatched=ismatched,
+            isprimary=isprimary,
+            charge_truth=charge_truth,
+            track_charge=track_charge,
             inGoingArmTime=inGoingArmTime,
             inGoingArmTimeError=inGoingArmTimeError,
             outGoingArmTime=outGoingArmTime,
             outGoingArmTimeError=outGoingArmTimeError,
-            timeDiffInAndOutArms=timeDiffInAndOutArms,
+            InOutArmTimeDifference=InOutArmTimeDifference,
+            InOutArmTimeDifferenceError=InOutArmTimeDifferenceError,
             )
         return crops
 

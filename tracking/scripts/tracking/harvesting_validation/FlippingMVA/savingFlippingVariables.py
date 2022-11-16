@@ -95,11 +95,14 @@ class Saving1stMVAData(harvesting.HarvestingModule):
         last_cdc_layer = nan
         ndf_hits = nan
         isPrimary_misID = False
+        ismatched = False,
+        isprimary = False,
         inGoingArmTime = nan
         inGoingArmTimeError = nan
         outGoingArmTime = nan
         outGoingArmTimeError = nan
-        timeDiffInAndOutArms = nan
+        InOutArmTimeDifference = nan
+        InOutArmTimeDifferenceError = nan
 
         if (recoTrack):
 
@@ -110,11 +113,13 @@ class Saving1stMVAData(harvesting.HarvestingModule):
             inGoingArmTimeError = recoTrack.getIngoingArmTimeError()
             outGoingArmTime = recoTrack.getOutgoingArmTime()
             outGoingArmTimeError = recoTrack.getOutgoingArmTimeError()
-            timeDiffInAndOutArms = recoTrack.getInOutArmTimeDifference()
+            InOutArmTimeDifference = recoTrack.getInOutArmTimeDifference()
+            InOutArmTimeDifferenceError = recoTrack.getInOutArmTimeDifferenceError()
 
+            ismatched = track_match_look_up.isMatchedPRRecoTrack(recoTrack)
             if mc_particle and fit_result:
-                is_primary = bool(mc_particle.hasStatus(Belle2.MCParticle.c_PrimaryParticle))
-                if is_primary:
+                isprimary = bool(mc_particle.hasStatus(Belle2.MCParticle.c_PrimaryParticle))
+                if isprimary:
                     track_charge = fit_result.getChargeSign()
                     if mc_particle.getCharge() != track_charge:
                         isPrimary_misID = True
@@ -209,11 +214,14 @@ class Saving1stMVAData(harvesting.HarvestingModule):
             last_cdc_layer=last_cdc_layer,
             ndf_hits=ndf_hits,
             isPrimary_misID=isPrimary_misID,
+            ismatched=ismatched,
+            isprimary=isprimary,
             inGoingArmTime=inGoingArmTime,
             inGoingArmTimeError=inGoingArmTimeError,
             outGoingArmTime=outGoingArmTime,
             outGoingArmTimeError=outGoingArmTimeError,
-            timeDiffInAndOutArms=timeDiffInAndOutArms,
+            InOutArmTimeDifference=InOutArmTimeDifference,
+            InOutArmTimeDifferenceError=InOutArmTimeDifferenceError,
             )
         return crops
 

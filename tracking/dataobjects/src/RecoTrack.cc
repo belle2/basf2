@@ -719,9 +719,13 @@ bool RecoTrack::isOutgoingArm(RecoHitInformation::RecoHitDetector pre, RecoHitIn
 
 void RecoTrack::flipTrackDirectionAndCharge(const genfit::MeasuredStateOnPlane& measuredStateOnPlane)
 {
+  const ROOT::Math::XYZVector& currentPosition = ROOT::Math::XYZVector(measuredStateOnPlane.getPos());
+  const ROOT::Math::XYZVector& currentMomentum = ROOT::Math::XYZVector(measuredStateOnPlane.getMom());
+  const double& currentCharge = measuredStateOnPlane.getCharge();
+
   // revert the charge and momentum
-  setChargeSeed(-measuredStateOnPlane.getCharge());
-  setPositionAndMomentum(measuredStateOnPlane.getPos(), -measuredStateOnPlane.getMom());
+  setChargeSeed(-currentCharge);
+  setPositionAndMomentum(currentPosition, -currentMomentum);
 
   // Reverse the SortingParameters
   for (auto RecoHitInfo : getRecoHitInformations()) {

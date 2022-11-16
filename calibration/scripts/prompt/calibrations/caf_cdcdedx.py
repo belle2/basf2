@@ -31,7 +31,7 @@ ROOT.gROOT.SetBatch(True)
 
 settings = CalibrationSettings(
     name="CDC dedx",
-    expert_username="jikumar",
+    expert_username="renu",
     description=__doc__,
     input_data_formats=["cdst"],
     input_data_names=["bhabha_all_calib"],

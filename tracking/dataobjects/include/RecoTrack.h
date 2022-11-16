@@ -564,9 +564,9 @@ namespace Belle2 {
       return m_nSVDHitsOfIngoingArm;
     }
 
-    /// Flip the direction of the RecoTrack by inverting the momenum vector and the charge
-    /// @param trackRep The genfit::AbsTrackRep to be used, which depends on the PDG code of the particle used for the fit
-    /// @param useFirstHit If true, use the first hit of the MeasuredStateOnPlane, else use the last hit
+    /** Flip the direction of the RecoTrack by inverting the momenum vector and the charge
+     *  @param measuredStateOnPlane Measured state on plane to be used to extract the track paramters from
+     */
     void flipTrackDirectionAndCharge(const genfit::MeasuredStateOnPlane& measuredStateOnPlane);
 
     /// Return the position, the momentum and the charge of the first measured state on plane or - if unfitted - the seeds.

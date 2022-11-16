@@ -34,7 +34,7 @@ namespace Belle2 {
     template<>
     inline ROOT::Math::PxPyPzEVector getFourVector(const RecoTrack& track)
     {
-      const TVector3& positionSeed = track.getPositionSeed();
+      const ROOT::Math::XYZVector& positionSeed = track.getPositionSeed();
       return ROOT::Math::PxPyPzEVector(positionSeed.X(), positionSeed.Y(), positionSeed.Z(),
                                        sqrt(positionSeed.Mag2() + Const::pionMass * Const::pionMass));
     }

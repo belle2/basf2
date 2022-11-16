@@ -53,12 +53,12 @@ double PlaneTriggerTrackTimeEstimatorModule::estimateFlightLengthUsingSeedInform
   B2ASSERT("Position must have 3 components.", m_param_triggerPlanePosition.size() == 3);
   B2ASSERT("Normal direction must have 3 components.", m_param_triggerPlaneNormalDirection.size() == 3);
 
-  const TVector3& momentum = recoTrack.getMomentumSeed();
+  const ROOT::Math::XYZVector& momentum = recoTrack.getMomentumSeed();
   const short int charge = recoTrack.getChargeSeed();
-  const TVector3& position = recoTrack.getPositionSeed();
+  const ROOT::Math::XYZVector& position = recoTrack.getPositionSeed();
 
   const double bZ = BFieldManager::getField(0, 0, 0).Z() / Unit::T;
-  const Helix h(ROOT::Math::XYZVector(position), ROOT::Math::XYZVector(momentum), charge, bZ);
+  const Helix h(position, momentum, charge, bZ);
 
   const double arcLengthAtPosition = h.getArcLength2DAtXY(position.X(), position.Y());
 

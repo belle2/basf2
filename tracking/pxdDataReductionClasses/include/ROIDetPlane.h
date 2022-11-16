@@ -13,7 +13,7 @@
 #include <genfit/DetPlane.h>
 #include <genfit/SharedPlanePtr.h>
 
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 
 namespace Belle2 {
   /** ROIDetPlane describes the plane containing a sensor.
@@ -31,12 +31,11 @@ namespace Belle2 {
     // Needed by root. Dont use!
     ROIDetPlane() = default;
 
-
     /**return the sensor ID*/
     VxdID getVxdID() {return m_vxdID;};
 
     /** determine if the sensor is in range */
-    bool isSensorInRange(const TVector3& trackPosition, int layer);
+    bool isSensorInRange(const ROOT::Math::XYZVector& trackPosition, int layer);
 
     /** assign the shared-plane pointer */
     void setSharedPlanePtr(genfit::SharedPlanePtr spp) {m_sharedPlanePtr = spp;};
@@ -46,17 +45,17 @@ namespace Belle2 {
   private:
     VxdID m_vxdID; /**< the sensor ID*/
 
-    /** these two vectors define the planes going through the upper and lower edge of the sensor */
-    TVector3 m_orthoVec_upper; /**< vector normal to the vector from 0,0,0 to a point on the upper edge of the sensor in x-y-plane */
-    TVector3 m_orthoVec_lower; /**< vector normal to the vector from 0,0,0 to a point on the lower edge of the sensor in x-y-plane */
+    /* these two vectors define the planes going through the upper and lower edge of the sensor */
+    /** vector normal to the vector from 0,0,0 to a point on the upper edge of the sensor in x-y-plane */
+    ROOT::Math::XYZVector m_orthoVec_upper;
+    /** vector normal to the vector from 0,0,0 to a point on the lower edge of the sensor in x-y-plane */
+    ROOT::Math::XYZVector m_orthoVec_lower;
 
     double m_sensorZMin = 0; /**< min of allowed global z range*/
     double m_sensorZMax = 0; /**< max of allowed global z range*/
 
     int m_layer = 0; /**< layer number */
 
-
     genfit::SharedPlanePtr m_sharedPlanePtr; /**< the shared plane pointer*/
-
   };
 }

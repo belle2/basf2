@@ -200,7 +200,7 @@ void RootParameterTracker::addParameters4DoubleAlgorithms(std::string tcTypeName
   if (data4AlgorithmOftcType == nullptr) {
     B2DEBUG(5, "RootParameterTracker::addParameters4DoubleAlgorithms(), algorithm " << algorithmName <<
             " not yet added to m_algoDataDouble[tcType], doing it now...");
-    AnalyzingAlgorithm<double>* newAlgorithm = AnalyzingAlgorithmFactoryDouble<double, AnalizerTCInfo, TVector3>
+    AnalyzingAlgorithm<double>* newAlgorithm = AnalyzingAlgorithmFactoryDouble<double, AnalizerTCInfo, ROOT::Math::XYZVector>
                                                (AlgoritmType::getTypeEnum(algorithmName));
     algorithms4tcType->push_back({
       algorithmName,
@@ -257,8 +257,9 @@ void RootParameterTracker::addParameters4IntAlgorithms(std::string tcTypeName, s
   if (data4AlgorithmOftcType == nullptr) {
     B2DEBUG(5, "RootParameterTracker::addParameters4IntAlgorithms(), algorithm " << algorithmName <<
             " not yet added to m_algoDataInt[tcType], doing it now...");
-    AnalyzingAlgorithm<int>* newAlgorithm = AnalyzingAlgorithmFactoryInt<int, AnalizerTCInfo, TVector3>(AlgoritmType::getTypeEnum(
-                                              algorithmName));
+    AnalyzingAlgorithm<int>* newAlgorithm =
+      AnalyzingAlgorithmFactoryInt<int, AnalizerTCInfo, ROOT::Math::XYZVector>(AlgoritmType::getTypeEnum(algorithmName));
+
     algorithms4tcType->push_back({
       algorithmName,
       {
@@ -316,7 +317,7 @@ void RootParameterTracker::addParameters4VecDoubleAlgorithms(std::string tcTypeN
     B2DEBUG(5, "RootParameterTracker::addParameters4VecDoubleAlgorithms(), algorithm " << algorithmName <<
             " not yet added to m_algoDataVecDouble[tcType], doing it now...");
     AnalyzingAlgorithm<std::vector<double>>* newAlgorithm =
-                                           AnalyzingAlgorithmFactoryVecDouble<std::vector<double>, AnalizerTCInfo, TVector3>
+                                           AnalyzingAlgorithmFactoryVecDouble<std::vector<double>, AnalizerTCInfo, ROOT::Math::XYZVector>
                                            (AlgoritmType::getTypeEnum(algorithmName));
     algorithms4tcType->push_back({
       algorithmName,

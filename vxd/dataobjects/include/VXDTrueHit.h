@@ -12,7 +12,7 @@
 
 #include <vxd/dataobjects/VxdID.h>
 #include <framework/datastore/RelationsObject.h>
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 #include <algorithm>
 
 namespace Belle2 {
@@ -90,11 +90,11 @@ namespace Belle2 {
     /** Return the time when the track reached its midpoint.*/
     float getGlobalTime() const { return m_globalTime; }
     /** Return momentum at the midpoint of the track.*/
-    TVector3 getMomentum() const { return TVector3(m_momentumMidPoint[0], m_momentumMidPoint[1], m_momentumMidPoint[2]); }
+    ROOT::Math::XYZVector getMomentum() const { return ROOT::Math::XYZVector(m_momentumMidPoint[0], m_momentumMidPoint[1], m_momentumMidPoint[2]); }
     /** Return momentum at the start point of the track.*/
-    TVector3 getEntryMomentum() const { return TVector3(m_momentumEntry[0], m_momentumEntry[1], m_momentumEntry[2]);}
+    ROOT::Math::XYZVector getEntryMomentum() const { return ROOT::Math::XYZVector(m_momentumEntry[0], m_momentumEntry[1], m_momentumEntry[2]);}
     /** Return momentum at the endpoint of the track.*/
-    TVector3 getExitMomentum() const { return TVector3(m_momentumExit[0], m_momentumExit[1], m_momentumExit[2]); }
+    ROOT::Math::XYZVector getExitMomentum() const { return ROOT::Math::XYZVector(m_momentumExit[0], m_momentumExit[1], m_momentumExit[2]); }
 
     /** Shift the TrueHit in time (for backgorund mixing)
      * @param delta The value of the time shift.

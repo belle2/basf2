@@ -52,8 +52,8 @@ void RecoTracksReverterModule::event()
     if (!track) continue;
 
     const auto& measuredStateOnPlane = recoTrack.getMeasuredStateOnPlaneFromLastHit();
-    const TVector3& currentPosition = measuredStateOnPlane.getPos();
-    const TVector3& currentMomentum = measuredStateOnPlane.getMom();
+    const ROOT::Math::XYZVector& currentPosition = ROOT::Math::XYZVector(measuredStateOnPlane.getPos());
+    const ROOT::Math::XYZVector& currentMomentum = ROOT::Math::XYZVector(measuredStateOnPlane.getMom());
     const double& currentCharge = measuredStateOnPlane.getCharge();
 
     RecoTrack* newRecoTrack = m_outputRecoTracks.appendNew(currentPosition, -currentMomentum, -currentCharge,

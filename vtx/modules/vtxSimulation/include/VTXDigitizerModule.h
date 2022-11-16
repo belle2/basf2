@@ -19,9 +19,7 @@
 #include <vector>
 #include <boost/array.hpp>
 
-#include <TFile.h>
-#include <TH1D.h>
-#include <TH2D.h>
+#include <Math/Vector3D.h>
 
 namespace Belle2 {
   /** Namespace to encapsulate code needed for simulation and reconstrucion of the VTX */
@@ -108,7 +106,7 @@ namespace Belle2 {
        * @param position start position of the charge
        * @param electrons number of electrons to drift
        */
-      void driftCharge(const TVector3& position, double electrons);
+      void driftCharge(const ROOT::Math::XYZVector& position, double electrons);
       /** Add pure noise digits to the Sensors */
       void addNoiseDigits();
       /** Calculate the noise contribution to one pixel with given charge.
@@ -159,7 +157,7 @@ namespace Belle2 {
       /** Pointer to the SensorInfo of the current sensor */
       const SensorInfo*  m_currentSensorInfo = nullptr;
       /** Current magnetic field */
-      TVector3 m_currentBField;
+      ROOT::Math::XYZVector m_currentBField;
 
     };//end class declaration
 

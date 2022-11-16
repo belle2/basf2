@@ -75,7 +75,8 @@ namespace Belle2 {
 
     /** Non-templated convenience function to add a track
      */
-    RecoTrack& addTrack(const TVector3& seedPosition, const TVector3& seedMomentum, const short int seedCharge)
+    RecoTrack& addTrack(const ROOT::Math::XYZVector& seedPosition, const ROOT::Math::XYZVector& seedMomentum,
+                        const short int seedCharge)
     {
       return add(seedPosition, seedMomentum, seedCharge);
     }

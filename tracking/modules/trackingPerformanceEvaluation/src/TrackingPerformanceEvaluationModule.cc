@@ -920,7 +920,7 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
 
           m_h2_TrackPointFitWeightVXD->Fill(sensor.getLayerNumber(), weight);
           const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(sensor);
-          globalHit = aSensorInfo.pointToGlobal(TVector3(uCoor, vCoor, 0), true);
+          globalHit = aSensorInfo.pointToGlobal(ROOT::Math::XYZVector(uCoor, vCoor, 0), true);
 
 
           const VTXCluster* vtxcl = vtxHit->getCluster();

@@ -25,7 +25,7 @@ SpacePoint::SpacePoint(const VTXCluster* vtxCluster,
   }
 
   // the second parameter set to true results in alignment constants being applied
-  m_position = aSensorInfo->pointToGlobal(TVector3(vtxCluster->getU(), vtxCluster->getV(), 0), true);
+  m_position = aSensorInfo->pointToGlobal(ROOT::Math::XYZVector(vtxCluster->getU(), vtxCluster->getV(), 0), true);
 
   setPositionError(vtxCluster->getUSigma(), vtxCluster->getVSigma(), aSensorInfo);
 

@@ -252,8 +252,8 @@ void VTXDigitizerModule::processHit()
   }
 
   //Get step length and direction
-  const TVector3 startPoint = m_currentHit->getPosIn();
-  TVector3 stopPoint = m_currentHit->getPosOut();
+  const ROOT::Math::XYZVector startPoint = m_currentHit->getPosIn();
+  ROOT::Math::XYZVector stopPoint = m_currentHit->getPosOut();
   double dx = stopPoint.x() - startPoint.x();
   double dy = stopPoint.y() - startPoint.y();
   double dz = stopPoint.z() - startPoint.z();
@@ -292,7 +292,7 @@ inline double pol3(double x, const double* c)
   return c[0] + x * (c[1] + x * (c[2] + x * c[3]));
 };
 
-void VTXDigitizerModule::driftCharge(const TVector3& r, double electrons)
+void VTXDigitizerModule::driftCharge(const ROOT::Math::XYZVector& r, double electrons)
 {
 
   //Get references to current sensor/info for ease of use

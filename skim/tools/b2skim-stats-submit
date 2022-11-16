@@ -348,14 +348,19 @@ def submit_jobs(skims, samples, nEventsPerSample, DryRun, *, CombinedSkimDefinit
 
                 skim_checked = True
 
-            arguments = [*bsub_arguments, *basf2_arguments]
+            #arguments = [*bsub_arguments, *basf2_arguments]
+            command = " ".join([quote(str(arg)) for arg in bsub_arguments])
+            command += " \" " + " ulimit -v 10000000 && ulimit -a && " + " ".join([quote(str(arg)) for arg in basf2_arguments]) + " \" "
             if DryRun:
-                print(" ".join([quote(str(arg)) for arg in arguments]) + "\n")
+                #print(" ".join([quote(str(arg)) for arg in arguments]) + "\n")
+                print(command + "\n")
                 continue
 
             # Submit jobs
             process = subprocess.run(
-                arguments,
+                #arguments,
+                args=command,
+                shell=True,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 cwd=OutputDirectory,

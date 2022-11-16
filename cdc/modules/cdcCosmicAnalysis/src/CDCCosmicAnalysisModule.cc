@@ -156,7 +156,7 @@ void CDCCosmicAnalysisModule::event()
       continue;
     }
 
-    TVector3 posSeed = recoTrack->getPositionSeed();
+    B2Vector3D posSeed = recoTrack->getPositionSeed();
     const genfit::FitStatus* fs = recoTrack->getTrackFitStatus();
 
     double ndf = fs->getNdf();

@@ -72,7 +72,7 @@ ROIGeometry::fillPlaneList(double toleranceZ, double tolerancePhi)
 
 
 void
-ROIGeometry::appendSelectedPlanes(std::list<ROIDetPlane>* selectedPlanes, TVector3 recoTrackPosition, int layer)
+ROIGeometry::appendSelectedPlanes(std::list<ROIDetPlane>* selectedPlanes, ROOT::Math::XYZVector recoTrackPosition, int layer)
 {
 
 

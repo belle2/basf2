@@ -9,6 +9,8 @@
 
 #include <framework/logging/Logger.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/geometry/XYZVectorToTVector3Converter.h>
+#include <framework/geometry/BFieldManager.h>
 #include <tracking/v0Finding/dataobjects/VertexVector.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/trackFitting/fitter/base/TrackFitter.h>
@@ -137,7 +139,7 @@ bool V0Fitter::fitGFRaveVertex(genfit::Track& trackPlus, genfit::Track& trackMin
 /// used in the fitAndStore function.
 /// if tracks have hits inside the V0 vertex position, bits in hasInnerHitStatus are set.
 bool V0Fitter::extrapolateToVertex(genfit::MeasuredStateOnPlane& stPlus, genfit::MeasuredStateOnPlane& stMinus,
-                                   const TVector3& vertexPosition, unsigned int& hasInnerHitStatus)
+                                   const ROOT::Math::XYZVector& vertexPosition, unsigned int& hasInnerHitStatus)
 {
   /// initialize
   hasInnerHitStatus = 0;
@@ -145,8 +147,8 @@ bool V0Fitter::extrapolateToVertex(genfit::MeasuredStateOnPlane& stPlus, genfit:
   try {
     /// extrapolate the first (innermost) hit to the V0 vertex position
     /// the value will be positive (negative) if the direction of the extrapolation is (counter)momentum-wise
-    double extralengthPlus  =  stPlus.extrapolateToPoint(vertexPosition);
-    double extralengthMinus = stMinus.extrapolateToPoint(vertexPosition);
+    double extralengthPlus  =  stPlus.extrapolateToPoint(XYZToTVector(vertexPosition));
+    double extralengthMinus = stMinus.extrapolateToPoint(XYZToTVector(vertexPosition));
     if (extralengthPlus  > 0) hasInnerHitStatus |= 0x1; ///  plus track has hits inside the V0 vertex.
     if (extralengthMinus > 0) hasInnerHitStatus |= 0x2; /// minus track has hits inside the V0 vertex.
     B2DEBUG(22, "extralengthPlus=" << extralengthPlus << ", extralengthMinus=" << extralengthMinus);
@@ -159,16 +161,6 @@ bool V0Fitter::extrapolateToVertex(genfit::MeasuredStateOnPlane& stPlus, genfit:
   }
   return true;
 }
-
-double V0Fitter::getBzAtVertex(const TVector3& vertexPosition)
-{
-  double Bx, By, Bz;
-  genfit::FieldManager::getInstance()->getFieldVal(vertexPosition.X(), vertexPosition.Y(), vertexPosition.Z(),
-                                                   Bx, By, Bz);
-  Bz = Bz / 10;
-  return Bz;
-}
-
 
 TrackFitResult* V0Fitter::buildTrackFitResult(const genfit::Track& track, const RecoTrack* recoTrack,
                                               const genfit::MeasuredStateOnPlane& msop, const double Bz,
@@ -228,7 +220,7 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
   unsigned int hasInnerHitStatus = 0;
 
   /// fitted vertex position
-  TVector3 vertexPos(0, 0, 0);
+  ROOT::Math::XYZVector vertexPos(0, 0, 0);
 
   /// Try V0 vertex fit. If the fit fails, return false.
   /// If hasInnerHitStatus evaluated in the vertexFitWithRecoTracks function results to be 0
@@ -356,13 +348,13 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
 bool V0Fitter::vertexFitWithRecoTracks(const Track* trackPlus, const Track* trackMinus,
                                        RecoTrack* recoTrackPlus, RecoTrack* recoTrackMinus,
                                        const Const::ParticleType& v0Hypothesis,
-                                       unsigned int& hasInnerHitStatus, TVector3& vertexPos,
+                                       unsigned int& hasInnerHitStatus, ROOT::Math::XYZVector& vertexPos,
                                        const bool forceStore)
 {
   const auto trackHypotheses = getTrackHypotheses(v0Hypothesis);
 
-  genfit::Track gfTrackPlus = RecoTrackGenfitAccess::getGenfitTrack(
-                                *recoTrackPlus);/// make a clone, not use the reference so that the genfit::Track and its TrackReps will not be altered.
+  // make a clone, not use the reference so that the genfit::Track and its TrackReps will not be altered.
+  genfit::Track gfTrackPlus = RecoTrackGenfitAccess::getGenfitTrack(*recoTrackPlus);
   const int pdgTrackPlus = trackPlus->getTrackFitResultWithClosestMass(trackHypotheses.first)->getParticleType().getPDGCode();
   genfit::AbsTrackRep* plusRepresentation = recoTrackPlus->getTrackRepresentationForPDG(pdgTrackPlus);
   if ((plusRepresentation == nullptr) or (not recoTrackPlus->wasFitSuccessful(plusRepresentation))) {
@@ -370,8 +362,8 @@ bool V0Fitter::vertexFitWithRecoTracks(const Track* trackPlus, const Track* trac
     return false;
   }
 
-  genfit::Track gfTrackMinus = RecoTrackGenfitAccess::getGenfitTrack(
-                                 *recoTrackMinus);/// make a clone, not use the reference so that the genfit::Track and its TrackReps will not be altered.
+  // make a clone, not use the reference so that the genfit::Track and its TrackReps will not be altered.
+  genfit::Track gfTrackMinus = RecoTrackGenfitAccess::getGenfitTrack(*recoTrackMinus);
   const int pdgTrackMinus = trackMinus->getTrackFitResultWithClosestMass(trackHypotheses.second)->getParticleType().getPDGCode();
   genfit::AbsTrackRep* minusRepresentation = recoTrackMinus->getTrackRepresentationForPDG(pdgTrackMinus);
   if ((minusRepresentation == nullptr) or (not recoTrackMinus->wasFitSuccessful(minusRepresentation))) {
@@ -411,12 +403,12 @@ bool V0Fitter::vertexFitWithRecoTracks(const Track* trackPlus, const Track* trac
     return false;
   }
 
-  const TVector3& posVert(vert.getPos());
+  const ROOT::Math::XYZVector& posVert = ROOT::Math::XYZVector(vert.getPos());
   vertexPos = posVert;
 
   /// Apply cuts. We have one set of cuts inside the beam pipe,
   /// the other outside.
-  if (posVert.Perp() < m_beamPipeRadius) {
+  if (posVert.Rho() < m_beamPipeRadius) {
     return false;
   } else {
     if (vert.getChi2() > m_vertexChi2CutOutside) {
@@ -458,11 +450,10 @@ bool V0Fitter::vertexFitWithRecoTracks(const Track* trackPlus, const Track* trac
     }
 
 
-    /// To build the trackFitResult, use the magnetic field at the origin;
+    /// To build the trackFitResult, use the magnetic field at the origin = (0, 0, 0);
     /// the helix is extrapolated to the IP in a constant magnetic field and material effects are neglected
     /// so that the vertexing tool executed on the MDST object will find again this vertex position
-    const TVector3 origin(0, 0, 0);
-    const double Bz = getBzAtVertex(origin);
+    const double Bz = BFieldManager::getFieldInTesla({0, 0, 0}).Z();
 
     int sharedInnermostCluster = checkSharedInnermostCluster(recoTrackPlus, recoTrackMinus);
 
@@ -480,7 +471,7 @@ bool V0Fitter::vertexFitWithRecoTracks(const Track* trackPlus, const Track* trac
       auto validationV0 = m_validationV0s.appendNew(
                             std::make_pair(trackPlus, tfrPlusVtx),
                             std::make_pair(trackMinus, tfrMinusVtx),
-                            vert.getPos(),
+                            ROOT::Math::XYZVector(vert.getPos()),
                             vert.getCov(),
                             (lv0 + lv1).P(),
                             (lv0 + lv1).M(),
@@ -524,7 +515,7 @@ RecoTrack* V0Fitter::copyRecoTrackAndFit(RecoTrack* origRecoTrack, const int tra
 }
 
 bool V0Fitter::removeInnerHits(RecoTrack* prevRecoTrack, RecoTrack* recoTrack,
-                               const int trackPDG, const TVector3& vertexPosition)
+                               const int trackPDG, const ROOT::Math::XYZVector& vertexPosition)
 {
   if (!prevRecoTrack || !recoTrack) {
     B2ERROR("Input recotrack is nullptr!");
@@ -556,7 +547,7 @@ bool V0Fitter::removeInnerHits(RecoTrack* prevRecoTrack, RecoTrack* recoTrack,
                                                      prevRecoHitInformations[nRemoveHits]);
       /// extrapolate the hit to the V0 vertex position
       /// the value will be positive (negative) if the direction of the extrapolation is (counter)momentum-wise
-      double extralength = stPrevRecoHit.extrapolateToPoint(vertexPosition);
+      double extralength = stPrevRecoHit.extrapolateToPoint(XYZToTVector(vertexPosition));
       if (extralength > 0) {
         recoHitInformations[nRemoveHits]->setUseInFit(false);
       } else

@@ -31,9 +31,9 @@ ROOT::Math::XYZVector VXDMomentumEstimationTools<PXDCluster>::getEntryMomentumOf
   } else {
     const VxdID& vxdID = cluster.getSensorID();
     const VXD::SensorInfoBase& sensorInfoBase = VXD::GeoCache::getInstance().getSensorInfo(vxdID);
-    const TVector3& momentum = sensorInfoBase.vectorToGlobal(trueHit->getEntryMomentum(), true);
+    const ROOT::Math::XYZVector& momentum = sensorInfoBase.vectorToGlobal(trueHit->getEntryMomentum(), true);
 
-    return ROOT::Math::XYZVector(momentum);
+    return momentum;
   }
 }
 
@@ -47,9 +47,9 @@ ROOT::Math::XYZVector VXDMomentumEstimationTools<SVDCluster>::getEntryMomentumOf
   } else {
     const VxdID& vxdID = cluster.getSensorID();
     const VXD::SensorInfoBase& sensorInfoBase = VXD::GeoCache::getInstance().getSensorInfo(vxdID);
-    const TVector3& momentum = sensorInfoBase.vectorToGlobal(trueHit->getEntryMomentum(), true);
+    const ROOT::Math::XYZVector& momentum = sensorInfoBase.vectorToGlobal(trueHit->getEntryMomentum(), true);
 
-    return ROOT::Math::XYZVector(momentum);
+    return momentum;
   }
 }
 
@@ -63,10 +63,10 @@ ROOT::Math::XYZVector VXDMomentumEstimationTools<PXDCluster>::getEntryPositionOf
   } else {
     const VxdID& vxdID = cluster.getSensorID();
     const VXD::SensorInfoBase& sensorInfoBase = VXD::GeoCache::getInstance().getSensorInfo(vxdID);
-    const TVector3& momentum = sensorInfoBase.pointToGlobal(TVector3(trueHit->getEntryU(), trueHit->getEntryV(), trueHit->getEntryW()),
-                                                            true);
+    const ROOT::Math::XYZVector& momentum =
+      sensorInfoBase.pointToGlobal(ROOT::Math::XYZVector(trueHit->getEntryU(), trueHit->getEntryV(), trueHit->getEntryW()), true);
 
-    return ROOT::Math::XYZVector(momentum);
+    return momentum;
   }
 }
 
@@ -80,9 +80,9 @@ ROOT::Math::XYZVector VXDMomentumEstimationTools<SVDCluster>::getEntryPositionOf
   } else {
     const VxdID& vxdID = cluster.getSensorID();
     const VXD::SensorInfoBase& sensorInfoBase = VXD::GeoCache::getInstance().getSensorInfo(vxdID);
-    const TVector3& momentum = sensorInfoBase.pointToGlobal(TVector3(trueHit->getEntryU(), trueHit->getEntryV(), trueHit->getEntryW()),
-                                                            true);
+    const ROOT::Math::XYZVector& momentum =
+      sensorInfoBase.pointToGlobal(ROOT::Math::XYZVector(trueHit->getEntryU(), trueHit->getEntryV(), trueHit->getEntryW()), true);
 
-    return ROOT::Math::XYZVector(momentum);
+    return momentum;
   }
 }

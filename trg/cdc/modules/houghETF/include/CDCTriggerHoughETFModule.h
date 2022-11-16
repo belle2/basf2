@@ -277,6 +277,9 @@ namespace Belle2 {
      *          of the cluster) */
     bool m_hitRelationsFromCorners;
 
+    /** offset for ETF simulation*/
+    int m_offset = 0;
+
     /** filename for test output for firmware debugging */
     std::string m_testFilename;
     /** filestream for test output for firmware debugging */

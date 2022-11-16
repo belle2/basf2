@@ -12,7 +12,7 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <mdst/dataobjects/ECLCluster.h>
 
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 
 namespace Belle2 {
 
@@ -35,10 +35,10 @@ namespace Belle2 {
      * and the clusters position relative to the radiation position
      * @param acceptanceFactor  The acceptance factor which is needed to find the BremHit
      */
-    BremHit(const RecoTrack* recoTrack, const ECLCluster* bremCluster, const TVector3& position, double bremEnergy,
+    BremHit(const RecoTrack* recoTrack, const ECLCluster* bremCluster, const ROOT::Math::XYZVector& position, double bremEnergy,
             double clusterDistance, double acceptanceFactor) :
       m_position(position),
-      m_positionRadius(position.Perp()),
+      m_positionRadius(position.Rho()),
       m_bremEnergy(bremEnergy),
       m_clusterDistance(clusterDistance),
       m_acceptanceFactor(acceptanceFactor)
@@ -48,7 +48,7 @@ namespace Belle2 {
     }
 
     /** Set the radiation position. */
-    void setPosition(const TVector3& position) {m_position = position;}
+    void setPosition(const ROOT::Math::XYZVector& position) {m_position = position;}
 
     /** Set the radiated energy. */
     void setBremEnergy(const double bremEnergy) {m_bremEnergy = bremEnergy;}
@@ -57,7 +57,7 @@ namespace Belle2 {
     void setClusterDistance(const double distance) {m_clusterDistance = distance;}
 
     /** Return the radiation position. */
-    TVector3 getPosition() const
+    ROOT::Math::XYZVector getPosition() const
     {
       return m_position;
     }
@@ -81,7 +81,7 @@ namespace Belle2 {
 
   private:
     /** The radiation position. */
-    TVector3 m_position;
+    ROOT::Math::XYZVector m_position;
 
     /** The radiation position radius. */
     double m_positionRadius;
@@ -96,6 +96,6 @@ namespace Belle2 {
     double m_acceptanceFactor;
 
     /** Making this class a ROOT class.*/
-    ClassDef(BremHit, 1);
+    ClassDef(BremHit, 2);
   };
 }

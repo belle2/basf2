@@ -85,8 +85,8 @@ void SPTC2RTConverterModule::createRecoTrack(const SpacePointTrackCand& spacePoi
 {
 
   // Determine the tracking parameters
-  const TVector3& position = spacePointTC.getPosSeed();
-  const TVector3& momentum = spacePointTC.getMomSeed();
+  const ROOT::Math::XYZVector& position = spacePointTC.getPosSeed();
+  const ROOT::Math::XYZVector& momentum = spacePointTC.getMomSeed();
   const short int charge = spacePointTC.getChargeSeed();
   const TMatrixDSym& covSeed = spacePointTC.getCovSeed();
   const float qi = spacePointTC.getQualityIndicator();

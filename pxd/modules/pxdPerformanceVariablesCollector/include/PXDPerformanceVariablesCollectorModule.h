@@ -88,7 +88,7 @@ namespace Belle2 {
         posU = trackCluster.cluster.posU;
         posV = trackCluster.cluster.posV;
       } else {
-        auto localPoint = Info.pointToLocal(TVector3(tPoint.x, tPoint.y, tPoint.z), true);
+        auto localPoint = Info.pointToLocal(ROOT::Math::XYZVector(tPoint.x, tPoint.y, tPoint.z), true);
         posU = localPoint.X();
         posV = localPoint.Y();
       }

@@ -147,9 +147,9 @@ namespace Belle2 {
       inline double getSensorArea(VxdID sensorID) const;
 
       /** Convert local sensor coordinates to global */
-      const TVector3& pointToGlobal(VxdID sensorID, const TVector3& local);
+      const ROOT::Math::XYZVector& pointToGlobal(VxdID sensorID, const ROOT::Math::XYZVector& local);
       /** Convert local vector coordinates to global */
-      const TVector3& vectorToGlobal(VxdID sensorID, const TVector3& local);
+      const ROOT::Math::XYZVector& vectorToGlobal(VxdID sensorID, const ROOT::Math::XYZVector& local);
 
       /** Get number of sensors in a layer */
       inline int getNumSensors(int layerNum);

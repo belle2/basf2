@@ -93,7 +93,7 @@ namespace Belle2 {
     std::string m_MCDecayString; /**< MC decay string to be filled */
     StoreObjPtr<StringWrapper> m_stringWrapper; /**< string wrapper storing the MCDecayString */
 
-    std::string m_signalSideParticleList;      /** Name of signal-side particle list  */
+    std::string m_signalSideParticleList;      /**< Name of signal-side particle list  */
     int m_signalSideCandidate{-1};             /**< signal-side candidate counter */
     unsigned int m_nSignalSideCandidates{0};   /**< total n signal-side candidates */
     StoreObjPtr<RestOfEvent> m_roe;            /**< ROE object */

@@ -4075,7 +4075,8 @@ def getAnalysisGlobaltagB2BII() -> str:
     import b2bii
     if not b2bii.isB2BII():
         B2ERROR('The getAnalysisGlobaltagB2BII() function cannot be used for Belle II data.')
-    return 'analysis_b2bii'
+    from versioning import recommended_b2bii_analysis_global_tag
+    return recommended_b2bii_analysis_global_tag()
 
 
 def getNbarIDMVA(particleList, path=None):

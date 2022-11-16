@@ -139,14 +139,7 @@ void BaseRecoFitterModule::event()
         // Get the charge from the measuredStateOnPlane at the last hit. If this charge, which is the charge after the track
         // fit, is not equal to the charge seed of the RecoTrack, flip the track and reorder the hits.
         if (m_param_flipTrackIfFittedChargeNEQSeedCharge and recoTrack.getChargeSeed() != mSoPAtFirstHit.getCharge()) {
-          // revert the charge and momentum
-          recoTrack.setChargeSeed(-mSoPAtFirstHit.getCharge());
-          recoTrack.setPositionAndMomentum(mSoPAtFirstHit.getPos(), -mSoPAtFirstHit.getMom());
-
-          // Reverse the SortingParameters
-          for (auto RecoHitInfo : recoTrack.getRecoHitInformations()) {
-            RecoHitInfo->setSortingParameter(std::numeric_limits<unsigned int>::max() - RecoHitInfo->getSortingParameter());
-          }
+          recoTrack.flipTrackDirectionAndCharge(mSoPAtFirstHit);
         }
       } else {
         B2DEBUG(28, "       fit failed!");

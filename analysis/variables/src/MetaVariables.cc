@@ -2848,8 +2848,6 @@ namespace Belle2 {
 
             ROOT::Math::PxPyPzMVector dauMom = ROOT::Math::PxPyPzMVector(frame.getMomentum(dauPart));
 
-            // This can be improved with a faster algorithm to check if an std::vector contains a
-            // certain element
             int pdgCode;
             try {
               pdgCode = mapOfReplacedDaughters.at(iDau);

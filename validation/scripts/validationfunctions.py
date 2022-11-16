@@ -23,6 +23,7 @@ import sys
 import time
 from typing import Dict, Optional, List, Union
 import logging
+from pathlib import Path
 
 # 3rd party
 import ROOT
@@ -602,3 +603,25 @@ def terminal_title_line(title="", subtitle="", level=0) -> str:
         ret += subtitle + "\n"
     ret += line
     return ret
+
+
+def get_file_metadata(filename: str) -> str:
+    """
+    Retrieve the metadata for a file using ``b2file-metadata-show -a``.
+
+    Args:
+       metadata (str): File to get number of events from.
+
+    Returns:
+        (str): Metadata of file.
+    """
+    if not Path(filename).exists():
+        raise FileNotFoundError(f"Could not find file {filename}")
+
+    proc = subprocess.run(
+        ["b2file-metadata-show", "-a", str(filename)],
+        stdout=subprocess.PIPE,
+        check=True,
+    )
+    metadata = proc.stdout.decode("utf-8")
+    return metadata

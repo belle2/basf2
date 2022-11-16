@@ -36,14 +36,14 @@ class DisplayHLTTags(b2.Module):
         displayData.create()
 
         print("HLT Tags:")
-        displayData.obj().addLabel('HLT Tags:', ROOT.TVector3(200, 220, -300))
+        displayData.obj().addLabel('HLT Tags:', ROOT.Math.XYZVector(200, 220, -300))
         trigger_result = Belle2.PyStoreObj('SoftwareTriggerResult')
         dz_pos = 0
         for name, result in trigger_result.getResults():
             prefix = 'software_trigger_cut&hlt&accept_'
             if result == 1 and name.startswith(prefix):
                 name = name[len(prefix):]
-                displayData.obj().addLabel(name, ROOT.TVector3(200, 200 - dz_pos, -300))
+                displayData.obj().addLabel(name, ROOT.Math.XYVector(200, 200 - dz_pos, -300))
                 dz_pos += 15
                 print(name)
 

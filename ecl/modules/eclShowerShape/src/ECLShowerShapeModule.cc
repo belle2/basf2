@@ -297,7 +297,7 @@ std::vector<ECLShowerShapeModule::ProjectedECLDigit> ECLShowerShapeModule::proje
   // Calculate axes that span the perpendicular plane.
   //---------------------------------------------------------------------
   //xPrimeDirection = showerdirection.cross(zAxis)
-  B2Vector3D xPrimeDirection = B2Vector3D(showerPosition.y(), -showerPosition.x(), 0.0);
+  B2Vector3D xPrimeDirection = B2Vector3D(showerPosition.Y(), -showerPosition.X(), 0.0);
   xPrimeDirection *= 1.0 / xPrimeDirection.Mag();
 
   B2Vector3D yPrimeDirection = xPrimeDirection.Cross(showerDirection);

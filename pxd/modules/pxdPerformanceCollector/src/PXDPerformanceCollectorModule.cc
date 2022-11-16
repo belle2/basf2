@@ -368,7 +368,7 @@ void PXDPerformanceCollectorModule::collectFromTrack(const PXD2TrackEvent::baseT
       // Get uBin and vBin from a global point.
       VxdID sensorID = getVxdIDFromPXDModuleID(cluster.pxdID);
       const PXD::SensorInfo& Info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
-      auto localPoint = Info.pointToLocal(TVector3(x, y, z));
+      auto localPoint = Info.pointToLocal(ROOT::Math::XYZVector(x, y, z));
       auto uID = Info.getUCellID(localPoint.X());
       auto vID = Info.getVCellID(localPoint.Y());
       auto iSensor = gTools->getPXDSensorIndex(sensorID);

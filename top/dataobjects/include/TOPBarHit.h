@@ -10,6 +10,8 @@
 
 #include <framework/datastore/RelationsObject.h>
 #include <TVector3.h>
+#include <Math/Vector3D.h>
+#include <Math/Point3D.h>
 
 namespace Belle2 {
 
@@ -44,32 +46,32 @@ namespace Belle2 {
     TOPBarHit(
       int moduleID,
       int PDG,
-      TVector3 origin,
-      TVector3 impact,
-      TVector3 momentum,
+      ROOT::Math::XYZPoint origin,
+      ROOT::Math::XYZPoint impact,
+      ROOT::Math::XYZVector momentum,
       double time,
       double length,
-      TVector3 impactLoc,
+      ROOT::Math::XYZPoint impactLoc,
       double theta,
       double phi
     )
     {
       m_moduleID = moduleID;
       m_pdg = PDG;
-      m_x0 = (float) origin.x();
-      m_y0 = (float) origin.y();
-      m_z0 = (float) origin.z();
-      m_x = (float) impact.x();
-      m_y = (float) impact.y();
-      m_z = (float) impact.z();
-      m_px = (float) momentum.x();
-      m_py = (float) momentum.y();
-      m_pz = (float) momentum.z();
+      m_x0 = (float) origin.X();
+      m_y0 = (float) origin.Y();
+      m_z0 = (float) origin.Z();
+      m_x = (float) impact.X();
+      m_y = (float) impact.Y();
+      m_z = (float) impact.Z();
+      m_px = (float) momentum.X();
+      m_py = (float) momentum.Y();
+      m_pz = (float) momentum.Z();
       m_time = (float) time;
       m_length = (float) length;
-      m_xloc = (float) impactLoc.x();
-      m_yloc = (float) impactLoc.y();
-      m_zloc = (float) impactLoc.z();
+      m_xloc = (float) impactLoc.X();
+      m_yloc = (float) impactLoc.Y();
+      m_zloc = (float) impactLoc.Z();
       m_theta = (float) theta;
       m_phi = (float) phi;
     }
@@ -90,25 +92,39 @@ namespace Belle2 {
      * Returns production point
      * @return production position
      */
-    TVector3 getProductionPoint() const {return TVector3(m_x0, m_y0, m_z0);}
+    ROOT::Math::XYZPoint getProductionPoint() const {return ROOT::Math::XYZPoint(m_x0, m_y0, m_z0);}
 
     /**
      * Returns impact point
      * @return impact position
      */
-    TVector3 getPosition() const { return TVector3(m_x, m_y, m_z);}
+    ROOT::Math::XYZPoint getPosition() const { return ROOT::Math::XYZPoint(m_x, m_y, m_z);}
+
+    /**
+     * Returns impact point
+     * TODO: to be removed when the constructor from GenVector classes is provided in ExtHit
+     * @return impact position
+     */
+    TVector3 getPositionTVector3() const { return TVector3(m_x, m_y, m_z);}
 
     /**
      * Returns impact point
      * @return impact position
      */
-    TVector3 getLocalPosition() const { return TVector3(m_xloc, m_yloc, m_zloc);}
+    ROOT::Math::XYZPoint getLocalPosition() const { return ROOT::Math::XYZPoint(m_xloc, m_yloc, m_zloc);}
 
     /**
      * Returns impact momentum
      * @return impact momentum vector
      */
-    TVector3 getMomentum() const {return TVector3(m_px, m_py, m_pz); }
+    ROOT::Math::XYZVector getMomentum() const {return ROOT::Math::XYZVector(m_px, m_py, m_pz);}
+
+    /**
+     * Returns impact momentum
+     * TODO: to be removed when the constructor from GenVector classes is provided in ExtHit
+     * @return impact momentum vector
+     */
+    TVector3 getMomentumTVector3() const {return TVector3(m_px, m_py, m_pz);}
 
     /**
      * Returns tract length from production to impact point

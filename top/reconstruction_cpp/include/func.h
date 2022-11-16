@@ -8,6 +8,8 @@
 
 #pragma once
 #include <cmath>
+#include <Math/Vector3D.h>
+
 
 namespace Belle2 {
   namespace TOP {
@@ -99,6 +101,32 @@ namespace Belle2 {
         if (angle < 0) angle += 2 * M_PI;
         return angle;
       }
+
+      /**
+       * Replacement for a function TVector3::RotateUz which is not implemented in GenVector classes.
+       * @param vec vector to be rotated from frame S' [in] to frame S [out]
+       * @param z_Axis vector representing z-axis of the frame S' expressed in the coordinates of frame S
+       */
+      inline void rotateUz(ROOT::Math::XYZVector& vec, const ROOT::Math::XYZVector& z_Axis)
+      {
+        auto zAxis = z_Axis.Unit();
+        double cth = zAxis.Z();
+        double sth = sqrt(1 - cth * cth);
+        if (sth == 0) {
+          if (cth < 0) vec = -vec;
+          return;
+        }
+        double cfi = zAxis.X() / sth;
+        double sfi = zAxis.Y() / sth;
+        // rotation by theta around y then by phi around z
+        double x = cth * vec.X() + sth * vec.Z();
+        double y = vec.Y();
+        double z = -sth * vec.X() + cth * vec.Z();
+        vec.SetX(cfi * x - sfi * y);
+        vec.SetY(sfi * x + cfi * y);
+        vec.SetZ(z);
+      }
+
 
     } // func
   } // TOP

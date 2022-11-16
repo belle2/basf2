@@ -14,15 +14,22 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 #include <framework/particledb/EvtGenDatabasePDG.h>
+#include <framework/dataobjects/MCInitialParticles.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 
 /* ROOT headers. */
 #include <THashList.h>
+#include <Math/LorentzRotation.h>
+#include <Math/Boost.h>
+#include <Math/Vector3D.h>
 
 /* C++ headers. */
 #include <cmath>
 #include <string>
 #include <utility>
+
+#include <Eigen/Dense>
+
 
 using namespace Belle2;
 
@@ -73,57 +80,62 @@ int KKGenInterface::setup(const std::string& KKdefaultFileName, const std::strin
   return 0;
 }
 
-void KKGenInterface::set_beam_info(ROOT::Math::PxPyPzEVector P4_LER, double Espread_LER, ROOT::Math::PxPyPzEVector P4_HER,
-                                   double Espread_HER)
+
+void KKGenInterface::set_beam_info(double Ecms0, double Ecms0Spread)
 {
-
-  // Beam 4 momenta settings
-//   double crossing_angle = 0.;
-  double ph = P4_HER.P();
-  double pl = P4_LER.P();
-  double eh = P4_HER.E();
-  double el = P4_LER.E();
-  if (ph > 0. && pl > 0. && eh > 0. && el > 0.) {
-
-    double pxh, pyh, pzh, pxl, pyl, pzl;
-    pxh = P4_HER.Px();
-    pyh = P4_HER.Py();
-    pzh = P4_HER.Pz();
-
-    pxl = P4_LER.Px();
-    pyl = P4_LER.Py();
-    pzl = P4_LER.Pz();
-
-    char buf[200];
-    sprintf(buf,
-            "Set Beam info: (%9.4f, %9.4f, %9.4f, %9.4f), (%9.4f, %9.4f, %9.4f, %9.4f)", pxh, pyh, pzh, eh, pxl, pyl, pzl, el);
-    B2DEBUG(100, buf);
-
-    kk_putbeam_(&pxh, &pyh, &pzh, &eh, &pxl, &pyl, &pzl, &el);
-
-    B2DEBUG(20, "Espread_LER=" << Espread_LER);
-    B2DEBUG(20, "Espread_HER=" << Espread_HER);
-    double Espread_CM = 0.0;
-
-    sprintf(buf,
-            "Set Beam Energy spread: %9.4f", Espread_CM);
-    B2DEBUG(100, buf);
-    kk_begin_run_(&Espread_CM);
+  if (Ecms0 > 0. && Ecms0Spread >= 0.) {
+    // KKMC requires spread of energy of a single beam in CMS system
+    double E0spread = Ecms0Spread / std::sqrt(2);
+    kk_begin_run_(&Ecms0, &E0spread);
   } else {
-    char buf[200];
-    sprintf(buf,
-            "Wrongly Set Beam info: Eh=%9.4f, Ph=%9.4f, El=%9.4f, Pl=%9.4f",
-            eh, ph, el, pl);
-    B2DEBUG(100, buf);
+    B2DEBUG(100, "Wrong beam info");
   }
-
 }
 
-int KKGenInterface::simulateEvent(MCParticleGraph& graph, TVector3 vertex)
+
+int KKGenInterface::simulateEvent(MCParticleGraph& graph, const ConditionalGaussGenerator& lorentzGenerator,
+                                  ROOT::Math::XYZVector vertex)
 {
   B2DEBUG(20, "Start simulation of KKGen Interface.");
   int status = 0;
   kk_event_(&status);
+
+  ROOT::Math::PxPyPzEVector pHERorg(hepevt_.phep[0][0], hepevt_.phep[0][1], hepevt_.phep[0][2], hepevt_.phep[0][3]);
+  ROOT::Math::PxPyPzEVector pLERorg(hepevt_.phep[1][0], hepevt_.phep[1][1], hepevt_.phep[1][2], hepevt_.phep[1][3]);
+  ROOT::Math::PxPyPzEVector pTotOrg = pHERorg + pLERorg;
+
+  // KKMC allows generation of events with E-spread of beams, where
+  // without spread both energies are equal and momenta aligned along z-asis
+  // When spread it on, the system is no more CMS, so we transform to it
+  ROOT::Math::LorentzRotation rotKKMC(ROOT::Math::Boost(pTotOrg.BoostToCM()));
+
+  // CMS energy from KKMC used for conditional generator
+  double EcmsNow = pTotOrg.M();
+
+  // Calculate Lorentz transformation to LAB for this event
+  Eigen::VectorXd               transVec = lorentzGenerator.generate(EcmsNow);
+  ROOT::Math::LorentzRotation   rot =  MCInitialParticles::cmsToLab(transVec[1], transVec[2], transVec[3], transVec[4], transVec[5]);
+
+  // Total Lorentz transformation
+  ROOT::Math::LorentzRotation rotTot = rot * rotKKMC;
+
+  for (int i = 0; i < hepevt_.nhep; ++i) {
+    ROOT::Math::PxPyPzEVector p4cms(hepevt_.phep[i][0], hepevt_.phep[i][1], hepevt_.phep[i][2], hepevt_.phep[i][3]);
+
+    // transform to LAB
+    ROOT::Math::PxPyPzEVector p4lab = rotTot * p4cms;
+
+    hepevt_.phep[i][0] = p4lab.Px();
+    hepevt_.phep[i][1] = p4lab.Py();
+    hepevt_.phep[i][2] = p4lab.Pz();
+    hepevt_.phep[i][3] = p4lab.E();
+    //hepevt_.phep[i][4] = p4lab.M();
+  }
+
+
+  // Shift vertex point due to tau life time
+  kk_shifttaudecayvtx_();
+
 
   // before storing event to MCParticle, check /hepevt/ common block
   B2DEBUG(100, "HepEVT table:");
@@ -150,10 +162,10 @@ int KKGenInterface::simulateEvent(MCParticleGraph& graph, TVector3 vertex)
     int moID = 0;
     char buf[200];
     sprintf(buf, "IntB: %3d %4u %8d %4d %4d %4d %9.4f %9.4f %9.4f %9.4f",
-            p->getIndex() ,  p->getStatus() ,  p->getPDG() ,  moID ,
-            p->getFirstDaughter() ,  p->getLastDaughter() ,
-            p->get4Vector().Px() ,  p->get4Vector().Py() ,
-            p->get4Vector().Pz() ,  p->get4Vector().E());
+            p->getIndex(),  p->getStatus(),  p->getPDG(),  moID,
+            p->getFirstDaughter(),  p->getLastDaughter(),
+            p->get4Vector().Px(),  p->get4Vector().Py(),
+            p->get4Vector().Pz(),  p->get4Vector().E());
     B2DEBUG(100, buf);
 
   }
@@ -164,7 +176,7 @@ int KKGenInterface::simulateEvent(MCParticleGraph& graph, TVector3 vertex)
 
 
 
-int KKGenInterface::addParticles2Graph(MCParticleGraph& graph, TVector3 vertex)
+int KKGenInterface::addParticles2Graph(MCParticleGraph& graph, ROOT::Math::XYZVector vertex)
 {
   // KKMC generates at least five particles:
   // beam (e+ e-), intermediate gamma/Z, f+ f- (f=mu, tau, ...)
@@ -197,7 +209,7 @@ int KKGenInterface::addParticles2Graph(MCParticleGraph& graph, TVector3 vertex)
 }
 
 
-void KKGenInterface::updateGraphParticle(int index, MCParticleGraph::GraphParticle* gParticle, TVector3 vertex)
+void KKGenInterface::updateGraphParticle(int index, MCParticleGraph::GraphParticle* gParticle, ROOT::Math::XYZVector vertex)
 {
   if (index < 1 || index > hepevt_.nhep)
     return;
@@ -248,9 +260,9 @@ void KKGenInterface::updateGraphParticle(int index, MCParticleGraph::GraphPartic
   gParticle->set4Vector(p4);
 
   //set vertex including smearing (if user requested)
-  TVector3 pProductionVertex(hepevt_.vhep[index - 1][0]*Unit::mm,
-                             hepevt_.vhep[index - 1][1]*Unit::mm,
-                             hepevt_.vhep[index - 1][2]*Unit::mm);
+  ROOT::Math::XYZVector pProductionVertex(hepevt_.vhep[index - 1][0]*Unit::mm,
+                                          hepevt_.vhep[index - 1][1]*Unit::mm,
+                                          hepevt_.vhep[index - 1][2]*Unit::mm);
   if (!gParticle->hasStatus(MCParticle::c_Initial)) {
     pProductionVertex = pProductionVertex + vertex;
   }

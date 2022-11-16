@@ -87,7 +87,7 @@ QualityEstimationResults QualityEstimatorMC::estimateQualityAndProperties(std::v
   QualityEstimatorBase::estimateQualityAndProperties(measurements);
   if (m_results.qualityIndicator != 0) {
     auto mcParticle = m_mcRecoTracks[m_match.first]->getRelated<MCParticle>();
-    m_results.p = mcParticle->getMomentum();
+    m_results.p = B2Vector3D(mcParticle->getMomentum());
     m_results.pt = mcParticle->get4Vector().Pt();
   }
   return m_results;

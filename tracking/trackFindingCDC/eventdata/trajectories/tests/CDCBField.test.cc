@@ -17,7 +17,7 @@ using namespace TrackFindingCDC;
 
 TEST(TrackFindingCDCTest, eventdata_trajectories_CDCBField_getBFieldZSign)
 {
-  TVector3 bFieldAtOrigin = BFieldManager::getField(0, 0, 0) / Unit::T;
+  ROOT::Math::XYZVector bFieldAtOrigin = BFieldManager::getField(0, 0, 0) / Unit::T;
   Double_t bZAtOrigin = bFieldAtOrigin.Z();
   ESign bZSignAtOrigin = sign(bZAtOrigin);
   EXPECT_EQ(bZSignAtOrigin, CDCBFieldUtil::getBFieldZSign());

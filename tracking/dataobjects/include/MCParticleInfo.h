@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include <TVector3.h>
 #include <mdst/dataobjects/MCParticle.h>
 
 namespace Belle2 {
@@ -21,18 +20,18 @@ namespace Belle2 {
   public :
 
     /// Constructor
-    MCParticleInfo(const MCParticle& the_mcParticle, const TVector3& the_magField);
+    MCParticleInfo(const MCParticle& the_mcParticle, const ROOT::Math::XYZVector& the_magField);
 
     /// Getter for x component of momentum.
-    double getPx() { return m_mcParticle.getMomentum().Px(); };
+    double getPx() { return m_mcParticle.getMomentum().x(); };
     /// Getter for y component of momentum.
-    double getPy() { return m_mcParticle.getMomentum().Py(); };
+    double getPy() { return m_mcParticle.getMomentum().y(); };
     /// Getter for z component of momentum.
-    double getPz() { return m_mcParticle.getMomentum().Pz(); };
+    double getPz() { return m_mcParticle.getMomentum().z(); };
     /// Getter for transverse momentum.
-    double getPt() { return m_mcParticle.getMomentum().Pt(); };
+    double getPt() { return m_mcParticle.getMomentum().Rho(); };
     /// Getter for magnitut of momentum.
-    double getP() { return m_mcParticle.getMomentum().Mag(); };
+    double getP() { return m_mcParticle.getMomentum().R(); };
     /// Getter for energy.
     double getEnergy() { return m_mcParticle.getEnergy(); };
 

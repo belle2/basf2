@@ -778,7 +778,9 @@ at the end of the reconstruction chain, in particular after the outer detector r
     )DOC");
 
     REGISTER_VARIABLE("trackTime", getTrackTime, R"DOC(
-Returns the track time computed as the difference between the outgoing/ingoing arm time (computed with SVD hits) and the SVD EventT0. Return NaN if SVD eventT0 is NaN, or if no outgoing/ingoing arm exists. The track time estimates the time at which the track is produced with respect to the time of the collision.
+Returns the track time computed as the difference between the outgoing/ingoing arm time (computed with SVD hits) and the SVD EventT0. 
+Returns NaN if SVD eventT0 is NaN, or if no outgoing/ingoing arm exists. 
+The track time estimates the time at which the track is produced with respect to the time of the collision.
     )DOC", "ns");
   }
 }

@@ -13,8 +13,8 @@
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 
 #include <genfit/MeasuredStateOnPlane.h>
-#include <root/TVector3.h>
-#include <root/TMatrixDSym.h>
+#include <Math/Vector3D.h>
+#include <TMatrixDSym.h>
 
 namespace Belle2 {
   /// class to extract results from qualityEstimation
@@ -99,8 +99,8 @@ namespace Belle2 {
 
     /// calculated differences and saves them in variable set
     void setCDCSVDTrackDifferenceVariables(const std::string& prefix,
-                                           const TVector3* svdTrackVector,
-                                           const TVector3* cdcTrackVector)
+                                           const ROOT::Math::XYZVector* svdTrackVector,
+                                           const ROOT::Math::XYZVector* cdcTrackVector)
     {
       if (not(svdTrackVector and cdcTrackVector)) {
         m_variables.at(prefix + "_diff_Z") = -1.;
@@ -112,10 +112,10 @@ namespace Belle2 {
         return;
       }
       m_variables.at(prefix + "_diff_Z") = fabs(cdcTrackVector->Z() - svdTrackVector->Z());
-      m_variables.at(prefix + "_diff_Pt") = fabs(cdcTrackVector->Pt() - svdTrackVector->Pt());
+      m_variables.at(prefix + "_diff_Pt") = fabs(cdcTrackVector->Rho() - svdTrackVector->Rho());
       m_variables.at(prefix + "_diff_Theta") = fabs(cdcTrackVector->Theta() - svdTrackVector->Theta());
       m_variables.at(prefix + "_diff_Phi") = fabs(cdcTrackVector->Phi() - svdTrackVector->Phi());
-      m_variables.at(prefix + "_diff_Mag") = fabs(cdcTrackVector->Mag() - svdTrackVector->Mag());
+      m_variables.at(prefix + "_diff_Mag") = fabs(cdcTrackVector->R() - svdTrackVector->R());
       m_variables.at(prefix + "_diff_Eta") = fabs(cdcTrackVector->Eta() - svdTrackVector->Eta());
     }
 
@@ -125,8 +125,8 @@ namespace Belle2 {
     void extractVariablesAtExtrapolationToCDCWall(RecoTrack const* CDCRecoTrack, RecoTrack const* SVDRecoTrack)
     {
       // position and momentum used for extrapolations to the CDC Wall
-      TVector3 center(0., 0., 0.);
-      TVector3 direction(0., 0., 1.);
+      B2Vector3D center(0., 0., 0.);
+      B2Vector3D direction(0., 0., 1.);
 
       genfit::MeasuredStateOnPlane svdTrackStateOnPlane;
       genfit::MeasuredStateOnPlane cdcTrackStateOnPlane;
@@ -147,10 +147,10 @@ namespace Belle2 {
       }
 
       // set differences in Position and Momentum
-      const TVector3 svdTrackPositionOnPlaneAtCDCWall = svdTrackStateOnPlane.getPos();
-      const TVector3 svdTrackMomentumOnPlaneAtCDCWall = svdTrackStateOnPlane.getMom();
-      const TVector3 cdcTrackPositionOnPlaneAtCDCWall = cdcTrackStateOnPlane.getPos();
-      const TVector3 cdcTrackMomentumOnPlaneAtCDCWall = cdcTrackStateOnPlane.getMom();
+      const ROOT::Math::XYZVector svdTrackPositionOnPlaneAtCDCWall = ROOT::Math::XYZVector(svdTrackStateOnPlane.getPos());
+      const ROOT::Math::XYZVector svdTrackMomentumOnPlaneAtCDCWall = ROOT::Math::XYZVector(svdTrackStateOnPlane.getMom());
+      const ROOT::Math::XYZVector cdcTrackPositionOnPlaneAtCDCWall = ROOT::Math::XYZVector(cdcTrackStateOnPlane.getPos());
+      const ROOT::Math::XYZVector cdcTrackMomentumOnPlaneAtCDCWall = ROOT::Math::XYZVector(cdcTrackStateOnPlane.getMom());
       setCDCSVDTrackDifferenceVariables("SVD_CDC_CDCwall_Pos", &svdTrackPositionOnPlaneAtCDCWall, &cdcTrackPositionOnPlaneAtCDCWall);
       setCDCSVDTrackDifferenceVariables("SVD_CDC_CDCwall_Mom", &svdTrackMomentumOnPlaneAtCDCWall, &cdcTrackMomentumOnPlaneAtCDCWall);
       try {
@@ -176,8 +176,8 @@ namespace Belle2 {
     void extractVariablesAtExtrapolationToPOCA(RecoTrack const* CDCRecoTrack, RecoTrack const* SVDRecoTrack)
     {
       // position and momentum used for extrapolations to the CDC Wall
-      const TVector3 linePoint(0., 0., 0.);
-      const TVector3 lineDirection(0., 0., 1.);
+      const B2Vector3D linePoint(0., 0., 0.);
+      const B2Vector3D lineDirection(0., 0., 1.);
 
       genfit::MeasuredStateOnPlane svdTrackStateOnPlane;
       genfit::MeasuredStateOnPlane cdcTrackStateOnPlane;
@@ -197,10 +197,10 @@ namespace Belle2 {
       }
 
       // set differences in Position and Momentum
-      const TVector3 svdTrackPositionOnPlaneAtPOCA = svdTrackStateOnPlane.getPos();
-      const TVector3 svdTrackMomentumOnPlaneAtPOCA = svdTrackStateOnPlane.getMom();
-      const TVector3 cdcTrackPositionOnPlaneAtPOCA = cdcTrackStateOnPlane.getPos();
-      const TVector3 cdcTrackMomentumOnPlaneAtPOCA = cdcTrackStateOnPlane.getMom();
+      const ROOT::Math::XYZVector svdTrackPositionOnPlaneAtPOCA = ROOT::Math::XYZVector(svdTrackStateOnPlane.getPos());
+      const ROOT::Math::XYZVector svdTrackMomentumOnPlaneAtPOCA = ROOT::Math::XYZVector(svdTrackStateOnPlane.getMom());
+      const ROOT::Math::XYZVector cdcTrackPositionOnPlaneAtPOCA = ROOT::Math::XYZVector(cdcTrackStateOnPlane.getPos());
+      const ROOT::Math::XYZVector cdcTrackMomentumOnPlaneAtPOCA = ROOT::Math::XYZVector(cdcTrackStateOnPlane.getMom());
       setCDCSVDTrackDifferenceVariables("SVD_CDC_POCA_Pos", &svdTrackPositionOnPlaneAtPOCA, &cdcTrackPositionOnPlaneAtPOCA);
       setCDCSVDTrackDifferenceVariables("SVD_CDC_POCA_Mom", &svdTrackMomentumOnPlaneAtPOCA, &cdcTrackMomentumOnPlaneAtPOCA);
     }

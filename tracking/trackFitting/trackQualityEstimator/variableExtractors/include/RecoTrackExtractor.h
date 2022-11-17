@@ -16,7 +16,7 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <framework/gearbox/Const.h>
-#include <root/TVector3.h>
+#include <framework/geometry/B2Vector3.h>
 #include <limits>
 
 namespace Belle2 {
@@ -152,8 +152,8 @@ namespace Belle2 {
       m_variables.at(m_prefix + "Fit_Successful") = (float)recoTrack.wasFitSuccessful();
 
       if (recoTrack.wasFitSuccessful()) {
-        TVector3 linePoint(0., 0., 0.);
-        TVector3 lineDirection(0., 0., 1.);
+        B2Vector3D linePoint(0., 0., 0.);
+        B2Vector3D lineDirection(0., 0., 1.);
 
         genfit::MeasuredStateOnPlane reco_sop;
         try {

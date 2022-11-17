@@ -235,15 +235,27 @@ void DQMHistAnalysisModule::UpdateCanvas(std::string name, bool updated)
   s_canvasUpdatedList[name] = updated;
 }
 
-void DQMHistAnalysisModule::ExtractRunType(void)
+void DQMHistAnalysisModule::ExtractRunType(std::vector <TH1*>& hs)
 {
-  auto runtype = findHist("DQMInfo/rtype");
-  s_runType = runtype ? runtype->GetTitle() : "";
+  s_runType = "";
+  for (size_t i = 0; i < hs.size(); i++) {
+    if (hs[i]->GetName() == std::string("DQMInfo/rtype")) {
+      s_runType = hs[i]->GetTitle();
+      return;
+    }
+  }
+  B2ERROR("ExtractRunType: Histogram \"DQMInfo/rtype\" missing");
 }
 
-void DQMHistAnalysisModule::ExtractEvent(void)
+void DQMHistAnalysisModule::ExtractEvent(std::vector <TH1*>& hs)
 {
-  auto hnevt = findHist("DAQ/Nevent");
-  s_eventProcessed = hnevt ? hnevt->GetEntries() : 0;
+  s_eventProcessed = 0;
+  for (size_t i = 0; i < hs.size(); i++) {
+    if (hs[i]->GetName() == std::string("DAQ/Nevent")) {
+      s_eventProcessed = hs[i]->GetEntries();
+      return;
+    }
+  }
+  B2ERROR("ExtractEvent: Histogram \"DAQ/Nevent\" missing");
 }
 

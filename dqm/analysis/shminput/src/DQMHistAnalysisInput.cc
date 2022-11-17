@@ -220,7 +220,7 @@ void DQMHistAnalysisInputModule::event()
   //setRunNr(m_runno); // redundant access from MetaData
   // ExtractRunType();// Run Type is processed above already, just take it
   setRunType(rtype);
-  ExtractEvent();
+  ExtractEvent(hs);
 
   // this code must be run after "event processed" has been extracted
   for (size_t i = 0; i < hs.size(); i++) {

@@ -245,12 +245,12 @@ namespace Belle2 {
     /**
      * Extract Run Type from histogram title, called from input module
      */
-    void ExtractRunType(void);
+    void ExtractRunType(std::vector <TH1*>& hs);
 
     /**
      * Extract event processed from daq histogram, called from input module
      */
-    void ExtractEvent(void);
+    void ExtractEvent(std::vector <TH1*>& hs);
 
     // Public functions
   public:

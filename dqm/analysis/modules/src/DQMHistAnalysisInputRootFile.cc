@@ -123,8 +123,11 @@ void DQMHistAnalysisInputRootFileModule::event()
     m_eventMetaDataPtr->setTime(0);
     //setExpNr(m_expno); // redundant access from MetaData
     //setRunNr(m_runno); // redundant access from MetaData
-    ExtractRunType();
-    ExtractEvent();
+    std::string rtype = "";
+    setRunType(rtype);
+    //ExtractRunType();
+    setEventProcessed(0);
+    //ExtractEvent();
 
     B2INFO("DQMHistAnalysisInputRootFile: event finished. count: " << m_count);
     m_count++;
@@ -252,8 +255,8 @@ void DQMHistAnalysisInputRootFileModule::event()
 
   //setExpNr(m_expno); // redundant access from MetaData
   //setRunNr(m_runno); // redundant access from MetaData
-  ExtractRunType();
-  ExtractEvent();
+  ExtractRunType(hs);
+  ExtractEvent(hs);
 
   // this code must be run after "event processed" has been extracted
   for (size_t i = 0; i < hs.size(); i++) {

@@ -537,7 +537,7 @@ void DQMHistoModuleBase::FillTRClusterCorrelations(float phi_deg, float phiPrev_
   m_TRClusterCorrelationsTheta[correlationIndex]->Fill(thetaPrev_deg, theta_deg);
 }
 
-void DQMHistoModuleBase::FillUBResidualsPXD(const TVector3& residual_um)
+void DQMHistoModuleBase::FillUBResidualsPXD(const B2Vector3D& residual_um)
 {
   if (checkVariableForNANOrINF(residual_um.X()) or checkVariableForNANOrINF(residual_um.Y())) {
     return;
@@ -547,7 +547,7 @@ void DQMHistoModuleBase::FillUBResidualsPXD(const TVector3& residual_um)
   m_UBResidualsPXDV->Fill(residual_um.y());
 }
 
-void DQMHistoModuleBase::FillUBResidualsSVD(const TVector3& residual_um)
+void DQMHistoModuleBase::FillUBResidualsSVD(const B2Vector3D& residual_um)
 {
   if (checkVariableForNANOrINF(residual_um.X()) or checkVariableForNANOrINF(residual_um.Y())) {
     return;
@@ -557,7 +557,7 @@ void DQMHistoModuleBase::FillUBResidualsSVD(const TVector3& residual_um)
   m_UBResidualsSVDV->Fill(residual_um.y());
 }
 
-void DQMHistoModuleBase::FillHalfShellsPXD(const TVector3& globalResidual_um, bool isNotYang)
+void DQMHistoModuleBase::FillHalfShellsPXD(const B2Vector3D& globalResidual_um, bool isNotYang)
 {
   if (checkVariableForNANOrINF(globalResidual_um.X()) or
       checkVariableForNANOrINF(globalResidual_um.Y()) or
@@ -575,7 +575,7 @@ void DQMHistoModuleBase::FillHalfShellsPXD(const TVector3& globalResidual_um, bo
   }
 }
 
-void DQMHistoModuleBase::FillHalfShellsSVD(const TVector3& globalResidual_um, bool isNotMat)
+void DQMHistoModuleBase::FillHalfShellsSVD(const B2Vector3D& globalResidual_um, bool isNotMat)
 {
   if (checkVariableForNANOrINF(globalResidual_um.X()) or
       checkVariableForNANOrINF(globalResidual_um.Y()) or
@@ -593,7 +593,7 @@ void DQMHistoModuleBase::FillHalfShellsSVD(const TVector3& globalResidual_um, bo
   }
 }
 
-void DQMHistoModuleBase::FillUB1DResidualsSensor(const TVector3& residual_um, int sensorIndex)
+void DQMHistoModuleBase::FillUB1DResidualsSensor(const B2Vector3D& residual_um, int sensorIndex)
 {
   if (checkVariableForNANOrINF(residual_um.X()) or checkVariableForNANOrINF(residual_um.Y())) {
     return;
@@ -602,7 +602,7 @@ void DQMHistoModuleBase::FillUB1DResidualsSensor(const TVector3& residual_um, in
   m_UBResidualsSensorV[sensorIndex]->Fill(residual_um.y());
 }
 
-void DQMHistoModuleBase::FillUB2DResidualsSensor(const TVector3& residual_um, int sensorIndex)
+void DQMHistoModuleBase::FillUB2DResidualsSensor(const B2Vector3D& residual_um, int sensorIndex)
 {
   if (checkVariableForNANOrINF(residual_um.X()) or checkVariableForNANOrINF(residual_um.Y())) {
     return;

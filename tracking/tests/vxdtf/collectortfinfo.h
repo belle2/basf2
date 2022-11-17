@@ -65,7 +65,7 @@ namespace Belle2 {
 //     virtual void updateSectors (int sector_ID, int pass_index, std::string died_at, std::vector<int> accepted, std::vector<int> rejected, int deltaUseCounter); //Sector update
 //     virtual void updateClusters (int cluster_id, std::string died_at, std::vector<int> accepted, std::vector<int> rejected, int deltaUseCounter);  //Cluster Update
 //
-//     virtual int importHit (int pass_index, std::string died_at, std::vector<int> accepted, std::vector<int> rejected, std::vector<int> assigned_Cluster_IDs, int sec_id, TVector3 hit_position); // Hit import
+//     virtual int importHit (int pass_index, std::string died_at, std::vector<int> accepted, std::vector<int> rejected, std::vector<int> assigned_Cluster_IDs, int sec_id, B2Vector3D hit_position); // Hit import
 //     virtual void updateHit (int hit_id, std::string died_at, std::vector<int> accepted, std::vector<int> rejected, int deltaUseCounter_TCID, std::vector<int> deltaUseCounter_cell); // Hit update
 //
 //     int getParticleIDfromRelations (int pass_index, int cluster_id);
@@ -205,60 +205,64 @@ namespace Belle2 {
   {
     //     virtual int importHit (int pass_index, std::string died_at, std::vector<int> accepted,
     //                            std::vector<int> rejected, std::vector<int> assigned_Cluster_IDs,
-    //                            int sec_id, TVector3 hit_position); // Hit import_clusters
+    //                            int sec_id, B2Vector3D hit_position); // Hit import_clusters
 
     // ID 0 - 4
     // Sector Overlap => Hitid 3,4
     // Cluster Overlap => Hitid 7,8
     m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>({1, 2, 3}), 0,
-                          TVector3(),
-                          TVector3());
-    m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>({4}), 2, TVector3(),
-                          TVector3());
-    m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>({7}), 4, TVector3(),
-                          TVector3());
-    m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>({9}), 5, TVector3(),
-                          TVector3());
-    m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>({10}), 5, TVector3(),
-                          TVector3());
+                          B2Vector3D(),
+                          B2Vector3D());
+    m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>({4}), 2, B2Vector3D(),
+                          B2Vector3D());
+    m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>({7}), 4, B2Vector3D(),
+                          B2Vector3D());
+    m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>({9}), 5, B2Vector3D(),
+                          B2Vector3D());
+    m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>({10}), 5,
+                          B2Vector3D(),
+                          B2Vector3D());
 
     // ID 5 - 9
     m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>({11, 12, 13}), 6,
-                          TVector3(),
-                          TVector3());
+                          B2Vector3D(),
+                          B2Vector3D());
     m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>({14, 15}), 7,
-                          TVector3(),
-                          TVector3());
-    m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>({17}), 8, TVector3(),
-                          TVector3());
-    m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>({17}), 9, TVector3(),
-                          TVector3());
-    m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>({18}), 1, TVector3(),
-                          TVector3());
+                          B2Vector3D(),
+                          B2Vector3D());
+    m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>({17}), 8,
+                          B2Vector3D(),
+                          B2Vector3D());
+    m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>({17}), 9,
+                          B2Vector3D(),
+                          B2Vector3D());
+    m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>({18}), 1,
+                          B2Vector3D(),
+                          B2Vector3D());
 
     // ID 10 - 14
-    m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>(), -1, TVector3(),
-                          TVector3());
-    m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>(), -1, TVector3(),
-                          TVector3());
-    m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>(), -1, TVector3(),
-                          TVector3());
-    m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>(), -1, TVector3(),
-                          TVector3());
-    m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>(), -1, TVector3(),
-                          TVector3());
+    m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>(), -1, B2Vector3D(),
+                          B2Vector3D());
+    m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>(), -1, B2Vector3D(),
+                          B2Vector3D());
+    m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>(), -1, B2Vector3D(),
+                          B2Vector3D());
+    m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>(), -1, B2Vector3D(),
+                          B2Vector3D());
+    m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>(), -1, B2Vector3D(),
+                          B2Vector3D());
 
     // ID 15 - 19
-    m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>(), 19, TVector3(),
-                          TVector3());
-    m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>(), 20, TVector3(),
-                          TVector3());
-    m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>(), 21, TVector3(),
-                          TVector3());
-    m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>(), 22, TVector3(),
-                          TVector3());
-    m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>(), 23, TVector3(),
-                          TVector3());
+    m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>(), 19, B2Vector3D(),
+                          B2Vector3D());
+    m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>(), 20, B2Vector3D(),
+                          B2Vector3D());
+    m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>(), 21, B2Vector3D(),
+                          B2Vector3D());
+    m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>(), 22, B2Vector3D(),
+                          B2Vector3D());
+    m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>(), 23, B2Vector3D(),
+                          B2Vector3D());
   }
 
 
@@ -271,10 +275,10 @@ namespace Belle2 {
       for (uint i = 0; i <  anz_hits; i++) {
         //     virtual int importHit (int pass_index, std::string died_at, std::vector<int> accepted,
         //                            std::vector<int> rejected, std::vector<int> assigned_Cluster_IDs,
-        //                            int sec_id, TVector3 hit_position); // Hit import_clusters
+        //                            int sec_id, B2Vector3D hit_position); // Hit import_clusters
 
-        /*int akt_id =*/ m_collector.importHit(index, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>(), 1, TVector3(),
-                                               TVector3());
+        /*int akt_id =*/ m_collector.importHit(index, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>(), 1, B2Vector3D(),
+                                               B2Vector3D());
       }
     }
   }

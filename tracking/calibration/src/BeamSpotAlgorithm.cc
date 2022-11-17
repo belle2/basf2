@@ -31,7 +31,7 @@ BeamSpotAlgorithm::BeamSpotAlgorithm() : CalibrationAlgorithm("BeamSpotCollector
 static TObject* getBeamSpotObj(Vector3d ipVtx, Matrix3d  ipVtxUnc, Matrix3d  sizeMat)
 {
   auto payload = new BeamSpot();
-  payload->setIP(toTVector3(ipVtx), toTMatrixDSym(ipVtxUnc));
+  payload->setIP(toB2Vector3(ipVtx), toTMatrixDSym(ipVtxUnc));
   payload->setSizeCovMatrix(toTMatrixDSym(sizeMat));
   TObject* obj  = static_cast<TObject*>(payload);
   return obj;

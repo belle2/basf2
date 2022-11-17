@@ -12,12 +12,12 @@
 
 #include <tracking/calibration/Splitter.h>
 #include <TMatrixDSym.h>
-#include <TVector3.h>
 #include <functional>
 #include <map>
 
 #include <framework/database/EventDependency.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/geometry/B2Vector3.h>
 #include <calibration/CalibrationAlgorithm.h>
 
 #include <Eigen/Dense>
@@ -47,9 +47,9 @@ namespace Belle2 {
   }
 
   /** Function that converts Eigen vector to ROOT vector */
-  inline TVector3 toTVector3(Eigen::VectorXd vIn)
+  inline B2Vector3D toB2Vector3(Eigen::VectorXd vIn)
   {
-    return TVector3(vIn(0), vIn(1), vIn(2));
+    return B2Vector3D(vIn(0), vIn(1), vIn(2));
   }
 
   /** get id of the time point t */

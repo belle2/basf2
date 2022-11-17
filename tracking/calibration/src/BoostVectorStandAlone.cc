@@ -10,7 +10,6 @@
 #include <vector>
 #include <tuple>
 #include <TTree.h>
-#include <TVector3.h>
 #include <Eigen/Dense>
 
 //if compiled within BASF2
@@ -70,8 +69,8 @@ namespace Belle2::BoostVectorCalib {
     tr->SetBranchAddress("exp", &evt.exp);
     tr->SetBranchAddress("event", &evt.evtNo);
 
-    TVector3* p0 = nullptr;
-    TVector3* p1 = nullptr;
+    B2Vector3D* p0 = nullptr;
+    B2Vector3D* p1 = nullptr;
 
     tr->SetBranchAddress("mu0_p", &p0);
     tr->SetBranchAddress("mu1_p", &p1);
@@ -132,9 +131,9 @@ namespace Belle2::BoostVectorCalib {
 
 
   /** Rapidities of particles with momenta vecs wrt the input boost vector (tanAngleX, tanAnlgeY) (in mili-units) */
-  std::vector<double> getRapidities(std::vector<TVector3> vecs, std::vector<double> boostDir)
+  std::vector<double> getRapidities(std::vector<B2Vector3D> vecs, std::vector<double> boostDir)
   {
-    TVector3 boost(boostDir[0], boostDir[1], 1);
+    B2Vector3D boost(boostDir[0], boostDir[1], 1);
     boost = boost.Unit();
 
     double th0 = vecs[0].Angle(boost);
@@ -161,10 +160,10 @@ namespace Belle2::BoostVectorCalib {
 
     for (const auto& e : evts) {
       if (e.nBootStrap * e.isSig == 0) continue;
-      std::vector<TVector3> vecs = {e.mu0.p, e.mu1.p};
+      std::vector<B2Vector3D> vecs = {e.mu0.p, e.mu1.p};
 
 
-      TVector3 n = vecs[0].Cross(vecs[1]);
+      B2Vector3D n = vecs[0].Cross(vecs[1]);
       double phi = n.Phi();
       double angle = M_PI / 2 - n.Theta();
       auto res = std::make_pair(phi, tan(angle));
@@ -208,7 +207,7 @@ namespace Belle2::BoostVectorCalib {
           continue;
         }
 
-        std::vector<TVector3> vecs = {e.mu0.p, e.mu1.p};
+        std::vector<B2Vector3D> vecs = {e.mu0.p, e.mu1.p};
         std::vector<double> raps = getRapidities(vecs, boostDir);
 
         double yDiff = abs(raps[0] - raps[1]) / 2;
@@ -233,7 +232,7 @@ namespace Belle2::BoostVectorCalib {
 
     for (auto e : evts) {
       if (e.nBootStrap * e.isSig == 0) continue;
-      std::vector<TVector3> vecs = {e.mu0.p, e.mu1.p};
+      std::vector<B2Vector3D> vecs = {e.mu0.p, e.mu1.p};
 
       std::vector<double> raps = getRapidities(vecs, boostDir);
 
@@ -276,7 +275,7 @@ namespace Belle2::BoostVectorCalib {
 
 
   /** run boost vector calibration over evts */
-  TVector3 getBoostVector(const std::vector<Event>& evts)
+  B2Vector3D getBoostVector(const std::vector<Event>& evts)
   {
     // Get the direction of the boost vector (tanXZ and tanYZ)
     std::vector<double> boostDir = fitBoostFast(evts);
@@ -288,7 +287,7 @@ namespace Belle2::BoostVectorCalib {
     double beta = tanh(yMag);
 
     // Vector pointing in the boost vector direction
-    TVector3 bVec = TVector3(boostDir[0], boostDir[1], 1);
+    B2Vector3D bVec = B2Vector3D(boostDir[0], boostDir[1], 1);
 
     // Adding proper magnitude of the vector (in speed of light units)
     bVec = beta * bVec.Unit();
@@ -309,7 +308,7 @@ namespace Belle2::BoostVectorCalib {
         for (auto& e : evts)
           e.nBootStrap = gRandom->Poisson(1);
 
-      TVector3 b = getBoostVector(evts);
+      B2Vector3D b = getBoostVector(evts);
       Vector3d boost(b.X(), b.Y(), b.Z());
       var.add(boost);
     }

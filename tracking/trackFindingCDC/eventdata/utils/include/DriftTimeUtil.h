@@ -78,9 +78,9 @@ namespace Belle2 {
         unsigned short iCLayer = wireID.getICLayer();
         const CDC::CDCGeometryPar& geometryPar = CDC::CDCGeometryPar::Instance();
         const CDC::CDCGeoControlPar& controlPar = CDC::CDCGeoControlPar::getInstance();
-        TVector3 backwardWirePos =
+        B2Vector3D backwardWirePos =
           geometryPar.wireBackwardPosition(wireID, CDC::CDCGeometryPar::c_Aligned);
-        TVector3 forwardWirePos =
+        B2Vector3D forwardWirePos =
           geometryPar.wireForwardPosition(wireID, CDC::CDCGeometryPar::c_Aligned);
         double zDistance = z - backwardWirePos.Z();
 

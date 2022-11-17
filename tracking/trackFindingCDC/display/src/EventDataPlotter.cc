@@ -340,7 +340,7 @@ void EventDataPlotter::draw(const CDCSimHit& simHit, const AttributeMap& attribu
   startAnimationGroup(simHit);
 
   // Draw hit position as a small circle
-  TVector3 position = simHit.getPosTrack();
+  ROOT::Math::XYZVector position = simHit.getPosTrack();
   float x = position.X();
   float y = position.Y();
   float radius = 0.2;
@@ -350,7 +350,7 @@ void EventDataPlotter::draw(const CDCSimHit& simHit, const AttributeMap& attribu
   // Draw momentum as an arrow proportional to the transverse component of the momentum
   const float momentumToArrowLength = 1.5;
 
-  TVector3 momentum = simHit.getMomentum();
+  ROOT::Math::XYZVector momentum = simHit.getMomentum();
   float endX = x + momentum.X() * momentumToArrowLength;
   float endY = y + momentum.Y() * momentumToArrowLength;
 

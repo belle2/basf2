@@ -67,16 +67,14 @@ void EvtBGLFF::getscalarff(EvtId parent, EvtId,
 
   double phi_sub = (1 + r) * (1 - z) + 2.0 * sqrt(r) * (1 + z);
 
-  double g_sub = (4.0 * r) / pow(1 + r, 2);
-
   double phi_p = 1.1213 * pow(1 + z, 2.) * sqrt(1 - z) * pow(phi_sub, -5);
 
   double phi_0 = 0.5299 * (1 + z) * pow(1 - z, 1.5) * pow(phi_sub, -4);
 
 
-  *fp = g_sub * (ap_0 + ap_1 * z + ap_2 * z * z + ap_3 * z * z * z) / (p_i * phi_p);
+  *fp = (ap_0 + ap_1 * z + ap_2 * z * z + ap_3 * z * z * z) / (p_i * phi_p);
 
-  *f0 = g_sub * (a0_0 + a0_1 * z + a0_2 * z * z + a0_3 * z * z * z) / (p_i * phi_0);
+  *f0 = (a0_0 + a0_1 * z + a0_2 * z * z + a0_3 * z * z * z) / (p_i * phi_0);
 
   return;
 }
@@ -110,9 +108,9 @@ void EvtBGLFF::getvectorff(EvtId parent, EvtId, double t, double mass, double* a
 
   double phi_g = sqrt(256. * n_i / (3. * M_PI * chiT_plus33)) * r * r * (1. + z) * (1. + z) / sqrt(1. - z) / pow((1. + r) *
                  (1. - z) + 2. * sqrt(r) * (1. + z), 4.);
-  double phi_f = 1. / (mb * mb) * sqrt(16. * n_i / (3. * M_PI * chiT_minus33)) * r * (1. + z) * pow(1. - z ,
+  double phi_f = 1. / (mb * mb) * sqrt(16. * n_i / (3. * M_PI * chiT_minus33)) * r * (1. + z) * pow(1. - z,
                  1.5) / pow((1. + r) * (1. - z) + 2. * sqrt(r) * (1. + z), 4.);
-  double phi_F1 = 1. / (mb * mb * mb) * sqrt(8. * n_i / (3. * M_PI * chiT_minus33)) * r * (1. + z) * pow(1. - z ,
+  double phi_F1 = 1. / (mb * mb * mb) * sqrt(8. * n_i / (3. * M_PI * chiT_minus33)) * r * (1. + z) * pow(1. - z,
                   2.5) / pow((1. + r) * (1. - z) + 2 * sqrt(r) * (1. + z), 5.);
 
   double p_g = 1.;

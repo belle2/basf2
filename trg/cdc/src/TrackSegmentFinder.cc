@@ -28,6 +28,7 @@
 #include "trg/cdc/TrackSegmentFinder.h"
 #include "framework/datastore/StoreArray.h"
 #include "framework/datastore/RelationArray.h"
+#include <framework/geometry/B2Vector3.h>
 #include "cdc/dataobjects/CDCSimHit.h"
 #include "mdst/dataobjects/MCParticle.h"
 #include "trg/cdc/FrontEnd.h"
@@ -446,8 +447,8 @@ namespace Belle2 {
       // Find L/R, phi of priority wires
       vector<int> priorityLRs(3);
       vector<float> priorityPhis(3);
-      TVector3 posOnTrack;
-      TVector3 posOnWire;
+      B2Vector3D posOnTrack;
+      B2Vector3D posOnWire;
       if (priority->hit() != 0) {
         int iSimHit = priority->hit()->iCDCSimHit();
         priorityLRs[0] = SimHits[iSimHit]->getPosFlag();

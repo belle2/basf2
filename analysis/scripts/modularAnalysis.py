@@ -1896,7 +1896,8 @@ def printList(list_name, full, path):
     path.add_module(prlist)
 
 
-def variablesToNtuple(decayString, variables, treename='variables', filename='ntuple.root', path=None, basketsize=1600):
+def variablesToNtuple(decayString, variables, treename='variables', filename='ntuple.root', path=None, basketsize=1600,
+                      signalSideParticleList=""):
     """
     Creates and fills a flat ntuple with the specified variables from the VariableManager.
     If a decayString is provided, then there will be one entry per candidate (for particle in list of candidates).
@@ -1909,6 +1910,8 @@ def variablesToNtuple(decayString, variables, treename='variables', filename='nt
         filename (str): which is used to store the variables
         path (basf2.Path): the basf2 path where the analysis is processed
         basketsize (int): size of baskets in the output ntuple in bytes
+        signalSideParticleList (str): The name of the signal-side ParticleList.
+                                      Only valid if the module is called in a for_each loop over the RestOfEvent.
     """
 
     output = register_module('VariablesToNtuple')
@@ -1918,6 +1921,7 @@ def variablesToNtuple(decayString, variables, treename='variables', filename='nt
     output.param('fileName', filename)
     output.param('treeName', treename)
     output.param('basketSize', basketsize)
+    output.param('signalSideParticleList', signalSideParticleList)
     path.add_module(output)
 
 

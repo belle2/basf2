@@ -24,7 +24,7 @@
 
 #include <string>
 
-#include <root/TVector3.h>
+#include <Math/Vector3D.h>
 #include <root/TFile.h>
 #include <root/TTree.h>
 #include <root/TH1D.h>
@@ -61,7 +61,7 @@ namespace Belle2 {
        * @param carriers number of electrons and holes to drift
        * @param carrierType electrons or holes
        */
-      void driftCharge(const TVector3& position, double carriers, SVD::SensorInfo::CarrierType carrierType);
+      void driftCharge(const ROOT::Math::XYZVector& position, double carriers, SVD::SensorInfo::CarrierType carrierType);
 
       /** Calculate the noise contribution to one strip with given charge.
        * @param charge the original charge on the strip

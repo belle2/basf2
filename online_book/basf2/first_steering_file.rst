@@ -662,8 +662,9 @@ happen to fulfill all your selection criteria.
 .. admonition:: Hint
     :class: toggle xhint stacked
 
-    Read in the ntuple using ``read_root`` of ``root_pandas``. Use the
+    Read in the ntuple using ``uproot``. Use the
     histogram plotting routine of the dataframe.
+    For instructions on the basic usage of ``uproot`` see the `Getting started guide <https://uproot.readthedocs.io/en/latest/basic.html>`_.
 
 .. admonition:: Hint
     :class: toggle xhint stacked
@@ -679,9 +680,9 @@ happen to fulfill all your selection criteria.
         :linenos:
 
         import matplotlib.pyplot as plt
-        from root_pandas import read_root
+        import uproot
 
-        df = read_root('Bd2JpsiKS.root')
+        df = uproot.open('Bd2JpsiKS.root:tree').arrays(['Mbc'], library='pd')
 
         df.hist('Mbc', bins=100, range=(4.3, 5.3))
         plt.xlabel(r'M$_{\rm bc}$ [GeV/c$^{2}$]')
@@ -778,9 +779,9 @@ definitely read it to understand at least the basics.
         :linenos:
 
         import matplotlib.pyplot as plt
-        from root_pandas import read_root
+        import uproot
 
-        df = read_root('Bd2JpsiKS.root')
+        df = uproot.open('Bd2JpsiKS.root:tree').arrays(['isSignal', 'Mbc'], library='pd')
 
         df.hist('Mbc', bins=100, range=(4.3, 5.3), by='isSignal')
         plt.xlabel(r'M$_{\rm bc}$ [GeV/c$^{2}$]')

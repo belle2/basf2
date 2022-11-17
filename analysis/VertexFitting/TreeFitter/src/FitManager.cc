@@ -39,10 +39,7 @@ namespace TreeFitter {
     m_useReferencing(useReferencing),
     m_config(config)
   {
-    m_decaychain =  new DecayChain(particle,
-                                   config,
-                                   false
-                                  );
+    m_decaychain = new DecayChain(particle, config, false);
     m_fitparams  = new FitParams(m_decaychain->dim());
   }
 
@@ -52,22 +49,11 @@ namespace TreeFitter {
     delete m_fitparams;
   }
 
-  void FitManager::setExtraInfo(Belle2::Particle* part, const std::string& name, const double value) const
-  {
-    if (part) {
-      if (part->hasExtraInfo(name)) {
-        part->setExtraInfo(name, value);
-      } else {
-        part->addExtraInfo(name, value);
-      }
-    }
-  }
-
   bool FitManager::fit()
   {
     const int nitermax = 100;
     const int maxndiverging = 3;
-    double dChisqConv = m_prec;
+    const double dChisqConv = m_prec;
     m_chiSquare = -1;
     m_errCode.reset();
 
@@ -82,33 +68,32 @@ namespace TreeFitter {
       int ndiverging = 0;
       bool finished = false;
       for (m_niter = 0; m_niter < nitermax && !finished; ++m_niter) {
-        if (0 == m_niter) {
+        if (m_niter == 0) {
           m_errCode = m_decaychain->filter(*m_fitparams);
         } else if (m_useReferencing) {
           auto* tempState = new FitParams(*m_fitparams);
           m_errCode = m_decaychain->filterWithReference(*m_fitparams, *tempState);
           delete tempState;
         }
-        m_ndf = nDof();
+        m_ndf = m_fitparams->nDof();
         double chisq = m_fitparams->chiSquare();
         double deltachisq = chisq - m_chiSquare;
         if (m_errCode.failure()) {
           finished = true ;
           m_status = VertexStatus::Failed;
-          setExtraInfo(m_particle, "failed", 1);
+          m_particle->writeExtraInfo("failed", 1);
         } else {
           if (m_niter > 0) {
             if ((std::abs(deltachisq) / m_chiSquare < dChisqConv)) {
               m_chiSquare = chisq;
               m_status = VertexStatus::Success;
               finished = true ;
-              setExtraInfo(m_particle, "failed", 0);
+              m_particle->writeExtraInfo("failed", 0);
             } else if (deltachisq > 0 && ++ndiverging >= maxndiverging) {
-              setExtraInfo(m_particle, "failed", 2);
+              m_particle->writeExtraInfo("failed", 2);
               m_status = VertexStatus::NonConverged;
               m_errCode = ErrCode(ErrCode::Status::slowdivergingfit);
               finished = true ;
-            } else if (deltachisq > 0) {
             }
           }
           if (deltachisq < 0) {
@@ -118,11 +103,11 @@ namespace TreeFitter {
         }
       }
       if (m_niter == nitermax && m_status != VertexStatus::Success) {
-        setExtraInfo(m_particle, "failed", 3);
+        m_particle->writeExtraInfo("failed", 3);
         m_status = VertexStatus::NonConverged;
       }
       if (!(m_fitparams->testCovariance())) {
-        setExtraInfo(m_particle, "failed", 4);
+        m_particle->writeExtraInfo("failed", 4);
         m_status = VertexStatus::Failed;
       }
     }
@@ -137,11 +122,6 @@ namespace TreeFitter {
     }
 
     return (m_status == VertexStatus::Success);
-  }
-
-  int FitManager::nDof() const
-  {
-    return m_fitparams->nDof();
   }
 
   int FitManager::posIndex(Belle2::Particle* particle) const
@@ -251,17 +231,17 @@ namespace TreeFitter {
         if (&pb == m_decaychain->cand()) { // if head
           const double fitparchi2 = m_fitparams->chiSquare();
           cand.setPValue(TMath::Prob(fitparchi2, m_ndf));//if m_ndf<1, this is 0.
-          setExtraInfo(&cand, "chiSquared", fitparchi2);
-          setExtraInfo(&cand, "modifiedPValue", TMath::Prob(fitparchi2, 3));
-          setExtraInfo(&cand, "ndf", m_ndf);
+          cand.writeExtraInfo("chiSquared", fitparchi2);
+          cand.writeExtraInfo("modifiedPValue", TMath::Prob(fitparchi2, 3));
+          cand.writeExtraInfo("ndf", m_ndf);
         }
         if (pb.mother()) {
           int motherPosIndex = pb.mother()->posIndex();
           if (motherPosIndex >= 0) {
-            setExtraInfo(&cand, "prodVertexX", m_fitparams->getStateVector()(motherPosIndex));
-            setExtraInfo(&cand, "prodVertexY", m_fitparams->getStateVector()(motherPosIndex + 1));
+            cand.writeExtraInfo("prodVertexX", m_fitparams->getStateVector()(motherPosIndex));
+            cand.writeExtraInfo("prodVertexY", m_fitparams->getStateVector()(motherPosIndex + 1));
             if (pb.mother()->dim() > 2)
-              setExtraInfo(&cand, "prodVertexZ", m_fitparams->getStateVector()(motherPosIndex + 2));
+              cand.writeExtraInfo("prodVertexZ", m_fitparams->getStateVector()(motherPosIndex + 2));
           }
         }
       }
@@ -285,12 +265,12 @@ namespace TreeFitter {
     }
 
     if (pb.tauIndex() > 0) {
-      std::tuple<double, double>tau  = getDecayLength(cand);
-      std::tuple<double, double>life = getLifeTime(cand);
-      setExtraInfo(&cand, std::string("decayLength"), std::get<0>(tau));
-      setExtraInfo(&cand, std::string("decayLengthErr"), std::get<1>(tau));
-      setExtraInfo(&cand, std::string("lifeTime"), std::get<0>(life));
-      setExtraInfo(&cand, std::string("lifeTimeErr"), std::get<1>(life));
+      const std::tuple<double, double>tau  = getDecayLength(cand);
+      const std::tuple<double, double>life = getLifeTime(cand);
+      cand.writeExtraInfo("decayLength", std::get<0>(tau));
+      cand.writeExtraInfo("decayLengthErr", std::get<1>(tau));
+      cand.writeExtraInfo("lifeTime", std::get<0>(life));
+      cand.writeExtraInfo("lifeTimeErr", std::get<1>(life));
     }
   }
 
@@ -320,7 +300,7 @@ namespace TreeFitter {
       const Eigen::Matrix<double, 3, 3> mom_cov = m_fitparams->getCovariance().block<3, 3>(momindex, momindex);
       Eigen::Matrix<double, 4, 4> comb_cov =  Eigen::Matrix<double, 4, 4>::Zero(4, 4);
 
-      std::tuple<double, double> lenTuple  = getDecayLength(cand);
+      const std::tuple<double, double> lenTuple  = getDecayLength(cand);
 
       const double lenErr = std::get<1>(lenTuple);
       comb_cov(0, 0) = lenErr * lenErr;

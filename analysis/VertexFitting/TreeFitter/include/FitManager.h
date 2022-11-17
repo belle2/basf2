@@ -51,9 +51,6 @@ namespace TreeFitter {
     /** main fit function that uses the kalman filter */
     bool fit();
 
-    /** add extrainfo to particle */
-    void setExtraInfo(Belle2::Particle* part, const std::string& name, const double value) const;
-
     /** update particles parameters with the fit results */
     bool updateCand(Belle2::Particle& particle, const bool isTreeHead) const;
 
@@ -89,9 +86,6 @@ namespace TreeFitter {
 
     /** getter for chi2 of the newton iteration */
     double chiSquare() const { return m_chiSquare ; }
-
-    /** getter for degrees of freedom of the fitparameters */
-    int nDof() const;
 
     /** getter for the status of the newton iteration  */
     int status() const { return m_status; }

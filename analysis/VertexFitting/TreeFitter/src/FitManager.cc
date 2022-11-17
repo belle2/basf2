@@ -31,7 +31,6 @@ namespace TreeFitter {
     m_decaychain(nullptr),
     m_status(VertexStatus::UnFitted),
     m_chiSquare(-1),
-    m_niter(-1),
     m_prec(prec),
     m_updateDaugthers(updateDaughters),
     m_ndf(0),
@@ -67,8 +66,9 @@ namespace TreeFitter {
       m_status = VertexStatus::UnFitted;
       int ndiverging = 0;
       bool finished = false;
-      for (m_niter = 0; m_niter < nitermax && !finished; ++m_niter) {
-        if (m_niter == 0) {
+      int niter = 0;
+      for (niter = 0; niter < nitermax && !finished; ++niter) {
+        if (niter == 0) {
           m_errCode = m_decaychain->filter(*m_fitparams);
         } else if (m_useReferencing) {
           auto* tempState = new FitParams(*m_fitparams);
@@ -83,7 +83,7 @@ namespace TreeFitter {
           m_status = VertexStatus::Failed;
           m_particle->writeExtraInfo("failed", 1);
         } else {
-          if (m_niter > 0) {
+          if (niter > 0) {
             if ((std::abs(deltachisq) / m_chiSquare < dChisqConv)) {
               m_chiSquare = chisq;
               m_status = VertexStatus::Success;
@@ -102,7 +102,7 @@ namespace TreeFitter {
           m_chiSquare = chisq;
         }
       }
-      if (m_niter == nitermax && m_status != VertexStatus::Success) {
+      if (niter == nitermax && m_status != VertexStatus::Success) {
         m_particle->writeExtraInfo("failed", 3);
         m_status = VertexStatus::NonConverged;
       }
@@ -122,21 +122,6 @@ namespace TreeFitter {
     }
 
     return (m_status == VertexStatus::Success);
-  }
-
-  int FitManager::posIndex(Belle2::Particle* particle) const
-  {
-    return m_decaychain->posIndex(particle);
-  }
-
-  int FitManager::momIndex(Belle2::Particle* particle) const
-  {
-    return m_decaychain->momIndex(particle);
-  }
-
-  int FitManager::tauIndex(Belle2::Particle* particle) const
-  {
-    return m_decaychain->tauIndex(particle);
   }
 
   void FitManager::getCovFromPB(const ParticleBase* pb, TMatrixFSym& returncov) const

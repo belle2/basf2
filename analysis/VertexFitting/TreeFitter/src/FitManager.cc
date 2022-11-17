@@ -175,7 +175,7 @@ namespace TreeFitter {
         }
       }
 
-      double mass = pb->pdgMass();
+      double mass = pb->particle()->getPDGMass();
       Eigen::Matrix<double, 3, 1> momVec =
         m_fitparams->getStateVector().segment(momindex, 3);
 
@@ -310,7 +310,7 @@ namespace TreeFitter {
 
       comb_cov.block<3, 3>(1, 1) = mom_cov;
 
-      const double mass = pb->pdgMass();
+      const double mass = pb->particle()->getPDGMass();
       const double mBYc = mass / Belle2::Const::speedOfLight;
       const double mom = mom_vec.norm();
       const double mom3 = mom * mom * mom;

@@ -642,6 +642,15 @@ double Particle::getPDGMass() const
   return TDatabasePDG::Instance()->GetParticle(m_pdgCode)->Mass();
 }
 
+double Particle::getPDGLifetime() const
+{
+  if (TDatabasePDG::Instance()->GetParticle(m_pdgCode) == nullptr) {
+    B2ERROR("PDG=" << m_pdgCode << " ***code unknown to TDatabasePDG");
+    return 0.0;
+  }
+  return TDatabasePDG::Instance()->GetParticle(m_pdgCode)->Lifetime();
+}
+
 double Particle::getCharge() const
 {
   if (TDatabasePDG::Instance()->GetParticle(m_pdgCode) == nullptr) {

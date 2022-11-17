@@ -496,6 +496,12 @@ namespace Belle2 {
     double getPDGMass(void) const;
 
     /**
+     * Returns particle nominal lifetime
+     * @return nominal lifetime [sec]
+     */
+    double getPDGLifetime() const;
+
+    /**
      * Returns total energy
      * @return total energy
      */

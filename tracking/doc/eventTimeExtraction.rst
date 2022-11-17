@@ -5,22 +5,25 @@ Time Extraction
 
 Track Time
 ----------
-The track time estimates the time at which the track is produced with respect to the time of the collision.
-Firstly, it is necessary to introduce the definition of outgoing and ingoing arm times.
-Outgoing and ingoing arms are identified using the order of the detectors associated to the track hits:
-for example, the arm is considered outgoing (ingoing) if the hits are found respectively in PXD-SVD-CDC 
+The track time is the time at which the track is produced with respect to the collision time.
+We define the outgoing (ingoing) arm as the part of the helix that exits (enters) the IP. 
+They are identified using the order of the detectors associated to the track hits:
+for example, the arm is considered outgoing (ingoing) if the hits are found in PXD-SVD-CDC 
 (CDC-SVD-PXD). Outgoing (ingoing) arm time is computed with the SVD clusters used in the reconstruction of 
 the outgoing (ingoing) arm of the track as the average of the cluster times.
-
 If the track has only the outgoing (ingoing) arm, the track time is computed as the difference of the outgoing
 (ingoing) arm time and the event time (EventT0, see next section). 
+In case the track has both outgoing and ingoing arms, the one with the smallest time is used.
 
-In case the track has both outgoing and ingoing arms, the following cases are considered:
+.. note::
+   Tracks can have roughly:
 
-#. when the outgoing arm time is smaller than the ingoing arm time, the track time is computed as the
-difference between the outgoing arm time and the event time;
+   #. outgoing arm only (98.5%)
 
-#. otherwise, the track time is computed as the difference between the ingoing arm time and the event time.
+   #. ingoing arm only (0.9%)
+
+   #. both outgoing and ingoing arms (0.6%) 
+   
 
 EventT0
 -------

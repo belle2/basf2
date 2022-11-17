@@ -15,9 +15,9 @@
 using namespace Belle2;
 using boost::math::sign;
 
-int ThreeHitFilters::calcSign(const TVector3& a, const TVector3& b, const TVector3& c)
+int ThreeHitFilters::calcSign(const B2Vector3D& a, const B2Vector3D& b, const B2Vector3D& c)
 {
-  TVector3 ba = a - b; ba.SetZ(0.);
-  TVector3 bc = b - c; bc.SetZ(0.);
+  B2Vector3D ba = a - b; ba.SetZ(0.);
+  B2Vector3D bc = b - c; bc.SetZ(0.);
   return sign(bc.Orthogonal() * ba); //normal vector of m_vecBC times segment of ba
 }

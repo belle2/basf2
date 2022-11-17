@@ -22,7 +22,7 @@
 
 #include <string>
 
-#include <TVector3.h>
+#include <framework/geometry/B2Vector3.h>
 
 
 namespace Belle2 {
@@ -75,8 +75,8 @@ namespace Belle2 {
     {
       // prepare stuff for 2-hit-filters:
       auto prepareStuff = [ = ](const PointType & outerHit, const PointType & innerHit) -> void {
-        TVector3 tOuterHit(outerHit.X(), outerHit.Y(), outerHit.Z());
-        TVector3 tInnerHit(innerHit.X(), innerHit.Y(), innerHit.Z());
+        B2Vector3D tOuterHit(outerHit.X(), outerHit.Y(), outerHit.Z());
+        B2Vector3D tInnerHit(innerHit.X(), innerHit.Y(), innerHit.Z());
         m_twoHit.resetValues(tOuterHit, tInnerHit);
       };
 
@@ -118,8 +118,8 @@ namespace Belle2 {
 
       // prepare stuff for 2+1-hit-filters
       auto prepareStuffHiOc = [ = ](const PointType & outerHit, const PointType & innerHit) -> void {
-        TVector3 tOuterHit(outerHit.X(), outerHit.Y(), outerHit.Z());
-        TVector3 tInnerHit(innerHit.X(), innerHit.Y(), innerHit.Z());
+        B2Vector3D tOuterHit(outerHit.X(), outerHit.Y(), outerHit.Z());
+        B2Vector3D tInnerHit(innerHit.X(), innerHit.Y(), innerHit.Z());
         m_threeHit.resetValues(tOuterHit, tInnerHit, m_virtualIP);
       };
 
@@ -199,9 +199,9 @@ namespace Belle2 {
     {
       // prepare stuff for 3-hit-filters
       auto prepareStuff3Hit = [ = ](const PointType & outerHit, const PointType & centerHit, const PointType & innerHit) -> void {
-        TVector3 tOuterHit(outerHit.X(), outerHit.Y(), outerHit.Z());
-        TVector3 tCenterHit(centerHit.X(), centerHit.Y(), centerHit.Z());
-        TVector3 tInnerHit(innerHit.X(), innerHit.Y(), innerHit.Z());
+        B2Vector3D tOuterHit(outerHit.X(), outerHit.Y(), outerHit.Z());
+        B2Vector3D tCenterHit(centerHit.X(), centerHit.Y(), centerHit.Z());
+        B2Vector3D tInnerHit(innerHit.X(), innerHit.Y(), innerHit.Z());
         m_threeHit.resetValues(tOuterHit, tCenterHit, tInnerHit);
       };
 
@@ -273,9 +273,9 @@ namespace Belle2 {
       // prepare stuff for 3+1-hit-filters
       auto prepareStuff4Hit = [ = ](const PointType & outerHit, const PointType & centerHit,
       const PointType & innerHit) -> void {
-        TVector3 tOuterHit(outerHit.X(), outerHit.Y(), outerHit.Z());
-        TVector3 tCenterHit(centerHit.X(), centerHit.Y(), centerHit.Z());
-        TVector3 tInnerHit(innerHit.X(), innerHit.Y(), innerHit.Z());
+        B2Vector3D tOuterHit(outerHit.X(), outerHit.Y(), outerHit.Z());
+        B2Vector3D tCenterHit(centerHit.X(), centerHit.Y(), centerHit.Z());
+        B2Vector3D tInnerHit(innerHit.X(), innerHit.Y(), innerHit.Z());
         m_fourHit.resetValues(tOuterHit, tCenterHit, tInnerHit, m_virtualIP);
       };
 
@@ -320,10 +320,10 @@ namespace Belle2 {
       // prepare stuff for 4-hit-filters
       auto prepareStuff4Hit = [ = ](const PointType & outerHit, const PointType & outerCenterHit,
       const PointType & innerCenterHit, const PointType & innerHit) -> void {
-        TVector3 tOuterHit(outerHit.X(), outerHit.Y(), outerHit.Z());
-        TVector3 tOuterCenterHit(outerCenterHit.X(), outerCenterHit.Y(), outerCenterHit.Z());
-        TVector3 tInnerCenterHit(innerCenterHit.X(), innerCenterHit.Y(), innerCenterHit.Z());
-        TVector3 tInnerHit(innerHit.X(), innerHit.Y(), innerHit.Z());
+        B2Vector3D tOuterHit(outerHit.X(), outerHit.Y(), outerHit.Z());
+        B2Vector3D tOuterCenterHit(outerCenterHit.X(), outerCenterHit.Y(), outerCenterHit.Z());
+        B2Vector3D tInnerCenterHit(innerCenterHit.X(), innerCenterHit.Y(), innerCenterHit.Z());
+        B2Vector3D tInnerHit(innerHit.X(), innerHit.Y(), innerHit.Z());
         m_fourHit.resetValues(tOuterHit, tOuterCenterHit, tInnerCenterHit, tInnerHit);
       };
 
@@ -360,7 +360,7 @@ namespace Belle2 {
     ThreeHitFilters m_threeHit; /**< contains all 3-hit-filters. */
     FourHitFilters m_fourHit; /**< contains all 4-hit-filters. */
 
-    TVector3 m_virtualIP; /**< contains global coordinates of virtual interaction point. */
+    B2Vector3D m_virtualIP; /**< contains global coordinates of virtual interaction point. */
   };
 }
 

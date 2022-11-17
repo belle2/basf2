@@ -176,9 +176,6 @@ namespace TreeFitter {
     /** number of charged candidates */
     virtual int nFinalChargedCandidates() const;
 
-    /** set the relation to basf2 particle type */
-    /* void setParticle(Belle2::Particle* particle) { m_particle = particle ; } */
-
   protected:
 
     /** just an alias */

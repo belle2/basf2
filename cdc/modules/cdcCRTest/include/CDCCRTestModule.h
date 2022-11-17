@@ -19,6 +19,7 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <framework/dataobjects/EventT0.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/geometry/B2Vector3.h>
 #include "TH1.h"
 #include "TH2.h"
 #include "TProfile.h"
@@ -165,7 +166,7 @@ namespace Belle2 {
       /**
        * extrapolation track to trigger counter plane (y position).
        */
-      TVector3 getTriggerHitPosition(Belle2::RecoTrack* track);
+      B2Vector3D getTriggerHitPosition(Belle2::RecoTrack* track);
 
       /**
        * Cal Hit eff.
@@ -280,7 +281,7 @@ namespace Belle2 {
       double omega;             /**< Track Parameter, omega. */
       double m_MinimumPt;       /**< Minimum Transverse momentum of tracks*/
 
-      TVector3 m_trigHitPos;                            /**< Trigger position. */
+      B2Vector3D m_trigHitPos;                          /**< Trigger position. */
       std::vector<double> m_TriggerPos;                 /**< Nominal center position of trigger counter. */
       std::vector<double> m_TriggerPlaneDirection;      /**< Nominal center position of trigger counter. */
       std::vector<double> m_TriggerSize;                /**< Size of trigger counter (Width x length). */

@@ -99,10 +99,7 @@ namespace TreeFitter {
     int index() const { return m_index ; }
 
     /** getMother() / hasMother() */
-    const ParticleBase* mother() const;
-
-    /**  get name of the particle */
-    const std::string& name() const { return m_name ; }
+    const ParticleBase* mother() const { return m_mother; };
 
     /**  project geometrical constraint */
     virtual ErrCode projectGeoConstraint(const FitParams&, Projection&) const ;

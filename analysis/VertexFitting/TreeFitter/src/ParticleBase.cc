@@ -285,14 +285,9 @@ namespace TreeFitter {
     return status;
   }
 
-  const ParticleBase* ParticleBase::mother() const
-  {
-    return m_mother;
-  }
-
   std::string ParticleBase::parname(int thisindex) const
   {
-    std::string rc = name();
+    std::string rc = m_name;
     switch (thisindex) {
       case 0: rc += "_x  "; break;
       case 1: rc += "_y  "; break;

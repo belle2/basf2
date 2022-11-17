@@ -1,3 +1,11 @@
+Changes in the analysis package in light-2212-foldex
+----------------------------------------------------
+
+Variables
++++++++++
+ * Extended the variable `useAlternativeDaughterHypothesis` to variables using daughters' pdg codes, e.g. `InvM`.
+
+
 Changes in the analysis package in light-2210-devonrex
 ------------------------------------------------------
 

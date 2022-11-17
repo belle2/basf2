@@ -33,15 +33,10 @@ namespace TreeFitter {
                                    Eigen::Matrix<double, 5, 6>& jacobian)
   {
 
+    helix = Belle2::Helix(ROOT::Math::XYZVector(positionAndMomentum(0), positionAndMomentum(1), positionAndMomentum(2)),
+                          ROOT::Math::XYZVector(positionAndMomentum(3), positionAndMomentum(4), positionAndMomentum(5)),
+                          charge, Bz);
 
-    const ROOT::Math::XYZVector position(positionAndMomentum(0),
-                                         positionAndMomentum(1),
-                                         positionAndMomentum(2));
-    const ROOT::Math::XYZVector momentum(positionAndMomentum(3),
-                                         positionAndMomentum(4),
-                                         positionAndMomentum(5));
-
-    helix = Belle2::Helix(position, momentum, charge, Bz);
     L = helix.getArcLength2DAtXY(positionAndMomentum(0),
                                  positionAndMomentum(1));
 
@@ -134,14 +129,9 @@ namespace TreeFitter {
                                                           Eigen::Matrix<double, 5, 6>& jacobian)
   {
 
-    const ROOT::Math::XYZVector position(positionAndMom(0),
-                                         positionAndMom(1),
-                                         positionAndMom(2));
-    const ROOT::Math::XYZVector momentum(positionAndMom(3),
-                                         positionAndMom(4),
-                                         positionAndMom(5));
-
-    helix = Belle2::Helix(position, momentum, charge, Bz);
+    helix = Belle2::Helix(ROOT::Math::XYZVector(positionAndMom(0), positionAndMom(1), positionAndMom(2)),
+                          ROOT::Math::XYZVector(positionAndMom(3), positionAndMom(4), positionAndMom(5)),
+                          charge, Bz);
 
     // numeric calculation of the jacobian
     Belle2::Helix helixPlusDelta;

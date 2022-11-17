@@ -1060,7 +1060,7 @@ void EVEVisualization::makeLines(TEveTrack* eveTrack, const genfit::StateOnPlane
 
 void EVEVisualization::addSimHit(const CDCSimHit* hit, const MCParticle* particle)
 {
-  addSimHit(hit->getPosWire(), particle);
+  addSimHit(ROOT::Math::XYZVector(hit->getPosWire()), particle);
 }
 void EVEVisualization::addSimHit(const PXDSimHit* hit, const MCParticle* particle)
 {

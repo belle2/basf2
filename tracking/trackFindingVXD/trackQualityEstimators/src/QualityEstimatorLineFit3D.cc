@@ -14,7 +14,6 @@ using namespace Belle2;
 
 double QualityEstimatorLineFit3D::estimateQuality(std::vector<SpacePoint const*> const& measurements)
 {
-  TVector3 directionVector;
   double sumWyi = 0, // sum of weights for Yi
          sumWzi = 0, // sum of weights for Zi
          sumWyiXi = 0, // sum of (y-weights times x-values)

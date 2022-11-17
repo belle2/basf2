@@ -8,7 +8,7 @@
 
 #include <cdc/translators/RealisticTDCCountTranslator.h>
 #include <framework/core/Environment.h>
-#include <TVector3.h>
+#include <framework/geometry/B2Vector3.h>
 
 using namespace std;
 using namespace Belle2;
@@ -52,8 +52,8 @@ double RealisticTDCCountTranslator::getDriftTime(unsigned short tdcCount,
   // Need to undo everything the digitization does in reverse order.
   // First: Undo propagation in wire, if it was used:
   if (m_useInWirePropagationDelay) {
-    const TVector3& backWirePos = m_cdcp.wireBackwardPosition(wireID, CDCGeometryPar::c_Aligned);
-    const TVector3& diffWirePos = m_cdcp.wireForwardPosition(wireID, CDCGeometryPar::c_Aligned) - backWirePos;
+    const B2Vector3D& backWirePos = m_cdcp.wireBackwardPosition(wireID, CDCGeometryPar::c_Aligned);
+    const B2Vector3D& diffWirePos = m_cdcp.wireForwardPosition(wireID, CDCGeometryPar::c_Aligned) - backWirePos;
     //subtract distance divided by speed of electric signal in the wire from the drift time.
     //    std::cout << layer <<" "<< diffWirePos.Z() <<" "<< stereoAngleFactor << std::endl;
     double propLength = z - backWirePos.Z();

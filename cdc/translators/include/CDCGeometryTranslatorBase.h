@@ -9,8 +9,7 @@
 #pragma once
 
 #include <cdc/dataobjects/WireID.h>
-
-#include <TVector3.h>
+#include <framework/geometry/B2Vector3.h>
 
 namespace Belle2 {
   namespace CDC {
@@ -25,10 +24,10 @@ namespace Belle2 {
 
       /** End of wire in the more forward position.
        */
-      virtual const TVector3 getWireForwardPosition(const WireID& wireID) = 0;
+      virtual const B2Vector3D getWireForwardPosition(const WireID& wireID) = 0;
 
       /** Beginning of wire in the more backward position. */
-      virtual const TVector3 getWireBackwardPosition(const WireID& wireID) = 0;
+      virtual const B2Vector3D getWireBackwardPosition(const WireID& wireID) = 0;
 
       /** End of imaginary wire in the more forward position.
        *
@@ -37,14 +36,14 @@ namespace Belle2 {
        *  During the tracking the z-position of the actual hit is known quite well, which means,
        *  that individual corrections due to wire sag, etc. can be applied by moving the endpoints accordingly.
        */
-      virtual const TVector3 getWireForwardPosition(const WireID& wireID,
-                                                    //float z = 0) = 0;
-                                                    float z) = 0;
+      virtual const B2Vector3D getWireForwardPosition(const WireID& wireID,
+                                                      //float z = 0) = 0;
+                                                      float z) = 0;
 
       /** Beginning of imaginary wire in the more backward position. */
-      virtual const TVector3 getWireBackwardPosition(const WireID& wireID,
-                                                     //float z = 0) = 0;
-                                                     float z) = 0;
+      virtual const B2Vector3D getWireBackwardPosition(const WireID& wireID,
+                                                       //float z = 0) = 0;
+                                                       float z) = 0;
     };
   }
 }

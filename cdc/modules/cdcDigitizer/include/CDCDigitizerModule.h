@@ -205,9 +205,9 @@ namespace Belle2 {
     WireID m_wireID;            /**< WireID of this hit */
     unsigned short m_posFlag;   /**< left or right flag of this hit */
     unsigned short m_boardID = 0; /**< FEE board ID */
-    TVector3 m_posWire;         /**< wire position of this hit */
-    TVector3 m_posTrack;        /**< track position of this hit */
-    TVector3 m_momentum;        /**< 3-momentum of this hit */
+    B2Vector3D m_posWire;         /**< wire position of this hit */
+    B2Vector3D m_posTrack;        /**< track position of this hit */
+    B2Vector3D m_momentum;        /**< 3-momentum of this hit */
     double m_driftLength;       /**< drift length of this hit */
     double m_flightTime;        /**< flight time of this hit */
     double m_globalTime;        /**< global time of this hit */

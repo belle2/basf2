@@ -19,20 +19,12 @@ Decay B-sig
 0.5  D+sig   pi-   e-   anti-nu_e     PHOTOS  GOITY_ROBERTS;
 0.5  D+sig   pi-   mu-  anti-nu_mu    PHOTOS   GOITY_ROBERTS;
 Enddecay
-
-Decay B+sig
-
-0.5  D-sig   pi+   e+   nu_e     PHOTOS  GOITY_ROBERTS;
-0.5  D-sig   pi+   mu+  nu_mu    PHOTOS   GOITY_ROBERTS;
-Enddecay
-
+CDecay B+sig
 
 Decay D+sig
 1  K- pi+ pi+  PHOTOS PHSP;
 Enddecay
-Decay D-sig
-1  K+ pi- pi-  PHOTOS PHSP;
-Enddecay
+CDecay D-sig
 
 End
 

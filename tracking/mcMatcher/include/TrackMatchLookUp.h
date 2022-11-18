@@ -31,13 +31,26 @@ namespace Belle2 {
   public:
     /*!
      * Matching categories for the Monte Carlo tracks.
+     * c_undefined, //until the matcher module sets it
+     * c_matched, // hit pattern and charge are both correct
+     * c_wrongCharge, // hit pattern is correct, but the charge is wrong
+     * c_merged, //a clone with the correct charge
+     * c_mergedWrongCharge, //a clone with the wrong charge
+     * c_missing
      */
-    enum class MCToPRMatchInfo { c_Invalid, c_Matched, c_WrongCharge, c_Merged, c_MergedWrongCharge, c_Missing };
+    enum class MCToPRMatchInfo { c_undefined, c_matched, c_wrongCharge, c_merged, c_mergedWrongCharge, c_missing };
 
     /*!
      * Matching categories for the pattern recognition tracks.
+     * c_undefined, //until the matcher module sets it
+     * c_matched, // hit pattern and charge are both correct
+     * c_wrongCharge, // hit pattern is correct, but the charge is wrong
+     * c_clone, //a clone with the correct charge
+     * c_cloneWrongCharge, //a clone with the wrong charge
+     * c_background,
+     * c_ghost
      */
-    enum class PRToMCMatchInfo { c_Invalid, c_Matched, c_WrongCharge, c_Clone, c_CloneWrongCharge, c_Background, c_Ghost };
+    enum class PRToMCMatchInfo { c_undefined, c_matched, c_wrongCharge, c_clone, c_cloneWrongCharge, c_background, c_ghost };
 
   public:
     /*!
@@ -145,7 +158,7 @@ namespace Belle2 {
      */
     bool isMatchedPRRecoTrack(const RecoTrack& prRecoTrack) const
     {
-      return getPRToMCMatchInfo(prRecoTrack) == PRToMCMatchInfo::c_Matched;
+      return getPRToMCMatchInfo(prRecoTrack) == PRToMCMatchInfo::c_matched;
     }
 
     /*!
@@ -154,7 +167,7 @@ namespace Belle2 {
     */
     bool isWrongChargePRRecoTrack(const RecoTrack& prRecoTrack) const
     {
-      return getPRToMCMatchInfo(prRecoTrack) == PRToMCMatchInfo::c_WrongCharge;
+      return getPRToMCMatchInfo(prRecoTrack) == PRToMCMatchInfo::c_wrongCharge;
     }
 
     /*!
@@ -162,7 +175,7 @@ namespace Belle2 {
      */
     bool isClonePRRecoTrack(const RecoTrack& prRecoTrack) const
     {
-      return getPRToMCMatchInfo(prRecoTrack) == PRToMCMatchInfo::c_Clone;
+      return getPRToMCMatchInfo(prRecoTrack) == PRToMCMatchInfo::c_clone;
     }
     /*!
      * Checks, if the pattern recognition track is a clone of an other pattern recognition track,
@@ -170,7 +183,7 @@ namespace Belle2 {
      */
     bool isCloneWrongChargePRRecoTrack(const RecoTrack& prRecoTrack) const
     {
-      return getPRToMCMatchInfo(prRecoTrack) == PRToMCMatchInfo::c_CloneWrongCharge;
+      return getPRToMCMatchInfo(prRecoTrack) == PRToMCMatchInfo::c_cloneWrongCharge;
     }
 
     /*!
@@ -178,7 +191,7 @@ namespace Belle2 {
      */
     bool isBackgroundPRRecoTrack(const RecoTrack& prRecoTrack) const
     {
-      return getPRToMCMatchInfo(prRecoTrack) == PRToMCMatchInfo::c_Background;
+      return getPRToMCMatchInfo(prRecoTrack) == PRToMCMatchInfo::c_background;
     }
 
     /*!
@@ -187,7 +200,7 @@ namespace Belle2 {
      */
     bool isGhostPRRecoTrack(const RecoTrack& prRecoTrack) const
     {
-      return getPRToMCMatchInfo(prRecoTrack) == PRToMCMatchInfo::c_Ghost;
+      return getPRToMCMatchInfo(prRecoTrack) == PRToMCMatchInfo::c_ghost;
     }
 
   public:
@@ -206,7 +219,7 @@ namespace Belle2 {
      */
     bool isMatchedMCRecoTrack(const RecoTrack& mcRecoTrack) const
     {
-      return getMCToPRMatchInfo(mcRecoTrack) == MCToPRMatchInfo::c_Matched;
+      return getMCToPRMatchInfo(mcRecoTrack) == MCToPRMatchInfo::c_matched;
     }
 
     /*!
@@ -214,7 +227,7 @@ namespace Belle2 {
      */
     bool isMatchedWrongChargeMCRecoTrack(const RecoTrack& mcRecoTrack) const
     {
-      return getMCToPRMatchInfo(mcRecoTrack) == MCToPRMatchInfo::c_WrongCharge;
+      return getMCToPRMatchInfo(mcRecoTrack) == MCToPRMatchInfo::c_wrongCharge;
     }
 
     /*!
@@ -222,7 +235,7 @@ namespace Belle2 {
      */
     bool isMergedMCRecoTrack(const RecoTrack& mcRecoTrack) const
     {
-      return getMCToPRMatchInfo(mcRecoTrack) == MCToPRMatchInfo::c_Merged;
+      return getMCToPRMatchInfo(mcRecoTrack) == MCToPRMatchInfo::c_merged;
     }
 
     /*!
@@ -231,7 +244,7 @@ namespace Belle2 {
      */
     bool isMergedWrongChargeMCRecoTrack(const RecoTrack& mcRecoTrack) const
     {
-      return getMCToPRMatchInfo(mcRecoTrack) == MCToPRMatchInfo::c_MergedWrongCharge;
+      return getMCToPRMatchInfo(mcRecoTrack) == MCToPRMatchInfo::c_mergedWrongCharge;
     }
 
     /*!
@@ -239,7 +252,7 @@ namespace Belle2 {
      */
     bool isMissingMCRecoTrack(const RecoTrack& mcRecoTrack) const
     {
-      return getMCToPRMatchInfo(mcRecoTrack) == MCToPRMatchInfo::c_Missing;
+      return getMCToPRMatchInfo(mcRecoTrack) == MCToPRMatchInfo::c_missing;
     }
 
   public:

@@ -63,6 +63,10 @@ namespace Belle2 {
    *
    *  The PRTracks can be classified into six categories:
    *
+   *  - UNDEFINED
+   *      - Status of the track *before* any real status has been set.
+   *      - If the track status is still UNDEFINED after matching, something went wrong.
+   *
    *  - MATCHED
    *      - The highest efficiency PRTrack of the highest purity MCTrack to this PRTrack is the same as this PRTrack.
    *      - In addition, the charge of the PRTrack and the one of the MCTrack are the same.
@@ -127,6 +131,10 @@ namespace Belle2 {
    *  .
    *
    *  MCTracks are classified into five categories:
+   *
+   *  - UNDEFINED
+   *      - Status of the track *before* any real status has been set.
+   *      - If the track status is still UNDEFINED after matching, something went wrong.
    *
    *  - MATCHED
    *      - The highest purity MCTrack of the highest efficiency PRTrack of this MCTrack is the same as this MCTrack.

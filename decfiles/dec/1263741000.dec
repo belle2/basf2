@@ -24,6 +24,7 @@ CDecay B+sig
 Decay D*+sig
 0.6770    D0sig  pi+                        PHOTOS VSS;
 0.3070    D+sig  pi0                        PHOTOS VSS;
+0.0160    D+sig  gamma                      VSP_PWAVE;
 Enddecay
 CDecay D*-sig
 

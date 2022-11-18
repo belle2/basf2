@@ -2018,6 +2018,11 @@ def variablesToEventExtraInfo(particleList, variables, option=0, path=None):
     For each particle in the input list the selected variables are saved in an event-extra-info field with the given name,
     Can be used to save MC truth information, for example, in a ntuple of reconstructed particles.
 
+    .. tip::
+        When the function is called first time not in the main path but in a sub-path e.g. ``roe_path``,
+        the eventExtraInfo cannot be accessed from the main path because of the shorter lifetime of the event-extra-info field.
+        If one wants to call the function in a sub-path, one has to call the function in the main path beforehand.
+
     Parameters:
         particleList (str):         The input ParticleList
         variables (dict[str,str]):  Dictionary of Variables (key) and extraInfo names (value).

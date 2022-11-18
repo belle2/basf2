@@ -41,9 +41,8 @@ namespace TreeFitter {
 
     const double distanceToMother = vertexToCluster.norm();
     const double energy =  m_clusterPars(3);
-    const double energy2 = energy * energy;
-    const double pdgMass2 = ParticleBase::pdgMass() * ParticleBase::pdgMass();
-    const double absMom = -1 * std::sqrt(energy2 - pdgMass2);
+    const double pdgMass = particle()->getPDGMass();
+    const double absMom = -1 * std::sqrt(energy * energy - pdgMass * pdgMass);
 
     const int momindex = momIndex();
 

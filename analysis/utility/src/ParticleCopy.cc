@@ -29,16 +29,20 @@ Particle* ParticleCopy::copyParticle(const Particle* original)
   // Copy daughters as well.
   unsigned nDaughters = original->getNDaughters();
 
+  // If the particle has undergone Bremsstrahlung correction, removing its
+  // daughters (the original lepton and potential photons) and then appending
+  // the copied versions should not change its source type.
+  // Or, if the particle's source is V0, it should be kept as V0 rather than changing to Composite.
+  bool updateType = true;
+  if (copy->hasExtraInfo("bremsCorrected") ||
+      copy->getParticleSource() == Particle::EParticleSourceObject::c_V0)
+    updateType = false;
+
   for (unsigned iOld = 0; iOld < nDaughters; iOld++) {
     const Particle* originalDaughter = original->getDaughter(iOld);
 
     Particle* daughterCopy = copyParticle(originalDaughter);
 
-    // If the particle has undergone Bremsstrahlung correction, removing its
-    // daughters (the original lepton and potential photons) and then appending
-    // the copied versions should not change its source type.
-    bool updateType = true;
-    if (copy->hasExtraInfo("bremsCorrected")) updateType = false;
     // remove original daughter
     copy->removeDaughter(originalDaughter, updateType);
     // append copied daughter instead
@@ -50,14 +54,23 @@ Particle* ParticleCopy::copyParticle(const Particle* original)
 
 void ParticleCopy::copyDaughters(Belle2::Particle* mother)
 {
+  // If the particle has undergone Bremsstrahlung correction, removing its
+  // daughters (the original lepton and potential photons) and then appending
+  // the copied versions should not change its source type.
+  // Or, if the particle's source is V0, it should be kept as V0 rather than changing to Composite.
+  bool updateType = true;
+  if (mother->hasExtraInfo("bremsCorrected") ||
+      mother->getParticleSource() == Particle::EParticleSourceObject::c_V0)
+    updateType = false;
+
   unsigned nDaughters = mother->getNDaughters();
   for (unsigned iOld = 0; iOld < nDaughters; iOld++) {
     const Particle* originalDaughter = mother->getDaughter(0);
     Particle* daughterCopy = copyParticle(originalDaughter);
 
     // remove original daughter
-    mother->removeDaughter(originalDaughter);
+    mother->removeDaughter(originalDaughter, updateType);
     // append copied daughter instead
-    mother->appendDaughter(daughterCopy);
+    mother->appendDaughter(daughterCopy, updateType);
   }
 }

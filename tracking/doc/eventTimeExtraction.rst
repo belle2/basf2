@@ -40,10 +40,10 @@ There are several estimators in the tracking package:
 SVD Event Time Estimator
 ^^^^^^^^^^^^^^^^^^^^^^^^
 This is a simple estimator that is computed after tracking: the SVD clusters, belonging to the 
-outgoing arm (or to the ingoing arm, only if the ingoing arm is also present and has a smaller time 
-than the outgoing arm, or if the ingoing arm is the only one available), used in the reconstruction 
-of tracks with :math:`p_T > 250` MeV/c are selected and then compute the time of the event as the 
-average of the cluster times. This is the default time of the event computed by tracking.
+outgoing arm (or to the ingoing arm, if its time is smaller than the outgoing arm time or if it 
+is the only one available), used in the reconstruction of tracks with :math:`p_T > 250` MeV/c 
+are selected and then compute the time of the event as the average of the cluster times. This 
+is the default time of the event computed by tracking.
 
 CDC Hit Based Estimator
 ^^^^^^^^^^^^^^^^^^^^^^^

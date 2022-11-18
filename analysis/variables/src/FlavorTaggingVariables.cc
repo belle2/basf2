@@ -8,6 +8,7 @@
 
 // Own include
 #include <analysis/variables/FlavorTaggingVariables.h>
+#include <analysis/variables/ROEVariables.h>
 
 #include <analysis/variables/MCTruthVariables.h>
 #include <analysis/variables/KLMClusterVariables.h>
@@ -99,8 +100,15 @@ namespace Belle2 {
 
     double cosTPTO(const Particle* part)
     {
-      StoreObjPtr<RestOfEvent> roe("RestOfEvent");
-      if (!roe.isValid()) return 0;
+      StoreObjPtr<RestOfEvent> roeobject("RestOfEvent");
+      const RestOfEvent* roe;
+      if (roeobject.isValid()) { // if in for_each loop over ROE
+        roe = &(*roeobject);
+      } else {
+        roe = getRelatedROEObject(part);
+        if (!roe)
+          return 0;
+      }
 
       std::vector<ROOT::Math::XYZVector> p3_cms_roe;
       static const double P_MAX(3.2);
@@ -164,8 +172,17 @@ namespace Belle2 {
         B2FATAL("At most 1 argument (name of mask) accepted.");
 
       auto func = [maskName](const Particle * particle) -> double {
-        StoreObjPtr<RestOfEvent> roe("RestOfEvent");
-        if (!roe.isValid()) return 0;
+        StoreObjPtr<RestOfEvent> roeobject("RestOfEvent");
+        const RestOfEvent* roe;
+        if (roeobject.isValid())   // if in for_each loop over ROE
+        {
+          roe = &(*roeobject);
+        } else
+        {
+          roe = getRelatedROEObject(particle);
+          if (!roe)
+            return 0;
+        }
 
         std::vector<ROOT::Math::XYZVector> p3_cms_roe;
         // static const double P_MAX(3.2);

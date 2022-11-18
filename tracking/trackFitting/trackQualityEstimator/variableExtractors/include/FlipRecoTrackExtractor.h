@@ -125,7 +125,7 @@ namespace Belle2 {
         m_variables.at(m_prefix + "seed_z_estimate") = svdcdc_pos.Z() ;
         m_variables.at(m_prefix + "seed_tan_lambda_estimate") = svdcdc_FitResult.getCotTheta();
 
-        float seed_pt_estimate = svdcdc_mom.Perp();
+        float seed_pt_estimate = svdcdc_mom.Rho();
         float seed_pt_variance = (pow(svdcdc_mom.X(), 2) * svdcdc_cov(3, 3) + pow(svdcdc_mom.Y(), 2) * svdcdc_cov(4,
                                   4) - 2 * svdcdc_mom.X() * svdcdc_mom.Y() * svdcdc_cov(3, 4)) / svdcdc_mom.Perp2();
         float seed_pt_resolution = seed_pt_variance / seed_pt_estimate;

@@ -33,15 +33,10 @@ namespace TreeFitter {
                                    Eigen::Matrix<double, 5, 6>& jacobian)
   {
 
+    helix = Belle2::Helix(ROOT::Math::XYZVector(positionAndMomentum(0), positionAndMomentum(1), positionAndMomentum(2)),
+                          ROOT::Math::XYZVector(positionAndMomentum(3), positionAndMomentum(4), positionAndMomentum(5)),
+                          charge, Bz);
 
-    ROOT::Math::XYZVector position(positionAndMomentum(0),
-                                   positionAndMomentum(1),
-                                   positionAndMomentum(2));
-    ROOT::Math::XYZVector momentum(positionAndMomentum(3),
-                                   positionAndMomentum(4),
-                                   positionAndMomentum(5));
-
-    helix = Belle2::Helix(position, momentum, charge, Bz);
     L = helix.getArcLength2DAtXY(positionAndMomentum(0),
                                  positionAndMomentum(1));
 
@@ -134,15 +129,9 @@ namespace TreeFitter {
                                                           Eigen::Matrix<double, 5, 6>& jacobian)
   {
 
-    ROOT::Math::XYZVector position(positionAndMom(0),
-                                   positionAndMom(1),
-                                   positionAndMom(2));
-
-    ROOT::Math::XYZVector momentum(positionAndMom(3),
-                                   positionAndMom(4),
-                                   positionAndMom(5));
-
-    helix = Belle2::Helix(position, momentum, charge, Bz);
+    helix = Belle2::Helix(ROOT::Math::XYZVector(positionAndMom(0), positionAndMom(1), positionAndMom(2)),
+                          ROOT::Math::XYZVector(positionAndMom(3), positionAndMom(4), positionAndMom(5)),
+                          charge, Bz);
 
     // numeric calculation of the jacobian
     Belle2::Helix helixPlusDelta;
@@ -224,31 +213,31 @@ namespace TreeFitter {
                                Belle2::B2Vector3D& vertex, bool parallel)
   {
 
-    double d0_1     = helix1.getD0();
-    double phi0_1   = helix1.getPhi0();
-    double omega_1  = helix1.getOmega();
-    double z0_1     = helix1.getZ0();
-    double tandip_1 = helix1.getTanLambda();
-    double cosdip_1 = cos(atan(tandip_1))  ; // can do that faster
+    const double d0_1     = helix1.getD0();
+    const double phi0_1   = helix1.getPhi0();
+    const double omega_1  = helix1.getOmega();
+    const double z0_1     = helix1.getZ0();
+    const double tandip_1 = helix1.getTanLambda();
+    const double cosdip_1 = cos(atan(tandip_1))  ; // can do that faster
 
-    double d0_2     = helix2.getD0();
-    double phi0_2   = helix2.getPhi0();
-    double omega_2  = helix2.getOmega();
-    double z0_2     = helix2.getZ0();
-    double tandip_2 = helix2.getTanLambda();
-    double cosdip_2 = cos(atan(tandip_2))  ; // can do that faster
+    const double d0_2     = helix2.getD0();
+    const double phi0_2   = helix2.getPhi0();
+    const double omega_2  = helix2.getOmega();
+    const double z0_2     = helix2.getZ0();
+    const double tandip_2 = helix2.getTanLambda();
+    const double cosdip_2 = cos(atan(tandip_2))  ; // can do that faster
 
-    double r_1 = 1 / omega_1 ;
-    double r_2 = 1 / omega_2 ;
+    const double r_1 = 1 / omega_1 ;
+    const double r_2 = 1 / omega_2 ;
 
-    double x0_1 = - (r_1 + d0_1) * sin(phi0_1) ;
-    double y0_1 = (r_1 + d0_1) * cos(phi0_1) ;
+    const double x0_1 = - (r_1 + d0_1) * sin(phi0_1) ;
+    const double y0_1 = (r_1 + d0_1) * cos(phi0_1) ;
 
-    double x0_2 = - (r_2 + d0_2) * sin(phi0_2) ;
-    double y0_2 = (r_2 + d0_2) * cos(phi0_2) ;
+    const double x0_2 = - (r_2 + d0_2) * sin(phi0_2) ;
+    const double y0_2 = (r_2 + d0_2) * cos(phi0_2) ;
 
-    double deltax = x0_2 - x0_1 ;
-    double deltay = y0_2 - y0_1 ;
+    const double deltax = x0_2 - x0_1 ;
+    const double deltay = y0_2 - y0_1 ;
 
     double phi1[2] ;
     double phi2[2] ;
@@ -256,25 +245,25 @@ namespace TreeFitter {
 
     // the phi of the 'intersection'.
     const double pi = TMath::Pi();
-    double phi    = - atan2(deltax, deltay) ;
-    double phinot = phi > 0 ?  phi - pi : phi + pi ;
+    const double phi    = - atan2(deltax, deltay) ;
+    const double phinot = phi > 0 ?  phi - pi : phi + pi ;
     phi1[0] = r_1 < 0 ? phi : phinot ;
     phi2[0] = r_2 > 0 ? phi : phinot ;
 
-    double R1 = fabs(r_1) ;
-    double R2 = fabs(r_2) ;
-    double Rmin = R1 < R2 ? R1 : R2 ;
-    double Rmax = R1 > R2 ? R1 : R2 ;
-    double dX = sqrt(deltax * deltax + deltay * deltay) ;
+    const double R1 = fabs(r_1) ;
+    const double R2 = fabs(r_2) ;
+    const double Rmin = R1 < R2 ? R1 : R2 ;
+    const double Rmax = R1 > R2 ? R1 : R2 ;
+    const double dX = sqrt(deltax * deltax + deltay * deltay) ;
 
     if (!parallel && dX + Rmin > Rmax && dX < R1 + R2) {
       // there are two solutions
       nsolutions = 2 ;
-      double ddphi1 = acos((dX * dX - R2 * R2 + R1 * R1) / (2.*dX * R1)) ;
+      const double ddphi1 = acos((dX * dX - R2 * R2 + R1 * R1) / (2.*dX * R1)) ;
       phi1[1] = phidomain(phi1[0] + ddphi1) ;
       phi1[0] = phidomain(phi1[0] - ddphi1)  ;
 
-      double ddphi2 = acos((dX * dX - R1 * R1 + R2 * R2) / (2.*dX * R2)) ;
+      const double ddphi2 = acos((dX * dX - R1 * R1 + R2 * R2) / (2.*dX * R2)) ;
       phi2[1] = phidomain(phi2[0] - ddphi2) ;
       phi2[0] = phidomain(phi2[0] + ddphi2) ;
 
@@ -289,35 +278,38 @@ namespace TreeFitter {
     int ibest = 0;
     const int ncirc(2) ;
     for (int i = 0; i < nsolutions; ++i) {
-      double dphi1 = phidomain(phi1[i] - phi0_1) ;
-      double dphi2 = phidomain(phi2[i] - phi0_2) ;
+      const double dphi1 = phidomain(phi1[i] - phi0_1) ;
+      const double dphi2 = phidomain(phi2[i] - phi0_2) ;
+
       for (int n1 = 1 - ncirc; n1 <= 1 + ncirc ; ++n1) {
-        double l1 = (dphi1 + n1 * TMath::TwoPi()) / omega_1 ;
-        double tmpz1 = (z0_1 + l1 * tandip_1) ;
-        if (n1 == 0 || fabs(tmpz1) < 100) {
-          for (int n2 = 1 - ncirc ; n2 <= 1 + ncirc; ++n2) {
-            double l2 = (dphi2 + n2 * TMath::TwoPi()) / omega_2 ;
-            double tmpz2 = (z0_2 + l2 * tandip_2) ;
-            if (n2 == 0 || fabs(tmpz2) < 100) {
-              if (first || fabs(tmpz1 - tmpz2) < fabs(z1 - z2)) {
-                ibest = i ;
-                first = false ;
-                z1 = tmpz1 ;
-                z2 = tmpz2 ;
-                flt1 = l1 / cosdip_1 ;
-                flt2 = l2 / cosdip_2 ;
-              }
-            }
+        const double l1 = (dphi1 + n1 * TMath::TwoPi()) / omega_1 ;
+        const double tmpz1 = (z0_1 + l1 * tandip_1) ;
+        if (n1 != 0 && fabs(tmpz1) > 100)
+          continue;
+
+        for (int n2 = 1 - ncirc ; n2 <= 1 + ncirc; ++n2) {
+          double l2 = (dphi2 + n2 * TMath::TwoPi()) / omega_2 ;
+          double tmpz2 = (z0_2 + l2 * tandip_2) ;
+          if (n2 != 0 && fabs(tmpz2) > 100)
+            continue;
+
+          if (first || fabs(tmpz1 - tmpz2) < fabs(z1 - z2)) {
+            ibest = i ;
+            first = false ;
+            z1 = tmpz1 ;
+            z2 = tmpz2 ;
+            flt1 = l1 / cosdip_1 ;
+            flt2 = l2 / cosdip_2 ;
           }
         }
       }
     }
 
-    double x1 =  r_1 * sin(phi1[ibest]) + x0_1 ;
-    double y1 = -r_1 * cos(phi1[ibest]) + y0_1 ;
+    const double x1 =  r_1 * sin(phi1[ibest]) + x0_1 ;
+    const double y1 = -r_1 * cos(phi1[ibest]) + y0_1 ;
 
-    double x2 =  r_2 * sin(phi2[ibest]) + x0_2 ;
-    double y2 = -r_2 * cos(phi2[ibest]) + y0_2 ;
+    const double x2 =  r_2 * sin(phi2[ibest]) + x0_2 ;
+    const double y2 = -r_2 * cos(phi2[ibest]) + y0_2 ;
 
     vertex.SetX(0.5 * (x1 + x2));
     vertex.SetY(0.5 * (y1 + y2));
@@ -331,35 +323,35 @@ namespace TreeFitter {
                                const Belle2::B2Vector3D& point,
                                double& flt)
   {
-    double d0     = helix.getD0();
-    double phi0   = helix.getPhi0();
-    double omega  = helix.getOmega();
-    double z0     = helix.getZ0();
-    double tandip = helix.getTanLambda();
-    double cosdip = cos(atan(tandip))  ; // can do that faster
+    const double d0     = helix.getD0();
+    const double phi0   = helix.getPhi0();
+    const double omega  = helix.getOmega();
+    const double z0     = helix.getZ0();
+    const double tandip = helix.getTanLambda();
+    const double cosdip = cos(atan(tandip))  ; // can do that faster
 
-    double r = 1 / omega ;
+    const double r = 1 / omega ;
 
-    double x0 = - (r + d0) * sin(phi0) ;
-    double y0 = (r + d0) * cos(phi0) ;
+    const double x0 = - (r + d0) * sin(phi0) ;
+    const double y0 = (r + d0) * cos(phi0) ;
 
-    double deltax = x0 - point.X() ;
-    double deltay = y0 - point.Y() ;
+    const double deltax = x0 - point.X() ;
+    const double deltay = y0 - point.Y() ;
 
     const double pi = TMath::Pi();
-    double phi    = - atan2(deltax, deltay) ;
+    double phi = - atan2(deltax, deltay) ;
     if (r < 0) phi = phi > 0 ?  phi - pi : phi + pi ;
 
     // find the best solution for z by running multiples of 2_pi
-    double x =  r * sin(phi) + x0 ;
-    double y = -r * cos(phi) + y0 ;
+    const double x =  r * sin(phi) + x0 ;
+    const double y = -r * cos(phi) + y0 ;
     double z(0) ;
     bool first(true) ;
     const int ncirc(2) ;
-    double dphi = phidomain(phi - phi0) ;
+    const double dphi = phidomain(phi - phi0) ;
     for (int n = 1 - ncirc; n <= 1 + ncirc ; ++n) {
-      double l = (dphi + n * TMath::TwoPi()) / omega ;
-      double tmpz = (z0 + l * tandip) ;
+      const double l = (dphi + n * TMath::TwoPi()) / omega ;
+      const double tmpz = (z0 + l * tandip) ;
       if (first || fabs(tmpz - point.Z()) < fabs(z - point.Z())) {
         first = false ;
         z = tmpz ;

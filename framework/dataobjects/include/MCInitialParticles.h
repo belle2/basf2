@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <framework/gearbox/Const.h>
+
 #include <TLorentzVector.h>
 #include <Math/AxisAngle.h>
 #include <Math/Boost.h>
@@ -97,6 +99,37 @@ namespace Belle2 {
       resetBoost();
     }
 
+    /** Initialize the event values from CMS energy and parameters of the Lorentz transformation between LAB and CMS.
+     *  In addition the vertex is also initialized.
+     * @param Ecms     centre-of-mass energy of the collision
+     * @param bX       x-component of the boost vector, i.e. of (pHER + pLER) / (eHER + eLER), where pHER & pLER are momentum 3-vectors
+     * @param bY       y-component of the boost vector, i.e. of (pHER + pLER) / (eHER + eLER), where pHER & pLER are momentum 3-vectors
+     * @param bZ       z-component of the boost vector, i.e. of (pHER + pLER) / (eHER + eLER), where pHER & pLER are momentum 3-vectors
+     * @param angleXZ  angle in the XZ plane of the collision axis in the CM system obtained by pure boost
+     * @param angleYZ  angle in the YZ plane of the collision axis in the CM system obtained by pure boost
+     * @param vertex   position of the actual collision vertex
+     */
+    void setByLorentzTransformation(double Ecms, double bX, double bY, double bZ, double angleXZ, double angleYZ,
+                                    const ROOT::Math::XYZVector& vertex)
+    {
+      if (m_labToCMS) delete m_labToCMS;
+      if (m_CMSToLab) delete m_CMSToLab;
+
+      m_invariantMass = Ecms;
+      m_CMSToLab      = new ROOT::Math::LorentzRotation();
+      m_labToCMS      = new ROOT::Math::LorentzRotation();
+      *m_CMSToLab     = cmsToLab(bX, bY, bZ, angleXZ, angleYZ);
+      *m_labToCMS     = m_CMSToLab->Inverse();
+
+      const double me = Const::electron.getMass();
+      double p = sqrt(Ecms * Ecms / 4 - me * me);
+      m_her = (*m_CMSToLab) * ROOT::Math::PxPyPzEVector(0.0, 0.0,  p, Ecms / 2);
+      m_ler = (*m_CMSToLab) * ROOT::Math::PxPyPzEVector(0.0, 0.0, -p, Ecms / 2);
+
+      m_vertex = vertex;
+      m_validFlag = true;
+    }
+
     /** Set the High Energy Beam 4-momentum */
     void setHER(const ROOT::Math::PxPyPzEVector& her)
     {
@@ -166,6 +199,17 @@ namespace Belle2 {
      * @param separator separation string to be put between flags */
     std::string getGenerationFlagString(const std::string& separator = " ") const;
 
+
+    /** Return the LorentzRotation from CMS to LAB based on the following parameters
+     * @param Ecms     centre-of-mass energy of the collision
+     * @param bX       x-component of the boost vector, i.e. of (pHER + pLER) / (eHER + eLER), where pHER & pLER are momentum 3-vectors
+     * @param bY       y-component of the boost vector, i.e. of (pHER + pLER) / (eHER + eLER), where pHER & pLER are momentum 3-vectors
+     * @param bZ       z-component of the boost vector, i.e. of (pHER + pLER) / (eHER + eLER), where pHER & pLER are momentum 3-vectors
+     * @param angleXZ  angle in the XZ plane of the collision axis in the CM system obtained by pure boost
+     * @param angleYZ  angle in the YZ plane of the collision axis in the CM system obtained by pure boost
+     */
+    static ROOT::Math::LorentzRotation cmsToLab(double bX, double bY, double bZ, double angleXZ, double angleYZ);
+
   private:
 
     /** Calculate the boost if necessary */
@@ -231,6 +275,10 @@ namespace Belle2 {
     //cache derived quantities
     m_CMSToLab = new ROOT::Math::LorentzRotation(m_labToCMS->Inverse());
   }
+
+
+
+
 
   inline void MCInitialParticles::resetBoost()
   {

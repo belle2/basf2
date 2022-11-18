@@ -165,7 +165,7 @@ namespace Belle2 {
     * Checks, if the pattern recognition track was matched to a Monte Carlo track
     * but with the wrong charge.
     */
-    bool isWrongChargePRRecoTrack(const RecoTrack& prRecoTrack) const
+    bool isMatchedWrongChargePRRecoTrack(const RecoTrack& prRecoTrack) const
     {
       return getPRToMCMatchInfo(prRecoTrack) == PRToMCMatchInfo::c_wrongCharge;
     }

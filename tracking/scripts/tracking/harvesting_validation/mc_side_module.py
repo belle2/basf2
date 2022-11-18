@@ -182,8 +182,14 @@ class MCSideTrackingValidationModule(harvesting.HarvestingModule):
         """Extracts track-match information from the MCMatcherTracksModule results"""
         track_match_look_up = self.track_match_look_up
         return dict(
-            is_matched=track_match_look_up.isMatchedMCRecoTrack(mc_reco_track),
-            is_merged=track_match_look_up.isMergedMCRecoTrack(mc_reco_track),
+            is_matched=track_match_look_up.isMatchedMCRecoTrack(mc_reco_track) or
+            track_match_look_up.isMatchedWrongChargeMCRecoTrack(mc_reco_track),
+            is_matched_correct_charge=track_match_look_up.isMatchedMCRecoTrack(mc_reco_track),
+            is_matched_wrong_charge=track_match_look_up.isMatchedWrongChargeMCRecoTrack(mc_reco_track),
+            is_merged=track_match_look_up.isMergedMCRecoTrack(mc_reco_track) or
+            track_match_look_up.isMergedWrongChargeMCRecoTrack(mc_reco_track),
+            is_merged_correct_charge=track_match_look_up.isMergedMCRecoTrack(mc_reco_track),
+            is_merged_wrong_charge=track_match_look_up.isMergedWrongChargeMCRecoTrack(mc_reco_track),
             is_missing=track_match_look_up.isMissingMCRecoTrack(mc_reco_track),
             hit_efficiency=track_match_look_up.getRelatedEfficiency(mc_reco_track),
         )

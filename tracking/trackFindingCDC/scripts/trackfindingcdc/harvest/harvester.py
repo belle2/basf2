@@ -197,8 +197,10 @@ class SegmentFakeRatesModule(HarvestingModule):
 
         is_background = mc_track_matcher_local.isBackgroundPRRecoTrack(local_track_cand)
         is_ghost = mc_track_matcher_local.isGhostPRRecoTrack(local_track_cand)
-        is_matched = mc_track_matcher_local.isMatchedPRRecoTrack(local_track_cand)
-        is_clone = mc_track_matcher_local.isClonePRRecoTrack(local_track_cand)
+        is_matched = mc_track_matcher_local.isMatchedPRRecoTrack(local_track_cand) or \
+            mc_track_matcher_local.isMatchedWrongChargePRRecoTrack(local_track_cand)
+        is_clone = mc_track_matcher_local.isClonePRRecoTrack(local_track_cand) or \
+            mc_track_matcher_local.isCloneWrongChargePRRecoTrack(local_track_cand)
         is_clone_or_matched = is_matched or is_clone
         hit_purity = abs(mc_track_matcher_local.getRelatedPurity(local_track_cand))
 
@@ -220,8 +222,10 @@ class SegmentFakeRatesModule(HarvestingModule):
 
         if is_clone_or_matched:
             related_mc_track_cand = mc_track_matcher_local.getRelatedMCRecoTrack(local_track_cand)
-            has_partner = (mc_track_matcher_legendre.isMatchedMCRecoTrack(related_mc_track_cand) or
-                           mc_track_matcher_legendre.isMergedMCRecoTrack(related_mc_track_cand))
+            has_partner = ((mc_track_matcher_legendre.isMatchedMCRecoTrack(related_mc_track_cand) or
+                            mc_track_matcher_legendre.isMatcheWrongChargeMCRecoTrack(related_mc_track_cand)) or
+                           (mc_track_matcher_legendre.isMergedMCRecoTrack(related_mc_track_cand) or
+                            mc_track_matcher_legendre.isMergedWrongChargeMCRecoTrack(related_mc_track_cand)))
             mc_track_pt = related_mc_track_cand.getMomSeed().Pt()
             mc_track_dist = related_mc_track_cand.getPosSeed().Mag()
             if has_partner:
@@ -302,7 +306,8 @@ class SegmentFinderParameterExtractorModule(HarvestingModule):
         """ Extract the information from the local track candidate. """
         mc_track_matcher = self.mc_track_matcher
 
-        is_matched = mc_track_matcher.isMatchedPRRecoTrack(local_track_cand)
+        is_matched = mc_track_matcher.isMatchedPRRecoTrack(local_track_cand) or \
+            mc_track_matcher.isMatchedWrongChargePRRecoTrack(local_track_cand)
         is_background = mc_track_matcher.isBackgroundPRRecoTrack(local_track_cand)
         is_ghost = mc_track_matcher.isGhostPRRecoTrack(local_track_cand)
 

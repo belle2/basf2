@@ -183,10 +183,12 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
                 cdcHitIDs = set(cdcHitIDs)
 
             totalHitListPR.extend(cdcHitIDs)
-            if self.trackMatchLookUp.isMatchedPRRecoTrack(trackCand):
+            if self.trackMatchLookUp.isMatchedPRRecoTrack(trackCand) or \
+               self.trackMatchLookUp.isMatchedWrongChargePRRecoTrack(trackCand):
                 totalHitListPRGood.extend(cdcHitIDs)
 
-            if self.trackMatchLookUp.isClonePRRecoTrack(trackCand):
+            if self.trackMatchLookUp.isClonePRRecoTrack(trackCand) or \
+               self.trackMatchLookUp.isCloneWrongChargePRRecoTrack(trackCand):
                 totalHitListPRClone.extend(cdcHitIDs)
 
             if (self.trackMatchLookUp.isBackgroundPRRecoTrack(trackCand) or
@@ -211,8 +213,10 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
 
         for trackCand in trackCands:
 
-            is_matched = self.trackMatchLookUp.isMatchedPRRecoTrack(trackCand)
-            is_clone = self.trackMatchLookUp.isClonePRRecoTrack(trackCand)
+            is_matched = self.trackMatchLookUp.isMatchedPRRecoTrack(trackCand) or \
+                         self.trackMatchLookUp.isMatchedWrongChargePRRecoTrack(trackCand)
+            is_clone = self.trackMatchLookUp.isClonePRRecoTrack(trackCand) or \
+                self.trackMatchLookUp.isCloneWrongChargePRRecoTrack(trackCand)
 
             trackCandHits = [cdcHit.getArrayIndex() for cdcHit in getObjectList(trackCand.getCDCHitList())]
             # Working around a bug in ROOT where you should not access empty std::vectors

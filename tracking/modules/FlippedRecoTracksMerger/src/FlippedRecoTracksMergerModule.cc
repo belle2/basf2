@@ -84,6 +84,6 @@ void FlippedRecoTracksMergerModule::event()
       }
     }
 
-    recoTrack.flipTrackDirectionAndCharge(recoTrack.getMeasuredStateOnPlaneFromLastHit());
+    recoTrack.flipTrackDirectionAndCharge();
   }
 }

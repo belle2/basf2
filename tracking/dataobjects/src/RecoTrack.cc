@@ -717,8 +717,9 @@ bool RecoTrack::isOutgoingArm(RecoHitInformation::RecoHitDetector pre, RecoHitIn
   return isOutgoing;
 }
 
-void RecoTrack::flipTrackDirectionAndCharge(const genfit::MeasuredStateOnPlane& measuredStateOnPlane)
+void RecoTrack::flipTrackDirectionAndCharge(const genfit::AbsTrackRep* representation)
 {
+  const genfit::MeasuredStateOnPlane& measuredStateOnPlane = getMeasuredStateOnPlaneFromLastHit(representation);
   const ROOT::Math::XYZVector& currentPosition = ROOT::Math::XYZVector(measuredStateOnPlane.getPos());
   const ROOT::Math::XYZVector& currentMomentum = ROOT::Math::XYZVector(measuredStateOnPlane.getMom());
   const double& currentCharge = measuredStateOnPlane.getCharge();

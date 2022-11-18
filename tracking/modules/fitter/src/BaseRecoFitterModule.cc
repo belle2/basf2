@@ -136,9 +136,9 @@ void BaseRecoFitterModule::event()
 
         // Get the charge from the measuredStateOnPlane at the last hit. If this charge, which is the charge after the track fit,
         // is not equal to the charge seed of the RecoTrack, flip the track and reorder the hits.
-        const genfit::MeasuredStateOnPlane& mSoPAtLastHit = recoTrack.getMeasuredStateOnPlaneFromLastHit(trackRep);
-        if (m_param_flipTrackIfFittedChargeNEQSeedCharge and recoTrack.getChargeSeed() != mSoPAtLastHit.getCharge()) {
-          recoTrack.flipTrackDirectionAndCharge(mSoPAtLastHit);
+        if (m_param_flipTrackIfFittedChargeNEQSeedCharge and
+            recoTrack.getChargeSeed() != recoTrack.getMeasuredStateOnPlaneFromLastHit(trackRep).getCharge()) {
+          recoTrack.flipTrackDirectionAndCharge(trackRep);
         }
       } else {
         B2DEBUG(28, "       fit failed!");

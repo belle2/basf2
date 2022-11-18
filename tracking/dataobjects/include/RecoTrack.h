@@ -564,10 +564,11 @@ namespace Belle2 {
       return m_nSVDHitsOfIngoingArm;
     }
 
-    /** Flip the direction of the RecoTrack by inverting the momenum vector and the charge
-     *  @param measuredStateOnPlane Measured state on plane to be used to extract the track paramters from
+    /** Flip the direction of the RecoTrack by inverting the momentum vector and the charge.
+     *  In addition, also the ingoing and outgoing arms and arm times are swapped.
+     *  @param representation Track representation to be used to get the MeasuredStateOnPlane at the last hit
      */
-    void flipTrackDirectionAndCharge(const genfit::MeasuredStateOnPlane& measuredStateOnPlane);
+    void flipTrackDirectionAndCharge(const genfit::AbsTrackRep* representation = nullptr);
 
     /// Return the position, the momentum and the charge of the first measured state on plane or - if unfitted - the seeds.
     std::tuple<ROOT::Math::XYZVector, ROOT::Math::XYZVector, short> extractTrackState() const;

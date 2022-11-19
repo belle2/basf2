@@ -6,7 +6,7 @@ Time Extraction
 Track Time
 ----------
 The track time is the time at which the track is produced with respect to the collision time.
-We define the outgoing (ingoing) arm as the part of the helix that exits (enters) the IP. 
+We define the outgoing (ingoing) arm as the part of the helix that exits (enters) the IR. 
 They are identified using the order of the detectors associated to the track hits:
 for example, the arm is considered outgoing (ingoing) if the hits are found in PXD-SVD-CDC 
 (CDC-SVD-PXD). Outgoing (ingoing) arm time is computed with the SVD clusters used in the reconstruction of 

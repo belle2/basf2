@@ -593,15 +593,13 @@ void MCRecoTracksMatcherModule::event()
     // absolute efficiency
 
     // MATCHED
-    {
-      if (prId == mostWeightEfficientPRId) {
-        if (foundTrackCharge != MCParticleTrackCharge) {
-          prRecoTrack->setMatchingStatus(RecoTrack::MatchingStatus::c_wrongCharge);
-          ++nWrongCharge;
-        } else {
-          prRecoTrack->setMatchingStatus(RecoTrack::MatchingStatus::c_matched);
-          ++nMatched;
-        }
+    if (prId == mostWeightEfficientPRId) {
+      if (foundTrackCharge != MCParticleTrackCharge) {
+        prRecoTrack->setMatchingStatus(RecoTrack::MatchingStatus::c_wrongCharge);
+        ++nWrongCharge;
+      } else {
+        prRecoTrack->setMatchingStatus(RecoTrack::MatchingStatus::c_matched);
+        ++nMatched;
       }
       // Setup the relation purity relation
       // regardless of the charge matching

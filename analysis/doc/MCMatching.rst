@@ -80,7 +80,7 @@ Flag                            Explanation
  c_MisID = 128                   One of the charged final state particles is mis-identified (wrong signed PDG code).
  c_AddedWrongParticle = 256      A non-FSP Particle has wrong PDG code, meaning one of the daughters (or their daughters)
                                  belongs to another Particle. 
- c_InternalError = 512           Not a valid match was found. For tracks, it indicates that there
+ c_InternalError = 512           No valid match was found. For tracks, it indicates that there
                                  is not a true track related to the reconstructed one. Might indicate fake or background 
                                  track or cluster. 
  c_MissPHOTOS    = 1024          A photon created by PHOTOS was not reconstructed (based on MCParticle: :c_IsPHOTOSPhoton). 
@@ -371,7 +371,7 @@ Track matching
 
 A reconstructed track can be:
 
-1) **matched**, the reconstructed track is matched to a true track and it is its the best description. 
+1) **matched**, the reconstructed track is matched to a true track and it is its best description. 
 2) **clone**, the reconstructed track is matched to a true track, but there is another reconstructed track that better describes the true track (this second reconstructed track will therefore be matched)
 3) **fake**, the reconstructed track is not matched to any true track. It can be a beam-background track or a track built out of noise hits in the detector, or a mixture of these two.
 

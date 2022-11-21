@@ -574,12 +574,9 @@ void MCRecoTracksMatcherModule::event()
       short nNegativeCharges = 0;
       if (fittedTracks.size() > 0) {
         for (const auto& fittedTrack : fittedTracks) {
-          const RelationVector<TrackFitResult> trackFitResults = fittedTrack.getRelationsFrom<TrackFitResult>();
-          if (trackFitResults.size() > 0) {
-            for (const auto& trackFitResult : trackFitResults) {
-              trackFitResult.getChargeSign() > 0 ? nPositiveCharges++ : nNegativeCharges++;
-            }
-          }
+          const TrackFitResult* trackFitResult = fittedTrack.getTrackFitResultWithClosestMass(Const::ChargedStable(std::abs(
+                                                   mcParticle->getPDG())));
+          trackFitResult->getChargeSign() > 0 ? nPositiveCharges++ : nNegativeCharges++;
         }
       }
       if (nPositiveCharges > 0 and nNegativeCharges > 0) {

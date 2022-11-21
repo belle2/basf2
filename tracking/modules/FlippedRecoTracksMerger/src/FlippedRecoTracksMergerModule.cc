@@ -101,5 +101,8 @@ void FlippedRecoTracksMergerModule::event()
       RecoHitInfo->setSortingParameter(std::numeric_limits<unsigned int>::max() - RecoHitInfo->getSortingParameter());
     }
 
+    // swap outgoing and ingoing arm times (computed with SVD hits)
+    recoTrack.swapArmTimes();
+
   }
 }

@@ -181,6 +181,12 @@ def stdLep(pdgId,
     * 'UniformEff80' 80% lepton efficiency list, uniform in a given multi-dimensional parametrisation.
     * 'UniformEff90' 90% lepton efficiency list, uniform in a given multi-dimensional parametrisation.
     * 'UniformEff95' 95% lepton efficiency list, uniform in a given multi-dimensional parametrisation.
+    * 'UniformPiFR5EM1' 50% pion to lepton fake rate, uniform in a given multi-dimensional parametrisation.
+    * 'UniformPiFR1EM1' 10% pion to lepton fake rate, uniform in a given multi-dimensional parametrisation.
+    * 'UniformPiFR5EM2' 5% pion to lepton fake rate, uniform in a given multi-dimensional parametrisation.
+    * 'UniformPiFR1EM2' 1% pion to lepton fake rate, uniform in a given multi-dimensional parametrisation.
+    * 'UniformPiFR5EM3' 0.5% pion to lepton fake rate, uniform in a given multi-dimensional parametrisation.
+    * 'UniformPiFR1EM3' 0.1% pion to lepton fake rate, uniform in a given multi-dimensional parametrisation.
 
     The function creates a ``ParticleList``, selecting particles according to the chosen ``working_point``,
     and decorates each candidate in the list with the nominal Data/MC :math:`\\ell` ID efficiency and
@@ -264,6 +270,12 @@ def stdLep(pdgId,
         "UniformEff80",
         "UniformEff90",
         "UniformEff95",
+        "UniformPiFR5EM1",
+        "UniformPiFR1EM1",
+        "UniformPiFR5EM2",
+        "UniformPiFR1EM2",
+        "UniformPiFR5EM3",
+        "UniformPiFR1EM3",
     )
 
     available_methods = ("likelihood", "bdt")

@@ -64,13 +64,14 @@ void ParticleCopy::copyDaughters(Belle2::Particle* mother)
     updateType = false;
 
   unsigned nDaughters = mother->getNDaughters();
-  for (unsigned iOld = 0; iOld < nDaughters; iOld++) {
+  for (unsigned iOld_neverUsed = 0; iOld_neverUsed < nDaughters; iOld_neverUsed++) {
+    // always accessing the first daughter of mother that is being updated
     const Particle* originalDaughter = mother->getDaughter(0);
     Particle* daughterCopy = copyParticle(originalDaughter);
 
-    // remove original daughter
+    // remove original daughter from the begging of the daughters vector
     mother->removeDaughter(originalDaughter, updateType);
-    // append copied daughter instead
+    // append copied daughter instead at the end of the daughters vector
     mother->appendDaughter(daughterCopy, updateType);
   }
 }

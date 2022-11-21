@@ -202,7 +202,7 @@ namespace Belle2 {
     //! Parameter : Switch whether only axial CDCHits should be used
     bool m_useOnlyAxialCDCHits;
 
-    //! Use fitted tracks for matching to be able to check the fitted charge
+    //! Use fitted tracks for matching
     bool m_useFittedTracks = true;
 
     /*!

@@ -215,7 +215,8 @@ namespace Belle2 {
     }
 
     /*!
-     * Checks, if the Monte Carlo Track was matched to a pattern recognition track.
+     * Checks, if the Monte Carlo Track was matched to a pattern recognition track
+     * based on the hit pattern.
      */
     bool isMatchedMCRecoTrack(const RecoTrack& mcRecoTrack) const
     {
@@ -223,7 +224,8 @@ namespace Belle2 {
     }
 
     /*!
-     * Checks, if the Monte Carlo Track was matched to a pattern recognition track.
+     * Checks, if the Monte Carlo Track was matched to a pattern recognition track
+     * based on the hit pattern, but was assigned the wrong charge.
      */
     bool isMatchedWrongChargeMCRecoTrack(const RecoTrack& mcRecoTrack) const
     {

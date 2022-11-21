@@ -121,7 +121,7 @@ Abc*Xyz*                Classes derived from *Xyz***Base**
 
 .. _class_naming_conventions:
 
-.. figure:: basf2ObjectNamingConventions.gif
+.. figure:: object_naming_convention.svg
    :width: 10cm
    :align: center
    

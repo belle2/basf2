@@ -5,6 +5,7 @@ The following rules and conventions should ensure a good usability and maintaina
 the Belle II software. They are written for C++, but have to be followed for Python code
 as well, unless other rules for Python are given.
 
+
 General rules
 -------------
 
@@ -39,6 +40,7 @@ Please, please avoid:
 5. Side effects: if code has side effects this must be clearly documented.
 
 6. Preprocessor definitions if possible; in particular don't use them for constants.
+
 
 Naming conventions
 ------------------
@@ -127,6 +129,13 @@ Abc*Xyz*                Classes derived from *Xyz***Base**
    
    Object naming conventions in basf2.
 
+.. warning::
+
+   Some subdetector packages may use slightly different naming conventions. In case you
+   need further clarifications, please check the sphinx documentation of the subdetector
+   package (when available) or contact the subdetector librarians.
+
+
 Namespaces
 ----------
 
@@ -141,6 +150,7 @@ Namespaces
 
 4. ``enum class`` should be used to implement enumerations to contain the constant within
    the enum’s scope
+
 
 Classes
 -------
@@ -179,6 +189,7 @@ other classes should be derived.
 
 Try to pass function parameters by value, const reference, or const pointer, especially
 if they are not meant to be changed in the function.
+
 
 Order of class members
 ----------------------
@@ -219,6 +230,7 @@ footprint of the class, which is critical for basf2 on the HLT.
 Because usually classes contain several data members, there is no clear rule where to add
 classes as data members in other classes, usually it would be at position 1, 2, or 3.
 
+
 Initialisation
 --------------
 
@@ -228,6 +240,7 @@ Always initialize variables immediately in the same statement where you create t
 All data members of a class must be initialized at their declaration. Specific
 constructors should use the initialization list (after the colon of the constructor
 declaration) instead of an initialization in the body of the constructor if possible.
+
 
 Data objects
 ------------
@@ -248,10 +261,12 @@ Data objects
    written to output files can be put into any folder. They must always be registered as
    transient in the data store.
 
+
 Random numbers
 --------------
 
-Always use ``gRandom`` for random numbers.
+Always use ``gRandom`` for generating random numbers.
+
 
 Error handling
 --------------
@@ -292,6 +307,7 @@ Use the logging system:
     their code or the debugging of production jobs by experts.
         
   * 30-39 for framework code. The use case is that an expert wants to debug problems in the core software.
+
 
 Files
 -----
@@ -414,6 +430,7 @@ what should be documented, and how:
   * Documentation about the input and output of modules is
     `automatically generated <https://confluence.desy.de/display/BI/Software+VisualizeDataFlow>`_
     if both are registered in the initialize method.
+
 
 Further Suggestions
 -------------------

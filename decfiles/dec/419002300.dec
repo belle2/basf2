@@ -1,0 +1,30 @@
+# EventType 419002300
+# Descriptor: vpho -> chi_b0 omega
+#                     chi_b0 -> gamma Upsilon
+#                               g     g
+#                     omega  -> pi+ pi- pi0
+#                                       pi0 -> gamma gamma
+# NickName: vpho_chib0_omega_pi+pi-pi0
+# PhysicsWG: Quarkonium
+# Reponsible: Pavel	Oskin
+# Email: oskin.pavel.v@gmail.com
+# Date: 21-11-2022
+
+Decay vpho
+1.0  omega  chi_b0  PHSP;
+Enddecay
+
+Decay chi_b0
+0.0192    gamma  Upsilon          HELAMP 1. 0. 1. 0.;  #best values from BBR 2014, using B(Y2S->gamma chib)
+0.9808    g      g                PYTHIA 91;
+Enddecay
+
+Decay omega
+1.0  pi+  pi- pi0 OMEGA_DALITZ;
+Enddecay
+
+Decay pi0
+1.0  gamma gamma  PHSP;
+Enddecay
+
+End

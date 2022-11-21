@@ -438,8 +438,9 @@ G4double BelleCrystal::DistanceToIn(const G4ThreeVector& p,
   auto outside = [delta, &tin, &tout](double d, double nv) -> bool {
     double t = -d / nv;
     if (nv < 0)
-      tin  = max(tin , t);
-    else {
+      tin  = max(tin, t);
+    else
+    {
       if (d >= -delta) return true;
       tout = min(tout, t);
     }
@@ -485,17 +486,16 @@ G4double BelleCrystal::DistanceToOut(const G4ThreeVector& p, const G4ThreeVector
     if (d > delta) // definitly outside
     {
       lmin = 0; iside = i; return true;
-    } else {
+    } else
+    {
       bool c = nv > 0;
-      if (d < -delta) // definitly inside
-      {
+      if (d < -delta) { // definitly inside
         if (c) { // has to point to the same direction
           d = -d;
           if (d < nv * lmin) {lmin = d / nv; iside = i;}
         }
       } else { // surface
-        if (c) // points outside
-        {
+        if (c) { // points outside
           lmin = 0; iside = i; return true;
         }
       }

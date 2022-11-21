@@ -24,9 +24,19 @@ CHANGES since release-01-00-04:
 - The default magnetic field is changed affecting all momentum measurements.
 - Track:
   + getQualityIndicator
+  + statusBitmap and getStatusBit
+  + getTrackTime added
+  + wasRefined
+  + isFlippedAndRefitted
+  + getTrackFitResultByName
+  + getTrackFitResultsByName
+  + getTrackFitResultWithClosestMassByName
 - TrackFitResult:
   + ndf
   + chi2
+  + remove the const classifier of TrackFitResults and add a function to update the contents
+  + updateTrackFitResult
+  + mask
 - TRGSummary:
   + getTimQuality added
   + isPoissonInInjectionVeto()

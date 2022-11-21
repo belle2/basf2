@@ -7,7 +7,7 @@
  **************************************************************************/
 //+
 // File : DQMHistAnalysisEventT0.cc
-// Description : module for DQM histogram analysis of SVD sensors occupancies
+// Description : module for trigger jitter/EventT0 DQM histogram analysis
 //-
 
 
@@ -15,11 +15,8 @@
 
 #include <TROOT.h>
 #include <TStyle.h>
-#include <TString.h>
-#include <TFitResult.h>
-
+#include <TF1.h>
 #include <TMath.h>
-#include <iostream>
 
 using namespace std;
 using namespace Belle2;
@@ -27,7 +24,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(DQMHistAnalysisEventT0)
+REG_MODULE(DQMHistAnalysisEventT0);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -201,7 +198,6 @@ void DQMHistAnalysisEventT0Module::terminate()
   delete m_cCDCTRG;
 
 }
-
 
 double DQMHistAnalysisEventT0Module::fDoubleGaus(double* x, double* par)
 {

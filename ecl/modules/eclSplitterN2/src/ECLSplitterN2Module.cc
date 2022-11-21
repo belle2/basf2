@@ -33,8 +33,8 @@ using namespace ECL;
 //-----------------------------------------------------------------
 //                 Register the Module(s)
 //-----------------------------------------------------------------
-REG_MODULE(ECLSplitterN2)
-REG_MODULE(ECLSplitterN2PureCsI)
+REG_MODULE(ECLSplitterN2);
+REG_MODULE(ECLSplitterN2PureCsI);
 
 //-----------------------------------------------------------------
 //                 Implementation

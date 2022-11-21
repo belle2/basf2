@@ -13,7 +13,7 @@ import os
 import basf2_mva
 from basf2 import B2ERROR, B2FATAL
 import basf2
-import variables.utils as vu
+from variables import variables as vm
 import modularAnalysis as ma
 
 
@@ -240,6 +240,6 @@ def DeepFlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdenti
         roe_path.add_module(flavorTaggerInfoFiller)
 
         # Create standard alias for the output of the flavor tagger
-        vu._variablemanager.addAlias('DNN_qrCombined', 'qrOutput(DNN)')
+        vm.addAlias('DNN_qrCombined', 'qrOutput(DNN)')
 
     path.for_each('RestOfEvent', 'RestOfEvents', roe_path)

@@ -8,20 +8,18 @@
 #include <tracking/modules/fitter/timeEstimator/BaseTrackTimeEstimatorModule.h>
 
 #include <tracking/trackFitting/fitter/base/TrackFitter.h>
-#include <tracking/dataobjects/RecoTrack.h>
 
 #include <TVector3.h>
 
-using namespace std;
 using namespace Belle2;
 
 namespace {
   /// Anonymous helper function for doing some maths.
-  double calculateVelocity(const TVector3& momentum, const Const::ChargedStable& particleHypothesis)
+  double calculateVelocity(const ROOT::Math::XYZVector& momentum, const Const::ChargedStable& particleHypothesis)
   {
     // Particle velocity in cm / ns using the typical relation between E and p.
     const double m = particleHypothesis.getMass();
-    const double p = momentum.Mag();
+    const double p = momentum.R();
     const double E = hypot(m, p);
     const double beta = p / E;
     const double v = beta * Const::speedOfLight;
@@ -64,7 +62,7 @@ BaseTrackTimeEstimatorModule::BaseTrackTimeEstimatorModule() :
            "When this feature is enabled, the length from the incident of the particle in the trigger to the position"
            "set by the readoutPosition flag is calculated and using the readoutPositionPropagationSpeed, a time is"
            "calculated which is used in the time estimation as an offset."
-           "In the moment, this feature is only possible when using the fitted information." , m_param_useReadoutPosition);
+           "In the moment, this feature is only possible when using the fitted information.", m_param_useReadoutPosition);
   addParam("readoutPositionPropagationSpeed", m_param_readoutPositionPropagationSpeed,
            "Speed of the propagation from the hit on the trigger to the readoutPosition. Only is used when the"
            "flag useReadoutPosition is enabled.", m_param_readoutPositionPropagationSpeed);
@@ -73,8 +71,7 @@ BaseTrackTimeEstimatorModule::BaseTrackTimeEstimatorModule() :
 void BaseTrackTimeEstimatorModule::initialize()
 {
   // Read and write out RecoTracks
-  StoreArray<RecoTrack> recoTracks(m_param_recoTracksStoreArrayName);
-  recoTracks.isRequired();
+  m_recoTracks.isRequired(m_param_recoTracksStoreArrayName);
 
   if (m_param_useReadoutPosition and not m_param_useFittedInformation) {
     B2FATAL("The combination of using the seed information and the readout position is not implemented in the moment.");
@@ -83,12 +80,10 @@ void BaseTrackTimeEstimatorModule::initialize()
 
 void BaseTrackTimeEstimatorModule::event()
 {
-  StoreArray<RecoTrack> recoTracks(m_param_recoTracksStoreArrayName);
-
   const Const::ChargedStable particleHypothesis(m_param_pdgCodeToUseForEstimation);
 
   // Estimate the track time for each reco track depending on the settings of the module.
-  for (auto& recoTrack : recoTracks) {
+  for (auto& recoTrack : m_recoTracks) {
     double timeSeed;
     if (m_param_useFittedInformation) {
       try {
@@ -110,7 +105,7 @@ void BaseTrackTimeEstimatorModule::event()
       timeSeed += m_param_timeOffset;
     }
 
-    B2DEBUG(100, "Setting seed to " <<  timeSeed);
+    B2DEBUG(28, "Setting seed to " <<  timeSeed);
     recoTrack.setTimeSeed(timeSeed);
   }
 }
@@ -129,12 +124,12 @@ double BaseTrackTimeEstimatorModule::estimateTimeSeedUsingFittedInformation(Reco
     genfit::MeasuredStateOnPlane measuredState = recoTrack.getMeasuredStateOnPlaneFromFirstHit(trackRepresentation);
 
     // Fix the position and momentum seed to the same place as where we calculation the time seed: the first measured state on plane
-    recoTrack.setPositionAndMomentum(measuredState.getPos(), measuredState.getMom());
+    recoTrack.setPositionAndMomentum(ROOT::Math::XYZVector(measuredState.getPos()), ROOT::Math::XYZVector(measuredState.getMom()));
 
     const double flightLength = estimateFlightLengthUsingFittedInformation(measuredState);
 
     // Be aware that we use the measured state on plane after the extrapolation to compile the momentum.
-    const TVector3& momentum = measuredState.getMom();
+    const ROOT::Math::XYZVector& momentum = ROOT::Math::XYZVector(measuredState.getMom());
     const double v = calculateVelocity(momentum, particleHypothesis);
 
     const double flightTime = flightLength / v;
@@ -161,7 +156,7 @@ double BaseTrackTimeEstimatorModule::estimateTimeSeedUsingSeedInformation(const 
   // If the flight length is clear, just use the s = v * t relation.
   const double s = estimateFlightLengthUsingSeedInformation(recoTrack);
 
-  const TVector3& momentum = recoTrack.getMomentumSeed();
+  const ROOT::Math::XYZVector& momentum = recoTrack.getMomentumSeed();
   const double v = calculateVelocity(momentum, particleHypothesis);
 
   return s / v;

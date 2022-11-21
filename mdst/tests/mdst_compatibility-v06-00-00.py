@@ -15,6 +15,18 @@ Test backwards compatibility for an mdst file produced with release-06-00-00.
 See https://confluence.desy.de/display/BI/Backward+Compatibility if this test fails.
 
 CHANGES since release-06-00-00:
+- Track:
+  + statusBitmap and getStatusBit
+  + getTrackTime added
+  + wasRefined
+  + isFlippedAndRefitted
+  + getTrackFitResultByName
+  + getTrackFitResultsByName
+  + getTrackFitResultWithClosestMassByName
+- TrackFitResult:
+  + remove the const classifier of TrackFitResults and add a function to update the contents
+  + updateTrackFitResult
+  + mask
 """
 
 from basf2 import create_path, process, set_random_seed, find_file

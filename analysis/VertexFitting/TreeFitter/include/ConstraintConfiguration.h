@@ -8,6 +8,7 @@
 #pragma once
 
 #include <vector>
+#include <Eigen/Core>
 
 namespace TreeFitter {
 
@@ -18,18 +19,21 @@ namespace TreeFitter {
     /** constructor */
     ConstraintConfiguration() :
       m_massConstraintType(false),
-      m_massConstraintListPDG( {}),
-                             m_fixedToMotherVertexListPDG({}),
-                             m_geoConstraintListPDG({}),
-                             m_removeConstraintList({}),
-                             m_automatic_vertex_constraining(false),
-                             m_ipConstraint(false),
-                             m_customOrigin(false),
-                             m_customOriginVertex({}),
-                             m_customOriginCovariance({}),
-                             m_originDimension(3),
-                             m_headOfTreePDG(0),
-                             m_inflationFactorCovZ(1)
+      m_massConstraintListPDG({}),
+                            m_fixedToMotherVertexListPDG({}),
+                            m_geoConstraintListPDG({}),
+                            m_removeConstraintList({}),
+                            m_automatic_vertex_constraining(false),
+                            m_ipConstraint(false),
+                            m_customOrigin(false),
+                            m_customOriginVertex({}),
+                            m_customOriginCovariance({}),
+                            m_originDimension(3),
+                            m_headOfTreePDG(0),
+                            m_beamConstraintPDG(0),
+                            m_beamMomE(Eigen::Matrix<double, 4, 1>()),
+                            m_beamCovariance(Eigen::Matrix<double, 4, 4>()),
+                            m_inflationFactorCovZ(1)
     {};
 
     /** constructor */
@@ -44,6 +48,9 @@ namespace TreeFitter {
                             const std::vector<double>& customOriginVertex,
                             const std::vector<double>& customOriginCovariance,
                             const int& originDimension,
+                            const int& beamConstraintPDG,
+                            const Eigen::Matrix<double, 4, 1>& beamMomE,
+                            const Eigen::Matrix<double, 4, 4>& beamCovariance,
                             const int& inflationFactorCovZ = 1
                            ) :
       m_massConstraintType(massConstraintType),
@@ -58,6 +65,9 @@ namespace TreeFitter {
       m_customOriginCovariance(customOriginCovariance),
       m_originDimension(originDimension),
       m_headOfTreePDG(0),
+      m_beamConstraintPDG(beamConstraintPDG),
+      m_beamMomE(beamMomE),
+      m_beamCovariance(beamCovariance),
       m_inflationFactorCovZ(inflationFactorCovZ)
     {}
 
@@ -97,8 +107,18 @@ namespace TreeFitter {
     /** PDG code of the head particle */
     mutable int m_headOfTreePDG;
 
+    /** PDG code to beam constraint */
+    const int m_beamConstraintPDG;
+
+    /** Beam four-momentum */
+    Eigen::Matrix<double, 4, 1> m_beamMomE;
+
+    /** Beam Covariance */
+    Eigen::Matrix<double, 4, 4> m_beamCovariance;
+
     /** inflate covariance of z by this number -> iptube  */
     const int m_inflationFactorCovZ;
+
   };
 }
 

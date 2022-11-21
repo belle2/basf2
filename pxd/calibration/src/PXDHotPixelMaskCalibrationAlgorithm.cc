@@ -96,6 +96,14 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
   auto collector_pxdhits = getObjectPtr<TH1I>("PXDHits");
   auto collector_pxdhitcounts = getObjectPtr<TH1I>("PXDHitCounts");
 
+  // Check if there is any PXD hit
+  if (!collector_pxdhits) {
+    if (forceContinueMasking)
+      return c_OK;
+    else
+      return c_NotEnoughData;
+  }
+
   // We should have some minimum number of events
   auto nevents = collector_pxdhits->GetEntries();
   if (nevents < minEvents) {

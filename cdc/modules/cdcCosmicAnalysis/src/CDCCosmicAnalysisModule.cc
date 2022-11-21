@@ -8,6 +8,7 @@
 
 #include "cdc/modules/cdcCosmicAnalysis/CDCCosmicAnalysisModule.h"
 #include <framework/geometry/BFieldManager.h>
+#include <framework/geometry/B2Vector3.h>
 #include <framework/gearbox/Const.h>
 #include <framework/datastore/RelationArray.h>
 
@@ -22,7 +23,7 @@ using namespace CDC;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(CDCCosmicAnalysis)
+REG_MODULE(CDCCosmicAnalysis);
 
 
 //-----------------------------------------------------------------
@@ -104,8 +105,8 @@ void CDCCosmicAnalysisModule::initialize()
 
 void CDCCosmicAnalysisModule::beginRun()
 {
-  B2Vector3D pos(0, 0, 0);
-  B2Vector3D bfield = BFieldManager::getFieldInTesla(pos);
+  ROOT::Math::XYZVector pos(0, 0, 0);
+  ROOT::Math::XYZVector bfield = BFieldManager::getFieldInTesla(pos);
   if (bfield.Z() > 0.5) {
     m_bField = true;
     B2INFO("CDCCosmicAnalysis: Magnetic field is ON");
@@ -113,7 +114,7 @@ void CDCCosmicAnalysisModule::beginRun()
     m_bField = false;
     B2INFO("CDCCosmicAnalysis: Magnetic field is OFF");
   }
-  B2INFO("CDCCosmicAnalysis: BField at (0,0,0)  = " << bfield.Mag());
+  B2INFO("CDCCosmicAnalysis: BField at (0,0,0)  = " << bfield.R());
 }
 
 void CDCCosmicAnalysisModule::event()
@@ -155,7 +156,7 @@ void CDCCosmicAnalysisModule::event()
       continue;
     }
 
-    TVector3 posSeed = recoTrack->getPositionSeed();
+    B2Vector3D posSeed = recoTrack->getPositionSeed();
     const genfit::FitStatus* fs = recoTrack->getTrackFitStatus();
 
     double ndf = fs->getNdf();
@@ -183,7 +184,7 @@ void CDCCosmicAnalysisModule::event()
       }
 
       Omega1 = fitresult->getOmega();
-      Mom1 = fitresult->getMomentum();
+      Mom1 = B2Vector3D(fitresult->getMomentum());
       eOm1 = sqrt(fitresult->getCovariance5()[2][2]);
       Z01 = fitresult->getZ0();
       eZ01 = sqrt(fitresult->getCovariance5()[3][3]);
@@ -207,7 +208,7 @@ void CDCCosmicAnalysisModule::event()
         ePhi02 *=  180 / M_PI;
       }
       Omega2 = fitresult->getOmega();
-      Mom2 = fitresult->getMomentum();
+      Mom2 = B2Vector3D(fitresult->getMomentum());
       eOm2 = sqrt(fitresult->getCovariance5()[2][2]);
       Z02 = fitresult->getZ0();
       eZ02 = sqrt(fitresult->getCovariance5()[3][3]);

@@ -81,6 +81,8 @@ namespace Belle2 {
     int m_fullBkgdCount; /**< Number of expected background digits at full background. TODO move to DB*/
 
     /** Other variables. */
+    bool m_isOnlineProcessing{false}; /**< flag for identifying the online processing. */
+
     double m_energyCutMod[3] {}; /**< modified energy cut taking into account bkgd per event for seed, neighbours, ...*/
     int m_tempCRId = -1; /**< Temporary CR ID*/
 

@@ -210,7 +210,7 @@ namespace Belle2 {
       cout << endl;
       cout << "           Mapping of TOP front-end electronics" << endl << endl;
 
-      char label[5] = "ABCD";
+      const char label[5] = "ABCD";
       for (int i = 0; i < c_numModules; i++) {
         int moduleID = i + 1;
         cout << " slot " << moduleID

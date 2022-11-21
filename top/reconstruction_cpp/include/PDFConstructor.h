@@ -18,6 +18,7 @@
 #include <top/geometry/TOPGeometryPar.h>
 #include <vector>
 #include <map>
+#include <set>
 #include <limits>
 
 namespace Belle2 {
@@ -44,7 +45,7 @@ namespace Belle2 {
        */
       enum EStoreOption {
         c_Reduced = 0, /**< only PDF peak data */
-        c_Full = 1     /**< also extra information */
+        c_Full = 1     /**< also extra information and derivatives */
       };
 
       /**
@@ -185,22 +186,87 @@ namespace Belle2 {
       double getExpectedSignalPhotons() const {return m_signalPhotons;}
 
       /**
-       * Returns the expected number of background photons within the default time window
+       * Returns the expected number of delta-ray photons within the default time window
+       * @return expected number of delta-ray photons (0 if modeling turned off)
+       */
+      double getExpectedDeltaPhotons() const {return m_deltaPDFOn ? m_deltaPhotons : 0;}
+
+      /**
+       * Returns the expected number of background photons within the default time window.
+       * Photons from other tracks in the module are counted here as background.
        * @return expected number of background photons
        */
-      double getExpectedBkgPhotons() const {return m_bkgPhotons;}
+      double getExpectedBkgPhotons() const
+      {
+        double photons = m_bkgPhotons;
+        for (const auto* other : m_pdfOtherTracks) {
+          photons += other->getExpectedSignalPhotons() + other->getExpectedDeltaPhotons();
+        }
+        return photons;
+      }
 
       /**
-       * Returns the expected number of delta-ray photons within the default time window
-       * @return expected number of delta-ray photons
-       */
-      double getExpectedDeltaPhotons() const {return m_deltaPhotons;}
-
-      /**
-       * Returns the expected number of photons within the default time window
+       * Returns the expected number of all photons within the default time window
        * @return expected number of photons (signal + background + delta-ray)
        */
-      double getExpectedPhotons() const {return m_signalPhotons + m_bkgPhotons + m_deltaPhotons;}
+      double getExpectedPhotons() const
+      {
+        return getExpectedSignalPhotons() + getExpectedDeltaPhotons() + getExpectedBkgPhotons();
+      }
+
+      /**
+       * Returns the expected number of signal photons within a given time window
+       * @param minTime time window lower edge
+       * @param maxTime time window upper edge
+       * @return expected number of signal photons
+       */
+      double getExpectedSignalPhotons(double minTime, double maxTime) const
+      {
+        double ps = 0;
+        for (const auto& signalPDF : m_signalPDFs) {
+          ps += signalPDF.getIntegral(minTime, maxTime);
+        }
+        return ps * m_signalPhotons;
+      }
+
+      /**
+       * Returns the expected number of delta-ray photons within a given time window
+       * @param minTime time window lower edge
+       * @param maxTime time window upper edge
+       * @return expected number of delta-ray photons (0 if modeling turned off)
+       */
+      double getExpectedDeltaPhotons(double minTime, double maxTime) const
+      {
+        return m_deltaPDFOn ? m_deltaRayPDF.getIntegral(minTime, maxTime) * m_deltaPhotons : 0;
+      }
+
+      /**
+       * Returns the expected number of background photons within a given time window.
+       * Photons from other tracks in the module are counted here as background.
+       * @param minTime time window lower edge
+       * @param maxTime time window upper edge
+       * @return expected number of background photons
+       */
+      double getExpectedBkgPhotons(double minTime, double maxTime) const
+      {
+        double photons = (maxTime - minTime) / (m_maxTime - m_minTime) * m_bkgPhotons;
+        for (const auto* other : m_pdfOtherTracks) {
+          photons += other->getExpectedSignalPhotons(minTime, maxTime) + other->getExpectedDeltaPhotons(minTime, maxTime);
+        }
+        return photons;
+      }
+
+      /**
+       * Returns the expected number of all photons within a given time window
+       * @param minTime time window lower edge
+       * @param maxTime time window upper edge
+       * @return expected number of photons (signal + background + delta-ray)
+       */
+      double getExpectedPhotons(double minTime, double maxTime) const
+      {
+        return getExpectedSignalPhotons(minTime, maxTime) + getExpectedDeltaPhotons(minTime, maxTime) +
+               getExpectedBkgPhotons(minTime, maxTime);
+      }
 
       /**
        * Returns PDF value.
@@ -210,7 +276,10 @@ namespace Belle2 {
        * @param sigt additional time smearing
        * @return PDF value
        */
-      double getPDFValue(int pixelID, double time, double timeErr, double sigt = 0) const;
+      double getPDFValue(int pixelID, double time, double timeErr, double sigt = 0) const
+      {
+        return pdfValue(pixelID, time, timeErr, sigt) / getExpectedPhotons();
+      }
 
       /**
        * Returns extended log likelihood (using the default time window)
@@ -288,6 +357,29 @@ namespace Belle2 {
        * @return number of calls
        */
       int getNCalls_expandPDF(SignalPDF::EPeakType type) const {return m_ncallsExpandPDF[type];}
+
+      /**
+       * Returns a collection of derivatives for debugging purposes.
+       * The derivatives are available only for EStoreOption::c_Full
+       * @return map of xD and derivatives
+       */
+      const std::map <double, YScanner::Derivatives>& getDerivatives() const {return m_derivatives;}
+
+      /**
+       * Append most probable PDF of other track in this module
+       * @param pdfOther PDF of other track
+       */
+      void appendPDFOther(const PDFConstructor* pdfOther)
+      {
+        if (not pdfOther) return;
+        m_pdfOtherTracks.push_back(pdfOther);
+      }
+
+      /**
+       * Clear the container of PDF's of other tracks
+       */
+      void clearPDFOther() {m_pdfOtherTracks.clear();}
+
 
     private:
 
@@ -430,6 +522,26 @@ namespace Belle2 {
       double deltaXD(double dFic, const InverseRaytracer::Solution& sol, double xD);
 
       /**
+       * Sets the derivatives (numerically) using forward ray-tracing
+       * @param D derivatives to be set
+       * @param dL step in trajectory running parameter [cm]
+       * @param de step in photon energy [eV]
+       * @param dFic step in Cherenkov azimuthal angle
+       * @return true on success
+       */
+      bool setDerivatives(YScanner::Derivatives& D, double dL, double de, double dFic);
+
+      /**
+       * Forward ray-tracing (called by setDerivatives)
+       * @param rayTracer forward ray-tracer object
+       * @param dL value to be added to trajectory running parameter [cm]
+       * @param de value to be added to photon energy [eV]
+       * @param dFic value to be added to Cherenkov azimuthal angle
+       * @return true on success
+       */
+      bool raytrace(const FastRaytracer& rayTracer, double dL = 0, double de = 0, double dFic = 0);
+
+      /**
        * Returns photon propagation losses (bulk absorption, surface reflectivity, mirror reflectivity)
        * @param E photon energy
        * @param propLen propagation length
@@ -507,7 +619,17 @@ namespace Belle2 {
        * @param L emission position distance along particle trajectory
        * @return solution
        */
-      PrismSolution prismSolution(const TVector3& rD, double L);
+      PrismSolution prismSolution(const ROOT::Math::XYZPoint& rD, double L);
+
+      /**
+       * Returns the value of signal + deltaRay PDF normalized to the number of expected photons.
+       * @param pixelID pixel ID
+       * @param time photon hit time
+       * @param timeErr uncertainty of hit time
+       * @param sigt additional time smearing
+       * @return PDF value
+       */
+      double pdfValueSignalDelta(int pixelID, double time, double timeErr, double sigt = 0) const;
 
       /**
        * Returns the value of PDF normalized to the number of expected photons.
@@ -518,14 +640,6 @@ namespace Belle2 {
        * @return PDF value
        */
       double pdfValue(int pixelID, double time, double timeErr, double sigt = 0) const;
-
-      /**
-       * Returns the expected number of photons within given time window
-       * @param minTime time window lower edge
-       * @param maxTime time window upper edge
-       * @return expected number of photons (signal + background + delta-ray)
-       */
-      double expectedPhotons(double minTime, double maxTime) const;
 
       /**
        * Initializes pixel log likelihoods
@@ -545,6 +659,7 @@ namespace Belle2 {
       const Const::ChargedStable m_hypothesis; /**< particle hypothesis */
       const InverseRaytracer* m_inverseRaytracer = 0; /**< inverse ray-tracer */
       const FastRaytracer* m_fastRaytracer = 0; /**< fast ray-tracer */
+      std::vector<FastRaytracer> m_rayTracers; /**< copies of fast ray-tracer used to compute derivatives */
       const YScanner* m_yScanner = 0; /**< PDF expander in y */
       const BackgroundPDF* m_backgroundPDF = 0; /**< background PDF */
       DeltaRayPDF m_deltaRayPDF; /**< delta-ray PDF */
@@ -564,7 +679,7 @@ namespace Belle2 {
 
       std::vector<SignalPDF> m_signalPDFs; /**< parameterized signal PDF in pixels (index = pixelID - 1) */
       double m_signalPhotons = 0; /**< expected number of signal photons */
-      double m_bkgPhotons = 0; /**< expected number of background photons */
+      double m_bkgPhotons = 0; /**< expected number of uniform background photons */
       double m_deltaPhotons = 0; /**< expected number of delta-ray photons */
 
       std::map<double, InverseRaytracer::CerenkovAngle> m_cerenkovAngles; /**< sine and cosine of Cerenkov angles */
@@ -575,27 +690,36 @@ namespace Belle2 {
       mutable std::vector<LogL> m_pixelLLs; /**< pixel log likelihoods (index = pixelID - 1) */
       mutable std::vector<Pull> m_pulls; /**< photon pulls w.r.t PDF peaks */
       mutable bool m_deltaPDFOn = true; /**< include/exclude delta-ray PDF in likelihood calculation */
+      std::map <double, YScanner::Derivatives> m_derivatives; /**< a map of xD and derivatives */
+      mutable std::set<int> m_zeroPixels; /**< collection of pixelID's with zero pdfValue */
+
+      std::vector<const PDFConstructor*> m_pdfOtherTracks; /**< most probable PDF's of other tracks in the module */
 
     };
 
     //--- inline functions ------------------------------------------------------------
 
-    inline double PDFConstructor::pdfValue(int pixelID, double time, double timeErr, double sigt) const
+    inline double PDFConstructor::pdfValueSignalDelta(int pixelID, double time, double timeErr, double sigt) const
     {
       unsigned k = pixelID - 1;
       if (k < m_signalPDFs.size() and m_valid) {
-        double f = 0;
-        f += m_signalPhotons * m_signalPDFs[k].getPDFValue(time, timeErr, sigt);
+        double f = m_signalPhotons * m_signalPDFs[k].getPDFValue(time, timeErr, sigt);
         if (m_deltaPDFOn) f += m_deltaPhotons * m_deltaRayPDF.getPDFValue(pixelID, time);
-        f += m_bkgPhotons * m_backgroundPDF->getPDFValue(pixelID);
         return f;
       }
       return 0;
     }
 
-    inline double PDFConstructor::getPDFValue(int pixelID, double time, double timeErr, double sigt) const
+    inline double PDFConstructor::pdfValue(int pixelID, double time, double timeErr, double sigt) const
     {
-      return pdfValue(pixelID, time, timeErr, sigt) / getExpectedPhotons();
+
+      if (not m_valid) return 0;
+
+      double f = pdfValueSignalDelta(pixelID, time, timeErr, sigt); // signal
+      f += m_bkgPhotons * m_backgroundPDF->getPDFValue(pixelID); // uniform background
+      for (const auto* other : m_pdfOtherTracks) f += other->pdfValueSignalDelta(pixelID, time, timeErr, sigt); // other tracks
+
+      return f;
     }
 
     inline double PDFConstructor::deltaXD(double dFic, const InverseRaytracer::Solution& sol, double xD)
@@ -622,6 +746,7 @@ namespace Belle2 {
       }
       return cer;
     }
+
 
     template<class T>
     void PDFConstructor::setSignalPDF(T& t, unsigned col, double xD, double zD, int Nxm, double xmMin, double xmMax)
@@ -663,58 +788,47 @@ namespace Belle2 {
         k++;
       }
 
-      // solutions with emission point displaced by dL
-
-      double dL = 0.1; // cm
-      int i_dL = t.solve(xD, zD, Nxm, xmMin, xmMax, m_track.getEmissionPoint(dL), cerenkovAngle(), dL);
-      if (i_dL < 0) return;
-      k = 0;
-      while (m_inverseRaytracer->isNymDifferent()) { // get rid of discontinuities
-        if (k > 8) {
-          B2DEBUG(20, "TOP::PDFConstructor::setSignalPDF: failed to find the same Nym (dL)");
-          return;
-        }
-        dL = - dL / 2;
-        i_dL = t.solve(xD, zD, Nxm, xmMin, xmMax, m_track.getEmissionPoint(dL), cerenkovAngle(), dL);
-        if (i_dL < 0) return;
-        k++;
-      }
-
-      // solutions with photon energy changed by de
-
-      double de = 0.1; // eV
-      int i_de = t.solve(xD, zD, Nxm, xmMin, xmMax, m_track.getEmissionPoint(), cerenkovAngle(de), de);
-      if (i_de < 0) return;
-      k = 0;
-      while (m_inverseRaytracer->isNymDifferent()) { // get rid of discontinuities
-        if (k > 8) {
-          B2DEBUG(20, "TOP::PDFConstructor::setSignalPDF: failed to find the same Nym (de)");
-          return;
-        }
-        de = - de / 2;
-        i_de = t.solve(xD, zD, Nxm, xmMin, xmMax, m_track.getEmissionPoint(), cerenkovAngle(de), de);
-        if (i_de < 0) return;
-        k++;
-      }
-
-      // loop over the two solutions, compute the derivatives, do ray-tracing corrections and expand PDF in y
+      // loop over the two solutions, do ray-tracing corrections, compute the derivatives and expand PDF in y
 
       for (unsigned i = 0; i < 2; i++) {
         if (not m_inverseRaytracer->getStatus(i)) continue;
         const auto& solutions = m_inverseRaytracer->getSolutions(i);
         const auto& sol = solutions[i0];
         const auto& sol_dx = solutions[i_dx];
-        const auto& sol_de = solutions[i_de];
-        const auto& sol_dL = solutions[i_dL];
-        YScanner::Derivatives D(sol, sol_dx, sol_de, sol_dL);
+
+        // compute dFic/dx needed in raytracing corrections
+
+        double dFic_dx = YScanner::Derivatives::dFic_d(sol, sol_dx);
+
+        // do raytracing corrections
+
         m_dFic = 0;
-        bool ok = doRaytracingCorrections(sol, D.dFic_dx, xD);
+        bool ok = doRaytracingCorrections(sol, dFic_dx, xD);
         if (not ok) continue;
+        m_Fic = sol.getFic() + m_dFic;
+
+        // check if time is still within the reconstruction range
 
         double time = m_tof + m_fastRaytracer->getPropagationLen() * m_groupIndex / Const::speedOfLight;
         if (time > m_maxTime) continue;
 
-        m_Fic = sol.getFic() + m_dFic;
+        // compute the derivatives
+
+        YScanner::Derivatives D;
+        ok = setDerivatives(D, 0.1, 0.1, 0.001);
+        if (not ok) {
+          B2DEBUG(20, "TOP::PDFConstructor::setSignalPDF: failed to determine derivatives: "
+                  << LogVar("track momentum", m_track.getMomentumMag())
+                  << LogVar("impact local z", m_track.getEmissionPoint().position.Z())
+                  << LogVar("xD", xD)
+                  << LogVar("Nxm", Nxm)
+                  << LogVar("time", time)
+                  << LogVar("peak type", t.type));
+          continue;
+        }
+        if (m_storeOption == c_Full) m_derivatives[xD] = D;
+
+        // expand PDF in y
 
         expandSignalPDF(col, D, t.type);
       }

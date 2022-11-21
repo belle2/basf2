@@ -5,8 +5,8 @@
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
+
 import basf2
-import ROOT
 from softwaretrigger import constants
 import modularAnalysis
 import stdV0s
@@ -32,7 +32,7 @@ def add_online_dqm(path, run_type, dqm_environment, components, dqm_mode, create
         add_cosmic_dqm(path, components=components, dqm_environment=dqm_environment,
                        dqm_mode=dqm_mode, create_hlt_unit_histograms=create_hlt_unit_histograms)
     else:
-        basf2.B2FATAL("Run type {} not supported.".format(run_type))
+        basf2.B2FATAL(f"Run type {run_type} not supported.")
 
     if dqm_mode in ["dont_care", "all_events"]:
         path.add_module('DelayDQM', title=dqm_environment, histogramDirectoryName='DAQ')
@@ -240,6 +240,10 @@ def hlt_event_abort(module, condition, error_flag):
     Create a discard path suitable for HLT processing, i.e. set an error flag and
     keep only the metadata.
     """
+
+    # Always avoid the top-level 'import ROOT'.
+    import ROOT  # noqa
+
     p = basf2.Path()
     p.add_module("EventErrorFlag", errorFlag=error_flag)
     add_store_only_metadata_path(p)

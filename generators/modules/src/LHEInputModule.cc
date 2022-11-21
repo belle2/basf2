@@ -17,7 +17,7 @@
 using namespace std;
 using namespace Belle2;
 
-REG_MODULE(LHEInput)
+REG_MODULE(LHEInput);
 
 LHEInputModule::LHEInputModule() : Module(),
   m_nInitial(0),

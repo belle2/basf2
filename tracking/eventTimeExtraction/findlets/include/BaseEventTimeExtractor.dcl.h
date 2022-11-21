@@ -49,6 +49,6 @@ namespace Belle2 {
     bool m_param_overwriteExistingEstimation = true;
 
     /// Storage for the event t0 before this module ran
-    boost::optional<EventT0::EventT0Component> m_eventT0Before;
+    std::optional<EventT0::EventT0Component> m_eventT0Before;
   };
 }

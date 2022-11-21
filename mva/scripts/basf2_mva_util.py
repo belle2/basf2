@@ -137,6 +137,7 @@ class Method(object):
         Load a method stored under the given identifier
         @param identifier identifying the method
         """
+        # Always avoid the top-level 'import ROOT'.
         import ROOT  # noqa
         # Initialize all the available interfaces
         ROOT.Belle2.MVA.AbstractInterface.initSupportedInterfaces()
@@ -211,6 +212,7 @@ class Method(object):
         @param specific_options specific options given to basf2_mva.teacher
           (if None the options of this method are used)
         """
+        # Always avoid the top-level 'import ROOT'.
         import ROOT  # noqa
         if isinstance(datafiles, str):
             datafiles = [datafiles]
@@ -253,9 +255,23 @@ class Method(object):
 
             expert_target = identifier + '_' + self.general_options.m_target_variable
             stripped_expert_target = self.identifier + '_' + self.general_options.m_target_variable
-            d = tree2dict(
-                roottree, [
+
+            output_names = [self.identifier]
+            branch_names = [
                     ROOT.Belle2.MakeROOTCompatible.makeROOTCompatible(identifier),
-                    ROOT.Belle2.MakeROOTCompatible.makeROOTCompatible(expert_target)], [
-                    self.identifier, stripped_expert_target])
-        return d[self.identifier], d[stripped_expert_target]
+                    ]
+            if self.general_options.m_nClasses > 2:
+                output_names = [self.identifier+f'_{i}' for i in range(self.general_options.m_nClasses)]
+                branch_names = [
+                    ROOT.Belle2.MakeROOTCompatible.makeROOTCompatible(
+                        identifier +
+                        f'_{i}') for i in range(
+                        self.general_options.m_nClasses)]
+
+            d = tree2dict(
+                roottree,
+                [*branch_names, ROOT.Belle2.MakeROOTCompatible.makeROOTCompatible(expert_target)],
+                [*output_names, stripped_expert_target])
+
+        return (d[self.identifier] if self.general_options.m_nClasses <= 2 else np.array([d[x]
+                for x in output_names]).T), d[stripped_expert_target]

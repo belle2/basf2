@@ -20,7 +20,6 @@
 #include <ecl/digitization/EclConfiguration.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/ClusterUtility/ClusterUtils.h>
-#include <boost/optional.hpp>
 #include <ecl/geometry/ECLGeometryPar.h>
 
 #include <TH2F.h>
@@ -34,7 +33,7 @@ using namespace std;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(ECLBhabhaTCollector)
+REG_MODULE(ECLBhabhaTCollector);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -591,8 +590,6 @@ void ECLBhabhaTCollectorModule::collect()
 
   //---------------------------------------------------------------------
   //..Some utilities
-  ClusterUtils cUtil;
-  const TVector3 clustervertex = cUtil.GetIPPosition();
   PCmsLabTransform boostrotate;
 
   //---------------------------------------------------------------------
@@ -619,7 +616,7 @@ void ECLBhabhaTCollectorModule::collect()
     double z0 = tempTrackFit->getZ0();
     double d0 = tempTrackFit->getD0();
     int nCDChits = tempTrackFit->getHitPatternCDC().getNHits();
-    double p = tempTrackFit->getMomentum().Mag();
+    double p = tempTrackFit->getMomentum().R();
 
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     //== Save debug TTree with detailed information if necessary.
@@ -725,8 +722,8 @@ void ECLBhabhaTCollectorModule::collect()
   double trkEClustCOM[2] = {0., 0.};
   double trkpLab[2];
   double trkpCOM[2];
-  TLorentzVector trkp4Lab[2];
-  TLorentzVector trkp4COM[2];
+  ROOT::Math::PxPyPzEVector trkp4Lab[2];
+  ROOT::Math::PxPyPzEVector trkp4COM[2];
 
   // Index of the cluster and the crystal that has the highest energy crystal for the two tracks
   int crysIDMax[2] = { -1, -1 };
@@ -752,8 +749,8 @@ void ECLBhabhaTCollectorModule::collect()
       if (not tempTrackFit) {continue;}
       trkp4Lab[icharge] = tempTrackFit->get4Momentum();
       trkp4COM[icharge] = boostrotate.rotateLabToCms() * trkp4Lab[icharge];
-      trkpLab[icharge] = trkp4Lab[icharge].Rho();
-      trkpCOM[icharge] = trkp4COM[icharge].Rho();
+      trkpLab[icharge] = trkp4Lab[icharge].P();
+      trkpCOM[icharge] = trkp4COM[icharge].P();
 
 
       /* For each cluster associated to the current track, sum up the energies to get the total
@@ -984,7 +981,7 @@ void ECLBhabhaTCollectorModule::collect()
   for (int iCharge = 0; iCharge < 2; iCharge++) {
     if (crystalCutsPassed[iCharge]) {
       getObjectPtr<TH2F>("TimevsCrysPrevCrateCalibPrevCrystCalib")->Fill((crystalIDs[iCharge]) + 0.001,
-          times_noPreviousCalibrations[iCharge] - ts_prevCalib[iCharge] - tcrate_prevCalib[iCharge] , 1);
+          times_noPreviousCalibrations[iCharge] - ts_prevCalib[iCharge] - tcrate_prevCalib[iCharge], 1);
       getObjectPtr<TH2F>("TimevsCratePrevCrateCalibPrevCrystCalib")->Fill((crateIDs[iCharge]) + 0.001,
           times_noPreviousCalibrations[iCharge]  - ts_prevCalib[iCharge] - tcrate_prevCalib[iCharge], 1);
       getObjectPtr<TH2F>("TimevsCrysNoCalibrations")->Fill((crystalIDs[iCharge]) + 0.001, times_noPreviousCalibrations[iCharge], 1);
@@ -992,7 +989,7 @@ void ECLBhabhaTCollectorModule::collect()
       getObjectPtr<TH2F>("TimevsCrysPrevCrateCalibNoCrystCalib")->Fill((crystalIDs[iCharge]) + 0.001,
           times_noPreviousCalibrations[iCharge] - tcrate_prevCalib[iCharge], 1);
       getObjectPtr<TH2F>("TimevsCrateNoCrateCalibPrevCrystCalib")->Fill((crateIDs[iCharge]) + 0.001,
-          times_noPreviousCalibrations[iCharge]  - ts_prevCalib[iCharge] , 1);
+          times_noPreviousCalibrations[iCharge]  - ts_prevCalib[iCharge], 1);
 
       // Record number of crystals used from the event.  Should be exactly two.
       numCrystalsPassingCuts++;

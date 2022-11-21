@@ -15,7 +15,6 @@
 #include <analysis/ContinuumSuppression/HarmonicMoments.h>
 #include <analysis/ContinuumSuppression/SphericityEigenvalues.h>
 
-#include <TVector3.h>
 #include <TRandom3.h>
 #include <TMath.h>
 #include <boost/math/special_functions/legendre.hpp>
@@ -23,6 +22,7 @@
 #include <gtest/gtest.h>
 
 using namespace std;
+using namespace ROOT::Math;
 
 namespace Belle2 {
 
@@ -33,7 +33,7 @@ namespace Belle2 {
   /** Test the calculation of a thrust axis */
   TEST_F(eventShapeCoreAlgorithmTest, Thrust)
   {
-    std::vector<TVector3> momenta;
+    std::vector<ROOT::Math::XYZVector> momenta;
     // random generated numbers
     momenta.emplace_back(0.5935352844151847, 0.28902324918117417, 0.9939000705771412);
     momenta.emplace_back(0.7097025137911714, 0.5118418422879152, 0.44501044145648994);
@@ -41,9 +41,9 @@ namespace Belle2 {
     momenta.emplace_back(0.8548902083897467, 0.6887268865943484, 0.34301136659215437);
     momenta.emplace_back(0.26863521039211535, 0.011148638667487942, 0.96186334199901);
 
-    const TVector3 thrustB = Thrust::calculateThrust(momenta);
+    const ROOT::Math::XYZVector thrustB = Thrust::calculateThrust(momenta);
 
-    EXPECT_FLOAT_EQ(0.925838, thrustB.Mag());
+    EXPECT_FLOAT_EQ(0.925838, thrustB.R());
     EXPECT_FLOAT_EQ(0.571661, thrustB.X());
     EXPECT_FLOAT_EQ(0.306741, thrustB.Y());
     EXPECT_FLOAT_EQ(0.660522, thrustB.Z());
@@ -54,9 +54,9 @@ namespace Belle2 {
   {
     const bool use_all = true;
     const bool use_roe = true;
-    std::vector<TVector3> momenta;
-    std::vector<TVector3> sig_side_momenta;
-    std::vector<TVector3> roe_side_momenta;
+    std::vector<ROOT::Math::XYZVector> momenta;
+    std::vector<ROOT::Math::XYZVector> sig_side_momenta;
+    std::vector<ROOT::Math::XYZVector> roe_side_momenta;
 
     // "Signal Side"
     sig_side_momenta.emplace_back(0.5429965262452898, 0.37010582077332344, 0.0714978744529432);
@@ -86,7 +86,7 @@ namespace Belle2 {
 
 
     // Calculate thrust from "Signal Side"
-    const TVector3 thrustB = Thrust::calculateThrust(sig_side_momenta);
+    const ROOT::Math::XYZVector thrustB = Thrust::calculateThrust(sig_side_momenta);
 
     CleoCones myCleoCones(momenta, roe_side_momenta, thrustB, use_all, use_roe);
 
@@ -117,7 +117,7 @@ namespace Belle2 {
   /** Test the calculation of the Fox-Wolfram moments */
   TEST_F(eventShapeCoreAlgorithmTest, FoxWolfram)
   {
-    std::vector<TVector3> momenta;
+    std::vector<ROOT::Math::XYZVector> momenta;
 
     momenta.emplace_back(0.5429965262452898, 0.37010582077332344, 0.0714978744529432);
     momenta.emplace_back(0.34160659934755344, 0.6444967896760643, 0.18455766323674105);
@@ -175,7 +175,7 @@ namespace Belle2 {
   {
 
     float dummySqrtS = 10.;
-    std::vector<TVector3> partMom;
+    std::vector<XYZVector> partMom;
 
     partMom.emplace_back(0.5429965262452898, 0.37010582077332344, 0.0714978744529432);
     partMom.emplace_back(0.34160659934755344, 0.6444967896760643, 0.18455766323674105);
@@ -188,11 +188,11 @@ namespace Belle2 {
     partMom.emplace_back(0.61672460498333, 0.4472311336875816, 0.31288581834261064);
     partMom.emplace_back(0.18544654870476218, 0.0758107751704592, 0.31909701462121065);
 
-    TVector3 axis(0., 0., 1.);
+    XYZVector axis(0., 0., 1.);
     // repeats the calculation
     double moment[9] = {0.};
     for (auto& p : partMom) {
-      double pMag = p.Mag();
+      double pMag = p.R();
       double cTheta = p.Dot(axis) / pMag;
       for (short i = 0; i < 9; i++)
         moment[i] += pMag * boost::math::legendre_p(i, cTheta) / dummySqrtS;
@@ -211,7 +211,7 @@ namespace Belle2 {
   /** Test the calculation of the Sphericity eigenvalues and eigenvectors */
   TEST_F(eventShapeCoreAlgorithmTest, Sphericity)
   {
-    std::vector<TVector3> partMom;
+    std::vector<XYZVector> partMom;
 
     partMom.emplace_back(0.5429965262452898, 0.37010582077332344, 0.0714978744529432);
     partMom.emplace_back(0.34160659934755344, 0.6444967896760643, 0.18455766323674105);

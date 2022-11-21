@@ -107,6 +107,11 @@ namespace {
     EXPECT_TRUE(absvar13 != nullptr);
     EXPECT_EQ(std::get<double>(absvar13->function(nullptr)), 10);
 
+    // Test that nested metavariables with multiple arguments are parsed correctly
+    const Manager::Var* minformulas = Manager::Instance().getVariable("passesCut(min(2+min(1/3, abs(-2/3)), 2+2/3) > 2.3)");
+    EXPECT_TRUE(minformulas != nullptr);
+    EXPECT_TRUE(std::get<bool>(minformulas->function(nullptr)));
+
 
     //test special variable operations
     const Manager::Var* daughterProductP = Manager::Instance().getVariable("daughterProductOf(p)");

@@ -2,7 +2,7 @@ Belle 2 Software Documentation
 ==============================
 
 This document contains documentation of the Belle 2 Software, its command line
-tools and the Python API.
+tools and the Python programming interface.
 
 .. note:: Generated on |today| for release |release|, commit |version|.
 

@@ -160,13 +160,11 @@ class TDCPV_qqs(BaseSkim):
         bd_qqs_List = []
         for chID, channel in enumerate(bd_qqs_Channels):
             ma.reconstructDecay('B0:TDCPV_qqs' + str(chID) + ' -> ' + channel, btotcpvcuts, chID, path=path)
-            ma.applyCuts('B0:TDCPV_qqs' + str(chID), 'nTracks>4', path=path)
             bd_qqs_List.append('B0:TDCPV_qqs' + str(chID))
 
         bu_qqs_List = []
         for chID, channel in enumerate(bu_qqs_Channels):
             ma.reconstructDecay('B+:TDCPV_qqs' + str(chID) + ' -> ' + channel, btotcpvcuts, chID, path=path)
-            ma.applyCuts('B+:TDCPV_qqs' + str(chID), 'nTracks>4', path=path)
             bu_qqs_List.append('B+:TDCPV_qqs' + str(chID))
 
         ma.fillParticleList(decayString='pi+:TDCPV_eventshape',

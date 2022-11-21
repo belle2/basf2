@@ -16,7 +16,7 @@
 using namespace std;
 using namespace Belle2;
 
-REG_MODULE(SVDB4CommissioningPlots)
+REG_MODULE(SVDB4CommissioningPlots);
 
 SVDB4CommissioningPlotsModule::SVDB4CommissioningPlotsModule() : Module()
   , m_nTracks(0), m_Pvalue(), m_mom(0), m_nSVDhits(0)
@@ -61,93 +61,93 @@ void SVDB4CommissioningPlotsModule::beginRun()
   //RECO DIGITS
   TH1F hRecoCharge("reco_charge_L@layerL@ladderS@sensor@view",
                    "Charge of RecoDigits in @layer.@ladder.@sensor @view/@side side",
-                   100, 0 , 1000);
+                   100, 0, 1000);
   hRecoCharge.GetXaxis()->SetTitle("charge (ke-)");
   h_recoCharge = new SVDHistograms<TH1F>(hRecoCharge);
 
   TH1F hRecoEnergy("reco_energy_L@layerL@ladderS@sensor@view",
                    "Energy of RecoDigits in @layer.@ladder.@sensor @view/@side side",
-                   100, 0 , 360);
+                   100, 0, 360);
   hRecoEnergy.GetXaxis()->SetTitle("energy (keV)");
   h_recoEnergy = new SVDHistograms<TH1F>(hRecoEnergy);
 
   TH1F hRecoTime("reco_time_L@layerL@ladderS@sensor@view",
                  "Time of RecoDigits in @layer.@ladder.@sensor @view/@side side",
-                 200, -100 , 100);
+                 200, -100, 100);
   hRecoTime.GetXaxis()->SetTitle("time (ns)");
   h_recoTime = new SVDHistograms<TH1F>(hRecoTime);
 
   TH1F hRecoNoise("reco_noise_L@layerL@ladderS@sensor@view",
                   "Noise of RecoDigits in @layer.@ladder.@sensor @view/@side side",
-                  200, 300 , 1800);
+                  200, 300, 1800);
   hRecoNoise.GetXaxis()->SetTitle("strip noise (e-)");
   h_recoNoise = new SVDHistograms<TH1F>(hRecoNoise);
 
   //CLUSTER NOT RELATED TO TRACKS
   TH1F hClusterCharge("cluster_charge_L@layerL@ladderS@sensor@view",
                       "Charge of Clusters in @layer.@ladder.@sensor @view/@side side",
-                      100, 0 , 100);
+                      100, 0, 100);
   hClusterCharge.GetXaxis()->SetTitle("charge (ke-)");
   h_clusterCharge = new SVDHistograms<TH1F>(hClusterCharge);
 
   TH1F hClusterSize("cluster_size_L@layerL@ladderS@sensor@view",
                     "Clusters Size for @layer.@ladder.@sensor @view/@side side",
-                    20, 0 , 20);
+                    20, 0, 20);
   hClusterSize.GetXaxis()->SetTitle("cluster size");
   h_clusterSize = new SVDHistograms<TH1F>(hClusterSize);
 
   TH1F hClusterSNR("cluster_SNR_L@layerL@ladderS@sensor@view",
                    "SNR of Clusters in @layer.@ladder.@sensor @view/@side side",
-                   100, 0 , 140);
+                   100, 0, 140);
   hClusterSNR.GetXaxis()->SetTitle("SNR");
   h_clusterSNR = new SVDHistograms<TH1F>(hClusterSNR);
 
   TH1F hClusterEnergy("cluster_energy_L@layerL@ladderS@sensor@view",
                       "Energy of Clusters in @layer.@ladder.@sensor @view/@side side",
-                      100, 0 , 360);
+                      100, 0, 360);
   hClusterEnergy.GetXaxis()->SetTitle("energy (keV)");
   h_clusterEnergy = new SVDHistograms<TH1F>(hClusterEnergy);
 
   TH1F hClusterTime("cluster_time_L@layerL@ladderS@sensor@view",
                     "Time of Clusters in @layer.@ladder.@sensor @view/@side side",
-                    200, -100 , 100);
+                    200, -100, 100);
   hClusterTime.GetXaxis()->SetTitle("time (ns)");
   h_clusterTime = new SVDHistograms<TH1F>(hClusterTime);
 
   //CLUSTER RELATED TO TRACKS
   TH1F hClusterTrkCharge("clusterTrk_charge_L@layerL@ladderS@sensor@view",
                          "Charge of Clusters Related to Tracks in @layer.@ladder.@sensor @view/@side side",
-                         100, 0 , 100);
+                         100, 0, 100);
   hClusterTrkCharge.GetXaxis()->SetTitle("charge (ke-)");
   h_clusterTrkCharge = new SVDHistograms<TH1F>(hClusterTrkCharge);
 
   TH1F hClusterTrkSize("clusterTrk_size_L@layerL@ladderS@sensor@view",
                        "Cluster Size for @layer.@ladder.@sensor @view/@side side",
-                       20, 0 , 20);
+                       20, 0, 20);
   hClusterTrkSize.GetXaxis()->SetTitle("cluster size");
   h_clusterTrkSize = new SVDHistograms<TH1F>(hClusterTrkSize);
 
   TH1F hClusterTrkSNR("clusterTrk_SNR_L@layerL@ladderS@sensor@view",
                       "SNR of Clusters Related to Tracks in @layer.@ladder.@sensor @view/@side side",
-                      100, 0 , 140);
+                      100, 0, 140);
   hClusterTrkSNR.GetXaxis()->SetTitle("SNR");
   h_clusterTrkSNR = new SVDHistograms<TH1F>(hClusterTrkSNR);
 
   TH1F hClusterTrkEnergy("clusterTrk_energy_L@layerL@ladderS@sensor@view",
                          "Energy of Clusters Related to Tracks in @layer.@ladder.@sensor @view/@side side",
-                         100, 0 , 360);
+                         100, 0, 360);
   hClusterTrkEnergy.GetXaxis()->SetTitle("energy (keV)");
   h_clusterTrkEnergy = new SVDHistograms<TH1F>(hClusterTrkEnergy);
 
   TH1F hClusterTrkTime("clusterTrk_time_L@layerL@ladderS@sensor@view",
                        "Time of Clusters Related to Tracks in @layer.@ladder.@sensor @view/@side side",
-                       200, -100 , 100);
+                       200, -100, 100);
   hClusterTrkTime.GetXaxis()->SetTitle("time (ns)");
   h_clusterTrkTime = new SVDHistograms<TH1F>(hClusterTrkTime);
 
   TH1F hClusterTrkInterstripPos("clusterTrk_interstripPos_L@layerL@ladderS@sensor@view",
                                 "Interstrip Position of Clusters Related to Tracks in @layer.@ladder.@sensor @view/@side side",
-                                400, 0 , 1);
+                                400, 0, 1);
   hClusterTrkInterstripPos.GetXaxis()->SetTitle("interstrip position");
   h_clusterTrkInterstripPos = new SVDHistograms<TH1F>(hClusterTrkInterstripPos);
 
@@ -182,7 +182,7 @@ void SVDB4CommissioningPlotsModule::event()
     const TrackFitResult* tfr = track.getTrackFitResultWithClosestMass(Const::pion);
     if (tfr) {
       m_Pvalue->Fill(tfr->getPValue());
-      m_mom->Fill(tfr->getMomentum().Mag());
+      m_mom->Fill(tfr->getMomentum().R());
       m_nSVDhits->Fill((tfr->getHitPatternVXD()).getNSVDHits());
     }
 

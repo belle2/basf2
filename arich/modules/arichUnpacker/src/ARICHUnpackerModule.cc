@@ -37,10 +37,10 @@ namespace Belle2 {
   //using namespace ARICH;
 
   //-----------------------------------------------------------------
-  //                 Register module
+  ///                Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(ARICHUnpacker)
+  REG_MODULE(ARICHUnpacker);
 
   //-----------------------------------------------------------------
   //                 Implementation
@@ -266,7 +266,7 @@ namespace Belle2 {
           for (int i = 0; i < 10; i++) {
             int val = calbyte(buffer);
             jbyte++;
-            if (i < 6) {
+            if (i > 1 && i < 6) {
               feb_trigno |= (0xff & val) << (5 - i) * 8;
             }
           }

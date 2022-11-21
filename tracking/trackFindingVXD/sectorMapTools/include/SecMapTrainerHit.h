@@ -29,7 +29,7 @@ namespace Belle2 {
     SecMapTrainerHit(const FullSecID& fullSecID, const B2Vector3<double>& position):
       SpacePoint(position, B2Vector3<double> (0., 0., 0.),
                  std::pair<double, double> (0., 0.),
-                 std::pair<bool, bool>() , VxdID(),
+                 std::pair<bool, bool>(), VxdID(),
                  Belle2::VXD::SensorInfoBase::SensorType()),
       m_secID(fullSecID) {}
 
@@ -38,7 +38,7 @@ namespace Belle2 {
       SpacePoint(B2Vector3<double> (x, y, z),
                  B2Vector3<double> (0., 0., 0.),
                  std::pair<double, double> (0., 0.),
-                 std::pair<bool, bool>() , VxdID(),
+                 std::pair<bool, bool>(), VxdID(),
                  Belle2::VXD::SensorInfoBase::SensorType()),
       m_secID() {}
 

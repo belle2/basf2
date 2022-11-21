@@ -8,13 +8,15 @@
 
 // Own include
 #include <analysis/variables/FlavorTaggingVariables.h>
+#include <analysis/variables/ROEVariables.h>
+
 #include <analysis/variables/MCTruthVariables.h>
 #include <analysis/variables/KLMClusterVariables.h>
-#include <analysis/utility/PCmsLabTransform.h>
 
 #include <analysis/ClusterUtility/ClusterUtils.h>
 
 #include <analysis/utility/MCMatching.h>
+#include <analysis/utility/PCmsLabTransform.h>
 
 // framework - DataStore
 #include <framework/datastore/StoreObjPtr.h>
@@ -32,13 +34,13 @@
 #include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
 
-
 // framework aux
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
-#include <TLorentzVector.h>
-#include <TVector3.h>
+#include <Math/Vector3D.h>
+#include <Math/Vector4D.h>
+#include <framework/geometry/B2Vector3.h>
 
 #include <algorithm>
 #include <cmath>
@@ -48,7 +50,6 @@ using namespace std;
 namespace Belle2 {
   namespace Variable {
 
-    auto& labToCms = PCmsLabTransform::labToCms;
     static const double realNaN = std::numeric_limits<double>::quiet_NaN();
     //   ############################################## FlavorTagger Variables   ###############################################
 
@@ -59,11 +60,11 @@ namespace Belle2 {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
       if (!roe.isValid()) return 0;
 
-      TLorentzVector roeCMSVec;
+      ROOT::Math::PxPyPzEVector roeCMSVec;
 
       const auto& roeChargedParticles = roe->getChargedParticles();
       for (auto roeChargedParticle : roeChargedParticles) {
-        roeCMSVec += labToCms(roeChargedParticle->get4Vector());
+        roeCMSVec += PCmsLabTransform::labToCms(roeChargedParticle->get4Vector());
       }
 
       double missMom = -roeCMSVec.P();
@@ -80,16 +81,16 @@ namespace Belle2 {
       else
         B2FATAL("At most 1 argument (name of mask) accepted.");
 
-      auto func = [maskName](const Particle * particle) -> double {
+      auto func = [maskName](const Particle*) -> double {
         StoreObjPtr<RestOfEvent> roe("RestOfEvent");
         if (!roe.isValid()) return 0;
 
-        TLorentzVector roeCMSVec;
+        ROOT::Math::PxPyPzEVector roeCMSVec;
 
         const auto& roeChargedParticles = roe->getChargedParticles(maskName);
         for (auto roeChargedParticle : roeChargedParticles)
         {
-          roeCMSVec += labToCms(roeChargedParticle->get4Vector());
+          roeCMSVec += PCmsLabTransform::labToCms(roeChargedParticle->get4Vector());
         }
         double missMom = -roeCMSVec.P();
         return missMom ;
@@ -99,10 +100,17 @@ namespace Belle2 {
 
     double cosTPTO(const Particle* part)
     {
-      StoreObjPtr<RestOfEvent> roe("RestOfEvent");
-      if (!roe.isValid()) return 0;
+      StoreObjPtr<RestOfEvent> roeobject("RestOfEvent");
+      const RestOfEvent* roe;
+      if (roeobject.isValid()) { // if in for_each loop over ROE
+        roe = &(*roeobject);
+      } else {
+        roe = getRelatedROEObject(part);
+        if (!roe)
+          return 0;
+      }
 
-      std::vector<TVector3> p3_cms_roe;
+      std::vector<ROOT::Math::XYZVector> p3_cms_roe;
       static const double P_MAX(3.2);
 
       // Charged tracks
@@ -111,20 +119,20 @@ namespace Belle2 {
       for (auto& roeChargedParticle : roeTracks) {
         // TODO: Add helix and KVF with IpProfile once available. Port from L163-199 of:
         // /belle/b20090127_0910/src/anal/ekpcontsuppress/src/ksfwmoments.cc
-        TLorentzVector p_cms = labToCms(roeChargedParticle->get4Vector());
+        ROOT::Math::PxPyPzEVector p_cms = PCmsLabTransform::labToCms(roeChargedParticle->get4Vector());
         if (p_cms != p_cms) continue;
         if (p_cms.P() > P_MAX) continue;
         p3_cms_roe.push_back(p_cms.Vect());
       }
 
-      // ECLCluster -> Gamma
+      // ECLCluster->Gamma
       const auto& roePhotons = roe->getPhotons();
       for (auto& roePhoton : roePhotons) {
         if (roePhoton->getECLClusterEHypothesisBit() == ECLCluster::EHypothesisBit::c_nPhotons) {
-          TLorentzVector p_lab = roePhoton->get4Vector();
+          ROOT::Math::PxPyPzEVector p_lab = roePhoton->get4Vector();
           if (p_lab != p_lab) continue;
           if (p_lab.P() < 0.05) continue;
-          TLorentzVector p_cms = labToCms(p_lab);
+          ROOT::Math::PxPyPzEVector p_cms = PCmsLabTransform::labToCms(p_lab);
           if (p_cms != p_cms) continue;
           if (p_cms.P() > P_MAX) continue;
           p3_cms_roe.push_back(p_cms.Vect());
@@ -134,18 +142,18 @@ namespace Belle2 {
       const auto& roeKlongs = roe->getHadrons();
       for (auto& roeKlong : roeKlongs) {
         if (nKLMClusterTrackMatches(roeKlong) == 0 && !(roeKlong->getKLMCluster()->getAssociatedEclClusterFlag())) {
-          TLorentzVector p_lab = roeKlong->get4Vector();
+          ROOT::Math::PxPyPzEVector p_lab = roeKlong->get4Vector();
           if (p_lab != p_lab) continue;
           if (p_lab.P() < 0.05) continue;
-          TLorentzVector p_cms = labToCms(p_lab);
+          ROOT::Math::PxPyPzEVector p_cms = PCmsLabTransform::labToCms(p_lab);
           if (p_cms != p_cms) continue;
           if (p_cms.P() > P_MAX) continue;
           p3_cms_roe.push_back(p_cms.Vect());
         }
       }
 
-      const TVector3 thrustO  = Thrust::calculateThrust(p3_cms_roe);
-      const TVector3 pAxis = labToCms(part->get4Vector()).Vect();
+      const B2Vector3D thrustO = Thrust::calculateThrust(p3_cms_roe);
+      const B2Vector3D pAxis = PCmsLabTransform::labToCms(part->get4Vector()).Vect();
 
       double result = 0 ;
       if (pAxis == pAxis) result = abs(cos(pAxis.Angle(thrustO)));
@@ -164,10 +172,19 @@ namespace Belle2 {
         B2FATAL("At most 1 argument (name of mask) accepted.");
 
       auto func = [maskName](const Particle * particle) -> double {
-        StoreObjPtr<RestOfEvent> roe("RestOfEvent");
-        if (!roe.isValid()) return 0;
+        StoreObjPtr<RestOfEvent> roeobject("RestOfEvent");
+        const RestOfEvent* roe;
+        if (roeobject.isValid())   // if in for_each loop over ROE
+        {
+          roe = &(*roeobject);
+        } else
+        {
+          roe = getRelatedROEObject(particle);
+          if (!roe)
+            return 0;
+        }
 
-        std::vector<TVector3> p3_cms_roe;
+        std::vector<ROOT::Math::XYZVector> p3_cms_roe;
         // static const double P_MAX(3.2);
 
         // Charged tracks
@@ -176,21 +193,21 @@ namespace Belle2 {
         {
           // TODO: Add helix and KVF with IpProfile once available. Port from L163-199 of:
           // /belle/b20090127_0910/src/anal/ekpcontsuppress/src/ksfwmoments.cc
-          TLorentzVector p_cms = labToCms(roeChargedParticle->get4Vector());
+          ROOT::Math::PxPyPzEVector p_cms = PCmsLabTransform::labToCms(roeChargedParticle->get4Vector());
           if (p_cms != p_cms) continue;
           // if (p_cms.P() > P_MAX) continue; // Should not be added without any description.
           p3_cms_roe.push_back(p_cms.Vect());
         }
 
-        // ECLCluster -> Gamma
+        // ECLCluster->Gamma
         const auto& roePhotons = roe->getPhotons(maskName);
         for (auto& roePhoton : roePhotons)
         {
           if (roePhoton->getECLClusterEHypothesisBit() == ECLCluster::EHypothesisBit::c_nPhotons) {
-            TLorentzVector p_lab = roePhoton->get4Vector();
+            ROOT::Math::PxPyPzEVector p_lab = roePhoton->get4Vector();
             if (p_lab != p_lab) continue;
             // if (p_lab.P() < 0.05) continue; // Should not be added without any description.
-            TLorentzVector p_cms = labToCms(p_lab);
+            ROOT::Math::PxPyPzEVector p_cms = PCmsLabTransform::labToCms(p_lab);
             if (p_cms != p_cms) continue;
             // if (p_cms.P() > P_MAX) continue; // Should not be added without any description.
             p3_cms_roe.push_back(p_cms.Vect());
@@ -202,18 +219,18 @@ namespace Belle2 {
         for (auto& roeKlong : roeKlongs)
         {
           if (nKLMClusterTrackMatches(roeKlong) == 0 && !(roeKlong->getKLMCluster()->getAssociatedEclClusterFlag())) {
-            TLorentzVector p_lab = roeKlong->get4Vector();
+            ROOT::Math::PxPyPzEVector p_lab = roeKlong->get4Vector();
             if (p_lab != p_lab) continue;
             // if (p_lab.P() < 0.05) continue; // Should not be added without any description.
-            TLorentzVector p_cms = labToCms(p_lab);
+            ROOT::Math::PxPyPzEVector p_cms = PCmsLabTransform::labToCms(p_lab);
             if (p_cms != p_cms) continue;
             // if (p_cms.P() > P_MAX) continue; // Should not be added without any description.
             p3_cms_roe.push_back(p_cms.Vect());
           }
         }
 
-        const TVector3 thrustO  = Thrust::calculateThrust(p3_cms_roe);
-        const TVector3 pAxis = labToCms(particle->get4Vector()).Vect();
+        const B2Vector3D thrustO  = Thrust::calculateThrust(p3_cms_roe);
+        const B2Vector3D pAxis = PCmsLabTransform::labToCms(particle->get4Vector()).Vect();
 
         double result = 0 ;
         if (pAxis == pAxis)
@@ -256,7 +273,7 @@ namespace Belle2 {
     double momentumOfSecondDaughterCMS(const Particle* part)
     {
       if (!part->getDaughter(1)) return 0.0;
-      TLorentzVector vec = labToCms(part->getDaughter(1)->get4Vector());
+      ROOT::Math::PxPyPzEVector vec = PCmsLabTransform::labToCms(part->getDaughter(1)->get4Vector());
       return vec.P();
     }
 
@@ -313,7 +330,7 @@ namespace Belle2 {
         for (const auto& track : roe->getChargedParticles(maskName))
         {
           if (particle->isCopyOf(track, true)) continue;
-          sum += track->getMomentum().Pt();
+          sum += track->getMomentum().Rho();
         }
 
         return sum;
@@ -376,7 +393,7 @@ namespace Belle2 {
           double probMuon = pMuon->getExtraInfo("isRightTrack(Muon)");
           if (probMuon > maximumProbMuon) {
             maximumProbMuon = probMuon;
-            trackTargetMuon = pMuon -> getTrack();
+            trackTargetMuon = pMuon->getTrack();
           }
         }
       }
@@ -394,7 +411,7 @@ namespace Belle2 {
           double probElectron = pElectron->getExtraInfo("isRightTrack(Electron)");
           if (probElectron > maximumProbElectron) {
             maximumProbElectron = probElectron;
-            trackTargetElectron = pElectron -> getTrack();
+            trackTargetElectron = pElectron->getTrack();
           }
         }
       }
@@ -444,7 +461,7 @@ namespace Belle2 {
       else
         B2FATAL("At most 1 argument (name of mask) accepted.");
 
-      auto func = [maskName](const Particle * particle) -> bool {
+      auto func = [maskName](const Particle*) -> bool {
         StoreObjPtr<RestOfEvent> roe("RestOfEvent");
         if (!roe.isValid()) return 0;
 
@@ -485,7 +502,7 @@ namespace Belle2 {
       else
         B2FATAL("At most 1 argument (name of mask) accepted.");
 
-      auto func = [maskName](const Particle * particle) -> bool {
+      auto func = [maskName](const Particle*) -> bool {
         StoreObjPtr<RestOfEvent> roe("RestOfEvent");
         if (!roe.isValid()) return 0;
 
@@ -518,7 +535,7 @@ namespace Belle2 {
       else
         B2FATAL("At most 1 argument (name of mask) accepted.");
 
-      auto func = [maskName](const Particle * particle) -> bool {
+      auto func = [maskName](const Particle*) -> bool {
         StoreObjPtr<RestOfEvent> roe("RestOfEvent");
         if (!roe.isValid()) return 0;
 
@@ -630,7 +647,7 @@ namespace Belle2 {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
       if (!roe.isValid()) return 0;
 
-      const Particle* Bcp = roe->getRelated<Particle>();
+      const Particle* Bcp = roe->getRelatedFrom<Particle>();
       return Variable::isRelatedRestOfEventB0Flavor(Bcp);
     }
 
@@ -639,18 +656,18 @@ namespace Belle2 {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
       if (!roe.isValid()) return 0;
 
-      const MCParticle* BcpMC = roe->getRelated<Particle>()->getMCParticle();
+      const MCParticle* BcpMC = roe->getRelatedFrom<Particle>()->getMCParticle();
       const MCParticle* Y4S = BcpMC->getMother();
       const MCParticle* mcParticle = particle->getMCParticle();
 
       int outputB0tagQ = 0;
       while (mcParticle) {
         if (mcParticle->getMother() == Y4S) {
-          if (mcParticle != BcpMC && abs(mcParticle -> getPDG()) == 511) {
-            if (mcParticle -> getPDG() == 511) outputB0tagQ = 1;
+          if (mcParticle != BcpMC && abs(mcParticle->getPDG()) == 511) {
+            if (mcParticle->getPDG() == 511) outputB0tagQ = 1;
             else outputB0tagQ = -1;
           } else if (mcParticle == BcpMC) {
-            if (mcParticle -> getPDG() == 511) outputB0tagQ = 2;
+            if (mcParticle->getPDG() == 511) outputB0tagQ = 2;
             else outputB0tagQ = -2;
           } else outputB0tagQ = 5;
           break;
@@ -666,8 +683,8 @@ namespace Belle2 {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
       if (!roe.isValid()) return -1;
 
-      const Particle* Bcp = roe->getRelated<Particle>();
-      const MCParticle* BcpMC = roe->getRelated<Particle>()->getMCParticle();
+      const Particle* Bcp = roe->getRelatedFrom<Particle>();
+      const MCParticle* BcpMC = roe->getRelatedFrom<Particle>()->getMCParticle();
       return MCMatching::getMCErrors(Bcp, BcpMC);
     }
 
@@ -712,7 +729,7 @@ namespace Belle2 {
       else
         B2FATAL("At most 1 argument (name of mask) accepted.");
 
-      auto func = [maskName](const Particle * particle) -> int {
+      auto func = [maskName](const Particle*) -> int {
         StoreObjPtr<RestOfEvent> roe("RestOfEvent");
         if (!roe.isValid()) return -2;
 
@@ -753,7 +770,7 @@ namespace Belle2 {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
       if (!roe.isValid()) return -2;//gRandom->Uniform(0, 1);
 
-      const Particle* Bcp = roe->getRelated<Particle>();
+      const Particle* Bcp = roe->getRelatedFrom<Particle>();
       return Variable::isRelatedRestOfEventMajorityB0Flavor(Bcp);
     }
 
@@ -820,7 +837,7 @@ namespace Belle2 {
         if (!roe.isValid())
           return 0;
 
-        TLorentzVector momXChargedTracks; //Momentum of charged X tracks in lab-System
+        ROOT::Math::PxPyPzEVector momXChargedTracks; //Momentum of charged X tracks in lab-System
         const auto& roeChargedParticles = roe->getChargedParticles(maskName);
         for (auto& roeChargedParticle : roeChargedParticles)
         {
@@ -828,7 +845,7 @@ namespace Belle2 {
           momXChargedTracks += roeChargedParticle->get4Vector();
         }
 
-        TLorentzVector momXNeutralClusters = roe->get4VectorNeutralECLClusters(maskName); //Momentum of neutral X clusters in lab-System
+        ROOT::Math::PxPyPzEVector momXNeutralClusters = roe->get4VectorNeutralECLClusters(maskName); //Momentum of neutral X clusters in lab-System
         const auto& klongs = roe->getHadrons(maskName);
         for (auto& klong : klongs)
         {
@@ -837,19 +854,19 @@ namespace Belle2 {
           }
         }
 
-        TLorentzVector momX = PCmsLabTransform::labToCms(momXChargedTracks + momXNeutralClusters); //Total Momentum of the recoiling X in CMS-System
-        TLorentzVector momTarget = PCmsLabTransform::labToCms(particle->get4Vector());  //Momentum of Mu in CMS-System
-        TLorentzVector momMiss = -(momX + momTarget); //Momentum of Anti-v  in CMS-System
+        ROOT::Math::PxPyPzEVector momX = PCmsLabTransform::labToCms(momXChargedTracks + momXNeutralClusters); //Total Momentum of the recoiling X in CMS-System
+        ROOT::Math::PxPyPzEVector momTarget = PCmsLabTransform::labToCms(particle->get4Vector());  //Momentum of Mu in CMS-System
+        ROOT::Math::PxPyPzEVector momMiss = -(momX + momTarget); //Momentum of Anti-v  in CMS-System
 
         double output = 0.0;
         if (requestedVariable == "recoilMass") output = momX.M();
         if (requestedVariable == "recoilMassSqrd") output = momX.M2();
-        if (requestedVariable == "pMissCMS") output = momMiss.Vect().Mag();
-        if (requestedVariable == "cosThetaMissCMS") output = TMath::Cos(momTarget.Angle(momMiss.Vect()));
+        if (requestedVariable == "pMissCMS") output = momMiss.P();
+        if (requestedVariable == "cosThetaMissCMS") output = momTarget.Vect().Unit().Dot(momMiss.Vect().Unit());
         if (requestedVariable == "EW90")
         {
 
-          TLorentzVector momW = momTarget + momMiss; //Momentum of the W-Boson in CMS
+          ROOT::Math::PxPyPzEVector momW = momTarget + momMiss; //Momentum of the W-Boson in CMS
           float E_W_90 = 0 ; // Energy of all charged and neutral clusters in the hemisphere of the W-Boson
 
           const auto& photons = roe->getPhotons(maskName);
@@ -899,7 +916,7 @@ namespace Belle2 {
           B2FATAL("Wrong variable  " << requestedVariable << " requested. The possibilities are cosKaonPion or HaveOpositeCharges");
 
 
-        TLorentzVector momTargetSlowPion;
+        ROOT::Math::PxPyPzEVector momTargetSlowPion;
         double chargeTargetSlowPion = 0;
         if (SlowPionList.isValid())
         {
@@ -913,7 +930,7 @@ namespace Belle2 {
             if (probSlowPion > maximumProbSlowPion) {
               maximumProbSlowPion = probSlowPion;
               chargeTargetSlowPion =  pSlowPion->getCharge();
-              momTargetSlowPion = labToCms(pSlowPion->get4Vector());
+              momTargetSlowPion = PCmsLabTransform::labToCms(pSlowPion->get4Vector());
             }
           }
         }
@@ -929,9 +946,9 @@ namespace Belle2 {
         //TODO: when momTargetSlowPion == momTargetSlowPion fail?
         else if (requestedVariable == "cosKaonPion")
         {
-          TLorentzVector momTargetKaon = labToCms(particle->get4Vector());
+          ROOT::Math::PxPyPzEVector momTargetKaon = PCmsLabTransform::labToCms(particle->get4Vector());
           if (momTargetKaon == momTargetKaon && momTargetSlowPion == momTargetSlowPion)
-            output = cos(momTargetKaon.Angle(momTargetSlowPion.Vect()));
+            output = momTargetKaon.Vect().Unit().Dot(momTargetSlowPion.Vect().Unit());
         }
 
         return output;
@@ -956,14 +973,14 @@ namespace Belle2 {
 
 
         double maximumProbFastest = 0;
-        TLorentzVector momFastParticle;  //Momentum of Fast Pion in CMS-System
+        ROOT::Math::PxPyPzEVector momFastParticle;  //Momentum of Fast Pion in CMS-System
         Particle* TargetFastParticle = nullptr;
         for (unsigned int i = 0; i < FastParticleList->getListSize(); ++i)
         {
           Particle* particlei = FastParticleList->getParticle(i);
           if (!particlei) continue;
 
-          TLorentzVector momParticlei = labToCms(particlei->get4Vector());
+          ROOT::Math::PxPyPzEVector momParticlei = PCmsLabTransform::labToCms(particlei->get4Vector());
           if (momParticlei != momParticlei) continue;
 
           double probFastest = momParticlei.P();
@@ -981,13 +998,13 @@ namespace Belle2 {
         double output = 0.0;
 
         if (requestedVariable == "cosTPTOFast")
-          output = std::get<double>(Variable::Manager::Instance().getVariable("cosTPTO")->function(TargetFastParticle));
+          output = cosTPTO(TargetFastParticle);
 
-        TLorentzVector momSlowPion = labToCms(particle->get4Vector());  //Momentum of Slow Pion in CMS-System
+        ROOT::Math::PxPyPzEVector momSlowPion = PCmsLabTransform::labToCms(particle->get4Vector());  //Momentum of Slow Pion in CMS-System
         if (momSlowPion == momSlowPion)   // FIXME
         {
           if (requestedVariable == "cosSlowFast") {
-            output = cos(momSlowPion.Angle(momFastParticle.Vect()));
+            output = momSlowPion.Vect().Unit().Dot(momFastParticle.Vect().Unit());
           } else if (requestedVariable == "SlowFastHaveOpositeCharges") {
             if (particle->getCharge()*TargetFastParticle->getCharge() == -1) {
               output = 1;
@@ -1095,7 +1112,7 @@ namespace Belle2 {
           mothersPDG.push_back(abs(mcMother->getPDG()));
           mothersPointers.push_back(mcMother);
           if (abs(mcMother->getPDG()) == 511) break;
-          mcMother = mcMother -> getMother();
+          mcMother = mcMother->getMother();
         }
 
         if (mothersPDG.size() == 0) return -2;
@@ -1151,8 +1168,8 @@ namespace Belle2 {
         if (mothersPDG.size() > 1 && mothersPDG.rbegin()[1] == 15)
         {
           int numberOfChargedDaughters = 0;
-          for (auto& tauDaughter : mothersPointers.rbegin()[1] -> getDaughters()) {
-            if (tauDaughter -> getCharge() != 0)
+          for (auto& tauDaughter : mothersPointers.rbegin()[1]->getDaughters()) {
+            if (tauDaughter->getCharge() != 0)
               numberOfChargedDaughters += 1;
           }
           if (numberOfChargedDaughters == 1)
@@ -1204,7 +1221,8 @@ namespace Belle2 {
                    && mcPDG == Const::Lambda.getPDGCode() && isCharmedBaryonInChain == true)
         {
           return 1;
-        } else {
+        } else
+        {
           return 0;
         }
       };
@@ -1229,7 +1247,7 @@ namespace Belle2 {
       auto func = [index](const Particle * particle) -> int {
 
         Particle* nullParticle = nullptr;
-        double qTarget = particle -> getCharge();
+        double qTarget = particle->getCharge();
         double qMC = Variable::isRestOfEventB0Flavor(nullParticle);
 
         const MCParticle* mcParticle = particle->getMCParticle();
@@ -1304,8 +1322,8 @@ namespace Belle2 {
         if (mothersPDG.size() > 1 && mothersPDG.rbegin()[1] == 15)
         {
           int numberOfChargedDaughters = 0;
-          for (auto& tauDaughter : mothersPointers.rbegin()[1] -> getDaughters()) {
-            if (tauDaughter -> getCharge() != 0)
+          for (auto& tauDaughter : mothersPointers.rbegin()[1]->getDaughters()) {
+            if (tauDaughter->getCharge() != 0)
               numberOfChargedDaughters += 1;
           }
           if (numberOfChargedDaughters == 1)
@@ -1324,7 +1342,7 @@ namespace Belle2 {
             for (unsigned int i = 0; i < SlowPionList->getListSize(); ++i) {
               Particle* pSlowPion = SlowPionList->getParticle(i);
               if (!pSlowPion) continue;
-              if (pSlowPion -> hasExtraInfo("isRightCategory(SlowPion)")) {
+              if (pSlowPion->hasExtraInfo("isRightCategory(SlowPion)")) {
                 double probSlowPion = pSlowPion->getExtraInfo("isRightCategory(SlowPion)");
                 if (probSlowPion > mcProbSlowPion) {
                   mcProbSlowPion = probSlowPion;
@@ -1334,7 +1352,7 @@ namespace Belle2 {
             }
             if (targetSlowPion != nullptr) {
               const MCParticle* mcSlowPion = targetSlowPion ->getMCParticle();
-              //               SlowPion_q = targetSlowPion -> getCharge();
+              //               SlowPion_q = targetSlowPion->getCharge();
               if (mcSlowPion != nullptr && mcSlowPion->getMother() != nullptr
                   && abs(mcSlowPion->getPDG()) == Const::pion.getPDGCode() && abs(mcSlowPion->getMother()->getPDG()) == 413) {
                 mcSlowPionMother = mcSlowPion->getMother();
@@ -1360,7 +1378,7 @@ namespace Belle2 {
               Particle* particlei = FastParticleList->getParticle(i);
               if (!particlei) continue;
 
-              TLorentzVector momParticlei = labToCms(particlei -> get4Vector());
+              ROOT::Math::PxPyPzEVector momParticlei = PCmsLabTransform::labToCms(particlei->get4Vector());
               if (momParticlei == momParticlei) {
                 double probFastest = momParticlei.P();
                 if (probFastest > mcProbFastest) {
@@ -1371,7 +1389,7 @@ namespace Belle2 {
             }
             if (targetFastParticle != nullptr) {
               const MCParticle* mcFastParticle = targetFastParticle ->getMCParticle();
-              //               FastParticle_q = targetFastParticle -> getCharge();
+              //               FastParticle_q = targetFastParticle->getCharge();
               if (mcFastParticle != nullptr && mcFastParticle->getMother() != nullptr) {
                 FastParticlePDGMother = abs(mcFastParticle->getMother()->getPDG());
                 qFSC = mcFastParticle->getCharge();
@@ -1443,7 +1461,8 @@ namespace Belle2 {
                    && mcPDG == Const::Lambda.getPDGCode() && isCharmedBaryonInChain == true)
         {
           return 1;
-        } else {
+        } else
+        {
           return 0;
         }
       };
@@ -1502,7 +1521,7 @@ namespace Belle2 {
 
           double prob = 0;
           if (extraInfoName == "isRightTrack(MaximumPstar)") {
-            TLorentzVector momParticlei = labToCms(particlei -> get4Vector());
+            ROOT::Math::PxPyPzEVector momParticlei = PCmsLabTransform::labToCms(particlei->get4Vector());
             if (momParticlei == momParticlei) {
               prob = momParticlei.P();
             }
@@ -1518,7 +1537,7 @@ namespace Belle2 {
         }
 
         bool output = false;
-        if ((extraInfoName == "isRightTrack(MaximumPstar)") && (labToCms(particle->get4Vector()).P() == maximumProb))
+        if ((extraInfoName == "isRightTrack(MaximumPstar)") && (PCmsLabTransform::labToCms(particle->get4Vector()).P() == maximumProb))
         {
           output = true;
         } else if (extraInfoName != "isRightTrack(MaximumPstar)" && particle->hasExtraInfo(extraInfoName))
@@ -1582,7 +1601,7 @@ namespace Belle2 {
 
           double prob = 0;
           if (extraInfoName == "isRightTrack(MaximumPstar)") {
-            TLorentzVector momParticlei = labToCms(particlei -> get4Vector());
+            ROOT::Math::PxPyPzEVector momParticlei = PCmsLabTransform::labToCms(particlei->get4Vector());
             if (momParticlei == momParticlei) {
               prob = momParticlei.P();
             }
@@ -1668,7 +1687,7 @@ namespace Belle2 {
 
           double target_prob = 0;
           if (indexRanking == 9 || indexRanking == 20) { // MaximumPstar
-            TLorentzVector momParticlei = labToCms(particlei -> get4Vector());
+            ROOT::Math::PxPyPzEVector momParticlei = PCmsLabTransform::labToCms(particlei->get4Vector());
             if (momParticlei == momParticlei) {
               target_prob = momParticlei.P();
             }
@@ -1696,13 +1715,14 @@ namespace Belle2 {
         } else if (indexRanking == 1 || indexRanking == 3 || indexRanking == 5 || indexRanking == 7 ||
                    indexRanking == 12 || indexRanking == 14 || indexRanking == 16 || indexRanking == 18)
         {
-          qTarget = (-1) * target -> getCharge();
-        } else {
-          qTarget = target -> getCharge();
+          qTarget = (-1) * target->getCharge();
+        } else
+        {
+          qTarget = target->getCharge();
         }
 
         //Get the probability of being right classified flavor from event level
-        double prob = target -> getExtraInfo(availableExtraInfos[indexOutput]);
+        double prob = target->getExtraInfo(availableExtraInfos[indexOutput]);
 
         //float r = abs(2 * prob - 1); //Definition of the dilution factor  */
         //return 0.5 * (qTarget * r + 1);
@@ -1760,8 +1780,8 @@ namespace Belle2 {
         };
 
         auto compareMomentum = [rankingExtraInfo](const Particle * part1, const Particle * part2)-> bool {
-          double info1 = labToCms(part1 -> get4Vector()).P();
-          double info2 = labToCms(part2 -> get4Vector()).P();
+          double info1 = PCmsLabTransform::labToCms(part1->get4Vector()).P();
+          double info2 = PCmsLabTransform::labToCms(part2->get4Vector()).P();
           return (info1 > info2);
         };
 
@@ -1857,7 +1877,7 @@ namespace Belle2 {
 
           double target_prob = 0;
           if (indexRanking == 9 || indexRanking == 20) { // MaximumPstar
-            TLorentzVector momParticlei = labToCms(particlei->get4Vector());
+            ROOT::Math::PxPyPzEVector momParticlei = PCmsLabTransform::labToCms(particlei->get4Vector());
             if (momParticlei == momParticlei) {
               target_prob = momParticlei.P();
             }
@@ -1942,8 +1962,9 @@ namespace Belle2 {
           if (!iParticle) continue;
 
           if (categoryName == "MaximumPstar") {
-            bool targetFlag = std::get<bool>(manager.getVariable("hasHighestProbInCat(pi+:inRoe, isRightTrack(MaximumPstar))")->function(
-              iParticle));
+            static Manager::FunctionPtr selectionFunction =
+            hasHighestProbInCat({"pi+:inRoe", "isRightTrack(MaximumPstar)"});
+            bool targetFlag = std::get<bool>(selectionFunction(iParticle));
             if (targetFlag) {
               particlesHaveMCAssociated = true;
               ++nTargets;
@@ -2016,7 +2037,9 @@ namespace Belle2 {
           if (!iParticle) continue;
 
           if (categoryName == "MaximumPstar") {
-            if (std::get<bool>(manager.getVariable("hasHighestProbInCat(pi+:inRoe, isRightTrack(MaximumPstar))")->function(iParticle)))
+            static Manager::FunctionPtr selectionFunction =
+            hasHighestProbInCat({"pi+:inRoe", "isRightTrack(MaximumPstar)"});
+            if (std::get<bool>(selectionFunction(iParticle)))
               targetParticles.push_back(iParticle);
           } else if (std::get<int>(manager.getVariable("isRightTrack(" + trackTargetName + ")")->function(iParticle))) {
             targetParticles.push_back(iParticle);
@@ -2037,15 +2060,15 @@ namespace Belle2 {
         /*            if (nTargets > 1) {
                       B2INFO("The Category " << categoryName << " has " <<  std::to_string(nTargets) << " target tracks.");
                       for (auto& iTargetParticlesCategory : targetParticlesCategory) {
-                      const MCParticle* MCp = iTargetParticlesCategory -> getMCParticle();
+                      const MCParticle* MCp = iTargetParticlesCategory->getMCParticle();
 
                       RelationVector<Particle> mcRelations = MCp->getRelationsFrom<Particle>();
                       if (mcRelations.size() > 1) B2WARNING("MCparticle is related to two particles");
 
-                      B2INFO("MCParticle has pdgCode = " << MCp -> getPDG() << ", MCMother has pdgCode = " << MCp-> getMother() -> getPDG() << " and " <<
-                      MCp-> getMother() -> getNDaughters() << " daughters.");
+                      B2INFO("MCParticle has pdgCode = " << MCp->getPDG() << ", MCMother has pdgCode = " << MCp-> getMother()->getPDG() << " and " <<
+                      MCp-> getMother()->getNDaughters() << " daughters.");
 
-                      for (auto& iDaughter : MCp->getMother() -> getDaughters()) B2INFO("iDaughter PDGCode = " << iDaughter -> getPDG());
+                      for (auto& iDaughter : MCp->getMother()->getDaughters()) B2INFO("iDaughter PDGCode = " << iDaughter->getPDG());
                       }
                       }*/
 
@@ -2137,7 +2160,7 @@ namespace Belle2 {
           std::map<std::string, float> iQpCategories = flavorTaggerInfo->getMethodMap("FBDT")->getQpCategory();
           if (iQpCategories.find(categoryName) != iQpCategories.end()) output = iQpCategories.at(categoryName);
           else if (iQpCategories.size() != 0) B2FATAL("qpCategory: Category with name " << categoryName
-            << " not found. Check the official category names or if this category is included in the flavor tagger categories list.");
+                                                        << " not found. Check the official category names or if this category is included in the flavor tagger categories list.");
         }
         return output;
       };
@@ -2160,7 +2183,7 @@ namespace Belle2 {
           std::map<std::string, float> iIsTrueCategories = flavorTaggerInfo->getMethodMap("FBDT")->getIsTrueCategory();
           if (iIsTrueCategories.find(categoryName) != iIsTrueCategories.end()) output = iIsTrueCategories.at(categoryName);
           else if (iIsTrueCategories.size() != 0) B2FATAL("isTrueFTCategory: Category with name " << categoryName
-            << " not found. Check the official category names or if this category is included in the flavor tagger categories list.");
+                                                            << " not found. Check the official category names or if this category is included in the flavor tagger categories list.");
         }
 
         return output;
@@ -2184,7 +2207,7 @@ namespace Belle2 {
           std::map<std::string, float> iHasTrueTargets = flavorTaggerInfo->getMethodMap("FBDT")->getHasTrueTarget();
           if (iHasTrueTargets.find(categoryName) != iHasTrueTargets.end()) output = iHasTrueTargets.at(categoryName);
           else if (iHasTrueTargets.size() != 0) B2FATAL("hasTrueTargets: Category with name " << categoryName
-            << " not found. Check the official category names or if this category is included in the flavor tagger categories list.");
+                                                          << " not found. Check the official category names or if this category is included in the flavor tagger categories list.");
         }
 
         return output;
@@ -2197,9 +2220,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("pMissTag", momentumMissingTagSide, R"DOC(
 [Expert] Calculates the missing momentum for a given particle on the tag side. 
 :noindex:
-)DOC");
+)DOC","GeV/c");
     REGISTER_METAVARIABLE("pMissTag(maskName)", momentumMissingTagSideWithMask,
-                          "[Expert] Calculates the missing momentum for a given particle on the tag side.",
+                          "[Expert] Calculates the missing momentum for a given particle on the tag side. The unit of the missing momentum is ``GeV/c`` ",
                           Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("cosTPTO"  , cosTPTO, R"DOC(
 [Expert] Returns cosine of angle between thrust axis of given particle and thrust axis of ROE.
@@ -2211,22 +2234,22 @@ namespace Belle2 {
     REGISTER_VARIABLE("lambdaFlavor", lambdaFlavor,
                       "[Expert] Returns 1.0 if particle is ``Lambda0``, -1.0 in case of ``anti-Lambda0``, 0.0 otherwise.");
     REGISTER_VARIABLE("isLambda", isLambda,  "[Expert] Returns 1.0 if particle is truth-matched to ``Lambda0``, 0.0 otherwise.");
-    REGISTER_VARIABLE("lambdaZError", lambdaZError,  "[Expert] Returns the variance of the z-component of the decay vertex.");
+    REGISTER_VARIABLE("lambdaZError", lambdaZError,  "[Expert] Returns the variance of the z-component of the decay vertex.",":math:`\\text{cm}^2`");
     REGISTER_VARIABLE("momentumOfSecondDaughter", momentumOfSecondDaughter,
-                      "[Expert] Returns the momentum of second daughter if exists, 0. otherwise.");
+                      "[Expert] Returns the momentum of second daughter if exists, 0. otherwise.","GeV/c");
     REGISTER_VARIABLE("momentumOfSecondDaughterCMS", momentumOfSecondDaughterCMS,
-                      "[Expert] Returns the momentum of the second daughter in the centre-of-mass system, 0. if this daughter doesn't exist.");
+                      "[Expert] Returns the momentum of the second daughter in the centre-of-mass system, 0. if this daughter doesn't exist.","GeV/c");
     REGISTER_VARIABLE("chargeTimesKaonLiklihood", chargeTimesKaonLiklihood,
                       "[Expert] Returns ``q*(highest PID_Likelihood for Kaons)``, 0. otherwise.");
     REGISTER_VARIABLE("ptTracksRoe", transverseMomentumOfChargeTracksInRoe, R"DOC(
 [Expert] Returns the transverse momentum of all charged tracks of the ROE related to the given particle, 0.0 if particle has no related ROE.
 :noindex:
-)DOC");
+)DOC","GeV/c");
     REGISTER_METAVARIABLE("ptTracksRoe(maskName)", transverseMomentumOfChargeTracksInRoeWithMask,
-                          "[Exepert] Returns the transverse momentum of all charged tracks of the ROE related to the given particle, 0.0 if particle has no related ROE.",
+                          "[Expert] Returns the transverse momentum of all charged tracks of the ROE related to the given particle, 0.0 if particle has no related ROE. The unit of the momentum is ``GeV/c`` ",
                           Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("pt2TracksRoe(maskName)", transverseMomentumSquaredOfChargeTracksInRoeWithMask,
-                          "[Expert] Returns the transverse momentum squared of all charged tracks of the ROE related to the given particle, 0.0 if particle has no related ROE.",
+                          "[Expert] Returns the transverse momentum squared of all charged tracks of the ROE related to the given particle, 0.0 if particle has no related ROE. The unit of the momentum squared is :math:`[\\text{GeV}/\\text{c}]^2` ",
                           Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("NumberOfKShortsInRoe", NumberOfKShortsInRoe,
                       "[Expert] Returns the number of ``K_S0`` in the rest of event. The particle list ``K_S0:inRoe`` has to be filled beforehand.");
@@ -2282,7 +2305,7 @@ In other words, this variable checks the generated flavor of the other generated
 
     REGISTER_METAVARIABLE("BtagToWBosonVariables(requestedVariable[, maskName])", BtagToWBosonVariables, R"DOC(
 [Eventbased][Expert] Returns values of FlavorTagging-specific kinematical variables assuming a semileptonic decay with the given particle as target.
-The input values of ``requestedVariable`` can be the following:  recoilMass, pMissCMS, cosThetaMissCMS and EW90.
+The input values of ``requestedVariable`` can be the following:  recoilMass in GeV/c^2 , pMissCMS in ``GeV/c``, cosThetaMissCMS and EW90.
 )DOC", Manager::VariableDataType::c_double);
   REGISTER_METAVARIABLE("KaonPionVariables(requestedVariable)"  , KaonPionVariables , R"DOC(
 [Expert] Returns values of FlavorTagging-specific kinematical variables for ``KaonPion`` category.
@@ -2290,7 +2313,7 @@ The input values of ``requestedVariable`` can be the following:  cosKaonPion, Ha
 )DOC", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("FSCVariables(requestedVariable)", FSCVariables, R"DOC(
 [Eventbased][Expert] Returns values of FlavorTagging-specific kinematical variables for ``FastSlowCorrelated`` category.
-The input values of ``requestedVariable`` can be the following: pFastCMS, cosSlowFast, SlowFastHaveOpositeCharges, or cosTPTOFast.
+The input values of ``requestedVariable`` can be the following: pFastCMS in ``GeV/c``, cosSlowFast, SlowFastHaveOpositeCharges, or cosTPTOFast.
 )DOC", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("hasHighestProbInCat(particleListName, extraInfoName)", hasHighestProbInCat, R"DOC(
 [Expert] Returns 1.0 if the given Particle is classified as target track, i.e. if it has the highest target track probability in particleListName. 
@@ -2364,14 +2387,14 @@ Allowed input values for ``particleName`` argument in this variable are the foll
 )DOC", Manager::VariableDataType::c_int);
     REGISTER_METAVARIABLE("QpOf(particleListName, outputExtraInfo, rankingExtraInfo)", QpOf,  R"DOC(
 [Eventbased][Expert] Returns the :math:`q*p` value for a given particle list provided as the 1st argument, 
-where math:`p` is the probability of a category stored as extraInfo, provided as the 2nd argument, 
+where :math:`p` is the probability of a category stored as extraInfo, provided as the 2nd argument, 
 allowed values are same as in :b2:var:`hasHighestProbInCat`.
 The particle is selected after ranking according to a flavor tagging extraInfo, provided as the 3rd argument, 
 allowed values are same as in :b2:var:`hasHighestProbInCat`.
 )DOC", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("weightedQpOf(particleListName, outputExtraInfo, rankingExtraInfo)", weightedQpOf, R"DOC(
 [Eventbased][Expert] Returns the weighted :math:`q*p` value for a given particle list, provided as the  1st argument, 
-where math:`p` is the probability of a category stored as extraInfo, provided in the 2nd argument, 
+where :math:`p` is the probability of a category stored as extraInfo, provided in the 2nd argument, 
 allowed values are same as in :b2:var:`hasHighestProbInCat`.
 The particles in the list are ranked according to a flavor tagging extraInfo, provided as the 3rd argument, 
 allowed values are same as in :b2:var:`hasHighestProbInCat`.

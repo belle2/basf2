@@ -11,6 +11,7 @@
 #include <generators/aafh/AAFHInterface.h>
 #include <TRandom3.h>
 #include <TDatabasePDG.h>
+#include <Math/Vector4D.h>
 #include <algorithm>
 #include <array>
 #include <iomanip>
@@ -29,13 +30,13 @@ extern "C" {
     return gRandom->Rndm();
   }
   /** Callback to show error if weights are not sufficient */
-  void aafhdiag36_esft_maxed_(double* weight)
+  void aafhdiag36_esft_maxed_(const double* weight)
   {
     B2ERROR("AAFH: Maximum weight to small, increase maxFinalWeight to at least "
             << *weight);
   }
   /** Callback to show error if weights are not sufficient */
-  void aafhdiag36_eswe_maxed_(double* weight)
+  void aafhdiag36_eswe_maxed_(const double* weight)
   {
     B2ERROR("AAFH: Maximum weight to small, increase maxSubGeneratorWeight to at least "
             << *weight);
@@ -255,7 +256,7 @@ void AAFHInterface::updateParticle(MCParticleGraph::GraphParticle& p, double* q,
 {
   // all values in q are in units of beam energy
   // z-direction inversed since AAFH uses different convention
-  TLorentzVector vec(-q[0]*input_.eb, -q[1]*input_.eb, -q[2]*input_.eb, q[3]*input_.eb);
+  ROOT::Math::PxPyPzEVector vec(-q[0]*input_.eb, -q[1]*input_.eb, -q[2]*input_.eb, q[3]*input_.eb);
   p.set4Vector(vec);
 
   // mass is multiplied by charge sign so take the absolute

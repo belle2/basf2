@@ -26,11 +26,12 @@
 #include <klm/dataobjects/KLMMuidLikelihood.h>
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
 #include <TDirectory.h>
+#include <TMath.h>
 #include <map>
 
 using namespace Belle2;
 
-REG_MODULE(PhysicsObjectsMiraBelle)
+REG_MODULE(PhysicsObjectsMiraBelle);
 
 PhysicsObjectsMiraBelleModule::PhysicsObjectsMiraBelleModule() : HistoModule()
 {
@@ -82,9 +83,11 @@ void PhysicsObjectsMiraBelleModule::defineHisto()
   m_h_D0->SetXTitle("hist_D0");
   m_h_Z0 = new TH1F("hist_Z0", "hist_Z0", 100, -0.3, 0.3);
   m_h_Z0->SetXTitle("hist_Z0");
-  m_h_theta = new TH1F("hist_theta", "hist_theta", 36, 10, 170);
+  m_h_theta = new TH1F("hist_theta", "hist_theta in CMS", 32, 10, 170);
   m_h_theta->SetXTitle("hist_theta");
-  m_h_Phi0 = new TH1F("hist_Phi0", "hist_Phi0", 72, -180, 180);
+  m_h_theta_lab = new TH1F("hist_theta_lab", "hist_theta in lab frame", 180, 0, 180);
+  m_h_theta_lab->SetXTitle("hist_theta_lab");
+  m_h_Phi0 = new TH1F("hist_Phi0", "hist_Phi0 in lab frame", 72, -180, 180);
   m_h_Phi0->SetXTitle("hist_Phi0");
   m_h_Pt = new TH1F("hist_Pt", "hist_Pt", 100, 0, 10);
   m_h_Pt->SetXTitle("hist_Pt");
@@ -96,8 +99,10 @@ void PhysicsObjectsMiraBelleModule::defineHisto()
   m_h_klmTotalBarrelHits->SetXTitle("hist_klmTotalBarrelHits");
   m_h_klmTotalEndcapHits = new TH1F("hist_klmTotalEndcapHits", "hist_klmTotalEndcapHits", 16, 0, 16);
   m_h_klmTotalEndcapHits->SetXTitle("hist_klmTotalEndcapHits");
-  m_h_dPhicms = new TH1F("hist_dPhicms", "hist_dPhicms", 100, -1, 1);
+  m_h_dPhicms = new TH1F("hist_dPhicms", "hist_dPhicms: 180#circ - |#phi_{1} - #phi_{2}|", 100, -10, 10);
   m_h_dPhicms->SetXTitle("hist_dPhicms");
+  m_h_dThetacms = new TH1F("hist_dThetacms", "hist_dThetacms: |#theta_{1} + #theta_{2}| - 180#circ", 100, -10, 10);
+  m_h_dThetacms->SetXTitle("hist_dThetacms");
 
   oldDir->cd();
 }
@@ -131,6 +136,7 @@ void PhysicsObjectsMiraBelleModule::beginRun()
   m_h_D0->Reset();
   m_h_Z0->Reset();
   m_h_theta->Reset();
+  m_h_theta_lab->Reset();
   m_h_Phi0->Reset();
   m_h_Pt->Reset();
   m_h_Mom->Reset();
@@ -138,6 +144,7 @@ void PhysicsObjectsMiraBelleModule::beginRun()
   m_h_klmTotalBarrelHits->Reset();
   m_h_klmTotalEndcapHits->Reset();
   m_h_dPhicms->Reset();
+  m_h_dThetacms->Reset();
 }
 
 void PhysicsObjectsMiraBelleModule::event()
@@ -164,6 +171,7 @@ void PhysicsObjectsMiraBelleModule::event()
   double z0[2] = {};
   double ptcms[2] = {};
   double phicms[2] = {};
+  double thetacms[2] = {};
 
   //get the di-muons for beam energy check
   StoreObjPtr<ParticleList> UpsParticles(m_mumuPListName);
@@ -229,10 +237,12 @@ void PhysicsObjectsMiraBelleModule::event()
       m_h_Z0->Fill(z0[index]);
       // Momentum
       ptcms[index] = Belle2::PCmsLabTransform::labToCms(fitresult->get4Momentum()).Pt();//CMS
-      phicms[index] = Belle2::PCmsLabTransform::labToCms(fitresult->get4Momentum()).Phi();
+      phicms[index] = Belle2::PCmsLabTransform::labToCms(fitresult->get4Momentum()).Phi() * TMath::RadToDeg();
+      thetacms[index] = Belle2::PCmsLabTransform::labToCms(fitresult->get4Momentum()).Theta() * TMath::RadToDeg();
       m_h_Pt->Fill(fitresult->get4Momentum().Pt());//Lab
-      m_h_theta->Fill(Belle2::PCmsLabTransform::labToCms(fitresult->get4Momentum()).Theta());//CMS
-      m_h_Phi0->Fill(fitresult->get4Momentum().Phi());//Lab
+      m_h_theta->Fill(Belle2::PCmsLabTransform::labToCms(fitresult->get4Momentum()).Theta() * TMath::RadToDeg());//CMS
+      m_h_theta_lab->Fill(fitresult->get4Momentum().Theta() * TMath::RadToDeg());//Lab
+      m_h_Phi0->Fill(fitresult->get4Momentum().Phi() * TMath::RadToDeg());//Lab
       m_h_Mom->Fill(fitresult->get4Momentum().P());//Lab
     }
   }
@@ -241,6 +251,7 @@ void PhysicsObjectsMiraBelleModule::event()
   m_h_dZ0->Fill((z0[0] - z0[1]) / sqrt(2));
   m_h_dPtcms->Fill((ptcms[0] - ptcms[1]) / sqrt(2));
   m_h_dPhicms->Fill(180 - abs(phicms[0] - phicms[1]));
+  m_h_dThetacms->Fill(abs(thetacms[0] + thetacms[1]) - 180);
   // Event level information
   StoreObjPtr<EventLevelTrackingInfo> elti;
   if (elti) {

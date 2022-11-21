@@ -22,13 +22,13 @@ class TfDataBasf2():
         declaration of class variables
         """
         #: training features
-        self.train_x = train_x
+        self.train_x = train_x.astype(np.float32)
         #: training targets
-        self.train_y = train_y
+        self.train_y = train_y.astype(np.float32)
         #: validation features
-        self.valid_x = valid_x
+        self.valid_x = valid_x.astype(np.float32)
         #: validation targets
-        self.valid_y = valid_y
+        self.valid_y = valid_y.astype(np.float32)
 
         #: batch size
         self.batch_size = batch_size

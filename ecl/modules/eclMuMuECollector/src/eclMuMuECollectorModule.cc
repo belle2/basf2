@@ -36,7 +36,7 @@ using namespace ECL;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(eclMuMuECollector)
+REG_MODULE(eclMuMuECollector);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -267,8 +267,8 @@ void eclMuMuECollectorModule::collect()
   if (iTrack[0] == -1 || iTrack[1] == -1) { return; }
 
   /** Quit if the invariant mass of the two tracks is too low */
-  TLorentzVector mu0 = m_trackArray[iTrack[0]]->getTrackFitResult(Const::ChargedStable(211))->get4Momentum();
-  TLorentzVector mu1 = m_trackArray[iTrack[1]]->getTrackFitResult(Const::ChargedStable(211))->get4Momentum();
+  ROOT::Math::PxPyPzEVector mu0 = m_trackArray[iTrack[0]]->getTrackFitResult(Const::ChargedStable(211))->get4Momentum();
+  ROOT::Math::PxPyPzEVector mu1 = m_trackArray[iTrack[1]]->getTrackFitResult(Const::ChargedStable(211))->get4Momentum();
   if ((mu0 + mu1).M() < m_minPairMass) { return; }
 
   //------------------------------------------------------------------------
@@ -276,7 +276,7 @@ void eclMuMuECollectorModule::collect()
   int extCrysID[2] = { -1, -1};
   Const::EDetector eclID = Const::EDetector::ECL;
   for (int imu = 0; imu < 2; imu++) {
-    TVector3 temppos[2] = {};
+    ROOT::Math::XYZVector temppos[2] = {};
     int IDEnter = -99;
     for (auto& extHit : m_trackArray[iTrack[imu]]->getRelationsTo<ExtHit>()) {
       int pdgCode = extHit.getPdgCode();
@@ -294,7 +294,7 @@ void eclMuMuECollectorModule::collect()
         temppos[1] = extHit.getPosition();
 
         /** Keep track of this crystal if the track length is long enough. Note that if minTrackLength is less than half the crystal length, we will keep only the first extrapolation due to break */
-        double trackLength = (temppos[1] - temppos[0]).Mag();
+        double trackLength = (temppos[1] - temppos[0]).R();
         if (trackLength > m_minTrackLength) {extCrysID[imu] = temp0;}
         break;
       }

@@ -115,6 +115,7 @@ std::vector<double> eclLeakageFitParameters(TH1F* h, const double& target)
 
 /**-------------------------------------------------------------------------------------*/
 //..Novosibirsk; H. Ikeda et al. / NIM A 441 (2000) 401-426
+// cppcheck-suppress constParameter ; TF1 fit functions cannot have const parameters
 double eclLeakageNovo(Double_t* x, Double_t* par)
 {
 
@@ -596,7 +597,7 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
   //-----------------------------------------------------------------------------------
   //..Histograms to store the energy
   const int nDir = 3;
-  TString dirName[nDir] = {"theta", "phiMech", "phiNoMech"};
+  const TString dirName[nDir] = {"theta", "phiMech", "phiNoMech"};
 
   TH1F* eFracPosition[nEnergies][nThetaID][nDir][nPositions]; // the histograms
   std::vector<TString> failedeFracPosition; // names of hists with failed fits
@@ -1265,8 +1266,8 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
   //..One histogram of new and original reconstructed energy after leakage correction
   //  per generated energy per region. Also uncorrected.
   const int nResType = 5;
-  TString resName[nResType] = {"Uncorrected", "Original", "Corrected no nCrys", "Corrected measured", "Corrected true"};
-  TString regName[nLeakReg] = {"forward", "barrel", "backward"};
+  const TString resName[nResType] = {"Uncorrected", "Original", "Corrected no nCrys", "Corrected measured", "Corrected true"};
+  const TString regName[nLeakReg] = {"forward", "barrel", "backward"};
   TH1F* energyResolution[nLeakReg][nEnergies][nResType];
 
   //..Base number of bins on a typical thetaID for each region

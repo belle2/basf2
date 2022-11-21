@@ -63,24 +63,34 @@ std::unique_ptr<BaseFacetFilter> FacetFilterFactory::create(const std::string& f
 {
   if (filterName == "none") {
     return std::make_unique<NoneFilter<BaseFacetFilter>>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "all") {
     return std::make_unique<AllFacetFilter>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "truth") {
     return std::make_unique<MCFacetFilter>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "feasible") {
     return std::make_unique<FeasibleRLFacetFilter>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "simple") {
     return std::make_unique<SimpleFacetFilter>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "realistic") {
     return std::make_unique<RealisticFacetFilter>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "realistic_loss") {
     return std::make_unique<RealisticFacetFilter>(25);
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "chi2") {
     return std::make_unique<Chi2FacetFilter>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "chi2_old") {
     return std::make_unique<Chi2FacetFilter>(75.0, 120.0);
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "unionrecording") {
     return std::make_unique<UnionRecordingFacetFilter>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "mva") {
     return std::make_unique<MVAFacetFilter>();
   } else {

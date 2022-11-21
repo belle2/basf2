@@ -8,9 +8,10 @@
 
 #pragma once
 
-#include <TLorentzRotation.h>
-#include <TRotation.h>
-#include <TLorentzVector.h>
+#include <Math/Rotation3D.h>
+#include <Math/Boost.h>
+#include <Math/Vector3D.h>
+#include <Math/Vector4D.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/utility/PCmsLabTransform.h>
 
@@ -28,14 +29,14 @@ namespace Belle2 {
      * @param vector 3-vector from particle
      * @return 3-vector in reference frame
      */
-    virtual TVector3 getVertex(const TVector3& vector) const = 0;
+    virtual ROOT::Math::XYZVector getVertex(const ROOT::Math::XYZVector& vector) const = 0;
 
     /**
      * Wrapper for particles
      * @param particle
      * @return 3-vector in reference frame
      */
-    virtual TVector3 getVertex(const Particle* particle) const
+    virtual ROOT::Math::XYZVector getVertex(const Particle* particle) const
     {
       return getVertex(particle->getVertex());
     }
@@ -45,14 +46,14 @@ namespace Belle2 {
      * @param vector 4-vector from particle
      * @return momentum 4-vector in reference frame
      */
-    virtual TLorentzVector getMomentum(const TLorentzVector& vector) const = 0;
+    virtual ROOT::Math::PxPyPzEVector getMomentum(const ROOT::Math::PxPyPzEVector& vector) const = 0;
 
     /**
      * Wrapper for particles
      * @param particle particle
      * @return momentum 4-vector in reference frame
      */
-    virtual TLorentzVector getMomentum(const Particle* particle) const
+    virtual ROOT::Math::PxPyPzEVector getMomentum(const Particle* particle) const
     {
       return getMomentum(particle->get4Vector());
     }
@@ -137,14 +138,14 @@ namespace Belle2 {
      * @param vector 3-vector from particle
      * @return 3-vector in rest frame System
      */
-    virtual TVector3 getVertex(const TVector3& vector) const override;
+    virtual ROOT::Math::XYZVector getVertex(const ROOT::Math::XYZVector& vector) const override;
 
     /**
      * Get Lorentz vector in rest frame System
      * @param vector Lorentz vector from particle
      * @return Lorentz vector in rest frame System
      */
-    virtual TLorentzVector getMomentum(const TLorentzVector& vector) const override;
+    virtual ROOT::Math::PxPyPzEVector getMomentum(const ROOT::Math::PxPyPzEVector& vector) const override;
 
     /**
      * Get Momentum error matrix in rest frame
@@ -161,10 +162,10 @@ namespace Belle2 {
     virtual TMatrixFSym getVertexErrorMatrix(const TMatrixFSym& matrix) const override;
 
   private:
-    TLorentzVector m_momentum;         /**< momentum of RF in the lab frame */
-    TVector3 m_displacement;           /**< displacement of RF origin in th lab frame */
-    TVector3 m_boost;                  /**< boost of RF relative to the lab frame */
-    TLorentzRotation m_lab2restframe;  /**< Lorentz transformation connecting lab and rest frame */
+    ROOT::Math::PxPyPzEVector m_momentum; /**< momentum of RF in the lab frame */
+    ROOT::Math::XYZVector m_displacement; /**< displacement of RF origin in th lab frame */
+    ROOT::Math::XYZVector m_boost;        /**< boost of RF relative to the lab frame */
+    ROOT::Math::Boost m_lab2restframe;    /**< Lorentz transformation connecting lab and rest frame */
   };
 
   /**
@@ -179,14 +180,14 @@ namespace Belle2 {
      * @param vector 3-vector from particle
      * @return 3-vector in lab frame
      */
-    virtual TVector3 getVertex(const TVector3& vector) const override;
+    virtual ROOT::Math::XYZVector getVertex(const ROOT::Math::XYZVector& vector) const override;
 
     /**
      * Get Lorentz vector in lab frame
      * @param vector Lorentz vector from particle
      * @return Lorentz vector in lab frame
      */
-    virtual TLorentzVector getMomentum(const TLorentzVector& vector) const override;
+    virtual ROOT::Math::PxPyPzEVector getMomentum(const ROOT::Math::PxPyPzEVector& vector) const override;
 
     /**
      * Get Momentum error matrix in lab frame
@@ -215,14 +216,14 @@ namespace Belle2 {
      * @param vector 3-vector from particle
      * @return 3-vector in cms frame
      */
-    virtual TVector3 getVertex(const TVector3& vector) const override;
+    virtual ROOT::Math::XYZVector getVertex(const ROOT::Math::XYZVector& vector) const override;
 
     /**
      * Get Lorentz vector in cms frame
      * @param vector Lorentz vector from particle
      * @return Lorentz vector in cms frame
      */
-    virtual TLorentzVector getMomentum(const TLorentzVector& vector) const override;
+    virtual ROOT::Math::PxPyPzEVector getMomentum(const ROOT::Math::PxPyPzEVector& vector) const override;
 
     /**
      * Get Momentum error matrix in cms frame
@@ -251,21 +252,21 @@ namespace Belle2 {
     /**
      * Create new rotation frame
      */
-    explicit RotationFrame(const TVector3& newX, const TVector3& newY, const TVector3& newZ);
+    explicit RotationFrame(const ROOT::Math::XYZVector& newX, const ROOT::Math::XYZVector& newY, const ROOT::Math::XYZVector& newZ);
 
     /**
      * Get vertex 3-vector in rotation frame
      * @param vector 3-vector from particle
      * @return 3-vector in rotation frame
      */
-    virtual TVector3 getVertex(const TVector3& vector) const override;
+    virtual ROOT::Math::XYZVector getVertex(const ROOT::Math::XYZVector& vector) const override;
 
     /**
      * Get Lorentz vector in rotation frame
      * @param vector Lorentz vector from particle
      * @return Lorentz vector in rotation frame
      */
-    virtual TLorentzVector getMomentum(const TLorentzVector& vector) const override;
+    virtual ROOT::Math::PxPyPzEVector getMomentum(const ROOT::Math::PxPyPzEVector& vector) const override;
 
     /**
      * Get Momentum error matrix in rotation frame
@@ -282,7 +283,7 @@ namespace Belle2 {
     virtual TMatrixFSym getVertexErrorMatrix(const TMatrixFSym& matrix) const override;
 
   private:
-    TRotation m_rotation; /**< Rotation */
+    ROOT::Math::Rotation3D m_rotation; /**< Rotation */
   };
 
   /**
@@ -294,21 +295,21 @@ namespace Belle2 {
     /**
      * Create new rotation frame
      */
-    explicit CMSRotationFrame(const TVector3& newX, const TVector3& newY, const TVector3& newZ);
+    explicit CMSRotationFrame(const ROOT::Math::XYZVector& newX, const ROOT::Math::XYZVector& newY, const ROOT::Math::XYZVector& newZ);
 
     /**
      * Get vertex 3-vector in rotation frame
      * @param vector 3-vector from particle
      * @return 3-vector in rotation frame
      */
-    virtual TVector3 getVertex(const TVector3& vector) const override;
+    virtual ROOT::Math::XYZVector getVertex(const ROOT::Math::XYZVector& vector) const override;
 
     /**
      * Get Lorentz vector in rotation frame
      * @param vector Lorentz vector from particle
      * @return Lorentz vector in rotation frame
      */
-    virtual TLorentzVector getMomentum(const TLorentzVector& vector) const override;
+    virtual ROOT::Math::PxPyPzEVector getMomentum(const ROOT::Math::PxPyPzEVector& vector) const override;
 
     /**
      * Get Momentum error matrix in rotation frame

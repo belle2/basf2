@@ -6,10 +6,13 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 import matplotlib.pyplot as plt
-from root_pandas import read_root
+import uproot
 
 plt.style.use("belle2")
-df = read_root("Bd2JpsiKS.root")
+
+# Declare list of variables to load, then open root file into pandas DataFrame
+var_list = ["Jpsi_dz", "Jpsi_mcDecayVertexZ", "Jpsi_chiProb"]
+df = uproot.open("Bd2JpsiKS.root:tree").arrays(var_list, library="pd")
 
 m_bins = 50  # number of bins for the histograms of both plots
 

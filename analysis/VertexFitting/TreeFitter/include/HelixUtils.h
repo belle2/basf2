@@ -11,6 +11,7 @@
 #include <string>
 
 #include <framework/dataobjects/Helix.h>
+#include <framework/geometry/B2Vector3.h>
 #include <Eigen/Core>
 namespace TreeFitter {
 
@@ -63,7 +64,7 @@ namespace TreeFitter {
                                               );
 
     /** vertex --> helix */
-    static void helixFromVertex(const Eigen::Matrix<double, 1, 6>& positionAndMomentum ,
+    static void helixFromVertex(const Eigen::Matrix<double, 1, 6>& positionAndMomentum,
                                 int charge, double Bz,
                                 Belle2::Helix& helix,
                                 double& L,
@@ -73,8 +74,8 @@ namespace TreeFitter {
     /** helix --> vertex */
     static void vertexFromHelix(const Belle2::Helix& helix,
                                 double L, double Bz,
-                                TVector3& position,
-                                TVector3& momentum, int& charge);
+                                ROOT::Math::XYZVector& position,
+                                ROOT::Math::XYZVector& momentum, int& charge);
 
     /** map of the helix parameters by list index */
     static std::string helixParName(int i) ;
@@ -83,16 +84,16 @@ namespace TreeFitter {
     static std::string vertexParName(int i) ;
 
     /** Print the vertex parameters */
-    static void printVertexPar(const TVector3& position, const TVector3& momentum, int charge) ;
+    static void printVertexPar(const Belle2::B2Vector3D& position, const Belle2::B2Vector3D& momentum, int charge) ;
 
     /** POCA between two tracks */
     static double helixPoca(const Belle2::Helix& helix1,
                             const Belle2::Helix& helix2,
                             double& flt1, double& flt2,
-                            TVector3& vertex, bool parallel = false) ;
+                            Belle2::B2Vector3D& vertex, bool parallel = false) ;
 
     /** POCA between a track and a point */
-    static double helixPoca(const Belle2::Helix& helix, const TVector3& point,
+    static double helixPoca(const Belle2::Helix& helix, const Belle2::B2Vector3D& point,
                             double& flt) ;
 
     /** the domain of phi */

@@ -10,6 +10,7 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 
 #include <string>
 #include <vector>
@@ -17,6 +18,7 @@
 namespace Belle2 {
 
   class MCParticle;
+  class StringWrapper;
 
   /** The PrintMCParticles module.
    * Prints the content of the MCParticle collection
@@ -60,7 +62,9 @@ namespace Belle2 {
     bool m_showMomenta;         /**< Show particle momenta */
     bool m_showProperties;      /**< Show remaining properties */
     bool m_showStatus;          /**< Show extended status information */
+    bool m_suppressPrint;       /**< Suppress print the information */
     StoreArray<MCParticle> m_mcparticles; /**< store array for the MCParticles */
+    StoreObjPtr<StringWrapper> m_stringWrapper; /**< string wrapper to store the MCDecayString */
   };
 
 } // end namespace Belle2

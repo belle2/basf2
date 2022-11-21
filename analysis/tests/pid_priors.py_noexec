@@ -30,7 +30,7 @@ class PidPriorPrint(Module):
     def event(self):
         """Print PID priors for 'pi+' list"""
         for p in self.plist:
-            self.priors.calculate_priors(np.array([p.getP()]), np.array([p.getMomentum().CosTheta()]))
+            self.priors.calculate_priors(np.array([p.getP()]), np.array(np.cos([p.getMomentum().Theta()])))
             print(self.priors.get_priors())
 
 

@@ -28,15 +28,16 @@
 
 
 using namespace std;
+using namespace ROOT::Math;
 
 namespace Belle2 {
   using namespace TOP;
 
   //-----------------------------------------------------------------
-  //                 Register module
+  ///                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPPDFChecker)
+  REG_MODULE(TOPPDFChecker);
 
   //-----------------------------------------------------------------
   //                 Implementation
@@ -132,7 +133,7 @@ namespace Belle2 {
       // average values - to print in terminate()
       const auto& module = geo->getModule(trk.getModuleID());
       m_avrgMomentum += module.momentumToLocal(trk.getExtHit()->getMomentum());
-      m_avrgPosition += module.pointToLocal(trk.getExtHit()->getPosition());
+      m_avrgPosition += static_cast<XYZVector>(module.pointToLocal(static_cast<XYZPoint>(trk.getExtHit()->getPosition())));
       m_numTracks++;
       m_slotIDs.emplace(trk.getModuleID());
       m_PDGCodes.emplace(trk.getPDGCode());
@@ -187,7 +188,7 @@ namespace Belle2 {
     cout << " position: x = " << m_avrgPosition.X()
          << ", y = " << m_avrgPosition.Y()
          << ", z = " << m_avrgPosition.Z() << endl;
-    cout << " momentum: p = " << m_avrgMomentum.Mag()
+    cout << " momentum: p = " << m_avrgMomentum.R()
          << ", theta = " << m_avrgMomentum.Theta() / Unit::deg
          << ", phi = " << m_avrgMomentum.Phi() / Unit::deg << endl;
     cout << "Number of particles: " << m_numTracks << endl;

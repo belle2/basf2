@@ -35,12 +35,15 @@ class V0Harvester(HarvestingModule):
         HarvestingModule.__init__(self, foreach="MCParticles", output_file_name="../V0ValidationHarvested.root")
 
     def pick(self, mc_particle):
-        """Selects all MCParticles which are KShort.
+        """Selects all MCParticles which are KShort AND decay to Pi+Pi-.
 
         :param mc_particle: Belle2::MCParticle.
-        :return: True if the MCParticle is a KShort.
+        :return: True if the MCParticle is a KShort decaying to two charged pions.
         """
-        return abs(mc_particle.getPDG()) == 310
+        if abs(mc_particle.getPDG()) != 310:
+            return False
+        daughters = mc_particle.getDaughters()
+        return len(daughters) == 2 and abs(daughters[0].getPDG()) == 211 and abs(daughters[1].getPDG()) == 211
 
     def peel(self, mc):
         """Selects MCTrue variables of interest for all KShort in the sample. If the KShort has a related reconstructed
@@ -59,17 +62,17 @@ class V0Harvester(HarvestingModule):
         :return: dict with the variables of interest.
         """
         mc_vertex = mc.getDecayVertex()
-        mc_perp = mc_vertex.Perp()
+        mc_perp = mc_vertex.Rho()
         mc_theta = mc_vertex.Theta()
         mc_phi = mc_vertex.Phi()
         mc_m = mc.getMass()
-        mc_p = mc.getMomentum().Mag()
+        mc_p = mc.getMomentum().R()
 
         v0 = mc.getRelated("V0ValidationVertexs")
 
         if v0:
             v0_vertex = v0.getVertexPosition()
-            v0_perp = v0_vertex.Perp()
+            v0_perp = v0_vertex.Rho()
             v0_theta = v0_vertex.Theta()
             v0_phi = v0_vertex.Phi()
             v0_m = v0.getFittedInvariantMass()
@@ -126,6 +129,8 @@ for module in path.modules():
         module.param("Validation", True)
 path.add_module('MCV0Matcher', V0ColName='V0ValidationVertexs')
 path.add_module(V0Harvester())
+
+path.add_module("Progress")
 
 basf2.process(path)
 print(basf2.statistics)

@@ -7,7 +7,6 @@
  **************************************************************************/
 
 #pragma once
-#include <framework/geometry/B2Vector3.h>
 #include <framework/dbobjects/MagneticFieldComponent.h>
 #include <framework/gearbox/Unit.h>
 
@@ -46,12 +45,12 @@ namespace Belle2 {
      * @warning The returned field is in basf2 units which is NOT Tesla. If you
      *     need the field strength in a fixed unit please divide the returned value
      *     by Unit::T or similar. */
-    B2Vector3D getField(const B2Vector3D& pos) const;
+    ROOT::Math::XYZVector getField(const ROOT::Math::XYZVector& pos) const;
     /** Convenience function to get the field directly in Tesla
      * @param pos position where the field should be evaluated in framework units.
      * @return magnetic field at pos in framework units.
      */
-    B2Vector3D getFieldInTesla(const B2Vector3D& pos) const { return getField(pos) / Unit::T; }
+    ROOT::Math::XYZVector getFieldInTesla(const ROOT::Math::XYZVector& pos) const { return getField(pos) / Unit::T; }
     /** Add a new component to the magnetic field. Ownership is taken over by the MagneticField instance */
     void addComponent(MagneticFieldComponent* component) { m_components.emplace_back(component); }
   private:
@@ -61,9 +60,9 @@ namespace Belle2 {
     ClassDef(MagneticField, 1);
   };
 
-  inline B2Vector3D MagneticField::getField(const B2Vector3D& pos) const
+  inline ROOT::Math::XYZVector MagneticField::getField(const ROOT::Math::XYZVector& pos) const
   {
-    B2Vector3D field;
+    ROOT::Math::XYZVector field;
     for (auto c : m_components) {
       if (c->inside(pos)) {
         // is it an exclusive component? If so return the field

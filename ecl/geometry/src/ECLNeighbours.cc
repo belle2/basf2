@@ -36,24 +36,24 @@ ECLNeighbours::ECLNeighbours(const std::string& neighbourDef, const double par, 
     B2DEBUG(150, "ECLNeighbours::ECLNeighbours: initialize " << neighbourDef << ", n x n: " << parToInt * 2 + 1 << " x " << parToInt * 2
             + 1);
     if ((parToInt >= 0) and (parToInt < 11)) initializeN(parToInt, sorted);
-    else B2FATAL("ECLNeighbours::ECLNeighbours: " << parToInt << " is an invalid parameter (must be between 0 and 10)!");
+    else B2FATAL("ECLNeighbours::ECLNeighbours: " << LogVar("parameter", parToInt) << "Invalid parameter (must be between 0 and 10)!");
   } else if (neighbourDef == "NC") {
     B2DEBUG(150, "ECLNeighbours::ECLNeighbours: initialize " << neighbourDef << ", n x n (minus corners): " << parToInt * 2 + 1 << " x "
             <<
             parToInt * 2 + 1);
     if ((parToInt >= 0) and (parToInt < 11)) initializeNC(parToInt);
-    else B2FATAL("ECLNeighbours::ECLNeighbours: " << parToInt << " is an invalid parameter (must be between 0 and 10)!");
+    else B2FATAL("ECLNeighbours::ECLNeighbours: " << LogVar("parameter", parToInt) << "Invalid parameter (must be between 0 and 10)!");
   } else if (neighbourDef == "NLegacy") {
     B2DEBUG(150, "ECLNeighbours::ECLNeighbours: initialize " << neighbourDef << ", n x n: " << parToInt * 2 + 1 << " x " << parToInt * 2
             + 1);
     if ((parToInt >= 0) and (parToInt < 11)) initializeNLegacy(parToInt);
-    else B2FATAL("ECLNeighbours::ECLNeighbours: " << parToInt << " is an invalid parameter (must be between 0 and 10)!");
+    else B2FATAL("ECLNeighbours::ECLNeighbours: " << LogVar("parameter", parToInt) << "Invalid parameter (must be between 0 and 10)!");
   } else if (neighbourDef == "NCLegacy") {
     B2DEBUG(150, "ECLNeighbours::ECLNeighbours: initialize " << neighbourDef << ", n x n (minus corners): " << parToInt * 2 + 1 << " x "
             <<
             parToInt * 2 + 1);
     if ((parToInt >= 0) and (parToInt < 11)) initializeNCLegacy(parToInt, 1);
-    else B2FATAL("ECLNeighbours::ECLNeighbours: " << parToInt << " is an invalid parameter (must be between 0 and 10)!");
+    else B2FATAL("ECLNeighbours::ECLNeighbours: " << LogVar("parameter", parToInt) << "Invalid parameter (must be between 0 and 10)!");
   }
   // or neighbours depend on the distance:
   else if (neighbourDef == "R") {
@@ -139,9 +139,9 @@ void ECLNeighbours::initializeF(double frac)
     // add the two in the same theta ring
     const short int phiInc = increasePhiId(pid, tid, 1);
     const short int phiDec = decreasePhiId(pid, tid, 1);
-    neighbours.push_back(geom->GetCellID(tid , pid) + 1);
-    neighbours.push_back(geom->GetCellID(tid , phiInc) + 1);
-    neighbours.push_back(geom->GetCellID(tid , phiDec) + 1);
+    neighbours.push_back(geom->GetCellID(tid, pid) + 1);
+    neighbours.push_back(geom->GetCellID(tid, phiInc) + 1);
+    neighbours.push_back(geom->GetCellID(tid, phiDec) + 1);
 
     double fracPos = (pid + 0.5) / m_crystalsPerRing[tid];
 
@@ -327,8 +327,8 @@ void ECLNeighbours::initializeNC(const int n)
       if (abs(thetaid - centerthetaid) == n) {
         const short int phiInc = increasePhiId(geom->GetPhiID(), geom->GetThetaID(), 1);
         const short int phiDec = decreasePhiId(geom->GetPhiID(), geom->GetThetaID(), 1);
-        const int cid1 = geom->GetCellID(thetaid , phiInc) + 1;
-        const int cid2 = geom->GetCellID(thetaid , phiDec) + 1;
+        const int cid1 = geom->GetCellID(thetaid, phiInc) + 1;
+        const int cid2 = geom->GetCellID(thetaid, phiDec) + 1;
 
         // if that crystal has two neighbours in the same theta-ring, it will not be removed
         if (!((std::find(neighbours.begin(), neighbours.end(), cid1) != neighbours.end()) and
@@ -381,7 +381,7 @@ void ECLNeighbours::initializeNLegacy(int n)
       const std::vector<short int> phiList = getPhiIdsInBetween(thisPhiInc, thisPhiDec, theta);
 
       for (unsigned int k = 0; k < phiList.size(); ++k) {
-        neighbours.push_back(geom->GetCellID(theta , phiList.at(k)) + 1);
+        neighbours.push_back(geom->GetCellID(theta, phiList.at(k)) + 1);
       }
     }
 
@@ -431,7 +431,7 @@ void ECLNeighbours::initializeNCLegacy(const int n, const int corners)
       else phiList = getPhiIdsInBetween(thisPhiInc, thisPhiDec, theta);
 
       for (unsigned int k = 0; k < phiList.size(); ++k) {
-        neighbours.push_back(geom->GetCellID(theta , phiList.at(k)) + 1);
+        neighbours.push_back(geom->GetCellID(theta, phiList.at(k)) + 1);
       }
     }
 

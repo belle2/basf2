@@ -28,7 +28,7 @@ using namespace SoftwareTrigger;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SVDDQMClustersOnTrack)
+REG_MODULE(SVDDQMClustersOnTrack);
 
 
 //-----------------------------------------------------------------

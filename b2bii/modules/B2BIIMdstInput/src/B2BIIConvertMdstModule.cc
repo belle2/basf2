@@ -19,6 +19,7 @@
 // Belle II utilities
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
+#include <framework/geometry/B2Vector3.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
 
 // Belle II dataobjects
@@ -30,8 +31,9 @@
 #include <b2bii/utility/BelleMdstToGenHepevt.h>
 
 // ROOT
-#include <TVector3.h>
-#include <TLorentzVector.h>
+#include <Math/RotationY.h>
+#include <Math/Vector3D.h>
+#include <Math/Vector4D.h>
 
 #include <limits>
 #include <algorithm>
@@ -149,7 +151,7 @@ void fill7x7ErrorMatrix(const TrackFitResult* tfr, TMatrixDSym& error7x7, const 
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(B2BIIConvertMdst)
+REG_MODULE(B2BIIConvertMdst);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -381,16 +383,18 @@ void B2BIIConvertMdstModule::convertBeamEnergy()
   HepLorentzVector p_beam = Belle::BeamEnergy::p_beam(); // Testing only
 
   // Get four momentum of LER and HER
-  TLorentzVector P_her(0.0, 0.0, TMath::Sqrt(Eher * Eher - mass_e * mass_e), Eher);
-  P_her.RotateY(angleHer);
-  TLorentzVector P_ler(0.0, 0.0, TMath::Sqrt(Eler * Eler - mass_e * mass_e), Eler);
-  P_ler.RotateY(angleLer);
+  ROOT::Math::PxPyPzEVector P_her(0.0, 0.0, TMath::Sqrt(Eher * Eher - mass_e * mass_e), Eher);
+  ROOT::Math::RotationY rotateAroundYAxis(angleHer);
+  P_her = rotateAroundYAxis(P_her);
+  ROOT::Math::PxPyPzEVector P_ler(0.0, 0.0, TMath::Sqrt(Eler * Eler - mass_e * mass_e), Eler);
+  rotateAroundYAxis.SetAngle(angleLer);
+  P_ler = rotateAroundYAxis(P_ler);
 
   // Get four momentum of beam
-  TLorentzVector P_beam = P_her + P_ler;
+  ROOT::Math::PxPyPzEVector P_beam = P_her + P_ler;
 
-  m_collisionBoostVector.setBoost(P_beam.BoostVector(), covariance);
-  m_collisionInvM.setMass(P_beam.M(), 0.0 , 0.0);
+  m_collisionBoostVector.setBoost(B2Vector3D(-P_beam.BoostToCM()), covariance);
+  m_collisionInvM.setMass(P_beam.M(), 0.0, 0.0);
 
   B2DEBUG(99, "Beam Energy: E_HER = " << Eher << "; E_LER = " << Eler << "; angle = " << crossingAngle);
   B2DEBUG(99, "Beam Momentum (pre-convert) : P_X = " << p_beam.px() << "; P_Y = " << p_beam.py() << "; P_Z = " << p_beam.pz());
@@ -606,8 +610,8 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
             errMatrixP(i, j) = error7x7P[i][j];
 
         daughterP = Particle(trackID[0] - 1, tmpTFR, pTypeP);
-        daughterP.updateMomentum(TLorentzVector(momentumP.px(), momentumP.py(), momentumP.pz(), momentumP.e()),
-                                 TVector3(positionP.x(), positionP.y(), positionP.z()),
+        daughterP.updateMomentum(ROOT::Math::PxPyPzEVector(momentumP.px(), momentumP.py(), momentumP.pz(), momentumP.e()),
+                                 ROOT::Math::XYZVector(positionP.x(), positionP.y(), positionP.z()),
                                  errMatrixP, 0.5);
         delete tmpTFR;
       } else {
@@ -638,8 +642,8 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
           for (unsigned j = 0; j < 7; j++)
             errMatrixP(i, j) = error7x7P[i][j];
 
-        daughterP.updateMomentum(TLorentzVector(momentumP.px(), momentumP.py(), momentumP.pz(), momentumP.e()),
-                                 TVector3(positionP.x(), positionP.y(), positionP.z()),
+        daughterP.updateMomentum(ROOT::Math::PxPyPzEVector(momentumP.px(), momentumP.py(), momentumP.pz(), momentumP.e()),
+                                 ROOT::Math::XYZVector(positionP.x(), positionP.y(), positionP.z()),
                                  errMatrixP, pValue);
       }
     }
@@ -661,8 +665,8 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
             errMatrixM(i, j) = error7x7M[i][j];
 
         daughterM = Particle(trackID[1] - 1, tmpTFR, pTypeM);
-        daughterM.updateMomentum(TLorentzVector(momentumM.px(), momentumM.py(), momentumM.pz(), momentumM.e()),
-                                 TVector3(positionM.x(), positionM.y(), positionM.z()),
+        daughterM.updateMomentum(ROOT::Math::PxPyPzEVector(momentumM.px(), momentumM.py(), momentumM.pz(), momentumM.e()),
+                                 ROOT::Math::XYZVector(positionM.x(), positionM.y(), positionM.z()),
                                  errMatrixM, 0.5);
         delete tmpTFR;
       } else {
@@ -693,8 +697,8 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
           for (unsigned j = 0; j < 7; j++)
             errMatrixM(i, j) = error7x7M[i][j];
 
-        daughterM.updateMomentum(TLorentzVector(momentumM.px(), momentumM.py(), momentumM.pz(), momentumM.e()),
-                                 TVector3(positionM.x(), positionM.y(), positionM.z()),
+        daughterM.updateMomentum(ROOT::Math::PxPyPzEVector(momentumM.px(), momentumM.py(), momentumM.pz(), momentumM.e()),
+                                 ROOT::Math::XYZVector(positionM.x(), positionM.y(), positionM.z()),
                                  errMatrixM, pValue);
       }
     }
@@ -724,8 +728,8 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
     if (mcParticleM)
       newDaugM->addRelationTo(mcParticleM);
 
-    TLorentzVector v0Momentum(belleV0.px(), belleV0.py(), belleV0.pz(), belleV0.energy());
-    TVector3 v0Vertex(belleV0.vx(), belleV0.vy(), belleV0.vz());
+    ROOT::Math::PxPyPzEVector v0Momentum(belleV0.px(), belleV0.py(), belleV0.pz(), belleV0.energy());
+    ROOT::Math::XYZVector v0Vertex(belleV0.vx(), belleV0.vy(), belleV0.vz());
 
     /*
      * Documentation of Mdst_vee2 vertex fit:
@@ -871,9 +875,7 @@ void B2BIIConvertMdstModule::convertGenHepEvtTable()
     // Select particles without mother.
     if (!(hep.moFirst() == 0 && hep.moLast() == 0))
       continue;
-    // Ignore particles with code 911, they are used for CDC data.
-    if (hep.idhep() == 911)
-      continue;
+
     int position = m_particleGraph.size();
     m_particleGraph.addParticle();
     genHepevtToMCParticle[hep.get_ID()] = position;
@@ -899,8 +901,8 @@ void B2BIIConvertMdstModule::convertGenHepEvtTable()
     MCParticleGraph::GraphParticle* currMother = currFamily.first;
     Belle::Gen_hepevt& currDaughter = currFamily.second;
 
-    // Skip particles with idhep = 0 or 911 (CDC data).
-    if (currDaughter.idhep() == 0 || currDaughter.idhep() == 911)
+    // Skip particles with idhep = 0.
+    if (currDaughter.idhep() == 0)
       continue;
 
     //putting the daughter in the graph:
@@ -943,7 +945,6 @@ void B2BIIConvertMdstModule::convertMdstECLTable()
 
   // Loop over all Belle Mdst_ecl
   Belle::Mdst_ecl_Manager& ecl_manager = Belle::Mdst_ecl_Manager::get_manager();
-  // cppcheck-suppress constVariable; cppcheck doesn't understand the manager initialisation
   Belle::Mdst_ecl_aux_Manager& ecl_aux_manager = Belle::Mdst_ecl_aux_Manager::get_manager();
 
   for (Belle::Mdst_ecl_Manager::iterator eclIterator = ecl_manager.begin(); eclIterator != ecl_manager.end(); ++eclIterator) {
@@ -1085,9 +1086,9 @@ void B2BIIConvertMdstModule::convertMdstPi0Table()
     if (!mdstGamma1 || !mdstGamma2)
       continue;
 
-    TLorentzVector p4(mdstPi0.px(), mdstPi0.py(), mdstPi0.pz(), mdstPi0.energy());
+    ROOT::Math::PxPyPzEVector p4(mdstPi0.px(), mdstPi0.py(), mdstPi0.pz(), mdstPi0.energy());
 
-    // Create Particle from TLorentzVector and PDG code, add to StoreArray
+    // Create Particle from LorentzVector and PDG code, add to StoreArray
     Particle* B2Pi0 = m_particles.appendNew(p4, 111);
 
     // Get Belle II photons from map
@@ -1362,14 +1363,14 @@ void B2BIIConvertMdstModule::convertPIDData(const Belle::Mdst_charged& belleTrac
   double tofL[c_nHyp];
   double cdcL[c_nHyp];
   for (int i = 0; i < c_nHyp; i++) {
-    accL[i] = tofL[i] = cdcL[i] = 1.0;
+    accL[i] = tofL[i] = cdcL[i] = 1.0; // cppcheck-suppress unreadVariable
   }
 #ifdef HAVE_KID_ACC
   //accq0 = 3, as implemented in acc_prob3()
   const auto& acc = belleTrack.acc();
   if (acc and acc.quality() == 0) {
     for (int i = 0; i < c_nHyp; i++)
-      accL[i] = likelihoods[i] = acc_pid(belleTrack, i);
+      accL[i] = likelihoods[i] = acc_pid(belleTrack, i); // cppcheck-suppress unreadVariable
     setLikelihoods(pid, Const::ARICH, likelihoods, true);
   }
 #endif
@@ -1379,7 +1380,7 @@ void B2BIIConvertMdstModule::convertPIDData(const Belle::Mdst_charged& belleTrac
   const Belle::Mdst_tof& tof = belleTrack.tof();
   if (tof and tof.quality() == 0) {
     for (int i = 0; i < c_nHyp; i++)
-      tofL[i] = likelihoods[i] = tof.pid(i);
+      tofL[i] = likelihoods[i] = tof.pid(i); // cppcheck-suppress unreadVariable
     setLikelihoods(pid, Const::TOP, likelihoods, true);
   }
 
@@ -1390,7 +1391,7 @@ void B2BIIConvertMdstModule::convertPIDData(const Belle::Mdst_charged& belleTrac
   if (trk.dEdx() > 0) {
     for (int i = 0; i < c_nHyp; i++) {
       likelihoods[i] = trk.pid(i);
-      cdcL[i] = cdc_pid(belleTrack, i);
+      cdcL[i] = cdc_pid(belleTrack, i); // cppcheck-suppress unreadVariable
     }
     setLikelihoods(pid, Const::CDC, likelihoods, true);
   }
@@ -1809,7 +1810,7 @@ void B2BIIConvertMdstModule::convertGenHepevtObject(const Belle::Gen_hepevt& gen
 
   mcParticle->setMass(genHepevt.M());
 
-  TLorentzVector p4(genHepevt.PX(), genHepevt.PY(), genHepevt.PZ(), genHepevt.E());
+  ROOT::Math::PxPyPzEVector p4(genHepevt.PX(), genHepevt.PY(), genHepevt.PZ(), genHepevt.E());
   mcParticle->set4Vector(p4);
 
   mcParticle->setProductionVertex(genHepevt.VX()*Unit::mm, genHepevt.VY()*Unit::mm, genHepevt.VZ()*Unit::mm);
@@ -2020,8 +2021,8 @@ void B2BIIConvertMdstModule::testMCRelation(const Belle::Gen_hepevt& belleMC, co
     B2WARNING("[B2BIIConvertMdstModule] " << objectName << " matched to different MCParticle! " << bellePDGCode << " vs. " <<
               belleIIPDGCode);
 
-  double belleMomentum[]  = { belleMC.PX(), belleMC.PY(), belleMC.PZ() };
-  double belle2Momentum[] = { mcP->get4Vector().Px(),  mcP->get4Vector().Py(),  mcP->get4Vector().Pz() };
+  const double belleMomentum[]  = { belleMC.PX(), belleMC.PY(), belleMC.PZ() };
+  const double belle2Momentum[] = { mcP->get4Vector().Px(),  mcP->get4Vector().Py(),  mcP->get4Vector().Pz() };
 
   for (unsigned i = 0; i < 3; i++) {
     double relDev = (belle2Momentum[i] - belleMomentum[i]) / belleMomentum[i];
@@ -2145,8 +2146,8 @@ TrackFitResult B2BIIConvertMdstModule::createTrackFitResult(const CLHEP::HepLore
                                                             const uint32_t hitPatternVXDInitializer,
                                                             const uint16_t ndf)
 {
-  TVector3 pos(position.x(),  position.y(),  position.z());
-  TVector3 mom(momentum.px(), momentum.py(), momentum.pz());
+  ROOT::Math::XYZVector pos(position.x(),  position.y(),  position.z());
+  ROOT::Math::XYZVector mom(momentum.px(), momentum.py(), momentum.pz());
 
   TMatrixDSym errMatrix(6);
   for (unsigned i = 0; i < 7; i++) {

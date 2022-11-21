@@ -43,8 +43,8 @@ namespace Belle2 {
   static constexpr int nAllMergers = 146;
   /** width of a single word in the raw int buffer */
   static constexpr int wordWidth = 32;
-  /** Number of FINESSE in the copper */
-  static constexpr int nFinesse = 4;
+  /** Number of FINESSE in a PCIe40 */
+  static constexpr int nFinesse = 48;
   /** Merger data bus */
   using MergerBus = std::array<std::bitset<mergerWidth>, nAllMergers>;
   /** Merger data bus Bitstream */
@@ -55,12 +55,13 @@ namespace Belle2 {
     /** constructor */
     SubTrigger(const std::string& inName,
                unsigned inEventWidth, unsigned inOffset,
-               int inHeaderSize, const std::vector<int>& inNodeID,
+               int inHeaderSize, const std::vector<int>& inNodeID, const std::vector<int>& inNodeID_pcie40,
                int& inDelay, int& inCnttrg, int inDebugLevel = 0) :
       name(inName), eventWidth(inEventWidth), offset(inOffset),
       headerSize(inHeaderSize), iNode(inNodeID.front()),
-      iFinesse(inNodeID.back()), delay(inDelay),
-      cnttrg(inCnttrg),
+      iFinesse(inNodeID.back()),
+      iNode_pcie40(inNodeID_pcie40.front()), iFinesse_pcie40(inNodeID_pcie40.back()),
+      delay(inDelay), cnttrg(inCnttrg),
       debugLevel(inDebugLevel) {};
 
     /** Name of the UT3 */
@@ -75,6 +76,10 @@ namespace Belle2 {
     int iNode;
     /** FINESSE (HSLB) id) of the board */
     int iFinesse;
+    /** PCIe40 id of the board */
+    int iNode_pcie40;
+    /** PCIe40 ch id of the board */
+    int iFinesse_pcie40;
 
     /* information from Belle2Link header */
     /** type of the FPGA firmware */
@@ -97,7 +102,7 @@ namespace Belle2 {
      *
      *  @param nWords          Number of words of each FINESSE in the COPPER
      */
-    virtual void reserve(int, std::array<int, nFinesse>) {};
+    virtual void reserve(int, std::array<int, nFinesse>, bool) {};
 
     /**
      *  Unpack the Belle2Link data and fill the Bitstream
@@ -110,7 +115,8 @@ namespace Belle2 {
      */
     virtual void unpack(int,
                         std::array<int*, nFinesse>,
-                        std::array<int, nFinesse>) {};
+                        std::array<int, nFinesse>,
+                        bool) {};
 
     /**
      *  Get the Belle2Link header information
@@ -124,19 +130,31 @@ namespace Belle2 {
      *  @return                1 if there are data other than the header
      */
     virtual int getHeaders(int subDetectorId,
-                           std::array<int*, 4> data32tab,
-                           std::array<int, 4> nWords)
+                           std::array<int*, 48> data32tab,
+                           std::array<int, 48> nWords,
+                           bool pciedata)
     {
-      if (subDetectorId != iNode) {
+
+      int iNode_i = 0;
+      int iFinesse_i = 0;
+      if (pciedata) {
+        iNode_i = iNode_pcie40;
+        iFinesse_i = iFinesse_pcie40;
+      } else {
+        iNode_i = iNode;
+        iFinesse_i = iFinesse;
+      }
+
+      if (subDetectorId != iNode_i) {
         return 0;
       }
       // int nWordsize = 3075;  // temporary solution to hard coded the correct event size (for 2D only?)
       // empty data buffer
-      if (nWords[iFinesse] < headerSize) {
+      if (nWords[iFinesse_i] < headerSize) {
         B2WARNING("The module " << name << " does not have enough data (" <<
-                  nWords[iFinesse] << "). Nothing will be unpacked.");
+                  nWords[iFinesse_i] << "). Nothing will be unpacked.");
         return 0;
-      } else if (nWords[iFinesse] == headerSize) {
+      } else if (nWords[iFinesse_i] == headerSize) {
         B2DEBUG(20, "The module " << name <<
                 " contains only the header. Nothing will be unpacked.");
         return 0;
@@ -147,21 +165,21 @@ namespace Belle2 {
       // event data block header:
       // 0xdddd  --> correct event data (for 2D only?)
       // 0xbbbb  --> dummy buffer supposed to be used for only suppressed events.
-      if (nWords[iFinesse] > headerSize) {
+      if (nWords[iFinesse_i] > headerSize) {
         //dataHeader = CDCTriggerUnpacker::rawIntToAscii(data32tab.at(iFinesse)[headerSize]&0xFFFF0000 >> 16);
         //bool dataHeader = ( (data32tab.at(iFinesse)[headerSize]&0xffff0000) == 0xdddd0000);
-        long dataHeader = (data32tab.at(iFinesse)[headerSize] & 0xffff0000);
+        long dataHeader = (data32tab.at(iFinesse_i)[headerSize] & 0xffff0000);
         if (dataHeader != 0xdddd0000) {
           B2DEBUG(30, "The module " << name << " has an event data header " << std::hex << std::setfill('0') << std::setw(4) <<
                   (dataHeader >> 16) <<
                   " in this event. It will be ignore.");
           return 0;
         }
-        B2DEBUG(50, "subdet and head size " <<  std::setfill('0') << std::hex << std::setw(8) << iNode << ", " << std::dec <<  std::setw(
-                  0) << nWords[iFinesse] <<
-                " : " << std::hex << std::setw(8) << data32tab.at(iFinesse)[0] << " " << data32tab.at(iFinesse)[1] << " " << data32tab.at(
-                  iFinesse)[2] <<
-                " " << data32tab.at(iFinesse)[3] << " dataheader = " << dataHeader);
+        B2DEBUG(50, "subdet and head size " <<  std::setfill('0') << std::hex << std::setw(8) << iNode_i << ", " << std::dec <<  std::setw(
+                  0) << nWords[iFinesse_i] <<
+                " : " << std::hex << std::setw(8) << data32tab.at(iFinesse_i)[0] << " " << data32tab.at(iFinesse_i)[1] << " " << data32tab.at(
+                  iFinesse_i)[2] <<
+                " " << data32tab.at(iFinesse_i)[3] << " dataheader = " << dataHeader);
       }
 
       /* get event header information
@@ -172,13 +190,13 @@ namespace Belle2 {
        */
       if (headerSize >= 2) {
         // supposedly these two Words will stay for all the versions
-        firmwareType = CDCTriggerUnpacker::rawIntToAscii(data32tab.at(iFinesse)[0]);
-        firmwareVersion = CDCTriggerUnpacker::rawIntToString(data32tab.at(iFinesse)[1]);
+        firmwareType = CDCTriggerUnpacker::rawIntToAscii(data32tab.at(iFinesse_i)[0]);
+        firmwareVersion = CDCTriggerUnpacker::rawIntToString(data32tab.at(iFinesse_i)[1]);
         //int cnttrg = 0;    // temporary solution, this should be one as a reference for comparison
         int l1_revoclk = -1;
 
         if (headerSize >= 3) {
-          std::bitset<wordWidth> thirdWord(data32tab.at(iFinesse)[2]);
+          std::bitset<wordWidth> thirdWord(data32tab.at(iFinesse_i)[2]);
           l1_revoclk = CDCTriggerUnpacker::subset<32, 0, 11>(thirdWord).to_ulong();
 
           if (firmwareType == "2D  ") {  // temporary solcuion, the following version number check is valid only for 2D
@@ -201,8 +219,8 @@ namespace Belle2 {
         }
 
         B2DEBUG(20, name << ": " << firmwareType << ", version " <<
-                firmwareVersion << ", node " << std::hex << iNode <<
-                ", finesse " << iFinesse << ", delay: " << delay <<
+                firmwareVersion << ", node " << std::hex << iNode_i <<
+                ", finesse " << iFinesse_i << ", delay: " << delay <<
                 ", cnttrg: " << cnttrg << std::dec << " == " << cnttrg <<  ", L1_revoclk " << l1_revoclk);
 
 
@@ -263,6 +281,7 @@ namespace Belle2 {
 
     bool m_decodeTSHit = false;  /**< flag to decode track segment  */
     NodeList m_tracker2DNodeID; /**< list of (COPPER ID, HSLB ID) of 2D tracker */
+    NodeList m_tracker2DNodeID_pcie40; /**< list of (PCIe40 ID, ch ID) of 2D tracker */
     bool m_unpackTracker2D;  /**< flag to unpack 2D tracker data */
     bool m_decode2DFinderTrack;  /**< flag to decode 2D finder track  */
     bool m_decode2DFinderInputTS;  /**< flag to decode 2D finder input TS */
@@ -270,6 +289,7 @@ namespace Belle2 {
     int  m_n2DTS = 0; //TODO whats the best def val?  /**< flag to unpack 2D tracker data with 15TS*/
 
     NodeList m_neuroNodeID;  /**< list of (COPPER ID, HSLB ID) of neurotrigger */
+    NodeList m_neuroNodeID_pcie40;  /**< list of (PCIe40 ID, ch ID) of neurotrigger */
     bool m_unpackNeuro;  /**< flag to unpack neurotrigger data */
     bool m_decodeNeuro;  /**< flag to decode neurotrigger data */
 
@@ -356,6 +376,8 @@ namespace Belle2 {
     bool m_useDB;
     /** bool value wether to simulate 13 bit drift time by using 2dcc */
     bool m_sim13dt;
+    /** PCIe40 data or copper data */
+    bool m_pciedata;
   };
 
 

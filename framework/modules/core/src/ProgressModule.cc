@@ -18,7 +18,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(Progress)
+REG_MODULE(Progress);
 
 ProgressModule::ProgressModule() : Module()
 {

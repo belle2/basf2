@@ -23,7 +23,6 @@
 /* C++ headers. */
 #include <cfloat>
 
-using namespace std;
 using namespace CLHEP;
 using namespace Belle2;
 using namespace Belle2::bklm;
@@ -170,7 +169,7 @@ double BKLMTrackFitter::distanceToHit(KLMHit2d* hit,
   const Belle2::bklm::Module* refMod = m_GeoPar->findModule(hit->getSection(), hit->getSector(), 1);
   const Belle2::bklm::Module* corMod = m_GeoPar->findModule(hit->getSection(), hit->getSector(), hit->getLayer());
 
-  CLHEP::Hep3Vector globalPos(hit->getPosition()[0], hit->getPosition()[1], hit->getPosition()[2]);
+  CLHEP::Hep3Vector globalPos(hit->getPositionX(), hit->getPositionY(), hit->getPositionZ());
 
   //+++ local coordinates of the hit
   CLHEP::Hep3Vector local = refMod->globalToLocal(globalPos);
@@ -243,9 +242,9 @@ double BKLMTrackFitter::globalDistanceToHit(KLMHit2d* hit,
   }
 
   //in global fit, we have two functions y = a + b*x and y = c + d*z
-  double x_mea = hit->getPosition()[0];
-  double y_mea = hit->getPosition()[1];
-  double z_mea = hit->getPosition()[2];
+  double x_mea = hit->getPositionX();
+  double y_mea = hit->getPositionY();
+  double z_mea = hit->getPositionZ();
 
   double x_pre = (y_mea - m_GlobalPar[ AY ]) / m_GlobalPar[ BY ]; //y_mea has uncertainties actually
   double z_pre = (y_mea - m_GlobalPar[ AZ ]) / m_GlobalPar[ BZ ];
@@ -384,9 +383,9 @@ double BKLMTrackFitter::fit1dSectorTrack(std::list< KLMHit2d* > hitList,
     const Belle2::bklm::Module* corMod = m_GeoPar->findModule(hit->getSection(), hit->getSector(), hit->getLayer());
 
     CLHEP::Hep3Vector globalPos;
-    globalPos[0] = hit->getPosition()[0];
-    globalPos[1] = hit->getPosition()[1];
-    globalPos[2] = hit->getPosition()[2];
+    globalPos[0] = hit->getPositionX();
+    globalPos[1] = hit->getPositionY();
+    globalPos[2] = hit->getPositionZ();
 
     localHitPos = refMod->globalToLocal(globalPos);
     double hit_localPhiErr = corMod->getPhiStripWidth() / sqrt(12);

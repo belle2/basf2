@@ -41,7 +41,7 @@ namespace Belle2 {
     void addAsicRecord(const Short_t channel, const Short_t ADC, const asicChannels& asicInfo)
     {
       Short_t ch8 = channel % 8;
-      adcAsicTuple entry{ADC, ch8 , asicInfo};
+      adcAsicTuple entry{ADC, ch8, asicInfo};
       // keep sorted
       auto place = upper_bound(m_library.begin(), m_library.end(), entry, adc_search());
       m_library.insert(place, entry);
@@ -137,12 +137,12 @@ namespace Belle2 {
       for (int i = 0; i < 8; i += 1) {
         if (rec[i].TDC > 0) {
           if (i == ch8) {   // store input values
-            B2ASSERT("CDC Cross talk entry for the selected channel cannot be empty " << ch8 << " " << rec[ch8].TDC , rec[ch8].TDC > -1);
+            B2ASSERT("CDC Cross talk entry for the selected channel cannot be empty " << ch8 << " " << rec[ch8].TDC, rec[ch8].TDC > -1);
             if (insertSignalToOutput)
               outRec.emplace_back(std::make_pair(channel, asicChannel{TDCin, ADCin, TOTin}));
           } else { // adjust TDC for the cross talk, keep ADC and TOT
             Short_t TDCout = rec[i].TDC + DeltaTDC;
-            outRec.emplace_back(std::make_pair(i - ch8 + channel , asicChannel{TDCout, rec[i].ADC, rec[i].TOT}));
+            outRec.emplace_back(std::make_pair(i - ch8 + channel, asicChannel{TDCout, rec[i].ADC, rec[i].TOT}));
           }
         }
       }

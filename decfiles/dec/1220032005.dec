@@ -1,0 +1,26 @@
+# EventType: 1220032005
+# Descriptor: [B+ -> rho+ f0]
+# NickName: Bu_rho+f0
+# Documentation: Peaking background for B+ -> rho+rho0
+# Tested: Yes
+# Physics WG: BToCharmless 
+# Responsible: R. Manfredi
+# Email: riccardo.manfredi@ts.infn.it
+# Cuts: None
+# Date: 28/02/2022
+
+Alias B-sig B-
+Alias B+sig B+
+ChargeConj B-sig B+sig
+
+Decay Upsilon(4S)
+0.50000 B- B+sig  VSS;
+0.50000 B+ B-sig  VSS;
+Enddecay
+
+Decay B+sig
+1.0  rho+ f_0                PHOTOS SVS;
+Enddecay
+CDecay B-sig
+
+End

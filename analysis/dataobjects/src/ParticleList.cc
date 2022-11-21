@@ -166,6 +166,20 @@ Particle* ParticleList::getParticle(unsigned i, bool includingAntiList) const
   return nullptr;
 }
 
+Particle* ParticleList::getParticleWithMdstIdx(unsigned int mdstIdx, bool includingAntiList) const
+{
+  const unsigned int n = this->getListSize(includingAntiList);
+  for (unsigned i = 0; i < n; i++) {
+
+    auto particle = this->getParticle(i, includingAntiList);
+
+    if (particle->getMdstArrayIndex() == mdstIdx) {
+      return particle;
+    }
+  }
+  return nullptr;
+}
+
 unsigned ParticleList::getListSize(bool includingAntiList) const
 {
   unsigned size = 0;
@@ -213,6 +227,29 @@ bool ParticleList::contains(const Particle* p, bool includingAntiList) const
   return false;
 }
 
+int ParticleList::getIndex(const Particle* p, bool includingAntiList) const
+{
+  const int index = p->getArrayIndex();
+
+  auto it_fs = std::find(m_fsList.begin(), m_fsList.end(), index);
+  if (it_fs != m_fsList.end()) {
+    return std::distance(m_fsList.begin(), it_fs);
+  }
+
+  auto it_sc = std::find(m_scList.begin(), m_scList.end(), index);
+  if (it_sc != m_scList.end()) {
+    return std::distance(m_scList.begin(), it_sc) + m_fsList.size();
+  }
+
+  if (includingAntiList and !m_antiListName.empty()) {
+    int indexAnti = getAntiParticleList().getIndex(p, false);
+    if (indexAnti != -1)
+      return indexAnti + m_fsList.size() + m_scList.size();
+  }
+
+  return -1;
+}
+
 void ParticleList::print() const
 {
   B2INFO(HTML::htmlToPlainText(getInfoHTML()));
@@ -246,4 +283,3 @@ ParticleList& ParticleList::getAntiParticleList() const
   }
   return **m_antiList;
 }
-

@@ -9,8 +9,8 @@
 Double_t scalefactor = 7000;
 TCanvas* c1;
 void DrawDisplacement(const char* AmplitudeFile, const char* PhaseFile){
-  Double_t amp[36];
-  Double_t phase[36];
+  Double_t amp[36]; // cppcheck-suppress constVariable
+  Double_t phase[36]; // cppcheck-suppress constVariable
   ifstream fa(AmplitudeFile);
   ifstream fp(PhaseFile);
   string line;

@@ -13,12 +13,13 @@
 #include <analysis/VertexFitting/KFit/RecoilMassKFit.h>
 #include <analysis/VertexFitting/KFit/MakeMotherKFit.h>
 #include <analysis/utility/CLHEPToROOT.h>
-
+#include <framework/gearbox/Const.h>
 
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::analysis;
 using namespace CLHEP;
+using namespace ROOT::Math;
 
 RecoilMassKFit::RecoilMassKFit()
 {
@@ -32,7 +33,7 @@ RecoilMassKFit::RecoilMassKFit()
   m_lam = HepMatrix(1, 1, 0);
   m_AfterVertexError = HepSymMatrix(3, 0);
   m_recoilMass = -1.0;
-  m_FourMomentum = TLorentzVector();
+  m_FourMomentum = PxPyPzEVector();
 }
 
 
@@ -71,7 +72,7 @@ RecoilMassKFit::setRecoilMass(const double m) {
 
 
 enum KFitError::ECode
-RecoilMassKFit::setFourMomentum(const  TLorentzVector& m) {
+RecoilMassKFit::setFourMomentum(const PxPyPzEVector& m) {
   m_FourMomentum = m;
 
   return m_ErrorCode = KFitError::kNoError;
@@ -325,8 +326,7 @@ RecoilMassKFit::prepareInputMatrix() {
       // charge, mass, a
       m_property[index][0] =  track.getCharge();
       m_property[index][1] =  track.getMass();
-      const double c = KFitConst::kLightSpeed; // C++ bug?
-      // m_property[index][2] = -KFitConst::kLightSpeed * m_MagneticField * it->getCharge();
+      const double c = Belle2::Const::speedOfLight * 1e-4;
       m_property[index][2] = -c * m_MagneticField * track.getCharge();
       index++;
     }
@@ -347,7 +347,8 @@ RecoilMassKFit::prepareInputMatrix() {
     m_V_al_1 = HepMatrix(KFitConst::kNumber7 * m_TrackCount, KFitConst::kNumber7 * m_TrackCount, 0);
     m_D      = m_V_al_1.sub(1, 1, 1, KFitConst::kNumber7 * m_TrackCount);
 
-  } else {
+  } else
+  {
     //TODO: Not Implemented
     return m_ErrorCode = KFitError::kUnimplemented;
   }
@@ -445,17 +446,17 @@ RecoilMassKFit::prepareOutputMatrix() {
       pdata.setMomentum(HepLorentzVector(h3v, m_al_1[index * KFitConst::kNumber7 + 3][0]), KFitConst::kAfterFit);
     // position
     pdata.setPosition(HepPoint3D(
-      m_al_1[index * KFitConst::kNumber7 + 4][0],
-      m_al_1[index * KFitConst::kNumber7 + 5][0],
-      m_al_1[index * KFitConst::kNumber7 + 6][0]), KFitConst::kAfterFit);
+                        m_al_1[index * KFitConst::kNumber7 + 4][0],
+                        m_al_1[index * KFitConst::kNumber7 + 5][0],
+                        m_al_1[index * KFitConst::kNumber7 + 6][0]), KFitConst::kAfterFit);
     // error of the tracks
     pdata.setError(this->makeError3(pdata.getMomentum(),
-    m_V_al_1.sub(
-      index    * KFitConst::kNumber7 + 1,
-      (index + 1)*KFitConst::kNumber7,
-      index    * KFitConst::kNumber7 + 1,
-      (index + 1)*KFitConst::kNumber7), m_IsFixMass[index]),
-    KFitConst::kAfterFit);
+                                    m_V_al_1.sub(
+                                      index    * KFitConst::kNumber7 + 1,
+                                      (index + 1)*KFitConst::kNumber7,
+                                      index    * KFitConst::kNumber7 + 1,
+                                      (index + 1)*KFitConst::kNumber7), m_IsFixMass[index]),
+                   KFitConst::kAfterFit);
     if (m_ErrorCode != KFitError::kNoError) break;
     index++;
   }
@@ -464,7 +465,8 @@ RecoilMassKFit::prepareOutputMatrix() {
   {
     //TODO: Not Implemented
     return m_ErrorCode = KFitError::kUnimplemented;
-  } else {
+  } else
+  {
     // not fit
     m_AfterVertex = m_BeforeVertex;
   }
@@ -489,9 +491,9 @@ RecoilMassKFit::makeCoreMatrix() {
       al_1_prime[i * KFitConst::kNumber7 + 0][0] -= a * (m_BeforeVertex.y() - al_1_prime[i * KFitConst::kNumber7 + 5][0]);
       al_1_prime[i * KFitConst::kNumber7 + 1][0] += a * (m_BeforeVertex.x() - al_1_prime[i * KFitConst::kNumber7 + 4][0]);
       energy[i] = sqrt(al_1_prime[i * KFitConst::kNumber7 + 0][0] * al_1_prime[i * KFitConst::kNumber7 + 0][0] +
-      al_1_prime[i * KFitConst::kNumber7 + 1][0] * al_1_prime[i * KFitConst::kNumber7 + 1][0] +
-      al_1_prime[i * KFitConst::kNumber7 + 2][0] * al_1_prime[i * KFitConst::kNumber7 + 2][0] +
-      m_property[i][1] * m_property[i][1]);
+                       al_1_prime[i * KFitConst::kNumber7 + 1][0] * al_1_prime[i * KFitConst::kNumber7 + 1][0] +
+                       al_1_prime[i * KFitConst::kNumber7 + 2][0] * al_1_prime[i * KFitConst::kNumber7 + 2][0] +
+                       m_property[i][1] * m_property[i][1]);
     }
 
     for (int i = 0; i < m_TrackCount; i++) {
@@ -543,7 +545,8 @@ RecoilMassKFit::makeCoreMatrix() {
       }
     }
 
-  } else {
+  } else
+  {
     //TODO: Not Implemented
     return m_ErrorCode = KFitError::kUnimplemented;
   }
@@ -587,8 +590,8 @@ enum KFitError::ECode RecoilMassKFit::updateMother(Particle* mother)
   mother->writeExtraInfo("ndf", ndf);
 
   mother->updateMomentum(
-    CLHEPToROOT::getTLorentzVector(kmm.getMotherMomentum()),
-    CLHEPToROOT::getTVector3(kmm.getMotherPosition()),
+    CLHEPToROOT::getLorentzVector(kmm.getMotherMomentum()),
+    CLHEPToROOT::getXYZVector(kmm.getMotherPosition()),
     CLHEPToROOT::getTMatrixFSym(kmm.getMotherError()),
     prob);
   m_ErrorCode = KFitError::kNoError;

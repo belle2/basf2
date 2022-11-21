@@ -30,6 +30,7 @@
 #include <TClonesArray.h>
 #include <TDatabasePDG.h>
 #include <TMatrixFSym.h>
+#include <Math/Boost.h>
 
 #include <iostream>
 #include <iomanip>
@@ -39,6 +40,7 @@
 #include <boost/algorithm/string.hpp>
 
 using namespace Belle2;
+using namespace ROOT::Math;
 
 Particle::Particle() :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
@@ -49,7 +51,7 @@ Particle::Particle() :
 }
 
 
-Particle::Particle(const TLorentzVector& momentum, const int pdgCode) :
+Particle::Particle(const PxPyPzEVector& momentum, const int pdgCode) :
   m_pdgCode(pdgCode), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1), m_flavorType(c_Unflavored), m_particleSource(c_Undefined), m_mdstIndex(0), m_properties(0), m_arrayPointer(nullptr)
 {
@@ -63,7 +65,7 @@ Particle::Particle(const TLorentzVector& momentum, const int pdgCode) :
 }
 
 
-Particle::Particle(const TLorentzVector& momentum,
+Particle::Particle(const PxPyPzEVector& momentum,
                    const int pdgCode,
                    EFlavorType flavorType,
                    const EParticleSourceObject source,
@@ -84,7 +86,7 @@ Particle::Particle(const TLorentzVector& momentum,
 }
 
 
-Particle::Particle(const TLorentzVector& momentum,
+Particle::Particle(const PxPyPzEVector& momentum,
                    const int pdgCode,
                    EFlavorType flavorType,
                    const std::vector<int>& daughterIndices,
@@ -117,7 +119,7 @@ Particle::Particle(const TLorentzVector& momentum,
   }
 }
 
-Particle::Particle(const TLorentzVector& momentum,
+Particle::Particle(const PxPyPzEVector& momentum,
                    const int pdgCode,
                    EFlavorType flavorType,
                    const std::vector<int>& daughterIndices,
@@ -153,7 +155,7 @@ Particle::Particle(const TLorentzVector& momentum,
 }
 
 
-Particle::Particle(const TLorentzVector& momentum,
+Particle::Particle(const PxPyPzEVector& momentum,
                    const int pdgCode,
                    EFlavorType flavorType,
                    const std::vector<int>& daughterIndices,
@@ -259,10 +261,10 @@ Particle::Particle(const ECLCluster* eclCluster, const Const::ParticleType& type
   // returns default vertex from clusterutils (from beam parameters if available)
   // leave it like that for the moment to make it transparent
   ClusterUtils C;
-  const TVector3 clustervertex = C.GetIPPosition();
+  const XYZVector clustervertex = C.GetIPPosition();
   setVertex(clustervertex);
 
-  const TLorentzVector clustermom = C.Get4MomentumFromCluster(eclCluster, clustervertex, getECLClusterEHypothesisBit());
+  const PxPyPzEVector clustermom = C.Get4MomentumFromCluster(eclCluster, clustervertex, getECLClusterEHypothesisBit());
   m_px = clustermom.Px();
   m_py = clustermom.Py();
   m_pz = clustermom.Pz();
@@ -286,7 +288,7 @@ void Particle::updateJacobiMatrix()
 
   const ECLCluster* cluster = this->getECLCluster();
 
-  const TVector3 clustervertex = C.GetIPPosition();
+  const XYZVector clustervertex = C.GetIPPosition();
 
   // Get Jacobi matrix.
   TMatrixD jacobi = C.GetJacobiMatrix4x6FromCluster(cluster, clustervertex, getECLClusterEHypothesisBit());
@@ -328,7 +330,7 @@ Particle::Particle(const KLMCluster* klmCluster, const int pdgCode) :
   setFlavorType();
 
   set4Vector(klmCluster->getMomentum());
-  setVertex(klmCluster->getPosition());
+  setVertex(XYZVector(0, 0, 0)); // so far KLMCluster don't provide reliable / usable position information
   updateMass(m_pdgCode); // KLMCluster internally use Klong mass, overwrite here to allow neutrons
 
   m_particleSource = c_KLMCluster;
@@ -360,9 +362,9 @@ Particle::Particle(const MCParticle* mcParticle) :
 
   // mass and momentum
   m_mass = mcParticle->getMass();
-  m_px = mcParticle->getMomentum().Px();
-  m_py = mcParticle->getMomentum().Py();
-  m_pz = mcParticle->getMomentum().Pz();
+  m_px = mcParticle->getMomentum().X();
+  m_py = mcParticle->getMomentum().Y();
+  m_pz = mcParticle->getMomentum().Z();
   // production vertex
   // TODO: good only for FS particles, for composite we must use decay vertex
   setVertex(mcParticle->getVertex());
@@ -486,28 +488,27 @@ TMatrixFSym Particle::getVertexErrorMatrix() const
   return pos;
 }
 
-float Particle::getCosHelicity(const Particle* mother) const
+double Particle::getCosHelicity(const Particle* mother) const
 {
   // boost vector to the rest frame of the particle
-  TVector3 boost = -get4Vector().BoostVector();
+  Boost boost(get4Vector().BoostToCM());
 
   // momentum of the mother in the particle's rest frame
-  TLorentzVector pMother;
+  PxPyPzEVector pMother;
   if (mother) {
     pMother = mother->get4Vector();
   } else {
     static DBObjPtr<CollisionBoostVector> cmsBoost;
     static DBObjPtr<CollisionInvariantMass> cmsMass;
     pMother.SetE(cmsMass->getMass());
-    pMother.Boost(cmsBoost->getBoost());
+    pMother = Boost(cmsBoost->getBoost()) * pMother;
   }
-  pMother.Boost(boost);
+  pMother = boost * pMother;
 
   // momentum of the daughter (or normal vector) in the particle's rest frame
-  TLorentzVector pDaughter;
+  PxPyPzEVector pDaughter;
   if (getNDaughters() == 2) {  // two body decay
-    pDaughter = getDaughter(0)->get4Vector();
-    pDaughter.Boost(boost);
+    pDaughter = boost * getDaughter(0)->get4Vector();
   } else if (getNDaughters() == 3) {
     if (getPDGCode() == Const::pi0.getPDGCode()) {  // pi0 Dalitz decay
       for (auto& daughter : getDaughters()) {
@@ -515,61 +516,59 @@ float Particle::getCosHelicity(const Particle* mother) const
           pDaughter = daughter->get4Vector();
         }
       }
-      pDaughter.Boost(boost);
+      pDaughter = boost * pDaughter;
     } else {  // three body decay
-      TLorentzVector pDaughter0 = getDaughter(0)->get4Vector();
-      pDaughter0.Boost(boost);
-      TLorentzVector pDaughter1 = getDaughter(1)->get4Vector();
-      pDaughter1.Boost(boost);
-      pDaughter.SetVect(pDaughter0.Vect().Cross(pDaughter1.Vect()));
+      PxPyPzEVector pDaughter0 = boost * getDaughter(0)->get4Vector();
+      PxPyPzEVector pDaughter1 = boost * getDaughter(1)->get4Vector();
+
+      XYZVector pDaughterNormal(pDaughter0.Vect().Cross(pDaughter1.Vect()));
+      pDaughter.SetPxPyPzE(pDaughterNormal.X(), pDaughterNormal.Y(), pDaughterNormal.Z(), 0); // energy doesn't matter
     }
   }
 
-  double mag2 = pMother.Vect().Mag2() * pDaughter.Vect().Mag2();
-  if (mag2 <= 0) return std::numeric_limits<float>::quiet_NaN();
-  return (-pMother.Vect()) * pDaughter.Vect() / sqrt(mag2);
+  double mag2 = pMother.P2() * pDaughter.P2();
+  if (mag2 <= 0) return std::numeric_limits<double>::quiet_NaN();
+  return -pMother.Vect().Dot(pDaughter.Vect()) / sqrt(mag2);
 }
 
-float Particle::getCosHelicityDaughter(unsigned iDaughter, unsigned iGrandDaughter) const
+double Particle::getCosHelicityDaughter(unsigned iDaughter, unsigned iGrandDaughter) const
 {
   // check existence of daughter
   if (getNDaughters() <= iDaughter) {
     B2ERROR("No daughter of particle 'name' with index 'iDaughter' for calculation of helicity angle"
             << LogVar("name", getName()) << LogVar("iDaughter", iDaughter));
-    return std::numeric_limits<float>::quiet_NaN();
+    return std::numeric_limits<double>::quiet_NaN();
   }
 
   // boost vector to the rest frame of the daughter particle
   const Particle* daughter = getDaughter(iDaughter);
-  TVector3 boost = -daughter->get4Vector().BoostVector();
+  Boost boost(daughter->get4Vector().BoostToCM());
 
   // momentum of the this particle in the daughter's rest frame
-  TLorentzVector pMother = get4Vector();
-  pMother.Boost(boost);
+  PxPyPzEVector pMother = boost * get4Vector();
 
   // check existence of grand daughter
   if (daughter->getNDaughters() <= iGrandDaughter) {
     B2ERROR("No grand daughter of daughter 'iDaughter' of particle 'name' with index 'iGrandDaughter' for calculation of helicity angle"
             << LogVar("name", getName()) << LogVar("iDaughter", iDaughter) << LogVar("iGrandDaughter", iGrandDaughter));
-    return std::numeric_limits<float>::quiet_NaN();
+    return std::numeric_limits<double>::quiet_NaN();
   }
 
   // momentum of the grand daughter in the daughter's rest frame
-  TLorentzVector pGrandDaughter = daughter->getDaughter(iGrandDaughter)->get4Vector();
-  pGrandDaughter.Boost(boost);
+  PxPyPzEVector pGrandDaughter = boost * daughter->getDaughter(iGrandDaughter)->get4Vector();
 
-  double mag2 = pMother.Vect().Mag2() * pGrandDaughter.Vect().Mag2();
-  if (mag2 <= 0) return std::numeric_limits<float>::quiet_NaN();
-  return (-pMother.Vect()) * pGrandDaughter.Vect() / sqrt(mag2);
+  double mag2 = pMother.P2() * pGrandDaughter.P2();
+  if (mag2 <= 0) return std::numeric_limits<double>::quiet_NaN();
+  return -pMother.Vect().Dot(pGrandDaughter.Vect()) / sqrt(mag2);
 }
 
-float Particle::getAcoplanarity() const
+double Particle::getAcoplanarity() const
 {
   // check that we have a decay to two daughters and then two grand daughters each
   if (getNDaughters() != 2) {
     B2ERROR("Cannot calculate acoplanarity of particle 'name' because the number of daughters is not 2"
             << LogVar("name", getName()) << LogVar("# of daughters", getNDaughters()));
-    return std::numeric_limits<float>::quiet_NaN();
+    return std::numeric_limits<double>::quiet_NaN();
   }
   const Particle* daughter0 = getDaughter(0);
   const Particle* daughter1 = getDaughter(1);
@@ -577,41 +576,37 @@ float Particle::getAcoplanarity() const
     B2ERROR("Cannot calculate acoplanarity of particle 'name' because the number of grand daughters is not 2"
             << LogVar("name", getName()) << LogVar("# of grand daughters of first daughter", daughter0->getNDaughters())
             << LogVar("# of grand daughters of second daughter", daughter1->getNDaughters()));
-    return std::numeric_limits<float>::quiet_NaN();
+    return std::numeric_limits<double>::quiet_NaN();
   }
 
   // boost vector to the rest frame of the particle
-  TVector3 boost = -get4Vector().BoostVector();
+  Boost boost(get4Vector().BoostToCM());
 
   // momenta of the daughters and grand daughters in the particle's rest frame
-  TLorentzVector pDaughter0 = daughter0->get4Vector();
-  pDaughter0.Boost(boost);
-  TLorentzVector pGrandDaughter0 = daughter0->getDaughter(0)->get4Vector();
-  pGrandDaughter0.Boost(boost);
-  TLorentzVector pDaughter1 = daughter1->get4Vector();
-  pDaughter1.Boost(boost);
-  TLorentzVector pGrandDaughter1 = daughter1->getDaughter(0)->get4Vector();
-  pGrandDaughter1.Boost(boost);
+  PxPyPzEVector pDaughter0 = boost * daughter0->get4Vector();
+  PxPyPzEVector pGrandDaughter0 = boost * daughter0->getDaughter(0)->get4Vector();
+  PxPyPzEVector pDaughter1 = boost * daughter1->get4Vector();
+  PxPyPzEVector pGrandDaughter1 = boost * daughter1->getDaughter(0)->get4Vector();
 
   // calculate angle between normal vectors
-  TVector3 normal0 = pDaughter0.Vect().Cross(pGrandDaughter0.Vect());
-  TVector3 normal1 = -pDaughter1.Vect().Cross(pGrandDaughter1.Vect());
-  double result = normal0.Angle(normal1);
-  if (normal0.Cross(normal1) * pDaughter0.Vect() < 0) result = -result;
+  XYZVector normal0 = pDaughter0.Vect().Cross(pGrandDaughter0.Vect());
+  XYZVector normal1 = -pDaughter1.Vect().Cross(pGrandDaughter1.Vect());
+  double result = acos(normal0.Unit().Dot(normal1.Unit()));
+  if (normal0.Cross(normal1).Dot(pDaughter0.Vect()) < 0) result = -result;
 
   return result;
 }
 
 
 /*
-float Particle::getMassError(void) const
+double Particle::getMassError(void) const
 {
-  float result = 0.0;
+  double result = 0.0;
 
   if(m_pValue<0)
     return result;
 
-  float invMass = getMass();
+  double invMass = getMass();
 
   TMatrixFSym covarianceMatrix = getMomentumErrorMatrix();
   TVectorF    jacobian(c_DimMomentum);
@@ -638,7 +633,7 @@ void Particle::updateMass(const int pdgCode)
   m_mass = TDatabasePDG::Instance()->GetParticle(pdgCode)->Mass() ;
 }
 
-float Particle::getPDGMass() const
+double Particle::getPDGMass() const
 {
   if (TDatabasePDG::Instance()->GetParticle(m_pdgCode) == nullptr) {
     B2ERROR("PDG=" << m_pdgCode << " ***code unknown to TDatabasePDG");
@@ -647,7 +642,16 @@ float Particle::getPDGMass() const
   return TDatabasePDG::Instance()->GetParticle(m_pdgCode)->Mass();
 }
 
-float Particle::getCharge() const
+double Particle::getPDGLifetime() const
+{
+  if (TDatabasePDG::Instance()->GetParticle(m_pdgCode) == nullptr) {
+    B2ERROR("PDG=" << m_pdgCode << " ***code unknown to TDatabasePDG");
+    return 0.0;
+  }
+  return TDatabasePDG::Instance()->GetParticle(m_pdgCode)->Lifetime();
+}
+
+double Particle::getCharge() const
 {
   if (TDatabasePDG::Instance()->GetParticle(m_pdgCode) == nullptr) {
     B2ERROR("PDG=" << m_pdgCode << " ***code unknown to TDatabasePDG");
@@ -680,6 +684,14 @@ std::vector<const Belle2::Particle*> Particle::getFinalStateDaughters() const
   fillFSPDaughters(fspDaughters);
 
   return fspDaughters;
+}
+
+std::vector<const Belle2::Particle*> Particle::getAllDaughters() const
+{
+  std::vector<const Particle*> allDaughters;
+  fillAllDaughters(allDaughters);
+
+  return allDaughters;
 }
 
 std::vector<int> Particle::getMdstArrayIndices(EParticleSourceObject source) const
@@ -722,6 +734,36 @@ void Particle::removeDaughter(const Particle* daughter, const bool updateType)
   if (getNDaughters() == 0 and updateType)
     m_particleSource = c_Undefined;
 }
+
+bool Particle::replaceDaughter(const Particle* oldDaughter, const Particle* newDaughter)
+{
+  int index = oldDaughter->getArrayIndex();
+
+  for (unsigned i = 0; i < getNDaughters(); i++) {
+    if (m_daughterIndices[i] == index) {
+      auto ite_index =  m_daughterIndices.erase(m_daughterIndices.begin() + i);
+      m_daughterIndices.insert(ite_index, newDaughter->getArrayIndex());
+      auto ite_property =  m_daughterProperties.erase(m_daughterProperties.begin() + i);
+      m_daughterProperties.insert(ite_property, Particle::PropertyFlags::c_Ordinary);
+      return true;
+    }
+  }
+  return false;
+}
+
+bool Particle::replaceDaughterRecursively(const Particle* oldDaughter, const Particle* newDaughter)
+{
+  bool isReplaced = this->replaceDaughter(oldDaughter, newDaughter);
+  if (isReplaced)
+    return true;
+  for (auto& daughter : this->getDaughters()) {
+    isReplaced = daughter->replaceDaughterRecursively(oldDaughter, newDaughter);
+    if (isReplaced)
+      return true;
+  }
+  return false;
+}
+
 
 bool Particle::overlapsWith(const Particle* oParticle) const
 {
@@ -844,7 +886,7 @@ const TrackFitResult* Particle::getTrackFitResult() const
 {
   // if the particle is related to a TrackFitResult then return this
   auto* selfrelated = this->getRelatedTo<TrackFitResult>();
-  if (selfrelated)
+  if (selfrelated && !isnan(selfrelated->getPValue()))
     return selfrelated;
 
   // if not get the TFR with closest mass to this particle
@@ -972,7 +1014,7 @@ const Particle* Particle::getParticleFromGeneralizedIndexString(const std::strin
 
     // Check that the daughter index is smaller than the number of daughters of the current root particle
     if (dauIndex >= int(currentPart->getNDaughters()) or dauIndex < 0) {
-      B2WARNING("Daughter index " << dauIndex << " out of range");
+      B2WARNING("Daughter index out of range" << LogVar("Daughter index", dauIndex));
       B2WARNING("Trying to access non-existing particle.");
       return nullptr;
     } else {
@@ -990,9 +1032,9 @@ const Particle* Particle::getParticleFromGeneralizedIndexString(const std::strin
 void Particle::setMomentumPositionErrorMatrix(const TrackFitResult* trackFit)
 {
   // set momentum
-  m_px = trackFit->getMomentum().Px();
-  m_py = trackFit->getMomentum().Py();
-  m_pz = trackFit->getMomentum().Pz();
+  m_px = trackFit->getMomentum().X();
+  m_py = trackFit->getMomentum().Y();
+  m_pz = trackFit->getMomentum().Z();
 
   // set position at which the momentum is given (= POCA)
   setVertex(trackFit->getPosition());
@@ -1028,14 +1070,14 @@ void Particle::setMomentumPositionErrorMatrix(const TrackFitResult* trackFit)
      dE/dpx = px/E etc.
   */
 
-  const float E = getEnergy();
-  const float dEdp[] = {m_px / E, m_py / E, m_pz / E};
+  const double E = getEnergy();
+  const double dEdp[] = {m_px / E, m_py / E, m_pz / E};
   constexpr unsigned compMom[] = {c_Px, c_Py, c_Pz};
   constexpr unsigned compPos[] = {c_X,  c_Y,  c_Z};
 
   // covariances (p,E)
   for (unsigned int i : compMom) {
-    float Cov = 0;
+    double Cov = 0;
     for (int k = 0; k < 3; k++) {
       Cov += errMatrix(i, compMom[k]) * dEdp[k];
     }
@@ -1044,7 +1086,7 @@ void Particle::setMomentumPositionErrorMatrix(const TrackFitResult* trackFit)
 
   // covariances (x,E)
   for (unsigned int comp : compPos) {
-    float Cov = 0;
+    double Cov = 0;
     for (int k = 0; k < 3; k++) {
       Cov += errMatrix(comp, compMom[k]) * dEdp[k];
     }
@@ -1052,7 +1094,7 @@ void Particle::setMomentumPositionErrorMatrix(const TrackFitResult* trackFit)
   }
 
   // variance (E,E)
-  float Cov = 0;
+  double Cov = 0;
   for (int i = 0; i < 3; i++) {
     Cov += errMatrix(compMom[i], compMom[i]) * dEdp[i] * dEdp[i];
   }
@@ -1067,13 +1109,13 @@ void Particle::setMomentumPositionErrorMatrix(const TrackFitResult* trackFit)
 
 void Particle::resetErrorMatrix()
 {
-  for (float& i : m_errMatrix)
+  for (double& i : m_errMatrix)
     i = 0.0;
 }
 
 void Particle::resetJacobiMatrix()
 {
-  for (float& i : m_jacobiMatrix)
+  for (double& i : m_jacobiMatrix)
     i = 0.0;
 }
 
@@ -1111,6 +1153,19 @@ void Particle::fillFSPDaughters(std::vector<const Belle2::Particle*>& fspDaughte
   // this is not FSP (go one level down)
   for (unsigned i = 0; i < getNDaughters(); i++)
     getDaughter(i)->fillFSPDaughters(fspDaughters);
+}
+
+void Particle::fillAllDaughters(std::vector<const Belle2::Particle*>& allDaughters) const
+{
+  // this is FSP
+  if (getNDaughters() == 0)
+    return;
+
+  // this is not FSP (fill it and go one level down)
+  for (unsigned i = 0; i < getNDaughters(); i++) {
+    allDaughters.push_back(getDaughter(i));
+    getDaughter(i)->fillAllDaughters(allDaughters);
+  }
 }
 
 void Particle::fillDecayChain(std::vector<int>& decayChain) const
@@ -1199,14 +1254,14 @@ std::string Particle::getInfoHTML() const
   stream << " <b>mass</b>=" << m_mass;
   stream << "<br>";
 
-  stream << " <b>momentum</b>=" << HTML::getString(getMomentum());
+  stream << " <b>momentum</b>=" << HTML::getString(ROOT::Math::XYZVector(getPx(), getPy(), getPz()));
   stream << " <b>p</b>=" << getP();
   stream << "<br>";
 
   stream << " <b>momentum scaling factor</b>=" << m_momentumScale;
   stream << "<br>";
 
-  stream << " <b>position</b>=" << HTML::getString(getVertex());
+  stream << " <b>position</b>=" << HTML::getString(ROOT::Math::XYZVector(m_x, m_y, m_z));
   stream << "<br>";
 
   stream << " <b>p-value of fit</b> (if done): ";
@@ -1259,7 +1314,7 @@ void Particle::removeExtraInfo()
   m_extraInfo.clear();
 }
 
-float Particle::getExtraInfo(const std::string& name) const
+double Particle::getExtraInfo(const std::string& name) const
 {
   if (m_extraInfo.empty())
     throw std::runtime_error(std::string("getExtraInfo: Value '") + name + "' not found in Particle!");
@@ -1278,7 +1333,7 @@ float Particle::getExtraInfo(const std::string& name) const
 
 }
 
-void Particle::writeExtraInfo(const std::string& name, const float value)
+void Particle::writeExtraInfo(const std::string& name, const double value)
 {
   if (this->hasExtraInfo(name)) {
     this->setExtraInfo(name, value);
@@ -1287,7 +1342,7 @@ void Particle::writeExtraInfo(const std::string& name, const float value)
   }
 }
 
-void Particle::setExtraInfo(const std::string& name, float value)
+void Particle::setExtraInfo(const std::string& name, double value)
 {
   if (m_extraInfo.empty())
     throw std::runtime_error(std::string("setExtraInfo: Value '") + name + "' not found in Particle!");
@@ -1306,7 +1361,7 @@ void Particle::setExtraInfo(const std::string& name, float value)
 
 }
 
-void Particle::addExtraInfo(const std::string& name, float value)
+void Particle::addExtraInfo(const std::string& name, double value)
 {
   if (hasExtraInfo(name))
     throw std::runtime_error(std::string("addExtraInfo: Value '") + name + "' already set!");
@@ -1366,4 +1421,30 @@ bool Particle::isMostLikely() const
   const PIDLikelihood* likelihood = Particle::getPIDLikelihood();
   if (likelihood) return likelihood->getMostLikely().getPDGCode() == std::abs(m_pdgCode);
   else return false;
+}
+
+std::pair<Const::ChargedStable, const TrackFitResult*> Particle::getMostLikelyTrackFitResult() const
+{
+
+  const auto track = this->getTrack();
+
+  if (!track) {
+    return std::make_pair(Const::ChargedStable(std::abs(this->getPDGCode())), nullptr);
+  }
+
+  // Find the track fit with the highest pValue
+  auto trackFitResults = track->getTrackFitResults();
+  auto it_maxPValue = std::max_element(std::begin(trackFitResults), std::end(trackFitResults),
+  [](auto tfrAndM1, auto tfrAndM2) {return tfrAndM1.second->getPValue() < tfrAndM2.second->getPValue();});
+
+  return trackFitResults[std::distance(std::begin(trackFitResults), it_maxPValue)];
+
+}
+
+bool Particle::isMostLikelyTrackFitResult() const
+{
+  const auto trackFit = this->getTrackFitResult();
+  if (!trackFit) return false;
+
+  return (trackFit == this->getMostLikelyTrackFitResult().second);
 }

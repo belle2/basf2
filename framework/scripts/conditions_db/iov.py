@@ -44,6 +44,7 @@ class IntervalOfValidity:
 
     For simplicity ``-1`` can be passed in instead of infinity when creating objects.
     """
+
     def __init__(self, *iov):
         """Create a new object.
 
@@ -290,6 +291,7 @@ class IoVSet:
         >>> a
         {(0, 0, 0, 5), (0, 8, 0, 9)}
     """
+
     def __init__(self, iterable=None, *, allow_overlaps=False, allow_startone=False):
         """Create a new set.
 

@@ -9,6 +9,10 @@
 
 #include <framework/core/Module.h>
 #include <framework/gearbox/Const.h>
+#include <framework/datastore/StoreArray.h>
+#include <tracking/dataobjects/RecoTrack.h>
+#include <mdst/dataobjects/MCParticle.h>
+
 
 namespace Belle2 {
   /*!
@@ -162,14 +166,20 @@ namespace Belle2 {
      */
     double m_param_minimalEfficiency;
 
-  public: // Other variables
+    StoreArray<MCParticle>  m_MCParticles;  /**< StoreArray containing MCParticles */
+    StoreArray<RecoTrack>   m_PRRecoTracks; /**< StoreArray containing PR RecoTracks */
+    StoreArray<RecoTrack>   m_MCRecoTracks; /**< StoreArray containing MC RecoTracks */
+    StoreArray<PXDCluster>  m_PXDClusters;  /**< StoreArray containing PXDClusters */
+    StoreArray<SVDCluster>  m_SVDClusters;  /**< StoreArray containing SVDClusters */
+    StoreArray<CDCHit>      m_CDCHits;      /**< StoreArray containing CDCHits */
+
+    //! Flag to indicated whether the Monte Carlo track are on the DataStore
+    bool m_mcParticlesPresent = false;
+
     //! Descriptive type defintion for a number of degrees of freedom.
     using NDF = int;
 
     //! Map storing the standard number degrees of freedom for a single hit by detector */
     std::map<int, NDF> m_ndf_by_detId = {{Const::PXD, 2}, {Const::SVD, 1}, {Const::CDC, 1}};
-
-    //! Flag to indicated whether the Monte Carlo track are on the DataStore
-    bool m_mcParticlesPresent = false;
   };
 }

@@ -1,0 +1,27 @@
+# EventType: 1213030008
+# Descriptor: [B+ -> [anti-D0 -> K+ pi-] pi0 pi+]
+# NickName: Bu_Dpi0pi+_DtoK+pi-
+# Documentation: B to Charm [phi3 (gamma)] studies.
+# Tested: Yes
+# PhysicsWG: Hadronic B Decay to Open Charm WG
+# Responsible: Yi Zhang
+# Email: zhangy17@fudan.edu.cn 
+# Cuts: None
+# Date: 20220509
+#
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B+ B-sig VSS;
+Enddecay
+
+Decay B+sig
+1.0 anti-D0sig pi0 pi+ PHOTOS PHSP;
+Enddecay
+CDecay B-sig
+
+Decay anti-D0sig
+1.0 K+ pi- PHOTOS PHSP;
+Enddecay
+CDecay D0sig
+
+End

@@ -203,6 +203,8 @@ int ERecoEventProcessor::Start(NSMmsg* nsmm, NSMcontext* /*nsmc*/)
   system(cmdline);
   printf("ERecoEventProcessor : DQM TMemFile cleared\n");
 
+  m_rbufin->clear();
+
   string rbufin = string(m_conf->getconf("system", "unitname")) + ":" +
                   string(m_conf->getconf("processor", "ringbufin"));
   string rbufout = string(m_conf->getconf("system", "unitname")) + ":" +

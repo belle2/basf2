@@ -67,10 +67,26 @@ void TRGCDCETFUnpackerModule::event()
 {
   StoreArray<RawTRG> raw_trgarray;
   for (int i = 0; i < raw_trgarray.getEntries(); i++) {
+
+    // Check PCIe40 data or Copper data
+    if (raw_trgarray[i]->GetMaxNumOfCh(0) == 48) { m_pciedata = true; }
+    else if (raw_trgarray[i]->GetMaxNumOfCh(0) == 4) { m_pciedata = false; }
+    else { B2FATAL("TRGCDCETFUnpackerModule: Invalid value of GetMaxNumOfCh from raw data: " << LogVar("Number of ch: ", raw_trgarray[i]->GetMaxNumOfCh(0))); }
+
+    unsigned int node_id = 0;
+    unsigned int ch_id = 0;
+    if (m_pciedata) {
+      node_id = m_pcie40_address;
+      ch_id = m_pcie40_ch;
+    } else {
+      node_id = m_copper_address;
+      ch_id = m_copper_ab;
+    }
+
     for (int j = 0; j < raw_trgarray[i]->GetNumEntries(); j++) {
-      if (raw_trgarray[i]->GetNodeID(j) == 0x15000001) {
-        if (raw_trgarray[i]->GetDetectorNwords(j, 1) > 0) {
-          fillTreeTRGCDCETFUnpacker(raw_trgarray[i]->GetDetectorBuffer(j, 1), raw_trgarray[j]->GetEveNo(j));
+      if (raw_trgarray[i]->GetNodeID(j) == node_id) {
+        if (raw_trgarray[i]->GetDetectorNwords(j, ch_id) > 0) {
+          fillTreeTRGCDCETFUnpacker(raw_trgarray[i]->GetDetectorBuffer(j, ch_id), raw_trgarray[j]->GetEveNo(j));
         }
       }
     }

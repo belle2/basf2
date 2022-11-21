@@ -9,7 +9,9 @@
 // Own include
 #include <analysis/variables/ParticleDaughterVariables.h>
 
+// include VariableManager
 #include <analysis/VariableManager/Manager.h>
+
 #include <analysis/variables/MCTruthVariables.h>
 
 // dataobjects
@@ -155,10 +157,14 @@ namespace Belle2 {
 
     VARIABLE_GROUP("DirectDaughterInfo");
     REGISTER_VARIABLE("hasCharmedDaughter(i)", hasCharmedDaughter,
-                      "Returns information regarding the charm quark presence in the decay.");
+                      "If i = 1 is provided it checks for b -> anti-c / anti-b -> c transition and for i = -1 it checks for b -> c / anti-b -> anti-c transitions.\n"
+                      "Returns 1 if at least one of the daughters on MC truth level is a charm meson. The particle's MC partner must be a B-meson.\n"
+                      "Returns 0 if no charmed daughter found on MC truth level and NaN if no MC partner was found or the related MC particle isn't a B-meson.");
     REGISTER_VARIABLE("hasCharmoniumDaughter", hasCharmoniumDaughter,
-                      "Returns information regarding the charmonium state presence in the decay.");
+                      "Returns 1 if at least one of the daughters on MC truth level is a ccbar resonance. The particle's MC partner must be a B-meson.\n"
+                      "Returns 0 if no ccbar resonance found on MC truth level and NaN if no MC partner was found or the related MC particle isn't a B-meson.");
     REGISTER_VARIABLE("hasRealPhotonDaughter", hasRealPhotonDaughter,
-                      "Returns information regarding photon daughter origin for a particle.");
+                      "Returns 1 if on MC truth level there is at least one real photon daughter, a photon that was not created by photos.\n"
+                      "Returns 0 if no real photon daughter found and NaN if the particle has no daughters.");
   }
 }

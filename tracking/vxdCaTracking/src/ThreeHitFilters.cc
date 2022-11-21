@@ -12,7 +12,6 @@
 // #include <math.h>
 #include <boost/math/special_functions/sign.hpp>
 
-using namespace std;
 using namespace Belle2;
 using boost::math::sign;
 

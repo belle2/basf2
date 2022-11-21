@@ -37,9 +37,9 @@ namespace Belle2 {
     */
     ARICHHit(TVector3 position, int mod, int ch)
     {
-      m_x = (float) position.x();
-      m_y = (float) position.y();
-      m_z = (float) position.z();
+      m_x = (float) position.X();
+      m_y = (float) position.Y();
+      m_z = (float) position.Z();
       m_mod = mod;
       m_ch = ch;
     }

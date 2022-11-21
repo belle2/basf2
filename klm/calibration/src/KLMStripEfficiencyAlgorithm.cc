@@ -86,7 +86,7 @@ CalibrationAlgorithm::EResult KLMStripEfficiencyAlgorithm::calibrate()
   KLMChannelIndex klmPlanes(KLMChannelIndex::c_IndexLevelPlane);
   for (KLMChannelIndex& klmPlane : klmPlanes) {
     KLMPlaneNumber plane = klmPlane.getKLMPlaneNumber();
-    uint16_t planeIndex = m_PlaneArrayIndex->getIndex(plane);
+    KLMPlaneNumber planeIndex = m_PlaneArrayIndex->getIndex(plane);
     int extHits = allExtHitsInPlane->GetBinContent(planeIndex + 1);
     float efficiencyError = efficiencyHistogram->GetBinError(planeIndex + 1);
     if (efficiencyError > m_Results.m_AchievedPrecision)
@@ -130,7 +130,7 @@ CalibrationAlgorithm::EResult KLMStripEfficiencyAlgorithm::calibrate()
         planeKLM = m_ElementNumbers->planeNumberEKLM(
                      section, sector, layer, plane);
       }
-      uint16_t planeIndex = m_PlaneArrayIndex->getIndex(planeKLM);
+      KLMPlaneNumber planeIndex = m_PlaneArrayIndex->getIndex(planeKLM);
       float efficiency = efficiencyHistogram->GetBinContent(planeIndex + 1);
       float efficiencyError = efficiencyHistogram->GetBinError(planeIndex + 1);
       /* Fill the efficiency for this strip. */
@@ -159,7 +159,7 @@ CalibrationAlgorithm::EResult KLMStripEfficiencyAlgorithm::calibrate()
 }
 
 int KLMStripEfficiencyAlgorithm::Results::newMeasuredPlanes(
-  float* efficiency) const
+  const float* efficiency) const
 {
   const int nPlanes = KLMPlaneArrayIndex::Instance().getNElements();
   int newPlanes = 0;
@@ -171,7 +171,7 @@ int KLMStripEfficiencyAlgorithm::Results::newMeasuredPlanes(
 }
 
 int KLMStripEfficiencyAlgorithm::Results::newExtHitsPlanes(
-  int* extHitsPlane) const
+  const int* extHitsPlane) const
 {
   const int nPlanes = KLMPlaneArrayIndex::Instance().getNElements();
   int newPlanes = 0;

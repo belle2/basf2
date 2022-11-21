@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include "dqm/analysis/modules/DQMHistAnalysisPXDER.h"
+#include <dqm/analysis/modules/DQMHistAnalysisPXDER.h>
 
 #include <pxd/geometry/SensorInfo.h>
 #include <vxd/geometry/SensorInfoBase.h>
@@ -14,13 +14,7 @@
 
 #include <boost/format.hpp>
 
-#include <TClass.h>
-#include <TKey.h>
-#include <TDirectory.h>
-#include <TFile.h>
 #include <TROOT.h>
-
-#include <memory>
 
 using namespace std;
 using boost::format;
@@ -29,7 +23,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(DQMHistAnalysisPXDER)
+REG_MODULE(DQMHistAnalysisPXDER);
 
 
 //-----------------------------------------------------------------
@@ -40,6 +34,8 @@ DQMHistAnalysisPXDERModule::DQMHistAnalysisPXDERModule() : DQMHistAnalysisModule
 {
   //Set module properties
   setDescription("PXD DQM analysis module for Express Reco ");
+  addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms were placed",
+           std::string("PXDER"));
   addParam("RefHistoFile", m_refFileName, "Reference histrogram file name", std::string("refHisto.root"));
 
   // NO parallel processing
@@ -54,7 +50,7 @@ void DQMHistAnalysisPXDERModule::initialize()
 {
   m_refFile = NULL;
   if (m_refFileName != "") {
-    m_refFile = new TFile(m_refFileName.data());
+    m_refFile = new TFile(m_refFileName.data());// default is read only
   }
 
   gROOT->cd(); // this seems to be important, or strange things happen
@@ -95,51 +91,51 @@ void DQMHistAnalysisPXDERModule::initialize()
     // Number of fired pixels per frame
     //----------------------------------------------------------------
     m_fired.emplace_back(str(format("DQMER_PXD_%1%_Fired") % sensorDescr));
-    m_ref_fired.emplace_back("ref/" + m_fired.back());
+    m_ref_fired.emplace_back(m_fired.back());
     //----------------------------------------------------------------
     // Number of clusters per frame
     //----------------------------------------------------------------
     m_clusters.emplace_back(str(format("DQMER_PXD_%1%_Clusters") % sensorDescr));
-    m_ref_clusters.emplace_back("ref/" + m_clusters.back());
+    m_ref_clusters.emplace_back(m_clusters.back());
     //----------------------------------------------------------------
     // Start row distribution
     //----------------------------------------------------------------
     m_startRow.emplace_back(str(format("DQMER_PXD_%1%_StartRow") % sensorDescr));
-    m_ref_startRow.emplace_back("ref/" + m_startRow.back());
+    m_ref_startRow.emplace_back(m_startRow.back());
     //----------------------------------------------------------------
     // Cluster seed charge by distance from the start row
     //----------------------------------------------------------------
     m_chargStartRow.emplace_back(str(format("DQMER_PXD_%1%_AverageSeedByStartRow") % sensorDescr));
-    m_ref_chargStartRow.emplace_back("ref/" + m_chargStartRow.back());
+    m_ref_chargStartRow.emplace_back(m_chargStartRow.back());
 
 
     m_startRowCount.emplace_back(str(format("DQMER_PXD_%1%_SeedCountsByStartRow") % sensorDescr));
-    m_ref_startRowCount.emplace_back("ref/" + m_startRowCount.back());
+    m_ref_startRowCount.emplace_back(m_startRowCount.back());
     //----------------------------------------------------------------
     // Cluster Charge
     //----------------------------------------------------------------
     m_clusterCharge.emplace_back(str(format("DQMER_PXD_%1%_ClusterCharge") % sensorDescr));
-    m_ref_clusterCharge.emplace_back("ref/" + m_clusterCharge.back());
+    m_ref_clusterCharge.emplace_back(m_clusterCharge.back());
     //----------------------------------------------------------------
     // Pixel Signal
     //----------------------------------------------------------------
     m_pixelSignal.emplace_back(str(format("DQMER_PXD_%1%_PixelSignal") % sensorDescr));
-    m_ref_pixelSignal.emplace_back("ref/" + m_pixelSignal.back());
+    m_ref_pixelSignal.emplace_back(m_pixelSignal.back());
     //----------------------------------------------------------------
     // Cluster Size in U
     //----------------------------------------------------------------
     m_clusterSizeU.emplace_back(str(format("DQMER_PXD_%1%_ClusterSizeU") % sensorDescr));
-    m_ref_clusterSizeU.emplace_back("ref/" + m_clusterSizeU.back());
+    m_ref_clusterSizeU.emplace_back(m_clusterSizeU.back());
     //----------------------------------------------------------------
     // Cluster Size in V
     //----------------------------------------------------------------
     m_clusterSizeV.emplace_back(str(format("DQMER_PXD_%1%_ClusterSizeV") % sensorDescr));
-    m_ref_clusterSizeV.emplace_back("ref/" + m_clusterSizeV.back());
+    m_ref_clusterSizeV.emplace_back(m_clusterSizeV.back());
     //----------------------------------------------------------------
     // Cluster Size in U+V
     //----------------------------------------------------------------
     m_clusterSizeUV.emplace_back(str(format("DQMER_PXD_%1%_ClusterSizeUV") % sensorDescr));
-    m_ref_clusterSizeUV.emplace_back("ref/" + m_clusterSizeUV.back());
+    m_ref_clusterSizeUV.emplace_back(m_clusterSizeUV.back());
   }
 //   m_fHitMapCountsFlag = NULL;
 //   m_fHitMapClCountsFlag = NULL;
@@ -324,18 +320,19 @@ void DQMHistAnalysisPXDERModule::getIDsFromIndex(const int Index, int& Layer, in
   }
 }
 
-int DQMHistAnalysisPXDERModule::SetFlag(int Type, int bin, double* pars, double ratio, const std::string& name_hist,
+int DQMHistAnalysisPXDERModule::SetFlag(int Type, int bin, const double* pars, double ratio, const std::string& name_hist,
                                         const std::string& name_refhist, TH1I* flaghist)
 {
   int iret = 0;
   float WarningLevel = 6.0;
   float ErrorLevel = 10.0;
 
-  TH1* hist, *refhist;
+  TH1* hist = nullptr, *refhist = nullptr;
 
-  hist = GetHisto(name_hist);
+  hist = findHist(m_histogramDirectoryName, name_hist);
   if (!hist) return -1;
-  refhist = GetHisto(name_refhist);
+  // assumes that ref file has no sub dirs
+  refhist = findHistInFile(m_refFile, name_refhist);
   if (!refhist) return -1;
 
   // What happens if they are TH1I, TH1D and not TH1F
@@ -472,100 +469,3 @@ int DQMHistAnalysisPXDERModule::SetFlag(int Type, int bin, double* pars, double 
 //   delete refhistF;
 //   return ret;
 // }
-
-TH1* DQMHistAnalysisPXDERModule::GetHisto(TString histoname)
-{
-  TH1* hh1;
-  hh1 = findHist(histoname.Data());
-  if (hh1 == NULL) {
-    B2INFO("Histo " << histoname << " not in memfile");
-
-    // first search reference root file ... if ther is one
-    if (m_refFile && m_refFile->IsOpen()) {
-      TDirectory* d = m_refFile;
-      TString myl = histoname;
-      TString tok;
-      Ssiz_t from = 0;
-      B2INFO(myl);
-      while (myl.Tokenize(tok, from, "/")) {
-        TString dummy;
-        Ssiz_t f;
-        f = from;
-        if (myl.Tokenize(dummy, f, "/")) { // check if its the last one
-          auto e = d->GetDirectory(tok);
-          if (e) {
-            B2INFO("Cd Dir " << tok);
-            d = e;
-          } else {
-            B2INFO("cd failed " << tok);
-          }
-        } else {
-          break;
-        }
-      }
-      TObject* obj = d->FindObject(tok);
-      if (obj != NULL) {
-        if (obj->IsA()->InheritsFrom("TH1")) {
-          B2INFO("Histo " << histoname << " found in ref file");
-          hh1 = (TH1*)obj;
-        } else {
-          B2INFO("Histo " << histoname << " found in ref file but wrong type");
-        }
-      } else {
-        // seems find will only find objects, not keys, thus get the object on first access
-        TIter next(d->GetListOfKeys());
-        TKey* key;
-        while ((key = (TKey*)next())) {
-          TObject* obj2 = key->ReadObj() ;
-          if (obj2->InheritsFrom("TH1")) {
-            if (obj2->GetName() == tok) {
-              hh1 = (TH1*)obj2;
-              B2INFO("Histo " << histoname << " found as key -> readobj");
-              break;
-            }
-          }
-        }
-        if (hh1 == NULL) B2INFO("Histo " << histoname << " NOT found in ref file " << tok);
-      }
-    }
-
-    if (hh1 == NULL) {
-      B2INFO("Histo " << histoname << " not in memfile or ref file");
-
-      TDirectory* d = gROOT;
-      TString myl = histoname;
-      TString tok;
-      Ssiz_t from = 0;
-      while (myl.Tokenize(tok, from, "/")) {
-        TString dummy;
-        Ssiz_t f;
-        f = from;
-        if (myl.Tokenize(dummy, f, "/")) { // check if its the last one
-          auto e = d->GetDirectory(tok);
-          if (e) {
-            B2INFO("Cd Dir " << tok);
-            d = e;
-          } else B2INFO("cd failed " << tok);
-          d->cd();
-        } else {
-          break;
-        }
-      }
-      TObject* obj = d->FindObject(tok);
-      if (obj != NULL) {
-        if (obj->IsA()->InheritsFrom("TH1")) {
-          B2INFO("Histo " << histoname << " found in mem");
-          hh1 = (TH1*)obj;
-        }
-      } else {
-        B2INFO("Histo " << histoname << " NOT found in mem");
-      }
-    }
-  }
-
-  if (hh1 == NULL) {
-    B2INFO("Histo " << histoname << " not found");
-  }
-
-  return hh1;
-}

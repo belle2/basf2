@@ -8,7 +8,11 @@
 
 // Own includes
 #include <analysis/variables/TrackVariables.h>
+
+// include VariableManager
 #include <analysis/VariableManager/Manager.h>
+
+#include <analysis/dataobjects/Particle.h>
 
 // framework - DataStore
 #include <framework/datastore/StoreObjPtr.h>
@@ -31,7 +35,7 @@ namespace Belle2 {
   namespace Variable {
 
     static const double realNaN = std::numeric_limits<double>::quiet_NaN();
-    static const TVector3 vecNaN(realNaN, realNaN, realNaN);
+    static const B2Vector3D vecNaN(realNaN, realNaN, realNaN);
 
     double trackNHits(const Particle* part, const Const::EDetector& det)
     {
@@ -221,6 +225,19 @@ namespace Belle2 {
       return sqrt(errorSquared);
     }
 
+    double trackFitCovariance(const Particle* particle, const std::vector<double>& indices)
+    {
+      if (indices.size() != 2) {
+        B2FATAL("Exactly two indices must be provided to the variable trackFitCovariance!");
+      }
+      if (*(std::min_element(indices.begin(), indices.end())) < 0 or *(std::max_element(indices.begin(), indices.end())) > 4) {
+        B2FATAL("The indices provided to the variable trackFitCovariance must be in the range 0 - 4!");
+      }
+      auto trackFit = particle->getTrackFitResult();
+      if (!trackFit) return realNaN;
+      return trackFit->getCovariance5()[indices[0]][indices[1]];
+    }
+
     double trackPValue(const Particle* part)
     {
       auto trackFit = part->getTrackFitResult();
@@ -249,19 +266,26 @@ namespace Belle2 {
     }
 
     // used in trackHelixExtTheta and trackHelixExtPhi
-    TVector3 getPositionOnHelix(const Particle* part, const std::vector<double>& pars)
+    B2Vector3D getPositionOnHelix(const Particle* part, const std::vector<double>& pars)
     {
-      if (pars.size() != 3) {
-        B2FATAL("Exactly three parameters (r, zfwd, zbwd) required.");
+      const auto nParams = pars.size();
+      if (nParams != 3 && nParams != 4) {
+        B2FATAL("Exactly three (+1 optional) parameters (r, zfwd, zbwd, [useHighestProbMass]) required.");
       }
 
-      const double r    = pars[0];
+      const double r = pars[0];
       const double zfwd = pars[1];
       const double zbwd = pars[2];
+      const auto useHighestProbMass = (nParams == 4) ? bool(pars[3]) : false;
 
-      // get the track fit
-      auto trackFit = part->getTrackFitResult();
-      if (!trackFit) return vecNaN;
+      const Track* track = part->getTrack();
+
+      if (!track) return vecNaN;
+
+      auto highestProbMass = (useHighestProbMass) ? part->getMostLikelyTrackFitResult().first : Const::ChargedStable(std::abs(
+                               part->getPDGCode()));
+
+      const TrackFitResult* trackFit = track->getTrackFitResultWithClosestMass(highestProbMass);
 
       // get helix and parameters
       const double z0 = trackFit->getZ0();
@@ -287,10 +311,11 @@ namespace Belle2 {
     // returns extrapolated theta position based on helix parameters
     double trackHelixExtTheta(const Particle* part, const std::vector<double>& pars)
     {
-      if (pars.size() != 3) {
-        B2FATAL("Exactly three parameters (r, zfwd, zbwd) required for helixExtTheta.");
+      const auto nParams = pars.size();
+      if (nParams != 3 && nParams != 4) {
+        B2FATAL("Exactly three (+1 optional) parameters (r, zfwd, zbwd, [useHighestProbMass]) required for helixExtTheta.");
       }
-      TVector3 position = getPositionOnHelix(part, pars);
+      B2Vector3D position = getPositionOnHelix(part, pars);
       if (position == vecNaN) return realNaN;
       return position.Theta();
     }
@@ -298,10 +323,11 @@ namespace Belle2 {
     // returns extrapolated phi position based on helix parameters
     double trackHelixExtPhi(const Particle* part, const std::vector<double>& pars)
     {
-      if (pars.size() != 3) {
-        B2FATAL("Exactly three parameters (r, zfwd, zbwd) required for helixExtPhi.");
+      const auto nParams = pars.size();
+      if (nParams != 3 && nParams != 4) {
+        B2FATAL("Exactly three (+1 optional) parameters (r, zfwd, zbwd, [useHighestProbMass]) required for helixExtPhi.");
       }
-      TVector3 position = getPositionOnHelix(part, pars);
+      B2Vector3D position = getPositionOnHelix(part, pars);
       if (position == vecNaN) return realNaN;
       return position.Phi();
     }
@@ -405,8 +431,8 @@ namespace Belle2 {
 
       const Belle2::UncertainHelix measHelix = trackfit->getUncertainHelix();
       const TMatrixDSym measCovariance = measHelix.getCovariance();
-      const TVector3 mcProdVertex = mcparticle->getVertex();
-      const TVector3 mcMomentum = mcparticle->getMomentum();
+      const ROOT::Math::XYZVector mcProdVertex = mcparticle->getVertex();
+      const ROOT::Math::XYZVector mcMomentum = mcparticle->getMomentum();
 
       const double BzAtProdVertex = Belle2::BFieldManager::getFieldInTesla(mcProdVertex).Z();
       const double mcParticleCharge = mcparticle->getCharge();
@@ -442,7 +468,19 @@ namespace Belle2 {
     {
       return getHelixParameterPullAtIndex(part, 4);
     }
+    double getTrackTime(const Particle* part)
+    {
+      const Track* track = part->getTrack();
+      if (!track) return realNaN;
+      return track->getTrackTime();
+    }
 
+    double isTrackFlippedAndRefitted(const Particle* part)
+    {
+      auto track = part->getTrack();
+      if (!track) return realNaN;
+      return track->isFlippedAndRefitted() ? 1 : 0;
+    }
 
     VARIABLE_GROUP("Tracking");
     REGISTER_VARIABLE("d0Pull", getHelixD0Pull,     R"DOC(
@@ -519,9 +557,9 @@ track-based particle.
     REGISTER_VARIABLE("nVXDHits", trackNVXDHits,
                       "The number of PXD and SVD hits associated to the track. Returns NaN if called for something other than a track-based particle.");
     REGISTER_VARIABLE("ndf",      trackNDF, R"DOC(
-Returns the number of degrees of freedom of the track fit. 
+Returns the number of degrees of freedom of the track fit.
 
-.. note:: 
+.. note::
 
         Note that this is not simply the number of hits -5 due to outlier hit
         rejection.
@@ -531,9 +569,9 @@ mdst files processed with basf2 versions older than ``release-05-01``.
     )DOC");
     REGISTER_VARIABLE("chi2",      trackChi2, R"DOC(
 Returns the :math:`\chi^2` of the track fit.  This is actually computed based on
-:b2:var:`pValue` and :b2:var:`ndf`. 
+:b2:var:`pValue` and :b2:var:`ndf`.
 
-.. note:: Note that for :b2:var:`pValue` exactly equal to 0 it returns infinity. 
+.. note:: Note that for :b2:var:`pValue` exactly equal to 0 it returns infinity.
 
 Returns NaN if called for something other than a track-based particle, or for
 mdst files processed with basf2 versions older than ``release-05-01``.
@@ -548,7 +586,7 @@ mdst files processed with basf2 versions older than ``release-05-01``.
                       "The last CDC layer associated to the track. Returns NaN if called for something other than a track-based particle.");
     REGISTER_VARIABLE("d0", trackD0, R"DOC(
 Returns the tracking parameter :math:`d_0`, the signed distance to the
-point-of-closest-approach (POCA) in the :math:`r-\phi` plane. 
+point-of-closest-approach (POCA) in the :math:`r-\phi` plane.
 
 .. note::
 
@@ -598,14 +636,14 @@ Returns NaN if called for something other than a track-based particle.
     )DOC", "cm");
     REGISTER_VARIABLE("phi0Err", trackPhi0Error, R"DOC(
 Returns the uncertainty on :math:`\phi_0`, the angle of the transverse momentum
-in the :math:`r-\phi` plane. 
+in the :math:`r-\phi` plane.
 
 .. seealso:: :b2:var:`phi0`, :b2:var:`phi0Pull`
 
 Returns NaN if called for something other than a track-based particle.
     )DOC", "rad");
     REGISTER_VARIABLE("omegaErr", trackOmegaError, R"DOC(
-Returns the uncertainty on :math:`\omega`, the curvature of the track. 
+Returns the uncertainty on :math:`\omega`, the curvature of the track.
 
 .. seealso:: :b2:var:`omega`, :b2:var:`omegaPull`
 
@@ -613,7 +651,7 @@ Returns NaN if called for something other than a track-based particle.
     )DOC", ":math:`\\text{cm}^{-1}`");
     REGISTER_VARIABLE("z0Err", trackZ0Error, R"DOC(
 Returns the uncertainty on :math:`z_0`, the z-coordinate of the
-point-of-closest-approach (POCA). 
+point-of-closest-approach (POCA).
 
 .. seealso:: :b2:var:`z0`, :b2:var:`z0Pull`
 
@@ -627,6 +665,23 @@ Returns the uncertainty on :math:`\tan\lambda`, the slope of the track in the
 
 Returns NaN if called for something other than a track-based particle.
     )DOC");
+    REGISTER_VARIABLE("trackFitCovariance(i, j)", trackFitCovariance, R"DOC(
+      The track fit covariance matrix element corresponding to the two indices is returned.
+      This is the association between integers and parameters:
+
+      * 0: :math:`d_0`
+      * 1: :math:`\phi_0`
+      * 2: :math:`\omega`
+      * 3: :math:`z_0`
+      * 4: :math:`\tan\lambda`
+
+      .. note::
+
+              The covariance is returned. This means that the return value can be negative.
+              Furthermore, it's the squared value of the track fit error variables :b2:var:`d0Err`, etc.
+              when selecting the diagonal entries.
+
+      )DOC");
     REGISTER_VARIABLE("pValue", trackPValue, R"DOC(
 The :math:`\chi^2` probability of the **track** fit.
 
@@ -641,7 +696,7 @@ The :math:`\chi^2` probability of the **track** fit.
 Returns NaN if called for something other than a track-based particle.
     )DOC");
     REGISTER_VARIABLE("trackFitHypothesisPDG", trackFitHypothesisPDG, R"DOC(
-Returns the PDG code of the track hypothesis actually used for the fit. 
+Returns the PDG code of the track hypothesis actually used for the fit.
 Returns NaN if called for something other than a track-based particle.
     )DOC");
     REGISTER_VARIABLE("trackNECLClusters", trackNECLClusters, R"DOC(
@@ -667,10 +722,12 @@ always 0 or 1 with newer versions of ECL reconstruction.
 
 Returns NaN if called for something other than a track-based particle.
     )DOC");
-    REGISTER_VARIABLE("helixExtTheta", trackHelixExtTheta,
-                      "Returns theta of extrapolated helix parameters (parameters (in cm): radius, z fwd, z bwd)", "rad");
-    REGISTER_VARIABLE("helixExtPhi", trackHelixExtPhi,
-                      "Returns phi of extrapolated helix parameters (parameters (in cm): radius, z fwd, z bwd)", "rad");
+    REGISTER_VARIABLE("helixExtTheta(radius [cm], z fwd [cm], z bwd [cm], useHighestProbMass=0)", trackHelixExtTheta,
+                      "Returns theta of extrapolated helix parameters. If ``useHighestProbMass=1`` is set, the extrapolation will use the track fit result for the mass hypothesis with the highest pValue.",
+                      "rad");
+    REGISTER_VARIABLE("helixExtPhi(radius, z fwd, z bwd, useHighestProbMass=0)", trackHelixExtPhi,
+                      "Returns phi of extrapolated helix parameters. If ``useHighestProbMass=1`` is set, the extrapolation will use the track fit result for the mass hypothesis with the highest pValue.",
+                      "rad");
 
     REGISTER_VARIABLE("nExtraCDCHits", nExtraCDCHits, R"DOC(
 [Eventbased] The number of CDC hits in the event not assigned to any track.
@@ -714,5 +771,16 @@ there was a track in the event missed by the tracking, or the track finding was
 
 Returns NaN if there is no event-level tracking information available.
     )DOC");
+
+    REGISTER_VARIABLE("isTrackFlippedAndRefitted", isTrackFlippedAndRefitted, R"DOC(
+Returns 1 if the charged final state particle comes from a track that has been flipped and refitted
+at the end of the reconstruction chain, in particular after the outer detector reconstruction.
+    )DOC");
+
+    REGISTER_VARIABLE("trackTime", getTrackTime, R"DOC(
+Returns the track time, computed as the difference 
+between the average of the SVD clusters time associated to the track and the SVD event T0.
+Return NaN if SVD eventT0 is NaN, or if no SVD Hits are attached to the track.
+    )DOC", "ns");
   }
 }

@@ -11,7 +11,6 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -31,8 +30,8 @@ void SVDResultVarSet::initialize()
 
 bool SVDResultVarSet::extract(const CKFToSVDResult* result)
 {
-  const TVector3& resultMomentum = result->getMomentum();
-  var<named("pt")>() = resultMomentum.Pt();
+  const ROOT::Math::XYZVector& resultMomentum = result->getMomentum();
+  var<named("pt")>() = resultMomentum.Rho();
   var<named("theta")>() = resultMomentum.Theta();
 
   const std::vector<const SpacePoint*>& spacePoints = result->getHits();

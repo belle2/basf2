@@ -226,11 +226,11 @@ namespace Belle2 {
     }
 
     prob = chargeProb * timeProb * sizeProb * clusters[0]->getQuality() * clusters[1]->getQuality();
-    error = prob * sqrt(pow(timeProb * sizeProb * clusters[0]->getQuality() * clusters[1]->getQuality() * chargeProbError , 2) +
-                        pow(chargeProb * sizeProb * clusters[0]->getQuality() * clusters[1]->getQuality() * timeProbError , 2) +
-                        pow(chargeProb * timeProb * clusters[0]->getQuality() * clusters[1]->getQuality() * sizeProbError , 2) +
-                        pow(chargeProb * timeProb * sizeProb * clusters[1]->getQuality() * clusters[0]->getQualityError() , 2) +
-                        pow(chargeProb * timeProb * sizeProb * clusters[0]->getQuality() * clusters[1]->getQualityError() , 2));
+    error = prob * sqrt(pow(timeProb * sizeProb * clusters[0]->getQuality() * clusters[1]->getQuality() * chargeProbError, 2) +
+                        pow(chargeProb * sizeProb * clusters[0]->getQuality() * clusters[1]->getQuality() * timeProbError, 2) +
+                        pow(chargeProb * timeProb * clusters[0]->getQuality() * clusters[1]->getQuality() * sizeProbError, 2) +
+                        pow(chargeProb * timeProb * sizeProb * clusters[1]->getQuality() * clusters[0]->getQualityError(), 2) +
+                        pow(chargeProb * timeProb * sizeProb * clusters[0]->getQuality() * clusters[1]->getQualityError(), 2));
   }
 
   /** finds all possible combinations of U and V Clusters for SVDClusters.

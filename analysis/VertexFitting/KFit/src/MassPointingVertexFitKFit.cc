@@ -9,6 +9,7 @@
 #include <analysis/VertexFitting/KFit/MakeMotherKFit.h>
 #include <analysis/VertexFitting/KFit/MassPointingVertexFitKFit.h>
 #include <analysis/utility/CLHEPToROOT.h>
+#include <framework/gearbox/Const.h>
 
 using namespace std;
 using namespace Belle2;
@@ -244,8 +245,7 @@ MassPointingVertexFitKFit::prepareInputMatrix() {
     // charge, mass, a
     m_property[index][0] =  track.getCharge();
     m_property[index][1] =  track.getMass();
-    const double c = KFitConst::kLightSpeed; // C++ bug?
-    // m_property[index][2] = - it->getCharge() * KFitConst::kLightSpeed * m_MagneticField;
+    const double c = Belle2::Const::speedOfLight * 1e-4;
     m_property[index][2] = -c * m_MagneticField * track.getCharge();
     index++;
   }
@@ -343,17 +343,17 @@ MassPointingVertexFitKFit::prepareOutputMatrix() {
       pdata.setMomentum(HepLorentzVector(h3v, m_al_1[index * KFitConst::kNumber7 + 3][0]), KFitConst::kAfterFit);
     // position
     pdata.setPosition(HepPoint3D(
-      m_al_1[index * KFitConst::kNumber7 + 4][0],
-      m_al_1[index * KFitConst::kNumber7 + 5][0],
-      m_al_1[index * KFitConst::kNumber7 + 6][0]), KFitConst::kAfterFit);
+                        m_al_1[index * KFitConst::kNumber7 + 4][0],
+                        m_al_1[index * KFitConst::kNumber7 + 5][0],
+                        m_al_1[index * KFitConst::kNumber7 + 6][0]), KFitConst::kAfterFit);
     // error of the tracks
     pdata.setError(this->makeError3(pdata.getMomentum(),
-    m_V_al_1.sub(
-      index    * KFitConst::kNumber7 + 1,
-      (index + 1)*KFitConst::kNumber7,
-      index    * KFitConst::kNumber7 + 1,
-      (index + 1)*KFitConst::kNumber7), m_IsFixMass[index]),
-    KFitConst::kAfterFit);
+                                    m_V_al_1.sub(
+                                      index    * KFitConst::kNumber7 + 1,
+                                      (index + 1)*KFitConst::kNumber7,
+                                      index    * KFitConst::kNumber7 + 1,
+                                      (index + 1)*KFitConst::kNumber7), m_IsFixMass[index]),
+                   KFitConst::kAfterFit);
     if (m_ErrorCode != KFitError::kNoError) break;
     index++;
   }
@@ -398,9 +398,9 @@ MassPointingVertexFitKFit::makeCoreMatrix() {
     al_1_prime[i * KFitConst::kNumber7 + 0][0] -= a * (m_v_a[1][0] - al_1_prime[i * KFitConst::kNumber7 + 5][0]);
     al_1_prime[i * KFitConst::kNumber7 + 1][0] += a * (m_v_a[0][0] - al_1_prime[i * KFitConst::kNumber7 + 4][0]);
     energy[i] = sqrt(al_1_prime[i * KFitConst::kNumber7 + 0][0] * al_1_prime[i * KFitConst::kNumber7 + 0][0] +
-    al_1_prime[i * KFitConst::kNumber7 + 1][0] * al_1_prime[i * KFitConst::kNumber7 + 1][0] +
-    al_1_prime[i * KFitConst::kNumber7 + 2][0] * al_1_prime[i * KFitConst::kNumber7 + 2][0] +
-    m_property[i][1] * m_property[i][1]);
+                     al_1_prime[i * KFitConst::kNumber7 + 1][0] * al_1_prime[i * KFitConst::kNumber7 + 1][0] +
+                     al_1_prime[i * KFitConst::kNumber7 + 2][0] * al_1_prime[i * KFitConst::kNumber7 + 2][0] +
+                     m_property[i][1] * m_property[i][1]);
   }
 
   for (int i = 0; i < m_TrackCount; i++)
@@ -414,8 +414,8 @@ MassPointingVertexFitKFit::makeCoreMatrix() {
   }
 
   double vtx = sqrt((m_v_a[0][0] - m_ProductionVertex.x()) * (m_v_a[0][0] - m_ProductionVertex.x())
-  + (m_v_a[1][0] - m_ProductionVertex.y()) * (m_v_a[1][0] - m_ProductionVertex.y())
-  + (m_v_a[2][0] - m_ProductionVertex.z()) * (m_v_a[2][0] - m_ProductionVertex.z()));
+                    + (m_v_a[1][0] - m_ProductionVertex.y()) * (m_v_a[1][0] - m_ProductionVertex.y())
+                    + (m_v_a[2][0] - m_ProductionVertex.z()) * (m_v_a[2][0] - m_ProductionVertex.z()));
   double vtxpt2 = (m_ProductionVertex.x() - m_v_a[0][0]) * (m_ProductionVertex.x() - m_v_a[0][0]) + (m_ProductionVertex.y() - m_v_a[1][0]) * (m_ProductionVertex.y() - m_v_a[1][0]);
   double mom = sqrt(Sum_al_1[0][0] * Sum_al_1[0][0] + Sum_al_1[1][0] * Sum_al_1[1][0] + Sum_al_1[2][0] * Sum_al_1[2][0]);
   double Pt2 = Sum_al_1[0][0] * Sum_al_1[0][0] + Sum_al_1[1][0] * Sum_al_1[1][0];
@@ -625,8 +625,8 @@ enum KFitError::ECode MassPointingVertexFitKFit::updateMother(Particle* mother)
   mother->addExtraInfo("ndf", ndf);
   mother->addExtraInfo("chiSquared", chi2);
   mother->updateMomentum(
-    CLHEPToROOT::getTLorentzVector(kmm.getMotherMomentum()),
-    CLHEPToROOT::getTVector3(kmm.getMotherPosition()),
+    CLHEPToROOT::getLorentzVector(kmm.getMotherMomentum()),
+    CLHEPToROOT::getXYZVector(kmm.getMotherPosition()),
     CLHEPToROOT::getTMatrixFSym(kmm.getMotherError()),
     prob);
   m_ErrorCode = KFitError::kNoError;

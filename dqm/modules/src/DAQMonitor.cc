@@ -18,7 +18,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(DAQMonitor)
+REG_MODULE(DAQMonitor);
 
 DAQMonitorModule::DAQMonitorModule() : HistoModule()
 {

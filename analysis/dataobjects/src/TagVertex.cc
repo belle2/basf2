@@ -11,9 +11,9 @@
 using namespace Belle2;
 
 static const double realNaN = std::numeric_limits<double>::quiet_NaN();
-static const TVector3 vecNaN(realNaN, realNaN, realNaN);
+static const B2Vector3D vecNaN(realNaN, realNaN, realNaN);
 
-TVector3 TagVertex::getTagVertex() const
+B2Vector3D TagVertex::getTagVertex() const
 {
   return m_tagVertex;
 }
@@ -52,7 +52,7 @@ float TagVertex::getDeltaTErr() const
   return m_deltaTErr;
 }
 
-TVector3 TagVertex::getMCTagVertex() const
+B2Vector3D TagVertex::getMCTagVertex() const
 {
   return m_mcTagV;
 }
@@ -82,7 +82,7 @@ std::string TagVertex::getConstraintType() const
   return m_constraintType;
 }
 
-TVector3 TagVertex::getConstraintCenter() const
+B2Vector3D TagVertex::getConstraintCenter() const
 {
   if (m_constraintType == "noConstraint") return vecNaN;
   return m_constraintCenter;
@@ -148,23 +148,10 @@ float TagVertex::getTagVChi2IP() const
   return m_tagVChi2IP;
 }
 
-TVector3 TagVertex::getVtxFitTrackPosition(unsigned int trackIndex) const
+ROOT::Math::XYZVector TagVertex::getVtxFitTrackP(unsigned int trackIndex) const
 {
-  if (m_vtxFitParticles.size() <= trackIndex) return vecNaN;
-  return m_vtxFitParticles.at(trackIndex)->getTrackFitResult()->getPosition();
-}
-
-
-TVector3 TagVertex::getVtxFitTrackP(unsigned int trackIndex) const
-{
-  if (m_vtxFitParticles.size() <= trackIndex) return vecNaN;
+  if (m_vtxFitParticles.size() <= trackIndex) return ROOT::Math::XYZVector(realNaN, realNaN, realNaN);
   return m_vtxFitParticles.at(trackIndex)->getMomentum();
-}
-
-double TagVertex::getVtxFitTrackPComponent(unsigned int trackIndex, unsigned int component) const
-{
-  if (m_vtxFitParticles.size() <= trackIndex || component > 2) return realNaN;
-  return m_vtxFitParticles.at(trackIndex)->getMomentum()[component];
 }
 
 double TagVertex::getVtxFitTrackZ0(unsigned int trackIndex) const
@@ -195,7 +182,7 @@ int TagVertex::getRollBackStatus() const
   return m_rollbackStatus;
 }
 
-void TagVertex::setTagVertex(const TVector3& tagVertex)
+void TagVertex::setTagVertex(const B2Vector3D& tagVertex)
 {
   m_tagVertex = tagVertex;
 }
@@ -220,7 +207,7 @@ void TagVertex::setDeltaTErr(float DeltaTErr)
   m_deltaTErr = DeltaTErr;
 }
 
-void TagVertex::setMCTagVertex(const TVector3& mcTagVertex)
+void TagVertex::setMCTagVertex(const B2Vector3D& mcTagVertex)
 {
   m_mcTagV = mcTagVertex;
 }
@@ -311,7 +298,7 @@ void TagVertex::setRaveWeights(const std::vector<double>& raveWeights)
   m_raveWeights = raveWeights;
 }
 
-void TagVertex::setConstraintCenter(const TVector3& constraintCenter)
+void TagVertex::setConstraintCenter(const B2Vector3D& constraintCenter)
 {
   m_constraintCenter = constraintCenter;
 }

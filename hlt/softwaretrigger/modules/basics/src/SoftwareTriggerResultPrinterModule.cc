@@ -21,7 +21,7 @@
 using namespace Belle2;
 using namespace SoftwareTrigger;
 
-REG_MODULE(SoftwareTriggerResultPrinter)
+REG_MODULE(SoftwareTriggerResultPrinter);
 
 
 SoftwareTriggerResultPrinterModule::SoftwareTriggerResultPrinterModule()
@@ -84,6 +84,7 @@ void SoftwareTriggerResultPrinterModule::terminate()
   accepted = false;
   counter = 0;
   for (auto& cutResult : m_passedEventsPerTrigger) {
+    // cppcheck-suppress unreadVariable
     value[counter] = static_cast<double>(cutResult.second[SoftwareTriggerCutResult::c_reject]);
     counter++;
   }
@@ -99,8 +100,10 @@ void SoftwareTriggerResultPrinterModule::terminate()
   for (auto& cutResult : m_passedEventsPerTrigger) {
     const auto& cutName = cutResult.first;
     if (m_passedEventsPerTriggerNonPrescaled.find(cutName) == m_passedEventsPerTriggerNonPrescaled.end()) {
+      // cppcheck-suppress unreadVariable
       value[counter] = NAN;
     } else {
+      // cppcheck-suppress unreadVariable
       value[counter] = static_cast<double>(m_passedEventsPerTriggerNonPrescaled[cutName][SoftwareTriggerCutResult::c_accept]);
     }
     counter++;
@@ -117,8 +120,10 @@ void SoftwareTriggerResultPrinterModule::terminate()
   for (auto& cutResult : m_passedEventsPerTrigger) {
     const auto& cutName = cutResult.first;
     if (m_passedEventsPerTriggerNonPrescaled.find(cutName) == m_passedEventsPerTriggerNonPrescaled.end()) {
+      // cppcheck-suppress unreadVariable
       value[counter] = NAN;
     } else {
+      // cppcheck-suppress unreadVariable
       value[counter] = static_cast<double>(m_passedEventsPerTriggerNonPrescaled[cutName][SoftwareTriggerCutResult::c_reject]);
     }
     counter++;
@@ -135,8 +140,10 @@ void SoftwareTriggerResultPrinterModule::terminate()
   for (auto& cutResult : m_passedEventsPerTrigger) {
     const auto& cutName = cutResult.first;
     if (m_prescales.find(cutName) == m_prescales.end()) {
+      // cppcheck-suppress unreadVariable
       value[counter] = NAN;
     } else {
+      // cppcheck-suppress unreadVariable
       value[counter] = static_cast<double>(m_prescales[cutName]);
     }
     counter++;

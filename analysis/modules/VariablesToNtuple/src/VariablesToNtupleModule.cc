@@ -12,6 +12,7 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/VariableManager/Utility.h>
+#include <analysis/dataobjects/StringWrapper.h>
 
 // framework
 #include <framework/logging/Logger.h>
@@ -28,14 +29,14 @@ using namespace std;
 using namespace Belle2;
 
 // Register module in the framework
-REG_MODULE(VariablesToNtuple)
+REG_MODULE(VariablesToNtuple);
 
 
 VariablesToNtupleModule::VariablesToNtupleModule() :
   Module(), m_tree("", DataStore::c_Persistent)
 {
   //Set module properties
-  setDescription("Calculate variables specified by the user for a given ParticleList and save them into a TNtuple. The TNtuple is candidate-based, meaning that the variables of each candidate are saved separate rows.");
+  setDescription("Calculate variables specified by the user for a given ParticleList and save them into a TNtuple. The TNtuple is candidate-based, meaning that the variables of each candidate are saved into separate rows.");
   setPropertyFlags(c_ParallelProcessingCertified | c_TerminateInAllProcesses);
 
   vector<string> emptylist;
@@ -48,11 +49,17 @@ VariablesToNtupleModule::VariablesToNtupleModule() :
 
   addParam("fileName", m_fileName, "Name of ROOT file for output.", string("VariablesToNtuple.root"));
   addParam("treeName", m_treeName, "Name of the NTuple in the saved file.", string("ntuple"));
+  addParam("basketSize", m_basketsize, "Size of baskets in Output NTuple in bytes.", 1600);
 
   std::tuple<std::string, std::map<int, unsigned int>> default_sampling{"", {}};
   addParam("sampling", m_sampling,
            "Tuple of variable name and a map of integer values and inverse sampling rate. E.g. (signal, {1: 0, 0:10}) selects all signal candidates and every 10th background candidate.",
            default_sampling);
+
+  addParam("signalSideParticleList", m_signalSideParticleList,
+           "Name of signal-side particle list to store the index of the signal-side particle when one calls the module in a for_each loop over the RestOfEvent",
+           std::string(""));
+
 }
 
 void VariablesToNtupleModule::initialize()
@@ -60,7 +67,6 @@ void VariablesToNtupleModule::initialize()
   m_eventMetaData.isRequired();
   if (not m_particleList.empty())
     StoreObjPtr<ParticleList>().isRequired(m_particleList);
-
 
   // Initializing the output root file
   if (m_fileName.empty()) {
@@ -101,12 +107,26 @@ void VariablesToNtupleModule::initialize()
   // declare counter branches - pass through variable list, remove counters added by user
   m_tree->get().Branch("__experiment__", &m_experiment, "__experiment__/I");
   m_tree->get().Branch("__run__", &m_run, "__run__/I");
-  m_tree->get().Branch("__event__", &m_event, "__event__/I");
+  m_tree->get().Branch("__event__", &m_event, "__event__/i");
   m_tree->get().Branch("__production__", &m_production, "__production__/I");
   if (not m_particleList.empty()) {
     m_tree->get().Branch("__candidate__", &m_candidate, "__candidate__/I");
     m_tree->get().Branch("__ncandidates__", &m_ncandidates, "__ncandidates__/I");
   }
+
+  if (not m_signalSideParticleList.empty()) {
+    StoreObjPtr<ParticleList>().isRequired(m_signalSideParticleList);
+    m_tree->get().Branch("__signalSideCandidate__", &m_signalSideCandidate, "__signalSideCandidate__/I");
+    m_tree->get().Branch("__nSignalSideCandidates__", &m_nSignalSideCandidates, "__nSignalSideCandidates__/I");
+    if (not m_roe.isOptional("RestOfEvent")) {
+      B2WARNING("The signalSideParticleList is set outside of a for_each loop over the RestOfEvent. "
+                << "__signalSideCandidates__ and __nSignalSideCandidate__ will be always -1 and 0, respectively.");
+    }
+  }
+
+  if (m_stringWrapper.isOptional("MCDecayString"))
+    m_tree->get().Branch("__MCDecayString__", &m_MCDecayString);
+
   for (const auto& variable : m_variables)
     if (Variable::isCounterVariable(variable)) {
       B2WARNING("The counter '" << variable
@@ -115,6 +135,15 @@ void VariablesToNtupleModule::initialize()
 
   // declare branches and get the variable strings
   m_variables = Variable::Manager::Instance().resolveCollections(m_variables);
+  // remove duplicates from list of variables but keep the previous order
+  unordered_set<string> seen;
+  auto newEnd = remove_if(m_variables.begin(), m_variables.end(), [&seen](const string & varStr) {
+    if (seen.find(varStr) != std::end(seen)) return true;
+    seen.insert(varStr);
+    return false;
+  });
+  m_variables.erase(newEnd, m_variables.end());
+
   m_branchAddressesDouble.resize(m_variables.size() + 1);
   m_branchAddressesInt.resize(m_variables.size() + 1);
   m_tree->get().Branch("__weight__", &m_branchAddressesDouble[0], "__weight__/D");
@@ -149,7 +178,7 @@ void VariablesToNtupleModule::initialize()
     }
     enumerate++;
   }
-  m_tree->get().SetBasketSize("*", 1600);
+  m_tree->get().SetBasketSize("*", m_basketsize);
 
   m_sampling_name = std::get<0>(m_sampling);
   m_sampling_rates = std::get<1>(m_sampling);
@@ -198,6 +227,23 @@ void VariablesToNtupleModule::event()
   m_run = m_eventMetaData->getRun();
   m_experiment = m_eventMetaData->getExperiment();
   m_production = m_eventMetaData->getProduction();
+
+  if (m_stringWrapper.isValid())
+    m_MCDecayString = m_stringWrapper->getString();
+  else
+    m_MCDecayString = "";
+
+  if (not m_signalSideParticleList.empty()) {
+    if (m_roe.isValid()) {
+      StoreObjPtr<ParticleList> signaSideParticleList(m_signalSideParticleList);
+      auto signal = m_roe->getRelatedFrom<Particle>();
+      m_signalSideCandidate = signaSideParticleList->getIndex(signal);
+      m_nSignalSideCandidates = signaSideParticleList->getListSize();
+    } else {
+      m_signalSideCandidate = -1;
+      m_nSignalSideCandidates = 0;
+    }
+  }
 
   if (m_particleList.empty()) {
     m_branchAddressesDouble[0] = getInverseSamplingRateWeight(nullptr);

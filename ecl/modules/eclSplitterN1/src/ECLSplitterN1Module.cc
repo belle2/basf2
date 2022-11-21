@@ -43,8 +43,8 @@ using namespace ECL;
 //-----------------------------------------------------------------
 //                 Register the Module(s)
 //-----------------------------------------------------------------
-REG_MODULE(ECLSplitterN1)
-REG_MODULE(ECLSplitterN1PureCsI)
+REG_MODULE(ECLSplitterN1);
+REG_MODULE(ECLSplitterN1PureCsI);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -567,9 +567,9 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
           centroidShiftAverage += centroidShift.Mag();
 
           // Debugging output
-          B2DEBUG(175, "   old centroid: " << oldCentroidPos.x() << " cm, " <<  oldCentroidPos.y() << " cm, " <<  oldCentroidPos.z() <<
+          B2DEBUG(175, "   old centroid: " << oldCentroidPos.X() << " cm, " <<  oldCentroidPos.Y() << " cm, " <<  oldCentroidPos.Z() <<
                   "cm");
-          B2DEBUG(175, "   new centroid: " << newCentroidPos.x() << " cm, " <<  newCentroidPos.y() << " cm, " <<  newCentroidPos.z() <<
+          B2DEBUG(175, "   new centroid: " << newCentroidPos.X() << " cm, " <<  newCentroidPos.Y() << " cm, " <<  newCentroidPos.Z() <<
                   "cm");
           B2DEBUG(175, "   centroid shift: " << centroidShift.Mag() << " cm");
 

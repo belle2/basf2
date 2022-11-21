@@ -40,7 +40,7 @@ namespace Belle2 {
 
     public:
       /// Constructor using the given maximal level.
-      SimpleHitBasedHoughTree(size_t maxLevel, float curlCurv = NAN) :
+      explicit SimpleHitBasedHoughTree(size_t maxLevel, float curlCurv = NAN) :
         Super(maxLevel),
         m_curlCurv(curlCurv),
         m_stereoHitContainedInBox(curlCurv)

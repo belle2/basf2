@@ -46,6 +46,9 @@ namespace Belle2 {
     /// Constructor for track segments.
     TRGCDCLayer(unsigned id, const TRGCDCCell& w);
 
+    /// Empty constructor for reduced CDC.
+    TRGCDCLayer();
+
     /// Destructor
     virtual ~TRGCDCLayer();
 

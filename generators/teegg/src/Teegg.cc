@@ -15,7 +15,8 @@
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <TDatabasePDG.h>
-#include <TLorentzVector.h>
+#include <Math/Vector4D.h>
+#include <TMath.h>
 #include <TRandom3.h>
 
 using namespace std;
@@ -53,7 +54,7 @@ extern "C" {
 
 
   /** Replace internal random generator with the framework random generator */
-  void teegg_rndmarr_(double* drvec, int* lengt)
+  void teegg_rndmarr_(double* drvec, const int* lengt)
   {
     for (int i = 0; i < *lengt; ++i) {
       double rr = gRandom->Rndm();
@@ -71,7 +72,7 @@ extern "C" {
   void teeggm_(int* mode, double* xpar, int* npar);
 
   /** Callback to show warning */
-  void teegg_warning_generic_(double* weight, double* max)
+  void teegg_warning_generic_(const double* weight, const double* max)
   {
     B2WARNING("TEEGG: Maximum weight " << *max  << " to small, increase fmax to at least " << *weight);
   }
@@ -155,7 +156,7 @@ void Teegg::init()
 }
 
 
-void Teegg::generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, TLorentzRotation boost)
+void Teegg::generateEvent(MCParticleGraph& mcGraph, ROOT::Math::XYZVector vertex, ROOT::Math::LorentzRotation boost)
 {
   //Generate event
   int mode = 1;
@@ -277,7 +278,8 @@ void Teegg::applySettings()
 }
 
 
-void Teegg::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, TVector3 vertex, TLorentzRotation boost,
+void Teegg::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, ROOT::Math::XYZVector vertex,
+                          ROOT::Math::LorentzRotation boost,
                           bool isVirtual, bool isInitial)
 {
   // Create particle
@@ -303,19 +305,19 @@ void Teegg::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, 
   part.setPDG(pdg);
   part.setFirstDaughter(0);
   part.setLastDaughter(0);
-  part.setMomentum(TVector3(mom[0], mom[1], mom[2]));
+  part.setMomentum(ROOT::Math::XYZVector(mom[0], mom[1], mom[2]));
   part.setMass(TDatabasePDG::Instance()->GetParticle(pdg)->Mass());
   part.setEnergy(mom[3]);
 
   //boost
-  TLorentzVector p4 = part.get4Vector();
+  ROOT::Math::PxPyPzEVector p4 = part.get4Vector();
   p4.SetPz(-1.0 * p4.Pz()); //TEEGG uses other direction convention
   p4 = boost * p4;
   part.set4Vector(p4);
 
   //set vertex
   if (!isInitial) {
-    TVector3 v3 = part.getProductionVertex();
+    ROOT::Math::XYZVector v3 = part.getProductionVertex();
     v3 = v3 + vertex;
     part.setProductionVertex(v3);
     part.setValidVertex(true);

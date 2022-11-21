@@ -30,9 +30,9 @@ namespace Belle2 {
       //--------------------------
       /*  CDCGeometryPar& cdcgp = CDCGeometryPar::Instance();
       TVector3 tfwp = cdcgp.wireForwardPosition(layerId, cellId);
-      G4ThreeVector fwp(tfwp.x(), tfwp.y(), tfwp.z());
+      G4ThreeVector fwp(tfwp.X(), tfwp.Y(), tfwp.Z());
       TVector3 tbwp = cdcgp.wireBackwardPosition(layerId, cellId);
-      G4ThreeVector bwp(tbwp.x(), tbwp.y(), tbwp.z());
+      G4ThreeVector bwp(tbwp.X(), tbwp.Y(), tbwp.Z());
       */
 
       TVector3 wireLine = fwp - bwp;

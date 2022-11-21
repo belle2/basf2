@@ -16,7 +16,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(DQMHistAnalysisEpicsExample)
+REG_MODULE(DQMHistAnalysisEpicsExample);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -113,7 +113,7 @@ void DQMHistAnalysisEpicsExampleModule::beginRun()
   m_c1->Clear();
 
   TH1* hh1;
-  hh1 = findHist(m_histoname.c_str());
+  hh1 = findHist(m_histoname);
 
   if (hh1 == NULL) {
     B2DEBUG(20, "Histo " << m_histoname << " not in memfile");
@@ -163,7 +163,7 @@ void DQMHistAnalysisEpicsExampleModule::event()
   TH1* hh1;
   bool flag = false;
 
-  hh1 = findHist(m_histoname.c_str());
+  hh1 = findHist(m_histoname);
   if (hh1 == NULL) {
     B2DEBUG(20, "Histo " << m_histoname << " not in memfile");
     TDirectory* d = gROOT;

@@ -36,6 +36,7 @@ Use :ref:`add_tracking_reconstruction<tracking_addtrkreconstruction>` to append 
    trackFitting
    specials
    trackMatching
+   eventTimeExtraction
    pxdDataReduction
    calibration
    scripts
@@ -54,7 +55,6 @@ The tracking package includes the following sub-packages
    datastore
    dbobjects
    dqmUtils
-   eventTimeExtraction
    modules/*
    spacePointCreation
    svdROIFinder

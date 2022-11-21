@@ -31,7 +31,9 @@ settings = CalibrationSettings(name="ecl_leakage",
                                               "barrel_energies": [0.030, 0.050, 0.100, 0.200, 0.458, 1.049, 2.402, 5.500],
                                               "backward_energies": [0.030, 0.050, 0.100, 0.200, 0.428, 0.917, 1.962, 4.200],
                                               "lowEnergyThreshold": 0.,
-                                              "noNCrysThreshold": 0.}
+                                              "noNCrysThreshold": 0.,
+                                              "showerArrayName": "ECLShowers"
+                                              }
                                )
 
 
@@ -68,6 +70,9 @@ def get_calibrations(input_data, **kwargs):
 
     backward_energies = expert_config["backward_energies"]
     ecl_leakage_collector.param("energies_backward", backward_energies)
+
+    showerArrayName = expert_config["showerArrayName"]
+    ecl_leakage_collector.param("showerArrayName", showerArrayName)
 
     # ..Algorithm
     algo_leakage = Belle2.ECL.eclLeakageAlgorithm()

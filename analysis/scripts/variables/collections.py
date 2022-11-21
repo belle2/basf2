@@ -8,8 +8,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-from variables import utils
-
 #: Replacement for DeltaEMbc
 deltae_mbc = ["Mbc", "deltaE"]
 
@@ -366,10 +364,3 @@ belle_track_hit = [
     "BelleLastCDCHitY",
     "BelleLastCDCHitZ"
 ]
-
-# now register all the variables declared in this file as collections
-# TODO: this is still not optimal but better than before. Should we not just
-# get rid of the collections in the manager?
-for name, value in list(globals().items()):
-    if isinstance(value, list):
-        utils.add_collection(value, name)

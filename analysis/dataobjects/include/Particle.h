@@ -12,8 +12,8 @@
 #include <framework/gearbox/Const.h>
 #include <mdst/dataobjects/ECLCluster.h>
 
-#include <TVector3.h>
-#include <TLorentzVector.h>
+#include <Math/Vector3D.h>
+#include <Math/Vector4D.h>
 #include <TMatrixFSymfwd.h>
 
 #include <vector>
@@ -75,13 +75,14 @@ namespace Belle2 {
      * particle source enumerators
      */
     enum EParticleSourceObject {
-      c_Undefined  = 0,
-      c_Track      = 1,
-      c_ECLCluster = 2,
-      c_KLMCluster = 3,
-      c_V0         = 4,
-      c_MCParticle = 5,
-      c_Composite  = 6
+      c_Undefined     = 0,
+      c_Track         = 1,
+      c_ECLCluster    = 2,
+      c_KLMCluster    = 3,
+      c_V0            = 4,
+      c_MCParticle    = 5,
+      c_Composite     = 6,
+      c_NoMDSTSource  = 7
     };
 
     /** describes flavor type, see getFlavorType(). */
@@ -132,7 +133,7 @@ namespace Belle2 {
      * @param momentum Lorentz vector
      * @param pdgCode PDG code
      */
-    Particle(const TLorentzVector& momentum, const int pdgCode);
+    Particle(const ROOT::Math::PxPyPzEVector& momentum, const int pdgCode);
 
     /**
      * Constructor for final state particles.
@@ -143,7 +144,7 @@ namespace Belle2 {
      * @param particleType particle source
      * @param mdstIndex mdst index
      */
-    Particle(const TLorentzVector& momentum,
+    Particle(const ROOT::Math::PxPyPzEVector& momentum,
              const int pdgCode,
              EFlavorType flavorType,
              const EParticleSourceObject particleType,
@@ -158,7 +159,7 @@ namespace Belle2 {
      * @param daughterIndices indices of daughters in StoreArray<Particle>
      * @param arrayPointer pointer to store array which stores the daughters, if the particle itself is stored in the same array the pointer can be automatically determined
      */
-    Particle(const TLorentzVector& momentum,
+    Particle(const ROOT::Math::PxPyPzEVector& momentum,
              const int pdgCode,
              EFlavorType flavorType,
              const std::vector<int>& daughterIndices,
@@ -174,7 +175,7 @@ namespace Belle2 {
      * @param properties particle property
      * @param arrayPointer pointer to store array which stores the daughters, if the particle itself is stored in the same array the pointer can be automatically determined
      */
-    Particle(const TLorentzVector& momentum,
+    Particle(const ROOT::Math::PxPyPzEVector& momentum,
              const int pdgCode,
              EFlavorType flavorType,
              const std::vector<int>& daughterIndices,
@@ -192,7 +193,7 @@ namespace Belle2 {
      * @param daughterProperties daughter particle properties
      * @param arrayPointer pointer to store array which stores the daughters, if the particle itself is stored in the same array the pointer can be automatically determined
      */
-    Particle(const TLorentzVector& momentum,
+    Particle(const ROOT::Math::PxPyPzEVector& momentum,
              const int pdgCode,
              EFlavorType flavorType,
              const std::vector<int>& daughterIndices,
@@ -269,7 +270,7 @@ namespace Belle2 {
      * Sets Lorentz vector
      * @param p4 Lorentz vector
      */
-    void set4Vector(const TLorentzVector& p4)
+    void set4Vector(const ROOT::Math::PxPyPzEVector& p4)
     {
       m_px = p4.Px();
       m_py = p4.Py();
@@ -278,10 +279,22 @@ namespace Belle2 {
     }
 
     /**
+     * Sets Lorentz vector dividing by the momentum scaling factor
+     * @param p4 Lorentz vector
+     */
+    void set4VectorDividingByMomentumScaling(const ROOT::Math::PxPyPzEVector& p4)
+    {
+      m_px = p4.Px() / m_momentumScale;
+      m_py = p4.Py() / m_momentumScale;
+      m_pz = p4.Pz() / m_momentumScale;
+      m_mass = p4.M();
+    }
+
+    /**
      * Sets position (decay vertex)
      * @param vertex position
      */
-    void setVertex(const TVector3& vertex)
+    void setVertex(const ROOT::Math::XYZVector& vertex)
     {
       m_x = vertex.X();
       m_y = vertex.Y();
@@ -292,9 +305,20 @@ namespace Belle2 {
      * Sets momentum scaling
      * @param momentumScalingFactor scaling factor
      */
-    void setMomentumScalingFactor(float momentumScalingFactor)
+    void setMomentumScalingFactor(double momentumScalingFactor)
     {
-      m_momentumScale = momentumScalingFactor;
+      m_momentumScalingFactor = momentumScalingFactor;
+      m_momentumScale = m_momentumScalingFactor * m_momentumSmearingFactor;
+    }
+
+    /**
+     * Sets momentum smearing
+     * @param momentumSmearingFactor scaling factor
+     */
+    void setMomentumSmearingFactor(double momentumSmearingFactor)
+    {
+      m_momentumSmearingFactor = momentumSmearingFactor;
+      m_momentumScale = m_momentumScalingFactor * m_momentumSmearingFactor;
     }
 
     /**
@@ -313,7 +337,7 @@ namespace Belle2 {
      * Sets chi^2 probability of fit
      * @param pValue p-value of fit
      */
-    void setPValue(float pValue)
+    void setPValue(double pValue)
     {
       m_pValue = pValue;
     }
@@ -333,10 +357,10 @@ namespace Belle2 {
      * @param errMatrix 7x7 momentum and vertex error matrix (order: px,py,pz,E,x,y,z)
      * @param pValue chi^2 probability of the fit
      */
-    void updateMomentum(const TLorentzVector& p4,
-                        const TVector3& vertex,
+    void updateMomentum(const ROOT::Math::PxPyPzEVector& p4,
+                        const ROOT::Math::XYZVector& vertex,
                         const TMatrixFSym& errMatrix,
-                        float pValue)
+                        double pValue)
     {
       set4Vector(p4);
       setVertex(vertex);
@@ -379,6 +403,21 @@ namespace Belle2 {
      */
     void removeDaughter(const Particle* daughter, const bool updateType = true);
 
+    /**
+     * Replace index of given daughter with new daughter, return true if a replacement is made
+     * @param oldDaughter pointer to the daughter that will be removed
+     * @param newDaughter pointer to the particle that will be added as a daughter
+     */
+    bool replaceDaughter(const Particle* oldDaughter, const Particle* newDaughter);
+
+    /**
+     * Apply replaceDaughter to all Particles in the decay tree by looping recursively through
+     * it, return true if a replacement is made
+     * @param oldDaughter pointer to the daughter that will be removed
+     * @param newDaughter pointer to the particle that will be added as a daughter
+     */
+    bool replaceDaughterRecursively(const Particle* oldDaughter, const Particle* newDaughter);
+
     // getters
 
     /**
@@ -394,7 +433,7 @@ namespace Belle2 {
      * Returns particle charge
      * @return particle charge in units of elementary charge
      */
-    float getCharge(void) const;
+    double getCharge(void) const;
 
     /**
      * Returns flavor type of the decay (for FS particles: flavor type of particle)
@@ -438,7 +477,7 @@ namespace Belle2 {
      * Returns invariant mass (= nominal for FS particles)
      * @return invariant mass
      */
-    float getMass() const
+    double getMass() const
     {
       return m_mass;
     }
@@ -448,19 +487,25 @@ namespace Belle2 {
      * (requires valid momentum error matrix)
      * @return mass error
      */
-    //float getMassError() const;
+    //double getMassError() const;
 
     /**
      * Returns particle nominal mass
      * @return nominal mass
      */
-    float getPDGMass(void) const;
+    double getPDGMass(void) const;
+
+    /**
+     * Returns particle nominal lifetime
+     * @return nominal lifetime [sec]
+     */
+    double getPDGLifetime() const;
 
     /**
      * Returns total energy
      * @return total energy
      */
-    float getEnergy() const
+    double getEnergy() const
     {
       return sqrt(m_momentumScale * m_momentumScale * m_px * m_px + m_momentumScale * m_momentumScale * m_py * m_py + m_momentumScale *
                   m_momentumScale * m_pz * m_pz + m_mass * m_mass);
@@ -470,27 +515,25 @@ namespace Belle2 {
      * Returns Lorentz vector
      * @return Lorentz vector
      */
-    TLorentzVector get4Vector() const
+    ROOT::Math::PxPyPzEVector get4Vector() const
     {
-      TLorentzVector vec;
-      vec.SetXYZM(m_momentumScale * m_px, m_momentumScale * m_py, m_momentumScale * m_pz, m_mass);
-      return vec;
+      return ROOT::Math::PxPyPzEVector(m_momentumScale * m_px, m_momentumScale * m_py, m_momentumScale * m_pz, getEnergy());
     }
 
     /**
      * Returns momentum vector
      * @return momentum vector
      */
-    TVector3 getMomentum() const
+    ROOT::Math::XYZVector getMomentum() const
     {
-      return m_momentumScale * TVector3(m_px, m_py, m_pz);
+      return m_momentumScale * ROOT::Math::XYZVector(m_px, m_py, m_pz);
     };
 
     /**
      * Returns momentum magnitude
      * @return momentum magnitude
      */
-    float getMomentumMagnitude() const
+    double getMomentumMagnitude() const
     {
       return m_momentumScale * sqrt(m_px * m_px + m_py * m_py + m_pz * m_pz);
     };
@@ -499,7 +542,7 @@ namespace Belle2 {
      * Returns momentum magnitude (same as getMomentumMagnitude but with shorter name)
      * @return momentum magnitude
      */
-    float getP() const
+    double getP() const
     {
       return m_momentumScale * sqrt(m_px * m_px + m_py * m_py + m_pz * m_pz);
     };
@@ -508,7 +551,7 @@ namespace Belle2 {
      * Returns x component of momentum
      * @return x component of momentum
      */
-    float getPx() const
+    double getPx() const
     {
       return m_momentumScale * m_px;
     }
@@ -517,7 +560,7 @@ namespace Belle2 {
      * Returns y component of momentum
      * @return y component of momentum
      */
-    float getPy() const
+    double getPy() const
     {
       return m_momentumScale * m_py;
     }
@@ -526,16 +569,16 @@ namespace Belle2 {
      * Returns z component of momentum
      * @return z component of momentum
      */
-    float getPz() const
+    double getPz() const
     {
       return m_momentumScale * m_pz;
     }
 
     /**
-     * Returns momentum scaling factor
+     * Returns effective momentum scale which is the product of the momentum scaling and smearing factors
      * @return momentum scaling factor
      */
-    float getMomentumScalingFactor() const
+    double getEffectiveMomentumScale() const
     {
       return m_momentumScale;
     }
@@ -544,16 +587,16 @@ namespace Belle2 {
      * Returns vertex position (POCA for charged, IP for neutral FS particles)
      * @return vertex position
      */
-    TVector3 getVertex() const
+    ROOT::Math::XYZVector getVertex() const
     {
-      return TVector3(m_x, m_y, m_z);
+      return ROOT::Math::XYZVector(m_x, m_y, m_z);
     };
 
     /**
      * Returns x component of vertex position
      * @return x component of vertex position
      */
-    float getX() const
+    double getX() const
     {
       return m_x;
     }
@@ -562,7 +605,7 @@ namespace Belle2 {
      * Returns y component of vertex position
      * @return y component of vertex position
      */
-    float getY() const
+    double getY() const
     {
       return m_y;
     }
@@ -571,7 +614,7 @@ namespace Belle2 {
      * Returns z component of vertex position
      * @return z component of vertex position
      */
-    float getZ() const
+    double getZ() const
     {
       return m_z;
     }
@@ -580,7 +623,7 @@ namespace Belle2 {
      * Returns chi^2 probability of fit if done or -1
      * @return p-value of fit (nan means no fit done)
      */
-    float getPValue() const
+    double getPValue() const
     {
       return m_pValue;
     }
@@ -612,7 +655,7 @@ namespace Belle2 {
      * @param mother mother particle, if not given the center of mass system is taken as mother frame
      * @return cosine of the helicity angle
      */
-    float getCosHelicity(const Particle* mother = nullptr) const;
+    double getCosHelicity(const Particle* mother = nullptr) const;
 
     /**
      * Returns cosine of the helicity angle of the given daughter defined by given grand daughter
@@ -620,14 +663,14 @@ namespace Belle2 {
      * @param iGrandDaughter 0-based index of grand daughter particle
      * @return cosine of the helicity angle
      */
-    float getCosHelicityDaughter(unsigned iDaughter, unsigned iGrandDaughter = 0) const;
+    double getCosHelicityDaughter(unsigned iDaughter, unsigned iGrandDaughter = 0) const;
 
     /**
      * Returns acoplanarity angle defined as the angle between the decay planes of the grand daughters in the particle's rest frame
      * This assumes that the particle and its daughters have two daughters each
      * @return acoplanarity angle
      */
-    float getAcoplanarity() const;
+    double getAcoplanarity() const;
 
 
     /**
@@ -694,6 +737,13 @@ namespace Belle2 {
      * @return vector of pointers to final state daughter particles
      */
     std::vector<const Belle2::Particle*> getFinalStateDaughters() const;
+    //Need namespace qualifier because ROOT CINT has troubles otherwise
+
+    /**
+     * Returns a vector of pointers to all generations' daughter particles
+     * @return vector of pointers to all generations' daughter particles
+     */
+    std::vector<const Belle2::Particle*> getAllDaughters() const;
     //Need namespace qualifier because ROOT CINT has troubles otherwise
 
     /**
@@ -821,7 +871,7 @@ namespace Belle2 {
      *
      * throws std::runtime_error if variable is not set.
      */
-    float getExtraInfo(const std::string& name) const;
+    double getExtraInfo(const std::string& name) const;
 
     /** Return whether the extra info with the given name is set. */
     bool hasExtraInfo(const std::string& name) const;
@@ -841,19 +891,19 @@ namespace Belle2 {
     /**
      * Sets the user defined extraInfo. Adds it if necessary, overwrites existing ones if they share the same name.
      * */
-    void writeExtraInfo(const std::string& name, const float value);
+    void writeExtraInfo(const std::string& name, const double value);
 
     /** Sets the user-defined data of given name to the given value.
      *
      * throws std::runtime_error if variable isn't set.
      */
-    void setExtraInfo(const std::string& name, float value);
+    void setExtraInfo(const std::string& name, double value);
 
     /** Sets the user-defined data of given name to the given value.
      *
      * throws std::runtime_error if variable is already set.
      */
-    void addExtraInfo(const std::string& name, float value);
+    void addExtraInfo(const std::string& name, double value);
 
     /** Returns the pointer to the store array which holds the daughter particles
      *
@@ -871,7 +921,7 @@ namespace Belle2 {
      * be different than the Particle's PDG id as not all mass hypothesis
      * are fitted during the reconstruction.
      */
-    int getPDGCodeUsedForFit()
+    int getPDGCodeUsedForFit() const
     {
       return std::abs(m_pdgCodeUsedForFit);
     }
@@ -888,8 +938,21 @@ namespace Belle2 {
 
     /**
      * Returns true if the (track-based) particle is created with its most likely mass hypothesis
+     * based on PID likelihood.
      */
     bool isMostLikely() const;
+
+    /**
+     * For a (track-based) particle, returns the charged stable mass hypothesis associated to the most probable TrackFitResult,
+     * and the TrackFitResult itself.
+     */
+    std::pair<Const::ChargedStable, const TrackFitResult*> getMostLikelyTrackFitResult() const;
+
+    /**
+     * Returns true if the (track-based) particle is created with its most likely mass hypothesis
+     * based on TrackFitResult.
+     */
+    bool isMostLikelyTrackFitResult() const;
 
     /**
     * Returns the ECLCluster EHypothesisBit for this Particle.
@@ -932,17 +995,19 @@ namespace Belle2 {
     // persistent data members
     int m_pdgCode;  /**< PDG code */
     int m_pdgCodeUsedForFit = 0; /**< PDG code used for the track fit */
-    float m_mass;   /**< particle (invariant) mass */
-    float m_px;     /**< momentum component x */
-    float m_py;     /**< momentum component y */
-    float m_pz;     /**< momentum component z */
-    float m_momentumScale = 1.0; /**< momentum scaling factor */
-    float m_x;      /**< position component x */
-    float m_y;      /**< position component y */
-    float m_z;      /**< position component z */
-    float m_errMatrix[c_SizeMatrix] = {}; /**< error matrix (1D representation) */
-    float m_jacobiMatrix[c_SizeMatrix] = {}; /**< error matrix (1D representation) */
-    float m_pValue;   /**< chi^2 probability of the fit. Default is nan */
+    double m_mass;   /**< particle (invariant) mass */
+    double m_px;     /**< momentum component x */
+    double m_py;     /**< momentum component y */
+    double m_pz;     /**< momentum component z */
+    double m_momentumScale = 1.0; /**< effective momentum scale factor */
+    double m_momentumScalingFactor = 1.0; /**< momentum scaling factor */
+    double m_momentumSmearingFactor = 1.0; /**< momentum smearing factor */
+    double m_x;      /**< position component x */
+    double m_y;      /**< position component y */
+    double m_z;      /**< position component z */
+    double m_errMatrix[c_SizeMatrix] = {}; /**< error matrix (1D representation) */
+    double m_jacobiMatrix[c_SizeMatrix] = {}; /**< error matrix (1D representation) */
+    double m_pValue;   /**< chi^2 probability of the fit. Default is nan */
     std::vector<int> m_daughterIndices;  /**< daughter particle indices */
     EFlavorType m_flavorType;  /**< flavor type. */
     EParticleSourceObject m_particleSource;  /**< (mdst) source of particle */
@@ -964,7 +1029,7 @@ namespace Belle2 {
      * Order is given by string -> index mapping in ParticleExtraInfoMap.
      * entry 0 is reserved specifies which map to use.
      */
-    std::vector<float> m_extraInfo;
+    std::vector<double> m_extraInfo;
 
     // transient data members
     /**
@@ -1011,6 +1076,13 @@ namespace Belle2 {
      * @param fspDaughters vector of daughter particles
      */
     void fillFSPDaughters(std::vector<const Belle2::Particle*>& fspDaughters) const;
+    /**
+     * Fill all generations' daughters into a vector
+     *
+     * Function is called recursively
+     * @param allDaughters vector of daughter particles
+     */
+    void fillAllDaughters(std::vector<const Belle2::Particle*>& allDaughters) const;
 
     /**
      * Fill vector with (PDGCode, MdstSource) pairs for the entire decay chain.
@@ -1039,7 +1111,7 @@ namespace Belle2 {
      */
     int generatePDGCodeFromCharge(const int chargedSign, const Const::ChargedStable& chargedStable);
 
-    ClassDefOverride(Particle, 14); /**< Class to store reconstructed particles. */
+    ClassDefOverride(Particle, 16); /**< Class to store reconstructed particles. */
     // v8: added identifier, changed getMdstSource
     // v9: added m_pdgCodeUsedForFit
     // v10: added m_properties
@@ -1047,6 +1119,8 @@ namespace Belle2 {
     // v12: renamed EParticleType m_particleType to EParticleSourceObject m_particleSource
     // v13: added m_momentumScale
     // v14: added m_jacobiMatrix
+    // v15: added m_momentumScalingFactor and m_momentumSmearingFactor
+    // v16: use double precision for private members
 
     friend class ParticleSubset;
   };

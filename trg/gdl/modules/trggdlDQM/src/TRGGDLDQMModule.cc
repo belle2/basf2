@@ -15,8 +15,6 @@
 //---------------------------------------------------------------
 // Description : A trigger module for TRG GDL
 //---------------------------------------------------------------
-// 1.00 : 2017/05/08 : First version
-//---------------------------------------------------------------
 #include <trg/gdl/modules/trggdlDQM/TRGGDLDQMModule.h>
 #include <trg/gdl/modules/trggdlUnpacker/trggdlUnpackerModule.h>
 
@@ -768,6 +766,7 @@ bool TRGGDLDQMModule::anaBitCondition(void)
             B2DEBUG(20,
                     m_bitConditionToDumpVcd.substr(begin_word, word_length).c_str()
                     << "(" << fired << ")");
+            // cppcheck-suppress knownConditionTrueFalse
             if (((!not_flag && fired) || (not_flag && !fired)) && result_the_term) {
               return true;
             }

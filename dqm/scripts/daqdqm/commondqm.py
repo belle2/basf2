@@ -42,6 +42,10 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
     # Check components.
     check_components(components)
 
+    if dqm_mode in ["dont_care", "filtered"]:
+        # TTD trigger and bunch injection monitoring
+        path.add_module('TTDDQM')
+
     if dqm_environment == "expressreco" and (dqm_mode in ["dont_care"]):
         # PXD (not useful on HLT)
         if components is None or 'PXD' in components:
@@ -315,11 +319,6 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         add_analysis_dqm(path)
     if dqm_environment == "expressreco" and (dqm_mode in ["dont_care"]):
         add_mirabelle_dqm(path)
-
-    # KLM2 (requires mu+ particle list from add_analysis_dqm)
-    if (components is None or 'KLM' in components) and (dqm_mode in ["dont_care", "filtered"]):
-        klmdqm2 = b2.register_module("KLMDQM2")
-        path.add_module(klmdqm2, MuonListName='mu+:KLMDQM')
 
     # We want to see the datasize of all events after removing the raw data
     if dqm_mode in ["dont_care", "all_events"]:

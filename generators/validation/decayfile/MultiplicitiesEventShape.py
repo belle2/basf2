@@ -11,15 +11,21 @@
 
 #############################################################
 # Steering file to reconstruct charged/mixed MC cdst files.
-# Used to validate chnages between decay files.
-# Prints multiplicites of generated particles.
+# Used to validate changes between decay files.
+# Prints multiplicities of generated particles.
 # Uses the SplitMultiplicities module to list multiplicities
 # of Kaons depending on B meson flavour in a separate tree.
 # In addition gives tree containing generated event shapes.
 #############################################################
 
+"""
+<header>
+    <input>../charged.cdst.root</input>
+    <output>MCvalidation.root</output>
+    <description>Determining multiplicities of different particles on generator level</description>
+</header>
+"""
 
-import argparse
 import basf2 as b2
 import modularAnalysis as ma
 from variables import variables as v
@@ -27,14 +33,6 @@ from variables import collections as c
 from SplitMultiplicities import SplitMultiplicities
 
 path = b2.create_path()
-
-# define command line arguments
-parser = argparse.ArgumentParser(description="Determining multiplicities of different particles on generator level")
-# optional arguments
-parser.add_argument("InputFile", nargs='?', default='charged.cdst.root', help="Name of the input tuple")
-parser.add_argument("OutputName", nargs='?', default="MCvalidationR4.root", help="Name of the output tuple")
-# get arguments
-args = parser.parse_args()
 
 
 def define_ups_aliases():
@@ -100,8 +98,8 @@ def add_aliases(alias_dict={}):
         v.addAlias(key, value)
 
 
-# read input file given by first optional argument
-ma.inputMdstList('default', args.InputFile, path)
+# read input file
+ma.inputMdstList('../charged.cdst.root', path)
 
 # pick one charged track per event needed for the SplitMultiplicities module
 ma.fillParticleList('pi+:sel', '',  path=path)
@@ -128,7 +126,7 @@ ma.fillParticleListsFromMC([pions, kaons, muons, electrons, protons, klongs, pho
 # build event shape
 ma.buildEventShape(['pi+:MC', "K+:MC", "mu+:MC", "e+:MC", "p+:MC", "K_L0:MC", "gamma:MC"], path=path)
 
-# create a dictionary of multplicity variable aliases
+# create a dictionary of multiplicity variable aliases
 Multi_aliasDict = define_ups_aliases()
 Split_aliasDict = define_split_aliases()
 
@@ -141,10 +139,20 @@ split_variables = list(Split_aliasDict.keys())
 # add event shape variables to a list
 eventshape_variables = c.event_shape
 
-# write out the trees containing the multiplicities, split multiplicites for kaons and the event shape variables
-ma.variablesToNtuple('Upsilon(4S):MC', treename="Multiplicities", variables=multi_variables, filename=args.OutputName, path=path)
-ma.variablesToNtuple('pi+:sel', treename="Split", variables=split_variables, filename=args.OutputName, path=path)
-ma.variablesToNtuple('Upsilon(4S):MC', treename="EventShape", variables=eventshape_variables, filename=args.OutputName, path=path)
+# write out the trees containing the multiplicities, split multiplicities for kaons and the event shape variables
+ma.variablesToNtuple(
+    'Upsilon(4S):MC',
+    treename="Multiplicities",
+    variables=multi_variables,
+    filename='MCvalidation.root',
+    path=path)
+ma.variablesToNtuple('pi+:sel', treename="Split", variables=split_variables, filename='MCvalidation.root', path=path)
+ma.variablesToNtuple(
+    'Upsilon(4S):MC',
+    treename="EventShape",
+    variables=eventshape_variables,
+    filename='MCvalidation.root',
+    path=path)
 
 progress = ma.register_module('Progress')
 path.add_module(progress)

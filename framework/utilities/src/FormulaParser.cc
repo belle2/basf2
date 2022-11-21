@@ -42,9 +42,9 @@ namespace Belle2 {
     return 0;
   }
 
-  auto FormulaParserBase::checkNumber(ENumberStatus current, char next) -> ENumberStatus {
-    switch (current)
-    {
+  auto FormulaParserBase::checkNumber(ENumberStatus current, char next) -> ENumberStatus
+  {
+    switch (current) {
       case ENumberStatus::c_Invalid:
         // invalid stays invalid
         return ENumberStatus::c_Invalid;
@@ -185,9 +185,9 @@ namespace Belle2 {
     m_currentVariableNameNumberStatus = ENumberStatus::c_Empty;
   }
 
-  auto FormulaParserBase::checkForOperator(char next) -> EOperator {
-    if (next == '+' or next == '-')
-    {
+  auto FormulaParserBase::checkForOperator(char next) -> EOperator
+  {
+    if (next == '+' or next == '-') {
       // plus and minus are also part of literals so only treat it as operator
       // if, together with the next character, this is not a valid float literal
       auto isvalid = checkNumber(m_currentVariableNameNumberStatus, next);
@@ -200,8 +200,7 @@ namespace Belle2 {
     }
     if (next == '/') return EOperator::c_divide;
     if (next == '^') return EOperator::c_power;
-    if (next == '*')
-    {
+    if (next == '*') {
       // is it python style '**'? if yes, remove one char from stream and
       // assume pow
       if (m_buffer.peek() == '*') {

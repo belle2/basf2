@@ -34,7 +34,7 @@ using namespace genfit;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(CDCCRTest)
+REG_MODULE(CDCCRTest);
 
 //                 Implementation
 CDCCRTestModule::CDCCRTestModule() : HistoModule()
@@ -310,7 +310,7 @@ void CDCCRTestModule::event()
     tanL = fitresult->getTanLambda();
     omega = fitresult->getOmega();
     phi0 = fitresult->getPhi0() * 180 / M_PI;
-    Pt = fitresult->getMomentum().Perp();
+    Pt = fitresult->getMomentum().Rho();
     m_hPhi0->Fill(phi0);
     m_hChi2->Fill(Chi2);
     if (Pt < m_MinimumPt) continue;
@@ -419,7 +419,7 @@ void CDCCRTestModule::plotResults(Belle2::RecoTrack* track)
           theta = cdcgeo.getOutgoingTheta(alpha, theta);
           alpha = cdcgeo.getOutgoingAlpha(alpha);
           B2DEBUG(199, "x_unbiased " << x_u << " |left_right " << lr);
-          if (m_calExpectedDriftTime) { t_fit = cdcgeo.getDriftTime(std::abs(x_u), lay, lr, alpha , theta);}
+          if (m_calExpectedDriftTime) { t_fit = cdcgeo.getDriftTime(std::abs(x_u), lay, lr, alpha, theta);}
           alpha *= 180 / M_PI;
           theta *= 180 / M_PI;
           m_hAlpha->Fill(alpha);
@@ -478,13 +478,17 @@ TVector3 CDCCRTestModule::getTriggerHitPosition(RecoTrack* track)
   TVector3 trigpos(m_TriggerPos.at(0), m_TriggerPos.at(1), m_TriggerPos.at(2));
   TVector3 trigDir(m_TriggerPlaneDirection.at(0), m_TriggerPlaneDirection.at(1), m_TriggerPlaneDirection.at(2));
   const genfit::AbsTrackRep* trackRepresentation = track->getCardinalRepresentation();
-  genfit::MeasuredStateOnPlane mop = track->getMeasuredStateOnPlaneClosestTo(trigpos, trackRepresentation);
   TVector3 pos(-200, 200, 200);
   try {
+    genfit::MeasuredStateOnPlane mop = track->getMeasuredStateOnPlaneClosestTo(ROOT::Math::XYZVector(trigpos), trackRepresentation);
     double l = mop.extrapolateToPlane(genfit::SharedPlanePtr(new genfit::DetPlane(trigpos, trigDir)));
     if (fabs(l) < 1000) pos = mop.getPos();
   } catch (const genfit::Exception& er) {
     B2WARNING("extrapolate to Trigger counter failure" << er.what());
+  } catch (const std::runtime_error& er) {
+    B2WARNING("Runtime error encountered: " << er.what());
+  } catch (...) {
+    B2WARNING("Undefined exception encountered.");
   }
   return pos;
 }
@@ -573,7 +577,7 @@ void CDCCRTestModule::getResidualOfUnFittedLayer(Belle2::RecoTrack* track)
     //}
     //    if (hitID > track->getNumberOfCDCHits() / 2) { //case for last part of track, searching backward, and stop at the first choice
     auto hitListReverse = track->getCDCHitList();
-    std::reverse(hitListReverse.begin() , hitListReverse.end());
+    std::reverse(hitListReverse.begin(), hitListReverse.end());
     for (const RecoHitInformation::UsedCDCHit* hit : hitListReverse) {
       RecoHitInformation const* recoHitInfo_bkw = track->getRecoHitInformation(hit);
       if (recoHitInfo_bkw->useInFit()) {

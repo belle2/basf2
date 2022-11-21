@@ -24,7 +24,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(DQMHistAnalysisInputPVSrv)
+REG_MODULE(DQMHistAnalysisInputPVSrv);
 
 //-----------------------------------------------------------------
 //                 Implementation

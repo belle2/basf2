@@ -114,6 +114,10 @@ bool Variable::Manager::addAlias(const std::string& alias, const std::string& va
   return true;
 }
 
+void Variable::Manager::clearAliases()
+{
+  m_alias.clear();
+}
 
 void Variable::Manager::printAliases()
 {
@@ -246,7 +250,7 @@ bool Variable::Manager::createVariable(const std::string& name)
     }
   }
   // Try Formula registration with python parser if variable is not a simple identifier (else we get a infinite loop)
-  if (not std::regex_match(name, std::regex("^[a-zA-Z]([a-zA-Z_0-9&:]|\\+:|-:|':)*$"))) {
+  if (not std::regex_match(name, std::regex("^[a-zA-Z_][a-zA-Z_0-9]*$")) and not name.empty()) {
     Py_Initialize();
     try {
       // Import parser
@@ -269,7 +273,7 @@ bool Variable::Manager::createVariable(const std::string& name)
       }
     } catch (py::error_already_set&) {
       PyErr_Print();
-      B2FATAL("Parsing Error on variable: '" << name);
+      B2FATAL("Parsing error for formula: '" << name << "'");
     }
   }
 
@@ -462,7 +466,6 @@ double Variable::Manager::evaluate(const std::string& varName, const Particle* p
   const Var* var = getVariable(varName);
   if (!var) {
     throw std::runtime_error("Variable::Manager::evaluate(): variable '" + varName + "' not found!");
-    return 0.0; //never reached, suppresses cppcheck warning
   }
 
   if (var->variabletype == Variable::Manager::VariableDataType::c_double)

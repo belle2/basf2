@@ -59,6 +59,7 @@ def run():
 
     path.add_module(VxdCdcMergerHarvester())
 
+    path.add_module('Progress')
     basf2.process(path)
     print(basf2.statistics)
 
@@ -101,7 +102,7 @@ class VxdCdcMergerHarvester(HarvestingModule):
         mc_track = mc_particle.getRelatedFrom("MCRecoTracks")
 
         mc_nhits = mc_track.getNumberOfTotalHits()
-        mc_pt = mc_particle.getMomentum().Pt()
+        mc_pt = mc_particle.getMomentum().Rho()
         mc_theta = mc_particle.getMomentum().Theta()
 
         # reco_tracks = Belle2.PyStoreArray('RecoTracks')

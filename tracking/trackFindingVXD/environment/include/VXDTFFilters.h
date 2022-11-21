@@ -109,7 +109,7 @@ namespace Belle2 {
 
 
     /// typedef to make a static sector type more readable.
-    typedef StaticSector< point_t, twoHitFilter_t, threeHitFilter_t , int >
+    typedef StaticSector< point_t, twoHitFilter_t, threeHitFilter_t, int >
     staticSector_t;
 
     /** Construct the container of all the filters used by the VXD Track Finder**/
@@ -387,7 +387,7 @@ namespace Belle2 {
     {
       TTree* tree = new TTree(c_CompactSecIDstreeName, c_CompactSecIDstreeName);
       UInt_t layer, ladder, sensor;
-      tree->Branch("layer" , & layer , "layer/i");
+      tree->Branch("layer", & layer, "layer/i");
       tree->Branch("ladder", & ladder, "ladder/i");
       tree->Branch("sensor", & sensor, "sensor/i");
 
@@ -431,7 +431,7 @@ namespace Belle2 {
       treeName.Append(c_CompactSecIDstreeName);
       TTree* tree = (TTree*) gFile->Get(treeName);
       UInt_t layer, ladder, sensor;
-      if (tree->SetBranchAddress("layer" , & layer) < 0) B2FATAL("VXDTFFilters: invalid branch address");
+      if (tree->SetBranchAddress("layer", & layer) < 0) B2FATAL("VXDTFFilters: invalid branch address");
       if (tree->SetBranchAddress("ladder", & ladder) < 0) B2FATAL("VXDTFFilters: invalid branch address");
       if (tree->SetBranchAddress("sensor", & sensor) < 0) B2FATAL("VXDTFFilters: invalid branch address");
 

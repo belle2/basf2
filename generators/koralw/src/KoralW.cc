@@ -60,7 +60,7 @@ extern"C" {
   void kw_getmomdec_(double* p1, double* p2, double* p3, double* p4);
   void kw_getxsecmc_(double* xSecMC, double* xErrMC);
 
-  void koralw_warning_ecm_(double* ecmconfig, double* ecm)
+  void koralw_warning_ecm_(const double* ecmconfig, const double* ecm)
   {
     B2WARNING("KORALW: Different center of mass energy in config file (obsolete), E=" << *ecmconfig << ", and from beam parameters, E="
               << *ecm);
@@ -104,7 +104,7 @@ void KoralW::init(const std::string& dataPath, const std::string& userDataFile)
 }
 
 
-void KoralW::generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, TLorentzRotation boost)
+void KoralW::generateEvent(MCParticleGraph& mcGraph, ROOT::Math::XYZVector vertex, ROOT::Math::LorentzRotation boost)
 {
   kw_make_();
 
@@ -131,8 +131,8 @@ void KoralW::term()
 //                       Protected methods
 //=========================================================================
 
-void KoralW::storeParticle(MCParticleGraph& mcGraph, const float* mom, const float* vtx, int pdg, TVector3 vertex,
-                           TLorentzRotation boost, bool isVirtual, bool isInitial)
+void KoralW::storeParticle(MCParticleGraph& mcGraph, const float* mom, const float* vtx, int pdg, ROOT::Math::XYZVector vertex,
+                           ROOT::Math::LorentzRotation boost, bool isVirtual, bool isInitial)
 {
   // //Create particle
   //MCParticleGraph::GraphParticle& part = mcGraph.addParticle();
@@ -155,19 +155,19 @@ void KoralW::storeParticle(MCParticleGraph& mcGraph, const float* mom, const flo
   part.setPDG(pdg);
   part.setFirstDaughter(0);
   part.setLastDaughter(0);
-  part.setMomentum(TVector3(mom[0], mom[1], mom[2]));
+  part.setMomentum(ROOT::Math::XYZVector(mom[0], mom[1], mom[2]));
   part.setEnergy(mom[3]);
   part.setMass(mom[4]);
   part.setProductionVertex(vtx[0]*Unit::mm, vtx[1]*Unit::mm, vtx[2]*Unit::mm);
 
   //boost, TF
-  TLorentzVector p4 = part.get4Vector();
+  ROOT::Math::PxPyPzEVector p4 = part.get4Vector();
   p4 = boost * p4;
   part.set4Vector(p4);
 
   //set vertex, TF
   if (!isInitial) {
-    TVector3 v3 = part.getProductionVertex();
+    ROOT::Math::XYZVector v3 = part.getProductionVertex();
     v3 = v3 + vertex;
     part.setProductionVertex(v3);
     part.setValidVertex(true);

@@ -348,29 +348,28 @@ NeuroTrigger::updateTrack(const CDCTriggerTrack& track)
 void
 NeuroTrigger::updateTrackFix(const CDCTriggerTrack& track)
 {
-  unsigned precisionPhi = m_precision[0];
-  unsigned precisionAlpha = m_precision[0];
+  //unsigned precisionPhi = m_precision[0];
+  //unsigned precisionAlpha = m_precision[0];
+  unsigned precisionPhiAlpha = m_precision[0];
   unsigned precisionScale = m_precision[1];
   unsigned precisionId = m_precision[2];
 
   double omega = track.getOmega();
-  long phi = round(track.getPhi0() * (1 << precisionPhi));
+  long phi = round(track.getPhi0() * (1 << precisionPhiAlpha));
 
   for (int iSL = 0; iSL < 9; ++iSL) {
     for (int priority = 0; priority < 2; ++priority) {
       // LUT, calculated on the fly here
       m_alpha[iSL][priority] =
         (m_radius[iSL][priority] * abs(omega) < 2) ?
-        round(asin(m_radius[iSL][priority] * omega / 2) * (1 << precisionAlpha)) :
-        round(M_PI_2 * (1 << precisionAlpha));
-      long dphi = (precisionAlpha >= precisionPhi) ?
-                  phi - (long(m_alpha[iSL][priority]) >> (precisionAlpha - precisionPhi)) :
-                  phi - (long(m_alpha[iSL][priority]) << (precisionPhi - precisionAlpha));
+        round(asin(m_radius[iSL][priority] * omega / 2) * (1 << precisionPhiAlpha)) :
+        round(M_PI_2 * (1 << precisionPhiAlpha));
+      long dphi = phi - (long(m_alpha[iSL][priority]));
       m_idRef[iSL][priority] =
         long(dphi * round((m_TSoffset[iSL + 1] - m_TSoffset[iSL]) / 2. / M_PI * (1 << precisionScale)) /
-             (long(1) << (precisionPhi + precisionScale - precisionId)));
+             (long(1) << (precisionPhiAlpha + precisionScale - precisionId)));
       // unscale after rounding
-      m_alpha[iSL][priority] /= (1 << precisionAlpha);
+      m_alpha[iSL][priority] /= (1 << precisionPhiAlpha);
       m_idRef[iSL][priority] /= (1 << precisionId);
     }
   }

@@ -57,6 +57,8 @@
 
 #include "trg/ecl/dataobjects/TRGECLCluster.h"
 
+#include <analysis/utility/PCmsLabTransform.h>
+
 using namespace std;
 using namespace Belle2;
 //
@@ -101,6 +103,23 @@ TrgEclBhabha::TrgEclBhabha():
   m_3DBhabhaVetoClusterThetaIds.clear();
 
   m_3DBhabhaVetoInTrackFlag = -10;
+
+  m_taub2bEtotCut = 7.0;
+  m_taub2bClusterECut1 = 1.9;
+  m_taub2bClusterECut2 = 999.0;
+  m_taub2bAngleFlag = 0;
+  m_taub2bEtotFlag = 0;
+  m_taub2bClusterEFlag = 0;
+
+  m_taub2b2EtotCut = 7.0;
+  m_taub2b2CLEEndcapCut = 3.0;
+  m_taub2b2CLECut = 1.62;
+
+  //Taub2b3 by S.Ito
+  m_taub2b3EtotCut = 7.0;
+  m_taub2b3CLEb2bCut  = 0.14;
+  m_taub2b3CLELowCut  = 0.12;
+  m_taub2b3CLEHighCut = 4.5;
 
 }
 //
@@ -380,6 +399,7 @@ bool TrgEclBhabha::GetBhabha01()
       }
     }
   }
+
   if (BhabhaFlag) {
     m_3DBhabhaVetoClusterTCIds.push_back(MaxTCId[cl_idx1]);
     m_3DBhabhaVetoClusterTCIds.push_back(MaxTCId[cl_idx2]);
@@ -581,12 +601,12 @@ bool TrgEclBhabha::GetTaub2b(double E_total1to17)
   ClusterTiming.clear();
   ClusterPosition.clear();
 
-  m_Taub2bAngleFlag    = 0;
-  m_Taub2bEtotFlag     = 0;
-  m_Taub2bClusterEFlag = 0;
+  m_taub2bAngleFlag    = 0;
+  m_taub2bEtotFlag     = 0;
+  m_taub2bClusterEFlag = 0;
 
-  if (E_total1to17 < m_Taub2bEtotCut) {
-    m_Taub2bEtotFlag = 1;
+  if (E_total1to17 < m_taub2bEtotCut) {
+    m_taub2bEtotFlag = 1;
   }
 
   StoreArray<TRGECLCluster> trgeclClusterArray;
@@ -616,31 +636,213 @@ bool TrgEclBhabha::GetTaub2b(double E_total1to17)
                 dphi,
                 thetaSum);
 
-      if (dphi     > m_Taub2bAngleCut[0] &&
-          dphi     < m_Taub2bAngleCut[1] &&
-          thetaSum > m_Taub2bAngleCut[2] &&
-          thetaSum < m_Taub2bAngleCut[3]) {
-        m_Taub2bAngleFlag++;
+      if (dphi     > m_taub2bAngleCut[0] &&
+          dphi     < m_taub2bAngleCut[1] &&
+          thetaSum > m_taub2bAngleCut[2] &&
+          thetaSum < m_taub2bAngleCut[3]) {
+        m_taub2bAngleFlag++;
         //
-        if ((ClusterEnergy[icluster] < m_Taub2bClusterECut1 &&
-             ClusterEnergy[jcluster] < m_Taub2bClusterECut2) ||
-            (ClusterEnergy[icluster] < m_Taub2bClusterECut2 &&
-             ClusterEnergy[jcluster] < m_Taub2bClusterECut1)) {
-          m_Taub2bClusterEFlag++;
+        if ((ClusterEnergy[icluster] < m_taub2bClusterECut1 &&
+             ClusterEnergy[jcluster] < m_taub2bClusterECut2) ||
+            (ClusterEnergy[icluster] < m_taub2bClusterECut2 &&
+             ClusterEnergy[jcluster] < m_taub2bClusterECut1)) {
+          m_taub2bClusterEFlag++;
         }
       }
     }
   }
 
   bool Taub2bFlag = false;
-  if (m_Taub2bAngleFlag    > 0 &&
-      m_Taub2bEtotFlag     > 0 &&
-      m_Taub2bClusterEFlag > 0) {
+  if (m_taub2bAngleFlag    > 0 &&
+      m_taub2bEtotFlag     > 0 &&
+      m_taub2bClusterEFlag > 0) {
     Taub2bFlag = true;
   }
 
   return Taub2bFlag;
 }
+//========================================================
+// taub2b selection for tau 1x1 process (tigher selection than taub2b
+//========================================================
+bool TrgEclBhabha::GetTaub2b2(double E_total1to17)
+{
+  //
+  // Read Cluster Table
+  //
+  MaxTCId.clear();
+  ClusterEnergy.clear();
+  ClusterTiming.clear();
+  ClusterPosition.clear();
+
+  int taub2b2EtotFlag  = 0;
+  int taub2b2AngleFlag = 0;
+  int taub2b2NCLEndcapFlag = 0;
+  int taub2b2AngleCLEFlag = 0;
+
+  if (E_total1to17 < m_taub2b2EtotCut) {
+    taub2b2EtotFlag = 1;
+  }
+
+  // countor of cluster for E(cluster)>threshold in endcap
+  int ncl_clecut_endcap = 0;
+  // cluster array loop
+  StoreArray<TRGECLCluster> trgeclClusterArray;
+  for (int ii = 0; ii < trgeclClusterArray.getEntries(); ii++) {
+    TRGECLCluster* aTRGECLCluster = trgeclClusterArray[ii];
+    int maxTCId           = aTRGECLCluster->getMaxTCId();
+    double clusterenergy  = aTRGECLCluster->getEnergyDep();
+    double clusterthetaid = aTRGECLCluster->getMaxThetaId();
+    ClusterEnergy.push_back(clusterenergy);
+    MaxTCId.push_back(maxTCId);
+    // count N(cluster) of E(cluster) > threshold in endcap
+    if ((clusterthetaid <=  3 ||
+         clusterthetaid >= 16) &&
+        clusterenergy > m_taub2b2CLEEndcapCut) {
+      ncl_clecut_endcap++;
+    }
+  }
+
+  // bool for N(cluster) of E(cluster)>threshold in endcap
+  if (ncl_clecut_endcap < 2) {
+    taub2b2NCLEndcapFlag = 1;
+  }
+
+  // total number of cluster
+  const int ncluster = ClusterEnergy.size();
+
+  // 2 cluster combination
+  for (int icluster = 0; icluster < ncluster ; icluster++) {
+    for (int jcluster = icluster + 1; jcluster < ncluster; jcluster ++) {
+      if (icluster == jcluster) {continue;}
+      int energy1 = 0;
+      int energy2 = 0;
+      int dphi = 0;
+      int thetaSum = 0;
+      get2CLETP(MaxTCId[icluster],
+                MaxTCId[jcluster],
+                energy1,
+                energy2,
+                dphi,
+                thetaSum);
+      // delta phi and theta sum selection
+      if (dphi     > m_taub2b2AngleCut[0] &&
+          dphi     < m_taub2b2AngleCut[1] &&
+          thetaSum > m_taub2b2AngleCut[2] &&
+          thetaSum < m_taub2b2AngleCut[3]) {
+        taub2b2AngleFlag++;
+        if (ClusterEnergy[icluster] > m_taub2b2CLECut &&
+            ClusterEnergy[jcluster] > m_taub2b2CLECut) {
+          taub2b2AngleCLEFlag++;
+        }
+      }
+    }
+  }
+  //
+  bool taub2b2Flag = false;
+  if (taub2b2EtotFlag      > 0 &&
+      taub2b2AngleFlag     > 0 &&
+      taub2b2NCLEndcapFlag > 0 &&
+      taub2b2AngleCLEFlag  > 0) {
+    taub2b2Flag = true;
+  }
+
+  return taub2b2Flag;
+}
+
+
+//========================================================
+// taub2b3 added by S.Ito
+//========================================================
+bool TrgEclBhabha::GetTaub2b3(double E_total1to17)
+{
+  //
+  // Read Cluster Table
+  //
+  MaxTCId.clear();
+  MaxTCThetaId.clear();
+  ClusterEnergy.clear();
+  ClusterTiming.clear();
+  ClusterPosition.clear();
+
+  int taub2b3EtotFlag = 0;
+  int taub2b3AngleCLEThetaIdFlag = 0;
+  int taub2b3CLELowCutFlag  = 1;
+  int taub2b3CLEHighCutFlag = 1;
+
+  // Total Energy Etot < 7 GeV in lab
+  if (E_total1to17 < m_taub2b3EtotCut) {
+    taub2b3EtotFlag = 1;
+  }
+
+  // cluster array loop
+  StoreArray<TRGECLCluster> trgeclClusterArray;
+  for (int ii = 0; ii < trgeclClusterArray.getEntries(); ii++) {
+    TRGECLCluster* aTRGECLCluster = trgeclClusterArray[ii];
+    int maxTCId           = aTRGECLCluster->getMaxTCId();
+    double clusterenergy  = aTRGECLCluster->getEnergyDep();
+    ClusterEnergy.push_back(clusterenergy);
+    MaxTCId.push_back(maxTCId);
+    MaxTCThetaId.push_back(aTRGECLCluster->getMaxThetaId());
+
+    // All clusters in the event shoule be E > 0.12 GeV in lab.
+    if (clusterenergy <= m_taub2b3CLELowCut) {
+      taub2b3CLELowCutFlag = 0;
+    }
+    // The number of clusters with E > 4.5 GeV in lab should be 0.
+    if (clusterenergy > m_taub2b3CLEHighCut) {
+      taub2b3CLEHighCutFlag = 0;
+    }
+  }
+
+  // total number of cluster
+  const int ncluster = ClusterEnergy.size();
+
+  // 2 cluster combination
+  for (int icluster = 0; icluster < ncluster ; icluster++) {
+    for (int jcluster = icluster + 1; jcluster < ncluster; jcluster ++) {
+      if (icluster == jcluster) {continue;}
+      int energy1 = 0;
+      int energy2 = 0;
+      int dphi = 0;
+      int thetaSum = 0;
+      get2CLETP(MaxTCId[icluster],
+                MaxTCId[jcluster],
+                energy1,
+                energy2,
+                dphi,
+                thetaSum);
+
+      // delta phi and theta sum selection in cms
+      if (dphi     > m_taub2b3AngleCut[0] &&
+          dphi     < m_taub2b3AngleCut[1] &&
+          thetaSum > m_taub2b3AngleCut[2] &&
+          thetaSum < m_taub2b3AngleCut[3]) {
+        // Cluster ThetaID selection
+        if (MaxTCThetaId[icluster] >=  2 &&
+            MaxTCThetaId[icluster] <= 16 &&
+            MaxTCThetaId[jcluster] >=  2 &&
+            MaxTCThetaId[jcluster] <= 16) {
+          // Cluster energy selection in lab
+          if (ClusterEnergy[icluster] > m_taub2b3CLEb2bCut ||
+              ClusterEnergy[jcluster] > m_taub2b3CLEb2bCut) {
+            taub2b3AngleCLEThetaIdFlag++;
+          }
+        }
+      }
+    }
+  }
+  // all selections
+  bool taub2b3Flag = false;
+  if (taub2b3EtotFlag            > 0 &&
+      taub2b3AngleCLEThetaIdFlag > 0 &&
+      taub2b3CLELowCutFlag       > 0 &&
+      taub2b3CLEHighCutFlag      > 0) {
+    taub2b3Flag = true;
+  }
+
+  return taub2b3Flag;
+}
+
 //========================================================
 // additional Bhabha veto
 //========================================================

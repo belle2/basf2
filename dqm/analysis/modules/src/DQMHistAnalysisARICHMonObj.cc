@@ -9,9 +9,6 @@
 // Own include
 #include <dqm/analysis/modules/DQMHistAnalysisARICHMonObj.h>
 
-//DQM
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
-
 #include <TF1.h>
 #include <TH1F.h>
 #include <TH3.h>
@@ -198,7 +195,7 @@ void DQMHistAnalysisARICHMonObjModule::endRun()
     //fit two gauses
     if (theta->GetEntries() == 0) return;
     TF1* f1 = new TF1("thcFit", "gaus(0)+gaus(3)", 0.2, 0.4);
-    f1->SetParameters(0.8 * theta->GetMaximum(), 0.323, 0.016, 0.2 * theta->GetMaximum() , 0.323, 0.13);
+    f1->SetParameters(0.8 * theta->GetMaximum(), 0.323, 0.016, 0.2 * theta->GetMaximum(), 0.323, 0.13);
     f1->FixParameter(5, 0.13);
     f1->SetParName(0, "C");
     f1->SetParName(1, "mean");

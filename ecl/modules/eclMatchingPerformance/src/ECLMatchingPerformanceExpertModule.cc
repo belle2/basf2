@@ -19,7 +19,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(ECLMatchingPerformanceExpert)
+REG_MODULE(ECLMatchingPerformanceExpert);
 
 ECLMatchingPerformanceExpertModule::ECLMatchingPerformanceExpertModule() :
   Module(), m_trackProperties()
@@ -66,7 +66,7 @@ void ECLMatchingPerformanceExpertModule::event()
   m_trackMultiplicity = m_tracks.getEntries();
 
   double distance;
-  TVector3 pos_enter, pos_exit, pos_center;
+  ROOT::Math::XYZVector pos_enter, pos_exit, pos_center;
   ECL::ECLGeometryPar* geometry = ECL::ECLGeometryPar::Instance();
 
   for (const Track& track : m_tracks) {
@@ -77,14 +77,14 @@ void ECLMatchingPerformanceExpertModule::event()
       B2ASSERT("Related Belle2 Track has no related track fit result!", fitResult);
 
       // write some data to the root tree
-      TVector3 mom = fitResult->getMomentum();
-      m_trackProperties.cosTheta = mom.CosTheta();
+      ROOT::Math::XYZVector mom = fitResult->getMomentum();
+      m_trackProperties.cosTheta = cos(mom.Theta());
       m_trackProperties.phi = mom.Phi();
-      m_trackProperties.ptot = mom.Mag();
-      m_trackProperties.pt = mom.Pt();
-      m_trackProperties.px = mom.Px();
-      m_trackProperties.py = mom.Py();
-      m_trackProperties.pz = mom.Pz();
+      m_trackProperties.ptot = mom.R();
+      m_trackProperties.pt = mom.Rho();
+      m_trackProperties.px = mom.X();
+      m_trackProperties.py = mom.Y();
+      m_trackProperties.pz = mom.Z();
       m_trackProperties.x = fitResult->getPosition().X();
       m_trackProperties.y = fitResult->getPosition().Y();
       m_trackProperties.z = fitResult->getPosition().Z();
@@ -118,7 +118,7 @@ void ECLMatchingPerformanceExpertModule::event()
         if (extHit.getDetectorID() != Const::EDetector::ECL) continue;
         ECLCluster* eclClusterNear = extHit.getRelatedFrom<ECLCluster>();
         if (eclClusterNear) {
-          distance = (eclClusterNear->getClusterPosition() - extHit.getPosition()).Mag();
+          distance = (eclClusterNear->getClusterPosition() - extHit.getPositionTVector3()).Mag();
           if (m_distance < 0 || distance < m_distance) {
             m_distance = distance;
           }
@@ -163,10 +163,10 @@ void ECLMatchingPerformanceExpertModule::event()
             const short int phiDec = ((phiID - 1 < 0) ? crystalsPerRing + phiID - 1 : phiID - 1);
             const double fractionalPhiDec = static_cast < double >(phiDec) / crystalsPerRing;
             if (m_matchedToDecreasedPhi == 0) {
-              findECLCalDigitMatch(geometry->GetCellID(thetaID , phiDec) + 1, m_matchedToDecreasedPhi);
+              findECLCalDigitMatch(geometry->GetCellID(thetaID, phiDec) + 1, m_matchedToDecreasedPhi);
             }
             if (m_matchedToIncreasedPhi == 0) {
-              findECLCalDigitMatch(geometry->GetCellID(thetaID , phiInc) + 1, m_matchedToIncreasedPhi);
+              findECLCalDigitMatch(geometry->GetCellID(thetaID, phiInc) + 1, m_matchedToIncreasedPhi);
             }
             if (thetaID < 68) {
               if (m_matchedToIncreasedTheta == 0) {
@@ -217,12 +217,13 @@ void ECLMatchingPerformanceExpertModule::event()
           pos_exit = extHit.getPosition();
         }
       }
-      m_trackLength = (pos_enter - pos_exit).Mag();
+      m_trackLength = (pos_enter - pos_exit).R();
       for (const auto& eclCalDigit : m_eclCalDigits) {
         if (eclCalDigit.getEnergy() < m_innerDistanceEnergy) continue;
         int cellid = eclCalDigit.getCellId();
         TVector3 cvec = geometry->GetCrystalPos(cellid - 1);
-        distance = (cvec - 0.5 * (pos_enter + pos_exit)).Mag();
+        ROOT::Math::XYZVector crystalPosition(cvec.X(), cvec.Y(), cvec.Z());
+        distance = (crystalPosition - 0.5 * (pos_enter + pos_exit)).R();
         if (m_innerdistance < 0 || distance < m_innerdistance) {
           m_innerdistance = distance;
         }

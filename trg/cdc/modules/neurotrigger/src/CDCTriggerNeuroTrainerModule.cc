@@ -23,6 +23,7 @@
 
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <framework/gearbox/Unit.h>
+#include <framework/geometry/B2Vector3.h>
 
 #include <fstream>
 #include <cmath>
@@ -33,7 +34,7 @@ using namespace std;
 
 //this line registers the module with the framework and actually makes it available
 //in steering files or the the module list (basf2 -m).
-REG_MODULE(CDCTriggerNeuroTrainer)
+REG_MODULE(CDCTriggerNeuroTrainer);
 
 CDCTriggerNeuroTrainerModule::CDCTriggerNeuroTrainerModule() : Module()
 {
@@ -328,11 +329,11 @@ CDCTriggerNeuroTrainerModule::event()
         // extrapolate to z-axis (may throw an exception -> continue to next representation)
         try {
           genfit::MeasuredStateOnPlane state =
-            recoTrack->getMeasuredStateOnPlaneClosestTo(TVector3(0, 0, 0), reps[irep]);
+            recoTrack->getMeasuredStateOnPlaneClosestTo(ROOT::Math::XYZVector(0, 0, 0), reps[irep]);
           reps[irep]->extrapolateToLine(state, TVector3(0, 0, -1000), TVector3(0, 0, 2000));
           // flip tracks if necessary, such that trigger tracks and reco tracks
           // point in the same direction
-          if (state.getMom().Dot(m_tracks[itrack]->getDirection()) < 0) {
+          if (state.getMom().Dot(B2Vector3D(m_tracks[itrack]->getDirection())) < 0) {
             state.setPosMom(state.getPos(), -state.getMom());
             state.setChargeSign(-state.getCharge());
           }
@@ -359,7 +360,7 @@ CDCTriggerNeuroTrainerModule::event()
         continue;
       }
       phi0Target = mcTrack->getMomentum().Phi();
-      invptTarget = mcTrack->getCharge() / mcTrack->getMomentum().Pt();
+      invptTarget = mcTrack->getCharge() / mcTrack->getMomentum().Rho();
       thetaTarget = mcTrack->getMomentum().Theta();
       zTarget = mcTrack->getProductionVertex().Z();
     }

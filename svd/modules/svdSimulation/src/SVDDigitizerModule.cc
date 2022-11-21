@@ -48,7 +48,7 @@ double tree_signal[20];         // array for 20 samples of 10 ns
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SVDDigitizer)
+REG_MODULE(SVDDigitizer);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -430,10 +430,10 @@ void SVDDigitizerModule::processHit()
   m_currentTime = m_currentEventTime + m_currentHit->getGlobalTime();
 
   //Get Steplength and direction
-  const TVector3& startPoint = m_currentHit->getPosIn();
-  const TVector3& stopPoint = m_currentHit->getPosOut();
-  TVector3 direction = stopPoint - startPoint;
-  double trackLength = direction.Mag();
+  const ROOT::Math::XYZVector& startPoint = m_currentHit->getPosIn();
+  const ROOT::Math::XYZVector& stopPoint = m_currentHit->getPosOut();
+  ROOT::Math::XYZVector direction = stopPoint - startPoint;
+  double trackLength = direction.R();
 
   if (m_currentHit->getPDGcode() == Const::photon.getPDGCode() || trackLength < 0.1 * Unit::um) {
     //Photons deposit energy at the end of their step
@@ -455,7 +455,7 @@ void SVDDigitizerModule::processHit()
       std::tie(lastFraction, lastElectrons) = segment;
 
       //And drift charge from that position
-      const TVector3 position = startPoint + f * direction;
+      const ROOT::Math::XYZVector position = startPoint + f * direction;
       driftCharge(position, e, SVD::SensorInfo::electron);
       driftCharge(position, e, SVD::SensorInfo::hole);
     }
@@ -463,16 +463,17 @@ void SVDDigitizerModule::processHit()
 }
 
 
-void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, SVD::SensorInfo::CarrierType carrierType)
+void SVDDigitizerModule::driftCharge(const ROOT::Math::XYZVector& position, double carriers,
+                                     SVD::SensorInfo::CarrierType carrierType)
 {
   bool have_electrons = (carrierType == SVD::SensorInfo::electron);
 
   string carrierName = (have_electrons) ? "electron" : "hole";
   B2DEBUG(29,
-          "Drifting " << carriers << " " << carrierName << "s at position (" << position.x() << ", " << position.y() << ", " << position.z()
+          "Drifting " << carriers << " " << carrierName << "s at position (" << position.X() << ", " << position.Y() << ", " << position.Z()
           << ").");
-  B2DEBUG(29, "@@@ driftCharge: drifting " << carriers << " " << carrierName << "s at position (" << position.x() << ", " <<
-          position.y() << ", " << position.z()
+  B2DEBUG(29, "@@@ driftCharge: drifting " << carriers << " " << carrierName << "s at position (" << position.X() << ", " <<
+          position.Y() << ", " << position.Z()
           << ").");
 
   // Get references to current sensor/info for ease of use
@@ -488,10 +489,10 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, 
 
   // Approximation: calculate drift velocity at the point halfway towards
   // the respective sensor surface.
-  TVector3 mean_pos(position.X(), position.Y(), position.Z() + 0.5 * distanceToPlane);
+  ROOT::Math::XYZVector mean_pos(position.X(), position.Y(), position.Z() + 0.5 * distanceToPlane);
 
   // Calculate drift times and widths of charge clouds.
-  TVector3 v = info.getVelocity(carrierType, mean_pos);
+  ROOT::Math::XYZVector v = info.getVelocity(carrierType, mean_pos);
   if (m_histVelocity_e && have_electrons) m_histVelocity_e->Fill(v.Z()); //Unit::cm/Unit::cm*Unit::eV/Unit::e*Unit::s);
   if (m_histVelocity_h && !have_electrons) m_histVelocity_h->Fill(v.Z()); //Unit::cm/Unit::cm*Unit::eV/Unit::e*Unit::s);
 
@@ -499,10 +500,10 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, 
   if (m_histDriftTime_e && have_electrons) m_histDriftTime_e->Fill(driftTime); //ns
   if (m_histDriftTime_h && !have_electrons) m_histDriftTime_h->Fill(driftTime); //ns
 
-  TVector3 center = position + driftTime * v; //cm
+  ROOT::Math::XYZVector center = position + driftTime * v; //cm
   double mobility = (have_electrons) ?
-                    info.getElectronMobility(info.getEField(mean_pos).Mag()) :
-                    info.getHoleMobility(info.getEField(mean_pos).Mag());
+                    info.getElectronMobility(info.getEField(mean_pos).R()) :
+                    info.getHoleMobility(info.getEField(mean_pos).R());
 
   if (m_histMobility_e && have_electrons) m_histMobility_e->Fill(mobility); //cm2/V/ns
   if (m_histMobility_h && !have_electrons) m_histMobility_h->Fill(mobility); //cm2/V/ns

@@ -8,7 +8,6 @@
 
 
 #include <analysis/ContinuumSuppression/HarmonicMoments.h>
-#include "TVector3.h"
 
 using namespace Belle2;
 
@@ -19,7 +18,7 @@ void HarmonicMoments::calculateBasicMoments()
   // Loop over the particles' momenta
   for (auto& p : m_momenta) {
     // Gets momentum and costheta of the vector
-    double pMag = p.Mag();
+    double pMag = p.R();
     double cTheta = p.Dot(m_axis) / pMag;
 
     // Fills the momenta.
@@ -45,7 +44,7 @@ void HarmonicMoments::calculateAllMoments()
   // Loop over the particles' momenta
   for (auto& p : m_momenta) {
     // gets momentum and costheta of the vector
-    double pMag = p.Mag();
+    double pMag = p.R();
     double cTheta = p.Dot(m_axis) / pMag;
 
     // Fills the momenta.

@@ -19,7 +19,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(CDCTriggerNeuroDQM)
+REG_MODULE(CDCTriggerNeuroDQM);
 
 
 //-----------------------------------------------------------------
@@ -1829,7 +1829,7 @@ void CDCTriggerNeuroDQMModule::event()
         // extrapolate to z-axis (may throw an exception -> continue to next representation)
         try {
           genfit::MeasuredStateOnPlane state =
-            recoTrack.getMeasuredStateOnPlaneClosestTo(TVector3(0, 0, 0), rep);
+            recoTrack.getMeasuredStateOnPlaneClosestTo(ROOT::Math::XYZVector(0, 0, 0), rep);
           rep->extrapolateToLine(state, TVector3(0, 0, -1000), TVector3(0, 0, 2000));
           // TODO check after matching
           //  // flip tracks if necessary, such that trigger tracks and reco tracks
@@ -2107,33 +2107,33 @@ void CDCTriggerNeuroDQMModule::event()
       // plot input vector
       vector<float> nnInput =
         neuroswTrack.getRelatedTo<CDCTriggerMLPInput>(m_simNeuroInputVectorSWTSSW2DName)->getInput();
-      condFill(m_neuroSWTSSW2DInputID_Layer0    , nnInput[0]);
-      condFill(m_neuroSWTSSW2DInputT_Layer0     , nnInput[1]);
-      condFill(m_neuroSWTSSW2DInputAlpha_Layer0 , nnInput[2]);
-      condFill(m_neuroSWTSSW2DInputID_Layer1    , nnInput[3]);
-      condFill(m_neuroSWTSSW2DInputT_Layer1     , nnInput[4]);
-      condFill(m_neuroSWTSSW2DInputAlpha_Layer1 , nnInput[5]);
-      condFill(m_neuroSWTSSW2DInputID_Layer2    , nnInput[6]);
-      condFill(m_neuroSWTSSW2DInputT_Layer2     , nnInput[7]);
-      condFill(m_neuroSWTSSW2DInputAlpha_Layer2 , nnInput[8]);
-      condFill(m_neuroSWTSSW2DInputID_Layer3    , nnInput[9]);
-      condFill(m_neuroSWTSSW2DInputT_Layer3     , nnInput[10]);
-      condFill(m_neuroSWTSSW2DInputAlpha_Layer3 , nnInput[11]);
-      condFill(m_neuroSWTSSW2DInputID_Layer4    , nnInput[12]);
-      condFill(m_neuroSWTSSW2DInputT_Layer4     , nnInput[13]);
-      condFill(m_neuroSWTSSW2DInputAlpha_Layer4 , nnInput[14]);
-      condFill(m_neuroSWTSSW2DInputID_Layer5    , nnInput[15]);
-      condFill(m_neuroSWTSSW2DInputT_Layer5     , nnInput[16]);
-      condFill(m_neuroSWTSSW2DInputAlpha_Layer5 , nnInput[17]);
-      condFill(m_neuroSWTSSW2DInputID_Layer6    , nnInput[18]);
-      condFill(m_neuroSWTSSW2DInputT_Layer6     , nnInput[19]);
-      condFill(m_neuroSWTSSW2DInputAlpha_Layer6 , nnInput[20]);
-      condFill(m_neuroSWTSSW2DInputID_Layer7    , nnInput[21]);
-      condFill(m_neuroSWTSSW2DInputT_Layer7     , nnInput[22]);
-      condFill(m_neuroSWTSSW2DInputAlpha_Layer7 , nnInput[23]);
-      condFill(m_neuroSWTSSW2DInputID_Layer8    , nnInput[24]);
-      condFill(m_neuroSWTSSW2DInputT_Layer8     , nnInput[25]);
-      condFill(m_neuroSWTSSW2DInputAlpha_Layer8 , nnInput[26]);
+      condFill(m_neuroSWTSSW2DInputID_Layer0, nnInput[0]);
+      condFill(m_neuroSWTSSW2DInputT_Layer0, nnInput[1]);
+      condFill(m_neuroSWTSSW2DInputAlpha_Layer0, nnInput[2]);
+      condFill(m_neuroSWTSSW2DInputID_Layer1, nnInput[3]);
+      condFill(m_neuroSWTSSW2DInputT_Layer1, nnInput[4]);
+      condFill(m_neuroSWTSSW2DInputAlpha_Layer1, nnInput[5]);
+      condFill(m_neuroSWTSSW2DInputID_Layer2, nnInput[6]);
+      condFill(m_neuroSWTSSW2DInputT_Layer2, nnInput[7]);
+      condFill(m_neuroSWTSSW2DInputAlpha_Layer2, nnInput[8]);
+      condFill(m_neuroSWTSSW2DInputID_Layer3, nnInput[9]);
+      condFill(m_neuroSWTSSW2DInputT_Layer3, nnInput[10]);
+      condFill(m_neuroSWTSSW2DInputAlpha_Layer3, nnInput[11]);
+      condFill(m_neuroSWTSSW2DInputID_Layer4, nnInput[12]);
+      condFill(m_neuroSWTSSW2DInputT_Layer4, nnInput[13]);
+      condFill(m_neuroSWTSSW2DInputAlpha_Layer4, nnInput[14]);
+      condFill(m_neuroSWTSSW2DInputID_Layer5, nnInput[15]);
+      condFill(m_neuroSWTSSW2DInputT_Layer5, nnInput[16]);
+      condFill(m_neuroSWTSSW2DInputAlpha_Layer5, nnInput[17]);
+      condFill(m_neuroSWTSSW2DInputID_Layer6, nnInput[18]);
+      condFill(m_neuroSWTSSW2DInputT_Layer6, nnInput[19]);
+      condFill(m_neuroSWTSSW2DInputAlpha_Layer6, nnInput[20]);
+      condFill(m_neuroSWTSSW2DInputID_Layer7, nnInput[21]);
+      condFill(m_neuroSWTSSW2DInputT_Layer7, nnInput[22]);
+      condFill(m_neuroSWTSSW2DInputAlpha_Layer7, nnInput[23]);
+      condFill(m_neuroSWTSSW2DInputID_Layer8, nnInput[24]);
+      condFill(m_neuroSWTSSW2DInputT_Layer8, nnInput[25]);
+      condFill(m_neuroSWTSSW2DInputAlpha_Layer8, nnInput[26]);
     }
   }
   if (!m_limitedoutput && m_simNeuroTracksName != "") {
@@ -2241,33 +2241,33 @@ void CDCTriggerNeuroDQMModule::event()
       // plot input vector
       vector<float> nnInput =
         neuroswTrack.getRelatedTo<CDCTriggerMLPInput>(m_simNeuroInputVectorName)->getInput();
-      condFill(m_neuroSWInputID_Layer0    , nnInput[0]);
-      condFill(m_neuroSWInputT_Layer0     , nnInput[1]);
-      condFill(m_neuroSWInputAlpha_Layer0 , nnInput[2]);
-      condFill(m_neuroSWInputID_Layer1    , nnInput[3]);
-      condFill(m_neuroSWInputT_Layer1     , nnInput[4]);
-      condFill(m_neuroSWInputAlpha_Layer1 , nnInput[5]);
-      condFill(m_neuroSWInputID_Layer2    , nnInput[6]);
-      condFill(m_neuroSWInputT_Layer2     , nnInput[7]);
-      condFill(m_neuroSWInputAlpha_Layer2 , nnInput[8]);
-      condFill(m_neuroSWInputID_Layer3    , nnInput[9]);
-      condFill(m_neuroSWInputT_Layer3     , nnInput[10]);
-      condFill(m_neuroSWInputAlpha_Layer3 , nnInput[11]);
-      condFill(m_neuroSWInputID_Layer4    , nnInput[12]);
-      condFill(m_neuroSWInputT_Layer4     , nnInput[13]);
-      condFill(m_neuroSWInputAlpha_Layer4 , nnInput[14]);
-      condFill(m_neuroSWInputID_Layer5    , nnInput[15]);
-      condFill(m_neuroSWInputT_Layer5     , nnInput[16]);
-      condFill(m_neuroSWInputAlpha_Layer5 , nnInput[17]);
-      condFill(m_neuroSWInputID_Layer6    , nnInput[18]);
-      condFill(m_neuroSWInputT_Layer6     , nnInput[19]);
-      condFill(m_neuroSWInputAlpha_Layer6 , nnInput[20]);
-      condFill(m_neuroSWInputID_Layer7    , nnInput[21]);
-      condFill(m_neuroSWInputT_Layer7     , nnInput[22]);
-      condFill(m_neuroSWInputAlpha_Layer7 , nnInput[23]);
-      condFill(m_neuroSWInputID_Layer8    , nnInput[24]);
-      condFill(m_neuroSWInputT_Layer8     , nnInput[25]);
-      condFill(m_neuroSWInputAlpha_Layer8 , nnInput[26]);
+      condFill(m_neuroSWInputID_Layer0, nnInput[0]);
+      condFill(m_neuroSWInputT_Layer0, nnInput[1]);
+      condFill(m_neuroSWInputAlpha_Layer0, nnInput[2]);
+      condFill(m_neuroSWInputID_Layer1, nnInput[3]);
+      condFill(m_neuroSWInputT_Layer1, nnInput[4]);
+      condFill(m_neuroSWInputAlpha_Layer1, nnInput[5]);
+      condFill(m_neuroSWInputID_Layer2, nnInput[6]);
+      condFill(m_neuroSWInputT_Layer2, nnInput[7]);
+      condFill(m_neuroSWInputAlpha_Layer2, nnInput[8]);
+      condFill(m_neuroSWInputID_Layer3, nnInput[9]);
+      condFill(m_neuroSWInputT_Layer3, nnInput[10]);
+      condFill(m_neuroSWInputAlpha_Layer3, nnInput[11]);
+      condFill(m_neuroSWInputID_Layer4, nnInput[12]);
+      condFill(m_neuroSWInputT_Layer4, nnInput[13]);
+      condFill(m_neuroSWInputAlpha_Layer4, nnInput[14]);
+      condFill(m_neuroSWInputID_Layer5, nnInput[15]);
+      condFill(m_neuroSWInputT_Layer5, nnInput[16]);
+      condFill(m_neuroSWInputAlpha_Layer5, nnInput[17]);
+      condFill(m_neuroSWInputID_Layer6, nnInput[18]);
+      condFill(m_neuroSWInputT_Layer6, nnInput[19]);
+      condFill(m_neuroSWInputAlpha_Layer6, nnInput[20]);
+      condFill(m_neuroSWInputID_Layer7, nnInput[21]);
+      condFill(m_neuroSWInputT_Layer7, nnInput[22]);
+      condFill(m_neuroSWInputAlpha_Layer7, nnInput[23]);
+      condFill(m_neuroSWInputID_Layer8, nnInput[24]);
+      condFill(m_neuroSWInputT_Layer8, nnInput[25]);
+      condFill(m_neuroSWInputAlpha_Layer8, nnInput[26]);
     }
   }
 
@@ -2430,33 +2430,33 @@ void CDCTriggerNeuroDQMModule::event()
       if (!m_limitedoutput) {
         vector<float> nnInput =
           neuroTrack.getRelatedTo<CDCTriggerMLPInput>(m_unpackedNeuroInputVectorName)->getInput();
-        condFill(m_neuroHWInputID_Layer0    , nnInput[0]);
-        condFill(m_neuroHWInputT_Layer0     , nnInput[1]);
-        condFill(m_neuroHWInputAlpha_Layer0 , nnInput[2]);
-        condFill(m_neuroHWInputID_Layer1    , nnInput[3]);
-        condFill(m_neuroHWInputT_Layer1     , nnInput[4]);
-        condFill(m_neuroHWInputAlpha_Layer1 , nnInput[5]);
-        condFill(m_neuroHWInputID_Layer2    , nnInput[6]);
-        condFill(m_neuroHWInputT_Layer2     , nnInput[7]);
-        condFill(m_neuroHWInputAlpha_Layer2 , nnInput[8]);
-        condFill(m_neuroHWInputID_Layer3    , nnInput[9]);
-        condFill(m_neuroHWInputT_Layer3     , nnInput[10]);
-        condFill(m_neuroHWInputAlpha_Layer3 , nnInput[11]);
-        condFill(m_neuroHWInputID_Layer4    , nnInput[12]);
-        condFill(m_neuroHWInputT_Layer4     , nnInput[13]);
-        condFill(m_neuroHWInputAlpha_Layer4 , nnInput[14]);
-        condFill(m_neuroHWInputID_Layer5    , nnInput[15]);
-        condFill(m_neuroHWInputT_Layer5     , nnInput[16]);
-        condFill(m_neuroHWInputAlpha_Layer5 , nnInput[17]);
-        condFill(m_neuroHWInputID_Layer6    , nnInput[18]);
-        condFill(m_neuroHWInputT_Layer6     , nnInput[19]);
-        condFill(m_neuroHWInputAlpha_Layer6 , nnInput[20]);
-        condFill(m_neuroHWInputID_Layer7    , nnInput[21]);
-        condFill(m_neuroHWInputT_Layer7     , nnInput[22]);
-        condFill(m_neuroHWInputAlpha_Layer7 , nnInput[23]);
-        condFill(m_neuroHWInputID_Layer8    , nnInput[24]);
-        condFill(m_neuroHWInputT_Layer8     , nnInput[25]);
-        condFill(m_neuroHWInputAlpha_Layer8 , nnInput[26]);
+        condFill(m_neuroHWInputID_Layer0, nnInput[0]);
+        condFill(m_neuroHWInputT_Layer0, nnInput[1]);
+        condFill(m_neuroHWInputAlpha_Layer0, nnInput[2]);
+        condFill(m_neuroHWInputID_Layer1, nnInput[3]);
+        condFill(m_neuroHWInputT_Layer1, nnInput[4]);
+        condFill(m_neuroHWInputAlpha_Layer1, nnInput[5]);
+        condFill(m_neuroHWInputID_Layer2, nnInput[6]);
+        condFill(m_neuroHWInputT_Layer2, nnInput[7]);
+        condFill(m_neuroHWInputAlpha_Layer2, nnInput[8]);
+        condFill(m_neuroHWInputID_Layer3, nnInput[9]);
+        condFill(m_neuroHWInputT_Layer3, nnInput[10]);
+        condFill(m_neuroHWInputAlpha_Layer3, nnInput[11]);
+        condFill(m_neuroHWInputID_Layer4, nnInput[12]);
+        condFill(m_neuroHWInputT_Layer4, nnInput[13]);
+        condFill(m_neuroHWInputAlpha_Layer4, nnInput[14]);
+        condFill(m_neuroHWInputID_Layer5, nnInput[15]);
+        condFill(m_neuroHWInputT_Layer5, nnInput[16]);
+        condFill(m_neuroHWInputAlpha_Layer5, nnInput[17]);
+        condFill(m_neuroHWInputID_Layer6, nnInput[18]);
+        condFill(m_neuroHWInputT_Layer6, nnInput[19]);
+        condFill(m_neuroHWInputAlpha_Layer6, nnInput[20]);
+        condFill(m_neuroHWInputID_Layer7, nnInput[21]);
+        condFill(m_neuroHWInputT_Layer7, nnInput[22]);
+        condFill(m_neuroHWInputAlpha_Layer7, nnInput[23]);
+        condFill(m_neuroHWInputID_Layer8, nnInput[24]);
+        condFill(m_neuroHWInputT_Layer8, nnInput[25]);
+        condFill(m_neuroHWInputAlpha_Layer8, nnInput[26]);
 
 
         if (m_simNeuroTracksName != "") {
@@ -3179,7 +3179,7 @@ void CDCTriggerNeuroDQMModule::event()
         // extrapolate to z-axis (may throw an exception -> continue to next representation)
         try {
           genfit::MeasuredStateOnPlane state =
-            ltrack.getMeasuredStateOnPlaneClosestTo(TVector3(0, 0, 0), rep);
+            ltrack.getMeasuredStateOnPlaneClosestTo(ROOT::Math::XYZVector(0, 0, 0), rep);
           rep->extrapolateToLine(state, TVector3(0, 0, -1000), TVector3(0, 0, 2000));
           // TODO check after matching
           //  // flip tracks if necessary, such that trigger tracks and reco tracks

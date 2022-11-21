@@ -11,7 +11,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(KLMDigitTimeShifter)
+REG_MODULE(KLMDigitTimeShifter);
 
 KLMDigitTimeShifterModule::KLMDigitTimeShifterModule() :
   Module()

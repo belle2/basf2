@@ -17,7 +17,6 @@
 
 using namespace Belle2;
 using namespace Belle2::HistogramFactory;
-using namespace std;
 using boost::format;
 
 //-----------------------------------------------------------------
@@ -94,7 +93,8 @@ void DQMHistoModuleBase::event()
   }
 }
 
-TH1F* DQMHistoModuleBase::Create(string name, string title, int nbinsx, double xlow, double xup, string xTitle, string yTitle)
+TH1F* DQMHistoModuleBase::Create(std::string name, std::string title, int nbinsx, double xlow, double xup, std::string xTitle,
+                                 std::string yTitle)
 {
   TH1F* histogram = new TH1F(name.c_str(), title.c_str(), nbinsx, xlow, xup);
   histogram->GetXaxis()->SetTitle(xTitle.c_str());
@@ -105,8 +105,8 @@ TH1F* DQMHistoModuleBase::Create(string name, string title, int nbinsx, double x
   return histogram;
 }
 
-TH2F* DQMHistoModuleBase::Create(string name, string title, int nbinsx, double xlow, double xup, int nbinsy, double ylow,
-                                 double yup, string xTitle, string yTitle, string zTitle)
+TH2F* DQMHistoModuleBase::Create(std::string name, std::string title, int nbinsx, double xlow, double xup, int nbinsy, double ylow,
+                                 double yup, std::string xTitle, std::string yTitle, std::string zTitle)
 {
   TH2F* histogram = new TH2F(name.c_str(), title.c_str(), nbinsx, xlow, xup, nbinsy, ylow, yup);
   histogram->GetXaxis()->SetTitle(xTitle.c_str());
@@ -118,19 +118,19 @@ TH2F* DQMHistoModuleBase::Create(string name, string title, int nbinsx, double x
   return histogram;
 }
 
-string DQMHistoModuleBase::SensorNameDescription(VxdID sensorID)
+std::string DQMHistoModuleBase::SensorNameDescription(VxdID sensorID)
 {
   return str(format("%1%_%2%_%3%") % sensorID.getLayerNumber() % sensorID.getLadderNumber() % sensorID.getSensorNumber());
 }
 
-string DQMHistoModuleBase::SensorTitleDescription(VxdID sensorID)
+std::string DQMHistoModuleBase::SensorTitleDescription(VxdID sensorID)
 {
   return str(format("Layer %1% Ladder %2% Sensor %3%") % sensorID.getLayerNumber() % sensorID.getLadderNumber() %
              sensorID.getSensorNumber());
 }
 
 TH1F** DQMHistoModuleBase::CreateLayers(boost::format nameTemplate, boost::format titleTemplate, int nbinsx, double xlow,
-                                        double xup, string xTitle, string yTitle)
+                                        double xup, std::string xTitle, std::string yTitle)
 {
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   auto gTools = geo.getGeoTools();
@@ -140,8 +140,8 @@ TH1F** DQMHistoModuleBase::CreateLayers(boost::format nameTemplate, boost::forma
   for (VxdID layer : geo.getLayers()) {
     int layerNumber = layer.getLayerNumber();
     int layerIndex = gTools->getLayerIndex(layerNumber);
-    string name = str(nameTemplate % layerNumber);
-    string title = str(titleTemplate % layerNumber);
+    std::string name = str(nameTemplate % layerNumber);
+    std::string title = str(titleTemplate % layerNumber);
     output[layerIndex] = Create(name, title, nbinsx, xlow, xup, xTitle, yTitle);
   }
 
@@ -149,7 +149,7 @@ TH1F** DQMHistoModuleBase::CreateLayers(boost::format nameTemplate, boost::forma
 }
 
 TH2F** DQMHistoModuleBase::CreateLayers(boost::format nameTemplate, boost::format titleTemplate, int nbinsx, double xlow,
-                                        double xup, int nbinsy, double ylow, double yup, string xTitle, string yTitle, string zTitle)
+                                        double xup, int nbinsy, double ylow, double yup, std::string xTitle, std::string yTitle, std::string zTitle)
 {
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   auto gTools = geo.getGeoTools();
@@ -159,8 +159,8 @@ TH2F** DQMHistoModuleBase::CreateLayers(boost::format nameTemplate, boost::forma
   for (VxdID layer : geo.getLayers()) {
     int layerNumber = layer.getLayerNumber();
     int layerIndex = gTools->getLayerIndex(layerNumber);
-    string name = str(nameTemplate % layerNumber);
-    string title = str(titleTemplate % layerNumber);
+    std::string name = str(nameTemplate % layerNumber);
+    std::string title = str(titleTemplate % layerNumber);
     output[layerIndex] = Create(name, title, nbinsx, xlow, xup, nbinsy, ylow, yup, xTitle, yTitle, zTitle);
   }
 
@@ -168,7 +168,7 @@ TH2F** DQMHistoModuleBase::CreateLayers(boost::format nameTemplate, boost::forma
 }
 
 TH1F** DQMHistoModuleBase::CreateSensors(boost::format nameTemplate, boost::format titleTemplate, int nbinsx, double xlow,
-                                         double xup, string xTitle, string yTitle)
+                                         double xup, std::string xTitle, std::string yTitle)
 {
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   auto gTools = geo.getGeoTools();
@@ -178,8 +178,8 @@ TH1F** DQMHistoModuleBase::CreateSensors(boost::format nameTemplate, boost::form
 
   for (int sensorIndex = 0; sensorIndex < nVXDSensors; sensorIndex++) {
     VxdID sensorID = gTools->getSensorIDFromIndex(sensorIndex);
-    string name = str(nameTemplate % SensorNameDescription(sensorID));
-    string title = str(titleTemplate % SensorTitleDescription(sensorID));
+    std::string name = str(nameTemplate % SensorNameDescription(sensorID));
+    std::string title = str(titleTemplate % SensorTitleDescription(sensorID));
     output[sensorIndex] = Create(name, title, nbinsx, xlow, xup, xTitle, yTitle);
   }
 
@@ -187,7 +187,7 @@ TH1F** DQMHistoModuleBase::CreateSensors(boost::format nameTemplate, boost::form
 }
 
 TH2F** DQMHistoModuleBase::CreateSensors(boost::format nameTemplate, boost::format titleTemplate, int nbinsx, double xlow,
-                                         double xup, int nbinsy, double ylow, double yup, string xTitle, string yTitle, string zTitle)
+                                         double xup, int nbinsy, double ylow, double yup, std::string xTitle, std::string yTitle, std::string zTitle)
 {
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   auto gTools = geo.getGeoTools();
@@ -197,8 +197,8 @@ TH2F** DQMHistoModuleBase::CreateSensors(boost::format nameTemplate, boost::form
 
   for (int sensorIndex = 0; sensorIndex < nVXDSensors; sensorIndex++) {
     VxdID sensorID = gTools->getSensorIDFromIndex(sensorIndex);
-    string name = str(nameTemplate % SensorNameDescription(sensorID));
-    string title = str(titleTemplate % SensorTitleDescription(sensorID));
+    std::string name = str(nameTemplate % SensorNameDescription(sensorID));
+    std::string title = str(titleTemplate % SensorTitleDescription(sensorID));
     output[sensorIndex] = Create(name, title, nbinsx, xlow, xup, nbinsy, ylow, yup, xTitle, yTitle, zTitle);
   }
 
@@ -392,18 +392,18 @@ void DQMHistoModuleBase::DefineTRClusters()
     int layerIndex = gTools->getLayerIndex(layerNumber);
 
     /** Track related clusters - neighbor corelations in Phi */
-    string name = str(format("CorrelationsPhiLayers_%1%_%2%") % layerNumber % (layerNumber + 1));
-    string title = str(format("Correlations in Phi for Layers %1% %2%") % layerNumber % (layerNumber + 1));
-    string xTitle = str(format("angle layer %1% [deg]") % layerNumber);
-    string yTitle = str(format("angle layer %1% [deg]") % (layerNumber + 1));
-    m_TRClusterCorrelationsPhi[layerIndex] = Create(name.c_str(), title.c_str(), nbins, -range, range, nbins, -range, range,
-                                                    xTitle.c_str(), yTitle.c_str(), "counts");
+    std::string name = str(format("CorrelationsPhiLayers_%1%_%2%") % layerNumber % (layerNumber + 1));
+    std::string title = str(format("Correlations in Phi for Layers %1% %2%") % layerNumber % (layerNumber + 1));
+    std::string xTitle = str(format("angle layer %1% [deg]") % layerNumber);
+    std::string yTitle = str(format("angle layer %1% [deg]") % (layerNumber + 1));
+    m_TRClusterCorrelationsPhi[layerIndex] = Create(name, title, nbins, -range, range, nbins, -range, range,
+                                                    xTitle, yTitle, "counts");
 
     /** Track related clusters - neighbor corelations in Theta */
     name = str(format("CorrelationsThetaLayers_%1%_%2%") % layerNumber % (layerNumber + 1));
     title = str(format("Correlations in Theta for Layers %1% %2%") % layerNumber % (layerNumber + 1));
-    m_TRClusterCorrelationsTheta[layerIndex] = Create(name.c_str(), title.c_str(), nbins / 2, .0, range, nbins / 2, .0, range,
-                                                      xTitle.c_str(), yTitle.c_str(), "counts");
+    m_TRClusterCorrelationsTheta[layerIndex] = Create(name, title, nbins / 2, .0, range, nbins / 2, .0, range,
+                                                      xTitle, yTitle, "counts");
   }
 }
 
@@ -460,15 +460,16 @@ void DQMHistoModuleBase::FillHitNumbers(int nPXD, int nSVD, int nCDC)
 
 void DQMHistoModuleBase::FillMomentumAngles(const TrackFitResult* tfr)
 {
-  TVector3 mom = tfr->getMomentum();
+  const ROOT::Math::XYZVector mom = tfr->getMomentum();
 
-  float px = mom.Px();
-  float py = mom.Py();
-  float pz = mom.Pz();
+  // don't fill NAN or INF
+  if (checkVariableForNANOrINF(mom.X()) or checkVariableForNANOrINF(mom.Y()) or checkVariableForNANOrINF(mom.Z()) or
+      checkVariableForNANOrINF(mom.Phi()) or checkVariableForNANOrINF(mom.Theta())) {
+    return;
+  }
 
-  float Phi = atan2(py, px);
-  float pxy = sqrt(px * px + py * py);
-  float Theta = atan2(pxy, pz);
+  float Phi = mom.Phi();
+  float Theta = mom.Theta();
 
   m_MomPhi->Fill(Phi / Unit::deg);
   m_MomTheta->Fill(Theta / Unit::deg);
@@ -477,17 +478,29 @@ void DQMHistoModuleBase::FillMomentumAngles(const TrackFitResult* tfr)
 
 void DQMHistoModuleBase::FillMomentumCoordinates(const TrackFitResult* tfr)
 {
-  TVector3 mom = tfr->getMomentum();
+  const ROOT::Math::XYZVector& mom = tfr->getMomentum();
 
-  m_MomX->Fill(mom.Px());
-  m_MomY->Fill(mom.Py());
-  m_MomZ->Fill(mom.Pz());
-  m_Mom->Fill(mom.Mag());
-  m_MomPt->Fill(mom.Pt());
+  // don't fill NAN or INF, Mag is NAN/INF if any component is, no need to check
+  if (checkVariableForNANOrINF(mom.X()) or checkVariableForNANOrINF(mom.Y()) or
+      checkVariableForNANOrINF(mom.Z()) or checkVariableForNANOrINF(mom.Rho())) {
+    return;
+  }
+
+  m_MomX->Fill(mom.X());
+  m_MomY->Fill(mom.Y());
+  m_MomZ->Fill(mom.Z());
+  m_Mom->Fill(mom.R());
+  m_MomPt->Fill(mom.Rho());
 }
 
 void DQMHistoModuleBase::FillHelixParametersAndCorrelations(const TrackFitResult* tfr)
 {
+  // don't fill NAN or INF
+  if (checkVariableForNANOrINF(tfr->getD0()) or checkVariableForNANOrINF(tfr->getZ0()) or checkVariableForNANOrINF(tfr->getPhi()) or
+      checkVariableForNANOrINF(tfr->getOmega()) or checkVariableForNANOrINF(tfr->getTanLambda())) {
+    return;
+  }
+
   m_D0->Fill(tfr->getD0());
   m_Z0->Fill(tfr->getZ0());
   m_Phi->Fill(tfr->getPhi() / Unit::deg);
@@ -500,12 +513,17 @@ void DQMHistoModuleBase::FillHelixParametersAndCorrelations(const TrackFitResult
 
 void DQMHistoModuleBase::FillTrackFitStatus(const genfit::FitStatus* tfs)
 {
+  // don't fill NAN or INF
+  if (checkVariableForNANOrINF(tfs->getChi2()) or checkVariableForNANOrINF(tfs->getNdf())) {
+    return;
+  }
+
   float NDF = tfs->getNdf();
   m_NDF->Fill(NDF);
-
-  m_Chi2->Fill(tfs->getChi2());
-  if (NDF) {
-    float Chi2NDF = tfs->getChi2() / NDF;
+  float chi2 = tfs->getChi2();
+  m_Chi2->Fill(chi2);
+  if (NDF > 0) {
+    float Chi2NDF = chi2 / NDF;
     m_Chi2NDF->Fill(Chi2NDF);
   }
 
@@ -519,22 +537,33 @@ void DQMHistoModuleBase::FillTRClusterCorrelations(float phi_deg, float phiPrev_
   m_TRClusterCorrelationsTheta[correlationIndex]->Fill(thetaPrev_deg, theta_deg);
 }
 
-void DQMHistoModuleBase::FillUBResidualsPXD(TVector3 residual_um)
+void DQMHistoModuleBase::FillUBResidualsPXD(const TVector3& residual_um)
 {
+  if (checkVariableForNANOrINF(residual_um.X()) or checkVariableForNANOrINF(residual_um.Y())) {
+    return;
+  }
   m_UBResidualsPXD->Fill(residual_um.x(), residual_um.y());
   m_UBResidualsPXDU->Fill(residual_um.x());
   m_UBResidualsPXDV->Fill(residual_um.y());
 }
 
-void DQMHistoModuleBase::FillUBResidualsSVD(TVector3 residual_um)
+void DQMHistoModuleBase::FillUBResidualsSVD(const TVector3& residual_um)
 {
+  if (checkVariableForNANOrINF(residual_um.X()) or checkVariableForNANOrINF(residual_um.Y())) {
+    return;
+  }
   m_UBResidualsSVD->Fill(residual_um.x(), residual_um.y());
   m_UBResidualsSVDU->Fill(residual_um.x());
   m_UBResidualsSVDV->Fill(residual_um.y());
 }
 
-void DQMHistoModuleBase::FillHalfShellsPXD(TVector3 globalResidual_um, bool isNotYang)
+void DQMHistoModuleBase::FillHalfShellsPXD(const TVector3& globalResidual_um, bool isNotYang)
 {
+  if (checkVariableForNANOrINF(globalResidual_um.X()) or
+      checkVariableForNANOrINF(globalResidual_um.Y()) or
+      checkVariableForNANOrINF(globalResidual_um.Z())) {
+    return;
+  }
   if (isNotYang) {
     m_UBResidualsPXDX_Yin->Fill(globalResidual_um.x());
     m_UBResidualsPXDY_Yin->Fill(globalResidual_um.y());
@@ -546,8 +575,13 @@ void DQMHistoModuleBase::FillHalfShellsPXD(TVector3 globalResidual_um, bool isNo
   }
 }
 
-void DQMHistoModuleBase::FillHalfShellsSVD(TVector3 globalResidual_um, bool isNotMat)
+void DQMHistoModuleBase::FillHalfShellsSVD(const TVector3& globalResidual_um, bool isNotMat)
 {
+  if (checkVariableForNANOrINF(globalResidual_um.X()) or
+      checkVariableForNANOrINF(globalResidual_um.Y()) or
+      checkVariableForNANOrINF(globalResidual_um.Z())) {
+    return;
+  }
   if (isNotMat) {
     m_UBResidualsSVDX_Pat->Fill(globalResidual_um.x());
     m_UBResidualsSVDY_Pat->Fill(globalResidual_um.y());
@@ -559,14 +593,20 @@ void DQMHistoModuleBase::FillHalfShellsSVD(TVector3 globalResidual_um, bool isNo
   }
 }
 
-void DQMHistoModuleBase::FillUB1DResidualsSensor(TVector3 residual_um, int sensorIndex)
+void DQMHistoModuleBase::FillUB1DResidualsSensor(const TVector3& residual_um, int sensorIndex)
 {
+  if (checkVariableForNANOrINF(residual_um.X()) or checkVariableForNANOrINF(residual_um.Y())) {
+    return;
+  }
   m_UBResidualsSensorU[sensorIndex]->Fill(residual_um.x());
   m_UBResidualsSensorV[sensorIndex]->Fill(residual_um.y());
 }
 
-void DQMHistoModuleBase::FillUB2DResidualsSensor(TVector3 residual_um, int sensorIndex)
+void DQMHistoModuleBase::FillUB2DResidualsSensor(const TVector3& residual_um, int sensorIndex)
 {
+  if (checkVariableForNANOrINF(residual_um.X()) or checkVariableForNANOrINF(residual_um.Y())) {
+    return;
+  }
   m_UBResidualsSensor[sensorIndex]->Fill(residual_um.x(), residual_um.y());
 }
 
@@ -596,7 +636,8 @@ void DQMHistoModuleBase::ComputeMean(TH1F* output, TH2F* input, bool onX)
   }
 }
 
-void DQMHistoModuleBase::ProcessHistogramParameterChange(const string& name, const string& parameter, const string& value)
+void DQMHistoModuleBase::ProcessHistogramParameterChange(const std::string& name, const std::string& parameter,
+                                                         const std::string& value)
 {
   TH1* histogram = nullptr;
 
@@ -611,17 +652,17 @@ void DQMHistoModuleBase::ProcessHistogramParameterChange(const string& name, con
   } else {
     try {
       EditHistogramParameter(histogram, parameter, value);
-    } catch (const invalid_argument& e) {
+    } catch (const std::invalid_argument& e) {
       B2WARNING("Value " + value + " of parameter " + parameter + " for histogram " + histogram->GetName() +
                 " could not be parsed, parameter change is skipped in " + getName() + ".");
-    } catch (const out_of_range& e) {
+    } catch (const std::out_of_range& e) {
       B2WARNING("Value " + value + " of parameter " + parameter + " for histogram " + histogram->GetName() +
                 " is out of range, parameter change is skipped in " + getName() + ".");
     }
   }
 }
 
-void DQMHistoModuleBase::EditHistogramParameter(TH1* histogram, const string& parameter, string value)
+void DQMHistoModuleBase::EditHistogramParameter(TH1* histogram, const std::string& parameter, std::string value)
 {
   if (parameter == "title") {
     histogram->SetTitle(value.c_str());

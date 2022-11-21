@@ -73,28 +73,36 @@ CDCPathFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
     return std::make_unique<TrackFindingCDC::NoneFilter<BaseCDCPathFilter>>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "all") {
     return std::make_unique<TrackFindingCDC::AllFilter<BaseCDCPathFilter>>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "size") {
     return std::make_unique<SizeCDCPathFilter>();
     //} else if (filterName == "mc_truth") {
     //  return std::make_unique<MCTruthCDCPathFilter>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "recording") {
     return std::make_unique<RecordingCDCPathFilter>("CDCPathFilter.root");
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "size_and_recording") {
     return std::make_unique<AndCDCPathFilter>(
              std::make_unique<RecordingCDCPathFilter>("CDCPathFilter.root"),
              std::make_unique<SizeCDCPathFilter>()
            );
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "recording_fromEcl") {
     return std::make_unique<RecordingCDCfromEclPathFilter>("CDCfromEclPathFilter.root");
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "size_and_recording_fromEcl") {
     return std::make_unique<AndCDCPathFilter>(
              std::make_unique<RecordingCDCfromEclPathFilter>("CDCfromEclPathFilter.root"),
              std::make_unique<SizeCDCPathFilter>()
            );
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "seedCharge") {
     return std::make_unique<SeedChargeCDCPathFilter>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "seedCharge_and_recording_fromEcl") {
     return std::make_unique<AndCDCPathFilter>(
              std::make_unique<RecordingCDCfromEclPathFilter>("CDCfromEclPathFilter.root"),

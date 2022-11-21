@@ -9,21 +9,8 @@
 // Own include
 #include <dqm/analysis/modules/DQMHistAnalysisMiraBelle.h>
 
-//DQM
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
-
-#include <TFile.h>
-#include <TF1.h>
-#include <TH1F.h>
-#include <TH2F.h>
-#include <TCanvas.h>
-#include <TLine.h>
-#include <TClass.h>
 #include <TROOT.h>
-
-#include <fstream>
-#include <vector>
-#include <algorithm>
+#include <TF1.h>
 
 using namespace std;
 using namespace Belle2;

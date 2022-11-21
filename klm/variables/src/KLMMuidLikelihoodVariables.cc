@@ -14,8 +14,6 @@
 #include <analysis/VariableManager/Manager.h>
 #include <mdst/dataobjects/Track.h>
 
-using namespace std;
-
 namespace Belle2 {
   namespace Variable {
 

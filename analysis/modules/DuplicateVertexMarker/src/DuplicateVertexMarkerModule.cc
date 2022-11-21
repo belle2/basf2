@@ -24,7 +24,7 @@ using namespace Belle2;
 //                 Register module
 //-----------------------------------------------------------------
 
-REG_MODULE(DuplicateVertexMarker)
+REG_MODULE(DuplicateVertexMarker);
 
 DuplicateVertexMarkerModule::DuplicateVertexMarkerModule() : Module(), m_targetVar(nullptr)
 {

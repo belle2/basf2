@@ -43,14 +43,14 @@ namespace Belle2 {
                TVector3 momentum)
     {
 
-      m_x = (float) position.x();
-      m_y = (float) position.y();
-      m_z = (float) position.z();
+      m_x = (float) position.X();
+      m_y = (float) position.Y();
+      m_z = (float) position.Z();
       m_momentum = (float) momentum.Mag();
       momentum = momentum.Unit();
-      m_dx = (float) momentum.x();
-      m_dy = (float) momentum.y();
-      m_dz = (float) momentum.z();
+      m_dx = (float) momentum.X();
+      m_dy = (float) momentum.Y();
+      m_dz = (float) momentum.Z();
 
     }
 
@@ -83,13 +83,13 @@ namespace Belle2 {
     explicit ARICHTrack(const ExtHit* extHit)
     {
 
-      TVector3 pos = extHit->getPosition();
+      ROOT::Math::XYZVector pos = extHit->getPosition();
       m_x = (float) pos.X();
       m_y = (float) pos.Y();
       m_z = (float) pos.Z();
 
-      TVector3 mom = extHit->getMomentum();
-      m_momentum = (float) mom.Mag();
+      ROOT::Math::XYZVector mom = extHit->getMomentum();
+      m_momentum = (float) mom.R();
       mom = mom.Unit();
       m_dx = (float) mom.X();
       m_dy = (float) mom.Y();
@@ -103,7 +103,7 @@ namespace Belle2 {
      */
     void setHapdWindowHit(const ExtHit* extHit)
     {
-      TVector3 pos = extHit->getPosition();
+      ROOT::Math::XYZVector pos = extHit->getPosition();
       m_winX = (float) pos.X();
       m_winY = (float) pos.Y();
       m_hitWin = true;

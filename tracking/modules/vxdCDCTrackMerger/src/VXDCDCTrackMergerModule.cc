@@ -11,7 +11,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(VXDCDCTrackMerger)
+REG_MODULE(VXDCDCTrackMerger);
 
 VXDCDCTrackMergerModule::VXDCDCTrackMergerModule() :
   Module(), m_CDC_wall_radius(16.25)
@@ -43,11 +43,11 @@ void VXDCDCTrackMergerModule::event()
 {
   //get CDC tracks
   unsigned int nCDCTracks = m_CDCRecoTracks.getEntries();
-  B2DEBUG(9, "VXDCDCTrackMerger: input Number of CDC Tracks: " << nCDCTracks);
+  B2DEBUG(29, "VXDCDCTrackMerger: input Number of CDC Tracks: " << nCDCTracks);
 
   //get VXD tracks
   unsigned int nVXDTracks = m_VXDRecoTracks.getEntries();
-  B2DEBUG(9,
+  B2DEBUG(29,
           "VXDCDCTrackMerger: input Number of VXD Tracks: " << nVXDTracks);
 
   // position and momentum used for extrapolations to the CDC Wall
@@ -91,7 +91,7 @@ void VXDCDCTrackMergerModule::event()
       cdcpos = cdc_sop.getPos();
       cdcmom = cdc_sop.getMom();
     } catch (...) {
-      B2DEBUG(9, "CDCTrack extrapolation to cylinder failed!");
+      B2DEBUG(29, "CDCTrack extrapolation to cylinder failed!");
       continue;
     }
 
@@ -118,7 +118,7 @@ void VXDCDCTrackMergerModule::event()
         vxdmom = vxd_sop.getMom();
       } catch (genfit::Exception const&) {
         // extrapolation not possible, skip this track
-        B2DEBUG(9, "VXDTrack extrapolation to cylinder failed!");
+        B2DEBUG(29, "VXDTrack extrapolation to cylinder failed!");
         continue;
       }
 
@@ -133,7 +133,7 @@ void VXDCDCTrackMergerModule::event()
           vxd_sop.extrapolateToPlane(cdc_sop.getPlane());
         } catch (genfit::Exception const&) {
           // extrapolation not possible, skip this track
-          B2DEBUG(9, "VXDTrack extrapolation to plane failed!");
+          B2DEBUG(29, "VXDTrack extrapolation to plane failed!");
           continue;
         }
 

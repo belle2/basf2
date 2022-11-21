@@ -17,7 +17,7 @@
 using namespace Belle2;
 
 // Register module in the framework
-REG_MODULE(VariableToReturnValue)
+REG_MODULE(VariableToReturnValue);
 
 
 VariableToReturnValueModule::VariableToReturnValueModule() :

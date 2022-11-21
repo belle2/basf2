@@ -3554,6 +3554,12 @@ namespace Belle2 {
       unsigned int m_copper_address;
       /// address of copper module
       unsigned int m_copper_ab;
+      /// address of PCIe40 module
+      unsigned int m_pcie40_address = 0x10000001;
+      /// channel ID of PCIe40 module
+      unsigned int m_pcie40_ch;
+      /// PCIe40 data or copper data;
+      bool m_pciedata = false;
       /// Number of words im raw data, 2k
       int m_nword_2k = 3075;
       /// Number of words im raw data, 2.6k, 15 TS version

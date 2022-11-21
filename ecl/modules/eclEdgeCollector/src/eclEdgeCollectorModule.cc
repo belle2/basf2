@@ -19,7 +19,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(eclEdgeCollector)
+REG_MODULE(eclEdgeCollector);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -101,7 +101,8 @@ void eclEdgeCollectorModule::collect()
       float thetaEdge = crystalPos.Theta() - offsetTheta[cellID - 1];
       getObjectPtr<TH1F>("eclCrystalEdgeTheta")->SetBinContent(cellID, thetaEdge);
 
-      float phiEdge = crystalPos.Phi() - offsetPhi[cellID - 1];
+      float phiEdge = crystalPos.Phi();
+      if (!offsetPhi.empty()) phiEdge -= offsetPhi[cellID - 1];
       if (phiEdge < -TMath::Pi()) {phiEdge += 2 * TMath::Pi();}
       getObjectPtr<TH1F>("eclCrystalEdgePhi")->SetBinContent(cellID, phiEdge);
 

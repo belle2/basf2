@@ -252,7 +252,7 @@ def stdLep(pdgId,
         path (basf2.Path): modules are added to this path.
 
     Returns:
-        (str): the alias for the lepton ID variable.
+        tuple(str, list(str)): the alias for the lepton ID variable, and the list of aliases for the weights.
     """
 
     working_points = (
@@ -418,11 +418,20 @@ def stdLep(pdgId,
     ma.applyCuts(outputListName, cut, path=path)
 
     # Define convenience aliases for the nominal weight and up/dn variations.
-    aliases_to_var = {
+    weight_aliases_to_var = {
         f"weight_{pid_alias}_eff_{working_point}": f"extraInfo({payload_eff}_data_MC_ratio)",
         f"weight_{pid_alias}_misid_pi_{working_point}": f"extraInfo({payload_misid_pi}_data_MC_ratio)",
+        # These aliases are *absolute* variations.
+        f"weight_{pid_alias}_eff_{working_point}_stat_up": f"extraInfo({payload_eff}_data_MC_uncertainty_stat_up)",
+        f"weight_{pid_alias}_eff_{working_point}_stat_dn": f"extraInfo({payload_eff}_data_MC_uncertainty_stat_dn)",
+        f"weight_{pid_alias}_eff_{working_point}_sys_up": f"extraInfo({payload_eff}_data_MC_uncertainty_sys_up)",
+        f"weight_{pid_alias}_eff_{working_point}_sys_dn": f"extraInfo({payload_eff}_data_MC_uncertainty_sys_dn)",
+        f"weight_{pid_alias}_misid_pi_{working_point}_stat_up": f"extraInfo({payload_misid_pi}_data_MC_uncertainty_stat_up)",
+        f"weight_{pid_alias}_misid_pi_{working_point}_stat_dn": f"extraInfo({payload_misid_pi}_data_MC_uncertainty_stat_dn)",
+        f"weight_{pid_alias}_misid_pi_{working_point}_sys_up": f"extraInfo({payload_misid_pi}_data_MC_uncertainty_sys_up)",
+        f"weight_{pid_alias}_misid_pi_{working_point}_sys_dn": f"extraInfo({payload_misid_pi}_data_MC_uncertainty_sys_dn)",
         # These aliases are *relative* variations, so they can be multiplied to the nominal
-        # to get the varied value:
+        # to get the varied weight:
         #
         # w_rel_var_up = (1 + w_up/w_nominal)
         # w_rel_var_dn = (1 - w_dn/w_nominal)
@@ -447,8 +456,13 @@ def stdLep(pdgId,
         f"formula(1-[extraInfo({payload_misid_pi}_data_MC_uncertainty_sys_dn)/extraInfo({payload_misid_pi}_data_MC_ratio)])",
     }
     if classification == "global":
-        aliases_to_var.update({
+        weight_aliases_to_var.update({
             f"weight_{pid_alias}_misid_K_{working_point}": f"extraInfo({payload_misid_K}_data_MC_ratio)",
+            #
+            f"weight_{pid_alias}_misid_K_{working_point}_stat_up": f"extraInfo({payload_misid_K}_data_MC_uncertainty_stat_up)",
+            f"weight_{pid_alias}_misid_K_{working_point}_stat_dn": f"extraInfo({payload_misid_K}_data_MC_uncertainty_stat_dn)",
+            f"weight_{pid_alias}_misid_K_{working_point}_sys_up": f"extraInfo({payload_misid_K}_data_MC_uncertainty_sys_up)",
+            f"weight_{pid_alias}_misid_K_{working_point}_sys_dn": f"extraInfo({payload_misid_K}_data_MC_uncertainty_sys_dn)",
             #
             f"weight_{pid_alias}_misid_K_{working_point}_rel_stat_up":
             f"formula(1+[extraInfo({payload_misid_K}_data_MC_uncertainty_stat_up)/extraInfo({payload_misid_K}_data_MC_ratio)])",
@@ -460,10 +474,10 @@ def stdLep(pdgId,
             f"formula(1-[extraInfo({payload_misid_K}_data_MC_uncertainty_sys_dn)/extraInfo({payload_misid_K}_data_MC_ratio)])",
         })
 
-    for alias, var in aliases_to_var.items():
+    for alias, var in weight_aliases_to_var.items():
         variables.addAlias(alias, var)
 
-    return pid_alias
+    return pid_alias, list(weight_aliases_to_var.keys())
 
 
 def stdE(listtype=_defaultlist,
@@ -495,12 +509,12 @@ def stdE(listtype=_defaultlist,
     * '85eff'
 
     Returns:
-        (str): the alias for the electron ID variable.
+        tuple(str, list(str)): the alias for the electron ID variable, and the list of aliases for the weights.
     """
 
     if listtype in _stdnames + _effnames:
         stdCharged("e", listtype, path)
-        return _pidnames[_chargednames.index("e")]
+        return _pidnames[_chargednames.index("e")], None
 
     return stdLep(Const.electron.getPDGCode(), listtype, method, classification, lid_weights_gt,
                   release=release,
@@ -543,12 +557,12 @@ def stdMu(listtype=_defaultlist,
     * '85eff'
 
     Returns:
-        (str): the alias for the muon ID variable.
+        tuple(str, list(str)): the alias for the muon ID variable, and the list of aliases for the weights.
     """
 
     if listtype in _stdnames + _effnames:
         stdCharged("mu", listtype, path)
-        return _pidnames[_chargednames.index("mu")]
+        return _pidnames[_chargednames.index("mu")], None
 
     return stdLep(Const.muon.getPDGCode(), listtype, method, classification, lid_weights_gt,
                   release=release,

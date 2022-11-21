@@ -14,13 +14,12 @@
 #include <iostream>
 #include <TVector3.h>
 
-using namespace std;
 using namespace Belle2;
 
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SVDROIFinderAnalysisData)
+REG_MODULE(SVDROIFinderAnalysisData);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -99,7 +98,7 @@ SVDROIFinderAnalysisDataModule::SVDROIFinderAnalysisDataModule() : Module()
 
   addParam("rootFileName", m_rootFileName,
            "fileName used for . Will be ignored if parameter 'writeToRoot' is false (standard)",
-           string("svdDataRedAnalysisData"));
+           std::string("svdDataRedAnalysisData"));
 
   addParam("recoTrackListName", m_recoTrackListName,
            "name of the input collection of RecoTracks", std::string(""));
@@ -230,7 +229,7 @@ void SVDROIFinderAnalysisDataModule::initialize()
 void SVDROIFinderAnalysisDataModule::event()
 {
 
-  B2DEBUG(1, "  ++++++++++++++ SVDROIFinderAnalysisDataModule");
+  B2DEBUG(21, "  ++++++++++++++ SVDROIFinderAnalysisDataModule");
 
   int nGoodROIs = 0;
   int nOkROIs = 0;
@@ -241,10 +240,10 @@ void SVDROIFinderAnalysisDataModule::event()
 
     const TrackFitResult* tfr = m_tracks[i]->getTrackFitResultWithClosestMass(Const::pion);
 
-    TVector3 mom = tfr->getMomentum();
-    m_h1Track_pt->Fill(mom.Perp());
+    ROOT::Math::XYZVector mom = tfr->getMomentum();
+    m_h1Track_pt->Fill(mom.Rho());
     m_h1Track_phi->Fill(mom.Phi());
-    m_h1Track_cosTheta->Fill(mom.CosTheta());
+    m_h1Track_cosTheta->Fill(cos(mom.Theta()));
     m_h1Track_lambda->Fill(TMath::Pi() / 2 - mom.Theta());
     m_h1Track_pVal->Fill(tfr->getPValue());
 
@@ -278,11 +277,11 @@ void SVDROIFinderAnalysisDataModule::event()
       continue;
     }
 
-    TVector3 mom = tfr->getMomentum();
+    ROOT::Math::XYZVector mom = tfr->getMomentum();
     m_h1ROItrack->Fill(1);
-    m_h1ROItrack_pt->Fill(mom.Perp());
+    m_h1ROItrack_pt->Fill(mom.Rho());
     m_h1ROItrack_phi->Fill(mom.Phi());
-    m_h1ROItrack_cosTheta->Fill(mom.CosTheta());
+    m_h1ROItrack_cosTheta->Fill(cos(mom.Theta()));
     m_h1ROItrack_lambda->Fill(TMath::Pi() / 2 - mom.Theta());
     m_h1ROItrack_pVal->Fill(tfr->getPValue());
 
@@ -304,11 +303,11 @@ void SVDROIFinderAnalysisDataModule::event()
 
     float edgeStripsU = m_edgeU / pitchU;
     float edgeStripsV = m_edgeV / pitchV;
-    B2DEBUG(10, "good U in range " << edgeStripsU << ", " << nStripsU - edgeStripsU);
-    B2DEBUG(10, "good V in range " << edgeStripsV << ", " << nStripsV - edgeStripsV);
+    B2DEBUG(21, "good U in range " << edgeStripsU << ", " << nStripsU - edgeStripsU);
+    B2DEBUG(21, "good V in range " << edgeStripsV << ", " << nStripsV - edgeStripsV);
 
-    B2DEBUG(10, "U check: " << abs(centerROIU - centerSensorU) << " < (good) " << centerSensorU - edgeStripsU);
-    B2DEBUG(10, "V check: " << abs(centerROIV - centerSensorV) << " < (good) " << centerSensorV - edgeStripsV);
+    B2DEBUG(21, "U check: " << abs(centerROIU - centerSensorU) << " < (good) " << centerSensorU - edgeStripsU);
+    B2DEBUG(21, "V check: " << abs(centerROIV - centerSensorV) << " < (good) " << centerSensorV - edgeStripsV);
 
     if ((abs(centerROIU - centerSensorU) > centerSensorU - edgeStripsU)
         || (abs(centerROIV - centerSensorV) > centerSensorV - edgeStripsV))
@@ -322,9 +321,9 @@ void SVDROIFinderAnalysisDataModule::event()
              ": U side " << m_ROIs[i]->getMinUid() << "->" << m_ROIs[i]->getMaxUid() << ", V side " << m_ROIs[i]->getMinVid() << "->" <<
              m_ROIs[i]->getMaxVid());
 
-    m_h1GoodROItrack_pt->Fill(mom.Perp());
+    m_h1GoodROItrack_pt->Fill(mom.Rho());
     m_h1GoodROItrack_phi->Fill(mom.Phi());
-    m_h1GoodROItrack_cosTheta->Fill(mom.CosTheta());
+    m_h1GoodROItrack_cosTheta->Fill(cos(mom.Theta()));
     m_h1GoodROItrack_lambda->Fill(TMath::Pi() / 2 - mom.Theta());
     m_h1GoodROItrack_pVal->Fill(tfr->getPValue());
 
@@ -334,9 +333,9 @@ void SVDROIFinderAnalysisDataModule::event()
 
         m_h2FullROIcenters->Fill(centerROIU, centerROIV);
         m_h1FullROItrack->Fill(1);
-        m_h1FullROItrack_pt->Fill(mom.Perp());
+        m_h1FullROItrack_pt->Fill(mom.Rho());
         m_h1FullROItrack_phi->Fill(mom.Phi());
-        m_h1FullROItrack_cosTheta->Fill(mom.CosTheta());
+        m_h1FullROItrack_cosTheta->Fill(cos(mom.Theta()));
         m_h1FullROItrack_lambda->Fill(TMath::Pi() / 2 - mom.Theta());
         m_h1FullROItrack_pVal->Fill(tfr->getPValue());
 

@@ -20,7 +20,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(SmearPrimaryVertex)
+REG_MODULE(SmearPrimaryVertex);
 
 SmearPrimaryVertexModule::SmearPrimaryVertexModule() : Module(),
   m_Initial(BeamParameters::c_smearVertex)
@@ -46,8 +46,8 @@ void SmearPrimaryVertexModule::event()
 {
   StoreArray<MCParticle> mcParticles(m_MCParticlesName);
   // smear the primary vertex if not already done
-  TVector3 shift = m_Initial.updateVertex();
-  if (shift == TVector3{0, 0, 0}) return;
+  ROOT::Math::XYZVector shift = m_Initial.updateVertex();
+  if (shift == ROOT::Math::XYZVector(0, 0, 0)) return;
   for (MCParticle& mcParticle : mcParticles) {
     /* Shift the production vertex. */
     mcParticle.setProductionVertex(mcParticle.getProductionVertex() + shift);

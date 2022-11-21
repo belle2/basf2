@@ -7,15 +7,19 @@
  **************************************************************************/
 
 #pragma once
+
 #include <analysis/VariableManager/Manager.h>
-#include <mdst/dataobjects/MCParticle.h>
+
 #include <analysis/dataobjects/RestOfEvent.h>
-#include <TLorentzVector.h>
+
+#include <Math/Vector4D.h>
+
 #include <string>
 #include <vector>
 #include <set>
 
 namespace Belle2 {
+  class MCParticle;
   class Particle;
 
   namespace Variable {
@@ -40,6 +44,13 @@ namespace Belle2 {
      * Intended for debugging purposes, always returns 0.
      */
     double printROE(const Particle* particle);
+
+    /**
+     * Returns 1 if there is correct combination of daughter particles between the particle that is the basis of the ROE and the particle loaded from the ROE.
+     * Returns 0 if there is not correct combination.
+     * If there is no daughter particle loaded from the ROE, returns quiet NaN.
+     */
+    double hasCorrectROECombination(const Particle* particle);
 
     /**
      * Helper function for nRemainingTracksInRestOfEventWithMask and nRemainingTracksInRestOfEvent
@@ -351,7 +362,7 @@ namespace Belle2 {
      * Option 6: LAB: Same as option 5, but fix Emiss = pmiss (missing mass set to 0)
      * Option 7: LAB: Same as 6, correct pmiss 4vector with factor
      */
-    TLorentzVector missing4Vector(const Particle* particle, const std::string& maskName, const std::string& opt);
+    ROOT::Math::PxPyPzEVector missing4Vector(const Particle* particle, const std::string& maskName, const std::string& opt);
 
     /**
      * Helper function: Returns bit-pattern of flags corresponding to daughters of MCParticle missing in ROE

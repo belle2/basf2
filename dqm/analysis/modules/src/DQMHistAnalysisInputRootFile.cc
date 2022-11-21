@@ -14,7 +14,6 @@
 
 #include <dqm/analysis/modules/DQMHistAnalysisInputRootFile.h>
 
-#include <daq/slc/base/StringUtil.h>
 #include <TKey.h>
 #include <TROOT.h>
 
@@ -26,7 +25,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(DQMHistAnalysisInputRootFile)
+REG_MODULE(DQMHistAnalysisInputRootFile);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -36,14 +35,14 @@ DQMHistAnalysisInputRootFileModule::DQMHistAnalysisInputRootFileModule()
   : DQMHistAnalysisModule()
 {
   //Parameter definition
-  addParam("FileList", m_file_list, "List of input files" , std::vector<std::string> {"input_histo.root"});
+  addParam("FileList", m_file_list, "List of input files", std::vector<std::string> {"input_histo.root"});
   addParam("SelectHistograms", m_histograms, "List of histogram name patterns, empty for all. Support wildcard matching (* and ?).",
            std::vector<std::string>());
-  addParam("Experiment", m_expno, "Experiment Nr" , 7u);
-  addParam("RunList", m_run_list, "Run Number List" , std::vector<unsigned int> {1u});
-  addParam("EventsList", m_events_list, "Number of events for each run" , std::vector<unsigned int> {10u});
-  addParam("EventInterval", m_interval, "Time between events (seconds)" , 20u);
-  addParam("NullHistogramMode", m_null_histo_mode, "Test mode for null histograms" , false);
+  addParam("Experiment", m_expno, "Experiment Nr", 7u);
+  addParam("RunList", m_run_list, "Run Number List", std::vector<unsigned int> {1u});
+  addParam("EventsList", m_events_list, "Number of events for each run", std::vector<unsigned int> {10u});
+  addParam("EventInterval", m_interval, "Time between events (seconds)", 20u);
+  addParam("NullHistogramMode", m_null_histo_mode, "Test mode for null histograms", false);
   addParam("AutoCanvas", m_autocanvas, "Automatic creation of canvas", true);
   B2DEBUG(1, "DQMHistAnalysisInputRootFile: Constructor done.");
 }
@@ -89,11 +88,15 @@ bool DQMHistAnalysisInputRootFileModule::hname_pattern_match(std::string pattern
 void DQMHistAnalysisInputRootFileModule::beginRun()
 {
   B2INFO("DQMHistAnalysisInputRootFile: beginRun called. Run: " << m_run_list[m_run_idx]);
+  clearHistList();
 }
 
 void DQMHistAnalysisInputRootFileModule::event()
 {
   B2INFO("DQMHistAnalysisInputRootFile: event called.");
+
+  initHistListBeforeEvent();
+
   sleep(m_interval);
 
   if (m_count > m_events_list[m_run_idx]) {
@@ -230,7 +233,6 @@ void DQMHistAnalysisInputRootFileModule::event()
     }
   }
 
-  resetHist();
   for (size_t i = 0; i < hs.size(); i++) {
     TH1* h = hs[i];
     addHist("", h->GetName(), h);

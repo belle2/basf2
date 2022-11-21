@@ -49,6 +49,7 @@ namespace Belle2 {
     std::vector<double> m_energies_backward; /**< generated photon energies, backward */
 
     /** Required arrays */
+    std::string m_showerArrayName;  /**< Name of ECLShower StoreArray data object */
     StoreArray<ECLShower> m_eclShowerArray; /**< Required input array of ECLShowers */
     StoreArray<MCParticle> m_mcParticleArray; /**< Required input array of MCParticles */
     StoreObjPtr<EventMetaData> m_evtMetaData; /**< dataStore EventMetaData */

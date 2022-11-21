@@ -16,7 +16,7 @@ Decay Upsilon(4S)
 Enddecay
 #
 Decay B0sig
-1.000 K*0  gamma  HELAMP 1.0 0.0 1.0 0.0; 
+1.000 K*0  gamma  SVP_HELAMP 1.0 0.0 1.0 0.0;
 Enddecay
 CDecay anti-B0sig
 #

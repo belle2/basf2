@@ -28,7 +28,6 @@
 import basf2 as b2
 from basf2 import conditions as b2c
 # Individual validation packages
-from SVDValidationTTree import SVDValidationTTree
 from SVDValidationTTreeStrip import SVDValidationTTreeStrip
 from SVDValidationTTreeSimhit import SVDValidationTTreeSimhit
 from SVDValidationTTreeSpacePoint import SVDValidationTTreeSpacePoint
@@ -62,8 +61,6 @@ progress = b2.register_module('Progress')
 main.add_module(progress)
 
 # SVD validation modules
-svdvalidation = SVDValidationTTree()
-main.add_module(svdvalidation)
 svdvalidationstrip = SVDValidationTTreeStrip()
 main.add_module(svdvalidationstrip)
 svdvalidationspacepoint = SVDValidationTTreeSpacePoint()
@@ -80,6 +77,7 @@ svdvalidationcluster = SVDValidationTTreeCluster()
 main.add_module(svdvalidationcluster)
 
 
+main.add_module('Progress')
 b2.process(main)
 
 # Print call statistics

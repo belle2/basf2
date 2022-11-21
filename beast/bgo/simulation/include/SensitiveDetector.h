@@ -5,10 +5,12 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#ifndef BGO_SENSITIVEDETECTOR_H
-#define BGO_SENSITIVEDETECTOR_H
+
+#pragma once
 
 #include <simulation/kernel/SensitiveDetectorBase.h>
+
+#include <TVector3.h>
 
 namespace Belle2 {
   /** Namespace to encapsulate code needed for the BGO detector */
@@ -74,5 +76,3 @@ namespace Belle2 {
 
   } //bgo namespace
 } //Belle2 namespace
-
-#endif

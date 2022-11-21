@@ -296,7 +296,8 @@ class ValidationPlot(object):
                 allow_discrete=False,
                 cumulation_direction=None,
                 gaus_z_score=None,
-                is_expert=True):
+                is_expert=True,
+                is_asymmetry=False):
         """Fill the plot with a one dimensional profile of one variable over another."""
 
         # if referenceFileName was set the binning will taken from there
@@ -354,11 +355,14 @@ class ValidationPlot(object):
             if not self.ylabel:
                 self.ylabel = 'probability'
 
+            min_y = 0
+            if(is_asymmetry):
+                min_y = -1.05
             for histogram in self.histograms:
-                histogram.SetMinimum(0)
+                histogram.SetMinimum(min_y)
                 histogram.SetMaximum(1.05)
 
-            self.plot.SetMinimum(0)
+            self.plot.SetMinimum(min_y)
             self.plot.SetMaximum(1.05)
 
         return self
@@ -2287,7 +2291,7 @@ class ValidationPlot(object):
 
 
 def test():
-    """Simple test methode"""
+    """Simple test method"""
     ValidationPlot.set_tstyle()
 
     # Test a histogram plot with some nan and inf values

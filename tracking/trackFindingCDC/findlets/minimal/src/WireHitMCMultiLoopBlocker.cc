@@ -79,9 +79,9 @@ void WireHitMCMultiLoopBlocker::apply(std::vector<CDCWireHit>& wireHits)
 
     const double speed = mcParticle->get4Vector().Beta() * Const::speedOfLight;
 
-    const TVector3 mom3D = mcParticle->getMomentum();
-    const float absMom2D = mom3D.Perp();
-    const float absMom3D = mom3D.Mag();
+    const ROOT::Math::XYZVector mom3D = mcParticle->getMomentum();
+    const float absMom2D = mom3D.Rho();
+    const float absMom3D = mom3D.R();
 
     const Vector3D pos3D(0.0, 0.0, 0.0);
     const double bendRadius = CDCBFieldUtil::absMom2DToBendRadius(absMom2D, pos3D);

@@ -12,7 +12,6 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/logging/Logger.h>
 
-using namespace std;
 using namespace Belle2;
 
 TrackMatchLookUp::TrackMatchLookUp(const std::string& mcRecoTrackStoreArrayName,
@@ -185,6 +184,7 @@ const RecoTrack* TrackMatchLookUp::getMatchedPRRecoTrack(const RecoTrack& mcReco
 
 float TrackMatchLookUp::getMatchedPurity(const RecoTrack& recoTrack) const
 {
+
   if (isMCRecoTrack(recoTrack)) {
     const RecoTrack& mcRecoTrack = recoTrack;
     const RecoTrack* prRecoTrack = getMatchedPRRecoTrack(mcRecoTrack);
@@ -225,4 +225,16 @@ float TrackMatchLookUp::getMatchedEfficiency(const RecoTrack& recoTrack) const
       return NAN;
     }
   }
+}
+
+
+bool TrackMatchLookUp::isChargeMatched(const RecoTrack& recoTrack) const
+{
+  const MCParticle* mcParticle = getRelatedMCParticle(recoTrack);
+
+  if (mcParticle)
+    return (mcParticle->getCharge() == recoTrack.getChargeSeed());
+  else
+    return NAN;
+
 }

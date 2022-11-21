@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# coding: utf-8
+# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -9,14 +9,16 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-###############################################################
-# Plotting script to compare generated particle multiplicities
-# between two MC samples.
-###############################################################
+"""
+<header>
+    <input>MCvalidation.root</input>
+    <description>Comparing generated particle multiplicities</description>
+</header>
+"""
 
 from root_pandas import read_root
 import matplotlib.pyplot as plt
-import numpy as np
+# import numpy as np
 
 plt.rcParams['axes.prop_cycle'] = plt.cycler(color=["#7fcdbb", "#081d58"])
 
@@ -27,45 +29,40 @@ def PlottingCompHistos(particle):
     nbins = int(range_dic[particle][1] - (range_dic[particle][0]))
 
     # get unnormalised bin counts
-    raw, _, _ = plt.hist(new[var], bins=nbins, range=range_dic[particle])
-    raw2, outbins, _ = plt.hist(old[var], bins=nbins, range=range_dic[particle], histtype='step')
+    raw, _, _ = plt.hist(file[var], bins=nbins, range=range_dic[particle])
+    # raw2, outbins, _ = plt.hist(old[var], bins=nbins, range=range_dic[particle], histtype='step')
     plt.close()
 
     # plot normalised particle multiplicities histograms
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(5, 5), dpi=300, sharex=True, gridspec_kw={"height_ratios": [3.5, 1]})
-    count1, _, _ = ax1.hist(new[var], bins=nbins, range=range_dic[particle], density=True, label=label_new)
-    count2, outbins, _ = ax1.hist(old[var], bins=nbins, range=range_dic[particle], histtype='step', density=True, label=label_old)
+    count1, _, _ = ax1.hist(file[var], bins=nbins, range=range_dic[particle], density=True)
+    # count2, outbins, _ = ax1.hist(old[var], bins=nbins, range=range_dic[particle], histtype='step', density=True)
 
-    # calculate ratios
-    bin_centers = outbins[:-1] + np.diff(outbins) / 2
-    ratio = count1/count2
-    err = np.sqrt((1/raw)+(1/raw2))
+    # # calculate ratios
+    # bin_centers = outbins[:-1] + np.diff(outbins) / 2
+    # ratio = count1/count2
+    # err = np.sqrt((1/raw)+(1/raw2))
 
-    # plot residuals
-    ax2.errorbar(x=bin_centers, y=ratio, yerr=err, ls='', marker='_',  markersize='10', color="#4575b4")
-    ax2.axhline(1.0, alpha=0.3)
+    # # plot residuals
+    # ax2.errorbar(x=bin_centers, y=ratio, yerr=err, ls='', marker='_',  markersize='10', color="#4575b4")
+    # ax2.axhline(1.0, alpha=0.3)
 
     # add labels and legend
-    ax1.legend()
-    ax2.set_xlabel(axis_dic[particle])
-    ax2.set_ylabel(r'$\dfrac{New}{Old}$')
+    # ax1.legend()
+    # ax2.set_xlabel(axis_dic[particle])
+    # ax2.set_ylabel(r'$\dfrac{New}{Old}$')
     ax1.set_ylabel("Norm. Entries/Bin")
-    ax2.set_ylim(0.9, 1.1)
+    # ax2.set_ylim(0.9, 1.1)
 
     # save histograms
     fig.tight_layout()
     plt.savefig(str(var) + '.png')
-    plt.show()
 
 
 if __name__ == '__main__':
 
     # load the root files
-    new = read_root("MCvalidationR5.root", key="Multiplicities")
-    old = read_root("MCvalidationR4.root", key="Multiplicities")
-
-    label_new = 'Release 5'
-    label_old = 'Release 4'
+    file = read_root("MCvalidation.root", key="Multiplicities")
 
     # define the variables to plot
     all_list = [

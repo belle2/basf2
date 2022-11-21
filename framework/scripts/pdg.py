@@ -38,8 +38,8 @@ def _get_instance():
     """
     Function to return an instance of the EvtGenDatabasePDG class.
     """
-
-    from ROOT import Belle2  # Avoid to import ROOT when pdg is imported.
+    # Always avoid the top-level 'import ROOT'.
+    from ROOT import Belle2  # noqa
     instance = Belle2.EvtGenDatabasePDG.Instance()
     return instance
 

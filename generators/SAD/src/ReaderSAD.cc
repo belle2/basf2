@@ -362,7 +362,7 @@ void ReaderSAD::addParticleToMCParticles(MCParticleGraph& graph, bool gaussSmear
   */
   //each rings have 12 section of ~250m
   //the 1st section D01, the second section is D12, followed by D11, D10 .... for both rings
-  int section_ordering[12] = {1, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2};
+  const int section_ordering[12] = {1, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2};
   //int ring_section = section_ordering[(int)((m_inputSAD_ssraw + 1500.) / 12.)];
   double ssraw = 0.;
   if (ring == 1) {
@@ -383,8 +383,8 @@ void ReaderSAD::addParticleToMCParticles(MCParticleGraph& graph, bool gaussSmear
   }
 
   //Set missing particle information
-  particle.setMomentum(TVector3(particleMomGeant4));
-  particle.setProductionVertex(TVector3(particlePosGeant4));
+  particle.setMomentum(ROOT::Math::XYZVector(particleMomGeant4[0], particleMomGeant4[1], particleMomGeant4[2]));
+  particle.setProductionVertex(ROOT::Math::XYZVector(particlePosGeant4[0], particlePosGeant4[1], particlePosGeant4[2]));
   particle.setProductionTime(0.0);
   particle.setEnergy(sqrt(m_lostE * m_lostE + particle.getMass()*particle.getMass()));
   particle.setValidVertex(true);

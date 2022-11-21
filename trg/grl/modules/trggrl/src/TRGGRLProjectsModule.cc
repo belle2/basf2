@@ -23,7 +23,6 @@
 #include <framework/database/DBObjPtr.h>
 #include <mdst/dbobjects/TRGGDLDBInputBits.h>
 
-#include <TLorentzVector.h>
 #include <TMath.h>
 
 #include <iostream>
@@ -65,7 +64,7 @@ double radtodeg;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(TRGGRLProjects)
+REG_MODULE(TRGGRLProjects);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -149,10 +148,10 @@ void TRGGRLProjectsModule::initialize()
 
     //..Four vector of a 1 GeV lab photon at this TC
     TVector3 CellPosition = eclMapping->getTCPosition(tc);
-    TLorentzVector CellLab(1., 1., 1., 1.);
-    CellLab.SetTheta(CellPosition.Theta());
-    CellLab.SetPhi(CellPosition.Phi());
-    CellLab.SetRho(1.);
+    ROOT::Math::PxPyPzEVector CellLab;
+    CellLab.SetPx(CellPosition.Px() / CellPosition.Mag());
+    CellLab.SetPy(CellPosition.Py() / CellPosition.Mag());
+    CellLab.SetPz(CellPosition.Pz() / CellPosition.Mag());
     CellLab.SetE(1.);
 
     //..cotan Theta and phi in lab
@@ -161,7 +160,7 @@ void TRGGRLProjectsModule::initialize()
     TCcotThetaLab.push_back(1. / tantheta);
 
     //..Corresponding 4 vector in the COM frame
-    TLorentzVector CellCOM = boostrotate.rotateLabToCms() * CellLab;
+    ROOT::Math::PxPyPzEVector CellCOM = boostrotate.rotateLabToCms() * CellLab;
     TCThetaCOM.push_back(CellCOM.Theta()*radtodeg);
     TCPhiCOM.push_back(CellCOM.Phi()*radtodeg);
 
@@ -646,6 +645,8 @@ void TRGGRLProjectsModule::event()
   bool bha_theta_1 = (ECLtoGDL[2] & (1 << (88 - 32 * 2))) != 0;
   //ecltaub2b
   bool ecltaub2b = (ECLtoGDL[2] & (1 << (89 - 32 * 2))) != 0;
+  bool ecltaub2b2 = (ECLtoGDL[2] & (1 << (93 - 32 * 2))) != 0;
+  bool ecltaub2b3 = (ECLtoGDL[2] & (1 << (94 - 32 * 2))) != 0;
   // ehigh1-3
   bool ehigh1 = (ECLtoGDL[2] & (1 << (90 - 32 * 2))) != 0;
   bool ehigh2 = (ECLtoGDL[2] & (1 << (91 - 32 * 2))) != 0;
@@ -868,6 +869,8 @@ void TRGGRLProjectsModule::event()
     else if (bitname == "ecl_mumu") {bit = ecl_mumu;}
     else if (bitname == "ecl_bst") {bit = ecl_bst;}
     else if (bitname == "ecl_taub2b") {bit = ecltaub2b;}
+    else if (bitname == "ecl_taub2b2") {bit = ecltaub2b2;}
+    else if (bitname == "ecl_taub2b3") {bit = ecltaub2b3;}
     else if (bitname == "ehigh1") {bit = ehigh1;}
     else if (bitname == "ehigh2") {bit = ehigh2;}
     else if (bitname == "ehigh3") {bit = ehigh3;}
@@ -962,6 +965,9 @@ void TRGGRLProjectsModule::event()
 
     //other trigger bits
     else if (bitname == "itsfb2b") {bit = false;}
+    else if (bitname == "inp156") {bit = false;}
+    else if (bitname == "inp157") {bit = false;}
+    else if (bitname == "inp158") {bit = false;}
     else if (bitname == "inp159") {bit = false;}
 
     //DITTO: please don't change the WARNING message below.

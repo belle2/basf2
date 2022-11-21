@@ -147,7 +147,7 @@ void TrackExtrapolateG4e::initialize(double minPt, double minKE,
   m_tracks.registerRelationTo(m_extHits);
 
   // Save the magnetic field z component (gauss) at the origin
-  m_MagneticField = BFieldManager::getField(B2Vector3D(0, 0, 0)).Z() / Unit::T * CLHEP::tesla / CLHEP::gauss;
+  m_MagneticField = BFieldManager::getField(0, 0, 0).Z() / Unit::T * CLHEP::tesla / CLHEP::gauss;
 
   // Convert user cutoff values to geant4 units
   m_MinPt = std::max(0.0, minPt) * CLHEP::GeV;
@@ -221,7 +221,7 @@ void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMT
   m_MaxDt = maxDt;
 
   // Save the magnetic field z component (gauss) at the origin
-  m_MagneticField = BFieldManager::getField(B2Vector3D(0, 0, 0)).Z() / Unit::T * CLHEP::tesla / CLHEP::gauss;
+  m_MagneticField = BFieldManager::getField(0, 0, 0).Z() / Unit::T * CLHEP::tesla / CLHEP::gauss;
 
   // Convert from sigma to variance for hit-position uncertainty
   m_MaxDistSqInVariances = maxKLMTrackHitDistance * maxKLMTrackHitDistance;
@@ -343,8 +343,8 @@ void TrackExtrapolateG4e::beginRun(bool byMuid)
     std::vector<int> muidPdgCodes = MuidElementNumbers::getPDGVector();
     if (!m_MuidBuilderMap.empty()) {
       if (m_klmLikelihoodParameters.hasChanged()) { /* Clear m_MuidBuilderMap if KLMLikelihoodParameters payload changed. */
-        for (auto const& [pdg, muidBuilder] : m_MuidBuilderMap)
-          delete muidBuilder;
+        for (auto const& muidBuilder : m_MuidBuilderMap)
+          delete muidBuilder.second;
         m_MuidBuilderMap.clear();
       } else /* Return if m_MuidBuilderMap is already initialized. */
         return;
@@ -420,8 +420,8 @@ void TrackExtrapolateG4e::terminate(bool byMuid)
     delete m_DefaultHypotheses;
   if (byMuid) {
     delete m_TargetMuid;
-    for (auto const& [pdg, muidBuilder] : m_MuidBuilderMap)
-      delete muidBuilder;
+    for (auto const& muidBuilder : m_MuidBuilderMap)
+      delete muidBuilder.second;
   }
   if (m_TargetExt != nullptr) {
     delete m_TargetExt;
@@ -472,7 +472,6 @@ void TrackExtrapolateG4e::extrapolate(int pdgCode, // signed for charge
 
   G4ThreeVector positionG4e = position * CLHEP::cm; // convert from genfit2 units (cm) to geant4 units (mm)
   G4ThreeVector momentumG4e = momentum * CLHEP::GeV; // convert from genfit2 units (GeV/c) to geant4 units (MeV/c)
-  // cppcheck-suppress knownConditionTrueFalse
   if (isCosmic)
     momentumG4e = -momentumG4e;
   G4ErrorSymMatrix covarianceG4e(5, 0); // in Geant4e units (GeV/c, cm)

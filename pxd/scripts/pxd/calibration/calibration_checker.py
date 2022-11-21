@@ -221,7 +221,7 @@ class PXDHotPixelMaskCalibrationChecker(CalibrationCheckerBase):
             self.sum_graphs["hot_dead"].append(current_run, sum_hotdeadfraction / nSensors)
 
         nSensors = nSensors - len(dead_checker.dbObj.getDeadSensorMap())
-        if current_run == saved_run_occ:
+        if current_run == saved_run_occ and nSensors > 0:
             self.sum_graphs["occ_masked"].append(current_run, sum_occupancymasked / nSensors)
             self.sum_graphs["occ_no_mask"].append(current_run, sum_occupancynomask / nSensors)
 

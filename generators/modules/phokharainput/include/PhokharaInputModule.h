@@ -7,8 +7,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef PHOKHARAINPUTMODULE_H
-#define PHOKHARAINPUTMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/logging/Logger.h>
@@ -129,5 +128,3 @@ namespace Belle2 {
   }
 
 } // end namespace Belle2
-
-#endif /* PHOKHARAINPUTMODULE_H */

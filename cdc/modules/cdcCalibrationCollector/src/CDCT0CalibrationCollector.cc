@@ -23,7 +23,7 @@ using namespace Belle2;
 using namespace CDC;
 using namespace genfit;
 
-REG_MODULE(CDCT0CalibrationCollector)
+REG_MODULE(CDCT0CalibrationCollector);
 
 CDCT0CalibrationCollectorModule::CDCT0CalibrationCollectorModule() : CalibrationCollectorModule()
 {
@@ -130,7 +130,7 @@ void CDCT0CalibrationCollectorModule::collect()
 
     if (Pval < m_PvalCut || ndf < m_ndfCut) continue;
     //cut at Pt
-    if (fitresult->getMomentum().Perp() < m_MinimumPt) continue;
+    if (fitresult->getMomentum().Rho() < m_MinimumPt) continue;
     //reject events don't have eventT0
     if (m_EventT0Extraction) {
       // event with is fail to extract t0 will be exclude from analysis
@@ -181,7 +181,7 @@ void CDCT0CalibrationCollectorModule::collect()
           theta = cdcgeo.getOutgoingTheta(alpha, theta);
           alpha = cdcgeo.getOutgoingAlpha(alpha);
 
-          double t_fit = cdcgeo.getDriftTime(std::abs(x_u), lay, lr, alpha , theta);
+          double t_fit = cdcgeo.getDriftTime(std::abs(x_u), lay, lr, alpha, theta);
           //estimate drift time
           double dt_flight;
           double dt_prop;

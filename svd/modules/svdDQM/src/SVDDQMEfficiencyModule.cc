@@ -14,7 +14,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SVDDQMEfficiency)
+REG_MODULE(SVDDQMEfficiency);
 
 //-----------------------------------------------------------------
 //                 Implementation

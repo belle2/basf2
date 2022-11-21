@@ -56,7 +56,7 @@ namespace Belle2 {
       if (CDCRecoTrack) {
         const float cdcQI = CDCRecoTrack->getQualityIndicator();
         m_variables.at("CDC_QI") = isnan(cdcQI) ? 0. : cdcQI;
-        m_variables.at("CDC_FitSuccessful") = CDCRecoTrack->wasFitSuccessful();
+        m_variables.at("CDC_FitSuccessful") = (float)CDCRecoTrack->wasFitSuccessful();
       } else {
         m_variables.at("CDC_QI") = -1.;
         m_variables.at("CDC_FitSuccessful") = -1.;
@@ -64,8 +64,8 @@ namespace Belle2 {
 
       if (SVDRecoTrack) {
         m_variables.at("SVD_QI") = SVDRecoTrack->getQualityIndicator();
-        m_variables.at("SVD_FitSuccessful") = SVDRecoTrack->wasFitSuccessful();
-        m_variables.at("SVD_has_SPTC") = bool(SVDRecoTrack->getRelatedTo<SpacePointTrackCand>("SPTrackCands"));
+        m_variables.at("SVD_FitSuccessful") = (float)SVDRecoTrack->wasFitSuccessful();
+        m_variables.at("SVD_has_SPTC") = (float)bool(SVDRecoTrack->getRelatedTo<SpacePointTrackCand>("SPTrackCands"));
       } else {
         m_variables.at("SVD_QI") = -1.;
         m_variables.at("SVD_has_SPTC") = -1.;

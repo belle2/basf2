@@ -8,9 +8,11 @@
 #pragma once
 
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
 #include <framework/database/DBObjPtr.h>
 
 #include <tracking/dbobjects/TrackFitMomentumRange.h>
+#include <tracking/dataobjects/RecoTrack.h>
 
 #include <TVector3.h>
 #include <vector>
@@ -72,6 +74,8 @@ namespace Belle2 {
 
     /// TrackFitMomentumRange Database OjbPtr
     DBObjPtr<TrackFitMomentumRange> m_trackFitMomentumRange;
+
+    StoreArray<RecoTrack> m_RecoTracks; /**< RecoTracks StoreArray */
 
   };
 }

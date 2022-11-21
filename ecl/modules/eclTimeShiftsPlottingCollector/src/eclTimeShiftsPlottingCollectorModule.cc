@@ -25,7 +25,7 @@ using namespace std;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(eclTimeShiftsPlottingCollector)
+REG_MODULE(eclTimeShiftsPlottingCollector);
 
 //-----------------------------------------------------------------
 //                 Implementation

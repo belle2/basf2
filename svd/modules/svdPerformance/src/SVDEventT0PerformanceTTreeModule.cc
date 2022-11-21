@@ -20,6 +20,7 @@
 #include <genfit/TrackPoint.h>
 #include <TVector3.h>
 #include <TDirectory.h>
+#include <Math/Boost.h>
 #include <math.h>
 #include <iostream>
 #include <algorithm>
@@ -35,7 +36,7 @@ using namespace std;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SVDEventT0PerformanceTTree)
+REG_MODULE(SVDEventT0PerformanceTTree);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -71,6 +72,8 @@ void SVDEventT0PerformanceTTreeModule::initialize()
   m_t->Branch("trueEventT0", &m_trueEventT0, "trueEventT0/F");
   m_t->Branch("eventT0", &m_eventT0, "eventT0/F");
   m_t->Branch("eventT0Err", &m_eventT0Err, "eventT0Err/F");
+  m_t->Branch("svdEventT0", &m_svdEventT0, "svdEventT0/F");
+  m_t->Branch("svdEventT0Err", &m_svdEventT0Err, "svdEventT0Err/F");
   m_t->Branch("cdcEventT0", &m_cdcEventT0, "cdcEventT0/F");
   m_t->Branch("cdcEventT0Err", &m_cdcEventT0Err, "cdcEventT0Err/F");
   m_t->Branch("topEventT0", &m_topEventT0, "topEventT0/F");
@@ -111,12 +114,14 @@ void SVDEventT0PerformanceTTreeModule::initialize()
 void SVDEventT0PerformanceTTreeModule::event()
 {
   m_trueEventT0 = -999;
-  m_eventT0 = -99; /**< final event T0 */
-  m_eventT0Err = -99; /**< final event T0 error */
-  m_cdcEventT0 = -99; /**< CDC event T0 */
-  m_cdcEventT0Err = -99; /**< CDC event T0 */
-  m_topEventT0 = -99; /**< TOP event T0 error */
-  m_topEventT0Err = -99; /**< TOP event T0 error */
+  m_eventT0 = -99;
+  m_eventT0Err = -99;
+  m_svdEventT0 = -99;
+  m_svdEventT0Err = -99;
+  m_cdcEventT0 = -99;
+  m_cdcEventT0Err = -99;
+  m_topEventT0 = -99;
+  m_topEventT0Err = -99;
 
   StoreObjPtr<EventMetaData> evtMetaData;
   m_exp = evtMetaData->getExperiment();
@@ -127,6 +132,13 @@ void SVDEventT0PerformanceTTreeModule::event()
     if (m_EventT0->hasEventT0()) {
       m_eventT0 = (float)m_EventT0->getEventT0();
       m_eventT0Err = (float)m_EventT0->getEventT0Uncertainty();
+
+      if (m_EventT0->hasTemporaryEventT0(Const::EDetector::SVD)) {
+        auto evtT0List_SVD = m_EventT0->getTemporaryEventT0s(Const::EDetector::SVD) ;
+        //    There is only one estimate of SVD EVentT0 for the moment
+        m_svdEventT0 = evtT0List_SVD.back().eventT0 ;
+        m_svdEventT0Err = evtT0List_SVD.back().eventT0Uncertainty;
+      }
 
       if (m_EventT0->hasTemporaryEventT0(Const::EDetector::CDC)) {
         auto evtT0List_CDC = m_EventT0->getTemporaryEventT0s(Const::EDetector::CDC) ;
@@ -214,13 +226,14 @@ void SVDEventT0PerformanceTTreeModule::event()
         m_svdTrkPhi.push_back(tfr->getMomentum().Phi());
         m_svdTrkd0.push_back(tfr->getD0());
         m_svdTrkz0.push_back(tfr->getZ0());
-        m_svdTrkp.push_back(tfr->getMomentum().Mag());
-        m_svdTrkpT.push_back(tfr->getMomentum().Perp());
+        m_svdTrkp.push_back(tfr->getMomentum().R());
+        m_svdTrkpT.push_back(tfr->getMomentum().Rho());
         m_svdTrkPValue.push_back(tfr->getPValue());
         m_svdTrkCharge.push_back(tfr->getChargeSign());
         m_svdTrkNDF.push_back(tfr->getNDF());
-        TLorentzVector pStar = tfr->get4Momentum();
-        pStar.Boost(0, 0, 3. / 11);
+        ROOT::Math::PxPyPzEVector pStar = tfr->get4Momentum();
+        ROOT::Math::BoostZ boost(3. / 11);
+        pStar = boost(pStar);
         m_svdTrkpCM.push_back(pStar.P());
       }
 

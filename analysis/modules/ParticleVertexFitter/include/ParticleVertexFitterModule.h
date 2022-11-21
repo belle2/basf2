@@ -16,6 +16,8 @@
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreObjPtr.h>
 
+#include <framework/geometry/B2Vector3.h>
+
 // DataObjects
 #include <analysis/dataobjects/ParticleList.h>
 #include <mdst/dbobjects/BeamSpot.h>
@@ -81,7 +83,7 @@ namespace Belle2 {
     bool m_updateDaughters;       /**< flag for daughters update */
     DecayDescriptor m_decaydescriptor; /**< Decay descriptor of decays to look for. */
     bool m_hasCovMatrix = false;      /**< flag for mother covariance matrix (PseudoFitter)*/
-    TVector3 m_BeamSpotCenter;    /**< Beam spot position */
+    B2Vector3D m_BeamSpotCenter;    /**< Beam spot position */
     TMatrixDSym m_beamSpotCov;    /**< Beam spot covariance matrix */
     DBObjPtr<BeamSpot> m_beamSpotDB;/**< Beam spot database object */
     double m_smearing;            /**< smearing width applied to IP tube */
@@ -245,6 +247,12 @@ namespace Belle2 {
      */
     bool fillFitParticles(const Particle* mother, std::vector<const Particle*>& fitChildren,
                           std::vector<const Particle*>& twoPhotonChildren);
+
+    /**
+     * Fills valid particle's children (with valid error matrix) in the vector of Particles that will not enter the fit.
+     */
+    bool fillNotFitParticles(const Particle* mother, std::vector<const Particle*>& notFitChildren,
+                             const std::vector<const Particle*>& fitChildren);
 
     /**
      * Combines preFit particle and vertex information from vertex fit kv to create new postFit particle.

@@ -41,7 +41,8 @@ class CosmicsExtapolationPlotModule(basf2.Module):
         function_list.Add(TNamed('Check', ' No bias, no large background, resolution ~ 2 cm.'))
         function_list.Add(TNamed('Contact', contact))
         if shifter:
-            function_list.Add(TNamed('MetaOptions', 'shifter'))
+            basf2.B2WARNING("temporarily removed all shifter plots for the CosmicsExtrapolationPlots")
+            # function_list.Add(TNamed('MetaOptions', 'shifter'))
 
     def set_options_momentum(self, histogram, description):
         """ Set options for momentum plot. """
@@ -285,7 +286,7 @@ class CosmicsExtapolationPlotModule(basf2.Module):
             if len(track_exthits) == 0:
                 continue
             mc_momentum = mcparticles[0].getMomentum()
-            p_diff = momentum.Mag() - mc_momentum.Mag()
+            p_diff = momentum.R() - mc_momentum.R()
             muon_found = False
             for i in range(len(track_exthits)):
                 if abs(track_exthits[i].getPdgCode()) == 13:

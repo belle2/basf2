@@ -9,9 +9,6 @@
 // Own include
 #include <dqm/analysis/modules/DQMHistAnalysisTRGGDL.h>
 
-//DQM
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
-
 #include <TH1F.h>
 #include <TH2F.h>
 #include <TCanvas.h>
@@ -43,7 +40,7 @@ DQMHistAnalysisTRGGDLModule::DQMHistAnalysisTRGGDLModule()
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("debug", m_debug, "debug mode", false);
   addParam("alert", m_enableAlert, "Enable color alert", true);
-  addParam("useEpics", m_useEpics, "useEpics", true);
+  addParam("useEpics", m_useEpics, "Whether to update EPICS PVs.", false);
 }
 
 DQMHistAnalysisTRGGDLModule::~DQMHistAnalysisTRGGDLModule()

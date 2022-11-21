@@ -49,7 +49,7 @@ ExpList = args.exp
 
 b2.conditions.prepend_globaltag("online")
 b2.conditions.prepend_globaltag("svd_basic")
-b2.conditions.prepend_globaltag("svd_loadedOnFADC")
+b2.conditions.prepend_globaltag("data_reprocessing_prompt")
 b2.conditions.prepend_globaltag("svd_onlySVDinGeoConfiguration")
 
 myLocalDB = None

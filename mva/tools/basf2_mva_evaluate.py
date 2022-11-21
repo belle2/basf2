@@ -12,6 +12,7 @@
 import basf2_mva_util
 
 from basf2_mva_evaluation import plotting
+from basf2 import conditions
 import argparse
 import tempfile
 
@@ -40,6 +41,11 @@ def get_argument_parser() -> argparse.ArgumentParser:
     parser.add_argument('-w', '--working_directory', dest='working_directory', type=str, default='',
                         help="""Working directory where the created images and root files are stored,
                               default is to create a temporary directory.""")
+    parser.add_argument('-l', '--localdb', dest='localdb', type=str, action='append', nargs='+', required=False,
+                        help="""path or list of paths to local database(s) containing the mvas of interest.
+                                The testing payloads are preprended and take precedence over payloads in global tags.""")
+    parser.add_argument('-g', '--globaltag', dest='globaltag', type=str, action='append', nargs='+', required=False,
+                        help='globaltag or list of globaltags containing the mvas of interest. The globaltags are prepended.')
     parser.add_argument('-n', '--fillnan', dest='fillnan', action='store_true',
                         help='Fill nan and inf values with actual numbers')
     parser.add_argument('-c', '--compile', dest='compile', action='store_true',
@@ -57,6 +63,14 @@ def unique(input_list: List[Any]) -> List[Any]:
         if x not in output:
             output.append(x)
     return output
+
+
+def flatten(input_list: List[List[Any]]) -> List[Any]:
+    """
+    Flattens a list of lists
+    @param input_list list of lists to be flattened
+    """
+    return [item for sublist in input_list for item in sublist]
 
 
 def create_abbreviations(names, length=5):
@@ -91,10 +105,17 @@ if __name__ == '__main__':
     parser = get_argument_parser()
     args = parser.parse_args()
 
-    identifiers = sum(args.identifiers, [])
+    identifiers = flatten(args.identifiers)
     identifier_abbreviations = create_abbreviations(identifiers)
 
-    datafiles = sum(args.datafiles, [])
+    datafiles = flatten(args.datafiles)
+    if args.localdb is not None:
+        for localdb in flatten(args.localdb):
+            conditions.prepend_testing_payloads(localdb)
+
+    if args.globaltag is not None:
+        for tag in flatten(args.globaltag):
+            conditions.prepend_globaltag(tag)
 
     print("Load methods")
     methods = [basf2_mva_util.Method(identifier) for identifier in identifiers]
@@ -175,6 +196,11 @@ if __name__ == '__main__':
             This section contains an overview of the importance and correlation of the variables used by the classifiers.
             And distribution plots of the variables on the independent dataset. The distributions are normed for signal and
             background separately, and only the region +- 3 sigma around the mean is shown.
+
+            The importance scores shown are based on the variable importance as estimated by each MVA method internally.
+            This means the variable with the lowest importance will have score 0, and the variable
+            with the highest importance will have score 100. If the method does not provide such a ranking, all
+            importances will be 0.
         """)
 
         table = b2latex.LongTable(r"ll", "Abbreviations of variables", "{name} & {abbr}", r"Variable & Abbreviation")

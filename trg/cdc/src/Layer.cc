@@ -76,6 +76,21 @@ namespace Belle2 {
   {
   }
 
+  TRGCDCLayer::TRGCDCLayer()
+    :  _id(0),
+       _superLayerId(0),
+       _localLayerId(0),
+       _axialStereoLayerId(0),
+       _axialStereoSuperLayerId(0),
+       _offset(0),
+       _nShifts(0),
+       _cellSize(0),
+       _nCells(0),
+       _innerRadius(0),
+       _outerRadius(0)
+  {
+  }
+
   TRGCDCLayer::~TRGCDCLayer()
   {
   }

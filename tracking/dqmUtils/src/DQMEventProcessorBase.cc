@@ -10,10 +10,10 @@
 #include <tracking/dqmUtils/DQMHistoModuleBase.h>
 
 #include <framework/datastore/StoreArray.h>
+#include <framework/geometry/XYZVectorToTVector3Converter.h>
 #include <vxd/geometry/GeoTools.h>
 #include <vxd/geometry/SensorInfoBase.h>
 
-using namespace std;
 using namespace Belle2;
 
 void DQMEventProcessorBase::Run()
@@ -92,11 +92,11 @@ TString DQMEventProcessorBase::ConstructMessage(const TrackFitResult* trackFitRe
   return Form("%s: track %3i, Mom: %f, %f, %f, Pt: %f, Mag: %f, Hits: PXD %i SVD %i CDC %i Suma %i\n",
               m_histoModule->getName().c_str(),
               m_iTrack,
-              (float)trackFitResult->getMomentum().Px(),
-              (float)trackFitResult->getMomentum().Py(),
-              (float)trackFitResult->getMomentum().Pz(),
-              (float)trackFitResult->getMomentum().Pt(),
-              (float)trackFitResult->getMomentum().Mag(),
+              (float)trackFitResult->getMomentum().x(),
+              (float)trackFitResult->getMomentum().y(),
+              (float)trackFitResult->getMomentum().z(),
+              (float)trackFitResult->getMomentum().Rho(),
+              (float)trackFitResult->getMomentum().R(),
               nPXDClusters, nSVDClusters, nCDCHits, nPXDClusters + nSVDClusters + nCDCHits
              );
 }
@@ -164,13 +164,13 @@ void DQMEventProcessorBase::ProcessPXDRecoHit(RecoHitInformation* recoHitInfo)
 
   FillCommonHistograms();
 
-  m_histoModule->FillUBResidualsPXD(m_residual_um);
-  m_histoModule->FillHalfShellsPXD(m_globalResidual_um, IsNotYang(m_sensorID.getLadderNumber(), m_layerNumber));
+  m_histoModule->FillUBResidualsPXD(XYZToTVector(m_residual_um));
+  m_histoModule->FillHalfShellsPXD(XYZToTVector(m_globalResidual_um), IsNotYang(m_sensorID.getLadderNumber(), m_layerNumber));
 
   if (m_produce1Dres)
-    m_histoModule->FillUB1DResidualsSensor(m_residual_um, m_sensorIndex);
+    m_histoModule->FillUB1DResidualsSensor(XYZToTVector(m_residual_um), m_sensorIndex);
   if (m_produce2Dres)
-    m_histoModule->FillUB2DResidualsSensor(m_residual_um, m_sensorIndex);
+    m_histoModule->FillUB2DResidualsSensor(XYZToTVector(m_residual_um), m_sensorIndex);
 
   SetCommonPrevVariables();
 }
@@ -192,13 +192,13 @@ void DQMEventProcessorBase::ProcessSVDRecoHit(RecoHitInformation* recoHitInfo)
     if (! m_runningOnHLT) {
       FillCommonHistograms();
 
-      m_histoModule->FillUBResidualsSVD(m_residual_um);
-      m_histoModule->FillHalfShellsSVD(m_globalResidual_um, IsNotMat(m_sensorID.getLadderNumber(), m_layerNumber));
+      m_histoModule->FillUBResidualsSVD(XYZToTVector(m_residual_um));
+      m_histoModule->FillHalfShellsSVD(XYZToTVector(m_globalResidual_um), IsNotMat(m_sensorID.getLadderNumber(), m_layerNumber));
 
       if (m_produce1Dres)
-        m_histoModule->FillUB1DResidualsSensor(m_residual_um, m_sensorIndex);
+        m_histoModule->FillUB1DResidualsSensor(XYZToTVector(m_residual_um), m_sensorIndex);
       if (m_produce2Dres)
-        m_histoModule->FillUB2DResidualsSensor(m_residual_um, m_sensorIndex);
+        m_histoModule->FillUB2DResidualsSensor(XYZToTVector(m_residual_um), m_sensorIndex);
     }
 
     SetCommonPrevVariables();
@@ -211,7 +211,7 @@ void DQMEventProcessorBase::ComputeCommonVariables()
 {
   auto sensorInfo = &VXD::GeoCache::get(m_sensorID);
   m_globalResidual_um = sensorInfo->vectorToGlobal(m_residual_um, true);
-  TVector3 globalPosition = sensorInfo->pointToGlobal(m_position, true);
+  ROOT::Math::XYZVector globalPosition = sensorInfo->pointToGlobal(m_position, true);
 
   m_phi_deg = globalPosition.Phi() / Unit::deg;
   m_theta_deg = globalPosition.Theta() / Unit::deg;

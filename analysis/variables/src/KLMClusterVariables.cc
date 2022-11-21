@@ -9,10 +9,12 @@
 /* Own header. */
 #include <analysis/variables/KLMClusterVariables.h>
 
+// include VariableManager
+#include <analysis/VariableManager/Manager.h>
+
 /* Analysis headers. */
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/utility/PCmsLabTransform.h>
-#include <analysis/VariableManager/Manager.h>
 
 /* Belle 2 headers. */
 #include <framework/datastore/StoreArray.h>
@@ -46,10 +48,10 @@ namespace Belle2::Variable {
     if (!cluster) {
       return 0;
     }
-    const TVector3& pos = cluster->getClusterPosition();
+    const B2Vector3D& pos = cluster->getClusterPosition();
     StoreArray<TrackFitResult> tracks;
     for (const TrackFitResult& track : tracks) {
-      const TVector3& trackPos = track.getPosition();
+      const B2Vector3D& trackPos = track.getPosition();
       if (trackPos.Angle(pos) < angle) {
         return 1;
       }
@@ -64,10 +66,10 @@ namespace Belle2::Variable {
     if (!klmCluster) {
       return 0;
     }
-    const TVector3& klmClusterPos = klmCluster->getClusterPosition();
+    const B2Vector3D& klmClusterPos = klmCluster->getClusterPosition();
     StoreArray<ECLCluster> eclClusters;
     for (const ECLCluster& eclCluster : eclClusters) {
-      const TVector3& eclClusterPos = eclCluster.getClusterPosition();
+      const B2Vector3D& eclClusterPos = eclCluster.getClusterPosition();
       if (eclClusterPos.Angle(klmClusterPos) < angle) {
         return 1;
       }
@@ -91,7 +93,7 @@ namespace Belle2::Variable {
     if (!cluster) {
       return std::numeric_limits<double>::quiet_NaN();
     }
-    return cluster->getClusterPosition().x();
+    return cluster->getClusterPosition().X();
   }
 
 
@@ -101,7 +103,7 @@ namespace Belle2::Variable {
     if (!cluster) {
       return std::numeric_limits<double>::quiet_NaN();
     }
-    return cluster->getClusterPosition().y();
+    return cluster->getClusterPosition().Y();
   }
 
 
@@ -111,7 +113,7 @@ namespace Belle2::Variable {
     if (!cluster) {
       return std::numeric_limits<double>::quiet_NaN();
     }
-    return cluster->getClusterPosition().z();
+    return cluster->getClusterPosition().Z();
   }
 
 
@@ -230,12 +232,12 @@ namespace Belle2::Variable {
 
     // get the input particle's vector momentum in the CMS frame
     PCmsLabTransform T;
-    const TVector3 pCms = (T.rotateLabToCms() * particle->get4Vector()).Vect();
+    const B2Vector3D pCms = (T.rotateLabToCms() * particle->get4Vector()).Vect();
 
     // find the KLM cluster with the largest angle
     double maxAngle = 0.0;
     for (int iKLM = 0; iKLM < clusters.getEntries(); iKLM++) {
-      const TVector3 clusterMomentumCms = (T.rotateLabToCms() * clusters[iKLM]->getMomentum()).Vect();
+      const B2Vector3D clusterMomentumCms = (T.rotateLabToCms() * clusters[iKLM]->getMomentum()).Vect();
       double angle = pCms.Angle(clusterMomentumCms);
       if (angle > maxAngle) maxAngle = angle;
     }
@@ -292,22 +294,22 @@ namespace Belle2::Variable {
   REGISTER_VARIABLE("klmClusterBelleECLFlag", klmClusterBelleECLFlag,
                     "Returns the Belle-style ECL flag.");
   REGISTER_VARIABLE("klmClusterTiming", klmClusterTiming, R"DOC(
-Returns the timing informationf of the associated KLMCluster.
+Returns the timing information of the associated KLMCluster.
 
 .. warning::
   Currently the KLM has no time calibration. This leads to a huge discrepancy for the variable :b2:var:`klmClusterTiming` if one compares collisions and simulated data. Moreover, the distribution of the variable on collisions data has a very complicated structure, due to the different timing shifts of different KLM components.
   It is recommended to not use it in any case until the KLM is calibrated, even for simulated data.
 
-)DOC");
+)DOC","ns");
   REGISTER_VARIABLE("klmClusterPositionX", klmClusterPositionX, R"DOC(
 Returns the :math:`x` position of the associated KLMCluster.
-)DOC");
+)DOC","cm");
   REGISTER_VARIABLE("klmClusterPositionY", klmClusterPositionY, R"DOC(
 Returns the :math:`y` position of the associated KLMCluster.
-)DOC");
+)DOC","cm");
   REGISTER_VARIABLE("klmClusterPositionZ", klmClusterPositionZ, R"DOC(
 Returns the :math:`z` position of the associated KLMCluster.
-)DOC");
+)DOC","cm");
   REGISTER_VARIABLE("klmClusterInnermostLayer", klmClusterInnermostLayer,
                     "Returns the number of the innermost KLM layer with a 2-dimensional hit of the associated KLMCluster.");
   REGISTER_VARIABLE("klmClusterLayers", klmClusterLayers,
@@ -320,7 +322,7 @@ Returns the energy of the associated KLMCluster.
   (:math:`E_{\text{KLM}} = \sqrt{M_{K^0_L}^2 + p_{\text{KLM}}^2}`, where :math:`E_{\text{KLM}}` is this variable, :math:`M_{K^0_L}` is the :math:`K^0_L` mass and :math:`p_{\text{KLM}}` is :b2:var:`klmClusterMomentum`).
   It should be used with caution, and may not be physically meaningful, especially for :math:`n` candidates.
 
-)DOC");
+)DOC","GeV");
   REGISTER_VARIABLE("klmClusterMomentum", klmClusterMomentum, R"DOC(
 Returns the momentum magnitude of the associated KLMCluster. 
 
@@ -329,7 +331,7 @@ Returns the momentum magnitude of the associated KLMCluster.
   (:math:`p_{\text{KLM}} = 0.215 \cdot N_{\text{layers}}`, where :math:`p_{\text{KLM}}` is this variable and :math:`N_{\text{layers}}` is :b2:var:`klmClusterLayers`).
   It should be used with caution, and may not be physically meaningful.
 
-)DOC");
+)DOC","GeV/c");
   REGISTER_VARIABLE("klmClusterIsBKLM", klmClusterIsBKLM,
                     "Returns 1 if the associated KLMCluster is in barrel KLM.");
   REGISTER_VARIABLE("klmClusterIsEKLM", klmClusterIsEKLM,
@@ -340,12 +342,12 @@ Returns the momentum magnitude of the associated KLMCluster.
                     "Returns 1 if the associated KLMCluster is in backward endcap KLM.");
   REGISTER_VARIABLE("klmClusterTheta", klmClusterTheta, R"DOC(
 Returns the polar (:math:`\theta`) angle of the associated KLMCluster.
-)DOC");
+)DOC","rad");
   REGISTER_VARIABLE("klmClusterPhi", klmClusterPhi, R"DOC(
 Returns the azimuthal (:math:`\phi`) angle of the associated KLMCluster.
-)DOC");
+)DOC","rad");
   REGISTER_VARIABLE("maximumKLMAngleCMS", maximumKLMAngleCMS ,
-                    "Returns the maximum angle in the CMS frame between the Particle and all KLMClusters in the event.");
+                    "Returns the maximum angle in the CMS frame between the Particle and all KLMClusters in the event.","rad");
   REGISTER_VARIABLE("nKLMClusterTrackMatches", nKLMClusterTrackMatches, R"DOC(
 Returns the number of Tracks matched to the KLMCluster associated to this Particle. This variable can return a number greater than 0 for :math:`K_{L}^0` or :math:`n` candidates originating from KLMClusters and returns NaN for Particles with no KLMClusters associated.
 )DOC");
@@ -358,6 +360,7 @@ Returns the number of Tracks matched to the KLMCluster associated to this Partic
                      Returns the number of ECLClusters matched to the KLMCluster associated to this Particle.
               )DOC");
   REGISTER_VARIABLE("klmClusterTrackDistance", klmClusterTrackDistance,
-                    "Returns the distance between the Track and the KLMCluster associated to this Particle. This variable returns NaN if there is no Track-to-KLMCluster relationship.");
+                    "Returns the distance between the Track and the KLMCluster associated to this Particle. This variable returns NaN if there is no Track-to-KLMCluster relationship.",
+                    "cm");
 
 }

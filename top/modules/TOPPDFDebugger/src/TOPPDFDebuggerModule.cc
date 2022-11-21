@@ -25,14 +25,15 @@
 #include <algorithm>
 
 using namespace std;
+using namespace ROOT::Math;
 
 namespace Belle2 {
   using namespace TOP;
   //-----------------------------------------------------------------
-  //                 Register the Module
+  ///                 Register the Module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPPDFDebugger)
+  REG_MODULE(TOPPDFDebugger);
 
 
   //-----------------------------------------------------------------
@@ -125,7 +126,7 @@ namespace Belle2 {
       // add this vector of vector of triplets to the TOPPDFCollection
       TOPPDFCollection* topPDFColl = m_pdfCollection.appendNew();
       const auto& module = geo->getModule(trk.getModuleID());
-      topPDFColl->setLocalPositionMomentum(module.pointToLocal(trk.getExtHit()->getPosition()),
+      topPDFColl->setLocalPositionMomentum(module.pointToLocal(static_cast<XYZPoint>(trk.getExtHit()->getPosition())),
                                            module.momentumToLocal(trk.getExtHit()->getMomentum()),
                                            trk.getModuleID());
 

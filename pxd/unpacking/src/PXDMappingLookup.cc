@@ -164,8 +164,8 @@ void PXDMappingLookup::map_rc_to_uv_IB_OF(unsigned int& v_cellID, unsigned int& 
 
   DCD_channel = (u_cellID << 2) + (v_cellID & 0x3) + 256 * dhp_id;
   Drain = LUT_IB_OF[DCD_channel];
-  u_cellID = 250 - 1 - (Drain >> 2);
-  if (u_cellID >= 250) u_cellID = 255; // workaround for negative values!!! fix LUT above!
+  if (Drain >> 2 >= 250) u_cellID = 255;
+  else u_cellID = 250 - 1 - (Drain >> 2);
 //   row = (v_cellID / 4) * 4  + Drain % 4;
   row = (v_cellID & ~0x3)  + ((~Drain) & 0x3); // ~ bei drain
   row = row % 768;
@@ -205,11 +205,11 @@ void PXDMappingLookup::write_mapping_to_file(void)
           coli = col;
           rowi = row;
           map_rc_to_uv_IF_OB(rowi,   coli,   dhp_id, 0x00);
-          fprintf(file, "%u; %u; %u; %u; %u; " , row, dhp_id, col, rowi, coli);
+          fprintf(file, "%u; %u; %u; %u; %u; ", row, dhp_id, col, rowi, coli);
           coli = col;
           rowi = row;
           map_rc_to_uv_IB_OF(rowi,  coli,  dhp_id, 0x00);
-          fprintf(file, "%u; %u\n" , rowi, coli);
+          fprintf(file, "%u; %u\n", rowi, coli);
         }
       }
     }
@@ -222,11 +222,11 @@ void PXDMappingLookup::write_mapping_to_file(void)
           coli = col;
           rowi = row;
           map_rc_to_uv_IF_OB(rowi,   coli,   dhp_id, 0x01);
-          fprintf(file, "%u; %u; %u; %u; %u; " , row, dhp_id, col, rowi, coli);
+          fprintf(file, "%u; %u; %u; %u; %u; ", row, dhp_id, col, rowi, coli);
           coli = col;
           rowi = row;
           map_rc_to_uv_IB_OF(rowi,  coli,  dhp_id, 0x01);
-          fprintf(file, "%u; %u\n" , rowi, coli);
+          fprintf(file, "%u; %u\n", rowi, coli);
         }
       }
     }
@@ -240,11 +240,11 @@ void PXDMappingLookup::write_mapping_to_file(void)
           coli = col;
           rowi = row;
           map_rc_to_uv_IF_OB(rowi,   coli,   dhp_id, 0x20);
-          fprintf(file, "%u; %u; %u; %u; %u; " , row, dhp_id, col, rowi, coli);
+          fprintf(file, "%u; %u; %u; %u; %u; ", row, dhp_id, col, rowi, coli);
           coli = col;
           rowi = row;
           map_rc_to_uv_IB_OF(rowi,  coli,  dhp_id, 0x20);
-          fprintf(file, "%u; %u\n" , rowi, coli);
+          fprintf(file, "%u; %u\n", rowi, coli);
         }
       }
     }
@@ -258,11 +258,11 @@ void PXDMappingLookup::write_mapping_to_file(void)
           coli = col;
           rowi = row;
           map_rc_to_uv_IF_OB(rowi,   coli,   dhp_id, 0x21);
-          fprintf(file, "%u; %u; %u; %u; %u; " , row, dhp_id, col, rowi, coli);
+          fprintf(file, "%u; %u; %u; %u; %u; ", row, dhp_id, col, rowi, coli);
           coli = col;
           rowi = row;
           map_rc_to_uv_IB_OF(rowi,  coli,  dhp_id, 0x21);
-          fprintf(file, "%u; %u\n" , rowi, coli);
+          fprintf(file, "%u; %u\n", rowi, coli);
         }
       }
     }
@@ -279,7 +279,7 @@ void PXDMappingLookup::write_inversemapping_to_file(void)
 
 void PXDMappingLookup::check(void)
 {
-  unsigned int dhe_ID[4] = {0x02, 0x03, 0x22, 0x23};// one of each kind, IB, OB, IF, OF
+  const unsigned int dhe_ID[4] = {0x02, 0x03, 0x22, 0x23};// one of each kind, IB, OB, IF, OF
   for (int i = 0; i < 4; i++) {
     unsigned int dhe = dhe_ID[i];
     for (unsigned int u_org = 0; i < 768; i++) {

@@ -71,16 +71,22 @@ PXDResultFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
     return std::make_unique<TrackFindingCDC::NoneFilter<BasePXDResultFilter>>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "all") {
     return std::make_unique<TrackFindingCDC::AllFilter<BasePXDResultFilter>>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "recording") {
     return std::make_unique<RecordingPXDResultFilter>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "mva") {
     return std::make_unique<MVAPXDResultFilter>("ckf_CDCToPXDResult");
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "truth") {
     return std::make_unique<ChooseableTruthPXDResultFilter>("truth");
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "truth_teacher") {
     return std::make_unique<ChooseableTruthPXDResultFilter>("truth_teacher");
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "size") {
     return std::make_unique<SizePXDResultFilter>();
   } else {

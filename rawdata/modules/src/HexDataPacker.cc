@@ -42,7 +42,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(HexDataPacker)
+REG_MODULE(HexDataPacker);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -133,7 +133,7 @@ void HexDataPackerModule::event()
         size = val[1];
         val[2] = val[2] | 0x00008000; // For data which was not reduced in FPGA
         if (size < 0 || size > MAX_CPRBUF_WORDS) {
-          B2FATAL("The size of an event =(" << size << ") is too large. Exiting...");
+          B2FATAL("The size of an event is too large." << LogVar("size", size) << "Exiting...");
         }
       } else {
         sscanf(strin.c_str(), "%20s %u %20s %x %x %x %x %x %x %x %x",

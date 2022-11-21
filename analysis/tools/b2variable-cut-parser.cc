@@ -26,7 +26,7 @@ int main()
     std::unique_ptr<Variable::Cut> cut = Variable::Cut::compile(condition);
     cut->print();
 
-    TLorentzVector momentum(1, 2, 3, 4);
+    ROOT::Math::PxPyPzEVector momentum(1, 2, 3, 4);
     Particle p(momentum, 421);
     std::cout << "This condition is: " << (cut->check(&p) ? "True" : "False") << std::endl;
 

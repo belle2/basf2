@@ -448,6 +448,10 @@ void Belle2::ECL::GeoECLCreator::barrel(G4LogicalVolume& _top)
       new G4PVPlacement(twc, wrapped_crystals[s - cryst.begin()], suf("ECLBarrelWrappedCrystal_Physical", indx), sectorlogical, false,
                         72 + 9 * (indx / 2) + (indx % 2), overlap);
     }
+
+    for (shape_t* shape : cryst) {
+      delete shape;
+    }
   }
 
   if (b_crystal_support) {
@@ -459,8 +463,8 @@ void Belle2::ECL::GeoECLCreator::barrel(G4LogicalVolume& _top)
     }
 
     double offset[] = { -945, -607, -305, -45, 45, 305, 607, 909, 1240, 1628, 2040};
-    int ns[] = {8, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1};
-    double offsetb[] = {263.4 - 210 - 30, 27.4, 10.6, 16.1, 26.2, 21.7, 35, 22 + 240};
+    const int ns[] = {8, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1};
+    const double offsetb[] = {263.4 - 210 - 30, 27.4, 10.6, 16.1, 26.2, 21.7, 35, 22 + 240};
     bool flip[] = {1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1};
     for (int i = 0; i < 11; i++) {
       G4Transform3D tflip = flip[i] ? G4RotateY3D(-M_PI / 2) : G4RotateY3D(M_PI / 2);

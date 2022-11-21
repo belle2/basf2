@@ -86,7 +86,7 @@ bool WireEfficiencyAlgorithm::buildEfficiencies()
   // loop over entries in the tree and build the TEfficiencies
   B2INFO("Filling the efficiencies");
   const Long64_t nEntries = efftree->GetEntries();
-  B2INFO("Number of entries in tree: " << nEntries;);
+  B2INFO("Number of entries in tree: " << nEntries);
   for (Long64_t i = 0; i < nEntries; i++) {
     efftree->GetEntry(i);
     TEfficiency* efficiencyInLayer = (TEfficiency*)m_efficiencyList->At(layerID);
@@ -229,7 +229,7 @@ double WireEfficiencyAlgorithm::chiTest(TGraphAsymmErrors* graph1, TGraphAsymmEr
 CalibrationAlgorithm::EResult WireEfficiencyAlgorithm::calibrate()
 {
   const auto exprun = getRunList()[0];
-  B2INFO("ExpRun used for DB Geometry : " << exprun.first << " " << exprun.second;);
+  B2INFO("ExpRun used for DB Geometry : " << exprun.first << " " << exprun.second);
   updateDBObjPtrs(1, exprun.second, exprun.first);
 
   B2INFO("Creating CDCGeometryPar object");

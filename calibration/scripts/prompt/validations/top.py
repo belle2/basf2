@@ -19,7 +19,7 @@ from basf2 import B2ERROR
 import sys
 
 #: Tells the automated system some details of this script
-settings = ValidationSettings(name='TOP calibration validation',
+settings = ValidationSettings(name='TOP post-tracking calibration',
                               description=__doc__,
                               download_files=[],
                               expert_config=None)
@@ -333,6 +333,80 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
             h.SetMinimum(-50.0)
             h.SetMaximum(50.0)
             h.Draw()
+    canvas.Print(outputFileName)
+
+    # plot offsets
+
+    canvas.Clear()
+    canvas.Divide(2, 2)
+    offsets = [file_in.Get("svdOffset"), file_in.Get("cdcOffset")]
+    sigmas = [file_in.Get("svdSigma"), file_in.Get("cdcSigma")]
+    components = ['SVD', 'CDC']
+    colors = [4, 2]
+
+    canvas.cd(1)
+    hmin = 0
+    hmax = 0
+    for h in offsets:
+        if h:
+            hmin = min(hmin, h.GetMinimum())
+            hmax = max(hmax, h.GetMaximum())
+    hmin = round(hmin, 0) - 1
+    hmax = round(hmax, 0) + 1
+    for i, h in enumerate(offsets):
+        if h:
+            h.SetMinimum(hmin)
+            h.SetMaximum(hmax)
+            h.SetMarkerStyle(24)
+            h.SetMarkerColor(colors[i])
+            h.SetLineColor(colors[i])
+    first = True
+    legend1 = TLegend()
+    for i, h in enumerate(offsets):
+        if not h or not sigmas[i] or sigmas[i].Integral() == 0:
+            continue
+        if first:
+            h.Draw()
+            first = False
+        else:
+            h.Draw("same")
+        legend1.AddEntry(h, components[i])
+    legend1.Draw("same")
+
+    canvas.cd(2)
+    hmax = 0
+    for h in sigmas:
+        if h:
+            hmax = max(hmax, h.GetMaximum())
+    for i, h in enumerate(sigmas):
+        if h:
+            h.SetMinimum(0)
+            h.SetMaximum(hmax * 1.1)
+            h.SetMarkerStyle(24)
+            h.SetMarkerColor(colors[i])
+            h.SetLineColor(colors[i])
+    first = True
+    legend2 = TLegend()
+    for i, h in enumerate(sigmas):
+        if not h or h.Integral() == 0:
+            continue
+        if first:
+            h.Draw()
+            first = False
+        else:
+            h.Draw("same")
+        legend2.AddEntry(h, components[i])
+    legend2.Draw("same")
+
+    fillPatt = [file_in.Get("fillPatternOffset"), file_in.Get("fillPatternFract")]
+    for i, h in enumerate(fillPatt):
+        canvas.cd(3 + i)
+        if h:
+            if i == 1:
+                for k in range(h.GetNbinsX()):
+                    h.SetBinError(k + 1, h.GetBinContent(k + 1) / 1000)
+            h.Draw()
+
     canvas.Print(outputFileName)
 
     # close pdf file

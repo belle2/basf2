@@ -10,7 +10,6 @@
 
 #include <framework/datastore/RelationsObject.h>
 
-#include <TVector3.h>
 #include <TMatrixFSym.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>

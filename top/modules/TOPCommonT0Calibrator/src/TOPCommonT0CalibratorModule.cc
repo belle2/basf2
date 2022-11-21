@@ -21,10 +21,10 @@ namespace Belle2 {
   using namespace TOP;
 
   //-----------------------------------------------------------------
-  //                 Register module
+  ///                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPCommonT0Calibrator)
+  REG_MODULE(TOPCommonT0Calibrator);
 
   //-----------------------------------------------------------------
   //                 Implementation
@@ -209,7 +209,7 @@ namespace Belle2 {
         m_numPhotons++;
         m_hits1D.Fill(digit.getModuleID());
         int bs = digit.getBoardstackNumber();
-        m_hits2D.Fill((digit.getModuleID() * 4 + bs - 1.5) / 4.0 , digit.getTime());
+        m_hits2D.Fill((digit.getModuleID() * 4 + bs - 1.5) / 4.0, digit.getTime());
       }
 
       // fill output tree
@@ -219,11 +219,11 @@ namespace Belle2 {
       m_y = localPosition.Y();
       m_z = localPosition.Z();
       const auto& localMomentum = m_selector.getLocalMomentum();
-      m_p = localMomentum.Mag();
+      m_p = localMomentum.R();
       m_theta = localMomentum.Theta();
       m_phi = localMomentum.Phi();
       const auto& pocaPosition = m_selector.getPOCAPosition();
-      m_pocaR = pocaPosition.Perp();
+      m_pocaR = pocaPosition.Rho();
       m_pocaZ = pocaPosition.Z();
       m_pocaX = pocaPosition.X();
       m_pocaY = pocaPosition.Y();

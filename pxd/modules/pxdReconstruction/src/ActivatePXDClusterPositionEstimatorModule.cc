@@ -16,7 +16,7 @@ using namespace std;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(ActivatePXDClusterPositionEstimator)
+REG_MODULE(ActivatePXDClusterPositionEstimator);
 
 ActivatePXDClusterPositionEstimatorModule::ActivatePXDClusterPositionEstimatorModule() : Module()
 {

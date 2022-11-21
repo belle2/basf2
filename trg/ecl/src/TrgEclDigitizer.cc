@@ -307,9 +307,9 @@ TrgEclDigitizer::digitization01(std::vector<std::vector<double>>& TCDigiE,
                                 std::vector<std::vector<double>>& TCDigiT)
 {
   TCDigiE.clear();
-  TCDigiE.resize(576, vector<double>(64 , 0));
+  TCDigiE.resize(576, vector<double>(64, 0));
   TCDigiT.clear();
-  TCDigiT.resize(576, vector<double>(64 , 0));
+  TCDigiT.resize(576, vector<double>(64, 0));
 
   //
   double cut_energy_tot = 0.03; // [GeV]
@@ -472,9 +472,9 @@ TrgEclDigitizer::digitization02(std::vector<std::vector<double>>& TCDigiE, std::
   // (03)Signal digitization (w/ 12ns interval for method-0)
   //===============
   TCDigiE.clear();
-  TCDigiE.resize(576, vector<double>(666 , 0));
+  TCDigiE.resize(576, vector<double>(666, 0));
   TCDigiT.clear();
-  TCDigiT.resize(576, vector<double>(666 , 0));
+  TCDigiT.resize(576, vector<double>(666, 0));
   double cut_energy_tot = 0.03; // [GeV]
   int nbin_pedestal = 100;
   float fam_sampling_interval = 12; // [ns]

@@ -18,7 +18,6 @@
 """
 
 import basf2
-from beamparameters import add_beamparameters
 from simulation import add_simulation
 from reconstruction import add_reconstruction
 
@@ -37,7 +36,6 @@ eventinfosetter.param('evtNumList', [2000])
 # Evtgen and beam parameters.
 evtgen = basf2.register_module('EvtGenInput')
 evtgen.param('userDECFile', basf2.find_file('klm/validation/btojpsikl0.dec'))
-beamparameters = add_beamparameters(main, "Y4S")
 
 # Add progress bars
 progress = basf2.register_module('Progress')

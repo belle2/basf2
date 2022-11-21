@@ -31,7 +31,7 @@ using namespace SoftwareTrigger;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SVDDQMExpressReco)
+REG_MODULE(SVDDQMExpressReco);
 
 
 //-----------------------------------------------------------------

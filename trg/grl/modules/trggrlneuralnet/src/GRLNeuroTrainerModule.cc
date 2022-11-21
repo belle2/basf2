@@ -1,3 +1,11 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
+
 #include "trg/grl/modules/trggrlneuralnet/GRLNeuroTrainerModule.h"
 #ifdef HAS_OPENMP
 #include <parallel_fann.hpp>
@@ -33,7 +41,7 @@ using namespace std;
 
 //this line registers the module with the framework and actually makes it available
 //in steering files or the the module list (basf2 -m).
-REG_MODULE(GRLNeuroTrainer)
+REG_MODULE(GRLNeuroTrainer);
 
 GRLNeuroTrainerModule::GRLNeuroTrainerModule() : Module()
 {
@@ -178,12 +186,12 @@ GRLNeuroTrainerModule::initialize()
   h_ncdcs_sig.push_back(new TH1D("h_ncdcs_sig", "h_ncdcs_sig", 10, 0, 10));
   h_ncdci_sig.push_back(new TH1D("h_ncdci_sig", "h_ncdci_sig", 10, 0, 10));
   h_ncdc_sig.push_back(new TH1D("h_ncdc_sig", "h_ncdc_sig", 10, 0, 10));
-  h_necl_sig.push_back(new TH1D("h_necl_sig"  , "h_necl_sig" , 10, 0, 10));
-  h_ncdcf_bg.push_back(new TH1D("h_ncdcf_bg"  , "h_ncdcf_bg" , 10, 0, 10));
-  h_ncdcs_bg.push_back(new TH1D("h_ncdcs_bg"  , "h_ncdcs_bg" , 10, 0, 10));
-  h_ncdci_bg.push_back(new TH1D("h_ncdci_bg"  , "h_ncdci_bg" , 10, 0, 10));
+  h_necl_sig.push_back(new TH1D("h_necl_sig", "h_necl_sig", 10, 0, 10));
+  h_ncdcf_bg.push_back(new TH1D("h_ncdcf_bg", "h_ncdcf_bg", 10, 0, 10));
+  h_ncdcs_bg.push_back(new TH1D("h_ncdcs_bg", "h_ncdcs_bg", 10, 0, 10));
+  h_ncdci_bg.push_back(new TH1D("h_ncdci_bg", "h_ncdci_bg", 10, 0, 10));
   h_ncdc_bg.push_back(new TH1D("h_ncdc_bg", "h_ncdc_bg", 10, 0, 10));
-  h_necl_bg.push_back(new TH1D("h_necl_bg"    , "h_necl_bg"  , 10, 0, 10));
+  h_necl_bg.push_back(new TH1D("h_necl_bg", "h_necl_bg", 10, 0, 10));
 
   //..Trigger ThetaID for each trigger cell. Could be replaced by getMaxThetaId() for newer MC
   TrgEclMapping* trgecl_obj = new TrgEclMapping();
@@ -198,10 +206,10 @@ GRLNeuroTrainerModule::initialize()
 
     //..Four vector of a 1 GeV lab photon at this TC
     TVector3 CellPosition = trgecl_obj->getTCPosition(tc);
-    TLorentzVector CellLab(1., 1., 1., 1.);
-    CellLab.SetTheta(CellPosition.Theta());
-    CellLab.SetPhi(CellPosition.Phi());
-    CellLab.SetRho(1.);
+    ROOT::Math::PxPyPzEVector CellLab;
+    CellLab.SetPx(CellPosition.Unit().Px());
+    CellLab.SetPy(CellPosition.Unit().Py());
+    CellLab.SetPz(CellPosition.Unit().Pz());
     CellLab.SetE(1.);
 
     //..cotan Theta and phi in lab
@@ -210,14 +218,13 @@ GRLNeuroTrainerModule::initialize()
     TCcotThetaLab.push_back(1. / tantheta);
 
     //..Corresponding 4 vector in the COM frame
-    TLorentzVector CellCOM = boostrotate.rotateLabToCms() * CellLab;
-    TCThetaCOM.push_back(CellCOM.Theta()*radtodeg);
-    TCPhiCOM.push_back(CellCOM.Phi()*radtodeg);
+    ROOT::Math::PxPyPzEVector CellCOM = boostrotate.rotateLabToCms() * CellLab;
+    TCThetaCOM.push_back(CellCOM.Theta()*TMath::RadToDeg());
+    TCPhiCOM.push_back(CellCOM.Phi()*TMath::RadToDeg());
 
     //..Scale to give 1 GeV in the COM frame
     TC1GeV.push_back(1. / CellCOM.E());
   }
-  radtodeg = 180. / TMath::Pi();
 
   delete trgecl_obj;
 }
@@ -250,14 +257,14 @@ GRLNeuroTrainerModule::event()
 
   //full track
   for (int i = 0; i < 36; i++) {
-    if (GRLStore->m_phi_CDC[i]) {
+    if (GRLStore->get_phi_CDC(i)) {
       map_cdcf[i] = 1;
     }
   }
 
   //short track
   for (int i = 0; i < 64; i++) {
-    if (GRLStore->m_map_ST2[i]) {
+    if (GRLStore->get_map_ST2(i)) {
       int j = i * (36. / 64.);
       map_cdcs[j] = 1;
     }
@@ -265,7 +272,7 @@ GRLNeuroTrainerModule::event()
 
   //inner track
   for (int i = 0; i < 64; i++) {
-    if (GRLStore->m_map_TSF0[i]) {
+    if (GRLStore->get_map_TSF0(i)) {
       int j = i * (36. / 64.);
       int j1 = i - 4;
       if (j1 < 0) j1 = j1 + 64;
@@ -281,11 +288,11 @@ GRLNeuroTrainerModule::event()
       int j7 = i + 2;
       if (j7 > 63) j7 = j7 - 64;
       if (
-        (GRLStore->m_map_TSF1[j1] || GRLStore->m_map_TSF1[j2] || GRLStore->m_map_TSF1[j3] || GRLStore->m_map_TSF1[j4]
-         || GRLStore->m_map_TSF1[j5])
+        (GRLStore->get_map_TSF1(j1) || GRLStore->get_map_TSF1(j2) || GRLStore->get_map_TSF1(j3) || GRLStore->get_map_TSF1(j4)
+         || GRLStore->get_map_TSF1(j5))
         &&
-        (GRLStore->m_map_TSF2[j3] || GRLStore->m_map_TSF2[j4] || GRLStore->m_map_TSF2[j5] || GRLStore->m_map_TSF2[j6]
-         || GRLStore->m_map_TSF2[j7])
+        (GRLStore->get_map_TSF2(j3) || GRLStore->get_map_TSF2(j4) || GRLStore->get_map_TSF2(j5) || GRLStore->get_map_TSF2(j6)
+         || GRLStore->get_map_TSF2(j7))
       )
         map_cdci[j] = 1;
     }
@@ -300,6 +307,7 @@ GRLNeuroTrainerModule::event()
       if (i2 < 0) i2 = i2 + 36;
       int i3 = i;
       int i4 = i + 1;
+      // cppcheck-suppress knownConditionTrueFalse
       if (i4 > 36) i4 = i4 - 36;
       int i5 = i + 2;
       if (i5 > 36) i5 = i5 - 36;
@@ -323,6 +331,7 @@ GRLNeuroTrainerModule::event()
       if (i2 < 0) i2 = i2 + 36;
       int i3 = i;
       int i4 = i + 1;
+      // cppcheck-suppress knownConditionTrueFalse
       if (i4 > 36) i4 = i4 - 36;
       int i5 = i + 2;
       if (i5 > 36) i5 = i5 - 36;

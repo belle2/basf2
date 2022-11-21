@@ -60,18 +60,25 @@ SegmentPairFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
     return std::make_unique<NoneFilter<BaseSegmentPairFilter>>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "all") {
     return std::make_unique<AllSegmentPairFilter>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "truth") {
     return std::make_unique<MCSegmentPairFilter>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "fitless") {
     return std::make_unique<FitlessSegmentPairFilter>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "simple") {
     return std::make_unique<SimpleSegmentPairFilter>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "unionrecording") {
     return std::make_unique<UnionRecordingSegmentPairFilter>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "feasible") {
     return std::make_unique<MVAFeasibleSegmentPairFilter>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "realistic") {
     return std::make_unique<MVARealisticSegmentPairFilter>();
   } else {

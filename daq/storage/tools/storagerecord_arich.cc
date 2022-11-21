@@ -217,7 +217,7 @@ int main(int argc, char** argv)
   const int ibufsize = atoi(argv[2]);
   const char* hostname = argv[3];
   const char* runtype = argv[4];
-  const bool not_record = std::string(runtype) == "null";
+  const bool not_record = std::string(runtype).find(std::string("null")) != std::string::npos;
   const char* path = argv[5];
   const int ndisks = atoi(argv[6]);
   const char* file_dbtmp = argv[7];

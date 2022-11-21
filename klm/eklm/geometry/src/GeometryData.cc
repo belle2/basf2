@@ -107,7 +107,7 @@ static void readShieldDetailGeometry(
   for (i = 0; i < n; i++) {
     GearDir point(*gd);
     name = "/Point[" + std::to_string(i + 1) + "]";
-    point.append(name.c_str());
+    point.append(name);
     p.setX(point.getLength("X") * CLHEP::cm);
     p.setY(point.getLength("Y") * CLHEP::cm);
     sdg->setPoint(i, p);
@@ -276,7 +276,7 @@ void EKLM::GeometryData::readXMLDataStrips(const GearDir& gd)
   for (i = 0; i < m_NStrips; i++) {
     GearDir StripContent(Strips);
     name = "/Strip[" + std::to_string(i + 1) + "]";
-    StripContent.append(name.c_str());
+    StripContent.append(name);
     m_StripPosition[i].setLength(StripContent.getLength("Length") * CLHEP::cm);
     m_StripPosition[i].setX(StripContent.getLength("X") * CLHEP::cm);
     m_StripPosition[i].setY(StripContent.getLength("Y") * CLHEP::cm);
@@ -481,6 +481,8 @@ void EKLM::GeometryData::initializeFromGearbox(const GearDir* gearDir)
   ShieldDetailGeometry shieldDetailGeometry;
   GearDir gd(*gearDir);
   gd.append("/EKLM");
+  /* Beam-background study. */
+  m_BeamBackgroundStudy = gd.getBool("BeamBackgroundStudy");
   /* Numbers of elements. */
   m_NSections = gd.getInt("NSections");
   m_ElementNumbers->checkSection(m_NSections);
@@ -551,9 +553,9 @@ void EKLM::GeometryData::initializeFromGearbox(const GearDir* gearDir)
       k = j * (m_NSegments + 1) + i;
       GearDir segmentSupport2(segmentSupport);
       name = "/SegmentSupportPlane[" + std::to_string(j + 1) + "]";
-      segmentSupport2.append(name.c_str());
+      segmentSupport2.append(name);
       name = "/SegmentSupport[" + std::to_string(i + 1) + "]";
-      segmentSupport2.append(name.c_str());
+      segmentSupport2.append(name);
       m_SegmentSupportPosition[k].setLength(
         segmentSupport2.getLength("Length") * CLHEP::cm);
       m_SegmentSupportPosition[k].setX(

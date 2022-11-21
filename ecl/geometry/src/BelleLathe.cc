@@ -107,7 +107,7 @@ void BelleLathe::Init(const vector<zr_t>& c, double phi0, double dphi)
         ++it0; ++it1;
       }
     }
-    const zr_t& s0 = *it0, &s1 = contour[0];
+    const zr_t& s0 = *it0, &s1 = contour[0]; // cppcheck-suppress invalidContainer ; contour should be valid here
     if (abs(s0.z - s1.z) < kCarTolerance && abs(s0.r - s1.r) < kCarTolerance) contour.erase(it0);
   } while (0);
 
@@ -158,7 +158,8 @@ void BelleLathe::Init(const vector<zr_t>& c, double phi0, double dphi)
     double a = s.dz * s.is, b = s.dr * s.is, cc = b * s.z - a * s.r;
     bool dp = false, dm = false;
     s.isconvex = true;
-    do {
+    do
+    {
       const zr_t& p = *it;
       double d = a * p.r - b * p.z + cc; // distance to line
       dm = dm || (d < -eps);
@@ -529,7 +530,8 @@ G4bool BelleLathe::CalculateExtent(const EAxis A,
         double phi = fphi + 0.5 * fdphi;
         r.set(R * cos(phi), R * sin(phi), Z);
       }
-    } else {
+    } else
+    {
       double dmax = -kInfinity;
       do {
         const cachezr_t& s = fcache[i];
@@ -1266,7 +1268,8 @@ G4double BelleLathe::DistanceToIn(const G4ThreeVector& p, const G4ThreeVector& n
     } else if (i == imax)
     {
       o.setX(fn0x), o.setY(fn0y);
-    } else {
+    } else
+    {
       o.setX(fn1x), o.setY(fn1y);
     }
     return o;
@@ -1484,7 +1487,8 @@ G4double BelleLathe::DistanceToOut(const G4ThreeVector& p, const G4ThreeVector& 
     } else if (i == imax)
     {
       o.setX(fn0x), o.setY(fn0y);
-    } else {
+    } else
+    {
       o.setX(fn1x), o.setY(fn1y);
     }
     return o;
@@ -1765,7 +1769,8 @@ G4ThreeVector BelleLathe::GetPointOnSurface() const
     if (CLHEP::RandFlat::shoot(0., 1.) > 0.5) // select phi side
     {
       c = -fn0y; s = fn0x;
-    } else {
+    } else
+    {
       c = fn1y; s = -fn1x;
     }
     G4ThreeVector r1(p.r * c, p.r * s, p.z);
@@ -2082,8 +2087,9 @@ double mindist(const zr_t& r, const vector<zr_t>& contour)
     {
       double d2 = dz * dz + dr * dr; // distance to the first point of the segement
       d = min(d, d2);
-    } else{
-      d = min(d, crs* crs / s2);
+    } else
+    {
+      d = min(d, crs * crs / s2);
     }
     //    cout<<i0<<" "<<s0.z<<" "<<s0.r<<" "<<d<<" "<<wn<<endl;
   };

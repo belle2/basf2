@@ -19,7 +19,7 @@ namespace Belle2 {
     unsigned EnergyMask::s_Nmax = 256;
 
     EnergyMask::EnergyMask(double dyde, double dydL, double dydx, double dy, double dL, double dx, double dE):
-      m_dE(dE), m_Wy(dy / abs(dyde))
+      m_dE(dE), m_Wy(dy / std::abs(dyde))
     {
       if (dy <= 0) {
         B2ERROR("TOP::EnergyMask: dy must be > 0");
@@ -28,8 +28,8 @@ namespace Belle2 {
 
       std::vector<double> x;
       x.push_back(m_Wy);
-      x.push_back(abs(dL * dydL / dyde));
-      x.push_back(abs(dx * dydx / dyde));
+      x.push_back(std::abs(dL * dydL / dyde));
+      x.push_back(std::abs(dx * dydx / dyde));
       std::sort(x.begin(), x.end());
 
       m_A = x[2];
@@ -88,7 +88,7 @@ namespace Belle2 {
     {
       double x1 = (m_A - m_B) / 2;
       double x2 = (m_A + m_B) / 2;
-      double x = abs(E);
+      double x = std::abs(E);
 
       if (x < x1) {
         return 1 / m_A * m_Wy;
@@ -103,7 +103,7 @@ namespace Belle2 {
     double EnergyMask::threeSquareConvolution(double E) const
     {
       double halfWid = (m_A + m_B + m_C) / 2;
-      if (abs(E) >= halfWid) return 0;
+      if (std::abs(E) >= halfWid) return 0;
 
       double t1 = halfWid - E;
       double t2 = halfWid + E;

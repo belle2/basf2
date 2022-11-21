@@ -55,7 +55,7 @@ void FullGridChi2TrackTimeExtractor::apply(std::vector<RecoTrack*>& recoTracks)
   m_wasSuccessful = m_finalExtractor.wasSuccessful();
 
   if (not wasSuccessful()) {
-    B2DEBUG(50, "Resetting the event t0 as the final extraction was not successful.");
+    B2DEBUG(25, "Resetting the event t0 as the final extraction was not successful.");
     resetEventT0();
   }
 }

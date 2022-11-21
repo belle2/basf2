@@ -46,7 +46,7 @@ namespace Belle2 {
                                                      bool logicLUTFlag)
     :
     TRGBoard("", TRGClock("", 0, 0), TRGClock("", 0, 0), TRGClock("", 0, 0),
-            TRGClock("", 0, 0)),
+             TRGClock("", 0, 0)),
     _cdc(TRGCDC),
     m_logicLUTFlag(logicLUTFlag),
     m_makeRootFile(makeRootFile),
@@ -307,7 +307,8 @@ namespace Belle2 {
     result.push_back(resultT);
     result.push_back(resultE);
 
-    delete [] LUTValue;
+    // cppcheck-suppress uninitdata
+    delete[] LUTValue;
     delete Hitmap;
 
     return result;
@@ -319,7 +320,7 @@ namespace Belle2 {
                                const unsigned maxHit)
   {
     TRGSignalVector* result =
-      new TRGSignalVector("", (* hitList[0]).clock() , 21 * maxHit);
+      new TRGSignalVector("", (* hitList[0]).clock(), 21 * maxHit);
 
     for (unsigned ci = 0; ci < cList.size(); ci++) {
       unsigned cntHit = 0;
@@ -354,7 +355,7 @@ namespace Belle2 {
   {
 
     //TRGSignalVector * result = new TRGSignalVector("",(*hitList[0]).clock() ,N+9*maxHit);
-    TRGSignalVector* result = new TRGSignalVector("", (*hitList[0]).clock() ,
+    TRGSignalVector* result = new TRGSignalVector("", (*hitList[0]).clock(),
                                                   hitList.size() + 9 * maxHit);
 
     for (unsigned ci = 0; ci < cList.size(); ci++) {
@@ -533,7 +534,7 @@ namespace Belle2 {
           tsPatternInformation[6] = priorityPhis[1];
           tsPatternInformation[7] = priorityLRs[2];
           tsPatternInformation[8] = priorityPhis[2];
-          new(hitPatternInformation[nHitTSs++]) TVectorD(tsPatternInformation);
+          new (hitPatternInformation[nHitTSs++]) TVectorD(tsPatternInformation);
         }
         //cout<<ts.name()<<" has "<<nHitWires<<" hit wires."<<endl;
       }
@@ -647,7 +648,7 @@ namespace Belle2 {
         bitset<9> hitSuperLayers(particleNHitTS[iMCParticle]);
         int numberHitSuperLayers = hitSuperLayers.count();
         //cout<<"iMCParticle: "<< iMCParticle << " # hit TS: "<<numberHitSuperLayers<<" MC # TS: "<<lastSLHit<<endl;
-        float mcPt = mcParticles[iMCParticle]->getMomentum().Perp();
+        float mcPt = mcParticles[iMCParticle]->getMomentum().Rho();
         float efficiency;
         if (lastSLHit == 0) efficiency = -1;
         else efficiency = float(numberHitSuperLayers) / lastSLHit;
@@ -671,7 +672,7 @@ namespace Belle2 {
         t_particleEfficiency[0] = tsEfficiency[iEfficiency][0];
         t_particleEfficiency[1] = tsEfficiency[iEfficiency][1];
         t_particleEfficiency[2] = tsEfficiency[iEfficiency][2];
-        new(particleEfficiency[iEfficiency]) TVectorD(t_particleEfficiency);
+        new (particleEfficiency[iEfficiency]) TVectorD(t_particleEfficiency);
       }
 
     } // End of no MC information
@@ -696,7 +697,7 @@ namespace Belle2 {
             tempTSInformation[0] = iSuperLayer;
             tempTSInformation[1] = ts.localId();
             tempTSInformation[2] = ts.wires()[iWire]->signal().stateChanges()[iHit];
-            new(tsInformation[iHitTS++]) TVectorD(tempTSInformation);
+            new (tsInformation[iHitTS++]) TVectorD(tempTSInformation);
             //cout<<ts.wires()[iWire]->signal().stateChanges()[iHit]<<", ";
             //iHit++;
           }
@@ -838,7 +839,7 @@ namespace Belle2 {
             //for(unsigned iWire=0; iWire<15; iWire++){
             for (unsigned iWire = 0; iWire < 21; iWire++)
               t_nnPatternInformation[iWire + 2] = wireTime[iWire];
-            new(nnPatternInformation[indexSaving++]) TVectorD(t_nnPatternInformation);
+            new (nnPatternInformation[indexSaving++]) TVectorD(t_nnPatternInformation);
           } else {
             //t_nnPatternInformation.ResizeTo(13);
             t_nnPatternInformation.ResizeTo(17);
@@ -847,7 +848,7 @@ namespace Belle2 {
             //for(unsigned iWire=0; iWire<11; iWire++){
             for (unsigned iWire = 0; iWire < 15; iWire++)
               t_nnPatternInformation[iWire + 2] = wireTime[iWire];
-            new(nnPatternInformation[indexSaving++]) TVectorD(t_nnPatternInformation);
+            new (nnPatternInformation[indexSaving++]) TVectorD(t_nnPatternInformation);
           }
 
         } // End of if priority cell is hit
@@ -1160,7 +1161,8 @@ namespace Belle2 {
     result.push_back(resultT);
     result.push_back(resultE);
 
-    delete [] LUTValue;
+    // cppcheck-suppress uninitdata
+    delete[] LUTValue;
     delete Hitmap;
 
     return result;
@@ -2384,7 +2386,7 @@ namespace Belle2 {
   {
 
     TRGSignalVector* result =
-      new TRGSignalVector("", (* hitList[0]).clock() , 21 * maxHit);
+      new TRGSignalVector("", (* hitList[0]).clock(), 21 * maxHit);
 
     for (unsigned ci = 0; ci < cList.size(); ci++) {
       unsigned cntHit = 0;
@@ -2572,7 +2574,8 @@ namespace Belle2 {
     result.push_back(resultT);
     result.push_back(resultE);
 
-    delete [] LUTValue;
+    // cppcheck-suppress uninitdata
+    delete[] LUTValue;
     delete Hitmap;
 
     return result;
@@ -2796,7 +2799,8 @@ namespace Belle2 {
     result.push_back(resultT);
     result.push_back(resultE);
 
-    delete [] LUTValue;
+    // cppcheck-suppress uninitdata
+    delete[] LUTValue;
     delete Hitmap;
 
     return result;

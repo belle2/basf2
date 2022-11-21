@@ -22,7 +22,7 @@ namespace Belle2 {
 
     /** default constructor for ROOT */
     MicrotpcRecoTrack(): m_detNb(0), m_pixnb(0), m_chi2(0), m_theta(0), m_phi(0), m_esum(0), m_totsum(0), m_trl(0), m_time_range(0),
-      m_parFit(), m_parFit_err(), m_cov(), m_impact_x() , m_impact_y(), m_side(), m_partID() {}
+      m_parFit(), m_parFit_err(), m_cov(), m_impact_x(), m_impact_y(), m_side(), m_partID() {}
 
     /** Standard constructor
      * @param detNb detector number

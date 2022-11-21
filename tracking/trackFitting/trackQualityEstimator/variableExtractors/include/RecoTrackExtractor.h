@@ -115,15 +115,15 @@ namespace Belle2 {
 
       m_variables.at(m_prefix + "seed_Charge") = recoTrack.getChargeSeed();
 
-      m_variables.at(m_prefix + "seed_Pos_Pt") = recoTrack.getPositionSeed().Pt();
+      m_variables.at(m_prefix + "seed_Pos_Pt") = recoTrack.getPositionSeed().Rho();
       m_variables.at(m_prefix + "seed_Pos_Z") = recoTrack.getPositionSeed().Z();
-      m_variables.at(m_prefix + "seed_Pos_Mag") = recoTrack.getPositionSeed().Mag();
+      m_variables.at(m_prefix + "seed_Pos_Mag") = recoTrack.getPositionSeed().R();
       m_variables.at(m_prefix + "seed_Pos_Theta") = recoTrack.getPositionSeed().Theta();
       m_variables.at(m_prefix + "seed_Pos_Phi") = recoTrack.getPositionSeed().Phi();
 
-      m_variables.at(m_prefix + "seed_Mom_Pt") = recoTrack.getMomentumSeed().Pt();
+      m_variables.at(m_prefix + "seed_Mom_Pt") = recoTrack.getMomentumSeed().Rho();
       m_variables.at(m_prefix + "seed_Mom_Z") = recoTrack.getMomentumSeed().Z();
-      m_variables.at(m_prefix + "seed_Mom_Mag") = recoTrack.getMomentumSeed().Mag();
+      m_variables.at(m_prefix + "seed_Mom_Mag") = recoTrack.getMomentumSeed().R();
       m_variables.at(m_prefix + "seed_Mom_Theta") = recoTrack.getMomentumSeed().Theta();
       m_variables.at(m_prefix + "seed_Mom_Phi") = recoTrack.getMomentumSeed().Phi();
 
@@ -149,7 +149,7 @@ namespace Belle2 {
         m_variables.at(m_prefix + "Fit_PVal") = -1.;
       }
 
-      m_variables.at(m_prefix + "Fit_Successful") = recoTrack.wasFitSuccessful();
+      m_variables.at(m_prefix + "Fit_Successful") = (float)recoTrack.wasFitSuccessful();
 
       if (recoTrack.wasFitSuccessful()) {
         TVector3 linePoint(0., 0., 0.);

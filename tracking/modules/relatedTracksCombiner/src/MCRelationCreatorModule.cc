@@ -18,9 +18,9 @@ MCRelationCreatorModule::MCRelationCreatorModule() :
   setDescription("Create relations between MC-matched RecoTracks in CDC and SVD.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  addParam("CDCRecoTracksStoreArrayName", m_cdcRecoTracksStoreArrayName , "Name of the input CDC StoreArray.",
+  addParam("CDCRecoTracksStoreArrayName", m_cdcRecoTracksStoreArrayName, "Name of the input CDC StoreArray.",
            m_cdcRecoTracksStoreArrayName);
-  addParam("VXDRecoTracksStoreArrayName", m_vxdRecoTracksStoreArrayName , "Name of the input VXD StoreArray.",
+  addParam("VXDRecoTracksStoreArrayName", m_vxdRecoTracksStoreArrayName, "Name of the input VXD StoreArray.",
            m_vxdRecoTracksStoreArrayName);
 }
 

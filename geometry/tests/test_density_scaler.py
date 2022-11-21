@@ -8,15 +8,17 @@
 
 '''
 Test if the DensityScaler module works.
+N.B.: this test can not be run in a light-release enviroment.
 '''
 
 import basf2 as b2
-import generators as ge
-import simulation as si
 import b2test_utils as b2tu
 
-
 b2tu.skip_test_if_light()
+
+import generators as ge  # noqa
+import simulation as si  # noqa
+
 
 main = b2.Path()
 

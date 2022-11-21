@@ -17,11 +17,10 @@
 /* Belle 2 headers. */
 #include <framework/logging/Logger.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace Belle2::KLM;
 
-REG_MODULE(KLMUnpacker)
+REG_MODULE(KLMUnpacker);
 
 KLMUnpackerModule::KLMUnpackerModule() : Module(),
   m_Time(&(KLMTime::Instance())),
@@ -31,7 +30,7 @@ KLMUnpackerModule::KLMUnpackerModule() : Module(),
   setDescription("KLM unpacker (creates KLMDigits from RawKLM).");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("outputKLMDigitsName", m_outputKLMDigitsName,
-           "Name of KLMDigit store array.", string(""));
+           "Name of KLMDigit store array.", std::string(""));
   addParam("WriteDigitRaws", m_WriteDigitRaws,
            "Record raw data in dataobject format (e.g. for debugging).", false);
   addParam("WriteWrongHits", m_WriteWrongHits,

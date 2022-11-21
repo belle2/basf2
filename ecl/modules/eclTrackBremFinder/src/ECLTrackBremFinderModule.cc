@@ -32,7 +32,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(ECLTrackBremFinder)
+REG_MODULE(ECLTrackBremFinder);
 
 ECLTrackBremFinderModule::ECLTrackBremFinderModule() :
   Module()
@@ -123,7 +123,7 @@ void ECLTrackBremFinderModule::event()
     const TrackFitResult* trackFitResult = track.getTrackFitResult(Const::ChargedStable(211));
     double trackMomentum;
     if (trackFitResult) {
-      trackMomentum = trackFitResult->getMomentum().Mag();
+      trackMomentum = trackFitResult->getMomentum().R();
       // if the momentum of the track is higher than 5 GeV, do not use this track
       if (trackMomentum > 5.0) {
         B2DEBUG(20, "Track momentum higher than 5GeV! Track is not used for bremsstrahlung finding");
@@ -279,9 +279,8 @@ void ECLTrackBremFinderModule::event()
         auto matchClustermSoP = matchContainer.getBestMatch();
         const auto fitted_state = std::get<1>(matchClustermSoP);
 
-        const auto fitted_pos = fitted_state.getPos();
-        const auto fitted_mom = fitted_state.getMom();
-        const auto fitted_dir = fitted_state.getDir();
+        const auto fitted_pos = ROOT::Math::XYZVector(fitted_state.getPos());
+        const auto fitted_mom = ROOT::Math::XYZVector(fitted_state.getMom());
 
         const auto hit_theta = fitted_mom.Theta();
         const auto hit_phi = fitted_mom.Phi();
@@ -298,7 +297,7 @@ void ECLTrackBremFinderModule::event()
         ECLCluster* bremCluster = std::get<0>(matchClustermSoP);
         double clusterDistance = std::get<2>(matchClustermSoP);
 
-        if (fitted_pos.Perp() <= 16 && clusterDistance <= m_clusterDistanceCut) {
+        if (fitted_pos.Rho() <= 16 && clusterDistance <= m_clusterDistanceCut) {
           m_bremHits.appendNew(recoTrack, bremCluster,
                                fitted_pos, bremCluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons),
                                clusterDistance, effAcceptanceFactor);

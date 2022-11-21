@@ -21,7 +21,7 @@ using namespace std;
 using namespace Belle2;
 
 
-REG_MODULE(SVDCrossTalkCalibrationsCollector)
+REG_MODULE(SVDCrossTalkCalibrationsCollector);
 
 SVDCrossTalkCalibrationsCollectorModule::SVDCrossTalkCalibrationsCollectorModule() : CalibrationCollectorModule()
 {

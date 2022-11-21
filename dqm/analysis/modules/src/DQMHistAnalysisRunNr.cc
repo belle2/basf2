@@ -21,7 +21,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(DQMHistAnalysisRunNr)
+REG_MODULE(DQMHistAnalysisRunNr);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -35,7 +35,7 @@ DQMHistAnalysisRunNrModule::DQMHistAnalysisRunNrModule()
   //Parameter definition
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("DAQ"));
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:DAQ:RunNr:"));
-  addParam("useEpics", m_useEpics, "useEpics", true);
+  addParam("useEpics", m_useEpics, "Whether to update EPICS PVs.", false);
 
   B2DEBUG(99, "DQMHistAnalysisRunNr: Constructor done.");
 }

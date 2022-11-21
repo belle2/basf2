@@ -20,7 +20,6 @@
 #include <sstream>
 
 using namespace Belle2;
-using namespace std;
 
 REG_MODULE(FastBDTClassifierTraining);
 
@@ -76,7 +75,7 @@ void FastBDTClassifierTrainingModule::initialize()
   }
 
   if (m_PARAMuseSamples) {
-    ifstream sampFile(m_PARAMsamplesFileName);
+    std::ifstream sampFile(m_PARAMsamplesFileName);
     if (!sampFile.is_open() || !sampFile.good()) {
       B2ERROR("Was not able to open the samples file: " << m_PARAMsamplesFileName);
     }
@@ -93,7 +92,7 @@ void FastBDTClassifierTrainingModule::event()
 
   DirectedNodeNetwork<TrackNode, VoidMetaInfo>& hitNetwork = m_network->accessHitNetwork();
 
-  // B2DEBUG(1, "size of hitNetwork " << hitNetwork.getNodes().size());
+  // B2DEBUG(20, "size of hitNetwork " << hitNetwork.getNodes().size());
 
   size_t samplePriorEvent = m_samples.size();
 
@@ -108,29 +107,29 @@ void FastBDTClassifierTrainingModule::event()
     } // center node loop
   } // outer node loop
 
-  B2DEBUG(10, "collected " << m_samples.size() - samplePriorEvent << " training samples in this event");
+  B2DEBUG(21, "collected " << m_samples.size() - samplePriorEvent << " training samples in this event");
 
 }
 
 void FastBDTClassifierTrainingModule::terminate()
 {
   if (m_PARAMstoreSamples) {
-    B2DEBUG(1, "Storing the collected samples to file: " << m_PARAMsamplesFileName);
-    ofstream sampStream(m_PARAMsamplesFileName);
+    B2DEBUG(20, "Storing the collected samples to file: " << m_PARAMsamplesFileName);
+    std::ofstream sampStream(m_PARAMsamplesFileName);
     sampStream.precision(16); // increase precision for sample writeout
     writeSamplesToStream(sampStream, m_samples);
     sampStream.close();
   }
   if (m_PARAMdoTrain) {
     FBDTClassifier<9> classifier{};
-    B2DEBUG(1, "Training a FBDTClassifier with " << m_samples.size() << " input samples. Training Parameters: \n" <<
+    B2DEBUG(20, "Training a FBDTClassifier with " << m_samples.size() << " input samples. Training Parameters: \n" <<
             "nTrees: " << m_PARAMnTrees << "\n" <<
             "treeDetph: " << m_PARAMtreeDepth << "\n" <<
             "shrinkage: " << m_PARAMshrinkage << "\n" <<
             "randRatio: " << m_PARAMrandRatio << "\n");
     classifier.train(m_samples, m_PARAMnTrees, m_PARAMtreeDepth, m_PARAMshrinkage, m_PARAMrandRatio);
 
-    ofstream ofs(m_PARAMfbdtOutFileName);
+    std::ofstream ofs(m_PARAMfbdtOutFileName);
     classifier.writeToStream(ofs);
     ofs.close();
   }
@@ -140,7 +139,7 @@ const FastBDTClassifierTrainingModule::TrainSample
 FastBDTClassifierTrainingModule::makeTrainSample(const Belle2::SpacePoint* outer, const Belle2::SpacePoint* center,
                                                  const Belle2::SpacePoint* inner)
 {
-  vector<MCVXDPurityInfo> purityInfos = createPurityInfosVec({outer, center, inner});
+  std::vector<MCVXDPurityInfo> purityInfos = createPurityInfosVec({outer, center, inner});
   auto mcId = purityInfos[0].getPurity(); // there is at least one entry in this vector!
   bool signal = (mcId.first >= 0 && mcId.second == 1); // only assign true for actual MCParticle and purity 1
 
@@ -156,7 +155,7 @@ FastBDTClassifierTrainingModule::makeTrainSample(const Belle2::SpacePoint* outer
     std::stringstream coordOutput;
     for (double d : sample.hits) coordOutput << d << " ";
 
-    B2DEBUG(499, "Created TrainingsSample with coordinates: ( " << coordOutput.str() <<  " ) " << sample.signal);
+    B2DEBUG(29, "Created TrainingsSample with coordinates: ( " << coordOutput.str() <<  " ) " << sample.signal);
   }
 
   return sample;

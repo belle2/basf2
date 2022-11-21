@@ -13,7 +13,6 @@
 #include <analysis/dataobjects/EventExtraInfo.h>
 
 #include <TDatabasePDG.h>
-#include <TLorentzVector.h>
 #include <TRandom3.h>
 
 #include <generators/utilities/InitialParticleGeneration.h>
@@ -98,110 +97,110 @@ extern "C" {
   void babayaga_setvpolnsk_(const char* vpolnskfilename, size_t* length);
 
   /** Callback to show warning if weights are not sufficient --> bias*/
-  void babayaganlo_warning_overweight_(double* weight, double* max)
+  void babayaganlo_warning_overweight_(const double* weight, const double* max)
   {
     B2WARNING("Babayaga.NLO: Maximum weight " << *max  << " to small, increase fmax to at least " << *weight);
   }
 
   /** Callback to show error if event is rejected*/
-  void babayaganlo_error_rejection_(double* ratio)
+  void babayaganlo_error_rejection_(const double* ratio)
   {
     B2ERROR("Babayaga.NLO: Event rejected! Ratio of cross section error increase too large: " << *ratio);
   }
 
   /** Callback to show error if weight is negative*/
-  void babayaganlo_error_negative_(double* weight)
+  void babayaganlo_error_negative_(const double* weight)
   {
     B2ERROR("Babayaga.NLO: Event has negative weight: " << *weight);
   }
 
   /** Callback results */
-  void babayaganlo_result_nominalcmsenergy_(double* energy)
+  void babayaganlo_result_nominalcmsenergy_(const double* energy)
   {
     B2RESULT("Babayaga.NLO: Nominal CMS energy (GeV): " << *energy);
   }
 
-  void babayaganlo_result_weightedxsec_(double* xsec, double* xsecerr)
+  void babayaganlo_result_weightedxsec_(const double* xsec, const double* xsecerr)
   {
     B2RESULT("Babayaga.NLO: Weighted cross section (nb): " << *xsec << " +/- " << *xsecerr);
   }
 
-  void babayaganlo_result_unweightedxsec_(double* xsec, double* xsecerr)
+  void babayaganlo_result_unweightedxsec_(const double* xsec, const double* xsecerr)
   {
     B2RESULT("Babayaga.NLO: Unweighted cross section (nb): " << *xsec << " +/- " << *xsecerr);
   }
 
-  void babayaganlo_result_unweightedxsec_biascorrected_(double* xsec, double* xsecerr)
+  void babayaganlo_result_unweightedxsec_biascorrected_(const double* xsec, const double* xsecerr)
   {
     B2RESULT("Babayaga.NLO: Unweighted cross section, bias corrected (nb): " << *xsec << " +/- " << *xsecerr);
   }
 
-  void babayaganlo_result_unweightedxsec_overweight_(double* xsec, double* xsecerr)
+  void babayaganlo_result_unweightedxsec_overweight_(const double* xsec, const double* xsecerr)
   {
     B2RESULT("Babayaga.NLO: Unweighted cross section overweight (nb): " << *xsec << " +/- " << *xsecerr);
   }
 
-  void babayaganlo_result_unweightedxsec_underweight_(double* xsec, double* xsecerr)
+  void babayaganlo_result_unweightedxsec_underweight_(const double* xsec, const double* xsecerr)
   {
     B2RESULT("Babayaga.NLO: Unweighted cross section underweight (nb): " << -*xsec << " +/- " << *xsecerr);
   }
 
-  void babayaganlo_result_hitormisseff_(double* eff)
+  void babayaganlo_result_hitormisseff_(const double* eff)
   {
     B2RESULT("Babayaga.NLO: Hit or miss efficiency: " << *eff * 100. << " % ");
   }
 
-  void babayaganlo_result_nover_(int* nover)
+  void babayaganlo_result_nover_(const int* nover)
   {
     B2RESULT("Babayaga.NLO: Points with w > fmax (bias): " << *nover);
   }
 
-  void babayaganlo_result_biashit_(double* biashit)
+  void babayaganlo_result_biashit_(const double* biashit)
   {
     B2RESULT("Babayaga.NLO: Bias/hit: " << *biashit * 100. << " % ");
   }
 
-  void babayaganlo_result_biashitpmiss_(double* biashitpmiss)
+  void babayaganlo_result_biashitpmiss_(const double* biashitpmiss)
   {
     B2RESULT("Babayaga.NLO: Bias/(hit+missed): " << *biashitpmiss * 100. << " % ");
   }
 
-  void babayaganlo_result_nneg_(int* nneg)
+  void babayaganlo_result_nneg_(const int* nneg)
   {
     B2RESULT("Babayaga.NLO: Points with w > fmax (bias): " << *nneg);
   }
 
-  void babayaganlo_result_biasneghit_(double* biasneghit)
+  void babayaganlo_result_biasneghit_(const double* biasneghit)
   {
     B2RESULT("Babayaga.NLO: Neg. bias/hit: " << *biasneghit * 100. << " % ");
   }
 
-  void babayaganlo_result_biasneghitmiss_(double* biasneghitmiss)
+  void babayaganlo_result_biasneghitmiss_(const double* biasneghitmiss)
   {
     B2RESULT("Babayaga.NLO: Neg. bias/(hit+missed): " << *biasneghitmiss * 100. << " % ");
   }
 
-  void babayaganlo_result_maxweight_(double* sdifmax, double* fmax)
+  void babayaganlo_result_maxweight_(const double* sdifmax, const double* fmax)
   {
     B2RESULT("Babayaga.NLO: Maximum weight (sdifmax): " << *sdifmax << ", user maximum weight(fmax): " << *fmax);
   }
 
-  void babayaganlo_result_vpmin_(double* xsec, double* xsecerr, double* frac)
+  void babayaganlo_result_vpmin_(const double* xsec, const double* xsecerr, const double* frac)
   {
     B2RESULT("Babayaga.NLO: VP Uncertainty, minimum (nb): " << *xsec << " +/- " << *xsecerr << " (" << *frac << " %)");
   }
 
-  void babayaganlo_result_vpcentral_(double* xsec, double* xsecerr)
+  void babayaganlo_result_vpcentral_(const double* xsec, const double* xsecerr)
   {
     B2RESULT("Babayaga.NLO: VP Uncertainty, central (nb): " << *xsec << " +/- " << *xsecerr);
   }
 
-  void babayaganlo_result_vpmax_(double* xsec, double* xsecerr, double* frac)
+  void babayaganlo_result_vpmax_(const double* xsec, const double* xsecerr, const double* frac)
   {
     B2RESULT("Babayaga.NLO: VP Uncertainty, maximum (nb): " << *xsec << " +/- " << *xsecerr << " ( " << *frac << " %)");
   }
 
-  void babayaganlo_finishedmaxsearch_(double* fmax)
+  void babayaganlo_finishedmaxsearch_(const double* fmax)
   {
     B2INFO("Babayaga.NLO: Finished maximum search: " << *fmax << ", starting now unweighted generation");
   }
@@ -226,27 +225,27 @@ extern "C" {
     B2FATAL("Babayaga.NLO: Generator prescale is not allowed with usermode = weighted");
   }
 
-  void babayaganlo_result_weightsum_(double* wsum)
+  void babayaganlo_result_weightsum_(const double* wsum)
   {
     B2RESULT("Babayaga.NLO: Sum of weights: " << *wsum);
   }
 
-  void babayaganlo_result_intlum_(double* lum, double* lumerr)
+  void babayaganlo_result_intlum_(const double* lum, const double* lumerr)
   {
     B2RESULT("Babayaga.NLO: Luminosity equivalent (using calc. xsec) (fb-1): " << *lum << " +/- " << *lumerr);
   }
 
-  void babayaganlo_warning_prescaleweight_(double* weight)
+  void babayaganlo_warning_prescaleweight_(const double* weight)
   {
     B2WARNING("Babayaga.NLO: Prescale of less than one, increase prescale safety margin " << *weight);
   }
 
-  void babayaganlo_error_isnan1_(double* phsp, double* w)
+  void babayaganlo_error_isnan1_(const double* phsp, const double* w)
   {
     B2ERROR("Babayaga.NLO: phsp (" << *phsp << ") or w (" << *w << ") are NAN, skipping event (nan1 type)");
   }
 
-  void babayaganlo_error_isnan2_(double* sdif)
+  void babayaganlo_error_isnan2_(const double* sdif)
   {
     B2ERROR("Babayaga.NLO: sdif (" << *sdif << ") is NAN, skipping event (nan2 type)");
   }
@@ -329,7 +328,8 @@ void BabayagaNLO::init()
 }
 
 
-void BabayagaNLO::generateEvent(MCParticleGraph& mcGraph, double ecm, TVector3 vertex, TLorentzRotation boost)
+void BabayagaNLO::generateEvent(MCParticleGraph& mcGraph, double ecm, ROOT::Math::XYZVector vertex,
+                                ROOT::Math::LorentzRotation boost)
 {
   //Generate event
   int mode = 1;
@@ -485,8 +485,8 @@ void BabayagaNLO::applySettings()
 }
 
 
-void BabayagaNLO::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, TVector3 vertex, TLorentzRotation boost,
-                                bool isVirtual, bool isInitial, bool isISRFSR)
+void BabayagaNLO::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, ROOT::Math::XYZVector vertex,
+                                ROOT::Math::LorentzRotation boost, bool isVirtual, bool isInitial, bool isISRFSR)
 {
 
 //   Create particle
@@ -512,18 +512,18 @@ void BabayagaNLO::storeParticle(MCParticleGraph& mcGraph, const double* mom, int
   part.setPDG(pdg);
   part.setFirstDaughter(0);
   part.setLastDaughter(0);
-  part.setMomentum(TVector3(mom[0], mom[1], mom[2]));
+  part.setMomentum(ROOT::Math::XYZVector(mom[0], mom[1], mom[2]));
   part.setMass(TDatabasePDG::Instance()->GetParticle(pdg)->Mass());
   part.setEnergy(mom[3]);
 
   //boost
-  TLorentzVector p4 = part.get4Vector();
+  ROOT::Math::PxPyPzEVector p4 = part.get4Vector();
   p4 = boost * p4;
   part.set4Vector(p4);
 
   //set vertex
   if (!isInitial) {
-    TVector3 v3 = part.getProductionVertex();
+    ROOT::Math::XYZVector v3 = part.getProductionVertex();
     v3 = v3 + vertex;
     part.setProductionVertex(v3);
     part.setValidVertex(true);

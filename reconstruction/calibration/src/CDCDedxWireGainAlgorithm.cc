@@ -575,9 +575,9 @@ void CDCDedxWireGainAlgorithm::plotBadWires(int nDeadwires, int oDeadwires, int 
   legend->SetBorderSize(0);
   legend->SetLineWidth(3);
   legend->SetHeader(Form("Total Bad: %d (~%0.02f%%)", nDeadwires + Badwires, 100.*(nDeadwires + Badwires) / 14336.0));
-  legend->AddEntry(hxyBad, Form("badadc  %d" , Badwires), "p");
-  legend->AddEntry(hxyOldDead, Form("olddead  %d" , oDeadwires), "p");
-  legend->AddEntry(hxyNewDead, Form("newdead  %d" , nDeadwires), "p");
+  legend->AddEntry(hxyBad, Form("badadc  %d", Badwires), "p");
+  legend->AddEntry(hxyOldDead, Form("olddead  %d", oDeadwires), "p");
+  legend->AddEntry(hxyNewDead, Form("newdead  %d", nDeadwires), "p");
   legend->Draw();
 
   gStyle->SetLegendTextSize(0.025);
@@ -636,7 +636,7 @@ TH2F* CDCDedxWireGainAlgorithm::getHistoPattern(TString badFileName, TString suf
 double CDCDedxWireGainAlgorithm::getIndexVal(int iWire, TString what)
 {
   //radius of each CDC layer
-  double r[56] = {
+  const double r[56] = {
     16.80,  17.80,  18.80,  19.80,  20.80,  21.80,  22.80,  23.80,
     25.70,  27.52,  29.34,  31.16,  32.98,  34.80,
     36.52,  38.34,  40.16,  41.98,  43.80,  45.57,

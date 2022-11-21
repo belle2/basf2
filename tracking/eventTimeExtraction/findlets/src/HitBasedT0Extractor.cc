@@ -139,7 +139,7 @@ void HitBasedT0Extractor::apply(std::vector<CDCWireHit>& inputWireHits)
   }
 
   if (timingHistgram.GetEntries() < m_param_minHitCount) {
-    B2DEBUG(50, "Only " << timingHistgram.GetEntries() << " hits satisfied the requirements for t0 extraction, " << m_param_minHitCount
+    B2DEBUG(25, "Only " << timingHistgram.GetEntries() << " hits satisfied the requirements for t0 extraction, " << m_param_minHitCount
             << " are required.");
     return;
   }
@@ -148,7 +148,7 @@ void HitBasedT0Extractor::apply(std::vector<CDCWireHit>& inputWireHits)
   // the cumulated plot
   timingHistgram.SetBinContent(1, timingHistgram.GetBinContent(1) + 1);
 
-  B2DEBUG(50,
+  B2DEBUG(25,
           "Filled histogram with " << timingHistgram.GetEntries() << " Entries");
 
   std::unique_ptr<TH1> cumTimingHistogram(timingHistgram.GetCumulative());
@@ -237,7 +237,7 @@ void HitBasedT0Extractor::apply(std::vector<CDCWireHit>& inputWireHits)
                                            fitted_t0_first - m_param_refitWindow, fitted_t0_first + m_param_refitWindow);
       refitSuccess = true;
     } else {
-      B2DEBUG(50, "First t0 estimate not in proper range" << fitted_t0_first);
+      B2DEBUG(25, "First t0 estimate not in proper range" << fitted_t0_first);
     }
 
     if (m_param_storeAllFits) {
@@ -251,15 +251,15 @@ void HitBasedT0Extractor::apply(std::vector<CDCWireHit>& inputWireHits)
 
       const double norm_chi2 = fitresFull->Chi2() / double(fitresFull->Ndf());
 
-      B2DEBUG(50, "T0 fit with t0 " << fitted_t0 << " +- " << fitted_t0_error << " and normalized chi2 " << norm_chi2 << " and " <<
+      B2DEBUG(25, "T0 fit with t0 " << fitted_t0 << " +- " << fitted_t0_error << " and normalized chi2 " << norm_chi2 << " and " <<
               timingHistgram.GetEntries() << " hits");
 
       // check if all the criteria required for a "good fit" have been met
       if (norm_chi2 > m_param_rejectIfChiSquareLargerThan) {
-        B2DEBUG(50,
+        B2DEBUG(25,
                 "T0 fit has too large Chi2 " << fitresFull->Chi2());
       } else if (std::abs(fitted_t0_error) > m_param_rejectIfUncertaintyLargerThan) {
-        B2DEBUG(50,
+        B2DEBUG(25,
                 "T0 fit has too large error " << fitted_t0_error);
       } else {
 
@@ -270,15 +270,15 @@ void HitBasedT0Extractor::apply(std::vector<CDCWireHit>& inputWireHits)
         m_eventT0->addTemporaryEventT0(eventT0Component);
         m_eventT0->setEventT0(eventT0Component);
         m_wasSuccessful = true;
-        B2DEBUG(50,
+        B2DEBUG(25,
                 "Successful t0 extraction with CDC hits: " << fitted_t0 << " +- " << fitted_t0_error);
       }
     } else {
-      B2DEBUG(50,
+      B2DEBUG(25,
               "Cannot fit t0 from CDC hits only. Won't set EventT0 for now.");
     }
   } else {
-    B2DEBUG(50,
+    B2DEBUG(25,
             "Cannot extract background or signal segment because fit failed. Won't set EventT0 for now.");
   }
 

@@ -10,10 +10,9 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
 
-using namespace std;
 using namespace Belle2;
 
-REG_MODULE(FittedTracksStorer)
+REG_MODULE(FittedTracksStorer);
 
 FittedTracksStorerModule::FittedTracksStorerModule() :
   Module()
@@ -30,36 +29,27 @@ FittedTracksStorerModule::FittedTracksStorerModule() :
 
 void FittedTracksStorerModule::initialize()
 {
-  StoreArray<RecoTrack> inputRecoTracks(m_param_inputRecoTracksStoreArrayName);
-  inputRecoTracks.isRequired();
+  m_inputRecoTracks.isRequired(m_param_inputRecoTracksStoreArrayName);
+  m_outputRecoTracks.registerInDataStore(m_param_outputRecoTracksStoreArrayName, DataStore::c_ErrorIfAlreadyRegistered);
 
-  StoreArray<RecoTrack> outputRecoTracks(m_param_outputRecoTracksStoreArrayName);
-  outputRecoTracks.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered);
+  RecoTrack::registerRequiredRelations(m_outputRecoTracks);
+  m_inputRecoTracks.registerRelationTo(m_outputRecoTracks);
 
-  RecoTrack::registerRequiredRelations(outputRecoTracks);
-
-  inputRecoTracks.registerRelationTo(outputRecoTracks);
-
-  StoreArray<MCParticle> mcParticles;
-  if (mcParticles.isOptional()) {
-    outputRecoTracks.registerRelationTo(mcParticles);
+  if (m_MCParticles.isOptional()) {
+    m_outputRecoTracks.registerRelationTo(m_MCParticles);
   }
 
-  StoreArray<Track> tracks;
-  if (tracks.isOptional()) {
-    tracks.registerRelationTo(outputRecoTracks);
+  if (m_Tracks.isOptional()) {
+    m_Tracks.registerRelationTo(m_outputRecoTracks);
   }
 }
 
 
 void FittedTracksStorerModule::event()
 {
-  StoreArray<RecoTrack> inputRecoTracks(m_param_inputRecoTracksStoreArrayName);
-  StoreArray<RecoTrack> outputRecoTracks(m_param_outputRecoTracksStoreArrayName);
-
-  for (RecoTrack& recoTrack : inputRecoTracks) {
+  for (RecoTrack& recoTrack : m_inputRecoTracks) {
     if (recoTrack.wasFitSuccessful()) {
-      auto newRecoTrack = recoTrack.copyToStoreArray(outputRecoTracks);
+      auto newRecoTrack = recoTrack.copyToStoreArray(m_outputRecoTracks);
       newRecoTrack->addHitsFromRecoTrack(&recoTrack, 0, false, m_param_minimalWeight);
 
       // Add also relations

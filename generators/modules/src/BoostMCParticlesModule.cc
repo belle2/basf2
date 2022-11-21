@@ -15,11 +15,11 @@
 #include <framework/logging/Logger.h>
 
 /* ROOT headers. */
-#include <TLorentzVector.h>
+#include <Math/Vector4D.h>
 
 using namespace Belle2;
 
-REG_MODULE(BoostMCParticles)
+REG_MODULE(BoostMCParticles);
 
 BoostMCParticlesModule::BoostMCParticlesModule() : Module(), m_firstEvent{true}, m_initial(0)
 {
@@ -49,16 +49,18 @@ void BoostMCParticlesModule::event()
   }
   m_firstEvent = false;
   for (MCParticle& mcParticle : m_mcParticles) {
-    TLorentzVector momentum = mcParticle.get4Vector();
+    ROOT::Math::PxPyPzEVector momentum = mcParticle.get4Vector();
     mcParticle.set4Vector(m_boost * momentum);
     if (mcParticle.getProductionTime() != 0.) { // Boost only if the production vertex is not the default one.
-      TLorentzVector productionVertex{mcParticle.getProductionVertex(), Const::speedOfLight * mcParticle.getProductionTime()};
+      ROOT::Math::XYZVector v = mcParticle.getProductionVertex();
+      ROOT::Math::PxPyPzEVector productionVertex(v.X(), v.Y(), v.Z(), Const::speedOfLight * mcParticle.getProductionTime());
       productionVertex = m_boost * productionVertex;
       mcParticle.setProductionVertex(productionVertex.X(), productionVertex.Y(), productionVertex.Z());
       mcParticle.setProductionTime(productionVertex.T() / Const::speedOfLight);
     }
     if (mcParticle.getDecayTime() != 0.) { // Boost only if the decay vertex is not the default one.
-      TLorentzVector decayVertex{mcParticle.getDecayVertex(), Const::speedOfLight * mcParticle.getDecayTime()};
+      ROOT::Math::XYZVector v = mcParticle.getDecayVertex();
+      ROOT::Math::PxPyPzEVector decayVertex(v.X(), v.Y(), v.Z(), Const::speedOfLight * mcParticle.getDecayTime());
       decayVertex = m_boost * decayVertex;
       mcParticle.setDecayVertex(decayVertex.X(), decayVertex.Y(), decayVertex.Z());
       mcParticle.setDecayTime(decayVertex.T() / Const::speedOfLight);

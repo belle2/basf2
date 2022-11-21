@@ -18,10 +18,13 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <ecl/dbobjects/ECLDigitWaveformParametersForMC.h>
 #include <framework/database/DBObjPtr.h>
+#include <framework/database/DBArray.h>
 
 //ECL
 #include <ecl/digitization/EclConfiguration.h>
 #include <ecl/utility/ECLChannelMapper.h>
+
+class TTree;
 
 namespace Belle2 {
 
@@ -149,6 +152,15 @@ namespace Belle2 {
 
     /** dbobject for hadron signal shapes*/
     DBObjPtr<ECLDigitWaveformParametersForMC> m_waveformParametersMC;
+    /** dbobject for CellID-specific signal shapes */
+    DBObjPtr<TTree> m_waveformParameters;
+    /** dbobject for shape fitting algo parameters */
+    DBObjPtr<TTree> m_algoParameters;
+    /** dbobject for electronics noise covariance matrix */
+    DBObjPtr<TTree> m_noiseParameters;
+
+    /** Always load waveform parameters at least once */
+    bool m_loadOnce = true;
 
     /** callback hadron signal shapes from database*/
     void callbackHadronSignalShapes();
@@ -198,5 +210,15 @@ namespace Belle2 {
     bool m_trigTime; /**< Use trigger time from beam background overlay */
     std::string m_eclWaveformsName;   /**< name of background waveforms storage*/
     bool m_dspDataTest; /**< DSP data usage flag */
+    /** If true, use m_waveformParameters, m_algoParameters, m_noiseParameters.
+     *  If false, use the data from ecl/data/ECL-WF.root or ECL-WF-BG.root
+     */
+    bool m_useWaveformParameters;
+    /** Normalization coefficient for ECL signal shape.
+     *  If positive, use same static value for all ECL channels.
+     *  If negative, calculate it dynamically at beginRun().
+     *  (for default shape parameters, the static value is 27.7221)
+     */
+    double m_unitscale;
   };
 }//Belle2

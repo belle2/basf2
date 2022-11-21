@@ -7,6 +7,8 @@
  **************************************************************************/
 
 #include <analysis/variables/VertexVariables.h>
+
+#include <analysis/dataobjects/Particle.h>
 #include <analysis/utility/ReferenceFrame.h>
 
 #include <framework/database/DBObjPtr.h>
@@ -14,7 +16,6 @@
 #include <framework/utilities/Conversion.h>
 
 #include <TMatrixFSym.h>
-#include <TVector3.h>
 
 #include <mdst/dbobjects/BeamSpot.h>
 #include <mdst/dataobjects/MCParticle.h>
@@ -55,14 +56,14 @@ namespace Belle2 {
     {
       auto* mcparticle = part->getMCParticle();
       if (!mcparticle) return realNaN;
-      return mcparticle->getDecayVertex().Perp();
+      return mcparticle->getDecayVertex().Rho();
     }
 
-    TVector3 getMcDecayVertexFromIP(const MCParticle* mcparticle)
+    B2Vector3D getMcDecayVertexFromIP(const MCParticle* mcparticle)
     {
       static DBObjPtr<BeamSpot> beamSpotDB;
       const auto& frame = ReferenceFrame::GetCurrent();
-      return frame.getVertex(mcparticle->getDecayVertex() - beamSpotDB->getIPPosition());
+      return frame.getVertex(mcparticle->getDecayVertex() - ROOT::Math::XYZVector(beamSpotDB->getIPPosition()));
     }
 
     double mcDecayVertexFromIPX(const Particle* part)
@@ -121,11 +122,11 @@ namespace Belle2 {
       return mcparticle->getProductionVertex().Z();
     }
 
-    TVector3 getMcProductionVertexFromIP(const MCParticle* mcparticle)
+    B2Vector3D getMcProductionVertexFromIP(const MCParticle* mcparticle)
     {
       static DBObjPtr<BeamSpot> beamSpotDB;
       const auto& frame = ReferenceFrame::GetCurrent();
-      return frame.getVertex(mcparticle->getProductionVertex() - beamSpotDB->getIPPosition());
+      return frame.getVertex(mcparticle->getProductionVertex() - ROOT::Math::XYZVector(beamSpotDB->getIPPosition()));
     }
 
     double mcProductionVertexFromIPX(const Particle* part)
@@ -199,16 +200,16 @@ namespace Belle2 {
     //----------------------------------------------------------------------------------
     // vertex or POCA in respect to measured IP
 
-    TVector3 getVertexD(const Particle* part)
+    B2Vector3D getVertexD(const Particle* part)
     {
       static DBObjPtr<BeamSpot> beamSpotDB;
       const auto& frame = ReferenceFrame::GetCurrent();
       auto trackFit = part->getTrackFitResult();
       if (!trackFit)
-        return frame.getVertex(part->getVertex() - beamSpotDB->getIPPosition());
+        return frame.getVertex(part->getVertex() - ROOT::Math::XYZVector(beamSpotDB->getIPPosition()));
 
       UncertainHelix helix = trackFit->getUncertainHelix();
-      helix.passiveMoveBy(beamSpotDB->getIPPosition());
+      helix.passiveMoveBy(ROOT::Math::XYZVector(beamSpotDB->getIPPosition()));
       return frame.getVertex(helix.getPerigee());
     }
 
@@ -258,10 +259,10 @@ namespace Belle2 {
       // and V_{ij} is the covariance matrix
       static DBObjPtr<BeamSpot> beamSpotDB;
       const auto& frame = ReferenceFrame::GetCurrent();
-      const TVector3& vertex = frame.getVertex(part->getVertex() - beamSpotDB->getIPPosition());
+      const B2Vector3D& vertex = frame.getVertex(part->getVertex() - ROOT::Math::XYZVector(beamSpotDB->getIPPosition()));
       const TMatrixFSym& vertexErr = frame.getVertexErrorMatrix(static_cast<TMatrixDSym>(part->getVertexErrorMatrix()) +
                                                                 beamSpotDB->getCovVertex());
-      const double denominator = vertex * (vertexErr * vertex);
+      const double denominator = vertex * B2Vector3D(vertexErr * vertex);
       if (denominator <= 0) return realNaN;
 
       return vertex.Mag2() / std::sqrt(denominator);
@@ -288,34 +289,24 @@ namespace Belle2 {
     }
 
     // Production vertex covariance matrix
-    Manager::FunctionPtr particleProductionCovElement(const std::vector<std::string>& arguments)
+    double particleProductionCovElement(const Particle* part, const std::vector<double>& indices)
     {
-      if (arguments.size() != 2) {
+      if (indices.size() != 2) {
         B2FATAL("Number of arguments of prodVertexCov function is incorrect!");
       }
 
-      int ielement = -1;
-      int jelement = -1;
-      try {
-        ielement = Belle2::convertString<int>(arguments[0]);
-        jelement = Belle2::convertString<int>(arguments[1]);
-      } catch (std::invalid_argument&) {
-        B2ERROR("Arguments of prodVertexCov function must be integer!");
-        return nullptr;
-      }
+      int ielement = std::lround(indices[0]);
+      int jelement = std::lround(indices[1]);
 
       if (std::min(ielement, jelement) < 0 || std::max(ielement, jelement) > 2) {
         B2ERROR("Range of indexes of prodVertexCov function is incorrect!");
-        return nullptr;
       }
 
       const std::vector<char> names = {'x', 'y', 'z'};
-      const std::string prodVertS = Form("prodVertS%c%c", names[ielement] , names[jelement]);
+      const std::string prodVertS = Form("prodVertS%c%c", names[ielement], names[jelement]);
 
-      return [prodVertS](const Particle * part) -> double {
-        if (!part->hasExtraInfo(prodVertS)) return realNaN;
-        return part->getExtraInfo(prodVertS);
-      };
+      if (!part->hasExtraInfo(prodVertS)) return realNaN;
+      return part->getExtraInfo(prodVertS);
     }
 
     double particleProductionXErr(const Particle* part)
@@ -339,35 +330,50 @@ namespace Belle2 {
     VARIABLE_GROUP("Vertex Information");
     // Generated vertex information
     REGISTER_VARIABLE("mcDecayVertexX", mcDecayVertexX,
-                      "Returns the x position of the decay vertex of the matched generated particle. Returns nan if the particle has no matched generated particle.");
+                      "Returns the x position of the decay vertex of the matched generated particle. Returns nan if the particle has no matched generated particle.",
+                      "cm");
     REGISTER_VARIABLE("mcDecayVertexY", mcDecayVertexY,
-                      "Returns the y position of the decay vertex of the matched generated particle. Returns nan if the particle has no matched generated particle.");
+                      "Returns the y position of the decay vertex of the matched generated particle. Returns nan if the particle has no matched generated particle.",
+                      "cm");
     REGISTER_VARIABLE("mcDecayVertexZ", mcDecayVertexZ,
-                      "Returns the z position of the decay vertex of the matched generated particle. Returns nan if the particle has no matched generated particle.");
+                      "Returns the z position of the decay vertex of the matched generated particle. Returns nan if the particle has no matched generated particle.",
+                      "cm");
     REGISTER_VARIABLE("mcDecayVertexRho", mcDecayVertexRho,
-                      "Returns the transverse position of the decay vertex of the matched generated particle. Returns nan if the particle has no matched generated particle.");
+                      "Returns the transverse position of the decay vertex of the matched generated particle. Returns nan if the particle has no matched generated particle.",
+                      "cm");
     REGISTER_VARIABLE("mcDecayVertexFromIPX", mcDecayVertexFromIPX,
-                      "Returns the x position of the decay vertex of the matched generated particle wrt the IP. Returns nan if the particle has no matched generated particle.");
+                      "Returns the x position of the decay vertex of the matched generated particle wrt the IP. Returns nan if the particle has no matched generated particle.",
+                      "cm");
     REGISTER_VARIABLE("mcDecayVertexFromIPY", mcDecayVertexFromIPY,
-                      "Returns the y position of the decay vertex of the matched generated particle wrt the IP. Returns nan if the particle has no matched generated particle.");
+                      "Returns the y position of the decay vertex of the matched generated particle wrt the IP. Returns nan if the particle has no matched generated particle.",
+                      "cm");
     REGISTER_VARIABLE("mcDecayVertexFromIPZ", mcDecayVertexFromIPZ,
-                      "Returns the z position of the decay vertex of the matched generated particle wrt the IP. Returns nan if the particle has no matched generated particle.");
+                      "Returns the z position of the decay vertex of the matched generated particle wrt the IP. Returns nan if the particle has no matched generated particle.",
+                      "cm");
     REGISTER_VARIABLE("mcDecayVertexFromIPRho", mcDecayVertexFromIPRho,
-                      "Returns the transverse position of the decay vertex of the matched generated particle wrt the IP. Returns nan if the particle has no matched generated particle.");
+                      "Returns the transverse position of the decay vertex of the matched generated particle wrt the IP. Returns nan if the particle has no matched generated particle.",
+                      "cm");
     REGISTER_VARIABLE("mcDecayVertexFromIPDistance", mcDecayVertexFromIPDistance,
-                      "Returns the distance of the decay vertex of the matched generated particle from the IP. Returns nan if the particle has no matched generated particle.");
+                      "Returns the distance of the decay vertex of the matched generated particle from the IP. Returns nan if the particle has no matched generated particle.",
+                      "cm");
     REGISTER_VARIABLE("mcProductionVertexX", mcProductionVertexX,
-                      "Returns the x position of production vertex of matched generated particle. Returns nan if the particle has no matched generated particle.");
+                      "Returns the x position of production vertex of matched generated particle. Returns nan if the particle has no matched generated particle.",
+                      "cm");
     REGISTER_VARIABLE("mcProductionVertexY", mcProductionVertexY,
-                      "Returns the y position of production vertex of matched generated particle. Returns nan if the particle has no matched generated particle.");
+                      "Returns the y position of production vertex of matched generated particle. Returns nan if the particle has no matched generated particle.",
+                      "cm");
     REGISTER_VARIABLE("mcProductionVertexZ", mcProductionVertexZ,
-                      "Returns the z position of production vertex of matched generated particle. Returns nan if the particle has no matched generated particle.");
+                      "Returns the z position of production vertex of matched generated particle. Returns nan if the particle has no matched generated particle.",
+                      "cm");
     REGISTER_VARIABLE("mcProductionVertexFromIPX", mcProductionVertexFromIPX,
-                      "Returns the x position of the production vertex of the matched generated particle wrt the IP. Returns nan if the particle has no matched generated particle.");
+                      "Returns the x position of the production vertex of the matched generated particle wrt the IP. Returns nan if the particle has no matched generated particle.",
+                      "cm");
     REGISTER_VARIABLE("mcProductionVertexFromIPY", mcProductionVertexFromIPY,
-                      "Returns the y position of the production vertex of the matched generated particle wrt the IP. Returns nan if the particle has no matched generated particle.");
+                      "Returns the y position of the production vertex of the matched generated particle wrt the IP. Returns nan if the particle has no matched generated particle.",
+                      "cm");
     REGISTER_VARIABLE("mcProductionVertexFromIPZ", mcProductionVertexFromIPZ,
-                      "Returns the z position of the production vertex of the matched generated particle wrt the IP. Returns nan if the particle has no matched generated particle.");
+                      "Returns the z position of the production vertex of the matched generated particle wrt the IP. Returns nan if the particle has no matched generated particle.",
+                      "cm");
 
     // Decay vertex position
     REGISTER_VARIABLE("distance", particleDistance,
@@ -375,42 +381,43 @@ namespace Belle2 {
 
 In case the particle has been created from a track, the distance is defined between the POCA and IP.
 If the particle is built from an ECL cluster, the decay vertex is set to the nominal IP. 
-If the particle is created from a KLM cluster, the distance is calculated between the IP and the cluster itself.)DOC");
+If the particle is created from a KLM cluster, the distance is calculated between the IP and the cluster itself.)DOC", "cm");
 
     REGISTER_VARIABLE("significanceOfDistance", particleDistanceSignificance,
                       "significance of distance from vertex or POCA to interaction point(-1 in case of numerical problems)");
-    REGISTER_VARIABLE("dx", particleDX, "vertex or POCA in case of tracks x in respect to IP");
-    REGISTER_VARIABLE("dy", particleDY, "vertex or POCA in case of tracks y in respect to IP");
-    REGISTER_VARIABLE("dz", particleDZ, "vertex or POCA in case of tracks z in respect to IP");
+    REGISTER_VARIABLE("dx", particleDX, "vertex or POCA in case of tracks x in respect to IP", "cm");
+    REGISTER_VARIABLE("dy", particleDY, "vertex or POCA in case of tracks y in respect to IP", "cm");
+    REGISTER_VARIABLE("dz", particleDZ, "vertex or POCA in case of tracks z in respect to IP", "cm");
     REGISTER_VARIABLE("x", particleX,
-                      "x coordinate of vertex in case of composite particle, or point of closest approach (POCA) in case of a track");
+                      "x coordinate of vertex in case of composite particle, or point of closest approach (POCA) in case of a track", "cm");
     REGISTER_VARIABLE("y", particleY,
-                      "y coordinate of vertex in case of composite particle, or point of closest approach (POCA) in case of a track");
+                      "y coordinate of vertex in case of composite particle, or point of closest approach (POCA) in case of a track", "cm");
     REGISTER_VARIABLE("z", particleZ,
-                      "z coordinate of vertex in case of composite particle, or point of closest approach (POCA) in case of a track");
-    REGISTER_VARIABLE("x_uncertainty", particleDXUncertainty, "uncertainty on x (measured with respect to the origin)");
-    REGISTER_VARIABLE("y_uncertainty", particleDYUncertainty, "uncertainty on y (measured with respect to the origin)");
-    REGISTER_VARIABLE("z_uncertainty", particleDZUncertainty, "uncertainty on z (measured with respect to the origin)");
-    REGISTER_VARIABLE("dr", particleDRho, "transverse distance in respect to IP for a vertex; track d0 relative to IP for a track.");
-    REGISTER_VARIABLE("dphi", particleDPhi, "vertex azimuthal angle of the vertex or POCA in degrees in respect to IP");
+                      "z coordinate of vertex in case of composite particle, or point of closest approach (POCA) in case of a track", "cm");
+    REGISTER_VARIABLE("x_uncertainty", particleDXUncertainty, "uncertainty on x (measured with respect to the origin)", "cm");
+    REGISTER_VARIABLE("y_uncertainty", particleDYUncertainty, "uncertainty on y (measured with respect to the origin)", "cm");
+    REGISTER_VARIABLE("z_uncertainty", particleDZUncertainty, "uncertainty on z (measured with respect to the origin)", "cm");
+    REGISTER_VARIABLE("dr", particleDRho, "transverse distance in respect to IP for a vertex; track d0 relative to IP for a track.",
+                      "cm");
+    REGISTER_VARIABLE("dphi", particleDPhi, "vertex azimuthal angle of the vertex or POCA in degrees in respect to IP", "rad");
     REGISTER_VARIABLE("dcosTheta", particleDCosTheta, "vertex or POCA polar angle in respect to IP");
     // Production vertex position
     REGISTER_VARIABLE("prodVertexX", particleProductionX,
-                      "Returns the x position of particle production vertex. Returns NaN if particle has no production vertex.");
+                      "Returns the x position of particle production vertex. Returns NaN if particle has no production vertex.", "cm");
     REGISTER_VARIABLE("prodVertexY", particleProductionY,
-                      "Returns the y position of particle production vertex.");
+                      "Returns the y position of particle production vertex.", "cm");
     REGISTER_VARIABLE("prodVertexZ", particleProductionZ,
-                      "Returns the z position of particle production vertex.");
+                      "Returns the z position of particle production vertex.", "cm");
     // Production vertex covariance matrix
-    REGISTER_METAVARIABLE("prodVertexCov(i,j)", particleProductionCovElement,
-                          "Returns the ij covariance matrix component of particle production vertex, arguments i,j should be 0, 1 or 2. Returns NaN if particle has no production covariance matrix.",
-                          Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("prodVertexCov(i,j)", particleProductionCovElement,
+                      "Returns the ij covariance matrix component of particle production vertex, arguments i,j should be 0, 1 or 2. Returns NaN if particle has no production covariance matrix.",
+                      ":math:`\\text{cm}^2`");
     REGISTER_VARIABLE("prodVertexXErr", particleProductionXErr,
-                      "Returns the x position uncertainty of particle production vertex. Returns NaN if particle has no production vertex.");
+                      "Returns the x position uncertainty of particle production vertex. Returns NaN if particle has no production vertex.", "cm");
     REGISTER_VARIABLE("prodVertexYErr", particleProductionYErr,
-                      "Returns the y position uncertainty of particle production vertex.");
+                      "Returns the y position uncertainty of particle production vertex.", "cm");
     REGISTER_VARIABLE("prodVertexZErr", particleProductionZErr,
-                      "Returns the z position uncertainty of particle production vertex.");
+                      "Returns the z position uncertainty of particle production vertex.", "cm");
 
   }
 }

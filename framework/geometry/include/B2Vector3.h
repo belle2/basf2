@@ -12,6 +12,7 @@
 #include <framework/logging/Logger.h>
 
 #include <TVector3.h>
+#include <Math/Vector3D.h>
 #include <string>
 #include <iostream>     // std::cout, std::fixed
 #include <iomanip>      // std::setprecision
@@ -69,6 +70,12 @@ namespace Belle2 {
     /** Constructor expecting a pointer to a B2Vector3 of different type */
     template <typename OtherType> explicit B2Vector3(const B2Vector3<OtherType>* b2Vec3):
       m_coordinates {static_cast<DataType>(b2Vec3->X()), static_cast<DataType>(b2Vec3->Y()), static_cast<DataType>(b2Vec3->Z())} {};
+    /** Constructor expecting a XYZVector */
+    // cppcheck-suppress noExplicitConstructor
+    B2Vector3(const ROOT::Math::XYZVector& xyzVec): m_coordinates {static_cast<DataType>(xyzVec.X()), static_cast<DataType>(xyzVec.Y()), static_cast<DataType>(xyzVec.Z())} {};
+    /** Constructor expecting a pointer to a XYZVector */
+    // cppcheck-suppress noExplicitConstructor
+    B2Vector3(const ROOT::Math::XYZVector* xyzVec): m_coordinates {static_cast<DataType>(xyzVec->X()), static_cast<DataType>(xyzVec->Y()), static_cast<DataType>(xyzVec->Z())} {};
 
     /** member access without boundary check */
     DataType operator()(unsigned i) const { return m_coordinates[i]; }
@@ -83,18 +90,26 @@ namespace Belle2 {
     B2Vector3<DataType>& operator = (const B2Vector3<DataType>& b);
     /** Assignment via TVector3 */
     B2Vector3<DataType>& operator = (const TVector3& b);
+    /** Assignment via XYZVector */
+    B2Vector3<DataType>& operator = (const ROOT::Math::XYZVector& b);
 
     /** type conversion in TVector3 */
     operator TVector3() const { return GetTVector3(); }
+    /** type conversion in ROOT::Math::XYZVector */
+    operator ROOT::Math::XYZVector() const { return GetXYZVector(); }
 
     /** Comparison for equality with a B2Vector3 */
     bool operator == (const B2Vector3<DataType>& b) const { return X() == b.X() && Y() == b.Y() && Z() == b.Z(); }
     /** Comparison for equality with a TVector3 */
     bool operator == (const TVector3& b) const { return X() == b.X() && Y() == b.Y() && Z() == b.Z(); }
+    /** Comparison for equality with a XYZVector */
+    bool operator == (const ROOT::Math::XYZVector& b) const { return X() == b.X() && Y() == b.Y() && Z() == b.Z(); }
     /** Comparison != with a B2Vector3 */
     bool operator != (const B2Vector3<DataType>& b) const { return !(*this == b); }
     /** Comparison != with a TVector3 */
     bool operator != (const TVector3& b) const { return !(*this == b); }
+    /** Comparison != with a XYZVector */
+    bool operator != (const ROOT::Math::XYZVector& b) const { return !(*this == b); }
 
     /** addition */
     B2Vector3<DataType>& operator += (const B2Vector3<DataType>& b);
@@ -427,8 +442,12 @@ namespace Belle2 {
     void GetXYZ(Float_t* carray) const;
     /** directly copies coordinates to a TVector3 */
     void GetXYZ(TVector3* tVec) const;
+    /** directly copies coordinates to a XYZVector */
+    void GetXYZ(ROOT::Math::XYZVector* xyzVec) const;
     /** returns a TVector3 containing the same coordinates */
     TVector3 GetTVector3() const;
+    /** returns a XYZVector containing the same coordinates */
+    ROOT::Math::XYZVector GetXYZVector() const;
 
     /** set X/1st-coordinate */
     void SetX(DataType x) { m_coordinates[0] = x; }
@@ -446,6 +465,10 @@ namespace Belle2 {
     void SetXYZ(const TVector3& tVec);
     /** set all coordinates using a pointer to TVector3 */
     void SetXYZ(const TVector3* tVec);
+    /** set all coordinates using a reference to XYZVector */
+    void SetXYZ(const ROOT::Math::XYZVector& xyzVec);
+    /** set all coordinates using a pointer to XYZVector */
+    void SetXYZ(const ROOT::Math::XYZVector* xyzVec);
 
     /** Returns the name of the B2Vector. */
     static std::string name();
@@ -540,6 +563,34 @@ namespace Belle2 {
     return B2Vector3<DataType>(a.X() - b.X(), a.Y() - b.Y(), a.Z() - b.Z());
   }
 
+  /** non-memberfunction for adding a XYZVector to a B2Vector3 */
+  template < typename DataType>
+  B2Vector3<DataType> operator + (const ROOT::Math::XYZVector& a, const B2Vector3<DataType>& b)
+  {
+    return B2Vector3<DataType>(a.X() + b.X(), a.Y() + b.Y(), a.Z() + b.Z());
+  }
+
+  /** non-memberfunction for substracting a XYZVector from a B2Vector3 */
+  template < typename DataType>
+  B2Vector3<DataType> operator - (const ROOT::Math::XYZVector& a, const B2Vector3<DataType>& b)
+  {
+    return B2Vector3<DataType>(a.X() - b.X(), a.Y() - b.Y(), a.Z() - b.Z());
+  }
+
+  /** non-memberfunction for adding a B2Vector3 to a XYZVector */
+  template < typename DataType>
+  B2Vector3<DataType> operator + (const B2Vector3<DataType>& a, const ROOT::Math::XYZVector& b)
+  {
+    return B2Vector3<DataType>(a.X() + b.X(), a.Y() + b.Y(), a.Z() + b.Z());
+  }
+
+  /** non-memberfunction for substracting a B2Vector3 from a XYZVector */
+  template < typename DataType>
+  B2Vector3<DataType> operator - (const B2Vector3<DataType>& a, const ROOT::Math::XYZVector& b)
+  {
+    return B2Vector3<DataType>(a.X() - b.X(), a.Y() - b.Y(), a.Z() - b.Z());
+  }
+
 
   /** Assignment via B2Vector3 */
   template< typename DataType >
@@ -554,6 +605,16 @@ namespace Belle2 {
   /** Assignment via TVector3 */
   template< typename DataType >
   B2Vector3<DataType>& B2Vector3<DataType>::operator = (const TVector3& b)
+  {
+    m_coordinates[0] = b.X();
+    m_coordinates[1] = b.Y();
+    m_coordinates[2] = b.Z();
+    return *this;
+  }
+
+  /** Assignment via XYZVector */
+  template< typename DataType >
+  B2Vector3<DataType>& B2Vector3<DataType>::operator = (const ROOT::Math::XYZVector& b)
   {
     m_coordinates[0] = b.X();
     m_coordinates[1] = b.Y();
@@ -610,6 +671,24 @@ namespace Belle2 {
     m_coordinates[2] = static_cast<Double_t>(tVec->Z());
   }
 
+  /** set all coordinates using a reference to XYZVector */
+  template< typename DataType >
+  void B2Vector3<DataType>::SetXYZ(const ROOT::Math::XYZVector& xyzVec)
+  {
+    m_coordinates[0] = static_cast<Double_t>(xyzVec.X());
+    m_coordinates[1] = static_cast<Double_t>(xyzVec.Y());
+    m_coordinates[2] = static_cast<Double_t>(xyzVec.Z());
+  }
+
+  /** set all coordinates using a pointer to XYZVector */
+  template< typename DataType >
+  void B2Vector3<DataType>::SetXYZ(const ROOT::Math::XYZVector* xyzVec)
+  {
+    m_coordinates[0] = static_cast<Double_t>(xyzVec->X());
+    m_coordinates[1] = static_cast<Double_t>(xyzVec->Y());
+    m_coordinates[2] = static_cast<Double_t>(xyzVec->Z());
+  }
+
   template< typename DataType >
   void B2Vector3<DataType>::GetXYZ(double* carray) const
   {
@@ -627,6 +706,15 @@ namespace Belle2 {
                  static_cast<Double_t>(Z()));
   }
 
+  /** directly copies coordinates to a XYZVector */
+  template< typename DataType >
+  void B2Vector3<DataType>::GetXYZ(ROOT::Math::XYZVector* xyzVec) const
+  {
+    xyzVec->SetXYZ(static_cast<Double_t>(X()),
+                   static_cast<Double_t>(Y()),
+                   static_cast<Double_t>(Z()));
+  }
+
 
   /** returns a TVector3 containing the same coordinates */
   template< typename DataType >
@@ -634,6 +722,19 @@ namespace Belle2 {
   {
     return
       TVector3(
+        static_cast<Double_t>(X()),
+        static_cast<Double_t>(Y()),
+        static_cast<Double_t>(Z())
+      );
+  }
+
+
+  /** returns a ROOT::Math::XYZVector containing the same coordinates */
+  template< typename DataType >
+  ROOT::Math::XYZVector B2Vector3<DataType>::GetXYZVector() const
+  {
+    return
+      ROOT::Math::XYZVector(
         static_cast<Double_t>(X()),
         static_cast<Double_t>(Y()),
         static_cast<Double_t>(Z())

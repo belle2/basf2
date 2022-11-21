@@ -19,7 +19,7 @@ using namespace std;
 using namespace Belle2;
 
 
-REG_MODULE(BestCandidateSelection)
+REG_MODULE(BestCandidateSelection);
 
 
 BestCandidateSelectionModule::BestCandidateSelectionModule():

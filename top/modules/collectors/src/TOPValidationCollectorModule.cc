@@ -32,10 +32,10 @@ namespace Belle2 {
   using namespace TOP;
 
   //-----------------------------------------------------------------
-  //                 Register module
+  ///                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPValidationCollector)
+  REG_MODULE(TOPValidationCollector);
 
   //-----------------------------------------------------------------
   //                 Implementation
@@ -150,6 +150,12 @@ namespace Belle2 {
     tree->Branch("numActiveCalibrated", &m_treeEntry.numActiveCalibrated, "numActiveCalibrated[16]/I");
     tree->Branch("thrEffi", &m_treeEntry.thrEffi, "thrEffi[16]/F");
     tree->Branch("asicShifts", &m_treeEntry.asicShifts, "asicShifts[4]/F");
+    tree->Branch("svdOffset", &m_treeEntry.svdOffset, "svdOffset/F");
+    tree->Branch("svdSigma", &m_treeEntry.svdSigma, "svdSigma/F");
+    tree->Branch("cdcOffset", &m_treeEntry.cdcOffset, "cdcOffset/F");
+    tree->Branch("cdcSigma", &m_treeEntry.cdcSigma, "cdcSigma/F");
+    tree->Branch("fillPatternOffset", &m_treeEntry.fillPatternOffset, "fillPatternOffset/F");
+    tree->Branch("fillPatternFraction", &m_treeEntry.fillPatternFraction, "fillPatternFraction/F");
     registerObject<TTree>("tree", tree);
   }
 
@@ -206,6 +212,17 @@ namespace Belle2 {
                                         std::numeric_limits<float>::quiet_NaN();
     }
 
+    const auto& svd = m_eventT0Offset->get(Const::SVD);
+    m_treeEntry.svdOffset = svd.offset;
+    m_treeEntry.svdSigma = svd.sigma;
+
+    const auto& cdc = m_eventT0Offset->get(Const::CDC);
+    m_treeEntry.cdcOffset = cdc.offset;
+    m_treeEntry.cdcSigma = cdc.sigma;
+
+    m_treeEntry.fillPatternOffset = m_fillPatternOffset->isCalibrated() ? m_fillPatternOffset->get() :
+                                    std::numeric_limits<float>::quiet_NaN();
+    m_treeEntry.fillPatternFraction = m_fillPatternOffset->getFraction();
   }
 
 

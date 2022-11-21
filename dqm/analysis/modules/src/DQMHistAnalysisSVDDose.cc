@@ -17,14 +17,14 @@ using namespace Belle2;
 // Utility function
 inline double getClockSeconds() { return Utils::getClock() / 1e9; }
 
-REG_MODULE(DQMHistAnalysisSVDDose)
+REG_MODULE(DQMHistAnalysisSVDDose);
 
 DQMHistAnalysisSVDDoseModule::DQMHistAnalysisSVDDoseModule()
 {
   setDescription("Monitoring of SVD Dose with events from Poisson trigger w/o inj. veto. See also SVDDQMDoseModule.");
   // THIS MODULE CAN NOT BE RUN IN PARALLEL
   addParam("pvPrefix", m_pvPrefix, "Prefix for EPICS PVs.", std::string("DQM:SVD:"));
-  addParam("useEpics", m_useEpics, "Whether to update EPICS PVs.", true);
+  addParam("useEpics", m_useEpics, "Whether to update EPICS PVs.", false);
   addParam("epicsUpdateSeconds", m_epicsUpdateSeconds,
            "Minimum interval between two successive PV updates (in seconds).", 1000.0);
   addParam("pvSuffix", m_pvSuffix, "Suffix for EPICS PVs.", std::string(":Occ:Pois:Avg"));

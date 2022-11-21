@@ -164,56 +164,30 @@ float TrackMatchLookUp::getRelatedEfficiency(const RecoTrack& mcRecoTrack) const
   return std::fabs(efficiency);
 }
 
-const RecoTrack* TrackMatchLookUp::getMatchedMCRecoTrack(const RecoTrack& prRecoTrack) const
+const RecoTrack* TrackMatchLookUp::getMCRecoTrackWithStatus(const RecoTrack& prRecoTrack,
+                                                            const PRToMCMatchInfo matchingStatus) const
 {
   B2ASSERT("This RecoTrack isn't a PR RecoTrack as it is supposed to be.", isPRRecoTrack(prRecoTrack));
 
   float purity = NAN;
   const RecoTrack* mcRecoTrack = getRelatedMCRecoTrack(prRecoTrack, purity);
 
-  if (extractPRToMCMatchInfo(prRecoTrack, mcRecoTrack, purity) == PRToMCMatchInfo::c_matched) {
+  if (extractPRToMCMatchInfo(prRecoTrack, mcRecoTrack, purity) == matchingStatus) {
     return mcRecoTrack;
   } else {
     return nullptr;
   }
 }
 
-const RecoTrack* TrackMatchLookUp::getWrongChargeMCRecoTrack(const RecoTrack& prRecoTrack) const
-{
-  B2ASSERT("This RecoTrack isn't a PR RecoTrack as it is supposed to be.", isPRRecoTrack(prRecoTrack));
-
-  float purity = NAN;
-  const RecoTrack* mcRecoTrack = getRelatedMCRecoTrack(prRecoTrack, purity);
-
-  if (extractPRToMCMatchInfo(prRecoTrack, mcRecoTrack, purity) == PRToMCMatchInfo::c_matchedWrongCharge) {
-    return mcRecoTrack;
-  } else {
-    return nullptr;
-  }
-}
-
-const RecoTrack* TrackMatchLookUp::getMatchedPRRecoTrack(const RecoTrack& mcRecoTrack) const
+const RecoTrack* TrackMatchLookUp::getPRRecoTrackWithStatus(const RecoTrack& mcRecoTrack,
+                                                            const MCToPRMatchInfo matchingStatus) const
 {
   B2ASSERT("This RecoTrack isn't a MC RecoTrack as it is supposed to be.", isMCRecoTrack(mcRecoTrack));
 
   float efficiency = NAN;
   const RecoTrack* prRecoTrack = getRelatedPRRecoTrack(mcRecoTrack, efficiency);
 
-  if (extractMCToPRMatchInfo(mcRecoTrack, prRecoTrack, efficiency) == MCToPRMatchInfo::c_matched) {
-    return prRecoTrack;
-  } else {
-    return nullptr;
-  }
-}
-
-const RecoTrack* TrackMatchLookUp::getWrongChargePRRecoTrack(const RecoTrack& mcRecoTrack) const
-{
-  B2ASSERT("This RecoTrack isn't a MC RecoTrack as it is supposed to be.", isMCRecoTrack(mcRecoTrack));
-
-  float efficiency = NAN;
-  const RecoTrack* prRecoTrack = getRelatedPRRecoTrack(mcRecoTrack, efficiency);
-
-  if (extractMCToPRMatchInfo(mcRecoTrack, prRecoTrack, efficiency) == MCToPRMatchInfo::c_matchedWrongCharge) {
+  if (extractMCToPRMatchInfo(mcRecoTrack, prRecoTrack, efficiency) == matchingStatus) {
     return prRecoTrack;
   } else {
     return nullptr;

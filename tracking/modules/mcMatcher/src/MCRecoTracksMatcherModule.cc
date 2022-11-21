@@ -595,7 +595,7 @@ void MCRecoTracksMatcherModule::event()
     // MATCHED
     if (prId == mostWeightEfficientPRId) {
       if (foundTrackCharge != MCParticleTrackCharge) {
-        prRecoTrack->setMatchingStatus(RecoTrack::MatchingStatus::c_wrongCharge);
+        prRecoTrack->setMatchingStatus(RecoTrack::MatchingStatus::c_matchedWrongCharge);
         ++nWrongCharge;
       } else {
         prRecoTrack->setMatchingStatus(RecoTrack::MatchingStatus::c_matched);
@@ -678,7 +678,7 @@ void MCRecoTracksMatcherModule::event()
     // MATCHED
     if (mcId == mostPureMCId and
         (prRecoTrack->getMatchingStatus() == RecoTrack::MatchingStatus::c_matched or
-         prRecoTrack->getMatchingStatus() == RecoTrack::MatchingStatus::c_wrongCharge or
+         prRecoTrack->getMatchingStatus() == RecoTrack::MatchingStatus::c_matchedWrongCharge or
          prRecoTrack->getMatchingStatus() == RecoTrack::MatchingStatus::c_clone or
          prRecoTrack->getMatchingStatus() == RecoTrack::MatchingStatus::c_cloneWrongCharge)) {
       // Setup the relation with positive weighted efficiency for this case.
@@ -695,7 +695,7 @@ void MCRecoTracksMatcherModule::event()
     bool isMergedMCRecoTrack =
       (weightedEfficiency >= m_minimalEfficiency) and
       (prRecoTrack->getMatchingStatus() == RecoTrack::MatchingStatus::c_matched or
-       prRecoTrack->getMatchingStatus() == RecoTrack::MatchingStatus::c_wrongCharge or
+       prRecoTrack->getMatchingStatus() == RecoTrack::MatchingStatus::c_matchedWrongCharge or
        prRecoTrack->getMatchingStatus() == RecoTrack::MatchingStatus::c_clone or
        prRecoTrack->getMatchingStatus() == RecoTrack::MatchingStatus::c_cloneWrongCharge);
 

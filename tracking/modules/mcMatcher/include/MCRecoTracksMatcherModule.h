@@ -181,13 +181,13 @@ namespace Belle2 {
     void event() final;
 
   private: //Parameters
-    //! Parameter : RecoTracks StoreArray name from the pattern recognition
+    //! Parameter : Name of the RecoTracks StoreArray from pattern recognition
     std::string m_prRecoTracksStoreArrayName;
 
-    //! Parameter : RecoTracks StoreArray name from the MC recognition
+    //! Parameter : Name of the RecoTracks StoreArray from MC track finding
     std::string m_mcRecoTracksStoreArrayName;
 
-    //! Parameter : Tracks StoreArray
+    //! Parameter : Name of the Tracks StoreArray
     std::string m_TracksStoreArrayName;
 
     //! Parameter : Switch whether PXDHits should be used in the matching

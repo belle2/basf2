@@ -77,13 +77,10 @@ TrackMatchLookUp::extractMCToPRMatchInfo(const RecoTrack& mcRecoTrack,
   const RecoTrack* roundTripMCRecoTrack =
     prRecoTrack->getRelatedTo<RecoTrack>(m_mcTracksStoreArrayName);
 
-  bool wrongCharge = false;
-
-  if (roundTripMCRecoTrack->getChargeSeed() != mcRecoTrack.getChargeSeed())
-    wrongCharge == true;
+  const bool wrongCharge = roundTripMCRecoTrack->getChargeSeed() != mcRecoTrack.getChargeSeed();
 
   if (roundTripMCRecoTrack == &mcRecoTrack) {
-    if (wrongCharge) return MCToPRMatchInfo::c_wrongCharge;
+    if (wrongCharge) return MCToPRMatchInfo::c_matchedWrongCharge;
     else return MCToPRMatchInfo::c_matched;
   } else {
     if (wrongCharge) return MCToPRMatchInfo::c_mergedWrongCharge;
@@ -112,9 +109,9 @@ TrackMatchLookUp::extractPRToMCMatchInfo(const RecoTrack& prRecoTrack,
   } else if (matchingStatus == RecoTrack::MatchingStatus::c_matched) {
     if (not mcRecoTrack) B2WARNING("Match with no related Monte Carlo RecoTrack");
     return PRToMCMatchInfo::c_matched;
-  }  else if (matchingStatus == RecoTrack::MatchingStatus::c_wrongCharge) {
+  }  else if (matchingStatus == RecoTrack::MatchingStatus::c_matchedWrongCharge) {
     if (not mcRecoTrack) B2WARNING("Match with no related Monte Carlo RecoTrack");
-    return PRToMCMatchInfo::c_wrongCharge;
+    return PRToMCMatchInfo::c_matchedWrongCharge;
   } else if (matchingStatus == RecoTrack::MatchingStatus::c_undefined) {
     return PRToMCMatchInfo::c_undefined;
   }
@@ -188,7 +185,7 @@ const RecoTrack* TrackMatchLookUp::getWrongChargeMCRecoTrack(const RecoTrack& pr
   float purity = NAN;
   const RecoTrack* mcRecoTrack = getRelatedMCRecoTrack(prRecoTrack, purity);
 
-  if (extractPRToMCMatchInfo(prRecoTrack, mcRecoTrack, purity) == PRToMCMatchInfo::c_wrongCharge) {
+  if (extractPRToMCMatchInfo(prRecoTrack, mcRecoTrack, purity) == PRToMCMatchInfo::c_matchedWrongCharge) {
     return mcRecoTrack;
   } else {
     return nullptr;
@@ -216,7 +213,7 @@ const RecoTrack* TrackMatchLookUp::getWrongChargePRRecoTrack(const RecoTrack& mc
   float efficiency = NAN;
   const RecoTrack* prRecoTrack = getRelatedPRRecoTrack(mcRecoTrack, efficiency);
 
-  if (extractMCToPRMatchInfo(mcRecoTrack, prRecoTrack, efficiency) == MCToPRMatchInfo::c_wrongCharge) {
+  if (extractMCToPRMatchInfo(mcRecoTrack, prRecoTrack, efficiency) == MCToPRMatchInfo::c_matchedWrongCharge) {
     return prRecoTrack;
   } else {
     return nullptr;

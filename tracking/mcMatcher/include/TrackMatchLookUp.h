@@ -33,24 +33,24 @@ namespace Belle2 {
      * Matching categories for the Monte Carlo tracks.
      * c_undefined, //until the matcher module sets it
      * c_matched, // hit pattern and charge are both correct
-     * c_wrongCharge, // hit pattern is correct, but the charge is wrong
+     * c_matchedWrongCharge, // hit pattern is correct, but the charge is wrong
      * c_merged, //a clone with the correct charge
      * c_mergedWrongCharge, //a clone with the wrong charge
      * c_missing
      */
-    enum class MCToPRMatchInfo { c_undefined, c_matched, c_wrongCharge, c_merged, c_mergedWrongCharge, c_missing };
+    enum class MCToPRMatchInfo { c_undefined, c_matched, c_matchedWrongCharge, c_merged, c_mergedWrongCharge, c_missing };
 
     /*!
      * Matching categories for the pattern recognition tracks.
      * c_undefined, //until the matcher module sets it
      * c_matched, // hit pattern and charge are both correct
-     * c_wrongCharge, // hit pattern is correct, but the charge is wrong
+     * c_matchedWrongCharge, // hit pattern is correct, but the charge is wrong
      * c_clone, //a clone with the correct charge
      * c_cloneWrongCharge, //a clone with the wrong charge
      * c_background,
      * c_ghost
      */
-    enum class PRToMCMatchInfo { c_undefined, c_matched, c_wrongCharge, c_clone, c_cloneWrongCharge, c_background, c_ghost };
+    enum class PRToMCMatchInfo { c_undefined, c_matched, c_matchedWrongCharge, c_clone, c_cloneWrongCharge, c_background, c_ghost };
 
   public:
     /*!
@@ -167,7 +167,7 @@ namespace Belle2 {
     */
     bool isMatchedWrongChargePRRecoTrack(const RecoTrack& prRecoTrack) const
     {
-      return getPRToMCMatchInfo(prRecoTrack) == PRToMCMatchInfo::c_wrongCharge;
+      return getPRToMCMatchInfo(prRecoTrack) == PRToMCMatchInfo::c_matchedWrongCharge;
     }
 
     /*!
@@ -227,7 +227,7 @@ namespace Belle2 {
      */
     bool isMatchedWrongChargeMCRecoTrack(const RecoTrack& mcRecoTrack) const
     {
-      return getMCToPRMatchInfo(mcRecoTrack) == MCToPRMatchInfo::c_wrongCharge;
+      return getMCToPRMatchInfo(mcRecoTrack) == MCToPRMatchInfo::c_matchedWrongCharge;
     }
 
     /*!

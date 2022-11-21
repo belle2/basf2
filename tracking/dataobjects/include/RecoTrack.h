@@ -101,7 +101,7 @@ namespace Belle2 {
     enum MatchingStatus {
       c_undefined, //until the matcher module sets it
       c_matched, // hit pattern and charge are both correct
-      c_wrongCharge, // hit pattern is correct, but the charge is wrong
+      c_matchedWrongCharge, // hit pattern is correct, but the charge is wrong
       c_clone, //a clone with the correct charge
       c_cloneWrongCharge, //a clone with the wrong charge
       c_background,

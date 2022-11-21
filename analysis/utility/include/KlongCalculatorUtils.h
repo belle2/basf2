@@ -48,13 +48,12 @@ namespace Belle2 {
         if (daughter->getPDGCode() == Const::Klong.getPDGCode()) {
           const Belle2::KLMCluster* klm_cluster = daughter->getKLMCluster();
           const Belle2::ECLCluster* ecl_cluster = daughter->getECLCluster();
-          if (NULL != klm_cluster)
-            klDaughters += klm_cluster->getMomentum();
-          else if (NULL != ecl_cluster) {
-            ClusterUtils clutls;
-            klDaughters += clutls.GetCluster4MomentumFromCluster(ecl_cluster, ECLCluster::EHypothesisBit::c_neutralHadron);
-            //  klDaughters += clutls.GetCluster4MomentumFromCluster(ecl_cluster, daughter->getECLClusterEHypothesisBit());
-          }
+          if (if (klm_cluster != nullptr))
+              klDaughters += klm_cluster->getMomentum();
+            else if (if (ecl_cluster != nullptr)) {
+                ClusterUtils clutls;
+                klDaughters += clutls.Get4MomentumFromCluster(ecl_cluster, ECLCluster::EHypothesisBit::c_neutralHadron);
+              }
         } else {
           pDaughters += daughter->get4Vector();
 

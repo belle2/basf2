@@ -411,8 +411,9 @@ what should be documented, and how:
     the utf-coding definition. Further documentation describing the package can be added after
     this line as comments.
   
-  * Documentation about the input and output of modules is `automatically generated <https://confluence.desy.de/display/BI/Software+VisualizeDataFlow>`_ if both
-    are registered in the initialize method.
+  * Documentation about the input and output of modules is
+    `automatically generated <https://confluence.desy.de/display/BI/Software+VisualizeDataFlow>`_
+    if both are registered in the initialize method.
 
 Further Suggestions
 -------------------
@@ -425,4 +426,5 @@ Further Suggestions
   
   * If you get a warning about too large or unbound stack usage, use ``std::vector`` instead
     of a one-dimensional C array or ``boost::multi_array`` instead of multi-dimensional C arrays.
-    See these `slides <http://kds.kek.jp/getFile.py/access?contribId=0&resId=0&materialId=slides&confId=19219>`_ or `mail <https://belle2.kek.jp/sympa/arc/software/2015-07/msg00061.html>`_ for more information.
+    See these `slides <http://kds.kek.jp/getFile.py/access?contribId=0&resId=0&materialId=slides&confId=19219>`_
+    or `mail <https://belle2.kek.jp/sympa/arc/software/2015-07/msg00061.html>`_ for more information.

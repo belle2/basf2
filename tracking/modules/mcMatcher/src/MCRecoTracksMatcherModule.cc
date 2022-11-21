@@ -566,12 +566,12 @@ void MCRecoTracksMatcherModule::event()
     // const Efficiency& efficiency = mostWeightEfficientPRId_for_mcId.efficiency;
 
     // find the true charge and reconstructed charge
-    double MCParticleTrackCharge = mcParticle->getCharge();
-    double foundTrackCharge = prRecoTrack->getChargeSeed();
+    const short MCParticleTrackCharge = mcParticle->getCharge() > 0 ? 1 : -1;
+    short foundTrackCharge = prRecoTrack->getChargeSeed();
     if (m_useFittedTracks) {
       const RelationVector<Track> fittedTracks = prRecoTrack->getRelationsFrom<Track>(m_TracksStoreArrayName);
-      int nPositiveCharges = 0;
-      int nNegativeCharges = 0;
+      short nPositiveCharges = 0;
+      short nNegativeCharges = 0;
       if (fittedTracks.size() > 0) {
         for (const auto& fittedTrack : fittedTracks) {
           const RelationVector<TrackFitResult> trackFitResults = fittedTrack.getRelationsFrom<TrackFitResult>();

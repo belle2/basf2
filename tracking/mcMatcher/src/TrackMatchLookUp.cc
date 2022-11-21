@@ -37,7 +37,7 @@ bool TrackMatchLookUp::isPRRecoTrack(const RecoTrack& recoTrack) const
 const RecoTrack*
 TrackMatchLookUp::getRelatedMCRecoTrack(const RecoTrack& prRecoTrack, float& purity) const
 {
-  assert(isPRRecoTrack(prRecoTrack));
+  B2ASSERT("This RecoTrack isn't a PR RecoTrack as it is supposed to be.", isPRRecoTrack(prRecoTrack));
   std::pair<RecoTrack*, float> mcRecoTrackAndWeight =
     prRecoTrack.getRelatedToWithWeight<RecoTrack>(getMCTracksStoreArrayName());
   const RecoTrack* mcRecoTrack = mcRecoTrackAndWeight.first;
@@ -52,7 +52,7 @@ TrackMatchLookUp::getRelatedMCRecoTrack(const RecoTrack& prRecoTrack, float& pur
 const RecoTrack*
 TrackMatchLookUp::getRelatedPRRecoTrack(const RecoTrack& mcRecoTrack, float& efficiency) const
 {
-  assert(isMCRecoTrack(mcRecoTrack));
+  B2ASSERT("This RecoTrack isn't a MC RecoTrack as it is supposed to be.", isMCRecoTrack(mcRecoTrack));
   std::pair<RecoTrack*, float> prRecoTrackAndWeight =
     mcRecoTrack.getRelatedToWithWeight<RecoTrack>(getPRTracksStoreArrayName());
   const RecoTrack* prRecoTrack = prRecoTrackAndWeight.first;
@@ -71,8 +71,8 @@ TrackMatchLookUp::extractMCToPRMatchInfo(const RecoTrack& mcRecoTrack,
 {
   if (not prRecoTrack) return MCToPRMatchInfo::c_missing;
   if (std::isnan(efficiency)) return MCToPRMatchInfo::c_undefined;
-  assert(isMCRecoTrack(mcRecoTrack));
-  assert(isPRRecoTrack(*prRecoTrack));
+  B2ASSERT("This RecoTrack isn't a MC RecoTrack as it is supposed to be.", isMCRecoTrack(mcRecoTrack));
+  B2ASSERT("This RecoTrack isn't a PR RecoTrack as it is supposed to be.", isPRRecoTrack(*prRecoTrack));
 
   const RecoTrack* roundTripMCRecoTrack =
     prRecoTrack->getRelatedTo<RecoTrack>(m_mcTracksStoreArrayName);
@@ -93,7 +93,7 @@ TrackMatchLookUp::extractPRToMCMatchInfo(const RecoTrack& prRecoTrack,
                                          const RecoTrack* mcRecoTrack,
                                          const float& purity __attribute__((unused))) const
 {
-  assert(isPRRecoTrack(prRecoTrack));
+  B2ASSERT("This RecoTrack isn't a PR RecoTrack as it is supposed to be.", isPRRecoTrack(prRecoTrack));
   const RecoTrack::MatchingStatus matchingStatus = prRecoTrack.getMatchingStatus();
 
   if (matchingStatus == RecoTrack::MatchingStatus::c_ghost) {
@@ -125,14 +125,14 @@ const MCParticle* TrackMatchLookUp::getRelatedMCParticle(const RecoTrack& recoTr
 
 const RecoTrack* TrackMatchLookUp::getRelatedMCRecoTrack(const RecoTrack& prRecoTrack) const
 {
-  assert(isPRRecoTrack(prRecoTrack));
+  B2ASSERT("This RecoTrack isn't a PR RecoTrack as it is supposed to be.", isPRRecoTrack(prRecoTrack));
   return prRecoTrack.getRelatedTo<RecoTrack>(getMCTracksStoreArrayName());
 }
 
 const TrackFitResult* TrackMatchLookUp::getRelatedTrackFitResult(const RecoTrack& prRecoTrack,
     Const::ChargedStable chargedStable) const
 {
-  assert(isPRRecoTrack(prRecoTrack));
+  B2ASSERT("This RecoTrack isn't a PR RecoTrack as it is supposed to be.", isPRRecoTrack(prRecoTrack));
   Belle2::Track* b2track = prRecoTrack.getRelatedFrom<Belle2::Track>();
   if (b2track) {
     // Query the Belle2::Track for the selected fit hypothesis
@@ -144,13 +144,13 @@ const TrackFitResult* TrackMatchLookUp::getRelatedTrackFitResult(const RecoTrack
 
 const RecoTrack* TrackMatchLookUp::getRelatedPRRecoTrack(const RecoTrack& mcRecoTrack) const
 {
-  assert(isMCRecoTrack(mcRecoTrack));
+  B2ASSERT("This RecoTrack isn't a MC RecoTrack as it is supposed to be.", isMCRecoTrack(mcRecoTrack));
   return mcRecoTrack.getRelatedTo<RecoTrack>(getPRTracksStoreArrayName());
 }
 
 float TrackMatchLookUp::getRelatedPurity(const RecoTrack& prRecoTrack) const
 {
-  assert(isPRRecoTrack(prRecoTrack));
+  B2ASSERT("This RecoTrack isn't a PR RecoTrack as it is supposed to be.", isPRRecoTrack(prRecoTrack));
   float purity = NAN;
   getRelatedMCRecoTrack(prRecoTrack, purity);
   return std::fabs(purity);
@@ -158,7 +158,7 @@ float TrackMatchLookUp::getRelatedPurity(const RecoTrack& prRecoTrack) const
 
 float TrackMatchLookUp::getRelatedEfficiency(const RecoTrack& mcRecoTrack) const
 {
-  assert(isMCRecoTrack(mcRecoTrack));
+  B2ASSERT("This RecoTrack isn't a MC RecoTrack as it is supposed to be.", isMCRecoTrack(mcRecoTrack));
   float efficiency = NAN;
   getRelatedPRRecoTrack(mcRecoTrack, efficiency);
   return std::fabs(efficiency);
@@ -166,7 +166,7 @@ float TrackMatchLookUp::getRelatedEfficiency(const RecoTrack& mcRecoTrack) const
 
 const RecoTrack* TrackMatchLookUp::getMatchedMCRecoTrack(const RecoTrack& prRecoTrack) const
 {
-  assert(isPRRecoTrack(prRecoTrack));
+  B2ASSERT("This RecoTrack isn't a PR RecoTrack as it is supposed to be.", isPRRecoTrack(prRecoTrack));
 
   float purity = NAN;
   const RecoTrack* mcRecoTrack = getRelatedMCRecoTrack(prRecoTrack, purity);
@@ -180,7 +180,7 @@ const RecoTrack* TrackMatchLookUp::getMatchedMCRecoTrack(const RecoTrack& prReco
 
 const RecoTrack* TrackMatchLookUp::getWrongChargeMCRecoTrack(const RecoTrack& prRecoTrack) const
 {
-  assert(isPRRecoTrack(prRecoTrack));
+  B2ASSERT("This RecoTrack isn't a PR RecoTrack as it is supposed to be.", isPRRecoTrack(prRecoTrack));
 
   float purity = NAN;
   const RecoTrack* mcRecoTrack = getRelatedMCRecoTrack(prRecoTrack, purity);
@@ -194,7 +194,7 @@ const RecoTrack* TrackMatchLookUp::getWrongChargeMCRecoTrack(const RecoTrack& pr
 
 const RecoTrack* TrackMatchLookUp::getMatchedPRRecoTrack(const RecoTrack& mcRecoTrack) const
 {
-  assert(isMCRecoTrack(mcRecoTrack));
+  B2ASSERT("This RecoTrack isn't a MC RecoTrack as it is supposed to be.", isMCRecoTrack(mcRecoTrack));
 
   float efficiency = NAN;
   const RecoTrack* prRecoTrack = getRelatedPRRecoTrack(mcRecoTrack, efficiency);
@@ -208,7 +208,7 @@ const RecoTrack* TrackMatchLookUp::getMatchedPRRecoTrack(const RecoTrack& mcReco
 
 const RecoTrack* TrackMatchLookUp::getWrongChargePRRecoTrack(const RecoTrack& mcRecoTrack) const
 {
-  assert(isMCRecoTrack(mcRecoTrack));
+  B2ASSERT("This RecoTrack isn't a MC RecoTrack as it is supposed to be.", isMCRecoTrack(mcRecoTrack));
 
   float efficiency = NAN;
   const RecoTrack* prRecoTrack = getRelatedPRRecoTrack(mcRecoTrack, efficiency);

@@ -470,7 +470,12 @@ the second option to load data from a tree is with the ``iterate`` method, discu
 .. admonition:: Note about speed
   :class: toggle
 
-  blah
+  If you have a workflow that uses :py:func:`modularAnalysis.variablesToNtuple` to create NTuples and you observe very slow
+  loading times when reading those NTuples with uproot, this is probably due to small basket sizes in the output NTuples.
+  To change this, set the ``basketsize`` parameter of the :py:func:`modularAnalysis.variablesToNtuple` method to a large number 
+  (eg. 20000000). The produced NTuples should then be faster to read in uproot.
+  As a general rule of thumb about the size of this number: make sure that the basketsize times the number of branches you want
+  to read at once is smaller than the available memory of your machine.
 
 Investigating your DataFrame
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

@@ -153,9 +153,9 @@ former.
 
 In a later lesson you'll learn how and where to find input files for your
 analysis. For the purpose of this tutorial we have prepared some local input
-files. They should be available in the
-``${BELLE2_EXAMPLES_DATA_DIR}/starterkit/2021`` directory on KEKCC, DESY and
-other servers.
+files of :math:`B^0 \to J/\Psi K_S^0`. They should be available in the
+``${BELLE2_EXAMPLES_DATA_DIR}/starterkit/2021`` directory on KEKCC, NAF, and
+other servers. The files' names start with the decfile number 1111540100.
 
 .. admonition:: If you're working from an institute server
     :class: stacked toggle
@@ -378,7 +378,7 @@ of the decay mode you are studying, it is recommended to use them for V0s
 .. admonition:: Task
     :class: exercise stacked
 
-    Extend your steering file by loading electrons, positrons, and :math:`K_S^0`s. At
+    Extend your steering file by loading electrons, positrons, and :math:`K_S^0`. At
     the very end of your script you should also print a summary table of all
     modules added to your path using the function `statistics`.
 
@@ -453,8 +453,8 @@ of the CDC (`thetaInCDCAcceptance`).
     :class: exercise stacked
 
     Find out what's the difference between ``dr`` and ``dz``, e.g. why do we
-    not have to explicitly ask for the absolute value of dr, and the angular
-    range of the CDC acceptance (as implemented in the software).
+    not have to explicitly ask for the absolute value of dr. What's the angular
+    range of the CDC acceptance (as implemented in the software)?
 
 .. admonition:: Hint
     :class: toggle xhint stacked
@@ -475,7 +475,7 @@ of the CDC (`thetaInCDCAcceptance`).
 
     The polar range of the CDC acceptance is :math:`17^\circ < \theta <
     150^\circ` as written `here
-    <https://stash.desy.de/projects/B2/repos/basf2/browse/analysis/variables/src/AcceptanceVariables.cc#25>`_
+    <https://stash.desy.de/projects/B2/repos/basf2/browse/analysis/variables/src/AcceptanceVariables.cc#27>`_.
 
 .. admonition:: Task
     :class: exercise stacked
@@ -834,7 +834,7 @@ documentation.
 .. admonition:: Exercise
     :class: exercise stacked
 
-    Find out to which variable collections the two variables belong that we
+    Find out to which variable collections the variables belong that we
     added to the ntuple so far.
 
 .. admonition:: Solution
@@ -848,7 +848,7 @@ documentation.
     :class: exercise stacked
 
     Save all kinematics information, both the truth and the reconstructed
-    values, of the :math:`B` meson to the ntuple. Also use the variable collections
+    values, of the :math:`B` meson to the ntuple. Also, use the variable collections
     from the last exercise to replace the individual list.
 
 .. admonition:: Hint
@@ -920,7 +920,6 @@ This can be done with `addAlias`.
 
         from variables import variables as vm
 
-
         vm.addAlias("mup_E", "daughter(0, daughter(0, E))")
 
 However, this can quickly fill up many, many lines. Therefore, there are utils
@@ -935,7 +934,7 @@ or `matchedMC`.
     :class: exercise stacked
 
     Add PID and track variables for all charged final state particles and the
-    invariant mass of the intermediate resonances to the ntuple. Also add the
+    invariant mass of the intermediate resonances to the ntuple. Also, add the
     standard variables from before for all particles in the decay chain, the
     kinematics both in the lab and the CMS frame.
 

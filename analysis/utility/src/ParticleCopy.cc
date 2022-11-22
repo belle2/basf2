@@ -69,9 +69,9 @@ void ParticleCopy::copyDaughters(Belle2::Particle* mother)
     const Particle* originalDaughter = mother->getDaughter(0);
     Particle* daughterCopy = copyParticle(originalDaughter);
 
-    // remove original daughter from the begging of the daughters vector
+    // remove original daughter from the beginning of the daughters' vector
     mother->removeDaughter(originalDaughter, updateType);
-    // append copied daughter instead at the end of the daughters vector
+    // append copied daughter instead at the end of the daughters' vector
     mother->appendDaughter(daughterCopy, updateType);
   }
 }

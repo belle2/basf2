@@ -734,6 +734,7 @@ void RecoTrack::flipTrackDirectionAndCharge(const genfit::AbsTrackRep* represent
   }
 
   swapArmTimes();
+  setDirtyFlag();
 }
 
 std::string RecoTrack::getInfoHTML() const

@@ -574,7 +574,6 @@ namespace Belle2 {
     std::tuple<ROOT::Math::XYZVector, ROOT::Math::XYZVector, short> extractTrackState() const;
 
     /// Set the position and momentum seed of the reco track. ATTENTION: This is not the fitted position or momentum.
-    /// There exists a private version of this method to avoid multiple XYZVector <-> TVector3 conversions
     void setPositionAndMomentum(const ROOT::Math::XYZVector& positionSeed, const ROOT::Math::XYZVector& momentumSeed)
     {
       m_genfitTrack.setStateSeed(XYZToTVector(positionSeed), XYZToTVector(momentumSeed));
@@ -1038,13 +1037,6 @@ namespace Belle2 {
       std::swap(m_outgoingArmTime, m_ingoingArmTime);
       std::swap(m_hasOutgoingArmTime, m_hasIngoingArmTime);
       std::swap(m_nSVDHitsOfOutgoingArm, m_nSVDHitsOfIngoingArm);
-    }
-
-    /// Set the position and momentum seed of the reco track. ATTENTION: This is not the fitted position or momentum.
-    void setPositionAndMomentum(const TVector3& positionSeed, const TVector3& momentumSeed)
-    {
-      m_genfitTrack.setStateSeed(positionSeed, momentumSeed);
-      deleteFittedInformation();
     }
 
     /// Helper: Check the dirty flag and produce a warning, whenever a fit result is accessed.

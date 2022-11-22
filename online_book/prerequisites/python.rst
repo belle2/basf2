@@ -360,6 +360,8 @@ package to read TTrees from ROOT files.
 Now, the previous sentence may have not been familiar to you at all. If so, read
 on. If not, feel free to skip the next paragraph.
 
+.. _rootintro:
+
 ROOT: a nano introduction
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -999,7 +1001,7 @@ and perform selection and further processing on those chunks instead of the whol
 
 You can read more about the many features of the ``iterate`` method in the `documentation <https://uproot.readthedocs.io/en/latest/uproot.behaviors.TTree.TTree.html#iterate>`_.
 
-If you want to process many files, uproot offers the function ``uproot.iterate`` so you don't have to loop manually over all files. It has a similar interface to the tree methods ``arrays`` and ``itereate``, 
+If you want to process many files, uproot offers the function ``uproot.iterate`` so you don't have to loop manually over all files. It has a similar interface to the tree methods ``arrays`` and ``iterate``, 
 except it also accepts a list of files or a wildcard expression:
 
 .. code:: python3

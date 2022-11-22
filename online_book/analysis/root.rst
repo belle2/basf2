@@ -1,6 +1,9 @@
 ROOT
 ====
 
+If you don't know about ROOT yet, check out the section :ref:`rootintro`.
+You can find the documentation for RDataFrames `here <https://root.cern/doc/master/classROOT_1_1RDataFrame.html>`_.
+
 RDataFrames 
 ---------------------------------
 
@@ -40,7 +43,7 @@ Inspect the contents of a tree
 
 .. code:: text
 
-   Dataframe from TChain b0phiKs in file /project/agkuhr/users/dkoch/data/pandas_tutorial_ntuple.root
+   Dataframe from TChain b0phiKs in file /path/to/pandas_tutorial_ntuple.root
 
    Property                Value
    --------                -----
@@ -60,18 +63,17 @@ Inspect the contents of a tree
    B0_M                    Float_t Dataset
    B0_R2                   Float_t Dataset
    B0_SigM                 Float_t Dataset
-   B0_ThrustB              Float_t Dataset| B0_M     | B0_ErrM     | 
-   +-----+----------+-------------+
-   | 0   | 5.02445f | 0.0224362f  | 
-   +-----+----------+-------------+
-   | 1   | 5.10793f | 0.0823563f  | 
-   +-----+----------+-------------+
-   | 2   | 5.11921f | 0.0868997f  | 
-   +-----+----------+-------------+
-   | 3   | 5.36136f | 0.00969569f | 
-   +-----+----------+-------------+
-   | 4   | 5.30105f | 0.00664467f | 
-   +-----+--
+   B0_ThrustB              Float_t Dataset
+   ...
+
+Inspect the contents of one or more columns
+
+.. code:: python
+
+   df.Display(["B0_M", "B0_ErrM"], 5).Print()
+
+.. code:: text
+
    +-----+----------+-------------+
    | Row | B0_M     | B0_ErrM     | 
    +-----+----------+-------------+

@@ -39,10 +39,8 @@ else:
                  path=analysis_path)
 
 # Reconstruction of photons.
-gamma_list = 'gamma:mdst'
-if not arguments.belle1:
-    gamma_list = 'gamma:all'
-    ma.fillParticleList(gamma_list, '', path=analysis_path)
+gamma_list = 'gamma:all'
+ma.fillParticleList(gamma_list, '', path=analysis_path)
 
 # Reconstruction of pi0.
 mass_window = 0.02

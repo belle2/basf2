@@ -20,6 +20,7 @@ Requires Bhabha mc in mdst format, plus ECLCalDigits"""
 #       "caf_script":
 #               "/home/belle2/czhearty/users2022/BII-9711-remove-eclDigits/
 #                calibration/scripts/notPrompt/calibrations/caf_ecl_ee_expected.py",
+#   Environment variable BELLE2_RELEASE_DIR is useful for this purpose.
 
 
 from prompt import CalibrationSettings

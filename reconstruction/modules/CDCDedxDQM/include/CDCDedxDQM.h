@@ -96,6 +96,8 @@ namespace Belle2 {
 
     TH1D* hMeta{nullptr}; /**< metadata */
     TH1D* hdEdx{nullptr}; /**< dedx */
+    TH1D* hinjtimeHer{nullptr}; /**< injection time in HER*/
+    TH1D* hinjtimeLer{nullptr}; /**< injection time in LER*/
     TH2D* hdEdxvsP{nullptr}; /**< dedx vs p*/
     TH2D* hdEdxvsPhi{nullptr}; /**< dedx vs phi */
     TH2D* hdEdxvsCosth{nullptr}; /**< dedx vs costh */

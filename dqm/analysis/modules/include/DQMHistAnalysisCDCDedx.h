@@ -99,9 +99,14 @@ namespace Belle2 {
     void drawDedxCosPhi();
 
     /**
-    * funtion to dedx bands P
-    */
+     * funtion to dedx bands P
+     */
     void drawBandPlot();
+
+    /**
+     * function to draw the injection time
+     */
+    void drawInjectTime();
 
     /**
     * funtion to fit gaussian dist.

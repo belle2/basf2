@@ -78,13 +78,15 @@ void DQMHistAnalysisCDCDedxModule::event()
 
   //Plot 1 dE/dx per run gain/reso
   c_pr_dedx->Clear();
-  if (mmode != "basic") {
-    c_pr_dedx->SetWindowSize(1400, 800);
-    c_pr_dedx->Divide(3, 2);
-  } else {
-    c_pr_dedx->SetWindowSize(1000, 800);
-    c_pr_dedx->Divide(2, 2);
-  }
+  // if (mmode != "basic") {
+  //   c_pr_dedx->SetWindowSize(1400, 800);
+  //   c_pr_dedx->Divide(3, 2);
+  // } else {
+  //   c_pr_dedx->SetWindowSize(1000, 800);
+  //   c_pr_dedx->Divide(2, 2);
+  // }
+  c_pr_dedx->SetWindowSize(1400, 800);
+  c_pr_dedx->Divide(3, 2);
 
   drawDedxPR();
 
@@ -93,7 +95,7 @@ void DQMHistAnalysisCDCDedxModule::event()
 
   // Plot 5 dE/dx vs phi and costh
   drawDedxCosPhi();
-
+  drawInjectTime();
   c_pr_dedx->Modified();
   c_pr_dedx->Update();
 
@@ -445,6 +447,61 @@ void DQMHistAnalysisCDCDedxModule::drawBandPlot()
       pinfo0->AddText(Form("Events: %0.02fK", double(m_nhadevt / 1e3)));
     else
       pinfo0->AddText(Form("Events: %d", m_nhadevt));
+    pinfo0->DrawClone("same");
+  }
+
+}
+
+//-----------------------------------------------
+void DQMHistAnalysisCDCDedxModule::drawInjectTime()
+{
+
+  TH1D* hinjtimeHer = (TH1D*)findHist("CDCDedx/hinjtimeHer");
+  TH1D* hinjtimeLer = (TH1D*)findHist("CDCDedx/hinjtimeLer");
+  if (hinjtimeHer != nullptr) {
+
+    c_pr_dedx->cd(5);
+    gPad->SetLogx();
+    gPad->SetLogy();
+
+    set_Plot_Style();
+    set_Hist_Style(hinjtimeHer);
+    hinjtimeHer->SetTitle("Time since last injection (HER)");
+    hinjtimeHer->SetMinimum(0);
+    hinjtimeHer->Draw();
+    TPaveText* pinfo0 = new TPaveText(0.60, 0.77, 0.85, 0.89, "NBNDC");
+    set_Text_Style(pinfo0);
+    pinfo0->AddText(Form("Exp/Run: %d/%d", m_exp, m_run));
+    if (m_nallevt > 1e5)
+      pinfo0->AddText(Form("Events: %0.02fM", double(m_nallevt / 1e6)));
+    if (m_nallevt > 1e3)
+      pinfo0->AddText(Form("Events: %0.02fK", double(m_nallevt / 1e3)));
+    else
+      pinfo0->AddText(Form("Events: %d", m_nallevt));
+
+    pinfo0->DrawClone("same");
+  }
+  if (hinjtimeLer != nullptr) {
+
+    c_pr_dedx->cd(6);
+    gPad->SetLogx();
+    gPad->SetLogy();
+
+    set_Plot_Style();
+    set_Hist_Style(hinjtimeLer);
+    hinjtimeLer->SetTitle("Time since last injection (LER)");
+    hinjtimeLer->SetMinimum(0);
+    hinjtimeLer->Draw();
+    TPaveText* pinfo0 = new TPaveText(0.60, 0.77, 0.85, 0.89, "NBNDC");
+    set_Text_Style(pinfo0);
+    pinfo0->AddText(Form("Exp/Run: %d/%d", m_exp, m_run));
+    if (m_nallevt > 1e5)
+      pinfo0->AddText(Form("Events: %0.02fM", double(m_nallevt / 1e6)));
+    if (m_nallevt > 1e3)
+      pinfo0->AddText(Form("Events: %0.02fK", double(m_nallevt / 1e3)));
+    else
+      pinfo0->AddText(Form("Events: %d", m_nallevt));
+
     pinfo0->DrawClone("same");
   }
 

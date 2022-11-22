@@ -7,6 +7,8 @@
  **************************************************************************/
 
 #include <reconstruction/modules/CDCDedxDQM/CDCDedxDQM.h>
+#include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
+
 #include <TDirectory.h>
 
 using namespace Belle2;
@@ -50,6 +52,8 @@ void CDCDedxDQMModule::defineHisto()
   hMeta->GetXaxis()->SetBinLabel(3, "nhadron");
 
   hdEdx = new TH1D("hdEdx", ";CDC dE/dx;Entries", 250, 0., 2.5);
+  hinjtimeHer = new TH1D("hinjtimeHer", ";injection time (#mu s); Entries", 500, 0, 100e6);
+  hinjtimeLer = new TH1D("hinjtimeLer", ";injection time (#mu s); Entries", 500, 0, 100e6);
   hdEdxvsP = new TH2D("hdEdxVsP", ";#it{p}_{CDC} (GeV/c);CDC dE/dx", 400, 0.050, 4.50, 800, 0.35, 20.35);
   hdEdxvsEvt = new TH2D("hdEdxvsEvt", ";Events(M);CDC dE/dx", 300, 0, 300, 200, 0.00, 2.5);
   hdEdxvsCosth = new TH2D("hdEdxvsCosth", ";cos#theta (e^{-}e^{+} tracks);CDC dE/dx", 100, -1.00, 1.00, 250, 0.00, 2.5);
@@ -91,6 +95,8 @@ void CDCDedxDQMModule::beginRun()
 
   hMeta->Reset();
   hdEdx->Reset();
+  hinjtimeHer->Reset();
+  hinjtimeLer->Reset();
   hdEdxvsP->Reset();
   hdEdxvsCosth->Reset();
   hdEdxvsPhi->Reset();
@@ -105,6 +111,24 @@ void CDCDedxDQMModule::beginRun()
 //----------------------------
 void CDCDedxDQMModule::event()
 {
+
+  StoreObjPtr<EventLevelTriggerTimeInfo> TTDInfo;
+
+  // Check if the pointer is valid
+  if (!TTDInfo.isValid()) {
+    B2WARNING("StoreObjPtr<EventLevelTriggerTimeInfo> does not exist, are you running over data reconstructed with release-05 or earlier?");
+    return;
+  }
+
+  // And check if the stored data is valid and if an injection happened recently
+  if (TTDInfo->isValid() && TTDInfo->hasInjection()) {
+    if (TTDInfo->isHER())
+      hinjtimeHer->Fill(TTDInfo->getTimeSinceLastInjectionInMicroSeconds());
+    else hinjtimeLer->Fill(TTDInfo->getTimeSinceLastInjectionInMicroSeconds());
+  } else {
+    return;
+  }
+
 
   if (!m_cdcDedxTracks.isOptional())  return;
 
@@ -126,6 +150,8 @@ void CDCDedxDQMModule::event()
   if (!IsBhabhaEvt and !IsHadronEvt)return;
   if (IsBhabhaEvt)m_nBEvt += 1;
   if (IsHadronEvt)m_nHEvt += 1;
+
+
 
   //Get current evt number
   if (m_MetaDataPtr)m_event = int(m_MetaDataPtr->getEvent());
@@ -228,6 +254,12 @@ void CDCDedxDQMModule::endRun()
     hdEdxvsEvt->GetXaxis()->SetRange(hdEdxvsEvt->FindFirstBinAbove(0, 1), hdEdxvsEvt->FindLastBinAbove(0, 1));
   }
 
+  if (hinjtimeHer->GetEntries() > 0) {
+    hinjtimeHer->GetXaxis()->SetRange(hinjtimeHer->FindFirstBinAbove(0, 1), hinjtimeHer->FindLastBinAbove(0, 1));
+  }
+  if (hinjtimeLer->GetEntries() > 0) {
+    hinjtimeLer->GetXaxis()->SetRange(hinjtimeLer->FindFirstBinAbove(0, 1), hinjtimeLer->FindLastBinAbove(0, 1));
+  }
   //get dead wire pattern
   if (mmode != "basic") {
     Int_t nbadwires = 0;

@@ -8,7 +8,6 @@
 
 #include <tracking/modules/eventTimeExtractor/SVDEventT0EstimatorModule.h>
 #include <framework/datastore/RelationArray.h>
-#include <svd/dataobjects/SVDCluster.h>
 #include <framework/geometry/B2Vector3.h>
 #include <tracking/dataobjects/RecoTrack.h>
 

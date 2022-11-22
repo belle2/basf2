@@ -5,9 +5,12 @@
 #                     omega  -> pi+ pi- pi0
 #                                       pi0 -> gamma gamma
 # NickName: vpho_chib1_omega_pi+pi-pi0
+# Documentation: signal MC for e+e- -> chi_b1 omega analysis with omega -> pi+pi-pi0 inclusive reconstruction
+# Tested: Yes
 # PhysicsWG: Quarkonium
-# Reponsible: Pavel	Oskin
+# Reponsible: Pavel Oskin
 # Email: oskin.pavel.v@gmail.com
+# Cuts: None
 # Date: 21-11-2022
 
 Decay vpho

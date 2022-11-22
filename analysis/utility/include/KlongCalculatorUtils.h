@@ -66,20 +66,19 @@ namespace Belle2 {
         m_j = pDaughters.M();
       }
 
-      const double m_k = Const::Klong.getMass();
+      const double m_k2 = Const::Klong.getMass() * Const::Klong.getMass();
 
       const double s_p = (klDaughters.Vect().Unit()).Dot(pDaughters.Vect());
-      const double m_sum = (m_b * m_b) - (m_j * m_j) - (m_k * m_k);
+      const double m_sum = (m_b * m_b) - (m_j * m_j) - m_k2;
 
       const double s_p2 = s_p * s_p;
       const double m_sum2 = m_sum * m_sum;
       const double s_pm = s_p * m_sum;
       const double e_j2 = pDaughters.E() * pDaughters.E();
-      const double m_k2 = m_k * m_k;
 
-      const double k_mag1 = (s_pm + std::sqrt((s_p2) * (m_sum2) - 4 * ((e_j2) - (s_p2)) * ((e_j2) * (m_k2) - (m_sum2) / 4))) / (2 *
+      const double k_mag1 = (s_pm + std::sqrt(s_p2 * m_sum2 - 4 * (e_j2 - s_p2) * (e_j2 * m_k2 - m_sum2 / 4))) / (2 *
                             (e_j2 - s_p2));
-      const double k_mag2 = (s_pm - std::sqrt((s_p2) * (m_sum2) - 4 * ((e_j2) - (s_p2)) * ((e_j2) * (m_k2) - (m_sum2) / 4))) / (2 *
+      const double k_mag2 = (s_pm - std::sqrt(s_p2 * m_sum2 - 4 * (e_j2 - s_p2) * (e_j2 * m_k2 - m_sum2 / 4))) / (2 *
                             (e_j2 - s_p2));
 
 
@@ -90,7 +89,7 @@ namespace Belle2 {
       else
         missDaughters = k_mag2 * klDaughters / klDaughters.P();
 
-      missDaughters.SetE(std::sqrt(m_k * m_k + missDaughters.P2()));
+      missDaughters.SetE(std::sqrt(m_k2 + missDaughters.P2()));
 
       if (isnan(missDaughters.P()))
         return false;

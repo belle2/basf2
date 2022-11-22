@@ -29,7 +29,7 @@ First steering file
 In this hands-on tutorial you'll be writing your first steering file. Our
 ultimate goal is to reconstruct :math:`B^0 \to J/\Psi(\to e^+e^-)K_S^0(\to
 \pi^+\pi^+)`. You'll be learning step-by-step what is necessary to achieve
-this, and in the end you will produce a plot of the B meson candidates. As you
+this, and in the end you will produce a plot of the :math:`B` meson candidates. As you
 have already learned in the previous sections, basf2 provides a large variety
 of functionality. While the final steering file of this lesson will be working
 and producing some reasonable output, there are many possible extensions that
@@ -371,7 +371,7 @@ of the decay mode you are studying, it is recommended to use them for V0s
 .. admonition:: Solution
     :class: toggle solution
 
-    It's ``K_S0:merged`` because it is a combination of Kshorts created
+    It's ``K_S0:merged`` because it is a combination of :math:`K_S^0` candidates created
     directly from V0s found in the tracking and combinations of two charged
     pions.
 
@@ -432,7 +432,7 @@ of the decay mode you are studying, it is recommended to use them for V0s
     to be between 0.45 and 0.55 GeV/c :superscript:`2`.
 
     The module ``TreeFitter_K_S0:RD`` takes the longest. It's a vertex fit of
-    the Kshort candidates. You will learn more about vertex fits in
+    the :math:`K_S^0` candidates. You will learn more about vertex fits in
     :ref:`onlinebook_vertex_fitting`.
 
 In the previous task you should have learned how useful it is to carefully
@@ -562,8 +562,8 @@ particles themselves need to be written in the decay string.
     :class: exercise stacked
 
     Extend the steering file by first forming :math:`J/\Psi` candidates from
-    electron-positron combinations and then combining them with Kshorts to
-    form B0 candidates.
+    electron-positron combinations and then combining them with a :math:`K_S^0` to
+    form :math:`B^0` candidates.
 
     Include a ``dM < 0.11`` cut for the :math:`J/\Psi`.
 
@@ -624,19 +624,19 @@ as
 
     \text{M}_{\rm bc} = \sqrt{E_{\rm beam}^2 - \mathbf{p}_{B}^2}
 
-For correctly reconstructed B mesons this variable should peak at the B meson
+For correctly reconstructed :math:`B` mesons this variable should peak at the :math:`B` meson
 mass.
 
 .. admonition:: Task
     :class: exercise stacked
 
-    Save the beam-constrained B mass of each B candidate in an output ntuple.
+    Save the beam-constrained :math:`B` mass of each :math:`B` candidate in an output ntuple.
     Then, run your steering file.
 
 .. admonition:: Hint
     :class: toggle xhint stacked
 
-    The variable for the beam-constrained B mass is called `Mbc`. It has to be
+    The variable for the beam-constrained :math:`B` mass is called `Mbc`. It has to be
     provided as element of a list to the argument ``variables`` of the
     `variablesToNtuple` function.
 
@@ -694,7 +694,7 @@ happen to fulfill all your selection criteria.
         :width: 40em
         :align: center
 
-        There is a (signal) peak at the nominal B mass of 5.28 GeV/c
+        There is a (signal) peak at the nominal :math:`B` mass of 5.28 GeV/c
         :superscript:`2` and lots of background candidates as a shoulder left
         of the peak.
 
@@ -737,8 +737,8 @@ definitely read it to understand at least the basics.
     :class: exercise stacked
 
     Add MC matching for all particles of the decay chain and add the
-    information whether the reconstructed B meson is a signal candidate to the
-    ntuple. Run the steering file and again.
+    information whether the reconstructed :math:`B` meson is a signal candidate to the
+    ntuple. Run the steering file again.
 
 .. admonition:: Hint
     :class: toggle xhint stacked
@@ -848,7 +848,7 @@ documentation.
     :class: exercise stacked
 
     Save all kinematics information, both the truth and the reconstructed
-    values, of the B meson to the ntuple. Also use the variable collections
+    values, of the :math:`B` meson to the ntuple. Also use the variable collections
     from the last exercise to replace the individual list.
 
 .. admonition:: Hint
@@ -875,7 +875,7 @@ documentation.
 Variable aliases
 ----------------
 
-Apart from variables for the mother B-meson, we are also interested in
+Apart from variables for the mother :math:`B` meson, we are also interested in
 information of the other daughter and granddaughter variables. You can access
 them via the `daughter` meta variable, which takes an integer and a variable
 name as input arguments. The integer (0-based) counts through the daughter

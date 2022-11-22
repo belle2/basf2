@@ -1008,8 +1008,8 @@ Returns NaN for data.
 
 .. note::
   The event time can be measured by several sub-detectors including the SVD, CDC, ECL, and TOP.
-  This EventT0 variable is the final combined value of all the event time measurements.
-  Currently only the SVD and ECL are used in this combination.
+  This eventT0 variable is the final combined value of all the event time measurements.
+  Currently, only the SVD and ECL are used in this combination.
 )DOC","ns");
   }
 }

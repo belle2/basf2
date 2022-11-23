@@ -60,6 +60,10 @@ Names should be precise, colorful and in self-explanatory English:
 5. Use the ``get`` prefix for methods that return the value of the data member (getters).
    Use the ``set`` prefix for methods that set the value of a data member by parsing an
    argument (setters).
+   In addition, usage of ``is`` instead of ``get`` as prefix for methods that return a
+   boolean is recommended, e.g. ``isPhoton(const auto& someParticle)`` instead of
+   ``getPhotonStatus(const auto& someParticle)`` or ``isFittedTrack(const auto& track)``
+   instead of ``getTrackFitStatus(const auto& track)``.
 
 6. *Python*: except for class names, use lower case words with underscores,
    e.g. ``find_particle()``.

@@ -139,7 +139,7 @@ MC track candidates are classified into three categories:
 
   * The highest purity MC track candidate of the highest efficiency PR track candidate of this MC track candidate is not the same as this MC track
     candidate,  moreover the reconstructed charge is NOT correct.
-    This means this MC track candidate is mostly contained in a PR track candidate (wut with the wrong charge), 
+    This means this MC track candidate is mostly contained in a PR track candidate (but with the wrong charge), 
     which in turn however better describes a MC track candidate different from this.
 
 * MISSING

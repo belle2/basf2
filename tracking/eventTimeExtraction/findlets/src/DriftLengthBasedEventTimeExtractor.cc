@@ -52,8 +52,7 @@ namespace {
     // The state at index 3 is equivalent to the drift length -> see CDCRecoHit HMatrix
     // The rest is handled by the CDCGeometryPar
     const ROOT::Math::XYZVector& wirePositon = ROOT::Math::XYZVector(mSoP.getPlane()->getO());
-    // const double alpha = -wirePositon.DeltaPhi(mom);
-    const double alpha = -ROOT::Math::VectorUtil::DeltaPhi(wirePositon, mom);
+    const double alpha = ROOT::Math::VectorUtil::DeltaPhi(wirePositon, mom);
     const double theta = mom.Theta();
 
     const TVectorD& stateOnPlane = mSoP.getState();

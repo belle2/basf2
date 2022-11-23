@@ -23,14 +23,14 @@ import os
 if __name__ == '__main__':
 
     b2test_utils.configure_logging_for_tests()
-
     topdir = Path(os.environ['BELLE2_LOCAL_DIR'])
     assert topdir.is_dir()
 
     diff_to_main = Repo(topdir).head.commit.diff('main')
 
     added_or_modified_decfiles = [topdir / new_file.a_path for new_file in diff_to_main
-                                  if Path(new_file.a_path).suffix == '.dec']
+                                  if (Path(new_file.a_path).suffix == '.dec')
+                                  and (Path('decfiles/dec') in Path(new_file.a_path).parents)]
 
     if added_or_modified_decfiles:
         print(f"Changed decayfiles: {' '.join(str(p) for p in added_or_modified_decfiles)}")

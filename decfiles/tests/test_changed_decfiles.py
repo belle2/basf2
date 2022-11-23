@@ -26,7 +26,7 @@ if __name__ == '__main__':
     topdir = Path(os.environ['BELLE2_LOCAL_DIR'])
     assert topdir.is_dir()
 
-    diff_to_main = Repo(topdir).head.commit.diff('main')
+    diff_to_main = Repo(topdir).head.commit.diff('origin/main')
 
     added_or_modified_decfiles = [topdir / new_file.a_path for new_file in diff_to_main
                                   if (Path(new_file.a_path).suffix == '.dec')

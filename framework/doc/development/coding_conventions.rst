@@ -61,10 +61,10 @@ Names should be precise, colorful and in self-explanatory English:
    Use the ``set`` prefix for methods that set the value of a data member by parsing an
    argument (setters).
 
-5. *Python*: except for class names, use lower case words with underscores,
+6. *Python*: except for class names, use lower case words with underscores,
    e.g. ``find_particle()``.
 
-6. Specifically:
+7. Specifically:
 
    * class and type names start with a capital letter (``CapWords``, same for Python)
 
@@ -83,20 +83,18 @@ Names should be precise, colorful and in self-explanatory English:
    * module parameter names are equal to the corresponding variable name, but without
      ``m_`` prefix
 
-7. If values are not given in standard units the used units have to be stated explicitly
+8. If values are not given in standard units the used units have to be stated explicitly
    in the variable name. Standard units are cm, nanosecond, radian, GeV, Kelvin, Tesla,
-   elementary charge as defined in `Unit.h`_.
+   elementary charge as defined in `Unit.h <https://github.com/belle2/basf2/blob/main/framework/gearbox/include/Unit.h>`_.
 
-.. _Unit.h: https://github.com/belle2/basf2/blob/main/framework/gearbox/include/Unit.h
-
-8. Executable that are part of the official interface on which users and other tools can
+9. Executable that are part of the official interface on which users and other tools can
    rely on must have the prefix ``b2`` and must be documented in Sphinx. Other executables
    must have a prefix equal to the name of the package to which they belong.
 
-9. Avoid the usage of "slave/master", "blacklist/whitelist". Prefer instead:
-   "controller/agent", "primary/secondary", "denylist/allowlist".
+10. Avoid the usage of "slave/master", "blacklist/whitelist". Prefer instead:
+    "controller/agent", "primary/secondary", "denylist/allowlist".
 
-10. In general, avoid anything that might cause distress or feelings of exclusion to other
+11. In general, avoid anything that might cause distress or feelings of exclusion to other
     collaborators.
 
 In case of doubts, don't hesitate to contact the coordinators.
@@ -173,7 +171,7 @@ each such section elements shall be ordered like:
 
 with static methods and members after non-static ones. **Public data members are forbidden**.
 
-The only exception to the above rule are simple structs with no methods except for a
+The only exception to the rule above are simple structs with no methods except for a
 default constructor. In this case public data members (without ``m_`` prefix) are allowed.
 Use the ``struct`` instead of the ``class`` keyword for such structures.
 
@@ -209,7 +207,7 @@ It is advisable to order the data members in the following order:
 The reason for this order is how processors and memory work. Modern PCs usually have a
 so-called cache that holds data (data cache) and instructions (instruction cache) that
 either are used often, or expected to be used in the next O(100) clock cycles. The
-content of the cache is retrieved from memory in *cache lines* of up to 64 bytes. Thus
+content of the cache is retrieved from memory in *cache lines* of up to 64 bytes. Thus,
 the data should be ordered such that the bytes in the cache lines are filled.
 Although a ``bool`` technically can be represented by a single bit, it occupies a
 byte in memory as memory addresses are based on units of 1 byte, thus the smallest
@@ -286,7 +284,7 @@ Use the logging system:
   
 * ``B2ERROR(message)`` for things that went wrong and **must be fixed**.
 
-* B2WARNING(message) for potential problems that should not be ignored and **accepted if
+* ``B2WARNING(message)`` for potential problems that should not be ignored and only **accepted if
   understood**.
 
 * ``B2INFO(message)`` for informational messages that are **relevant to the user**.
@@ -384,9 +382,10 @@ Example::
 
 *Python*: Follow the `Style Guide for Python Code <http://www.python.org/dev/peps/pep-0008/>`_.
 
-Hint: You can use the fixstyle tool to format your code according to the style rules. Only
-code that follows the required style can be committed to the subversion repository! The
-checkstyle tool can be used to print the changes that the fixstyle tool would apply.
+.. tip::
+    You can use the ``b2code-style-fix`` tool to format your code according to the style rules. Only
+    code that follows the required style can be committed to the git repository! The
+    ``b2code-style-check`` tool can be used to print the changes that the ``b2code-style-fix`` tool would apply.
 
 In the definition of pointers and references the \* and \& symbols have to be attached to
 the variable type, not the variable name, e.g.::

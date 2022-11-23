@@ -79,9 +79,6 @@ namespace TreeFitter {
     /** set mass constraint flag */
     void setMassConstraint(bool b) { m_massconstraint = b ; }
 
-    /** rotate in positive phi domain  */
-    double phidomain(const double);
-
   protected:
 
     /** init momentum of *this and daughters */

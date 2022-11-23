@@ -44,7 +44,7 @@ namespace Belle2 {
       auto statePtr = getTrackStateOnModule(sensorInfo, *recoTracks[0]);
       if (statePtr == nullptr) return nullptr; // shouldn't happen.
       auto intersec = statePtr -> getPos();
-      auto localPoint = sensorInfo.pointToLocal(intersec, true);
+      auto localPoint = sensorInfo.pointToLocal(ROOT::Math::XYZVector(intersec), true);
       auto intersec_p = statePtr -> getMom();
       auto local_p = sensorInfo.vectorToLocal(ROOT::Math::XYZVector(intersec_p), true);
 
@@ -53,7 +53,7 @@ namespace Belle2 {
       x = intersec.X();
       y = intersec.Y();
       z = intersec.Z();
-      tol = local_p.CosTheta();
+      tol = cos(local_p.Theta());
 
       // Estimate the charge MPV (in ADU) of the hit.
       double length = sensorInfo.getThickness() / tol; // track path length

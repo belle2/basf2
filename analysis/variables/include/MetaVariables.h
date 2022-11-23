@@ -525,6 +525,11 @@ namespace Belle2 {
     Manager::FunctionPtr useRecoilParticleRestFrame(const std::vector<std::string>& arguments);
 
     /**
+     * Returns the value of the variable in the rest frame of the daughter identified via generalized index.
+     */
+    Manager::FunctionPtr useDaughterRestFrame(const std::vector<std::string>& arguments);
+
+    /**
     * Returns a  function that returns the value of a variable calculated using new mass assumptions for the daughters' masses.
     */
     Manager::FunctionPtr  useAlternativeDaughterHypothesis(const std::vector<std::string>& arguments);

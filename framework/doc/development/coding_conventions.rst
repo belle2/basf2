@@ -106,21 +106,21 @@ In case of doubts, don't hesitate to contact the coordinators.
 In the following table ``Xyz`` stands for an arbitrary name and DET for a detector name,
 like PXD or ARICH.
 
-======================  ===========================================================================
-Name                    Description
-======================  ===========================================================================
-*DET***SimHit**         MC truth information about an energy deposition
-*DET***Digit**          simulated or real detector signal, the raw data information
-*DET***Hit**            reconstructed hit, after clustering
-*DET***Digitizer**      class (usually a module, see below) that creates digits from simulated hits
-*DET***Clusterizer**    class (usually a module, see below) that creates hits from digits
-*DET***Trigger***Xyz*   classes for detector related triggers
-*Xyz***Collection**     a class for an array of objects of class *Xyz*, if not a ``StoreArray``
-*Xyz***Module**         a basf2 module class
-*Xyz***Base**           a class whose main purpose is to serve as a base class for derived classes
-Abc*Xyz*                Classes derived from *Xyz***Base**
-*Xyz***Error**          an exception class
-======================  ===========================================================================
+=======================  ===========================================================================
+Name                     Description
+=======================  ===========================================================================
+*DET* **SimHit**         MC truth information about an energy deposition
+*DET* **Digit**          simulated or real detector signal, the raw data information
+*DET* **Hit**            reconstructed hit, after clustering
+*DET* **Digitizer**      class (usually a module, see below) that creates digits from simulated hits
+*DET* **Clusterizer**    class (usually a module, see below) that creates hits from digits
+*DET* **Trigger** *Xyz*   classes for detector related triggers
+*Xyz* **Collection**     a class for an array of objects of class *Xyz*, if not a ``StoreArray``
+*Xyz* **Module**         a basf2 module class
+*Xyz* **Base**           a class whose main purpose is to serve as a base class for derived classes
+Abc *Xyz*                Classes derived from *Xyz* **Base**
+*Xyz* **Error**          an exception class
+=======================  ===========================================================================
 
 .. _class_naming_conventions:
 

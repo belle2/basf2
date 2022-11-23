@@ -10,10 +10,10 @@
 Simple launcher for decfiles/tests/test_changed_decfiles.py_noexec. This tests whether new decay files work.
 '''
 
-import subprocess
-
 import basf2
 import b2test_utils
+import subprocess
+import sys
 
 from git import Repo
 from pathlib import Path
@@ -23,6 +23,11 @@ import os
 if __name__ == '__main__':
 
     b2test_utils.configure_logging_for_tests()
+
+    if not os.environ.get('BELLE2_LOCAL_DIR'):
+        sys.stderr.write("TEST SKIPPED: Test for changed decfiles failed because $BELLE2_LOCAL_DIR is not set.")
+        sys.exit(-1)
+
     topdir = Path(os.environ['BELLE2_LOCAL_DIR'])
     assert topdir.is_dir()
 

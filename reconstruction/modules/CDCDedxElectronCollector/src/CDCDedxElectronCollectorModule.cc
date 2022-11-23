@@ -45,7 +45,8 @@ CDCDedxElectronCollectorModule::CDCDedxElectronCollectorModule() : CalibrationCo
   addParam("IsEnta", IsEnta, "true for adding enta tree branch. ", false);
   addParam("IsDocaRS", IsDocaRS, "true for adding doca tree branch. ", false);
   addParam("IsEntaRS", IsEntaRS, "true for adding enta tree branch. ", false);
-  addParam("Isdedxhit", Isdedxhit, "true for adding dedxhit tree branch. ", false);
+  addParam("IsDedxhit", IsDedxhit, "true for adding dedxhit tree branch. ", false);
+  addParam("IsADCcorr", IsADCcorr, "true for adding adc tree branch. ", false);
   addParam("IsBhabhaEvt", IsBhabhaEvt, "true for bhabha events", true);
   addParam("IsRadBhabhaEvt", IsRadBhabhaEvt, "true for radee events", false);
   addParam("enableTrgSel", enableTrgSel, "true to enable trigger sel inside module", false);
@@ -97,7 +98,8 @@ void CDCDedxElectronCollectorModule::prepare()
   if (IsEnta)ttree->Branch("enta", &m_enta);
   if (IsDocaRS)ttree->Branch("docaRS", &m_docaRS);
   if (IsEntaRS)ttree->Branch("entaRS", &m_entaRS);
-  if (Isdedxhit)ttree->Branch("dedxhit", &m_dedxhit);
+  if (IsDedxhit)ttree->Branch("dedxhit", &m_dedxhit);
+  if (IsADCcorr)ttree->Branch("adccorr", &m_adccorr);
 
   // Collector object registration
   registerObject<TH1D>("means", means);
@@ -257,7 +259,8 @@ void CDCDedxElectronCollectorModule::collect()
     if (IsEnta)m_enta.clear();
     if (IsDocaRS)m_docaRS.clear();
     if (IsEntaRS)m_entaRS.clear();
-    if (Isdedxhit)m_dedxhit.clear();
+    if (IsDedxhit)m_dedxhit.clear();
+    if (IsADCcorr)m_adccorr.clear();
 
     // Simple numbers don't need to be cleared
     // make sure to use the truncated mean without the hadron saturation correction
@@ -272,7 +275,8 @@ void CDCDedxElectronCollectorModule::collect()
       if (IsEnta)m_enta.push_back(dedxTrack->getEnta(i));
       if (IsDocaRS)m_docaRS.push_back(dedxTrack->getDocaRS(i) / dedxTrack->getCellHalfWidth(i));
       if (IsEntaRS)m_entaRS.push_back(dedxTrack->getEntaRS(i));
-      if (Isdedxhit)m_dedxhit.push_back(dedxTrack->getDedx(i));
+      if (IsDedxhit)m_dedxhit.push_back(dedxTrack->getDedx(i));
+      if (IsADCcorr)m_adccorr.push_back(dedxTrack->getADCCount(i));
     }
 
     // Track and/or hit information filled as per config

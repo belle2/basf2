@@ -124,7 +124,7 @@ namespace Belle2 {
      * both pattern and charge are matched correctly, or only the pattern is correct but the charge is wrong.
      * If no match exists at all, a nullptr is returned.
      */
-    const RecoTrack* getAnyMatchedMCRecoTrack(const RecoTrack& prRecoTrack)
+    const RecoTrack* getAnyMatchedMCRecoTrack(const RecoTrack& prRecoTrack) const
     {
       const RecoTrack* anyMatchedRecoTrack = getMCRecoTrackWithStatus(prRecoTrack, PRToMCMatchInfo::c_matched);
       if (anyMatchedRecoTrack == nullptr) {
@@ -158,7 +158,7 @@ namespace Belle2 {
      * both pattern and charge are matched correctly, or only the pattern is correct but the charge is wrong.
      * If no match exists at all, a nullptr is returned.
      */
-    const RecoTrack* getAnyMatchedPRRecoTrack(const RecoTrack& mcRecoTrack)
+    const RecoTrack* getAnyMatchedPRRecoTrack(const RecoTrack& mcRecoTrack) const
     {
       const RecoTrack* anyMatchedRecoTrack = getPRRecoTrackWithStatus(mcRecoTrack, MCToPRMatchInfo::c_matched);
       if (anyMatchedRecoTrack == nullptr) {

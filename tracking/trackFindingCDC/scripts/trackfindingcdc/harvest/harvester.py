@@ -387,7 +387,7 @@ class SeedsAnalyser(HarvestingModule):
             helix = Belle2.Helix(legendre_track_cand.getPosSeed(), legendre_track_cand.getMomSeed(), -1, 1.5)
 
         matcher = Belle2.TrackMatchLookUp("MCTrackCands", self.foreach)
-        mc_track_cand = matcher.getMatchedMCRecoTrack(legendre_track_cand)
+        mc_track_cand = matcher.getAnyMatchedMCRecoTrack(legendre_track_cand)
 
         pxd_clusters = Belle2.PyStoreArray("PXDClusters")
         svd_clusters = Belle2.PyStoreArray("SVDClusters")

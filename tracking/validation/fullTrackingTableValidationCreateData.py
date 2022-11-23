@@ -52,9 +52,9 @@ class VxdCdcPartFinderHarvester(HarvestingModule):
         """
         Extract the information.
         """
-        this_best_track_cdc = self.mc_track_matcher_cdc.getMatchedPRRecoTrack(mc_track)
-        this_best_track_vxd = self.mc_track_matcher_vxd.getMatchedPRRecoTrack(mc_track)
-        # reco_track = self.mc_track_matcher.getMatchedPRRecoTrack(mc_track)
+        this_best_track_cdc = self.mc_track_matcher_cdc.getAnyMatchedPRRecoTrack(mc_track)
+        this_best_track_vxd = self.mc_track_matcher_vxd.getAnyMatchedPRRecoTrack(mc_track)
+        # reco_track = self.mc_track_matcher.getAnyMatchedPRRecoTrack(mc_track)
 
         mc_particle = mc_track.getRelated("MCParticles")
 

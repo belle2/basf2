@@ -199,7 +199,7 @@ float TrackMatchLookUp::getMatchedPurity(const RecoTrack& recoTrack) const
 
   if (isMCRecoTrack(recoTrack)) {
     const RecoTrack& mcRecoTrack = recoTrack;
-    const RecoTrack* prRecoTrack = getMatchedPRRecoTrack(mcRecoTrack);
+    const RecoTrack* prRecoTrack = getAnyMatchedPRRecoTrack(mcRecoTrack);
     if (prRecoTrack) {
       return getRelatedPurity(*prRecoTrack);
     } else {
@@ -208,7 +208,7 @@ float TrackMatchLookUp::getMatchedPurity(const RecoTrack& recoTrack) const
 
   } else {
     const RecoTrack& prRecoTrack = recoTrack;
-    const RecoTrack* mcRecoTrack = getMatchedMCRecoTrack(prRecoTrack);
+    const RecoTrack* mcRecoTrack = getAnyMatchedMCRecoTrack(prRecoTrack);
     if (mcRecoTrack) {
       return getRelatedPurity(prRecoTrack);
     } else {
@@ -221,7 +221,7 @@ float TrackMatchLookUp::getMatchedEfficiency(const RecoTrack& recoTrack) const
 {
   if (isPRRecoTrack(recoTrack)) {
     const RecoTrack& prRecoTrack = recoTrack;
-    const RecoTrack* mcRecoTrack = getMatchedMCRecoTrack(prRecoTrack);
+    const RecoTrack* mcRecoTrack = getAnyMatchedMCRecoTrack(prRecoTrack);
     if (mcRecoTrack) {
       return getRelatedEfficiency(*mcRecoTrack);
     } else {
@@ -230,7 +230,7 @@ float TrackMatchLookUp::getMatchedEfficiency(const RecoTrack& recoTrack) const
 
   } else {
     const RecoTrack& mcRecoTrack = recoTrack;
-    const RecoTrack* prRecoTrack = getMatchedPRRecoTrack(mcRecoTrack);
+    const RecoTrack* prRecoTrack = getAnyMatchedPRRecoTrack(mcRecoTrack);
     if (prRecoTrack) {
       return getRelatedEfficiency(mcRecoTrack);
     } else {

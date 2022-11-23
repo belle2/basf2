@@ -52,8 +52,8 @@ class VxdCdcMergerHarvesterMCSide(HarvestingModule):
 
         result["mc_store_array_number"] = mc_track.getArrayIndex()
 
-        this_best_track_cdc = self.mc_track_matcher_cdc.getMatchedPRRecoTrack(mc_track)
-        this_best_track_vxd = self.mc_track_matcher_vxd.getMatchedPRRecoTrack(mc_track)
+        this_best_track_cdc = self.mc_track_matcher_cdc.getAnyMatchedPRRecoTrack(mc_track)
+        this_best_track_vxd = self.mc_track_matcher_vxd.getAnyMatchedPRRecoTrack(mc_track)
 
         result.update(peelers.peel_reco_track_hit_content(this_best_track_cdc, key="cdc_{part_name}"))
         result.update(peelers.peel_reco_track_seed(this_best_track_cdc, key="cdc_{part_name}"))
@@ -218,7 +218,7 @@ class VxdCdcMergerHarvesterPRSide(HarvestingModule):
 
         result["store_array_number"] = pr_track.getArrayIndex()
 
-        mc_track = self.mc_track_matcher.getMatchedMCRecoTrack(pr_track)
+        mc_track = self.mc_track_matcher.getAnyMatchedMCRecoTrack(pr_track)
 
         if mc_track:
             result["mc_store_array_number"] = mc_track.getArrayIndex()

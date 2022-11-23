@@ -19,7 +19,7 @@ Try to keep your code as simple as possible:
    should be complete) and low coupling.
 
 3. The code should compile without warning messages and must be portable (e.g. it should
-   run on x86_64 64 bit machines, we do not support ARM processors).
+   run on x86_64 64 bit machines, we do not yet support ARM processors).
 
 Please, please avoid:
 

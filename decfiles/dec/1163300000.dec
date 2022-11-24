@@ -17,6 +17,7 @@
 #
 Alias MyK0 K0
 Alias Myanti-K0 anti-K0
+CDecay MyK0 Myanti-K0
 #
 Alias MyKs K_S0
 #

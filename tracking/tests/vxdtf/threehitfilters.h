@@ -66,7 +66,6 @@ namespace Belle2 {
   /** the correctness of the angle calculators */
   TEST_F(ThreeHitFiltersTest, TestAngles)
   {
-//     B2Vector3D innerHit(1., 1., 0.), centerHit(3., 3., 0.), outerHitEvil(6., 3., 0.), outerHitSimple(6., 4., 0.);
     B2Vector3D innerHit(1., 1., 0.), centerHit(3., 3., 0.), outerHit(6., 4., 1.);
     B2Vector3D cent_inner = centerHit - innerHit, outer_center = outerHit - centerHit;
 

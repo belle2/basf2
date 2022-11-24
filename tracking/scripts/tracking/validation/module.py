@@ -276,14 +276,8 @@ class TrackingValidationModule(basf2.Module):
             return
 
         for trackCand in trackCands:
-            is_matched = trackMatchLookUp.isMatchedPRRecoTrack(trackCand) or \
-                         trackMatchLookUp.isMatchedWrongChargePRRecoTrack(trackCand)
-            # is_matched_correct_charge = trackMatchLookUp.isMatchedPRRecoTrack(trackCand)
-            # is_matched_wrong_charge = trackMatchLookUp.isMatchedWrongChargePRRecoTrack(trackCand)
-            is_clone = trackMatchLookUp.isClonePRRecoTrack(trackCand) or \
-                trackMatchLookUp.isCloneWrongChargePRRecoTrack(trackCand)
-            # is_clone_correct_charge = trackMatchLookUp.isClonePRRecoTrack(trackCand)
-            # is_clone_wrong_charge = trackMatchLookUp.isCloneWrongChargePRRecoTrack(trackCand)
+            is_matched = trackMatchLookUp.isAnyChargeMatchedPRRecoTrack(trackCand)
+            is_clone = trackMatchLookUp.isAnyChargeClonePRRecoTrack(trackCand)
 
             pt_truth = float('nan')
             omega_truth = float('nan')
@@ -407,8 +401,7 @@ class TrackingValidationModule(basf2.Module):
         n_matched_minus = 0
 
         for mcTrackCand in mcTrackCands:
-            is_matched = trackMatchLookUp.isMatchedMCRecoTrack(mcTrackCand) or \
-                         trackMatchLookUp.isMatchedWrongChargeMCRecoTrack(mcTrackCand)
+            is_matched = trackMatchLookUp.isAnyChargeMatchedMCRecoTrack(mcTrackCand)
 
             relatedPRtrackCand = trackMatchLookUp.getRelatedPRRecoTrack(mcTrackCand)
             if relatedPRtrackCand:

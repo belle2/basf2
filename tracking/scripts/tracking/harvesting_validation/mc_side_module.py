@@ -97,10 +97,10 @@ class MCSideTrackingValidationModule(harvesting.HarvestingModule):
 
                 found_det_hit_ids |= det_hit_ids
 
-                if track_match_look_up.isMatchedPRRecoTrack(reco_track):
+                if track_match_look_up.isAnyChargedMatchedPRRecoTrack(reco_track):
                     matched_det_hit_ids |= det_hit_ids
 
-                if track_match_look_up.isClonePRRecoTrack(reco_track):
+                if track_match_look_up.isAnyChargeClonePRRecoTrack(reco_track):
                     clone_det_hit_ids |= det_hit_ids
 
                 if (track_match_look_up.isGhostPRRecoTrack(reco_track) or
@@ -182,14 +182,12 @@ class MCSideTrackingValidationModule(harvesting.HarvestingModule):
         """Extracts track-match information from the MCMatcherTracksModule results"""
         track_match_look_up = self.track_match_look_up
         return dict(
-            is_matched=track_match_look_up.isMatchedMCRecoTrack(mc_reco_track) or
-            track_match_look_up.isMatchedWrongChargeMCRecoTrack(mc_reco_track),
-            is_matched_correct_charge=track_match_look_up.isMatchedMCRecoTrack(mc_reco_track),
-            is_matched_wrong_charge=track_match_look_up.isMatchedWrongChargeMCRecoTrack(mc_reco_track),
-            is_merged=track_match_look_up.isMergedMCRecoTrack(mc_reco_track) or
-            track_match_look_up.isMergedWrongChargeMCRecoTrack(mc_reco_track),
-            is_merged_correct_charge=track_match_look_up.isMergedMCRecoTrack(mc_reco_track),
-            is_merged_wrong_charge=track_match_look_up.isMergedWrongChargeMCRecoTrack(mc_reco_track),
+            is_matched=track_match_look_up.isAnyChargeMatchedMCRecoTrack(mc_reco_track),
+            is_matched_correct_charge=track_match_look_up.isCorrectChargeMatchedMCRecoTrack(mc_reco_track),
+            is_matched_wrong_charge=track_match_look_up.isWrongChargeMatchedMCRecoTrack(mc_reco_track),
+            is_merged=track_match_look_up.isAnyChargeMergedMCRecoTrack(mc_reco_track),
+            is_merged_correct_charge=track_match_look_up.isCorrectChargeMergedMCRecoTrack(mc_reco_track),
+            is_merged_wrong_charge=track_match_look_up.isWrongChargeMergedMCRecoTrack(mc_reco_track),
             is_missing=track_match_look_up.isMissingMCRecoTrack(mc_reco_track),
             hit_efficiency=track_match_look_up.getRelatedEfficiency(mc_reco_track),
         )

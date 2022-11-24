@@ -53,14 +53,14 @@ void MCVXDCDCTrackMergerFindlet::apply()
       continue;
     }
 
-    const RecoTrack* cdcMCRecoTrack = cdcMCLookUp.getAnyMatchedMCRecoTrack(*cdcRecoTrack);
+    const RecoTrack* cdcMCRecoTrack = cdcMCLookUp.getAnyChargeMatchedMCRecoTrack(*cdcRecoTrack);
 
     if (not cdcMCRecoTrack) {
       continue;
     }
 
     for (auto& vxdRecoTrack : vxdRecoTrackVector) {
-      const RecoTrack* vxdMCRecoTrack = vxdMCLookUp.getAnyMatchedMCRecoTrack(*vxdRecoTrack);
+      const RecoTrack* vxdMCRecoTrack = vxdMCLookUp.getAnyChargeMatchedMCRecoTrack(*vxdRecoTrack);
       if (not vxdMCRecoTrack) {
         continue;
       }

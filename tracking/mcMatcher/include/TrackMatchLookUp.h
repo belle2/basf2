@@ -103,7 +103,7 @@ namespace Belle2 {
      * If there is no match or the pattern recognition track is a clone, or
      * the charge is wrong return nullptr.
      */
-    const RecoTrack* getMatchedMCRecoTrack(const RecoTrack& prRecoTrack) const
+    const RecoTrack* getCorrectChargeMatchedMCRecoTrack(const RecoTrack& prRecoTrack) const
     {
       return getMCRecoTrackWithStatus(prRecoTrack, PRToMCMatchInfo::c_matched);
     }
@@ -114,7 +114,7 @@ namespace Belle2 {
       * If there is no match or the pattern recognition track is a clone, or the charge is
       * correct return nullptr.
       */
-    const RecoTrack* getWrongChargeMCRecoTrack(const RecoTrack& prRecoTrack) const
+    const RecoTrack* getWrongChargeMatchedMCRecoTrack(const RecoTrack& prRecoTrack) const
     {
       return getMCRecoTrackWithStatus(prRecoTrack, PRToMCMatchInfo::c_matchedWrongCharge);
     }
@@ -124,7 +124,7 @@ namespace Belle2 {
      * both pattern and charge are matched correctly, or only the pattern is correct but the charge is wrong.
      * If no match exists at all, a nullptr is returned.
      */
-    const RecoTrack* getAnyMatchedMCRecoTrack(const RecoTrack& prRecoTrack) const
+    const RecoTrack* getAnyChargeMatchedMCRecoTrack(const RecoTrack& prRecoTrack) const
     {
       const RecoTrack* anyMatchedRecoTrack = getMCRecoTrackWithStatus(prRecoTrack, PRToMCMatchInfo::c_matched);
       if (anyMatchedRecoTrack == nullptr) {
@@ -138,7 +138,7 @@ namespace Belle2 {
      * If there is no match or the Monte Carlo track is a over-merged, or the
      * charge is wrong return nullptr.
      */
-    const RecoTrack* getMatchedPRRecoTrack(const RecoTrack& mcRecoTrack) const
+    const RecoTrack* getCorrectChargeMatchedPRRecoTrack(const RecoTrack& mcRecoTrack) const
     {
       return getPRRecoTrackWithStatus(mcRecoTrack, MCToPRMatchInfo::c_matched);
     }
@@ -148,7 +148,7 @@ namespace Belle2 {
       * If there is no match or the Monte Carlo track is a over-merged or the
       * charge is correct return nullptr.
       */
-    const RecoTrack* getWrongChargePRRecoTrack(const RecoTrack& mcRecoTrack) const
+    const RecoTrack* getWrongChargeMatchedPRRecoTrack(const RecoTrack& mcRecoTrack) const
     {
       return getPRRecoTrackWithStatus(mcRecoTrack, MCToPRMatchInfo::c_matchedWrongCharge);
     }
@@ -158,7 +158,7 @@ namespace Belle2 {
      * both pattern and charge are matched correctly, or only the pattern is correct but the charge is wrong.
      * If no match exists at all, a nullptr is returned.
      */
-    const RecoTrack* getAnyMatchedPRRecoTrack(const RecoTrack& mcRecoTrack) const
+    const RecoTrack* getAnyChargeMatchedPRRecoTrack(const RecoTrack& mcRecoTrack) const
     {
       const RecoTrack* anyMatchedRecoTrack = getPRRecoTrackWithStatus(mcRecoTrack, MCToPRMatchInfo::c_matched);
       if (anyMatchedRecoTrack == nullptr) {
@@ -209,9 +209,10 @@ namespace Belle2 {
     }
 
     /*!
-     * Checks, if the pattern recognition track was matched to a Monte Carlo track.
+     * Checks, if the pattern recognition track was matched to a Monte Carlo track
+     * with both hit pattern and charge being matched.
      */
-    bool isMatchedPRRecoTrack(const RecoTrack& prRecoTrack) const
+    bool isCorrectChargeMatchedPRRecoTrack(const RecoTrack& prRecoTrack) const
     {
       return getPRToMCMatchInfo(prRecoTrack) == PRToMCMatchInfo::c_matched;
     }
@@ -220,25 +221,46 @@ namespace Belle2 {
     * Checks, if the pattern recognition track was matched to a Monte Carlo track
     * but with the wrong charge.
     */
-    bool isMatchedWrongChargePRRecoTrack(const RecoTrack& prRecoTrack) const
+    bool isWrongChargeMatchedPRRecoTrack(const RecoTrack& prRecoTrack) const
     {
       return getPRToMCMatchInfo(prRecoTrack) == PRToMCMatchInfo::c_matchedWrongCharge;
     }
 
     /*!
+    * Checks, if the pattern recognition track was matched to a Monte Carlo track,
+    * independent of whether the charge is matched.
+    */
+    bool isAnyChargeMatchedPRRecoTrack(const RecoTrack& prRecoTrack) const
+    {
+      return getPRToMCMatchInfo(prRecoTrack) == PRToMCMatchInfo::c_matched or
+             getPRToMCMatchInfo(prRecoTrack) == PRToMCMatchInfo::c_matchedWrongCharge;
+    }
+
+    /*!
      * Checks, if the pattern recognition track is a clone of an other pattern recognition track.
      */
-    bool isClonePRRecoTrack(const RecoTrack& prRecoTrack) const
+    bool isCorrectChargeClonePRRecoTrack(const RecoTrack& prRecoTrack) const
     {
       return getPRToMCMatchInfo(prRecoTrack) == PRToMCMatchInfo::c_clone;
     }
+
     /*!
      * Checks, if the pattern recognition track is a clone of an other pattern recognition track,
      * but with the wrong charge
      */
-    bool isCloneWrongChargePRRecoTrack(const RecoTrack& prRecoTrack) const
+    bool isWrongChargeClonePRRecoTrack(const RecoTrack& prRecoTrack) const
     {
       return getPRToMCMatchInfo(prRecoTrack) == PRToMCMatchInfo::c_cloneWrongCharge;
+    }
+
+    /*!
+     * Checks, if the pattern recognition track is a clone of an other pattern recognition track,
+     * independent of whether the charge is correct
+     */
+    bool isAnyChargeClonePRRecoTrack(const RecoTrack& prRecoTrack) const
+    {
+      return getPRToMCMatchInfo(prRecoTrack) == PRToMCMatchInfo::c_clone or
+             getPRToMCMatchInfo(prRecoTrack) == PRToMCMatchInfo::c_cloneWrongCharge;
     }
 
     /*!
@@ -271,9 +293,9 @@ namespace Belle2 {
 
     /*!
      * Checks, if the Monte Carlo Track was matched to a pattern recognition track
-     * based on the hit pattern.
+     * based on the hit pattern and the correct charge.
      */
-    bool isMatchedMCRecoTrack(const RecoTrack& mcRecoTrack) const
+    bool isCorrectChargeMatchedMCRecoTrack(const RecoTrack& mcRecoTrack) const
     {
       return getMCToPRMatchInfo(mcRecoTrack) == MCToPRMatchInfo::c_matched;
     }
@@ -282,15 +304,25 @@ namespace Belle2 {
      * Checks, if the Monte Carlo Track was matched to a pattern recognition track
      * based on the hit pattern, but was assigned the wrong charge.
      */
-    bool isMatchedWrongChargeMCRecoTrack(const RecoTrack& mcRecoTrack) const
+    bool isWrongChargeMatchedMCRecoTrack(const RecoTrack& mcRecoTrack) const
     {
       return getMCToPRMatchInfo(mcRecoTrack) == MCToPRMatchInfo::c_matchedWrongCharge;
     }
 
     /*!
+     * Checks, if the Monte Carlo Track was matched to a pattern recognition track
+     * independent of the charge.
+     */
+    bool isAnyChargeMatchedMCRecoTrack(const RecoTrack& mcRecoTrack) const
+    {
+      return getMCToPRMatchInfo(mcRecoTrack) == MCToPRMatchInfo::c_matched or
+             getMCToPRMatchInfo(mcRecoTrack) == MCToPRMatchInfo::c_matchedWrongCharge;
+    }
+
+    /*!
      * Checks, if the Monte Carlo Track has been merged into another pattern recognition track.
      */
-    bool isMergedMCRecoTrack(const RecoTrack& mcRecoTrack) const
+    bool isCorrectChargeMergedMCRecoTrack(const RecoTrack& mcRecoTrack) const
     {
       return getMCToPRMatchInfo(mcRecoTrack) == MCToPRMatchInfo::c_merged;
     }
@@ -299,9 +331,18 @@ namespace Belle2 {
      * Checks, if the Monte Carlo Track has been merged into another pattern recognition track
      * and with the wrong charge.
      */
-    bool isMergedWrongChargeMCRecoTrack(const RecoTrack& mcRecoTrack) const
+    bool isWrongChargeMergedMCRecoTrack(const RecoTrack& mcRecoTrack) const
     {
       return getMCToPRMatchInfo(mcRecoTrack) == MCToPRMatchInfo::c_mergedWrongCharge;
+    }
+
+    /*!
+     * Checks, if the Monte Carlo Track has been merged into another pattern recognition track.
+     */
+    bool isAnyChargeMergedMCRecoTrack(const RecoTrack& mcRecoTrack) const
+    {
+      return getMCToPRMatchInfo(mcRecoTrack) == MCToPRMatchInfo::c_merged or
+             getMCToPRMatchInfo(mcRecoTrack) == MCToPRMatchInfo::c_mergedWrongCharge;
     }
 
     /*!

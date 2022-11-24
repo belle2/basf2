@@ -52,9 +52,9 @@ class VxdCdcPartFinderHarvester(HarvestingModule):
         """
         Extract the information.
         """
-        this_best_track_cdc = self.mc_track_matcher_cdc.getAnyMatchedPRRecoTrack(mc_track)
-        this_best_track_vxd = self.mc_track_matcher_vxd.getAnyMatchedPRRecoTrack(mc_track)
-        # reco_track = self.mc_track_matcher.getAnyMatchedPRRecoTrack(mc_track)
+        this_best_track_cdc = self.mc_track_matcher_cdc.getAnyChargeMatchedPRRecoTrack(mc_track)
+        this_best_track_vxd = self.mc_track_matcher_vxd.getAnyChargeMatchedPRRecoTrack(mc_track)
+        # reco_track = self.mc_track_matcher.getAnyChargeMatchedPRRecoTrack(mc_track)
 
         mc_particle = mc_track.getRelated("MCParticles")
 
@@ -78,19 +78,15 @@ class VxdCdcPartFinderHarvester(HarvestingModule):
         return_dict.update(peel_mc_particle(mc_particle))
 
         return_dict.update(dict(
-            is_matched=self.mc_track_matcher.isMatchedMCRecoTrack(mc_track) or
-            self.mc_track_matcher.isMatchedWrongChargeMCRecoTrack(mc_track),
-            is_merged=self.mc_track_matcher.isMergedMCRecoTrack(mc_track) or
-            self.mc_track_matcher.isMergedWrongChargeMCRecoTrack(mc_track),
+            is_matched=self.mc_track_matcher.isAnyChargeMatchedMCRecoTrack(mc_track),
+            is_merged=self.mc_track_matcher.isAnyChargeMergedMCRecoTrack(mc_track),
             is_missing=self.mc_track_matcher.isMissingMCRecoTrack(mc_track),
             hit_efficiency=self.mc_track_matcher.getRelatedEfficiency(mc_track),
         ))
 
         return_dict.update(dict(
-            fitted_is_matched=self.fitted_mc_track_matcher.isMatchedMCRecoTrack(mc_track) or
-            self.fitted_mc_track_matcher.isMatchedWrongChargeMCRecoTrack(mc_track),
-            fitted_is_merged=self.fitted_mc_track_matcher.isMergedMCRecoTrack(mc_track) or
-            self.fitted_mc_track_matcher.isMergedWrongChargeMCRecoTrack(mc_track),
+            fitted_is_matched=self.fitted_mc_track_matcher.isAnyChargeMatchedMCRecoTrack(mc_track),
+            fitted_is_merged=self.fitted_mc_track_matcher.isAnyChargeMergedMCRecoTrack(mc_track),
             fitted_is_missing=self.fitted_mc_track_matcher.isMissingMCRecoTrack(mc_track),
             fitted_hit_efficiency=self.fitted_mc_track_matcher.getRelatedEfficiency(mc_track),
         ))

@@ -36,7 +36,8 @@ if __name__ == '__main__':
                                   and (Path('decfiles/dec') in Path(new_file.a_path).parents)]
 
     if added_or_modified_decfiles:
-        print(f"Changed decayfiles: {' '.join(str(p) for p in added_or_modified_decfiles)}")
+        changed_file_string = '\n'.join(str(p) for p in added_or_modified_decfiles)
+        print(f"Changed decayfiles: \n{changed_file_string}")
     steering_file = basf2.find_file('decfiles/tests/test_changed_decfiles.py_noexec')
 
     run_results = []
@@ -48,5 +49,5 @@ if __name__ == '__main__':
                         for i, ret in enumerate(run_results) if ret.returncode != 0]
     if len(files_and_errors):
 
-        raise RuntimeError("At least one added decfile has failed. "
+        raise RuntimeError("At least one added decfile has failed.\n"
                            + '\n'.join(files_and_errors))

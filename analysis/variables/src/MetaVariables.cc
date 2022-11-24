@@ -2799,9 +2799,8 @@ namespace Belle2 {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
 
         // Parses the other arguments, which are in the form of index:particleName pairs,
-        // and stores indexes and masses in two std::vectors
-        std::vector<unsigned int>indexesToBeReplaced = {};
-        std::vector<double>massesToBeReplaced = {};
+        // and stores indexes and pdgs in std::unordered_map
+        std::unordered_map<unsigned int, int> mapOfReplacedDaughters;
 
         // Loop over the arguments to parse them
         for (unsigned int iCoord = 1; iCoord < arguments.size(); iCoord++) {
@@ -2838,12 +2837,14 @@ namespace Belle2 {
             return nullptr;
           }
 
-          // Stores the indexes and the masses in the vectors that will be passed to the lambda function
+          // Stores the indexes and the pdgs in the map that will be passed to the lambda function
           int pdgCode = particlePDG->PdgCode();
-          double dauNewMass = TDatabasePDG::Instance()->GetParticle(pdgCode)->Mass() ;
-          indexesToBeReplaced.push_back(dauIndex);
-          massesToBeReplaced.push_back(dauNewMass);
+          mapOfReplacedDaughters[dauIndex] = pdgCode;
         } // End of parsing
+
+        // Check the size of mapOfReplacedDaughters
+        if (mapOfReplacedDaughters.size() != arguments.size() - 1)
+          B2FATAL("Overlapped daughter's index is detected in the meta-variable useAlternativeDaughterHypothesis");
 
         //----
         // 2) replacing
@@ -2851,7 +2852,7 @@ namespace Belle2 {
 
         // Core function: creates a new particle from the original one changing
         // some of the daughters' masses
-        auto func = [var, indexesToBeReplaced, massesToBeReplaced](const Particle * particle) -> double {
+        auto func = [var, mapOfReplacedDaughters](const Particle * particle) -> double {
           if (particle == nullptr)
           {
             B2WARNING("Trying to access a particle that does not exist. Skipping");
@@ -2876,20 +2877,29 @@ namespace Belle2 {
 
             ROOT::Math::PxPyPzMVector dauMom = ROOT::Math::PxPyPzMVector(frame.getMomentum(dauPart));
 
-            // This can be improved with a faster algorithm to check if an std::vector contains a
-            // certain element
-            for (unsigned int iReplace = 0; iReplace < indexesToBeReplaced.size(); iReplace++) {
-              if (indexesToBeReplaced[iReplace] == iDau) {
-                double p_x = dauMom.Px();
-                double p_y = dauMom.Py();
-                double p_z = dauMom.Pz();
-                dauMom.SetCoordinates(p_x, p_y, p_z, massesToBeReplaced[iReplace]);
-
-                // overwrite the daughter's kinematics
-                const_cast<Particle*>(dummy->getDaughter(iDau))->set4Vector(ROOT::Math::PxPyPzEVector(dauMom));
-                break;
-              }
+            int pdgCode;
+            try {
+              pdgCode = mapOfReplacedDaughters.at(iDau);
+            } catch (std::out_of_range&) {
+              // iDau is not in mapOfReplacedDaughters
+              pSum += dauMom;
+              continue;
             }
+
+            // overwrite the daughter's kinematics
+            double p_x = dauMom.Px();
+            double p_y = dauMom.Py();
+            double p_z = dauMom.Pz();
+            dauMom.SetCoordinates(p_x, p_y, p_z, TDatabasePDG::Instance()->GetParticle(pdgCode)->Mass());
+            const_cast<Particle*>(dummy->getDaughter(iDau))->set4VectorDividingByMomentumScaling(ROOT::Math::PxPyPzEVector(dauMom));
+
+            // overwrite the daughter's pdg
+            const int charge = dummy->getDaughter(iDau)->getCharge();
+            if (TDatabasePDG::Instance()->GetParticle(pdgCode)->Charge() / 3.0 == charge)
+              const_cast<Particle*>(dummy->getDaughter(iDau))->setPDGCode(pdgCode);
+            else
+              const_cast<Particle*>(dummy->getDaughter(iDau))->setPDGCode(-1 * pdgCode);
+
             pSum += dauMom;
           } // End of loop over number of daughter
 

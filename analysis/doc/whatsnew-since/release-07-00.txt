@@ -3,11 +3,10 @@ Changes in the analysis package in light-2212-foldex
 
 Variables
 +++++++++
+ * Extended the variable `useAlternativeDaughterHypothesis` to variables using daughters' pdg codes, e.g. `InvM`.
  * New metavariable `useDaughterRestFrame` to calculate a variable in the rest frame of the given daughters is added.
  * New variable `cosHelicityAngleForQuasiTwoBodyDecay` is added for the angular analysis on a quasi-two-body decay.
  * Extended the variable `cosTPTO` to be available both in a main path and for_each loop over ROEs.
-
-
 
 Modules
 +++++++

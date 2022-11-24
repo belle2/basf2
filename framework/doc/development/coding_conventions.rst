@@ -125,7 +125,7 @@ Abc *Xyz*                Classes derived from *Xyz* **Base**
 .. _class_naming_conventions:
 
 .. figure:: object_naming_convention.svg
-   :width: 10cm
+   :width: 300px
    :align: center
    
    Object naming conventions in basf2.

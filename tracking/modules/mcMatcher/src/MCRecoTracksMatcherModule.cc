@@ -633,7 +633,6 @@ void MCRecoTracksMatcherModule::event()
     }
     // Setup the relation purity relation
     // regardless whether the charge is correctly reconstructed or not
-    prRecoTrack->setMatchingStatus(RecoTrack::MatchingStatus::c_clone);
     prRecoTrack->addRelationTo(mcRecoTrack, -purity);
     prRecoTrack->addRelationTo(mcParticle, -purity);
     ++nClones;

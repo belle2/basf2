@@ -11,6 +11,8 @@
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
 #include <mdst/dataobjects/KLMCluster.h>
+#include <mdst/dataobjects/ECLCluster.h>
+#include <analysis/ClusterUtility/ClusterUtils.h>
 
 // ROOT
 #include <Math/Vector4D.h>
@@ -44,7 +46,15 @@ namespace Belle2 {
       double m_j = 0;
       for (auto daughter : daughters) {
         if (daughter->getPDGCode() == Const::Klong.getPDGCode()) {
-          klDaughters += daughter->getKLMCluster()->getMomentum();
+          const Belle2::KLMCluster* klm_cluster = daughter->getKLMCluster();
+          const Belle2::ECLCluster* ecl_cluster = daughter->getECLCluster();
+          if (NULL != klm_cluster)
+            klDaughters += klm_cluster->getMomentum();
+          else if (NULL != ecl_cluster) {
+            ClusterUtils clutls;
+            klDaughters += clutls.GetCluster4MomentumFromCluster(ecl_cluster, ECLCluster::EHypothesisBit::c_neutralHadron);
+            //  klDaughters += clutls.GetCluster4MomentumFromCluster(ecl_cluster, daughter->getECLClusterEHypothesisBit());
+          }
         } else {
           pDaughters += daughter->get4Vector();
 

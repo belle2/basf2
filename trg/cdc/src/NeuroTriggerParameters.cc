@@ -207,17 +207,9 @@ void NeuroTriggerParameters::saveconfigtxt(const std::string& filename)
     savestream  << std::endl;
   } else {savestream << "tMax = 256" << std::endl;}
   savestream << "# Determine, how the event time should be obtained. The options are:" << std::endl;
-  savestream << "# - fastestpriority" << std::endl;
-  savestream << "# - fastest2d" << std::endl;
-  savestream << "# - etf" << std::endl;
-  savestream << "# - etf_or_fastestpriority" << std::endl;
-  savestream << "# - etf_or_fastest2d" << std::endl;
-  savestream << "# - etf_only" << std::endl;
-  savestream << "# - etfcc" << std::endl;
-  savestream << "# - etfhwin" << std::endl;
-  savestream << "# - etfcc_or_fastestpriority" << std::endl;
-  savestream << "# - min_etf_fastestpriority" << std::endl;
-  savestream << "# - min_etfcc_fastestpriority" << std::endl;
+  for (unsigned i = 0; i < 11; i++) {
+    savestream << "# " << i << ": " << to_strTiming(i) << std::endl;
+  }
   if (ETOption.isSet()) {
     savestream << "ETOption " << (ETOption.isLocked() ? "== " : "= ") << ETOption << std::endl;
     savestream  << std::endl;

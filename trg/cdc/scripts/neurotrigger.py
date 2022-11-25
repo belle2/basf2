@@ -115,7 +115,86 @@ class randommaker(basf2.Module):
         self.counter += 1
 
 
-def add_train_output(path, baseOutputFileName, baseAnaFileName, excludeBranchNames=[], branchNames=[]):
+def add_nnta_gzip_output(path, baseAnaFileName, configFileName, baseGzipFileName, excludeBranchNames=[], branchNames=[]):
+    # create 4 output paths:
+    outpaths = []
+    for x in range(4):
+        outpaths.append([".random_"+str(x), basf2.create_path()])
+    # add the randommaker module:
+    rm = basf2.register_module(randommaker())
+    path.add_module(rm)
+
+    # also add nnta module:
+
+    rm.if_value('==0', outpaths[0][1])
+    rm.if_value('==1', outpaths[1][1])
+    rm.if_value('==2', outpaths[2][1])
+    rm.if_value('==3', outpaths[3][1])
+    for p in outpaths:
+        nnta = basf2.register_module(nntd.nntd())
+        nnta.param({"filename": baseAnaFileName+p[0]+".pkl", "netname": "default_all"})
+        p[1].add_module(nnta)
+        p[1].add_module('CDCTriggerNeuroData',
+                        # input and target arrays
+                        NeuroTrackInputMode=False,
+                        inputCollectionName=hwneuroinput2dfindertracks,  # the hardware input tracks
+                        # inputCollectionName=sim2dtracks_swts, # the software 2dtracks from real hits
+                        # inputCollectionName='TRGCDC2DFinderTracks', # the mcparticle based 2d tracks
+                        hitCollectionName=hwneuroinputsegmenthits,  # simsegmenthits, #'SimSegmentHits',
+                        EventTimeName="CDCTriggerNeuroETFT0",
+                        targetCollectionName='RecoTracks',
+                        trainOnRecoTracks=True,
+                        gzipFilename=baseGzipFileName+p[0]+".gz",
+                        configFileName=configFileName,
+                        writeconfigFileName=baseGzipFileName.split("/gzip")[0]+"/"+configFileName,
+                        )
+
+
+def add_all_output(
+        path,
+        baseOutputFileName,
+        baseAnaFileName,
+        configFileName,
+        baseGzipFileName,
+        excludeBranchNames=[],
+        branchNames=[]):
+    # create 4 output paths:
+    outpaths = []
+    for x in range(4):
+        outpaths.append([".random_"+str(x), basf2.create_path()])
+    # add the randommaker module:
+    rm = basf2.register_module(randommaker())
+    path.add_module(rm)
+
+    # also add nnta module:
+
+    rm.if_value('==0', outpaths[0][1])
+    rm.if_value('==1', outpaths[1][1])
+    rm.if_value('==2', outpaths[2][1])
+    rm.if_value('==3', outpaths[3][1])
+    for p in outpaths:
+        nnta = basf2.register_module(nntd.nntd())
+        nnta.param({"filename": baseAnaFileName+p[0]+".pkl", "netname": "default_all"})
+        p[1].add_module("RootOutput", outputFileName=baseOutputFileName +
+                        p[0]+".root", excludeBranchNames=excludeBranchNames, branchNames=branchNames)
+        p[1].add_module(nnta)
+        p[1].add_module('CDCTriggerNeuroData',
+                        # input and target arrays
+                        NeuroTrackInputMode=False,
+                        inputCollectionName=hwneuroinput2dfindertracks,  # the hardware input tracks
+                        # inputCollectionName=sim2dtracks_swts, # the software 2dtracks from real hits
+                        # inputCollectionName='TRGCDC2DFinderTracks', # the mcparticle based 2d tracks
+                        hitCollectionName=hwneuroinputsegmenthits,  # simsegmenthits, #'SimSegmentHits',
+                        EventTimeName="CDCTriggerNeuroETFT0",
+                        targetCollectionName='RecoTracks',
+                        trainOnRecoTracks=True,
+                        gzipFilename=baseGzipFileName+p[0]+".gz",
+                        configFileName=configFileName,
+                        writeconfigFileName=baseGzipFileName.split("/gzip")[0]+"/"+configFileName,
+                        )
+
+
+def add_nnta_root_output(path, baseOutputFileName, baseAnaFileName, excludeBranchNames=[], branchNames=[]):
     # create 4 output paths:
     outpaths = []
     for x in range(4):

@@ -272,19 +272,6 @@ footprint of the class, which is critical for basf2 on the HLT.
 Because usually classes contain several data members, there is no clear rule where to add
 classes as data members in other classes, usually it would be at position 1, 2, or 3.
 
-.. tip::
-
-   You can easily check the effect how the order of data members affects the memory
-   footprint of a class by inspecting the following examples with two structs with the
-   same content:
-
-   * compiled with ``gcc 12.2``: https://godbolt.org/z/7nKE75bMv
-
-   * compiled with ``clang 15``: https://godbolt.org/z/Y3GM8hYEn
-
-   You can also check that adding the ``-O3`` flag has no impact on the memory footprint
-   of a class (e.g. using ``gcc 12.2``: https://godbolt.org/z/3frPjoMoY ).
-
 
 Initialisation
 --------------

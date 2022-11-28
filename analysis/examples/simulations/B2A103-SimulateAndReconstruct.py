@@ -25,10 +25,10 @@
 ##########################################################################
 
 import basf2 as b2
-import mdst as mdst
-import simulation as si
-import reconstruction as re
-import modularAnalysis as ma
+from mdst import add_mdst_output
+from simulation import add_simulation
+from reconstruction import add_reconstruction
+from modularAnalysis import inputMdst
 
 # We previously generated events but we want to simulate them with the
 # currently best values, not whatever was valid back then. So we have to
@@ -39,19 +39,19 @@ b2.conditions.disable_globaltag_replay()
 my_path = b2.create_path()
 
 # load input ROOT file
-ma.inputMdst(filename=b2.find_file('B2pi0D_D2hh_D2hhh_B2munu_evtgen.root', 'examples', False),
-             path=my_path)
+inputMdst(filename=b2.find_file('B2pi0D_D2hh_D2hhh_B2munu_evtgen.root', 'examples', False),
+          path=my_path)
 
 # simulation
-si.add_simulation(path=my_path)
+add_simulation(path=my_path)
 
 # reconstruction
-re.add_reconstruction(path=my_path)
+add_reconstruction(path=my_path)
 
 # dump in MDST format
-mdst.add_mdst_output(path=my_path,
-                     mc=True,
-                     filename='B2pi0D_D2hh_D2hhh_B2munu.root')
+add_mdst_output(path=my_path,
+                mc=True,
+                filename='B2pi0D_D2hh_D2hhh_B2munu.root')
 
 # Show progress of processing
 my_path.add_module('ProgressBar')

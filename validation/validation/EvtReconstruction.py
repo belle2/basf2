@@ -23,7 +23,8 @@
 """
 
 from basf2 import set_random_seed, create_path, process, statistics
-from reconstruction import add_reconstruction, add_mdst_output
+from reconstruction import add_reconstruction
+from mdst import add_mdst_output
 from validation import statistics_plots, event_timing_plot
 
 set_random_seed(12345)

@@ -30,7 +30,7 @@ import basf2 as b2
 from generators import add_evtgen_generator
 from modularAnalysis import setupEventInfo
 from modularAnalysis import loadGearbox
-from reconstruction import add_mdst_output
+from mdst import add_mdst_output
 from optparse import OptionParser
 from ROOT import Belle2
 

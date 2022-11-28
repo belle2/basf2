@@ -24,7 +24,6 @@ from simulation import add_simulation
 from reconstruction import add_reconstruction
 from mdst import add_mdst_output
 import glob
-from ROOT import Belle2
 
 # Suppress messages and warnings during processing:
 b2.set_log_level(b2.LogLevel.ERROR)
@@ -40,7 +39,7 @@ main.add_module(eventinfosetter)
 # Event generator (B0 -> K+pi- + cc, other B0 generic)
 evtgeninput = b2.register_module('EvtGenInput')
 evtgeninput.param('userDECFile',
-                  Belle2.FileSystem.findFile('top/examples/B2Kpi.dec'))
+                  b2.find_file('top/examples/B2Kpi.dec'))
 main.add_module(evtgeninput)
 
 # Detector simulation

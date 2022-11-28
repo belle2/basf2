@@ -53,7 +53,10 @@ EvtBGLFF::EvtBGLFF(double bgla_0, double bgla_1, double bglb_0, double bglb_1, d
 // Use dispersion relation parametrization from
 // C.G.Boyd, B.Grinstein, R.F.Lebed, Phys. Rev. Lett. 74,4603(1995)
 // and
-// R.Glattauer, etc. (Belle) Phys. Rev. D 93,032006 (2016)
+// R.Glattauer, etc. (Belle) Phys. Rev. D 93,032006 (2016).
+// Form factors defined following Equ. (4) and (8) in the later paper
+// and following the EvtGen convention as in Equ. (54) in the
+// EvtGen guide (BAD 522 V6 EvtGen V00-11-06).
 
 void EvtBGLFF::getscalarff(EvtId parent, EvtId,
                            double t, double mass, double* fp, double* f0)

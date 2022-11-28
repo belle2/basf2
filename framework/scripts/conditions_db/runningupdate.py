@@ -79,7 +79,7 @@ class RunningTagUpdater:
         Arguments:
             db (ConditionsDB): reference to the database object
             running (str): name of the running tag
-            stagin (str): name of the staging tag
+            staging (str): name of the staging tag
             valid_from (tuple(int,int)): first valid exp,run
             mode (RunningTagUpdateMode): the mode of the update
             dry_run (bool): If true only check, don't do anything.
@@ -103,7 +103,7 @@ class RunningTagUpdater:
         self._valid_from = valid_from
 
         #: True if we want to allow payloads in the staging tag to be closed,
-        #  for example when retireing a payload
+        #  for example when retiring a payload
         self._mode = mode
         #: Do we allow closed iovs in staging?
         self._allow_closed = mode in (RunningTagUpdateMode.ALLOW_CLOSED, RunningTagUpdateMode.FIX_CLOSED,

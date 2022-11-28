@@ -160,8 +160,7 @@ add_mdst_output(
         'ECLDigitsPureCsIToECLHits'])
 
 # Show progress of processing
-progressBar = b2.register_module('ProgressBar')
-mainPath.add_module(progressBar)
+mainPath.add_module('ProgressBar')
 
 # Process the events and print call statistics
 mainPath.add_module('Progress')

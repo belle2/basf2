@@ -42,6 +42,41 @@ Please, please avoid:
 6. Preprocessor definitions if possible; in particular don't use them for constants.
 
 
+Directories structure
+---------------------
+
+By default, one shared library is created per basf2 package and is installed in a
+top-level ``lib`` directory that is included in the user's library path. The build system
+treats the package's contents in pre-defined subdirectories as follows:
+
+* ``include`` and ``src`` must always include the header and source files, respectively,
+  of the code written in C++.
+
+* ``modules``: the code is compiled into a shared library and installed in a top-level
+  ``module`` directory, so that it can be dynamically loaded by basf2.
+
+* ``tools``: C++ code is compiled into an executable and installed in a top-level ``bin``
+  directory that is included in the user's path; executable scripts, usually written in
+  Python, are symlinked to this directory.
+
+* ``dataobjects``: these classes define the organization of the data that can be stored in
+  output files; the code is linked in a shared library with the ``_dataobjects`` suffix.
+
+* ``scripts``: Python scripts are installed in a directory that is included in the Python path;
+  this folder should then only contain Python modules.
+
+* ``data``: all files are symlinked to a top-level ``data`` folder; this folder should contain
+  XML files for defining the detector geometry, generators configuration files, etc., but it
+  must not contain files containing calibration constants, particle identification likelihoods
+  or other contents that can be stored in our conditions database.
+
+* ``tests``: unit and script tests used by our CI/CD pipelines.
+
+* ``validation``: scripts and reference histograms for validation plots.
+
+* ``examples``: example scripts that illustrate features of the package.
+
+
 Naming conventions
 ------------------
 
@@ -135,6 +170,12 @@ Abc *Xyz*                Classes derived from *Xyz* **Base**
    Some subdetector packages may use slightly different naming conventions. In case you
    need further clarifications, please check the sphinx documentation of the subdetector
    package (when available) or contact the subdetector librarians.
+
+.. tip::
+
+   Please check the `AWESOME <https://github.com/belle2/basf2/tree/main/online_book/awesome>`_
+   subpackage for a full, working, example on how to start writing subdetector-specific
+   code.
 
 
 Namespaces
@@ -230,6 +271,19 @@ footprint of the class, which is critical for basf2 on the HLT.
 
 Because usually classes contain several data members, there is no clear rule where to add
 classes as data members in other classes, usually it would be at position 1, 2, or 3.
+
+.. tip::
+
+   You can easily check the effect how the order of data members affects the memory
+   footprint of a class by inspecting the following examples with two structs with the
+   same content:
+
+   * compiled with ``gcc 12.2``: https://godbolt.org/z/7nKE75bMv
+
+   * compiled with ``clang 15``: https://godbolt.org/z/Y3GM8hYEn
+
+   You can also check that adding the ``-O3`` flag has no impact on the memory footprint
+   of a class (e.g. using ``gcc 12.2``: https://godbolt.org/z/3frPjoMoY ).
 
 
 Initialisation

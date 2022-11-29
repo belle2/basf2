@@ -28,6 +28,7 @@ void FlippedRecoTracksMergerModule::initialize()
 {
   m_inputRecoTracks.isRequired(m_inputStoreArrayName);
   m_inputRecoTracksFlipped.isRequired(m_inputStoreArrayNameFlipped);
+  m_trackFitResults.isRequired();
 }
 
 void FlippedRecoTracksMergerModule::event()
@@ -66,24 +67,68 @@ void FlippedRecoTracksMergerModule::event()
     //set the c_isFlippedAndRefitted bit
     track->setFlippedAndRefitted();
 
-    // loop over the original fitResults
-    for (long unsigned int index = 0; index < fitResultsBefore.size() ; index++) {
-      bool updatedFitResult = false;
-      for (long unsigned int index1 = 0; index1 < fitResultsAfter.size() ; index1++) {
-        if (fitResultsBefore[index].first == fitResultsAfter[index1].first) {
+    for (auto& index : track->getTrackFitResults()) std::cout << " B " << index.first.__repr__() << " - " << index.second;
+    std::cout << std::endl;
+    for (auto& index : trackFlipped->getTrackFitResults()) std::cout << " F " << index.first.__repr__() << " - " << index.second;
+    std::cout << std::endl;
 
-          auto fitResultAfter  = fitResultsAfter[index1].second;
-          fitResultsBefore[index].second->updateTrackFitResult(*fitResultAfter);
-          updatedFitResult = true;
+    /*
+        // loop over the original fitResults
+        for (long unsigned int index = 0; index < fitResultsBefore.size() ; index++) {
+          bool updatedFitResult = false;
+          for (long unsigned int index1 = 0; index1 < fitResultsAfter.size() ; index1++) {
+            if (fitResultsBefore[index].first == fitResultsAfter[index1].first) {
+
+              auto fitResultAfter  = fitResultsAfter[index1].second;
+              fitResultsBefore[index].second->updateTrackFitResult(*fitResultAfter);
+              updatedFitResult = true;
+            }
+
+          }
+          if (not updatedFitResult) {
+            fitResultsBefore[index].second->mask();
+            track->setTrackFitResultIndex(fitResultsBefore[index].first, -1);
+          }
         }
+    */
+    // loop over all particle hypothesis
+    for (const auto particleType : Const::chargedStableSet) {
+      // TODO: find better way to get non-const TrackFitResult pointers from the Track
+      auto oldFitResultPairIter = std::find_if(fitResultsBefore.begin(),
+      fitResultsBefore.end(), [&particleType](const Track::ChargedStableTrackFitResultPair & a) { return a.first == particleType;});
+      TrackFitResult* oldFitResult = nullptr;
+      if (oldFitResultPairIter != fitResultsBefore.end())  oldFitResult = oldFitResultPairIter->second;
 
+      auto flippedFitResultPairIter = std::find_if(fitResultsAfter.begin(),
+      fitResultsAfter.end(), [&particleType](const Track::ChargedStableTrackFitResultPair & a) { return a.first == particleType;});
+      TrackFitResult* flippedFitResult = nullptr;
+      if (flippedFitResultPairIter != fitResultsAfter.end())  flippedFitResult = flippedFitResultPairIter->second;
+
+      // for old track get the TrackFitResult from the default StoreArray
+      //const TrackFitResult * oldFitResult = track->getTrackFitResult(particleType);
+      //const TrackFitResult * flippedFitResult = trackFlipped->getTrackFitResultByName(particleType, "TrackFitResults_flipped");
+
+      // no flipped track fit, skip and invalidate potential old results
+      if (!flippedFitResult) {
+        track->setTrackFitResultIndex(particleType, -1);
+        if (oldFitResult) oldFitResult->mask();
+        continue;
       }
-      if (not updatedFitResult) {
-        fitResultsBefore[index].second->mask();
-        track->setTrackFitResultIndex(fitResultsBefore[index].first, -1);
+
+      // if flipped result exists check if old exists then update, if it not exists add a new TrackFitResult
+      if (oldFitResult) {
+        oldFitResult->updateTrackFitResult(*flippedFitResult);
+      } else {
+        TrackFitResult* newFitResult = m_trackFitResults.appendNew();
+        newFitResult->updateTrackFitResult(*flippedFitResult);
+        const int newTrackFitResultArrayIndex = newFitResult->getArrayIndex();
+        track->setTrackFitResultIndex(particleType, newTrackFitResultArrayIndex);
       }
     }
 
+
+    for (auto& index : track->getTrackFitResults()) std::cout << " A " << index.first.__repr__() << " - " << index.second;
+    std::cout << std::endl;
 
     const auto& measuredStateOnPlane = recoTrack.getMeasuredStateOnPlaneFromLastHit();
 

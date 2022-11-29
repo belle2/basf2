@@ -1157,7 +1157,7 @@ NeuroTrigger::load(const string& filename, const string& arrayname)
       B2ERROR("Could not load Neurotrigger weights from database!");
       return false;
     }
-    B2DEBUG(2, "Loaded Neurotrigger MLP weights from database: " +  m_cdctriggerneuroconfig->getNNName());
+    B2INFO("Loaded Neurotrigger MLP weights from database: " +  m_cdctriggerneuroconfig->getNNName());
     B2DEBUG(100, "loaded " << m_MLPs.size() << " networks from database");
     // load some values from the geometry that will be needed for the input
     setConstants();
@@ -1186,6 +1186,7 @@ NeuroTrigger::load(const string& filename, const string& arrayname)
     datafile.Close();
     B2DEBUG(100, "loaded " << m_MLPs.size() << " networks");
 
+    B2INFO("Loaded Neurotrigger MLP weights from file: " +  filename);
     // load some values from the geometry that will be needed for the input
     setConstants();
 

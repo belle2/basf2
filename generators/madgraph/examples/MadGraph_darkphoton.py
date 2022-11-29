@@ -21,7 +21,7 @@ else:
     basf2_dir = b2.find_file(os.environ['BELLE2_RELEASE_DIR'])
 
 # Generation parameters
-mg_steeringtemplate = f'{basf2_dir}/generators/madgraph/examples/run_darkphoton_isr.steeringtemplate'
+mg_steeringtemplate = f'{basf2_dir}/generators/madgraph/examples/run_darkphoton.steeringtemplate'
 mg_nevents = '1000'
 mg_beamenergy = '10.58/2.'
 b2_seed = b2.get_random_seed().encode('utf-8')
@@ -39,7 +39,7 @@ mg_parameter_kappa = '0.001'
 mg_parameter_wAp = '0.000001'
 
 # Path to output directory
-mg_output = f'Dark_photon_mass_{int(mAp)}_isr'
+mg_output = f'Dark_photon_mass_{int(mAp)}'
 if not os.path.exists(mg_output):
     os.mkdir(mg_output)
 else:
@@ -49,7 +49,7 @@ else:
 
 # Other stuffs
 mg_externals = 'mg5_aMC'  # MadGraph executable (from the externals)
-mg_steeringfile = f'{mg_output}/run_darkphoton_isr.steering'  # MadGraph steering file (will be created on-the-fly later)
+mg_steeringfile = f'{mg_output}/run_darkphoton.steering'  # MadGraph steering file (will be created on-the-fly later)
 # MadGraph run_card to be used (param_card is generated automatically)
 mg_runcard = f'{basf2_dir}/generators/madgraph/cards/run_card.dat'
 
@@ -104,6 +104,6 @@ main.add_module('SmearPrimaryVertex')
 main.add_module('Progress')
 
 main.add_module('RootOutput',
-                outputFileName=f'Dark_photon_mass_{int(mAp)}_isr.root')
+                outputFileName=f'Dark_photon_mass_{int(mAp)}.root')
 
 b2.process(main)

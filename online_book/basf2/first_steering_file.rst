@@ -378,7 +378,7 @@ of the decay mode you are studying, it is recommended to use them for V0s
 .. admonition:: Task
     :class: exercise stacked
 
-    Extend your steering file by loading electron, positron, and :math:`K_S^0` candidates. At
+    Extend your steering file by loading electrons, positrons, and :math:`K_S^0` candidates. At
     the very end of your script you should also print a summary table of all the
     modules added to your path using the function `statistics`.
 
@@ -494,8 +494,8 @@ of the CDC (`thetaInCDCAcceptance`).
     :class: toggle solution
 
     .. literalinclude:: steering_files/013_first_steering_file.py
-        :start-at: [S10]
-        :end-before: [E10] 
+        :start-at: S10
+        :end-at: E10 
 
 
 .. note:: Marker comments in the solution code

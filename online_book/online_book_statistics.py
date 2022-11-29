@@ -8,7 +8,8 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-"""This script calculates some numbers about the online book, e.g. number of
+"""
+This script calculates some numbers about the online book, e.g. number of
 exercises etc.
 """
 
@@ -20,7 +21,7 @@ import re
 
 class Statistics:
     """
-    statistics base class
+    Statistics base class
     """
     def __init__(self):
         """Initialize members"""
@@ -34,13 +35,13 @@ class Statistics:
         self.characters: int = 0
 
     def print_summary(self):
-        """print the summary"""
+        """Print the summary"""
         pprint.pprint(self.__dict__)
 
 
 class StatisticsVisitor:
     """
-    statistics visitor class
+    Statistics visitor class
     """
     #: Dictionary keys must match attributes of Statistics class
     regexes = dict(

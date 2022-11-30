@@ -67,36 +67,52 @@ void FlippedRecoTracksMergerModule::event()
     //set the c_isFlippedAndRefitted bit
     track->setFlippedAndRefitted();
 
-    // loop over all particle hypothesis
-    for (const auto particleType : Const::chargedStableSet) {
-      // TODO: find better way to get non-const TrackFitResult pointers from the Track
-      auto oldFitResultPairIter = std::find_if(fitResultsBefore.begin(),
-      fitResultsBefore.end(), [&particleType](const Track::ChargedStableTrackFitResultPair & a) { return a.first == particleType;});
-      TrackFitResult* oldFitResult = nullptr;
-      if (oldFitResultPairIter != fitResultsBefore.end())  oldFitResult = oldFitResultPairIter->second;
 
-      auto flippedFitResultPairIter = std::find_if(fitResultsAfter.begin(),
-      fitResultsAfter.end(), [&particleType](const Track::ChargedStableTrackFitResultPair & a) { return a.first == particleType;});
-      TrackFitResult* flippedFitResult = nullptr;
-      if (flippedFitResultPairIter != fitResultsAfter.end())  flippedFitResult = flippedFitResultPairIter->second;
+    // debugging:
+    for (auto& index : track->getTrackFitResults()) std::cout << " B " << index.first.__repr__() << " - " << index.second << " w " <<
+                                                                index.second->getOmega() ;
+    std::cout << std::endl;
+    for (auto& index : trackFlipped->getTrackFitResultsByName("TrackFitResults_flipped")) std::cout << " F " << index.first.__repr__()
+          << " - " << index.second << " w " << index.second->getOmega();
+    std::cout << std::endl;
 
-      // no flipped track fit, skip and invalidate potential old results
-      if (!flippedFitResult) {
-        track->setTrackFitResultIndex(particleType, -1);
-        if (oldFitResult) oldFitResult->mask();
-        continue;
-      }
 
-      // if flipped result exists check if old exists then update, if it not exists add a new TrackFitResult
-      if (oldFitResult) {
-        oldFitResult->updateTrackFitResult(*flippedFitResult);
-      } else {
-        TrackFitResult* newFitResult = m_trackFitResults.appendNew();
-        newFitResult->updateTrackFitResult(*flippedFitResult);
-        const int newTrackFitResultArrayIndex = newFitResult->getArrayIndex();
-        track->setTrackFitResultIndex(particleType, newTrackFitResultArrayIndex);
+
+    // invalidate all TrackFitResults of old Track that dont exist in new Track
+    for (auto fitResult : fitResultsBefore) {
+      auto iterFitResult = std::find_if(fitResultsAfter.begin(),
+      fitResultsAfter.end(), [&fitResult](const Track::ChargedStableTrackFitResultPair & a) { return a.first == fitResult.first;});
+      // did not find this hypothesis in the new FitResults, so invalidate it
+      if (iterFitResult == fitResultsAfter.end()) {
+        track->setTrackFitResultIndex(fitResult.first, -1);
+        fitResult.second->mask();
       }
     }
+
+
+    // loop over new TrackFitResults and update or add new FitResults to the old Track
+    for (auto fitResult : fitResultsAfter) {
+
+      auto oldFitResultPairIter = std::find_if(fitResultsBefore.begin(),
+      fitResultsBefore.end(), [&fitResult](const Track::ChargedStableTrackFitResultPair & a) { return a.first == fitResult.first;});
+
+      // if old result exists update it, if not exists add a new TrackFitResult
+      if (oldFitResultPairIter != fitResultsBefore.end()) {
+        oldFitResultPairIter->second->updateTrackFitResult(*fitResult.second);
+      } else {
+        TrackFitResult* newFitResult = m_trackFitResults.appendNew();
+        newFitResult->updateTrackFitResult(*fitResult.second);
+        const int newTrackFitResultArrayIndex = newFitResult->getArrayIndex();
+        track->setTrackFitResultIndex(fitResult.first, newTrackFitResultArrayIndex);
+      }
+    }
+
+    //debugging
+    for (auto& index : track->getTrackFitResults()) std::cout << " A " << index.first.__repr__() << " - " << index.second << " w " <<
+                                                                index.second->getOmega() ;
+    std::cout << std::endl;
+
+
 
     const auto& measuredStateOnPlane = recoTrack.getMeasuredStateOnPlaneFromLastHit();
 

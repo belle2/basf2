@@ -109,7 +109,7 @@ if args.is3sample:
     zsemulator.param("outputSVDEventInfo", "SVDEventInfo")
     zsemulator.param("chooseStartingSample", False)
     zsemulator.param("chooseRelativeShift", True)
-    zsemulator.param("relativeShift", 9)
+    zsemulator.param("relativeShift", 7)
     zsemulator.param("SVDShaperDigits", "SVDShaperDigits6Sample")
     zsemulator.param("SVDEventInfo", "SVDEventInfo6Sample")
     main.add_module(zsemulator)

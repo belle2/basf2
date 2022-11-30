@@ -67,30 +67,6 @@ void FlippedRecoTracksMergerModule::event()
     //set the c_isFlippedAndRefitted bit
     track->setFlippedAndRefitted();
 
-    for (auto& index : track->getTrackFitResults()) std::cout << " B " << index.first.__repr__() << " - " << index.second;
-    std::cout << std::endl;
-    for (auto& index : trackFlipped->getTrackFitResults()) std::cout << " F " << index.first.__repr__() << " - " << index.second;
-    std::cout << std::endl;
-
-    /*
-        // loop over the original fitResults
-        for (long unsigned int index = 0; index < fitResultsBefore.size() ; index++) {
-          bool updatedFitResult = false;
-          for (long unsigned int index1 = 0; index1 < fitResultsAfter.size() ; index1++) {
-            if (fitResultsBefore[index].first == fitResultsAfter[index1].first) {
-
-              auto fitResultAfter  = fitResultsAfter[index1].second;
-              fitResultsBefore[index].second->updateTrackFitResult(*fitResultAfter);
-              updatedFitResult = true;
-            }
-
-          }
-          if (not updatedFitResult) {
-            fitResultsBefore[index].second->mask();
-            track->setTrackFitResultIndex(fitResultsBefore[index].first, -1);
-          }
-        }
-    */
     // loop over all particle hypothesis
     for (const auto particleType : Const::chargedStableSet) {
       // TODO: find better way to get non-const TrackFitResult pointers from the Track
@@ -103,10 +79,6 @@ void FlippedRecoTracksMergerModule::event()
       fitResultsAfter.end(), [&particleType](const Track::ChargedStableTrackFitResultPair & a) { return a.first == particleType;});
       TrackFitResult* flippedFitResult = nullptr;
       if (flippedFitResultPairIter != fitResultsAfter.end())  flippedFitResult = flippedFitResultPairIter->second;
-
-      // for old track get the TrackFitResult from the default StoreArray
-      //const TrackFitResult * oldFitResult = track->getTrackFitResult(particleType);
-      //const TrackFitResult * flippedFitResult = trackFlipped->getTrackFitResultByName(particleType, "TrackFitResults_flipped");
 
       // no flipped track fit, skip and invalidate potential old results
       if (!flippedFitResult) {
@@ -125,10 +97,6 @@ void FlippedRecoTracksMergerModule::event()
         track->setTrackFitResultIndex(particleType, newTrackFitResultArrayIndex);
       }
     }
-
-
-    for (auto& index : track->getTrackFitResults()) std::cout << " A " << index.first.__repr__() << " - " << index.second;
-    std::cout << std::endl;
 
     const auto& measuredStateOnPlane = recoTrack.getMeasuredStateOnPlaneFromLastHit();
 

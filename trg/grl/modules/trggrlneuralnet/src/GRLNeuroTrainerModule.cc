@@ -496,15 +496,15 @@ GRLNeuroTrainerModule::terminate()
     // skip sectors that have already been trained
     if (m_GRLNeuro[isector].isTrained())
       continue;
-    float nTrainMin = m_multiplyNTrain ? m_nTrainMin * m_GRLNeuro[isector].nWeights() : m_nTrainMin;
+    float nTrainMin = m_multiplyNTrain ? m_nTrainMin * m_GRLNeuro[isector].get_nWeights() : m_nTrainMin;
     std::cout << m_nTrainMin << " " << m_nValid << " " << m_nTest << std::endl;
-    if (m_trainSets[isector].nSamples() < (nTrainMin + m_nValid + m_nTest)) {
+    if (m_trainSets[isector].get_nSamples() < (nTrainMin + m_nValid + m_nTest)) {
       B2WARNING("Not enough training samples for sector " << isector << " (" << (nTrainMin + m_nValid + m_nTest)
-                << " requested, " << m_trainSets[isector].nSamples() << " found)");
+                << " requested, " << m_trainSets[isector].get_nSamples() << " found)");
       continue;
     }
     train(isector);
-    m_GRLNeuro[isector].trained = true;
+    m_GRLNeuro[isector].Trained(true);
     // save all networks (including the newly trained)
     m_GRLNeuro.save(m_filename, m_arrayname);
   }
@@ -524,16 +524,16 @@ GRLNeuroTrainerModule::train(unsigned isector)
   B2INFO("Training network for sector " << isector << " without OpenMP");
 #endif
   // initialize network
-  unsigned nLayers = m_GRLNeuro[isector].nLayers();
+  unsigned nLayers = m_GRLNeuro[isector].get_nLayers();
   unsigned* nNodes = new unsigned[nLayers];
   for (unsigned il = 0; il < nLayers; ++il) {
-    nNodes[il] = m_GRLNeuro[isector].nNodesLayer(il);
+    nNodes[il] = m_GRLNeuro[isector].get_nNodesLayer(il);
   }
   struct fann* ann = fann_create_standard_array(nLayers, nNodes);
   // initialize training and validation data
   GRLMLPData currentData = m_trainSets[isector];
   // train set
-  unsigned nTrain = m_trainSets[isector].nSamples() - m_nValid - m_nTest;
+  unsigned nTrain = m_trainSets[isector].get_nSamples() - m_nValid - m_nTest;
   struct fann_train_data* train_data =
     fann_create_train(nTrain, nNodes[0], nNodes[nLayers - 1]);
   for (unsigned i = 0; i < nTrain; ++i) {
@@ -576,7 +576,7 @@ GRLNeuroTrainerModule::train(unsigned isector)
     int breakEpoch = 0;
     int bestEpoch = 0;
     vector<fann_type> bestWeights = {};
-    bestWeights.assign(m_GRLNeuro[isector].nWeights(), 0.);
+    bestWeights.assign(m_GRLNeuro[isector].get_nWeights(), 0.);
     fann_randomize_weights(ann, -0.1, 0.1);
     // train and save the network
     for (int epoch = 1; epoch <= m_maxEpochs; ++epoch) {
@@ -630,10 +630,10 @@ GRLNeuroTrainerModule::train(unsigned isector)
     trainOptLog.push_back(trainLog[bestEpoch - 1]);
     validOptLog.push_back(validLog[bestEpoch - 1]);
     vector<float> oldWeights = m_GRLNeuro[isector].getWeights();
-    m_GRLNeuro[isector].weights = bestWeights;
+    m_GRLNeuro[isector].m_weights = bestWeights;
   }
   if (m_saveDebug) {
-    for (unsigned i = nTrain + m_nValid; i < m_trainSets[isector].nSamples(); ++i) {
+    for (unsigned i = nTrain + m_nValid; i < m_trainSets[isector].get_nSamples(); ++i) {
       vector<float> output = m_GRLNeuro.runMLP(isector, m_trainSets[isector].getInput(i));
       vector<float> target = m_trainSets[isector].getTarget(i);
       for (unsigned iout = 0; iout < output.size(); ++iout) {

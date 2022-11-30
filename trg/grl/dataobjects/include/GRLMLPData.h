@@ -16,29 +16,29 @@ namespace Belle2 {
   class GRLMLPData : public TObject {
   public:
     /** default constructor. */
-    GRLMLPData(): inputSamples(), targetSamples() { }
+    GRLMLPData(): m_inputSamples(), m_targetSamples() { }
     /** destructor, empty because we don't allocate memory anywhere. */
     ~GRLMLPData() { }
 
     /** add a pair of input and target */
     void addSample(const std::vector<float>& input, const std::vector<float>& target)
     {
-      inputSamples.push_back(input);
-      targetSamples.push_back(target);
+      m_inputSamples.push_back(input);
+      m_targetSamples.push_back(target);
     }
 
     /** get number of samples (same for input and target) */
-    unsigned nSamples() const { return targetSamples.size(); }
+    unsigned get_nSamples() const { return m_targetSamples.size(); }
     /** get input vector of sample i */
-    const std::vector<float>& getInput(unsigned i) const { return inputSamples[i]; }
+    const std::vector<float>& getInput(unsigned i) const { return m_inputSamples[i]; }
     /** get target value of sample i */
-    const std::vector<float>& getTarget(unsigned i) const { return targetSamples[i]; }
+    const std::vector<float>& getTarget(unsigned i) const { return m_targetSamples[i]; }
 
   private:
     /** list of input vectors for network training. */
-    std::vector<std::vector<float>> inputSamples;
+    std::vector<std::vector<float>> m_inputSamples;
     /** list of target values for network training. */
-    std::vector<std::vector<float>> targetSamples;
+    std::vector<std::vector<float>> m_targetSamples;
 
     //! Needed to make the ROOT object storable
     ClassDef(GRLMLPData, 1);

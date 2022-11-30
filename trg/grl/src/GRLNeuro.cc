@@ -118,12 +118,12 @@ GRLNeuro::runMLP(unsigned isector, const vector<float>& input)
   vector<float> layerinput = input;
   vector<float> layeroutput = {};
   unsigned iw = 0;
-  for (unsigned il = 1; il < expert.nLayers(); ++il) {
+  for (unsigned il = 1; il < expert.get_nLayers(); ++il) {
     //add bias input
     layerinput.push_back(1.);
     //prepare output
     layeroutput.clear();
-    layeroutput.assign(expert.nNodesLayer(il), 0.);
+    layeroutput.assign(expert.get_nNodesLayer(il), 0.);
     //loop over outputs
     for (unsigned io = 0; io < layeroutput.size(); ++io) {
       //loop over inputs
@@ -168,12 +168,12 @@ GRLNeuro::runMLPFix(unsigned isector, const vector<float>& input)
   vector<long> layerinput = inputFix;
   vector<long> layeroutput = {};
   unsigned iw = 0;
-  for (unsigned il = 1; il < expert.nLayers(); ++il) {
+  for (unsigned il = 1; il < expert.get_nLayers(); ++il) {
     // add bias input
     layerinput.push_back(1 << precisionInput);
     // prepare output
     layeroutput.clear();
-    layeroutput.assign(expert.nNodesLayer(il), 0);
+    layeroutput.assign(expert.get_nNodesLayer(il), 0);
     // loop over outputs
     for (unsigned io = 0; io < layeroutput.size(); ++io) {
       // loop over inputs

@@ -68,15 +68,6 @@ void FlippedRecoTracksMergerModule::event()
     track->setFlippedAndRefitted();
 
 
-    // debugging:
-    for (auto& index : track->getTrackFitResults()) std::cout << " B " << index.first.__repr__() << " - " << index.second << " w " <<
-                                                                index.second->getOmega() ;
-    std::cout << std::endl;
-    for (auto& index : trackFlipped->getTrackFitResultsByName("TrackFitResults_flipped")) std::cout << " F " << index.first.__repr__()
-          << " - " << index.second << " w " << index.second->getOmega();
-    std::cout << std::endl;
-
-
 
     // invalidate all TrackFitResults of old Track that dont exist in new Track
     for (auto fitResult : fitResultsBefore) {
@@ -107,10 +98,6 @@ void FlippedRecoTracksMergerModule::event()
       }
     }
 
-    //debugging
-    for (auto& index : track->getTrackFitResults()) std::cout << " A " << index.first.__repr__() << " - " << index.second << " w " <<
-                                                                index.second->getOmega() ;
-    std::cout << std::endl;
 
 
 

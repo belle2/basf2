@@ -145,7 +145,7 @@ class BaseFEISkim(BaseSkim):
         ma.fillParticleList(decayString="pi+:FEI_cleaned",
                             cut=CleanedTrackCuts, path=path)
         ma.fillParticleList(decayString="gamma:FEI_cleaned",
-                            cut=CleanedClusterCuts, path=path, loadPhotonBeamBackgroundMVA=False)
+                            cut=CleanedClusterCuts, path=path)
 
         ma.buildEventKinematics(inputListNames=["pi+:FEI_cleaned",
                                                 "gamma:FEI_cleaned"],

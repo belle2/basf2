@@ -1,0 +1,47 @@
+#EventType:1110040000
+#Descriptor:[B0 -> phi [-> K+ K-] K*0 [-> K+ pi-]]
+#NickName:Bd_phiKstar_K+K-K+pi-
+#Documentation:Rare B decay process
+#Tested:Yes
+#PhysicsWG:TDCPV
+#Responsible:Sayaka Imai
+#Email:was_imai@cc.nara-wu.ac.jp
+#Cuts:None
+#Date:20221201
+#
+#
+Alias   MyB0 B0
+Alias   Myanti-B0 anti-B0
+ChargeConj MyB0 Myanti-B0
+Alias   Myphi  phi
+Alias   MyK*0    K*0
+Alias   Myanti-K*0 anti-K*0
+ChargeConj MyK*0 Myanti-K*0
+
+
+# B0-B0bar mixing Delta m in PDG2022
+Define dm 0.5065e12
+
+Decay Upsilon(4S)
+1.000  B0 anti-B0 MyB0 Myanti-B0 VSS_BMIX dm;
+Enddecay
+
+Decay MyB0
+1.000    Myphi MyK*0    SVV_HELAMP 0.7069 2.4772 0.7050 0.0 0.0525 1.7413;
+
+Enddecay
+CDecay Myanti-B0
+
+Decay Myphi
+1.0     K+      K-     PHOTOS VSS;
+
+Enddecay
+
+Decay MyK*0
+1.0   K+       pi-     PHOTOS VSS;
+Enddecay
+CDecay Myanti-K*0
+
+End
+
+

@@ -63,6 +63,23 @@ void FlippedRecoTracksMergerModule::event()
       trackFlipped->getTrackFitResultsByName("TrackFitResults_flipped");
     std::vector<Track::ChargedStableTrackFitResultPair> fitResultsBefore = track->getTrackFitResults();
 
+
+    // Test if at least one track fit hypothesis of old track is present in the flippled track. If that is not the case
+    // the update procedure fails and will cause a FATAL downstream
+    bool isUpdatable = false;
+    for (const auto& oldFitResult : fitResultsBefore) {
+      if (std::find_if(fitResultsAfter.begin(), fitResultsAfter.end(), [&oldFitResult](Track::ChargedStableTrackFitResultPair & a) {
+      return a.first == oldFitResult.first;
+    }) != fitResultsAfter.end()) {
+        isUpdatable = true;
+        break;
+      }
+    }
+    if (not isUpdatable) {
+      continue;
+    }
+
+
     //set the c_isFlippedAndRefitted bit
     track->setFlippedAndRefitted();
 

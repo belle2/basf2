@@ -7,6 +7,7 @@
  **************************************************************************/
 
 #include <tracking/modules/FlippedRecoTracksMerger/FlippedRecoTracksMergerModule.h>
+#include <tracking/trackFitting/fitter/base/TrackFitter.h>
 
 using namespace Belle2;
 
@@ -22,6 +23,17 @@ FlippedRecoTracksMergerModule::FlippedRecoTracksMergerModule() :
            "Name of the input StoreArray");
   addParam("inputStoreArrayNameFlipped", m_inputStoreArrayNameFlipped,
            "Name of the input StoreArray for flipped tracks");
+
+  addParam("pxdHitsStoreArrayName", m_param_pxdHitsStoreArrayName, "StoreArray name of the input PXD hits.",
+           m_param_pxdHitsStoreArrayName);
+  addParam("svdHitsStoreArrayName", m_param_svdHitsStoreArrayName, "StoreArray name of the input SVD hits.",
+           m_param_svdHitsStoreArrayName);
+  addParam("cdcHitsStoreArrayName", m_param_cdcHitsStoreArrayName, "StoreArray name of the input CDC hits.",
+           m_param_cdcHitsStoreArrayName);
+  addParam("bklmHitsStoreArrayName", m_param_bklmHitsStoreArrayName, "StoreArray name of the input BKLM hits.",
+           m_param_bklmHitsStoreArrayName);
+  addParam("eklmHitsStoreArrayName", m_param_eklmHitsStoreArrayName, "StoreArray name of the input EKLM hits.",
+           m_param_eklmHitsStoreArrayName);
 }
 
 void FlippedRecoTracksMergerModule::initialize()
@@ -85,5 +97,11 @@ void FlippedRecoTracksMergerModule::event()
     }
 
     recoTrack.flipTrackDirectionAndCharge();
+    // Initialise the TrackFitter to refit the recoTrack and provide a valid genfit state
+    TrackFitter fitter(m_param_pxdHitsStoreArrayName, m_param_svdHitsStoreArrayName, m_param_cdcHitsStoreArrayName,
+                       m_param_bklmHitsStoreArrayName, m_param_eklmHitsStoreArrayName);
+    // PDG code 211 for pion is enough to get a valid track fit with a valid genfit::MeasuredStateOnPlane
+    Const::ChargedStable particleUsedForFitting(211);
+    fitter.fit(recoTrack, particleUsedForFitting);
   }
 }

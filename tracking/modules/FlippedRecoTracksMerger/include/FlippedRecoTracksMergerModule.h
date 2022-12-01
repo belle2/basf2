@@ -36,6 +36,16 @@ namespace Belle2 {
     void event() override;
 
   private:
+    /// StoreArray name of the PXD hits.
+    std::string m_param_pxdHitsStoreArrayName = "";
+    /// StoreArray name of the SVD hits.
+    std::string m_param_svdHitsStoreArrayName = "";
+    /// StoreArray name of the CDC hits.
+    std::string m_param_cdcHitsStoreArrayName = "";
+    /// StoreArray name of the BKLM hits.
+    std::string m_param_bklmHitsStoreArrayName = "";
+    /// StoreArray name of the EKLM hits.
+    std::string m_param_eklmHitsStoreArrayName = "";
     /// Name of the input StoreArray
     std::string m_inputStoreArrayName;
     /// store array for the input RecoTracks

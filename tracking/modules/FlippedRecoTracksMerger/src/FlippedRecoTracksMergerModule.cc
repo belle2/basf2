@@ -28,7 +28,6 @@ void FlippedRecoTracksMergerModule::initialize()
 {
   m_inputRecoTracks.isRequired(m_inputStoreArrayName);
   m_inputRecoTracksFlipped.isRequired(m_inputStoreArrayNameFlipped);
-  m_trackFitResults.isRequired();
 }
 
 void FlippedRecoTracksMergerModule::event()
@@ -67,44 +66,29 @@ void FlippedRecoTracksMergerModule::event()
     //set the c_isFlippedAndRefitted bit
     track->setFlippedAndRefitted();
 
+    // loop over the original fitResults
+    for (long unsigned int index = 0; index < fitResultsBefore.size() ; index++) {
+      bool updatedFitResult = false;
+      for (long unsigned int index1 = 0; index1 < fitResultsAfter.size() ; index1++) {
+        if (fitResultsBefore[index].first == fitResultsAfter[index1].first) {
 
+          auto fitResultAfter  = fitResultsAfter[index1].second;
+          fitResultsBefore[index].second->updateTrackFitResult(*fitResultAfter);
+          updatedFitResult = true;
+        }
 
-    // invalidate all TrackFitResults of old Track that dont exist in new Track
-    for (auto fitResult : fitResultsBefore) {
-      auto iterFitResult = std::find_if(fitResultsAfter.begin(),
-      fitResultsAfter.end(), [&fitResult](const Track::ChargedStableTrackFitResultPair & a) { return a.first == fitResult.first;});
-      // did not find this hypothesis in the new FitResults, so invalidate it
-      if (iterFitResult == fitResultsAfter.end()) {
-        track->setTrackFitResultIndex(fitResult.first, -1);
-        fitResult.second->mask();
+      }
+      if (not updatedFitResult) {
+        fitResultsBefore[index].second->mask();
+        track->setTrackFitResultIndex(fitResultsBefore[index].first, -1);
       }
     }
-
-
-    // loop over new TrackFitResults and update or add new FitResults to the old Track
-    for (auto fitResult : fitResultsAfter) {
-
-      auto oldFitResultPairIter = std::find_if(fitResultsBefore.begin(),
-      fitResultsBefore.end(), [&fitResult](const Track::ChargedStableTrackFitResultPair & a) { return a.first == fitResult.first;});
-
-      // if old result exists update it, if not exists add a new TrackFitResult
-      if (oldFitResultPairIter != fitResultsBefore.end()) {
-        oldFitResultPairIter->second->updateTrackFitResult(*fitResult.second);
-      } else {
-        TrackFitResult* newFitResult = m_trackFitResults.appendNew();
-        newFitResult->updateTrackFitResult(*fitResult.second);
-        const int newTrackFitResultArrayIndex = newFitResult->getArrayIndex();
-        track->setTrackFitResultIndex(fitResult.first, newTrackFitResultArrayIndex);
-      }
-    }
-
-
 
 
     const auto& measuredStateOnPlane = recoTrack.getMeasuredStateOnPlaneFromLastHit();
 
-    const TVector3& currentPosition = measuredStateOnPlane.getPos();
-    const TVector3& currentMomentum = measuredStateOnPlane.getMom();
+    const ROOT::Math::XYZVector& currentPosition = ROOT::Math::XYZVector(measuredStateOnPlane.getPos());
+    const ROOT::Math::XYZVector& currentMomentum = ROOT::Math::XYZVector(measuredStateOnPlane.getMom());
     const double& currentCharge = measuredStateOnPlane.getCharge();
 
     // revert the charge and momentum
@@ -116,6 +100,9 @@ void FlippedRecoTracksMergerModule::event()
     for (auto RecoHitInfo : RecoHitInfos) {
       RecoHitInfo->setSortingParameter(std::numeric_limits<unsigned int>::max() - RecoHitInfo->getSortingParameter());
     }
+
+    // swap outgoing and ingoing arm times (computed with SVD hits)
+    recoTrack.swapArmTimes();
 
   }
 }

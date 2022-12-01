@@ -139,6 +139,11 @@ void BaseRecoFitterModule::event()
         if (m_param_flipTrackIfFittedChargeNEQSeedCharge and
             recoTrack.getChargeSeed() != recoTrack.getMeasuredStateOnPlaneFromLastHit(trackRep).getCharge()) {
           recoTrack.flipTrackDirectionAndCharge(trackRep);
+
+          // The track momentum and charge have been reversed, which deleted the genfit::TrackStatus of the m_genfitTrack
+          // member of the recoTrack. To re-set the fit status, fit the track again, now with flipped momentum and charge.
+          Const::ChargedStable particleUsedForFitting(pdgCodeToUseForFitting);
+          fitter.fit(recoTrack, particleUsedForFitting);
         }
       } else {
         B2DEBUG(28, "       fit failed!");

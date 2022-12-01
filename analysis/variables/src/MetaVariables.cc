@@ -10,7 +10,7 @@
 #include <analysis/variables/MetaVariables.h>
 
 #include <analysis/VariableManager/Utility.h>
-#include <analysis/dataobjects/EventExtraInfo.h>
+#include <framework/dataobjects/EventExtraInfo.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/RestOfEvent.h>

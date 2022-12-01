@@ -664,19 +664,17 @@ class InelasticDarkMatterWithDarkHiggs(BaseSkim):
         skim_str = "InelasticDarkMatterWithDarkHiggs"
         n_track_event_cut = "[nCleanedTracks([nCDCHits > 20] and [thetaInCDCAcceptance] and [dr < 0.5] and [abs(dz) < 2]) < 5]"
 
-        track_requirements = "[(nPXDHits + nSVDHits + nCDCHits) > 6]"
-        binary_pid_e = "[binaryPID(11, 13) > 0.1]"
-        binary_pid_mu = "[binaryPID(11, 13) < 0.9]"
+        track_requirements = "[formula(nPXDHits + nSVDHits + nCDCHits) > 20]"
 
         ma.cutAndCopyList(
             f"e+:{skim_str}",
             "e+:all",
-            f"[{track_requirements} and {n_track_event_cut} and {binary_pid_e}]",
+            f"[{track_requirements} and {n_track_event_cut}]",
             path=path)
         ma.cutAndCopyList(
             f"mu+:{skim_str}",
             "mu+:all",
-            f"[{track_requirements} and {n_track_event_cut} and {binary_pid_mu}]",
+            f"[{track_requirements} and {n_track_event_cut}]",
             path=path)
 
         ma.reconstructDecay(
@@ -713,11 +711,30 @@ class InelasticDarkMatterWithDarkHiggs(BaseSkim):
             path=path,
         )
 
-        dr_cut = "[daughter(0, dr) > 0.2] or [daughter(1, dr) > 0.2]"
+        dr_cut = "[daughter(0, dr) > 0.05] or [daughter(1, dr) > 0.05]"
         vertex_fit_cut = "[daughter(0, chiProb) > 0.1] or [daughter(1, chiProb) > 0.1]"
         ma.reconstructDecay(
             decayString=f"beam:{skim_str} -> A0:{skim_str} chi2:{skim_str}",
             cut=f"[{dr_cut} and {vertex_fit_cut}]",
+            path=path,
+        )
+        ma.buildRestOfEvent(
+            target_list_name=f"beam:{skim_str}",
+            fillWithMostLikely=True,
+            path=path,
+        )
+        ma.appendROEMasks(
+            list_name=f"beam:{skim_str}",
+            mask_tuples=[
+                ("std_roe",
+                 "thetaInCDCAcceptance and nCDCHits>20 and dr < 0.5 and abs(dz) < 2",
+                 "thetaInCDCAcceptance and E > 0.05")],
+            path=path,
+         )
+
+        ma.applyCuts(
+            list_name=f"beam:{skim_str}",
+            cut="roeNeextra(std_roe) < 2.0",
             path=path,
         )
 

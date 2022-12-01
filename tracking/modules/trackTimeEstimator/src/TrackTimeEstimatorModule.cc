@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <tracking/modules/TrackTimeEstimator/TrackTimeEstimatorModule.h>
+#include <tracking/modules/trackTimeEstimator/TrackTimeEstimatorModule.h>
 #include <framework/logging/Logger.h>
 #include <framework/core/ModuleParam.templateDetails.h>
 
@@ -38,20 +38,24 @@ void TrackTimeEstimatorModule::event()
       for (auto& track : m_tracks) {
         // Access related recoTrack
         const auto& recoTrack = track.getRelatedTo<RecoTrack>();
-        // Get SVD hits
-        const std::vector SVDHitsList = recoTrack->getSVDHitList();
-        if (SVDHitsList.size() > 0) {
-          float averageTime = 0;
-          for (auto const& hit : SVDHitsList) { // Compute average of ClsTime
-            averageTime += hit->getClsTime();
+
+        // compute and set Track Time
+        float outgoingArmTime = recoTrack->getOutgoingArmTime();
+        float ingoingArmTime = recoTrack->getIngoingArmTime();
+
+        // check if recoTrack has both ingoing and outgoing arms
+        if (recoTrack->hasOutgoingArmTime() && recoTrack->hasIngoingArmTime()) {
+          if (outgoingArmTime <= ingoingArmTime) {
+            track.setTrackTime(outgoingArmTime - svdBestT0.eventT0);
+          } else {
+            track.setTrackTime(ingoingArmTime - svdBestT0.eventT0);
           }
-          averageTime = averageTime / (SVDHitsList.size());
-          track.setTrackTime(averageTime - svdBestT0.eventT0);
+        } else if (recoTrack->hasOutgoingArmTime() && !recoTrack->hasIngoingArmTime()) { // check if it has only outgoing arm
+          track.setTrackTime(outgoingArmTime - svdBestT0.eventT0);
+        } else if (!recoTrack->hasOutgoingArmTime() && recoTrack->hasIngoingArmTime()) { // check if it has only ingoing arm
+          track.setTrackTime(ingoingArmTime - svdBestT0.eventT0);
         }
       }
     }
   }
-
 }
-
-

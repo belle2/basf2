@@ -16,6 +16,9 @@
 #include <genfit/RKTrackRep.h>
 #include <genfit/MplTrackRep.h>
 #include <simulation/monopoles/MonopoleConstants.h>
+#include <svd/dataobjects/SVDCluster.h>
+
+#include <cmath>
 
 using namespace Belle2;
 
@@ -636,4 +639,95 @@ std::string RecoTrack::getInfoHTML() const
   out << "<br>";
 
   return out.str();
+}
+
+void RecoTrack::estimateArmTime()
+{
+  m_isArmTimeComputed = true;
+  const std::vector<RecoHitInformation*>& recoHits = getRecoHitInformations(true);
+  bool svdDone = false;
+  int nSVDHits = 0;
+  static RecoHitInformation::RecoHitDetector und = RecoHitInformation::RecoHitDetector::c_undefinedTrackingDetector;
+  RecoHitInformation::RecoHitDetector SVD = RecoHitInformation::RecoHitDetector::c_SVD;
+  RecoHitInformation::RecoHitDetector detIDpre = und;
+  RecoHitInformation::RecoHitDetector detIDpost = und;
+  float clusterTimeSum = 0;
+  float clusterTimeSigma2Sum = 0;
+  bool trackArmTimeDone = false;
+
+  // loop over the recoHits of the RecoTrack
+  for (const auto& recoHit : recoHits) {
+    RecoHitInformation::RecoHitDetector foundin = recoHit->getTrackingDetector();
+    if (!svdDone && foundin != SVD) {
+      detIDpre = foundin;
+      trackArmTimeDone = false;
+    }
+    if (foundin == SVD) {
+      RelationVector<SVDCluster> svdClusters = recoHit->getRelationsTo<SVDCluster>(m_storeArrayNameOfSVDHits);
+      clusterTimeSum += svdClusters[0]->getClsTime();
+      clusterTimeSigma2Sum += svdClusters[0]->getClsTimeSigma() * svdClusters[0]->getClsTimeSigma();
+      nSVDHits += 1;
+      svdDone = true;
+    } else {
+      // Compute the track arm times using SVD cluster times
+      if (svdDone && nSVDHits > 1) {
+        detIDpost = foundin;
+        if (!isOutgoingArm(detIDpre, detIDpost)) {
+          m_ingoingArmTime = clusterTimeSum / nSVDHits;
+          m_ingoingArmTimeError = std::sqrt(clusterTimeSigma2Sum / (nSVDHits * (nSVDHits - 1)));
+          m_hasIngoingArmTime = true;
+          m_nSVDHitsOfIngoingArm = nSVDHits;
+        } else {
+          m_outgoingArmTime = clusterTimeSum / nSVDHits;
+          m_outgoingArmTimeError = std::sqrt(clusterTimeSigma2Sum / (nSVDHits * (nSVDHits - 1)));
+          m_hasOutgoingArmTime = true;
+          m_nSVDHitsOfOutgoingArm = nSVDHits;
+        }
+        svdDone = false;
+        detIDpre = detIDpost;
+        detIDpost = und;
+        clusterTimeSum = 0;
+        nSVDHits = 0;
+        trackArmTimeDone = true;
+      }
+    }
+
+    // When the last recoHit is SVD, it does not enter in the else{} of if (detID == SVD) {...} else {...}
+    // where the track arm times are calculated, so they are calculated here.
+    // It will not reset all variables because it is run only at the last recoHit
+    if (!trackArmTimeDone && (recoHit == recoHits.back()) && nSVDHits > 1) {
+      if (!isOutgoingArm(detIDpre, detIDpost)) {
+        m_ingoingArmTime = clusterTimeSum / nSVDHits;
+        m_ingoingArmTimeError = std::sqrt(clusterTimeSigma2Sum / (nSVDHits * (nSVDHits - 1)));
+        m_hasIngoingArmTime = true;
+        m_nSVDHitsOfIngoingArm = nSVDHits;
+      } else {
+        m_outgoingArmTime = clusterTimeSum / nSVDHits;
+        m_outgoingArmTimeError = std::sqrt(clusterTimeSigma2Sum / (nSVDHits * (nSVDHits - 1)));
+        m_hasOutgoingArmTime = true;
+        m_nSVDHitsOfOutgoingArm = nSVDHits;
+      }
+    }
+  }
+}
+
+bool RecoTrack::isOutgoingArm(RecoHitInformation::RecoHitDetector pre, RecoHitInformation::RecoHitDetector post)
+{
+  static RecoHitInformation::RecoHitDetector und = RecoHitInformation::RecoHitDetector::c_undefinedTrackingDetector;
+  RecoHitInformation::RecoHitDetector PXD = RecoHitInformation::RecoHitDetector::c_PXD;
+  RecoHitInformation::RecoHitDetector CDC = RecoHitInformation::RecoHitDetector::c_CDC;
+  bool isOutgoing = true;
+  if (pre == PXD && post == CDC) isOutgoing = true;
+  else if (pre == und && post == CDC) isOutgoing = true;
+  else if (pre == PXD && post == und) isOutgoing = true;
+  else if (pre == CDC && post == PXD) isOutgoing = false;
+  else if (pre == und && post == PXD) isOutgoing = false;
+  else if (pre == CDC && post == und) isOutgoing = false;
+  else {
+    //TO DO
+    B2DEBUG(29,
+            "SVD-only? PXD-SVD-PXD??? --- use layer information to determine if the track arm is outgoing or ingoing! Considered --> 'OUT'");
+    isOutgoing = true;
+  }
+  return isOutgoing;
 }

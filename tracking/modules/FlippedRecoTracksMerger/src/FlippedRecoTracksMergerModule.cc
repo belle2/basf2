@@ -87,8 +87,8 @@ void FlippedRecoTracksMergerModule::event()
 
     const auto& measuredStateOnPlane = recoTrack.getMeasuredStateOnPlaneFromLastHit();
 
-    const ROOT::Math::XYZVector& currentPosition = ROOT::Math::XYZVector(measuredStateOnPlane.getPos());
-    const ROOT::Math::XYZVector& currentMomentum = ROOT::Math::XYZVector(measuredStateOnPlane.getMom());
+    const TVector3& currentPosition = measuredStateOnPlane.getPos();
+    const TVector3& currentMomentum = measuredStateOnPlane.getMom();
     const double& currentCharge = measuredStateOnPlane.getCharge();
 
     // revert the charge and momentum

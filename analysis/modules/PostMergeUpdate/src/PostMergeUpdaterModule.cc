@@ -13,6 +13,7 @@
 #include <analysis/utility/RotationTools.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <TDatabasePDG.h>
+#include <Math/Vector3D.h>
 
 namespace Belle2 {
   //-----------------------------------------------------------------
@@ -74,7 +75,7 @@ namespace Belle2 {
         ROOT::Math::PxPyPzEVector sec4v(sec3v.X(), sec3v.Y(), sec3v.Z(), E);
         ROOT::Math::PxPyPzEVector secCMS = T.labToCms(sec4v);
 
-        // relection:
+        // reflection:
         ROOT::Math::PxPyPzEVector secRoeCMS(-secCMS.X(), -secCMS.Y(), -secCMS.Z(), secCMS.E());
         ROOT::Math::PxPyPzEVector sec4roe = T.cmsToLab(secRoeCMS);
 
@@ -90,7 +91,6 @@ namespace Belle2 {
       rot.Rotate(-acos(dot), cros);
 
       // Closure test that rotation does what expected:
-
       B2Vector3D test = rot * sec3v;
       double smallValue = 1e-12;
       if ((abs(sin(test.Phi() - tag3v.Phi())) > smallValue) or (abs(test.Theta() - tag3v.Theta()) > smallValue)) {
@@ -135,10 +135,12 @@ namespace Belle2 {
 
             // Also Rotate:
             B2Vector3D position = helixO.getPerigee();
-            B2Vector3D momentum = rot * helixO.getMomentum(bz);
+            B2Vector3D momentum = rot * B2Vector3D(helixO.getMomentum(bz));
 
             // New helix
-            Helix helix(position, momentum, charge, bz);
+            //            Helix helix(position, momentum, charge, bz);
+            Helix helix(ROOT::Math::XYZVector(position.X(), position.Y(), position.Z()),
+                        ROOT::Math::XYZVector(momentum.X(), momentum.Y(), momentum.Z()), charge, bz);
 
             // Store back in the mdst:
             m_trackFits[t_idx]->m_tau[TrackFitResult::iD0]        = helix.getD0();

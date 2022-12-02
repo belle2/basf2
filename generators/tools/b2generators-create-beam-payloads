@@ -122,9 +122,10 @@ if __name__ == "__main__":
 
     #: Beamparameter object we want
     beamparams = Belle2.BeamParameters()
-    beamparams.setHER(values['energyHER'], values['angleHER'], __vec(values['covHER']))
-    beamparams.setLER(values['energyLER'], values['angleLER'], __vec(values['covLER']))
+    beamparams.setHER(values['energyHER'], values['angleXHER'], values['angleYHER'], __vec(values['covHER']))
+    beamparams.setLER(values['energyLER'], values['angleXLER'], values['angleYLER'], __vec(values['covLER']))
     beamparams.setVertex(ROOT.TVector3(*values['vertex']), __vec(values['covVertex']))
+
     flags = 0
     if values['generateCMS']:
         flags |= Belle2.BeamParameters.c_generateCMS
@@ -138,7 +139,6 @@ if __name__ == "__main__":
 
     # do we want to estimate uncertainties from smearing?
     if arguments.tries >  0:
-        # then we need the intial particle generator
         ROOT.gInterpreter.Declare("#include <generators/utilities/InitialParticleGeneration.h>")
         Belle2.DBStore.Instance().addConstantOverride("BeamParameters", beamparams)
         gen = Belle2.InitialParticleGeneration(Belle2.BeamParameters.c_smearALL)
@@ -150,7 +150,8 @@ if __name__ == "__main__":
             evt = gen.generate()
             e_cms.append(evt.getMass())
             cms = evt.getLER() + evt.getHER()
-            boosts.append(list(cms.BoostVector()))
+            boost_vect = ROOT.TVector3(cms.Px(), cms.Py(), cms.Pz())
+            boosts.append(list(boost_vect/cms.E()))
 
         e_cms = np.array(e_cms)
         energy_mean = e_cms.mean()
@@ -170,7 +171,8 @@ if __name__ == "__main__":
         energy_mean = cms.M()
         energy_spread = 0
         energy_error = 0
-        boost_mean = list(cms.BoostVector())
+        boost_vect = ROOT.TVector3(cms.Px()/cms.E(), cms.Py()/cms.E(), cms.Pz()/cms.E())
+        boost_mean = list(boost_vect)
         boost_cov = ROOT.TMatrixDSym(3)
 
     #: beamspot object
@@ -181,10 +183,11 @@ if __name__ == "__main__":
     for i in range(3):
         for j in range(3):
             pos_cov[i][j] = 1e-6 * vtx_cov[i][j]
-    
-    beamspot.setIP(beamparams.getVertex(), pos_cov)
+
+    vtx = ROOT.TVector3(beamparams.getVertex().X(), beamparams.getVertex().Y(), beamparams.getVertex().Z())
+    beamspot.setIP(vtx, pos_cov)
     beamspot.setSizeCovMatrix(vtx_cov)
-    
+
     #: invariant mass object
     invmass = Belle2.CollisionInvariantMass()
     invmass.setMass(energy_mean, energy_error, energy_spread)

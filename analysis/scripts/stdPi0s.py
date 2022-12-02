@@ -34,6 +34,7 @@ def stdPi0s(listtype="eff60_May2020", path=None, loadPhotonBeamBackgroundMVA=Fal
         listtype (str): name of standard list
         path (basf2.Path): modules are added to this path
         loadPhotonBeamBackgroundMVA (bool): If true, photon candidates will be assigned a beam background probability.
+        loadPhotonHadronicSplitOffMVA (bool): If true, photon candidates will be assigned a hadronic split-off probability.
     """
 
     if listtype != 'all':

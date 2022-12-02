@@ -34,6 +34,7 @@ def stdPhotons(listtype='loose', path=None, loadPhotonBeamBackgroundMVA=False, l
         listtype (str): name of standard list
         path (basf2.Path):           modules are added to this path
         loadPhotonBeamBackgroundMVA (bool): If true, photon candidates will be assigned a beam background probability.
+        loadPhotonHadronicSplitOffMVA (bool): If true, photon candidates will be assigned a hadronic split-off probability.
     """
 
     # all photons (all neutral ECLClusters that have the c_nPhotons hypothesis)

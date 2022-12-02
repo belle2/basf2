@@ -22,22 +22,18 @@ to achieve a selected cms energy.
 """
 
 
-import basf2
-import os
-from beamparameters import beamparameter_presets, calculate_beamparameters
 import argparse
-from ROOT import PyConfig
-PyConfig.IgnoreCommandLineOptions = True
-import ROOT
-from ROOT import Belle2
 import numpy as np
+
+import basf2
+from beamparameters import beamparameter_presets, calculate_beamparameters
 
 
 def __parse_floatlist(string):
     """Small helper function to parse a comma separated list of floats"""
     try:
         return [float(e) for e in string.split(",")]
-    except:
+    except BaseException:
         raise argparse.ArgumentTypeError("'%s' is not a valid list of comma separated float values" % string)
 
 
@@ -56,7 +52,7 @@ def __parse_iov(string):
         iov = [int(e) for e in string.split(",")]
         if len(iov) != 4:
             raise ValueError()
-    except:
+    except BaseException:
         raise argparse.ArgumentTypeError(
             "'%s' is not a valid iov. It should be of the format "
             "'firstExp,firstRun,lastExp,lastRun'" % string)
@@ -67,7 +63,9 @@ def __parse_iov(string):
         raise argparse.ArgumentTypeError("first run cannot be larger than final run")
     return iov
 
+
 def __vec(values):
+    import ROOT  # noqa
     vec = ROOT.std.vector("double")()
     for v in values:
         vec.push_back(v)
@@ -120,6 +118,10 @@ if __name__ == "__main__":
     #: command line arguments
     arguments = parser.parse_args()
 
+    # now we can import ROOT and Belle2
+    import ROOT  # noqa
+    from ROOT import Belle2  # noqa
+
     #: calculate beam parameter values from arguments
     values.update(calculate_beamparameters(arguments.preset, arguments.cms))
 
@@ -127,7 +129,7 @@ if __name__ == "__main__":
     # directly to the Beamparameters if they are set
     for arg, value in arguments.__dict__.items():
         if arg.startswith("param_") and value is not None:
-           values[arg[6:]] = value
+            values[arg[6:]] = value
 
     #: Beamparameter object we want
     beamparams = Belle2.BeamParameters()
@@ -147,7 +149,7 @@ if __name__ == "__main__":
     beamparams.setGenerationFlags(flags)
 
     # do we want to estimate uncertainties from smearing?
-    if arguments.tries >  0:
+    if arguments.tries > 0:
         ROOT.gInterpreter.Declare("#include <generators/utilities/InitialParticleGeneration.h>")
         Belle2.DBStore.Instance().addConstantOverride("BeamParameters", beamparams)
         gen = Belle2.InitialParticleGeneration(Belle2.BeamParameters.c_smearALL)

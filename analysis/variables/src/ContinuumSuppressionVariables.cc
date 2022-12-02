@@ -10,7 +10,7 @@
 
 #include <analysis/variables/ROEVariables.h>
 #include <analysis/VariableManager/Manager.h>
-#include <analysis/dataobjects/EventExtraInfo.h>
+#include <framework/dataobjects/EventExtraInfo.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ContinuumSuppression.h>
 #include <analysis/utility/ReferenceFrame.h>

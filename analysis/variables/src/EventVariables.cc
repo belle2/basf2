@@ -1007,9 +1007,9 @@ Returns NaN for data.
 [Eventbased][Calibration] The Event t0, is the time of the event relative to the trigger time.
 
 .. note::
-  The event time can be measured by several sub-detectors including the CDC, ECL, and TOP.
-  This Event t0 variable is the final combined value of all the event time measurements.
-  Currently only the CDC and ECL are used in this combination.
+  The event time can be measured by several sub-detectors including the SVD, CDC, ECL, and TOP.
+  This eventT0 variable is the final combined value of all the event time measurements.
+  Currently, only the SVD and ECL are used in this combination.
 )DOC","ns");
   }
 }

@@ -267,6 +267,15 @@ namespace Belle2 {
     // setters
 
     /**
+     * Sets PDG code
+     * @param pdg PDG code
+     */
+    void setPDGCode(const int pdg)
+    {
+      m_pdgCode = pdg;
+    }
+
+    /**
      * Sets Lorentz vector
      * @param p4 Lorentz vector
      */
@@ -494,6 +503,12 @@ namespace Belle2 {
      * @return nominal mass
      */
     double getPDGMass(void) const;
+
+    /**
+     * Returns particle nominal lifetime
+     * @return nominal lifetime [sec]
+     */
+    double getPDGLifetime() const;
 
     /**
      * Returns total energy

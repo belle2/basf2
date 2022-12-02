@@ -12,6 +12,8 @@
 #pragma link C++ class Belle2::ProfileInfo+; // checksum=0xf2e3190a, version=2
 #pragma link C++ class Belle2::MCInitialParticles+; // checksum=0x77c00ada, version=5
 #pragma link C++ class Belle2::DigitBase+; // checksum=0xd2fac950, version=2
+#pragma link C++ class Belle2::MergedEventConsistency+; // checksum=0x39886d50, version=1
+#pragma link C++ class Belle2::EventExtraInfo+; // checksum=0x965ad50b, version=2
 
 #pragma link C++ class Belle2::Helix+; // checksum=0xc11c13b7, version=2
 #pragma link C++ class Belle2::UncertainHelix+; // checksum=0xe2ab4508, version=2

@@ -27,7 +27,6 @@ from tracking.path_utils import (  # noqa
     add_svd_track_finding,
     add_track_fit_and_track_creator,
     add_prefilter_track_fit_and_track_creator,
-    add_postfilter_track_fit,
     add_vxd_track_finding_vxdtf2,
     add_svd_standalone_tracking,
     is_cdc_used,
@@ -47,7 +46,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
                                 use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False,
                                 add_cdcTrack_QI=True, add_vxdTrack_QI=False, add_recoTrack_QI=False,
                                 pxd_filtering_offline=False, append_full_grid_cdc_eventt0=False,
-                                flip_recoTrack=True):
+                                v0_finding=True, flip_recoTrack=True):
     """
     This function adds the **standard tracking reconstruction** modules
     to a path:
@@ -106,6 +105,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
         The reconstructed SVD/CDC tracks are used to define the ROIs and reject all PXD clusters outside of these.
     :param append_full_grid_cdc_eventt0: If True, the module FullGridChi2TrackTimeExtractor is added to the path
                                       and provides the CDC temporary EventT0.
+    :param v0_finding: if false, the V0Finder module is not executed
     :param flip_recoTrack: if true, add the recoTracks flipping function in the postfilter
     """
 
@@ -131,7 +131,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
     add_postfilter_tracking_reconstruction(path,
                                            components=components,
                                            pruneTracks=pruneTracks,
-                                           fit_tracks=fit_tracks,
+                                           v0_finding=v0_finding,
                                            reco_tracks=reco_tracks,
                                            prune_temporary_tracks=prune_temporary_tracks,
                                            flip_recoTrack=flip_recoTrack)
@@ -233,8 +233,8 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
                                                   add_mva_quality_indicator=add_recoTrack_QI)
 
 
-def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=False, fit_tracks=True, reco_tracks="RecoTracks",
-                                           prune_temporary_tracks=True, flip_recoTrack=True):
+def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=False, reco_tracks="RecoTracks",
+                                           prune_temporary_tracks=True, v0_finding=True, flip_recoTrack=True):
     """
     This function adds the tracking reconstruction modules not required to calculate HLT filter
     decision to a path.
@@ -242,20 +242,27 @@ def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=Fa
     :param path: The path to add the tracking reconstruction modules to
     :param components: the list of geometry components in use or None for all components.
     :param pruneTracks: Delete all hits except the first and the last in the found tracks.
-    :param fit_tracks: If false, the V0 module module will no be executed
+    :param v0_finding: If false, the V0 module will not be executed
     :param reco_tracks: Name of the StoreArray where the reco tracks should be stored
     :param prune_temporary_tracks: If false, store all information of the single CDC and VXD tracks before merging.
         If true, prune them.
     :param flip_recoTrack: if true, add the recoTracks flipping function in the postfilter
     """
 
-    if fit_tracks:
-        add_postfilter_track_fit(path, components=components, pruneTracks=pruneTracks, reco_tracks=reco_tracks)
+    # V0 finding
+    if v0_finding:
+        path.add_module('V0Finder', RecoTracks=reco_tracks, v0FitterMode=1)
 
+    # flip & refit to fix the charge of some tracks
     if flip_recoTrack:
         add_flipping_of_recoTracks(path, reco_tracks="RecoTracks")
 
+    # estimate the track time
     path.add_module('TrackTimeEstimator')
+
+    # prune
+    if pruneTracks:
+        add_prune_tracks(path, components=components, reco_tracks=reco_tracks)
 
     if prune_temporary_tracks or pruneTracks:
         path.add_module("PruneRecoHits")

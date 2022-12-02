@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 """
 Small tool to create beam parameter payloads for local usage.
 
@@ -12,6 +20,7 @@ You can supply all the arguments you can supply to the BeamParameters module and
 in addition choose a predefined preset (one of %s) and scale the beam energies
 to achieve a selected cms energy.
 """
+
 
 import basf2
 import os

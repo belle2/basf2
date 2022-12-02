@@ -72,7 +72,25 @@ void CDCDedxCorrectionModule::initialize()
       m_hadronpars.push_back(0.0);
     m_hadronpars.push_back(1.0);
   } else m_hadronpars = m_DBHadronCor->getHadronPars();
+
+  double actwg[56] = {0.};
+  int nactwire[56] = {0};
+
+  for (int jwire = 0; jwire < 14336; jwire++) {
+    int layer = getLayerInWire(jwire);
+    if (m_DBWireGains->getWireGain(jwire) > 0.) {
+      //active wire only
+      actwg[layer] += m_DBWireGains->getWireGain(jwire);
+      nactwire[layer]++;
+    }
+  }
+
+  for (int il = 0; il < 56; il++) {
+    if (nactwire[il] > 0)m_lgainavg.push_back(actwg[il] / nactwire[il]);
+    else m_lgainavg.push_back(0);
+  }
 }
+
 
 void CDCDedxCorrectionModule::event()
 {
@@ -173,7 +191,7 @@ void CDCDedxCorrectionModule::RunGainCorrection(double& dedx) const
   } else dedx = 0;
 }
 
-void CDCDedxCorrectionModule::WireGainCorrection(int wireID, double& dedx) const
+void CDCDedxCorrectionModule::WireGainCorrection(int wireID, double& dedx, int layer) const
 {
   double gain = m_DBWireGains->getWireGain(wireID);
   if (gain != 0) dedx = dedx / gain;
@@ -181,6 +199,9 @@ void CDCDedxCorrectionModule::WireGainCorrection(int wireID, double& dedx) const
     //rel-abs method needs all wire for cal but w/ this method post calis (e.g.final RG)
     //will also see all hitdedx but that is not an issue for track level calibration
     if (m_relative)dedx = 0;
+    else {
+      if (m_lgainavg.at(layer) > 0)dedx = dedx / m_lgainavg.at(layer);
+    }
   }
 }
 
@@ -240,7 +261,7 @@ void CDCDedxCorrectionModule::StandardCorrection(int adc, int layer, int wireID,
     RunGainCorrection(dedx);
 
   if (m_wireGain)
-    WireGainCorrection(wireID, dedx);
+    WireGainCorrection(wireID, dedx, layer);
 
   if (m_cosineCor)
     CosineCorrection(costheta, dedx);
@@ -254,7 +275,6 @@ void CDCDedxCorrectionModule::StandardCorrection(int adc, int layer, int wireID,
 
   if (m_oneDCell)
     OneDCorrection(layer, enta, dedx);
-
 }
 
 

@@ -60,7 +60,7 @@ namespace Belle2 {
     void RunGainCorrection(double& dedx) const;
 
     /** Perform a wire gain correction */
-    void WireGainCorrection(int wireID, double& dedx) const;
+    void WireGainCorrection(int wireID, double& dedx, int layer) const;
 
     /** Perform a 2D correction */
     void TwoDCorrection(int layer, double doca, double enta, double& dedx) const;
@@ -93,6 +93,22 @@ namespace Belle2 {
      * convert the actural ionization (I) to measured ionization (D) */
     double I2D(const double cosTheta, const double I) const;
 
+    /** Get the layer from wire */
+    int getLayerInWire(int wire)
+    {
+      int nwire = 160, layer = 0, superlayer;
+      for (int iw = 0; iw < 14336; iw++) {
+        if (iw == nwire) {
+          layer++;
+          superlayer = (layer - 2) / 6;
+          if (superlayer <= 0) superlayer = 1;
+          nwire = nwire + (160 + (superlayer - 1) * 32);
+        }
+        if (iw == wire) break;
+      }
+      return layer;
+    }
+
   private:
 
     bool m_relative; /**< boolean to apply relative or absolute correction */
@@ -123,6 +139,7 @@ namespace Belle2 {
     DBObjPtr<CDCDedxCosineEdge> m_DBCosEdgeCor; /**< cosine edge calibration */
 
     std::vector<double> m_hadronpars; /**< hadron saturation parameters */
+    std::vector<double> m_lgainavg; /**< average calibration factor for the layer */
 
     /** Recalculate the dE/dx mean values after corrections */
     void calculateMeans(double* mean, double* truncatedMean, double* truncatedMeanErr, const std::vector<double>& dedx) const;

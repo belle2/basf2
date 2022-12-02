@@ -10,7 +10,7 @@
 
 import basf2_mva
 import pandas as pd
-from root_pandas import to_root
+from uproot import recreate
 import uproot
 import numpy as np
 from matplotlib import pyplot as plt
@@ -46,7 +46,8 @@ def create_random_data():
     df = pd.DataFrame({"A": np.random.rand(1000), "B": np.random.rand(1000)})
     df["C"] = (df.A + df.B) / 2
 
-    to_root(df, file_name, store_index=False, key="tree")
+    with recreate(file_name) as outfile:
+        outfile['tree'] = df
     return file_name
 
 

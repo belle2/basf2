@@ -7,7 +7,7 @@
 ##########################################################################
 
 from ipython_tools import handler
-from root_pandas import read_root, to_root
+from uproot import recreate, concatenate
 import numpy as np
 import os.path
 from subprocess import check_output, CalledProcessError, STDOUT
@@ -220,7 +220,14 @@ class MVATeacherAndAnalyser:
             self._call_evaluation_routine()
             self._call_expert_routine()
 
-        df = read_root(self.expert_file_name).merge(read_root(self.test_file_name), left_index=True, right_index=True)
+        df = concatenate(
+            self.expert_file_name,
+            library='pd').merge(
+            concatenate(
+                self.test_file_name,
+                library='pd'),
+            left_index=True,
+            right_index=True)
 
         if self.use_jupyter:
             from IPython.display import display
@@ -238,13 +245,15 @@ class MVATeacherAndAnalyser:
     def _write_train_and_test_files(self):
         """Split the recorded file into two halves: training and test file and write it back"""
         # TODO: This seems to reorder the columns...
-        df = read_root(self.recording_file_name)
+        df = concatenate(self.recording_file_name, library='pd')
         mask = np.random.rand(len(df)) < 0.5
         training_sample = df[mask]
         test_sample = df[~mask]
 
-        to_root(training_sample, self.training_file_name, tree_key="records")
-        to_root(test_sample, self.test_file_name, tree_key="records")
+        with recreate(self.training_file_name) as outfile:
+            outfile["records"] = training_sample
+        with recreate(self.test_file_name) as outfile:
+            outfile["records"] = test_sample
 
     def _create_records_file(self):
         """

@@ -16,7 +16,7 @@
 </header>
 """
 
-from root_pandas import read_root
+from uproot import concatenate
 import matplotlib.pyplot as plt
 # import numpy as np
 
@@ -60,7 +60,7 @@ def PlottingCompHistos(var):
 if __name__ == '__main__':
 
     # load in the two root files
-    file = read_root("MCvalidation.root", key="EventShape")
+    file = concatenate("MCvalidation.root:EventShape", library='pd')
 
     bins = 25
 

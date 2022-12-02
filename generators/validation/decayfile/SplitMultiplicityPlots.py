@@ -16,7 +16,7 @@
 </header>
 """
 
-from root_pandas import read_root
+from uproot import concatenate
 import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib.gridspec as gridspec
@@ -128,7 +128,7 @@ def PlottingCompHistos(particle, varlp, varlm, legend):
 if __name__ == '__main__':
 
     # load in the root files
-    file = read_root("MCvalidation.root", key="Split")
+    file = concatenate("MCvalidation.root:Split", library="pd")
 
     B = 'charged'
 

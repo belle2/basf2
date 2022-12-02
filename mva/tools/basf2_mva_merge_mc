@@ -48,6 +48,7 @@ PyConfig.IgnoreCommandLineOptions = True
 import argparse
 import numpy as np
 from root_pandas import read_root
+import uproot 
 from sklearn.model_selection import train_test_split
 import os
 
@@ -102,15 +103,15 @@ if __name__ == '__main__':
     cut_sig = args.cut_sig if args.cut_sig is not None else args.cut
     cut_bkg = args.cut_bkg if args.cut_bkg is not None else args.cut
 
-    data_sig = sum(args.data_sig, [])
-    data_bkg = sum(args.data_bkg, [])
-    columns  = sum(args.columns,  [])
+    data_sig = list(map(lambda x: x+":%s"%args.treename, sum(args.data_sig, [])))
+    data_bkg = list(map(lambda x: x+":%s"%args.treename, sum(args.data_bkg, [])))
+    columns = sum(args.columns,  []) if len(args.columns) != 0 else None
 
     # Load the data
     print("Load data")
 
-    df_sig = read_root(data_sig, args.treename, columns, where=cut_sig)
-    df_bkg = read_root(data_bkg, args.treename, columns, where=cut_bkg)
+    df_sig = uproot.concatenate(data_sig, args.treename, columns, cut=cut_sig, library = 'pd')
+    df_bkg = uproot.concatenate(data_sig, args.treename, columns, cut=cut_sig, library = 'pd')
 
     n_sig = len(df_sig)
     n_bkg = len(df_bkg)
@@ -157,8 +158,13 @@ if __name__ == '__main__':
 
         print('Creating output files\n\t -  %s \n\t -  %s' % (filename+ '_train.root', filename + '_test.root'))
 
-        df_train.to_root(filename + '_train.root', args.treename)
-        df_test.to_root(filename + '_test.root', args.treename)
+        with uproot.recreate(filename + '_train.root') as outfile:
+            outfile[args.treename] = df_train
+        with uproot.recreate(filename + '_test.root') as outfile:
+            outfile[args.treename] = df_test
+
     else:
         print('Creating output file\n\t -  %s' % args.output)
-        df.to_root(args.output, args.treename)
+        with uproot.recreate(args.output) as outfile:
+            outfile[args.treename] = df
+

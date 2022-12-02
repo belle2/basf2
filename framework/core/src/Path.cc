@@ -106,7 +106,6 @@ void Path::doWhile(PathPtr path, const std::string& condition, unsigned int maxI
   addModule(module);
 }
 
-// Please note that addIndependentPath and addIndependentMergePath have similar structure, if you plan to update one function, check another too.
 void Path::addIndependentPath(const PathPtr& independent_path, std::string ds_ID, const boost::python::list& merge_back)
 {
   if (ds_ID.empty()) {
@@ -133,7 +132,6 @@ void Path::addIndependentPath(const PathPtr& independent_path, std::string ds_ID
   addModule(switchEnd);
 }
 
-// Please note that addIndependentPath and addIndependentMergePath have similar structure, if you plan to update one function, check another too.
 void Path::addIndependentMergePath(const PathPtr& independent_path, std::string ds_ID, const boost::python::list& merge_back,
                                    std::string consistency_check, bool event_mixing, bool merge_same_file)
 {

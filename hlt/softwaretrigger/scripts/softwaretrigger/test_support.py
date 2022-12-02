@@ -39,6 +39,15 @@ class CheckForCorrectHLTResults(basf2.Module):
             basf2.B2FATAL("ROIs are not present")
 
 
+def get_file_name(base_path, run_type, location, passthrough, simulate_events_of_doom_buster):
+    mode = ""
+    if passthrough:
+        mode += "_passthrough"
+    if simulate_events_of_doom_buster:
+        mode += "_eodb"
+    return os.path.join(base_path, f"{location.name}_{run_type.name}{mode}.root")
+
+
 def generate_input_file(run_type, location, output_file_name, exp_number, passthrough,
                         simulate_events_of_doom_buster):
     """
@@ -55,7 +64,7 @@ def generate_input_file(run_type, location, output_file_name, exp_number, passth
       EventsOfDoomBuster module by inflating the number of CDC hits
     """
     if os.path.exists(output_file_name):
-        return
+        return 1
 
     basf2.set_random_seed(12345)
 
@@ -159,6 +168,8 @@ def generate_input_file(run_type, location, output_file_name, exp_number, passth
 
     basf2.process(path)
 
+    return 0
+
 
 def test_script(script_location, input_file_name, temp_dir):
     """
@@ -244,16 +255,18 @@ def test_folder(location, run_type, exp_number, phase, passthrough=False,
 
     # The test is already run in a clean, temporary directory
     temp_dir = os.getcwd()
-    output_file_name = os.path.join(temp_dir, f"{location.name}_{run_type.name}.root")
-    generate_input_file(run_type=run_type, location=location,
-                        output_file_name=output_file_name, exp_number=exp_number,
-                        passthrough=passthrough,
-                        simulate_events_of_doom_buster=simulate_events_of_doom_buster)
+    prepare_path = os.environ["BELLE2_PREPARE_PATH"]
+    input_file_name = get_file_name(
+        prepare_path, run_type, location, passthrough, simulate_events_of_doom_buster)
+    # generate_input_file(run_type=run_type, location=location,
+    #                    output_file_name=output_file_name, exp_number=exp_number,
+    #                    passthrough=passthrough,
+    #                    simulate_events_of_doom_buster=simulate_events_of_doom_buster)
 
     script_dir = basf2.find_file(f"hlt/operation/{phase}/global/{location.name}/evp_scripts/")
     run_at_least_one = False
     for script_location in glob(os.path.join(script_dir, f"run_{run_type.name}*.py")):
         run_at_least_one = True
-        test_script(script_location, input_file_name=output_file_name, temp_dir=temp_dir)
+        test_script(script_location, input_file_name=input_file_name, temp_dir=temp_dir)
 
     assert run_at_least_one

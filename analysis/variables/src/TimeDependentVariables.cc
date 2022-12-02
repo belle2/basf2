@@ -394,7 +394,7 @@ namespace Belle2 {
       if (trackIndex.size() != 1) return realNaN;
       unsigned trackIndexInt = trackIndex.at(0);
 
-      return vert->getVtxFitTrackP(trackIndexInt).x();
+      return vert->getVtxFitTrackP(trackIndexInt).X();
     }
 
     double tagTrackMomentumY(const Particle* part, const std::vector<double>& trackIndex)
@@ -405,7 +405,7 @@ namespace Belle2 {
       if (trackIndex.size() != 1) return realNaN;
       unsigned trackIndexInt = trackIndex.at(0);
 
-      return vert->getVtxFitTrackP(trackIndexInt).y();
+      return vert->getVtxFitTrackP(trackIndexInt).Y();
     }
 
     double tagTrackMomentumZ(const Particle* part, const std::vector<double>& trackIndex)
@@ -416,7 +416,7 @@ namespace Belle2 {
       if (trackIndex.size() != 1) return realNaN;
       unsigned trackIndexInt = trackIndex.at(0);
 
-      return vert->getVtxFitTrackP(trackIndexInt).z();
+      return vert->getVtxFitTrackP(trackIndexInt).Z();
     }
 
     double tagTrackZ0(const Particle* part, const std::vector<double>& trackIndex)

@@ -235,6 +235,11 @@ Here is a list of trigger variables:
 .. b2-variables::
    :group: L1 Trigger
 
+.. tip::
+  Please see the `Trigger Bits section
+  <https://software.belle2.org/development/sphinx/trg/doc/index.html#trigger-bits>`__
+  for further details.
+  
 .. b2-variables::
    :group: Software Trigger
 

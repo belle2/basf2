@@ -31,8 +31,8 @@ const
 
 double IPTrackTimeEstimatorModule::estimateFlightLengthUsingSeedInformation(const RecoTrack& recoTrack) const
 {
-  const TVector3& position = recoTrack.getPositionSeed();
-  const TVector3& momentum = recoTrack.getMomentumSeed();
+  const ROOT::Math::XYZVector& position = recoTrack.getPositionSeed();
+  const ROOT::Math::XYZVector& momentum = recoTrack.getMomentumSeed();
   const short int charge = recoTrack.getChargeSeed();
 
   const double bZ = BFieldManager::getField(0, 0, 0).Z() / Unit::T;

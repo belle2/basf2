@@ -88,6 +88,7 @@ Environment::Environment() :
   m_steering(""),
   m_numberEventsOverride(0),
   m_inputFilesOverride(),
+  m_secondaryInputFilesOverride(),
   m_entrySequencesOverride(),
   m_outputFileOverride(""),
   m_numberProcessesOverride(-1),

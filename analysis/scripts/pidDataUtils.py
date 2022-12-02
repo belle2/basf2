@@ -12,6 +12,7 @@
 import numpy as np
 import pandas as pd
 import h5py
+import uproot
 
 
 def _make_const_lists():
@@ -85,16 +86,7 @@ def read_root(root_filenames):
         pandas.DataFrame: DataFrame containing the data of the ROOT datafile(s).
     """
 
-    import root_pandas as rtp
-
-    if isinstance(root_filenames, str):
-        root_filenames = [root_filenames]
-
-    df = rtp.read_root(root_filenames[0])
-    for i in range(1, len(root_filenames)):
-        df.append(rtp.read_root(root_filenames[i]), ignore_index=True, sort=False)
-
-    return df
+    return uproot.concatenate(root_filenames, library='pd')
 
 
 def make_h5(df, tags, out_filename, pdg=None, column=root_column):

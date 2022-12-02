@@ -42,24 +42,26 @@ ma.reconstructDecay(
 # match reconstructed with MC particles
 ma.matchMCTruth("B0", path=main)
 
-# Create list of variables to save into the output file
+# create list of variables to save into the output file
 b_vars = []
 
 standard_vars = vc.kinematics + vc.mc_kinematics + vc.mc_truth
 b_vars += vc.deltae_mbc
 b_vars += standard_vars
 
-# Variables for final states (electrons, positrons, pions) [S50]
+# variables for final states (electrons, positrons, pions) [S50]
 fs_vars = vc.pid + vc.track + vc.track_hits + standard_vars
 b_vars += vu.create_aliases_for_selected(
     fs_vars,
     "B0 -> [J/psi -> ^e+ ^e-] [K_S0 -> ^pi+ ^pi-]",
     prefix=["ep", "em", "pip", "pim"],
 )  # [E50]
-# Variables for J/Psi, KS
+
+# variables for J/Psi, KS
 jpsi_ks_vars = vc.inv_mass + standard_vars
 b_vars += vu.create_aliases_for_selected(jpsi_ks_vars, "B0 -> ^J/psi ^K_S0")
-# Also add kinematic variables boosted to the center of mass frame (CMS) [S60]
+
+# also add kinematic variables boosted to the center of mass frame (CMS) [S60]
 # for all particles
 cmskinematics = vu.create_aliases(
     vc.kinematics, "useCMSFrame({variable})", "CMS"
@@ -68,7 +70,7 @@ b_vars += vu.create_aliases_for_selected(
     cmskinematics, "^B0 -> [^J/psi -> ^e+ ^e-] [^K_S0 -> ^pi+ ^pi-]"
 )
 
-# Save variables to an output file (ntuple)
+# save variables to an output file (ntuple)
 ma.variablesToNtuple(
     "B0",
     variables=b_vars,
@@ -77,7 +79,7 @@ ma.variablesToNtuple(
     path=main,
 )
 
-# Start the event loop (actually start processing things)
+# start the event loop (actually start processing things)
 b2.process(main)
 
 # print out the summary

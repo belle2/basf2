@@ -10,7 +10,7 @@
 #include <tracking/trackFindingCDC/numerics/WithWeight.h>
 
 #include <genfit/MeasuredStateOnPlane.h>
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 
 #include <vector>
 
@@ -98,13 +98,13 @@ namespace Belle2 {
     }
 
     /// Get the position this track should start at
-    const TVector3& getPosition() const
+    const ROOT::Math::XYZVector& getPosition() const
     {
       return m_trackPosition;
     }
 
     /// Get the momentum this track should start at (defined at the position)
-    const TVector3& getMomentum() const
+    const ROOT::Math::XYZVector& getMomentum() const
     {
       return m_trackMomentum;
     }
@@ -145,9 +145,9 @@ namespace Belle2 {
     /// The minimal chi2 of the single states NAN means there is no valid chi2 at all.
     double m_minimalChi2 = NAN;
     /// The position this track should start at
-    TVector3 m_trackPosition;
+    ROOT::Math::XYZVector m_trackPosition;
     /// The momentum this track should start at (defined at the position)
-    TVector3 m_trackMomentum;
+    ROOT::Math::XYZVector m_trackMomentum;
     /// The charge of the track
     short m_trackCharge = 0;
     /// The stored sum of weights

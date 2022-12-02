@@ -240,10 +240,10 @@ void SVDROIFinderAnalysisDataModule::event()
 
     const TrackFitResult* tfr = m_tracks[i]->getTrackFitResultWithClosestMass(Const::pion);
 
-    TVector3 mom = tfr->getMomentum();
-    m_h1Track_pt->Fill(mom.Perp());
+    ROOT::Math::XYZVector mom = tfr->getMomentum();
+    m_h1Track_pt->Fill(mom.Rho());
     m_h1Track_phi->Fill(mom.Phi());
-    m_h1Track_cosTheta->Fill(mom.CosTheta());
+    m_h1Track_cosTheta->Fill(cos(mom.Theta()));
     m_h1Track_lambda->Fill(TMath::Pi() / 2 - mom.Theta());
     m_h1Track_pVal->Fill(tfr->getPValue());
 
@@ -277,11 +277,11 @@ void SVDROIFinderAnalysisDataModule::event()
       continue;
     }
 
-    TVector3 mom = tfr->getMomentum();
+    ROOT::Math::XYZVector mom = tfr->getMomentum();
     m_h1ROItrack->Fill(1);
-    m_h1ROItrack_pt->Fill(mom.Perp());
+    m_h1ROItrack_pt->Fill(mom.Rho());
     m_h1ROItrack_phi->Fill(mom.Phi());
-    m_h1ROItrack_cosTheta->Fill(mom.CosTheta());
+    m_h1ROItrack_cosTheta->Fill(cos(mom.Theta()));
     m_h1ROItrack_lambda->Fill(TMath::Pi() / 2 - mom.Theta());
     m_h1ROItrack_pVal->Fill(tfr->getPValue());
 
@@ -321,9 +321,9 @@ void SVDROIFinderAnalysisDataModule::event()
              ": U side " << m_ROIs[i]->getMinUid() << "->" << m_ROIs[i]->getMaxUid() << ", V side " << m_ROIs[i]->getMinVid() << "->" <<
              m_ROIs[i]->getMaxVid());
 
-    m_h1GoodROItrack_pt->Fill(mom.Perp());
+    m_h1GoodROItrack_pt->Fill(mom.Rho());
     m_h1GoodROItrack_phi->Fill(mom.Phi());
-    m_h1GoodROItrack_cosTheta->Fill(mom.CosTheta());
+    m_h1GoodROItrack_cosTheta->Fill(cos(mom.Theta()));
     m_h1GoodROItrack_lambda->Fill(TMath::Pi() / 2 - mom.Theta());
     m_h1GoodROItrack_pVal->Fill(tfr->getPValue());
 
@@ -333,9 +333,9 @@ void SVDROIFinderAnalysisDataModule::event()
 
         m_h2FullROIcenters->Fill(centerROIU, centerROIV);
         m_h1FullROItrack->Fill(1);
-        m_h1FullROItrack_pt->Fill(mom.Perp());
+        m_h1FullROItrack_pt->Fill(mom.Rho());
         m_h1FullROItrack_phi->Fill(mom.Phi());
-        m_h1FullROItrack_cosTheta->Fill(mom.CosTheta());
+        m_h1FullROItrack_cosTheta->Fill(cos(mom.Theta()));
         m_h1FullROItrack_lambda->Fill(TMath::Pi() / 2 - mom.Theta());
         m_h1FullROItrack_pVal->Fill(tfr->getPValue());
 

@@ -8,7 +8,12 @@
 
 #include <mdst/modules/EventMerging/FixMergedObjectsModule.h>
 
+#include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/ParticleList.h>
 #include <framework/gearbox/Const.h>
+#include <framework/logging/Logger.h>
+
+#include <boost/algorithm/string.hpp>
 
 using namespace Belle2;
 
@@ -35,6 +40,16 @@ void FixMergedObjectsModule::initialize()
   m_tracks.isOptional();
   m_v0s.isOptional();
   m_mcParticles.isOptional();
+  // Throw a warning if Particles and ParticleList are found in the DataStore: they are likely "broken" after the
+  // event embedding
+  const auto particleArrays{DataStore::Instance().getListOfArrays(Particle::Class(), DataStore::c_Event)};
+  if (particleArrays.size() > 0)
+    B2WARNING("Some Particle arrays are found in the DataStore: they are likely invalid/broken after having used the event embedding!"
+              << LogVar("Particle array names", boost::algorithm::join(particleArrays, " ")));
+  const auto particleListObjects{DataStore::Instance().getListOfObjects(ParticleList::Class(), DataStore::c_Event)};
+  if (particleListObjects.size() > 0)
+    B2WARNING("Some ParticleList objects are found in the DataStore: they are likely invalid/broken after having used the event embedding!"
+              << LogVar("ParticleList object names", boost::algorithm::join(particleListObjects, " ")));
 }
 
 void FixMergedObjectsModule::event()

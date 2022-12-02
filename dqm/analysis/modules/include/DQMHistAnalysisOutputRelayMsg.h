@@ -12,7 +12,7 @@
 
 #pragma once
 
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 #include <TSocket.h>
 #include <string>
 
@@ -67,7 +67,8 @@ namespace Belle2 {
     int m_port;
     /** The hostname of the canvas server. */
     std::string m_hostname;
-
+    /** Send untagged canvase by default */
+    bool m_canvasSendDefault{true};
   };
 } // end namespace Belle2
 

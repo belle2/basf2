@@ -22,10 +22,13 @@
 #include <vector>
 #include <algorithm>
 
+using namespace std;
+using namespace ROOT::Math;
+
 namespace Belle2 {
   namespace TOP {
 
-    TOPTrack::TrackAngles::TrackAngles(const TVector3& dir):
+    TOPTrack::TrackAngles::TrackAngles(const XYZVector& dir):
       cosTh(dir.Z()), sinTh(sqrt(1 - cosTh * cosTh)), cosFi(dir.X() / sinTh), sinFi(dir.Y() / sinTh)
     {}
 
@@ -113,7 +116,7 @@ namespace Belle2 {
       m_momentum = m_extHit->getMomentum().R();
       m_charge = fitResult->getChargeSign();
       m_TOFLength = m_extHit->getTOF() * Const::speedOfLight * getBeta(chargedStable);
-      m_valid = setHelix(m_alignment->getRotation(m_moduleID), m_alignment->getTranslation(m_moduleID));
+      m_valid = setHelix(m_alignment->getTransformation(m_moduleID));
       if (not m_valid) return;
 
       // selection of photon hits belonging to this track
@@ -160,7 +163,7 @@ namespace Belle2 {
     }
 
 
-    bool TOPTrack::setHelix(const TRotation& rotation, const TVector3& translation)
+    bool TOPTrack::setHelix(const Transform3D& transform)
     {
       m_emissionPoints.clear();
 
@@ -168,12 +171,12 @@ namespace Belle2 {
 
       const auto* geo = TOPGeometryPar::Instance()->getGeometry();
       const auto& module = geo->getModule(m_moduleID);
-      auto globalPosition = m_extHit->getPositionTVector3();
-      auto position = module.pointGlobalToNominal(globalPosition);
-      auto momentum = module.momentumGlobalToNominal(m_extHit->getMomentumTVector3());
+      auto globalPosition = m_extHit->getPosition();
+      auto position = module.pointGlobalToNominal(static_cast<XYZPoint>(globalPosition));
+      auto momentum = module.momentumGlobalToNominal(m_extHit->getMomentum());
       double Bz = BFieldManager::getField(globalPosition).Z();
       m_helix.set(position, momentum, m_charge, Bz);
-      m_helix.setTransformation(rotation, translation);
+      m_helix.setTransformation(transform);
 
       // geometry data
 
@@ -182,24 +185,24 @@ namespace Belle2 {
 
       // bar surfaces in module nominal frame
 
-      std::vector<TVector3> points;
-      std::vector<TVector3> normals;
-      points.push_back(rotation * TVector3(0, -bar.B / 2, 0) + translation); // lower
-      normals.push_back(rotation * TVector3(0, -1, 0));
+      std::vector<XYZPoint> points;
+      std::vector<XYZVector> normals;
+      points.push_back(transform * XYZPoint(0, -bar.B / 2, 0)); // lower
+      normals.push_back(transform * XYZVector(0, -1, 0));
 
-      points.push_back(rotation * TVector3(0, bar.B / 2, 0) + translation); // upper
-      normals.push_back(rotation * TVector3(0, 1, 0));
+      points.push_back(transform * XYZPoint(0, bar.B / 2, 0)); // upper
+      normals.push_back(transform * XYZVector(0, 1, 0));
 
-      points.push_back(rotation * TVector3(-bar.A / 2, 0, 0) + translation); // left side
-      normals.push_back(rotation * TVector3(-1, 0, 0));
+      points.push_back(transform * XYZPoint(-bar.A / 2, 0, 0)); // left side
+      normals.push_back(transform * XYZVector(-1, 0, 0));
 
-      points.push_back(rotation * TVector3(bar.A / 2, 0, 0) + translation); // right side
-      normals.push_back(rotation * TVector3(1, 0, 0));
+      points.push_back(transform * XYZPoint(bar.A / 2, 0, 0)); // right side
+      normals.push_back(transform * XYZVector(1, 0, 0));
 
       // intersection with quartz bar
 
       std::vector<double> lengths; // w.r.t extHit position
-      std::vector<TVector3> positions; // in module local frame
+      std::vector<XYZPoint> positions; // in module local frame
       for (size_t i = 0; i < 2; i++) {
         double t = m_helix.getDistanceToPlane(points[i], normals[i]);
         if (isnan(t)) return false;
@@ -219,14 +222,14 @@ namespace Belle2 {
 
       if (positions[0].Z() < bar.zL or positions[1].Z() < bar.zL) {
         const RaytracerBase::Prism prism(module);
-        bool ok = xsecPrism(lengths, positions, prism, rotation, translation);
+        bool ok = xsecPrism(lengths, positions, prism, transform);
         if (not ok) return false;
       }
 
       // crossing mirror surface?
 
       std::vector<bool> outOfBar;
-      TVector3 rc(mirror.xc, mirror.yc, mirror.zc);
+      XYZPoint rc(mirror.xc, mirror.yc, mirror.zc);
       double Rsq = mirror.R * mirror.R;
       for (const auto& r : positions) {
         outOfBar.push_back((r - rc).Mag2() > Rsq);
@@ -263,24 +266,23 @@ namespace Belle2 {
     }
 
 
-    bool TOPTrack::xsecPrism(std::vector<double>& lengths, std::vector<TVector3>& positions,
-                             const RaytracerBase::Prism& prism, const TRotation& rotation,
-                             const TVector3& translation)
+    bool TOPTrack::xsecPrism(std::vector<double>& lengths, std::vector<XYZPoint>& positions,
+                             const RaytracerBase::Prism& prism, const Transform3D& transform)
     {
-      std::vector<TVector3> points;
-      std::vector<TVector3> normals;
+      std::vector<XYZPoint> points;
+      std::vector<XYZVector> normals;
 
-      points.push_back(rotation * TVector3(0, prism.yDown, 0) + translation); // lower-most surface
-      normals.push_back(rotation * TVector3(0, -1, 0));
+      points.push_back(transform * XYZPoint(0, prism.yDown, 0)); // lower-most surface
+      normals.push_back(transform * XYZVector(0, -1, 0));
 
-      points.push_back(rotation * TVector3(0, prism.yUp, 0) + translation); // upper surface
-      normals.push_back(rotation * TVector3(0, 1, 0));
+      points.push_back(transform * XYZPoint(0, prism.yUp, 0)); // upper surface
+      normals.push_back(transform * XYZVector(0, 1, 0));
 
-      points.push_back(rotation * TVector3(-prism.A / 2, 0, 0) + translation); // left-side surface
-      normals.push_back(rotation * TVector3(-1, 0, 0));
+      points.push_back(transform * XYZPoint(-prism.A / 2, 0, 0)); // left-side surface
+      normals.push_back(transform * XYZVector(-1, 0, 0));
 
-      points.push_back(rotation * TVector3(prism.A / 2, 0, 0) + translation); // right-side surface
-      normals.push_back(rotation * TVector3(1, 0, 0));
+      points.push_back(transform * XYZPoint(prism.A / 2, 0, 0)); // right-side surface
+      normals.push_back(transform * XYZVector(1, 0, 0));
 
       for (size_t i = 0; i < 2; i++) {
         if (positions[i].Z() < prism.zR) {
@@ -288,7 +290,7 @@ namespace Belle2 {
           if (isnan(t)) return false;
           auto r = m_helix.getPosition(t);
           if (i == 0 and r.Z() > prism.zFlat) { // intersection with slanted surface -> find it using bisection
-            auto point = rotation * TVector3(0, -prism.B / 2, 0) + translation;
+            auto point = transform * XYZPoint(0, -prism.B / 2, 0);
             double t1 = m_helix.getDistanceToPlane(point, normals[0]);
             if (isnan(t1)) return false;
             double t2 = t;

@@ -9,29 +9,15 @@
 // Own include
 #include <dqm/analysis/modules/DQMHistAnalysisCDCMonObj.h>
 
-//DQM
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
-
 // CDC geometry
 #include <cdc/geometry/CDCGeometryPar.h>
 
-#include <TH1.h>
-#include <TH1F.h>
-#include <TH2F.h>
-#include <TH2Poly.h>
+#include <TROOT.h>
 #include <TEllipse.h>
 #include <TF1.h>
-#include <TCanvas.h>
 #include <TLine.h>
-#include <TClass.h>
-#include <TROOT.h>
-#include <TString.h>
-#include <TFile.h>
 #include <TStyle.h>
 
-#include <fstream>
-#include <vector>
-#include <algorithm>
 #include <numeric>
 
 using namespace std;

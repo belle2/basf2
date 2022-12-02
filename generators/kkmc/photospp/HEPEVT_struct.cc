@@ -74,6 +74,8 @@ namespace Photospp {
     hep.phep[i][2] = particle->getPz();
     hep.phep[i][3] = particle->getE();
 
+    particle->getVertexPosition(&hep.vhep[i][0], &hep.vhep[i][1], &hep.vhep[i][2], &hep.vhep[i][3]);
+
     // if massFrom4Vector=true (default) - get sqrt(e^2-p^2)
     // otherwise - get mass from event record
     if (!Photos::massFrom4Vector) hep.phep[i][4] = particle->getMass();
@@ -95,11 +97,6 @@ namespace Photospp {
         }
       }
     }
-
-    hep.vhep[i][0] = 0;
-    hep.vhep[i][1] = 0;
-    hep.vhep[i][2] = 0;
-    hep.vhep[i][3] = 0;
 
     hep.qedrad[i] = 1;
 
@@ -209,6 +206,8 @@ namespace Photospp {
                                                               hep.phep[index][1],
                                                               hep.phep[index][2],
                                                               hep.phep[index][3]);
+
+      new_particle->setVertexPosition(hep.vhep[index][0], hep.vhep[index][1], hep.vhep[index][2], hep.vhep[index][3]);
 
       //add into the event record
       //get mother particle of new particle

@@ -23,8 +23,8 @@
 #include <cdc/translators/RealisticTDCCountTranslator.h>
 #include <cdc/translators/LinearGlobalADCCountTranslator.h>
 
-#include <cdc/dataobjects/TDCCountTranslatorBase.h>
-#include <cdc/dataobjects/ADCCountTranslatorBase.h>
+#include <cdc/translators/TDCCountTranslatorBase.h>
+#include <cdc/translators/ADCCountTranslatorBase.h>
 
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/WireID.h>

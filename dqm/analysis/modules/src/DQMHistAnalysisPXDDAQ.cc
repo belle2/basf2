@@ -7,7 +7,7 @@
  **************************************************************************/
 //+
 // File : DQMHistAnalysisPXDDAQ.cc
-// Description : Analysis of PXD Reduction
+// Description : Analysis of PXD DAQ and Issues
 //-
 
 

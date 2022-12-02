@@ -9,7 +9,7 @@
 #pragma once
 
 /* DQM headers. */
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 
 /* Belle 2 headers. */
 #include <framework/database/DBObjPtr.h>
@@ -87,12 +87,13 @@ namespace Belle2 {
      * @param[in]  subdetector  Subdetector.
      * @param[in]  section      Section.
      * @param[in]  sector       Sector.
+     * @param[in]  index        Histogram Index.
      * @param[in]  histogram    Histogram.
      * @param[in]  canvas       Canvas.
      * @param[out] latex        TLatex to draw messages.
      */
     void analyseChannelHitHistogram(
-      int subdetector, int section, int sector,
+      int subdetector, int section, int sector, int index,
       TH1* histogram, TCanvas* canvas, TLatex& latex);
 
     /**
@@ -185,6 +186,9 @@ namespace Belle2 {
 
     /** Electronics map. */
     DBObjPtr<KLMElectronicsMap> m_ElectronicsMap;
+
+    /** Monitoring object. */
+    MonitoringObject* m_monObj {};
 
   };
 

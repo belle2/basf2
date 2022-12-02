@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <cdc/dataobjects/CDCGeometryTranslatorBase.h>
+#include <cdc/translators/CDCGeometryTranslatorBase.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 
 namespace Belle2 {

@@ -30,7 +30,7 @@ namespace Belle2 {
    */
   TrackFitResult const* addDummyTrack(StoreArray<TrackFitResult>& trackFitResults, Const::ChargedStable particeType)
   {
-    const TVector3 dummyVector3;
+    const ROOT::Math::XYZVector dummyVector3;
     const TMatrixDSym dummyMatrix(6);
     const int charge = 1;
     const float pValue = 1.;

@@ -118,9 +118,9 @@ genfit::SharedPlanePtr CDCRecoHit::constructPlane(const genfit::StateOnPlane& st
   dirInPoca.SetMag(1.);
   const TVector3& pocaOnWire = wire1 + wireDirection.Dot(poca - wire1) * wireDirection;
   //temp
-  //  std::cout << (noSagWire1 + noSagWireDirection.Dot(noSagPoca - noSagWire1) * noSagWireDirection).y() <<" "<< pocaOnWire.y() <<" " << (noSagWire1 + noSagWireDirection.Dot(noSagPoca - noSagWire1) * noSagWireDirection - pocaOnWire).y() << std::endl;
+  //  std::cout << (noSagWire1 + noSagWireDirection.Dot(noSagPoca - noSagWire1) * noSagWireDirection).Y() <<" "<< pocaOnWire.Y() <<" " << (noSagWire1 + noSagWireDirection.Dot(noSagPoca - noSagWire1) * noSagWireDirection - pocaOnWire).Y() << std::endl;
   //  std::cout << (noSagWire1 + noSagWireDirection.Dot(noSagPoca - noSagWire1) * noSagWireDirection).Perp() <<" "<< pocaOnWire.Perp() << std::endl;
-  //  std::cout << (noSagWire1 + noSagWireDirection.Dot(noSagPoca - noSagWire1) * noSagWireDirection).z() <<" "<< pocaOnWire.z() << std::endl;
+  //  std::cout << (noSagWire1 + noSagWireDirection.Dot(noSagPoca - noSagWire1) * noSagWireDirection).Z() <<" "<< pocaOnWire.Z() << std::endl;
 
   // check if direction is parallel to wire
   if (fabs(wireDirection.Angle(dirInPoca)) < 0.01) {
@@ -149,14 +149,14 @@ std::vector<genfit::MeasurementOnPlane*> CDCRecoHit::constructMeasurementsOnPlan
 //  double theta = CDCGeometryPar::Instance().getTheta(p);
 
 //N.B. The folowing 8 lines are tentative to avoid the circular dependence mentioned above ! The definitions of alpha and theta should be identical to those defined in CDCGeometryPar.
-  const double wx = state.getPlane()->getO().x();
-  const double wy = state.getPlane()->getO().y();
-  const double px = p.x();
-  const double py = p.y();
+  const double wx = state.getPlane()->getO().X();
+  const double wy = state.getPlane()->getO().Y();
+  const double px = p.X();
+  const double py = p.Y();
   const double cross = wx * py - wy * px;
   const double dot   = wx * px + wy * py;
   double alpha = atan2(cross, dot);
-  double theta = atan2(p.Perp(), p.z());
+  double theta = atan2(p.Perp(), p.Z());
   /*
   double alpha0 =  CDCGeometryPar::Instance().getAlpha(state.getPlane()->getO(), p);
   double theta0 =  CDCGeometryPar::Instance().getTheta(p);
@@ -270,14 +270,14 @@ std::vector<double> CDCRecoHit::timeDerivativesMeasurementsOnPlane(const genfit:
 //  double theta = CDCGeometryPar::Instance().getTheta(p);
 
 //N.B. The folowing 8 lines are tentative to avoid the circular dependence mentioned above ! The definitions of alpha and theta should be identical to those defined in CDCGeometryPar.
-  const double wx = state.getPlane()->getO().x();
-  const double wy = state.getPlane()->getO().y();
-  const double px = p.x();
-  const double py = p.y();
+  const double wx = state.getPlane()->getO().X();
+  const double wy = state.getPlane()->getO().Y();
+  const double px = p.X();
+  const double py = p.Y();
   const double cross = wx * py - wy * px;
   const double dot   = wx * px + wy * py;
   double alpha = atan2(cross, dot);
-  double theta = atan2(p.Perp(), p.z());
+  double theta = atan2(p.Perp(), p.Z());
   /*
   double alpha0 =  CDCGeometryPar::Instance().getAlpha(state.getPlane()->getO(), p);
   double theta0 =  CDCGeometryPar::Instance().getTheta(p);

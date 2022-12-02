@@ -648,7 +648,7 @@ namespace Belle2 {
         bitset<9> hitSuperLayers(particleNHitTS[iMCParticle]);
         int numberHitSuperLayers = hitSuperLayers.count();
         //cout<<"iMCParticle: "<< iMCParticle << " # hit TS: "<<numberHitSuperLayers<<" MC # TS: "<<lastSLHit<<endl;
-        float mcPt = mcParticles[iMCParticle]->getMomentum().Perp();
+        float mcPt = mcParticles[iMCParticle]->getMomentum().Rho();
         float efficiency;
         if (lastSLHit == 0) efficiency = -1;
         else efficiency = float(numberHitSuperLayers) / lastSLHit;

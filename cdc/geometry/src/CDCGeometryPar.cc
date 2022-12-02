@@ -1857,9 +1857,9 @@ unsigned CDCGeometryPar::cellId(unsigned layerId, const TVector3& position) cons
 
     const TVector3 v = f - b;
     const TVector3 u = v.Unit();
-    const double beta = (0 - b.z()) / u.z();
+    const double beta = (0 - b.Z()) / u.Z();
     const TVector3 p = b + beta * u;
-    double phi0 = - atan2(p.y(), p.x());
+    double phi0 = - atan2(p.Y(), p.X());
     offset += phi0 / (2 * M_PI / double(nWires));
   }*/
 
@@ -1872,10 +1872,10 @@ unsigned CDCGeometryPar::cellId(unsigned layerId, const TVector3& position) cons
     const TVector3 b(m_rSLayer[layerId] * cos(phiB), m_rSLayer[layerId] * sin(phiB), m_zSBackwardLayer[layerId]);
     const TVector3 v = f - b;
     const TVector3 u = v.Unit();
-    const double beta = (position.z() - b.z()) / u.z();
+    const double beta = (position.Z() - b.Z()) / u.Z();
     const TVector3 p = b + beta * u;
-    double dPhi = std::atan2(position.y(), position.x())
-                  - std::atan2(p.y(), p.x())
+    double dPhi = std::atan2(position.Y(), position.X())
+                  - std::atan2(p.Y(), p.X())
                   + phiSize / 2.;
     while (dPhi < 0) dPhi += (2. * M_PI);
     j = int(dPhi / phiSize);
@@ -2761,7 +2761,7 @@ unsigned short CDCGeometryPar::getOldLeftRight(const TVector3& posOnWire, const 
                                                const TVector3& momentum) const
 {
   unsigned short lr = 0;
-  double wCrossT = (posOnWire.Cross(posOnTrack)).z();
+  double wCrossT = (posOnWire.Cross(posOnTrack)).Z();
 
   if (wCrossT < 0.) {
     lr = 0;
@@ -2769,7 +2769,7 @@ unsigned short CDCGeometryPar::getOldLeftRight(const TVector3& posOnWire, const 
     lr = 1;
   } else {
     if ((posOnTrack - posOnWire).Perp() != 0.) {
-      double wCrossP = (posOnWire.Cross(momentum)).z();
+      double wCrossP = (posOnWire.Cross(momentum)).Z();
       if (wCrossP > 0.) {
         if (posOnTrack.Perp() > posOnWire.Perp()) {
           lr = 0;
@@ -2795,7 +2795,7 @@ unsigned short CDCGeometryPar::getOldLeftRight(const TVector3& posOnWire, const 
 unsigned short CDCGeometryPar::getNewLeftRightRaw(const TVector3& posOnWire, const TVector3& posOnTrack,
                                                   const TVector3& momentum) const
 {
-  const double distanceCrossP = ((posOnWire - posOnTrack).Cross(momentum)).z();
+  const double distanceCrossP = ((posOnWire - posOnTrack).Cross(momentum)).Z();
   unsigned short int lr = (distanceCrossP > 0.) ? 1 : 0;
   return lr;
 }
@@ -2803,10 +2803,10 @@ unsigned short CDCGeometryPar::getNewLeftRightRaw(const TVector3& posOnWire, con
 //N.B. The following alpha and theta calculations are directly implemented in CDCRecoHit.cc tentatively to avoid a circular dependence betw cdc_dataobjects and cdclib. So be careful when changing the calculations !
 double CDCGeometryPar::getAlpha(const TVector3& posOnWire, const TVector3& momentum) const
 {
-  const double wx = posOnWire.x();
-  const double wy = posOnWire.y();
-  const double px = momentum.x();
-  const double py = momentum.y();
+  const double wx = posOnWire.X();
+  const double wy = posOnWire.Y();
+  const double px = momentum.X();
+  const double py = momentum.Y();
 
   const double cross = wx * py - wy * px;
   const double dot   = wx * px + wy * py;
@@ -2816,7 +2816,7 @@ double CDCGeometryPar::getAlpha(const TVector3& posOnWire, const TVector3& momen
 
 double CDCGeometryPar::getTheta(const TVector3& momentum) const
 {
-  return atan2(momentum.Perp(), momentum.z());
+  return atan2(momentum.Perp(), momentum.Z());
 }
 
 

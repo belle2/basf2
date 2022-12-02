@@ -5,7 +5,7 @@ PID Calibration Weight Tools
 ++++++++++++++++++++++++++++
  * Added the module ``scripts/pidDataUtils.py`` to provide a set of tools for preparing and analyzing data with weights
  * Added the script ``scripts/pidTrainWeights.py`` to train a set of calibration weights on a dataset
- * Added an example for training a set of weights and using them in an analysis in ``examples/pid_calibration``
+ * Added an example for training a set of weights and using them in an analysis in ``analysis/examples/PIDCalibration``
 
 Variables
 +++++++++
@@ -14,10 +14,7 @@ Variables
  * Added the variable `kaonID_noARICHwoECL` which returns kaonID without using ARICH likelihood for tracks without associated
    ECL cluster. 
  * Added the metavariable `binaryPID_noARICHwoECL` which returns binary PID without using ARICH likelihood 
-   for tracks without associated ECL cluster. 
- * Added the variable `nMCDaughters` which returns the number of daughters of the MC-matched MCParticle or a MCParticle
-   obtained with e.g. the `genUpsilon4S` metavariable.
- 
+   for tracks without associated ECL cluster.
 
 Changes in the analysis package in light-2205-abys
 --------------------------------------------------

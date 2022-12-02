@@ -11,7 +11,7 @@
 
 """
 <header>
-    <output>mixed.cdst.root</output>
+    <output>../mixed.cdst.root</output>
     <description>creating mixed MC cdst files needed for the DecayFile/Multiplicity validation</description>
 </header>
 """
@@ -37,8 +37,9 @@ si.add_simulation(path=main)
 re.add_reconstruction(path=main, reconstruct_cdst='rawFormat')
 
 # finally add cdst output
-main.add_module('RootOutput', outputFileName='mixed.cdst.root')
+main.add_module('RootOutput', outputFileName='../mixed.cdst.root')
 
+main.add_module('Progress')
 # process events and print call statistics
 b2.process(path=main)
 print(b2.statistics)

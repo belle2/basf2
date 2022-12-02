@@ -212,7 +212,8 @@ namespace Belle2 {
     hitGlob.SetMagPhi(r, phi);
     TVector2 shift = hit;
     hitGlob += shift.Rotate(phi);
-    TVector3 Bfield = BFieldManager::getField(m_geoPar->getMasterVolume().pointToGlobal(TVector3(hitGlob.X(), hitGlob.Y(), z)));
+    ROOT::Math::XYZVector Bfield = BFieldManager::getField(ROOT::Math::XYZVector(m_geoPar->getMasterVolume().pointToGlobal(TVector3(
+                                                             hitGlob.X(), hitGlob.Y(), z))));
     double cc = m_geoPar->getHAPDGeometry().getPhotocathodeApdDistance() / abs(Bfield.Z());
     shift.SetX(cc * Bfield.X());
     shift.SetY(cc * Bfield.Y());

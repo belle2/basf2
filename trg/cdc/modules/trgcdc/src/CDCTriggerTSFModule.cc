@@ -76,7 +76,7 @@ CDCTriggerTSFModule::CDCTriggerTSFModule() : Module::Module()
   addParam("Crosstalk_tdcfilter",
            m_crosstalk_tdcfilter,
            "TDC based crosstalk filtering logic on CDCFE. True:enable False:disable",
-           true);
+           false);
   addParam("ADC_cut_enable",
            m_adcflag,
            "remove hits with lower ADC than cut threshold. True:enable False:disable",
@@ -362,16 +362,18 @@ CDCTriggerTSFModule::event()
           }
           std::sort(tdc_asic.begin(), tdc_asic.end());
           for (int ncoin = ncdchit_asic[i][j]; ncoin >= 4; ncoin--) {
+            bool breakOuterLoop = false;
             for (int k = 0; k < ncdchit_asic[i][j] - ncoin; k++) {
               if (tdc_asic[k + ncoin - 1] - tdc_asic[k] <= 16) {
                 for (int l = k; l < k + ncoin - 1; l++) {
                   filtered_hit[id_ncdchit_asic[i][j][l]] = 1;
                 }
-                //break loop
-                ncoin = 0;
-                k = 8;
+                breakOuterLoop = true;
+                break;
               }
             }
+            if (breakOuterLoop)
+              break;
           }
           tdc_asic.clear();
         }

@@ -83,6 +83,7 @@ path.add_module('VariablesToNtuple',
                 variables=variables,
                 fileName='../TreeFitted_B0ToJPsiKs.root')
 
+path.add_module('Progress')
 process(path)
 
 print(statistics)

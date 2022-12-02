@@ -310,7 +310,7 @@ void CDCCRTestModule::event()
     tanL = fitresult->getTanLambda();
     omega = fitresult->getOmega();
     phi0 = fitresult->getPhi0() * 180 / M_PI;
-    Pt = fitresult->getMomentum().Perp();
+    Pt = fitresult->getMomentum().Rho();
     m_hPhi0->Fill(phi0);
     m_hChi2->Fill(Chi2);
     if (Pt < m_MinimumPt) continue;
@@ -480,7 +480,7 @@ TVector3 CDCCRTestModule::getTriggerHitPosition(RecoTrack* track)
   const genfit::AbsTrackRep* trackRepresentation = track->getCardinalRepresentation();
   TVector3 pos(-200, 200, 200);
   try {
-    genfit::MeasuredStateOnPlane mop = track->getMeasuredStateOnPlaneClosestTo(trigpos, trackRepresentation);
+    genfit::MeasuredStateOnPlane mop = track->getMeasuredStateOnPlaneClosestTo(ROOT::Math::XYZVector(trigpos), trackRepresentation);
     double l = mop.extrapolateToPlane(genfit::SharedPlanePtr(new genfit::DetPlane(trigpos, trigDir)));
     if (fabs(l) < 1000) pos = mop.getPos();
   } catch (const genfit::Exception& er) {

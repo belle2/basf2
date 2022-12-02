@@ -8,7 +8,7 @@
 /*
 <header>
   <input>EvtGenSimRec_dedx.root</input>
-  <contact>jkumar@andrew.cmu.edu</contact>
+  <contact>renu2@andrew.cmu.edu</contact>
   <description>Plot dE/dx over momentum</description>
   </header>
 */
@@ -63,7 +63,7 @@ TH1D *GetBandPlot(TFile *file, TTree *tree, TString det="temp", Int_t ipart=0){
   if(hist)std::cout << "histogram created as : " << hist->GetName() << std::endl;
   hist->SetTitle(TString::Format("dE/dx curve for %s (%s w/ CC); p [GeV/c]; %s dE/dx", det.Data(), pname.Data(), det.Data()));
   hist->GetListOfFunctions()->Add(new TNamed("Description", hist->GetTitle()));
-  hist->GetListOfFunctions()->Add(new TNamed("Contact","Jitendra Kumar: jkumar@andrew.cmu.edu"));
+  hist->GetListOfFunctions()->Add(new TNamed("Contact","Renu Garg: renu2@andrew.cmu.edu"));
   if(ipart==0){
     hist->GetListOfFunctions()->Add(new TNamed("Check", "Distinct bands for pions/kaons/protons below 1 GeV. Some misreconstructed tracks at very low dE/dx values"));
     hist->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter,nostats,colz"));

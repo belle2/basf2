@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 
 #include <TCanvas.h>
 #include <TH1.h>
@@ -61,12 +61,6 @@ namespace Belle2 {
      */
     virtual void terminate() override;
 
-    /**
-     * Find histogram corresponding to canvas.
-     * @param hname Name of the histogram
-     * @return The pointer to the histogram, or nullptr if not found.
-     */
-    TH1* find_histo_in_canvas(TString hname);
     //! Data members
   private:
     /** Histogram from DQMInfo with run type. */
@@ -113,6 +107,10 @@ namespace Belle2 {
     TPaveText* m_text1 = nullptr;
     /** The text for the conditions of the nornal window. */
     TPaveText* m_text2 = nullptr;
+
+    /** Monitoring object. */
+    MonitoringObject* m_monObj {};
+
   };
 } // end namespace Belle2
 

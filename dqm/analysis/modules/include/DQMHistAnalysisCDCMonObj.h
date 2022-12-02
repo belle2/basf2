@@ -9,22 +9,15 @@
 #pragma once
 
 //DQM
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
-#include <framework/datastore/StoreArray.h>
+#include <dqm/core/DQMHistAnalysis.h>
+
 #include <framework/database/DBArray.h>
 #include <framework/database/DBObjPtr.h>
 #include <cdc/dataobjects/WireID.h>
 #include <cdc/dbobjects/CDCChannelMap.h>
 #include <cdc/dbobjects/CDCGeometry.h>
 
-#include <vector>
-
-#include <TCanvas.h>
-#include <TLine.h>
-#include <TH1F.h>
-#include <TH2F.h>
 #include <TH2Poly.h>
-#include <TString.h>
 
 
 namespace Belle2 {

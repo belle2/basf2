@@ -19,6 +19,7 @@
 // Belle II utilities
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
+#include <framework/geometry/B2Vector3.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
 
 // Belle II dataobjects
@@ -2145,8 +2146,8 @@ TrackFitResult B2BIIConvertMdstModule::createTrackFitResult(const CLHEP::HepLore
                                                             const uint32_t hitPatternVXDInitializer,
                                                             const uint16_t ndf)
 {
-  TVector3 pos(position.x(),  position.y(),  position.z());
-  TVector3 mom(momentum.px(), momentum.py(), momentum.pz());
+  ROOT::Math::XYZVector pos(position.x(),  position.y(),  position.z());
+  ROOT::Math::XYZVector mom(momentum.px(), momentum.py(), momentum.pz());
 
   TMatrixDSym errMatrix(6);
   for (unsigned i = 0; i < 7; i++) {

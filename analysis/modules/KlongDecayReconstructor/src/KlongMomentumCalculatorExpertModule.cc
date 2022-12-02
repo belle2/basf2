@@ -97,6 +97,9 @@ void KlongMomentumCalculatorExpertModule::initialize()
       m_decaydescriptor.getDaughter(i)->getMother();
     StoreObjPtr<ParticleList>().isRequired(daughter->getFullName());
     if (daughter->getPDGCode() == Const::Klong.getPDGCode()) {
+      if (k_check)
+        B2FATAL("More than one K_L is detected! This module accepts only one K_L in the final state.");
+
       m_klistName = daughter->getFullName() + m_klistName;
       k_check = true;
     }

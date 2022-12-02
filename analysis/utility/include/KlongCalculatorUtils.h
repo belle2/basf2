@@ -41,27 +41,37 @@ namespace Belle2 {
                                    int& idx)
     {
 
-      ROOT::Math::PxPyPzEVector klDaughters;
-      ROOT::Math::PxPyPzEVector pDaughters;
+      bool k_check = false;
+      ROOT::Math::PxPyPzEVector klDaughters; // 4-vector of K_L
+      ROOT::Math::PxPyPzEVector pDaughters; // 4-vector of other daughters
       double m_j = 0;
       for (auto daughter : daughters) {
         if (daughter->getPDGCode() == Const::Klong.getPDGCode()) {
+          if (k_check)
+            B2FATAL("More than one K_L is detected! This tool accepts only one K_L in the final state.");
+
           const Belle2::KLMCluster* klm_cluster = daughter->getKLMCluster();
           const Belle2::ECLCluster* ecl_cluster = daughter->getECLCluster();
           if (klm_cluster != nullptr)
-            klDaughters += klm_cluster->getMomentum();
+            klDaughters = klm_cluster->getMomentum();
           else if (ecl_cluster != nullptr) {
             ClusterUtils clutls;
-            klDaughters += clutls.Get4MomentumFromCluster(ecl_cluster, ECLCluster::EHypothesisBit::c_neutralHadron);
+            klDaughters = clutls.Get4MomentumFromCluster(ecl_cluster, ECLCluster::EHypothesisBit::c_neutralHadron);
           }
+          k_check = true;
         } else {
           pDaughters += daughter->get4Vector();
 
+          // if there is only two daughter (e.g. K_L J/psi), use the PDG mass of the other daughter.
           m_j = daughter->getPDGMass();
           idx = daughter->getArrayIndex() + idx * 100;
         }
       }
 
+      if (!k_check)
+        B2FATAL("This tool is meant to reconstruct decays with a K_L0 in the final state. There is no K_L0 in this decay!");
+
+      // if there are more than two daughters, use the invariant mass of sum of the other daughters.
       if (daughters.size() == 3) {
         m_j = pDaughters.M();
       }

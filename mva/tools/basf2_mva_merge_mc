@@ -111,7 +111,7 @@ if __name__ == '__main__':
     print("Load data")
 
     df_sig = uproot.concatenate(data_sig, args.treename, columns, cut=cut_sig, library = 'pd')
-    df_bkg = uproot.concatenate(data_sig, args.treename, columns, cut=cut_sig, library = 'pd')
+    df_bkg = uproot.concatenate(data_bkg, args.treename, columns, cut=cut_bkg, library = 'pd')
 
     n_sig = len(df_sig)
     n_bkg = len(df_bkg)

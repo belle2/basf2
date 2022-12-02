@@ -16,7 +16,7 @@
 </header>
 """
 
-from uproot import concatenate
+import uproot
 import matplotlib.pyplot as plt
 # import numpy as np
 
@@ -62,7 +62,7 @@ def PlottingCompHistos(particle):
 if __name__ == '__main__':
 
     # load the root files
-    file = concatenate("MCvalidation.root:Multiplicities", library='pd')
+    file = uproot.open("MCvalidation.root:Multiplicities").array(library='pd')
 
     # define the variables to plot
     all_list = [

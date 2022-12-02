@@ -231,7 +231,7 @@ def partial_fit(state, X, S, y, w, epoch, batch):
 if __name__ == "__main__":
     import os
     import pandas
-    from uproot import recreate
+    import uproot
     import tempfile
     import json
 
@@ -294,7 +294,7 @@ if __name__ == "__main__":
             dic.update({'isSignal': target})
 
             df = pandas.DataFrame(dic, dtype=np.float32)
-            with recreate(os.path.join(path, filename)) as outfile:
+            with uproot.recreate(os.path.join(path, filename)) as outfile:
                 outfile['variables'] = df
 
         # ##########################Do Training#################################

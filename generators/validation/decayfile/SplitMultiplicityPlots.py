@@ -16,7 +16,7 @@
 </header>
 """
 
-from uproot import concatenate
+import uproot
 import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib.gridspec as gridspec
@@ -128,7 +128,7 @@ def PlottingCompHistos(particle, varlp, varlm, legend):
 if __name__ == '__main__':
 
     # load in the root files
-    file = concatenate("MCvalidation.root:Split", library="pd")
+    file = uproot.concatenate("MCvalidation.root:Split").array(library="pd")
 
     B = 'charged'
 

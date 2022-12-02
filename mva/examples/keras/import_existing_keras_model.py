@@ -32,7 +32,7 @@ def partial_fit(state, X, S, y, w, epoch, batch):
 if __name__ == "__main__":
     import os
     import pandas
-    from uproot import recreate
+    import uproot
     import tempfile
     import json
     import numpy as np
@@ -80,7 +80,7 @@ if __name__ == "__main__":
         dic.update({'isSignal': data[:, -1]})
 
         df = pandas.DataFrame(dic, dtype=np.float64)
-        with recreate(os.path.join(path, 'data.root')) as outfile:
+        with uproot.recreate(os.path.join(path, 'data.root')) as outfile:
             outfile['tree'] = df
 
         # Saving keras training model

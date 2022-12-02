@@ -16,7 +16,7 @@
 </header>
 """
 
-from uproot import concatenate
+import uproot
 import matplotlib.pyplot as plt
 # import numpy as np
 
@@ -60,7 +60,7 @@ def PlottingCompHistos(var):
 if __name__ == '__main__':
 
     # load in the two root files
-    file = concatenate("MCvalidation.root:EventShape", library='pd')
+    file = uproot.open("MCvalidation.root:EventShape").array(library='pd')
 
     bins = 25
 

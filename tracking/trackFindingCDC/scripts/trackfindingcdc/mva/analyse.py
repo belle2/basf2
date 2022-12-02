@@ -7,7 +7,7 @@
 ##########################################################################
 
 from ipython_tools import handler
-from uproot import recreate, concatenate
+import uproot
 import numpy as np
 import os.path
 from subprocess import check_output, CalledProcessError, STDOUT
@@ -220,10 +220,10 @@ class MVATeacherAndAnalyser:
             self._call_evaluation_routine()
             self._call_expert_routine()
 
-        df = concatenate(
+        df = uproot.concatenate(
             self.expert_file_name,
             library='pd').merge(
-            concatenate(
+            uproot.concatenate(
                 self.test_file_name,
                 library='pd'),
             left_index=True,
@@ -245,14 +245,14 @@ class MVATeacherAndAnalyser:
     def _write_train_and_test_files(self):
         """Split the recorded file into two halves: training and test file and write it back"""
         # TODO: This seems to reorder the columns...
-        df = concatenate(self.recording_file_name, library='pd')
+        df = uproot.concatenate(self.recording_file_name, library='pd')
         mask = np.random.rand(len(df)) < 0.5
         training_sample = df[mask]
         test_sample = df[~mask]
 
-        with recreate(self.training_file_name) as outfile:
+        with uproot.recreate(self.training_file_name) as outfile:
             outfile["records"] = training_sample
-        with recreate(self.test_file_name) as outfile:
+        with uproot.recreate(self.test_file_name) as outfile:
             outfile["records"] = test_sample
 
     def _create_records_file(self):

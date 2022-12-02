@@ -30,9 +30,9 @@ unsigned
 GRLMLP::nWeightsCal() const
 {
   unsigned nWeights = 0;
-  if (get_nLayers() > 1) {
+  if (getNumberOfLayers() > 1) {
     nWeights = (m_nNodes[0] + 1) * m_nNodes[1];
-    for (unsigned il = 1; il < get_nLayers() - 1; ++il) {
+    for (unsigned il = 1; il < getNumberOfLayers() - 1; ++il) {
       nWeights += (m_nNodes[il] + 1) * m_nNodes[il + 1];
     }
   }

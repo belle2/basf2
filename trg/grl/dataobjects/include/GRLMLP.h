@@ -32,11 +32,11 @@ namespace Belle2 {
     /** check if weights are default values or set by some trainer */
     bool isTrained() const { return m_trained; }
     /** get number of layers */
-    unsigned get_nLayers() const { return m_nNodes.size(); }
+    unsigned getNumberOfLayers() const { return m_nNodes.size(); }
     /** get number of nodes in a layer */
-    unsigned get_nNodesLayer(unsigned iLayer) const { return m_nNodes[iLayer]; }
+    unsigned getNumberOfNodesLayer(unsigned iLayer) const { return m_nNodes[iLayer]; }
     /** get number of weights from length of weights vector */
-    unsigned get_nWeights() const { return m_weights.size(); }
+    unsigned getNumberOfWeights() const { return m_weights.size(); }
     /** calculate number of weights from number of nodes */
     unsigned nWeightsCal() const;
     /** get weights vector */

@@ -28,7 +28,7 @@ namespace Belle2 {
     }
 
     /** get number of samples (same for input and target) */
-    unsigned get_nSamples() const { return m_targetSamples.size(); }
+    unsigned getNumberOfSamples() const { return m_targetSamples.size(); }
     /** get input vector of sample i */
     const std::vector<float>& getInput(unsigned i) const { return m_inputSamples[i]; }
     /** get target value of sample i */

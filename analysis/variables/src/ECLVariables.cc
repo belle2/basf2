@@ -927,10 +927,9 @@ Returns an integer code for the ECL region of a cluster.
     REGISTER_VARIABLE("minC2TDist", eclClusterIsolation, R"DOC(
 Returns the distance between the ECL cluster and its nearest track. 
 
-This is computed by using the ECL hits of the extrapolated track. All extrapolated tracks in the event 
-have the distance between each of their ECL hits and the (:math:`R, \theta, \phi`) coordinates of the given 
-ECL shower calculated, and the overall smallest distance is returned. The track array index of the track which 
-has the closest ECL hit to the ECL cluster can be retrieved using `minC2TDistID`.  
+For all tracks in the event, the distance between each of their extrapoldated hits in the ECL and the ECL shower 
+position is calculated, and the overall smallest distance is returned. The track array index of the track that is 
+closest to the ECL cluster can be retrieved using `minC2TDistID`. 
 
 If the minimum calculated distance is greater than :math:`9999.0`, the returned distance is :math:`0.0`, and if the 
 calculated distance is greater than :math:`250.0`, the returned distance will be capped at :math:`250.0`.
@@ -951,9 +950,9 @@ using the `minC2TDist` variable.
 )DOC");
     REGISTER_METAVARIABLE("minC2TDistVar(variable,particleList=pi-:all)", eclClusterIsolationVar, R"DOC(
 Returns the variable value of the nearest track to the given ECL cluster as calculated by `minC2TDist`. The 
-first argument is the variable name, e.g. `nCDCHits`, while the second argument is the particle list name which 
+first argument is the variable name, e.g. `nCDCHits`, while the second (optional) argument is the particle list name which 
 will be used to pick up the nearest track in the calculation of `minC2TDist`. The default particle list used 
-is `pi-:all`. 
+is ``pi-:all``. 
 )DOC", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("clusterE", eclClusterE, R"DOC(
 Returns ECL cluster's energy corrected for leakage and background.

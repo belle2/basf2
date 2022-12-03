@@ -60,7 +60,7 @@ def PlottingCompHistos(var):
 if __name__ == '__main__':
 
     # load in the two root files
-    file = uproot.open("MCvalidation.root:EventShape").array(library='pd')
+    file = uproot.open("MCvalidation.root:EventShape").arrays(library='pd')
 
     bins = 25
 

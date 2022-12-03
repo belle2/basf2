@@ -128,7 +128,7 @@ def PlottingCompHistos(particle, varlp, varlm, legend):
 if __name__ == '__main__':
 
     # load in the root files
-    file = uproot.concatenate("MCvalidation.root:Split").array(library="pd")
+    file = uproot.open("MCvalidation.root:Split").arrays(library="pd")
 
     B = 'charged'
 

@@ -95,12 +95,12 @@ namespace Belle2 {
     int m_upperLineFull{};
 
     //! Module list for mask
-    std::vector <std::string> m_par_module_list;
+    std::vector <std::string> m_parModuleList;
     //! Double-gate list for mask
-    std::vector <std::vector<int>> m_par_gate_list;
+    std::vector <std::vector<int>> m_parGateList;
 
     //! Module wise gate masking in CM plot and alarm
-    std::map <VxdID, std::vector<int>> m_masked_gates;
+    std::map <VxdID, std::vector<int>> m_maskedGates;
 
     //! IDs of all PXD Modules to iterate over
     std::vector<VxdID> m_PXDModules;

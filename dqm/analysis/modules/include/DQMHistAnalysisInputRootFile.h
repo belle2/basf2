@@ -67,10 +67,10 @@ namespace Belle2 {
      * @param text    Histogram name to be matched
      * @return true, if the pattern matches the text
      */
-    bool hname_pattern_match(std::string pattern, std::string text);
+    bool hnamePatternMatch(std::string pattern, std::string text);
 
     /** The list of names of the input root file. */
-    std::vector<std::string> m_file_list;
+    std::vector<std::string> m_fileList;
 
     /** The TFile object for the input file. */
     TFile* m_file = nullptr;
@@ -91,10 +91,10 @@ namespace Belle2 {
     unsigned int m_count = 0;
 
     /** List of total number of events for each run. */
-    std::vector<unsigned int> m_events_list;
+    std::vector<unsigned int> m_eventsList;
 
     /** List of runs. */
-    std::vector<unsigned int> m_run_list;
+    std::vector<unsigned int> m_runList;
 
     /** Time between two events in second. */
     unsigned int m_interval = 0;
@@ -103,7 +103,7 @@ namespace Belle2 {
     unsigned int m_run_idx = 0;
 
     /** Test mode for null histograms */
-    bool m_null_histo_mode = false;
+    bool m_nullHistoMode = false;
     /** Whether to automatically generate canvases for histograms */
     bool m_autocanvas = true;
   };

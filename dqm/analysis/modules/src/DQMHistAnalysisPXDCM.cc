@@ -53,8 +53,8 @@ DQMHistAnalysisPXDCMModule::DQMHistAnalysisPXDCMModule()
   addParam("errorOutsideFull", m_errorOutsideFull, "error level for outside fraction", 1e-4);
   addParam("upperLineFull", m_upperLineFull, "upper threshold and line for outside fraction", 17);
 
-  addParam("gateMaskModuleList", m_par_module_list, "Module List for Gate Masking");
-  addParam("gateMaskGateList", m_par_gate_list, "Gate List for Gate Masking");
+  addParam("gateMaskModuleList", m_parModuleList, "Module List for Gate Masking");
+  addParam("gateMaskGateList", m_parGateList, "Gate List for Gate Masking");
 
   B2DEBUG(99, "DQMHistAnalysisPXDCM: Constructor done.");
 }
@@ -114,13 +114,13 @@ void DQMHistAnalysisPXDCMModule::initialize()
 
   m_monObj->addCanvas(m_cCommonMode);
 
-  if (m_par_module_list.size() != m_par_gate_list.size()) {
+  if (m_parModuleList.size() != m_parGateList.size()) {
     B2FATAL("Parameter list need same length");
     return;
   }
-  for (size_t i = 0; i < m_par_module_list.size(); i++) {
-    for (auto n : m_par_gate_list[i]) {
-      m_masked_gates[VxdID(m_par_module_list[i])].push_back(n);
+  for (size_t i = 0; i < m_parModuleList.size(); i++) {
+    for (auto n : m_parGateList[i]) {
+      m_maskedGates[VxdID(m_parModuleList[i])].push_back(n);
     }
   }
 
@@ -212,7 +212,7 @@ void DQMHistAnalysisPXDCMModule::event()
       if (scale > 0) scale = 1.0 / scale;
       else scale = 1.; // worst case, no events at run start
 
-      auto& gm = m_masked_gates[m_PXDModules[i]];
+      auto& gm = m_maskedGates[m_PXDModules[i]];
       // We loop over a 2d histogram!
       // loop CM values
       double dhpc = 0.0;

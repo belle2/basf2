@@ -187,7 +187,7 @@ namespace Belle2 {
        * @param flaghist Histogram of flags.
        * @return Indication of succes of realizing of condition, 1: OK.
        */
-    int SetFlag(int Type, int bin, const double* pars, double ratio, const std::string& name_hist, const std::string& name_refhist,
+    int setFlag(int Type, int bin, const double* pars, double ratio, const std::string& name_hist, const std::string& name_refhist,
                 TH1I* flaghist);
     /** Function return flag histogram filled based on condition from TH1I source.
        * Flag values:

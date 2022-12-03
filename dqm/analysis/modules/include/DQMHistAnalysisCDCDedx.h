@@ -111,22 +111,22 @@ namespace Belle2 {
     /**
     * funtion to add plot style
     */
-    void set_Plot_Style();
+    void setPlotStyle();
 
     /**
     * funtion to add text style
     */
-    void set_Text_Style(TPaveText*& obj);
+    void setTextStyle(TPaveText*& obj);
 
     /**
     * funtion to reset pad margins
     */
-    void set_Hist_Style(TH1* obj);
+    void setHistStyle(TH1* obj);
 
     /**
     * funtion to reset pad margins
     */
-    void set_Pad_Style(double l, double r, double t, double b);
+    void setPadStyle(double l, double r, double t, double b);
 
 
   private:

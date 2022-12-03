@@ -86,9 +86,9 @@ namespace Belle2 {
     // Data members
   private:
     /** Names of the histograms that should be monitored */
-    std::vector<std::string> m_monitored_histos;
+    std::vector<std::string> m_monitoredHistos;
     /** Map of histogram names to queues of monitoring objects */
-    std::map<std::string, std::queue<SSNODE*> > m_histos_queues;
+    std::map<std::string, std::queue<SSNODE*> > m_histosQueues;
     /** Interval between checks in second. */
     int m_interval;
     /** The metadata for each event. */

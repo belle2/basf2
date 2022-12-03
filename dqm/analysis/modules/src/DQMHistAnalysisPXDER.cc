@@ -264,29 +264,29 @@ void DQMHistAnalysisPXDERModule::event()
 
     double m_NoOfEvents = 1., m_NoOfEventsRef = 1.; // workaround
 
-//     SetFlag(9, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
+//     setFlag(9, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
 //             m_hitMapCounts, r_hitMapCounts, m_fHitMapCountsFlag);
-//     SetFlag(9, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
+//     setFlag(9, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
 //             m_hitMapClCounts, r_hitMapClCounts, m_fHitMapClCountsFlag);
-    SetFlag(2, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
+    setFlag(2, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
             m_fired.at(i), m_ref_fired.at(i), m_fFiredFlag);
-    SetFlag(2, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
+    setFlag(2, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
             m_clusters.at(i), m_ref_clusters.at(i), m_fClustersFlag);
-    SetFlag(100, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
+    setFlag(100, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
             m_startRow.at(i), m_ref_startRow.at(i), m_fStartRowFlag);
-    SetFlag(100, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
+    setFlag(100, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
             m_chargStartRow.at(i), m_ref_chargStartRow.at(i), m_fChargStartRowFlag);
-    SetFlag(100, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
+    setFlag(100, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
             m_startRowCount.at(i), m_ref_startRowCount.at(i), m_fStartRowCountFlag);
-    SetFlag(5, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
+    setFlag(5, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
             m_clusterCharge.at(i), m_ref_clusterCharge.at(i), m_fClusterChargeFlag);
-    SetFlag(5, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
+    setFlag(5, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
             m_pixelSignal.at(i), m_ref_pixelSignal.at(i), m_fPixelSignalFlag);
-    SetFlag(2, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
+    setFlag(2, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
             m_clusterSizeU.at(i), m_ref_clusterSizeU.at(i), m_fClusterSizeUFlag);
-    SetFlag(2, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
+    setFlag(2, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
             m_clusterSizeV.at(i), m_ref_clusterSizeV.at(i), m_fClusterSizeVFlag);
-    SetFlag(2, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
+    setFlag(2, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
             m_clusterSizeUV.at(i), m_ref_clusterSizeUV.at(i), m_fClusterSizeUVFlag);
 
   }
@@ -320,7 +320,7 @@ void DQMHistAnalysisPXDERModule::getIDsFromIndex(const int Index, int& Layer, in
   }
 }
 
-int DQMHistAnalysisPXDERModule::SetFlag(int Type, int bin, const double* pars, double ratio, const std::string& name_hist,
+int DQMHistAnalysisPXDERModule::setFlag(int Type, int bin, const double* pars, double ratio, const std::string& name_hist,
                                         const std::string& name_refhist, TH1I* flaghist)
 {
   int iret = 0;
@@ -449,12 +449,12 @@ int DQMHistAnalysisPXDERModule::SetFlag(int Type, int bin, const double* pars, d
     flaghist->SetBinContent(bin + 1, -3);
     iret = -1;
   }
-  strDebugInfo = Form("SetFlag---> %f, type %i\n", flaghist->GetBinContent(bin + 1), Type);
+  strDebugInfo = Form("setFlag---> %f, type %i\n", flaghist->GetBinContent(bin + 1), Type);
   B2DEBUG(130, strDebugInfo.Data());
   return iret;
 }
 
-// int DQMHistAnalysisPXDERModule::SetFlag(int Type, int bin, double* pars, double ratio, std::string name_hist, std::string name_refhist, TH1I* flaghist)
+// int DQMHistAnalysisPXDERModule::setFlag(int Type, int bin, double* pars, double ratio, std::string name_hist, std::string name_refhist, TH1I* flaghist)
 // {
 //
 //   TH1F* histF = new TH1F("histF", "histF", hist->GetNbinsX(), hist->GetXaxis()->GetXmin(), hist->GetXaxis()->GetXmax());
@@ -464,7 +464,7 @@ int DQMHistAnalysisPXDERModule::SetFlag(int Type, int bin, const double* pars, d
 //     histF->SetBinContent(j + 1, hist->GetBinContent(j + 1));
 //     refhistF->SetBinContent(j + 1, refhist->GetBinContent(j + 1));
 //   }
-//   int ret = SetFlag(Type, bin, pars, ratio, histF, refhistF, flaghist);
+//   int ret = setFlag(Type, bin, pars, ratio, histF, refhistF, flaghist);
 //   delete histF;
 //   delete refhistF;
 //   return ret;

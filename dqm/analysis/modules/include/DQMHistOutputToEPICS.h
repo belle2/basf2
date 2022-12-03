@@ -85,7 +85,7 @@ namespace Belle2 {
     /** Parameter list for histograms */
     std::vector< std::vector<std::string>> m_histlist;
 
-    /** Flag to mark that a new runs as started anddata not copied to last PV */
+    /** Flag to mark that a new runs as started and data not copied to last PV */
     bool m_dirty = false;
 
 #ifdef _BELLE2_EPICS

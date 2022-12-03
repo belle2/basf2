@@ -68,7 +68,7 @@ namespace Belle2 {
     double m_scale_dst; /**< Scale factor "signal region" / "sideband", assuming uniform events */
     Belle2::DQMFileMetaData* dqm_data = nullptr; /**< DQM file meta data */
     Belle2::MonitoringObject* mon_mumu = nullptr; /**< MonitoringObject for mumu events */
-    Belle2::MonitoringObject* mon_dst = nullptr; /**< MonitoringObject for mumu events */
+    Belle2::MonitoringObject* mon_dst = nullptr; /**< MonitoringObject for D* events */
 
     // TCanvases for mumu
     TCanvas* mumu_main = nullptr; /**< TCanvas object for main display */

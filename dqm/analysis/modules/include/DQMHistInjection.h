@@ -29,7 +29,7 @@ namespace Belle2 {
 
 #ifdef _BELLE2_EPICS
     typedef struct MYNODE_struct {
-      chid    mychid; /**< channel ID */
+      chid  mychid; /**< channel ID */
       TH1*  histo = {}; /**< initial histogram */
       std::vector <double> data; /**< vector of data */
     } MYNODE;

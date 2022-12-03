@@ -69,7 +69,7 @@ namespace Belle2 {
     std::string  m_pvPrefix;
     /** The prefix for MonitoringObj. */
     std::string  m_monPrefix;
-    /** Update entry intervall */
+    /** Update entry interval */
     int m_minEntries = 1000;
 
     /** The drawing canvas. */
@@ -82,7 +82,7 @@ namespace Belle2 {
     /** Monitoring Object */
     MonitoringObject* m_monObj {};
 
-    /** flag if to export to EPICS */
+    /** flag if exporting to EPICS */
     bool m_useEpics;
     /** number of EPICS PVs */
     static const int m_parameters = 3;

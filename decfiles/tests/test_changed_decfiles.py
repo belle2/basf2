@@ -23,7 +23,10 @@ if __name__ == '__main__':
 
     b2test_utils.configure_logging_for_tests()
 
-    if not os.environ.get('BELLE2_LOCAL_DIR'):
+    if not b2test_utils.is_ci():
+        b2test_utils.skip_test("Test for changed decfiles failed because $BELLE2_IS_CI is not set.")
+
+    if not os.environ['BELLE2_LOCAL_DIR']:
         b2test_utils.skip_test("Test for changed decfiles failed because $BELLE2_LOCAL_DIR is not set.")
 
     topdir = Path(os.environ['BELLE2_LOCAL_DIR'])

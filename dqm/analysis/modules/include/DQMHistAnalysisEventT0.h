@@ -25,19 +25,19 @@ namespace Belle2 {
     /** Constructor */
     DQMHistAnalysisEventT0Module();
     /** Destructor */
-    virtual ~DQMHistAnalysisEventT0Module();
+    ~DQMHistAnalysisEventT0Module();
 
     /** create TCanvas and MonitoringObject */
-    virtual void initialize() override;
+    void initialize() override;
 
     /** clear TCanvas */
-    virtual void beginRun() override;
+    void beginRun() override;
 
     /** fit the histograms */
-    virtual void endRun() override;
+    void endRun() override;
 
     /** delete pointers */
-    virtual void terminate() override;
+    void terminate() override;
 
     std::string m_prefixCanvas; /**< prefix to be added to canvas name when saved as pdf*/
     bool m_printCanvas; /**< if true print the pdf of the canvases */

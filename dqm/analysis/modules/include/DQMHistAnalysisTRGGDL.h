@@ -46,36 +46,36 @@ namespace Belle2 {
     /**
      * Destructor
      */
-    virtual ~DQMHistAnalysisTRGGDLModule();
+    ~DQMHistAnalysisTRGGDLModule();
 
     /**
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */
-    virtual void initialize() override;
+    void initialize() override;
 
     /**
      * Called when entering a new run.
      * Set run dependent things like run header parameters, alignment, etc.
      */
-    virtual void beginRun() override;
+    void beginRun() override;
 
     /**
      * Event processor.
      */
-    virtual void event() override;
+    void event() override;
 
     /**
      * End-of-run action.
      * Save run-related stuff, such as statistics.
      */
-    virtual void endRun() override;
+    void endRun() override;
 
     /**
      * Termination action.
      * Clean-up, close files, summarize statistics, etc.
      */
-    virtual void terminate() override;
+    void terminate() override;
 
   protected:
     bool m_debug;/**<debug*/

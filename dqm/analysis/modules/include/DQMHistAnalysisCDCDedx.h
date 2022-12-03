@@ -46,32 +46,32 @@ namespace Belle2 {
     /**
     * destructor
     */
-    virtual ~DQMHistAnalysisCDCDedxModule();
+    ~DQMHistAnalysisCDCDedxModule();
 
     /**
     * init function for default values
     */
-    virtual void initialize() override;
+    void initialize() override;
 
     /**
     * begin each run
     */
-    virtual void beginRun() override;
+    void beginRun() override;
 
     /**
     * event by event function
     */
-    virtual void event() override;
+    void event() override;
 
     /**
     * end of each run
     */
-    virtual void endRun() override;
+    void endRun() override;
 
     /**
     * terminating at the end of last run
     */
-    virtual void terminate() override;
+    void terminate() override;
 
     /**
     * funtion to get metadata from histogram

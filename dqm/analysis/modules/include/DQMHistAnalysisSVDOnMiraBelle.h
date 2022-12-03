@@ -27,17 +27,17 @@ namespace Belle2 {
     /** Constructor */
     DQMHistAnalysisSVDOnMiraBelleModule();
     /** Destructor */
-    virtual ~DQMHistAnalysisSVDOnMiraBelleModule();
+    ~DQMHistAnalysisSVDOnMiraBelleModule();
     /** Module function initialize */
-    virtual void initialize() override;
+    void initialize() override;
     /** Module function beginRun */
-    virtual void beginRun() override;
+    void beginRun() override;
     /** Module function event */
-    virtual void event() override;
+    void event() override;
     /** Module function endRun */
-    virtual void endRun() override;
+    void endRun() override;
     /** Module function terminate */
-    virtual void terminate() override;
+    void terminate() override;
 
   private:
 

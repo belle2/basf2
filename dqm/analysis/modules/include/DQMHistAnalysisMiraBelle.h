@@ -31,30 +31,30 @@ namespace Belle2 {
     /**
      * Destructor
      */
-    virtual ~DQMHistAnalysisMiraBelleModule();
+    ~DQMHistAnalysisMiraBelleModule();
 
     /**
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */
-    virtual void initialize() override;
+    void initialize() override;
 
     /**
      * Called when entering a new run.
      * Set run dependent things like run header parameters, alignment, etc.
      */
-    virtual void beginRun() override;
+    void beginRun() override;
 
     /**
      * Event processor.
      */
-    virtual void event() override;
+    void event() override;
 
     /**
      * End-of-run action.
      * Save run-related stuff, such as statistics.
      */
-    virtual void endRun() override;
+    void endRun() override;
 
     /**
      * Termination action.

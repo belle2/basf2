@@ -32,32 +32,32 @@ namespace Belle2 {
     /**
      * Destructor
      */
-    virtual ~DQMHistAnalysisARICHMonObjModule();
+    ~DQMHistAnalysisARICHMonObjModule();
 
     /**
      * Initialize the Module.
      */
-    virtual void initialize() override;
+    void initialize() override;
 
     /**
      * Begin run function
      */
-    virtual void beginRun() override;
+    void beginRun() override;
 
     /**
      * Event processor.
      */
-    virtual void event() override;
+    void event() override;
 
     /**
      * End-of-run action.
      */
-    virtual void endRun() override;
+    void endRun() override;
 
     /**
      * Termination action.
      */
-    virtual void terminate() override;
+    void terminate() override;
 
   protected:
 

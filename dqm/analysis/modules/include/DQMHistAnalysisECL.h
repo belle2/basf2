@@ -33,18 +33,18 @@ namespace Belle2 {
     DQMHistAnalysisECLModule();
 
     /** Destructor. */
-    virtual ~DQMHistAnalysisECLModule();
+    ~DQMHistAnalysisECLModule();
 
     /** Initialize the module. */
-    virtual void initialize() override;
+    void initialize() override;
     /** Call when a run begins. */
-    virtual void beginRun() override;
+    void beginRun() override;
     /** Event processor. */
-    virtual void event() override;
+    void event() override;
     /** Call when a run ends. */
-    virtual void endRun() override;
+    void endRun() override;
     /** Terminate. */
-    virtual void terminate() override;
+    void terminate() override;
 
   private:
 

@@ -30,7 +30,7 @@ RT2SPTCConverterModule::RT2SPTCConverterModule() :
   addParam("RecoTracksName", m_RecoTracksName, "Name of container of RecoTracks", std::string(""));
 
   // required for conversion
-  addParam("SVDClusters", m_SVDClusterName, "SVDCluster collection name", std::string(""));
+  addParam("SVDClusters", m_SVDClusterName, "SVDCluster collection name", std::make_optional<std::string>("SVDClusters"));
 
   addParam("SVDSpacePointStoreArrayName", m_svdSpacePointsStoreArrayName, "Name of the collection for SVD.",
            std::make_optional<std::string>("SVDSpacePoints"));
@@ -91,11 +91,11 @@ void RT2SPTCConverterModule::initialize()
   initializeCounters();
 
   // check if all required StoreArrays are here
-  m_SVDClusters.isRequired(m_SVDClusterName);
   if (m_pxdSpacePointsStoreArrayName) {
     m_PXDSpacePoints.isRequired(*m_pxdSpacePointsStoreArrayName);
   }
   if (m_svdSpacePointsStoreArrayName) {
+    m_SVDClusters.isRequired(*m_SVDClusterName);
     m_SVDSpacePoints.isRequired(*m_svdSpacePointsStoreArrayName);
   }
   if (m_vtxSpacePointsStoreArrayName) {
@@ -114,7 +114,9 @@ void RT2SPTCConverterModule::initialize()
 
   if (m_useTrueHits) {
     // FIXME This test is troublesome since there will be no SVDTrueHits when VTX is used.
-    m_SVDTrueHit.isRequired();
+    if (m_svdSpacePointsStoreArrayName) {
+      m_SVDTrueHit.isRequired();
+    }
   }
 
   // register Relation to RecoTrack

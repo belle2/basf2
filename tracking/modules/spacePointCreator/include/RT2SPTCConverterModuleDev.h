@@ -86,7 +86,7 @@ namespace Belle2 {
       m_mcParticlesPresent = false;
     }
 
-    std::string m_SVDClusterName; /**< SVDCluster collection name */
+    std::optional<std::string> m_SVDClusterName; /**< SVDCluster collection name */
 
     std::optional<std::string> m_pxdSpacePointsStoreArrayName; /**< PXD SpacePoints collection names */
     std::optional<std::string> m_svdSpacePointsStoreArrayName; /**< Non SingleCluster SVD SpacePoints collection names */

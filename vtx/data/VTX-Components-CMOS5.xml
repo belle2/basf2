@@ -219,7 +219,7 @@
     <Color>#006699</Color>
     <width  unit="mm">40.0</width>
     <length unit="mm">120.0</length>
-    <height unit="mm"> 0.300</height>
+    <height unit="mm">0.470</height>
     <Active>
       <u unit="mm"> 1.5</u>
       <v unit="mm"> 0.0</v>

@@ -130,23 +130,23 @@ CalibrationAlgorithm::EResult CDCDedxBadWireAlgorithm::calibrate()
   cgtmp->Divide(4, 4);
   cgtmp->SetBatch(kTRUE);
   std::stringstream psgood;
-  psgood << Form("cdcdedx_badwirecal_gwiredist_%s.pdf[", saddSfx.data());
+  psgood << Form("cdcdedx_bdcalcal_gwiredist_%s.pdf[", saddSfx.data());
   cgtmp->Print(psgood.str().c_str());
   psgood.str("");
-  psgood << Form("cdcdedx_badwirecal_gwiredist_%s.pdf", saddSfx.data());
+  psgood << Form("cdcdedx_bdcalcal_gwiredist_%s.pdf", saddSfx.data());
 
   TCanvas* cbtmp = new TCanvas(Form("cbad_%s", saddSfx.data()), "", 1200, 1200);
   std::stringstream psdefect;
   cbtmp->Divide(4, 4);
   cbtmp->SetBatch(kTRUE);
-  psdefect << Form("cdcdedx_badwirecal_bwiredist_%s.pdf[", saddSfx.data());
+  psdefect << Form("cdcdedx_bdcalcal_bwiredist_%s.pdf[", saddSfx.data());
   cbtmp->Print(psdefect.str().c_str());
   psdefect.str("");
-  psdefect << Form("cdcdedx_badwirecal_bwiredist_%s.pdf", saddSfx.data());
+  psdefect << Form("cdcdedx_bdcalcal_bwiredist_%s.pdf", saddSfx.data());
 
   std::ofstream ofile_newbad, ofile_newdead;
-  ofile_newbad.open(Form("cdcdedx_badwirecal_bwirelist_%s.txt", saddSfx.data()));
-  ofile_newdead.open(Form("cdcdedx_badwirecal_dwirelist_%s.txt", saddSfx.data()));
+  ofile_newbad.open(Form("cdcdedx_bdcalcal_bwirelist_%s.txt", saddSfx.data()));
+  ofile_newdead.open(Form("cdcdedx_bdcalcal_dwirelist_%s.txt", saddSfx.data()));
 
   int fentThres = 50;
   int cbadwire[2] = {0}, cdeadwire[2] = {0}, cgoodwire[2] = {0};
@@ -247,13 +247,13 @@ CalibrationAlgorithm::EResult CDCDedxBadWireAlgorithm::calibrate()
 
   //1 for variable distribution
   psdefect.str("");
-  psdefect << Form("cdcdedx_badwirecal_bwiredist_%s.pdf]", saddSfx.data());
+  psdefect << Form("cdcdedx_bdcalcal_bwiredist_%s.pdf]", saddSfx.data());
   cbtmp->Print(psdefect.str().c_str());
   cbtmp->Clear("D");
   delete cbtmp;
 
   psgood.str("");
-  psgood << Form("cdcdedx_badwirecal_gwiredist_%s.pdf]", saddSfx.data());
+  psgood << Form("cdcdedx_bdcalcal_gwiredist_%s.pdf]", saddSfx.data());
   cgtmp->Print(psgood.str().c_str());
   cgtmp->Clear("D");
   delete cgtmp;
@@ -292,8 +292,8 @@ CalibrationAlgorithm::EResult CDCDedxBadWireAlgorithm::calibrate()
   lfrac->SetLineColorAlpha(kRed, 0.5);
   lfrac->Draw("same");
 
-  c_pars->Print(Form("cdcdedx_badwire_qapars_%s.pdf", saddSfx.data()));
-  c_pars->Print(Form("cdcdedx_badwire_qapars_%s.root", saddSfx.data()));
+  c_pars->Print(Form("cdcdedx_bdcal_qapars_%s.pdf", saddSfx.data()));
+  c_pars->Print(Form("cdcdedx_bdcal_qapars_%s.root", saddSfx.data()));
   delete c_pars;
   //3 for stats
   TCanvas* cstats = new TCanvas("cstats", "cstats", 1000, 500);
@@ -316,7 +316,7 @@ CalibrationAlgorithm::EResult CDCDedxBadWireAlgorithm::calibrate()
     hestats->SetStats(0);
   }
 
-  cstats->Print(Form("cdcdedx_badwire_qastats_%s.pdf", saddSfx.data()));
+  cstats->Print(Form("cdcdedx_bdcal_qastats_%s.pdf", saddSfx.data()));
   delete cstats;
 
   //create bad/dead wire map using files created above
@@ -377,7 +377,7 @@ void CDCDedxBadWireAlgorithm::createBadWireMap(int ndead[2], int nbad[2])
   hxyAll->SetStats(0);
   hxyAll->Draw();
 
-  TH2F* hxyBad = getHistoPattern(Form("cdcdedx_badwirecal_bwirelist_%s.txt", saddSfx.data()), "bad");
+  TH2F* hxyBad = getHistoPattern(Form("cdcdedx_bdcalcal_bwirelist_%s.txt", saddSfx.data()), "bad");
   if (hxyBad) {
     hxyBad->SetTitle("");
     hxyBad->SetMarkerStyle(20);
@@ -387,7 +387,7 @@ void CDCDedxBadWireAlgorithm::createBadWireMap(int ndead[2], int nbad[2])
     hxyBad->Draw("same");
   }
 
-  TH2F* hxyDead = getHistoPattern(Form("cdcdedx_badwirecal_dwirelist_%s.txt", saddSfx.data()), "dead");
+  TH2F* hxyDead = getHistoPattern(Form("cdcdedx_bdcalcal_dwirelist_%s.txt", saddSfx.data()), "dead");
   if (hxyDead) {
     hxyDead->SetTitle("");
     hxyDead->SetMarkerStyle(20);
@@ -416,7 +416,7 @@ void CDCDedxBadWireAlgorithm::createBadWireMap(int ndead[2], int nbad[2])
   t1->SetTextColor(kGray + 1);
   pt->Draw("same");
 
-  cmap->SaveAs(Form("cdcdedx_badwirecal_wiremap_%s.pdf", saddSfx.data()));
+  cmap->SaveAs(Form("cdcdedx_bdcalcal_wiremap_%s.pdf", saddSfx.data()));
   delete cmap;
 }
 

@@ -354,7 +354,7 @@ namespace Belle2 {
     RecoTrack* recoTrack = recoTracks.appendNew(m_recoTrack->getPositionSeed(), momentum,
                                                 m_recoTrack->getChargeSeed(),
                                                 m_storeArrayNameOfCDCHits, m_storeArrayNameOfSVDHits, m_storeArrayNameOfPXDHits,
-                                                m_storeArrayNameOfBKLMHits, m_storeArrayNameOfEKLMHits,
+                                                m_storeArrayNameOfVTXHits, m_storeArrayNameOfBKLMHits, m_storeArrayNameOfEKLMHits,
                                                 m_storeArrayNameOfHitInformation);
 
     // SVD Hits

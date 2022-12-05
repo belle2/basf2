@@ -116,7 +116,7 @@ void DQMHistAnalysisInputRootFileModule::event()
   // which expects analysis run in endRun function
   initHistListBeforeEvent();
 
-  if (m_null_histo_mode) {
+  if (m_nullHistoMode) {
     m_eventMetaDataPtr.create();
     m_eventMetaDataPtr->setExperiment(m_expno);
     m_eventMetaDataPtr->setRun(m_runList[m_run_idx]);

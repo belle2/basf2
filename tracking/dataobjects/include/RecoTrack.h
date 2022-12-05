@@ -99,9 +99,11 @@ namespace Belle2 {
      * Enum for the matching status of this reco track (set by the matching modules in the tracking package).
      */
     enum MatchingStatus {
-      c_undefined,
-      c_matched,
-      c_clone,
+      c_undefined, //until the matcher module sets it
+      c_matched, // hit pattern and charge are both correct
+      c_matchedWrongCharge, // hit pattern is correct, but the charge is wrong
+      c_clone, //a clone with the correct charge
+      c_cloneWrongCharge, //a clone with the wrong charge
       c_background,
       c_ghost
     };

@@ -189,7 +189,8 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
             if self.trackMatchLookUp.isAnyChargeClonePRRecoTrack(trackCand):
                 totalHitListPRClone.extend(cdcHitIDs)
 
-            if self.trackMatchLookUp.isBackgroundPRRecoTrack(trackCand):
+            if (self.trackMatchLookUp.isBackgroundPRRecoTrack(trackCand) or
+                    self.trackMatchLookUp.isGhostPRRecoTrack(trackCand)):
                 totalHitListPRFake.extend(cdcHitIDs)
 
         # Make the ids unique

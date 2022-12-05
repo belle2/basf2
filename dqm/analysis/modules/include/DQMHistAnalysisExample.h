@@ -37,8 +37,15 @@ namespace Belle2 {
 
     /**
      * Initializer.
+     * This method is called at the beginning of data processing.
      */
     void initialize() override;
+
+    /**
+     * Called when entering a new run.
+     * Set run dependent things like run header parameters, alignment, etc.
+     */
+    void beginRun() override;
 
     /**
      * This method is called for each event.
@@ -47,6 +54,7 @@ namespace Belle2 {
 
     /**
      * This method is called if the current run ends.
+     * Save run-related stuff, such as statistics.
      */
     void endRun() override;
 

@@ -35,27 +35,27 @@ namespace Belle2 {
     /**
      * Initialize the module.
      */
-    void initialize() override;
+    void initialize() override final;
 
     /**
      * Called when entering a new run.
      */
-    void beginRun() override;
+    void beginRun() override final;
 
     /**
      * Event processor.
      */
-    void event() override;
+    void event() override final;
 
     /**
      * End-of-run action.
      */
-    void endRun() override;
+    void endRun() override final;
 
     /**
      * Termination action.
      */
-    void terminate() override;
+    void terminate() override final;
 
     /**
      * Plot/print function for debugging

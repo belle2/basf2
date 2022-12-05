@@ -41,6 +41,10 @@ void DQMHistAnalysisExampleModule::initialize()
   m_f = new TF1("f_" + a, TString(m_function), -100, 100);
 }
 
+void DQMHistAnalysisExampleModule::beginRun()
+{
+  B2DEBUG(20, "DQMHistAnalysisExample : beginRun called");
+}
 
 void DQMHistAnalysisExampleModule::event()
 {

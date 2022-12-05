@@ -26,7 +26,6 @@ DQMHistAnalysisCDCDedxModule::DQMHistAnalysisCDCDedxModule()
 //--------------------------------------------------------------
 DQMHistAnalysisCDCDedxModule::~DQMHistAnalysisCDCDedxModule()
 {
-
 }
 
 //---------------------------------------------

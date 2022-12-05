@@ -43,15 +43,6 @@ namespace Belle2 {
      */
     void event() override final;
 
-    /**
-     * This method is called if the current run ends.
-     */
-    void endRun() override final;
-
-    /**
-     * This method is called at the end of the event processing.
-     */
-    void terminate() override final;
 
   private:
 

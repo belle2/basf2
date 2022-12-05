@@ -116,9 +116,6 @@ void DQMHistAnalysisTRGGDLModule::initialize()
   B2DEBUG(20, "DQMHistAnalysisTRGGDL: initialized.");
 }
 
-void DQMHistAnalysisTRGGDLModule::beginRun()
-{
-}
 
 void DQMHistAnalysisTRGGDLModule::event()
 {

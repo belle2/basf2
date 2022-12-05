@@ -95,8 +95,6 @@ void DQMHistAnalysisInputRootFileModule::event()
 {
   B2INFO("DQMHistAnalysisInputRootFile: event called.");
 
-  initHistListBeforeEvent();
-
   sleep(m_interval);
 
   if (m_count > m_eventsList[m_run_idx]) {
@@ -114,7 +112,11 @@ void DQMHistAnalysisInputRootFileModule::event()
     m_file = new TFile(m_fileList[m_run_idx].c_str());
   }
 
-  if (m_nullHistoMode) {
+  // Clear only after EndOfRun check, otherwise we wont have any histograms for MiraBelle
+  // which expects analysis run in endRun function
+  initHistListBeforeEvent();
+
+  if (m_null_histo_mode) {
     m_eventMetaDataPtr.create();
     m_eventMetaDataPtr->setExperiment(m_expno);
     m_eventMetaDataPtr->setRun(m_runList[m_run_idx]);

@@ -52,11 +52,6 @@ namespace Belle2 {
     void beginRun() override;
 
     /**
-     * Event processor.
-     */
-    void event() override;
-
-    /**
      * End-of-run action.
      * Save run-related stuff, such as statistics.
      */

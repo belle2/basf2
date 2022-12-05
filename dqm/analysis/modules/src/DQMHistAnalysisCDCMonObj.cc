@@ -44,7 +44,6 @@ DQMHistAnalysisCDCMonObjModule::DQMHistAnalysisCDCMonObjModule()
 
 DQMHistAnalysisCDCMonObjModule::~DQMHistAnalysisCDCMonObjModule()
 {
-
 }
 
 void DQMHistAnalysisCDCMonObjModule::initialize()
@@ -122,9 +121,6 @@ void DQMHistAnalysisCDCMonObjModule::beginRun()
 
 }
 
-void DQMHistAnalysisCDCMonObjModule::event()
-{
-}
 
 void DQMHistAnalysisCDCMonObjModule::configureBins(TH2Poly* h)
 {

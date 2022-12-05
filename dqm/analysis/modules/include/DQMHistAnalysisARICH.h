@@ -46,12 +46,6 @@ namespace Belle2 {
     void initialize() override;
 
     /**
-     * Called when entering a new run.
-     * Set run dependent things like run header parameters, alignment, etc.
-     */
-    void beginRun() override;
-
-    /**
      * Event processor.
      */
     void event() override;

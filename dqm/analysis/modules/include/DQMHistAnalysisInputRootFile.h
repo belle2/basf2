@@ -63,7 +63,7 @@ namespace Belle2 {
   private:
     /**
      * Pattern match for histogram name
-     * @param pattern Pattern used for matchng the histogram name. Wildcards (* and ?) are supported
+     * @param pattern Used for matchng the histogram name. Wildcards (* and ?) are supported
      * @param text    Histogram name to be matched
      * @return true, if the pattern matches the text
      */
@@ -104,6 +104,7 @@ namespace Belle2 {
 
     /** Test mode for null histograms */
     bool m_nullHistoMode = false;
+
     /** Whether to automatically generate canvases for histograms */
     bool m_autocanvas = true;
   };

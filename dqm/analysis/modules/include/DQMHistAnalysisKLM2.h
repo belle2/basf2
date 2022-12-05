@@ -65,10 +65,6 @@ namespace Belle2 {
      */
     void endRun() override;
 
-    /**
-     * This method is called at the end of the event processing.
-     */
-    void terminate() override;
 
   private:
 

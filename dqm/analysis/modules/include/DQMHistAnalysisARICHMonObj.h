@@ -40,16 +40,6 @@ namespace Belle2 {
     void initialize() override;
 
     /**
-     * Begin run function
-     */
-    void beginRun() override;
-
-    /**
-     * Event processor.
-     */
-    void event() override;
-
-    /**
      * End-of-run action.
      */
     void endRun() override;

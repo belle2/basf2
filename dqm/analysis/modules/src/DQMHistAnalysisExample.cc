@@ -42,11 +42,6 @@ void DQMHistAnalysisExampleModule::initialize()
 }
 
 
-void DQMHistAnalysisExampleModule::beginRun()
-{
-  //B2DEBUG(20, "DQMHistAnalysisExample: beginRun called.");
-}
-
 void DQMHistAnalysisExampleModule::event()
 {
   TH1* h = findHist(m_histoname);

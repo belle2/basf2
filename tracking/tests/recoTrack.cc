@@ -8,6 +8,7 @@
 
 #include <tracking/dataobjects/RecoTrack.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/geometry/XYZVectorToTVector3Converter.h>
 
 #include <framework/utilities/TestHelpers.h>
 #include <framework/gearbox/Const.h>
@@ -211,11 +212,11 @@ namespace Belle2 {
   {
     // Create a genfit track cand
     genfit::TrackCand newCreatedTrackCand;
-    TVector3 position(4, 23, 5.6);
-    TVector3 momentum(4, 23, 5.6);
+    ROOT::Math::XYZVector position(4, 23, 5.6);
+    ROOT::Math::XYZVector momentum(4, 23, 5.6);
     short int charge = 1;
     // We can not add these parameters immediately - we hve to convert them to the perigee parameters
-    newCreatedTrackCand.setPosMomSeed(position, momentum, charge);
+    newCreatedTrackCand.setPosMomSeed(XYZToTVector(position), XYZToTVector(momentum), charge);
     newCreatedTrackCand.addHit(new genfit::WireTrackCandHit(Const::CDC, 0, -1, 0, 0));
     newCreatedTrackCand.addHit(new genfit::WireTrackCandHit(Const::CDC, 1, -1, 1, 0));
     newCreatedTrackCand.addHit(new genfit::WireTrackCandHit(Const::CDC, 2, -1, 2, 0));

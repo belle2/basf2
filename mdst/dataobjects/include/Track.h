@@ -242,5 +242,7 @@ namespace Belle2 {
     float m_trackTime = std::numeric_limits<float>::quiet_NaN();
 
     ClassDefOverride(Track, 6); /**< Class that bundles various TrackFitResults. */
+
+    friend class FixMergedObjectsModule;
   };
 }

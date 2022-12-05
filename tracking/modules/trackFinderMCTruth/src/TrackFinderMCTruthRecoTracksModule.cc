@@ -1001,9 +1001,9 @@ void TrackFinderMCTruthRecoTracksModule::event()
           const CDCSimHit* aCDCSimHitPtr = cdcHit->getRelatedFrom<CDCSimHit>();
 
           //now determine the correct sign to resolve the left right ambiguity in the fitter
-          TVector3 simHitPos = aCDCSimHitPtr->getPosTrack();
-          TVector3 simMom = aCDCSimHitPtr->getMomentum();
-          TVector3 simHitPosOnWire = aCDCSimHitPtr->getPosWire();
+          ROOT::Math::XYZVector simHitPos = aCDCSimHitPtr->getPosTrack();
+          ROOT::Math::XYZVector simMom = aCDCSimHitPtr->getMomentum();
+          ROOT::Math::XYZVector simHitPosOnWire = aCDCSimHitPtr->getPosWire();
 
           CDC::CDCGeometryPar& cdcGeometry = CDC::CDCGeometryPar::Instance();
           const unsigned short isRightHit = cdcGeometry.getNewLeftRightRaw(simHitPosOnWire, simHitPos, simMom);

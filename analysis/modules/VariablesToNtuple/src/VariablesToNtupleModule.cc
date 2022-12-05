@@ -55,6 +55,11 @@ VariablesToNtupleModule::VariablesToNtupleModule() :
   addParam("sampling", m_sampling,
            "Tuple of variable name and a map of integer values and inverse sampling rate. E.g. (signal, {1: 0, 0:10}) selects all signal candidates and every 10th background candidate.",
            default_sampling);
+
+  addParam("signalSideParticleList", m_signalSideParticleList,
+           "Name of signal-side particle list to store the index of the signal-side particle when one calls the module in a for_each loop over the RestOfEvent",
+           std::string(""));
+
 }
 
 void VariablesToNtupleModule::initialize()
@@ -107,6 +112,16 @@ void VariablesToNtupleModule::initialize()
   if (not m_particleList.empty()) {
     m_tree->get().Branch("__candidate__", &m_candidate, "__candidate__/I");
     m_tree->get().Branch("__ncandidates__", &m_ncandidates, "__ncandidates__/I");
+  }
+
+  if (not m_signalSideParticleList.empty()) {
+    StoreObjPtr<ParticleList>().isRequired(m_signalSideParticleList);
+    m_tree->get().Branch("__signalSideCandidate__", &m_signalSideCandidate, "__signalSideCandidate__/I");
+    m_tree->get().Branch("__nSignalSideCandidates__", &m_nSignalSideCandidates, "__nSignalSideCandidates__/I");
+    if (not m_roe.isOptional("RestOfEvent")) {
+      B2WARNING("The signalSideParticleList is set outside of a for_each loop over the RestOfEvent. "
+                << "__signalSideCandidates__ and __nSignalSideCandidate__ will be always -1 and 0, respectively.");
+    }
   }
 
   if (m_stringWrapper.isOptional("MCDecayString"))
@@ -217,6 +232,18 @@ void VariablesToNtupleModule::event()
     m_MCDecayString = m_stringWrapper->getString();
   else
     m_MCDecayString = "";
+
+  if (not m_signalSideParticleList.empty()) {
+    if (m_roe.isValid()) {
+      StoreObjPtr<ParticleList> signaSideParticleList(m_signalSideParticleList);
+      auto signal = m_roe->getRelatedFrom<Particle>();
+      m_signalSideCandidate = signaSideParticleList->getIndex(signal);
+      m_nSignalSideCandidates = signaSideParticleList->getListSize();
+    } else {
+      m_signalSideCandidate = -1;
+      m_nSignalSideCandidates = 0;
+    }
+  }
 
   if (m_particleList.empty()) {
     m_branchAddressesDouble[0] = getInverseSamplingRateWeight(nullptr);

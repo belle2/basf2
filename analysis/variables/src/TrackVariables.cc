@@ -797,9 +797,10 @@ at the end of the reconstruction chain, in particular after the outer detector r
     )DOC");
 
     REGISTER_VARIABLE("trackTime", getTrackTime, R"DOC(
-Returns the track time, computed as the difference 
-between the average of the SVD clusters time associated to the track and the SVD event T0.
-Return NaN if SVD eventT0 is NaN, or if no SVD Hits are attached to the track.
+Returns the time at which the track is produced relative to the time of the collision (given by SVD EventT0). 
+Both the time of the collision and the track time are computed using only SVD hits.
+Returns NaN if SVD EventT0 is NaN, or if no SVD Hits are attached to the track.
+For more details, see :ref:`Time Extraction <tracking_eventTimeExtraction>` page.
     )DOC", "ns");
   }
 }

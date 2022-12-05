@@ -163,8 +163,12 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
     def peel_pr_to_mc_match_info(self, reco_track):
         """Extracts track-match information from the MCMatcherTracksModule results"""
         track_match_look_up = self.track_match_look_up
-        is_matched = track_match_look_up.isMatchedPRRecoTrack(reco_track)
-        is_clone = track_match_look_up.isClonePRRecoTrack(reco_track)
+        is_matched = track_match_look_up.isAnyChargeMatchedPRRecoTrack(reco_track)
+        is_matched_correct_charge = track_match_look_up.isCorrectChargeMatchedPRRecoTrack(reco_track)
+        is_matched_wrong_charge = track_match_look_up.isWrongChargeMatchedPRRecoTrack(reco_track)
+        is_clone = track_match_look_up.isAnyChargeClonePRRecoTrack(reco_track)
+        is_clone_correct_charge = track_match_look_up.isCorrectChargeClonePRRecoTrack(reco_track)
+        is_clone_wrong_charge = track_match_look_up.isWrongChargeClonePRRecoTrack(reco_track)
         is_background = track_match_look_up.isBackgroundPRRecoTrack(reco_track)
         is_ghost = track_match_look_up.isGhostPRRecoTrack(reco_track)
 
@@ -183,7 +187,15 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         return dict(
             is_matched=is_matched,
             is_matchedPrimary=is_matched and mc_is_primary,
+            is_matched_correct_charge=is_matched_correct_charge,
+            is_matchedPrimary_correct_charge=is_matched_correct_charge and mc_is_primary,
+            is_matched_wrong_charge=is_matched_wrong_charge,
+            is_matchedPrimary_wrong_charge=is_matched_wrong_charge and mc_is_primary,
+
             is_clone=is_clone,
+            is_clone_correct_charge=is_clone_correct_charge,
+            is_clone_wrong_charge=is_clone_wrong_charge,
+
             is_background=is_background,
             is_ghost=is_ghost,
             is_clone_or_match=(is_matched or is_clone),

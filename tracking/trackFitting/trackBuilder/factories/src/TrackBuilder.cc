@@ -21,7 +21,6 @@
 #include <svd/reconstruction/SVDRecoHit2D.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
-#include <TVector3.h>
 #include <TMatrixDSym.h>
 
 #include <genfit/FitStatus.h>
@@ -110,7 +109,7 @@ bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack,
 
     double Bx, By, Bz;  // In cgs units
     if (useBFieldAtHit) {
-      const TVector3& hitPosition = msop.getPos();
+      const B2Vector3D& hitPosition = msop.getPos();
       genfit::FieldManager::getInstance()->getFieldVal(hitPosition.X(), hitPosition.Y(), hitPosition.Z(), Bx, By, Bz);
     } else {
       genfit::FieldManager::getInstance()->getFieldVal(poca.X(), poca.Y(), poca.Z(), Bx, By, Bz);

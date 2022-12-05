@@ -8,11 +8,11 @@
 
 #pragma once
 
+#include <framework/core/Module.h>
 #include <framework/dataobjects/EventExtraInfo.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
-#include <framework/core/Module.h>
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>

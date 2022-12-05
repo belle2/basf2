@@ -56,7 +56,7 @@ involving neutrinos, referred to as B\ :sub:`sig`.
 .. admonition:: Hint
      :class: toggle xhint stacked
 
-     The documentation can be found in the :ref:`analysis/doc/index-01-analysis:Advanced Topics` section of the analysis module.
+     The documentation can be found in the :ref:`analysis/doc/AdvancedTopics:Advanced Topics` section of the analysis module.
      The definitions can be found in the section titled ``Hadronic, Semileptonic and Inclusive Tagging``.
 
 .. admonition:: Solution

@@ -113,7 +113,6 @@ void RT2SPTCConverterModule::initialize()
   }
 
   if (m_useTrueHits) {
-    // FIXME This test is troublesome since there will be no SVDTrueHits when VTX is used.
     if (m_svdSpacePointsStoreArrayName) {
       m_SVDTrueHit.isRequired();
     }

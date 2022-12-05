@@ -28,6 +28,9 @@
 #include <mdst/dataobjects/PIDLikelihood.h>
 
 namespace Belle2 {
+  /**
+   *  Module to filter udst content based on a particle list
+   */
   class UdstListFilterModule : public Module {
   public:
     /**
@@ -62,11 +65,9 @@ namespace Belle2 {
     StoreArray<TrackFitResult> m_trackfitresults; /**< StoreArray of TrackFitResults */
     StoreArray<V0> m_v0s; /**< StoreArray of V0s */
     StoreArray<V0>*  m_selectedV0s; /**< New selected V0 array */
-
-
-    SelectSubset< ECLCluster > m_ecl_selector;
-    SelectSubset< Track > m_track_selector;
-    SelectSubset< KLMCluster > m_klm_selector;
-    SelectSubset< V0 > m_v0_selector;
+    SelectSubset< ECLCluster > m_ecl_selector;  /**< Selector of sub-set of ECL clusters */
+    SelectSubset< Track > m_track_selector;     /**< Selector of sub-set of tracks */
+    SelectSubset< KLMCluster > m_klm_selector;  /**< Selector of sub-set of KLM clusters */
+    SelectSubset< V0 > m_v0_selector;           /**< Selector of sub-set of V0s */
   };
 }

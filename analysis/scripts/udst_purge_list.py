@@ -110,6 +110,7 @@ def list_select_signal_mc(listName, path):
 def prepare_path(FileIn, ListName, icharge, isROE, FileOut):
     '''
     Return processing path
+       FileIn   -- input file name
        ListName -- B+ or B0 decay chain of the skim
        icharge  -- charge (0, -1 or +1)
        isROE    -- ROE (data) if true, signal (MC) if false

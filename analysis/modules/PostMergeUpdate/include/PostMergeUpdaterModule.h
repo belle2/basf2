@@ -59,8 +59,8 @@ namespace Belle2 {
     StoreArray<TrackFitResult> m_trackFits; /**< track fits */
     StoreArray<Track> m_tracks; /**< tracks */
     StoreArray<ECLCluster> m_eclclusters; /**< StoreArray of ECLCluster */
-    StoreObjPtr<EventExtraInfo> m_eventExtraInfo;
-    StoreObjPtr<EventExtraInfo> m_eventExtraInfo_orig;
+    StoreObjPtr<EventExtraInfo> m_eventExtraInfo; /**< Event extra info */
+    StoreObjPtr<EventExtraInfo> m_eventExtraInfo_orig; /**<  Event extra info original */
     StoreObjPtr<EventExtraInfo> m_mergedArrayIndices; /**< indices where the StoreArrays were merged */
     bool m_mixing; /**< Fix to common vertex */
     bool m_isCharged; /**< B+ or B0 */

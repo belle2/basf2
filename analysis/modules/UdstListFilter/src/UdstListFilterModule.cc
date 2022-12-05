@@ -19,11 +19,13 @@ using namespace std;
 #include <iostream>
 
 namespace Belle2 {
+
+  /**
+   *  KLM and ECL clusters to keep/remove
+   */
   void storeRelatedToTrack(const Track* p,
                            std::map < Particle::EParticleSourceObject, std::unordered_set<unsigned  int>>& indicesToKeep)
   {
-
-    // KLM and ECL clusters to keep/remove:
     for (const ECLCluster& cluster : p->getRelationsTo<ECLCluster>()) {
       indicesToKeep[Particle::EParticleSourceObject::c_ECLCluster].insert(cluster.getArrayIndex());
     };
@@ -33,6 +35,9 @@ namespace Belle2 {
   }
 
 
+  /**
+   * Keep all information about the particle
+   */
   void keepObject(const Particle* p, std::map < Particle::EParticleSourceObject, std::unordered_set<unsigned  int>>& indicesToKeep)
   {
     auto source = p->getParticleSource();
@@ -113,13 +118,14 @@ namespace Belle2 {
       // Do removal
       if (source == Particle::EParticleSourceObject::c_Track) {
         m_track_selector.select(selector);
-        // Do something with V0s...
+        // Update V0s...
         // Also overwrite the original tracks:
         swapV0s();
         m_track_selector.swapSetsAndDestroyOriginal();
       }
 
       else if (source == Particle::EParticleSourceObject::c_V0) {
+        // already dealt with
       }
 
       else if (source == Particle::EParticleSourceObject::c_ECLCluster) {

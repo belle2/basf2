@@ -1,0 +1,18 @@
+#!/usr/bin/env python3
+
+import basf2 as b2
+import generators as ge
+import sys
+
+decfile = sys.argv[1]
+
+print(decfile)
+b2.set_log_level(b2.LogLevel.ERROR)
+
+main = b2.Path()
+
+main.add_module('EventInfoSetter', evtNumList=[10], expList=[0])
+
+ge.add_evtgen_generator(path=main, finalstate='signal', signaldecfile=decfile)
+
+b2.process(path=main)

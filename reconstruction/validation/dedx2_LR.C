@@ -8,7 +8,7 @@
 /*
   <header>
   <input>EvtGenSimRec_dedx.root</input>
-  <contact>jkumar@andrew.cmu.edu</contact>
+  <contact>renu2@andrew.cmu.edu</contact>
   <description>check PID performance of each particle vs. all others</description>
   </header>
 */

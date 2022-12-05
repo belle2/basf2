@@ -7,6 +7,7 @@ Untested method Particle::forEachDaughter
 Untested method Particle::getAllDaughters
 Untested method Particle::getArrayPointer
 Untested method Particle::getMostLikelyTrackFitResult
+Untested method Particle::getPDGLifetime
 Untested method Particle::isCopyOf
 Untested method Particle::isMostLikely
 Untested method Particle::isMostLikelyTrackFitResult
@@ -22,6 +23,7 @@ Untested method Particle::setJacobiMatrix
 Untested method Particle::setMomentumScalingFactor
 Untested method Particle::setMomentumSmearingFactor
 Untested method Particle::setMomentumVertexErrorMatrix
+Untested method Particle::setPDGCode
 Untested method Particle::setPValue
 Untested method Particle::setProperty
 Untested method Particle::setVertex

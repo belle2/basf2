@@ -8,7 +8,7 @@
 /*
   <header>
   <input>EvtGenSimRec_dedx.root</input>
-  <contact>jkumar@andrew.cmu.edu</contact>
+  <contact>renu2@andrew.cmu.edu</contact>
   <description>check log-likelihood difference pi vs. K</description>
   </header>
 */

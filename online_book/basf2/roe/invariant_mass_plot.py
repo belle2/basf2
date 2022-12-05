@@ -10,15 +10,18 @@
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-from root_pandas import read_root
+import uproot
 
 # Only include this line if you're running from ipython an a remote server
 mpl.use("Agg")
 
 plt.style.use("belle2")  # use the official Belle II plotting style
 
+# Declare list of variables
+var_list = ['Jpsi_isSignal', 'Jpsi_M_uncorrected', 'Jpsi_M']
+
 # Make sure that the .root file is in the same directory to find it
-df = read_root("Bd2JpsiKS.root")
+df = uproot.open("Bd2JpsiKS.root:tree").arrays(var_list, library='pd')
 
 # Let's only consider signal J/Psi
 df_signal_only = df.query("Jpsi_isSignal == 1")

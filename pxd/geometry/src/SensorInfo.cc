@@ -30,7 +30,7 @@ double SensorInfo::getElectronMobility(double E) const
           / (pow(1. + pow((fabs(E) / EcElec), betaElec), (1. / betaElec))));
 }
 
-const TVector3 SensorInfo::getEField(const TVector3& point) const
+const ROOT::Math::XYZVector SensorInfo::getEField(const ROOT::Math::XYZVector& point) const
 {
   // FIXME: Get rid of the gateDepth
   double depletionVoltage = 0.5 * Unit::e * m_bulkDoping
@@ -38,29 +38,30 @@ const TVector3 SensorInfo::getEField(const TVector3& point) const
   double gateZ = 0.5 * m_thickness - m_gateDepth;
   double Ez = 2 * depletionVoltage * (point.Z() - gateZ) / m_thickness
               / m_thickness;
-  TVector3 E(0, 0, Ez);
+  ROOT::Math::XYZVector E(0, 0, Ez);
   return E;
 }
 
-const TVector3 SensorInfo::getBField(const TVector3& point) const
+const ROOT::Math::XYZVector SensorInfo::getBField(const ROOT::Math::XYZVector& point) const
 {
-  TVector3 pointGlobal = pointToGlobal(point, true);
-  ROOT::Math::XYZVector bGlobal = BFieldManager::getField(ROOT::Math::XYZVector(pointGlobal));
-  TVector3 bLocal = vectorToLocal(bGlobal, true);
+  ROOT::Math::XYZVector pointGlobal = pointToGlobal(point, true);
+  ROOT::Math::XYZVector bGlobal = BFieldManager::getField(pointGlobal);
+  ROOT::Math::XYZVector bLocal = vectorToLocal(bGlobal, true);
   return bLocal;
 }
 
-const TVector3 SensorInfo::getDriftVelocity(const TVector3& E,
-                                            const TVector3& B) const
+const ROOT::Math::XYZVector
+SensorInfo::getDriftVelocity(const ROOT::Math::XYZVector& E,
+                             const ROOT::Math::XYZVector& B) const
 {
   // Set mobility parameters
-  double mobility = -getElectronMobility(E.Mag());
+  double mobility = -getElectronMobility(E.R());
   double mobilityH = m_hallFactor * mobility;
   // Calculate products
-  TVector3 EcrossB = E.Cross(B);
-  TVector3 BEdotB = E.Dot(B) * B;
-  TVector3 v = mobility * E + mobility * mobilityH * EcrossB
-               + mobility * mobilityH * mobilityH * BEdotB;
+  ROOT::Math::XYZVector EcrossB = E.Cross(B);
+  ROOT::Math::XYZVector BEdotB = E.Dot(B) * B;
+  ROOT::Math::XYZVector v = mobility * E + mobility * mobilityH * EcrossB
+                            + mobility * mobilityH * mobilityH * BEdotB;
   v *= 1.0 / (1.0 + mobilityH * mobilityH * B.Mag2());
   return v;
 }
@@ -95,7 +96,7 @@ int SensorInfo::getPixelKindNew(const VxdID& sensorID, int vID) const
 }
 
 
-const TVector3 SensorInfo::getLorentzShift(double u, double v) const
+const ROOT::Math::XYZVector SensorInfo::getLorentzShift(double u, double v) const
 {
   // Constants for the 5-point Gauss quadrature formula
   const double alphaGL = 1.0 / 3.0 * sqrt(5.0 + 2.0 * sqrt(10.0 / 7.0));
@@ -112,12 +113,12 @@ const TVector3 SensorInfo::getLorentzShift(double u, double v) const
     midpoint - alphaGL * h, midpoint - betaGL * h, midpoint, midpoint + betaGL * h, midpoint + alphaGL* h
   };
   // Integrate v/v_z from z = 0 to z = distanceToPlane
-  TVector3 position(u, v, 0);
-  TVector3 currentBField = getBField(position);
+  ROOT::Math::XYZVector position(u, v, 0);
+  ROOT::Math::XYZVector currentBField = getBField(position);
   for (int iz = 0; iz < 5; ++iz) {
     // This is OK as long as E only depends on z
-    TVector3 currentEField = getEField(TVector3(0, 0, zKnots[iz]));
-    TVector3 velocity = getDriftVelocity(currentEField, currentBField);
+    ROOT::Math::XYZVector currentEField = getEField(ROOT::Math::XYZVector(0, 0, zKnots[iz]));
+    ROOT::Math::XYZVector velocity = getDriftVelocity(currentEField, currentBField);
     position += weightGL[iz] / velocity.Z() * velocity;
   } // for knots
   position.SetZ(0);

@@ -28,7 +28,7 @@ void TrackSelector::apply(std::vector<RecoTrack*>& tracks)
 {
   const auto trackHasEnoughPtAndHits = [this](RecoTrack * rt) {
     return (rt->getNumberOfCDCHits() < m_param_minNumberCDCHits) or
-           (rt->getMomentumSeed().Mag() < m_param_minimumTrackPt);
+           (rt->getMomentumSeed().Rho() < m_param_minimumTrackPt);
   };
   TrackFindingCDC::erase_remove_if(tracks, trackHasEnoughPtAndHits);
 

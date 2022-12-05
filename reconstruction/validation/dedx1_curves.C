@@ -8,7 +8,7 @@
 /*
 <header>
   <input>EvtGenSimRec_dedx.root</input>
-  <contact>jkumar@andrew.cmu.edu</contact>
+  <contact>renu2@andrew.cmu.edu</contact>
   <description>Plot dE/dx over momentum</description>
   </header>
 */

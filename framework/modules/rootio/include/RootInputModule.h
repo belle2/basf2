@@ -57,7 +57,8 @@ namespace Belle2 {
     virtual std::vector<std::string> getFileNames(bool outputFiles = false) override
     {
       B2ASSERT("RootInput is not an output module", !outputFiles);
-      std::vector<std::string> inputFiles = Environment::Instance().getInputFilesOverride();
+      std::vector<std::string> inputFiles = !m_isSecondaryInput ? Environment::Instance().getInputFilesOverride() :
+                                            Environment::Instance().getSecondaryInputFilesOverride();
       if (!m_ignoreCommandLineOverride and !inputFiles.empty()) {
         return inputFiles;
       }
@@ -222,5 +223,10 @@ namespace Belle2 {
 
     /** Set to true if we process the input files completely: No skip events or sequences or -n parameters */
     bool m_processingAllEvents{true};
+
+    /** When using a second RootInputModule in an independent path [usually if you are using add_independent_merge_path(...)]
+     * this has to be set to true
+     * */
+    bool m_isSecondaryInput{false};
   };
 } // end namespace Belle2

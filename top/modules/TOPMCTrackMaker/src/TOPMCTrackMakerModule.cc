@@ -126,8 +126,8 @@ namespace Belle2 {
                                        EXT_ENTER,
                                        false,
                                        tof,
-                                       barHit->getPositionTVector3(),
-                                       barHit->getMomentumTVector3(),
+                                       barHit->getPosition(),
+                                       barHit->getMomentum(),
                                        cov);
       track->addRelationTo(extHit);
     }

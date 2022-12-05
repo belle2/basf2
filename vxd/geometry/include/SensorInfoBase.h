@@ -13,7 +13,6 @@
 
 #include <Math/Vector3D.h>
 #include <TGeoMatrix.h>
-#include <TVector3.h>
 
 namespace Belle2 {
   /** Namespace to provide code needed by both Vertex Detectors, PXD and SVD */
@@ -234,7 +233,7 @@ namespace Belle2 {
        * @param local point in local coordinates
        * @return true if inside active area, false otherwise
        */
-      bool inside(const TVector3& local) const
+      bool inside(const ROOT::Math::XYZVector& local) const
       {
         double nw = local.Z() / getThickness() + 0.5;
         return inside(local.X(), local.Y()) && 0 <= nw && nw <= 1;
@@ -256,35 +255,35 @@ namespace Belle2 {
        * @param local point in local coordinates, will be modified to lie
        * inside or at the border of the sensor
        */
-      void forceInside(TVector3& local) const;
+      void forceInside(ROOT::Math::XYZVector& local) const;
 
       /** Convert a point from local to global coordinates
        * @param local point in local coordinates
        * @param reco Use sensor position in reconstruction (true) or in nominal geometry (false)
        * @return point in global coordinates
        */
-      TVector3 pointToGlobal(const TVector3& local, bool reco = false) const;
+      ROOT::Math::XYZVector pointToGlobal(const ROOT::Math::XYZVector& local, bool reco = false) const;
 
       /** Convert a vector from local to global coordinates
        * @param local vector in local coordinates
        * @param reco Use sensor position in reconstruction (true) or in nominal geometry (false)
        * @return vector in global coordinates
        */
-      TVector3 vectorToGlobal(const TVector3& local, bool reco = false) const;
+      ROOT::Math::XYZVector vectorToGlobal(const ROOT::Math::XYZVector& local, bool reco = false) const;
 
       /** Convert a point from global to local coordinates
        * @param global point in global coordinates
        * @param reco Use sensor position in reconstruction (true) or in nominal geometry (false)
        * @return point in local coordinates
        */
-      TVector3 pointToLocal(const TVector3& global, bool reco = false) const;
+      ROOT::Math::XYZVector pointToLocal(const ROOT::Math::XYZVector& global, bool reco = false) const;
 
       /** Convert a vector from global to local coordinates
        * @param global vector in global coordinates
        * @param reco Use sensor position in reconstruction (true) or in nominal geometry (false)
        * @return vector in local coordinates
        */
-      TVector3 vectorToLocal(const ROOT::Math::XYZVector& global, bool reco = false) const;
+      ROOT::Math::XYZVector vectorToLocal(const ROOT::Math::XYZVector& global, bool reco = false) const;
 
       /** Set the transformation matrix of the Sensor
        * @param transform Transformation matrix of the Sensor
@@ -347,7 +346,7 @@ namespace Belle2 {
       std::vector<double> m_surfaceDeformationParameters = std::vector<double>(12, 0.0);
     };
 
-    inline void SensorInfoBase::forceInside(TVector3& local) const
+    inline void SensorInfoBase::forceInside(ROOT::Math::XYZVector& local) const
     {
       double u = local.X();
       double v = local.Y();
@@ -358,44 +357,44 @@ namespace Belle2 {
       local.SetZ(std::min(thickness, std::max(-thickness, local.Z())));
     }
 
-    inline TVector3 SensorInfoBase::pointToGlobal(const TVector3& local, bool reco) const
+    inline ROOT::Math::XYZVector SensorInfoBase::pointToGlobal(const ROOT::Math::XYZVector& local, bool reco) const
     {
       double clocal[3];
       double cmaster[3];
-      local.GetXYZ(clocal);
+      local.GetCoordinates(clocal);
       if (reco) m_recoTransform.LocalToMaster(clocal, cmaster);
       else m_transform.LocalToMaster(clocal, cmaster);
-      return TVector3(cmaster);
+      return ROOT::Math::XYZVector(cmaster[0], cmaster[1], cmaster[2]);
     }
 
-    inline TVector3 SensorInfoBase::vectorToGlobal(const TVector3& local, bool reco) const
+    inline ROOT::Math::XYZVector SensorInfoBase::vectorToGlobal(const ROOT::Math::XYZVector& local, bool reco) const
     {
       double clocal[3];
       double cmaster[3];
-      local.GetXYZ(clocal);
+      local.GetCoordinates(clocal);
       if (reco) m_recoTransform.LocalToMasterVect(clocal, cmaster);
       else m_transform.LocalToMasterVect(clocal, cmaster);
-      return TVector3(cmaster);
+      return ROOT::Math::XYZVector(cmaster[0], cmaster[1], cmaster[2]);
     }
 
-    inline TVector3 SensorInfoBase::pointToLocal(const TVector3& global, bool reco) const
+    inline ROOT::Math::XYZVector SensorInfoBase::pointToLocal(const ROOT::Math::XYZVector& global, bool reco) const
     {
       double clocal[3];
       double cmaster[3];
-      global.GetXYZ(cmaster);
+      global.GetCoordinates(cmaster);
       if (reco) m_recoTransform.MasterToLocal(cmaster, clocal);
       else m_transform.MasterToLocal(cmaster, clocal);
-      return TVector3(clocal);
+      return ROOT::Math::XYZVector(clocal[0], clocal[1], clocal[2]);
     }
 
-    inline TVector3 SensorInfoBase::vectorToLocal(const ROOT::Math::XYZVector& global, bool reco) const
+    inline ROOT::Math::XYZVector SensorInfoBase::vectorToLocal(const ROOT::Math::XYZVector& global, bool reco) const
     {
       double clocal[3];
       double cmaster[3];
       global.GetCoordinates(cmaster);
       if (reco) m_recoTransform.MasterToLocalVect(cmaster, clocal);
       else m_transform.MasterToLocalVect(cmaster, clocal);
-      return TVector3(clocal);
+      return ROOT::Math::XYZVector(clocal[0], clocal[1], clocal[2]);
     }
   }
 } //Belle2 namespace

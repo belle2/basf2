@@ -31,7 +31,7 @@ namespace Belle2 {
     /**
      * This method is called for each event.
      */
-    void event() override final;
+    void event() override;
 
     // Data members
   private:

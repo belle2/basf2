@@ -157,15 +157,16 @@ if args.isMC:
     outputFileName += "_MC"
 if args.is3sample:
     outputFileName += "_emulated3sample"
-outputFileName += "_"+str(args.fileTag)
 
-# main.add_module('SVDEventT0PerformanceTTree', outputFileName=outputFileName+".root")
+# recoFileName = outputFileName + "_" + str(args.fileTag) + ".root"
+# main.add_module('SVDEventT0PerformanceTTree', outputFileName=recoFileName)
 
 # # write everything
 # main.add_module('OverlapResiduals', ExpertLevel=True)
 
+rootOutFileName = outputFileName + "_RootOutput_" + str(args.fileTag) + ".root"
 main.add_module('RootOutput',
-                outputFileName=outputFileName+"_RootOutput.root",
+                outputFileName=rootOutFileName,
                 branchNames=['SVDClusters'])
 
 main.add_module('Progress')

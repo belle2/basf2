@@ -85,7 +85,7 @@ else:
     # main.add_module('RootInput', branchNames=['RawPXDs', 'RawSVDs', 'RawCDCs', 'RawECLs'])
     # raw.add_unpackers(main, components=['PXD', 'SVD', 'CDC', 'ECL'])
 
-    # main.add_module('RootInput', entrySequences=['0:1000'])
+    # main.add_module('RootInput', entrySequences=['0:50'])
     main.add_module('RootInput')
 
     main.add_module("Gearbox")
@@ -158,12 +158,16 @@ if args.isMC:
 if args.is3sample:
     outputFileName += "_emulated3sample"
 outputFileName += "_"+str(args.fileTag)
-main.add_module('SVDEventT0PerformanceTTree', outputFileName=outputFileName+".root")
+
+# main.add_module('SVDEventT0PerformanceTTree', outputFileName=outputFileName+".root")
 
 # # write everything
 # main.add_module('OverlapResiduals', ExpertLevel=True)
 
-# main.add_module('RootOutput')
+main.add_module('RootOutput',
+                outputFileName=outputFileName+"_RootOutput.root",
+                branchNames=['SVDClusters'])
+
 main.add_module('Progress')
 
 b2.print_path(main)

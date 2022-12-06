@@ -318,8 +318,8 @@ def generate_cos_theta_plot(data_tree, pt_value):
                         cos_upper)
 
     data_tree.Draw('cosTheta_gen>>hCosGen',
-                   'pt_gen>({:.2f} - {:f}) &&pt_gen<({:.2f} + {:f})'.format(pt_value,
-                                                                            DELTA_PT, pt_value, DELTA_PT), 'goff')
+                   'pt_gen>(%.2f - %f) &&pt_gen<(%.2f + %f)' % (pt_value,
+                                                                DELTA_PT, pt_value, DELTA_PT), 'goff')
     data_tree.Draw('cosTheta_gen>>hCosRec',
                    'pt_gen>(%.2f - %f) &&pt_gen<(%.2f + %f) && pt != -999'
                    % (pt_value, DELTA_PT, pt_value, DELTA_PT), 'goff')
@@ -482,7 +482,7 @@ def calculate_momentum_resolution2(data_tree):
     for key in sorted(delta_pt_dict):
         (rms90, rms_error) = get_scaled_rms_90(delta_pt_dict[key])
         pt_resolutions[key] = [rms90, rms_error]
-        print('pt = {:0.2f}: sigma/pt = {:0.4f}'.format(key, rms90 / key))
+        print('pt = %0.2f: sigma/pt = %0.4f' % (key, rms90 / key))
 
     return pt_resolutions
 
@@ -587,8 +587,8 @@ def draw_impact_parameter(data_tree):
         d0_resolutions[key] = [d0_resolution, d0_error]
         (z_resolution, z_error) = get_scaled_rms_90(impact_param_z[key])
         z_resolutions[key] = [z_resolution, z_error]
-        print('pt = {:0.2f}: sigma_d0 = {:0.4f}, sigma_z = {:0.4f}'.format(key,
-                                                                           d0_resolution, z_resolution))
+        print('pt = %0.2f: sigma_d0 = %0.4f, sigma_z = %0.4f' % (key,
+                                                                 d0_resolution, z_resolution))
 
     number_bins = 62
     lower_edge = -0.025
@@ -687,8 +687,8 @@ def draw_residua(
 
     histograms = {}
     for pt_value in used_pts:
-        histograms[pt_value] = TH1F('h{}Residuum_{:0.2f}GeV'.format(variable_name,
-                                                                    pt_value), 'h%sResiduum_%0.2fGeV'
+        histograms[pt_value] = TH1F('h%sResiduum_%0.2fGeV' % (variable_name,
+                                                              pt_value), 'h%sResiduum_%0.2fGeV'
                                     % (variable_name, pt_value), bins, ledge,
                                     uedge)
 
@@ -709,10 +709,10 @@ def draw_residua(
     for (pt, hist) in histograms.items():
         scale_histogram(hist)
         if normalize:
-            hist.SetXTitle('({} - {}) / {}'.format(variable_name,
-                                                   gen_variable_name, gen_variable_name))
+            hist.SetXTitle('(%s - %s) / %s' % (variable_name,
+                                               gen_variable_name, gen_variable_name))
         else:
-            hist.SetXTitle('({} - {})'.format(variable_name, gen_variable_name))
+            hist.SetXTitle('(%s - %s)' % (variable_name, gen_variable_name))
         hist.GetListOfFunctions().Add(TNamed('Contact', CONTACT_PERSON['Email'
                                                                        ]))
         make_expert_plot(hist)

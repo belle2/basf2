@@ -77,6 +77,12 @@ Modules
 * The ParticleLists labeled ``:MC``, which were created by default when the `fillParticleListFromMC` is called, are no longer
   created automatically by the function. Also, the protection that was previously applied to the list labeled ":MC" has been
   removed.
+ * Added an option ``signalSideParticleList`` to the function :func:`modularAnalysis.variablesToNtuple` to store the index of the signal-side particle.
+   This option is only valid when one calls the function in a ``for_each`` loop over the RestOfEvent.
+   The branches ``__signalSideCandidate__`` and ``__nSignalSideCandidates__`` are added to the TTree by setting the option.
+ * Added the argument ``treatAsInvisibleForVertex`` in :func:`vertex.treeFit` to ignore particles to determine the vertex position but still valid for kinematics.
+   The ``treatAsInvisibleForVertex`` option is expected to mimic a ``K_S0`` or a ``pi0`` with a control channel by ignoring a track for vertex fit.
+   While, ``treatAsInvisible`` will ignore both for vertex and kinematics. The ``treatAsInvisible`` option is expected to recover an invisible particle's kinematics from beam-constraint.
 
 Changes in the analysis package in light-2210-devonrex
 ------------------------------------------------------

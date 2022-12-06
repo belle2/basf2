@@ -178,8 +178,9 @@ float DQMHistAnalysisCDCMonObjModule::getHistMedian(TH1D* h) const
 {
   TH1D* hist = (TH1D*)h->Clone();
   hist->SetBinContent(1, 0.0); // Exclude 0-th bin
+  if (hist->GetMean() == 0) {return 0.0;} // Avoid an error if only ADC=0 entries
   double quantiles[1] = {0.0}; // One element to store median
-  double probSums[1] = {0.5}; // Median definiton
+  double probSums[1] = {0.5}; // Median definition
   hist->GetQuantiles(1, quantiles, probSums);
   float median = quantiles[0];
   return median;

@@ -234,6 +234,7 @@ def treeFit(
     customOriginCovariance=[0.0048, 0, 0, 0, 0.003567, 0, 0, 0, 0.0400],
     originDimension=3,
     treatAsInvisible='',
+    treatAsInvisibleForVertex='',
     path=None,
 ):
     """
@@ -288,6 +289,7 @@ def treeFit(
     treeFitter.param('customOriginCovariance', customOriginCovariance)
     treeFitter.param('originDimension', originDimension)
     treeFitter.param('treatAsInvisible', treatAsInvisible)
+    treeFitter.param('treatAsInvisibleForVertex', treatAsInvisibleForVertex)
     path.add_module(treeFitter)
 
 

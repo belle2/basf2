@@ -321,8 +321,8 @@ def generate_cos_theta_plot(data_tree, pt_value):
                    'pt_gen>({:.2f} - {:f}) &&pt_gen<({:.2f} + {:f})'.format(pt_value,
                                                                             DELTA_PT, pt_value, DELTA_PT), 'goff')
     data_tree.Draw('cosTheta_gen>>hCosRec',
-                   'pt_gen>(%.2f - %f) &&pt_gen<(%.2f + %f) && pt != -999'
-                   % (pt_value, DELTA_PT, pt_value, DELTA_PT), 'goff')
+                   'pt_gen>({:.2f} - {:f}) &&pt_gen<({:.2f} + {:f}) && pt != -999'.format(pt_value,
+                                                                                          DELTA_PT, pt_value, DELTA_PT), 'goff')
 
     description = ('Events with 10 muon tracks with fixed transverse '
                    'momentum are generated using the ParticleGun(500 '

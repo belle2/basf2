@@ -453,7 +453,7 @@ class Plotuple:
 
         # Create a ROOT Legend
         legend = ROOT.TLegend(0.01, 0.01, 0.49, 0.06)
-        legend.SetNColumns(3)
+        legend.SetNColumns(len(self._elements))
         legend.SetTextSize(0.024)
 
         # Allow possibility to turn off the stats box

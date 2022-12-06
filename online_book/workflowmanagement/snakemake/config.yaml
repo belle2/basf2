@@ -1,0 +1,14 @@
+outputDirectory:
+    "/group/belle/users/<user>/"
+BatchesPerSkim:
+    3
+release:
+    "release-06-00-03"
+gbasf2_max_retries:
+    10
+gbasf2_download_logs:
+    False
+gbasf2_min_proxy_lifetime:
+    0
+gbasf2_proxy_lifetime:
+    24

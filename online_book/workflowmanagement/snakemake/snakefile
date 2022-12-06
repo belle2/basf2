@@ -1,0 +1,104 @@
+configfile: "config.yaml"
+
+workdir: config["outputDirectory"]
+
+localrules: OfflineAnalysis, MergeEventType, MergeBatch, BatchToTextFile, Skim, SetProxy #only Reconstruction on bsub cluster
+    
+from extravariables import outputfile, runningOnMC
+import numpy as np
+import hashlib
+
+rule OfflineAnalysis:
+    input:
+        data_BB = "data/projectName_bmesons/reco.root",
+        data_QQ = "data/projectName_qqcontinuum/reco.root"
+        
+    output:
+        mbc_plot = "Mbc.jpg",
+        deltaE_plot = "deltaE.jpg"
+    
+    script:
+        "offlineanalysis.py"
+      
+def PathDictionary(wildcards): #match gbasf2 dataset paths to output file paths
+    Paths = dict()
+    for i,skim in enumerate(open(f"{workflow.basedir}/{wildcards.EventType}skims.dat",'r').read().splitlines()):
+        Paths.update({skim:f"Reconstruction/projectName_{wildcards.EventType}/skim_{i}/reco.root"})
+    return Paths
+
+rule MergeEventType:
+    input:
+        unpack(PathDictionary)
+        
+    output:
+        "data/projectName_{EventType}/reco.root"
+        
+    shell:
+        "hadd {output} {input}" #for merging nTuples
+        
+rule MergeBatch:
+    input:
+        expand("Reconstruction/projectName_{EventType}/skim_{skim}/reco_batch{batch}.root",\
+               batch=np.arange(config["BatchesPerSkim"]), allow_missing=True)
+        
+    output:
+        "Reconstruction/projectName_{EventType}/skim_{skim}/reco.root"
+        
+    shell:
+        "hadd {output} {input}" #for merging nTuples
+        
+rule ReconstructBatch:
+    input:
+        inputfileList = "Skim/projectName_{EventType}/skim_{skim}/batch{batch}.json"
+        
+    params:
+        runningOnMC = runningOnMC
+    
+    log:
+        "Reconstruction/projectName_{EventType}/skim_{skim}/batch{batch}_log.dat"
+        
+    output:
+        "Reconstruction/projectName_{EventType}/skim_{skim}/reco_batch{batch}.root"
+        
+    script:
+        "Reconstruction.py"
+
+rule BatchToTextFile:
+    input:
+        skim_dirs = "Skim/projectName_{EventType}/skim_{skim}/skimslist.dat"
+        
+    output:
+        expand("Skim/projectName_{EventType}/skim_{skim}/batch{batch}.json",\
+               batch=np.arange(config["BatchesPerSkim"]),allow_missing=True)
+        
+    params:
+        BatchesPerSkim = config["BatchesPerSkim"]
+        
+    script:
+        "BatchToTxt.py"
+        
+rule Skim:
+    input:
+        proxy_text_file = "proxy.dat"
+    params:
+        steeringfile = f"{workflow.basedir}/Skim.py",
+        sandbox_input_files = ["extravariables.py"],
+        gbasf2_dataset = lambda wildcards: list(PathDictionary(wildcards).keys())[int(wildcards.skim)],
+        release = config["release"],
+        maxretries = int(config["gbasf2_max_retries"]),
+        gbasf2_download_logs = bool(config["gbasf2_download_logs"]),
+        gbasf2_min_proxy_lifetime = config["gbasf2_min_proxy_lifetime"],
+        gbasf2_proxy_lifetime = config["gbasf2_proxy_lifetime"],
+        gbasf2_output_file_name = outputfile
+    output:
+        output_filelist = "Skim/projectName_{EventType}/skim_{skim}/skimslist.dat"
+    wrapper:
+        "file:/path/to/gbasf2_wrapper_for_snakemake"
+        
+rule SetProxy:
+    params:
+        setProxy = True
+    output:
+        proxy_text_file = temp("proxy.dat")
+    wrapper:
+        "file:/path/to/gbasf2_wrapper_for_snakemake"

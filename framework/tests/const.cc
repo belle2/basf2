@@ -208,12 +208,12 @@ namespace {
     set += Const::SVD + Const::VTX;
     EXPECT_EQ(set.getIndex(Const::IR), -1);
     EXPECT_EQ(set.getIndex(Const::PXD), 0);
-    EXPECT_EQ(set.getIndex(Const::TEST), 2);
+    EXPECT_EQ(set.getIndex(Const::VTX), 2);
     Const::DetectorSet::Iterator it = set.begin();
     EXPECT_EQ(*it, Const::PXD);
     ++it;
     ++it;
-    EXPECT_EQ(*it, Const::TEST);
+    EXPECT_EQ(*it, Const::VTX);
     ++it;
     EXPECT_EQ(*it, Const::invalidDetector);
     EXPECT_EQ(set.size(), (size_t)3);

@@ -179,7 +179,7 @@ Const::DetectorSet::Iterator& Const::DetectorSet::Iterator::operator++()
 {
   while (1) {
     m_SetBit = m_SetBit << 1;
-    if (m_SetBit >= 0x1000) {
+    if (m_SetBit >= 0x2000) {
       m_SetBit = invalidDetector;
       return *this;
     }
@@ -207,7 +207,7 @@ Const::DetectorSet::Iterator Const::DetectorSet::begin() const
   uint16_t setBit = 1;
   while ((m_bits & setBit) == 0) {
     setBit = setBit << 1;
-    if (setBit >= 0x1000)
+    if (setBit >= 0x2000)
       return Const::DetectorSet::Iterator(0, m_bits, invalidDetector);
   }
   return Const::DetectorSet::Iterator(0, m_bits, setBit);

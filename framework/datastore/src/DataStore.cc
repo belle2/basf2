@@ -353,8 +353,6 @@ void DataStore::replaceData(const StoreAccessorBase& from, const StoreAccessorBa
 
   if (!fromEntry->ptr) {
     //since we don't need to move any data, just invalidate toEntry instead.
-    if (toEntry->isArray)
-      toEntry->getPtrAsArray()->Delete();   // This seems to be needed too.
     toEntry->ptr = nullptr;
   } else if (fromEntry->isArray) {
     if (!toEntry->ptr)

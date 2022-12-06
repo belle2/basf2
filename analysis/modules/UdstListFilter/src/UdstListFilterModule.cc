@@ -100,7 +100,11 @@ void UdstListFilterModule::event()
     keepObject(&p, mdstIndices);
   }
 
-  for (const auto& [source, indices] : mdstIndices) {
+  for (const auto& mI : mdstIndices) {
+    // for (const auto& [source, indices] : mdstIndices) {
+
+    const auto& source  = mI.first;
+    const auto& indices = mI.second;
 
     // Selector
     auto selector = [indices, this](const RelationsObject * p) -> bool {

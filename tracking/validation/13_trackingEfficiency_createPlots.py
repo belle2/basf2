@@ -83,10 +83,10 @@ def main():
     try:
         number_entries = data_tree.GetEntries()
     except AttributeError:
-        print('Could not load tree with name %s.' % tree_name)
+        print(f'Could not load tree with name {tree_name}.')
 
     if number_entries == 0:
-        print('Data tree \'%s\'is empty or does not exist. Exit.' % tree_name)
+        print(f'Data tree \'{tree_name}\'is empty or does not exist. Exit.')
         sys.exit(0)
 
     # output root file
@@ -167,12 +167,11 @@ def draw_hit_counts(data_tree, pt_values):
 
     hists = {}
     for det in ['PXD', 'SVD', 'CDC']:
-        hists[det] = TProfile('hHitCounts%s' % det,
-                              'Hit count profile for the %s;pT;nHits' % det,
+        hists[det] = TProfile(f'hHitCounts{det}',
+                              f'Hit count profile for the {det};pT;nHits',
                               number_bins, pt_lower, pt_upper)
 
-        description = 'Distribution of Hit Counts in %s (Contact: %s).' \
-            % (det, CONTACT_PERSON['Email'])
+        description = f'Distribution of Hit Counts in {det} (Contact: {CONTACT_PERSON["Email"]}).'
         check = ''
 
         hists[det].GetListOfFunctions().Add(TNamed('Description', description))
@@ -223,8 +222,8 @@ def draw_pvalue(data_tree):
         try:
             pvalue = data_tree.GetLeaf('pValue').GetValue()
         except ReferenceError:
-            print('The variable "pValue" doesn\'t exist in the tree "%s".\nLeave this function without plotting the variable.'
-                  % data_tree.GetName())
+            print(f'The variable "pValue" doesn\'t exist in the tree "{data_tree.GetName()}".\n'
+                  'Leave this function without plotting the variable.')
             return
 
         if pvalue is -999:
@@ -236,8 +235,7 @@ def draw_pvalue(data_tree):
     hist_pvalue.SetXTitle('pValue')
     hist_pvalue.SetYTitle('number of entries')
 
-    description = 'Distribution of pValues of the tracks (Contact: %s).' \
-        % CONTACT_PERSON['Email']
+    description = f'Distribution of pValues of the tracks (Contact: {CONTACT_PERSON["Email"]}).'
     check = 'Should be a flat distribution.'
 
     hist_pvalue.GetListOfFunctions().Add(TNamed('Description', description))
@@ -318,11 +316,9 @@ def generate_cos_theta_plot(data_tree, pt_value):
                         cos_upper)
 
     data_tree.Draw('cosTheta_gen>>hCosGen',
-                   'pt_gen>({:.2f} - {:f}) &&pt_gen<({:.2f} + {:f})'.format(pt_value,
-                                                                            DELTA_PT, pt_value, DELTA_PT), 'goff')
+                   f'pt_gen>({pt_value:.2f} - {DELTA_PT:f}) && pt_gen<({pt_value:.2f} + {DELTA_PT:f})', 'goff')
     data_tree.Draw('cosTheta_gen>>hCosRec',
-                   'pt_gen>({:.2f} - {:f}) &&pt_gen<({:.2f} + {:f}) && pt != -999'.format(pt_value,
-                                                                                          DELTA_PT, pt_value, DELTA_PT), 'goff')
+                   f'pt_gen>({pt_value:.2f} - {DELTA_PT:f}) && pt_gen<({pt_value:.2f} + {DELTA_PT:f}) && pt != -999', 'goff')
 
     description = ('Events with 10 muon tracks with fixed transverse '
                    'momentum are generated using the ParticleGun(500 '
@@ -333,9 +329,9 @@ def generate_cos_theta_plot(data_tree, pt_value):
                    'momentum pt = %.2f GeV.')
     check = 'Stable efficiency over the hole range of the polar angle.'
 
-    efficiency_hist = TH1F('hEfficiencyPt%.2fGeV' % pt_value,
-                           'hEfficiencyPt%.2fGeV' % pt_value, number_bins,
-                           cos_lower, cos_upper)
+    efficiency_hist = TH1F(f'hEfficiencyPt{pt_value:.2f}GeV',
+                           f'hEfficiencyPt{pt_value:.2f}GeV',
+                           number_bins, cos_lower, cos_upper)
     efficiency_hist.GetListOfFunctions().Add(TNamed('Description',
                                                     description))
     efficiency_hist.GetListOfFunctions().Add(TNamed('Check', check))
@@ -355,7 +351,7 @@ def generate_cos_theta_plot(data_tree, pt_value):
         efficiency_hist.SetBinContent(ibin, efficiency)
         efficiency_hist.SetBinError(ibin, error)
 
-    efficiency_hist.SetTitle('Tracks with pt = %.2f GeV' % pt_value)
+    efficiency_hist.SetTitle(f'Tracks with pt = {pt_value:.2f} GeV')
     efficiency_hist.SetXTitle('cos #Theta')
     efficiency_hist.SetYTitle('efficiency')
     make_expert_plot(efficiency_hist)
@@ -472,8 +468,7 @@ def calculate_momentum_resolution2(data_tree):
                 try:
                     delta_pt_dict[test_object[1]].append(pt - pt_gen)
                 except KeyError:
-                    print('pt = %0.2f is not generated and not used as key. Abort!'
-                          % test_object[1])
+                    print(f'pt = {test_object[1]:0.2f} is not generated and not used as key. Abort!')
                     sys.exit(1)
     pt_resolutions = {}
 
@@ -482,7 +477,7 @@ def calculate_momentum_resolution2(data_tree):
     for key in sorted(delta_pt_dict):
         (rms90, rms_error) = get_scaled_rms_90(delta_pt_dict[key])
         pt_resolutions[key] = [rms90, rms_error]
-        print('pt = {:0.2f}: sigma/pt = {:0.4f}'.format(key, rms90 / key))
+        print(f'pt = {key:0.2f}: sigma/pt = {rms90/key:0.4f}')
 
     return pt_resolutions
 
@@ -587,8 +582,7 @@ def draw_impact_parameter(data_tree):
         d0_resolutions[key] = [d0_resolution, d0_error]
         (z_resolution, z_error) = get_scaled_rms_90(impact_param_z[key])
         z_resolutions[key] = [z_resolution, z_error]
-        print('pt = {:0.2f}: sigma_d0 = {:0.4f}, sigma_z = {:0.4f}'.format(key,
-                                                                           d0_resolution, z_resolution))
+        print(f'pt = {key:0.2f}: sigma_d0 = {d0_resolution:0.4f}, sigma_z = {z_resolution:0.4f}')
 
     number_bins = 62
     lower_edge = -0.025
@@ -687,10 +681,9 @@ def draw_residua(
 
     histograms = {}
     for pt_value in used_pts:
-        histograms[pt_value] = TH1F('h{}Residuum_{:0.2f}GeV'.format(variable_name,
-                                                                    pt_value), 'h%sResiduum_%0.2fGeV'
-                                    % (variable_name, pt_value), bins, ledge,
-                                    uedge)
+        histograms[pt_value] = TH1F(f'h{variable_name}Residuum_{pt_value:0.2f}GeV',
+                                    f'h{variable_name}Residuum_{pt_value:0.2f}GeV',
+                                    bins, ledge, uedge)
 
     for index in range(number_entries):
         data_tree.GetEntry(index)
@@ -709,10 +702,9 @@ def draw_residua(
     for (pt, hist) in histograms.items():
         scale_histogram(hist)
         if normalize:
-            hist.SetXTitle('({} - {}) / {}'.format(variable_name,
-                                                   gen_variable_name, gen_variable_name))
+            hist.SetXTitle(f'({variable_name} - {gen_variable_name}) / {gen_variable_name}')
         else:
-            hist.SetXTitle('({} - {})'.format(variable_name, gen_variable_name))
+            hist.SetXTitle(f'({variable_name} - {gen_variable_name})')
         hist.GetListOfFunctions().Add(TNamed('Contact', CONTACT_PERSON['Email'
                                                                        ]))
         make_expert_plot(hist)

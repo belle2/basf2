@@ -89,6 +89,8 @@ TreeFitterModule::TreeFitterModule() : Module(), m_nCandidatesBeforeFit(-1), m_n
            1);
   addParam("treatAsInvisible", m_treatAsInvisible,
            "Type::[string]. Decay string to select one particle that will be ignored in the fit.", {});
+  addParam("treatAsInvisibleForVertex", m_treatAsInvisibleForVertex,
+           "Type::[string]. Decay string to select one particle that will be ignored to determine the vertex position while kept for kinematics determination.", {});
 }
 
 void TreeFitterModule::initialize()
@@ -112,6 +114,16 @@ void TreeFitterModule::initialize()
     else if (m_pDDescriptorInvisibles.getSelectionPDGCodes().size() != 1)
       B2ERROR("TreeFitterModule::initialize Please select exactly one particle to ignore: " << m_treatAsInvisible);
   }
+
+  if (!m_treatAsInvisibleForVertex.empty()) {
+    if (!m_treatAsInvisible.empty())
+      B2ERROR("TreeFitterModule::initialize Using treatAsInvisible and treatAsInvisibleForVertex simultaneously is not supported");
+
+    bool valid = m_pDDescriptorInvisibles.init(m_treatAsInvisibleForVertex);
+    if (!valid)
+      B2ERROR("TreeFitterModule::initialize Invalid Decay Descriptor: " << m_treatAsInvisible);
+  }
+
 }
 
 void TreeFitterModule::beginRun()
@@ -172,6 +184,29 @@ void TreeFitterModule::event()
       bool isReplaced = particle->replaceDaughterRecursively(targetD, daughterCopy);
       if (!isReplaced)
         B2ERROR("TreeFitterModule::event No target particle found for " << m_treatAsInvisible);
+    }
+
+    if (!m_treatAsInvisibleForVertex.empty()) {
+      std::vector<const Particle*> selParticlesTarget = m_pDDescriptorInvisibles.getSelectionParticles(particle);
+
+      for (auto part : selParticlesTarget) {
+        Particle* targetD = m_particles[part->getArrayIndex()];
+        Particle* daughterCopy = Belle2::ParticleCopy::copyParticle(targetD);
+        daughterCopy->writeExtraInfo("treeFitterTreatMeAsInvisible", 1);
+
+        TMatrixFSym covariance = daughterCopy->getMomentumVertexErrorMatrix();
+        for (int row = 4; row < 7; row++) {
+          for (int column = 0; column < 7; column++) { // off-diag
+            covariance(row, column) = 0;
+          }
+          covariance(row, row) = 10000; // diag
+        }
+
+        daughterCopy->setMomentumVertexErrorMatrix(covariance);
+        bool isReplaced = particle->replaceDaughterRecursively(targetD, daughterCopy);
+        if (!isReplaced)
+          B2ERROR("TreeFitterModule::event No target particle found for " << m_treatAsInvisible);
+      }
     }
 
     try {

@@ -271,6 +271,9 @@ def treeFit(
         originDimension (int): If the origin or IP constraint (``customOriginVertex`` or ``ipConstraint``) are used,
             this specifies the dimension of the constraint (3D or 2D).
         treatAsInvisible (str): Decay string to select one particle that will be treated as invisible in the fit.
+                                This option cannot be used together with treatAsInvisibleForVertex.
+        treatAsInvisibleForVertex (str): Decay string to select particles that will be ignored to determine the vertex position.
+                                         This option cannot be used together with treatAsInvisible.
         path (basf2.Path): modules are added to this path
     """
     treeFitter = register_module("TreeFitter")

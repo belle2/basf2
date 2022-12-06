@@ -146,6 +146,8 @@ Advanced Topics
 
 .. toctree:: PIDCalibrationWeights
 
+.. toctree:: embedding
+	     
 .. _analysismodules:
 
 Full list of analysis modules

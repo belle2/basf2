@@ -147,16 +147,27 @@ def prepare_path(FileIn, ListName, icharge, isROE, FileOut):
     return main
 
 
+def get_parser():
+    """Handles the command-line argument parsing.
+
+    Returns:
+        argparse.Namespace: The parsed arguments.
+    """
+    parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument("--fileIn",  help='Input file name. Required parameter.')
+    parser.add_argument('--listName', help='Name of the particle list to keep (isSignal) or to remove. Required parameter.')
+    parser.add_argument("--isSignal", action='store_true', help='If added, the input is signal MC')
+    parser.add_argument("--charge", default='pos',
+                        help='Filter charge. Possible values are :code:`pos`, :code:`neg` or :code:`zero`. Default is :code:`pos`')
+    parser.add_argument("--fileOut", default='test.root', help='Output file name. Default: :code:`test.root`')
+
+    return parser
+
+
 ############################################################################################################
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('--listName', default="")
-    parser.add_argument("--isSignal", action='store_true', help='Signal MC (if true) or data')
-    parser.add_argument("--charge", default='pos', help='Filter charge. Possible values are `pos`, `neg` or `zero`')
-    parser.add_argument("--fileOut", default='test.root', help='output file name')
-    parser.add_argument("--fileIn", default="", help='input file name')
 
-    args = parser.parse_args()
+    args = get_parser().parse_args()
 
     list1 = args.listName
     signal = args.isSignal

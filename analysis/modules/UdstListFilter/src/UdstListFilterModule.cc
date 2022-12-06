@@ -145,6 +145,14 @@ void UdstListFilterModule::swapV0s()
     }
   }
 
-  DataStore::Instance().replaceData(*m_selectedV0s, m_v0s);
+  StoreEntry* fromEntry = DataStore::Instance().getEntry(*m_selectedV0s);
+  StoreEntry* toEntry = DataStore::Instance().getEntry(m_v0s);
+  if (!fromEntry->ptr) {
+    if (toEntry->isArray)
+      toEntry->getPtrAsArray()->Delete();   // This seems to be needed too.
+    toEntry->ptr = nullptr;
+  } else {
+    DataStore::Instance().replaceData(*m_selectedV0s, m_v0s);
+  }
 }
 

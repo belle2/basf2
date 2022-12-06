@@ -51,12 +51,21 @@ def prepare_path(File1, File2, FileOut):
     return main
 
 
-if __name__ == '__main__':
+def get_parser():
+    """Handles the command-line argument parsing.
+
+    Returns:
+        argparse.Namespace: The parsed arguments.
+    """
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('--filePrimary', default='', help='Input file to be uses as a primary (tag-side)')
-    parser.add_argument('--fileSecondary', default='', help='Input file to be uses as a secondary (signal-side)')
+    parser.add_argument('--filePrimary', help='Input file to be uses as a primary (tag-side data or MC)')
+    parser.add_argument('--fileSecondary', help='Input file to be uses as a secondary (signal-side MC)')
     parser.add_argument("--fileOut", default='merged.root', help='Output file name')
-    args = parser.parse_args()
+    return parser
+
+
+if __name__ == '__main__':
+    args = get_parser().parse_args()
 
     path = prepare_path(args.filePrimary, args.fileSecondary, args.fileOut)
 

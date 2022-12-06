@@ -19,7 +19,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register module
 //-----------------------------------------------------------------
-REG_MODULE(PostMergeUpdater)
+REG_MODULE(PostMergeUpdater);
 
 // Implementation
 PostMergeUpdaterModule::PostMergeUpdaterModule() : Module()

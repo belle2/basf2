@@ -359,13 +359,13 @@ void SVDEventT0PerformanceTTreeModule::event()
   }
 
   StoreArray<TRGECLUnpackerStore> TRGECLData;
-  for (const auto& trg_hit : TRGECLData) {
-    int hit_win   = trg_hit.getHitWin();
-    B2DEBUG(40, "hit_win = " << hit_win);
-    if (hit_win != 3 && hit_win != 4) { continue; }
-    if (trg_hit.getTCEnergy() > m_eclTCEmax) {
-      m_eclTCid      = trg_hit.getTCId();
-      m_eclTCEmax    = trg_hit.getTCEnergy();
+  for (const auto& trgHit : TRGECLData) {
+    int hitWin   = trgHit.getHitWin();
+    B2DEBUG(40, "hitWin = " << hitWin);
+    if (hitWin != 3 && hitWin != 4) { continue; }
+    if (trgHit.getTCEnergy() > m_eclTCEmax) {
+      m_eclTCid      = trgHit.getTCId();
+      m_eclTCEmax    = trgHit.getTCEnergy();
     }
   }
 

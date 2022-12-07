@@ -201,9 +201,9 @@ class SVDValidationTTreeCluster(b2.Module):
                 vPos = cluster_position
             localPosition = TVector3(uPos, vPos, 0)  # sensor center at (0, 0, 0)
             globalPosition = sensorInfo.pointToGlobal(localPosition, True)
-            x = globalPosition[0]
-            y = globalPosition[1]
-            z = globalPosition[2]
+            x = globalPosition.X()
+            y = globalPosition.Y()
+            z = globalPosition.Z()
             # see https://d2comp.kek.jp/record/242?ln=en for the Belle II
             # coordinate system and related variables
             rho = math.sqrt(x * x + y * y)
@@ -237,7 +237,7 @@ class SVDValidationTTreeCluster(b2.Module):
             truehit_interstripPosition = truehitPos % strip_pitch / strip_pitch
             self.data.truehit_interstripPosition = truehit_interstripPosition
             self.data.truehit_deposEnergy = bestTrueHit.getEnergyDep()
-            self.data.truehit_lossmomentum = bestTrueHit.getEntryMomentum().Mag() - bestTrueHit.getExitMomentum().Mag()
+            self.data.truehit_lossmomentum = bestTrueHit.getEntryMomentum().R() - bestTrueHit.getExitMomentum().R()
             self.data.truehit_time = bestTrueHit.getGlobalTime()
 
             # DEBUG options, commented out

@@ -15,10 +15,7 @@ import pdg
 
 
 # Check the basf2 location
-if os.environ['BELLE2_LOCAL_DIR'] != '':
-    basf2_dir = b2.find_file(os.environ['BELLE2_LOCAL_DIR'])
-else:
-    basf2_dir = b2.find_file(os.environ['BELLE2_RELEASE_DIR'])
+basf2_dir = os.environ.get('BELLE2_LOCAL_DIR', os.environ.get('BELLE2_RELEASE_DIR'))
 
 # Generation parameters
 mg_steeringtemplate = f'{basf2_dir}/generators/madgraph/examples/run_darkphoton.steeringtemplate'

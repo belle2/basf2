@@ -183,14 +183,14 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
                 cdcHitIDs = set(cdcHitIDs)
 
             totalHitListPR.extend(cdcHitIDs)
-            if self.trackMatchLookUp.isMatchedPRRecoTrack(trackCand):
+            if self.trackMatchLookUp.isAnyChargeMatchedPRRecoTrack(trackCand):
                 totalHitListPRGood.extend(cdcHitIDs)
 
-            if self.trackMatchLookUp.isClonePRRecoTrack(trackCand):
+            if self.trackMatchLookUp.isAnyChargeClonePRRecoTrack(trackCand):
                 totalHitListPRClone.extend(cdcHitIDs)
 
             if (self.trackMatchLookUp.isBackgroundPRRecoTrack(trackCand) or
-                    self.trackMatchLookUp.isBackgroundPRRecoTrack(trackCand)):
+                    self.trackMatchLookUp.isGhostPRRecoTrack(trackCand)):
                 totalHitListPRFake.extend(cdcHitIDs)
 
         # Make the ids unique
@@ -211,8 +211,8 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
 
         for trackCand in trackCands:
 
-            is_matched = self.trackMatchLookUp.isMatchedPRRecoTrack(trackCand)
-            is_clone = self.trackMatchLookUp.isClonePRRecoTrack(trackCand)
+            is_matched = self.trackMatchLookUp.isAnyChargeMatchedPRRecoTrack(trackCand)
+            is_clone = self.trackMatchLookUp.isAnyChargeClonePRRecoTrack(trackCand)
 
             trackCandHits = [cdcHit.getArrayIndex() for cdcHit in getObjectList(trackCand.getCDCHitList())]
             # Working around a bug in ROOT where you should not access empty std::vectors

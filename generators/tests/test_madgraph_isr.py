@@ -11,6 +11,7 @@ Test if MadGraph works when running a simple BSM model.
 '''
 
 
+import os
 import subprocess
 
 import basf2 as b2
@@ -19,7 +20,9 @@ import b2test_utils as b2tu
 
 if __name__ == '__main__':
 
-    with b2tu.clean_working_directory():
+    with b2tu.clean_working_directory() as working_dir:
+
+        os.chmod(working_dir, 0o744)
 
         steering_file = b2.find_file('generators/madgraph/examples/MadGraph_darkphoton_isr.py')
         subprocess.check_call(['basf2', steering_file, '--random-seed', 'madgraph'])

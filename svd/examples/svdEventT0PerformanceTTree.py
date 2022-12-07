@@ -11,10 +11,9 @@
 
 ##################################################################################
 #
-# Example Script to use SVDEventT0PerformanceTTree and OverlapResidual Modules
-# on simulation or real data
+# Example Script to use SVDEventT0PerformanceTTree on simulation or real data
 #
-# Use: basf2 -i <RAWDATAFILE> script -- --fileDir temp/ --fileTag test
+# Use: basf2 -i <RAWDATAFILE> script -- --fileDir temp/ --fileTag test [...]
 #
 ###################################################################################
 
@@ -40,6 +39,12 @@ parser.add_argument("--isMC", action="store_true",
                     help="Use Simulation")
 parser.add_argument("--is3sample", action="store_true",
                     help="Emulate SVD 3 samples")
+parser.add_argument("--RootOutput", action="store_true",
+                    help="Store svd clusters before reconstruction to root file")
+parser.add_argument("--noReco", action="store_true",
+                    help="Do not perform the reconstruction")
+parser.add_argument("--test", action="store_true",
+                    help="Test with small numbers of events")
 args = parser.parse_args()
 b2.B2INFO(f"Steering file args = {args}")
 
@@ -85,7 +90,9 @@ else:
     # main.add_module('RootInput', branchNames=['RawPXDs', 'RawSVDs', 'RawCDCs', 'RawECLs'])
     # raw.add_unpackers(main, components=['PXD', 'SVD', 'CDC', 'ECL'])
 
-    # main.add_module('RootInput', entrySequences=['0:50'])
+if args.test:
+    main.add_module('RootInput', entrySequences=['0:100'])
+else:
     main.add_module('RootInput')
 
     main.add_module("Gearbox")
@@ -127,13 +134,17 @@ if args.is3sample:
     # clusterizer.param('EventInfo', "SVDEventInfo3Sample")
     # main.add_module(clusterizer)
 
-# now do reconstruction:
-trk.add_tracking_reconstruction(
-    main,
-    mcTrackFinding=MCTracking,
-    append_full_grid_cdc_eventt0=True,
-    trackFitHypotheses=[211])  # ,
-#    skipHitPreparerAdding=True)
+if args.noReco:
+    main.add_module('SVDClusterizer')
+else:
+    # now do reconstruction:
+    # SVDClusterizer added by default
+    trk.add_tracking_reconstruction(
+        main,
+        mcTrackFinding=MCTracking,
+        append_full_grid_cdc_eventt0=True,
+        trackFitHypotheses=[211])  # ,
+    #    skipHitPreparerAdding=True)
 
 '''
 # skim mu+mu- events:
@@ -158,16 +169,15 @@ if args.isMC:
 if args.is3sample:
     outputFileName += "_emulated3sample"
 
-# recoFileName = outputFileName + "_" + str(args.fileTag) + ".root"
-# main.add_module('SVDEventT0PerformanceTTree', outputFileName=recoFileName)
+if not args.noReco:
+    recoFileName = outputFileName + "_" + str(args.fileTag) + ".root"
+    main.add_module('SVDEventT0PerformanceTTree', outputFileName=recoFileName)
 
-# # write everything
-# main.add_module('OverlapResiduals', ExpertLevel=True)
-
-rootOutFileName = outputFileName + "_RootOutput_" + str(args.fileTag) + ".root"
-main.add_module('RootOutput',
-                outputFileName=rootOutFileName,
-                branchNames=['SVDClusters'])
+if args.RootOutput:
+    rootOutFileName = outputFileName + "_RootOutput_" + str(args.fileTag) + ".root"
+    main.add_module('RootOutput',
+                    outputFileName=rootOutFileName,
+                    branchNames=['SVDClusters'])
 
 main.add_module('Progress')
 

@@ -23,12 +23,7 @@ import rawdata as raw
 import tracking as trk
 import simulation as sim
 import glob
-# import sys
 import argparse
-# import os
-
-# b2.set_log_level(b2.LogLevel.DEBUG)
-# b2.set_debug_level(40)
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("--fileDir", default="./",
@@ -67,7 +62,6 @@ if args.isMC:
     eventinfosetter.param('runList', [0])
     eventinfosetter.param('evtNumList', [numEvents])
     main.add_module(eventinfosetter)
-    # main.add_module('EventInfoPrinter')
     main.add_module('EvtGenInput')
 
     sim.add_simulation(
@@ -86,10 +80,6 @@ else:
 
     MCTracking = False
 
-    # input root files
-    # main.add_module('RootInput', branchNames=['RawPXDs', 'RawSVDs', 'RawCDCs', 'RawECLs'])
-    # raw.add_unpackers(main, components=['PXD', 'SVD', 'CDC', 'ECL'])
-
 if args.test:
     main.add_module('RootInput', entrySequences=['0:100'])
 else:
@@ -107,7 +97,6 @@ if not args.isMC:
             if moda.name() == 'SVDUnpacker':
                 moda.param("svdShaperDigitListName", "SVDShaperDigits6Sample")
                 moda.param("SVDEventInfo", "SVDEventInfo6Sample")
-        # main.add_module("SVDZeroSuppressionEmulator",SNthreshold=5,ShaperDigits="SVDShaperDigitsZS3",ShaperDigitsIN="SVDShaperDigits")
 
 if args.is3sample:
     # emulate 3-sample DAQ for events
@@ -126,19 +115,12 @@ if args.is3sample:
     zsonline.param("ShaperDigitsIN", "SVDShaperDigits")
     main.add_module(zsonline)
 
-    # #  clusterizer
-    # clusterizer = b2.register_module('SVDClusterizer')
-    # clusterizer.set_name("SVDClusterizer_3Sample")
-    # clusterizer.param('ShaperDigits', "SVDShaperDigits3Sample")
-    # clusterizer.param('Clusters', "SVDClusters3Sample")
-    # clusterizer.param('EventInfo', "SVDEventInfo3Sample")
-    # main.add_module(clusterizer)
-
 if args.noReco:
+    #  clusterizer
     main.add_module('SVDClusterizer')
 else:
     # now do reconstruction:
-    # SVDClusterizer added by default
+    # clusterizer added by default
     trk.add_tracking_reconstruction(
         main,
         mcTrackFinding=MCTracking,
@@ -146,21 +128,6 @@ else:
         trackFitHypotheses=[211])  # ,
     #    skipHitPreparerAdding=True)
 
-'''
-# skim mu+mu- events:
-ma.applyEventCuts("nTracks ==2", path=main)
-
-mySelection = 'pt>1.0 and abs(dz)<0.5 and dr<0.4'
-ma.fillParticleList('mu+:DQM', mySelection, path=main)
-ma.reconstructDecay('Upsilon(4S):IPDQM -> mu+:DQM mu-:DQM', '10<M<11', path=main)
-
-skimfilter = b2.register_module('SkimFilter')
-skimfilter.set_name('SkimFilter_MUMU')
-skimfilter.param('particleLists', ['Upsilon(4S):IPDQM'])
-main.add_module(skimfilter)
-filter_path = b2.create_path()
-skimfilter.if_value('=1', filter_path, b2.AfterConditionPath.CONTINUE)
-'''
 
 # fill TTrees
 outputFileName = str(args.fileDir)+"SVDEventT0PerformanceTTree"

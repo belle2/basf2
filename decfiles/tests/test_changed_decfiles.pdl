@@ -2,3 +2,5 @@
 * Add new aliases here if the test fails with "Unknown particle name".
 
 add  p Particle  Xb                           1111553    10604.35e-3         1.2e-3         100e-3     0     2              0          0
+
+* No 'end' needed here as the default pdl is concatenated with this file.

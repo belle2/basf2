@@ -12,11 +12,12 @@ Simple launcher for decfiles/tests/test_changed_decfiles.py_noexec. This tests w
 
 import basf2
 import b2test_utils
+import os
 import subprocess
 
 from git import Repo
 from pathlib import Path
-import os
+from tempfile import NamedTemporaryFile
 
 
 def add_hint(errorstring: str):
@@ -54,11 +55,20 @@ if __name__ == '__main__':
         changed_file_string = '\n'.join(str(p) for p in added_or_modified_decfiles)
         print(f"Changed decayfiles: \n{changed_file_string}")
     steering_file = basf2.find_file('decfiles/tests/test_changed_decfiles.py_noexec')
+    default_evtpdl = basf2.find_file(os.path.join("data", "framework", "particledb", "evt.pdl"))
+    custom_evtpdl = basf2.find_file("decfiles/tests/test_changed_decfiles.pdl")
 
-    run_results = []
-    for decfile in added_or_modified_decfiles:
-        with b2test_utils.clean_working_directory():
-            run_results.append(subprocess.run(['basf2', steering_file, str(decfile)], capture_output=True))
+    with NamedTemporaryFile(mode='w', suffix='.pdl') as tempfile:
+
+        for fname in [custom_evtpdl, default_evtpdl]:
+            with open(fname, 'r') as infile:
+                tempfile.write(infile.read())
+
+        run_results = []
+        for decfile in added_or_modified_decfiles:
+            with b2test_utils.clean_working_directory():
+                run_results.append(subprocess.run(['basf2', steering_file, str(decfile), tempfile.name],
+                                                  capture_output=True))
 
     files_and_errors = [f'Decfile {added_or_modified_decfiles[i]} failed with error \n {add_hint(ret.stderr.decode())}'
                         for i, ret in enumerate(run_results) if ret.returncode != 0]

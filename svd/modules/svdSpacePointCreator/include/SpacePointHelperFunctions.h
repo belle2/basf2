@@ -108,6 +108,12 @@ namespace Belle2 {
           continue;
         }
 
+        if ((uCluster->getTimeGroupId()) < 0 || (vCluster->getTimeGroupId()) < 0 ||
+            (uCluster->getTimeGroupId()) != (vCluster->getTimeGroupId())) {
+          B2DEBUG(1, "Cluster combination rejected due to different time-group Id. Time-group Id U (" << uCluster->getTimeGroupId() <<
+                  ") is incompatible with V (" << vCluster->getTimeGroupId() << ")");
+          continue;
+        }
 
         foundCombinations.push_back({uCluster, vCluster});
 

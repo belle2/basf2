@@ -19,6 +19,18 @@ from pathlib import Path
 import os
 
 
+def add_hint(errorstring: str):
+
+    hint = "\n Don't forget to add custom (i.e. not yet discovered or measured) particles to " \
+           "decfiles/tests/test_changed_decfiles.pdl, otherwise the test will not pass." \
+           " Already discovered particles should go in framework/particledb/data/evt.pdl instead."
+
+    if 'Unknown particle name' in errorstring:
+        return errorstring + hint
+    else:
+        return errorstring
+
+
 if __name__ == '__main__':
 
     b2test_utils.configure_logging_for_tests()
@@ -48,7 +60,7 @@ if __name__ == '__main__':
         with b2test_utils.clean_working_directory():
             run_results.append(subprocess.run(['basf2', steering_file, str(decfile)], capture_output=True))
 
-    files_and_errors = [f'Decfile {added_or_modified_decfiles[i]} failed with error \n {ret.stderr.decode()}'
+    files_and_errors = [f'Decfile {added_or_modified_decfiles[i]} failed with error \n {add_hint(ret.stderr.decode())}'
                         for i, ret in enumerate(run_results) if ret.returncode != 0]
     if len(files_and_errors):
 

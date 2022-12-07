@@ -5,8 +5,7 @@ import generators as ge
 import sys
 import pdg
 
-pdg.load('test_changed_decfiles.pdl')
-
+pdg.load(sys.argv[2])
 decfile = sys.argv[1]
 
 print(decfile)

@@ -345,7 +345,7 @@ a message with the given level or higher is encountered. The default is
   class_<LogPythonInterface, std::shared_ptr<LogPythonInterface>, boost::noncopyable>("LogPythonInterface", R"(
 Logging configuration (for messages generated from C++ or Python), available as a global `basf2.logging` object in Python. See also `basf2.set_log_level()` and `basf2.set_debug_level()`.
 
-This class exposes a object called `logging` to the python interface. With
+This class exposes a object called `logging <basf2.logging>` to the python interface. With
 this object it is possible to set all properties of the logging system
 directly in the steering file in a consistent manner This class also
 exposes the `LogConfig` class as well as the `LogLevel`

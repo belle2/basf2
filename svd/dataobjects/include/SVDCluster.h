@@ -40,12 +40,12 @@ namespace Belle2 {
      */
     SVDCluster(VxdID sensorID, bool isU, float position, float positionSigma,
                double clsTime, double clsTimeSigma, float clsCharge, float seedCharge,
-               unsigned short clsSize, float clsSN, float clsChi2, int firstFrame = 0):
+               unsigned short clsSize, float clsSN, float clsChi2, int firstFrame = 0, int timeGroupId = 0):
       m_sensorID(sensorID), m_isU(isU),
       m_position(position), m_positionSigma(positionSigma),
       m_clsTime(clsTime), m_clsTimeSigma(clsTimeSigma), m_clsCharge(clsCharge),
       m_seedCharge(seedCharge), m_clsSize(clsSize), m_clsSN(clsSN),
-      m_clsChi2(clsChi2), m_firstFrame(firstFrame)
+      m_clsChi2(clsChi2), m_firstFrame(firstFrame), m_timeGroupId(timeGroupId)
     {}
 
     /** Default constructor for the ROOT IO. */
@@ -163,6 +163,11 @@ namespace Belle2 {
      */
     int getFirstFrame() const { return m_firstFrame; }
 
+    /** Get ID of the time-group.
+     * @return time-group ID
+     */
+    int getTimeGroupId() const { return m_timeGroupId; }
+
     /** Get cluster quality indicator
     * @return probability that cluster is generated from signal hit.
     */
@@ -187,6 +192,14 @@ namespace Belle2 {
     void setClsTime(const double time)
     {
       m_clsTime = time;
+    }
+
+    /** Set the ID of the time-group.
+     *
+     */
+    void setTimeGroupId(const int& groupId)
+    {
+      m_timeGroupId = groupId;
     }
 
     /** Add quality indicator to object.
@@ -235,10 +248,11 @@ namespace Belle2 {
     float m_clsSN;             /**< Cluster S/N ratio */
     float m_clsChi2;           /**< Chi2 for time/amplitude fit */
     int m_firstFrame;           /**< firstFrame computed with the MaxSum algorithm */
+    int m_timeGroupId;          /**< Grouping of clusters in time */
     double m_qualityIndicator = {0.};  /**< Probability of signal cluster */
     double m_qualityIndicatorError = {0.};  /**< Error associated with probability calcualtion */
 
-    ClassDef(SVDCluster, 7)
+    ClassDef(SVDCluster, 8)
 
   };
 

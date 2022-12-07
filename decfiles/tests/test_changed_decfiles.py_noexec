@@ -3,6 +3,9 @@
 import basf2 as b2
 import generators as ge
 import sys
+import pdg
+
+pdg.load('test_changed_decfiles.pdl')
 
 decfile = sys.argv[1]
 

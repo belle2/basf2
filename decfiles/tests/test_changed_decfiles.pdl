@@ -1,0 +1,4 @@
+* This particle DB contains particle aliases which can't be found in evt.pdl and would otherwise make the test fail.
+* Add new aliases here if the test fails with "Unknown particle name".
+
+add  p Particle  Xb                           1111553    10604.35e-3         1.2e-3         100e-3     0     2              0          0

@@ -349,6 +349,13 @@ void SVDEventT0PerformanceTTreeModule::event()
       } else
         m_svdTrueTime.push_back(std::numeric_limits<float>::quiet_NaN());
     }
+    // just fill the cdc hits if there is no svd hit in the tracks
+    if (!int(m_svdTrkCDCHits.size()) && int((trk.getCDCHitList()).size())) {
+      m_svdTrkPXDHits.push_back((trk.getPXDHitList()).size());
+      m_svdTrkSVDHits.push_back((trk.getSVDHitList()).size()); // must be zero
+      m_svdTrkCDCHits.push_back((trk.getCDCHitList()).size());
+      m_trkNumber.push_back(trkNumber);
+    }
   }
 
   StoreArray<TRGECLUnpackerStore> TRGECLData;

@@ -110,8 +110,8 @@ namespace Belle2 {
 
         int uTimeGroupId = uCluster->getTimeGroupId();
         int vTimeGroupId = vCluster->getTimeGroupId();
-        if ((uTimeGroupId) < 0 || (vTimeGroupId) < 0 ||
-            (uTimeGroupId) != (vTimeGroupId)) {
+        if (uTimeGroupId < 0 || vTimeGroupId < 0 ||
+            uTimeGroupId != vTimeGroupId) {
           B2DEBUG(1, "Cluster combination rejected due to different time-group Id. Time-group Id U ("
                   << uTimeGroupId << ") is incompatible with V (" << vTimeGroupId << ")");
           continue;

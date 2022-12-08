@@ -194,24 +194,9 @@ void TreeFitterModule::event()
         Particle* daughterCopy = Belle2::ParticleCopy::copyParticle(targetD);
         daughterCopy->writeExtraInfo("treeFitterTreatMeAsInvisible", 1);
 
-        TMatrixFSym covariance = daughterCopy->getMomentumVertexErrorMatrix();
-        // keeping momentum error (4x4), set dummy values for other elements
-        for (int row = 0; row < 4; row++) {
-          for (int column = 4; column < 7; column++) { // only for vertex error
-            covariance(row, column) = 0;  // off-diag
-          }
-        }
-        for (int row = 4; row < 7; row++) { // only for vertex error
-          for (int column = 0; column < 7; column++) {
-            covariance(row, column) = 0; // off-diag
-          }
-          covariance(row, row) = 10000; // diag (overwrite)
-        }
-
-        daughterCopy->setMomentumVertexErrorMatrix(covariance);
         bool isReplaced = particle->replaceDaughterRecursively(targetD, daughterCopy);
         if (!isReplaced)
-          B2ERROR("TreeFitterModule::event No target particle found for " << m_treatAsInvisible);
+          B2ERROR("TreeFitterModule::event No target particle found for " << m_treatAsInvisibleForVertex);
       }
     }
 

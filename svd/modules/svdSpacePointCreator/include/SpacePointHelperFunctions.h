@@ -108,10 +108,12 @@ namespace Belle2 {
           continue;
         }
 
-        if ((uCluster->getTimeGroupId()) < 0 || (vCluster->getTimeGroupId()) < 0 ||
-            (uCluster->getTimeGroupId()) != (vCluster->getTimeGroupId())) {
-          B2DEBUG(1, "Cluster combination rejected due to different time-group Id. Time-group Id U (" << uCluster->getTimeGroupId() <<
-                  ") is incompatible with V (" << vCluster->getTimeGroupId() << ")");
+        int uTimeGroupId = uCluster->getTimeGroupId();
+        int vTimeGroupId = vCluster->getTimeGroupId();
+        if ((uTimeGroupId) < 0 || (vTimeGroupId) < 0 ||
+            (uTimeGroupId) != (vTimeGroupId)) {
+          B2DEBUG(1, "Cluster combination rejected due to different time-group Id. Time-group Id U ("
+                  << uTimeGroupId << ") is incompatible with V (" << vTimeGroupId << ")");
           continue;
         }
 

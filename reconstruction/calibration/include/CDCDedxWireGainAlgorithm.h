@@ -72,6 +72,11 @@ namespace Belle2 {
     */
     double getLayerAverage(std::vector<double> tempWire);
 
+    /**
+      * funtion to get info about current exp and run
+      */
+    void getExpRunInfo();
+
   protected:
 
     /**

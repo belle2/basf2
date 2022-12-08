@@ -108,8 +108,6 @@ CalibrationAlgorithm::EResult CDCDedxBadWireAlgorithm::calibrate()
 
   //starting calibration at this point
   saddSfx = Form("%s_%s", svar.data(), saddSfx.data());
-  TH1D* hvar = new TH1D("hvar", "", nbins, fmin, fmax);
-  hvar->SetTitle(Form("%s; %s; entries", saddSfx.data(), svar.data()));
 
   TH1D* hmean = new TH1D(Form("hmean_%s", saddSfx.data()), "", nwireCDC, -0.5, 14335.5);
   hmean->SetTitle(Form("mean vs wires (%s); wire ; <mean>", saddSfx.data()));
@@ -123,38 +121,40 @@ CalibrationAlgorithm::EResult CDCDedxBadWireAlgorithm::calibrate()
   double avgmean = hvarall->GetMean();
   double avgrms = hvarall->GetRMS();
 
-  bool iwdefect;
   std::vector<double> m_vdefectwires;
 
   TCanvas* cgtmp = new TCanvas(Form("cgood_%s", saddSfx.data()), "", 1200, 1200);
   cgtmp->Divide(4, 4);
   cgtmp->SetBatch(kTRUE);
   std::stringstream psgood;
-  psgood << Form("cdcdedx_bdcalcal_gwiredist_%s.pdf[", saddSfx.data());
+  psgood << Form("cdcdedx_bdcal_gwiredist_%s.pdf[", saddSfx.data());
   cgtmp->Print(psgood.str().c_str());
   psgood.str("");
-  psgood << Form("cdcdedx_bdcalcal_gwiredist_%s.pdf", saddSfx.data());
+  psgood << Form("cdcdedx_bdcal_gwiredist_%s.pdf", saddSfx.data());
 
   TCanvas* cbtmp = new TCanvas(Form("cbad_%s", saddSfx.data()), "", 1200, 1200);
   std::stringstream psdefect;
   cbtmp->Divide(4, 4);
   cbtmp->SetBatch(kTRUE);
-  psdefect << Form("cdcdedx_bdcalcal_bwiredist_%s.pdf[", saddSfx.data());
+  psdefect << Form("cdcdedx_bdcal_bwiredist_%s.pdf[", saddSfx.data());
   cbtmp->Print(psdefect.str().c_str());
   psdefect.str("");
-  psdefect << Form("cdcdedx_bdcalcal_bwiredist_%s.pdf", saddSfx.data());
+  psdefect << Form("cdcdedx_bdcal_bwiredist_%s.pdf", saddSfx.data());
 
   std::ofstream ofile_newbad, ofile_newdead;
-  ofile_newbad.open(Form("cdcdedx_bdcalcal_bwirelist_%s.txt", saddSfx.data()));
-  ofile_newdead.open(Form("cdcdedx_bdcalcal_dwirelist_%s.txt", saddSfx.data()));
+  ofile_newbad.open(Form("cdcdedx_bdcal_bwirelist_%s.txt", saddSfx.data()));
+  ofile_newdead.open(Form("cdcdedx_bdcal_dwirelist_%s.txt", saddSfx.data()));
 
   int fentThres = 50;
   int cbadwire[2] = {0}, cdeadwire[2] = {0}, cgoodwire[2] = {0};
 
   for (unsigned int jw = 0; jw < nwireCDC; ++jw) {
 
-    hvar->SetName(Form("%s_wire%d", saddSfx.data(), jw));
-    hvar->SetTitle(Form("%s, wire = %d", saddSfx.data(), jw));
+    TH1D* hvar = new TH1D(Form("%s_wire%d", saddSfx.data(), jw), "", nbins, fmin, fmax);
+    hvar->SetTitle(Form("%s, wire = %d; %s; entries", saddSfx.data(), jw, svar.data()));
+
+    TH1D* hvarhf = new TH1D(Form("hf%s_wire%d", saddSfx.data(), jw), "", 100, fmin, fmax);
+    hvarhf->SetTitle(Form("%s, wire = %d; %s; entries", saddSfx.data(), jw, svar.data()));
 
     int tsum = 0, nsum = 0;
 
@@ -163,7 +163,10 @@ CalibrationAlgorithm::EResult CDCDedxBadWireAlgorithm::calibrate()
       if (ihvar < fmax) {
         nsum++;
         hvar->Fill(ihvar);
-      } else tsum++;
+      } else {
+        tsum++;
+        if (ihvar < 70) hvarhf->Fill(ihvar / 10.);
+      }
     }
 
     double fmean = 0., fmeanerr = 0.;
@@ -188,6 +191,7 @@ CalibrationAlgorithm::EResult CDCDedxBadWireAlgorithm::calibrate()
     hfrac->SetBinError(jw + 1, 0.0001);
 
     double oldwg = m_DBWireGains->getWireGain(jw);
+    bool iwdefect = false;
 
     if ((nsum < fentThres) || (abs(fmean - avgmean) / avgmean > fmeanThers) || (abs(frms - avgrms) / avgrms > frmsThers)
         || (ffrac > ffracThers)) {
@@ -200,7 +204,6 @@ CalibrationAlgorithm::EResult CDCDedxBadWireAlgorithm::calibrate()
         if (oldwg == 0)cdeadwire[1]++;
       }
     } else {
-      iwdefect = false;
       cgoodwire[0]++;
     }
 
@@ -212,34 +215,47 @@ CalibrationAlgorithm::EResult CDCDedxBadWireAlgorithm::calibrate()
     pinfo->AddText(Form("N: %d", nsum));
 
     if (iwdefect) {
+      m_vdefectwires.push_back(0.0);
       if (nsum != 0) {
         cbtmp->cd((cbadwire[0] - 1) % 16 + 1);
         hvar->SetStats(false);
-        hvar->SetFillColorAlpha(kOrange, 0.20);
-        if (oldwg == 0)hvar->SetFillColorAlpha(kRed, 0.70);
+        hvar->SetFillColor(kYellow - 9);
+        if (oldwg == 0) hvar->SetFillColor(kRed);
+        hvarhf->SetFillColor(kGray);
+        if (hvar->GetMaximum() < hvarhf->GetMaximum()) hvar->SetMaximum(hvarhf->GetMaximum());
+        pinfo->AddText(Form("hf N: %0.1f", hvarhf->Integral()));
         hvar->DrawCopy("hist");
+        hvarhf->DrawCopy("hist same");
         pinfo->Draw("same");
-        if ((cbadwire[0] % 16 == 0) || (jw == nwireCDC))  {
+        cbtmp->Update();
+        gPad->Update();
+        if ((cbadwire[0] % 16 == 0))  {
           cbtmp->Print(psdefect.str().c_str());
           cbtmp->Clear("D");
         }
         ofile_newbad <<  jw << std::endl;
       } else ofile_newdead <<  jw << std::endl;
-      m_vdefectwires.push_back(0.0);
     } else {
       cgtmp->cd((cgoodwire[0] - 1) % 16 + 1);
       hvar->SetStats(false);
-      hvar->SetFillColorAlpha(kGreen, 0.20);
-      if (oldwg == 0)hvar->SetFillColorAlpha(kRed, 0.70);
+      hvar->SetFillColor(kGreen + 1);
+      if (oldwg == 0) hvar->SetFillColor(kRed);
       hvar->DrawCopy("hist");
       pinfo->Draw("same");
-      if ((cgoodwire[0] % 16 == 0) || (jw == nwireCDC))  {
+      cgtmp->Update();
+      gPad->Update();
+      if ((cgoodwire[0] % 16 == 0))  {
         cgtmp->Print(psgood.str().c_str());
         cgtmp->Clear("D");
       }
       m_vdefectwires.push_back(1.0);
     }
-    hvar->Reset();
+    if (jw == nwireCDC - 1) {
+      cbtmp->Print(psdefect.str().c_str());
+      cgtmp->Print(psgood.str().c_str());
+    }
+    delete hvar;
+    delete hvarhf;
   }
 
   ofile_newbad.close();
@@ -247,15 +263,13 @@ CalibrationAlgorithm::EResult CDCDedxBadWireAlgorithm::calibrate()
 
   //1 for variable distribution
   psdefect.str("");
-  psdefect << Form("cdcdedx_bdcalcal_bwiredist_%s.pdf]", saddSfx.data());
+  psdefect << Form("cdcdedx_bdcal_bwiredist_%s.pdf]", saddSfx.data());
   cbtmp->Print(psdefect.str().c_str());
-  cbtmp->Clear("D");
   delete cbtmp;
 
   psgood.str("");
-  psgood << Form("cdcdedx_bdcalcal_gwiredist_%s.pdf]", saddSfx.data());
+  psgood << Form("cdcdedx_bdcal_gwiredist_%s.pdf]", saddSfx.data());
   cgtmp->Print(psgood.str().c_str());
-  cgtmp->Clear("D");
   delete cgtmp;
 
   //2 for qa parameters
@@ -267,10 +281,10 @@ CalibrationAlgorithm::EResult CDCDedxBadWireAlgorithm::calibrate()
   hmean->SetStats(0);
   hmean->Draw();
   TLine* lmeanmin = new TLine(-0.5, avgmean * (1 - fmeanThers), 14335.5, avgmean * (1 - fmeanThers));
-  lmeanmin->SetLineColorAlpha(kRed, 0.5);
+  lmeanmin->SetLineColor(kRed);
   lmeanmin->Draw("same");
   TLine* lmeanmax = new TLine(-0.5, avgmean * (1 + fmeanThers), 14335.5, avgmean * (1 + fmeanThers));
-  lmeanmax->SetLineColorAlpha(kRed, 0.5);
+  lmeanmax->SetLineColor(kRed);
   lmeanmax->Draw("same");
 
   c_pars->cd(2);
@@ -278,10 +292,10 @@ CalibrationAlgorithm::EResult CDCDedxBadWireAlgorithm::calibrate()
   hrms->SetStats(0);
   hrms->Draw();
   TLine* lrmsmin = new TLine(-0.5, avgrms * (1 - frmsThers), 14335.5, avgrms * (1 - frmsThers));
-  lrmsmin->SetLineColorAlpha(kRed, 0.5);
+  lrmsmin->SetLineColor(kRed);
   lrmsmin->Draw("same");
   TLine* lrmsmax = new TLine(-0.5, avgrms * (1 + frmsThers), 14335.5, avgrms * (1 + frmsThers));
-  lrmsmax->SetLineColorAlpha(kRed, 0.5);
+  lrmsmax->SetLineColor(kRed);
   lrmsmax->Draw("same");
 
   c_pars->cd(3);
@@ -289,12 +303,13 @@ CalibrationAlgorithm::EResult CDCDedxBadWireAlgorithm::calibrate()
   hfrac->SetStats(0);
   hfrac->Draw();
   TLine* lfrac = new TLine(-0.5, ffracThers, 14335.5, ffracThers);
-  lfrac->SetLineColorAlpha(kRed, 0.5);
+  lfrac->SetLineColor(kRed);
   lfrac->Draw("same");
 
   c_pars->Print(Form("cdcdedx_bdcal_qapars_%s.pdf", saddSfx.data()));
   c_pars->Print(Form("cdcdedx_bdcal_qapars_%s.root", saddSfx.data()));
   delete c_pars;
+
   //3 for stats
   TCanvas* cstats = new TCanvas("cstats", "cstats", 1000, 500);
   cstats->SetBatch(kTRUE);
@@ -336,8 +351,14 @@ CalibrationAlgorithm::EResult CDCDedxBadWireAlgorithm::calibrate()
   B2INFO("dE/dx Badwire calibration done: " << m_vdefectwires.size() << " wires");
   CDCDedxBadWires* c_badwires = new CDCDedxBadWires(m_vdefectwires);
   saveCalibration(c_badwires, "CDCDedxBadWires");
-  return c_OK;
 
+  delete hvarall;
+  delete hmean;
+  delete hrms;
+  delete hfrac;
+  saddSfx.clear();
+
+  return c_OK;
 }
 
 //------------------------------------
@@ -360,7 +381,7 @@ void CDCDedxBadWireAlgorithm::getExpRunInfo()
   updateDBObjPtrs(1, rstart, estart);
 
   if (saddSfx.length() > 0)saddSfx = Form("%s_e%d_r%dr%d", saddSfx.data(), estart, rstart, rend);
-  else saddSfx = Form("e%d_r%dr%d", estart, rstart, rend);
+  else  saddSfx = Form("e%d_r%dr%d", estart, rstart, rend);
 
 }
 
@@ -377,7 +398,7 @@ void CDCDedxBadWireAlgorithm::createBadWireMap(int ndead[2], int nbad[2])
   hxyAll->SetStats(0);
   hxyAll->Draw();
 
-  TH2F* hxyBad = getHistoPattern(Form("cdcdedx_bdcalcal_bwirelist_%s.txt", saddSfx.data()), "bad");
+  TH2F* hxyBad = getHistoPattern(Form("cdcdedx_bdcal_bwirelist_%s.txt", saddSfx.data()), "bad");
   if (hxyBad) {
     hxyBad->SetTitle("");
     hxyBad->SetMarkerStyle(20);
@@ -387,7 +408,7 @@ void CDCDedxBadWireAlgorithm::createBadWireMap(int ndead[2], int nbad[2])
     hxyBad->Draw("same");
   }
 
-  TH2F* hxyDead = getHistoPattern(Form("cdcdedx_bdcalcal_dwirelist_%s.txt", saddSfx.data()), "dead");
+  TH2F* hxyDead = getHistoPattern(Form("cdcdedx_bdcal_dwirelist_%s.txt", saddSfx.data()), "dead");
   if (hxyDead) {
     hxyDead->SetTitle("");
     hxyDead->SetMarkerStyle(20);
@@ -416,7 +437,7 @@ void CDCDedxBadWireAlgorithm::createBadWireMap(int ndead[2], int nbad[2])
   t1->SetTextColor(kGray + 1);
   pt->Draw("same");
 
-  cmap->SaveAs(Form("cdcdedx_bdcalcal_wiremap_%s.pdf", saddSfx.data()));
+  cmap->SaveAs(Form("cdcdedx_bdcal_wiremap_%s.pdf", saddSfx.data()));
   delete cmap;
 }
 

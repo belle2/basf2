@@ -64,7 +64,7 @@ void SVDTimeGroupComposerModule::event()
 
   /** finalized the groups */
   int groupBegin = -1; int groupEnd = -1;
-  std::vector<std::tuple<double, double, int>> groupInfo; // start, end, totClusters
+  std::vector<std::tuple<double, double, int>> groupInfo; // start, end, totCls
   for (int ij = 2; ij < h_clsTime.GetNbinsX(); ij++) {
     double sumc = h_clsTime.GetBinContent(ij);
     double suml = h_clsTime.GetBinContent(ij - 1);
@@ -112,19 +112,24 @@ void SVDTimeGroupComposerModule::event()
     auto endPos      = std::get<1>(groupInfo[ij]);
     auto totCls      = std::get<2>(groupInfo[ij]);
 
-    std::cout << " group " << ij << " beginPos " << beginPos << " endPos " << endPos << " totCls " << totCls << std::endl;
+    B2DEBUG(1, "SVDTimeGroupComposerModule group " << ij
+            << " beginPos " << beginPos << " endPos " << endPos
+            << " totCls " << totCls);
     int rejectedCount = 0;
     for (int jk = 0; jk < int(rejectedCls.size()); jk++) {
       int place = rejectedCls[jk] < 0 ? jk : rejectedCls[jk];
       double clsTime = m_svdClusters[place]->getClsTime();
       if (clsTime >= beginPos && clsTime <= endPos) {
         m_svdClusters[place]->setTimeGroupId(ij);
-        std::cout << "    accepted cluster " << place << " clsTime " << clsTime << std::endl;
+        B2DEBUG(1, "SVDTimeGroupComposerModule    accepted cluster " << place
+                << " clsTime " << clsTime);
       } else {
-        std::cout << "      rejected cluster " << place << " clsTime " << clsTime << std::endl;
+        B2DEBUG(1, "SVDTimeGroupComposerModule      rejected cluster " << place
+                << " clsTime " << clsTime);
         if (ij == totGroups - 1) {
           m_svdClusters[place]->setTimeGroupId(-1);
-          std::cout << "        orphan cluster " << place << " clsTime " << clsTime << std::endl;
+          B2DEBUG(1, "SVDTimeGroupComposerModule        orphan cluster " << place
+                  << " clsTime " << clsTime);
         } else {
           rejectedCls[rejectedCount++] = place;
         }
@@ -132,7 +137,6 @@ void SVDTimeGroupComposerModule::event()
     } // for(int jk=0;jk<int(rejectedCls.size());jk++) {
     rejectedCls.resize(rejectedCount);
   } // for(int ij=0;ij<int(groupInfo.size());ij++) {
-
 
 }
 

@@ -10,8 +10,8 @@ b2luigi
 
     **Prerequisites**:
 
-        * access to kekcc.
-        * grid-certificate for gbasf2.
+        * access to kekcc
+        * grid-certificate for gbasf2
 
     **Questions**:
 

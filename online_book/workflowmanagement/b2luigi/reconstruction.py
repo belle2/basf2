@@ -6,7 +6,7 @@ import basf2 as b2
 import modularAnalysis as ma
 import vertex as vx
 
-from Skim import BatchesToTextFile, NumBatches
+from skim import BatchesToTextFile, NumBatches
 
 
 class ReconstructBatch(Basf2PathTask):

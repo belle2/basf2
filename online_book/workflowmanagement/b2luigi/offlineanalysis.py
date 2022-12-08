@@ -1,6 +1,6 @@
 import b2luigi as luigi
 from b2luigi.basf2_helper import Basf2nTupleMergeTask
-from Reconstruction import ReconstructionWrapper
+from reconstruction import ReconstructionWrapper
 import uproot
 import matplotlib.pyplot as plt
 

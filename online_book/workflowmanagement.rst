@@ -19,7 +19,7 @@ In so-called workflow management tools, **dependencies between processing steps 
 
 A workflow is visualized in a directed acyclic graph (DAG), which illustrates the dependencies between all processing steps. The DAG for a typical Belle II analysis quickly gets large, and workflow management tools can save you lots of headaches:
 
-.. figure:: workflowmanagement/workflows/dag.png
+.. figure:: workflowmanagement/workflows/dag.jpg
     :width: 40em
     :align: center
     

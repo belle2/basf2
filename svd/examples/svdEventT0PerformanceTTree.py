@@ -115,12 +115,12 @@ if args.is3sample:
     zsonline.param("ShaperDigitsIN", "SVDShaperDigits")
     main.add_module(zsonline)
 
-if args.noReco:
-    #  clusterizer
-    main.add_module('SVDClusterizer')
-else:
+#  clusterizer
+main.add_module('SVDClusterizer')
+main.add_module('SVDTimeGroupComposer')
+
+if not args.noReco:
     # now do reconstruction:
-    # clusterizer added by default
     trk.add_tracking_reconstruction(
         main,
         mcTrackFinding=MCTracking,

@@ -54,8 +54,8 @@ if __name__ == '__main__':
                                   and (Path('decfiles/dec') in Path(new_file.a_path).parents)]
 
     steering_file = basf2.find_file('decfiles/tests/test_changed_decfiles.py_noexec')
-    default_evtpdl = basf2.find_file(os.path.join("data", "framework", "particledb", "evt.pdl"))
     custom_evtpdl = basf2.find_file("decfiles/tests/test_changed_decfiles.pdl")
+    default_evtpdl = basf2.find_file('data/framework/particledb/evt.pdl')
 
     run_results = []
     if added_or_modified_decfiles:
@@ -73,8 +73,10 @@ if __name__ == '__main__':
                     run_results.append(subprocess.run(['basf2', steering_file, str(decfile), tempfile.name],
                                                       capture_output=True))
 
-    files_and_errors = [f'Decfile {added_or_modified_decfiles[i]} failed with error \n {add_hint(ret.stderr.decode())}'
+    files_and_errors = [f'Decfile {added_or_modified_decfiles[i]} failed with output \n'
+                        f'{ret.stdout.decode()} \n and error \n {add_hint(ret.stderr.decode())}'
                         for i, ret in enumerate(run_results) if ret.returncode != 0]
+
     if len(files_and_errors):
         raise RuntimeError("At least one added decfile has failed.\n"
                            + '\n'.join(files_and_errors))

@@ -70,9 +70,9 @@ void SVDTimeGroupComposerModule::event()
     double suml = h_clsTime.GetBinContent(ij - 1);
     double sumr = h_clsTime.GetBinContent(ij + 1);
     // possible background
-    if (sumc <= 2) sumc = 0;
-    if (suml <= 2) suml = 0;
-    if (sumr <= 2) sumr = 0;
+    if (sumc <= m_removeBaseline) sumc = 0;
+    if (suml <= m_removeBaseline) suml = 0;
+    if (sumr <= m_removeBaseline) sumr = 0;
 
     double sum = suml + sumc + sumr;
     // finding group

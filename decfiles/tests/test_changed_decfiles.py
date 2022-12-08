@@ -22,7 +22,7 @@ from tempfile import NamedTemporaryFile
 
 def add_hint(errorstring: str):
 
-    hint = "\n Don't forget to add custom (i.e. not yet discovered or measured) particles to " \
+    hint = "\nDon't forget to add custom (i.e. not yet discovered or measured) particles to " \
            "decfiles/tests/test_changed_decfiles.pdl, otherwise the test will not pass." \
            " Already discovered particles should go in framework/particledb/data/evt.pdl instead."
 
@@ -45,34 +45,36 @@ if __name__ == '__main__':
     topdir = Path(os.environ['BELLE2_LOCAL_DIR'])
     assert topdir.is_dir()
 
-    diff_to_main = Repo(topdir).head.commit.diff('origin/main')
+    repo = Repo(topdir)
+    merge_base = repo.merge_base('origin/main', repo.head)
+    diff_to_main = repo.head.commit.diff(merge_base)
 
     added_or_modified_decfiles = [topdir / new_file.a_path for new_file in diff_to_main
                                   if (Path(new_file.a_path).suffix == '.dec')
                                   and (Path('decfiles/dec') in Path(new_file.a_path).parents)]
 
-    if added_or_modified_decfiles:
-        changed_file_string = '\n'.join(str(p) for p in added_or_modified_decfiles)
-        print(f"Changed decayfiles: \n{changed_file_string}")
     steering_file = basf2.find_file('decfiles/tests/test_changed_decfiles.py_noexec')
     default_evtpdl = basf2.find_file(os.path.join("data", "framework", "particledb", "evt.pdl"))
     custom_evtpdl = basf2.find_file("decfiles/tests/test_changed_decfiles.pdl")
 
-    with NamedTemporaryFile(mode='w', suffix='.pdl') as tempfile:
+    run_results = []
+    if added_or_modified_decfiles:
+        changed_file_string = '\n'.join(str(p) for p in added_or_modified_decfiles)
+        print(f"Changed decayfiles: \n{changed_file_string}")
 
-        for fname in [custom_evtpdl, default_evtpdl]:
-            with open(fname, 'r') as infile:
-                tempfile.write(infile.read())
+        with NamedTemporaryFile(mode='w', suffix='.pdl') as tempfile:
 
-        run_results = []
-        for decfile in added_or_modified_decfiles:
-            with b2test_utils.clean_working_directory():
-                run_results.append(subprocess.run(['basf2', steering_file, str(decfile), tempfile.name],
-                                                  capture_output=True))
+            for fname in [custom_evtpdl, default_evtpdl]:
+                with open(fname, 'r') as infile:
+                    tempfile.write(infile.read())
+
+            for decfile in added_or_modified_decfiles:
+                with b2test_utils.clean_working_directory():
+                    run_results.append(subprocess.run(['basf2', steering_file, str(decfile), tempfile.name],
+                                                      capture_output=True))
 
     files_and_errors = [f'Decfile {added_or_modified_decfiles[i]} failed with error \n {add_hint(ret.stderr.decode())}'
                         for i, ret in enumerate(run_results) if ret.returncode != 0]
     if len(files_and_errors):
-
         raise RuntimeError("At least one added decfile has failed.\n"
                            + '\n'.join(files_and_errors))

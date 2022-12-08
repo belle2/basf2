@@ -72,10 +72,10 @@ void EvtBGL2FF::getscalarff(EvtId parent, EvtId,
   const double z = (sqrt(w + 1) - sqrt(2.)) / (sqrt(w + 1) + sqrt(2.)); //With t0 = tm in order to have N = 1 (see below)
   const double chiT = 5.131e-4;
   const double chiL = 6.332e-3;
-  const double tp = (mass + mb) * (mass +
-                                   mb); //divide by mb**2 like in Hammer ? This factor should cancel when calculating zP so I don't understand its presence.
-  const double tm = (mass - mb) * (mass -
-                                   mb); //divide by mb**2 like in Hammer ? This factor should cancel when calculating zP so I don't understand its presence.
+  //divide tp/tm by mb**2 like in Hammer ? This factor should cancel when calculating zP
+  //so I don't understand its presence.
+  const double tp = (mass + mb) * (mass + mb);
+  const double tm = (mass - mb) * (mass - mb);
   //The Bc states are taken directly from Hammer, need to clarify where they come from
   vector<double> BcStatesp = {6.329, 6.920, 7.020}; //GeV
   vector<double> BcStates0 = {6.716, 7.121}; //GeV
@@ -83,16 +83,18 @@ void EvtBGL2FF::getscalarff(EvtId parent, EvtId,
 
   double Pp = 1.;
   for (size_t n = 0; n < BcStatesp.size(); ++n) {
-    double sqrttpmp = sqrt(tp - pow(BcStatesp[n],
-                                    2)); //Hammer multiplies by unitres/Mb -> what is that ? unitres should = 1 and this Mb cancels the one from tp/tm above, again not sure why they do tha in Hammer.
+    //Hammer multiplies by unitres/Mb -> what is that ? unitres should = 1
+    //and this Mb cancels the one from tp/tm above, again not sure why they do tha in Hammer.
+    double sqrttpmp = sqrt(tp - pow(BcStatesp[n], 2));
     double zPp = (sqrttpmp - sqrttpt0) / (sqrttpmp + sqrttpt0);
     Pp *= (z - zPp) / (1 - z * zPp);
   }
 
   double P0 = 1.;
   for (size_t n = 0; n < BcStates0.size(); ++n) {
-    double sqrttpmp = sqrt(tp - pow(BcStates0[n],
-                                    2)); //Hammer multiplies by unitres/Mb -> what is that ? unitres should = 1 and this Mb cancels the one from tp/tm above, again not sure why they do tha in Hammer.
+    //Hammer multiplies by unitres/Mb -> what is that ? unitres should = 1
+    //and this Mb cancels the one from tp/tm above, again not sure why they do tha in Hammer.
+    double sqrttpmp = sqrt(tp - pow(BcStates0[n], 2));
     double zP0 = (sqrttpmp - sqrttpt0) / (sqrttpmp + sqrttpt0);
     P0 *= (z - zP0) / (1 - z * zP0);
   }

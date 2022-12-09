@@ -63,5 +63,5 @@ if __name__ == "__main__":
     if not light_build:
         check_error_free("b2code-sphinx-warnings", "sphinx", None,
                          lambda x:
-                         re.findall(ignoretoolsdoc)
+                         re.findall(ignoretoolsdoc, x)
                          )

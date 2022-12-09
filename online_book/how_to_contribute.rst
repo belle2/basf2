@@ -40,7 +40,7 @@ Submitting a PR
 You need to
 
 1. Create a development setup as explained in
-   :ref:`build/tools_doc/index-01-tools:Development Setup`
+   :ref:`build/tools_doc/cvmfs_setup:Development Setup`
 2. Change to a new branch ``feature/describe-your-change`` or ``bugfix/something`` (if your PR is based on a
    JIRA issue ``BII-XXXX`` you can include it in the name ``feature/BII-XXXX-improve-docs``).
    You will not be able to push your branch if it isn't prefixed with ``feature/`` or ``bugfix/``

@@ -11,7 +11,7 @@
 # @cond
 
 import basf2
-from mdst import MDST_OBJECTS
+from mdst import add_mdst_output
 import modularAnalysis as ma
 import vertex as vtx
 from variables import variables as vm
@@ -131,14 +131,9 @@ def prepare_path(FileIn, ListName, icharge, isROE, FileOut):
         list_select_signal_mc(ListName, main)
 
     # output
-    branches = list(MDST_OBJECTS) + ['MCParticles', 'EventExtraInfo']
-    persistentBranches = ['FileMetaData', 'BackgroundInfo']
+    additionalBranches = ['EventExtraInfo']
 
-    output = basf2.register_module('RootOutput')
-    output.param('outputFileName', FileOut)
-    output.param("branchNames", branches)
-    output.param("branchNamesPersistent", persistentBranches)
-    main.add_module(output)
+    add_mdst_output(main, filename=FileOut, additionalBranches=additionalBranches)
 
     # progress
     main.add_module('Progress')
@@ -154,8 +149,8 @@ def get_parser():
         argparse.Namespace: The parsed arguments.
     """
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument("--fileIn",  help='Input file name. Required parameter.')
-    parser.add_argument('--listName', help='Name of the particle list to keep (isSignal) or to remove. Required parameter.')
+    parser.add_argument("--fileIn",  help='Input file name.', required=True)
+    parser.add_argument('--listName', help='Name of the particle list to keep (isSignal) or to remove.', required=True)
     parser.add_argument("--isSignal", action='store_true', help='If added, the input is signal MC')
     parser.add_argument("--charge", default='pos',
                         help='Filter charge. Possible values are :code:`pos`, :code:`neg` or :code:`zero`. Default is :code:`pos`')

@@ -1,5 +1,5 @@
 import basf2
-from mdst import MDST_OBJECTS
+from mdst import add_mdst_output
 import argparse
 
 
@@ -33,21 +33,19 @@ def prepare_path(File1, File2, FileOut):
     main.add_module('FixMergedObjects')
     main.add_module("PostMergeUpdater")
 
-    # write out further reduced set (for now)
-    branches = list(MDST_OBJECTS) + ["MergedArrayIndices"]
-    branches += ['EventLevelClusteringInfo_indepPath',
-                 'EventLevelTrackingInfo_indepPath',
-                 'EventMetaData_indepPath',
-                 'TRGSummary_indepPath',
-                 'SoftwareTriggerResult_indepPath']
-    persistentBranches = ['FileMetaData', 'BackgroundInfo']
+    # write out further reduced set
+
+    additionalBranches = ['MergedArrayIndices',
+                          'EventLevelClusteringInfo_indepPath',
+                          'EventLevelTrackingInfo_indepPath',
+                          'EventMetaData_indepPath',
+                          'TRGSummary_indepPath',
+                          'SoftwareTriggerResult_indepPath'
+                          ]
 
     # output
-    output = basf2.register_module('RootOutput')
-    output.param('outputFileName', FileOut)
-    output.param("branchNames", branches)
-    output.param("branchNamesPersistent", persistentBranches)
-    main.add_module(output)
+    add_mdst_output(main, filename=FileOut, additionalBranches=additionalBranches)
+
     return main
 
 
@@ -58,8 +56,8 @@ def get_parser():
         argparse.Namespace: The parsed arguments.
     """
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('--filePrimary', help='Input file to be uses as a primary (tag-side data or MC)')
-    parser.add_argument('--fileSecondary', help='Input file to be uses as a secondary (signal-side MC)')
+    parser.add_argument('--filePrimary', help='Input file to be used as a primary (tag-side data or MC)', required=True)
+    parser.add_argument('--fileSecondary', help='Input file to be used as a secondary (signal-side MC)', required=True)
     parser.add_argument("--fileOut", default='merged.root', help='Output file name')
     return parser
 

@@ -3,7 +3,7 @@
 Signal Embedding
 ================
 
-Most Belle II analyses use machine learning methods that increase signal purity.  The classifiers are typically trained using simulated samples and require validation with data. This validation is arranged using a control channel, classifier efficiency for which is compared between data and simulation.  However, kinematic differences between the signal and control channel lead to different classifier output. The high-purity and low-efficiency region that is usually employed in analyses is hard to model in particular making efficiency correction based on a control channel unreliable.
+Most Belle II analyses use machine learning methods that increase signal purity.  The classifiers are typically trained using simulated samples and require validation with data. This validation is arranged using a control channel, for which the classifier efficiency is compared between data and simulation.  However, kinematic differences between the signal and control channel lead to different classifier output. The high-purity and low-efficiency region that is usually employed in analyses is hard to model in particular making efficiency correction based on a control channel unreliable.
 
 Signal embedding is designed to address this issue. It is assumed that signal decay reconstruction efficiency before the classifier can be studied by other means. The key question is to test that the rest-of-event (ROE) information that is used by the classifier is modelled adequately and provide a correction, if not. 
 

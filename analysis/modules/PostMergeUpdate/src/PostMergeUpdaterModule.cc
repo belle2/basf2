@@ -24,7 +24,7 @@ REG_MODULE(PostMergeUpdater);
 // Implementation
 PostMergeUpdaterModule::PostMergeUpdaterModule() : Module()
 {
-  setDescription("Synchronize parts of the evnets post merge/embedding. Used in the signal embedding pipeline. Uses kinematic information for the tag / simulated decay stored in eventExtraInfo.");
+  setDescription("Synchronize parts of the events post merge/embedding. Used in the signal embedding pipeline. Uses kinematic information for the tag / simulated decay stored in eventExtraInfo.");
   addParam("Mixing", m_mixing, "Mixing (true) or embedding (false) corrections", false);
   addParam("isCharged", m_isCharged, "Charged (true) or neutral (false) B mesons", true);
 }
@@ -118,7 +118,7 @@ void PostMergeUpdaterModule::event()
       const B2Vector3D beamSpot = beamSpotDB->getIPPosition();
 
       const TRotation rot = tag_vertex_rotation();
-      const double bz = BFieldManager::getField(beamSpot).Z() / Unit::T;
+      const double bz = BFieldManager::getFieldInTesla(beamSpot).Z();
 
       // Loop over track fit results from the attached part of the event:
       // Loop over new tracks and corresponding track fit results
@@ -174,8 +174,7 @@ void PostMergeUpdaterModule::event()
                            m_eventExtraInfo->getExtraInfo("Y"),
                            m_eventExtraInfo->getExtraInfo("Z"));
 
-
-      const double bz = BFieldManager::getField(vertexTag).Z() / Unit::T;
+      const double bz = BFieldManager::getFieldInTesla(vertexTag).Z();
       const TRotation rot = tag_vertex_rotation();
 
       // Loop over new tracks and corresponding track fit results

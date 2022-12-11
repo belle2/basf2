@@ -70,7 +70,7 @@
   version="[-3]"                            \
   targetClass="Belle2::MCInitialParticles"  \
   target="m_vertex"                         \
-  code="{m_vertex = onfile.m_vertex;}"      \
+  code="{m_vertex = ROOT::Math::XYZVector(onfile.m_vertex.X(), onfile.m_vertex.Y(), onfile.m_vertex.Z());}"      \
 
 #pragma read                                                                  \
   sourceClass="Belle2::DisplayData"                                           \

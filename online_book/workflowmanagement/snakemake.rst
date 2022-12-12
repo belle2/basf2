@@ -23,7 +23,7 @@ snakemake
         * Look at a complete Belle II workflow example.
         * Understand how to modify and extend the workflow.
 
-`Snakemake <https://snakemake.readthedocs.io/en/v3.11.1/index.html>`_ is a workflow management framework designed for uses in research, with extensive support for environment management and remote execution. It features a very simple Python-based syntax and accomodates shell commands and external scripts in multiple programming languages with minimal adaptations. A full guide can be found elsewhere.
+`Snakemake <https://snakemake.readthedocs.io/en/v3.11.1/index.html>`_ is a workflow management framework designed for uses in research, with extensive support for environment management and remote execution. It features a very simple Python-based syntax and accommodates shell commands and external scripts in multiple programming languages with minimal adaptations. A full guide can be found elsewhere.
 
 Let us reproduce the full Belle II workflow that we dicussed for :ref:`onlinebook_workflowmanagement_b2luigi`.
 

@@ -10,7 +10,7 @@ class MergeFiles(Basf2nTupleMergeTask):
     projectName = luigi.Parameter()
 
     def requires(self):
-        skims = open(f"{self.projectName}skims.dat", 'r')
+        skims = open(f"../{self.projectName}skims.dat", 'r')
         for skim in skims.read().splitlines():
             yield ReconstructionWrapper(skim=skim, projectName=self.projectName)
 

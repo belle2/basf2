@@ -2,8 +2,6 @@ outputDirectory:
     "/group/belle/users/<user>/"
 BatchesPerSkim:
     3
-release:
-    "release-06-00-03"
 gbasf2_max_retries:
     10
 gbasf2_download_logs:

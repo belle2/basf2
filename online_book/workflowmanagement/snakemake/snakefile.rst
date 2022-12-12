@@ -3,7 +3,7 @@
 Workflow Logic Code in the Snakefile
 ====================================
 
-In snakemake all workflow logic is centralized in the so-called *snakefile*, similar to a make file. All analysis code is detached in separate scripts, with minimal adaptations to accomodate them in the workflow logic. Snakemake supports multiple programming languages; we will stick to Python.
+In snakemake all workflow logic is centralized in the so-called *snakefile*, similar to a make file. All analysis code is detached in separate scripts, with minimal adaptations to accommodate them in the workflow logic. Snakemake supports multiple programming languages; we will stick to Python.
 
 Processing steps in a snakemake workflow are called *rules*, written in a simple Python-based language and typically consist of :code:`input:` files, :code:`output:` files and a directive to create the latter. Available directives are :code:`shell:` commands, python code in :code:`run:` or a :code:`script:` path. Let us examine the snakefile for our Belle II workflow.
 
@@ -27,12 +27,12 @@ To submit jobs to the grid using gbasf2, we provide a public wrapper via :code:`
 
 To map gbasf2 input file paths to output directories, we here use a dictionary :code:`PathDictionary`, which is filled with paths from the provided text files:
 
-.. literalinclude:: ../b2luigi/qqcontinuumskims.dat
+.. literalinclude:: ../qqcontinuumskims.dat
    :language: python
    :linenos:
    :caption:
    
-.. literalinclude:: ../b2luigi/bmesonsskims.dat
+.. literalinclude:: ../bmesonsskims.dat
    :language: python
    :linenos:
    :caption:

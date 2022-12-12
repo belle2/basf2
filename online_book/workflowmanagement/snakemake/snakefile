@@ -22,7 +22,7 @@ rule OfflineAnalysis:
       
 def PathDictionary(wildcards): #match gbasf2 dataset paths to output file paths
     Paths = dict()
-    for i,skim in enumerate(open(f"{workflow.basedir}/{wildcards.EventType}skims.dat",'r').read().splitlines()):
+    for i,skim in enumerate(open(f"{workflow.basedir}/../{wildcards.EventType}skims.dat",'r').read().splitlines()):
         Paths.update({skim:f"Reconstruction/projectName_{wildcards.EventType}/skim_{i}/reco.root"})
     return Paths
 
@@ -61,7 +61,7 @@ rule ReconstructBatch:
         "Reconstruction/projectName_{EventType}/skim_{skim}/reco_batch{batch}.root"
         
     script:
-        "Reconstruction.py"
+        "reconstruction.py"
 
 rule BatchToTextFile:
     input:
@@ -81,10 +81,10 @@ rule Skim:
     input:
         proxy_text_file = "proxy.dat"
     params:
-        steeringfile = f"{workflow.basedir}/Skim.py",
+        steeringfile = f"{workflow.basedir}/skim.py",
         sandbox_input_files = ["extravariables.py"],
         gbasf2_dataset = lambda wildcards: list(PathDictionary(wildcards).keys())[int(wildcards.skim)],
-        release = config["release"],
+        release = str(subprocess.check_output(["b2help-releases"]).strip(),'utf-8'),
         maxretries = int(config["gbasf2_max_retries"]),
         gbasf2_download_logs = bool(config["gbasf2_download_logs"]),
         gbasf2_min_proxy_lifetime = config["gbasf2_min_proxy_lifetime"],

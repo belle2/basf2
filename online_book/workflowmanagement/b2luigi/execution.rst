@@ -14,7 +14,7 @@ It is best practice  to include a :code:`__main__` method in the scripts:
 
 Calling :code:`python3 main.py --batch` on KEKcc will the trigger the full workflow execution. b2luigi will build the dependency tree for the :code:`Plot` task and execute only the required tasks for which no output files are existing in the given output directory.  Do not forget to setup basf2 beforehand with :code:`b2setup`. Remember that the reconstruction task is the only task not marked as :code:`local` and will therefore be submitted to the KEKcc batch system. 
 
-You can run b2luigi workflows dryly with :code:`python3 main.py --dry-run` to check what tasks would we run.
+You can run b2luigi workflows dryly with :code:`python3 main.py --dry-run` to check what tasks would be run.
     
 Luigi features a dynamic directed acyclic graph, that can be viewed in the *Luigi Task Status*. To access it, start the luigi scheduler in a tmux process on KEKcc and specify the host and port in the workflow execution:
 

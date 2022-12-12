@@ -12,12 +12,12 @@ Generally, a b2luigi task is written as a python class and contains :code:`requi
 
 The :code:`MergeFiles` task employs :code:`b2luigi.basf2_helper.Basf2nTupleMergeTask` to merge the reconstructed nTuples for all skims specified in :code:`qqcontinuumskims.dat` for quark-antiquark continuum and :code:`bmesonsskims.dat` for B mesons.
 
-.. literalinclude:: qqcontinuumskims.dat
+.. literalinclude:: ../qqcontinuumskims.dat
    :language: python
    :linenos:
    :caption:
    
-.. literalinclude:: bmesonsskims.dat
+.. literalinclude:: ../bmesonsskims.dat
    :language: python
    :linenos:
    :caption:

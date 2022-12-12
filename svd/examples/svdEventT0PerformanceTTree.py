@@ -19,6 +19,7 @@
 
 import basf2 as b2
 from basf2 import conditions as b2conditions
+from svd.executionTime_utils import SVDExtraEventStatisticsModule
 import rawdata as raw
 import tracking as trk
 import simulation as sim
@@ -34,8 +35,12 @@ parser.add_argument("--isMC", action="store_true",
                     help="Use Simulation")
 parser.add_argument("--is3sample", action="store_true",
                     help="Emulate SVD 3 samples")
+parser.add_argument("--noEventT0Tree", action="store_true",
+                    help="Do not store eventT0 time tree")
 parser.add_argument("--RootOutput", action="store_true",
                     help="Store svd clusters before reconstruction to root file")
+parser.add_argument("--executionTime", action="store_true",
+                    help="Store exection time tree")
 parser.add_argument("--noReco", action="store_true",
                     help="Do not perform the reconstruction")
 parser.add_argument("--test", action="store_true",
@@ -136,7 +141,7 @@ if args.isMC:
 if args.is3sample:
     outputFileName += "_emulated3sample"
 
-if not args.noReco:
+if not args.noReco and not args.noEventT0Tree:
     recoFileName = outputFileName + "_" + str(args.fileTag) + ".root"
     main.add_module('SVDEventT0PerformanceTTree', outputFileName=recoFileName)
 
@@ -145,6 +150,15 @@ if args.RootOutput:
     main.add_module('RootOutput',
                     outputFileName=rootOutFileName,
                     branchNames=['SVDClusters'])
+
+if args.executionTime:
+    executionFileName = str(args.fileDir) + "SVDExecutionTime"
+    if args.isMC:
+        executionFileName += "_MC"
+        if args.is3sample:
+            executionFileName += "_emulated3sample"
+    executionFileName += "_" + str(args.fileTag) + ".root"
+    main.add_module(SVDExtraEventStatisticsModule(executionFileName))
 
 main.add_module('Progress')
 

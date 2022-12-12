@@ -290,7 +290,7 @@ def add_time_extraction(path, append_full_grid_cdc_eventt0=False, components=Non
     if is_svd_used(components):
         path.add_module("SVDEventT0Estimator")
 
-    if is_vtx_used(components) and (append_full_grid_cdc_eventt0 or is_vtx_used(components)):
+    if is_cdc_used(components) and (append_full_grid_cdc_eventt0 or is_vtx_used(components)):
         path.add_module("FullGridChi2TrackTimeExtractor")
 
     if is_cdc_used(components) and append_full_grid_cdc_eventt0:

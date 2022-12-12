@@ -99,6 +99,9 @@ def add_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False, 
         svdTrackingEventLevelMdstInfoFiller.param('svdClustersName', clustersName)
         path.add_module(svdTrackingEventLevelMdstInfoFiller)
 
+    if 'SVDTimeGroupComposer' not in [e.name() for e in path.modules()]:
+        path.add_module('SVDTimeGroupComposer')
+
     # Add SVDSpacePointCreator
     add_svd_SPcreation(path, isROIsimulation)
 
@@ -221,6 +224,9 @@ def add_rel5_svd_reconstruction(path, isROIsimulation=False, applyMasking=False)
         svdTrackingEventLevelMdstInfoFiller.param('EventLevelTrackingInfoName', nameEventTrackingInfo)
         svdTrackingEventLevelMdstInfoFiller.param('svdClustersName', clusterName)
         path.add_module(svdTrackingEventLevelMdstInfoFiller)
+
+    if 'SVDTimeGroupComposer' not in [e.name() for e in path.modules()]:
+        path.add_module('SVDTimeGroupComposer')
 
     # Add SVDSpacePointCreator
     add_svd_SPcreation(path, isROIsimulation)

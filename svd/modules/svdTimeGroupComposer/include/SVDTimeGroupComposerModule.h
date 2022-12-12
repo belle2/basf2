@@ -55,9 +55,9 @@ namespace Belle2 {
 
     std::string m_eventLevelTrackingInfoName = ""; /**< Name of the EventLevelTrackingInfo */
 
-    double m_xRange = 200.; /** Half-x range of time histogram */
-    double m_AverageCountPerBin = 1.; /** This sets the bin width of histogram time scale */
-    double m_removeBaseline = 2.; /** Bin Content bellow this is not considered */
+    double m_xRange = 160.; /** Half-x range of time histogram */
+    double m_AverageCountPerBin = 2.; /** This sets the bin width of histogram time scale */
+    double m_removeBaseline = 1.; /** Bin Content bellow this is not considered */
 
     // modification parameters
     std::string m_nameOfInstance =

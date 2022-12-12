@@ -16,7 +16,7 @@
 </header>
 """
 
-from root_pandas import read_root
+import uproot
 import matplotlib.pyplot as plt
 # import numpy as np
 
@@ -62,7 +62,7 @@ def PlottingCompHistos(particle):
 if __name__ == '__main__':
 
     # load the root files
-    file = read_root("MCvalidation.root", key="Multiplicities")
+    file = uproot.open("MCvalidation.root:Multiplicities").array(library='pd')
 
     # define the variables to plot
     all_list = [

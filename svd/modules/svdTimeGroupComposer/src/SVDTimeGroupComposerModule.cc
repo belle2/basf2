@@ -20,7 +20,7 @@ REG_MODULE(SVDTimeGroupComposer);
 SVDTimeGroupComposerModule::SVDTimeGroupComposerModule() :
   Module()
 {
-  setDescription("Imports Clusters of the SVD detector and converts them to spacePoints.");
+  setDescription("Imports Clusters of the SVD detector and Assign time-group Id.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   // 1. Collections.
@@ -31,7 +31,7 @@ SVDTimeGroupComposerModule::SVDTimeGroupComposerModule() :
 
   // 2.Modification parameters:
   addParam("AverageCountPerBin", m_AverageCountPerBin, "This sets the bin width of histogram.",
-           double(2.));
+           double(1.));
   addParam("XRange", m_xRange, "This sets the x-range of histogram in ns.",
            double(160.));
   addParam("RemoveBaseline", m_removeBaseline, "Bin Content bellow this is not considered.",
@@ -45,6 +45,9 @@ void SVDTimeGroupComposerModule::initialize()
   // prepare all store:
   m_svdClusters.isRequired(m_svdClustersName);
 
+  if (m_AverageCountPerBin <= 0.) B2FATAL("AverageCountPerBin cannot be zero or less.");
+  if (m_xRange < 10.)             B2FATAL("XRange should not be less than 10 (hard-coded).");
+
   B2DEBUG(1, "SVDTimeGroupComposerModule \nsvdClusters: " << m_svdClusters.getName());
 }
 
@@ -52,9 +55,6 @@ void SVDTimeGroupComposerModule::initialize()
 
 void SVDTimeGroupComposerModule::event()
 {
-  if (m_AverageCountPerBin <= 0.) B2FATAL("AverageCountPerBin cannot be zero or less.");
-  if (m_xRange < 10.)             B2FATAL("XRange should not be less than 10 (hard-coded).");
-
   int totClusters = m_svdClusters.getEntries();
   int xbin = totClusters / m_AverageCountPerBin;
   if (xbin > 0) {

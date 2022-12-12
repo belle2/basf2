@@ -120,9 +120,12 @@ if args.is3sample:
     zsonline.param("ShaperDigitsIN", "SVDShaperDigits")
     main.add_module(zsonline)
 
-#  clusterizer
-main.add_module('SVDClusterizer')
-main.add_module('SVDTimeGroupComposer')
+# #  clusterizer
+# main.add_module('SVDClusterizer')
+
+# #  SVDTimeGroupComposer
+# main.add_module('SVDTimeGroupComposer')
+
 
 if not args.noReco:
     # now do reconstruction:

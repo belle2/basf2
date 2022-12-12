@@ -182,7 +182,7 @@ void PostMergeUpdaterModule::event()
         for (short int i : m_tracks[idxTr]->getValidIndices()) {
           auto t_idx = m_tracks[idxTr]->m_trackFitIndices[i];
 
-          // get d0, z0 vs original vertex, add them back, to account for smearing:
+          // get d0, z0 vs original simulated-truth vertex. They include smearing due to reconstruction.
           auto helix = m_trackFits[t_idx]->getHelix();
           helix.passiveMoveBy(vertexEmb);
 
@@ -192,12 +192,16 @@ void PostMergeUpdaterModule::event()
           // Rotate (no boost for now)
           B2Vector3D momTag = rot * mom;
 
-          // New helix
+          // Define new helix "h", based on tag vertex position and rotated track momentum. Note that the vertex position is usually well
+          // reconstructed and smearing in the track position parameters (d0,z0) for the helix h is not sufficient. In addition,
+          // for embedding channels with multiple tracks we need an extra smearing for each track individually. To take into account correlations,
+          // at least to first order, we used determined above (d0,z0) parameters from the track vs original simulated vertex.
+
           Helix h(vertexTag, momTag, charge, bz);
 
-          m_trackFits[t_idx]->m_tau[TrackFitResult::iD0]          = h.getD0() + helix.getD0(); // some smearing
+          m_trackFits[t_idx]->m_tau[TrackFitResult::iD0]          = h.getD0() + helix.getD0(); // include smearing simulated -> reconstructed
           m_trackFits[t_idx]->m_tau[TrackFitResult::iPhi0]        = h.getPhi0();
-          m_trackFits[t_idx]->m_tau[TrackFitResult::iZ0]          = h.getZ0() + helix.getZ0();
+          m_trackFits[t_idx]->m_tau[TrackFitResult::iZ0]          = h.getZ0() + helix.getZ0(); // include smearing simulated -> reconstructed
           m_trackFits[t_idx]->m_tau[TrackFitResult::iTanLambda]   = h.getTanLambda();
           m_trackFits[t_idx]->m_tau[TrackFitResult::iOmega]       = h.getOmega();
 

@@ -147,6 +147,10 @@ CDCTriggerHoughETFModule::CDCTriggerHoughETFModule() : Module()
   addParam("suppressClone", m_suppressClone,
            "Switch to send only the first found track and suppress the "
            "subsequent clones.", false);
+
+  addParam("offset", m_offset,
+           "Set certain time offset for ETFHough simulation"
+           "Default as -10", -10);
 }
 
 void
@@ -326,7 +330,7 @@ CDCTriggerHoughETFModule::event()
   /* merge track candidates */
   if (m_clusterPattern) {
     if (patternClustering(fastHitMap))
-      m_eventTime->addBinnedEventT0(calcEventTiming(), Const::CDC);
+      m_eventTime->addBinnedEventT0(calcEventTiming() + m_offset, Const::CDC);
   } else {
     connectedRegions();
   }

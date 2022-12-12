@@ -286,7 +286,7 @@ class CosmicsExtapolationPlotModule(basf2.Module):
             if len(track_exthits) == 0:
                 continue
             mc_momentum = mcparticles[0].getMomentum()
-            p_diff = momentum.Mag() - mc_momentum.Mag()
+            p_diff = momentum.R() - mc_momentum.R()
             muon_found = False
             for i in range(len(track_exthits)):
                 if abs(track_exthits[i].getPdgCode()) == 13:

@@ -20,6 +20,7 @@
 #include <TTree.h>
 #include <TFile.h>
 #include <utility>
+#include <Math/VectorUtil.h>
 
 #include "reconstruction/modules/KlId/KLMExpert/KlId.h"
 
@@ -313,12 +314,12 @@ void DataWriterModule::event()
 
     if (part) {
       m_KLMMCWeight = mcParticleWeightPair.second;
-      m_KLMAngleToMC    = clusterPos.Angle(part->getMomentum());
+      m_KLMAngleToMC    = ROOT::Math::VectorUtil::Angle(clusterPos, part->getMomentum());
       m_KLMMCStatus     = part->getStatus();
       m_KLMMCLifetime   = part->getLifetime();
       m_KLMMCPDG        = std::abs(part->getPDG());
       m_KLMMCPrimaryPDG = getPrimaryPDG(part);
-      m_KLMMCMom        = part->getMomentum().Mag();
+      m_KLMMCMom        = part->getMomentum().R();
       m_KLMMCPhi        = part->getMomentum().Phi();
       m_KLMMCTheta      = part->getMomentum().Theta();
     } else {

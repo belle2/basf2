@@ -85,14 +85,8 @@ namespace TreeFitter {
     /** reset the staevector */
     void resetCovariance();
 
-    /** resize and reset statevec and its covariance */
-    void resizeAndResetStateAndCov(int newdim);
-
     /** get the states dimension */
     int getDimensionOfState() const {return m_dim;};
-
-    /** get dimension sum of constraints */
-    int getNConstraints() {return m_nConstraints;}
 
     /** test if the covariance makes sense */
     bool testCovariance() const;
@@ -103,26 +97,11 @@ namespace TreeFitter {
     /** returns a reference(!) to the number of constraints for rows parameter. Used to reset that value. */
     int& nConstraintsVec(int row) { return m_nConstraintsVec[row - 1]; }
 
-    /** get dimension od statevector */
-    int dim() const { return m_dim; }
-
     /** get chi2 of statevector*/
-    double chiSquare() const;
-
-    /** get number of constraints */
-    int nConstraints() const { return m_nConstraints; }
+    double chiSquare() const {return m_chiSquare;};
 
     /** get numer of degrees of freedom */
     int nDof() const;
-
-    /** resize (enlarge!) the statevector */
-    void resize(int newdim);
-
-    /** set statevector elements to 0*/
-    void resetPar();
-
-    /** check if global cov makes sense*/
-    bool testCov() const;
 
     /** some constraints are special the geometric for example */
     void addNConstraint(int value) { m_nConstraints += value; }

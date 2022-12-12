@@ -404,6 +404,16 @@ class ValidationRoot:
             ),
         }
 
+    @cherrypy.expose
+    def retrieve_file_metadata(self, filename):
+        """
+        Returns:
+            Metadata(str) of the file
+        """
+        cherrypy.response.headers['Content-Type'] = 'text/plain'
+        metadata = validationfunctions.get_file_metadata(filename)
+        return metadata
+
 
 def setup_gzip_compression(path, cherry_config):
     """

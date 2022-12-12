@@ -300,7 +300,7 @@ void ECLChargedPIDDataAnalysisModule::event()
     if (imcpart.getMother() != nullptr) n1_mcMothPdg->push_back(imcpart.getMother()->getPDG());
     else n1_mcMothPdg->push_back(-999);
     n1_mcEnergy->push_back(imcpart.getEnergy());
-    n1_mcP->push_back(imcpart.getMomentum().Mag());
+    n1_mcP->push_back(imcpart.getMomentum().R());
     n1_mcTheta->push_back(imcpart.getMomentum().Theta());
     n1_mcPhi->push_back(imcpart.getMomentum().Phi());
 
@@ -308,7 +308,7 @@ void ECLChargedPIDDataAnalysisModule::event()
     if (imcpart.getMother() != nullptr) n2_mcMothPdg->push_back(imcpart.getMother()->getPDG());
     else n2_mcMothPdg->push_back(-999);
     n2_mcEnergy->push_back(imcpart.getEnergy());
-    n2_mcP->push_back(imcpart.getMomentum().Mag());
+    n2_mcP->push_back(imcpart.getMomentum().R());
     n2_mcTheta->push_back(imcpart.getMomentum().Theta());
     n2_mcPhi->push_back(imcpart.getMomentum().Phi());
 
@@ -320,8 +320,8 @@ void ECLChargedPIDDataAnalysisModule::event()
       // get the track fit results
       const TrackFitResult* atrkF = itrk.getTrackFitResult(Const::pion);
       if (atrkF == nullptr) continue; //go to next track if no fit result
-      if (atrkF->getMomentum().Mag() > max_mom) {
-        max_mom = atrkF->getMomentum().Mag();
+      if (atrkF->getMomentum().R() > max_mom) {
+        max_mom = atrkF->getMomentum().R();
         index_max_mom = index;
       }
       index++;
@@ -339,13 +339,13 @@ void ECLChargedPIDDataAnalysisModule::event()
     // get trk kinematics
     n1_trkPdg->push_back(atrkF->getParticleType().getPDGCode());
     n1_trkCharge->push_back(atrkF->getChargeSign());
-    n1_trkP->push_back(atrkF->getMomentum().Mag());
+    n1_trkP->push_back(atrkF->getMomentum().R());
     n1_trkTheta->push_back(atrkF->getMomentum().Theta());
     n1_trkPhi->push_back(atrkF->getMomentum().Phi());
 
     n2_trkPdg->push_back(atrkF->getParticleType().getPDGCode());
     n2_trkCharge->push_back(atrkF->getChargeSign());
-    n2_trkP->push_back(atrkF->getMomentum().Mag());
+    n2_trkP->push_back(atrkF->getMomentum().R());
     n2_trkTheta->push_back(atrkF->getMomentum().Theta());
     n2_trkPhi->push_back(atrkF->getMomentum().Phi());
 
@@ -392,7 +392,7 @@ void ECLChargedPIDDataAnalysisModule::event()
       n1_eclShowerAbsZernike40->push_back(i1shower->getAbsZernikeMoment(4, 0));
       n1_eclShowerAbsZernike51->push_back(i1shower->getAbsZernikeMoment(5, 1));
       // get E/p
-      n1_eclEoP->push_back((i1shower->getEnergy()) / (atrkF->getMomentum().Mag()));
+      n1_eclEoP->push_back((i1shower->getEnergy()) / (atrkF->getMomentum().R()));
       n1_eclShowerMultip++;
     }
     if (jndex2_max_e != -1) {
@@ -407,7 +407,7 @@ void ECLChargedPIDDataAnalysisModule::event()
       n2_eclShowerAbsZernike40->push_back(i2shower->getAbsZernikeMoment(4, 0));
       n2_eclShowerAbsZernike51->push_back(i2shower->getAbsZernikeMoment(5, 1));
       // get E/p
-      n2_eclEoP->push_back((i2shower->getEnergy()) / (atrkF->getMomentum().Mag()));
+      n2_eclEoP->push_back((i2shower->getEnergy()) / (atrkF->getMomentum().R()));
       n2_eclShowerMultip++;
     }
   }

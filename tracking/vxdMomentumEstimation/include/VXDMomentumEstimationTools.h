@@ -11,7 +11,6 @@
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <framework/geometry/B2Vector3.h>
-#include <TVector3.h>
 #include <framework/dataobjects/Helix.h>
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
@@ -45,7 +44,8 @@ namespace Belle2 {
     }
 
     /** Main function: return dEdX for a cluster and the given momentum, position and charge seeds. */
-    double getDEDX(const ClusterType& cluster, const TVector3& momentum, const TVector3& position, short charge) const
+    double getDEDX(const ClusterType& cluster, const ROOT::Math::XYZVector& momentum, const ROOT::Math::XYZVector& position,
+                   short charge) const
     {
 
       const Helix trajectory(position, momentum, charge, 1.5);
@@ -152,18 +152,18 @@ namespace Belle2 {
 
     /** Return the momentum of the simulated MCParticle at this cluster (by using the TrueHit associated with this cluster)
      * This method is implemented for the two cluster types differently below. */
-    TVector3 getEntryMomentumOfMCParticle(const ClusterType&) const
+    ROOT::Math::XYZVector getEntryMomentumOfMCParticle(const ClusterType&) const
     {
       B2FATAL("Can not deal with this cluster type!");
-      return TVector3();
+      return ROOT::Math::XYZVector();
     }
 
     /** Return the entry position of the simulated MCParticle at this cluster (by using the TrueHit associated with this cluster)
      * This method is implemented for the two cluster types differently below. */
-    TVector3 getEntryPositionOfMCParticle(const ClusterType&) const
+    ROOT::Math::XYZVector getEntryPositionOfMCParticle(const ClusterType&) const
     {
       B2FATAL("Can not deal with this cluster type!");
-      return TVector3();
+      return ROOT::Math::XYZVector();
     }
 
     /** Return the path length of a particle with the given helix that goes through the cluster.
@@ -194,7 +194,7 @@ namespace Belle2 {
         return thickness;
       }
 
-      const TVector3& position_at_inner_radius = trajectory.getPositionAtArcLength2D(perp_s_at_cluster_entry);
+      const ROOT::Math::XYZVector& position_at_inner_radius = trajectory.getPositionAtArcLength2D(perp_s_at_cluster_entry);
 
       const double perp_s_at_cluster_exit = trajectory.getArcLength2DAtCylindricalR(radius + thickness);
 
@@ -202,9 +202,9 @@ namespace Belle2 {
         return std::min(width, length);
       }
 
-      const TVector3& position_at_outer_radius = trajectory.getPositionAtArcLength2D(perp_s_at_cluster_exit);
+      const ROOT::Math::XYZVector& position_at_outer_radius = trajectory.getPositionAtArcLength2D(perp_s_at_cluster_exit);
 
-      const double distance_3D = (position_at_outer_radius - position_at_inner_radius).Mag();
+      const double distance_3D = (position_at_outer_radius - position_at_inner_radius).R();
 
       return distance_3D;
     }
@@ -226,17 +226,17 @@ namespace Belle2 {
 
   /** We have to handle PXD and SVD differently here. */
   template <>
-  TVector3 VXDMomentumEstimationTools<PXDCluster>::getEntryMomentumOfMCParticle(const PXDCluster& cluster) const;
+  ROOT::Math::XYZVector VXDMomentumEstimationTools<PXDCluster>::getEntryMomentumOfMCParticle(const PXDCluster& cluster) const;
 
   /** We have to handle PXD and SVD differently here. */
   template <>
-  TVector3 VXDMomentumEstimationTools<SVDCluster>::getEntryMomentumOfMCParticle(const SVDCluster& cluster) const;
+  ROOT::Math::XYZVector VXDMomentumEstimationTools<SVDCluster>::getEntryMomentumOfMCParticle(const SVDCluster& cluster) const;
 
   /** We have to handle PXD and SVD differently here. */
   template <>
-  TVector3 VXDMomentumEstimationTools<PXDCluster>::getEntryPositionOfMCParticle(const PXDCluster& cluster) const;
+  ROOT::Math::XYZVector VXDMomentumEstimationTools<PXDCluster>::getEntryPositionOfMCParticle(const PXDCluster& cluster) const;
 
   /** We have to handle PXD and SVD differently here. */
   template <>
-  TVector3 VXDMomentumEstimationTools<SVDCluster>::getEntryPositionOfMCParticle(const SVDCluster& cluster) const;
+  ROOT::Math::XYZVector VXDMomentumEstimationTools<SVDCluster>::getEntryPositionOfMCParticle(const SVDCluster& cluster) const;
 }

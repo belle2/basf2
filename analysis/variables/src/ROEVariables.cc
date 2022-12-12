@@ -1871,7 +1871,7 @@ namespace Belle2 {
         B2Vector3D pB = - roe4vec.Vect();
         pB.SetMag(0.340);
         pB -= rec4vec.Vect();
-        miss4vec.SetPxPyPzE(pB.x(), pB.y(), pB.z(), E_beam_cms - rec4vec.E());
+        miss4vec.SetPxPyPzE(pB.X(), pB.Y(), pB.Z(), E_beam_cms - rec4vec.E());
       }
 
       // Definition 5: LAB, use energy and momentum of tracks and clusters from whole event

@@ -11,6 +11,7 @@
 #include <geometry/bfieldmap/BFieldComponentAbs.h>
 
 #include <string>
+#include <vector>
 
 namespace Belle2 {
 
@@ -114,9 +115,9 @@ namespace Belle2 {
      * Calculates the magnetic field vector at the specified space point.
      *
      * @param point The space point in Cartesian coordinates (x,y,z) in [cm] at which the magnetic field vector should be calculated.
-     * @return The magnetic field vector at the given space point in [T]. Returns a zero vector TVector(0,0,0) if the space point lies outside the region described by the component.
+     * @return The magnetic field vector at the given space point in [T]. Returns a zero vector XYZVector(0,0,0) if the space point lies outside the region described by the component.
      */
-    virtual B2Vector3D calculate(const B2Vector3D& point) const override;
+    virtual ROOT::Math::XYZVector calculate(const ROOT::Math::XYZVector& point) const override;
 
     /**
      * Returns the HER beam pipe aperture at given position.
@@ -163,10 +164,10 @@ namespace Belle2 {
     void setApertSize(int sizeHER, int sizeLER) { m_apertSizeHER = sizeHER; m_apertSizeLER = sizeLER; }
 
   private:
-    /** Search for range occuped by optics since now only for ranges are present use linear search
+    /** Search for range occupied by optics since now only for ranges are present use linear search
      *
-     * @param a   cooridinate along beamline
-     * @param b   vector with ranges with sentinel at the begining and the end
+     * @param a   coordinate along beamline
+     * @param b   vector with ranges with sentinel at the beginning and the end
      * @return    the range number if out of ranges return -1
      */
     inline int getRange(double a, const ranges_t& b) const;

@@ -6,13 +6,16 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #pragma once
+
 #include <framework/core/Module.h>
+#include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dbobjects/BeamParameters.h>
 
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 
-#include <framework/datastore/StoreObjPtr.h>
 #include <analysis/VertexFitting/TreeFitter/ConstraintConfiguration.h>
 
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
@@ -151,5 +154,8 @@ namespace Belle2 {
 
     /** StoreArray of Particles */
     StoreArray<Particle> m_particles;
+
+    /** Pointer to the BeamParameters */
+    DBObjPtr<BeamParameters> m_beamparams;
   };
 }

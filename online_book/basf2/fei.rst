@@ -324,7 +324,9 @@ indicator for the quality of the B mesons we have reconstructed.
     :class: exercise stacked
 
     Load your ntuple file into python, either using ``root_pandas`` or ``uproot``.
-    Then, plot the distribution of `Mbc` from 5.15 -- 5.3 GeV.
+    The latter is strongly recommended since ``root_pandas`` is deprecated and unmaintained.
+    For instructions on the basic usage of ``uproot`` see the `Getting started guide <https://uproot.readthedocs.io/en/latest/basic.html>`_.
+    After loading your ntuple, plot the distribution of `Mbc` from 5.15 -- 5.3 GeV.
 
     You should see broad peak with a sharp drop-off below 5.2 GeV.
     This drop-off is caused by a fixed pre-cut in the FEI. Candidates below this threshold are rejected before
@@ -339,9 +341,10 @@ indicator for the quality of the B mesons we have reconstructed.
         %matplotlib inline
 
         import matplotlib.pyplot as plt
-        from root_pandas import read_root
-
-        df = read_root('B_charged_hadronic.root')
+        import uproot
+        
+        # To load a root tree with uproot.open, the argument has to be in the form 'filename:treename'
+        df = uproot.open('B_charged_hadronic.root:variables').arrays(['Mbc'], library='pd')
 
         fig, ax = plt.subplots()
         n, bins, patches = ax.hist(df['Mbc'], bins=30, range=(5.15, 5.3))
@@ -389,9 +392,9 @@ indicator for the quality of the B mesons we have reconstructed.
         %matplotlib inline
 
         import matplotlib.pyplot as plt
-        from root_pandas import read_root
-
-        df = read_root('B_charged_hadronic.root')
+        import uproot
+        
+        df = uproot.open('B_charged_hadronic.root:variables').arrays(['Mbc', 'SigProb', 'FEIProbRank'], library='pd')
 
         fig, ax = plt.subplots()
 
@@ -663,9 +666,13 @@ an MC sample with only four decay channels.
         %matplotlib inline
 
         import matplotlib.pyplot as plt
-        from root_pandas import read_root
+        import uproot
 
-        df = read_root('Upsilon4S.root')
+        df = uproot.open('Upsilon4S.root:variables').arrays(['Bsig_isSignal',
+                                                             'm2RecoilSignalSide',
+                                                             'Btag_SigProb',
+                                                             'nCharged'],
+                                                            library='pd')
 
         fig, ax = plt.subplots()
 

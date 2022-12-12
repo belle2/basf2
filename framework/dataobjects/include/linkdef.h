@@ -10,8 +10,10 @@
 #pragma link C++ class Belle2::EventMetaData+; // checksum=0xb2c44743, version=4
 #pragma link C++ class Belle2::FileMetaData+; // checksum=0xccd642e4, version=10
 #pragma link C++ class Belle2::ProfileInfo+; // checksum=0xf2e3190a, version=2
-#pragma link C++ class Belle2::MCInitialParticles+; // checksum=0x842c5f2e, version=4
+#pragma link C++ class Belle2::MCInitialParticles+; // checksum=0x77c00ada, version=5
 #pragma link C++ class Belle2::DigitBase+; // checksum=0xd2fac950, version=2
+#pragma link C++ class Belle2::MergedEventConsistency+; // checksum=0x39886d50, version=1
+#pragma link C++ class Belle2::EventExtraInfo+; // checksum=0x965ad50b, version=2
 
 #pragma link C++ class Belle2::Helix+; // checksum=0xc11c13b7, version=2
 #pragma link C++ class Belle2::UncertainHelix+; // checksum=0xe2ab4508, version=2
@@ -32,13 +34,15 @@
   targetClass="Belle2::FileMetaData" target="m_nEvents" \
   code="{m_nEvents = onfile.m_events;}"
 
-#pragma link C++ class Belle2::DisplayData+; // checksum=0x3c177e04, version=4
+#pragma link C++ class Belle2::DisplayData+; // checksum=0x8b755e12, version=5
 #pragma link C++ class std::vector<TVector3>+; // checksum=0x907dc885, version=6
 #pragma link C++ class std::map<string, vector<TVector3>>+; // checksum=0xd74970c5, version=6
+#pragma link C++ class std::map<string, vector<ROOT::Math::XYZVector>>+; // checksum=0x91d6f4ec, version=6
 #pragma link C++ class std::pair<string, TVector3>+; // checksum=0x4d496280, version=-1
 #pragma link C++ class std::vector<std::pair<std::string, TVector3>>+; // checksum=0x1998b952, version=6
+#pragma link C++ class std::vector<std::pair<std::string, ROOT::Math::XYZVector>>+; // checksum=0xa2b6087d, version=6
 #pragma link C++ class std::vector<TH1*>+; // checksum=0x1c8a598, version=6
-#pragma link C++ class Belle2::DisplayData::Arrow+; // checksum=0xf3209a92, version=-1
+#pragma link C++ class Belle2::DisplayData::Arrow+; // checksum=0xaf5e21d6, version=-1
 #pragma link C++ class std::vector<Belle2::DisplayData::Arrow>+; // checksum=0xf328c034, version=6
 #pragma link C++ class std::pair<Belle2::Const::EDetector, std::map<std::string, int>>+; // checksum=0x32be0e15, version=-1
 #pragma link C++ class std::pair<Belle2::Const::EDetector, std::map<std::string, double>>+; // checksum=0x7add857, version=-1
@@ -67,5 +71,29 @@
   targetClass="Belle2::MCInitialParticles"  \
   target="m_vertex"                         \
   code="{m_vertex = onfile.m_vertex;}"      \
+
+#pragma read                                                                  \
+  sourceClass="Belle2::DisplayData"                                           \
+  source="std::map<std::string, std::vector<TVector3>> m_pointSets"           \
+  version="[-4]"                                                              \
+  targetClass="Belle2::DisplayData"                                           \
+  target="m_pointSets"                                                        \
+  code="{for (const auto& [key, value] : onfile.m_pointSets) {                \
+           std::vector<ROOT::Math::XYZVector> tmp;                            \
+           for (const auto& vec : value)                                      \
+             tmp.push_back(ROOT::Math::XYZVector(vec.X(), vec.Y(), vec.Z())); \
+           m_pointSets[key] = tmp;                                            \
+         }                                                                    \
+        }"                                                                    \
+
+#pragma read                                                         \
+  sourceClass="Belle2::DisplayData"                                  \
+  source="std::vector<std::pair<std::string, TVector3>> m_labels"    \
+  version="[-4]"                                                     \
+  targetClass="Belle2::DisplayData"                                  \
+  target="m_labels"                                                  \
+  code="{for (const auto& labelPair : onfile.m_labels)               \
+           m_labels.emplace_back(labelPair);                         \
+        }"                                                           \
 
 #endif

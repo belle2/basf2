@@ -55,7 +55,7 @@ when extracting a signal component.
     i.e. directly to some lighter hadrons without creating a ϒ(4S) resonance.
 
     In Belle II Monte Carlo, the centrally produced continuum samples are separated by their quark content and are
-    called 'uubar', 'ddbar', 'ssbar' and 'ccbar'.
+    called ``uubar``, ``ddbar``, ``ssbar``, and ``ccbar``.
 
 If variables which you already know from the previous exercises are bad at separating continuum and
 BB events, which other properties of the events can we use?
@@ -120,7 +120,7 @@ They are defined by
 
     H_l = \sum_{i,j} \frac{\lvert p_i \rvert \lvert p_j \rvert }{E^2_{\text{event}}} P_l(\cos{\theta_{i, j}})
 
-with  the momenta p :sub:`i,j`, the angle θ :sub:`i,j` between them, the total energy in the event
+with the momenta p :sub:`i,j`, the angle θ :sub:`i,j` between them, the total energy in the event
 E :sub:`event` and the Legendre Polynomials P :sub:`l`.
 
 Other powerful properties are those based on the thrust vector. This is the vector along which the total projection
@@ -171,7 +171,7 @@ First Continuum Suppression steps in basf2
 Now, how do we access the shape of events in basf2?
 
 First we need some data. In this exercise we will use two samples, one with "uubar" continuum background and one
-with B → K :sub:`S` :sup:`0` 𝜋 :sup:`0` decays. These samples are called ``uubar_sample.root`` and
+with :math:`B^0 \to K_S^0 \pi^0` decays. These samples are called ``uubar_sample.root`` and
 ``B02ks0pi0_sample.root`` and can be used with the `basf2.find_file` function
 (you need the ``data_type='examples'`` switch and also have to prepend ``starterkit/2021/`` to the filename).
 If this doesn't work you can find the files in ``/sw/belle2/examples-data/starterkit/2021`` on KEKCC.

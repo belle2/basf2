@@ -101,12 +101,12 @@ int HepMCReader::getEvent(MCParticleGraph& graph, double& eventWeight)
             << " mass " << mass << " px " << momentum.x() << " py " << momentum.y() << " px " << momentum.z() << " E " << momentum.t());
     p.addStatus(MCParticle::c_PrimaryParticle);  // all particles part of the hepmc file should be set as primary
     p.setPDG(pdg_code);
-    p.setMomentum(TVector3(momentum.x(), momentum.y(), momentum.z()));
+    p.setMomentum(ROOT::Math::XYZVector(momentum.x(), momentum.y(), momentum.z()));
     p.setEnergy(momentum.t());
     p.setMass(mass);
     if (production_vertex) {
       const auto pos = production_vertex->position();
-      p.setProductionVertex(TVector3(pos.x(), pos.y(), pos.z()) * len_conv * Unit::cm);
+      p.setProductionVertex(ROOT::Math::XYZVector(pos.x(), pos.y(), pos.z()) * len_conv * Unit::cm);
       p.setProductionTime(pos.t() * len_conv * Unit::cm / Const::speedOfLight);
       p.setValidVertex(true);
     }

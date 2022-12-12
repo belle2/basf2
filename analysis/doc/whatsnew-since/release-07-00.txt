@@ -1,3 +1,32 @@
+Changes in the analysis package in light-2212-foldex
+----------------------------------------------------
+
+Variables
++++++++++
+ * Extended the variable `useAlternativeDaughterHypothesis` to variables using daughters' pdg codes, e.g. `InvM`.
+ * New metavariable `useDaughterRestFrame` to calculate a variable in the rest frame of the given daughters is added.
+ * New variable `cosHelicityAngleForQuasiTwoBodyDecay` is added for the angular analysis on a quasi-two-body decay.
+ * Extended the variable `cosTPTO` to be available both in a main path and for_each loop over ROEs.
+
+Modules
++++++++
+ * Added an option ``signalSideParticleList`` to the function :func:`modularAnalysis.variablesToNtuple` to store the index of the signal-side particle.
+   This option is only valid when one calls the function in a ``for_each`` loop over the RestOfEvent.
+   The branches ``__signalSideCandidate__`` and ``__nSignalSideCandidates__`` are added to the TTree by setting the option.
+
+Changes in the analysis package in light-2210-devonrex
+------------------------------------------------------
+
+Modules
++++++++
+ * Fixed a bug in KFit when the daughters' kinematics are updated (``daughtersUpdate=True``). The mother's momentum was calculated
+   at the updated vertex position, while the updated daughters' momenta were calculated at the original position. This caused an
+   inconsistency in the momentum between the mother and the sum of the daughters. Now the daughters' momenta are also calculated at
+   the updated vertex position and the inconsistency is resolved.
+ * Changed TreeFit and KFit to be compatible with the momentum scaling factor.
+   The daughters' kinematics as member variables of the Particle class are updated by being divided by the momentum scaling factor.
+   However, the vertex fitters do not change the momentum scaling factor. So, the kinematics variables now return correct values.
+
 Changes in the analysis package in light-2209-calico
 ----------------------------------------------------
 
@@ -44,7 +73,6 @@ Modular Analysis Function
    selection. The decomposition of meta variables can be tricky, so a new argument ``metavariables`` is added to extend
    the list of meta variables which should be decomposed and should themselves be ignored in the check.
  * Added the argument ``treatAsInvisible`` in :func:`vertex.treeFit` to ignore particles in the fit. 
- * Updated the `calculateTrackIsolation` helper. Now, it returns a list of metavariables (`minET2ETDist`, optionally `minET2ETDistVar` as well)
  * Updated the `calculateTrackIsolation` helper. Now, it returns a list of metavariables (`minET2ETDist`, `minET2ETIsoScore`, optionally `minET2ETDistVar` as well)
    correctly configured according to the helper input options.
    Users can then create aliases in their own steering script: see ``analysis/examples/VariableManager/trackIsolationVariables.py`` for an example.
@@ -74,6 +102,8 @@ Variables
    and `pidWeightedProbabilityExpert`.
  * Added the variable `hasCorrectROECombination` to check if the correct combination of the particle that is the basis of
    the ROE object and the particle that is loaded from the ROE.
+ * Added the variable `nMCDaughters` which returns the number of daughters of the MC-matched MCParticle or a MCParticle
+   obtained with e.g. the `genUpsilon4S` metavariable.
 
 Modules
 +++++++

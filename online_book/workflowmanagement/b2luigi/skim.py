@@ -7,8 +7,6 @@ import numpy as np
 import basf2 as b2
 import modularAnalysis as ma
 import vertex as vx
-import subprocess
-
 
 class StarterTask(luigi.Task):
     # this task is a dummy task to have one common starting Task, from which all dependencies can be visualized
@@ -26,7 +24,7 @@ class SkimTask(Basf2PathTask):
     batch_system = "gbasf2"
     gbasf2_project_name_prefix = luigi.Parameter(significant=False)
     gbasf2_input_dataset = luigi.Parameter(hashed=True)
-    gbasf2_release = str(subprocess.check_output(["b2help-releases"]).strip(), 'utf-8')
+#    gbasf2_release = "<release name>" #defaults to current basf2 release if not specified
     gbasf2_print_status_updates = True
     gbasf2_max_retries = 10
     gbasf2_download_dataset = True

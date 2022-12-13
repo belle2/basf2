@@ -10,7 +10,7 @@
 ##########################################################################
 
 import basf2 as b2
-from reconstruction import add_mdst_output
+from mdst import add_mdst_output
 from softwaretrigger.constants import SoftwareTriggerModes
 from softwaretrigger.processing import add_hlt_processing
 

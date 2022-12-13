@@ -138,6 +138,9 @@
   <DetectorComponent name="VTX-CMOS-5layer" isDefault="false">
     <xi:include href="../vtx/VTX-CMOS5.xml" xpointer="xpointer(/DetectorComponent/*)" />
   </DetectorComponent>
+  <DetectorComponent name="VTX-CMOS-5layer-L3mod" isDefault="false">
+    <xi:include href="../vtx/VTX-CMOS5-L3mod.xml" xpointer="xpointer(/DetectorComponent/*)" />
+  </DetectorComponent>
   <DetectorComponent name="VTX-CMOS-5layer-plus1inCDC" isDefault="false">
     <xi:include href="../vtx/VTX-CMOS5-plus1inCDC.xml" xpointer="xpointer(/DetectorComponent/*)" />
   </DetectorComponent>

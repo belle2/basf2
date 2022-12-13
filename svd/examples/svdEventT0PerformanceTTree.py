@@ -48,6 +48,9 @@ parser.add_argument("--test", action="store_true",
 args = parser.parse_args()
 b2.B2INFO(f"Steering file args = {args}")
 
+# b2.set_log_level(b2.LogLevel.DEBUG)
+# b2.set_debug_level(1)
+
 main = b2.create_path()
 
 b2.set_random_seed(1)
@@ -82,6 +85,7 @@ else:
     b2conditions.globaltags = ["online"]
     b2conditions.prepend_globaltag("data_reprocessing_prompt")
     b2conditions.prepend_globaltag("patch_main_release-07")
+    b2conditions.prepend_globaltag("tracking_TEST_SVDTimeSelectionOFFrev1_VXDTF2TimeFiltersONrev27")
 
     MCTracking = False
 
@@ -120,11 +124,14 @@ if args.is3sample:
     zsonline.param("ShaperDigitsIN", "SVDShaperDigits")
     main.add_module(zsonline)
 
-# #  clusterizer
-# main.add_module('SVDClusterizer')
 
-# #  SVDTimeGroupComposer
-# main.add_module('SVDTimeGroupComposer')
+#  SVDTimeGroupComposer
+main.add_module('SVDClusterizer')
+svdTimeGroupComposer = b2.register_module('SVDTimeGroupComposer')
+svdTimeGroupComposer.param('XRange', 160.)
+svdTimeGroupComposer.param('AverageCountPerBin', 1.)
+svdTimeGroupComposer.param('Threshold', 1.)
+main.add_module(svdTimeGroupComposer)
 
 
 if not args.noReco:

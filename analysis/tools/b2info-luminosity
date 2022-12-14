@@ -1,5 +1,4 @@
-#!/bin/env python3
-# -*- mode: Python; coding: utf-8 -*-
+#!/usr/bin/env python3
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -49,6 +48,7 @@ def parseNumList(string):
         result |= parseNumRange(rr)
 
     return sorted(list(result))
+
 
 def procString(s):
     """
@@ -111,12 +111,13 @@ def argparser():
                         choices=[None, '4S', '4S_offres', '4S_scan', '5S_scan'],
                         default=None,
                         help="Consider only runs with given beam energy None(default)/4S/4S_offres/4S_scan/5S_scan")
-    parser.add_argument("--proc",
-                        dest="proc",
-                        action="store",
-                        type=procString,
-                        default=None,
-                        help="Which processing we need to consider: procNN. Default is latest proc and prompt where proc is not available")
+    parser.add_argument(
+        "--proc",
+        dest="proc",
+        action="store",
+        type=procString,
+        default=None,
+        help="Which processing we need to consider: procNN. Default is latest proc and prompt where proc is not available")
     parser.add_argument("--uncert",
                         dest="uncert",
                         action="store_true",
@@ -255,7 +256,7 @@ class Luminosity:
         df['lumi'] *= 1E-6
         df['lumiErr'] *= 1E-6
 
-        # to compute undetertainty
+        # to compute uncertainty
         df['lumiErr2'] = df['lumiErr'] ** 2
 
         # cumulative integrated luminosity
@@ -426,7 +427,7 @@ class Luminosity:
 
         # Load from cache if any
 
-        df = pd.DataFrame(columns=["exp", "run", "date", "date_stop", "lumi", "lumiErr" "intLumi", "intLumiDel"])
+        df = pd.DataFrame(columns=["exp", "run", "date", "date_stop", "lumi", "lumiErr", "intLumi", "intLumiDel"])
 
         # this is not working yet.
         # try:
@@ -513,31 +514,33 @@ class Luminosity:
                 df['lumiDel'] = np.nan
                 procAvailable = df['proc'].unique()
                 if args.proc and args.proc not in procAvailable:
-                    b2.B2FATAL(f"No luminosity information found in exp {self.exp} for processing {args.proc}: available processing are {procAvailable}")
+                    b2.B2FATAL(
+                        f"No luminosity information found in exp {self.exp} for"
+                        "processing {args.proc}: available processing are {procAvailable}")
                 # get the latest if none is specified
                 if not args.proc:
-                    if len(procAvailable)==1:
-                        args.proc=procAvailable[0]
+                    if len(procAvailable) == 1:
+                        args.proc = procAvailable[0]
                     else:
-                        args.proc=(sorted([proc for proc in procAvailable if proc != "prompt"]))[-1]
-    
+                        args.proc = (sorted([proc for proc in procAvailable if proc != "prompt"]))[-1]
+
                 if args.proc == 'prompt':
                     b2.B2INFO(f"Using processing {args.proc} for luminosity information")
                 else:
                     b2.B2INFO(f"Using processing {args.proc} (and prompt) for luminosity information")
-                    
+
                     # select only the requested processing (or prompt)
-                    df = df[df['proc'].isin([args.proc,"prompt"])]
+                    df = df[df['proc'].isin([args.proc, "prompt"])]
 
                     # if a run has both prompt and procNN, get the proc lumi
                     # define proc as a category
                     df['proc'] = df['proc'].astype('category')
                     # define the ordering of the category, first procXX then prompt
-                    df['proc'] = df['proc'].cat.set_categories([args.proc,"prompt"], ordered=True)
+                    df['proc'] = df['proc'].cat.set_categories([args.proc, "prompt"], ordered=True)
                     # sort according to the defined category
-                    df.sort_values(['exp','run','proc'],inplace=True, ascending=True)
+                    df.sort_values(['exp', 'run', 'proc'], inplace=True, ascending=True)
                     # drop duplicated exp-run keeping the first cat (procxx)
-                    df = df.drop_duplicates(['exp','run'])
+                    df = df.drop_duplicates(['exp', 'run'])
 
         if len(df) == 0:
             b2.B2FATAL(f"No runs found in exp {self.exp} for range {self.runRangeStr}")
@@ -567,7 +570,7 @@ class Luminosity:
             dfRuns = self.df
         # create a reduced dataframe with only runs selected
 
-        cols=['exp','run','lumi','lumiErr','date','length','intLumi','intLumiErr','intLumiDel','quality','beam_energy']
+        cols = ['exp', 'run', 'lumi', 'lumiErr', 'date', 'length', 'intLumi', 'intLumiErr', 'intLumiDel', 'quality', 'beam_energy']
         dfRuns['length'] = dfRuns['date_stop'] - dfRuns['date']
         dfRuns['date'].fillna(pd.Timedelta(seconds=0))
         if (self.verb):
@@ -593,7 +596,7 @@ class Luminosity:
                         "run": "{:5d}".format,
                         "lumi": lambda x: "{:,.3f}".format(
                             x*1000),
-                        "lumiErr" : lambda x: "{:,.3f}".format(
+                        "lumiErr": lambda x: "{:,.3f}".format(
                             x*1000),
                         "date": lambda x: "{:%Y/%m/%d %H:%M}".format(
                             pd.to_datetime(
@@ -604,7 +607,7 @@ class Luminosity:
                                     x,
                                     unit='s')),
                         "intLumi": "{:,.3f}".format,
-                        "intLumiErr" : "{:,.3f}".format,
+                        "intLumiErr": "{:,.3f}".format,
                         "intLumiDel": "{:,.3f}".format,
                         "good": "{:5s}".format,
                         "beam_energy": "{:8s}".format,
@@ -614,34 +617,34 @@ class Luminosity:
         b2.B2INFO(f"Num runs: {len(dfRuns)}")
 
         b2.B2INFO('-' * 20 + " Luminosity by Beam Eenrgy " + '-' * 20)
-        LL = dfRuns.groupby(["beam_energy"])[['lumi','lumiErr2']].apply(sum)
-        for i,L,Le in LL.itertuples():
+        LL = dfRuns.groupby(["beam_energy"])[['lumi', 'lumiErr2']].apply(sum)
+        for i, L, Le in LL.itertuples():
             Le = np.sqrt(Le)
             b2.B2INFO(
                 f"RECORDED {self.what} {i:9s} : L = {L:8.3f} +/- {Le:3.3f} /fb "
                 f"= {L/1E3:8.4f} +/- {Le/1E3:3.3f}  /ab"
             )
 
-        b2.B2INFO('-' * 20 + " Luminosity by Exp and Beam Eenrgy " + '-' * 20 )
-        LL = dfRuns.groupby(['exp',"beam_energy"])[['lumi','lumiErr2']].sum()
-        for i,L,Le in LL.itertuples():
+        b2.B2INFO('-' * 20 + " Luminosity by Exp and Beam Eenrgy " + '-' * 20)
+        LL = dfRuns.groupby(['exp', "beam_energy"])[['lumi', 'lumiErr2']].sum()
+        for i, L, Le in LL.itertuples():
             Le = np.sqrt(Le)
             b2.B2INFO(
                 f"RECORDED {self.what} {i[0]:4} {i[1]:9s} : L = {L:8.3f} +/- {Le:3.3f} /fb "
                 f"= {L/1E3:8.4f} +/- {Le/1E3:3.3f} /ab"
             )
 
-        b2.B2INFO('-' * 20 + " Luminosity by processing " + '-' * 20 )
-        LL = dfRuns.groupby(["proc"])[['lumi','lumiErr2']].sum()
-        for i,L,Le in LL.itertuples():
+        b2.B2INFO('-' * 20 + " Luminosity by processing " + '-' * 20)
+        LL = dfRuns.groupby(["proc"])[['lumi', 'lumiErr2']].sum()
+        for i, L, Le in LL.itertuples():
             Le = np.sqrt(Le)
             b2.B2INFO(
                 f"RECORDED {self.what} {i:9s} : L = {L:8.3f} +/- {Le:3.3f} /fb "
                 f"= {L/1E3:8.4f} +/- {Le/1E3:3.3f}  /ab"
             )
 
-        b2.B2INFO('-' * 20 + " Total Luminosity " + '-' * 20 )
-        L=dfRuns['lumi'].sum()
+        b2.B2INFO('-' * 20 + " Total Luminosity " + '-' * 20)
+        L = dfRuns['lumi'].sum()
         Le = np.sqrt(dfRuns['lumiErr2'].sum())
         b2.B2INFO(
             f"RECORDED {self.what} {i:9s} : L = {L:8.3f} +/- {Le:3.3f} /fb "
@@ -656,7 +659,7 @@ class Luminosity:
             )
 
         # store luminosity values for each run in a .csv file
-        b2.B2INFO(f"Saving run-by-run luminosity informations to luminosityByRuns.csv")
+        b2.B2INFO("Saving run-by-run luminosity informations to luminosityByRuns.csv")
         dfRuns.to_csv("luminosityByRuns.csv")
 
         pass

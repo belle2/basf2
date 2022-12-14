@@ -125,13 +125,13 @@ if args.is3sample:
     main.add_module(zsonline)
 
 
-#  SVDTimeGroupComposer
-main.add_module('SVDClusterizer')
-svdTimeGroupComposer = b2.register_module('SVDTimeGroupComposer')
-svdTimeGroupComposer.param('XRange', 160.)
-svdTimeGroupComposer.param('AverageCountPerBin', 1.)
-svdTimeGroupComposer.param('Threshold', 1.)
-main.add_module(svdTimeGroupComposer)
+# #  SVDTimeGroupComposer
+# main.add_module('SVDClusterizer')
+# svdTimeGroupComposer = b2.register_module('SVDTimeGroupComposer')
+# svdTimeGroupComposer.param('XRange', 160.)
+# svdTimeGroupComposer.param('AverageCountPerBin', 1.)
+# svdTimeGroupComposer.param('Threshold', 1.)
+# main.add_module(svdTimeGroupComposer)
 
 
 if not args.noReco:

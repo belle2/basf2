@@ -1,4 +1,5 @@
-#!/usr/bin/env python3
+#!/bin/env python3
+# -*- mode: Python; coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -48,6 +49,15 @@ def parseNumList(string):
         result |= parseNumRange(rr)
 
     return sorted(list(result))
+
+def procString(s):
+    """
+    check if the string is of type procNN
+    """
+    if not s.startswith('proc'):
+        raise argparse.ArgumentTypeError("String must be 'procNN'")
+    else:
+        return s
 
 
 def argparser():
@@ -101,6 +111,18 @@ def argparser():
                         choices=[None, '4S', '4S_offres', '4S_scan', '5S_scan'],
                         default=None,
                         help="Consider only runs with given beam energy None(default)/4S/4S_offres/4S_scan/5S_scan")
+    parser.add_argument("--proc",
+                        dest="proc",
+                        action="store",
+                        type=procString,
+                        default=None,
+                        help="Which processing we need to consider: procNN. Default is latest proc and prompt where proc is not available")
+    parser.add_argument("--uncert",
+                        dest="uncert",
+                        action="store_true",
+                        default=True,
+                        help="Compute and print also statistical uncertainties for integrated luminosity")
+
     parser.add_argument("--dbonline",
                         dest="dbonline",
                         action="store",
@@ -218,8 +240,9 @@ class Luminosity:
         """
         create a panda dataframe from Offline DB
         """
-        cmdexp = "SELECT lee as lumi, exp, run, start_time as date, " \
-                 f"s as beam_energy FROM RunLumi WHERE exp IN ({', '.join(['?' for _ in self.exp])}) "
+        cmdexp = "SELECT lee as lumi, leee as lumiErr, exp, run, start_time as date, end_time as date_stop, " \
+                 "s as beam_energy, proc " \
+                 f"FROM RunLumi WHERE exp IN ({', '.join(['?' for _ in self.exp])}) "
         if args.runs:
             cmdexp += f" AND run >= {min(self.runs)} AND run <= {max(self.runs)}"
 
@@ -230,6 +253,10 @@ class Luminosity:
 
         # lumi in /fb
         df['lumi'] *= 1E-6
+        df['lumiErr'] *= 1E-6
+
+        # to compute undetertainty
+        df['lumiErr2'] = df['lumiErr'] ** 2
 
         # cumulative integrated luminosity
         df['intLumi'] = df['lumi'].cumsum()
@@ -399,7 +426,7 @@ class Luminosity:
 
         # Load from cache if any
 
-        df = pd.DataFrame(columns=["exp", "run", "date", "date_stop", "lumi", "intLumi", "intLumiDel"])
+        df = pd.DataFrame(columns=["exp", "run", "date", "date_stop", "lumi", "lumiErr" "intLumi", "intLumiDel"])
 
         # this is not working yet.
         # try:
@@ -475,13 +502,42 @@ class Luminosity:
                 df = df.sort_values(by=['exp', 'run'])
 
                 df['intLumi'] = df['lumi'].cumsum()
+                df['intLumiErr'] = np.nan
                 df['lumiDel'] = df['intLumiDel'].diff()
             else:
                 self.conn = self.create_connection(self.what)
                 df = pd.DataFrame(columns=["exp", "run", "date", "date_stop", "lumi", "intLumi", "intLumiDel"])
                 df = df.append(self.getDataFrameFromDBOffLine(), sort=False)
                 df['intLumi'] = df['lumi'].cumsum()
+                df['intLumiErr'] = np.sqrt(df['lumiErr2'].cumsum())
                 df['lumiDel'] = np.nan
+                procAvailable = df['proc'].unique()
+                if args.proc and args.proc not in procAvailable:
+                    b2.B2FATAL(f"No luminosity information found in exp {self.exp} for processing {args.proc}: available processing are {procAvailable}")
+                # get the latest if none is specified
+                if not args.proc:
+                    if len(procAvailable)==1:
+                        args.proc=procAvailable[0]
+                    else:
+                        args.proc=(sorted([proc for proc in procAvailable if proc != "prompt"]))[-1]
+    
+                if args.proc == 'prompt':
+                    b2.B2INFO(f"Using processing {args.proc} for luminosity information")
+                else:
+                    b2.B2INFO(f"Using processing {args.proc} (and prompt) for luminosity information")
+                    
+                    # select only the requested processing (or prompt)
+                    df = df[df['proc'].isin([args.proc,"prompt"])]
+
+                    # if a run has both prompt and procNN, get the proc lumi
+                    # define proc as a category
+                    df['proc'] = df['proc'].astype('category')
+                    # define the ordering of the category, first procXX then prompt
+                    df['proc'] = df['proc'].cat.set_categories([args.proc,"prompt"], ordered=True)
+                    # sort according to the defined category
+                    df.sort_values(['exp','run','proc'],inplace=True, ascending=True)
+                    # drop duplicated exp-run keeping the first cat (procxx)
+                    df = df.drop_duplicates(['exp','run'])
 
         if len(df) == 0:
             b2.B2FATAL(f"No runs found in exp {self.exp} for range {self.runRangeStr}")
@@ -511,7 +567,7 @@ class Luminosity:
             dfRuns = self.df
         # create a reduced dataframe with only runs selected
 
-        cols = ['exp', 'run', 'lumi', 'date', 'length', 'intLumi', 'intLumiDel', 'quality', 'beam_energy']
+        cols=['exp','run','lumi','lumiErr','date','length','intLumi','intLumiErr','intLumiDel','quality','beam_energy']
         dfRuns['length'] = dfRuns['date_stop'] - dfRuns['date']
         dfRuns['date'].fillna(pd.Timedelta(seconds=0))
         if (self.verb):
@@ -537,6 +593,8 @@ class Luminosity:
                         "run": "{:5d}".format,
                         "lumi": lambda x: "{:,.3f}".format(
                             x*1000),
+                        "lumiErr" : lambda x: "{:,.3f}".format(
+                            x*1000),
                         "date": lambda x: "{:%Y/%m/%d %H:%M}".format(
                             pd.to_datetime(
                                 x,
@@ -546,6 +604,7 @@ class Luminosity:
                                     x,
                                     unit='s')),
                         "intLumi": "{:,.3f}".format,
+                        "intLumiErr" : "{:,.3f}".format,
                         "intLumiDel": "{:,.3f}".format,
                         "good": "{:5s}".format,
                         "beam_energy": "{:8s}".format,
@@ -555,26 +614,38 @@ class Luminosity:
         b2.B2INFO(f"Num runs: {len(dfRuns)}")
 
         b2.B2INFO('-' * 20 + " Luminosity by Beam Eenrgy " + '-' * 20)
-        LL = dfRuns.groupby(["beam_energy"])['lumi'].sum()
-        for i, L in LL.items():
+        LL = dfRuns.groupby(["beam_energy"])[['lumi','lumiErr2']].apply(sum)
+        for i,L,Le in LL.itertuples():
+            Le = np.sqrt(Le)
             b2.B2INFO(
-                f"RECORDED {self.what} {i:9s} : L = {L*1E6:12.2f} /nb = {L*1E3:10.2f} "
-                f"/pb = {L:8.3f} /fb = {L/1E3:8.4f} /ab"
+                f"RECORDED {self.what} {i:9s} : L = {L:8.3f} +/- {Le:3.3f} /fb "
+                f"= {L/1E3:8.4f} +/- {Le/1E3:3.3f}  /ab"
             )
 
-        b2.B2INFO('-' * 20 + " Luminosity by Exp and Beam Eenrgy " + '-' * 20)
-        LL = dfRuns.groupby(['exp', "beam_energy"])['lumi'].sum()
-        for i, L in LL.items():
+        b2.B2INFO('-' * 20 + " Luminosity by Exp and Beam Eenrgy " + '-' * 20 )
+        LL = dfRuns.groupby(['exp',"beam_energy"])[['lumi','lumiErr2']].sum()
+        for i,L,Le in LL.itertuples():
+            Le = np.sqrt(Le)
             b2.B2INFO(
-                f"RECORDED {self.what} {i[0]:4} {i[1]:9s} : L = {L*1E6:12.2f} /nb = {L*1E3:8.2f} "
-                f"/pb = {L:8.3f} /fb = {L/1E3:8.4f} /ab"
+                f"RECORDED {self.what} {i[0]:4} {i[1]:9s} : L = {L:8.3f} +/- {Le:3.3f} /fb "
+                f"= {L/1E3:8.4f} +/- {Le/1E3:3.3f} /ab"
             )
 
-        b2.B2INFO('-' * 20 + " Total Luminosity " + '-' * 20)
-        L = dfRuns['lumi'].sum()
+        b2.B2INFO('-' * 20 + " Luminosity by processing " + '-' * 20 )
+        LL = dfRuns.groupby(["proc"])[['lumi','lumiErr2']].sum()
+        for i,L,Le in LL.itertuples():
+            Le = np.sqrt(Le)
+            b2.B2INFO(
+                f"RECORDED {self.what} {i:9s} : L = {L:8.3f} +/- {Le:3.3f} /fb "
+                f"= {L/1E3:8.4f} +/- {Le/1E3:3.3f}  /ab"
+            )
+
+        b2.B2INFO('-' * 20 + " Total Luminosity " + '-' * 20 )
+        L=dfRuns['lumi'].sum()
+        Le = np.sqrt(dfRuns['lumiErr2'].sum())
         b2.B2INFO(
-            f"RECORDED {self.what} Total     : L = {L*1E6:12.2f} /nb = {L*1E3:8.2f} "
-            f"/pb = {L:8.3f} /fb = {L/1E3:8.4f} /ab"
+            f"RECORDED {self.what} {i:9s} : L = {L:8.3f} +/- {Le:3.3f} /fb "
+            f"= {L/1E3:8.4f} +/- {Le/1E3:3.3f}  /ab"
         )
 
         if self.what == 'online' and self.delivered:
@@ -585,7 +656,8 @@ class Luminosity:
             )
 
         # store luminosity values for each run in a .csv file
-        dfRuns.to_csv("dfruns.csv")
+        b2.B2INFO(f"Saving run-by-run luminosity informations to luminosityByRuns.csv")
+        dfRuns.to_csv("luminosityByRuns.csv")
 
         pass
 

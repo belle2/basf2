@@ -20,7 +20,7 @@ Assuming the skims are prepared, the removal of the control channel/ROE is arran
 
 ..
 
-Here  :code:`B+:BplusToKplusJpsiMuM` and  :code:`B+:BplusToKplusNuNu` are the list names for the reconstructed :math:`B^+ \to K^+ J/\psi (\mu^+ \mu^-)` decay and truth-matched :math:`B^+ \to K^+ \nu \bar{\nu}` decay, respectively. The two output files are :code:`data.root` and :code:`sigmc.root`. Note that apart from selecting objects, the script performs vertex fits of :code:`listName` and stores the fit results. Events with multiple B candidates and failed vertex fits are removed. 
+Here  :code:`B+:BplusToKplusJpsiMuMu` and  :code:`B+:BplusToKplusNuNu` are the list names for the reconstructed :math:`B^+ \to K^+ J/\psi (\mu^+ \mu^-)` decay and truth-matched :math:`B^+ \to K^+ \nu \bar{\nu}` decay, respectively. The two output files are :code:`data.root` and :code:`sigmc.root`. Note that apart from selecting objects, the script performs vertex fits of :code:`listName` and stores the fit results. Events with multiple B candidates and failed vertex fits are removed. 
 
 The two output files can be then merged using
 

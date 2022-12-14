@@ -1,5 +1,10 @@
 Changes in the analysis package in light-2212-foldex
 ----------------------------------------------------
+Signal embedding
+++++++++++++++++
+ * New modules `UdstListFilter` and `PostMergeUpdate` for signal embedding which remove extra `mdst` objects and merge events together, respectively.
+ * New scripts `udst_purge_list.py` and `embedding_merge.py` to enable signal embedding.
+ * A shell script ``analysis/examples/embedding/embedding.sh`` which illustrates the usage of the scripts.
 
 Variables
 +++++++++

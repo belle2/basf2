@@ -18,7 +18,6 @@ def prepare_path(File1, File2, FileOut):
 
     # and the other input
     input2 = basf2.register_module('RootInput')
-    # input2.param('inputFileName', 'mcjpsi_skim.root')
     input2.param('inputFileName', File2)
     input2.param('isSecondaryInput', True)
     indep.add_module(input2).set_name("input2")

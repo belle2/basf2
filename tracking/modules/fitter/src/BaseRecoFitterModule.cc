@@ -51,10 +51,6 @@ BaseRecoFitterModule::BaseRecoFitterModule() :
   addParam("monopoleMagCharge", Monopoles::monopoleMagCharge,
            "Sets monopole magnetic charge hypothesis if it is in the pdgCodesToUseForFitting",
            Monopoles::monopoleMagCharge);
-
-  addParam("flipTrackIfFittedChargeNEQSeedCharge", m_param_flipTrackIfFittedChargeNEQSeedCharge,
-           "Flip the track if the charge after the fit is not the same as before the fit (which is the seed charge of the RecoTrack)?",
-           m_param_flipTrackIfFittedChargeNEQSeedCharge);
 }
 
 void BaseRecoFitterModule::initialize()
@@ -133,18 +129,6 @@ void BaseRecoFitterModule::event()
         B2DEBUG(28, "Charge after fit " << mSoP.getCharge());
         B2DEBUG(28, "Position after fit " << mSoP.getPos().X() << " " << mSoP.getPos().Y() << " " << mSoP.getPos().Z());
         B2DEBUG(28, "Momentum after fit " << mSoP.getMom().X() << " " << mSoP.getMom().Y() << " " << mSoP.getMom().Z());
-
-        // Get the charge from the measuredStateOnPlane at the last hit. If this charge, which is the charge after the track fit,
-        // is not equal to the charge seed of the RecoTrack, flip the track and reorder the hits.
-        if (m_param_flipTrackIfFittedChargeNEQSeedCharge and
-            recoTrack.getChargeSeed() != recoTrack.getMeasuredStateOnPlaneFromLastHit(trackRep).getCharge()) {
-          recoTrack.flipTrackDirectionAndCharge(trackRep);
-
-          // The track momentum and charge have been reversed, which deleted the genfit::TrackStatus of the m_genfitTrack
-          // member of the recoTrack. To re-set the fit status, fit the track again, now with flipped momentum and charge.
-          Const::ChargedStable particleUsedForFitting(pdgCodeToUseForFitting);
-          fitter.fit(recoTrack, particleUsedForFitting);
-        }
       } else {
         B2DEBUG(28, "       fit failed!");
       }

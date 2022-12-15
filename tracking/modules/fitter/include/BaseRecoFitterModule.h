@@ -73,9 +73,6 @@ namespace Belle2 {
      * implicitly if the cdc is available in the geometry.*/
     bool m_param_initializeCDCTranslators = true;
 
-    /** Flip order of hits in RecoTrack if charge after fit != seed charge in RecoTrack */
-    bool m_param_flipTrackIfFittedChargeNEQSeedCharge = true;
-
     StoreArray<RecoTrack> m_recoTracks; /**< RecoTracks StoreArray */
   };
 }

@@ -735,6 +735,16 @@ namespace Belle2 {
     /// Name of the store array of the reco hit informations.
     const std::string& getStoreArrayNameOfRecoHitInformation() const { return m_storeArrayNameOfRecoHitInformation; }
 
+    /// Revert the sorting order of the RecoHitInformation
+    void revertRecoHitInformationSorting()
+    {
+      const uint recoHitInformationSize = getRecoHitInformations().size();
+      for (auto RecoHitInfo : getRecoHitInformations()) {
+        // The "-1" ensures that the sorting parameter still is in range 0...size-1 instead of 1...size
+        RecoHitInfo->setSortingParameter(recoHitInformationSize - RecoHitInfo->getSortingParameter() - 1);
+      }
+    }
+
     /**
      * Call a function on all hits of the given type in the store array, that are related to this track.
      * @param storeArrayNameOfHits The store array the hits should come from.

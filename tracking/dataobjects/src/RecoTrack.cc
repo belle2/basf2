@@ -720,19 +720,14 @@ bool RecoTrack::isOutgoingArm(RecoHitInformation::RecoHitDetector pre, RecoHitIn
 void RecoTrack::flipTrackDirectionAndCharge(const genfit::AbsTrackRep* representation)
 {
   const genfit::MeasuredStateOnPlane& measuredStateOnPlane = getMeasuredStateOnPlaneFromLastHit(representation);
-  const ROOT::Math::XYZVector& currentPosition = ROOT::Math::XYZVector(measuredStateOnPlane.getPos());
-  const ROOT::Math::XYZVector& currentMomentum = ROOT::Math::XYZVector(measuredStateOnPlane.getMom());
-  const double& currentCharge = measuredStateOnPlane.getCharge();
+  const ROOT::Math::XYZVector& fittedPosition = ROOT::Math::XYZVector(measuredStateOnPlane.getPos());
+  const ROOT::Math::XYZVector& fittedMomentum = ROOT::Math::XYZVector(measuredStateOnPlane.getMom());
+  const double& fittedCharge = measuredStateOnPlane.getCharge();
 
   // revert the charge and momentum
-  setChargeSeed(-currentCharge);
-  setPositionAndMomentum(currentPosition, -currentMomentum);
-
-  // Reverse the SortingParameters
-  for (auto RecoHitInfo : getRecoHitInformations()) {
-    RecoHitInfo->setSortingParameter(std::numeric_limits<unsigned int>::max() - RecoHitInfo->getSortingParameter());
-  }
-
+  setChargeSeed(fittedCharge);
+  setPositionAndMomentum(fittedPosition, -fittedMomentum);
+  revertRecoHitInformationSorting();
   swapArmTimes();
   setDirtyFlag();
 }

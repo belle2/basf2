@@ -725,7 +725,7 @@ void RecoTrack::flipTrackDirectionAndCharge(const genfit::AbsTrackRep* represent
   const double& fittedCharge = measuredStateOnPlane.getCharge();
 
   // revert the charge and momentum
-  setChargeSeed(fittedCharge);
+  setChargeSeed(-fittedCharge);
   setPositionAndMomentum(fittedPosition, -fittedMomentum);
   revertRecoHitInformationSorting();
   swapArmTimes();

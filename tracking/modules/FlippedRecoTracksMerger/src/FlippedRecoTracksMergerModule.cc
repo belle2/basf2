@@ -7,6 +7,7 @@
  **************************************************************************/
 
 #include <tracking/modules/FlippedRecoTracksMerger/FlippedRecoTracksMergerModule.h>
+#include <tracking/trackFitting/fitter/base/TrackFitter.h>
 
 using namespace Belle2;
 
@@ -22,6 +23,17 @@ FlippedRecoTracksMergerModule::FlippedRecoTracksMergerModule() :
            "Name of the input StoreArray");
   addParam("inputStoreArrayNameFlipped", m_inputStoreArrayNameFlipped,
            "Name of the input StoreArray for flipped tracks");
+
+  addParam("pxdHitsStoreArrayName", m_param_pxdHitsStoreArrayName, "StoreArray name of the input PXD hits.",
+           m_param_pxdHitsStoreArrayName);
+  addParam("svdHitsStoreArrayName", m_param_svdHitsStoreArrayName, "StoreArray name of the input SVD hits.",
+           m_param_svdHitsStoreArrayName);
+  addParam("cdcHitsStoreArrayName", m_param_cdcHitsStoreArrayName, "StoreArray name of the input CDC hits.",
+           m_param_cdcHitsStoreArrayName);
+  addParam("bklmHitsStoreArrayName", m_param_bklmHitsStoreArrayName, "StoreArray name of the input BKLM hits.",
+           m_param_bklmHitsStoreArrayName);
+  addParam("eklmHitsStoreArrayName", m_param_eklmHitsStoreArrayName, "StoreArray name of the input EKLM hits.",
+           m_param_eklmHitsStoreArrayName);
 }
 
 void FlippedRecoTracksMergerModule::initialize()
@@ -52,13 +64,13 @@ void FlippedRecoTracksMergerModule::event()
 
     // if we should not flip the tracks: the 2nd MVA QI is nan (aka didn't pass the 1st MVA filter) or smaller than the cut
     if (isnan(recoTrack.get2ndFlipQualityIndicator()) or (recoTrack.get2ndFlipQualityIndicator() < mvaFlipCut)) continue;
-    // get the related RecoTrackflipped
-    RecoTrack* RecoTrackflipped =  recoTrack.getRelatedFrom<Belle2::RecoTrack>("RecoTracks_flipped");
+    // get the related flippedRecoTrack
+    RecoTrack* flippedRecoTrack =  recoTrack.getRelatedFrom<Belle2::RecoTrack>("RecoTracks_flipped");
 
-    if (!RecoTrackflipped) continue;
+    if (!flippedRecoTrack) continue;
 
     // get the tracksflipped
-    Track* trackFlipped = RecoTrackflipped->getRelatedFrom<Belle2::Track>("Tracks_flipped");
+    Track* trackFlipped = flippedRecoTrack->getRelatedFrom<Belle2::Track>("Tracks_flipped");
     if (!trackFlipped) continue;
     std::vector<Track::ChargedStableTrackFitResultPair> fitResultsAfter =
       trackFlipped->getTrackFitResultsByName("TrackFitResults_flipped");
@@ -66,8 +78,6 @@ void FlippedRecoTracksMergerModule::event()
 
     //set the c_isFlippedAndRefitted bit
     track->setFlippedAndRefitted();
-
-
 
     // invalidate all TrackFitResults of old Track that dont exist in new Track
     for (auto fitResult : fitResultsBefore) {
@@ -98,27 +108,12 @@ void FlippedRecoTracksMergerModule::event()
       }
     }
 
-
-
-
-    const auto& measuredStateOnPlane = recoTrack.getMeasuredStateOnPlaneFromLastHit();
-
-    const ROOT::Math::XYZVector& currentPosition = ROOT::Math::XYZVector(measuredStateOnPlane.getPos());
-    const ROOT::Math::XYZVector& currentMomentum = ROOT::Math::XYZVector(measuredStateOnPlane.getMom());
-    const double& currentCharge = measuredStateOnPlane.getCharge();
-
-    // revert the charge and momentum
-    recoTrack.setChargeSeed(-currentCharge);
-    recoTrack.setPositionAndMomentum(currentPosition,  -currentMomentum);
-
-    // Reverse the SortingParameters
-    auto RecoHitInfos = recoTrack.getRecoHitInformations();
-    for (auto RecoHitInfo : RecoHitInfos) {
-      RecoHitInfo->setSortingParameter(std::numeric_limits<unsigned int>::max() - RecoHitInfo->getSortingParameter());
-    }
-
-    // swap outgoing and ingoing arm times (computed with SVD hits)
-    recoTrack.swapArmTimes();
-
+    recoTrack.flipTrackDirectionAndCharge();
+    // Initialise the TrackFitter to refit the recoTrack and provide a valid genfit state
+    TrackFitter fitter(m_param_pxdHitsStoreArrayName, m_param_svdHitsStoreArrayName, m_param_cdcHitsStoreArrayName,
+                       m_param_bklmHitsStoreArrayName, m_param_eklmHitsStoreArrayName);
+    // PDG code 211 for pion is enough to get a valid track fit with a valid genfit::MeasuredStateOnPlane
+    Const::ChargedStable particleUsedForFitting(211);
+    fitter.fit(recoTrack, particleUsedForFitting);
   }
 }

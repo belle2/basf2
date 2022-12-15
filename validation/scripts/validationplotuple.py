@@ -491,7 +491,6 @@ class Plotuple:
             # If there is a reference object, plot it first
             if self._reference is not None:
                 self._draw_ref(canvas)
-                # legend.AddEntry(self._reference.object, 'reference')
                 drawn = True
 
         # If we have a 2D histogram
@@ -603,7 +602,9 @@ class Plotuple:
 
         canvas.GetFrame().SetFillColor(ROOT.kWhite)
 
-        legend.AddEntry(self._reference.object, 'reference')
+        # Add reference legend entry last for neatness
+        if self._reference is not None:
+            legend.AddEntry(self._reference.object, 'reference')
 
         legend.Draw()
 

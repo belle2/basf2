@@ -21,6 +21,7 @@ from tracking.validation.run import TrackingValidationRun
 import tracking
 import logging
 import basf2
+from basf2 import conditions as b2conditions
 import svd
 
 VALIDATION_OUTPUT_FILE = 'toCDCCKFTrackingValidationBkg.root'
@@ -28,6 +29,8 @@ N_EVENTS = 1000
 ACTIVE = True
 
 basf2.set_random_seed(1337)
+
+b2conditions.prepend_globaltag("tracking_TEST_SVDTimeSelectionOFFrev1_VXDTF2TimeFiltersONrev27")
 
 
 class toCDCCKFValidationBkg(TrackingValidationRun):

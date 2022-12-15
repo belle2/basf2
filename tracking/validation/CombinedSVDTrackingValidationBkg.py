@@ -23,6 +23,7 @@ import tracking
 from tracking.validation.run import TrackingValidationRun
 import logging
 import basf2
+from basf2 import conditions as b2conditions
 from tracking.path_utils import add_svd_standalone_tracking
 
 VALIDATION_OUTPUT_FILE = 'CombinedSVDTrackingValidationBkg.root'
@@ -30,6 +31,7 @@ N_EVENTS = 1000
 ACTIVE = True
 
 basf2.set_random_seed(1337)
+b2conditions.prepend_globaltag("tracking_TEST_SVDTimeSelectionOFFrev1_VXDTF2TimeFiltersONrev27")
 
 
 class CombinedSVDTrackingValidationBkg(TrackingValidationRun):

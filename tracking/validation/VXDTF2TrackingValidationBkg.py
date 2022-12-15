@@ -23,11 +23,14 @@ import tracking
 from tracking.validation.run import TrackingValidationRun
 import logging
 import basf2
+from basf2 import conditions as b2conditions
 VALIDATION_OUTPUT_FILE = 'VXDTF2TrackingValidationBkg.root'
 N_EVENTS = 1000
 ACTIVE = True
 
 basf2.set_random_seed(1337)
+
+b2conditions.prepend_globaltag("tracking_TEST_SVDTimeSelectionOFFrev1_VXDTF2TimeFiltersONrev27")
 
 
 def setupFinderModule(path):

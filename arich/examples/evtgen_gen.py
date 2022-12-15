@@ -29,10 +29,8 @@
 import basf2 as b2
 from generators import add_evtgen_generator
 from modularAnalysis import setupEventInfo
-from modularAnalysis import loadGearbox
-from reconstruction import add_mdst_output
+from mdst import add_mdst_output
 from optparse import OptionParser
-from ROOT import Belle2
 
 parser = OptionParser()
 parser.add_option('-n', '--nevents', dest='nevents', default=1000,
@@ -44,17 +42,12 @@ parser.add_option('-f', '--file', dest='filename',
 # Suppress messages and warnings during processing:
 b2.set_log_level(b2.LogLevel.ERROR)
 
-
 # generation of 1000 events according to the specified DECAY table
 # Y(4S) -> B0 B0bar
 # one B0->K+pi-, other generic decay
 mypath = b2.create_path()
 setupEventInfo(int(options.nevents), mypath)
-add_evtgen_generator(mypath, 'signal', Belle2.FileSystem.findFile('arich/examples/B2kpi.dec'))
-
-# If the simulation and reconstruction is not performed in the sam job,
-# then the Gearbox needs to be loaded with the loadGearbox() function.
-loadGearbox(mypath)
+add_evtgen_generator(mypath, 'signal', b2.find_file('arich/examples/B2kpi.dec'))
 
 # dump generated events in MDST format to the output ROOT file
 add_mdst_output(mypath, True, options.filename)

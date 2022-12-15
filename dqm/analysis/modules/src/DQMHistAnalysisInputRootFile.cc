@@ -88,11 +88,13 @@ bool DQMHistAnalysisInputRootFileModule::hname_pattern_match(std::string pattern
 void DQMHistAnalysisInputRootFileModule::beginRun()
 {
   B2INFO("DQMHistAnalysisInputRootFile: beginRun called. Run: " << m_run_list[m_run_idx]);
+  clearHistList();
 }
 
 void DQMHistAnalysisInputRootFileModule::event()
 {
   B2INFO("DQMHistAnalysisInputRootFile: event called.");
+
   sleep(m_interval);
 
   if (m_count > m_events_list[m_run_idx]) {
@@ -109,6 +111,10 @@ void DQMHistAnalysisInputRootFileModule::event()
     }
     m_file = new TFile(m_file_list[m_run_idx].c_str());
   }
+
+  // Clear only after EndOfRun check, otherwise we wont have any histograms for MiraBelle
+  // which expects analysis run in endRun function
+  initHistListBeforeEvent();
 
   if (m_null_histo_mode) {
     m_eventMetaDataPtr.create();
@@ -229,7 +235,6 @@ void DQMHistAnalysisInputRootFileModule::event()
     }
   }
 
-  resetHist();
   for (size_t i = 0; i < hs.size(); i++) {
     TH1* h = hs[i];
     addHist("", h->GetName(), h);

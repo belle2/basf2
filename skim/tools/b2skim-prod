@@ -239,7 +239,7 @@ def verify_registry(sampleRegistry, mcri, mcrd):
     ]
 
     expectedDataEntries = [
-        "sampleLabel,",
+        "sampleLabel",
         "LPNPrefix",
         "inputReleaseNumber",
         "inputDBGlobalTag",

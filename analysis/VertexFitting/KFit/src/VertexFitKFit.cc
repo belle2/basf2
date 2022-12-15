@@ -16,7 +16,7 @@
 #include <analysis/VertexFitting/KFit/MakeMotherKFit.h>
 #include <analysis/VertexFitting/KFit/VertexFitKFit.h>
 #include <analysis/utility/CLHEPToROOT.h>
-
+#include <framework/gearbox/Const.h>
 
 using namespace std;
 using namespace Belle2;
@@ -649,8 +649,7 @@ VertexFitKFit::prepareInputMatrix() {
     // charge , mass , a
     tmp_property[index][0] =  track.getCharge();
     tmp_property[index][1] =  track.getMass();
-    const double c = KFitConst::kLightSpeed; // C++ bug?
-    // tmp_property[index][2] = -KFitConst::kLightSpeed * m_MagneticField * it->getCharge();
+    const double c = Belle2::Const::speedOfLight * 1e-4;
     tmp_property[index][2] = -c * m_MagneticField * track.getCharge();
     index++;
   }

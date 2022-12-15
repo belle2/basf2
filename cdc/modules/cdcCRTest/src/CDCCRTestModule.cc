@@ -310,7 +310,7 @@ void CDCCRTestModule::event()
     tanL = fitresult->getTanLambda();
     omega = fitresult->getOmega();
     phi0 = fitresult->getPhi0() * 180 / M_PI;
-    Pt = fitresult->getMomentum().Perp();
+    Pt = fitresult->getMomentum().Rho();
     m_hPhi0->Fill(phi0);
     m_hChi2->Fill(Chi2);
     if (Pt < m_MinimumPt) continue;
@@ -395,9 +395,9 @@ void CDCCRTestModule::plotResults(Belle2::RecoTrack* track)
           adc = rawCDC->getCDCHit()->getADCCount();
 
           const genfit::MeasuredStateOnPlane& mop = kfi->getFittedState();
-          const TVector3 pocaOnWire = mop.getPlane()->getO();//Local wire position
-          const TVector3 pocaOnTrack = mop.getPlane()->getU();//residual direction
-          const TVector3 pocaMom = mop.getMom();
+          const B2Vector3D pocaOnWire = mop.getPlane()->getO();//Local wire position
+          const B2Vector3D pocaOnTrack = mop.getPlane()->getU();//residual direction
+          const B2Vector3D pocaMom = mop.getMom();
           alpha = cdcgeo.getAlpha(pocaOnWire, pocaMom) ;
           theta = cdcgeo.getTheta(pocaMom);
           //Convert to outgoing
@@ -473,14 +473,14 @@ void CDCCRTestModule::getHitDistInTrackCand(const RecoTrack* track)
   }
 }
 
-TVector3 CDCCRTestModule::getTriggerHitPosition(RecoTrack* track)
+B2Vector3D CDCCRTestModule::getTriggerHitPosition(RecoTrack* track)
 {
-  TVector3 trigpos(m_TriggerPos.at(0), m_TriggerPos.at(1), m_TriggerPos.at(2));
-  TVector3 trigDir(m_TriggerPlaneDirection.at(0), m_TriggerPlaneDirection.at(1), m_TriggerPlaneDirection.at(2));
+  B2Vector3D trigpos(m_TriggerPos.at(0), m_TriggerPos.at(1), m_TriggerPos.at(2));
+  B2Vector3D trigDir(m_TriggerPlaneDirection.at(0), m_TriggerPlaneDirection.at(1), m_TriggerPlaneDirection.at(2));
   const genfit::AbsTrackRep* trackRepresentation = track->getCardinalRepresentation();
-  TVector3 pos(-200, 200, 200);
+  B2Vector3D pos(-200, 200, 200);
   try {
-    genfit::MeasuredStateOnPlane mop = track->getMeasuredStateOnPlaneClosestTo(trigpos, trackRepresentation);
+    genfit::MeasuredStateOnPlane mop = track->getMeasuredStateOnPlaneClosestTo(ROOT::Math::XYZVector(trigpos), trackRepresentation);
     double l = mop.extrapolateToPlane(genfit::SharedPlanePtr(new genfit::DetPlane(trigpos, trigDir)));
     if (fabs(l) < 1000) pos = mop.getPos();
   } catch (const genfit::Exception& er) {
@@ -498,7 +498,7 @@ void CDCCRTestModule::HitEfficiency(const Belle2::RecoTrack* track)
   for (int i = 0; i < 56; ++i) {
     double  rcell = (rinnerlayer[i] + routerlayer[i]) / 2;
     double arcL = h.getArcLength2DAtCylindricalR(rcell);
-    const TVector3 hitpos = h.getPositionAtArcLength2D(arcL);
+    const B2Vector3D hitpos = h.getPositionAtArcLength2D(arcL);
     int cellID = cdcgeo.cellId(i, hitpos);
     B2INFO("Hit at LayerID - CellID: " << i << "-" << cellID);
   }
@@ -623,8 +623,8 @@ void CDCCRTestModule::getResidualOfUnFittedLayer(Belle2::RecoTrack* track)
     }
     IWire = wireid.getIWire();
     lay = wireid.getICLayer();
-    const TVector3 pocaOnWire = meaOnPlane.getPlane()->getO();//Local wire position
-    const TVector3 pocaMom = meaOnPlane.getMom();
+    const B2Vector3D pocaOnWire = meaOnPlane.getPlane()->getO();//Local wire position
+    const B2Vector3D pocaMom = meaOnPlane.getMom();
     x_u = meaOnPlane.getState()(3);
     alpha = cdcgeo.getAlpha(pocaOnWire, pocaMom) ;
     theta = cdcgeo.getTheta(pocaMom);
@@ -675,40 +675,40 @@ const genfit::SharedPlanePtr CDCCRTestModule::constructPlane(const genfit::Measu
   const StateOnPlane stateOnPlane = StateOnPlane(state.getState(), state.getPlane(), state.getRep());
   genfit::StateOnPlane st(stateOnPlane);
 
-  const TVector3& Wire1PosIdeal(cdcgeoTrans->getWireBackwardPosition(m_wireID));
-  const TVector3& Wire2PosIdeal(cdcgeoTrans->getWireForwardPosition(m_wireID));
+  const B2Vector3D& Wire1PosIdeal(cdcgeoTrans->getWireBackwardPosition(m_wireID));
+  const B2Vector3D& Wire2PosIdeal(cdcgeoTrans->getWireForwardPosition(m_wireID));
 
   // unit vector of wire direction
-  TVector3 WireDirectionIdeal = Wire2PosIdeal - Wire1PosIdeal;
+  B2Vector3D WireDirectionIdeal = Wire2PosIdeal - Wire1PosIdeal;
   WireDirectionIdeal.SetMag(1.);//normalized
 
   // extraplate to find z
   const genfit::AbsTrackRep* rep = state.getRep();
   rep->extrapolateToLine(st, Wire1PosIdeal, WireDirectionIdeal);
-  const TVector3& PocaIdeal = rep->getPos(st);
+  const B2Vector3D& PocaIdeal = rep->getPos(st);
 
   double zPOCA = (Wire1PosIdeal.Z()
                   + WireDirectionIdeal.Dot(PocaIdeal - Wire1PosIdeal) * WireDirectionIdeal.Z());
 
   // Now re-extrapolate to new wire direction, wire sag was taking account.
-  const TVector3& wire1(cdcgeoTrans->getWireBackwardPosition(m_wireID, zPOCA));
-  const TVector3& wire2(cdcgeoTrans->getWireForwardPosition(m_wireID, zPOCA));
+  const B2Vector3D& wire1(cdcgeoTrans->getWireBackwardPosition(m_wireID, zPOCA));
+  const B2Vector3D& wire2(cdcgeoTrans->getWireForwardPosition(m_wireID, zPOCA));
 
   // unit vector of wire direction (include sag)
-  TVector3 wireDirection = wire2 - wire1;
+  B2Vector3D wireDirection = wire2 - wire1;
   wireDirection.SetMag(1.);
 
   // extraplate to find poca
   rep->extrapolateToLine(st, wire1, wireDirection);
-  const TVector3& poca = rep->getPos(st);
-  TVector3 dirInPoca = rep->getMom(st);
+  const B2Vector3D& poca = rep->getPos(st);
+  B2Vector3D dirInPoca = rep->getMom(st);
   dirInPoca.SetMag(1.);
-  const TVector3& pocaOnWire = wire1 + wireDirection.Dot(poca - wire1) * wireDirection;
+  const B2Vector3D& pocaOnWire = wire1 + wireDirection.Dot(poca - wire1) * wireDirection;
   if (fabs(wireDirection.Angle(dirInPoca)) < 0.01) {
     B2WARNING("cannot construct det plane, track parallel with wire");
   }
   // construct orthogonal (unit) vector for plane
-  const TVector3& U = wireDirection.Cross(dirInPoca);
+  const B2Vector3D& U = wireDirection.Cross(dirInPoca);
   genfit::SharedPlanePtr pl = genfit::SharedPlanePtr(new genfit::DetPlane(pocaOnWire, U, wireDirection));
   return pl;
 }

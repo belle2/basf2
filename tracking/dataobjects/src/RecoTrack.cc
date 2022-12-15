@@ -16,10 +16,14 @@
 #include <genfit/RKTrackRep.h>
 #include <genfit/MplTrackRep.h>
 #include <simulation/monopoles/MonopoleConstants.h>
+#include <svd/dataobjects/SVDCluster.h>
+
+#include <cmath>
 
 using namespace Belle2;
 
-RecoTrack::RecoTrack(const TVector3& seedPosition, const TVector3& seedMomentum, const short int seedCharge,
+RecoTrack::RecoTrack(const ROOT::Math::XYZVector& seedPosition, const ROOT::Math::XYZVector& seedMomentum,
+                     const short int seedCharge,
                      const std::string& storeArrayNameOfCDCHits,
                      const std::string& storeArrayNameOfSVDHits,
                      const std::string& storeArrayNameOfPXDHits,
@@ -34,7 +38,7 @@ RecoTrack::RecoTrack(const TVector3& seedPosition, const TVector3& seedMomentum,
   m_storeArrayNameOfEKLMHits(storeArrayNameOfEKLMHits),
   m_storeArrayNameOfRecoHitInformation(storeArrayNameOfRecoHitInformation)
 {
-  m_genfitTrack.setStateSeed(seedPosition, seedMomentum);
+  m_genfitTrack.setStateSeed(XYZToTVector(seedPosition), XYZToTVector(seedMomentum));
   // TODO Set the covariance seed (that should be done by the tracking package)
   TMatrixDSym covSeed(6);
   covSeed(0, 0) = 1e-3;
@@ -111,8 +115,8 @@ RecoTrack* RecoTrack::createFromTrackCand(const genfit::TrackCand& trackCand,
   StoreArray<UsedEKLMHit> eklmHits(storeArrayNameOfEKLMHits);
 
   // Set the tracking parameters
-  const TVector3& position = trackCand.getPosSeed();
-  const TVector3& momentum = trackCand.getMomSeed();
+  const ROOT::Math::XYZVector& position = ROOT::Math::XYZVector(trackCand.getPosSeed());
+  const ROOT::Math::XYZVector& momentum = ROOT::Math::XYZVector(trackCand.getMomSeed());
   const short int charge = trackCand.getChargeSeed();
   const double time = trackCand.getTimeSeed();
 
@@ -177,7 +181,7 @@ genfit::TrackCand RecoTrack::createGenfitTrackCand() const
   genfit::TrackCand createdTrackCand;
 
   // Set the trajectory parameters
-  createdTrackCand.setPosMomSeed(getPositionSeed(), getMomentumSeed(), getChargeSeed());
+  createdTrackCand.setPosMomSeed(XYZToTVector(getPositionSeed()), XYZToTVector(getMomentumSeed()), getChargeSeed());
   createdTrackCand.setCovSeed(getSeedCovariance());
   createdTrackCand.setTimeSeed(getTimeSeed());
 
@@ -415,7 +419,7 @@ genfit::AbsTrackRep* RecoTrackGenfitAccess::createOrReturnRKTrackRep(RecoTrack& 
   return trackRepresentation;
 }
 
-const genfit::MeasuredStateOnPlane& RecoTrack::getMeasuredStateOnPlaneClosestTo(const TVector3& closestPoint,
+const genfit::MeasuredStateOnPlane& RecoTrack::getMeasuredStateOnPlaneClosestTo(const ROOT::Math::XYZVector& closestPoint,
     const genfit::AbsTrackRep* representation)
 {
   checkDirtyFlag();
@@ -429,7 +433,7 @@ const genfit::MeasuredStateOnPlane& RecoTrack::getMeasuredStateOnPlaneClosestTo(
     try {
       const genfit::MeasuredStateOnPlane& measuredStateOnPlane = m_genfitTrack.getFittedState(hitIndex, representation);
 
-      const double currentDistance2 = (measuredStateOnPlane.getPos() - closestPoint).Mag2();
+      const double currentDistance2 = (ROOT::Math::XYZVector(measuredStateOnPlane.getPos()) - closestPoint).Mag2();
 
       if (not nearestStateOnPlane or currentDistance2 < minimalDistance2) {
         nearestStateOnPlane = &measuredStateOnPlane;
@@ -488,18 +492,19 @@ genfit::AbsTrackRep* RecoTrack::getTrackRepresentationForPDG(int pdgCode)
 
 
 /// Helper function to get the seed or the measured state on plane from a track
-std::tuple<TVector3, TVector3, short> RecoTrack::extractTrackState() const
+std::tuple<ROOT::Math::XYZVector, ROOT::Math::XYZVector, short> RecoTrack::extractTrackState() const
 {
   if (not wasFitSuccessful()) {
     return std::make_tuple(getPositionSeed(), getMomentumSeed(), getChargeSeed());
   } else {
     const auto& measuredStateOnPlane = getMeasuredStateOnPlaneFromFirstHit();
-    return std::make_tuple(measuredStateOnPlane.getPos(), measuredStateOnPlane.getMom(), measuredStateOnPlane.getCharge());
+    return std::make_tuple(ROOT::Math::XYZVector(measuredStateOnPlane.getPos()), ROOT::Math::XYZVector(measuredStateOnPlane.getMom()),
+                           measuredStateOnPlane.getCharge());
   }
 }
 
 RecoTrack* RecoTrack::copyToStoreArrayUsing(StoreArray<RecoTrack>& storeArray,
-                                            const TVector3& position, const TVector3& momentum, short charge,
+                                            const ROOT::Math::XYZVector& position, const ROOT::Math::XYZVector& momentum, short charge,
                                             const TMatrixDSym& covariance, double timeSeed) const
 {
   RecoTrack* newRecoTrack = storeArray.appendNew(position, momentum, charge,
@@ -521,7 +526,10 @@ RecoTrack* RecoTrack::copyToStoreArray(StoreArray<RecoTrack>& storeArray) const
 {
   if (wasFitSuccessful()) {
     const auto& mSoP = getMeasuredStateOnPlaneFromFirstHit();
-    return copyToStoreArrayUsing(storeArray, mSoP.getPos(), mSoP.getMom(), static_cast<short>(mSoP.getCharge()),
+    return copyToStoreArrayUsing(storeArray,
+                                 ROOT::Math::XYZVector(mSoP.getPos()),
+                                 ROOT::Math::XYZVector(mSoP.getMom()),
+                                 static_cast<short>(mSoP.getCharge()),
                                  mSoP.get6DCov(), mSoP.getTime());
   } else {
     return copyToStoreArrayUsingSeeds(storeArray);
@@ -624,7 +632,7 @@ std::string RecoTrack::getInfoHTML() const
 
   out << "<b>Charge seed</b>=" << getChargeSeed();
 
-  out << "<b>pT seed</b>=" << getMomentumSeed().Pt();
+  out << "<b>pT seed</b>=" << getMomentumSeed().Rho();
   out << ", <b>pZ seed</b>=" << getMomentumSeed().Z();
   out << "<br>";
   out << "<b>position seed</b>=" << getMomentumSeed().X() << ", " << getMomentumSeed().Y() << ", " << getMomentumSeed().Z();
@@ -636,4 +644,95 @@ std::string RecoTrack::getInfoHTML() const
   out << "<br>";
 
   return out.str();
+}
+
+void RecoTrack::estimateArmTime()
+{
+  m_isArmTimeComputed = true;
+  const std::vector<RecoHitInformation*>& recoHits = getRecoHitInformations(true);
+  bool svdDone = false;
+  int nSVDHits = 0;
+  static RecoHitInformation::RecoHitDetector und = RecoHitInformation::RecoHitDetector::c_undefinedTrackingDetector;
+  RecoHitInformation::RecoHitDetector SVD = RecoHitInformation::RecoHitDetector::c_SVD;
+  RecoHitInformation::RecoHitDetector detIDpre = und;
+  RecoHitInformation::RecoHitDetector detIDpost = und;
+  float clusterTimeSum = 0;
+  float clusterTimeSigma2Sum = 0;
+  bool trackArmTimeDone = false;
+
+  // loop over the recoHits of the RecoTrack
+  for (const auto& recoHit : recoHits) {
+    RecoHitInformation::RecoHitDetector foundin = recoHit->getTrackingDetector();
+    if (!svdDone && foundin != SVD) {
+      detIDpre = foundin;
+      trackArmTimeDone = false;
+    }
+    if (foundin == SVD) {
+      RelationVector<SVDCluster> svdClusters = recoHit->getRelationsTo<SVDCluster>(m_storeArrayNameOfSVDHits);
+      clusterTimeSum += svdClusters[0]->getClsTime();
+      clusterTimeSigma2Sum += svdClusters[0]->getClsTimeSigma() * svdClusters[0]->getClsTimeSigma();
+      nSVDHits += 1;
+      svdDone = true;
+    } else {
+      // Compute the track arm times using SVD cluster times
+      if (svdDone && nSVDHits > 1) {
+        detIDpost = foundin;
+        if (!isOutgoingArm(detIDpre, detIDpost)) {
+          m_ingoingArmTime = clusterTimeSum / nSVDHits;
+          m_ingoingArmTimeError = std::sqrt(clusterTimeSigma2Sum / (nSVDHits * (nSVDHits - 1)));
+          m_hasIngoingArmTime = true;
+          m_nSVDHitsOfIngoingArm = nSVDHits;
+        } else {
+          m_outgoingArmTime = clusterTimeSum / nSVDHits;
+          m_outgoingArmTimeError = std::sqrt(clusterTimeSigma2Sum / (nSVDHits * (nSVDHits - 1)));
+          m_hasOutgoingArmTime = true;
+          m_nSVDHitsOfOutgoingArm = nSVDHits;
+        }
+        svdDone = false;
+        detIDpre = detIDpost;
+        detIDpost = und;
+        clusterTimeSum = 0;
+        nSVDHits = 0;
+        trackArmTimeDone = true;
+      }
+    }
+
+    // When the last recoHit is SVD, it does not enter in the else{} of if (detID == SVD) {...} else {...}
+    // where the track arm times are calculated, so they are calculated here.
+    // It will not reset all variables because it is run only at the last recoHit
+    if (!trackArmTimeDone && (recoHit == recoHits.back()) && nSVDHits > 1) {
+      if (!isOutgoingArm(detIDpre, detIDpost)) {
+        m_ingoingArmTime = clusterTimeSum / nSVDHits;
+        m_ingoingArmTimeError = std::sqrt(clusterTimeSigma2Sum / (nSVDHits * (nSVDHits - 1)));
+        m_hasIngoingArmTime = true;
+        m_nSVDHitsOfIngoingArm = nSVDHits;
+      } else {
+        m_outgoingArmTime = clusterTimeSum / nSVDHits;
+        m_outgoingArmTimeError = std::sqrt(clusterTimeSigma2Sum / (nSVDHits * (nSVDHits - 1)));
+        m_hasOutgoingArmTime = true;
+        m_nSVDHitsOfOutgoingArm = nSVDHits;
+      }
+    }
+  }
+}
+
+bool RecoTrack::isOutgoingArm(RecoHitInformation::RecoHitDetector pre, RecoHitInformation::RecoHitDetector post)
+{
+  static RecoHitInformation::RecoHitDetector und = RecoHitInformation::RecoHitDetector::c_undefinedTrackingDetector;
+  RecoHitInformation::RecoHitDetector PXD = RecoHitInformation::RecoHitDetector::c_PXD;
+  RecoHitInformation::RecoHitDetector CDC = RecoHitInformation::RecoHitDetector::c_CDC;
+  bool isOutgoing = true;
+  if (pre == PXD && post == CDC) isOutgoing = true;
+  else if (pre == und && post == CDC) isOutgoing = true;
+  else if (pre == PXD && post == und) isOutgoing = true;
+  else if (pre == CDC && post == PXD) isOutgoing = false;
+  else if (pre == und && post == PXD) isOutgoing = false;
+  else if (pre == CDC && post == und) isOutgoing = false;
+  else {
+    //TO DO
+    B2DEBUG(29,
+            "SVD-only? PXD-SVD-PXD??? --- use layer information to determine if the track arm is outgoing or ingoing! Considered --> 'OUT'");
+    isOutgoing = true;
+  }
+  return isOutgoing;
 }

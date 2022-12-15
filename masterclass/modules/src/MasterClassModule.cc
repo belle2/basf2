@@ -25,7 +25,7 @@ REG_MODULE(MasterClass);
 MasterClassModule::MasterClassModule() : Module()
 {
   // Set module properties
-  setDescription(R"DOC("Module to write out data in a format for Belle II masterclasses)DOC");
+  setDescription(R"DOC(Module to write out data in a format for Belle II masterclasses)DOC");
   addParam("outputFileName", m_filename, "File name of root ntuple output.", std::string("masterclass.root"));
 }
 

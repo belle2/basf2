@@ -77,14 +77,14 @@ void ECLMatchingPerformanceExpertModule::event()
       B2ASSERT("Related Belle2 Track has no related track fit result!", fitResult);
 
       // write some data to the root tree
-      TVector3 mom = fitResult->getMomentum();
-      m_trackProperties.cosTheta = mom.CosTheta();
+      ROOT::Math::XYZVector mom = fitResult->getMomentum();
+      m_trackProperties.cosTheta = cos(mom.Theta());
       m_trackProperties.phi = mom.Phi();
-      m_trackProperties.ptot = mom.Mag();
-      m_trackProperties.pt = mom.Pt();
-      m_trackProperties.px = mom.Px();
-      m_trackProperties.py = mom.Py();
-      m_trackProperties.pz = mom.Pz();
+      m_trackProperties.ptot = mom.R();
+      m_trackProperties.pt = mom.Rho();
+      m_trackProperties.px = mom.X();
+      m_trackProperties.py = mom.Y();
+      m_trackProperties.pz = mom.Z();
       m_trackProperties.x = fitResult->getPosition().X();
       m_trackProperties.y = fitResult->getPosition().Y();
       m_trackProperties.z = fitResult->getPosition().Z();

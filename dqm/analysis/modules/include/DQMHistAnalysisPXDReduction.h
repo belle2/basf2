@@ -22,7 +22,6 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <TLine.h>
 
-//#include <vector>
 
 namespace Belle2 {
   /*! DQM Histogram Analysis for PXD Reduction */
@@ -69,6 +68,16 @@ namespace Belle2 {
     std::string m_histogramDirectoryName;
     //! prefix for EPICS PVs
     std::string m_pvPrefix;
+    //! low warn limit for alarm
+    double m_lowarnlimit;
+    //! low error limit for alarm
+    double m_loerrorlimit;
+    //! high warn limit for alarm
+    double m_hiwarnlimit;
+    //! high error limit for alarm
+    double m_hierrorlimit;
+    /** Update entry intervall */
+    int m_minEntries = 1000;
 
     //! IDs of all PXD Modules to iterate over
     std::vector<VxdID> m_PXDModules;
@@ -86,6 +95,9 @@ namespace Belle2 {
 
     /** flag if to export to EPICS */
     bool m_useEpics;
+
+    /** flag if to import from EPICS only */
+    bool m_useEpicsRO;
 
 #ifdef _BELLE2_EPICS
     //! EPICS PVs

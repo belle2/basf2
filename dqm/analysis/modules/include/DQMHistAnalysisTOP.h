@@ -107,6 +107,10 @@ namespace Belle2 {
     TPaveText* m_text1 = nullptr;
     /** The text for the conditions of the nornal window. */
     TPaveText* m_text2 = nullptr;
+
+    /** Monitoring object. */
+    MonitoringObject* m_monObj {};
+
   };
 } // end namespace Belle2
 

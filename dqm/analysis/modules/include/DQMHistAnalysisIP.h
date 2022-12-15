@@ -12,18 +12,14 @@
 
 #pragma once
 
+#include <dqm/core/DQMHistAnalysis.h>
+
 #ifdef _BELLE2_EPICS
 // EPICS
 #include "cadef.h"
 #endif
 
-#include <framework/core/Module.h>
-
-#include <dqm/core/DQMHistAnalysis.h>
-
-#include <TCanvas.h>
 #include <TLine.h>
-#include <TH1.h>
 
 namespace Belle2 {
   /*! Class definition for the output module of Sequential ROOT I/O */
@@ -66,7 +62,9 @@ namespace Belle2 {
     // Data members
   private:
     /** The name of the histogram. */
-    std::string m_histoname;
+    std::string m_histoName;
+    /** The name of the histogram dir. */
+    std::string m_histoDirectory;
     /** The prefix of PV. */
     std::string  m_pvPrefix;
     /** The prefix for MonitoringObj. */
@@ -80,9 +78,6 @@ namespace Belle2 {
     TLine* m_line = nullptr;
     /** The line for the median result. */
     TLine* m_line2 = nullptr;
-
-    /** last histogram */
-    TH1* m_h_last = nullptr;
 
     /** Monitoring Object */
     MonitoringObject* m_monObj {};

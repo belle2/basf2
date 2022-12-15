@@ -29,6 +29,12 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <framework/datastore/RelationArray.h>
 
+// Unpackers
+#include <trg/ecl/dataobjects/TRGECLUnpackerStore.h>
+
+// OnlineEventT0
+#include <hlt/dataobjects/OnlineEventT0.h>
+
 using namespace Belle2;
 using namespace std;
 
@@ -74,10 +80,22 @@ void SVDEventT0PerformanceTTreeModule::initialize()
   m_t->Branch("eventT0Err", &m_eventT0Err, "eventT0Err/F");
   m_t->Branch("svdEventT0", &m_svdEventT0, "svdEventT0/F");
   m_t->Branch("svdEventT0Err", &m_svdEventT0Err, "svdEventT0Err/F");
+  m_t->Branch("svdOnlineEventT0", &m_svdOnlineEventT0, "svdOnlineEventT0/F");
+  m_t->Branch("svdOnlineEventT0Err", &m_svdOnlineEventT0Err, "svdOnlineEventT0Err/F");
   m_t->Branch("cdcEventT0", &m_cdcEventT0, "cdcEventT0/F");
   m_t->Branch("cdcEventT0Err", &m_cdcEventT0Err, "cdcEventT0Err/F");
+  m_t->Branch("cdcOnlineEventT0", &m_cdcOnlineEventT0, "cdcOnlineEventT0/F");
+  m_t->Branch("cdcOnlineEventT0Err", &m_cdcOnlineEventT0Err, "cdcOnlineEventT0Err/F");
   m_t->Branch("topEventT0", &m_topEventT0, "topEventT0/F");
   m_t->Branch("topEventT0Err", &m_topEventT0Err, "topEventT0Err/F");
+  m_t->Branch("topOnlineEventT0", &m_topOnlineEventT0, "topOnlineEventT0/F");
+  m_t->Branch("topOnlineEventT0Err", &m_topOnlineEventT0Err, "topOnlineEventT0Err/F");
+  m_t->Branch("eclEventT0", &m_eclEventT0, "eclEventT0/F");
+  m_t->Branch("eclEventT0Err", &m_eclEventT0Err, "eclEventT0Err/F");
+  m_t->Branch("eclOnlineEventT0", &m_eclOnlineEventT0, "eclOnlineEventT0/F");
+  m_t->Branch("eclOnlineEventT0Err", &m_eclOnlineEventT0Err, "eclOnlineEventT0Err/F");
+  m_t->Branch("eclTCEmax", &m_eclTCEmax, "eclTCEmax/I");
+  m_t->Branch("eclTCid", &m_eclTCid, "eclTCid/I");
   m_t->Branch("totTracks", &m_nTracks, "totTracks/i");
   m_t->Branch("TB", &m_svdTB, "TB/i");
   m_t->Branch("trkNumb", &m_trkNumber);
@@ -113,15 +131,27 @@ void SVDEventT0PerformanceTTreeModule::initialize()
 
 void SVDEventT0PerformanceTTreeModule::event()
 {
-  m_trueEventT0 = -999;
-  m_eventT0 = -99;
-  m_eventT0Err = -99;
-  m_svdEventT0 = -99;
-  m_svdEventT0Err = -99;
-  m_cdcEventT0 = -99;
-  m_cdcEventT0Err = -99;
-  m_topEventT0 = -99;
-  m_topEventT0Err = -99;
+  m_trueEventT0         = std::numeric_limits<float>::quiet_NaN();
+  m_eventT0             = std::numeric_limits<float>::quiet_NaN();
+  m_eventT0Err          = std::numeric_limits<float>::quiet_NaN();
+  m_svdEventT0          = std::numeric_limits<float>::quiet_NaN();
+  m_svdEventT0Err       = std::numeric_limits<float>::quiet_NaN();
+  m_svdOnlineEventT0    = std::numeric_limits<float>::quiet_NaN();
+  m_svdOnlineEventT0Err = std::numeric_limits<float>::quiet_NaN();
+  m_cdcEventT0          = std::numeric_limits<float>::quiet_NaN();
+  m_cdcEventT0Err       = std::numeric_limits<float>::quiet_NaN();
+  m_cdcOnlineEventT0    = std::numeric_limits<float>::quiet_NaN();
+  m_cdcOnlineEventT0Err = std::numeric_limits<float>::quiet_NaN();
+  m_topEventT0          = std::numeric_limits<float>::quiet_NaN();
+  m_topEventT0Err       = std::numeric_limits<float>::quiet_NaN();
+  m_topOnlineEventT0    = std::numeric_limits<float>::quiet_NaN();
+  m_topOnlineEventT0Err = std::numeric_limits<float>::quiet_NaN();
+  m_eclEventT0          = std::numeric_limits<float>::quiet_NaN();
+  m_eclEventT0Err       = std::numeric_limits<float>::quiet_NaN();
+  m_eclOnlineEventT0    = std::numeric_limits<float>::quiet_NaN();
+  m_eclOnlineEventT0Err = std::numeric_limits<float>::quiet_NaN();
+  m_eclTCEmax           = std::numeric_limits<int>::quiet_NaN();
+  m_eclTCid             = std::numeric_limits<int>::quiet_NaN();
 
   StoreObjPtr<EventMetaData> evtMetaData;
   m_exp = evtMetaData->getExperiment();
@@ -153,7 +183,42 @@ void SVDEventT0PerformanceTTreeModule::event()
         m_topEventT0 = evtT0List_TOP.back().eventT0 ;
         m_topEventT0Err = evtT0List_TOP.back().eventT0Uncertainty;
       }
+
+      if (m_EventT0->hasTemporaryEventT0(Const::EDetector::ECL)) {
+        auto evtT0List_ECL = m_EventT0->getTemporaryEventT0s(Const::EDetector::ECL) ;
+        //    There is only one estimate of ECL EVentT0 for the moment
+        m_eclEventT0 = evtT0List_ECL.back().eventT0 ;
+        m_eclEventT0Err = evtT0List_ECL.back().eventT0Uncertainty;
+      }
     }
+
+  StoreArray<OnlineEventT0> onlineEventT0;
+  for (auto& evt : onlineEventT0) {
+    if (evt.getOnlineEventT0Detector() == Const::EDetector::SVD) {
+      B2DEBUG(40, "OnlineEventT0 given by SVD");
+      m_svdOnlineEventT0    = evt.getOnlineEventT0();
+      m_svdOnlineEventT0Err = evt.getOnlineEventT0Uncertainty();
+    }
+
+    if (evt.getOnlineEventT0Detector() == Const::EDetector::CDC) {
+      B2DEBUG(40, "OnlineEventT0 given by CDC");
+      m_cdcOnlineEventT0    = evt.getOnlineEventT0();
+      m_cdcOnlineEventT0Err = evt.getOnlineEventT0Uncertainty();
+    }
+
+    if (evt.getOnlineEventT0Detector() == Const::EDetector::ECL) {
+      B2DEBUG(40, "OnlineEventT0 given by ECL");
+      m_eclOnlineEventT0    = evt.getOnlineEventT0();
+      m_eclOnlineEventT0Err = evt.getOnlineEventT0Uncertainty();
+    }
+
+    if (evt.getOnlineEventT0Detector() == Const::EDetector::TOP) {
+      B2DEBUG(40, "OnlineEventT0 given by TOP");
+      m_topOnlineEventT0    = evt.getOnlineEventT0();
+      m_topOnlineEventT0Err = evt.getOnlineEventT0Uncertainty();
+    }
+  }
+
 
   // clear all vectors
   m_trkNumber.clear();
@@ -226,8 +291,8 @@ void SVDEventT0PerformanceTTreeModule::event()
         m_svdTrkPhi.push_back(tfr->getMomentum().Phi());
         m_svdTrkd0.push_back(tfr->getD0());
         m_svdTrkz0.push_back(tfr->getZ0());
-        m_svdTrkp.push_back(tfr->getMomentum().Mag());
-        m_svdTrkpT.push_back(tfr->getMomentum().Perp());
+        m_svdTrkp.push_back(tfr->getMomentum().R());
+        m_svdTrkpT.push_back(tfr->getMomentum().Rho());
         m_svdTrkPValue.push_back(tfr->getPValue());
         m_svdTrkCharge.push_back(tfr->getChargeSign());
         m_svdTrkNDF.push_back(tfr->getNDF());
@@ -282,10 +347,20 @@ void SVDEventT0PerformanceTTreeModule::event()
             m_trueEventT0 = mcParticle_1[0]->getProductionTime();
         }
       } else
-        m_svdTrueTime.push_back(-99);
+        m_svdTrueTime.push_back(std::numeric_limits<float>::quiet_NaN());
     }
   }
 
+  StoreArray<TRGECLUnpackerStore> TRGECLData;
+  for (const auto& trgHit : TRGECLData) {
+    int hitWin   = trgHit.getHitWin();
+    B2DEBUG(40, "hitWin = " << hitWin);
+    if (hitWin != 3 && hitWin != 4) { continue; }
+    if (trgHit.getTCEnergy() > m_eclTCEmax) {
+      m_eclTCid      = trgHit.getTCId();
+      m_eclTCEmax    = trgHit.getTCEnergy();
+    }
+  }
 
   m_t->Fill();
 

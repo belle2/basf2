@@ -17,6 +17,7 @@
 #include <simulation/monopoles/MonopoleConstants.h>
 
 #include <framework/geometry/BFieldManager.h>
+#include <framework/geometry/B2Vector3.h>
 #include <framework/dataobjects/Helix.h>
 
 #include <TRandom.h>
@@ -391,7 +392,7 @@ void TrackFinderMCTruthRecoTracksModule::event()
 
     MCParticle* aMcParticlePtr = m_MCParticles[iPart];
     // Ignore particles that didn't propagate significantly, they cannot make tracks.
-    if ((aMcParticlePtr->getDecayVertex() - B2Vector3D(aMcParticlePtr->getProductionVertex())).Mag() < 1 * Unit::cm) {
+    if ((aMcParticlePtr->getDecayVertex() - aMcParticlePtr->getProductionVertex()).R() < 1 * Unit::cm) {
       B2DEBUG(20, "Particle that did not propagate significantly cannot make track.");
       continue;
     }
@@ -813,13 +814,13 @@ void TrackFinderMCTruthRecoTracksModule::event()
 
 
     //set track parameters from MCParticle information
-    B2Vector3D positionTrue = aMcParticlePtr->getProductionVertex();
-    TVector3 momentumTrue = aMcParticlePtr->getMomentum();
+    ROOT::Math::XYZVector positionTrue = aMcParticlePtr->getProductionVertex();
+    ROOT::Math::XYZVector momentumTrue = aMcParticlePtr->getMomentum();
     double timeTrue = aMcParticlePtr->getProductionTime();
 
     // if no kind of smearing is activated the initial values (seeds) for track fit will be the simulated truth
-    TVector3 momentum = momentumTrue;
-    TVector3 position = positionTrue;
+    ROOT::Math::XYZVector momentum = momentumTrue;
+    ROOT::Math::XYZVector position = positionTrue;
     double time = timeTrue;
     TVectorD stateSeed(6); //this will
     TMatrixDSym covSeed(6);
@@ -871,7 +872,7 @@ void TrackFinderMCTruthRecoTracksModule::event()
         time = std::get<0>(hitInformationVector.at(0));
         const double deltaT = time - aMcParticlePtr->getProductionTime();
         const double energy = sqrt(momentum.Mag2() + aMcParticlePtr->get4Vector().M() * aMcParticlePtr->get4Vector().M());
-        const double beta_xy = momentum.Perp() / energy;
+        const double beta_xy = momentum.Rho() / energy;
         // calculate arclength in 2D of the track
         const double arclength2D = beta_xy * Const::speedOfLight * deltaT;
 
@@ -882,7 +883,7 @@ void TrackFinderMCTruthRecoTracksModule::event()
       }
 
 
-      RecoTrack* newRecoTrack = m_RecoTracks.appendNew(position, momentum, charge);
+      RecoTrack* newRecoTrack = m_RecoTracks.appendNew(B2Vector3D(position), B2Vector3D(momentum), charge);
       if (m_setTimeSeed) {
         newRecoTrack->setTimeSeed(time);
       }
@@ -905,9 +906,9 @@ void TrackFinderMCTruthRecoTracksModule::event()
           const CDCSimHit* aCDCSimHitPtr = cdcHit->getRelatedFrom<CDCSimHit>();
 
           //now determine the correct sign to resolve the left right ambiguity in the fitter
-          TVector3 simHitPos = aCDCSimHitPtr->getPosTrack();
-          TVector3 simMom = aCDCSimHitPtr->getMomentum();
-          TVector3 simHitPosOnWire = aCDCSimHitPtr->getPosWire();
+          ROOT::Math::XYZVector simHitPos = aCDCSimHitPtr->getPosTrack();
+          ROOT::Math::XYZVector simMom = aCDCSimHitPtr->getMomentum();
+          ROOT::Math::XYZVector simHitPosOnWire = aCDCSimHitPtr->getPosWire();
 
           CDC::CDCGeometryPar& cdcGeometry = CDC::CDCGeometryPar::Instance();
           const unsigned short isRightHit = cdcGeometry.getNewLeftRightRaw(simHitPosOnWire, simHitPos, simMom);
@@ -960,7 +961,7 @@ bool TrackFinderMCTruthRecoTracksModule::isWithinNLoops(double Bz, const THit* a
   // for particles produced at times t' > t0
   const double tof = aSimHit->getGlobalTime() - mcParticle->getProductionTime();
   const double speed = mcParticle->get4Vector().Beta() * Const::speedOfLight;
-  const float absMom3D = mcParticle->getMomentum().Mag();
+  const float absMom3D = mcParticle->getMomentum().R();
 
   const double loopLength = 2 * M_PI * absMom3D / (Bz * 0.00299792458);
   const double loopTOF =  loopLength / speed;

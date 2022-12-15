@@ -19,7 +19,7 @@ ROOT.gSystem.Load("libtracking")
 class Saving1stMVAData(harvesting.HarvestingModule):
     """ A dedicated module to save the variables using in flipping steps"""
 
-    def __init__(self, name, contact=None, preInfo="", checkObj='RecoTracks', output_file_name='output.root'):
+    def __init__(self, name, contact=None, preInfo="", checkObj='RecoTracks', output_file_name='flip-refit-MVA1.root'):
         """Constructor"""
         super().__init__(foreach=checkObj, name=name, contact=contact, output_file_name=output_file_name)
 
@@ -95,8 +95,9 @@ class Saving1stMVAData(harvesting.HarvestingModule):
         last_cdc_layer = nan
         ndf_hits = nan
         isPrimary_misID = False
-        ismatched = False,
-        isprimary = False,
+        ismatched = False
+        isprimary = False
+        charge_truth = nan
         inGoingArmTime = nan
         inGoingArmTimeError = nan
         outGoingArmTime = nan
@@ -119,6 +120,7 @@ class Saving1stMVAData(harvesting.HarvestingModule):
             ismatched = track_match_look_up.isMatchedPRRecoTrack(recoTrack)
             if mc_particle and fit_result:
                 isprimary = bool(mc_particle.hasStatus(Belle2.MCParticle.c_PrimaryParticle))
+                charge_truth = mc_particle.getCharge()
                 if isprimary:
                     track_charge = fit_result.getChargeSign()
                     if mc_particle.getCharge() != track_charge:
@@ -216,6 +218,7 @@ class Saving1stMVAData(harvesting.HarvestingModule):
             isPrimary_misID=isPrimary_misID,
             ismatched=ismatched,
             isprimary=isprimary,
+            charge_truth=charge_truth,
             inGoingArmTime=inGoingArmTime,
             inGoingArmTimeError=inGoingArmTimeError,
             outGoingArmTime=outGoingArmTime,

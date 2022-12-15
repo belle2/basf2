@@ -106,6 +106,9 @@ def add_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False, 
         svdTimeGroupComposer.set_name(timeGroupComposerName)
         svdTimeGroupComposer.param('SVDClusters', clustersName)
         svdTimeGroupComposer.param('EventLevelTrackingInfoName', nameEventTrackingInfo)
+        svdTimeGroupComposer.param('XRange', 160.)
+        svdTimeGroupComposer.param('AverageCountPerBin', 10.)
+        svdTimeGroupComposer.param('Threshold', 4.)
         path.add_module(svdTimeGroupComposer)
 
     # Add SVDSpacePointCreator
@@ -238,6 +241,9 @@ def add_rel5_svd_reconstruction(path, isROIsimulation=False, applyMasking=False)
         svdTimeGroupComposer.set_name(timeGroupComposerName)
         svdTimeGroupComposer.param('SVDClusters', clusterName)
         svdTimeGroupComposer.param('EventLevelTrackingInfoName', nameEventTrackingInfo)
+        svdTimeGroupComposer.param('XRange', 160.)
+        svdTimeGroupComposer.param('AverageCountPerBin', 10.)
+        svdTimeGroupComposer.param('Threshold', 4.)
         path.add_module(svdTimeGroupComposer)
 
     # Add SVDSpacePointCreator

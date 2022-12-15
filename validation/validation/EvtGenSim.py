@@ -20,6 +20,7 @@
 """
 
 from basf2 import set_random_seed, create_path, process, statistics
+from basf2 import conditions as b2conditions
 from simulation import add_simulation
 from validation import statistics_plots, event_timing_plot
 from background import get_background_files
@@ -27,6 +28,8 @@ from background import get_background_files
 set_random_seed(12345)
 
 main = create_path()
+
+b2conditions.prepend_globaltag("tracking_TEST_SVDTimeSelectionOFFrev1_VXDTF2TimeFiltersONrev27")
 
 # specify number of events to be generated
 main.add_module("EventInfoSetter", evtNumList=[1000], runList=[1], expList=[0])

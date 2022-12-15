@@ -20,7 +20,7 @@ REG_MODULE(SVDTimeGroupComposer);
 SVDTimeGroupComposerModule::SVDTimeGroupComposerModule() :
   Module()
 {
-  setDescription("Imports Clusters of the SVD detector and converts them to spacePoints.");
+  setDescription("Imports Clusters of the SVD detector and Assign time-group Id.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   // 1. Collections.
@@ -30,11 +30,12 @@ SVDTimeGroupComposerModule::SVDTimeGroupComposerModule() :
            "EventLevelTrackingInfo collection name", string(""));
 
   // 2.Modification parameters:
-  addParam("AverageCountPerBin", m_AverageCountPerBin, "This sets the bin width of histogram.",
-           double(2.));
+  addParam("AverageCountPerBin", m_AverageCountPerBin,
+           "This sets the bin width of histogram. Setting it zero or less disables the module.",
+           double(1.));
   addParam("XRange", m_xRange, "This sets the x-range of histogram in ns.",
            double(160.));
-  addParam("RemoveBaseline", m_removeBaseline, "Bin Content bellow this is not considered.",
+  addParam("Threshold", m_threshold, "Bin Content bellow this is not considered.",
            double(1.));
 }
 
@@ -45,19 +46,23 @@ void SVDTimeGroupComposerModule::initialize()
   // prepare all store:
   m_svdClusters.isRequired(m_svdClustersName);
 
+  if (m_AverageCountPerBin <= 0.) B2WARNING("AverageCountPerBin is set to zero or less."
+                                              << "SVDTimeGroupComposer module is ineffective.");
+  if (m_xRange < 10.)             B2FATAL("XRange should not be less than 10 (hard-coded).");
+
   B2DEBUG(1, "SVDTimeGroupComposerModule \nsvdClusters: " << m_svdClusters.getName());
+  B2INFO("SVDTimeGroupComposer : AverageCountPerBin = " << m_AverageCountPerBin);
+  B2INFO("SVDTimeGroupComposer : Xrange             = " << m_xRange);
+  B2INFO("SVDTimeGroupComposer : Threshold          = " << m_threshold);
 }
 
 
 
 void SVDTimeGroupComposerModule::event()
 {
-  if (m_AverageCountPerBin <= 0.) B2FATAL("AverageCountPerBin cannot be zero or less.");
-  if (m_xRange < 10.)             B2FATAL("XRange should not be less than 10 (hard-coded).");
-
   int totClusters = m_svdClusters.getEntries();
-  int xbin = totClusters / m_AverageCountPerBin;
-  if (xbin > 0) {
+  int xbin = totClusters / (m_AverageCountPerBin > 0 ? m_AverageCountPerBin : 1.); // safety
+  if (m_AverageCountPerBin > 0 && xbin > 0) {
     /** declaring histogram */
     TH1D h_clsTime("h_clsTime", "h_clsTime", xbin, -m_xRange, m_xRange);
     for (int ij = 0; ij < totClusters; ij++) {
@@ -67,14 +72,14 @@ void SVDTimeGroupComposerModule::event()
     /** finalized the groups */
     int groupBegin = -1; int groupEnd = -1;
     std::vector<std::tuple<double, double, int>> groupInfo; // start, end, totCls
-    for (int ij = 2; ij < h_clsTime.GetNbinsX(); ij++) {
+    for (int ij = 1; ij <= xbin; ij++) {
       double sumc = h_clsTime.GetBinContent(ij);
-      double suml = h_clsTime.GetBinContent(ij - 1);
-      double sumr = h_clsTime.GetBinContent(ij + 1);
+      double suml = (ij == 1    ? 0. : h_clsTime.GetBinContent(ij - 1));
+      double sumr = (ij == xbin ? 0. : h_clsTime.GetBinContent(ij + 1));
       // possible background
-      if (sumc <= m_removeBaseline) sumc = 0;
-      if (suml <= m_removeBaseline) suml = 0;
-      if (sumr <= m_removeBaseline) sumr = 0;
+      if (sumc <= m_threshold) sumc = 0;
+      if (suml <= m_threshold) suml = 0;
+      if (sumr <= m_threshold) sumr = 0;
 
       double sum = suml + sumc + sumr;
       // finding group
@@ -91,6 +96,8 @@ void SVDTimeGroupComposerModule::event()
         groupBegin = groupEnd = -1; // reset for new group
       }
     }
+    double underflow = h_clsTime.GetBinContent(0);
+    double overflow  = h_clsTime.GetBinContent(xbin + 1);
 
     // sorting groups in descending cluster-counts
     // this should help speed up the next process
@@ -114,7 +121,7 @@ void SVDTimeGroupComposerModule::event()
       auto endPos      = std::get<1>(groupInfo[ij]);
       auto totCls      = std::get<2>(groupInfo[ij]);
 
-      B2DEBUG(1, "SVDTimeGroupComposerModule group " << ij
+      B2DEBUG(1, " group " << ij
               << " beginPos " << beginPos << " endPos " << endPos
               << " totCls " << totCls);
       int rejectedCount = 0;
@@ -123,15 +130,20 @@ void SVDTimeGroupComposerModule::event()
         double clsTime = m_svdClusters[place]->getClsTime();
         if (clsTime >= beginPos && clsTime <= endPos) {
           m_svdClusters[place]->setTimeGroupId(ij);
-          B2DEBUG(1, "SVDTimeGroupComposerModule    accepted cluster " << place
+          B2DEBUG(1, "   accepted cluster " << place
                   << " clsTime " << clsTime);
         } else {
-          B2DEBUG(1, "SVDTimeGroupComposerModule      rejected cluster " << place
+          B2DEBUG(1, "     rejected cluster " << place
                   << " clsTime " << clsTime);
-          if (ij == totGroups - 1) {
-            m_svdClusters[place]->setTimeGroupId(-1);
-            B2DEBUG(1, "SVDTimeGroupComposerModule        orphan cluster " << place
-                    << " clsTime " << clsTime);
+          if (ij == totGroups - 1) {                              // leftover clusters
+            if (clsTime < -m_xRange && underflow > m_threshold)
+              m_svdClusters[place]->setTimeGroupId(ij + 1);       // underflow
+            else if (clsTime > m_xRange && overflow > m_threshold)
+              m_svdClusters[place]->setTimeGroupId(ij + 2);       // overflow
+            else
+              m_svdClusters[place]->setTimeGroupId(-1);           // orphan
+            B2DEBUG(1, "     leftover cluster " << place
+                    << " GroupId " << m_svdClusters[place]->getTimeGroupId());
           } else {
             rejectedCls[rejectedCount++] = place;
           }

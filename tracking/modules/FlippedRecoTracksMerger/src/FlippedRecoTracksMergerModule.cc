@@ -63,13 +63,13 @@ void FlippedRecoTracksMergerModule::event()
 
     // if we should not flip the tracks: the 2nd MVA QI is nan (aka didn't pass the 1st MVA filter) or smaller than the cut
     if (isnan(recoTrack.get2ndFlipQualityIndicator()) or (recoTrack.get2ndFlipQualityIndicator() < mvaFlipCut)) continue;
-    // get the related RecoTrackflipped
-    RecoTrack* RecoTrackflipped =  recoTrack.getRelatedFrom<Belle2::RecoTrack>("RecoTracks_flipped");
+    // get the related flippedRecoTrack
+    RecoTrack* flippedRecoTrack =  recoTrack.getRelatedFrom<Belle2::RecoTrack>("RecoTracks_flipped");
 
-    if (!RecoTrackflipped) continue;
+    if (!flippedRecoTrack) continue;
 
     // get the tracksflipped
-    Track* trackFlipped = RecoTrackflipped->getRelatedFrom<Belle2::Track>("Tracks_flipped");
+    Track* trackFlipped = flippedRecoTrack->getRelatedFrom<Belle2::Track>("Tracks_flipped");
     if (!trackFlipped) continue;
     std::vector<Track::ChargedStableTrackFitResultPair> fitResultsAfter =
       trackFlipped->getTrackFitResultsByName("TrackFitResults_flipped");
@@ -79,20 +79,20 @@ void FlippedRecoTracksMergerModule::event()
     track->setFlippedAndRefitted();
 
     // loop over the original fitResults
-    for (long unsigned int index = 0; index < fitResultsBefore.size() ; index++) {
+    for (long unsigned int indexBeforeResults = 0; indexBeforeResults < fitResultsBefore.size() ; indexBeforeResults++) {
       bool updatedFitResult = false;
-      for (long unsigned int index1 = 0; index1 < fitResultsAfter.size() ; index1++) {
-        if (fitResultsBefore[index].first == fitResultsAfter[index1].first) {
+      for (long unsigned int indexAfterResults = 0; indexAfterResults < fitResultsAfter.size() ; indexAfterResults++) {
+        if (fitResultsBefore[indexBeforeResults].first == fitResultsAfter[indexAfterResults].first) {
 
-          auto fitResultAfter  = fitResultsAfter[index1].second;
-          fitResultsBefore[index].second->updateTrackFitResult(*fitResultAfter);
+          auto fitResultAfter  = fitResultsAfter[indexAfterResults].second;
+          fitResultsBefore[indexBeforeResults].second->updateTrackFitResult(*fitResultAfter);
           updatedFitResult = true;
         }
 
       }
       if (not updatedFitResult) {
-        fitResultsBefore[index].second->mask();
-        track->setTrackFitResultIndex(fitResultsBefore[index].first, -1);
+        fitResultsBefore[indexBeforeResults].second->mask();
+        track->setTrackFitResultIndex(fitResultsBefore[indexBeforeResults].first, -1);
       }
     }
 

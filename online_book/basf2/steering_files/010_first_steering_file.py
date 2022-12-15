@@ -12,5 +12,5 @@ ma.inputMdstList(
     path=main
 )
 
-# Start the event loop (actually start processing things)
+# start the event loop (actually start processing things)
 b2.process(main)

@@ -40,6 +40,7 @@ void FlippedRecoTracksMergerModule::initialize()
 {
   m_inputRecoTracks.isRequired(m_inputStoreArrayName);
   m_inputRecoTracksFlipped.isRequired(m_inputStoreArrayNameFlipped);
+  m_trackFitResults.isRequired();
 }
 
 void FlippedRecoTracksMergerModule::event()
@@ -78,21 +79,32 @@ void FlippedRecoTracksMergerModule::event()
     //set the c_isFlippedAndRefitted bit
     track->setFlippedAndRefitted();
 
-    // loop over the original fitResults
-    for (long unsigned int indexBeforeResults = 0; indexBeforeResults < fitResultsBefore.size() ; indexBeforeResults++) {
-      bool updatedFitResult = false;
-      for (long unsigned int indexAfterResults = 0; indexAfterResults < fitResultsAfter.size() ; indexAfterResults++) {
-        if (fitResultsBefore[indexBeforeResults].first == fitResultsAfter[indexAfterResults].first) {
-
-          auto fitResultAfter  = fitResultsAfter[indexAfterResults].second;
-          fitResultsBefore[indexBeforeResults].second->updateTrackFitResult(*fitResultAfter);
-          updatedFitResult = true;
-        }
-
+    // invalidate all TrackFitResults of old Track that dont exist in new Track
+    for (auto fitResult : fitResultsBefore) {
+      auto iterFitResult = std::find_if(fitResultsAfter.begin(),
+      fitResultsAfter.end(), [&fitResult](const Track::ChargedStableTrackFitResultPair & a) { return a.first == fitResult.first;});
+      // did not find this hypothesis in the new FitResults, so invalidate it
+      if (iterFitResult == fitResultsAfter.end()) {
+        track->setTrackFitResultIndex(fitResult.first, -1);
+        fitResult.second->mask();
       }
-      if (not updatedFitResult) {
-        fitResultsBefore[indexBeforeResults].second->mask();
-        track->setTrackFitResultIndex(fitResultsBefore[indexBeforeResults].first, -1);
+    }
+
+
+    // loop over new TrackFitResults and update or add new FitResults to the old Track
+    for (auto fitResult : fitResultsAfter) {
+
+      auto oldFitResultPairIter = std::find_if(fitResultsBefore.begin(),
+      fitResultsBefore.end(), [&fitResult](const Track::ChargedStableTrackFitResultPair & a) { return a.first == fitResult.first;});
+
+      // if old result exists update it, if not exists add a new TrackFitResult
+      if (oldFitResultPairIter != fitResultsBefore.end()) {
+        oldFitResultPairIter->second->updateTrackFitResult(*fitResult.second);
+      } else {
+        TrackFitResult* newFitResult = m_trackFitResults.appendNew();
+        newFitResult->updateTrackFitResult(*fitResult.second);
+        const int newTrackFitResultArrayIndex = newFitResult->getArrayIndex();
+        track->setTrackFitResultIndex(fitResult.first, newTrackFitResultArrayIndex);
       }
     }
 

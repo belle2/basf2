@@ -28,9 +28,10 @@
 ##########################################################################
 
 import basf2 as b2
-import modularAnalysis as ma
-import simulation as si
-import reconstruction as re
+from modularAnalysis import inputMdst
+from simulation import add_simulation
+from reconstruction import add_reconstruction
+from mdst import add_mdst_output
 import glob
 import os
 
@@ -38,7 +39,7 @@ import os
 my_path = b2.create_path()
 
 # load input ROOT file
-ma.inputMdst(filename=b2.find_file('B2A101-Y4SEventGeneration-evtgen.root'), path=my_path)
+inputMdst(filename=b2.find_file('B2A101-Y4SEventGeneration-evtgen.root'), path=my_path)
 
 # background files
 # location of the files is obtained from a shell variable - check first if it is set
@@ -53,15 +54,15 @@ if len(bg) == 0:
     b2.B2FATAL('No files found in ', os.environ['BELLE2_BACKGROUND_DIR'])
 
 # simulation
-si.add_simulation(path=my_path, bkgfiles=bg)
+add_simulation(path=my_path, bkgfiles=bg)
 
 # reconstruction
-re.add_reconstruction(path=my_path)
+add_reconstruction(path=my_path)
 
 # dump in MDST format
-re.add_mdst_output(path=my_path,
-                   mc=True,
-                   filename='B2A101-Y4SEventGeneration-gsim-BKGx1.root')
+add_mdst_output(path=my_path,
+                mc=True,
+                filename='B2A101-Y4SEventGeneration-gsim-BKGx1.root')
 
 # Show progress of processing
 my_path.add_module('ProgressBar')

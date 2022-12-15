@@ -1,13 +1,12 @@
-# This file was automatically created by FeynRules 2.0.26
-# Mathematica version: 9.0 for Linux x86 (64-bit) (November 20, 2012)
-# Date: Wed 23 Jul 2014 02:04:07
+# This file was automatically created by FeynRules 2.3.49
+# Mathematica version: 13.0.1 for Linux x86 (64-bit) (January 29, 2022)
+# Date: Fri 4 Nov 2022 15:12:56
 
 
 # 
-# This is the logfile for the model DarkPhotonPion
+# This is the logfile for the model Dark_photon
 
-# Authors: ym zhong
-# Model version: 1.0
+# Authors: E. Bernreuther
 # Checking the Quantum numbers
    * Electric charge defined.
 # Checking the Lagrangians
@@ -19,14 +18,10 @@
    * No particles removed. All particles correspond to GenInt setup.
 
 # Automatically assigned PDG numbers
-   * Assigned PDG number 9000001 to particle chi
-   * Assigned PDG number 9000002 to particle ghA
-   * Assigned PDG number 9000003 to particle ghZ
-   * Assigned PDG number 9000004 to particle ghWp
-   * Assigned PDG number 9000005 to particle ghWm
-   * Assigned PDG number 9000006 to particle ghG
-   * Assigned PDG number 9000007 to particle ghAp
-   * Assigned PDG number 9000008 to particle Ap
+   * Assigned PDG number 9000001 to particle ghA
+   * Assigned PDG number 9000002 to particle ghZ
+   * Assigned PDG number 9000003 to particle ghWp
+   * Assigned PDG number 9000004 to particle ghWm
 
 
 # Compulsory PDG codes:
@@ -42,33 +37,34 @@
 
 
 # Vertices
-   * Calling FeynmanRules for 6 Lagrangians.
-   * Number of classes vertices: 40
-   * Number of flavored vertices: 90
+   * Calling FeynmanRules for 4 Lagrangians.
+   * Number of classes vertices: 35
+   * Number of flavored vertices: 85
    * Saved vertices in InterfaceRun[ 1 ].
    * Checked QNumber conservation.
       - Quantum number GhostNumber conserved in all vertices.
       - Quantum number LeptonNumber conserved in all vertices.
       - Quantum number Q conserved in all vertices.
+      - Quantum number Y conserved in all vertices.
    * particles.py written.
    * parameters.py written.
 #
 # Vertex definitions
 #
 
-   * 90 vertices written.
+   * 85 vertices written.
    * vertices.py written.
 #
 # Lorentz structure definitions
 #
 
-   * 18 lorentz structures written.
+   * 16 lorentz structures written.
    * lorentz.py written.
 #
 # Coupling definitions
 #
 
-   * 56 couplings written.
+   * 57 couplings written.
    * couplings.py written.
 #
 # Coupling order definitions
@@ -82,3 +78,9 @@
 
    * 13 decays written.
    * decay.py not written
+#
+# CTCoupling definitions
+#
+
+   * 0 CTcouplings written.
+   * CT_couplings.py written.

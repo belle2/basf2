@@ -6,12 +6,12 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 import matplotlib.pyplot as plt
-import root_pandas
+import uproot
 
 
 plt.style.use("belle2")
 
-df = root_pandas.read_root("Bd2JpsiKS.root")
+df = uproot.open("Bd2JpsiKS.root:tree").arrays(['qrMC', 'FBDT_qrCombined'], library='pd')
 
 fig, ax = plt.subplots()
 ax.hist(
@@ -31,3 +31,4 @@ ax.hist(
 ax.set_xlabel("FBDT_qrCombined")
 ax.legend()
 fig.savefig("flavor_tags.svg")
+

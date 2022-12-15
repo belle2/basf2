@@ -14,7 +14,6 @@
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <iostream>
-#include <TVector3.h>
 
 #include <vxd/geometry/GeoCache.h>
 

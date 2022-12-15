@@ -46,6 +46,9 @@ namespace Belle2 {
     StoreArray<RecoTrack> m_inputRecoTracksFlipped;
     /// flipping cuts could be read from the DB
     OptionalDBObjPtr<TrackFlippingCuts> m_flipCutsFromDB{"TRKTrackFlipAndRefit_MVA_cuts"};
+
+    /// StoreArray of TrackFitResult, only default name should be considered here
+    StoreArray<TrackFitResult> m_trackFitResults;
   };
 }
 

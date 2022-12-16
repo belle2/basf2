@@ -23,8 +23,9 @@ from svd.executionTime_utils import SVDExtraEventStatisticsModule
 import rawdata as raw
 import tracking as trk
 import simulation as sim
-import glob
 import argparse
+from background import get_background_files
+import generators as ge
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("--fileDir", default="./",
@@ -60,8 +61,8 @@ if args.isMC:
     # expList = [1003]
     expList = [0]
     numEvents = 20
-    bkgFiles = glob.glob('/sw/belle2/bkg/*.root')  # Phase3 background
-    bkgFiles = None  # uncomment to remove  background
+    bkgFiles = get_background_files()  # Phase3 background
+    # bkgFiles = None  # uncomment to remove  background
     simulateJitter = False
     ROIfinding = False
     MCTracking = False
@@ -70,14 +71,18 @@ if args.isMC:
     eventinfosetter.param('runList', [0])
     eventinfosetter.param('evtNumList', [numEvents])
     main.add_module(eventinfosetter)
-    main.add_module('EvtGenInput')
+    ge.add_evtgen_generator(path=main, finalstate='mixed')
+    # main.add_module('EvtGenInput')
 
-    sim.add_simulation(
-        main,
-        bkgfiles=bkgFiles,
-        forceSetPXDDataReduction=True,
-        usePXDDataReduction=ROIfinding,
-        simulateT0jitter=simulateJitter)
+    sim.add_simulation(main, bkgfiles=bkgFiles)
+
+    # sim.add_simulation(
+    #     main,
+    #     bkgfiles=bkgFiles,
+    #     forceSetPXDDataReduction=True,
+    #     usePXDDataReduction=ROIfinding,
+    #     simulateT0jitter=simulateJitter)
+
 else:
     # setup database
     b2conditions.reset()
@@ -89,15 +94,15 @@ else:
 
     MCTracking = False
 
-if args.test:
-    main.add_module('RootInput', entrySequences=['0:100'])
-else:
-    main.add_module('RootInput')
-
     main.add_module("Gearbox")
     main.add_module('Geometry', useDB=True)
 
 if not args.isMC:
+    if args.test:
+        main.add_module('RootInput', entrySequences=['0:100'])
+    else:
+        main.add_module('RootInput')
+
     raw.add_unpackers(main)
 
     if args.is3sample:

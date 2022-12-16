@@ -60,12 +60,12 @@ if __name__ == "__main__":
                  "flipped_px_variance",
                  "flipped_py_variance",
                  "flipped_x_estimate",
-                 "quality_flip_indicator",
-                 "inGoingArmTime",
-                 "inGoingArmTimeError",
-                 "outGoingArmTime",
-                 "outGoingArmTimeError",
-                 "timeDiffInAndOutArms"]
+                 "quality_flip_indicator"]
+    # "inGoingArmTime",
+    # "inGoingArmTimeError",
+    # "outGoingArmTime",
+    # "outGoingArmTimeError",
+    # "timeDiffInAndOutArms"]
 
     general_options = basf2_mva.GeneralOptions()
     general_options.m_datafiles = training_data

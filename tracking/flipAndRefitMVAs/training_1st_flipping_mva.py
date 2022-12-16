@@ -56,13 +56,13 @@ if __name__ == "__main__":
                  "svd_layer3_positionSigma",
                  "first_cdc_layer",
                  "last_cdc_layer",
-                 "ndf_hits",
-                 "inGoingArmTime",
-                 "inGoingArmTimeError",
-                 "outGoingArmTime",
-                 "outGoingArmTimeError",
-                 "InOutArmTimeDifference",
-                 "InOutArmTimeDifferenceError"]
+                 "ndf_hits"]
+    # "inGoingArmTime",
+    # "inGoingArmTimeError",
+    # "outGoingArmTime",
+    # "outGoingArmTimeError",
+    # "InOutArmTimeDifference",
+    # "InOutArmTimeDifferenceError"]
 
     general_options = basf2_mva.GeneralOptions()
     general_options.m_datafiles = training_data
@@ -75,7 +75,7 @@ if __name__ == "__main__":
     general_options.m_treename = "data"
     general_options.m_variables = basf2_mva.vector(*variables)
     general_options.m_target_variable = "isPrimary_misID"
-    general_options.m_max_events = 6000
+    general_options.m_max_events = 50000
 
     fastbdt_options = basf2_mva.FastBDTOptions()
     fastbdt_options.m_nTrees = 400

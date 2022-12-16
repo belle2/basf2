@@ -274,7 +274,7 @@ void NeuroTriggerParameters::saveconfigtxt(const std::string& filename)
   if (checkarr(nHidden)) {
     savestream << print2dArray<float>("nHidden", nHidden);
     savestream  << std::endl;
-  } else {savestream << "nHidden = [[3]]" << std::endl;}
+  } else {savestream << "nHidden = [[81]]" << std::endl;}
   savestream << "# Maximum number of hits in a single super layer for all networks. " << std::endl;
   if (checkarr(maxHitsPerSL)) {
     savestream << print1dArray<unsigned short>("maxHitsPerSL", maxHitsPerSL);
@@ -293,7 +293,7 @@ void NeuroTriggerParameters::saveconfigtxt(const std::string& filename)
   if (checkarr(SLpattern)) {
     savestream << print1dArray<unsigned long>("SLpattern", SLpattern);
     savestream  << std::endl;
-  } else {savestream << "SLpattern = [511, 479, 495, 503, 509]" << std::endl;}
+  } else {savestream << "SLpattern = [511, 383, 479, 503, 509]" << std::endl;}
   savestream << "# Super layer pattern mask for which MLP is trained for all networks." << std::endl;
   savestream << "#   Binary pattern of 9 * maxHitsPerSL bits (on/off for each hit)." << std::endl;
   savestream << "#   0 in bit <i>: super layer <i> may or may not have a hit." << std::endl;

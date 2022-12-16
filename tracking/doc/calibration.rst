@@ -17,7 +17,7 @@ Below the instructions how to retrain, apply and evaluate the MVAs for the :ref:
   The Flip&Refit tool uses two MVAs:
 
   1. 1st MVA: select the RecoTracks to be flipped looking at low level variables (eg: ndf, cdc hits number, pxd hits etc)
-  2. 2nd MVA: takes the fitResults fro the original and the flipped Tracks as input to decide wich one to keep
+  2. 2nd MVA: takes the fitResults from the original and the flipped Tracks as input to decide wich one to keep
 
   The steps for sample generation, training and performance evlauation are similare, and are described in the following.
 
@@ -42,12 +42,12 @@ step 2: MVA training
 """"""""""""""""""""
 
 In this step, a local database containing the payloads with the weightfiles of the first or second MVA will be created.
-The payloads are created with the script ``tracking/flipAndRefitMVAs/training_flipping_mvaa.py``.
+The payloads are created with the script ``tracking/tools/training_flipping_mvas.py``.
 An example for the 1st MVA is reported below:
 
 .. code:: bash
 
-  basf2 tracking/flipAndRefitMVAs/training_flipping_mvas.py -train train_1stmva.root -data test_1stmva.root -tree data -mva 1
+  basf2 tracking/tools/training_flipping_mvas.py -train train_1stmva.root -data test_1stmva.root -tree data -mva 1
 
 .. note::
 
@@ -56,7 +56,7 @@ An example for the 1st MVA is reported below:
 
     .. code:: bash
 
-      basf2 tracking/flipAndRefitMVAs/training_flipping_mvas.py --h
+      basf2 tracking/tools/training_flipping_mvas.py --h
 
 
 step 3: 1st-MVA performance evaluation
@@ -67,7 +67,7 @@ An example is reported in the following:
 
 .. code:: bash
 
-  basf2_mva_evaluate.py -id localdb/dbstore_Weightfile_rev_0b43a0.root -tree data -train train.root -data test.root -o validation.root
+  basf2_mva_evaluate.py -id localdb/dbstore_***.root -tree data -train train.root -data test.root -o validation.root
 
 For further instructions, use the help of the executable.
 

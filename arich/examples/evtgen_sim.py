@@ -57,10 +57,9 @@ mypath.add_module('PXDDigitizer')
 mypath.add_module('PXDClusterizer')
 
 # SVD digitization & clustering
-svd_digitizer = b2.register_module('SVDDigitizer')
-mypath.add_module(svd_digitizer)
-svd_clusterizer = b2.register_module('SVDClusterizer')
-mypath.add_module(svd_clusterizer)
+mypath.add_module('SVDEventInfoSetter')
+mypath.add_module('SVDDigitizer')
+mypath.add_module('SVDClusterizer')
 
 # CDC digitization
 mypath.add_module('CDCDigitizer')

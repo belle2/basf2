@@ -1,3 +1,4 @@
+# @cond
 import b2luigi as luigi
 from b2luigi.basf2_helper import Basf2PathTask, Basf2nTupleMergeTask
 
@@ -61,3 +62,4 @@ class ReconstructionWrapper(Basf2nTupleMergeTask):
         for looper in range(BatchesToTextFile.NumBatches):
             yield self.clone(ReconstructBatch, runningOnMC=True,
                              looper=looper, projectName=self.projectName, skim=self.skim)
+# @endcond

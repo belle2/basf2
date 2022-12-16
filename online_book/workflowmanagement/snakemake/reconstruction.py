@@ -1,3 +1,4 @@
+# @cond
 import json
 import basf2 as b2
 import modularAnalysis as ma
@@ -30,3 +31,4 @@ ma.variablesToNtuple(decayString='B0:PiD-toK2Pi', variables=some_variables,
                      filename=outname,  path=mypath, treename='BtoPiDtoKPiPi')
 
 b2.process(mypath)
+# @endcond

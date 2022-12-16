@@ -1,3 +1,4 @@
+# @cond
 import b2luigi as luigi
 from b2luigi.basf2_helper.tasks import Basf2PathTask
 
@@ -7,18 +8,6 @@ import numpy as np
 import basf2 as b2
 import modularAnalysis as ma
 import vertex as vx
-
-class StarterTask(luigi.Task):
-    # this task is a dummy task to have one common starting Task, from which all dependencies can be visualized
-    complete = False
-
-    def run(self):
-        print("Starting Sample Belle II Workflow")
-        self.complete = True
-
-    def complete(self):
-        return bool(self.complete)
-
 
 class SkimTask(Basf2PathTask):
     batch_system = "gbasf2"
@@ -31,9 +20,6 @@ class SkimTask(Basf2PathTask):
     gbasf2_download_logs = False
 
     runningOnMC = luigi.BoolParameter()
-
-    def requires(self):
-        yield StarterTask()
 
     def output(self):
         yield self.add_to_output("skim.root")
@@ -105,3 +91,4 @@ class BatchesToTextFile(luigi.Task):
 
             with open(self.get_output_file_name(key), "w+") as f:
                 f.write(json.dumps(file_list))
+# @endcond

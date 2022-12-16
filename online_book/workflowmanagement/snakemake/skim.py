@@ -1,3 +1,4 @@
+# @cond
 import basf2 as b2
 import modularAnalysis as ma
 import vertex as vx
@@ -26,3 +27,4 @@ mdst.add_mdst_output(path=mypath,  # use mdst for further modification using bas
 
 b2.process(mypath)
 print(b2.statistics)
+# @endcond

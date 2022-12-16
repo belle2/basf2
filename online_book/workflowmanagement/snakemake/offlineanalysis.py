@@ -1,3 +1,4 @@
+# @cond
 import uproot
 import matplotlib.pyplot as plt
 
@@ -16,3 +17,4 @@ for var in some_variables:
     plt.xlabel(f"{var} [GeV]")
     plt.savefig(output_file[var], dpi=100)
     plt.close()
+# @endcond

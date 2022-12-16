@@ -1,3 +1,4 @@
+# @cond
 import b2luigi as luigi
 from b2luigi.basf2_helper import Basf2nTupleMergeTask
 from reconstruction import ReconstructionWrapper
@@ -15,7 +16,7 @@ class MergeFiles(Basf2nTupleMergeTask):
             yield ReconstructionWrapper(skim=skim, projectName=self.projectName)
 
 
-class Plot(luigi.WrapperTask):
+class Plot(luigi.Task):
     batch_system = 'local'
 
     def requires(self):
@@ -42,3 +43,4 @@ class Plot(luigi.WrapperTask):
             plt.xlabel(f"{var} [GeV]")
             plt.savefig(self.get_output_file_name(f"{var}.jpg"), dpi=100)
             plt.close()
+# @endcond

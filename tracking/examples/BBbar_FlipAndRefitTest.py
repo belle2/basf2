@@ -15,8 +15,8 @@ from basf2 import register_module, process, \
 from basf2 import conditions as b2c
 import simulation as si
 import tracking as trk
-from tracking.harvesting_validation.FlippingMVA.savingFlippingVariables import Saving1stMVAData
-from tracking.harvesting_validation.FlippingMVA.savingFlippingVariablesFor2ndMVA import Saving2ndMVAData
+from tracking.FlippingMVA.savingFlippingVariables import Saving1stMVAData
+from tracking.FlippingMVA.savingFlippingVariablesFor2ndMVA import Saving2ndMVAData
 
 from background import get_background_files
 import argparse

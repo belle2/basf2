@@ -13,8 +13,8 @@ bsub -q s -oo train_1mva_0.log basf2 BBbar_FlipAndRefitTest.py  -- -n 50000 --ex
 bsub -q s -oo test_1mva_0.log basf2 BBbar_FlipAndRefitTest.py -- -n 50000 --exp 1003 --ranseed 24 --output_file_mva test_1stmva.root --num 1
 
 #step 2: training 1st mva, please check the variables list and configuration of the fastBDT before running it
-python3 tracking/flipAndRefitMVAs/training_flipping_mvas.py --h
-python3 tracking/flipAndRefitMVAs/training_flipping_mvas.py -train train_1stmva.root -data test_1stmva.root -tree data -mva 1
+python3 tracking/tools/training_flipping_mvas.py --h
+python3 tracking/tools/training_flipping_mvas.py -train train_1stmva.root -data test_1stmva.root -tree data -mva 1
 
 #setp 3: evaluation, also please specify the root path  
 basf2_mva_evaluate.py -id localdb/dbstore_Weightfile_rev_0b43a0.root -tree data -train train.root -data test.root -o validation.root
@@ -26,7 +26,7 @@ bsub -q s -oo train_2ndmva_0.log basf2 BBbar_FlipAndRefitTest.py -- -n 50000 --e
 bsub -q s -oo test_2ndmva_0.log basf2 BBbar_FlipAndRefitTest.py -- -n 50000 --exp 1003 --ranseed 121 --output_file_mva test_2ndmva.root --num 2  --flip_recoTrack True
 
 #step 2: training 
-python3 tracking/flipAndRefitMVAs/training_flipping_mvas.py -train train_2ndmva.root -data test_2ndmva.root -tree data -mva 2
+python3 tracking/tools/training_flipping_mvas.py -train train_2ndmva.root -data test_2ndmva.root -tree data -mva 2
 
 setp 3: evaluation using basf2 script: same way as 1st MVA
 

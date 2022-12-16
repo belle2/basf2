@@ -36,8 +36,7 @@ b2.set_log_level(b2.LogLevel.ERROR)
 inputMdst('None', home + '/B2Kpi_events.root', path=mypath)
 
 # Gearbox: access to database (xml files)
-gearbox = b2.register_module('Gearbox')
-mypath.add_module(gearbox)
+mypath.add_module('Gearbox')
 
 # Geometry
 geometry = b2.register_module('Geometry')
@@ -51,14 +50,11 @@ geometry.param('components', [
 mypath.add_module(geometry)
 
 # Simulation
-simulation = b2.register_module('FullSim')
-mypath.add_module(simulation)
+mypath.add_module('FullSim')
 
 # PXD digitization & clustering
-pxd_digitizer = b2.register_module('PXDDigitizer')
-mypath.add_module(pxd_digitizer)
-pxd_clusterizer = b2.register_module('PXDClusterizer')
-mypath.add_module(pxd_clusterizer)
+mypath.add_module('PXDDigitizer')
+mypath.add_module('PXDClusterizer')
 
 # SVD digitization & clustering
 svd_digitizer = b2.register_module('SVDDigitizer')
@@ -67,22 +63,19 @@ svd_clusterizer = b2.register_module('SVDClusterizer')
 mypath.add_module(svd_clusterizer)
 
 # CDC digitization
-cdcDigitizer = b2.register_module('CDCDigitizer')
-mypath.add_module(cdcDigitizer)
+mypath.add_module('CDCDigitizer')
 
 # tracking reconstruction
 add_tracking_reconstruction(mypath)
 
 # Track extrapolation
-ext = b2.register_module('Ext')
-mypath.add_module(ext)
+mypath.add_module('Ext')
 
 # This creates relations between ExtHits (track points on aerogel plane, from
 # extrapolated CDC tracks) and ARICHAeroHits (MC hits on aerogel plane).
 # It allows to have relevant MC information
 # without storing full MCParticles (which are LARGE) into output root file.
-arichRELATE = b2.register_module('ARICHRelate')
-mypath.add_module(arichRELATE)
+mypath.add_module('ARICHRelate')
 
 # store branches needed for ARICH reconstruction in root file
 output = b2.register_module('RootOutput')
@@ -92,8 +85,7 @@ output.param('branchNames', ['ARICHAeroHits', 'ARICHSimHits', 'ExtHits',
 mypath.add_module(output)
 
 # Show progress of processing
-progress = b2.register_module('Progress')
-mypath.add_module(progress)
+mypath.add_module('Progress')
 
 # Process events
 b2.process(mypath)

@@ -42,8 +42,7 @@ histo.param('histoFileName', 'DQMhistograms.root')  # File to save histograms
 main.add_module(histo)
 
 # Gearbox: access to database (xml files)
-gearbox = b2.register_module('Gearbox')
-main.add_module(gearbox)
+main.add_module('Gearbox')
 
 # Geometry
 geometry = b2.register_module('Geometry')
@@ -51,17 +50,14 @@ geometry.param('components', ['ARICH'])
 main.add_module(geometry)
 
 # ARICH digitizer
-arichDigi = b2.register_module('ARICHDigitizer')
-main.add_module(arichDigi)
+main.add_module('ARICHDigitizer')
 
 # convert ARICHDigits to ARICHHits
-arichHits = b2.register_module('ARICHFillHits')
-main.add_module(arichHits)
+main.add_module('ARICHFillHits')
 
 # ARICH reconstruction
 # calculate PID likelihoods for all tracks
-arichreco = b2.register_module('ARICHReconstructor')
-main.add_module(arichreco)
+main.add_module('ARICHReconstructor')
 
 # ARICH Ntuple
 # create flat ntuple for performance analysis
@@ -71,8 +67,7 @@ main.add_module(arichNtuple)
 
 # ARICH DQM
 # create DQM occupancy plots
-arichdqm = b2.register_module('ARICHDQM')
-main.add_module(arichdqm)
+main.add_module('ARICHDQM')
 
 # Uncomment to store DataStore content to root file
 # output = register_module('RootOutput')
@@ -80,8 +75,7 @@ main.add_module(arichdqm)
 # main.add_module(output)
 
 # Show progress of processing
-progress = b2.register_module('Progress')
-main.add_module(progress)
+main.add_module('Progress')
 
 # Process events
 b2.process(main)

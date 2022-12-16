@@ -72,8 +72,7 @@ main.add_module(histo)
 
 # build geometry if display option
 if int(options.tracking):
-    gearbox = b2.register_module('Gearbox')
-    main.add_module(gearbox)
+    main.add_module('Gearbox')
     geometry = b2.register_module('Geometry')
     geometry.param('useDB', 1)
     main.add_module(geometry)
@@ -97,10 +96,8 @@ if int(options.tracking):
     add_cosmics_reconstruction(main, 'CDC', False)
 
 if int(options.gdl):
-    trggdlUnpacker = b2.register_module("TRGGDLUnpacker")
-    main.add_module(trggdlUnpacker)
-    trggdlsummary = b2.register_module('TRGGDLSummary')
-    main.add_module(trggdlsummary)
+    main.add_module('TRGGDLUnpacker')
+    main.add_module('TRGGDLSummary')
 
 # create simple DQM histograms
 arichHists = b2.register_module('ARICHDQM')
@@ -122,8 +119,7 @@ if(options.output != ''):
         main.add_module(output)
 
 # show progress
-progress = b2.register_module('Progress')
-main.add_module(progress)
+main.add_module('Progress')
 
 if int(options.arichtrk):
     arichHists.if_value('==1', store)

@@ -59,8 +59,7 @@ main.add_module(histo)
 
 # build geometry if display option
 if int(options.display):
-    gearbox = b2.register_module('Gearbox')
-    main.add_module(gearbox)
+    main.add_module('Gearbox')
     geometry = b2.register_module('Geometry')
     geometry.param('components', ['ARICH'])
     main.add_module(geometry)
@@ -71,8 +70,7 @@ unPacker.param('debug', int(options.debug))
 main.add_module(unPacker)
 
 # create ARICHHits from ARICHDigits
-arichHits = b2.register_module('ARICHFillHits')
-main.add_module(arichHits)
+main.add_module('ARICHFillHits')
 
 # create simple DQM histograms
 arichHists = b2.register_module('ARICHDQM')
@@ -97,8 +95,7 @@ output.param('branchNames', branches)
 main.add_module(output)
 
 # show progress
-progress = b2.register_module('Progress')
-main.add_module(progress)
+main.add_module('Progress')
 
 arichHists.if_value('==1', displ)
 

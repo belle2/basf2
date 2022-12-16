@@ -62,8 +62,7 @@ histo.param('histoFileName', 'DQMhistograms.root')  # File to save histograms
 main.add_module(histo)
 
 # Gearbox: access to database (xml files)
-gearbox = b2.register_module('Gearbox')
-main.add_module(gearbox)
+main.add_module('Gearbox')
 
 # Geometry
 # only ARICH and magnetic field
@@ -156,8 +155,7 @@ main.add_module(arichdqm)
 # main.add_module(display)
 
 # Show progress of processing
-progress = b2.register_module('Progress')
-main.add_module(progress)
+main.add_module('Progress')
 
 # Process events
 b2.process(main)

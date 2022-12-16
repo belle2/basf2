@@ -44,8 +44,7 @@ main.add_module(histo)
 
 
 # Load parameters
-gearbox = b2.register_module('Gearbox')
-main.add_module(gearbox)
+main.add_module('Gearbox')
 
 # Create geometry
 geometry = b2.register_module('Geometry')
@@ -100,12 +99,10 @@ arichDIGI.param('BackgroundHits', 0)
 main.add_module(arichDIGI)
 
 # fill ARICHHits from ARICHDigits
-arichHits = b2.register_module('ARICHFillHits')
-main.add_module(arichHits)
+main.add_module('ARICHFillHits')
 
 # add ARICH DQM module
-arichDQM = b2.register_module('ARICHDQM')
-main.add_module(arichDQM)
+main.add_module('ARICHDQM')
 
 # add display module
 # display = register_module('Display')
@@ -122,8 +119,7 @@ main.add_module(arichDQM)
 # main.add_module(output)
 
 # Show progress of processing
-progress = b2.register_module('Progress')
-main.add_module(progress)
+main.add_module('Progress')
 
 # Process events
 b2.process(main)

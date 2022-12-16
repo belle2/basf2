@@ -51,8 +51,7 @@ main.add_module(histo)
 
 # build geometry if display option
 if int(options.display):
-    gearbox = b2.register_module('Gearbox')
-    main.add_module(gearbox)
+    main.add_module('Gearbox')
     geometry = b2.register_module('Geometry')
     geometry.param('components', ['ARICH', 'MagneticField'])
     main.add_module(geometry)
@@ -91,8 +90,7 @@ if int(options.display):
 
 
 # show progress
-progress = b2.register_module('Progress')
-main.add_module(progress)
+main.add_module('Progress')
 
 arichHists.if_value('==1', displ)
 

@@ -73,7 +73,7 @@ ma.reconstructDecay(decayString='K_S0 -> pi+:loose pi-:loose',
 
 # do vertex fit
 # only keeps candidates with conf_level>0.001
-vx.KFit(list_name='K_S0',
+vx.kFit(list_name='K_S0',
         conf_level=0.001,
         path=my_path)
 

@@ -33,7 +33,7 @@ mypath = b2.create_path()
 b2.set_log_level(b2.LogLevel.ERROR)
 
 # load input ROOT file
-inputMdst('None', home + '/B2Kpi_events.root', path=mypath)
+inputMdst(home + '/B2Kpi_events.root', path=mypath)
 
 # Gearbox: access to database (xml files)
 mypath.add_module('Gearbox')

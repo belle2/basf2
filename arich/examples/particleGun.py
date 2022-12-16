@@ -48,10 +48,6 @@ histo = b2.register_module('HistoManager')
 histo.param('histoFileName', 'DQMhistograms.root')  # File to save histograms
 main.add_module(histo)
 
-# Gearbox: access to database (xml files)
-gearbox = b2.register_module('Gearbox')
-main.add_module(gearbox)
-
 # Particle gun: generate multiple tracks
 particlegun = b2.register_module('ParticleGun')
 particlegun.param('pdgCodes', [211, -211, 321, -321])

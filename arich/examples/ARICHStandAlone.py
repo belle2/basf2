@@ -169,14 +169,10 @@ if (options.rootbatch):
 else:
     com = 'root -l ' + options.filename + ' ' + home + '/arich/utility/scripts/plotEfficiency.C'
 
-if not (options.hepr):
-    if not (options.overlap):
-        if not (options.rootoff):
-            os.system(com)
+if not (options.hepr or options.overlap or options.rootoff):
+    os.system(com)
 
 # Retrieve of the histograms from TCanvas produced by plotEfficiency.C
 com = 'root -l -b -q ' + 'ARICHPerformance.root' + ' ' + home + '/arich/utility/scripts/plotEfficiencyConvertTCanvasToHist.C'
-if not (options.hepr):
-    if not (options.overlap):
-        if not (options.rootoff):
-            os.system(com)
+if not (options.hepr or options.overlap or options.rootoff):
+    os.system(com)

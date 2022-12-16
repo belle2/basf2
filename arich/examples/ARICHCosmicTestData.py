@@ -25,8 +25,8 @@ from optparse import OptionParser
 home = os.environ['BELLE2_LOCAL_DIR']
 
 
-b2.reset_database()
-b2.use_central_database("332_COPY-OF_GT_gen_prod_004.11_Master-20171213-230000")
+b2.conditions.override_globaltags()
+b2.conditions.append_globaltag("332_COPY-OF_GT_gen_prod_004.11_Master-20171213-230000")
 
 # parameters
 parser = OptionParser()

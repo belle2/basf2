@@ -28,8 +28,7 @@ b2.set_log_level(b2.LogLevel.INFO)
 
 home = os.environ['BELLE2_LOCAL_DIR']
 # cosmic test local DB folder
-b2.use_local_database(home + "/arich/database/cosmicTest_payloads/cosmicTest_database.txt",
-                      home + "/arich/database/cosmicTest_payloads")
+b2.conditions.append_testing_payloads(home + "/arich/database/cosmicTest_payloads/cosmicTest_database.txt")
 
 # Create path
 main = b2.create_path()

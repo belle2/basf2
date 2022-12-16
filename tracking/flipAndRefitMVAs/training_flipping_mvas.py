@@ -21,9 +21,9 @@ import argparse
 def get_argument_parser() -> argparse.ArgumentParser:
     """ Parses the command line options of the fei and returns the corresponding arguments. """
     parser = argparse.ArgumentParser()
-    parser.add_argument('-train', '--train_datafiles', dest='train_datafiles', type=str, required=False, action='append', nargs='+',
+    parser.add_argument('-train', '--train_datafiles', dest='train_datafiles', type=str, default='train.root',
                         help='Data file containing ROOT TTree used during training')
-    parser.add_argument('-data', '--datafiles', dest='datafiles', type=str, required=True, action='append', nargs='+',
+    parser.add_argument('-data', '--datafiles', dest='datafiles', type=str, required=True, default='test.root',
                         help='Data file containing ROOT TTree with independent test data')
     parser.add_argument('-tree', '--treename', dest='treename', type=str, default='data', help='Treename in data file')
     parser.add_argument('-mva', '--mvaindex', dest='mvaindex', type=str, default='1', help='index of mva to be trainned')
@@ -127,6 +127,7 @@ if __name__ == "__main__":
 
     conditions.testing_payloads = ['localdb/database.txt']
 
+    print(args.train_datafiles)
     training_data = basf2_mva.vector(args.train_datafiles)
     test_data = basf2_mva.vector(args.datafiles)
 

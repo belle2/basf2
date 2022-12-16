@@ -12,7 +12,7 @@
 # It converts arich raw data to arichDigits and arichHits
 # Using "-t 1" option the cdc tracks are also reconstructed and stored into
 # the output root file (along with the arichHits).
-# Using option "-a 1" only the data from events that contain reconstruced track hit
+# Using option "-a 1" only the data from events that contain reconstructed track hit
 # in the is included into the output file.
 # ARICHDQM module is also included, it produces "DQMhistograms.root" with some basic
 # dqm histograms (using all events). You can conveniently display some of them using
@@ -84,7 +84,7 @@ main.add_module(unPacker)
 
 # create ARICHHits from ARICHDigits
 arichHits = b2.register_module('ARICHFillHits')
-# set bitmask for makin hits form digits
+# set bitmask for making hits from digits
 arichHits.param("bitMask", 0xFF)
 main.add_module(arichHits)
 

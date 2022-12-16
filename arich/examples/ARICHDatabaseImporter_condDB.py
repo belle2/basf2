@@ -49,7 +49,7 @@ eventinfo.initialize()
 main = b2.create_path()
 main.add_module(eventinfo)
 
-# create a gearbox module to read read the aerogel data so it can be used
+# create a gearbox module to read the aerogel data so it can be used
 # it needs to open just the aerogel/AerogelData.xml which includes all other xml
 # files in that folder. What we do is that we set the backend to point to that
 # folder so that gearbox can find all files in there.

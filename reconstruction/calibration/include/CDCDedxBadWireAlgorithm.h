@@ -8,16 +8,29 @@
 
 #pragma once
 
+#include <algorithm>
 #include <string>
-#include <vector>
-#include "TH1D.h"
-#include "TH2F.h"
+#include <iostream>
+#include <fstream>
 
+#include <TCanvas.h>
+#include <TH2F.h>
+#include <TH1I.h>
+#include <TMath.h>
+#include <TLine.h>
+#include <TStyle.h>
 #include <TPaveText.h>
+#include <TText.h>
+#include <TLegend.h>
+
+#include <geometry/GeometryManager.h>
+#include <framework/gearbox/GearDir.h>
 #include <framework/database/DBObjPtr.h>
-#include <calibration/CalibrationAlgorithm.h>
+#include <cdc/geometry/CDCGeometryPar.h>
+#include <cdc/geometry/CDCGeometryParConstants.h>
 #include <reconstruction/dbobjects/CDCDedxBadWires.h>
 #include <reconstruction/dbobjects/CDCDedxWireGain.h>
+#include <calibration/CalibrationAlgorithm.h>
 
 namespace Belle2 {
 
@@ -40,92 +53,131 @@ namespace Belle2 {
     virtual ~CDCDedxBadWireAlgorithm() {}
 
     /**
-    * funtion to set dedx histogram param
+    * function to enable plotting
     */
-    void setDedxPars(int nbin, double min, double max)
-    {
-      fdedxBin = nbin; fdedxMin = min; fdedxMax = max;
-    }
+    void setMonitoringPlots(bool value = false) {isMakePlots = value;}
 
     /**
-    * funtion to set adc histogram param
+    * funtion to set high dedx fraction thershold
     */
-    void setADCPars(int nbin, double min, double max)
-    {
-      fadcBin = nbin; fadcMin = min; fadcMax = max;
-    }
+    void setHighFracThers(double value) {m_fracThers = value;}
 
     /**
-    * funtion to set thershold for high dedx fraction (%)
+    * funtion to set RMS thershold
     */
-    void setHighFracThers(double value) {ffracThers = value;}
+    void setRMSThers(double value) {m_rmsThers = value;}
 
     /**
-    * funtion to set thershold for high dedx rms
+    * funtion to set Mean thershold
     */
-    void setRMSThers(double value) {frmsThers = value;}
+    void setMeanThers(double value) {m_meanThers = value;}
 
     /**
-    * funtion to set thershold for high dedx mean
-    */
-    void setMeanThers(double value) {fmeanThers = value;}
-
-    /**
-     * function to set flag active to use adc
+     * function to choose adc or dedx as variable
      */
-    void setADC(bool value = false) {isadc = value;}
+    void setADC(bool value = false)
+    {
+      isADC = value;
+      if (isADC) m_varMax = 1000.0;
+      else m_varMax = 7.0;
+    }
 
     /**
-    * funtion to get info about current exp and run
+    * function to set adc/dedx parameters
+    */
+    void setHistPars(int nbin, double min, double max)
+    {
+      m_varBins = nbin;
+      m_varMin = min;
+      m_varMax = max;
+    }
+
+    /**
+    * funtion to get extract calibration run/exp
     */
     void getExpRunInfo();
 
     /**
-     * function to plot bad wire status (then and now)
-     */
-    void createBadWireMap(int ndead[2], int nbad[2]);
+      * function to draw per wire plots
+      */
+    void plotWireDist(std::string badfile, std::map<int, std::vector<double>> vhitvar, double amean, double arms);
 
     /**
-     * function to plot wires in hist with input file
+     * function to print canvas
      */
-    TH2F* getHistoPattern(std::string badFileName, std::string suffix);
+    void printCanvas(TList* list, TList* hflist, Color_t color, double amean, double arms);
 
     /**
-     * function to return various CDC indexing for given wire                                                                                                                                                                                     */
+     * function to plot wire status map (all, bad and dead)
+     */
+    void plotBadWireMap(std::string& badfile, std::string& deadfile);
+
+    /**
+     * function to get wire map with input file (all, good and dead)
+     */
+    TH2F* getHistoPattern(const std::string& infile, const std::string& suffix, int& total);
+
+    /**
+     * function to return various CDC indexing for a given wire
+     */
     double getIndexVal(int iWire, std::string what);
 
     /**
-     * function to change text styles                                                                                                                                                                                    */
-    void setTextCosmetics(TPaveText*& pt);
+     * function to plot the QA (decision) parameters
+     */
+    void plotQaPars(std::map<int, std::vector<double>> qapars, double amean, double arms);
+
+    /**
+     * function to draw the stats
+     */
+    void plotEventStats();
+
+    /**
+     * function to change text styles
+     */
+    void setTextCosmetics(TPaveText* pt, double size)
+    {
+      pt->SetTextAlign(11);
+      pt->SetFillStyle(3001);
+      pt->SetLineColor(2);
+      pt->SetTextFont(82);
+      pt->SetTextSize(size);
+    }
+
+    /**
+     * function to change histogram styles
+     */
+    void setHistCosmetics(TH2F* hist, Color_t color)
+    {
+      hist->SetMarkerStyle(20);
+      hist->SetMarkerSize(0.3);
+      hist->SetMarkerColor(color);
+      hist->SetFillColor(color);
+      hist->SetStats(0);
+    }
 
   protected:
 
     /**
-     * badwire algorithm
+     * cdcdedx badwire algorithm
      */
     virtual EResult calibrate() override;
 
   private:
 
-    const unsigned int nwireCDC; /**< number of wires in CDC */
+    unsigned int c_nwireCDC; /**< number of wires in CDC */
 
-    int fdedxBin; /**< number of bins for wirededx */
-    double fdedxMin; /**< min dedx range for wirededx */
-    double fdedxMax; /**< max dedx range for wirededx */
-
-    int fadcBin; /**< number of bins for adc */
-    double fadcMin; /**< min dedx range for adc */
-    double fadcMax; /**< max dedx range for adc */
-
-    double fmeanThers; /**< min hist mean accepted for good wire */
-    double frmsThers; /**< min hist rms accepted for good wire */
-    double ffracThers; /**< min high-frac accepted for good wire */
-
-    bool isadc; /**< Use adc for calibration*/
-    std::string saddSfx; /**< suffix string to seperate plots */
-
-    DBObjPtr<CDCDedxBadWires> m_DBBadWires; /**< Bad wire DB object */
-    DBObjPtr<CDCDedxWireGain> m_DBWireGains; /**< Bad wire DB object */
-
+    bool isMakePlots; /**< produce plots for status */
+    bool isADC; /**< Use adc if(true) else dedx for calibration*/
+    std::string m_varName; /**< string to set var name (adc or dedx) */
+    int m_varBins; /**< number of bins for input variable */
+    double m_varMin; /**< min range for input variable */
+    double m_varMax; /**< max range for input variable */
+    double m_meanThers; /**< mean thershold accepted for good wire */
+    double m_rmsThers; /**< rms thershold accepted for good wire */
+    double m_fracThers; /**< high-frac thershold accepted for good wire */
+    std::string m_suffix; /**< suffix string for naming plots */
+    DBObjPtr<CDCDedxBadWires> m_DBBadWires; /**< Badwire DB object */
+    DBObjPtr<CDCDedxWireGain> m_DBWireGains; /**< Wiregain DB object */
   };
 } // namespace Belle2

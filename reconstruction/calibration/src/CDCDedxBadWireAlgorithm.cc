@@ -6,38 +6,27 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <algorithm>
-#include <iostream>
-#include <fstream>
-#include <TH1I.h>
-#include <TCanvas.h>
-#include <TMath.h>
-#include <TLine.h>
-#include <TStyle.h>
-#include <TPaveText.h>
-#include <TText.h>
-#include <TLegend.h>
 #include <reconstruction/calibration/CDCDedxBadWireAlgorithm.h>
 
 using namespace Belle2;
+using namespace CDC;
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 CDCDedxBadWireAlgorithm::CDCDedxBadWireAlgorithm() :
   CalibrationAlgorithm("CDCDedxElectronCollector"),
-  nwireCDC(14336),
-  fdedxBin(140),
-  fdedxMin(0.0),
-  fdedxMax(7.0),
-  fadcBin(100),
-  fadcMin(0.0),
-  fadcMax(1000),
-  fmeanThers(1.0),
-  frmsThers(1.0),
-  ffracThers(1.0),
-  isadc(false),
-  saddSfx("")
+  c_nwireCDC(c_nSenseWires),
+  isMakePlots(true),
+  isADC(false),
+  m_varName("hitdedx"),
+  m_varBins(100),
+  m_varMin(0.0),
+  m_varMax(7.0),
+  m_meanThers(1.0),
+  m_rmsThers(1.0),
+  m_fracThers(1.0),
+  m_suffix("")
 {
   // Set module properties
   setDescription("A calibration algorithm for CDC dE/dx bad wires");
@@ -50,313 +39,126 @@ CalibrationAlgorithm::EResult CDCDedxBadWireAlgorithm::calibrate()
 {
 
   getExpRunInfo();
+
+  //old wg for book-keeping previous bad+dead
   if (!m_DBBadWires.isValid() || !m_DBWireGains.isValid())
-    B2FATAL("There is no valid payload for BadWires and/or Wirgain");
+    B2FATAL("There is no valid payload for BadWire and/or Wirgain");
 
   // Get data objects
   auto ttree = getObjectPtr<TTree>("tree");
   if (ttree->GetEntries() < 1000)return c_NotEnoughData;
 
   std::vector<int>* wire = 0;
-  std::vector<double>* hitvar = 0;
-
   ttree->SetBranchAddress("wire", &wire);
-  if (isadc)ttree->SetBranchAddress("adccorr", &hitvar);
+
+  std::vector<double>* hitvar = 0;
+  if (isADC)ttree->SetBranchAddress("adccorr", &hitvar);
   else ttree->SetBranchAddress("dedxhit", &hitvar);
 
-  std::string svar;
-  int nbins;
-  double fmin = 0.0, fmax = 0.0;
-  if (isadc) {
-    svar = "adccount";
-    nbins = fadcBin;
-    fmin = fadcMin;
-    fmax = fadcMax;
-  } else {
-    svar = "hitdedx";
-    nbins = fdedxBin;
-    fmin = fdedxMin;
-    fmax = fdedxMax;
-  }
+  if (isADC)m_varName = "hitadc";
+  m_suffix = Form("%s_%s", m_varName.data(), m_suffix.data());
 
-  std::vector<std::vector<double>> vhitvar(nwireCDC, std::vector<double>());
-  TH1D* hvarall = new TH1D("hvarall", "", nbins, fmin, fmax);
-  hvarall->SetTitle(Form("dist %s; %s; %s", svar.data(), svar.data(), "entries"));
+  TH1D hvarall(Form("hvarall_%s", m_suffix.data()), "", m_varBins, m_varMin, m_varMax);
+  hvarall.SetTitle(Form("dist %s; %s; %s", m_suffix.data(), m_varName.data(), "entries"));
 
-  // hit dedx or adc vector for each wire
+  std::map<int, std::vector<double>> vhitvar;
+
   for (int i = 0; i < ttree->GetEntries(); ++i) {
     ttree->GetEvent(i);
     for (unsigned int ih = 0; ih < wire->size(); ++ih) {
-      int iwire = wire->at(ih);
-      double var = hitvar->at(ih);
-      hvarall->Fill(var);
-      vhitvar[iwire].push_back(var);
+      double ivalue = hitvar->at(ih);
+      vhitvar[wire->at(ih)].push_back(ivalue);
+      hvarall.Fill(ivalue);
     }
   }
 
-  //check statistics of dead wire
+  double amean = hvarall.GetMean();
+  double arms = hvarall.GetRMS();
+
+  //return if >5% bad wire or null histogram
   int minstat = 0;
-  for (unsigned int jw = 0; jw < nwireCDC; ++jw) {
-    if (vhitvar[jw].size() == 0) minstat++;
-  }
+  for (unsigned int jw = 0; jw < c_nwireCDC; ++jw)
+    if (vhitvar[jw].size() <= 100) minstat++;
+  if (minstat > 700 || amean == 0 || arms == 0)  return c_NotEnoughData;
 
-  double deadfrac = 100.0 * minstat / nwireCDC;
-  if (deadfrac > 5.0) {
-    B2INFO("CDCDedxBadWire: too many dead wires? " << deadfrac << "%");
-    return c_NotEnoughData;
-  }
+  std::ofstream ofile_bad, ofile_dead;
+  std::string badfile = Form("cdcdedx_bdcal_goodlist_%s.txt", m_suffix.data());
+  ofile_bad.open(badfile);
 
-  //starting calibration at this point
-  saddSfx = Form("%s_%s", svar.data(), saddSfx.data());
+  std::string deadfile = Form("cdcdedx_bdcal_badlist_%s.txt", m_suffix.data());
+  ofile_dead.open(deadfile);
 
-  TH1D* hmean = new TH1D(Form("hmean_%s", saddSfx.data()), "", nwireCDC, -0.5, 14335.5);
-  hmean->SetTitle(Form("mean vs wires (%s); wire ; <mean>", saddSfx.data()));
-
-  TH1D* hrms = new TH1D(Form("hrms_%s", saddSfx.data()), "", nwireCDC, -0.5, 14335.5);
-  hrms->SetTitle(Form("rms vs wires (%s); wire ; RMS", saddSfx.data()));
-
-  TH1D* hfrac = new TH1D(Form("hfrac_%s", saddSfx.data()), "", nwireCDC, -0.5, 14335.5);
-  hfrac->SetTitle(Form("high fraction vs wires (%s); wire; fraction", saddSfx.data()));
-
-  double avgmean = hvarall->GetMean();
-  double avgrms = hvarall->GetRMS();
-
+  std::map<int, std::vector<double>> qapars;
   std::vector<double> m_vdefectwires;
 
-  TCanvas* cgtmp = new TCanvas(Form("cgood_%s", saddSfx.data()), "", 1200, 1200);
-  cgtmp->Divide(4, 4);
-  cgtmp->SetBatch(kTRUE);
-  std::stringstream psgood;
-  psgood << Form("cdcdedx_bdcal_gwiredist_%s.pdf[", saddSfx.data());
-  cgtmp->Print(psgood.str().c_str());
-  psgood.str("");
-  psgood << Form("cdcdedx_bdcal_gwiredist_%s.pdf", saddSfx.data());
-
-  TCanvas* cbtmp = new TCanvas(Form("cbad_%s", saddSfx.data()), "", 1200, 1200);
-  std::stringstream psdefect;
-  cbtmp->Divide(4, 4);
-  cbtmp->SetBatch(kTRUE);
-  psdefect << Form("cdcdedx_bdcal_bwiredist_%s.pdf[", saddSfx.data());
-  cbtmp->Print(psdefect.str().c_str());
-  psdefect.str("");
-  psdefect << Form("cdcdedx_bdcal_bwiredist_%s.pdf", saddSfx.data());
-
-  std::ofstream ofile_newbad, ofile_newdead;
-  ofile_newbad.open(Form("cdcdedx_bdcal_bwirelist_%s.txt", saddSfx.data()));
-  ofile_newdead.open(Form("cdcdedx_bdcal_dwirelist_%s.txt", saddSfx.data()));
-
-  int fentThres = 50;
-  int cbadwire[2] = {0}, cdeadwire[2] = {0}, cgoodwire[2] = {0};
-
-  for (unsigned int jw = 0; jw < nwireCDC; ++jw) {
-
-    TH1D* hvar = new TH1D(Form("%s_wire%d", saddSfx.data(), jw), "", nbins, fmin, fmax);
-    hvar->SetTitle(Form("%s, wire = %d; %s; entries", saddSfx.data(), jw, svar.data()));
-
-    TH1D* hvarhf = new TH1D(Form("hf%s_wire%d", saddSfx.data(), jw), "", 100, fmin, fmax);
-    hvarhf->SetTitle(Form("%s, wire = %d; %s; entries", saddSfx.data(), jw, svar.data()));
-
-    int tsum = 0, nsum = 0;
-
+  for (unsigned int jw = 0; jw < c_nwireCDC; ++jw) {
+    int ncount = 0, tcount = 0;
+    double nmean = 0.;
     for (unsigned int jh = 0; jh < vhitvar[jw].size(); ++jh) {
-      double ihvar = vhitvar[jw][jh];
-      if (ihvar < fmax) {
-        nsum++;
-        hvar->Fill(ihvar);
-      } else {
-        tsum++;
-        if (ihvar < 70) hvarhf->Fill(ihvar / 10.);
-      }
+      double jvalue = vhitvar[jw][jh];
+      if (jvalue < m_varMax) {
+        ncount++;
+        nmean += jvalue;
+      } else tcount++;
     }
 
-    double fmean = 0., fmeanerr = 0.;
-    double frms = 0., frmserr = 0.;
-
-    if (nsum > 0) {
-      fmean = hvar->GetMean();
-      fmeanerr = hvar->GetMeanError();
-      frms = hvar->GetRMS();
-      frmserr = hvar->GetRMSError();
-    }
-
-    hmean->SetBinContent(jw + 1, fmean);
-    hmean->SetBinError(jw + 1, fmeanerr);
-
-    hrms->SetBinContent(jw + 1, frms);
-    hrms->SetBinError(jw + 1, frmserr);
-
-    double ffrac = 0.0;
-    if (nsum > 0 && tsum > 0)ffrac = (1.0 * tsum) / (tsum + nsum);
-    hfrac->SetBinContent(jw + 1, ffrac);
-    hfrac->SetBinError(jw + 1, 0.0001);
-
-    double oldwg = m_DBWireGains->getWireGain(jw);
-    bool iwdefect = false;
-
-    if ((nsum < fentThres) || (abs(fmean - avgmean) / avgmean > fmeanThers) || (abs(frms - avgrms) / avgrms > frmsThers)
-        || (ffrac > ffracThers)) {
-      iwdefect = true;
-      if (nsum != 0) {
-        cbadwire[0]++;
-        if (oldwg == 0)cbadwire[1]++;
-      } else {
-        cdeadwire[0]++;
-        if (oldwg == 0)cdeadwire[1]++;
-      }
+    bool badwire = false;
+    if (ncount < 100) {
+      qapars[0].push_back(0);
+      qapars[1].push_back(0);
+      qapars[2].push_back(0);
+      badwire = true; //partial dead
     } else {
-      cgoodwire[0]++;
+      nmean = nmean / ncount;
+      if (std::abs(nmean - amean) / amean > m_meanThers)badwire = true;
+      double nrms = 0.;
+      for (unsigned int kh = 0; kh < vhitvar[jw].size(); ++kh) {
+        double kvalue = vhitvar[jw][kh];
+        if (kvalue < m_varMax)  nrms += std::pow(kvalue - nmean, 2);
+      }
+
+      nrms = sqrt(nrms / ncount);
+      if (std::abs(nrms - arms) / arms > m_rmsThers)badwire = true;
+
+      double badfrac = 0.0;
+      if (tcount > 0)badfrac = (1.0 * tcount) / (tcount + ncount);
+      if (badfrac > m_fracThers)badwire = true;
+
+      qapars[0].push_back(nmean);
+      qapars[1].push_back(nrms);
+      qapars[2].push_back(badfrac);
     }
 
-    TPaveText* pinfo = new TPaveText(0.35, 0.63, 0.83, 0.89, "NBNDC");
-    setTextCosmetics(pinfo);
-    pinfo->AddText(Form("#mu: %0.2f(%0.2f#pm%0.2f)", fmean, avgmean, fmeanThers * avgmean));
-    pinfo->AddText(Form("#sigma: %0.2f(%0.2f#pm%0.2f)", frms, avgrms, frmsThers * avgrms));
-    pinfo->AddText(Form("fac: %0.2f(%0.2f)", ffrac, ffracThers));
-    pinfo->AddText(Form("N: %d", nsum));
-
-    if (iwdefect) {
+    if (badwire) {
       m_vdefectwires.push_back(0.0);
-      if (nsum != 0) {
-        cbtmp->cd((cbadwire[0] - 1) % 16 + 1);
-        hvar->SetStats(false);
-        hvar->SetFillColor(kYellow - 9);
-        if (oldwg == 0) hvar->SetFillColor(kRed);
-        hvarhf->SetFillColor(kGray);
-        if (hvar->GetMaximum() < hvarhf->GetMaximum()) hvar->SetMaximum(hvarhf->GetMaximum());
-        pinfo->AddText(Form("hf N: %0.1f", hvarhf->Integral()));
-        hvar->DrawCopy("hist");
-        hvarhf->DrawCopy("hist same");
-        pinfo->Draw("same");
-        cbtmp->Update();
-        gPad->Update();
-        if ((cbadwire[0] % 16 == 0))  {
-          cbtmp->Print(psdefect.str().c_str());
-          cbtmp->Clear("D");
-        }
-        ofile_newbad <<  jw << std::endl;
-      } else ofile_newdead <<  jw << std::endl;
-    } else {
-      cgtmp->cd((cgoodwire[0] - 1) % 16 + 1);
-      hvar->SetStats(false);
-      hvar->SetFillColor(kGreen + 1);
-      if (oldwg == 0) hvar->SetFillColor(kRed);
-      hvar->DrawCopy("hist");
-      pinfo->Draw("same");
-      cgtmp->Update();
-      gPad->Update();
-      if ((cgoodwire[0] % 16 == 0))  {
-        cgtmp->Print(psgood.str().c_str());
-        cgtmp->Clear("D");
-      }
-      m_vdefectwires.push_back(1.0);
-    }
-    if (jw == nwireCDC - 1) {
-      cbtmp->Print(psdefect.str().c_str());
-      cgtmp->Print(psgood.str().c_str());
-    }
-    delete hvar;
-    delete hvarhf;
+      if (ncount == 0)ofile_dead <<  jw << std::endl;
+      else ofile_bad <<  jw << std::endl;
+    } else m_vdefectwires.push_back(1.0);
   }
 
-  ofile_newbad.close();
-  ofile_newdead.close();
+  ofile_bad.close();
+  ofile_dead.close();
 
-  //1 for variable distribution
-  psdefect.str("");
-  psdefect << Form("cdcdedx_bdcal_bwiredist_%s.pdf]", saddSfx.data());
-  cbtmp->Print(psdefect.str().c_str());
-  delete cbtmp;
+  if (isMakePlots) {
+    //1. plot bad and good wire plots.
+    plotWireDist(badfile, vhitvar, amean, arms);
 
-  psgood.str("");
-  psgood << Form("cdcdedx_bdcal_gwiredist_%s.pdf]", saddSfx.data());
-  cgtmp->Print(psgood.str().c_str());
-  delete cgtmp;
+    //2. plots wire status map
+    plotBadWireMap(badfile, deadfile);
 
-  //2 for qa parameters
-  TCanvas* c_pars = new TCanvas("c_pars", "", 600, 1200);
-  c_pars->Divide(1, 3);
+    //3. plot control parameters histograms
+    plotQaPars(qapars, amean, arms);
 
-  c_pars->cd(1);
-  hmean->SetTitle(Form("%s, avg: %0.03f", hmean->GetTitle(), avgmean));
-  hmean->SetStats(0);
-  hmean->Draw();
-  TLine* lmeanmin = new TLine(-0.5, avgmean * (1 - fmeanThers), 14335.5, avgmean * (1 - fmeanThers));
-  lmeanmin->SetLineColor(kRed);
-  lmeanmin->Draw("same");
-  TLine* lmeanmax = new TLine(-0.5, avgmean * (1 + fmeanThers), 14335.5, avgmean * (1 + fmeanThers));
-  lmeanmax->SetLineColor(kRed);
-  lmeanmax->Draw("same");
-
-  c_pars->cd(2);
-  hrms->SetTitle(Form("%s, avg: %0.03f", hrms->GetTitle(), avgrms));
-  hrms->SetStats(0);
-  hrms->Draw();
-  TLine* lrmsmin = new TLine(-0.5, avgrms * (1 - frmsThers), 14335.5, avgrms * (1 - frmsThers));
-  lrmsmin->SetLineColor(kRed);
-  lrmsmin->Draw("same");
-  TLine* lrmsmax = new TLine(-0.5, avgrms * (1 + frmsThers), 14335.5, avgrms * (1 + frmsThers));
-  lrmsmax->SetLineColor(kRed);
-  lrmsmax->Draw("same");
-
-  c_pars->cd(3);
-  gPad->SetGridy();
-  hfrac->SetStats(0);
-  hfrac->Draw();
-  TLine* lfrac = new TLine(-0.5, ffracThers, 14335.5, ffracThers);
-  lfrac->SetLineColor(kRed);
-  lfrac->Draw("same");
-
-  c_pars->Print(Form("cdcdedx_bdcal_qapars_%s.pdf", saddSfx.data()));
-  c_pars->Print(Form("cdcdedx_bdcal_qapars_%s.root", saddSfx.data()));
-  delete c_pars;
-
-  //3 for stats
-  TCanvas* cstats = new TCanvas("cstats", "cstats", 1000, 500);
-  cstats->SetBatch(kTRUE);
-  cstats->Divide(2, 1);
-
-  cstats->cd(1);
-  auto hestats = getObjectPtr<TH1I>("hestats");
-  if (hestats) {
-    hestats->SetName(Form("htstats_%s", saddSfx.data()));
-    hestats->SetStats(0);
-    hestats->DrawCopy("");
+    //4. plot statistics related histograms
+    plotEventStats();
   }
 
-  cstats->cd(2);
-  auto htstats = getObjectPtr<TH1I>("htstats");
-  if (htstats) {
-    hestats->SetName(Form("htstats_%s", saddSfx.data()));
-    htstats->DrawCopy("");
-    hestats->SetStats(0);
-  }
-
-  cstats->Print(Form("cdcdedx_bdcal_qastats_%s.pdf", saddSfx.data()));
-  delete cstats;
-
-  //create bad/dead wire map using files created above
-  createBadWireMap(cdeadwire, cbadwire);
-
-  const unsigned newtotalwire = cdeadwire[0] + cbadwire[0] + cgoodwire[0];
-  if (newtotalwire != nwireCDC) {
-    B2INFO("CDCDedxBadWires: wire counting is wrong: new total " << newtotalwire << " wires");
-    return c_NotEnoughData;
-  }
-
-  if (cdeadwire[0] + cbadwire[0] > 1000) {
-    B2INFO("CDCDedxBadWires: too many bad+dead wires: new total " << cdeadwire[0] + cbadwire[0] << " wires");
-    return c_NotEnoughData;
-  }
-
-  B2INFO("dE/dx Badwire calibration done: " << m_vdefectwires.size() << " wires");
+  // Save payloads
+  B2INFO("dE/dx Badwire Calibration done: " << m_vdefectwires.size() << " wires");
   CDCDedxBadWires* c_badwires = new CDCDedxBadWires(m_vdefectwires);
   saveCalibration(c_badwires, "CDCDedxBadWires");
 
-  delete hvarall;
-  delete hmean;
-  delete hrms;
-  delete hfrac;
-  saddSfx.clear();
+  m_suffix.clear();
 
   return c_OK;
 }
@@ -380,81 +182,192 @@ void CDCDedxBadWireAlgorithm::getExpRunInfo()
 
   updateDBObjPtrs(1, rstart, estart);
 
-  if (saddSfx.length() > 0)saddSfx = Form("%s_e%d_r%dr%d", saddSfx.data(), estart, rstart, rend);
-  else  saddSfx = Form("e%d_r%dr%d", estart, rstart, rend);
+  if (m_suffix.length() > 0)m_suffix = Form("%s_e%d_r%dr%d", m_suffix.data(), estart, rstart, rend);
+  else  m_suffix = Form("e%d_r%dr%d", estart, rstart, rend);
+}
 
+
+//------------------------------------
+void CDCDedxBadWireAlgorithm::plotWireDist(std::string badfile, std::map<int, std::vector<double>> vhitvar, double amean,
+                                           double arms)
+{
+
+  TList* bdlist = new TList();
+  bdlist->SetName("badwires");
+
+  TList* goodlist = new TList();
+  goodlist->SetName("goodwires");
+
+  TList* hflist = new TList();
+  hflist->SetName("highfracwires");
+
+  for (unsigned int jw = 0; jw < c_nwireCDC; ++jw) {
+
+    TH1D* hvar = new TH1D(Form("%s_wire%d", m_suffix.data(), jw), "", m_varBins, m_varMin, m_varMax);
+    hvar->SetTitle(Form("%s, wire = %d; %s; entries", m_suffix.data(), jw, m_varName.data()));
+
+    TH1D* hvarhf = new TH1D(Form("hf%s_wire%d", m_suffix.data(), jw), "", m_varBins, m_varMin, m_varMax);
+    hvarhf->SetTitle(Form("%s, wire = %d; %s; entries", m_suffix.data(), jw, m_varName.data()));
+
+    for (unsigned int jh = 0; jh < vhitvar[jw].size(); ++jh) {
+      double jvalue = vhitvar[jw][jh];
+      if (jvalue < m_varMax) hvar->Fill(jvalue);
+      else if (jvalue < m_varMax * 10.) hvarhf->Fill(jvalue / 10.);
+    }
+
+    bool isbad = false;
+    std::ifstream infile;
+    infile.open(Form("%s", badfile.data()));
+    if (infile) {
+      unsigned int bwires;
+      while (infile >> bwires)
+        if (jw == bwires) {
+          isbad = true;
+          break;
+        }
+    }
+
+    double oldwg = m_DBWireGains->getWireGain(jw);
+    if (oldwg == 0) {
+      hvar->SetLineWidth(2);
+      hvar->SetLineColor(kRed);
+    }
+
+    if (isbad) {
+      bdlist->Add(hvar);
+      hflist->Add(hvarhf);
+    } else {
+      if (hvar->Integral() > 100)goodlist->Add(hvar);
+    }
+  }
+
+  printCanvas(bdlist, hflist, kYellow - 9, amean, arms);
+  printCanvas(goodlist, hflist, kGreen, amean, arms);
+
+  delete bdlist;
+  delete goodlist;
+  delete hflist;
 }
 
 //------------------------------------
-void CDCDedxBadWireAlgorithm::createBadWireMap(int ndead[2], int nbad[2])
+void CDCDedxBadWireAlgorithm::printCanvas(TList* list, TList* hflist, Color_t color, double amean, double arms)
 {
 
-  TCanvas* cmap = new TCanvas(Form("cmap_%s", saddSfx.data()), "CDC dE/dx bad wire status", 800, 800);
-  TH2F* hxyAll = getHistoPattern("all", "allwires");
-  hxyAll->SetTitle(Form("wire status map (%s)", saddSfx.data()));
-  hxyAll->SetMarkerStyle(20);
-  hxyAll->SetMarkerSize(0.2);
-  hxyAll->SetMarkerColor(kGray);
-  hxyAll->SetStats(0);
+  std::string listname = list->GetName();
+  std::string sfx = Form("%s_%s", listname.data(), m_suffix.data());
+
+  TCanvas* ctmp = new TCanvas(Form("cdcdedx_%s", sfx.data()), "", 1200, 1200);
+  ctmp->Divide(4, 4);
+  ctmp->SetBatch(kTRUE);
+
+  std::stringstream psname;
+  psname << Form("cdcdedx_bdcal_%s.pdf[", sfx.data());
+  ctmp->Print(psname.str().c_str());
+  psname.str("");
+  psname << Form("cdcdedx_bdcal_%s.pdf", sfx.data());
+
+  for (int ih = 0; ih < list->GetSize(); ih++) {
+
+    TH1D* hist = (TH1D*)list->At(ih);
+
+    TPaveText* pinfo = new TPaveText(0.35, 0.63, 0.83, 0.89, "NBNDC");
+    pinfo->AddText(Form("#mu: %0.2f(%0.2f#pm%0.2f)", hist->GetMean(), amean, m_meanThers * amean));
+    pinfo->AddText(Form("#sigma: %0.2f(%0.2f#pm%0.2f)", hist->GetRMS(), arms, m_rmsThers * arms));
+    pinfo->AddText(Form("N: %0.00f", hist->Integral()));
+    setTextCosmetics(pinfo, 0.04258064);
+
+    ctmp->cd(ih % 16 + 1);
+    hist->SetFillColor(color);
+    hist->SetStats(0);
+    hist->Draw();
+    pinfo->Draw("same");
+
+    if (listname == "badwires") {
+      TH1D* histhf = (TH1D*)hflist->At(ih);
+      if (hist->GetMaximum() < histhf->GetMaximum()) hist->SetMaximum(histhf->GetMaximum() * 1.05);
+      histhf->SetFillColor(kGray);
+      histhf->SetStats(0);
+      histhf->Draw("same");
+    }
+
+    if (((ih + 1) % 16 == 0) || ih == (list->GetSize() - 1))  {
+      ctmp->Print(psname.str().c_str());
+      ctmp->Clear("D");
+    }
+  }
+
+  psname.str("");
+  psname << Form("cdcdedx_bdcal_%s.pdf]", sfx.data());
+  ctmp->Print(psname.str().c_str());
+  delete ctmp;
+}
+
+
+//------------------------------------
+void CDCDedxBadWireAlgorithm::plotBadWireMap(std::string& badfile, std::string& deadfile)
+{
+
+  TCanvas* cmap = new TCanvas(Form("cmap_%s", m_suffix.data()), "", 800, 800);
+  cmap->SetTitle("CDC dE/dx bad wire status");
+
+  int total = 0;
+  TH2F* hxyAll = getHistoPattern("all", "allwires", total);
+  hxyAll->SetTitle(Form("wire status map (%s)", m_suffix.data()));
+  setHistCosmetics(hxyAll, kGray);
   hxyAll->Draw();
 
-  TH2F* hxyBad = getHistoPattern(Form("cdcdedx_bdcal_bwirelist_%s.txt", saddSfx.data()), "bad");
+  int nbad = 0.0;
+  TH2F* hxyBad = getHistoPattern(badfile, "bad", nbad);
   if (hxyBad) {
-    hxyBad->SetTitle("");
-    hxyBad->SetMarkerStyle(20);
-    hxyBad->SetMarkerSize(0.3);
-    hxyBad->SetMarkerColor(kRed);
-    hxyBad->SetStats(0);
+    setHistCosmetics(hxyBad, kRed);
     hxyBad->Draw("same");
   }
 
-  TH2F* hxyDead = getHistoPattern(Form("cdcdedx_bdcal_dwirelist_%s.txt", saddSfx.data()), "dead");
+  int ndead = 0.0;
+  TH2F* hxyDead = getHistoPattern(deadfile, "dead", ndead);
   if (hxyDead) {
-    hxyDead->SetTitle("");
-    hxyDead->SetMarkerStyle(20);
-    hxyDead->SetMarkerSize(0.3);
-    hxyDead->SetMarkerColor(kBlack);
-    hxyDead->SetStats(0);
+    setHistCosmetics(hxyDead, kBlack);
     hxyDead->Draw("same");
   }
 
-  auto legend = new TLegend(0.68, 0.80, 0.90, 0.92);
-  legend->SetBorderSize(0);
-  legend->SetLineWidth(3);
-  legend->SetHeader(Form("total defective: %d (~%0.02f%%)", ndead[0] + nbad[0], 100.*(ndead[0] + nbad[0]) / 14336.0));
-  legend->AddEntry(hxyBad, Form("bad #rightarrow new:%d, old:%d", nbad[0], nbad[1]), "p");
-  legend->AddEntry(hxyDead, Form("dead #rightarrow new:%d, old:%d", ndead[0], ndead[1]), "p");
-  legend->Draw();
+  int ndefect = nbad + ndead;
+  auto leg = new TLegend(0.68, 0.80, 0.90, 0.92);
+  leg->SetBorderSize(0);
+  leg->SetLineWidth(3);
+  leg->SetHeader(Form("total defective: %d (~%0.02f%%)", ndefect, 100.*(ndefect) / c_nwireCDC));
+  leg->AddEntry(hxyBad, Form("bad #rightarrow %d", nbad), "p");
+  leg->AddEntry(hxyDead, Form("dead #rightarrow %d", ndead), "p");
+  leg->Draw();
 
   gStyle->SetLegendTextSize(0.025);
-  TPaveText* pt = new TPaveText(-0.30993, -1.470968, -0.3102707, -1.304516, "br");
-  pt->SetFillColor(0);
-  pt->SetFillStyle(3001);
-  pt->SetLineColor(2);
-  pt->SetTextFont(82);
-  pt->SetTextSize(0.02258064);
-  TText* t1 = pt->AddText("CDC-wire map: counter-clockwise and start from +x");
-  t1->SetTextColor(kGray + 1);
+  TPaveText* pt = new TPaveText(-0.30, -1.47, -0.31, -1.30, "br");
+  setTextCosmetics(pt, 0.02258064);
+
+  TText* text = pt->AddText("CDC-wire map: counter-clockwise and start from +x");
+  text->SetTextColor(kGray + 1);
   pt->Draw("same");
 
-  cmap->SaveAs(Form("cdcdedx_bdcal_wiremap_%s.pdf", saddSfx.data()));
+  cmap->SaveAs(Form("cdcdedx_bdcal_wiremap_%s.pdf", m_suffix.data()));
   delete cmap;
 }
 
 //------------------------------------
-TH2F* CDCDedxBadWireAlgorithm::getHistoPattern(std::string badFileName, std::string suffix)
+TH2F* CDCDedxBadWireAlgorithm::getHistoPattern(const std::string& infile, const std::string& suffix, int& total)
 {
 
   int wire, nwire, twire;
   double radius, phi, x, y;
 
-  std::ifstream infile;
-  infile.open(Form("%s", badFileName.data()));
+  std::ifstream in;
+  in.open(Form("%s", infile.data()));
 
-  TH2F* temp = new TH2F(Form("temp_%s_%s", saddSfx.data(), suffix.data()), "", 2400, -1.2, 1.2, 2400, -1.2, 1.2);
-  if (!infile.fail()) {
+  TH2F* temp = new TH2F(Form("temp_%s_%s", m_suffix.data(), suffix.data()), "", 2400, -1.2, 1.2, 2400, -1.2, 1.2);
+
+  if (!in.fail()) {
     int bwires = 0;
-    while (infile >> bwires) {
+    total = 0;
+    while (in >> bwires) {
+      total++;
       nwire = getIndexVal(bwires, "nwirelayer");
       twire = getIndexVal(bwires, "twire");
       radius = getIndexVal(bwires, "rwire");
@@ -465,7 +378,7 @@ TH2F* CDCDedxBadWireAlgorithm::getHistoPattern(std::string badFileName, std::str
       temp->Fill(x, y);
     }
   } else {
-    for (int iwires = 0; iwires < 14336; iwires++) {
+    for (unsigned int iwires = 0; iwires < c_nwireCDC; iwires++) {
       nwire = getIndexVal(iwires, "nwirelayer");
       twire = getIndexVal(iwires, "twire");
       radius = getIndexVal(iwires, "rwire");
@@ -483,7 +396,6 @@ TH2F* CDCDedxBadWireAlgorithm::getHistoPattern(std::string badFileName, std::str
 double CDCDedxBadWireAlgorithm::getIndexVal(int iWire, std::string what)
 {
 
-  //radius of each CDC layer
   const double r[56] = {
     16.80,  17.80,  18.80,  19.80,  20.80,  21.80,  22.80,  23.80,
     25.70,  27.52,  29.34,  31.16,  32.98,  34.80,
@@ -498,7 +410,7 @@ double CDCDedxBadWireAlgorithm::getIndexVal(int iWire, std::string what)
 
   Int_t totalWireiLayer = 0 ;
   double myreturn = 0;
-  for (Int_t iLayer = 0; iLayer < 56; iLayer++) {
+  for (int iLayer = 0; iLayer < 56; iLayer++) {
     int iSuperLayer = (iLayer - 2) / 6;
     if (iSuperLayer <= 0)iSuperLayer = 1;
     int nWireiLayer = 160 + (iSuperLayer - 1) * 32;
@@ -516,13 +428,67 @@ double CDCDedxBadWireAlgorithm::getIndexVal(int iWire, std::string what)
   return myreturn;
 }
 
+
 //------------------------------------
-void CDCDedxBadWireAlgorithm::setTextCosmetics(TPaveText*& pt)
+void CDCDedxBadWireAlgorithm::plotQaPars(std::map<int, std::vector<double>> qapars, double amean, double arms)
 {
-  //pt->SetFillColor(0);
-  pt->SetTextAlign(11);
-  pt->SetFillStyle(3001);
-  pt->SetLineColor(2);
-  pt->SetTextFont(82);
-  pt->SetTextSize(0.04258064);
+
+  TH1D* histqa[3];
+  std::string qaname[3] = {"mean", "rms", "high fraction"};
+
+  for (int i = 0; i < 3; i++) histqa[i] = new TH1D(Form("%s_%s", qaname[i].data(), m_suffix.data()), "", c_nwireCDC, -0.5, 14335.5);
+
+  for (unsigned int jw = 0; jw < c_nwireCDC; jw++) {
+    histqa[0]->SetBinContent(jw + 1, qapars[0][jw]);
+    histqa[1]->SetBinContent(jw + 1, qapars[1][jw]);
+    histqa[2]->SetBinContent(jw + 1, qapars[2][jw]);
+  }
+
+  TCanvas c_pars("c_pars", "", 600, 1200);
+  c_pars.Divide(1, 3);
+  double linemin[3] = {amean* (1 - m_meanThers), arms* (1 - m_rmsThers), m_fracThers};
+  double linemax[3] = {amean* (1 + m_meanThers), arms* (1 + m_rmsThers), m_fracThers};
+
+  for (int iqa = 0; iqa < 3; iqa++) {
+    c_pars.cd(iqa + 1);
+    gPad->SetGridy();
+    histqa[iqa]->SetTitle(Form("%s vs wires (%s); wire ; %s", qaname[iqa].data(), m_suffix.data(), qaname[iqa].data()));
+    histqa[iqa]->SetStats(0);
+    histqa[iqa]->Draw();
+    TLine* lmin = new TLine(-0.5, linemin[iqa], 14335.5, linemin[iqa]);
+    lmin->SetLineColor(kRed);
+    lmin->Draw("same");
+    TLine* lmax = new TLine(-0.5, linemax[iqa], 14335.5, linemax[iqa]);
+    lmax->SetLineColor(kRed);
+    lmax->Draw("same");
+  }
+  c_pars.Print(Form("cdcdedx_bdcal_qapars_%s.pdf", m_suffix.data()));
+  c_pars.Print(Form("cdcdedx_bdcal_qapars_%s.root", m_suffix.data()));
+}
+
+//------------------------------------
+void CDCDedxBadWireAlgorithm::plotEventStats()
+{
+
+  TCanvas cstats("cstats", "cstats", 1000, 500);
+  cstats.SetBatch(kTRUE);
+  cstats.Divide(2, 1);
+
+  cstats.cd(1);
+  auto hestats = getObjectPtr<TH1I>("hestats");
+  if (hestats) {
+    hestats->SetName(Form("htstats_%s", m_suffix.data()));
+    hestats->SetStats(0);
+    hestats->DrawCopy("");
+  }
+
+  cstats.cd(2);
+  auto htstats = getObjectPtr<TH1I>("htstats");
+  if (htstats) {
+    hestats->SetName(Form("htstats_%s", m_suffix.data()));
+    htstats->DrawCopy("");
+    hestats->SetStats(0);
+  }
+
+  cstats.Print(Form("cdcdedx_bdcal_qastats_%s.pdf", m_suffix.data()));
 }

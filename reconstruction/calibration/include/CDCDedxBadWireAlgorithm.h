@@ -32,6 +32,9 @@
 #include <reconstruction/dbobjects/CDCDedxWireGain.h>
 #include <calibration/CalibrationAlgorithm.h>
 
+#include <framework/database/IntervalOfValidity.h>
+#include <cdc/dbobjects/CDCGeometry.h>
+
 namespace Belle2 {
 
   /**
@@ -100,7 +103,7 @@ namespace Belle2 {
     /**
       * function to draw per wire plots
       */
-    void plotWireDist(std::string badfile, std::map<int, std::vector<double>> vhitvar, double amean, double arms);
+    void plotWireDist(std::vector<double> m_inwires, std::map<int, std::vector<double>> vhitvar, double amean, double arms);
 
     /**
      * function to print canvas
@@ -110,17 +113,12 @@ namespace Belle2 {
     /**
      * function to plot wire status map (all, bad and dead)
      */
-    void plotBadWireMap(std::string& badfile, std::string& deadfile);
+    void plotBadWireMap(std::vector<double> m_badwires, std::vector<double> m_deadwires);
 
     /**
      * function to get wire map with input file (all, good and dead)
      */
-    TH2F* getHistoPattern(const std::string& infile, const std::string& suffix, int& total);
-
-    /**
-     * function to return various CDC indexing for a given wire
-     */
-    double getIndexVal(int iWire, std::string what);
+    TH2F* getHistoPattern(std::vector<double> m_inwires, const std::string& suffix, int& total);
 
     /**
      * function to plot the QA (decision) parameters
@@ -179,5 +177,6 @@ namespace Belle2 {
     std::string m_suffix; /**< suffix string for naming plots */
     DBObjPtr<CDCDedxBadWires> m_DBBadWires; /**< Badwire DB object */
     DBObjPtr<CDCDedxWireGain> m_DBWireGains; /**< Wiregain DB object */
+    DBObjPtr<CDCGeometry> m_cdcGeo; /**< Geometry of CDC */
   };
 } // namespace Belle2

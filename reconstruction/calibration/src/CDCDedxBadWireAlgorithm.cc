@@ -8,8 +8,8 @@
 
 #include <reconstruction/calibration/CDCDedxBadWireAlgorithm.h>
 
+using namespace std;
 using namespace Belle2;
-using namespace CDC;
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -81,15 +81,8 @@ CalibrationAlgorithm::EResult CDCDedxBadWireAlgorithm::calibrate()
     if (vhitvar[jw].size() <= 100) minstat++;
   if (minstat > 700 || amean == 0 || arms == 0)  return c_NotEnoughData;
 
-  std::ofstream ofile_bad, ofile_dead;
-  std::string badfile = Form("cdcdedx_bdcal_goodlist_%s.txt", m_suffix.data());
-  ofile_bad.open(badfile);
-
-  std::string deadfile = Form("cdcdedx_bdcal_badlist_%s.txt", m_suffix.data());
-  ofile_dead.open(deadfile);
-
   std::map<int, std::vector<double>> qapars;
-  std::vector<double> m_vdefectwires;
+  std::vector<double> m_vdefectwires, m_badwires, m_deadwires;
 
   for (unsigned int jw = 0; jw < c_nwireCDC; ++jw) {
     int ncount = 0, tcount = 0;
@@ -131,20 +124,18 @@ CalibrationAlgorithm::EResult CDCDedxBadWireAlgorithm::calibrate()
 
     if (badwire) {
       m_vdefectwires.push_back(0.0);
-      if (ncount == 0)ofile_dead <<  jw << std::endl;
-      else ofile_bad <<  jw << std::endl;
+      if (ncount == 0)m_deadwires.push_back(jw);
+      else m_badwires.push_back(jw);
     } else m_vdefectwires.push_back(1.0);
   }
 
-  ofile_bad.close();
-  ofile_dead.close();
 
   if (isMakePlots) {
     //1. plot bad and good wire plots.
-    plotWireDist(badfile, vhitvar, amean, arms);
+    plotWireDist(m_badwires, vhitvar, amean, arms);
 
     //2. plots wire status map
-    plotBadWireMap(badfile, deadfile);
+    plotBadWireMap(m_badwires, m_deadwires);
 
     //3. plot control parameters histograms
     plotQaPars(qapars, amean, arms);
@@ -188,7 +179,7 @@ void CDCDedxBadWireAlgorithm::getExpRunInfo()
 
 
 //------------------------------------
-void CDCDedxBadWireAlgorithm::plotWireDist(std::string badfile, std::map<int, std::vector<double>> vhitvar, double amean,
+void CDCDedxBadWireAlgorithm::plotWireDist(std::vector<double> m_inwires, std::map<int, std::vector<double>> vhitvar, double amean,
                                            double arms)
 {
 
@@ -216,16 +207,7 @@ void CDCDedxBadWireAlgorithm::plotWireDist(std::string badfile, std::map<int, st
     }
 
     bool isbad = false;
-    std::ifstream infile;
-    infile.open(Form("%s", badfile.data()));
-    if (infile) {
-      unsigned int bwires;
-      while (infile >> bwires)
-        if (jw == bwires) {
-          isbad = true;
-          break;
-        }
-    }
+    if (std::count(m_inwires.begin(), m_inwires.end(), jw)) isbad = true;
 
     double oldwg = m_DBWireGains->getWireGain(jw);
     if (oldwg == 0) {
@@ -304,27 +286,28 @@ void CDCDedxBadWireAlgorithm::printCanvas(TList* list, TList* hflist, Color_t co
 
 
 //------------------------------------
-void CDCDedxBadWireAlgorithm::plotBadWireMap(std::string& badfile, std::string& deadfile)
+void CDCDedxBadWireAlgorithm::plotBadWireMap(std::vector<double> m_badwires, std::vector<double> m_deadwires)
 {
 
   TCanvas* cmap = new TCanvas(Form("cmap_%s", m_suffix.data()), "", 800, 800);
   cmap->SetTitle("CDC dE/dx bad wire status");
 
+  const std::vector<double> m_allwires;
   int total = 0;
-  TH2F* hxyAll = getHistoPattern("all", "allwires", total);
+  TH2F* hxyAll = getHistoPattern(m_allwires, "all", total);
   hxyAll->SetTitle(Form("wire status map (%s)", m_suffix.data()));
   setHistCosmetics(hxyAll, kGray);
   hxyAll->Draw();
 
   int nbad = 0.0;
-  TH2F* hxyBad = getHistoPattern(badfile, "bad", nbad);
+  TH2F* hxyBad = getHistoPattern(m_badwires, "bad", nbad);
   if (hxyBad) {
     setHistCosmetics(hxyBad, kRed);
     hxyBad->Draw("same");
   }
 
   int ndead = 0.0;
-  TH2F* hxyDead = getHistoPattern(deadfile, "dead", ndead);
+  TH2F* hxyDead = getHistoPattern(m_deadwires, "dead", ndead);
   if (hxyDead) {
     setHistCosmetics(hxyDead, kBlack);
     hxyDead->Draw("same");
@@ -352,82 +335,44 @@ void CDCDedxBadWireAlgorithm::plotBadWireMap(std::string& badfile, std::string& 
 }
 
 //------------------------------------
-TH2F* CDCDedxBadWireAlgorithm::getHistoPattern(const std::string& infile, const std::string& suffix, int& total)
+TH2F* CDCDedxBadWireAlgorithm::getHistoPattern(std::vector<double> m_inwires, const std::string& suffix, int& total)
 {
 
-  int wire, nwire, twire;
-  double radius, phi, x, y;
+  B2INFO("Creating CDCGeometryPar object");
+  CDC::CDCGeometryPar::Instance(&(*m_cdcGeo));
+  CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
 
-  std::ifstream in;
-  in.open(Form("%s", infile.data()));
+  std::ofstream outfile;
+  std::string outname = Form("cdcdedx_bdcal_%slist_%s.txt", suffix.data(), m_suffix.data());
+  outfile.open(outname);
 
   TH2F* temp = new TH2F(Form("temp_%s_%s", m_suffix.data(), suffix.data()), "", 2400, -1.2, 1.2, 2400, -1.2, 1.2);
 
-  if (!in.fail()) {
-    int bwires = 0;
-    total = 0;
-    while (in >> bwires) {
-      total++;
-      nwire = getIndexVal(bwires, "nwirelayer");
-      twire = getIndexVal(bwires, "twire");
-      radius = getIndexVal(bwires, "rwire");
-      wire = bwires - twire ;
-      phi = 2.*TMath::Pi() * (float(wire) / float(nwire));
-      x = radius * cos(phi);
-      y = radius * sin(phi);
-      temp->Fill(x, y);
-    }
-  } else {
-    for (unsigned int iwires = 0; iwires < c_nwireCDC; iwires++) {
-      nwire = getIndexVal(iwires, "nwirelayer");
-      twire = getIndexVal(iwires, "twire");
-      radius = getIndexVal(iwires, "rwire");
-      wire = iwires - twire ;
-      phi = 2.*TMath::Pi() * (float(wire) / float(nwire));
-      x = radius * cos(phi);
-      y = radius * sin(phi);
-      temp->Fill(x, y);
+  Int_t jwire = -1;
+  total = 0;
+  for (int ilay = 0; ilay < 56; ++ilay) {
+    for (unsigned int iwire = 0; iwire < cdcgeo.nWiresInLayer(ilay); ++iwire) {
+      jwire++;
+      double phi = 2.*TMath::Pi() * (float(iwire) / float(cdcgeo.nWiresInLayer(ilay)));
+      double radius = cdcgeo.senseWireR(ilay) / 100.;
+      double x = radius * cos(phi);
+      double y = radius * sin(phi);
+      if (suffix == "all") {
+        total++;
+        temp->Fill(x, y);
+        outfile << jwire << std::endl;
+      } else {
+        if (std::count(m_inwires.begin(), m_inwires.end(), jwire)) {
+          temp->Fill(x, y);
+          total++;
+          outfile << jwire << std::endl;;
+        }
+      }
     }
   }
+  outfile.close();
   return temp;
 }
-
-//------------------------------------
-double CDCDedxBadWireAlgorithm::getIndexVal(int iWire, std::string what)
-{
-
-  const double r[56] = {
-    16.80,  17.80,  18.80,  19.80,  20.80,  21.80,  22.80,  23.80,
-    25.70,  27.52,  29.34,  31.16,  32.98,  34.80,
-    36.52,  38.34,  40.16,  41.98,  43.80,  45.57,
-    47.69,  49.46,  51.28,  53.10,  54.92,  56.69,
-    58.41,  60.18,  62.00,  63.82,  65.64,  67.41,
-    69.53,  71.30,  73.12,  74.94,  76.76,  78.53,
-    80.25,  82.02,  83.84,  85.66,  87.48,  89.25,
-    91.37,  93.14,  94.96,  96.78,  98.60, 100.37,
-    102.09, 103.86, 105.68, 107.50, 109.32, 111.14
-  };
-
-  Int_t totalWireiLayer = 0 ;
-  double myreturn = 0;
-  for (int iLayer = 0; iLayer < 56; iLayer++) {
-    int iSuperLayer = (iLayer - 2) / 6;
-    if (iSuperLayer <= 0)iSuperLayer = 1;
-    int nWireiLayer = 160 + (iSuperLayer - 1) * 32;
-    totalWireiLayer += nWireiLayer;
-
-    if (iWire < totalWireiLayer) {
-      if (what == "layer")myreturn = iLayer;
-      else if (what == "nwirelayer") myreturn = nWireiLayer;
-      else if (what == "twire")  myreturn = totalWireiLayer - nWireiLayer;
-      else if (what == "rwire")  myreturn = r[iLayer] / 100.;
-      else std::cout << "Invalid return :0 " << std::endl;
-      break;
-    }
-  }
-  return myreturn;
-}
-
 
 //------------------------------------
 void CDCDedxBadWireAlgorithm::plotQaPars(std::map<int, std::vector<double>> qapars, double amean, double arms)

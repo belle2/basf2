@@ -28,6 +28,6 @@ foo2=$(printf "%02d" $2)
 # exec="b2validation -p 10 -s fullTrackingValidationBkg.py -t proposed_b6e67e021" # TimeGroupComposer (4, 8)
 # exec="b2validation -p 10 -s fullTrackingValidationBkg.py -t proposed_7e200bc44" # TimeGroupComposer (10, 4)
 
-exec='b2validation -o "-n 1000 -p 10" -s fullTrackingValidationBkg.py CombinedSVDTrackingValidationBkg.py VXDTF2TrackingValidationBkg.py toCDCCKFTrackingValidationBkg.py -t proposed_'${foo1}'_'${foo2}
+exec='b2validation -o "-n 1000 -p 10" -s fullTrackingValidationBkg.py CombinedSVDTrackingValidationBkg.py VXDTF2TrackingValidationBkg.py toCDCCKFTrackingValidationBkg.py -t proposed_OnOn_'${foo1}'_'${foo2}
 echo $exec
 echo $exec | sh

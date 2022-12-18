@@ -1086,7 +1086,6 @@ namespace Belle2 {
       G4Material* medCAT7 = geometry::Materials::get("CDCCAT7");
       G4Material* medTRG = geometry::Materials::get("CDCOpticalFiberTRG");
       G4Material* medHV = geometry::Materials::get("CDCHVCable");
-      G4Material* medSWX = geometry::Materials::get("CDC-SWX-238");
 
       m_VisAttributes.push_back(new G4VisAttributes(true, G4Colour(0., 1., 0.)));
       const int nCover = content.getNumberNodes("Covers/Cover");
@@ -1139,8 +1138,6 @@ namespace Belle2 {
           createTube(rmin1, rmax1, coverThick, coverPosZ, coverID, medTRG, coverName);
         if (coverID == 53)
           createTube(rmin1, rmax1, coverThick, coverPosZ, coverID, medHV, coverName);
-        if (coverID == 470)
-          createTube(rmin1, rmax1, coverThick, coverPosZ, coverID, medSWX, coverName);
       }
 
       const int nCover2 = content.getNumberNodes("Covers/Cover2");
@@ -1517,7 +1514,6 @@ namespace Belle2 {
       G4Material* medCAT7 = geometry::Materials::get("CDCCAT7");
       G4Material* medTRG = geometry::Materials::get("CDCOpticalFiberTRG");
       G4Material* medHV = geometry::Materials::get("CDCHVCable");
-      G4Material* medSWX = geometry::Materials::get("CDC-SWX-238");
 
       m_VisAttributes.push_back(new G4VisAttributes(true, G4Colour(0., 1., 0.)));
       for (const auto& cover : geom.getCovers()) {
@@ -1559,8 +1555,6 @@ namespace Belle2 {
           createTube(rmin1, rmax1, thick, posZ, coverID, medTRG, coverName);
         if (coverID == 53)
           createTube(rmin1, rmax1, thick, posZ, coverID, medHV, coverName);
-        if (coverID == 470)
-          createTube(rmin1, rmax1, thick, posZ, coverID, medSWX, coverName);
       }
     }
 

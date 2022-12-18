@@ -286,6 +286,7 @@ def add_time_extraction(path, append_full_grid_cdc_eventt0=False, components=Non
     :param append_full_grid_cdc_eventt0: If True, the module FullGridChi2TrackTimeExtractor is added to the path
                                       and provides the CDC temporary EventT0.
     :param components: the list of geometry components in use or None for all components.
+    :param useVTX: If true, the VTX reconstruction is performed.
     """
     if is_svd_used(components):
         path.add_module("SVDEventT0Estimator")

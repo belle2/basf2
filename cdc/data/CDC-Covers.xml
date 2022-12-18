@@ -493,6 +493,15 @@
     <Thickness desc="The thickness of the cover" unit="mm">0.351</Thickness>
     <PosZ desc="Z position near IP" unit="mm">1520.0</PosZ>
   </Cover>
+  <Cover id="470" desc="Backward Optical fiber shielding outer">
+    <Name>BackwardCover</Name>
+    <InnerR1 desc="Inner radius near IP" unit="mm">470.0</InnerR1>
+    <InnerR2 desc="Inner radius far from IP" unit="mm">470.0</InnerR2>
+    <OuterR1 desc="Outer radius near IP" unit="mm">950.0</OuterR1>
+    <OuterR2 desc="Outer radius far from IP" unit="mm">950.0</OuterR2>
+    <Thickness desc="The thickness of the cover" unit="mm">3.2</Thickness>
+    <PosZ desc="Z position near IP" unit="mm">-966.8</PosZ>
+  </Cover>
 
   <Cover2 id="0" desc="HV arc">
     <Name>HV arc</Name>

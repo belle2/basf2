@@ -9,7 +9,6 @@
 import os
 import ROOT
 import numpy
-import root_numpy
 from array import array
 from ROOT import TCanvas, TH1F, TLine
 
@@ -127,8 +126,14 @@ def Median_plots_phi(filename, lyr_num, phi_bins, phi_inf, phi_sup):
         l_V_median_pos.append(median_pos_V)
         h_U.GetYaxis().SetTitle('counts')
         h_V.GetYaxis().SetTitle('counts')
-        meas_U = root_numpy.hist2array(h_U)
-        meas_V = root_numpy.hist2array(h_V)
+        nbins = h_U.GetNbinsX()
+        meas_U = numpy.zeros(nbins)
+        for i in range(nbins):
+            meas_U[i] = h_U.GetBinContent(i + 1)
+        nbins = h_V.GetNbinsX()
+        meas_V = numpy.zeros(nbins)
+        for i in range(nbins):
+            meas_V[i] = h_V.GetBinContent(i + 1)
         bs_U = numpy.random.poisson(1., (len(meas_U), Nrs))
         bs_V = numpy.random.poisson(1., (len(meas_V), Nrs))
         for j in range(Nrs):
@@ -265,8 +270,14 @@ def Median_plots_z(filename, lyr_num, z_bins, z_inf, z_sup):
         l_V_median_pos.append(median_pos_V)
         h_U.GetYaxis().SetTitle('counts')
         h_V.GetYaxis().SetTitle('counts')
-        meas_U = root_numpy.hist2array(h_U)
-        meas_V = root_numpy.hist2array(h_V)
+        nbins = h_U.GetNbinsX()
+        meas_U = numpy.zeros(nbins)
+        for i in range(nbins):
+            meas_U[i] = h_U.GetBinContent(i + 1)
+        nbins = h_V.GetNbinsX()
+        meas_V = numpy.zeros(nbins)
+        for i in range(nbins):
+            meas_V[i] = h_V.GetBinContent(i + 1)
         bs_U = numpy.random.poisson(1., (len(meas_U), Nrs))
         bs_V = numpy.random.poisson(1., (len(meas_V), Nrs))
         for j in range(Nrs):

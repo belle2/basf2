@@ -9,7 +9,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-from root_numpy import hist2array
 from matplotlib import pyplot as pl
 from basf2 import logging, LogLevel, create_path, process
 import ROOT as root
@@ -72,11 +71,14 @@ def plot_hist(region, **argk):
     h = rmaterial_file.Get("Ray/%s_x0" % region)
     if not h:
         return None
-    data, edges = hist2array(h, return_edges=True)
-    # Now we have to play around a bit: pl.plot(edges[:-1], data, drawstyle="steps-post") does work but
-    # the last bin does not get a top line so we need to add a 0 to the
-    # histogram to go back down to where we were
-    data = np.append(data, 0)
+    nbins = h.GetNbinsX()
+    data = np.zeros(nbins + 1)
+    for i in range(nbins):
+        data[i] = h.GetBinContent(i + 1)
+    edges = []
+    edges.append(np.empty(nbins + 1))
+    h.GetLowEdge(edges[-1])
+    edges[-1][-1] = h.GetXaxis().GetXmax()
     # now plot
     pl.plot(edges[0], data, drawstyle="steps-post", **argk)
     return data, edges[0]

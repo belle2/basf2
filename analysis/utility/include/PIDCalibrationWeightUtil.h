@@ -45,7 +45,7 @@ namespace Belle2 {
       if (m_matrixName.find("PIDDetectorWeights") != std::string::npos) {
         m_pidDetWeightDB = std::make_unique<DBObjPtr<PIDDetectorWeights>>(m_matrixName);
         if (!(*m_pidDetWeightDB))
-          B2FATAL("The dbobject PIDCalibrationWeight, " << m_matrixName <<
+          B2FATAL("The dbobject PIDDetectorWeights, " << m_matrixName <<
                   " could not be found! It is necessary for the weighted PID variables.");
       } else {
         m_pidCalibWeightDB = std::make_unique<DBObjPtr<PIDCalibrationWeight>>(m_matrixName);
@@ -54,29 +54,6 @@ namespace Belle2 {
                   " could not be found! It is necessary for the weighted PID variables.");
       }
     };
-
-    /**
-     * Get the weight for the given combination of the PDG code and the detector name.
-     */
-    double getWeight(int pdg, std::string detector, double p, double theta) const
-    {
-      if (m_matrixName.find("PIDDetectorWeights") != std::string::npos) {
-
-        Const::EDetector det;
-        boost::to_lower(detector);
-        if (detector == "svd") det = Const::SVD;
-        else if (detector == "cdc") det = Const::CDC;
-        else if (detector == "top") det = Const::TOP;
-        else if (detector == "arich") det = Const::ARICH;
-        else if (detector == "ecl") det = Const::ECL;
-        else if (detector == "klm") det = Const::KLM;
-        else B2FATAL("Unknown detector component: " << detector);
-
-        return (*m_pidDetWeightDB)->getWeight(Const::ParticleType(pdg), det, p, theta);
-      } else {
-        return (*m_pidCalibWeightDB)->getWeight(pdg, detector);
-      }
-    }
 
     /**
      * Get the weight for the given combination of the PDG code and the detector in Const::EDetector.
@@ -88,14 +65,6 @@ namespace Belle2 {
       } else {
         return (*m_pidCalibWeightDB)->getWeight(pdg, det);
       }
-    }
-
-    /**
-     * Get the weights for the given PDG code
-     */
-    std::vector<double> getWeights(int pdg) const
-    {
-      return (*m_pidCalibWeightDB)->getWeights(pdg);
     }
 
   private:

@@ -125,11 +125,14 @@ class ClassificationOverview:
         print("Truth name", truth_name)
         print("Variable names", variable_names)
 
-        import root_numpy
         print("Loading tree")
         branch_names = {*variable_names, truth_name, *groupbys, *auxiliaries, *filters}
         branch_names = [name for name in branch_names if name]
-        input_array = root_numpy.tree2array(input_tree, branches=branch_names)
+        if isinstance(self.output_file_name, str):
+            rdf = ROOT.RDataFrame(input_tree, self.output_file_name)
+        else:
+            rdf = ROOT.RDataFrame(input_tree, self.output_file_name.GetName())
+        input_array = rdf.AsNumpy(branch_names)
         input_record_array = input_array.view(np.recarray)
 
         if filters:

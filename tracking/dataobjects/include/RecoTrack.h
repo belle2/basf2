@@ -601,13 +601,11 @@ namespace Belle2 {
       return m_nSVDHitsOfIngoingArm;
     }
 
-    /// Swap arm times, booleans and nSVDHits
-    void swapArmTimes()
-    {
-      std::swap(m_outgoingArmTime, m_ingoingArmTime);
-      std::swap(m_hasOutgoingArmTime, m_hasIngoingArmTime);
-      std::swap(m_nSVDHitsOfOutgoingArm, m_nSVDHitsOfIngoingArm);
-    }
+    /** Flip the direction of the RecoTrack by inverting the momentum vector and the charge.
+     *  In addition, also the ingoing and outgoing arms and arm times are swapped.
+     *  @param representation Track representation to be used to get the MeasuredStateOnPlane at the last hit
+     */
+    void flipTrackDirectionAndCharge(const genfit::AbsTrackRep* representation = nullptr);
 
     /// Return the position, the momentum and the charge of the first measured state on plane or - if unfitted - the seeds.
     std::tuple<ROOT::Math::XYZVector, ROOT::Math::XYZVector, short> extractTrackState() const;
@@ -774,6 +772,16 @@ namespace Belle2 {
 
     /// Name of the store array of the reco hit informations.
     const std::string& getStoreArrayNameOfRecoHitInformation() const { return m_storeArrayNameOfRecoHitInformation; }
+
+    /// Revert the sorting order of the RecoHitInformation
+    void revertRecoHitInformationSorting()
+    {
+      const uint recoHitInformationSize = getRecoHitInformations().size();
+      for (auto RecoHitInfo : getRecoHitInformations()) {
+        // The "-1" ensures that the sorting parameter still is in range 0...size-1 instead of 1...size
+        RecoHitInfo->setSortingParameter(recoHitInformationSize - RecoHitInfo->getSortingParameter() - 1);
+      }
+    }
 
     /**
      * Call a function on all hits of the given type in the store array, that are related to this track.
@@ -1073,6 +1081,14 @@ namespace Belle2 {
       }
       // cppcheck-suppress returnDanglingLifetime
       return hitList;
+    }
+
+    /// Swap arm times, booleans and nSVDHits
+    void swapArmTimes()
+    {
+      std::swap(m_outgoingArmTime, m_ingoingArmTime);
+      std::swap(m_hasOutgoingArmTime, m_hasIngoingArmTime);
+      std::swap(m_nSVDHitsOfOutgoingArm, m_nSVDHitsOfIngoingArm);
     }
 
     /// Helper: Check the dirty flag and produce a warning, whenever a fit result is accessed.

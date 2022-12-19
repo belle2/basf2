@@ -39,7 +39,7 @@ class PickleHarvestingModule(HarvestingModule):
             except GeneratorExit:
                 pass
 
-        elif isinstance(crop, collections.MutableMapping):
+        elif isinstance(crop, collections.abc.MutableMapping):
             try:
                 while True:
                     crops.append(crop)

@@ -653,26 +653,6 @@ const genfit::MeasuredStateOnPlane& RecoTrack::getMeasuredStateOnPlaneFromLastHi
   B2FATAL("There is no single hit with a valid mSoP in this track!");
 }
 
-std::string RecoTrack::getInfoHTML() const
-{
-  std::stringstream out;
-
-  out << "<b>Charge seed</b>=" << getChargeSeed();
-
-  out << "<b>pT seed</b>=" << getMomentumSeed().Rho();
-  out << ", <b>pZ seed</b>=" << getMomentumSeed().Z();
-  out << "<br>";
-  out << "<b>position seed</b>=" << getMomentumSeed().X() << ", " << getMomentumSeed().Y() << ", " << getMomentumSeed().Z();
-  out << "<br>";
-
-  for (const genfit::AbsTrackRep* rep : getRepresentations()) {
-    out << "<b>was fitted with " << rep->getPDG() << "</b>=" << wasFitSuccessful() << ", ";
-  }
-  out << "<br>";
-
-  return out.str();
-}
-
 void RecoTrack::estimateArmTime()
 {
   m_isArmTimeComputed = true;
@@ -762,4 +742,39 @@ bool RecoTrack::isOutgoingArm(RecoHitInformation::RecoHitDetector pre, RecoHitIn
     isOutgoing = true;
   }
   return isOutgoing;
+}
+
+void RecoTrack::flipTrackDirectionAndCharge(const genfit::AbsTrackRep* representation)
+{
+  const genfit::MeasuredStateOnPlane& measuredStateOnPlane = getMeasuredStateOnPlaneFromLastHit(representation);
+  const ROOT::Math::XYZVector& fittedPosition = ROOT::Math::XYZVector(measuredStateOnPlane.getPos());
+  const ROOT::Math::XYZVector& fittedMomentum = ROOT::Math::XYZVector(measuredStateOnPlane.getMom());
+  const double& fittedCharge = measuredStateOnPlane.getCharge();
+
+  // revert the charge and momentum
+  setChargeSeed(-fittedCharge);
+  setPositionAndMomentum(fittedPosition, -fittedMomentum);
+  revertRecoHitInformationSorting();
+  swapArmTimes();
+  setDirtyFlag();
+}
+
+std::string RecoTrack::getInfoHTML() const
+{
+  std::stringstream out;
+
+  out << "<b>Charge seed</b>=" << getChargeSeed();
+
+  out << "<b>pT seed</b>=" << getMomentumSeed().Rho();
+  out << ", <b>pZ seed</b>=" << getMomentumSeed().Z();
+  out << "<br>";
+  out << "<b>position seed</b>=" << getMomentumSeed().X() << ", " << getMomentumSeed().Y() << ", " << getMomentumSeed().Z();
+  out << "<br>";
+
+  for (const genfit::AbsTrackRep* rep : getRepresentations()) {
+    out << "<b>was fitted with " << rep->getPDG() << "</b>=" << wasFitSuccessful() << ", ";
+  }
+  out << "<br>";
+
+  return out.str();
 }

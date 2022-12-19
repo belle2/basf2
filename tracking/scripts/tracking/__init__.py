@@ -288,7 +288,7 @@ def add_time_extraction(path, append_full_grid_cdc_eventt0=False, components=Non
     :param components: the list of geometry components in use or None for all components.
     :param useVTX: If true, the VTX reconstruction is performed.
     """
-    if is_svd_used(components):
+    if is_svd_used(components) and not useVTX:
         path.add_module("SVDEventT0Estimator")
 
     if is_cdc_used(components) and (append_full_grid_cdc_eventt0 or useVTX):

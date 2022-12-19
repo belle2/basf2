@@ -3,7 +3,7 @@ import basf2 as b2
 import modularAnalysis as ma
 import vertex as vx
 from extravariables import runningOnMC, outputfile
-import mdst as mdst
+import udst
 
 gbasf2_dataset = []  # gbasf2 will figure this out
 
@@ -19,12 +19,8 @@ ma.reconstructDecay(decayString='B0:PiD-toK2Pi -> D-:K2Pi pi+:my', cut='5.0 < Mb
 vx.treeFit('B0:PiD-toK2Pi', 0, path=mypath, updateAllDaughters=False, ipConstraint=True, massConstraint=[411])
 ma.applyCuts('B0:PiD-toK2Pi', '5.2 < Mbc and abs(deltaE) < 0.5', path=mypath)
 
-# dump in MDST format
-mdst.add_mdst_output(path=mypath,  # use mdst for further modification using basf2, nTuples for offline
-                     mc=runningOnMC,
-                     filename=outputfile
-                     )
-
+# dump in UDST format
+udst.add_skimmed_udst_output(mypath, skimParticleLists=['B0:PiD-toK2Pi'], mc=runningOnMC, outputFile=outputfile)
 b2.process(mypath)
 print(b2.statistics)
 # @endcond

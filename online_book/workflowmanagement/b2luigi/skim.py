@@ -9,6 +9,7 @@ import basf2 as b2
 import modularAnalysis as ma
 import vertex as vx
 
+
 class SkimTask(Basf2PathTask):
     batch_system = "gbasf2"
     gbasf2_project_name_prefix = luigi.Parameter(significant=False)
@@ -40,12 +41,11 @@ class SkimTask(Basf2PathTask):
         vx.treeFit('B0:PiD-toK2Pi', 0, path=mypath, updateAllDaughters=False, ipConstraint=True, massConstraint=[411])
         ma.applyCuts('B0:PiD-toK2Pi', '5.2 < Mbc and abs(deltaE) < 0.5', path=mypath)
 
-        # dump in MDST format
-        import mdst as mdst
-        mdst.add_mdst_output(path=mypath,  # use mdst for further modification using basf2, nTuples for offline
-                             mc=self.runningOnMC,
-                             filename="skim.root"  # WARNING: here do not use self.get_output_file_name
-                             )
+        import udst
+        # dump in UDST format
+        udst.add_skimmed_udst_output(mypath, skimParticleLists=['B0:PiD-toK2Pi'], mc=self.runningOnMC,
+                                     outputFile="skim.root"  # WARNING: here do not use self.get_output_file_name
+                                     )
         return mypath
 
 

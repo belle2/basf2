@@ -13,10 +13,10 @@ from basf2 import B2WARNING
 import basf2_mva
 
 
-def tree2dict(tree, tree_columns, dict_columns=None):
+def chain2dict(chain, tree_columns, dict_columns=None):
     """
-    Convert a ROOT.TTree into a dictionary of np.arrays
-    @param tree the ROOT.TTree
+    Convert a ROOT.TChain into a dictionary of np.arrays
+    @param chain the ROOT.TChain
     @param tree_columns the column (or branch) names in the tree
     @param dict_columns the corresponding column names in the dictionary
     """
@@ -25,12 +25,13 @@ def tree2dict(tree, tree_columns, dict_columns=None):
     if dict_columns is None:
         dict_columns = tree_columns
     try:
-        import root_numpy
-        d = root_numpy.tree2array(tree, branches=tree_columns)
+        from ROOT import RDataFrame
+        rdf = RDataFrame(chain)
+        d = rdf.AsNumpy(tree_columns)
         d.dtype.names = dict_columns
     except ImportError:
-        d = {column: np.zeros((tree.GetEntries(),)) for column in dict_columns}
-        for iEvent, event in enumerate(tree):
+        d = {column: np.zeros((chain.GetEntries(),)) for column in dict_columns}
+        for iEvent, event in enumerate(chain):
             for dict_column, tree_column in zip(dict_columns, tree_columns):
                 d[dict_column][iEvent] = getattr(event, tree_column)
     return d
@@ -250,8 +251,8 @@ class Method(object):
                              basf2_mva.vector(*datafiles),
                              treename,
                              rootfilename)
-            rootfile = ROOT.TFile(rootfilename, "UPDATE")
-            roottree = rootfile.Get("variables")
+            chain = ROOT.TChain("variables")
+            chain.Add(rootfilename)
 
             expert_target = identifier + '_' + self.general_options.m_target_variable
             stripped_expert_target = self.identifier + '_' + self.general_options.m_target_variable
@@ -268,8 +269,8 @@ class Method(object):
                         f'_{i}') for i in range(
                         self.general_options.m_nClasses)]
 
-            d = tree2dict(
-                roottree,
+            d = chain2dict(
+                chain,
                 [*branch_names, ROOT.Belle2.MakeROOTCompatible.makeROOTCompatible(expert_target)],
                 [*output_names, stripped_expert_target])
 

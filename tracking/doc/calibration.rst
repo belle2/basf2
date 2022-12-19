@@ -92,7 +92,7 @@ in the following way:
 .. code:: python
 
   path.add_module("FlipQuality", recoTracksStoreArrayName=reco_tracks,
-                  identifier='localdb/dbstore_Weightfile_rev_0b43a0.root',  
+                  identifier='localdb/dbstore_Weightfile_rev_XXXXXX.root',  
                   indexOfFlippingMVA=1).set_name("FlipQuality_1stMVA")
 
 .. note:: 

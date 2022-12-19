@@ -15,7 +15,6 @@
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 #include <analysis/DecayDescriptor/DecayDescriptorParticle.h>
 #include <TMatrixFSym.h>
-#include <framework/geometry/B2Vector3.h>
 
 #include <string>
 namespace TestUtilities {
@@ -40,7 +39,7 @@ namespace TestUtilities {
      * and charges  will be respected.
      */
     const Belle2::Particle* produceParticle(const std::string& decayString, const ROOT::Math::PxPyPzEVector& momentum,
-                                            const Belle2::B2Vector3D& vertex)
+                                            const ROOT::Math::XYZVector& vertex)
     {
       Belle2::DecayDescriptor* decaydescriptor = new Belle2::DecayDescriptor();
       bool isString = decaydescriptor->init(decayString);
@@ -80,7 +79,7 @@ namespace TestUtilities {
      * This method is used for recursion.
      */
     const Belle2::Particle* createParticle(const Belle2::DecayDescriptor* particleDescriptor, const ROOT::Math::PxPyPzEVector& momentum,
-                                           const Belle2::B2Vector3D& vertex)
+                                           const ROOT::Math::XYZVector& vertex)
     {
       Belle2::Particle::EParticleSourceObject type = getType(particleDescriptor->getMother());
       if (type == Belle2::Particle::EParticleSourceObject::c_Track) {
@@ -137,10 +136,10 @@ namespace TestUtilities {
      * Creates different charged particles for tests
      * */
     const Belle2::Particle* createCharged(const Belle2::DecayDescriptor* particleDescriptor,  const ROOT::Math::PxPyPzEVector& momentum,
-                                          const Belle2::B2Vector3D& vertex)
+                                          const ROOT::Math::XYZVector& vertex)
     {
       auto* particleDescription = particleDescriptor->getMother();
-      Belle2::B2Vector3D tmomentum(momentum.x(), momentum.y(), momentum.z());
+      ROOT::Math::XYZVector tmomentum(momentum.X(), momentum.Y(), momentum.Z());
       const float pValue = 0.5;
       const float bField = 1.5;
       TMatrixDSym cov6(6);

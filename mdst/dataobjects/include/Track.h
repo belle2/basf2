@@ -196,7 +196,12 @@ namespace Belle2 {
       return m_qualityIndicator;
     }
 
-    /** Set track time computed as the difference between the average of SVD clusters time and the SVD EventT0 */
+    /** Set track time computed as the difference between the outgoing/ingoing arm time (computed with SVD hits) and the SVD EventT0.
+     * If both outgoing and ingoing arms exist:
+     * 1) if the outgoing arm time is smaller than the ingoing arm time, the track time is computed as the difference of the outgoing arm time and the SVD EventT0;
+     * 2) otherwise the track time is computed as the difference of the ingoing arm time and the SVD EventT0.
+     * If only the outgoing arm exists, the track time is computed as the difference of the outgoing arm time and the SVD EventT0.
+     * If only the ingoing arm exists, the track time is computed as the difference of the ingoing arm time and the SVD EventT0. */
     void setTrackTime(float track_time)
     {
       m_trackTime = track_time;
@@ -233,9 +238,11 @@ namespace Belle2 {
      */
     float const m_qualityIndicator;
 
-    /** Track time, computed as the difference between the average of SVD clusters time and the SVDEvent T0 */
+    /** Track time, computed as the difference between outgoing/ingoing arm time and the SVDEvent T0 */
     float m_trackTime = std::numeric_limits<float>::quiet_NaN();
 
     ClassDefOverride(Track, 6); /**< Class that bundles various TrackFitResults. */
+
+    friend class FixMergedObjectsModule;
   };
 }

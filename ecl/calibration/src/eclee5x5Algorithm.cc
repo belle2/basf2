@@ -181,7 +181,7 @@ CalibrationAlgorithm::EResult eclee5x5Algorithm::calibrate()
       ECLCrystalCalib* ExpectedE = new ECLCrystalCalib();
       ExpectedE->setCalibVector(tempCalib, tempCalibStdDev);
       saveCalibration(ExpectedE, "ECLExpee5x5E");
-      B2INFO("eclCosmicEAlgorithm: successfully stored expected energies ECLExpee5x5E");
+      B2INFO("eclee5x5Algorithm: successfully stored expected energies ECLExpee5x5E");
     }
 
     /**-----------------------------------------------------------------------------------------------*/
@@ -211,7 +211,7 @@ CalibrationAlgorithm::EResult eclee5x5Algorithm::calibrate()
         nNotCalibrated++;
       }
     }
-    B2INFO("eclCosmicEAlgorithm: " << nNotCalibrated << " crystals will not be calibrated. ");
+    B2INFO("eclee5x5Algorithm: " << nNotCalibrated << " crystals will not be calibrated. ");
 
     //..Invert to solve Q g = R
     TDecompLU lu(matrixQ);
@@ -244,7 +244,7 @@ CalibrationAlgorithm::EResult eclee5x5Algorithm::calibrate()
       ECLCrystalCalib* e5x5ECalib = new ECLCrystalCalib();
       e5x5ECalib->setCalibVector(tempCalib, tempCalibStdDev);
       saveCalibration(e5x5ECalib, "ECLCrystalEnergyee5x5");
-      B2INFO("eclCosmicEAlgorithm: successfully stored calibration ECLCrystalEnergyee5x5");
+      B2INFO("eclee5x5Algorithm: successfully stored calibration ECLCrystalEnergyee5x5");
     }
 
     /**-----------------------------------------------------------------------------------------------*/
@@ -345,7 +345,7 @@ CalibrationAlgorithm::EResult eclee5x5Algorithm::calibrate()
       ECLCrystalCalib* eedPhi = new ECLCrystalCalib();
       eedPhi->setCalibVector(tempCalib, tempCalibWidth);
       saveCalibration(eedPhi, m_payloadName);
-      B2INFO("eclCosmicEAlgorithm: successfully stored calibration " << m_payloadName);
+      B2INFO("eclee5x5Algorithm: successfully stored calibration " << m_payloadName);
     }
 
     /**-----------------------------------------------------------------------------------------------*/

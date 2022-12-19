@@ -17,6 +17,9 @@ from variables import variables as vm
 from ROOT import TFile
 
 
+basf2.set_random_seed('aSeed')
+
+
 class TestTreeFits(unittest.TestCase):
     """The unit test case for TreeFitter"""
 
@@ -25,14 +28,9 @@ class TestTreeFits(unittest.TestCase):
 
         testFile = tempfile.NamedTemporaryFile()
 
-        # we want to use the latest grated globaltag, not the old one from the
-        # file
-        basf2.conditions.disable_globaltag_replay()
-
         main = basf2.create_path()
 
-        inputfile = b2test_utils.require_file('analysis/tests/150_noBKG_DtoPiNuNu.root', py_case=self)
-        ma.inputMdst(inputfile, path=main)
+        ma.inputMdst(b2test_utils.require_file('analysis/tests/150_noBKG_DtoPiNuNu.root'), path=main)
         ma.fillParticleList('pi+:a', 'pionID > 0.5', path=main)
         ma.fillParticleList('K+:a', 'kaonID > 0.5', path=main)
 
@@ -123,4 +121,5 @@ class TestTreeFits(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main()
+    with b2test_utils.clean_working_directory():
+        unittest.main()

@@ -57,9 +57,9 @@ namespace TreeFitter {
       m_covariance = Eigen::Matrix<double, 3, 3>::Zero(3, 3);
       const Belle2::B2Vector3D& vertexVector = m_beamSpot->getIPPosition();
       const TMatrixDSym& covVertex = m_beamSpot->getCovVertex();
-      m_posVec(0) = vertexVector.x();
-      m_posVec(1) = vertexVector.y();
-      m_posVec(2) = vertexVector.z();
+      m_posVec(0) = vertexVector.X();
+      m_posVec(1) = vertexVector.Y();
+      m_posVec(2) = vertexVector.Z();
       m_covariance(0, 0) = covVertex(0, 0);
       m_covariance(1, 1) = covVertex(1, 1);
       m_covariance(2, 2) = covVertex(2, 2);
@@ -71,8 +71,8 @@ namespace TreeFitter {
       m_covariance = Eigen::Matrix<double, 2, 2>::Zero(2, 2);
       const Belle2::B2Vector3D& vertexVector = m_beamSpot->getIPPosition();
       const TMatrixDSym& covVertex = m_beamSpot->getCovVertex();
-      m_posVec(0) = vertexVector.x();
-      m_posVec(1) = vertexVector.y();
+      m_posVec(0) = vertexVector.X();
+      m_posVec(1) = vertexVector.Y();
       m_covariance(0, 0) = covVertex(0, 0);
       m_covariance(1, 1) = covVertex(1, 1);
       m_covariance(1, 0) = covVertex(1, 0);

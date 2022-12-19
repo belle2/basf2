@@ -460,7 +460,7 @@ void DQMHistoModuleBase::FillHitNumbers(int nPXD, int nSVD, int nCDC)
 
 void DQMHistoModuleBase::FillMomentumAngles(const TrackFitResult* tfr)
 {
-  const TVector3 mom = tfr->getMomentum();
+  const ROOT::Math::XYZVector mom = tfr->getMomentum();
 
   // don't fill NAN or INF
   if (checkVariableForNANOrINF(mom.X()) or checkVariableForNANOrINF(mom.Y()) or checkVariableForNANOrINF(mom.Z()) or
@@ -478,19 +478,19 @@ void DQMHistoModuleBase::FillMomentumAngles(const TrackFitResult* tfr)
 
 void DQMHistoModuleBase::FillMomentumCoordinates(const TrackFitResult* tfr)
 {
-  const TVector3 mom = tfr->getMomentum();
+  const ROOT::Math::XYZVector& mom = tfr->getMomentum();
 
   // don't fill NAN or INF, Mag is NAN/INF if any component is, no need to check
   if (checkVariableForNANOrINF(mom.X()) or checkVariableForNANOrINF(mom.Y()) or
-      checkVariableForNANOrINF(mom.Z()) or checkVariableForNANOrINF(mom.Pt())) {
+      checkVariableForNANOrINF(mom.Z()) or checkVariableForNANOrINF(mom.Rho())) {
     return;
   }
 
-  m_MomX->Fill(mom.Px());
-  m_MomY->Fill(mom.Py());
-  m_MomZ->Fill(mom.Pz());
-  m_Mom->Fill(mom.Mag());
-  m_MomPt->Fill(mom.Pt());
+  m_MomX->Fill(mom.X());
+  m_MomY->Fill(mom.Y());
+  m_MomZ->Fill(mom.Z());
+  m_Mom->Fill(mom.R());
+  m_MomPt->Fill(mom.Rho());
 }
 
 void DQMHistoModuleBase::FillHelixParametersAndCorrelations(const TrackFitResult* tfr)
@@ -537,7 +537,7 @@ void DQMHistoModuleBase::FillTRClusterCorrelations(float phi_deg, float phiPrev_
   m_TRClusterCorrelationsTheta[correlationIndex]->Fill(thetaPrev_deg, theta_deg);
 }
 
-void DQMHistoModuleBase::FillUBResidualsPXD(const TVector3& residual_um)
+void DQMHistoModuleBase::FillUBResidualsPXD(const B2Vector3D& residual_um)
 {
   if (checkVariableForNANOrINF(residual_um.X()) or checkVariableForNANOrINF(residual_um.Y())) {
     return;
@@ -547,7 +547,7 @@ void DQMHistoModuleBase::FillUBResidualsPXD(const TVector3& residual_um)
   m_UBResidualsPXDV->Fill(residual_um.y());
 }
 
-void DQMHistoModuleBase::FillUBResidualsSVD(const TVector3& residual_um)
+void DQMHistoModuleBase::FillUBResidualsSVD(const B2Vector3D& residual_um)
 {
   if (checkVariableForNANOrINF(residual_um.X()) or checkVariableForNANOrINF(residual_um.Y())) {
     return;
@@ -557,7 +557,7 @@ void DQMHistoModuleBase::FillUBResidualsSVD(const TVector3& residual_um)
   m_UBResidualsSVDV->Fill(residual_um.y());
 }
 
-void DQMHistoModuleBase::FillHalfShellsPXD(const TVector3& globalResidual_um, bool isNotYang)
+void DQMHistoModuleBase::FillHalfShellsPXD(const B2Vector3D& globalResidual_um, bool isNotYang)
 {
   if (checkVariableForNANOrINF(globalResidual_um.X()) or
       checkVariableForNANOrINF(globalResidual_um.Y()) or
@@ -575,7 +575,7 @@ void DQMHistoModuleBase::FillHalfShellsPXD(const TVector3& globalResidual_um, bo
   }
 }
 
-void DQMHistoModuleBase::FillHalfShellsSVD(const TVector3& globalResidual_um, bool isNotMat)
+void DQMHistoModuleBase::FillHalfShellsSVD(const B2Vector3D& globalResidual_um, bool isNotMat)
 {
   if (checkVariableForNANOrINF(globalResidual_um.X()) or
       checkVariableForNANOrINF(globalResidual_um.Y()) or
@@ -593,7 +593,7 @@ void DQMHistoModuleBase::FillHalfShellsSVD(const TVector3& globalResidual_um, bo
   }
 }
 
-void DQMHistoModuleBase::FillUB1DResidualsSensor(const TVector3& residual_um, int sensorIndex)
+void DQMHistoModuleBase::FillUB1DResidualsSensor(const B2Vector3D& residual_um, int sensorIndex)
 {
   if (checkVariableForNANOrINF(residual_um.X()) or checkVariableForNANOrINF(residual_um.Y())) {
     return;
@@ -602,7 +602,7 @@ void DQMHistoModuleBase::FillUB1DResidualsSensor(const TVector3& residual_um, in
   m_UBResidualsSensorV[sensorIndex]->Fill(residual_um.y());
 }
 
-void DQMHistoModuleBase::FillUB2DResidualsSensor(const TVector3& residual_um, int sensorIndex)
+void DQMHistoModuleBase::FillUB2DResidualsSensor(const B2Vector3D& residual_um, int sensorIndex)
 {
   if (checkVariableForNANOrINF(residual_um.X()) or checkVariableForNANOrINF(residual_um.Y())) {
     return;

@@ -8,6 +8,7 @@
 
 // Own include
 #include <analysis/variables/FlavorTaggingVariables.h>
+#include <analysis/variables/ROEVariables.h>
 
 #include <analysis/variables/MCTruthVariables.h>
 #include <analysis/variables/KLMClusterVariables.h>
@@ -99,8 +100,15 @@ namespace Belle2 {
 
     double cosTPTO(const Particle* part)
     {
-      StoreObjPtr<RestOfEvent> roe("RestOfEvent");
-      if (!roe.isValid()) return 0;
+      StoreObjPtr<RestOfEvent> roeobject("RestOfEvent");
+      const RestOfEvent* roe;
+      if (roeobject.isValid()) { // if in for_each loop over ROE
+        roe = &(*roeobject);
+      } else {
+        roe = getRelatedROEObject(part);
+        if (!roe)
+          return 0;
+      }
 
       std::vector<ROOT::Math::XYZVector> p3_cms_roe;
       static const double P_MAX(3.2);
@@ -164,8 +172,17 @@ namespace Belle2 {
         B2FATAL("At most 1 argument (name of mask) accepted.");
 
       auto func = [maskName](const Particle * particle) -> double {
-        StoreObjPtr<RestOfEvent> roe("RestOfEvent");
-        if (!roe.isValid()) return 0;
+        StoreObjPtr<RestOfEvent> roeobject("RestOfEvent");
+        const RestOfEvent* roe;
+        if (roeobject.isValid())   // if in for_each loop over ROE
+        {
+          roe = &(*roeobject);
+        } else
+        {
+          roe = getRelatedROEObject(particle);
+          if (!roe)
+            return 0;
+        }
 
         std::vector<ROOT::Math::XYZVector> p3_cms_roe;
         // static const double P_MAX(3.2);
@@ -981,7 +998,7 @@ namespace Belle2 {
         double output = 0.0;
 
         if (requestedVariable == "cosTPTOFast")
-          output = std::get<double>(Variable::Manager::Instance().getVariable("cosTPTO")->function(TargetFastParticle));
+          output = cosTPTO(TargetFastParticle);
 
         ROOT::Math::PxPyPzEVector momSlowPion = PCmsLabTransform::labToCms(particle->get4Vector());  //Momentum of Slow Pion in CMS-System
         if (momSlowPion == momSlowPion)   // FIXME
@@ -1945,8 +1962,9 @@ namespace Belle2 {
           if (!iParticle) continue;
 
           if (categoryName == "MaximumPstar") {
-            bool targetFlag = std::get<bool>(manager.getVariable("hasHighestProbInCat(pi+:inRoe, isRightTrack(MaximumPstar))")->function(
-                                               iParticle));
+            static Manager::FunctionPtr selectionFunction =
+            hasHighestProbInCat({"pi+:inRoe", "isRightTrack(MaximumPstar)"});
+            bool targetFlag = std::get<bool>(selectionFunction(iParticle));
             if (targetFlag) {
               particlesHaveMCAssociated = true;
               ++nTargets;
@@ -2019,7 +2037,9 @@ namespace Belle2 {
           if (!iParticle) continue;
 
           if (categoryName == "MaximumPstar") {
-            if (std::get<bool>(manager.getVariable("hasHighestProbInCat(pi+:inRoe, isRightTrack(MaximumPstar))")->function(iParticle)))
+            static Manager::FunctionPtr selectionFunction =
+            hasHighestProbInCat({"pi+:inRoe", "isRightTrack(MaximumPstar)"});
+            if (std::get<bool>(selectionFunction(iParticle)))
               targetParticles.push_back(iParticle);
           } else if (std::get<int>(manager.getVariable("isRightTrack(" + trackTargetName + ")")->function(iParticle))) {
             targetParticles.push_back(iParticle);

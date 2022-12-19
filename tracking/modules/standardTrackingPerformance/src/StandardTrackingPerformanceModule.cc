@@ -87,12 +87,12 @@ void StandardTrackingPerformanceModule::event()
 
       m_nGeneratedChargedStableMcParticles++;
 
-      m_trackProperties.cosTheta_gen = mcParticle.getMomentum().CosTheta();
-      m_trackProperties.ptot_gen = mcParticle.getMomentum().Mag();
-      m_trackProperties.pt_gen = mcParticle.getMomentum().Pt();
-      m_trackProperties.px_gen = mcParticle.getMomentum().Px();
-      m_trackProperties.py_gen = mcParticle.getMomentum().Py();
-      m_trackProperties.pz_gen = mcParticle.getMomentum().Pz();
+      m_trackProperties.cosTheta_gen = cos(mcParticle.getMomentum().Theta());
+      m_trackProperties.ptot_gen = mcParticle.getMomentum().R();
+      m_trackProperties.pt_gen = mcParticle.getMomentum().Rho();
+      m_trackProperties.px_gen = mcParticle.getMomentum().X();
+      m_trackProperties.py_gen = mcParticle.getMomentum().Y();
+      m_trackProperties.pz_gen = mcParticle.getMomentum().Z();
       m_trackProperties.x_gen = mcParticle.getVertex().X();
       m_trackProperties.y_gen = mcParticle.getVertex().Y();
       m_trackProperties.z_gen = mcParticle.getVertex().Z();
@@ -128,13 +128,13 @@ void StandardTrackingPerformanceModule::event()
 
         m_nFittedChargedStabletracks++;
         // write some data to the root tree
-        TVector3 mom = fitResult->getMomentum();
-        m_trackProperties.cosTheta = mom.CosTheta();
-        m_trackProperties.ptot = mom.Mag();
-        m_trackProperties.pt = mom.Pt();
-        m_trackProperties.px = mom.Px();
-        m_trackProperties.py = mom.Py();
-        m_trackProperties.pz = mom.Pz();
+        ROOT::Math::XYZVector mom = fitResult->getMomentum();
+        m_trackProperties.cosTheta = cos(mom.Theta());
+        m_trackProperties.ptot = mom.R();
+        m_trackProperties.pt = mom.Rho();
+        m_trackProperties.px = mom.X();
+        m_trackProperties.py = mom.Y();
+        m_trackProperties.pz = mom.Z();
         m_trackProperties.x = fitResult->getPosition().X();
         m_trackProperties.y = fitResult->getPosition().Y();
         m_trackProperties.z = fitResult->getPosition().Z();

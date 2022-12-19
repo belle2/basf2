@@ -76,10 +76,10 @@ void TrackCreatorModule::initialize()
   }
 
   B2ASSERT("BeamSpot should have exactly 3 parameters", m_beamSpot.size() == 3);
-  m_beamSpotAsTVector = TVector3(m_beamSpot[0], m_beamSpot[1], m_beamSpot[2]);
+  m_beamSpotAsTVector = B2Vector3D(m_beamSpot[0], m_beamSpot[1], m_beamSpot[2]);
 
   B2ASSERT("BeamAxis should have exactly 3 parameters", m_beamAxis.size() == 3);
-  m_beamAxisAsTVector = TVector3(m_beamAxis[0], m_beamAxis[1], m_beamAxis[2]);
+  m_beamAxisAsTVector = B2Vector3D(m_beamAxis[0], m_beamAxis[1], m_beamAxis[2]);
 }
 
 void TrackCreatorModule::beginRun()
@@ -103,8 +103,8 @@ void TrackCreatorModule::event()
       // Otherwise fits them with the default fitter.
       B2DEBUG(25, "Trying to fit with PDG = " << pdg);
       B2DEBUG(25, "PDG hypothesis: " << pdg << "\tMomentum cut: " << m_trackFitMomentumRange->getMomentumRange(
-                pdg) << "\tSeed p: " << recoTrack.getMomentumSeed().Mag());
-      if (recoTrack.getMomentumSeed().Mag() <= m_trackFitMomentumRange->getMomentumRange(pdg)) {
+                pdg) << "\tSeed p: " << recoTrack.getMomentumSeed().R());
+      if (recoTrack.getMomentumSeed().R() <= m_trackFitMomentumRange->getMomentumRange(pdg)) {
         trackFitter.fit(recoTrack, Const::ParticleType(abs(pdg)));
       }
     }

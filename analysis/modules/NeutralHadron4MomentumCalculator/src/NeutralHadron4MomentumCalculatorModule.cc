@@ -95,9 +95,9 @@ void NeutralHadron4MomentumCalculatorModule::event()
     double D = (a * a - c * c) * d + b * b;
     if (D >= 0) {
       double neutralP = (-1. * a * b - c * std::sqrt(D)) / (a * a - c * c);
-      double neutralPx = neutralP * neutralDirection.x();
-      double neutralPy = neutralP * neutralDirection.y();
-      double neutralPz = neutralP * neutralDirection.z();
+      double neutralPx = neutralP * neutralDirection.X();
+      double neutralPy = neutralP * neutralDirection.Y();
+      double neutralPz = neutralP * neutralDirection.Z();
       double neutralE = std::sqrt(neutralP * neutralP + d);
       const ROOT::Math::PxPyPzEVector newNeutral4Momentum(neutralPx, neutralPy, neutralPz, neutralE);
 

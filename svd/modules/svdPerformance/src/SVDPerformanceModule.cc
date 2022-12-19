@@ -469,11 +469,11 @@ void SVDPerformanceModule::event()
       tfr = track.getTrackFitResultWithClosestMass(Const::pion);
     if (tfr) {
       m_Pvalue->Fill(tfr->getPValue());
-      m_mom->Fill(tfr->getMomentum().Mag());
+      m_mom->Fill(tfr->getMomentum().R());
       m_nSVDhits->Fill((tfr->getHitPatternVXD()).getNSVDHits());
 
       if (m_is2017TBanalysis) {
-        if ((tfr->getPValue() < 0.001) || (tfr->getMomentum().Mag() < 1))
+        if ((tfr->getPValue() < 0.001) || (tfr->getMomentum().R() < 1))
           continue;
       }
     }

@@ -37,6 +37,9 @@
 #include <mdst/dbobjects/BeamSpot.h>
 #include <mdst/dataobjects/MCParticle.h>
 
+// ROOT
+#include <Math/Vector3D.h>
+
 #include <string>
 #include <vector>
 
@@ -114,20 +117,20 @@ namespace Belle2 {
                            * 1 fit performed with rolled back parameters
                            * 2 unable to recover truth parameters */
     double m_fitPval;             /**< P value of the tag side fit result */
-    B2Vector3D m_tagV;              /**< tag side fit result */
+    ROOT::Math::XYZVector m_tagV;              /**< tag side fit result */
     TMatrixDSym m_tagVErrMatrix;  /**< Error matrix of the tag side fit result */
-    B2Vector3D m_mcTagV;            /**< generated tag side vertex */
+    ROOT::Math::XYZVector m_mcTagV;            /**< generated tag side vertex */
     double   m_mcTagLifeTime;     /**< generated tag side life time of B-decay */
     int m_mcPDG;                  /**< generated tag side B flavor */
-    B2Vector3D m_mcVertReco;        /**< generated Breco decay vertex */
+    ROOT::Math::XYZVector m_mcVertReco;        /**< generated Breco decay vertex */
     double m_mcLifeTimeReco;      /**< generated Breco life time */
     double m_deltaT;              /**< reconstructed DeltaT */
     double m_deltaTErr;           /**< reconstructed DeltaT error */
     double m_mcDeltaTau;            /**< generated DeltaT */
     double m_mcDeltaT;            /**< generated DeltaT with boost-direction approximation */
     TMatrixDSym m_constraintCov;  /**< constraint to be used in the tag vertex fit */
-    B2Vector3D m_constraintCenter;  /**< centre position of the constraint for the tag Vertex fit */
-    B2Vector3D m_BeamSpotCenter;    /**< Beam spot position */
+    ROOT::Math::XYZVector m_constraintCenter;  /**< centre position of the constraint for the tag Vertex fit */
+    ROOT::Math::XYZVector m_BeamSpotCenter;    /**< Beam spot position */
     TMatrixDSym m_BeamSpotCov;    /**< size of the beam spot == covariance matrix on the beam spot position */
     bool m_mcInfo;                /**< true if user wants to retrieve MC information out from the tracks used in the fit */
     DBObjPtr<BeamSpot> m_beamSpotDB;/**< Beam spot database object*/
@@ -155,14 +158,14 @@ namespace Belle2 {
     Particle* doVertexFitForBTube(const Particle* mother, std::string fitType) const;
 
     /** calculate the constraint for the vertex fit on the tag side using Breco information*/
-    std::pair<B2Vector3D, TMatrixDSym> findConstraint(const Particle* Breco, double cut) const;
+    std::pair<ROOT::Math::XYZVector, TMatrixDSym> findConstraint(const Particle* Breco, double cut) const;
 
     /** calculate the standard constraint for the vertex fit on the tag side*/
-    std::pair<B2Vector3D, TMatrixDSym> findConstraintBoost(double cut) const;
+    std::pair<ROOT::Math::XYZVector, TMatrixDSym> findConstraintBoost(double cut) const;
 
     /** calculate constraint for the vertex fit on the tag side using the B tube (cylinder along
     the expected BTag line of flights */
-    std::pair<B2Vector3D, TMatrixDSym> findConstraintBTube(const Particle* Breco, double cut);
+    std::pair<ROOT::Math::XYZVector, TMatrixDSym> findConstraintBTube(const Particle* Breco, double cut);
 
     /** get the vertex of the MC B particle associated to Btag. It works only with signal MC */
     void BtagMCVertex(const Particle* Breco);
@@ -210,7 +213,7 @@ namespace Belle2 {
     /**
      * Fill tagV vertex info
     */
-    void fillTagVinfo(const B2Vector3D& tagVpos, const TMatrixDSym& tagVposErr);
+    void fillTagVinfo(const ROOT::Math::XYZVector& tagVpos, const TMatrixDSym& tagVposErr);
 
     /**
      * make the vertex fit on the tag side:
@@ -259,7 +262,7 @@ namespace Belle2 {
     /**
      * This finds the point on the true particle trajectory closest to the measured track position
      */
-    static B2Vector3D getTruePoca(ParticleAndWeight const& paw);
+    static ROOT::Math::XYZVector getTruePoca(ParticleAndWeight const& paw);
 
     /**
      * If the fit has to be done with the rolled back tracks, Rave or KFit is fed with a track where the
@@ -272,7 +275,7 @@ namespace Belle2 {
     /**
      * This shifts the position of tracks by the vector difference of mother B and production point of track from truth info
      */
-    B2Vector3D getRollBackPoca(ParticleAndWeight const& paw);
+    ROOT::Math::XYZVector getRollBackPoca(ParticleAndWeight const& paw);
   };
 
   /**

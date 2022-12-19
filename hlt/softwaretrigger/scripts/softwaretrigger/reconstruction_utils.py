@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -25,7 +24,7 @@ def bToCharmHLTSkim(path):
     # Light mesons
     ma.fillParticleList("pi+:GoodTrackForHLT", "abs(d0) < 2 and abs(z0) < 5", path=path)
     ma.fillParticleList("K+:GoodTrackForHLT", "abs(d0) < 2 and abs(z0) < 5", path=path)
-    stdPi0s('all', path, loadPhotonBeamBackgroundMVA=False)
+    stdPi0s('all', path)
     ma.cutAndCopyList(outputListName='pi0:GoodPi0ForHLT', inputListName='pi0:all',
                       cut='[[daughter(0, clusterReg) == 1 and daughter(0, E) > 0.02250] or ' +
                       '[daughter(0, clusterReg) == 2 and daughter(0, E) > 0.020] or ' +

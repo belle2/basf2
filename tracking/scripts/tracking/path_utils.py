@@ -77,7 +77,7 @@ def add_hit_preparation_modules(path, components=None, pxd_filtering_offline=Fal
 
 
 def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, trackFitHypotheses=None,
-                                    reco_tracks="RecoTracks", add_mva_quality_indicator=False):
+                                    reco_tracks="RecoTracks", add_mva_quality_indicator=False, v0_finding=True):
     """
     Helper function to add the modules performing the
     track fit, the V0 fit and the Belle2 track creation to the path.
@@ -86,6 +86,7 @@ def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, tr
     :param components: the list of geometry components in use or None for all components.
     :param pruneTracks: Delete all hits expect the first and the last from the found tracks.
     :param reco_tracks: Name of the StoreArray where the reco tracks should be stored
+    :param v0_finding: if false, the V0Finder module is not executed
     :param add_mva_quality_indicator: If true, add the MVA track quality estimation
         to the path that sets the quality indicator property of the found tracks.
     """
@@ -95,7 +96,12 @@ def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, tr
                                               reco_tracks=reco_tracks,
                                               add_mva_quality_indicator=add_mva_quality_indicator)
 
-    add_postfilter_track_fit(path, components=components, pruneTracks=pruneTracks, reco_tracks=reco_tracks)
+    # V0 finding
+    if v0_finding:
+        path.add_module('V0Finder', RecoTracks=reco_tracks, v0FitterMode=1)
+
+    if pruneTracks:
+        add_prune_tracks(path, components=components, reco_tracks=reco_tracks)
 
 
 def add_prefilter_track_fit_and_track_creator(path, trackFitHypotheses=None,
@@ -118,6 +124,7 @@ def add_prefilter_track_fit_and_track_creator(path, trackFitHypotheses=None,
         "Combined_DAFRecoFitter")
     # Add MVA classifier that uses information not included in the calculation of the fit p-value
     # to add a track quality indicator for classification of fake vs. MC-matched tracks
+
     if add_mva_quality_indicator:
         path.add_module("TrackQualityEstimatorMVA", collectEventFeatures=True)
     # create Belle2 Tracks from the genfit Tracks
@@ -129,25 +136,6 @@ def add_prefilter_track_fit_and_track_creator(path, trackFitHypotheses=None,
     # implementation.
     path.add_module('TrackCreator', recoTrackColName=reco_tracks,
                     pdgCodes=[211, 321, 2212] if not trackFitHypotheses else trackFitHypotheses)
-
-
-def add_postfilter_track_fit(path, components=None, pruneTracks=False, reco_tracks="RecoTracks"):
-    """
-    Helper function to add the modules not requred to calcualte HLT filter decision: performing
-    the V0 fit to the path.
-
-    :param path: The path to add the tracking reconstruction modules to
-    :param components: the list of geometry components in use or None for all components.
-    :param pruneTracks: Delete all hits expect the first and the last from the found tracks.
-    :param reco_tracks: Name of the StoreArray where the reco tracks should be stored
-    """
-
-    # V0 finding
-    path.add_module('V0Finder', RecoTracks=reco_tracks, v0FitterMode=1)
-
-    # prune genfit tracks
-    if pruneTracks:
-        add_prune_tracks(path, components=components, reco_tracks=reco_tracks)
 
 
 def add_cr_track_fit_and_track_creator(path, components=None,

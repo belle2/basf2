@@ -348,7 +348,7 @@ void TrackingPerformanceEvaluationModule::beginRun()
 
 void TrackingPerformanceEvaluationModule::event()
 {
-  B2Vector3D magField = BFieldManager::getField(0, 0, 0) / Unit::T;
+  ROOT::Math::XYZVector magField = BFieldManager::getField(0, 0, 0) / Unit::T;
 
   bool hasTrack = false;
   B2DEBUG(29, "+++++ 1. loop on MCParticles");
@@ -488,8 +488,8 @@ void TrackingPerformanceEvaluationModule::event()
 
     m_h1_pValue->Fill(fitResult->getPValue());
 
-    TVector3 momentum = fitResult->getMomentum();
-    m_h3_Tracks->Fill(momentum.Pt(), momentum.Theta(), momentum.Phi());
+    ROOT::Math::XYZVector momentum = fitResult->getMomentum();
+    m_h3_Tracks->Fill(momentum.Rho(), momentum.Theta(), momentum.Phi());
 
     fillTrackErrParams2DHistograms(fitResult);
 
@@ -518,7 +518,7 @@ void TrackingPerformanceEvaluationModule::event()
     for (int mcp = 0; mcp < (int)MCParticles_fromTrack.size(); mcp++)
       if (isTraceable(*MCParticles_fromTrack[mcp])) {
         nMCParticles ++;
-        m_h3_MCParticlesPerTrack->Fill(momentum.Pt(), momentum.Theta(), momentum.Phi());
+        m_h3_MCParticlesPerTrack->Fill(momentum.Rho(), momentum.Theta(), momentum.Phi());
       }
     //    }
 
@@ -722,17 +722,17 @@ void  TrackingPerformanceEvaluationModule::fillTrackParams1DHistograms(const Tra
   double px_res = fitResult->getMomentum().X() - mcParticleInfo.getPx();
   double py_res = fitResult->getMomentum().Y() - mcParticleInfo.getPy();
   double pz_res = fitResult->getMomentum().Z() - mcParticleInfo.getPz();
-  double p_res = (fitResult->getMomentum().Mag() - mcParticleInfo.getP()) / mcParticleInfo.getP();
-  double pt_res = (fitResult->getMomentum().Pt() - mcParticleInfo.getPt()) / mcParticleInfo.getPt();
+  double p_res = (fitResult->getMomentum().R() - mcParticleInfo.getP()) / mcParticleInfo.getP();
+  double pt_res = (fitResult->getMomentum().Rho() - mcParticleInfo.getPt()) / mcParticleInfo.getPt();
 
   //track parameters residuals in position:
   double x_res = fitResult->getPosition().X() - mcParticleInfo.getX();
   double y_res = fitResult->getPosition().Y() - mcParticleInfo.getY();
   double z_res = fitResult->getPosition().Z() - mcParticleInfo.getZ();
-  double r_res = fitResult->getPosition().Perp() - sqrt(mcParticleInfo.getX() * mcParticleInfo.getX() + mcParticleInfo.getY() *
-                                                        mcParticleInfo.getY());
-  double rtot_res = fitResult->getPosition().Mag() - sqrt(mcParticleInfo.getX() * mcParticleInfo.getX() + mcParticleInfo.getY() *
-                                                          mcParticleInfo.getY() + mcParticleInfo.getZ() * mcParticleInfo.getZ());
+  double r_res = fitResult->getPosition().Rho() - sqrt(mcParticleInfo.getX() * mcParticleInfo.getX() + mcParticleInfo.getY() *
+                                                       mcParticleInfo.getY());
+  double rtot_res = fitResult->getPosition().R() - sqrt(mcParticleInfo.getX() * mcParticleInfo.getX() + mcParticleInfo.getY() *
+                                                        mcParticleInfo.getY() + mcParticleInfo.getZ() * mcParticleInfo.getZ());
 
   m_h1_d0_err->Fill(d0_err);
   m_h1_phi_err->Fill(phi_err);
@@ -767,7 +767,7 @@ void  TrackingPerformanceEvaluationModule::fillTrackParams1DHistograms(const Tra
   m_h1_cotTheta_pll->Fill(cotTheta_res / cotTheta_err);
 
 
-  m_h2_OmegaerrOmegaVSpt->Fill(fitResult->getMomentum().Pt(), omega_err / mcParticleInfo.getOmega());
+  m_h2_OmegaerrOmegaVSpt->Fill(fitResult->getMomentum().Rho(), omega_err / mcParticleInfo.getOmega());
 
 
 }
@@ -781,13 +781,13 @@ void  TrackingPerformanceEvaluationModule::fillTrackErrParams2DHistograms(const 
   double z0_err =  sqrt((fitResult->getCovariance5())[3][3]);
   double cotTheta_err = sqrt((fitResult->getCovariance5())[4][4]);
 
-  TVector3 momentum = fitResult->getMomentum();
+  ROOT::Math::XYZVector momentum = fitResult->getMomentum();
 
-  double px = momentum.Px();
-  double py = momentum.Py();
-  double pz = momentum.Pz();
-  double pt = momentum.Pt();
-  double p = momentum.Mag();
+  double px = momentum.x();
+  double py = momentum.y();
+  double pz = momentum.z();
+  double pt = momentum.Rho();
+  double p = momentum.R();
   double mass = fitResult->getParticleType().getMass();
   double beta = p / sqrt(p * p + mass * mass);
   double sinTheta = TMath::Sin(momentum.Theta());
@@ -826,7 +826,7 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
   if (fitResult) {
     d0_err = sqrt((fitResult->getCovariance5())[0][0]);
     z0_err = sqrt((fitResult->getCovariance5())[3][3]);
-    pt = fitResult->getMomentum().Pt();
+    pt = fitResult->getMomentum().Rho();
   }
 
   const bool hasCDChit[56] = { false };
@@ -853,7 +853,7 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
           B2WARNING(" No KalmanFitterInfo associated to the TrackPoint!");
 
         double detId(-999);
-        TVector3 globalHit(-999, -999, -999);
+        ROOT::Math::XYZVector globalHit(-999, -999, -999);
 
         PXDRecoHit* pxdHit =  dynamic_cast<PXDRecoHit*>(absMeas);
         SVDRecoHit2D* svdHit2D =  dynamic_cast<SVDRecoHit2D*>(absMeas);
@@ -879,7 +879,7 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
 
           m_h2_TrackPointFitWeightVXD->Fill(sensor.getLayerNumber(), weight);
           const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(sensor);
-          globalHit = aSensorInfo.pointToGlobal(TVector3(uCoor, vCoor, 0), true);
+          globalHit = aSensorInfo.pointToGlobal(ROOT::Math::XYZVector(uCoor, vCoor, 0), true);
 
 
           const PXDCluster* pxdcl = pxdHit->getCluster();
@@ -920,7 +920,7 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
 
           m_h2_TrackPointFitWeightVXD->Fill(sensor.getLayerNumber(), weight);
           const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(sensor);
-          globalHit = aSensorInfo.pointToGlobal(TVector3(uCoor, vCoor, 0), true);
+          globalHit = aSensorInfo.pointToGlobal(ROOT::Math::XYZVector(uCoor, vCoor, 0), true);
 
 
           const VTXCluster* vtxcl = vtxHit->getCluster();
@@ -959,7 +959,7 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
           m_h2_TrackPointFitWeightVXD->Fill(sensor.getLayerNumber(), weight);
 
           const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(sensor);
-          globalHit = aSensorInfo.pointToGlobal(TVector3(uCoor, vCoor, 0), true);
+          globalHit = aSensorInfo.pointToGlobal(ROOT::Math::XYZVector(uCoor, vCoor, 0), true);
 
         } else if (svdHit) {
 
@@ -981,7 +981,7 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
 
           m_h2_TrackPointFitWeightVXD->Fill(sensor.getLayerNumber(), weight);
           const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(sensor);
-          globalHit = aSensorInfo.pointToGlobal(TVector3(uCoor, vCoor, 0), true);
+          globalHit = aSensorInfo.pointToGlobal(ROOT::Math::XYZVector(uCoor, vCoor, 0), true);
         } else if (cdcHit) {
 
           if (kalmanInfo)
@@ -1003,7 +1003,7 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
 
         m_h2_VXDhitsPR_xy->Fill(globalHit.X(), globalHit.Y());
 
-        m_h2_VXDhitsPR_rz->Fill(globalHit.Z(), globalHit.Perp());
+        m_h2_VXDhitsPR_rz->Fill(globalHit.Z(), globalHit.Rho());
 
       }
 

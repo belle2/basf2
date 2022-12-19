@@ -57,6 +57,7 @@
 #include "trg/cdc/Link.h"
 #include "trg/cdc/EventTime.h"
 #include <framework/gearbox/Const.h>
+#include <framework/geometry/B2Vector3.h>
 #include <TObjString.h>
 
 #define NOT_USE_SOCKETLIB
@@ -2166,7 +2167,7 @@ namespace Belle2 {
           const TCRelation& trackRelation = aTrack.relation();
           const MCParticle& trackMCParticle = trackRelation.mcParticle(0);
           int mcCharge = trackMCParticle.getCharge();
-          double mcPt = trackMCParticle.getMomentum().Pt();
+          double mcPt = trackMCParticle.getMomentum().Rho();
           double mcPhi0 = 0.0;
           if (mcCharge > 0) mcPhi0 = trackMCParticle.getMomentum().Phi() - M_PI / 2;
           if (mcCharge < 0) mcPhi0 = trackMCParticle.getMomentum().Phi() + M_PI / 2;
@@ -2179,7 +2180,7 @@ namespace Belle2 {
           TVector3 impactPosition;
           Fitter3DUtility::findImpactPosition(&vertex, &vector4, mcCharge, helixCenter, impactPosition);
           double mcZ0 = impactPosition.Z();
-          double mcCot = trackMCParticle.getMomentum().Pz() / trackMCParticle.getMomentum().Pt();
+          double mcCot = trackMCParticle.getMomentum().z() / trackMCParticle.getMomentum().Rho();
           cout << TRGDebug::tab() << "Track[" << iTrack << "]: mcCharge=" << mcCharge
                << " mcPt=" << mcPt << " mcPhi_c=" << mcPhi0
                << " mcZ0=" << mcZ0 << " mcCot=" << mcCot << endl;

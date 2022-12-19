@@ -173,7 +173,7 @@ def extract_features(reco_track):
     # Presently, the TripletFit is used. But this may change.
     # qi = reco_track.getQualityIndicator()
     momentum = reco_track.getMomentumSeed()
-    seed_pt = momentum.Perp()
+    seed_pt = momentum.Rho()
     # seed_mom = momentum.Mag()
     seed_tan_lambda = np.divide(1.0, math.tan(momentum.Theta()))
 

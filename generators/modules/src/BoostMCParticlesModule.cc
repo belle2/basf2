@@ -59,7 +59,7 @@ void BoostMCParticlesModule::event()
       mcParticle.setProductionTime(productionVertex.T() / Const::speedOfLight);
     }
     if (mcParticle.getDecayTime() != 0.) { // Boost only if the decay vertex is not the default one.
-      B2Vector3D v = mcParticle.getDecayVertex();
+      ROOT::Math::XYZVector v = mcParticle.getDecayVertex();
       ROOT::Math::PxPyPzEVector decayVertex(v.X(), v.Y(), v.Z(), Const::speedOfLight * mcParticle.getDecayTime());
       decayVertex = m_boost * decayVertex;
       mcParticle.setDecayVertex(decayVertex.X(), decayVertex.Y(), decayVertex.Z());

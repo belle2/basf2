@@ -11,6 +11,7 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <vtx/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
+#include <TMath.h>
 #include <cmath>
 #include <numeric>
 
@@ -55,8 +56,8 @@ const Belle2::VTXClusterOffsetPar* Belle2::VTX::VTXClusterPositionEstimator::get
     double tu,
     double tv) const
 {
-  double thetaU = TMath::ATan2(tu, 1.0) * 180.0 / M_PI;
-  double thetaV = TMath::ATan2(tv, 1.0) * 180.0 / M_PI;
+  double thetaU = TMath::ATan2(tu, 1.0) * TMath::RadToDeg();
+  double thetaV = TMath::ATan2(tv, 1.0) * TMath::RadToDeg();
   int sector_index = getSectorIndex(thetaU, thetaV);
   int clusterkind = cluster.getKind();
   int shape_index = cluster.getSectorShapeIndices().at(sector_index);
@@ -67,8 +68,8 @@ const Belle2::VTXClusterOffsetPar* Belle2::VTX::VTXClusterPositionEstimator::get
 
 float Belle2::VTX::VTXClusterPositionEstimator::getShapeLikelyhood(const Belle2::VTXCluster& cluster, double tu, double tv) const
 {
-  double thetaU = TMath::ATan2(tu, 1.0) * 180.0 / M_PI;
-  double thetaV = TMath::ATan2(tv, 1.0) * 180.0 / M_PI;
+  double thetaU = TMath::ATan2(tu, 1.0) * TMath::RadToDeg();
+  double thetaV = TMath::ATan2(tv, 1.0) * TMath::RadToDeg();
   int clusterkind = cluster.getKind();
   int sector_index = getSectorIndex(thetaU, thetaV);
   int shape_index = cluster.getSectorShapeIndices().at(sector_index);

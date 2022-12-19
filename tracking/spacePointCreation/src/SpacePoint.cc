@@ -25,7 +25,7 @@ SpacePoint::SpacePoint(const VTXCluster* vtxCluster,
   }
 
   // the second parameter set to true results in alignment constants being applied
-  m_position = aSensorInfo->pointToGlobal(TVector3(vtxCluster->getU(), vtxCluster->getV(), 0), true);
+  m_position = aSensorInfo->pointToGlobal(ROOT::Math::XYZVector(vtxCluster->getU(), vtxCluster->getV(), 0), true);
 
   setPositionError(vtxCluster->getUSigma(), vtxCluster->getVSigma(), aSensorInfo);
 
@@ -47,7 +47,7 @@ SpacePoint::SpacePoint(const PXDCluster* pxdCluster,
   }
 
   // the second parameter set to true results in alignment constants being applied
-  m_position = aSensorInfo->pointToGlobal(TVector3(pxdCluster->getU(), pxdCluster->getV(), 0), true);
+  m_position = aSensorInfo->pointToGlobal(ROOT::Math::XYZVector(pxdCluster->getU(), pxdCluster->getV(), 0), true);
 
   setPositionError(pxdCluster->getUSigma(), pxdCluster->getVSigma(), aSensorInfo);
 
@@ -114,7 +114,7 @@ SpacePoint::SpacePoint(std::vector<const SVDCluster*>& clusters,
     uCoord = uCluster->getPosition(vCoord);
 
   // the second parameter set to true results in alignment constants being applied
-  m_position = aSensorInfo->pointToGlobal(TVector3(uCoord, vCoord, 0), true);
+  m_position = aSensorInfo->pointToGlobal(ROOT::Math::XYZVector(uCoord, vCoord, 0), true);
   m_normalizedLocal = convertLocalToNormalizedCoordinates({ uCoord, vCoord }, m_vxdID, aSensorInfo);
 
   // if sigma for a coordinate is not known, a uniform distribution over the whole sensor is asumed:
@@ -233,5 +233,5 @@ B2Vector3<double> SpacePoint::getGlobalCoordinates(std::pair<double, double> con
   }
 
   // the second parameter set to true results in alignment constants being applied
-  return aSensorInfo->pointToGlobal(TVector3(hitLocal.first, hitLocal.second, 0), true);
+  return aSensorInfo->pointToGlobal(ROOT::Math::XYZVector(hitLocal.first, hitLocal.second, 0), true);
 }

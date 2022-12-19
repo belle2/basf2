@@ -326,14 +326,9 @@ namespace Belle2 {
     void setPositionError(double uSigma, double vSigma, const VXD::SensorInfoBase* aSensorInfo)
     {
       //As only variances, but not the sigmas transform linearly, we need to use some acrobatics.
-      m_positionError = aSensorInfo->vectorToGlobal(
-                          TVector3(
-                            uSigma * uSigma,
-                            vSigma * vSigma,
-                            0
-                          ),
-                          true // use alignment in transformation
-                        );
+      m_positionError = aSensorInfo->vectorToGlobal(ROOT::Math::XYZVector(uSigma * uSigma, vSigma * vSigma, 0),
+                                                    true // use alignment in transformation
+                                                   );
       m_positionError.Sqrt();
     }
 

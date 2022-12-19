@@ -26,7 +26,7 @@
 
 #include <TFile.h>
 #include <TTree.h>
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 
 using namespace Belle2;
 
@@ -596,7 +596,7 @@ void SpacePoint2TrueHitConnectorModule::positionAnalysis(Belle2::SpacePoint* spa
     if (detType == c_SVD) { trueHit = m_SVDTrueHits[info.m_Id]; }
     else if (detType == c_VTX) { trueHit = m_VTXTrueHits[info.m_Id]; }
     else { trueHit = m_PXDTrueHits[info.m_Id]; }
-    std::pair<TVector3, TVector3> trueHitPos = getTrueHitPositions(trueHit);
+    std::pair<ROOT::Math::XYZVector, ROOT::Math::XYZVector> trueHitPos = getTrueHitPositions(trueHit);
 
     double weightU = info.m_wU;
     double weightV = info.m_wV;
@@ -760,8 +760,8 @@ bool SpacePoint2TrueHitConnectorModule::compatibleCombination(Belle2::SpacePoint
 
   B2DEBUG(29, "maximum residual in U: " << maxUres << ", in V: " << maxVres);
 
-  const TVector3 trueHitLocalPos = TVector3(trueHit->getU(), trueHit->getV(), 0);
-  const TVector3 trueHitGlobalPos = SensorInfoBase.pointToGlobal(trueHitLocalPos, true); // uses alignment
+  const ROOT::Math::XYZVector trueHitLocalPos = ROOT::Math::XYZVector(trueHit->getU(), trueHit->getV(), 0);
+  const ROOT::Math::XYZVector trueHitGlobalPos = SensorInfoBase.pointToGlobal(trueHitLocalPos, true); // uses alignment
 
   std::pair<double, double> spacePointLocal = getLocalPos(spacePoint);
   // compare only those values of the local coordinates that have been set
@@ -818,14 +818,14 @@ std::pair<double, double> SpacePoint2TrueHitConnectorModule::getLocalPos(Belle2:
 
 // =============================================================== GET TRUEHIT POSITIONS ==========================================
 template<typename TrueHitType>
-std::pair<TVector3, TVector3> SpacePoint2TrueHitConnectorModule::getTrueHitPositions(TrueHitType* trueHit)
+std::pair<ROOT::Math::XYZVector, ROOT::Math::XYZVector> SpacePoint2TrueHitConnectorModule::getTrueHitPositions(TrueHitType* trueHit)
 {
 //   TrueHitType* trueHit = trueHits[index];
-  const TVector3 localPos = TVector3(trueHit->getU(), trueHit->getV(), 0);
+  const ROOT::Math::XYZVector localPos = ROOT::Math::XYZVector(trueHit->getU(), trueHit->getV(), 0);
 
   const VxdID trueHitVxdId = trueHit->getSensorID();
   VXD::SensorInfoBase SensorInfoBase = VXD::GeoCache::getInstance().getSensorInfo(trueHitVxdId);
-  const TVector3 globalPos = SensorInfoBase.pointToGlobal(localPos, true); // uses alignment
+  const ROOT::Math::XYZVector globalPos = SensorInfoBase.pointToGlobal(localPos, true); // uses alignment
 
   return std::make_pair(localPos, globalPos);
 }

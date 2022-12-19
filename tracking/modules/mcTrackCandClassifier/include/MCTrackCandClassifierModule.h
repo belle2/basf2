@@ -127,7 +127,7 @@ namespace Belle2 {
     StoreArray<genfit::TrackCand> m_GenfitMCTrackCands; /**< MC Genfit TrackCands StoreArray */
     StoreArray<genfit::TrackCand> m_GenfitIdealMCTrackCands; /**< Ideal Genfit TrackCands StoreArray */
 
-    B2Vector3D m_magField; /**< magnetic field needed set particle info */
+    ROOT::Math::XYZVector m_magField; /**< magnetic field needed set particle info */
 
     /** Function to get semiplane.
      * @param vertex: Vertex position
@@ -135,7 +135,7 @@ namespace Belle2 {
      * @param hit: hit position
      * @return difference in y-slope between hit and semiplane
      */
-    double semiPlane(TVector3 vertex, TVector3 center, TVector3 hit);
+    double semiPlane(ROOT::Math::XYZVector vertex, ROOT::Math::XYZVector center, ROOT::Math::XYZVector hit);
 
     /** Function to check if a omega value is in a given semiPlane.
      * @param semiPlane: slope of semiplane
@@ -149,7 +149,7 @@ namespace Belle2 {
      * @param hit: hit position
      * @return Distance between the two hits
      */
-    double theDistance(TVector3 center, TVector3 hit);
+    double theDistance(ROOT::Math::XYZVector center, ROOT::Math::XYZVector hit);
 
     /** Function to check if hitDistance is within a given annulus.
      * @param hitDistance: distance between two hits

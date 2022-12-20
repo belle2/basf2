@@ -19,11 +19,10 @@
 </header>
 """
 import reconstruction as rec
-import simulation as sim
+from simulation import add_simulation
 from vtx import get_upgrade_globaltag
 from ROOT import Belle2
 import ROOT
-import sys
 import math
 import basf2 as b2
 from ROOT import PyConfig
@@ -165,8 +164,6 @@ class ClusterEfficiency(b2.Module):
 
             # meh, something strange with the momentum, ignore this one
             if p_gen is None:
-                B2WARNING("Strange particle momentum: %f, expected one of %s" %
-                          (p.Mag(), ", ".join(str() for p in momenta)))
                 continue
 
             # and check all truehits
@@ -181,10 +178,10 @@ main = b2.create_path()
 b2.conditions.disable_globaltag_replay()
 b2.conditions.prepend_globaltag(get_upgrade_globaltag())
 
-main.add_module("EventInfoSetter", evtNumList=[10000])
-
-main.add_module('Gearbox')
-main.add_module('Geometry')
+eventinfosetter = main.add_module('EventInfoSetter')
+eventinfosetter.param('evtNumList', [1000])
+eventinfosetter.param('runList', [1])
+eventinfosetter.param('expList', [0])
 
 particlegun = main.add_module("ParticleGun")
 particlegun.param({
@@ -198,10 +195,10 @@ particlegun.param({
 })
 
 # Add simulation modules
-sim.add_simulation(main, components=['VTX'], useVTX=True)
+add_simulation(main, useVTX=True)
 
 # Add mc reconstruction
-rec.add_mc_reconstruction(main, components=['VTX'], pruneTracks=False, useVTX=True)
+rec.add_mc_reconstruction(main, pruneTracks=False, useVTX=True)
 
 
 clusterefficiency = ClusterEfficiency()

@@ -238,7 +238,7 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
 
     # Only run the track time extraction on the full reconstruction chain for now. Later, we may
     # consider to do the CDC-hit based method already during the fast reconstruction stage
-    add_time_extraction(path, append_full_grid_cdc_eventt0, components=components)
+    add_time_extraction(path, append_full_grid_cdc_eventt0, components=components, useVTX=useVTX)
 
     add_mc_matcher(path, components=components, reco_tracks=reco_tracks,
                    use_second_cdc_hits=use_second_cdc_hits)
@@ -285,7 +285,7 @@ def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=Fa
         path.add_module("PruneRecoHits")
 
 
-def add_time_extraction(path, append_full_grid_cdc_eventt0=False, components=None):
+def add_time_extraction(path, append_full_grid_cdc_eventt0=False, components=None, useVTX=False):
     """
     Add time extraction components via tracking
 
@@ -293,11 +293,12 @@ def add_time_extraction(path, append_full_grid_cdc_eventt0=False, components=Non
     :param append_full_grid_cdc_eventt0: If True, the module FullGridChi2TrackTimeExtractor is added to the path
                                       and provides the CDC temporary EventT0.
     :param components: the list of geometry components in use or None for all components.
+    :param useVTX: If true, the VTX reconstruction is performed.
     """
-    if is_svd_used(components):
+    if is_svd_used(components) and not useVTX:
         path.add_module("SVDEventT0Estimator")
 
-    if is_cdc_used(components) and append_full_grid_cdc_eventt0:
+    if is_cdc_used(components) and (append_full_grid_cdc_eventt0 or useVTX):
         path.add_module("FullGridChi2TrackTimeExtractor")
 
 

@@ -141,6 +141,14 @@ namespace Belle2 {
      */
     static MonitoringObject* findMonitoringObject(const std::string& objName);
 
+    /**
+     * Helper function to compute half of the central interval covering 68% of a distribution.
+     * This quantity is an alternative to the standard deviation.
+     * @param h histogram
+     * @return Half of the central interval covering 68% of a distribution.
+     */
+    double getSigma68(TH1* h) const;
+
   public:
     /**
      * Add histogram.

@@ -70,7 +70,7 @@ SVDROIGeometry::fillPlaneList(double toleranceZ,
 
 
 void
-SVDROIGeometry::appendSelectedPlanes(std::list<ROIDetPlane>* selectedPlanes, TVector3 recoTrackPosition, int layer)
+SVDROIGeometry::appendSelectedPlanes(std::list<ROIDetPlane>* selectedPlanes, ROOT::Math::XYZVector recoTrackPosition, int layer)
 {
 
 
@@ -80,7 +80,7 @@ SVDROIGeometry::appendSelectedPlanes(std::list<ROIDetPlane>* selectedPlanes, TVe
 
   while (itPlanes != m_planeList.end()) {
 
-    if (itPlanes->isSensorInRange(ROOT::Math::XYZVector(recoTrackPosition), layer))
+    if (itPlanes->isSensorInRange(recoTrackPosition, layer))
       selectedPlanes->push_back(*itPlanes);
 
     ++itPlanes;

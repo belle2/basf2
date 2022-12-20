@@ -119,7 +119,8 @@ void SVDTimeGroupComposerModule::event()
           kj--;
         } else    // sort in distance from zero
         while ((kj >= 0) &&
-               (std::fabs(std::get<0>(groupInfo[kj]) + std::get<1>(groupInfo[kj])) > std::fabs(std::get<0>(key) + std::get<1>(key)))) {
+               std::min(std::fabs(std::get<0>(groupInfo[kj])), std::fabs(std::get<1>(groupInfo[kj]))) > std::min(std::fabs(std::get<0>(key)),
+                   std::fabs(std::get<1>(key)))) {
           groupInfo[kj + 1] = groupInfo[kj];
           kj--;
         }

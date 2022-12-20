@@ -23,8 +23,6 @@
 #include <TText.h>
 #include <TLegend.h>
 
-#include <geometry/GeometryManager.h>
-#include <framework/gearbox/GearDir.h>
 #include <framework/database/DBObjPtr.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/geometry/CDCGeometryParConstants.h>
@@ -38,7 +36,7 @@
 namespace Belle2 {
 
   /**
-   * A calibration algorithm for CDC dE/dx wire gains
+   * A calibration algorithm for CDC dE/dx to find the bad wires
    *
    */
   class CDCDedxBadWireAlgorithm : public CalibrationAlgorithm {
@@ -61,17 +59,17 @@ namespace Belle2 {
     void setMonitoringPlots(bool value = false) {isMakePlots = value;}
 
     /**
-    * funtion to set high dedx fraction thershold
+    * function to set high dedx fraction threshold
     */
     void setHighFracThers(double value) {m_fracThers = value;}
 
     /**
-    * funtion to set RMS thershold
+    * function to set RMS thershold
     */
     void setRMSThers(double value) {m_rmsThers = value;}
 
     /**
-    * funtion to set Mean thershold
+    * function to set Mean thershold
     */
     void setMeanThers(double value) {m_meanThers = value;}
 
@@ -96,7 +94,7 @@ namespace Belle2 {
     }
 
     /**
-    * funtion to get extract calibration run/exp
+    * function to get extract calibration run/exp
     */
     void getExpRunInfo();
 
@@ -167,14 +165,17 @@ namespace Belle2 {
 
     bool isMakePlots; /**< produce plots for status */
     bool isADC; /**< Use adc if(true) else dedx for calibration*/
-    std::string m_varName; /**< string to set var name (adc or dedx) */
+
     int m_varBins; /**< number of bins for input variable */
     double m_varMin; /**< min range for input variable */
     double m_varMax; /**< max range for input variable */
     double m_meanThers; /**< mean thershold accepted for good wire */
     double m_rmsThers; /**< rms thershold accepted for good wire */
     double m_fracThers; /**< high-frac thershold accepted for good wire */
+
+    std::string m_varName; /**< string to set var name (adc or dedx) */
     std::string m_suffix; /**< suffix string for naming plots */
+
     DBObjPtr<CDCDedxBadWires> m_DBBadWires; /**< Badwire DB object */
     DBObjPtr<CDCDedxWireGain> m_DBWireGains; /**< Wiregain DB object */
     DBObjPtr<CDCGeometry> m_cdcGeo; /**< Geometry of CDC */

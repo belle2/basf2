@@ -8,15 +8,29 @@
 
 #pragma once
 
-#include <reconstruction/dbobjects/CDCDedxWireGain.h>
-#include <reconstruction/dbobjects/CDCDedxBadWires.h>
-#include <reconstruction/calibration/CDCDedxBadWireAlgorithm.h>
-#include <calibration/CalibrationAlgorithm.h>
-#include <framework/database/DBObjPtr.h>
+#include <algorithm>
+#include <iostream>
+#include <fstream>
 #include <string>
 #include <vector>
-#include "TH1D.h"
-#include "TH2F.h"
+
+#include <TH1D.h>
+#include <TCanvas.h>
+#include <TMath.h>
+#include <TLine.h>
+#include <TStyle.h>
+#include <TH1I.h>
+
+#include <reconstruction/dbobjects/CDCDedxWireGain.h>
+#include <reconstruction/dbobjects/CDCDedxBadWires.h>
+#include <cdc/dbobjects/CDCGeometry.h>
+#include <calibration/CalibrationAlgorithm.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/database/IntervalOfValidity.h>
+
+#include <cdc/geometry/CDCGeometryPar.h>
+#include <cdc/geometry/CDCGeometryParConstants.h>
+
 
 namespace Belle2 {
   /**
@@ -45,7 +59,7 @@ namespace Belle2 {
     /**
     * funtion to set flag active for plotting
     */
-    void enableExtraPlots(bool value = false) {isExtPlot = value;}
+    void enableExtraPlots(bool value = false) {isMakePlots = value;}
 
     /**
     * funtion to set trucation method (local vs global)
@@ -53,9 +67,9 @@ namespace Belle2 {
     void setWireBasedTruction(bool value = false) {isWireTruc = value;}
 
     /**
-    * funtion to set layer scaling
+    * function to get extract calibration run/exp
     */
-    void setLayerScale(bool value = false) {isLayerScale = value;}
+    void getExpRunInfo();
 
     /**
     * function to finally store new payload after full calibration
@@ -65,17 +79,42 @@ namespace Belle2 {
     /**
     * function to get bins of trunction from histogram
     */
-    void getTrucationBins(TH1D* htemp, int& binlow, int& binhigh);
+    void  getTruncatedBins(TH1D* hdedxhit, unsigned int& binlow, unsigned int& binhigh);
 
     /**
-    * function to get layer avg from outer layers
+    * function to get mean of trunction from histogram
     */
-    double getLayerAverage(std::vector<double> tempWire);
+    double getTruncationMean(TH1D* hdedxhit, int binlow, int binhigh);
 
     /**
-      * funtion to get info about current exp and run
-      */
-    void getExpRunInfo();
+    * function to draw dE/dx for inner/outer layer
+    */
+    void plotLayerDist(TH1D*& hdedxIL, TH1D*& hdedxOL);
+
+    /**
+    * function to draw dE/dx histograms for each wire
+    */
+    void plotWireDist(TH1D* hist[], std::vector<double>vrel_mean);
+
+    /**
+    * function to draw wire gains
+    */
+    void plotWireGain(std::vector<double>vdedx_means, std::vector<double>vrel_mean, double layeravg);
+
+    /**
+    * function to draw layer gains
+    */
+    void plotLayerGain(std::array<double, 56> layermean, double layeravg);
+
+    /**
+    * function to draw WG per layer
+    */
+    void plotWGPerLayer(std::vector<double>vdedx_means, std::array<double, 56> layermean, double layeravg);
+
+    /**
+    * function to draw statstics
+    */
+    void plotStats();
 
   protected:
 
@@ -94,22 +133,22 @@ namespace Belle2 {
      * @param removeHighest     highest fraction of hits to remove (0.25)
      */
 
-    unsigned int nwireCDC; /**< number of wires in CDC */
-    bool isExtPlot; /**< produce plots for status */
-    bool isMerge; /**< merge payload at the of calibration */
-    bool isWireTruc; /**< method of trunc range for mean */
-    bool isLayerScale; /**< method of scaling layer avg */
-    int fdEdxBins; /**< number of bins for dedx histogram */
-    double fdEdxMin; /**< min dedx range for wiregain cal */
-    double fdEdxMax; /**< max dedx range for wiregain cal */
-    double fTrucMin; /**< min trunc range for mean */
-    double fTrucMax; /**< max trunc range for mean */
-    std::string saddSfx; /**< suffix string to seperate plots */
+    unsigned int c_nwireCDC; /**< number of wires in CDC */
 
-    std::vector<double> vlayerAvg; /**< layer wire avg of trun mean */
+    bool isMakePlots; /**< produce plots for status */
+    bool isMerge; /**< merge payload at the time of calibration */
+    bool isWireTruc; /**< method of trunc range for mean */
+
+    int m_dedxBins; /**< number of bins for dedx histogram */
+    double m_dedxMin; /**< min dedx range for wiregain cal */
+    double m_dedxMax; /**< max dedx range for wiregain cal */
+    double m_trucMin; /**< min trunc range for mean */
+    double m_trucMax; /**< max trunc range for mean */
+
+    std::string m_suffix; /**< suffix string to seperate plots */
+
     DBObjPtr<CDCDedxWireGain> m_DBWireGains; /**< Wire gain DB object */
     DBObjPtr<CDCDedxBadWires> m_DBBadWires; /**< Bad wire DB object */
-    CDCDedxBadWireAlgorithm* m_CalWireGain; /**< pointer of CDCDedxBadWireAlgorithm */
-
+    DBObjPtr<CDCGeometry> m_cdcGeo; /**< Geometry of CDC */
   };
 } // namespace Belle2

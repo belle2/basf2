@@ -10,6 +10,8 @@
 
 using namespace std;
 using namespace Belle2;
+using namespace CDC;
+
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -19,13 +21,13 @@ CDCDedxBadWireAlgorithm::CDCDedxBadWireAlgorithm() :
   c_nwireCDC(c_nSenseWires),
   isMakePlots(true),
   isADC(false),
-  m_varName("hitdedx"),
   m_varBins(100),
   m_varMin(0.0),
   m_varMax(7.0),
   m_meanThers(1.0),
   m_rmsThers(1.0),
   m_fracThers(1.0),
+  m_varName("hitdedx"),
   m_suffix("")
 {
   // Set module properties
@@ -79,7 +81,7 @@ CalibrationAlgorithm::EResult CDCDedxBadWireAlgorithm::calibrate()
   int minstat = 0;
   for (unsigned int jw = 0; jw < c_nwireCDC; ++jw)
     if (vhitvar[jw].size() <= 100) minstat++;
-  if (minstat > 700 || amean == 0 || arms == 0)  return c_NotEnoughData;
+  if (minstat > 0.05 * c_nwireCDC || amean == 0 || arms == 0)  return c_NotEnoughData;
 
   std::map<int, std::vector<double>> qapars;
   std::vector<double> m_vdefectwires, m_badwires, m_deadwires;
@@ -339,8 +341,7 @@ TH2F* CDCDedxBadWireAlgorithm::getHistoPattern(std::vector<double> m_inwires, co
 {
 
   B2INFO("Creating CDCGeometryPar object");
-  CDC::CDCGeometryPar::Instance(&(*m_cdcGeo));
-  CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
+  CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance(&(*m_cdcGeo));
 
   std::ofstream outfile;
   std::string outname = Form("cdcdedx_bdcal_%slist_%s.txt", suffix.data(), m_suffix.data());
@@ -350,7 +351,7 @@ TH2F* CDCDedxBadWireAlgorithm::getHistoPattern(std::vector<double> m_inwires, co
 
   Int_t jwire = -1;
   total = 0;
-  for (int ilay = 0; ilay < 56; ++ilay) {
+  for (unsigned int ilay = 0; ilay < c_maxNSenseLayers; ++ilay) {
     for (unsigned int iwire = 0; iwire < cdcgeo.nWiresInLayer(ilay); ++iwire) {
       jwire++;
       double phi = 2.*TMath::Pi() * (float(iwire) / float(cdcgeo.nWiresInLayer(ilay)));

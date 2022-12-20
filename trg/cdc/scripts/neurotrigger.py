@@ -98,24 +98,28 @@ class randommaker(basf2.Module):
 
     def event(self):
         print("counter is " + str(self.counter))
-        if self.counter % 1000 == 0:
+        if self.counter % 100 == 0:
             print("case 0")
             self.return_value(0)
         elif self.counter % 3 == 0:
-            print("case 1")
             self.return_value(1)
         elif self.counter % 3 == 1:
-            print("case 2")
             self.return_value(2)
         elif self.counter % 3 == 2:
-            print("case 3")
             self.return_value(3)
         else:
             print("some kind of error")
         self.counter += 1
 
 
-def add_nnta_gzip_output(path, baseAnaFileName, configFileName, baseGzipFileName, excludeBranchNames=[], branchNames=[]):
+def add_nnta_gzip_test_output(
+        path,
+        baseAnaFileName,
+        configFileName,
+        baseGzipFileName,
+        baseOutputFileName,
+        excludeBranchNames=[],
+        branchNames=[]):
     # create 4 output paths:
     outpaths = []
     for x in range(4):
@@ -132,7 +136,45 @@ def add_nnta_gzip_output(path, baseAnaFileName, configFileName, baseGzipFileName
     rm.if_value('==3', outpaths[3][1])
     for p in outpaths:
         nnta = basf2.register_module(nntd.nntd())
-        nnta.param({"filename": baseAnaFileName+p[0]+".pkl", "netname": "default_all"})
+        nnta.param({"filename": baseAnaFileName+p[0]+".pkl", "netname": "hardware"})
+        p[1].add_module(nnta)
+        p[1].add_module('CDCTriggerNeuroData',
+                        # input and target arrays
+                        NeuroTrackInputMode=False,
+                        inputCollectionName=hwneuroinput2dfindertracks,  # the hardware input tracks
+                        # inputCollectionName=sim2dtracks_swts, # the software 2dtracks from real hits
+                        # inputCollectionName='TRGCDC2DFinderTracks', # the mcparticle based 2d tracks
+                        hitCollectionName=hwneuroinputsegmenthits,  # simsegmenthits, #'SimSegmentHits',
+                        EventTimeName="CDCTriggerNeuroETFT0",
+                        targetCollectionName='RecoTracks',
+                        trainOnRecoTracks=True,
+                        gzipFilename=baseGzipFileName+p[0]+".gz",
+                        configFileName=configFileName,
+                        writeconfigFileName=baseGzipFileName.split("/gzip")[0]+"/"+configFileName,
+                        )
+        if p[0] == ".random_3":
+            p[1].add_module("RootOutput", outputFileName=baseOutputFileName +
+                            p[0]+".root", excludeBranchNames=excludeBranchNames, branchNames=branchNames)
+
+
+def add_nnta_gzip_output(path, baseAnaFileName, configFileName, baseGzipFileName):
+    # create 4 output paths:
+    outpaths = []
+    for x in range(4):
+        outpaths.append([".random_"+str(x), basf2.create_path()])
+    # add the randommaker module:
+    rm = basf2.register_module(randommaker())
+    path.add_module(rm)
+
+    # also add nnta module:
+
+    rm.if_value('==0', outpaths[0][1])
+    rm.if_value('==1', outpaths[1][1])
+    rm.if_value('==2', outpaths[2][1])
+    rm.if_value('==3', outpaths[3][1])
+    for p in outpaths:
+        nnta = basf2.register_module(nntd.nntd())
+        nnta.param({"filename": baseAnaFileName+p[0]+".pkl", "netname": "hardware"})
         p[1].add_module(nnta)
         p[1].add_module('CDCTriggerNeuroData',
                         # input and target arrays
@@ -174,7 +216,7 @@ def add_all_output(
     rm.if_value('==3', outpaths[3][1])
     for p in outpaths:
         nnta = basf2.register_module(nntd.nntd())
-        nnta.param({"filename": baseAnaFileName+p[0]+".pkl", "netname": "default_all"})
+        nnta.param({"filename": baseAnaFileName+p[0]+".pkl", "netname": "hardware"})
         p[1].add_module("RootOutput", outputFileName=baseOutputFileName +
                         p[0]+".root", excludeBranchNames=excludeBranchNames, branchNames=branchNames)
         p[1].add_module(nnta)
@@ -211,7 +253,7 @@ def add_nnta_root_output(path, baseOutputFileName, baseAnaFileName, excludeBranc
     rm.if_value('==3', outpaths[3][1])
     for p in outpaths:
         nnta = basf2.register_module(nntd.nntd())
-        nnta.param({"filename": baseAnaFileName+p[0]+".pkl", "netname": "default_all"})
+        nnta.param({"filename": baseAnaFileName+p[0]+".pkl", "netname": "hardware"})
         p[1].add_module("RootOutput", outputFileName=baseOutputFileName +
                         p[0]+".root", excludeBranchNames=excludeBranchNames, branchNames=branchNames)
         p[1].add_module(nnta)
@@ -366,7 +408,7 @@ def add_neurotrigger_hw(path, nntweightfile=None, debug_level=4, debugout=False,
     if 'et_option' in kwargs:
         nnt.param('et_option', kwargs['et_option'])
     else:
-        nnt.param('et_option', 'etf_or_fastestpriority')
+        nnt.param('et_option', 'etfhwin')
 
     if 'EventTimeName' in kwargs:
         nnt.param('EventTimeName', kwargs['EventTimeName'])
@@ -402,9 +444,11 @@ def add_neuro_simulation(path, nntweightfile=None, **kwargs):
                     outputCollectionName=sim2dtracks_swts)
     if nntweightfile is not None:
         nnt.param('filename', Belle2.FileSystem.findFile(nntweightfile))
+    if 'et_option' in kwargs:
+        nnt.param('et_option', kwargs['et_option'])
     nnt.param('inputCollectionName', sim2dtracks_swts)
     nnt.param('outputCollectionName', simneurotracks_swtssw2d)
     nnt.param('hitCollectionName', simsegmenthits)
     nnt.param('writeMLPinput', True)
-    nnt.param('fixedPoint', True)
+    nnt.param('fixedPoint', False)
     path.add_module(nnt)

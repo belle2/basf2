@@ -30,12 +30,15 @@ SVDTimeGroupComposerModule::SVDTimeGroupComposerModule() :
            "EventLevelTrackingInfo collection name", string(""));
 
   // 2.Modification parameters:
-  addParam("AverageCountPerBin", m_AverageCountPerBin,
+  addParam("useOnlyOneGroup", m_useOnlyOneGroup,
+           "Clusters belonging to the group nearest to zero is kept.",
+           bool(false));
+  addParam("averageCountPerBin", m_AverageCountPerBin,
            "This sets the bin width of histogram. Setting it zero or less disables the module.",
            double(1.));
-  addParam("XRange", m_xRange, "This sets the x-range of histogram in ns.",
+  addParam("xRange", m_xRange, "This sets the x-range of histogram in ns.",
            double(160.));
-  addParam("Threshold", m_threshold, "Bin Content bellow this is not considered.",
+  addParam("threshold", m_threshold, "Bin Content bellow this is not considered.",
            double(1.));
 }
 
@@ -46,9 +49,10 @@ void SVDTimeGroupComposerModule::initialize()
   // prepare all store:
   m_svdClusters.isRequired(m_svdClustersName);
 
-  if (m_AverageCountPerBin <= 0.) B2WARNING("AverageCountPerBin is set to zero or less."
-                                              << "SVDTimeGroupComposer module is ineffective.");
-  if (m_xRange < 10.)             B2FATAL("XRange should not be less than 10 (hard-coded).");
+  if (m_useOnlyOneGroup) B2WARNING("Only the group nearest to zero is selected.");
+  if (m_AverageCountPerBin <= 0.) B2WARNING("averageCountPerBin is set to zero or less."
+                                              << " Module is ineffective.");
+  if (m_xRange < 10.)             B2FATAL("xRange should not be less than 10 (hard-coded).");
 
   B2DEBUG(1, "SVDTimeGroupComposerModule \nsvdClusters: " << m_svdClusters.getName());
   B2INFO("SVDTimeGroupComposer : AverageCountPerBin = " << m_AverageCountPerBin);
@@ -92,6 +96,9 @@ void SVDTimeGroupComposerModule::event()
                           h_clsTime.GetXaxis()->GetBinWidth(groupEnd);
         if (clsInGroup > 1) {
           groupInfo.push_back(std::make_tuple(beginPos, endPos, clsInGroup));
+          B2DEBUG(1, " group " << ij
+                  << " beginPos " << beginPos << " endPos " << endPos
+                  << " totCls " << clsInGroup);
         }
         groupBegin = groupEnd = -1; // reset for new group
       }
@@ -99,19 +106,28 @@ void SVDTimeGroupComposerModule::event()
     double underflow = h_clsTime.GetBinContent(0);
     double overflow  = h_clsTime.GetBinContent(xbin + 1);
 
-    // sorting groups in descending cluster-counts
+    // sorting groups in descending cluster-counts or distance from zero
     // this should help speed up the next process
     std::tuple<double, double, int> key;
     for (int ij = 1; ij < int(groupInfo.size()); ij++) {
       key = groupInfo[ij];
       int kj = ij - 1;
-      while ((kj >= 0) &&
-             ((std::get<2>(groupInfo[kj])) < (std::get<2>(key)))) {
-        groupInfo[kj + 1] = groupInfo[kj];
-        kj--;
-      }
+      if (!m_useOnlyOneGroup) // sort in cluster time
+        while ((kj >= 0) &&
+               ((std::get<2>(groupInfo[kj])) < (std::get<2>(key)))) {
+          groupInfo[kj + 1] = groupInfo[kj];
+          kj--;
+        } else    // sort in distance from zero
+        while ((kj >= 0) &&
+               (std::fabs(std::get<0>(groupInfo[kj]) + std::get<1>(groupInfo[kj])) > std::fabs(std::get<0>(key) + std::get<1>(key)))) {
+          groupInfo[kj + 1] = groupInfo[kj];
+          kj--;
+        }
       groupInfo[kj + 1] = key;
     }
+
+    if (m_useOnlyOneGroup && int(groupInfo.size())) // keep only one group
+      groupInfo.resize(1);
 
     std::vector<int> rejectedCls;
     rejectedCls.assign(totClusters, -1);
@@ -136,9 +152,11 @@ void SVDTimeGroupComposerModule::event()
           B2DEBUG(1, "     rejected cluster " << place
                   << " clsTime " << clsTime);
           if (ij == totGroups - 1) {                              // leftover clusters
-            if (clsTime < -m_xRange && underflow > m_threshold)
+            if (!m_useOnlyOneGroup &&
+                clsTime < -m_xRange && underflow > m_threshold)
               m_svdClusters[place]->setTimeGroupId(ij + 1);       // underflow
-            else if (clsTime > m_xRange && overflow > m_threshold)
+            else if (!m_useOnlyOneGroup &&
+                     clsTime > m_xRange && overflow > m_threshold)
               m_svdClusters[place]->setTimeGroupId(ij + 2);       // overflow
             else
               m_svdClusters[place]->setTimeGroupId(-1);           // orphan

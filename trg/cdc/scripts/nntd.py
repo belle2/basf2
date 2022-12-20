@@ -319,7 +319,9 @@ class nntd(basf2.Module):
             self.eventlist += savedict["eventlist"]
             self.varnum = savedict["varnum"]
             print("Loaded file: " + x)
+            print("length of eventlist: " + str(len(self.eventlist)))
         self.makearray(self.eventlist)
+        print("all files loaded, array.size: " + str(self.data.size) + ", array.shape: " + str(self.data.shape))
 
     def load(self, filename):
         # load a given pickle file

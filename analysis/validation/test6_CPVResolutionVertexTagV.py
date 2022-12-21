@@ -125,6 +125,9 @@ for VXDReq in VXDReqs:
     if VXDReq == 'SVD2':
         cut = cut + "&& Jpsi_mu_0_nSVDHits> 0 && Jpsi_mu_1_nSVDHits> 0 "
 
+    ROOT.gROOT.SetBatch(True)
+    c1 = ROOT.TCanvas("c1", "c1", 1400, 1100)
+
     tdat.Draw("DeltaT - mcDeltaT >> B0_DeltaT_" + VXDReq, cut)
     tdat.Draw("DeltaTErr >> B0_DeltaTErr_" + VXDReq, cut)
     tdat.Draw("z - mcDecayVertexZ >> B0_DeltaZsig_" + VXDReq, cut)
@@ -197,6 +200,8 @@ for VXDReq in VXDReqs:
     histo_DeltaZTag.GetListOfFunctions().Add(ROOT.TNamed('Check', 'Std. Dev. and Mean should not change drastically.'))
     histo_DeltaZTag.GetListOfFunctions().Add(ROOT.TNamed('Contact', 'yosato@post.kek.jp'))
     histo_DeltaZTag.Write()
+
+    c1.Clear()
 
     argSet = ROOT.RooArgSet(
         # B0_mcTagPDG,
@@ -410,7 +415,6 @@ for VXDReq in VXDReqs:
 
     Numbr = '{:d}'.format(int((f1 + f2) * fitDataDT.numEntries()))
 
-    c1 = ROOT.TCanvas("c1", "c1", 1400, 1100)
     c1.cd()
     Pad = ROOT.TPad("p1", "p1", 0, 0, 1, 1, 0, 0, 0)
     Pad.SetLeftMargin(0.15)
@@ -446,7 +450,6 @@ for VXDReq in VXDReqs:
     resFrameDtErr.GetYaxis().SetTitleOffset(1.5)
     resFrameDtErr.GetYaxis().SetLabelSize(0.045)
 
-    c1 = ROOT.TCanvas("c1", "c1", 1400, 1100)
     c1.cd()
     Pad = ROOT.TPad("p1", "p1", 0, 0, 1, 1, 0, 0, 0)
     Pad.SetLeftMargin(0.15)
@@ -548,8 +551,7 @@ for VXDReq in VXDReqs:
     resolutionErrSigZ = math.sqrt((Sigma1SigZ.getError() * f1SigZ)**2 + (Sigma2SigZ.getError() * f2SigZ)**2 +
                                   (Sigma3SigZ.getError() * f3SigZ)**2) * 10000
 
-    cSig = ROOT.TCanvas("c1", "c1", 1400, 1100)
-    cSig.cd()
+    c1.cd()
     Pad = ROOT.TPad("p1", "p1", 0, 0, 1, 1, 0, 0, 0)
     Pad.SetLeftMargin(0.15)
     Pad.SetBottomMargin(0.15)
@@ -580,8 +582,8 @@ for VXDReq in VXDReqs:
     legend.Draw()
     Pad.Update()
     nPlot = PATH + "/test6_CPVResDeltaZsig" + VXDReq + ".pdf"
-    cSig.SaveAs(nPlot)
-    cSig.Clear()
+    c1.SaveAs(nPlot)
+    c1.Clear()
 
     fitResSigZ.Clear()
     modelSigZ.Clear()
@@ -672,8 +674,7 @@ for VXDReq in VXDReqs:
     resolutionErrTagZ = math.sqrt((Sigma1TagZ.getError() * f1TagZ)**2 + (Sigma2TagZ.getError() * f2TagZ)**2 +
                                   (Sigma3TagZ.getError() * f3TagZ)**2) * 10000
 
-    cTag = ROOT.TCanvas("c1", "c1", 1400, 1100)
-    cTag.cd()
+    c1.cd()
     Pad = ROOT.TPad("p1", "p1", 0, 0, 1, 1, 0, 0, 0)
     Pad.SetLeftMargin(0.15)
     Pad.SetBottomMargin(0.15)
@@ -692,9 +693,9 @@ for VXDReq in VXDReqs:
     legend.SetFillColorAlpha(ROOT.kWhite, 0)
     legend.Draw()
     Pad.Update()
-    nPlot = PATH + "/test6_CPVResDeltaZtag" + VXDReq + ".pdf"
-    cTag.SaveAs(nPlot)
-    cTag.Clear()
+    nPlot = PATH + f"/test6_CPVResDeltaZtag{VXDReq}.pdf"
+    c1.SaveAs(nPlot)
+    c1.Clear()
 
     iResult.append(['mu = ' + '{:^5.1f}'.format(shiftTagZ) + ' +- ' + '{:^4.1f}'.format(shiftErrTagZ) + ' mum',
                     'sigma = ' + '{:^4.1f}'.format(resolutionTagZ) + ' +- ' + '{:^4.1f}'.format(resolutionErrTagZ) + ' mum'])

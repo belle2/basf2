@@ -515,8 +515,8 @@ class Luminosity:
                 procAvailable = df['proc'].unique()
                 if args.proc and args.proc not in procAvailable:
                     b2.B2FATAL(
-                        f"No luminosity information found in exp {self.exp} for"
-                        "processing {args.proc}: available processing are {procAvailable}")
+                        f"No luminosity information found in exp {self.exp} for "
+                        f"processing {args.proc}: available processing are {procAvailable}")
                 # get the latest if none is specified
                 if not args.proc:
                     if len(procAvailable) == 1:
@@ -585,9 +585,11 @@ class Luminosity:
                         'Exp',
                         'Run',
                         'Lumi [/pb]',
+                        '+/-',
                         'date',
                         'length',
                         'int Lumi [/fb]',
+                        '+/-',
                         'int Lumi Delivered [/fb]',
                         "Good",
                         "Beam Energy"],
@@ -669,10 +671,9 @@ if __name__ == '__main__':
 
     args = argparser().parse_args()
 
-    
     lumi = Luminosity(args)
 
     if args.what == 'online':
-        b2.B2INFO(f"Selecting online lumi: uncertainty is not available")
+        b2.B2INFO("Selecting online lumi: uncertainty is not available")
 
     lumi.printLumi()

@@ -135,12 +135,16 @@ def partial_fit(state, X, S, y, w, epoch, batch):
         # we are at the start of a new epoch, print out details of the last epoch
         if len(state.ytest) > 0:
             # run the validation set:
-            test_pred = state.model(state.Xtest)
+            state.model.eval()
+            with torch.no_grad():
+                test_pred = state.model(state.Xtest)
             test_loss_fn = state.loss_fn(weight=state.wtest)
             test_loss = test_loss_fn(test_pred, state.ytest).item()
             test_correct = (test_pred.round() == state.ytest).type(torch.float).sum().item()
+
             print(f"Epoch: {epoch-1:04d},\t Training Cost: {np.mean((state.avg_costs)):.4f},"
                   f"\t Testing Cost: {test_loss:.4f}, \t Testing Accuracy: {test_correct/len(state.ytest)}")
+            state.model.train()
         else:
             print(f"Epoch: {epoch-1:04d},\t Training Cost: {np.mean((state.avg_costs)):.4f}")
 
@@ -158,7 +162,8 @@ def apply(state, X):
     """
     Apply estimator to passed data.
     """
-    r = state.model(torch.from_numpy(X)).detach().numpy()
+    with torch.no_grad():
+        r = state.model(torch.from_numpy(X)).detach().numpy()
     if r.shape[1] == 1:
         r = r[:, 0]  # cannot use squeeze because we might have output of shape [1,X classes]
     return np.require(r, dtype=np.float32, requirements=['A', 'W', 'C', 'O'])

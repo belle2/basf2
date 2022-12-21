@@ -249,6 +249,10 @@ def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=Fa
     :param flip_recoTrack: if true, add the recoTracks flipping function in the postfilter
     """
 
+    # do not add any new modules if no tracking detectors are in the components
+    if components and not ('SVD' in components or 'CDC' in components):
+        return
+
     # V0 finding
     if v0_finding:
         path.add_module('V0Finder', RecoTracks=reco_tracks, v0FitterMode=1)

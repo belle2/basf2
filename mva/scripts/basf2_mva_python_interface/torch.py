@@ -89,7 +89,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     return state
 
 
-def begin_fit(state, Xtest, Stest, ytest, wtest):
+def begin_fit(state, Xtest, Stest, ytest, wtest, nBatches):
     """
     Passes in a fraction of events if specific_options.m_training_fraction is set.
     """

@@ -62,7 +62,7 @@ def PlottingCompHistos(particle):
 if __name__ == '__main__':
 
     # load the root files
-    file = uproot.open("MCvalidation.root:Multiplicities").array(library='pd')
+    file = uproot.open("MCvalidation.root:Multiplicities").arrays(library='pd')
 
     # define the variables to plot
     all_list = [

@@ -31,7 +31,10 @@ SVDTimeGroupComposerModule::SVDTimeGroupComposerModule() :
 
   // 2.Modification parameters:
   addParam("useOnlyOneGroup", m_useOnlyOneGroup,
-           "Clusters belonging to the group nearest to zero is kept.",
+           "Only one group is kept.",
+           bool(false));
+  addParam("timeBasedSort", m_timeBasedSort,
+           "Clusters belonging to the group nearest to zero is first.",
            bool(false));
   addParam("averageCountPerBin", m_AverageCountPerBin,
            "This sets the bin width of histogram. Setting it zero or less disables the module.",
@@ -112,7 +115,7 @@ void SVDTimeGroupComposerModule::event()
     for (int ij = 1; ij < int(groupInfo.size()); ij++) {
       key = groupInfo[ij];
       int kj = ij - 1;
-      if (!m_useOnlyOneGroup) // sort in cluster time
+      if (!m_timeBasedSort) // sort in cluster size
         while ((kj >= 0) &&
                ((std::get<2>(groupInfo[kj])) < (std::get<2>(key)))) {
           groupInfo[kj + 1] = groupInfo[kj];

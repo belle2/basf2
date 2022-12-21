@@ -55,7 +55,8 @@ namespace Belle2 {
 
     std::string m_eventLevelTrackingInfoName = ""; /**< Name of the EventLevelTrackingInfo */
 
-    bool   m_useOnlyOneGroup    = false; /** Clusters belonging to the group nearest to zero is kept */
+    bool   m_useOnlyOneGroup    = false; /** Only one group is kept. */
+    bool   m_timeBasedSort      = false; /** Group nearest to zero is kept at the first. */
     double m_xRange             = 160.; /** Half-x range of time histogram */
     double m_AverageCountPerBin = 1.;   /** This sets the bin width of histogram time scale */
     double m_threshold          = 1.;   /** Bin Content bellow this is not considered */

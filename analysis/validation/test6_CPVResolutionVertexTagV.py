@@ -50,11 +50,11 @@ outputNtuple = ROOT.TNtuple(
     "mu_DT_PXD2:sigma_DT_PXD2:mu_DZsig_PXD2:sigma_DZsig_PXD2:mu_DZtag_PXD2:sigma_DZtag_PXD2:PXD2_PXD0_Eff")
 
 outputNtuple.SetAlias('Description', "These are the weighted averages of the mean and the standard deviation " +
-                      "of the residuals for DeltaT, DeltaZsig and DeltaZtag. The fit is performed with 3 Gaussian functions." +
+                      "of the residuals for DeltaT, DeltaZsig and DeltaZtag. The fit is performed with 3 Gaussian functions. " +
                       "The units are ps for DeltaT and microns for DeltaZ.")
 outputNtuple.SetAlias(
     'Check',
-    "These parameters should not change drastically. Since the nightly reconstruction validation runs" +
+    "These parameters should not change drastically. Since the nightly reconstruction validation runs " +
     "on the same input file (which changes only from release to release), the values between builds should be the same.")
 outputNtuple.SetAlias('Contact', "yosato@post.kek.jp")
 
@@ -283,7 +283,7 @@ for VXDReq in VXDReqs:
     fitDataTagZ.Print()
     numberOfEntries.append(data.numEntries())
 
-# Fit and plot of the DeltaT Error and DeltaTRECO - DeltaTMC
+    # Fit and plot of the DeltaT Error and DeltaTRECO - DeltaTMC
 
     Mu1 = ROOT.RooRealVar("Mu1", "Mu1", 0., -limDeltaT, limDeltaT)
     Mu2 = ROOT.RooRealVar("Mu2", "Mu2", 0., -limDeltaT, limDeltaT)

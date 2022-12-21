@@ -309,10 +309,7 @@ for VXDReq in VXDReqs:
 
     DT.setRange("fitRange", -limDeltaT, limDeltaT)
 
-    fitRes = model.fitTo(
-        fitDataDT,
-        ROOT.RooFit.Minos(ROOT.kFALSE), ROOT.RooFit.Extended(ROOT.kFALSE),
-        ROOT.RooFit.NumCPU(8), ROOT.RooFit.Save())
+    fitRes = model.fitTo(fitDataDT, ROOT.RooFit.NumCPU(8), ROOT.RooFit.Save())
 
     fitRes.Print("v")
 
@@ -343,10 +340,8 @@ for VXDReq in VXDReqs:
             fracErr1, fracErr2))
 
     if VXDReq == 'PXD0' or VXDReq == 'PXD1' or VXDReq == 'PXD2':
-        CBSFitRes = modelTErr.fitTo(
-            fitDataDTErr,
-            ROOT.RooFit.Minos(ROOT.kFALSE), ROOT.RooFit.Extended(ROOT.kFALSE),
-            ROOT.RooFit.NumCPU(8), ROOT.RooFit.Save())
+        CBSFitRes = modelTErr.fitTo(fitDataDTErr, ROOT.RooFit.NumCPU(8), ROOT.RooFit.Save())
+        CBSFitRes.Print("v")
 
     dtErrCBS.Print()
 
@@ -500,9 +495,9 @@ for VXDReq in VXDReqs:
 
     DSigZ.setRange("fitRange", -limZSig, limZSig)
 
-    fitResSigZ = modelSigZ.fitTo(
-        fitDataSigZ, ROOT.RooFit.Minos(ROOT.kFALSE),
-        ROOT.RooFit.Extended(ROOT.kFALSE), ROOT.RooFit.NumCPU(1), ROOT.RooFit.Save())
+    fitResSigZ = modelSigZ.fitTo(fitDataSigZ, ROOT.RooFit.NumCPU(1), ROOT.RooFit.Save())
+
+    fitResSigZ.Print("v")
 
     resFrameSigZ = DSigZ.frame()
 
@@ -612,12 +607,9 @@ for VXDReq in VXDReqs:
 
     DTagZ.setRange("fitRange", -limZTag, limZTag)
 
-    fitResTagZ = modelTagZ.fitTo(
-        fitDataTagZ, ROOT.RooFit.Minos(
-            ROOT.kFALSE), ROOT.RooFit.Extended(
-            ROOT.kFALSE), ROOT.RooFit.NumCPU(1), ROOT.RooFit.Save())
-
+    fitResTagZ = modelTagZ.fitTo(fitDataTagZ, ROOT.RooFit.NumCPU(1), ROOT.RooFit.Save())
     fitResTagZ.Print("v")
+
     resFrameTagZ = DTagZ.frame()
 
     f1TagZ = frac1TagZ.getVal()

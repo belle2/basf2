@@ -14,19 +14,19 @@ Python
 
     **Prerequisites**:
 
-      * :ref:`onlinebook_ssh`
+    * :ref:`onlinebook_ssh`
 
     **Questions**:
 
-      * What are the key concepts of python?
-      * How can I process tabular data?
-      * How can I plot data?
+    * What are the key concepts of python?
+    * How can I process tabular data?
+    * How can I plot data?
 
 
     **Objectives**:
 
-      * Get more familiar with python
-      * Understand how to manipulate and plot data with ``root_pandas``
+    * Get more familiar with python
+    * Understand how to manipulate and plot data with ``root_pandas``
 
 High Energy Physics (HEP) analyses are too complex to be done with pen, paper
 and calculator. They usually are not even suited for spreadsheet programs like
@@ -1023,8 +1023,8 @@ However, your python journey has just begun and there's a lot to learn.
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Authors of this lesson
+.. rubric:: Authors of this lesson
 
-  Martin Ritter (Intro),
-  Hannah Wakeling (Exercises),
-  Kilian Lieret
+Martin Ritter (Intro),
+Hannah Wakeling (Exercises),
+Kilian Lieret

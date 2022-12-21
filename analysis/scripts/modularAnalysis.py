@@ -4068,7 +4068,7 @@ def getAnalysisGlobaltag(timeout=180) -> str:
         B2FATAL(f'A {te} exception was raised during the call of getAnalysisGlobaltag(). '
                 'The function took too much time to retrieve the requested information '
                 'from the versioning repository.\n'
-                'Plase try to re-run your job. In case of persistent failures, there may '
+                'Please try to re-run your job. In case of persistent failures, there may '
                 'be issues with the DESY collaborative services, so please contact the experts.')
     except subprocess.CalledProcessError as ce:
         B2FATAL(f'A {ce} exception was raised during the call of getAnalysisGlobaltag(). '
@@ -4084,10 +4084,11 @@ def getAnalysisGlobaltagB2BII() -> str:
     import b2bii
     if not b2bii.isB2BII():
         B2ERROR('The getAnalysisGlobaltagB2BII() function cannot be used for Belle II data.')
-    return 'analysis_b2bii'
+    from versioning import recommended_b2bii_analysis_global_tag
+    return recommended_b2bii_analysis_global_tag()
 
 
-def getNbarIDMVA(particleList, path=None, ):
+def getNbarIDMVA(particleList, path=None):
     """
     This function can give a score to predict if it is a anti-n0.
     It is not used to predict n0.
@@ -4096,6 +4097,10 @@ def getNbarIDMVA(particleList, path=None, ):
     @param particleList     The input ParticleList
     @param path             modules are added to this path
     """
+
+    import b2bii
+    if b2bii.isB2BII():
+        B2ERROR("The MVA-based anti-neutron PID is only available for Belle II data.")
 
     from variables import variables
     variables.addAlias('V1', 'clusterHasPulseShapeDiscrimination')

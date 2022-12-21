@@ -7,14 +7,9 @@
  **************************************************************************/
 
 #include <reconstruction/modules/CDCDedxCorrection/CDCDedxCorrectionModule.h>
-#include <reconstruction/dataobjects/CDCDedxTrack.h>
-#include <reconstruction/dataobjects/DedxConstants.h>
-
-#include <cmath>
-#include <algorithm>
-#include "TMath.h"
 
 using namespace Belle2;
+using namespace CDC;
 using namespace Dedx;
 
 REG_MODULE(CDCDedxCorrection);
@@ -52,7 +47,7 @@ void CDCDedxCorrectionModule::initialize()
   }
 
   // wire gains
-  for (unsigned int i = 0; i < 14336; ++i) {
+  for (unsigned int i = 0; i < c_nSenseWires; ++i) {
     if (m_DBWireGains->getWireGain(i) == 0)
       B2WARNING("Wire gain is zero for this wire: " << i);
   }
@@ -73,21 +68,24 @@ void CDCDedxCorrectionModule::initialize()
     m_hadronpars.push_back(1.0);
   } else m_hadronpars = m_DBHadronCor->getHadronPars();
 
-  double actwg[56] = {0.};
-  int nactwire[56] = {0};
+  int jwire = -1;
+  B2INFO("Creating CDCGeometryPar object");
+  CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
 
-  for (int jwire = 0; jwire < 14336; jwire++) {
-    int layer = getLayerInWire(jwire);
-    if (m_DBWireGains->getWireGain(jwire) > 0.) {
-      //active wire only
-      actwg[layer] += m_DBWireGains->getWireGain(jwire);
-      nactwire[layer]++;
+  for (unsigned int il = 0; il < c_maxNSenseLayers; il++) {
+    int activewires = 0;
+    m_lgainavg[il] = 0.0;
+
+    for (unsigned int iw = 0; iw < cdcgeo.nWiresInLayer(il); ++iw) {
+      jwire++;
+      if (m_DBWireGains->getWireGain(jwire) > 0.) {
+        //active wire only
+        m_lgainavg[il] += m_DBWireGains->getWireGain(jwire);
+        activewires++;
+      }
     }
-  }
-
-  for (int il = 0; il < 56; il++) {
-    if (nactwire[il] > 0)m_lgainavg.push_back(actwg[il] / nactwire[il]);
-    else m_lgainavg.push_back(0);
+    if (activewires > 0) m_lgainavg[il] /= activewires;
+    else m_lgainavg[il] = 1.0;
   }
 }
 

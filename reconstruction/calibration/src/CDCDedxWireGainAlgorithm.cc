@@ -3,7 +3,7 @@
  * Author: The Belle II Collaboration                                     *
  *                                                                        *
  * See git log for contributors and copyright holders.                    *
- * This fiLe is licensed under LGPL-3.0, see LICENSE.md.                  *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
 #include <reconstruction/calibration/CDCDedxWireGainAlgorithm.h>

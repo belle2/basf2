@@ -8,11 +8,17 @@
 
 #pragma once
 
-#include <framework/core/Module.h>
+#include <cmath>
+#include <algorithm>
+#include <TMath.h>
+#include <vector>
 
+#include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/database/DBObjPtr.h>
 
+#include <reconstruction/dataobjects/CDCDedxTrack.h>
+#include <reconstruction/dataobjects/DedxConstants.h>
 #include <reconstruction/dbobjects/CDCDedxScaleFactor.h>
 #include <reconstruction/dbobjects/CDCDedxMomentumCor.h>
 #include <reconstruction/dbobjects/CDCDedxWireGain.h>
@@ -24,7 +30,8 @@
 #include <reconstruction/dbobjects/CDCDedxADCNonLinearity.h> //new in rel5
 #include <reconstruction/dbobjects/CDCDedxCosineEdge.h> //new in rel5
 
-#include <vector>
+#include <cdc/geometry/CDCGeometryParConstants.h>
+#include <cdc/geometry/CDCGeometryPar.h>
 
 namespace Belle2 {
   class CDCDedxTrack;
@@ -93,22 +100,6 @@ namespace Belle2 {
      * convert the actural ionization (I) to measured ionization (D) */
     double I2D(const double cosTheta, const double I) const;
 
-    /** Get the layer from wire */
-    int getLayerInWire(int wire)
-    {
-      int nwire = 160, layer = 0, superlayer;
-      for (int iw = 0; iw < 14336; iw++) {
-        if (iw == nwire) {
-          layer++;
-          superlayer = (layer - 2) / 6;
-          if (superlayer <= 0) superlayer = 1;
-          nwire = nwire + (160 + (superlayer - 1) * 32);
-        }
-        if (iw == wire) break;
-      }
-      return layer;
-    }
-
   private:
 
     bool m_relative; /**< boolean to apply relative or absolute correction */
@@ -139,7 +130,7 @@ namespace Belle2 {
     DBObjPtr<CDCDedxCosineEdge> m_DBCosEdgeCor; /**< cosine edge calibration */
 
     std::vector<double> m_hadronpars; /**< hadron saturation parameters */
-    std::vector<double> m_lgainavg; /**< average calibration factor for the layer */
+    std::array<double, 56> m_lgainavg; /**< average calibration factor for the layer */
 
     /** Recalculate the dE/dx mean values after corrections */
     void calculateMeans(double* mean, double* truncatedMean, double* truncatedMeanErr, const std::vector<double>& dedx) const;

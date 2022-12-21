@@ -424,10 +424,8 @@ for VXDReq in VXDReqs:
     resFrame.Draw()
     legend = ROOT.TLegend(0.59, 0.6, 0.9, 0.9)
     # legend.AddEntry(0, 'Entries' + '{:>11}'.format(Numbr))
-    legend.AddEntry(0, '#splitline{#mu_{#Delta t} =' + '{: 4.2f}'.format(shift) + '}{    #pm ' +
-                    '{:4.2f}'.format(shiftErr) + ' ps}')
-    legend.AddEntry(0, '#splitline{#sigma_{#Delta t} =' + '{: 4.2f}'.format(resolution) + '}{    #pm ' +
-                    '{:4.2f}'.format(resolutionErr) + ' ps}')
+    legend.AddEntry(0, f'#splitline{{#mu_{{#Delta t}} = {shift:4.2f}}}{{    #pm {shiftErr:4.2f} ps}}')
+    legend.AddEntry(0, f'#splitline{{#sigma_{{#Delta t}} = {resolution:4.2f}}}{{    #pm {resolutionErr:4.2f} ps}}')
     legend.SetTextSize(0.054)
     legend.SetFillColorAlpha(ROOT.kWhite, 0)
     legend.Draw()
@@ -436,8 +434,8 @@ for VXDReq in VXDReqs:
     c1.SaveAs(nPlot)
     c1.Clear()
 
-    iResult.append(['mu = ' + '{: 4.2f}'.format(shift) + ' +- ' + '{:4.2f}'.format(shiftErr) + ' ps',
-                    'sigma =' + '{: 4.2f}'.format(resolution) + ' +- ' + '{:4.2f}'.format(resolutionErr) + ' ps'])
+    iResult.append([f'mu = {shift:4.2f} +- {shiftErr:4.2f} ps',
+                    f'sigma = {resolution:4.2f} +- {resolutionErr:4.2f} ps'])
     fitResultsForNtuple.append(shift)
     fitResultsForNtuple.append(resolution)
 
@@ -459,10 +457,10 @@ for VXDReq in VXDReqs:
     resFrameDtErr.Draw()
     legend = ROOT.TLegend(0.59, 0.6, 0.9, 0.9)
     # legend.AddEntry(0, 'Entries' + '{:>11}'.format(Numbr))
-    legend.AddEntry(0, '#splitline{#mu_{#Delta t} =' + '{: 4.2f}'.format(meanCBS.getVal()) + '}{    #pm ' +
-                    '{:4.2f}'.format(meanCBS.getError()) + ' ps}')  # '{:>6}'.format(Shift)
-    legend.AddEntry(0, '#splitline{#sigma_{#Delta t} =' + '{: 4.2f}'.format(sigmaCBS.getVal()) +
-                    '}{    #pm ' + '{:4.2f}'.format(sigmaCBS.getError()) + ' ps}')  # '{:>4}'.format(Resol)
+    legend.AddEntry(0, f'#splitline{{#mu_{{#Delta t}} = {meanCBS.getVal():4.2f}}}{{    #pm '
+                    f'{meanCBS.getError():4.2f} ps}}')  # '{:>6}'.format(Shift)
+    legend.AddEntry(0, f'#splitline{{#sigma_{{#Delta t}} = {sigmaCBS.getVal():4.2f}}}'
+                    f'{{    #pm {sigmaCBS.getError():4.2f} ps}}')  # '{:>4}'.format(Resol)
     legend.SetTextSize(0.054)
     legend.SetFillColorAlpha(ROOT.kWhite, 0)
     # legend.Draw()
@@ -564,18 +562,12 @@ for VXDReq in VXDReqs:
 
     legend.AddEntry(
         0,
-        '#splitline{#mu_{#Delta z} =' +
-        '{: 1.1f}'.format(shiftSigZ) +
-        '}{    #pm ' +
-        '{:1.1f}'.format(shiftErrSigZ) +
-        ' #mum}')
+        f'#splitline{{#mu_{{#Delta z}} = {shiftSigZ:1.1f}}}'
+        f'{{    #pm {shiftErrSigZ:1.1f} #mum}}')
     legend.AddEntry(
         0,
-        '#splitline{#sigma_{#Delta z} =' +
-        '{: 1.1f}'.format(resolutionSigZ) +
-        '}{    #pm ' +
-        '{:1.1f}'.format(resolutionErrSigZ) +
-        ' #mum}')
+        f'#splitline{{#sigma_{{#Delta z}} = {resolutionSigZ:1.1f}}}'
+        f'{{    #pm {resolutionErrSigZ:1.1f} #mum}}')
 
     legend.SetTextSize(0.05)
     legend.SetFillColorAlpha(ROOT.kWhite, 0)
@@ -588,8 +580,8 @@ for VXDReq in VXDReqs:
     fitResSigZ.Clear()
     modelSigZ.Clear()
 
-    iResult.append(['mu = ' + '{:^5.1f}'.format(shiftSigZ) + ' +- ' + '{:^4.1f}'.format(shiftErrSigZ) + ' mum',
-                    'sigma = ' + '{:^4.1f}'.format(resolutionSigZ) + ' +- ' + '{:^4.1f}'.format(resolutionErrSigZ) + ' mum'])
+    iResult.append([f'mu = {shiftSigZ:4.1f}  +- {shiftErrSigZ:3.1f}  mum',
+                    f'sigma = {resolutionSigZ:4.1f} +- {resolutionErrSigZ:3.1f}  mum'])
     fitResultsForNtuple.append(shiftSigZ)
     fitResultsForNtuple.append(resolutionSigZ)
 
@@ -685,10 +677,10 @@ for VXDReq in VXDReqs:
     # NumbrTagZ = '{:d}'.format(int((f1+f2)*fitDataTagZ.numEntries()))
     # legend.AddEntry(0, 'Entries' + '{:>11}'.format(NumbrTagZ))
 
-    legend.AddEntry(0, '#splitline{#mu_{#Delta z} =' + '{: 1.1f}'.format(shiftTagZ) +
-                    '}{  #pm ' + '{: 1.1f}'.format(shiftErrTagZ) + ' #mum}')
-    legend.AddEntry(0, '#splitline{#sigma_{#Delta z} =' + '{: 1.1f}'.format(resolutionTagZ) +
-                    '}{  #pm ' + '{: 1.1f}'.format(resolutionErrTagZ) + ' #mum}')
+    legend.AddEntry(0, f'#splitline{{#mu_{{#Delta z}} = {shiftTagZ:1.1f}'
+                    f'}}{{  #pm {shiftErrTagZ:1.1f} #mum}}')
+    legend.AddEntry(0, f'#splitline{{#sigma_{{#Delta z}} = {resolutionTagZ:1.1f}'
+                    f'}}{{  #pm {resolutionErrTagZ:1.1f} #mum}}')
     legend.SetTextSize(0.05)
     legend.SetFillColorAlpha(ROOT.kWhite, 0)
     legend.Draw()
@@ -697,8 +689,8 @@ for VXDReq in VXDReqs:
     c1.SaveAs(nPlot)
     c1.Clear()
 
-    iResult.append(['mu = ' + '{:^5.1f}'.format(shiftTagZ) + ' +- ' + '{:^4.1f}'.format(shiftErrTagZ) + ' mum',
-                    'sigma = ' + '{:^4.1f}'.format(resolutionTagZ) + ' +- ' + '{:^4.1f}'.format(resolutionErrTagZ) + ' mum'])
+    iResult.append([f'mu = {shiftTagZ:4.1f}  +- {shiftErrTagZ:3.1f}  mum',
+                    f'sigma = {resolutionTagZ:4.1f} +- {resolutionErrTagZ:3.1f}  mum'])
     fitResultsForNtuple.append(shiftTagZ)
     fitResultsForNtuple.append(resolutionTagZ)
 
@@ -732,8 +724,8 @@ print('********REQUIRING BOTH MUON TRACKS TO HAVE A PXD HIT***********')
 print('*                                                             *')
 print('* Efficiency                                                  *')
 print('*                                                             *')
-print('* N_' + VXDReqs[1] + '/N_' + VXDReqs[0] + ' = ' + str(numberOfEntries[1]) + "/" + str(numberOfEntries[0]) + ' = ' +
-      '{:^3.2f}'.format(float((numberOfEntries[1] / numberOfEntries[0]) * 100)) + '%             *')
+print(f'* N_{VXDReqs[1]}/N_{VXDReqs[0]} = {numberOfEntries[1]}/{numberOfEntries[0]} = '
+      f'{(numberOfEntries[1] / numberOfEntries[0]) * 100:3.2f}%                          *')
 print('*                                                             *')
 print('* DeltaT - Gen. DeltaT                                        *')
 print('*                                                             *')

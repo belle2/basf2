@@ -243,12 +243,15 @@ for VXDReq in VXDReqs:
 
     if VXDReq == 'PXD1' or VXDReq == 'PXD2':
         fitDataDTErr = ROOT.RooDataSet("data", "data", tdat, ROOT.RooArgSet(
-            B0_isSignal, B0_Jpsi_mu0_nPXDHits, B0_Jpsi_mu1_nPXDHits, deltaTErr), cut)
+            B0_isSignal, B0_Jpsi_mu0_nPXDHits, B0_Jpsi_mu1_nPXDHits, deltaTErr),
+            f'{cut} && DeltaTErr >= {deltaTErr.getMin()} && DeltaTErr <= {deltaTErr.getMax()}')
     elif VXDReq == 'SVD1' or VXDReq == 'SVD2':
         fitDataDTErr = ROOT.RooDataSet("data", "data", tdat, ROOT.RooArgSet(
-            B0_isSignal, B0_Jpsi_mu0_nSVDHits, B0_Jpsi_mu1_nSVDHits, deltaTErr), cut)
+            B0_isSignal, B0_Jpsi_mu0_nSVDHits, B0_Jpsi_mu1_nSVDHits, deltaTErr),
+            f'{cut} && DeltaTErr >= {deltaTErr.getMin()} && DeltaTErr <= {deltaTErr.getMax()}')
     else:
-        fitDataDTErr = ROOT.RooDataSet("data", "data", tdat, ROOT.RooArgSet(B0_isSignal, deltaTErr), cut)
+        fitDataDTErr = ROOT.RooDataSet("data", "data", tdat, ROOT.RooArgSet(B0_isSignal, deltaTErr),
+                                       f'{cut} && DeltaTErr >= {deltaTErr.getMin()} && DeltaTErr <= {deltaTErr.getMax()}')
 
     # fitData.append(data)
 

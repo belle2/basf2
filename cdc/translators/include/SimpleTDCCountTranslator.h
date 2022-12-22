@@ -10,8 +10,7 @@
 
 #include <framework/logging/Logger.h>
 #include <cdc/translators/TDCCountTranslatorBase.h>
-
-#include <TVector3.h>
+#include <framework/geometry/B2Vector3.h>
 
 namespace Belle2 {
   namespace CDC {
@@ -92,7 +91,7 @@ namespace Belle2 {
       /**
        * Wire position at the cdc backward endplate.
        */
-      TVector3 m_backWirePos;
+      B2Vector3D m_backWirePos;
 
       /**
        * Event timing.

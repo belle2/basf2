@@ -12,17 +12,17 @@ Continuum Suppression (CS)
 
     **Prerequisites**:
 
-    	* :ref:`onlinebook_basf2_introduction` lesson
-    	* :ref:`onlinebook_roe` lesson
+    * :ref:`onlinebook_basf2_introduction` lesson
+    * :ref:`onlinebook_roe` lesson
 
     **Questions**:
 
-        * What is continuum?
-        * How can I separate it from signal events?
+    * What is continuum?
+    * How can I separate it from signal events?
 
     **Objectives**:
 
-        * Suppress continuum
+    * Suppress continuum
 
 
 Introduction
@@ -148,7 +148,7 @@ has an extensive overview over these quantities.
 .. admonition:: Hint
     :class: toggle xhint stacked
 
-    Check the Continuum Suppression variable group in :ref:`analysis/doc/index-01-analysis:Variables`.
+    Check the Continuum Suppression variable group in :ref:`analysis_variables`.
 
 .. admonition:: Solution
     :class: toggle solution
@@ -334,7 +334,7 @@ probability of an event being a continuum event, as estimated based on the input
 principle any variable that looks different between continuum and non-continuum
 events. The recommended and most commonly used variables are the ones introduced in
 the previous lesson as well as others from the *Continuum Suppression* variable group in
-the :ref:`analysis/doc/index-01-analysis:Variables`.
+the :ref:`analysis_variables`.
 
 The BDT is a supervised machine learning method, i.e. it needs to be trained on a
 dataset where we know the true class that we are trying to predict (this variable
@@ -580,10 +580,10 @@ data and MC on this variable, but if you use 30 variables in a BDT you will have
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Authors of this lesson
+.. rubric:: Authors of this lesson
 
-   Moritz Bauer, Yaroslav Kulii
+Moritz Bauer, Yaroslav Kulii
 
-.. topic:: Code contributors
+.. rubric:: Code contributors
 
-   Pablo Goldenzweig, Ilya Komarov
+Pablo Goldenzweig, Ilya Komarov

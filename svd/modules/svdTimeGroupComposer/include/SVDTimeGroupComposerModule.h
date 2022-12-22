@@ -55,11 +55,13 @@ namespace Belle2 {
 
     std::string m_eventLevelTrackingInfoName = ""; /**< Name of the EventLevelTrackingInfo */
 
-    double m_tRange             = 160.; /** Half-x range of time histogram */
+    double m_tRangeLow          = -160.; /** Half-x range of time histogram */
+    double m_tRangeHigh         = 160.; /** Half-x range of time histogram */
     double m_AverageCountPerBin = 1.;   /** This sets the bin width of histogram time scale */
     double m_threshold          = 1.;   /** Bin Content bellow this is not considered */
     bool   m_applyCentralLimit  = true; /** Sum adjacent bins many times to form the groups. */
-    double m_signalRange        = 40;   /** Expected time range of signal hits. */
+    double m_signalRangeLow     = -40;   /** Expected time range of signal hits. */
+    double m_signalRangeHigh    = 40;   /** Expected time range of signal hits. */
     int    m_factor             = 10;    /** Fine divisions of histogram. */
     int    m_iteration          = 10;    /** Number of summations of the histogram. */
     bool   m_includeOutOfRangeClusters = true; /** Assign groups to under and overflow. */

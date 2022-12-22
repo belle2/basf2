@@ -47,6 +47,9 @@ SVDTimeGroupComposerModule::SVDTimeGroupComposerModule() :
   addParam("factor", m_factor,
            "Fine divisions of histogram.",
            int(10));
+  addParam("iteration", m_iteration,
+           "Number of summations of the histogram.",
+           int(10));
 
   addParam("includeOutOfRangeClusters", m_includeOutOfRangeClusters,
            "Assign groups to under and overflow.",
@@ -122,7 +125,7 @@ void SVDTimeGroupComposerModule::event()
         currentHisto = !currentHisto;
         counter++;
         // if(maxval > 15. * std::pow(m_factor, 2)) isWhile = false;
-        if (counter > 20) isWhile = false;
+        if (counter > m_iteration) isWhile = false;
       } // while(isWhile) {
       // std::cout<<" counter "<<counter<<" maxval "<<maxval<<std::endl;
 

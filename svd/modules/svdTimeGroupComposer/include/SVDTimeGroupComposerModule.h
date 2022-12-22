@@ -61,6 +61,7 @@ namespace Belle2 {
     bool   m_applyCentralLimit  = true; /** Sum adjacent bins many times to form the groups. */
     double m_signalRange        = 40;   /** Expected time range of signal hits. */
     int    m_factor             = 10;    /** Fine divisions of histogram. */
+    int    m_iteration          = 10;    /** Number of summations of the histogram. */
     bool   m_includeOutOfRangeClusters = true; /** Assign groups to under and overflow. */
     bool   m_useOnlyOneGroup    = false; /** Only one group is kept. */
     bool   m_timeBasedSort      = false; /** Group nearest to zero is kept at the first. */

@@ -49,8 +49,9 @@ parser.add_argument("--test", action="store_true",
 args = parser.parse_args()
 b2.B2INFO(f"Steering file args = {args}")
 
-# b2.set_log_level(b2.LogLevel.DEBUG)
-# b2.set_debug_level(1)
+if args.test:
+    b2.set_log_level(b2.LogLevel.DEBUG)
+    b2.set_debug_level(1)
 
 main = b2.create_path()
 
@@ -62,7 +63,7 @@ if args.isMC:
     expList = [0]
     numEvents = 20
     bkgFiles = get_background_files()  # Phase3 background
-    # bkgFiles = None  # uncomment to remove  background
+    bkgFiles = None  # uncomment to remove  background
     simulateJitter = False
     ROIfinding = False
     MCTracking = False

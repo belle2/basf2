@@ -30,19 +30,33 @@ SVDTimeGroupComposerModule::SVDTimeGroupComposerModule() :
            "EventLevelTrackingInfo collection name", string(""));
 
   // 2.Modification parameters:
+  addParam("averageCountPerBin", m_AverageCountPerBin,
+           "This sets the bin width of histogram. Setting it zero or less disables the module.",
+           double(1.));
+  addParam("tRange", m_tRange, "This sets the x-range of histogram in ns.",
+           double(160.));
+  addParam("threshold", m_threshold, "Bin Content bellow this is not considered.",
+           double(1.));
+
+  addParam("applyCentralLimit", m_applyCentralLimit,
+           "Sum adjacent bins many times to form the groups.",
+           bool(true));
+  addParam("signalRange", m_signalRange,
+           "Expected time range of signal hits.",
+           double(40.));
+  addParam("factor", m_factor,
+           "Fine divisions of histogram.",
+           int(10));
+
+  addParam("includeOutOfRangeClusters", m_includeOutOfRangeClusters,
+           "Assign groups to under and overflow.",
+           bool(true));
   addParam("useOnlyOneGroup", m_useOnlyOneGroup,
            "Only one group is kept.",
            bool(false));
   addParam("timeBasedSort", m_timeBasedSort,
            "Clusters belonging to the group nearest to zero is first.",
            bool(false));
-  addParam("averageCountPerBin", m_AverageCountPerBin,
-           "This sets the bin width of histogram. Setting it zero or less disables the module.",
-           double(1.));
-  addParam("xRange", m_xRange, "This sets the x-range of histogram in ns.",
-           double(160.));
-  addParam("threshold", m_threshold, "Bin Content bellow this is not considered.",
-           double(1.));
 }
 
 
@@ -55,12 +69,12 @@ void SVDTimeGroupComposerModule::initialize()
   if (m_useOnlyOneGroup) B2WARNING("Only the group nearest to zero is selected.");
   if (m_AverageCountPerBin <= 0.) B2WARNING("averageCountPerBin is set to zero or less."
                                               << " Module is ineffective.");
-  if (m_xRange < 10.)             B2FATAL("xRange should not be less than 10 (hard-coded).");
+  if (m_tRange < 10.)             B2FATAL("tRange should not be less than 10 (hard-coded).");
 
   B2DEBUG(1, "SVDTimeGroupComposerModule \nsvdClusters: " << m_svdClusters.getName());
-  B2INFO("SVDTimeGroupComposer : AverageCountPerBin = " << m_AverageCountPerBin);
-  B2INFO("SVDTimeGroupComposer : Xrange             = " << m_xRange);
-  B2INFO("SVDTimeGroupComposer : Threshold          = " << m_threshold);
+  B2INFO("SVDTimeGroupComposer : averageCountPerBin = " << m_AverageCountPerBin);
+  B2INFO("SVDTimeGroupComposer : tRange             = " << m_tRange);
+  B2INFO("SVDTimeGroupComposer : threshold          = " << m_threshold);
 }
 
 
@@ -68,35 +82,79 @@ void SVDTimeGroupComposerModule::initialize()
 void SVDTimeGroupComposerModule::event()
 {
   int totClusters = m_svdClusters.getEntries();
-  int xbin = totClusters / (m_AverageCountPerBin > 0 ? m_AverageCountPerBin : 1.); // safety
-  if (m_AverageCountPerBin > 0 && xbin > 0) {
+  if (m_AverageCountPerBin > 0 && totClusters > 0) {
+
+    // number of clusters in signalRange
+    int clsInSignalRange = 0;
+    for (int ij = 0; ij < totClusters; ij++)
+      if (std::fabs(m_svdClusters[ij]->getClsTime()) < m_signalRange)
+        clsInSignalRange++;
+
+    int xbin = clsInSignalRange * m_tRange / m_signalRange;
+    if (xbin < 1) xbin = 1;
+    if (m_applyCentralLimit) xbin *= m_factor;
+    else xbin /= m_AverageCountPerBin;
+    if (xbin < 1) xbin = 1;
+
+
     /** declaring histogram */
-    TH1D h_clsTime("h_clsTime", "h_clsTime", xbin, -m_xRange, m_xRange);
-    for (int ij = 0; ij < totClusters; ij++) {
-      h_clsTime.Fill(m_svdClusters[ij]->getClsTime());
-    }
+    TH1D h_clsTime[2];
+    h_clsTime[0] = TH1D("h_clsTime_0", "h_clsTime_0", xbin, -m_tRange, m_tRange);
+    h_clsTime[1] = TH1D("h_clsTime_1", "h_clsTime_1", xbin, -m_tRange, m_tRange);
+    for (int ij = 0; ij < totClusters; ij++)
+      h_clsTime[0].Fill(m_svdClusters[ij]->getClsTime());
+
+    bool currentHisto = false;
+    if (m_applyCentralLimit) {
+      double maxval = 0;
+      int counter = 0;
+      bool isWhile = true;
+      while (isWhile) {
+        for (int ij = 1; ij <= xbin; ij++) {
+          double sumc = h_clsTime[currentHisto].GetBinContent(ij);
+          double suml = (ij == 1    ? 0. : h_clsTime[currentHisto].GetBinContent(ij - 1));
+          double sumr = (ij == xbin ? 0. : h_clsTime[currentHisto].GetBinContent(ij + 1));
+          double sum = suml + sumc + sumr;
+          h_clsTime[!currentHisto].SetBinContent(ij, sum);
+          double binc = h_clsTime[currentHisto].GetBinCenter(ij);
+          if (std::fabs(binc) < m_signalRange && sum > maxval) maxval = sum;
+        } // for(int ij=1;ij<=xbin;ij++) {
+        currentHisto = !currentHisto;
+        counter++;
+        // if(maxval > 15. * std::pow(m_factor, 2)) isWhile = false;
+        if (counter > 20) isWhile = false;
+      } // while(isWhile) {
+      // std::cout<<" counter "<<counter<<" maxval "<<maxval<<std::endl;
+
+    } else {
+      for (int ij = 1; ij <= xbin; ij++) {
+        double sumc = h_clsTime[currentHisto].GetBinContent(ij);
+        double suml = (ij == 1    ? 0. : h_clsTime[currentHisto].GetBinContent(ij - 1));
+        double sumr = (ij == xbin ? 0. : h_clsTime[currentHisto].GetBinContent(ij + 1));
+        // possible background
+        if (sumc <= m_threshold) sumc = 0;
+        if (suml <= m_threshold) suml = 0;
+        if (sumr <= m_threshold) sumr = 0;
+        double sum = suml + sumc + sumr;
+        h_clsTime[!currentHisto].SetBinContent(ij, sum);
+      } // for (int ij = 1; ij <= xbin; ij++) {
+      currentHisto = !currentHisto;
+    } // if(m_applyCentralLimit) {
+
 
     /** finalized the groups */
     int groupBegin = -1; int groupEnd = -1;
     std::vector<std::tuple<double, double, int>> groupInfo; // start, end, totCls
     for (int ij = 1; ij <= xbin; ij++) {
-      double sumc = h_clsTime.GetBinContent(ij);
-      double suml = (ij == 1    ? 0. : h_clsTime.GetBinContent(ij - 1));
-      double sumr = (ij == xbin ? 0. : h_clsTime.GetBinContent(ij + 1));
-      // possible background
-      if (sumc <= m_threshold) sumc = 0;
-      if (suml <= m_threshold) suml = 0;
-      if (sumr <= m_threshold) sumr = 0;
-
-      double sum = suml + sumc + sumr;
+      double sum = h_clsTime[currentHisto].GetBinContent(ij);
       // finding group
       if (sum > 0 && groupBegin < 0 && groupEnd < 0) { groupBegin = ij;}
       if (sum <= 0 && groupBegin > 0 && groupEnd < 0) {
         groupEnd = ij - 1;
-        int clsInGroup = h_clsTime.Integral(groupBegin, groupEnd);
-        double beginPos = h_clsTime.GetXaxis()->GetBinLowEdge(groupBegin);
-        double endPos   = h_clsTime.GetXaxis()->GetBinLowEdge(groupEnd) +
-                          h_clsTime.GetXaxis()->GetBinWidth(groupEnd);
+        int clsInGroup = h_clsTime[currentHisto].Integral(groupBegin, groupEnd);
+        double beginPos = h_clsTime[currentHisto].GetXaxis()->GetBinLowEdge(groupBegin);
+        double endPos   = h_clsTime[currentHisto].GetXaxis()->GetBinLowEdge(groupEnd) +
+                          h_clsTime[currentHisto].GetXaxis()->GetBinWidth(groupEnd);
         if (clsInGroup > 1) {
           groupInfo.push_back(std::make_tuple(beginPos, endPos, clsInGroup));
           B2DEBUG(1, " group " << ij
@@ -106,8 +164,8 @@ void SVDTimeGroupComposerModule::event()
         groupBegin = groupEnd = -1; // reset for new group
       }
     }
-    double underflow = h_clsTime.GetBinContent(0);
-    double overflow  = h_clsTime.GetBinContent(xbin + 1);
+    double underflow = h_clsTime[currentHisto].GetBinContent(0);
+    double overflow  = h_clsTime[currentHisto].GetBinContent(xbin + 1);
 
     // sorting groups in descending cluster-counts or distance from zero
     // this should help speed up the next process
@@ -157,10 +215,12 @@ void SVDTimeGroupComposerModule::event()
                   << " clsTime " << clsTime);
           if (ij == totGroups - 1) {                              // leftover clusters
             if (!m_useOnlyOneGroup &&
-                clsTime < -m_xRange && underflow > m_threshold)
+                m_includeOutOfRangeClusters &&
+                clsTime < -m_tRange && underflow > m_threshold)
               m_svdClusters[place]->setTimeGroupId(ij + 1);       // underflow
             else if (!m_useOnlyOneGroup &&
-                     clsTime > m_xRange && overflow > m_threshold)
+                     m_includeOutOfRangeClusters &&
+                     clsTime > m_tRange && overflow > m_threshold)
               m_svdClusters[place]->setTimeGroupId(ij + 2);       // overflow
             else
               m_svdClusters[place]->setTimeGroupId(-1);           // orphan

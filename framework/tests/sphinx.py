@@ -43,6 +43,8 @@ if __name__ == "__main__":
     ignoretrackmatching = 'trk_matching'
     #: ignore missing tracking_eventtimeextraction
     ignoretrackingeventtimeextraction = 'tracking_eventtimeextraction'
+    #: ignore wrong link to tools doc until tools are updated
+    ignoretoolsdoc = 'cvmfs_setup'
 
     check_error_free("b2code-sphinx-warnings", "sphinx", None,
                      lambda x:
@@ -54,9 +56,12 @@ if __name__ == "__main__":
                      re.findall(ignoreincludeproblem, x) or
                      re.findall(ignoreonlinebook, x) or
                      re.findall(ignoretrackmatching, x) or
+                     re.findall(ignoretoolsdoc, x) or
                      re.findall(ignoretrackingeventtimeextraction, x),
                      ['--light']
                      )
     if not light_build:
         check_error_free("b2code-sphinx-warnings", "sphinx", None,
+                         lambda x:
+                         re.findall(ignoretoolsdoc, x)
                          )

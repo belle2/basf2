@@ -12,21 +12,21 @@ Collaborative Tools.
 
     **Prerequisites**:
 
-        * DESY accounts.
-        * An internet browser.
+    * DESY accounts.
+    * An internet browser.
 
     **Questions**:
 
-        * Where do I find information?
-        * Where can I ask for help?
-        * Where can I report bugs?
-        * Where do I find the source code?
+    * Where do I find information?
+    * Where can I ask for help?
+    * Where can I report bugs?
+    * Where do I find the source code?
 
     **Objectives**:
 
-        * Learn where things are or where to look.
-        * Learn to ask good questions at the right places.
-        * Learn how to report problems.
+    * Learn where things are or where to look.
+    * Learn to ask good questions at the right places.
+    * Learn how to report problems.
 
 Belle II is an international collaboration of more than 1000 members from all
 over the world.
@@ -625,7 +625,7 @@ Help us out with documentation: as a beginner, you know best what is missing!
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Author(s) of this lesson
+.. rubric:: Author(s) of this lesson
 
-     Kilian Lieret,
-     Sam Cunliffe
+Kilian Lieret,
+Sam Cunliffe

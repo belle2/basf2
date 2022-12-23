@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -12,159 +11,88 @@
 """
 <header>
     <input>MCvalidation.root</input>
+    <output>SplitMultiplicityPlots.root</output>
+    <contact>Frank Meier; frank.meier@belle2.org</contact>
     <description>Comparing generated kaon multiplicities, optionally split by charge and originating B meson flavor</description>
 </header>
 """
 
-import uproot
-import matplotlib.pyplot as plt
-import numpy as np
-import matplotlib.gridspec as gridspec
-# import matplotlib.ticker as ticker
-
-plt.rcParams['axes.prop_cycle'] = plt.cycler(color=["#7fcdbb", "#081d58"])
+import ROOT
 
 
-def PlottingCompHistos(particle, varlp, varlm, legend):
-    ''' Function to plot histograms of particle multiplicities'''
+def PlottingHistos(particle, pos, neg):
+    ''' Plotting function'''
 
-    nbins = int(range_dic[particle][1] - (range_dic[particle][0]))
+    nbins = int(2*range_dic[particle])
 
-    # create figure and axes
-    plt.figure(figsize=(6, 5), dpi=200)
-    gs = gridspec.GridSpec(2, 2,  height_ratios=[4, 1])
-    gs.update(hspace=0.1, wspace=0)
-
-    # create subplots
-    ax1 = plt.subplot(gs[0, 1])
-    ax2 = plt.subplot(gs[0, 0], sharey=ax1)
-    # ax1b = plt.subplot(gs[1, 1], sharex=ax1)
-    # ax2b = plt.subplot(gs[1, 0], sharex=ax2, sharey=ax1b)
-
-    # make axes that overlap invisible
-    plt.setp(ax1.get_yticklabels(), visible=False)
-    # plt.setp(ax1b.get_yticklabels(), visible=False)
-    plt.setp(ax2.get_xticklabels(), visible=False)
-    # plt.setp(ax2b.get_xticklabels(), visible=False)
-
-    # create histograms
-    count = 0
-    for varnp, varnm, leg in zip(varlp, varlm, legend):
-        # get unnormalised bin counts
-        raw_p, _ = np.histogram(file[varnp], bins=nbins, range=range_dic[particle])
-        # raw_p2, outbins = np.histogram(old[varnp], bins=nbins, range=range_dic[particle])
-
-        raw_m, _ = np.histogram(file[varnm], bins=nbins, range=range_dic[particle])
-        # raw_m2, outbins = np.histogram(old[varnm], bins=nbins, range=range_dic[particle])
-
-        # plot normalised multiplicity histograms
-        count1_p, _, _ = ax1.hist(file[varnp], bins=nbins, ls=lines[count], color=colors[count],
-                                  range=range_dic[particle], density=True, histtype='step')
-        # count2_p, outbins, _ = ax1.hist(old[varnp], ls=lines[count+1], bins=nbins, color=colors[count],
-        #                                 range=range_dic[particle], histtype='step',  density=True)
-
-        count1_m, _, _ = ax2.hist(file[varnm], bins=nbins, ls=lines[count], color=colors[count],
-                                  range=range_dic[particle], density=True, histtype='step')
-        # count2_m, outbins, _ = ax2.hist(old[varnm], ls=lines[count+1], color=colors[count], bins=nbins,
-        #                                 range=range_dic[particle], histtype='step', fill=False, density=True)
-
-        # # calculate ratios
-        # bin_centers = outbins[:-1] + np.diff(outbins) / 2
-        # ratio_p = count1_p/count2_p
-        # err_p = np.sqrt((1/raw_p)+(1/raw_p2))
-        # ratio_m = count1_m/count2_m
-        # err_m = np.sqrt((1/raw_m)+(1/raw_m2))
-
-        # # plot residuals
-        # ax1b.errorbar(x=bin_centers, y=ratio_p, yerr=err_p,
-        #               color=colors[count],
-        #               marker=markers[2*count],
-        #               ls='',
-        #               markersize=markers[2*count+1])
-
-        # ax2b.errorbar(x=bin_centers, y=ratio_m, yerr=err_m,
-        #               color=colors[count],
-        #               ls='',
-        #               marker=markers[2*count],
-        #               markersize=markers[2*count+1])
-
-        count += 1
-
-    # set axis limits and invert anti-particle x-axis
-    ax1.set_xlim(range_dic[particle][0] - 0.5, range_dic[particle][1] + 0.5)
-    ax2.set_xlim(range_dic[particle][0] - 0.5, range_dic[particle][1] + 0.5)
-    ax2.invert_xaxis()
-
-    # # set a tick frequency equal to 1
-    # ax1b.xaxis.set_major_locator(ticker.MultipleLocator(1.0))
-    # ax2b.xaxis.set_major_locator(ticker.MultipleLocator(1.0))
-
-    # # draw separating line and set residuals axis
-    # ax1b.axhline(1.0, alpha=0.3)
-    # ax2b.axhline(1.0, alpha=0.3)
-    # ax1b.set_ylim(0.9, 1.1)
-
-    # # add some labels and titles
-    # ax1b.set_xlabel(axisp_dic[particle])
-    # ax2b.set_xlabel(axism_dic[particle])
-    # ax2b.set_ylabel(r'$\dfrac{\mathrm{New}}{\mathrm{Old}}$')
-    ax2.set_ylabel("Norm. Entries/Bin")
-    # ax1.legend(frameon=False, fontsize='xx-small')
-
-    ax2.annotate(
-        f"{B}", (0.02, 0.98), xytext=(4, -4), xycoords='axes fraction',
-        textcoords='offset points',
-        fontweight='bold', ha='left', va='top'
-    )
-
-    # save the plots
-    plt.subplots_adjust(hspace=0.2)
-    if len(varlp) > 1:
-        plt.savefig(str(B) + str(particle) + '_split.png')
-    else:
-        plt.savefig(str(B) + str(particle) + '.png')
+    hist = rdf_fix.Histo1D((particle, particle, nbins, -range_dic[particle], range_dic[particle]), pos)
+    hist_neg = rdf_fix.Histo1D((f"{particle}_neg", f"{particle}_neg", nbins, -range_dic[particle], range_dic[particle]), neg)
+    hist.Add(hist_neg.GetPtr())
+    hist.SetTitle(f";{axis_dic[particle]}; Events")
+    hist.GetListOfFunctions().Add(ROOT.TNamed('Description', f'{axis_dic[particle]} multiplicity'))
+    hist.GetListOfFunctions().Add(ROOT.TNamed('Check', 'Shape should not change drastically.'))
+    hist.GetListOfFunctions().Add(ROOT.TNamed('Contact', 'frank.meier@belle2.org'))
+    hist.GetListOfFunctions().Add(ROOT.TNamed('MetaOptions', 'nostats'))
+    hist.Write()
+    # c1.Clear()
 
 
 if __name__ == '__main__':
 
     # load in the root files
-    file = uproot.open("MCvalidation.root:Split").arrays(library="pd")
+    rdf = ROOT.RDataFrame("Split", "MCvalidation.root")
+    rdf_fix = rdf.Define("gen_Kn", "-gen_Km").Define("gen_K0bar", "-gen_antiK0")
 
     B = 'charged'
 
-    # define axis-label and range dictionaries
-    axism_dic = {'Kpm': '$\\# K^{-}$',
-                 'K0': '$\\# \\overline{K^{0}}$'
+    axis_dic = {'Kpm': 'K^{+} / K^{#minus} from both B',
+                'K0': 'K^{0} / #bar{K}^{0} from both B'
+                }
+
+    range_dic = {'Kpm': 4.5,
+                 'K0': 3.5,
+                 'Kpm_same': 4.5,
+                 'Kpm_diff': 4.5,
+                 'K0_same': 3.5,
+                 'K0_diff': 3.5
                  }
 
-    axisp_dic = {'Kpm': '$\\# K^{+}$',
-                 'K0': '$\\# K^{0}$'
-                 }
+    outputFile = ROOT.TFile("SplitMultiplicityPlots.root", "RECREATE")
+    ROOT.gROOT.SetBatch(True)
+    ROOT.gROOT.SetStyle("BELLE2")
+    ROOT.gROOT.ForceStyle()
 
-    range_dic = {'Kpm': [-0.5, 4.5],
-                 'K0': [-0.5, 3.5]
-                 }
+    PlottingHistos("Kpm", "gen_Kp", "gen_Kn")
+    PlottingHistos("K0", "gen_K0", "gen_K0bar")
+    if B == "charged":
+        axis_dic['Kpm_same'] = 'K^{+} from B^{+} / K^{#minus} from B^{#minus}'
+        axis_dic['Kpm_diff'] = 'K^{+} from B^{#minus} / K^{#minus} from B^{+}'
+        axis_dic['K0_same'] = 'K^{0} from B^{+} / #bar{K}^{0} from B^{#minus}'
+        axis_dic['K0_diff'] = 'K^{0} from B^{#minus} / #bar{K}^{0} from B^{+}'
 
-    # define settings for the histograms
-    lines = ['-', (0, (5, 1)), '-']
-    markers = ["v", 3,
-               "^", 3]
-    colors = ["#081d58", "#7fcdbb"]
+        rdf_fix = rdf.Define("gen_Kp_Bn", "-gen_Kp_Bm")\
+                     .Define("gen_Km_Bn", "-gen_Km_Bm")\
+                     .Define("gen_K0_Bn", "-gen_K0_Bm")\
+                     .Define("gen_antiK0_Bn", "-gen_antiK0_Bm")
 
-    # Plot the histograms
-    PlottingCompHistos("Kpm", ["gen_Kp"], ["gen_Km"], [" from both B"])
-    PlottingCompHistos("K0", ["gen_K0"], ["gen_antiK0"], [" from both B"])
-
-    if B == 'charged':
-        PlottingCompHistos("K0", ["gen_K0_Bp", "gen_K0_Bm"], ["gen_antiK0_Bp", "gen_antiK0_Bm", ], [" from Bp", " from Bm"])
+        PlottingHistos("Kpm_same", "gen_Kp_Bp", "gen_Km_Bn")
+        PlottingHistos("Kpm_diff", "gen_Kp_Bn", "gen_Km_Bp")
+        PlottingHistos("K0_same", "gen_K0_Bp", "gen_antiK0_Bn")
+        PlottingHistos("K0_diff", "gen_K0_Bn", "gen_antiK0_Bp")
     else:
-        PlottingCompHistos(
-            "K0", [
-                "gen_K0_B0", "gen_K0_antiB0"], [
-                "gen_antiK0_B0", "gen_antiK0_antiB0", ], [
-                " from B0", " from antiB0"])
+        axis_dic['Kpm_same'] = 'K^{+} from B^{0} / K^{#minus} from #bar{B}^{0}'
+        axis_dic['Kpm_diff'] = 'K^{+} from #bar{B}^{0} / K^{#minus} from B^{0}'
+        axis_dic['K0_same'] = 'K^{0} from B^{0} / #bar{K}^{0} from #bar{B}^{0}'
+        axis_dic['K0_diff'] = 'K^{0} from #bar{B}^{0} / #bar{K}^{0} from B^{0}'
 
-    if B == 'charged':
-        PlottingCompHistos("Kpm", ["gen_Kp_Bp", "gen_Kp_Bm"], ["gen_Km_Bp", "gen_Km_Bm", ], [" from Bp", " from Bm"])
-    else:
-        PlottingCompHistos("Kpm", ["gen_Kp_B0", "gen_Kp_antiB0"], ["gen_Km_B0", "gen_Km_antiB0", ], [" from B0", " from antiB0"])
+        rdf_fix = rdf.Define("gen_Kp_B0bar", "-gen_Kp_antiB0")\
+                     .Define("gen_Km_B0bar", "-gen_Km_antiB0")\
+                     .Define("gen_K0_B0bar", "-gen_K0_antiB0")\
+                     .Define("gen_antiK0_B0bar", "-gen_antiK0_antiB0")
+
+        PlottingHistos("Kpm_same", "gen_Kp_B0", "gen_Km_B0bar")
+        PlottingHistos("Kpm_diff", "gen_Kp_B0bar", "gen_Km_B0")
+        PlottingHistos("K0_same", "gen_K0_B0", "gen_antiK0_B0bar")
+        PlottingHistos("K0_diff", "gen_K0_B0bar", "gen_antiK0_B0")
+
+    outputFile.Close()

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -42,7 +41,7 @@ def arg_parser():
     parser.add_argument('-is', '--initialstate',
                         nargs='*',
                         default=['B+', 'B-', 'B0', 'anti-B0'],
-                        help='initital state particles',
+                        help='initial state particles',
                         metavar='LIST')
     return parser
 
@@ -59,45 +58,40 @@ if __name__ == '__main__':
     B2decs = {istate[0]: [], istate[1]: [], istate[2]: [], istate[3]: []}
     Bdecs = {istate[0]: [], istate[1]: [], istate[2]: [], istate[3]: []}
 
-    B1BF = {istate[0]: 0, istate[1]: 0, istate[2]: 0, istate[3]: 0}
-    B2BF = {istate[0]: 0, istate[1]: 0, istate[2]: 0, istate[3]: 0}
-    BtotBF = {istate[0]: 0, istate[1]: 0, istate[2]: 0, istate[3]: 0}
+    B1BF = {istate[i]: 0 for i in range(len(istate))}
+    B2BF = B1BF
+    BtotBF = B1BF
     togglesave = ''
 
     with open(filepath) as f:
         line = f.readline()
         while line:
-            if "Decay "+str(istate[0]) in line and line[0] != '#':
-                togglesave = istate[0]
-            if "Decay "+str(istate[1]) in line and line[0] != '#':
-                togglesave = istate[1]
-            if "Decay "+str(istate[2]) in line and line[0] != '#':
-                togglesave = istate[2]
-            if "Decay "+str(istate[3]) in line and line[0] != '#':
-                togglesave = istate[3]
+            for i in range(len(istate)):
+                if f"Decay {istate[i]}" in line and line[0] != '#':
+                    togglesave = istate[i]
+                    break
 
             if "Enddecay" in line:
                 togglesave = ''
 
             if togglesave:
-                if(line[0] != '#' and (' '+fstate[0]+' ' in line or ' '+fstate[1]+' ' in line
-                                       or ' '+fstate[2]+' ' in line or ' '+fstate[3]+' ' in line)
+                if(line[0] != '#' and (f' {fstate[0]} ' in line or f' {fstate[1]} ' in line
+                                       or f' {fstate[2]} ' in line or f' {fstate[3]} ' in line)
                    and line[0:5] != 'Decay' and line != '\n'):
                     Bdecs[togglesave].append(line)
-                if(line[0] != '#' and (' '+fstate[0]+' ' in line or ' '+fstate[1]+' ' in line)
+                if(line[0] != '#' and (f' {fstate[0]} ' in line or f' {fstate[1]} ' in line)
                    and line[0:5] != 'Decay' and line != '\n'):
                     B1decs[togglesave].append(line)
-                if(line[0] != '#' and (' '+fstate[2]+' ' in line or ' '+fstate[3]+' ' in line)
+                if(line[0] != '#' and (f' {fstate[2]} ' in line or f' {fstate[3]} ' in line)
                    and line[0:5] != 'Decay' and line != '\n'):
                     B2decs[togglesave].append(line)
             line = f.readline()
 
-    print("\n")
+    print()
     basf2.B2INFO("Number of decays for: ")
-    basf2.B2INFO(istate[0] + " " + str(len(Bdecs[istate[0]])))
-    basf2.B2INFO(istate[1] + " " + str(len(Bdecs[istate[1]])))
-    basf2.B2INFO(istate[2] + " " + str(len(Bdecs[istate[2]])))
-    basf2.B2INFO(istate[3] + " " + str(len(Bdecs[istate[3]]))+"\n")
+    for i in range(len(istate)):
+        basf2.B2INFO(f'{istate[i]} {len(Bdecs[istate[i]])}')
+    print()
 
     for keys, vals in Bdecs.items():
         for string in vals:
@@ -109,12 +103,12 @@ if __name__ == '__main__':
         for string in vals:
             B2BF[keys] += float(string.split()[0])
 
-    basf2.B2INFO("The BFs for "+fstate[0] + " and " + fstate[1]+" are: ")
-    basf2.B2INFO(B1BF)
-    basf2.B2INFO("The BFs for "+fstate[2] + " and " + fstate[3]+" are: ")
-    basf2.B2INFO(B2BF)
-    basf2.B2INFO("The total BFs are: ")
-    basf2.B2INFO(BtotBF)
+    basf2.B2INFO(f"The BFs for {fstate[0]} and {fstate[1]} are:")
+    basf2.B2INFO({k: round(v, 9) for k, v in B1BF.items()})
+    basf2.B2INFO(f"The BFs for {fstate[2]} and {fstate[3]} are:")
+    basf2.B2INFO({k: round(v, 9) for k, v in B2BF.items()})
+    basf2.B2INFO("The total BFs are:")
+    basf2.B2INFO({k: round(v, 9) for k, v in BtotBF.items()})
 
     with open(filepath) as f:
         with open(outpath, "w+") as outf:
@@ -126,6 +120,6 @@ if __name__ == '__main__':
                 outf.write(str(keys)+'\n')
                 for val in vals:
                     outf.write(str(val))
-        print("\n")
-        basf2.B2INFO('Sucessfully written decays to '+outpath)
+        print()
+        basf2.B2INFO('Successfully written decays to '+outpath)
         outf.close()

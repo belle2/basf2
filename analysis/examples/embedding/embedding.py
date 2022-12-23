@@ -44,4 +44,4 @@ if __name__ == "__main__":
                     ' --filePrimary ' + outputDataForRemoveList +
                     ' --fileSecondary ' + outputMCForSignalList +
                     ' --fileOut ' + outputEmbedded,
-                    shel=True)
+                    shell=True)

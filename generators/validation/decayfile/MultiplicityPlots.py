@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -12,82 +11,39 @@
 """
 <header>
     <input>MCvalidation.root</input>
+    <output>MultiplicityPlots.root</output>
+    <contact>Frank Meier; frank.meier@belle2.org</contact>
     <description>Comparing generated particle multiplicities</description>
 </header>
 """
 
-import uproot
-import matplotlib.pyplot as plt
-# import numpy as np
-
-plt.rcParams['axes.prop_cycle'] = plt.cycler(color=["#7fcdbb", "#081d58"])
+import ROOT
 
 
-def PlottingCompHistos(particle):
-    ''' Plotting function to compare generated particle multiplicities between two MC samples'''
+def PlottingHistos(particle):
+    ''' Plotting function'''
 
     nbins = int(range_dic[particle][1] - (range_dic[particle][0]))
 
-    # get unnormalised bin counts
-    raw, _, _ = plt.hist(file[var], bins=nbins, range=range_dic[particle])
-    # raw2, outbins, _ = plt.hist(old[var], bins=nbins, range=range_dic[particle], histtype='step')
-    plt.close()
-
-    # plot normalised particle multiplicities histograms
-    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(5, 5), dpi=300, sharex=True, gridspec_kw={"height_ratios": [3.5, 1]})
-    count1, _, _ = ax1.hist(file[var], bins=nbins, range=range_dic[particle], density=True)
-    # count2, outbins, _ = ax1.hist(old[var], bins=nbins, range=range_dic[particle], histtype='step', density=True)
-
-    # # calculate ratios
-    # bin_centers = outbins[:-1] + np.diff(outbins) / 2
-    # ratio = count1/count2
-    # err = np.sqrt((1/raw)+(1/raw2))
-
-    # # plot residuals
-    # ax2.errorbar(x=bin_centers, y=ratio, yerr=err, ls='', marker='_',  markersize='10', color="#4575b4")
-    # ax2.axhline(1.0, alpha=0.3)
-
-    # add labels and legend
-    # ax1.legend()
-    # ax2.set_xlabel(axis_dic[particle])
-    # ax2.set_ylabel(r'$\dfrac{New}{Old}$')
-    ax1.set_ylabel("Norm. Entries/Bin")
-    # ax2.set_ylim(0.9, 1.1)
-
-    # save histograms
-    fig.tight_layout()
-    plt.savefig(str(var) + '.png')
+    hist = rdf.Histo1D((var, var, nbins, range_dic[particle][0], range_dic[particle][1]), var)
+    hist.SetTitle(f";{axis_dic[particle]}; Events")
+    hist.GetListOfFunctions().Add(ROOT.TNamed('Description', f'{axis_dic[particle]} multiplicity'))
+    hist.GetListOfFunctions().Add(ROOT.TNamed('Check', 'Shape should not change drastically.'))
+    hist.GetListOfFunctions().Add(ROOT.TNamed('Contact', 'frank.meier@belle2.org'))
+    hist.GetListOfFunctions().Add(ROOT.TNamed('MetaOptions', 'nostats'))
+    hist.Write()
 
 
 if __name__ == '__main__':
 
-    # load the root files
-    file = uproot.open("MCvalidation.root:Multiplicities").arrays(library='pd')
+    # load the root file into RDataFrame
+    rdf = ROOT.RDataFrame("Multiplicities", "MCvalidation.root")
 
     # define the variables to plot
-    all_list = [
-        'nPIp',
-        'nPI0',
-        'nETA',
-        'nETAprim',
-        'nPHI',
-        'nRHOp',
-        'nRHO0',
-        'nKp',
-        'nKL0',
-        'nKS0',
-        'nKstar0',
-        'nKstarp',
-        'nDp',
-        'nD0',
-        'nJPSI',
-        'nELECTRON',
-        'nENEUTRINO',
-        'nMUON',
-        'nMNEUTRINO',
-        'nTAUON',
-        'nTNEUTRINO',
-        'nPHOTON']
+    colnames = rdf.GetColumnNames()
+    all_list = [str(x) for x in colnames if x[0] == "n"]
+    all_list.remove("nB0")
+    all_list.remove("nBp")
 
     # define dictionaries for the axis-labels and the ranges
     range_dic = {'nPIp': [-0.5, 25.5],
@@ -114,29 +70,36 @@ if __name__ == '__main__':
                  'nPHOTON': [-0.5, 35.5]
                  }
 
-    axis_dic = {'nPIp': r'$\pi^+$',
-                'nPI0': r'$\pi^0$',
-                'nETA': r'$\eta$',
-                'nETAprim': r"$\eta'$",
-                'nPHI': r'$\phi$',
-                'nRHOp': r'$\rho^0$',
-                'nRHO0': r'$\rho^+$',
-                'nKp': r'$K^+$',
-                'nKL0': r'$K_L^0$',
-                'nKS0': r'$K_S^0$',
-                'nKstar0': r'$K^{*,0}$',
-                'nKstarp': r'$K^{*,+}$',
-                'nDp': r'$D^+$',
-                'nD0': r'$D^0$',
-                'nJPSI': r'$J/\psi$',
-                'nELECTRON': r'$e^-$',
-                'nENEUTRINO': r'$\nu_e^-$',
-                'nMUON': r'$\mu^-$',
-                'nMNEUTRINO': r'$\nu_{\mu}^-$',
-                'nTAUON': r'$\tau^-$',
-                'nTNEUTRINO': r'$\nu_{\tau}^-$',
-                'nPHOTON': r'$\gamma$'}
+    axis_dic = {'nPIp': '#pi^{+}',
+                'nPI0': '#pi^{0}',
+                'nETA': '#eta',
+                'nETAprim': "#eta'",
+                'nPHI': '#phi',
+                'nRHOp': '#rho^{0}',
+                'nRHO0': '#rho^{+}',
+                'nKp': 'K^{+}',
+                'nKL0': 'K_{L}^{0}',
+                'nKS0': 'K_{S}^{0}',
+                'nKstar0': 'K^{*,0}',
+                'nKstarp': 'K^{*,+}',
+                'nDp': 'D^{+}',
+                'nD0': 'D^{0}',
+                'nJPSI': 'J/#psi',
+                'nELECTRON': 'e^{#minus}',
+                'nENEUTRINO': '#nu_{e}^{#minus}',
+                'nMUON': '#mu^{#minus}',
+                'nMNEUTRINO': '#nu_{#mu}^{#minus}',
+                'nTAUON': '#tau^{#minus}',
+                'nTNEUTRINO': '#nu_{#tau}^{#minus}',
+                'nPHOTON': '#gamma'}
+
+    outputFile = ROOT.TFile("MultiplicityPlots.root", "RECREATE")
+    ROOT.gROOT.SetBatch(True)
+    ROOT.gROOT.SetStyle("BELLE2")
+    ROOT.gROOT.ForceStyle()
 
     # plot the histograms
     for var in all_list:
-        PlottingCompHistos(var)
+        PlottingHistos(var)
+
+    outputFile.Close()

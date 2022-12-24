@@ -25,23 +25,14 @@ if __name__ == "__main__":
     outputMCForSignalList = 'sigmc.root'
     outputEmbedded = 'embedded_data.root'
 
-    subprocess.call('basf2 udst_purge_list.py -- ' +
-                    ' --listName ' + removeList +
-                    ' --charge pos ' +  # pos: B+, neg:B-, zero:B0 (B0bar)
-                    ' --fileIn ' + inputDataForRemoveList +
-                    ' --fileOut ' + outputDataForRemoveList,
-                    shell=True)
+    cmd = f'basf2 udst_purge_list.py -- --listName {removeList} --charge pos --fileIn {inputDataForRemoveList}'\
+          f' --fileOut {outputDataForRemoveList}'
+    subprocess.check_call(cmd.split())
 
-    subprocess.call('basf2 udst_purge_list.py -- ' +
-                    ' --isSignal ' +  # for signal MC
-                    ' --listName ' + signalList +
-                    ' --charge pos ' +  # pos: B+, neg:B-, zero:B0 (B0bar)
-                    ' --fileIn ' + inputMCForSignalList +
-                    ' --fileOut ' + outputMCForSignalList,
-                    shell=True)
+    cmd = f'basf2 udst_purge_list.py -- --isSignal --listName {signalList} --charge pos --fileIn {inputMCForSignalList}'\
+          f' --fileOut {outputMCForSignalList}'
+    subprocess.check_call(cmd.split())
 
-    subprocess.call('basf2 embedding_merge.py --' +
-                    ' --filePrimary ' + outputDataForRemoveList +
-                    ' --fileSecondary ' + outputMCForSignalList +
-                    ' --fileOut ' + outputEmbedded,
-                    shell=True)
+    cmd = f'basf2 embedding_merge.py -- --filePrimary {outputDataForRemoveList} --fileSecondary {outputMCForSignalList}'\
+          f' --fileOut {outputEmbedded}'
+    subprocess.check_call(cmd.split())

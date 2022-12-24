@@ -75,22 +75,24 @@ void SVDTimeGroupComposerModule::initialize()
   m_svdClusters.isRequired(m_svdClustersName);
 
   if (m_useOnlyOneGroup) B2WARNING("Only the group nearest to zero is selected.");
-  if (m_AverageCountPerBin <= 0.) B2WARNING("averageCountPerBin is set to zero or less."
-                                              << " Module is ineffective.");
+  if (m_AverageCountPerBin <= 0 || m_factor <= 0) B2WARNING("averageCountPerBin is set to zero or less."
+                                                              << " Module is ineffective.");
   if (m_tRangeHigh - m_tRangeLow < 10.) B2FATAL("tRange should not be less than 10 (hard-coded).");
 
   B2DEBUG(1, "SVDTimeGroupComposerModule \nsvdClusters: " << m_svdClusters.getName());
-  B2INFO("SVDTimeGroupComposer : tRange                    = [" << m_tRangeLow << "," << m_tRangeHigh << "]");
-  B2INFO("SVDTimeGroupComposer : signalRange               = [" << m_signalRangeLow << "," << m_signalRangeHigh << "]");
-  B2INFO("SVDTimeGroupComposer : applyCentralLimit         = " << m_applyCentralLimit);
-  if (!m_applyCentralLimit) {
-    B2INFO("SVDTimeGroupComposer : averageCountPerBin        = " << m_AverageCountPerBin);
-    B2INFO("SVDTimeGroupComposer : threshold                 = " << m_threshold);
-  } else {
-    B2INFO("SVDTimeGroupComposer : factor                    = " << m_factor);
-    B2INFO("SVDTimeGroupComposer : iteration                 = " << m_iteration);
-  }
-  B2INFO("SVDTimeGroupComposer : includeOutOfRangeClusters = " << m_includeOutOfRangeClusters);
+  if (m_AverageCountPerBin > 0 && m_factor > 0) {
+    B2INFO("SVDTimeGroupComposer : tRange                    = [" << m_tRangeLow << "," << m_tRangeHigh << "]");
+    B2INFO("SVDTimeGroupComposer : signalRange               = [" << m_signalRangeLow << "," << m_signalRangeHigh << "]");
+    B2INFO("SVDTimeGroupComposer : applyCentralLimit         = " << m_applyCentralLimit);
+    if (!m_applyCentralLimit) {
+      B2INFO("SVDTimeGroupComposer : averageCountPerBin        = " << m_AverageCountPerBin);
+      B2INFO("SVDTimeGroupComposer : threshold                 = " << m_threshold);
+    } else {
+      B2INFO("SVDTimeGroupComposer : factor                    = " << m_factor);
+      B2INFO("SVDTimeGroupComposer : iteration                 = " << m_iteration);
+    }
+    B2INFO("SVDTimeGroupComposer : includeOutOfRangeClusters = " << m_includeOutOfRangeClusters);
+  } // if(m_AverageCountPerBin > 0 && m_factor > 0) {
 }
 
 

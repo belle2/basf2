@@ -63,7 +63,7 @@ if args.isMC:
     expList = [0]
     numEvents = 20
     bkgFiles = get_background_files()  # Phase3 background
-    bkgFiles = None  # uncomment to remove  background
+    # bkgFiles = None  # uncomment to remove  background
     simulateJitter = False
     ROIfinding = False
     MCTracking = False
@@ -84,8 +84,8 @@ if args.isMC:
     #     usePXDDataReduction=ROIfinding,
     #     simulateT0jitter=simulateJitter)
 
-    # b2conditions.prepend_globaltag("tracking_TEST_SVDTimeSelectionONrev5_VXDTF2TimeFiltersONrev27")
-    b2conditions.prepend_globaltag("tracking_TEST_SVDTimeSelectionOFFrev1_VXDTF2TimeFiltersONrev27")
+    b2conditions.prepend_globaltag("tracking_TEST_SVDTimeSelectionONrev5_VXDTF2TimeFiltersONrev27")
+    # b2conditions.prepend_globaltag("tracking_TEST_SVDTimeSelectionOFFrev1_VXDTF2TimeFiltersONrev27")
 
 else:
     # setup database
@@ -168,7 +168,7 @@ if args.RootOutput:
     rootOutFileName = outputFileName + "_RootOutput_" + str(args.fileTag) + ".root"
     main.add_module('RootOutput',
                     outputFileName=rootOutFileName,
-                    branchNames=['SVDClusters'])
+                    branchNames=['SVDTrueHits', 'SVDClusters', 'SVDSpacePoints'])
 
 if args.executionTime:
     executionFileName = str(args.fileDir) + "SVDExecutionTime"

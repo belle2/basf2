@@ -67,7 +67,7 @@ void SVDSpacePointCreatorModule::initialize()
 
 
   //Relations to cluster objects only if the ancestor relations exist:
-  m_spacePoints.registerRelationTo(m_svdClusters, DataStore::c_Event, DataStore::c_DontWriteOut);
+  m_spacePoints.registerRelationTo(m_svdClusters, DataStore::c_Event, DataStore::c_WriteOut);
 
 
   B2DEBUG(1, "SVDSpacePointCreatorModule(" << m_nameOfInstance << ")::initialize: names set for containers:\n" <<

@@ -19,7 +19,7 @@ if __name__ == "__main__":
 
     # example files that contain the particleList
     inputDataForRemoveList = b2.find_file('embedding_skim_BplusToKplusJpsiMuMu_bucket17.udst.root', 'examples', False)
-    inputMCForSignalList = b2.find_file('embedding_skim_BplusToKplusJpsiMuMu_bucket17.udst.root', 'examples', False)
+    inputMCForSignalList = b2.find_file('embedding_skim_sig_71_Bplus2Kplus.udst.root', 'examples', False)
 
     outputDataForRemoveList = 'data.root'
     outputMCForSignalList = 'sigmc.root'

@@ -180,8 +180,11 @@ class CharmoniumPsi(BaseSkim):
 
     def build_lists(self, path):
 
-        # Electron list. Exclude TOP
-        ma.fillParticleList('e+:loosepid_noTOP', 'electronID_noTOP > 0.1', path=path)
+        # Lepton lists. Exclude SVD and TOP formuons.
+        ma.fillParticleList('e+:loosepid_noSVD_noTOP',
+                            'electronID_noSVD_noTOP > 0.1', path=path)
+        ma.fillParticleList('mu+:loosepid_noTOP',
+                            'muonID_noSVD > 0.1', path=path)
 
         # Mass cuts.
         jpsi_mass_cut = '2.85 < M < 3.3'
@@ -193,16 +196,19 @@ class CharmoniumPsi(BaseSkim):
         # The recommeneded list for further reconstruction is J/psi:eebrems.
         # The estimated ratio of efficiencies in B decays in release 5.1.5 is
         # 1.00 (J/psi:eebrems) : 0.95 (J/psi:eebrems2) : 0.82 (J/psi:ee).
-        ma.correctBremsBelle('e+:brems', 'e+:loosepid_noTOP', 'gamma:all',
+        ma.correctBremsBelle('e+:brems', 'e+:loosepid_noSVD_noTOP', 'gamma:all',
                              angleThreshold=0.05,
                              path=path)
-        ma.correctBrems('e+:brems2', 'e+:loosepid_noTOP', 'gamma:all', path=path)
+        ma.correctBrems('e+:brems2', 'e+:loosepid_noSVD_noTOP', 'gamma:all',
+                        path=path)
 
         # Reconstruct J/psi or psi(2S).
-        ma.reconstructDecay('J/psi:ee -> e+:loosepid_noTOP e-:loosepid_noTOP',
-                            jpsi_mass_cut, path=path)
-        ma.reconstructDecay('psi(2S):ee -> e+:loosepid_noTOP e-:loosepid_noTOP',
-                            psi2s_mass_cut, path=path)
+        ma.reconstructDecay(
+            'J/psi:ee -> e+:loosepid_noSVD_noTOP e-:loosepid_noSVD_noTOP',
+            jpsi_mass_cut, path=path)
+        ma.reconstructDecay(
+            'psi(2S):ee -> e+:loosepid_noSVD_noTOP e-:loosepid_noSVD_noTOP',
+            psi2s_mass_cut, path=path)
 
         ma.reconstructDecay('J/psi:eebrems -> e+:brems e-:brems',
                             jpsi_mass_cut, path=path)
@@ -214,10 +220,12 @@ class CharmoniumPsi(BaseSkim):
         ma.reconstructDecay('psi(2S):eebrems2 -> e+:brems2 e-:brems2',
                             psi2s_mass_cut, path=path)
 
-        ma.reconstructDecay('J/psi:mumu -> mu+:loosepid mu-:loosepid',
-                            jpsi_mass_cut, path=path)
-        ma.reconstructDecay('psi(2S):mumu -> mu+:loosepid mu-:loosepid',
-                            psi2s_mass_cut, path=path)
+        ma.reconstructDecay(
+            'J/psi:mumu -> mu+:loosepid_noSVD mu-:loosepid_noSVD',
+            jpsi_mass_cut, path=path)
+        ma.reconstructDecay(
+            'psi(2S):mumu -> mu+:loosepid_noSVD mu-:loosepid_noSVD',
+            psi2s_mass_cut, path=path)
 
         # Return the lists.
         return ['J/psi:ee', 'psi(2S):ee',
@@ -231,8 +239,12 @@ class CharmoniumPsi(BaseSkim):
         from validation_tools.metadata import create_validation_histograms
 
         # [Y(3S) -> pi+pi- [Y(1S,2S) -> mu+mu-]] decay
-        ma.reconstructDecay('J/psi:mumu_test -> mu+:loosepid mu-:loosepid', '', path=path)
-        ma.reconstructDecay('J/psi:ee_test -> e+:loosepid_noTOP e-:loosepid_noTOP', '', path=path)
+        ma.reconstructDecay(
+            'J/psi:mumu_test -> mu+:loosepid_noSVD mu-:loosepid_noSVD',
+            '', path=path)
+        ma.reconstructDecay(
+            'J/psi:ee_test -> e+:loosepid_noSVD_noTOP e-:loosepid_noSVD_noTOP',
+            '', path=path)
         ma.copyList('J/psi:ll', 'J/psi:mumu_test', path=path)
         ma.copyList('J/psi:ll', 'J/psi:ee_test', path=path)
 

@@ -188,7 +188,7 @@ class CharmoniumPsi(BaseSkim):
         # Lepton lists. Exclude SVD and TOP formuons.
         ma.fillParticleList('e+:loosepid_noSVD_noTOP',
                             'electronID_noSVD_noTOP > 0.1', path=path)
-        ma.fillParticleList('mu+:loosepid_noTOP',
+        ma.fillParticleList('mu+:loosepid_noSVD',
                             'muonID_noSVD > 0.1', path=path)
 
         # Mass cuts.

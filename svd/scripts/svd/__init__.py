@@ -46,6 +46,7 @@ def add_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False, 
     if(isROIsimulation):
         clusterizerName = '__ROISVDClusterizer'
         timeGroupComposerName = '__ROISVDTimeGroupComposer'
+        # shaperDigitsGroupingName = '__ROISVDShaperDigitsGrouping'
         recocreatorName = '__ROISVDRecoDigitCreator'
         dataFormatName = '__ROISVDDataFormat'
         # recoDigitsName = '__ROIsvdRecoDigits'
@@ -55,6 +56,7 @@ def add_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False, 
     else:
         clusterizerName = 'SVDClusterizer'
         timeGroupComposerName = 'SVDTimeGroupComposer'
+        # shaperDigitsGroupingName = 'SVDShaperDigitsGrouping'
         recocreatorName = 'SVDRecoDigitCreator'
         dataFormatName = 'SVDDataFormat'
         # recoDigitsName = ""
@@ -81,6 +83,16 @@ def add_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False, 
     if dataFormatName not in [e.name() for e in path.modules()]:
         dataFormat = b2.register_module('SVDDataFormatCheck')
         dataFormat.param('ShaperDigits', shaperDigitsName)
+
+    # if shaperDigitsGroupingName not in [e.name() for e in path.modules()]:
+    #     svdShaperDigitsGrouping = b2.register_module('SVDShaperDigitsGrouping')
+    #     svdShaperDigitsGrouping.set_name(shaperDigitsGroupingName)
+    #     svdShaperDigitsGrouping.param('signalRangeLow', -50)
+    #     svdShaperDigitsGrouping.param('signalRangeHigh', 50)
+    #     svdShaperDigitsGrouping.param('factor', 2)
+    #     svdShaperDigitsGrouping.param('iteration', 4)
+    #     svdShaperDigitsGrouping.param('useOnlyOneGroup', False)
+    #     path.add_module(svdShaperDigitsGrouping)
 
     if clusterizerName not in [e.name() for e in path.modules()]:
         clusterizer = b2.register_module('SVDClusterizer')
@@ -184,6 +196,7 @@ def add_rel5_svd_reconstruction(path, isROIsimulation=False, applyMasking=False)
         fitterName = '__ROISVDCoGTimeEstimator'
         clusterizerName = '__ROISVDSimpleClusterizer'
         timeGroupComposerName = '__ROISVDTimeGroupComposer'
+        # shaperDigitsGroupingName = '__ROISVDShaperDigitsGrouping'
         dataFormatName = '__ROISVDDataFormat'
         clusterName = '__ROIsvdClusters'
         recoDigitsName = '__ROIsvdRecoDigits'
@@ -193,6 +206,7 @@ def add_rel5_svd_reconstruction(path, isROIsimulation=False, applyMasking=False)
         fitterName = 'SVDCoGTimeEstimator'
         clusterizerName = 'SVDSimpleClusterizer'
         timeGroupComposerName = 'SVDTimeGroupComposer'
+        # shaperDigitsGroupingName = 'SVDShaperDigitsGrouping'
         dataFormatName = 'SVDDataFormat'
         clusterName = ""
         recoDigitsName = ""
@@ -217,6 +231,17 @@ def add_rel5_svd_reconstruction(path, isROIsimulation=False, applyMasking=False)
     if dataFormatName not in [e.name() for e in path.modules()]:
         dataFormat = b2.register_module('SVDDataFormatCheck')
         dataFormat.param('ShaperDigits', shaperDigitsName)
+
+    # if shaperDigitsGroupingName not in [e.name() for e in path.modules()]:
+    #     svdShaperDigitsGrouping = b2.register_module('SVDShaperDigitsGrouping')
+    #     svdShaperDigitsGrouping.set_name(shaperDigitsGroupingName)
+    #     svdShaperDigitsGrouping.param('signalRangeLow', -50)
+    #     svdShaperDigitsGrouping.param('signalRangeHigh', 50)
+    #     svdShaperDigitsGrouping.param('factor', 2)
+    #     svdShaperDigitsGrouping.param('iteration', 4)
+    #     svdShaperDigitsGrouping.param('includeOutOfRangeClusters', False)
+    #     svdShaperDigitsGrouping.param('useOnlyOneGroup', False)
+    #     path.add_module(svdShaperDigitsGrouping)
 
     if fitterName not in [e.name() for e in path.modules()]:
         fitter = b2.register_module('SVDCoGTimeEstimator')

@@ -172,7 +172,7 @@ void SVDTimeGroupComposerModule::event()
       double sum = h_clsTime[currentHisto].GetBinContent(ij);
       // finding group
       if (sum > 0 && groupBegin < 0 && groupEnd < 0) { groupBegin = ij;}
-      if (sum <= 0 && groupBegin > 0 && groupEnd < 0) {
+      if ((sum <= 0 || ij == xbin) && groupBegin > 0 && groupEnd < 0) {
         groupEnd = ij - 1;
         int clsInGroup = h_clsTime[currentHisto].Integral(groupBegin, groupEnd);
         double beginPos = h_clsTime[currentHisto].GetXaxis()->GetBinLowEdge(groupBegin);

@@ -84,8 +84,8 @@ if args.isMC:
     #     usePXDDataReduction=ROIfinding,
     #     simulateT0jitter=simulateJitter)
 
-    b2conditions.prepend_globaltag("tracking_TEST_SVDTimeSelectionONrev5_VXDTF2TimeFiltersONrev27")
-    # b2conditions.prepend_globaltag("tracking_TEST_SVDTimeSelectionOFFrev1_VXDTF2TimeFiltersONrev27")
+    # b2conditions.prepend_globaltag("tracking_TEST_SVDTimeSelectionONrev5_VXDTF2TimeFiltersONrev27")
+    b2conditions.prepend_globaltag("tracking_TEST_SVDTimeSelectionOFFrev1_VXDTF2TimeFiltersONrev27")
 
 else:
     # setup database
@@ -134,9 +134,9 @@ if args.is3sample:
     main.add_module(zsonline)
 
 
-#  SVDShaperDigitsGrouping
-svdShaperDigitsGrouping = b2.register_module('SVDShaperDigitsGrouping')
-main.add_module(svdShaperDigitsGrouping)
+# #  SVDShaperDigitsGrouping
+# svdShaperDigitsGrouping = b2.register_module('SVDShaperDigitsGrouping')
+# main.add_module(svdShaperDigitsGrouping)
 
 
 # #  SVDTimeGroupComposer

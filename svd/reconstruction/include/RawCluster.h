@@ -25,7 +25,6 @@ namespace Belle2::SVD {
     Belle2::SVDShaperDigit::APVFloatSamples samples; /**< ADC of the acquired samples*/
     double charge; /**< strip charge*/
     double time; /**< strip time*/
-    int timeGroupId; /** time group ID */
   };
 
   /**

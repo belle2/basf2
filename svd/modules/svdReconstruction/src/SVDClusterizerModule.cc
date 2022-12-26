@@ -305,10 +305,13 @@ void SVDClusterizerModule::event()
     aStrip.cellID = thisCellID;
     aStrip.noise = thisNoise;
     aStrip.samples = currentDigit.getSamples();
-    aStrip.timeGroupId = currentDigit.getTimeGroupId();
 
     //try to add the strip to the existing cluster
-    if (! rawCluster.add(thisSensorID, thisSide, aStrip)) {
+    if (currentDigit.getTimeGroupId() != rawCluster.getTimeGroupId() ||
+        ! rawCluster.add(thisSensorID, thisSide, aStrip)) {
+
+      B2DEBUG(1, " strip not added, groupId : "
+              << currentDigit.getTimeGroupId() << " and " << rawCluster.getTimeGroupId());
 
       //if the strip is not added, write the cluster, if present and good:
       if ((rawCluster.getSize() > 0) && (rawCluster.isGoodRawCluster()))
@@ -316,7 +319,7 @@ void SVDClusterizerModule::event()
 
       //prepare for the next cluster:
       rawCluster = RawCluster(thisSensorID, thisSide, m_cutSeed, m_cutAdjacent, m_storeShaperDigitsName);
-      rawCluster.setTimeGroupId(aStrip.timeGroupId);
+      rawCluster.setTimeGroupId(currentDigit.getTimeGroupId());
 
       //start another cluster:
       if (! rawCluster.add(thisSensorID, thisSide, aStrip))

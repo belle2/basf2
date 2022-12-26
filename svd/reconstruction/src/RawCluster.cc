@@ -52,13 +52,6 @@ namespace Belle2 {
 
       bool added = false;
 
-      //do not add if from different groups
-      if (m_timeGroupId != aStrip.timeGroupId) {
-        B2DEBUG(1, " strip not added to RawCluster due to mismatch in groupId : "
-                << m_timeGroupId << " and " << aStrip.timeGroupId);
-        return false;
-      }
-
       //do not add if you are on the wrong sensor or side
       if ((m_vxdID != vxdID) || (m_isUside != isUside))
         return false;

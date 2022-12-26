@@ -25,6 +25,7 @@ namespace Belle2::SVD {
     Belle2::SVDShaperDigit::APVFloatSamples samples; /**< ADC of the acquired samples*/
     double charge; /**< strip charge*/
     double time; /**< strip time*/
+    int timeGroupId; /** time group ID */
   };
 
   /**
@@ -132,6 +133,19 @@ namespace Belle2::SVD {
      */
     void setStripTime(int index, double time) {m_strips.at(index).time = time;}
 
+    /** Get ID of the time-group.
+     * @return time-group ID
+     */
+    int getTimeGroupId() const { return m_timeGroupId; }
+
+    /** Set the ID of the time-group.
+     *
+     */
+    void setTimeGroupId(const int& groupId)
+    {
+      m_timeGroupId = groupId;
+    }
+
   protected:
 
     /** VxdID of the cluster */
@@ -164,6 +178,7 @@ namespace Belle2::SVD {
     /** Name of the collection to use for the SVDShaperDigits */
     std::string m_storeShaperDigitsName;
 
+    int m_timeGroupId = 0;  /**< Grouping of clusters in time */
   };
 
 }

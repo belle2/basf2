@@ -274,6 +274,7 @@ void SVDClusterizerModule::event()
   //create a dummy cluster just to start
   RawCluster rawCluster(m_storeDigits[0]->getSensorID(), m_storeDigits[0]->isUStrip(), m_cutSeed, m_cutAdjacent,
                         m_storeShaperDigitsName);
+  rawCluster.setTimeGroupId(m_storeDigits[0]->getTimeGroupId());
 
   //loop over the SVDShaperDigits
   for (const SVDShaperDigit& currentDigit : m_storeDigits) {
@@ -304,6 +305,7 @@ void SVDClusterizerModule::event()
     aStrip.cellID = thisCellID;
     aStrip.noise = thisNoise;
     aStrip.samples = currentDigit.getSamples();
+    aStrip.timeGroupId = currentDigit.getTimeGroupId();
 
     //try to add the strip to the existing cluster
     if (! rawCluster.add(thisSensorID, thisSide, aStrip)) {
@@ -314,6 +316,7 @@ void SVDClusterizerModule::event()
 
       //prepare for the next cluster:
       rawCluster = RawCluster(thisSensorID, thisSide, m_cutSeed, m_cutAdjacent, m_storeShaperDigitsName);
+      rawCluster.setTimeGroupId(aStrip.timeGroupId);
 
       //start another cluster:
       if (! rawCluster.add(thisSensorID, thisSide, aStrip))

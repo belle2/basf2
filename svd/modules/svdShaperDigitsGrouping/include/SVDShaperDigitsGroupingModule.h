@@ -68,6 +68,11 @@ namespace Belle2 {
      */
     void calculateStripTime(SVDShaperDigit& currentDigit);
 
+    /**
+     * assign group id to the strips
+     */
+    void assignGroupId();
+
   protected:
 
     /** Name of the collection to use for the SVDEventInfo */
@@ -107,14 +112,17 @@ namespace Belle2 {
     /** if true takes the clusterizer cuts and reconstruction configuration from the DB objects*/
     bool m_useDB = true;
 
-    double m_tRangeLow          = -160.; /** Half-x range of time histogram */
-    double m_tRangeHigh         = 160.;  /** Half-x range of time histogram */
-    double m_signalRangeLow     = -40;   /** Expected time range of signal hits. */
-    double m_signalRangeHigh    = 40;    /** Expected time range of signal hits. */
+    double m_tRangeLow          = -300.; /** Half-x range of time histogram */
+    double m_tRangeHigh         =  100.; /** Half-x range of time histogram */
+    double m_signalRangeLow     = -50;   /** Expected time range of signal hits. */
+    double m_signalRangeHigh    =  50;   /** Expected time range of signal hits. */
     int    m_factor             =  2;    /** Fine divisions of histogram. */
     int    m_iteration          =  4;    /** Number of summations of the histogram. */
     bool   m_useOnlyOneGroup    = false; /** Only one group is kept. */
     bool   m_timeBasedSort      = false; /** Group nearest to zero is kept at the first. */
+
+    int    m_clsInSignalRange   = 0;     /** number of clusters within signalRange. */
+
   };
 
 } // end namespace Belle2

@@ -45,10 +45,10 @@ SVDShaperDigitsGroupingModule::SVDShaperDigitsGroupingModule() :
   // 3. Modification parameters:
   addParam("signalRangeLow", m_signalRangeLow,
            "Expected time range of signal hits.",
-           double(-40.));
+           double(-50.));
   addParam("signalRangeHigh", m_signalRangeHigh,
            "Expected time range of signal hits.",
-           double(40.));
+           double(50.));
   addParam("factor", m_factor,
            "Fine divisions of histogram.",
            int(2));
@@ -69,6 +69,17 @@ SVDShaperDigitsGroupingModule::SVDShaperDigitsGroupingModule() :
 void SVDShaperDigitsGroupingModule::initialize()
 {
   m_storeDigits.isRequired(m_storeShaperDigitsName);
+
+  if (m_useOnlyOneGroup) B2WARNING("Only the group nearest to zero is selected.");
+  if (m_factor <= 0) B2WARNING("factor is set to zero or less. Module is ineffective.");
+  if (m_signalRangeHigh - m_signalRangeLow < 10.) B2FATAL("signalRange should not be less than 10 (hard-coded).");
+
+  B2DEBUG(1, "SVDShaperDigitsGroupingModule \nsvdShaperDigits: " << m_storeDigits.getName());
+  if (m_factor > 0) {
+    B2INFO("SVDShaperDigitsGrouping : signalRange               = [" << m_signalRangeLow << "," << m_signalRangeHigh << "]");
+    B2INFO("SVDShaperDigitsGrouping : factor                    = " << m_factor);
+    B2INFO("SVDShaperDigitsGrouping : iteration                 = " << m_iteration);
+  } // if(m_factor > 0) {
 }
 
 
@@ -85,15 +96,28 @@ void SVDShaperDigitsGroupingModule::beginRun()
 void SVDShaperDigitsGroupingModule::event()
 {
   int nDigits = m_storeDigits.getEntries();
-  if (nDigits == 0)
+  if (nDigits == 0 || m_factor <= 0)
     return;
+
+  m_clsInSignalRange = 0;
+  m_tRangeLow        =  10000.;
+  m_tRangeHigh       = -10000.;
 
   //loop over the SVDShaperDigits
   for (SVDShaperDigit& currentDigit : m_storeDigits) {
 
     calculateStripTime(currentDigit);
+    float strptime = currentDigit.getTime();
+
+    if (strptime > m_signalRangeLow && strptime < m_signalRangeHigh) m_clsInSignalRange++;
+
+    if (strptime < m_tRangeLow)  m_tRangeLow  = strptime;
+    if (strptime > m_tRangeHigh) m_tRangeHigh = strptime;
 
   } // for (SVDShaperDigit& currentDigit : m_storeDigits) {
+
+  // assign group number to strips
+  assignGroupId();
 
 }
 
@@ -184,3 +208,125 @@ void SVDShaperDigitsGroupingModule::calculateStripTime(SVDShaperDigit& currentDi
 
 }
 
+
+
+
+void SVDShaperDigitsGroupingModule::assignGroupId()
+{
+
+  B2DEBUG(1, " m_clsInSignalRange " << m_clsInSignalRange
+          << " m_tRangeLow " << m_tRangeLow << " m_tRangeHigh " << m_tRangeHigh);
+
+  int xbin = m_clsInSignalRange * (m_tRangeHigh - m_tRangeLow) / (m_signalRangeHigh - m_signalRangeLow);
+  xbin *= m_factor;
+  if (xbin < 2) xbin = 2;
+
+
+  /** declaring histogram */
+  TH1D h_clsTime[2];
+  h_clsTime[0] = TH1D("h_clsTime_0", "h_clsTime_0", xbin, m_tRangeLow, m_tRangeHigh);
+  h_clsTime[1] = TH1D("h_clsTime_1", "h_clsTime_1", xbin, m_tRangeLow, m_tRangeHigh);
+  for (SVDShaperDigit& currentDigit : m_storeDigits)
+    h_clsTime[0].Fill(currentDigit.getTime());
+
+  bool currentHisto = false;
+  int counter = 0;
+  bool isWhile = true;
+  while (isWhile) {
+    for (int ij = 1; ij <= xbin; ij++) {
+      double sumc = h_clsTime[currentHisto].GetBinContent(ij);
+      double suml = (ij == 1    ? 0. : h_clsTime[currentHisto].GetBinContent(ij - 1));
+      double sumr = (ij == xbin ? 0. : h_clsTime[currentHisto].GetBinContent(ij + 1));
+      double sum = suml + sumc + sumr;
+      h_clsTime[!currentHisto].SetBinContent(ij, sum);
+    } // for(int ij=1;ij<=xbin;ij++) {
+    currentHisto = !currentHisto;
+    counter++;
+    if (counter > m_iteration) isWhile = false;
+  } // while(isWhile) {
+
+
+  /** finalized the groups */
+  int groupBegin = -1; int groupEnd = -1;
+  std::vector<std::tuple<double, double, int>> groupInfo; // start, end, totCls
+  for (int ij = 1; ij <= xbin; ij++) {
+    double sum = h_clsTime[currentHisto].GetBinContent(ij);
+    // finding group
+    if (sum > 0 && groupBegin < 0 && groupEnd < 0) { groupBegin = ij;}
+    if ((sum <= 0 || ij == xbin) && groupBegin > 0 && groupEnd < 0) {
+      groupEnd = ij - 1;
+      int clsInGroup = h_clsTime[currentHisto].Integral(groupBegin, groupEnd);
+      double beginPos = h_clsTime[currentHisto].GetXaxis()->GetBinLowEdge(groupBegin);
+      double endPos   = h_clsTime[currentHisto].GetXaxis()->GetBinLowEdge(groupEnd) +
+                        h_clsTime[currentHisto].GetXaxis()->GetBinWidth(groupEnd);
+      if (clsInGroup > 1) {
+        groupInfo.push_back(std::make_tuple(beginPos, endPos, clsInGroup));
+        B2DEBUG(1, " group " << ij
+                << " beginPos " << beginPos << " endPos " << endPos
+                << " totCls " << clsInGroup);
+      }
+      groupBegin = groupEnd = -1; // reset for new group
+    }
+  }
+
+  // sorting groups in descending cluster-counts or distance from zero
+  // this should help speed up the next process
+  std::tuple<double, double, int> key;
+  for (int ij = 1; ij < int(groupInfo.size()); ij++) {
+    key = groupInfo[ij];
+    int kj = ij - 1;
+    if (!m_timeBasedSort) // sort in cluster size
+      while ((kj >= 0) &&
+             ((std::get<2>(groupInfo[kj])) < (std::get<2>(key)))) {
+        groupInfo[kj + 1] = groupInfo[kj];
+        kj--;
+      } else    // sort in distance from zero
+      while ((kj >= 0) &&
+             std::min(std::fabs(std::get<0>(groupInfo[kj])), std::fabs(std::get<1>(groupInfo[kj]))) > std::min(std::fabs(std::get<0>(key)),
+                 std::fabs(std::get<1>(key)))) {
+        groupInfo[kj + 1] = groupInfo[kj];
+        kj--;
+      }
+    groupInfo[kj + 1] = key;
+  }
+
+  if (m_useOnlyOneGroup && int(groupInfo.size())) // keep only one group
+    groupInfo.resize(1);
+
+  std::vector<int> rejectedCls;
+  rejectedCls.assign(int(m_storeDigits.getEntries()), -1);
+  int totGroups = int(groupInfo.size());
+  for (int ij = 0; ij < totGroups; ij++) {
+    auto beginPos    = std::get<0>(groupInfo[ij]);
+    auto endPos      = std::get<1>(groupInfo[ij]);
+    auto totCls      = std::get<2>(groupInfo[ij]);
+
+    B2DEBUG(1, " group " << ij
+            << " beginPos " << beginPos << " endPos " << endPos
+            << " totCnt " << totCls);
+    int rejectedCount = 0;
+    for (int jk = 0; jk < int(rejectedCls.size()); jk++) {
+      int place = rejectedCls[jk] < 0 ? jk : rejectedCls[jk];
+      double strptime = m_storeDigits[place]->getTime();
+      if (strptime >= beginPos && strptime <= endPos) {
+        m_storeDigits[place]->setTimeGroupId(ij);
+        B2DEBUG(1, "   accepted strip " << place
+                << " time " << strptime);
+      } else {
+        B2DEBUG(1, "     rejected strip " << place
+                << " time " << strptime);
+        if (ij == totGroups - 1) { // leftover clusters
+          m_storeDigits[place]->setTimeGroupId(-1);
+          B2DEBUG(1, "     leftover strip " << place
+                  << " GroupId " << m_storeDigits[place]->getTimeGroupId());
+        } else {
+          rejectedCls[rejectedCount++] = place;
+        }
+      }
+    } // for(int jk=0;jk<int(rejectedCls.size());jk++) {
+    rejectedCls.resize(rejectedCount);
+  } // for(int ij=0;ij<int(groupInfo.size());ij++) {
+
+
+
+}

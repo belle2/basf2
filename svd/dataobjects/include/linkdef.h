@@ -10,7 +10,7 @@
 #pragma link C++ class Belle2::SVDDAQDiagnostic+; // checksum=0x10c3ffc4, version=5
 #pragma link C++ class Belle2::SVDRecoDigit+; // checksum=0x359100bf, version=3
 #pragma link C++ class Belle2::SVDRecoTimeBase+; // checksum=0xf6a86f3e, version=2
-#pragma link C++ class Belle2::SVDShaperDigit+; // checksum=0x855d9163, version=5
+#pragma link C++ class Belle2::SVDShaperDigit+; // checksum=0x44af15ab, version=6
 #pragma link C++ class Belle2::SVDTransparentDigit+; // checksum=0x476654f7, version=3
 #pragma link C++ class Belle2::SVDSimHit+; // checksum=0x684fdd1, version=3
 #pragma link C++ class Belle2::SVDTrueHit+; // checksum=0xf1b5adfe, version=6

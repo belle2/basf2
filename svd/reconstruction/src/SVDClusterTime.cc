@@ -12,6 +12,7 @@
 #include <svd/dataobjects/SVDEventInfo.h>
 #include <TMath.h>
 #include <numeric>
+#include <iostream>
 
 using namespace std;
 
@@ -76,6 +77,7 @@ namespace Belle2 {
 
     void SVDClusterTime::applyCoG3Time(const Belle2::SVD::RawCluster& rawCluster, double& time, double& timeError, int& firstFrame)
     {
+
       //take the MaxSum 3 samples
       SVDMaxSumAlgorithm maxSum = SVDMaxSumAlgorithm(rawCluster.getClsSamples(false));
 
@@ -127,6 +129,67 @@ namespace Belle2 {
       //compute the error on the calibrated time
       timeError = m_CoG3TimeCal.getCorrectedTimeError(rawCluster.getSensorID(), rawCluster.isUSide(), 10, rawtime, rawtimeError,
                                                       m_triggerBin);
+
+      // std::cout<<" strip times ";
+      // for (int i = 0; i < (int)strips.size(); i++) {
+
+      //   Belle2::SVD::StripInRawCluster strip = strips.at(i);
+
+      //   double stripTime = 0;
+      //   float stripSumAmplitudes = 0;
+
+      //  //take the MaxSum 3 samples
+      //  SVDMaxSumAlgorithm maxSumTest = SVDMaxSumAlgorithm(strip.samples);
+      //  std::vector<float> selectedSamplesTest = maxSumTest.getSelectedSamples();
+
+      //  auto beginTest = selectedSamplesTest.begin();
+      //  const auto endTest = selectedSamplesTest.end();
+
+      //  for (auto step = 0.; beginTest != endTest; ++beginTest, step += m_apvClockPeriod) {
+      //    stripSumAmplitudes += static_cast<double>(*beginTest);
+      //    stripTime += static_cast<double>(*beginTest) * step;
+      //  }
+      //   if (stripSumAmplitudes != 0) {
+      //     stripTime /= (stripSumAmplitudes);
+      //   } else {
+      //     stripTime = -1;
+      //     B2WARNING("Trying to divide by 0 (ZERO)! Sum of amplitudes is nullptr! Skipping this SVDShaperDigit!");
+      //   }
+
+      //  if (isnan(m_triggerBin))
+      //    B2FATAL("OOPS, we can't continue, you have to set the trigger bin!");
+
+      //  if (!m_returnRawClusterTime)
+      //    //cellID = 10 not used for calibration
+      //    stripTime = m_CoG3TimeCal.getCorrectedTime(rawCluster.getSensorID(), rawCluster.isUSide(), 10, stripTime, m_triggerBin);
+
+      //   // for (int k = 0; k < 6; k ++) {
+      //   //   stripTime += k * strip.samples[k];
+      //   //   stripSumAmplitudes += strip.samples[k];
+      //   // }
+      //   // if (stripSumAmplitudes != 0) {
+      //   //   stripTime /= (stripSumAmplitudes);
+      //   //   stripTime *= m_apvClockPeriod;
+      //   // } else {
+      //   //   stripTime = -1;
+      //   //   B2WARNING("Trying to divide by 0 (ZERO)! Sum of amplitudes is nullptr! Skipping this SVDShaperDigit!");
+      //   // }
+
+      //   // // correct strip by the CalPeak
+      //   // stripTime -= m_PulseShapeCal.getPeakTime(rawCluster.getSensorID(), rawCluster.isUSide(), strip.cellID);
+
+      //   // if (isnan(m_triggerBin))
+      //   //   B2FATAL("OOPS, we can't continue, you have to set the trigger bin!");
+
+      //   // if (! m_returnRawClusterTime)
+      //   //   // calibrate strip time (cellID not used)
+      //   //   stripTime =  m_CoG6TimeCal.getCorrectedTime(rawCluster.getSensorID(), rawCluster.isUSide(), strip.cellID, stripTime, m_triggerBin);
+
+      //  std::cout<<" "<<stripTime;
+
+      // }  // for (int i = 0; i < (int)strips.size(); i++) {
+      // std::cout<<"\n\t clsTime "<<time<<std::endl;
+
     }
 
 

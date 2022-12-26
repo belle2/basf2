@@ -134,6 +134,11 @@ if args.is3sample:
     main.add_module(zsonline)
 
 
+#  SVDShaperDigitsGrouping
+svdShaperDigitsGrouping = b2.register_module('SVDShaperDigitsGrouping')
+main.add_module(svdShaperDigitsGrouping)
+
+
 # #  SVDTimeGroupComposer
 # main.add_module('SVDClusterizer')
 # svdTimeGroupComposer = b2.register_module('SVDTimeGroupComposer')
@@ -168,7 +173,7 @@ if args.RootOutput:
     rootOutFileName = outputFileName + "_RootOutput_" + str(args.fileTag) + ".root"
     main.add_module('RootOutput',
                     outputFileName=rootOutFileName,
-                    branchNames=['SVDTrueHits', 'SVDClusters', 'SVDSpacePoints'])
+                    branchNames=['SVDTrueHits', 'SVDShaperDigits', 'SVDClusters', 'SVDSpacePoints'])
 
 if args.executionTime:
     executionFileName = str(args.fileDir) + "SVDExecutionTime"

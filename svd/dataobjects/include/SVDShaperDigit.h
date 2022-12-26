@@ -297,12 +297,12 @@ namespace Belle2 {
     /** Get CoG3 time.
      * @return CoG3 time
      */
-    double getTime() const { return m_time; }
+    float getTime() const { return m_time; }
 
     /** Set CoG3 time.
      *
      */
-    void setTime(const double& time)
+    void setTime(const float& time)
     {
       m_time = time;
     }
@@ -318,7 +318,7 @@ namespace Belle2 {
     static size_t s_APVSampleMode; /**< APV acquisition mode (3 or 6) */
     static size_t s_APVSampleBegin; /**< first sample number for 3 sample acquisition mode (0 - 3) */
 
-    double m_time = std::numeric_limits<double>::quiet_NaN(); /** CoG3 time */
+    float m_time = std::numeric_limits<float>::quiet_NaN(); /** CoG3 time */
     int m_timeGroupId = 0;  /**< Grouping of clusters in time */
 
     ClassDefOverride(SVDShaperDigit, 6)

@@ -59,7 +59,7 @@ void SVDShaperDigitsGroupingModule::event()
   // std::cout<<" strip times ";
   for (SVDShaperDigit& currentDigit : m_storeDigits) {
 
-    double stripTime = 0;
+    float stripTime = 0;
     float stripSumAmplitudes = 0;
 
     //take the MaxSum 3 samples
@@ -70,8 +70,8 @@ void SVDShaperDigitsGroupingModule::event()
     const auto end = selectedSamples.end();
 
     for (auto step = 0.; begin != end; ++begin, step += m_apvClockPeriod) {
-      stripSumAmplitudes += static_cast<double>(*begin);
-      stripTime += static_cast<double>(*begin) * step;
+      stripSumAmplitudes += static_cast<float>(*begin);
+      stripTime += static_cast<float>(*begin) * step;
     }
     if (stripSumAmplitudes != 0) {
       stripTime /= (stripSumAmplitudes);

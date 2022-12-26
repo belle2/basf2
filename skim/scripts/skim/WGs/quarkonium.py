@@ -184,9 +184,6 @@ class CharmoniumPsi(BaseSkim):
         from variables import variables
         variables.addAlias('electronID_noSVD_noTOP',
                            'pidProbabilityExpert(11, CDC,ARICH, ECL, KLM)')
-        variables.addAlias(
-            'muonID_noSVD',
-            'pidProbabilityExpert(13, CDC, TOP, ARICH, ECL, KLM)')
 
         # Lepton lists. Exclude SVD and TOP formuons.
         ma.fillParticleList('e+:loosepid_noSVD_noTOP',

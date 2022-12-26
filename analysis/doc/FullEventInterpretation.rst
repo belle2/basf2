@@ -351,8 +351,7 @@ Software and Environment Setup
 
 The following software packages need an installation: local `basf2`, `luigi <https://luigi.readthedocs.io/en/latest/>`_, `b2luigi <https://b2luigi.readthedocs.io/en/latest/>`_, and `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_.
 
-In case the required developments are not merged into a `basf2` release yet, the first step would be to setup a local `basf2` development directory, which is also documented in 
-:ref:`build/tools_doc/index-01-tools:Development Setup`. The easiest way to do that is by performing the following commands:
+In case the required developments are not merged into a `basf2` release yet, the first step would be to setup a local `basf2` development directory. The easiest way to do that is by performing the following commands:
 
 
 .. code-block:: bash

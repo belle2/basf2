@@ -41,6 +41,27 @@ SVDShaperDigitsGroupingModule::SVDShaperDigitsGroupingModule() :
   addParam("AdjacentSN", m_cutAdjacent,
            "minimum SNR for strips to be considered for clustering. Overwritten by the dbobject, unless you set useDB = False.",
            m_cutAdjacent);
+
+  // 3. Modification parameters:
+  addParam("signalRangeLow", m_signalRangeLow,
+           "Expected time range of signal hits.",
+           double(-40.));
+  addParam("signalRangeHigh", m_signalRangeHigh,
+           "Expected time range of signal hits.",
+           double(40.));
+  addParam("factor", m_factor,
+           "Fine divisions of histogram.",
+           int(2));
+  addParam("iteration", m_iteration,
+           "Number of summations of the histogram.",
+           int(4));
+  addParam("useOnlyOneGroup", m_useOnlyOneGroup,
+           "Only one group is kept.",
+           bool(false));
+  addParam("timeBasedSort", m_timeBasedSort,
+           "Clusters belonging to the group nearest to zero is first.",
+           bool(false));
+
 }
 
 
@@ -68,90 +89,98 @@ void SVDShaperDigitsGroupingModule::event()
     return;
 
   //loop over the SVDShaperDigits
-  // std::cout<<" strip times ";
   for (SVDShaperDigit& currentDigit : m_storeDigits) {
 
-    if (m_useDB)
-      m_cutAdjacent = m_ClusterCal.getMinAdjSNR(currentDigit.getSensorID(), currentDigit.isUStrip());
+    calculateStripTime(currentDigit);
 
-    //Ignore digits with insufficient signal
-    float thisNoise = m_NoiseCal.getNoise(currentDigit.getSensorID(), currentDigit.isUStrip(), currentDigit.getCellID());
-    int thisCharge = currentDigit.getMaxADCCounts();
-    B2DEBUG(20, "Noise = " << thisNoise << " ADC, MaxSample = " << thisCharge << " ADC");
+  } // for (SVDShaperDigit& currentDigit : m_storeDigits) {
 
-    if ((float)thisCharge / thisNoise < m_cutAdjacent)
-      continue;
+}
 
-    float stripTime = 0;
-    float stripSumAmplitudes = 0;
 
-    Belle2::SVDShaperDigit::APVFloatSamples samples = currentDigit.getSamples();
+
+
+void SVDShaperDigitsGroupingModule::calculateStripTime(SVDShaperDigit& currentDigit)
+{
+
+  if (m_useDB)
+    m_cutAdjacent = m_ClusterCal.getMinAdjSNR(currentDigit.getSensorID(), currentDigit.isUStrip());
+
+  //Ignore digits with insufficient signal
+  float thisNoise = m_NoiseCal.getNoise(currentDigit.getSensorID(), currentDigit.isUStrip(), currentDigit.getCellID());
+  int thisCharge = currentDigit.getMaxADCCounts();
+  B2DEBUG(20, "Noise = " << thisNoise << " ADC, MaxSample = " << thisCharge << " ADC");
+
+  if ((float)thisCharge / thisNoise < m_cutAdjacent)
+    return;
+
+  float stripTime = 0;
+  float stripSumAmplitudes = 0;
+
+  Belle2::SVDShaperDigit::APVFloatSamples samples = currentDigit.getSamples();
 
 #define CoG3Alg
 #ifdef CoG6Alg
 
-    int firstFrame = 0;
-    for (int k = 0; k < static_cast<int>(samples.size()); k ++) {
-      stripTime += k * samples.at(k);
-      stripSumAmplitudes += samples.at(k);
-    }
+  int firstFrame = 0;
+  for (int k = 0; k < static_cast<int>(samples.size()); k ++) {
+    stripTime += k * samples.at(k);
+    stripSumAmplitudes += samples.at(k);
+  }
 
 #endif
 #ifdef CoG3Alg
 
-    //take the MaxSum 3 samples
-    SVD::SVDMaxSumAlgorithm maxSum = SVD::SVDMaxSumAlgorithm(samples);
-    std::vector<float> selectedSamples = maxSum.getSelectedSamples();
-    int firstFrame = maxSum.getFirstFrame();
+  //take the MaxSum 3 samples
+  SVD::SVDMaxSumAlgorithm maxSum = SVD::SVDMaxSumAlgorithm(samples);
+  std::vector<float> selectedSamples = maxSum.getSelectedSamples();
+  int firstFrame = maxSum.getFirstFrame();
 
-    auto begin = selectedSamples.begin();
-    const auto end = selectedSamples.end();
+  auto begin = selectedSamples.begin();
+  const auto end = selectedSamples.end();
 
-    for (auto step = 0.; begin != end; ++begin, step += m_apvClockPeriod) {
-      stripSumAmplitudes += static_cast<float>(*begin);
-      stripTime += static_cast<float>(*begin) * step;
-    }
+  for (auto step = 0.; begin != end; ++begin, step += m_apvClockPeriod) {
+    stripSumAmplitudes += static_cast<float>(*begin);
+    stripTime += static_cast<float>(*begin) * step;
+  }
 #endif
 
-    if (stripSumAmplitudes != 0) {
-      stripTime /= (stripSumAmplitudes);
-    } else {
-      stripTime = -1;
-      B2WARNING("Trying to divide by 0 (ZERO)! Sum of amplitudes is nullptr! Skipping this SVDShaperDigit!");
-    }
+  if (stripSumAmplitudes != 0) {
+    stripTime /= (stripSumAmplitudes);
+  } else {
+    stripTime = -1;
+    B2WARNING("Trying to divide by 0 (ZERO)! Sum of amplitudes is nullptr! Skipping this SVDShaperDigit!");
+  }
 
-    if (isnan(m_triggerBin))
-      B2FATAL("OOPS, we can't continue, you have to set the trigger bin!");
+  if (isnan(m_triggerBin))
+    B2FATAL("OOPS, we can't continue, you have to set the trigger bin!");
 
 #ifdef CoG6Alg
 
-    stripTime -= m_PulseShapeCal.getPeakTime(currentDigit.getSensorID(), currentDigit.isUStrip(), currentDigit.getCellID());
-    stripTime =  m_CoG6TimeCal.getCorrectedTime(currentDigit.getSensorID(), currentDigit.isUStrip(), currentDigit.getCellID(),
-                                                stripTime, m_triggerBin);
+  stripTime -= m_PulseShapeCal.getPeakTime(currentDigit.getSensorID(), currentDigit.isUStrip(), currentDigit.getCellID());
+  stripTime =  m_CoG6TimeCal.getCorrectedTime(currentDigit.getSensorID(), currentDigit.isUStrip(), currentDigit.getCellID(),
+                                              stripTime, m_triggerBin);
 
 #endif
 #ifdef CoG3Alg
 
-    //cellID = 10 not used for calibration
-    stripTime = m_CoG3TimeCal.getCorrectedTime(currentDigit.getSensorID(), currentDigit.isUStrip(), 10, stripTime, m_triggerBin);
+  //cellID = 10 not used for calibration
+  stripTime = m_CoG3TimeCal.getCorrectedTime(currentDigit.getSensorID(), currentDigit.isUStrip(), 10, stripTime, m_triggerBin);
 
 #endif
 
-    //first take Event Informations:
-    StoreObjPtr<SVDEventInfo> temp_eventinfo(m_svdEventInfoName);
-    if (!temp_eventinfo.isValid())
-      m_svdEventInfoName = "SVDEventInfoSim";
-    StoreObjPtr<SVDEventInfo> eventinfo(m_svdEventInfoName);
-    if (!eventinfo) B2ERROR("No SVDEventInfo!");
+  //first take Event Informations:
+  StoreObjPtr<SVDEventInfo> temp_eventinfo(m_svdEventInfoName);
+  if (!temp_eventinfo.isValid())
+    m_svdEventInfoName = "SVDEventInfoSim";
+  StoreObjPtr<SVDEventInfo> eventinfo(m_svdEventInfoName);
+  if (!eventinfo) B2ERROR("No SVDEventInfo!");
 
-    // now go into FTSW time reference frame
-    stripTime = eventinfo->getTimeInFTSWReference(stripTime, firstFrame);
+  // now go into FTSW time reference frame
+  stripTime = eventinfo->getTimeInFTSWReference(stripTime, firstFrame);
 
-    currentDigit.setTime(stripTime);
-    // std::cout<<" "<<currentDigit.getTime();
-
-  } // for (SVDShaperDigit& currentDigit : m_storeDigits) {
-  // std::cout<<"\n";
+  currentDigit.setTime(stripTime);
+  // std::cout<<" "<<currentDigit.getTime();
 
 }
 

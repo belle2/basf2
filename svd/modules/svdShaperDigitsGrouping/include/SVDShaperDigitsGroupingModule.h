@@ -63,6 +63,11 @@ namespace Belle2 {
     void setTriggerBin(const int triggerBin)
     { m_triggerBin = triggerBin; };
 
+    /**
+     * calculate strip time from shaper digits
+     */
+    void calculateStripTime(SVDShaperDigit& currentDigit);
+
   protected:
 
     /** Name of the collection to use for the SVDEventInfo */
@@ -101,6 +106,15 @@ namespace Belle2 {
     double m_cutAdjacent = 3;
     /** if true takes the clusterizer cuts and reconstruction configuration from the DB objects*/
     bool m_useDB = true;
+
+    double m_tRangeLow          = -160.; /** Half-x range of time histogram */
+    double m_tRangeHigh         = 160.;  /** Half-x range of time histogram */
+    double m_signalRangeLow     = -40;   /** Expected time range of signal hits. */
+    double m_signalRangeHigh    = 40;    /** Expected time range of signal hits. */
+    int    m_factor             =  2;    /** Fine divisions of histogram. */
+    int    m_iteration          =  4;    /** Number of summations of the histogram. */
+    bool   m_useOnlyOneGroup    = false; /** Only one group is kept. */
+    bool   m_timeBasedSort      = false; /** Group nearest to zero is kept at the first. */
   };
 
 } // end namespace Belle2

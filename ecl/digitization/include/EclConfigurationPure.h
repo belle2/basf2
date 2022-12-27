@@ -75,10 +75,10 @@ namespace Belle2 {
 
       /** a struct for the fit parameters for the pure CsI calorimeter */
       struct fitparamspure_t {
-        typedef double double_matrix[16][2 * m_ndtPure];
-        typedef double fine_array[2 * m_ndtPure];
-        double invC[16][16];
-        double_matrix f, f1;
+        typedef double double_matrix[16][2 * m_ndtPure]; /**< table of sub-arrays (one for each of the 16 channels) */
+        typedef double fine_array[2 * m_ndtPure]; /**< sub-array to tabulate signal fit parameters */
+        double invC[16][16]; /**< inverse noise covariance matrix */
+        double_matrix f, f1; /**< signal response function and its first derivative */
         double_matrix c100, c010;
         fine_array c110, c200, c020, c101, c011;
         double c002;

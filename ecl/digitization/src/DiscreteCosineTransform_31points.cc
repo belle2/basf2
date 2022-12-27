@@ -33,14 +33,14 @@
  */
 
 typedef double R;
-typedef R E;  /* internal precision of codelets. */
+typedef R E;  /**< internal precision of codelets */
 #define K(x) ((E) x)
 #define DK(name, value) const E name = K(value)
 #define WS(x,y) (y)
-#define FMA(a, b, c) (((a) * (b)) + (c))
-#define FMS(a, b, c) (((a) * (b)) - (c))
-#define FNMA(a, b, c) (- (((a) * (b)) + (c)))
-#define FNMS(a, b, c) ((c) - ((a) * (b)))
+#define FMA(a, b, c) (((a) * (b)) + (c)) /**< fused multiply add */
+#define FMS(a, b, c) (((a) * (b)) - (c)) /**< fused multiply subtract */
+#define FNMA(a, b, c) (- (((a) * (b)) + (c))) /** fused negative multiply add */
+#define FNMS(a, b, c) ((c) - ((a) * (b))) /** fused negative multiply subtract */
 
 extern "C" {
   void e10_31(const R* I, R* O);

@@ -13,7 +13,6 @@
 
 import modularAnalysis as ma
 from skim import BaseSkim, fancy_skim_header
-from stdCharged import stdMu
 from stdPhotons import stdPhotons
 from stdV0s import stdLambdas
 from variables import variables as v
@@ -175,7 +174,6 @@ class CharmoniumPsi(BaseSkim):
     validation_sample = _VALIDATION_SAMPLE
 
     def load_standard_lists(self, path):
-        stdMu('loosepid', path=path)
         stdPhotons("all", path=path, loadPhotonBeamBackgroundMVA=False)
 
     def build_lists(self, path):
@@ -183,9 +181,9 @@ class CharmoniumPsi(BaseSkim):
         # Definition of the variables.
         from variables import variables
         variables.addAlias('electronID_noSVD_noTOP',
-                           'pidProbabilityExpert(11, CDC,ARICH, ECL, KLM)')
+                           'pidProbabilityExpert(11, CDC, ARICH, ECL, KLM)')
 
-        # Lepton lists. Exclude SVD and TOP formuons.
+        # Lepton lists. Exclude SVD and TOP for electrons, and TOP for muons.
         ma.fillParticleList('e+:loosepid_noSVD_noTOP',
                             'electronID_noSVD_noTOP > 0.1', path=path)
         ma.fillParticleList('mu+:loosepid_noSVD',

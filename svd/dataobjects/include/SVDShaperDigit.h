@@ -281,31 +281,6 @@ namespace Belle2 {
       s_APVSampleBegin = firstSample;
     }
 
-    /** Get ID of the time-group.
-     * @return time-group ID
-     */
-    int getTimeGroupId() const { return m_timeGroupId; }
-
-    /** Set the ID of the time-group.
-     *
-     */
-    void setTimeGroupId(const int& groupId)
-    {
-      m_timeGroupId = groupId;
-    }
-
-    /** Get CoG3 time.
-     * @return CoG3 time
-     */
-    float getTime() const { return m_time; }
-
-    /** Set CoG3 time.
-     *
-     */
-    void setTime(const float& time)
-    {
-      m_time = time;
-    }
 
   private:
 
@@ -318,10 +293,7 @@ namespace Belle2 {
     static size_t s_APVSampleMode; /**< APV acquisition mode (3 or 6) */
     static size_t s_APVSampleBegin; /**< first sample number for 3 sample acquisition mode (0 - 3) */
 
-    float m_time = std::numeric_limits<float>::quiet_NaN(); /** CoG3 time */
-    int m_timeGroupId = 0;  /**< Grouping of clusters in time */
-
-    ClassDefOverride(SVDShaperDigit, 6)
+    ClassDefOverride(SVDShaperDigit, 5)
 
   }; // class SVDShaperDigit
 

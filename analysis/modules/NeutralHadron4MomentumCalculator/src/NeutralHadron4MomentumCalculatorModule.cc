@@ -86,8 +86,8 @@ void NeutralHadron4MomentumCalculatorModule::event()
     particle->removeDaughter(originalNeutral);
     particle->appendDaughter(neutral);
     B2Vector3D neutralDirection = neutral->getMomentum().Unit();
-    double a = others4Momentum.Vect() * neutralDirection;
-    double b = (std::pow(particle->getPDGMass(), 2) - std::pow(neutral->getMass(), 2) - others4Momentum.Mag2()) / 2.;
+    double a = others4Momentum.Vect().Dot(neutralDirection.GetXYZVector());
+    double b = (std::pow(particle->getPDGMass(), 2) - std::pow(neutral->getMass(), 2) - others4Momentum.mag2()) / 2.;
     double c = others4Momentum.E();
     double d = std::pow(neutral->getMass(), 2);
     double D = (a * a - c * c) * d + b * b;

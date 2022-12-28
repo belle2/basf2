@@ -115,7 +115,22 @@ namespace Belle2 {
 
       SVDPulseShapeCalibrations pulseShapeCal;
 
+      std::vector<float> digitFractions;
+      float maxDigit = 0;
       for (auto istrip : m_strips) {
+        const SVDShaperDigit* shaperdigit = m_storeShaperDigits[istrip.shaperDigitIndex];
+        if (!shaperdigit) B2ERROR("No SVDShaperDigit for this strip! Are you sure you set the correct SVDShaperDigit StoreArray name?");
+        Belle2::SVDShaperDigit::APVFloatSamples APVsamples = shaperdigit->getSamples();
+        float fraction = 0;
+        for (int iSample = 0; iSample < static_cast<int>(APVsamples.size()); ++iSample)
+          fraction += APVsamples.at(iSample);
+        digitFractions.push_back(fraction);
+        if (fraction > maxDigit) maxDigit = fraction;
+      }
+
+      int count = 0;
+      for (auto istrip : m_strips) {
+        if (digitFractions[count++] / maxDigit < 0.3) continue;
         const SVDShaperDigit* shaperdigit = m_storeShaperDigits[istrip.shaperDigitIndex];
         if (!shaperdigit) B2ERROR("No SVDShaperDigit for this strip! Are you sure you set the correct SVDShaperDigit StoreArray name?");
         Belle2::SVDShaperDigit::APVFloatSamples APVsamples = shaperdigit->getSamples();

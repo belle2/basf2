@@ -319,8 +319,8 @@ namespace Belle2 {
 
                       For example, in the decay :math:`B^0 \to \left(J/\psi \to \mu^+ \mu^-\right) \left(K^{*0} \to K^+ \pi^-\right)`, 
                       if the provided particle is :math:`B^0` and the selected indices are (0, 0),
-                      the variable will return the angle between the momentum of the :math:`B^0` and the momentum of the :math:`\mu^+`,
-                      both momenta in the rest frame of the :math:`J/\psi`.
+                      the variable will return the angle between the momentum of the :math:`\mu^+` and the direction opposite to the momentum of 
+                      the :math:`B^0`, both momenta in the rest frame of the :math:`J/\psi`.
 
                       This variable is needed for angular analyses of :math:`B`-meson decays into two vector particles.)DOC");
 

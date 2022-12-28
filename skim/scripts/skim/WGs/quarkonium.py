@@ -147,7 +147,7 @@ class BottomoniumUpsilon(BaseSkim):
             ma.reconstructDecay("junction:all" + str(chID) + " -> " + channel, Ycuts, chID, path=path, allowChargeViolation=True)
             UpsilonList.append("junction:all" + str(chID))
 
-        # reture the list
+        # return the list
         return UpsilonList
 
     #       *two* sets of validation scripts defined.
@@ -183,7 +183,7 @@ class CharmoniumPsi(BaseSkim):
         variables.addAlias('electronID_noSVD_noTOP',
                            'pidProbabilityExpert(11, CDC, ARICH, ECL, KLM)')
 
-        # Lepton lists. Exclude SVD and TOP for electrons, and TOP for muons.
+        # Lepton lists. Exclude SVD and TOP for electrons, and SVD for muons.
         ma.fillParticleList('e+:loosepid_noSVD_noTOP',
                             'electronID_noSVD_noTOP > 0.1', path=path)
         ma.fillParticleList('mu+:loosepid_noSVD',
@@ -196,7 +196,7 @@ class CharmoniumPsi(BaseSkim):
         # Electrons with bremsstrahlung correction.
         # Use both correction algorithms as well as uncorrected electrons
         # to allow for algorithm comparison in analysis.
-        # The recommeneded list for further reconstruction is J/psi:eebrems.
+        # The recommended list for further reconstruction is J/psi:eebrems.
         # The estimated ratio of efficiencies in B decays in release 5.1.5 is
         # 1.00 (J/psi:eebrems) : 0.95 (J/psi:eebrems2) : 0.82 (J/psi:ee).
         ma.correctBremsBelle('e+:brems', 'e+:loosepid_noSVD_noTOP', 'gamma:all',

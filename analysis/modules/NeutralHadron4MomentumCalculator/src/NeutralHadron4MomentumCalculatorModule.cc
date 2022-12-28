@@ -12,8 +12,6 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/DecayDescriptor/DecayDescriptorParticle.h>
 #include <analysis/utility/ParticleCopy.h>
-#include <framework/geometry/B2Vector3.h>
-#include <Math/Vector4D.h>
 #include <vector>
 #include <cmath>
 
@@ -50,15 +48,15 @@ void NeutralHadron4MomentumCalculatorModule::initialize()
 
   std::string neutralHadronName = hierarchy[0][1].second;
   if (neutralHadronName != "n0" and neutralHadronName != "K_L0") {
-    if (m_allowGamma == true and neutralHadronName == "gamma")
+    if (m_allowGamma and neutralHadronName == "gamma")
       B2WARNING("NeutralHadron4MomentumCalculatorModule::initialize The selected particle is gamma but you allowed so; be aware.");
-    else if (m_allowAnyParticleSource == true)
+    else if (m_allowAnyParticleSource)
       B2WARNING("NeutralHadron4momentumCalculatorModule::initialize The selected particle can be from anything; the magnitude of "
                 "the momentum will be overridden by that calculated from the mother mass constraint; be aware.");
     else
       B2ERROR("NeutralHadron4MomentumCalculatorModule::initialize The selected particle must be a long-lived neutral hadron "
-              "i.e. (anti-)n0 or K_L0, unless you set allowGamma as true and selected a photon (gamma), or you set "
-              "allowAnyParticleSource as true."
+              "i.e. (anti-)n0 or K_L0, unless you set allowGamma to true and selected a photon (gamma), or you set "
+              "allowAnyParticleSource to true."
               "Input particle: " << m_decayString);
   }
 
@@ -85,8 +83,8 @@ void NeutralHadron4MomentumCalculatorModule::event()
     Particle* neutral = ParticleCopy::copyParticle(originalNeutral);
     particle->removeDaughter(originalNeutral);
     particle->appendDaughter(neutral);
-    B2Vector3D neutralDirection = neutral->getMomentum().Unit();
-    double a = others4Momentum.Vect().Dot(neutralDirection.GetXYZVector());
+    ROOT::Math::XYZVector neutralDirection = neutral->getMomentum().Unit();
+    double a = others4Momentum.Vect().Dot(neutralDirection);
     double b = (std::pow(particle->getPDGMass(), 2) - std::pow(neutral->getMass(), 2) - others4Momentum.mag2()) / 2.;
     double c = others4Momentum.E();
     double d = std::pow(neutral->getMass(), 2);

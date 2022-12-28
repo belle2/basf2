@@ -240,6 +240,15 @@ void CDCDedxPIDModule::event()
     dedxTrack->m_cosTheta = costh;
     dedxTrack->m_charge = charge;
 
+    double injring = -1.0, injtime = -1.0;
+    StoreObjPtr<EventLevelTriggerTimeInfo> m_TTDInfo;
+    if (m_TTDInfo.isValid() && m_TTDInfo->hasInjection()) {
+      injring = m_TTDInfo->isHER();
+      injtime =  m_TTDInfo->getTimeSinceLastInjectionInMicroSeconds();
+    }
+    dedxTrack->m_injring = injring;
+    dedxTrack->m_injtime = injtime;
+
     // dE/dx values will be calculated using associated RecoTrack
     const RecoTrack* recoTrack = track.getRelatedTo<RecoTrack>();
     if (!recoTrack) {
@@ -257,16 +266,22 @@ void CDCDedxPIDModule::event()
     dedxTrack->m_scale = (m_DBScaleFactor) ? m_DBScaleFactor->getScaleFactor() : 1.0;
 
     // store run gains only for data!
-    dedxTrack->m_runGain = (m_DBRunGain && m_usePrediction && numMCParticles == 0) ? m_DBRunGain->getRunGain() : 1.0;
+    bool isData = false;
+    if (m_usePrediction && numMCParticles == 0)isData = true;
+    dedxTrack->m_runGain = (m_DBRunGain && isData) ? m_DBRunGain->getRunGain() : 1.0;
 
     // get the cosine correction only for data!
-    dedxTrack->m_cosCor = (m_DBCosineCor && m_usePrediction && numMCParticles == 0) ? m_DBCosineCor->getMean(costh) : 1.0;
+    dedxTrack->m_cosCor = (m_DBCosineCor && isData) ? m_DBCosineCor->getMean(costh) : 1.0;
 
     // get the cosine edge correction only for data!
     bool isEdge = false;
     if ((abs(costh + 0.860) < 0.010) || (abs(costh - 0.955) <= 0.005))isEdge = true;
-    dedxTrack->m_cosEdgeCor = (m_DBCosEdgeCor && m_usePrediction && numMCParticles == 0
-                               && isEdge) ? m_DBCosEdgeCor->getMean(costh) : 1.0;
+    dedxTrack->m_cosEdgeCor = (m_DBCosEdgeCor && isData && isEdge) ? m_DBCosEdgeCor->getMean(costh) : 1.0;
+
+    bool isvalidTime = true;
+    if (injtime < 0 || injring < 0)isvalidTime = false;
+    dedxTrack->m_timeGain = (m_DBInjectTime && isData && isvalidTime) ? m_DBInjectTime->getCorrection("mean", injring, injtime) : 1.0;
+    dedxTrack->m_timeReso = (m_DBInjectTime && isData && isvalidTime) ? m_DBInjectTime->getCorrection("reso", injring, injtime) : 1.0;
 
     // initialize a few variables to be used in the loop over track points
     double layerdE = 0.0; // total charge in current layer
@@ -473,7 +488,8 @@ void CDCDedxPIDModule::event()
           // apply the calibration to dE to propagate to both hit and layer measurements
           // Note: could move the sin(theta) here since it is common accross the track
           //       It is applied in two places below (hit level and layer level)
-          double correction = dedxTrack->m_runGain * dedxTrack->m_cosCor * dedxTrack->m_cosEdgeCor * wiregain * twodcor * onedcor;
+          double correction = dedxTrack->m_runGain * dedxTrack->m_cosCor * dedxTrack->m_cosEdgeCor * dedxTrack->m_timeGain * wiregain *
+                              twodcor * onedcor;
 
           // --------------------
           // save individual hits (even for dead wires)

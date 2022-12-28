@@ -16,6 +16,8 @@
 
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
+
 #include <tracking/dataobjects/RecoTrack.h>
 
 #include <framework/datastore/StoreArray.h>
@@ -32,6 +34,7 @@
 #include <reconstruction/dbobjects/CDCDedxMeanPars.h>
 #include <reconstruction/dbobjects/CDCDedxSigmaPars.h>
 #include <reconstruction/dbobjects/CDCDedxHadronCor.h>
+#include <reconstruction/dbobjects/CDCDedxInjectTime.h>
 #include <reconstruction/dbobjects/DedxPDFs.h>
 
 #include <vector>
@@ -164,13 +167,14 @@ namespace Belle2 {
 
     // parameters: calibration constants
     DBObjPtr<CDCDedxScaleFactor> m_DBScaleFactor; /**< Scale factor to make electrons ~1 */
-    DBObjPtr<CDCDedxWireGain> m_DBWireGains; /**< Wire gain DB object */
     DBObjPtr<CDCDedxRunGain> m_DBRunGain; /**< Run gain DB object */
+    DBObjPtr<CDCDedxInjectTime> m_DBInjectTime; /**< time gain/reso DB object */
     DBObjPtr<CDCDedxCosineCor> m_DBCosineCor; /**< Electron saturation correction DB object */
+    DBObjPtr<CDCDedxCosineEdge> m_DBCosEdgeCor; /**< non-lineary ACD correction DB object */
+    DBObjPtr<CDCDedxWireGain> m_DBWireGains; /**< Wire gain DB object */
     DBObjPtr<CDCDedx2DCell> m_DB2DCell; /**< 2D correction DB object */
     DBObjPtr<CDCDedx1DCell> m_DB1DCell; /**< 1D correction DB object */
     DBObjPtr<CDCDedxADCNonLinearity> m_DBNonlADC; /**< non-lineary ACD correction DB object */
-    DBObjPtr<CDCDedxCosineEdge> m_DBCosEdgeCor; /**< non-lineary ACD correction DB object */
     DBObjPtr<CDCDedxHadronCor> m_DBHadronCor; /**< hadron saturation parameters */
 
     std::vector<double> m_hadronpars; /**< hadron saturation parameters */

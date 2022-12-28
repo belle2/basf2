@@ -311,7 +311,7 @@ namespace Belle2 {
                       automatically loaded by the function, given the accelerator's conditions.)DOC");
 
     REGISTER_VARIABLE("cosHelicityAngle(i, j)", cosHelicityAngle, R"DOC(
-                      Cosine of the helicity angle between the momentum of the provided particle and the momentum of the selected granddaughter
+                      Cosine of the helicity angle between the momentum of the selected granddaughter and the direction opposite to the momentum of the provided particle 
                       in the reference frame of the selected daughter (:math:`\theta_1` and :math:`\theta_2` in the
                       `PDG <https://journals.aps.org/prd/abstract/10.1103/PhysRevD.98.030001>`_ 2018, p. 722).
 

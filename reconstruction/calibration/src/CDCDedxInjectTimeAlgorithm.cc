@@ -643,7 +643,8 @@ void CDCDedxInjectTimeAlgorithm::plotFinalConstants(array<double, numdedx::nring
         double mean = 0.0, reso = 0.0;
         if (ip == 0) {
           mean = vinjPayload[ir * 3 + 1].at(it);
-          reso = vinjPayload[ir * 3 + 2].at(it) / vinjPayload[ir * 3 + 1].at(it);
+          //reso is reso/mu (reso is relative so mean needs to be relative)
+          reso = m_vresos[ir].at(it) / m_vmeans[ir].at(it);
         } else {
           mean = oldvectors[ir * 3 + 1].at(it);
           reso = oldvectors[ir * 3 + 2].at(it) / oldvectors[ir * 3 + 1].at(it);

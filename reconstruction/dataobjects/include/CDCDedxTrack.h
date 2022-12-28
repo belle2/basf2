@@ -28,9 +28,9 @@ namespace Belle2 {
     /** Default constructor */
     CDCDedxTrack() :
       RelationsObject(),
-      m_track(0), m_charge(0), m_cosTheta(0), m_p(0), m_pCDC(0),
-      m_length(0.0), m_pdg(-999), m_mcmass(0), m_motherPDG(0), m_pTrue(0), m_cosThetaTrue(0),
-      m_scale(0), m_cosCor(0), m_cosEdgeCor(0), m_runGain(0),
+      m_track(0), m_charge(0), m_cosTheta(0), m_p(0), m_pCDC(0), m_length(0.0), m_injring(-1),
+      m_injtime(-1), m_pdg(-999), m_mcmass(0), m_motherPDG(0), m_pTrue(0), m_cosThetaTrue(0),
+      m_scale(0), m_cosCor(0), m_cosEdgeCor(0), m_runGain(0), m_timeGain(0), m_timeReso(0),
       m_lNHitsUsed(0)
     {
       m_simDedx = m_dedxAvg = m_dedxAvgTruncated = m_dedxAvgTruncatedNoSat = m_dedxAvgTruncatedErr = 0.0;
@@ -119,6 +119,12 @@ namespace Belle2 {
     /** Return the charge for this track */
     int getCharge() const { return m_charge; }
 
+    /** Return cos(theta) for this track */
+    double getInjectionTime() const { return m_injtime; }
+
+    /** Return cos(theta) for this track */
+    double getInjectionRing() const { return m_injring; }
+
     /** Return the total path length for this track */
     double getLength() const { return m_length; }
 
@@ -130,6 +136,12 @@ namespace Belle2 {
 
     /** Return the run gain for this track */
     double getRunGain() const { return m_runGain; }
+
+    /** Return the injection gain for this track */
+    double getTimeMean() const { return m_timeGain; }
+
+    /** Return the injection reso for this track */
+    double getTimeReso() const { return m_timeReso; }
 
     /** Get the track-level MC dE/dx mean for this track */
     double getSimulatedDedx() const { return m_simDedx; }
@@ -277,6 +289,8 @@ namespace Belle2 {
     double m_p;        /**< momentum at the IP */
     double m_pCDC;    /**< momentum at the inner layer of the CDC */
     double m_length;   /**< total distance travelled by the track */
+    double m_injring; /**< injection ring type of track's event*/
+    double m_injtime;  /**< time since last injection of track's event*/
 
     // dE/dx simulation
     double m_pdg;        /**< MC PID */
@@ -291,6 +305,9 @@ namespace Belle2 {
     double m_cosCor;  /**< calibration cosine correction */
     double m_cosEdgeCor;  /**< calibration cosine edge correction */
     double m_runGain; /**< calibration run gain */
+    double m_timeGain; /**< calibration injection time gain */
+    double m_timeReso; /**< calibration injection time gain */
+
     std::vector<double> m_hWireGain; /**< calibration hit gain (indexed on number of hits) */
     std::vector<double> m_hTwodCor;  /**< calibration 2-D correction (indexed on number of hits) */
     std::vector<double> m_hOnedCor;  /**< calibration 1-D correction (indexed on number of hits) */
@@ -338,6 +355,6 @@ namespace Belle2 {
     std::vector<double> m_hCellHeight;    /**< height of the CDC cell */
     std::vector<double> m_hCellHalfWidth; /**< half-width of the CDC cell */
 
-    ClassDef(CDCDedxTrack, 16); /**< Debug output for CDCDedxPID module. */
+    ClassDef(CDCDedxTrack, 17); /**< Debug output for CDCDedxPID module. */
   };
 }

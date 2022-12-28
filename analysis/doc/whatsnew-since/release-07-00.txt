@@ -14,6 +14,8 @@ Modules
    This option is only valid when one calls the function in a ``for_each`` loop over the RestOfEvent.
    The branches ``__signalSideCandidate__`` and ``__nSignalSideCandidates__`` are added to the TTree by setting the option.
    An example of usage can be found in ``analysis/examples/VariableManager/variablesToNtuple.py``.
+ * Added an option ``allowAnyParticleSource`` to the function :func:`modularAnalysis.reconstructDecayWithNeutralHadron` to let
+   users apply the mother-mass constraint on a charged particle.
 
 Changes in the analysis package in light-2210-devonrex
 ------------------------------------------------------

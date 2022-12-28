@@ -130,7 +130,7 @@ namespace Belle2 {
 
       int count = 0;
       for (auto istrip : m_strips) {
-        if (digitFractions[count++] / maxDigit < 0.3) continue;
+        if (digitFractions[count++] / maxDigit < 0.5) continue;
         const SVDShaperDigit* shaperdigit = m_storeShaperDigits[istrip.shaperDigitIndex];
         if (!shaperdigit) B2ERROR("No SVDShaperDigit for this strip! Are you sure you set the correct SVDShaperDigit StoreArray name?");
         Belle2::SVDShaperDigit::APVFloatSamples APVsamples = shaperdigit->getSamples();

@@ -9,7 +9,7 @@
 #include <simulation/physicslist/GammaLeptoNuclearPhysics.h>
 
 #include "G4ProcessManager.hh"
-#include "G4PhotoNuclearProcess.hh"
+#include "G4HadronInelasticProcess.hh"
 #include "G4ElectronNuclearProcess.hh"
 #include "G4PositronNuclearProcess.hh"
 #include "G4MuonNuclearProcess.hh"
@@ -73,7 +73,7 @@ void GammaLeptoNuclearPhysics::ConstructProcess()
 
   // Gamma
   procMan = G4Gamma::Gamma()->GetProcessManager();
-  G4PhotoNuclearProcess* pnProc = new G4PhotoNuclearProcess;
+  G4HadronInelasticProcess* pnProc = new G4HadronInelasticProcess("photonNuclear", G4Gamma::Definition());
   pnProc->RegisterMe(theGammaReaction);
   pnProc->RegisterMe(m_qgsp);
   procMan->AddDiscreteProcess(pnProc);

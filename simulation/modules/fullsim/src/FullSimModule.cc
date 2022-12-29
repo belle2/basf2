@@ -30,6 +30,7 @@
 #include <simulation/monopoles/G4MonopolePhysics.h>
 #include <simulation/longlivedneutral/G4LongLivedNeutralPhysics.h>
 
+#include <G4FieldManager.hh>
 #include <G4TransportationManager.hh>
 #include <G4Transportation.hh>
 #include <G4PhysListFactory.hh>
@@ -51,6 +52,7 @@
 #include <G4HelixExplicitEuler.hh>
 #include <G4HelixSimpleRunge.hh>
 #include <G4CachedMagneticField.hh>
+#include <G4ChordFinder.hh>
 
 using namespace std;
 using namespace Belle2;

@@ -65,6 +65,11 @@ namespace Belle2 {
     void setFitWidth(double value) {m_sigmaR = value;}
 
     /**
+    * function to set min # of tracks in time bins (0-40ms)
+    */
+    void setMinTracks(int value) {m_thersE = value;}
+
+    /**
     * function to set dedx hist parameters
     */
     void setDedxPars(int value, double min, double max)
@@ -216,6 +221,7 @@ namespace Belle2 {
     bool ismakePlots; /**< produce plots for monitoring */
     bool isMerge; /**< merge payload when rel constant*/
     int m_countR; /**< a hack for running functions once */
+    int m_thersE; /**< min tracks to start calibration */
     std::string m_prefix; /**< string prefix for plot names */
     std::string m_suffix; /**< string suffix for object names */
     std::map<int, std::vector<double>> m_vmeans; /**< vector for mean values*/

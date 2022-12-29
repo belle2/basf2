@@ -84,16 +84,6 @@ def add_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False, 
         dataFormat = b2.register_module('SVDDataFormatCheck')
         dataFormat.param('ShaperDigits', shaperDigitsName)
 
-    # if shaperDigitsGroupingName not in [e.name() for e in path.modules()]:
-    #     svdShaperDigitsGrouping = b2.register_module('SVDShaperDigitsGrouping')
-    #     svdShaperDigitsGrouping.set_name(shaperDigitsGroupingName)
-    #     svdShaperDigitsGrouping.param('signalRangeLow', -50)
-    #     svdShaperDigitsGrouping.param('signalRangeHigh', 50)
-    #     svdShaperDigitsGrouping.param('factor', 2)
-    #     svdShaperDigitsGrouping.param('iteration', 4)
-    #     svdShaperDigitsGrouping.param('useOnlyOneGroup', False)
-    #     path.add_module(svdShaperDigitsGrouping)
-
     if clusterizerName not in [e.name() for e in path.modules()]:
         clusterizer = b2.register_module('SVDClusterizer')
         clusterizer.set_name(clusterizerName)
@@ -231,17 +221,6 @@ def add_rel5_svd_reconstruction(path, isROIsimulation=False, applyMasking=False)
     if dataFormatName not in [e.name() for e in path.modules()]:
         dataFormat = b2.register_module('SVDDataFormatCheck')
         dataFormat.param('ShaperDigits', shaperDigitsName)
-
-    # if shaperDigitsGroupingName not in [e.name() for e in path.modules()]:
-    #     svdShaperDigitsGrouping = b2.register_module('SVDShaperDigitsGrouping')
-    #     svdShaperDigitsGrouping.set_name(shaperDigitsGroupingName)
-    #     svdShaperDigitsGrouping.param('signalRangeLow', -50)
-    #     svdShaperDigitsGrouping.param('signalRangeHigh', 50)
-    #     svdShaperDigitsGrouping.param('factor', 2)
-    #     svdShaperDigitsGrouping.param('iteration', 4)
-    #     svdShaperDigitsGrouping.param('includeOutOfRangeClusters', False)
-    #     svdShaperDigitsGrouping.param('useOnlyOneGroup', False)
-    #     path.add_module(svdShaperDigitsGrouping)
 
     if fitterName not in [e.name() for e in path.modules()]:
         fitter = b2.register_module('SVDCoGTimeEstimator')

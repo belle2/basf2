@@ -22,6 +22,7 @@ CDCDedxInjectTimeAlgorithm::CDCDedxInjectTimeAlgorithm() :
   ismakePlots(true),
   isMerge(false),
   m_countR(0),
+  m_thersE(1000),
   m_prefix("cdcdedx_injcal"),
   m_suffix("")
 {
@@ -152,6 +153,7 @@ CalibrationAlgorithm::EResult CDCDedxInjectTimeAlgorithm::calibrate()
 
   //preparing final payload
   vinjPayload.clear();
+  vinjPayload.reserve(6);
   for (int ir = 0; ir < 2; ir++) {
     vinjPayload.push_back(vtlocaledges);
     vinjPayload.push_back(m_vmeanscorr[ir]);
@@ -316,7 +318,7 @@ void CDCDedxInjectTimeAlgorithm::checkStatistics(array<vector<TH1D*>, numdedx::n
   for (unsigned int ir = 0; ir < c_rings; ir++) {
     for (unsigned int it = 3; it < m_tbins; it++) {
       //check statiscs from 1-40ms
-      if (m_tedges[it] < 4e4 && hvar[ir][it]->Integral() < 2000) {
+      if (m_tedges[it] < 4e4 && hvar[ir][it]->Integral() < m_thersE) {
         isminStat = true;
         break;
       } else continue;

@@ -179,7 +179,7 @@ namespace Belle2 {
         return 1.0;
       }
 
-      if (std::isnan(ring))return 1.0;
+      if (std::isnan(ring) || std::isnan(time))return 1.0;
 
       if (ring > 2) {
         B2ERROR("wrong ring input, choose 0 or 1");
@@ -219,7 +219,7 @@ namespace Belle2 {
 
         if (it <= 2) {
           double diff = m_injectionvar[iv].at(2) - m_injectionvar[iv].at(1) ;
-          if (diff < -0.010) { //difference above 1.5%
+          if (diff < -0.015) { //difference above 1.5%
             thisbin = it;
             if (it == 1) nextbin = it;
             else nextbin = it + 1;

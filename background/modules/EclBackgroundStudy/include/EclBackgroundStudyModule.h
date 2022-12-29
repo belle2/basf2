@@ -67,8 +67,15 @@ namespace Belle2 {
 
     std::string m_filename; /**< Output file name.   */
 
-    Int_t m_CellId, m_TcId, m_Pdg, m_iEntry;
-    Double_t m_Edep, m_TimeAve, m_FlightTime, m_Hadronedep;
+    std::vector<int>  m_CellId;
+    std::vector<int>  m_TcId;
+    std::vector<int>  m_Pdg;
+    std::vector<double>  m_Edep;
+    std::vector<double>  m_TimeAve;
+    std::vector<double>  m_FlightTime;
+    std::vector<double>  m_Hadronedep;
+
+    Int_t m_iEntry;
 
     TFile* m_ff;    /**< Output root file.   */
     TTree* m_tree1;   /**< Output tree */

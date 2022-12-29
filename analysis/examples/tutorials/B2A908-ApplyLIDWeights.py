@@ -25,6 +25,11 @@ def argparser():
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawTextHelpFormatter)
 
+    parser.add_argument("--release",
+                        type=int,
+                        default=5,
+                        help="The major release number associated to the corrections that are being applied.\n"
+                        "Default: %(default)s.")
     parser.add_argument("--lid_weights_gt",
                         type=str,
                         default="leptonid_Moriond2022_Official_rel5_v1a",
@@ -87,7 +92,7 @@ def main():
     electrons_fixed09 = "lh_B_fixed09"
     electrons_wp = "FixedThresh09"
     electron_id_var, electron_id_weights = stdE(electrons_wp, "likelihood", "binary", args.lid_weights_gt,
-                                                release=5,
+                                                release=args.release,
                                                 inputListName="e+:corrected",
                                                 outputListLabel=electrons_fixed09,
                                                 path=path)
@@ -95,7 +100,7 @@ def main():
     muons_uniform90 = "bdt_G_uniform90"
     muons_wp = "UniformEff90"
     muon_id_var, muon_id_weights = stdMu(muons_wp, "bdt", "global", args.lid_weights_gt,
-                                         release=5,
+                                         release=args.release,
                                          outputListLabel=muons_uniform90,
                                          path=path)
 

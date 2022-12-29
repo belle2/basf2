@@ -329,8 +329,7 @@ G4PhysicsTable* EnergyLossForExtrapolator::PrepareTable()
 
   for (G4int i = 0; i < m_NMaterials; i++) {
 
-    G4PhysicsVector* v = new G4PhysicsLogVector(m_UserTmin, m_UserTmax, m_Nbins);
-    v->SetSpline(true);
+    G4PhysicsVector* v = new G4PhysicsLogVector(m_UserTmin, m_UserTmax, m_Nbins, true);
     table->push_back(v);
   }
   return table;

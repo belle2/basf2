@@ -32,10 +32,12 @@ def add_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False, 
         nameTrackingInfoModule = "RegisterEventLevelTrackingInfo__ROI"
         nameEventTrackingInfo = "EventLevelTrackingInfo__ROI"
         nameSVDTrackingEventLevelMdstInfoFiller = "SVDTrackingEventLevelMdstInfoFiller__ROI"
+        nameSVDShaperDigitsSlope = "SVDShaperDigitsSlope__ROI"
     else:
         nameTrackingInfoModule = "RegisterEventLevelTrackingInfo"
         nameEventTrackingInfo = "EventLevelTrackingInfo"
         nameSVDTrackingEventLevelMdstInfoFiller = "SVDTrackingEventLevelMdstInfoFiller"
+        nameSVDShaperDigitsSlope = "SVDShaperDigitsSlope"
 
     if nameTrackingInfoModule not in path:
         registerEventlevelTrackingInfo = b2.register_module('RegisterEventLevelTrackingInfo')
@@ -43,8 +45,9 @@ def add_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False, 
         registerEventlevelTrackingInfo.param('EventLevelTrackingInfoName', nameEventTrackingInfo)
         path.add_module(registerEventlevelTrackingInfo)
 
-    if 'SVDShaperDigitsSlope' not in [e.name() for e in path.modules()]:
+    if nameSVDShaperDigitsSlope not in [e.name() for e in path.modules()]:
         svdShaperDigitsSlope = b2.register_module('SVDShaperDigitsSlope')
+        svdShaperDigitsSlope.set_name(nameSVDShaperDigitsSlope)
         path.add_module(svdShaperDigitsSlope)
 
     if(isROIsimulation):
@@ -121,7 +124,7 @@ def add_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False, 
         svdTimeGroupComposer.param('signalRangeHigh', 40)
         svdTimeGroupComposer.param('factor', 10)
         svdTimeGroupComposer.param('iteration', 10)
-        svdTimeGroupComposer.param('includeOutOfRangeClusters', False)
+        svdTimeGroupComposer.param('includeOutOfRangeClusters', True)
         svdTimeGroupComposer.param('useOnlyOneGroup', False)
         path.add_module(svdTimeGroupComposer)
 
@@ -175,10 +178,12 @@ def add_rel5_svd_reconstruction(path, isROIsimulation=False, applyMasking=False)
         nameTrackingInfoModule = "RegisterEventLevelTrackingInfo__ROI"
         nameEventTrackingInfo = "EventLevelTrackingInfo__ROI"
         nameSVDTrackingEventLevelMdstInfoFiller = "SVDTrackingEventLevelMdstInfoFiller__ROI"
+        nameSVDShaperDigitsSlope = "SVDShaperDigitsSlope__ROI"
     else:
         nameTrackingInfoModule = "RegisterEventLevelTrackingInfo"
         nameEventTrackingInfo = "EventLevelTrackingInfo"
         nameSVDTrackingEventLevelMdstInfoFiller = "SVDTrackingEventLevelMdstInfoFiller"
+        nameSVDShaperDigitsSlope = "SVDShaperDigitsSlope"
 
     if nameTrackingInfoModule not in path:
         registerEventlevelTrackingInfo = b2.register_module('RegisterEventLevelTrackingInfo')
@@ -186,8 +191,9 @@ def add_rel5_svd_reconstruction(path, isROIsimulation=False, applyMasking=False)
         registerEventlevelTrackingInfo.param('EventLevelTrackingInfoName', nameEventTrackingInfo)
         path.add_module(registerEventlevelTrackingInfo)
 
-    if 'SVDShaperDigitsSlope' not in [e.name() for e in path.modules()]:
+    if nameSVDShaperDigitsSlope not in [e.name() for e in path.modules()]:
         svdShaperDigitsSlope = b2.register_module('SVDShaperDigitsSlope')
+        svdShaperDigitsSlope.set_name(nameSVDShaperDigitsSlope)
         path.add_module(svdShaperDigitsSlope)
 
     if(isROIsimulation):
@@ -270,7 +276,7 @@ def add_rel5_svd_reconstruction(path, isROIsimulation=False, applyMasking=False)
         svdTimeGroupComposer.param('signalRangeHigh', 40)
         svdTimeGroupComposer.param('factor', 10)
         svdTimeGroupComposer.param('iteration', 10)
-        svdTimeGroupComposer.param('includeOutOfRangeClusters', False)
+        svdTimeGroupComposer.param('includeOutOfRangeClusters', True)
         svdTimeGroupComposer.param('useOnlyOneGroup', False)
         path.add_module(svdTimeGroupComposer)
 

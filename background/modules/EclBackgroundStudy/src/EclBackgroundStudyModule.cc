@@ -68,7 +68,7 @@ namespace Belle2 {
     // loop over ECLHits
     for (const ECLHit& hit : m_ECLHits) {
       m_CellId = hit.getCellId();
-      m_TcId = m_TCMap->getTCIdFromXtalId(m_CellId + 1) - 1;
+      m_TcId = m_TCMap->getTCIdFromXtalId(m_CellId);
       m_Edep = hit.getEnergyDep();
       m_TimeAve = hit.getTimeAve();
       // fill the tree
@@ -78,7 +78,7 @@ namespace Belle2 {
     // loop over ECLSimHits
     for (const ECLSimHit& hit : m_ECLSimHits) {
       m_CellId = hit.getCellId();
-      m_TcId = m_TCMap->getTCIdFromXtalId(m_CellId + 1) - 1;
+      m_TcId = m_TCMap->getTCIdFromXtalId(m_CellId);
       m_Pdg = hit.getPDGCode();
       m_FlightTime = hit.getFlightTime();
       m_Edep = hit.getEnergyDep();

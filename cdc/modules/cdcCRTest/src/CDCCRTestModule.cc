@@ -396,7 +396,6 @@ void CDCCRTestModule::plotResults(Belle2::RecoTrack* track)
 
           const genfit::MeasuredStateOnPlane& mop = kfi->getFittedState();
           const B2Vector3D pocaOnWire = mop.getPlane()->getO();//Local wire position
-          const B2Vector3D pocaOnTrack = mop.getPlane()->getU();//residual direction
           const B2Vector3D pocaMom = mop.getMom();
           alpha = cdcgeo.getAlpha(pocaOnWire, pocaMom) ;
           theta = cdcgeo.getTheta(pocaMom);

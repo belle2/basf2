@@ -274,6 +274,7 @@ void SVDClusterizerModule::event()
   //create a dummy cluster just to start
   RawCluster rawCluster(m_storeDigits[0]->getSensorID(), m_storeDigits[0]->isUStrip(), m_cutSeed, m_cutAdjacent,
                         m_storeShaperDigitsName);
+  rawCluster.setSlopeType(m_storeDigits[0]->getSlope());
 
   //loop over the SVDShaperDigits
   for (const SVDShaperDigit& currentDigit : m_storeDigits) {
@@ -306,7 +307,11 @@ void SVDClusterizerModule::event()
     aStrip.samples = currentDigit.getSamples();
 
     //try to add the strip to the existing cluster
-    if (! rawCluster.add(thisSensorID, thisSide, aStrip)) {
+    if (currentDigit.getSlope() * rawCluster.getSlopeType() < 0 ||
+        ! rawCluster.add(thisSensorID, thisSide, aStrip)) {
+
+      B2DEBUG(1, " strip not added, slope : "
+              << currentDigit.getSlope() << " and " << rawCluster.getSlopeType());
 
       //if the strip is not added, write the cluster, if present and good:
       if ((rawCluster.getSize() > 0) && (rawCluster.isGoodRawCluster()))
@@ -314,6 +319,7 @@ void SVDClusterizerModule::event()
 
       //prepare for the next cluster:
       rawCluster = RawCluster(thisSensorID, thisSide, m_cutSeed, m_cutAdjacent, m_storeShaperDigitsName);
+      rawCluster.setSlopeType(currentDigit.getSlope());
 
       //start another cluster:
       if (! rawCluster.add(thisSensorID, thisSide, aStrip))

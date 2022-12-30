@@ -488,8 +488,12 @@ void CDCDedxInjectTimeAlgorithm::plotInjectionTime(array<array<TH1D*, 3>, numded
     for (unsigned int ir = 0; ir < c_rings; ir++) {
       hvar[ir][wt]->SetStats(0);
       hvar[ir][wt]->SetFillColorAlpha(5 + ir, 0.20);
-      if (ir == 0)hvar[ir][wt]->Draw("");
-      else hvar[ir][wt]->Draw("same");
+      if (ir == 0) {
+        double max1 = hvar[ir][wt]->GetMaximum();
+        double max2 = hvar[c_rings - 1][wt]->GetMaximum();
+        if (max2 > max1)hvar[ir][wt]->SetMaximum(max2 * 1.05);
+        hvar[ir][wt]->Draw("");
+      } else hvar[ir][wt]->Draw("same");
     }
   }
   ctzoom->Print(Form("%s_timezoom_%s.pdf]", m_prefix.data(), m_suffix.data()));
@@ -517,7 +521,7 @@ void CDCDedxInjectTimeAlgorithm::plotRelConstants(map<int, vector<double>>& m_me
   mleg->SetBorderSize(0);
   mleg->SetFillStyle(0);
 
-  TLegend* rleg = new TLegend(0.50, 0.60, 0.80, 0.72, NULL, "brNDC");
+  TLegend* rleg = new TLegend(0.40, 0.60, 0.80, 0.72, NULL, "brNDC");
   rleg->SetBorderSize(0);
   rleg->SetFillStyle(0);
 
@@ -569,24 +573,25 @@ void CDCDedxInjectTimeAlgorithm::plotRelConstants(map<int, vector<double>>& m_me
     cconst[0]->cd();
     mleg->AddEntry(hmean[ir], Form("%s", m_sring[ir].data()), "lep");
     mleg->AddEntry(hmeancorr[ir], Form("%s (bin-bias-corr)", m_sring[ir].data()), "lep");
-    setHistStyle(hmean[ir], lcolors[ir], ir + 24, 0.60, 1.05);
-    setHistStyle(hmeancorr[ir], lcolors[ir], ir + 20, 0.60, 1.05);
+    setHistStyle(hmean[ir], lcolors[ir], ir + 24, 0.60, 1.10);
+    setHistStyle(hmeancorr[ir], lcolors[ir], ir + 20, 0.60, 1.10);
     if (ir == 0)hmean[ir]->Draw("");
     else hmean[ir]->Draw("same");
     hmeancorr[ir]->Draw("same");
     if (ir == 1)mleg->Draw("same");
 
     cconst[1]->cd();
-    setHistStyle(hreso[ir], lcolors[ir], ir + 24, 0.01, 0.15);
-    setHistStyle(hresocorr[ir], lcolors[ir], ir + 20, 0.01, 0.15);
+    setHistStyle(hreso[ir], lcolors[ir], ir + 24, 0.01, 0.20);
+    setHistStyle(hresocorr[ir], lcolors[ir], ir + 20, 0.01, 0.20);
     if (ir == 0)hreso[ir]->Draw("");
     else hreso[ir]->Draw("same");
     hresocorr[ir]->Draw("same");
     if (ir == 1)mleg->Draw("same");
 
     cconst[2]->cd();
-    rleg->AddEntry(htimestat[ir], Form("%s", m_sring[ir].data()), "lep");
-    htimestat[ir]->Scale(1.0 / htimestat[ir]->GetMaximum());
+    double norm = htimestat[ir]->GetMaximum();
+    rleg->AddEntry(htimestat[ir], Form("%s (scaled with %0.02f)", m_sring[ir].data(), norm), "lep");
+    htimestat[ir]->Scale(1.0 / norm);
     setHistStyle(htimestat[ir], lcolors[ir], ir + 20, 0.0, 1.10);
     htimestat[ir]->SetFillColorAlpha(lcolors[ir], 0.30);
     if (ir == 0) htimestat[ir]->Draw("hist");

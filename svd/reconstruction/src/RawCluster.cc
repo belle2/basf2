@@ -115,22 +115,39 @@ namespace Belle2 {
 
       SVDPulseShapeCalibrations pulseShapeCal;
 
-      // std::vector<float> digitFractions;
-      // float maxDigit = 0;
-      // for (auto istrip : m_strips) {
-      //   const SVDShaperDigit* shaperdigit = m_storeShaperDigits[istrip.shaperDigitIndex];
-      //   if (!shaperdigit) B2ERROR("No SVDShaperDigit for this strip! Are you sure you set the correct SVDShaperDigit StoreArray name?");
-      //   Belle2::SVDShaperDigit::APVFloatSamples APVsamples = shaperdigit->getSamples();
-      //   float fraction = 0;
-      //   for (int iSample = 0; iSample < static_cast<int>(APVsamples.size()); ++iSample)
-      //     fraction += APVsamples.at(iSample);
-      //   digitFractions.push_back(fraction);
-      //   if (fraction > maxDigit) maxDigit = fraction;
-      // }
+      int startPos = -1;
+      int endPos   = -1;
+      int clusterSize = static_cast<int>(m_strips.size());
+      if (clusterSize > 3) {
+        int maxDigitPos;
+        float maxDigit = 0;
+        int count = 0;
+        for (auto istrip : m_strips) {
+          const SVDShaperDigit* shaperdigit = m_storeShaperDigits[istrip.shaperDigitIndex];
+          if (!shaperdigit) B2ERROR("No SVDShaperDigit for this strip! Are you sure you set the correct SVDShaperDigit StoreArray name?");
+          Belle2::SVDShaperDigit::APVFloatSamples APVsamples = shaperdigit->getSamples();
+          float fraction = 0;
+          for (int iSample = 0; iSample < static_cast<int>(APVsamples.size()); ++iSample)
+            fraction += APVsamples.at(iSample);
+          // std::cout<<" count "<<count<<" fraction "<<fraction<<std::endl;
+          if (fraction > maxDigit) {
+            maxDigit = fraction;
+            maxDigitPos = count;
+          }
+          count++;
+        }
+        if (maxDigitPos == 0) maxDigitPos = 1;
+        if (maxDigitPos == clusterSize - 1) maxDigitPos = clusterSize - 2;
+        startPos = maxDigitPos - 1;
+        endPos   = maxDigitPos + 1;
+        // std::cout<<" startPos "<<startPos<<" endPos "<<endPos<<std::endl;
+      } // if (static_cast<int>(APVsamples.size()) > 3) {
 
-      // int count = 0;
+      int count = 0;
       for (auto istrip : m_strips) {
-        // if (digitFractions[count++] / maxDigit < 0.75) continue;
+        count++;
+        if (startPos >= 0 && (count - 1 < startPos || count - 1 > endPos)) continue;
+        // std::cout<<" count - 1 : "<<(count - 1)<<std::endl;
         const SVDShaperDigit* shaperdigit = m_storeShaperDigits[istrip.shaperDigitIndex];
         if (!shaperdigit) B2ERROR("No SVDShaperDigit for this strip! Are you sure you set the correct SVDShaperDigit StoreArray name?");
         Belle2::SVDShaperDigit::APVFloatSamples APVsamples = shaperdigit->getSamples();

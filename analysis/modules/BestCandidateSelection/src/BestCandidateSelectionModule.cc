@@ -166,21 +166,18 @@ void BestCandidateSelectionModule::event()
     if (first_candidate) {
       first_candidate = false;
     } else {
+      // If allowMultiRank, only increase rank when value changes
       if (!m_allowMultiRank || (candidate.first != previous_val))  ++rank;
     }
+
+    if ((m_numBest != 0) and (rank > m_numBest)) // Only keep particles with same rank or below
+      break;
 
     if (!p->hasExtraInfo(m_outputVariableName))
       p->addExtraInfo(m_outputVariableName, rank);
     m_inputList->addParticle(p);
-
     previous_val = candidate.first;
 
-    if (m_numBest == 0) // keep all 
-      continue;
-
-    if (rank > m_numBest or 
-	(rank == m_numBest and !m_allowMultiRank)) // if allowMultiRank is True, same rank is accepted
-      break;
 
   }
 }

@@ -398,7 +398,7 @@ void SVDClusterizerModule::finalizeCluster(Belle2::SVD::RawCluster& rawCluster)
   //append the new cluster to the StoreArray...
   if (SNR > m_cutCluster) {
     m_storeClusters.appendNew(sensorID, isU, position, positionError, time, timeError, charge, seedCharge, size, SNR, -1,
-                              firstFrame, 0);
+                              firstFrame);
 
     B2DEBUG(20, "CLUSTER SIZE = " << size);
     B2DEBUG(20, "        time = " << time << ", timeError = " << timeError << ", firstframe = " << firstFrame);

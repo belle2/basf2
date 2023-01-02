@@ -230,7 +230,7 @@ void SVDTimeGroupComposerModule::event()
         int place = rejectedCls[jk] < 0 ? jk : rejectedCls[jk];
         double clsTime = m_svdClusters[place]->getClsTime();
         if (clsTime >= beginPos && clsTime <= endPos) {
-          m_svdClusters[place]->setTimeGroupId(ij);
+          m_svdClusters[place]->getTimeGroupId().push_back(ij);
           B2DEBUG(1, "   accepted cluster " << place
                   << " clsTime " << clsTime);
         } else {
@@ -240,15 +240,15 @@ void SVDTimeGroupComposerModule::event()
             if (!m_useOnlyOneGroup &&
                 m_includeOutOfRangeClusters &&
                 clsTime < m_tRangeLow && underflow > 1)
-              m_svdClusters[place]->setTimeGroupId(ij + 1);       // underflow
+              m_svdClusters[place]->getTimeGroupId().push_back(ij + 1);       // underflow
             else if (!m_useOnlyOneGroup &&
                      m_includeOutOfRangeClusters &&
                      clsTime > m_tRangeHigh && overflow > 1)
-              m_svdClusters[place]->setTimeGroupId(ij + 2);       // overflow
+              m_svdClusters[place]->getTimeGroupId().push_back(ij + 2);       // overflow
             else
-              m_svdClusters[place]->setTimeGroupId(-1);           // orphan
+              m_svdClusters[place]->getTimeGroupId().push_back(-1);           // orphan
             B2DEBUG(1, "     leftover cluster " << place
-                    << " GroupId " << m_svdClusters[place]->getTimeGroupId());
+                    << " GroupId " << m_svdClusters[place]->getTimeGroupId().back());
           } else {
             rejectedCls[rejectedCount++] = place;
           }

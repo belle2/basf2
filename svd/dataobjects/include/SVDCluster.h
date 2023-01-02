@@ -15,6 +15,7 @@
 #include <vxd/geometry/GeoCache.h>
 
 #include <sstream>
+#include <vector>
 
 namespace Belle2 {
 
@@ -40,7 +41,7 @@ namespace Belle2 {
      */
     SVDCluster(VxdID sensorID, bool isU, float position, float positionSigma,
                double clsTime, double clsTimeSigma, float clsCharge, float seedCharge,
-               unsigned short clsSize, float clsSN, float clsChi2, int firstFrame = 0, int timeGroupId = 0):
+               unsigned short clsSize, float clsSN, float clsChi2, int firstFrame = 0, std::vector<int> timeGroupId = {}):
       m_sensorID(sensorID), m_isU(isU),
       m_position(position), m_positionSigma(positionSigma),
       m_clsTime(clsTime), m_clsTimeSigma(clsTimeSigma), m_clsCharge(clsCharge),
@@ -166,7 +167,12 @@ namespace Belle2 {
     /** Get ID of the time-group.
      * @return time-group ID
      */
-    int getTimeGroupId() const { return m_timeGroupId; }
+    std::vector<int>& getTimeGroupId() { return m_timeGroupId; }
+
+    /** Get ID of the time-group.
+     * @return time-group ID
+     */
+    const std::vector<int>& getTimeGroupId() const { return m_timeGroupId; }
 
     /** Get cluster quality indicator
     * @return probability that cluster is generated from signal hit.
@@ -197,7 +203,7 @@ namespace Belle2 {
     /** Set the ID of the time-group.
      *
      */
-    void setTimeGroupId(const int& groupId)
+    void setTimeGroupId(const std::vector<int>& groupId)
     {
       m_timeGroupId = groupId;
     }
@@ -248,7 +254,7 @@ namespace Belle2 {
     float m_clsSN;             /**< Cluster S/N ratio */
     float m_clsChi2;           /**< Chi2 for time/amplitude fit */
     int m_firstFrame;           /**< firstFrame computed with the MaxSum algorithm */
-    int m_timeGroupId;          /**< Grouping of clusters in time */
+    std::vector<int> m_timeGroupId;    /**< Grouping of clusters in time */
     double m_qualityIndicator = {0.};  /**< Probability of signal cluster */
     double m_qualityIndicatorError = {0.};  /**< Error associated with probability calcualtion */
 

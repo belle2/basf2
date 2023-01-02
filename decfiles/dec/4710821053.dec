@@ -9,8 +9,10 @@
 # Email: yinjh2012@korea.ac.kr 
 # Date: 20230102
 
+Alias etasig eta
+
 Decay vpho
-1.0 eta Upsilon(2S)sig PHSP;
+1.0 etasig Upsilon(2S)sig PHSP;
 Enddecay
 
 Decay Upsilon(2S)sig

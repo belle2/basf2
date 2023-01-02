@@ -51,7 +51,7 @@ class RankChecker(basf2.Module):
 
     def event(self):
         """And check all the ranks"""
-        # make a list of all the values and a dict of all the exta infos
+        # make a list of all the values and a dict of all the extra infos
         px = []
         py = []
         einfo = defaultdict(list)
@@ -129,21 +129,26 @@ class NumBestChecker(basf2.Module):
     """Check if 'numBest' works correctly"""
 
     def __init__(self):
-
+        """Initializing the parameters."""
         super().__init__()
-        self.allow_multirank = False
+        #: Number of candidates to keep (must be given as parameter, otherwise assert will fail).
         self.num_best = None
+        #: MultiRank option switch
+        self.allow_multirank = False
 
     def param(self, kwargs):
+        """Checking for module parameters to distinguish between the different test cases."""
+        self.num_best = kwargs.pop('numBest')
         self.allow_multirank = kwargs.pop('allowMultiRank', False)
-        self.num_best = kwargs.pop('numBest', None)
         super().param(kwargs)
 
     def initialize(self):
         """Create particle list 'e-:numBest(MultiRank)' object, depending on parameter choice."""
         if self.allow_multirank:
+            #: particle list object
             self.plist = Belle2.PyStoreObj('e-:numBestMultiRank')
         else:
+            #: particle list object
             self.plist = Belle2.PyStoreObj('e-:numBest')
 
     def event(self):
@@ -177,6 +182,6 @@ ma.fillParticleListFromMC("e-:numBestMultiRank", "", path=path)
 # sort the list, using numBest and allowMultiRank
 ma.rankByHighest("e-:numBestMultiRank", "px", numBest=numBest_value, allowMultiRank=True, path=path)
 # and check that numBest worked as expected
-path.add_module(NumBestChecker(), allowMultiRank=True, numBest=numBest_value)
+path.add_module(NumBestChecker(), numBest=numBest_value, allowMultiRank=True)
 
 basf2.process(path)

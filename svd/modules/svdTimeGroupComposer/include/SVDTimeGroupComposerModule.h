@@ -14,8 +14,9 @@
 
 #include <string>
 
-#include <TFile.h>
 #include <TH1D.h>
+#include <TF1.h>
+#include <TMath.h>
 
 namespace Belle2 {
   /**
@@ -64,6 +65,16 @@ namespace Belle2 {
     double m_signalRangeHigh    = 40;   /** Expected time range of signal hits. */
     int    m_factor             = 10;    /** Fine divisions of histogram. */
     int    m_iteration          = 10;    /** Number of summations of the histogram. */
+    bool   m_gausFill           = true;
+    double m_fillSigmaN         = 3.;
+    double m_calSigmaN          = 5.;
+    double m_fracThreshold      = 0.01;
+    double m_minSigma           = 1.;
+    double m_maxSigma           = 15.;
+    double m_timeSpread         = 5.;
+    int    m_maxGroups          = 10;
+    std::vector<float> m_clsSizeVsSigma =
+    {5.33428, 3.35899, 3.32646, 4.15011, 5.38317, 6.28281, 7.07448, 7.36558, 7.7327, 9.66326};
     bool   m_includeOutOfRangeClusters = true; /** Assign groups to under and overflow. */
     bool   m_useOnlyOneGroup    = false; /** Only one group is kept. */
     bool   m_timeBasedSort      = false; /** Group nearest to zero is kept at the first. */

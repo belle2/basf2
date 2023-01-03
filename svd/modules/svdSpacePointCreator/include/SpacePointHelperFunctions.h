@@ -110,13 +110,15 @@ namespace Belle2 {
 
         const std::vector<int>& uTimeGroupId = uCluster->getTimeGroupId();
         const std::vector<int>& vTimeGroupId = vCluster->getTimeGroupId();
-        bool isContinue = true;
-        for (auto& uitem : uTimeGroupId)
-          for (auto& vitem : vTimeGroupId)
-            if (uitem >= 0 && vitem >= 0 && uitem == vitem) { isContinue = false; break; }
-        if (isContinue) {
-          B2DEBUG(1, "Cluster combination rejected due to different time-group Id.");
-          continue;
+        if (int(uTimeGroupId.size()) && int(vTimeGroupId.size())) {
+          bool isContinue = true;
+          for (auto& uitem : uTimeGroupId)
+            for (auto& vitem : vTimeGroupId)
+              if (uitem >= 0 && vitem >= 0 && uitem == vitem) { isContinue = false; break; }
+          if (isContinue) {
+            B2DEBUG(1, "Cluster combination rejected due to different time-group Id.");
+            continue;
+          }
         }
 
         foundCombinations.push_back({uCluster, vCluster});

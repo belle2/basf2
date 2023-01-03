@@ -17,6 +17,11 @@ using namespace Belle2;
 
 REG_MODULE(SVDTimeGroupComposer);
 
+double mygaus(double* x, double* par)
+{
+  return par[0] * exp(-0.5 * std::pow((x[0] - par[1]) / par[2], 2)) / (sqrt(2.*TMath::Pi()) * par[2]);
+}
+
 SVDTimeGroupComposerModule::SVDTimeGroupComposerModule() :
   Module()
 {
@@ -54,6 +59,31 @@ SVDTimeGroupComposerModule::SVDTimeGroupComposerModule() :
            int(10));
   addParam("iteration", m_iteration,
            "Number of summations of the histogram.",
+           int(10));
+
+  addParam("gausFill", m_gausFill,
+           "Fill cluster times with gauss uncertainity.",
+           bool(true));
+  addParam("fillSigmaN", m_fillSigmaN,
+           "Fill cluster times upto N sigma.",
+           double(3.));
+  addParam("calSigmaN", m_calSigmaN,
+           "Evaluate gauss upto N sigma.",
+           double(5.));
+  addParam("fracThreshold", m_fracThreshold,
+           "Do not fit bellow this threshold.",
+           double(0.01));
+  addParam("minSigma", m_minSigma,
+           "Lower limit of cluster time sigma for fit.",
+           double(1.));
+  addParam("maxSigma", m_maxSigma,
+           "Upper limit of cluster time sigma for fit.",
+           double(15.));
+  addParam("timeSpread", m_timeSpread,
+           "Time range for the fit.",
+           double(5.));
+  addParam("maxGroups", m_maxGroups,
+           "Maximum groups to be accepted.",
            int(10));
 
   addParam("includeOutOfRangeClusters", m_includeOutOfRangeClusters,
@@ -100,74 +130,89 @@ void SVDTimeGroupComposerModule::initialize()
 void SVDTimeGroupComposerModule::event()
 {
   int totClusters = m_svdClusters.getEntries();
-  if (m_AverageCountPerBin > 0 && m_factor > 0 && totClusters > 0) {
+  if (m_AverageCountPerBin <= 0 || m_factor <= 0 || totClusters <= 0) return;
 
-    // number of clusters in signalRange
-    int clsInSignalRange = 0;
-    for (int ij = 0; ij < totClusters; ij++)
-      if (m_svdClusters[ij]->getClsTime() > m_signalRangeLow &&
-          m_svdClusters[ij]->getClsTime() < m_signalRangeHigh)
-        clsInSignalRange++;
+  // number of clusters in signalRange
+  int clsInSignalRange = 0;
+  double tmax = -1000; double tmin = 1000;
+  for (int ij = 0; ij < totClusters; ij++) {
+    double clsTime = m_svdClusters[ij]->getClsTime();
+    if (clsTime > m_signalRangeLow &&
+        clsTime < m_signalRangeHigh)
+      clsInSignalRange++;
+    if (clsTime > tmax) tmax = clsTime;
+    if (clsTime < tmin) tmin = clsTime;
+  }
+  if (m_tRangeHigh > tmax) m_tRangeHigh = tmax;
+  if (m_tRangeLow  < tmin) m_tRangeLow  = tmin;
+  B2DEBUG(1, "tRange: [" << m_tRangeLow << "," << m_tRangeHigh << "]");
 
-    int xbin = clsInSignalRange * (m_tRangeHigh - m_tRangeLow) / (m_signalRangeHigh - m_signalRangeLow);
-    if (xbin < 1) xbin = 1;
-    if (m_applyCentralLimit) xbin *= m_factor;
-    else xbin /= m_AverageCountPerBin;
-    if (xbin < 2) xbin = 2;
+  int xbin = clsInSignalRange * (m_tRangeHigh - m_tRangeLow) / (m_signalRangeHigh - m_signalRangeLow);
+  if (xbin < 1) xbin = 1;
+  if (m_applyCentralLimit) xbin *= m_factor;
+  else xbin /= m_AverageCountPerBin;
+  if (xbin < 2) xbin = 2;
 
 
-    /** declaring histogram */
-    TH1D h_clsTime[2];
-    h_clsTime[0] = TH1D("h_clsTime_0", "h_clsTime_0", xbin, m_tRangeLow, m_tRangeHigh);
-    h_clsTime[1] = TH1D("h_clsTime_1", "h_clsTime_1", xbin, m_tRangeLow, m_tRangeHigh);
-    for (int ij = 0; ij < totClusters; ij++)
+  /** declaring histogram */
+  TH1D h_clsTime[2];
+  h_clsTime[0] = TH1D("h_clsTime_0", "h_clsTime_0", xbin, m_tRangeLow, m_tRangeHigh);
+  h_clsTime[1] = TH1D("h_clsTime_1", "h_clsTime_1", xbin, m_tRangeLow, m_tRangeHigh);
+  for (int ij = 0; ij < totClusters; ij++) {
+    if (!m_gausFill)
       h_clsTime[0].Fill(m_svdClusters[ij]->getClsTime());
-    h_clsTime[1].SetBinContent(0, h_clsTime[0].GetBinContent(0)); // underflow
-    h_clsTime[1].SetBinContent(xbin + 1, h_clsTime[0].GetBinContent(xbin + 1)); // overflow
+    else {      // if (!m_gausFill)
+      float clsSize = m_svdClusters[ij]->getSize();
+      float  gSigma = (clsSize >= int(m_clsSizeVsSigma.size()) ?
+                       m_clsSizeVsSigma.back() : m_clsSizeVsSigma[clsSize]);
+      float gCenter = m_svdClusters[ij]->getClsTime();
+      int  startBin = h_clsTime[0].FindBin(gCenter - m_fillSigmaN * gSigma);
+      int    endBin = h_clsTime[0].FindBin(gCenter + m_fillSigmaN * gSigma);
+      if (startBin < 1) startBin = 1;
+      if (endBin > xbin) endBin = xbin;
+      for (int ijx = startBin; ijx <= endBin; ijx++) {
+        float tbinc = h_clsTime[0].GetBinCenter(ijx);
+        h_clsTime[0].Fill(tbinc, TMath::Gaus(tbinc, gCenter, gSigma, true));
+      }
+    } // if (!m_gausFill)
+  }   // for (int ij = 0; ij < totClusters; ij++) {
 
-    bool currentHisto = false;
-    if (m_applyCentralLimit) {
-      double maxval = 0;
-      int counter = 0;
-      bool isWhile = true;
-      while (isWhile) {
-        for (int ij = 1; ij <= xbin; ij++) {
-          double sumc = h_clsTime[currentHisto].GetBinContent(ij);
-          double suml = (ij == 1    ? 0. : h_clsTime[currentHisto].GetBinContent(ij - 1));
-          double sumr = (ij == xbin ? 0. : h_clsTime[currentHisto].GetBinContent(ij + 1));
-          double sum = suml + sumc + sumr;
-          h_clsTime[!currentHisto].SetBinContent(ij, sum);
-          double binc = h_clsTime[currentHisto].GetBinCenter(ij);
-          if (binc > m_signalRangeLow &&
-              binc < m_signalRangeHigh &&
-              sum > maxval) maxval = sum;
-        } // for(int ij=1;ij<=xbin;ij++) {
-        currentHisto = !currentHisto;
-        counter++;
-        // if(maxval > 15. * std::pow(m_factor, 2)) isWhile = false;
-        if (counter > m_iteration) isWhile = false;
-      } // while(isWhile) {
-      // std::cout<<" counter "<<counter<<" maxval "<<maxval<<std::endl;
-
-    } else {
+  bool currentHisto = false;
+  if (m_applyCentralLimit) {
+    int counter = 0;
+    while (1) {
+      if (counter >= m_iteration) break;
       for (int ij = 1; ij <= xbin; ij++) {
         double sumc = h_clsTime[currentHisto].GetBinContent(ij);
         double suml = (ij == 1    ? 0. : h_clsTime[currentHisto].GetBinContent(ij - 1));
         double sumr = (ij == xbin ? 0. : h_clsTime[currentHisto].GetBinContent(ij + 1));
-        // possible background
-        if (sumc <= m_threshold) sumc = 0;
-        if (suml <= m_threshold) suml = 0;
-        if (sumr <= m_threshold) sumr = 0;
         double sum = suml + sumc + sumr;
         h_clsTime[!currentHisto].SetBinContent(ij, sum);
-      } // for (int ij = 1; ij <= xbin; ij++) {
+      } // for(int ij=1;ij<=xbin;ij++) {
       currentHisto = !currentHisto;
-    } // if(m_applyCentralLimit) {
+      counter++;
+    } // while(1) {
 
+  } else {
+    for (int ij = 1; ij <= xbin; ij++) {
+      double sumc = h_clsTime[currentHisto].GetBinContent(ij);
+      double suml = (ij == 1    ? 0. : h_clsTime[currentHisto].GetBinContent(ij - 1));
+      double sumr = (ij == xbin ? 0. : h_clsTime[currentHisto].GetBinContent(ij + 1));
+      // possible background
+      if (sumc <= m_threshold) sumc = 0;
+      if (suml <= m_threshold) suml = 0;
+      if (sumr <= m_threshold) sumr = 0;
+      double sum = suml + sumc + sumr;
+      h_clsTime[!currentHisto].SetBinContent(ij, sum);
+    } // for (int ij = 1; ij <= xbin; ij++) {
+    currentHisto = !currentHisto;
+  } // if(m_applyCentralLimit) {
+
+  std::vector<std::tuple<double, double, int>> groupInfo; // start, end, totCls
+  if (!m_gausFill) {
 
     /** finalized the groups */
     int groupBegin = -1; int groupEnd = -1;
-    std::vector<std::tuple<double, double, int>> groupInfo; // start, end, totCls
     for (int ij = 1; ij <= xbin; ij++) {
       double sum = h_clsTime[currentHisto].GetBinContent(ij);
       // finding group
@@ -256,6 +301,85 @@ void SVDTimeGroupComposerModule::event()
       } // for(int jk=0;jk<int(rejectedCls.size());jk++) {
       rejectedCls.resize(rejectedCount);
     } // for(int ij=0;ij<int(groupInfo.size());ij++) {
-  }   // if(totClusters > 2) {
+
+  } else {      // if (!m_gausFill) {
+
+    double maxval = 0;
+    while (1) {
+
+      int maxBin       = h_clsTime[currentHisto].GetMaximumBin();
+      double maxBinPos = h_clsTime[currentHisto].GetBinCenter(maxBin);
+      double maxBinCnt = h_clsTime[currentHisto].GetBinContent(maxBin);
+      if (maxval == 0) maxval = maxBinCnt;
+      if (maxBinCnt < maxval * m_fracThreshold) break;
+
+      TF1* ngaus = new TF1("ngaus", mygaus, m_tRangeLow, m_tRangeHigh, 3);
+      double maxPar0 = maxBinCnt * std::sqrt(2.*TMath::Pi()) * m_timeSpread;
+      ngaus->SetParameter(0, maxBinCnt); ngaus->SetParLimits(0, maxPar0 * 0.01, maxPar0 * 2.);
+      ngaus->SetParameter(1, maxBinPos); ngaus->SetParLimits(1, maxBinPos - m_timeSpread * 0.2, maxBinPos + m_timeSpread * 0.2);
+      ngaus->SetParameter(2, m_timeSpread); ngaus->SetParLimits(2, m_minSigma, m_maxSigma);
+      int status = h_clsTime[currentHisto].Fit("ngaus", "NQ0", "", maxBinPos - m_timeSpread, maxBinPos + m_timeSpread);
+      if (!status) {
+        double pars[3] = {ngaus->GetParameter(0), ngaus->GetParameter(1), std::fabs(ngaus->GetParameter(2))};
+        if (pars[2] <= m_minSigma + 0.01) break;
+        if (pars[2] >= m_maxSigma - 0.01) break;
+        if (pars[0] < maxval * std::sqrt(2.*TMath::Pi()) * pars[2] * m_fracThreshold) break;
+        // std::cout<<pars[0]<<"\t"<<pars[1]<<"\t"<<pars[2]<<std::endl;
+
+        int startBin = h_clsTime[currentHisto].FindBin(pars[1] - m_calSigmaN * pars[2]);
+        int   endBin = h_clsTime[currentHisto].FindBin(pars[1] + m_calSigmaN * pars[2]);
+        if (startBin < 1) startBin = 1;
+        if (endBin > xbin)  endBin = xbin;
+        for (int ijx = startBin; ijx <= endBin; ijx++) {
+          float tbinc = h_clsTime[currentHisto].GetBinCenter(ijx);
+          float tbincontent = h_clsTime[currentHisto].GetBinContent(ijx) - ngaus->Eval(tbinc);
+          h_clsTime[currentHisto].SetBinContent(ijx, tbincontent);
+        }
+
+
+        // print
+        double beginPos = pars[1] - m_fillSigmaN * pars[2];
+        double   endPos = pars[1] + m_fillSigmaN * pars[2];
+        if (beginPos < m_tRangeLow) beginPos = m_tRangeLow;
+        if (endPos > m_tRangeHigh)  endPos   = m_tRangeHigh;
+        groupInfo.push_back(std::make_tuple(beginPos, endPos, 1));
+        if (int(groupInfo.size()) >= m_maxGroups) break;
+      } else break;   // if(!status) {
+
+    } // while(1) {
+
+    int totGroups = int(groupInfo.size());
+    for (int ij = 0; ij < totGroups; ij++) {
+      auto beginPos = std::get<0>(groupInfo[ij]);
+      auto endPos   = std::get<1>(groupInfo[ij]);
+      B2DEBUG(1, " group " << ij
+              << " beginPos " << beginPos << " endPos " << endPos);
+      for (int jk = 0; jk < totClusters; jk++) {
+        double clsTime = m_svdClusters[jk]->getClsTime();
+        if (clsTime >= beginPos && clsTime <= endPos) {
+          m_svdClusters[jk]->getTimeGroupId().push_back(ij);
+          B2DEBUG(1, "   accepted cluster " << jk
+                  << " clsTime " << clsTime);
+        } else {
+          B2DEBUG(1, "     rejected cluster " << jk
+                  << " clsTime " << clsTime);
+          if (ij == totGroups - 1 && !int(m_svdClusters[jk]->getTimeGroupId().size())) { // leftover clusters
+            if (!m_useOnlyOneGroup &&
+                m_includeOutOfRangeClusters &&
+                clsTime < m_tRangeLow)
+              m_svdClusters[jk]->getTimeGroupId().push_back(ij + 1);       // underflow
+            else if (!m_useOnlyOneGroup &&
+                     m_includeOutOfRangeClusters &&
+                     clsTime > m_tRangeHigh)
+              m_svdClusters[jk]->getTimeGroupId().push_back(ij + 2);       // overflow
+            else
+              m_svdClusters[jk]->getTimeGroupId().push_back(-1);           // orphan
+            B2DEBUG(1, "     leftover cluster " << jk
+                    << " GroupId " << m_svdClusters[jk]->getTimeGroupId().back());
+          }
+        }
+      } // for (int jk = 0; jk < totClusters; jk++) {
+    } // for (int ij = 0; ij < totGroups; ij++) {
+  } // if (!m_gausFill) {
 }
 

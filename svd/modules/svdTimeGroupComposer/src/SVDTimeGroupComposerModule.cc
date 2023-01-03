@@ -70,6 +70,9 @@ SVDTimeGroupComposerModule::SVDTimeGroupComposerModule() :
   addParam("calSigmaN", m_calSigmaN,
            "Evaluate gauss upto N sigma.",
            double(5.));
+  addParam("accSigmaN", m_accSigmaN,
+           "Accept hits upto N sigma.",
+           double(3.));
   addParam("fracThreshold", m_fracThreshold,
            "Do not fit bellow this threshold.",
            double(0.01));
@@ -336,8 +339,8 @@ void SVDTimeGroupComposerModule::event()
 
 
         // print
-        double beginPos = pars[1] - m_fillSigmaN * pars[2];
-        double   endPos = pars[1] + m_fillSigmaN * pars[2];
+        double beginPos = pars[1] - m_accSigmaN * pars[2];
+        double   endPos = pars[1] + m_accSigmaN * pars[2];
         if (beginPos < m_tRangeLow) beginPos = m_tRangeLow;
         if (endPos > m_tRangeHigh)  endPos   = m_tRangeHigh;
         groupInfo.push_back(std::make_tuple(beginPos, endPos, 1));

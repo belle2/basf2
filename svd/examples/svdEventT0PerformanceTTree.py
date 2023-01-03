@@ -61,7 +61,7 @@ if args.isMC:
     # options for simulation:
     # expList = [1003]
     expList = [0]
-    numEvents = 20
+    numEvents = 10
     bkgFiles = get_background_files()  # Phase3 background
     # bkgFiles = None  # uncomment to remove  background
     simulateJitter = False

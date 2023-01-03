@@ -68,6 +68,7 @@ namespace Belle2 {
     bool   m_gausFill           = true;
     double m_fillSigmaN         = 3.;
     double m_calSigmaN          = 5.;
+    double m_accSigmaN          = 3.;
     double m_fracThreshold      = 0.01;
     double m_minSigma           = 1.;
     double m_maxSigma           = 15.;

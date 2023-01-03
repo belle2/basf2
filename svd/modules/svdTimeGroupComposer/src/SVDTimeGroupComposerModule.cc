@@ -232,8 +232,6 @@ void SVDTimeGroupComposerModule::event()
         groupBegin = groupEnd = -1; // reset for new group
       }
     }
-    double underflow = h_clsTime[currentHisto].GetBinContent(0);
-    double overflow  = h_clsTime[currentHisto].GetBinContent(xbin + 1);
 
     // sorting groups in descending cluster-counts or distance from zero
     // this should help speed up the next process
@@ -284,11 +282,11 @@ void SVDTimeGroupComposerModule::event()
           if (ij == totGroups - 1) {                              // leftover clusters
             if (!m_useOnlyOneGroup &&
                 m_includeOutOfRangeClusters &&
-                clsTime < m_tRangeLow && underflow > 1)
+                clsTime < m_tRangeLow)
               m_svdClusters[place]->getTimeGroupId().push_back(ij + 1);       // underflow
             else if (!m_useOnlyOneGroup &&
                      m_includeOutOfRangeClusters &&
-                     clsTime > m_tRangeHigh && overflow > 1)
+                     clsTime > m_tRangeHigh)
               m_svdClusters[place]->getTimeGroupId().push_back(ij + 2);       // overflow
             else
               m_svdClusters[place]->getTimeGroupId().push_back(-1);           // orphan

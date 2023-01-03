@@ -89,7 +89,7 @@ namespace Belle2 {
     /**
     * function to draw dE/dx for inner/outer layer
     */
-    void plotLayerDist(TH1D*& hdedxIL, TH1D*& hdedxOL);
+    void plotLayerDist(TH1D* hdedxL[2]);
 
     /**
     * function to draw dE/dx histograms for each wire

@@ -9,20 +9,18 @@
 
 #include <TObject.h>
 #include <string>
-#include <iostream>
-using namespace std;
 
 namespace Belle2 {
   /** Class for the MVA filter payloads. */
-  class TrackingMVAFilterPayloads : public TObject {
+  class BaseTrackingMVAFilterPayload : public TObject {
   public:
     /** Default constructor */
-    TrackingMVAFilterPayloads() : m_cutValue(-1.), m_weightFileIdentifier("") {}
+    BaseTrackingMVAFilterPayload() : m_cutValue(-1.), m_weightFileIdentifier("") {}
 
     //    cout << "BaseMVAPayloadParameters.h 0 " << endl;
 
     /** Destructor */
-    ~TrackingMVAFilterPayloads() {}
+    ~BaseTrackingMVAFilterPayload() {}
 
     /** Set the MVA filter cut value (-1 if not used) */
     void setCutValue(const double cutValue)
@@ -54,6 +52,6 @@ namespace Belle2 {
     /** Name of the MVA weightfile */
     std::string m_weightFileIdentifier;
 
-    ClassDef(TrackingMVAFilterPayloads, 1);  /**< ClassDef, necessary for ROOT */
+    ClassDef(BaseTrackingMVAFilterPayload, 1);  /**< ClassDef, necessary for ROOT */
   };
 }

@@ -9,4 +9,7 @@
 #pragma link C++ class Belle2::TrackFitMomentumRange+; // checksum=0x8f6de621, version=1
 #pragma link C++ class Belle2::TrackFlippingCuts+; // checksum=0x57cfa387, version=1
 
+// Tracking MVAFilter payloads
+#pragma link C++ class Belle2::BaseTrackingMVAFilterPayload+; // checksum=0xa8a5567a, version=1
+
 #endif

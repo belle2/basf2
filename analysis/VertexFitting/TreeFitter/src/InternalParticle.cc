@@ -129,9 +129,9 @@ namespace TreeFitter {
         double flt1(0), flt2(0);
         HelixUtils::helixPoca(helix1, helix2, flt1, flt2, v, m_isconversion);
 
-        fitparams.getStateVector()(posindex)     = v.x();
-        fitparams.getStateVector()(posindex + 1) = v.y();
-        fitparams.getStateVector()(posindex + 2) = v.z();
+        fitparams.getStateVector()(posindex)     = v.X();
+        fitparams.getStateVector()(posindex + 1) = v.Y();
+        fitparams.getStateVector()(posindex + 2) = v.Z();
 
         dau1->setFlightLength(flt1);
         dau2->setFlightLength(flt2);
@@ -184,7 +184,7 @@ namespace TreeFitter {
       fitparams.getStateVector().segment(momindex, maxrow) += fitparams.getStateVector().segment(daumomindex, maxrow);
 
       if (maxrow == 3) {
-        double mass = daughter->pdgMass();
+        double mass = daughter->particle()->getPDGMass();
         fitparams.getStateVector()(momindex + 3) += std::sqrt(e2 + mass * mass);
       }
     }
@@ -229,7 +229,7 @@ namespace TreeFitter {
         // m^2 + p^2 = E^2
         // so
         // E = sqrt(m^2 + p^2)
-        const double mass = daughter->pdgMass();
+        const double mass = daughter->particle()->getPDGMass();
         const double p2 = p3_vec.squaredNorm();
         const double energy = std::sqrt(mass * mass + p2);
         p.getResiduals()(3) -= energy;

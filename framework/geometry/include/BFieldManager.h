@@ -9,8 +9,8 @@
 #pragma once
 
 #include <vector>
+#include <Math/Vector3D.h>
 #include <framework/logging/Logger.h>
-#include <framework/geometry/B2Vector3.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/dbobjects/MagneticField.h>
@@ -33,29 +33,20 @@ namespace Belle2 {
      */
     static void getField(const double* pos, double* field);
     /** return the magnetic field at a given position.
-     * @param pos position where to evaluate the magnetic field
-     * @returns magnetic field value at position pos in framework units
-     */
-    static TVector3 getField(const TVector3& pos)
-    {
-      return getField(B2Vector3D(pos)).GetTVector3();
-    }
-
-    /** return the magnetic field at a given position.
      * @param x x coordinate of the position where to evaluate the magnetic field
      * @param y y coordinate of the position where to evaluate the magnetic field
      * @param z z coordinate of the position where to evaluate the magnetic field
      * @returns magnetic field value at position pos in framework units
      */
-    static B2Vector3D getField(double x, double y, double z)
+    static ROOT::Math::XYZVector getField(double x, double y, double z)
     {
-      return getField(B2Vector3D(x, y, z));
+      return getField(ROOT::Math::XYZVector(x, y, z));
     }
     /** return the magnetic field at a given position.
      * @param pos position where to evaluate the magnetic field
      * @returns magnetic field value at position pos in framework units
      */
-    static B2Vector3D getField(const B2Vector3D& pos)
+    static ROOT::Math::XYZVector getField(const ROOT::Math::XYZVector& pos)
     {
       return BFieldManager::getInstance().calculate(pos);
     }
@@ -63,7 +54,7 @@ namespace Belle2 {
      * @param pos position where to evaluate the magnetic field
      * @returns magnetic field value at position pos in Tesla
      */
-    static B2Vector3D getFieldInTesla(const B2Vector3D& pos)
+    static ROOT::Math::XYZVector getFieldInTesla(const ROOT::Math::XYZVector& pos)
     {
       return getField(pos) / Unit::T;
     }
@@ -82,12 +73,12 @@ namespace Belle2 {
      * @param pos position where to evaluate the magnetic field
      * @returns magnetic field value at position pos
      */
-    B2Vector3D calculate(const B2Vector3D& pos) const;
+    ROOT::Math::XYZVector calculate(const ROOT::Math::XYZVector& pos) const;
     /** Pointer to the actual magnetic field in the database */
     DBObjPtr<MagneticField> m_magfield;
   };
 
-  inline B2Vector3D BFieldManager::calculate(const B2Vector3D& pos) const
+  inline ROOT::Math::XYZVector BFieldManager::calculate(const ROOT::Math::XYZVector& pos) const
   {
     if (!m_magfield) B2FATAL("Could not load magnetic field configuration from database");
     return m_magfield->getField(pos);
@@ -95,7 +86,9 @@ namespace Belle2 {
 
   inline void BFieldManager::getField(const double* pos, double* field)
   {
-    B2Vector3D fieldvec = getField(B2Vector3D(pos));
-    fieldvec.GetXYZ(field);
+    ROOT::Math::XYZVector fieldvec = getField(ROOT::Math::XYZVector(pos[0], pos[1], pos[2]));
+    field[0] = fieldvec.X();
+    field[1] = fieldvec.Y();
+    field[2] = fieldvec.Z();
   }
 }

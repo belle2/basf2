@@ -291,9 +291,7 @@ void PXDDigitizerModule::event()
 
     VxdID sensorID = m_currentHit->getSensorID();
     if (!m_currentSensorInfo || sensorID != m_currentSensorInfo->getID()) {
-      m_currentSensorInfo =
-        dynamic_cast<const SensorInfo*>(&VXD::GeoCache::get(
-                                          sensorID));
+      m_currentSensorInfo = dynamic_cast<const SensorInfo*>(&VXD::GeoCache::get(sensorID));
       if (!m_currentSensorInfo)
         B2FATAL(
           "SensorInformation for Sensor " << sensorID << " not found, make sure that the geometry is set up correctly");
@@ -336,9 +334,9 @@ void PXDDigitizerModule::processHit()
     float currentHitTime = m_currentHit->getGlobalTime();
 
     // First we have to now the current hit gate
-    const TVector3 startPoint = m_currentHit->getPosIn();
-    const TVector3 stopPoint = m_currentHit->getPosOut();
-    auto row = m_currentSensorInfo->getVCellID(0.5 * (stopPoint.y() + startPoint.y()));
+    const ROOT::Math::XYZVector startPoint = m_currentHit->getPosIn();
+    const ROOT::Math::XYZVector stopPoint = m_currentHit->getPosOut();
+    auto row = m_currentSensorInfo->getVCellID(0.5 * (stopPoint.Y() + startPoint.Y()));
 
     if (m_currentSensorInfo->getID().getLayerNumber() == 1)
       row  = 767 - row;
@@ -382,11 +380,11 @@ void PXDDigitizerModule::processHit()
   }
 
   //Get step length and direction
-  const TVector3 startPoint = m_currentHit->getPosIn();
-  TVector3 stopPoint = m_currentHit->getPosOut();
-  double dx = stopPoint.x() - startPoint.x();
-  double dy = stopPoint.y() - startPoint.y();
-  double dz = stopPoint.z() - startPoint.z();
+  const ROOT::Math::XYZVector startPoint = m_currentHit->getPosIn();
+  ROOT::Math::XYZVector stopPoint = m_currentHit->getPosOut();
+  double dx = stopPoint.X() - startPoint.X();
+  double dy = stopPoint.Y() - startPoint.Y();
+  double dz = stopPoint.Z() - startPoint.Z();
   double trackLength2 = dx * dx + dy * dy + dz * dz;
 
   // Set magnetic field to save calls to getBField()
@@ -411,7 +409,7 @@ void PXDDigitizerModule::processHit()
       std::tie(lastFraction, lastElectrons) = segment;
 
       //And drift charge from that position
-      stopPoint.SetXYZ(startPoint.x() + f * dx, startPoint.y() + f * dy, startPoint.z() + f * dz);
+      stopPoint.SetXYZ(startPoint.X() + f * dx, startPoint.Y() + f * dy, startPoint.Z() + f * dz);
       driftCharge(stopPoint, e);
     }
   }
@@ -422,7 +420,7 @@ inline double pol3(double x, const double* c)
   return c[0] + x * (c[1] + x * (c[2] + x * c[3]));
 };
 
-void PXDDigitizerModule::driftCharge(const TVector3& r, double electrons)
+void PXDDigitizerModule::driftCharge(const ROOT::Math::XYZVector& r, double electrons)
 {
   //Get references to current sensor/info for ease of use
   const SensorInfo& info = *m_currentSensorInfo;
@@ -435,7 +433,7 @@ void PXDDigitizerModule::driftCharge(const TVector3& r, double electrons)
 
   double dz = 0.5 * info.getThickness() - info.getGateDepth() - r.Z(), adz = fabs(dz);
 
-  double dx = fabs(m_currentBField.y()) > Unit::T ? copysign(pol3(adz, cx),
+  double dx = fabs(m_currentBField.Y()) > Unit::T ? copysign(pol3(adz, cx),
                                                              dz) : 0; // two configurations: with default B field (B~1.5T) and B=0T
   double sigmaDrift_u = pol3(adz, cu);
   double sigmaDrift_v = pol3(adz, cv);
@@ -446,8 +444,8 @@ void PXDDigitizerModule::driftCharge(const TVector3& r, double electrons)
   double groupCharge = electrons / nGroups;
   while (nGroups--) {
     double du = gRandom->Gaus(0.0, sigmaDrift_u), dv = gRandom->Gaus(0.0, sigmaDrift_v);
-    double uPos = r.x() + du + dx;
-    double vPos = r.y() + dv;
+    double uPos = r.X() + du + dx;
+    double vPos = r.Y() + dv;
     int step = 0;
     for (; step < m_elMaxSteps; ++step) {
       int id = info.getTrappedID(uPos, vPos);

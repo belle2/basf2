@@ -23,7 +23,9 @@
 
 #include <algorithm>
 #include <TMatrixFSym.h>
+#include <Math/Vector3D.h>
 #include <Math/Vector4D.h>
+#include <Math/VectorUtil.h>
 
 #include <vector>
 
@@ -126,9 +128,9 @@ void BelleBremRecoveryModule::event()
     for (unsigned j = 0; j < nGam; j++) {
       Particle* gamma = m_gammaList->getParticle(j);
       // get angle (in lab system)
-      B2Vector3D pi = lepton->getMomentum();
-      B2Vector3D pj = gamma->getMomentum();
-      double angle = (pi.Angle(pj));
+      ROOT::Math::XYZVector pi = lepton->getMomentum();
+      ROOT::Math::XYZVector pj = gamma->getMomentum();
+      double angle = ROOT::Math::VectorUtil::Angle(pi, pj);
       //Instead of first-come-first-serve, serve all charged particle equally.
       // https://indico.belle2.org/event/946/contributions/4007/attachments/1946/2967/SCunliffe190827.pdf
       if (m_angleThres > angle) {

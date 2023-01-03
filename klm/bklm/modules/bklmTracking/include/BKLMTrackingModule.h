@@ -70,6 +70,18 @@ namespace Belle2 {
     //! angle required between RecoTrack and BKLMTrack, if openangle is larger than m_maxAngleRequired, they don't match
     double m_maxAngleRequired = 10;
 
+    //! maximum distance required between track and KLMHit2d to be accepted for efficiency calculation
+    double m_maxDistance = 10;
+
+    //! maximum sigma for hit acceptance during efficiency calculation
+    double m_maxSigma = 5;
+
+    //! minimum number of hits in sector for track finder to run (-2 from initial seed)
+    unsigned int m_minHitList = 2;
+
+    //! max number of hits in sector for track finder to run
+    unsigned int m_maxHitList = 60;
+
     //! do the BKLMTrack fitting in global system (multi-sectors track) or local system (sector by sector)
     bool m_globalFit;
 

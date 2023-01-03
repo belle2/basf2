@@ -878,7 +878,7 @@ EXCLUDE                = externals \
                          generators/kkmc/tauola \
                          generators/koralw/koralw \
                          generators/madgraph/models/ALP_UFO \
-                         generators/madgraph/models/darkphoton \
+                         generators/madgraph/models/Dark_photon_UFO \
                          generators/madgraph/models/Lmu_minus_Ltau_UFO \
                          generators/phokhara/phokhara \
                          generators/teegg/teegg \

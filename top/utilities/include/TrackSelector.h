@@ -11,7 +11,8 @@
 #include <top/reconstruction_cpp/TOPTrack.h>
 #include <framework/gearbox/Const.h>
 #include <string>
-#include <TVector3.h>
+#include <Math/Vector3D.h>
+#include <Math/Point3D.h>
 
 namespace Belle2 {
   namespace TOP {
@@ -130,13 +131,13 @@ namespace Belle2 {
        * Returns position of POCA of the track in last isSelected call
        * @return POCA if track is selected, otherwise undefined
        */
-      const TVector3& getPOCAPosition() const {return m_pocaPosition;}
+      const ROOT::Math::XYZVector& getPOCAPosition() const {return m_pocaPosition;}
 
       /**
        * Returns momentum vector at POCA of the track in last isSelected call
        * @return momentum vector if track is selected, otherwise undefined
        */
-      const TVector3& getPOCAMomentum() const {return m_pocaMomentum;}
+      const ROOT::Math::XYZVector& getPOCAMomentum() const {return m_pocaMomentum;}
 
       /**
        * Returns c.m.s energy of the track in last isSelected call
@@ -148,13 +149,13 @@ namespace Belle2 {
        * Returns position at TOP in local frame of the track in last isSelected call
        * @return position in local frame if track is selected, otherwise undefined
        */
-      const TVector3& getLocalPosition() const {return m_localPosition;}
+      const ROOT::Math::XYZPoint& getLocalPosition() const {return m_localPosition;}
 
       /**
        * Returns momentum at TOP in local frame of the track in last isSelected call
        * @return momentum vector in local frame if track is selected, otherwise undefined
        */
-      const TVector3& getLocalMomentum() const {return m_localMomentum;}
+      const ROOT::Math::XYZVector& getLocalMomentum() const {return m_localMomentum;}
 
       /**
        * Returns selection status
@@ -176,11 +177,11 @@ namespace Belle2 {
       Const::ChargedStable m_chargedStable = Const::muon; /**< track hypothesis */
 
       /* cache for track parameters */
-      mutable TVector3 m_pocaPosition; /**< position of POCA */
-      mutable TVector3 m_pocaMomentum; /**< momentum at POCA */
+      mutable ROOT::Math::XYZVector m_pocaPosition; /**< position of POCA */
+      mutable ROOT::Math::XYZVector m_pocaMomentum; /**< momentum at POCA */
       mutable double m_cmsEnergy = 0;  /**< c.m.s. energy of track */
-      mutable TVector3 m_localPosition; /**< position at TOP in local (module) frame */
-      mutable TVector3 m_localMomentum; /**< momentum at TOP in local (module) frame */
+      mutable ROOT::Math::XYZPoint m_localPosition; /**< position at TOP in local (module) frame */
+      mutable ROOT::Math::XYZVector m_localMomentum; /**< momentum at TOP in local (module) frame */
 
     };
 

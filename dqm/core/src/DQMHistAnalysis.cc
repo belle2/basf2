@@ -199,6 +199,15 @@ MonitoringObject* DQMHistAnalysisModule::findMonitoringObject(const std::string&
   return NULL;
 }
 
+double DQMHistAnalysisModule::getSigma68(TH1* h) const
+{
+  double probs[2] = {0.16, 1 - 0.16};
+  double quant[2] = {0, 0};
+  h->GetQuantiles(2, quant, probs);
+  const double sigma68 = (-quant[0] + quant[1]) / 2;
+  return sigma68;
+}
+
 std::vector <std::string> DQMHistAnalysisModule::StringSplit(const std::string& in, const char delim)
 {
   std::vector <std::string> out;

@@ -96,7 +96,7 @@ void TeeggInputModule::event()
   ROOT::Math::LorentzRotation boost = initial.getCMSToLab();
 
   // vertex
-  TVector3 vertex = initial.getVertex();
+  ROOT::Math::XYZVector vertex = initial.getVertex();
 
   m_generator.generateEvent(m_mcGraph, vertex, boost);
   m_mcGraph.generateList("", MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);

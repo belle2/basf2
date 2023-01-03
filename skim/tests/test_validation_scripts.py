@@ -23,6 +23,12 @@ import multiprocessing as mp
 from concurrent.futures import ProcessPoolExecutor
 
 
+# Skip this test for light releases.
+b2u.skip_test_if_light()
+# And skip also if the validation folder is not available
+b2u.require_file('mdst14.root', 'validation')
+
+
 def arg_parser():
     '''
     A very simple argument parser.

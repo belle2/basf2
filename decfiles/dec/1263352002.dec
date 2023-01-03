@@ -1,14 +1,14 @@
 # EventType: 1263352002
-# Descriptor: [B- -> [D**0 -> [D*+(D*0) -> [D0 -> K- pi+ (K- pi+ pi0) (K- pi+ pi+ pi-)] pi+]] [tau -> l nu nu] nu]cc
+# Descriptor: [B- -> [D**0 -> [D*+(D*0) -> [D0 -> K- pi+ (K- pi+ pi0)] pi+(pi0)(gamma)] pi-] [tau -> l nu nu] nu]cc
 # NickName: Bu_Dstst0taunu
-# Documentation: B- -> D**0 tau nu, D**0 -> (D*+)(D*0) -> D0 pi+(pi0)(gamma), D*0 ->  D0 -> K- pi+ (K- pi+ pi0) (K- pi+ pi+ pi-), tau -> e(mu) nu nu, background mode for inclusive tagging R(D(*))
+# Documentation: B- -> D**0 tau nu, D**0 -> (D*+)(D*0) -> D0 pi+(pi0)(gamma), D*0 ->  D0 -> K- pi+ (K- pi+ pi0), tau -> e(mu) nu nu, background mode for inclusive tagging R(D(*))
 # Dominant channel: B- -> D'_10(-> D*+(-> D0(-> K- pi+ pi0) pi+) pi-) tau-(-> l- nu anti-nu) anti-nu
 # Tested: Yes
 # PhysicsWG: SL
 # Responsible: Tia Crane
 # Email: tcrane@hawaii.edu 
 # Cuts: None
-# Date: 20220914
+# Date: 20221012
 
 Alias D_10sig D_10
 Alias anti-D_10sig anti-D_10
@@ -29,73 +29,72 @@ ChargeConj D_2*0sig anti-D_2*0sig
 yesPhotos
 
 Decay Upsilon(4S)
-0.5 B+ B-sig VSS;
-0.5 B- B+sig VSS;
+0.5            B+ B-sig                                          VSS;
+0.5            B- B+sig                                          VSS;
 Enddecay
 
 Decay B-sig
-0.001300000   D_10sig  tau-sig  anti-nu_tau                      LLSW 0.71 -1.6 -0.5 2.9;
-0.001300000   D_0*0sig  tau-sig  anti-nu_tau                     LLSW 0.68 -0.2 0.3;
-0.002000000   D'_10sig  tau-sig  anti-nu_tau                     LLSW 0.68 -0.2 0.3;
-0.002000000   D_2*0sig  tau-sig  anti-nu_tau                     LLSW 0.71 -1.6 -0.5 2.9;
+0.001300000    D_10sig  tau-sig  anti-nu_tau                     LLSW 0.71 -1.6 -0.5 2.9;
+0.001300000    D_0*0sig  tau-sig  anti-nu_tau                    LLSW 0.68 -0.2 0.3;
+0.002000000    D'_10sig  tau-sig  anti-nu_tau                    LLSW 0.68 -0.2 0.3;
+0.002000000    D_2*0sig  tau-sig  anti-nu_tau                    LLSW 0.71 -1.6 -0.5 2.9;
 Enddecay
 CDecay B+sig
 
 
 Decay D_10sig
-0.199700000   D*0sig  pi0                                     VVS_PWAVE  0.0 0.0 0.0 0.0 1.0 0.0;
-0.399400000   D*+sig  pi-                                     VVS_PWAVE  0.0 0.0 0.0 0.0 1.0 0.0;
-0.171900000   D0sig  pi+  pi-                                 PHSP;
-0.114500000   D0sig  pi0  pi0                                 PHSP;
+0.199700000    D*0sig  pi0                                       VVS_PWAVE  0.0 0.0 0.0 0.0 1.0 0.0;
+0.399400000    D*+sig  pi-                                       VVS_PWAVE  0.0 0.0 0.0 0.0 1.0 0.0;
+0.171900000    D0sig  pi+  pi-                                   PHSP;
+0.114500000    D0sig  pi0  pi0                                   PHSP;
 Enddecay
 CDecay anti-D_10sig
 
 
 Decay D_0*0sig
-1.0   D0sig  pi0                                      PHSP;
+1.0            D0sig  pi0                                        PHSP;
 Enddecay
 CDecay anti-D_0*0sig
 
 
 Decay D'_10sig
-0.666700000   D*+sig  pi-                                     VVS_PWAVE  1.0 0.0 0.0 0.0 0.0 0.0;
-0.333300000   D*0sig  pi0                                     VVS_PWAVE  1.0 0.0 0.0 0.0 0.0 0.0;
+0.666700000    D*+sig  pi-                                       VVS_PWAVE  1.0 0.0 0.0 0.0 0.0 0.0;
+0.333300000    D*0sig  pi0                                       VVS_PWAVE  1.0 0.0 0.0 0.0 0.0 0.0;
 Enddecay
 CDecay anti-D'_10sig
 
 
 Decay D_2*0sig
-0.133400000   D*0sig  pi0                                     TVS_PWAVE  0.0 0.0 1.0 0.0 0.0 0.0;
-0.266900000   D*+sig  pi-                                     TVS_PWAVE  0.0 0.0 1.0 0.0 0.0 0.0;
-0.199900000   D0sig  pi0                                      TSS;
+0.133400000    D*0sig  pi0                                       TVS_PWAVE  0.0 0.0 1.0 0.0 0.0 0.0;
+0.266900000    D*+sig  pi-                                       TVS_PWAVE  0.0 0.0 1.0 0.0 0.0 0.0;
+0.199900000    D0sig  pi0                                        TSS;
 Enddecay
 CDecay anti-D_2*0sig
 
 
 Decay D*0sig
-0.647000000   D0sig  pi0                                      VSS;
-0.353000000   D0sig  gamma                                    VSP_PWAVE;
+0.647000000    D0sig  pi0                                        VSS;
+0.353000000    D0sig  gamma                                      VSP_PWAVE;
 Enddecay
 CDecay anti-D*0sig
 
 
 Decay D*+sig
-1.0   D0sig  pi+                                      VSS;
+1.0            D0sig  pi+                                        VSS;
 Enddecay
 CDecay D*-sig
 
 
 Decay D0sig
-0.039500000   K-  pi+                                      PHSP;
-0.144000000   K-  pi+  pi0                                 D_DALITZ;
-0.008800000   K-  pi+  pi+  pi-                            PHSP;
+0.039500000    K-  pi+                                           PHSP;
+0.144000000    K-  pi+  pi0                                      D_DALITZ;
 Enddecay
 CDecay anti-D0sig
 
 
 Decay tau-sig
-0.178175 e-           anti-nu_e      nu_tau TAULNUNU;
-0.173937 mu-          anti-nu_mu     nu_tau TAULNUNU;
+0.178175       e-           anti-nu_e      nu_tau                TAULNUNU;
+0.173937       mu-          anti-nu_mu     nu_tau                TAULNUNU;
 Enddecay
 CDecay tau+sig
 

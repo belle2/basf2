@@ -6,11 +6,11 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-
 #pragma once
+
+#include <framework/geometry/B2Vector3.h>
 #include <vector>
 #include <tuple>
-#include <TVector3.h>
 #include <Eigen/Dense>
 
 //If compiled within BASF2
@@ -23,7 +23,7 @@
 namespace Belle2::InvariantMassBhadCalib {
 
   static const double realNaN = std::numeric_limits<double>::quiet_NaN();
-  static const TVector3 vecNaN(realNaN, realNaN, realNaN);
+  static const B2Vector3D vecNaN(realNaN, realNaN, realNaN);
 
 
   /** structure containing variables relevant to the B-candidate */

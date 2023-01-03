@@ -125,36 +125,36 @@ namespace Belle2 {
     TMatrixDSym rawHitCovariance(1);
 
     // Copy the information from the current state
-    const TVector3& statePosition(state.getPos());
-    const TVector3& stateMomentum(state.getMom());
+    const B2Vector3D& statePosition(state.getPos());
+    const B2Vector3D& stateMomentum(state.getMom());
     short stateCharge = state.getCharge();
 
 
     // Copy the information from the reco track.
-    const TVector3& trackPosition(m_recoTrack->getPositionSeed());
-    const TVector3& trackMomentum(m_recoTrack->getMomentumSeed());
+    const B2Vector3D& trackPosition(m_recoTrack->getPositionSeed());
+    const B2Vector3D& trackMomentum(m_recoTrack->getMomentumSeed());
     short trackCharge = m_recoTrack->getChargeSeed();
 
     // Copy the information from the mc particle (if there is one)
     MCParticle* relatedMCParticle = m_hit->template getRelated<MCParticle>("MCParticles");
 
-    TVector3 mcMomentum;
-    TVector3 mcPosition;
+    ROOT::Math::XYZVector mcMomentum;
+    ROOT::Math::XYZVector mcPosition;
     short mcCharge;
 
     if (relatedMCParticle == nullptr) {
-      mcMomentum = trackMomentum;
-      mcPosition = trackPosition;
+      mcMomentum = ROOT::Math::XYZVector(trackMomentum);
+      mcPosition = ROOT::Math::XYZVector(trackPosition);
       mcCharge = trackCharge;
     } else {
       mcMomentum = relatedMCParticle->getMomentum();
-      mcPosition = B2Vector3D(relatedMCParticle->getProductionVertex());
+      mcPosition = relatedMCParticle->getProductionVertex();
       mcCharge = relatedMCParticle->getCharge();
     }
 
     // Copy information from the mc hit
-    const TVector3& hitMCMomentum = momentumEstimationTools.getEntryMomentumOfMCParticle(*m_hit);
-    const TVector3& hitMCPosition = momentumEstimationTools.getEntryPositionOfMCParticle(*m_hit);
+    const ROOT::Math::XYZVector& hitMCMomentum = momentumEstimationTools.getEntryMomentumOfMCParticle(*m_hit);
+    const ROOT::Math::XYZVector& hitMCPosition = momentumEstimationTools.getEntryPositionOfMCParticle(*m_hit);
 
 
     if (m_useThickness) {
@@ -168,7 +168,8 @@ namespace Belle2 {
                                                                   m_correctionFitParameters);
 
         } else {
-          rawHitCoordinates(0) = momentumEstimator.estimateQOverP(*m_hit, trackMomentum, trackPosition, trackCharge,
+          rawHitCoordinates(0) = momentumEstimator.estimateQOverP(*m_hit, ROOT::Math::XYZVector(trackMomentum),
+                                                                  ROOT::Math::XYZVector(trackPosition), trackCharge,
                                                                   m_fitParameters,
                                                                   m_correctionFitParameters);
         }
@@ -178,7 +179,8 @@ namespace Belle2 {
                                                                   m_fitParameters,
                                                                   m_correctionFitParameters);
         } else {
-          rawHitCoordinates(0) = momentumEstimator.estimateQOverP(*m_hit, stateMomentum, statePosition, stateCharge,
+          rawHitCoordinates(0) = momentumEstimator.estimateQOverP(*m_hit, ROOT::Math::XYZVector(stateMomentum),
+                                                                  ROOT::Math::XYZVector(statePosition), stateCharge,
                                                                   m_fitParameters,
                                                                   m_correctionFitParameters);
         }

@@ -98,7 +98,7 @@ void TrackLoader::apply(std::vector<RecoTrack*>& seeds)
   }
 
   const auto hasLowPt = [this](const auto & track) {
-    return track->getMomentumSeed().Pt() < m_param_minimalPtRequirement;
+    return track->getMomentumSeed().Rho() < m_param_minimalPtRequirement;
   };
   TrackFindingCDC::erase_remove_if(seeds, hasLowPt);
 

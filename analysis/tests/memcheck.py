@@ -17,7 +17,8 @@ skip_test_if_light()  # light builds don't contain simulation, reconstruction et
 
 from basf2 import set_random_seed, set_log_level, LogLevel, create_path, Module, find_file, process, statistics, conditions
 from simulation import add_simulation
-from reconstruction import add_reconstruction, add_mdst_output
+from reconstruction import add_reconstruction
+from mdst import add_mdst_output
 from ROOT import Belle2
 from modularAnalysis import reconstructDecay, rankByHighest, buildRestOfEvent, buildContinuumSuppression, matchMCTruth, \
     variablesToNtuple, getAnalysisGlobaltag

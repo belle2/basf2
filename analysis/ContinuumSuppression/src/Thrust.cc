@@ -94,7 +94,7 @@ XYZVector Thrust::calculateThrust(const std::vector<XYZVector>& momenta)
 
   for (auto const& mom : momenta) {
     // By convention, thrust axis in same direction as Z axis
-    trial_axis = (mom.z() >= 0.) ? XYZVector(mom) : XYZVector(-mom);
+    trial_axis = (mom.Z() >= 0.) ? XYZVector(mom) : XYZVector(-mom);
 
     // Normalize if magnitude != 0
     trial_axis = trial_axis.Unit();

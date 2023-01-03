@@ -75,9 +75,6 @@ namespace Belle2 {
       /** Maximum permissible hit time based on overflow of LeCroy 1877 TDC. */
       double m_HitTimeMax;
 
-      /** All hits with time large than m_ThresholdHitTime will be dropped. */
-      double m_ThresholdHitTime;
-
       /** Section depth. */
       static constexpr int m_DepthSection = 2;
 

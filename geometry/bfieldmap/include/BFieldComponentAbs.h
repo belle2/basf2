@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <framework/geometry/B2Vector3.h>
+#include <Math/Vector3D.h>
 
 namespace Belle2 {
 
@@ -52,7 +52,7 @@ namespace Belle2 {
      * @param point The space point in Cartesian coordinates (x,y,z) in [cm] at which the magnetic field vector should be calculated.
      * @return The magnetic field vector at the given space point in [T]. Return a zero vector TVector(0,0,0) if the space point lies outside the region described by the component.
      */
-    virtual B2Vector3D calculate(const B2Vector3D& point) const = 0;
+    virtual ROOT::Math::XYZVector calculate(const ROOT::Math::XYZVector& point) const = 0;
 
     /**
      * Terminates the magnetic field component.

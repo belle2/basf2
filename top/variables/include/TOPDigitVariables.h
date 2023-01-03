@@ -10,8 +10,9 @@
 
 #include <analysis/VariableManager/Manager.h>
 #include <vector>
+#include <Math/Vector3D.h>
+#include <Math/Point3D.h>
 
-class TVector3;
 namespace Belle2 {
   class Particle;
   class TOPLikelihood;
@@ -92,7 +93,7 @@ namespace Belle2 {
        * @param result local position if the return value is true
        * @return true on success
        */
-      bool getLocalPosition(const Particle* particle, TVector3& result);
+      bool getLocalPosition(const Particle* particle, ROOT::Math::XYZPoint& result);
 
       /**
        * Returns the X coordinate of the particle entry point to the TOP in the local frame
@@ -128,7 +129,7 @@ namespace Belle2 {
        * @param result local position if the return value is true
        * @return true on success
        */
-      bool getLocalPositionMCMatch(const Particle* particle, TVector3& result);
+      bool getLocalPositionMCMatch(const Particle* particle, ROOT::Math::XYZPoint& result);
 
       /**
        * Returns the X coordinate of the matched MC particle entry point to the TOP in the local frame.
@@ -164,7 +165,7 @@ namespace Belle2 {
        * @param result local position if the return value is true
        * @return true on success
        */
-      bool getLocalMomentum(const Particle* particle, TVector3& result);
+      bool getLocalMomentum(const Particle* particle, ROOT::Math::XYZVector& result);
 
       /**
        * Returns the momentum azimuthal angle in the local frame of the particle at entry point to the TOP.
@@ -191,7 +192,7 @@ namespace Belle2 {
        * @param result local momentum vector if the return value is true
        * @return true on success
        */
-      bool getLocalMomentumMCMatch(const Particle* particle, TVector3& result);
+      bool getLocalMomentumMCMatch(const Particle* particle, ROOT::Math::XYZVector& result);
 
       /**
        * Returns the momentum azimuthal angle in the local frame of the matched MC particle at entry point to the TOP.

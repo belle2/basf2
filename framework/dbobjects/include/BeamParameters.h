@@ -145,7 +145,7 @@ namespace Belle2 {
      * @param vertex vertex position
      * @param cov entries of the covariance matrix.
      */
-    void setVertex(const TVector3& vertex, const std::vector<double>& cov);
+    void setVertex(const ROOT::Math::XYZVector& vertex, const std::vector<double>& cov);
 
     /** Get the covariance matrix of HER (E, theta_x, theta_y) where E is the
      * energy, theta_x is the horizontal angle between nominal direction and

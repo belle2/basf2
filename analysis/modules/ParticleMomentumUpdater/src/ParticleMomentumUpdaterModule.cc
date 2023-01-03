@@ -55,7 +55,7 @@ void ParticleMomentumUpdaterModule::initialize()
   if (!valid)
     B2ERROR("ParticleMomentumUpdaterModule::initialize invalid Decay Descriptor: " << m_decayStringTarget);
   else if (m_pDDescriptorTarget.getSelectionPDGCodes().size() != 1)
-    B2ERROR("ParticleMomentumUpdaterModule::please select exactly one target: " << m_decayStringTarget);
+    B2ERROR("ParticleMomentumUpdaterModule::initialize please select exactly one target: " << m_decayStringTarget);
 }
 
 void ParticleMomentumUpdaterModule::event()
@@ -86,9 +86,15 @@ void ParticleMomentumUpdaterModule::event()
     }
 
     Particle* targetP = particles[selParticlesTarget[0]->getArrayIndex()];
-    Particle* daughterCopy = Belle2::ParticleCopy::copyParticle(targetP);
-    daughterCopy->set4Vector(boost4Vector - daughters4Vector);
-    iParticle->replaceDaughter(targetP, daughterCopy);
+    if (targetP == iParticle) {
+      iParticle->set4Vector(boost4Vector - daughters4Vector);
+    } else {
+      Particle* daughterCopy = Belle2::ParticleCopy::copyParticle(targetP);
+      daughterCopy->set4Vector(boost4Vector - daughters4Vector);
+      bool isReplaced = iParticle->replaceDaughterRecursively(targetP, daughterCopy);
+      if (!isReplaced)
+        B2ERROR("ParticleMomentumUpdaterModule::event No target particle found for " << m_decayStringTarget);
+    }
   }
 }
 

@@ -1,3 +1,6 @@
+Truth-matching
+==============
+
 .. _mcmatching:
 
 -----------
@@ -80,7 +83,8 @@ Flag                            Explanation
  c_MisID = 128                   One of the charged final state particles is mis-identified (wrong signed PDG code).
  c_AddedWrongParticle = 256      A non-FSP Particle has wrong PDG code, meaning one of the daughters (or their daughters)
                                  belongs to another Particle. 
- c_InternalError = 512           There was an error in MC matching. Not a valid match. Might indicate fake/background 
+ c_InternalError = 512           No valid match was found. For tracks, it indicates that there
+                                 is not a true track related to the reconstructed one. Might indicate fake or background 
                                  track or cluster. 
  c_MissPHOTOS    = 1024          A photon created by PHOTOS was not reconstructed (based on MCParticle: :c_IsPHOTOSPhoton). 
  c_AddedRecoBremsPhoton = 2048   A photon added with the bremsstrahlung recovery tools (correctBrems or correctBremsBelle) has 
@@ -368,8 +372,29 @@ MC mode       Decay channel                                    MC mode       Dec
 Track matching
 --------------
 
-Details on the track matching can be found in the :ref:`trk_matching` section of the Tracking chapter.
+A reconstructed track can be:
 
+1) **matched**, the reconstructed track is matched to a true track and it is its best description. 
+2) **clone**, the reconstructed track is matched to a true track, but there is another reconstructed track that better describes the true track (this second reconstructed track will therefore be matched)
+3) **fake**, the reconstructed track is not matched to any true track. It can be a beam-background track or a track built out of noise hits in the detector, or a mixture of these two.
+
+.. note:: 
+        In case of matched or clone tracks, the charge of the reconstructed track is **not checked** against the charge of the true track.
+        The charge check is anyway included in the MCMatching that sets the :ref:`Error_flags`.
+
+More details on the track matching can be found in the :ref:`trk_matching` section of the Tracking chapter, in particular :ref:`trk_matching_analysis`. 
+Here is a table to translate the matching status at tracking level with the one at analysis level:
+
+=================  ===============
+tracking-level     analysis-level
+=================  ===============
+ matched           matched
+ wrongCharge       matched
+ clone             clone
+ cloneWrongCharge  clone
+ background        fake
+ ghost             fake
+=================  ===============
 
 ---------------
 Photon matching

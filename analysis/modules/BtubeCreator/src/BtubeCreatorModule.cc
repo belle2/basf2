@@ -63,7 +63,7 @@ void BtubeCreatorModule::initialize()
   m_plist.isRequired(m_listName);
 
   // magnetic field
-  m_Bfield = BFieldManager::getFieldInTesla(B2Vector3D(0, 0, 0)).Z();
+  m_Bfield = BFieldManager::getFieldInTesla(ROOT::Math::XYZVector(0, 0, 0)).Z();
 
   m_BeamSpotCenter = m_beamSpotDB->getIPPosition();
   m_beamSpotCov.ResizeTo(3, 3);
@@ -113,9 +113,9 @@ void BtubeCreatorModule::event()
 
     if (m_verbose) {
       B2DEBUG(10, "tubecreator  B decay vertex: ");
-      B2DEBUG(10, "{" << std::fixed << std::setprecision(20) << tubecreatorBCopy->getVertex().x() << "," << std::fixed <<
+      B2DEBUG(10, "{" << std::fixed << std::setprecision(20) << tubecreatorBCopy->getVertex().X() << "," << std::fixed <<
               std::setprecision(
-                20) << tubecreatorBCopy->getVertex().y() << "," << std::fixed << std::setprecision(20) << tubecreatorBCopy->getVertex().z() << "}");
+                20) << tubecreatorBCopy->getVertex().Y() << "," << std::fixed << std::setprecision(20) << tubecreatorBCopy->getVertex().Z() << "}");
     }
 
     bool ok0 = doVertexFit(tubecreatorBCopy);
@@ -127,9 +127,9 @@ void BtubeCreatorModule::event()
         particle->setVertex(tubecreatorBCopy->getVertex());
         particle->setMomentumVertexErrorMatrix(tubecreatorBCopy->getMomentumVertexErrorMatrix());
 
-        tubecreatorB->writeExtraInfo("prod_vtx_x", tubecreatorBCopy->getVertex().x());
-        tubecreatorB->writeExtraInfo("prod_vtx_y", tubecreatorBCopy->getVertex().y());
-        tubecreatorB->writeExtraInfo("prod_vtx_z", tubecreatorBCopy->getVertex().z());
+        tubecreatorB->writeExtraInfo("prod_vtx_x", tubecreatorBCopy->getVertex().X());
+        tubecreatorB->writeExtraInfo("prod_vtx_y", tubecreatorBCopy->getVertex().Y());
+        tubecreatorB->writeExtraInfo("prod_vtx_z", tubecreatorBCopy->getVertex().Z());
         tubecreatorB->writeExtraInfo("prod_vtx_cov00", tubecreatorBCopy->getVertexErrorMatrix()(0, 0));
         tubecreatorB->writeExtraInfo("prod_vtx_cov01", tubecreatorBCopy->getVertexErrorMatrix()(0, 1));
         tubecreatorB->writeExtraInfo("prod_vtx_cov02", tubecreatorBCopy->getVertexErrorMatrix()(0, 2));
@@ -145,8 +145,8 @@ void BtubeCreatorModule::event()
         tubecreatorB->writeExtraInfo("Pz_after_avf", (tubecreatorBCopy->get4Vector()).Pz());
         tubecreatorB->writeExtraInfo("E_after_avf", (tubecreatorBCopy->get4Vector()).E());
 
-        Eigen::Matrix<double, 3, 1> tubecreatorBOriginpos(tubecreatorBCopy->getVertex().x(), tubecreatorBCopy->getVertex().y(),
-                                                          tubecreatorBCopy->getVertex().z());
+        Eigen::Matrix<double, 3, 1> tubecreatorBOriginpos(tubecreatorBCopy->getVertex().X(), tubecreatorBCopy->getVertex().Y(),
+                                                          tubecreatorBCopy->getVertex().Z());
         ROOT::Math::PxPyPzEVector v4Final = tubecreatorBCopy->get4Vector();
         PCmsLabTransform T;
         ROOT::Math::PxPyPzEVector vec = T.rotateLabToCms() * v4Final;
@@ -231,9 +231,9 @@ void BtubeCreatorModule::event()
                   1) << "," << std::fixed << std::setprecision(20) << pvNew(2, 2) << "}");
 
           B2DEBUG(10, "B origin  ");
-          B2DEBUG(10, "{" << std::fixed << std::setprecision(20) << tubecreatorBCopy->getVertex().x() << "," << std::fixed <<
+          B2DEBUG(10, "{" << std::fixed << std::setprecision(20) << tubecreatorBCopy->getVertex().X() << "," << std::fixed <<
                   std::setprecision(
-                    20) << tubecreatorBCopy->getVertex().y() << "," << std::fixed << std::setprecision(20) << tubecreatorBCopy->getVertex().z() << "}");
+                    20) << tubecreatorBCopy->getVertex().Y() << "," << std::fixed << std::setprecision(20) << tubecreatorBCopy->getVertex().Z() << "}");
         }
 
         tubecreatorBCopy->setMomentumVertexErrorMatrix(errNew);
@@ -281,9 +281,9 @@ bool BtubeCreatorModule::doVertexFit(Particle* mother)
 
 void BtubeCreatorModule::addextrainfos(Particle* daughter, Particle* copy, TMatrix mat, ROOT::Math::PxPyPzEVector TLV)
 {
-  daughter->writeExtraInfo("TubePosX", copy->getVertex().x());
-  daughter->writeExtraInfo("TubePosY", copy->getVertex().y());
-  daughter->writeExtraInfo("TubePosZ", copy->getVertex().z());
+  daughter->writeExtraInfo("TubePosX", copy->getVertex().X());
+  daughter->writeExtraInfo("TubePosY", copy->getVertex().Y());
+  daughter->writeExtraInfo("TubePosZ", copy->getVertex().Z());
 
   daughter->writeExtraInfo("TubeCov00", mat(0, 0));
   daughter->writeExtraInfo("TubeCov01", mat(0, 1));

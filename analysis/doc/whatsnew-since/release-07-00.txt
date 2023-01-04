@@ -1,5 +1,14 @@
 Changes in the analysis package in light-2212-foldex
 ----------------------------------------------------
+ParticleList dataobject
++++++++++++++++++++++++
+ * Added new member variable ``isReserved`` to prevent the reserved ParticleLists (``:all`` labeled final-state particles, ``:MC``
+   labeled particles loaded from MCParticle, and ``:V0`` labeled V0-particles) from being changed. While some modules have already
+   had protection not to edit the reserved lists, e.g. `ParticleSelector` and `ParticleListManipulator`, the other modules editing
+   the ParticleList had the potential to introduce critical bugs. If one's script breaks due to the update since the
+   ``light-2212-foldex``, please modify the script not to edit the reserved ParticleLists by copying them with other names
+   beforehand.
+
 Signal embedding
 ++++++++++++++++
  * New modules `UdstListFilter` and `PostMergeUpdater` for signal embedding which remove extra ``mdst`` objects and merge events together, respectively.

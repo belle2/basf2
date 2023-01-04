@@ -452,9 +452,9 @@ class Plotuple:
         canvas = ROOT.TCanvas("", "", self._width, self._height)
 
         # Create a ROOT Legend
-        legend = ROOT.TLegend(0.01, 0.01, 0.49, 0.06)
-        legend.SetNColumns(len(self._elements))
-        legend.SetTextSize(0.024)
+        legend = ROOT.TLegend(0.01, 0.01, 0.53, 0.06)
+        legend.SetNColumns(3)
+        legend.SetTextSize(0.02)
 
         # Allow possibility to turn off the stats box
         if self._mop.has_option("nostats"):
@@ -491,7 +491,6 @@ class Plotuple:
             # If there is a reference object, plot it first
             if self._reference is not None:
                 self._draw_ref(canvas)
-                legend.AddEntry(self._reference.object, 'reference')
                 drawn = True
 
         # If we have a 2D histogram
@@ -602,6 +601,10 @@ class Plotuple:
             self._set_background(canvas)
 
         canvas.GetFrame().SetFillColor(ROOT.kWhite)
+
+        # Add reference legend entry last for neatness
+        if self._reference is not None:
+            legend.AddEntry(self._reference.object, 'reference')
 
         legend.Draw()
 

@@ -1,5 +1,10 @@
 Changes in the analysis package in light-2212-foldex
 ----------------------------------------------------
+Signal embedding
+++++++++++++++++
+ * New modules `UdstListFilter` and `PostMergeUpdater` for signal embedding which remove extra ``mdst`` objects and merge events together, respectively.
+ * New scripts ``udst_purge_list`` and ``embedding_merge`` to enable signal embedding.
+ * A shell script ``analysis/examples/embedding/embedding.sh`` which illustrates the usage of the scripts.
 
 Variables
 +++++++++
@@ -7,6 +12,10 @@ Variables
  * New metavariable `useDaughterRestFrame` to calculate a variable in the rest frame of the given daughters is added.
  * New variable `cosHelicityAngleForQuasiTwoBodyDecay` is added for the angular analysis on a quasi-two-body decay.
  * Extended the variable `cosTPTO` to be available both in a main path and for_each loop over ROEs.
+
+stdCharged
+++++++++++
+ * Added working points for uniform pion-lepton fake rate.
 
 Modules
 +++++++
@@ -52,7 +61,7 @@ Modules
    function :func:`modularAnalysis.setBeamConstrainedMomentum`. It lets you replace the momentum
    of one particle in your decay chain by p(beam)-p(selected particles).
  * The module :b2:mod:`ParticleLoader` has a new option to create particles which do
-   not have a mdst source. It is also available via the convenience function 
+   not have a mdst source. It is also available via the convenience function
    :func:`modularAnalysis.fillParticleListFromDummy`.
  * New module :b2:mod:`KlongMomentumUpdaterExpert` to calculate and update the two-body B-meson decay including a
    Klong is added. New function :func:`modularAnalysis.updateKlongKinematicsExpert` is also added.
@@ -60,7 +69,7 @@ Modules
    substitute Rave vertex fitter for the tagged B meson. The default configuration of the :b2:mod:`TagVertex` has changed.
    The default algorithm changed from ``Rave`` to ``KFit`` and the default constraint from ``IP`` to ``tube``.
    The ``KFit`` algorithm by default includes iterations, this can be changed by newly added ``kFitReqReducedChi2`` parameter.
- * The new expert argument ``expertBeamConstraintPDG`` has been added to the :b2:mod:`TreeFitter`. It allows the user to constrain 
+ * The new expert argument ``expertBeamConstraintPDG`` has been added to the :b2:mod:`TreeFitter`. It allows the user to constrain
    the four-momentum of a Particle to the four-momentum of the initial e+e- state.
  * Updated :b2:mod:`TrackIsoCalculator` to compute the particle isolation score.
 
@@ -73,7 +82,7 @@ Modular Analysis Function
  * Added a check to the `applyEventCuts` function to make sure that only event-based variables are used in the
    selection. The decomposition of meta variables can be tricky, so a new argument ``metavariables`` is added to extend
    the list of meta variables which should be decomposed and should themselves be ignored in the check.
- * Added the argument ``treatAsInvisible`` in :func:`vertex.treeFit` to ignore particles in the fit. 
+ * Added the argument ``treatAsInvisible`` in :func:`vertex.treeFit` to ignore particles in the fit.
  * Updated the `calculateTrackIsolation` helper. Now, it returns a list of metavariables (`minET2ETDist`, `minET2ETIsoScore`, optionally `minET2ETDistVar` as well)
    correctly configured according to the helper input options.
    Users can then create aliases in their own steering script: see ``analysis/examples/VariableManager/trackIsolationVariables.py`` for an example.
@@ -89,7 +98,7 @@ Particle dataobject
  * Added a ``replaceDaughter`` method to Particle. It allows you to replace the daughter
    of a Particle with another Particle while keeping the original order of the daughters.
    This is important to ensure the decay string will work correctly after replacing a daughter.
- * Added a new Particle source ``NoMDSTSource`` to Particle. It can be used for Particles 
+ * Added a new Particle source ``NoMDSTSource`` to Particle. It can be used for Particles
    that do not come from any mdst source.
 
 Changes in the analysis package in light-2207-bengal

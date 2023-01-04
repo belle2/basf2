@@ -12,18 +12,18 @@ Full Event Interpretation
 
     **Prerequisites**:
 
-        * Lessons 1-2
+    * Lessons 1-2
 
     **Questions**:
 
-        * What are tagged analyses?
-        * How can I reconstruct a generic B meson?
-        * How can I use information from **both** B mesons for my analysis?
+    * What are tagged analyses?
+    * How can I reconstruct a generic B meson?
+    * How can I use information from **both** B mesons for my analysis?
 
     **Objectives**:
 
-        * Learn how to use the FEI in your steering file
-        * Understand the output from the FEI
+    * Learn how to use the FEI in your steering file
+    * Understand the output from the FEI
 
 
 Introduction
@@ -49,14 +49,14 @@ involving neutrinos, referred to as B\ :sub:`sig`.
 .. admonition:: Exercise
      :class: exercise stacked
 
-      Find the documentation of the FEI and look up "hadronic tagging" and
-      "semileptonic tagging".
-      What is the difference between both analysis strategies? What are advantages and disadvantages?
+     Find the documentation of the FEI and look up "hadronic tagging" and
+     "semileptonic tagging".
+     What is the difference between both analysis strategies? What are advantages and disadvantages?
 
 .. admonition:: Hint
      :class: toggle xhint stacked
 
-     The documentation can be found in the :ref:`analysis/doc/index-01-analysis:Advanced Topics` section of the analysis module.
+     The documentation can be found in the :ref:`analysis/doc/AdvancedTopics:Advanced Topics` section of the analysis module.
      The definitions can be found in the section titled ``Hadronic, Semileptonic and Inclusive Tagging``.
 
 .. admonition:: Solution
@@ -713,9 +713,9 @@ and explanations on the code structure.
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Author of this lesson
+.. rubric:: Author of this lesson
 
-    Moritz Bauer
+Moritz Bauer
 
 .. rubric:: Footnotes
 

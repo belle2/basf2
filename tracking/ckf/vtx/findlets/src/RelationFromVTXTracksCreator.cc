@@ -75,7 +75,6 @@ void RelationFromVTXTracksCreator::apply(std::vector<CKFToVTXState>& seedStates,
       } else {
         for (CKFToVTXState& seedState : seedStates) {
           // We are not setting the related VTX track of the first state!
-          // cppcheck-suppress useStlAlgorithm
           relations.emplace_back(&seedState, NAN, &nextState);
         }
       }

@@ -10,7 +10,7 @@
 
 #include <analysis/variables/ROEVariables.h>
 #include <analysis/VariableManager/Manager.h>
-#include <analysis/dataobjects/EventExtraInfo.h>
+#include <framework/dataobjects/EventExtraInfo.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ContinuumSuppression.h>
 #include <analysis/utility/ReferenceFrame.h>
@@ -373,7 +373,7 @@ namespace Belle2 {
 
         auto func = [var, modeisSignal, modeisAuto, maskName](const Particle * particle) -> double {
           StoreObjPtr<RestOfEvent> roe("RestOfEvent");
-          const Particle* Bparticle = roe->getRelated<Particle>();
+          const Particle* Bparticle = roe->getRelatedFrom<Particle>();
           RelationVector<ContinuumSuppression> continuumSuppressionRelations = Bparticle->getRelationsTo<ContinuumSuppression>("ALL");
           ContinuumSuppression* qq = nullptr;
           if (maskName.empty())
@@ -398,12 +398,12 @@ namespace Belle2 {
             newZ = qq->getThrustO();
 
           ROOT::Math::XYZVector newY(0, 0, 0);
-          if (newZ.z() == 0 and newZ.y() == 0)
+          if (newZ.Z() == 0 and newZ.Y() == 0)
             newY.SetX(1);
           else
           {
-            newY.SetY(newZ.z());
-            newY.SetZ(-newZ.y());
+            newY.SetY(newZ.Z());
+            newY.SetZ(-newZ.Y());
           }
           ROOT::Math::XYZVector newX = newY.Cross(newZ);
 
@@ -487,7 +487,7 @@ Returns cosine of angle between thrust axis of the signal B and z-axis.
 :noindex:
 )DOC");
     REGISTER_METAVARIABLE("KSFWVariables(variable[, string, string])", KSFWVariables,  R"DOC(
-Returns variable et, mm2, or one of the 16 KSFW moments.
+Returns variable et in ``GeV/c``, mm2 in (GeV/c^2)^2, or one of the 16 KSFW moments.
 The second and third arguments are optional unless you have created multiple instances of the ContinuumSuppression with different ROE masks.
 In that case the desired ROE mask name must be provided as well.
 If the second argument is set to 'FS1', the KSFW moment is calculated from the B final state daughters.
@@ -511,7 +511,7 @@ The second and third arguments are optional unless you have created multiple ins
 In that case the desired ROE mask name must be provided as well.
 If the second argument is set to 'ROE', the CleoCones are calculated only from ROE particles.
 Otherwise, the CleoCones are calculated from all final state particles.
-The ROE mask name is then either the second or the third argument and must not be called 'ROE'.
+The ROE mask name is then either the second or the third argument and must not be called 'ROE'. The unit of the CleoConeCS is ``GeV/c``.
 
 .. warning:: You have to run the Continuum Suppression builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_continuumsuppression` and `buildContinuumSuppression`.

@@ -105,7 +105,7 @@ namespace Belle2 {
         Nodetuple right_node = static_cast<const py::tuple>(tuple[2]);
         ComparisonOperator coperator = static_cast<ComparisonOperator>(static_cast<int>(py::extract<int>(tuple[3])));
         return std::unique_ptr<const AbstractBooleanNode<AVariableManager>>(new BinaryRelationalNode<AVariableManager>(left_node,
-               right_node , coperator));
+               right_node, coperator));
       } else if (node_type == NodeType::TernaryRelationalNode) {
         if (py::len(tuple) != 6) B2FATAL("TernaryRelationalNode tuple has to have length 6." << LogVar("actual length", py::len(tuple)));
         Nodetuple left_node = static_cast<const py::tuple>(tuple[1]);

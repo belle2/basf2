@@ -88,11 +88,11 @@ namespace Belle2 {
       "mgr2l0hit", "mgr2l1hit", "mgr2l2hit", "mgr2l3hit", "mgr2l4hit",
       "mgr3l0hit", "mgr3l1hit", "mgr3l2hit", "mgr3l3hit", "mgr3l4hit",
       "mgr4l0hit", "mgr4l1hit", "mgr4l2hit", "mgr4l3hit", "mgr4l4hit",
-      "mgr0l0" , "mgr0l1", "mgr0l2", "mgr0l3", "mgr0l4", "mgr0l5", "mgr0l6", "mgr0l7",
-      "mgr1l0" , "mgr1l1", "mgr1l2", "mgr1l3", "mgr1l4", "mgr1l5", "mgr1l6", "mgr1l7",
-      "mgr2l0" , "mgr2l1", "mgr2l2", "mgr2l3", "mgr2l4", "mgr2l5", "mgr2l6", "mgr2l7",
-      "mgr3l0" , "mgr3l1", "mgr3l2", "mgr3l3", "mgr3l4", "mgr3l5", "mgr3l6", "mgr3l7",
-      "mgr4l0" , "mgr4l1", "mgr4l2", "mgr4l3", "mgr4l4", "mgr4l5", "mgr4l6", "mgr4l7",
+      "mgr0l0", "mgr0l1", "mgr0l2", "mgr0l3", "mgr0l4", "mgr0l5", "mgr0l6", "mgr0l7",
+      "mgr1l0", "mgr1l1", "mgr1l2", "mgr1l3", "mgr1l4", "mgr1l5", "mgr1l6", "mgr1l7",
+      "mgr2l0", "mgr2l1", "mgr2l2", "mgr2l3", "mgr2l4", "mgr2l5", "mgr2l6", "mgr2l7",
+      "mgr3l0", "mgr3l1", "mgr3l2", "mgr3l3", "mgr3l4", "mgr3l5", "mgr3l6", "mgr3l7",
+      "mgr4l0", "mgr4l1", "mgr4l2", "mgr4l3", "mgr4l4", "mgr4l5", "mgr4l6", "mgr4l7",
       "firmid", "firmver", "evt", "clk"
     };
 
@@ -149,11 +149,11 @@ namespace Belle2 {
       "mgr2l0hit", "mgr2l1hit", "mgr2l2hit", "mgr2l3hit", "mgr2l4hit",
       "mgr3l0hit", "mgr3l1hit", "mgr3l2hit", "mgr3l3hit", "mgr3l4hit",
       "mgr4l0hit", "mgr4l1hit", "mgr4l2hit", "mgr4l3hit", "mgr4l4hit",
-      "mgr0l0" , "mgr0l1", "mgr0l2", "mgr0l3", "mgr0l4", "mgr0l5", "mgr0l6", "mgr0l7",
-      "mgr1l0" , "mgr1l1", "mgr1l2", "mgr1l3", "mgr1l4", "mgr1l5", "mgr1l6", "mgr1l7",
-      "mgr2l0" , "mgr2l1", "mgr2l2", "mgr2l3", "mgr2l4", "mgr2l5", "mgr2l6", "mgr2l7",
-      "mgr3l0" , "mgr3l1", "mgr3l2", "mgr3l3", "mgr3l4", "mgr3l5", "mgr3l6", "mgr3l7",
-      "mgr4l0" , "mgr4l1", "mgr4l2", "mgr4l3", "mgr4l4", "mgr4l5", "mgr4l6", "mgr4l7",
+      "mgr0l0", "mgr0l1", "mgr0l2", "mgr0l3", "mgr0l4", "mgr0l5", "mgr0l6", "mgr0l7",
+      "mgr1l0", "mgr1l1", "mgr1l2", "mgr1l3", "mgr1l4", "mgr1l5", "mgr1l6", "mgr1l7",
+      "mgr2l0", "mgr2l1", "mgr2l2", "mgr2l3", "mgr2l4", "mgr2l5", "mgr2l6", "mgr2l7",
+      "mgr3l0", "mgr3l1", "mgr3l2", "mgr3l3", "mgr3l4", "mgr3l5", "mgr3l6", "mgr3l7",
+      "mgr4l0", "mgr4l1", "mgr4l2", "mgr4l3", "mgr4l4", "mgr4l5", "mgr4l6", "mgr4l7",
       "firmid", "firmver", "evt", "clk"
     };
 
@@ -279,7 +279,7 @@ namespace Belle2 {
       2031, 15, // c127 (2031 downto 2016)
 //    2015, 159, //tshitmap
 //+1015 for TSF1
-      1764   , 0, //trackervalid
+      1764, 0,    //trackervalid
       1805 - 42, 8, //trackercc
       1796 - 42, 7, //trackerhit0id
       1788 - 42, 8, //trackerhit0rt
@@ -535,9 +535,9 @@ namespace Belle2 {
       79 + 1024,  15, //mgr4l4hit
 
 
-      31 ,  31,
-      63 ,  31,
-      95 ,  31,
+      31,  31,
+      63,  31,
+      95,  31,
       127,  31,
       159,  31,
       191,  31,
@@ -589,7 +589,7 @@ namespace Belle2 {
       2031, 15, // c127 (2031 downto 2016)
 //    2015, 159, //tshitmap
 //+1015 for TSF1
-      1764 + 1015   , 0, //trackervalid
+      1764 + 1015, 0,    //trackervalid
       1805 + 1015 - 42, 8, //trackercc
       1796 + 1015 - 42, 7, //trackerhit0id
       1788 + 1015 - 42, 8, //trackerhit0rt
@@ -845,9 +845,9 @@ namespace Belle2 {
       79 + 1024,  15, //mgr4l4hit
 
 
-      31 ,  31,
-      63 ,  31,
-      95 ,  31,
+      31,  31,
+      63,  31,
+      95,  31,
       127,  31,
       159,  31,
       191,  31,
@@ -899,7 +899,7 @@ namespace Belle2 {
       2031, 15, // c127 (2031 downto 2016)
 //    2015, 159, //tshitmap
 //+1015 for TSF1
-      1764 + 1015 + 105  , 0, //trackervalid
+      1764 + 1015 + 105, 0,   //trackervalid
       1805 + 1015 - 42 + 105, 8, //trackercc
       1796 + 1015 - 42 + 105, 7, //trackerhit0id
       1788 + 1015 - 42 + 105, 8, //trackerhit0rt
@@ -1170,9 +1170,9 @@ namespace Belle2 {
       79 + 1024,  15, //mgr4l4hit
 
 
-      31 ,  31,
-      63 ,  31,
-      95 ,  31,
+      31,  31,
+      63,  31,
+      95,  31,
       127,  31,
       159,  31,
       191,  31,
@@ -1872,6 +1872,12 @@ namespace Belle2 {
       unsigned int m_copper_address;
       //! address of copper module
       unsigned int m_copper_ab;
+      //! address of PCIe40 module
+      unsigned int m_pcie40_address;
+      //! channel ID of PCIe40 module
+      unsigned int m_pcie40_ch;
+      //! PCIe40 data or copper data
+      bool m_pciedata;
 
       //! TSF module number
       int m_TSFMOD;

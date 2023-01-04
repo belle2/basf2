@@ -51,9 +51,6 @@
 #include <tools.h>
 #endif
 
-
-using namespace std;
-
 using Eigen::VectorXd;
 using Eigen::Vector3d;
 using Eigen::MatrixXd;
@@ -66,7 +63,7 @@ namespace Belle2::BeamSpotCalib {
   inline double sqrS(double x) {return x >= 0 ? x * x : -x * x; } ///< sign-sensitive sqr
   inline double sqrtS(double x) {return x >= 0 ? sqrt(x) : -sqrt(-x); } ///< sign-sensitive sqrt
 
-  MatrixXd getRotatedSizeMatrix(vector<double> xySize, double zzSize, double kX, double kY);
+  MatrixXd getRotatedSizeMatrix(std::vector<double> xySize, double zzSize, double kX, double kY);
 
 
   /** structure containing most of the beam spot parameters */
@@ -98,9 +95,10 @@ namespace Belle2::BeamSpotCalib {
      * vals, errors and vector with splines - are aggregated results of linear-regression
        Order of variables in the vals & errs vector is the following:
        xVals, yVals, kXvals, kYvals, zVals */
-    SpotParam(const vector<double>& vals, const vector<double>& errs, const vector<vector<double>>& spls, int order = 0)
+    SpotParam(const std::vector<double>& vals, const std::vector<double>& errs, const std::vector<std::vector<double>>& spls,
+              int order = 0)
     {
-      auto getSize = [order](const vector<double>& sp) {
+      auto getSize = [order](const std::vector<double>& sp) {
         if (sp.size() == 0)
           return 1;
         else {
@@ -151,7 +149,7 @@ namespace Belle2::BeamSpotCalib {
 
   /** Spline with uncertainty obtained from the boot-strap replicas */
   struct UnknowSpline {
-    vector<Spline> spls; ///< vector with replicas
+    std::vector<Spline> spls; ///< vector with replicas
     void add(Spline spl) { spls.push_back(spl); } ///< add boot-strap replica
 
     /** Get mean and 1-sigma errors of the spline values */
@@ -192,7 +190,7 @@ namespace Belle2::BeamSpotCalib {
       double indx = (spls.size() - 1) * v;
       int nNd = spls[0].vals.size();
       for (int k = 0; k < nNd; ++k) {
-        vector<double> vals;
+        std::vector<double> vals;
         for (unsigned i = 0; i < spls.size(); ++i) {
           vals.push_back(spls[i].vals[k]);
         }
@@ -213,7 +211,7 @@ namespace Belle2::BeamSpotCalib {
 
   /** variable with uncertainty from boot-strap replicas */
   struct UnknowVar {
-    vector<double> vars; ///< vector of variable values for all replicas
+    std::vector<double> vars; ///< vector of variable values for all replicas
     void add(double x) { vars.push_back(x); } ///< add value to the replicas
 
     /** Get mean value */
@@ -257,7 +255,7 @@ namespace Belle2::BeamSpotCalib {
     }
 
     /** Get basic stats */
-    vector<double> getStats()
+    std::vector<double> getStats()
     {
       return {getLimit(0.50), getLimit(0.16), getLimit(1 - 0.16)};
     }
@@ -286,7 +284,7 @@ namespace Belle2::BeamSpotCalib {
    @param SizeXY: Off-diagonal xy BS-size element in [um]
    @return A pair with small and high eigenvalue (in [um])
    */
-  pair<double, double> getSizeMinMax(double SizeX, double SizeY, double SizeXY)
+  std::pair<double, double> getSizeMinMax(double SizeX, double SizeY, double SizeXY)
   {
     double A = pow(SizeX, 2) + pow(SizeY, 2);
     double B = pow(SizeX, 2) * pow(SizeY, 2) - pow(SizeXY, 4);
@@ -375,7 +373,7 @@ namespace Belle2::BeamSpotCalib {
 
       // Calculate the eigen-values
       double SizeMin, SizeMax;
-      tie(SizeMin, SizeMax) = getSizeMinMax(SizeX, SizeY, SizeXY);
+      std::tie(SizeMin, SizeMax) = getSizeMinMax(SizeX, SizeY, SizeXY);
 
       sizeMin.add(SizeMin);
       sizeMax.add(SizeMax);
@@ -435,7 +433,7 @@ namespace Belle2::BeamSpotCalib {
     }
 
     /** get output in Belle2-like format */
-    void getOutput(vector<VectorXd>& vtxPos, vector<MatrixXd>& vtxErr, MatrixXd& sizeMat)
+    void getOutput(std::vector<VectorXd>& vtxPos, std::vector<MatrixXd>& vtxErr, MatrixXd& sizeMat)
     {
       //Store the vertex position
       int nVals = x.spls[0].vals.size();
@@ -477,7 +475,7 @@ namespace Belle2::BeamSpotCalib {
 
 
     /** save bootstrap variable to TTree */
-    void setBranchVal(TTree* T, vector<double>* vec, TString n)
+    void setBranchVal(TTree* T, std::vector<double>* vec, TString n)
     {
       T->Branch(n, &vec->at(0), n + "/D");
       T->Branch(n + "_low", &vec->at(1), n + "_low/D");
@@ -515,32 +513,32 @@ namespace Belle2::BeamSpotCalib {
       Spline kyAvg = kY.getMeanSigma();
       setBranchSpline(T, &kyAvg, "kY");
 
-      vector<double> sizeXVar = sizeX.getStats();
+      std::vector<double> sizeXVar = sizeX.getStats();
       setBranchVal(T, &sizeXVar, "sizeX");
-      vector<double> sizeYVar = sizeY.getStats();
+      std::vector<double> sizeYVar = sizeY.getStats();
       setBranchVal(T, &sizeYVar, "sizeY");
-      vector<double> sizeXYVar = sizeXY.getStats();
+      std::vector<double> sizeXYVar = sizeXY.getStats();
       setBranchVal(T, &sizeXYVar, "sizeXY");
-      vector<double> sizeZVar = sizeZ.getStats();
+      std::vector<double> sizeZVar = sizeZ.getStats();
       setBranchVal(T, &sizeZVar, "sizeZ");
 
-      vector<double> sizeMinVar = sizeMin.getStats();
+      std::vector<double> sizeMinVar = sizeMin.getStats();
       setBranchVal(T, &sizeMinVar, "sizeMin");
-      vector<double> sizeMaxVar = sizeMax.getStats();
+      std::vector<double> sizeMaxVar = sizeMax.getStats();
       setBranchVal(T, &sizeMaxVar, "sizeMax");
-      vector<double> xyAngleVar = xyAngle.getStats();
+      std::vector<double> xyAngleVar = xyAngle.getStats();
       setBranchVal(T, &xyAngleVar, "xyAngle");
 
-      vector<double> crossAngleVar = crossAngle.getStats();
+      std::vector<double> crossAngleVar = crossAngle.getStats();
       setBranchVal(T, &crossAngleVar, "crossAngle");
 
 
-      vector<double> matXXVar = matXX.getStats();
-      vector<double> matYYVar = matYY.getStats();
-      vector<double> matZZVar = matZZ.getStats();
-      vector<double> matXYVar = matXY.getStats();
-      vector<double> matXZVar = matXZ.getStats();
-      vector<double> matYZVar = matYZ.getStats();
+      std::vector<double> matXXVar = matXX.getStats();
+      std::vector<double> matYYVar = matYY.getStats();
+      std::vector<double> matZZVar = matZZ.getStats();
+      std::vector<double> matXYVar = matXY.getStats();
+      std::vector<double> matXZVar = matXZ.getStats();
+      std::vector<double> matYZVar = matYZ.getStats();
 
       setBranchVal(T, &matXXVar, "matXX");
       setBranchVal(T, &matYYVar, "matYY");
@@ -649,20 +647,20 @@ namespace Belle2::BeamSpotCalib {
     @param evts: vector with events
     @return a pair containing smallest and highest time
     */
-  pair<double, double> getStartStop(const vector<Event>&  evts)
+  std::pair<double, double> getStartStop(const std::vector<Event>&  evts)
   {
     double minT = 1e20, maxT = -1e20;
     for (auto ev : evts) {
-      minT = min(minT, ev.t);
-      maxT = max(maxT, ev.t);
+      minT = std::min(minT, ev.t);
+      maxT = std::max(maxT, ev.t);
     }
     return {minT, maxT};
   }
 
   /**get list of file names from comma-separated string */
-  vector<TString> extractFileNames(TString str)
+  std::vector<TString> extractFileNames(TString str)
   {
-    vector<TString> files;
+    std::vector<TString> files;
     auto tempVec = str.Tokenize(",");
     for (int i = 0; i < tempVec->GetEntries(); ++i) {
       TString s = ((TObjString*)tempVec->At(i))->GetString();
@@ -672,10 +670,10 @@ namespace Belle2::BeamSpotCalib {
   }
 
 /// read events from TTree to std::vector
-  vector<Event> getEvents(TTree* tr)
+  std::vector<Event> getEvents(TTree* tr)
   {
 
-    vector<Event> events;
+    std::vector<Event> events;
     events.reserve(tr->GetEntries());
 
     Event evt;
@@ -715,7 +713,7 @@ namespace Belle2::BeamSpotCalib {
   }
 
   /** Add random boot-strap weights to events */
-  void bootStrap(vector<Event>& evts)
+  void bootStrap(std::vector<Event>& evts)
   {
     for (auto& e : evts)
       e.nBootStrap = gRandom->Poisson(1);
@@ -748,7 +746,8 @@ namespace Belle2::BeamSpotCalib {
     @param[out] err2pressErr: uncertainty of the err2press
     @return vector with the fitted parameters
    */
-  pair<vector<double>, vector<double>> linearFitErr(MatrixXd m, VectorXd r, double& err2Mean, double& err2press, double& err2pressErr)
+  std::pair<std::vector<double>, std::vector<double>> linearFitErr(MatrixXd m, VectorXd r, double& err2Mean, double& err2press,
+                                                   double& err2pressErr)
   {
     MatrixXd mT = m.transpose();
     MatrixXd mat = mT * m;
@@ -841,7 +840,7 @@ namespace Belle2::BeamSpotCalib {
     //////////////////////////
 
     //Maximum likelihood over eigenvector and angle
-    TF2 fEig(rn(), [covMatI, pars, s2MinLimit](double * x, double*) {
+    TF2 fEig(rn(), [covMatI, pars, s2MinLimit](const double * x, const double*) {
       double eig1 = x[0];
       double eig2 = s2MinLimit;
       double phi  = x[1];
@@ -902,7 +901,7 @@ namespace Belle2::BeamSpotCalib {
   }
 
   /** Get theoretical <d0_1 *d0_2> based on the provided BS size parameters */
-  double getD12th(Event e, vector<double> sizesXY)
+  double getD12th(Event e, std::vector<double> sizesXY)
   {
     double sxx = sizesXY[0];
     double syy = sizesXY[1];
@@ -916,7 +915,7 @@ namespace Belle2::BeamSpotCalib {
   }
 
   /** Get theoretical <z0_1 *z0_2> based on the provided BS size parameters */
-  double getZ12th(Event e, vector<double> sizesXY)
+  double getZ12th(Event e, std::vector<double> sizesXY)
   {
     double sxx = sizesXY[0];
     double syy = sizesXY[1];
@@ -933,7 +932,7 @@ namespace Belle2::BeamSpotCalib {
 
 
   /** Plot TGraph with the fitted function */
-  void plotSpotPositionFit(const vector<Event>& evts, SpotParam par, TString fName)
+  void plotSpotPositionFit(const std::vector<Event>& evts, SpotParam par, TString fName)
   {
     TGraph* gr = new TGraph();
     TProfile* dProf     = new TProfile(rn(), "dProf", 100, -M_PI, M_PI, "S");
@@ -1018,7 +1017,7 @@ namespace Belle2::BeamSpotCalib {
 
 
   /** Plot TGraph with the fitted function */
-  void plotSpotZPositionFit(const vector<Event>& evts, SpotParam par, TString fName)
+  void plotSpotZPositionFit(const std::vector<Event>& evts, SpotParam par, TString fName)
   {
     TProfile* zProf  = new TProfile(rn(), "dProf", 100, -M_PI, M_PI, "S");
     TGraph* gr = new TGraph();
@@ -1079,7 +1078,7 @@ namespace Belle2::BeamSpotCalib {
 
 
   /** Plot pull distribution for the position */
-  void plotSpotPositionPull(const vector<Event>& evts, const SpotParam& par, TString fName, double cut = 70)
+  void plotSpotPositionPull(const std::vector<Event>& evts, const SpotParam& par, TString fName, double cut = 70)
   {
     TH1D* hPull = new TH1D(rn(), "", 200, -200, 200);
 
@@ -1110,7 +1109,7 @@ namespace Belle2::BeamSpotCalib {
 
 
   /** Plot pull distribution for kX and kY */
-  void plotKxKyFit(const vector<Event>& evts, SpotParam par, TString fName)
+  void plotKxKyFit(const std::vector<Event>& evts, SpotParam par, TString fName)
   {
     TProfile* profRes    = new TProfile(rn(), "dProf", 100, -800, 800, "S");
     TProfile* profResKx  = new TProfile(rn(), "dProfKx", 100, -800, 800, "S");
@@ -1180,7 +1179,7 @@ namespace Belle2::BeamSpotCalib {
   }
 
   /** Plot pull distribution to visualize possible time dependence of the positions */
-  void plotXYtimeDep(const vector<Event>& evts, SpotParam par, TString fName)
+  void plotXYtimeDep(const std::vector<Event>& evts, SpotParam par, TString fName)
   {
     TProfile* profRes    = new TProfile(rn(), "dProf", 50,   -0.5, 0.5);
     TProfile* profResTx  = new TProfile(rn(), "dProfTx", 50, -0.5, 0.5);
@@ -1242,7 +1241,7 @@ namespace Belle2::BeamSpotCalib {
 
 
   /** Plot pull distribution for the z-position of the BS center */
-  void plotSpotZpositionPull(const vector<Event>& evts, const SpotParam& par, TString fName, double cut = 1000)
+  void plotSpotZpositionPull(const std::vector<Event>& evts, const SpotParam& par, TString fName, double cut = 1000)
   {
     TH1D* hPull = new TH1D(rn(), "", 200, -2000, 2000);
 
@@ -1273,7 +1272,7 @@ namespace Belle2::BeamSpotCalib {
 
 
   /** Remove outlier from the position fit (for d0) */
-  void removeSpotPositionOutliers(vector<Event>& evts,  const SpotParam& par, double cut = 70)
+  void removeSpotPositionOutliers(std::vector<Event>& evts,  const SpotParam& par, double cut = 70)
   {
     int nRem = 0;
     int nAll = 0;
@@ -1292,7 +1291,7 @@ namespace Belle2::BeamSpotCalib {
 
 
   /** Remove outlier from the position fit (for z0) */
-  void removeSpotZpositionOutliers(vector<Event>& evts,  const SpotParam& par, double cut = 1000)
+  void removeSpotZpositionOutliers(std::vector<Event>& evts,  const SpotParam& par, double cut = 1000)
   {
     int nRem = 0;
     int nAll = 0;
@@ -1312,14 +1311,14 @@ namespace Belle2::BeamSpotCalib {
 
 
   /** Fill matrix with bases based on linear splines for the time dependence */
-  vector<vector<double>> fillSplineBasesLinear(const vector<Event>& evts, vector<double> spl,
-                                               std::function<double(Track, double)> fun)
+  std::vector<std::vector<double>> fillSplineBasesLinear(const std::vector<Event>& evts, std::vector<double> spl,
+                                                         std::function<double(Track, double)> fun)
   {
     int n = spl.size(); //number of params
     if (n == 0 || (n == 2 && spl[0] > spl[1]))
       n = 1;
 
-    vector<vector<double>> vecs(n);
+    std::vector<std::vector<double>> vecs(n);
 
     if (n == 1) { //no time dependence
       for (const auto& e : evts) {
@@ -1356,11 +1355,12 @@ namespace Belle2::BeamSpotCalib {
 
 
   /** Fill matrix with bases based on zero-order splines for the time dependence */
-  vector<vector<double>> fillSplineBasesZero(const vector<Event>& evts, vector<double> spl, std::function<double(Track, double)> fun)
+  std::vector<std::vector<double>> fillSplineBasesZero(const std::vector<Event>& evts, std::vector<double> spl,
+                                                       std::function<double(Track, double)> fun)
   {
     int n = spl.size() + 1; //number of params
 
-    vector<vector<double>> vecs(n);
+    std::vector<std::vector<double>> vecs(n);
 
     if (n == 1) { //no time dependence
       for (const auto& e : evts) {
@@ -1417,18 +1417,18 @@ namespace Belle2::BeamSpotCalib {
       double v2 = spl2.val(x);
       double e2 = spl2.err(x);
 
-      double d = pow(v2 - v1, 2) / pow(max(e1, e2), 2);
+      double d = pow(v2 - v1, 2) / pow(std::max(e1, e2), 2);
       sum += d * step;
     }
     return sum;
   }
 
   /** Fit width in z-direction (output in [um^2]) */
-  double fitSpotZwidth(const vector<Event>& evts, const SpotParam& spotPar, const vector<double>& sizesXY)
+  double fitSpotZwidth(const std::vector<Event>& evts, const SpotParam& spotPar, const std::vector<double>& sizesXY)
   {
 
-    vector<double> dataVec;
-    vector<double> zzVec;
+    std::vector<double> dataVec;
+    std::vector<double> zzVec;
 
 
     for (auto e : evts) {
@@ -1447,9 +1447,9 @@ namespace Belle2::BeamSpotCalib {
 
     MatrixXd mat = vecs2mat({zzVec});
 
-    vector<double> pars, err2;
+    std::vector<double> pars, err2;
     double err2Mean, err2press, err2pressErr;
-    tie(pars, err2) = linearFitErr(mat, vec2vec(dataVec), err2Mean, err2press, err2pressErr);
+    std::tie(pars, err2) = linearFitErr(mat, vec2vec(dataVec), err2Mean, err2press, err2pressErr);
 
     return pars[0];
 
@@ -1459,17 +1459,17 @@ namespace Belle2::BeamSpotCalib {
 
 
   /** Fit xy widths (including XZ, YZ slopes), no prior */
-  SpotParam fitSpotPositionSplines(const vector<Event>& evts, const vector<double>& splX, const vector<double>& splY,
-                                   const vector<double>& splKX, const vector<double>& splKY)
+  SpotParam fitSpotPositionSplines(const std::vector<Event>& evts, const std::vector<double>& splX, const std::vector<double>& splY,
+                                   const std::vector<double>& splKX, const std::vector<double>& splKY)
   {
-    vector<vector<double>> basesX  = fillSplineBasesZero(evts, splX, [](Track tr, double) {return  sin(tr.phi0);});
-    vector<vector<double>> basesY  = fillSplineBasesZero(evts, splY, [](Track tr, double) {return -cos(tr.phi0);});
+    std::vector<std::vector<double>> basesX  = fillSplineBasesZero(evts, splX, [](Track tr, double) {return  sin(tr.phi0);});
+    std::vector<std::vector<double>> basesY  = fillSplineBasesZero(evts, splY, [](Track tr, double) {return -cos(tr.phi0);});
 
-    vector<vector<double>> basesKX = fillSplineBasesZero(evts, splKX, [](Track tr, double) {return  sin(tr.phi0) * tr.z0;});
-    vector<vector<double>> basesKY = fillSplineBasesZero(evts, splKY, [](Track tr, double) {return -cos(tr.phi0) * tr.z0;});
+    std::vector<std::vector<double>> basesKX = fillSplineBasesZero(evts, splKX, [](Track tr, double) {return  sin(tr.phi0) * tr.z0;});
+    std::vector<std::vector<double>> basesKY = fillSplineBasesZero(evts, splKY, [](Track tr, double) {return -cos(tr.phi0) * tr.z0;});
 
 
-    vector<double> dataVec;
+    std::vector<double> dataVec;
     for (auto e : evts) {
       for (int i = 0; i < e.nBootStrap * e.isSig; ++i) {
         dataVec.push_back(e.mu0.d0);
@@ -1477,33 +1477,33 @@ namespace Belle2::BeamSpotCalib {
       }
     }
 
-    vector<vector<double>> allVecs = merge({basesX, basesY, basesKX, basesKY});
+    std::vector<std::vector<double>> allVecs = merge({basesX, basesY, basesKX, basesKY});
 
     MatrixXd A = vecs2mat(allVecs);
 
 
     VectorXd vData = vec2vec(dataVec);
 
-    vector<double> pars(A.cols()), err2(A.cols());
+    std::vector<double> pars(A.cols()), err2(A.cols());
     double err2Mean, err2press, err2pressErr;
-    tie(pars, err2) = linearFitErr(A, vData, err2Mean, err2press, err2pressErr);
+    std::tie(pars, err2) = linearFitErr(A, vData, err2Mean, err2press, err2pressErr);
 
     for (auto& e : err2) e = sqrt(e);
     return SpotParam(pars, err2, {splX, splY, splKX, splKY});
   }
 
   /** Fit xy widths (including XZ, YZ slopes), with prior info from spotPars */
-  SpotParam fitSpotPositionSplines(const vector<Event>& evts, const vector<double>& splX, const vector<double>& splY,
-                                   const vector<double>& splKX, const vector<double>& splKY, const SpotParam& spotPars)
+  SpotParam fitSpotPositionSplines(const std::vector<Event>& evts, const std::vector<double>& splX, const std::vector<double>& splY,
+                                   const std::vector<double>& splKX, const std::vector<double>& splKY, const SpotParam& spotPars)
   {
-    vector<vector<double>> basesX  = fillSplineBasesZero(evts, splX, [](Track tr, double) {return  sin(tr.phi0);});
-    vector<vector<double>> basesY  = fillSplineBasesZero(evts, splY, [](Track tr, double) {return -cos(tr.phi0);});
+    std::vector<std::vector<double>> basesX  = fillSplineBasesZero(evts, splX, [](Track tr, double) {return  sin(tr.phi0);});
+    std::vector<std::vector<double>> basesY  = fillSplineBasesZero(evts, splY, [](Track tr, double) {return -cos(tr.phi0);});
 
-    vector<vector<double>> basesKX = fillSplineBasesZero(evts, splKX, [ = ](Track tr, double t) {return  sin(tr.phi0) * (getZIPest(tr, t, spotPars) - spotPars.z.val(t));});
-    vector<vector<double>> basesKY = fillSplineBasesZero(evts, splKY, [ = ](Track tr, double t) {return -cos(tr.phi0) * (getZIPest(tr, t, spotPars) - spotPars.z.val(t));});
+    std::vector<std::vector<double>> basesKX = fillSplineBasesZero(evts, splKX, [ = ](Track tr, double t) {return  sin(tr.phi0) * (getZIPest(tr, t, spotPars) - spotPars.z.val(t));});
+    std::vector<std::vector<double>> basesKY = fillSplineBasesZero(evts, splKY, [ = ](Track tr, double t) {return -cos(tr.phi0) * (getZIPest(tr, t, spotPars) - spotPars.z.val(t));});
 
 
-    vector<double> dataVec;
+    std::vector<double> dataVec;
     for (auto e : evts) {
       for (int i = 0; i < e.nBootStrap * e.isSig; ++i) {
         dataVec.push_back(e.mu0.d0);
@@ -1511,16 +1511,16 @@ namespace Belle2::BeamSpotCalib {
       }
     }
 
-    vector<vector<double>> allVecs = merge({basesX, basesY, basesKX, basesKY});
+    std::vector<std::vector<double>> allVecs = merge({basesX, basesY, basesKX, basesKY});
 
     MatrixXd A = vecs2mat(allVecs);
 
 
     VectorXd vData = vec2vec(dataVec);
 
-    vector<double> pars(A.cols()), err2(A.cols());
+    std::vector<double> pars(A.cols()), err2(A.cols());
     double err2Mean, err2press, err2pressErr;
-    tie(pars, err2) = linearFitErr(A, vData, err2Mean, err2press, err2pressErr);
+    std::tie(pars, err2) = linearFitErr(A, vData, err2Mean, err2press, err2pressErr);
 
     for (auto& e : err2) e = sqrt(e);
     auto res = SpotParam(pars, err2, {splX, splY, splKX, splKY});
@@ -1533,12 +1533,12 @@ namespace Belle2::BeamSpotCalib {
 
 
   /** simple fit of position splines, without kX, kY slopes */
-  SpotParam fitSpotPositionSplines(const vector<Event>& evts, const vector<double>& splX, const vector<double>& splY)
+  SpotParam fitSpotPositionSplines(const std::vector<Event>& evts, const std::vector<double>& splX, const std::vector<double>& splY)
   {
-    vector<vector<double>> basesX  = fillSplineBasesZero(evts, splX, [](Track tr, double) {return  sin(tr.phi0);});
-    vector<vector<double>> basesY  = fillSplineBasesZero(evts, splY, [](Track tr, double) {return -cos(tr.phi0);});
+    std::vector<std::vector<double>> basesX  = fillSplineBasesZero(evts, splX, [](Track tr, double) {return  sin(tr.phi0);});
+    std::vector<std::vector<double>> basesY  = fillSplineBasesZero(evts, splY, [](Track tr, double) {return -cos(tr.phi0);});
 
-    vector<double> dataVec;
+    std::vector<double> dataVec;
     for (auto e : evts) {
       for (int i = 0; i < e.nBootStrap * e.isSig; ++i) {
         dataVec.push_back(e.mu0.d0);
@@ -1546,15 +1546,15 @@ namespace Belle2::BeamSpotCalib {
       }
     }
 
-    vector<vector<double>> allVecs = merge({basesX, basesY});
+    std::vector<std::vector<double>> allVecs = merge({basesX, basesY});
 
     MatrixXd A = vecs2mat(allVecs);
 
     VectorXd vData = vec2vec(dataVec);
 
-    vector<double> pars(A.cols()), err2(A.cols());
+    std::vector<double> pars(A.cols()), err2(A.cols());
     double err2Mean, err2press, err2pressErr;
-    tie(pars, err2) = linearFitErr(A, vData, err2Mean, err2press, err2pressErr);
+    std::tie(pars, err2) = linearFitErr(A, vData, err2Mean, err2press, err2pressErr);
 
     for (auto& e : err2) e = sqrt(e);
     return SpotParam(pars, err2, {splX, splY});
@@ -1566,20 +1566,20 @@ namespace Belle2::BeamSpotCalib {
 
 
   /** Fit Zposition */
-  SpotParam fitZpositionSplines(const vector<Event>& evts, const vector<double>& splX, const vector<double>& splY,
-                                const vector<double>& splKX, const vector<double>& splKY,
-                                const vector<double>& splZ)
+  SpotParam fitZpositionSplines(const std::vector<Event>& evts, const std::vector<double>& splX, const std::vector<double>& splY,
+                                const std::vector<double>& splKX, const std::vector<double>& splKY,
+                                const std::vector<double>& splZ)
   {
-    vector<vector<double>> basesX  = fillSplineBasesZero(evts, splX, [](Track tr, double) {return -tr.tanlambda * cos(tr.phi0);});
-    vector<vector<double>> basesY  = fillSplineBasesZero(evts, splY, [](Track tr, double) {return -tr.tanlambda * sin(tr.phi0);});
+    std::vector<std::vector<double>> basesX  = fillSplineBasesZero(evts, splX, [](Track tr, double) {return -tr.tanlambda * cos(tr.phi0);});
+    std::vector<std::vector<double>> basesY  = fillSplineBasesZero(evts, splY, [](Track tr, double) {return -tr.tanlambda * sin(tr.phi0);});
 
-    vector<vector<double>> basesKX = fillSplineBasesZero(evts, splKX, [](Track tr, double) {return -tr.z0 * tr.tanlambda * cos(tr.phi0);});
-    vector<vector<double>> basesKY = fillSplineBasesZero(evts, splKY, [](Track tr, double) {return -tr.z0 * tr.tanlambda * sin(tr.phi0);});
+    std::vector<std::vector<double>> basesKX = fillSplineBasesZero(evts, splKX, [](Track tr, double) {return -tr.z0 * tr.tanlambda * cos(tr.phi0);});
+    std::vector<std::vector<double>> basesKY = fillSplineBasesZero(evts, splKY, [](Track tr, double) {return -tr.z0 * tr.tanlambda * sin(tr.phi0);});
 
-    vector<vector<double>> basesZ  = fillSplineBasesZero(evts, splZ,  [](Track , double) {return 1;});
+    std::vector<std::vector<double>> basesZ  = fillSplineBasesZero(evts, splZ,  [](Track, double) {return 1;});
 
 
-    vector<double> dataVec;
+    std::vector<double> dataVec;
     for (auto e : evts) {
       for (int i = 0; i < e.nBootStrap * e.isSig; ++i) {
         dataVec.push_back(e.mu0.z0);
@@ -1587,15 +1587,15 @@ namespace Belle2::BeamSpotCalib {
       }
     }
 
-    vector<vector<double>> allVecs = merge({basesX, basesY, basesKX, basesKY, basesZ});
+    std::vector<std::vector<double>> allVecs = merge({basesX, basesY, basesKX, basesKY, basesZ});
 
     MatrixXd A = vecs2mat(allVecs);
 
     VectorXd vData = vec2vec(dataVec);
 
-    vector<double> pars(A.cols()), err2(A.cols());
+    std::vector<double> pars(A.cols()), err2(A.cols());
     double err2Mean, err2press, err2pressErr;
-    tie(pars, err2) = linearFitErr(A, vData, err2Mean, err2press, err2pressErr);
+    std::tie(pars, err2) = linearFitErr(A, vData, err2Mean, err2press, err2pressErr);
 
     for (auto& e : err2) e = sqrt(e);
     return SpotParam(pars, err2, {splX, splY, splKX, splKY, splZ});
@@ -1604,11 +1604,11 @@ namespace Belle2::BeamSpotCalib {
 
 
   /** Fit Zposition, xIP, yIP fixed from d0 fit */
-  SpotParam fitZpositionSplinesSimple(const vector<Event>& evts, const vector<double>& splZ, const SpotParam& spotPars)
+  SpotParam fitZpositionSplinesSimple(const std::vector<Event>& evts, const std::vector<double>& splZ, const SpotParam& spotPars)
   {
-    vector<vector<double>> basesZ  = fillSplineBasesZero(evts, splZ,  [](Track, double) {return 1;});
+    std::vector<std::vector<double>> basesZ  = fillSplineBasesZero(evts, splZ,  [](Track, double) {return 1;});
 
-    vector<double> dataVec;
+    std::vector<double> dataVec;
     for (auto e : evts) {
       for (int i = 0; i < e.nBootStrap * e.isSig; ++i) {
         double z1 =  getZIPest(e.mu0, e.t, spotPars);
@@ -1622,9 +1622,9 @@ namespace Belle2::BeamSpotCalib {
 
     VectorXd vData = vec2vec(dataVec);
 
-    vector<double> pars(A.cols()), err2(A.cols());
+    std::vector<double> pars(A.cols()), err2(A.cols());
     double err2Mean, err2press, err2pressErr;
-    tie(pars, err2) = linearFitErr(A, vData, err2Mean, err2press, err2pressErr);
+    std::tie(pars, err2) = linearFitErr(A, vData, err2Mean, err2press, err2pressErr);
 
     for (auto& e : err2) e = sqrt(e);
 
@@ -1639,10 +1639,10 @@ namespace Belle2::BeamSpotCalib {
 
 
   /** Returns x-y sizes in um^2 */
-  vector<double> fitSpotWidthCMS(const vector<Event>& evts, const SpotParam& spotPar)
+  std::vector<double> fitSpotWidthCMS(const std::vector<Event>& evts, const SpotParam& spotPar)
   {
 
-    vector<double> dataVec, ccVec, ssVec, scVec;
+    std::vector<double> dataVec, ccVec, ssVec, scVec;
 
 
     for (auto e : evts) {
@@ -1669,7 +1669,7 @@ namespace Belle2::BeamSpotCalib {
 
 
   /** Plot pulls for xy size fit */
-  void plotSpotSizePull(const vector<Event>& evts, const SpotParam& spotPar, const vector<double>& sizesXY)
+  void plotSpotSizePull(const std::vector<Event>& evts, const SpotParam& spotPar, const std::vector<double>& sizesXY)
   {
     TH1D* hPull = new TH1D(rn(), "", 100, -2000, 2000);
     for (auto& e : evts) {
@@ -1689,7 +1689,7 @@ namespace Belle2::BeamSpotCalib {
 
 
   /** Plot pulls in Zsize fit */
-  void plotSpotSizeZPull(const vector<Event>& evts, const SpotParam& spotPar, const vector<double>& sizesXY,  double sizeZZ)
+  void plotSpotSizeZPull(const std::vector<Event>& evts, const SpotParam& spotPar, const std::vector<double>& sizesXY,  double sizeZZ)
   {
     TH1D* hPull = new TH1D(rn(), "", 100, -300e3, 600e3);
     for (auto& e : evts) {
@@ -1717,7 +1717,7 @@ namespace Belle2::BeamSpotCalib {
 
 
   /** Plot size fit control plots */
-  void plotSpotSizeFit(const vector<Event>& evts, const SpotParam& par, const vector<double>& sizeXY)
+  void plotSpotSizeFit(const std::vector<Event>& evts, const SpotParam& par, const std::vector<double>& sizeXY)
   {
     double sxx = sizeXY[0];
     double syy = sizeXY[1];
@@ -1776,7 +1776,7 @@ namespace Belle2::BeamSpotCalib {
 
 
   /** Plot zSizeFit control plots */
-  void plotSpotZSizeFit(const vector<Event>& evts, const SpotParam& par, const vector<double>& sizesXY, double sizeZZ)
+  void plotSpotZSizeFit(const std::vector<Event>& evts, const SpotParam& par, const std::vector<double>& sizesXY, double sizeZZ)
   {
 
     gStyle->SetOptStat(0);
@@ -1863,7 +1863,8 @@ namespace Belle2::BeamSpotCalib {
 
 
   /** Remove outliers in xy-spotSize */
-  void removeSpotSizeOutliers(vector<Event>& evts, const SpotParam& spotPar, const vector<double>& sizesXY, double cut = 1500)
+  void removeSpotSizeOutliers(std::vector<Event>& evts, const SpotParam& spotPar, const std::vector<double>& sizesXY,
+                              double cut = 1500)
   {
 
     int nRem = 0;
@@ -1884,7 +1885,7 @@ namespace Belle2::BeamSpotCalib {
 
 
   /** Remove outliers in z-spotSize */
-  void removeSpotSizeZOutliers(vector<Event>& evts, const SpotParam& spotPar, const vector<double>& sizesXY, double sizeZZ,
+  void removeSpotSizeZOutliers(std::vector<Event>& evts, const SpotParam& spotPar, const std::vector<double>& sizesXY, double sizeZZ,
                                double cut = 150000)
   {
 
@@ -1933,7 +1934,7 @@ namespace Belle2::BeamSpotCalib {
     @param kY: Angle of the BS in the YZ plane
     @return The BS matrix in the nominal Belle2 frame
   */
-  MatrixXd getRotatedSizeMatrix(vector<double> xySize, double zzSize, double kX, double kY)
+  MatrixXd getRotatedSizeMatrix(std::vector<double> xySize, double zzSize, double kX, double kY)
   {
     TRotation rot; // rotation moving eZ=(0,0,1) to (kX, kY, 1)
     rot.RotateX(-kY); //x-rot
@@ -1958,25 +1959,24 @@ namespace Belle2::BeamSpotCalib {
 
 
 
-// Returns tuple with the beamspot parameters
-  tuple<vector<VectorXd>, vector<MatrixXd>, MatrixXd>  runBeamSpotAnalysis(vector<Event> evts,
-      const vector<double>& splitPoints)
+  // Returns tuple with the beamspot parameters
+  std::tuple<std::vector<VectorXd>, std::vector<MatrixXd>, MatrixXd>  runBeamSpotAnalysis(std::vector<Event> evts,
+      const std::vector<double>& splitPoints)
   {
     const double xyPosLimit  = 70; //um
     const double xySize2Limit = pow(40, 2); //um^2
     const double zPosLimit   = 1200; //um
 
 
-    vector<double> indX = splitPoints;
-    vector<double> indY = splitPoints;
-    vector<double> indZ = splitPoints;
+    std::vector<double> indX = splitPoints;
+    std::vector<double> indY = splitPoints;
+    std::vector<double> indZ = splitPoints;
 
     //no time dependence, as for beam size
-    vector<double> indKX =  {};
-    vector<double> indKY =  {};
+    std::vector<double> indKX =  {};
+    std::vector<double> indKY =  {};
 
     UnknownPars allPars;
-    const int kPlot = -1; //do plots for index kPlot
     for (int k = 0; k < 1; ++k) { //loop over BootStrap replicas
       for (auto& e : evts) e.isSig = true; //reset cuts
       if (k != 0) bootStrap(evts);
@@ -1985,6 +1985,8 @@ namespace Belle2::BeamSpotCalib {
       //simple XY pos fit
       auto resTemp = fitSpotPositionSplines(evts, indX, indY);
 
+      const int kPlot = -1;
+      // cppcheck-suppress knownConditionTrueFalse
       if (k == kPlot) {
         plotSpotPositionFit(evts, resTemp, "positionFitSimpe");
         plotSpotPositionPull(evts, resTemp, "pullsPositionSimple",  xyPosLimit);
@@ -2057,13 +2059,13 @@ namespace Belle2::BeamSpotCalib {
 
     //allPars.printStat();
 
-    vector<VectorXd> vtxPos;
-    vector<MatrixXd> vtxErr;
+    std::vector<VectorXd> vtxPos;
+    std::vector<MatrixXd> vtxErr;
     MatrixXd sizeMat;
 
     allPars.getOutput(vtxPos, vtxErr, sizeMat);
 
-    return make_tuple(vtxPos, vtxErr, sizeMat);
+    return std::make_tuple(vtxPos, vtxErr, sizeMat);
   }
 
 }

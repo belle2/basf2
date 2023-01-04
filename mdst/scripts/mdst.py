@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -10,7 +9,6 @@
 ##########################################################################
 
 from b2test_utils.datastoreprinter import DataStorePrinter, PrintObjectsModule
-from ROOT.Belle2 import Const
 
 
 MDST_OBJECTS = (
@@ -75,8 +73,17 @@ def add_mdst_dump(path, print_untested=False):
             explicitly printed to make sure we don't miss addition of new members
     """
 
+    # Always avoid the top-level 'import ROOT'.
+    from ROOT.Belle2 import Const  # noqa
+
     # prepare a list of PID detector sets and charged stable particles
-    pid_detectors = [Const.PIDDetectorSet(Const.PIDDetectors.c_set[index]) for index in range(Const.PIDDetectors.c_size)]
+    pid_detectors = []
+    it = Const.PIDDetectors.c_set.begin()
+    while True:
+        pid_detectors.append(Const.PIDDetectorSet(it.getDetector()))
+        it.increment()
+        if it == Const.PIDDetectors.c_set.end():
+            break
     charged_stables = [Const.ChargedStable(Const.chargedStableSet.at(index)) for index in range(Const.chargedStableSet.size())]
 
     # Now we define a list of all the mdst_dataobjects we want to print out and all
@@ -87,7 +94,11 @@ def add_mdst_dump(path, print_untested=False):
             "getProduction", "getTime", "getParentLfn", "getGeneratedWeight",
             "isEndOfRun"
         ], array=False),
-        DataStorePrinter("Track", ["getNumberOfFittedHypotheses", "getQualityIndicator"], {
+
+        DataStorePrinter("Track", [
+            "getNumberOfFittedHypotheses", "getQualityIndicator", "isFlippedAndRefitted",
+            "getTrackTime", "wasRefined"
+            ], {
             "getTrackFitResult": charged_stables,
             "getTrackFitResultWithClosestMass": charged_stables,
             "getRelationsWith": ["ECLClusters", "KLMClusters", "MCParticles", "PIDLikelihoods"],
@@ -99,7 +110,7 @@ def add_mdst_dump(path, print_untested=False):
             "getPosition", "getMomentum", "get4Momentum", "getEnergy", "getTransverseMomentum",
             "getCovariance6", "getParticleType", "getChargeSign", "getPValue", "getD0", "getPhi0",
             "getPhi", "getOmega", "getZ0", "getTanLambda", "getCotTheta",
-            "getTau", "getCov", "getCovariance5", "getHitPatternCDC", "getHitPatternVXD", "getNDF", "getChi2"
+            "getTau", "getCov", "getCovariance5", "getHitPatternCDC", "getHitPatternVXD", "getNDF", "getChi2",
         ]),
         DataStorePrinter("EventLevelTrackingInfo", [
             "getNCDCHitsNotAssigned", "getNCDCHitsNotAssignedPostCleaning",

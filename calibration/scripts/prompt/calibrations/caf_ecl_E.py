@@ -27,17 +27,72 @@ settings = CalibrationSettings(
         "bhabha_all_calib": [
             INPUT_DATA_FILTERS["Data Tag"]["bhabha_all_calib"],
             INPUT_DATA_FILTERS["Data Quality Tag"]["Good Or Recoverable"],
+            INPUT_DATA_FILTERS["Beam Energy"]["4S"],
+            INPUT_DATA_FILTERS["Run Type"]["physics"],
             INPUT_DATA_FILTERS["Magnet"]["On"]],
         "gamma_gamma_calib": [
             INPUT_DATA_FILTERS["Data Tag"]["gamma_gamma_calib"],
             INPUT_DATA_FILTERS["Data Quality Tag"]["Good Or Recoverable"],
+            INPUT_DATA_FILTERS["Beam Energy"]["4S"],
+            INPUT_DATA_FILTERS["Run Type"]["physics"],
             INPUT_DATA_FILTERS["Magnet"]["On"]],
         "mumu_tight_or_highm_calib": [
             INPUT_DATA_FILTERS["Data Tag"]["mumu_tight_or_highm_calib"],
             INPUT_DATA_FILTERS["Data Quality Tag"]["Good Or Recoverable"],
+            INPUT_DATA_FILTERS["Beam Energy"]["4S"],
+            INPUT_DATA_FILTERS["Run Type"]["physics"],
             INPUT_DATA_FILTERS["Magnet"]["On"]]},
     depends_on=[],
     expert_config={"ee5x5_min_entries": 100})
+
+# --------------------------------------------------------------
+# ..Raise clustering seed threshold in ECLCRFinder
+
+
+def touch_CRFinder(path, new_seed):
+    import basf2
+    """
+    Speed up ECL clustering by increasing seed threshold
+    """
+    new_path = basf2.create_path()
+    found = False
+    for m in path.modules():
+        if str(m) != "ECLCRFinder":  # search module by name
+            new_path.add_module(m)
+        else:
+            crfinder = basf2.register_module('ECLCRFinder')
+            crfinder.param('energyCut0', new_seed)
+            crfinder.param('energyCutBkgd0', new_seed)
+            basf2.print_params(crfinder)
+            new_path.add_module(crfinder)
+            found = True
+    if not found:
+        raise KeyError("Could not find ECLCRFinder in path")
+    return new_path
+
+# --------------------------------------------------------------
+# ..Raise threshold in ECLWaveformFit
+
+
+def touch_WaveformFit(path, energy_threshold):
+    import basf2
+    """
+    Speed up ECL reconstruction by increasing energy threshold
+    """
+    new_path = basf2.create_path()
+    found = False
+    for m in path.modules():
+        if str(m) != "ECLWaveformFit":  # search module by name
+            new_path.add_module(m)
+        else:
+            waveformfit = basf2.register_module('ECLWaveformFit')
+            waveformfit.param('EnergyThreshold', energy_threshold)
+            basf2.print_params(waveformfit)
+            new_path.add_module(waveformfit)
+            found = True
+    if not found:
+        raise KeyError("Could not find ECLWaveformFit in path")
+    return new_path
 
 # --------------------------------------------------------------
 # ..The calibration functions
@@ -87,6 +142,10 @@ def get_calibrations(input_data, **kwargs):
     # ..Add prepare_cdst_analysis to pre_collector_path
     ee5x5_pre_path = basf2.create_path()
     prepare_cdst_analysis(ee5x5_pre_path, components=['ECL'])
+    new_threshold = 1.0  # GeV
+    ee5x5_pre_path = touch_CRFinder(ee5x5_pre_path, new_threshold)
+    waveform_threshold = 99.  # GeV
+    ee5x5_pre_path = touch_WaveformFit(ee5x5_pre_path, waveform_threshold)
     cal_ecl_ee5x5.pre_collector_path = ee5x5_pre_path
 
     # --------------------------------------------------------------
@@ -131,6 +190,10 @@ def get_calibrations(input_data, **kwargs):
     # ..Add prepare_cdst_analysis to pre_collector_path
     gamma_gamma_pre_path = basf2.create_path()
     prepare_cdst_analysis(gamma_gamma_pre_path, components=['ECL'])
+    new_threshold = 1.0  # GeV
+    gamma_gamma_pre_path = touch_CRFinder(gamma_gamma_pre_path, new_threshold)
+    waveform_threshold = 99.  # GeV
+    gamma_gamma_pre_path = touch_WaveformFit(gamma_gamma_pre_path, waveform_threshold)
     cal_ecl_gamma_gamma.pre_collector_path = gamma_gamma_pre_path
 
     # --------------------------------------------------------------
@@ -169,6 +232,10 @@ def get_calibrations(input_data, **kwargs):
     ext_path = basf2.create_path()
     prepare_cdst_analysis(ext_path, components=['ECL'])
     ext_path.add_module("Ext", pdgCodes=[13])
+    new_threshold = 0.1  # GeV
+    ext_path = touch_CRFinder(ext_path, new_threshold)
+    waveform_threshold = 99.  # GeV
+    ext_path = touch_WaveformFit(ext_path, waveform_threshold)
     cal_ecl_mu_mu.pre_collector_path = ext_path
 
     # --------------------------------------------------------------
@@ -191,6 +258,10 @@ def get_calibrations(input_data, **kwargs):
     # ..Uses cdst data so it requires prepare_cdst_analysis
     ecl_merge_pre_path = basf2.create_path()
     prepare_cdst_analysis(ecl_merge_pre_path, components=['ECL'])
+    new_threshold = 0.15  # GeV
+    ecl_merge_pre_path = touch_CRFinder(ecl_merge_pre_path, new_threshold)
+    waveform_threshold = 99.  # GeV
+    ecl_merge_pre_path = touch_WaveformFit(ecl_merge_pre_path, waveform_threshold)
     ecl_merge_pre_path.pre_collector_path = ecl_merge_pre_path
 
     # --------------------------------------------------------------

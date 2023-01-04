@@ -49,7 +49,8 @@ namespace {
         if (object != nullptr)
         {
           return object->m_value;
-        } else {
+        } else
+        {
           return std::numeric_limits<double>::quiet_NaN();
         }
       };
@@ -121,7 +122,8 @@ namespace {
       } else if (std::holds_alternative<double>(var->function(object)))
       {
         sum += std::get<double>(var->function(object));
-      } else {
+      } else
+      {
         sum += std::get<bool>(var->function(object));
       }
       for (size_t i = 1; i < arguments.size(); i++)

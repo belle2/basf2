@@ -223,7 +223,8 @@ namespace Belle2::IOIntercept {
         }
         break;
       }
-      // is the message empty?
+      // is the message empty? cppcheck thinks that's always the case
+      // cppcheck-suppress knownConditionTrueFalse
       if (message.empty()) return;
       // add indentation
       boost::algorithm::replace_all(message, "\n", "\n" + indent);

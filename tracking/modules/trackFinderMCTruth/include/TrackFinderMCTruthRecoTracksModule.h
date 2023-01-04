@@ -8,6 +8,18 @@
 #pragma once
 
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
+#include <mdst/dataobjects/MCParticle.h>
+#include <cdc/dataobjects/CDCHit.h>
+#include <cdc/dataobjects/CDCSimHit.h>
+#include <pxd/dataobjects/PXDTrueHit.h>
+#include <pxd/dataobjects/PXDCluster.h>
+#include <svd/dataobjects/SVDTrueHit.h>
+#include <svd/dataobjects/SVDCluster.h>
+#include <vtx/dataobjects/VTXTrueHit.h>
+#include <vtx/dataobjects/VTXCluster.h>
+#include <tracking/dataobjects/RecoTrack.h>
+
 #include <TMatrixDSym.h>
 #include <string>
 
@@ -122,6 +134,17 @@ namespace Belle2 {
     std::array<bool, 9> m_useCDCSuperLayers{};   /**< Bits for the used super layers ATTENTION: hardcoded value for number of super layers */
 
     std::array<bool, 56> m_useCDCLayers{};       /**< Bits for the used layers ATTENTION: hardcoded value for number of layers */
+
+    StoreArray<MCParticle> m_MCParticles;   /**< MCParticles StoreArray */
+    StoreArray<RecoTrack> m_RecoTracks;     /**< RecoTracks StoreArray */
+    StoreArray<PXDTrueHit> m_PXDTrueHits;   /**< PXDTrueHits StoreArray */
+    StoreArray<PXDCluster> m_PXDClusters;   /**< PXDClusters StoreArray */
+    StoreArray<SVDTrueHit> m_SVDTrueHits;   /**< SVDTrueHits StoreArray */
+    StoreArray<SVDCluster> m_SVDClusters;   /**< SVDTrueHits StoreArray */
+    StoreArray<VTXTrueHit> m_VTXTrueHits;   /**< VTXTrueHits StoreArray */
+    StoreArray<VTXCluster> m_VTXClusters;   /**< VTXClusters StoreArray */
+    StoreArray<CDCHit> m_CDCHits;           /**< CDCHits StoreArray */
+    StoreArray<CDCSimHit> m_CDCSimHits;     /**< CDCSimHits StoreArray */
   };
 }
 

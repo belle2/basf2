@@ -33,7 +33,7 @@ using namespace ECL;
 //-----------------------------------------------------------------
 //                 Register the Modules
 //-----------------------------------------------------------------
-REG_MODULE(ECLWaveformFit)
+REG_MODULE(ECLWaveformFit);
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
@@ -54,6 +54,7 @@ namespace {
   double aNoise;
 
   //Function to minimize in photon template + hadron template fit. (chi2)
+  // cppcheck-suppress constParameter ; TF1 fit functions cannot have const parameters
   void FCN2h(int&, double* grad, double& f, double* p, int)
   {
     constexpr int N = 31;
@@ -89,6 +90,7 @@ namespace {
   }
 
   //Function to minimize in photon template + hadron template + background photon fit. (chi2)
+  // cppcheck-suppress constParameter ; TF1 fit functions cannot have const parameters
   void FCN2h2(int&, double* grad, double& f, double* p, int)
   {
     const int N = 31;
@@ -212,9 +214,9 @@ void ECLWaveformFitModule::loadTemplateParameterArray()
         Htemp[j] = (double)WavePars->getHadronParameters(i + 1)[j];
         Dtemp[j] = (double)WavePars->getDiodeParameters(i + 1)[j];
       }
-      new(&m_si[i][0]) SignalInterpolation2(Ptemp);
-      new(&m_si[i][1]) SignalInterpolation2(Htemp);
-      new(&m_si[i][2]) SignalInterpolation2(Dtemp);
+      new (&m_si[i][0]) SignalInterpolation2(Ptemp);
+      new (&m_si[i][1]) SignalInterpolation2(Htemp);
+      new (&m_si[i][2]) SignalInterpolation2(Dtemp);
     }
   } else {
     //load mc template
@@ -225,9 +227,9 @@ void ECLWaveformFitModule::loadTemplateParameterArray()
       Htemp[j] = (double)WaveParsMC->getHadronParameters()[j];
       Dtemp[j] = (double)WaveParsMC->getDiodeParameters()[j];
     }
-    new(&m_si[0][0]) SignalInterpolation2(Ptemp);
-    new(&m_si[0][1]) SignalInterpolation2(Htemp);
-    new(&m_si[0][2]) SignalInterpolation2(Dtemp);
+    new (&m_si[0][0]) SignalInterpolation2(Ptemp);
+    new (&m_si[0][1]) SignalInterpolation2(Htemp);
+    new (&m_si[0][2]) SignalInterpolation2(Dtemp);
   }
 }
 
@@ -480,9 +482,13 @@ void ECLWaveformFitModule::Fit2hExtraPhoton(double& B, double& Ag, double& T, do
   double amax1 = 0; int jmax1 = 6;
   for (int j = 0; j < 31; j++)
     if (j < jmax - 3 || jmax + 4 < j) {
-      if (j == 0  && amax1 < fitA[j] && fitA[j + 1] < fitA[j]) { amax1 = fitA[j]; jmax1 = j;}
-      else if (j == 30 && amax1 < fitA[j] && fitA[j - 1] < fitA[j]) { amax1 = fitA[j]; jmax1 = j;}
-      else if (amax1 < fitA[j] && fitA[j + 1] < fitA[j] && fitA[j - 1] < fitA[j]) { amax1 = fitA[j]; jmax1 = j;}
+      if (j == 0) {
+        if (amax1 < fitA[j] && fitA[j + 1] < fitA[j]) { amax1 = fitA[j]; jmax1 = j;}
+      } else if (j == 30) {
+        if (amax1 < fitA[j] && fitA[j - 1] < fitA[j]) { amax1 = fitA[j]; jmax1 = j;}
+      } else {
+        if (amax1 < fitA[j] && fitA[j + 1] < fitA[j] && fitA[j - 1] < fitA[j]) { amax1 = fitA[j]; jmax1 = j;}
+      }
     }
 
   double sumB0 = 0; int jsum = 0;
@@ -499,7 +505,7 @@ void ECLWaveformFitModule::Fit2hExtraPhoton(double& B, double& Ag, double& T, do
   m_Minit2h2->mnparm(2, "T",  T0,   0.5, T0 - 2.5, T0 + 2.5, ierflg);
   m_Minit2h2->mnparm(3, "Ah", 0., A0 / 20,    -A0,   2 * A0, ierflg);
   m_Minit2h2->mnparm(4, "A2", A01, A01 / 20,    0,   2 * A01, ierflg);
-  m_Minit2h2->mnparm(5, "T2", T01 ,  0.5 ,    T01 - 2.5,   T01 + 2.5, ierflg);
+  m_Minit2h2->mnparm(5, "T2", T01,  0.5,    T01 - 2.5,   T01 + 2.5, ierflg);
 
   // Now ready for minimization step
   arglist[0] = 50000;

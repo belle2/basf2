@@ -19,6 +19,8 @@
 
 namespace Belle2 {
 
+  class StringWrapper;
+
   /** Module to calculate variables specified by the user for a given ParticleList
    *  and save them into a TTree. The Tree is event-based, meaning that the variables of each candidate for each event
    *  are saved in an array in a branch of the Tree.
@@ -93,5 +95,7 @@ namespace Belle2 {
     /** event metadata (get event number etc) */
     StoreObjPtr<EventMetaData> m_eventMetaData;
 
+    std::string m_MCDecayString; /**< MC decay string to be filled */
+    StoreObjPtr<StringWrapper> m_stringWrapper; /**< string wrapper storing the MCDecayString */
   };
 } // end namespace Belle2

@@ -11,7 +11,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(SPTC2RTConverter)
+REG_MODULE(SPTC2RTConverter);
 
 SPTC2RTConverterModule::SPTC2RTConverterModule() : Module()
 {
@@ -78,7 +78,7 @@ void SPTC2RTConverterModule::event()
   for (const SpacePointTrackCand& spacePointTC : m_spacePointTCs) {
     m_SPTCCtr++;
     if (spacePointTC.getRefereeStatus() < SpacePointTrackCand::c_isActive) {
-      B2DEBUG(100, "SPTC2RTConverter::event: SpacePointTrackCandidate not active or reserved. RefereeStatus: " <<
+      B2DEBUG(29, "SPTC2RTConverter::event: SpacePointTrackCandidate not active or reserved. RefereeStatus: " <<
               spacePointTC.getRefereeStatus());
       continue; // Ignore SpacePointTrackCandidate
     } else if (spacePointTC.getNHits() < 3) {
@@ -94,8 +94,8 @@ void SPTC2RTConverterModule::createRecoTrack(const SpacePointTrackCand& spacePoi
 {
 
   // Determine the tracking parameters
-  const TVector3& position = spacePointTC.getPosSeed();
-  const TVector3& momentum = spacePointTC.getMomSeed();
+  const ROOT::Math::XYZVector& position = spacePointTC.getPosSeed();
+  const ROOT::Math::XYZVector& momentum = spacePointTC.getMomSeed();
   const short int charge = spacePointTC.getChargeSeed();
   const TMatrixDSym& covSeed = spacePointTC.getCovSeed();
   const float qi = spacePointTC.getQualityIndicator();
@@ -117,13 +117,13 @@ void SPTC2RTConverterModule::createRecoTrack(const SpacePointTrackCand& spacePoi
   // Add individual Hits/Clusters
   unsigned int sortingParameter = 0; // Recreate sorting since there are two cluster per SVD hit.
   for (auto spacePoint : spacePointTC.getSortedHits()) {
-    B2DEBUG(110, "SPTC2RTConverter::event: Converting spacepoint: " << spacePoint->getArrayIndex());
+    B2DEBUG(29, "SPTC2RTConverter::event: Converting spacepoint: " << spacePoint->getArrayIndex());
 
     int detID = spacePoint->getType();
 
     if (detID == VXD::SensorInfoBase::PXD) {
       RelationVector<PXDCluster> relatedClusters = spacePoint->getRelationsTo<PXDCluster>(m_param_pxdClustersName);
-      B2DEBUG(110, "SPTC2RTConverter::event: Number of related PXD Clusters: " << relatedClusters.size());
+      B2DEBUG(29, "SPTC2RTConverter::event: Number of related PXD Clusters: " << relatedClusters.size());
       // relatedClusters should only contain 1 cluster for pxdHits. Loop over them to be robust against missing relations.
       for (const PXDCluster& cluster : relatedClusters) {
         newRecoTrack->addPXDHit(&cluster, sortingParameter, Belle2::RecoHitInformation::c_VXDTrackFinder);
@@ -139,7 +139,7 @@ void SPTC2RTConverterModule::createRecoTrack(const SpacePointTrackCand& spacePoi
       }
     } else if (detID == VXD::SensorInfoBase::SVD) {
       RelationVector<SVDCluster> relatedClusters = spacePoint->getRelationsTo<SVDCluster>(m_param_svdClustersName);
-      B2DEBUG(110, "SPTC2RTConverter::event: Number of related SVD Clusters: " << relatedClusters.size());
+      B2DEBUG(29, "SPTC2RTConverter::event: Number of related SVD Clusters: " << relatedClusters.size());
       // relatedClusters should contain 2 clusters for svdHits. Loop over them to be robust against missing relations.
       for (const SVDCluster& cluster : relatedClusters) {
         newRecoTrack->addSVDHit(&cluster, sortingParameter, Belle2::RecoHitInformation::c_VXDTrackFinder);
@@ -156,7 +156,7 @@ void SPTC2RTConverterModule::createRecoTrack(const SpacePointTrackCand& spacePoi
   // Add relation to SpacePointTrackCandidate
   newRecoTrack->addRelationTo(&spacePointTC);
 
-  B2DEBUG(110, "SPTC2RTConverter::event: nHits: " << spacePointTC.getNHits() <<
+  B2DEBUG(29, "SPTC2RTConverter::event: nHits: " << spacePointTC.getNHits() <<
           " ChargeSeed: " << charge <<
           " PositionSeed: " << position.X() << ", " << position.Y() << ", " << position.Z() <<
           " MomentumSeed: " << momentum.X() << ", " << momentum.Y() << ", " << momentum.Z());
@@ -164,7 +164,7 @@ void SPTC2RTConverterModule::createRecoTrack(const SpacePointTrackCand& spacePoi
 
 void SPTC2RTConverterModule::terminate()
 {
-  B2DEBUG(100, "SPTC2RTConverter::terminate: Got " << m_SPTCCtr << " SpacePointTrackCands and created " << m_RTCtr << " RecoTracks";);
+  B2DEBUG(29, "SPTC2RTConverter::terminate: Got " << m_SPTCCtr << " SpacePointTrackCands and created " << m_RTCtr << " RecoTracks");
 }
 
 void SPTC2RTConverterModule::initializeCounters()

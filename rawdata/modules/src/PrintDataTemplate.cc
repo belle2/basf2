@@ -19,7 +19,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(PrintDataTemplate)
+REG_MODULE(PrintDataTemplate);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -98,10 +98,10 @@ void PrintDataTemplateModule::printFTSWEvent(RawDataBlock* raw_datablock, int i)
 
   timeval tv;
   int n = i;
-  rawftsw.GetTTTimeVal(n , &tv);
+  rawftsw.GetTTTimeVal(n, &tv);
 
   timeval tv_pc;
-  rawftsw.GetPCTimeVal(n , &tv_pc);
+  rawftsw.GetPCTimeVal(n, &tv_pc);
 
   printf("HdrNwords %d nodeID %.8x runsub %.8x run %.4x sub %.4x exp %.4x eve %.8x trl %.8x\n",
          rawftsw.GetNwordsHeader(n),
@@ -173,7 +173,7 @@ void PrintDataTemplateModule::checkFTSWver2(RawFTSW* rawftsw, int i)
   unsigned int bunch_num = buf[ 14 ] & 0x7ff;
 
   timeval tv;
-  rawftsw->GetTTTimeVal(i , &tv);
+  rawftsw->GetTTTimeVal(i, &tv);
 
   //int err_flag = 0;
 

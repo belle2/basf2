@@ -31,8 +31,8 @@
   <xi:include href="../arich/ARICH-Materials.xml"/>
   <xi:include href="../arich/ARICH-Materials-Aerogel.xml"/>
   <xi:include href="../ecl/ECL-Materials.xml"/>
-  <xi:include href="../klm/bklm/BKLM-Materials.xml"/>
-  <xi:include href="../klm/eklm/EKLMMaterials.xml"/>
+  <xi:include href="../klm/BKLMMaterials.xml"/>
+  <xi:include href="../klm/EKLMMaterials.xml"/>
   <xi:include href="../beast/bgo/BGO-Materials.xml" />
   <xi:include href="../beast/microtpc/MICROTPC-Materials.xml"/>
   <xi:include href="../beast/pindiode/PINDIODE-Materials.xml"/>
@@ -137,6 +137,9 @@
   <!-- Vertex detector upgrade specific subdetectors -->
   <DetectorComponent name="VTX-CMOS-5layer" isDefault="false">
     <xi:include href="../vtx/VTX-CMOS5.xml" xpointer="xpointer(/DetectorComponent/*)" />
+  </DetectorComponent>
+  <DetectorComponent name="VTX-CMOS-5layer-L3mod" isDefault="false">
+    <xi:include href="../vtx/VTX-CMOS5-L3mod.xml" xpointer="xpointer(/DetectorComponent/*)" />
   </DetectorComponent>
   <DetectorComponent name="VTX-CMOS-5layer-plus1inCDC" isDefault="false">
     <xi:include href="../vtx/VTX-CMOS5-plus1inCDC.xml" xpointer="xpointer(/DetectorComponent/*)" />

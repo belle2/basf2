@@ -19,6 +19,7 @@ using namespace Belle2;
 using namespace ECL;
 
 /**..Novosibirsk function, plus constant  H. Ikeda et al., Nuclear Instruments and Methods A 441 (2000) 401-426. */
+// cppcheck-suppress constParameter ; TF1 fit functions cannot have const parameters
 double eclCosmicNovoConst(double* x, double* par)
 {
   double qc = 0.;
@@ -220,7 +221,7 @@ CalibrationAlgorithm::EResult eclCosmicEAlgorithm::calibrate()
 
   /**-----------------------------------------------------------------------------------------------*/
   /**..Some prep for the many fits about to follow  */
-  TString preName[2] = {"SameRing", "DifferentRing"};
+  const TString preName[2] = {"SameRing", "DifferentRing"};
 
   TH1F* PeakperCrys[2];
   PeakperCrys[0] = new TH1F("PeakperCrysSame", "Fit peak per crystal, same theta ring;Crystal ID;Peak normalized energy", 8736, 0,

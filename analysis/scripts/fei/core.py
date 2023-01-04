@@ -120,6 +120,7 @@ class TrainingDataInformation:
         Read out the number of MC particles from the file created by reconstruct
         """
         # Unique absolute pdg-codes of all particles
+        # Always avoid the top-level 'import ROOT'.
         import ROOT  # noqa
         root_file = ROOT.TFile.Open(self.filename, 'read')
         mc_counts = {}
@@ -177,7 +178,7 @@ class FSPLoader:
         else:
             ma.fillParticleLists([('K+:FSP', ''), ('pi+:FSP', ''), ('e+:FSP', ''),
                                   ('mu+:FSP', ''), ('gamma:FSP', ''),
-                                  ('p+:FSP', ''), ('K_L0:FSP', '')], writeOut=True, loadPhotonBeamBackgroundMVA=False, path=path)
+                                  ('p+:FSP', ''), ('K_L0:FSP', '')], writeOut=True, path=path)
             ma.fillParticleList('K_S0:V0 -> pi+ pi-', '', writeOut=True, path=path)
             ma.fillParticleList('Lambda0:V0 -> p+ pi-', '', writeOut=True, path=path)
             ma.fillConvertedPhotonsList('gamma:V0 -> e+ e-', '', writeOut=True, path=path)
@@ -620,6 +621,7 @@ class Teacher:
         """
         Do all trainings for which we find training data
         """
+        # Always avoid the top-level 'import ROOT'.
         import ROOT  # noqa
         # FEI uses multi-threading for parallel execution of tasks therefore
         # the ROOT gui-thread is disabled, which otherwise interferes sometimes

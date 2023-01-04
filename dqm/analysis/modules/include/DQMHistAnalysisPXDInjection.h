@@ -13,11 +13,9 @@
 
 #pragma once
 
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 #include <vxd/geometry/GeoCache.h>
 
-#include <TH1.h>
-#include <TCanvas.h>
 
 namespace Belle2 {
   /*! DQM Histogram Analysis for PXD occupancy after Injection */

@@ -16,7 +16,7 @@
 #include <framework/datastore/RelationsObject.h>
 
 /* ROOT headers. */
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 
 /* CLHEP headers. */
 #include <CLHEP/Vector/ThreeVector.h>
@@ -212,7 +212,7 @@ namespace Belle2 {
      * Set hit global position.
      * @param[in] pos Position.
      */
-    //void setPosition(const TVector3& pos);
+    //void setPosition(const ROOT::Math::XYZVector& pos);
 
     /**
      * Get hit global position x coordinate.
@@ -245,9 +245,9 @@ namespace Belle2 {
      * Get hit global position.
      * @return Hit coordinates.
      */
-    TVector3 getPosition() const
+    ROOT::Math::XYZVector getPosition() const
     {
-      return TVector3(m_GlobalX, m_GlobalY, m_GlobalZ);
+      return ROOT::Math::XYZVector(m_GlobalX, m_GlobalY, m_GlobalZ);
     }
 
     /**

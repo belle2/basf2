@@ -4,18 +4,26 @@
 [INFO] Added file ${BELLE2_SOFTWARE_DIR}/analysis/tests/udst-v05-00-00.root
 Untested method Particle::appendDaughter
 Untested method Particle::forEachDaughter
+Untested method Particle::getAllDaughters
 Untested method Particle::getArrayPointer
+Untested method Particle::getMostLikelyTrackFitResult
+Untested method Particle::getPDGLifetime
 Untested method Particle::isCopyOf
 Untested method Particle::isMostLikely
+Untested method Particle::isMostLikelyTrackFitResult
 Untested method Particle::overlapsWith
 Untested method Particle::removeDaughter
 Untested method Particle::removeExtraInfo
+Untested method Particle::replaceDaughter
+Untested method Particle::replaceDaughterRecursively
 Untested method Particle::set4Vector
+Untested method Particle::set4VectorDividingByMomentumScaling
 Untested method Particle::setExtraInfo
 Untested method Particle::setJacobiMatrix
 Untested method Particle::setMomentumScalingFactor
 Untested method Particle::setMomentumSmearingFactor
 Untested method Particle::setMomentumVertexErrorMatrix
+Untested method Particle::setPDGCode
 Untested method Particle::setPValue
 Untested method Particle::setProperty
 Untested method Particle::setVertex
@@ -950,7 +958,7 @@ Particle#7:
   getAcoplanarity(): nan
   getCharge(): 0
   getCosHelicity(): -0.964198
-  getCosHelicityDaughter(0): -0.922448
+  getCosHelicityDaughter(0): -0.922447
   getDaughter(0): -> Particles#6
   getDaughter(1): -> Particles#4
   getDaughterIndices(): size(3)
@@ -1219,7 +1227,7 @@ Particle#9:
   getAcoplanarity(): nan
   getCharge(): 1
   getCosHelicity(): 0.232871
-  getCosHelicityDaughter(0): -0.597175
+  getCosHelicityDaughter(0): -0.597174
   getDaughter(0): -> Particles#8
   getDaughter(1): -> Particles#1
   getDaughterIndices(): size(2)

@@ -10,7 +10,7 @@
 
 #include <vxd/geometry/SensorInfoBase.h>
 
-#include <root/TVector3.h>
+#include <Math/Vector3D.h>
 
 namespace Belle2 {
   /** Namespace to encapsulate code needed for simulation and reconstrucion of the PXD */
@@ -140,25 +140,25 @@ namespace Belle2 {
        * @param info The SensorInfo for the current sensor.
        * @return The E field vector in local coordinates.
        */
-      const TVector3 getEField(const TVector3& point) const;
+      const ROOT::Math::XYZVector getEField(const ROOT::Math::XYZVector& point) const;
       /** Get B field value from the field map.
        * @param point Desired position in local coordinates.
        * @param info the SensorInfo for the current sensor.
        * @return The B field vector in local coordinates.
        */
-      const TVector3 getBField(const TVector3& point) const;
+      const ROOT::Math::XYZVector getBField(const ROOT::Math::XYZVector& point) const;
       /** Calculate Lorentz shift.
        * @param u Local u coordinate
        * @param v Local v coordinate
        * @return 3-vector (du, dv, 0) of Lorentz shifts.
        */
-      const TVector3 getLorentzShift(double u, double v) const;
+      const ROOT::Math::XYZVector getLorentzShift(double u, double v) const;
       /** Calculate drift velocity of an electron.
        * @param E Electric field vector
        * @param B Magnetic field vector
        * @result drift velocity of an electron in the E+B field.
        */
-      const TVector3 getDriftVelocity(const TVector3& E, const TVector3& B) const;
+      const ROOT::Math::XYZVector getDriftVelocity(const ROOT::Math::XYZVector& E, const ROOT::Math::XYZVector& B) const;
       /** Return pixel kind ID
        * @param sensorID the sensor identification
        * @param v Local v coordinate

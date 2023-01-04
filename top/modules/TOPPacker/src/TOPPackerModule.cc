@@ -30,10 +30,10 @@ namespace Belle2 {
   using namespace TOP;
 
   //-----------------------------------------------------------------
-  //                 Register module
+  ///                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPPacker)
+  REG_MODULE(TOPPacker);
 
   //-----------------------------------------------------------------
   //                 Implementation

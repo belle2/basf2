@@ -14,7 +14,7 @@
 #endif
 
 //DQM
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 
 //std
 #include <set>
@@ -65,6 +65,20 @@ namespace Belle2 {
     chid chid_logic[c_collector_count];
     /** EPICS channels for pedestal width */
     chid chid_pedwidth[4];
+
+    /** Max pedestal width array
+     * [0] -> Max pedestal width in FWD endcap
+     * [1] -> Max pedestal width in barrel
+     * [2] -> Max pedestal width in BWD endcap
+     * [3] -> Max pedestal width in all calorimeter
+     * The algorithm takes not the actual maximum,
+     * it first filters out highest 10% of noisy channels
+     * in an attempt to provide more robust estimate.
+     */
+    double m_pedwidth_max[4] = {};
+
+    MonitoringObject* m_monObj = nullptr; /**< monitoring object */
+    TCanvas* m_c_main = nullptr; /**< main panel for monitoring object */
 #endif
   };
 } // end namespace Belle2

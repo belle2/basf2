@@ -114,6 +114,10 @@ bool Variable::Manager::addAlias(const std::string& alias, const std::string& va
   return true;
 }
 
+void Variable::Manager::clearAliases()
+{
+  m_alias.clear();
+}
 
 void Variable::Manager::printAliases()
 {

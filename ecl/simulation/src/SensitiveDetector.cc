@@ -84,11 +84,11 @@ bool SensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
   const G4ParticleDefinition* StepParticleDefinition = aStep->GetTrack()->GetParticleDefinition();
   G4Material* StepMaterial = aStep->GetTrack()->GetMaterial();
   const double CsIDensity = 4.51; //gcm^-3
-  double ELE_DEDX = m_emCal.ComputeDEDX(avgKineticEnergy, StepParticleDefinition, "eIoni"  ,
+  double ELE_DEDX = m_emCal.ComputeDEDX(avgKineticEnergy, StepParticleDefinition, "eIoni",
                                         StepMaterial) / CLHEP::MeV * CLHEP::cm / (CsIDensity);
-  double MU_DEDX = m_emCal.ComputeDEDX(avgKineticEnergy, StepParticleDefinition, "muIoni"  ,
+  double MU_DEDX = m_emCal.ComputeDEDX(avgKineticEnergy, StepParticleDefinition, "muIoni",
                                        StepMaterial) / CLHEP::MeV * CLHEP::cm / (CsIDensity);
-  double HAD_DEDX = m_emCal.ComputeDEDX(avgKineticEnergy, StepParticleDefinition, "hIoni"  ,
+  double HAD_DEDX = m_emCal.ComputeDEDX(avgKineticEnergy, StepParticleDefinition, "hIoni",
                                         StepMaterial) / CLHEP::MeV * CLHEP::cm / (CsIDensity);
   double ION_DEDX = m_emCal.ComputeDEDX(avgKineticEnergy, StepParticleDefinition, "ionIoni",
                                         StepMaterial) / CLHEP::MeV * CLHEP::cm / (CsIDensity);
@@ -330,7 +330,7 @@ bool BkgSensitiveDiode::step(G4Step* aStep, G4TouchableHistory*)
     //Get world position
     const G4ThreeVector& worldPosition = s0.GetPosition();
     const double mm2cm = Unit::mm / Unit::cm;
-    m_startPos.SetXYZ(worldPosition.x() * mm2cm , worldPosition.y() * mm2cm, worldPosition.z() * mm2cm);
+    m_startPos.SetXYZ(worldPosition.x() * mm2cm, worldPosition.y() * mm2cm, worldPosition.z() * mm2cm);
     //Get momentum
     const G4ThreeVector& momentum = s0.GetMomentum() ;
     m_startMom.SetXYZ(momentum.x() * Unit::MeV, momentum.y() * Unit::MeV, momentum.z() * Unit::MeV);

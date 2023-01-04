@@ -11,10 +11,9 @@
 #include <framework/dataobjects/Helix.h>
 #include <framework/geometry/BFieldManager.h>
 
-using namespace std;
 using namespace Belle2;
 
-REG_MODULE(RadiusTrackTimeEstimator)
+REG_MODULE(RadiusTrackTimeEstimator);
 
 RadiusTrackTimeEstimatorModule::RadiusTrackTimeEstimatorModule() : BaseTrackTimeEstimatorModule()
 {
@@ -38,9 +37,9 @@ const
 
 double RadiusTrackTimeEstimatorModule::estimateFlightLengthUsingSeedInformation(const RecoTrack& recoTrack) const
 {
-  const TVector3& momentum = recoTrack.getMomentumSeed();
+  const ROOT::Math::XYZVector& momentum = recoTrack.getMomentumSeed();
   const short int charge = recoTrack.getChargeSeed();
-  const TVector3& position = recoTrack.getPositionSeed();
+  const ROOT::Math::XYZVector& position = recoTrack.getPositionSeed();
 
   const double bZ = BFieldManager::getField(0, 0, 0).Z() / Unit::T;
   const Helix h(position, momentum, charge, bZ);

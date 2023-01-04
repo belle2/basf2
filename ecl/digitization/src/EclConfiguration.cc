@@ -31,7 +31,8 @@ double EclConfiguration::getRF()
    *   see www-linac.kek.jp/linac-com/report/skb-tdr/, ch. 6 */
   if (m_rf < 0) {
     DBObjPtr<Belle2::HardwareClockSettings> clock_info("HardwareClockSettings");
-    m_rf = clock_info->getAcceleratorRF();
+    // Convert RF from GHz to MHz
+    m_rf = clock_info->getAcceleratorRF() * 1e3;
   }
   return m_rf;
 }

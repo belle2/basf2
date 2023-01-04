@@ -63,7 +63,7 @@
   </Ladder>
   
   <Ladder layer="6">
-    <shift  unit="mm"> 8.0</shift>
+    <shift  unit="mm"> 12.0</shift>
     <radius unit="mm">225.0</radius>
     <Sensor id="10" type="LayerInCDC" unit="mm" flipV="true"> -360.0</Sensor>
     <Sensor id="9" type="LayerInCDC" unit="mm" flipV="true"> -240.0</Sensor>

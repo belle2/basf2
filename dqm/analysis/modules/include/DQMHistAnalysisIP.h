@@ -12,18 +12,14 @@
 
 #pragma once
 
+#include <dqm/core/DQMHistAnalysis.h>
+
 #ifdef _BELLE2_EPICS
 // EPICS
 #include "cadef.h"
 #endif
 
-#include <framework/core/Module.h>
-
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
-
-#include <TCanvas.h>
 #include <TLine.h>
-#include <TH1.h>
 
 namespace Belle2 {
   /*! Class definition for the output module of Sequential ROOT I/O */
@@ -66,7 +62,9 @@ namespace Belle2 {
     // Data members
   private:
     /** The name of the histogram. */
-    std::string m_histoname;
+    std::string m_histoName;
+    /** The name of the histogram dir. */
+    std::string m_histoDirectory;
     /** The prefix of PV. */
     std::string  m_pvPrefix;
     /** The prefix for MonitoringObj. */
@@ -76,11 +74,10 @@ namespace Belle2 {
 
     /** The drawing canvas. */
     TCanvas* m_c1 = nullptr;
-    /** The line for the fitting result. */
+    /** The line for the mean result. */
     TLine* m_line = nullptr;
-
-    /** last histogram */
-    TH1* m_h_last = nullptr;
+    /** The line for the median result. */
+    TLine* m_line2 = nullptr;
 
     /** Monitoring Object */
     MonitoringObject* m_monObj {};
@@ -88,9 +85,9 @@ namespace Belle2 {
     /** flag if to export to EPICS */
     bool m_useEpics;
     /** number of EPICS PVs */
-    static const int m_parameters = 2;
+    static const int m_parameters = 3;
 #ifdef _BELLE2_EPICS
-    chid mychid[m_parameters];// hard limit max 2 parameters
+    chid mychid[m_parameters];// hard limit max parameters
 #endif
   };
 } // end namespace Belle2

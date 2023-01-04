@@ -68,6 +68,101 @@ namespace Belle2 {
     class DetectorSet {
     public:
 
+      /**
+       * Iterator.
+       */
+      class Iterator {
+
+      public:
+
+        /**
+         * Constructor.
+         * @param[in] index           Index.
+         * @param[in] detectorSetBits Bits in DetectorSet.
+         * @param[in] setBit          Set bit.
+         */
+        Iterator(int index, uint16_t detectorSetBits, uint16_t setBit) :
+          m_Index(index),
+          m_DetectorSetBits(detectorSetBits),
+          m_SetBit(setBit)
+        {
+        }
+
+        /**
+         * Destructor.
+         */
+        ~Iterator()
+        {
+        }
+
+        /**
+         * Operator ++.
+         */
+        Iterator& operator++();
+
+        /**
+         * Increment.
+         */
+        void increment()
+        {
+          ++(*this);
+        }
+
+        /**
+         * Operator *.
+         */
+        EDetector operator*() const
+        {
+          return DetectorSet::getDetector(m_SetBit);
+        }
+
+        /**
+         * Get detector.
+         */
+        EDetector getDetector() const
+        {
+          return *(*this);
+        }
+
+        /**
+         * Operator ==.
+         */
+        bool operator==(const Iterator& iterator);
+
+        /**
+         * Operator !=.
+         */
+        bool operator!=(const Iterator& iterator);
+
+        /**
+         * Get index.
+         */
+        int getIndex() const
+        {
+          return m_Index;
+        }
+
+        /**
+         * Get set bit.
+         */
+        uint16_t getSetBit() const
+        {
+          return m_SetBit;
+        }
+
+      private:
+
+        /** Index. */
+        int m_Index;
+
+        /** Bits in DetectorSet. */
+        uint16_t m_DetectorSetBits;
+
+        /** Set bit. */
+        uint16_t m_SetBit;
+
+      };
+
       /** Default constructor */
       DetectorSet(): m_bits(0) {}
       /** Copy constructor */
@@ -86,6 +181,16 @@ namespace Belle2 {
        * Destructor.
        */
       virtual ~DetectorSet() {};
+
+      /**
+       * Beginning iterator.
+       */
+      Iterator begin() const;
+
+      /**
+       * Ending iterator.
+       */
+      Iterator end() const;
 
       /**
        * Addition of another set to this one.
@@ -118,18 +223,20 @@ namespace Belle2 {
       bool contains(const DetectorSet& set) const {return (m_bits & set.m_bits) == set.m_bits;}
 
       /**
+       * Check whether this set contains detector specified by iterator.
+       * @param[in] it Iterator.
+       */
+      bool contains(const Iterator& it) const
+      {
+        return (m_bits & it.getSetBit()) != 0;
+      }
+
+      /**
        * Getter for the index of a given detector in this set.
        * @param det  The detector ID.
        * @return     Index of the detector ID in this set, or -1 if the detector ID is not in this set.
        */
       int getIndex(EDetector det) const;
-
-      /**
-       * Accessor for a detector ID in this set.
-       * @param index  The index in the set.
-       * @return       The detector ID at the given index, or Const::invalidDetector if the index is out of range.
-       */
-      EDetector operator [](int index) const;
 
       /**
        * Getter for number of detector IDs in this set.
@@ -139,7 +246,7 @@ namespace Belle2 {
       /**
        * String for printing in python.
        */
-      std::string __repr__() const;
+      std::string __str__() const;
 
     private:
 
@@ -147,25 +254,28 @@ namespace Belle2 {
        * Constructor.
        * @param bits  The internal representation of the set as bit pattern.
        */
-      explicit DetectorSet(unsigned short bits): m_bits(bits) {};
+      explicit DetectorSet(uint16_t bits): m_bits(bits) {};
 
       /**
        * Conversion of detector ID to bit pattern.
        * @param det  The detector ID.
        * @return     The bit pattern representing the given detector ID.
        */
-      static unsigned short getBit(EDetector det);
+      static uint16_t getBit(EDetector det);
 
       /**
        * Conversion of bit pattern to detector ID.
        * @param bit  The bit pattern.
        * @return     The detector ID corresponding to the given bit pattern.
        */
-      static EDetector getDetector(unsigned short bit);
+      static EDetector getDetector(uint16_t bit);
 
-      unsigned short m_bits;  /**< The internal representation of the set as bit pattern. */
+      /** The internal representation of the set as bit pattern. */
+      uint16_t m_bits;
 
-      ClassDef(DetectorSet, 1) /**< A set of Detector IDs. */
+      /** Class version. */
+      ClassDef(DetectorSet, 1);
+
     };
 
     /**

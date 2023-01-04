@@ -209,9 +209,13 @@ namespace {
     EXPECT_EQ(set.getIndex(Const::IR), -1);
     EXPECT_EQ(set.getIndex(Const::PXD), 0);
     EXPECT_EQ(set.getIndex(Const::VTX), 2);
-    EXPECT_EQ(set[0], Const::PXD);
-    EXPECT_EQ(set[2], Const::VTX);
-    EXPECT_EQ(set[3], Const::invalidDetector);
+    Const::DetectorSet::Iterator it = set.begin();
+    EXPECT_EQ(*it, Const::PXD);
+    ++it;
+    ++it;
+    EXPECT_EQ(*it, Const::VTX);
+    ++it;
+    EXPECT_EQ(*it, Const::invalidDetector);
     EXPECT_EQ(set.size(), (size_t)3);
     EXPECT_EQ(Const::allDetectors.size(), (size_t)13);
   }

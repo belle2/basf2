@@ -17,14 +17,14 @@ using namespace vxdHoughTracking;
 
 void FourHitFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "circleRadiusDifferenceCut"), m_param_CircleRadiusDifferenceCut,
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "circleRadiusDifferenceCut"), m_CircleRadiusDifferenceCut,
                                 "Cut on the difference of the radii of the two circles that can be defined by two hit triplets.",
-                                m_param_CircleRadiusDifferenceCut);
+                                m_CircleRadiusDifferenceCut);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "circleCenterPositionDifferenceCut"),
-                                m_param_CircleCenterPositionDifferenceCut,
+                                m_CircleCenterPositionDifferenceCut,
                                 "Cut on the difference between the center positions of the two circles that can be defined by two hit triplets.",
-                                m_param_CircleCenterPositionDifferenceCut);
+                                m_CircleCenterPositionDifferenceCut);
 }
 
 void FourHitFilter::beginRun()
@@ -50,10 +50,10 @@ FourHitFilter::operator()(const BasePathFilter::Object& pair)
 
   m_fourHitVariables.setHits(firstHitPos, secondHitPos, thirdHitPos, currentHitPos);
 
-  if (m_fourHitVariables.getCircleRadiusDifference() > m_param_CircleRadiusDifferenceCut) {
+  if (m_fourHitVariables.getCircleRadiusDifference() > m_CircleRadiusDifferenceCut) {
     return NAN;
   }
-  if (m_fourHitVariables.getCircleCenterPositionDifference() > m_param_CircleCenterPositionDifferenceCut) {
+  if (m_fourHitVariables.getCircleCenterPositionDifference() > m_CircleCenterPositionDifferenceCut) {
     return NAN;
   }
 

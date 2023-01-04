@@ -11,6 +11,8 @@
 #include <vxd/dbobjects/VXDGeometryPar.h>
 #include <vxd/dbobjects/VXDPolyConePar.h>
 
+#include <vxd/dbobjects/VXDRotationSolidPar.h>
+
 namespace Belle2 {
 
 
@@ -22,6 +24,12 @@ namespace Belle2 {
   public:
     //! Default constructor
     VTXGeometryPar() {}
+
+    /** get VTX halfshell Rotation Solids */
+    const std::vector<VXDRotationSolidPar>& getRotationSolids() const {return m_halfShell;}
+    /** get VTX halfshell Rotation Solids */
+    std::vector<VXDRotationSolidPar>& getRotationSolids() {return m_halfShell;}
+
     /** build support */
     bool getBuildSupport() const { return (m_nCutouts > 0); }
     /** get number of cutouts */
@@ -104,6 +112,9 @@ namespace Belle2 {
     /** VTX Endflanges */
     std::vector<VXDPolyConePar> m_endflanges;
 
+    /** VTX Half Shell parameters */
+    std::vector<VXDRotationSolidPar> m_halfShell;
+
     /** Number of VTX endflange coutOuts */
     int m_nCutouts {0};
     /** Width of VTX endflange coutOuts */
@@ -138,7 +149,7 @@ namespace Belle2 {
     /** Material of VTX carbon tubes */
     std::string m_tubesMaterial {"Carbon"};
 
-    ClassDef(VTXGeometryPar, 5);  /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(VTXGeometryPar, 6);  /**< ClassDef, must be the last term before the closing {}*/
   };
 } // end of namespace Belle2
 

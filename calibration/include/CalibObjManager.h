@@ -110,6 +110,7 @@ namespace Belle2 {
 
   private:
 
+    /// Clone object
     template<class T>
     T* cloneObj(T* source, const std::string& newName) const
     {
@@ -132,8 +133,10 @@ namespace Belle2 {
     /// Sometimes it's nice to just pass in the EventMetaData instead of converting manually
     std::string getSuffix(const EventMetaData& emd) const;
 
+    /// Get object experiment and run name
     std::string getObjectExpRunName(const std::string& name, const Calibration::ExpRun& expRun) const;
 
+    /// Extract key index
     unsigned int extractKeyIndex(const std::string& keyName) const;
   };
   /// Template specialization for TTree needs to be defined here to prevent automatic specialization being created

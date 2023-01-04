@@ -422,7 +422,7 @@ namespace Belle2 {
         h_secHitsPerTrack[trSector]->Fill(nphoton);
         h_hitsPerTrack2D->Fill(recPos.X(), recPos.Y(), nphoton);
         int aeroID = arichGeoAero.getAerogelTileID(recPos.X(), recPos.Y());
-        h_aerogelHits3D->Fill(aeroID, (trPhi - arichGeoAero.getRingDPhi(iRing)*iAzimuth) / (arichGeoAero.getRingDPhi(iRing) / 20) ,
+        h_aerogelHits3D->Fill(aeroID, (trPhi - arichGeoAero.getRingDPhi(iRing)*iAzimuth) / (arichGeoAero.getRingDPhi(iRing) / 20),
                               (trR - arichGeoAero.getRingRadius(iRing)) / ((arichGeoAero.getRingRadius(iRing + 1) - arichGeoAero.getRingRadius(iRing)) / 20),
                               nphoton);
         h_aerogelHit->Fill(aeroID, nphoton);

@@ -26,7 +26,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(PXDClusterChargeCollector)
+REG_MODULE(PXDClusterChargeCollector);
 
 //-----------------------------------------------------------------
 //                 Implementation

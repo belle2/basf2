@@ -24,7 +24,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(MCMatcherKLMClusters)
+REG_MODULE(MCMatcherKLMClusters);
 
 MCMatcherKLMClustersModule::MCMatcherKLMClustersModule() : Module()
 {

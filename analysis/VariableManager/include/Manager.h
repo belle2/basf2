@@ -197,6 +197,11 @@ namespace Belle2 {
        */
       void printAliases();
 
+      /**
+       * Clear existing aliases
+       */
+      void clearAliases();
+
       /** Add collection
        * Return true if the collection was successfully added
        */

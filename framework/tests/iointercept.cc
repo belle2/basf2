@@ -51,27 +51,27 @@ namespace {
    */
   logconvert_params_t logconvert_params[] = {
     // test info message for stdout and stderr
-    {LogConfig::c_Info, "foo" , "foo", false, true},
-    {LogConfig::c_Info, "foo" , "foo", true, true},
+    {LogConfig::c_Info, "foo", "foo", false, true},
+    {LogConfig::c_Info, "foo", "foo", true, true},
     // also for error
-    {LogConfig::c_Error, "foo" , "foo", false, true},
-    {LogConfig::c_Error, "foo" , "foo", true, true},
+    {LogConfig::c_Error, "foo", "foo", false, true},
+    {LogConfig::c_Error, "foo", "foo", true, true},
     // ok, test the other levels only for stdout
-    {LogConfig::c_Warning, "foo" , "foo", false, true},
-    {LogConfig::c_Result, "foo" , "foo", false, true},
+    {LogConfig::c_Warning, "foo", "foo", false, true},
+    {LogConfig::c_Result, "foo", "foo", false, true},
     // test that empty message gets removed
-    {LogConfig::c_Info, "" , "", false, false},
+    {LogConfig::c_Info, "", "", false, false},
     // also with whitespace
-    {LogConfig::c_Info, " " , "", false, false},
-    {LogConfig::c_Info, " \t " , "", false, false},
-    {LogConfig::c_Info, " \n " , "", false, false},
+    {LogConfig::c_Info, " ", "", false, false},
+    {LogConfig::c_Info, " \t ", "", false, false},
+    {LogConfig::c_Info, " \n ", "", false, false},
     // trim space at end
-    {LogConfig::c_Info, "message\n\n   \t\r\n" , "message", false, true},
+    {LogConfig::c_Info, "message\n\n   \t\r\n", "message", false, true},
     // trim space at beginning
-    {LogConfig::c_Info, "   \n\t\nmessage" , "message", false, true},
+    {LogConfig::c_Info, "   \n\t\nmessage", "message", false, true},
     // but not the spaces in the first line which also contains text to not break alignment of formatted output
-    {LogConfig::c_Info, "   \n\tmessage" , "\tmessage", false, true},
-    {LogConfig::c_Info, "   \n  message" , "  message", false, true},
+    {LogConfig::c_Info, "   \n\tmessage", "\tmessage", false, true},
+    {LogConfig::c_Info, "   \n  message", "  message", false, true},
 
   };
 

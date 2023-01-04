@@ -8,6 +8,7 @@
 
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
+#include <framework/geometry/XYZVectorToTVector3Converter.h>
 #include <vtx/reconstruction/VTXRecoHit.h>
 #include <vtx/reconstruction/VTXClusterPositionEstimator.h>
 //#include <pxd/reconstruction/VTXGainCalibrator.h>
@@ -18,7 +19,7 @@
 #include <vxd/geometry/GeoCache.h>
 
 #include <genfit/DetPlane.h>
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 #include <TRandom.h>
 
 using namespace std;
@@ -120,15 +121,16 @@ void VTXRecoHit::setDetectorPlane()
   const VTX::SensorInfo& geometry = dynamic_cast<const VTX::SensorInfo&>(VXD::GeoCache::get(m_sensorID));
 
   // Construct vectors o, u, v
-  TVector3 uLocal(1, 0, 0);
-  TVector3 vLocal(0, 1, 0);
-  TVector3 origin  = geometry.pointToGlobal(TVector3(0, 0, 0), true);
-  TVector3 uGlobal = geometry.vectorToGlobal(uLocal, true);
-  TVector3 vGlobal = geometry.vectorToGlobal(vLocal, true);
+  ROOT::Math::XYZVector uLocal(1, 0, 0);
+  ROOT::Math::XYZVector vLocal(0, 1, 0);
+  ROOT::Math::XYZVector origin  = geometry.pointToGlobal(ROOT::Math::XYZVector(0, 0, 0), true);
+  ROOT::Math::XYZVector uGlobal = geometry.vectorToGlobal(uLocal, true);
+  ROOT::Math::XYZVector vGlobal = geometry.vectorToGlobal(vLocal, true);
 
   //Construct the detector plane
   VXD::SensorPlane* finitePlane = new VXD::SensorPlane(m_sensorID, 20.0, 20.0);
-  genfit::SharedPlanePtr detPlane(new genfit::DetPlane(origin, uGlobal, vGlobal, finitePlane));
+  genfit::SharedPlanePtr detPlane(new genfit::DetPlane(XYZToTVector(origin), XYZToTVector(uGlobal), XYZToTVector(vGlobal),
+                                                       finitePlane));
   setPlane(detPlane, m_sensorID);
 }
 

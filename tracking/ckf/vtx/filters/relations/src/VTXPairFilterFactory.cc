@@ -54,25 +54,20 @@ VTXPairFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "all") {
     return std::make_unique<TrackFindingCDC::AllFilter<BaseVTXPairFilter>>();
-  }
-
-  if (filterName == "none") {
+    // cppcheck-suppress knownConditionTrueFalse
+  } else if (filterName == "none") {
     return std::make_unique<TrackFindingCDC::NoneFilter<BaseVTXPairFilter>>();
-  }
-
-  if (filterName == "sensor") {
+    // cppcheck-suppress knownConditionTrueFalse
+  } else if (filterName == "sensor") {
     return std::make_unique<SensorVTXPairFilter>();
-  }
-
-  if (filterName == "distance") {
+    // cppcheck-suppress knownConditionTrueFalse
+  } else if (filterName == "distance") {
     return std::make_unique<DistanceVTXPairFilter>();
-  }
-
-  if (filterName == "sectormap") {
+    // cppcheck-suppress knownConditionTrueFalse
+  } else if (filterName == "sectormap") {
     return std::make_unique<SectorMapBasedVTXPairFilter>();
-  }
-
-  if (filterName == "loose") {
+    // cppcheck-suppress knownConditionTrueFalse
+  } else if (filterName == "loose") {
     return std::make_unique<LooseVTXPairFilter>();
   }
 

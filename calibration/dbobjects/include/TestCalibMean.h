@@ -30,8 +30,8 @@ namespace Belle2 {
     void setMeanError(float meanError) {m_meanError = meanError;};
   private:
 
-    float m_mean;
-    float m_meanError;
+    float m_mean; /**< mean */
+    float m_meanError; /**< meanError */
 
     ClassDef(TestCalibMean, 1); /**< ClassDef */
   };

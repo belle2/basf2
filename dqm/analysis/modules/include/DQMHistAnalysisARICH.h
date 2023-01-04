@@ -9,7 +9,7 @@
 #pragma once
 
 //DQM
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 
 //ARICH
 #include <arich/utility/ARICHChannelHist.h>

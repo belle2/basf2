@@ -20,9 +20,9 @@
     <!-- Include Alignment information -->
     <xi:include href="VTX-Alignment-CMOS5.xml"/>
     <!-- Include definition of logical volume encapsulating the VTX -->
-    <!--xi:include href="VTX-Envelope.xml"/-->
+    <xi:include href="VTX-Envelope.xml"/>
     <!-- Include the definition of the mechanical support -->
-    <!--xi:include href="VTX-Support.xml"/-->
+    <xi:include href="VTX-Support.xml"/>
     <!-- Include the definition of all the components like ladders, sensors and
          chips -->
     <xi:include href="VTX-Components-CMOS5.xml"/>

@@ -12,6 +12,8 @@
 #include <framework/core/Module.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/database/DBObjPtr.h>
+#include <analysis/DecayDescriptor/DecayDescriptor.h>
+#include <framework/datastore/StoreArray.h>
 
 // MVA
 #include <mva/interface/Expert.h>
@@ -20,6 +22,7 @@
 // ANALYSIS
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/VariableManager/Manager.h>
+#include <analysis/VariableManager/Utility.h>
 #include <analysis/dbobjects/ChargedPidMVAWeights.h>
 
 namespace Belle2 {
@@ -36,6 +39,7 @@ namespace Belle2 {
 
     typedef std::vector<std::unique_ptr<MVA::Expert> > ExpertsList; /**< Typedef */
     typedef std::vector<std::unique_ptr<MVA::SingleDataset> > DatasetsList; /**< Typedef */
+    typedef std::vector<std::unique_ptr<Variable::Cut>> CutsList; /**< Typedef */
     typedef std::vector< std::vector<const Variable::Manager::Var*> > VariablesLists; /**< Typedef */
 
   public:
@@ -98,11 +102,18 @@ namespace Belle2 {
     }
 
   private:
+    /**
+     * StoreArray of Particles
+     */
+    StoreArray<Particle> m_particles;
 
     /**
-     * The input list of ParticleList names.
+     * The input list of DecayStrings, where each selected (^) daughter should correspond to a standard charged ParticleList,
+     * e.g. `['Lambda0:sig -> ^p+ ^pi-', 'J/psi:sig -> ^mu+ ^mu-']`. One can also directly pass a list of
+     * standard charged ParticleLists, e.g. `['e+:my_electrons', 'pi+:my_pions']`.
+     * Note that charge-conjugated ParticleLists will automatically be included.
      */
-    std::vector<std::string> m_particle_lists;
+    std::vector<std::string> m_decayStrings;
 
     /**
      * The name of the database payload object with the MVA weights.
@@ -127,7 +138,9 @@ namespace Belle2 {
     /**
      * Interface to get the database payload with the MVA weight files.
      * The payload class has a method to retrieve the correct weightfile representation
-     * given a reconstructed particle's (clusterTheta, p).
+     * given a reconstructed particle's (polar angle, p, charge).
+     * Note that the theta of the track helix extraplolated at the ECL entry surface
+     * is used if the particle doesn't have an ECL cluster match.
      */
     std::unique_ptr<DBObjPtr<ChargedPidMVAWeights>> m_weightfiles_representation;
 
@@ -145,6 +158,12 @@ namespace Belle2 {
     DatasetsList m_datasets;
 
     /**
+     * List of Cut objects.
+     * One Cut to be stored for each training category.
+     */
+    CutsList m_cuts;
+
+    /**
      * List of lists of feature variables.
      * One list of lists to be stored for each xml file found in the database, i.e. for each training category.
      */
@@ -160,6 +179,28 @@ namespace Belle2 {
      * List of MVA class names.
      */
     std::vector<std::string> m_classes;
+
+    /**
+     * Map with standard charged particles' info. For convenience.
+     */
+    std::map<int, std::string> m_stdChargedInfo = {
+      { Const::electron.getPDGCode(), "electron" },
+      { Const::muon.getPDGCode(), "muon" },
+      { Const::pion.getPDGCode(), "pion" },
+      { Const::kaon.getPDGCode(), "kaon" },
+      { Const::proton.getPDGCode(), "proton" },
+      { Const::deuteron.getPDGCode(), "deuteron" }
+    };
+
+    /**
+     * Set variable aliases needed by the MVA. Fallback to this if no aliases map found in payload.
+     */
+    void registerAliasesLegacy();
+
+    /**
+     * Set variable aliases needed by the MVA. Read from payload.
+     */
+    void registerAliases();
 
   };
 }

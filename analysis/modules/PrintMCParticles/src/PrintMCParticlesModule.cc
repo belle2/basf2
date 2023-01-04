@@ -7,6 +7,7 @@
  **************************************************************************/
 
 #include <analysis/modules/PrintMCParticles/PrintMCParticlesModule.h>
+#include <analysis/dataobjects/StringWrapper.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 
@@ -116,11 +117,13 @@ PrintMCParticlesModule::PrintMCParticlesModule() : Module()
   addParam("showMomenta", m_showMomenta, "Show also the particle momenta", false);
   addParam("showProperties", m_showProperties, "Show the basic particle properties", false);
   addParam("showStatus", m_showStatus, "Show extendend status information of the particle", false);
+  addParam("suppressPrint", m_suppressPrint, "Suppress print the information", false);
 }
 
 void PrintMCParticlesModule::initialize()
 {
   m_mcparticles.isRequired(m_particleList);
+  m_stringWrapper.registerInDataStore("MCDecayString");
 }
 
 void PrintMCParticlesModule::event()
@@ -143,7 +146,13 @@ void PrintMCParticlesModule::event()
   filterPrimaryOnly(first_gen);
   printTree(first_gen);
 
-  B2INFO(m_output.str());
+  if (!m_suppressPrint)
+    B2INFO(m_output.str());
+
+  if (not m_stringWrapper.isValid())
+    m_stringWrapper.create();
+
+  m_stringWrapper->setString(std::string(m_output.str()));
 }
 
 void PrintMCParticlesModule::filterPrimaryOnly(std::vector<MCParticle*>& particles) const

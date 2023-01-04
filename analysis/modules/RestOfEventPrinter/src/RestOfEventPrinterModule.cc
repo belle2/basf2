@@ -62,7 +62,7 @@ void RestOfEventPrinterModule::event()
 
   if (roe.isValid()) {
 
-    const Particle* part = roe->getRelated<Particle>();
+    const Particle* part = roe->getRelatedFrom<Particle>();
     const MCParticle* mcpart = part->getRelated<MCParticle>();
 
     int relatedPDG = part->getPDGCode();

@@ -25,7 +25,7 @@ import copy
 
 import argparse
 ap = argparse.ArgumentParser()
-ap.add_argument("--vtx", default="VTX-CMOS-7layer", help="VTX geometry variant from xml")
+ap.add_argument("--vtx", default="VTX-CMOS-5layer", help="VTX geometry variant from xml")
 args = vars(ap.parse_args())
 
 print("INFO: Mapping materials for " + args['vtx'])

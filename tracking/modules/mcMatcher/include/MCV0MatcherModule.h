@@ -8,6 +8,9 @@
 #pragma once
 
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
+#include <mdst/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/V0.h>
 
 namespace Belle2 {
   /** A module matching the V0s from the mcV0Matcher to MC particles. .
@@ -52,6 +55,9 @@ namespace Belle2 {
      */
     void terminate() override;
   private:
+    StoreArray<V0>          m_V0s;          /**< V0s StoreArray */
+    StoreArray<MCParticle>  m_MCParticles;  /**< MCParticles StoreArray */
+
     std::string m_TrackColName;  ///< Belle2::Track collection name (input).
     std::string m_TFRColName;   ///< Belle2::TrackFitResult collection name (input).
     std::string m_V0ColName;   ///< V0 collection name (input).

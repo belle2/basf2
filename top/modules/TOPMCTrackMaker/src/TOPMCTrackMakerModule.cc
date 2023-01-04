@@ -29,10 +29,10 @@ using namespace std;
 namespace Belle2 {
 
   //-----------------------------------------------------------------
-  //                 Register module
+  ///                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPMCTrackMaker)
+  REG_MODULE(TOPMCTrackMaker);
 
   //-----------------------------------------------------------------
   //                 Implementation
@@ -102,7 +102,7 @@ namespace Belle2 {
       if (!barHit) continue;
 
       TMatrixDSym cov(6); // infinite precission
-      fitResults.appendNew(B2Vector3D(mcParticle.getVertex()),
+      fitResults.appendNew(mcParticle.getVertex(),
                            mcParticle.getMomentum(),
                            cov,
                            mcParticle.getCharge(),
@@ -116,7 +116,7 @@ namespace Belle2 {
       track->addRelationTo(&mcParticle);
 
       const Const::ChargedStable& chargedStable = Const::pion;
-      double pmom = barHit->getMomentum().Mag();
+      double pmom = barHit->getMomentum().R();
       double mass = chargedStable.getMass();
       double beta = pmom / sqrt(pmom * pmom + mass * mass);
       double tof = barHit->getLength() / beta / Const::speedOfLight;

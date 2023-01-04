@@ -8,6 +8,7 @@
 
 // Own include
 #include <analysis/variables/FlavorTaggingVariables.h>
+#include <analysis/variables/ROEVariables.h>
 
 #include <analysis/variables/MCTruthVariables.h>
 #include <analysis/variables/KLMClusterVariables.h>
@@ -99,8 +100,15 @@ namespace Belle2 {
 
     double cosTPTO(const Particle* part)
     {
-      StoreObjPtr<RestOfEvent> roe("RestOfEvent");
-      if (!roe.isValid()) return 0;
+      StoreObjPtr<RestOfEvent> roeobject("RestOfEvent");
+      const RestOfEvent* roe;
+      if (roeobject.isValid()) { // if in for_each loop over ROE
+        roe = &(*roeobject);
+      } else {
+        roe = getRelatedROEObject(part);
+        if (!roe)
+          return 0;
+      }
 
       std::vector<ROOT::Math::XYZVector> p3_cms_roe;
       static const double P_MAX(3.2);
@@ -164,8 +172,17 @@ namespace Belle2 {
         B2FATAL("At most 1 argument (name of mask) accepted.");
 
       auto func = [maskName](const Particle * particle) -> double {
-        StoreObjPtr<RestOfEvent> roe("RestOfEvent");
-        if (!roe.isValid()) return 0;
+        StoreObjPtr<RestOfEvent> roeobject("RestOfEvent");
+        const RestOfEvent* roe;
+        if (roeobject.isValid())   // if in for_each loop over ROE
+        {
+          roe = &(*roeobject);
+        } else
+        {
+          roe = getRelatedROEObject(particle);
+          if (!roe)
+            return 0;
+        }
 
         std::vector<ROOT::Math::XYZVector> p3_cms_roe;
         // static const double P_MAX(3.2);
@@ -630,7 +647,7 @@ namespace Belle2 {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
       if (!roe.isValid()) return 0;
 
-      const Particle* Bcp = roe->getRelated<Particle>();
+      const Particle* Bcp = roe->getRelatedFrom<Particle>();
       return Variable::isRelatedRestOfEventB0Flavor(Bcp);
     }
 
@@ -639,7 +656,7 @@ namespace Belle2 {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
       if (!roe.isValid()) return 0;
 
-      const MCParticle* BcpMC = roe->getRelated<Particle>()->getMCParticle();
+      const MCParticle* BcpMC = roe->getRelatedFrom<Particle>()->getMCParticle();
       const MCParticle* Y4S = BcpMC->getMother();
       const MCParticle* mcParticle = particle->getMCParticle();
 
@@ -666,8 +683,8 @@ namespace Belle2 {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
       if (!roe.isValid()) return -1;
 
-      const Particle* Bcp = roe->getRelated<Particle>();
-      const MCParticle* BcpMC = roe->getRelated<Particle>()->getMCParticle();
+      const Particle* Bcp = roe->getRelatedFrom<Particle>();
+      const MCParticle* BcpMC = roe->getRelatedFrom<Particle>()->getMCParticle();
       return MCMatching::getMCErrors(Bcp, BcpMC);
     }
 
@@ -753,7 +770,7 @@ namespace Belle2 {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
       if (!roe.isValid()) return -2;//gRandom->Uniform(0, 1);
 
-      const Particle* Bcp = roe->getRelated<Particle>();
+      const Particle* Bcp = roe->getRelatedFrom<Particle>();
       return Variable::isRelatedRestOfEventMajorityB0Flavor(Bcp);
     }
 
@@ -981,7 +998,7 @@ namespace Belle2 {
         double output = 0.0;
 
         if (requestedVariable == "cosTPTOFast")
-          output = std::get<double>(Variable::Manager::Instance().getVariable("cosTPTO")->function(TargetFastParticle));
+          output = cosTPTO(TargetFastParticle);
 
         ROOT::Math::PxPyPzEVector momSlowPion = PCmsLabTransform::labToCms(particle->get4Vector());  //Momentum of Slow Pion in CMS-System
         if (momSlowPion == momSlowPion)   // FIXME
@@ -1945,8 +1962,9 @@ namespace Belle2 {
           if (!iParticle) continue;
 
           if (categoryName == "MaximumPstar") {
-            bool targetFlag = std::get<bool>(manager.getVariable("hasHighestProbInCat(pi+:inRoe, isRightTrack(MaximumPstar))")->function(
-                                               iParticle));
+            static Manager::FunctionPtr selectionFunction =
+            hasHighestProbInCat({"pi+:inRoe", "isRightTrack(MaximumPstar)"});
+            bool targetFlag = std::get<bool>(selectionFunction(iParticle));
             if (targetFlag) {
               particlesHaveMCAssociated = true;
               ++nTargets;
@@ -2019,7 +2037,9 @@ namespace Belle2 {
           if (!iParticle) continue;
 
           if (categoryName == "MaximumPstar") {
-            if (std::get<bool>(manager.getVariable("hasHighestProbInCat(pi+:inRoe, isRightTrack(MaximumPstar))")->function(iParticle)))
+            static Manager::FunctionPtr selectionFunction =
+            hasHighestProbInCat({"pi+:inRoe", "isRightTrack(MaximumPstar)"});
+            if (std::get<bool>(selectionFunction(iParticle)))
               targetParticles.push_back(iParticle);
           } else if (std::get<int>(manager.getVariable("isRightTrack(" + trackTargetName + ")")->function(iParticle))) {
             targetParticles.push_back(iParticle);
@@ -2200,9 +2220,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("pMissTag", momentumMissingTagSide, R"DOC(
 [Expert] Calculates the missing momentum for a given particle on the tag side. 
 :noindex:
-)DOC");
+)DOC","GeV/c");
     REGISTER_METAVARIABLE("pMissTag(maskName)", momentumMissingTagSideWithMask,
-                          "[Expert] Calculates the missing momentum for a given particle on the tag side.",
+                          "[Expert] Calculates the missing momentum for a given particle on the tag side. The unit of the missing momentum is ``GeV/c`` ",
                           Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("cosTPTO"  , cosTPTO, R"DOC(
 [Expert] Returns cosine of angle between thrust axis of given particle and thrust axis of ROE.
@@ -2214,22 +2234,22 @@ namespace Belle2 {
     REGISTER_VARIABLE("lambdaFlavor", lambdaFlavor,
                       "[Expert] Returns 1.0 if particle is ``Lambda0``, -1.0 in case of ``anti-Lambda0``, 0.0 otherwise.");
     REGISTER_VARIABLE("isLambda", isLambda,  "[Expert] Returns 1.0 if particle is truth-matched to ``Lambda0``, 0.0 otherwise.");
-    REGISTER_VARIABLE("lambdaZError", lambdaZError,  "[Expert] Returns the variance of the z-component of the decay vertex.");
+    REGISTER_VARIABLE("lambdaZError", lambdaZError,  "[Expert] Returns the variance of the z-component of the decay vertex.",":math:`\\text{cm}^2`");
     REGISTER_VARIABLE("momentumOfSecondDaughter", momentumOfSecondDaughter,
-                      "[Expert] Returns the momentum of second daughter if exists, 0. otherwise.");
+                      "[Expert] Returns the momentum of second daughter if exists, 0. otherwise.","GeV/c");
     REGISTER_VARIABLE("momentumOfSecondDaughterCMS", momentumOfSecondDaughterCMS,
-                      "[Expert] Returns the momentum of the second daughter in the centre-of-mass system, 0. if this daughter doesn't exist.");
+                      "[Expert] Returns the momentum of the second daughter in the centre-of-mass system, 0. if this daughter doesn't exist.","GeV/c");
     REGISTER_VARIABLE("chargeTimesKaonLiklihood", chargeTimesKaonLiklihood,
                       "[Expert] Returns ``q*(highest PID_Likelihood for Kaons)``, 0. otherwise.");
     REGISTER_VARIABLE("ptTracksRoe", transverseMomentumOfChargeTracksInRoe, R"DOC(
 [Expert] Returns the transverse momentum of all charged tracks of the ROE related to the given particle, 0.0 if particle has no related ROE.
 :noindex:
-)DOC");
+)DOC","GeV/c");
     REGISTER_METAVARIABLE("ptTracksRoe(maskName)", transverseMomentumOfChargeTracksInRoeWithMask,
-                          "[Exepert] Returns the transverse momentum of all charged tracks of the ROE related to the given particle, 0.0 if particle has no related ROE.",
+                          "[Expert] Returns the transverse momentum of all charged tracks of the ROE related to the given particle, 0.0 if particle has no related ROE. The unit of the momentum is ``GeV/c`` ",
                           Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("pt2TracksRoe(maskName)", transverseMomentumSquaredOfChargeTracksInRoeWithMask,
-                          "[Expert] Returns the transverse momentum squared of all charged tracks of the ROE related to the given particle, 0.0 if particle has no related ROE.",
+                          "[Expert] Returns the transverse momentum squared of all charged tracks of the ROE related to the given particle, 0.0 if particle has no related ROE. The unit of the momentum squared is :math:`[\\text{GeV}/\\text{c}]^2` ",
                           Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("NumberOfKShortsInRoe", NumberOfKShortsInRoe,
                       "[Expert] Returns the number of ``K_S0`` in the rest of event. The particle list ``K_S0:inRoe`` has to be filled beforehand.");
@@ -2285,7 +2305,7 @@ In other words, this variable checks the generated flavor of the other generated
 
     REGISTER_METAVARIABLE("BtagToWBosonVariables(requestedVariable[, maskName])", BtagToWBosonVariables, R"DOC(
 [Eventbased][Expert] Returns values of FlavorTagging-specific kinematical variables assuming a semileptonic decay with the given particle as target.
-The input values of ``requestedVariable`` can be the following:  recoilMass, pMissCMS, cosThetaMissCMS and EW90.
+The input values of ``requestedVariable`` can be the following:  recoilMass in GeV/c^2 , pMissCMS in ``GeV/c``, cosThetaMissCMS and EW90.
 )DOC", Manager::VariableDataType::c_double);
   REGISTER_METAVARIABLE("KaonPionVariables(requestedVariable)"  , KaonPionVariables , R"DOC(
 [Expert] Returns values of FlavorTagging-specific kinematical variables for ``KaonPion`` category.
@@ -2293,7 +2313,7 @@ The input values of ``requestedVariable`` can be the following:  cosKaonPion, Ha
 )DOC", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("FSCVariables(requestedVariable)", FSCVariables, R"DOC(
 [Eventbased][Expert] Returns values of FlavorTagging-specific kinematical variables for ``FastSlowCorrelated`` category.
-The input values of ``requestedVariable`` can be the following: pFastCMS, cosSlowFast, SlowFastHaveOpositeCharges, or cosTPTOFast.
+The input values of ``requestedVariable`` can be the following: pFastCMS in ``GeV/c``, cosSlowFast, SlowFastHaveOpositeCharges, or cosTPTOFast.
 )DOC", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("hasHighestProbInCat(particleListName, extraInfoName)", hasHighestProbInCat, R"DOC(
 [Expert] Returns 1.0 if the given Particle is classified as target track, i.e. if it has the highest target track probability in particleListName. 
@@ -2367,14 +2387,14 @@ Allowed input values for ``particleName`` argument in this variable are the foll
 )DOC", Manager::VariableDataType::c_int);
     REGISTER_METAVARIABLE("QpOf(particleListName, outputExtraInfo, rankingExtraInfo)", QpOf,  R"DOC(
 [Eventbased][Expert] Returns the :math:`q*p` value for a given particle list provided as the 1st argument, 
-where math:`p` is the probability of a category stored as extraInfo, provided as the 2nd argument, 
+where :math:`p` is the probability of a category stored as extraInfo, provided as the 2nd argument, 
 allowed values are same as in :b2:var:`hasHighestProbInCat`.
 The particle is selected after ranking according to a flavor tagging extraInfo, provided as the 3rd argument, 
 allowed values are same as in :b2:var:`hasHighestProbInCat`.
 )DOC", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("weightedQpOf(particleListName, outputExtraInfo, rankingExtraInfo)", weightedQpOf, R"DOC(
 [Eventbased][Expert] Returns the weighted :math:`q*p` value for a given particle list, provided as the  1st argument, 
-where math:`p` is the probability of a category stored as extraInfo, provided in the 2nd argument, 
+where :math:`p` is the probability of a category stored as extraInfo, provided in the 2nd argument, 
 allowed values are same as in :b2:var:`hasHighestProbInCat`.
 The particles in the list are ranked according to a flavor tagging extraInfo, provided as the 3rd argument, 
 allowed values are same as in :b2:var:`hasHighestProbInCat`.

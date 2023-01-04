@@ -10,4 +10,3 @@
 // This file is kept as a redirect for ecl/mapper/ECLChannelMapper to provide
 // backwards compatibility.
 #include <ecl/mapper/ECLChannelMapper.h>
-

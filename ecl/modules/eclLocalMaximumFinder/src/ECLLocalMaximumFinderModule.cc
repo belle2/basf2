@@ -37,8 +37,8 @@ using namespace ECL;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(ECLLocalMaximumFinder)
-REG_MODULE(ECLLocalMaximumFinderPureCsI)
+REG_MODULE(ECLLocalMaximumFinder);
+REG_MODULE(ECLLocalMaximumFinderPureCsI);
 
 //-----------------------------------------------------------------
 //                 Implementation

@@ -22,7 +22,7 @@ namespace Belle2 {
 
                              /// Alias to apply the () operator to all items filtered by CKF SVD layer states
                              using ChooseablePathFilter =
-                             PathLengthToggledApplier<VXDHoughState, LimitedOnHitApplier<VXDHoughState, TrackFindingCDC::ChooseableFilter<PathFilterFactory>>>;
+                               PathLengthToggledApplier<VXDHoughState, LimitedOnHitApplier<VXDHoughState, TrackFindingCDC::ChooseableFilter<PathFilterFactory>>>;
 
   }
 }

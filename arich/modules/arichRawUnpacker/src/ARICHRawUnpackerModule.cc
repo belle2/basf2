@@ -100,7 +100,7 @@ namespace Belle2 {
           for (int i = 0; i < 10; i++) {
             int val = calbyte(buf);
             ibyte++;
-            if (i < 6) {
+            if (i > 1 && i < 6) {
               feb_trigno |= (0xff & val) << (5 - i) * 8;
             }
           }
@@ -116,10 +116,10 @@ namespace Belle2 {
                 ss << "ch# " << ch << "(" << val << ") ";
                 hasHit = true;
                 if (febno < 0 || febno > 6) {
-                  B2ERROR("FEB is bad : " << febno << " hslb-" << finesse << ":"
-                          << " type=" << type_feb << ", ver=" << ver << " "
-                          << ", boardid=" << boardid << ", febno=" << febno
-                          << ", length=" << length << ", evtno=" << evtno);
+                  B2ERROR("FEB is bad:" << LogVar("FEB", to_string(febno) + " hslb-" + to_string(finesse))
+                          << LogVar("type", type_feb) << LogVar("ver", ver)
+                          << LogVar("boardid", boardid) << LogVar("febno", febno)
+                          << LogVar("length", length) << LogVar("evtno", evtno));
                 }
                 feb.push_back(ch, val);
               }
@@ -138,10 +138,10 @@ namespace Belle2 {
                 ss << "ch# " << ch << "(" << val << ") ";
                 hasHit = true;
                 if (febno < 0 || febno > 6) {
-                  B2ERROR("FEB is bad : " << febno << " hslb-" << finesse << ":"
-                          << " type=" << type_feb << ", ver=" << ver << " "
-                          << ", boardid=" << boardid << ", febno=" << febno
-                          << ", length=" << length << ", evtno=" << evtno);
+                  B2ERROR("FEB is bad:" << LogVar("FEB", to_string(febno) + " hslb-" + to_string(finesse))
+                          << LogVar("type", type_feb) << LogVar("ver", ver)
+                          << LogVar("boardid", boardid) << LogVar("febno", febno)
+                          << LogVar("length", length) << LogVar("evtno", evtno));
                   return;
                 }
                 feb.push_back(ch, val);

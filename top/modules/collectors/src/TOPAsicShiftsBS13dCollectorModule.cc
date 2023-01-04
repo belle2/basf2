@@ -20,10 +20,10 @@ namespace Belle2 {
   using namespace TOP;
 
   //-----------------------------------------------------------------
-  //                 Register module
+  ///                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPAsicShiftsBS13dCollector)
+  REG_MODULE(TOPAsicShiftsBS13dCollector);
 
   //-----------------------------------------------------------------
   //                 Implementation

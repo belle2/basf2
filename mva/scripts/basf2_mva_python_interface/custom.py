@@ -38,14 +38,14 @@ def apply(state, X):
     raise RuntimeError("You have to overwrite apply if you use the custom framework")
 
 
-def begin_fit(state, Xtest, Stest, ytest, wtest):
+def begin_fit(state, Xtest, Stest, ytest, wtest, nBatches):
     """
     Assert
     """
     raise RuntimeError("You have to overwrite begin_fit if you use the custom framework")
 
 
-def partial_fit(state, X, S, y, w, epoch):
+def partial_fit(state, X, S, y, w, epoch, batch):
     """
     Assert
     """

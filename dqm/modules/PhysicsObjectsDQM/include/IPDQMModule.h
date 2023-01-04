@@ -8,14 +8,12 @@
 
 /* Belle 2 headers. */
 #include <framework/core/HistoModule.h>
-#include <hlt/softwaretrigger/modules/dqm/SoftwareTriggerHLTDQMModule.h>
 
 /* ROOT headers. */
 #include <TH1F.h>
 
 /* C++ headers. */
 #include <string>
-#include <vector>
 
 namespace Belle2 {
 
@@ -39,7 +37,7 @@ namespace Belle2 {
 
     /**
      * Called when entering a new run
-     * Reset the histograms and counter m_r and clear the vectors
+     * Reset the histograms
      */
     void beginRun() override;
 
@@ -48,17 +46,6 @@ namespace Belle2 {
      * The main analysis happens here
      */
     void event() override;
-
-    /**
-     * End-of-run action.
-     * The histograms range is set to be large 10 sigmas and centered on the mean
-     */
-    void endRun() override;
-
-    /**
-     * Termination action.
-     */
-    void terminate() override;
 
     /**
      * Defining the histograms.

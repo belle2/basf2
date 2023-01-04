@@ -9,11 +9,10 @@
 #include <tracking/modules/spacePointCreator/SPTCvirtualIPRemoverModule.h>
 #include <framework/logging/Logger.h>
 
-using namespace std;
 using namespace Belle2;
 
 
-REG_MODULE(SPTCvirtualIPRemover)
+REG_MODULE(SPTCvirtualIPRemover);
 
 SPTCvirtualIPRemoverModule::SPTCvirtualIPRemoverModule() : Module()
 {
@@ -23,7 +22,8 @@ SPTCvirtualIPRemoverModule::SPTCvirtualIPRemoverModule() : Module()
   setDescription("The quality estimator module for SpacePointTrackCandidates using a circleFit.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  addParam("tcArrayName", m_PARAMtcArrayName, " sets the name of expected StoreArray with SpacePointTrackCand in it", string(""));
+  addParam("tcArrayName", m_PARAMtcArrayName, " sets the name of expected StoreArray with SpacePointTrackCand in it",
+           std::string(""));
 
   addParam("doCheckOnly", m_PARAMdoCheckOnly, " if true, no vIP is removed, but only nVIPs are counted.", bool(false));
 
@@ -36,7 +36,7 @@ SPTCvirtualIPRemoverModule::SPTCvirtualIPRemoverModule() : Module()
 void SPTCvirtualIPRemoverModule::event()
 {
   m_eventCounter++;
-  B2DEBUG(1, "\n" << "SPTCvirtualIPRemoverModule:event: event " << m_eventCounter << "\n");
+  B2DEBUG(20, "\n" << "SPTCvirtualIPRemoverModule:event: event " << m_eventCounter << "\n");
   m_nTCsTotal += m_spacePointTrackCands.getEntries();
 
   unsigned nTC = 0;
@@ -61,7 +61,7 @@ void SPTCvirtualIPRemoverModule::event()
       }
     }
 
-    B2DEBUG(1, "SPTCvirtualIPRemoverModule:event: event " << m_eventCounter
+    B2DEBUG(20, "SPTCvirtualIPRemoverModule:event: event " << m_eventCounter
             << ": TC " << nTC
             << " with " << nHits
             << " hits has vIP: " << (hasVIP ? "true" : "false")
@@ -78,7 +78,7 @@ void SPTCvirtualIPRemoverModule::endRun()
   if (m_eventCounter == 0) { m_eventCounter++; } // prevents division by zero
   double invEvents = 1. / m_eventCounter;
 
-  B2DEBUG(1, "SPTCvirtualIPRemoverModule:endRun: events: " << m_eventCounter
+  B2DEBUG(20, "SPTCvirtualIPRemoverModule:endRun: events: " << m_eventCounter
           << ", nSPTCsPerEvent: " << invEvents * float(m_nTCsTotal)
           << ", nVIPsPerEvent: " << invEvents * float(m_nVIPsTotal)
           << ", nVIPsRemovedPerEvent: " << invEvents * float(m_nVIPsRemoved)

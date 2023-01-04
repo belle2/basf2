@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -31,7 +30,7 @@ basf2.set_random_seed(1337)
 
 def setupFinderModule(path):
     tracking.add_hit_preparation_modules(path, components=["SVD", "PXD"])
-    tracking.add_track_finding(path, svd_ckf_mode="VXDTF2_alone")
+    tracking.add_track_finding(path, svd_ckf_mode="SVD_alone")
 
 
 class CKFBkg(TrackingValidationRun):

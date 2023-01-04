@@ -1,0 +1,30 @@
+# EventType: 1110024005
+# Descriptor: [B0 -> rho+ pi- pi0]cc
+# NickName: Bd_rho+pi-pi0
+# Documentation: 3 Body charmless process 
+# Reponsible: Yu Nakazawa
+# Email: nakancyo@post.kek.jp
+# Tested: yes 
+# PhysicsWG: BToCharmless
+# Cuts: None
+# Date: 29/04/2022
+#
+#
+#
+Decay Upsilon(4S)
+1.0     B0sig anti-B0sig B0 anti-B0			VSS_BMIX dm;
+Enddecay
+###
+###
+Decay B0sig
+0.5  rho+ pi- pi0        PHOTOS PHSP;
+0.5  rho- pi+ pi0        PHOTOS PHSP;
+Enddecay
+CDecay anti-B0sig
+###
+###
+###
+###
+###
+End
+

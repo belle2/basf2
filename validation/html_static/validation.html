@@ -34,7 +34,10 @@
              style='display: block; position: relative;'>
           Loading ...
         </div>
-
+        <div class='datafiles menuhead'>
+          <a id='datalink' title="Display data files"
+          href="#" onclick="toggleDataFilesView();return false;">Display data files</a>
+        </div>
         <div class='menuhead' title="Links with additional information. Suggestions welcome.">
           <img src="images/link.png" alt="Useful links">&nbsp; Useful links
 
@@ -109,6 +112,7 @@
     </div>
   </div>
   <div id='content_scroll'>
+    <div id='data'>Loading ...</div>
     <div id='content'>Loading ...</div>
   </div>
 </div>
@@ -149,7 +153,24 @@
         console.log("Document loaded, starting RestAPI calls");
         setSystemInfo();
         loadRevisions();
+        fetchDataInfo();
     });
+</script>
+<script type="text/javascript">
+  function toggleDataFilesView() {
+  var files_container = document.getElementById("data");
+  var plots_container = document.getElementById("content");
+  var link = document.getElementById("datalink");
+  if (files_container.style.display === "none" || plots_container.style.display === "block") {
+    files_container.style.display = "block";
+    plots_container.style.display = "none";
+    link.innerText = 'Back to plots';
+  } else {
+    files_container.style.display = "none";
+    plots_container.style.display = "block";
+    link.innerText = 'Display data files';
+  }
+}
 </script>
 </body>
 </html>

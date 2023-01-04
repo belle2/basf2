@@ -300,28 +300,41 @@ namespace {
     bool initok = dd1.init(std::string{"B0:B2Dzpipi -> [D0 -> ^K+:loose pi-:loose] pi+:loose pi-:loose"});
     EXPECT_EQ(initok, true);
     std::vector<std::string> names = dd1.getSelectionNames();
+    std::vector<int> pdgs = dd1.getSelectionPDGCodes();
     ASSERT_EQ(names.size(), 1);
     EXPECT_EQ(names[0], "B0_D0_K");
+    ASSERT_EQ(pdgs.size(), 1);
+    EXPECT_EQ(pdgs[0], 321);
 
     // add another selection particle to an already existing decay descriptor
     // not sure exactly who is using this feature, but might as well test it.
     initok = dd1.init(std::string{"B0:B2Dzpipi -> [D0 -> K+:loose ^pi-:loose] pi+:loose pi-:loose"});
     EXPECT_EQ(initok, true);
     names = dd1.getSelectionNames();
+    pdgs = dd1.getSelectionPDGCodes();
     ASSERT_EQ(names.size(), 2);
     EXPECT_EQ(names[0], "B0_D0_K");
     EXPECT_EQ(names[1], "B0_D0_pi");
+    ASSERT_EQ(pdgs.size(), 2);
+    EXPECT_EQ(pdgs[0], 321);
+    EXPECT_EQ(pdgs[1], -211);
 
     // more complex decay string with multiple particles of the same type
     DecayDescriptor dd2;
     initok = dd2.init(std::string{"vpho:complex -> [D0 -> ^K+:loose pi-:loose] ^e+:loose ^e-:loose ^gamma:loose"});
     EXPECT_EQ(initok, true);
     names = dd2.getSelectionNames();
+    pdgs = dd2.getSelectionPDGCodes();
     ASSERT_EQ(names.size(), 4);
     EXPECT_EQ(names[0], "vpho_D0_K");
     EXPECT_EQ(names[1], "vpho_e0");
     EXPECT_EQ(names[2], "vpho_e1");
     EXPECT_EQ(names[3], "vpho_gamma");
+    ASSERT_EQ(pdgs.size(), 4);
+    EXPECT_EQ(pdgs[0], 321);
+    EXPECT_EQ(pdgs[1], -11);
+    EXPECT_EQ(pdgs[2], 11);
+    EXPECT_EQ(pdgs[3], 22);
   }
 
   TEST(DecayDescriptorTest, MisIDandDecayInFlightGrammar)

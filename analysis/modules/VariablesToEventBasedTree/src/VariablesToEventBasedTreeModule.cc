@@ -9,6 +9,7 @@
 #include <analysis/modules/VariablesToEventBasedTree/VariablesToEventBasedTreeModule.h>
 
 #include <analysis/dataobjects/ParticleList.h>
+#include <analysis/dataobjects/StringWrapper.h>
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/VariableManager/Utility.h>
 #include <framework/logging/Logger.h>
@@ -106,12 +107,15 @@ void VariablesToEventBasedTreeModule::initialize()
   m_event_valuesDouble.resize(m_event_variables.size());
   m_event_valuesInt.resize(m_event_variables.size());
 
-  m_tree->get().Branch("__event__", &m_event, "__event__/I");
+  m_tree->get().Branch("__event__", &m_event, "__event__/i");
   m_tree->get().Branch("__run__", &m_run, "__run__/I");
   m_tree->get().Branch("__experiment__", &m_experiment, "__experiment__/I");
   m_tree->get().Branch("__production__", &m_production, "__production__/I");
   m_tree->get().Branch("__ncandidates__", &m_ncandidates, "__ncandidates__/I");
   m_tree->get().Branch("__weight__", &m_weight, "__weight__/F");
+
+  if (m_stringWrapper.isOptional("MCDecayString"))
+    m_tree->get().Branch("__MCDecayString__", &m_MCDecayString);
 
   for (unsigned int i = 0; i < m_event_variables.size(); ++i) {
     auto varStr = m_event_variables[i];
@@ -217,6 +221,11 @@ void VariablesToEventBasedTreeModule::event()
   m_run = m_eventMetaData->getRun();
   m_experiment = m_eventMetaData->getExperiment();
   m_production = m_eventMetaData->getProduction();
+
+  if (m_stringWrapper.isValid())
+    m_MCDecayString = m_stringWrapper->getString();
+  else
+    m_MCDecayString = "";
 
   StoreObjPtr<ParticleList> particlelist(m_particleList);
   m_ncandidates = particlelist->getListSize();

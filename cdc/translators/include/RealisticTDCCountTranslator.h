@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <cdc/dataobjects/TDCCountTranslatorBase.h>
+#include <cdc/translators/TDCCountTranslatorBase.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/geometry/CDCGeoControlPar.h>
 #include <cdc/simulation/CDCSimControlPar.h>

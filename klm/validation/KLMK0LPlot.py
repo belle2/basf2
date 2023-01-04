@@ -34,5 +34,6 @@ main = basf2.create_path()
 main.add_module(root_input)
 main.add_module(klmk0lplot)
 
+main.add_module('Progress')
 # Run.
 basf2.process(main)

@@ -29,7 +29,6 @@
 #include <mdst/dataobjects/Track.h>
 
 // root
-#include "TVector3.h"
 #include "TDirectory.h"
 
 // boost
@@ -43,10 +42,10 @@ namespace Belle2 {
   using namespace TOP;
 
   //-----------------------------------------------------------------
-  //                 Register module
+  ///                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPDQM)
+  REG_MODULE(TOPDQM);
 
   //-----------------------------------------------------------------
   //                 Implementation
@@ -495,7 +494,7 @@ namespace Belle2 {
     for (const auto& track : m_tracks) {
       const auto* trackFit = track.getTrackFitResultWithClosestMass(Const::pion);
       if (!trackFit) continue;
-      if (trackFit->getMomentum().Mag() < m_momentumCut) continue;
+      if (trackFit->getMomentum().R() < m_momentumCut) continue;
       if (trackFit->getPValue() < m_pValueCut) continue;
       if (m_usePionID) {
         const auto* top = track.getRelated<TOPLikelihood>();

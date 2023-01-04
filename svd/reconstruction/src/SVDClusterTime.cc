@@ -11,6 +11,7 @@
 #include <svd/reconstruction/SVDMaxSumAlgorithm.h>
 #include <svd/dataobjects/SVDEventInfo.h>
 #include <TMath.h>
+#include <numeric>
 
 using namespace std;
 
@@ -75,12 +76,6 @@ namespace Belle2 {
 
     void SVDClusterTime::applyCoG3Time(const Belle2::SVD::RawCluster& rawCluster, double& time, double& timeError, int& firstFrame)
     {
-
-      // ISSUES:
-      // 1. time error not computer
-
-      timeError = 0;
-
       //take the MaxSum 3 samples
       SVDMaxSumAlgorithm maxSum = SVDMaxSumAlgorithm(rawCluster.getClsSamples(false));
 
@@ -104,9 +99,34 @@ namespace Belle2 {
       if (m_returnRawClusterTime)
         time = rawtime;
       else
-        //cellID not used for calibration
+        //cellID = 10 not used for calibration
         time = m_CoG3TimeCal.getCorrectedTime(rawCluster.getSensorID(), rawCluster.isUSide(), 10, rawtime, m_triggerBin);
 
+
+
+      // now compute the CoG3 time error
+      // assumptions:
+      // 1. calibration function parameters error not taken into account
+      // 2. 100% correlation among different strip noises
+      // 3. error on the sample amplitude = strip noise for all samples
+
+      //compute the noise of the clustered sample
+      //it is the same for all samples
+      //computed assuming 2. (-> linear sum, not quadratic)
+      std::vector<Belle2::SVD::StripInRawCluster> strips = rawCluster.getStripsInRawCluster();
+      float noise = std::accumulate(strips.begin(), strips.end(), 0., [](float sum, const Belle2::SVD::StripInRawCluster & strip) { return sum + strip.noise; });
+
+      //compute the noise of the raw time
+      //assuming only the clustered sample amplitude carries an uncertainty
+      double rawtimeError = 0;
+      begin = selectedSamples.begin();
+      for (float i = 0.; begin != end; ++begin, i += 1)
+        rawtimeError += TMath::Power((m_apvClockPeriod * i - rawtime) / norm, 2);
+      rawtimeError = sqrt(rawtimeError) * noise;
+
+      //compute the error on the calibrated time
+      timeError = m_CoG3TimeCal.getCorrectedTimeError(rawCluster.getSensorID(), rawCluster.isUSide(), 10, rawtime, rawtimeError,
+                                                      m_triggerBin);
     }
 
 

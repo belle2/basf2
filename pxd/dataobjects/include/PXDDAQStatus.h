@@ -30,12 +30,12 @@ namespace Belle2 {
   public:
 
     /** Default constructor for the ROOT IO. */
-    PXDDAQStatus() : m_errorMask(0), m_critErrorMask(0), m_usable(false) , m_gated(false), m_unfiltered(false) {}
+    PXDDAQStatus() : m_errorMask(0), m_critErrorMask(0), m_usable(false), m_gated(false), m_unfiltered(false) {}
 
     /** constructor setting the error mask.
      * @param mask Error mask
      */
-    explicit PXDDAQStatus(const PXDErrorFlags& mask) : m_errorMask(mask), m_critErrorMask(0), m_usable(false) , m_gated(false),
+    explicit PXDDAQStatus(const PXDErrorFlags& mask) : m_errorMask(mask), m_critErrorMask(0), m_usable(false), m_gated(false),
       m_unfiltered(false) {}
 
     /** destructor */
@@ -125,7 +125,7 @@ namespace Belle2 {
     /** Return map of module usability
      * @return map of VxdID with usable flags
      */
-    std::map <VxdID , bool> getUsable() const;
+    std::map <VxdID, bool> getUsable() const;
 
 
     /** iterator-based iteration for packets */

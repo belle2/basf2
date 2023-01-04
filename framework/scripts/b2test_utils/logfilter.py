@@ -16,6 +16,7 @@ class LogReplacementFilter:
     Simple class to intercept anything written to python stdout and replace
     a given set of strings with placehholders to improve reproducibility.
     """
+
     def __init__(self, out, replacements):
         """Setup the forwarding and replacements
 

@@ -13,16 +13,15 @@
 # This steering file creates the Belle II detector
 # geometry and checks for overlaps
 #
-# Usage: basf2 check_vtx_geometry.py -- --fast --vtx=VTX-CMOS-5layer-Discs
+# Usage: basf2 check_vtx_geometry.py -- --fast --vtx=VTX-CMOS-5layer
 #
 ######################################################
 
 from basf2 import Path, process
-from sys import argv
 
 import argparse
 ap = argparse.ArgumentParser()
-ap.add_argument("--vtx", default="VTX-CMOS-7layer", help="VTX geometry variant from xml")
+ap.add_argument("--vtx", default="VTX-CMOS-5layer", help="VTX geometry variant from xml")
 ap.add_argument('--fast', default=False, action='store_true', help="Use this option to restrict overlap checking to VXD volume")
 ap.add_argument("--points", type=int, default=10000, help="Number of test points")
 args = vars(ap.parse_args())

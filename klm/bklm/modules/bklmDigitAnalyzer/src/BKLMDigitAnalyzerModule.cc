@@ -19,7 +19,7 @@
 using namespace Belle2;
 
 
-REG_MODULE(BKLMDigitAnalyzer)
+REG_MODULE(BKLMDigitAnalyzer);
 
 
 BKLMDigitAnalyzerModule::BKLMDigitAnalyzerModule() : Module(),

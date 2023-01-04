@@ -19,26 +19,26 @@ REG_MODULE(TFCDC_TrackFlightTimeAdjuster);
 REG_MODULE(TFCDC_TrackExporter);
 
 TFCDC_TrackRejecterModule::TFCDC_TrackRejecterModule()
-  : Super( {"CDCTrackVector"})
+  : Super({"CDCTrackVector"})
 {
 }
 
 TFCDC_TrackQualityAsserterModule::TFCDC_TrackQualityAsserterModule()
-  : Super( {"CDCTrackVector"})
+  : Super({"CDCTrackVector"})
 {
 }
 
 TFCDC_TrackOrienterModule::TFCDC_TrackOrienterModule()
-  : Super( {"CDCTrackVector"})
+  : Super({"CDCTrackVector"})
 {
 }
 
 TFCDC_TrackFlightTimeAdjusterModule::TFCDC_TrackFlightTimeAdjusterModule()
-  : Super( {"CDCTrackVector"})
+  : Super({"CDCTrackVector"})
 {
 }
 
 TFCDC_TrackExporterModule::TFCDC_TrackExporterModule()
-  : Super( {"CDCTrackVector"})
+  : Super({"CDCTrackVector"})
 {
 }

@@ -190,9 +190,7 @@ void KLMCalibrationChecker::checkAlignment()
     layer = klmModule.getLayer();
     param = KLMAlignmentData::c_DeltaU;
     value = alignment->getDeltaU();
-    /* cppcheck-suppress nullPointerRedundantCheck */
     error = alignmentError->getDeltaU();
-    /* cppcheck-suppress nullPointerRedundantCheck */
     correction = alignmentCorrection->getDeltaU();
     if (klmModule.getSubdetector() == KLMElementNumbers::c_BKLM)
       bklmModuleTree->Fill();

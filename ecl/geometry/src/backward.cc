@@ -271,6 +271,10 @@ void Belle2::ECL::GeoECLCreator::backward(G4LogicalVolume& _top)
                                   false, (1152 + 6624) / 16 + indx, 0);
       if (overlap)pv->CheckOverlaps(npoints);
     }
+
+    for (shape_t* shape : cryst) {
+      delete shape;
+    }
   }
 
   if (b_preamplifier) {
@@ -291,7 +295,7 @@ void Belle2::ECL::GeoECLCreator::backward(G4LogicalVolume& _top)
     G4Transform3D t1 = G4Translate3D(0, 185. / 2, (40. - 5) / 2);
     l1->SetVisAttributes(batt);
 
-    Point_t v3[] = {{ -212. / 2, -135. / 2}, {212. / 2 - 30, -135. / 2}, {212. / 2, -135. / 2 + 30}, {212. / 2, 135. / 2} , { -212. / 2, 135. / 2}};
+    Point_t v3[] = {{ -212. / 2, -135. / 2}, {212. / 2 - 30, -135. / 2}, {212. / 2, -135. / 2 + 30}, {212. / 2, 135. / 2}, { -212. / 2, 135. / 2}};
     const int n3 = sizeof(v3) / sizeof(Point_t);
     G4ThreeVector c3[n3 * 2];
 
@@ -357,6 +361,7 @@ void Belle2::ECL::GeoECLCreator::backward(G4LogicalVolume& _top)
                         1496 - 185 + 178. / 2,
                         434 + 5 - 5. / 2), l1a, "l1a_physical", top, false, i, overlap);
 
+    delete support_leg;
   }
 
 }

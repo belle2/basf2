@@ -8,6 +8,8 @@
 
 #include <trg/top/modules/trgtopUnpacker/trgtopUnpackerModule.h>
 
+#include <iostream>
+
 /* --------------- WARNING ---------------------------------------------- *
 If you have more complex parameter types in your class then simple int,
 double or std::vector of those you might need to uncomment the following
@@ -15,7 +17,7 @@ include directive to avoid an undefined reference on compilation.
 * ---------------------------------------------------------------------- */
 // #include <framework/core/ModuleParam.templateDetails.h>
 
-using namespace std;
+//using namespace std;
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -23,9 +25,9 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 REG_MODULE(TRGTOPUnpacker);
 
-string TRGTOPUnpackerModule::version() const
+std::string TRGTOPUnpackerModule::version() const
 {
-  return string("1.00");
+  return std::string("1.00");
 }
 
 //-----------------------------------------------------------------
@@ -39,7 +41,7 @@ TRGTOPUnpackerModule::TRGTOPUnpackerModule()
   // Set module properties
 
 
-  string desc = "TRGTOPUnpackerModule(" + version() + ")";
+  std::string desc = "TRGTOPUnpackerModule(" + version() + ")";
   setDescription(desc);
   setPropertyFlags(c_ParallelProcessingCertified);
 
@@ -47,6 +49,10 @@ TRGTOPUnpackerModule::TRGTOPUnpackerModule()
 
 
   // Parameter definitions
+  addParam("overrideControlBits", m_overrideControlBits,
+           "Override control bits in data",
+           true);
+  //           false);
 
 }
 
@@ -56,7 +62,14 @@ TRGTOPUnpackerModule::~TRGTOPUnpackerModule()
 
 void TRGTOPUnpackerModule::initialize()
 {
-  m_TRGTOPCombinedTimingArray.registerInDataStore();
+
+  m_TRGTOPCombinedT0DecisionArray.registerInDataStore();
+  //  m_TRGTOPCombinedTimingArray.registerInDataStore();
+  m_TRGTOPSlotTimingArray.registerInDataStore();
+
+  //  m_TRGTOPCombinedTimingArray.registerRelationTo(m_TRGTOPSlotTimingArray);
+  //  m_TRGTOPSlotTimingArray.registerRelationTo(m_TRGTOPCombinedTimingArray);
+
 }
 
 
@@ -72,60 +85,87 @@ void TRGTOPUnpackerModule::event()
   StoreArray<RawTRG> raw_trgarray;
 
   for (int i = 0; i < raw_trgarray.getEntries(); i++) {
+
+    // Check PCIe40 data or Copper data
+    if (raw_trgarray[i]->GetMaxNumOfCh(0) == 48) { m_pciedata = true; }
+    else if (raw_trgarray[i]->GetMaxNumOfCh(0) == 4) { m_pciedata = false; }
+    else { B2FATAL("TRGTOPUnpackerModule: Invalid value of GetMaxNumOfCh from raw data: " << LogVar("Number of ch: ", raw_trgarray[i]->GetMaxNumOfCh(0))); }
+
+    int node_id = 0;
+    int ch_id_1 = 0;
+    int ch_id_2 = 1;
+    if (m_pciedata) {
+      node_id = 0x10000001;
+      ch_id_1 = 23;
+      ch_id_2 = 24;
+    } else {
+      node_id = 0x12000001;
+      ch_id_1 = 0;
+      ch_id_2 = 1;
+    }
+
     for (int j = 0; j < raw_trgarray[i]->GetNumEntries(); j++) {
 
       m_nodeId = raw_trgarray[i]->GetNodeID(j);
 
-      //      B2INFO("m_nodeId = " << std::hex <<  m_nodeId);
+      if (m_nodeId == node_id) {
 
-      if (m_nodeId == 0x12000001) {               ////// TRGTOP NodeID is 0x12000001, verified (tp & vs)
+        int numberOfChannels = raw_trgarray[i]->GetMaxNumOfCh(i);
 
-        m_nWords       = raw_trgarray[i]->GetDetectorNwords(j, 0);
-        m_eventNumber  = raw_trgarray[i]->GetEveNo(j);
-        m_trigType     = raw_trgarray[i]->GetTRGType(j);
+        //  B2INFO("raw_trgarray.GetMaxNumOfCh() = " << numberOfChannels);
 
-        //  B2INFO("m_nWords from cpr12001 = " << m_nWords);
+        for (int channel = 0; channel < numberOfChannels; channel++) {
 
-        //        if ( m_nWords > 3 ) {                                         ////general header is 3 words long
-        if (m_nWords > 0) {                                           ////general header is 3 words long
+          if (channel != ch_id_1 && channel != ch_id_2) continue;
 
-          //          B2INFO("raw_trgarray.getEntries() = " << raw_trgarray.getEntries());
-          //          B2INFO("raw_trgarray[i]->GetNumEntries() = " << raw_trgarray[i]->GetNumEntries());
-          //          B2INFO("raw_trgarray[]->GetEveNo(j) = " << raw_trgarray[i]->GetEveNo(j));
-          //          B2INFO("raw_trgarray[]->GetNodeID(j) = " << std::hex << raw_trgarray[i]->GetNodeID(j) << std::dec);
-          //          B2INFO("raw_trgarray[]->GetDetectorNwords(j,0) = " << m_nWords);
+          m_nWords       = raw_trgarray[i]->GetDetectorNwords(j, channel);
 
-          readCOPPEREvent(raw_trgarray[i] , j);
+          //    B2INFO("raw_trgarray[" << i << "]->GetDetectorNwords(" << j << ", " << channel << ") = " << m_nWords);
 
+          //        if ( m_nWords > 3 ) {                                         ////general header is 3 words long
+          if (m_nWords > 0) {
+
+            m_eventNumber  = raw_trgarray[i]->GetEveNo(j);
+            m_trigType     = raw_trgarray[i]->GetTRGType(j);
+
+            //          B2INFO("raw_trgarray.getEntries() = " << raw_trgarray.getEntries());
+            //          B2INFO("raw_trgarray[i]->GetNumEntries() = " << raw_trgarray[i]->GetNumEntries());
+            //          B2INFO("raw_trgarray[]->GetEveNo(j) = " << raw_trgarray[i]->GetEveNo(j));
+            //          B2INFO("raw_trgarray[]->GetNodeID(j) = " << std::hex << raw_trgarray[i]->GetNodeID(j) << std::dec);
+            //          B2INFO("raw_trgarray[]->GetDetectorNwords(j,0) = " << m_nWords);
+
+            readDAQEvent(raw_trgarray[i], j, channel);
+
+          }
         }
       }
     }
   }
 }
 
-void TRGTOPUnpackerModule::readCOPPEREvent(RawTRG* raw_copper, int i)
+void TRGTOPUnpackerModule::readDAQEvent(RawTRG* raw_daq, int j, int channel)
 {
-  //  if (raw_copper->GetDetectorNwords(i, 0) > 3) {                ///general header is 3 words long
-  if (raw_copper->GetDetectorNwords(i, 0) > 0) {                ///general header is 3 words long
-    fillTreeTRGTOP(raw_copper->GetDetectorBuffer(i, 0));
+  //  if (raw_daq->GetDetectorNwords(j, channel) > 3) {                ///general header is 3 words long
+  if (raw_daq->GetDetectorNwords(j, channel) > 0) {
+    unpackT0Decisions(raw_daq->GetDetectorBuffer(j, channel), channel);
   }
 }
 
-void TRGTOPUnpackerModule::fillTreeTRGTOP(int* rdat)
+void TRGTOPUnpackerModule::unpackT0Decisions(int* rdat, int channel)
 {
 
-  //  B2INFO("data size (32bit words) = " << m_nWords);
+  //  B2INFO("channel, data size (32bit words) = " << channel << ", " << m_nWords);
 
   // Information for each data window
 
   // rvc from the header of the buffer
-  int l1_revo = rdat[2] & 0x7ff;  /// L1 timestamp (11 bits)
+  int rvcL1 = rdat[2] & 0x7ff;  /// L1 timestamp (11 bits)
 
   // L1 event number
-  int trgtag = (rdat[2] >> 12) & 0xfffff; /// 20 LSBs of trgtag (sequential trigger number)
+  int eventNumberL1 = (rdat[2] >> 12) & 0xfffff; /// 20 LSBs of eventNumberL1 (sequential trigger number)
 
-  //  B2INFO("l1_rvc from header = " << l1_revo);
-  //  B2INFO("trgtag (evt) from buffer header = " << trgtag);
+  //  B2INFO("l1_rvc from header = " << rvcL1);
+  //  B2INFO("eventNumberL1 (evt) from buffer header = " << eventNumberL1);
 
   bool dataFormatKnown = false;
 
@@ -133,7 +173,9 @@ void TRGTOPUnpackerModule::fillTreeTRGTOP(int* rdat)
   int numberOfWindows = -1;
 
   int dataFormatVersionExpected = -1;
+  // cppcheck-suppress variableScope
   int revoClockDeltaExpected = 4;
+  // cppcheck-suppress variableScope
   int cntr127DeltaExpected = 4;
 
   // 3 = 3:  header only
@@ -167,16 +209,24 @@ void TRGTOPUnpackerModule::fillTreeTRGTOP(int* rdat)
     windowSize = 32;
     numberOfWindows = 96;
     dataFormatKnown = true;
-    dataFormatVersionExpected = 4;
+    dataFormatVersionExpected = 5;
   }
 
   if (!dataFormatKnown) {
     if (!m_reportedAlreadyRun_1) {
-      B2INFO("Unknown data format / error / exiting. This message is reported only once per run.");
+      B2INFO("Unknown data format / error / exiting. This condition is reported only once per run.");
       m_reportedAlreadyRun_1 = true;
     }
     return;
   }
+
+  // FTSW / rvc / the difference is 1280 (expected)
+  //  int revoClockDeltaJump1 = -92;
+  //  int revoClockDeltaJump2 = 1188;
+
+  // VME / 16bit counter
+  //  int cntr127DeltaJump1 = -92;
+  //  int cntr127DeltaJump2 = -65532;
 
   //  if ( dataFormatVersionExpected > 0 ) B2INFO("---------------------------------------------------------------------------------------------------------------");
 
@@ -194,18 +244,9 @@ void TRGTOPUnpackerModule::fillTreeTRGTOP(int* rdat)
   int revoClockLast = -1;
   int cntr127Last = -1;
 
-  // error counter for possible data corruption
-  unsigned int errorCountEvent = 0;
-
-  // need to know when a new decision is made (there could be more than one TOP L1 timing decision stored in the same B2L buffer)
-  // cppcheck-suppress variableScope
-  int t0CombinedDecisionLast = -1;
-  int logLSumLast = -1;
-  int logLSumNow = 0;
-
   bool performBufferAnalysis = true;
   bool reportAllErrors = true;
-  bool reportSummaryErrors = true;
+  // bool reportSummaryErrors = true;
 
   // check if this event's buffer is a dummy buffer
   int counterDummyWindows = 0;
@@ -216,12 +257,15 @@ void TRGTOPUnpackerModule::fillTreeTRGTOP(int* rdat)
     if (testPattern == testPatternDummyEvent) {
       counterDummyWindows++;
     }
-    // Oct. 31, 2020: three most significant bits are now used to control unpacker from FW
-    // Note that setting either flag for any of the windows changes it for all windows here
-    testPattern = (rdat[index + 2] >> 29) & 0x7;
-    if (testPattern & 0x1) performBufferAnalysis = false;
-    if (testPattern & 0x2) reportAllErrors = false;
-    if (testPattern & 0x4) reportSummaryErrors = false;
+    // March 30, 2022: need to be able to override the settings in data
+    if (!m_overrideControlBits) {
+      // Oct. 31, 2020: three most significant bits are now used to control unpacker from FW
+      // Note that setting either flag for any of the windows changes it for all windows here
+      testPattern = (rdat[index + 2] >> 29) & 0x7;
+      if (testPattern & 0x1) performBufferAnalysis = false;
+      if (testPattern & 0x2) reportAllErrors = false;
+      // if (testPattern & 0x4) reportSummaryErrors = false;
+    }
   }
 
   // note that events with empty buffer have numberOfWindows=0
@@ -235,12 +279,7 @@ void TRGTOPUnpackerModule::fillTreeTRGTOP(int* rdat)
     }
   }
 
-  // the ID of the first actual window with data (depends on b2l_buffer_delay, which could be figured out from data
-  // iWindowFirst = 0 is correct for b2l_buffer_delay = 0
-  int iWindowFirst = 0;
-
-  // identify the actual first window (either the first window (when b2l_buffer_delay=0) or the first window where we see the jump of rvc by -92 or by 1188 (1188+92 = 1280))
-
+  /*
   int numberRvcJumps = 0;
   int numberCntr127Jumps = 0;
   int windowRvcJumpFirst = -1;
@@ -260,14 +299,9 @@ void TRGTOPUnpackerModule::fillTreeTRGTOP(int* rdat)
         //      if (revoClockLast != -1 && revoClockNow > revoClockLast)  {
         int revoClockDeltaNow = revoClockNow - revoClockLast;
         if (revoClockDeltaNow != revoClockDeltaExpected) {
-          // -1276 is simply going to the next cycle of rvc counting, but 1188 or -92 means that we identified the first window (these numbers are such for 24 windows @ 32MHz)
-          if (revoClockDeltaNow == 1188 || revoClockDeltaNow == -92) {
-            // note that the first buffer window could not cause this condition because we would never get to execute this line on the first buffer window, yet it does not matter
-            if (iWindowFirst == 0) {
-              iWindowFirst = iWindow;
-            }
-          } else if (revoClockDeltaNow != -1276) {
-            if (reportAllErrors) B2ERROR("rvc changed by an unexpected number of units: " << revoClockDeltaNow << ", last rvc = " <<
+          // -1276 is simply going to the next cycle of rvc counting, but 1188 or -92 means that there was one frame missing in data / corrupted data
+          if (revoClockDeltaNow != -1276) {
+            if (reportAllErrors) B2INFO("rvc changed by an unexpected number of units (1): " << revoClockDeltaNow << ", last rvc = " <<
                                            revoClockLast <<
                                            ", current rvc = " << revoClockNow << ", window " << iWindow << ", index = " << index);
             numberRvcJumps++;
@@ -287,9 +321,9 @@ void TRGTOPUnpackerModule::fillTreeTRGTOP(int* rdat)
         //      if (cntr127Last != -1 && cntr127Now > cntr127Last)  {
         int cntr127DeltaNow = cntr127Now - cntr127Last;
         if (cntr127DeltaNow != cntr127DeltaExpected) {
-          // 65444 is the value of the difference in cntr127 (VME counter) because we use 16 bits of 64 bit-long counter (these numbers are such for 24 windows @ 32MHz)
-          if (cntr127DeltaNow != 65444 && cntr127DeltaNow != -92 && cntr127DeltaNow != -65532) {
-            if (reportAllErrors) B2ERROR("cntr127 changed by an unexpected number of units: " << cntr127DeltaNow << ", cntr127 last = " <<
+          // 65444 is the value of the difference in cntr127 (VME counter) because we use 16 bits of 64 bit-long counter
+          if (cntr127DeltaNow != 65444) {
+            if (reportAllErrors) B2INFO("cntr127 changed by an unexpected number of units (1): " << cntr127DeltaNow << ", cntr127 last = " <<
                                            cntr127Last <<
                                            ", cntr127 now = " << cntr127Now << ", window " << iWindow << ", index = " << index + 1);
             numberCntr127Jumps++;
@@ -303,6 +337,7 @@ void TRGTOPUnpackerModule::fillTreeTRGTOP(int* rdat)
       cntr127Last = cntr127Now;
     }
   }
+  */
 
   /*
   if (numberRvcJumps > 0) {
@@ -322,8 +357,8 @@ void TRGTOPUnpackerModule::fillTreeTRGTOP(int* rdat)
   /*
   if (numberRvcJumps > 0 || numberCntr127Jumps > 0) {
     B2INFO("===========================================================================================================");
-    B2INFO("l1_rvc from header = " << l1_revo);
-    B2INFO("trgtag (evt) from buffer header = " << trgtag);
+    B2INFO("l1_rvc from header = " << rvcL1);
+    B2INFO("eventNumberL1 (evt) from buffer header = " << eventNumberL1);
     B2INFO("Reporting the entire data buffer");
     B2INFO("Header 0 = : " << std::hex << rdat[0] << std::dec);
     B2INFO("Header 1 = : " << std::hex << rdat[1] << std::dec);
@@ -349,42 +384,41 @@ void TRGTOPUnpackerModule::fillTreeTRGTOP(int* rdat)
   revoClockLast = -1;
   cntr127Last = -1;
 
-  //  B2INFO("Start buffer analysis, iWindowFirst = " << iWindowFirst);
-
   // events with no buffer (i.e. no payload), empty (i.e. dummy) windows and presumably corrupted events are NOT analyzed
   if (performBufferAnalysis) {
 
-    // Loop over windows in B2L buffer and locate all unique TOP L1 decisions
-    for (int iWindowProvisional = 0; iWindowProvisional < numberOfWindows; iWindowProvisional++) {
+    int slotT0Last[8];
+    int slotNHitLast[8];
+    int slotSegmentLast[8];
 
-      // we need to be smarter now about how to calculate window number in the buffer
-      int iWindow = iWindowProvisional + iWindowFirst;
+    int otherInformationLast[8];
 
-      if (iWindow >= numberOfWindows) {
-        iWindow = iWindow - numberOfWindows;
-      }
+    int combinedT0Last;
+    int combinedT0RVC2GDLLast;
+
+    // Loop over windows in B2L buffer and locate all unique slot-level TOP L1 decisions
+    for (int iWindow = 0; iWindow < numberOfWindows; iWindow++) {
 
       //      B2INFO("REAL DEBUG:  window number = " << iWindow);
 
+      int clockCycle = iWindow * 4;
+
       // error counters for possible data corruption in the current window
-      unsigned int errorCountWindowMinor = 0;
-      unsigned int errorCountWindowMajor = 0;
+      unsigned int errorCountWindow = 0;
 
       // a pointer-like variable for accessing the data in the buffer sequentially
       int index = iWindow * windowSize + 3;
 
       unsigned int testPatternExpected = 0;
       if (dataFormatVersionExpected == 1) testPatternExpected = 0xbbba;
-      else if (dataFormatVersionExpected == 2 || dataFormatVersionExpected == 3
-               || dataFormatVersionExpected == 4) testPatternExpected = 0xdddd;
+      else if (dataFormatVersionExpected >= 2) testPatternExpected = 0xdddd;
 
       testPattern = (rdat[index] >> 16) & 0xffff;
       //    B2INFO("testPattern = " << std::hex << testPattern << std::dec);
       if (testPattern != testPatternExpected) {
-        //      if (reportAllErrors) B2ERROR("Unexpected test pattern 1: " << std::hex << testPattern << std::dec);
-        if (reportAllErrors) B2ERROR("Unexpected test pattern 1: " << std::hex << testPattern << std::dec << ", window " << iWindow <<
+        if (reportAllErrors) B2ERROR("An unexpected test pattern: " << std::hex << testPattern << std::dec << ", window " << iWindow <<
                                        ", index = " << index);
-        errorCountWindowMajor++;
+        errorCountWindow++;
       }
 
       int dataFormatVersionNow = (rdat[index] >> 11) & 0x1f;
@@ -395,37 +429,40 @@ void TRGTOPUnpackerModule::fillTreeTRGTOP(int* rdat)
       if (dataFormatVersionNow == 4 && dataFormatVersionExpected == 2) {
         dataFormatVersionExpected = 4;
       }
+      if (dataFormatVersionNow == 5) {
+        dataFormatVersionExpected = 5;
+      }
 
       if (dataFormatVersionNow != dataFormatVersionExpected) {
         if (reportAllErrors) {
           if (!m_reportedAlreadyRun_2) {
-            B2ERROR("Unexpected data format version: " << dataFormatVersionNow << ", window " << iWindow << ", index = " <<
+            B2ERROR("An unexpected data format version: " << dataFormatVersionNow << ", window " << iWindow << ", index = " <<
                     index);
             m_reportedAlreadyRun_2 = true;
           }
         }
-        errorCountWindowMajor++;
+        errorCountWindow++;
       }
 
       // revoclk (comes from b2tt) has the range between 0 and 1279 @127MHz => 1279*7.8ns ~10us = 1 revolution (11bits are used)
       int revoClockNow = rdat[index] & 0x7ff;
-      //    B2INFO("rvc now = " << revoClockNow);
+      //      B2INFO("window = " << iWindow << ", rvc now = " << revoClockNow);
       // first need to know max revoClock (1279)
       if (revoClockLast != -1)  {
         //      if (revoClockLast != -1 && revoClockNow > revoClockLast)  {
         int revoClockDeltaNow = revoClockNow - revoClockLast;
         if (revoClockDeltaNow != revoClockDeltaExpected) {
-          if (revoClockDeltaNow != 1188 && revoClockDeltaNow != -92 && revoClockDeltaNow != -1276) {
-            if (reportAllErrors) B2ERROR("rvc changed by an unexpected number of units: " << revoClockDeltaNow << ", last rvc = " <<
-                                           revoClockLast <<
-                                           ", current rvc = " << revoClockNow << ", window " << iWindow << ", index = " << index);
-            errorCountWindowMinor++;
+          if (revoClockDeltaNow != -1276) {
+            if (reportAllErrors) B2INFO("rvc changed by an unexpected number of units (2): " << revoClockDeltaNow << ", last rvc = " <<
+                                          revoClockLast <<
+                                          ", current rvc = " << revoClockNow << ", window " << iWindow << ", index = " << index);
+            //            errorCountWindow++;
           }
         }
       }
       if (revoClockNow > 1279) {
-        if (reportAllErrors) B2ERROR("Unexpected rvc value = " << revoClockNow << ", window " << iWindow << ", index = " << index);
-        errorCountWindowMajor++;
+        if (reportAllErrors) B2ERROR("An unexpected rvc value = " << revoClockNow << ", window " << iWindow << ", index = " << index);
+        errorCountWindow++;
       }
       revoClockLast = revoClockNow;
 
@@ -437,475 +474,225 @@ void TRGTOPUnpackerModule::fillTreeTRGTOP(int* rdat)
         int cntr127DeltaNow = cntr127Now - cntr127Last;
         if (cntr127DeltaNow != cntr127DeltaExpected) {
           // 65444 is the value of the difference in cntr127 (VME counter) because we use 16 bits of 64 bit-long counter
-          if (cntr127DeltaNow != 65444 && cntr127DeltaNow != -92 && cntr127DeltaNow != -65532) {
-            if (reportAllErrors) B2ERROR("cntr127 changed by an unexpected number of units: " << cntr127DeltaNow << ", cntr127 last = " <<
-                                           cntr127Last <<
-                                           ", cntr127 now = " << cntr127Now << ", window " << iWindow << ", index = " << index + 1);
-            errorCountWindowMinor++;
+          if (cntr127DeltaNow != 65444 && cntr127DeltaNow != -65532) {
+            if (reportAllErrors) B2INFO("cntr127 changed by an unexpected number of units (2): " << cntr127DeltaNow << ", cntr127 last = " <<
+                                          cntr127Last <<
+                                          ", cntr127 now = " << cntr127Now << ", window " << iWindow << ", index = " << index + 1);
+            errorCountWindow++;
           }
         }
       }
       cntr127Last = cntr127Now;
 
-      // Tianping Oct. 22, 2021 -> vs Mar. 25, 2022 / removed
+      //
 
-      //      testPattern = (rdat[index + 1]) & 0x0000ffff;
-      //    B2INFO("testPattern = " << std::hex << testPattern << std::dec);
-      //      if (testPattern != 0) {
-      //        if (reportAllErrors) B2ERROR("Unexpected test pattern 2: " << testPattern << ", window " << iWindow << ", index = " << index + 1);
-      //        errorCountWindowMajor++;
-      //      }
+      int slotT0[8];
+      int slotNHit[8];
+      int slotSegment[8];
 
+      int otherInformation[8];
 
-      // combined t0 from the current window
-      int t0CombinedDecisionNow = (rdat[index + 2]) & 0x3ffff;
-      int t0CombinedDecisionNowEstimated = 0;
-      //    B2INFO("Combined t0 (raw ns) = " << t0CombinedDecisionNow);
+      //      int versionFW = rdat[index + 3];
 
-      // revo clock when t0 decision was supposed to be posted to GDL
-      int revoClockGDL = (rdat[index + 2] >> 18) & 0x7ff;
-      //    B2INFO("rvc when t0 was supposed to be posted to GDL/GRL = " << revoClockGDL);
+      int combinedT0 = rdat[index + 2] & 0x3ffff;
+      int combinedT0RVC2GDL = (rdat[index + 2] >> 18) & 0x7ff;
+      int combinedT0ClockCycle = clockCycle;
 
-      // Oct. 31, 2020: these three bits are now used to control unpacker from FW
-      //      testPattern = (rdat[index + 2] >> 29) & 0x7;
-      //    B2INFO("testPattern = " << std::hex << testPattern << std::dec);
-      //      if (testPattern != 0) {
-      //       if (reportAllErrors) B2ERROR("Unexpected test pattern 3: " << testPattern << ", window " << iWindow << ", index = " << index + 2);
-      //        errorCountWindowMajor++;
-      //      }
+      slotT0[0] = (rdat[index + 4] >> 16) & 0xffff;
+      slotT0[1] = (rdat[index + 4]) & 0xffff;
+      slotT0[2] = (rdat[index + 5] >> 16) & 0xffff;
+      slotT0[3] = (rdat[index + 5]) & 0xffff;
+      slotT0[4] = (rdat[index + 6] >> 16) & 0xffff;
+      slotT0[5] = (rdat[index + 6]) & 0xffff;
+      slotT0[6] = (rdat[index + 7] >> 16) & 0xffff;
+      slotT0[7] = (rdat[index + 7]) & 0xffff;
 
-      int t0CombinedSegments[16];
+      slotNHit[0] = (rdat[index + 8] >> 20) & 0x3ff;
+      slotNHit[1] = (rdat[index + 8] >> 10) & 0x3ff;
+      slotNHit[2] = (rdat[index + 8]) & 0x3ff;
 
-      t0CombinedSegments[15] = (rdat[index + 11] >> 28) & 0xf;
-      t0CombinedSegments[14] = (rdat[index + 11] >> 24) & 0xf;
-      t0CombinedSegments[13] = (rdat[index + 11] >> 20) & 0xf;
-      t0CombinedSegments[12] = (rdat[index + 11] >> 16) & 0xf;
-      t0CombinedSegments[11] = (rdat[index + 11] >> 12) & 0xf;
-      t0CombinedSegments[10] = (rdat[index + 11] >>  8) & 0xf;
-      t0CombinedSegments[9] = (rdat[index + 11]  >>  4) & 0xf;
-      t0CombinedSegments[8] = (rdat[index + 11]) & 0xf;
+      slotNHit[3] = (rdat[index + 9] >> 20) & 0x3ff;
+      slotNHit[4] = (rdat[index + 9] >> 10) & 0x3ff;
+      slotNHit[5] = (rdat[index + 9]) & 0x3ff;
 
-      t0CombinedSegments[7] = (rdat[index + 12] >> 28) & 0xf;
-      t0CombinedSegments[6] = (rdat[index + 12] >> 24) & 0xf;
-      t0CombinedSegments[5] = (rdat[index + 12] >> 20) & 0xf;
-      t0CombinedSegments[4] = (rdat[index + 12] >> 16) & 0xf;
-      t0CombinedSegments[3] = (rdat[index + 12] >> 12) & 0xf;
-      t0CombinedSegments[2] = (rdat[index + 12] >>  8) & 0xf;
-      t0CombinedSegments[1] = (rdat[index + 12] >>  4) & 0xf;
-      t0CombinedSegments[0] = (rdat[index + 12]) & 0xf;
+      slotNHit[6] = (rdat[index + 10] >> 10) & 0x3ff;
+      slotNHit[7] = (rdat[index + 10]) & 0x3ff;
 
-      int nSegmentsCombinedDecision = 0;
+      slotSegment[0] = (rdat[index + 11] >> 28) & 0xf;
+      slotSegment[1] = (rdat[index + 11] >> 24) & 0xf;
+      slotSegment[2] = (rdat[index + 11] >> 20) & 0xf;
+      slotSegment[3] = (rdat[index + 11] >> 16) & 0xf;
+      slotSegment[4] = (rdat[index + 11] >> 12) & 0xf;
+      slotSegment[5] = (rdat[index + 11] >> 8) & 0xf;
+      slotSegment[6] = (rdat[index + 11] >> 4) & 0xf;
+      slotSegment[7] = (rdat[index + 11] >> 0) & 0xf;
 
-      for (int iSlot = 0; iSlot < NUMBER_OF_SLOTS; iSlot++) {
-        if (t0CombinedSegments[iSlot] != 0) {
-          //        if (t0CombinedSegments[iSlot] != 0 && iWindow == 0) {
-          //    B2INFO("Slot " << iSlot+1 << ", segment = " << t0CombinedSegments[iSlot]);
-          nSegmentsCombinedDecision++;
-        }
-      }
+      // the following information is board-dependent
+      otherInformation[0] = (rdat[index + 12] >> 16) & 0xffff;
+      otherInformation[1] = (rdat[index + 12]) & 0xffff;
+      otherInformation[2] = (rdat[index + 13] >> 16) & 0xffff;
+      otherInformation[3] = (rdat[index + 13]) & 0xffff;
+      otherInformation[4] = (rdat[index + 14] >> 16) & 0xffff;
+      otherInformation[5] = (rdat[index + 14]) & 0xffff;
+      otherInformation[6] = (rdat[index + 15] >> 16) & 0xffff;
+      otherInformation[7] = (rdat[index + 15]) & 0xffff;
 
-      int t0CombinedSlots[16];
+      if (iWindow != 0) {
 
-      t0CombinedSlots[0] = (rdat[index + 3] >> 16) & 0xffff;
-      t0CombinedSlots[1] = (rdat[index + 3]) & 0xffff;
-      t0CombinedSlots[2] = (rdat[index + 4] >> 16) & 0xffff;
-      t0CombinedSlots[3] = (rdat[index + 4]) & 0xffff;
-      t0CombinedSlots[4] = (rdat[index + 5] >> 16) & 0xffff;
-      t0CombinedSlots[5] = (rdat[index + 5]) & 0xffff;
-      t0CombinedSlots[6] = (rdat[index + 6] >> 16) & 0xffff;
-      t0CombinedSlots[7] = (rdat[index + 6]) & 0xffff;
-      t0CombinedSlots[8] = (rdat[index + 7] >> 16) & 0xffff;
-      t0CombinedSlots[9] = (rdat[index + 7]) & 0xffff;
-      t0CombinedSlots[10] = (rdat[index + 8] >> 16) & 0xffff;
-      t0CombinedSlots[11] = (rdat[index + 8]) & 0xffff;
-      t0CombinedSlots[12] = (rdat[index + 9] >> 16) & 0xffff;
-      t0CombinedSlots[13] = (rdat[index + 9]) & 0xffff;
-      t0CombinedSlots[14] = (rdat[index + 10] >> 16) & 0xffff;
-      t0CombinedSlots[15] = (rdat[index + 10]) & 0xffff;
+        // try to retrieve combined t0 decisions (limited info)
+        if (channel == 0) {
+          if (combinedT0 != combinedT0Last ||
+              combinedT0RVC2GDL != combinedT0RVC2GDLLast
+             ) {
 
-      int nSlotsCombinedDecision = 0;
+            //      int toptrgT0_revoToNS = combinedT0%revoToNS;
+            //      int rvcL1_NS = rvcL1 * 8;
+            //      int deltaT0 = rvcL1_NS >= toptrgT0_revoToNS ? rvcL1_NS - toptrgT0_revoToNS : rvcL1_NS - toptrgT0_revoToNS + revoToNS;
+            //      int latencyL12TOPTRG = revoClockNow >= rvcL1 ? revoClockNow - rvcL1 : revoClockNow - rvcL1 + 1280;
 
-      int nSegmentErrors = 0;
+            TRGTOPCombinedT0Decision combinedT0Decision(combinedT0,
+                                                        revoClockNow,
+                                                        combinedT0ClockCycle,
+                                                        combinedT0RVC2GDL,
+                                                        eventNumberL1,
+                                                        rvcL1
+                                                       );
 
-      for (int iSlot = 0; iSlot < NUMBER_OF_SLOTS; iSlot++) {
-        if (t0CombinedSegments[iSlot] != 0) {
-          //    B2INFO("Slot " << iSlot+1 << ", t0 (raw ns) = " << 2 * t0CombinedSlots[iSlot]);
-          t0CombinedDecisionNowEstimated = t0CombinedDecisionNowEstimated + 2 * t0CombinedSlots[iSlot];
-          nSlotsCombinedDecision++;
-        } else if (t0CombinedSlots[iSlot] != 0) {
-          if (reportAllErrors) B2ERROR("Segment==0 for Slot " << iSlot + 1 << ", t0 (raw ns) = " << 2 * t0CombinedSlots[iSlot] <<
-                                         ", nSegmentsCombinedDecision = " << nSegmentsCombinedDecision << ", combined t0 decision (FW) = " << t0CombinedDecisionNow <<
-                                         ", window " << iWindow);
-          errorCountWindowMajor++;
-          nSegmentErrors++;
-        }
-      }
+            m_TRGTOPCombinedT0DecisionArray.appendNew(combinedT0Decision);
 
-      //    if ( nSlotsCombinedDecision == 0 ) error = true;
+            /*
+            cout << "-DEBUG- new combined decision: t0 (2ns), eventNumberL1, rvc2GDL, clock cycle, rvcNOW, rvcL1, latency, deltaT0 (ns) = "
+            << combinedT0/2 << ", "
+            << eventNumberL1 << ", "
+            << combinedT0RVC2GDL << ", "
+            << combinedT0ClockCycle << ", "
+            << revoClockNow << ", "
+            << rvcL1 << ", "
+            << latencyL12TOPTRG << ", "
+            << deltaT0
+            << endl;
+            */
 
-      int nHitsSlots[16];
+            combinedT0Last = combinedT0;
+            combinedT0RVC2GDLLast = combinedT0RVC2GDL;
+          }
 
-      nHitsSlots[0] = (rdat[index + 13] >> 16) & 0x3ff;
-      nHitsSlots[1] = (rdat[index + 13]) & 0x3ff;
-      nHitsSlots[2] = (rdat[index + 14] >> 16) & 0x3ff;
-      nHitsSlots[3] = (rdat[index + 14]) & 0x3ff;
-      nHitsSlots[4] = (rdat[index + 15] >> 16) & 0x3ff;
-      nHitsSlots[5] = (rdat[index + 15]) & 0x3ff;
-      nHitsSlots[6] = (rdat[index + 16] >> 16) & 0x3ff;
-      nHitsSlots[7] = (rdat[index + 16]) & 0x3ff;
-      nHitsSlots[8] = (rdat[index + 17] >> 16) & 0x3ff;
-      nHitsSlots[9] = (rdat[index + 17]) & 0x3ff;
-      nHitsSlots[10] = (rdat[index + 18] >> 16) & 0x3ff;
-      nHitsSlots[11] = (rdat[index + 18]) & 0x3ff;
-      nHitsSlots[12] = (rdat[index + 19] >> 16) & 0x3ff;
-      nHitsSlots[13] = (rdat[index + 19]) & 0x3ff;
-      nHitsSlots[14] = (rdat[index + 20] >> 16) & 0x3ff;
-      nHitsSlots[15] = (rdat[index + 20]) & 0x3ff;
+          // retrieve slot-level decisions (limited info) for slots 1 through 8 as observed on the board used for slots 9 through 16
+          for (int i = 0; i < 8; i++) {
 
-      int nHitsCombinedDecision = 0;
-      int nSlotsHitsCombinedDecision = 0;
+            if (otherInformation[i] != otherInformationLast[i]) {
 
-      for (int iSlot = 0; iSlot < NUMBER_OF_SLOTS; iSlot++) {
-        if (t0CombinedSegments[iSlot] != 0) {
-          //          B2INFO("Slot " << iSlot+1 << ", N hits = " << nHitsSlots[iSlot]);
-          nSlotsHitsCombinedDecision++;
-          nHitsCombinedDecision = nHitsCombinedDecision + nHitsSlots[iSlot];
-        } else if (nHitsSlots[iSlot] != 0) {
-          if (reportAllErrors) B2ERROR("Unexpected nHit (via segments) = " << nHitsSlots[iSlot] << " for slot " << iSlot + 1 <<
-                                         ", nSegmentsCombinedDecision = " << nSegmentsCombinedDecision << ", combined t0 decision (FW) = " << t0CombinedDecisionNow <<
-                                         ", window " << iWindow);
-          errorCountWindowMajor++;
-        }
-      }
+              int slotOther = i + 1;
 
-      // nHits are packed in 10bits, 2 slots per 32bit word
-      for (int iWord = 0; iWord < NUMBER_OF_SLOTS / 2; iWord++) {
-        testPattern = (rdat[index + 13 + iWord]) & 0xfc00fc00;
-        //    B2INFO("testPattern = " << std::hex << testPattern << std::dec);
-        if (testPattern != 0) {
-          if (reportAllErrors) B2ERROR("Unexpected test pattern 4: " << testPattern << ", window " << iWindow << ", index = " << index + 13 +
-                                         iWord);
-          errorCountWindowMajor++;
-        }
-      }
+              TRGTOPSlotTiming slotTiming(slotOther,
+                                          2 * otherInformation[i],
+                                          0,
+                                          0,
+                                          0,
+                                          clockCycle,
+                                          errorCountWindow,
+                                          0,
+                                          -1
+                                         );
 
-      int logLikelihoodsSlots[16];
+              //        auto* thisSlotTiming = m_TRGTOPSlotTimingArray.appendNew(slotTiming);
+              m_TRGTOPSlotTimingArray.appendNew(slotTiming);
 
-      // dataFormatVersion == 4 does not have logL info
-      if (dataFormatVersionExpected == 2 || dataFormatVersionExpected == 3) {
-        logLikelihoodsSlots[0] = (rdat[index + 21]) & 0xffff;
-        logLikelihoodsSlots[1] = (rdat[index + 21] >> 16) & 0xffff;
-        logLikelihoodsSlots[2] = (rdat[index + 22]) & 0xffff;
-        logLikelihoodsSlots[3] = (rdat[index + 22] >> 16) & 0xffff;
-        logLikelihoodsSlots[4] = (rdat[index + 23]) & 0xffff;
-        logLikelihoodsSlots[5] = (rdat[index + 23] >> 16) & 0xffff;
-        logLikelihoodsSlots[6] = (rdat[index + 24]) & 0xffff;
-        logLikelihoodsSlots[7] = (rdat[index + 24] >> 16) & 0xffff;
-        logLikelihoodsSlots[8] = (rdat[index + 25]) & 0xffff;
-        logLikelihoodsSlots[9] = (rdat[index + 25] >> 16) & 0xffff;
-        logLikelihoodsSlots[10] = (rdat[index + 26]) & 0xffff;
-        logLikelihoodsSlots[11] = (rdat[index + 26] >> 16) & 0xffff;
-        logLikelihoodsSlots[12] = (rdat[index + 27]) & 0xffff;
-        logLikelihoodsSlots[13] = (rdat[index + 27] >> 16) & 0xffff;
-        logLikelihoodsSlots[14] = (rdat[index + 28]) & 0xffff;
-        logLikelihoodsSlots[15] = (rdat[index + 28] >> 16) & 0xffff;
-      } else if (dataFormatVersionExpected == 1) {
-        logLikelihoodsSlots[0] = (rdat[index + 21]);
-        logLikelihoodsSlots[1] = (rdat[index + 22]);
-        logLikelihoodsSlots[2] = (rdat[index + 23]);
-        logLikelihoodsSlots[3] = (rdat[index + 24]);
-        logLikelihoodsSlots[4] = (rdat[index + 25]);
-        logLikelihoodsSlots[5] = (rdat[index + 26]);
-        logLikelihoodsSlots[6] = (rdat[index + 27]);
-        logLikelihoodsSlots[7] = (rdat[index + 28]);
-        logLikelihoodsSlots[8] = (rdat[index + 29]);
-        logLikelihoodsSlots[9] = (rdat[index + 30]);
-        logLikelihoodsSlots[10] = (rdat[index + 31]);
-        logLikelihoodsSlots[11] = (rdat[index + 32]);
-        logLikelihoodsSlots[12] = (rdat[index + 33]);
-        logLikelihoodsSlots[13] = (rdat[index + 34]);
-        logLikelihoodsSlots[14] = (rdat[index + 35]);
-        logLikelihoodsSlots[15] = (rdat[index + 36]);
-      }
+              otherInformationLast[i] = otherInformation[i];
 
-      int nLogLikelihoodsCombinedDecision = 0;
-
-      for (int iSlot = 0; iSlot < NUMBER_OF_SLOTS; iSlot++) {
-        if (t0CombinedSegments[iSlot] != 0) {
-          //    B2INFO("Slot " << iSlot+1 << ", log likelihood = " << logLikelihoodsSlots[iSlot]);
-          nLogLikelihoodsCombinedDecision++;
-        } else if (logLikelihoodsSlots[iSlot] != 0) {
-          if (reportAllErrors) B2ERROR("Unexpected log likelihood (via segments) = " << logLikelihoodsSlots[iSlot] << " for slot " << iSlot +
-                                         1 << ", nSegmentsCombinedDecision = " << nSegmentsCombinedDecision << ", combined t0 decision (FW) = " << t0CombinedDecisionNow <<
-                                         ", window " << iWindow);
-          errorCountWindowMajor++;
-        }
-      }
-
-      if (nSlotsCombinedDecision != 0) {
-        t0CombinedDecisionNowEstimated = t0CombinedDecisionNowEstimated / nSlotsCombinedDecision;
-      } else {
-        t0CombinedDecisionNowEstimated = -1;
-        if (reportAllErrors) B2ERROR("nSlotsCombinedDecision (via segments) is zero! FW t0 decision = " << t0CombinedDecisionNow <<
-                                       ", window " << iWindow);
-        errorCountWindowMajor++;
-      }
-
-      if (reportAllErrors) {
-        if (nSegmentErrors != 0) {
-          B2ERROR("nSegmentErrors = " << nSegmentErrors << ", nSegmentsCombinedDecision = " << nSegmentsCombinedDecision <<
-                  ", combined t0 decision (FW) = " << t0CombinedDecisionNow << ", window " << iWindow);
-          for (int iSlot = 0; iSlot < NUMBER_OF_SLOTS; iSlot++) {
-            if (t0CombinedSegments[iSlot] == 0 && logLikelihoodsSlots[iSlot] != 0) {
-              B2ERROR("Segment==0, t0Combined (ns)   = " << 2 * t0CombinedSlots[iSlot] << " for slot " << iSlot + 1);
-              B2ERROR("Segment==0, nHits             = " << nHitsSlots[iSlot] << " for slot " << iSlot + 1);
-              B2ERROR("Segment==0, logLikelihood     = " << logLikelihoodsSlots[iSlot] << " for slot " << iSlot + 1);
-              B2ERROR("Segment==0, t0CombinedSegment = " << t0CombinedSegments[iSlot] << " for slot " << iSlot + 1);
             }
           }
         }
-      }
 
-      // the rest of the window
-      if (dataFormatVersionExpected == 1) index = index + 37;
-      else if (dataFormatVersionExpected == 2 || dataFormatVersionExpected == 3) index = index + 29;
-      else index = index + 29;
+        // retrieve slot-level decisions (complete info) for the currently-processed readout board
 
-      // trgCntr - currently not working (not incrementing in FW in v02067301, incorrectly implemented in v02007401)
-      //    int trgCntrNow = rdat[index];
-      //    B2INFO("trgCntrNow = " << trgCntrNow);
+        int slotNow = 1;
+        if (channel == 0) slotNow = 9;
 
-      int revoClockT0CombinedDecisionPrev = -1;
-      int revoClockT0CombinedDecisionNow = -1;
+        for (int i = 0; i < 8; i++) {
 
-      // format version 1 does not have trgCntr info
-      if (dataFormatVersionExpected == 2 || dataFormatVersionExpected == 3) index++;
+          if (slotT0[i] != slotT0Last[i] ||
+              slotNHit[i] != slotNHitLast[i] ||
+              slotSegment[i] != slotSegmentLast[i]) {
 
-      if (dataFormatVersionExpected == 2) {
-        // 0xfeedbeef
-        testPatternExpected = 0xfeedbeef;
-        testPattern = rdat[index];
-        //    B2INFO("testPattern = " << std::hex << testPattern << std::dec);
-        if (testPattern != testPatternExpected) {
-          if (reportAllErrors) B2ERROR("Unexpected test pattern 5: " << std::hex << testPattern << std::dec << ", window " << iWindow <<
-                                         ", index = " << index);
-          errorCountWindowMajor++;
+            /*
+            cout << "-DEBUG- slot, index, clockCycle = " << slotNow << ", " << index << ", " << clockCycle
+            << ", combT0 = " << combT0
+            <<",  rvcL1 from header = " << rvcL1
+            << ", eventNumberL1 (evt) = " << eventNumberL1
+            << ", FW version = " << std::hex << versionFW << std::dec
+            << ", slot T0 = " << slotT0[i]
+            << ", NHit = " << slotNHit[i]
+            << ", Segment = " << slotSegment[i]
+            << ", other information = " << otherInformation[i]
+            << endl;
+            */
+
+            //      TRGTOPSlotTiming* thisSlotTiming(NULL);
+
+            // logL is currently not available (use nHit in lieu of that), so set to 0
+            // firstTS info is only available for slots 1 through 8 (channel == 1)
+            // -1 for firstTS means no info
+            // 1 as the next to the last parameter means "information from the board being read-out"
+
+            if (channel == 1) {
+
+              TRGTOPSlotTiming slotTiming(slotNow,
+                                          2 * slotT0[i],
+                                          slotSegment[i],
+                                          slotNHit[i],
+                                          0,
+                                          clockCycle,
+                                          errorCountWindow,
+                                          1,
+                                          otherInformation[i]
+                                         );
+              //        thisSlotTiming = m_TRGTOPSlotTimingArray.appendNew(slotTiming);
+              m_TRGTOPSlotTimingArray.appendNew(slotTiming);
+            } else {
+
+              TRGTOPSlotTiming slotTiming(slotNow,
+                                          2 * slotT0[i],
+                                          slotSegment[i],
+                                          slotNHit[i],
+                                          0,
+                                          clockCycle,
+                                          errorCountWindow,
+                                          1,
+                                          -1
+                                         );
+              //        thisSlotTiming = m_TRGTOPSlotTimingArray.appendNew(slotTiming);
+              m_TRGTOPSlotTimingArray.appendNew(slotTiming);
+            }
+
+            // slot-level decisions are not currently related to combined decisions
+            //      thisSlotTiming->addRelationTo(thisCombinedTiming);
+            //      thisCombinedTiming->addRelationTo(thisSlotTiming);
+
+            slotT0Last[i] = slotT0[i];
+            slotNHitLast[i] = slotNHit[i];
+            slotSegmentLast[i] = slotSegment[i];
+
+          }
+
+          slotNow++;
+
         }
-      } else if (dataFormatVersionExpected == 3) {
-        revoClockT0CombinedDecisionPrev = (rdat[index]) & 0x7ff;
-        revoClockT0CombinedDecisionNow = (rdat[index] >> 11) & 0x7ff;
-      }
+      } else {
 
-      index++;
+        combinedT0Last = combinedT0;
+        for (int i = 0; i < 8; i++) {
+          slotT0Last[i] = slotT0[i];
+          slotNHitLast[i] = slotNHit[i];
+          slotSegmentLast[i] = slotSegment[i];
+          otherInformationLast[i] = otherInformation[i];
 
-      // cnttrg: event number at the time of TOP combined t0 decision (should be current L1 event number - 1)
-      int cnttrgNow = rdat[index];
-      //    B2INFO("trgtag (evt) from buffer header, cnttrg and rvc from window = " << trgtag <<", " << cnttrgNow << ", " << revoClockNow);
-
-      // does not work like this for waveform readout version
-      logLSumNow = 0;
-      for (int iSlot = 0; iSlot < NUMBER_OF_SLOTS; iSlot++) {
-        // store compromised decisions also
-        if (nHitsSlots[iSlot] != 0) {
-          logLSumNow = logLSumNow + logLikelihoodsSlots[iSlot];
+          combinedT0Last = combinedT0;
+          combinedT0RVC2GDLLast = combinedT0RVC2GDL;
         }
       }
-
-      // report and store combined t0 decision - this is where we can write all this info into persistent objects
-
-      if ((t0CombinedDecisionNow != t0CombinedDecisionLast && dataFormatVersionExpected == 4) || (logLSumNow != logLSumLast
-          && dataFormatVersionExpected != 4)) {
-
-        logLSumLast = logLSumNow;
-
-        t0CombinedDecisionLast = t0CombinedDecisionNow;
-
-        int t0Residual = t0CombinedDecisionNow - t0CombinedDecisionNowEstimated;
-
-        //-------------------------------------------------------------------------------------------
-        /*
-          B2INFO("l1_rvc from buffer header, rvc for window# = "
-          << l1_revo << ", "
-          << revoClockNow << ", "
-          << iWindow
-          );
-
-          if ( dataFormatVersionExpected == 3 ) {
-          B2INFO("rvc for previous and current combined t0 decisions, rvc when the current t0 decision was supposed to be posted to GDL/GRL, current window# = "
-          << revoClockT0CombinedDecisionPrev << ", "
-          << revoClockT0CombinedDecisionNow << ", "
-          << revoClockGDL << ", "
-          << iWindow
-          );
-          }
-
-
-          B2INFO("trgtag (evt) from buffer header, cnttrg for window# = "
-          << trgtag << ", "
-          << cnttrgNow << ", "
-          << iWindow
-          );
-
-          B2INFO("TOP timing (+1735, ns, frame), actual and estimated combined t0 (raw ns, frame9), N slots, discrepancy (raw ns) = " << (int) ((t0CombinedDecisionNow%10240)*clkTo1ns+1735) << ", " << t0CombinedDecisionNow << ", " << t0CombinedDecisionNowEstimated << ", " << nSlotsCombinedDecision << ", " << t0Residual);
-
-          // report slot-level t0 decisions
-          for ( int iSlot = 0; iSlot < NUMBER_OF_SLOTS; iSlot++ ) {
-          if ( t0CombinedSegments[iSlot] != 0 ) {
-          B2INFO("slot= " << iSlot+1
-          << ", segment= " << t0CombinedSegments[iSlot]
-          << ", TOP timing (+1735, ns, frame) = " << (int) (( 2 * t0CombinedSlots[iSlot])%10240*clkTo1ns+1735)
-          << ", t0 (raw ns, frame9) = " << 2 * t0CombinedSlots[iSlot]
-          << ", N hits= " << nHitsSlots[iSlot]
-          << ", log L= " << logLikelihoodsSlots[iSlot]
-          );
-          }
-          }
-        */
-        //-------------------------------------------------------------------------------------------
-
-        // store decision in event store
-        m_TRGTOPCombinedTimingArray.appendNew();
-
-        int i = m_TRGTOPCombinedTimingArray.getEntries() - 1;
-
-        m_TRGTOPCombinedTimingArray[i]->setEventIdL1(trgtag);
-        m_TRGTOPCombinedTimingArray[i]->setEventIdTOP(cnttrgNow);
-        m_TRGTOPCombinedTimingArray[i]->setWindowIdTOP(iWindow);
-        m_TRGTOPCombinedTimingArray[i]->setRvcB2L(l1_revo);
-        m_TRGTOPCombinedTimingArray[i]->setRvcWindow(revoClockNow);
-        m_TRGTOPCombinedTimingArray[i]->setRvcTopTimingDecisionPrev(revoClockT0CombinedDecisionPrev);
-        m_TRGTOPCombinedTimingArray[i]->setRvcTopTimingDecisionNow(revoClockT0CombinedDecisionNow);
-        m_TRGTOPCombinedTimingArray[i]->setRvcTopTimingDecisionNowGdl(revoClockGDL);
-        m_TRGTOPCombinedTimingArray[i]->setCombinedTimingTop(t0CombinedDecisionNow);
-        m_TRGTOPCombinedTimingArray[i]->setNSlotsCombinedTimingTop(nSlotsCombinedDecision);
-        m_TRGTOPCombinedTimingArray[i]->setCombinedTimingTopResidual(t0Residual);
-        m_TRGTOPCombinedTimingArray[i]->setNErrorsMinor(errorCountWindowMinor);
-        m_TRGTOPCombinedTimingArray[i]->setNErrorsMajor(errorCountWindowMajor);
-        m_TRGTOPCombinedTimingArray[i]->setTrigType(m_trigType);
-
-        // now store slot-level decisions
-
-        int nSlots = 0;
-
-        int nHitSum = 0;
-
-        double logLSum_d = 0;
-        double logLSum2_d = 0;
-
-        double timingSum_d = 0;
-        double timingSum2_d = 0;
-
-        for (int iSlot = 0; iSlot < NUMBER_OF_SLOTS; iSlot++) {
-          int slotNErrors = 0;
-          // data corruption (no slot-level segment information available but N hits != 0)
-          if (t0CombinedSegments[iSlot] == 0 && nHitsSlots[iSlot] != 0) slotNErrors++;
-          // store compromised decisions also
-          if (t0CombinedSegments[iSlot] != 0 || nHitsSlots[iSlot] != 0) {
-
-            nSlots++;
-            nHitSum = nHitSum + nHitsSlots[iSlot];
-
-            logLSum_d = logLSum_d + logLikelihoodsSlots[iSlot];
-            logLSum2_d = logLSum2_d + logLikelihoodsSlots[iSlot] * logLikelihoodsSlots[iSlot];
-
-            int timingNow = (2 * t0CombinedSlots[iSlot] % 10240);
-
-            //    B2INFO("   timingNow = " << timingNow );
-
-            timingSum_d = timingSum_d + timingNow;
-            timingSum2_d = timingSum2_d + pow(timingNow, 2);
-
-            TRGTOPSlotTiming slotTiming(iSlot + 1);
-            slotTiming.setSlotTiming(2 * t0CombinedSlots[iSlot]);
-            slotTiming.setSlotSegment(t0CombinedSegments[iSlot]);
-            slotTiming.setSlotNHits(nHitsSlots[iSlot]);
-            slotTiming.setSlotLogL(logLikelihoodsSlots[iSlot]);
-            slotTiming.setSlotNErrors(slotNErrors);
-            m_TRGTOPCombinedTimingArray[i]->setSlotTimingDecision(slotTiming);
-
-          }
-        }
-
-        if (nSlots == 0) nSlots = 1;
-
-        double logLVar_d = logLSum2_d / nSlots - pow(logLSum_d / nSlots, 2);
-        int logLVar = (int)(logLVar_d + 0.5);
-        int logLSum = (int)(logLSum_d + 0.5);
-
-        double timingVar_d = timingSum2_d / nSlots - pow(timingSum_d / nSlots, 2);
-        int timingVar = (int)(timingVar_d + 0.5);
-        //      int timingSum = (int) (timingSum_d + 0.5);
-        //      int timingSum2 = (int) (timingSum2_d + 0.5);
-
-        //      B2INFO("nSlots = " << nSlots );
-        //      B2INFO("timingSum = " << timingSum );
-        //      B2INFO("timingSum2 = " << timingSum2 );
-        //      B2INFO("timingVar = " << timingVar );
-
-        if (nSlots == 1) {
-          logLVar = -1;
-          timingVar = -1;
-        }
-
-        m_TRGTOPCombinedTimingArray[i]->setNHitSum(nHitSum);
-        m_TRGTOPCombinedTimingArray[i]->setLogLSum(logLSum);
-        m_TRGTOPCombinedTimingArray[i]->setLogLVar(logLVar);
-        m_TRGTOPCombinedTimingArray[i]->setTimingVar(timingVar);
-
-        //================================================================
-        // some inlined validation
-        /*
-          const vector<Belle2::TRGTOPSlotTiming> tmp = m_TRGTOPCombinedTimingArray[i]->getSlotTimingDecisions();
-
-          cout << "-VS-D-the number of slots in this decision (SlotTimingDecisions.size()) = " << tmp.size() << endl;
-
-          for ( vector<Belle2::TRGTOPSlotTiming>::const_iterator it = tmp.begin(); it != tmp.end(); ++it) {
-          const TRGTOPSlotTiming& slotTiming = *it;
-
-          cout << "-VS-D-slot number   = " << slotTiming.getSlotId() << endl;
-          cout << "-VS-D-slot timing   = " << slotTiming.getSlotTiming() << endl;
-          cout << "-VS-D-slot segment  = " << slotTiming.getSlotSegment() << endl;
-          cout << "-VS-D-slot N hits   = " << slotTiming.getSlotNHits() << endl;
-          cout << "-VS-D-slot logL     = " << slotTiming.getSlotLogL() << endl;
-          cout << "-VS-D-slot N errors = " << slotTiming.getSlotNErrors() << endl;
-
-          }
-        */
-        //
-        //================================================================
-
-      }
-
-      errorCountEvent = errorCountEvent + errorCountWindowMinor + errorCountWindowMajor;
-
     }
   }
-
-  // at this time any unexpected features in the data are lumped together
-  // this includes possibly corrupted data (checksum would be a better solution to diagnose such problem)
-  // AND incorrectly prepared (but not corrupted) data
-  if (reportSummaryErrors) {
-    if (errorCountEvent != 0) {
-      B2INFO("Number of instances of unexpected data diagnozed during unpacking = " << errorCountEvent);
-    }
-
-    if (numberRvcJumps > 0) {
-      B2INFO("The number of rvc jumps = " << numberRvcJumps);
-      B2INFO("The window of the first rvc jump = " << windowRvcJumpFirst);
-      B2INFO("The number of clock cycles associated with the first rvc jump = " << clocksRvcJumpFirst);
-      B2INFO("The number of combined decisions = " << m_TRGTOPCombinedTimingArray.getEntries());
-    }
-
-    if (numberCntr127Jumps > 0) {
-      B2INFO("The number of cntr127 jumps = " << numberCntr127Jumps);
-      B2INFO("The window of the first cntr127 jump = " << windowCntr127JumpFirst);
-      B2INFO("The number of clock cycles associated with the first cntr127 jump = " << clocksCntr127JumpFirst);
-      B2INFO("The number of combined decisions = " << m_TRGTOPCombinedTimingArray.getEntries());
-    }
-  }
-
-  // need to store the info about error rate / type of errors in unpacking
-  // need a new TObject for that (NOT an Array)
 
 }
 

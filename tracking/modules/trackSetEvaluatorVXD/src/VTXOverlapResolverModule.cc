@@ -25,7 +25,7 @@
 using namespace std;
 using namespace Belle2;
 
-REG_MODULE(VTXOverlapResolver)
+REG_MODULE(VTXOverlapResolver);
 
 VTXOverlapResolverModule::VTXOverlapResolverModule() : Module()
 {
@@ -126,7 +126,7 @@ void VTXOverlapResolverModule::event()
     }
   }
 
-  for (auto && track : qiTrackOverlap) {
+  for (auto&& track : qiTrackOverlap) {
     if (track.activityState < m_minActivityState) {
       activeCandidates[track.trackIndex]->removeRefereeStatus(SpacePointTrackCand::c_isActive);
     }

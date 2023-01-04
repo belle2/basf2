@@ -20,6 +20,7 @@ from caf.strategies import SequentialBoundaries
 from top_calibration import BS13d_calibration_cdst
 from top_calibration import moduleT0_calibration_DeltaT, moduleT0_calibration_LL
 from top_calibration import commonT0_calibration_BF
+from top_calibration import offset_calibration
 from top_calibration import calibration_validation
 from prompt.calibrations.caf_top_pre import settings as top_pretracking
 from prompt.utils import filter_by_max_files_per_run
@@ -69,6 +70,7 @@ def get_calibrations(input_data, **kwargs):
            moduleT0_calibration_DeltaT(inputFiles),  # this cal cannot span across experiments
            moduleT0_calibration_LL(inputFiles, sample),  # this cal cannot span across experiments
            commonT0_calibration_BF(inputFiles),  # this is run-dep
+           offset_calibration(inputFiles),  # this is run-dep
            calibration_validation(inputFiles, sample)]  # this is run-dep
 
     for c in cal:
@@ -94,11 +96,12 @@ def get_calibrations(input_data, **kwargs):
     # Don't save the rough moduleT0 result
     cal[1].save_payloads = False
     # Just to make it sure ...
-    cal[4].save_payloads = False  # in fact it does not make any payloads, but produces histograms for validation
+    cal[5].save_payloads = False  # in fact it does not make any payloads, but produces histograms for validation
 
     cal[1].depends_on(cal[0])
     cal[2].depends_on(cal[1])
     cal[3].depends_on(cal[2])
     cal[4].depends_on(cal[3])
+    cal[5].depends_on(cal[4])
 
     return cal

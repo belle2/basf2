@@ -38,28 +38,28 @@
   <Ladder layer="3">
     <shift  unit="mm"> 5.1</shift>
     <radius unit="mm">39.1</radius>
-    <Sensor id="2" type="Layer2" unit="mm" flipV="true"> -32.0</Sensor>
-    <Sensor id="1" type="Layer2" unit="mm" flipV="true"> 88.0</Sensor>
+    <Sensor id="2" type="Layer3" unit="mm" flipV="true"> -32.0</Sensor>
+    <Sensor id="1" type="Layer3" unit="mm" flipV="true"> 88.0</Sensor>
   </Ladder>
 
   <Ladder layer="4">
     <shift  unit="mm"> 7.1</shift>
     <radius unit="mm">89.5</radius>
-    <Sensor id="4" type="Layer2" unit="mm" flipV="true"> -109.0</Sensor>
-    <Sensor id="3" type="Layer2" unit="mm" flipV="true"> 11.0</Sensor>
-    <Sensor id="2" type="Layer2" unit="mm" flipV="true"> 131.0</Sensor>
-    <Sensor id="1" type="Layer2" unit="mm" flipV="true"> 251.0</Sensor>
+    <Sensor id="4" type="Layer4" unit="mm" flipV="true"> -109.0</Sensor>
+    <Sensor id="3" type="Layer4" unit="mm" flipV="true"> 11.0</Sensor>
+    <Sensor id="2" type="Layer4" unit="mm" flipV="true"> 131.0</Sensor>
+    <Sensor id="1" type="Layer4" unit="mm" flipV="true"> 251.0</Sensor>
   </Ladder>
 
   <Ladder layer="5">
     <shift  unit="mm"> 8.0</shift>
     <radius unit="mm">140.0</radius>
-    <Sensor id="6" type="Layer2" unit="mm" flipV="true"> -193.0</Sensor>
-    <Sensor id="5" type="Layer2" unit="mm" flipV="true"> -73.0</Sensor>
-    <Sensor id="4" type="Layer2" unit="mm" flipV="true"> 47.0</Sensor>
-    <Sensor id="3" type="Layer2" unit="mm" flipV="true"> 167.0</Sensor>
-    <Sensor id="2" type="Layer2" unit="mm" flipV="true"> 287.0</Sensor>
-    <Sensor id="1" type="Layer2" unit="mm" flipV="true"> 407.0</Sensor>
+    <Sensor id="6" type="Layer5" unit="mm" flipV="true"> -193.0</Sensor>
+    <Sensor id="5" type="Layer5" unit="mm" flipV="true"> -73.0</Sensor>
+    <Sensor id="4" type="Layer5" unit="mm" flipV="true"> 47.0</Sensor>
+    <Sensor id="3" type="Layer5" unit="mm" flipV="true"> 167.0</Sensor>
+    <Sensor id="2" type="Layer5" unit="mm" flipV="true"> 287.0</Sensor>
+    <Sensor id="1" type="Layer5" unit="mm" flipV="true"> 407.0</Sensor>
   </Ladder>
 
   
@@ -163,8 +163,8 @@
     </Component>
   </Sensor>
 
-  <!-- The sensor in Layer2 is almost the same as for Layer1 except for the  dimensions -->
-  <Sensor type="Layer2">
+  <!-- The sensor in Layer3 is almost the same as for Layer1 except for the  dimensions and material budget -->
+  <Sensor type="Layer3">
     <Material>Si</Material>
     <Color>#006699</Color>
     <width  unit="mm">40.0</width>
@@ -211,10 +211,106 @@
       <IntegrationStart unit="ns">-50.0</IntegrationStart>
       <IntegrationEnd   unit="ns"> 50.0</IntegrationEnd>
     </Active>
-    <!-- The sensors in the outer layer are not thinned -->
-    <!--Component type="ThinningLayer2">
-      <u unit="mm"> 15</u><v unit="mm">60</v>
-    </Component-->
+  </Sensor>
+
+  <!-- The sensor in Layer4 is almost the same as for Layer1 except for the  dimensions and material budget -->
+  <Sensor type="Layer4">
+    <Material>Si</Material>
+    <Color>#006699</Color>
+    <width  unit="mm">40.0</width>
+    <length unit="mm">120.0</length>
+    <height unit="mm">0.470</height>
+    <Active>
+      <u unit="mm"> 1.5</u>
+      <v unit="mm"> 0.0</v>
+      <w>top</w>
+      <width  unit="mm">35.0</width>
+      <length unit="mm">120.0</length>
+      <height unit="mm"> 0.030</height>
+      <stepSize unit="um">5</stepSize>
+      <pixelsU>1060</pixelsU>
+      <pixelsV>3640</pixelsV>
+
+      <BulkDoping unit="1/um^3">10.0</BulkDoping>
+      <BackVoltage unit="V">-30.0</BackVoltage>
+      <TopVoltage unit="V">-5.0</TopVoltage>
+      <BorderU unit="um">6.0</BorderU>
+      <BorderV unit="um">4.0</BorderV>
+      <ChargeThreshold unit="ADU">1.25</ChargeThreshold>
+      <NoiseFraction>0.00000000</NoiseFraction>
+      <ApplyElectronicEffects>true</ApplyElectronicEffects>
+      <ElectronicNoise unit="ENC">20.0</ElectronicNoise>
+      <ApplyBinaryReadout>false</ApplyBinaryReadout>
+      <BinaryHitThreshold unit="ENC">220.0</BinaryHitThreshold>
+      <ElectronToADU unit="ENC">120</ElectronToADU>
+      <MaxADUCode>127</MaxADUCode>
+      <ApplyPoissonSmearing>true</ApplyPoissonSmearing>
+      <ApplyIntegrationWindow>true</ApplyIntegrationWindow>
+      <SegmentLength unit="mm">0.005</SegmentLength>
+      <ElectronGroupSize>100</ElectronGroupSize>
+      <ElectronStepTime unit="ns">1.0</ElectronStepTime>
+      <ElectronMaxSteps>200</ElectronMaxSteps>
+      <HardwareDelay unit="ns">0.0</HardwareDelay>
+      <ADCunit>120</ADCunit>
+      <CloudSize>0.000085</CloudSize>
+      <Gq>1.0</Gq>
+      <X0average>0.003</X0average>
+      <TanLorentzAngle>0.24</TanLorentzAngle>
+      <ResolutionCoefficientU>0.6</ResolutionCoefficientU>
+      <ResolutionCoefficientV>0.6</ResolutionCoefficientV>
+      <IntegrationStart unit="ns">-50.0</IntegrationStart>
+      <IntegrationEnd   unit="ns"> 50.0</IntegrationEnd>
+    </Active>
+  </Sensor>
+
+  <!-- The sensor in Layer5 is almost the same as for Layer1 except for the  dimensions and material budget -->
+  <Sensor type="Layer5">
+    <Material>Si</Material>
+    <Color>#006699</Color>
+    <width  unit="mm">40.0</width>
+    <length unit="mm">120.0</length>
+    <height unit="mm"> 0.750</height>
+    <Active>
+      <u unit="mm"> 1.5</u>
+      <v unit="mm"> 0.0</v>
+      <w>top</w>
+      <width  unit="mm">35.0</width>
+      <length unit="mm">120.0</length>
+      <height unit="mm"> 0.030</height>
+      <stepSize unit="um">5</stepSize>
+      <pixelsU>1060</pixelsU>
+      <pixelsV>3640</pixelsV>
+
+      <BulkDoping unit="1/um^3">10.0</BulkDoping>
+      <BackVoltage unit="V">-30.0</BackVoltage>
+      <TopVoltage unit="V">-5.0</TopVoltage>
+      <BorderU unit="um">6.0</BorderU>
+      <BorderV unit="um">4.0</BorderV>
+      <ChargeThreshold unit="ADU">1.25</ChargeThreshold>
+      <NoiseFraction>0.00000000</NoiseFraction>
+      <ApplyElectronicEffects>true</ApplyElectronicEffects>
+      <ElectronicNoise unit="ENC">20.0</ElectronicNoise>
+      <ApplyBinaryReadout>false</ApplyBinaryReadout>
+      <BinaryHitThreshold unit="ENC">220.0</BinaryHitThreshold>
+      <ElectronToADU unit="ENC">120</ElectronToADU>
+      <MaxADUCode>127</MaxADUCode>
+      <ApplyPoissonSmearing>true</ApplyPoissonSmearing>
+      <ApplyIntegrationWindow>true</ApplyIntegrationWindow>
+      <SegmentLength unit="mm">0.005</SegmentLength>
+      <ElectronGroupSize>100</ElectronGroupSize>
+      <ElectronStepTime unit="ns">1.0</ElectronStepTime>
+      <ElectronMaxSteps>200</ElectronMaxSteps>
+      <HardwareDelay unit="ns">0.0</HardwareDelay>
+      <ADCunit>120</ADCunit>
+      <CloudSize>0.000085</CloudSize>
+      <Gq>1.0</Gq>
+      <X0average>0.003</X0average>
+      <TanLorentzAngle>0.24</TanLorentzAngle>
+      <ResolutionCoefficientU>0.6</ResolutionCoefficientU>
+      <ResolutionCoefficientV>0.6</ResolutionCoefficientV>
+      <IntegrationStart unit="ns">-50.0</IntegrationStart>
+      <IntegrationEnd   unit="ns"> 50.0</IntegrationEnd>
+    </Active>
   </Sensor>
   
   <Component name="ThinningLayer1">
@@ -226,13 +322,6 @@
     <angle  unit="deg">0</angle>
   </Component>
 
-  <Component name="ThinningLayer2">
-    <Material>ColdAir</Material>
-    <Color>#5599BB</Color>
-    <width  unit="mm">32.000</width>
-    <length unit="mm">120</length>
-    <height unit="mm"> 0.260</height>
-    <angle  unit="deg">0</angle>
-  </Component>
+  
 
 </Components>

@@ -102,7 +102,7 @@ void e1ProfilePlots (TString input, TString sample, TString output) {
     //..Define histograms
     TString name, title;
     TFile *fout = new TFile(output,"recreate");
-    TString cName[2] = { "negative", "positive"};
+    const TString cName[2] = { "negative", "positive"};
 
     //..e1 vs position, basic plots upon which the alignment is based.
     TProfile *e1VsTheta[nThetaReg][nPhiReg][2];

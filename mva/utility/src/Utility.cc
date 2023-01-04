@@ -139,31 +139,22 @@ void Utility::expert(const std::vector<std::string>& filenames, const std::vecto
                      const std::string& outputfile, int experiment, int run, int event, bool copy_target)
 {
 
-  std::vector<Weightfile> weightfiles;
-  std::vector<TBranch*> branches;
-
   TFile file(outputfile.c_str(), "RECREATE");
   file.cd();
   TTree tree("variables", "variables");
-  float result = 0;
-
-  for (auto& filename : filenames) {
-    Belle2::EventMetaData emd(event, run, experiment);
-    auto weightfile = Weightfile::load(filename, emd);
-    weightfiles.push_back(weightfile);
-
-    std::string branchname = Belle2::MakeROOTCompatible::makeROOTCompatible(filename);
-    auto branch = tree.Branch(branchname.c_str(), &result, (branchname + "/F").c_str());
-    branches.push_back(branch);
-  }
 
   AbstractInterface::initSupportedInterfaces();
   auto supported_interfaces = AbstractInterface::getSupportedInterfaces();
 
   unsigned int i = 0;
-  for (auto& weightfile : weightfiles) {
+  for (auto& filename : filenames) {
+
+    Belle2::EventMetaData emd(event, run, experiment);
+    auto weightfile = Weightfile::load(filename, emd);
+
     GeneralOptions general_options;
     weightfile.getOptions(general_options);
+
     general_options.m_treename = treename;
     // Override possible restriction of number of events in training
     // otherwise this would apply to the expert as well.
@@ -171,27 +162,57 @@ void Utility::expert(const std::vector<std::string>& filenames, const std::vecto
 
     auto expertLocal = supported_interfaces[general_options.m_method]->getExpert();
     expertLocal->load(weightfile);
+
+    bool isMulticlass = general_options.m_nClasses > 2;
+
     // define if target variables should be copied
     if (not copy_target) {
       general_options.m_target_variable = std::string();
     }
 
     general_options.m_datafiles = datafiles;
-    auto& branch = branches[i];
     ROOTDataset data(general_options);
-    std::chrono::high_resolution_clock::time_point start = std::chrono::high_resolution_clock::now();
-    auto results = expertLocal->apply(data);
-    std::chrono::high_resolution_clock::time_point stop = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double, std::milli> training_time = stop - start;
-    B2INFO("Elapsed application time in ms " << training_time.count() << " for " << general_options.m_identifier);
-    for (auto& r : results) {
-      result = r;
-      branch->Fill();
+
+    std::vector<TBranch*> branches;
+    //create the output branches
+    if (not isMulticlass) {
+      float result = 0;
+      std::string branchname = Belle2::MakeROOTCompatible::makeROOTCompatible(filename);
+      branches.push_back(tree.Branch(branchname.c_str(), &result, (branchname + "/F").c_str()));
+      std::chrono::high_resolution_clock::time_point start = std::chrono::high_resolution_clock::now();
+
+      auto results = expertLocal->apply(data);
+      std::chrono::high_resolution_clock::time_point stop = std::chrono::high_resolution_clock::now();
+      std::chrono::duration<double, std::milli> application_time = stop - start;
+      B2INFO("Elapsed application time in ms " << application_time.count() << " for " << general_options.m_identifier);
+      for (auto& r : results) {
+        result = r;
+        branches[0]->Fill();
+      }
+
+    } else {
+      float result = 0;
+      for (unsigned int iClass = 0; iClass < general_options.m_nClasses; ++iClass) {
+        std::string branchname = Belle2::MakeROOTCompatible::makeROOTCompatible(filename + "_" + std::to_string(iClass));
+        branches.push_back(tree.Branch(branchname.c_str(), &result, (branchname + "/F").c_str()));
+      }
+      std::chrono::high_resolution_clock::time_point start = std::chrono::high_resolution_clock::now();
+      auto results = expertLocal->applyMulticlass(data);
+      std::chrono::high_resolution_clock::time_point stop = std::chrono::high_resolution_clock::now();
+      std::chrono::duration<double, std::milli> application_time = stop - start;
+      B2INFO("Elapsed application time in ms " << application_time.count() << " for " << general_options.m_identifier);
+      for (auto& r : results) {
+        for (unsigned int iClass = 0; iClass < general_options.m_nClasses; ++iClass) {
+          result = r[iClass];
+          branches[iClass]->Fill();
+        }
+      }
+
     }
 
 
     if (not general_options.m_target_variable.empty()) {
-      std::string branchname = Belle2::MakeROOTCompatible::makeROOTCompatible(std::string(branch->GetName()) + "_" +
+      std::string branchname = Belle2::MakeROOTCompatible::makeROOTCompatible(filename + "_" +
                                general_options.m_target_variable);
       float target = 0;
       auto target_branch = tree.Branch(branchname.c_str(), &target, (branchname + "/F").c_str());
@@ -322,7 +343,7 @@ std::unique_ptr<Belle2::MVA::Expert> Utility::teacher_splot(const GeneralOptions
   auto data_feature = discriminant_dataset.getFeature(0);
   auto data_weights = discriminant_dataset.getWeights();
 
-  Binning binning = Binning::CreateEqualFrequency(mc_feature , mc_weights, mc_signals, 100);
+  Binning binning = Binning::CreateEqualFrequency(mc_feature, mc_weights, mc_signals, 100);
 
   float signalFraction = binning.m_signal_yield / (binning.m_signal_yield + binning.m_bckgrd_yield);
 

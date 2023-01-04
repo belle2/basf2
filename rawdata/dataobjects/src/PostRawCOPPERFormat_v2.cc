@@ -288,7 +288,7 @@ int PostRawCOPPERFormat_v2::CheckCRC16(int n, int finesse_num)
         sprintf(err_buf,
                 "[WARNING] %s ch=%d : ARICH : POST B2link event CRC16 error with B2link Packet CRC error. data(%x) calc(%x) fns nwords %d type 0x%.8x : This error is ignored and the error event will be recorded in .sroot file acording to request from ARICH group: slot%c eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
                 hostname, finesse_num,
-                *buf , temp_crc16, GetFINESSENwords(n, finesse_num), copper_buf[ tmp_header.POS_TRUNC_MASK_DATATYPE ],
+                *buf, temp_crc16, GetFINESSENwords(n, finesse_num), copper_buf[ tmp_header.POS_TRUNC_MASK_DATATYPE ],
                 65 + finesse_num, GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
                 __FILE__, __PRETTY_FUNCTION__, __LINE__);
         printf("%s", err_buf); fflush(stdout);
@@ -297,7 +297,7 @@ int PostRawCOPPERFormat_v2::CheckCRC16(int n, int finesse_num)
         sprintf(err_buf,
                 "[FATAL] %s ch=%d : ERROR_EVENT : POST B2link event CRC16 error with B2link Packet CRC error. data(%x) calc(%x) fns nwords %d type 0x%.8x : slot%c eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
                 hostname, finesse_num,
-                *buf , temp_crc16, GetFINESSENwords(n, finesse_num), copper_buf[ tmp_header.POS_TRUNC_MASK_DATATYPE ],
+                *buf, temp_crc16, GetFINESSENwords(n, finesse_num), copper_buf[ tmp_header.POS_TRUNC_MASK_DATATYPE ],
                 65 + finesse_num, GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
                 __FILE__, __PRETTY_FUNCTION__, __LINE__);
         printf("%s", err_buf); fflush(stdout);
@@ -319,7 +319,7 @@ int PostRawCOPPERFormat_v2::CheckCRC16(int n, int finesse_num)
       sprintf(err_buf,
               "[FATAL] %s ch=%d : ERROR_EVENT : POST B2link event CRC16 error without B2link Packet CRC error. data(%x) calc(%x) fns nwords %d type 0x%.8x: slot%c eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
               hostname, finesse_num,
-              *buf , temp_crc16, GetFINESSENwords(n, finesse_num), copper_buf[ tmp_header.POS_TRUNC_MASK_DATATYPE ],
+              *buf, temp_crc16, GetFINESSENwords(n, finesse_num), copper_buf[ tmp_header.POS_TRUNC_MASK_DATATYPE ],
               65 + finesse_num, GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
               __FILE__, __PRETTY_FUNCTION__, __LINE__);
       printf("%s", err_buf); fflush(stdout);
@@ -353,7 +353,7 @@ int* PostRawCOPPERFormat_v2::PackDetectorBuf(int* packed_buf_nwords,
 
   int poswords_to = 0;
   int* detector_buf[ 4 ] = { detector_buf_1st, detector_buf_2nd, detector_buf_3rd, detector_buf_4th };
-  int nwords[ 4 ] = { nwords_1st, nwords_2nd, nwords_3rd, nwords_4th };
+  const int nwords[ 4 ] = { nwords_1st, nwords_2nd, nwords_3rd, nwords_4th };
 
   // calculate the event length
   int length_nwords = tmp_header.GetHdrNwords() + SIZE_COPPER_HEADER + SIZE_COPPER_TRAILER + tmp_trailer.GetTrlNwords();

@@ -132,7 +132,7 @@ class HitCleaner(basf2.Module):
             self.number_of_hits += len(hitIDs)
 
             # Set the position and momentum
-            mc_track = mc_matcher_lookup.getMatchedMCRecoTrack(track)
+            mc_track = mc_matcher_lookup.getAnyChargeMatchedMCRecoTrack(track)
 
             if mc_track:
                 mc_trajectory = Belle2.TrackFindingCDC.CDCTrajectory3D(Belle2.TrackFindingCDC.Vector3D(mc_track.getPosSeed()),

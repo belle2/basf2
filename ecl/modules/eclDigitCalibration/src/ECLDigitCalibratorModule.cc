@@ -42,8 +42,8 @@ using namespace ECL;
 //-----------------------------------------------------------------
 //                 Register the Modules
 //-----------------------------------------------------------------
-REG_MODULE(ECLDigitCalibrator)
-REG_MODULE(ECLDigitCalibratorPureCsI)
+REG_MODULE(ECLDigitCalibrator);
+REG_MODULE(ECLDigitCalibratorPureCsI);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -292,7 +292,7 @@ void ECLDigitCalibratorModule::event()
       if (!m_IsMCFlag) {
         double energyTimeShift = ECLTimeUtil->energyDependentTimeOffsetElectronic(amplitude * v_calibrationCrystalElectronics[cellid - 1]) *
                                  m_timeInverseSlope ;
-        B2DEBUG(35, "cellid = " << cellid << ", amplitude = " << amplitude << ", corrected amplitude = " << amplitude *
+        B2DEBUG(35, "cellid = " << cellid << ", amplitude = " << amplitude << ", corrected amplitude = " << amplitude*
                 v_calibrationCrystalElectronics[cellid - 1] << ", time before t(E) shift = " << calibratedTime << ", t(E) shift = " <<
                 energyTimeShift << " ns") ;
         calibratedTime -= energyTimeShift ;
@@ -319,7 +319,7 @@ void ECLDigitCalibratorModule::event()
         const double calibratedTwoComponentTotalEnergy = aECLDsp->getTwoComponentTotalAmp() * v_calibrationCrystalElectronics[cellid - 1] *
                                                          v_calibrationCrystalEnergy[cellid - 1];
         const double calibratedTwoComponentHadronEnergy = aECLDsp->getTwoComponentHadronAmp() * v_calibrationCrystalElectronics[cellid -
-                                                          1] *
+                                                                 1] *
                                                           v_calibrationCrystalEnergy[cellid - 1];
         const double calibratedTwoComponentDiodeEnergy = aECLDsp->getTwoComponentDiodeAmp() * v_calibrationCrystalElectronics[cellid - 1] *
                                                          v_calibrationCrystalEnergy[cellid - 1];

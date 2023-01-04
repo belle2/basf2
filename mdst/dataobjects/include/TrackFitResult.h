@@ -13,8 +13,8 @@
 #include <framework/dataobjects/UncertainHelix.h>
 #include <framework/geometry/BFieldManager.h>
 
-#include <TVector3.h>
 #include <TMatrixDSym.h>
+#include <Math/Vector3D.h>
 #include <Math/Vector4D.h>
 
 #include <stdint.h>
@@ -65,7 +65,7 @@ namespace Belle2 {
      *  @param hitPatternVXDInitializer  bits for initializing VXD hit pattern.
      *  @param NDF  number of degrees of freedom for the fit
      */
-    TrackFitResult(const TVector3& position, const TVector3& momentum,
+    TrackFitResult(const ROOT::Math::XYZVector& position, const ROOT::Math::XYZVector& momentum,
                    const TMatrixDSym& covariance, const short int charge,
                    const Const::ParticleType& particleType, const float pValue,
                    const float bField,
@@ -90,16 +90,24 @@ namespace Belle2 {
                    const uint32_t hitPatternVXDInitializer,
                    const uint16_t NDF
                   );
+    /** update the TrackFitResults
+    * @param input the TrackFitResult that will be
+    * copied into this TrackFitResult
+    */
+    void updateTrackFitResult(const TrackFitResult& input);
+
+    /** mask this TrackFitResults by setting the pValue to nan*/
+    void mask() {m_pValue = NAN;}
 
     /** Getter for vector of position at closest approach of track in r/phi projection. */
-    TVector3 getPosition() const { return getHelix().getPerigee(); }
+    ROOT::Math::XYZVector getPosition() const { return getHelix().getPerigee(); }
 
     /** Getter for vector of momentum at closest approach of track in r/phi projection.
      *
      *  As we calculate recalculate the momentum from a geometric helix, we need an estimate
      *  of the magnetic field along the z-axis to give back the momentum.
      */
-    TVector3 getMomentum() const
+    ROOT::Math::XYZVector getMomentum() const
     {
       const double bField = BFieldManager::getField(getPosition()).Z() / Unit::T;
       return getHelix().getMomentum(bField);
@@ -110,8 +118,8 @@ namespace Belle2 {
      */
     ROOT::Math::PxPyPzEVector get4Momentum() const
     {
-      const B2Vector3D momentum = getMomentum();
-      return ROOT::Math::PxPyPzEVector(momentum.x(), momentum.y(), momentum.z(), getEnergy());
+      const ROOT::Math::XYZVector momentum = getMomentum();
+      return ROOT::Math::PxPyPzEVector(momentum.X(), momentum.Y(), momentum.Z(), getEnergy());
     }
 
     /** Getter for the Energy at the closest approach of the track in the r/phi projection.
@@ -242,10 +250,10 @@ namespace Belle2 {
 
     //---------------------------------------------------------------------------------------------------------------------------
     /** PDG Code for hypothesis with which the corresponding fit was performed. */
-    const unsigned int m_pdg;
+    unsigned int m_pdg;
 
     /** Chi2 Probability of the fit. */
-    const Double32_t m_pValue;
+    Double32_t m_pValue;
 
     /** \name TFRStorageSizes
      *  Constants for Storage sizes */
@@ -284,7 +292,7 @@ namespace Belle2 {
      *
      *  @sa HitPatternVXD
      */
-    const uint32_t m_hitPatternVXDInitializer;
+    uint32_t m_hitPatternVXDInitializer;
 
     /** backward compatibility initialisation for NDF */
     static const uint16_t c_NDFFlag = 0xFFFF;
@@ -292,8 +300,9 @@ namespace Belle2 {
     /** Memeber for number of degrees of freedom*/
     uint16_t m_NDF;
 
-    ClassDefOverride(TrackFitResult, 8); /**< Values of the result of a track fit with a given particle hypothesis. */
+    ClassDefOverride(TrackFitResult, 9); /**< Values of the result of a track fit with a given particle hypothesis. */
     /* Version history:
+       ver 9: change m_pValue, m_pdg, m_hitPatternVXDInitializer to a non-const value
        ver 8: add NDF
        ver 7: fixed sign errors in the translation of position and momentum covariances.
        ver 6: use fixed size arrays instead of vectors (add schema evolution rule), use Double32_t.
@@ -307,5 +316,6 @@ namespace Belle2 {
        ver 2:                                     <------- incompatible with later version 2
        ver 1:
     */
+    friend class PostMergeUpdaterModule;
   };
 }

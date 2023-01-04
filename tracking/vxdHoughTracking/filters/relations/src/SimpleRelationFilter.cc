@@ -16,13 +16,13 @@ using namespace vxdHoughTracking;
 
 void SimpleRelationFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "simpleThetaCutDeltaL0"), m_param_SimpleThetaCutDeltaL0,
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "simpleThetaCutDeltaL0"), m_SimpleThetaCutDeltaL0,
                                 "Simple cut in theta for the overlay region of different ladders in the same layer.",
-                                m_param_SimpleThetaCutDeltaL0);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "simpleThetaCutDeltaL1"), m_param_SimpleThetaCutDeltaL1,
-                                "Simple cut in theta for relations between hits with Delta_Layer = +-1.", m_param_SimpleThetaCutDeltaL1);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "simpleThetaCutDeltaL2"), m_param_SimpleThetaCutDeltaL2,
-                                "Simple cut in theta for relations between hits with Delta_Layer = +-2.", m_param_SimpleThetaCutDeltaL2);
+                                m_SimpleThetaCutDeltaL0);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "simpleThetaCutDeltaL1"), m_SimpleThetaCutDeltaL1,
+                                "Simple cut in theta for relations between hits with Delta_Layer = +-1.", m_SimpleThetaCutDeltaL1);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "simpleThetaCutDeltaL2"), m_SimpleThetaCutDeltaL2,
+                                "Simple cut in theta for relations between hits with Delta_Layer = +-2.", m_SimpleThetaCutDeltaL2);
 }
 
 TrackFindingCDC::Weight
@@ -36,7 +36,7 @@ SimpleRelationFilter::operator()(const std::pair<const VXDHoughState*, const VXD
   // if the connection is possible in u, it should also be possible in v, but as there could in principle be a chance that the hits
   // are on different sensors (X.X.1 -> X.(X+-1).2 or X.X.2 -> X.(X+-1).1) check for a similar theta value instead of v
   if (currentVXDHoughState.layer == nextVXDHoughState.layer) {
-    if (absThetaDiff > m_param_SimpleThetaCutDeltaL0) {
+    if (absThetaDiff > m_SimpleThetaCutDeltaL0) {
       return NAN;
     }
     // The hits are on the same layer but neighbouring ladders and in the overlap region they are in close proximity in phi.
@@ -46,8 +46,8 @@ SimpleRelationFilter::operator()(const std::pair<const VXDHoughState*, const VXD
   }
 
   const ushort absLayerDiff = abs(currentVXDHoughState.layer - nextVXDHoughState.layer);
-  if ((absLayerDiff == 1 and absThetaDiff < m_param_SimpleThetaCutDeltaL1) or
-      (absLayerDiff == 2 and absThetaDiff < m_param_SimpleThetaCutDeltaL2)) {
+  if ((absLayerDiff == 1 and absThetaDiff < m_SimpleThetaCutDeltaL1) or
+      (absLayerDiff == 2 and absThetaDiff < m_SimpleThetaCutDeltaL2)) {
     return 1.0;
   }
 

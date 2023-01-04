@@ -12,7 +12,7 @@
 
 #include <simulation/dataobjects/SimHitBase.h>
 #include <vxd/dataobjects/VxdID.h>
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 #include <vector>
 #include <algorithm>
 
@@ -63,9 +63,9 @@ namespace Belle2 {
     /** Return the PDG code of the particle causing the electron deposition */
     int getPDGcode() const { return m_pdg; }
     /** Return the start point of the electron deposition in local coordinates */
-    TVector3 getPosIn() const { return TVector3(m_posIn[0], m_posIn[1], m_posIn[2]); }
+    ROOT::Math::XYZVector getPosIn() const { return ROOT::Math::XYZVector(m_posIn[0], m_posIn[1], m_posIn[2]); }
     /** Return the end point of the electron deposition in local coordinates */
-    TVector3 getPosOut() const { return TVector3(m_posOut[0], m_posOut[1], m_posOut[2]); }
+    ROOT::Math::XYZVector getPosOut() const { return ROOT::Math::XYZVector(m_posOut[0], m_posOut[1], m_posOut[2]); }
     /** Return the start point of the electron deposition in local coordinates as float array */
     const float* getPosArrayIn() const { return m_posIn; }
     /** Return the end point of the electron deposition in local coordinates as float array */

@@ -37,13 +37,13 @@ namespace Belle2 {
 
     void InverseRaytracer::Solution::setTotalReflStatus(double A, double B, double cosTotal)
     {
-      totRefl = (abs(kx) < cosTotal or abs(xD) < A / 2) and (abs(ky) < cosTotal or abs(yB) < B / 2);
+      totRefl = (std::abs(kx) < cosTotal or std::abs(xD) < A / 2) and (std::abs(ky) < cosTotal or std::abs(yB) < B / 2);
     }
 
     void InverseRaytracer::Solution::setTotalReflStatus(double A, double B, double cosTotal, double Kx, double Ky)
     {
-      bool beforeMirror = (abs(kx) < cosTotal or Nxm == 0) and (abs(ky) < cosTotal or Nym == 0);
-      bool afterMirror = (abs(Kx) < cosTotal or abs(xD) < A / 2) and (abs(Ky) < cosTotal or abs(yB) < B / 2);
+      bool beforeMirror = (std::abs(kx) < cosTotal or Nxm == 0) and (std::abs(ky) < cosTotal or Nym == 0);
+      bool afterMirror = (std::abs(Kx) < cosTotal or std::abs(xD) < A / 2) and (std::abs(Ky) < cosTotal or std::abs(yB) < B / 2);
       totRefl = beforeMirror and afterMirror;
     }
 
@@ -272,7 +272,7 @@ namespace Belle2 {
 
       if (d == 0) {
         double cfic = a / b;
-        if (abs(cfic) > 1) return false;
+        if (std::abs(cfic) > 1) return false;
         double sfic = sqrt(1 - cfic * cfic);
         m_solutions[0].push_back(Solution(cfic, sfic));
         m_solutions[1].push_back(Solution(cfic, -sfic));

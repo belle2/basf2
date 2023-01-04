@@ -12,7 +12,7 @@
 using namespace Belle2;
 
 
-REG_MODULE(VXDTrackCandidatesQualityIndicatorCutter)
+REG_MODULE(VXDTrackCandidatesQualityIndicatorCutter);
 
 VXDTrackCandidatesQualityIndicatorCutterModule::VXDTrackCandidatesQualityIndicatorCutterModule() : Module()
 {

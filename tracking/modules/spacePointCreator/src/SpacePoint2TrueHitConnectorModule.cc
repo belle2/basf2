@@ -26,13 +26,12 @@
 
 #include <TFile.h>
 #include <TTree.h>
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 
 using namespace Belle2;
-using namespace std;
 
 
-REG_MODULE(SpacePoint2TrueHitConnector) // register the modules
+REG_MODULE(SpacePoint2TrueHitConnector); // register the modules
 
 SpacePoint2TrueHitConnectorModule::SpacePoint2TrueHitConnectorModule() :
   Module()
@@ -147,12 +146,12 @@ void SpacePoint2TrueHitConnectorModule::initialize()
       }
     } else { m_detectorTypes.push_back(m_detectorTypes.at(i - 1)); } // add the last entry again
 
-    m_inputSpacePoints.push_back(make_pair(StoreArray<SpacePoint>(m_PARAMspacePointNames.at(i)), m_detectorTypes.at(i)));
+    m_inputSpacePoints.push_back(std::make_pair(StoreArray<SpacePoint>(m_PARAMspacePointNames.at(i)), m_detectorTypes.at(i)));
     m_inputSpacePoints.at(i).first.isRequired();
 
     // add counters
     m_SpacePointsCtr.push_back(0);
-    m_nRelTrueHitsCtr.push_back(array<unsigned int, 5>());
+    m_nRelTrueHitsCtr.push_back(std::array<unsigned int, 5>());
     m_noClusterCtr.push_back(0);
     m_noTrueHitCtr.push_back(0);
     m_regRelationsCtr.push_back(0);
@@ -211,7 +210,7 @@ void SpacePoint2TrueHitConnectorModule::event()
 {
   StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
   const int eventCtr = eventMetaDataPtr->getEvent();
-  B2DEBUG(10, "SpacePoint2TrueHitConnector::event(). Processing event " << eventCtr << " -----------------------");
+  B2DEBUG(20, "SpacePoint2TrueHitConnector::event(). Processing event " << eventCtr << " -----------------------");
 
   if (m_PARAMpositionAnalysis) m_rootVariables = RootVariables(); // clear the rootVariables for every event
 
@@ -226,20 +225,20 @@ void SpacePoint2TrueHitConnectorModule::event()
     else detTypeStr = "PXD";
 
 
-    B2DEBUG(10, "Found " << nSpacePoints << " SpacePoints in Array " << m_inputSpacePoints.at(m_iCont).first.getName() <<
+    B2DEBUG(20, "Found " << nSpacePoints << " SpacePoints in Array " << m_inputSpacePoints.at(m_iCont).first.getName() <<
             " for this event. detType: " << detTypeStr);
 
     m_SpacePointsCtr.at(m_iCont) += nSpacePoints;
 
     for (int iSP = 0; iSP < nSpacePoints; ++iSP) {
       SpacePoint* spacePoint = spacePoints[iSP];
-      B2DEBUG(49, "Processing SpacePoint " << iSP << " from " << nSpacePoints);
+      B2DEBUG(21, "Processing SpacePoint " << iSP << " from " << nSpacePoints);
 
       baseMapT trueHitMap = processSpacePoint<baseMapT>(spacePoint, detType);
       if (trueHitMap.empty()) continue; // next SpacePoint if something went wrong
 
       unsigned int nUniqueTHs = getUniqueSize(trueHitMap);
-      B2DEBUG(50, "Found " << nUniqueTHs << " TrueHits (unique) related to SpacePoint " << spacePoint->getArrayIndex() << " from Array "
+      B2DEBUG(23, "Found " << nUniqueTHs << " TrueHits (unique) related to SpacePoint " << spacePoint->getArrayIndex() << " from Array "
               << spacePoint->getArrayName());
       unsigned int iRels = nUniqueTHs > 4 ? 4 : nUniqueTHs - 1;
       m_nRelTrueHitsCtr.at(m_iCont).at(iRels)++;
@@ -247,7 +246,7 @@ void SpacePoint2TrueHitConnectorModule::event()
       // print the complete map if the debug level is set high enough
       if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 350, PACKAGENAME())) {
         std::string mapCont = printMap(trueHitMap);
-        B2DEBUG(250, "The TrueHits and their weights for spacePoint " << spacePoint->getArrayIndex() << ": " + mapCont);
+        B2DEBUG(24, "The TrueHits and their weights for spacePoint " << spacePoint->getArrayIndex() << ": " + mapCont);
       }
 
       int thIndex = -1; // declare negative and only assign a value if ONE relation gets registered! (see doc of positionAnalysis)
@@ -255,7 +254,7 @@ void SpacePoint2TrueHitConnectorModule::event()
         registerAllRelations(spacePoint, trueHitMap, detType);
       } else { // find THE ONE TrueHit (to rule them all, one TrueHit to find them all ...)
         // COULDDO: wrap this up in a function
-        pair<VXDTrueHit*, double> trueHitwWeight;
+        std::pair<VXDTrueHit*, double> trueHitwWeight;
 
         if (detType == c_PXD) trueHitwWeight = getTHwithWeight<baseMapT, PXDTrueHit>(trueHitMap, m_PXDTrueHits, spacePoint, c_PXD);
         else if (detType == c_VTX)  trueHitwWeight = getTHwithWeight<baseMapT, VTXTrueHit>(trueHitMap, m_VTXTrueHits, spacePoint, c_VTX);
@@ -265,7 +264,7 @@ void SpacePoint2TrueHitConnectorModule::event()
           registerOneRelation(spacePoint, trueHitwWeight, detType);
           thIndex = trueHitwWeight.first->getArrayIndex();
         } else {
-          B2DEBUG(10, "Could not relate one TrueHit to SpacePoint " << spacePoint->getArrayIndex() << ".");
+          B2DEBUG(20, "Could not relate one TrueHit to SpacePoint " << spacePoint->getArrayIndex() << ".");
           m_rejectedRelsCtr.at(m_iCont)++;
         }
       }
@@ -285,7 +284,7 @@ void SpacePoint2TrueHitConnectorModule::terminate()
   B2RESULT("SpacePoint2TrueHitConnector: Got " << sumSpacePoints << " SpacePoints in " << m_nContainers <<
            " containers and registered " << sumRelations << " relations to TrueHits");
   if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 1, PACKAGENAME())) {
-    stringstream contSumm;
+    std::stringstream contSumm;
     contSumm << "Container-wise summary: \n";
 
     for (unsigned int iCont = 0; iCont < m_nContainers; ++iCont) {
@@ -298,11 +297,11 @@ void SpacePoint2TrueHitConnectorModule::terminate()
                  iCont) << " were probably ghost hits in this container!\n";
       contSumm << m_noTrueHitCtr[iCont] << " SpacePoints had no relation to a TrueHit at all.\n";
     }
-    B2DEBUG(1, contSumm.str());
+    B2DEBUG(20, contSumm.str());
 
     if (!m_PARAMregisterAll) {
       // TODO: do this containerwise
-      stringstream furtherSummary;
+      std::stringstream furtherSummary;
       furtherSummary << "Ommited Relations because of weight < " << m_PARAMminWeight << ": " << m_weightTooSmallCtr << "\n";
       furtherSummary << "Rejected Relations because of non primary particle: " << m_rejectedNoPrimaryCtr;
 //       furtherSummary << "Summary for all containers:\n";
@@ -311,7 +310,7 @@ void SpacePoint2TrueHitConnectorModule::terminate()
 //       furtherSummary << m_single2WTHCtr << "/" << m_accSingle2WTHCtr << " SP with THs (more than one) with only one TH having two weights\n";
 //       furtherSummary << m_nonSingle2WTHCtr << "/" << m_accNonSingle2WTHCtr << " SP with THs (more than one) with more than one but not all THs having two weights\n";
 //       furtherSummary << "In " << m_oneCluster2THCtr << " cases there was a SP with only one Cluster but more than one related TrueHits";
-      B2DEBUG(2, furtherSummary.str());
+      B2DEBUG(20, furtherSummary.str());
     }
   }
 
@@ -325,7 +324,7 @@ void SpacePoint2TrueHitConnectorModule::terminate()
 template<typename MapType>
 MapType SpacePoint2TrueHitConnectorModule::processSpacePoint(Belle2::SpacePoint* spacePoint, e_detTypes detType)
 {
-  B2DEBUG(50, "Processing SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName());
+  B2DEBUG(23, "Processing SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName());
   MapType trueHitMap;
   try {
     if (detType == c_PXD) {
@@ -343,7 +342,7 @@ MapType SpacePoint2TrueHitConnectorModule::processSpacePoint(Belle2::SpacePoint*
     throw; // throw further (maybe it is caught somewhere else)
   }
 
-  B2DEBUG(499, "trueHitMap.size() before return in processSpacePoint: " << trueHitMap.size());
+  B2DEBUG(25, "trueHitMap.size() before return in processSpacePoint: " << trueHitMap.size());
   return trueHitMap;
 }
 
@@ -356,11 +355,11 @@ MapType SpacePoint2TrueHitConnectorModule::getRelatedTrueHits(Belle2::SpacePoint
 
   RelationVector<ClusterType> spacePointClusters = spacePoint->getRelationsTo<ClusterType>(clusterName);
   if (spacePointClusters.size() == 0) {
-    B2DEBUG(1, "Found no related Cluster for SpacePoint " << spacePoint->getArrayIndex() << " from Array " <<
+    B2DEBUG(20, "Found no related Cluster for SpacePoint " << spacePoint->getArrayIndex() << " from Array " <<
             spacePoint->getArrayIndex());
     throw NoClusterToSpacePoint();
   }
-  B2DEBUG(75, "Found " << spacePointClusters.size() << " related Clusters to SpacePoint " << spacePoint->getArrayIndex() <<
+  B2DEBUG(24, "Found " << spacePointClusters.size() << " related Clusters to SpacePoint " << spacePoint->getArrayIndex() <<
           " from Array " << spacePoint->getArrayName());
 
   // loop over all Clusters, get all TrueHits from them and add the information to the map
@@ -370,11 +369,11 @@ MapType SpacePoint2TrueHitConnectorModule::getRelatedTrueHits(Belle2::SpacePoint
     const ClusterType* cluster = spacePointClusters[iCl];
     RelationVector<TrueHitType> clusterTrueHits = cluster->template getRelationsTo<TrueHitType>(trueHitName);
     if (clusterTrueHits.size() == 0) {
-      B2DEBUG(3, "Found no related TrueHit for Cluster " << cluster->getArrayIndex() << " contained by SpacePoint " <<
+      B2DEBUG(20, "Found no related TrueHit for Cluster " << cluster->getArrayIndex() << " contained by SpacePoint " <<
               spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName());
       noTrueHits++;
     } else {
-      B2DEBUG(80, "Found " << clusterTrueHits.size() << " related TrueHits to Cluster " << cluster->getArrayIndex() << " from Array " <<
+      B2DEBUG(26, "Found " << clusterTrueHits.size() << " related TrueHits to Cluster " << cluster->getArrayIndex() << " from Array " <<
               cluster->getArrayName());
 
       for (unsigned int i = 0; i < clusterTrueHits.size(); ++i) { // 'TrueHit' loop
@@ -385,14 +384,14 @@ MapType SpacePoint2TrueHitConnectorModule::getRelatedTrueHits(Belle2::SpacePoint
         int index = clusterTrueHits[i]->getArrayIndex();
         if (trueHitsMap.find(index) == trueHitsMap.end()) {  // create entry only if it is not already in the map
           trueHitsMap[index] = TrueHitInfo(index);
-          B2DEBUG(499, "Added new TrueHitInfo to map. Index " << index);
+          B2DEBUG(29, "Added new TrueHitInfo to map. Index " << index);
         }
         if (spacePointClusters.weight(iCl) > 0) {
           trueHitsMap[index].setUWeight(clusterTrueHits.weight(i));
-          B2DEBUG(499, "Added UCluster to TrueHitInfo with index " << index);
+          B2DEBUG(29, "Added UCluster to TrueHitInfo with index " << index);
         } else {
           trueHitsMap[index].setVWeight(clusterTrueHits.weight(i));
-          B2DEBUG(499, "Added VCluster to TrueHitInfo with index " << index);
+          B2DEBUG(29, "Added VCluster to TrueHitInfo with index " << index);
         }
       }
     }
@@ -447,13 +446,13 @@ void SpacePoint2TrueHitConnectorModule::initializeCounters()
 template<typename MapType>
 void SpacePoint2TrueHitConnectorModule::registerAllRelations(Belle2::SpacePoint* spacePoint, MapType trueHitMap, e_detTypes detType)
 {
-  B2DEBUG(50, "Registering all possible relations for SpacePoint " << spacePoint->getArrayIndex() << " from Array " <<
+  B2DEBUG(23, "Registering all possible relations for SpacePoint " << spacePoint->getArrayIndex() << " from Array " <<
           spacePoint->getArrayName() << ". storeSeparate is set to " << m_PARAMstoreSeparate);
   SpacePoint* newSP = spacePoint; // declaring pointer here, getting new pointer if storeSeparate is true
 
   if (m_PARAMstoreSeparate) { // if storing in separate Array, re-register the relations to the Clusters first
     newSP = m_outputSpacePoints.at(m_iCont).appendNew(*spacePoint);
-    B2DEBUG(50, "Added new SpacePoint to Array " << m_outputSpacePoints[m_iCont].getName() << ".");
+    B2DEBUG(23, "Added new SpacePoint to Array " << m_outputSpacePoints[m_iCont].getName() << ".");
     if (detType == c_PXD) reRegisterClusterRelations<PXDCluster>(spacePoint, newSP, m_PXDClusters.getName());
     else if (detType == c_VTX) reRegisterClusterRelations<VTXCluster>(spacePoint, newSP, m_VTXClusters.getName());
     else reRegisterClusterRelations<SVDCluster>(spacePoint, newSP, m_SVDClusters.getName());
@@ -479,12 +478,12 @@ void SpacePoint2TrueHitConnectorModule::registerOneRelation(Belle2::SpacePoint* 
                                                             std::pair<TrueHitType*, double> trueHitwWeight, e_detTypes detType)
 {
   TrueHitType* trueHit = trueHitwWeight.first;
-  B2DEBUG(50, "Registering relation to TrueHit " << trueHit->getArrayIndex() << " from Array " << trueHit->getArrayName());
+  B2DEBUG(23, "Registering relation to TrueHit " << trueHit->getArrayIndex() << " from Array " << trueHit->getArrayName());
   SpacePoint* newSP = spacePoint; // declaring pointer here, getting new pointer if storeSeparate ist true
 
   if (m_PARAMstoreSeparate) { // if storing in separate Array, re-register the relations to the Clusters first
     newSP = m_outputSpacePoints.at(m_iCont).appendNew(*spacePoint);
-    B2DEBUG(50, "Added new SpacePoint to Array " << m_outputSpacePoints[m_iCont].getName() << ".");
+    B2DEBUG(23, "Added new SpacePoint to Array " << m_outputSpacePoints[m_iCont].getName() << ".");
     if (detType == c_PXD) reRegisterClusterRelations<PXDCluster>(spacePoint, newSP, m_PXDClusters.getName());
     else if (detType == c_VTX) reRegisterClusterRelations<VTXCluster>(spacePoint, newSP, m_VTXClusters.getName());
     else reRegisterClusterRelations<SVDCluster>(spacePoint, newSP, m_SVDClusters.getName());
@@ -492,7 +491,7 @@ void SpacePoint2TrueHitConnectorModule::registerOneRelation(Belle2::SpacePoint* 
 
   newSP->addRelationTo(trueHit, trueHitwWeight.second);
   m_regRelationsCtr.at(m_iCont)++;
-  B2DEBUG(50, "Added Relation to TrueHit " << trueHit->getArrayIndex() << " from Array " << trueHit->getArrayName() <<
+  B2DEBUG(23, "Added Relation to TrueHit " << trueHit->getArrayIndex() << " from Array " << trueHit->getArrayName() <<
           " for SpacePoint " << spacePoint->getArrayIndex() << " (weight = " << trueHitwWeight.second << ")");
 }
 
@@ -501,14 +500,14 @@ template<typename ClusterType>
 void SpacePoint2TrueHitConnectorModule::reRegisterClusterRelations(Belle2::SpacePoint* origSpacePoint,
     Belle2::SpacePoint* newSpacePoint, std::string clusterName)
 {
-  B2DEBUG(100, "Registering the Relations to Clusters of SpacePoint " << origSpacePoint->getArrayIndex() << " in Array " <<
+  B2DEBUG(27, "Registering the Relations to Clusters of SpacePoint " << origSpacePoint->getArrayIndex() << " in Array " <<
           origSpacePoint->getArrayName() << " for SpacePoint " << newSpacePoint->getArrayIndex() << " in Array " <<
           newSpacePoint->getArrayName());
 
-  vector<pair<ClusterType*, double> > clustersAndWeights = getRelatedClusters<ClusterType>(origSpacePoint, clusterName);
+  std::vector<std::pair<ClusterType*, double> > clustersAndWeights = getRelatedClusters<ClusterType>(origSpacePoint, clusterName);
   for (auto aCluster : clustersAndWeights) {
     newSpacePoint->addRelationTo(aCluster.first, aCluster.second);
-    B2DEBUG(100, "Registered Relation to Cluster " << aCluster.first->getArrayIndex() << " with weight " << aCluster.second);
+    B2DEBUG(27, "Registered Relation to Cluster " << aCluster.first->getArrayIndex() << " with weight " << aCluster.second);
   }
 }
 
@@ -517,11 +516,11 @@ template<typename ClusterType>
 std::vector<std::pair<ClusterType*, double> > SpacePoint2TrueHitConnectorModule::getRelatedClusters(Belle2::SpacePoint* spacePoint,
     std::string clusterName)
 {
-  vector<pair<ClusterType*, double> > indsAndWeights;
+  std::vector<std::pair<ClusterType*, double> > indsAndWeights;
   RelationVector<ClusterType> relClusters = spacePoint->getRelationsTo<ClusterType>(clusterName);
 
   for (unsigned int iCl = 0; iCl < relClusters.size(); ++iCl) {
-    indsAndWeights.push_back(make_pair(relClusters[iCl], relClusters.weight(iCl)));
+    indsAndWeights.push_back(std::make_pair(relClusters[iCl], relClusters.weight(iCl)));
   }
 
   // safety measure, should not / cannot happen (checked before)
@@ -538,7 +537,7 @@ void SpacePoint2TrueHitConnectorModule::registerTrueHitRelation(Belle2::SpacePoi
   TrueHitType* trueHit = trueHits[index];
   spacePoint->addRelationTo(trueHit, weight);
   m_regRelationsCtr.at(m_iCont)++; // increase counter of registered relations for this container
-  B2DEBUG(50, "Added Relation to TrueHit " << index << " from Array " << trueHits.getName() << " for SpacePoint " <<
+  B2DEBUG(23, "Added Relation to TrueHit " << index << " from Array " << trueHits.getName() << " for SpacePoint " <<
           spacePoint->getArrayIndex() << " (weight = " << weight << ")");
 }
 
@@ -548,28 +547,28 @@ template<typename MapType>
 void SpacePoint2TrueHitConnectorModule::positionAnalysis(Belle2::SpacePoint* spacePoint, const MapType& trueHitMap,
                                                          const int& index, e_detTypes detType)
 {
-  B2DEBUG(250, "Doing position analysis for SpacePoint "  << spacePoint->getArrayIndex() << " from Array " <<
+  B2DEBUG(28, "Doing position analysis for SpacePoint "  << spacePoint->getArrayIndex() << " from Array " <<
           spacePoint->getArrayName());
   simpleBitfield<unsigned short int> relationStatus;
 
   // TODO TODO TODO TODO TODO TODO TODO: remove if not needed, only for tessting at the moment (i.e. do not commit)
-  pair<unsigned short int, unsigned short int> clusterSizes = getClusterSizes(spacePoint, detType);
-  pair<double, double> positionError = getLocalError(spacePoint);
+  std::pair<unsigned short int, unsigned short int> clusterSizes = getClusterSizes(spacePoint, detType);
+  std::pair<double, double> positionError = getLocalError(spacePoint);
   // TODO TODO TODO TODO TODO TODO TODO: remove if not needed, only for tessting at the moment (i.e. do not commit)
 
   // do some checks and set the relationStatus
-  pair<bool, bool> setUV = spacePoint->getIfClustersAssigned();
+  std::pair<bool, bool> setUV = spacePoint->getIfClustersAssigned();
   if (setUV.first) relationStatus.addStatus(c_SpacePointU);
   if (setUV.second) relationStatus.addStatus(c_SpacePointV);
 
-  const vector<TrueHitInfo> trueHitInfos = getAllValues(trueHitMap);
+  const std::vector<TrueHitInfo> trueHitInfos = getAllValues(trueHitMap);
   unsigned int nRelations = trueHitInfos.size();
   if (nRelations != 1) relationStatus.addStatus(c_nonUniqueRelation);
   else relationStatus.addStatus(c_clearHit); // TODO: check if this is according to the definition of cleanHit
 
-  B2DEBUG(999, "SpacePoint has assigned U: " << setUV.first << ", V: " << setUV.second << ". Possible TrueHits: " << nRelations);
+  B2DEBUG(29, "SpacePoint has assigned U: " << setUV.first << ", V: " << setUV.second << ". Possible TrueHits: " << nRelations);
 
-  pair<double, double> spLocalPos = getLocalPos(spacePoint);
+  std::pair<double, double> spLocalPos = getLocalPos(spacePoint);
   unsigned short int vxdId = spacePoint->getVxdID();
   short nClusters = spacePoint->getNClustersAssigned();
 
@@ -597,7 +596,7 @@ void SpacePoint2TrueHitConnectorModule::positionAnalysis(Belle2::SpacePoint* spa
     if (detType == c_SVD) { trueHit = m_SVDTrueHits[info.m_Id]; }
     else if (detType == c_VTX) { trueHit = m_VTXTrueHits[info.m_Id]; }
     else { trueHit = m_PXDTrueHits[info.m_Id]; }
-    pair<TVector3, TVector3> trueHitPos = getTrueHitPositions(trueHit);
+    std::pair<ROOT::Math::XYZVector, ROOT::Math::XYZVector> trueHitPos = getTrueHitPositions(trueHit);
 
     double weightU = info.m_wU;
     double weightV = info.m_wV;
@@ -637,7 +636,7 @@ void SpacePoint2TrueHitConnectorModule::positionAnalysis(Belle2::SpacePoint* spa
     m_rootVariables.SpacePointErrorZ.push_back(spacePoint->getPositionError().Z());
     // TODO TODO TODO TODO TODO TODO TODO: remove if not needed, only for tessting at the moment (i.e. do not commit)
 
-    B2DEBUG(999, "Branch contents of this entry:\nSPLocalU: " << spLocalPos.first << ". SPLocalV: " << spLocalPos.second << "\n" << \
+    B2DEBUG(29, "Branch contents of this entry:\nSPLocalU: " << spLocalPos.first << ". SPLocalV: " << spLocalPos.second << "\n" << \
             "SPGlobalX: " << spacePoint->X() << ", SPGlobalY: " << spacePoint->Y() << ", SPGlobalZ " << spacePoint->Z() << "\n" << \
             "THLocalU: " << trueHitPos.first.X() << ", THLocalV: " << trueHitPos.first.Y() << "\n" << \
             "THGlobalX: " << trueHitPos.second.X() << ", THGlobalY: " << trueHitPos.second.Y() << ", THGlobalZ: " << trueHitPos.second.Z() <<
@@ -653,7 +652,7 @@ std::pair<TrueHitType*, double>
 SpacePoint2TrueHitConnectorModule::getTHwithWeight(const MapType& aMap, Belle2::StoreArray<TrueHitType> trueHits,
                                                    Belle2::SpacePoint* spacePoint, e_detTypes detType)
 {
-  vector<TrueHitInfo> trueHitInfos = getAllValues(aMap);
+  std::vector<TrueHitInfo> trueHitInfos = getAllValues(aMap);
   std::pair<TrueHitType*, double> THwithWeight(nullptr, 0.0); // default return value
   // return nullptr pointer and zero weight if there is no TrueHit (safety measure that should not actually be needed!)
   if (trueHitInfos.empty()) return THwithWeight;
@@ -662,21 +661,21 @@ SpacePoint2TrueHitConnectorModule::getTHwithWeight(const MapType& aMap, Belle2::
   short nClusters = spacePoint->getNClustersAssigned();
   size_t nRelations = trueHitInfos.size(); // get the number of possible relations
 
-  B2DEBUG(50, "Trying to select one TrueHit for SpacePoint " << spacePoint->getArrayIndex() << " from Array " <<
+  B2DEBUG(23, "Trying to select one TrueHit for SpacePoint " << spacePoint->getArrayIndex() << " from Array " <<
           spacePoint->getArrayName() << ". SpacePoint has " << nClusters << " Clusters.");
-  B2DEBUG(150, "There are " << nRelations << " possible candidates.");
+  B2DEBUG(25, "There are " << nRelations << " possible candidates.");
 
   // very verbose output only to have a look on why these TrueHits could be in the same SpacePoint, COULDDO: wrap up in function
   if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 999, PACKAGENAME())) {
-    stringstream output;
+    std::stringstream output;
     output << "The candidates are: ";
     for (auto& info : trueHitInfos) { output << info; }
-    B2DEBUG(999, output.str());
+    B2DEBUG(29, output.str());
 
     std::pair<double, double> spacePointLocal = getLocalPos(spacePoint);
     std::pair<bool, bool> assignedLocal = spacePoint->getIfClustersAssigned();
 
-    B2DEBUG(999, "SpacePoint " << spacePoint->getArrayIndex() << " U: " << spacePointLocal.first << " V: " << spacePointLocal.second <<
+    B2DEBUG(29, "SpacePoint " << spacePoint->getArrayIndex() << " U: " << spacePointLocal.first << " V: " << spacePointLocal.second <<
             " assigned: " << assignedLocal.first << ", " << assignedLocal.second);
 
     std::vector<int> uniqueKeys = getUniqueKeys(aMap);
@@ -694,7 +693,7 @@ SpacePoint2TrueHitConnectorModule::getTHwithWeight(const MapType& aMap, Belle2::
         pdgCode = mcParticle->getPDG();
       }
 
-      B2DEBUG(999, "TrueHit " << key << " U: " << trueHit->getU() << ", V: " << trueHit->getV() << " mc Particle Id: " << mcPartId <<
+      B2DEBUG(29, "TrueHit " << key << " U: " << trueHit->getU() << ", V: " << trueHit->getV() << " mc Particle Id: " << mcPartId <<
               ", primary " << primary << ", pdg: " << pdgCode);
     }
   }
@@ -703,23 +702,23 @@ SpacePoint2TrueHitConnectorModule::getTHwithWeight(const MapType& aMap, Belle2::
   // Clusters in the SpacePoint -> if so, check for compatibility and return (the first that is compatible)
   bool ghostHit = false;
   for (const TrueHitInfo& info : trueHitInfos) {
-    B2DEBUG(499, "Now checking trueHit: " << info);
+    B2DEBUG(28, "Now checking trueHit: " << info);
     if (nClusters == info.getNClusters()) {
       TrueHitType* trueHit = trueHits[info.m_Id];
       if (compatibleCombination(spacePoint, trueHit)) {
-        double weight = ((detType == c_PXD
-                          or detType == c_VTX) ? 1 : calculateRelationWeight(info, spacePoint));  // if PXD or VTX weight is always 1!
-        return make_pair(trueHit, weight);
+        double weight = ((detType == c_PXD or detType == c_VTX) ?
+                         1 : calculateRelationWeight(info, spacePoint));  // if PXD or VTX weight is always 1!
+        return std::make_pair(trueHit, weight);
       }
     } else {
-      B2DEBUG(499, "The number of related Clusters ( = " << nClusters << ") and the number of associated weights ( = " <<
+      B2DEBUG(28, "The number of related Clusters ( = " << nClusters << ") and the number of associated weights ( = " <<
               info.getNClusters() << ") do not match! This indicates a ghost hit");
       ghostHit = true;
     }
   }
   if (ghostHit) m_ghostHitCtr[m_iCont]++;
 
-  // B2DEBUG(4999, "just before return in getTHwithWeight")
+  // B2DEBUG(28, "just before return in getTHwithWeight")
   return THwithWeight;
 }
 
@@ -727,7 +726,7 @@ SpacePoint2TrueHitConnectorModule::getTHwithWeight(const MapType& aMap, Belle2::
 template <typename TrueHitType>
 bool SpacePoint2TrueHitConnectorModule::compatibleCombination(Belle2::SpacePoint* spacePoint, TrueHitType* trueHit)
 {
-  B2DEBUG(150, "Checking TrueHit " << trueHit->getArrayIndex() << " from Array " << trueHit->getArrayName() << " and SpacePoint " <<
+  B2DEBUG(25, "Checking TrueHit " << trueHit->getArrayIndex() << " from Array " << trueHit->getArrayName() << " and SpacePoint " <<
           spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName() << " for compatibility");
 
   // check primary first
@@ -735,22 +734,22 @@ bool SpacePoint2TrueHitConnectorModule::compatibleCombination(Belle2::SpacePoint
   bool primaryPart = false; // assume secondary or background for safety
   if (mcPart != nullptr) primaryPart = mcPart->hasStatus(MCParticle::c_PrimaryParticle);
   if (m_PARAMrequirePrimary && !primaryPart) {
-    B2DEBUG(150, "TrueHit is not related to a primary particle but 'requirePrimary' is set to true!");
+    B2DEBUG(25, "TrueHit is not related to a primary particle but 'requirePrimary' is set to true!");
     m_rejectedNoPrimaryCtr++;
     return false;
   }
 
   // CAUTION: if further tests are added, make sure that they do not get 'over-ruled' by this one (i.e. put before this if)
   if (!m_PARAMrequireProximity) {
-    B2DEBUG(999, "Not checking positions because 'requireProximity' is set to false");
+    B2DEBUG(29, "Not checking positions because 'requireProximity' is set to false");
     return true;
   }
   const VxdID spacePointVxdId = spacePoint->getVxdID();
   const VxdID trueHitVxdId = trueHit->getSensorID();
 
-  B2DEBUG(999, "Comparing the VxdIDs, SpacePoint: " << spacePointVxdId << ", TrueHit: " << trueHitVxdId);
+  B2DEBUG(29, "Comparing the VxdIDs, SpacePoint: " << spacePointVxdId << ", TrueHit: " << trueHitVxdId);
   if (spacePointVxdId != trueHitVxdId) {
-    B2DEBUG(150, "SpacePoint and TrueHit do not have the same VxdID. spacePoint: " << spacePointVxdId << ", trueHit: " << trueHitVxdId);
+    B2DEBUG(25, "SpacePoint and TrueHit do not have the same VxdID. spacePoint: " << spacePointVxdId << ", trueHit: " << trueHitVxdId);
     return false;
   }
 
@@ -759,29 +758,29 @@ bool SpacePoint2TrueHitConnectorModule::compatibleCombination(Belle2::SpacePoint
   double maxUres = SensorInfoBase.getUPitch(trueHit->getV()) / sqrt(12.) * m_PARAMmaxPosSigma;
   double maxVres = SensorInfoBase.getVPitch(trueHit->getV()) / sqrt(12.) * m_PARAMmaxPosSigma;
 
-  B2DEBUG(999, "maximum residual in U: " << maxUres << ", in V: " << maxVres);
+  B2DEBUG(29, "maximum residual in U: " << maxUres << ", in V: " << maxVres);
 
-  const TVector3 trueHitLocalPos = TVector3(trueHit->getU(), trueHit->getV(), 0);
-  const TVector3 trueHitGlobalPos = SensorInfoBase.pointToGlobal(trueHitLocalPos, true); // uses alignment
+  const ROOT::Math::XYZVector trueHitLocalPos = ROOT::Math::XYZVector(trueHit->getU(), trueHit->getV(), 0);
+  const ROOT::Math::XYZVector trueHitGlobalPos = SensorInfoBase.pointToGlobal(trueHitLocalPos, true); // uses alignment
 
   std::pair<double, double> spacePointLocal = getLocalPos(spacePoint);
   // compare only those values of the local coordinates that have been set
   std::pair<bool, bool> setCoordinates = spacePoint->getIfClustersAssigned();
 
   if (setCoordinates.first) {
-    B2DEBUG(999, "Comparing the U-coordinates, SpacePoint: " << spacePointLocal.first << ", TrueHit: " << trueHitLocalPos.X() <<
+    B2DEBUG(29, "Comparing the U-coordinates, SpacePoint: " << spacePointLocal.first << ", TrueHit: " << trueHitLocalPos.X() <<
             " -> diff: " << spacePointLocal.first - trueHitLocalPos.X());
     if (pow(spacePointLocal.first - trueHitLocalPos.X(), 2) > maxUres * maxUres) {
-      B2DEBUG(150, "The local position difference in U direction is " << spacePointLocal.first - trueHitLocalPos.X() <<
+      B2DEBUG(25, "The local position difference in U direction is " << spacePointLocal.first - trueHitLocalPos.X() <<
               " but maximum local position difference is set to: " << maxUres);
       return false;
     }
   }
   if (setCoordinates.second) {
-    B2DEBUG(999, "Comparing the V-coordinates, SpacePoint: " << spacePointLocal.second << ", TrueHit: " << trueHitLocalPos.Y() <<
+    B2DEBUG(29, "Comparing the V-coordinates, SpacePoint: " << spacePointLocal.second << ", TrueHit: " << trueHitLocalPos.Y() <<
             " -> diff: " << spacePointLocal.second - trueHitLocalPos.Y());
     if (pow(spacePointLocal.second - trueHitLocalPos.Y(), 2) > maxVres * maxVres) {
-      B2DEBUG(150, "The local position difference in V direction is " << spacePointLocal.second - trueHitLocalPos.Y() <<
+      B2DEBUG(25, "The local position difference in V direction is " << spacePointLocal.second - trueHitLocalPos.Y() <<
               " but maximum local position difference is set to: " << maxVres);
       return false;
     }
@@ -789,18 +788,18 @@ bool SpacePoint2TrueHitConnectorModule::compatibleCombination(Belle2::SpacePoint
 
   // only if both local coordinates of a SpacePoint are set, compare also the global positions!
   if (setCoordinates.first && setCoordinates.second) {
-    B2DEBUG(999, "Comparing the global positions, SpacePoint: (" << spacePoint->X() << "," << spacePoint->Y() << "," << spacePoint->Z()
+    B2DEBUG(29, "Comparing the global positions, SpacePoint: (" << spacePoint->X() << "," << spacePoint->Y() << "," << spacePoint->Z()
             << "), TrueHit:  (" << trueHitGlobalPos.X() << "," << trueHitGlobalPos.Y() << "," << trueHitGlobalPos.Z() << ")");
     if (pow(spacePoint->X() - trueHitGlobalPos.X(), 2) > m_maxGlobalDiff
         || pow(spacePoint->Y() - trueHitGlobalPos.Y(), 2) > m_maxGlobalDiff ||
         pow(spacePoint->Z() - trueHitGlobalPos.Z(), 2) > m_maxGlobalDiff) {
-      B2DEBUG(150, "The position differences are for X: " << spacePoint->X() - trueHitGlobalPos.X() << ", Y: " << spacePoint->Y() -
+      B2DEBUG(25, "The position differences are for X: " << spacePoint->X() - trueHitGlobalPos.X() << ", Y: " << spacePoint->Y() -
               trueHitGlobalPos.Y() << " Z: " << spacePoint->Z() - trueHitGlobalPos.Z() << " but the maximum position difference is set to: " <<
               sqrt(m_PARAMmaxGlobalDiff));
       return false;
     }
   } else {
-    B2DEBUG(5, "For SpacePoint " << spacePoint->getArrayIndex() <<
+    B2DEBUG(20, "For SpacePoint " << spacePoint->getArrayIndex() <<
             " one of the local coordinates was not assigned. The global positions and the un-assigned local coordinate were not compared!");
   }
 
@@ -819,30 +818,30 @@ std::pair<double, double> SpacePoint2TrueHitConnectorModule::getLocalPos(Belle2:
 
 // =============================================================== GET TRUEHIT POSITIONS ==========================================
 template<typename TrueHitType>
-std::pair<TVector3, TVector3> SpacePoint2TrueHitConnectorModule::getTrueHitPositions(TrueHitType* trueHit)
+std::pair<ROOT::Math::XYZVector, ROOT::Math::XYZVector> SpacePoint2TrueHitConnectorModule::getTrueHitPositions(TrueHitType* trueHit)
 {
 //   TrueHitType* trueHit = trueHits[index];
-  const TVector3 localPos = TVector3(trueHit->getU(), trueHit->getV(), 0);
+  const ROOT::Math::XYZVector localPos = ROOT::Math::XYZVector(trueHit->getU(), trueHit->getV(), 0);
 
   const VxdID trueHitVxdId = trueHit->getSensorID();
   VXD::SensorInfoBase SensorInfoBase = VXD::GeoCache::getInstance().getSensorInfo(trueHitVxdId);
-  const TVector3 globalPos = SensorInfoBase.pointToGlobal(localPos, true); // uses alignment
+  const ROOT::Math::XYZVector globalPos = SensorInfoBase.pointToGlobal(localPos, true); // uses alignment
 
-  return make_pair(localPos, globalPos);
+  return std::make_pair(localPos, globalPos);
 }
 
 // ================================================================= INITIALIZE ROOT FILE =========================================
 void SpacePoint2TrueHitConnectorModule::initializeRootFile()
 {
   if (m_PARAMrootFileName.size() != 2 || (m_PARAMrootFileName[1] != "UPDATE" && m_PARAMrootFileName[1] != "RECREATE")) {
-    string output;
-    for (string entry : m_PARAMrootFileName) {
+    std::string output;
+    for (std::string entry : m_PARAMrootFileName) {
       output += "'" + entry + "' ";
     }
     B2FATAL("CurlingTrackCandSplitter::initialize() : rootFileName is set wrong: entries are: " << output);
   }
 
-  string fileName = m_PARAMrootFileName[0] + ".root";
+  std::string fileName = m_PARAMrootFileName[0] + ".root";
   m_rootFilePtr = new TFile(fileName.c_str(), m_PARAMrootFileName[1].c_str());
   m_treePtr = new TTree("PosAnaTree", "Position Analysis");
 
@@ -892,13 +891,13 @@ std::pair<unsigned short int, unsigned short int> SpacePoint2TrueHitConnectorMod
 {
   std::pair<unsigned short int, unsigned short int> clusterSizes = { 0, 0 };
   if (detType == c_PXD) {
-    vector<pair<PXDCluster*, double> > relClusters = getRelatedClusters<PXDCluster>(spacePoint, m_PXDClusters.getName());
-    return make_pair(relClusters[0].first->getUSize(), relClusters[0].first->getVSize());
+    std::vector<std::pair<PXDCluster*, double> > relClusters = getRelatedClusters<PXDCluster>(spacePoint, m_PXDClusters.getName());
+    return std::make_pair(relClusters[0].first->getUSize(), relClusters[0].first->getVSize());
   } else if (detType == c_VTX) {
-    vector<pair<VTXCluster*, double> > relClusters = getRelatedClusters<VTXCluster>(spacePoint, m_VTXClusters.getName());
-    return make_pair(relClusters[0].first->getUSize(), relClusters[0].first->getVSize());
+    std::vector<std::pair<VTXCluster*, double> > relClusters = getRelatedClusters<VTXCluster>(spacePoint, m_VTXClusters.getName());
+    return std::make_pair(relClusters[0].first->getUSize(), relClusters[0].first->getVSize());
   } else {
-    vector<pair<SVDCluster*, double> > relClusters = getRelatedClusters<SVDCluster>(spacePoint, m_SVDClusters.getName());
+    std::vector<std::pair<SVDCluster*, double> > relClusters = getRelatedClusters<SVDCluster>(spacePoint, m_SVDClusters.getName());
     for (auto cluster : relClusters) {
       if (cluster.first->isUCluster()) clusterSizes.first = cluster.first->getSize();
       else clusterSizes.second = cluster.first->getSize();
@@ -910,17 +909,17 @@ std::pair<unsigned short int, unsigned short int> SpacePoint2TrueHitConnectorMod
 std::pair<double, double> SpacePoint2TrueHitConnectorModule::getLocalError(Belle2::SpacePoint* spacePoint)
 {
   auto detType = spacePoint->getType();
-  pair<double, double> errors = { -1., -1. };
+  std::pair<double, double> errors = { -1., -1. };
   if (detType == VXD::SensorInfoBase::PXD) {
-    vector<pair<PXDCluster*, double> > relClusters = getRelatedClusters<PXDCluster>(spacePoint, m_PXDClusters.getName());
+    std::vector<std::pair<PXDCluster*, double> > relClusters = getRelatedClusters<PXDCluster>(spacePoint, m_PXDClusters.getName());
     errors.first = relClusters[0].first->getUSigma();
     errors.second = relClusters[0].first->getVSigma();
   } if (detType == VXD::SensorInfoBase::VTX) {
-    vector<pair<VTXCluster*, double> > relClusters = getRelatedClusters<VTXCluster>(spacePoint, m_VTXClusters.getName());
+    std::vector<std::pair<VTXCluster*, double> > relClusters = getRelatedClusters<VTXCluster>(spacePoint, m_VTXClusters.getName());
     errors.first = relClusters[0].first->getUSigma();
     errors.second = relClusters[0].first->getVSigma();
   } else if (detType == VXD::SensorInfoBase::SVD) {
-    vector<pair<SVDCluster*, double> > relClusters = getRelatedClusters<SVDCluster>(spacePoint, m_SVDClusters.getName());
+    std::vector<std::pair<SVDCluster*, double> > relClusters = getRelatedClusters<SVDCluster>(spacePoint, m_SVDClusters.getName());
     for (auto cluster : relClusters) {
       if (cluster.first->isUCluster()) { errors.first = cluster.first->getPositionSigma(); }
       else { errors.second = cluster.first->getPositionSigma(); }

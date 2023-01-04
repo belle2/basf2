@@ -23,7 +23,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(KLMDigitizer)
+REG_MODULE(KLMDigitizer);
 
 KLMDigitizerModule::KLMDigitizerModule() :
   Module(),

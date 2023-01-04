@@ -1,3 +1,6 @@
+# disable doxygen check for this file
+# @cond
+
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
 # Author: The Belle II Collaboration                                     #
@@ -46,7 +49,8 @@ settings = CalibrationSettings(name="CDC Tracking",
                                    "max_events_for_xt_sr_calibration": 10000000,  # 10M
                                    "fractions_for_each_type": [0.5, 1, 0.5],  # [mumu, hadron, cosmic]
                                    "max_job_for_each_type": [400, 700, 400],
-                                   "calib_mode": "quick",
+                                   "calib_mode": "quick",  # manual or predefined: quick, full
+                                   "calibration_procedure": {"tz0": 1, "xt0": 0, "sr_tz0": 0, "tz2": 0},
                                    "payload_boundaries": [],
                                    "backend_args": {"request_memory": "4 GB"}
                                })
@@ -257,8 +261,10 @@ def get_calibrations(input_data, **kwargs):
             "sr_tz1": 0,
             "tz2": 0
         }
+    elif calib_mode == "manual":
+        calibration_procedure = expert_config["calibration_procedure"]
     else:
-        basf2.B2FATAL(f"Calibration mode is not defined {calib_mode}")
+        basf2.B2FATAL(f"Calibration mode is not defined {calib_mode}, should be quick, full, or manual")
     # t0
     calib_keys = list(calibration_procedure)
     cals = [None]*len(calib_keys)
@@ -295,7 +301,7 @@ def get_calibrations(input_data, **kwargs):
                                  use_badWires=True if calib_keys[i] == "tz" else False,
                                  collector_granularity=collector_granularity,
                                  backend_args=expert_config["backend_args"],
-                                 dependencies=[cals[i-1]] if i > 1 else None
+                                 dependencies=[cals[i-1]] if i > 0 else None
                                  )
     if payload_boundaries:
         basf2.B2INFO("Found payload_boundaries: calibration strategies set to SequentialBoundaries.")
@@ -313,7 +319,6 @@ def get_calibrations(input_data, **kwargs):
 
 
 #################################################
-
 def pre_collector(max_events=None, is_cosmic=False, use_badWires=False):
     """
     Define pre collection (reconstruction in our purpose).

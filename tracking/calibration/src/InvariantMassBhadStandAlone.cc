@@ -55,18 +55,16 @@
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
 
-using namespace std;
-
 
 namespace Belle2::InvariantMassBhadCalib {
 
 
 
   /// read events from TTree to std::vector
-  vector<Event> getEvents(TTree* tr)
+  std::vector<Event> getEvents(TTree* tr)
   {
 
-    vector<Event> events;
+    std::vector<Event> events;
     events.reserve(tr->GetEntries());
 
     Event evt;
@@ -77,14 +75,14 @@ namespace Belle2::InvariantMassBhadCalib {
     tr->SetBranchAddress("time", &evt.t); //time in hours
 
 
-    vector<double>* pBcms  = new vector<double>;
-    vector<double>* mB     = new vector<double>;
-    vector<int>*    pdg    = new vector<int>;
-    vector<int>*    mode   = new vector<int>;
-    vector<double>* Kpid   = new vector<double>;
-    vector<double>* R2     = new vector<double>;
-    vector<double>* mD     = new vector<double>;
-    vector<double>* dmDstar = new vector<double>;
+    std::vector<double>* pBcms  = new std::vector<double>;
+    std::vector<double>* mB     = new std::vector<double>;
+    std::vector<int>*    pdg    = new std::vector<int>;
+    std::vector<int>*    mode   = new std::vector<int>;
+    std::vector<double>* Kpid   = new std::vector<double>;
+    std::vector<double>* R2     = new std::vector<double>;
+    std::vector<double>* mD     = new std::vector<double>;
+    std::vector<double>* dmDstar = new std::vector<double>;
 
 
 
@@ -226,7 +224,8 @@ namespace Belle2::InvariantMassBhadCalib {
 
 
 
-  map<TString, pair<double, double>> argusFit(const vector<Event>& evts,  vector<pair<double, double>> limits)
+  std::map<TString, std::pair<double, double>> argusFit(const std::vector<Event>& evts,
+                                                        std::vector<std::pair<double, double>> limits)
   {
 
     const double cMBp = EvtGenDatabasePDG::Instance()->GetParticle("B+")->Mass();
@@ -354,12 +353,12 @@ namespace Belle2::InvariantMassBhadCalib {
     simPdf.fitTo(combData);
 
 
-    map<TString, pair<double, double>> resMap;
+    std::map<TString, std::pair<double, double>> resMap;
     resMap["sigmean"]  = {sigmean.getValV(),  sigmean.getError()};
     resMap["sigwidth"] = {sigwidth.getValV(), sigwidth.getError()};
     resMap["argpar"]   = {argpar.getValV(), argpar.getError()};
 
-    filesystem::create_directories("plotsHadBonly");
+    std::filesystem::create_directories("plotsHadBonly");
 
     plotArgusFit(dataE0, sumB0, argusB0, gauss, eNow, Form("plotsHadBonly/B0Single_%d.pdf", int(round(limits[0].first))));
     plotArgusFit(dataEp, sumBp, argusBp, gauss, eNow, Form("plotsHadBonly/BpSingle_%d.pdf", int(round(limits[0].first))));
@@ -383,8 +382,9 @@ namespace Belle2::InvariantMassBhadCalib {
 
 
 // Analysis itself
-  map<TString, pair<double, double>> argusFitConstrained(const vector<Event>& evts, vector<pair<double, double>> limits,
-                                                         vector<pair<double, double>> mumuVals,  vector<double> startPars)
+  std::map<TString, std::pair<double, double>> argusFitConstrained(const std::vector<Event>& evts,
+                                            std::vector<std::pair<double, double>> limits,
+                                            std::vector<std::pair<double, double>> mumuVals,  std::vector<double> startPars)
   {
     // Calculate eCMS/2
     for (auto& el : mumuVals) {
@@ -413,8 +413,8 @@ namespace Belle2::InvariantMassBhadCalib {
 
     RooRealVar eNow("eNow", "E^{*}_{B} [GeV]", cMBp, 5.37);
 
-    vector<RooDataSet*> dataE0(limits.size());
-    vector<RooDataSet*> dataEp(limits.size());
+    std::vector<RooDataSet*> dataE0(limits.size());
+    std::vector<RooDataSet*> dataEp(limits.size());
 
     for (unsigned i = 0; i < limits.size(); ++i) {
       dataE0[i] = new RooDataSet(Form("dataE0_%u", i), Form("dataE0_%u", i), RooArgSet(eNow));
@@ -484,7 +484,7 @@ namespace Belle2::InvariantMassBhadCalib {
 
     RooDataSet* combData = nullptr;
 
-    map<string, RooDataSet*> dataSetMap;
+    std::map<std::string, RooDataSet*> dataSetMap;
     for (unsigned i = 0; i < limits.size(); ++i) {
       dataSetMap[Form("B0_%u", i)] = dataE0[i];
       dataSetMap[Form("Bp_%u", i)] = dataEp[i];
@@ -496,8 +496,8 @@ namespace Belle2::InvariantMassBhadCalib {
 
     RooRealVar sigwidth("#sigma", "width of B-meson energy in CMS",  sigmaInit, 0.0001, 0.030) ;
 
-    vector<RooRealVar*> sigmean(limits.size());
-    vector<RooGaussian*> gauss(limits.size());
+    std::vector<RooRealVar*> sigmean(limits.size());
+    std::vector<RooGaussian*> gauss(limits.size());
 
 
 
@@ -531,14 +531,14 @@ namespace Belle2::InvariantMassBhadCalib {
     RooArgusBG argusBp("argusBp", "Argus PDF", eNowDifBp, endpointBp, argpar) ;
 
 
-    vector<RooRealVar*> nsigB0(limits.size());
-    vector<RooRealVar*> nbkgB0(limits.size());
+    std::vector<RooRealVar*> nsigB0(limits.size());
+    std::vector<RooRealVar*> nbkgB0(limits.size());
 
-    vector<RooRealVar*> nsigBp(limits.size());
-    vector<RooRealVar*> nbkgBp(limits.size());
+    std::vector<RooRealVar*> nsigBp(limits.size());
+    std::vector<RooRealVar*> nbkgBp(limits.size());
 
-    vector<RooAddPdf*> sumB0(limits.size());
-    vector<RooAddPdf*> sumBp(limits.size());
+    std::vector<RooAddPdf*> sumB0(limits.size());
+    std::vector<RooAddPdf*> sumBp(limits.size());
 
 
     // --- Construct signal+background PDF ---
@@ -566,8 +566,8 @@ namespace Belle2::InvariantMassBhadCalib {
 
     RooRealVar shift("shift", "shift to mumu", shiftInit, -30e-3, 30e-3);
 
-    vector<RooGaussian*> fconstraint(limits.size());
-    vector<RooPolyVar*> shiftNow(limits.size());
+    std::vector<RooGaussian*> fconstraint(limits.size());
+    std::vector<RooPolyVar*> shiftNow(limits.size());
 
     for (unsigned i = 0; i < limits.size(); ++i) {
       shiftNow[i] = new RooPolyVar(Form("shiftNow_%u", i), "shiftShift", shift, RooArgSet(RooConst(mumuVals[i].first), RooConst(1.)));
@@ -584,7 +584,7 @@ namespace Belle2::InvariantMassBhadCalib {
     simPdf.fitTo(*combData, ExternalConstraints(constraintSet));
 
 
-    map<TString, pair<double, double>> resMap;
+    std::map<TString, std::pair<double, double>> resMap;
     for (unsigned i = 0; i < limits.size(); ++i) {
       resMap[Form("sigmean_%u", i)]  = {sigmean[i]->getValV(),  sigmean[i]->getError()};
       resMap[Form("pull_%u", i)]  = {  (sigmean[i]->getValV() - shift.getValV() - mumuVals[i].first) / mumuVals[i].second,  0};
@@ -638,19 +638,19 @@ namespace Belle2::InvariantMassBhadCalib {
 
 
 
-  vector<vector<double>> doBhadFit(const vector<Event>& evts, vector<pair<double, double>> limits,
-                                   vector<pair<double, double>> mumuVals,  const vector<double>& startPars)
+  std::vector<std::vector<double>> doBhadFit(const std::vector<Event>& evts, std::vector<std::pair<double, double>> limits,
+                                             std::vector<std::pair<double, double>> mumuVals,  const std::vector<double>& startPars)
   {
 
     auto r = argusFitConstrained(evts, limits, mumuVals, startPars);
     assert(limits.size() == mumuVals.size());
 
-    vector<vector<double>> result(limits.size());
+    std::vector<std::vector<double>> result(limits.size());
 
 
     for (unsigned i = 0; i < limits.size(); ++i) {
-      string n  = Form("sigmean_%u", i);
-      string np = Form("pull_%u", i);
+      std::string n  = Form("sigmean_%u", i);
+      std::string np = Form("pull_%u", i);
 
       //convert to whole eCMS (ecms, ecmsSpread, ecmsShift)
       result[i] = {2 * r.at(n).first,  2 * r.at(n).second,  2 * r.at("sigwidth").first, 2 * r.at("sigwidth").second, 2 * r.at("shift").first, 2 * r.at("shift").second, r.at(np).first};
@@ -661,7 +661,7 @@ namespace Belle2::InvariantMassBhadCalib {
   }
 
 
-  vector<double> doBhadOnlyFit(const vector<Event>& evts, const vector<pair<double, double>>& limits)
+  std::vector<double> doBhadOnlyFit(const std::vector<Event>& evts, const std::vector<std::pair<double, double>>& limits)
   {
 
     auto r = argusFit(evts, limits);

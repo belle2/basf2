@@ -32,3 +32,7 @@ ${PARENT} basf2 ${PROCESSES} \
     --output-file ${OUTPUT_ROOT_DIR}/beam_reco_monitor-expressreco-out.root \
     --histo-output-file ${OUTPUT_ROOT_DIR}/beam_reco_monitor-expressreco-dqm.root \
     --local-db-path cdb
+
+#For weird reasons, RbTupleManager does not create the ROOT file with DQM histograms
+# in ${OUTPUT_ROOT_DIR}, so we must manually move it there.
+mv beam_reco_monitor-expressreco-dqm.root ${OUTPUT_ROOT_DIR}/beam_reco_monitor-expressreco-dqm.root

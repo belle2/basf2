@@ -116,7 +116,6 @@ namespace Belle2 {
       }
 
       // if we did not run the ECLTRGInformation module, return NaN
-      // cppcheck-suppress unassignedVariable
       StoreArray<ECLTriggerCell> ecltc;
       if (!ecltc) return std::numeric_limits<double>::quiet_NaN();
 
@@ -157,7 +156,6 @@ namespace Belle2 {
       }
 
       // if we did not run the ECLTRGInformation module, return NaN
-      // cppcheck-suppress unassignedVariable
       StoreArray<ECLTriggerCell> ecltc;
       if (!ecltc) return std::numeric_limits<double>::quiet_NaN();
 

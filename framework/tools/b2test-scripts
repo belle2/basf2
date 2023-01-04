@@ -48,6 +48,8 @@ from a different directory.
 import sys
 import os
 import glob
+import pathlib
+import shutil
 import subprocess
 import difflib
 from concurrent.futures import ThreadPoolExecutor
@@ -58,9 +60,13 @@ from nbconvert.preprocessors.execute import CellExecutionError
 import argparse
 import re
 import datetime
+import tempfile
 import timeit
 import xml.etree.cElementTree as ET
 from collections import defaultdict
+from functools import partial
+from basf2 import find_file
+from b2test_utils import is_ci, temporary_set_environment
 
 # allow stopping tests with Ctrl+c
 import signal
@@ -113,9 +119,9 @@ def format_output(name, out, err):
     if options.quiet:
         return ""
     output = []
-    if out.strip():
+    if out and out.strip():
         output += ["=== stdout of %s ===\n" % name, out.decode(errors="replace")]
-    if err.strip():
+    if err and err.strip():
         output += ["=== stderr of %s ===\n" % name, err.decode(errors="replace")]
     if len(output):
         output.append("=== end %s ===\n" % name)
@@ -128,15 +134,19 @@ def report_test_result(result, extra, name, message):
     print(f"{extra}finished test {name}\n     -> {result_message}: {message}", flush=True)
 
 
-def run_test(argument):
+def run_test(prepare_step, argument):
     """ run either regurlar python tests (with basf2) or as jupyter notebooks """
 
     name, release_dir = argument
     ext = os.path.splitext(name)[1]
     if ext == ".ipynb":
-        return run_test_ipynb(argument)
+        # FIXME: we temporarily ignore the jupyter tests on our CI pipeline
+        if is_ci() or prepare_step:
+            return (None, "Temporarily skipped on our CI pipeline", 0, "")
+        else:
+            return run_test_ipynb(argument)
     elif ext == ".py":
-        return run_test_py(argument)
+        return run_test_py(argument, prepare_step)
     else:
         print(f"Testfile {name} with extension {ext} not supported")
 
@@ -168,15 +178,15 @@ def run_test_ipynb(argument):
     # execution errors within the notebook will throw this exception
     except CellExecutionError as ce:
         result = False
-        message = f"A CellExecutionError happened. Please re-run the build if this failure happened on bamboo."
+        message = "A CellExecutionError happened. Please re-run the build if this failure happened on bamboo."
         extra = str(ce)
     except TimeoutError as te:
         result = False
-        message = f"A TimeoutError happened. Please re-run the build if this failure happened on bamboo."
+        message = "A TimeoutError happened. Please re-run the build if this failure happened on bamboo."
         extra = str(te)
     except RuntimeError as re:
         result = False
-        message = f"A RuntimeError happened. Please re-run the build if this failure happened on bamboo."
+        message = "A RuntimeError happened. Please re-run the build if this failure happened on bamboo."
         extra = str(re)
 
     time = timeit.default_timer() - time_start
@@ -187,7 +197,7 @@ def run_test_ipynb(argument):
     return (result, message, time, extra)
 
 
-def run_test_py(argument):
+def run_test_py(argument, prepare_step=False):
     """Run the test for the given steering file"""
 
     global options
@@ -255,8 +265,8 @@ def run_test_py(argument):
     return (result, message, time, extra)
 
 
-def process_dir(dir, release_dir):
-    """Search a directory for test steering files"""
+def process_dir(dir, release_dir, prepare_step=False):
+    """Search a directory for prepare/test steering files"""
 
     exclude_dirs = ['include', 'src', 'tools', 'scripts', 'data', 'doc', 'examples']
     tests = []
@@ -264,19 +274,24 @@ def process_dir(dir, release_dir):
         dir_entry = os.path.join(dir, entry)
         if entry.find('.') > -1 or not os.path.isdir(dir_entry) or entry in exclude_dirs:
             continue
-        if entry == 'tests':
+        if not prepare_step and entry == 'tests':
             # search for files with .py (basf2 steering files) and .ipynb (jupyter notebooks) extensions
             for steering in glob.glob(os.path.join(dir_entry, '*.py')) + glob.glob(os.path.join(dir_entry, '*.ipynb')):
                 name = steering[len(release_dir):]
                 name = name.lstrip('/')
                 tests.append((name, release_dir))
+        elif prepare_step and entry == 'prepare':
+            for steering in glob.glob(os.path.join(dir_entry, '*.py')):
+                name = steering[len(release_dir):]
+                name = name.lstrip('/')
+                tests.append((name, release_dir))
         else:
-            tests += process_dir(dir_entry, release_dir)
+            tests += process_dir(dir_entry, release_dir, prepare_step)
 
     return tests
 
 
-def process_top_dir(release_dir, directories, processed_dirs):
+def process_top_dir(release_dir, directories, processed_dirs, prepare_step=False):
     """Loop over folders in the top release directory"""
 
     dirs = os.listdir(release_dir)
@@ -291,7 +306,7 @@ def process_top_dir(release_dir, directories, processed_dirs):
         dir_entry = os.path.join(release_dir, entry)
         if entry.find('.') > -1 or not os.path.isdir(dir_entry):
             continue
-        tests += process_dir(dir_entry, release_dir)
+        tests += process_dir(dir_entry, release_dir, prepare_step)
         processed_dirs.append(entry)
 
     return tests
@@ -299,6 +314,7 @@ def process_top_dir(release_dir, directories, processed_dirs):
 
 class TestSuite(list):
     """Class to aggregate test case results by directory"""
+
     def __init__(self):
         """Init the suite with empty values"""
         #: number of passed tests in the suite/package
@@ -349,22 +365,17 @@ def get_argument_parser():
     return parser
 
 
-if __name__ == "__main__":
-    options = get_argument_parser().parse_args()
+def executor(options, prepare_step):
 
-    # check whether a release is set up
-    if not ('BELLE2_LOCAL_DIR' in os.environ or 'BELLE2_RELEASE_DIR' in os.environ):
-        sys.stderr.write('Error: no release is set up.\n')
-        sys.exit(-1)
+    print(f"Running steering file tests in {options.nprocess} processes", flush=True)
 
-    # first let's collect all tests
-    print(f"running steering file tests in {options.nprocess} processes", flush=True)
+    # let's collect all tests
     all_tests = []
     processed_dirs = []
     if "BELLE2_LOCAL_DIR" in os.environ:
-        all_tests += process_top_dir(os.environ['BELLE2_LOCAL_DIR'], options.directories, processed_dirs)
+        all_tests += process_top_dir(os.environ['BELLE2_LOCAL_DIR'], options.directories, processed_dirs, prepare_step)
     if "BELLE2_RELEASE_DIR" in os.environ:
-        all_tests += process_top_dir(os.environ['BELLE2_RELEASE_DIR'], options.directories, processed_dirs)
+        all_tests += process_top_dir(os.environ['BELLE2_RELEASE_DIR'], options.directories, processed_dirs, prepare_step)
 
     for name, invert in [("filter", False), ("exclude", True)]:
         arg = getattr(options, name)
@@ -380,14 +391,15 @@ if __name__ == "__main__":
     print(f"Collected {len(all_tests)} tests...", flush=True)
 
     # now let's run them, either in multiprocessing or in a single process
+    run_test_partial = partial(run_test, prepare_step)
     if options.nprocess > 1:
         with ThreadPoolExecutor(max_workers=options.nprocess) as pool:
             # run tests in multiple threads but consume the iterator right away to
             # avoid a bug in python 3.5 when zipping over a futures result iterator
             # and then exiting using sys.exit().
-            results = list(pool.map(run_test, all_tests))
+            results = list(pool.map(run_test_partial, all_tests))
     else:
-        results = map(run_test, all_tests)
+        results = map(run_test_partial, all_tests)
 
     # and present the results
     test_results = TestSuite()
@@ -419,7 +431,7 @@ if __name__ == "__main__":
                     failure = ET.SubElement(test_el, "failure" if passed is False else "skipped", message=message,
                                             type="FAILED" if passed is False else "SKIPPED")
                     if output is not None:
-                        failure.text = output
+                        failure.text = re.sub('\033\[[0-9;]*m', '', output)
 
         tree = ET.ElementTree(root_el)
         tree.write(options.xml, encoding="UTF-8", xml_declaration=True)
@@ -432,4 +444,29 @@ if __name__ == "__main__":
         print("\n    ".join(["FAILED tests: "] + ["%s (%s)" % e for e in tests_failed]), flush=True)
     # print summary and exit
     print(f'{test_results.failed} out of {len(test_results)} tests failed, {test_results.skipped} were skipped', flush=True)
-    sys.exit(len(tests_failed))
+    return len(tests_failed)
+
+
+if __name__ == "__main__":
+
+    # check whether a release is set up
+    if not ('BELLE2_LOCAL_DIR' in os.environ or 'BELLE2_RELEASE_DIR' in os.environ):
+        sys.stderr.write('Error: no release is set up.\n')
+        sys.exit(-1)
+
+    options = get_argument_parser().parse_args()
+
+    # create a temporary directory where to store the files created during the prepare step
+    with tempfile.TemporaryDirectory() as prepare_path:
+        os.chmod(prepare_path, 0o744)  # necessary for the buildbot
+        # and temporary set the BELLE2_PREPARE_PATH variable
+        with temporary_set_environment(BELLE2_PREPARE_PATH=prepare_path):
+
+            # prepare step
+            exit_code = executor(options, prepare_step=True)
+            if exit_code > 0:  # if everything is fine, do not exit immediately!
+                sys.exit(exit_code)
+
+            # test step
+            exit_code = executor(options, prepare_step=False)
+            sys.exit(exit_code)

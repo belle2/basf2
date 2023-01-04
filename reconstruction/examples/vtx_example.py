@@ -18,11 +18,9 @@
 # Example steering file for VTX upgrade - 2020 Belle II Collaboration
 #############################################################
 
-
 import basf2 as b2
 from simulation import add_simulation
-from L1trigger import add_tsim
-from reconstruction import add_reconstruction, add_cdst_output
+from reconstruction import add_reconstruction
 from mdst import add_mdst_output
 
 # Need to use default global tag prepended with upgrade GT
@@ -40,14 +38,11 @@ main.add_module('EventInfoSetter', evtNumList=[10])
 # print event numbers
 main.add_module('EventInfoPrinter')
 
-main.add_module("EvtGenInput")
+# generate BBbar events
+main.add_module('EvtGenInput')
 
-# detector simulation
+# detector and L1 trigger simulation
 add_simulation(main, useVTX=True)
-
-
-# trigger simulation
-add_tsim(main)
 
 # reconstruction
 add_reconstruction(main, useVTX=True)
@@ -63,4 +58,4 @@ add_mdst_output(main, filename='vtx_mdst.root')
 
 # process events and print call statistics
 b2.process(main)
-print(statistics)
+print(b2.statistics)

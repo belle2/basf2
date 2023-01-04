@@ -25,7 +25,7 @@ namespace Belle2 {
       m_sensorID(0),
       m_row(0),
       m_column(0),
-      m_charge(0) ,
+      m_charge(0),
       m_frameNr(0) {};
 
 

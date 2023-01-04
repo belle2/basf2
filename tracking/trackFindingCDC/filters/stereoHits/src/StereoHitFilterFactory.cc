@@ -73,16 +73,22 @@ StereoHitFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
     return std::make_unique<NoneStereoHitFilter>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "all") {
     return std::make_unique<AllStereoHitFilter>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "random") {
     return std::make_unique<RandomStereoHitFilter>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "simple") {
     return std::make_unique<SimpleStereoHitFilter>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "truth") {
     return std::make_unique<MCStereoHitFilter>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "recording") {
     return std::make_unique<RecordingStereoHitFilter>("StereoHitFilter.root");
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "mva") {
     return std::make_unique<MVAStereoHitFilter>("trackfindingcdc_StereoHitFilter");
   } else {

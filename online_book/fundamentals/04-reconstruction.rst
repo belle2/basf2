@@ -10,14 +10,14 @@ Reconstruction
 
     **Prerequisites**:
 
-        * :ref:`Fundamentals of Data Taking <onlinebook_fundamentals_datataking>`
-        * :ref:`Fundamentals of Simulation <onlinebook_fundamentals_simulation>`
+    * :ref:`Fundamentals of Data Taking <onlinebook_fundamentals_datataking>`
+    * :ref:`Fundamentals of Simulation <onlinebook_fundamentals_simulation>`
 
     **Objectives**:
 
-        * The key concepts of data reconstruction.
-        * How is reconstruction organized in Belle II
-        * The different data formats available
+    * The key concepts of data reconstruction.
+    * How is reconstruction organized in Belle II
+    * The different data formats available
 
 
 Now after the data acquisition or the simulation we have events which contain
@@ -338,10 +338,10 @@ uDST (user Data Summary Table)
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Author(s) of this lesson
+.. rubric:: Author(s) of this lesson
 
-    Umberto Tamponi,
-    Martin Ritter,
-    Oskar Hartbrich,
-    Michael Eliachevitch,
-    Sam Cunliffe
+Umberto Tamponi,
+Martin Ritter,
+Oskar Hartbrich,
+Michael Eliachevitch,
+Sam Cunliffe

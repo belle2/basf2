@@ -20,7 +20,6 @@
 #include <framework/database/DBObjPtr.h>
 #include <simulation/background/BkgSensitiveDetector.h>
 
-using namespace std;
 using namespace Belle2::bklm;
 
 GeometryPar* GeometryPar::m_Instance = nullptr;
@@ -49,7 +48,6 @@ GeometryPar* GeometryPar::instance(const BKLMGeometryPar& element)
 
 GeometryPar::GeometryPar(const GearDir& content) :
   m_DoBeamBackgroundStudy(false),
-  m_BkgSensitiveDetector(nullptr),
   m_NSector(BKLMElementNumbers::getMaximalSectorNumber()),
   m_NLayer(BKLMElementNumbers::getMaximalLayerNumber())
 {
@@ -60,7 +58,6 @@ GeometryPar::GeometryPar(const GearDir& content) :
 
 GeometryPar::GeometryPar(const BKLMGeometryPar& element) :
   m_DoBeamBackgroundStudy(false),
-  m_BkgSensitiveDetector(nullptr),
   m_NSector(BKLMElementNumbers::getMaximalSectorNumber()),
   m_NLayer(BKLMElementNumbers::getMaximalLayerNumber())
 {
@@ -396,12 +393,6 @@ void GeometryPar::readFromDB(const BKLMGeometryPar& element)
 // Calculate derived quantities from the database-defined values
 void GeometryPar::calculate(void)
 {
-  if (m_DoBeamBackgroundStudy) {
-    B2INFO("BKLM::GeometryPar: DoBeamBackgroundStudy is enabled");
-    m_BkgSensitiveDetector = new BkgSensitiveDetector("BKLM");
-  } else {
-    B2DEBUG(20, "BKLM::GeometryPar: DoBeamBackgroundStudy is disabled");
-  }
   m_Gap1ActualHeight = m_Gap1NominalHeight + (m_IronNominalHeight - m_IronActualHeight) / 2.0;
   m_GapActualHeight = m_GapNominalHeight + (m_IronNominalHeight - m_IronActualHeight);
   m_Layer1Height = m_IronNominalHeight + m_Gap1NominalHeight;
@@ -727,21 +718,21 @@ bool GeometryPar::hasRPCs(int layer) const
 const Module* GeometryPar::findModule(int section, int sector, int layer) const
 {
   int moduleID = BKLMElementNumbers::moduleNumber(section, sector, layer);
-  map<int, Module*>::const_iterator iM = m_Modules.find(moduleID);
+  std::map<int, Module*>::const_iterator iM = m_Modules.find(moduleID);
   return (iM == m_Modules.end() ? nullptr : iM->second);
 }
 
 const HepGeom::Transform3D GeometryPar::getModuleAlignment(int section, int sector, int layer) const
 {
   int moduleID = BKLMElementNumbers::moduleNumber(section, sector, layer);
-  map<int, HepGeom::Transform3D>::const_iterator iA = m_Alignments.find(moduleID);
+  std::map<int, HepGeom::Transform3D>::const_iterator iA = m_Alignments.find(moduleID);
   return (iA == m_Alignments.end() ? HepGeom::Transform3D() : iA->second);
 }
 
 const HepGeom::Transform3D GeometryPar::getModuleDisplacedGeo(int section, int sector, int layer) const
 {
   int moduleID = BKLMElementNumbers::moduleNumber(section, sector, layer);
-  map<int, HepGeom::Transform3D>::const_iterator iDis = m_Displacements.find(moduleID);
+  std::map<int, HepGeom::Transform3D>::const_iterator iDis = m_Displacements.find(moduleID);
   return (iDis == m_Displacements.end() ? HepGeom::Transform3D() : iDis->second);
 }
 

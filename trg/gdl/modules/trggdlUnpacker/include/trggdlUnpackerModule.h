@@ -112,6 +112,8 @@ namespace Belle2 {
       int conf_map;
       int evt_map;
       int clk_map;
+      /** PCIe40 data or copper data **/
+      bool m_pciedata;
     };
   }
 } // end namespace Belle2

@@ -85,8 +85,7 @@ class TwoTrackLeptonsForLuminosity(BaseSkim):
 
         # Reconstruct the event candidates with one track plus one cluster
         ma.fillParticleList('e+:' + skim_label_1, single_track_cut + ' and ' + nTracks_cut_1, path=path)
-        ma.fillParticleList('gamma:' + skim_label_1, single_cluster_cut + ' and ' + nTracks_cut_1, path=path,
-                            loadPhotonBeamBackgroundMVA=False)
+        ma.fillParticleList('gamma:' + skim_label_1, single_cluster_cut + ' and ' + nTracks_cut_1, path=path)
         ma.reconstructDecay(
             'vpho:' +
             skim_label_1 +
@@ -157,7 +156,7 @@ class LowMassTwoTrack(BaseSkim):
         ma.fillParticleList(f"pi+:{label}", pCut, path=path)
         ma.fillParticleList(f"K+:{label}", pCut, path=path)
         ma.fillParticleList(f"p+:{label}", pCut, path=path)
-        ma.fillParticleList(f"gamma:{label}_ISR", ISRECut, path=path, loadPhotonBeamBackgroundMVA=False)
+        ma.fillParticleList(f"gamma:{label}_ISR", ISRECut, path=path)
 
         # the mass hypothesis is different for p+, pi+ and K+ lists, so it is good to write them separately.
         ModesAndCuts = [
@@ -234,16 +233,16 @@ class SingleTagPseudoScalar(BaseSkim):
     def load_standard_lists(self, path):
         stdE("all", path=path)
         stdPi("all", path=path)
-        stdPhotons("all", path=path, loadPhotonBeamBackgroundMVA=False)
+        stdPhotons("all", path=path)
 
     def build_lists(self, path):
 
         label = "PseudoScalarSkim"
         TrackCuts = "abs(dz) < 2.0 and dr < 0.5 and pt > 0.15"
 
-        ma.fillParticleList(f"e+:{label}", f"{TrackCuts} and E > 1.5 and electronID_noTOP > 0.7", path=path)
-        ma.fillParticleList(f"pi+:{label}", f"{TrackCuts} and electronID_noTOP < 0.7", path=path)
-        ma.fillParticleList(f"gamma:{label}", "clusterE > 0.1", path=path, loadPhotonBeamBackgroundMVA=False)
+        ma.fillParticleList(f"e+:{label}", f"{TrackCuts} and E > 1.5 and clusterEoP > 0.7", path=path)
+        ma.fillParticleList(f"pi+:{label}", f"{TrackCuts} and [not isInList(e+:{label})]", path=path)
+        ma.fillParticleList(f"gamma:{label}", "clusterE > 0.1", path=path)
 
         pi0MassWindow = "0.04 < InvM < 0.4"
         etaMassWindow = "0.50 < InvM < 0.60"

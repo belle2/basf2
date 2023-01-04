@@ -61,38 +61,58 @@ void TRGCDCTSFUnpackerModule::initialize()
   if (m_TSFMOD == 0) {
     m_copper_address = 0x11000007;
     m_copper_ab = 0;
+    m_pcie40_address = 0x10000001;
+    m_pcie40_ch = 12;
   } else if (m_TSFMOD == 1) {
     if (_exp > 7 || (_exp == 7 && _run > 4023)) {
       m_copper_address = 0x11000009;
       m_copper_ab = 0;
+      m_pcie40_address = 0x10000001;
+      m_pcie40_ch = 13;
     } else {
       m_copper_address = 0x11000007;
       m_copper_ab = 1;
+      m_pcie40_address = 0x10000001;
+      m_pcie40_ch = 13;
     }
   } else if (m_TSFMOD == 2) {
     m_copper_address = 0x11000008;
     m_copper_ab = 0;
+    m_pcie40_address = 0x10000001;
+    m_pcie40_ch = 14;
   } else if (m_TSFMOD == 3) {
     m_copper_address = 0x11000008;
     m_copper_ab = 1;
+    m_pcie40_address = 0x10000001;
+    m_pcie40_ch = 15;
   } else if (m_TSFMOD == 4) {
     if (_exp > 7 || (_exp == 7 && _run > 4023)) {
       m_copper_address = 0x11000007;
       m_copper_ab = 1;
+      m_pcie40_address = 0x10000001;
+      m_pcie40_ch = 16;
     } else {
       m_copper_address = 0x11000009;
       m_copper_ab = 0;
+      m_pcie40_address = 0x10000001;
+      m_pcie40_ch = 16;
     }
   } else if (m_TSFMOD == 5) {
     m_copper_address = 0x11000009;
     m_copper_ab = 1;
+    m_pcie40_address = 0x10000001;
+    m_pcie40_ch = 17;
   } else if (m_TSFMOD == 6) {
     m_copper_address = 0x1100000a;
     m_copper_ab = 0;
+    m_pcie40_address = 0x10000001;
+    m_pcie40_ch = 18;
   } else {
     B2ERROR("trgcdctsfunpacker:cooper address is not set");
     m_copper_address = 0;
     m_copper_ab = 0;
+    m_pcie40_address = 0;
+    m_pcie40_ch = 0;
   }
 
 
@@ -138,23 +158,39 @@ void TRGCDCTSFUnpackerModule::event()
 {
   StoreArray<RawTRG> raw_trgarray;
   for (int i = 0; i < raw_trgarray.getEntries(); i++) {
+
+    // Check PCIe40 data or Copper data
+    if (raw_trgarray[i]->GetMaxNumOfCh(0) == 48) { m_pciedata = true; }
+    else if (raw_trgarray[i]->GetMaxNumOfCh(0) == 4) { m_pciedata = false; }
+    else { B2FATAL("TRGCDCTSFUnpackerModule: Invalid value of GetMaxNumOfCh from raw data: " << LogVar("Number of ch: ", raw_trgarray[i]->GetMaxNumOfCh(0))); }
+
+    unsigned int node_id = 0;
+    unsigned int ch_id = 0;
+    if (m_pciedata) {
+      node_id = m_pcie40_address;
+      ch_id = m_pcie40_ch;
+    } else {
+      node_id = m_copper_address;
+      ch_id = m_copper_ab;
+    }
+
     for (int j = 0; j < raw_trgarray[i]->GetNumEntries(); j++) {
-      if (raw_trgarray[i]->GetNodeID(j) == m_copper_address) {
-        if (raw_trgarray[i]->GetDetectorNwords(j, m_copper_ab) == m_nword) {
+      if (raw_trgarray[i]->GetNodeID(j) == node_id) {
+        if (raw_trgarray[i]->GetDetectorNwords(j, ch_id) == m_nword) {
           // get the firm_vers beforehand to know 10 or 15 TS version
-          int firm_vers = (raw_trgarray[i]->GetDetectorBuffer(j, m_copper_ab))[1];
+          int firm_vers = (raw_trgarray[i]->GetDetectorBuffer(j, ch_id))[1];
           // condition for 15 TS version:
           // TSF1:  X"19041805" or newer than X"19052105"
           // TSF3:  X"19041805" or newer than X"19052105"
           // TSF5:  X"19041901" or newer than X"19061105"
           if (m_TSFMOD == 1 && (firm_vers == 0x19041805 || firm_vers > 0x19052105)) {
-            fillTreeCDCTSF_4k15ts(raw_trgarray[i]->GetDetectorBuffer(j, m_copper_ab), raw_trgarray[j]->GetEveNo(j));
+            fillTreeCDCTSF_4k15ts(raw_trgarray[i]->GetDetectorBuffer(j, ch_id), raw_trgarray[j]->GetEveNo(j));
           } else if (m_TSFMOD == 3 && (firm_vers == 0x19041805 || firm_vers > 0x19052105)) {
-            fillTreeCDCTSF_4k15ts(raw_trgarray[i]->GetDetectorBuffer(j, m_copper_ab), raw_trgarray[j]->GetEveNo(j));
+            fillTreeCDCTSF_4k15ts(raw_trgarray[i]->GetDetectorBuffer(j, ch_id), raw_trgarray[j]->GetEveNo(j));
           } else if (m_TSFMOD == 5 && (firm_vers == 0x19041901 || firm_vers > 0x19061105)) {
-            fillTreeCDCTSF_4k15ts(raw_trgarray[i]->GetDetectorBuffer(j, m_copper_ab), raw_trgarray[j]->GetEveNo(j));
+            fillTreeCDCTSF_4k15ts(raw_trgarray[i]->GetDetectorBuffer(j, ch_id), raw_trgarray[j]->GetEveNo(j));
           } else {
-            fillTreeCDCTSF(raw_trgarray[i]->GetDetectorBuffer(j, m_copper_ab), raw_trgarray[j]->GetEveNo(j));
+            fillTreeCDCTSF(raw_trgarray[i]->GetDetectorBuffer(j, ch_id), raw_trgarray[j]->GetEveNo(j));
           }
         }
       }

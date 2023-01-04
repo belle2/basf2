@@ -188,7 +188,7 @@ void ECLDigiStudyModule::event()
     }
     m_baselineAvg1[i] /= 16;
     assert(m_DspHit1[i] == (&m_DspHit1[i][0]));
-    m_maxVal1[i] = * (max_element(& m_DspHit1[i][16] , (& m_DspHit1[i][16]) + 15));
+    m_maxVal1[i] = * (max_element(& m_DspHit1[i][16], (& m_DspHit1[i][16]) + 15));
   }
 
   for (const auto& dsp : m_eclDspArray2) {
@@ -199,7 +199,7 @@ void ECLDigiStudyModule::event()
       m_baselineAvg2[i] += m_baseline2[i][j];
     }
     m_baselineAvg2[i] /= 16;
-    m_maxVal2[i] = * (max_element(& m_DspHit2[i][16] , (& m_DspHit2[i][16]) + 15));
+    m_maxVal2[i] = * (max_element(& m_DspHit2[i][16], (& m_DspHit2[i][16]) + 15));
   }
 
   m_tree->Fill();

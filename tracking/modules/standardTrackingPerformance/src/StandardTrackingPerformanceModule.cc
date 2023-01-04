@@ -8,7 +8,6 @@
 
 #include <tracking/modules/standardTrackingPerformance/StandardTrackingPerformanceModule.h>
 
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/RelationVector.h>
@@ -17,9 +16,6 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <genfit/TrackPoint.h>
 #include <genfit/KalmanFitterInfo.h>
-
-#include <mdst/dataobjects/MCParticle.h>
-#include <mdst/dataobjects/Track.h>
 
 #include <pxd/reconstruction/PXDRecoHit.h>
 #include <vtx/reconstruction/VTXRecoHit.h>
@@ -35,7 +31,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(StandardTrackingPerformance)
+REG_MODULE(StandardTrackingPerformance);
 
 StandardTrackingPerformanceModule::StandardTrackingPerformanceModule() :
   Module(), m_outputFile(nullptr), m_dataTree(nullptr), m_trackProperties(-999),  m_pValue(-999),
@@ -56,16 +52,7 @@ StandardTrackingPerformanceModule::StandardTrackingPerformanceModule() :
 void StandardTrackingPerformanceModule::initialize()
 {
   // MCParticles and Tracks needed for this module
-  StoreArray<MCParticle> mcParticles;
-  mcParticles.isRequired();
-  StoreArray<Track> tracks;
-  tracks.isRequired();
-
-  StoreArray<RecoTrack> recoTracks(m_recoTracksStoreArrayName);
-  recoTracks.isRequired();
-
-  StoreArray<TrackFitResult> trackFitResults;
-  trackFitResults.isRequired();
+  m_MCParticles.isRequired();
 
   m_outputFile = new TFile(m_outputFileName.c_str(), "RECREATE");
   TDirectory* oldDir = gDirectory;
@@ -83,32 +70,29 @@ void StandardTrackingPerformanceModule::event()
   unsigned long runNumber = eventMetaData->getRun();
   unsigned long expNumber = eventMetaData->getExperiment();
 
-  B2DEBUG(99,
+  B2DEBUG(29,
           "Processes experiment " << expNumber << " run " << runNumber << " event " << eventNumber);
-
-  StoreArray<RecoTrack> recoTracks(m_recoTracksStoreArrayName);
-  StoreArray<MCParticle> mcParticles;
 
   m_nGeneratedChargedStableMcParticles = 0;
   m_nReconstructedChargedStableTracks = 0;
   m_nFittedChargedStabletracks = 0;
 
-  for (MCParticle& mcParticle : mcParticles) {
+  for (MCParticle& mcParticle : m_MCParticles) {
     // check status of mcParticle
     if (isPrimaryMcParticle(mcParticle) && isChargedStable(mcParticle) && mcParticle.hasStatus(MCParticle::c_StableInGenerator)) {
       setVariablesToDefaultValue();
 
       int pdgCode = mcParticle.getPDG();
-      B2DEBUG(99, "Primary MCParticle has PDG code " << pdgCode);
+      B2DEBUG(29, "Primary MCParticle has PDG code " << pdgCode);
 
       m_nGeneratedChargedStableMcParticles++;
 
-      m_trackProperties.cosTheta_gen = mcParticle.getMomentum().CosTheta();
-      m_trackProperties.ptot_gen = mcParticle.getMomentum().Mag();
-      m_trackProperties.pt_gen = mcParticle.getMomentum().Pt();
-      m_trackProperties.px_gen = mcParticle.getMomentum().Px();
-      m_trackProperties.py_gen = mcParticle.getMomentum().Py();
-      m_trackProperties.pz_gen = mcParticle.getMomentum().Pz();
+      m_trackProperties.cosTheta_gen = cos(mcParticle.getMomentum().Theta());
+      m_trackProperties.ptot_gen = mcParticle.getMomentum().R();
+      m_trackProperties.pt_gen = mcParticle.getMomentum().Rho();
+      m_trackProperties.px_gen = mcParticle.getMomentum().X();
+      m_trackProperties.py_gen = mcParticle.getMomentum().Y();
+      m_trackProperties.pz_gen = mcParticle.getMomentum().Z();
       m_trackProperties.x_gen = mcParticle.getVertex().X();
       m_trackProperties.y_gen = mcParticle.getVertex().Y();
       m_trackProperties.z_gen = mcParticle.getVertex().Z();
@@ -144,13 +128,13 @@ void StandardTrackingPerformanceModule::event()
 
         m_nFittedChargedStabletracks++;
         // write some data to the root tree
-        TVector3 mom = fitResult->getMomentum();
-        m_trackProperties.cosTheta = mom.CosTheta();
-        m_trackProperties.ptot = mom.Mag();
-        m_trackProperties.pt = mom.Pt();
-        m_trackProperties.px = mom.Px();
-        m_trackProperties.py = mom.Py();
-        m_trackProperties.pz = mom.Pz();
+        ROOT::Math::XYZVector mom = fitResult->getMomentum();
+        m_trackProperties.cosTheta = cos(mom.Theta());
+        m_trackProperties.ptot = mom.R();
+        m_trackProperties.pt = mom.Rho();
+        m_trackProperties.px = mom.X();
+        m_trackProperties.py = mom.Y();
+        m_trackProperties.pz = mom.Z();
         m_trackProperties.x = fitResult->getPosition().X();
         m_trackProperties.y = fitResult->getPosition().Y();
         m_trackProperties.z = fitResult->getPosition().Z();
@@ -276,11 +260,11 @@ void StandardTrackingPerformanceModule::writeData()
   }
 }
 
-void StandardTrackingPerformanceModule::findSignalMCParticles(const StoreArray<MCParticle>& mcParticles)
+void StandardTrackingPerformanceModule::findSignalMCParticles()
 {
   std::sort(m_signalDaughterPDGs.begin(), m_signalDaughterPDGs.end());
 
-  for (const MCParticle& mcParticle : mcParticles) {
+  for (const MCParticle& mcParticle : m_MCParticles) {
     // continue if mcParticle is not a B meson
     if (abs(mcParticle.getPDG()) != 511 && abs(mcParticle.getPDG()) != 521)
       continue;
@@ -341,7 +325,7 @@ void StandardTrackingPerformanceModule::addChargedStable(const MCParticle& mcPar
   // charged stable particle is added to the interesting particle vector
   if (isChargedStable(mcParticle) && isPrimaryMcParticle(mcParticle)
       && mcParticle.hasStatus(MCParticle::c_StableInGenerator)) {
-//   B2DEBUG(99,
+//   B2DEBUG(29,
 //          "Found a charged stable particle. Add it to interesting MCParticles. PDG(" << mcParticle->getPDG() << ").");
     m_interestingChargedStableMcParcticles.push_back(&mcParticle);
     return;

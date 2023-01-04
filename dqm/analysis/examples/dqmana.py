@@ -34,9 +34,5 @@ output = b2.register_module('DQMHistAnalysisOutputRelayMsg')
 output.param("Port", 9192)
 main.add_module(output)
 
-# nsm = register_module('DQMHistAnalysisOutputNSM')
-# nsm.param('NSMNodeName', "DQMH1")
-# main.add_module(nsm)
-
 # Process all events
 b2.process(main)

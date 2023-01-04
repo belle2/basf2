@@ -12,7 +12,7 @@
 using namespace Belle2;
 
 
-REG_MODULE(AddVXDTrackCandidateSubSets)
+REG_MODULE(AddVXDTrackCandidateSubSets);
 
 AddVXDTrackCandidateSubSetsModule::AddVXDTrackCandidateSubSetsModule() : Module()
 {

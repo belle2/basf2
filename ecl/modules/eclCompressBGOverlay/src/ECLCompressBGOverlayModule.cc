@@ -22,7 +22,7 @@ using namespace ECL;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(ECLCompressBGOverlay)
+REG_MODULE(ECLCompressBGOverlay);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -30,7 +30,7 @@ REG_MODULE(ECLCompressBGOverlay)
 ECLCompressBGOverlayModule::ECLCompressBGOverlayModule() : Module()
 {
   //Set module properties
-  setDescription("Compress recorded waveforms for beam backround overlay in simulation.");
+  setDescription("Compress recorded waveforms for beam background overlay in simulation.");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("CompressionAlgorithm", m_compAlgo, "Waveform compression algorithm (0..127)", 0u);
   addParam("WithTriggerTime", m_trgTime, "Trigger time from each create", 1u);

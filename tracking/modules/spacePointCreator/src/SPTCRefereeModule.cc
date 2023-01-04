@@ -19,13 +19,12 @@
 #include <vtx/dataobjects/VTXTrueHit.h>
 #include <vxd/dataobjects/VxdID.h>
 
-#include <framework/geometry/B2Vector3.h> // use TVector3 instead?
+#include <framework/geometry/B2Vector3.h>
 #include <boost/range/adaptor/reversed.hpp> // for ranged based loops in reversed order
 
 using namespace Belle2;
-using namespace std;
 
-REG_MODULE(SPTCReferee) // register the module
+REG_MODULE(SPTCReferee); // register the module
 
 SPTCRefereeModule::SPTCRefereeModule() : Module()
 {
@@ -105,20 +104,21 @@ void SPTCRefereeModule::initialize()
 {
   B2INFO("SPTCReferee::initialize(): ------------------------------------------------ ");
   // check if StoreArray of SpacePointTrackCands is her
-  StoreArray<SpacePointTrackCand> inputSpacePoints(m_PARAMsptcName);
-  inputSpacePoints.isRequired(m_PARAMsptcName);
+  m_inputSpacePointTrackCands.isRequired(m_PARAMsptcName);
 
   // register new StoreArray
   if (m_PARAMstoreNewArray) {
-    StoreArray<SpacePointTrackCand> newStoreArray(m_PARAMnewArrayName);
-    newStoreArray.registerInDataStore(m_PARAMnewArrayName, DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered);
-    newStoreArray.registerRelationTo(inputSpacePoints, DataStore::c_Event, DataStore::c_DontWriteOut);
+//     StoreArray<SpacePointTrackCand> m_optionalOutputSpacePointTrackCands(m_PARAMnewArrayName);
+    m_optionalOutputSpacePointTrackCands.registerInDataStore(m_PARAMnewArrayName,
+                                                             DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered);
+    m_optionalOutputSpacePointTrackCands.registerRelationTo(m_inputSpacePointTrackCands, DataStore::c_Event, DataStore::c_DontWriteOut);
   } else {
     m_curlingArrayName = m_PARAMsptcName + m_PARAMcurlingSuffix;
     B2DEBUG(20, "StoreArray name of the curling parts: " << m_curlingArrayName);
-    StoreArray<SpacePointTrackCand> newStoreArray(m_curlingArrayName);
-    newStoreArray.registerInDataStore(m_curlingArrayName, DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered);
-    newStoreArray.registerRelationTo(inputSpacePoints, DataStore::c_Event, DataStore::c_DontWriteOut);
+//     StoreArray<SpacePointTrackCand> m_curlingSpacePointTrackCands(m_curlingArrayName);
+    m_curlingSpacePointTrackCands.registerInDataStore(m_curlingArrayName,
+                                                      DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered);
+    m_curlingSpacePointTrackCands.registerRelationTo(m_inputSpacePointTrackCands, DataStore::c_Event, DataStore::c_DontWriteOut);
   }
 
   // sanity checks on the other parameters
@@ -153,15 +153,14 @@ void SPTCRefereeModule::event()
   const int eventCtr = eventMetaDataPtr->getEvent();
   B2DEBUG(20, "Processing event " << eventCtr << " -----------------------");
 
-  StoreArray<SpacePointTrackCand> trackCands(m_PARAMsptcName);
-  const int nTCs = trackCands.getEntries();
+  const int nTCs = m_inputSpacePointTrackCands.getEntries();
 
   m_totalTrackCandCtr += nTCs;
 
-  B2DEBUG(20, "Found " << nTCs << " SpacePointTrackCands in Array " << trackCands.getName() << " for this event");
+  B2DEBUG(20, "Found " << nTCs << " SpacePointTrackCands in Array " << m_inputSpacePointTrackCands.getName() << " for this event");
 
   for (int iTC = 0; iTC < nTCs; ++iTC) { // loop over all TrackCands
-    SpacePointTrackCand* trackCand = trackCands[iTC];
+    SpacePointTrackCand* trackCand = m_inputSpacePointTrackCands[iTC];
     B2DEBUG(20, "Processing SpacePointTrackCand " << iTC << ": It has " << trackCand->getNHits() << " SpacePoints in it");
 
     if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 200, PACKAGENAME())) { trackCand->print(); }
@@ -219,7 +218,7 @@ void SPTCRefereeModule::event()
         }
       } else {
         B2DEBUG(20, "Found no two subsequent SpacePoints on the same sensor for this SpacePointTrackCand ("
-                << iTC << " in Array " << trackCands.getName() << ")");
+                << iTC << " in Array " << m_inputSpacePointTrackCands.getName() << ")");
       }
       trackCand->addRefereeStatus(SpacePointTrackCand::c_checkedSameSensors);
       B2DEBUG(20, "refereeStatus of TrackCand after checkSameSensor " << trackCand->getRefereeStatus() << " -> " <<
@@ -243,7 +242,7 @@ void SPTCRefereeModule::event()
         }
       } else {
         B2DEBUG(20, "Found no two subsequent SpacePoints that were closer than " << m_PARAMminDistance <<
-                " cm together for this SpacePointTrackCand (" << iTC << " in Array " << trackCands.getName() << ")");
+                " cm together for this SpacePointTrackCand (" << iTC << " in Array " << m_inputSpacePointTrackCands.getName() << ")");
       }
       trackCand->addRefereeStatus(SpacePointTrackCand::c_checkedMinDistance);
       B2DEBUG(20, "refereeStatus of TrackCand after checkMinDistance " << trackCand->getRefereeStatus() << " -> " <<
@@ -292,15 +291,13 @@ void SPTCRefereeModule::event()
 
     // store in appropriate StoreArray
     if (m_PARAMstoreNewArray) {
-      StoreArray<SpacePointTrackCand> newArray(m_PARAMnewArrayName);
-      if (!trackCand->isCurling()) { copyToNewStoreArray(trackCand, newArray); }
+      if (!trackCand->isCurling()) { copyToNewStoreArray(trackCand, m_optionalOutputSpacePointTrackCands); }
       else {
-        for (const SpacePointTrackCand& trackStub : curlingTrackStubs) { addToStoreArray(trackStub, newArray, trackCand); }
+        for (const SpacePointTrackCand& trackStub : curlingTrackStubs) { addToStoreArray(trackStub, m_optionalOutputSpacePointTrackCands, trackCand); }
       }
     } else {
-      StoreArray<SpacePointTrackCand> curlingArray(m_curlingArrayName);
       if (trackCand->isCurling()) {
-        for (const SpacePointTrackCand& trackStub : curlingTrackStubs) { addToStoreArray(trackStub, curlingArray, trackCand); }
+        for (const SpacePointTrackCand& trackStub : curlingTrackStubs) { addToStoreArray(trackStub, m_curlingSpacePointTrackCands, trackCand); }
       }
     }
   }
@@ -310,7 +307,7 @@ void SPTCRefereeModule::event()
 void SPTCRefereeModule::terminate()
 {
   // TODO: info output more sophisticated
-  stringstream summary;
+  std::stringstream summary;
   if (m_PARAMcheckSameSensor) {
     summary << "Checked for consecutive SpacePoints on same sensor and found "
             << m_SameSensorCtr << " TrackCands showing this behavior.\n";
@@ -504,7 +501,7 @@ SPTCRefereeModule::splitTrackCand(const Belle2::SpacePointTrackCand* trackCand, 
           << splitIndices.size() << ", onlyFirstPart " << onlyFirstPart);
 
   if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 999, PACKAGENAME())) {
-    stringstream dbOutput;
+    std::stringstream dbOutput;
     dbOutput << "The indices that will be used for splitting the SPTC: ";
     for (auto entry : rangeIndices) { dbOutput << "[" << entry.first << "," << entry.second << ") "; }
     B2DEBUG(20, dbOutput.str());
@@ -600,16 +597,20 @@ bool SPTCRefereeModule::getDirOfFlightTrueHit(const Belle2::SpacePoint* spacePoi
 {
   TrueHitType* trueHit = spacePoint->template getRelatedTo<TrueHitType>("ALL"); // COULDDO: search only certain arrays
 
-  if (trueHit == nullptr) { B2ERROR("Found no TrueHit to SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName()); }
+  if (trueHit == nullptr) {B2FATAL("Found no TrueHit to SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName()); }
 
   // get SensorId - needed for transforming local to global coordinates
+  // cppcheck-suppress nullPointerRedundantCheck
   VxdID vxdID = trueHit->getSensorID();
 
   const VXD::SensorInfoBase& sensorInfoBase = VXD::GeoCache::getInstance().getSensorInfo(vxdID);
+  // cppcheck-suppress nullPointerRedundantCheck
   B2Vector3F position = sensorInfoBase.pointToGlobal(B2Vector3F(trueHit->getU(), trueHit->getV(), 0), true); // global position
+  // cppcheck-suppress nullPointerRedundantCheck
   B2Vector3F momentum = sensorInfoBase.vectorToGlobal(trueHit->getMomentum(), true); // global momentum
 
   B2DEBUG(20, "Getting the direction of flight for SpacePoint " << spacePoint->getArrayIndex() << ", related to TrueHit " <<
+          // cppcheck-suppress nullPointerRedundantCheck
           trueHit->getArrayIndex() << ". Both are on Sensor " << vxdID << ". (TrueHit) Position: (" << position.x() << "," << position.y() <<
           "," << position.z() << "), (TrueHit) Momentum: (" << momentum.x() << "," << momentum.y() << "," << momentum.z() << ")");
 

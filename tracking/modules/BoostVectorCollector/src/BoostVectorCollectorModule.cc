@@ -7,19 +7,17 @@
  **************************************************************************/
 #include <tracking/modules/BoostVectorCollector/BoostVectorCollectorModule.h>
 
-#include <framework/geometry/B2Vector3.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
 
 using namespace Belle2;
-using namespace std;
 
 #include <iostream>
 
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(BoostVectorCollector)
+REG_MODULE(BoostVectorCollector);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -53,8 +51,8 @@ void BoostVectorCollectorModule::prepare()
   tree->Branch<double>("mu0_pid", &m_mu0_pid);
   tree->Branch<double>("mu1_pid", &m_mu1_pid);
 
-  tree->Branch<TVector3>("mu0_p", &m_mu0_p);
-  tree->Branch<TVector3>("mu1_p", &m_mu1_p);
+  tree->Branch<B2Vector3D>("mu0_p", &m_mu0_p);
+  tree->Branch<B2Vector3D>("mu1_p", &m_mu1_p);
 
 
   // We register the objects so that our framework knows about them.

@@ -12,12 +12,11 @@
 #include <vtx/reconstruction/VTXRecoHit.h>
 #include <svd/reconstruction/SVDRecoHit.h>
 
-using namespace std;
 using namespace Belle2;
 
 //---VTX related constructor---
 SpacePoint::SpacePoint(const VTXCluster* vtxCluster,
-                       const VXD::SensorInfoBase* aSensorInfo) :  m_clustersAssigned( {true, true}), m_vxdID(vtxCluster->getSensorID())
+                       const VXD::SensorInfoBase* aSensorInfo) :  m_clustersAssigned({true, true}), m_vxdID(vtxCluster->getSensorID())
 {
   //We need some handle to translate IDs to local and global coordinates.
   //aSensorInfo exists only for testing purposes, so this is the relevant case!
@@ -26,7 +25,7 @@ SpacePoint::SpacePoint(const VTXCluster* vtxCluster,
   }
 
   // the second parameter set to true results in alignment constants being applied
-  m_position = aSensorInfo->pointToGlobal(TVector3(vtxCluster->getU(), vtxCluster->getV(), 0), true);
+  m_position = aSensorInfo->pointToGlobal(ROOT::Math::XYZVector(vtxCluster->getU(), vtxCluster->getV(), 0), true);
 
   setPositionError(vtxCluster->getUSigma(), vtxCluster->getVSigma(), aSensorInfo);
 
@@ -39,7 +38,7 @@ SpacePoint::SpacePoint(const VTXCluster* vtxCluster,
 
 //---PXD related constructor---
 SpacePoint::SpacePoint(const PXDCluster* pxdCluster,
-                       const VXD::SensorInfoBase* aSensorInfo) :  m_clustersAssigned( {true, true}), m_vxdID(pxdCluster->getSensorID())
+                       const VXD::SensorInfoBase* aSensorInfo) :  m_clustersAssigned({true, true}), m_vxdID(pxdCluster->getSensorID())
 {
   //We need some handle to translate IDs to local and global coordinates.
   //aSensorInfo exists only for testing purposes, so this is the relevant case!
@@ -48,7 +47,7 @@ SpacePoint::SpacePoint(const PXDCluster* pxdCluster,
   }
 
   // the second parameter set to true results in alignment constants being applied
-  m_position = aSensorInfo->pointToGlobal(TVector3(pxdCluster->getU(), pxdCluster->getV(), 0), true);
+  m_position = aSensorInfo->pointToGlobal(ROOT::Math::XYZVector(pxdCluster->getU(), pxdCluster->getV(), 0), true);
 
   setPositionError(pxdCluster->getUSigma(), pxdCluster->getVSigma(), aSensorInfo);
 
@@ -69,7 +68,7 @@ SpacePoint::SpacePoint(std::vector<const SVDCluster*>& clusters,
            || (clusters.size() == 2)));
 
   //No cluster pointer is a nullptr.
-  for (auto && cluster : clusters) {
+  for (auto&& cluster : clusters) {
     B2ASSERT("An SVDCluster Pointer is a nullptr!", cluster != nullptr);
   }
 
@@ -115,8 +114,8 @@ SpacePoint::SpacePoint(std::vector<const SVDCluster*>& clusters,
     uCoord = uCluster->getPosition(vCoord);
 
   // the second parameter set to true results in alignment constants being applied
-  m_position = aSensorInfo->pointToGlobal(TVector3(uCoord, vCoord, 0), true);
-  m_normalizedLocal = convertLocalToNormalizedCoordinates({ uCoord, vCoord } , m_vxdID, aSensorInfo);
+  m_position = aSensorInfo->pointToGlobal(ROOT::Math::XYZVector(uCoord, vCoord, 0), true);
+  m_normalizedLocal = convertLocalToNormalizedCoordinates({ uCoord, vCoord }, m_vxdID, aSensorInfo);
 
   // if sigma for a coordinate is not known, a uniform distribution over the whole sensor is asumed:
   if (uSigma < 0) {
@@ -138,10 +137,10 @@ SpacePoint::SpacePoint(std::vector<const SVDCluster*>& clusters,
 }
 
 
-vector< genfit::PlanarMeasurement > SpacePoint::getGenfitCompatible() const
+std::vector< genfit::PlanarMeasurement > SpacePoint::getGenfitCompatible() const
 {
   // XYRecoHit will be stored as their base-class, which is detector-independent.
-  vector< genfit::PlanarMeasurement > collectedMeasurements;
+  std::vector< genfit::PlanarMeasurement > collectedMeasurements;
 
 
   // get the related clusters to this spacePoint and create a genfit::PlanarMeasurement for each of them:
@@ -164,7 +163,7 @@ vector< genfit::PlanarMeasurement > SpacePoint::getGenfitCompatible() const
     B2FATAL("unknown detector type");
   }
 
-  B2DEBUG(50, "SpacePoint::getGenfitCompatible(): collected " << collectedMeasurements.size() << " meaturements");
+  B2DEBUG(20, "SpacePoint::getGenfitCompatible(): collected " << collectedMeasurements.size() << " meaturements");
 
   return collectedMeasurements;
 }
@@ -191,7 +190,7 @@ std::pair<double, double> SpacePoint::convertLocalToNormalizedCoordinates(
                                sensorSizeU; // indepedent of the trapezoidal sensor-issue by definition
   double normalizedVPosition = (hitLocal.second +  0.5 * sensorSizeV) / sensorSizeV;
 
-  boundaryEnforce(normalizedUPosition, normalizedVPosition, 0, 1 , 0, vxdID);
+  boundaryEnforce(normalizedUPosition, normalizedVPosition, 0, 1, 0, vxdID);
   boundaryEnforce(normalizedVPosition, normalizedUPosition, 0, 1, 1, vxdID);
 
   return { normalizedUPosition, normalizedVPosition };
@@ -234,5 +233,5 @@ B2Vector3<double> SpacePoint::getGlobalCoordinates(std::pair<double, double> con
   }
 
   // the second parameter set to true results in alignment constants being applied
-  return aSensorInfo->pointToGlobal(TVector3(hitLocal.first, hitLocal.second, 0), true);
+  return aSensorInfo->pointToGlobal(ROOT::Math::XYZVector(hitLocal.first, hitLocal.second, 0), true);
 }

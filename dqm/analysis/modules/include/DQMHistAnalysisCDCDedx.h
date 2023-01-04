@@ -22,7 +22,7 @@
 #include "TH1.h"
 #include "TH2D.h"
 
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 
 namespace Belle2 {
 
@@ -81,7 +81,7 @@ namespace Belle2 {
     /**
     * funtion to draw dEdx+Fit
     */
-    void drawDedx();
+    void drawDedxPR();
 
     /**
     * funtion to draw dEdx+Fit for run variation
@@ -147,13 +147,7 @@ namespace Belle2 {
 
     //DQM analysis and Mirabelle
     TCanvas* c_pr_dedx = nullptr; /**< dedx dist+fit */
-    TCanvas* c_pr_dedxphi = nullptr; /**< dedx vs phi  */
-    TCanvas* c_pr_dedxcos = nullptr; /**< dedx vs costh  */
-    TCanvas* c_pr_bands = nullptr; /**< dedx band plot */
-    TCanvas* c_pr_wires = nullptr; /**< dead wire status */
     TCanvas* c_ir_dedx = nullptr; /**< intra-run dedx status */
-    TCanvas* c_ir_mean = nullptr; /**< intra-run dedx mean */
-    TCanvas* c_ir_reso = nullptr; /**< intra-run dedx sigma */
 
     TF1* f_gaus = nullptr; /**< fit function */
     TLine* l_line = nullptr; /**< line for dedx mean */

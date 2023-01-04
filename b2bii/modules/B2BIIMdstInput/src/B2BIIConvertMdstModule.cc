@@ -19,6 +19,7 @@
 // Belle II utilities
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
+#include <framework/geometry/B2Vector3.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
 
 // Belle II dataobjects
@@ -874,9 +875,7 @@ void B2BIIConvertMdstModule::convertGenHepEvtTable()
     // Select particles without mother.
     if (!(hep.moFirst() == 0 && hep.moLast() == 0))
       continue;
-    // Ignore particles with code 911, they are used for CDC data.
-    if (hep.idhep() == 911)
-      continue;
+
     int position = m_particleGraph.size();
     m_particleGraph.addParticle();
     genHepevtToMCParticle[hep.get_ID()] = position;
@@ -902,8 +901,8 @@ void B2BIIConvertMdstModule::convertGenHepEvtTable()
     MCParticleGraph::GraphParticle* currMother = currFamily.first;
     Belle::Gen_hepevt& currDaughter = currFamily.second;
 
-    // Skip particles with idhep = 0 or 911 (CDC data).
-    if (currDaughter.idhep() == 0 || currDaughter.idhep() == 911)
+    // Skip particles with idhep = 0.
+    if (currDaughter.idhep() == 0)
       continue;
 
     //putting the daughter in the graph:
@@ -2147,8 +2146,8 @@ TrackFitResult B2BIIConvertMdstModule::createTrackFitResult(const CLHEP::HepLore
                                                             const uint32_t hitPatternVXDInitializer,
                                                             const uint16_t ndf)
 {
-  TVector3 pos(position.x(),  position.y(),  position.z());
-  TVector3 mom(momentum.px(), momentum.py(), momentum.pz());
+  ROOT::Math::XYZVector pos(position.x(),  position.y(),  position.z());
+  ROOT::Math::XYZVector mom(momentum.px(), momentum.py(), momentum.pz());
 
   TMatrixDSym errMatrix(6);
   for (unsigned i = 0; i < 7; i++) {

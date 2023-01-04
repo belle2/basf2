@@ -36,7 +36,7 @@ using namespace ECL;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(eclMuMuECollector)
+REG_MODULE(eclMuMuECollector);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -276,7 +276,7 @@ void eclMuMuECollectorModule::collect()
   int extCrysID[2] = { -1, -1};
   Const::EDetector eclID = Const::EDetector::ECL;
   for (int imu = 0; imu < 2; imu++) {
-    TVector3 temppos[2] = {};
+    ROOT::Math::XYZVector temppos[2] = {};
     int IDEnter = -99;
     for (auto& extHit : m_trackArray[iTrack[imu]]->getRelationsTo<ExtHit>()) {
       int pdgCode = extHit.getPdgCode();
@@ -294,7 +294,7 @@ void eclMuMuECollectorModule::collect()
         temppos[1] = extHit.getPosition();
 
         /** Keep track of this crystal if the track length is long enough. Note that if minTrackLength is less than half the crystal length, we will keep only the first extrapolation due to break */
-        double trackLength = (temppos[1] - temppos[0]).Mag();
+        double trackLength = (temppos[1] - temppos[0]).R();
         if (trackLength > m_minTrackLength) {extCrysID[imu] = temp0;}
         break;
       }

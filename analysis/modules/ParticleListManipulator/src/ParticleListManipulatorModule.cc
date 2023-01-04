@@ -98,6 +98,10 @@ void ParticleListManipulatorModule::initialize()
             " but the label " << listLabel << " is not allowed for merged or copied particle lists.");
   }
 
+  if (listLabel == "V0" and
+      (("K_S0:mdst" == m_inputListNames[0]) or ("Lambda0:mdst" == m_inputListNames[0]) or ("gamma:v0mdst" == m_inputListNames[0])))
+    m_exceptionForV0B2BII = true;
+
   m_outputAntiListName = ParticleListName::antiParticleListName(m_outputListName);
   m_isSelfConjugatedParticle = (m_outputListName == m_outputAntiListName);
 
@@ -161,6 +165,9 @@ void ParticleListManipulatorModule::event()
     }
   }
 
+  if (m_exceptionForV0B2BII)
+    m_particleList->setEditable(true);
+
   // create list of candidate indices and corresponding sorting values
   typedef std::pair<double, unsigned int> ValueIndexPair;
   std::vector<ValueIndexPair> valueToIndex;
@@ -213,6 +220,10 @@ void ParticleListManipulatorModule::event()
       m_particlesInTheList.push_back(idSeq);
     }
   }
+
+  if (m_exceptionForV0B2BII)
+    m_particleList->setEditable(false);
+
 }
 
 void ParticleListManipulatorModule::fillUniqueIdentifier(const Particle* p, std::vector<int>& idSequence, bool ignoreMotherFlavor)

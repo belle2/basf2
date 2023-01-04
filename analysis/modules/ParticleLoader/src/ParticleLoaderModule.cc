@@ -460,6 +460,8 @@ void ParticleLoaderModule::v0sToParticles()
       antiPlist->bindAntiParticleList(*(plist));
     }
 
+    plist->setEditable(true); // :V0 list is originally reserved. we have to set it as editable.
+
     // load reconstructed V0s as Kshorts (pi-pi+ combination), Lambdas (p+pi- combinations), and converted photons (e-e+ combinations)
     for (int i = 0; i < m_v0s.getEntries(); i++) {
       const V0* v0 = m_v0s[i];
@@ -561,6 +563,8 @@ void ParticleLoaderModule::v0sToParticles()
       Particle* newPart = m_particles.appendNew(v0P);
       plist->addParticle(newPart);
     }
+
+    plist->setEditable(false); // set the :V0 list as not editable.
   }
 }
 
@@ -593,6 +597,8 @@ void ParticleLoaderModule::tracksToParticles()
 
       antiPlist->bindAntiParticleList(*(plist));
     }
+
+    plist->setEditable(true); // :all list is originally reserved. we have to set it as editable.
 
     // the inner loop over all tracks from which Particles
     // are created, and get sorted in the particle lists
@@ -644,6 +650,8 @@ void ParticleLoaderModule::tracksToParticles()
 
       } // sanity check correct particle type
     } // loop over tracks
+
+    plist->setEditable(false); // set the :all list as not editable.
   } // particle lists
 }
 
@@ -675,6 +683,8 @@ void ParticleLoaderModule::eclAndKLMClustersToParticles()
 
       antiPlist->bindAntiParticleList(*(plist));
     }
+
+    plist->setEditable(true); // :all list is originally reserved. we have to set it as editable.
 
     // load reconstructed neutral ECL clusters as photons or Klongs or neutrons
     for (int i = 0; i < m_eclclusters.getEntries(); i++) {
@@ -777,6 +787,8 @@ void ParticleLoaderModule::eclAndKLMClustersToParticles()
       // add particle to list
       plist->addParticle(newPart);
     }
+
+    plist->setEditable(false); // set the :all list as not editable.
   } // loop over particle lists
 }
 
@@ -808,6 +820,8 @@ void ParticleLoaderModule::mcParticlesToParticles()
       antiPlist->bindAntiParticleList(*(plist));
     }
 
+    plist->setEditable(true); // :MC list is originally reserved. we have to set it as editable.
+
     for (int i = 0; i < m_mcparticles.getEntries(); i++) {
       const MCParticle* mcParticle = m_mcparticles[i];
 
@@ -826,6 +840,8 @@ void ParticleLoaderModule::mcParticlesToParticles()
 
       plist->addParticle(newPart);
     }
+
+    plist->setEditable(false); // set the :MC list as not editable.
   }
 }
 

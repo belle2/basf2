@@ -132,19 +132,6 @@ namespace Belle2::SVD {
      */
     void setStripTime(int index, double time) {m_strips.at(index).time = time;}
 
-    /** Get slope-type of shaper digits.
-     * @return slopeType
-     */
-    float getSlopeType() const { return m_slopeType; }
-
-    /** Set slope-type of shaper digits.
-     *
-     */
-    void setSlopeType(const float& slope)
-    {
-      m_slopeType = slope > 0 ? 1. : -1.;
-    }
-
   protected:
 
     /** VxdID of the cluster */
@@ -177,8 +164,6 @@ namespace Belle2::SVD {
     /** Name of the collection to use for the SVDShaperDigits */
     std::string m_storeShaperDigitsName;
 
-    /**< slope of shaper digits */
-    float m_slopeType = 0;
   };
 
 }

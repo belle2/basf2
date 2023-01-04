@@ -32,12 +32,10 @@ def add_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False, 
         nameTrackingInfoModule = "RegisterEventLevelTrackingInfo__ROI"
         nameEventTrackingInfo = "EventLevelTrackingInfo__ROI"
         nameSVDTrackingEventLevelMdstInfoFiller = "SVDTrackingEventLevelMdstInfoFiller__ROI"
-        nameSVDShaperDigitsSlope = "SVDShaperDigitsSlope__ROI"
     else:
         nameTrackingInfoModule = "RegisterEventLevelTrackingInfo"
         nameEventTrackingInfo = "EventLevelTrackingInfo"
         nameSVDTrackingEventLevelMdstInfoFiller = "SVDTrackingEventLevelMdstInfoFiller"
-        nameSVDShaperDigitsSlope = "SVDShaperDigitsSlope"
 
     if nameTrackingInfoModule not in path:
         registerEventlevelTrackingInfo = b2.register_module('RegisterEventLevelTrackingInfo')
@@ -45,15 +43,9 @@ def add_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False, 
         registerEventlevelTrackingInfo.param('EventLevelTrackingInfoName', nameEventTrackingInfo)
         path.add_module(registerEventlevelTrackingInfo)
 
-    if nameSVDShaperDigitsSlope not in [e.name() for e in path.modules()]:
-        svdShaperDigitsSlope = b2.register_module('SVDShaperDigitsSlope')
-        svdShaperDigitsSlope.set_name(nameSVDShaperDigitsSlope)
-        path.add_module(svdShaperDigitsSlope)
-
     if(isROIsimulation):
         clusterizerName = '__ROISVDClusterizer'
         timeGroupComposerName = '__ROISVDTimeGroupComposer'
-        # shaperDigitsGroupingName = '__ROISVDShaperDigitsGrouping'
         recocreatorName = '__ROISVDRecoDigitCreator'
         dataFormatName = '__ROISVDDataFormat'
         # recoDigitsName = '__ROIsvdRecoDigits'
@@ -63,7 +55,6 @@ def add_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False, 
     else:
         clusterizerName = 'SVDClusterizer'
         timeGroupComposerName = 'SVDTimeGroupComposer'
-        # shaperDigitsGroupingName = 'SVDShaperDigitsGrouping'
         recocreatorName = 'SVDRecoDigitCreator'
         dataFormatName = 'SVDDataFormat'
         # recoDigitsName = ""
@@ -127,7 +118,7 @@ def add_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False, 
         svdTimeGroupComposer.param('gausFill', True)
         svdTimeGroupComposer.param('fillSigmaN', 3.)
         svdTimeGroupComposer.param('calSigmaN', 5.)
-        svdTimeGroupComposer.param('accSigmaN', 2.)
+        svdTimeGroupComposer.param('accSigmaN', 3.)
         svdTimeGroupComposer.param('fracThreshold', 0.05)
         svdTimeGroupComposer.param('minSigma', 1.)
         svdTimeGroupComposer.param('maxSigma', 15.)
@@ -187,12 +178,10 @@ def add_rel5_svd_reconstruction(path, isROIsimulation=False, applyMasking=False)
         nameTrackingInfoModule = "RegisterEventLevelTrackingInfo__ROI"
         nameEventTrackingInfo = "EventLevelTrackingInfo__ROI"
         nameSVDTrackingEventLevelMdstInfoFiller = "SVDTrackingEventLevelMdstInfoFiller__ROI"
-        nameSVDShaperDigitsSlope = "SVDShaperDigitsSlope__ROI"
     else:
         nameTrackingInfoModule = "RegisterEventLevelTrackingInfo"
         nameEventTrackingInfo = "EventLevelTrackingInfo"
         nameSVDTrackingEventLevelMdstInfoFiller = "SVDTrackingEventLevelMdstInfoFiller"
-        nameSVDShaperDigitsSlope = "SVDShaperDigitsSlope"
 
     if nameTrackingInfoModule not in path:
         registerEventlevelTrackingInfo = b2.register_module('RegisterEventLevelTrackingInfo')
@@ -200,16 +189,10 @@ def add_rel5_svd_reconstruction(path, isROIsimulation=False, applyMasking=False)
         registerEventlevelTrackingInfo.param('EventLevelTrackingInfoName', nameEventTrackingInfo)
         path.add_module(registerEventlevelTrackingInfo)
 
-    if nameSVDShaperDigitsSlope not in [e.name() for e in path.modules()]:
-        svdShaperDigitsSlope = b2.register_module('SVDShaperDigitsSlope')
-        svdShaperDigitsSlope.set_name(nameSVDShaperDigitsSlope)
-        path.add_module(svdShaperDigitsSlope)
-
     if(isROIsimulation):
         fitterName = '__ROISVDCoGTimeEstimator'
         clusterizerName = '__ROISVDSimpleClusterizer'
         timeGroupComposerName = '__ROISVDTimeGroupComposer'
-        # shaperDigitsGroupingName = '__ROISVDShaperDigitsGrouping'
         dataFormatName = '__ROISVDDataFormat'
         clusterName = '__ROIsvdClusters'
         recoDigitsName = '__ROIsvdRecoDigits'
@@ -219,7 +202,6 @@ def add_rel5_svd_reconstruction(path, isROIsimulation=False, applyMasking=False)
         fitterName = 'SVDCoGTimeEstimator'
         clusterizerName = 'SVDSimpleClusterizer'
         timeGroupComposerName = 'SVDTimeGroupComposer'
-        # shaperDigitsGroupingName = 'SVDShaperDigitsGrouping'
         dataFormatName = 'SVDDataFormat'
         clusterName = ""
         recoDigitsName = ""
@@ -288,7 +270,7 @@ def add_rel5_svd_reconstruction(path, isROIsimulation=False, applyMasking=False)
         svdTimeGroupComposer.param('gausFill', True)
         svdTimeGroupComposer.param('fillSigmaN', 3.)
         svdTimeGroupComposer.param('calSigmaN', 5.)
-        svdTimeGroupComposer.param('accSigmaN', 2.)
+        svdTimeGroupComposer.param('accSigmaN', 3.)
         svdTimeGroupComposer.param('fracThreshold', 0.05)
         svdTimeGroupComposer.param('minSigma', 1.)
         svdTimeGroupComposer.param('maxSigma', 15.)

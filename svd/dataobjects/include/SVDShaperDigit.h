@@ -281,18 +281,6 @@ namespace Belle2 {
       s_APVSampleBegin = firstSample;
     }
 
-    /** Get slope of shaper digits.
-     * @return slope
-     */
-    float getSlope() const { return m_slope; }
-
-    /** Set slope of shaper digits.
-     *
-     */
-    void setSlope(const float& slope)
-    {
-      m_slope = slope;
-    }
 
   private:
 
@@ -305,9 +293,7 @@ namespace Belle2 {
     static size_t s_APVSampleMode; /**< APV acquisition mode (3 or 6) */
     static size_t s_APVSampleBegin; /**< first sample number for 3 sample acquisition mode (0 - 3) */
 
-    float m_slope = 0;  /**< slope of shaper digits */
-
-    ClassDefOverride(SVDShaperDigit, 6)
+    ClassDefOverride(SVDShaperDigit, 5)
 
   }; // class SVDShaperDigit
 

@@ -134,11 +134,6 @@ if args.is3sample:
     main.add_module(zsonline)
 
 
-# #  SVDShaperDigitsGrouping
-# svdShaperDigitsGrouping = b2.register_module('SVDShaperDigitsGrouping')
-# main.add_module(svdShaperDigitsGrouping)
-
-
 # #  SVDTimeGroupComposer
 # main.add_module('SVDClusterizer')
 # svdTimeGroupComposer = b2.register_module('SVDTimeGroupComposer')

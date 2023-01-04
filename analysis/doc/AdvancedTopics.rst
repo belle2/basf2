@@ -22,3 +22,5 @@ Advanced Topics
 .. toctree:: KsSelector
 
 .. toctree:: PIDCalibrationWeights
+
+.. toctree:: embedding

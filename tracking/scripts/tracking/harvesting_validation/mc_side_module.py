@@ -97,7 +97,7 @@ class MCSideTrackingValidationModule(harvesting.HarvestingModule):
 
                 found_det_hit_ids |= det_hit_ids
 
-                if track_match_look_up.isAnyChargedMatchedPRRecoTrack(reco_track):
+                if track_match_look_up.isAnyChargeMatchedPRRecoTrack(reco_track):
                     matched_det_hit_ids |= det_hit_ids
 
                 if track_match_look_up.isAnyChargeClonePRRecoTrack(reco_track):

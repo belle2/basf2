@@ -70,6 +70,8 @@ namespace Belle2 {
       if (m_mvaPayload->isValid()) {
         m_identifier = (*m_mvaPayload)->getIdentifierName();
         m_cutValue = (*m_mvaPayload)->getCutValue();
+        B2DEBUG(20,
+                "MVAFilter: Using DBObject " << m_DBPayloadName << " with weightfile " << m_identifier << " and cut value " << m_cutValue << ".");
       }
 
       std::vector<Named<Float_t*>> namedVariables = Super::getVarSet().getNamedVariables();

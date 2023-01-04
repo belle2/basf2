@@ -211,18 +211,18 @@ void SVDTimeGroupComposerModule::event()
     currentHisto = !currentHisto;
   } // if(m_applyCentralLimit) {
 
-  std::vector<std::tuple<double, double, int>> groupInfo; // start, end, totCls
   if (!m_gausFill) {
 
     /** finalized the groups */
     int groupBegin = -1; int groupEnd = -1;
+    std::vector<std::tuple<double, double, double>> groupInfo; // start, end, totCls
     for (int ij = 1; ij <= xbin; ij++) {
       double sum = h_clsTime[currentHisto].GetBinContent(ij);
       // finding group
       if (sum > 0 && groupBegin < 0 && groupEnd < 0) { groupBegin = ij;}
       if ((sum <= 0 || ij == xbin) && groupBegin > 0 && groupEnd < 0) {
         groupEnd = ij - 1;
-        int clsInGroup = h_clsTime[currentHisto].Integral(groupBegin, groupEnd);
+        double clsInGroup = h_clsTime[currentHisto].Integral(groupBegin, groupEnd);
         double beginPos = h_clsTime[currentHisto].GetXaxis()->GetBinLowEdge(groupBegin);
         double endPos   = h_clsTime[currentHisto].GetXaxis()->GetBinLowEdge(groupEnd) +
                           h_clsTime[currentHisto].GetXaxis()->GetBinWidth(groupEnd);
@@ -305,6 +305,7 @@ void SVDTimeGroupComposerModule::event()
 
   } else {      // if (!m_gausFill) {
 
+    std::vector<std::tuple<double, double, double>> groupInfo; // pars
     double maxval = 0;
     while (1) {
 
@@ -314,14 +315,14 @@ void SVDTimeGroupComposerModule::event()
       if (maxval == 0) maxval = maxBinCnt;
       if (maxBinCnt < maxval * m_fracThreshold) break;
 
-      TF1* ngaus = new TF1("ngaus", mygaus, m_tRangeLow, m_tRangeHigh, 3);
+      TF1 ngaus("ngaus", mygaus, m_tRangeLow, m_tRangeHigh, 3);
       double maxPar0 = maxBinCnt * std::sqrt(2.*TMath::Pi()) * m_timeSpread;
-      ngaus->SetParameter(0, maxBinCnt); ngaus->SetParLimits(0, maxPar0 * 0.01, maxPar0 * 2.);
-      ngaus->SetParameter(1, maxBinPos); ngaus->SetParLimits(1, maxBinPos - m_timeSpread * 0.2, maxBinPos + m_timeSpread * 0.2);
-      ngaus->SetParameter(2, m_timeSpread); ngaus->SetParLimits(2, m_minSigma, m_maxSigma);
+      ngaus.SetParameter(0, maxBinCnt); ngaus.SetParLimits(0, maxPar0 * 0.01, maxPar0 * 2.);
+      ngaus.SetParameter(1, maxBinPos); ngaus.SetParLimits(1, maxBinPos - m_timeSpread * 0.2, maxBinPos + m_timeSpread * 0.2);
+      ngaus.SetParameter(2, m_timeSpread); ngaus.SetParLimits(2, m_minSigma, m_maxSigma);
       int status = h_clsTime[currentHisto].Fit("ngaus", "NQ0", "", maxBinPos - m_timeSpread, maxBinPos + m_timeSpread);
       if (!status) {
-        double pars[3] = {ngaus->GetParameter(0), ngaus->GetParameter(1), std::fabs(ngaus->GetParameter(2))};
+        double pars[3] = {ngaus.GetParameter(0), ngaus.GetParameter(1), std::fabs(ngaus.GetParameter(2))};
         if (pars[2] <= m_minSigma + 0.01) break;
         if (pars[2] >= m_maxSigma - 0.01) break;
         if (pars[0] < maxval * std::sqrt(2.*TMath::Pi()) * pars[2] * m_fracThreshold) break;
@@ -333,17 +334,15 @@ void SVDTimeGroupComposerModule::event()
         if (endBin > xbin)  endBin = xbin;
         for (int ijx = startBin; ijx <= endBin; ijx++) {
           float tbinc = h_clsTime[currentHisto].GetBinCenter(ijx);
-          float tbincontent = h_clsTime[currentHisto].GetBinContent(ijx) - ngaus->Eval(tbinc);
+          float tbincontent = h_clsTime[currentHisto].GetBinContent(ijx) - ngaus.Eval(tbinc);
           h_clsTime[currentHisto].SetBinContent(ijx, tbincontent);
         }
 
 
         // print
-        double beginPos = pars[1] - m_accSigmaN * pars[2];
-        double   endPos = pars[1] + m_accSigmaN * pars[2];
-        if (beginPos < m_tRangeLow) beginPos = m_tRangeLow;
-        if (endPos > m_tRangeHigh)  endPos   = m_tRangeHigh;
-        groupInfo.push_back(std::make_tuple(beginPos, endPos, 1));
+        groupInfo.push_back(std::make_tuple(pars[0], pars[1], pars[2]));
+        B2DEBUG(1, " group " << int(groupInfo.size())
+                << " pars[0] " << pars[0] << " pars[1] " << pars[1] << " pars[2] " << pars[2]);
         if (int(groupInfo.size()) >= m_maxGroups) break;
       } else break;   // if(!status) {
 
@@ -351,8 +350,11 @@ void SVDTimeGroupComposerModule::event()
 
     int totGroups = int(groupInfo.size());
     for (int ij = 0; ij < totGroups; ij++) {
-      auto beginPos = std::get<0>(groupInfo[ij]);
-      auto endPos   = std::get<1>(groupInfo[ij]);
+      double pars[3] = {std::get<0>(groupInfo[ij]), std::get<1>(groupInfo[ij]), std::get<2>(groupInfo[ij])};
+      double beginPos = pars[1] - m_accSigmaN * pars[2];
+      double   endPos = pars[1] + m_accSigmaN * pars[2];
+      if (beginPos < m_tRangeLow) beginPos = m_tRangeLow;
+      if (endPos > m_tRangeHigh)  endPos   = m_tRangeHigh;
       B2DEBUG(1, " group " << ij
               << " beginPos " << beginPos << " endPos " << endPos);
       for (int jk = 0; jk < totClusters; jk++) {

@@ -393,6 +393,6 @@ easily get all the relevant information: :ref:`b2help-particles`.
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Author of this lesson
+.. rubric:: Author of this lesson
 
-   Giacomo "the goat" De Pietro
+Giacomo "the goat" De Pietro

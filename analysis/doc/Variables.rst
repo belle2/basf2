@@ -1,7 +1,20 @@
+.. _analysis_variables:
+
+Variables
+=========
+
+While ``basf2`` operates on `ParticleList <https://software.belle2.org/|release|/classBelle2_1_1ParticleList.html>`_ s, it is also important to calculate physics quantities associated with a given candidate or event.
+
+In ``basf2`` analysis, variables are handled by the `VariableManager`.
+There are many variables available for use in analysis.
+Probably the most obvious, and useful are: :b2:var:`p`, :b2:var:`E`, :b2:var:`Mbc`, and :b2:var:`deltaE`.
+
+You can search the variables in an alphabetical :ref:`b2-varindex`, or browse :ref:`variablesByGroup`.
+
 .. _analysis_variablemanager_class:
 
 VariableManager
-===============
+---------------
 
 The VariableManager handles all variables in ``basf2`` analysis.
 It is implemented as a `singleton <https://en.wikipedia.org/wiki/Singleton_pattern>`_
@@ -106,7 +119,7 @@ The C++ documentation is `here <https://software.belle2.org/development/classBel
 .. _variablesByGroup:
 
 Variables by group
-==================
+------------------
 
 Here is a categorised list of variables known to ``basf2``.
 You can also look at the alphabetical index: :ref:`b2-varindex`.
@@ -516,7 +529,7 @@ New variables seem to be found to address this problem.
    :group: FEIVariables
 
 Collections and Lists
-=====================
+---------------------
 
 To avoid very long lists of variable names in `variablesToNtuple <modularAnalysis.variablesToNtuple>`,
 it is possible to use collections of variables or lists of variables instead.
@@ -549,7 +562,7 @@ For each predefined list, there is a collection with the same name:
 
 
 Operations with variable lists
-==============================
+------------------------------
 
 It is possible to create new variable lists using meta-variables.  For example,
 one can define list of kinematic variables in LAB frame and create another
@@ -579,7 +592,7 @@ to help to easily create aliases.
 .. autofunction:: variables.utils.create_isSignal_alias
 
 Miscellaneous helpers for using variables
-=========================================
+-----------------------------------------
 
 .. autofunction:: variables.getAllTrgNames
 .. autofunction:: variables.std_vector
@@ -587,7 +600,7 @@ Miscellaneous helpers for using variables
 
 
 Writing your own variable
-=========================
+-------------------------
 
 The code of VariableManager lives inside the analysis package. If you want to write your own variables you have a couple of options. You can (and should) try to make your variables general, so that they are useful for many collaborators. In this case, we recommend you make a pull request. Then your variables will be made available in a central release to many people.
 

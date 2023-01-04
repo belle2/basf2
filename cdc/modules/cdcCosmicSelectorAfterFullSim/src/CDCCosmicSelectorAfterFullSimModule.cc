@@ -185,8 +185,8 @@ void CDCCosmicSelectorAfterFullSimModule::event()
     if (ihit_up < 0 || ihit_dn < 0) continue;
     const B2Vector3D pos_up = m_simHits[ihit_up]->getPosTrack();
     const B2Vector3D pos_dn = m_simHits[ihit_dn]->getPosTrack();
-    const B2Vector3D mom_up = m_simHits[ihit_up]->getMomentum();
-    const B2Vector3D mom_dn = m_simHits[ihit_dn]->getMomentum();
+    // const B2Vector3D mom_up = m_simHits[ihit_up]->getMomentum();
+    // const B2Vector3D mom_dn = m_simHits[ihit_dn]->getMomentum();
     if (tof_up > tof_dn) B2WARNING("tof_up > tof_dn " << tof_up << " " << tof_dn);
     //    std::cout <<"tof_up,dn= " << tof_up <<" "<< tof_dn << std::endl;
 

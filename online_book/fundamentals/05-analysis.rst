@@ -10,13 +10,13 @@ Analysis
 
     **Prerequisites**:
 
-        * :ref:`Fundamentals Introduction <onlinebook_fundamentals_introduction>`
-        * :ref:`Fundamentals of Data Processing <onlinebook_fundamentals_datataking>`
+    * :ref:`Fundamentals Introduction <onlinebook_fundamentals_introduction>`
+    * :ref:`Fundamentals of Data Processing <onlinebook_fundamentals_datataking>`
 
     **Objectives**:
 
-        * The concept of Skimming
-        * Reconstructed and Combined particles
+    * The concept of Skimming
+    * Reconstructed and Combined particles
 
 
 The Skimming
@@ -176,10 +176,10 @@ V0
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Author(s) of this lesson
+.. rubric:: Author(s) of this lesson
 
-    Umberto Tamponi,
-    Martin Ritter,
-    Oskar Hartbrich,
-    Michael Eliachevitch,
-    Sam Cunliffe
+Umberto Tamponi,
+Martin Ritter,
+Oskar Hartbrich,
+Michael Eliachevitch,
+Sam Cunliffe

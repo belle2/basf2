@@ -11,5 +11,6 @@
 
 // Tracking MVAFilter payloads
 #pragma link C++ class Belle2::BaseTrackingMVAFilterPayload+; // checksum=0xa8a5567a, version=1
+#pragma link C++ class Belle2::TrackQualityEstimatorPayload+; // checksum=0x7a64d7f6, version=1
 
 #endif

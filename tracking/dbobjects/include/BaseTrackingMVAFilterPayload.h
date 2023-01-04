@@ -17,8 +17,6 @@ namespace Belle2 {
     /** Default constructor */
     BaseTrackingMVAFilterPayload() : m_cutValue(-1.), m_weightFileIdentifier("") {}
 
-    //    cout << "BaseMVAPayloadParameters.h 0 " << endl;
-
     /** Destructor */
     ~BaseTrackingMVAFilterPayload() {}
 

@@ -87,6 +87,7 @@ def add_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False, 
         clusterizer.set_name(clusterizerName)
         clusterizer.param('ShaperDigits', shaperDigitsName)
         clusterizer.param('Clusters', clustersName)
+        # clusterizer.param('returnClusterRawTime', True)
         path.add_module(clusterizer)
 
     if missingAPVsClusterCreatorName not in [e.name() for e in path.modules()]:
@@ -238,6 +239,7 @@ def add_rel5_svd_reconstruction(path, isROIsimulation=False, applyMasking=False)
         clusterizer.set_name(clusterizerName)
         clusterizer.param('RecoDigits', recoDigitsName)
         clusterizer.param('Clusters', clusterName)
+        # clusterizer.param('returnClusterRawTime', True)
         clusterizer.param('useDB', True)
         path.add_module(clusterizer)
 

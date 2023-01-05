@@ -306,14 +306,15 @@ void SVDTimeGroupComposerModule::event()
   } else {      // if (!m_gausFill) {
 
     std::vector<std::tuple<double, double, double>> groupInfo; // pars
-    double maxval = 0;
+    double maxPeak = 0;
+    double maxNorm = 0;
     while (1) {
 
       int maxBin       = h_clsTime[currentHisto].GetMaximumBin();
       double maxBinPos = h_clsTime[currentHisto].GetBinCenter(maxBin);
       double maxBinCnt = h_clsTime[currentHisto].GetBinContent(maxBin);
-      if (maxval == 0) maxval = maxBinCnt;
-      if (maxBinCnt < maxval * m_fracThreshold) break;
+      if (maxPeak == 0) maxPeak = maxBinCnt;
+      if (maxBinCnt < maxPeak * m_fracThreshold) break;
 
       TF1 ngaus("ngaus", mygaus, m_tRangeLow, m_tRangeHigh, 3);
       double maxPar0 = maxBinCnt * std::sqrt(2.*TMath::Pi()) * m_timeSpread;
@@ -325,7 +326,8 @@ void SVDTimeGroupComposerModule::event()
         double pars[3] = {ngaus.GetParameter(0), ngaus.GetParameter(1), std::fabs(ngaus.GetParameter(2))};
         if (pars[2] <= m_minSigma + 0.01) break;
         if (pars[2] >= m_maxSigma - 0.01) break;
-        if (pars[0] < maxval * std::sqrt(2.*TMath::Pi()) * pars[2] * m_fracThreshold) break;
+        if (maxNorm == 0) maxNorm = pars[0];
+        if (pars[0] < maxNorm * m_fracThreshold) break;
         // std::cout<<pars[0]<<"\t"<<pars[1]<<"\t"<<pars[2]<<std::endl;
 
         int startBin = h_clsTime[currentHisto].FindBin(pars[1] - m_calSigmaN * pars[2]);

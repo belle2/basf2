@@ -421,15 +421,15 @@ using the total energy deposited by the ``MCParticle`` in each ``ECLCalDigit``. 
    Schematic diagram showing the weighted relations between ECL reconstruction objects and simulated particles.  
 
 The overall weight for the relation between an ``ECLCluster`` object and a ``MCParticle`` is then given by the product of the weight between the corresponding ``ECLShower`` and ``ECLCalDigit`` and the weight 
-between the ``ECLCalDigit`` and ``MCParticle``. For example, the weight of the relation between the first ``ECLCluster`` in :numref:`photon_matching` and MCParticle :math:`\gamma_2` is given by :math:`1.0\times 0.23=0.23` GeV.   
+between the ``ECLCalDigit`` and ``MCParticle``. For example, the weight of the relation between the first ``ECLCluster`` in :numref:`photon_matching` and MCParticle :math:`\gamma_2` is given by :math:`1.0\times 0.8=0.8` GeV.   
 
-An ``ECLCluster`` that is not matched to any track is reconstructed as a photon ``Particle``, and relations between the photon ``Particle`` and ``MCParticles`` is only set at the user-analysis level if the following conditions 
+An ``ECLCluster`` that is not matched to any track is reconstructed as a photon ``Particle``, and relations between the photon ``Particle`` and ``MCParticles`` are only set at the user-analysis level if the following conditions 
 are met:
 
 1) :math:`\mathrm{weight}/{E_\mathrm{rec}} > 0.2` GeV
 2) :math:`\mathrm{weight}/{E_\mathrm{true}} > 0.3` GeV
 
-where the *weight* here refers to the relation with the largest weight. This means that if multiple relations between a given ``Particle`` and ``MCParticles`` exists, only the relation with the largest weight will be used, and the 
+where the *weight* here refers to the relation with the largest weight. This means that if multiple relations between a given ``Particle`` and ``MCParticles`` exist, only the relation with the largest weight will be used, and the 
 corresponding ``MCParticle`` with this relation will be used to decide the photon matching. 
 
 A photon match is made if `mcErrors` == 0 and the ``MCParticle`` has a `mcPDG` == 22. If the chosen ``MCParticle`` does not correspond to a true photon, then the `mcErrors` :math:`\neq` 0 and no correct match will be made (even if 

@@ -47,10 +47,10 @@ namespace Belle2 {
     std::string m_OverlayPath = "";
 
     //! Module functions to be called from main process
-    void initialize() override;
+    void initialize() override final;
 
     //! Module functions to be called from event process
-    void event() override;
+    void event() override final;
 
   };
 } // end namespace Belle2

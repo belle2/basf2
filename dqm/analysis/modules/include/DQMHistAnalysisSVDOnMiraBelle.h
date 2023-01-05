@@ -29,15 +29,15 @@ namespace Belle2 {
     /** Destructor */
     ~DQMHistAnalysisSVDOnMiraBelleModule();
     /** Module function initialize */
-    void initialize() override;
+    void initialize() override final;
     /** Module function beginRun */
-    void beginRun() override;
+    void beginRun() override final;
     /** Module function event */
-    void event() override;
+    void event() override final;
     /** Module function endRun */
-    void endRun() override;
+    void endRun() override final;
     /** Module function terminate */
-    void terminate() override;
+    void terminate() override final;
 
   private:
 

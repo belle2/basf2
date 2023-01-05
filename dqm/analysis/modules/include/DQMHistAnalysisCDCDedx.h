@@ -51,27 +51,27 @@ namespace Belle2 {
     /**
     * init function for default values
     */
-    void initialize() override;
+    void initialize() override final;
 
     /**
     * begin each run
     */
-    void beginRun() override;
+    void beginRun() override final;
 
     /**
     * event by event function
     */
-    void event() override;
+    void event() override final;
 
     /**
     * end of each run
     */
-    void endRun() override;
+    void endRun() override final;
 
     /**
     * terminating at the end of last run
     */
-    void terminate() override;
+    void terminate() override final;
 
     /**
     * funtion to get metadata from histogram

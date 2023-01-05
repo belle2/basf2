@@ -26,9 +26,9 @@ namespace Belle2 {
     ~DQMHistAnalysisTrackingHLTModule() {};
 
     /** Module function initialize */
-    void initialize() override;
+    void initialize() override final;
     /** Module function event */
-    void event() override;
+    void event() override final;
 
     // parameters
     bool m_printCanvas = false; /**< if true print the pdf of the canvases */

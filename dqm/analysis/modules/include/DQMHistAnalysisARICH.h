@@ -43,24 +43,24 @@ namespace Belle2 {
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */
-    void initialize() override;
+    void initialize() override final;
 
     /**
      * Event processor.
      */
-    void event() override;
+    void event() override final;
 
     /**
      * End-of-run action.
      * Save run-related stuff, such as statistics.
      */
-    void endRun() override;
+    void endRun() override final;
 
     /**
      * Termination action.
      * Clean-up, close files, summarize statistics, etc.
      */
-    void terminate() override;
+    void terminate() override final;
 
   protected:
     bool m_debug;/**<debug*/

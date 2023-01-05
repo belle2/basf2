@@ -33,18 +33,18 @@ namespace Belle2 {
     /**
      * Initialize the Module.
      */
-    void initialize() override;
+    void initialize() override final;
 
 
     /**
      * End-of-run action.
      */
-    void endRun() override;
+    void endRun() override final;
 
     /**
      * Termination action.
      */
-    void terminate() override;
+    void terminate() override final;
 
   protected:
 

@@ -39,15 +39,15 @@ namespace Belle2 {
     ~DQMHistAnalysisECLShapersModule();
 
     /** Initialize the module. */
-    void initialize() override;
+    void initialize() override final;
     /** Call when a run begins. */
-    void beginRun() override;
+    void beginRun() override final;
     /** Event processor. */
-    void event() override;
+    void event() override final;
     /** Call when a run ends. */
-    void endRun() override;
+    void endRun() override final;
     /** Terminate. */
-    void terminate() override;
+    void terminate() override final;
 
   private:
 

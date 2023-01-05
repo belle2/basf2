@@ -39,29 +39,29 @@ namespace Belle2 {
      * Initializer.
      * This method is called at the beginning of data processing.
      */
-    void initialize() override;
+    void initialize() override final;
 
     /**
      * Called when entering a new run.
      * Set run dependent things like run header parameters, alignment, etc.
      */
-    void beginRun() override;
+    void beginRun() override final;
 
     /**
      * This method is called for each event.
      */
-    void event() override;
+    void event() override final;
 
     /**
      * This method is called if the current run ends.
      * Save run-related stuff, such as statistics.
      */
-    void endRun() override;
+    void endRun() override final;
 
     /**
      * This method is called at the end of the event processing.
      */
-    void terminate() override;
+    void terminate() override final;
 
     //! Parameters accesible from basf2 scripts
   protected:

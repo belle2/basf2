@@ -94,9 +94,9 @@ namespace Belle2 {
     /** threshold level/line for outside fraction */
     int m_upperLineFull{};
 
-    //! Module list for mask
+    //! Module list for masking
     std::vector <std::string> m_parModuleList;
-    //! Double-gate list for mask
+    //! Gate list for masking
     std::vector <std::vector<int>> m_parGateList;
 
     //! Module wise gate masking in CM plot and alarm

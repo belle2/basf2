@@ -58,12 +58,11 @@ void MCTrackMergerModule::initialize()
   }
 }
 
-void MCTrackMergerModule::analyzeAndCleanTrackArray(
+void MCTrackMergerModule::analyzeTrackArray(
   StoreArray<RecoTrack>& recoTracks,
   const StoreArray<MCParticle>& mcParticles,
   std::vector<int>& trackMCParticles,
-  std::vector<double>& trackMinToF,
-  bool isVXD)
+  std::vector<double>& trackMinToF)
 {
 
   for (auto& recoTrack : recoTracks) {
@@ -160,16 +159,28 @@ void MCTrackMergerModule::analyzeAndCleanTrackArray(
       B2DEBUG(9, "No MC particle found => fake");
       trackMCParticles.push_back(-1);
       trackMinToF.push_back(minGlobalTime);
-      recoTrack.setQualityIndicator(0.0);
-      if (isVXD) {
-        m_fakeVXDTracks += 1;
-      } else {
-        m_fakeCDCTracks += 1;
-      }
     } else if (float(dst.crbegin()->first) / nHits < 0.66)  {
       B2DEBUG(9, "Less than 66% of hits from same MCParticle => fake");
       trackMCParticles.push_back(-1);
       trackMinToF.push_back(minGlobalTime);
+    } else {
+      B2DEBUG(9, "MC particle found at " << dst.crbegin()->second);
+      trackMCParticles.push_back(dst.crbegin()->second);
+      trackMinToF.push_back(minGlobalTime - mcParticles[dst.crbegin()->second]->getProductionTime());
+      B2DEBUG(9, "GOOD VXD track with min tof " << minGlobalTime - mcParticles[dst.crbegin()->second]->getProductionTime());
+    }
+  }
+
+  return;
+}
+
+void MCTrackMergerModule::cleanTrackArray(
+  StoreArray<RecoTrack>& recoTracks,
+  std::vector<int>& trackMCParticles,
+  bool isVXD)
+{
+  for (auto& recoTrack : recoTracks) {
+    if (trackMCParticles[recoTrack.getArrayIndex()] == -1) {
       recoTrack.setQualityIndicator(0.0);
       if (isVXD) {
         m_fakeVXDTracks += 1;
@@ -177,11 +188,7 @@ void MCTrackMergerModule::analyzeAndCleanTrackArray(
         m_fakeCDCTracks += 1;
       }
     } else {
-      B2DEBUG(9, "MC particle found at " << dst.crbegin()->second);
-      trackMCParticles.push_back(dst.crbegin()->second);
-      trackMinToF.push_back(minGlobalTime - mcParticles[dst.crbegin()->second]->getProductionTime());
       recoTrack.setQualityIndicator(1.0);
-      B2DEBUG(9, "GOOD VXD track with min tof " << minGlobalTime - mcParticles[dst.crbegin()->second]->getProductionTime());
     }
   }
 
@@ -316,7 +323,7 @@ void MCTrackMergerModule::mergeVXDAndCDCTrackArrays(
 }
 
 
-void MCTrackMergerModule::removeCurlersFromTrackArray(
+void MCTrackMergerModule::removeClonesFromTrackArray(
   StoreArray<RecoTrack>& recoTracks,
   std::vector<int>& tracksMCParticles,
   std::vector<double>& tracksMinToF,
@@ -418,22 +425,33 @@ void MCTrackMergerModule::event()
   std::vector<double> vxdTrackMinToF;
   std::vector<double> cdcTrackMinToF;
 
-  B2DEBUG(9, "Clean VXD tracks from fakes");
-  analyzeAndCleanTrackArray(
+  B2DEBUG(9, "Analyze VXD tracks");
+  analyzeTrackArray(
     m_VXDRecoTracks,
     mcparticles,
     vxdTrackMCParticles,
-    vxdTrackMinToF,
+    vxdTrackMinToF
+  );
+
+  B2DEBUG(9, "Clean VXD tracks from fakes");
+  cleanTrackArray(
+    m_VXDRecoTracks,
+    vxdTrackMCParticles,
     true
   );
 
-
-  B2DEBUG(9, "Clean CDC tracks from fakes");
-  analyzeAndCleanTrackArray(
+  B2DEBUG(9, "Analyze CDC tracks");
+  analyzeTrackArray(
     m_CDCRecoTracks,
     mcparticles,
     cdcTrackMCParticles,
-    cdcTrackMinToF,
+    cdcTrackMinToF
+  );
+
+  B2DEBUG(9, "Clean CDC tracks from fakes");
+  cleanTrackArray(
+    m_CDCRecoTracks,
+    cdcTrackMCParticles,
     false
   );
 
@@ -447,8 +465,8 @@ void MCTrackMergerModule::event()
     vxdTrackMinToF
   );
 
-  B2DEBUG(9, "Removing curlers in CDC => treat as fake");
-  removeCurlersFromTrackArray(
+  B2DEBUG(9, "Removing clones in CDC");
+  removeClonesFromTrackArray(
     m_CDCRecoTracks,
     cdcTrackMCParticles,
     cdcTrackMinToF,
@@ -456,8 +474,8 @@ void MCTrackMergerModule::event()
     false
   );
 
-  B2DEBUG(9, "Removing curlers in VXD => treat as fake");
-  removeCurlersFromTrackArray(
+  B2DEBUG(9, "Removing clones in VXD");
+  removeClonesFromTrackArray(
     m_VXDRecoTracks,
     vxdTrackMCParticles,
     vxdTrackMinToF,

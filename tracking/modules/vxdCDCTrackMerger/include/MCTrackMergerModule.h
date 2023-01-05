@@ -75,6 +75,18 @@ namespace Belle2 {
                                     std::vector<double>& tracksMinToF, const std::string& relatedTracksColumnName,
                                     bool isVXD);
 
+    /** Called once for a VXD or CDC only RecoTrack Store array in an event.
+     *
+     * The methode inspects the relations from CDC tracks to VXD tracks and vice versa. Incorrect relations
+     * get removed. The dicision is based on the best matched MC particle and the time of flight to determine
+     * the weight of relations (-> order of track segments in RelatedTracksCombiner).
+     */
+    void checkRelatedTrackArrays(StoreArray<RecoTrack>& cdcTracks, const std::vector<int>& cdcTrackMCParticles,
+                                 const std::vector<double>& cdcTrackMinToF,
+                                 StoreArray<RecoTrack>& vxdTracks,
+                                 const std::vector<int>& vxdTrackMCParticles,
+                                 const std::vector<double>& vxdTrackMinToF);
+
     /** Called once for to merge VXD and CDC only tracks an event.
      *
      * The methode merges (makes relations) between pairs of a CDC and a VXD track belonging to the same
@@ -96,16 +108,11 @@ namespace Belle2 {
     int m_fakeVXDTracks = 0;     /**< will hold number of fake VXD tracks, i.e. not related to MCParticle*/
     int m_fakeCDCTracks = 0;     /**< will hold number of fake CDC traks, i.e. not related to MCParticle*/
     int m_matchedTotal = 0;      /**< will hold number of matches*/
-    int m_removedVXDCurlers = 0;    /**< will hold number of VXD tracks from higher loops*/
-    int m_removedCDCCurlers = 0;    /**< will hold number of CDC tracks from higher loops*/
+    int m_removedVXDClones = 0;    /**< will hold number of removed VXD clone tracks*/
+    int m_removedCDCClones = 0;    /**< will hold number of removed CDC clone tracks*/
     int m_foundRelatedTracks = 0;    /**< will hold number of CDC tracks with existing relation*/
     int m_foundButWrongRelations = 0;  /**< will hold number of CDC tracks with existing relations that where removed (wrong)*/
     int m_foundCorrectlyRelatedTracks = 0;    /**< will hold number of CDC tracks with existing correct relation*/
-    int m_foundWronglyRelatedTracks_FAKE = 0;    /**< will hold number of CDC tracks with existing but wrong relation to fake*/
-    int m_foundWronglyRelatedTracks_BADORDER =
-      0;    /**< will hold number of CDC tracks with existing but wrong sorted relation (VXD track after CDC track)*/
-    int m_foundWronglyRelatedTracks_OTHER =
-      0;   /**< will hold number of CDC tracks with existing but wrong relation to other signal track*/
 
     /** StoreArray name of the VXD Track collection */
     std::string m_VXDRecoTrackColName;

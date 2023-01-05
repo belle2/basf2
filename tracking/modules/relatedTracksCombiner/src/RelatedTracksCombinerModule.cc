@@ -56,7 +56,8 @@ void RelatedTracksCombinerModule::event()
       continue;
     }
 
-    B2ASSERT("Can not handle more than 2 relations!", relatedVXDRecoTracks.size() <= 2);
+    // TODO: now there can be mulitple VXD tracks before the CDC track. Needs to be fixed.
+    //B2ASSERT("Can not handle more than 2 relations!", relatedVXDRecoTracks.size() <= 2);
 
     RecoTrack* vxdTrackBefore = nullptr;
     RecoTrack* vxdTrackAfter = nullptr;

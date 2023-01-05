@@ -12,7 +12,7 @@
 Alias etasig eta
 
 Decay vpho
-1.0 etasig Upsilonsig PARTWAVE 0.0 0.0 1.0 0.0 0.0 0.0;
+1.0 etasig Upsilonsig  PARTWAVE  0.0 0.0 1.0 0.0 0.0 0.0;
 Enddecay
 
 Decay Upsilonsig

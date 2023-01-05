@@ -42,7 +42,7 @@ namespace Belle2 {
   class DQMHistAnalysisSVDDoseModule : public DQMHistAnalysisModule {
   public:
     DQMHistAnalysisSVDDoseModule();
-    virtual ~DQMHistAnalysisSVDDoseModule();
+    ~DQMHistAnalysisSVDDoseModule();
 
   private:
     /** A struct to define the sensors group we average over.

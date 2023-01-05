@@ -60,7 +60,7 @@ namespace Belle2 {
      * Termination action.
      * Clean-up, close files, summarize statistics, etc.
      */
-    virtual void terminate() override final;
+    void terminate() override final;
 
   protected:
     bool m_debug;/**<debug*/

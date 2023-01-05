@@ -37,8 +37,7 @@ void ParticleList::initialize(int pdg, const std::string& name, const std::strin
   m_antiListName.clear();
 
   std::string label = m_thisListName.substr(m_thisListName.find_first_of(':') + 1);
-  if ((Const::finalStateParticlesSet.contains(Const::ParticleType(abs(m_pdg))) and label == "all") or
-      label == "MC" or label == "V0")
+  if ((Const::finalStateParticlesSet.contains(Const::ParticleType(abs(m_pdg))) and label == "all") or label == "V0")
     m_isReserved = true;
 }
 

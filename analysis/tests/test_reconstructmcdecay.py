@@ -35,7 +35,7 @@ class TestNewMCDecayFinder(unittest.TestCase):
         fillParticleListFromMC('pi+:primaryMC', 'mcPrimary', path=main)
 
         reconstructMCDecay(
-            'B0:DstD0Kpi =direct=> [D*+:D0pi =direct=> [D0:Kpi =direct=> K-:primaryMC pi+:primaryMC ] pi+:primaryMC] pi-:primaryMC',
+            'B0:DstD0Kpi =direct=> [D*+:MC =direct=> [D0:MC =direct=> K-:primaryMC pi+:primaryMC ] pi+:primaryMC] pi-:primaryMC',
             '',
             path=main)
 

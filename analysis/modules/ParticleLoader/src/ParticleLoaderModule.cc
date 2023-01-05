@@ -147,8 +147,8 @@ void ParticleLoaderModule::initialize()
       if (m_useROEs) listName = mother->getFullName();
       // dummy particles get the full name
       else if (m_useDummy) listName = mother->getFullName();
-      // MC particles get the label "MC"
-      else if (m_useMCParticles) listName = mother->getName() + ":MC";
+      // MC particles get the full label
+      else if (m_useMCParticles) listName = mother->getFullName();
       // V0s get the label "V0"
       else if (nProducts > 0) listName = mother->getName() + ":V0";
 
@@ -164,6 +164,9 @@ void ParticleLoaderModule::initialize()
           StoreObjPtr<ParticleList> antiParticleList(antiListName);
           antiParticleList.registerInDataStore(flags);
         }
+      } else if (m_useMCParticles) {
+        B2WARNING("ParticleList " << listName << " already exists and will not be created again. " <<
+                  "The given options (addDaughters, skipNonPrimaryDaughters, skipNonPrimary) do not applied on the existing list.");
       }
 
       if (not isValidPDGCode(pdgCode) and (m_useMCParticles == false and m_useROEs == false and m_useDummy == false))
@@ -820,8 +823,6 @@ void ParticleLoaderModule::mcParticlesToParticles()
       antiPlist->bindAntiParticleList(*(plist));
     }
 
-    plist->setEditable(true); // :MC list is originally reserved. we have to set it as editable.
-
     for (int i = 0; i < m_mcparticles.getEntries(); i++) {
       const MCParticle* mcParticle = m_mcparticles[i];
 
@@ -841,7 +842,6 @@ void ParticleLoaderModule::mcParticlesToParticles()
       plist->addParticle(newPart);
     }
 
-    plist->setEditable(false); // set the :MC list as not editable.
   }
 }
 

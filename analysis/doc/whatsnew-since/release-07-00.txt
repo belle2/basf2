@@ -2,12 +2,11 @@ Changes in the analysis package in light-2212-foldex
 ----------------------------------------------------
 ParticleList dataobject
 +++++++++++++++++++++++
- * Added new member variable ``isReserved`` to prevent the reserved ParticleLists (``:all`` labeled final-state particles, ``:MC``
-   labeled particles loaded from MCParticle, and ``:V0`` labeled V0-particles) from being changed. While some modules have already
-   had protection not to edit the reserved lists, e.g. `ParticleSelector` and `ParticleListManipulator`, the other modules editing
-   the ParticleList had the potential to introduce critical bugs. If one's script breaks due to the update since the
-   ``light-2212-foldex``, please modify the script not to edit the reserved ParticleLists by copying them with other names
-   beforehand.
+ * Added new member variable ``isReserved`` to prevent the reserved ParticleLists (``:all`` labeled final-state particles, and
+   ``:V0`` labeled V0-particles) from being changed. While some modules have already had protection not to edit the reserved lists,
+   e.g. `ParticleSelector` and `ParticleListManipulator`, the other modules editing the ParticleList had the potential to introduce
+   critical bugs. If one's script breaks due to the update since the ``light-2212-foldex``, please modify the script not to edit the
+   reserved ParticleLists by copying them with other names beforehand.
 
 Signal embedding
 ++++++++++++++++
@@ -32,6 +31,9 @@ Modules
    This option is only valid when one calls the function in a ``for_each`` loop over the RestOfEvent.
    The branches ``__signalSideCandidate__`` and ``__nSignalSideCandidates__`` are added to the TTree by setting the option.
    An example of usage can be found in ``analysis/examples/VariableManager/variablesToNtuple.py``.
+ * The ParticleLists labeled ``:MC``, which were created by default when the `fillParticleListFromMC` is called, are no longer
+   created automatically by the function. Also, the protection that was previously applied to the list labeled ":MC" has been
+   removed.
 
 Changes in the analysis package in light-2210-devonrex
 ------------------------------------------------------

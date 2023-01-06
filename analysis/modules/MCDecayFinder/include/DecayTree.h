@@ -27,9 +27,9 @@ namespace Belle2 {
     /** Destructor. */
     ~DecayTree();
     /** Return list of decay daughters. */
-    std::vector< DecayTree<T>* > getDaughters();
+    std::vector< DecayTree<T>* > getDaughters() const;
     /** Return the decaying object itself, e.g. an MCParticle. */
-    T* getObj();
+    T* getObj() const;
     /** Set the decaying object, e.g. an MCParticle.*/
     void setObj(T* obj);
     /** Frees memory occupied by m_myObject and the daughter objects. */
@@ -59,14 +59,14 @@ namespace Belle2 {
 
   /** Return a vector of daughters. */
   template <class T>
-  std::vector< DecayTree<T>* > DecayTree<T>::getDaughters()
+  std::vector< DecayTree<T>* > DecayTree<T>::getDaughters() const
   {
     return m_daughters;
   }
 
   /** Return the main object. */
   template <class T>
-  T* DecayTree<T>::getObj()
+  T* DecayTree<T>::getObj() const
   {
     return m_myObject;
   }

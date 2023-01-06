@@ -14,12 +14,13 @@
 
 #include <dqm/analysis/modules/DQMHistAnalysisInputRootFile.h>
 
-#include <TKey.h>
 #include <TROOT.h>
+#include <TKey.h>
 
 #include <boost/regex.hpp>
 #include <boost/algorithm/string/replace.hpp>
 #include <iostream>
+
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -122,6 +123,14 @@ void DQMHistAnalysisInputRootFileModule::event()
     m_eventMetaDataPtr->setRun(m_run_list[m_run_idx]);
     m_eventMetaDataPtr->setEvent(m_count);
     m_eventMetaDataPtr->setTime(0);
+    //setExpNr(m_expno); // redundant access from MetaData
+    //setRunNr(m_runno); // redundant access from MetaData
+    std::string rtype = "";
+    setRunType(rtype);
+    //ExtractRunType();
+    setEventProcessed(0);
+    //ExtractEvent();
+
     B2INFO("DQMHistAnalysisInputRootFile: event finished. count: " << m_count);
     m_count++;
     return;
@@ -176,11 +185,15 @@ void DQMHistAnalysisInputRootFileModule::event()
           m_cs.insert(std::pair<std::string, TCanvas*>(name, c));
         }
 
-        TCanvas* c = m_cs[name];
+        TCanvas* c = m_cs[name]; // access already created canvas
+        B2DEBUG(1, "DQMHistAnalysisInputRoot: new canvas " << c->GetName());
         c->cd();
         if (h->GetDimension() == 1) {
+          // assume users are expecting non-0-suppressed axis
+          if (h->GetMinimum() > 0) h->SetMinimum(0);
           h->Draw("hist");
         } else if (h->GetDimension() == 2) {
+          // ... but not in 2d
           h->Draw("colz");
         }
         c->Update();
@@ -235,20 +248,26 @@ void DQMHistAnalysisInputRootFileModule::event()
     }
   }
 
+  m_count++;
+  m_eventMetaDataPtr.create();
+  m_eventMetaDataPtr->setExperiment(m_expno);
+  m_eventMetaDataPtr->setRun(m_run_list[m_run_idx]);
+  m_eventMetaDataPtr->setEvent(m_count);
+  m_eventMetaDataPtr->setTime(ts * 1e9);
+
+  //setExpNr(m_expno); // redundant access from MetaData
+  //setRunNr(m_runno); // redundant access from MetaData
+  ExtractRunType(hs);
+  ExtractEvent(hs);
+
+  // this code must be run after "event processed" has been extracted
   for (size_t i = 0; i < hs.size(); i++) {
     TH1* h = hs[i];
     addHist("", h->GetName(), h);
     B2DEBUG(1, "Found : " << h->GetName() << " : " << h->GetEntries());
   }
-  m_eventMetaDataPtr.create();
 
-  m_eventMetaDataPtr->setExperiment(m_expno);
-  m_eventMetaDataPtr->setRun(m_run_list[m_run_idx]);
-  m_eventMetaDataPtr->setEvent(m_count);
-  m_eventMetaDataPtr->setTime(ts * 1e9);
   B2INFO("DQMHistAnalysisInputRootFile: event finished. count: " << m_count);
-
-  m_count++;
 }
 
 void DQMHistAnalysisInputRootFileModule::endRun()

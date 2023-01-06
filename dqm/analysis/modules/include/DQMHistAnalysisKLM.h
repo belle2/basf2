@@ -53,27 +53,27 @@ namespace Belle2 {
     /**
      * Initializer.
      */
-    void initialize() override;
+    void initialize() override final;
 
     /**
      * Called when entering a new run.
      */
-    void beginRun() override;
+    void beginRun() override final;
 
     /**
      * This method is called for each event.
      */
-    void event() override;
+    void event() override final;
 
     /**
      * This method is called if the current run ends.
      */
-    void endRun() override;
+    void endRun() override final;
 
     /**
      * This method is called at the end of the event processing.
      */
-    void terminate() override;
+    void terminate() override final;
 
   private:
 
@@ -162,12 +162,6 @@ namespace Belle2 {
 
     /** TText for names in plane histograms. */
     TText m_PlaneText;
-
-    /** Histogram from DQMInfo with run type. */
-    TH1* m_RunType = nullptr;
-
-    /** String with run type. */
-    TString m_RunTypeString;
 
     /** Run type flag for null runs. */
     bool m_IsNullRun;

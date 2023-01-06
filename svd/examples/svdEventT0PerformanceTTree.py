@@ -168,7 +168,7 @@ if args.RootOutput:
     rootOutFileName = outputFileName + "_RootOutput_" + str(args.fileTag) + ".root"
     main.add_module('RootOutput',
                     outputFileName=rootOutFileName,
-                    branchNames=['EventT0', 'SVDTrueHits', 'SVDShaperDigits', 'SVDClusters', 'SVDSpacePoints', 'Track'])
+                    branchNames=['EventT0', 'SVDTrueHits', 'SVDShaperDigits', 'SVDClusters', 'SVDSpacePoints', 'Tracks'])
 
 if args.executionTime:
     executionFileName = str(args.fileDir) + "SVDExecutionTime"

@@ -75,8 +75,10 @@ namespace Belle2 {
     double m_timeSpread         = 5.;
     int    m_maxGroups          = 10;
     bool   m_writeGroupInfo     = false;
-    std::vector<float> m_clsSizeVsSigma =
-    {5.33428, 3.35899, 3.32646, 4.15011, 5.38317, 6.28281, 7.07448, 7.36558, 7.7327, 9.66326};
+    std::vector<float> m_clsSizeVsSigma[2] = { /* 0: V, 1: U */
+      {3.49898, 2.94008, 3.46766, 5.3746, 6.68848, 7.35446, 7.35983, 7.71601, 10.6172, 13.4805},
+      {6.53642, 3.76216, 3.30086, 3.95969, 5.49408, 7.07294, 8.35687, 8.94839, 9.23135, 10.485}
+    };
     bool   m_includeOutOfRangeClusters = true; /** Assign groups to under and overflow. */
     bool   m_useOnlyOneGroup    = false; /** Only one group is kept. */
     bool   m_timeBasedSort      = false; /** Group nearest to zero is kept at the first. */

@@ -46,8 +46,8 @@ void RelatedTracksCombinerModule::event()
 {
   TrackFitter trackFitter;
 
-  // Loop over all CDC reco tracks and add them to the store array of they do not have a match or combined them with
-  // their VXD partner if they do.
+  // Loop over all CDC reco tracks and add them to the store array if they do not have a match or combined them with
+  // their VXD partners if they do.
   // For this, the fitted or seed state of the tracks is used - if they are already fitted or not.
   for (RecoTrack& cdcRecoTrack : m_cdcRecoTracks) {
     const RelationVector<RecoTrack>& relatedVXDRecoTracks = cdcRecoTrack.getRelationsWith<RecoTrack>(m_vxdRecoTracksStoreArrayName);
@@ -56,11 +56,8 @@ void RelatedTracksCombinerModule::event()
       continue;
     }
 
-    // TODO: now there can be mulitple VXD tracks before the CDC track. Needs to be fixed.
-    //B2ASSERT("Can not handle more than 2 relations!", relatedVXDRecoTracks.size() <= 2);
-
-    RecoTrack* vxdTrackBefore = nullptr;
-    RecoTrack* vxdTrackAfter = nullptr;
+    std::vector<RecoTrack*> vxdTracksBefore;
+    std::vector<RecoTrack*> vxdTracksAfter;
 
     for (unsigned int index = 0; index < relatedVXDRecoTracks.size(); ++index) {
       if (m_param_onlyGoodQITracks and relatedVXDRecoTracks[index]->getQualityIndicator() <=  m_param_qiCutValue) {
@@ -69,23 +66,34 @@ void RelatedTracksCombinerModule::event()
 
       const double weight = relatedVXDRecoTracks.weight(index);
       if (weight < 0) {
-        vxdTrackBefore = relatedVXDRecoTracks[index];
+        vxdTracksBefore.push_back(relatedVXDRecoTracks[index]);
       } else if (weight > 0) {
-        vxdTrackAfter = relatedVXDRecoTracks[index];
+        vxdTracksAfter.push_back(relatedVXDRecoTracks[index]);
       }
     }
 
     // Do not output non-fittable tracks
-    if (not vxdTrackAfter and not vxdTrackBefore and not trackFitter.fit(cdcRecoTrack)) {
+    if (vxdTracksAfter.empty() and vxdTracksBefore.empty() and not trackFitter.fit(cdcRecoTrack)) {
       continue;
     }
 
     RecoTrack* newMergedTrack = nullptr;
 
-    if (vxdTrackBefore) {
-      newMergedTrack = vxdTrackBefore->copyToStoreArray(m_recoTracks);
-      newMergedTrack->addHitsFromRecoTrack(vxdTrackBefore, newMergedTrack->getNumberOfTotalHits());
-      newMergedTrack->addRelationTo(vxdTrackBefore);
+    // TODO: i see tracks before and after. only expect before ... how to check if hits are really added in the right order.
+    B2RESULT("Benni: number tracks before " << vxdTracksBefore.size());
+    B2RESULT("Benni: number tracks after " << vxdTracksAfter.size());
+    B2ASSERT("Can not handle more than 2 before relations!", vxdTracksBefore.size() <= 2);
+    B2ASSERT("Can not handle more than 2 after relations!", vxdTracksAfter.size() <= 2);
+
+
+    if (not vxdTracksBefore.empty()) {
+      newMergedTrack = vxdTracksBefore[0]->copyToStoreArray(m_recoTracks);
+      newMergedTrack->addHitsFromRecoTrack(vxdTracksBefore[0], newMergedTrack->getNumberOfTotalHits());
+      newMergedTrack->addRelationTo(vxdTracksBefore[0]);
+      for (unsigned int index = 1; index < vxdTracksBefore.size(); ++index) {
+        newMergedTrack->addHitsFromRecoTrack(vxdTracksBefore[index], newMergedTrack->getNumberOfTotalHits());
+        newMergedTrack->addRelationTo(vxdTracksBefore[index]);
+      }
     } else {
       newMergedTrack = cdcRecoTrack.copyToStoreArray(m_recoTracks);
     }
@@ -93,9 +101,9 @@ void RelatedTracksCombinerModule::event()
     newMergedTrack->addHitsFromRecoTrack(&cdcRecoTrack, newMergedTrack->getNumberOfTotalHits());
     newMergedTrack->addRelationTo(&cdcRecoTrack);
 
-    if (vxdTrackAfter) {
-      newMergedTrack->addHitsFromRecoTrack(vxdTrackAfter, newMergedTrack->getNumberOfTotalHits(), true);
-      newMergedTrack->addRelationTo(vxdTrackAfter);
+    for (unsigned int index = 0; index < vxdTracksAfter.size(); ++index) {
+      newMergedTrack->addHitsFromRecoTrack(vxdTracksAfter[index], newMergedTrack->getNumberOfTotalHits(), true);
+      newMergedTrack->addRelationTo(vxdTracksAfter[index]);
     }
   }
 

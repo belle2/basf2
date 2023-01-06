@@ -171,7 +171,7 @@ void SVDTimeGroupComposerModule::event()
       float clsSize = m_svdClusters[ij]->getSize();
       bool  isUcls  = m_svdClusters[ij]->isUCluster();
       float gSigma  = (clsSize >= int(m_clsSizeVsSigma[isUcls].size()) ?
-                       m_clsSizeVsSigma[isUcls].back() : m_clsSizeVsSigma[isUcls][clsSize]);
+                       m_clsSizeVsSigma[isUcls].back() : m_clsSizeVsSigma[isUcls][clsSize - 1]);
       float gCenter = m_svdClusters[ij]->getClsTime();
       int  startBin = h_clsTime[0].FindBin(gCenter - m_fillSigmaN * gSigma);
       int    endBin = h_clsTime[0].FindBin(gCenter + m_fillSigmaN * gSigma);

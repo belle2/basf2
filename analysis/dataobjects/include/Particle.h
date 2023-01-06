@@ -396,7 +396,7 @@ namespace Belle2 {
      * @param daughterProperty property of the daughter particle
      * @param updateType bool to set whether particle type should be updated
      */
-    void appendDaughter(const Particle* daughter, const int daughtersProperty, const bool updateType = true);
+    void appendDaughter(const Particle* daughter, const int daughterProperty, const bool updateType = true);
 
     /**
      * Appends index of daughter to daughters index array

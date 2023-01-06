@@ -70,9 +70,14 @@ namespace Belle2 {
 
 
     /**
-     * Get mean of ADC histgram excluding 0-th bin.
+     * Get mean of ADC histogram excluding 0-th bin.
      */
-    float getHistMean(TH1D* h);
+    float getHistMean(TH1D* h) const;
+
+    /**
+     * Get median of ADC histogram excluding 0-th bin.
+     */
+    float getHistMedian(TH1D* h) const;
 
     /**
      * Get board/channel from layer/wire.
@@ -95,8 +100,8 @@ namespace Belle2 {
     TH2F* m_hADC = nullptr; /**< Summary of ADC histograms with track associated hits*/
     TH2F* m_hTDC = nullptr; /**< Summary of TDC histograms with track associated hits*/
     TH2F* m_hHit = nullptr; /**< Summary of hit histograms */
-    TH1D* m_hADCs[300]; /**< ADC histograms with track associated hits (0-299) */
-    TH1D* m_hTDCs[300]; /**< TDC histograms with track associated hits (0-299) */
+    TH1D* m_hADCs[300]; /**< ADC histograms with track associated hits for each board (0-299) */
+    TH1D* m_hTDCs[300]; /**< TDC histograms with track associated hits for each board (0-299) */
     TH1D* m_hHits[56]; /**< hit histograms for each layer (0-55) */
 
     TH2Poly* h2p = nullptr; /**< bad wires in xy view */

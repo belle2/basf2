@@ -431,7 +431,7 @@ def executor(options, prepare_step):
                     failure = ET.SubElement(test_el, "failure" if passed is False else "skipped", message=message,
                                             type="FAILED" if passed is False else "SKIPPED")
                     if output is not None:
-                        failure.text = output
+                        failure.text = re.sub('\033\[[0-9;]*m', '', output)
 
         tree = ET.ElementTree(root_el)
         tree.write(options.xml, encoding="UTF-8", xml_declaration=True)

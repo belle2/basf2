@@ -7,7 +7,7 @@
  **************************************************************************/
 #include <calibration/CalibrationCollectorModule.h>
 
-#include <TVector3.h>
+#include <framework/geometry/B2Vector3.h>
 
 #include <string>
 
@@ -47,8 +47,8 @@ namespace Belle2 {
     double m_mu0_pid; ///< particle ID of mu/e separation first muon
     double m_mu1_pid; ///< particle ID of mu/e separation second muon
 
-    TVector3 m_mu0_p; ///< three momentum of first muon
-    TVector3 m_mu1_p; ///< three momentum of second muon
+    B2Vector3D m_mu0_p; ///< three momentum of first muon
+    B2Vector3D m_mu1_p; ///< three momentum of second muon
 
     /** Name of the Y4S particle list */
     std::string m_Y4SPListName = "";

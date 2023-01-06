@@ -162,14 +162,25 @@ void DQMHistAnalysisCDCMonObjModule::makeBadChannelList()
   B2DEBUG(20, "num bad wires " << m_badChannels.size());
 }
 
-float DQMHistAnalysisCDCMonObjModule::getHistMean(TH1D* h)
+float DQMHistAnalysisCDCMonObjModule::getHistMean(TH1D* h) const
 {
   TH1D* hist = (TH1D*)h->Clone();
-  hist->SetBinContent(1, 0.0);
+  hist->SetBinContent(1, 0.0); // Exclude 0-th bin
   float m = hist->GetMean();
   return m;
 }
 
+float DQMHistAnalysisCDCMonObjModule::getHistMedian(TH1D* h) const
+{
+  TH1D* hist = (TH1D*)h->Clone();
+  hist->SetBinContent(1, 0.0); // Exclude 0-th bin
+  if (hist->GetMean() == 0) {return 0.0;} // Avoid an error if only ADC=0 entries
+  double quantiles[1] = {0.0}; // One element to store median
+  double probSums[1] = {0.5}; // Median definition
+  hist->GetQuantiles(1, quantiles, probSums);
+  float median = quantiles[0];
+  return median;
+}
 
 std::pair<int, int> DQMHistAnalysisCDCMonObjModule::getBoardChannel(unsigned short layer, unsigned short wire)
 {
@@ -216,7 +227,10 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   TH1F* hADC1000 = new TH1F("ADC1000", "ADC1000", 300, 0, 300);
   TH1F* hADC0 = new TH1F("ADC0", "ADC0", 300, 0, 300);
 
+  // Collect ADC mean/median for each board
   std::vector<float> means = {};
+  std::vector<float> medians = {};
+
   for (int i = 0; i < 300; ++i) {
     m_hADCs[i] = m_hADC->ProjectionY(Form("hADC%d", i), i + 1, i + 1, "");
     m_hADCs[i]->SetTitle(Form("hADC%d", i));
@@ -232,7 +246,9 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
       }
       float bin1 = m_hADCs[i]->GetBinContent(1);
       float m = getHistMean(m_hADCs[i]);
+      float md = getHistMedian(m_hADCs[i]);
       means.push_back(m);
+      medians.push_back(md);
       hADCMean->SetBinContent(i + 1, m);
       hADCMean->SetBinError(i + 1, 0);
       double overflow = m_hADCs[i]->GetBinContent(m_hADCs[i]->GetNbinsX() + 1);
@@ -415,6 +431,7 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   m_monObj->setVariable("nHits", nHits / neve);
   m_monObj->setVariable("nBadWires", m_badChannels.size());
   m_monObj->setVariable("adcMean", std::accumulate(means.begin(), means.end(), 0.0) / means.size());
+  m_monObj->setVariable("adcMeanMedianBoard", std::accumulate(medians.begin(), medians.end(), 0.0) / medians.size());
   m_monObj->setVariable("nDeadADC", nDeadADC);
   m_monObj->setVariable("nBadADC", nBadADC); //???? n_0/n_tot>0.9
   m_monObj->setVariable("tdcEdge", std::accumulate(tdcEdges.begin(), tdcEdges.end(), 0.0) / (tdcEdges.size() - 1 - nDeadTDC));

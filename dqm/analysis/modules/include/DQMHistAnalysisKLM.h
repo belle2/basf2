@@ -163,12 +163,6 @@ namespace Belle2 {
     /** TText for names in plane histograms. */
     TText m_PlaneText;
 
-    /** Histogram from DQMInfo with run type. */
-    TH1* m_RunType = nullptr;
-
-    /** String with run type. */
-    TString m_RunTypeString;
-
     /** Run type flag for null runs. */
     bool m_IsNullRun;
 

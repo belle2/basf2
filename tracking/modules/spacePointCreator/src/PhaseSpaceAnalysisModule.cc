@@ -14,8 +14,6 @@
 #include <algorithm>
 #include <numeric>
 
-#include <TVector3.h> // COULDDO: B2Vector3.h
-
 using namespace Belle2;
 
 REG_MODULE(PhaseSpaceAnalysis);
@@ -216,12 +214,12 @@ void PhaseSpaceAnalysisModule::getValuesForRoot(Belle2::MCParticle* mcParticle, 
   B2DEBUG(25, "XYZVector momentum: (" << momentum.X() << "," << momentum.Y() << "," << momentum.Z() << \
           "). This leads to p_T = " << momentum.Rho() << " and eta = " << momentum.Eta());
 
-  const B2Vector3D vertex = mcParticle->getVertex();
+  const ROOT::Math::XYZVector vertex = mcParticle->getVertex();
   rootVariables.VertX.push_back(vertex.Y());
   rootVariables.VertY.push_back(vertex.Y());
   rootVariables.VertZ.push_back(vertex.Z());
 
-  B2DEBUG(25, "TVector3 vertex: (" << vertex.X() << "," << vertex.Y() << "," << vertex.Z() << ")");
+  B2DEBUG(25, "vertex: (" << vertex.X() << "," << vertex.Y() << "," << vertex.Z() << ")");
 
   rootVariables.Charge.push_back(mcParticle->getCharge());
   rootVariables.Energy.push_back(mcParticle->getEnergy());

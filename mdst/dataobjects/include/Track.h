@@ -244,5 +244,6 @@ namespace Belle2 {
     ClassDefOverride(Track, 6); /**< Class that bundles various TrackFitResults. */
 
     friend class FixMergedObjectsModule;
+    friend class PostMergeUpdaterModule;
   };
 }

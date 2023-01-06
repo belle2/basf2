@@ -9,6 +9,7 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/core/ModuleParam.templateDetails.h>
+#include <framework/geometry/B2Vector3.h>
 
 //tracking:
 #include <tracking/modules/VXDTFHelperTools/TrackFinderVXDAnalizerModule.h>
@@ -18,16 +19,12 @@
 #include <tracking/trackFindingVXD/analyzingTools/AnalyzingAlgorithmFactory.h>
 #include <tracking/trackFindingVXD/analyzingTools/AlgoritmType.h>
 
-//root-stuff
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 
 #include <string>
 
-
-
 using namespace Belle2;
 using namespace Belle2::Tracking;
-
 
 
 //-----------------------------------------------------------------
@@ -192,9 +189,9 @@ void TrackFinderVXDAnalizerModule::initialize()
   // deal with algorithms:
   m_rootParameterTracker.initialize(m_PARAMrootFileName[0] + ".root", m_PARAMrootFileName[1]);
   // typedef for increased readability:
-  using AlgorithmDouble = AnalyzingAlgorithmBase<double, AnalizerTCInfo, TVector3>;
-  using AlgorithmInt = AnalyzingAlgorithmBase<int, AnalizerTCInfo, TVector3>;
-  using AlgorithmVecDouble = AnalyzingAlgorithmBase<std::vector<double>, AnalizerTCInfo, TVector3>;
+  using AlgorithmDouble = AnalyzingAlgorithmBase<double, AnalizerTCInfo, B2Vector3D>;
+  using AlgorithmInt = AnalyzingAlgorithmBase<int, AnalizerTCInfo, B2Vector3D>;
+  using AlgorithmVecDouble = AnalyzingAlgorithmBase<std::vector<double>, AnalizerTCInfo, B2Vector3D>;
 
 
   // prepare all algorithms which store a double per tc:
@@ -216,7 +213,7 @@ void TrackFinderVXDAnalizerModule::initialize()
       m_rootParameterTracker.addParameters4DoubleAlgorithms(tcTypeName, algorithm);
     }
   }
-  AlgorithmDouble::setOrigin(TVector3(m_PARAMorigin[0], m_PARAMorigin[1], m_PARAMorigin[2]));
+  AlgorithmDouble::setOrigin(B2Vector3D(m_PARAMorigin[0], m_PARAMorigin[1], m_PARAMorigin[2]));
   AlgorithmDouble::setWillRefTCdataBeUsed4TestTCs(m_PARAMuseMCDataForValues);
 
   // prepare all algorithms which store an int per tc:
@@ -238,7 +235,7 @@ void TrackFinderVXDAnalizerModule::initialize()
       m_rootParameterTracker.addParameters4IntAlgorithms(tcTypeName, algorithm);
     }
   }
-  AlgorithmInt::setOrigin(TVector3(m_PARAMorigin[0], m_PARAMorigin[1], m_PARAMorigin[2]));
+  AlgorithmInt::setOrigin(B2Vector3D(m_PARAMorigin[0], m_PARAMorigin[1], m_PARAMorigin[2]));
   AlgorithmInt::setWillRefTCdataBeUsed4TestTCs(m_PARAMuseMCDataForValues);
 
   // prepare all algorithms which store a vector< double> per tc:
@@ -260,7 +257,7 @@ void TrackFinderVXDAnalizerModule::initialize()
       m_rootParameterTracker.addParameters4VecDoubleAlgorithms(tcTypeName, algorithm);
     }
   }
-  AlgorithmVecDouble::setOrigin(TVector3(m_PARAMorigin[0], m_PARAMorigin[1], m_PARAMorigin[2]));
+  AlgorithmVecDouble::setOrigin(B2Vector3D(m_PARAMorigin[0], m_PARAMorigin[1], m_PARAMorigin[2]));
   AlgorithmVecDouble::setWillRefTCdataBeUsed4TestTCs(m_PARAMuseMCDataForValues);
 }
 

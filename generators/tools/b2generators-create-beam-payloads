@@ -122,8 +122,8 @@ if __name__ == "__main__":
 
     #: Beamparameter object we want
     beamparams = Belle2.BeamParameters()
-    beamparams.setHER(values['energyHER'], values['angleHER'], __vec(values['covHER']))
-    beamparams.setLER(values['energyLER'], values['angleLER'], __vec(values['covLER']))
+    beamparams.setHER(values['energyHER'], values['angleXHER'], 0, __vec(values['covHER']))
+    beamparams.setLER(values['energyLER'], values['angleXLER'], 0, __vec(values['covLER']))
     beamparams.setVertex(ROOT.TVector3(*values['vertex']), __vec(values['covVertex']))
     flags = 0
     if values['generateCMS']:

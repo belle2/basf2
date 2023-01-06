@@ -88,6 +88,9 @@ SVDTimeGroupComposerModule::SVDTimeGroupComposerModule() :
   addParam("maxGroups", m_maxGroups,
            "Maximum groups to be accepted.",
            int(10));
+  addParam("writeGroupInfo", m_writeGroupInfo,
+           "Write group info into SVDClusters.",
+           bool(false));
 
   addParam("includeOutOfRangeClusters", m_includeOutOfRangeClusters,
            "Assign groups to under and overflow.",
@@ -363,6 +366,7 @@ void SVDTimeGroupComposerModule::event()
         double clsTime = m_svdClusters[jk]->getClsTime();
         if (clsTime >= beginPos && clsTime <= endPos) {
           m_svdClusters[jk]->getTimeGroupId().push_back(ij);
+          if (m_writeGroupInfo) m_svdClusters[jk]->getTimeGroupInfo().push_back(std::make_tuple(pars[0], pars[1], pars[2]));
           B2DEBUG(1, "   accepted cluster " << jk
                   << " clsTime " << clsTime);
         } else {

@@ -41,12 +41,12 @@ namespace Belle2 {
      */
     SVDCluster(VxdID sensorID, bool isU, float position, float positionSigma,
                double clsTime, double clsTimeSigma, float clsCharge, float seedCharge,
-               unsigned short clsSize, float clsSN, float clsChi2, int firstFrame = 0, std::vector<int> timeGroupId = {}):
+               unsigned short clsSize, float clsSN, float clsChi2, int firstFrame = 0):
       m_sensorID(sensorID), m_isU(isU),
       m_position(position), m_positionSigma(positionSigma),
       m_clsTime(clsTime), m_clsTimeSigma(clsTimeSigma), m_clsCharge(clsCharge),
       m_seedCharge(seedCharge), m_clsSize(clsSize), m_clsSN(clsSN),
-      m_clsChi2(clsChi2), m_firstFrame(firstFrame), m_timeGroupId(timeGroupId)
+      m_clsChi2(clsChi2), m_firstFrame(firstFrame)
     {}
 
     /** Default constructor for the ROOT IO. */
@@ -169,6 +169,11 @@ namespace Belle2 {
      */
     std::vector<int>& getTimeGroupId() { return m_timeGroupId; }
 
+    /** Get time-group parameters.
+     * @return time-group parameters
+     */
+    std::vector<std::tuple<float, float, float>>& getTimeGroupInfo() { return m_timeGroupInfo; }
+
     /** Get ID of the time-group.
      * @return time-group ID
      */
@@ -198,14 +203,6 @@ namespace Belle2 {
     void setClsTime(const double time)
     {
       m_clsTime = time;
-    }
-
-    /** Set the ID of the time-group.
-     *
-     */
-    void setTimeGroupId(const std::vector<int>& groupId)
-    {
-      m_timeGroupId = groupId;
     }
 
     /** Add quality indicator to object.
@@ -255,6 +252,7 @@ namespace Belle2 {
     float m_clsChi2;           /**< Chi2 for time/amplitude fit */
     int m_firstFrame;           /**< firstFrame computed with the MaxSum algorithm */
     std::vector<int> m_timeGroupId;    /**< Grouping of clusters in time */
+    std::vector<std::tuple<float, float, float>> m_timeGroupInfo; /**< TimeGroup Gaussian Parameters */
     double m_qualityIndicator = {0.};  /**< Probability of signal cluster */
     double m_qualityIndicatorError = {0.};  /**< Error associated with probability calcualtion */
 

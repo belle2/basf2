@@ -74,6 +74,7 @@ namespace Belle2 {
     double m_maxSigma           = 15.;
     double m_timeSpread         = 5.;
     int    m_maxGroups          = 10;
+    bool   m_writeGroupInfo     = false;
     std::vector<float> m_clsSizeVsSigma =
     {5.33428, 3.35899, 3.32646, 4.15011, 5.38317, 6.28281, 7.07448, 7.36558, 7.7327, 9.66326};
     bool   m_includeOutOfRangeClusters = true; /** Assign groups to under and overflow. */

@@ -22,7 +22,7 @@ namespace Belle2 {
   /**
    * Class for HLT-related histogram analysis.
    */
-  class DQMHistAnalysisHLTModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisHLTModule final : public DQMHistAnalysisModule {
   public:
 
     /**

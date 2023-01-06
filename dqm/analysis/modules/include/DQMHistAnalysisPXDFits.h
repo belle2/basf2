@@ -20,7 +20,7 @@
 namespace Belle2 {
   /*! Class definition for the output module of Sequential ROOT I/O */
 
-  class DQMHistAnalysisPXDFitsModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisPXDFitsModule final : public DQMHistAnalysisModule {
 
     enum { NUM_MODULES = 40}; // we want that from geometry
     // Public functions

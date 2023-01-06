@@ -25,7 +25,7 @@
 namespace Belle2 {
   /** Class for generating snapshots for histograms. */
 
-  class DQMHistDeltaHistoModule : public DQMHistAnalysisModule {
+  class DQMHistDeltaHistoModule final : public DQMHistAnalysisModule {
 
     /**
      * The struct for the snapshots.

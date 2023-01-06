@@ -22,7 +22,7 @@
 namespace Belle2 {
   /*! Class definition for the output module of Sequential ROOT I/O */
 
-  class DQMHistAnalysisSVDEfficiencyModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisSVDEfficiencyModule final : public DQMHistAnalysisModule {
 
     // Public functions
   public:

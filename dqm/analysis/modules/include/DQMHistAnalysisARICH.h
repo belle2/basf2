@@ -25,7 +25,7 @@ namespace Belle2 {
   /**
    * Make summary of data quality from reconstruction
    */
-  class DQMHistAnalysisARICHModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisARICHModule final : public DQMHistAnalysisModule {
 
   public:
 

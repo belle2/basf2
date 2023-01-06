@@ -44,7 +44,7 @@ namespace Belle2 {
   } MYNODE;
 #endif
 
-  class DQMHistAnalysisInputPVSrvModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisInputPVSrvModule final : public DQMHistAnalysisModule {
 
     // Public functions
   public:

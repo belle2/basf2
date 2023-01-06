@@ -20,7 +20,7 @@
 namespace Belle2 {
   /*! Class definition for the output module of Sequential ROOT I/O */
 
-  class DQMHistAnalysisV0Module : public DQMHistAnalysisModule {
+  class DQMHistAnalysisV0Module final : public DQMHistAnalysisModule {
 
     //! List of histograms for display
     typedef std::map<std::string, TH1*> HistList;

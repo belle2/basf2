@@ -26,7 +26,7 @@ namespace Belle2 {
    * Class to read histograms from a root file for offline testing of analysis modules.
    */
 
-  class DQMHistAnalysisInputRootFileModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisInputRootFileModule final : public DQMHistAnalysisModule {
 
   public:
 

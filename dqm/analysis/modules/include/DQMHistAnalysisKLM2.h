@@ -31,7 +31,7 @@ namespace Belle2 {
   /**
    * Analysis of KLM DQM histograms.
    */
-  class DQMHistAnalysisKLM2Module : public DQMHistAnalysisModule {
+  class DQMHistAnalysisKLM2Module final : public DQMHistAnalysisModule {
 
   public:
 

@@ -24,7 +24,7 @@
 namespace Belle2 {
   /*! Class definition for the output module of Sequential ROOT I/O */
 
-  class DQMHistAnalysisIPModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisIPModule final : public DQMHistAnalysisModule {
 
     // Public functions
   public:

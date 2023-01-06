@@ -25,7 +25,7 @@ namespace Belle2 {
    * This module is for analysis of ECL DQM histograms.
    */
 
-  class DQMHistAnalysisECLModule : public DQMHistAnalysisModule { /**< derived from DQMHistAnalysisModule class. */
+  class DQMHistAnalysisECLModule final : public DQMHistAnalysisModule { /**< derived from DQMHistAnalysisModule class. */
 
   public:
 

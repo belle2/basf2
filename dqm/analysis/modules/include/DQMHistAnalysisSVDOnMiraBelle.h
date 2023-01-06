@@ -20,7 +20,7 @@
 namespace Belle2 {
 
   /** Class derived from HistoModule, for SVD monitoring variables at MiraBelle */
-  class DQMHistAnalysisSVDOnMiraBelleModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisSVDOnMiraBelleModule final : public DQMHistAnalysisModule {
 
   public:
 

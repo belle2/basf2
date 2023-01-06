@@ -16,7 +16,7 @@
 namespace Belle2 {
   /*! Class definition for the module to store MonitoringObject to output root file*/
 
-  class DQMHistAnalysisOutputMonObjModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisOutputMonObjModule final : public DQMHistAnalysisModule {
 
     // Public functions
   public:

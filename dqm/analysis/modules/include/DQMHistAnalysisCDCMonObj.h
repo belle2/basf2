@@ -25,7 +25,7 @@ namespace Belle2 {
   /**
    * Make summary of data quality from reconstruction
    */
-  class DQMHistAnalysisCDCMonObjModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisCDCMonObjModule final : public DQMHistAnalysisModule {
 
   public:
 

@@ -33,7 +33,7 @@
 namespace Belle2 {
   /*! DQM Histogram Analysis for PXD Cluster Charge */
 
-  class DQMHistAnalysisPXDTrackChargeModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisPXDTrackChargeModule final : public DQMHistAnalysisModule {
 
     // Public functions
   public:

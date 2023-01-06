@@ -13,7 +13,7 @@
 namespace Belle2 {
 
   /** Analysis of ER Tracking DQM plots */
-  class DQMHistAnalysisTrackingERModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisTrackingERModule final : public DQMHistAnalysisModule {
 
     // Public functions
   public:

@@ -14,7 +14,7 @@
 namespace Belle2 {
   /*! PXD DQM AnalysisModule */
 
-  class DQMHistAnalysisPXDERModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisPXDERModule final : public DQMHistAnalysisModule {
 
   public:
 

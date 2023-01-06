@@ -15,7 +15,7 @@
 namespace Belle2 {
 
   /** Analysis of HLT Tracking DQM plots */
-  class DQMHistAnalysisTrackingHLTModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisTrackingHLTModule final : public DQMHistAnalysisModule {
 
     // Public functions
   public:

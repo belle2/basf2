@@ -19,7 +19,7 @@ namespace Belle2 {
   /**
    * Make summary of data quality from reconstruction
    */
-  class DQMHistAnalysisMiraBelleModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisMiraBelleModule final : public DQMHistAnalysisModule {
 
   public:
 

@@ -16,7 +16,7 @@ namespace Belle2 {
   /**
    * Creates monitoring object for HLT
    */
-  class DQMHistAnalysisHLTMonObjModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisHLTMonObjModule final : public DQMHistAnalysisModule {
 
   public:
 

@@ -21,7 +21,7 @@ namespace Belle2 {
    * Class for TOP histogram analysis.
    */
 
-  class DQMHistAnalysisTOPModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisTOPModule final : public DQMHistAnalysisModule {
 
     // Public functions
   public:

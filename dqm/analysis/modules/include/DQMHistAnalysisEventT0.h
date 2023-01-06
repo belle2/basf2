@@ -17,7 +17,7 @@
 namespace Belle2 {
 
   /** Class definition */
-  class DQMHistAnalysisEventT0Module : public DQMHistAnalysisModule {
+  class DQMHistAnalysisEventT0Module final : public DQMHistAnalysisModule {
 
     // Public functions
   public:

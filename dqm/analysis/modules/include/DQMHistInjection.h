@@ -25,7 +25,7 @@
 namespace Belle2 {
   /*! DQM Histogram Analysis for PXD Efficiency */
 
-  class DQMHistInjectionModule : public DQMHistAnalysisModule {
+  class DQMHistInjectionModule final : public DQMHistAnalysisModule {
 
 #ifdef _BELLE2_EPICS
     typedef struct MYNODE_struct {

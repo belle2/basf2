@@ -25,7 +25,7 @@
 namespace Belle2 {
   /*! Write DQM Histogram Content to EPICS Arrays */
 
-  class DQMHistOutputToEPICSModule : public DQMHistAnalysisModule {
+  class DQMHistOutputToEPICSModule final : public DQMHistAnalysisModule {
 
 #ifdef _BELLE2_EPICS
     typedef struct {

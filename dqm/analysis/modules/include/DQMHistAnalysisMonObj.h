@@ -17,7 +17,7 @@ namespace Belle2 {
   /**
    * Example module of how to use MonitoringObject in DQMHistAnalysis module
    */
-  class DQMHistAnalysisMonObjModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisMonObjModule final : public DQMHistAnalysisModule {
 
   public:
 

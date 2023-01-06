@@ -718,6 +718,18 @@ void Particle::appendDaughter(const Particle* daughter, const bool updateType)
   m_daughterProperties.push_back(Particle::PropertyFlags::c_Ordinary);
 }
 
+void Particle::appendDaughter(const Particle* daughter, const int daughtersProperty, const bool updateType)
+{
+  if (updateType) {
+    // is it a composite particle or fsr corrected?
+    m_particleSource = c_Composite;
+  }
+
+  // add daughter index
+  m_daughterIndices.push_back(daughter->getArrayIndex());
+  m_daughterProperties.push_back(daughtersProperty);
+}
+
 void Particle::removeDaughter(const Particle* daughter, const bool updateType)
 {
   if (getNDaughters() == 0)

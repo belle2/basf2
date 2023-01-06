@@ -38,12 +38,15 @@ namespace Belle2 {
     void append(DecayTree<T>* t);
   };
 
+  /** Default constructor. */
   template <class T>
   DecayTree<T>::DecayTree() : m_myObject(0), m_daughters() {};
 
+  /** Constructor with T object. */
   template <class T>
   DecayTree<T>::DecayTree(T* obj) : m_myObject(obj), m_daughters() {};
 
+  /** Destructor. */
   template <class T>
   DecayTree<T>::~DecayTree()
   {
@@ -54,24 +57,29 @@ namespace Belle2 {
     }
   };
 
+  /** Return a vector of daughters. */
   template <class T>
   std::vector< DecayTree<T>* > DecayTree<T>::getDaughters()
   {
     return m_daughters;
   }
 
+  /** Return the main object. */
   template <class T>
   T* DecayTree<T>::getObj()
   {
     return m_myObject;
   }
 
+  /** Set the main object. */
   template <class T>
   void DecayTree<T>::setObj(T* obj)
   {
     m_myObject = obj;
   }
 
+
+  /** Clear the main object and daughters' objects. */
   template <class T>
   void DecayTree<T>::clear()
   {
@@ -83,6 +91,7 @@ namespace Belle2 {
     }
   }
 
+  /** Append a daughter. */
   template <class T>
   void DecayTree<T>::append(DecayTree<T>* t)
   {

@@ -176,7 +176,10 @@ if args.RootOutput:
             'SVDClusters',
             'SVDSpacePoints',
             'Tracks',
-            'RecoTracks'])
+            'RecoTracks',
+            'MCRecoTracks',
+            'MCParticles']
+    )
 
 if args.executionTime:
     executionFileName = str(args.fileDir) + "SVDExecutionTime"

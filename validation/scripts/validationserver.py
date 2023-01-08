@@ -1038,9 +1038,9 @@ def run_server(
 
         cherrypy.quickstart(
             ValidationRoot(
-                working_folder = cwd_folder,
-                gitlab_object = gitlab_object,
-                gitlab_config = gitlab_config,
+                working_folder=cwd_folder,
+                gitlab_object=gitlab_object,
+                gitlab_config=gitlab_config,
             ),
             "/",
             cherry_config,

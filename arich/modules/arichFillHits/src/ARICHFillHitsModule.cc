@@ -22,8 +22,6 @@
 // magnetic field manager
 #include <framework/geometry/BFieldManager.h>
 
-using namespace std;
-
 namespace Belle2 {
 
   //-----------------------------------------------------------------

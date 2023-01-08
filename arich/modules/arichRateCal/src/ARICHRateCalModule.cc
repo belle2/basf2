@@ -27,8 +27,6 @@
 #include <sstream>
 #include <TH2F.h>
 
-using namespace std;
-
 namespace Belle2 {
 
   //-----------------------------------------------------------------

@@ -30,7 +30,6 @@
 #include <TVector3.h>
 #include <TRandom3.h>
 
-using namespace std;
 using namespace boost;
 
 namespace Belle2 {
@@ -111,8 +110,8 @@ namespace Belle2 {
     // We try to include the effect of opposite-polarity crosstalk among channels
     // on each chip, which depend on number of p.e. on chip
 
-    std::map<pair<int, int>, int> photoElectrons; // this contains number of photoelectrons falling on each channel
-    std::map<pair<int, int>, int> chipHits; // this contains number of photoelectrons on each chip
+    std::map<std::pair<int, int>, int> photoElectrons; // this contains number of photoelectrons falling on each channel
+    std::map<std::pair<int, int>, int> chipHits; // this contains number of photoelectrons on each chip
 
     // Get number of photon hits in this event
     int nHits = arichSimHits.getEntries();
@@ -158,8 +157,8 @@ namespace Belle2 {
       if (gRandom->Uniform(1.) > qe_scale) continue;
 
       // photon was converted to photoelectron
-      chipHits[make_pair(moduleID, asicChannel / 36)] += 1;
-      photoElectrons[make_pair(moduleID, asicChannel)] += 1;
+      chipHits[std::make_pair(moduleID, asicChannel / 36)] += 1;
+      photoElectrons[std::make_pair(moduleID, asicChannel)] += 1;
 
     }
 
@@ -172,7 +171,7 @@ namespace Belle2 {
       double npe = double(it->second);
 
       // reduce efficiency
-      npe /= (1.0 + m_simPar->getChipNegativeCrosstalk() * (double(chipHits[make_pair(modch.first, modch.second / 36)]) - 1.0));
+      npe /= (1.0 + m_simPar->getChipNegativeCrosstalk() * (double(chipHits[std::make_pair(modch.first, modch.second / 36)]) - 1.0));
       if (npe < 1.0 && gRandom->Uniform(1) > npe) continue;
 
       // Make hit bitmap (depends on number of p.e. on channel). For now bitmap is 0001 for single p.e., 0011 for 2 p.e., ...

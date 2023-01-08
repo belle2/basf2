@@ -60,9 +60,8 @@ namespace Belle2 {
     int nHits = m_aeroHits.getEntries();
     B2DEBUG(50, "No. of hits " << nHits);
 
-    for (int iHit = 0; iHit < nHits; ++iHit) {
-      const ARICHAeroHit* aeroHit = m_aeroHits[iHit];
-      const MCParticle* particle = DataStore::getRelated<MCParticle>(aeroHit);
+    for (const ARICHAeroHit& aeroHit : m_aeroHits) {
+      const MCParticle* particle = DataStore::getRelated<MCParticle>(&aeroHit);
       if (!particle) {
         B2DEBUG(50, "No MCParticle for AeroHit!");
         continue;
@@ -83,7 +82,7 @@ namespace Belle2 {
         if (extHit->getDetectorID() != myDetID) continue;
         if (extHit->getCopyID() != 6789) continue; // aerogel Al support plate
         if (extHit->getStatus() != EXT_EXIT) continue; // particles registered at the EXIT of the Al plate
-        extHit->addRelationTo(aeroHit);
+        extHit->addRelationTo(&aeroHit);
         break;
       }
     }

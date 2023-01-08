@@ -16,6 +16,10 @@
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
+#include <mdst/dataobjects/Track.h>
+#include <tracking/dataobjects/ExtHit.h>
+#include <mdst/dataobjects/MCParticle.h>
+
 
 using namespace std;
 

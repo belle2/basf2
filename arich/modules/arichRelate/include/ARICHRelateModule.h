@@ -18,7 +18,7 @@ namespace Belle2 {
   class ARICHAeroHit;
 
   /**
-   *
+   * Creates relations between ARICHAeroHits and ExtHits. Allows to store simulation output without MCParticles
    */
   class ARICHRelateModule : public Module {
 

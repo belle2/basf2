@@ -10,9 +10,10 @@
 #define ARICHBACKGROUND_H
 
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/database/DBObjPtr.h>
 
 #include <arich/dbobjects/ARICHGeometryConfig.h>
-#include <framework/database/DBObjPtr.h>
 
 #include <string>
 
@@ -20,6 +21,10 @@
 #include <TTree.h>
 
 namespace Belle2 {
+  class MCParticle;
+  class ARICHSimHit;
+  class BeamBackHit;
+
   namespace arich {
 
     //! ARICH digitizer module.
@@ -108,6 +113,10 @@ namespace Belle2 {
       TFile* m_outputFile;               /**< Output root file.   */
       TTree* m_outputTree;               /**< Output tree */
       DBObjPtr<ARICHGeometryConfig> m_arichgp; /**< Geometry parametrization */
+
+      StoreArray<MCParticle>  m_MCParticles;  /**< StoreArray for MCParticles*/
+      StoreArray<ARICHSimHit> m_ARICHSimHits; /**< StoreArray for ARICHSimHits*/
+      StoreArray<BeamBackHit> m_BeamBackHits; /**< StoreArray for BeamBackHits*/
 
     };
 

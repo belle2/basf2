@@ -109,20 +109,11 @@ namespace Belle2 {
 
     void ARICHBackgroundModule::event()
     {
-
-      StoreArray<MCParticle> mcParticles;
-
-      StoreArray<ARICHSimHit>  arichSimHits;
-
-      StoreArray<BeamBackHit> beamBackHits;
-
-      StoreArray<ARICHDigit> arichDigits;
-
-      int nHits = beamBackHits.getEntries();
+      int nHits = m_BeamBackHits.getEntries();
 
       for (int iHit = 0; iHit < nHits; ++iHit) {
 
-        BeamBackHit* arichhit = beamBackHits[iHit];
+        BeamBackHit* arichhit = m_BeamBackHits[iHit];
         int subdet = arichhit->getSubDet();
         if (subdet != 4) continue;
         m_type = 0;
@@ -146,7 +137,7 @@ namespace Belle2 {
         m_phMPDG = -1; m_phPPDG = -1; m_phGMPDG = -1;
         m_phPvtx = TVector3(0, 0, 0); m_phPmom = TVector3(0, 0, 0); m_phGMvtx = TVector3(0, 0, 0); m_phGMmom = TVector3(0, 0, 0);
 
-        RelationIndex<MCParticle, BeamBackHit> relBeamBackHitToMCParticle(mcParticles, beamBackHits);
+        RelationIndex<MCParticle, BeamBackHit> relBeamBackHitToMCParticle(m_MCParticles, m_BeamBackHits);
         if (relBeamBackHitToMCParticle.getFirstElementTo(arichhit)) {
           const MCParticle* currParticle = relBeamBackHitToMCParticle.getFirstElementTo(arichhit)->from;
           m_phVtx = B2Vector3D(currParticle->getVertex());
@@ -177,10 +168,10 @@ namespace Belle2 {
         m_outputTree->Fill();
       }
 
-      nHits = arichSimHits.getEntries();
+      nHits = m_ARICHSimHits.getEntries();
 
       for (int iHit = 0; iHit < nHits; ++iHit) {
-        ARICHSimHit* simHit = arichSimHits[iHit];
+        ARICHSimHit* simHit = m_ARICHSimHits[iHit];
         m_moduleID = simHit->getModuleID();
         m_type = 2;
         m_phPDG = 0;
@@ -190,7 +181,7 @@ namespace Belle2 {
         m_phVtx = TVector3(0, 0, 0); m_phMvtx = TVector3(0, 0, 0);  m_phMmom = TVector3(0, 0, 0);
         m_phMPDG = -1; m_phPPDG = -1; m_phGMPDG = -1; m_phmom = TVector3(0, 0, 0);
         m_phPvtx = TVector3(0, 0, 0); m_phPmom = TVector3(0, 0, 0); m_phGMvtx = TVector3(0, 0, 0); m_phGMmom = TVector3(0, 0, 0);
-        RelationIndex<MCParticle, ARICHSimHit> relSimHitToMCParticle(mcParticles, arichSimHits);
+        RelationIndex<MCParticle, ARICHSimHit> relSimHitToMCParticle(m_MCParticles, m_ARICHSimHits);
         if (relSimHitToMCParticle.getFirstElementTo(simHit)) {
           const MCParticle* currParticle = relSimHitToMCParticle.getFirstElementTo(simHit)->from;
           m_phVtx = B2Vector3D(currParticle->getVertex());

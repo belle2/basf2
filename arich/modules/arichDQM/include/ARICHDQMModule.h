@@ -16,9 +16,17 @@
 #include <TH3F.h>
 
 #include <framework/datastore/StoreArray.h>
+#include <framework/database/DBObjPtr.h>
 #include <rawdata/dataobjects/RawFTSW.h>
 
+#include <arich/dbobjects/ARICHGeometryConfig.h>
+#include <arich/dbobjects/ARICHMergerMapping.h>
+
 namespace Belle2 {
+  class ARICHHit;
+  class ARICHDigit;
+  class ARICHTrack;
+  class ARICHLikelihood;
 
   /**
    * Make summary of data quality from reconstruction
@@ -121,6 +129,14 @@ namespace Belle2 {
 
     double m_momUpLim = 0;/**<Upper momentum limit of tracks used in GeV (if set 0, no limit is applied)*/
     double m_momDnLim = 0;/**<Lower momentum limit of tracks used in GeV (if set 0, no limit is applied)*/
+
+    StoreArray<ARICHDigit> m_arichDigits; /**< ARICHDigits StoreArray*/
+    StoreArray<ARICHHit>  m_arichHits; /**< ARICHHits StoreArray*/
+    StoreArray<ARICHTrack> m_arichTracks; /**< ARICHTracks StoreArray*/
+    StoreArray<ARICHLikelihood> m_arichLikelihoods; /**< ARICHLikelihoods StoreArray*/
+
+    DBObjPtr<ARICHGeometryConfig> m_arichGeoConfig; /**< ARICH Geometry configuration payload */
+    DBObjPtr<ARICHMergerMapping> m_arichMergerMap; /**< ARICH merger mapping payload */
 
   };
 

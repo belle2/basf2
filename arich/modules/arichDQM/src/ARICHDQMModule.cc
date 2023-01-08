@@ -10,26 +10,18 @@
 #include <arich/modules/arichDQM/ARICHDQMModule.h>
 
 // ARICH
-#include <arich/dbobjects/ARICHGeometryConfig.h>
-#include <arich/dbobjects/ARICHChannelMapping.h>
-#include <arich/dbobjects/ARICHMergerMapping.h>
 #include <arich/dbobjects/ARICHGeoDetectorPlane.h>
 #include <arich/dbobjects/ARICHGeoAerogelPlane.h>
 #include <arich/dataobjects/ARICHHit.h>
 #include <arich/dataobjects/ARICHDigit.h>
-#include <arich/dataobjects/ARICHAeroHit.h>
 #include <arich/dataobjects/ARICHTrack.h>
 #include <arich/dataobjects/ARICHLikelihood.h>
 #include <arich/dataobjects/ARICHPhoton.h>
 
 #include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/MCParticle.h>
 
 // framework - DataStore
 #include <framework/datastore/StoreArray.h>
-
-// Dataobject classes
-#include <framework/database/DBObjPtr.h>
 
 #include <TF1.h>
 #include <TVector3.h>
@@ -202,20 +194,15 @@ namespace Belle2 {
   void ARICHDQMModule::initialize()
   {
     REG_HISTOGRAM
-    StoreArray<MCParticle> MCParticles;
-    MCParticles.isOptional();
+    // Only need the Tracks via relations, but since DQM is only really possible if the
+    // Tracks StoreArray is present, make it a requirement instead of optional.
     StoreArray<Track> tracks;
-    tracks.isOptional();
-    StoreArray<ARICHHit> arichHits;
-    arichHits.isOptional();
-    StoreArray<ARICHDigit> arichDigits;
-    arichDigits.isRequired();
-    StoreArray<ARICHTrack> arichTracks;
-    arichTracks.isOptional();
-    StoreArray<ARICHAeroHit> arichAeroHits;
-    arichAeroHits.isOptional();
-    StoreArray<ARICHLikelihood> likelihoods;
-    likelihoods.isOptional();
+    tracks.isRequired();
+
+    m_arichHits.isRequired();
+    m_arichDigits.isRequired();
+    m_arichTracks.isRequired();
+    m_arichLikelihoods.isRequired();
     m_rawFTSW.isOptional(); /// better use isRequired(), but RawFTSW is not in sim
   }
 
@@ -263,32 +250,22 @@ namespace Belle2 {
 
   void ARICHDQMModule::event()
   {
-    StoreArray<MCParticle> MCParticles;
-    StoreArray<Track> tracks;
-    StoreArray<ARICHDigit> arichDigits;
-    StoreArray<ARICHHit> arichHits;
-    StoreArray<ARICHTrack> arichTracks;
-    StoreArray<ARICHAeroHit> arichAeroHits;
-    StoreArray<ARICHLikelihood> arichLikelihoods;
-    DBObjPtr<ARICHGeometryConfig> arichGeoConfig;
-    const ARICHGeoDetectorPlane& arichGeoDec = arichGeoConfig->getDetectorPlane();
-    const ARICHGeoAerogelPlane& arichGeoAero = arichGeoConfig->getAerogelPlane();
-    DBObjPtr<ARICHChannelMapping> arichChannelMap;
-    DBObjPtr<ARICHMergerMapping> arichMergerMap;
+    const ARICHGeoDetectorPlane& arichGeoDec = m_arichGeoConfig->getDetectorPlane();
+    const ARICHGeoAerogelPlane& arichGeoAero = m_arichGeoConfig->getAerogelPlane();
 
     setReturnValue(1);
 
-    if (arichHits.getEntries() < m_minHits || arichHits.getEntries() > m_maxHits) { setReturnValue(0); return;}
+    if (m_arichHits.getEntries() < m_minHits || m_arichHits.getEntries() > m_maxHits) { setReturnValue(0); return;}
 
-    if (!arichLikelihoods.getEntries() && m_arichEvents) { setReturnValue(0); return;}
+    if (!m_arichLikelihoods.getEntries() && m_arichEvents) { setReturnValue(0); return;}
 
     std::vector<int> apds(420 * 4, 0);
-    for (const auto& digit : arichDigits) {
+    for (const auto& digit : m_arichDigits) {
       uint8_t bits = digit.getBitmap();
       int moduleID  = digit.getModuleID();
       int channelID = digit.getChannelID();
-      int mergerID = arichMergerMap->getMergerID(moduleID);
-      int febSlot = arichMergerMap->getFEBSlot(moduleID);
+      int mergerID = m_arichMergerMap->getMergerID(moduleID);
+      int febSlot = m_arichMergerMap->getFEBSlot(moduleID);
       unsigned binID = (mergerID - 1) * N_FEB2MERGER + (febSlot);
 
       for (int i = 0; i < 8; i++) {
@@ -319,10 +296,10 @@ namespace Belle2 {
     std::vector<int> hpd(420, 0);
     int nHit = 0;
 
-    for (int i = 0; i < arichHits.getEntries(); i++) {
+    for (int i = 0; i < m_arichHits.getEntries(); i++) {
 
-      int moduleID = arichHits[i]->getModule();
-      int channelID = arichHits[i]->getChannel();
+      int moduleID = m_arichHits[i]->getModule();
+      int channelID = m_arichHits[i]->getChannel();
       h_chHit->Fill((moduleID - 1) * 144 + channelID);
       hpd[moduleID - 1]++;
       h_chipHit->Fill((moduleID - 1) * 4 + channelID / 36);
@@ -337,7 +314,7 @@ namespace Belle2 {
         }
       }
 
-      int mergerID = arichMergerMap->getMergerID(moduleID);
+      int mergerID = m_arichMergerMap->getMergerID(moduleID);
       h_mergerHit->Fill(mergerID);
       nHit++;
     }
@@ -347,7 +324,7 @@ namespace Belle2 {
     for (auto hh : hpd) { h_hapdHitPerEvent->Fill(mmid, hh); mmid++;}
 
     int ntrk = 0;
-    for (const auto& arichTrack : arichTracks) {
+    for (const auto& arichTrack : m_arichTracks) {
 
 
       //Momentum limits are applied
@@ -395,7 +372,7 @@ namespace Belle2 {
             h_theta->Fill(photon.getThetaCer());
           }
           int hitSector = 0;
-          double hitPhi = arichGeoDec.getSlotPhi(arichHits[photon.getHitID()]->getModule());
+          double hitPhi = arichGeoDec.getSlotPhi(m_arichHits[photon.getHitID()]->getModule());
           if (hitPhi < 0) hitPhi += 2 * M_PI;
           while (hitPhi > M_PI / 3 && hitSector < 5) {
             hitPhi -= M_PI / 3;
@@ -437,7 +414,7 @@ namespace Belle2 {
               it.GetTimeSinceLastInjection(0) << " IsHER " << it.GetIsHER(0) << " Bunch " << it.GetBunchNumber(0));
       auto difference = it.GetTimeSinceLastInjection(0);
       if (difference != 0x7FFFFFFF) {
-        unsigned int nentries = arichDigits.getEntries();
+        unsigned int nentries = m_arichDigits.getEntries();
         float diff2 = difference / 127.; //  127MHz clock ticks to us, inexact rounding
         if (it.GetIsHER(0)) {
           h_ARICHOccAfterInjHer->Fill(diff2, nentries);
@@ -453,8 +430,6 @@ namespace Belle2 {
 
   void ARICHDQMModule::endRun()
   {
-
-    DBObjPtr<ARICHMergerMapping> arichMergerMap;
     if (h_theta->GetEntries() < 200) return;
     TF1* f1 = new TF1("arichFitFunc", "gaus(0)+pol1(3)", 0.25, 0.4);
     f1->SetParameters(0.8 * h_theta->GetMaximum(), 0.323, 0.016, 0, 0);
@@ -469,7 +444,7 @@ namespace Belle2 {
     for (int mergerID = 1; mergerID < 73; ++mergerID) {
       double NHapd = 0;
       for (int febSlot = 1; febSlot < 7; ++febSlot) {
-        if (arichMergerMap->getModuleID(mergerID, febSlot) > 0) NHapd++;
+        if (m_arichMergerMap->getModuleID(mergerID, febSlot) > 0) NHapd++;
       }
 
       double bin_value[5];

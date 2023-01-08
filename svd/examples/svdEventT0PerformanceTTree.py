@@ -85,7 +85,8 @@ if args.isMC:
     #     simulateT0jitter=simulateJitter)
 
     # b2conditions.prepend_globaltag("tracking_TEST_SVDTimeSelectionONrev5_VXDTF2TimeFiltersONrev27")
-    b2conditions.prepend_globaltag("tracking_TEST_SVDTimeSelectionOFFrev1_VXDTF2TimeFiltersONrev27")
+    # b2conditions.prepend_globaltag("tracking_TEST_SVDTimeSelectionOFFrev1_VXDTF2TimeFiltersONrev27")
+    b2conditions.prepend_globaltag("tracking_TEST_SVDTimeSelectionOFFrev1_VXDTF2TimeFiltersOFFrev28")
 
 else:
     # setup database

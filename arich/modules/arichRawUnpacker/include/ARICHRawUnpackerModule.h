@@ -5,9 +5,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-
-#ifndef ARICHRAWUNPACKERMODULE_H
-#define ARICHRAWUNPACKERMODULE_H
+#pragma once
 
 #include <framework/core/HistoModule.h>
 #include <TH1F.h>
@@ -91,5 +89,3 @@ namespace Belle2 {
 
 
 } // Belle2 namespace
-
-#endif

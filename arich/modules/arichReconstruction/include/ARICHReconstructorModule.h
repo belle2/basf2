@@ -6,8 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef ARICHRECONSTRUCTORMODULE_H
-#define ARICHRECONSTRUCTORMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 
@@ -88,5 +87,3 @@ namespace Belle2 {
   };
 
 } // Belle2 namespace
-
-#endif // ARICHRECONSTRUCTORMODULE

@@ -5,9 +5,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-
-#ifndef ARICHPACKERMODULE_H
-#define ARICHPACKERMODULE_H
+#pragma once
 
 // mappers
 #include <arich/dbobjects/ARICHMergerMapping.h>
@@ -84,5 +82,3 @@ namespace Belle2 {
   };
 
 } // Belle2 namespace
-
-#endif

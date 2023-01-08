@@ -5,9 +5,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-
-#ifndef ARICHRATECALMODULE_H
-#define ARICHRATECALMODULE_H
+#pragma once
 
 #include <framework/core/HistoModule.h>
 #include <string>
@@ -98,5 +96,3 @@ namespace Belle2 {
   }
 
 } // Belle2 namespace
-
-#endif

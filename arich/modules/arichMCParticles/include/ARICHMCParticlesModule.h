@@ -19,7 +19,7 @@
 namespace Belle2 {
 
   /**
-   *
+   * Module to match ARICH hits to MCParticles
    */
   class ARICHMCParticlesModule : public Module {
 

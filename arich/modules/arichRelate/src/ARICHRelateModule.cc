@@ -44,10 +44,6 @@ namespace Belle2 {
 
   }
 
-  ARICHRelateModule::~ARICHRelateModule()
-  {
-  }
-
   void ARICHRelateModule::initialize()
 
   {
@@ -57,10 +53,6 @@ namespace Belle2 {
     m_aeroHits.isRequired();
     m_extHits.isRequired();
     m_extHits.registerRelationTo(m_aeroHits);
-  }
-
-  void ARICHRelateModule::beginRun()
-  {
   }
 
   void ARICHRelateModule::event()
@@ -96,20 +88,6 @@ namespace Belle2 {
       }
     }
   }
-
-
-  void ARICHRelateModule::endRun()
-  {
-  }
-
-  void ARICHRelateModule::terminate()
-  {
-  }
-
-  void ARICHRelateModule::printModuleParams() const
-  {
-  }
-
 
 } // end Belle2 namespace
 

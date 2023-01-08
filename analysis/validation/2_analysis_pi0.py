@@ -76,6 +76,7 @@ create_validation_histograms(
     description=r"$\pi^0$ MC mass distribution",
 )
 
+main.add_module('Progress')
 basf2.process(main)
 print(basf2.statistics)
 
@@ -123,6 +124,7 @@ outputNtuple = ROOT.TNtuple(
     "mean:meanerror:width:widtherror")
 
 
+ROOT.gROOT.SetBatch(True)
 canvas = ROOT.TCanvas("canvas", "pi0 mass fit", 1000, 600)
 canvas.Divide(2, 1)
 canvas.cd(1)

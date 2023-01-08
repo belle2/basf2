@@ -663,6 +663,16 @@ class ValidationRoot:
         }
 
     @cherrypy.expose
+    def retrieve_file_metadata(self, filename):
+        """
+        Returns:
+            Metadata(str) of the file
+        """
+        cherrypy.response.headers['Content-Type'] = 'text/plain'
+        metadata = validationfunctions.get_file_metadata(filename)
+        return metadata
+
+    @cherrypy.expose
     @cherrypy.tools.json_in()
     @cherrypy.tools.json_out()
     def create_issue(self, title, description):
@@ -1016,9 +1026,9 @@ def run_server(
         gitlab_config = None
         if not os.path.exists(config_path):
             logging.warning(
-                f"ERROR: Expected to find config folder with Gitlab config,"
+                "ERROR: Expected to find config folder with Gitlab config,"
                 f" but {config_path} doesn't exist. "
-                f"Gitlab features will not work."
+                "Gitlab features will not work."
             )
         else:
             gitlab_config = get_gitlab_config(config_path)
@@ -1028,9 +1038,9 @@ def run_server(
 
         cherrypy.quickstart(
             ValidationRoot(
-                working_folder=cwd_folder,
-                gitlab_object=gitlab_object,
-                gitlab_config=gitlab_config,
+                working_folder = cwd_folder,
+                gitlab_object = gitlab_object,
+                gitlab_config = gitlab_config,
             ),
             "/",
             cherry_config,

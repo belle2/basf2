@@ -9,6 +9,9 @@
 #pragma once
 
 #include <framework/dbobjects/MagneticFieldComponent.h>
+#include <framework/geometry/B2Vector3.h>
+
+#include <vector>
 
 namespace Belle2 {
   /** Describe one component of the Geometry */
@@ -19,7 +22,7 @@ namespace Belle2 {
     /** Full constructor to create an object from data */
     MagneticFieldComponent3D(double minR, double maxR, double minZ, double maxZ,
                              int nR, int nPhi, int nZ,
-                             std::vector<B2Vector3F>&& fieldmap):
+                             std::vector<ROOT::Math::XYZVector>&& fieldmap):
       MagneticFieldComponent(true), m_minR(minR), m_maxR(maxR), m_minZ(minZ), m_maxZ(maxZ), m_mapSize{nR, nPhi, nZ},
       m_gridPitch{static_cast<float>((maxR - minR) / (nR - 1)), static_cast<float>(M_PI / (nPhi - 1)), static_cast<float>((maxZ - minZ) / (nZ - 1))},
       m_invgridPitch{static_cast<float>(1. / m_gridPitch[0]), static_cast<float>(1. / m_gridPitch[1]), static_cast<float>(1. / m_gridPitch[2])},
@@ -27,15 +30,15 @@ namespace Belle2 {
     {}
 
     /** return whether we are inside the active region for this component */
-    bool inside(const B2Vector3D& pos) const override
+    bool inside(const ROOT::Math::XYZVector& pos) const override
     {
       const float z = pos.Z();
       if (z < m_minZ || z > m_maxZ) return false;
-      const float r = pos.Perp();
+      const float r = pos.Rho();
       return (r >= m_minR && r <= m_maxR);
     }
     /** return the field assuming we are inside the active region as returned by inside() */
-    B2Vector3D getField(const B2Vector3D& pos) const override;
+    ROOT::Math::XYZVector getField(const ROOT::Math::XYZVector& pos) const override;
   private:
     /** Linear interpolate the magnetic field inside a bin
      * @param ir number of the bin in r
@@ -45,7 +48,7 @@ namespace Belle2 {
      * @param wphi phi weight: fraction we are away from the lower phi corner relative to the pitch size
      * @param wz phi weight: fraction we are away from the lower z corner relative to the pitch size
      */
-    B2Vector3D interpolate(unsigned int ir, unsigned int iphi, unsigned int iz, double wr, double wphi, double wz) const;
+    ROOT::Math::XYZVector interpolate(unsigned int ir, unsigned int iphi, unsigned int iz, double wr, double wphi, double wz) const;
     /** minimal R=sqrt(x^2+y^2) for which this field is present */
     float m_minR{0};
     /** maximal R=sqrt(x^2+y^2) for which this field is present */
@@ -61,8 +64,8 @@ namespace Belle2 {
     /** inverted grid pitch in r, phi and z */
     float m_invgridPitch[3] {0};
     /** magnetic field strength */
-    std::vector<B2Vector3F> m_bmap;
+    std::vector<ROOT::Math::XYZVector> m_bmap;
     /** ROOT dictionary */
-    ClassDefOverride(MagneticFieldComponent3D, 1);
+    ClassDefOverride(MagneticFieldComponent3D, 2);
   };
 }; // Belle2 namespace

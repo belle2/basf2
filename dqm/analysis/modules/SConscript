@@ -2,7 +2,7 @@ import os
 
 Import('env')
 
-env['LIBS'] = ['framework', 'daq', 'boost_regex',
+env['LIBS'] = ['framework', 'dqm',
                'arich', 'cdc', 'dqm_dataobjects',
 	       'klm_dataobjects', 'klm_dbobjects', 
 	       'svd_dataobjects', 'cdc_dataobjects',

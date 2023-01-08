@@ -38,6 +38,7 @@ gROOT.ProcessLine('struct EventDataCluster {\
     int sensor_type;\
     int strip_dir;\
     int cluster_truehits_number;\
+    int matched;\
     float strip_pitch;\
     float cluster_theta;\
     float cluster_phi;\
@@ -60,6 +61,7 @@ gROOT.ProcessLine('struct EventDataCluster {\
     float eventt0_all;\
     float eventt0_top;\
     float eventt0_cdc;\
+    float eventt0_svd;\
     float eventt0_ecl;\
 };')
 
@@ -68,7 +70,7 @@ from ROOT import EventDataCluster  # noqa
 
 
 class SVDValidationTTreeCluster(b2.Module):
-    '''class to produce the ttree for cluster validation'''
+    '''class to produce the ttree for cluster reconstruction validation'''
 
     def __init__(self):
         """Initialize the module"""
@@ -100,11 +102,16 @@ class SVDValidationTTreeCluster(b2.Module):
         self.data.eventt0_top = -1
         self.data.eventt0_cdc = -1
         self.data.eventt0_ecl = -1
+        self.data.eventt0_svd = -1
         top = Belle2.Const.DetectorSet(Belle2.Const.TOP)
         cdc = Belle2.Const.DetectorSet(Belle2.Const.CDC)
         ecl = Belle2.Const.DetectorSet(Belle2.Const.ECL)
+        svd = Belle2.Const.DetectorSet(Belle2.Const.SVD)
         if eventt0.hasEventT0():
             self.data.eventt0_all = eventt0.getEventT0()
+        if eventt0.hasTemporaryEventT0(svd):
+            tmp = eventt0.getTemporaryEventT0s(Belle2.Const.SVD)
+            self.data.eventt0_svd = tmp.back().eventT0
         if eventt0.hasTemporaryEventT0(cdc):
             tmp = eventt0.getTemporaryEventT0s(Belle2.Const.CDC)
             self.data.eventt0_cdc = tmp.back().eventT0
@@ -122,126 +129,128 @@ class SVDValidationTTreeCluster(b2.Module):
                     self.data.eventt0_ecl = tmp.eventT0
 
         for cluster in clusters:
-            cluster_truehits = cluster.getRelationsTo('SVDTrueHits')  # SVDClustersToSVDTrueHits
-            cluster_TrueHit_Length = len(cluster_truehits)
-            if (cluster_TrueHit_Length == 0) or (cluster_TrueHit_Length != 1):
-                # Sensor identification
-                sensorID = cluster.getSensorID()
-                self.data.sensor_id = int(sensorID)
-                sensorNum = sensorID.getSensorNumber()
-                self.data.sensor = sensorNum
-                layerNum = sensorID.getLayerNumber()
-                self.data.layer = layerNum
-                if (layerNum == 3):
-                    sensorType = 1
+
+            cluster_truehits = cluster.getRelationsTo('SVDTrueHits')
+
+            # Sensor identification
+            sensorInfo = Belle2.VXD.GeoCache.get(cluster.getSensorID())
+            sensorID = cluster.getSensorID()
+            self.data.sensor_id = int(sensorID)
+            sensorNum = sensorID.getSensorNumber()
+            self.data.sensor = sensorNum
+            layerNum = sensorID.getLayerNumber()
+            self.data.layer = layerNum
+            if (layerNum == 3):
+                sensorType = 1
+            else:
+                if (sensorNum == 1):
+                    sensorType = 0
                 else:
-                    if (sensorNum == 1):
-                        sensorType = 0
-                    else:
-                        sensorType = 1
-                self.data.sensor_type = sensorType
-                ladderNum = sensorID.getLadderNumber()
-                self.data.ladder = ladderNum
-                #
-                self.data.strip_dir = -1
-                self.data.cluster_truehits_number = cluster_TrueHit_Length
+                    sensorType = 1
+            self.data.sensor_type = sensorType
+            ladderNum = sensorID.getLadderNumber()
+            self.data.ladder = ladderNum
+            if cluster.isUCluster():
+                strip_dir = 0
+            else:
+                strip_dir = 1
+
+            self.data.matched = 1
+            # We want only clusters with at least one associated TrueHit
+            # but, to compute purity, we need to store also some information
+            # for clusters not related to true hits
+            if len(cluster_truehits) == 0:
+                self.data.matched = 0
                 # Fill tree
                 self.file.cd()
                 self.tree.Fill()
-            else:
-                # We want only clusters with exactly one associated TrueHit
-                for truehit in cluster_truehits:
-                    self.data.cluster_truehits_number = cluster_TrueHit_Length
-                    sensorInfo = Belle2.VXD.GeoCache.get(cluster.getSensorID())
-                    # Sensor identification
-                    sensorID = cluster.getSensorID()
-                    self.data.sensor_id = int(sensorID)
-                    sensorNum = sensorID.getSensorNumber()
-                    self.data.sensor = sensorNum
-                    layerNum = sensorID.getLayerNumber()
-                    self.data.layer = layerNum
-                    if (layerNum == 3):
-                        sensorType = 1
-                    else:
-                        if (sensorNum == 1):
-                            sensorType = 0
-                        else:
-                            sensorType = 1
-                    self.data.sensor_type = sensorType
-                    ladderNum = sensorID.getLadderNumber()
-                    self.data.ladder = ladderNum
-                    # Cluster information
-                    self.data.cluster_clsTime = cluster.getClsTime()
-                    self.data.cluster_clsTimeSigma = cluster.getClsTimeSigma()
-                    self.data.cluster_charge = cluster.getCharge()
-                    self.data.cluster_seedCharge = cluster.getSeedCharge()
-                    self.data.cluster_size = cluster.getSize()
-                    self.data.cluster_snr = cluster.getSNR()
-                    cluster_position = cluster.getPosition()
-                    if cluster.isUCluster():
-                        cluster_position = cluster.getPosition(truehit.getV())
-                    # Interstrip position calculations
-                    if cluster.isUCluster():
-                        strip_dir = 0
-                        strip_pitch = sensorInfo.getUPitch(truehit.getV())
-                    else:
-                        strip_dir = 1
-                        strip_pitch = sensorInfo.getVPitch(truehit.getU())
-                    self.data.strip_dir = strip_dir
-                    self.data.strip_pitch = strip_pitch
-                    cluster_interstripPosition = cluster_position % strip_pitch / strip_pitch
-                    self.data.cluster_interstripPosition = cluster_interstripPosition
-                    # theta and phi definitions
-                    if cluster.isUCluster():
-                        uPos = cluster_position
-                        vPos = 0
-                    else:
-                        uPos = 0
-                        vPos = cluster_position
-                    localPosition = TVector3(uPos, vPos, 0)  # sensor center at (0, 0, 0)
-                    globalPosition = sensorInfo.pointToGlobal(localPosition, True)
-                    x = globalPosition[0]
-                    y = globalPosition[1]
-                    z = globalPosition[2]
-                    # see https://d2comp.kek.jp/record/242?ln=en for the Belle II
-                    # coordinate system and related variables
-                    rho = math.sqrt(x * x + y * y)
-                    r = math.sqrt(x * x + y * y + z * z)
-                    # get theta as arccosine(z/r)
-                    thetaRadians = math.acos(z / r)
-                    theta = (thetaRadians * 180) / math.pi
-                    # get phi as arccosine(x/rho)
-                    phiRadians = math.acos(x / rho)
-                    if y < 0:
-                        phi = 360 - (phiRadians * 180) / math.pi
-                    else:
-                        phi = (phiRadians * 180) / math.pi
-                    self.data.cluster_theta = theta
-                    self.data.cluster_phi = phi
-                    # Pull calculations
-                    clusterPos = cluster_position
-                    clusterPosSigma = cluster.getPositionSigma()
-                    if cluster.isUCluster():
-                        truehitPos = truehit.getU()
-                    else:
-                        truehitPos = truehit.getV()
-                    cluster_residual = clusterPos - truehitPos
-                    cluster_pull = cluster_residual / clusterPosSigma
-                    self.data.cluster_position = clusterPos
-                    self.data.cluster_positionSigma = clusterPosSigma
-                    self.data.cluster_residual = cluster_residual
-                    self.data.cluster_pull = cluster_pull
-                    # Truehit information
-                    self.data.truehit_position = truehitPos
-                    truehit_interstripPosition = truehitPos % strip_pitch / strip_pitch
-                    self.data.truehit_interstripPosition = truehit_interstripPosition
-                    self.data.truehit_deposEnergy = truehit.getEnergyDep()
-                    self.data.truehit_lossmomentum = truehit.getEntryMomentum().Mag() - truehit.getExitMomentum().Mag()
-                    self.data.truehit_time = truehit.getGlobalTime()
+                continue
 
-                    # Fill tree
-                    self.file.cd()
-                    self.tree.Fill()
+            # find the trueHit with highest energy deposit (the "best" match)
+            energy = 0
+            bestTrueHitIndex = 0
+            for i, trueHit in enumerate(cluster_truehits):
+                if trueHit.getEnergyDep() > energy:
+                    energy = trueHit.getEnergyDep()
+                    bestTrueHitIndex = i
+            bestTrueHit = cluster_truehits[bestTrueHitIndex]
+
+            # Cluster information
+            self.data.cluster_clsTime = cluster.getClsTime()
+            self.data.cluster_clsTimeSigma = cluster.getClsTimeSigma()
+            self.data.cluster_charge = cluster.getCharge()
+            self.data.cluster_seedCharge = cluster.getSeedCharge()
+            self.data.cluster_size = cluster.getSize()
+            self.data.cluster_snr = cluster.getSNR()
+            cluster_position = cluster.getPosition()
+            if cluster.isUCluster():
+                cluster_position = cluster.getPosition(bestTrueHit.getV())
+                # Interstrip position calculations
+                strip_pitch = sensorInfo.getUPitch(bestTrueHit.getV())
+            else:
+                strip_pitch = sensorInfo.getVPitch(bestTrueHit.getU())
+            self.data.strip_dir = strip_dir
+            self.data.strip_pitch = strip_pitch
+            self.data.cluster_interstripPosition = cluster_position % strip_pitch / strip_pitch
+            # theta and phi definitions
+            if cluster.isUCluster():
+                uPos = cluster_position
+                vPos = 0
+            else:
+                uPos = 0
+                vPos = cluster_position
+            localPosition = TVector3(uPos, vPos, 0)  # sensor center at (0, 0, 0)
+            globalPosition = sensorInfo.pointToGlobal(localPosition, True)
+            x = globalPosition.X()
+            y = globalPosition.Y()
+            z = globalPosition.Z()
+            # see https://d2comp.kek.jp/record/242?ln=en for the Belle II
+            # coordinate system and related variables
+            rho = math.sqrt(x * x + y * y)
+            r = math.sqrt(x * x + y * y + z * z)
+            # get theta as arccosine(z/r)
+            thetaRadians = math.acos(z / r)
+            theta = (thetaRadians * 180) / math.pi
+            # get phi as arccosine(x/rho)
+            phiRadians = math.acos(x / rho)
+            if y < 0:
+                phi = 360 - (phiRadians * 180) / math.pi
+            else:
+                phi = (phiRadians * 180) / math.pi
+            self.data.cluster_theta = theta
+            self.data.cluster_phi = phi
+            # Pull calculations
+            clusterPos = cluster_position
+            clusterPosSigma = cluster.getPositionSigma()
+            if cluster.isUCluster():
+                truehitPos = bestTrueHit.getU()
+            else:
+                truehitPos = bestTrueHit.getV()
+            cluster_residual = clusterPos - truehitPos
+            cluster_pull = cluster_residual / clusterPosSigma
+            self.data.cluster_position = clusterPos
+            self.data.cluster_positionSigma = clusterPosSigma
+            self.data.cluster_residual = cluster_residual
+            self.data.cluster_pull = cluster_pull
+            # Truehit information
+            self.data.truehit_position = truehitPos
+            truehit_interstripPosition = truehitPos % strip_pitch / strip_pitch
+            self.data.truehit_interstripPosition = truehit_interstripPosition
+            self.data.truehit_deposEnergy = bestTrueHit.getEnergyDep()
+            self.data.truehit_lossmomentum = bestTrueHit.getEntryMomentum().R() - bestTrueHit.getExitMomentum().R()
+            self.data.truehit_time = bestTrueHit.getGlobalTime()
+
+            # DEBUG options, commented out
+            # print("\n new cluster with at least one true hit ("+str(len(cluster_truehits))+")")
+            # print("best True hit has energy = "+str(bestTrueHit.getEnergyDep()*1e6)+" eV,\
+            # global time = "+str(bestTrueHit.getGlobalTime()))
+            # print("cluster isU = "+str(cluster.isUCluster())+", size = "+str(self.data.cluster_size)+"\
+            # position = "+str(clusterPos))
+            # print("cluster charge = "+str(self.data.cluster_charge)+", time = "+str(self.data.cluster_clsTime))
+
+            # Fill tree
+            self.file.cd()
+            self.tree.Fill()
 
     def terminate(self):
         """Close the output file. """

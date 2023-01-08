@@ -54,9 +54,9 @@ namespace Belle2 {
      * Calculates the magnetic field vector at the specified space point.
      *
      * @param point The space point in Cartesian coordinates (x,y,z) in [cm] at which the magnetic field vector should be calculated.
-     * @return The magnetic field vector at the given space point in [T]. Returns a zero vector TVector(0,0,0) if the space point lies outside the region described by the Component.
+     * @return The magnetic field vector at the given space point in [T]. Returns a zero vector XYZVector(0,0,0) if the space point lies outside the region described by the Component.
      */
-    virtual B2Vector3D calculate(const B2Vector3D& point) const override;
+    virtual ROOT::Math::XYZVector calculate(const ROOT::Math::XYZVector& point) const override;
 
     /**
      * Terminates the magnetic field Component.
@@ -65,7 +65,7 @@ namespace Belle2 {
 
     /**
      * Sets the filename of the magnetic field map.
-     * @param filename The filname of the magnetic field map.
+     * @param filename The filename of the magnetic field map.
      */
     void setMapFilename(const std::string& filename) { m_mapFilename = filename; };
 
@@ -131,7 +131,7 @@ namespace Belle2 {
     double m_barrelGapHeightLayer0{0};
     /** Gap height of BKLM layer1-14 */
     double m_endcapGapHeight{0};
-    /** deppth of BKLM module? */
+    /** depth of BKLM module? */
     double m_dLayer{0};
     /** Thickness of Barrel iron plate */
     double m_barrelIronThickness{0};
@@ -151,7 +151,7 @@ namespace Belle2 {
     /** Slope of Bz after the breakpoint in the barrel.
      * Index indicates the current layer */
     double m_barrelFieldZSlope2[15] {0};
-    /** Intercept of Bz after the beackpoint in the barrel.
+    /** Intercept of Bz after the breakpoint in the barrel.
      * Index indicates the current layer */
     double m_barrelFieldZIntercept2[15] {0};
     /** Slope of Br before the breakpoint in the barrel.

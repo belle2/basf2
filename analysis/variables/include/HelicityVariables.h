@@ -75,5 +75,13 @@ namespace Belle2 {
      */
     double acoplanarityAngle(const Particle* part);
 
+    /**
+     * Cosine of the helicity angle between the momentum of the provided particle and the momentum of the first selected
+     * daughter in the reference frame of the sum of two selected daughters.
+     * The variable is supposed to be used for the analysis of a quasi-two-body decay. The number of daughters of the given particle
+     * must be three. Otherwise, this variable returns NaN.
+     */
+    double cosHelicityAngleForQuasiTwoBodyDecay(const Particle* mother, const std::vector<double>& indices);
+
   }
 } // Belle2 namespace

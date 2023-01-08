@@ -12,17 +12,17 @@
 
 #pragma once
 
+#include <dqm/core/DQMHistAnalysis.h>
+
 #ifdef _BELLE2_EPICS
 // EPICS
 #include "cadef.h"
 #endif
 
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
 #include <vxd/dataobjects/VxdID.h>
 
-#include <TEfficiency.h>
-#include <TCanvas.h>
 #include <TH2F.h>
+#include <TEfficiency.h>
 
 namespace Belle2 {
   /*! DQM Histogram Analysis for PXD Efficiency */
@@ -139,10 +139,6 @@ namespace Belle2 {
     std::vector <chid>  mychid_status;
     //! EPICS PVs for Efficiency
     std::map <VxdID, chid> mychid_eff;
-    //! EPICS PVs for Efficiency, low warn limits
-    std::map <VxdID, chid> mychid_low;
-    //! EPICS PVs for Efficiency, low alarm limits
-    std::map <VxdID, chid> mychid_lolo;
 #endif
   };
 } // end namespace Belle2

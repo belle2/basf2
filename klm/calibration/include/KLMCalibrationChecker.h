@@ -78,6 +78,25 @@ namespace Belle2 {
     }
 
     /**
+     * Set time cable delay results file.
+     */
+    void setTimeCableDelayResultsFile(
+      const std::string& timeCableDelayResultsFile)
+    {
+      m_TimeCableDelayResultsFile = timeCableDelayResultsFile;
+    }
+
+    /**
+     * Set time constants result file.
+     */
+    void setTimeConstantsResultsFile(
+      const std::string& timeConstantsResultsFile)
+    {
+      m_TimeConstantsResultsFile = timeConstantsResultsFile;
+    }
+
+
+    /**
      * Check alignment.
      */
     void checkAlignment();
@@ -91,6 +110,17 @@ namespace Belle2 {
      * Create strip efficiency histograms.
      */
     void createStripEfficiencyHistograms();
+
+    /**
+     * Check time cable delay.
+     */
+    void checkTimeCableDelay();
+
+    /**
+     * Check time constants.
+     */
+    void checkTimeConstants();
+
 
   private:
 
@@ -133,6 +163,12 @@ namespace Belle2 {
 
     /** Output file for alignment results. */
     std::string m_StripEfficiencyResultsFile = "strip_efficiency.root";
+
+    /** Output file for time cable delay results. */
+    std::string m_TimeCableDelayResultsFile = "timeCableDelay.root";
+
+    /** Output file for time constants results. */
+    std::string m_TimeConstantsResultsFile = "timeConstants.root";
 
     /** Element numbers. */
     const KLMElementNumbers* m_ElementNumbers;

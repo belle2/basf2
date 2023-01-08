@@ -553,7 +553,7 @@ namespace {
 
     DBObjPtr<TNamed> named;
     EXPECT_TRUE(named.isValid());
-    double Bz = BFieldManager::getFieldInTesla({0, 0, 0}).Z();
+    double Bz = BFieldManager::getField(0, 0, 0).Z() / Unit::T;
     EXPECT_EQ(Bz, 1.5);
     DBStore::Instance().reset();
     //Ok, on next access the DBObjPtr should try to reconnect
@@ -566,7 +566,7 @@ namespace {
     field->addComponent(new Belle2::MagneticFieldComponentConstant({0, 0, 1.5 * Belle2::Unit::T}));
     Belle2::DBStore::Instance().addConstantOverride("MagneticField", field, false);
     //So now it should work again
-    Bz = BFieldManager::getFieldInTesla({0, 0, 0}).Z();
+    Bz = BFieldManager::getField(0, 0, 0).Z() / Unit::T;
     EXPECT_EQ(Bz, 1.5);
   }
 

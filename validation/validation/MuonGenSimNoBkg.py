@@ -64,6 +64,7 @@ output = register_module("RootOutput")
 output.param("outputFileName", "../MuonGenSimNoBkg.root")
 main.add_module(output)
 
+main.add_module('Progress')
 process(main)
 
 # Print call statistics

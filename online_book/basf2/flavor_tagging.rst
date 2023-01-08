@@ -12,15 +12,15 @@ Flavor tagging
 
     **Prerequisites**:
 
-        * The previous lesson
+    * The previous lesson
 
     **Questions**:
 
-        * How can I distinguish between a :math:`B_\text{tag}^0` and a :math:`\bar B_\text{tag}^0`
+    * How can I distinguish between a :math:`B_\text{tag}^0` and a :math:`\bar B_\text{tag}^0`
 
     **Objectives**:
 
-        * Perform flavor tagging
+    * Perform flavor tagging
 
 How can we distinguish between a :math:`B^0` and a :math:`\bar B^0`? This is not
 as simple as the case where we have a :math:`B^+` vs a :math:`B^-` and can just
@@ -179,6 +179,6 @@ it to ``FBDT_qrCombined``!
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Authors of this lesson
+.. rubric:: Authors of this lesson
 
-    Kilian Lieret
+Kilian Lieret

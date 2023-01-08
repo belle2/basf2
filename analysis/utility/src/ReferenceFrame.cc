@@ -41,7 +41,7 @@ ROOT::Math::XYZVector RestFrame::getVertex(const ROOT::Math::XYZVector& vector) 
   // 3. Subtract movement of vertex end due to the time difference between
   //    the former simultaneous measured vertex points (see derivation of Lorentz contraction)
   ROOT::Math::XYZVector v(vector - m_displacement);
-  ROOT::Math::PxPyPzEVector a = m_lab2restframe * ROOT::Math::PxPyPzEVector(v.x(), v.y(), v.z(), 0);
+  ROOT::Math::PxPyPzEVector a = m_lab2restframe * ROOT::Math::PxPyPzEVector(v.X(), v.Y(), v.Z(), 0);
   return a.Vect() - m_boost * a.T();
 }
 
@@ -80,9 +80,9 @@ TMatrixFSym RestFrame::getVertexErrorMatrix(const TMatrixFSym& matrix) const
   timeshift(0, 0) = 1;
   timeshift(1, 1) = 1;
   timeshift(2, 2) = 1;
-  timeshift(0, 3) = m_boost.x();
-  timeshift(1, 3) = m_boost.y();
-  timeshift(2, 3) = m_boost.z();
+  timeshift(0, 3) = m_boost.X();
+  timeshift(1, 3) = m_boost.Y();
+  timeshift(2, 3) = m_boost.Z();
 
   return rotated_error_matrix.Similarity(timeshift);
 }
@@ -114,9 +114,9 @@ ROOT::Math::XYZVector CMSFrame::getVertex(const ROOT::Math::XYZVector& vector) c
   // 1. Use Lorentz Transformation to Boost Vertex vector into cms frame
   // 2. Subtract movement of vertex end due to the time difference between
   //    the former simultaneous measured vertex points (see derivation of Lorentz contraction)
-  ROOT::Math::PxPyPzEVector a = m_transform.rotateLabToCms() * ROOT::Math::PxPyPzEVector(vector.x(), vector.y(), vector.z(), 0);
-  return a.Vect() - ROOT::Math::XYZVector(m_transform.getBoostVector().x(), m_transform.getBoostVector().y(),
-                                          m_transform.getBoostVector().z()) * a.T();
+  ROOT::Math::PxPyPzEVector a = m_transform.rotateLabToCms() * ROOT::Math::PxPyPzEVector(vector.X(), vector.Y(), vector.Z(), 0);
+  return a.Vect() - ROOT::Math::XYZVector(m_transform.getBoostVector().X(), m_transform.getBoostVector().Y(),
+                                          m_transform.getBoostVector().Z()) * a.T();
 }
 
 ROOT::Math::PxPyPzEVector CMSFrame::getMomentum(const ROOT::Math::PxPyPzEVector& vector) const

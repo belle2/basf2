@@ -560,12 +560,12 @@ namespace Belle2 {
 
           ROOT::Math::XYZVector newZ = evtShapeCont->getThrustAxis();
           ROOT::Math::XYZVector newY(0, 0, 0);
-          if (newZ.z() == 0 and newZ.y() == 0)
+          if (newZ.Z() == 0 and newZ.Y() == 0)
             newY.SetX(1);
           else
           {
-            newY.SetY(newZ.z());
-            newY.SetZ(-newZ.y());
+            newY.SetY(newZ.Z());
+            newY.SetZ(-newZ.Y());
           }
           ROOT::Math::XYZVector newX = newY.Cross(newZ);
 

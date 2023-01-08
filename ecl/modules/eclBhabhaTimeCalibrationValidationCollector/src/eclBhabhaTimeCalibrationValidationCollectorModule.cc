@@ -353,7 +353,7 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::collect()
     double z0 = tempTrackFit->getZ0() ;
     double d0 = tempTrackFit->getD0() ;
     int nCDChits = tempTrackFit->getHitPatternCDC().getNHits() ;
-    double p = tempTrackFit->getMomentum().Mag() ;
+    double p = tempTrackFit->getMomentum().R() ;
 
     /* Test if loose track  */
 

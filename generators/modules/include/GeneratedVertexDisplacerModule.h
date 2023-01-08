@@ -13,7 +13,6 @@
 #include <framework/core/RandomGenerator.h>
 #include <framework/gearbox/Const.h>
 #include <mdst/dataobjects/MCParticle.h>
-#include <TVector3.h>
 #include <Math/Vector4D.h>
 #include <TF1.h>
 #include <string>

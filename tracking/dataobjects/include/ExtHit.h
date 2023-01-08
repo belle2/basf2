@@ -11,6 +11,7 @@
 #include <framework/datastore/RelationsObject.h>
 #include <framework/gearbox/Const.h>
 #include <Math/Vector3D.h>
+#include <Math/Point3D.h>
 #include <TMatrixDSym.h>
 #include <TVector3.h>
 #include <G4ThreeVector.hh>
@@ -42,7 +43,7 @@ namespace Belle2 {
     //! @param p Momentum of extrapolated track at this hit (GeV/c)
     //! @param e Covariance matrix of extrapolation at this hit (GeV/c and cm)
     ExtHit(int pdgCode, Const::EDetector detector, int element, ExtHitStatus status, bool backwardPropagation, double t,
-           const TVector3& r, const TVector3& p, const TMatrixDSym& e);
+           const ROOT::Math::XYZPoint& r, const ROOT::Math::XYZVector& p, const TMatrixDSym& e);
 
     //! Constructor with initial values
     //! @param pdgCode PDG hypothesis used for this extrapolation

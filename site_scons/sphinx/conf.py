@@ -45,6 +45,7 @@ extensions = [
     'sphinxarg.ext',
     'basf2ext',
     'nbsphinx',
+    'sphinxcontrib.programoutput',
     'IPython.sphinxext.ipython_console_highlighting',
 ]
 
@@ -139,7 +140,7 @@ if tags.has('light'):  # noqa
 # now we need to exclude everything in the build dir except for the tools_doc
 # sub dir but there's no negative exclusion pattern so do it manually
 exclude_patterns.remove("build")
-exclude_patterns += ['build/html', 'build/latex', 'build/json', 'build/Linux*']
+exclude_patterns += ['build/html', 'build/latex', 'build/json', 'build/Linux*', 'build/belle2_tools']
 # Ignore jupyter notebooks by default, we only want the ones meant for documentation
 exclude_patterns += ['**/*.ipynb', '*.ipynb']
 
@@ -179,7 +180,7 @@ numfig = True
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'sphinx_rtd_theme'
+html_theme = 'sphinx_book_theme'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the

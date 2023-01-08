@@ -18,7 +18,8 @@
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
 
-#include <TVector3.h>
+#include <Math/Vector3D.h>
+#include <Math/Point3D.h>
 #include <TRandom.h>
 
 using namespace std;
@@ -83,16 +84,16 @@ namespace Belle2 {
       // photon at detection
       const G4ThreeVector& g_detPoint = photon.GetPosition();
       const G4ThreeVector& g_detMomDir = photon.GetMomentumDirection();
-      TVector3 detPoint(g_detPoint.x(), g_detPoint.y(), g_detPoint.z());
-      TVector3 detMomDir(g_detMomDir.x(), g_detMomDir.y(), g_detMomDir.z());
+      ROOT::Math::XYZPoint detPoint(g_detPoint.x(), g_detPoint.y(), g_detPoint.z());
+      ROOT::Math::XYZVector detMomDir(g_detMomDir.x(), g_detMomDir.y(), g_detMomDir.z());
       double detTime = photon.GetGlobalTime();
       double length = photon.GetTrackLength();
 
       // photon at emission
       const G4ThreeVector& g_emiPoint = photon.GetVertexPosition();
       const G4ThreeVector& g_emiMomDir = photon.GetVertexMomentumDirection();
-      TVector3 emiPoint(g_emiPoint.x(), g_emiPoint.y(), g_emiPoint.z());
-      TVector3 emiMomDir(g_emiMomDir.x(), g_emiMomDir.y(), g_emiMomDir.z());
+      ROOT::Math::XYZPoint emiPoint(g_emiPoint.x(), g_emiPoint.y(), g_emiPoint.z());
+      ROOT::Math::XYZVector emiMomDir(g_emiMomDir.x(), g_emiMomDir.y(), g_emiMomDir.z());
       double emiTime = photon.GetGlobalTime() - photon.GetLocalTime();
 
       // convert to basf2 units

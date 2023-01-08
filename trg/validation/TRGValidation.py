@@ -262,4 +262,5 @@ main.add_module(root_input)
 # Make plots
 main.add_module(MakePlots())
 
+main.add_module('Progress')
 basf2.process(main)

@@ -110,7 +110,7 @@ void CDCDedxValidationModule::event()
 
     const ECLCluster* eclCluster = track->getRelated<ECLCluster>();
     if (eclCluster and eclCluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
-      fTrkEoverP = (eclCluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons)) / (mTrack->getMomentum().Mag());
+      fTrkEoverP = (eclCluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons)) / (mTrack->getMomentum().R());
       if (fCollType == "bhabha" || fCollType == "radbhabha") {
         if (abs(fTrkEoverP - 1.0) >= 0.2)continue;
         ((TH1D*)fBasic->FindObject(Form("hEOverP_AR")))->Fill(double(fTrkEoverP));

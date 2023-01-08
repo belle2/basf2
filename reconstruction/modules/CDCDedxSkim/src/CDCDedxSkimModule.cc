@@ -118,9 +118,9 @@ void CDCDedxSkimModule::event()
       if (!isGoodTrack(track, Const::electron)) break;
 
       const TrackFitResult* fitResult = track->getTrackFitResult(Const::electron);
-      TVector3 trackMom = fitResult->getMomentum();
+      ROOT::Math::XYZVector trackMom = fitResult->getMomentum();
       double trackEnergy = sqrt(trackMom.Mag2() + mass_e * mass_e);
-      double EoverP = trackEnergy / trackMom.Mag();
+      double EoverP = trackEnergy / trackMom.R();
 
       // track level cuts
       if (EoverP < m_EoverP[1] && EoverP > m_EoverP[0])
@@ -134,9 +134,9 @@ void CDCDedxSkimModule::event()
       if (!isGoodTrack(track, Const::muon)) break;
 
       const TrackFitResult* fitResult = track->getTrackFitResult(Const::muon);
-      TVector3 trackMom = fitResult->getMomentum();
+      ROOT::Math::XYZVector trackMom = fitResult->getMomentum();
       double trackEnergy = sqrt(trackMom.Mag2() + mass_mu * mass_mu);
-      double EoverP = trackEnergy / trackMom.Mag();
+      double EoverP = trackEnergy / trackMom.R();
 
       // track level cuts
       if (EoverP < m_EoverP[1] && EoverP > m_EoverP[0])

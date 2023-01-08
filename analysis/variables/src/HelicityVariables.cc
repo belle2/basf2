@@ -251,6 +251,40 @@ namespace Belle2 {
     }
 
 
+    double cosHelicityAngleForQuasiTwoBodyDecay(const Particle* mother, const std::vector<double>& indices)
+    {
+      if (indices.size() != 2) {
+        B2FATAL("Wrong number of arguments for cosHelicityAngleForQuasiTwoBodyDecay: two are needed.");
+      }
+
+      if (mother->getNDaughters() != 3)
+        return std::numeric_limits<float>::quiet_NaN();
+
+      int iDau = std::lround(indices[0]);
+      int jDau = std::lround(indices[1]);
+
+      const Particle* iDaughter = mother->getDaughter(iDau);
+      if (!iDaughter)
+        return std::numeric_limits<float>::quiet_NaN();
+
+      const Particle* jDaughter = mother->getDaughter(jDau);
+      if (!jDaughter)
+        return std::numeric_limits<float>::quiet_NaN();
+
+      PxPyPzEVector mother4Vector = mother->get4Vector();
+      PxPyPzEVector iDaughter4Vector = iDaughter->get4Vector();
+      PxPyPzEVector jDaughter4Vector = jDaughter->get4Vector();
+
+      PxPyPzEVector resonance4Vector = iDaughter4Vector + jDaughter4Vector;
+      B2Vector3D resonanceBoost = resonance4Vector.BoostToCM();
+
+      iDaughter4Vector = Boost(resonanceBoost) * iDaughter4Vector;
+      mother4Vector = Boost(resonanceBoost) * mother4Vector;
+
+      return - iDaughter4Vector.Vect().Dot(mother4Vector.Vect()) / iDaughter4Vector.P() / mother4Vector.P();
+    }
+
+
     VARIABLE_GROUP("Helicity variables");
 
     REGISTER_VARIABLE("cosHelicityAngleMomentum", cosHelicityAngleMomentum, R"DOC(
@@ -277,7 +311,7 @@ namespace Belle2 {
                       automatically loaded by the function, given the accelerator's conditions.)DOC");
 
     REGISTER_VARIABLE("cosHelicityAngle(i, j)", cosHelicityAngle, R"DOC(
-                      Cosine of the helicity angle between the momentum of the provided particle and the momentum of the selected granddaughter
+                      Cosine of the helicity angle between the momentum of the selected granddaughter and the direction opposite to the momentum of the provided particle 
                       in the reference frame of the selected daughter (:math:`\theta_1` and :math:`\theta_2` in the
                       `PDG <https://journals.aps.org/prd/abstract/10.1103/PhysRevD.98.030001>`_ 2018, p. 722).
 
@@ -285,8 +319,8 @@ namespace Belle2 {
 
                       For example, in the decay :math:`B^0 \to \left(J/\psi \to \mu^+ \mu^-\right) \left(K^{*0} \to K^+ \pi^-\right)`, 
                       if the provided particle is :math:`B^0` and the selected indices are (0, 0),
-                      the variable will return the angle between the momentum of the :math:`B^0` and the momentum of the :math:`\mu^+`,
-                      both momenta in the rest frame of the :math:`J/\psi`.
+                      the variable will return the angle between the momentum of the :math:`\mu^+` and the direction opposite to the momentum of 
+                      the :math:`B^0`, both momenta in the rest frame of the :math:`J/\psi`.
 
                       This variable is needed for angular analyses of :math:`B`-meson decays into two vector particles.)DOC");
 
@@ -324,5 +358,18 @@ namespace Belle2 {
                       Acoplanarity angle (see ``Particle::getAcoplanarity``) assuming a two body decay of the particle and its daughters.
                       See `PDG Polarization Review <http://pdg.lbl.gov/2019/reviews/rpp2018-rev-b-decays-polarization.pdf>`_ for the definition of the acoplanarity angle.)DOC",
                       "rad");
+
+    REGISTER_VARIABLE("cosHelicityAngleForQuasiTwoBodyDecay(i, j)", cosHelicityAngleForQuasiTwoBodyDecay, R"DOC(
+                      Cosine of the helicity angle between the momentum of the provided particle and the momentum of the first selected
+                      daughter (i-th) in the reference frame of the sum of two selected daughters (i-th + j-th).
+
+                      The variable is supposed to be used for the analysis of a quasi-two-body decay. The number of daughters of the given 
+                      particle must be three. Otherwise, the variable returns NaN.
+
+                      For example, in the decay :math:`\bar{B}^0 \to D^+ K^- K^{*0}`, if the provided particle is :math:`\bar{B}^0` and
+                      the selected indices are (1, 2), the variable will return the angle between the momentum of the :math:`\bar{B}^0` 
+                      and the momentum of the :math:`K^-`, both momenta in the rest frame of the :math:`K^- K^{*0}`.)DOC");
+
+
   }
 }

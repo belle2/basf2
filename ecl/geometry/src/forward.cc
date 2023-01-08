@@ -269,6 +269,10 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
       new G4PVPlacement(twc, wrapped_crystals[s - cryst.begin()], suf("ECLForwardWrappedCrystal_Physical", indx), crystalvolume_logical,
                         false, indx, overlap);
     }
+
+    for (shape_t* shape : cryst) {
+      delete shape;
+    }
   }
 
   if (b_preamplifier) {
@@ -368,6 +372,8 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
     // for (int i = 0; i < 8; i++)
     //   new G4PVPlacement(G4RotateZ3D(-M_PI / 2 + M_PI / 8 + i * M_PI / 4)*G4Translate3D(0, 1415 - 165 + 420. / 2,
     //                     1960 + ZT + (97. + 160.) / 2)*tp * t4, l4, suf("support_leg_p4_physical", i), top, false, i, overlap);
+
+    delete support_leg;
   }
 
 
@@ -696,6 +702,8 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
     acs->MakeImprint(innervolumesector_logical,  tr, 0, overlap);
     tr = G4RotateZ3D(-M_PI / 16);
     acs->MakeImprint(innervolumesector_logical,  tr, 1, overlap);
+
+    delete acs;
   }
 
   if (b_support_structure_15) { // numbering scheme as in ECL-004K102.pdf page 15

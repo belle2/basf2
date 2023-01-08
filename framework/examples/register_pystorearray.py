@@ -42,8 +42,7 @@ class SillyGeneratorModule(basf2.Module):
         phi = ROOT.gRandom.Uniform(0.0, 2.0 * math.pi)
         costheta = ROOT.gRandom.Uniform(-1.0, 1.0)
         theta = math.acos(costheta)
-        momentum = ROOT.TVector3(0, 0, 0)
-        momentum.SetMagThetaPhi(1, theta, phi)
+        momentum = ROOT.Math.XYZVector(math.sin(theta) * math.cos(phi), math.sin(theta) * math.sin(phi), costheta)
 
         mcParticle.setPDG(13)
         mcParticle.setMassFromPDG()

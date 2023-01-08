@@ -9,7 +9,7 @@
 #pragma once
 
 /* DQM headers. */
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 
 /* KLM headers. */
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
@@ -119,6 +119,9 @@ namespace Belle2 {
 
     /** Histogram for EKLM sector efficiency. */
     TCanvas* m_c_eff_eklm_sector = NULL;
+
+    /** Monitoring object. */
+    MonitoringObject* m_monObj {};
 
 
     /** EKLM element numbers. */

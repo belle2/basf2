@@ -28,7 +28,7 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
-#include <analysis/dataobjects/EventExtraInfo.h>
+#include <framework/dataobjects/EventExtraInfo.h>
 
 #include <vector>
 #include <tuple>
@@ -143,6 +143,11 @@ namespace Belle2 {
     void addROEToParticleList(RestOfEvent* roe, int mdstIndex, int pdgCode = 0, bool isSelfConjugatedParticle = true);
 
     /**
+    * Loads dummy object as Particle of specified type to StoreArray<Particle> and adds it to the ParticleList
+    */
+    void dummyToParticles();
+
+    /**
      * returns true if the PDG code determined from the decayString is valid
      */
     bool isValidPDGCode(const int pdgCode);
@@ -168,6 +173,8 @@ namespace Belle2 {
 
     bool m_useROEs;  /**< Switch to load ROE as Particle */
 
+    bool m_useDummy;  /**< Switch to load dummy as Particle */
+
     DecayDescriptor m_decaydescriptor; /**< Decay descriptor for parsing the user specified DecayString */
 
     std::vector<std::string> m_decayStrings; /**< Input decay strings specifying the particles being created/loaded */
@@ -178,6 +185,8 @@ namespace Belle2 {
     std::vector<PList> m_ROE2Plists; /**< Collection of PLists that will collect Particles created from V0 */
     std::vector<PList>
     m_ECLKLMClusters2Plists; /**< Collection of PLists that will collect Particles created from ECLClusters and KLMClusters */
+    std::vector<PList> m_Dummies2Plists; /**< Collection of PLists that will collect Particles created from Dummies */
+
 
     bool m_writeOut;  /**< toggle particle list btw. transient/persistent */
     bool m_skipNonPrimary; /**< toggle skip of secondary MC particle */
@@ -187,6 +196,10 @@ namespace Belle2 {
     std::string m_sourceParticleListName; /**< Particle list name from which we need to get related ROEs */
     bool m_useMissing; /**< Use missing momentum to build a particle */
     int m_trackHypothesis; /**< pdg code for track hypothesis that should be used to create the particle */
+
+    int m_dummyMDSTIndex;  /**< mdst index for dummy particles */
+    double m_dummyCovMatrix;  /**< diag value of cov matrix for dummy particles */
+    bool m_dummyTreatAsInvisible; /**< should treeFitter treat the particle as invisible? */
 
     bool m_enforceFitHypothesis =
       false; /**<If true, a Particle is only created if a track fit with the particle hypothesis passed to the ParticleLoader is available. */

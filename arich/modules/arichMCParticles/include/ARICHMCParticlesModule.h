@@ -9,14 +9,13 @@
 #ifndef ARICHMCPARTICLESMODULE_H
 #define ARICHMCPARTICLESMODULE_H
 
-#include <mdst/dataobjects/Track.h>
-#include <tracking/dataobjects/ExtHit.h>
-#include <mdst/dataobjects/MCParticle.h>
-
 #include <framework/datastore/StoreArray.h>
 #include <framework/core/Module.h>
 
 namespace Belle2 {
+  class Track;
+  class ExtHit;
+  class MCParticle;
 
   /**
    * Module to match ARICH hits to MCParticles

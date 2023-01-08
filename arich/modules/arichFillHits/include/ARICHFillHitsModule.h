@@ -5,9 +5,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-
-#ifndef ARICHFILLHITSMODULE_H
-#define ARICHFILLHITSMODULE_H
+#pragma once
 
 #include <arich/dbobjects/ARICHGeometryConfig.h>
 #include <arich/dbobjects/ARICHChannelMapping.h>
@@ -85,5 +83,3 @@ namespace Belle2 {
   };
 
 } // Belle2 namespace
-
-#endif

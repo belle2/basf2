@@ -6,8 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef ARICHDIGITIZERMODULE_H
-#define ARICHDIGITIZERMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <arich/dbobjects/ARICHGeometryConfig.h>
@@ -109,5 +108,3 @@ namespace Belle2 {
   };
 
 } // Belle2 namespace
-
-#endif // ARICHDIGITIZERMODULE_H

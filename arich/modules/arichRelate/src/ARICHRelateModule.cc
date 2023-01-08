@@ -77,10 +77,10 @@ namespace Belle2 {
       RelationVector<ExtHit> extHits = DataStore::getRelationsWithObj<ExtHit>(track);
       const Const::EDetector arich = Const::EDetector::ARICH;
       for (const ExtHit& extHit : extHits) {
-        if (abs(extHit.getPdgCode()) != Const::pion.getPDGCode()) continue;
-        if (extHit.getDetectorID() != arich) continue;
-        if (extHit.getCopyID() != 6789) continue; // aerogel Al support plate
-        if (extHit.getStatus() != EXT_EXIT) continue; // particles registered at the EXIT of the Al plate
+        if (abs(extHit.getPdgCode()) != Const::pion.getPDGCode() or
+            extHit.getDetectorID() != arich or
+            extHit.getCopyID() != 6789 or // aerogel Al support plate
+            extHit.getStatus() != EXT_EXIT) continue; // particles registered at the EXIT of the Al plate
         extHit.addRelationTo(&aeroHit);
         break;
       }

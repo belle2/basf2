@@ -173,7 +173,7 @@ class NumBestChecker(basf2.Module):
 # create a new list
 ma.fillParticleListFromMC("e-:numBest", "", path=path)
 # sort the list, using numBest
-ma.rankByHighest("e-:numBest", "px", numBest=numBest_value, path=path)
+ma.rankByHighest("e-:numBest", "p", numBest=numBest_value, path=path)
 # and check that numBest worked as expected
 path.add_module(NumBestChecker(), numBest=numBest_value)
 

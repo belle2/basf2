@@ -86,10 +86,10 @@ namespace Belle2 {
 
       for (unsigned i = 0; i < extHits.size(); i++) {
         const ExtHit* extHit = extHits[i];
-        if (abs(extHit->getPdgCode()) != pdgCode) continue;
-        if (extHit->getDetectorID() != arich) continue;
-        if (extHit->getStatus() != EXT_EXIT) continue; // particles registered at the EXIT of the Al plate
-        if (extHit->getMomentum().Z() < 0.0) continue; // track passes in backward
+        if (abs(extHit->getPdgCode()) != pdgCode or
+            extHit->getDetectorID() != arich or
+            extHit->getStatus() != EXT_EXIT or // particles registered at the EXIT of the Al plate
+            extHit->getMomentum().Z() < 0.0) continue; // track passes in backward
         if (extHit->getCopyID() == 6789) {
           //MCParticle arichMCP = *particle;
           MCParticle* arichP = m_arichMCPs.appendNew(*particle);

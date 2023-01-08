@@ -22,8 +22,6 @@ namespace Belle2 {
   public:
     /** Default constructor. */
     DecayTree();
-    /** Constructor with decaying object (e.g. MCParticle) provided. */
-    explicit DecayTree(T* obj);
     /** Destructor. */
     ~DecayTree();
     /** Return list of decay daughters. */
@@ -32,8 +30,6 @@ namespace Belle2 {
     T* getObj() const;
     /** Set the decaying object, e.g. an MCParticle.*/
     void setObj(T* obj);
-    /** Frees memory occupied by m_myObject and the daughter objects. */
-    void clear();
     /** Add a daughter, which is a DecayTree itself. */
     void append(DecayTree<T>* t);
   };
@@ -41,10 +37,6 @@ namespace Belle2 {
   /** Default constructor. */
   template <class T>
   DecayTree<T>::DecayTree() : m_myObject(0), m_daughters() {};
-
-  /** Constructor with T object. */
-  template <class T>
-  DecayTree<T>::DecayTree(T* obj) : m_myObject(obj), m_daughters() {};
 
   /** Destructor. */
   template <class T>
@@ -76,19 +68,6 @@ namespace Belle2 {
   void DecayTree<T>::setObj(T* obj)
   {
     m_myObject = obj;
-  }
-
-
-  /** Clear the main object and daughters' objects. */
-  template <class T>
-  void DecayTree<T>::clear()
-  {
-    delete m_myObject;
-    m_myObject = 0;
-    while (!m_daughters.empty()) {
-      m_daughters.back().clear();
-      m_daughters.pop_back();
-    }
   }
 
   /** Append a daughter. */

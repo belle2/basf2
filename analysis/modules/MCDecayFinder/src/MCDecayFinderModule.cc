@@ -72,20 +72,25 @@ void MCDecayFinderModule::event()
     m_extraInfoMap.create();
 
   // Create output particle list
+  const int motherPDG = m_decaydescriptor.getMother()->getPDGCode();
   m_outputList.create();
-  m_outputList->initialize(m_decaydescriptor.getMother()->getPDGCode(), m_listName);
+  m_outputList->initialize(motherPDG, m_listName);
 
   if (!m_isSelfConjugatedParticle) {
     m_antiOutputList.create();
-    m_antiOutputList->initialize(-1 * m_decaydescriptor.getMother()->getPDGCode(), m_antiListName);
+    m_antiOutputList->initialize(-1 * motherPDG, m_antiListName);
     m_outputList->bindAntiParticleList(*(m_antiOutputList));
   }
 
   // loop over all MCParticles
   int nMCParticles = m_mcparticles.getEntries();
   for (int i = 0; i < nMCParticles; i++) {
+
+    if (abs(m_mcparticles[i]->getPDG()) != abs(motherPDG))
+      continue;
+
     for (int iCC = 0; iCC < 2; iCC++) {
-      int arrayIndex = 0;
+      int arrayIndex = -1;
       std::unique_ptr<DecayTree<MCParticle>> decay(match(m_mcparticles[i], m_decaydescriptor, iCC, arrayIndex));
 
       MCParticle* mcp = decay->getObj();
@@ -94,6 +99,7 @@ void MCDecayFinderModule::event()
       B2DEBUG(19, "Match!");
 
       if (m_appendAllDaughters) {
+        // if m_appendAllDaughters is True, create a new Particle appending all daughters
         Particle* newParticle = m_particles.appendNew(mcp);
         newParticle->addRelationTo(mcp);
 
@@ -107,7 +113,15 @@ void MCDecayFinderModule::event()
         }
         m_outputList->addParticle(newParticle);
 
+      } else if (arrayIndex == -1) {
+        // Particle is not created when no daughter is described in decayString
+        Particle* newParticle = m_particles.appendNew(mcp);
+        newParticle->addRelationTo(mcp);
+
+        m_outputList->addParticle(newParticle);
+
       } else {
+        // Particle is already created
         m_outputList->addParticle(m_particles[arrayIndex]);
       }
 
@@ -125,9 +139,9 @@ DecayTree<MCParticle>* MCDecayFinderModule::match(const MCParticle* mcp, const D
   auto* decay = new DecayTree<MCParticle>();
 
   // Load PDG codes and compare,
-  int iPDGD = d->getMother()->getPDGCode();
-  int iPDGP = mcp->getPDG();
-  bool isSelfConjugatedParticle = !(EvtPDLUtil::hasAntiParticle(iPDGD));
+  const int iPDGD = d->getMother()->getPDGCode();
+  const int iPDGP = mcp->getPDG();
+  const bool isSelfConjugatedParticle = !(EvtPDLUtil::hasAntiParticle(iPDGD));
 
   if (!isCC && iPDGD != iPDGP) return decay;
   else if (isCC && (iPDGD != -iPDGP && !isSelfConjugatedParticle)) return decay;
@@ -136,11 +150,11 @@ DecayTree<MCParticle>* MCDecayFinderModule::match(const MCParticle* mcp, const D
 
   // Get number of daughters in the decay descriptor.
   // If no daughters in decay descriptor, no more checks needed.
-  int nDaughtersD = d->getNDaughters();
+  const int nDaughtersD = d->getNDaughters();
   if (nDaughtersD == 0) {
     B2DEBUG(19, "DecayDescriptor has no Daughters, everything OK!");
     decay->setObj(const_cast<MCParticle*>(mcp));
-    return decay;
+    return decay; // arrayIndex is not set
   }
 
   // Get daughters of MCParticle
@@ -166,10 +180,8 @@ DecayTree<MCParticle>* MCDecayFinderModule::match(const MCParticle* mcp, const D
   // nested daughter has to be called at first to avoid overlap
   std::vector<std::pair<int, int>> daughtersDepthMapD; // first: -1*depth, second:iDD
   for (int iDD = 0; iDD < nDaughtersD; iDD++) {
-    auto daugD =  d->getDaughter(iDD);
-
     int depth = 1; // to be incremented
-    countMaxDepthOfNest(daugD, depth);
+    countMaxDepthOfNest(d->getDaughter(iDD), depth);
 
     daughtersDepthMapD.push_back({-1 * depth, iDD});
   }
@@ -179,13 +191,13 @@ DecayTree<MCParticle>* MCDecayFinderModule::match(const MCParticle* mcp, const D
   // loop over all daughters of the decay descriptor
   for (auto pair : daughtersDepthMapD) {
     int iDD = pair.second;
-
     // check if there is an unmatched particle daughter matching this decay descriptor daughter
     bool isMatchDaughter = false;
     auto itDP = daughtersP.begin();
     while (itDP != daughtersP.end()) {
       const MCParticle* daugP = *itDP;
-      int tmp;
+
+      int tmp; // array index of a created daughter Particle (not to be used)
       DecayTree<MCParticle>* daughter = match(daugP, d->getDaughter(iDD), isCC, tmp);
       if (!daughter->getObj()) {
         ++itDP;
@@ -275,10 +287,8 @@ void MCDecayFinderModule::countMaxDepthOfNest(const DecayDescriptor* d, int& dep
 {
   int maxDepth = 0;
   for (int i = 0; i < d->getNDaughters(); i++) {
-    auto daugD =  d->getDaughter(i);
-
     int tmp_depth = 1;
-    countMaxDepthOfNest(daugD, tmp_depth);
+    countMaxDepthOfNest(d->getDaughter(i), tmp_depth);
 
     if (tmp_depth > maxDepth)
       maxDepth = tmp_depth;

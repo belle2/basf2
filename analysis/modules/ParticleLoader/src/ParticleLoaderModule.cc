@@ -147,7 +147,7 @@ void ParticleLoaderModule::initialize()
       if (m_useROEs) listName = mother->getFullName();
       // dummy particles get the full name
       else if (m_useDummy) listName = mother->getFullName();
-      // MC particles get the full label
+      // MC particles get the full name
       else if (m_useMCParticles) listName = mother->getFullName();
       // V0s get the label "V0"
       else if (nProducts > 0) listName = mother->getName() + ":V0";

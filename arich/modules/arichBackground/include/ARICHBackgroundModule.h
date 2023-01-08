@@ -5,9 +5,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-
-#ifndef ARICHBACKGROUND_H
-#define ARICHBACKGROUND_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
@@ -122,5 +120,3 @@ namespace Belle2 {
 
   } // arich namespace
 } // Belle2 namespace
-
-#endif // ARICHDIGIMODULE_H

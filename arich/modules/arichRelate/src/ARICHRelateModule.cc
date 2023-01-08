@@ -16,6 +16,11 @@
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
+#include <mdst/dataobjects/Track.h>
+#include <tracking/dataobjects/ExtHit.h>
+#include <mdst/dataobjects/MCParticle.h>
+#include <arich/dataobjects/ARICHAeroHit.h>
+
 using namespace std;
 
 namespace Belle2 {

@@ -6,8 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef ARICHDQMMODULE_H
-#define ARICHDQMMODULE_H
+#pragma once
 
 #include <framework/core/HistoModule.h>
 
@@ -141,5 +140,3 @@ namespace Belle2 {
   };
 
 } // Belle2 namespace
-
-#endif

@@ -20,7 +20,6 @@
 #include <mdst/dataobjects/MCParticle.h>
 
 // framework - DataStore
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/RelationArray.h>
 
@@ -109,37 +108,34 @@ namespace Belle2 {
 
     void ARICHBackgroundModule::event()
     {
-      int nHits = m_BeamBackHits.getEntries();
+      for (const BeamBackHit& arichBeamBkgHit : m_BeamBackHits) {
 
-      for (int iHit = 0; iHit < nHits; ++iHit) {
-
-        BeamBackHit* arichhit = m_BeamBackHits[iHit];
-        int subdet = arichhit->getSubDet();
+        int subdet = arichBeamBkgHit.getSubDet();
         if (subdet != 4) continue;
         m_type = 0;
-        if (arichhit->getIdentifier() == 1) m_type = 1;
-        m_edep = arichhit->getEnergyDeposit();
-        m_ttime = arichhit->getTime();
-        m_phPDG = arichhit->getPDG();
-        m_phpos = arichhit->getPosition();
-        m_phmom = arichhit->getMomentum();
+        if (arichBeamBkgHit.getIdentifier() == 1) m_type = 1;
+        m_edep = arichBeamBkgHit.getEnergyDeposit();
+        m_ttime = arichBeamBkgHit.getTime();
+        m_phPDG = arichBeamBkgHit.getPDG();
+        m_phpos = arichBeamBkgHit.getPosition();
+        m_phmom = arichBeamBkgHit.getMomentum();
         m_moduleID = m_arichgp->getDetectorPlane().pointSlotID(m_phpos.X(), m_phpos.Y());
         double r = m_arichgp->getDetectorPlane().getSlotR(m_moduleID);
         double phi = m_arichgp->getDetectorPlane().getSlotPhi(m_moduleID);
         m_modOrig = TVector3(r * cos(phi), r * sin(phi), 0);
-        m_energy = arichhit->getEnergy();
+        m_energy = arichBeamBkgHit.getEnergy();
 
         if (m_phPDG == Const::neutron.getPDGCode()) {
-          m_phnw = arichhit->getNeutronWeight();
-          m_trackLength = arichhit->getTrackLength();
+          m_phnw = arichBeamBkgHit.getNeutronWeight();
+          m_trackLength = arichBeamBkgHit.getTrackLength();
         }
         m_phVtx = TVector3(0, 0, 0); m_phMvtx = TVector3(0, 0, 0);  m_phMmom = TVector3(0, 0, 0);
         m_phMPDG = -1; m_phPPDG = -1; m_phGMPDG = -1;
         m_phPvtx = TVector3(0, 0, 0); m_phPmom = TVector3(0, 0, 0); m_phGMvtx = TVector3(0, 0, 0); m_phGMmom = TVector3(0, 0, 0);
 
         RelationIndex<MCParticle, BeamBackHit> relBeamBackHitToMCParticle(m_MCParticles, m_BeamBackHits);
-        if (relBeamBackHitToMCParticle.getFirstElementTo(arichhit)) {
-          const MCParticle* currParticle = relBeamBackHitToMCParticle.getFirstElementTo(arichhit)->from;
+        if (relBeamBackHitToMCParticle.getFirstElementTo(arichBeamBkgHit)) {
+          const MCParticle* currParticle = relBeamBackHitToMCParticle.getFirstElementTo(arichBeamBkgHit)->from;
           m_phVtx = B2Vector3D(currParticle->getVertex());
           const MCParticle* mother = currParticle->getMother();
           int mm = 0;
@@ -168,22 +164,19 @@ namespace Belle2 {
         m_outputTree->Fill();
       }
 
-      nHits = m_ARICHSimHits.getEntries();
-
-      for (int iHit = 0; iHit < nHits; ++iHit) {
-        ARICHSimHit* simHit = m_ARICHSimHits[iHit];
-        m_moduleID = simHit->getModuleID();
+      for (const ARICHSimHit& arichsimhit : m_ARICHSimHits) {
+        m_moduleID = arichsimhit.getModuleID();
         m_type = 2;
         m_phPDG = 0;
         m_edep = 0;
-        m_ttime = simHit->getGlobalTime();
+        m_ttime = arichsimhit.getGlobalTime();
 
         m_phVtx = TVector3(0, 0, 0); m_phMvtx = TVector3(0, 0, 0);  m_phMmom = TVector3(0, 0, 0);
         m_phMPDG = -1; m_phPPDG = -1; m_phGMPDG = -1; m_phmom = TVector3(0, 0, 0);
         m_phPvtx = TVector3(0, 0, 0); m_phPmom = TVector3(0, 0, 0); m_phGMvtx = TVector3(0, 0, 0); m_phGMmom = TVector3(0, 0, 0);
         RelationIndex<MCParticle, ARICHSimHit> relSimHitToMCParticle(m_MCParticles, m_ARICHSimHits);
-        if (relSimHitToMCParticle.getFirstElementTo(simHit)) {
-          const MCParticle* currParticle = relSimHitToMCParticle.getFirstElementTo(simHit)->from;
+        if (relSimHitToMCParticle.getFirstElementTo(arichsimhit)) {
+          const MCParticle* currParticle = relSimHitToMCParticle.getFirstElementTo(arichsimhit)->from;
           m_phVtx = B2Vector3D(currParticle->getVertex());
           const MCParticle* mother = currParticle->getMother();
           int mm = 0;

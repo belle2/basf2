@@ -31,7 +31,6 @@
 // ROOT
 #include <TVector3.h>
 
-using namespace std;
 using namespace boost;
 
 namespace Belle2 {

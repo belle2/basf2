@@ -30,8 +30,6 @@
 #include <fstream>
 #include <math.h>
 
-using namespace std;
-
 namespace Belle2 {
 
   //-----------------------------------------------------------------
@@ -374,7 +372,7 @@ namespace Belle2 {
     h_trackPerEvent->Fill(ntrk);
 
     for (auto& it : m_rawFTSW) {
-      B2DEBUG(29, "TTD FTSW : " << hex << it.GetTTUtime(0) << " " << it.GetTTCtime(0) << " EvtNr " << it.GetEveNo(0)  << " Type " <<
+      B2DEBUG(29, "TTD FTSW : " << std::hex << it.GetTTUtime(0) << " " << it.GetTTCtime(0) << " EvtNr " << it.GetEveNo(0)  << " Type " <<
               (it.GetTTCtimeTRGType(0) & 0xF) << " TimeSincePrev " << it.GetTimeSincePrevTrigger(0) << " TimeSinceInj " <<
               it.GetTimeSinceLastInjection(0) << " IsHER " << it.GetIsHER(0) << " Bunch " << it.GetBunchNumber(0));
       auto difference = it.GetTimeSinceLastInjection(0);

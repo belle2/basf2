@@ -21,8 +21,6 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <arich/dataobjects/ARICHAeroHit.h>
 
-using namespace std;
-
 namespace Belle2 {
 
   //-----------------------------------------------------------------

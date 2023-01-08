@@ -28,7 +28,6 @@
 #include <framework/gearbox/Const.h>
 #include <framework/geometry/B2Vector3.h>
 
-using namespace std;
 using namespace boost;
 
 namespace Belle2 {
@@ -55,7 +54,7 @@ namespace Belle2 {
       setDescription("ARICHBackground module. Used to extract information relevant for ARICH background from background files");
 
       // Add parameters
-      addParam("FileName", m_filename, "output file name", string("mytree.root"));
+      addParam("FileName", m_filename, "output file name", std::string("mytree.root"));
       addParam("BkgTag", m_bkgTag, "background type tag (appended to hits in the output tree", 0);
 
     }

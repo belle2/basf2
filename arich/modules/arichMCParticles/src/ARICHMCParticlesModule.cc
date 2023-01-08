@@ -20,9 +20,6 @@
 #include <tracking/dataobjects/ExtHit.h>
 #include <mdst/dataobjects/MCParticle.h>
 
-
-using namespace std;
-
 namespace Belle2 {
 
   //-----------------------------------------------------------------

@@ -42,8 +42,6 @@
 // ifstream constructor.
 #include <fstream>
 
-const char* record_strings[] = { "Event", "Begin_run", "Pause", "Resume", "End_run" };
-
 using namespace std;
 
 namespace Belle2 {

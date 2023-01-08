@@ -164,11 +164,13 @@ namespace Belle2 {
         m_outputTree->Fill();
       }
 
+      // these assignments are the same in every iteration of the loop
+      // so just assign them once outside the loop
+      m_type = 2;
+      m_phPDG = 0;
+      m_edep = 0;
       for (const ARICHSimHit& arichsimhit : m_ARICHSimHits) {
         m_moduleID = arichsimhit.getModuleID();
-        m_type = 2;
-        m_phPDG = 0;
-        m_edep = 0;
         m_ttime = arichsimhit.getGlobalTime();
 
         m_phVtx = TVector3(0, 0, 0); m_phMvtx = TVector3(0, 0, 0);  m_phMmom = TVector3(0, 0, 0);

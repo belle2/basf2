@@ -461,7 +461,10 @@ CDCTriggerTSFModule::event()
                                   s.LUT()->getValue(s.lutPattern()),
                                   s.priorityTime(),
                                   s.fastestTime(),
-                                  s.foundTime());
+                                  s.foundTime(),
+                                  -1,
+                                  s.hitPattern());
+        //std::cout << "tsf hit pattern " << isl << " " << its << " " << s.id() << " " << s.hitPattern() << std::endl;
         // relation to all CDCHits in segment
         for (unsigned iw = 0; iw < s.wires().size(); ++iw) {
           const TRGCDCWire* wire = (TRGCDCWire*)s[iw];

@@ -22,7 +22,7 @@ namespace Belle2 {
     CDCTriggerSegmentHit():
       m_segmentID(0), m_priorityPosition(0), m_leftRight(0),
       m_priorityTime(0), m_fastestTime(0), m_foundTime(0),
-      m_eWire(65535), m_quadrant(-1)
+      m_eWire(65535), m_quadrant(-1), m_hitpattern(0)
     { }
 
     /** constructor using continuous TS ID. */
@@ -32,7 +32,8 @@ namespace Belle2 {
                          short priorityTime,
                          short fastestTime,
                          short foundTime,
-                         short quadrant = -1);
+                         short quadrant = -1,
+                         unsigned int hitpattern = 0);
 
     /** constructor using super layer ID and TS ID in layer (== central wire ID). */
     CDCTriggerSegmentHit(unsigned short iSL,
@@ -42,7 +43,8 @@ namespace Belle2 {
                          short priorityTime,
                          short fastestTime,
                          short foundTime,
-                         short quadrant = -1);
+                         short quadrant = -1,
+                         unsigned int hitpattern = 0);
 
     /** constructor using continuous TS ID and a reference to the priority hit
      *  (to save some calculations). */
@@ -53,7 +55,8 @@ namespace Belle2 {
                          short priorityTime,
                          short fastestTime,
                          short foundTime,
-                         short quadrant = -1);
+                         short quadrant = -1,
+                         unsigned int hitpattern = 0);
 
     /** destructor, empty because we don't allocate memory anywhere. */
     ~CDCTriggerSegmentHit() { }
@@ -78,6 +81,8 @@ namespace Belle2 {
     /** get hit time of priority cell in trigger clocks
      *  alias for priorityTime for backwards compatibility */
     short getTDCCount() const { return m_priorityTime; }
+    /** get hit pattern in a segment hit */
+    unsigned int gethitpattern() const { return m_hitpattern; }
 
     /** get super layer number. */
     unsigned short getISuperLayer() const
@@ -132,6 +137,9 @@ namespace Belle2 {
 
     /** quadrant */
     short m_quadrant;
+
+    /** hit pattern */
+    unsigned int m_hitpattern;
 
     //! Needed to make the ROOT object storable
     ClassDef(CDCTriggerSegmentHit, 4);

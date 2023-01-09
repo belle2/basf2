@@ -172,6 +172,7 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
     # convert.logging.set_log_level(LogLevel.DEBUG)
     # convert.logging.set_info(LogLevel.DEBUG, LogInfo.LEVEL | LogInfo.MESSAGE)
     path.add_module(convert)
+    path.add_module('BelleNbarMVA', particleList='anti-n0:mdst')
 
 
 def parse_process_url(url):

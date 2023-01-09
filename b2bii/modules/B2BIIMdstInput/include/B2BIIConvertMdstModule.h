@@ -201,6 +201,11 @@ namespace Belle2 {
     void convertMdstGammaTable();
 
     /**
+     * Copies Particles in 'gamma:mdst' with energy > 0.5 GeV to be anti-n0:mdst
+     */
+    void copyNbarFromGamma();
+
+    /**
      * Reads all entries of Mdst_Klong Panther table, creates a particle list 'K_L0:mdst' and adds them to StoreArray<Particles>.
      */
     void convertMdstKLongTable();

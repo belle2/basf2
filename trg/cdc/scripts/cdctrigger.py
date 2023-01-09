@@ -44,7 +44,7 @@ def add_cdc_trigger(path, SimulationMode=1, shortTracks=False, lowPt=False,
         else:
             minPt = 0.3
         path.add_module('CDCTrigger2DFinder',
-                        minHits=20, minHitsShort=20, minPt=minPt)
+                        minHits=4, minHitsShort=4, minPt=minPt)
 
         # Old ETF
         # path.add_module('CDCTriggerETF', trueEventTime=trueEventTime)

@@ -15,7 +15,6 @@
 #include <root/TMatrix.h>
 
 /* defines */
-//#define CDC_SUPER_LAYERS 9
 #define CDC_SUPER_LAYERS 45
 
 using namespace std;
@@ -67,10 +66,6 @@ CDCTrigger2DFinderModule::fastInterceptFinder(cdcMap& hits,
           << " x1 " << x1_s * 180 / M_PI << " x2 " << x2_s * 180 / M_PI
           << " y1 " << y1_s << " y2 " << y2_s
           << " ix " << ix_s << " iy " << iy_s);
-  //std::cout << indent << "intercept finder iteration " << iterations
-  //        << " x1 " << x1_s * 180 / M_PI << " x2 " << x2_s * 180 / M_PI
-  //        << " y1 " << y1_s << " y2 " << y2_s
-  //        << " ix " << ix_s << " iy " << iy_s << std::endl;
 
   int i, j, iHit;
   double unitx, unity;

@@ -150,7 +150,7 @@ namespace Belle2 {
     unsigned int m_hitpattern_adc;
 
     //! Needed to make the ROOT object storable
-    ClassDef(CDCTriggerSegmentHit, 7);
+    ClassDef(CDCTriggerSegmentHit, 5);
   };
 }
 #endif

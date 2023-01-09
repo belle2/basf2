@@ -83,10 +83,6 @@ namespace Belle2 {
 
   }
 
-  void ARICHUnpackerModule::beginRun()
-  {
-  }
-
   void ARICHUnpackerModule::event()
   {
 
@@ -534,16 +530,6 @@ namespace Belle2 {
       std::cout << i << "-th word bitset: " << std::bitset<32>(*(buffer + i)) << std::endl;
     }
   }
-
-
-  void ARICHUnpackerModule::endRun()
-  {
-  }
-
-  void ARICHUnpackerModule::terminate()
-  {
-  }
-
 
 } // end Belle2 namespace
 

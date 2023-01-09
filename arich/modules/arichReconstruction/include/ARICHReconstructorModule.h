@@ -9,10 +9,17 @@
 #pragma once
 
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
 
 #include <arich/modules/arichReconstruction/ARICHReconstruction.h>
 
 namespace Belle2 {
+  class ARICHHit;
+  class Track;
+  class ExtHit;
+  class ARICHAeroHit;
+  class ARICHLikelihood;
+  class ARICHTrack;
 
   /** ARICH subdetector main module
    *
@@ -61,6 +68,13 @@ namespace Belle2 {
     void printModuleParams();
 
   private:
+
+    StoreArray<ARICHHit> m_ARICHHits;
+    StoreArray<Track> m_Tracks;
+    StoreArray<ExtHit> m_ExtHits;
+    StoreArray<ARICHAeroHit> m_aeroHits;
+    StoreArray<ARICHLikelihood> m_ARICHLikelihoods;
+    StoreArray<ARICHTrack> m_ARICHTracks;
 
     // Other members.
     ARICHReconstruction* m_ana;      /**< Class with reconstruction tools */

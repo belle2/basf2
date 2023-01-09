@@ -72,20 +72,6 @@ namespace Belle2 {
     void magFieldDistorsion(TVector2& hit, int copyno);
 
     /**
-     * End-of-run action.
-     *
-     * Save run-related stuff, such as statistics.
-     */
-    virtual void endRun() override;
-
-    /**
-     * Termination action.
-     *
-     * Clean-up, close files, summarize statistics, etc.
-     */
-    virtual void terminate() override;
-
-    /**
      *Prints module parameters.
      */
     void printModuleParams() const {};

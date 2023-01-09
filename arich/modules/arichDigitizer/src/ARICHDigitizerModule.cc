@@ -205,13 +205,4 @@ namespace Belle2 {
     hit.SetY(hit.Y() + shift.Y());
   }
 
-  void ARICHDigitizerModule::endRun()
-  {
-  }
-
-  void ARICHDigitizerModule::terminate()
-  {
-
-  }
-
 } // end Belle2 namespace

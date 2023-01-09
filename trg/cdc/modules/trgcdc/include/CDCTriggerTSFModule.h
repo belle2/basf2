@@ -82,6 +82,10 @@ namespace Belle2 {
     bool m_adcflag;
     /** threshold for the adc cut. Default: -1 */
     int m_adccut;
+    /** Assign ADC based flag for full hit tracker. Lower threshold of ADC.  */
+    int m_adcflag_low;
+    /** Assign ADC based flag for full hit tracker. Higher threshold of ADC. */
+    int m_adcflag_high;
 
   private:
     /** structure to hold pointers to all wires in the CDC */

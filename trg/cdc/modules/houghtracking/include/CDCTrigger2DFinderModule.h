@@ -226,6 +226,9 @@ namespace Belle2 {
     /** switch to use hit pattern inside TSF */
     bool m_usehitpattern;
 
+    /** switch to use hit pattern inside TSF with ADC cut*/
+    bool m_useadc;
+
     /** switch to save the Hough plane in DataStore
      *  (0: don't save, 1: save only peaks, 2: save full plane) */
     unsigned m_storePlane;

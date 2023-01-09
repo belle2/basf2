@@ -114,6 +114,9 @@ CDCTrigger2DFinderModule::CDCTrigger2DFinderModule() : Module()
 
   addParam("usehitpattern", m_usehitpattern,
            "Switch to use hit pattern inside TSF ", false);
+
+  addParam("useadc", m_useadc,
+           "Switch to use ADC. Can be used with usehitpattern enabled. ", false);
 }
 
 void
@@ -187,7 +190,9 @@ CDCTrigger2DFinderModule::event()
     if (m_ignore2nd && m_segmentHits[iHit]->getPriorityPosition() < 3) continue;
 
     if (m_usehitpattern) {
-      unsigned hitpattern = m_segmentHits[iHit]->gethitpattern();
+      unsigned hitpattern;
+      if (m_useadc) m_segmentHits[iHit]->gethitpattern();
+      else         m_segmentHits[iHit]->gethitpattern_adc();
       int nhitpattern = 0;
       if (iSL == 0)nhitpattern = 15;
       else      nhitpattern = 11;

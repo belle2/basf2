@@ -22,7 +22,7 @@ namespace Belle2 {
     CDCTriggerSegmentHit():
       m_segmentID(0), m_priorityPosition(0), m_leftRight(0),
       m_priorityTime(0), m_fastestTime(0), m_foundTime(0),
-      m_eWire(65535), m_quadrant(-1), m_hitpattern(0)
+      m_eWire(65535), m_quadrant(-1), m_hitpattern(0), m_hitpattern_adc(0)
     { }
 
     /** constructor using continuous TS ID. */
@@ -33,7 +33,8 @@ namespace Belle2 {
                          short fastestTime,
                          short foundTime,
                          short quadrant = -1,
-                         unsigned int hitpattern = 0);
+                         unsigned int hitpattern = 0,
+                         unsigned int hitpattern_adc = 0);
 
     /** constructor using super layer ID and TS ID in layer (== central wire ID). */
     CDCTriggerSegmentHit(unsigned short iSL,
@@ -44,7 +45,8 @@ namespace Belle2 {
                          short fastestTime,
                          short foundTime,
                          short quadrant = -1,
-                         unsigned int hitpattern = 0);
+                         unsigned int hitpattern = 0,
+                         unsigned int hitpattern_adc = 0);
 
     /** constructor using continuous TS ID and a reference to the priority hit
      *  (to save some calculations). */
@@ -56,7 +58,8 @@ namespace Belle2 {
                          short fastestTime,
                          short foundTime,
                          short quadrant = -1,
-                         unsigned int hitpattern = 0);
+                         unsigned int hitpattern = 0,
+                         unsigned int hitpattern_adc = 0);
 
     /** destructor, empty because we don't allocate memory anywhere. */
     ~CDCTriggerSegmentHit() { }
@@ -83,6 +86,8 @@ namespace Belle2 {
     short getTDCCount() const { return m_priorityTime; }
     /** get hit pattern in a segment hit */
     unsigned int gethitpattern() const { return m_hitpattern; }
+    /** get hit pattern in a segment hit */
+    unsigned int gethitpattern_adc() const { return m_hitpattern_adc; }
 
     /** get super layer number. */
     unsigned short getISuperLayer() const
@@ -141,8 +146,11 @@ namespace Belle2 {
     /** hit pattern */
     unsigned int m_hitpattern;
 
+    /** hit pattern with adc cut*/
+    unsigned int m_hitpattern_adc;
+
     //! Needed to make the ROOT object storable
-    ClassDef(CDCTriggerSegmentHit, 6);
+    ClassDef(CDCTriggerSegmentHit, 7);
   };
 }
 #endif

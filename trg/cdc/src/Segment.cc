@@ -540,6 +540,18 @@ namespace Belle2 {
   }
 
   unsigned
+  TRGCDCSegment::hitPattern_adc() const
+  {
+    unsigned ptn = 0;
+    for (unsigned i = 0; i < _wires.size(); i++) {
+      const TRGSignal& s = _wires[i]->signal_adc();
+      if (s.active())
+        ptn |= (1 << i);
+    }
+    return ptn;
+  }
+
+  unsigned
   TRGCDCSegment::hitPattern(int clk0, int clk1) const
   {
     unsigned ptn = 0;

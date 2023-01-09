@@ -83,8 +83,16 @@ CDCTriggerTSFModule::CDCTriggerTSFModule() : Module::Module()
            false);
   addParam("ADC_cut_threshold",
            m_adccut,
-           "Threshold for the adc cut.  Default: -1",
+           "Threshold for the adc cut for all wires used for TSF.  Default: -1",
            -1);
+  addParam("ADCflag_low",
+           m_adcflag_low,
+           "Assign ADC based flag for full hit tracker. Lower threshold of ADC.",
+           10);
+  addParam("ADCflag_high",
+           m_adcflag_high,
+           "Assign ADC based flag for full hit tracker. Higher threshold of ADC.",
+           700);
 }
 
 void
@@ -393,6 +401,8 @@ CDCTriggerTSFModule::event()
     }
     // skim crosstalk hit
     if (filtered_hit[i] == 1)continue;
+    // select fixed timing window
+    if (h.getTDCCount() < 4450 || h.getTDCCount() > 4950)continue;
 
     // remove hits with low ADC
     if (m_adcflag) {
@@ -410,6 +420,10 @@ CDCTriggerTSFModule::event()
     fall.shift(1).reverse();
     TRGSignal signal = rise & fall;
     w.addSignal(signal);
+
+    if (h.getADCCount() > m_adcflag_low && h.getADCCount() < m_adcflag_high) {
+      w.addSignal_adc(signal);
+    }
 
     if (w.hit()) continue;
     // make a trigger wire hit (needed for relations)
@@ -463,8 +477,8 @@ CDCTriggerTSFModule::event()
                                   s.fastestTime(),
                                   s.foundTime(),
                                   -1,
-                                  s.hitPattern());
-        //std::cout << "tsf hit pattern " << isl << " " << its << " " << s.id() << " " << s.hitPattern() << std::endl;
+                                  s.hitPattern(),
+                                  s.hitPattern_adc());
         // relation to all CDCHits in segment
         for (unsigned iw = 0; iw < s.wires().size(); ++iw) {
           const TRGCDCWire* wire = (TRGCDCWire*)s[iw];

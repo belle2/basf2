@@ -57,10 +57,6 @@ namespace Belle2 {
 
   }
 
-  void ARICHMCParticlesModule::beginRun()
-  {
-  }
-
   void ARICHMCParticlesModule::event()
   {
     const Const::EDetector arich = Const::EDetector::ARICH; // arich
@@ -98,20 +94,6 @@ namespace Belle2 {
     }
 
   }
-
-
-  void ARICHMCParticlesModule::endRun()
-  {
-  }
-
-  void ARICHMCParticlesModule::terminate()
-  {
-  }
-
-  void ARICHMCParticlesModule::printModuleParams() const
-  {
-  }
-
 
 } // end Belle2 namespace
 

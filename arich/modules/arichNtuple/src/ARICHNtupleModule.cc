@@ -131,10 +131,6 @@ namespace Belle2 {
 
   }
 
-  void ARICHNtupleModule::beginRun()
-  {
-  }
-
   void ARICHNtupleModule::event()
   {
 
@@ -333,12 +329,6 @@ namespace Belle2 {
       }
       m_tree->Fill();
     }
-  }
-
-
-
-  void ARICHNtupleModule::endRun()
-  {
   }
 
   void ARICHNtupleModule::terminate()

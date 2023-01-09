@@ -67,9 +67,6 @@ namespace Belle2 {
 
   void ARICHDigitizerModule::initialize()
   {
-    // Print set parameters
-    printModuleParams();
-
     // QE at 400nm (3.1eV) applied in SensitiveDetector
     m_maxQE = m_simPar->getQE(3.1);
 

@@ -460,8 +460,4 @@ namespace Belle2 {
 
 
   }
-
-  void ARICHDQMModule::terminate()
-  {
-  }
 }

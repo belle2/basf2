@@ -69,13 +69,6 @@ namespace Belle2 {
      */
     virtual void endRun() override;
 
-    /**
-     * Termination action.
-     * Clean-up, close files, summarize statistics, etc.
-     */
-    virtual void terminate() override;
-
-
   protected:
     bool m_debug;/**<debug*/
 

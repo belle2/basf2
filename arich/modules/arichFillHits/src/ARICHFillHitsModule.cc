@@ -62,10 +62,6 @@ namespace Belle2 {
     arichHits.registerRelationTo(digits);
   }
 
-  void ARICHFillHitsModule::beginRun()
-  {
-  }
-
   void ARICHFillHitsModule::event()
   {
     StoreObjPtr<EventMetaData> evtMetaData;
@@ -157,15 +153,6 @@ namespace Belle2 {
     hitpos.SetX(hitpos.X() - shift.X());
     hitpos.SetY(hitpos.Y() - shift.Y());
   }
-
-  void ARICHFillHitsModule::endRun()
-  {
-  }
-
-  void ARICHFillHitsModule::terminate()
-  {
-  }
-
 
 } // end Belle2 namespace
 

@@ -50,18 +50,6 @@ namespace Belle2 {
      */
     virtual void event() override;
 
-    /**
-     * End-of-run action.
-     * Save run-related stuff, such as statistics.
-     */
-    virtual void endRun() override;
-
-    /**
-     * Termination action.
-     * Clean-up, close files, summarize statistics, etc.
-     */
-    virtual void terminate() override;
-
   protected:
     unsigned int calbyte(const int* buf);
     unsigned int calword(const int* buf);

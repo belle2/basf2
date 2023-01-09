@@ -63,13 +63,6 @@ namespace Belle2 {
       virtual void event();
 
       /**
-       * End-of-run action.
-       *
-       * Save run-related stuff, such as statistics.
-       */
-      virtual void endRun();
-
-      /**
        * Termination action.
        *
        * Clean-up, close files, summarize statistics, etc.

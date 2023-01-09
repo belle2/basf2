@@ -226,14 +226,6 @@ namespace Belle2 {
     }
   }
 
-  void ARICHReconstructorModule::endRun()
-  {
-  }
-
-  void ARICHReconstructorModule::terminate()
-  {
-  }
-
   void ARICHReconstructorModule::printModuleParams()
   {
     if (m_inputTrackType == 0) { B2DEBUG(100, "ARICHReconstructorModule: track infromation is taken from mdst Tracks.");}

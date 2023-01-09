@@ -134,7 +134,7 @@ namespace Belle2 {
         const MCParticle* mcParticle = track.getRelated<MCParticle>();
 
         ARICHAeroHit* aeroHit = NULL;
-        if (mcParticle) aeroHit = particle->getRelated<ARICHAeroHit>();
+        if (mcParticle) aeroHit = mcParticle->getRelated<ARICHAeroHit>();
 
         RelationVector<ExtHit> extHits = DataStore::getRelationsWithObj<ExtHit>(&track);
         ARICHTrack* arichTrack = NULL;
@@ -145,11 +145,11 @@ namespace Belle2 {
 
         for (unsigned i = 0; i < extHits.size(); i++) {
           const ExtHit* extHit = extHits[i];
-          if (abs(extHit->getPdgCode()) != pdgCode) continue;
-          if (extHit->getDetectorID() != myDetID) continue;
-          if (extHit->getStatus() != EXT_EXIT) continue; // particles registered at the EXIT of the Al plate
-          if (extHit->getMomentum().Z() < 0.0) continue; // track passes in backward
-          if (extHit->getCopyID() == 12345) { continue;}
+          if (abs(extHit->getPdgCode()) != pdgCode or
+              extHit->getDetectorID() != myDetID or
+              extHit->getStatus() != EXT_EXIT or // particles registered at the EXIT of the Al plate
+              extHit->getMomentum().Z() < 0.0 or // track passes in backward
+              extHit->getCopyID() == 12345) { continue;}
           if (extHit->getCopyID() == 6789) {  arich2ndHit = extHit; continue;}
           arichWinHit = extHit;
         }

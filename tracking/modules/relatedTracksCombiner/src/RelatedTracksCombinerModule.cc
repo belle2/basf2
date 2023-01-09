@@ -9,6 +9,8 @@
 #include <tracking/modules/relatedTracksCombiner/RelatedTracksCombinerModule.h>
 #include <tracking/trackFitting/fitter/base/TrackFitter.h>
 
+#include <tracking/dataobjects/RecoHitInformation.h>
+
 using namespace Belle2;
 
 REG_MODULE(RelatedTracksCombiner);
@@ -77,14 +79,13 @@ void RelatedTracksCombinerModule::event()
       continue;
     }
 
+    // TODO: This is upgrade specific. Sort tracks before according to layer number of first VTX hit
+    const auto sortByFirstVTXLayer = [](const RecoTrack * lhs, const RecoTrack * rhs) {
+      return lhs->getVTXHitList()[0]->getSensorID().getLayerNumber() < rhs->getVTXHitList()[0]->getSensorID().getLayerNumber();
+    };
+    sort(vxdTracksBefore.begin(), vxdTracksBefore.end(), sortByFirstVTXLayer);
+
     RecoTrack* newMergedTrack = nullptr;
-
-    // TODO: i see tracks before and after. only expect before ... how to check if hits are really added in the right order.
-    B2RESULT("Benni: number tracks before " << vxdTracksBefore.size());
-    B2RESULT("Benni: number tracks after " << vxdTracksAfter.size());
-    B2ASSERT("Can not handle more than 2 before relations!", vxdTracksBefore.size() <= 2);
-    B2ASSERT("Can not handle more than 2 after relations!", vxdTracksAfter.size() <= 2);
-
 
     if (not vxdTracksBefore.empty()) {
       newMergedTrack = vxdTracksBefore[0]->copyToStoreArray(m_recoTracks);

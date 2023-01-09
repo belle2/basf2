@@ -264,10 +264,6 @@ void MCTrackMergerModule::checkRelatedTrackArrays(
           (relatedQI > 0.0) &&
           (vxdMinTof < relatedToF))  {
 
-        if (relatedCDCRecoTracks.weight(index - offset) < 0) {
-          B2INFO("Related CDC: Found wrong weight: " << relatedCDCRecoTracks.weight(index - offset));
-          relatedCDCRecoTracks.setWeight(index - offset, 1);
-        }
         m_foundCorrectlyRelatedTracks += 1;
 
       } else {
@@ -385,7 +381,6 @@ void MCTrackMergerModule::removeClonesFromTrackArray(
               m_removedVXDClones += 1;
             else
               m_removedCDCClones += 1;
-            // Also remove the first related VXD track
             if (recoTrack.getRelated<RecoTrack>(relatedTracksColumnName)) {
               recoTrack.getRelated<RecoTrack>(relatedTracksColumnName)->setQualityIndicator(0);
               if (isVXD)
@@ -401,7 +396,6 @@ void MCTrackMergerModule::removeClonesFromTrackArray(
               m_removedVXDClones += 1;
             else
               m_removedCDCClones += 1;
-            // Also remove the first related VXD track
             if (recoTrack2.getRelated<RecoTrack>(relatedTracksColumnName)) {
               recoTrack2.getRelated<RecoTrack>(relatedTracksColumnName)->setQualityIndicator(0);
               if (isVXD)

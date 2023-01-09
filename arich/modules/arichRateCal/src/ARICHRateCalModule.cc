@@ -148,14 +148,4 @@ namespace Belle2 {
 
   }
 
-
-  void ARICHRateCalModule::endRun()
-  {
-  }
-
-  void ARICHRateCalModule::terminate()
-  {
-  }
-
-
 } // end Belle2 namespace

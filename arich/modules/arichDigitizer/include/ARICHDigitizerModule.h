@@ -71,11 +71,6 @@ namespace Belle2 {
      */
     void magFieldDistorsion(TVector2& hit, int copyno);
 
-    /**
-     *Prints module parameters.
-     */
-    void printModuleParams() const {};
-
   private:
 
     std::string m_inColName;         /**< Input collection name from simulation */

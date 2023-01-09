@@ -65,10 +65,6 @@ namespace Belle2 {
     rawData.registerInDataStore();
   }
 
-  void ARICHPackerModule::beginRun()
-  {
-  }
-
   void ARICHPackerModule::event()
   {
 
@@ -243,18 +239,6 @@ namespace Belle2 {
     }
 
   }
-
-
-
-
-  void ARICHPackerModule::endRun()
-  {
-  }
-
-  void ARICHPackerModule::terminate()
-  {
-  }
-
 
 } // end Belle2 namespace
 

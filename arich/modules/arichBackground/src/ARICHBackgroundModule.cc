@@ -66,9 +66,6 @@ namespace Belle2 {
 
     void ARICHBackgroundModule::initialize()
     {
-      // Print set parameters
-      printModuleParams();
-
       m_outputFile = new TFile(m_filename.c_str(), "RECREATE");
 
       m_outputTree = new TTree("m_outputTree", "tree of arich background hits");
@@ -207,28 +204,15 @@ namespace Belle2 {
       }
     }
 
-    void ARICHBackgroundModule::endRun()
-    {
-    }
-
     void ARICHBackgroundModule::terminate()
     {
-      // CPU time end
-
       // Announce
       B2INFO("ARICHBackground finished.");
 
       //m_outputTree->Write();
       m_outputFile->Write();
       m_outputFile->Close();
-
     }
-
-    void ARICHBackgroundModule::printModuleParams() const
-    {
-
-    }
-
 
   } // end arich namespace
 } // end Belle2 namespace

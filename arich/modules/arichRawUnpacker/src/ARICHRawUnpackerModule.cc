@@ -56,10 +56,6 @@ namespace Belle2 {
     rawdigit.registerInDataStore();
   }
 
-  void ARICHRawUnpackerModule::beginRun()
-  {
-  }
-
   void ARICHRawUnpackerModule::event()
   {
     StoreArray<RawARICH> rawdata;
@@ -153,15 +149,6 @@ namespace Belle2 {
         }
       }
     }
-  }
-
-
-  void ARICHRawUnpackerModule::endRun()
-  {
-  }
-
-  void ARICHRawUnpackerModule::terminate()
-  {
   }
 
 } // end Belle2 namespace

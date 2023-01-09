@@ -42,6 +42,8 @@ DQMHistAnalysisInputRootFileModule::DQMHistAnalysisInputRootFileModule()
   addParam("Experiment", m_expno, "Experiment Nr", 7u);
   addParam("RunList", m_run_list, "Run Number List", std::vector<unsigned int> {1u});
   addParam("EventsList", m_events_list, "Number of events for each run", std::vector<unsigned int> {10u});
+  addParam("RunType", m_runType, "Run Type override", std::string(""));
+  addParam("EventFilled", m_fillEvent, "Event override", 0);
   addParam("EventInterval", m_interval, "Time between events (seconds)", 20u);
   addParam("NullHistogramMode", m_null_histo_mode, "Test mode for null histograms", false);
   addParam("AutoCanvas", m_autocanvas, "Automatic creation of canvas", true);
@@ -125,10 +127,9 @@ void DQMHistAnalysisInputRootFileModule::event()
     m_eventMetaDataPtr->setTime(0);
     //setExpNr(m_expno); // redundant access from MetaData
     //setRunNr(m_runno); // redundant access from MetaData
-    std::string rtype = "";
-    setRunType(rtype);
+    setRunType(m_runType);
     //ExtractRunType();
-    setEventProcessed(0);
+    setEventProcessed(m_fillEvent);
     //ExtractEvent();
 
     B2INFO("DQMHistAnalysisInputRootFile: event finished. count: " << m_count);
@@ -257,8 +258,8 @@ void DQMHistAnalysisInputRootFileModule::event()
 
   //setExpNr(m_expno); // redundant access from MetaData
   //setRunNr(m_runno); // redundant access from MetaData
-  ExtractRunType(hs);
-  ExtractEvent(hs);
+  if (m_runType == "") ExtractRunType(hs);
+  if (m_fillEvent <= 0) ExtractEvent(hs);
 
   // this code must be run after "event processed" has been extracted
   for (size_t i = 0; i < hs.size(); i++) {

@@ -149,9 +149,7 @@ if not args.noReco:
     trk.add_tracking_reconstruction(
         main,
         mcTrackFinding=MCTracking,
-        append_full_grid_cdc_eventt0=True,
-        trackFitHypotheses=[211])  # ,
-    #    skipHitPreparerAdding=True)
+        append_full_grid_cdc_eventt0=True)
 
 
 # fill TTrees

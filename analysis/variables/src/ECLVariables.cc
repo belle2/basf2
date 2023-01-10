@@ -111,9 +111,11 @@ namespace Belle2 {
     {
 
       const ECLCluster* cluster = particle->getECLCluster();
-      if (cluster)
-        return cluster->getMinTrkDistance();
-
+      if (cluster) {
+        auto minDist = cluster->getMinTrkDistance();
+        if (minDist > 0)
+          return minDist;
+      }
       return std::numeric_limits<float>::quiet_NaN();
     }
 

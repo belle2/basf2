@@ -90,7 +90,16 @@ namespace Belle2 {
     /** Evt number. */
     unsigned int m_count = 0;
 
-    /** List of total number of events for each run. */
+    /** Run Type Override*/
+    std::string m_runType;
+
+    /** Filled event number. */
+    int m_fillEvent = 0;
+
+    /** List of total number of events for each run.
+     * This is the number of issued update events for testing,
+     * not the number of events from which histograms were filled
+     */
     std::vector<unsigned int> m_events_list;
 
     /** List of runs. */

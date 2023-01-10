@@ -583,7 +583,11 @@ void MCRecoTracksMatcherModule::event()
         B2DEBUG(23,
                 "There are different charges attributed to the same track, this shouldn't happen. Continue with the majority of positive or negative charges");
       }
-      foundTrackCharge = nPositiveCharges > nNegativeCharges ? 1 : -1;
+      // Only use nPositiveCharges and nNegativeCharges to assign a new value to foundTrackCharge if at least one fitted Tracks exists
+      // and at least one of the two values is > 0
+      if (fittedTracks.size() > 0 and (nPositiveCharges > 0 or nNegativeCharges > 0)) {
+        foundTrackCharge = nPositiveCharges > nNegativeCharges ? 1 : -1;
+      }
     }
 
     // Note : The matched category may also contain higher order clones recognisable by their low

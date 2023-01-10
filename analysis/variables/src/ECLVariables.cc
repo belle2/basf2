@@ -929,12 +929,12 @@ Returns an integer code for the ECL region of a cluster.
     REGISTER_VARIABLE("minC2TDist", eclClusterIsolation, R"DOC(
 Returns the distance between the ECL cluster and its nearest track. 
 
-For all tracks in the event, the distance between each of their extrapoldated hits in the ECL and the ECL shower 
+For all tracks in the event, the distance between each of their extrapolated hits in the ECL and the ECL shower 
 position is calculated, and the overall smallest distance is returned. The track array index of the track that is 
 closest to the ECL cluster can be retrieved using `minC2TDistID`. 
 
-If the minimum calculated distance is greater than :math:`9999.0`, the returned distance is :math:`0.0`, and if the 
-calculated distance is greater than :math:`250.0`, the returned distance will be capped at :math:`250.0`.
+If the calculated distance is greater than :math:`250.0`, the returned distance will be capped at :math:`250.0`. 
+If there are no extrapolated hits found in the ECL for the event, NaN will be returned. 
 
 .. note::
     This distance is calculated on the reconstructed level.

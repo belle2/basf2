@@ -361,7 +361,7 @@ Particle* MCDecayFinderModule::buildParticleFromDecayTree(const DecayTree<MCPart
 
     int daughterProperty = dd->getDaughter(iDD)->getProperty();
     property |= dd->getDaughter(iDD)->getMother()->getProperty();
-    newParticle->appendDaughter(partDaughter, daughterProperty, false);
+    newParticle->appendDaughter(partDaughter, false, daughterProperty);
   }
 
   return newParticle;

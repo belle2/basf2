@@ -46,7 +46,7 @@ if __name__ == '__main__':
     assert topdir.is_dir()
 
     repo = Repo(topdir)
-    merge_base = repo.merge_base('origin/main', repo.head)
+    merge_base = repo.merge_base('origin/release/07-00', repo.head)
     diff_to_main = repo.head.commit.diff(merge_base)
 
     added_or_modified_decfiles = [topdir / new_file.a_path for new_file in diff_to_main

@@ -130,6 +130,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
 
     add_postfilter_tracking_reconstruction(path,
                                            components=components,
+                                           mcTrackFinding=mcTrackFinding,
                                            pruneTracks=pruneTracks,
                                            v0_finding=v0_finding,
                                            reco_tracks=reco_tracks,
@@ -233,7 +234,7 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
                                                   add_mva_quality_indicator=add_recoTrack_QI)
 
 
-def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=False, reco_tracks="RecoTracks",
+def add_postfilter_tracking_reconstruction(path, components=None, mcTrackFinding=False, pruneTracks=False, reco_tracks="RecoTracks",
                                            prune_temporary_tracks=True, v0_finding=True, flip_recoTrack=True):
     """
     This function adds the tracking reconstruction modules not required to calculate HLT filter
@@ -241,6 +242,7 @@ def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=Fa
 
     :param path: The path to add the tracking reconstruction modules to
     :param components: the list of geometry components in use or None for all components.
+    :param mcTrackFinding: Use the MC track finders instead of the realistic ones.
     :param pruneTracks: Delete all hits except the first and the last in the found tracks.
     :param v0_finding: If false, the V0 module will not be executed
     :param reco_tracks: Name of the StoreArray where the reco tracks should be stored
@@ -258,7 +260,7 @@ def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=Fa
         path.add_module('V0Finder', RecoTracks=reco_tracks, v0FitterMode=1)
 
     # flip & refit to fix the charge of some tracks
-    if flip_recoTrack:
+    if flip_recoTrack and not mcTrackFinding:
         add_flipping_of_recoTracks(path, reco_tracks="RecoTracks")
 
     # estimate the track time

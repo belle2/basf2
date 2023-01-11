@@ -23,6 +23,8 @@ Modules
    This option is only valid when one calls the function in a ``for_each`` loop over the RestOfEvent.
    The branches ``__signalSideCandidate__`` and ``__nSignalSideCandidates__`` are added to the TTree by setting the option.
    An example of usage can be found in ``analysis/examples/VariableManager/variablesToNtuple.py``.
+ * Fixed a bug on the :b2:mod:`BestCandidateSelection` that keeps only less than the expected number of candidates when
+   ``allowMultiRank=True`` and ``numBest>0``. Now the module works as documented.
 
 Changes in the analysis package in light-2210-devonrex
 ------------------------------------------------------

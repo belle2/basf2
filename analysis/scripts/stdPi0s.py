@@ -41,6 +41,12 @@ def stdPi0s(
         loadPhotonBeamBackgroundMVA (bool): If true, photon candidates will be assigned a beam background probability.
         loadPhotonHadronicSplitOffMVA (bool): If true, photon candidates will be assigned a hadronic split-off probability.
         biasCorrectionTable (str): correction table for the photon energy bias correction (should only be applied to data)
+
+                          .. tip::
+                              Please refer to the
+                              `Neutrals Performance Confluence page <https://confluence.desy.de/display/BI/Neutrals+Performance>`_
+                              for information on the names of available correction tables..
+
     """
 
     if listtype != 'all':
@@ -48,15 +54,11 @@ def stdPi0s(
                   " page for most up-to-date pi0 recommendations.")
 
     if listtype == 'all':
-        stdPhotons('all', path, loadPhotonBeamBackgroundMVA, loadPhotonHadronicSplitOffMVA)
-        if not biasCorrectionTable:
-            ma.correctEnergyBias(['gamma:all'], biasCorrectionTable, path)
+        stdPhotons('all', path, loadPhotonBeamBackgroundMVA, loadPhotonHadronicSplitOffMVA, biasCorrectionTable)
         ma.reconstructDecay('pi0:all -> gamma:all gamma:all', '', 1, True, path)
         ma.matchMCTruth('pi0:all', path)
     elif 'eff10_May2020' == listtype:
-        stdPhotons('pi0eff10_May2020', path, loadPhotonBeamBackgroundMVA, loadPhotonHadronicSplitOffMVA)
-        if not biasCorrectionTable:
-            ma.correctEnergyBias(['gamma:pi0eff10_May2020'], biasCorrectionTable, path)
+        stdPhotons('pi0eff10_May2020', path, loadPhotonBeamBackgroundMVA, loadPhotonHadronicSplitOffMVA, biasCorrectionTable)
         ma.reconstructDecay('pi0:eff10_May2020 -> gamma:pi0eff10_May2020 gamma:pi0eff10_May2020',
                             '0.127<InvM<0.139 and -0.9<daughterDiffOf(0,1,phi)<0.9 and daughterAngle(0,1)<0.8',
                             1,
@@ -64,9 +66,7 @@ def stdPi0s(
                             path)
         ma.matchMCTruth('pi0:eff10_May2020', path)
     elif 'eff20_May2020' == listtype:
-        stdPhotons('pi0eff20_May2020', path, loadPhotonBeamBackgroundMVA, loadPhotonHadronicSplitOffMVA)
-        if not biasCorrectionTable:
-            ma.correctEnergyBias(['gamma:pi0eff20_May2020'], biasCorrectionTable, path)
+        stdPhotons('pi0eff20_May2020', path, loadPhotonBeamBackgroundMVA, loadPhotonHadronicSplitOffMVA, biasCorrectionTable)
         ma.reconstructDecay('pi0:eff20_May2020 -> gamma:pi0eff20_May2020 gamma:pi0eff20_May2020',
                             '0.121<InvM<0.142 and -1.0<daughterDiffOf(0,1,phi)<1.0 and daughterAngle(0,1)<0.9',
                             1,
@@ -74,9 +74,7 @@ def stdPi0s(
                             path)
         ma.matchMCTruth('pi0:eff20_May2020', path)
     elif 'eff30_May2020' == listtype:
-        stdPhotons('pi0eff30_May2020', path, loadPhotonBeamBackgroundMVA, loadPhotonHadronicSplitOffMVA)
-        if not biasCorrectionTable:
-            ma.correctEnergyBias(['gamma:pi0eff30_May2020'], biasCorrectionTable, path)
+        stdPhotons('pi0eff30_May2020', path, loadPhotonBeamBackgroundMVA, loadPhotonHadronicSplitOffMVA, biasCorrectionTable)
         ma.reconstructDecay('pi0:eff30_May2020 -> gamma:pi0eff30_May2020 gamma:pi0eff30_May2020',
                             '0.120<InvM<0.145 and -1.5<daughterDiffOf(0,1,phi)<1.5 and daughterAngle(0,1)<1.4',
                             1,
@@ -84,15 +82,11 @@ def stdPi0s(
                             path)
         ma.matchMCTruth('pi0:eff30_May2020', path)
     elif 'eff40_May2020' == listtype:
-        stdPhotons('pi0eff40_May2020', path, loadPhotonBeamBackgroundMVA, loadPhotonHadronicSplitOffMVA)
-        if not biasCorrectionTable:
-            ma.correctEnergyBias(['gamma:pi0eff40_May2020'], biasCorrectionTable, path)
+        stdPhotons('pi0eff40_May2020', path, loadPhotonBeamBackgroundMVA, loadPhotonHadronicSplitOffMVA, biasCorrectionTable)
         ma.reconstructDecay('pi0:eff40_May2020 -> gamma:pi0eff40_May2020 gamma:pi0eff40_May2020', '0.120<InvM<0.145', 1, True, path)
         ma.matchMCTruth('pi0:eff40_May2020', path)
     elif 'eff50_May2020_nomcmatch' == listtype:
-        stdPhotons('pi0eff50_May2020', path, loadPhotonBeamBackgroundMVA, loadPhotonHadronicSplitOffMVA)
-        if not biasCorrectionTable:
-            ma.correctEnergyBias(['gamma:pi0eff50_May2020'], biasCorrectionTable, path)
+        stdPhotons('pi0eff50_May2020', path, loadPhotonBeamBackgroundMVA, loadPhotonHadronicSplitOffMVA, biasCorrectionTable)
         ma.reconstructDecay(
             'pi0:eff50_May2020_nomcmatch -> gamma:pi0eff50_May2020 gamma:pi0eff50_May2020',
             '0.105<InvM<0.150',
@@ -104,9 +98,7 @@ def stdPi0s(
         ma.cutAndCopyList('pi0:eff50_May2020', 'pi0:eff50_May2020_nomcmatch', '', True, path)
         ma.matchMCTruth('pi0:eff50_May2020', path)
     elif 'eff60_May2020_nomcmatch' == listtype:
-        stdPhotons('pi0eff60_May2020', path, loadPhotonBeamBackgroundMVA, loadPhotonHadronicSplitOffMVA)
-        if not biasCorrectionTable:
-            ma.correctEnergyBias(['gamma:all'], biasCorrectionTable, path)
+        stdPhotons('pi0eff60_May2020', path, loadPhotonBeamBackgroundMVA, loadPhotonHadronicSplitOffMVA, biasCorrectionTable)
         ma.reconstructDecay(
             'pi0:eff60_May2020_nomcmatch -> gamma:pi0eff60_May2020 gamma:pi0eff60_May2020',
             '0.03<InvM',

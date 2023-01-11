@@ -1089,6 +1089,14 @@ void B2BIIConvertMdstModule::copyNbarFromGamma()
     B2DEBUG(99, "Copying anti-n0:mdst from gamma:mdst");
     Particle* nbar = m_particles.appendNew(eclCluster, Const::antiNeutron);
     plist->addParticle(nbar);
+
+    if (m_realData)
+      continue;
+
+    // Relation to MCParticle
+    MCParticle* matchedMCParticle = eclCluster->getRelated<MCParticle>();
+    if (matchedMCParticle)
+      nbar->addRelationTo(matchedMCParticle);
   }
 }
 

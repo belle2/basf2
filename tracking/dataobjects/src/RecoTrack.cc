@@ -634,117 +634,137 @@ typedef std::tuple<float, float, std::vector<int>> ClsTimeHelperTuple;
 //  * Excludes off-time SVD hits while calculating track time.
 //  * Returns cluster time and sigma
 //  */
-// ClsTimeHelperTuple excludeOffTimeClusters(std::vector<ClsTimeHelperTuple>& clusterTimesVec, const float& tolerance);
+// ClsTimeHelperTuple excludeOffTimeClusters(std::vector<ClsTimeHelperTuple>& clusterTimesVec);
 
-ClsTimeHelperTuple excludeOffTimeClusters(std::vector<ClsTimeHelperTuple>& clusterTimesVec, const float& tolerance)
+ClsTimeHelperTuple excludeOffTimeClusters(std::vector<ClsTimeHelperTuple>& clusterTimesVec)
 {
-  int vecSize = clusterTimesVec.size();
 
-  std::cout << std::endl;
+  // std::cout << std::endl;
   std::map<int, ClsTimeHelperTuple> grInfoOfCls;
   for (auto& item : clusterTimesVec) {
     auto clsTime  = std::get<0>(item);
     auto clsSigma = std::get<1>(item);
     auto grVec    = std::get<2>(item);
-    for (auto& gr : grVec) {
-      std::cout << "gr\t" << gr << "\tclsTime\t" << clsTime << "\tclsSigma\t" << clsSigma << std::endl;
-      if (auto search = grInfoOfCls.find(gr); search != grInfoOfCls.end()) {
-        std::get<0>(grInfoOfCls[gr]) += clsTime;
-        std::get<1>(grInfoOfCls[gr]) += clsSigma;
-        std::get<2>(grInfoOfCls[gr]).push_back(gr);
+    if (int(grVec.size()))
+      for (auto& gr : grVec) {
+        // std::cout << "gr\t" << gr
+        //    << "\tclsTime\t" << clsTime
+        //    << "\tclsSigma\t" << clsSigma
+        //    << std::endl;
+        if (auto search = grInfoOfCls.find(gr); search != grInfoOfCls.end()) {
+          std::get<0>(grInfoOfCls[gr]) += clsTime;
+          std::get<1>(grInfoOfCls[gr]) += clsSigma * clsSigma;
+          std::get<2>(grInfoOfCls[gr]).push_back(gr);
+        } else
+          grInfoOfCls[gr] = std::make_tuple(clsTime, clsSigma * clsSigma, std::vector<int> {gr});
+      } else    // when grouping is disabled
+      if (auto search = grInfoOfCls.find(-1); search != grInfoOfCls.end()) {
+        std::get<0>(grInfoOfCls[-1]) += clsTime;
+        std::get<1>(grInfoOfCls[-1]) += clsSigma * clsSigma;
+        std::get<2>(grInfoOfCls[-1]).push_back(-1);
       } else
-        grInfoOfCls[gr] = std::make_tuple(clsTime, clsSigma, std::vector<int> {gr});
-    }
+        grInfoOfCls[-1] = std::make_tuple(clsTime, clsSigma * clsSigma, std::vector<int> {-1});
   } // for (auto& item : clusterTimesVec) {
 
   std::vector<ClsTimeHelperTuple> clsInGroups;
-  std::cout << std::endl;
+  // std::cout << std::endl;
   for (auto& item : grInfoOfCls) {
-    auto grId    = std::get<0>(item);
     auto clsInfo = std::get<1>(item);
+    auto grVec   = std::get<2>(clsInfo);
+    float count = grVec.size();
+    if (count > 1.) {
+      std::get<0>(clsInfo) /= count;
+      std::get<1>(clsInfo) = std::sqrt(std::get<1>(clsInfo) / (count * (count - 1.)));
+    }
     clsInGroups.push_back(clsInfo);
-    auto clsTimeSum  = std::get<0>(clsInfo);
-    auto clsSigmaSum = std::get<1>(clsInfo);
-    auto grVec       = std::get<2>(clsInfo);
-    std::cout << "grId\t" << grId << "\tclsTimeSum\t" << clsTimeSum << "\tclsSigmaSum\t" << clsSigmaSum << "\tnCls\t" <<
-              (grVec.size()) << "\tgr\t" << (grVec.back()) << std::endl;
+
+    // auto grId     = std::get<0>(item);
+    // auto trkTime  = std::get<0>(clsInfo);
+    // auto trkSigma = std::get<1>(clsInfo);
+    // std::cout << "grId\t" << grId
+    //        << "\ttrkTime\t" << trkTime
+    //        << "\ttrkSigma\t" << trkSigma
+    //        << "\tnCls\t" << (grVec.size())
+    //        << "\tgr\t" << (grVec.back())
+    //        << std::endl;
   }
 
-  // if (vecSize > 2) {
-
-  //   {
-  //     // sorting items in descending time
-  //     std::tuple<float, float> key;
-  //     for (int ij = 1; ij < vecSize; ij++) {
-  //       key = clusterTimesVec[ij];
-  //       int kj = ij - 1;
-  //       while ((kj >= 0) &&
-  //              ((std::get<0>(clusterTimesVec[kj])) < (std::get<0>(key)))) {
-  //         clusterTimesVec[kj + 1] = clusterTimesVec[kj];
-  //         kj--;
-  //       }
-  //       clusterTimesVec[kj + 1] = key;
-  //     }
-  //   }
-
-  //   float mean, szxy, sz, sxy, sz2, sn;
-
-  //   while (1) {
-  //     mean = szxy = sz = sxy = sz2 = sn = 0.;
-
-  //     for (auto& item : clusterTimesVec) {
-  //       if (std::isnan(std::get<0>(item))) continue;
-  //       mean += std::get<0>(item);
-  //       sn += 1.;
-  //     }
-  //     if (sn > 0.) break;
-  //     mean /= sn;
-
-  //     sn = 0.;
-
-  //     // slope w.r.t. Z-axis.
-  //     for (int ij = 0; ij < vecSize; ij ++) {
-  //       float xzval[2] = {std::get<0>(clusterTimesVec[ij]), float(ij + 1)};
-  //       if (std::isnan(xzval[0])) continue;
-  //       float err = std::fabs(xzval[0] - mean);
-  //       szxy += xzval[1] * xzval[0] / err;
-  //       sz   += xzval[1] / err;
-  //       sz2  += xzval[1] * xzval[1] / err;
-  //       sxy  += xzval[0] / err;
-  //       sn   += 1. / err;
-  //     } // for (int ij = 0; ij < vecSize; ij ++) {
-
-  //     float slope, intersect;
-  //     if (sn > 0. && sz2 * sn - sz * sz != 0.) {
-  //       slope = (szxy * sn - sz * sxy) / (sz2 * sn - sz * sz);
-  //       intersect = sxy / sn - slope * sz / sn;
-  //     } else break;
-
-  //     bool breakFlag = true;
-  //     for (int ij = 0; ij < vecSize; ij ++) {
-  //       float deltaTime = (ij + 1.) * slope + intersect - std::get<0>(clusterTimesVec[ij]);
-  //       if (std::fabs(deltaTime) > tolerance) {
-  //         clusterTimesVec[ij] = std::make_tuple(std::numeric_limits<float>::quiet_NaN(), std::numeric_limits<float>::quiet_NaN());
-  //         breakFlag = false;
-  //       }
-  //     } // for (int ij = 0; ij < vecSize; ij ++) {
-  //     if (breakFlag) break;
-  //   }   // while(1) {
-  // } // if (vecSize > 2) {
-
-  float timeSum = 0;
-  float sigma2Sum = 0;
-  float count = 0;
-  for (auto& item : clusterTimesVec) {
-    timeSum += std::get<0>(item);
-    sigma2Sum += std::get<1>(item) * std::get<1>(item);
-    count += 1.;
+  {
+    // sorting items in descending cluster numbers
+    ClsTimeHelperTuple key;
+    for (int ij = 1; ij < int(clsInGroups.size()); ij++) {
+      key = clsInGroups[ij];
+      int kj = ij - 1;
+      while ((kj >= 0) &&
+             ((std::get<2>(clsInGroups[kj])).size() < (std::get<2>(key)).size())) {
+        clsInGroups[kj + 1] = clsInGroups[kj];
+        kj--;
+      }
+      clsInGroups[kj + 1] = key;
+    }
   }
-  if (count > 1.) {
-    timeSum /= count;
-    sigma2Sum = std::sqrt(sigma2Sum / (count * (count - 1.)));
+
+  // std::cout << std::endl;
+  // for (auto& clsInfo : clsInGroups) {
+  //   auto trkTime  = std::get<0>(clsInfo);
+  //   auto trkSigma = std::get<1>(clsInfo);
+  //   auto grVec    = std::get<2>(clsInfo);
+  //   std::cout << "\ttrkTime\t" << trkTime
+  //        << "\ttrkSigma\t" << trkSigma
+  //        << "\tnCls\t" << (grVec.size())
+  //        << "\tgr\t" << (grVec.back())
+  //        << std::endl;
+  // }
+
+  // remove unwanted groups
+  for (int ij = 1; ij < int(clsInGroups.size()); ij++) {
+    int prevGrCnt = (std::get<2>(clsInGroups[ij - 1])).size();
+    int     GrCnt = (std::get<2>(clsInGroups[ij])).size();
+    if (prevGrCnt != GrCnt) {
+      clsInGroups.resize(ij); break;
+    }
   }
-  return std::make_tuple(timeSum, sigma2Sum, std::vector<int> {});
+
+  // std::cout << std::endl;
+  // for (auto& clsInfo : clsInGroups) {
+  //   auto trkTime  = std::get<0>(clsInfo);
+  //   auto trkSigma = std::get<1>(clsInfo);
+  //   auto grVec    = std::get<2>(clsInfo);
+  //   std::cout << "\ttrkTime\t" << trkTime
+  //        << "\ttrkSigma\t" << trkSigma
+  //        << "\tnCls\t" << (grVec.size())
+  //        << "\tgr\t" << (grVec.back())
+  //        << std::endl;
+  // }
+
+  {
+    // sorting items in descending cluster sigma
+    ClsTimeHelperTuple key;
+    for (int ij = 1; ij < int(clsInGroups.size()); ij++) {
+      key = clsInGroups[ij];
+      int kj = ij - 1;
+      while ((kj >= 0) &&
+             ((std::get<1>(clsInGroups[kj])) > (std::get<1>(key)))) {
+        clsInGroups[kj + 1] = clsInGroups[kj];
+        kj--;
+      }
+      clsInGroups[kj + 1] = key;
+    }
+  }
+
+  // std::cout << std::endl;
+  // for (auto& clsInfo : clsInGroups) {
+  //   auto trkTime  = std::get<0>(clsInfo);
+  //   auto trkSigma = std::get<1>(clsInfo);
+  //   auto grVec    = std::get<2>(clsInfo);
+  //   std::cout << "\ttrkTime\t" << trkTime
+  //        << "\ttrkSigma\t" << trkSigma
+  //        << "\tnCls\t" << (grVec.size())
+  //        << "\tgr\t" << (grVec.back())
+  //        << std::endl;
+  // }
+
+  return clsInGroups[0];
 }
 
 void RecoTrack::estimateArmTime()
@@ -757,8 +777,6 @@ void RecoTrack::estimateArmTime()
   RecoHitInformation::RecoHitDetector SVD = RecoHitInformation::RecoHitDetector::c_SVD;
   RecoHitInformation::RecoHitDetector detIDpre = und;
   RecoHitInformation::RecoHitDetector detIDpost = und;
-  float clusterTimeSum = 0;
-  float clusterTimeSigma2Sum = 0;
   std::vector<ClsTimeHelperTuple> clusterTimesVec; // time, sigma, grId
   bool trackArmTimeDone = false;
 
@@ -780,7 +798,7 @@ void RecoTrack::estimateArmTime()
       // Compute the track arm times using SVD cluster times
       if (svdDone && nSVDHits > 1) {
         detIDpost = foundin;
-        ClsTimeHelperTuple clsTimeOutput = excludeOffTimeClusters(clusterTimesVec, 30.);
+        ClsTimeHelperTuple clsTimeOutput = excludeOffTimeClusters(clusterTimesVec);
         if (!isOutgoingArm(detIDpre, detIDpost)) {
           m_ingoingArmTime = std::get<0>(clsTimeOutput);
           m_ingoingArmTimeError = std::get<1>(clsTimeOutput);
@@ -795,7 +813,7 @@ void RecoTrack::estimateArmTime()
         svdDone = false;
         detIDpre = detIDpost;
         detIDpost = und;
-        clusterTimeSum = 0;
+        clusterTimesVec.clear();
         nSVDHits = 0;
         trackArmTimeDone = true;
       }
@@ -805,7 +823,7 @@ void RecoTrack::estimateArmTime()
     // where the track arm times are calculated, so they are calculated here.
     // It will not reset all variables because it is run only at the last recoHit
     if (!trackArmTimeDone && (recoHit == recoHits.back()) && nSVDHits > 1) {
-      ClsTimeHelperTuple clsTimeOutput = excludeOffTimeClusters(clusterTimesVec, 30.);
+      ClsTimeHelperTuple clsTimeOutput = excludeOffTimeClusters(clusterTimesVec);
       if (!isOutgoingArm(detIDpre, detIDpost)) {
         m_ingoingArmTime = std::get<0>(clsTimeOutput);
         m_ingoingArmTimeError = std::get<1>(clsTimeOutput);

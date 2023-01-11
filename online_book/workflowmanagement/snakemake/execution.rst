@@ -5,7 +5,7 @@ Full Workflow Execution
 
 We execute the full dependency tree of the workflow by calling :code:`snakemake --cores <ncores> -s snakefile`, where we point to the snakefile and :code:`<ncores>` specifies the maximum number of parallelly running tasks. Do not forget to setup basf2 beforehand, for the recommended release use :code:`b2setup $(b2help-releases)`.
 
-To submit rules to the KEKcc batch system, we can specify :code:`snakemake --cores <ncores> -s snakefile --cluster bsub`. In our case, we only want to submit the reconstructions, therefore we mark all other rules as local in the snakefile:
+To submit rules to the KEKcc batch system, we can specify :code:`snakemake --jobs <njobs> -s snakefile --cluster bsub`, where :code:`<njobs>` specifies the maximum number of parallelly running tasks. In our case, we only want to submit the reconstructions, therefore we mark all other rules as local in the snakefile:
 
 .. literalinclude:: localrules
    :language: python

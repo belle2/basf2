@@ -25,7 +25,7 @@ A workflow is visualized in a directed acyclic graph (DAG), which illustrates th
     
     Directed acyclic graph (DAG) for a sample Belle II analysis.
     
-A wide variety of workflow management tools exists (see for example `here <https://github.com/pditommaso/awesome-pipeline/>`_). For Belle II analyses, the b2luigi (based on the luigi framework) and snakemake workflow management tools are particulary useful (see e.g. `our comparison <https://arxiv.org/abs/2212.01422>`_). 
+A wide variety of workflow management tools exists (see for example `here <https://github.com/pditommaso/awesome-pipeline/>`_). For Belle II analyses, the b2luigi (based on the luigi framework) and snakemake workflow management tools are particulary useful (see e.g. `our comparison <https://arxiv.org/abs/2212.01422>`_). In general, each processing step is implemented as a task in the workflow, with its input(s) and output(s). A task is automatically scheduled for execution by the workflow management tool, as soon as all of its input(s) are existing but not all of its output(s). If output(s) to a task are already existing upon launch, the corresponding task will not be run again.
 
 In this lesson, we build a minimalistic Belle II analysis in both tools, employing gbasf2, basf2 and the LSF batch system:
 

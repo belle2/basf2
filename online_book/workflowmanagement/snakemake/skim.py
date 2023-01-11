@@ -20,7 +20,12 @@ vx.treeFit('B0:PiD-toK2Pi', 0, path=mypath, updateAllDaughters=False, ipConstrai
 ma.applyCuts('B0:PiD-toK2Pi', '5.2 < Mbc and abs(deltaE) < 0.5', path=mypath)
 
 # dump in UDST format
-udst.add_skimmed_udst_output(mypath, skimParticleLists=['B0:PiD-toK2Pi'], mc=runningOnMC, outputFile=outputfile)
+udst.add_skimmed_udst_output(
+    mypath,
+    skimDecayMode='BtoPiD',
+    skimParticleLists=['B0:PiD-toK2Pi'],
+    mc=runningOnMC,
+    outputFile=outputfile)
 b2.process(mypath)
 print(b2.statistics)
 # @endcond

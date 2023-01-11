@@ -75,7 +75,7 @@ rule BatchToTextFile:
         BatchesPerSkim = config["BatchesPerSkim"]
         
     script:
-        "BatchToTxt.py"
+        "batchToTxt.py"
         
 rule Skim:
     input:
@@ -89,7 +89,8 @@ rule Skim:
         gbasf2_download_logs = bool(config["gbasf2_download_logs"]),
         gbasf2_min_proxy_lifetime = config["gbasf2_min_proxy_lifetime"],
         gbasf2_proxy_lifetime = config["gbasf2_proxy_lifetime"],
-        gbasf2_output_file_name = outputfile
+        gbasf2_output_file_name = outputfile,
+        gbasf2_project_name_prefix = lambda wildcards: wildcards.EventType
     output:
         output_filelist = "Skim/projectName_{EventType}/skim_{skim}/skimslist.dat"
     wrapper:

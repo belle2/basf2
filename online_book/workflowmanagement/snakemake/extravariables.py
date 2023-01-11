@@ -1,4 +1,4 @@
 # @cond
 runningOnMC = True
-outputfile = "skim.root"
+outputfile = "skim.udst.root"
 # @endcond

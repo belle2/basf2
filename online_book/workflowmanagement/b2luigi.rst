@@ -10,18 +10,18 @@ b2luigi
 
     **Prerequisites**:
 
-        * access to kekcc
-        * grid-certificate for gbasf2
+    * access to kekcc
+    * grid-certificate for gbasf2
 
     **Questions**:
 
-        * How do I implement my analysis in a b2luigi workflow?
-        * How do I automatize job submission and job steering on remote computing resources?
+    * How do I implement my analysis in a b2luigi workflow?
+    * How do I automatize job submission and job steering on remote computing resources?
 
     **Objectives**:
 
-        * Look at a complete Belle II workflow example.
-        * Understand how to modify and extend the workflow.
+    * Look at a complete Belle II workflow example.
+    * Understand how to modify and extend the workflow.
 
 `Luigi <https://luigi.readthedocs.io/en/stable/>`_ is a workflow management framework named after a well-known plumber and widely used in industry. It was originally developed by the Spotify group and open-sourced in 2012. In luigi, the workflow logic is decentralized and integrated with the analysis code for every processing step.
 

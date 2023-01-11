@@ -1413,7 +1413,7 @@ def applyEventCuts(cut, path, metavariables=None):
                 if isinstance(meta_string_list[0], list):
                     meta_string_list = [element for element in meta_string_list[0]]
 
-            check_variable(var_list_temp)
+            check_variable(var_list_temp, metavar_ids)
 
             if len(meta_string_list) == 0:
                 continue

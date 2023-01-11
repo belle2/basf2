@@ -13,8 +13,9 @@
 
 #include <vxd/geometry/GeoCache.h>
 
-#include <svd/dataobjects/SVDRecoDigit.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
+#include <svd/dataobjects/SVDRecoDigit.h>
+#include <svd/dataobjects/SVDCluster.h>
 #include <tracking/dataobjects/ROIid.h>
 #include <tracking/dataobjects/SVDIntercept.h>
 
@@ -44,12 +45,14 @@ namespace Belle2 {
   private:
 
     std::string m_SVDShaperDigitsName; /**< shaper digit list name*/
+    std::string m_SVDClustersName; /**< cluster list name*/
     std::string m_SVDRecoDigitsName; /**< reco digit list name*/
 
     StoreArray<ROIid> m_ROIs; /**< ROis store array*/
     StoreArray<SVDIntercept> m_Intercepts; /**< SVDINtercept Store Arrays*/
     StoreArray<SVDShaperDigit> m_SVDShaperDigits; /**< shaper digits sotre array */
-    StoreArray<SVDRecoDigit> m_SVDRecoDigits; /**< reco digit store array*/
+    StoreArray<SVDRecoDigit> m_SVDRecoDigits; /**< reco digits sotre array */
+    StoreArray<SVDCluster> m_SVDClusters; /**< svd cluster store array*/
 
     VXD::GeoCache& m_geoCache = VXD::GeoCache::getInstance(); /**< the geo cache instance*/
 

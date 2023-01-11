@@ -20,15 +20,17 @@ using namespace Belle2;
 
 REG_MODULE(BelleNbarMVA)
 
-BelleNbarMVAModule::BelleNbarMVAModule() : Module(),
-  m_model(fdeep::read_model_from_string(((DatabaseRepresentationOfWeightfile*)Database::Instance().getData("nbarMVA", 0, 0))->m_data))
+BelleNbarMVAModule::BelleNbarMVAModule() : Module(), m_model()
 {
   setDescription(R"DOC(Apply nbarMVA for Belle I)DOC");
+  addParam("identifier", m_identifier, "Identifier of the MVA", std::string(""));
   addParam("particleList", m_particleList, "ParticleList to apply the MVA", std::string(""));
 }
 
 void BelleNbarMVAModule::initialize()
 {
+  m_model = std::make_unique<fdeep::model>(fdeep::read_model_from_string(((DatabaseRepresentationOfWeightfile*)
+                                           Database::Instance().getData(m_identifier, 0, 0))->m_data));
   m_plist.isRequired(m_particleList);
 }
 
@@ -42,7 +44,7 @@ void BelleNbarMVAModule::event()
     double transform_clusterNHits = (cluster->getNumberOfCrystals() - 14.32496591) / 3.55654319;
     double transform_clusterLAT = (cluster->getLAT() - 5.59208538) / 1.80608294;
     std::vector<double> v{transform_clusterE, transform_clusterE9E25, transform_clusterHighestE, transform_clusterNHits, transform_clusterLAT};
-    particle.addExtraInfo("nbarMVA", double(m_model.predict_single_output({fdeep::tensor(fdeep::tensor_shape(5), v)})));
+    particle.addExtraInfo("nbarMVA", double(m_model->predict_single_output({fdeep::tensor(fdeep::tensor_shape(5), v)})));
   }
 }
 

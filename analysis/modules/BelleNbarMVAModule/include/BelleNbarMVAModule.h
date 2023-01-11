@@ -35,8 +35,9 @@ namespace Belle2 {
 
   private:
 
+    std::string m_identifier;  /**< Identifier of the MVA */
     std::string m_particleList;  /**< Name of the ParticleList to apply the MVA */
     StoreObjPtr<ParticleList> m_plist;  /**< ParticeList to apply the MVA */
-    const fdeep::model m_model;  /**< Model of the MVA */
+    std::unique_ptr<fdeep::model> m_model;  /**< Model of the MVA */
   };
 }

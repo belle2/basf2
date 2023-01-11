@@ -629,7 +629,7 @@ const genfit::MeasuredStateOnPlane& RecoTrack::getMeasuredStateOnPlaneFromLastHi
 
 
 /// helper tuple typedef in the following function.
-typedef std::tuple<float, float> ClsTimeHelperTuple;
+typedef std::tuple<float, float, std::vector<int>> ClsTimeHelperTuple;
 // /**
 //  * Excludes off-time SVD hits while calculating track time.
 //  * Returns cluster time and sigma
@@ -639,73 +639,103 @@ typedef std::tuple<float, float> ClsTimeHelperTuple;
 ClsTimeHelperTuple excludeOffTimeClusters(std::vector<ClsTimeHelperTuple>& clusterTimesVec, const float& tolerance)
 {
   int vecSize = clusterTimesVec.size();
-  if (vecSize > 2) {
 
-    {
-      // sorting items in descending time
-      std::tuple<float, float> key;
-      for (int ij = 1; ij < vecSize; ij++) {
-        key = clusterTimesVec[ij];
-        int kj = ij - 1;
-        while ((kj >= 0) &&
-               ((std::get<0>(clusterTimesVec[kj])) < (std::get<0>(key)))) {
-          clusterTimesVec[kj + 1] = clusterTimesVec[kj];
-          kj--;
-        }
-        clusterTimesVec[kj + 1] = key;
-      }
+  std::cout << std::endl;
+  std::map<int, ClsTimeHelperTuple> grInfoOfCls;
+  for (auto& item : clusterTimesVec) {
+    auto clsTime  = std::get<0>(item);
+    auto clsSigma = std::get<1>(item);
+    auto grVec    = std::get<2>(item);
+    for (auto& gr : grVec) {
+      std::cout << "gr\t" << gr << "\tclsTime\t" << clsTime << "\tclsSigma\t" << clsSigma << std::endl;
+      if (auto search = grInfoOfCls.find(gr); search != grInfoOfCls.end()) {
+        std::get<0>(grInfoOfCls[gr]) += clsTime;
+        std::get<1>(grInfoOfCls[gr]) += clsSigma;
+        std::get<2>(grInfoOfCls[gr]).push_back(gr);
+      } else
+        grInfoOfCls[gr] = std::make_tuple(clsTime, clsSigma, std::vector<int> {gr});
     }
+  } // for (auto& item : clusterTimesVec) {
 
-    float mean, szxy, sz, sxy, sz2, sn;
+  std::vector<ClsTimeHelperTuple> clsInGroups;
+  std::cout << std::endl;
+  for (auto& item : grInfoOfCls) {
+    auto grId    = std::get<0>(item);
+    auto clsInfo = std::get<1>(item);
+    clsInGroups.push_back(clsInfo);
+    auto clsTimeSum  = std::get<0>(clsInfo);
+    auto clsSigmaSum = std::get<1>(clsInfo);
+    auto grVec       = std::get<2>(clsInfo);
+    std::cout << "grId\t" << grId << "\tclsTimeSum\t" << clsTimeSum << "\tclsSigmaSum\t" << clsSigmaSum << "\tnCls\t" <<
+              (grVec.size()) << "\tgr\t" << (grVec.back()) << std::endl;
+  }
 
-    while (1) {
-      mean = szxy = sz = sxy = sz2 = sn = 0.;
+  // if (vecSize > 2) {
 
-      for (auto& item : clusterTimesVec) {
-        if (std::isnan(std::get<0>(item))) continue;
-        mean += std::get<0>(item);
-        sn += 1.;
-      }
-      if (sn > 0.) break;
-      mean /= sn;
+  //   {
+  //     // sorting items in descending time
+  //     std::tuple<float, float> key;
+  //     for (int ij = 1; ij < vecSize; ij++) {
+  //       key = clusterTimesVec[ij];
+  //       int kj = ij - 1;
+  //       while ((kj >= 0) &&
+  //              ((std::get<0>(clusterTimesVec[kj])) < (std::get<0>(key)))) {
+  //         clusterTimesVec[kj + 1] = clusterTimesVec[kj];
+  //         kj--;
+  //       }
+  //       clusterTimesVec[kj + 1] = key;
+  //     }
+  //   }
 
-      sn = 0.;
+  //   float mean, szxy, sz, sxy, sz2, sn;
 
-      // slope w.r.t. Z-axis.
-      for (int ij = 0; ij < vecSize; ij ++) {
-        float xzval[2] = {std::get<0>(clusterTimesVec[ij]), float(ij + 1)};
-        if (std::isnan(xzval[0])) continue;
-        float err = std::fabs(xzval[0] - mean);
-        szxy += xzval[1] * xzval[0] / err;
-        sz   += xzval[1] / err;
-        sz2  += xzval[1] * xzval[1] / err;
-        sxy  += xzval[0] / err;
-        sn   += 1. / err;
-      } // for (int ij = 0; ij < vecSize; ij ++) {
+  //   while (1) {
+  //     mean = szxy = sz = sxy = sz2 = sn = 0.;
 
-      float slope, intersect;
-      if (sn > 0. && sz2 * sn - sz * sz != 0.) {
-        slope = (szxy * sn - sz * sxy) / (sz2 * sn - sz * sz);
-        intersect = sxy / sn - slope * sz / sn;
-      } else break;
+  //     for (auto& item : clusterTimesVec) {
+  //       if (std::isnan(std::get<0>(item))) continue;
+  //       mean += std::get<0>(item);
+  //       sn += 1.;
+  //     }
+  //     if (sn > 0.) break;
+  //     mean /= sn;
 
-      bool breakFlag = true;
-      for (int ij = 0; ij < vecSize; ij ++) {
-        float deltaTime = (ij + 1.) * slope + intersect - std::get<0>(clusterTimesVec[ij]);
-        if (std::fabs(deltaTime) > tolerance) {
-          clusterTimesVec[ij] = std::make_tuple(std::numeric_limits<float>::quiet_NaN(), std::numeric_limits<float>::quiet_NaN());
-          breakFlag = false;
-        }
-      } // for (int ij = 0; ij < vecSize; ij ++) {
-      if (breakFlag) break;
-    }   // while(1) {
-  } // if (vecSize > 2) {
+  //     sn = 0.;
+
+  //     // slope w.r.t. Z-axis.
+  //     for (int ij = 0; ij < vecSize; ij ++) {
+  //       float xzval[2] = {std::get<0>(clusterTimesVec[ij]), float(ij + 1)};
+  //       if (std::isnan(xzval[0])) continue;
+  //       float err = std::fabs(xzval[0] - mean);
+  //       szxy += xzval[1] * xzval[0] / err;
+  //       sz   += xzval[1] / err;
+  //       sz2  += xzval[1] * xzval[1] / err;
+  //       sxy  += xzval[0] / err;
+  //       sn   += 1. / err;
+  //     } // for (int ij = 0; ij < vecSize; ij ++) {
+
+  //     float slope, intersect;
+  //     if (sn > 0. && sz2 * sn - sz * sz != 0.) {
+  //       slope = (szxy * sn - sz * sxy) / (sz2 * sn - sz * sz);
+  //       intersect = sxy / sn - slope * sz / sn;
+  //     } else break;
+
+  //     bool breakFlag = true;
+  //     for (int ij = 0; ij < vecSize; ij ++) {
+  //       float deltaTime = (ij + 1.) * slope + intersect - std::get<0>(clusterTimesVec[ij]);
+  //       if (std::fabs(deltaTime) > tolerance) {
+  //         clusterTimesVec[ij] = std::make_tuple(std::numeric_limits<float>::quiet_NaN(), std::numeric_limits<float>::quiet_NaN());
+  //         breakFlag = false;
+  //       }
+  //     } // for (int ij = 0; ij < vecSize; ij ++) {
+  //     if (breakFlag) break;
+  //   }   // while(1) {
+  // } // if (vecSize > 2) {
 
   float timeSum = 0;
   float sigma2Sum = 0;
   float count = 0;
   for (auto& item : clusterTimesVec) {
-    if (std::isnan(std::get<0>(item))) continue;
     timeSum += std::get<0>(item);
     sigma2Sum += std::get<1>(item) * std::get<1>(item);
     count += 1.;
@@ -714,7 +744,7 @@ ClsTimeHelperTuple excludeOffTimeClusters(std::vector<ClsTimeHelperTuple>& clust
     timeSum /= count;
     sigma2Sum = std::sqrt(sigma2Sum / (count * (count - 1.)));
   }
-  return std::make_tuple(timeSum, sigma2Sum);
+  return std::make_tuple(timeSum, sigma2Sum, std::vector<int> {});
 }
 
 void RecoTrack::estimateArmTime()
@@ -729,7 +759,7 @@ void RecoTrack::estimateArmTime()
   RecoHitInformation::RecoHitDetector detIDpost = und;
   float clusterTimeSum = 0;
   float clusterTimeSigma2Sum = 0;
-  std::vector<ClsTimeHelperTuple> clusterTimesVec; // time, sigma
+  std::vector<ClsTimeHelperTuple> clusterTimesVec; // time, sigma, grId
   bool trackArmTimeDone = false;
 
   // loop over the recoHits of the RecoTrack
@@ -741,7 +771,9 @@ void RecoTrack::estimateArmTime()
     }
     if (foundin == SVD) {
       RelationVector<SVDCluster> svdClusters = recoHit->getRelationsTo<SVDCluster>(m_storeArrayNameOfSVDHits);
-      clusterTimesVec.push_back(std::make_tuple(svdClusters[0]->getClsTime(), svdClusters[0]->getClsTimeSigma()));
+      clusterTimesVec.push_back(std::make_tuple(svdClusters[0]->getClsTime(),
+                                                svdClusters[0]->getClsTimeSigma(),
+                                                svdClusters[0]->getTimeGroupId()));
       nSVDHits += 1;
       svdDone = true;
     } else {

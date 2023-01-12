@@ -53,7 +53,7 @@ def stdPhotons(
         ma.fillParticleList('gamma:all', '', writeOut=True, path=path,
                             loadPhotonBeamBackgroundMVA=loadPhotonBeamBackgroundMVA,
                             loadPhotonHadronicSplitOffMVA=loadPhotonHadronicSplitOffMVA)
-        if not biasCorrectionTable:
+        if biasCorrectionTable:
             ma.correctEnergyBias(inputListNames=['gamma:all'], tableName=biasCorrectionTable, path=path)
     # all photons within the cdc tracking acceptance: remove un track-matched
     # electrons from outside the tracking acceptance
@@ -66,7 +66,7 @@ def stdPhotons(
             loadPhotonBeamBackgroundMVA=loadPhotonBeamBackgroundMVA,
             loadPhotonHadronicSplitOffMVA=loadPhotonHadronicSplitOffMVA
         )
-        if not biasCorrectionTable:
+        if biasCorrectionTable:
             ma.correctEnergyBias(inputListNames=['gamma:cdc'], tableName=biasCorrectionTable, path=path)
     # clusterErrorTiming < 1e6 removes failed waveform fits, this is not an actual timing cut. A 99% efficiency cut
     # is already applied on mdst level for photons with E < 50 MeV.
@@ -103,7 +103,7 @@ def stdPhotons(
             loadPhotonBeamBackgroundMVA=loadPhotonBeamBackgroundMVA,
             loadPhotonHadronicSplitOffMVA=loadPhotonHadronicSplitOffMVA
         )
-        if not biasCorrectionTable:
+        if biasCorrectionTable:
             ma.correctEnergyBias(inputListNames=['gamma:pi0eff10_May2020'], tableName=biasCorrectionTable, path=path)
     elif listtype == 'pi0eff20_May2020':
         ma.fillParticleList(
@@ -115,7 +115,7 @@ def stdPhotons(
             loadPhotonBeamBackgroundMVA=loadPhotonBeamBackgroundMVA,
             loadPhotonHadronicSplitOffMVA=loadPhotonHadronicSplitOffMVA
         )
-        if not biasCorrectionTable:
+        if biasCorrectionTable:
             ma.correctEnergyBias(inputListNames=['gamma:pi0eff20_May2020'], tableName=biasCorrectionTable, path=path)
     elif listtype == 'pi0eff30_May2020' or listtype == 'pi0eff40_May2020':
         ma.fillParticleList(
@@ -127,7 +127,7 @@ def stdPhotons(
             loadPhotonBeamBackgroundMVA=loadPhotonBeamBackgroundMVA,
             loadPhotonHadronicSplitOffMVA=loadPhotonHadronicSplitOffMVA
         )
-        if not biasCorrectionTable:
+        if biasCorrectionTable:
             ma.correctEnergyBias(inputListNames=[f'gamma:{listtype}'], tableName=biasCorrectionTable, path=path)
     elif listtype == 'pi0eff50_May2020':
         ma.fillParticleList(
@@ -139,7 +139,7 @@ def stdPhotons(
             loadPhotonBeamBackgroundMVA=loadPhotonBeamBackgroundMVA,
             loadPhotonHadronicSplitOffMVA=loadPhotonHadronicSplitOffMVA
         )
-        if not biasCorrectionTable:
+        if biasCorrectionTable:
             ma.correctEnergyBias(inputListNames=['gamma:pi0eff50_May2020'], tableName=biasCorrectionTable, path=path)
     elif listtype == 'pi0eff60_May2020':
         ma.fillParticleList(
@@ -151,7 +151,7 @@ def stdPhotons(
             loadPhotonBeamBackgroundMVA=loadPhotonBeamBackgroundMVA,
             loadPhotonHadronicSplitOffMVA=loadPhotonHadronicSplitOffMVA
         )
-        if not biasCorrectionTable:
+        if biasCorrectionTable:
             ma.correctEnergyBias(inputListNames=['gamma:pi0eff60_May2020'], tableName=biasCorrectionTable, path=path)
     else:
         raise ValueError(f"\"{listtype}\" is none of the allowed standardized types of photon lists!")

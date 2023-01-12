@@ -38,7 +38,7 @@ def arg_parser():
                         action='store_true',
                         help='flag to include background in the simulation')
     parser.add_argument('--exp',
-                        default=1003,
+                        default=0,
                         type=int,
                         help='experiment number you want to simulate',
                         metavar='EXP')

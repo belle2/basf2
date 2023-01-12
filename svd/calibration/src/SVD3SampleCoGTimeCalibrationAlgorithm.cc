@@ -89,6 +89,7 @@ CalibrationAlgorithm::EResult SVD3SampleCoGTimeCalibrationAlgorithm::calibrate()
           auto hEventT0vsCoG = getObjectPtr<TH2F>(Form("eventT0vsCoG__L%dL%dS%d%c", layer_num, ladder_num, sensor_num, side));
           auto hEventT0 = getObjectPtr<TH1F>(Form("eventT0__L%dL%dS%d%c", layer_num, ladder_num, sensor_num, side));
           auto hEventT0nosync = getObjectPtr<TH1F>(Form("eventT0nosync__L%dL%dS%d%c", layer_num, ladder_num, sensor_num, side));
+          int nEntriesForFilter = hEventT0vsCoG->GetEntries();
           B2INFO("Histogram: " << hEventT0vsCoG->GetName() <<
                  " Entries (n. clusters): " << hEventT0vsCoG->GetEntries());
           if (layer_num == 3 && hEventT0vsCoG->GetEntries() < m_minEntries) {
@@ -109,13 +110,24 @@ CalibrationAlgorithm::EResult SVD3SampleCoGTimeCalibrationAlgorithm::calibrate()
             gSystem->Unlink(Form("algorithm_3SampleCoG_output_rev_%d.root", cal_rev));
             return c_NotEnoughData;
           }
+          TF1* f1 = new TF1("f1", "[0]+[1]*x", -100, 100);
+          f1->SetParameters(-84, 1.264);
+          TF1* f2 = new TF1("f1", "[0]+[1]*x", -100, 100);
+          f2->SetParameters(-144, 1.264);
+          //B2INFO("Number of entries considered in the filter: " << int(hEventT0vsCoG->GetEntries() * 0.001));
           for (int i = 1; i <= hEventT0vsCoG->GetNbinsX(); i++) {
             for (int j = 1; j <= hEventT0vsCoG->GetNbinsY(); j++) {
-              if (hEventT0vsCoG->GetBinContent(i, j) < max(2, int(hEventT0vsCoG->GetEntries() * 0.001))) {
+              double bcx = ((TAxis*)hEventT0vsCoG->GetXaxis())->GetBinCenter(i);
+              double bcy = ((TAxis*)hEventT0vsCoG->GetYaxis())->GetBinCenter(j);
+              if (hEventT0vsCoG->GetBinContent(i, j) > 0 && (bcy > f1->Eval(bcx) || bcy < f2->Eval(bcx))) {
+                hEventT0vsCoG->SetBinContent(i, j, 0);
+              } else if (hEventT0vsCoG->GetBinContent(i, j) > 0
+                         && (hEventT0vsCoG->GetBinContent(i, j) < max(2, int(nEntriesForFilter * 0.001)))) {
                 hEventT0vsCoG->SetBinContent(i, j, 0);
               }
             }
           }
+
           TProfile* pfx = hEventT0vsCoG->ProfileX();
           std::string name = "pfx_" + std::string(hEventT0vsCoG->GetName());
           pfx->SetName(name.c_str());

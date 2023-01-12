@@ -930,11 +930,11 @@ def get_argument_parser():
     for name, func in sorted(globals().items()):
         if not name.startswith("command_"):
             continue
-        # we interpret command_foo_bar_baz as subcommand baz of subcommmand bar
+        # we interpret command_foo_bar_baz as subcommand baz of subcommand bar
         # of subcommand foo. So let's split this into all commands and remove
         # the command_
         parts = name.split('_')[1:]
-        # now we need to get the subparsers instance for the parent commmand. if
+        # now we need to get the subparsers instance for the parent command. if
         # the command is top level, e.g. foo, we just use parsers. Otherwise we
         # go look into the dict of subparsers for command chains.
         parent = parsers
@@ -1002,7 +1002,7 @@ def main():
     Main function for the command line interface.
 
     it will automatically create an ArgumentParser including all functions which
-    start with command_ in the global namespace as sub commmands. These
+    start with command_ in the global namespace as sub commands. These
     functions should take the arguments as first argument and an instance of the
     ConditionsDB interface as second argument. If the db interface is None the
     first argument is an instance of argparse.ArgumentParser an in this case the

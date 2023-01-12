@@ -1,3 +1,31 @@
+Belle MDST samples
+==================
+The most important argument in `convertBelleMdstToBelleIIMdst` function is the first
+one, specifying the input Belle MDST sample to be converted and analysed. You can
+either specify the location of the input Belle MDST file (e.g. when running over
+your privately produced signal MC):
+
+.. code-block:: python3
+
+   convertBelleMdstToBelleIIMdst('/location_to_my_mdst_files/myMDSTFile.mdst', path=mypath)
+
+or specify the url of real data or generic MC samples. For example:
+
+.. code-block:: python3
+
+   convertBelleMdstToBelleIIMdst('http://bweb3/montecarlo.php?ex=37&rs=100&re=200&ty=evtgen-mixed&dt=on_resonance&bl=caseB&st=0', path=mypath)
+
+The form of the url is the same as used in BASF. More information is available
+at `the Belle analysis software page`_.
+
+.. note::
+   Belle index files cannot be used in the conversion, please use HadronB(J) skim
+   files, or convert your index files to mdst files first and then perform b2bii conversion.
+
+.. _the Belle analysis software page: https://belle.kek.jp/secured/wiki/doku.php?id=software:data_search
+
+There are different kind of MC/data samples available at Belle.
+
 .. _belledatamc:
 
 -------------------------
@@ -123,20 +151,14 @@ Here are several notes while using ``BelleMCOutput``.
 
 .. rubric:: Beam energy for MC generation
 
-The default global tag for MC generation is set to be the default gt for MC jobs,
-``B2BII_MC``. The beam energy spread is not considered when the payloads were
-created from the Belle DB; therefore, if you would like to include the energy
-spread in MC generation, please modify the prepended global tag:
-``b2bii_beamParameters_with_smearing``.
+The default global tag for analysis jobs is ``B2BII_MC``; however, this does not take into 
+account beam smearing. 
+Therefore, for the MC generation one must use ``b2bii_beamParameters_with_smearing``.
 
 .. code-block:: python
 
    # Use B2BII global tag.
    basf2.conditions.prepend_globaltag('b2bii_beamParameters_with_smearing')
-
-
-.. warning::
-   To generate run-independent MC, one must use ``B2BII_MC`` for now.
 
 
 .. rubric:: Run dependent MC

@@ -14,19 +14,19 @@ Python
 
     **Prerequisites**:
 
-      * :ref:`onlinebook_ssh`
+    * :ref:`onlinebook_ssh`
 
     **Questions**:
 
-      * What are the key concepts of python?
-      * How can I process tabular data?
-      * How can I plot data?
+    * What are the key concepts of python?
+    * How can I process tabular data?
+    * How can I plot data?
 
 
     **Objectives**:
 
-      * Get more familiar with python
-      * Understand how to manipulate and plot data with ``pandas``
+    * Get more familiar with python
+    * Understand how to manipulate and plot data with ``pandas``
 
 High Energy Physics (HEP) analyses are too complex to be done with pen, paper
 and calculator. They usually are not even suited for spreadsheet programs like
@@ -203,7 +203,7 @@ Congratulations! You've now created your first python file. Now, run it!
 Great! Well done! 😁 You can now create python scripts in your terminal!
 
 Practising Python: Jupyter notebooks
--------------------------------------
+------------------------------------
 
 .. seealso::
 
@@ -421,7 +421,7 @@ The ``keys`` method lists the tree(s) in that file. ``file`` behaves much like a
 
 .. admonition:: Shortcut to reading trees
 
-  If you already know the contents of the file, ie. the name of the tree you want to read (in our case ``"b0phiKs"``), you can get it in one go by passing the name of the tree after a colon to the ``open`` method.
+  If you already know the contents of the file, i.e. the name of the tree you want to read (in our case ``"b0phiKs"``), you can get it in one go by passing the name of the tree after a colon to the ``open`` method.
 
   .. code:: ipython3
 
@@ -480,7 +480,7 @@ the second option to load data from a tree is with the ``iterate`` method, discu
   to read at once is smaller than the available memory of your machine.
 
 Investigating your DataFrame
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 In jupyter notebooks, the last value of a cell is shown as output. So if we create
 a cell with
@@ -628,7 +628,7 @@ Let's look a slightly more complicated (but totally non-physical) example:
   2*x - 2
 
 Adding Columns
-^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^
 
 You can easily add columns in the following way:
 
@@ -730,7 +730,7 @@ In this section we will answer *"How can I plot data?"* and demonstrate the
 In previous example workshops the simple decay mode :math:`B^0\to \phi K_S^0`,
 where :math:`\phi \to K^+ K^-` and :math:`K_S^0 \to \pi^+ \pi^-` was
 reconstructed. Now we will use these candidates to plot example
-distributions. This time we use the ``uproot`` package to read the data
+distributions. We use the ``uproot`` package to read the data
 
 .. code:: ipython3
   :linenos:
@@ -787,8 +787,8 @@ section to get a feeling for the syntax.
 Making your plots pretty
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-Let’s face it, physicists aren’t well known for their amazing graphical
-representations, but here’s our chance to shine! We can implement matplotlib
+Let's face it, physicists aren't well known for their amazing graphical
+representations, but here's our chance to shine! We can implement matplotlib
 functions to make our plots GREAT. You can even choose a `colourblind friendly colour scheme <https://confluence.desy.de/display/BI/Colo%28u%29r+Blind+Friendly+Plots+and+Displays>`_!
 
 It is possible to display multiple plots at once using ``plt.subplots``. As you can see
@@ -962,7 +962,7 @@ Importing the style is as easy as "one, two, ...
 Dealing with large / many files (optional)
 ------------------------------------------
 
-If your files are quite large you may start to find your programm or jupyter notebook kernel
+If your files are quite large you may start to find your program or jupyter notebook kernel
 crashing - there are a few ways in which we can mitigate this.
 
 - "Chunk" your data
@@ -975,7 +975,7 @@ To import the file using chunking, instead of loading the tree with the ``arrays
   for df in tree.iterate(Y4S_columns, step_size=100_000, library="pd"):
     ...
 
-Here I have defined which columns I wish to be included in the following list:
+Here a few columns have been defined which are included in the following list:
 
 .. code:: ipython3
 
@@ -997,7 +997,7 @@ Here I have defined which columns I wish to be included in the following list:
       ...
 
 Now the data is loaded as chunks, we "loop" over or run through all the chunks
-and perform selection and further processing on those chunks instead of the whole dataset at once.
+and perform selection and further processing on those chunks instead of on the whole dataset at once.
 
 You can read more about the many features of the ``iterate`` method in the `documentation <https://uproot.readthedocs.io/en/latest/uproot.behaviors.TTree.TTree.html#iterate>`_.
 
@@ -1060,8 +1060,8 @@ However, your python journey has just begun and there's a lot to learn.
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Authors of this lesson
+.. rubric:: Authors of this lesson
 
-  Martin Ritter (Intro),
-  Hannah Wakeling (Exercises),
-  Kilian Lieret
+Martin Ritter (Intro),
+Hannah Wakeling (Exercises),
+Kilian Lieret

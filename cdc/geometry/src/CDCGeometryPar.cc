@@ -1705,17 +1705,17 @@ double CDCGeometryPar::getEDepToADCConvFactor(unsigned short iCL, unsigned short
 void CDCGeometryPar::Print() const
 {}
 
-const TVector3 CDCGeometryPar::wireForwardPosition(uint layerID, int cellID, EWirePosition set) const
+const B2Vector3D CDCGeometryPar::wireForwardPosition(uint layerID, int cellID, EWirePosition set) const
 {
   // return early in case of empty layer, i.e. layerID < m_firstLayerOffset
   if (layerID < m_firstLayerOffset) {
-    return TVector3(0, 0, 0);
+    return B2Vector3D(0, 0, 0);
   }
 
   //  std::cout <<"cdcgeopar::fwdpos set= " << set << std::endl;
-  TVector3 wPos(m_FWirPosAlign[layerID][cellID][0],
-                m_FWirPosAlign[layerID][cellID][1],
-                m_FWirPosAlign[layerID][cellID][2]);
+  B2Vector3D wPos(m_FWirPosAlign[layerID][cellID][0],
+                  m_FWirPosAlign[layerID][cellID][1],
+                  m_FWirPosAlign[layerID][cellID][2]);
 
   if (set == c_Misaligned) {
     wPos.SetX(m_FWirPosMisalign[layerID][cellID][0]);
@@ -1730,19 +1730,19 @@ const TVector3 CDCGeometryPar::wireForwardPosition(uint layerID, int cellID, EWi
   return wPos;
 }
 
-const TVector3 CDCGeometryPar::wireForwardPosition(uint layerID, int cellID, double z, EWirePosition set) const
+const B2Vector3D CDCGeometryPar::wireForwardPosition(uint layerID, int cellID, double z, EWirePosition set) const
 {
   // return early in case of empty layer, i.e. layerID < m_firstLayerOffset
   if (layerID < m_firstLayerOffset) {
-    return TVector3(0, 0, 0);
+    return B2Vector3D(0, 0, 0);
   }
 
   double yb_sag = 0.;
   double yf_sag = 0.;
   getWireSagEffect(set, layerID, cellID, z, yb_sag, yf_sag);
 
-  TVector3 wPos(m_FWirPosAlign[layerID][cellID][0], yf_sag,
-                m_FWirPosAlign[layerID][cellID][2]);
+  B2Vector3D wPos(m_FWirPosAlign[layerID][cellID][0], yf_sag,
+                  m_FWirPosAlign[layerID][cellID][2]);
   if (set == c_Misaligned) {
     wPos.SetX(m_FWirPosMisalign[layerID][cellID][0]);
     wPos.SetZ(m_FWirPosMisalign[layerID][cellID][2]);
@@ -1754,16 +1754,16 @@ const TVector3 CDCGeometryPar::wireForwardPosition(uint layerID, int cellID, dou
   return wPos;
 }
 
-const TVector3 CDCGeometryPar::wireBackwardPosition(uint layerID, int cellID, EWirePosition set) const
+const B2Vector3D CDCGeometryPar::wireBackwardPosition(uint layerID, int cellID, EWirePosition set) const
 {
   // return early in case of empty layer, i.e. layerID < m_firstLayerOffset
   if (layerID < m_firstLayerOffset) {
-    return TVector3(0, 0, 0);
+    return B2Vector3D(0, 0, 0);
   }
 
-  TVector3 wPos(m_BWirPosAlign[layerID][cellID][0],
-                m_BWirPosAlign[layerID][cellID][1],
-                m_BWirPosAlign[layerID][cellID][2]);
+  B2Vector3D wPos(m_BWirPosAlign[layerID][cellID][0],
+                  m_BWirPosAlign[layerID][cellID][1],
+                  m_BWirPosAlign[layerID][cellID][2]);
 
   if (set == c_Misaligned) {
     wPos.SetX(m_BWirPosMisalign[layerID][cellID][0]);
@@ -1778,19 +1778,19 @@ const TVector3 CDCGeometryPar::wireBackwardPosition(uint layerID, int cellID, EW
   return wPos;
 }
 
-const TVector3 CDCGeometryPar::wireBackwardPosition(uint layerID, int cellID, double z, EWirePosition set) const
+const B2Vector3D CDCGeometryPar::wireBackwardPosition(uint layerID, int cellID, double z, EWirePosition set) const
 {
   // return early in case of empty layer, i.e. layerID < m_firstLayerOffset
   if (layerID < m_firstLayerOffset) {
-    return TVector3(0, 0, 0);
+    return B2Vector3D(0, 0, 0);
   }
 
   double yb_sag = 0.;
   double yf_sag = 0.;
   getWireSagEffect(set, layerID, cellID, z, yb_sag, yf_sag);
 
-  TVector3 wPos(m_BWirPosAlign[layerID][cellID][0], yb_sag,
-                m_BWirPosAlign[layerID][cellID][2]);
+  B2Vector3D wPos(m_BWirPosAlign[layerID][cellID][0], yb_sag,
+                  m_BWirPosAlign[layerID][cellID][2]);
   if (set == c_Misaligned) {
     wPos.SetX(m_BWirPosMisalign[layerID][cellID][0]);
     wPos.SetZ(m_BWirPosMisalign[layerID][cellID][2]);
@@ -1837,7 +1837,7 @@ const double* CDCGeometryPar::outerRadiusWireLayer() const
   return ORWL;
 }
 
-unsigned CDCGeometryPar::cellId(unsigned layerId, const TVector3& position) const
+unsigned CDCGeometryPar::cellId(unsigned layerId, const B2Vector3D& position) const
 {
   if (layerId < m_firstLayerOffset) {
     return 0;
@@ -1852,13 +1852,13 @@ unsigned CDCGeometryPar::cellId(unsigned layerId, const TVector3& position) cons
     const double phiF = phiSize * offset
                         + phiSize * 0.5 * double(m_nShifts[layerId]);
     const double phiB = phiSize * offset;
-    const TVector3 f(m_rSLayer[layerId] * cos(phiF), m_rSLayer[layerId] * sin(phiF), m_zSForwardLayer[layerId]);
-    const TVector3 b(m_rSLayer[layerId] * cos(phiB), m_rSLayer[layerId] * sin(phiB), m_zSBackwardLayer[layerId]);
+    const B2Vector3D f(m_rSLayer[layerId] * cos(phiF), m_rSLayer[layerId] * sin(phiF), m_zSForwardLayer[layerId]);
+    const B2Vector3D b(m_rSLayer[layerId] * cos(phiB), m_rSLayer[layerId] * sin(phiB), m_zSBackwardLayer[layerId]);
 
-    const TVector3 v = f - b;
-    const TVector3 u = v.Unit();
+    const B2Vector3D v = f - b;
+    const B2Vector3D u = v.Unit();
     const double beta = (0 - b.Z()) / u.Z();
-    const TVector3 p = b + beta * u;
+    const B2Vector3D p = b + beta * u;
     double phi0 = - atan2(p.Y(), p.X());
     offset += phi0 / (2 * M_PI / double(nWires));
   }*/
@@ -1868,12 +1868,12 @@ unsigned CDCGeometryPar::cellId(unsigned layerId, const TVector3& position) cons
     const double phiF = phiSize * (double(i) + offset)
                         + phiSize * 0.5 * double(m_nShifts[layerId]) + m_globalPhiRotation;
     const double phiB = phiSize * (double(i) + offset)   + m_globalPhiRotation;
-    const TVector3 f(m_rSLayer[layerId] * cos(phiF), m_rSLayer[layerId] * sin(phiF), m_zSForwardLayer[layerId]);
-    const TVector3 b(m_rSLayer[layerId] * cos(phiB), m_rSLayer[layerId] * sin(phiB), m_zSBackwardLayer[layerId]);
-    const TVector3 v = f - b;
-    const TVector3 u = v.Unit();
+    const B2Vector3D f(m_rSLayer[layerId] * cos(phiF), m_rSLayer[layerId] * sin(phiF), m_zSForwardLayer[layerId]);
+    const B2Vector3D b(m_rSLayer[layerId] * cos(phiB), m_rSLayer[layerId] * sin(phiB), m_zSBackwardLayer[layerId]);
+    const B2Vector3D v = f - b;
+    const B2Vector3D u = v.Unit();
     const double beta = (position.Z() - b.Z()) / u.Z();
-    const TVector3 p = b + beta * u;
+    const B2Vector3D p = b + beta * u;
     double dPhi = std::atan2(position.Y(), position.X())
                   - std::atan2(p.Y(), p.X())
                   + phiSize / 2.;
@@ -2757,8 +2757,8 @@ double CDCGeometryPar::getSigma(const double DriftL0, const unsigned short iCLay
   return sigma;
 }
 
-unsigned short CDCGeometryPar::getOldLeftRight(const TVector3& posOnWire, const TVector3& posOnTrack,
-                                               const TVector3& momentum) const
+unsigned short CDCGeometryPar::getOldLeftRight(const B2Vector3D& posOnWire, const B2Vector3D& posOnTrack,
+                                               const B2Vector3D& momentum) const
 {
   unsigned short lr = 0;
   double wCrossT = (posOnWire.Cross(posOnTrack)).Z();
@@ -2792,8 +2792,8 @@ unsigned short CDCGeometryPar::getOldLeftRight(const TVector3& posOnWire, const 
   return lr;
 }
 
-unsigned short CDCGeometryPar::getNewLeftRightRaw(const TVector3& posOnWire, const TVector3& posOnTrack,
-                                                  const TVector3& momentum) const
+unsigned short CDCGeometryPar::getNewLeftRightRaw(const B2Vector3D& posOnWire, const B2Vector3D& posOnTrack,
+                                                  const B2Vector3D& momentum) const
 {
   const double distanceCrossP = ((posOnWire - posOnTrack).Cross(momentum)).Z();
   unsigned short int lr = (distanceCrossP > 0.) ? 1 : 0;
@@ -2801,7 +2801,7 @@ unsigned short CDCGeometryPar::getNewLeftRightRaw(const TVector3& posOnWire, con
 }
 
 //N.B. The following alpha and theta calculations are directly implemented in CDCRecoHit.cc tentatively to avoid a circular dependence betw cdc_dataobjects and cdclib. So be careful when changing the calculations !
-double CDCGeometryPar::getAlpha(const TVector3& posOnWire, const TVector3& momentum) const
+double CDCGeometryPar::getAlpha(const B2Vector3D& posOnWire, const B2Vector3D& momentum) const
 {
   const double wx = posOnWire.X();
   const double wy = posOnWire.Y();
@@ -2814,7 +2814,7 @@ double CDCGeometryPar::getAlpha(const TVector3& posOnWire, const TVector3& momen
   return atan2(cross, dot);
 }
 
-double CDCGeometryPar::getTheta(const TVector3& momentum) const
+double CDCGeometryPar::getTheta(const B2Vector3D& momentum) const
 {
   return atan2(momentum.Perp(), momentum.Z());
 }
@@ -3006,7 +3006,7 @@ void CDCGeometryPar::setShiftInSuperLayer()
     }
     //    std::cout <<"SLayer,firstCLayer= " << SLayer <<" "<< firstCLayer << std::endl;
 
-    TVector3 firstBPos = wireBackwardPosition(firstCLayer, 0);
+    B2Vector3D firstBPos = wireBackwardPosition(firstCLayer, 0);
     for (unsigned short Layer = 0; Layer < nLayers[SLayer]; ++Layer) {
       unsigned short CLayer = firstCLayer + Layer;
 
@@ -3014,7 +3014,7 @@ void CDCGeometryPar::setShiftInSuperLayer()
         m_shiftInSuperLayer[SLayer][Layer] = 0;
 
       } else if (CLayer == firstCLayer + 1) {
-        TVector3 BPos = wireBackwardPosition(CLayer, 0);
+        B2Vector3D BPos = wireBackwardPosition(CLayer, 0);
         m_shiftInSuperLayer[SLayer][Layer] = (BPos.Cross(firstBPos)).Z() > 0. ? -1 : 1;
         //  std::cout <<"CLayer,Layer,shift= " << CLayer <<" "<< Layer <<" "<< m_shiftInSuperLayer[SLayer][Layer] <<" "<< (BPos.Cross(firstBPos)).Z() << std::endl;
 

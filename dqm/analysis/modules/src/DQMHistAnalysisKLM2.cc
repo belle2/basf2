@@ -77,9 +77,6 @@ void DQMHistAnalysisKLM2Module::initialize()
 
 }
 
-void DQMHistAnalysisKLM2Module::terminate()
-{
-}
 
 void DQMHistAnalysisKLM2Module::beginRun()
 {

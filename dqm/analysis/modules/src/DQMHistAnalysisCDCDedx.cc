@@ -26,7 +26,6 @@ DQMHistAnalysisCDCDedxModule::DQMHistAnalysisCDCDedxModule()
 //--------------------------------------------------------------
 DQMHistAnalysisCDCDedxModule::~DQMHistAnalysisCDCDedxModule()
 {
-
 }
 
 //---------------------------------------------
@@ -199,7 +198,7 @@ void DQMHistAnalysisCDCDedxModule::drawDedxPR()
     m_monObj->setVariable("CDCDedxMeanErr", m_meanerr);
     m_monObj->setVariable("CDCDedxResoErr", m_sigmaerr);
 
-    set_Hist_Style(h_dEdxClone);
+    setHistStyle(h_dEdxClone);
     h_dEdxClone->SetTitle("CDC-dEdx");
     h_dEdxClone->DrawCopy("");
 
@@ -212,7 +211,7 @@ void DQMHistAnalysisCDCDedxModule::drawDedxPR()
 
 
     TPaveText* pinfo0 = new TPaveText(0.12, 0.69, 0.37, 0.89, "NBNDC");
-    set_Text_Style(pinfo0);
+    setTextStyle(pinfo0);
     pinfo0->AddText(Form("CDC dE/dx (e^{-}e^{+})"));
     pinfo0->AddText(Form("Exp/Run: %d/%d", m_exp, m_run));
     pinfo0->AddText(Form("-------------"));
@@ -224,7 +223,7 @@ void DQMHistAnalysisCDCDedxModule::drawDedxPR()
 
 
     TPaveText* pinfo1 = new TPaveText(0.60, 0.77, 0.85, 0.89, "NBNDC");
-    set_Text_Style(pinfo1);
+    setTextStyle(pinfo1);
     pinfo1->AddText(Form("-- Expert info"));
     pinfo1->AddText(Form("Prev Gain: %0.03f", m_dbrg));
     if (m_nbhabhaevt > 1e5)
@@ -252,16 +251,16 @@ void DQMHistAnalysisCDCDedxModule::drawDedxIR()
     TH2D* hdEdxIRScat = (TH2D*)findHist("CDCDedx/hdEdxvsEvt");
     if (hdEdxIRScat != nullptr) {
 
-      set_Pad_Style(0.143, 0.045, 0.077, 0.0);
+      setPadStyle(0.143, 0.045, 0.077, 0.0);
 
       if (hdEdxIRScat->GetEntries() > 0) {
         hdEdxIRScat->GetXaxis()->SetRange(hdEdxIRScat->FindFirstBinAbove(0, 1), hdEdxIRScat->FindLastBinAbove(0, 1));
       }
 
-      set_Hist_Style(hdEdxIRScat);
+      setHistStyle(hdEdxIRScat);
       hdEdxIRScat->Draw("");
       TPaveText* pinfo = new TPaveText(0.609, 0.710, 0.942, 0.911, "NBNDC");
-      set_Text_Style(pinfo);
+      setTextStyle(pinfo);
       pinfo->AddText("CDC-dE/dx Intra-run");
       pinfo->AddText("Electrons (e^{+}e^{-})");
       pinfo->AddText(Form("Exp/Run: %d/%d", m_exp, m_run));
@@ -318,8 +317,8 @@ void DQMHistAnalysisCDCDedxModule::drawDedxIR()
     }
 
     //2 intra-gain trend
-    set_Pad_Style(0.143, 0.045, 0.077, 0.0);
-    set_Hist_Style(hdEdxIRMean);
+    setPadStyle(0.143, 0.045, 0.077, 0.0);
+    setHistStyle(hdEdxIRMean);
     hdEdxIRMean->SetMarkerColor(kRed);
     hdEdxIRMean->SetMarkerStyle(20);
     hdEdxIRMean->SetMarkerSize(1.10);
@@ -332,7 +331,7 @@ void DQMHistAnalysisCDCDedxModule::drawDedxIR()
     l_line->DrawLine(0.5, m_mean, hdEdxIRMean->GetXaxis()->GetBinUpEdge(nbin), m_mean);
 
     TPaveText* pinfo0 = new TPaveText(0.609, 0.680, 0.942, 0.911, "NBNDC");
-    set_Text_Style(pinfo0);
+    setTextStyle(pinfo0);
     pinfo0->AddText("Intra-run variation");
     pinfo0->AddText("Electrons (e^{+}e^{-})");
     pinfo0->AddText(Form("Exp/Run: %d/%d", m_exp, m_run));
@@ -348,8 +347,8 @@ void DQMHistAnalysisCDCDedxModule::drawDedxIR()
     //3 intra-resolution trend
     c_ir_dedx->cd(2);
     gPad->SetGridy(1);
-    set_Pad_Style(0.143, 0.045, 0.077, 0.0);
-    set_Hist_Style(hdEdxIRSigma);
+    setPadStyle(0.143, 0.045, 0.077, 0.0);
+    setHistStyle(hdEdxIRSigma);
     hdEdxIRSigma->SetMarkerColor(kRed);
     hdEdxIRSigma->SetMarkerStyle(20);
     hdEdxIRSigma->SetMarkerSize(1.10);
@@ -362,7 +361,7 @@ void DQMHistAnalysisCDCDedxModule::drawDedxIR()
     l_line->DrawLine(0.5, m_sigma, hdEdxIRSigma->GetXaxis()->GetBinUpEdge(nbin), m_sigma);
 
     TPaveText* pinfo1 = new TPaveText(0.609, 0.680, 0.942, 0.911, "NBNDC");
-    set_Text_Style(pinfo1);
+    setTextStyle(pinfo1);
     pinfo1->AddText("Intra-run variation");
     pinfo1->AddText("Electrons (e^{+}e^{-})");
     pinfo1->AddText(Form("Exp/Run: %d/%d", m_exp, m_run));
@@ -390,7 +389,7 @@ void DQMHistAnalysisCDCDedxModule::drawWireStatus()
   if (hWires != nullptr && hWireStatus != nullptr) {
 
     c_pr_dedx->cd(5);
-    set_Hist_Style(hWires);
+    setHistStyle(hWires);
     hWires->SetMarkerColor(kGray + 1);
     hWires->Draw("");
 
@@ -398,13 +397,13 @@ void DQMHistAnalysisCDCDedxModule::drawWireStatus()
     int m_ndead = atof(s_ndead.c_str());
     m_monObj->setVariable("CDCDedxDeadWires", m_ndead);
 
-    set_Hist_Style(hWireStatus);
+    setHistStyle(hWireStatus);
     hWireStatus->SetMarkerColor(kRed);
     hWireStatus->SetMarkerStyle(7);
     hWireStatus->Draw("same");
 
     TPaveText* pinfo0 = new TPaveText(0.117, 0.832, 0.148, 0.976, "NBNDC");
-    set_Text_Style(pinfo0);
+    setTextStyle(pinfo0);
     pinfo0->AddText(Form("CDC Wire Status"));
     pinfo0->AddText(Form("Exp/Run: %d/%d", m_exp, m_run));
     pinfo0->AddText(Form("Dead: %d (%0.02f%%)", m_ndead, (100.0 * m_ndead / 14336.0)));
@@ -429,14 +428,14 @@ void DQMHistAnalysisCDCDedxModule::drawBandPlot()
     gPad->SetLogx();
     gPad->SetLogy();
 
-    set_Plot_Style();
-    set_Hist_Style(hdEdxVsP);
+    setPlotStyle();
+    setHistStyle(hdEdxVsP);
     hdEdxVsP->SetTitle("CDC-dEdx band plot");
     hdEdxVsP->SetMinimum(0.10);
     hdEdxVsP->Draw("col");
 
     TPaveText* pinfo0 = new TPaveText(0.60, 0.77, 0.85, 0.89, "NBNDC");
-    set_Text_Style(pinfo0);
+    setTextStyle(pinfo0);
     pinfo0->AddText(Form("IP tracks (hadron)"));
     pinfo0->AddText(Form("Exp/Run: %d/%d", m_exp, m_run));
     if (m_nhadevt > 1e5)
@@ -459,14 +458,14 @@ void DQMHistAnalysisCDCDedxModule::drawDedxCosPhi()
 
     c_pr_dedx->cd(3);
 
-    set_Hist_Style(hdEdxvsPhi);
+    setHistStyle(hdEdxvsPhi);
     hdEdxvsPhi->SetTitle("CDC-dEdx vs Phi");
     hdEdxvsPhi->Draw("col");
 
     l_line->DrawLine(-3.20, m_mean, 3.20, m_mean);
 
     TPaveText* pinfo0 = new TPaveText(0.60, 0.77, 0.85, 0.89, "NBNDC");
-    set_Text_Style(pinfo0);
+    setTextStyle(pinfo0);
     pinfo0->AddText(Form("Electrons (e^{+}e^{-})"));
     pinfo0->AddText(Form("Exp/Run: %d/%d", m_exp, m_run));
     if (m_nbhabhaevt > 1e5)
@@ -484,14 +483,14 @@ void DQMHistAnalysisCDCDedxModule::drawDedxCosPhi()
 
     c_pr_dedx->cd(4);
 
-    set_Hist_Style(hdEdxvsCosth);
+    setHistStyle(hdEdxvsCosth);
     hdEdxvsCosth->SetTitle("CDC-dEdx vs Costh");
     hdEdxvsCosth->Draw("col");
 
     l_line->DrawLine(-1.0, m_mean, 1.0, m_mean);
 
     TPaveText* pinfo1 = new TPaveText(0.60, 0.77, 0.85, 0.89, "NBNDC");
-    set_Text_Style(pinfo1);
+    setTextStyle(pinfo1);
     pinfo1->AddText(Form("Electrons (e^{+}e^{-})"));
     pinfo1->AddText(Form("Exp/Run: %d/%d", m_exp, m_run));
     if (m_nbhabhaevt > 1e5)
@@ -530,7 +529,7 @@ void DQMHistAnalysisCDCDedxModule::fitHistogram(TH1D*& temphist, std::string& st
 }
 
 //------------------------------------------------
-void DQMHistAnalysisCDCDedxModule::set_Plot_Style()
+void DQMHistAnalysisCDCDedxModule::setPlotStyle()
 {
 
   const Int_t NRGBs = 6;
@@ -546,7 +545,7 @@ void DQMHistAnalysisCDCDedxModule::set_Plot_Style()
 
 
 //------------------------------------------------------------------
-void DQMHistAnalysisCDCDedxModule::set_Text_Style(TPaveText*& obj)
+void DQMHistAnalysisCDCDedxModule::setTextStyle(TPaveText*& obj)
 {
 
   obj->SetFillColor(0);
@@ -565,7 +564,7 @@ void DQMHistAnalysisCDCDedxModule::set_Text_Style(TPaveText*& obj)
 
 
 //------------------------------------------------------------------
-void DQMHistAnalysisCDCDedxModule::set_Hist_Style(TH1* obj)
+void DQMHistAnalysisCDCDedxModule::setHistStyle(TH1* obj)
 {
 
   obj->SetStats(0);
@@ -589,7 +588,7 @@ void DQMHistAnalysisCDCDedxModule::set_Hist_Style(TH1* obj)
 
 
 //-------------------------------------------------------------------------------------
-void DQMHistAnalysisCDCDedxModule::set_Pad_Style(double l, double r, double t, double b)
+void DQMHistAnalysisCDCDedxModule::setPadStyle(double l, double r, double t, double b)
 {
 
   if (l != 0)gPad->SetLeftMargin(l);

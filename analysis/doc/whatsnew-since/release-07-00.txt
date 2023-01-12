@@ -25,6 +25,8 @@ Modules
    An example of usage can be found in ``analysis/examples/VariableManager/variablesToNtuple.py``.
  * Fixed a bug on the :b2:mod:`BestCandidateSelection` that keeps only less than the expected number of candidates when
    ``allowMultiRank=True`` and ``numBest>0``. Now the module works as documented.
+ * Added an option ``allowAnyParticleSource`` to the function :func:`modularAnalysis.reconstructDecayWithNeutralHadron` to let
+   users apply the mother-mass constraint on a charged particle.
 
 Changes in the analysis package in light-2210-devonrex
 ------------------------------------------------------

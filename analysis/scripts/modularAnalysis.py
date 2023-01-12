@@ -1377,6 +1377,56 @@ def applyEventCuts(cut, path, metavariables=None):
         for i in t:
             if isinstance(i, tuple):
                 find_vars(i, var_list, meta_list)
+
+    def check_variable(var_list: list, metavar_ids: list) -> None:
+        for var_string in var_list:
+            # Check if the var_string is alias
+            orig_name = variables.resolveAlias(var_string)
+            if orig_name != var_string:
+                var_list_temp = []
+                meta_list_temp = []
+                find_vars(b2parser.parse(orig_name), var_list_temp, meta_list_temp)
+
+                check_variable(var_list_temp, metavar_ids)
+                check_meta(meta_list_temp, metavar_ids)
+            else:
+                # Get the variable
+                var = variables.getVariable(var_string)
+                if event_var_id not in var.description:
+                    B2ERROR(f'Variable {var_string} is not an event-based variable! "\
+                    "Please check your inputs to the applyEventCuts method!')
+
+    def check_meta(meta_list: list, metavar_ids: list) -> None:
+        for meta_string_list in meta_list:
+            var_list_temp = []
+            while meta_string_list[0] in metavar_ids:
+                # remove special meta variable
+                meta_string_list.pop(0)
+                for meta_string in meta_string_list[0].split(","):
+                    find_vars(b2parser.parse(meta_string), var_list_temp, meta_string_list)
+                if len(meta_string_list) > 0:
+                    meta_string_list.pop(0)
+                if len(meta_string_list) == 0:
+                    break
+                if len(meta_string_list) > 1:
+                    meta_list += meta_string_list[1:]
+                if isinstance(meta_string_list[0], list):
+                    meta_string_list = [element for element in meta_string_list[0]]
+
+            check_variable(var_list_temp, metavar_ids)
+
+            if len(meta_string_list) == 0:
+                continue
+            elif len(meta_string_list) == 1:
+                var = variables.getVariable(meta_string_list[0])
+            else:
+                var = variables.getVariable(meta_string_list[0], meta_string_list[1].split(","))
+            # Check if the variable's description contains event-based marker
+            if event_var_id in var.description:
+                continue
+            # Throw an error message if non event-based variable is used
+            B2ERROR(f'Variable {var.name} is not an event-based variable! Please check your inputs to the applyEventCuts method!')
+
     event_var_id = '[Eventbased]'
     metavar_ids = ['formula', 'abs',
                    'cos', 'acos',
@@ -1387,51 +1437,17 @@ def applyEventCuts(cut, path, metavariables=None):
                    'isNAN']
     if metavariables:
         metavar_ids += metavariables
-    parsed_cut = b2parser.parse(cut)
+
     var_list = []
     meta_list = []
-    find_vars(parsed_cut, var_list=var_list, meta_list=meta_list)
+    find_vars(b2parser.parse(cut), var_list=var_list, meta_list=meta_list)
+
     if len(var_list) == 0 and len(meta_list) == 0:
         B2WARNING(f'Cut string "{cut}" has no variables for applyEventCuts helper function!')
-    for var_string in var_list:
-        # Get the variable and get rid of aliases
-        var = variables.getVariable(var_string)
-        # Throw an error message if the variable's description doesn't contain the event-based marker
-        if event_var_id not in var.description:
-            B2ERROR(f'Variable {var_string} is not an event-based variable! Please check your inputs to the applyEventCuts method!')
-    for meta_string_list in meta_list:
-        var_list_temp = []
-        while meta_string_list[0] in metavar_ids:
-            # remove special meta variable
-            meta_string_list.pop(0)
-            for meta_string in meta_string_list[0].split(","):
-                find_vars(b2parser.parse(meta_string), var_list_temp, meta_string_list)
-            if len(meta_string_list) > 0:
-                meta_string_list.pop(0)
-            if len(meta_string_list) == 0:
-                break
-            if len(meta_string_list) > 1:
-                meta_list += meta_string_list[1:]
-            if isinstance(meta_string_list[0], list):
-                meta_string_list = [element for element in meta_string_list[0]]
-        for var_string in var_list_temp:
-            # Get the variable and get rid of aliases
-            var = variables.getVariable(var_string)
-            # Throw an error message if the variable's description doesn't contain the event-based marker
-            if event_var_id not in var.description:
-                B2ERROR(f'Variable {var_string} is not an event-based variable!'
-                        ' Please check your inputs to the applyEventCuts method!')
-        if len(meta_string_list) == 0:
-            continue
-        elif len(meta_string_list) == 1:
-            var = variables.getVariable(meta_string_list[0])
-        else:
-            var = variables.getVariable(meta_string_list[0], meta_string_list[1].split(","))
-        # Check if the variable's description contains event-based marker
-        if event_var_id in var.description:
-            continue
-        # Throw an error message if non event-based variable is used
-        B2ERROR(f'Variable {var.name} is not an event-based variable! Please check your inputs to the applyEventCuts method!')
+
+    check_variable(var_list, metavar_ids)
+    check_meta(meta_list, metavar_ids)
+
     eselect = register_module('VariableToReturnValue')
     eselect.param('variable', 'passesEventCut(' + cut + ')')
     path.add_module(eselect)

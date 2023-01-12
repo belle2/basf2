@@ -17,7 +17,7 @@ import simulation as si
 import tracking as trk
 from tracking.FlippingMVA.savingFlippingVariables import Saving1stMVAData
 from tracking.FlippingMVA.savingFlippingVariablesFor2ndMVA import Saving2ndMVAData
-
+from tracking.path_utils import add_prune_tracks
 from background import get_background_files
 import argparse
 
@@ -108,7 +108,34 @@ if __name__ == "__main__":
         flip_recoTrack = True
 
     si.add_simulation(main, bkgfiles=bkgFiles)
-    trk.add_tracking_reconstruction(main, flip_recoTrack=flip_recoTrack)
+    trk.add_prefilter_tracking_reconstruction(main)
+
+    # V0 finding
+    reco_tracks = "RecoTracks"
+    main.add_module('V0Finder', RecoTracks=reco_tracks, v0FitterMode=1)
+
+    main.add_module("FlipQuality", recoTracksStoreArrayName=reco_tracks,
+                    identifier='TRKTrackFlipAndRefit_MVA1_weightfile',
+                    indexOfFlippingMVA=1).set_name("FlipQuality_1stMVA")
+    if args.num == 2:
+        reco_tracks_flipped = "RecoTracks_flipped"
+        main.add_module("RecoTracksReverter", inputStoreArrayName=reco_tracks,
+                        outputStoreArrayName=reco_tracks_flipped)
+        main.add_module("DAFRecoFitter", recoTracksStoreArrayName=reco_tracks_flipped).set_name("Combined_DAFRecoFitter_flipped")
+        main.add_module("IPTrackTimeEstimator",
+                        recoTracksStoreArrayName=reco_tracks_flipped, useFittedInformation=False)
+        main.add_module("TrackCreator", trackColName="Tracks_flipped",
+                        trackFitResultColName="TrackFitResults_flipped",
+                        recoTrackColName=reco_tracks_flipped,
+                        pdgCodes=[211, 321, 2212]).set_name("TrackCreator_flipped")
+        main.add_module("FlipQuality", recoTracksStoreArrayName=reco_tracks,
+                        identifier='TRKTrackFlipAndRefit_MVA2_weightfile',
+                        indexOfFlippingMVA=2).set_name("FlipQuality_2ndMVA")
+
+    main.add_module('TrackTimeEstimator')
+    # prune
+    add_prune_tracks(main, reco_tracks=reco_tracks)
+    main.add_module("PruneRecoHits")
 
     #####################################################
     outputfile = args.output_file_mva

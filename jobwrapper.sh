@@ -34,7 +34,7 @@ source /cvmfs/belle.cern.ch/tools/b2setup ""
 
 # exec='b2validation -o "-n 1000 -p 10" -s fullTrackingValidationBkg.py CombinedSVDTrackingValidationBkg.py VXDTF2TrackingValidationBkg.py toCDCCKFTrackingValidationBkg.py -t proposed_OffOn_'${foo0}'_'${foo1}'_'${foo2}'_'${4}'_'${5}
 
-exec='b2validation -o "-n 1000 -p 10" -s fullTrackingValidationBkg.py CombinedSVDTrackingValidationBkg.py VXDTF2TrackingValidationBkg.py toCDCCKFTrackingValidationBkg.py -t proposed_90445963f_OffOff_frac5p_sig3'
+exec='b2validation -o "-n 1000 -p 10" -s fullTrackingValidationBkg.py CombinedSVDTrackingValidationBkg.py VXDTF2TrackingValidationBkg.py toCDCCKFTrackingValidationBkg.py -t proposed_bcb937ab8_OnOn_frac5p_sig3'
 
 echo $exec
 echo $exec | sh

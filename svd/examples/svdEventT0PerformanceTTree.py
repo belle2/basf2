@@ -184,8 +184,8 @@ if args.executionTime:
     executionFileName = str(args.fileDir) + "SVDExecutionTime"
     if args.isMC:
         executionFileName += "_MC"
-        if args.is3sample:
-            executionFileName += "_emulated3sample"
+    if args.is3sample:
+        executionFileName += "_emulated3sample"
     executionFileName += "_" + str(args.fileTag) + ".root"
     main.add_module(SVDExtraEventStatisticsModule(executionFileName))
 

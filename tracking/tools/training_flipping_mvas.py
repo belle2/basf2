@@ -47,16 +47,16 @@ def get_variables(index='1'):
                "seed_tan_lambda_estimate",
                "d0_estimate",
                "seed_pt_estimate",
-               # "cdc_qualityindicator",
+               "cdc_qualityindicator",
                "omega_estimate",
                "z0_variance",
                "seed_x_estimate",
                "seed_y_estimate",
-               # "seed_pt_resolution",
+               "seed_pt_resolution",
                "seed_py_variance",
                "seed_d0_estimate",
                "seed_omega_variance",
-               # "tan_lambda_variance",
+               "tan_lambda_variance",
                "svd_layer6_clsTime",
                "seed_tan_lambda_variance",
                "seed_z_variance",
@@ -67,12 +67,7 @@ def get_variables(index='1'):
                "first_cdc_layer",
                "last_cdc_layer",
                "ndf_hits"]
-        # "inGoingArmTime",
-        # "inGoingArmTimeError",
-        # "outGoingArmTime",
-        # "outGoingArmTimeError",
-        # "InOutArmTimeDifference",
-        # "InOutArmTimeDifferenceError"]
+
     if index == '2':
         # training variables
         var = ["flipped_pz_estimate",
@@ -111,11 +106,6 @@ def get_variables(index='1'):
                "flipped_py_variance",
                "flipped_x_estimate",
                "quality_flip_indicator"]
-        # "inGoingArmTime",
-        # "inGoingArmTimeError",
-        # "outGoingArmTime",
-        # "outGoingArmTimeError",
-        # "timeDiffInAndOutArms"]
 
     return var
 

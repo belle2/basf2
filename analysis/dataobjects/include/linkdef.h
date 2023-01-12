@@ -253,12 +253,16 @@
 // ----------------------------------------------------------------------------
 // ParticleList evolution
 // In version 4, the member m_isReserved has been added
-#pragma read                                \
-  sourceClass="Belle2::ParticleList"        \
-  source="bool m_isReserved"                \
-  version="[-3]"                            \
-  targetClass="Belle2::ParticleList"        \
-  target="m_isReserved"                     \
-  code="{m_isReserved = false;}"            \
+#pragma read                                     \
+  sourceClass="Belle2::ParticleList"             \
+  source="std::string m_thisListName; int m_pdg" \
+  version="[-3]"                                 \
+  targetClass="Belle2::ParticleList"             \
+  target="m_isReserved"                          \
+  code="{std::string label = onfile.m_thisListName.substr(onfile.m_thisListName.find_first_of(':')+1);                                                 \
+         if ((Belle2::Const::finalStateParticlesSet.contains(Belle2::Const::ParticleType(abs(onfile.m_pdg))) and label == \"all\") or label == \"V0\") \
+           m_isReserved = true;                                                                                                                        \
+         else                                                                                                                                          \
+           m_isReserved = false;}"                                                                                                                     \
 
 #endif

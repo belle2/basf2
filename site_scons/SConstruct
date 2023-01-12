@@ -207,14 +207,14 @@ elif option == 'intel':
     global_env.PrependENVPath('LIB', os.path.join(base_dir, 'lib', arch))
     global_env.PrependENVPath('PATH', intel_dir)
     global_env.PrependENVPath('LD_LIBRARY_PATH', os.path.join(base_dir, 'lib', arch))
-    global_env['CC'] = 'icc'
-    global_env['CXX'] = 'icpc'
+    global_env['CC'] = 'icx'
+    global_env['CXX'] = 'icpx'
     global_env['FC'] = 'ifort'
     global_env['AR'] = 'xiar'
     global_env['LD'] = 'xild'
-    global_env['LINK'] = 'icpc'
-    global_env['SHLINK'] = 'icpc'
-    global_env.Append(CCFLAGS=['-wd383,981,1292,1419', '-Wshadow'])
+    global_env['LINK'] = 'icpx'
+    global_env['SHLINK'] = 'icpx'
+    global_env.Append(CCFLAGS=['-Wno-debug-disables-optimization', '-Wshadow'])
 elif option == 'clang':
     clang_dir = None
     for dir in os.environ.get('PATH', '').split(os.pathsep):

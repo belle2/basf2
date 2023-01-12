@@ -2229,30 +2229,53 @@ def findMCDecay(
     list_name,
     decay,
     writeOut=False,
+    appendAllDaughters=False,
+    skipNonPrimaryDaughters=True,
     path=None,
 ):
     """
-    .. warning::
-        This function is not fully tested and maintained.
-        Please consider to use reconstructMCDecay() instead.
-
     Finds and creates a ``ParticleList`` for all ``MCParticle`` decays matching a given :ref:`DecayString`.
     The decay string is required to describe correctly what you want.
     In the case of inclusive decays, you can use :ref:`Grammar_for_custom_MCMatching`
 
+    The output particles has only the daughter particles written in the given decay string, if
+    ``appendAllDaughters=False`` (default). If ``appendAllDaughters=True``, all daughters of the matched MCParticle are
+    appended in the order defined at the MCParticle level. For example,
+
+    .. code-block:: python
+
+        findMCDecay('B0:Xee', 'B0 -> e+ e- ... ?gamma', appendAllDaughters=False, path=mypath)
+
+    The output ParticleList ``B0:Xee`` will match the inclusive ``B0 -> e+ e-`` decays (but neutrinos are not included),
+    in both cases of ``appendAllDaughters`` is false and true.
+    If the ``appendAllDaughters=False`` as above example, the ``B0:Xee`` has only two electrons as daughters.
+    While, if ``appendAllDaughters=True``, all daughters of the matched MCParticles are appended. When the truth decay mode of
+    the MCParticle is ``B0 -> [K*0 -> K+ pi-] [J/psi -> e+ e-]``, the first daughter of ``B0:Xee`` is ``K*0`` and ``e+``
+    will be the first daughter of second daughter of ``B0:Xee``.
+
+    The option ``skipNonPrimaryDaughters`` only has an effect if ``appendAllDaughters=True``. If ``skipNonPrimaryDaughters=True``,
+    all primary daughters are appended but the secondary particles are not.
+
+    .. tip::
+        Daughters of ``Lambda0`` are not primary, but ``Lambda0`` is not a final state particle.
+        In order for the MCMatching to work properly, the daughters of ``Lambda0`` are appended to
+        ``Lambda0`` regardless of the value of the option ``skipNonPrimaryDaughters``.
+
+
     @param list_name The output particle list name
     @param decay     The decay string which you want
     @param writeOut  Whether `RootOutput` module should save the created ``outputList``
+    @param skipNonPrimaryDaughters if true, skip non primary daughters, useful to study final state daughter particles
+    @param appendAllDaughters if true, not only the daughters described in the decay string but all daughters are appended
     @param path      modules are added to this path
     """
-
-    B2WARNING("This function is not fully tested and maintained."
-              "Please consider to use reconstructMCDecay() instead.")
 
     decayfinder = register_module('MCDecayFinder')
     decayfinder.set_name('MCDecayFinder_' + list_name)
     decayfinder.param('listName', list_name)
     decayfinder.param('decayString', decay)
+    decayfinder.param('appendAllDaughters', appendAllDaughters)
+    decayfinder.param('skipNonPrimaryDaughters', skipNonPrimaryDaughters)
     decayfinder.param('writeOut', writeOut)
     path.add_module(decayfinder)
 

@@ -27,6 +27,11 @@ Modules
    ``allowMultiRank=True`` and ``numBest>0``. Now the module works as documented.
  * Added an option ``allowAnyParticleSource`` to the function :func:`modularAnalysis.reconstructDecayWithNeutralHadron` to let
    users apply the mother-mass constraint on a charged particle.
+ * The `findMCDecay` function is fixed so that all output particles have ``isSignal==1``.
+   New option ``appendAllDaughters`` is added so that one can append not only the daughters described in the decay string but all
+   daughters of the matched MCParticle. Another new option ``skipNonPrimaryDaughters`` is added to skip secondary particles when
+   ``appendAllDaughters=True``.
+
 
 Changes in the analysis package in light-2210-devonrex
 ------------------------------------------------------

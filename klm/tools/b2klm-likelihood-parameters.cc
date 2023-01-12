@@ -869,12 +869,11 @@ void makeprob(TChain* chain, FILE* output, char* xmllabel)
   canvas->Divide(1, 2);
   canvas->GetPad(1)->SetLogy(1);
   canvas->GetPad(2)->SetLogy(1);
-  int padNo = 0;
   gStyle->SetOptStat(110);
   gStyle->SetOptFit(2);
   for (int detector = 0; detector <= 2; ++detector) {
     for (int halfNdof = 1; halfNdof <= 18; ++halfNdof) {
-      padNo = (halfNdof - 1) % 2 + 1;
+      int padNo = (halfNdof - 1) % 2 + 1;
       canvas->cd(padNo);
       gPad->Clear();
       rchisqA[halfNdof][detector]->SetMinimum(0.001); // for vertical log axis

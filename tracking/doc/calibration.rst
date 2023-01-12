@@ -24,11 +24,11 @@ Below the instructions how to retrain, apply and evaluate the MVAs for the :ref:
 step 1: sample generation
 """""""""""""""""""""""""
 A sample of 100k :math:`B\bar{B}` events is used for training.
-The sample is generated using the script ``tracking/examples/BBbar_FlipAndRefitTest.py``
+The sample is generated using the script ``tracking/tools/flipAndRefit_sample_generation.py``
 
 .. code:: bash
 
-  basf2 BBbar_FlipAndRefitTest.py  -- --num {1,2} -n 1000 --exp 1003 --ranseed 23 --output_file_mva training_input.root 
+  basf2 flipAndRefit_sample_generation.py  -- --num {1,2} -n 1000 --exp 1003 --ranseed 23 --output_file_mva training_input.root 
 
 .. tip::
 

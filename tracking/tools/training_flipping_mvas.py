@@ -19,7 +19,7 @@ import argparse
 
 
 def get_argument_parser() -> argparse.ArgumentParser:
-    """ Parses the command line options of the fei and returns the corresponding arguments. """
+    """ Parses the command line options of the fliping mva training and returns the corresponding arguments. """
     parser = argparse.ArgumentParser()
     parser.add_argument('-train', '--train_datafiles', dest='train_datafiles', type=str, default='train.root',
                         help='Data file containing ROOT TTree used during training')

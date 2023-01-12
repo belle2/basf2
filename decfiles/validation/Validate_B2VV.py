@@ -17,7 +17,7 @@
 
 import basf2
 from generators import add_evtgen_generator
-from modularAnalysis import reconstructMCDecay, fillParticleListFromMC
+from modularAnalysis import findMCDecay
 from variables import variables
 from validation_tools.metadata import create_validation_histograms
 
@@ -25,28 +25,24 @@ basf2.set_random_seed('B+ => [rho0 -> pi+ pi-] [rho+ -> pi0 pi+]')
 
 variables.addAlias('cosThetaRhoZ', 'cosHelicityAngle(0, 0)')
 variables.addAlias('cosThetaRhoP', 'cosHelicityAngle(1, 1)')
-variables.addAlias('planarAngle', 'cosAcoplanarityAngle(0, 0)')
+variables.addAlias('cosPlanarAngle', 'cosAcoplanarityAngle(0, 0)')
 
 path = basf2.Path()
 path.add_module('EventInfoSetter', evtNumList=[10000])
 add_evtgen_generator(path, 'signal', basf2.find_file('decfiles/dec/Bu_rho0rho+.dec'))
-fillParticleListFromMC('pi+:sig', '', path=path)
-fillParticleListFromMC('pi0:sig', '', path=path)
-fillParticleListFromMC('rho0:sig', '', addDaughters=True, path=path)
-fillParticleListFromMC('rho+:sig', '', addDaughters=True, path=path)
-reconstructMCDecay('B+:sig -> rho0:sig rho+:sig', '', path=path)
+findMCDecay('B+:sig', 'B+ -> [rho0 -> pi+ pi-] [rho+ -> pi0 pi+]', path=path)
 create_validation_histograms(
     path, 'Validate_B2VV.root', 'B+:sig',
     [
-        ('cosThetaRhoZ', 50, -1.2, 1.2, '', 'P. Urquijo <phillip.urquijo@unimelb.edu.au>',
+        ('cosThetaRhoZ', 60, -1.2, 1.2, '', 'P. Urquijo <phillip.urquijo@unimelb.edu.au>',
          r'B2VV helicity angle of the $\rho^0 \to \pi^+ \pi^-$ in $B^+ \to \rho^0 \rho^+$ (truth values)',
          'should follow the reference', 'cos#theta_{helicity}(V1)'),
-        ('cosThetaRhoP', 50, -1.2, 1.2, '', 'P. Urquijo <phillip.urquijo@unimelb.edu.au>',
+        ('cosThetaRhoP', 60, -1.2, 1.2, '', 'P. Urquijo <phillip.urquijo@unimelb.edu.au>',
          r'B2VV helicity angle of the $\rho^+ \to \pi^0 \pi^+$ in $B^+ \to \rho^0 \rho^+$ (truth values)',
          'should follow the reference', 'cos#theta_{helicity}(V1)'),
-        ('planarAngle', 50, -1.2, 1.2, '', 'P. Urquijo <phillip.urquijo@unimelb.edu.au>',
-         r'B2VV planar angle of the $B^+ \to \rho^0 \rho^+$ (truth values)',
-         'should follow the reference', '#chi (planar angle)'),
+        ('cosPlanarAngle', 60, -1.2, 1.2, '', 'P. Urquijo <phillip.urquijo@unimelb.edu.au>',
+         r'Cosine of B2VV planar angle of the $B^+ \to \rho^0 \rho^+$ (truth values)',
+         'should follow the reference', 'cos#chi (planar angle)'),
     ],
     description='B2VV Validation to check generator level distributions',
 )

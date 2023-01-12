@@ -76,6 +76,10 @@ CalibrationAlgorithm::EResult SVD3SampleCoGTimeCalibrationAlgorithm::calibrate()
   m_tree->Branch("ndf", &ndf, "ndf/I");
   m_tree->Branch("p", &p, "p/F");
 
+  B2INFO("--------- 2D-region selection parameters: ");
+  B2INFO("Upper Line (q, m): " << m_interceptUpperLine << ", " << m_angularCoefficientUpperLine);
+  B2INFO("Lower Line (q, m): " << m_interceptLowerLine << ", " << m_angularCoefficientLowerLine);
+
   for (int layer = 0; layer < 4; layer++) {
     layer_num = layer + 3;
     for (int ladder = 0; ladder < (int)ladderOfLayer[layer]; ladder++) {
@@ -111,10 +115,9 @@ CalibrationAlgorithm::EResult SVD3SampleCoGTimeCalibrationAlgorithm::calibrate()
             return c_NotEnoughData;
           }
           TF1* f1 = new TF1("f1", "[0]+[1]*x", -100, 100);
-          f1->SetParameters(-84, 1.264);
+          f1->SetParameters(m_interceptUpperLine, m_angularCoefficientUpperLine);
           TF1* f2 = new TF1("f1", "[0]+[1]*x", -100, 100);
-          f2->SetParameters(-144, 1.264);
-          //B2INFO("Number of entries considered in the filter: " << int(hEventT0vsCoG->GetEntries() * 0.001));
+          f2->SetParameters(m_interceptLowerLine, m_angularCoefficientLowerLine);
           for (int i = 1; i <= hEventT0vsCoG->GetNbinsX(); i++) {
             for (int j = 1; j <= hEventT0vsCoG->GetNbinsY(); j++) {
               double bcx = ((TAxis*)hEventT0vsCoG->GetXaxis())->GetBinCenter(i);

@@ -53,6 +53,10 @@ settings = CalibrationSettings(name="caf_svd_time",
                                expert_config={
                                    "max_events_per_run": 50000,
                                    "isMC": False,
+                                   "interceptUpperLine": -84.0,
+                                   "angularCoefficientUpperLine": 1.264,
+                                   "interceptLowerLine": -144.0,
+                                   "angularCoefficientLowerLine": 1.264,
                                })
 
 ##################################################################
@@ -121,7 +125,14 @@ def create_validation_collector(name="SVDTimeValidationCollector",
     return collector
 
 
-def create_algorithm(unique_id, prefix="", min_entries=10000):
+def create_algorithm(
+        unique_id,
+        prefix="",
+        min_entries=10000,
+        interceptUpperLine=-84.0,
+        angularCoefficientUpperLine=1.264,
+        interceptLowerLine=-144.0,
+        angularCoefficientLowerLine=1.264):
     """
     Simply creates a SVDCoGTimeCalibrationAlgorithm class with some options.
 
@@ -132,6 +143,11 @@ def create_algorithm(unique_id, prefix="", min_entries=10000):
         algorithm = SVDCoGTimeCalibrationAlgorithm(unique_id)
     if "CoG3" in prefix:
         algorithm = SVD3SampleCoGTimeCalibrationAlgorithm(unique_id)
+        algorithm.setTwoLineSelectionParameters(
+            interceptUpperLine,
+            angularCoefficientUpperLine,
+            interceptLowerLine,
+            angularCoefficientLowerLine)
     if "ELS3" in prefix:
         algorithm = SVD3SampleELSTimeCalibrationAlgorithm(unique_id)
     if prefix:
@@ -241,6 +257,10 @@ def get_calibrations(input_data, **kwargs):
     expert_config = kwargs.get("expert_config")
     max_events_per_run = expert_config["max_events_per_run"]  # Maximum number of events selected per each run
     isMC = expert_config["isMC"]
+    interceptUpperLine = expert_config["interceptUpperLine"]
+    angularCoefficientUpperLine = expert_config["angularCoefficientUpperLine"]
+    interceptLowerLine = expert_config["interceptLowerLine"]
+    angularCoefficientLowerLine = expert_config["angularCoefficientLowerLine"]
 
     reduced_file_to_iov_physics = filter_by_max_events_per_run(file_to_iov_physics,
                                                                max_events_per_run, random_select=True)
@@ -337,7 +357,11 @@ def get_calibrations(input_data, **kwargs):
     algo_cog3 = create_algorithm(
         unique_id_cog3,
         prefix=coll_cog3.name(),
-        min_entries=10000)
+        min_entries=10000,
+        interceptUpperLine=interceptUpperLine,
+        angularCoefficientUpperLine=angularCoefficientUpperLine,
+        interceptLowerLine=interceptLowerLine,
+        angularCoefficientLowerLine=angularCoefficientLowerLine)
 
     coll_els3 = create_collector(
         name=f"SVDTimeCalibrationCollector{els3_suffix}",

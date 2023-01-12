@@ -37,6 +37,26 @@ namespace Belle2 {
     /** Get the minimum entries required in the histograms */
     int getMinEntries() {return m_minEntries;}
 
+    void setTwoLineSelectionParameters(float interceptUpperLine, float angularCoefficientUpperLine, float interceptLowerLine,
+                                       float angularCoefficientLowerLine)
+    {
+      m_interceptUpperLine =  interceptUpperLine;
+      m_angularCoefficientUpperLine =  angularCoefficientUpperLine;
+      m_interceptLowerLine =  interceptLowerLine;
+      m_angularCoefficientLowerLine =  angularCoefficientLowerLine;
+    }
+
+    std::vector<float> getTwoLineSelectionParameters()
+    {
+      std::vector<float> twoLineSelectionParameters;
+      twoLineSelectionParameters.push_back(m_interceptUpperLine);
+      twoLineSelectionParameters.push_back(m_angularCoefficientUpperLine);
+      twoLineSelectionParameters.push_back(m_interceptLowerLine);
+      twoLineSelectionParameters.push_back(m_angularCoefficientLowerLine);
+
+      return twoLineSelectionParameters;
+    }
+
   protected:
 
     /** Run algo on data */
@@ -59,5 +79,11 @@ namespace Belle2 {
     std::optional<float> m_previousRawTimeMeanL3V; /**< Raw CoG of the previous run*/
     float m_allowedTimeShift = 2.; /**< Allowed Raw CoGshift*/
     float m_minEntries = 10000; /**< Set the minimun number of entries required in the histograms of layer 3*/
+
+    // straight lines used to reject off-time clusters from 2D-distribution
+    float m_interceptUpperLine = -84.0; /**< */
+    float m_angularCoefficientUpperLine = 1.264; /**< */
+    float m_interceptLowerLine = -144.0; /**< */
+    float m_angularCoefficientLowerLine = 1.264; /**< */
   };
 } // namespace Belle2

@@ -259,6 +259,6 @@
   version="[-3]"                            \
   targetClass="Belle2::ParticleList"        \
   target="m_isReserved"                     \
-  code="{m_momentumScalingFactor = false;}" \
+  code="{m_isReserved = false;}"            \
 
 #endif

@@ -808,8 +808,6 @@ void ParticleLoaderModule::mcParticlesToParticles()
     bool isSelfConjugatedParticle = get<c_IsPListSelfConjugated>(mcParticle2Plist);
 
     StoreObjPtr<ParticleList> plist(listName);
-    // since a particle list in the ParticleLoader always contains all possible objects
-    // we check whether it already exists in this path and can skip any further steps if it does
     if (plist.isValid())
       continue;
     plist.create();

@@ -250,5 +250,15 @@
                                                                    onfile.m_backwardHemisphere4Momentum.Py(),   \
                                                                    onfile.m_backwardHemisphere4Momentum.Pz(),   \
                                                                    onfile.m_backwardHemisphere4Momentum.E());}" \
+// ----------------------------------------------------------------------------
+// ParticleList evolution
+// In version 4, the member m_isReserved has been added
+#pragma read                                \
+  sourceClass="Belle2::ParticleList"        \
+  source="bool m_isReserved"                \
+  version="[-3]"                            \
+  targetClass="Belle2::ParticleList"        \
+  target="m_isReserved"                     \
+  code="{m_momentumScalingFactor = false;}" \
 
 #endif

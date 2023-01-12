@@ -17,6 +17,13 @@ stdCharged
 ++++++++++
  * Added working points for uniform pion-lepton fake rate.
 
+stdPhoton and stdPi0
+++++++++++++++++++++
+ * Added an optional parameter ``biasCorrectionTable`` to `stdPhotons` and `stdPi0s` that allows the user to specify a table name for 
+   the photon energy bias correction. Providing a table name will automatically apply the bias correction to all particles in the particle lists. This is
+   available for all list types. The latest information on the bias correction can be found on the 
+   `Neutrals Performance Confluence Page <https://confluence.desy.de/display/BI/Neutrals+Performance>`_. 
+
 Modules
 +++++++
  * Added an option ``signalSideParticleList`` to the function :func:`modularAnalysis.variablesToNtuple` to store the index of the signal-side particle.

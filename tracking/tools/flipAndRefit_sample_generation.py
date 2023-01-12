@@ -33,10 +33,10 @@ def arg_parser():
                         type=int,
                         help='number of events',
                         metavar='EVENTS')
-    parser.add_argument('--no_bkg',
+    parser.add_argument('--use_background',
                         default=True,
                         action='store_true',
-                        help='flag to remove beam background from simulation')
+                        help='flag to include background in the simulation')
     parser.add_argument('--exp',
                         default=1003,
                         type=int,
@@ -52,10 +52,6 @@ def arg_parser():
                         default='',
                         type=str,
                         help='output name')
-    parser.add_argument('--flip_recoTrack',
-                        default=False,
-                        type=bool,
-                        help='trun on and off the track-flipping steps')
     parser.add_argument('--num',
                         default=1,
                         type=int,
@@ -84,13 +80,9 @@ if __name__ == "__main__":
             b2c.prepend_globaltag(gt)
 
     # add (or not) the beam background
-    bkgFiles = get_background_files()
-
-    if args.exp == 1003:
+    bkgFiles = None
+    if args.use_background:
         bkgFiles = get_background_files()
-
-    if args.no_bkg:
-        bkgFiles = None
 
     #####################################################
     # Part 1: setup the EventInfoSetter
@@ -107,8 +99,16 @@ if __name__ == "__main__":
 
     #####################################################
     # Part 3: build the path for simulation/reconstruction
+
+    flip_recoTrack = True
+
+    if (args.num == 1):
+        flip_recoTrack = False
+    if (args.num == 2):
+        flip_recoTrack = True
+
     si.add_simulation(main, bkgfiles=bkgFiles)
-    trk.add_tracking_reconstruction(main, flip_recoTrack=args.flip_recoTrack)
+    trk.add_tracking_reconstruction(main, flip_recoTrack=flip_recoTrack)
 
     #####################################################
     outputfile = args.output_file_mva

@@ -19,7 +19,7 @@ Below the instructions how to retrain, apply and evaluate the MVAs for the :ref:
   1. 1st MVA: select the RecoTracks to be flipped looking at low level variables (eg: ndf, cdc hits number, pxd hits etc)
   2. 2nd MVA: takes the fitResults from the original and the flipped Tracks as input to decide wich one to keep
 
-  The steps for sample generation, training and performance evlauation are similare, and are described in the following.
+  The steps for sample generation, training and performance evlauation are similar, and are described in the following.
 
 step 1: sample generation
 """""""""""""""""""""""""
@@ -34,7 +34,7 @@ The sample is generated using the script ``tracking/tools/flipAndRefit_sample_ge
 
   * the parameter ``--num`` indicates that the sample is generated for the training of the 1st MVA (with ``--num 1``) or the 2nd MVA (with ``--num 2``),
   * the rest of the parameters can be selected by the user
-  * the option ``--flip_recoTrack True`` must be added when generating the samples for the second MVA
+  * for the 2nd MVA (--num 2), the module ``FlippedRecoTracksMerger`` need to be commented. (line 308~310) in ``tracking/scripts/tracking/path_utils.py``
   * to speed up this step, the user can submit several jobs in parallel, paying attention to set different random seed and output file names for each job using the options ``--ranseed`` and ``--output_file_mva`` respectively.
 
 

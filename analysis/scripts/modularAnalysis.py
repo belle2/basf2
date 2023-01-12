@@ -2237,13 +2237,13 @@ def findMCDecay(
     the MCParticle is ``B0 -> [K*0 -> K+ pi-] [J/psi -> e+ e-]``, the first daughter of ``B0:Xee`` is ``K*0`` and ``e+``
     will be the first daughter of second daughter of ``B0:Xee``.
 
-    The option ``skipNonPrimaryDaughters`` is only valid if ``appendAllDaughters=True``. If ``skipNonPrimaryDaughters=True``,
+    The option ``skipNonPrimaryDaughters`` only has an effect if ``appendAllDaughters=True``. If ``skipNonPrimaryDaughters=True``,
     all primary daughters are appended but the secondary particles are not.
 
     .. tip::
-        Daughters of ``Lambda0`` are not primary, but ``Lambda0`` is not final state particle.
+        Daughters of ``Lambda0`` are not primary, but ``Lambda0`` is not a final state particle.
         In order for the MCMatching to work properly, the daughters of ``Lambda0`` are appended to
-        ``Lambda0`` even though the ``skipNonPrimaryDaughters`` option is set False.
+        ``Lambda0`` regardless of the value of the option ``skipNonPrimaryDaughters``.
 
 
     @param list_name The output particle list name

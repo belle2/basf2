@@ -149,21 +149,25 @@ void SVDTimeGroupComposerModule::event()
     if (clsTime > tmax) tmax = clsTime;
     if (clsTime < tmin) tmin = clsTime;
   }
-  if (m_tRangeHigh > tmax) m_tRangeHigh = tmax;
-  if (m_tRangeLow  < tmin) m_tRangeLow  = tmin;
-  B2DEBUG(1, "tRange: [" << m_tRangeLow << "," << m_tRangeHigh << "]");
+  double tRangeHigh = m_tRangeHigh;
+  double tRangeLow  = m_tRangeLow;
+  if (tRangeHigh > tmax) tRangeHigh = tmax;
+  if (tRangeLow  < tmin) tRangeLow  = tmin;
 
-  int xbin = clsInSignalRange * (m_tRangeHigh - m_tRangeLow) / (m_signalRangeHigh - m_signalRangeLow);
+  int xbin = tRangeHigh - tRangeLow;
+  if (!m_gausFill)
+    xbin *= clsInSignalRange / (m_signalRangeHigh - m_signalRangeLow);
   if (xbin < 1) xbin = 1;
   if (m_applyCentralLimit) xbin *= m_factor;
   else xbin /= m_AverageCountPerBin;
   if (xbin < 2) xbin = 2;
+  B2DEBUG(1, "tRange: [" << tRangeLow << "," << tRangeHigh << "], xBin: " << xbin);
 
 
   /** declaring histogram */
   TH1D h_clsTime[2];
-  h_clsTime[0] = TH1D("h_clsTime_0", "h_clsTime_0", xbin, m_tRangeLow, m_tRangeHigh);
-  h_clsTime[1] = TH1D("h_clsTime_1", "h_clsTime_1", xbin, m_tRangeLow, m_tRangeHigh);
+  h_clsTime[0] = TH1D("h_clsTime_0", "h_clsTime_0", xbin, tRangeLow, tRangeHigh);
+  h_clsTime[1] = TH1D("h_clsTime_1", "h_clsTime_1", xbin, tRangeLow, tRangeHigh);
   for (int ij = 0; ij < totClusters; ij++) {
     if (!m_gausFill)
       h_clsTime[0].Fill(m_svdClusters[ij]->getClsTime());
@@ -289,11 +293,11 @@ void SVDTimeGroupComposerModule::event()
           if (ij == totGroups - 1) {                              // leftover clusters
             if (!m_useOnlyOneGroup &&
                 m_includeOutOfRangeClusters &&
-                clsTime < m_tRangeLow)
+                clsTime < tRangeLow)
               m_svdClusters[place]->getTimeGroupId().push_back(ij + 1);       // underflow
             else if (!m_useOnlyOneGroup &&
                      m_includeOutOfRangeClusters &&
-                     clsTime > m_tRangeHigh)
+                     clsTime > tRangeHigh)
               m_svdClusters[place]->getTimeGroupId().push_back(ij + 2);       // overflow
             else
               m_svdClusters[place]->getTimeGroupId().push_back(-1);           // orphan
@@ -320,7 +324,7 @@ void SVDTimeGroupComposerModule::event()
       if (maxPeak == 0) maxPeak = maxBinCnt;
       if (maxBinCnt < maxPeak * m_fracThreshold) break;
 
-      TF1 ngaus("ngaus", mygaus, m_tRangeLow, m_tRangeHigh, 3);
+      TF1 ngaus("ngaus", mygaus, tRangeLow, tRangeHigh, 3);
       double maxPar0 = maxBinCnt * std::sqrt(2.*TMath::Pi()) * m_timeSpread;
       ngaus.SetParameter(0, maxBinCnt); ngaus.SetParLimits(0, maxPar0 * 0.01, maxPar0 * 2.);
       ngaus.SetParameter(1, maxBinPos); ngaus.SetParLimits(1, maxBinPos - m_timeSpread * 0.2, maxBinPos + m_timeSpread * 0.2);
@@ -359,8 +363,8 @@ void SVDTimeGroupComposerModule::event()
       double pars[3] = {std::get<0>(groupInfo[ij]), std::get<1>(groupInfo[ij]), std::get<2>(groupInfo[ij])};
       double beginPos = pars[1] - m_accSigmaN * pars[2];
       double   endPos = pars[1] + m_accSigmaN * pars[2];
-      if (beginPos < m_tRangeLow) beginPos = m_tRangeLow;
-      if (endPos > m_tRangeHigh)  endPos   = m_tRangeHigh;
+      if (beginPos < tRangeLow) beginPos = tRangeLow;
+      if (endPos > tRangeHigh)  endPos   = tRangeHigh;
       B2DEBUG(1, " group " << ij
               << " beginPos " << beginPos << " endPos " << endPos);
       for (int jk = 0; jk < totClusters; jk++) {
@@ -376,11 +380,11 @@ void SVDTimeGroupComposerModule::event()
           if (ij == totGroups - 1 && !int(m_svdClusters[jk]->getTimeGroupId().size())) { // leftover clusters
             if (!m_useOnlyOneGroup &&
                 m_includeOutOfRangeClusters &&
-                clsTime < m_tRangeLow)
+                clsTime < tRangeLow)
               m_svdClusters[jk]->getTimeGroupId().push_back(ij + 1);       // underflow
             else if (!m_useOnlyOneGroup &&
                      m_includeOutOfRangeClusters &&
-                     clsTime > m_tRangeHigh)
+                     clsTime > tRangeHigh)
               m_svdClusters[jk]->getTimeGroupId().push_back(ij + 2);       // overflow
             else
               m_svdClusters[jk]->getTimeGroupId().push_back(-1);           // orphan

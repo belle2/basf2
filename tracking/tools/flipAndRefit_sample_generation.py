@@ -30,10 +30,10 @@ def arg_parser():
                         type=int,
                         help='Number of events to be processed. Default is 1000.',
                         metavar='EVENTS')
-    parser.add_argument('--use_background',
-                        default=True,
+    parser.add_argument('--no_bkg',
+                        default=False,
                         action='store_true',
-                        help='Flag to include background in the simulation. Default is True')
+                        help='Flag to include background in the simulation. Default is False')
     parser.add_argument('--exp',
                         default=0,
                         type=int,
@@ -94,9 +94,9 @@ if __name__ == "__main__":
             b2c.prepend_globaltag(gt)
 
     # add (or not) the beam background
-    bkgFiles = None
-    if args.use_background:
-        bkgFiles = get_background_files()
+    bkgFiles = get_background_files()
+    if args.no_bkg:
+        bkgFiles = None
 
     #####################################################
     # Part 1: setup basf2 simulation and run it

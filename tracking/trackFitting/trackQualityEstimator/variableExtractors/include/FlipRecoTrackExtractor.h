@@ -66,7 +66,7 @@ namespace Belle2 {
     }
 
     /// extract the actual variables and write into a variable set
-    void extractVariables(RecoTrack& recoTrack)
+    void extractVariables(const RecoTrack& recoTrack)
     {
 
 

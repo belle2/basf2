@@ -11,10 +11,9 @@
 /* KLM headers. */
 #include <klm/bklm/geometry/GeometryPar.h>
 #include <klm/bklm/geometry/Module.h>
-#include <klm/dataobjects/bklm/BKLMSimHit.h>
 #include <klm/dataobjects/bklm/BKLMSimHitPosition.h>
 #include <klm/dataobjects/eklm/EKLMElementNumbers.h>
-#include <klm/dataobjects/eklm/EKLMSimHit.h>
+#include <klm/dataobjects/KLMSimHit.h>
 #include <klm/dbobjects/bklm/BKLMSimulationPar.h>
 
 /* Belle 2 headers. */
@@ -45,7 +44,7 @@ namespace Belle2 {
       SensitiveDetector(const G4String& name, KLMSubdetectorNumber subdetector);
 
       /**
-       * Process each step and store BKLMSimHits or EKLMSimHits.
+       * Process each step and store KLMSimHits.
        */
       bool step(G4Step*, G4TouchableHistory*) override;
 
@@ -108,20 +107,14 @@ namespace Belle2 {
       /** MC particles. */
       StoreArray<MCParticle> m_MCParticles;
 
-      /** BKLM simulation hits. */
-      StoreArray<BKLMSimHit> m_BKLMSimHits;
-
-      /** EKLM simulation hits. */
-      StoreArray<EKLMSimHit> m_EKLMSimHits;
+      /** Simulation hits. */
+      StoreArray<KLMSimHit> m_KLMSimHits;
 
       /** BKLM simulation hit positions. */
       StoreArray<BKLMSimHitPosition> m_BKLMSimHitPositions;
 
-      /** Relation array between MCPartices and BKLMSimHits. */
-      RelationArray m_MCParticlesToBKLMSimHits{m_MCParticles, m_BKLMSimHits};
-
-      /** Relation array between MCPartices and EKLMSimHits. */
-      RelationArray m_MCParticlesToEKLMSimHits{m_MCParticles, m_EKLMSimHits};
+      /** Relation array between MCPartices and KLMSimHits. */
+      RelationArray m_MCParticlesToKLMSimHits{m_MCParticles, m_KLMSimHits};
 
     };
 

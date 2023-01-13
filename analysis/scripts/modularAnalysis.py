@@ -554,8 +554,8 @@ def correctBremsBelle(outputListName,
                                  If false, a photon is allowed to be used for correction multiple times (Default).
 
        Warning:
-           One cannot use a photon twice to reconstruct a composite particle. Thus, for example, if `e+` and `e-` are corrected with
-           a `gamma`, the pair of `e+` and `e-` cannot form a `J/psi -> e+ e-` candidate.
+           One cannot use a photon twice to reconstruct a composite particle. Thus, for example, if ``e+`` and ``e-`` are corrected
+           with a ``gamma``, the pair of ``e+`` and ``e-`` cannot form a ``J/psi -> e+ e-`` candidate.
 
        path (basf2.Path): modules are added to this path
     """

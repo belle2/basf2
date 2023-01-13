@@ -26,13 +26,8 @@ def get_argument_parser() -> argparse.ArgumentParser:
     parser.add_argument('-data', '--datafiles', dest='datafiles', type=str, required=True, default='',
                         help='Data file containing ROOT TTree with independent test data. Default: \'\'.')
     parser.add_argument('-tree', '--treename', dest='treename', type=str, default='', help='Treename in data file. Default: \'\'.')
-    parser.add_argument(
-        '-mva',
-        '--mvaindex',
-        dest='mvaindex',
-        type=str,
-        default='1',
-        help='index of mva to be trainned. Default: 1')
+    parser.add_argument('-mva', '--mvaindex', dest='mvaindex', type=str, default='1',
+                        help='index of mva to be trainned. Default: 1')
 
     return parser
 

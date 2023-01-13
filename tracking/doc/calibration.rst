@@ -28,13 +28,13 @@ The sample is generated using the script ``tracking/tools/flipAndRefit_sample_ge
 
 .. code:: bash
 
-  basf2 flipAndRefit_sample_generation.py  -- --num {1,2} -n 1000 --exp 1003 --ranseed 23 --output_file_mva training_input.root 
+  basf2 flipAndRefit_sample_generation.py  -- --num {1,2} -n 1000 --randseed 23 --output_file_mva training_input.root 
 
 .. tip::
 
   * the parameter ``--num`` indicates that the sample is generated for the training of the 1st MVA (with ``--num 1``) or the 2nd MVA (with ``--num 2``),
   * the rest of the parameters can be selected by the user
-  * for the 2nd MVA (--num 2), the module ``FlippedRecoTracksMerger`` need to be commented. (line 308~310) in ``tracking/scripts/tracking/path_utils.py``
+  * for help about the script execute it as ``basf2 flipAndRefit_sample_generation.py -- -h``
   * to speed up this step, the user can submit several jobs in parallel, paying attention to set different random seed and output file names for each job using the options ``--ranseed`` and ``--output_file_mva`` respectively.
 
 

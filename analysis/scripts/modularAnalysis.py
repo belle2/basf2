@@ -567,6 +567,7 @@ def correctBremsBelle(outputListName,
     fsrcorrector.param('gammaListName', gammaListName)
     fsrcorrector.param('multiplePhotons', multiplePhotons)
     fsrcorrector.param('angleThreshold', angleThreshold)
+    fsrcorrector.param('usePhotonOnlyOnce', usePhotonOnlyOnce)
     fsrcorrector.param('writeOut', writeOut)
     path.add_module(fsrcorrector)
 

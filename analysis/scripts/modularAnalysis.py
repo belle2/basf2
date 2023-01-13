@@ -1241,10 +1241,6 @@ def fillParticleListFromMC(decayString,
     decayDescriptor = Belle2.DecayDescriptor()
     if not decayDescriptor.init(decayString):
         raise ValueError("Invalid decay string")
-    if decayDescriptor.getMother().getLabel() != 'MC':
-        # the particle loader automatically uses the label "MC" for particles built from MCParticles
-        # so we have to copy over the list to name/format that user wants
-        copyList(decayString, decayDescriptor.getMother().getName() + ':MC', writeOut, path)
 
     # apply a cut if a non-empty cut string is provided
     if cut != "":
@@ -1302,10 +1298,6 @@ def fillParticleListsFromMC(decayStringsWithCuts,
     for decayString, cut in decayStringsWithCuts:
         if not decayDescriptor.init(decayString):
             raise ValueError("Invalid decay string")
-        if decayDescriptor.getMother().getLabel() != 'MC':
-            # the particle loader automatically uses the label "MC" for particles built from MCParticles
-            # so we have to copy over the list to name/format that user wants
-            copyList(decayString, decayDescriptor.getMother().getName() + ':MC', writeOut, path)
 
         # apply a cut if a non-empty cut string is provided
         if cut != "":

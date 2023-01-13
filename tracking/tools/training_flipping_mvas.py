@@ -14,19 +14,25 @@
 import basf2_mva
 import basf2_mva_util
 import numpy as np
-from basf2 import conditions
+from basf2 import conditions, B2FATAL
 import argparse
 
 
 def get_argument_parser() -> argparse.ArgumentParser:
     """ Parses the command line options of the fliping mva training and returns the corresponding arguments. """
     parser = argparse.ArgumentParser()
-    parser.add_argument('-train', '--train_datafiles', dest='train_datafiles', type=str, default='train.root',
-                        help='Data file containing ROOT TTree used during training')
-    parser.add_argument('-data', '--datafiles', dest='datafiles', type=str, required=True, default='test.root',
-                        help='Data file containing ROOT TTree with independent test data')
-    parser.add_argument('-tree', '--treename', dest='treename', type=str, default='data', help='Treename in data file')
-    parser.add_argument('-mva', '--mvaindex', dest='mvaindex', type=str, default='1', help='index of mva to be trainned')
+    parser.add_argument('-train', '--train_datafiles', dest='train_datafiles', type=str, default='',
+                        help='Data file containing ROOT TTree used during training. Default: \'\'.')
+    parser.add_argument('-data', '--datafiles', dest='datafiles', type=str, required=True, default='',
+                        help='Data file containing ROOT TTree with independent test data. Default: \'\'.')
+    parser.add_argument('-tree', '--treename', dest='treename', type=str, default='', help='Treename in data file. Default: \'\'.')
+    parser.add_argument(
+        '-mva',
+        '--mvaindex',
+        dest='mvaindex',
+        type=str,
+        default='1',
+        help='index of mva to be trainned. Default: 1')
 
     return parser
 
@@ -114,6 +120,15 @@ if __name__ == "__main__":
 
     parser = get_argument_parser()
     args = parser.parse_args()
+
+    if args.train == '' or args.data == '':
+        B2FATAL("Missing train or test samples. Terminating here.")
+
+    if args.tree == '':
+        B2FATAL("Missing Treename. Terminating here.")
+
+    if args.mva not in [1, 2]:
+        B2FATAL("MVA number must be either 1 or 2. Terminating here.")
 
     conditions.testing_payloads = ['localdb/database.txt']
 

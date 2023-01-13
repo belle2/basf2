@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -9,15 +8,13 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-from basf2 import register_module, process, \
-    set_random_seed, create_path, statistics, print_path, B2FATAL
+from basf2 import process, set_random_seed, create_path, statistics, print_path, B2FATAL
 
 from basf2 import conditions as b2c
-import simulation as si
-import tracking as trk
+from simulation import add_simulation
+from tracking import add_prefilter_tracking_reconstruction
 from tracking.FlippingMVA.savingFlippingVariables import Saving1stMVAData
 from tracking.FlippingMVA.savingFlippingVariablesFor2ndMVA import Saving2ndMVAData
-from tracking.path_utils import add_prune_tracks
 from background import get_background_files
 import argparse
 
@@ -31,16 +28,16 @@ def arg_parser():
     parser.add_argument('-n', '--events',
                         default=1000,
                         type=int,
-                        help='number of events',
+                        help='Number of events to be processed. Default is 1000.',
                         metavar='EVENTS')
     parser.add_argument('--use_background',
                         default=True,
                         action='store_true',
-                        help='flag to include background in the simulation')
+                        help='Flag to include background in the simulation. Default is True')
     parser.add_argument('--exp',
                         default=0,
                         type=int,
-                        help='experiment number you want to simulate',
+                        help='Experiment number you want to simulate. Default is 0.',
                         metavar='EXP')
     parser.add_argument('--prepend_gt',
                         default='',
@@ -51,16 +48,16 @@ def arg_parser():
     parser.add_argument('--output_file_mva',
                         default='',
                         type=str,
-                        help='output name')
+                        help='Output file name. Default is \'\'.')
     parser.add_argument('--num',
                         default=1,
                         type=int,
-                        help='the index of track-flipping MVA variables to be savd. (1 or 2)',
+                        help='The index of track-flipping MVA variables to be saved. (1 or 2). Default is 1.',
                         metavar='NUMS')
-    parser.add_argument('--ranseed',
+    parser.add_argument('--randseed',
                         default=0,
                         type=int,
-                        help='random seed',
+                        help='Random seed value. Default is 0.',
                         metavar='NUMS')
     return parser
 
@@ -68,11 +65,28 @@ def arg_parser():
 if __name__ == "__main__":
 
     #####################################################
-    # Part 0: general setup
+    # Part 0: general setup parsing the input and checking the arguments
     args = arg_parser().parse_args()
 
+    if args.events < 0:
+        B2FATAL("Number of events to process must be larger than 0. Terminating here.")
+
+    if args.num not in [1, 2]:
+        B2FATAL("Argument num must be either 1 or 2. Terminating here.")
+    training_mva_number = args.num
+
+    if args.exp not in [0, 1003]:
+        B2FATAL("Argument exp must be either 0 or 1003. Terminating here.")
+
+    if args.output_file_mva == '':
+        B2FATAL("Empty output file name. Terminating here.")
+
+    outputfile = args.output_file_mva
+    if not outputfile.endswith(".root"):
+        outputfile + ".root"
+
     # Setting the random seed for particle generation
-    set_random_seed(args.ranseed)
+    set_random_seed(args.randseed)
 
     # Prepend and/or append the input GTs
     if not (args.prepend_gt == ''):
@@ -85,41 +99,36 @@ if __name__ == "__main__":
         bkgFiles = get_background_files()
 
     #####################################################
-    # Part 1: setup the EventInfoSetter
-    eventinfosetter = register_module('EventInfoSetter')
-    eventinfosetter.param({'evtNumList': [args.events], 'runList': [1], 'expList': [args.exp]})
-
+    # Part 1: setup basf2 simulation and run it
     main = create_path()
-    main.add_module(eventinfosetter)
-    main.add_module("Progress")
-
-    #####################################################
-    # Part 2: setup other modules
+    main.add_module('EventInfoSetter', evtNumList=[args.events], runList=[0], expList=[args.exp])
     main.add_module("EvtGenInput")
 
+    add_simulation(main, bkgfiles=bkgFiles)
+
     #####################################################
-    # Part 3: build the path for simulation/reconstruction
+    # Step 2: run the tracking reconstruction
 
-    flip_recoTrack = True
+    add_prefilter_tracking_reconstruction(main)
 
-    if (args.num == 1):
-        flip_recoTrack = False
-    if (args.num == 2):
-        flip_recoTrack = True
+    main.add_module('TrackTimeEstimator')
 
-    si.add_simulation(main, bkgfiles=bkgFiles)
-    trk.add_prefilter_tracking_reconstruction(main)
+    # Save data to train the first MVA. After that, we're done
+    if (training_mva_number == 1):
+        saveFirstMVAData = Saving1stMVAData(
+            name="saving1stMVA_BBbar",
+            output_file_name=outputfile)
+        main.add_module(saveFirstMVAData)
 
-    # V0 finding
-    reco_tracks = "RecoTracks"
-    main.add_module('V0Finder', RecoTracks=reco_tracks, v0FitterMode=1)
-
-    main.add_module("FlipQuality", recoTracksStoreArrayName=reco_tracks,
-                    identifier='TRKTrackFlipAndRefit_MVA1_weightfile',
-                    indexOfFlippingMVA=1).set_name("FlipQuality_1stMVA")
-    if args.num == 2:
+    # Now that the first MVA is trained, use the weight file to decide in the FlipQuality module which RecoTracks to flip and refit.
+    # Afterwards, revert the RecoTracks marked as such by the first MVA, fit them, calculate the IPTrackTime
+    # (is this really necessary?!?!?), create Track objects, and fill the information into the training sample for the second MVA
+    elif (training_mva_number == 2):
+        main.add_module("FlipQuality", recoTracksStoreArrayName="RecoTracks",
+                        identifier='TRKTrackFlipAndRefit_MVA1_weightfile',
+                        indexOfFlippingMVA=1).set_name("FlipQuality_1stMVA")
         reco_tracks_flipped = "RecoTracks_flipped"
-        main.add_module("RecoTracksReverter", inputStoreArrayName=reco_tracks,
+        main.add_module("RecoTracksReverter", inputStoreArrayName="RecoTracks",
                         outputStoreArrayName=reco_tracks_flipped)
         main.add_module("DAFRecoFitter", recoTracksStoreArrayName=reco_tracks_flipped).set_name("Combined_DAFRecoFitter_flipped")
         main.add_module("IPTrackTimeEstimator",
@@ -128,35 +137,15 @@ if __name__ == "__main__":
                         trackFitResultColName="TrackFitResults_flipped",
                         recoTrackColName=reco_tracks_flipped,
                         pdgCodes=[211, 321, 2212]).set_name("TrackCreator_flipped")
-        main.add_module("FlipQuality", recoTracksStoreArrayName=reco_tracks,
-                        identifier='TRKTrackFlipAndRefit_MVA2_weightfile',
-                        indexOfFlippingMVA=2).set_name("FlipQuality_2ndMVA")
-
-    main.add_module('TrackTimeEstimator')
-    # prune
-    add_prune_tracks(main, reco_tracks=reco_tracks)
-    main.add_module("PruneRecoHits")
-
-    #####################################################
-    outputfile = args.output_file_mva
-
-    if (args.num == 1):
-        trackingVali_0 = Saving1stMVAData(
-            name="saving1stMVA_BBbar",
-            contact="none",
-            output_file_name=outputfile)
-        main.add_module(trackingVali_0)
-    elif (args.num == 2):
-        trackingVali_0 = Saving2ndMVAData(
+        saveSecondMVAData = Saving2ndMVAData(
             name="saving2ndMVA_BBbar",
-            contact="none",
             output_file_name=outputfile)
-        main.add_module(trackingVali_0)
-    else:
-        B2FATAL("no data saving module added ...")
+        main.add_module(saveSecondMVAData)
 
     # Process events
     print_path(main)
+
+    main.add_module("Progress")
     process(main)
 
     # Print call statistics

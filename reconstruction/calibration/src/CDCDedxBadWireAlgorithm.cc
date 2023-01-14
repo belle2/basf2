@@ -197,16 +197,26 @@ void CDCDedxBadWireAlgorithm::plotWireDist(std::vector<double> m_inwires, std::m
   for (unsigned int jw = 0; jw < c_nwireCDC; ++jw) {
 
     TH1D* hvar = new TH1D(Form("%s_wire%d", m_suffix.data(), jw), "", m_varBins, m_varMin, m_varMax);
-    hvar->SetTitle(Form("%s, wire = %d; %s; entries", m_suffix.data(), jw, m_varName.data()));
 
     TH1D* hvarhf = new TH1D(Form("hf%s_wire%d", m_suffix.data(), jw), "", m_varBins, m_varMin, m_varMax);
     hvarhf->SetTitle(Form("%s, wire = %d; %s; entries", m_suffix.data(), jw, m_varName.data()));
 
+    int ncount = 0, tcount = 0;
+
     for (unsigned int jh = 0; jh < vhitvar[jw].size(); ++jh) {
       double jvalue = vhitvar[jw][jh];
-      if (jvalue < m_varMax) hvar->Fill(jvalue);
-      else if (jvalue < m_varMax * 10.) hvarhf->Fill(jvalue / 10.);
+      if (jvalue < m_varMax) {
+        ncount++;
+        hvar->Fill(jvalue);
+      } else {
+        tcount++;
+        if (jvalue < m_varMax * 10.) hvarhf->Fill(jvalue / 10.);
+      }
     }
+
+    double badfrac = 0.0;
+    if (tcount > 0) badfrac = (1.0 * tcount) / (tcount + ncount);
+    hvar->SetTitle(Form("%s, wire = %d; %s; %0.01f", m_suffix.data(), jw, m_varName.data(), badfrac * 100));
 
     bool isbad = false;
     if (std::count(m_inwires.begin(), m_inwires.end(), jw)) isbad = true;
@@ -254,13 +264,17 @@ void CDCDedxBadWireAlgorithm::printCanvas(TList* list, TList* hflist, Color_t co
 
     TH1D* hist = (TH1D*)list->At(ih);
 
-    TPaveText* pinfo = new TPaveText(0.35, 0.63, 0.83, 0.89, "NBNDC");
+    double frac = std::stod(hist->GetYaxis()->GetTitle());
+
+    TPaveText* pinfo = new TPaveText(0.40, 0.63, 0.89, 0.89, "NBNDC");
     pinfo->AddText(Form("#mu: %0.2f(%0.2f#pm%0.2f)", hist->GetMean(), amean, m_meanThers * amean));
     pinfo->AddText(Form("#sigma: %0.2f(%0.2f#pm%0.2f)", hist->GetRMS(), arms, m_rmsThers * arms));
     pinfo->AddText(Form("N: %0.00f", hist->Integral()));
+    pinfo->AddText(Form("hf: %0.00f%%", frac));
     setTextCosmetics(pinfo, 0.04258064);
 
     ctmp->cd(ih % 16 + 1);
+    hist->GetYaxis()->SetTitle("entries");
     hist->SetFillColor(color);
     hist->SetStats(0);
     hist->Draw();
@@ -380,23 +394,23 @@ void CDCDedxBadWireAlgorithm::plotQaPars(std::map<int, std::vector<double>> qapa
 {
 
   TH1D* histqa[3];
-  std::string qaname[3] = {"mean", "rms", "high fraction"};
+  std::string qaname[3] = {"mean", "rms", "high_fraction"};
 
   for (int i = 0; i < 3; i++) histqa[i] = new TH1D(Form("%s_%s", qaname[i].data(), m_suffix.data()), "", c_nwireCDC, -0.5, 14335.5);
 
   for (unsigned int jw = 0; jw < c_nwireCDC; jw++) {
     histqa[0]->SetBinContent(jw + 1, qapars[0][jw]);
     histqa[1]->SetBinContent(jw + 1, qapars[1][jw]);
-    histqa[2]->SetBinContent(jw + 1, qapars[2][jw]);
+    histqa[2]->SetBinContent(jw + 1, qapars[2][jw] * 100);
   }
 
-  TCanvas c_pars("c_pars", "", 600, 1200);
-  c_pars.Divide(1, 3);
-  double linemin[3] = {amean* (1 - m_meanThers), arms* (1 - m_rmsThers), m_fracThers};
-  double linemax[3] = {amean* (1 + m_meanThers), arms* (1 + m_rmsThers), m_fracThers};
+  //c_pars.Divide(1, 3);
+  double linemin[3] = {amean* (1 - m_meanThers), arms* (1 - m_rmsThers), m_fracThers * 100};
+  double linemax[3] = {amean* (1 + m_meanThers), arms* (1 + m_rmsThers), m_fracThers * 100};
 
   for (int iqa = 0; iqa < 3; iqa++) {
-    c_pars.cd(iqa + 1);
+    TCanvas c_pars(Form("c_pars_%d", iqa), "", 800, 600);
+    c_pars.cd();
     gPad->SetGridy();
     histqa[iqa]->SetTitle(Form("%s vs wires (%s); wire ; %s", qaname[iqa].data(), m_suffix.data(), qaname[iqa].data()));
     histqa[iqa]->SetStats(0);
@@ -407,9 +421,9 @@ void CDCDedxBadWireAlgorithm::plotQaPars(std::map<int, std::vector<double>> qapa
     TLine* lmax = new TLine(-0.5, linemax[iqa], 14335.5, linemax[iqa]);
     lmax->SetLineColor(kRed);
     lmax->Draw("same");
+    c_pars.Print(Form("cdcdedx_bdcal_%s_%s.root", qaname[iqa].data(), m_suffix.data()));
+    c_pars.Print(Form("cdcdedx_bdcal_qapars_%s_%s.pdf", qaname[iqa].data(), m_suffix.data()));
   }
-  c_pars.Print(Form("cdcdedx_bdcal_qapars_%s.pdf", m_suffix.data()));
-  c_pars.Print(Form("cdcdedx_bdcal_qapars_%s.root", m_suffix.data()));
 }
 
 //------------------------------------

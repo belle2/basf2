@@ -114,7 +114,7 @@ namespace Belle2 {
     /**
     * function to draw statstics
     */
-    void plotStats();
+    void plotEventStats();
 
   protected:
 
@@ -142,8 +142,8 @@ namespace Belle2 {
     int m_dedxBins; /**< number of bins for dedx histogram */
     double m_dedxMin; /**< min dedx range for wiregain cal */
     double m_dedxMax; /**< max dedx range for wiregain cal */
-    double m_trucMin; /**< min trunc range for mean */
-    double m_trucMax; /**< max trunc range for mean */
+    double m_truncMin; /**< min trunc range for mean */
+    double m_truncMax; /**< max trunc range for mean */
 
     std::string m_suffix; /**< suffix string to seperate plots */
 

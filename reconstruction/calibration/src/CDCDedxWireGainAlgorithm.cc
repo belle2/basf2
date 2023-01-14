@@ -24,8 +24,8 @@ CDCDedxWireGainAlgorithm::CDCDedxWireGainAlgorithm() :
   m_dedxBins(250),
   m_dedxMin(0.0),
   m_dedxMax(5.0),
-  m_trucMin(0.05),
-  m_trucMax(0.75),
+  m_truncMin(0.05),
+  m_truncMax(0.75),
   m_suffix("")
 {
   // Set module properties
@@ -131,6 +131,7 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
 
       double dedxmean;
       if (m_DBBadWires->getBadWireStatus(jwire) == kTRUE) dedxmean = 0.0;
+
       else dedxmean  = getTruncationMean(hdedxhit[jwire], minbin, maxbin);
       vrel_mean.push_back(dedxmean);
 
@@ -185,7 +186,7 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
     plotWGPerLayer(vdedx_means, layermean, layeravg);
 
     //6. Statstics plot
-    plotStats();
+    plotEventStats();
   }
 
   createPayload(vdedx_means);
@@ -261,11 +262,11 @@ void CDCDedxWireGainAlgorithm::getTruncatedBins(TH1D* hdedxhit, unsigned int& bi
   double sumPer5 = 0.0, sumPer75 = 0.0;
   for (int ibin = 1; ibin <= hdedxhit->GetNbinsX(); ibin++) {
     double bcdedx = hdedxhit->GetBinContent(ibin);
-    if (sumPer5  <= m_trucMin * sum) {
+    if (sumPer5  <= m_truncMin * sum) {
       sumPer5 += bcdedx;
       binlow = ibin;
     }
-    if (sumPer75  <= m_trucMax * sum) {
+    if (sumPer75  <= m_truncMax * sum) {
       sumPer75 += bcdedx;
       binhigh = ibin;
     }
@@ -439,13 +440,13 @@ void CDCDedxWireGainAlgorithm::plotWGPerLayer(std::vector<double>vdedx_means, st
 
   CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance(&(*m_cdcGeo));
 
-  TCanvas* clconst = new TCanvas("clconst", "", 800, 500);
-  clconst->Divide(2, 2);
-  clconst->SetBatch(kTRUE);
+  TCanvas clconst("clconst", "", 800, 500);
+  clconst.Divide(2, 2);
+  clconst.SetBatch(kTRUE);
 
   std::stringstream psnameL;
   psnameL << Form("cdcdedx_wgcal_layerconst_%s.pdf[", m_suffix.data());
-  clconst->Print(psnameL.str().c_str());
+  clconst.Print(psnameL.str().c_str());
   psnameL.str(""); psnameL << Form("cdcdedx_wgcal_layerconst_%s.pdf", m_suffix.data());
 
   int jwire = 0;
@@ -468,7 +469,7 @@ void CDCDedxWireGainAlgorithm::plotWGPerLayer(std::vector<double>vdedx_means, st
 
     double lmean  = layermean.at(il) / layeravg;
 
-    clconst->cd(il % 4 + 1);
+    clconst.cd(il % 4 + 1);
     gStyle->SetOptStat("ne");
 
     hconstpl->SetTitle(Form("%s, avg = %0.03f", hconstpl->GetTitle(), lmean));
@@ -482,19 +483,23 @@ void CDCDedxWireGainAlgorithm::plotWGPerLayer(std::vector<double>vdedx_means, st
     TLine* tlc = new TLine(jwire - nwires, lmean, jwire, lmean);
     tlc->SetLineColor(kRed);
     tlc->DrawClone("same");
-    delete tlc;
 
-    if ((il + 1) % 4 == 0)clconst->Print(psnameL.str().c_str());
+    if ((il + 1) % 4 == 0 || (il + 1) == c_maxNSenseLayers) {
+      clconst.Print(psnameL.str().c_str());
+      clconst.Clear("D");
+    }
+
+    delete tlc;
     hconstpl->Reset();
   }
 
   psnameL.str("");
   psnameL << Form("cdcdedx_wgcal_layerconst_%s.pdf]", m_suffix.data());
-  clconst->Print(psnameL.str().c_str());
+  clconst.Print(psnameL.str().c_str());
 }
 
 //--------------------------
-void CDCDedxWireGainAlgorithm::plotStats()
+void CDCDedxWireGainAlgorithm::plotEventStats()
 {
 
   TCanvas cstats("cstats", "cstats", 800, 400);

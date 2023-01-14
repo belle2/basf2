@@ -1,13 +1,13 @@
-# EventType: B02KsKsKs
+# EventType: B02KsKsKs_CPV
 # Descriptor: [B0 -> (K_S0 -> pi+ pi-)(K_S0 -> pi+ pi-)(K_S0 -> pi+ pi-)]cc
-# NickName: B0_3KS_6pi+pi-
+# NickName: B0_3KS_6pi+pi-_CPV
 # Documentation: Decay mode for sensitivity studies
 # Tested: Yes
 # PhysicsWG: TDCPV
-# Responsible: Alessandro Gaz
-# Email: gaz@hepl.phys.nagoya-u.ac.jp
+# Responsible: Hikaru Tanigawa
+# Email: tanigawa@post.kek.jp
 # Cuts: None
-# Date: 20171206
+# Date: 20230114
 #
 #
 #

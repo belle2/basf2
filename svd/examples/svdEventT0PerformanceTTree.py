@@ -96,6 +96,7 @@ else:
     b2conditions.prepend_globaltag("data_reprocessing_prompt")
     b2conditions.prepend_globaltag("patch_main_release-07")
     # b2conditions.prepend_globaltag("tracking_TEST_SVDTimeSelectionOFFrev1_VXDTF2TimeFiltersONrev27")
+    # b2conditions.prepend_globaltag("tracking_TEST_SVDTimeSelectionONrev5_VXDTF2TimeFiltersOFFrev28")
     b2conditions.prepend_globaltag("svd_CoG3TimeCalibration_bucket36")
 
     MCTracking = False
@@ -171,6 +172,7 @@ if args.RootOutput:
         outputFileName=rootOutFileName,
         branchNames=[
             'EventT0',
+            'SVDEventInfo', 'SVDEventInfoSim',
             'SVDTrueHits',
             'SVDShaperDigits',
             'SVDClusters',

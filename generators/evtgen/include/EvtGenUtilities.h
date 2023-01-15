@@ -5,5 +5,23 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include <analysis/modules/MCDecayFinder/DecayTree.h>
-// nothing to be done here
+
+#pragma once
+
+/* C++ headers. */
+#include <string>
+
+namespace Belle2 {
+
+  namespace generators {
+
+    /**
+     * Check EvtGen decay file name.
+     * @param[in] decayFile Decay file.
+     * @return True if the file is set up correctly.
+     */
+    bool checkEvtGenDecayFile(const std::string& decayFile);
+
+  }
+
+}

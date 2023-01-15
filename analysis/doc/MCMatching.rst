@@ -204,8 +204,6 @@ For more information and examples how to use the decay strings correctly, please
 ----------------------------------------------
 MC decay finder module :b2:mod:`MCDecayFinder`
 ----------------------------------------------
-.. warning:: 
-  This module is not fully tested and maintained. Please consider to use :b2:mod:`ParticleCombinerFromMC`
 
 Analysis module to search for a given decay in the list of generated particles ``MCParticle``.
 
@@ -233,11 +231,6 @@ The module can be used for:
   # Modules which can use the matched decays saved as Particle in the ParticleList 'B+:testB'
   ...
  
-
-.. warning:: 
-  `isSignal` of output particle, ``'B+:testB'`` in above case, is not related to given decay string for now.
-  For example, even if one uses ``...``, ``?gamma``, or ``?nu``, `isSignal` will be 0.
-  So please use a specific isSignal* variable, `isSignalAcceptMissing` in this case.
 
 For more information and examples how to use the decay strings correctly, please see :ref:`DecayString` and :ref:`Grammar_for_custom_MCMatching`.
 

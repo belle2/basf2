@@ -32,12 +32,12 @@ class TestTreeFits(unittest.TestCase):
 
         ma.fillParticleList('pi+:a', 'pionID > 0.5', path=main)
 
-        ma.reconstructDecay('K_S0:all -> pi+:a pi-:a', '', 0, path=main)
-        ma.matchMCTruth('K_S0:all', path=main)
+        ma.reconstructDecay('K_S0:pipi -> pi+:a pi-:a', '', 0, path=main)
+        ma.matchMCTruth('K_S0:pipi', path=main)
 
         conf = 0
         main.add_module('TreeFitter',
-                        particleList='K_S0:all',
+                        particleList='K_S0:pipi',
                         confidenceLevel=conf,
                         massConstraintList=[],
                         massConstraintListParticlename=[],
@@ -48,7 +48,7 @@ class TestTreeFits(unittest.TestCase):
         ntupler = basf2.register_module('VariablesToNtuple')
         ntupler.param('fileName', testFile.name)
         ntupler.param('variables', ['chiProb', 'M', 'isSignal'])
-        ntupler.param('particleList', 'K_S0:all')
+        ntupler.param('particleList', 'K_S0:pipi')
         main.add_module(ntupler)
 
         basf2.process(main)

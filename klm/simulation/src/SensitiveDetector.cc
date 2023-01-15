@@ -11,7 +11,6 @@
 
 /* KLM headers. */
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
-#include <klm/dataobjects/bklm/BKLMStatus.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/eklm/geometry/GeometryData.h>
 
@@ -159,18 +158,12 @@ G4bool SensitiveDetector::stepBKLM(G4Step* step, G4TouchableHistory* history)
     int layer = hist->GetCopyNumber(depth - m_DepthLayer);
     int sector = hist->GetCopyNumber(depth - m_DepthSector);
     int section = hist->GetCopyNumber(depth - m_DepthSection);
-    int moduleID =
-      int(BKLMElementNumbers::moduleNumber(section, sector, layer));
     double time = 0.5 * (preStep->GetGlobalTime() + postStep->GetGlobalTime());  // GEANT4: in ns
     if (time > m_HitTimeMax)
       return false;
     const CLHEP::Hep3Vector globalPosition = 0.5 * (preStep->GetPosition() + postStep->GetPosition()) / CLHEP::cm; // in cm
     const bklm::Module* m = m_GeoPar->findModule(section, sector, layer);
     const CLHEP::Hep3Vector localPosition = m->globalToLocal(globalPosition);
-    if (postStep->GetProcessDefinedStep() != 0) {
-      if (postStep->GetProcessDefinedStep()->GetProcessType() == fDecay)
-        moduleID |= BKLM_DECAYED_MASK;
-    }
     int trackID = track->GetTrackID();
     if (m->hasRPCs()) {
       const CLHEP::Hep3Vector propagationTimes =

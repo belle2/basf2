@@ -4,7 +4,6 @@ from b2luigi.basf2_helper.tasks import Basf2PathTask
 
 import os
 import json
-import numpy as np
 import basf2 as b2
 import modularAnalysis as ma
 import vertex as vx
@@ -23,7 +22,7 @@ class SkimTask(Basf2PathTask):
     runningOnMC = luigi.BoolParameter()
 
     def output(self):
-        yield self.add_to_output("skim.root")
+        yield self.add_to_output("skim.udst.root")  # udst.skimmed_udst_output will add ending .udst.root if different
 
     def create_path(self):
         mypath = b2.create_path()
@@ -43,9 +42,12 @@ class SkimTask(Basf2PathTask):
 
         import udst
         # dump in UDST format
-        udst.add_skimmed_udst_output(mypath, skimParticleLists=['B0:PiD-toK2Pi'], mc=self.runningOnMC,
-                                     outputFile="skim.root"  # WARNING: here do not use self.get_output_file_name
-                                     )
+        # basf2 currently does not support pickling paths with skimmed udst outputs
+        udst.add_udst_output(path=mypath, filename="skim.udst.root", particleLists=['B0:PiD-toK2Pi'], mc=self.runningOnMC)
+
+#        udst.add_skimmed_udst_output(mypath, skimDecayMode="BtoPiD", skimParticleLists=['B0:PiD-toK2Pi'], mc=self.runningOnMC,
+#                                     outputFile="skim.udst.root"  # WARNING: here do not use self.get_output_file_name
+#                                    )
         return mypath
 
 
@@ -63,11 +65,9 @@ class BatchesToTextFile(luigi.Task):
                 gbasf2_input_dataset=self.skim
             )
 
-    def get_batch_file_names(self, key="skim.root"):
-        skimfiles = []
+    def get_batch_file_names(self, key="skim.udst.root"):
         inputdir = self._transform_input(self.input(), key)[0]
-        skimfiles.append([f"{inputdir}/{file}" for file in os.listdir(inputdir)])
-        skimfiles = np.hstack(skimfiles)
+        skimfiles = [f"{inputdir}/{file}" for file in os.listdir(inputdir)]
 
         binwidth = int(len(skimfiles)/self.NumBatches)
 

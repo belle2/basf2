@@ -91,7 +91,7 @@ def main():
                                          use_vtx_to_cdc_ckf=True, use_mc_vtx_cdc_merger=True)
 
     for e in path.modules():
-        if e.name() == "VTXMergerCollector":
+        if e.name() == "VTXCDCMergerCollector":
             e.outputdir = args.outputdir
 
     b2.print_path(path)

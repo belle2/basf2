@@ -138,6 +138,9 @@ class MergerNNet(nn.Module):
         super(MergerNNet, self).__init__()
         self.n_graph_iters = n_graph_iters
 
+        # TODO: input_dim not used. instead inputs hardcoded, but this is error prone.
+        # This should be read from the scalers directly
+
         # Setup the input network
         self.input_network_vxd_hits = make_mlp(8, [hidden_dim],
                                                output_activation=hidden_activation,
@@ -147,11 +150,11 @@ class MergerNNet(nn.Module):
                                                output_activation=hidden_activation,
                                                layer_norm=layer_norm)
 
-        self.input_network_vxd_tracks = make_mlp(5, [hidden_dim],
+        self.input_network_vxd_tracks = make_mlp(7, [hidden_dim],
                                                  output_activation=hidden_activation,
                                                  layer_norm=layer_norm)
 
-        self.input_network_cdc_tracks = make_mlp(5, [hidden_dim],
+        self.input_network_cdc_tracks = make_mlp(7, [hidden_dim],
                                                  output_activation=hidden_activation,
                                                  layer_norm=layer_norm)
 

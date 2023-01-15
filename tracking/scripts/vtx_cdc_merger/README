@@ -1,8 +1,18 @@
 VTX CDC track merger
 
-The Belle II tracking produces for each event a list of tracks in VTX and CDC using 
-standalone subdetector tracking. The list of CDC tracks is enhanced by additional CDC
-tracks created by extending VTX tracks into the CDC. The newly found CDC track gets a 
-relation to the original VTX track. The same game may be played starting with the CDC 
-tracks. The VTX CDC merger forms a final set of merged tracks by combining the VTX and 
-CDC parts. At the same time, the tracks get cleaned from fake tracks and curlers. 
+This README describes how to train and validate the neural network based VTX CDC Merger
+module on simulated Belle II data.
+
+Usage:
+
+export BELLE2_VTX_UPGRADE_GT=upgrade_vtx_5layer_v3_2022-12-05
+export BELLE2_VTX_BACKGROUND_DIR=/home/benjamin/b2/bg_v3/
+
+
+basf2 collect_data.py -n 2000 -- --outputdir=/path/to/folder
+
+python3 train.py  --inputdir=/path/to/folder  --checkpoint=/path/to/checkpoint
+
+copy checkpoint dir to default location
+
+b2validation -s fullTrackingValidationVTXBkg_NNMERGER.py

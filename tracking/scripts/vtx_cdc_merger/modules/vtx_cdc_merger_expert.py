@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
 # Author: The Belle II Collaboration                                     #
@@ -15,12 +12,13 @@ import basf2 as b2
 
 
 import torch
+import numpy as np
 
 from vtx_cdc_merger.interaction_network.NNet import NNetWrapper
 import vtx_cdc_merger.var_set as var_set
 
 
-class VTXMerger(b2.Module):
+class VTXCDCMergerExpert(b2.Module):
     """
     Module to compute cleaned and merged VTX+CDC tracks.
 
@@ -31,11 +29,12 @@ class VTXMerger(b2.Module):
 
     def __init__(
             self,
-            VXDRecoTrackColName="VXDRecoTrackColName",
+            model_path,
             CDCRecoTrackColName="CDCRecoTrackColName",
-            model_path="/home/benjamin/vxt_cdc_merger_checkpoints",
-            ):
-        super().__init__()  # don't forget to call parent constructor
+            VXDRecoTrackColName="VXDRecoTrackColName",
+    ):
+        """Constructor"""
+        super().__init__()
 
         #: cached name of the CDC RecoTracks StoreArray
         self.CDCRecoTrackColName = CDCRecoTrackColName
@@ -46,13 +45,13 @@ class VTXMerger(b2.Module):
         #: cached name of the model checkpoint folder
         self.model_path = model_path
 
-        #: cached cut value for keeping vxd tracks
-        self.cut_vxd = 0.5
+        #: cached cut value: keep vxd tracks with classifier output above
+        self.cut_vxd = 0.0
 
-        #: cached cut value for keeping cdc tracks
-        self.cut_cdc = 0.5
+        #: cached cut value: keep cdc tracks with classifier output above
+        self.cut_cdc = 0.0
 
-        #: cached cut value for making new vxd to cdc relations
+        #: cached cut value: make relation for pair with classifier output above
         self.cut_links = 0.5
 
         #: cached cut value for making new vxd to cdc relations
@@ -68,19 +67,19 @@ class VTXMerger(b2.Module):
 
         cdcTracks = Belle2.PyStoreArray(self.CDCRecoTrackColName)
         vxdTracks = Belle2.PyStoreArray(self.VXDRecoTrackColName)
-
         vxdTracks.registerRelationTo(cdcTracks)
 
     def event(self):
         """
         Called for each event.
         """
-
         cdcTracks = Belle2.PyStoreArray(self.CDCRecoTrackColName)
         vxdTracks = Belle2.PyStoreArray(self.VXDRecoTrackColName)
 
         if self.remove_relations:
+            # TODO need to cross check this code
             # Dissolve all currently found relations
+
             for cdcTrack in cdcTracks:
                 B2DEBUG(9, "Look at CDCTrack at {}".format(cdcTrack.getArrayIndex()))
 
@@ -124,6 +123,8 @@ class VTXMerger(b2.Module):
 
         pred_links, pred_tracks = self.nnet.predict(vxd_hits, cdc_hits, vxd_tracks, cdc_tracks)
 
+        pred_tracks = np.atleast_1d(pred_tracks)
+
         # Apply the trackQI for VXD tracks
         n_vxd = len(vxdTracks)
         for i_vxd in range(n_vxd):
@@ -140,12 +141,11 @@ class VTXMerger(b2.Module):
             else:
                 cdcTracks[i_cdc].setQualityIndicator(1.0)
 
-        # Make the new relations
-        # for i_links in range(pred_links.shape[0]):
-        #    if pred_links[i_links] > self.cut_links:
-        #
-        #        i_vxd = i_links % n_cdc
-        #        i_cdc = i_links - i_vxd*n_cdc#
-        #
-        #        # -1 is the convention for "before the CDC track" in the related tracks combiner
-        #        vxdTracks[i_vxd].addRelationTo(cdcTracks[i_cdc], -1)
+        # Make relations from VXD to CDC
+        for i_links in range(pred_links.shape[0]):
+            if pred_links[i_links] > self.cut_links:
+                i_vxd = i_links // n_cdc
+                i_cdc = i_links - i_vxd*n_cdc
+                # TODO: do i need to check if relations exists?
+                # -1 is the convention for "before the CDC track" in the related tracks combiner
+                vxdTracks[i_vxd].addRelationTo(cdcTracks[i_cdc], -1)

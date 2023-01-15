@@ -16,16 +16,16 @@ import numpy as np
 from vtx_cdc_merger.var_set import extract_event_data
 
 
-class VTXMergerCollector(b2.Module):
+class VTXCDCMergerCollector(b2.Module):
     """
-    Module to collect training samples for the VTXMerger.
+    Module to collect training samples for the VTX CDC Merger.
     """
 
     def __init__(
         self,
-        VXDRecoTrackColName="VXDRecoTrackColName",
+        outputdir=None,
         CDCRecoTrackColName="CDCRecoTrackColName",
-        outputdir="/home/benjamin/b2/vtx_cdc_merger_data"
+        VXDRecoTrackColName="VXDRecoTrackColName",
     ):
         """Constructor"""
         super().__init__()
@@ -44,21 +44,19 @@ class VTXMergerCollector(b2.Module):
 
         cdcTracks = Belle2.PyStoreArray(self.CDCRecoTrackColName)
         vxdTracks = Belle2.PyStoreArray(self.VXDRecoTrackColName)
-
         vxdTracks.registerRelationTo(cdcTracks)
 
-    def analyzeAndCleanTrackArray(
+    def analyzeTrackArray(
         self,
         recoTracks,
         mcParticles,
-        trackMCParticles,
-        trackMinToF,
     ):
         """
-        Returns list with isFake labels for each track
+        Returns tuple of lists with best matched MC Particle index and minimum time of flight.
         """
 
-        isFake = []
+        trackMCParticles = []
+        trackMinToF = []
 
         for recoTrack in recoTracks:
 
@@ -106,78 +104,110 @@ class VTXMergerCollector(b2.Module):
                 B2DEBUG(9, "No MC particle found => fake")
                 trackMCParticles.append(-1)
                 trackMinToF.append(minGlobalTime)
-                recoTrack.setQualityIndicator(0.0)
-                isFake.append(1.0)
             else:
                 max_particle_id = max(stats.keys(), key=(lambda k: stats[k]))
                 if float(stats[max_particle_id])/nHits < 0.66:
                     B2DEBUG(9, "Less than 66% of hits from same MCParticle => fake")
                     trackMCParticles.append(-1)
                     trackMinToF.append(minGlobalTime)
-                    recoTrack.setQualityIndicator(0.0)
-                    isFake.append(1.0)
                 else:
+                    B2DEBUG(9, "MC particle found")
                     trackMCParticles.append(max_particle_id)
                     trackMinToF.append(minGlobalTime - mcParticles[max_particle_id].getProductionTime())
-                    recoTrack.setQualityIndicator(1.0)
-                    isFake.append(0.0)
+
+        return trackMCParticles, trackMinToF
+
+    def cleanTrackArray(
+        self,
+        recoTracks,
+        trackMCParticles,
+    ):
+        """
+        Returns list with isFake labels for each track
+        """
+        isFake = []
+
+        for recoTrack in recoTracks:
+            if trackMCParticles[recoTrack.getArrayIndex()] == -1:
+                recoTrack.setQualityIndicator(0.0)
+                isFake.append(1.0)
+            else:
+                recoTrack.setQualityIndicator(1.0)
+                isFake.append(0.0)
 
         return isFake
 
-    def removeCurlersFromTrackArray(
+    def checkRelatedTrackArrays(
         self,
-        recoTracks,
-        tracksMCParticles,
-        tracksMinToF,
-        relatedTracksColumnName,
+        cdcTracks,
+        cdcTrackMCParticles,
+        cdcTrackMinToF,
+        vxdTracks,
+        vxdTrackMCParticles,
+        vxdTrackMinToF,
     ):
+        """
+        Checks and relations from CDC to VXD tracks.
+        Retruns a list of correcly related pairs.
+        """
 
-        # Sparse list containing indices of curling tracks
-        isCurler1, isCurler2 = [], []
+        isRelatedVXDCDC = []
 
-        for recoTrack in recoTracks:
+        for cdcTrack in cdcTracks:
 
-            # get index of matched MCParticle
-            trackMCParticle_1 = tracksMCParticles[recoTrack.getArrayIndex()]
+            cdcMCParticle = cdcTrackMCParticles[cdcTrack.getArrayIndex()]
+            cdcMinTof = cdcTrackMinToF[cdcTrack.getArrayIndex()]
+            relatedVXDRecoTracks = cdcTrack.getRelationsWith(self.VXDRecoTrackColName)
 
-            # get min tof of track
-            trackMinTof_1 = tracksMinToF[recoTrack.getArrayIndex()]
+            offset = 0
+            initialSize = relatedVXDRecoTracks.size()
 
-            for recoTrack2 in recoTracks:
+            for index in range(initialSize):
+                relatedIndex = relatedVXDRecoTracks[index - offset].getArrayIndex()
+                relatedQI = relatedVXDRecoTracks[index - offset].getQualityIndicator()
+                relatedToF = vxdTrackMinToF[relatedIndex]
 
-                # skip self connections
-                if recoTrack.getArrayIndex() == recoTrack2.getArrayIndex():
-                    continue
+                if ((vxdTrackMCParticles[relatedIndex] == cdcMCParticle) and
+                    (cdcMCParticle >= 0) and
+                    (relatedQI > 0.0) and
+                        (relatedToF < cdcMinTof)):
 
-                # get index of matched MCParticle
-                trackMCParticle_2 = tracksMCParticles[recoTrack2.getArrayIndex()]
+                    if relatedVXDRecoTracks.weight(index - offset) > 0:
+                        relatedVXDRecoTracks.setWeight(index - offset, -1)
 
-                # get min tof of track
-                trackMinTof_2 = tracksMinToF[recoTrack2.getArrayIndex()]
+                    isRelatedVXDCDC.append((relatedIndex, cdcTrack.getArrayIndex()))
 
-                if (trackMCParticle_2 == trackMCParticle_1) and (trackMCParticle_1 >= 0):
+                else:
+                    # Need to remove the bad relation
+                    relatedVXDRecoTracks.remove(index - offset)
+                    offset += 1
 
-                    if trackMinTof_2 < trackMinTof_1:
-                        if recoTrack.getQualityIndicator() > 0:
-                            recoTrack.setQualityIndicator(0)
-                            isCurler1.append(recoTrack.getArrayIndex())
+        for vxdTrack in vxdTracks:
 
-                            # Also remove the first related track
-                            if recoTrack.getRelated(relatedTracksColumnName):
-                                recoTrack.getRelated(relatedTracksColumnName).setQualityIndicator(0)
-                                isCurler2.append(recoTrack.getRelated(relatedTracksColumnName).getArrayIndex())
+            vxdMCParticle = vxdTrackMCParticles[vxdTrack.getArrayIndex()]
+            vxdMinTof = vxdTrackMinToF[vxdTrack.getArrayIndex()]
+            relatedCDCRecoTracks = vxdTrack.getRelationsWith(self.CDCRecoTrackColName)
 
-                    else:
-                        if recoTrack2.getQualityIndicator() > 0:
-                            recoTrack2.setQualityIndicator(0)
-                            isCurler2.append(recoTrack2.getArrayIndex())
+            offset = 0
+            initialSize = relatedCDCRecoTracks.size()
 
-                            # Also remove the first related track
-                            if recoTrack2.getRelated(relatedTracksColumnName):
-                                recoTrack2.getRelated(relatedTracksColumnName).setQualityIndicator(0)
-                                isCurler1.append(recoTrack2.getRelated(relatedTracksColumnName).getArrayIndex())
+            for index in range(initialSize):
+                relatedIndex = relatedCDCRecoTracks[index - offset].getArrayIndex()
+                relatedQI = relatedCDCRecoTracks[index - offset].getQualityIndicator()
+                relatedToF = cdcTrackMinToF[relatedIndex]
 
-        return isCurler1, isCurler2
+                if ((cdcTrackMCParticles[relatedIndex] == vxdMCParticle) and
+                    (vxdMCParticle >= 0) and
+                    (relatedQI > 0.0) and
+                        (vxdMinTof < relatedToF)):
+                    pass
+
+                else:
+                    # Need to remove the bad relation
+                    relatedCDCRecoTracks.remove(index - offset)
+                    offset += 1
+
+        return isRelatedVXDCDC
 
     def mergeVXDAndCDCTrackArrays(
         self,
@@ -194,170 +224,108 @@ class VTXMergerCollector(b2.Module):
         for cdcTrack in cdcTracks:
             B2DEBUG(9, "Match with CDCTrack at {}".format(cdcTrack.getArrayIndex()))
 
-            # get index of matched MCParticle
-            cdcMCParticle = cdcTrackMCParticles[cdcTrack.getArrayIndex()]
-
-            # get min tof of CDC track
             cdcMinTof = cdcTrackMinToF[cdcTrack.getArrayIndex()]
 
             # skip CDC Tracks with bad quality indicator
             if cdcTrack.getQualityIndicator() == 0.0:
                 continue
 
-            B2DEBUG(9, "Good Quality ")
-
-            # skip if CDC track has already a correct match
-            cdcHasGoodRelation = False
-            relatedVXDRecoTracks = cdcTrack.getRelationsWith(self.VXDRecoTrackColName)
-
-            offset = 0
-            initialSize = relatedVXDRecoTracks.size()
-
-            for index in range(initialSize):
-
-                relatedIndex = relatedVXDRecoTracks[index - offset].getArrayIndex()
-                relatedQI = relatedVXDRecoTracks[index - offset].getQualityIndicator()
-                relatedToF = vxdTrackMinToF[relatedIndex]
-
-                if ((vxdTrackMCParticles[relatedIndex] == cdcMCParticle) and
-                    (cdcMCParticle >= 0) and
-                    (relatedQI > 0.0) and
-                        (relatedToF < cdcMinTof)):
-
-                    if relatedVXDRecoTracks.weight(index - offset) > 0:
-                        relatedVXDRecoTracks.setWeight(index - offset, -1)
-
-                    cdcHasGoodRelation = True
-                    isRelatedVXDCDC.append((relatedIndex, cdcTrack.getArrayIndex()))
-                else:
-                    # Need to remove the bad relation
-                    relatedVXDRecoTracks.remove(index - offset)
-                    offset += 1
-
-            if cdcHasGoodRelation:
-                continue
-
-            B2DEBUG(9, "Not yet related ")
-
-            matched_track = False
-            currentVxdTrack = -1
-            bestMatchedVxdTrack = 0
-
             for vxdTrack in vxdTracks:
 
-                # get index of matched MCParticle
-                vxdMCParticle = vxdTrackMCParticles[vxdTrack.getArrayIndex()]
-
-                # get min tof of VXD track
                 vxdMinTof = vxdTrackMinToF[vxdTrack.getArrayIndex()]
 
                 B2DEBUG(9, "Compare with  {}".format(vxdTrack.getArrayIndex()))
-                currentVxdTrack += 1
 
-                # skip VXD if it has already a correct match
-                vxdHasGoodRelation = False
                 relatedCDCRecoTracks = vxdTrack.getRelationsWith(self.CDCRecoTrackColName)
 
-                offsetCDC = 0
-                initialSizeCDC = relatedCDCRecoTracks.size()
-                for index in range(initialSizeCDC):
-                    relatedIndexCDC = relatedCDCRecoTracks[index - offsetCDC].getArrayIndex()
-                    relatedQICDC = relatedCDCRecoTracks[index - offsetCDC].getQualityIndicator()
-                    relatedToFCDC = cdcTrackMinToF[relatedIndexCDC]
-
-                    if ((cdcTrackMCParticles[relatedIndexCDC] == vxdMCParticle) and
-                        (vxdMCParticle >= 0) and
-                        (relatedQICDC > 0.0) and
-                            (vxdMinTof < relatedToFCDC)):
-
-                        vxdHasGoodRelation = True
-                        isRelatedVXDCDC.append((vxdTrack.getArrayIndex(), relatedIndexCDC))
-
-                    else:
-                        # Need to remove the bad relation
-                        relatedCDCRecoTracks.remove(index - offsetCDC)
-                        offsetCDC += 1
-
-                if vxdHasGoodRelation:
+                # skip VXD if it has already a correct relation
+                if relatedCDCRecoTracks.size() > 0:
                     continue
 
                 if ((vxdTrackMCParticles[vxdTrack.getArrayIndex()] == cdcTrackMCParticles[cdcTrack.getArrayIndex()]) and
                     (vxdTrackMCParticles[vxdTrack.getArrayIndex()] >= 0) and
                         (vxdMinTof < cdcMinTof)):
-                    matched_track = True
-                    bestMatchedVxdTrack = currentVxdTrack
+                    B2DEBUG(9, "matched to MC particle at: {}".format(vxdTrackMCParticles[vxdTrack.getArrayIndex()]))
+                    B2DEBUG(9, "vxd_tof: {} < cdc_tof: {}".format(vxdMinTof, cdcMinTof))
+                    # -1 is the convention for "before the CDC track" in the related tracks combiner
+                    vxdTracks[vxdTrack.getArrayIndex()].addRelationTo(cdcTrack, -1)
+                    isRelatedVXDCDC.append((vxdTrack.getArrayIndex(), cdcTrack.getArrayIndex()))
 
-            if matched_track:
-                # -1 is the convention for "before the CDC track" in the related tracks combiner
-                vxdTracks[bestMatchedVxdTrack].addRelationTo(cdcTrack, -1)
-                isRelatedVXDCDC.append((vxdTracks[bestMatchedVxdTrack].getArrayIndex(), cdcTrack.getArrayIndex()))
-
-        # make it unique
-        isRelatedVXDCDC = list(set(isRelatedVXDCDC))
         return isRelatedVXDCDC
 
-    def event(self):
-        """Event method"""
+    def removeClonesFromTrackArray(
+        self,
+        recoTracks,
+        tracksMCParticles,
+        tracksMinToF,
+        relatedTracksColumnName,
+    ):
 
-        cdcTracks = Belle2.PyStoreArray(self.CDCRecoTrackColName)
-        vxdTracks = Belle2.PyStoreArray(self.VXDRecoTrackColName)
-        mcparticles = Belle2.PyStoreArray("MCParticles")
+        # Sparse list containing indices of clone tracks
+        isClones, isClonesRelated = [], []
 
-        # Find a MCParticle for each track candidate
-        vxdTrackMCParticles = []
-        cdcTrackMCParticles = []
+        for recoTrack in recoTracks:
 
-        # Find minimum time of flight for each track candidate
-        vxdTrackMinToF = []
-        cdcTrackMinToF = []
+            trackMCParticle_1 = tracksMCParticles[recoTrack.getArrayIndex()]
+            trackMinTof_1 = tracksMinToF[recoTrack.getArrayIndex()]
+            relatedRecoTracks_1 = recoTrack.getRelationsWith(relatedTracksColumnName)
+            hasGoodRelation_1 = relatedRecoTracks_1.size() > 0
 
-        B2DEBUG(9, "Clean VXD tracks from fakes")
-        isFakeVXD = self.analyzeAndCleanTrackArray(
-            vxdTracks,
-            mcparticles,
-            vxdTrackMCParticles,
-            vxdTrackMinToF,
-        )
+            for recoTrack2 in recoTracks:
 
-        B2DEBUG(9, "Clean CDC tracks from fakes")
-        isFakeCDC = self.analyzeAndCleanTrackArray(
-            cdcTracks,
-            mcparticles,
-            cdcTrackMCParticles,
-            cdcTrackMinToF,
-        )
+                # do not compare a track against itself
+                if recoTrack.getArrayIndex() == recoTrack2.getArrayIndex():
+                    continue
 
-        B2DEBUG(9, "Merging  CDC to VXD tracks, where VXD track will be added before CDC track")
-        isRelatedVXDCDC = self.mergeVXDAndCDCTrackArrays(
-            cdcTracks,
-            cdcTrackMCParticles,
-            cdcTrackMinToF,
-            vxdTracks,
-            vxdTrackMCParticles,
-            vxdTrackMinToF
-        )
+                trackMCParticle_2 = tracksMCParticles[recoTrack2.getArrayIndex()]
+                trackMinTof_2 = tracksMinToF[recoTrack2.getArrayIndex()]
+                relatedRecoTracks_2 = recoTrack2.getRelationsWith(relatedTracksColumnName)
+                hasGoodRelation_2 = relatedRecoTracks_2.size() > 0
 
-        B2DEBUG(9, "Removing curlers in VXD => treat as fake")
-        isCurlerVXD2, isCurlerCDC2 = self.removeCurlersFromTrackArray(
-            vxdTracks,
-            vxdTrackMCParticles,
-            vxdTrackMinToF,
-            self.CDCRecoTrackColName,
-        )
+                # do not compare a tracks having common related track
+                commonRelatedTrack = False
+                if hasGoodRelation_1 and hasGoodRelation_2:
+                    commonRelatedTrack = (recoTrack.getRelated(relatedTracksColumnName).getArrayIndex() ==
+                                          recoTrack2.getRelated(relatedTracksColumnName).getArrayIndex())
 
-        B2DEBUG(9, "Removing curlers in CDC => treat as fake")
-        isCurlerCDC, isCurlerVXD = self.removeCurlersFromTrackArray(
-            cdcTracks,
-            cdcTrackMCParticles,
-            cdcTrackMinToF,
-            self.VXDRecoTrackColName,
-        )
+                if commonRelatedTrack:
+                    continue
 
-        isCurlerVXD.extend(isCurlerVXD2)
-        isCurlerCDC.extend(isCurlerCDC2)
+                if (trackMCParticle_2 == trackMCParticle_1) and (trackMCParticle_1 >= 0):
 
-        isCurlerCDC = list(set(isCurlerCDC))
-        isCurlerVXD = list(set(isCurlerVXD))
+                    if trackMinTof_2 < trackMinTof_1:
+                        if recoTrack.getQualityIndicator() > 0:
+                            recoTrack.setQualityIndicator(0)
+                            isClones.append(recoTrack.getArrayIndex())
+
+                            # Also remove the first related track
+                            if recoTrack.getRelated(relatedTracksColumnName):
+                                recoTrack.getRelated(relatedTracksColumnName).setQualityIndicator(0)
+                                isClonesRelated.append(recoTrack.getRelated(relatedTracksColumnName).getArrayIndex())
+
+                    else:
+                        if recoTrack2.getQualityIndicator() > 0:
+                            recoTrack2.setQualityIndicator(0)
+                            isClones.append(recoTrack2.getArrayIndex())
+
+                            # Also remove the first related track
+                            if recoTrack2.getRelated(relatedTracksColumnName):
+                                recoTrack2.getRelated(relatedTracksColumnName).setQualityIndicator(0)
+                                isClonesRelated.append(recoTrack2.getRelated(relatedTracksColumnName).getArrayIndex())
+
+        return isClones, isClonesRelated
+
+    def dump_event_data(
+        self,
+        cdcTracks,
+        vxdTracks,
+        isRelatedVXDCDC,
+        isFakeVXD,
+        isFakeCDC,
+        isClonesVXD,
+        isClonesCDC,
+    ):
+        """Write event data to output directory"""
 
         n_vxd = len(isFakeVXD)
         n_cdc = len(isFakeCDC)
@@ -368,7 +336,7 @@ class VTXMergerCollector(b2.Module):
             if isFakeVXD[i_vxd] == 1.0:
                 true_vxd[i_vxd] = 0.0
 
-            if i_vxd in isCurlerVXD:
+            if i_vxd in isClonesVXD:
                 true_vxd[i_vxd] = 0.0
 
         # Selects good CDC tracks: no fake and no culer
@@ -377,7 +345,7 @@ class VTXMergerCollector(b2.Module):
             if isFakeCDC[i_cdc] == 1.0:
                 true_cdc[i_cdc] = 0.0
 
-            if i_cdc in isCurlerCDC:
+            if i_cdc in isClonesCDC:
                 true_cdc[i_cdc] = 0.0
 
         # Selects good links from VXD to CDC
@@ -387,14 +355,15 @@ class VTXMergerCollector(b2.Module):
         true_links = np.zeros(n_vxd * n_cdc)
         for edge in isRelatedVXDCDC:
             i_vxd, i_cdc = edge
+
+            # TODO: these four if statements should not be needed
             if isFakeVXD[i_vxd] == 1.0:
                 continue
             if isFakeCDC[i_cdc] == 1.0:
                 continue
-
-            if i_vxd in isCurlerVXD:
+            if i_vxd in isClonesVXD:
                 continue
-            if i_cdc in isCurlerCDC:
+            if i_cdc in isClonesCDC:
                 continue
 
             true_links[i_cdc+i_vxd*n_cdc] = 1.0
@@ -418,3 +387,93 @@ class VTXMergerCollector(b2.Module):
         true_vxd.to_hdf(filename, key='true_vxd')
         true_cdc.to_hdf(filename, key='true_cdc')
         true_links.to_hdf(filename, key='true_links')
+
+    def event(self):
+        """Event method"""
+
+        cdcTracks = Belle2.PyStoreArray(self.CDCRecoTrackColName)
+        vxdTracks = Belle2.PyStoreArray(self.VXDRecoTrackColName)
+        mcparticles = Belle2.PyStoreArray("MCParticles")
+
+        B2DEBUG(9, "Analyze VXD tracks")
+        vxdTrackMCParticles, vxdTrackMinToF = self.analyzeTrackArray(
+            vxdTracks,
+            mcparticles
+        )
+
+        B2DEBUG(9, "Analyze CDC tracks")
+        cdcTrackMCParticles, cdcTrackMinToF = self.analyzeTrackArray(
+            cdcTracks,
+            mcparticles
+        )
+
+        B2DEBUG(9, "Clean VXD tracks from fakes")
+        isFakeVXD = self.cleanTrackArray(
+            vxdTracks,
+            vxdTrackMCParticles
+        )
+
+        B2DEBUG(9, "Clean CDC tracks from fakes")
+        isFakeCDC = self.cleanTrackArray(
+            cdcTracks,
+            cdcTrackMCParticles
+        )
+
+        B2DEBUG(9, "Checks the existing relations between CDC and VXD tracks and remove wrong ones")
+        isRelatedVXDCDC_check = self.checkRelatedTrackArrays(
+            cdcTracks,
+            cdcTrackMCParticles,
+            cdcTrackMinToF,
+            vxdTracks,
+            vxdTrackMCParticles,
+            vxdTrackMinToF
+        )
+
+        B2DEBUG(9, "Merging  CDC to VXD tracks, where VXD track will be added before CDC track")
+        isRelatedVXDCDC = self.mergeVXDAndCDCTrackArrays(
+            cdcTracks,
+            cdcTrackMCParticles,
+            cdcTrackMinToF,
+            vxdTracks,
+            vxdTrackMCParticles,
+            vxdTrackMinToF
+        )
+
+        B2DEBUG(9, "Removing clones in VXD")
+        isClonesVXD2, isClonesCDC2 = self.removeClonesFromTrackArray(
+            vxdTracks,
+            vxdTrackMCParticles,
+            vxdTrackMinToF,
+            self.CDCRecoTrackColName,
+        )
+
+        B2DEBUG(9, "Removing clones in CDC")
+        isClonesCDC, isClonesVXD = self.removeClonesFromTrackArray(
+            cdcTracks,
+            cdcTrackMCParticles,
+            cdcTrackMinToF,
+            self.VXDRecoTrackColName,
+        )
+
+        if self.outputdir:
+
+            isRelatedVXDCDC.extend(isRelatedVXDCDC_check)
+            isRelatedVXDCDC = list(set(isRelatedVXDCDC))
+
+            isClonesVXD.extend(isClonesVXD2)
+            isClonesVXD = list(set(isClonesVXD))
+
+            isClonesCDC.extend(isClonesCDC2)
+            isClonesCDC = list(set(isClonesCDC))
+
+            self.dump_event_data(
+                cdcTracks=cdcTracks,
+                vxdTracks=vxdTracks,
+                isRelatedVXDCDC=isRelatedVXDCDC,
+                isFakeVXD=isFakeVXD,
+                isFakeCDC=isFakeCDC,
+                isClonesVXD=isClonesVXD,
+                isClonesCDC=isClonesCDC,
+            )
+
+        return

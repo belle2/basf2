@@ -167,7 +167,7 @@ void MCTrackMergerModule::analyzeTrackArray(
       B2DEBUG(9, "MC particle found at " << dst.crbegin()->second);
       trackMCParticles.push_back(dst.crbegin()->second);
       trackMinToF.push_back(minGlobalTime - mcParticles[dst.crbegin()->second]->getProductionTime());
-      B2DEBUG(9, "GOOD VXD track with min tof " << minGlobalTime - mcParticles[dst.crbegin()->second]->getProductionTime());
+      B2DEBUG(9, "GOOD track with min tof " << minGlobalTime - mcParticles[dst.crbegin()->second]->getProductionTime());
     }
   }
 

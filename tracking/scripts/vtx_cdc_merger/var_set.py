@@ -10,7 +10,8 @@
 import numpy as np
 import pandas as pd
 import math
-from ROOT import Belle2, TVector3
+from ROOT import Belle2
+from ROOT.Math import XYZVector
 
 scales_vxd_hits = {
     'track_id': 1.0,
@@ -23,9 +24,22 @@ scales_vxd_hits = {
     'sizeU': 3,
     'sizeV': 3}
 scales_cdc_hits = {'track_id': 1.0, 'layer': 55, 'r': 100.0, 'phi': math.pi, 'z': 50, 'tdc': 500}
-
-scales_cdc_tracks = {'nhits': 50.0, 'seed_pT': 0.3, 'seed_tanLambda': 1.0, 'seed_pMag': 0.3, 'q': 1.0, }
-scales_vxd_tracks = {'nhits': 5.0,  'seed_pT': 0.3, 'seed_tanLambda': 1.0, 'seed_pMag': 0.3, 'q': 1.0, }
+scales_cdc_tracks = {
+    'nhits': 56.0,
+    'seed_pT': 0.3,
+    'seed_tanLambda': 1.0,
+    'seed_pMag': 0.3,
+    'q': 1.0,
+    'first_layer': 56,
+    'last_layer': 56}
+scales_vxd_tracks = {
+    'nhits': 5.0,
+    'seed_pT': 0.3,
+    'seed_tanLambda': 1.0,
+    'seed_pMag': 0.3,
+    'q': 1.0,
+    'first_layer': 5,
+    'last_layer': 5}
 
 
 def get_array(df, scales, use_scales=True):
@@ -58,8 +72,24 @@ def empty_event_data():
         'sizeU': [],
         'sizeV': []}
 
-    cdc_tracks = {'track_id': [], 'nhits': [], 'seed_pT': [], 'seed_tanLambda': [], 'seed_pMag': [], 'q': []}
-    vxd_tracks = {'track_id': [], 'nhits': [], 'seed_pT': [], 'seed_tanLambda': [], 'seed_pMag': [], 'q': []}
+    cdc_tracks = {
+        'track_id': [],
+        'nhits': [],
+        'seed_pT': [],
+        'seed_tanLambda': [],
+        'seed_pMag': [],
+        'q': [],
+        'first_layer': [],
+        'last_layer': []}
+    vxd_tracks = {
+        'track_id': [],
+        'nhits': [],
+        'seed_pT': [],
+        'seed_tanLambda': [],
+        'seed_pMag': [],
+        'q': [],
+        'first_layer': [],
+        'last_layer': []}
 
     return cdc_hits, cdc_tracks, vxd_hits, vxd_tracks
 
@@ -77,9 +107,10 @@ def extract_event_data(cdcTracks, vxdTracks):
         track_id = vxdTrack.getArrayIndex()
 
         momentum = vxdTrack.getMomentumSeed()
-        seed_pT = momentum.Perp()
-        seed_pmag = momentum.Mag()
+        seed_pT = momentum.Rho()
+        seed_pmag = math.sqrt(momentum.X()**2 + momentum.Y()**2 + momentum.Z()**2)
         seed_tanLambda = np.divide(1.0, math.tan(momentum.Theta()))
+        layers = [hit.getSensorID().getLayerNumber() for hit in vxdTrack.getSortedVTXHitList()]
 
         vxd_tracks['track_id'].append(track_id)
         vxd_tracks['nhits'].append(len(vxdTrack.getSortedVTXHitList()))
@@ -87,13 +118,15 @@ def extract_event_data(cdcTracks, vxdTracks):
         vxd_tracks['seed_pMag'].append(seed_pmag)
         vxd_tracks['seed_tanLambda'].append(seed_tanLambda)
         vxd_tracks['q'].append(vxdTrack.getChargeSeed())
+        vxd_tracks['first_layer'].append(layers[0])
+        vxd_tracks['last_layer'].append(layers[-1])
 
         for hit in vxdTrack.getSortedVTXHitList():
 
             hit_id = hit.getArrayIndex()
             layer = hit.getSensorID().getLayerNumber()
             sensor_info = Belle2.VXD.GeoCache.get(hit.getSensorID())
-            position = sensor_info.pointToGlobal(TVector3(hit.getU(), hit.getV(), 0), True)
+            position = sensor_info.pointToGlobal(XYZVector(hit.getU(), hit.getV(), 0), True)
 
             # Calculate derived hits variables
             r = np.sqrt(position.X()**2 + position.Y()**2)
@@ -116,9 +149,10 @@ def extract_event_data(cdcTracks, vxdTracks):
         track_id = cdcTrack.getArrayIndex()
 
         momentum = cdcTrack.getMomentumSeed()
-        seed_pT = momentum.Perp()
-        seed_pmag = momentum.Mag()
+        seed_pT = momentum.Rho()
+        seed_pmag = math.sqrt(momentum.X()**2 + momentum.Y()**2 + momentum.Z()**2)
         seed_tanLambda = np.divide(1.0, math.tan(momentum.Theta()))
+        layers = [hit.getICLayer() for hit in cdcTrack.getSortedCDCHitList()]
 
         cdc_tracks['track_id'].append(track_id)
         cdc_tracks['nhits'].append(len(cdcTrack.getSortedCDCHitList()))
@@ -126,6 +160,8 @@ def extract_event_data(cdcTracks, vxdTracks):
         cdc_tracks['seed_pMag'].append(seed_pmag)
         cdc_tracks['seed_tanLambda'].append(seed_tanLambda)
         cdc_tracks['q'].append(cdcTrack.getChargeSeed())
+        cdc_tracks['first_layer'].append(layers[0])
+        cdc_tracks['last_layer'].append(layers[-1])
 
         for hit in cdcTrack.getSortedCDCHitList():
 

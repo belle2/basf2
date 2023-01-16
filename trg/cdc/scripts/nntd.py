@@ -2,6 +2,7 @@ import basf2
 from ROOT import Belle2
 import numpy as np
 import pickle
+import os
 
 
 class nntd(basf2.Module):
@@ -306,6 +307,24 @@ class nntd(basf2.Module):
         print('file ' + filename + ' has been saved. ')
 
     def loadmore(self, filenames):
+        # first, check the amount of events and limit them to NNTD_EVLIMIT
+        evlim = 0
+        evnumber = 0
+        skipev = 0
+        if "NNTD_EVLIMIT" in os.environ:
+            evlim = int(os.environ["NNTD_EVLIMIT"])
+        else:
+            evlim = 50000
+        for i, x in enumerate(filenames):
+            print("checking file: " + str(i) + "/" + str(len(filenames)))
+            f = open(x, 'rb')
+            evnumber += len(pickle.load(f)["eventlist"])
+        if evnumber > evlim:
+            print("total number of available events is " + str(evnumber))
+            skipev = int(evnumber/evlim)
+            print("Number of events more than " + str(evlim) + " only taking every " + str(skipev) + " event")
+        else:
+            skipev = 1
         for x in filenames:
             f = open(x, 'rb')
             savedict = pickle.load(f)
@@ -316,10 +335,14 @@ class nntd(basf2.Module):
             self.networkname = savedict["networkname"]
             if "dataname" in savedict:
                 self.dataname = savedict["dataname"]
-            self.eventlist += savedict["eventlist"]
+            templim = evlim-len(self.eventlist)
+            self.eventlist += savedict["eventlist"][::skipev][:templim]
             self.varnum = savedict["varnum"]
             print("Loaded file: " + x)
             print("length of eventlist: " + str(len(self.eventlist)))
+            if evlim <= len(self.eventlist):
+                print("stop loading, maximum event number reached")
+                break
         self.makearray(self.eventlist)
         print("all files loaded, array.size: " + str(self.data.size) + ", array.shape: " + str(self.data.shape))
 

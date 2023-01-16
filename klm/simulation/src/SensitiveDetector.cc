@@ -43,10 +43,8 @@ SensitiveDetector::SensitiveDetector(
   m_HitTimeMax = m_SimPar->getHitTimeMax();
   m_MCParticles.isOptional();
   m_KLMSimHits.registerInDataStore();
-  m_BKLMSimHitPositions.registerInDataStore();
   m_MCParticlesToKLMSimHits.registerInDataStore();
   registerMCParticleRelation(m_MCParticlesToKLMSimHits);
-  m_BKLMSimHitPositions.registerRelationTo(m_KLMSimHits);
 }
 
 bool SensitiveDetector::stepEKLM(G4Step* aStep, G4TouchableHistory* history)
@@ -185,9 +183,9 @@ G4bool SensitiveDetector::stepBKLM(G4Step* step, G4TouchableHistory* history)
         simHit->setPropagationTime(propagationTimes.z());
         simHit->setTime(time);
         simHit->setEnergyDeposit(eDep);
+        simHit->setPosition(globalPosition.x(), globalPosition.y(),
+                            globalPosition.z());
         m_MCParticlesToKLMSimHits.add(trackID, simHit->getArrayIndex());
-        BKLMSimHitPosition* simHitPosition = m_BKLMSimHitPositions.appendNew(globalPosition.x(), globalPosition.y(), globalPosition.z());
-        simHitPosition->addRelationTo(simHit);
       }
       if (phiStripLower > 0) {
         KLMSimHit* simHit = m_KLMSimHits.appendNew();
@@ -201,9 +199,9 @@ G4bool SensitiveDetector::stepBKLM(G4Step* step, G4TouchableHistory* history)
         simHit->setPropagationTime(propagationTimes.y());
         simHit->setTime(time);
         simHit->setEnergyDeposit(eDep);
+        simHit->setPosition(globalPosition.x(), globalPosition.y(),
+                            globalPosition.z());
         m_MCParticlesToKLMSimHits.add(trackID, simHit->getArrayIndex());
-        BKLMSimHitPosition* simHitPosition = m_BKLMSimHitPositions.appendNew(globalPosition.x(), globalPosition.y(), globalPosition.z());
-        simHitPosition->addRelationTo(simHit);
       }
     } else {
       int scint = hist->GetCopyNumber(depth - m_DepthScintillator);
@@ -225,9 +223,9 @@ G4bool SensitiveDetector::stepBKLM(G4Step* step, G4TouchableHistory* history)
       simHit->setPropagationTime(propagationTime);
       simHit->setTime(time);
       simHit->setEnergyDeposit(eDep);
+      simHit->setPosition(globalPosition.x(), globalPosition.y(),
+                          globalPosition.z());
       m_MCParticlesToKLMSimHits.add(trackID, simHit->getArrayIndex());
-      BKLMSimHitPosition* simHitPosition = m_BKLMSimHitPositions.appendNew(globalPosition.x(), globalPosition.y(), globalPosition.z());
-      simHitPosition->addRelationTo(simHit);
     }
     return true;
   }

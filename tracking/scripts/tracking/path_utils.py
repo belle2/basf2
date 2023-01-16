@@ -1076,7 +1076,7 @@ def add_vtx_track_finding(
             path.add_module('VXDCDCTrackMerger',
                             CDCRecoTrackColName=input_reco_tracks,
                             VXDRecoTrackColName=temporary_reco_tracks,
-                            allow_more_mulitple_relations=True)
+                            allowMultipleRelations=True)
 
     elif vtx_ckf_mode == "VXDTF2_alone":
         add_vtx_track_finding_vxdtf2(path, components=["VTX"], reco_tracks=temporary_reco_tracks,
@@ -1110,7 +1110,7 @@ def add_vtx_track_finding(
                     CDCRecoTracksStoreArrayName=input_reco_tracks,
                     recoTracksStoreArrayName=combined_vtx_cdc_standalone_tracks,
                     keepOnlyGoodQITracks=keepOnlyGoodQITracks,
-                    allow_more_mulitple_relations=True)
+                    allowMultipleRelations=True)
 
     if use_vtx_to_cdc_ckf:
         path.add_module("ToCDCCKF",

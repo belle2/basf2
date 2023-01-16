@@ -50,7 +50,7 @@ namespace Belle2 {
     bool m_param_onlyGoodQITracks = false;
 
     /** Allow relations from one CDC track to m VXD tracks */
-    bool m_allow_more_mulitple_relations;
+    bool m_allowMultipleRelations;
 
     /// Parameter: QI cut value
     float m_param_qiCutValue = 0.0;

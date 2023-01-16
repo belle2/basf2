@@ -30,7 +30,7 @@ VXDCDCTrackMergerModule::VXDCDCTrackMergerModule() :
            double(2.0));
 
   //merging parameters
-  addParam("allow_more_mulitple_relations", m_allow_more_mulitple_relations,
+  addParam("allowMultipleRelations", m_allowMultipleRelations,
            "Allow relations from one CDC track to m VXD tracks",
            bool(false));
 
@@ -83,7 +83,7 @@ void VXDCDCTrackMergerModule::event()
     // skip CDC if it has already a match
     // you may want to allow using such CDC tracks of the vertex detector
     // has enough layers to find a charged particle track twice.
-    if (cdcTrack.getRelated<RecoTrack>(m_VXDRecoTrackColName) and not m_allow_more_mulitple_relations) {
+    if (cdcTrack.getRelated<RecoTrack>(m_VXDRecoTrackColName) and not m_allowMultipleRelations) {
       continue;
     }
 

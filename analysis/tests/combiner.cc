@@ -1021,6 +1021,8 @@ namespace {
     klong_1->initialize(Const::Klong.getPDGCode(), "K_L0:1");
 
     // add particles to lists
+    pipAll->setEditable(true);
+
     pipAll->addParticle(pip_1);
     pipAll->addParticle(pip_2);
     pipAll->addParticle(pip_3);
@@ -1029,6 +1031,10 @@ namespace {
     pipAll->addParticle(pim_2);
     pipAll->addParticle(pim_3);
 
+    pipAll->setEditable(false);
+
+    kpAll->setEditable(true);
+
     kpAll->addParticle(kp_1);
     kpAll->addParticle(kp_2);
     kpAll->addParticle(kp_3);
@@ -1036,6 +1042,8 @@ namespace {
     kpAll->addParticle(km_1);
     kpAll->addParticle(km_2);
     kpAll->addParticle(km_3);
+
+    kpAll->setEditable(false);
 
     pipGood->addParticle(pip_1_copy);
     pipGood->addParticle(pim_1_copy);

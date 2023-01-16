@@ -12,7 +12,6 @@
 
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <iostream>
-#include <TVector3.h>
 
 using namespace Belle2;
 

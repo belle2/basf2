@@ -25,7 +25,7 @@ namespace Belle2 {
   /**
    * Make summary of data quality from reconstruction
    */
-  class DQMHistAnalysisARICHModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisARICHModule final : public DQMHistAnalysisModule {
 
   public:
 
@@ -37,36 +37,30 @@ namespace Belle2 {
     /**
      * Destructor
      */
-    virtual ~DQMHistAnalysisARICHModule();
+    ~DQMHistAnalysisARICHModule();
 
     /**
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */
-    virtual void initialize() override;
-
-    /**
-     * Called when entering a new run.
-     * Set run dependent things like run header parameters, alignment, etc.
-     */
-    virtual void beginRun() override;
+    void initialize() override final;
 
     /**
      * Event processor.
      */
-    virtual void event() override;
+    void event() override final;
 
     /**
      * End-of-run action.
      * Save run-related stuff, such as statistics.
      */
-    virtual void endRun() override;
+    void endRun() override final;
 
     /**
      * Termination action.
      * Clean-up, close files, summarize statistics, etc.
      */
-    virtual void terminate() override;
+    void terminate() override final;
 
   protected:
     bool m_debug;/**<debug*/

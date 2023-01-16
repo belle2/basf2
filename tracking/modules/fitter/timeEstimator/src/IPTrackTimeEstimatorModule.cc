@@ -10,6 +10,7 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <framework/dataobjects/Helix.h>
 #include <framework/geometry/BFieldManager.h>
+#include <framework/geometry/B2Vector3.h>
 
 using namespace Belle2;
 
@@ -18,7 +19,7 @@ REG_MODULE(IPTrackTimeEstimator)
 double IPTrackTimeEstimatorModule::estimateFlightLengthUsingFittedInformation(genfit::MeasuredStateOnPlane& measuredStateOnPlane)
 const
 {
-  const TVector3 ipPosition;
+  const B2Vector3D ipPosition;
   try {
     const double s = measuredStateOnPlane.extrapolateToPoint(ipPosition);
     // Negative, because we extrapolated in the wrong direction
@@ -31,12 +32,12 @@ const
 
 double IPTrackTimeEstimatorModule::estimateFlightLengthUsingSeedInformation(const RecoTrack& recoTrack) const
 {
-  const TVector3& position = recoTrack.getPositionSeed();
-  const TVector3& momentum = recoTrack.getMomentumSeed();
+  const ROOT::Math::XYZVector& position = recoTrack.getPositionSeed();
+  const ROOT::Math::XYZVector& momentum = recoTrack.getMomentumSeed();
   const short int charge = recoTrack.getChargeSeed();
 
-  const double bZ = BFieldManager::getField(0, 0, 0).Z() / Unit::T;
-  const Helix h(ROOT::Math::XYZVector(position), ROOT::Math::XYZVector(momentum), charge, bZ);
+  const double bZ = BFieldManager::getFieldInTesla({0, 0, 0}).Z();
+  const Helix h(position, momentum, charge, bZ);
   const double s2D = h.getArcLength2DAtXY(position.X(), position.Y());
   const double s = s2D * hypot(1, h.getTanLambda());
 

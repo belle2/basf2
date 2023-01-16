@@ -5,7 +5,7 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class Belle2::ECLCellIdMapping+; // checksum=0x9b8992c6, version=1
+#pragma link C++ class Belle2::ECLCellIdMapping+; // checksum=0x4dfa4dcf, version=1
 #pragma link C++ class Belle2::ECLWaveforms+; // checksum=0x8e396ab6, version=1
 #pragma link C++ class Belle2::ECLLocalMaximum+; // checksum=0x508c657d, version=3
 #pragma link C++ class Belle2::ECLConnectedRegion+; // checksum=0xa7247f52, version=2

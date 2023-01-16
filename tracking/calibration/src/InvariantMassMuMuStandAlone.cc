@@ -17,7 +17,6 @@
 
 #include <TROOT.h>
 #include <TTree.h>
-#include <TVector3.h>
 #include <TGraph.h>
 #include <TRandom3.h>
 #include <TH1D.h>
@@ -73,8 +72,8 @@ namespace Belle2::InvariantMassMuMuCalib {
     tr->SetBranchAddress("exp", &evt.exp);
     tr->SetBranchAddress("event", &evt.evtNo);
 
-    TVector3* p0 = nullptr;
-    TVector3* p1 = nullptr;
+    B2Vector3D* p0 = nullptr;
+    B2Vector3D* p1 = nullptr;
 
     tr->SetBranchAddress("mu0_p", &p0);
     tr->SetBranchAddress("mu1_p", &p1);

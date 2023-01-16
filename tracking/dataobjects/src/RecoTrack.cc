@@ -22,7 +22,8 @@
 
 using namespace Belle2;
 
-RecoTrack::RecoTrack(const TVector3& seedPosition, const TVector3& seedMomentum, const short int seedCharge,
+RecoTrack::RecoTrack(const ROOT::Math::XYZVector& seedPosition, const ROOT::Math::XYZVector& seedMomentum,
+                     const short int seedCharge,
                      const std::string& storeArrayNameOfCDCHits,
                      const std::string& storeArrayNameOfSVDHits,
                      const std::string& storeArrayNameOfPXDHits,
@@ -37,7 +38,7 @@ RecoTrack::RecoTrack(const TVector3& seedPosition, const TVector3& seedMomentum,
   m_storeArrayNameOfEKLMHits(storeArrayNameOfEKLMHits),
   m_storeArrayNameOfRecoHitInformation(storeArrayNameOfRecoHitInformation)
 {
-  m_genfitTrack.setStateSeed(seedPosition, seedMomentum);
+  m_genfitTrack.setStateSeed(XYZToTVector(seedPosition), XYZToTVector(seedMomentum));
   // TODO Set the covariance seed (that should be done by the tracking package)
   TMatrixDSym covSeed(6);
   covSeed(0, 0) = 1e-3;
@@ -114,8 +115,8 @@ RecoTrack* RecoTrack::createFromTrackCand(const genfit::TrackCand& trackCand,
   StoreArray<UsedEKLMHit> eklmHits(storeArrayNameOfEKLMHits);
 
   // Set the tracking parameters
-  const TVector3& position = trackCand.getPosSeed();
-  const TVector3& momentum = trackCand.getMomSeed();
+  const ROOT::Math::XYZVector& position = ROOT::Math::XYZVector(trackCand.getPosSeed());
+  const ROOT::Math::XYZVector& momentum = ROOT::Math::XYZVector(trackCand.getMomSeed());
   const short int charge = trackCand.getChargeSeed();
   const double time = trackCand.getTimeSeed();
 
@@ -180,7 +181,7 @@ genfit::TrackCand RecoTrack::createGenfitTrackCand() const
   genfit::TrackCand createdTrackCand;
 
   // Set the trajectory parameters
-  createdTrackCand.setPosMomSeed(getPositionSeed(), getMomentumSeed(), getChargeSeed());
+  createdTrackCand.setPosMomSeed(XYZToTVector(getPositionSeed()), XYZToTVector(getMomentumSeed()), getChargeSeed());
   createdTrackCand.setCovSeed(getSeedCovariance());
   createdTrackCand.setTimeSeed(getTimeSeed());
 
@@ -418,7 +419,7 @@ genfit::AbsTrackRep* RecoTrackGenfitAccess::createOrReturnRKTrackRep(RecoTrack& 
   return trackRepresentation;
 }
 
-const genfit::MeasuredStateOnPlane& RecoTrack::getMeasuredStateOnPlaneClosestTo(const TVector3& closestPoint,
+const genfit::MeasuredStateOnPlane& RecoTrack::getMeasuredStateOnPlaneClosestTo(const ROOT::Math::XYZVector& closestPoint,
     const genfit::AbsTrackRep* representation)
 {
   checkDirtyFlag();
@@ -432,7 +433,7 @@ const genfit::MeasuredStateOnPlane& RecoTrack::getMeasuredStateOnPlaneClosestTo(
     try {
       const genfit::MeasuredStateOnPlane& measuredStateOnPlane = m_genfitTrack.getFittedState(hitIndex, representation);
 
-      const double currentDistance2 = (measuredStateOnPlane.getPos() - closestPoint).Mag2();
+      const double currentDistance2 = (ROOT::Math::XYZVector(measuredStateOnPlane.getPos()) - closestPoint).Mag2();
 
       if (not nearestStateOnPlane or currentDistance2 < minimalDistance2) {
         nearestStateOnPlane = &measuredStateOnPlane;
@@ -491,18 +492,19 @@ genfit::AbsTrackRep* RecoTrack::getTrackRepresentationForPDG(int pdgCode)
 
 
 /// Helper function to get the seed or the measured state on plane from a track
-std::tuple<TVector3, TVector3, short> RecoTrack::extractTrackState() const
+std::tuple<ROOT::Math::XYZVector, ROOT::Math::XYZVector, short> RecoTrack::extractTrackState() const
 {
   if (not wasFitSuccessful()) {
     return std::make_tuple(getPositionSeed(), getMomentumSeed(), getChargeSeed());
   } else {
     const auto& measuredStateOnPlane = getMeasuredStateOnPlaneFromFirstHit();
-    return std::make_tuple(measuredStateOnPlane.getPos(), measuredStateOnPlane.getMom(), measuredStateOnPlane.getCharge());
+    return std::make_tuple(ROOT::Math::XYZVector(measuredStateOnPlane.getPos()), ROOT::Math::XYZVector(measuredStateOnPlane.getMom()),
+                           measuredStateOnPlane.getCharge());
   }
 }
 
 RecoTrack* RecoTrack::copyToStoreArrayUsing(StoreArray<RecoTrack>& storeArray,
-                                            const TVector3& position, const TVector3& momentum, short charge,
+                                            const ROOT::Math::XYZVector& position, const ROOT::Math::XYZVector& momentum, short charge,
                                             const TMatrixDSym& covariance, double timeSeed) const
 {
   RecoTrack* newRecoTrack = storeArray.appendNew(position, momentum, charge,
@@ -524,7 +526,10 @@ RecoTrack* RecoTrack::copyToStoreArray(StoreArray<RecoTrack>& storeArray) const
 {
   if (wasFitSuccessful()) {
     const auto& mSoP = getMeasuredStateOnPlaneFromFirstHit();
-    return copyToStoreArrayUsing(storeArray, mSoP.getPos(), mSoP.getMom(), static_cast<short>(mSoP.getCharge()),
+    return copyToStoreArrayUsing(storeArray,
+                                 ROOT::Math::XYZVector(mSoP.getPos()),
+                                 ROOT::Math::XYZVector(mSoP.getMom()),
+                                 static_cast<short>(mSoP.getCharge()),
                                  mSoP.get6DCov(), mSoP.getTime());
   } else {
     return copyToStoreArrayUsingSeeds(storeArray);
@@ -621,26 +626,6 @@ const genfit::MeasuredStateOnPlane& RecoTrack::getMeasuredStateOnPlaneFromLastHi
   B2FATAL("There is no single hit with a valid mSoP in this track!");
 }
 
-std::string RecoTrack::getInfoHTML() const
-{
-  std::stringstream out;
-
-  out << "<b>Charge seed</b>=" << getChargeSeed();
-
-  out << "<b>pT seed</b>=" << getMomentumSeed().Pt();
-  out << ", <b>pZ seed</b>=" << getMomentumSeed().Z();
-  out << "<br>";
-  out << "<b>position seed</b>=" << getMomentumSeed().X() << ", " << getMomentumSeed().Y() << ", " << getMomentumSeed().Z();
-  out << "<br>";
-
-  for (const genfit::AbsTrackRep* rep : getRepresentations()) {
-    out << "<b>was fitted with " << rep->getPDG() << "</b>=" << wasFitSuccessful() << ", ";
-  }
-  out << "<br>";
-
-  return out.str();
-}
-
 void RecoTrack::estimateArmTime()
 {
   m_isArmTimeComputed = true;
@@ -730,4 +715,39 @@ bool RecoTrack::isOutgoingArm(RecoHitInformation::RecoHitDetector pre, RecoHitIn
     isOutgoing = true;
   }
   return isOutgoing;
+}
+
+void RecoTrack::flipTrackDirectionAndCharge(const genfit::AbsTrackRep* representation)
+{
+  const genfit::MeasuredStateOnPlane& measuredStateOnPlane = getMeasuredStateOnPlaneFromLastHit(representation);
+  const ROOT::Math::XYZVector& fittedPosition = ROOT::Math::XYZVector(measuredStateOnPlane.getPos());
+  const ROOT::Math::XYZVector& fittedMomentum = ROOT::Math::XYZVector(measuredStateOnPlane.getMom());
+  const double& fittedCharge = measuredStateOnPlane.getCharge();
+
+  // revert the charge and momentum
+  setChargeSeed(-fittedCharge);
+  setPositionAndMomentum(fittedPosition, -fittedMomentum);
+  revertRecoHitInformationSorting();
+  swapArmTimes();
+  setDirtyFlag();
+}
+
+std::string RecoTrack::getInfoHTML() const
+{
+  std::stringstream out;
+
+  out << "<b>Charge seed</b>=" << getChargeSeed();
+
+  out << "<b>pT seed</b>=" << getMomentumSeed().Rho();
+  out << ", <b>pZ seed</b>=" << getMomentumSeed().Z();
+  out << "<br>";
+  out << "<b>position seed</b>=" << getMomentumSeed().X() << ", " << getMomentumSeed().Y() << ", " << getMomentumSeed().Z();
+  out << "<br>";
+
+  for (const genfit::AbsTrackRep* rep : getRepresentations()) {
+    out << "<b>was fitted with " << rep->getPDG() << "</b>=" << wasFitSuccessful() << ", ";
+  }
+  out << "<br>";
+
+  return out.str();
 }

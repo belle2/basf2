@@ -96,7 +96,7 @@ class SVDValidationTTreeSimhit(b2.Module):
                 if not particle.hasStatus(Belle2.MCParticle.c_PrimaryParticle):
                     continue
 
-                length = (simhit.getPosOut() - simhit.getPosIn()).Mag()
+                length = (simhit.getPosOut() - simhit.getPosIn()).R()
                 # The deposited energy is the number of electrons multiplied
                 # by the energy required to create an electron-hole pair
                 energy = simhit.getElectrons() * Belle2.Const.ehEnergy

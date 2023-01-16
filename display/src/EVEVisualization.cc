@@ -49,6 +49,7 @@
 #include <framework/dataobjects/DisplayData.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/ColorPalette.h>
+#include <framework/geometry/XYZVectorToTVector3Converter.h>
 
 #include <Math/VectorUtil.h>
 #include <TEveArrow.h>
@@ -208,8 +209,8 @@ void EVEVisualization::addTrackCandidate(const std::string& collectionName,
 
 
   //track seeds
-  TVector3 track_pos = recoTrack.getPositionSeed();
-  TVector3 track_mom = recoTrack.getMomentumSeed();
+  const B2Vector3D& track_pos = recoTrack.getPositionSeed();
+  const B2Vector3D& track_mom = recoTrack.getMomentumSeed();
 
   TEveStraightLineSet* lines = new TEveStraightLineSet("RecoHits for " + label);
   lines->SetMainColor(c_recoTrackColor);
@@ -1059,18 +1060,18 @@ void EVEVisualization::makeLines(TEveTrack* eveTrack, const genfit::StateOnPlane
 
 void EVEVisualization::addSimHit(const CDCSimHit* hit, const MCParticle* particle)
 {
-  addSimHit(hit->getPosWire(), particle);
+  addSimHit(ROOT::Math::XYZVector(hit->getPosWire()), particle);
 }
 void EVEVisualization::addSimHit(const PXDSimHit* hit, const MCParticle* particle)
 {
   static VXD::GeoCache& geo = VXD::GeoCache::getInstance();
-  const TVector3& global_pos = geo.get(hit->getSensorID()).pointToGlobal(hit->getPosIn());
+  const ROOT::Math::XYZVector& global_pos = geo.get(hit->getSensorID()).pointToGlobal(hit->getPosIn());
   addSimHit(global_pos, particle);
 }
 void EVEVisualization::addSimHit(const SVDSimHit* hit, const MCParticle* particle)
 {
   static VXD::GeoCache& geo = VXD::GeoCache::getInstance();
-  const TVector3& global_pos = geo.get(hit->getSensorID()).pointToGlobal(hit->getPosIn());
+  const ROOT::Math::XYZVector& global_pos = geo.get(hit->getSensorID()).pointToGlobal(hit->getPosIn());
   addSimHit(global_pos, particle);
 }
 void EVEVisualization::addSimHit(const BKLMSimHit* hit, const MCParticle* particle)
@@ -1554,15 +1555,16 @@ void EVEVisualization::addROI(const ROIid* roi)
   double maxV = aSensorInfo.getVCellPosition(roi->getMaxVid());
 
 
-  TVector3 localA(minU, minV, 0);
-  TVector3 localB(minU, maxV, 0);
-  TVector3 localC(maxU, minV, 0);
+  ROOT::Math::XYZVector localA(minU, minV, 0);
+  ROOT::Math::XYZVector localB(minU, maxV, 0);
+  ROOT::Math::XYZVector localC(maxU, minV, 0);
 
-  TVector3 globalA = aSensorInfo.pointToGlobal(localA);
-  TVector3 globalB = aSensorInfo.pointToGlobal(localB);
-  TVector3 globalC = aSensorInfo.pointToGlobal(localC);
+  ROOT::Math::XYZVector globalA = aSensorInfo.pointToGlobal(localA);
+  ROOT::Math::XYZVector globalB = aSensorInfo.pointToGlobal(localB);
+  ROOT::Math::XYZVector globalC = aSensorInfo.pointToGlobal(localC);
 
-  TEveBox* ROIbox = boxCreator((globalB + globalC) * 0.5, globalB - globalA, globalC - globalA, 1, 1, 0.01);
+  TEveBox* ROIbox = boxCreator(XYZToTVector(globalB + globalC) * 0.5, XYZToTVector(globalB - globalA),
+                               XYZToTVector(globalC - globalA), 1, 1, 0.01);
 
   ROIbox->SetName(ObjectInfo::getIdentifier(roi));
   ROIbox->SetMainColor(kSpring - 9);
@@ -1577,15 +1579,15 @@ void EVEVisualization::addRecoHit(const SVDCluster* hit, TEveStraightLineSet* li
   static VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   const VXD::SensorInfoBase& sensor = geo.get(hit->getSensorID());
 
-  TVector3 a, b;
+  ROOT::Math::XYZVector a, b;
   if (hit->isUCluster()) {
     const float u = hit->getPosition();
-    a = sensor.pointToGlobal(TVector3(sensor.getBackwardWidth() / sensor.getWidth(0) * u, -0.5 * sensor.getLength(), 0.0));
-    b = sensor.pointToGlobal(TVector3(sensor.getForwardWidth() / sensor.getWidth(0) * u, +0.5 * sensor.getLength(), 0.0));
+    a = sensor.pointToGlobal(ROOT::Math::XYZVector(sensor.getBackwardWidth() / sensor.getWidth(0) * u, -0.5 * sensor.getLength(), 0.0));
+    b = sensor.pointToGlobal(ROOT::Math::XYZVector(sensor.getForwardWidth() / sensor.getWidth(0) * u, +0.5 * sensor.getLength(), 0.0));
   } else {
     const float v = hit->getPosition();
-    a = sensor.pointToGlobal(TVector3(-0.5 * sensor.getWidth(v), v, 0.0));
-    b = sensor.pointToGlobal(TVector3(+0.5 * sensor.getWidth(v), v, 0.0));
+    a = sensor.pointToGlobal(ROOT::Math::XYZVector(-0.5 * sensor.getWidth(v), v, 0.0));
+    b = sensor.pointToGlobal(ROOT::Math::XYZVector(+0.5 * sensor.getWidth(v), v, 0.0));
   }
 
   lines->AddLine(a.X(), a.Y(), a.Z(), b.X(), b.Y(), b.Z());

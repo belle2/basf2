@@ -36,6 +36,7 @@ DQMHistAnalysisInputTestModule::DQMHistAnalysisInputTestModule()
 {
   addParam("Experiment", m_expno, "Experiment Nr", 26u);
   addParam("Run", m_runno, "Run Number List", 1u);
+  addParam("RunType", m_runtype, "Run Type", std::string("physics"));
   addParam("Events", m_events, "Number of events for each run", 100u);
   addParam("NonFillMod", m_nonfillmod, "Non-Fill event Modulo, 0 disable", 7u);
   addParam("ConfigFiles", m_configs, "List of config files");
@@ -127,7 +128,7 @@ void DQMHistAnalysisInputTestModule::initialize()
         m_fill.push_back(fill);
         m_underflow.push_back(underflow);
 
-        if (dtype > 0) addDeltaPar(dir, name, dtype, parameter, amount); // only if we want delta for this one
+        if (dtype > 0) addDeltaPar(dir, name, HistDelta::EDeltaType(dtype), parameter, amount); // only if we want delta for this one
       }
     }
   }
@@ -191,6 +192,10 @@ void DQMHistAnalysisInputTestModule::event()
   m_eventMetaDataPtr->setRun(m_runno);
   m_eventMetaDataPtr->setEvent(m_count);
   m_eventMetaDataPtr->setTime(m_count * 1e9);
+  //setExpNr(m_expno); // redundant access from MetaData
+  //setRunNr(m_runno); // redundant access from MetaData
+  setRunType(m_runtype);
+  setEventProcessed(m_count * 10000); // just fix it for now.
   B2INFO("DQMHistAnalysisInputTest: event finished. count: " << m_count);
 
   PlotDelta();

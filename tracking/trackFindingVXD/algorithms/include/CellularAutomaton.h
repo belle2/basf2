@@ -37,7 +37,6 @@ namespace Belle2 {
        * TODO: Test Jakob's idea: Maybe its faster to recreate/refill an ActiveCell-List each round.
        */
       unsigned int activeCells = 1, // is set 1 because of following while loop.
-                   deadCells = 0,
                    caRound = 1,
                    goodNeighbours = 0,
                    highestCellState = 0;
@@ -68,7 +67,6 @@ namespace Belle2 {
             // WARNING setActivationState does provoke unintended behavior, since sometimes states can not be
             // upgraded in one round, but can in the next round!
             /*currentCell.setActivationState(false);*/
-            deadCells++;
           }
         }
 

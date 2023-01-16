@@ -30,6 +30,8 @@ RelatedTracksCombinerModule::RelatedTracksCombinerModule() :
   addParam("recoTracksStoreArrayName", m_recoTracksStoreArrayName, "Name of the output StoreArray.", m_recoTracksStoreArrayName);
   addParam("keepOnlyGoodQITracks", m_param_onlyGoodQITracks, "Only keep good QI tracks", m_param_onlyGoodQITracks);
   addParam("minRequiredQuality", m_param_qiCutValue, "Minimum QI to keep tracks", m_param_qiCutValue);
+  addParam("allow_more_mulitple_relations", m_allow_more_mulitple_relations, "Allow relations from one CDC track to m VXD tracks",
+           bool(false));
 }
 
 void RelatedTracksCombinerModule::initialize()
@@ -79,11 +81,16 @@ void RelatedTracksCombinerModule::event()
       continue;
     }
 
-    // TODO: This is upgrade specific. Sort tracks before according to layer number of first VTX hit
-    const auto sortByFirstVTXLayer = [](const RecoTrack * lhs, const RecoTrack * rhs) {
-      return lhs->getVTXHitList()[0]->getSensorID().getLayerNumber() < rhs->getVTXHitList()[0]->getSensorID().getLayerNumber();
-    };
-    sort(vxdTracksBefore.begin(), vxdTracksBefore.end(), sortByFirstVTXLayer);
+    if (not m_allow_more_mulitple_relations) {
+      B2ASSERT("Can not handle more than one before relation!", vxdTracksBefore.size() <= 1);
+      B2ASSERT("Can not handle more than one after relation!", vxdTracksAfter.size() <= 1);
+    } else {
+      // Presently, this works only for VTX upgrade case.
+      const auto sortByFirstVTXLayer = [](const RecoTrack * lhs, const RecoTrack * rhs) {
+        return lhs->getVTXHitList()[0]->getSensorID().getLayerNumber() < rhs->getVTXHitList()[0]->getSensorID().getLayerNumber();
+      };
+      sort(vxdTracksBefore.begin(), vxdTracksBefore.end(), sortByFirstVTXLayer);
+    }
 
     RecoTrack* newMergedTrack = nullptr;
 

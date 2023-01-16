@@ -1109,7 +1109,8 @@ def add_vtx_track_finding(
     path.add_module("RelatedTracksCombiner", VXDRecoTracksStoreArrayName=temporary_reco_tracks,
                     CDCRecoTracksStoreArrayName=input_reco_tracks,
                     recoTracksStoreArrayName=combined_vtx_cdc_standalone_tracks,
-                    keepOnlyGoodQITracks=keepOnlyGoodQITracks)
+                    keepOnlyGoodQITracks=keepOnlyGoodQITracks,
+                    allow_more_mulitple_relations=True)
 
     if use_vtx_to_cdc_ckf:
         path.add_module("ToCDCCKF",

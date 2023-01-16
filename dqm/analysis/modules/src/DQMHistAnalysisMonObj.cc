@@ -47,15 +47,6 @@ void DQMHistAnalysisMonObjModule::initialize()
   m_monObj->addCanvas(m_c_mask);
 }
 
-void DQMHistAnalysisMonObjModule::beginRun()
-{
-}
-
-void DQMHistAnalysisMonObjModule::event()
-{
-  // can put the analysis code here or in endRun() function
-  // for the start tests we will store output only end of run so better to put code there
-}
 
 void DQMHistAnalysisMonObjModule::endRun()
 {

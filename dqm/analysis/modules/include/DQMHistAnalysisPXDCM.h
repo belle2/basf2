@@ -27,7 +27,7 @@
 namespace Belle2 {
   /*! DQM Histogram Analysis for PXD Common Modes */
 
-  class DQMHistAnalysisPXDCMModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisPXDCMModule final : public DQMHistAnalysisModule {
 
     // Public functions
   public:
@@ -94,13 +94,13 @@ namespace Belle2 {
     /** threshold level/line for outside fraction */
     int m_upperLineFull{};
 
-    //! Module list for mask
-    std::vector <std::string> m_par_module_list;
-    //! Double-gate list for mask
-    std::vector <std::vector<int>> m_par_gate_list;
+    //! Module list for masking
+    std::vector <std::string> m_parModuleList;
+    //! Gate list for masking
+    std::vector <std::vector<int>> m_parGateList;
 
     //! Module wise gate masking in CM plot and alarm
-    std::map <VxdID, std::vector<int>> m_masked_gates;
+    std::map <VxdID, std::vector<int>> m_maskedGates;
 
     //! IDs of all PXD Modules to iterate over
     std::vector<VxdID> m_PXDModules;

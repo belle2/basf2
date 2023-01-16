@@ -114,6 +114,7 @@ void ProfileModule::storeMemoryGraph(const std::string& name, const std::string&
   if (!imgOutput.empty()) {
     TDirectory* saveDir = gDirectory;
     gROOT->cd();
+    gROOT->SetBatch(true);
     auto* can = new TCanvas();
     auto* graph = new TGraph(nPoints);
     for (int i = 0; i < nPoints; i++) {

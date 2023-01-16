@@ -147,8 +147,8 @@ void ParticleLoaderModule::initialize()
       if (m_useROEs) listName = mother->getFullName();
       // dummy particles get the full name
       else if (m_useDummy) listName = mother->getFullName();
-      // MC particles get the label "MC"
-      else if (m_useMCParticles) listName = mother->getName() + ":MC";
+      // MC particles get the full name
+      else if (m_useMCParticles) listName = mother->getFullName();
       // V0s get the label "V0"
       else if (nProducts > 0) listName = mother->getName() + ":V0";
 
@@ -164,6 +164,9 @@ void ParticleLoaderModule::initialize()
           StoreObjPtr<ParticleList> antiParticleList(antiListName);
           antiParticleList.registerInDataStore(flags);
         }
+      } else if (m_useMCParticles) {
+        B2WARNING("ParticleList " << listName << " already exists and will not be created again. " <<
+                  "The given options (addDaughters, skipNonPrimaryDaughters, skipNonPrimary) do not applied on the existing list.");
       }
 
       if (not isValidPDGCode(pdgCode) and (m_useMCParticles == false and m_useROEs == false and m_useDummy == false))
@@ -460,6 +463,8 @@ void ParticleLoaderModule::v0sToParticles()
       antiPlist->bindAntiParticleList(*(plist));
     }
 
+    plist->setEditable(true); // :V0 list is originally reserved. we have to set it as editable.
+
     // load reconstructed V0s as Kshorts (pi-pi+ combination), Lambdas (p+pi- combinations), and converted photons (e-e+ combinations)
     for (int i = 0; i < m_v0s.getEntries(); i++) {
       const V0* v0 = m_v0s[i];
@@ -561,6 +566,8 @@ void ParticleLoaderModule::v0sToParticles()
       Particle* newPart = m_particles.appendNew(v0P);
       plist->addParticle(newPart);
     }
+
+    plist->setEditable(false); // set the :V0 list as not editable.
   }
 }
 
@@ -593,6 +600,8 @@ void ParticleLoaderModule::tracksToParticles()
 
       antiPlist->bindAntiParticleList(*(plist));
     }
+
+    plist->setEditable(true); // :all list is originally reserved. we have to set it as editable.
 
     // the inner loop over all tracks from which Particles
     // are created, and get sorted in the particle lists
@@ -644,6 +653,8 @@ void ParticleLoaderModule::tracksToParticles()
 
       } // sanity check correct particle type
     } // loop over tracks
+
+    plist->setEditable(false); // set the :all list as not editable.
   } // particle lists
 }
 
@@ -675,6 +686,8 @@ void ParticleLoaderModule::eclAndKLMClustersToParticles()
 
       antiPlist->bindAntiParticleList(*(plist));
     }
+
+    plist->setEditable(true); // :all list is originally reserved. we have to set it as editable.
 
     // load reconstructed neutral ECL clusters as photons or Klongs or neutrons
     for (int i = 0; i < m_eclclusters.getEntries(); i++) {
@@ -777,6 +790,8 @@ void ParticleLoaderModule::eclAndKLMClustersToParticles()
       // add particle to list
       plist->addParticle(newPart);
     }
+
+    plist->setEditable(false); // set the :all list as not editable.
   } // loop over particle lists
 }
 
@@ -793,8 +808,6 @@ void ParticleLoaderModule::mcParticlesToParticles()
     bool isSelfConjugatedParticle = get<c_IsPListSelfConjugated>(mcParticle2Plist);
 
     StoreObjPtr<ParticleList> plist(listName);
-    // since a particle list in the ParticleLoader always contains all possible objects
-    // we check whether it already exists in this path and can skip any further steps if it does
     if (plist.isValid())
       continue;
     plist.create();
@@ -826,6 +839,7 @@ void ParticleLoaderModule::mcParticlesToParticles()
 
       plist->addParticle(newPart);
     }
+
   }
 }
 

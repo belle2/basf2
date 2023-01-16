@@ -1075,7 +1075,8 @@ def add_vtx_track_finding(
         else:
             path.add_module('VXDCDCTrackMerger',
                             CDCRecoTrackColName=input_reco_tracks,
-                            VXDRecoTrackColName=temporary_reco_tracks)
+                            VXDRecoTrackColName=temporary_reco_tracks,
+                            allow_more_mulitple_relations=True)
 
     elif vtx_ckf_mode == "VXDTF2_alone":
         add_vtx_track_finding_vxdtf2(path, components=["VTX"], reco_tracks=temporary_reco_tracks,

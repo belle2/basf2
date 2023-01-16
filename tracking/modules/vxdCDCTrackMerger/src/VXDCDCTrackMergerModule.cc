@@ -28,6 +28,12 @@ VXDCDCTrackMergerModule::VXDCDCTrackMergerModule() :
   addParam("merge_radius", m_merge_radius,
            "Maximum distance between extrapolated tracks on the CDC wall",
            double(2.0));
+
+  //merging parameters
+  addParam("allow_more_mulitple_relations", m_allow_more_mulitple_relations,
+           "Allow relations from one CDC track to m VXD tracks",
+           bool(false));
+
 }
 
 void VXDCDCTrackMergerModule::initialize()
@@ -75,7 +81,9 @@ void VXDCDCTrackMergerModule::event()
       continue;
 
     // skip CDC if it has already a match
-    if (cdcTrack.getRelated<RecoTrack>(m_VXDRecoTrackColName)) {
+    // you may want to allow using such CDC tracks of the vertex detector
+    // has enough layers to find a charged particle track twice.
+    if (cdcTrack.getRelated<RecoTrack>(m_VXDRecoTrackColName) and not m_allow_more_mulitple_relations) {
       continue;
     }
 

@@ -60,17 +60,11 @@ namespace Belle2 {
       addVariable(prefix + "first_cdc_layer", variableSet);
       addVariable(prefix + "last_cdc_layer", variableSet);
       addVariable(prefix + "ndf_hits", variableSet);
-      //addVariable(prefix + "inGoingArmTime", variableSet);
-      //addVariable(prefix + "inGoingArmTimeError", variableSet);
-      //addVariable(prefix + "outGoingArmTime", variableSet);
-      //addVariable(prefix + "outGoingArmTimeError", variableSet);
-      //addVariable(prefix + "timeDiffInAndOutArms", variableSet);
-      //addVariable(prefix + "timeDiffInAndOutArmsError", variableSet);
 
     }
 
     /// extract the actual variables and write into a variable set
-    void extractVariables(RecoTrack& recoTrack)
+    void extractVariables(const RecoTrack& recoTrack)
     {
 
 
@@ -111,13 +105,6 @@ namespace Belle2 {
       m_variables.at(m_prefix + "n_hits") = recoTrack.getNumberOfTrackingHits();
       m_variables.at(m_prefix + "n_svd_hits") = recoTrack.getNumberOfSVDHits();
       m_variables.at(m_prefix + "n_cdc_hits") = recoTrack.getNumberOfCDCHits();
-
-      //m_variables.at(m_prefix + "inGoingArmTime") = recoTrack.getIngoingArmTime();
-      //m_variables.at(m_prefix + "inGoingArmTimeError") = recoTrack.getIngoingArmTimeError();
-      //m_variables.at(m_prefix + "outGoingArmTime") = recoTrack.getOutgoingArmTime();
-      //m_variables.at(m_prefix + "outGoingArmTimeError") = recoTrack.getOutgoingArmTimeError();
-      //m_variables.at(m_prefix + "timeDiffInAndOutArms") = recoTrack.getInOutArmTimeDifference();
-      //m_variables.at(m_prefix + "timeDiffInAndOutArmsError") = recoTrack.getInOutArmTimeDifferenceError();
 
       RecoTrack* svdcdc_recoTrack =  recoTrack.getRelated<RecoTrack>("SVDCDCRecoTracks");
       if (svdcdc_recoTrack) {

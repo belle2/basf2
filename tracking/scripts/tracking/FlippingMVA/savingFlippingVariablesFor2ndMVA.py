@@ -18,7 +18,7 @@ ROOT.gSystem.Load("libtracking")
 class Saving2ndMVAData(harvesting.HarvestingModule):
     """ A dedicated module to save the variables using in flipping steps"""
 
-    def __init__(self, name, contact=None, preInfo="", checkObj='RecoTracks', output_file_name='flip-refit-MVA2.root'):
+    def __init__(self, name, contact=None, checkObj='RecoTracks', output_file_name='flip-refit-MVA2.root'):
         """Constructor"""
         super().__init__(foreach=checkObj, name=name, contact=contact, output_file_name=output_file_name)
 
@@ -30,9 +30,6 @@ class Saving2ndMVAData(harvesting.HarvestingModule):
 
         #: Reference to the track match lookup object reading the relation information
         self.track_match_look_up = None
-
-        #: preInfo (maybe not needed?)
-        self.preInfo = preInfo
 
         #: Name of the output file
         self.outputname = output_file_name

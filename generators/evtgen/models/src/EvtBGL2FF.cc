@@ -28,12 +28,12 @@ EvtBGL2FF::EvtBGL2FF(double bglap_0, double bglap_1, double bglap_2, double bgla
   ap_0 = bglap_0;
   ap_1 = bglap_1;
   ap_2 = bglap_2;
-  ap_3 = bglap_3;
+  ap_3 = bglap_3; // set to 0 for N = 2 expansion
 
   a0_0 = bgla0_0;
   a0_1 = bgla0_1;
   a0_2 = bgla0_2;
-  a0_3 = bgla0_3;
+  a0_3 = bgla0_3; // set to 0 for N = 2 expansion
 
   return;
 }

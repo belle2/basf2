@@ -14,6 +14,8 @@
 
 #include <framework/core/Module.h>
 #include <dqm/core/MonitoringObject.h>
+#include <dqm/analysis/HistObject.h>
+#include <dqm/analysis/HistDelta.h>
 #include <TFile.h>
 #include <TH1.h>
 
@@ -31,37 +33,104 @@ namespace Belle2 {
     /**
      * The type of list of histograms.
      */
-    typedef std::map<std::string, TH1*> HistList;
+    typedef std::map<std::string, HistObject> HistList;
     /**
      * The type of list of MonitoringObjects.
      */
     typedef std::map<std::string, MonitoringObject*> MonObjList;
 
+    /**
+     * The type of list of delta settings and histograms.
+     */
+    typedef std::map<std::string, HistDelta*> DeltaList;
 
+    /**
+     * The type of list of canvas updated status.
+     */
+    typedef std::map<std::string, bool> CanvasUpdatedList;
 
   private:
     /**
      * The list of Histograms.
      */
-    static HistList g_hist;
+    static HistList s_histList;
     /**
      * The list of MonitoringObjects.
      */
-    static MonObjList g_monObj;
+    static MonObjList s_monObjList;
 
+    /**
+     * The list of Delta Histograms and settings.
+     */
+    static DeltaList s_deltaList;
+
+    /**
+     * The list of canvas updated status.
+     */
+    static CanvasUpdatedList s_canvasUpdatedList;
+
+    /**
+     * Number of Events processed to fill histograms.
+     * Attention: histograms are updates asynchronously
+     * Thus the number for a specific histogram may be lower or
+     * higher. If you need precise number, you must fill
+     * it in the histogram itself (e.g. underflow bin)
+     */
+    inline static int s_eventProcessed = 0;
+
+    /**
+     * The Run type.
+     */
+    inline static std::string s_runType = "";
 
   public:
     /**
      * Get the list of the histograms.
      * @return The list of the histograms.
      */
-    static const HistList& getHistList() { return g_hist;};
+    static const HistList& getHistList() { return s_histList;};
 
     /**
      * Get the list of MonitoringObjects.
      * @return The list of the MonitoringObjects.
      */
-    static const MonObjList& getMonObjList() { return g_monObj;};
+    static const MonObjList& getMonObjList() { return s_monObjList;};
+
+    /**
+     * Get the list of the delta histograms.
+     * @return The list of the delta histograms.
+     */
+    static const DeltaList& getDeltaList() { return s_deltaList;};
+
+    /**
+     * Get the list of the canvas update status.
+     * @return The list of the canvases.
+     */
+    static const CanvasUpdatedList& getCanvasUpdatedList() { return s_canvasUpdatedList;};
+
+    /**
+     * Get the Run Type.
+     * @return Run type string.
+     */
+    static const std::string& getRunType(void) { return s_runType;};
+
+    /**
+     * Get the number of processed events. (Attention, asynch histogram updates!)
+     * @return Processed events.
+     */
+    static int getEventProcessed(void) { return s_eventProcessed;};
+
+    /**
+     * Set the Run Type.
+     * @par t Run type string.
+     */
+    void setRunType(std::string& t) {s_runType = t;};
+
+    /**
+     * Set the number of processed events. (Attention, asynch histogram updates!)
+     * @par e Processed events.
+     */
+    void setEventProcessed(int e) {s_eventProcessed = e;};
 
     /**
      * Find canvas by name
@@ -71,20 +140,22 @@ namespace Belle2 {
     TCanvas* findCanvas(TString cname);
 
     /**
-     * Find histogram.
-     * @param histname The name of the histogram.
+     * Get histogram from list (no other search).
+     * @param histname The name of the histogram (incl dir).
+     * @param onlyIfUpdated req only updated hists, return nullptr otherwise
      * @return The found histogram, or nullptr if not found.
      */
-    static TH1* findHist(const std::string& histname);
+    static TH1* findHist(const std::string& histname, bool onlyIfUpdated = false);
 
     /**
      * Find histogram.
      * @param dirname  The name of the directory.
      * @param histname The name of the histogram.
+     * @param onlyIfUpdated req only updated hists, return nullptr otherwise
      * @return The found histogram, or nullptr if not found.
      */
     static TH1* findHist(const std::string& dirname,
-                         const std::string& histname);
+                         const std::string& histname, bool onlyIfUpdated = false);
 
     /**
      * Find histogram in specific TFile (e.g. ref file).
@@ -108,6 +179,14 @@ namespace Belle2 {
      */
     static MonitoringObject* findMonitoringObject(const std::string& objName);
 
+    /**
+     * Helper function to compute half of the central interval covering 68% of a distribution.
+     * This quantity is an alternative to the standard deviation.
+     * @param h histogram
+     * @return Half of the central interval covering 68% of a distribution.
+     */
+    double getSigma68(TH1* h) const;
+
   public:
     /**
      * Add histogram.
@@ -121,20 +200,72 @@ namespace Belle2 {
     /**
      * Get MonitoringObject with given name (new object is created if non-existing)
      * @param histname name of MonitoringObject to get
+     * @return The MonitoringObject
      */
     static MonitoringObject* getMonitoringObject(const std::string& histname);
 
     /**
-     * Clear and reset the list of histograms.
+     * Reset the list of histograms.
      */
-    static void resetHist() { g_hist = std::map<std::string, TH1*>(); }
+    static void initHistListBeforeEvent(void);
+
+    /**
+     * Clears the list of histograms.
+     */
+    static void clearHistList(void);
+
+    /**
+     * Get Delta histogram.
+     * @param fullname directory+name of histogram
+     * @param n index of delta histogram, 0 is most recent one
+     * @param onlyIfUpdated req only updated deltas, return nullptr otherwise
+     * @return delta histogram or nullptr
+     */
+    TH1* getDelta(const std::string& fullname, int n = 0, bool onlyIfUpdated = true);
+
+    /**
+     * Get Delta histogram.
+     * @param dirname directory
+     * @param histname name of histogram
+     * @param n index of delta histogram, 0 is most recent one
+     * @param onlyIfUpdated req only updated deltas, return nullptr otherwise
+     * @return delta histogram or nullptr
+     */
+    TH1* getDelta(const std::string& dirname, const std::string& histname, int n = 0, bool onlyIfUpdated = true);
+
+    /**
+     * Add Delta histogram parameters.
+     * @param dirname directory
+     * @param histname name of histogram
+     * @param t type of delta histogramming
+     * @param p numerical parameter depnding on type, e.g. number of entries
+     * @param a amount of histograms in the past
+     */
+    void addDeltaPar(const std::string& dirname, const std::string& histname,  HistDelta::EDeltaType t, int p, unsigned int a);
+
+    /**
+     * Mark canvas as updated (or not)
+     * @param name name of Canvas
+     * @param updated was updated
+     */
+    void UpdateCanvas(std::string name, bool updated = true);
+
+    /**
+     * Extract Run Type from histogram title, called from input module
+     */
+    void ExtractRunType(std::vector <TH1*>& hs);
+
+    /**
+     * Extract event processed from daq histogram, called from input module
+     */
+    void ExtractEvent(std::vector <TH1*>& hs);
 
     // Public functions
   public:
 
     //! Constructor / Destructor
     DQMHistAnalysisModule();
-    virtual ~DQMHistAnalysisModule();
+    virtual ~DQMHistAnalysisModule() {};
 
     /**
      * Helper function for string token split

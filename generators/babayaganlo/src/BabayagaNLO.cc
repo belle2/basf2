@@ -10,7 +10,7 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 #include <framework/dataobjects/EventMetaData.h>
-#include <analysis/dataobjects/EventExtraInfo.h>
+#include <framework/dataobjects/EventExtraInfo.h>
 
 #include <TDatabasePDG.h>
 #include <TRandom3.h>
@@ -328,7 +328,8 @@ void BabayagaNLO::init()
 }
 
 
-void BabayagaNLO::generateEvent(MCParticleGraph& mcGraph, double ecm, TVector3 vertex, ROOT::Math::LorentzRotation boost)
+void BabayagaNLO::generateEvent(MCParticleGraph& mcGraph, double ecm, ROOT::Math::XYZVector vertex,
+                                ROOT::Math::LorentzRotation boost)
 {
   //Generate event
   int mode = 1;
@@ -484,7 +485,7 @@ void BabayagaNLO::applySettings()
 }
 
 
-void BabayagaNLO::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, TVector3 vertex,
+void BabayagaNLO::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, ROOT::Math::XYZVector vertex,
                                 ROOT::Math::LorentzRotation boost, bool isVirtual, bool isInitial, bool isISRFSR)
 {
 
@@ -511,7 +512,7 @@ void BabayagaNLO::storeParticle(MCParticleGraph& mcGraph, const double* mom, int
   part.setPDG(pdg);
   part.setFirstDaughter(0);
   part.setLastDaughter(0);
-  part.setMomentum(TVector3(mom[0], mom[1], mom[2]));
+  part.setMomentum(ROOT::Math::XYZVector(mom[0], mom[1], mom[2]));
   part.setMass(TDatabasePDG::Instance()->GetParticle(pdg)->Mass());
   part.setEnergy(mom[3]);
 
@@ -522,7 +523,7 @@ void BabayagaNLO::storeParticle(MCParticleGraph& mcGraph, const double* mom, int
 
   //set vertex
   if (!isInitial) {
-    B2Vector3D v3 = part.getProductionVertex();
+    ROOT::Math::XYZVector v3 = part.getProductionVertex();
     v3 = v3 + vertex;
     part.setProductionVertex(v3);
     part.setValidVertex(true);

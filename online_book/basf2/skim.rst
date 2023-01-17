@@ -12,24 +12,24 @@ Skimming
 
     **Prerequisites**:
 
-        * :ref:`gbasf2 lesson <onlinebook_gbasf2>`
+    * :ref:`gbasf2 lesson <onlinebook_gbasf2>`
 
     **Questions**:
 
-        * What are skims, and why should analysts use skims?
+    * What are skims, and why should analysts use skims?
 
-        * How can I find information about what skims are available?
+    * How can I find information about what skims are available?
 
     **Objectives**:
 
-        * Find documentation about available skims.
+    * Find documentation about available skims.
 
-        * Run a skim on a file using the command-line tool :ref:`b2skim-run
-          <b2skim-run>`.
+    * Run a skim on a file using the command-line tool :ref:`b2skim-run
+      <b2skim-run>`.
 
-        * Add an existing skim to a steering file.
+    * Add an existing skim to a steering file.
 
-        * Find information about skims available on the grid.
+    * Find information about skims available on the grid.
 
 
 What is skimming?
@@ -62,15 +62,15 @@ Skims are intended into reduce the overall CPU requirements of the
 collaboration, and to make your life easier. Skims can make your life easier in
 the following ways:
 
-    * Skimmed files are generally less than 10% the size of the original
-      (unskimmed) files, so your steering file will not need to process as many
-      events, and your jobs will finish quicker.
+* Skimmed files are generally less than 10% the size of the original
+  (unskimmed) files, so your steering file will not need to process as many
+  events, and your jobs will finish quicker.
 
-    * The particles reconstructed during a skim are available when you load in
-      the skimmed uDST, so you can use these in further reconstruction. For
-      example, there are skims which use the :ref:`FEI <onlinebook_fei>`, so
-      this computationally expensive reconstruction is performed during the
-      skimming step and does not need to be repeated in later reconstruction.
+* The particles reconstructed during a skim are available when you load in
+  the skimmed uDST, so you can use these in further reconstruction. For
+  example, there are skims which use the :ref:`FEI <onlinebook_fei>`, so
+  this computationally expensive reconstruction is performed during the
+  skimming step and does not need to be repeated in later reconstruction.
 
 
 Mechanics of a skim
@@ -367,7 +367,7 @@ documentation helpful.
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Authors of this lesson
+.. rubric:: Authors of this lesson
 
-     Phil Grace, Racha Cheaib
+Phil Grace, Racha Cheaib
 

@@ -18,8 +18,6 @@
 
 import basf2 as b2
 import generators as ge
-import simulation as si
-import reconstruction as re
 
 # create path
 main = b2.create_path()
@@ -29,12 +27,6 @@ main.add_module("EventInfoSetter", expList=1003, runList=0, evtNumList=2000)
 
 # generate BBbar events
 ge.add_evtgen_generator(path=main, finalstate='mixed')
-
-# detector simulation
-si.add_simulation(path=main)
-
-# reconstruction
-re.add_reconstruction(path=main, reconstruct_cdst='rawFormat')
 
 # finally add cdst output
 main.add_module('RootOutput', outputFileName='../mixed.cdst.root')

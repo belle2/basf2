@@ -27,6 +27,8 @@
 // random generator
 #include <TRandom.h>
 
+#include <Math/VectorUtil.h>
+
 // coordinates translation
 #include <iostream>
 #include <TGeoMatrix.h>
@@ -140,11 +142,11 @@ void BeamBkgGeneratorModule::initialize()
 
   if (m_ringName == "LER") {
     GearDir ring("/Detector/SuperKEKB/LER/");
-    m_rotation.RotateY(ring.getAngle("angle"));
+    m_rotation.SetAngle(ring.getAngle("angle"));
     m_ring = 2;
   } else {
     GearDir ring("/Detector/SuperKEKB/HER/");
-    m_rotation.RotateY(ring.getAngle("angle"));
+    m_rotation.SetAngle(ring.getAngle("angle"));
     m_ring = 1;
   }
 
@@ -194,13 +196,13 @@ void BeamBkgGeneratorModule::event()
 
   // transform to Belle II (flip sign of y and s, rotate)
 
-  TVector3 position(m_sad.x * Unit::m, -m_sad.y * Unit::m, -m_sad.s * Unit::m);
-  position.Transform(m_rotation);
+  ROOT::Math::XYZVector position(m_sad.x * Unit::m, -m_sad.y * Unit::m, -m_sad.s * Unit::m);
+  position = m_rotation * position;
 
   double pz = sqrt(m_sad.E * m_sad.E - m_sad.px * m_sad.px - m_sad.py * m_sad.py);
   if (m_ringName == "LER") pz = -pz;
-  TVector3 momentum(m_sad.px, -m_sad.py, pz);
-  momentum.Transform(m_rotation);
+  ROOT::Math::XYZVector momentum(m_sad.px, -m_sad.py, pz);
+  momentum = m_rotation * momentum;
 
   // PDG code and mass
 
@@ -243,8 +245,8 @@ void BeamBkgGeneratorModule::event()
     transMatrix.LocalToMaster(particlePosSADfar, particlePosGeant4); // position
     transMatrix.LocalToMasterVect(particleMomSADfar, particleMomGeant4); // momentum
     // apply a new set of coordinates
-    part->setMomentum(TVector3(particleMomGeant4));
-    part->setProductionVertex(TVector3(particlePosGeant4));
+    part->setMomentum(ROOT::Math::XYZVector(particleMomGeant4[0], particleMomGeant4[1], particleMomGeant4[2]));
+    part->setProductionVertex(ROOT::Math::XYZVector(particlePosGeant4[0], particlePosGeant4[1], particlePosGeant4[2]));
   }
 }
 

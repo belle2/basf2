@@ -57,6 +57,9 @@ ParticleListManipulatorModule::ParticleListManipulatorModule():
   addParam("writeOut", m_writeOut,
            "If true, the output ParticleList will be saved by RootOutput. If false, it will be ignored when writing the file.", false);
 
+  addParam("ignoreMotherFlavor", m_ignoreMotherFlavor,
+           "If true, the flavor of the mother particle is ignored.", false);
+
   // initializing the rest of private members
   m_pdgCode   = 0;
   m_isSelfConjugatedParticle = false;
@@ -87,13 +90,17 @@ void ParticleListManipulatorModule::initialize()
     B2FATAL("You have tried to create the list " << m_outputListName <<
             " but the label 'all' is forbidden for user-defined lists of final-state particles." <<
             " It could introduce *very* dangerous bugs.");
-  } else if ((listLabel == "MC") or (listLabel == "V0" and not(("K_S0:mdst" == m_inputListNames[0])
-                                     or ("Lambda0:mdst" == m_inputListNames[0]) or ("gamma:v0mdst" == m_inputListNames[0])))) {
-    // the labels MC, and V0 are also protected
+  } else if (listLabel == "V0" and
+             not(("K_S0:mdst" == m_inputListNames[0]) or ("Lambda0:mdst" == m_inputListNames[0]) or ("gamma:v0mdst" == m_inputListNames[0]))) {
+    // the label V0 is also protected
     // copying of some B2BII V0 lists has to be allowed to not break the FEI
     B2FATAL("You have tried to create the list " << m_outputListName <<
             " but the label " << listLabel << " is not allowed for merged or copied particle lists.");
   }
+
+  if (listLabel == "V0" and
+      (("K_S0:mdst" == m_inputListNames[0]) or ("Lambda0:mdst" == m_inputListNames[0]) or ("gamma:v0mdst" == m_inputListNames[0])))
+    m_exceptionForV0B2BII = true;
 
   m_outputAntiListName = ParticleListName::antiParticleListName(m_outputListName);
   m_isSelfConjugatedParticle = (m_outputListName == m_outputAntiListName);
@@ -153,10 +160,13 @@ void ParticleListManipulatorModule::event()
       const Particle* particle = m_particleList->getParticle(i);
 
       std::vector<int> idSeq;
-      fillUniqueIdentifier(particle, idSeq);
+      fillUniqueIdentifier(particle, idSeq, m_ignoreMotherFlavor);
       m_particlesInTheList.push_back(idSeq);
     }
   }
+
+  if (m_exceptionForV0B2BII)
+    m_particleList->setEditable(true);
 
   // create list of candidate indices and corresponding sorting values
   typedef std::pair<double, unsigned int> ValueIndexPair;
@@ -202,7 +212,7 @@ void ParticleListManipulatorModule::event()
     const Particle* part = m_particles[candidate.second];
 
     std::vector<int> idSeq;
-    fillUniqueIdentifier(part, idSeq);
+    fillUniqueIdentifier(part, idSeq, m_ignoreMotherFlavor);
     bool uniqueSeq = isUnique(idSeq);
 
     if (uniqueSeq) {
@@ -210,11 +220,16 @@ void ParticleListManipulatorModule::event()
       m_particlesInTheList.push_back(idSeq);
     }
   }
+
+  if (m_exceptionForV0B2BII)
+    m_particleList->setEditable(false);
+
 }
 
-void ParticleListManipulatorModule::fillUniqueIdentifier(const Particle* p, std::vector<int>& idSequence)
+void ParticleListManipulatorModule::fillUniqueIdentifier(const Particle* p, std::vector<int>& idSequence, bool ignoreMotherFlavor)
 {
-  idSequence.push_back(p->getPDGCode());
+  if (ignoreMotherFlavor) idSequence.push_back(abs(p->getPDGCode()));
+  else idSequence.push_back(p->getPDGCode());
 
   if (p->getNDaughters() == 0) {
     idSequence.push_back(p->getMdstArrayIndex());
@@ -227,7 +242,7 @@ void ParticleListManipulatorModule::fillUniqueIdentifier(const Particle* p, std:
     });
     // this is not FSP (go one level down)
     for (const auto& daughter : daughters)
-      fillUniqueIdentifier(daughter, idSequence);
+      fillUniqueIdentifier(daughter, idSequence, false);
   }
 }
 

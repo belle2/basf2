@@ -59,7 +59,7 @@ KLMDQMModule::~KLMDQMModule()
   KLMChannelIndex klmIndex(KLMChannelIndex::c_IndexLevelSector);
   for (KLMChannelIndex& klmSector : klmIndex) {
     KLMSectorNumber sector = klmSector.getKLMSectorNumber();
-    uint16_t sectorIndex = m_SectorArrayIndex->getIndex(sector);
+    KLMSectorNumber sectorIndex = m_SectorArrayIndex->getIndex(sector);
     if (m_ChannelHits[sectorIndex] != nullptr)
       delete[] m_ChannelHits[sectorIndex];
   }
@@ -119,7 +119,8 @@ void KLMDQMModule::defineHisto()
     m_ChannelHitHistogramsBKLM +
     EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder() *
     m_ChannelHitHistogramsEKLM;
-  uint16_t* firstChannelNumbers = new uint16_t[nChannelHistograms + 1];
+  KLMChannelNumber* firstChannelNumbers =
+    new KLMChannelNumber[nChannelHistograms + 1];
   int i = 0;
   KLMChannelIndex klmIndex(KLMChannelIndex::c_IndexLevelSector);
   for (KLMChannelIndex& klmSector : klmIndex) {
@@ -155,7 +156,7 @@ void KLMDQMModule::defineHisto()
     else
       nHistograms = m_ChannelHitHistogramsEKLM;
     KLMSectorNumber sector = klmSector.getKLMSectorNumber();
-    uint16_t sectorIndex = m_SectorArrayIndex->getIndex(sector);
+    KLMSectorNumber sectorIndex = m_SectorArrayIndex->getIndex(sector);
     m_ChannelHits[sectorIndex] = new TH1F*[nHistograms];
     for (int j = 0; j < nHistograms; j++) {
       std::string name =
@@ -176,14 +177,14 @@ void KLMDQMModule::defineHisto()
   delete[] firstChannelNumbers;
   /* Masked channels per sector:
    * it is defined here, but filled by the analysis module. */
-  uint16_t totalSectors = m_SectorArrayIndex->getNElements();
+  KLMSectorNumber totalSectors = m_SectorArrayIndex->getNElements();
   m_MaskedChannelsPerSector = new TH1F("masked_channels", "Number of masked channels per sector",
                                        totalSectors, -0.5, totalSectors - 0.5);
   klmIndex.setIndexLevel(KLMChannelIndex::c_IndexLevelSector);
   for (KLMChannelIndex& klmSector : klmIndex) {
     std::string label = m_ElementNumbers->getSectorDAQName(klmSector.getSubdetector(), klmSector.getSection(), klmSector.getSector());
     KLMSectorNumber sector = klmSector.getKLMSectorNumber();
-    uint16_t sectorIndex = m_SectorArrayIndex->getIndex(sector);
+    KLMSectorNumber sectorIndex = m_SectorArrayIndex->getIndex(sector);
     m_MaskedChannelsPerSector->GetXaxis()->SetBinLabel(sectorIndex + 1, label.c_str());
   }
   m_MaskedChannelsPerSector->SetOption("LIVE");
@@ -303,7 +304,7 @@ void KLMDQMModule::beginRun()
     else
       nHistograms = m_ChannelHitHistogramsEKLM;
     KLMSectorNumber sector = klmSector.getKLMSectorNumber();
-    uint16_t sectorIndex = m_SectorArrayIndex->getIndex(sector);
+    KLMSectorNumber sectorIndex = m_SectorArrayIndex->getIndex(sector);
     for (int j = 0; j < nHistograms; j++)
       m_ChannelHits[sectorIndex][j]->Reset();
   }
@@ -357,7 +358,7 @@ void KLMDQMModule::event()
       int strip = digit.getStrip();
       if (not digit.isMultiStrip()) {
         KLMSectorNumber klmSector = m_ElementNumbers->sectorNumberEKLM(section, sector);
-        uint16_t klmSectorIndex = m_SectorArrayIndex->getIndex(klmSector);
+        KLMSectorNumber klmSectorIndex = m_SectorArrayIndex->getIndex(klmSector);
         KLMChannelNumber channel = m_ElementNumbers->channelNumberEKLM(section, sector, layer, plane, strip);
         KLMChannelNumber channelIndex = m_ChannelArrayIndex->getIndex(channel);
         for (int j = 0; j < m_ChannelHitHistogramsEKLM; j++) {
@@ -394,7 +395,7 @@ void KLMDQMModule::event()
       int strip = digit.getStrip();
       if (not digit.isMultiStrip()) {
         KLMSectorNumber klmSector = m_ElementNumbers->sectorNumberBKLM(section, sector);
-        uint16_t klmSectorIndex = m_SectorArrayIndex->getIndex(klmSector);
+        KLMSectorNumber klmSectorIndex = m_SectorArrayIndex->getIndex(klmSector);
         KLMChannelNumber channel = m_ElementNumbers->channelNumberBKLM(section, sector, layer, plane, strip);
         KLMChannelNumber channelIndex = m_ChannelArrayIndex->getIndex(channel);
         for (int j = 0; j < m_ChannelHitHistogramsBKLM; j++) {

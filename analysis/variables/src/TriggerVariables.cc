@@ -361,19 +361,35 @@ namespace Belle2 {
     REGISTER_VARIABLE("L1Trigger", L1Trigger,
                       "[Eventbased] Returns 1 if at least one PSNM L1 trigger bit is true.");
     REGISTER_METAVARIABLE("L1PSNM(name)", L1PSNM,
-                          "[Eventbased] Returns the PSNM (Prescale And Mask, after prescale) status of the trigger bit with the given name.",
+                          R"DOC(
+[Eventbased] Returns the PSNM (Prescale And Mask, after prescale) status (1 or 0) of the output trigger bit with the given name. 
+For some output trigger bits, we assign a prescale factor to reduce the number of triggered events. 
+For example, we want to keep only 1% of Bhabha events. A prescale factor of 100 is then assigned to ``bha_3D`` (Bhabha selected in 3D criteria). 
+Prescale factor of a given output trigger bit could be different in different datasets. 
+It is recommended to use prescaled trigger bits (L1PSNM) or un-prescaled trigger bits (L1FTDL) for your analysis. 
+In run-independent MC, configuration of the prescales in TSIM (trigger simulation) can be different from data, so L1 FTDL is recommended. 
+In run-dependent MC, configuration of the prescales in TSIM is consistent with data, so L1PSNM is recommended.
+Please check on `the dedicated Confluence page <https://confluence.desy.de/display/BI/TriggerBitTable>`__ or or `the dedicated Belle II notes <https://docs.belle2.org/search?ln=en&p=%22Trigger+Summary%22&f=&action_search=Search&c=Belle+II+Notes>`__ to find out the definition of trigger bits.
+)DOC",
                           Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("L1FTDL(name)", L1FTDL,
-                          "[Eventbased] Returns the FTDL (Final Trigger Decision Logic, before prescale) status of the trigger bit with the given name.",
+                          R"DOC(
+[Eventbased] Returns the FTDL (Final Trigger Decision Logic, before prescale) status (1 or 0) of the output trigger bit with the given name. Output bits are the outputs of GDL, combining different input trigger bits for final decision. For example, ``ty_0/1/2/3`` is one of the input trigger bits meaning the number of neuro 3D tracks is one/two/three/more than three. While ``yyy`` is one of the output trigger bits meaning ``(ty_2 or ty_3) and !veto``. Please check on `the dedicated Confluence page <https://confluence.desy.de/display/BI/TriggerBitTable>`__ or or `the dedicated Belle II notes <https://docs.belle2.org/search?ln=en&p=%22Trigger+Summary%22&f=&action_search=Search&c=Belle+II+Notes>`__ to find out the definition of trigger bits.
+)DOC",
                           Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("L1Input(name)", L1Input,
-                          "[Eventbased] Returns the input bit status of the trigger bit with the given name.", Manager::VariableDataType::c_double);
+                          R"DOC(
+[Eventbased] Returns the input bit status (1 or 0) of the trigger bit with the given name. Input trigger bits are predefined selections from each sub-detector, with adjustment of the delay and width, in order to fix latency on GDL. For example, ``ty_0/1/2/3`` is one of the input trigger bits meaning the number of neuro 3D tracks is one/two/three/more than three. Please check on `the dedicated Confluence page <https://confluence.desy.de/display/BI/TriggerBitTable>`__ or or `the dedicated Belle II notes <https://docs.belle2.org/search?ln=en&p=%22Trigger+Summary%22&f=&action_search=Search&c=Belle+II+Notes>`__ to find out the definition of trigger bits.
+)DOC", 
+                          Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("L1Prescale(name)", L1PSNMPrescale,
-                          "[Eventbased] Returns the PSNM (prescale and mask) prescale of the trigger bit with the given name.",
+                          R"DOC(
+[Eventbased] Returns the PSNM (prescale and mask) prescale factor of the trigger bit with the given name. Definition of prescale factor is shown in a few lines before in `L1PSNM`. Prescale factors are usually dependent on different datasets.
+)DOC",
                           Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("L1PSNMBit(i)", L1PSNMBit,
                       R"DOC(
-[Eventbased] Returns the PSNM (Prescale And Mask, after prescale) status of i-th trigger bit.
+[Eventbased] Returns the PSNM (Prescale And Mask, after prescale) status (1 or 0) of i-th trigger bit.
 
 .. warning::
   It is recommended to use this variable only for debugging and to use :b2:var:`L1PSNM`
@@ -381,7 +397,7 @@ namespace Belle2 {
 )DOC");
     REGISTER_VARIABLE("L1FTDLBit(i)", L1FTDLBit,
                       R"DOC(
-[Eventbased] Returns the FTDL (Final Trigger Decision Logic, before prescale) status of i-th trigger bit.
+[Eventbased] Returns the FTDL (Final Trigger Decision Logic, before prescale) status (1 or 0) of i-th trigger bit.
 
 .. warning::
   It is recommended to use this variable only for debugging and to use :b2:var:`L1FTDL`
@@ -389,7 +405,7 @@ namespace Belle2 {
 )DOC");
     REGISTER_VARIABLE("L1InputBit(i)", L1InputBit,
                       R"DOC(
-[Eventbased] Returns the input bit status of the i-th input trigger bit.
+[Eventbased] Returns the input bit status (1 or 0) of the i-th input trigger bit.
 
 .. warning::
   It is recommended to use this variable only for debugging and to use :b2:var:`L1Input`
@@ -404,9 +420,9 @@ namespace Belle2 {
   with the explicit trigger bit name for physics analyses or performance studies.
 )DOC");
     REGISTER_VARIABLE("L1TimeType", L1TimeType,
-                      "[Eventbased] Returns ETimingType time type.");
+                      "[Eventbased] Returns kind of detector which determines the Level1 trigger timing. 0:ECL, 1:TOP, 2:SELF(timing of PSNM bit), 3:CDC, 5:delayed bhabha, 7: random, 13:poisson.");
     REGISTER_VARIABLE("L1TimeQuality", L1TimeQuality,
-                      "[Eventbased] Returns ETimingQuality time quality.");
+                      "[Eventbased] Returns expected Level1 timing resolution. This flag will be used for SVD 3-point sampling in future. 0:None; 1:Coarse (sigma > x ns); 2:FINE (sigma < x ns); x has been set to about 5ns before LS1 but can be changed in future");
     REGISTER_VARIABLE("isPoissonTriggerInInjectionVeto", isPoissonInInjectionVeto,
                       "[Eventbased] Returns 1 if the poisson random trigger is within the injection veto window.");
     //-------------------------------------------------------------------------

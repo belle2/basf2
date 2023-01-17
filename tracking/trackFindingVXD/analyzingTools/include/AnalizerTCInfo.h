@@ -13,7 +13,7 @@
 #include <tracking/trackFindingVXD/analyzingTools/TCType.h>
 
 // root:
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 
 // stl:
 #include <vector>
@@ -26,10 +26,10 @@ namespace Belle2 {
 
 
     /** carries the global coordinates of the position of the seed hit (typically the innermost hit) */
-    TVector3 posSeed;
+    ROOT::Math::XYZVector posSeed;
 
     /** carries the momentum vector at the position of the seed hit (typically the innermost hit) */
-    TVector3 momSeed;
+    ROOT::Math::XYZVector momSeed;
 
     /** a link to the TC itself */
     const SpacePointTrackCand* tC;

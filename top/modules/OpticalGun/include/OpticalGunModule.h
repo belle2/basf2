@@ -10,8 +10,9 @@
 
 #include <framework/core/Module.h>
 #include <string>
-#include <TVector3.h>
-#include <TRotation.h>
+#include <Math/Transform3D.h>
+#include <Math/Vector3D.h>
+#include <Math/Point3D.h>
 #include <TF1.h>
 
 // DataStore
@@ -25,13 +26,14 @@ namespace Belle2 {
    * Source of optical photons for the simulation of the TOP laser system.
    * The angular distribution can be picked up in a set of pre-defined functions:
    * - 'uniform'  (between minAlpha and maxAlpha),
-   * - 'Lambertian  (between minAlpha and maxAlpha),
-   * - Gaussian  (ignores minAlpha and maxAlpha and uses the numerical aperture na instead),
+   * - 'Lambertian'  (between minAlpha and maxAlpha),
+   * - 'Gaussian'  (uses numerical aperture instead of minAlpha and maxAlpha),
    * or passed as a string (TFormula-compliat) function of the polar direction theta.
-   * When using the latter option, be careful about normalizing over the spherical unit area proprely (i.e. multiply by sin(theta)).
+   * When using the latter option, be careful about normalizing over the spherical unit area proprely
+   * (i.e. multiply by sin(theta)).
    * In all cases we assume the emission is symmetric around the axis of the source.
    *
-   * In the output, the polarization fo the photons is saved using the decayVertex member of the MC particle class
+   * Polarization of photons is passed to FullSim using the decayVertex member of MC particle class.
    */
   class OpticalGunModule : public Module {
 
@@ -54,32 +56,9 @@ namespace Belle2 {
     virtual void initialize() override;
 
     /**
-     * Called when entering a new run.
-     * Set run dependent things like run header parameters, alignment, etc.
-     */
-    virtual void beginRun() override;
-
-    /**
      * Event processor.
      */
     virtual void event() override;
-
-    /**
-     * End-of-run action.
-     * Save run-related stuff, such as statistics.
-     */
-    virtual void endRun() override;
-
-    /**
-     * Termination action.
-     * Clean-up, close files, summarize statistics, etc.
-     */
-    virtual void terminate() override;
-
-    /**
-     * Prints module parameters.
-     */
-    void printModuleParams() const;
 
   private:
 
@@ -88,8 +67,8 @@ namespace Belle2 {
     double m_y = 0;          /**< source position in y */
     double m_z = 0;          /**< source position in z */
     double m_diameter = 0;   /**< source diameter */
-    double m_maxAlpha = 0;     /**< maximum emission angle */
-    double m_minAlpha = 0;      /**< minimum emission angle */
+    double m_maxAlpha = 0;   /**< maximum emission angle */
+    double m_minAlpha = 0;   /**< minimum emission angle */
     double m_na = 0;         /**< source numerical aperture. Used only by the Gaussian emission model. */
     double m_wavelength = 0; /**< source wavelenght [nm] */
     double m_phi = 0;        /**< first rotation angle (around z) [deg] */
@@ -98,27 +77,19 @@ namespace Belle2 {
     double m_startTime = 0;  /**< start time */
     double m_pulseWidth = 0; /**< pulse duration (Gaussian sigma) */
     double m_numPhotons = 0; /**< average number of photons in a pulse */
-    int m_slotID = 0;         /**< TOP slot ID */
+    int m_slotID = 0;        /**< TOP slot ID */
     double m_slitDX = 0;     /**< slit size in x */
     double m_slitDY = 0;     /**< slit size in y */
     double m_slitX0 = 0;     /**< slit x-offset in respect to source */
     double m_slitY0 = 0;     /**< slit y-offset in respect to source */
     double m_slitZ = 0;      /**< slit distance from source */
-    std::string
-    m_angularDistribution; /**< emission angular distribution. Can be either a pre-determined distribution or a string with a formula. */
+    std::string m_angularDistribution; /**< source angular distribution */
 
     // others
-    double m_cosMinAlpha =
-      0;   /**< for conveniency we calculate the cos of m_minAlpha only once, and then re-use it in several members */
-    double m_cosMaxAlpha =
-      0;   /**< for conveniency we calculate the cos of m_minAlpha only once, and then re-use it in several members */
-
+    double m_cosMinAlpha = 0; /**< cos of m_minAlpha */
+    double m_cosMaxAlpha = 0; /**< cos of m_maxAlpha */
     double m_energy = 0;     /**< photon energy (from wavelength) */
-
-    TVector3 m_translate;  /**< translation to Belle II frame */
-    TRotation m_rotate;    /**< rotation to Belle II frame */
-    TRotation m_rotateBar; /**< rotation of a bar */
-
+    ROOT::Math::Transform3D m_transform; /**< transformation to BelleII frame */
     TF1* m_customDistribution = 0; /**< Custom angular distribution, that uses m_angularDistribution as formula. */
 
     // data store objects
@@ -126,40 +97,42 @@ namespace Belle2 {
     StoreArray<TOPSimCalPulse> m_simCalPulses; /**< simulated cal pulse collection */
 
     /**
-     * Checks if photon flies through the slit
+     * Checks if photon passes the slit
      * @param point photon emission point
      * @param direction photon emission direction
-     * @return true, if photon flies through the slit
+     * @return true on success
      */
-    bool isInsideSlit(const TVector3& point, const TVector3& direction) const;
+    bool isInsideSlit(const ROOT::Math::XYZPoint& point, const ROOT::Math::XYZVector& direction) const;
 
     /**
-     * Return photon direction according to a projected 2D gaussian distribution based on
-     * numerical aperture NA.
+     * Return photon direction according to a projected 2D gaussian distribution based on numerical aperture NA.
+     * @return photon direction (unit vector)
      */
-    TVector3 getDirectionGaussian() const;
+    ROOT::Math::XYZVector getDirectionGaussian() const;
 
     /**
-     * Return photon direction according to a projected uniform distribution with opening
-     * angle alpha. Be careful.
+     * Return photon direction according to a projected uniform distribution with opening angle alpha. Be careful.
+     * @return photon direction (unit vector)
      */
-    TVector3 getDirectionUniform() const;
+    ROOT::Math::XYZVector getDirectionUniform() const;
 
     /**
-     * Return photon direction according to a lambertian distribution with
-     * opening angle alpha.
+     * Return photon direction according to a lambertian distribution with opening angle alpha.
+     * @return photon direction (unit vector)
      */
-    TVector3 getDirectionLambertian() const;
+    ROOT::Math::XYZVector getDirectionLambertian() const;
 
     /**
-     * Return photon direction according to a uniform distribution within m_minAlpha and m_maxAlpha
+     * Return photon direction according to a uniform distribution within m_minAlpha and m_maxAlpha.
+     * @return photon direction (unit vector)
      */
-    TVector3 getDirectionUniformRingAngle() const;
+    ROOT::Math::XYZVector getDirectionUniformRingAngle() const;
 
     /**
-     * Return photon direction according to a a custom distribution of theta.
+     * Return photon direction according to a custom angular distribution given by TFormula.
+     * @return photon direction (unit vector)
      */
-    TVector3 getDirectionCustom() const;
+    ROOT::Math::XYZVector getDirectionCustom() const;
 
   };
 

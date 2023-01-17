@@ -136,6 +136,18 @@ void Variable::Manager::printAliases()
   B2INFO("=====================================");
 }
 
+std::string Variable::Manager::resolveAlias(const std::string& alias)
+{
+
+  assertValidName(alias);
+
+  if (m_alias.find(alias) == m_alias.end()) {
+    return alias;
+  } else {
+    return m_alias[alias];
+  }
+}
+
 bool Variable::Manager::addCollection(const std::string& collection, const std::vector<std::string>& variables)
 {
 

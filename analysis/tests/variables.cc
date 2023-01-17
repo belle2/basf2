@@ -18,7 +18,7 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
 #include <analysis/dataobjects/ParticleList.h>
-#include <analysis/dataobjects/EventExtraInfo.h>
+#include <framework/dataobjects/EventExtraInfo.h>
 #include <analysis/dataobjects/RestOfEvent.h>
 #include <analysis/utility/ReferenceFrame.h>
 
@@ -307,7 +307,7 @@ namespace {
     {
       Particle p2({ 0.0 , 1.0, 0.0, 1.0 }, 11);
       p2.setPValue(0.5);
-      p2.setVertex(B2Vector3D(1.0, 0.0, 2.0));
+      p2.setVertex(XYZVector(1.0, 0.0, 2.0));
 
       UseReferenceFrame<RestFrame> dummy(&p2);
       EXPECT_FLOAT_EQ(0.0, particleDX(&p));
@@ -344,11 +344,11 @@ namespace {
     // Generate a random put orthogonal pair of vectors in the r-phi plane
     ROOT::Math::Cartesian2D d(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
     ROOT::Math::Cartesian2D pt(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
-    d.SetXY(d.X(), -(d.X()*pt.x()) / pt.y());
+    d.SetXY(d.X(), -(d.X()*pt.X()) / pt.Y());
 
     // Add a random z component
-    B2Vector3D position(d.X(), d.Y(), generator.Uniform(-1, 1));
-    B2Vector3D momentum(pt.x(), pt.y(), generator.Uniform(-1, 1));
+    ROOT::Math::XYZVector position(d.X(), d.Y(), generator.Uniform(-1, 1));
+    ROOT::Math::XYZVector momentum(pt.X(), pt.Y(), generator.Uniform(-1, 1));
 
     auto CDCValue = static_cast<unsigned long long int>(0x300000000000000);
 
@@ -384,7 +384,7 @@ namespace {
     Track* savedTrack2 = myTracks.appendNew(secondTrack);
     myParticles.appendNew(savedTrack2, Const::ChargedStable(11));
     myV0s.appendNew(V0(std::pair(savedTrack, myResults[0]), std::pair(savedTrack2, myResults[1])));
-    const PxPyPzEVector v0Momentum(2 * momentum.x(), 2 * momentum.y(), 2 * momentum.z(), (momentum * 2).Mag());
+    const PxPyPzEVector v0Momentum(2 * momentum.X(), 2 * momentum.Y(), 2 * momentum.Z(), (momentum * 2).R());
     auto v0particle = myParticles.appendNew(v0Momentum, 22,
                                             Particle::c_Unflavored, Particle::c_V0, 0);
     v0particle->appendDaughter(0, false);
@@ -465,7 +465,7 @@ namespace {
       // create a reco track (one has to also mock up a track fit result)
       TMatrixDSym cov(6);
       trackfits.appendNew(
-        B2Vector3D(), B2Vector3D(), cov, -1, Const::electron, 0.5, 1.5,
+        ROOT::Math::XYZVector(), ROOT::Math::XYZVector(), cov, -1, Const::electron, 0.5, 1.5,
         static_cast<unsigned long long int>(0x300000000000000), 16777215, 0);
       auto* electron_tr = tracks.appendNew(Track());
       electron_tr->setTrackFitResultIndex(Const::electron, 0);
@@ -473,7 +473,7 @@ namespace {
 
       TMatrixDSym cov1(6);
       trackfits.appendNew(
-        B2Vector3D(), B2Vector3D(), cov1, -1, Const::pion, 0.51, 1.5,
+        ROOT::Math::XYZVector(), ROOT::Math::XYZVector(), cov1, -1, Const::pion, 0.51, 1.5,
         static_cast<unsigned long long int>(0x300000000000000), 16777215, 0);
       auto* pion_tr = tracks.appendNew(Track());
       pion_tr->setTrackFitResultIndex(Const::pion, 0);
@@ -1270,13 +1270,13 @@ namespace {
     Particle p({ 0.1, -0.4, 0.8, 2.0 }, 11);
     Particle p2({ 0.1, -0.4, 0.8, 4.0 }, 11);
 
-    track_fit_results.appendNew(B2Vector3D(0.1, 0.1, 0.1), B2Vector3D(0.1, 0.0, 0.0),
+    track_fit_results.appendNew(ROOT::Math::XYZVector(0.1, 0.1, 0.1), ROOT::Math::XYZVector(0.1, 0.0, 0.0),
                                 TMatrixDSym(6), 1, Const::pion, 0.01, 1.5, 0, 0, 0);
-    track_fit_results.appendNew(B2Vector3D(0.1, 0.1, 0.1), B2Vector3D(0.15, 0.0, 0.0),
+    track_fit_results.appendNew(ROOT::Math::XYZVector(0.1, 0.1, 0.1), ROOT::Math::XYZVector(0.15, 0.0, 0.0),
                                 TMatrixDSym(6), 1, Const::pion, 0.01, 1.5, 0, 0, 0);
-    track_fit_results.appendNew(B2Vector3D(0.1, 0.1, 0.1), B2Vector3D(0.4, 0.0, 0.0),
+    track_fit_results.appendNew(ROOT::Math::XYZVector(0.1, 0.1, 0.1), ROOT::Math::XYZVector(0.4, 0.0, 0.0),
                                 TMatrixDSym(6), 1, Const::pion, 0.01, 1.5, 0, 0, 0);
-    track_fit_results.appendNew(B2Vector3D(0.1, 0.1, 0.1), B2Vector3D(0.6, 0.0, 0.0),
+    track_fit_results.appendNew(ROOT::Math::XYZVector(0.1, 0.1, 0.1), ROOT::Math::XYZVector(0.6, 0.0, 0.0),
                                 TMatrixDSym(6), 1, Const::pion, 0.01, 1.5, 0, 0, 0);
 
     tracks.appendNew()->setTrackFitResultIndex(Const::pion, 0);
@@ -4201,10 +4201,10 @@ namespace {
     // Generate a random put orthogonal pair of vectors in the r-phi plane
     ROOT::Math::Cartesian2D d(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
     ROOT::Math::Cartesian2D pt(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
-    d.SetXY(d.X(), -(d.X()*pt.x()) / pt.y());
+    d.SetXY(d.X(), -(d.X()*pt.X()) / pt.Y());
     // Add a random z component
-    B2Vector3D position(d.X(), d.Y(), generator.Uniform(-1, 1));
-    B2Vector3D momentum(pt.x(), pt.y(), generator.Uniform(-1, 1));
+    ROOT::Math::XYZVector position(d.X(), d.Y(), generator.Uniform(-1, 1));
+    ROOT::Math::XYZVector momentum(pt.X(), pt.Y(), generator.Uniform(-1, 1));
 
     auto CDCValue = static_cast<unsigned long long int>(0x300000000000000);
     tfrs.appendNew(position, momentum, cov6, charge, Const::electron, pValue, bField, CDCValue, 16777215, 0);
@@ -4264,8 +4264,7 @@ namespace {
     // Likelihoods for all detectors but SVD
     auto* lAllNoSVD = likelihood.appendNew();
 
-    for (unsigned int iDet(0); iDet < Const::PIDDetectors::c_size; iDet++) {
-      const auto det =  Const::PIDDetectors::c_set[iDet];
+    for (const auto& det : Const::PIDDetectorSet::set()) {
       for (const auto& hypo : Const::chargedStableSet) {
         if (det != Const::SVD) {
           lAllNoSVD->setLogLikelihood(det, hypo, lAll->getLogL(hypo, det));
@@ -4453,10 +4452,10 @@ namespace {
     // Generate a random put orthogonal pair of vectors in the r-phi plane
     ROOT::Math::Cartesian2D d(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
     ROOT::Math::Cartesian2D pt(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
-    d.SetXY(d.X(), -(d.X()*pt.x()) / pt.y());
+    d.SetXY(d.X(), -(d.X()*pt.X()) / pt.Y());
     // Add a random z component
-    B2Vector3D position(d.X(), d.Y(), generator.Uniform(-1, 1));
-    B2Vector3D momentum(pt.x(), pt.y(), generator.Uniform(-1, 1));
+    ROOT::Math::XYZVector position(d.X(), d.Y(), generator.Uniform(-1, 1));
+    ROOT::Math::XYZVector momentum(pt.X(), pt.Y(), generator.Uniform(-1, 1));
 
     auto CDCValue = static_cast<unsigned long long int>(0x300000000000000);
     tfrs.appendNew(position, momentum, cov6, charge, Const::electron, pValue, bField, CDCValue, 16777215, 0);
@@ -4842,7 +4841,7 @@ namespace {
       MCParticle mcKs;
       mcKs.setPDG(Const::Kshort.getPDGCode());
       mcKs.setDecayVertex(4.0, 5.0, 0.0);
-      mcKs.setProductionVertex(B2Vector3D(1.0, 2.0, 3.0));
+      mcKs.setProductionVertex(1.0, 2.0, 3.0);
       mcKs.setMassFromPDG();
       mcKs.setMomentum(1.164, 1.55200, 0);
       mcKs.setStatus(MCParticle::c_PrimaryParticle);

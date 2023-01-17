@@ -1,0 +1,19 @@
+{
+  "HistogramList": [
+    {
+      "Name": "testHist", "Dir": "test", 
+      "Delta": {"Type": 2, "Parameter": 500, "Amount": 10 },
+      "Analysis": {"Type": "Simple", "Delta": true, "Color": true,
+        "Mean": {"pvname": "Test:hist1:mean"},
+        "RMS": {"pvname": "Test:hist1:rms"},
+        "Median": {"pvname": "Test:hist1:median"}
+      },
+      "Simulation": {"HPar":[1000,0,1000], "Fill": 500, "Underflow": 100, "Function": "gaus(0)", "FPar":[100,900,3,100,100,400,600,30,70]},
+      "EPICS": [
+        {"pvname": "Test:hist1:mean", "low": 450, "high": 550, "lolo": 420, "hihi": 580},
+        {"pvname": "Test:hist1:rms", "low": 45, "high": 0.55, "lolo": 40, "hihi": 60},
+        {"pvname": "Test:hist1:median", "low": 450, "high": 550, "lolo": 420, "hihi": 580}
+      ]
+    }
+  ]
+}

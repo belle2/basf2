@@ -78,7 +78,7 @@ def stdXi(fitter='TreeFit', path=None):
         path=path)
 
 
-def stdXi0(gammatype='eff40', path=None, loadPhotonBeamBackgroundMVA=True):
+def stdXi0(gammatype='eff40', path=None, loadPhotonBeamBackgroundMVA=True, loadPhotonHadronicSplitOffMVA=True):
     r"""
     Reconstruct the standard :math:`\Xi^0` ``ParticleList`` named ``Xi0:std``.
 
@@ -90,6 +90,7 @@ def stdXi0(gammatype='eff40', path=None, loadPhotonBeamBackgroundMVA=True):
                          (default ``eff40``)
         path (basf2.Path): modules are added to this path building the ``Xi0:std`` list
         loadPhotonBeamBackgroundMVA (bool): If true, photon candidates will be assigned a beam background probability.
+        loadPhotonHadronicSplitOffMVA (bool): If true, photon candidates will be assigned a hadronic split-off probability.
     """
 
     if not isB2BII():
@@ -105,7 +106,11 @@ def stdXi0(gammatype='eff40', path=None, loadPhotonBeamBackgroundMVA=True):
             [ chiProb > 0.0 ]',
             True, path=path)
         # ~7*sigma Range around nominal mass
-        stdPhotons(f'pi0{gammatype}_May2020', path=path, loadPhotonBeamBackgroundMVA=loadPhotonBeamBackgroundMVA)
+        stdPhotons(
+            f'pi0{gammatype}_May2020',
+            path=path,
+            loadPhotonBeamBackgroundMVA=loadPhotonBeamBackgroundMVA,
+            loadPhotonHadronicSplitOffMVA=loadPhotonHadronicSplitOffMVA)
         reconstructDecay(f'pi0:reco -> gamma:pi0{gammatype}_May2020 gamma:pi0{gammatype}_May2020',
                          'abs( dM ) < 0.0406',
                          True, path=path)

@@ -1,0 +1,33 @@
+# EventType: 121005010a
+# Descriptor: [B+ -> (K_S0 -> pi+ pi-)(K_S0 -> pi+ pi-)K+]cc
+# NickName: Bu_KSKSK
+# Documentation: Control mode for B0 -> KSKSKS study
+# Tested: Yes
+# PhysicsWG: TDCPV
+# Responsible: Hikaru Tanigawa
+# Email: tanigawa@post.kek.jp
+# Cuts: None
+# Date: 20220912
+
+
+Alias      K_S0sig  K_S0
+ChargeConj K_S0sig  K_S0sig
+
+Decay Upsilon(4S)
+0.5 B+sig B-	VSS;
+0.5 B+ B-sig	VSS;
+Enddecay
+
+Decay B+sig
+1.000  K_S0sig    K_S0sig    K+                           PHSP; 
+Enddecay
+
+Decay B-sig
+1.000  K_S0sig    K_S0sig    K-                           PHSP; 
+Enddecay
+
+Decay K_S0sig
+1        pi+       pi-                 PHSP;
+Enddecay
+
+End

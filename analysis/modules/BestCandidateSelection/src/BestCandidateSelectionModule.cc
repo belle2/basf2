@@ -12,6 +12,8 @@
 
 #include <analysis/VariableManager/Utility.h>
 
+#include <analysis/DecayDescriptor/DecayDescriptor.h>
+
 #include <framework/logging/Logger.h>
 #include <framework/utilities/MakeROOTCompatible.h>
 
@@ -87,7 +89,27 @@ void BestCandidateSelectionModule::initialize()
   }
   if (m_numBest < 0) {
     B2ERROR("value of numBest must be >= 0!");
+  } else if (m_numBest != 0) {
+    DecayDescriptor decaydescriptor;
+    decaydescriptor.init(m_inputListName);
+
+    const DecayDescriptorParticle* ddpart = decaydescriptor.getMother();
+    const int pdgCode  = ddpart->getPDGCode();
+    const string listLabel = ddpart->getLabel();
+
+    // For final state particles we protect the label "all".
+    if (Const::finalStateParticlesSet.contains(Const::ParticleType(abs(pdgCode))) and listLabel == "all") {
+      B2FATAL("You are trying to apply a best-candidate-selection on the list " << m_inputListName <<
+	      " but the label 'all' is protected for lists of final-state particles." <<
+	      " It could introduce *very* dangerous bugs.");
+    } else if (listLabel == "MC" or listLabel == "V0") {
+      // the labels MC and V0 are also protected
+      B2FATAL("You are trying to apply a best-candidate-selection on the list " << m_inputListName <<
+	      " but the label " << listLabel << " is protected and can not be reduced.");
+    }
+
   }
+
   m_cut = Variable::Cut::compile(m_cutParameter);
 
   // parse the name that the rank will be stored under
@@ -104,6 +126,9 @@ void BestCandidateSelectionModule::event()
     B2WARNING("Input list " << m_inputList.getName() << " was not created?");
     return;
   }
+
+  if (m_numBest == 0 and m_inputList->getIsReserved())
+    m_inputList->setEditable(true);
 
   // create list of particle index and the corresponding value of variable
   typedef std::pair<double, unsigned int> ValueIndexPair;
@@ -144,16 +169,21 @@ void BestCandidateSelectionModule::event()
     if (first_candidate) {
       first_candidate = false;
     } else {
+      // If allowMultiRank, only increase rank when value changes
       if (!m_allowMultiRank || (candidate.first != previous_val))  ++rank;
     }
+
+    if ((m_numBest != 0) and (rank > m_numBest)) // Only keep particles with same rank or below
+      break;
 
     if (!p->hasExtraInfo(m_outputVariableName))
       p->addExtraInfo(m_outputVariableName, rank);
     m_inputList->addParticle(p);
-
     previous_val = candidate.first;
 
-    if (m_numBest != 0 and rank >= m_numBest)
-      break;
+
   }
+
+  if (m_numBest == 0 and m_inputList->getIsReserved())
+    m_inputList->setEditable(false);
 }

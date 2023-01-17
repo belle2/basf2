@@ -24,8 +24,6 @@
 
 #include <framework/logging/Logger.h>
 
-#include <TVector3.h>
-
 #include <ostream>
 #include <type_traits>
 

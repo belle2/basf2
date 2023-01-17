@@ -24,12 +24,24 @@ import basf2
 
 
 class SplitMultiplicities(basf2.Module):
-    def __init__(self, listname, pdgcode):
+    """
+    Module to determine the multiplicities of a particle of a certain pdg code
+    """
+
+    def __init__(self, pdgcode):
+        """
+        Initialise the class.
+        :param pdgcode: pdg code to be studied
+        """
         super().__init__()
-        self.listname = listname
+        #: pdg code to be studied
         self.pdgcode = pdgcode
+        #: event extra info object
+        self.eventExtraInfo = Belle2.PyStoreObj("EventExtraInfo")
 
     def event(self):
+        """ Event function """
+
         # set counters to 0
         gen_counter = 0
         Bp_counter = 0
@@ -60,35 +72,16 @@ class SplitMultiplicities(basf2.Module):
                     else:
                         mcMother = mcMother.getMother()
 
-        # set the extra info names and save them to the reconstructed  particles
+        # create the extra info names and save the corresponding multiplicities
         extraInfoName = 'nGen_{}'.format(self.pdgcode)
         extraInfoName_Bp = 'nGen_{}_Bp'.format(self.pdgcode)
         extraInfoName_Bm = 'nGen_{}_Bm'.format(self.pdgcode)
         extraInfoName_B0 = 'nGen_{}_B0'.format(self.pdgcode)
         extraInfoName_antiB0 = 'nGen_{}_antiB0'.format(self.pdgcode)
 
-        for particle in Belle2.PyStoreObj(self.listname).obj():
-            if particle.hasExtraInfo(extraInfoName):
-                particle.setExtraInfo(extraInfoName, gen_counter)
-            else:
-                particle.addExtraInfo(extraInfoName, gen_counter)
-
-            if particle.hasExtraInfo(extraInfoName_Bp):
-                particle.setExtraInfo(extraInfoName_Bp, Bp_counter)
-            else:
-                particle.addExtraInfo(extraInfoName_Bp, Bp_counter)
-
-            if particle.hasExtraInfo(extraInfoName_Bm):
-                particle.setExtraInfo(extraInfoName_Bm, Bm_counter)
-            else:
-                particle.addExtraInfo(extraInfoName_Bm, Bm_counter)
-
-            if particle.hasExtraInfo(extraInfoName_B0):
-                particle.setExtraInfo(extraInfoName_B0, B0_counter)
-            else:
-                particle.addExtraInfo(extraInfoName_B0, B0_counter)
-
-            if particle.hasExtraInfo(extraInfoName_antiB0):
-                particle.setExtraInfo(extraInfoName_antiB0, antiB0_counter)
-            else:
-                particle.addExtraInfo(extraInfoName_antiB0, antiB0_counter)
+        self.eventExtraInfo.create()
+        self.eventExtraInfo.setExtraInfo(extraInfoName, gen_counter)
+        self.eventExtraInfo.setExtraInfo(extraInfoName_Bp, Bp_counter)
+        self.eventExtraInfo.setExtraInfo(extraInfoName_Bm, Bm_counter)
+        self.eventExtraInfo.setExtraInfo(extraInfoName_B0, B0_counter)
+        self.eventExtraInfo.setExtraInfo(extraInfoName_antiB0, antiB0_counter)

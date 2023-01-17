@@ -35,6 +35,10 @@ void ParticleList::initialize(int pdg, const std::string& name, const std::strin
 
   m_thisListName = name;
   m_antiListName.clear();
+
+  std::string label = m_thisListName.substr(m_thisListName.find_first_of(':') + 1);
+  if ((Const::finalStateParticlesSet.contains(Const::ParticleType(abs(m_pdg))) and label == "all") or label == "V0")
+    m_isReserved = true;
 }
 
 void ParticleList::setParticleCollectionName(const std::string& name, bool forAntiParticle)
@@ -47,6 +51,10 @@ void ParticleList::setParticleCollectionName(const std::string& name, bool forAn
 
 void ParticleList::addParticle(const Particle* particle)
 {
+  if (m_isReserved)
+    B2FATAL("ParticleList::addParticle The ParticleList " << m_thisListName <<
+            " is reserved and forbidden to be manipulated.");
+
   if (particle->getArrayName() != m_particleStore) {
     B2ERROR("ParticleList::addParticle particle is from different store array, not added");
     return;
@@ -77,6 +85,10 @@ void ParticleList::bindAntiParticleList(ParticleList& antiList, bool includingAn
 
 void ParticleList::addParticle(unsigned iparticle, int pdg, Particle::EFlavorType type, bool includingAntiList)
 {
+  if (m_isReserved)
+    B2FATAL("ParticleList::addParticle The ParticleList " << m_thisListName <<
+            " is reserved and forbidden to be manipulated.");
+
   if (abs(pdg) != abs(getPDGCode())) {
     B2ERROR("ParticleList::addParticle PDG codes do not match, not added");
     return;
@@ -118,6 +130,10 @@ void ParticleList::addParticle(unsigned iparticle, int pdg, Particle::EFlavorTyp
 
 void ParticleList::removeParticles(const std::vector<unsigned int>& toRemove, bool removeFromAntiList)
 {
+  if (m_isReserved)
+    B2FATAL("ParticleList::removeParticles The ParticleList " << m_thisListName <<
+            " is reserved and forbidden to be manipulated.");
+
   std::vector<int> newList;
   // remove Particles from flavor-specific list of this Particle List
   for (int i : m_fsList) {
@@ -141,6 +157,10 @@ void ParticleList::removeParticles(const std::vector<unsigned int>& toRemove, bo
 
 void ParticleList::clear(bool includingAntiList)
 {
+  if (m_isReserved)
+    B2FATAL("ParticleList::clear The ParticleList " << m_thisListName <<
+            " is reserved and forbidden to be manipulated.");
+
   m_fsList.clear();
   m_scList.clear();
 
@@ -163,6 +183,20 @@ Particle* ParticleList::getParticle(unsigned i, bool includingAntiList) const
   if (includingAntiList and !m_antiListName.empty())
     return getAntiParticleList().getParticle(i - m_fsList.size() - m_scList.size(), false);
 
+  return nullptr;
+}
+
+Particle* ParticleList::getParticleWithMdstIdx(unsigned int mdstIdx, bool includingAntiList) const
+{
+  const unsigned int n = this->getListSize(includingAntiList);
+  for (unsigned i = 0; i < n; i++) {
+
+    auto particle = this->getParticle(i, includingAntiList);
+
+    if (particle->getMdstArrayIndex() == mdstIdx) {
+      return particle;
+    }
+  }
   return nullptr;
 }
 
@@ -269,4 +303,3 @@ ParticleList& ParticleList::getAntiParticleList() const
   }
   return **m_antiList;
 }
-

@@ -80,6 +80,19 @@ ParticleLoaderModule::ParticleLoaderModule() : Module()
   addParam("enforceFitHypothesis", m_enforceFitHypothesis,
            "If true, a Particle is only created if a track fit with the particle hypothesis passed to the ParticleLoader is available.",
            m_enforceFitHypothesis);
+
+  addParam("useDummy", m_useDummy,
+           "Use Dummy instead of reconstructed MDST dataobjects (tracks, ECL, KLM, clusters, V0s, ...)", false);
+
+  addParam("dummyMDSTIndex", m_dummyMDSTIndex,
+           "mdst index to use for dummy particle", 0);
+
+  addParam("dummyCovMatrix", m_dummyCovMatrix,
+           "Diagonal value of covariance matrix to use for dummy particle", 10000.);
+
+  addParam("dummyTreatAsInvisible", m_dummyTreatAsInvisible,
+           "Should treeFitter treat the particle as invisible?", true);
+
 }
 
 void ParticleLoaderModule::initialize()
@@ -132,8 +145,10 @@ void ParticleLoaderModule::initialize()
       string listName = mother->getName() + ":all";
       // ROE particles get the full name
       if (m_useROEs) listName = mother->getFullName();
-      // MC particles get the label "MC"
-      else if (m_useMCParticles) listName = mother->getName() + ":MC";
+      // dummy particles get the full name
+      else if (m_useDummy) listName = mother->getFullName();
+      // MC particles get the full name
+      else if (m_useMCParticles) listName = mother->getFullName();
       // V0s get the label "V0"
       else if (nProducts > 0) listName = mother->getName() + ":V0";
 
@@ -149,9 +164,12 @@ void ParticleLoaderModule::initialize()
           StoreObjPtr<ParticleList> antiParticleList(antiListName);
           antiParticleList.registerInDataStore(flags);
         }
+      } else if (m_useMCParticles) {
+        B2WARNING("ParticleList " << listName << " already exists and will not be created again. " <<
+                  "The given options (addDaughters, skipNonPrimaryDaughters, skipNonPrimary) do not applied on the existing list.");
       }
 
-      if (not isValidPDGCode(pdgCode) and (m_useMCParticles == false and m_useROEs == false))
+      if (not isValidPDGCode(pdgCode) and (m_useMCParticles == false and m_useROEs == false and m_useDummy == false))
         B2ERROR("Invalid particle type requested to be loaded. Set a valid decayString module parameter.");
 
       // if we're not loading MCParticles and we are loading K0S, Lambdas, or photons --> ee then this decaystring is a V0
@@ -163,7 +181,7 @@ void ParticleLoaderModule::initialize()
 
       if (mdstSourceIsV0 == false) {
         if (nProducts > 0) {
-          if (!m_useROEs) {
+          if (!m_useROEs and !m_useDummy) {
             B2ERROR("ParticleLoaderModule::initialize Invalid input DecayString " << decayString
                     << ". DecayString should not contain any daughters, only the mother particle.");
           } else {
@@ -188,6 +206,9 @@ void ParticleLoaderModule::initialize()
       if (m_useROEs) {
         B2INFO("   -> MDST source: RestOfEvents");
         m_ROE2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle);
+      } else if (m_useDummy) {
+        B2INFO("   -> MDST source: No MDST source");
+        m_Dummies2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle);
       } else if (m_useMCParticles) {
         B2INFO("   -> MDST source: MCParticles");
         m_MCParticles2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle);
@@ -239,6 +260,8 @@ void ParticleLoaderModule::event()
 
   if (m_useROEs)
     roeToParticles();
+  else if (m_useDummy)
+    dummyToParticles();
   else if (m_useMCParticles)
     mcParticlesToParticles();
   else {
@@ -267,6 +290,59 @@ void ParticleLoaderModule::terminate()
                 << get<c_PListName>(v02Plist));
     }
 }
+
+
+void ParticleLoaderModule::dummyToParticles()
+{
+  if (m_Dummies2Plists.empty()) // nothing to do
+    return;
+  if (m_Dummies2Plists.size() != 1)
+    B2ERROR("ParticleLoaderModule::dummyToParticles Multiple particle lists are not supported!");
+  auto dummy2Plist = m_Dummies2Plists[0];
+  string dummyListName = get<c_PListName>(dummy2Plist);
+  string antiDummyListName = get<c_AntiPListName>(dummy2Plist);
+  int pdgCode = get<c_PListPDGCode>(dummy2Plist);
+  bool isSelfConjugatedParticle = get<c_IsPListSelfConjugated>(dummy2Plist);
+
+  StoreObjPtr<ParticleList> plist(dummyListName);
+  plist.create();
+  plist->initialize(pdgCode, dummyListName);
+
+  if (!isSelfConjugatedParticle) {
+    StoreObjPtr<ParticleList> antiPlist(antiDummyListName);
+    antiPlist.create();
+    antiPlist->initialize(-1 * pdgCode, antiDummyListName);
+    antiPlist->bindAntiParticleList(*(plist));
+  }
+
+  TMatrixFSym covariance(7);
+  for (int row = 0; row < 7; ++row) { //diag
+    covariance(row, row) = m_dummyCovMatrix;
+  }
+
+  Particle* newPart = nullptr;
+  Particle* newAntiPart = nullptr;
+
+  auto isFlavored = (isSelfConjugatedParticle) ? Particle::EFlavorType::c_Unflavored : Particle::EFlavorType::c_Flavored;
+
+  ROOT::Math::PxPyPzEVector zero4Vector = {0., 0., 0., 0.};
+
+  newPart = m_particles.appendNew(zero4Vector, pdgCode, isFlavored, Particle::EParticleSourceObject::c_NoMDSTSource,
+                                  m_dummyMDSTIndex);
+  if (m_dummyCovMatrix > 0.) newPart->setMomentumVertexErrorMatrix(covariance);
+  if (m_dummyTreatAsInvisible) newPart->writeExtraInfo("treeFitterTreatMeAsInvisible", 1);
+  plist->addParticle(newPart);
+
+  if (!isSelfConjugatedParticle) {
+    newAntiPart = m_particles.appendNew(zero4Vector, -pdgCode, isFlavored, Particle::EParticleSourceObject::c_NoMDSTSource,
+                                        m_dummyMDSTIndex);
+    if (m_dummyCovMatrix > 0.) newAntiPart->setMomentumVertexErrorMatrix(covariance);
+    if (m_dummyTreatAsInvisible) newAntiPart->writeExtraInfo("treeFitterTreatMeAsInvisible", 1);
+    plist->addParticle(newAntiPart);
+  }
+
+}
+
 
 void ParticleLoaderModule::roeToParticles()
 {
@@ -387,6 +463,8 @@ void ParticleLoaderModule::v0sToParticles()
       antiPlist->bindAntiParticleList(*(plist));
     }
 
+    plist->setEditable(true); // :V0 list is originally reserved. we have to set it as editable.
+
     // load reconstructed V0s as Kshorts (pi-pi+ combination), Lambdas (p+pi- combinations), and converted photons (e-e+ combinations)
     for (int i = 0; i < m_v0s.getEntries(); i++) {
       const V0* v0 = m_v0s[i];
@@ -488,6 +566,8 @@ void ParticleLoaderModule::v0sToParticles()
       Particle* newPart = m_particles.appendNew(v0P);
       plist->addParticle(newPart);
     }
+
+    plist->setEditable(false); // set the :V0 list as not editable.
   }
 }
 
@@ -520,6 +600,8 @@ void ParticleLoaderModule::tracksToParticles()
 
       antiPlist->bindAntiParticleList(*(plist));
     }
+
+    plist->setEditable(true); // :all list is originally reserved. we have to set it as editable.
 
     // the inner loop over all tracks from which Particles
     // are created, and get sorted in the particle lists
@@ -571,6 +653,8 @@ void ParticleLoaderModule::tracksToParticles()
 
       } // sanity check correct particle type
     } // loop over tracks
+
+    plist->setEditable(false); // set the :all list as not editable.
   } // particle lists
 }
 
@@ -602,6 +686,8 @@ void ParticleLoaderModule::eclAndKLMClustersToParticles()
 
       antiPlist->bindAntiParticleList(*(plist));
     }
+
+    plist->setEditable(true); // :all list is originally reserved. we have to set it as editable.
 
     // load reconstructed neutral ECL clusters as photons or Klongs or neutrons
     for (int i = 0; i < m_eclclusters.getEntries(); i++) {
@@ -704,6 +790,8 @@ void ParticleLoaderModule::eclAndKLMClustersToParticles()
       // add particle to list
       plist->addParticle(newPart);
     }
+
+    plist->setEditable(false); // set the :all list as not editable.
   } // loop over particle lists
 }
 
@@ -720,8 +808,6 @@ void ParticleLoaderModule::mcParticlesToParticles()
     bool isSelfConjugatedParticle = get<c_IsPListSelfConjugated>(mcParticle2Plist);
 
     StoreObjPtr<ParticleList> plist(listName);
-    // since a particle list in the ParticleLoader always contains all possible objects
-    // we check whether it already exists in this path and can skip any further steps if it does
     if (plist.isValid())
       continue;
     plist.create();
@@ -753,6 +839,7 @@ void ParticleLoaderModule::mcParticlesToParticles()
 
       plist->addParticle(newPart);
     }
+
   }
 }
 

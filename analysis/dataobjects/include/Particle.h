@@ -75,13 +75,14 @@ namespace Belle2 {
      * particle source enumerators
      */
     enum EParticleSourceObject {
-      c_Undefined  = 0,
-      c_Track      = 1,
-      c_ECLCluster = 2,
-      c_KLMCluster = 3,
-      c_V0         = 4,
-      c_MCParticle = 5,
-      c_Composite  = 6
+      c_Undefined     = 0,
+      c_Track         = 1,
+      c_ECLCluster    = 2,
+      c_KLMCluster    = 3,
+      c_V0            = 4,
+      c_MCParticle    = 5,
+      c_Composite     = 6,
+      c_NoMDSTSource  = 7
     };
 
     /** describes flavor type, see getFlavorType(). */
@@ -266,6 +267,15 @@ namespace Belle2 {
     // setters
 
     /**
+     * Sets PDG code
+     * @param pdg PDG code
+     */
+    void setPDGCode(const int pdg)
+    {
+      m_pdgCode = pdg;
+    }
+
+    /**
      * Sets Lorentz vector
      * @param p4 Lorentz vector
      */
@@ -274,6 +284,18 @@ namespace Belle2 {
       m_px = p4.Px();
       m_py = p4.Py();
       m_pz = p4.Pz();
+      m_mass = p4.M();
+    }
+
+    /**
+     * Sets Lorentz vector dividing by the momentum scaling factor
+     * @param p4 Lorentz vector
+     */
+    void set4VectorDividingByMomentumScaling(const ROOT::Math::PxPyPzEVector& p4)
+    {
+      m_px = p4.Px() / m_momentumScale;
+      m_py = p4.Py() / m_momentumScale;
+      m_pz = p4.Pz() / m_momentumScale;
       m_mass = p4.M();
     }
 
@@ -365,8 +387,9 @@ namespace Belle2 {
      * Appends index of daughter to daughters index array
      * @param daughter pointer to the daughter particle
      * @param updateType bool to set whether particle type should be updated
+     * @param daughterProperty property of the daughter particle
      */
-    void appendDaughter(const Particle* daughter, const bool updateType = true);
+    void appendDaughter(const Particle* daughter, const bool updateType = true, const int daughterProperty = c_Ordinary);
 
     /**
      * Appends index of daughter to daughters index array
@@ -380,7 +403,7 @@ namespace Belle2 {
         m_particleSource = c_Composite;
       }
       m_daughterIndices.push_back(particleIndex);
-      m_daughterProperties.push_back(Particle::PropertyFlags::c_Ordinary);
+      m_daughterProperties.push_back(c_Ordinary);
     }
 
     /**
@@ -389,6 +412,21 @@ namespace Belle2 {
      * @param updateType bool whether particle type should be updated if last daughter was removed
      */
     void removeDaughter(const Particle* daughter, const bool updateType = true);
+
+    /**
+     * Replace index of given daughter with new daughter, return true if a replacement is made
+     * @param oldDaughter pointer to the daughter that will be removed
+     * @param newDaughter pointer to the particle that will be added as a daughter
+     */
+    bool replaceDaughter(const Particle* oldDaughter, const Particle* newDaughter);
+
+    /**
+     * Apply replaceDaughter to all Particles in the decay tree by looping recursively through
+     * it, return true if a replacement is made
+     * @param oldDaughter pointer to the daughter that will be removed
+     * @param newDaughter pointer to the particle that will be added as a daughter
+     */
+    bool replaceDaughterRecursively(const Particle* oldDaughter, const Particle* newDaughter);
 
     // getters
 
@@ -466,6 +504,12 @@ namespace Belle2 {
      * @return nominal mass
      */
     double getPDGMass(void) const;
+
+    /**
+     * Returns particle nominal lifetime
+     * @return nominal lifetime [sec]
+     */
+    double getPDGLifetime() const;
 
     /**
      * Returns total energy

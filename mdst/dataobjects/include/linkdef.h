@@ -130,9 +130,9 @@
   const double omega = onfile.m_tau[2];         \
   const double tanLambda = onfile.m_tau[4];         \
   const Belle2::Helix helix(d0,0, omega, 0, tanLambda);	    \
-  const TVector3 position = helix.getPerigee();	\
+  const ROOT::Math::XYZVector position = helix.getPerigee();	\
   /* Attention! Using a hardcoded 1.5 here. */ \
-  const TVector3 momentum = helix.getMomentum(bZ);          \
+  const ROOT::Math::XYZVector momentum = helix.getMomentum(bZ);          \
   const int charge = helix.getChargeSign();		      \
   							\
   const double alpha =  1.0 / (bZ * TMath::C()) * 1E11;     \

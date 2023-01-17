@@ -67,15 +67,6 @@ void DQMHistAnalysisARICHMonObjModule::initialize()
 
 }
 
-void DQMHistAnalysisARICHMonObjModule::beginRun()
-{
-}
-
-void DQMHistAnalysisARICHMonObjModule::event()
-{
-  // can put the analysis code here or in endRun() function
-  // for the start tests we will store output only end of run so better to put code there
-}
 
 void DQMHistAnalysisARICHMonObjModule::endRun()
 {

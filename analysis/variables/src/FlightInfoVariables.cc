@@ -215,8 +215,8 @@ namespace Belle2 {
 
 
       if (mode == "distance") {
-        B2Vector3D deltaVtx = mcparticle->getDecayVertex() - B2Vector3D(mcparticle->getProductionVertex());
-        double distance = deltaVtx.Mag();
+        ROOT::Math::XYZVector deltaVtx = mcparticle->getDecayVertex() - mcparticle->getProductionVertex();
+        double distance = deltaVtx.R();
         if (distance < 0)
           B2WARNING("Negative true flight distance, it's forbidden -> something went wrong.");
 

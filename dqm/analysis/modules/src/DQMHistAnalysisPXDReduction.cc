@@ -36,6 +36,12 @@ DQMHistAnalysisPXDReductionModule::DQMHistAnalysisPXDReductionModule()
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("PXDDAQ"));
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:Red:"));
   addParam("useEpics", m_useEpics, "Whether to update EPICS PVs.", false);
+  addParam("useEpicsRO", m_useEpicsRO, "useEpics ReadOnly", false);
+  addParam("lowarnlimit", m_lowarnlimit, "Mean Reduction Low Warn limit for alarms", 0.99);
+  addParam("LowErrorlimit", m_loerrorlimit, "Mean Reduction Low limit for alarms", 0.90);
+  addParam("HighWarnlimit", m_hiwarnlimit, "Mean Reduction High Warn limit for alarms", 1.01);
+  addParam("HighErrorlimit", m_hierrorlimit, "Mean Reduction High limit for alarms", 1.10);
+  addParam("minEntries", m_minEntries, "minimum number of new entries for last time slot", 1000);
   B2DEBUG(1, "DQMHistAnalysisPXDReduction: Constructor done.");
 }
 
@@ -59,10 +65,8 @@ void DQMHistAnalysisPXDReductionModule::initialize()
   std::vector<VxdID> sensors = geo.getListOfSensors();
   for (VxdID& aVxdID : sensors) {
     VXD::SensorInfoBase info = geo.getSensorInfo(aVxdID);
-    // B2DEBUG(20,"VXD " << aVxdID);
     if (info.getType() != VXD::SensorInfoBase::PXD) continue;
     m_PXDModules.push_back(aVxdID); // reorder, sort would be better
-
   }
   std::sort(m_PXDModules.begin(), m_PXDModules.end());  // back to natural order
 
@@ -75,6 +79,8 @@ void DQMHistAnalysisPXDReductionModule::initialize()
   for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
     TString ModuleName = (std::string)m_PXDModules[i];
     m_hReduction->GetXaxis()->SetBinLabel(i + 1, ModuleName);
+    addDeltaPar(m_histogramDirectoryName, "PXDDAQDHEDataReduction_" + (std::string)m_PXDModules[i], HistDelta::c_Entries, m_minEntries,
+                1); // register delta
   }
   //Unfortunately this only changes the labels, but can't fill the bins by the VxdIDs
   m_hReduction->Draw("");
@@ -94,8 +100,8 @@ void DQMHistAnalysisPXDReductionModule::initialize()
 //   m_line3->SetLineColor(1);
 //   m_line3->SetLineWidth(3);
 
-
 #ifdef _BELLE2_EPICS
+  m_useEpics |= m_useEpicsRO; // implicit
   if (m_useEpics) {
     if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
     mychid.resize(2);
@@ -112,14 +118,48 @@ void DQMHistAnalysisPXDReductionModule::beginRun()
   B2DEBUG(1, "DQMHistAnalysisPXDReduction: beginRun called.");
 
   m_cReduction->Clear();
+  m_hReduction->Reset(); // dont sum up!!!
+
+#ifdef _BELLE2_EPICS
+  if (m_useEpics) {
+    // get warn and error limit
+    // as the same array as above, we assume chid exists
+    struct dbr_ctrl_double tPvData;
+    auto r = ca_get(DBR_CTRL_DOUBLE, mychid[1], &tPvData);
+    if (r == ECA_NORMAL) r = ca_pend_io(5.0);
+    if (r == ECA_NORMAL) {
+      if (!std::isnan(tPvData.lower_alarm_limit)
+          && tPvData.lower_alarm_limit > 0.0) {
+        //m_hLoErrorLine->SetBinContent(i + 1, tPvData.lower_alarm_limit);
+        m_loerrorlimit = tPvData.lower_alarm_limit;
+      }
+      if (!std::isnan(tPvData.lower_warning_limit)
+          && tPvData.lower_warning_limit > 0.0) {
+        //m_hLoWarnLine->SetBinContent(i + 1, tPvData.lower_warning_limit);
+        m_lowarnlimit = tPvData.lower_warning_limit;
+      }
+      if (!std::isnan(tPvData.upper_alarm_limit)
+          && tPvData.upper_alarm_limit > 0.0) {
+        //m_hHiErrorLine->SetBinContent(i + 1, tPvData.upper_alarm_limit);
+        m_hierrorlimit = tPvData.upper_alarm_limit;
+      }
+      if (!std::isnan(tPvData.upper_warning_limit)
+          && tPvData.upper_warning_limit > 0.0) {
+        //m_hHiWarnLine->SetBinContent(i + 1, tPvData.upper_warning_limit);
+        m_hiwarnlimit = tPvData.upper_warning_limit;
+      }
+    } else {
+      SEVCHK(r, "ca_get or ca_pend_io failure");
+    }
+  }
+#endif
+
 }
 
 void DQMHistAnalysisPXDReductionModule::event()
 {
   if (!m_cReduction) return;
-  m_hReduction->Reset(); // dont sum up!!!
 
-  bool enough = false;
   double ireduction = 0.0;
   int ireductioncnt = 0;
 
@@ -127,42 +167,46 @@ void DQMHistAnalysisPXDReductionModule::event()
     std::string name = "PXDDAQDHEDataReduction_" + (std::string)m_PXDModules[i ];
     // std::replace( name.begin(), name.end(), '.', '_');
 
-    TH1* hh1 = findHist(name);
-    if (hh1 == NULL) {
-      hh1 = findHist(m_histogramDirectoryName, name);
-    }
+    TH1* hh1 = getDelta(name);
+    // no inital sampling, we should get lenty of statistics
     if (hh1) {
       auto mean = hh1->GetMean();
-      m_hReduction->Fill(i, mean);
-      if (hh1->GetEntries() > 100) enough = true;
-      if (mean > 0) {
-        ireduction += mean; // well fit would be better
-        ireductioncnt++;
-      }
+      m_hReduction->SetBinContent(i + 1, mean);
     }
   }
+  for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
+    auto mean = m_hReduction->GetBinContent(i + 1);
+    if (mean > 0) {
+      ireduction += mean; // well fit would be better
+      ireductioncnt++;
+    }
+  }
+
   m_cReduction->cd();
 
+  double value = ireductioncnt > 0 ? ireduction / ireductioncnt : 0;
+
   int status = 0;
-  // not enough Entries
-  if (!enough) {
+// not enough Entries
+  if (ireductioncnt < 15) { // still have to see how to handle masked modules
     status = 0; // Grey
     m_cReduction->Pad()->SetFillColor(kGray);// Magenta or Gray
   } else {
-    status = 1; // White
-    /// FIXME: absolute numbers or relative numbers and what is the accpetable limit?
-//   if (value > m_up_err_limit || value < m_low_err_limit ) {
-//     m_cReduction->Pad()->SetFillColor(kRed);// Red
-//   } else if (value >  m_up_warn_limit ||  value < m_low_warn_limit ) {
-//     m_cReduction->Pad()->SetFillColor(kYellow);// Yellow
+    if (value > m_hierrorlimit || value < m_loerrorlimit) {
+      m_cReduction->Pad()->SetFillColor(kRed);// Red
+      status = 4;
+    } else if (value >  m_hiwarnlimit ||  value < m_lowarnlimit) {
+      m_cReduction->Pad()->SetFillColor(kYellow);// Yellow
+      status = 3;
+    } else {
+      m_cReduction->Pad()->SetFillColor(kGreen);// Green
+      status = 2;
 //   } else {
-//     m_cReduction->Pad()->SetFillColor(kGreen);// Green
-//   } else {
-    m_cReduction->Pad()->SetFillColor(kWhite);// White
-//   }
+// we wont use white anymore here
+//    m_cReduction->Pad()->SetFillColor(kWhite);// White
+//    status = 1; // White
+    }
   }
-
-  double value = ireductioncnt > 0 ? ireduction / ireductioncnt : 0;
 
   if (m_hReduction) {
     m_hReduction->Draw("");
@@ -180,8 +224,10 @@ void DQMHistAnalysisPXDReductionModule::event()
   m_cReduction->Modified();
   m_cReduction->Update();
 #ifdef _BELLE2_EPICS
-  if (m_useEpics) {
+  if (m_useEpics && !m_useEpicsRO) {
+/// doch besser DBR_DOUBLE wg alarms?
     SEVCHK(ca_put(DBR_INT, mychid[0], (void*)&status), "ca_set failure");
+    // only update if statistics is reasonable, we dont want "0" drops between runs!
     SEVCHK(ca_put(DBR_DOUBLE, mychid[1], (void*)&value), "ca_set failure");
     SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
   }
@@ -191,8 +237,6 @@ void DQMHistAnalysisPXDReductionModule::event()
 void DQMHistAnalysisPXDReductionModule::terminate()
 {
   B2DEBUG(1, "DQMHistAnalysisPXDReduction: terminate called");
-  // m_cReduction->Print("c1.pdf");
-  // should delete canvas here, maybe hist, too? Who owns it?
 #ifdef _BELLE2_EPICS
   if (m_useEpics) {
     for (auto m : mychid) SEVCHK(ca_clear_channel(m), "ca_clear_channel failure");

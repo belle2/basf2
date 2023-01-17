@@ -48,7 +48,6 @@ GeometryPar* GeometryPar::instance(const BKLMGeometryPar& element)
 
 GeometryPar::GeometryPar(const GearDir& content) :
   m_DoBeamBackgroundStudy(false),
-  m_BkgSensitiveDetector(nullptr),
   m_NSector(BKLMElementNumbers::getMaximalSectorNumber()),
   m_NLayer(BKLMElementNumbers::getMaximalLayerNumber())
 {
@@ -59,7 +58,6 @@ GeometryPar::GeometryPar(const GearDir& content) :
 
 GeometryPar::GeometryPar(const BKLMGeometryPar& element) :
   m_DoBeamBackgroundStudy(false),
-  m_BkgSensitiveDetector(nullptr),
   m_NSector(BKLMElementNumbers::getMaximalSectorNumber()),
   m_NLayer(BKLMElementNumbers::getMaximalLayerNumber())
 {
@@ -395,12 +393,6 @@ void GeometryPar::readFromDB(const BKLMGeometryPar& element)
 // Calculate derived quantities from the database-defined values
 void GeometryPar::calculate(void)
 {
-  if (m_DoBeamBackgroundStudy) {
-    B2INFO("BKLM::GeometryPar: DoBeamBackgroundStudy is enabled");
-    m_BkgSensitiveDetector = new BkgSensitiveDetector("BKLM");
-  } else {
-    B2DEBUG(20, "BKLM::GeometryPar: DoBeamBackgroundStudy is disabled");
-  }
   m_Gap1ActualHeight = m_Gap1NominalHeight + (m_IronNominalHeight - m_IronActualHeight) / 2.0;
   m_GapActualHeight = m_GapNominalHeight + (m_IronNominalHeight - m_IronActualHeight);
   m_Layer1Height = m_IronNominalHeight + m_Gap1NominalHeight;

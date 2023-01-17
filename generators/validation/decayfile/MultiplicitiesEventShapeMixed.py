@@ -20,8 +20,8 @@
 
 """
 <header>
-    <input>../charged.cdst.root</input>
-    <output>MCvalidationCharged.root</output>
+    <input>../mixed.cdst.root</input>
+    <output>MCvalidationMixed.root</output>
     <description>Determining multiplicities of different particles on generator level</description>
 </header>
 """
@@ -99,7 +99,7 @@ def add_aliases(alias_dict={}):
 
 
 # read input file
-ma.inputMdstList('../charged.cdst.root', path)
+ma.inputMdstList('../mixed.cdst.root', path)
 
 path.add_module(SplitMultiplicities(321))  # K+
 path.add_module(SplitMultiplicities(-321))  # K-
@@ -137,14 +137,14 @@ ma.variablesToNtuple(
     '',
     treename="Multiplicities",
     variables=multi_variables,
-    filename='MCvalidationCharged.root',
+    filename='MCvalidationMixed.root',
     path=path)
-ma.variablesToNtuple('', treename="Split", variables=split_variables, filename='MCvalidationCharged.root', path=path)
+ma.variablesToNtuple('', treename="Split", variables=split_variables, filename='MCvalidationMixed.root', path=path)
 ma.variablesToNtuple(
     '',
     treename="EventShape",
     variables=eventshape_variables,
-    filename='MCvalidationCharged.root',
+    filename='MCvalidationMixed.root',
     path=path)
 
 progress = ma.register_module('Progress')

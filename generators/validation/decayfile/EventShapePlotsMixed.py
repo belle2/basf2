@@ -10,8 +10,8 @@
 
 """
 <header>
-    <input>MCvalidationCharged.root</input>
-    <output>EventShapePlotsCharged.root</output>
+    <input>MCvalidationMixed.root</input>
+    <output>EventShapePlotsMixed.root</output>
     <contact>Frank Meier; frank.meier@belle2.org</contact>
     <description>Comparing event shape variables</description>
 </header>
@@ -35,7 +35,7 @@ def PlottingHistos(var):
 if __name__ == '__main__':
 
     # load the root file into RDataFrame
-    rdf = ROOT.RDataFrame("EventShape", "MCvalidationCharged.root")
+    rdf = ROOT.RDataFrame("EventShape", "MCvalidationMixed.root")
 
     # define the variables to plot
     colnames = rdf.GetColumnNames()
@@ -90,7 +90,7 @@ if __name__ == '__main__':
                 'harmonicMomentThrust4': "harmonicMomentThrust4"
                 }
 
-    outputFile = ROOT.TFile("EventShapePlotsCharged.root", "RECREATE")
+    outputFile = ROOT.TFile("EventShapePlotsMixed.root", "RECREATE")
     ROOT.gROOT.SetBatch(True)
     ROOT.gROOT.SetStyle("BELLE2")
     ROOT.gROOT.ForceStyle()

@@ -10,8 +10,8 @@
 
 """
 <header>
-    <input>MCvalidationCharged.root</input>
-    <output>SplitMultiplicityPlotsCharged.root</output>
+    <input>MCvalidationMixed.root</input>
+    <output>SplitMultiplicityPlotsMixed.root</output>
     <contact>Frank Meier; frank.meier@belle2.org</contact>
     <description>Comparing generated kaon multiplicities, optionally split by charge and originating B meson flavor</description>
 </header>
@@ -40,10 +40,10 @@ def PlottingHistos(particle, pos, neg):
 if __name__ == '__main__':
 
     # load in the root files
-    rdf = ROOT.RDataFrame("Split", "MCvalidationCharged.root")
+    rdf = ROOT.RDataFrame("Split", "MCvalidationMixed.root")
     rdf_fix = rdf.Define("gen_Kn", "-gen_Km").Define("gen_K0bar", "-gen_antiK0")
 
-    B = 'charged'
+    B = 'mixed'
 
     axis_dic = {'Kpm': 'K^{+} / K^{#minus} from both B',
                 'K0': 'K^{0} / #bar{K}^{0} from both B'
@@ -57,7 +57,7 @@ if __name__ == '__main__':
                  'K0_diff': 3.5
                  }
 
-    outputFile = ROOT.TFile("SplitMultiplicityPlotsCharged.root", "RECREATE")
+    outputFile = ROOT.TFile("SplitMultiplicityPlotsMixed.root", "RECREATE")
     ROOT.gROOT.SetBatch(True)
     ROOT.gROOT.SetStyle("BELLE2")
     ROOT.gROOT.ForceStyle()

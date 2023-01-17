@@ -10,8 +10,8 @@
 
 """
 <header>
-    <input>MCvalidationCharged.root</input>
-    <output>MultiplicityPlotsCharged.root</output>
+    <input>MCvalidationMixed.root</input>
+    <output>MultiplicityPlotsMixed.root</output>
     <contact>Frank Meier; frank.meier@belle2.org</contact>
     <description>Comparing generated particle multiplicities</description>
 </header>
@@ -37,7 +37,7 @@ def PlottingHistos(particle):
 if __name__ == '__main__':
 
     # load the root file into RDataFrame
-    rdf = ROOT.RDataFrame("Multiplicities", "MCvalidationCharged.root")
+    rdf = ROOT.RDataFrame("Multiplicities", "MCvalidationMixed.root")
 
     # define the variables to plot
     colnames = rdf.GetColumnNames()
@@ -93,7 +93,7 @@ if __name__ == '__main__':
                 'nTNEUTRINO': '#nu_{#tau}^{#minus}',
                 'nPHOTON': '#gamma'}
 
-    outputFile = ROOT.TFile("MultiplicityPlotsCharged.root", "RECREATE")
+    outputFile = ROOT.TFile("MultiplicityPlotsMixed.root", "RECREATE")
     ROOT.gROOT.SetBatch(True)
     ROOT.gROOT.SetStyle("BELLE2")
     ROOT.gROOT.ForceStyle()

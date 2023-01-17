@@ -12,6 +12,7 @@
 
 
 #include <dqm/analysis/modules/DQMHistOutputToEPICS.h>
+#include <framework/core/ModuleParam.templateDetails.h>
 
 using namespace std;
 using namespace Belle2;
@@ -31,9 +32,7 @@ DQMHistOutputToEPICSModule::DQMHistOutputToEPICSModule()
   // This module CAN NOT be run in parallel!
 
   //Parameter definition
-#ifndef __INTEL_LLVM_COMPILER
   addParam("HistoList", m_histlist, "histname, pvname");
-#endif
   B2DEBUG(99, "DQMHistOutputToEPICS: Constructor done.");
 }
 

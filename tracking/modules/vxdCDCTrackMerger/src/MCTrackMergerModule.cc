@@ -36,42 +36,35 @@ MCTrackMergerModule::MCTrackMergerModule() :
   Module()
 {
   setDescription(
-    "This module merges tracks which are reconstructed, separately, in the silicon VXD and in the CDC");
+    "This module merges tracks which are reconstructed, separately, in the silicon VXD and in the CDC. It is based on MC truth information.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   //input
   addParam("CDCRecoTrackColName", m_CDCRecoTrackColName, "CDC Reco Tracks");
   addParam("VXDRecoTrackColName", m_VXDRecoTrackColName, "VXD Reco Tracks");
+  addParam("MCParticleColName", m_MCParticleColName, "MC Particles", m_MCParticleColName);
 }
 
 void MCTrackMergerModule::initialize()
 {
+  m_MCParticles.isRequired(m_MCParticleColName);
   m_CDCRecoTracks.isRequired(m_CDCRecoTrackColName);
   m_VXDRecoTracks.isRequired(m_VXDRecoTrackColName);
 
   m_CDCRecoTracks.registerRelationTo(m_VXDRecoTracks);
   m_VXDRecoTracks.registerRelationTo(m_CDCRecoTracks);
-
-  StoreArray<MCParticle> mcparticles;
-  if (mcparticles.isOptional()) {
-    m_mcParticlesPresent = true;
-  }
 }
 
 void MCTrackMergerModule::analyzeTrackArray(
-  StoreArray<RecoTrack>& recoTracks,
-  const StoreArray<MCParticle>& mcParticles,
-  std::vector<int>& trackMCParticles,
+  const StoreArray<RecoTrack>& recoTracks,
+  std::vector<int>& trackMCParticleIndices,
   std::vector<double>& trackMinToF)
 {
 
   for (auto& recoTrack : recoTracks) {
 
-    std::vector<int> contributingMCParticles;
-    auto nHits = recoTrack.getSortedCDCHitList().size() + \
-                 recoTrack.getSortedPXDHitList().size() + \
-                 recoTrack.getSortedSVDHitList().size() + \
-                 recoTrack.getSortedVTXHitList().size();
+    std::vector<int> contributingMCParticleIndices;
+    auto nHits = recoTrack.getNumberOfTotalHits();
 
     // Minimum global time of all sim hits in track
     double minGlobalTime = std::numeric_limits<double>::max();
@@ -81,7 +74,7 @@ void MCTrackMergerModule::analyzeTrackArray(
       const RelationVector<MCParticle>& relatedMCParticles = cdcHit->getRelationsFrom<MCParticle>();
       for (size_t i = 0; i < relatedMCParticles.size(); ++i) {
         auto aParticle = relatedMCParticles.object(i);
-        contributingMCParticles.push_back(aParticle->getArrayIndex());
+        contributingMCParticleIndices.push_back(aParticle->getArrayIndex());
       }
 
       const RelationVector<CDCSimHit>& relatedCDCSimHits = cdcHit->getRelationsFrom<CDCSimHit>();
@@ -99,7 +92,7 @@ void MCTrackMergerModule::analyzeTrackArray(
       const RelationVector<MCParticle>& relatedMCParticles = pxdHit->getRelationsTo<MCParticle>();
       for (size_t i = 0; i < relatedMCParticles.size(); ++i) {
         auto aParticle = relatedMCParticles.object(i);
-        contributingMCParticles.push_back(aParticle->getArrayIndex());
+        contributingMCParticleIndices.push_back(aParticle->getArrayIndex());
       }
 
       const RelationVector<PXDTrueHit>& relatedPXDTrueHits = pxdHit->getRelationsTo<PXDTrueHit>();
@@ -117,7 +110,7 @@ void MCTrackMergerModule::analyzeTrackArray(
       const RelationVector<MCParticle>& relatedMCParticles = svdHit->getRelationsTo<MCParticle>();
       for (size_t i = 0; i < relatedMCParticles.size(); ++i) {
         auto aParticle = relatedMCParticles.object(i);
-        contributingMCParticles.push_back(aParticle->getArrayIndex());
+        contributingMCParticleIndices.push_back(aParticle->getArrayIndex());
       }
 
       const RelationVector<SVDTrueHit>& relatedSVDTrueHits = svdHit->getRelationsTo<SVDTrueHit>();
@@ -135,7 +128,7 @@ void MCTrackMergerModule::analyzeTrackArray(
       const RelationVector<MCParticle>& relatedMCParticles = vtxHit->getRelationsTo<MCParticle>();
       for (size_t i = 0; i < relatedMCParticles.size(); ++i) {
         auto aParticle = relatedMCParticles.object(i);
-        contributingMCParticles.push_back(aParticle->getArrayIndex());
+        contributingMCParticleIndices.push_back(aParticle->getArrayIndex());
       }
 
       const RelationVector<VTXTrueHit>& relatedVTXTrueHits = vtxHit->getRelationsTo<VTXTrueHit>();
@@ -149,25 +142,25 @@ void MCTrackMergerModule::analyzeTrackArray(
     }
 
     std::map<int, int> counters;
-    for (auto i : contributingMCParticles) {
+    for (auto i : contributingMCParticleIndices) {
       ++counters[i];
     }
 
     std::multimap<int, int> dst = flip_map(counters);
 
     if (dst.size() == 0) {
-      B2DEBUG(9, "No MC particle found => fake");
-      trackMCParticles.push_back(-1);
+      B2DEBUG(29, "No MC particle found => fake");
+      trackMCParticleIndices.push_back(-1);
       trackMinToF.push_back(minGlobalTime);
     } else if (float(dst.crbegin()->first) / nHits < 0.66)  {
-      B2DEBUG(9, "Less than 66% of hits from same MCParticle => fake");
-      trackMCParticles.push_back(-1);
+      B2DEBUG(29, "Less than 66% of hits from same MCParticle => fake");
+      trackMCParticleIndices.push_back(-1);
       trackMinToF.push_back(minGlobalTime);
     } else {
-      B2DEBUG(9, "MC particle found at " << dst.crbegin()->second);
-      trackMCParticles.push_back(dst.crbegin()->second);
-      trackMinToF.push_back(minGlobalTime - mcParticles[dst.crbegin()->second]->getProductionTime());
-      B2DEBUG(9, "GOOD track with min tof " << minGlobalTime - mcParticles[dst.crbegin()->second]->getProductionTime());
+      B2DEBUG(29, "MC particle found at " << dst.crbegin()->second);
+      trackMCParticleIndices.push_back(dst.crbegin()->second);
+      trackMinToF.push_back(minGlobalTime - m_MCParticles[dst.crbegin()->second]->getProductionTime());
+      B2DEBUG(29, "GOOD track with min tof " << minGlobalTime - m_MCParticles[dst.crbegin()->second]->getProductionTime());
     }
   }
 
@@ -176,11 +169,11 @@ void MCTrackMergerModule::analyzeTrackArray(
 
 void MCTrackMergerModule::cleanTrackArray(
   StoreArray<RecoTrack>& recoTracks,
-  std::vector<int>& trackMCParticles,
+  const std::vector<int>& trackMCParticleIndices,
   bool isVXD)
 {
   for (auto& recoTrack : recoTracks) {
-    if (trackMCParticles[recoTrack.getArrayIndex()] == -1) {
+    if (trackMCParticleIndices[recoTrack.getArrayIndex()] == -1) {
       recoTrack.setQualityIndicator(0.0);
       if (isVXD) {
         m_fakeVXDTracks += 1;
@@ -196,17 +189,15 @@ void MCTrackMergerModule::cleanTrackArray(
 }
 
 void MCTrackMergerModule::checkRelatedTrackArrays(
-  StoreArray<RecoTrack>& cdcTracks,
-  const std::vector<int>& cdcTrackMCParticles,
+  const std::vector<int>& cdcTrackMCParticleIndices,
   const std::vector<double>& cdcTrackMinToF,
-  StoreArray<RecoTrack>& vxdTracks,
-  const std::vector<int>& vxdTrackMCParticles,
+  const std::vector<int>& vxdTrackMCParticleIndices,
   const std::vector<double>& vxdTrackMinToF)
 {
 
-  for (auto& cdcTrack : cdcTracks) {
+  for (auto& cdcTrack : m_CDCRecoTracks) {
     // get index of matched MCParticle
-    int cdcMCParticle = cdcTrackMCParticles[cdcTrack.getArrayIndex()];
+    int cdcMCParticle = cdcTrackMCParticleIndices[cdcTrack.getArrayIndex()];
 
     // get min tof of CDC track
     double cdcMinTof = cdcTrackMinToF[cdcTrack.getArrayIndex()];
@@ -222,7 +213,7 @@ void MCTrackMergerModule::checkRelatedTrackArrays(
       auto relatedQI = relatedVXDRecoTracks[index - offset]->getQualityIndicator();
       auto relatedToF = vxdTrackMinToF[relatedIndex];
 
-      if ((vxdTrackMCParticles[relatedIndex] == cdcMCParticle) &&
+      if ((vxdTrackMCParticleIndices[relatedIndex] == cdcMCParticle) &&
           (cdcMCParticle >= 0) &&
           (relatedQI > 0.0) &&
           (relatedToF < cdcMinTof))  {
@@ -241,9 +232,9 @@ void MCTrackMergerModule::checkRelatedTrackArrays(
     }
   }
 
-  for (auto& vxdTrack : vxdTracks) {
+  for (auto& vxdTrack : m_VXDRecoTracks) {
     // get index of matched MCParticle
-    int vxdMCParticle = vxdTrackMCParticles[vxdTrack.getArrayIndex()];
+    int vxdMCParticle = vxdTrackMCParticleIndices[vxdTrack.getArrayIndex()];
 
     // get min tof of VXD track
     double vxdMinTof = vxdTrackMinToF[vxdTrack.getArrayIndex()];
@@ -259,7 +250,7 @@ void MCTrackMergerModule::checkRelatedTrackArrays(
       auto relatedQI = relatedCDCRecoTracks[index - offset]->getQualityIndicator();
       auto relatedToF = cdcTrackMinToF[relatedIndex];
 
-      if ((cdcTrackMCParticles[relatedIndex] == vxdMCParticle) &&
+      if ((cdcTrackMCParticleIndices[relatedIndex] == vxdMCParticle) &&
           (vxdMCParticle >= 0) &&
           (relatedQI > 0.0) &&
           (vxdMinTof < relatedToF))  {
@@ -279,16 +270,14 @@ void MCTrackMergerModule::checkRelatedTrackArrays(
 }
 
 void MCTrackMergerModule::mergeVXDAndCDCTrackArrays(
-  StoreArray<RecoTrack>& cdcTracks,
-  const std::vector<int>& cdcTrackMCParticles,
+  const std::vector<int>& cdcTrackMCParticleIndices,
   const std::vector<double>& cdcTrackMinToF,
-  StoreArray<RecoTrack>& vxdTracks,
-  const std::vector<int>& vxdTrackMCParticles,
+  const std::vector<int>& vxdTrackMCParticleIndices,
   const std::vector<double>& vxdTrackMinToF)
 {
 
-  for (auto& cdcTrack : cdcTracks) {
-    B2DEBUG(9, "Match with CDCTrack at " <<  cdcTrack.getArrayIndex());
+  for (auto& cdcTrack : m_CDCRecoTracks) {
+    B2DEBUG(29, "Match with CDCTrack at " <<  cdcTrack.getArrayIndex());
 
     // get min tof of CDC track
     double cdcMinTof = cdcTrackMinToF[cdcTrack.getArrayIndex()];
@@ -298,12 +287,12 @@ void MCTrackMergerModule::mergeVXDAndCDCTrackArrays(
       continue;
 
     // check for new relations to VXD tracks missing so far
-    for (auto& vxdTrack : vxdTracks) {
+    for (auto& vxdTrack : m_VXDRecoTracks) {
 
       // get min tof of VXD track
       double vxdMinTof = vxdTrackMinToF[vxdTrack.getArrayIndex()];
 
-      B2DEBUG(9, "Compare with  " <<  vxdTrack.getArrayIndex());
+      B2DEBUG(29, "Compare with  " <<  vxdTrack.getArrayIndex());
 
       RelationVector<RecoTrack> relatedCDCRecoTracks = vxdTrack.getRelationsWith<RecoTrack>(m_CDCRecoTrackColName);
 
@@ -312,11 +301,11 @@ void MCTrackMergerModule::mergeVXDAndCDCTrackArrays(
       if (vxdHasGoodRelation)
         continue;
 
-      if ((vxdTrackMCParticles[vxdTrack.getArrayIndex()] == cdcTrackMCParticles[cdcTrack.getArrayIndex()]) &&
-          (vxdTrackMCParticles[vxdTrack.getArrayIndex()] >= 0) &&
+      if ((vxdTrackMCParticleIndices[vxdTrack.getArrayIndex()] == cdcTrackMCParticleIndices[cdcTrack.getArrayIndex()]) &&
+          (vxdTrackMCParticleIndices[vxdTrack.getArrayIndex()] >= 0) &&
           (vxdMinTof < cdcMinTof))  {
-        B2DEBUG(9, "matched to MC particle at: " << vxdTrackMCParticles[vxdTrack.getArrayIndex()]);
-        B2DEBUG(9, "vxd_tof: " << vxdMinTof << " < cdc_tof:" << cdcMinTof);
+        B2DEBUG(29, "matched to MC particle at: " << vxdTrackMCParticleIndices[vxdTrack.getArrayIndex()]);
+        B2DEBUG(29, "vxd_tof: " << vxdMinTof << " < cdc_tof:" << cdcMinTof);
         // -1 is the convention for "before the CDC track" in the related tracks combiner
         m_VXDRecoTracks[vxdTrack.getArrayIndex()]->addRelationTo(&cdcTrack, -1);
         m_matchedTotal += 1;
@@ -329,15 +318,15 @@ void MCTrackMergerModule::mergeVXDAndCDCTrackArrays(
 
 void MCTrackMergerModule::removeClonesFromTrackArray(
   StoreArray<RecoTrack>& recoTracks,
-  std::vector<int>& tracksMCParticles,
-  std::vector<double>& tracksMinToF,
+  const std::vector<int>& tracksMCParticleIndices,
+  const std::vector<double>& tracksMinToF,
   const std::string& relatedTracksColumnName,
   bool isVXD)
 {
   for (auto& recoTrack : recoTracks) {
 
     // get index of matched MCParticle
-    int trackMCParticle_1 = tracksMCParticles[recoTrack.getArrayIndex()];
+    int trackMCParticle_1 = tracksMCParticleIndices[recoTrack.getArrayIndex()];
 
     // get min tof of track
     double trackMinTof_1 = tracksMinToF[recoTrack.getArrayIndex()];
@@ -354,7 +343,7 @@ void MCTrackMergerModule::removeClonesFromTrackArray(
       }
 
       // get index of matched MCParticle
-      int trackMCParticle_2 = tracksMCParticles[recoTrack2.getArrayIndex()];
+      int trackMCParticle_2 = tracksMCParticleIndices[recoTrack2.getArrayIndex()];
 
       // get min tof of track
       double trackMinTof_2 = tracksMinToF[recoTrack2.getArrayIndex()];
@@ -416,95 +405,80 @@ void MCTrackMergerModule::event()
 
   // Get CDC tracks
   unsigned int nCDCTracks = m_CDCRecoTracks.getEntries();
-  B2DEBUG(9, "MCTrackMerger: input Number of CDC Tracks: " << nCDCTracks);
+  B2DEBUG(29, "MCTrackMerger: input Number of CDC Tracks: " << nCDCTracks);
   m_totalCDCTracks += nCDCTracks;
 
   // Get VXD tracks
   unsigned int nVXDTracks = m_VXDRecoTracks.getEntries();
-  B2DEBUG(9,
+  B2DEBUG(29,
           "MCTrackMerger: input Number of VXD Tracks: " << nVXDTracks);
   m_totalVXDTracks += nVXDTracks;
 
-  // Skip in the case there are no MC particles present
-  if (not m_mcParticlesPresent) {
-    B2DEBUG(9, "Skipping MC Track Finder as there are no MC Particles registered in the DataStore.");
-    return;
-  }
-
-  // Get MC particles
-  StoreArray<MCParticle> mcparticles;
-
   // Find a MCParticle for each track candidate
-  std::vector<int> vxdTrackMCParticles;
-  std::vector<int> cdcTrackMCParticles;
+  std::vector<int> vxdTrackMCParticleIndices;
+  std::vector<int> cdcTrackMCParticleIndices;
 
   // Find minimum time of flight for each track candidate
   std::vector<double> vxdTrackMinToF;
   std::vector<double> cdcTrackMinToF;
 
-  B2DEBUG(9, "Analyze VXD tracks");
+  B2DEBUG(29, "Analyze VXD tracks");
   analyzeTrackArray(
     m_VXDRecoTracks,
-    mcparticles,
-    vxdTrackMCParticles,
+    vxdTrackMCParticleIndices,
     vxdTrackMinToF
   );
 
-  B2DEBUG(9, "Clean VXD tracks from fakes");
+  B2DEBUG(29, "Clean VXD tracks from fakes");
   cleanTrackArray(
     m_VXDRecoTracks,
-    vxdTrackMCParticles,
+    vxdTrackMCParticleIndices,
     true
   );
 
-  B2DEBUG(9, "Analyze CDC tracks");
+  B2DEBUG(29, "Analyze CDC tracks");
   analyzeTrackArray(
     m_CDCRecoTracks,
-    mcparticles,
-    cdcTrackMCParticles,
+    cdcTrackMCParticleIndices,
     cdcTrackMinToF
   );
 
-  B2DEBUG(9, "Clean CDC tracks from fakes");
+  B2DEBUG(29, "Clean CDC tracks from fakes");
   cleanTrackArray(
     m_CDCRecoTracks,
-    cdcTrackMCParticles,
+    cdcTrackMCParticleIndices,
     false
   );
 
-  B2DEBUG(9, "Checks the existing relations between CDC and VXD tracks and remove wrong ones");
+  B2DEBUG(29, "Checks the existing relations between CDC and VXD tracks and remove wrong ones");
   checkRelatedTrackArrays(
-    m_CDCRecoTracks,
-    cdcTrackMCParticles,
+    cdcTrackMCParticleIndices,
     cdcTrackMinToF,
-    m_VXDRecoTracks,
-    vxdTrackMCParticles,
+    vxdTrackMCParticleIndices,
     vxdTrackMinToF
   );
 
-  B2DEBUG(9, "Merging  CDC to VXD tracks, where VXD track will be added before CDC track");
+  B2DEBUG(29, "Merging  CDC to VXD tracks, where VXD track will be added before CDC track");
   mergeVXDAndCDCTrackArrays(
-    m_CDCRecoTracks,
-    cdcTrackMCParticles,
+    cdcTrackMCParticleIndices,
     cdcTrackMinToF,
-    m_VXDRecoTracks,
-    vxdTrackMCParticles,
+    vxdTrackMCParticleIndices,
     vxdTrackMinToF
   );
 
-  B2DEBUG(9, "Removing clones in CDC");
+  B2DEBUG(29, "Removing clones in CDC");
   removeClonesFromTrackArray(
     m_CDCRecoTracks,
-    cdcTrackMCParticles,
+    cdcTrackMCParticleIndices,
     cdcTrackMinToF,
     m_VXDRecoTrackColName,
     false
   );
 
-  B2DEBUG(9, "Removing clones in VXD");
+  B2DEBUG(29, "Removing clones in VXD");
   removeClonesFromTrackArray(
     m_VXDRecoTracks,
-    vxdTrackMCParticles,
+    vxdTrackMCParticleIndices,
     vxdTrackMinToF,
     m_CDCRecoTrackColName,
     true

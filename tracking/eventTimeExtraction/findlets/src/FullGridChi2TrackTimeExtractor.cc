@@ -11,6 +11,7 @@
 #include <tracking/eventTimeExtraction/findlets/IterativeEventTimeExtractor.icc.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <tracking/dataobjects/RecoTrack.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -29,7 +30,7 @@ void FullGridChi2TrackTimeExtractor::exposeParameters(ModuleParamList* modulePar
   m_gridExtractor.exposeParameters(moduleParamList, prefixed("Grid", prefix));
   m_finalExtractor.exposeParameters(moduleParamList, prefixed("Refiner", prefix));
 
-  moduleParamList->getParameter<int>("GridIterations").setDefaultValue(1);
+  moduleParamList->getParameter<unsigned int>("GridIterations").setDefaultValue(1);
   moduleParamList->getParameter<bool>("RefinerUseLastEventT0").setDefaultValue(true);
 }
 

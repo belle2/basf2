@@ -126,127 +126,125 @@ void BelleBremRecoveryModule::event()
 
   if (nLep == 0) return;
 
-  const double maxAngle = TMath::Pi();
+  const std::string extraInfoSuffix = "BelleBremRecovery_" + m_inputListName + "_" + m_gammaListName;
 
-  // store angle for every pair of (Lep, Gam).  tuple<angle, isBestForLep, isBestForGamma>
-  std::vector<std::vector<std::tuple<double, bool, bool>>> angleMatrix;
-  angleMatrix.resize(nLep);
+  std::vector<std::vector<Particle*>> selectedGammas_nLep; // only used if m_usePhotonOnlyOnce is true
+  if (m_usePhotonOnlyOnce) selectedGammas_nLep.resize(nLep);
 
   // loop over charged particles
   for (unsigned iLep = 0; iLep < nLep; iLep++) {
-    angleMatrix[iLep].resize(nGam);
-    const ROOT::Math::XYZVector pLep = m_inputparticleList->getParticle(iLep)->getMomentum();
+    std::vector<Particle*> selectedGammas;
+
+    const Particle* lepton = m_inputparticleList->getParticle(iLep);
+    const ROOT::Math::XYZVector pLep = lepton->getMomentum();
 
     // look for all possible (radiative) gamma
     for (unsigned iGam = 0; iGam < nGam; iGam++) {
-      const ROOT::Math::XYZVector pGam = m_gammaList->getParticle(iGam)->getMomentum();
+      Particle* gamma = m_gammaList->getParticle(iGam); // to write extraInfo
+      const ROOT::Math::XYZVector pGam = gamma->getMomentum();
 
       const double angle = ROOT::Math::VectorUtil::Angle(pLep, pGam);
-      if (angle < m_angleThres)
-        angleMatrix[iLep][iGam] = std::make_tuple(angle, /* isBestForLep */ false, /* isBestForGamma */ false);
-      else
-        angleMatrix[iLep][iGam] = std::make_tuple(maxAngle, /* isBestForLep */ false, /* isBestForGamma */ false);
+
+      if (angle < m_angleThres) {
+        if (!m_usePhotonOnlyOnce) { // if multiple use is allowed, keep all gammas
+          gamma->writeExtraInfo("angle_" + extraInfoSuffix, angle);
+          gamma->writeExtraInfo("indexLep_" + extraInfoSuffix, iLep);
+          selectedGammas.push_back(gamma);
+        } else {
+          if (gamma->hasExtraInfo("angle_" + extraInfoSuffix)) { // check if the gamma has already selected
+            if (angle < gamma->getExtraInfo("angle_" + extraInfoSuffix)) {
+              // this lepton is closer to the gamma than previous lepton
+              int indexLep_prev = gamma->getExtraInfo("indexLep_" + extraInfoSuffix);
+              selectedGammas_nLep[indexLep_prev].erase(std::remove(selectedGammas_nLep[indexLep_prev].begin(),
+                                                                   selectedGammas_nLep[indexLep_prev].end(),
+                                                                   gamma),
+                                                       selectedGammas_nLep[indexLep_prev].end());
+              gamma->writeExtraInfo("angle_" + extraInfoSuffix, angle);
+              gamma->writeExtraInfo("indexLep_" + extraInfoSuffix, iLep);
+              selectedGammas.push_back(gamma);
+            }
+          } else {
+            gamma->writeExtraInfo("angle_" + extraInfoSuffix, angle);
+            gamma->writeExtraInfo("indexLep_" + extraInfoSuffix, iLep);
+            selectedGammas.push_back(gamma);
+          }
+        }
+      }
     }
 
-    // if m_isMultiPho is False, find the closest gamma of the iLep-th lepton.
-    if (!m_isMultiPho) {
-      const auto iter = std::min_element(angleMatrix[iLep].begin(), angleMatrix[iLep].end(),
-      [](const auto & a, const auto & b) { return std::get<0>(a) < std::get<0>(b); });
-      if (std::get<0>(*iter) != maxAngle) {
-        size_t index = std::distance(angleMatrix[iLep].begin(), iter);
-        angleMatrix[iLep][index] = std::make_tuple(std::get<0>(*iter), true, false);
-      }
+    // sorting the bremphotons in ascending order of the angle with the charged particle
+    std::sort(selectedGammas.begin(), selectedGammas.end(),
+    [extraInfoSuffix](const Particle * photon1, const Particle * photon2) {
+      return photon1->getExtraInfo("angle_" + extraInfoSuffix) < photon2->getExtraInfo("angle_" + extraInfoSuffix);
+    });
+
+    if (!m_usePhotonOnlyOnce)
+      correctLepton(lepton, selectedGammas);
+    else
+      selectedGammas_nLep[iLep] = selectedGammas;
+
+  }
+
+  if (m_usePhotonOnlyOnce) {
+    for (unsigned iLep = 0; iLep < nLep; iLep++) {
+      const Particle* lepton = m_inputparticleList->getParticle(iLep);
+      correctLepton(lepton, selectedGammas_nLep[iLep]);
     }
   }
 
-  // find the closest lepton of the iGam-th gamma.
-  for (unsigned iGam = 0; iGam < nGam; iGam++) {
-    std::vector<std::pair<double, bool>> distancesToLeptons;
-    distancesToLeptons.resize(nLep);
+}
 
-    for (unsigned iLep = 0; iLep < nLep; iLep++)
-      distancesToLeptons[iLep] = std::make_pair(std::get<0>(angleMatrix[iLep][iGam]), std::get<1>(angleMatrix[iLep][iGam]));
+void BelleBremRecoveryModule::correctLepton(const Particle* lepton, std::vector<Particle*> selectedGammas)
+{
+  // Updates 4-vector and errorMatrix
+  ROOT::Math::PxPyPzEVector new4Vec = lepton->get4Vector();
+  const TMatrixFSym& lepErrorMatrix = lepton->getMomentumVertexErrorMatrix();
+  TMatrixFSym corLepMatrix = lepErrorMatrix;
 
-    // find the closest lepton of iGam-th gamma.
-    if (m_isMultiPho) {
-      const auto iter = std::min_element(distancesToLeptons.begin(), distancesToLeptons.end(),
-      [](const auto & a, const auto & b) {return a.first < b.first; });
-      if ((*iter).first != maxAngle) {
-        size_t index = std::distance(distancesToLeptons.begin(), iter);
-        angleMatrix[index][iGam] = std::make_tuple((*iter).first, false, true);
-      }
-    } else {
-      // if m_isMultiPho is False, only gammas that are the best for a lepton.
-      const auto iter = std::min_element(distancesToLeptons.begin(), distancesToLeptons.end(), [](const auto & a, const auto & b) {
-        if (a.second and b.second) return a.first < b.first; // if both a and b is "Best", compare the angles
-        else                       return a.second;
-      });
-      if ((*iter).first != maxAngle) {
-        size_t index = std::distance(distancesToLeptons.begin(), iter);
-        angleMatrix[index][iGam] = std::make_tuple((*iter).first, (*iter).second, true);
-      }
-    }
+  // Sum of energy of correction gammas for the extraInfo
+  double bremsGammaEnergySum = 0.0;
+
+  // Create a correctedLepton. 4-vector will be updated
+  Particle correctedLepton(new4Vec, lepton->getPDGCode(), Particle::EFlavorType::c_Flavored, Particle::c_Track,
+                           lepton->getTrack()->getArrayIndex());
+
+  correctedLepton.setVertex(lepton->getVertex());
+  correctedLepton.setPValue(lepton->getPValue());
+
+  correctedLepton.appendDaughter(lepton, false);
+
+  for (auto gamma : selectedGammas) {
+
+    new4Vec += gamma->get4Vector();
+    bremsGammaEnergySum += Variable::eclClusterE(gamma);
+
+    const TMatrixFSym& fsrErrorMatrix = gamma->getMomentumVertexErrorMatrix();
+    for (int irow = 0; irow <= 3 ; irow++)
+      for (int icol = irow; icol <= 3; icol++)
+        corLepMatrix(irow, icol) += fsrErrorMatrix(irow, icol);
+
+    correctedLepton.appendDaughter(gamma, false);
+
+    B2DEBUG(19, "[BelleBremRecoveryModule] Found a radiative gamma and added its 4-vector to the charge particle");
+
+    if (!m_isMultiPho) break;
   }
 
-  for (unsigned iLep = 0; iLep < nLep; iLep++) {
-    const Particle* lepton = m_inputparticleList->getParticle(iLep);
+  correctedLepton.set4Vector(new4Vec);
+  correctedLepton.updateMass(m_pdgCode);
+  correctedLepton.setMomentumVertexErrorMatrix(corLepMatrix);
+  correctedLepton.addExtraInfo("bremsCorrected", float(bremsGammaEnergySum > 0));
+  correctedLepton.addExtraInfo("bremsCorrectedPhotonEnergy", bremsGammaEnergySum);
 
-    // Updates 4-vector and errorMatrix
-    ROOT::Math::PxPyPzEVector new4Vec = lepton->get4Vector();
-    const TMatrixFSym& lepErrorMatrix = lepton->getMomentumVertexErrorMatrix();
-    TMatrixFSym corLepMatrix = lepErrorMatrix;
+  // add the mc relation
+  Particle* newLepton = m_particles.appendNew(correctedLepton);
+  const MCParticle* mcLepton = lepton->getRelated<MCParticle>();
+  const PIDLikelihood* pid = lepton->getPIDLikelihood();
+  if (pid)
+    newLepton->addRelationTo(pid);
+  if (mcLepton)
+    newLepton->addRelationTo(mcLepton);
 
-    // Sum of energy of correction gammas for the extraInfo
-    double bremsGammaEnergySum = 0.0;
+  m_outputparticleList->addParticle(newLepton);
 
-    // Create a correctedLepton. 4-vector will be updated
-    Particle correctedLepton(new4Vec, lepton->getPDGCode(), Particle::EFlavorType::c_Flavored, Particle::c_Track,
-                             lepton->getTrack()->getArrayIndex());
-
-    correctedLepton.setVertex(lepton->getVertex());
-    correctedLepton.setPValue(lepton->getPValue());
-
-    correctedLepton.appendDaughter(lepton, false);
-
-    for (unsigned iGam = 0; iGam < nGam; iGam++) {
-      auto tuple = angleMatrix[iLep][iGam];
-
-      if (std::get<0>(tuple) < m_angleThres
-          and (m_isMultiPho or /* isBestForLepton */ std::get<1>(tuple))
-          and (!m_usePhotonOnlyOnce or /* isBestForGamma */ std::get<2>(tuple))) {
-
-        const auto gamma = m_gammaList->getParticle(iGam);
-
-        new4Vec += gamma->get4Vector();
-        bremsGammaEnergySum += Variable::eclClusterE(gamma);
-
-        const TMatrixFSym& fsrErrorMatrix = gamma->getMomentumVertexErrorMatrix();
-        for (int irow = 0; irow <= 3 ; irow++)
-          for (int icol = irow; icol <= 3; icol++)
-            corLepMatrix(irow, icol) += fsrErrorMatrix(irow, icol);
-
-        correctedLepton.appendDaughter(gamma, false);
-
-        B2DEBUG(19, "[BelleBremRecoveryModule] Found a radiative gamma and added its 4-vector to the charge particle");
-      }
-    }
-
-
-    correctedLepton.set4Vector(new4Vec);
-    correctedLepton.updateMass(m_pdgCode);
-    correctedLepton.setMomentumVertexErrorMatrix(corLepMatrix);
-    correctedLepton.addExtraInfo("bremsCorrected", float(bremsGammaEnergySum > 0));
-    correctedLepton.addExtraInfo("bremsCorrectedPhotonEnergy", bremsGammaEnergySum);
-
-    // add the mc relation
-    Particle* newLepton = m_particles.appendNew(correctedLepton);
-    const MCParticle* mcLepton = lepton->getRelated<MCParticle>();
-    const PIDLikelihood* pid = lepton->getPIDLikelihood();
-    if (pid)
-      newLepton->addRelationTo(pid);
-    if (mcLepton)
-      newLepton->addRelationTo(mcLepton);
-
-    m_outputparticleList->addParticle(newLepton);
-  }
 }

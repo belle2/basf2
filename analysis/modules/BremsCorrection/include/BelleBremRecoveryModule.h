@@ -52,6 +52,11 @@ namespace Belle2 {
      */
     virtual void event() override;
 
+    /**
+     * Correct lepton kinematics using the selectedGammas. Create a new Particle and add it into the output ParticleList.
+     */
+    void correctLepton(const Particle* lepton, std::vector<Particle*> selectedGammas);
+
     enum {c_DimMatrix = 7};
 
   private:

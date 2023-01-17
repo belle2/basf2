@@ -26,7 +26,6 @@
 #include <Math/Vector3D.h>
 #include <Math/Vector4D.h>
 #include <Math/VectorUtil.h>
-#include <TMath.h>
 
 #include <vector>
 
@@ -146,7 +145,7 @@ void BelleBremRecoveryModule::event()
       const double angle = ROOT::Math::VectorUtil::Angle(pLep, pGam);
 
       if (angle < m_angleThres) {
-        if (!m_usePhotonOnlyOnce) { // if multiple use is allowed, keep all gammas
+        if (!m_usePhotonOnlyOnce) { // if multiple use is allowed, keep all selected gammas
           gamma->writeExtraInfo("angle_" + extraInfoSuffix, angle);
           gamma->writeExtraInfo("indexLep_" + extraInfoSuffix, iLep);
           selectedGammas.push_back(gamma);
@@ -162,7 +161,7 @@ void BelleBremRecoveryModule::event()
               gamma->writeExtraInfo("angle_" + extraInfoSuffix, angle);
               gamma->writeExtraInfo("indexLep_" + extraInfoSuffix, iLep);
               selectedGammas.push_back(gamma);
-            }
+            } // else, the gamma will not be used for correction
           } else {
             gamma->writeExtraInfo("angle_" + extraInfoSuffix, angle);
             gamma->writeExtraInfo("indexLep_" + extraInfoSuffix, iLep);
@@ -178,10 +177,10 @@ void BelleBremRecoveryModule::event()
       return photon1->getExtraInfo("angle_" + extraInfoSuffix) < photon2->getExtraInfo("angle_" + extraInfoSuffix);
     });
 
-    if (!m_usePhotonOnlyOnce)
-      correctLepton(lepton, selectedGammas);
-    else
+    if (m_usePhotonOnlyOnce) // store the selectedGammas to check the closest lepton to gammas
       selectedGammas_nLep[iLep] = selectedGammas;
+    else // perform correction here.
+      correctLepton(lepton, selectedGammas);
 
   }
 

@@ -19,6 +19,8 @@
 import basf2 as b2
 import generators as ge
 
+b2.set_random_seed('charged')
+
 # create path
 main = b2.create_path()
 

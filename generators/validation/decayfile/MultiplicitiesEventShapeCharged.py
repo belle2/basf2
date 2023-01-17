@@ -21,7 +21,7 @@
 """
 <header>
     <input>../charged.cdst.root</input>
-    <output>MCvalidation.root</output>
+    <output>MCvalidationCharged.root</output>
     <description>Determining multiplicities of different particles on generator level</description>
 </header>
 """
@@ -29,7 +29,7 @@
 import basf2 as b2
 import modularAnalysis as ma
 from variables import variables as v
-from variables import collections as c
+from variables import collections as vc
 from SplitMultiplicities import SplitMultiplicities
 
 path = b2.create_path()
@@ -69,26 +69,26 @@ def define_ups_aliases():
 def define_split_aliases():
     '''Define aliases for extraInfo resulting from SplitMultiplicities module'''
     alias_dict = {}
-    alias_dict['gen_Kp'] = 'extraInfo(nGen_321)'
-    alias_dict['gen_Kp_Bp'] = 'extraInfo(nGen_321_Bp)'
-    alias_dict['gen_Kp_Bm'] = 'extraInfo(nGen_321_Bm)'
-    alias_dict['gen_Kp_B0'] = 'extraInfo(nGen_321_B0)'
-    alias_dict['gen_Kp_antiB0'] = 'extraInfo(nGen_321_antiB0)'
-    alias_dict['gen_Km'] = 'extraInfo(nGen_-321)'
-    alias_dict['gen_Km_Bp'] = 'extraInfo(nGen_-321_Bp)'
-    alias_dict['gen_Km_Bm'] = 'extraInfo(nGen_-321_Bm)'
-    alias_dict['gen_Km_B0'] = 'extraInfo(nGen_-321_B0)'
-    alias_dict['gen_Km_antiB0'] = 'extraInfo(nGen_-321_antiB0)'
-    alias_dict['gen_K0'] = 'extraInfo(nGen_311)'
-    alias_dict['gen_K0_Bp'] = 'extraInfo(nGen_311_Bp)'
-    alias_dict['gen_K0_Bm'] = 'extraInfo(nGen_311_Bm)'
-    alias_dict['gen_K0_B0'] = 'extraInfo(nGen_311_B0)'
-    alias_dict['gen_K0_antiB0'] = 'extraInfo(nGen_311_antiB0)'
-    alias_dict['gen_antiK0'] = 'extraInfo(nGen_-311)'
-    alias_dict['gen_antiK0_Bp'] = 'extraInfo(nGen_-311_Bp)'
-    alias_dict['gen_antiK0_Bm'] = 'extraInfo(nGen_-311_Bm)'
-    alias_dict['gen_antiK0_B0'] = 'extraInfo(nGen_-311_B0)'
-    alias_dict['gen_antiK0_antiB0'] = 'extraInfo(nGen_-311_antiB0)'
+    alias_dict['gen_Kp'] = 'eventExtraInfo(nGen_321)'
+    alias_dict['gen_Kp_Bp'] = 'eventExtraInfo(nGen_321_Bp)'
+    alias_dict['gen_Kp_Bm'] = 'eventExtraInfo(nGen_321_Bm)'
+    alias_dict['gen_Kp_B0'] = 'eventExtraInfo(nGen_321_B0)'
+    alias_dict['gen_Kp_antiB0'] = 'eventExtraInfo(nGen_321_antiB0)'
+    alias_dict['gen_Km'] = 'eventExtraInfo(nGen_-321)'
+    alias_dict['gen_Km_Bp'] = 'eventExtraInfo(nGen_-321_Bp)'
+    alias_dict['gen_Km_Bm'] = 'eventExtraInfo(nGen_-321_Bm)'
+    alias_dict['gen_Km_B0'] = 'eventExtraInfo(nGen_-321_B0)'
+    alias_dict['gen_Km_antiB0'] = 'eventExtraInfo(nGen_-321_antiB0)'
+    alias_dict['gen_K0'] = 'eventExtraInfo(nGen_311)'
+    alias_dict['gen_K0_Bp'] = 'eventExtraInfo(nGen_311_Bp)'
+    alias_dict['gen_K0_Bm'] = 'eventExtraInfo(nGen_311_Bm)'
+    alias_dict['gen_K0_B0'] = 'eventExtraInfo(nGen_311_B0)'
+    alias_dict['gen_K0_antiB0'] = 'eventExtraInfo(nGen_311_antiB0)'
+    alias_dict['gen_antiK0'] = 'eventExtraInfo(nGen_-311)'
+    alias_dict['gen_antiK0_Bp'] = 'eventExtraInfo(nGen_-311_Bp)'
+    alias_dict['gen_antiK0_Bm'] = 'eventExtraInfo(nGen_-311_Bm)'
+    alias_dict['gen_antiK0_B0'] = 'eventExtraInfo(nGen_-311_B0)'
+    alias_dict['gen_antiK0_antiB0'] = 'eventExtraInfo(nGen_-311_antiB0)'
     return(alias_dict)
 
 
@@ -101,17 +101,10 @@ def add_aliases(alias_dict={}):
 # read input file
 ma.inputMdstList('../charged.cdst.root', path)
 
-# pick one charged track per event needed for the SplitMultiplicities module
-ma.fillParticleList('pi+:sel', '',  path=path)
-ma.rankByHighest('pi+:sel', variable="random", numBest=1, outputVariable="Rank", path=path)
-
-path.add_module(SplitMultiplicities('pi+:sel', 321))  # K+
-path.add_module(SplitMultiplicities('pi+:sel', -321))  # K-
-path.add_module(SplitMultiplicities('pi+:sel', 311))  # K0
-path.add_module(SplitMultiplicities('pi+:sel', -311))  # anti_K0
-
-# fill generated Upsilon particle list
-ma.fillParticleListFromMC("Upsilon(4S):MC", '', True, path=path)
+path.add_module(SplitMultiplicities(321))  # K+
+path.add_module(SplitMultiplicities(-321))  # K-
+path.add_module(SplitMultiplicities(311))  # K0
+path.add_module(SplitMultiplicities(-311))  # anti_K0
 
 # fill other generated particle lists needed for event shape
 pions = ("pi+:MC", '')
@@ -137,21 +130,21 @@ multi_variables = list(Multi_aliasDict.keys())
 split_variables = list(Split_aliasDict.keys())
 
 # add event shape variables to a list
-eventshape_variables = c.event_shape
+eventshape_variables = vc.event_shape
 
 # write out the trees containing the multiplicities, split multiplicities for kaons and the event shape variables
 ma.variablesToNtuple(
-    'Upsilon(4S):MC',
+    '',
     treename="Multiplicities",
     variables=multi_variables,
-    filename='MCvalidation.root',
+    filename='MCvalidationCharged.root',
     path=path)
-ma.variablesToNtuple('pi+:sel', treename="Split", variables=split_variables, filename='MCvalidation.root', path=path)
+ma.variablesToNtuple('', treename="Split", variables=split_variables, filename='MCvalidationCharged.root', path=path)
 ma.variablesToNtuple(
-    'Upsilon(4S):MC',
+    '',
     treename="EventShape",
     variables=eventshape_variables,
-    filename='MCvalidation.root',
+    filename='MCvalidationCharged.root',
     path=path)
 
 progress = ma.register_module('Progress')

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 ##########################################################################
@@ -9,134 +9,145 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
+#############################################################
+# Steering file to reconstruct charged/mixed MC cdst files.
+# Used to validate changes between decay files.
+# Prints multiplicities of generated particles.
+# Uses the SplitMultiplicities module to list multiplicities
+# of Kaons depending on B meson flavour in a separate tree.
+# In addition gives tree containing generated event shapes.
+#############################################################
+
 """
 <header>
-    <input>MCvalidation.root</input>
-    <description>Comparing generated particle multiplicities</description>
+    <input>../charged.cdst.root</input>
+    <output>MCvalidationCharged.root</output>
+    <description>Determining multiplicities of different particles on generator level</description>
 </header>
 """
 
-from root_pandas import read_root
-import matplotlib.pyplot as plt
-# import numpy as np
+import basf2 as b2
+import modularAnalysis as ma
+from variables import variables as v
+from variables import collections as vc
+from SplitMultiplicities import SplitMultiplicities
 
-plt.rcParams['axes.prop_cycle'] = plt.cycler(color=["#7fcdbb", "#081d58"])
-
-
-def PlottingCompHistos(particle):
-    ''' Plotting function to compare generated particle multiplicities between two MC samples'''
-
-    nbins = int(range_dic[particle][1] - (range_dic[particle][0]))
-
-    # get unnormalised bin counts
-    raw, _, _ = plt.hist(file[var], bins=nbins, range=range_dic[particle])
-    # raw2, outbins, _ = plt.hist(old[var], bins=nbins, range=range_dic[particle], histtype='step')
-    plt.close()
-
-    # plot normalised particle multiplicities histograms
-    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(5, 5), dpi=300, sharex=True, gridspec_kw={"height_ratios": [3.5, 1]})
-    count1, _, _ = ax1.hist(file[var], bins=nbins, range=range_dic[particle], density=True)
-    # count2, outbins, _ = ax1.hist(old[var], bins=nbins, range=range_dic[particle], histtype='step', density=True)
-
-    # # calculate ratios
-    # bin_centers = outbins[:-1] + np.diff(outbins) / 2
-    # ratio = count1/count2
-    # err = np.sqrt((1/raw)+(1/raw2))
-
-    # # plot residuals
-    # ax2.errorbar(x=bin_centers, y=ratio, yerr=err, ls='', marker='_',  markersize='10', color="#4575b4")
-    # ax2.axhline(1.0, alpha=0.3)
-
-    # add labels and legend
-    # ax1.legend()
-    # ax2.set_xlabel(axis_dic[particle])
-    # ax2.set_ylabel(r'$\dfrac{New}{Old}$')
-    ax1.set_ylabel("Norm. Entries/Bin")
-    # ax2.set_ylim(0.9, 1.1)
-
-    # save histograms
-    fig.tight_layout()
-    plt.savefig(str(var) + '.png')
+path = b2.create_path()
 
 
-if __name__ == '__main__':
+def define_ups_aliases():
+    '''Define aliases to write out multiplicities'''
+    alias_dict = {}
+    alias_dict['nPIp'] = 'genUpsilon4S(NumberOfMCParticlesInEvent(211))'
+    alias_dict['nPI0'] = 'genUpsilon4S(NumberOfMCParticlesInEvent(111))'
+    alias_dict['nETA'] = 'genUpsilon4S(NumberOfMCParticlesInEvent(221))'
+    alias_dict['nETAprim'] = 'genUpsilon4S(NumberOfMCParticlesInEvent(331))'
+    alias_dict['nPHI'] = 'genUpsilon4S(NumberOfMCParticlesInEvent(333))'
+    alias_dict['nRHOp'] = 'genUpsilon4S(NumberOfMCParticlesInEvent(213))'
+    alias_dict['nRHO0'] = 'genUpsilon4S(NumberOfMCParticlesInEvent(113))'
+    alias_dict['nKp'] = 'genUpsilon4S(NumberOfMCParticlesInEvent(321))'
+    alias_dict['nKL0'] = 'genUpsilon4S(NumberOfMCParticlesInEvent(130))'
+    alias_dict['nKS0'] = 'genUpsilon4S(NumberOfMCParticlesInEvent(310))'
+    alias_dict['nKstar0'] = 'genUpsilon4S(NumberOfMCParticlesInEvent(313))'
+    alias_dict['nKstarp'] = 'genUpsilon4S(NumberOfMCParticlesInEvent(323))'
+    alias_dict['nDp'] = 'genUpsilon4S(NumberOfMCParticlesInEvent(411))'
+    alias_dict['nD0'] = 'genUpsilon4S(NumberOfMCParticlesInEvent(421))'
+    alias_dict['nBp'] = 'genUpsilon4S(NumberOfMCParticlesInEvent(521))'
+    alias_dict['nB0'] = 'genUpsilon4S(NumberOfMCParticlesInEvent(511))'
+    alias_dict['nJPSI'] = 'genUpsilon4S(NumberOfMCParticlesInEvent(443))'
+    alias_dict['nELECTRON'] = 'genUpsilon4S(NumberOfMCParticlesInEvent(11))'
+    alias_dict['nENEUTRINO'] = 'genUpsilon4S(NumberOfMCParticlesInEvent(12))'
+    alias_dict['nMUON'] = 'genUpsilon4S(NumberOfMCParticlesInEvent(13))'
+    alias_dict['nMNEUTRINO'] = 'genUpsilon4S(NumberOfMCParticlesInEvent(14))'
+    alias_dict['nTAUON'] = 'genUpsilon4S(NumberOfMCParticlesInEvent(15))'
+    alias_dict['nTNEUTRINO'] = 'genUpsilon4S(NumberOfMCParticlesInEvent(16))'
+    alias_dict['nPHOTON'] = 'genUpsilon4S(NumberOfMCParticlesInEvent(22))'
+    alias_dict['GenUp4S_nTracks'] = 'genUpsilon4S(nTracks)'
+    return(alias_dict)
 
-    # load the root files
-    file = read_root("MCvalidation.root", key="Multiplicities")
 
-    # define the variables to plot
-    all_list = [
-        'nPIp',
-        'nPI0',
-        'nETA',
-        'nETAprim',
-        'nPHI',
-        'nRHOp',
-        'nRHO0',
-        'nKp',
-        'nKL0',
-        'nKS0',
-        'nKstar0',
-        'nKstarp',
-        'nDp',
-        'nD0',
-        'nJPSI',
-        'nELECTRON',
-        'nENEUTRINO',
-        'nMUON',
-        'nMNEUTRINO',
-        'nTAUON',
-        'nTNEUTRINO',
-        'nPHOTON']
+def define_split_aliases():
+    '''Define aliases for extraInfo resulting from SplitMultiplicities module'''
+    alias_dict = {}
+    alias_dict['gen_Kp'] = 'eventExtraInfo(nGen_321)'
+    alias_dict['gen_Kp_Bp'] = 'eventExtraInfo(nGen_321_Bp)'
+    alias_dict['gen_Kp_Bm'] = 'eventExtraInfo(nGen_321_Bm)'
+    alias_dict['gen_Kp_B0'] = 'eventExtraInfo(nGen_321_B0)'
+    alias_dict['gen_Kp_antiB0'] = 'eventExtraInfo(nGen_321_antiB0)'
+    alias_dict['gen_Km'] = 'eventExtraInfo(nGen_-321)'
+    alias_dict['gen_Km_Bp'] = 'eventExtraInfo(nGen_-321_Bp)'
+    alias_dict['gen_Km_Bm'] = 'eventExtraInfo(nGen_-321_Bm)'
+    alias_dict['gen_Km_B0'] = 'eventExtraInfo(nGen_-321_B0)'
+    alias_dict['gen_Km_antiB0'] = 'eventExtraInfo(nGen_-321_antiB0)'
+    alias_dict['gen_K0'] = 'eventExtraInfo(nGen_311)'
+    alias_dict['gen_K0_Bp'] = 'eventExtraInfo(nGen_311_Bp)'
+    alias_dict['gen_K0_Bm'] = 'eventExtraInfo(nGen_311_Bm)'
+    alias_dict['gen_K0_B0'] = 'eventExtraInfo(nGen_311_B0)'
+    alias_dict['gen_K0_antiB0'] = 'eventExtraInfo(nGen_311_antiB0)'
+    alias_dict['gen_antiK0'] = 'eventExtraInfo(nGen_-311)'
+    alias_dict['gen_antiK0_Bp'] = 'eventExtraInfo(nGen_-311_Bp)'
+    alias_dict['gen_antiK0_Bm'] = 'eventExtraInfo(nGen_-311_Bm)'
+    alias_dict['gen_antiK0_B0'] = 'eventExtraInfo(nGen_-311_B0)'
+    alias_dict['gen_antiK0_antiB0'] = 'eventExtraInfo(nGen_-311_antiB0)'
+    return(alias_dict)
 
-    # define dictionaries for the axis-labels and the ranges
-    range_dic = {'nPIp': [-0.5, 25.5],
-                 'nPI0': [-0.5, 20.5],
-                 'nETA': [-0.5, 4.5],
-                 'nETAprim': [-0.5, 2.5],
-                 'nPHI': [-0.5, 3.5],
-                 'nRHOp': [-0.5, 6.5],
-                 'nRHO0': [-0.5, 4.5],
-                 'nKp': [-0.5, 6.5],
-                 'nKL0': [-0.5, 5.5],
-                 'nKS0': [-0.5, 5.5],
-                 'nKstar0': [-0.5, 4.5],
-                 'nKstarp': [-0.5, 4.5],
-                 'nDp': [-0.5, 3.5],
-                 'nD0': [-0.5, 4.5],
-                 'nJPSI': [-0.5, 1.5],
-                 'nELECTRON': [-0.5, 6.5],
-                 'nENEUTRINO': [-0.5, 4.5],
-                 'nMUON': [-0.5, 4.5],
-                 'nMNEUTRINO': [-0.5, 4.5],
-                 'nTAUON': [-0.5, 2.5],
-                 'nTNEUTRINO': [-0.5, 4.5],
-                 'nPHOTON': [-0.5, 35.5]
-                 }
 
-    axis_dic = {'nPIp': r'$\pi^+$',
-                'nPI0': r'$\pi^0$',
-                'nETA': r'$\eta$',
-                'nETAprim': r"$\eta'$",
-                'nPHI': r'$\phi$',
-                'nRHOp': r'$\rho^0$',
-                'nRHO0': r'$\rho^+$',
-                'nKp': r'$K^+$',
-                'nKL0': r'$K_L^0$',
-                'nKS0': r'$K_S^0$',
-                'nKstar0': r'$K^{*,0}$',
-                'nKstarp': r'$K^{*,+}$',
-                'nDp': r'$D^+$',
-                'nD0': r'$D^0$',
-                'nJPSI': r'$J/\psi$',
-                'nELECTRON': r'$e^-$',
-                'nENEUTRINO': r'$\nu_e^-$',
-                'nMUON': r'$\mu^-$',
-                'nMNEUTRINO': r'$\nu_{\mu}^-$',
-                'nTAUON': r'$\tau^-$',
-                'nTNEUTRINO': r'$\nu_{\tau}^-$',
-                'nPHOTON': r'$\gamma$'}
+def add_aliases(alias_dict={}):
+    '''Here we add the aliases defined in define_{split/ups}_aliases'''
+    for key, value in alias_dict.items():
+        v.addAlias(key, value)
 
-    # plot the histograms
-    for var in all_list:
-        PlottingCompHistos(var)
+
+# read input file
+ma.inputMdstList('../charged.cdst.root', path)
+
+path.add_module(SplitMultiplicities(321))  # K+
+path.add_module(SplitMultiplicities(-321))  # K-
+path.add_module(SplitMultiplicities(311))  # K0
+path.add_module(SplitMultiplicities(-311))  # anti_K0
+
+# fill other generated particle lists needed for event shape
+pions = ("pi+:MC", '')
+kaons = ("K+:MC", '')
+muons = ("mu+:MC", '')
+electrons = ("e+:MC", '')
+protons = ("p+:MC", '')
+photons = ("gamma:MC", '')
+klongs = ("K_L0:MC", '')
+ma.fillParticleListsFromMC([pions, kaons, muons, electrons, protons, klongs, photons], path=path)
+
+# build event shape
+ma.buildEventShape(['pi+:MC', "K+:MC", "mu+:MC", "e+:MC", "p+:MC", "K_L0:MC", "gamma:MC"], path=path)
+
+# create a dictionary of multiplicity variable aliases
+Multi_aliasDict = define_ups_aliases()
+Split_aliasDict = define_split_aliases()
+
+# add the multiplicity aliases into variables
+add_aliases(Multi_aliasDict)
+add_aliases(Split_aliasDict)
+multi_variables = list(Multi_aliasDict.keys())
+split_variables = list(Split_aliasDict.keys())
+
+# add event shape variables to a list
+eventshape_variables = vc.event_shape
+
+# write out the trees containing the multiplicities, split multiplicities for kaons and the event shape variables
+ma.variablesToNtuple(
+    '',
+    treename="Multiplicities",
+    variables=multi_variables,
+    filename='MCvalidationCharged.root',
+    path=path)
+ma.variablesToNtuple('', treename="Split", variables=split_variables, filename='MCvalidationCharged.root', path=path)
+ma.variablesToNtuple(
+    '',
+    treename="EventShape",
+    variables=eventshape_variables,
+    filename='MCvalidationCharged.root',
+    path=path)
+
+progress = ma.register_module('Progress')
+path.add_module(progress)
+b2.process(path)
+print(b2.statistics)

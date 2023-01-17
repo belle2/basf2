@@ -31,7 +31,7 @@ void FullGridDriftLengthTrackTimeExtractor::exposeParameters(ModuleParamList* mo
   m_gridExtractor.exposeParameters(moduleParamList, prefixed("Grid", prefix));
   m_finalExtractor.exposeParameters(moduleParamList, prefixed("Refiner", prefix));
 
-  moduleParamList->getParameter<unsigned int>("GridIterations").setDefaultValue(1);
+  moduleParamList->getParameter<int>("GridIterations").setDefaultValue(1);
   moduleParamList->getParameter<bool>("RefinerUseLastEventT0").setDefaultValue(true);
 }
 

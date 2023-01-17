@@ -31,7 +31,9 @@ DQMHistOutputToEPICSModule::DQMHistOutputToEPICSModule()
   // This module CAN NOT be run in parallel!
 
   //Parameter definition
+#ifndef __INTEL_LLVM_COMPILER
   addParam("HistoList", m_histlist, "histname, pvname");
+#endif
   B2DEBUG(99, "DQMHistOutputToEPICS: Constructor done.");
 }
 

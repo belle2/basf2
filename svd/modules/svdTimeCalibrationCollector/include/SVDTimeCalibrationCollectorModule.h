@@ -77,9 +77,12 @@ namespace Belle2 {
 
     TH1F* m_hEventT0FromCDC = nullptr; /**< Distribution of EventT0 reconstructed by the CDC for all sensos/side*/
     TH1F* m_hEventT0FromCDCSync = nullptr; /**< Distribution of EventT0 reconstructed by the CDC and synchronized for all sensos/side*/
-    TH1F* m_hRawTimeL3V = nullptr; /**< Raw_CoG distribution of layer3 V-side */
+    TH1F* m_hRawTimeL3V = nullptr; /**< Raw time distribution of layer3 V-side for IoV determination */
+    TH1F* m_hRawTimeL3VFullRange = nullptr; /**< Raw time distribution of layer3 V-side */
 
-    double m_rawCoGBinWidth = 2; /**< Raw_CoG Bin Width [ns] for 2D-histogram */
+    double m_rawCoGBinWidth = 2.; /**< Raw_CoG Bin Width [ns] for 2D-histogram */
+    double m_minRawTimeForIoV = 0.; /**< Minimum value of the raw time distribution used to determine whether change IoV or not */
+    double m_maxRawTimeForIoV = 150.; /**< Maxmum value of the raw time distribution used to determine whether change IoV or not */
   };
 
 } // end namespace Belle2

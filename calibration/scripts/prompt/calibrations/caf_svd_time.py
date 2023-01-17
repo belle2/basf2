@@ -54,10 +54,11 @@ settings = CalibrationSettings(name="caf_svd_time",
                                    "timeAlgorithms": ["CoG6", "CoG3", "ELS3"],
                                    "max_events_per_run": 50000,
                                    "isMC": False,
-                                   "interceptUpperLine": -84.0,
-                                   "angularCoefficientUpperLine": 1.264,
-                                   "interceptLowerLine": -144.0,
-                                   "angularCoefficientLowerLine": 1.264,
+                                   "upperLineParameters": [-84.0, 1.264],
+                                   "lowerLineParameters": [-144.0, 1.264],
+                                   "rangeRawTimeForIoVCoG6": [20., 80.],
+                                   "rangeRawTimeForIoVCoG3": [70., 140.],
+                                   "rangeRawTimeForIoVELS3": [20., 80.]
                                })
 
 ##################################################################
@@ -83,7 +84,9 @@ def create_collector(name="SVDTimeCalibrationCollector",
                      event_info="SVDEventInfo",
                      event_t0="EventT0",
                      rawBinWidth=2,
-                     granularity="run"):
+                     granularity="run",
+                     minRawTimeForIoV=0.,
+                     maxRawTimeForIoV=150.):
     """
     Simply creates a SVDTimeCalibrationCollector module with some options.
 
@@ -98,6 +101,8 @@ def create_collector(name="SVDTimeCalibrationCollector",
     collector.param("EventT0Name", event_t0)
     collector.param("granularity", granularity)
     collector.param("RawCoGBinWidth", rawBinWidth)
+    collector.param("RawTimeIoVMin", minRawTimeForIoV)
+    collector.param("RawTimeIoVMax", maxRawTimeForIoV)
 
     return collector
 
@@ -259,10 +264,11 @@ def get_calibrations(input_data, **kwargs):
     timeAlgorithms = expert_config["timeAlgorithms"]
     max_events_per_run = expert_config["max_events_per_run"]  # Maximum number of events selected per each run
     isMC = expert_config["isMC"]
-    interceptUpperLine = expert_config["interceptUpperLine"]
-    angularCoefficientUpperLine = expert_config["angularCoefficientUpperLine"]
-    interceptLowerLine = expert_config["interceptLowerLine"]
-    angularCoefficientLowerLine = expert_config["angularCoefficientLowerLine"]
+    upperLineParameters = expert_config["upperLineParameters"]
+    lowerLineParameters = expert_config["lowerLineParameters"]
+    rangeRawTimeForIoVCoG6 = expert_config["rangeRawTimeForIoVCoG6"]
+    rangeRawTimeForIoVCoG3 = expert_config["rangeRawTimeForIoVCoG3"]
+    rangeRawTimeForIoVELS3 = expert_config["rangeRawTimeForIoVELS3"]
 
     reduced_file_to_iov_physics = filter_by_max_events_per_run(file_to_iov_physics,
                                                                max_events_per_run, random_select=True)
@@ -342,7 +348,9 @@ def get_calibrations(input_data, **kwargs):
         name=f"SVDTimeCalibrationCollector{cog6_suffix}",
         clusters=f"SVDClustersFromTracks{cog6_suffix}",
         event_info=eventInfo,
-        event_t0="EventT0")
+        event_t0="EventT0",
+        minRawTimeForIoV=rangeRawTimeForIoVCoG6[0],
+        maxRawTimeForIoV=rangeRawTimeForIoVCoG6[1])
 
     algo_cog6 = create_algorithm(
         unique_id_cog6,
@@ -354,22 +362,26 @@ def get_calibrations(input_data, **kwargs):
         clusters=f"SVDClustersFromTracks{cog3_suffix}",
         event_info=eventInfo,
         rawBinWidth=1,
-        event_t0="EventT0")
+        event_t0="EventT0",
+        minRawTimeForIoV=rangeRawTimeForIoVCoG3[0],
+        maxRawTimeForIoV=rangeRawTimeForIoVCoG3[1])
 
     algo_cog3 = create_algorithm(
         unique_id_cog3,
         prefix=coll_cog3.name(),
         min_entries=10000,
-        interceptUpperLine=interceptUpperLine,
-        angularCoefficientUpperLine=angularCoefficientUpperLine,
-        interceptLowerLine=interceptLowerLine,
-        angularCoefficientLowerLine=angularCoefficientLowerLine)
+        interceptUpperLine=upperLineParameters[0],
+        angularCoefficientUpperLine=upperLineParameters[1],
+        interceptLowerLine=lowerLineParameters[0],
+        angularCoefficientLowerLine=lowerLineParameters[1])
 
     coll_els3 = create_collector(
         name=f"SVDTimeCalibrationCollector{els3_suffix}",
         clusters=f"SVDClustersFromTracks{els3_suffix}",
         event_info=eventInfo,
-        event_t0="EventT0")
+        event_t0="EventT0",
+        minRawTimeForIoV=rangeRawTimeForIoVELS3[0],
+        maxRawTimeForIoV=rangeRawTimeForIoVELS3[1])
 
     algo_els3 = create_algorithm(
         unique_id_els3,

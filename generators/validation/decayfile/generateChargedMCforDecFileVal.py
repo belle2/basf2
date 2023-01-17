@@ -23,7 +23,7 @@ import generators as ge
 main = b2.create_path()
 
 # default to early phase 3 (exp=1003), run 0, number of events = 2000
-main.add_module("EventInfoSetter", expList=1003, runList=0, evtNumList=2000)
+main.add_module("EventInfoSetter", expList=1003, runList=0, evtNumList=100000)
 
 # generate BBbar events
 ge.add_evtgen_generator(path=main, finalstate='charged')

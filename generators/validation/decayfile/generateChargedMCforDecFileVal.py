@@ -24,7 +24,7 @@ b2.set_random_seed('charged')
 # create path
 main = b2.create_path()
 
-# default to early phase 3 (exp=1003), run 0, number of events = 2000
+# default to early phase 3 (exp=1003), run 0, number of events = 100000
 main.add_module("EventInfoSetter", expList=1003, runList=0, evtNumList=100000)
 
 # generate BBbar events

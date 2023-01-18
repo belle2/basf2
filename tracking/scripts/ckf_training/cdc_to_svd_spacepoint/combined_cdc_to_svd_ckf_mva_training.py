@@ -8,8 +8,13 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
+import itertools
 import os
+import subprocess
 
+import basf2
+import background
+import simulation
 from packaging import version
 
 # wrap python modules that are used here but not in the externals into a try except block
@@ -17,6 +22,8 @@ install_helpstring_formatter = ("\nCould not find {module} python module.Try ins
                                 "  python3 -m pip install [--user] {module}\n")
 try:
     import b2luigi
+    from b2luigi.core.utils import create_output_dirs
+    from b2luigi.basf2_helper import Basf2PathTask, Basf2Task
     from b2luigi.basf2_helper.utils import get_basf2_git_hash
 except ModuleNotFoundError:
     print(install_helpstring_formatter.format(module="b2luigi"))
@@ -36,7 +43,171 @@ if (
           "  python3 -m pip install --upgrade [--user] git+https://github.com/nils-braun/b2luigi.git\n")
     raise ImportError
 
-# Utility functions
+
+class GenerateSimTask(Basf2PathTask):
+    """
+    Generate simulated Monte Carlo with background overlay.
+
+    Make sure to use different ``random_seed`` parameters for the training data
+    format the classifier trainings and for the test data for the respective
+    evaluation/validation tasks.
+    """
+
+    #: Number of events to generate.
+    n_events = b2luigi.IntParameter()
+    #: Experiment number of the conditions database, e.g. defines simulation geometry
+    experiment_number = b2luigi.IntParameter()
+    #: Random basf2 seed. It is further used to read of the production process to preserve
+    # clearness in the b2luigi output.
+    random_seed = b2luigi.Parameter()
+    #: Directory with overlay background root files
+    bkgfiles_dir = b2luigi.Parameter(
+        #: \cond
+        hashed=True
+        #: \endcond
+    )
+    #: specify queue. E.g. choose between 'l' (long), 's' (short) or 'sx' (short, extra ram)
+    queue = 'l'
+
+    #: Name of the ROOT output file with generated and simulated events.
+    def output_file_name(self, n_events=None, random_seed=None):
+        """
+        Create output file name depending on number of events and production
+        mode that is specified in the random_seed string.
+        """
+        if n_events is None:
+            n_events = self.n_events
+        if random_seed is None:
+            random_seed = self.random_seed
+        return "generated_mc_N" + str(n_events) + "_" + random_seed + ".root"
+
+    def output(self):
+        """
+        Generate list of output files that the task should produce.
+        The task is considered finished if and only if the outputs all exist.
+        """
+        yield self.add_to_output(self.output_file_name())
+
+    def create_path(self):
+        """
+        Create basf2 path to process with event generation and simulation.
+        """
+        basf2.set_random_seed(self.random_seed)
+        path = basf2.create_path()
+        if self.experiment_number in [0, 1003]:
+            runNo = 0
+        else:
+            runNo = 0
+            raise ValueError(
+                f"Simulating events with experiment number {self.experiment_number} is not implemented yet.")
+        path.add_module(
+            "EventInfoSetter", evtNumList=[self.n_events], runList=[runNo], expList=[self.experiment_number]
+        )
+        path.add_module("EvtGenInput")
+        # activate simulation of dead/masked pixel and reproduce detector gain, which will be
+        # applied at reconstruction level when the data GT is present in the DB chain
+        # path.add_module("ActivatePXDPixelMasker")
+        # path.add_module("ActivatePXDGainCalibrator")
+        bkg_files = background.get_background_files(self.bkgfiles_dir)
+
+        simulation.add_simulation(path, bkgfiles=bkg_files, bkgOverlay=True, usePXDDataReduction=False)
+
+        path.add_module(
+            "RootOutput",
+            outputFileName=self.get_output_file_name(self.output_file_name()),
+        )
+        return path
+
+
+# I don't use the default MergeTask or similar because they only work if every input file is called the same.
+# Additionally, I want to add more features like deleting the original input to save storage space.
+class SplitNMergeSimTask(Basf2Task):
+    """
+    Generate simulated Monte Carlo with background overlay.
+
+    Make sure to use different ``random_seed`` parameters for the training data
+    format the classifier trainings and for the test data for the respective
+    evaluation/validation tasks.
+    """
+
+    #: Number of events to generate.
+    n_events = b2luigi.IntParameter()
+    #: Experiment number of the conditions database, e.g. defines simulation geometry
+    experiment_number = b2luigi.IntParameter()
+    #: Random basf2 seed. It is further used to read of the production process to preserve
+    # clearness in the b2luigi output.
+    random_seed = b2luigi.Parameter()
+    #: Directory with overlay background root files
+    bkgfiles_dir = b2luigi.Parameter(
+        #: \cond
+        hashed=True
+        #: \endcond
+    )
+    #: specify queue. E.g. choose between 'l' (long), 's' (short) or 'sx' (short, extra ram)
+    queue = 'sx'
+
+    #: Name of the ROOT output file with generated and simulated events.
+    def output_file_name(self, n_events=None, random_seed=None):
+        """
+        Create output file name depending on number of events and production
+        mode that is specified in the random_seed string.
+        """
+        if n_events is None:
+            n_events = self.n_events
+        if random_seed is None:
+            random_seed = self.random_seed
+        return "generated_mc_N" + str(n_events) + "_" + random_seed + ".root"
+
+    def output(self):
+        """
+        Generate list of output files that the task should produce.
+        The task is considered finished if and only if the outputs all exist.
+        """
+        yield self.add_to_output(self.output_file_name())
+
+    def requires(self):
+        """
+        Generate list of luigi Tasks that this Task depends on.
+        """
+        n_events_per_task = MainTask.n_events_per_task
+        quotient, remainder = divmod(self.n_events, n_events_per_task)
+        for i in range(quotient):
+            yield GenerateSimTask(
+                bkgfiles_dir=self.bkgfiles_dir,
+                num_processes=MainTask.num_processes,
+                random_seed=self.random_seed + '_' + str(i).zfill(3),
+                n_events=n_events_per_task,
+                experiment_number=self.experiment_number,
+                )
+        if remainder > 0:
+            yield GenerateSimTask(
+                bkgfiles_dir=self.bkgfiles_dir,
+                num_processes=MainTask.num_processes,
+                random_seed=self.random_seed + '_' + str(quotient).zfill(3),
+                n_events=remainder,
+                experiment_number=self.experiment_number,
+                )
+
+    @b2luigi.on_temporary_files
+    def process(self):
+        """
+        When all GenerateSimTasks finished, merge the output.
+        """
+        create_output_dirs(self)
+
+        file_list = []
+        for _, file_name in self.get_input_file_names().items():
+            file_list.append(*file_name)
+        print("Merge the following files:")
+        print(file_list)
+        cmd = ["b2file-merge", "-f"]
+        args = cmd + [self.get_output_file_name(self.output_file_name())] + file_list
+        subprocess.check_call(args)
+        print("Finished merging. Now remove the input files to save space.")
+        cmd2 = ["rm", "-f"]
+        for tempfile in file_list:
+            args = cmd2 + [tempfile]
+            subprocess.check_call(args)
 
 
 class MainTask(b2luigi.WrapperTask):
@@ -85,6 +256,24 @@ class MainTask(b2luigi.WrapperTask):
 
         fast_bdt_options = []
         fast_bdt_options.append([200, 8, 3, 0.1])
+
+        experiment_numbers = b2luigi.get_setting("experiment_numbers")
+
+        # iterate over all possible combinations of parameters from the above defined parameter lists
+        for experiment_number, fast_bdt_option in itertools.product(
+                experiment_numbers, fast_bdt_options
+        ):
+
+            yield SplitNMergeSimTask(
+                # bkgfiles_dir=MainTask.bkgfiles_by_exp[self.experiment_number],
+                # random_seed=self.random_seed,
+                # n_events=self.n_events,
+                # experiment_number=self.experiment_number,
+                bkgfiles_dir=MainTask.bkgfiles_by_exp[experiment_number],
+                random_seed="self.random_seed",
+                n_events=self.n_events_training,
+                experiment_number=experiment_number,
+            )
 
 
 if __name__ == "__main__":

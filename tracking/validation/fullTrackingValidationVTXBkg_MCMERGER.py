@@ -13,7 +13,7 @@
 <header>
   <contact>software-tracking@belle2.org</contact>
   <input>VTXEvtGenSim.root</input>
-  <output>VTXFullTrackingValidationBkg.root</output>
+  <output>VTXFullTrackingValidationBkg_MCMERGER.root</output>
   <description>This script validates the full track finding chain in Y(4S) runs with background.</description>
 </header>
 """
@@ -23,19 +23,19 @@ import tracking
 import logging
 from basf2 import LogLevel
 import basf2
-VALIDATION_OUTPUT_FILE = 'VTXFullTrackingValidationBkg.root'
+VALIDATION_OUTPUT_FILE = 'VTXFullTrackingValidationBkg_MCMERGER.root'
 N_EVENTS = 1000
 ACTIVE = True
 
 basf2.set_random_seed(1337)
-basf2.set_log_level(LogLevel.ERROR)
+basf2.set_log_level(LogLevel.INFO)
 
 
 def setupFinderModule(path):
-    tracking.add_tracking_reconstruction(path, useVTX=True, use_vtx_to_cdc_ckf=True)
+    tracking.add_tracking_reconstruction(path, useVTX=True, use_vtx_to_cdc_ckf=True, use_mc_vtx_cdc_merger=True)
 
 
-class VTXFullTrackingValidationBkg(TrackingValidationRun):
+class VTXFullTrackingValidationBkg_MCMERGER(TrackingValidationRun):
     """Validate the full track-finding chain, including background overlay"""
     #: number of events to generate
     n_events = N_EVENTS
@@ -73,7 +73,7 @@ class VTXFullTrackingValidationBkg(TrackingValidationRun):
 
 
 def main():
-    validation_run = VTXFullTrackingValidationBkg()
+    validation_run = VTXFullTrackingValidationBkg_MCMERGER()
     validation_run.configure_and_execute_from_commandline()
 
 

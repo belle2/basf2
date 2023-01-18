@@ -9,6 +9,8 @@
 #include <tracking/modules/relatedTracksCombiner/RelatedTracksCombinerModule.h>
 #include <tracking/trackFitting/fitter/base/TrackFitter.h>
 
+#include <tracking/dataobjects/RecoHitInformation.h>
+
 using namespace Belle2;
 
 REG_MODULE(RelatedTracksCombiner);
@@ -26,6 +28,10 @@ RelatedTracksCombinerModule::RelatedTracksCombinerModule() :
   addParam("VXDRecoTracksStoreArrayName", m_vxdRecoTracksStoreArrayName, "Name of the input VXD StoreArray.",
            m_vxdRecoTracksStoreArrayName);
   addParam("recoTracksStoreArrayName", m_recoTracksStoreArrayName, "Name of the output StoreArray.", m_recoTracksStoreArrayName);
+  addParam("keepOnlyGoodQITracks", m_param_onlyGoodQITracks, "Only keep good QI tracks", m_param_onlyGoodQITracks);
+  addParam("minRequiredQuality", m_param_qiCutValue, "Minimum QI to keep tracks", m_param_qiCutValue);
+  addParam("allowMultipleRelations", m_allowMultipleRelations, "Allow relations from one CDC track to m VXD tracks",
+           bool(false));
 }
 
 void RelatedTracksCombinerModule::initialize()
@@ -44,37 +50,63 @@ void RelatedTracksCombinerModule::event()
 {
   TrackFitter trackFitter;
 
-  // Loop over all CDC reco tracks and add them to the store array of they do not have a match or combined them with
-  // their VXD partner if they do.
+  // Loop over all CDC reco tracks and add them to the store array if they do not have a match or combined them with
+  // their VXD partners if they do.
   // For this, the fitted or seed state of the tracks is used - if they are already fitted or not.
   for (RecoTrack& cdcRecoTrack : m_cdcRecoTracks) {
     const RelationVector<RecoTrack>& relatedVXDRecoTracks = cdcRecoTrack.getRelationsWith<RecoTrack>(m_vxdRecoTracksStoreArrayName);
 
-    B2ASSERT("Can not handle more than 2 relations!", relatedVXDRecoTracks.size() <= 2);
+    if (m_param_onlyGoodQITracks and cdcRecoTrack.getQualityIndicator() <=  m_param_qiCutValue) {
+      continue;
+    }
 
-    RecoTrack* vxdTrackBefore = nullptr;
-    RecoTrack* vxdTrackAfter = nullptr;
+    std::vector<RecoTrack*> vxdTracksBefore;
+    std::vector<RecoTrack*> vxdTracksAfter;
 
     for (unsigned int index = 0; index < relatedVXDRecoTracks.size(); ++index) {
+      if (m_param_onlyGoodQITracks and relatedVXDRecoTracks[index]->getQualityIndicator() <=  m_param_qiCutValue) {
+        continue;
+      }
+
       const double weight = relatedVXDRecoTracks.weight(index);
       if (weight < 0) {
-        vxdTrackBefore = relatedVXDRecoTracks[index];
+        vxdTracksBefore.push_back(relatedVXDRecoTracks[index]);
       } else if (weight > 0) {
-        vxdTrackAfter = relatedVXDRecoTracks[index];
+        vxdTracksAfter.push_back(relatedVXDRecoTracks[index]);
       }
     }
 
     // Do not output non-fittable tracks
-    if (not vxdTrackAfter and not vxdTrackBefore and not trackFitter.fit(cdcRecoTrack)) {
+    if (vxdTracksAfter.empty() and vxdTracksBefore.empty() and not trackFitter.fit(cdcRecoTrack)) {
       continue;
+    }
+
+    if (not m_allowMultipleRelations) {
+      B2ASSERT("Can not handle more than one before relation!", vxdTracksBefore.size() <= 1);
+      B2ASSERT("Can not handle more than one after relation!", vxdTracksAfter.size() <= 1);
+    } else {
+      const auto sortByFirstSilcionLayer = [](const RecoTrack * lhs, const RecoTrack * rhs) {
+        if (lhs->hasVTXHits() and rhs->hasVTXHits()) {
+          return lhs->getVTXHitList()[0]->getSensorID().getLayerNumber() < rhs->getVTXHitList()[0]->getSensorID().getLayerNumber();
+        } else if (lhs->hasSVDHits() and rhs->hasSVDHits()) {
+          return lhs->getSVDHitList()[0]->getSensorID().getLayerNumber() < rhs->getSVDHitList()[0]->getSensorID().getLayerNumber();
+        } else {
+          B2FATAL("Attempt to sort by silicon layer but at least one track has no silicon hits");
+        }
+      };
+      sort(vxdTracksBefore.begin(), vxdTracksBefore.end(), sortByFirstSilcionLayer);
     }
 
     RecoTrack* newMergedTrack = nullptr;
 
-    if (vxdTrackBefore) {
-      newMergedTrack = vxdTrackBefore->copyToStoreArray(m_recoTracks);
-      newMergedTrack->addHitsFromRecoTrack(vxdTrackBefore, newMergedTrack->getNumberOfTotalHits());
-      newMergedTrack->addRelationTo(vxdTrackBefore);
+    if (not vxdTracksBefore.empty()) {
+      newMergedTrack = vxdTracksBefore[0]->copyToStoreArray(m_recoTracks);
+      newMergedTrack->addHitsFromRecoTrack(vxdTracksBefore[0], newMergedTrack->getNumberOfTotalHits());
+      newMergedTrack->addRelationTo(vxdTracksBefore[0]);
+      for (unsigned int index = 1; index < vxdTracksBefore.size(); ++index) {
+        newMergedTrack->addHitsFromRecoTrack(vxdTracksBefore[index], newMergedTrack->getNumberOfTotalHits());
+        newMergedTrack->addRelationTo(vxdTracksBefore[index]);
+      }
     } else {
       newMergedTrack = cdcRecoTrack.copyToStoreArray(m_recoTracks);
     }
@@ -82,14 +114,18 @@ void RelatedTracksCombinerModule::event()
     newMergedTrack->addHitsFromRecoTrack(&cdcRecoTrack, newMergedTrack->getNumberOfTotalHits());
     newMergedTrack->addRelationTo(&cdcRecoTrack);
 
-    if (vxdTrackAfter) {
-      newMergedTrack->addHitsFromRecoTrack(vxdTrackAfter, newMergedTrack->getNumberOfTotalHits(), true);
-      newMergedTrack->addRelationTo(vxdTrackAfter);
+    for (unsigned int index = 0; index < vxdTracksAfter.size(); ++index) {
+      newMergedTrack->addHitsFromRecoTrack(vxdTracksAfter[index], newMergedTrack->getNumberOfTotalHits(), true);
+      newMergedTrack->addRelationTo(vxdTracksAfter[index]);
     }
   }
 
   // Now we only have to add the VXD tracks without a match
   for (RecoTrack& vxdRecoTrack : m_vxdRecoTracks) {
+    if (m_param_onlyGoodQITracks and vxdRecoTrack.getQualityIndicator() <=  m_param_qiCutValue) {
+      continue;
+    }
+
     const RecoTrack* cdcRecoTrack = vxdRecoTrack.getRelated<RecoTrack>(m_cdcRecoTracksStoreArrayName);
     if (not cdcRecoTrack and trackFitter.fit(vxdRecoTrack)) {
       RecoTrack* newTrack = vxdRecoTrack.copyToStoreArray(m_recoTracks);

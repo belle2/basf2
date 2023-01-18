@@ -45,6 +45,15 @@ namespace Belle2 {
     StoreArray<RecoTrack> m_vxdRecoTracks;
     /// Store Array of the output tracks
     StoreArray<RecoTrack> m_recoTracks;
+
+    /// Parameter: Copy only tracks with good QI
+    bool m_param_onlyGoodQITracks = false;
+
+    /** Allow relations from one CDC track to m VXD tracks */
+    bool m_allowMultipleRelations;
+
+    /// Parameter: QI cut value
+    float m_param_qiCutValue = 0.0;
   };
 }
 

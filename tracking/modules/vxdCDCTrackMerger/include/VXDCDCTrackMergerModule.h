@@ -43,6 +43,8 @@ namespace Belle2 {
     double m_CDC_wall_radius = 16.25;
     /** Maximum distance between extrapolated tracks on the CDC wall */
     double m_merge_radius;
+    /** Allow relations from one CDC track to m VXD tracks */
+    bool m_allowMultipleRelations;
 
     /** StoreArray name of the VXD Track collection */
     std::string m_VXDRecoTrackColName;

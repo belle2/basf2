@@ -50,7 +50,8 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
                                 add_cdcTrack_QI=True, add_vxdTrack_QI=False, add_recoTrack_QI=False,
                                 pxd_filtering_offline=False, append_full_grid_cdc_eventt0=False,
                                 v0_finding=True, flip_recoTrack=True,
-                                useVTX=False, use_vtx_to_cdc_ckf=True, useVTXClusterShapes=True):
+                                useVTX=False, use_vtx_to_cdc_ckf=True, useVTXClusterShapes=True,
+                                use_mc_vtx_cdc_merger=False):
     """
     This function adds the **standard tracking reconstruction** modules
     to a path:
@@ -114,6 +115,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
     :param useVTX: If true, the VTX reconstruction is performed.
     :param use_vtx_to_cdc_ckf: if true, add VTX to CDC CKF module.
     :param useVTXClusterShapes: use the VTX cluster shapes
+    :use_mc_vtx_cdc_merger: use mc vtx cdc track merger
     """
 
     add_prefilter_tracking_reconstruction(
@@ -136,7 +138,8 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
         append_full_grid_cdc_eventt0=append_full_grid_cdc_eventt0,
         useVTX=useVTX,
         use_vtx_to_cdc_ckf=use_vtx_to_cdc_ckf,
-        useVTXClusterShapes=useVTXClusterShapes)
+        useVTXClusterShapes=useVTXClusterShapes,
+        use_mc_vtx_cdc_merger=use_mc_vtx_cdc_merger)
 
     add_postfilter_tracking_reconstruction(path,
                                            components=components,
@@ -154,7 +157,8 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
                                           use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False,
                                           add_cdcTrack_QI=True, add_vxdTrack_QI=False, add_recoTrack_QI=False,
                                           pxd_filtering_offline=False, append_full_grid_cdc_eventt0=False,
-                                          useVTX=False, use_vtx_to_cdc_ckf=False, useVTXClusterShapes=True):
+                                          useVTX=False, use_vtx_to_cdc_ckf=False, useVTXClusterShapes=True,
+                                          use_mc_vtx_cdc_merger=False):
     """
     This function adds the tracking reconstruction modules required to calculate HLT filter decision
     to a path.
@@ -192,6 +196,7 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
     :param useVTX: If true, the VTX reconstruction is performed.
     :param use_vtx_to_cdc_ckf: if true, add VTX to CDC CKF module.
     :param useVTXClusterShapes: If true, use cluster shape corrections for hit position finding.
+    :use_mc_vtx_cdc_merger: use mc vtx cdc track merger
     """
 
     if not is_svd_used(components) and not is_cdc_used(components) and not is_vtx_used(components):
@@ -234,7 +239,8 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
                           add_vxdTrack_QI=add_vxdTrack_QI,
                           pxd_filtering_offline=pxd_filtering_offline,
                           useVTX=useVTX,
-                          use_vtx_to_cdc_ckf=use_vtx_to_cdc_ckf)
+                          use_vtx_to_cdc_ckf=use_vtx_to_cdc_ckf,
+                          use_mc_vtx_cdc_merger=use_mc_vtx_cdc_merger)
 
     # Only run the track time extraction on the full reconstruction chain for now. Later, we may
     # consider to do the CDC-hit based method already during the fast reconstruction stage
@@ -389,7 +395,8 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
                       add_cdcTrack_QI=True, add_vxdTrack_QI=False,
                       pxd_filtering_offline=False, use_HLT_ROIs=False,
                       useVTX=False, vtx_ckf_mode="VXDTF2_after",
-                      use_vtx_to_cdc_ckf=True, use_ckf_based_cdc_vtx_merger=False,):
+                      use_vtx_to_cdc_ckf=True, use_ckf_based_cdc_vtx_merger=False,
+                      use_mc_vtx_cdc_merger=False):
     """
     Add the CKF to the path with all the track finding related to and needed for it.
     :param path: The path to add the tracking reconstruction modules to
@@ -495,7 +502,8 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
                               vtx_ckf_mode=vtx_ckf_mode, add_both_directions=add_both_directions,
                               use_vtx_to_cdc_ckf=use_vtx_to_cdc_ckf, prune_temporary_tracks=prune_temporary_tracks,
                               use_ckf_based_cdc_vtx_merger=use_ckf_based_cdc_vtx_merger,
-                              add_mva_quality_indicator=False)  # add_subtrack_mva_quality_indicators)
+                              add_mva_quality_indicator=False,
+                              use_mc_vtx_cdc_merger=use_mc_vtx_cdc_merger)
         temporary_reco_track_list.append(vtx_reco_tracks)
         temporary_reco_track_list.append(vtx_cdc_reco_tracks)
         latest_reco_tracks = vtx_cdc_reco_tracks

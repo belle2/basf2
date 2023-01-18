@@ -227,7 +227,7 @@ elif option == 'clang':
     global_env['CC'] = 'clang'
     global_env['CXX'] = 'clang++'
     # enable a few extra warnings warnings but disable the missing braces warning, because it can lead
-    # to false positives in conjuction with std::array : https://llvm.org/bugs/show_bug.cgi?id=21629
+    # to false positives in conjunction with std::array : https://llvm.org/bugs/show_bug.cgi?id=21629
     global_env.Append(CCFLAGS=["-O3", "-Wno-missing-braces", '-Wmissing-field-initializers', '-Wshadow', '-Wno-unused-command-line-argument'],
                       CXXFLAGS=["-Wheader-hygiene"])
     # make sure clang uses the correct paths to the gcc std c++ and not the

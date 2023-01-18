@@ -31,6 +31,8 @@
 #include <cmath>
 #include <stack>
 
+#include <string.h>
+
 
 
 namespace Belle2 {
@@ -278,9 +280,23 @@ namespace Belle2 {
     double eclClusterTiming(const Particle* particle)
     {
 
-      const ECLCluster* cluster = particle->getECLCluster();
-      if (cluster) {
-        return cluster->getTime();
+      if (strcmp(std::getenv("B2BII"), "TRUE") != 0) {
+        const ECLCluster* cluster = particle->getECLCluster();
+        if (cluster) {
+          return cluster->getTime();
+        }
+      }
+      return std::numeric_limits<float>::quiet_NaN();
+    }
+
+    double eclClusterTCTimingBelle(const Particle* particle)
+    {
+
+      if (strcmp(std::getenv("B2BII"), "TRUE") == 0) {
+        const ECLCluster* cluster = particle->getECLCluster();
+        if (cluster) {
+          return cluster->getTime();
+        }
       }
       return std::numeric_limits<float>::quiet_NaN();
     }
@@ -1086,6 +1102,19 @@ documentation for `clusterHasFailedTiming`). (For MC, the calibrations and corre
 
 .. note::
     | Please read `this <importantNoteECL>` first.
+    | Lower limit: :math:`-1000.0`
+    | Upper limit: :math:`1000.0`
+    | Precision: :math:`12` bit
+..
+)DOC","ns");
+    REGISTER_VARIABLE("clusterTCTimingBelle", eclClusterTCTimingBelle, R"DOC(
+[Legacy] Returns the trigger cell (TC) time of the ECL cluster (photon).
+This information is available only in Belle data since experiment 31, and not available in Belle MC.
+Clusters produced at the interaction point in time with the event, have TC time in the range of 9000-11000
+Calculated based on the Appendix of Belle note 831.
+
+.. note::
+    | In case this variable is obtained from Belle data that is stored in Belle II mdst/udst format, it will be truncated to:
     | Lower limit: :math:`-1000.0`
     | Upper limit: :math:`1000.0`
     | Precision: :math:`12` bit

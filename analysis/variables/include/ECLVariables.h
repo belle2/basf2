@@ -114,6 +114,11 @@ namespace Belle2 {
     double eclClusterTiming(const Particle* particle);
 
     /**
+     * return ECL cluster's TC timing in Belle
+     */
+    double eclClusterTCTimingBelle(const Particle* particle);
+
+    /**
      * return whether or not ECL cluster's timing fit failed
      */
     double eclClusterHasFailedTiming(const Particle* particle);

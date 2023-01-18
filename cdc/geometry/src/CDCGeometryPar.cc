@@ -376,6 +376,8 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
 
   //Set various quantities (should be moved to CDC.xml later...)
   m_clockFreq4TDC = geom.getClockFrequency();
+  if (not m_clockSettings.isValid())
+    B2FATAL("HardwareClockSettings payloads are not valid.");
   const double officialClockFreq4TDC = 2 * m_clockSettings->getAcceleratorRF(); // in GHz
   if (abs(m_clockFreq4TDC - officialClockFreq4TDC) / m_clockFreq4TDC > 1.e-4) {
     B2WARNING("ClockFreq4TDC changed from cdclocal " << scientific << setprecision(6) << m_clockFreq4TDC << " to official " <<

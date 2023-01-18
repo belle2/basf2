@@ -2030,7 +2030,6 @@ namespace Belle2 {
 
 
         double output = 0;
-        int nTargets = 0;
         for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i)
         {
           Particle* iParticle = ListOfParticles->getParticle(i);
@@ -2052,25 +2051,10 @@ namespace Belle2 {
                                                         targetParticle));
           if (isTargetOfRightCategory == 1) {
             output = 1;
-            nTargets += 1; targetParticlesCategory.push_back(targetParticle);
+            targetParticlesCategory.push_back(targetParticle);
           } else if (isTargetOfRightCategory == -2 && output != 1)
             output = realNaN;
         }
-
-        /*            if (nTargets > 1) {
-                      B2INFO("The Category " << categoryName << " has " <<  std::to_string(nTargets) << " target tracks.");
-                      for (auto& iTargetParticlesCategory : targetParticlesCategory) {
-                      const MCParticle* MCp = iTargetParticlesCategory->getMCParticle();
-
-                      RelationVector<Particle> mcRelations = MCp->getRelationsFrom<Particle>();
-                      if (mcRelations.size() > 1) B2WARNING("MCparticle is related to two particles");
-
-                      B2INFO("MCParticle has pdgCode = " << MCp->getPDG() << ", MCMother has pdgCode = " << MCp-> getMother()->getPDG() << " and " <<
-                      MCp-> getMother()->getNDaughters() << " daughters.");
-
-                      for (auto& iDaughter : MCp->getMother()->getDaughters()) B2INFO("iDaughter PDGCode = " << iDaughter->getPDG());
-                      }
-                      }*/
 
         return output;
       };

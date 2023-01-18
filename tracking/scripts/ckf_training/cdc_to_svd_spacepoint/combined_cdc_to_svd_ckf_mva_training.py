@@ -13,6 +13,8 @@ import os
 import subprocess
 
 import basf2
+from tracking import add_track_finding
+from tracking.path_utils import add_hit_preparation_modules
 import background
 import simulation
 from packaging import version
@@ -210,6 +212,107 @@ class SplitNMergeSimTask(Basf2Task):
             subprocess.check_call(args)
 
 
+class StateRecordingTask(Basf2PathTask):
+    layer = b2luigi.IntParameter()
+
+    experiment_number = b2luigi.IntParameter()
+    n_events_training = b2luigi.IntParameter()
+
+    def output(self):
+        for record_fname in ["records1.root", "records2.root", "records3.root"]:
+            yield self.add_to_output(record_fname)
+
+    def requires(self):
+        yield SplitNMergeSimTask(
+            bkgfiles_dir=MainTask.bkgfiles_by_exp[self.experiment_number],
+            random_seed="self.random_seed",
+            n_events=self.n_events_training,
+            experiment_number=self.experiment_number,
+        )
+
+    def create_recording_path(self, layer, records1_fname, records2_fname, records3_fname):
+        path = basf2.create_path()
+
+        file_list = []
+        for _, file_name in self.get_input_file_names().items():
+            file_list.append(*file_name)
+        path.add_module("RootInput",
+                        inputFileNames=file_list)
+
+        path.add_module("Gearbox")
+        path.add_module("Geometry")
+        path.add_module("SetupGenfitExtrapolation")
+
+        add_track_finding(path, reco_tracks="CDCRecoTracks", components=["CDC"], prune_temporary_tracks=False)
+
+        path.add_module('TrackFinderMCTruthRecoTracks',
+                        RecoTracksStoreArrayName="MCRecoTracks",
+                        WhichParticles=[],
+                        UsePXDHits=True,
+                        UseSVDHits=True,
+                        UseCDCHits=True)
+
+        path.add_module("MCRecoTracksMatcher", UsePXDHits=False, UseSVDHits=False, UseCDCHits=True,
+                        mcRecoTracksStoreArrayName="MCRecoTracks",
+                        prRecoTracksStoreArrayName="CDCRecoTracks")
+        path.add_module("DAFRecoFitter", recoTracksStoreArrayName="CDCRecoTracks")
+
+        add_hit_preparation_modules(path, components=["SVD"])
+
+        path.add_module("CDCToSVDSpacePointCKF",
+                        inputRecoTrackStoreArrayName="CDCRecoTracks",
+                        outputRecoTrackStoreArrayName="VXDRecoTracks",
+                        outputRelationRecoTrackStoreArrayName="CDCRecoTracks",
+                        hitFilter="sensor",
+                        seedFilter="distance",
+
+                        relationCheckForDirection="backward",
+                        reverseSeed=False,
+                        writeOutDirection="backward",
+
+                        firstHighFilter="truth",
+                        firstEqualFilter="recording",
+                        firstEqualFilterParameters={"treeName": "records1", "rootFileName":
+                                                    records1_fname, "returnWeight": 1.0},
+                        firstLowFilter="none",
+                        firstHighUseNStates=0,
+                        firstToggleOnLayer=layer,
+
+                        advanceHighFilter="advance",
+
+                        secondHighFilter="truth",
+                        secondEqualFilter="recording",
+                        secondEqualFilterParameters={"treeName": "records2", "rootFileName":
+                                                     records2_fname, "returnWeight": 1.0},
+                        secondLowFilter="none",
+                        secondHighUseNStates=0,
+                        secondToggleOnLayer=layer,
+
+                        updateHighFilter="fit",
+
+                        thirdHighFilter="truth",
+                        thirdEqualFilter="recording",
+                        thirdEqualFilterParameters={"treeName": "records3", "rootFileName": records3_fname},
+                        thirdLowFilter="none",
+                        thirdHighUseNStates=0,
+                        thirdToggleOnLayer=layer,
+
+                        filter="none",
+                        exportTracks=False,
+
+                        enableOverlapResolving=False)
+
+        return path
+
+    def create_path(self):
+        return self.create_recording_path(
+            layer=self.layer,
+            records1_fname=self.get_output_file_name("records1.root"),
+            records2_fname=self.get_output_file_name("records2.root"),
+            records3_fname=self.get_output_file_name("records3.root"),
+        )
+
+
 class MainTask(b2luigi.WrapperTask):
     """
     Wrapper task that needs to finish for b2luigi to finish running this steering file.
@@ -264,16 +367,13 @@ class MainTask(b2luigi.WrapperTask):
                 experiment_numbers, fast_bdt_options
         ):
 
-            yield SplitNMergeSimTask(
-                # bkgfiles_dir=MainTask.bkgfiles_by_exp[self.experiment_number],
-                # random_seed=self.random_seed,
-                # n_events=self.n_events,
-                # experiment_number=self.experiment_number,
-                bkgfiles_dir=MainTask.bkgfiles_by_exp[experiment_number],
-                random_seed="self.random_seed",
-                n_events=self.n_events_training,
-                experiment_number=experiment_number,
-            )
+            for layer in [3, 4, 5, 6, 7]:
+                yield self.clone(
+                    StateRecordingTask,
+                    layer=layer,
+                    experiment_number=experiment_number,
+                    n_events_training=self.n_events_training
+                )
 
 
 if __name__ == "__main__":

@@ -1,3 +1,13 @@
+Changes in the analysis package in light-2302-genetta
+-----------------------------------------------------
+Modules
++++++++
+ * Added an option ``usePhotonOnlyOnce`` to the function :func:`modularAnalysis.correctBremsBelle`. The default of the option is ``False``
+   so the backward compatibility. If the option is set to ``True``, a photon is used for only the closest charged particle in the
+   input ParticleLists.
+
+
+
 Changes in the analysis package in light-2212-foldex
 ----------------------------------------------------
 ParticleList dataobject
@@ -50,9 +60,6 @@ Modules
  * The ParticleLists labeled ``:MC``, which were created by default when the `fillParticleListFromMC` is called, are no longer
    created automatically by the function. Also, the protection that was previously applied to the list labeled ":MC" has been
    removed.
- * Added an option ``usePhotonOnlyOnce`` to the function :func:`modularAnalysis.correctBremsBelle`. The default of the option is ``False``
-   so the backward compatibility. If the option is set to ``True``, a photon is used for only the closest charged particle in the
-   input ParticleLists.
 
 Changes in the analysis package in light-2210-devonrex
 ------------------------------------------------------

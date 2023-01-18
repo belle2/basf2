@@ -363,7 +363,7 @@ if len(global_env['TEST_FILES']) > 0:
 # build sphinx documentation if the --sphinx option is used
 if global_env.GetOption("sphinx"):
     light_option = " --light " if GetOption('light') else ""
-    sphinx_targets = ['html', 'latex', 'json']
+    sphinx_targets = ['html', 'latex']
     for sphinx_target in sphinx_targets:
         sphinx = global_env.Command(f'build/{sphinx_target}', 'index.rst', f"b2code-sphinx-build {light_option} -t {sphinx_target}")
         global_env.Depends(sphinx, ['scripts', 'data', 'lib', 'bin', 'modules'])

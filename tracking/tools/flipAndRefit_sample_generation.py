@@ -114,19 +114,12 @@ if __name__ == "__main__":
     main.add_module('TrackTimeEstimator')
 
     # Save data to train the first MVA. After that, we're done
-    if (training_mva_number == 1):
-        saveFirstMVAData = Saving1stMVAData(
-            name="saving1stMVA_BBbar",
-            output_file_name=outputfile)
-        main.add_module(saveFirstMVAData)
-
-    # Now that the first MVA is trained, use the weight file to decide in the FlipQuality module which RecoTracks to flip and refit.
-    # Afterwards, revert the RecoTracks marked as such by the first MVA, fit them, calculate the IPTrackTime
-    # (is this really necessary?!?!?), create Track objects, and fill the information into the training sample for the second MVA
-    elif (training_mva_number == 2):
+    if (training_mva_number == 1 or training_mva_number == 2):
         main.add_module("FlipQuality", recoTracksStoreArrayName="RecoTracks",
                         identifier='TRKTrackFlipAndRefit_MVA1_weightfile',
                         indexOfFlippingMVA=1).set_name("FlipQuality_1stMVA")
+
+    # elif (training_mva_number == 2):
         reco_tracks_flipped = "RecoTracks_flipped"
         main.add_module("RecoTracksReverter", inputStoreArrayName="RecoTracks",
                         outputStoreArrayName=reco_tracks_flipped)
@@ -137,10 +130,20 @@ if __name__ == "__main__":
                         trackFitResultColName="TrackFitResults_flipped",
                         recoTrackColName=reco_tracks_flipped,
                         pdgCodes=[211, 321, 2212]).set_name("TrackCreator_flipped")
-        saveSecondMVAData = Saving2ndMVAData(
-            name="saving2ndMVA_BBbar",
-            output_file_name=outputfile)
-        main.add_module(saveSecondMVAData)
+        main.add_module("FlipQuality", recoTracksStoreArrayName="RecoTracks",
+                        identifier='TRKTrackFlipAndRefit_MVA2_weightfile',
+                        indexOfFlippingMVA=2).set_name("FlipQuality_2ndMVA")
+
+        if training_mva_number == 1:
+            saveFirstMVAData = Saving1stMVAData(
+                name="saving1stMVA_BBbar",
+                output_file_name=outputfile)
+            main.add_module(saveFirstMVAData)
+        if training_mva_number == 2:
+            saveSecondMVAData = Saving2ndMVAData(
+                name="saving2ndMVA_BBbar",
+                output_file_name=outputfile)
+            main.add_module(saveSecondMVAData)
 
     # Process events
     print_path(main)

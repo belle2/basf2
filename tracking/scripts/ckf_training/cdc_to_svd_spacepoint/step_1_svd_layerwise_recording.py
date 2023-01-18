@@ -23,7 +23,7 @@ def create_path(layer, records1_fname, records2_fname, records3_fname):
     path.add_module("Geometry")
     path.add_module("SetupGenfitExtrapolation")
 
-    add_track_finding(path, reco_tracks="CDCRecoTracks", components=["CDC"])
+    add_track_finding(path, reco_tracks="CDCRecoTracks", components=["CDC"], prune_temporary_tracks=False)
 
     path.add_module('TrackFinderMCTruthRecoTracks',
                     RecoTracksStoreArrayName="MCRecoTracks",
@@ -85,7 +85,7 @@ def create_path(layer, records1_fname, records2_fname, records3_fname):
     return path  # , {"max_event": 1000}
 
 
-class ReconstructionTask(Basf2PathTask):
+class StateRecordingTask(Basf2PathTask):
     layer = b2luigi.IntParameter()
 
     def output(self):
@@ -101,11 +101,11 @@ class ReconstructionTask(Basf2PathTask):
         )
 
 
-class MainTask(b2luigi.WrapperTask):
+class MainStateRecordingTask(b2luigi.WrapperTask):
     def requires(self):
         for layer in [3, 4, 5, 6, 7]:
             yield self.clone(
-                ReconstructionTask,
+                StateRecordingTask,
                 layer=layer,
             )
 
@@ -115,4 +115,4 @@ if __name__ == "__main__":
     # b2luigi.set_setting("batch_system", "htcondor")
     b2luigi.set_setting("env_script", "/path/to/setup_basf2.sh")
     # b2luigi.set_setting("executable", ["python3"])
-    b2luigi.process(MainTask(), workers=5, batch=False)
+    b2luigi.process(MainStateRecordingTask(), workers=5, batch=False)

@@ -227,7 +227,7 @@ elif option == 'clang':
     global_env['CC'] = 'clang'
     global_env['CXX'] = 'clang++'
     # enable a few extra warnings warnings but disable the missing braces warning, because it can lead
-    # to false positives in conjuction with std::array : https://llvm.org/bugs/show_bug.cgi?id=21629
+    # to false positives in conjunction with std::array : https://llvm.org/bugs/show_bug.cgi?id=21629
     global_env.Append(CCFLAGS=["-O3", "-Wno-missing-braces", '-Wmissing-field-initializers', '-Wshadow', '-Wno-unused-command-line-argument'],
                       CXXFLAGS=["-Wheader-hygiene"])
     # make sure clang uses the correct paths to the gcc std c++ and not the
@@ -363,7 +363,7 @@ if len(global_env['TEST_FILES']) > 0:
 # build sphinx documentation if the --sphinx option is used
 if global_env.GetOption("sphinx"):
     light_option = " --light " if GetOption('light') else ""
-    sphinx_targets = ['html', 'latex', 'json']
+    sphinx_targets = ['html', 'latex']
     for sphinx_target in sphinx_targets:
         sphinx = global_env.Command(f'build/{sphinx_target}', 'index.rst', f"b2code-sphinx-build {light_option} -t {sphinx_target}")
         global_env.Depends(sphinx, ['scripts', 'data', 'lib', 'bin', 'modules'])

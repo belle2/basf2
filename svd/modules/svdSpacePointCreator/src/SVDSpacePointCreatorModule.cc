@@ -55,6 +55,10 @@ SVDSpacePointCreatorModule::SVDSpacePointCreatorModule() :
            "Maximum number of SpacePoints allowed in an event, above this threshold no SpacePoint will be created",
            unsigned(m_numMaxSpacePoints));
 
+  addParam("useSVDGroupInfo", m_useSVDGroupInfo,
+           "Use SVD group info to reject combinations",
+           bool(false));
+
 }
 
 
@@ -106,7 +110,7 @@ void SVDSpacePointCreatorModule::event()
                              m_spacePoints); /// WARNING TODO: missing: possibility to allow storing of u- or v-type clusters only!
   } else {
     provideSVDClusterCombinations(m_svdClusters, m_spacePoints, m_HitTimeCut, m_useQualityEstimator, m_calibrationFile,
-                                  m_useLegacyNaming, m_numMaxSpacePoints, m_eventLevelTrackingInfoName);
+                                  m_useLegacyNaming, m_numMaxSpacePoints, m_eventLevelTrackingInfoName, m_useSVDGroupInfo);
   }
 
 

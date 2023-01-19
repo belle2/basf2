@@ -88,7 +88,8 @@ namespace Belle2 {
    * Condition which has to be fulfilled: the first entry is always an u cluster, the second always a v-cluster
    */
   inline void findPossibleCombinations(const Belle2::ClustersOnSensor& aSensor,
-                                       std::vector< std::vector<const SVDCluster*> >& foundCombinations, const SVDHitTimeSelection& hitTimeCut)
+                                       std::vector< std::vector<const SVDCluster*> >& foundCombinations, const SVDHitTimeSelection& hitTimeCut,
+                                       const bool& useSVDGroupInfo)
   {
 
     for (const SVDCluster* uCluster : aSensor.clustersU) {
@@ -108,16 +109,18 @@ namespace Belle2 {
           continue;
         }
 
-        const std::vector<int>& uTimeGroupId = uCluster->getTimeGroupId();
-        const std::vector<int>& vTimeGroupId = vCluster->getTimeGroupId();
-        if (int(uTimeGroupId.size()) && int(vTimeGroupId.size())) {
-          bool isContinue = true;
-          for (auto& uitem : uTimeGroupId)
-            for (auto& vitem : vTimeGroupId)
-              if (uitem >= 0 && vitem >= 0 && uitem == vitem) { isContinue = false; break; }
-          if (isContinue) {
-            B2DEBUG(1, "Cluster combination rejected due to different time-group Id.");
-            continue;
+        if (useSVDGroupInfo) {
+          const std::vector<int>& uTimeGroupId = uCluster->getTimeGroupId();
+          const std::vector<int>& vTimeGroupId = vCluster->getTimeGroupId();
+          if (int(uTimeGroupId.size()) && int(vTimeGroupId.size())) {
+            bool isContinue = true;
+            for (auto& uitem : uTimeGroupId)
+              for (auto& vitem : vTimeGroupId)
+                if (uitem >= 0 && vitem >= 0 && uitem == vitem) { isContinue = false; break; }
+            if (isContinue) {
+              B2DEBUG(1, "Cluster combination rejected due to different time-group Id.");
+              continue;
+            }
           }
         }
 
@@ -254,7 +257,7 @@ namespace Belle2 {
    */
   template <class SpacePointType> void provideSVDClusterCombinations(const StoreArray<SVDCluster>& svdClusters,
       StoreArray<SpacePointType>& spacePoints, SVDHitTimeSelection& hitTimeCut, bool useQualityEstimator, TFile* pdfFile,
-      bool useLegacyNaming, unsigned int numMaxSpacePoints, std::string m_eventLevelTrackingInfoName)
+      bool useLegacyNaming, unsigned int numMaxSpacePoints, std::string m_eventLevelTrackingInfoName, const bool& useSVDGroupInfo)
   {
     std::unordered_map<VxdID::baseType, ClustersOnSensor>
     activatedSensors; // collects one entry per sensor, each entry will contain all Clusters on it TODO: better to use a sorted vector/list?
@@ -270,7 +273,7 @@ namespace Belle2 {
 
 
     for (auto& aSensor : activatedSensors)
-      findPossibleCombinations(aSensor.second, foundCombinations, hitTimeCut);
+      findPossibleCombinations(aSensor.second, foundCombinations, hitTimeCut, useSVDGroupInfo);
 
     // Do not make space-points if their number would be too large to be considered by tracking
     if (foundCombinations.size() > numMaxSpacePoints) {

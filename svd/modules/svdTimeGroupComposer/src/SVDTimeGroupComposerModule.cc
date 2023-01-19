@@ -48,6 +48,9 @@ SVDTimeGroupComposerModule::SVDTimeGroupComposerModule() :
   addParam("applyCentralLimit", m_applyCentralLimit,
            "Sum adjacent bins many times to form the groups.",
            bool(true));
+  addParam("expSignalLoc", m_expSignalLoc,
+           "Expected location of signal.",
+           double(0.));
   addParam("signalRangeLow", m_signalRangeLow,
            "Expected time range of signal hits.",
            double(-40.));
@@ -101,6 +104,10 @@ SVDTimeGroupComposerModule::SVDTimeGroupComposerModule() :
   addParam("timeBasedSort", m_timeBasedSort,
            "Clusters belonging to the group nearest to zero is first.",
            bool(false));
+
+  addParam("doBestGroupSelection", m_doBestGroupSelection,
+           "Choose one group near expected signal location.",
+           bool(false));
 }
 
 
@@ -110,9 +117,17 @@ void SVDTimeGroupComposerModule::initialize()
   // prepare all store:
   m_svdClusters.isRequired(m_svdClustersName);
 
+  if (m_doBestGroupSelection) {
+    m_writeGroupInfo = true; // group info is required while calibration
+    m_maxGroups = 2;       // only the nearest to the signal is kept
+    m_useOnlyOneGroup = false;
+  }
+  if (m_doBestGroupSelection || m_useOnlyOneGroup)
+    m_includeOutOfRangeClusters = false;
+
   if (m_useOnlyOneGroup) B2WARNING("Only the group nearest to zero is selected.");
-  if (m_AverageCountPerBin <= 0 || m_factor <= 0) B2WARNING("averageCountPerBin is set to zero or less."
-                                                              << " Module is ineffective.");
+  if (m_doBestGroupSelection) B2WARNING("Only the Probable signal group is chosen.");
+  if (m_AverageCountPerBin <= 0 || m_factor <= 0) B2WARNING("Module is ineffective.");
   if (m_tRangeHigh - m_tRangeLow < 10.) B2FATAL("tRange should not be less than 10 (hard-coded).");
 
   B2DEBUG(1, "SVDTimeGroupComposerModule \nsvdClusters: " << m_svdClusters.getName());
@@ -265,7 +280,7 @@ void SVDTimeGroupComposerModule::event()
       groupInfo[kj + 1] = key;
     }
 
-    if (m_useOnlyOneGroup && int(groupInfo.size())) // keep only one group
+    if (m_useOnlyOneGroup && int(groupInfo.size()) > 1) // keep only one group
       groupInfo.resize(1);
 
     std::vector<int> rejectedCls;
@@ -291,12 +306,10 @@ void SVDTimeGroupComposerModule::event()
           B2DEBUG(1, "     rejected cluster " << place
                   << " clsTime " << clsTime);
           if (ij == totGroups - 1) {                              // leftover clusters
-            if (!m_useOnlyOneGroup &&
-                m_includeOutOfRangeClusters &&
+            if (m_includeOutOfRangeClusters &&
                 clsTime < tRangeLow)
               m_svdClusters[place]->getTimeGroupId().push_back(ij + 1);       // underflow
-            else if (!m_useOnlyOneGroup &&
-                     m_includeOutOfRangeClusters &&
+            else if (m_includeOutOfRangeClusters &&
                      clsTime > tRangeHigh)
               m_svdClusters[place]->getTimeGroupId().push_back(ij + 2);       // overflow
             else
@@ -358,8 +371,25 @@ void SVDTimeGroupComposerModule::event()
 
     } // while(1) {
 
-    int totGroups = int(groupInfo.size());
-    for (int ij = 0; ij < totGroups; ij++) {
+    if (m_useOnlyOneGroup && int(groupInfo.size()) > 1) // keep only one group
+      groupInfo.resize(1);
+
+    if (m_doBestGroupSelection && int(groupInfo.size()) == 2) {
+      float gr0shift = std::fabs(std::get<1>(groupInfo[0]) - m_expSignalLoc);
+      float gr1shift = std::fabs(std::get<1>(groupInfo[1]) - m_expSignalLoc);
+      if (gr0shift < gr1shift) groupInfo.erase(groupInfo.begin() + 1);
+      else groupInfo.erase(groupInfo.begin() + 0);
+    }
+    if (m_doBestGroupSelection && int(groupInfo.size())) {
+      float grMean = std::get<1>(groupInfo[0]);
+      if (grMean < m_signalRangeLow || grMean > m_signalRangeHigh)
+        groupInfo.clear();
+    }
+    if (int(groupInfo.size()) == 0)
+      for (int jk = 0; jk < totClusters; jk++)
+        m_svdClusters[jk]->getTimeGroupId().push_back(-1);
+
+    for (int ij = 0; ij < int(groupInfo.size()); ij++) {
       double pars[3] = {std::get<0>(groupInfo[ij]), std::get<1>(groupInfo[ij]), std::get<2>(groupInfo[ij])};
       double beginPos = pars[1] - m_accSigmaN * pars[2];
       double   endPos = pars[1] + m_accSigmaN * pars[2];
@@ -377,13 +407,11 @@ void SVDTimeGroupComposerModule::event()
         } else {
           B2DEBUG(1, "     rejected cluster " << jk
                   << " clsTime " << clsTime);
-          if (ij == totGroups - 1 && !int(m_svdClusters[jk]->getTimeGroupId().size())) { // leftover clusters
-            if (!m_useOnlyOneGroup &&
-                m_includeOutOfRangeClusters &&
+          if (ij == int(groupInfo.size()) - 1 && !int(m_svdClusters[jk]->getTimeGroupId().size())) { // leftover clusters
+            if (m_includeOutOfRangeClusters &&
                 clsTime < tRangeLow)
               m_svdClusters[jk]->getTimeGroupId().push_back(ij + 1);       // underflow
-            else if (!m_useOnlyOneGroup &&
-                     m_includeOutOfRangeClusters &&
+            else if (m_includeOutOfRangeClusters &&
                      clsTime > tRangeHigh)
               m_svdClusters[jk]->getTimeGroupId().push_back(ij + 2);       // overflow
             else
@@ -393,7 +421,7 @@ void SVDTimeGroupComposerModule::event()
           }
         }
       } // for (int jk = 0; jk < totClusters; jk++) {
-    } // for (int ij = 0; ij < totGroups; ij++) {
+    } // for (int ij = 0; ij < int(groupInfo.size()); ij++) {
   } // if (!m_gausFill) {
 }
 

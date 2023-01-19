@@ -111,6 +111,7 @@ def add_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False, 
         svdTimeGroupComposer.param('tRangeHigh', 160)
         svdTimeGroupComposer.param('averageCountPerBin', 12)
         svdTimeGroupComposer.param('threshold', 2)
+        svdTimeGroupComposer.param('expSignalLoc', 0)
         svdTimeGroupComposer.param('signalRangeLow', -40)
         svdTimeGroupComposer.param('signalRangeHigh', 40)
         svdTimeGroupComposer.param('applyCentralLimit', True)
@@ -128,6 +129,7 @@ def add_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False, 
         svdTimeGroupComposer.param('writeGroupInfo', True)
         svdTimeGroupComposer.param('includeOutOfRangeClusters', True)
         svdTimeGroupComposer.param('useOnlyOneGroup', False)
+        # svdTimeGroupComposer.param('doBestGroupSelection', True)
         path.add_module(svdTimeGroupComposer)
 
     # Add SVDSpacePointCreator
@@ -265,6 +267,7 @@ def add_rel5_svd_reconstruction(path, isROIsimulation=False, applyMasking=False)
         svdTimeGroupComposer.param('tRangeHigh', 160)
         svdTimeGroupComposer.param('averageCountPerBin', 12)
         svdTimeGroupComposer.param('threshold', 2)
+        svdTimeGroupComposer.param('expSignalLoc', 0)
         svdTimeGroupComposer.param('signalRangeLow', -40)
         svdTimeGroupComposer.param('signalRangeHigh', 40)
         svdTimeGroupComposer.param('applyCentralLimit', True)
@@ -282,6 +285,7 @@ def add_rel5_svd_reconstruction(path, isROIsimulation=False, applyMasking=False)
         svdTimeGroupComposer.param('writeGroupInfo', True)
         svdTimeGroupComposer.param('includeOutOfRangeClusters', True)
         svdTimeGroupComposer.param('useOnlyOneGroup', False)
+        # svdTimeGroupComposer.param('doBestGroupSelection', True)
         path.add_module(svdTimeGroupComposer)
 
     # Add SVDSpacePointCreator
@@ -435,5 +439,6 @@ def add_svd_SPcreation(path, isROIsimulation=False):
         spCreatorSVD.param('NameOfInstance', 'SVDSpacePoints')
         spCreatorSVD.param('SpacePoints', nameSPs)
         spCreatorSVD.param('SVDClusters', svd_clusters)
+        spCreatorSVD.param('useSVDGroupInfo', True)
         spCreatorSVD.param('EventLevelTrackingInfoName', nameEventTrackingInfo)
         path.add_module(spCreatorSVD)

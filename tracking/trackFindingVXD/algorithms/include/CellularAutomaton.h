@@ -63,10 +63,6 @@ namespace Belle2 {
           if (goodNeighbours != 0) {
             currentCell.setStateUpgrade(true);
             activeCells++;
-          } else {
-            // WARNING setActivationState does provoke unintended behavior, since sometimes states can not be
-            // upgraded in one round, but can in the next round!
-            /*currentCell.setActivationState(false);*/
           }
         }
 

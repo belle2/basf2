@@ -45,7 +45,7 @@ KlongMomentumCalculatorExpertModule::KlongMomentumCalculatorExpertModule() :
 
 {
   // set module description (e.g. insert text)
-  setDescription("This module is used to employ kinematic constraints to determine the momentum of Klongs for two body B decays containing a K_L0 and something else. The module creates a list of K_L0 candidates whose K_L0 momentum is reconstructed by combining the reconstructed direction (from either the ECL or KLM) of the K_L0 and kinematic constraints of the intial state.");
+  setDescription("This module is used to employ kinematic constraints to determine the momentum of Klongs for two body B decays containing a K_L0 and something else. The module creates a list of K_L0 candidates whose K_L0 momentum is reconstructed by combining the reconstructed direction (from either the ECL or KLM) of the K_L0 and kinematic constraints of the initial state.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   // Add parameters
@@ -97,6 +97,9 @@ void KlongMomentumCalculatorExpertModule::initialize()
       m_decaydescriptor.getDaughter(i)->getMother();
     StoreObjPtr<ParticleList>().isRequired(daughter->getFullName());
     if (daughter->getPDGCode() == Const::Klong.getPDGCode()) {
+      if (k_check)
+        B2FATAL("More than one K_L is detected! This module accepts only one K_L in the final state.");
+
       m_klistName = daughter->getFullName() + m_klistName;
       k_check = true;
     }

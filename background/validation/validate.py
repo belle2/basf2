@@ -41,8 +41,9 @@ class BGHistogrammer(b2.Module):
         'TOPSimHits',
         'ARICHSimHits',
         'ECLHits',
-        'BKLMSimHits',
-        'EKLMSimHits',
+        'BKLMSimHits',  # Merged to KLMSimHits, keep the entry here temporarily.
+        'EKLMSimHits',  # Merged to KLMSimHits, keep the entry here temporarily.
+        'KLMSimHits',
     ]
     #: length of simHits list
     n = len(simHits)

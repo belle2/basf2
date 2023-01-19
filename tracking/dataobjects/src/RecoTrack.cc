@@ -25,16 +25,16 @@ using namespace Belle2;
 
 RecoTrack::RecoTrack(const ROOT::Math::XYZVector& seedPosition, const ROOT::Math::XYZVector& seedMomentum,
                      const short int seedCharge,
-                     const std::string& storeArrayNameOfCDCHits,
-                     const std::string& storeArrayNameOfSVDHits,
                      const std::string& storeArrayNameOfPXDHits,
+                     const std::string& storeArrayNameOfSVDHits,
+                     const std::string& storeArrayNameOfCDCHits,
                      const std::string& storeArrayNameOfBKLMHits,
                      const std::string& storeArrayNameOfEKLMHits,
                      const std::string& storeArrayNameOfRecoHitInformation) :
   m_charge(seedCharge),
-  m_storeArrayNameOfCDCHits(storeArrayNameOfCDCHits),
-  m_storeArrayNameOfSVDHits(storeArrayNameOfSVDHits),
   m_storeArrayNameOfPXDHits(storeArrayNameOfPXDHits),
+  m_storeArrayNameOfSVDHits(storeArrayNameOfSVDHits),
+  m_storeArrayNameOfCDCHits(storeArrayNameOfCDCHits),
   m_storeArrayNameOfBKLMHits(storeArrayNameOfBKLMHits),
   m_storeArrayNameOfEKLMHits(storeArrayNameOfEKLMHits),
   m_storeArrayNameOfRecoHitInformation(storeArrayNameOfRecoHitInformation)
@@ -64,10 +64,10 @@ void RecoTrack::registerRequiredRelations(
   recoHitInformations.registerInDataStore();
   recoTracks.registerRelationTo(recoHitInformations);
 
-  StoreArray<RecoHitInformation::UsedCDCHit> cdcHits(cdcHitsStoreArrayName);
-  if (cdcHits.isOptional()) {
-    cdcHits.registerRelationTo(recoTracks);
-    recoHitInformations.registerRelationTo(cdcHits);
+  StoreArray<RecoHitInformation::UsedPXDHit> pxdHits(pxdHitsStoreArrayName);
+  if (pxdHits.isOptional()) {
+    pxdHits.registerRelationTo(recoTracks);
+    recoHitInformations.registerRelationTo(pxdHits);
   }
 
   StoreArray<RecoHitInformation::UsedSVDHit> svdHits(svdHitsStoreArrayName);
@@ -76,10 +76,10 @@ void RecoTrack::registerRequiredRelations(
     recoHitInformations.registerRelationTo(svdHits);
   }
 
-  StoreArray<RecoHitInformation::UsedPXDHit> pxdHits(pxdHitsStoreArrayName);
-  if (pxdHits.isOptional()) {
-    pxdHits.registerRelationTo(recoTracks);
-    recoHitInformations.registerRelationTo(pxdHits);
+  StoreArray<RecoHitInformation::UsedCDCHit> cdcHits(cdcHitsStoreArrayName);
+  if (cdcHits.isOptional()) {
+    cdcHits.registerRelationTo(recoTracks);
+    recoHitInformations.registerRelationTo(cdcHits);
   }
 
   StoreArray<RecoHitInformation::UsedBKLMHit> bklmHits(bklmHitsStoreArrayName);
@@ -97,9 +97,9 @@ void RecoTrack::registerRequiredRelations(
 
 RecoTrack* RecoTrack::createFromTrackCand(const genfit::TrackCand& trackCand,
                                           const std::string& storeArrayNameOfRecoTracks,
-                                          const std::string& storeArrayNameOfCDCHits,
-                                          const std::string& storeArrayNameOfSVDHits,
                                           const std::string& storeArrayNameOfPXDHits,
+                                          const std::string& storeArrayNameOfSVDHits,
+                                          const std::string& storeArrayNameOfCDCHits,
                                           const std::string& storeArrayNameOfBKLMHits,
                                           const std::string& storeArrayNameOfEKLMHits,
                                           const std::string& storeArrayNameOfRecoHitInformation,
@@ -109,9 +109,9 @@ RecoTrack* RecoTrack::createFromTrackCand(const genfit::TrackCand& trackCand,
 
   StoreArray<RecoTrack> recoTracks(storeArrayNameOfRecoTracks);
   StoreArray<RecoHitInformation> recoHitInformations(storeArrayNameOfRecoHitInformation);
-  StoreArray<UsedCDCHit> cdcHits(storeArrayNameOfCDCHits);
-  StoreArray<UsedSVDHit> svdHits(storeArrayNameOfSVDHits);
   StoreArray<UsedPXDHit> pxdHits(storeArrayNameOfPXDHits);
+  StoreArray<UsedSVDHit> svdHits(storeArrayNameOfSVDHits);
+  StoreArray<UsedCDCHit> cdcHits(storeArrayNameOfCDCHits);
   StoreArray<UsedBKLMHit> bklmHits(storeArrayNameOfBKLMHits);
   StoreArray<UsedEKLMHit> eklmHits(storeArrayNameOfEKLMHits);
 
@@ -122,8 +122,7 @@ RecoTrack* RecoTrack::createFromTrackCand(const genfit::TrackCand& trackCand,
   const double time = trackCand.getTimeSeed();
 
   RecoTrack* newRecoTrack = recoTracks.appendNew(position, momentum, charge,
-                                                 cdcHits.getName(), svdHits.getName(),
-                                                 pxdHits.getName(),
+                                                 pxdHits.getName(), svdHits.getName(), cdcHits.getName(),
                                                  bklmHits.getName(), eklmHits.getName(),
                                                  recoHitInformations.getName());
   newRecoTrack->setTimeSeed(time);
@@ -187,6 +186,14 @@ genfit::TrackCand RecoTrack::createGenfitTrackCand() const
   createdTrackCand.setTimeSeed(getTimeSeed());
 
   // Add the hits
+  mapOnHits<UsedPXDHit>(m_storeArrayNameOfPXDHits, [&createdTrackCand](const RecoHitInformation & hitInformation,
+  const UsedPXDHit * const hit) {
+    createdTrackCand.addHit(Const::PXD, hit->getArrayIndex(), -1, hitInformation.getSortingParameter());
+  });
+  mapOnHits<UsedSVDHit>(m_storeArrayNameOfSVDHits, [&createdTrackCand](const RecoHitInformation & hitInformation,
+  const UsedSVDHit * const hit) {
+    createdTrackCand.addHit(Const::SVD, hit->getArrayIndex(), -1, hitInformation.getSortingParameter());
+  });
   mapOnHits<UsedCDCHit>(m_storeArrayNameOfCDCHits, [&createdTrackCand](const RecoHitInformation & hitInformation,
   const UsedCDCHit * const hit) {
     if (hitInformation.getRightLeftInformation() == RecoHitInformation::c_left) {
@@ -199,14 +206,6 @@ genfit::TrackCand RecoTrack::createGenfitTrackCand() const
       createdTrackCand.addHit(new genfit::WireTrackCandHit(Const::CDC, hit->getArrayIndex(), -1,
                                                            hitInformation.getSortingParameter(), 0));
     }
-  });
-  mapOnHits<UsedSVDHit>(m_storeArrayNameOfSVDHits, [&createdTrackCand](const RecoHitInformation & hitInformation,
-  const UsedSVDHit * const hit) {
-    createdTrackCand.addHit(Const::SVD, hit->getArrayIndex(), -1, hitInformation.getSortingParameter());
-  });
-  mapOnHits<UsedPXDHit>(m_storeArrayNameOfPXDHits, [&createdTrackCand](const RecoHitInformation & hitInformation,
-  const UsedPXDHit * const hit) {
-    createdTrackCand.addHit(Const::PXD, hit->getArrayIndex(), -1, hitInformation.getSortingParameter());
   });
   mapOnHits<UsedBKLMHit>(m_storeArrayNameOfBKLMHits, [&createdTrackCand](const RecoHitInformation & hitInformation,
   const UsedBKLMHit * const hit) {
@@ -509,7 +508,7 @@ RecoTrack* RecoTrack::copyToStoreArrayUsing(StoreArray<RecoTrack>& storeArray,
                                             const TMatrixDSym& covariance, double timeSeed) const
 {
   RecoTrack* newRecoTrack = storeArray.appendNew(position, momentum, charge,
-                                                 getStoreArrayNameOfCDCHits(), getStoreArrayNameOfSVDHits(), getStoreArrayNameOfPXDHits(),
+                                                 getStoreArrayNameOfPXDHits(), getStoreArrayNameOfSVDHits(), getStoreArrayNameOfCDCHits(),
                                                  getStoreArrayNameOfBKLMHits(), getStoreArrayNameOfEKLMHits(), getStoreArrayNameOfRecoHitInformation());
 
   newRecoTrack->setTimeSeed(timeSeed);

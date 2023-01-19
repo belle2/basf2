@@ -705,8 +705,7 @@ std::vector<int> Particle::getMdstArrayIndices(EParticleSourceObject source) con
   return mdstIndices;
 }
 
-
-void Particle::appendDaughter(const Particle* daughter, const bool updateType)
+void Particle::appendDaughter(const Particle* daughter, const bool updateType, const int daughterProperty)
 {
   if (updateType) {
     // is it a composite particle or fsr corrected?
@@ -715,7 +714,7 @@ void Particle::appendDaughter(const Particle* daughter, const bool updateType)
 
   // add daughter index
   m_daughterIndices.push_back(daughter->getArrayIndex());
-  m_daughterProperties.push_back(Particle::PropertyFlags::c_Ordinary);
+  m_daughterProperties.push_back(daughterProperty);
 }
 
 void Particle::removeDaughter(const Particle* daughter, const bool updateType)

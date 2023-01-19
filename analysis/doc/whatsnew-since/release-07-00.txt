@@ -1,10 +1,28 @@
+Changes in the analysis package in light-2302-genetta
+-----------------------------------------------------
+Modules
++++++++
+ * Added an option ``usePhotonOnlyOnce`` to the function :func:`modularAnalysis.correctBremsBelle`. The default of the option is ``False``
+   so the backward compatibility. If the option is set to ``True``, a photon is used for only the closest charged particle in the
+   input ParticleLists.
+
+
+
 Changes in the analysis package in light-2212-foldex
 ----------------------------------------------------
+ParticleList dataobject
++++++++++++++++++++++++
+ * Added new member variable ``isReserved`` to prevent the reserved ParticleLists (``:all`` labeled final-state particles, and
+   ``:V0`` labeled V0-particles) from being changed. While some modules have already had protection not to edit the reserved lists,
+   e.g. `ParticleSelector` and `ParticleListManipulator`, the other modules editing the ParticleList had the potential to introduce
+   critical bugs. If one's script breaks due to the update since the ``light-2212-foldex``, please modify the script not to edit the
+   reserved ParticleLists by copying them with other names beforehand.
+
 Signal embedding
 ++++++++++++++++
  * New modules `UdstListFilter` and `PostMergeUpdater` for signal embedding which remove extra ``mdst`` objects and merge events together, respectively.
  * New scripts ``udst_purge_list`` and ``embedding_merge`` to enable signal embedding.
- * A shell script ``analysis/examples/embedding/embedding.sh`` which illustrates the usage of the scripts.
+ * A python script ``analysis/examples/embedding/embedding.py`` which illustrates the usage of the scripts.
 
 Variables
 +++++++++
@@ -17,12 +35,31 @@ stdCharged
 ++++++++++
  * Added working points for uniform pion-lepton fake rate.
 
+stdPhoton and stdPi0
+++++++++++++++++++++
+ * Added an optional parameter ``biasCorrectionTable`` to `stdPhotons` and `stdPi0s` that allows the user to specify a table name for 
+   the photon energy bias correction. Providing a table name will automatically apply the bias correction to all particles in the particle lists. This is
+   available for all list types. The latest information on the bias correction can be found on the 
+   `Neutrals Performance Confluence Page <https://confluence.desy.de/display/BI/Neutrals+Performance>`_. 
+
 Modules
 +++++++
  * Added an option ``signalSideParticleList`` to the function :func:`modularAnalysis.variablesToNtuple` to store the index of the signal-side particle.
    This option is only valid when one calls the function in a ``for_each`` loop over the RestOfEvent.
    The branches ``__signalSideCandidate__`` and ``__nSignalSideCandidates__`` are added to the TTree by setting the option.
    An example of usage can be found in ``analysis/examples/VariableManager/variablesToNtuple.py``.
+ * Fixed a bug on the :b2:mod:`BestCandidateSelection` that keeps only less than the expected number of candidates when
+   ``allowMultiRank=True`` and ``numBest>0``. Now the module works as documented.
+ * Added an option ``allowAnyParticleSource`` to the function :func:`modularAnalysis.reconstructDecayWithNeutralHadron` to let
+   users apply the mother-mass constraint on a charged particle.
+ * The `findMCDecay` function is fixed so that all output particles have ``isSignal==1``.
+   New option ``appendAllDaughters`` is added so that one can append not only the daughters described in the decay string but all
+   daughters of the matched MCParticle. Another new option ``skipNonPrimaryDaughters`` is added to skip secondary particles when
+   ``appendAllDaughters=True``.
+
+ * The ParticleLists labeled ``:MC``, which were created by default when the `fillParticleListFromMC` is called, are no longer
+   created automatically by the function. Also, the protection that was previously applied to the list labeled ":MC" has been
+   removed.
 
 Changes in the analysis package in light-2210-devonrex
 ------------------------------------------------------

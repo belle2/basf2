@@ -132,21 +132,21 @@ namespace Belle2 {
     /** Histogram of SVD strips multiplicity */
     TH1F* h_SVDstrips_Mult = nullptr;
     /** Histogram of SVD differences of u-coordinate residuals grouped by clusters sizes */
-    TH1F* h_U_Cl1Cl2_DeltaRes[5] = {nullptr};
+    TH1F* h_U_Cl1Cl2_DeltaRes[5] = {{nullptr}};
     /** Histogram of SVD differences of v-coordinate residuals grouped by clusters sizes */
-    TH1F* h_V_Cl1Cl2_DeltaRes[5] = {nullptr};
+    TH1F* h_V_Cl1Cl2_DeltaRes[5] = {{nullptr}};
     /** Sensor hit-map for layer 6 from reconstructed u and v coordinates */
-    TH2F* h_Lyr6[17][6] = {nullptr}; //[Ladder][sensor number]
+    TH2F* h_Lyr6[17][6] = {{nullptr}}; //[Ladder][sensor number]
     /** Sensor hit-map for layer 5 from reconstructed u and v coordinates */
-    TH2F* h_Lyr5[13][5] = {nullptr}; //[Ladder][sensor number]
+    TH2F* h_Lyr5[13][5] = {{nullptr}}; //[Ladder][sensor number]
     /** Sensor hit-map for layer 4 from reconstructed u and v coordinates */
-    TH2F* h_Lyr4[11][4] = {nullptr}; //[Ladder][sensor number]
+    TH2F* h_Lyr4[11][4] = {{nullptr}}; //[Ladder][sensor number]
     /** Sensor hit-map for layer 3 from reconstructed u and v coordinates */
-    TH2F* h_Lyr3[8][3] = {nullptr}; //[Ladder][sensor number]
+    TH2F* h_Lyr3[8][3] = {{nullptr}}; //[Ladder][sensor number]
     /** Sensor hit-map for layer 2 from reconstructed u and v coordinates */
-    TH2F* h_Lyr2[13][3] = {nullptr}; //[Ladder][sensor number]
+    TH2F* h_Lyr2[13][3] = {{nullptr}}; //[Ladder][sensor number]
     /** Sensor hit-map for layer 1 from reconstructed u and v coordinates */
-    TH2F* h_Lyr1[9][3] = {nullptr}; //[Ladder][sensor number]
+    TH2F* h_Lyr1[9][3] = {{nullptr}}; //[Ladder][sensor number]
     /** Tree containing global information on PXD overlaps */
     TTree* t_PXD = nullptr;
     /** Tree containing global information on SVD u-coordinate overlaps */

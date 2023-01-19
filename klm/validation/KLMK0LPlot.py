@@ -12,7 +12,7 @@
 """
 <header>
     <input>KLMK0LOutput.root</input>
-    <contact>Kirill Chilikin (chilikin@lebedev.ru)</contact>
+    <contact>Kirill Chilikin (K.A.Chilikin@inp.nsk.su)</contact>
     <description>Creation of KLM K0L validation plots.</description>
 </header>
 """

@@ -127,6 +127,9 @@ void BestCandidateSelectionModule::event()
     return;
   }
 
+  if (m_numBest == 0 and m_inputList->getIsReserved())
+    m_inputList->setEditable(true);
+
   // create list of particle index and the corresponding value of variable
   typedef std::pair<double, unsigned int> ValueIndexPair;
   std::vector<ValueIndexPair> valueToIndex;
@@ -180,4 +183,7 @@ void BestCandidateSelectionModule::event()
 
 
   }
+
+  if (m_numBest == 0 and m_inputList->getIsReserved())
+    m_inputList->setEditable(false);
 }

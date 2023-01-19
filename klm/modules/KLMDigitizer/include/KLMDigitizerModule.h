@@ -9,10 +9,9 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/dataobjects/bklm/BKLMSimHit.h>
-#include <klm/dataobjects/eklm/EKLMSimHit.h>
 #include <klm/dataobjects/KLMDigit.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
+#include <klm/dataobjects/KLMSimHit.h>
 #include <klm/dbobjects/KLMChannelStatus.h>
 #include <klm/dbobjects/KLMScintillatorDigitizationParameters.h>
 #include <klm/dbobjects/KLMScintillatorFEEParameters.h>
@@ -152,25 +151,22 @@ namespace Belle2 {
     bool m_Debug;
 
     /** Simulation hit map for BKLM (by channel). */
-    std::multimap<KLMChannelNumber, const BKLMSimHit*> m_bklmSimHitChannelMap;
+    std::multimap<KLMChannelNumber, const KLMSimHit*> m_bklmSimHitChannelMap;
 
     /** Simulation hit map for BKLM (by plane). */
-    std::multimap<KLMPlaneNumber, const BKLMSimHit*> m_bklmSimHitPlaneMap;
+    std::multimap<KLMPlaneNumber, const KLMSimHit*> m_bklmSimHitPlaneMap;
 
     /** Simulation hit map for EKLM (by channel). */
-    std::multimap<KLMChannelNumber, const EKLMSimHit*> m_eklmSimHitChannelMap;
+    std::multimap<KLMChannelNumber, const KLMSimHit*> m_eklmSimHitChannelMap;
 
     /** Simulation hit map for EKLM (by plane). */
-    std::multimap<KLMPlaneNumber, const EKLMSimHit*> m_eklmSimHitPlaneMap;
+    std::multimap<KLMPlaneNumber, const KLMSimHit*> m_eklmSimHitPlaneMap;
 
     /** FPGA fitter. */
     KLM::ScintillatorFirmware* m_Fitter;
 
-    /** BKLM simulation hits. */
-    StoreArray<BKLMSimHit> m_bklmSimHits;
-
-    /** EKLM simulation hits. */
-    StoreArray<EKLMSimHit> m_eklmSimHits;
+    /** Simulation hits. */
+    StoreArray<KLMSimHit> m_SimHits;
 
     /** KLM digits. */
     StoreArray<KLMDigit> m_Digits;

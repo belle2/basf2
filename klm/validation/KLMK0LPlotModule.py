@@ -12,6 +12,7 @@
 """
 <header>
     <contact>Kirill Chilikin (K.A.Chilikin@inp.nsk.su)</contact>
+    <noexecute>Definition of plotting class</noexecute>
     <description>Creation of KLM K0L validation plots.</description>
 </header>
 """

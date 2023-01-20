@@ -56,7 +56,7 @@ namespace Belle2 {
         // correct strip by the CalPeak
         stripTime -= m_PulseShapeCal.getPeakTime(rawCluster.getSensorID(), rawCluster.isUSide(), strip.cellID);
 
-        if (std::isnan(m_triggerBin))
+        if (std::isnan(float(m_triggerBin)))
           B2FATAL("OOPS, we can't continue, you have to set the trigger bin!");
 
         if (! m_returnRawClusterTime)
@@ -91,7 +91,7 @@ namespace Belle2 {
       }
       float rawtime = retval / norm;
 
-      if (std::isnan(m_triggerBin))
+      if (std::isnan(float(m_triggerBin)))
         B2FATAL("OOPS, we can't continue, you have to set the trigger bin!");
 
       if (m_returnRawClusterTime)
@@ -158,7 +158,7 @@ namespace Belle2 {
       auto rawtime_den =  1 - E4 - w * (2 + E2);
       double rawtime = - m_apvClockPeriod * rawtime_num / rawtime_den;
 
-      if (std::isnan(m_triggerBin))
+      if (std::isnan(float(m_triggerBin)))
         B2FATAL("OOPS, we can't continue, you have to set the trigger bin!");
 
       if (m_returnRawClusterTime)

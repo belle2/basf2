@@ -13,8 +13,6 @@
 #include <TMath.h>
 #include <numeric>
 
-using namespace std;
-
 namespace Belle2 {
 
   namespace SVD {

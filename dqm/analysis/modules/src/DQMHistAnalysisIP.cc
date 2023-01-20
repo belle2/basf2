@@ -58,7 +58,7 @@ void DQMHistAnalysisIPModule::initialize()
 
   m_monObj = getMonitoringObject("ip");
 
-  addDeltaPar(m_histoDirectory, m_histoName, 1, m_minEntries, 1); // register delta
+  addDeltaPar(m_histoDirectory, m_histoName, HistDelta::c_Entries, m_minEntries, 1); // register delta
 
   auto  a = m_histoDirectory + "/" + m_histoName;
   m_c1 = new TCanvas((a +

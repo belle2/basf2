@@ -67,7 +67,7 @@ CDCCRTestModule::CDCCRTestModule() : HistoModule()
   addParam("StoreTrackParams", m_StoreTrackParams, "Store Track Parameter or not, it will be multicount for each hit", true);
   addParam("StoreHitDistribution", m_MakeHitDist, "Make hit distribution or not", true);
   addParam("EventT0Extraction", m_EventT0Extraction, "use event t0 extract t0 or not", true);
-  addParam("MinimumPt", m_MinimumPt, "Tracks with tranverse momentum small than this will not recored", 0.);
+  addParam("MinimumPt", m_MinimumPt, "Tracks with transverse momentum smaller than this will not be recorded", 0.);
 }
 
 CDCCRTestModule::~CDCCRTestModule()
@@ -277,7 +277,7 @@ void CDCCRTestModule::event()
     }
 
     m_hNTracks->Fill("fitted, converged", 1.0);
-    B2DEBUG(99, "-------Fittted and Conveged");
+    B2DEBUG(99, "-------Fitted and Converged");
 
     nfitted = nfitted + 1;
     /** find results in track fit results**/
@@ -290,7 +290,7 @@ void CDCCRTestModule::event()
       continue;
     }
 
-    if (m_noBFit) {ndf = fs->getNdf() + 1;} // incase no Magnetic field, NDF=4;
+    if (m_noBFit) {ndf = fs->getNdf() + 1;} // in case no Magnetic field, NDF=4;
     else {ndf = fs->getNdf();}
     double Chi2 = fs->getChi2();
     TrPval = std::max(0., ROOT::Math::chisquared_cdf_c(Chi2, ndf));
@@ -396,7 +396,6 @@ void CDCCRTestModule::plotResults(Belle2::RecoTrack* track)
 
           const genfit::MeasuredStateOnPlane& mop = kfi->getFittedState();
           const B2Vector3D pocaOnWire = mop.getPlane()->getO();//Local wire position
-          const B2Vector3D pocaOnTrack = mop.getPlane()->getU();//residual direction
           const B2Vector3D pocaMom = mop.getMom();
           alpha = cdcgeo.getAlpha(pocaOnWire, pocaMom) ;
           theta = cdcgeo.getTheta(pocaMom);
@@ -507,7 +506,7 @@ void CDCCRTestModule::HitEfficiency(const Belle2::RecoTrack* track)
   BOOST_FOREACH(const RecoHitInformation::UsedCDCHit * cdchit, track->getCDCHitList()) {
     WireID Wid = WireID(cdchit->getID());
     const genfit::TrackPoint* tp = track->getCreatedTrackPoint(track->getRecoHitInformation(cdchit));
-    //some hit didn't take account in fitting, so I use left/right info frm track finding results.
+    //some hit didn't take account in fitting, so I use left/right info from track finding results.
     int RLInfo = 0;
     RecoHitInformation::RightLeftInformation rightLeftHitInformation = track->getRecoHitInformation(cdchit)->getRightLeftInformation();
     if (rightLeftHitInformation == RecoHitInformation::RightLeftInformation::c_left) {
@@ -682,7 +681,7 @@ const genfit::SharedPlanePtr CDCCRTestModule::constructPlane(const genfit::Measu
   B2Vector3D WireDirectionIdeal = Wire2PosIdeal - Wire1PosIdeal;
   WireDirectionIdeal.SetMag(1.);//normalized
 
-  // extraplate to find z
+  // extrapolate to find z
   const genfit::AbsTrackRep* rep = state.getRep();
   rep->extrapolateToLine(st, Wire1PosIdeal, WireDirectionIdeal);
   const B2Vector3D& PocaIdeal = rep->getPos(st);
@@ -698,7 +697,7 @@ const genfit::SharedPlanePtr CDCCRTestModule::constructPlane(const genfit::Measu
   B2Vector3D wireDirection = wire2 - wire1;
   wireDirection.SetMag(1.);
 
-  // extraplate to find poca
+  // extrapolate to find poca
   rep->extrapolateToLine(st, wire1, wireDirection);
   const B2Vector3D& poca = rep->getPos(st);
   B2Vector3D dirInPoca = rep->getMom(st);

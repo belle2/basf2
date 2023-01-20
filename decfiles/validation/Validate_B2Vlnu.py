@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -12,7 +11,7 @@
 """
 <header>
   <contact>P. Urquijo phillip.urquijo@unimelb.edu.au</contact>
-  <output>../Validate_B2Vlnu.root</output>
+  <output>Validate_B2Vlnu.root</output>
 </header>
 """
 
@@ -31,9 +30,9 @@ path.add_module('EventInfoSetter', evtNumList=[10000])
 add_evtgen_generator(path, 'signal', basf2.find_file('decfiles/dec/Bu_Dst0enu.dec'))
 findMCDecay('B+:sig', 'B+ -> [anti-D*0 -> anti-D0 pi0] e+ nu_e', path=path)
 create_validation_histograms(
-    path, '../Validate_B2Vlnu.root', 'B+:sig',
+    path, 'Validate_B2Vlnu.root', 'B+:sig',
     [
-        ('q2', 50, -1, 12, '', 'P. Urquijo <phillip.urquijo@unimelb.edu.au>',
+        ('q2', 50, -0.5, 12.5, '', 'P. Urquijo <phillip.urquijo@unimelb.edu.au>',
          r'B2Vlnu $q^2$ of the $e^+\nu_{e}$ system in $B^+ \to \bar{D^{*0}} e^+ \nu_e$ (truth values)',
          'should follow the reference', '#q^2'),
     ],

@@ -88,6 +88,7 @@ namespace Belle2 {
     void fillSensorInterHistos(const SVDIntercept* inter); /**< fill histograms per sensor, filled once per intercept */
 
     int m_numModules; /**< number of hardware modules*/
+    int m_specificLayer = -1; /**< specific layer selected for which to produce the plots */
 
     TH1F* hnROIs; /**< number of ROIs*/
     TH1F* hnInter; /**< number of intercpets*/

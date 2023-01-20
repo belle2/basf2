@@ -11,18 +11,20 @@
 #include <boost/format.hpp>
 #include <TROOT.h>
 
-#include "TLine.h"
-#include "TPaveText.h"
-#include "TStyle.h"
-#include "TGaxis.h"
-#include "TColor.h"
+#include <TLine.h>
+#include <TPaveText.h>
+#include <TStyle.h>
+#include <TGaxis.h>
+#include <TColor.h>
+#include <TLegend.h>
 
-#include "TF1.h"
-#include "TCanvas.h"
-#include "TH1.h"
-#include "TH2D.h"
+#include <TF1.h>
+#include <TCanvas.h>
+#include <TH1.h>
+#include <TH2D.h>
 
 #include <dqm/core/DQMHistAnalysis.h>
+#include <cdc/geometry/CDCGeometryParConstants.h>
 
 namespace Belle2 {
 
@@ -33,7 +35,7 @@ namespace Belle2 {
    */
 
 
-  class DQMHistAnalysisCDCDedxModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisCDCDedxModule final: public DQMHistAnalysisModule {
 
     // Public functions
   public:
@@ -46,32 +48,32 @@ namespace Belle2 {
     /**
     * destructor
     */
-    virtual ~DQMHistAnalysisCDCDedxModule();
+    ~DQMHistAnalysisCDCDedxModule();
 
     /**
     * init function for default values
     */
-    virtual void initialize() override;
+    void initialize() override final;
 
     /**
     * begin each run
     */
-    virtual void beginRun() override;
+    void beginRun() override final;
 
     /**
     * event by event function
     */
-    virtual void event() override;
+    void event() override final;
 
     /**
     * end of each run
     */
-    virtual void endRun() override;
+    void endRun() override final;
 
     /**
     * terminating at the end of last run
     */
-    virtual void terminate() override;
+    void terminate() override final;
 
     /**
     * funtion to get metadata from histogram
@@ -104,9 +106,14 @@ namespace Belle2 {
     void drawBandPlot();
 
     /**
-     * function to draw the injection time
+     * function to draw the dEdx vs injection time
      */
-    void drawInjectTime();
+    void drawDedxInjTime();
+
+    /**
+    * funtion to draw the mean/reso of dedx vs injection time
+    */
+    void drawDedxInjTimeBin();
 
     /**
     * funtion to fit gaussian dist.
@@ -114,25 +121,39 @@ namespace Belle2 {
     void fitHistogram(TH1D*& temphist, std::string& status);
 
     /**
+    * funtion to set the mean and sigma histograms
+    */
+    void setHistPars(TH2D* hist, TH1F* hmean, TH1F* hsigma, int nbin);
+
+    /**
+    * funtion to draw the histograms
+    */
+    void drawHistPars(TH1F* hist, int nbin, double pars, double fac, std::string var);
+
+    /**
     * funtion to add plot style
     */
-    void set_Plot_Style();
+    void setPlotStyle();
 
     /**
     * funtion to add text style
     */
-    void set_Text_Style(TPaveText*& obj);
+    void setTextStyle(TPaveText*& obj);
 
     /**
     * funtion to reset pad margins
     */
-    void set_Hist_Style(TH1* obj);
+    void setHistStyle(TH1* obj);
 
     /**
     * funtion to reset pad margins
     */
-    void set_Pad_Style(double l, double r, double t, double b);
+    void setPadStyle(double l, double r, double t, double b);
 
+    /**
+    * funtion to set the bhabha event info
+    */
+    void setBEvtInfo(TPaveText* pt);
 
   private:
 

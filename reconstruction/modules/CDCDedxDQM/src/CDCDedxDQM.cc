@@ -52,8 +52,8 @@ void CDCDedxDQMModule::defineHisto()
   hMeta->GetXaxis()->SetBinLabel(3, "nhadron");
 
   hdEdx = new TH1D("hdEdx", ";CDC dE/dx;Entries", 250, 0., 2.5);
-  hinjtimeHer = new TH1D("hinjtimeHer", ";injection time (#mu s); Entries", 500, 0, 100e6);
-  hinjtimeLer = new TH1D("hinjtimeLer", ";injection time (#mu s); Entries", 500, 0, 100e6);
+  hinjtimeHer = new TH2D("hinjtimeHer", ";injection time (#mu s); CDC dE/dx", 160, 0, 80e3, 250, 0, 2.5);
+  hinjtimeLer = new TH2D("hinjtimeLer", ";injection time (#mu s); CDC dE/dx", 160, 0, 80e3, 250, 0, 2.5);
   hdEdxvsP = new TH2D("hdEdxVsP", ";#it{p}_{CDC} (GeV/c);CDC dE/dx", 400, 0.050, 4.50, 800, 0.35, 20.35);
   hdEdxvsEvt = new TH2D("hdEdxvsEvt", ";Events(M);CDC dE/dx", 300, 0, 300, 200, 0.00, 2.5);
   hdEdxvsCosth = new TH2D("hdEdxvsCosth", ";cos#theta (e^{-}e^{+} tracks);CDC dE/dx", 100, -1.00, 1.00, 250, 0.00, 2.5);
@@ -112,24 +112,6 @@ void CDCDedxDQMModule::beginRun()
 void CDCDedxDQMModule::event()
 {
 
-  StoreObjPtr<EventLevelTriggerTimeInfo> TTDInfo;
-
-  // Check if the pointer is valid
-  if (!TTDInfo.isValid()) {
-    B2WARNING("StoreObjPtr<EventLevelTriggerTimeInfo> does not exist, are you running over data reconstructed with release-05 or earlier?");
-    return;
-  }
-
-  // And check if the stored data is valid and if an injection happened recently
-  if (TTDInfo->isValid() && TTDInfo->hasInjection()) {
-    if (TTDInfo->isHER())
-      hinjtimeHer->Fill(TTDInfo->getTimeSinceLastInjectionInMicroSeconds());
-    else hinjtimeLer->Fill(TTDInfo->getTimeSinceLastInjectionInMicroSeconds());
-  } else {
-    return;
-  }
-
-
   if (!m_cdcDedxTracks.isOptional())  return;
 
   if (!m_TrgResult.isValid()) {
@@ -151,12 +133,10 @@ void CDCDedxDQMModule::event()
   if (IsBhabhaEvt)m_nBEvt += 1;
   if (IsHadronEvt)m_nHEvt += 1;
 
-
-
   //Get current evt number
   if (m_MetaDataPtr)m_event = int(m_MetaDataPtr->getEvent());
 
-  for (Int_t idedx = 0; idedx < m_cdcDedxTracks.getEntries(); idedx++) {
+  for (int idedx = 0; idedx < m_cdcDedxTracks.getEntries(); idedx++) {
 
     CDCDedxTrack* dedxTrack = m_cdcDedxTracks[idedx];
     if (!dedxTrack || dedxTrack->size() == 0)continue;
@@ -223,8 +203,17 @@ void CDCDedxDQMModule::event()
       m_event = int(m_event / 5e5);
       hdEdxvsEvt->Fill(m_event, dedxnosat);
 
-    }
+      StoreObjPtr<EventLevelTriggerTimeInfo> TTDInfo;
+      // And check if the stored data is valid and if an injection happened recently
+      if (TTDInfo->isValid() && TTDInfo->hasInjection()) {
+        if (TTDInfo->isHER())
+          hinjtimeHer->Fill(TTDInfo->getTimeSinceLastInjectionInMicroSeconds(), dedxnosat);
+        else
+          hinjtimeLer->Fill(TTDInfo->getTimeSinceLastInjectionInMicroSeconds(), dedxnosat);
+      } else
+        return;
 
+    }
     if (IsHadronEvt && hdEdxvsP->Integral() <= 80000)hdEdxvsP->Fill(pCDC, dedx);
 
     if (mmode != "basic") {
@@ -261,24 +250,7 @@ void CDCDedxDQMModule::endRun()
     hinjtimeLer->GetXaxis()->SetRange(hinjtimeLer->FindFirstBinAbove(0, 1), hinjtimeLer->FindLastBinAbove(0, 1));
   }
   //get dead wire pattern
-  if (mmode != "basic") {
-    Int_t nbadwires = 0;
-    for (int iwire = 0; iwire < 14336; ++iwire) {
-      int nwire = getIndexVal(iwire, "nwirelayer");
-      int twire = getIndexVal(iwire, "twire");
-      double radius = getIndexVal(iwire, "rwire");
-      int wire = iwire - twire ;
-      double phi = 2.*TMath::Pi() * (float(wire) / float(nwire));
-      double x = radius * cos(phi);
-      double y = radius * sin(phi);
-      hWires->Fill(x, y);
-      if (m_adc[iwire].size() > 0)continue;
-      nbadwires++;
-      hWireStatus->Fill(x, y);
-    }
-    hWireStatus->SetTitle(Form("%d", nbadwires));
-  }
-
+  if (mmode != "basic") plotWireMap();
 }
 
 
@@ -288,39 +260,28 @@ void CDCDedxDQMModule::terminate()
 
 }
 
-//-----------------------------------------------------------
-double CDCDedxDQMModule::getIndexVal(int iWire, TString what)
+//------------------------------------
+void CDCDedxDQMModule::plotWireMap()
 {
-  //few hardcoded number
-  //radius of each CDC layer
-  const double r[56] = {
-    16.80,  17.80,  18.80,  19.80,  20.80,  21.80,  22.80,  23.80,
-    25.70,  27.52,  29.34,  31.16,  32.98,  34.80,
-    36.52,  38.34,  40.16,  41.98,  43.80,  45.57,
-    47.69,  49.46,  51.28,  53.10,  54.92,  56.69,
-    58.41,  60.18,  62.00,  63.82,  65.64,  67.41,
-    69.53,  71.30,  73.12,  74.94,  76.76,  78.53,
-    80.25,  82.02,  83.84,  85.66,  87.48,  89.25,
-    91.37,  93.14,  94.96,  96.78,  98.60, 100.37,
-    102.09, 103.86, 105.68, 107.50, 109.32, 111.14
-  };
 
-  Int_t totalWireiLayer = 0 ;
-  double myreturn = 0;
-  for (Int_t iLayer = 0; iLayer < 56; iLayer++) {
-    int iSuperLayer = (iLayer - 2) / 6;
-    if (iSuperLayer <= 0)iSuperLayer = 1;
-    int nWireiLayer = 160 + (iSuperLayer - 1) * 32;
-    totalWireiLayer += nWireiLayer;
+  B2INFO("Creating CDCGeometryPar object");
+  Belle2::CDC::CDCGeometryPar& cdcgeo = Belle2::CDC::CDCGeometryPar::Instance();
 
-    if (iWire < totalWireiLayer) {
-      if (what == "layer")myreturn = iLayer;
-      else if (what == "nwirelayer") myreturn = nWireiLayer;
-      else if (what == "twire")  myreturn = totalWireiLayer - nWireiLayer;
-      else if (what == "rwire")  myreturn = r[iLayer] / 100.;
-      else std::cout << "Invalid return :0 " << std::endl;
-      break;
+  int jwire = -1;
+  int nbadwires = 0;
+
+  for (unsigned int ilay = 0; ilay < c_maxNSenseLayers; ++ilay) {
+    for (unsigned int iwire = 0; iwire < cdcgeo.nWiresInLayer(ilay); ++iwire) {
+      jwire++;
+      double phi = 2.*TMath::Pi() * (float(iwire) / float(cdcgeo.nWiresInLayer(ilay)));
+      double radius = cdcgeo.senseWireR(ilay) / 100.;
+      double x = radius * cos(phi);
+      double y = radius * sin(phi);
+      hWires->Fill(x, y);
+      if (m_adc[jwire].size() > 0)continue;
+      nbadwires++;
+      hWireStatus->Fill(x, y);
     }
   }
-  return myreturn;
+  hWireStatus->SetTitle(Form("%d", nbadwires));
 }

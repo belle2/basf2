@@ -109,6 +109,7 @@ class Saving1stMVAData(harvesting.HarvestingModule):
         InOutArmTimeDifference = nan
         InOutArmTimeDifferenceError = nan
         pt_estimate = nan
+        track_charge = nan
         quality_flip_indicator = nan
         quality_2ndflip_indicator = nan
 
@@ -140,8 +141,8 @@ class Saving1stMVAData(harvesting.HarvestingModule):
             if mc_particle and fit_result:
                 isprimary = bool(mc_particle.hasStatus(Belle2.MCParticle.c_PrimaryParticle))
                 charge_truth = mc_particle.getCharge()
+                track_charge = fit_result.getChargeSign()
                 if isprimary:
-                    track_charge = fit_result.getChargeSign()
                     if mc_particle.getCharge() != track_charge:
                         isPrimary_misID = True
 
@@ -248,6 +249,7 @@ class Saving1stMVAData(harvesting.HarvestingModule):
             isghost=isghost,
             isprimary=isprimary,
             charge_truth=charge_truth,
+            track_charge=track_charge,
             inGoingArmTime=inGoingArmTime,
             inGoingArmTimeError=inGoingArmTimeError,
             outGoingArmTime=outGoingArmTime,

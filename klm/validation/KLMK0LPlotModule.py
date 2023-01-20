@@ -11,7 +11,6 @@
 
 """
 <header>
-    <contact>Kirill Chilikin (K.A.Chilikin@inp.nsk.su)</contact>
     <noexecute>Definition of plotting class</noexecute>
     <description>Creation of KLM K0L validation plots.</description>
 </header>
@@ -38,7 +37,7 @@ class KLMK0LPlotModule(basf2.Module):
         self.check_eklm = check_eklm
         #: Output file.
         self.output_file = ROOT.TFile(output_file, 'recreate')
-        contact = 'Kirill Chilikin (K.A.Chilikin@inp.nsk.su)'
+        contact = 'Leo Piilonen (piilonen@vt.edu)'
         #: Number of K0L histogram.
         self.hist_nkl = ROOT.TH1F('k0l_number',
                                   'Number of KLM clusters per 1 MC particle',

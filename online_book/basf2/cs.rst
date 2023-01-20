@@ -12,17 +12,17 @@ Continuum Suppression (CS)
 
     **Prerequisites**:
 
-    	* :ref:`onlinebook_basf2_introduction` lesson
-    	* :ref:`onlinebook_roe` lesson
+    * :ref:`onlinebook_basf2_introduction` lesson
+    * :ref:`onlinebook_roe` lesson
 
     **Questions**:
 
-        * What is continuum?
-        * How can I separate it from signal events?
+    * What is continuum?
+    * How can I separate it from signal events?
 
     **Objectives**:
 
-        * Suppress continuum
+    * Suppress continuum
 
 
 Introduction
@@ -55,7 +55,7 @@ when extracting a signal component.
     i.e. directly to some lighter hadrons without creating a ϒ(4S) resonance.
 
     In Belle II Monte Carlo, the centrally produced continuum samples are separated by their quark content and are
-    called 'uubar', 'ddbar', 'ssbar' and 'ccbar'.
+    called ``uubar``, ``ddbar``, ``ssbar``, and ``ccbar``.
 
 If variables which you already know from the previous exercises are bad at separating continuum and
 BB events, which other properties of the events can we use?
@@ -120,7 +120,7 @@ They are defined by
 
     H_l = \sum_{i,j} \frac{\lvert p_i \rvert \lvert p_j \rvert }{E^2_{\text{event}}} P_l(\cos{\theta_{i, j}})
 
-with  the momenta p :sub:`i,j`, the angle θ :sub:`i,j` between them, the total energy in the event
+with the momenta p :sub:`i,j`, the angle θ :sub:`i,j` between them, the total energy in the event
 E :sub:`event` and the Legendre Polynomials P :sub:`l`.
 
 Other powerful properties are those based on the thrust vector. This is the vector along which the total projection
@@ -148,7 +148,7 @@ has an extensive overview over these quantities.
 .. admonition:: Hint
     :class: toggle xhint stacked
 
-    Check the Continuum Suppression variable group in :ref:`analysis/doc/index-01-analysis:Variables`.
+    Check the Continuum Suppression variable group in :ref:`analysis_variables`.
 
 .. admonition:: Solution
     :class: toggle solution
@@ -171,7 +171,7 @@ First Continuum Suppression steps in basf2
 Now, how do we access the shape of events in basf2?
 
 First we need some data. In this exercise we will use two samples, one with "uubar" continuum background and one
-with B → K :sub:`S` :sup:`0` 𝜋 :sup:`0` decays. These samples are called ``uubar_sample.root`` and
+with :math:`B^0 \to K_S^0 \pi^0` decays. These samples are called ``uubar_sample.root`` and
 ``B02ks0pi0_sample.root`` and can be used with the `basf2.find_file` function
 (you need the ``data_type='examples'`` switch and also have to prepend ``starterkit/2021/`` to the filename).
 If this doesn't work you can find the files in ``/sw/belle2/examples-data/starterkit/2021`` on KEKCC.
@@ -334,7 +334,7 @@ probability of an event being a continuum event, as estimated based on the input
 principle any variable that looks different between continuum and non-continuum
 events. The recommended and most commonly used variables are the ones introduced in
 the previous lesson as well as others from the *Continuum Suppression* variable group in
-the :ref:`analysis/doc/index-01-analysis:Variables`.
+the :ref:`analysis_variables`.
 
 The BDT is a supervised machine learning method, i.e. it needs to be trained on a
 dataset where we know the true class that we are trying to predict (this variable
@@ -580,10 +580,10 @@ data and MC on this variable, but if you use 30 variables in a BDT you will have
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Authors of this lesson
+.. rubric:: Authors of this lesson
 
-   Moritz Bauer, Yaroslav Kulii
+Moritz Bauer, Yaroslav Kulii
 
-.. topic:: Code contributors
+.. rubric:: Code contributors
 
-   Pablo Goldenzweig, Ilya Komarov
+Pablo Goldenzweig, Ilya Komarov

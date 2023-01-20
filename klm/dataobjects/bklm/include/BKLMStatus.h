@@ -8,12 +8,6 @@
 
 #pragma once
 
-//! bit position for MC-generated hit that represents a particle-decay point
-#define BKLM_DECAYED_BIT 23
-
-//! bit mask for MC-generated hit that represents a particle-decay point
-#define BKLM_DECAYED_MASK (1 << BKLM_DECAYED_BIT)
-
 namespace Belle2 {
 
   /**

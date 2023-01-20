@@ -22,28 +22,23 @@ namespace Belle2 {
   public:
     /** Default constructor. */
     DecayTree();
-    /** Constructor with decaying object (e.g. MCParticle) provided. */
-    explicit DecayTree(T* obj);
     /** Destructor. */
     ~DecayTree();
     /** Return list of decay daughters. */
-    std::vector< DecayTree<T>* > getDaughters();
+    std::vector< DecayTree<T>* > getDaughters() const;
     /** Return the decaying object itself, e.g. an MCParticle. */
-    T* getObj();
+    T* getObj() const;
     /** Set the decaying object, e.g. an MCParticle.*/
     void setObj(T* obj);
-    /** Frees memory occupied by m_myObject and the daughter objects. */
-    void clear();
     /** Add a daughter, which is a DecayTree itself. */
     void append(DecayTree<T>* t);
   };
 
+  /** Default constructor. */
   template <class T>
   DecayTree<T>::DecayTree() : m_myObject(0), m_daughters() {};
 
-  template <class T>
-  DecayTree<T>::DecayTree(T* obj) : m_myObject(obj), m_daughters() {};
-
+  /** Destructor. */
   template <class T>
   DecayTree<T>::~DecayTree()
   {
@@ -54,35 +49,28 @@ namespace Belle2 {
     }
   };
 
+  /** Return a vector of daughters. */
   template <class T>
-  std::vector< DecayTree<T>* > DecayTree<T>::getDaughters()
+  std::vector< DecayTree<T>* > DecayTree<T>::getDaughters() const
   {
     return m_daughters;
   }
 
+  /** Return the main object. */
   template <class T>
-  T* DecayTree<T>::getObj()
+  T* DecayTree<T>::getObj() const
   {
     return m_myObject;
   }
 
+  /** Set the main object. */
   template <class T>
   void DecayTree<T>::setObj(T* obj)
   {
     m_myObject = obj;
   }
 
-  template <class T>
-  void DecayTree<T>::clear()
-  {
-    delete m_myObject;
-    m_myObject = 0;
-    while (!m_daughters.empty()) {
-      m_daughters.back().clear();
-      m_daughters.pop_back();
-    }
-  }
-
+  /** Append a daughter. */
   template <class T>
   void DecayTree<T>::append(DecayTree<T>* t)
   {

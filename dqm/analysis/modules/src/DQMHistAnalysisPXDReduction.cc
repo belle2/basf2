@@ -79,7 +79,7 @@ void DQMHistAnalysisPXDReductionModule::initialize()
   for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
     TString ModuleName = (std::string)m_PXDModules[i];
     m_hReduction->GetXaxis()->SetBinLabel(i + 1, ModuleName);
-    addDeltaPar(m_histogramDirectoryName, "PXDDAQDHEDataReduction_" + (std::string)m_PXDModules[i], 1, m_minEntries,
+    addDeltaPar(m_histogramDirectoryName, "PXDDAQDHEDataReduction_" + (std::string)m_PXDModules[i], HistDelta::c_Entries, m_minEntries,
                 1); // register delta
   }
   //Unfortunately this only changes the labels, but can't fill the bins by the VxdIDs

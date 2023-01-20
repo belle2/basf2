@@ -35,7 +35,7 @@ namespace Belle2 {
    */
 
 
-  class DQMHistAnalysisCDCDedxModule final: public DQMHistAnalysisModule {
+  class DQMHistAnalysisCDCDedxModule final : public DQMHistAnalysisModule {
 
     // Public functions
   public:

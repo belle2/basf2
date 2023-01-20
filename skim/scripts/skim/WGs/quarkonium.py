@@ -42,13 +42,12 @@ class BottomoniumEtabExclusive(BaseSkim):
     __category__ = "physics, quarkonium"
 
     def load_standard_lists(self, path):
-        stdPhotons("loose", path=path, loadPhotonBeamBackgroundMVA=False)
+        stdPhotons("loose", path=path)
 
     def build_lists(self, path):
         # create and fill hard photon
         ma.fillParticleList(decayString="pi+:BottomoniumEtab_eventshape", cut="pt > 0.1", path=path)
-        ma.fillParticleList(decayString="gamma:BottomoniumEtab_eventshape", cut="E > 0.1", path=path,
-                            loadPhotonBeamBackgroundMVA=False)
+        ma.fillParticleList(decayString="gamma:BottomoniumEtab_eventshape", cut="E > 0.1", path=path)
 
         ma.buildEventShape(inputListNames=["pi+:BottomoniumEtab_eventshape", "gamma:BottomoniumEtab_eventshape"],
                            allMoments=False,
@@ -102,7 +101,7 @@ class BottomoniumUpsilon(BaseSkim):
     __category__ = "physics, quarkonium"
 
     def load_standard_lists(self, path):
-        stdPhotons("loose", path=path, loadPhotonBeamBackgroundMVA=False)
+        stdPhotons("loose", path=path)
 
     def build_lists(self, path):
         Ycuts = ""
@@ -119,8 +118,7 @@ class BottomoniumUpsilon(BaseSkim):
 
         # require foxWolframR2 < 0.995
         ma.fillParticleList(decayString="pi+:BottomoniumUpsilon_eventshape", cut="pt > 0.1", path=path)
-        ma.fillParticleList(decayString="gamma:BottomoniumUpsilon_eventshape", cut="E > 0.1", path=path,
-                            loadPhotonBeamBackgroundMVA=False)
+        ma.fillParticleList(decayString="gamma:BottomoniumUpsilon_eventshape", cut="E > 0.1", path=path)
 
         ma.buildEventShape(inputListNames=["pi+:BottomoniumUpsilon_eventshape", "gamma:BottomoniumUpsilon_eventshape"],
                            allMoments=False,

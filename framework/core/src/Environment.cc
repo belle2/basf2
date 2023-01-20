@@ -43,7 +43,7 @@ unsigned int Environment::getNumberOfEvents() const
   if (m_mcEvents != 0)
     return m_mcEvents;
 
-  unsigned int numEventsFromInput = InputController::numEntries();
+  unsigned int numEventsFromInput = InputController::getNumEntriesToProcess();
   unsigned int numEventsFromArgument = getNumberEventsOverride();
   if (numEventsFromArgument != 0
       && (numEventsFromInput == 0 || numEventsFromArgument < numEventsFromInput))
@@ -88,6 +88,7 @@ Environment::Environment() :
   m_steering(""),
   m_numberEventsOverride(0),
   m_inputFilesOverride(),
+  m_secondaryInputFilesOverride(),
   m_entrySequencesOverride(),
   m_outputFileOverride(""),
   m_numberProcessesOverride(-1),

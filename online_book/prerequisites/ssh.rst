@@ -12,24 +12,24 @@ SSH - Secure Shell
 
     **Prerequisites**:
 
-        * The ssh client installed on your computer
-        * To be able to enter simple commands on the terminal
-        * How to edit a text file on your computer
-        * A DESY account
-        * A `KEKCC account <https://belle.kek.jp/secured2/secretary/registration/comp_system.html>`_
+    * The ssh client installed on your computer
+    * To be able to enter simple commands on the terminal
+    * How to edit a text file on your computer
+    * A DESY account
+    * A `KEKCC account <https://belle.kek.jp/secured2/secretary/registration/comp_system.html>`_
 
     **Questions**:
 
-        * How to log in to a server?
-        * Why should I have a SSH config?
-        * How to generate and use keys?
-        * How to forward ports?
-        * How to copy files from and to a server?
-        * How can I get Jupyter notebooks running on a server?
+    * How to log in to a server?
+    * Why should I have a SSH config?
+    * How to generate and use keys?
+    * How to forward ports?
+    * How to copy files from and to a server?
+    * How can I get Jupyter notebooks running on a server?
 
     **Objectives**:
 
-        * Be able to work comfortably on a remote machine.
+    * Be able to work comfortably on a remote machine.
 
 
 Secure Shell (SSH) is a protocol to access other computers. It was invented in
@@ -998,8 +998,8 @@ also find keyboard shortcuts for most of them.
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Author(s) of this lesson
+.. rubric:: Author(s) of this lesson
 
-     Martin Ritter,
-     Michael Eliachevitch
+Martin Ritter,
+Michael Eliachevitch
 

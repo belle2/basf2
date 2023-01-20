@@ -1,19 +1,65 @@
+Changes in the analysis package in light-2302-genetta
+-----------------------------------------------------
+Modules
++++++++
+ * Added an option ``usePhotonOnlyOnce`` to the function :func:`modularAnalysis.correctBremsBelle`. The default of the option is ``False``
+   so the backward compatibility. If the option is set to ``True``, a photon is used for only the closest charged particle in the
+   input ParticleLists.
+
+
+
 Changes in the analysis package in light-2212-foldex
 ----------------------------------------------------
+ParticleList dataobject
++++++++++++++++++++++++
+ * Added new member variable ``isReserved`` to prevent the reserved ParticleLists (``:all`` labeled final-state particles, and
+   ``:V0`` labeled V0-particles) from being changed. While some modules have already had protection not to edit the reserved lists,
+   e.g. `ParticleSelector` and `ParticleListManipulator`, the other modules editing the ParticleList had the potential to introduce
+   critical bugs. If one's script breaks due to the update since the ``light-2212-foldex``, please modify the script not to edit the
+   reserved ParticleLists by copying them with other names beforehand.
+
+Signal embedding
+++++++++++++++++
+ * New modules `UdstListFilter` and `PostMergeUpdater` for signal embedding which remove extra ``mdst`` objects and merge events together, respectively.
+ * New scripts ``udst_purge_list`` and ``embedding_merge`` to enable signal embedding.
+ * A python script ``analysis/examples/embedding/embedding.py`` which illustrates the usage of the scripts.
 
 Variables
 +++++++++
+ * Extended the variable `useAlternativeDaughterHypothesis` to variables using daughters' pdg codes, e.g. `InvM`.
  * New metavariable `useDaughterRestFrame` to calculate a variable in the rest frame of the given daughters is added.
  * New variable `cosHelicityAngleForQuasiTwoBodyDecay` is added for the angular analysis on a quasi-two-body decay.
  * Extended the variable `cosTPTO` to be available both in a main path and for_each loop over ROEs.
 
+stdCharged
+++++++++++
+ * Added working points for uniform pion-lepton fake rate.
 
+stdPhoton and stdPi0
+++++++++++++++++++++
+ * Added an optional parameter ``biasCorrectionTable`` to `stdPhotons` and `stdPi0s` that allows the user to specify a table name for 
+   the photon energy bias correction. Providing a table name will automatically apply the bias correction to all particles in the particle lists. This is
+   available for all list types. The latest information on the bias correction can be found on the 
+   `Neutrals Performance Confluence Page <https://confluence.desy.de/display/BI/Neutrals+Performance>`_. 
 
 Modules
 +++++++
  * Added an option ``signalSideParticleList`` to the function :func:`modularAnalysis.variablesToNtuple` to store the index of the signal-side particle.
    This option is only valid when one calls the function in a ``for_each`` loop over the RestOfEvent.
    The branches ``__signalSideCandidate__`` and ``__nSignalSideCandidates__`` are added to the TTree by setting the option.
+   An example of usage can be found in ``analysis/examples/VariableManager/variablesToNtuple.py``.
+ * Fixed a bug on the :b2:mod:`BestCandidateSelection` that keeps only less than the expected number of candidates when
+   ``allowMultiRank=True`` and ``numBest>0``. Now the module works as documented.
+ * Added an option ``allowAnyParticleSource`` to the function :func:`modularAnalysis.reconstructDecayWithNeutralHadron` to let
+   users apply the mother-mass constraint on a charged particle.
+ * The `findMCDecay` function is fixed so that all output particles have ``isSignal==1``.
+   New option ``appendAllDaughters`` is added so that one can append not only the daughters described in the decay string but all
+   daughters of the matched MCParticle. Another new option ``skipNonPrimaryDaughters`` is added to skip secondary particles when
+   ``appendAllDaughters=True``.
+
+ * The ParticleLists labeled ``:MC``, which were created by default when the `fillParticleListFromMC` is called, are no longer
+   created automatically by the function. Also, the protection that was previously applied to the list labeled ":MC" has been
+   removed.
 
 Changes in the analysis package in light-2210-devonrex
 ------------------------------------------------------
@@ -52,7 +98,7 @@ Modules
    function :func:`modularAnalysis.setBeamConstrainedMomentum`. It lets you replace the momentum
    of one particle in your decay chain by p(beam)-p(selected particles).
  * The module :b2:mod:`ParticleLoader` has a new option to create particles which do
-   not have a mdst source. It is also available via the convenience function 
+   not have a mdst source. It is also available via the convenience function
    :func:`modularAnalysis.fillParticleListFromDummy`.
  * New module :b2:mod:`KlongMomentumUpdaterExpert` to calculate and update the two-body B-meson decay including a
    Klong is added. New function :func:`modularAnalysis.updateKlongKinematicsExpert` is also added.
@@ -60,7 +106,7 @@ Modules
    substitute Rave vertex fitter for the tagged B meson. The default configuration of the :b2:mod:`TagVertex` has changed.
    The default algorithm changed from ``Rave`` to ``KFit`` and the default constraint from ``IP`` to ``tube``.
    The ``KFit`` algorithm by default includes iterations, this can be changed by newly added ``kFitReqReducedChi2`` parameter.
- * The new expert argument ``expertBeamConstraintPDG`` has been added to the :b2:mod:`TreeFitter`. It allows the user to constrain 
+ * The new expert argument ``expertBeamConstraintPDG`` has been added to the :b2:mod:`TreeFitter`. It allows the user to constrain
    the four-momentum of a Particle to the four-momentum of the initial e+e- state.
  * Updated :b2:mod:`TrackIsoCalculator` to compute the particle isolation score.
 
@@ -73,7 +119,7 @@ Modular Analysis Function
  * Added a check to the `applyEventCuts` function to make sure that only event-based variables are used in the
    selection. The decomposition of meta variables can be tricky, so a new argument ``metavariables`` is added to extend
    the list of meta variables which should be decomposed and should themselves be ignored in the check.
- * Added the argument ``treatAsInvisible`` in :func:`vertex.treeFit` to ignore particles in the fit. 
+ * Added the argument ``treatAsInvisible`` in :func:`vertex.treeFit` to ignore particles in the fit.
  * Updated the `calculateTrackIsolation` helper. Now, it returns a list of metavariables (`minET2ETDist`, `minET2ETIsoScore`, optionally `minET2ETDistVar` as well)
    correctly configured according to the helper input options.
    Users can then create aliases in their own steering script: see ``analysis/examples/VariableManager/trackIsolationVariables.py`` for an example.
@@ -89,7 +135,7 @@ Particle dataobject
  * Added a ``replaceDaughter`` method to Particle. It allows you to replace the daughter
    of a Particle with another Particle while keeping the original order of the daughters.
    This is important to ensure the decay string will work correctly after replacing a daughter.
- * Added a new Particle source ``NoMDSTSource`` to Particle. It can be used for Particles 
+ * Added a new Particle source ``NoMDSTSource`` to Particle. It can be used for Particles
    that do not come from any mdst source.
 
 Changes in the analysis package in light-2207-bengal

@@ -146,6 +146,18 @@ void EventProcessor::process(const PathPtr& startPath, long maxEvent)
   //Initialize modules
   processInitialize(moduleList);
 
+  // SteerRootInputModule might have changed the number of events to be processed
+  for (const auto& module : moduleList) {
+    if (module->getType() == "SteerRootInput") {
+      if (maxEvent != Environment::Instance().getNumberEventsOverride()) {
+        B2INFO("Module 'SteerRootInputModule' is controlling the number of processed events.");
+        maxEvent = Environment::Instance().getNumberEventsOverride();
+        m_steerRootInputModuleOn = true;
+      }
+      break;
+    }
+  }
+
   //do we want to visualize DataStore input/ouput?
   if (Environment::Instance().getVisualizeDataFlow()) {
     DataFlowVisualization v(&DataStore::Instance().getDependencyMap());
@@ -327,7 +339,7 @@ bool EventProcessor::processEvent(PathIterator moduleIter, bool skipMasterModule
     //Check for end of data
     if ((m_eventMetaDataPtr && (m_eventMetaDataPtr->isEndOfData())) ||
         ((module == m_master) && !m_eventMetaDataPtr)) {
-      if (module != m_master) {
+      if ((module != m_master) && !m_steerRootInputModuleOn) {
         B2WARNING("Event processing stopped by module '" << module->getName() <<
                   "', which is not in control of event processing (does not provide EventMetaData)");
       }

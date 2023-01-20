@@ -118,7 +118,7 @@ class TauLFV(BaseSkim):
         stdMu("all", path=path)
         stdPi("all", path=path)
         stdPr("all", path=path)
-        stdPhotons("all", path=path, loadPhotonBeamBackgroundMVA=False)
+        stdPhotons("all", path=path)
         loadStdAllRho0(path=path)
         loadStdAllKstar0(path=path)
         loadStdAllPhi(path=path)
@@ -323,7 +323,7 @@ class TauGeneric(BaseSkim):
 
     def load_standard_lists(self, path):
         stdPi("all", path=path)
-        stdPhotons("all", path=path, loadPhotonBeamBackgroundMVA=False)
+        stdPhotons("all", path=path)
 
     def additional_setup(self, path):
         """
@@ -453,7 +453,7 @@ class TauThrust(BaseSkim):
 
     def load_standard_lists(self, path):
         stdPi("all", path=path)
-        stdPhotons("all", path=path, loadPhotonBeamBackgroundMVA=False)
+        stdPhotons("all", path=path)
 
     def additional_setup(self, path):
         """

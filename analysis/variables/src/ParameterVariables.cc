@@ -395,7 +395,7 @@ namespace Belle2 {
 
     VARIABLE_GROUP("ParameterFunctions");
     REGISTER_VARIABLE("NumberOfMCParticlesInEvent(pdgcode)", NumberOfMCParticlesInEvent, R"DOC(
-                      Returns number of MC Particles (including anti-particles) with the given pdgcode in the event.
+                      [Eventbased] Returns number of MC Particles (including anti-particles) with the given pdgcode in the event.
 
                       Used in the FEI to determine to calculate reconstruction efficiencies.
 

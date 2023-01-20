@@ -14,7 +14,7 @@
 #include <tracking/dbobjects/TrackFitMomentumRange.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
-#include <TVector3.h>
+#include <framework/geometry/B2Vector3.h>
 #include <vector>
 #include <string>
 
@@ -55,12 +55,12 @@ namespace Belle2 {
 
     /// BeamSpot define the coordinate system in which the tracks will be extrapolated to the perigee.
     std::vector<double> m_beamSpot = {0.0, 0.0, 0.0};
-    /// BeamSpot as TVector3
-    TVector3 m_beamSpotAsTVector;
+    /// BeamSpot as B2Vector3D
+    B2Vector3D m_beamSpotAsTVector;
     /// BeamAxis define the coordinate system in which the tracks will be extrapolated to the perigee.
     std::vector<double> m_beamAxis = {0.0, 0.0, 1.0};
-    /// BeamAxis as TVector3
-    TVector3 m_beamAxisAsTVector;
+    /// BeamAxis as B2Vector3D
+    B2Vector3D m_beamAxisAsTVector;
     /// PDG codes for which TrackFitResults will be created.
     std::vector<int> m_pdgCodes = {211};
 

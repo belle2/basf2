@@ -267,6 +267,15 @@ namespace Belle2 {
     // setters
 
     /**
+     * Sets PDG code
+     * @param pdg PDG code
+     */
+    void setPDGCode(const int pdg)
+    {
+      m_pdgCode = pdg;
+    }
+
+    /**
      * Sets Lorentz vector
      * @param p4 Lorentz vector
      */
@@ -378,8 +387,9 @@ namespace Belle2 {
      * Appends index of daughter to daughters index array
      * @param daughter pointer to the daughter particle
      * @param updateType bool to set whether particle type should be updated
+     * @param daughterProperty property of the daughter particle
      */
-    void appendDaughter(const Particle* daughter, const bool updateType = true);
+    void appendDaughter(const Particle* daughter, const bool updateType = true, const int daughterProperty = c_Ordinary);
 
     /**
      * Appends index of daughter to daughters index array
@@ -393,7 +403,7 @@ namespace Belle2 {
         m_particleSource = c_Composite;
       }
       m_daughterIndices.push_back(particleIndex);
-      m_daughterProperties.push_back(Particle::PropertyFlags::c_Ordinary);
+      m_daughterProperties.push_back(c_Ordinary);
     }
 
     /**

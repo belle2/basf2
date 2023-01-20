@@ -131,10 +131,12 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
     add_postfilter_tracking_reconstruction(path,
                                            components=components,
                                            pruneTracks=pruneTracks,
-                                           v0_finding=v0_finding,
                                            reco_tracks=reco_tracks,
+                                           use_second_cdc_hits=use_second_cdc_hits,
                                            prune_temporary_tracks=prune_temporary_tracks,
-                                           flip_recoTrack=flip_recoTrack)
+                                           v0_finding=v0_finding,
+                                           flip_recoTrack=flip_recoTrack,
+                                           mcTrackFinding=mcTrackFinding)
 
 
 def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdding=False,
@@ -223,9 +225,6 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
     # consider to do the CDC-hit based method already during the fast reconstruction stage
     add_time_extraction(path, append_full_grid_cdc_eventt0, components=components)
 
-    add_mc_matcher(path, components=components, reco_tracks=reco_tracks,
-                   use_second_cdc_hits=use_second_cdc_hits)
-
     if fit_tracks:
         add_prefilter_track_fit_and_track_creator(path,
                                                   trackFitHypotheses=trackFitHypotheses,
@@ -234,7 +233,8 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
 
 
 def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=False, reco_tracks="RecoTracks",
-                                           prune_temporary_tracks=True, v0_finding=True, flip_recoTrack=True):
+                                           use_second_cdc_hits=False, prune_temporary_tracks=True, v0_finding=True,
+                                           flip_recoTrack=True, mcTrackFinding=False):
     """
     This function adds the tracking reconstruction modules not required to calculate HLT filter
     decision to a path.
@@ -242,23 +242,32 @@ def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=Fa
     :param path: The path to add the tracking reconstruction modules to
     :param components: the list of geometry components in use or None for all components.
     :param pruneTracks: Delete all hits except the first and the last in the found tracks.
-    :param v0_finding: If false, the V0 module will not be executed
     :param reco_tracks: Name of the StoreArray where the reco tracks should be stored
+    :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
     :param prune_temporary_tracks: If false, store all information of the single CDC and VXD tracks before merging.
         If true, prune them.
+    :param v0_finding: If false, the V0 module will not be executed
     :param flip_recoTrack: if true, add the recoTracks flipping function in the postfilter
+    :param mcTrackFinding: Use the MC track finders instead of the realistic ones.
     """
+
+    # do not add any new modules if no tracking detectors are in the components
+    if components and not ('SVD' in components or 'CDC' in components):
+        return
 
     # V0 finding
     if v0_finding:
         path.add_module('V0Finder', RecoTracks=reco_tracks, v0FitterMode=1)
 
     # flip & refit to fix the charge of some tracks
-    if flip_recoTrack:
+    if flip_recoTrack and not mcTrackFinding:
         add_flipping_of_recoTracks(path, reco_tracks="RecoTracks")
 
     # estimate the track time
     path.add_module('TrackTimeEstimator')
+
+    add_mc_matcher(path, components=components, reco_tracks=reco_tracks,
+                   use_second_cdc_hits=use_second_cdc_hits)
 
     # prune
     if pruneTracks:

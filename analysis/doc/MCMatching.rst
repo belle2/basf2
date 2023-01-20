@@ -405,7 +405,7 @@ To understand the method of photon matching, a basic introduction to the ECL obj
 Starting with ``ECLSimHits`` from the GEANT4 simulation, ``ECLDigits`` are created and then calibrated to make ``ECLCalDigit`` objects which store the energy and 
 time of a single ECL crystal. The ``ECLCalDigits`` are then grouped to make ``ECLShower`` objects. The shower objects are corrected and calibrated, and used to 
 calculate shower-shape quantities and certain particle likelihoods (these calculations are derived using information stored in subsets of the ``ECLCalDigits`` that form the 
-shower). Following this, matching is performed between reconstructed tracks and shower objects. The last step is the conversion of the ``ECLShower`` object into a mdst 
+shower). Following this, track matching is performed between reconstructed tracks and shower objects. The last step is the conversion of the ``ECLShower`` object into a mdst 
 ``ECLCluster`` object which is the highest level ECL reconstruction object. 
 
 Each ``ECLShower`` object (and by extension each ``ECLCluster`` object) holds weighted **relations** to a maximum of twenty-one ``ECLCalDigits``, with the weights 

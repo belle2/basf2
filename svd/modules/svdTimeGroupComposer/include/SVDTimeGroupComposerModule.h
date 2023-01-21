@@ -76,7 +76,7 @@ namespace Belle2 {
     double m_timeSpread         = 5.;
     int    m_maxGroups          = 10;
     bool   m_writeGroupInfo     = false;
-    bool   m_doBestGroupSelection = false; /** Choose one group near expected signal location. */
+    bool   m_signalGroupSelection = false; /** Choose one group near expected signal location. */
     std::vector<float> m_clsSizeVsSigma[2] = { /* 0: V, 1: U */
       {3.49898, 2.94008, 3.46766, 5.3746, 6.68848, 7.35446, 7.35983, 7.71601, 10.6172, 13.4805},
       {6.53642, 3.76216, 3.30086, 3.95969, 5.49408, 7.07294, 8.35687, 8.94839, 9.23135, 10.485}

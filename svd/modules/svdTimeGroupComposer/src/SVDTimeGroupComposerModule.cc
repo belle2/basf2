@@ -105,7 +105,7 @@ SVDTimeGroupComposerModule::SVDTimeGroupComposerModule() :
            "Clusters belonging to the group nearest to zero is first.",
            bool(false));
 
-  addParam("doBestGroupSelection", m_doBestGroupSelection,
+  addParam("signalGroupSelection", m_signalGroupSelection,
            "Choose one group near expected signal location.",
            bool(false));
 }
@@ -117,16 +117,15 @@ void SVDTimeGroupComposerModule::initialize()
   // prepare all store:
   m_svdClusters.isRequired(m_svdClustersName);
 
-  if (m_doBestGroupSelection) {
-    m_writeGroupInfo = true; // group info is required while calibration
-    m_maxGroups = 2;       // only the nearest to the signal is kept
-    m_useOnlyOneGroup = false;
+  if (m_signalGroupSelection) {
+    m_writeGroupInfo = true; // group info is required
+    m_maxGroups = 2;       // only two groups are required for the comparisn
   }
-  if (m_doBestGroupSelection || m_useOnlyOneGroup)
+  if (m_signalGroupSelection || m_useOnlyOneGroup)
     m_includeOutOfRangeClusters = false;
 
-  if (m_useOnlyOneGroup) B2WARNING("Only the group nearest to zero is selected.");
-  if (m_doBestGroupSelection) B2WARNING("Only the Probable signal group is chosen.");
+  if (m_useOnlyOneGroup) B2WARNING("Only the first group is kept.");
+  if (m_signalGroupSelection) B2WARNING("Only the Probable signal group is chosen.");
   if (m_AverageCountPerBin <= 0 || m_factor <= 0) B2WARNING("Module is ineffective.");
   if (m_tRangeHigh - m_tRangeLow < 10.) B2FATAL("tRange should not be less than 10 (hard-coded).");
 
@@ -371,21 +370,21 @@ void SVDTimeGroupComposerModule::event()
 
     } // while(1) {
 
-    if (m_useOnlyOneGroup && int(groupInfo.size()) > 1) // keep only one group
-      groupInfo.resize(1);
-
-    if (m_doBestGroupSelection && int(groupInfo.size()) == 2) {
+    if (int(groupInfo.size()) > 1) { // move the first group to second, if predicted background
       float gr0shift = std::fabs(std::get<1>(groupInfo[0]) - m_expSignalLoc);
       float gr1shift = std::fabs(std::get<1>(groupInfo[1]) - m_expSignalLoc);
-      if (gr0shift < gr1shift) groupInfo.erase(groupInfo.begin() + 1);
-      else groupInfo.erase(groupInfo.begin() + 0);
+      if (gr0shift > gr1shift) std::swap(groupInfo[0], groupInfo[1]);
     }
-    if (m_doBestGroupSelection && int(groupInfo.size())) {
+    if (m_signalGroupSelection && int(groupInfo.size())) {
       float grMean = std::get<1>(groupInfo[0]);
       if (grMean < m_signalRangeLow || grMean > m_signalRangeHigh)
         groupInfo.clear();
     }
-    if (int(groupInfo.size()) == 0)
+
+    if ((m_useOnlyOneGroup || m_signalGroupSelection) && int(groupInfo.size()) > 1) // keep only one group
+      groupInfo.resize(1);
+
+    if (int(groupInfo.size()) == 0) // make all clusters orphan
       for (int jk = 0; jk < totClusters; jk++)
         m_svdClusters[jk]->getTimeGroupId().push_back(-1);
 

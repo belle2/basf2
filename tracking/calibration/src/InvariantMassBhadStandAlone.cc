@@ -251,7 +251,6 @@ namespace Belle2::InvariantMassBhadCalib {
     const double cmsE0 = EvtGenDatabasePDG::Instance()->GetParticle("Upsilon(4S)")->Mass(); //Y4S mass
 
     for (auto event : evts) {
-      int iCand = 0;
       for (auto cand : event.cand) {
 
         double p = cand.pBcms;
@@ -285,7 +284,6 @@ namespace Belle2::InvariantMassBhadCalib {
                 hMD->Fill(cand.mD);
                 hMB->Fill(mInv - mB);
               }
-        ++iCand;
       }
     }
 
@@ -428,7 +426,6 @@ namespace Belle2::InvariantMassBhadCalib {
     const double cmsE0 = EvtGenDatabasePDG::Instance()->GetParticle("Upsilon(4S)")->Mass(); //Y4S mass
 
     for (auto event : evts) {
-      int iCand = 0;
       for (auto cand : event.cand) {
 
         double p = cand.pBcms;
@@ -462,7 +459,6 @@ namespace Belle2::InvariantMassBhadCalib {
                 hMD->Fill(cand.mD);
                 hMB->Fill(mInv - mB);
               }
-        ++iCand;
       }
     }
 

@@ -136,6 +136,7 @@ if __name__ == "__main__":
             local_print_function("QED / Control Samples", filter_categories.QED),
             local_print_function("Level 1 Passthrough ", filter_categories.LEVEL1),
             local_print_function("Prescaled Vetoes", filter_categories.VETOES),
+            local_print_function("Obsolete", filter_categories.OBSOLETE),
             local_print_function("Skims", [index for index in df_print.index if index.startswith("skim ")]),
         ])
 

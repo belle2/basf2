@@ -89,14 +89,9 @@ namespace Belle2 {
     void checkScintillatorFEEParameters();
 
     /**
-     * Digitization in BKLM.
+     * Digitization.
      */
-    void digitizeBKLM();
-
-    /**
-     * Digitization in EKLM.
-     */
-    void digitizeEKLM();
+    void digitize();
 
     /**
      * Check if channel is active (status is not KLMChannelStatus::c_Dead).
@@ -150,17 +145,11 @@ namespace Belle2 {
     /** Use debug mode in EKLM::ScintillatorSimulator or not. */
     bool m_Debug;
 
-    /** Simulation hit map for BKLM (by channel). */
-    std::multimap<KLMChannelNumber, const KLMSimHit*> m_bklmSimHitChannelMap;
+    /** Simulation hit map (by channel). */
+    std::multimap<KLMChannelNumber, const KLMSimHit*> m_SimHitChannelMap;
 
-    /** Simulation hit map for BKLM (by plane). */
-    std::multimap<KLMPlaneNumber, const KLMSimHit*> m_bklmSimHitPlaneMap;
-
-    /** Simulation hit map for EKLM (by channel). */
-    std::multimap<KLMChannelNumber, const KLMSimHit*> m_eklmSimHitChannelMap;
-
-    /** Simulation hit map for EKLM (by plane). */
-    std::multimap<KLMPlaneNumber, const KLMSimHit*> m_eklmSimHitPlaneMap;
+    /** Simulation hit map (by plane). */
+    std::multimap<KLMPlaneNumber, const KLMSimHit*> m_SimHitPlaneMap;
 
     /** FPGA fitter. */
     KLM::ScintillatorFirmware* m_Fitter;

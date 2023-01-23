@@ -93,6 +93,7 @@ bool SensitiveDetector::stepEKLM(G4Step* aStep, G4TouchableHistory* history)
   hit->setLayer(layer);
   hit->setPlane(plane);
   hit->setStrip(strip);
+  hit->setLastStrip(strip);
   // hit->setPropagationTime();
   hit->setTime(hitTime);
   hit->setEnergyDeposit(eDep);

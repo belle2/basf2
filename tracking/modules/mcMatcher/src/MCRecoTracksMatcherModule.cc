@@ -556,6 +556,7 @@ void MCRecoTracksMatcherModule::event()
 
     RecoTrack* mcRecoTrack = m_MCRecoTracks[mcId];
     MCParticle* mcParticle = mcRecoTrack->getRelated<MCParticle>();
+
     B2ASSERT("No relation from MCRecoTrack to MCParticle.", mcParticle);
 
     const MostWeightEfficientPRId& mostWeightEfficientPRId_for_mcId =
@@ -572,10 +573,20 @@ void MCRecoTracksMatcherModule::event()
       const RelationVector<Track> fittedTracks = prRecoTrack->getRelationsFrom<Track>(m_TracksStoreArrayName);
       short nPositiveCharges = 0;
       short nNegativeCharges = 0;
+
+
+
       if (fittedTracks.size() > 0) {
+
+        // in rare cases we track non stable particles, but getTrackFitResult only supports chargedStableSet members
+        int useThisPDG = std::abs(mcParticle->getPDG());
+        if (Const::chargedStableSet.find(useThisPDG) == Const::invalidParticle) {
+          useThisPDG = Const::pion.getPDGCode();
+        }
+
         for (const auto& fittedTrack : fittedTracks) {
           const TrackFitResult* trackFitResult = fittedTrack.getTrackFitResultWithClosestMass(Const::ChargedStable(std::abs(
-                                                   mcParticle->getPDG())));
+                                                   useThisPDG)));
           trackFitResult->getChargeSign() > 0 ? nPositiveCharges++ : nNegativeCharges++;
         }
       }

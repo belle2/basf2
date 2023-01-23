@@ -578,16 +578,17 @@ void MCRecoTracksMatcherModule::event()
 
       if (fittedTracks.size() > 0) {
 
-        // in rare cases we track non stable particles, but getTrackFitResult only supports chargedStableSet members
-        int useThisPDG = std::abs(mcParticle->getPDG());
-        if (Const::chargedStableSet.find(useThisPDG) == Const::invalidParticle) {
-          useThisPDG = Const::pion.getPDGCode();
-        }
-
         for (const auto& fittedTrack : fittedTracks) {
-          const TrackFitResult* trackFitResult = fittedTrack.getTrackFitResultWithClosestMass(Const::ChargedStable(std::abs(
-                                                   useThisPDG)));
-          trackFitResult->getChargeSign() > 0 ? nPositiveCharges++ : nNegativeCharges++;
+
+          // catch rare case we track long lived non-chargedStable particles (e.g. Sigma)
+          try {
+            const TrackFitResult* trackFitResult = fittedTrack.getTrackFitResultWithClosestMass(Const::ChargedStable(std::abs(
+                                                     mcParticle->getPDG())));
+            trackFitResult->getChargeSign() > 0 ? nPositiveCharges++ : nNegativeCharges++;
+          } catch (...) {
+            const TrackFitResult* trackFitResult = fittedTrack.getTrackFitResultWithClosestMass(Const::pion);
+            trackFitResult->getChargeSign() > 0 ? nPositiveCharges++ : nNegativeCharges++;
+          }
         }
       }
       if (nPositiveCharges > 0 and nNegativeCharges > 0) {

@@ -186,7 +186,7 @@ void KLMDigitizerModule::digitizeScintillator()
     m_DigitizationInitialTime * m_Time->getCTimePeriod(), m_Debug);
   const KLMScintillatorFEEData* FEEData;
   std::multimap<KLMChannelNumber, const KLMSimHit*>::iterator
-  it, it2, lowerBound, upperBound;
+  it, lowerBound, upperBound;
   it = m_MapChannelSimHit.begin();
   while (it != m_MapChannelSimHit.end()) {
     lowerBound = it;

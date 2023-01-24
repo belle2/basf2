@@ -144,24 +144,21 @@ bool KLMDigitizerModule::efficiencyCorrection(float efficiency)
   return (selection < efficiency);
 }
 
-void KLMDigitizerModule::digitizeBKLM()
+void KLMDigitizerModule::digitize()
 {
-  int tdc;
+  uint16_t tdc;
   KLM::ScintillatorSimulator simulator(
     &(*m_DigPar), m_Fitter,
     m_DigitizationInitialTime * m_Time->getCTimePeriod(), m_Debug);
   const KLMScintillatorFEEData* FEEData;
   std::multimap<KLMChannelNumber, const KLMSimHit*>::iterator it, it2, ub;
-  for (it = m_bklmSimHitChannelMap.begin(); it != m_bklmSimHitChannelMap.end();
-       it = m_bklmSimHitChannelMap.upper_bound(it->first)) {
+  for (it = m_SimHitChannelMap.begin(); it != m_SimHitChannelMap.end();
+       it = m_SimHitChannelMap.upper_bound(it->first)) {
     const KLMSimHit* simHit = it->second;
-    ub = m_bklmSimHitChannelMap.upper_bound(it->first);
+    ub = m_SimHitChannelMap.upper_bound(it->first);
     bool rpc = simHit->inRPC();
     if (m_EfficiencyMode == c_Strip) {
-      float efficiency = m_StripEfficiency->getBarrelEfficiency(
-                           simHit->getSection(), simHit->getSector(),
-                           simHit->getLayer(), simHit->getPlane(),
-                           simHit->getStrip());
+      float efficiency = m_StripEfficiency->getEfficiency(it->first);
       if (!efficiencyCorrection(efficiency))
         continue;
     }
@@ -180,15 +177,11 @@ void KLMDigitizerModule::digitizeBKLM()
         }
         ++it2;
       }
-      KLMDigit* bklmDigit = m_Digits.appendNew(hit, strip);
-      bklmDigit->addRelationTo(simHit);
+      KLMDigit* digit = m_Digits.appendNew(hit, strip);
+      digit->addRelationTo(simHit);
     } else {
       if (m_ChannelSpecificSimulation) {
-        KLMChannelNumber channel = m_ElementNumbers->channelNumberBKLM(
-                                     simHit->getSection(), simHit->getSector(),
-                                     simHit->getLayer(), simHit->getPlane(),
-                                     simHit->getStrip());
-        FEEData = m_FEEPar->getFEEData(channel);
+        FEEData = m_FEEPar->getFEEData(it->first);
         if (FEEData == nullptr)
           B2FATAL("Incomplete KLM scintillator FEE data.");
         simulator.setFEEData(FEEData);
@@ -196,89 +189,31 @@ void KLMDigitizerModule::digitizeBKLM()
       simulator.simulate(it, ub);
       if (simulator.getNGeneratedPhotoelectrons() == 0)
         continue;
-      KLMDigit* bklmDigit = m_Digits.appendNew(simHit);
-      bklmDigit->addRelationTo(simHit);
-      bklmDigit->setMCTime(simulator.getMCTime());
-      bklmDigit->setSiPMMCTime(simulator.getSiPMMCTime());
-      bklmDigit->setNGeneratedPhotoelectrons(simulator.getNGeneratedPhotoelectrons());
+      KLMDigit* digit = m_Digits.appendNew(simHit);
+      digit->addRelationTo(simHit);
+      digit->setMCTime(simulator.getMCTime());
+      digit->setSiPMMCTime(simulator.getSiPMMCTime());
+      digit->setNGeneratedPhotoelectrons(
+        simulator.getNGeneratedPhotoelectrons());
       if (simulator.getFitStatus() ==
           KLM::c_ScintillatorFirmwareSuccessfulFit) {
         tdc = simulator.getFPGAFit()->getStartTime();
-        bklmDigit->setCharge(simulator.getFPGAFit()->getMinimalAmplitude());
+        digit->setCharge(simulator.getFPGAFit()->getMinimalAmplitude());
       } else {
         tdc = 0;
-        bklmDigit->setCharge(m_DigPar->getADCRange() - 1);
+        digit->setCharge(m_DigPar->getADCRange() - 1);
       }
-      bklmDigit->setTDC(tdc);
-      bklmDigit->setTime(m_Time->getTimeSimulation(tdc, true));
-      bklmDigit->setFitStatus(simulator.getFitStatus());
-      bklmDigit->setNPhotoelectrons(simulator.getNPhotoelectrons());
-      bklmDigit->setEnergyDeposit(simulator.getEnergy());
-      if (simulator.getFitStatus() == KLM::c_ScintillatorFirmwareSuccessfulFit &&
-          m_SaveFPGAFit) {
+      digit->setTDC(tdc);
+      digit->setTime(m_Time->getTimeSimulation(tdc, true));
+      digit->setFitStatus(simulator.getFitStatus());
+      digit->setNPhotoelectrons(simulator.getNPhotoelectrons());
+      digit->setEnergyDeposit(simulator.getEnergy());
+      if (m_SaveFPGAFit && (simulator.getFitStatus() ==
+                            KLM::c_ScintillatorFirmwareSuccessfulFit)) {
         KLMScintillatorFirmwareFitResult* fit =
           m_FPGAFits.appendNew(*simulator.getFPGAFit());
-        bklmDigit->addRelationTo(fit);
+        digit->addRelationTo(fit);
       }
-    }
-  }
-}
-
-void KLMDigitizerModule::digitizeEKLM()
-{
-  uint16_t tdc;
-  KLM::ScintillatorSimulator simulator(
-    &(*m_DigPar), m_Fitter,
-    m_DigitizationInitialTime * m_Time->getCTimePeriod(), m_Debug);
-  const KLMScintillatorFEEData* FEEData;
-  std::multimap<KLMChannelNumber, const KLMSimHit*>::iterator it, ub;
-  for (it = m_eklmSimHitChannelMap.begin(); it != m_eklmSimHitChannelMap.end();
-       it = m_eklmSimHitChannelMap.upper_bound(it->first)) {
-    const KLMSimHit* simHit = it->second;
-    ub = m_eklmSimHitChannelMap.upper_bound(it->first);
-    if (m_EfficiencyMode == c_Strip) {
-      float efficiency = m_StripEfficiency->getEndcapEfficiency(simHit->getSection(), simHit->getSector(),
-                                                                simHit->getLayer(), simHit->getPlane(),
-                                                                simHit->getStrip());
-      if (!efficiencyCorrection(efficiency))
-        continue;
-    }
-    if (m_ChannelSpecificSimulation) {
-      KLMChannelNumber channel = m_ElementNumbers->channelNumberEKLM(
-                                   simHit->getSection(), simHit->getSector(),
-                                   simHit->getLayer(), simHit->getPlane(),
-                                   simHit->getStrip());
-      FEEData = m_FEEPar->getFEEData(channel);
-      if (FEEData == nullptr)
-        B2FATAL("Incomplete KLM scintillator FEE data.");
-      simulator.setFEEData(FEEData);
-    }
-    /* Simulation for a strip. */
-    simulator.simulate(it, ub);
-    if (simulator.getNGeneratedPhotoelectrons() == 0)
-      continue;
-    KLMDigit* eklmDigit = m_Digits.appendNew(simHit);
-    eklmDigit->addRelationTo(simHit);
-    eklmDigit->setMCTime(simulator.getMCTime());
-    eklmDigit->setSiPMMCTime(simulator.getSiPMMCTime());
-    eklmDigit->setNGeneratedPhotoelectrons(simulator.getNGeneratedPhotoelectrons());
-    if (simulator.getFitStatus() == KLM::c_ScintillatorFirmwareSuccessfulFit) {
-      tdc = simulator.getFPGAFit()->getStartTime();
-      eklmDigit->setCharge(simulator.getFPGAFit()->getMinimalAmplitude());
-    } else {
-      tdc = 0;
-      eklmDigit->setCharge(m_DigPar->getADCRange() - 1);
-    }
-    eklmDigit->setTDC(tdc);
-    eklmDigit->setTime(m_Time->getTimeSimulation(tdc, true));
-    eklmDigit->setFitStatus(simulator.getFitStatus());
-    eklmDigit->setNPhotoelectrons(simulator.getNPhotoelectrons());
-    eklmDigit->setEnergyDeposit(simulator.getEnergy());
-    if (simulator.getFitStatus() == KLM::c_ScintillatorFirmwareSuccessfulFit &&
-        m_SaveFPGAFit) {
-      KLMScintillatorFirmwareFitResult* fit =
-        m_FPGAFits.appendNew(*simulator.getFPGAFit());
-      eklmDigit->addRelationTo(fit);
     }
   }
 }
@@ -287,180 +222,96 @@ void KLMDigitizerModule::event()
 {
   int i;
   KLMChannelNumber channel;
-  m_bklmSimHitChannelMap.clear();
-  m_eklmSimHitChannelMap.clear();
+  m_SimHitChannelMap.clear();
   if (m_EfficiencyMode == c_Plane) {
-    /* BKLM. */
-    {
-      m_bklmSimHitPlaneMap.clear();
-      for (i = 0; i < m_SimHits.getEntries(); i++) {
-        const KLMSimHit* hit = m_SimHits[i];
-        if (hit->getSubdetector() != KLMElementNumbers::c_BKLM)
-          continue;
-        if (hit->getStrip() <= 0)
-          continue;
-        const MCParticle* particle = hit->getRelatedFrom<MCParticle>();
-        /*
-         * We do not simulate the plane efficiency for KLMSimHits
-         * from beam background because there are no MCParticles associated
-         * to them.
-         */
-        if (particle != nullptr) {
-          KLMPlaneNumber plane = m_ElementNumbers->planeNumberBKLM(
-                                   hit->getSection(), hit->getSector(),
-                                   hit->getLayer(), hit->getPlane());
-          m_bklmSimHitPlaneMap.insert(
-            std::pair<KLMPlaneNumber, const KLMSimHit*>(plane, hit));
-        } else {
-          B2ASSERT("The KLMSimHit is not related to any MCParticle and "
-                   "it is also not a beam background hit.",
-                   hit->getBackgroundTag() != BackgroundMetaData::bg_none);
-          channel = m_ElementNumbers->channelNumberBKLM(
-                      hit->getSection(), hit->getSector(), hit->getLayer(),
-                      hit->getPlane(), hit->getStrip());
-          if (checkActive(channel))
-            m_bklmSimHitChannelMap.insert(
-              std::pair<KLMChannelNumber, const KLMSimHit*>(channel, hit));
-        }
-      }
-      std::multimap<KLMPlaneNumber, const KLMSimHit*>::iterator it, it2;
-      std::multimap<const MCParticle*, const KLMSimHit*> particleHitMap;
-      std::multimap<const MCParticle*, const KLMSimHit*>::iterator
-      itParticle, it2Particle;
-      it = m_bklmSimHitPlaneMap.begin();
-      while (it != m_bklmSimHitPlaneMap.end()) {
-        particleHitMap.clear();
-        it2 = it;
-        while (true) {
-          const KLMSimHit* hit = it2->second;
-          const MCParticle* particle = hit->getRelatedFrom<MCParticle>();
-          particleHitMap.insert(
-            std::pair<const MCParticle*, const KLMSimHit*>(particle, hit));
-          ++it2;
-          if (it2 == m_bklmSimHitPlaneMap.end())
-            break;
-          if (it2->first != it->first)
-            break;
-        }
-        itParticle = particleHitMap.begin();
-        while (itParticle != particleHitMap.end()) {
-          it2Particle = itParticle;
-          const KLMSimHit* hit = it2Particle->second;
-          float efficiency = m_StripEfficiency->getBarrelEfficiency(
-                               hit->getSection(), hit->getSector(),
-                               hit->getLayer(), hit->getPlane(),
-                               hit->getStrip());
-          bool hitSelected = efficiencyCorrection(efficiency);
-          while (true) {
-            hit = it2Particle->second;
-            if (hitSelected) {
-              for (int s = hit->getStrip(); s <= hit->getLastStrip(); ++s) {
-                channel = m_ElementNumbers->channelNumberBKLM(
-                            hit->getSection(), hit->getSector(), hit->getLayer(),
-                            hit->getPlane(), s);
-                if (checkActive(channel)) {
-                  m_bklmSimHitChannelMap.insert(
-                    std::pair<KLMChannelNumber, const KLMSimHit*>(channel, hit));
-                }
-              }
-            }
-            ++it2Particle;
-            if (it2Particle == particleHitMap.end())
-              break;
-            if (it2Particle->first != itParticle->first)
-              break;
-          }
-          itParticle = it2Particle;
-        }
-        it = it2;
+    m_SimHitPlaneMap.clear();
+    for (i = 0; i < m_SimHits.getEntries(); i++) {
+      const KLMSimHit* hit = m_SimHits[i];
+      /* For RPCs. */
+      if (hit->getStrip() <= 0)
+        continue;
+      const MCParticle* particle = hit->getRelatedFrom<MCParticle>();
+      /*
+       * We do not simulate the plane efficiency for KLMSimHits
+       * from beam background because there are no MCParticles associated
+       * to them.
+       */
+      if (particle != nullptr) {
+        KLMPlaneNumber plane =
+          m_ElementNumbers->planeNumber(
+            hit->getSubdetector(), hit->getSection(), hit->getSector(),
+            hit->getLayer(), hit->getPlane());
+        m_SimHitPlaneMap.insert(
+          std::pair<KLMPlaneNumber, const KLMSimHit*>(plane, hit));
+      } else {
+        B2ASSERT("The KLMSimHit is not related to any MCParticle and "
+                 "it is also not a beam background hit.",
+                 hit->getBackgroundTag() != BackgroundMetaData::bg_none);
+        channel =
+          m_ElementNumbers->channelNumber(
+            hit->getSubdetector(), hit->getSection(), hit->getSector(),
+            hit->getLayer(), hit->getPlane(), hit->getStrip());
+        if (checkActive(channel))
+          m_SimHitChannelMap.insert(
+            std::pair<KLMChannelNumber, const KLMSimHit*>(channel, hit));
       }
     }
-    /* EKLM. */
-    {
-      m_eklmSimHitPlaneMap.clear();
-      for (i = 0; i < m_SimHits.getEntries(); i++) {
-        const KLMSimHit* hit = m_SimHits[i];
-        if (hit->getSubdetector() != KLMElementNumbers::c_EKLM)
-          continue;
+    std::multimap<KLMPlaneNumber, const KLMSimHit*>::iterator it, it2;
+    std::multimap<const MCParticle*, const KLMSimHit*> particleHitMap;
+    std::multimap<const MCParticle*, const KLMSimHit*>::iterator
+    itParticle, it2Particle;
+    it = m_SimHitPlaneMap.begin();
+    while (it != m_SimHitPlaneMap.end()) {
+      particleHitMap.clear();
+      it2 = it;
+      while (true) {
+        const KLMSimHit* hit = it2->second;
         const MCParticle* particle = hit->getRelatedFrom<MCParticle>();
-        /*
-         * We do not simulate the plane efficiency for EKLMSimHits
-         * from beam background because there are no MCParticles
-         * associated to them.
-         */
-        if (particle != nullptr) {
-          KLMPlaneNumber plane = m_ElementNumbers->planeNumberEKLM(
-                                   hit->getSection(), hit->getSector(),
-                                   hit->getLayer(), hit->getPlane());
-          m_eklmSimHitPlaneMap.insert(
-            std::pair<KLMPlaneNumber, const KLMSimHit*>(plane, hit));
-        } else {
-          B2ASSERT("The KLMSimHit is not related to any MCParticle and "
-                   "it is also not a beam background hit.",
-                   hit->getBackgroundTag() != BackgroundMetaData::bg_none);
-          channel = m_ElementNumbers->channelNumberEKLM(
-                      hit->getSection(), hit->getSector(), hit->getLayer(),
-                      hit->getPlane(), hit->getStrip());
-          if (checkActive(channel))
-            m_eklmSimHitChannelMap.insert(
-              std::pair<KLMChannelNumber, const KLMSimHit*>(channel, hit));
-        }
+        particleHitMap.insert(
+          std::pair<const MCParticle*, const KLMSimHit*>(particle, hit));
+        ++it2;
+        if (it2 == m_SimHitPlaneMap.end())
+          break;
+        if (it2->first != it->first)
+          break;
       }
-      std::multimap<KLMPlaneNumber, const KLMSimHit*>::iterator it, it2;
-      std::multimap<const MCParticle*, const KLMSimHit*> particleHitMap;
-      std::multimap<const MCParticle*, const KLMSimHit*>::iterator
-      itParticle, it2Particle;
-      it = m_eklmSimHitPlaneMap.begin();
-      while (it != m_eklmSimHitPlaneMap.end()) {
-        particleHitMap.clear();
-        it2 = it;
+      itParticle = particleHitMap.begin();
+      while (itParticle != particleHitMap.end()) {
+        it2Particle = itParticle;
+        const KLMSimHit* hit = it2Particle->second;
+        channel =
+          m_ElementNumbers->channelNumber(
+            hit->getSubdetector(), hit->getSection(), hit->getSector(),
+            hit->getLayer(), hit->getPlane(), hit->getStrip());
+        float efficiency = m_StripEfficiency->getEfficiency(channel);
+        bool hitSelected = efficiencyCorrection(efficiency);
         while (true) {
-          const KLMSimHit* hit = it2->second;
-          const MCParticle* particle = hit->getRelatedFrom<MCParticle>();
-          particleHitMap.insert(
-            std::pair<const MCParticle*, const KLMSimHit*>(particle, hit));
-          ++it2;
-          if (it2 == m_eklmSimHitPlaneMap.end())
-            break;
-          if (it2->first != it->first)
-            break;
-        }
-        itParticle = particleHitMap.begin();
-        while (itParticle != particleHitMap.end()) {
-          it2Particle = itParticle;
-          const KLMSimHit* hit = it2Particle->second;
-          float efficiency = m_StripEfficiency->getEndcapEfficiency(
-                               hit->getSection(), hit->getSector(),
-                               hit->getLayer(), hit->getPlane(),
-                               hit->getStrip());
-          bool hitSelected = efficiencyCorrection(efficiency);
-          while (true) {
-            hit = it2Particle->second;
-            if (hitSelected) {
-              channel = m_ElementNumbers->channelNumberEKLM(
-                          hit->getSection(), hit->getSector(), hit->getLayer(),
-                          hit->getPlane(), hit->getStrip());
+          hit = it2Particle->second;
+          if (hitSelected) {
+            for (int s = hit->getStrip(); s <= hit->getLastStrip(); ++s) {
+              channel =
+                m_ElementNumbers->channelNumber(
+                  hit->getSubdetector(), hit->getSection(), hit->getSector(),
+                  hit->getLayer(), hit->getPlane(), s);
               if (checkActive(channel)) {
-                m_eklmSimHitChannelMap.insert(
+                m_SimHitChannelMap.insert(
                   std::pair<KLMChannelNumber, const KLMSimHit*>(channel, hit));
               }
             }
-            ++it2Particle;
-            if (it2Particle == particleHitMap.end())
-              break;
-            if (it2Particle->first != itParticle->first)
-              break;
           }
-          itParticle = it2Particle;
+          ++it2Particle;
+          if (it2Particle == particleHitMap.end())
+            break;
+          if (it2Particle->first != itParticle->first)
+            break;
         }
-        it = it2;
+        itParticle = it2Particle;
       }
+      it = it2;
     }
   } else {
     for (i = 0; i < m_SimHits.getEntries(); i++) {
       const KLMSimHit* hit = m_SimHits[i];
-      if (hit->getSubdetector() != KLMElementNumbers::c_BKLM)
-        continue;
       if (hit->inRPC()) {
         if (hit->getStrip() <= 0)
           continue;
@@ -469,35 +320,22 @@ void KLMDigitizerModule::event()
                       hit->getSection(), hit->getSector(), hit->getLayer(),
                       hit->getPlane(), s);
           if (checkActive(channel)) {
-            m_bklmSimHitChannelMap.insert(
+            m_SimHitChannelMap.insert(
               std::pair<KLMChannelNumber, const KLMSimHit*>(channel, hit));
           }
         }
       } else {
-        channel = m_ElementNumbers->channelNumberBKLM(
-                    hit->getSection(), hit->getSector(), hit->getLayer(),
-                    hit->getPlane(), hit->getStrip());
+        channel = m_ElementNumbers->channelNumber(
+                    hit->getSubdetector(), hit->getSection(), hit->getSector(),
+                    hit->getLayer(), hit->getPlane(), hit->getStrip());
         if (checkActive(channel)) {
-          m_bklmSimHitChannelMap.insert(
+          m_SimHitChannelMap.insert(
             std::pair<KLMChannelNumber, const KLMSimHit*>(channel, hit));
         }
       }
     }
-    for (i = 0; i < m_SimHits.getEntries(); i++) {
-      const KLMSimHit* hit = m_SimHits[i];
-      if (hit->getSubdetector() != KLMElementNumbers::c_EKLM)
-        continue;
-      channel = m_ElementNumbers->channelNumberEKLM(
-                  hit->getSection(), hit->getSector(), hit->getLayer(),
-                  hit->getPlane(), hit->getStrip());
-      if (checkActive(channel)) {
-        m_eklmSimHitChannelMap.insert(
-          std::pair<KLMChannelNumber, const KLMSimHit*>(channel, hit));
-      }
-    }
   }
-  digitizeBKLM();
-  digitizeEKLM();
+  digitize();
 }
 
 void KLMDigitizerModule::endRun()

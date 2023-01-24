@@ -108,6 +108,9 @@ SVDTimeGroupComposerModule::SVDTimeGroupComposerModule() :
   addParam("signalGroupSelection", m_signalGroupSelection,
            "Choose one group near expected signal location.",
            bool(false));
+  addParam("flatSignalCut", m_flatSignalCut,
+           "Select all clusters within signal range around first group.",
+           bool(false));
 }
 
 
@@ -117,10 +120,8 @@ void SVDTimeGroupComposerModule::initialize()
   // prepare all store:
   m_svdClusters.isRequired(m_svdClustersName);
 
-  if (m_signalGroupSelection) {
+  if (m_signalGroupSelection)
     m_writeGroupInfo = true; // group info is required
-    m_maxGroups = 2;       // only two groups are required for the comparisn
-  }
   if (m_signalGroupSelection || m_useOnlyOneGroup)
     m_includeOutOfRangeClusters = false;
 
@@ -397,14 +398,14 @@ void SVDTimeGroupComposerModule::event()
       groupInfo[kj - 1] = key;
     }
 
-    if (m_signalGroupSelection && int(groupInfo.size())) {
-      float grMean = std::get<1>(groupInfo[0]);
-      if (grMean < m_signalRangeLow || grMean > m_signalRangeHigh)
-        groupInfo.clear();
-    }
-
-    if ((m_useOnlyOneGroup || m_signalGroupSelection) && int(groupInfo.size()) > 1) // keep only one group
+    if ((m_useOnlyOneGroup || m_signalGroupSelection || m_flatSignalCut)
+        && int(groupInfo.size()) > 1) // keep only one group
       groupInfo.resize(1);
+
+    if (m_flatSignalCut)
+      groupInfo[0] = std::make_tuple(std::get<0>(groupInfo[0]),
+                                     std::get<1>(groupInfo[0]),
+                                     (m_signalRangeHigh - m_signalRangeLow) * 0.5 / m_accSigmaN);
 
     if (int(groupInfo.size()) == 0) // make all clusters orphan
       for (int jk = 0; jk < totClusters; jk++)

@@ -33,3 +33,8 @@ bool KLMElectronicsChannel::operator<(
   return m_Channel < channel.m_Channel;
 }
 
+KLMElectronicsChannel KLMElectronicsChannel::getAsic() const
+{
+  int asic = (m_Channel - 1) / 15;
+  return KLMElectronicsChannel(m_Copper, m_Slot, m_Lane, m_Axis, asic);
+}

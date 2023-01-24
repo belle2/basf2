@@ -5,7 +5,8 @@ Modules
  * Added an option ``usePhotonOnlyOnce`` to the function :func:`modularAnalysis.correctBremsBelle`. The default of the option is ``False``
    so the backward compatibility. If the option is set to ``True``, a photon is used for only the closest charged particle in the
    input ParticleLists.
-
+ * Removed the prepending of the analysis global tag inside the modularAnalysis functions, `lowEnergyPi0Identification`,
+   `getBeamBackgroundProbability`, `getHadronicSplitOffProbability`, and `getNbarIDMVA`, so that the priority of global tags gets clearer.
 
 
 Changes in the analysis package in light-2212-foldex

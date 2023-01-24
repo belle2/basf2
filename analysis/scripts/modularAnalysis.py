@@ -3189,12 +3189,6 @@ def lowEnergyPi0Identification(pi0List, gammaList, payloadNameSuffix,
     @param path                 Module path.
     """
 
-    import b2bii
-    if b2bii.isB2BII():
-        tag = getAnalysisGlobaltagB2BII()
-    else:
-        tag = getAnalysisGlobaltag()
-    basf2.conditions.prepend_globaltag(tag)
     # Select photons with higher energy for formation of veto combinations.
     cutAndCopyList('gamma:pi0veto', gammaList, 'E > 0.2', path=path)
     import b2bii
@@ -3219,7 +3213,6 @@ def getBeamBackgroundProbability(particleList, path=None):
     if b2bii.isB2BII():
         B2ERROR("The beam background probability is not trained for Belle data.")
 
-    basf2.conditions.prepend_globaltag(getAnalysisGlobaltag())
     path.add_module('MVAExpert',
                     listNames=particleList,
                     extraInfoName='beamBackgroundSuppression',
@@ -3237,7 +3230,6 @@ def getHadronicSplitOffProbability(particleList, path=None,):
     if b2bii.isB2BII():
         B2ERROR("The hadronic splitoff probability is not trained for Belle data.")
 
-    basf2.conditions.prepend_globaltag(getAnalysisGlobaltag())
     path.add_module('MVAExpert',
                     listNames=particleList,
                     extraInfoName='hadronicSplitOffSuppression',
@@ -4155,7 +4147,7 @@ def getNbarIDMVA(particleList, path=None):
     variables.addAlias('nbarIDValid',
                        'passesCut(V1 == 1 and V2 >= 0 and V3 >= 0 and V4 >= 0 and V5 >= 0 and V6 >= 0 and V7 >= 0 and V8 >= 0)')
     variables.addAlias('nbarIDmod', 'conditionalVariableSelector(nbarIDValid == 1, extraInfo(nbarIDFromMVA), constant(-1.0))')
-    basf2.conditions.prepend_globaltag(getAnalysisGlobaltag())
+
     path.add_module('MVAExpert', listNames=particleList, extraInfoName='nbarIDFromMVA', identifier='db_nbarIDECL')
     variablesToExtraInfo(particleList, {'nbarIDmod': 'nbarID'}, option=2, path=path)
 

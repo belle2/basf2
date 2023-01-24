@@ -27,8 +27,8 @@ from stdCharged import stdPi
 from validation_tools.metadata import create_validation_histograms
 
 DECAY_MODE_ID = 1110021010
-INPUT_FILENAME = "../%i.dst.root" % DECAY_MODE_ID
-OUTPUT_FILENAME = "%i_Validation.root" % DECAY_MODE_ID
+INPUT_FILENAME = f"../{DECAY_MODE_ID}.dst.root"
+OUTPUT_FILENAME = f"{DECAY_MODE_ID}_Validation.root"
 
 main = basf2.Path()
 inputMdst(INPUT_FILENAME, path=main)

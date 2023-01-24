@@ -328,7 +328,6 @@ void SVDTimeGroupComposerModule::event()
     std::vector<std::tuple<double, double, double>> groupInfo; // pars
     double maxPeak = 0;
     double maxNorm = 0;
-    double maxNormSig = 0;
     while (1) {
 
       int maxBin       = h_clsTime[currentHisto].GetMaximumBin();
@@ -348,7 +347,6 @@ void SVDTimeGroupComposerModule::event()
         if (pars[2] <= m_minSigma + 0.01) break;
         if (pars[2] >= m_maxSigma - 0.01) break;
         if (maxNorm == 0) maxNorm = pars[0];
-        if (maxNormSig == 0 && pars[1] > m_signalRangeLow && pars[1] < m_signalRangeHigh) maxNormSig = pars[0];
         if (pars[0] < maxNorm * m_fracThreshold) break;
         // std::cout<<pars[0]<<"\t"<<pars[1]<<"\t"<<pars[2]<<std::endl;
 
@@ -372,30 +370,31 @@ void SVDTimeGroupComposerModule::event()
 
     } // while(1) {
 
+    // resizing to max
+    groupInfo.resize(m_maxGroups, std::make_tuple(0., 0., 0.));
+
     // sorting groups
     // possible signal first, then others
     std::tuple<double, double, double> key;
-    for (int ij = 1; ij < int(groupInfo.size()); ij++) {
+    for (int ij = int(groupInfo.size()) - 2; ij >= 0; ij--) {
       key = groupInfo[ij];
-      float keymean  = std::fabs(std::get<1>(key));
-      bool isKeySignal = true;
-      if (keymean < m_signalRangeLow || keymean > m_signalRangeHigh) isKeySignal = false;
-      if (!isKeySignal) continue;
       float keynorm = std::get<0>(key);
-      if (keynorm < maxNormSig * 0.5) break;
-      float keyshift = std::fabs(std::get<1>(key) - m_expSignalLoc);
-      int kj = ij - 1;
+      float keymean = std::get<1>(key);
+      bool isKeySignal = true;
+      if (keynorm > 0 && (keymean < m_signalRangeLow || keymean > m_signalRangeHigh)) isKeySignal = false;
+      if (isKeySignal) continue;
+      int kj = ij + 1;
       while (1) {
-        if (kj < 0) break;
-        float grmean = std::fabs(std::get<1>(groupInfo[kj]));
+        if (kj >= int(groupInfo.size())) break;
+        float grnorm = std::get<0>(groupInfo[kj]);
+        float grmean = std::get<1>(groupInfo[kj]);
         bool isGrSignal = true;
-        if (grmean < m_signalRangeLow || grmean > m_signalRangeHigh) isGrSignal = false;
-        float grshift  = std::fabs(std::get<1>(groupInfo[kj]) - m_expSignalLoc);
-        if (isGrSignal && (grshift < keyshift)) break;
-        groupInfo[kj + 1] = groupInfo[kj];
-        kj--;
+        if (grnorm > 0 && (grmean < m_signalRangeLow || grmean > m_signalRangeHigh)) isGrSignal = false;
+        if (!isGrSignal && (grnorm > keynorm)) break;
+        groupInfo[kj - 1] = groupInfo[kj];
+        kj++;
       }
-      groupInfo[kj + 1] = key;
+      groupInfo[kj - 1] = key;
     }
 
     if (m_signalGroupSelection && int(groupInfo.size())) {
@@ -413,6 +412,7 @@ void SVDTimeGroupComposerModule::event()
 
     for (int ij = 0; ij < int(groupInfo.size()); ij++) {
       double pars[3] = {std::get<0>(groupInfo[ij]), std::get<1>(groupInfo[ij]), std::get<2>(groupInfo[ij])};
+      if (pars[2] == 0) continue;
       double beginPos = pars[1] - m_accSigmaN * pars[2];
       double   endPos = pars[1] + m_accSigmaN * pars[2];
       if (beginPos < tRangeLow) beginPos = tRangeLow;

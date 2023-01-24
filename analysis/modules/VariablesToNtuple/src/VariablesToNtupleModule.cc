@@ -18,6 +18,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/pcore/ProcHandler.h>
 #include <framework/core/ModuleParam.templateDetails.h>
+#include <framework/core/Environment.h>
 
 // framework - root utilities
 #include <framework/utilities/MakeROOTCompatible.h>
@@ -47,7 +48,8 @@ VariablesToNtupleModule::VariablesToNtupleModule() :
            "List of variables (or collections) to save. Variables are taken from Variable::Manager, and are identical to those available to e.g. ParticleSelector.",
            emptylist);
 
-  addParam("fileName", m_fileName, "Name of ROOT file for output.", string("VariablesToNtuple.root"));
+  addParam("fileName", m_fileName, "Name of ROOT file for output. Can be overridden using the -o argument to basf2.",
+           string("VariablesToNtuple.root"));
   addParam("treeName", m_treeName, "Name of the NTuple in the saved file.", string("ntuple"));
   addParam("basketSize", m_basketsize, "Size of baskets in Output NTuple in bytes.", 1600);
 
@@ -69,6 +71,12 @@ void VariablesToNtupleModule::initialize()
     StoreObjPtr<ParticleList>().isRequired(m_particleList);
 
   // Initializing the output root file
+
+  // override the output file name with the provided with the -o option
+  const std::string& outputFileArgument = Environment::Instance().getOutputFileOverride();
+  if (!outputFileArgument.empty())
+    m_fileName = outputFileArgument;
+
   if (m_fileName.empty()) {
     B2FATAL("Output root file name is not set. Please set a valid root output file name (\"fileName\" module parameter).");
   }

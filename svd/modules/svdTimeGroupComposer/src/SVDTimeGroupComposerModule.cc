@@ -328,6 +328,7 @@ void SVDTimeGroupComposerModule::event()
     std::vector<std::tuple<double, double, double>> groupInfo; // pars
     double maxPeak = 0;
     double maxNorm = 0;
+    double maxNormSig = 0;
     while (1) {
 
       int maxBin       = h_clsTime[currentHisto].GetMaximumBin();
@@ -347,6 +348,7 @@ void SVDTimeGroupComposerModule::event()
         if (pars[2] <= m_minSigma + 0.01) break;
         if (pars[2] >= m_maxSigma - 0.01) break;
         if (maxNorm == 0) maxNorm = pars[0];
+        if (maxNormSig == 0 && pars[1] > m_signalRangeLow && pars[1] < m_signalRangeHigh) maxNormSig = pars[0];
         if (pars[0] < maxNorm * m_fracThreshold) break;
         // std::cout<<pars[0]<<"\t"<<pars[1]<<"\t"<<pars[2]<<std::endl;
 
@@ -370,11 +372,32 @@ void SVDTimeGroupComposerModule::event()
 
     } // while(1) {
 
-    if (int(groupInfo.size()) > 1) { // move the first group to second, if predicted background
-      float gr0shift = std::fabs(std::get<1>(groupInfo[0]) - m_expSignalLoc);
-      float gr1shift = std::fabs(std::get<1>(groupInfo[1]) - m_expSignalLoc);
-      if (gr0shift > gr1shift) std::swap(groupInfo[0], groupInfo[1]);
+    // sorting groups
+    // possible signal first, then others
+    std::tuple<double, double, double> key;
+    for (int ij = 1; ij < int(groupInfo.size()); ij++) {
+      key = groupInfo[ij];
+      float keymean  = std::fabs(std::get<1>(key));
+      bool isKeySignal = true;
+      if (keymean < m_signalRangeLow || keymean > m_signalRangeHigh) isKeySignal = false;
+      if (!isKeySignal) continue;
+      float keynorm = std::get<0>(key);
+      if (keynorm < maxNormSig * 0.5) break;
+      float keyshift = std::fabs(std::get<1>(key) - m_expSignalLoc);
+      int kj = ij - 1;
+      while (1) {
+        if (kj < 0) break;
+        float grmean = std::fabs(std::get<1>(groupInfo[kj]));
+        bool isGrSignal = true;
+        if (grmean < m_signalRangeLow || grmean > m_signalRangeHigh) isGrSignal = false;
+        float grshift  = std::fabs(std::get<1>(groupInfo[kj]) - m_expSignalLoc);
+        if (isGrSignal && (grshift < keyshift)) break;
+        groupInfo[kj + 1] = groupInfo[kj];
+        kj--;
+      }
+      groupInfo[kj + 1] = key;
     }
+
     if (m_signalGroupSelection && int(groupInfo.size())) {
       float grMean = std::get<1>(groupInfo[0]);
       if (grMean < m_signalRangeLow || grMean > m_signalRangeHigh)

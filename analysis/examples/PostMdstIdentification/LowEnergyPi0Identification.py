@@ -19,6 +19,7 @@ import b2biiConversion
 import modularAnalysis as ma
 import variables.collections as vc
 from variables import variables
+import b2bii
 
 # Arguments.
 parser = argparse.ArgumentParser()
@@ -54,6 +55,14 @@ if arguments.belle1:
     payload_name_suffix = 'Belle1'
 else:
     payload_name_suffix = 'Belle2Release5'
+
+if b2bii.isB2BII():
+    tag = ma.getAnalysisGlobaltagB2BII()
+else:
+    tag = ma.getAnalysisGlobaltag()
+
+basf2.conditions.prepend_globaltag(tag)
+
 ma.lowEnergyPi0Identification(pi0_list, 'gamma:pi0', payload_name_suffix,
                               path=analysis_path)
 

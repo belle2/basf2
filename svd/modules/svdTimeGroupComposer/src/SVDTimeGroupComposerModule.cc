@@ -120,9 +120,7 @@ void SVDTimeGroupComposerModule::initialize()
   // prepare all store:
   m_svdClusters.isRequired(m_svdClustersName);
 
-  if (m_signalGroupSelection)
-    m_writeGroupInfo = true; // group info is required
-  if (m_signalGroupSelection || m_useOnlyOneGroup)
+  if (m_signalGroupSelection || m_flatSignalCut || m_useOnlyOneGroup)
     m_includeOutOfRangeClusters = false;
 
   if (m_useOnlyOneGroup) B2WARNING("Only the first group is kept.");

@@ -171,16 +171,17 @@ if args.RootOutput:
         'RootOutput',
         outputFileName=rootOutFileName,
         branchNames=[
-            'EventT0',
+            'EventT0', 'OnlineEventT0s',
+            'TRGECLUnpackerStores',
             'SVDEventInfo', 'SVDEventInfoSim',
+            'SVDClusters',
+            'Tracks',
+            'RecoTracks', 'MCRecoTracks',
             'SVDTrueHits',
             'SVDShaperDigits',
-            'SVDClusters',
             'SVDSpacePoints',
-            'Tracks',
-            'RecoTracks',
-            'MCRecoTracks',
-            'MCParticles']
+            'MCParticles'
+        ]
     )
 
 if args.executionTime:

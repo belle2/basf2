@@ -18,7 +18,7 @@ Decay Yb10751sig
 1.0   Upsilonsig f_0sig  PHSP;
 Enddecay
 
-Decay f0_sig
+Decay f_0sig
 1.0   pi+ pi- PHSP;
 Enddecay
 

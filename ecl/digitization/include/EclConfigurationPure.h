@@ -73,16 +73,48 @@ namespace Belle2 {
         void AddHit(const double a, const double t0, const signalsamplepure_t& q);
       };
 
-      /** a struct for the fit parameters for the pure CsI calorimeter */
+      /**
+       * A struct for the fit parameters for a single channel of the pure CsI
+       * calorimeter (in the simulation, all calorimeter channels normally use
+       * the same set of fit parameters).
+       *
+       * For detailed description of the fit algorithm, see ECL-TN-2013-02
+       * (latest version at https://stash.desy.de/users/remnev/repos/ecl-tn-2013-02/browse/digi.pdf)
+       */
       struct fitparamspure_t {
-        typedef double double_matrix[16][2 * m_ndtPure]; /**< table of sub-arrays (one for each of the 16 channels) */
+        /** Matrix used in shape fit algorithm.
+         *  1st index (i): signal sample ID (waveform always contains 15 signal samples)
+         *   0     -> special point that represents average pedestal value
+         *   1..15 -> signal samples
+         *  2nd index (j): tabulated point ID
+         *   0                            -> point at the ADC sample #i
+         *   1..(m_ndtPure-1)             -> points to the right of ADC sample #i
+         *   m_ndtPure..(2*m_ndtPure - 1) -> points to the left of ADC sample #i
+         */
+        typedef double double_matrix[16][2 * m_ndtPure];
+        /** Array used in shape fit algorithm.
+         *  1st index: tabulated point ID
+         *   0                            -> point at the signal start
+         *   1..(m_ndtPure-1)             -> points to the right of the signal start
+         *   m_ndtPure..(2*m_ndtPure - 1) -> points to the left of the signal start
+         */
         typedef double fine_array[2 * m_ndtPure]; /**< sub-array to tabulate signal fit parameters */
+
         double invC[16][16]; /**< inverse noise covariance matrix */
-        double_matrix f, f1; /**< signal response function and its first derivative */
-        double_matrix c100, c010;
+        double_matrix f;     /**< signal response function and its first derivative */
+        double_matrix f1;    /**< first derivative of a signal response function */
+        /**
+         * Intermediate coefficients for the left side of the system of linear
+         * equations to reconstruct amplitude, time and pedestal
+         */
         fine_array c110, c200, c020, c101, c011;
-        double c002;
-        double c001[16];
+        double c002; /**< \see c110 */
+        /**
+         * Intermediate coefficients for the right side of the system of linear
+         * equations to reconstruct amplitude, time and pedestal
+         */
+        double_matrix c100, c010;
+        double c001[16]; /**< \see c100 */
       };
 
     };

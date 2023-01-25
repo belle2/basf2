@@ -22,8 +22,7 @@
 
 import basf2
 import ROOT
-from modularAnalysis import cutAndCopyList, inputMdst, matchMCTruth
-from stdPi0s import stdPi0s
+from modularAnalysis import cutAndCopyList, inputMdst
 from validation_tools.metadata import create_validation_histograms
 from validation_tools.metadata import validation_metadata_update
 from variables import variables as vm
@@ -33,9 +32,6 @@ OUTPUT_FILENAME = "Pi0_Validation.root"
 
 main = basf2.Path()
 inputMdst(INPUT_FILENAME, path=main)
-
-stdPi0s('all', path=main)
-matchMCTruth('pi0:all', path=main)
 
 cutAndCopyList('pi0:rec', 'pi0:all', 'daughter(0, E)>0.05 and daughter(1, E)>0.05', path=main)
 cutAndCopyList('pi0:mc', 'pi0:all', 'mcErrors<1', path=main)
@@ -50,8 +46,8 @@ create_validation_histograms(
             "Mreco", 40, 0.08, 0.18,
             "#pi^{0} reconstructed candidates, invariant mass",
             "Andrea Selce <selce@infn.it>",
-            r"The $\pi^{0}$ invariant mass distribution with $E_{\gamma}>0.05\, \text{GeV}$",
-            r"Distribution should be peaking at the nominal $\pi^{0}$ mass.",
+            r"The $\pi^0$ invariant mass distribution with $E_{\gamma}>0.05\, \text{GeV}$",
+            r"Distribution should be peaking at the nominal $\pi^0$ mass.",
             "M(#pi^{0}) [GeV/c^{2}]", "Candidates", "shifter"
         ),
     ],
@@ -68,8 +64,8 @@ create_validation_histograms(
             "Mmc", 40, 0.08, 0.18,
             "#pi^{0} MC candidates, invariant mass",
             "Andrea Selce <selce@infn.it>",
-            r"The $\pi^{0}$ invariant mass distribution for truth matched candidates",
-            r"Distribution should be peaking at the nominal $\pi^{0}$ mass.",
+            r"The $\pi^0$ invariant mass distribution for truth matched candidates",
+            r"Distribution should be peaking at the nominal $\pi^0$ mass.",
             "M(#pi^{0}) [GeV/c^{2}]", "Candidates", "shifter"
         ),
     ],

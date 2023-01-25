@@ -101,20 +101,25 @@ namespace Belle2 {
         typedef double fine_array[2 * m_ndtPure]; /**< sub-array to tabulate signal fit parameters */
 
         double invC[16][16]; /**< inverse noise covariance matrix */
-        double_matrix f;     /**< signal response function and its first derivative */
+        double_matrix f;     /**< signal response function */
         double_matrix f1;    /**< first derivative of a signal response function */
         /**
          * Intermediate coefficients for the left side of the system of linear
          * equations to reconstruct amplitude, time and pedestal
          */
-        fine_array c110, c200, c020, c101, c011;
-        double c002; /**< \see c110 */
+        fine_array c110;
+        fine_array c200; /**< \see c110 */
+        fine_array c020; /**< \see c110 */
+        fine_array c101; /**< \see c110 */
+        fine_array c011; /**< \see c110 */
+        double c002;     /**< \see c110 */
         /**
          * Intermediate coefficients for the right side of the system of linear
          * equations to reconstruct amplitude, time and pedestal
          */
-        double_matrix c100, c010;
-        double c001[16]; /**< \see c100 */
+        double_matrix c100;
+        double_matrix c010; /**< \see c100 */
+        double c001[16];    /**< \see c100 */
       };
 
     };

@@ -2,9 +2,9 @@
 # Descriptor: [vpho->gamma[Y3S->pi+pi-[Y1S->e+e-]]]
 # NickName: vpho_gammaY3S_pipiY1S_ee
 # Cuts: None
-# Documentation: 
+# Documentation: ee-> gamma Upsilon process 
 # PhysicsWG: Bottomonium
-# Tested: 
+# Tested: Yes
 # Responsible: Yang Li 
 # Email: y_li21@m.fudan.edu.cn 
 # Date: 20230102

@@ -187,6 +187,8 @@ void KLMDigitizerModule::digitizeScintillator()
   const KLMScintillatorFEEData* FEEData;
   std::multimap<KLMChannelNumber, const KLMSimHit*>::iterator
   it, lowerBound, upperBound;
+  for (int i = 0; i < KLM::c_NChannelsAsic; ++i)
+    m_AsicDigits[i] = nullptr;
   it = m_MapChannelSimHit.begin();
   while (it != m_MapChannelSimHit.end()) {
     lowerBound = it;
@@ -207,8 +209,14 @@ void KLMDigitizerModule::digitizeScintillator()
     simulator.simulate(lowerBound, upperBound);
     if (simulator.getNGeneratedPhotoelectrons() == 0)
       continue;
-    KLMDigit* digit = m_Digits.appendNew(simHit);
-    digit->addRelationTo(simHit);
+    const KLMElectronicsChannel* electronicsChannel =
+      m_ElectronicsMap->getElectronicsChannel(it->first);
+    int channel = (electronicsChannel->getChannel() - 1) %
+                  KLM::c_NChannelsAsic;
+    KLMDigit* digit = new KLMDigit(simHit);
+    m_AsicDigits[channel] = digit;
+    m_AsicDigitSimHitsLowerBound[channel] = lowerBound;
+    m_AsicDigitSimHitsUpperBound[channel] = upperBound;
     digit->setMCTime(simulator.getMCTime());
     digit->setSiPMMCTime(simulator.getSiPMMCTime());
     digit->setNGeneratedPhotoelectrons(
@@ -239,6 +247,7 @@ void KLMDigitizerModule::digitizeAsic()
 {
   std::multimap<KLMElectronicsChannel, const KLMSimHit*>::iterator
   it, it2, upperBound;
+  std::multimap<KLMChannelNumber, const KLMSimHit*>::iterator it3;
   it = m_MapAsicSimHit.begin();
   while (it != m_MapAsicSimHit.end()) {
     upperBound = m_MapAsicSimHit.upper_bound(it->first);
@@ -253,6 +262,18 @@ void KLMDigitizerModule::digitizeAsic()
         std::pair<KLMChannelNumber, const KLMSimHit*>(channel, hit));
     }
     digitizeScintillator();
+    /* TODO: merge digits here creating multi-strip ones. */
+    for (int i = 0; i < KLM::c_NChannelsAsic; ++i) {
+      KLMDigit* digit = m_AsicDigits[i];
+      if (digit == nullptr)
+        continue;
+      KLMDigit* arrayDigit = m_Digits.appendNew(*digit);
+      for (it3 = m_AsicDigitSimHitsLowerBound[i];
+           it3 != m_AsicDigitSimHitsUpperBound[i]; ++it3) {
+        arrayDigit->addRelationTo(it3->second);
+      }
+      delete digit;
+    }
     it = upperBound;
   }
 }

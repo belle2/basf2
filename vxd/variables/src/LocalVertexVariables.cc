@@ -6,22 +6,12 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// #include <analysis/variables/VertexVariables.h>
 #include <analysis/utility/ReferenceFrame.h>
 #include <analysis/VariableManager/Manager.h>
 
-#include <framework/database/DBObjPtr.h>
-#include <framework/logging/Logger.h>
-#include <framework/utilities/Conversion.h>
-#include <framework/core/Module.h>
-
-#include <TMatrixFSym.h>
 #include <Math/Vector3D.h>
 
-#include <mdst/dbobjects/BeamSpot.h>
 #include <mdst/dataobjects/MCParticle.h>
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/TrackFitResult.h>
 
 #include <vxd/geometry/GeoCache.h>
 

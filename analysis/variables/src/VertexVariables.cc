@@ -22,9 +22,6 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 
-#include <tuple>
-using namespace std;
-
 
 namespace Belle2 {
   class Particle;

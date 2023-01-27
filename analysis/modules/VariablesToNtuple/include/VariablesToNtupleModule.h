@@ -58,6 +58,8 @@ namespace Belle2 {
     std::string m_fileName;
     /** Name of the TTree. */
     std::string m_treeName;
+    /** Suffix to be appended to the output file name. */
+    std::string m_fileNameSuffix;
     /** Size of TBaskets in the output ROOT file in bytes. */
     int m_basketsize;
 

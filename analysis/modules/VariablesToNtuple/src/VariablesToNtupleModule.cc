@@ -62,6 +62,9 @@ VariablesToNtupleModule::VariablesToNtupleModule() :
            "Name of signal-side particle list to store the index of the signal-side particle when one calls the module in a for_each loop over the RestOfEvent",
            std::string(""));
 
+  addParam("fileNameSuffix", m_fileNameSuffix, "The suffix of the output ROOT file to be appended before ``.root``.",
+           string(""));
+
 }
 
 void VariablesToNtupleModule::initialize()
@@ -76,6 +79,9 @@ void VariablesToNtupleModule::initialize()
   const std::string& outputFileArgument = Environment::Instance().getOutputFileOverride();
   if (!outputFileArgument.empty())
     m_fileName = outputFileArgument;
+
+  if (!m_fileNameSuffix.empty())
+    m_fileName = m_fileName.insert(m_fileName.rfind(".root"), m_fileNameSuffix);
 
   if (m_fileName.empty()) {
     B2FATAL("Output root file name is not set. Please set a valid root output file name (\"fileName\" module parameter).");

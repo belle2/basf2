@@ -1914,7 +1914,7 @@ def printList(list_name, full, path):
 
 
 def variablesToNtuple(decayString, variables, treename='variables', filename='ntuple.root', path=None, basketsize=1600,
-                      signalSideParticleList=""):
+                      signalSideParticleList="", filenameSuffix=""):
     """
     Creates and fills a flat ntuple with the specified variables from the VariableManager.
     If a decayString is provided, then there will be one entry per candidate (for particle in list of candidates).
@@ -1929,6 +1929,7 @@ def variablesToNtuple(decayString, variables, treename='variables', filename='nt
         basketsize (int): size of baskets in the output ntuple in bytes
         signalSideParticleList (str): The name of the signal-side ParticleList.
                                       Only valid if the module is called in a for_each loop over the RestOfEvent.
+        filenameSuffix (str): suffix to be appended the filename before ``.root``.
     """
 
     output = register_module('VariablesToNtuple')
@@ -1939,6 +1940,7 @@ def variablesToNtuple(decayString, variables, treename='variables', filename='nt
     output.param('treeName', treename)
     output.param('basketSize', basketsize)
     output.param('signalSideParticleList', signalSideParticleList)
+    output.param('fileNameSuffix', filenameSuffix)
     path.add_module(output)
 
 

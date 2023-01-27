@@ -16,7 +16,7 @@
 #include <framework/core/Module.h>
 
 #include <TMatrixFSym.h>
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 
 #include <mdst/dbobjects/BeamSpot.h>
 #include <mdst/dataobjects/MCParticle.h>
@@ -38,11 +38,11 @@ namespace Belle2 {
 
     // MC Local coordinates and sensor ID from getDecayVertex global coordinates -----------------------------------------------------------------
 
-    tuple<TVector3, int, int, int> getmcLocalCoordinates(const Particle* part)
+    tuple<ROOT::Math::XYZVector, int, int, int> getmcLocalCoordinates(const Particle* part)
     {
       VXD::GeoCache& geo = VXD::GeoCache::getInstance();
       auto* mcparticle = part->getMCParticle();
-      if (!mcparticle) return make_tuple(TVector3(realNaN, realNaN, realNaN), 0, 0, 0);
+      if (!mcparticle) return make_tuple(ROOT::Math::XYZVector(realNaN, realNaN, realNaN), 0, 0, 0);
       const auto& mcglobal = mcparticle->getDecayVertex();
       for (const auto& layer : geo.getLayers()) {
         for (const auto& ladder : geo.getLadders(layer)) {
@@ -53,7 +53,7 @@ namespace Belle2 {
           }
         }
       }
-      return make_tuple(TVector3(realNaN, realNaN, realNaN), 0, 0, 0);
+      return make_tuple(ROOT::Math::XYZVector(realNaN, realNaN, realNaN), 0, 0, 0);
     }
 
     double mcDecayVertexU(const Particle* part)
@@ -87,7 +87,7 @@ namespace Belle2 {
 
     //Local coordinates and sensor ID from getVertex global coordinates -----------------------------------------------------------------
 
-    tuple<TVector3, int, int, int> getLocalCoordinates(const Particle* part)
+    tuple<ROOT::Math::XYZVector, int, int, int> getLocalCoordinates(const Particle* part)
     {
       VXD::GeoCache& geo = VXD::GeoCache::getInstance();
       const auto& frame = ReferenceFrame::GetCurrent();
@@ -97,10 +97,10 @@ namespace Belle2 {
           for (const auto& sensor : geo.getSensors(ladder)) {
             const auto& sInfo = VXD::GeoCache::get(sensor);
             const auto& local = sInfo.pointToLocal(global, true);
-            if (sInfo.inside(local.x(), local.y(), 0.1, 0.1)) {
-              if (abs(local.z()) < 0.1) return make_tuple(local, sensor.getLayerNumber(), sensor.getLadderNumber(), sensor.getSensorNumber());
+            if (sInfo.inside(local.X(), local.Y(), 0.1, 0.1)) {
+              if (abs(local.Z()) < 0.1) return make_tuple(local, sensor.getLayerNumber(), sensor.getLadderNumber(), sensor.getSensorNumber());
               else {
-                TVector3 localz{local.x(), local.y(), abs(local.z()) - 0.1};
+                ROOT::Math::XYZVector localz{local.X(), local.Y(), abs(local.Z()) - 0.1};
                 if (sInfo.inside(localz)) return make_tuple(local, sensor.getLayerNumber(), sensor.getLadderNumber(), sensor.getSensorNumber());
               }
             }
@@ -108,7 +108,7 @@ namespace Belle2 {
           }
         }
       }
-      return make_tuple(TVector3(realNaN, realNaN, realNaN), 0, 0, 0);
+      return make_tuple(ROOT::Math::XYZVector(realNaN, realNaN, realNaN), 0, 0, 0);
     }
 
     double particleU(const Particle* part)

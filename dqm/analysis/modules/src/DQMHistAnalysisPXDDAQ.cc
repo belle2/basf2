@@ -63,7 +63,8 @@ void DQMHistAnalysisPXDDAQModule::initialize()
   m_cMissingDHP = new TCanvas((m_histogramDirectoryName + "/c_MissingDHP").data());
   m_cStatistic = new TCanvas((m_histogramDirectoryName + "/c_Statistic").data());
   m_cStatisticUpd = new TCanvas((m_histogramDirectoryName + "/c_StatisticUpd").data());
-  addDeltaPar(m_histogramDirectoryName, "PXDDAQStat", HistDelta::c_Underflow, m_minEntries, 1); // register delta
+  if (!hasDeltaPar(m_histogramDirectoryName, "PXDDAQStat")) addDeltaPar(m_histogramDirectoryName, "PXDDAQStat",
+        HistDelta::c_Underflow, m_minEntries, 1); // register delta
 
   m_monObj->addCanvas(m_cDAQError);
   m_monObj->addCanvas(m_cMissingDHC);

@@ -28,8 +28,6 @@
 /* Google Test headers. */
 #include <gtest/gtest.h>
 
-using namespace std;
-
 namespace Belle2 {
 
   /** Test for the MuidBuilder class, using the payloads in the default Global Tag. */

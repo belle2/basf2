@@ -24,8 +24,8 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(MCMatcherECLClusters)
-REG_MODULE(MCMatcherECLClustersPureCsI)
+REG_MODULE(MCMatcherECLClusters);
+REG_MODULE(MCMatcherECLClustersPureCsI);
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------

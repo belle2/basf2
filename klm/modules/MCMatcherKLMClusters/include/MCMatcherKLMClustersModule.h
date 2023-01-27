@@ -59,7 +59,7 @@ namespace Belle2 {
 
   private:
 
-    /** Add relations for BKLMHit2d and EKLMHit2d. */
+    /** Add relations for KLMHit2d and KLMHit2d. */
     bool m_Hit2dRelations;
 
     /** KLM clusters. */

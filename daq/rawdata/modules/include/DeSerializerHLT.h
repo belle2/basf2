@@ -45,12 +45,12 @@ namespace Belle2 {
     virtual ~DeSerializerHLTModule();
 
     //! initialize functions
-    virtual void initialize();
+    void initialize() override;
 
     //! Module functions to be called from event process
     //    void FillNewRawCOPPERHeader(RawCOPPER* raw_copper);
     //! Module functions to be called from event process
-    virtual void event();
+    void event() override;
 
 
   protected :

@@ -27,6 +27,7 @@
 // framework aux
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
+#include <framework/geometry/B2Vector3.h>
 
 using namespace std;
 using namespace boost;
@@ -34,10 +35,10 @@ using namespace boost;
 namespace Belle2 {
   namespace arich {
     //-----------------------------------------------------------------
-    //                 Register the Module
+    ///                Register the Module
     //-----------------------------------------------------------------
 
-    REG_MODULE(ARICHBackground)
+    REG_MODULE(ARICHBackground);
 
 
     //-----------------------------------------------------------------
@@ -147,25 +148,25 @@ namespace Belle2 {
         RelationIndex<MCParticle, BeamBackHit> relBeamBackHitToMCParticle(mcParticles, beamBackHits);
         if (relBeamBackHitToMCParticle.getFirstElementTo(arichhit)) {
           const MCParticle* currParticle = relBeamBackHitToMCParticle.getFirstElementTo(arichhit)->from;
-          phVtx = currParticle->getVertex();
+          phVtx = B2Vector3D(currParticle->getVertex());
           const MCParticle* mother = currParticle->getMother();
           int mm = 0;
           while (mother) {
             if (mm == 0) {
               phMPDG = mother->getPDG();
-              phMvtx = mother->getVertex();
-              phMmom = mother->getMomentum();
+              phMvtx = B2Vector3D(mother->getVertex());
+              phMmom = B2Vector3D(mother->getMomentum());
             }
             if (mm == 1) {
               phGMPDG = mother->getPDG();
-              phGMvtx = mother->getVertex();
-              phGMmom = mother->getMomentum();
+              phGMvtx = B2Vector3D(mother->getVertex());
+              phGMmom = B2Vector3D(mother->getMomentum());
             }
             const MCParticle* pommother = mother->getMother();
             if (!pommother) {
               phPPDG = mother->getPDG();
-              phPvtx = mother->getVertex();
-              phPmom = mother->getMomentum();
+              phPvtx = B2Vector3D(mother->getVertex());
+              phPmom = B2Vector3D(mother->getMomentum());
             }
             mother = pommother;
             mm++;
@@ -191,25 +192,25 @@ namespace Belle2 {
         RelationIndex<MCParticle, ARICHSimHit> relSimHitToMCParticle(mcParticles, arichSimHits);
         if (relSimHitToMCParticle.getFirstElementTo(simHit)) {
           const MCParticle* currParticle = relSimHitToMCParticle.getFirstElementTo(simHit)->from;
-          phVtx = currParticle->getVertex();
+          phVtx = B2Vector3D(currParticle->getVertex());
           const MCParticle* mother = currParticle->getMother();
           int mm = 0;
           while (mother) {
             if (mm == 0) {
               phMPDG = mother->getPDG();
-              phMvtx = mother->getVertex();
-              phMmom = mother->getMomentum();
+              phMvtx = B2Vector3D(mother->getVertex());
+              phMmom = B2Vector3D(mother->getMomentum());
             }
             if (mm == 1) {
               phGMPDG = mother->getPDG();
-              phGMvtx = mother->getVertex();
-              phGMmom = mother->getMomentum();
+              phGMvtx = B2Vector3D(mother->getVertex());
+              phGMmom = B2Vector3D(mother->getMomentum());
             }
             const MCParticle* pommother = mother->getMother();
             if (!pommother) {
               phPPDG = mother->getPDG();
-              phPvtx = mother->getVertex();
-              phPmom = mother->getMomentum();
+              phPvtx = B2Vector3D(mother->getVertex());
+              phPmom = B2Vector3D(mother->getMomentum());
             }
             mother = pommother;
             mm++;

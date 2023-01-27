@@ -12,23 +12,20 @@
 
 #pragma once
 
+#include <dqm/core/DQMHistAnalysis.h>
+
 #ifdef _BELLE2_EPICS
 // EPICS
 #include "cadef.h"
 #endif
 
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
 #include <vxd/dataobjects/VxdID.h>
 
-#include <vector>
-#include <array>
-#include <TF1.h>
-#include "TF1Convolution.h"
-#include <TCanvas.h>
-#include <TLine.h>
-#include <TGraphErrors.h>
 #include <TFile.h>
 #include <TH2.h>
+#include <TF1.h>
+#include <TLine.h>
+#include <TGraphErrors.h>
 
 #include <RooRealVar.h>
 #include <RooWorkspace.h>
@@ -36,33 +33,47 @@
 namespace Belle2 {
   /*! DQM Histogram Analysis for PXD Cluster Charge */
 
-  class DQMHistAnalysisPXDTrackChargeModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisPXDTrackChargeModule final : public DQMHistAnalysisModule {
 
     // Public functions
   public:
 
-    //! Constructor
+    /**
+     * Constructor.
+     */
     DQMHistAnalysisPXDTrackChargeModule();
-    //! Destructor
-    ~DQMHistAnalysisPXDTrackChargeModule();
-  private:
-
-    //! Module functions to be called from main process
-    void initialize(void) override final;
-
-    //! Module functions to be called from event process
-    void beginRun(void) override final;
-    void event(void) override final;
-    void endRun(void) override final;
-    void terminate(void) override final;
 
     /**
-     * Get histogram by its name.
-     * @param histoname The name of the histogram.
-     * @return The pointer to the histogram, or nullptr if not found.
+     * Destructor.
      */
-    TH1* GetHisto(TString histoname);
+    ~DQMHistAnalysisPXDTrackChargeModule();
 
+    /**
+     * Initializer.
+     */
+    void initialize(void) override final;
+
+    /**
+     * Called when entering a new run.
+     */
+    void beginRun(void) override final;
+
+    /**
+     * This method is called for each event.
+     */
+    void event(void) override final;
+
+    /**
+     * This method is called if the current run ends.
+     */
+    void endRun(void) override final;
+
+    /**
+     * This method is called at the end of the event processing.
+     */
+    void terminate(void) override final;
+
+  private:
     // Data members
 
     //! name of histogram directory
@@ -118,7 +129,7 @@ namespace Belle2 {
     /** Monitoring Object */
     MonitoringObject* m_monObj {};
 
-    /** flag if to export to EPICS */
+    /** flag if exporting to EPICS */
     bool m_useEpics;
 
 #ifdef _BELLE2_EPICS

@@ -70,7 +70,7 @@ std::size_t CDCObservations2D::append(const CDCWireHit& wireHit, ERightLeft rlIn
 
   double signedDriftLength = 0;
   if (m_fitPos == EFitPos::c_RLDriftCircle and isValid(rlInfo)) {
-    signedDriftLength = rlInfo * wireHit.getRefDriftLength();
+    signedDriftLength = static_cast<double>(rlInfo) * wireHit.getRefDriftLength();
   } else {
     signedDriftLength = 0;
   }
@@ -115,7 +115,7 @@ std::size_t CDCObservations2D::append(const CDCRLWireHit& rlWireHit)
 
   double signedDriftLength = 0;
   if (m_fitPos == EFitPos::c_RLDriftCircle and isValid(rlInfo)) {
-    signedDriftLength = rlInfo * driftLength;
+    signedDriftLength = static_cast<double>(rlInfo) * driftLength;
   } else {
     signedDriftLength = 0;
   }

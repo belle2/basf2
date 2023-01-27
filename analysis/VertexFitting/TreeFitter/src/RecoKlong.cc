@@ -8,6 +8,7 @@
  **************************************************************************/
 
 #include <framework/logging/Logger.h>
+#include <framework/geometry/B2Vector3.h>
 
 #include <analysis/dataobjects/Particle.h>
 #include <mdst/dataobjects/KLMCluster.h>
@@ -40,9 +41,8 @@ namespace TreeFitter {
 
     const double distanceToMother = vertexToCluster.norm();
     const double energy =  m_clusterPars(3);
-    const double energy2 = energy * energy;
-    const double pdgMass2 = ParticleBase::pdgMass() * ParticleBase::pdgMass();
-    const double absMom = -1 * std::sqrt(energy2 - pdgMass2);
+    const double pdgMass = particle()->getPDGMass();
+    const double absMom = -1 * std::sqrt(energy * energy - pdgMass * pdgMass);
 
     const int momindex = momIndex();
 
@@ -82,7 +82,7 @@ namespace TreeFitter {
   {
     const Belle2::KLMCluster* cluster = particle()->getKLMCluster();
 
-    const TVector3 cluster_pos = cluster->getClusterPosition();
+    const Belle2::B2Vector3D cluster_pos = cluster->getClusterPosition();
 
     m_init = true;
     m_covariance =  Eigen::Matrix<double, 4, 4>::Zero(4, 4);
@@ -108,15 +108,15 @@ namespace TreeFitter {
 
     auto p_vec = particle()->getMomentum();
     // find highest momentum, eliminate dim with highest mom
-    if ((std::abs(p_vec(0)) >= std::abs(p_vec(1))) && (std::abs(p_vec(0)) >= std::abs(p_vec(2)))) {
+    if ((std::abs(p_vec.X()) >= std::abs(p_vec.Y())) && (std::abs(p_vec.X()) >= std::abs(p_vec.Z()))) {
       m_i1 = 0; m_i2 = 1; m_i3 = 2;
-    } else if ((std::abs(p_vec(1)) >= std::abs(p_vec(0))) && (std::abs(p_vec(1)) >= std::abs(p_vec(2)))) {
+    } else if ((std::abs(p_vec.Y()) >= std::abs(p_vec.X())) && (std::abs(p_vec.Y()) >= std::abs(p_vec.Z()))) {
       m_i1 = 1; m_i2 = 0; m_i3 = 2;
-    } else if ((std::abs(p_vec(2)) >= std::abs(p_vec(1))) && (std::abs(p_vec(2)) >= std::abs(p_vec(0)))) {
+    } else if ((std::abs(p_vec.Z()) >= std::abs(p_vec.Y())) && (std::abs(p_vec.Z()) >= std::abs(p_vec.X()))) {
       m_i1 = 2; m_i2 = 1; m_i3 = 0;
     } else {
       B2ERROR("Could not estimate highest momentum for Klong constraint. Aborting this fit.\n px: "
-              << p_vec(0) << " py: " << p_vec(1) << " pz: " << p_vec(2) << " calculated from Ec: " << m_clusterPars(3));
+              << p_vec.X() << " py: " << p_vec.Y() << " pz: " << p_vec.Z() << " calculated from Ec: " << m_clusterPars(3));
       return ErrCode(ErrCode::Status::photondimerror);
     }
 

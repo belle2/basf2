@@ -130,8 +130,8 @@ namespace Belle2 {
         G4VSolid* s_plate_short = new G4Box("s_plate_short", dx_plate_short, dy_plate_short, dz_plate_short);
 
         //place plate volume
-        G4LogicalVolume* l_plate = new G4LogicalVolume(s_plate,  geometry::Materials::get("Al") , "l_plate", 0, 0);
-        G4LogicalVolume* l_plate_short = new G4LogicalVolume(s_plate_short,  geometry::Materials::get("Al") , "l_plate_short", 0, 0);
+        G4LogicalVolume* l_plate = new G4LogicalVolume(s_plate,  geometry::Materials::get("Al"), "l_plate", 0, 0);
+        G4LogicalVolume* l_plate_short = new G4LogicalVolume(s_plate_short,  geometry::Materials::get("Al"), "l_plate_short", 0, 0);
         G4VisAttributes* white = new G4VisAttributes(G4Colour(1, 1, 1));
         white->SetForceAuxEdgeVisible(true);
         l_plate->SetVisAttributes(white);
@@ -144,7 +144,7 @@ namespace Belle2 {
         G4VSolid* s_tpcbeam = new G4UnionSolid("s_tpcbeam", s_tpcbeampos, s_tpcbeamneg, 0, G4ThreeVector(0, -2.*dy_tpcbeam, 0));
 
         //create tpc beam volumes
-        G4LogicalVolume* l_tpcbeam = new G4LogicalVolume(s_tpcbeam,  geometry::Materials::get("FG_Epoxy") , "l_tpcbeam", 0, 0);
+        G4LogicalVolume* l_tpcbeam = new G4LogicalVolume(s_tpcbeam,  geometry::Materials::get("FG_Epoxy"), "l_tpcbeam", 0, 0);
 
         //place plate volume
         G4ThreeVector PH1SUSTRpos = G4ThreeVector(
@@ -294,7 +294,7 @@ namespace Belle2 {
         G4VSolid* s_tpcbeamvpos = new G4SubtractionSolid("s_tpcbeamvpos", s_tpcbeamv_a, s_tpcbeamv_b, 0, G4ThreeVector(0, dw_tpcbeam, 0));
         G4VSolid* s_tpcbeamvneg = new G4SubtractionSolid("s_tpcbeamvneg", s_tpcbeamv_a, s_tpcbeamv_b, 0, G4ThreeVector(0, -dw_tpcbeam, 0));
         G4VSolid* s_tpcbeamv = new G4UnionSolid("s_tpcbeamv", s_tpcbeamvpos, s_tpcbeamvneg, 0, G4ThreeVector(0, -2.*dy_tpcbeam, 0));
-        G4LogicalVolume* l_tpcbeamv = new G4LogicalVolume(s_tpcbeamv,  geometry::Materials::get("FG_Epoxy") , "l_tpcbeamv", 0, 0);
+        G4LogicalVolume* l_tpcbeamv = new G4LogicalVolume(s_tpcbeamv,  geometry::Materials::get("FG_Epoxy"), "l_tpcbeamv", 0, 0);
 
         //offset verti
         //G4double offset_v = fabs(76.*CLHEP::cm - 2. * dz_tpcbeamv) / 2.;
@@ -340,7 +340,7 @@ namespace Belle2 {
         G4VSolid* s_tpcbeamhneg = new G4SubtractionSolid("s_tpcbeanhneg", s_tpcbeamh_a, s_tpcbeamh_b, 0, G4ThreeVector(0, -dw_tpcbeam, 0));
         G4VSolid* s_tpcbeamh = new G4UnionSolid("s_tpcbeamh", s_tpcbeamhpos, s_tpcbeamhneg, 0, G4ThreeVector(0, -2.*dy_tpcbeam, 0));
 
-        G4LogicalVolume* l_tpcbeamh = new G4LogicalVolume(s_tpcbeamh,  geometry::Materials::get("FG_Epoxy") , "l_tpcbeamh", 0, 0);
+        G4LogicalVolume* l_tpcbeamh = new G4LogicalVolume(s_tpcbeamh,  geometry::Materials::get("FG_Epoxy"), "l_tpcbeamh", 0, 0);
 
         //place 1st horizontal TPC beam
         G4RotationMatrix* rotY = new G4RotationMatrix();
@@ -391,7 +391,7 @@ namespace Belle2 {
         //G4VSolid* s_csibeamhpos = new G4SubtractionSolid("s_csibeamhpos", s_csibeamh_a, s_csibeamh_b, 0, G4ThreeVector(dw_tpcbeam, 0, 0));
         //G4VSolid* s_csibeamhneg = new G4SubtractionSolid("s_csibeamhneg", s_csibeamh_a, s_csibeamh_b, 0, G4ThreeVector(-dw_tpcbeam, 0, 0));
         G4VSolid* s_csibeamh = new G4UnionSolid("s_csibeamh", s_csibeamhpos, s_csibeamhneg, 0, G4ThreeVector(0, -2.*dy_tpcbeam, 0));
-        G4LogicalVolume* l_csibeamh = new G4LogicalVolume(s_csibeamh,  geometry::Materials::get("FG_Epoxy") , "l_csibeamh", 0, 0);
+        G4LogicalVolume* l_csibeamh = new G4LogicalVolume(s_csibeamh,  geometry::Materials::get("FG_Epoxy"), "l_csibeamh", 0, 0);
         int xdimbase = 0;
         int ydimbase = 0;
         int zdimbase = 0;
@@ -498,7 +498,7 @@ namespace Belle2 {
         G4VSolid* s_csibeamvFneg = new G4SubtractionSolid("s_csibeamvFneg", s_csibeamvF_a, s_csibeamvF_b, 0, G4ThreeVector(0, -dw_tpcbeam,
                                                           0));
         G4VSolid* s_csibeamvF = new G4UnionSolid("s_csibeamvF", s_csibeamvFpos, s_csibeamvFneg, 0, G4ThreeVector(0, -2.*dy_tpcbeam, 0));
-        G4LogicalVolume* l_csibeamvF = new G4LogicalVolume(s_csibeamvF,  geometry::Materials::get("FG_Epoxy") , "l_csibeamvF", 0, 0);
+        G4LogicalVolume* l_csibeamvF = new G4LogicalVolume(s_csibeamvF,  geometry::Materials::get("FG_Epoxy"), "l_csibeamvF", 0, 0);
 
         for (double xcsiBeamvF : activeParams.getArray("xcsiBeamvF", {0})) {
           xcsiBeamvF *= CLHEP::cm;
@@ -529,7 +529,7 @@ namespace Belle2 {
         G4VSolid* s_csibeamvBneg = new G4SubtractionSolid("s_csibeamvBneg", s_csibeamvB_a, s_csibeamvB_b, 0, G4ThreeVector(0, -dw_tpcbeam,
                                                           0));
         G4VSolid* s_csibeamvB = new G4UnionSolid("s_csibeamvB", s_csibeamvBpos, s_csibeamvBneg, 0, G4ThreeVector(0, -2.*dy_tpcbeam, 0));
-        G4LogicalVolume* l_csibeamvB = new G4LogicalVolume(s_csibeamvB,  geometry::Materials::get("FG_Epoxy") , "l_csibeamvB", 0, 0);
+        G4LogicalVolume* l_csibeamvB = new G4LogicalVolume(s_csibeamvB,  geometry::Materials::get("FG_Epoxy"), "l_csibeamvB", 0, 0);
 
         for (double xcsiBeamvB : activeParams.getArray("xcsiBeamvB", {0})) {
           xcsiBeamvB *= CLHEP::cm;
@@ -555,7 +555,7 @@ namespace Belle2 {
         G4VSolid* s_base_a = new G4Box("s_base_a", dx_tpcbeam, dy_tpcbeam, dz_base);
         G4VSolid* s_base_b = new G4Box("s_base_b", dx_tpcbeam - 2.*dw_tpcbeam, dy_tpcbeam - dw_tpcbeam, dz_base);
         G4VSolid* s_base = new G4SubtractionSolid("s_base", s_base_a, s_base_b, 0, G4ThreeVector(0, dw_tpcbeam, 0));
-        G4LogicalVolume* l_base = new G4LogicalVolume(s_base,  geometry::Materials::get("FG_Epoxy") , "l_base", 0, 0);
+        G4LogicalVolume* l_base = new G4LogicalVolume(s_base,  geometry::Materials::get("FG_Epoxy"), "l_base", 0, 0);
 
         for (double xBase : activeParams.getArray("xBase", {0})) {
           xBase *= CLHEP::cm;
@@ -583,7 +583,7 @@ namespace Belle2 {
         G4VSolid* s_bgobeamvpos = new G4SubtractionSolid("s_bgobeamvpos", s_bgobeamv_a, s_bgobeamv_b, 0, G4ThreeVector(0, dw_tpcbeam, 0));
         G4VSolid* s_bgobeamvneg = new G4SubtractionSolid("s_bgobeamvneg", s_bgobeamv_a, s_bgobeamv_b, 0, G4ThreeVector(0, -dw_tpcbeam, 0));
         G4VSolid* s_bgobeamv = new G4UnionSolid("s_bgobeamv", s_bgobeamvpos, s_bgobeamvneg, 0, G4ThreeVector(0, -2.*dy_tpcbeam, 0));
-        G4LogicalVolume* l_bgobeamv = new G4LogicalVolume(s_bgobeamv,  geometry::Materials::get("FG_Epoxy") , "l_bgobeamv", 0, 0);
+        G4LogicalVolume* l_bgobeamv = new G4LogicalVolume(s_bgobeamv,  geometry::Materials::get("FG_Epoxy"), "l_bgobeamv", 0, 0);
 
         for (double xbgoBeamv : activeParams.getArray("xbgoBeamv", {0})) {
           xbgoBeamv *= CLHEP::cm;
@@ -611,7 +611,7 @@ namespace Belle2 {
         G4VSolid* s_bgobeamhpos = new G4SubtractionSolid("s_bgobeamhpos", s_bgobeamh_a, s_bgobeamh_b, 0, G4ThreeVector(0, dw_tpcbeam, 0));
         G4VSolid* s_bgobeamhneg = new G4SubtractionSolid("s_bgobeamhneg", s_bgobeamh_a, s_bgobeamh_b, 0, G4ThreeVector(0, -dw_tpcbeam, 0));
         G4VSolid* s_bgobeamh = new G4UnionSolid("s_bgobeamh", s_bgobeamhpos, s_bgobeamhneg, 0, G4ThreeVector(0, -2.*dy_tpcbeam, 0));
-        G4LogicalVolume* l_bgobeamh = new G4LogicalVolume(s_bgobeamh,  geometry::Materials::get("FG_Epoxy") , "l_bgobeamh", 0, 0);
+        G4LogicalVolume* l_bgobeamh = new G4LogicalVolume(s_bgobeamh,  geometry::Materials::get("FG_Epoxy"), "l_bgobeamh", 0, 0);
 
         for (double xbgoBeamh : activeParams.getArray("xbgoBeamh", {0})) {
           xbgoBeamh *= CLHEP::cm;
@@ -638,7 +638,7 @@ namespace Belle2 {
         G4VSolid* s_bgobeamt_a = new G4Box("s_bgobeamt_a", dx_tpcbeam, dy_tpcbeam, dz_bgobeamt);
         G4VSolid* s_bgobeamt_b = new G4Box("s_bgobeamt_b", dx_tpcbeam - 2.*dw_tpcbeam, dy_tpcbeam - dw_tpcbeam, dz_bgobeamt);
         G4VSolid* s_bgobeamt = new G4SubtractionSolid("s_bgobeamt", s_bgobeamt_a, s_bgobeamt_b, 0, G4ThreeVector(0, dw_tpcbeam, 0));
-        G4LogicalVolume* l_bgobeamt = new G4LogicalVolume(s_bgobeamt,  geometry::Materials::get("FG_Epoxy") , "l_bgobeamt", 0, 0);
+        G4LogicalVolume* l_bgobeamt = new G4LogicalVolume(s_bgobeamt,  geometry::Materials::get("FG_Epoxy"), "l_bgobeamt", 0, 0);
 
         for (double xbgoBeamt : activeParams.getArray("xbgoBeamt", {0})) {
           xbgoBeamt *= CLHEP::cm;
@@ -666,7 +666,7 @@ namespace Belle2 {
         G4VSolid* s_bgobeambpos = new G4SubtractionSolid("s_bgobeambpos", s_bgobeamb_a, s_bgobeamb_b, 0, G4ThreeVector(0, dw_tpcbeam, 0));
         G4VSolid* s_bgobeambneg = new G4SubtractionSolid("s_bgobeambneg", s_bgobeamb_a, s_bgobeamb_b, 0, G4ThreeVector(0, -dw_tpcbeam, 0));
         G4VSolid* s_bgobeamb = new G4UnionSolid("s_bgobeamb", s_bgobeambpos, s_bgobeambneg, 0, G4ThreeVector(0, -2.*dy_tpcbeam, 0));
-        G4LogicalVolume* l_bgobeamb = new G4LogicalVolume(s_bgobeamb,  geometry::Materials::get("FG_Epoxy") , "l_bgobeamb", 0, 0);
+        G4LogicalVolume* l_bgobeamb = new G4LogicalVolume(s_bgobeamb,  geometry::Materials::get("FG_Epoxy"), "l_bgobeamb", 0, 0);
         for (double xbgoBeamb : activeParams.getArray("xbgoBeamb", {0})) {
           xbgoBeamb *= CLHEP::cm;
           xbgobeamb[xdimbgobeamb] = xbgoBeamb - x_offset;
@@ -694,7 +694,7 @@ namespace Belle2 {
         G4VSolid* s_tpcbeambpos = new G4SubtractionSolid("s_tpcbeambpos", s_tpcbeamb_a, s_tpcbeamb_b, 0, G4ThreeVector(0, dw_tpcbeam, 0));
         G4VSolid* s_tpcbeambneg = new G4SubtractionSolid("s_tpcbeambneg", s_tpcbeamb_a, s_tpcbeamb_b, 0, G4ThreeVector(0, -dw_tpcbeam, 0));
         G4VSolid* s_tpcbeamb = new G4UnionSolid("s_tpcbeamb", s_tpcbeambpos, s_tpcbeambneg, 0, G4ThreeVector(0, -2.*dy_tpcbeam, 0));
-        G4LogicalVolume* l_tpcbeamb = new G4LogicalVolume(s_tpcbeamb,  geometry::Materials::get("FG_Epoxy") , "l_tpcbeamb", 0, 0);
+        G4LogicalVolume* l_tpcbeamb = new G4LogicalVolume(s_tpcbeamb,  geometry::Materials::get("FG_Epoxy"), "l_tpcbeamb", 0, 0);
         for (double xtpcBeamb : activeParams.getArray("xtpcBeamb", {0})) {
           xtpcBeamb *= CLHEP::cm;
           xtpcbeamb[xdimtpcbeamb] = xtpcBeamb - x_offset;
@@ -783,7 +783,7 @@ namespace Belle2 {
         G4VSolid* s_fangsbeamhf_b = new G4Box("s_fangsbeamhf_b", dx_tpcbeam - 2.*dw_tpcbeam, dy_tpcbeam - dw_tpcbeam, dz_fangsbeamhf);
         G4VSolid* s_fangsbeamhf = new G4SubtractionSolid("s_fangsbeamhf", s_fangsbeamhf_a, s_fangsbeamhf_b, 0, G4ThreeVector(0, dw_tpcbeam,
                                                          0));
-        G4LogicalVolume* l_fangsbeamhf = new G4LogicalVolume(s_fangsbeamhf,  geometry::Materials::get("FG_Epoxy") , "l_fangsbeamhf", 0, 0);
+        G4LogicalVolume* l_fangsbeamhf = new G4LogicalVolume(s_fangsbeamhf,  geometry::Materials::get("FG_Epoxy"), "l_fangsbeamhf", 0, 0);
         double xfangsbeamhf = activeParams.getLength("xfangsBeamhf") * CLHEP::cm;
         double yfangsbeamhf = activeParams.getLength("yfangsBeamhf") * CLHEP::cm;
         double zfangsbeamhf = activeParams.getLength("zfangsBeamhf") * CLHEP::cm;
@@ -799,7 +799,7 @@ namespace Belle2 {
                                                             -dw_tpcbeam, 0));
         G4VSolid* s_fangsbeamhb = new G4UnionSolid("s_fangsbeamhb", s_fangsbeamhbpos, s_fangsbeamhbneg, 0, G4ThreeVector(0, -2.*dy_tpcbeam,
                                                    0));
-        G4LogicalVolume* l_fangsbeamhb = new G4LogicalVolume(s_fangsbeamhb,  geometry::Materials::get("FG_Epoxy") , "l_fangsbeamhb", 0, 0);
+        G4LogicalVolume* l_fangsbeamhb = new G4LogicalVolume(s_fangsbeamhb,  geometry::Materials::get("FG_Epoxy"), "l_fangsbeamhb", 0, 0);
         double xfangsbeamhb = activeParams.getLength("xfangsBeamhb") * CLHEP::cm;
         double yfangsbeamhb = activeParams.getLength("yfangsBeamhb") * CLHEP::cm;
         double zfangsbeamhb = activeParams.getLength("zfangsBeamhb") * CLHEP::cm;

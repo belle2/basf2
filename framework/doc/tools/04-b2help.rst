@@ -27,6 +27,8 @@ Tools which will provide you help
     :nogroupsections:
 
 
+.. _b2help-variables:
+
 ``b2help-variables``: List available variables in the analysis package
 ----------------------------------------------------------------------
 
@@ -36,3 +38,6 @@ Tools which will provide you help
     :prog: b2help-variables
     :nodefault:
     :nogroupsections:
+
+
+.. include:: ../../../decfiles/doc/decfiles-tools.rstinclude

@@ -59,6 +59,9 @@ class TrackingValidationRun(BrowseTFileOnTerminateRunMixin, ReadOrGenerateTracke
     #: Only works in extended mode
     saveFullTrees = False
 
+    #: List of parameters which should be used as shifter plots (all plots with these x-labels)
+    non_expert_parameters = ['p_{t}']
+
     def preparePathValidation(self, path):
         """The default way to add the validation module to the path.
 
@@ -76,7 +79,7 @@ class TrackingValidationRun(BrowseTFileOnTerminateRunMixin, ReadOrGenerateTracke
                 contact=self.contact,
                 output_file_name=self.output_file_name,
                 expert_level=expert_level
-                )
+            )
         else:
             # Validation module generating plots
             trackingValidationModule = ExpertTrackingValidationModule(
@@ -89,8 +92,11 @@ class TrackingValidationRun(BrowseTFileOnTerminateRunMixin, ReadOrGenerateTracke
                 use_expert_folder=self.use_expert_folder,
                 exclude_profile_mc_parameter=self.exclude_profile_mc_parameter,
                 exclude_profile_pr_parameter=self.exclude_profile_pr_parameter
-                )
+            )
             trackingValidationModule.trackCandidatesColumnName = "RecoTracks"
+
+            # tell the module which are the shifter (aka non-experts) plots
+            trackingValidationModule.non_expert_parameters = self.non_expert_parameters
 
         path.add_module(trackingValidationModule)
 

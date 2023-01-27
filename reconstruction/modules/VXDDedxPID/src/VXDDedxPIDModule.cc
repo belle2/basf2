@@ -15,6 +15,7 @@
 
 #include <genfit/MaterialEffects.h>
 
+#include <Math/VectorUtil.h>
 #include <TH2F.h>
 
 #include <memory>
@@ -25,7 +26,7 @@
 using namespace Belle2;
 using namespace Dedx;
 
-REG_MODULE(VXDDedxPID)
+REG_MODULE(VXDDedxPID);
 
 VXDDedxPIDModule::VXDDedxPIDModule() : Module()
 {
@@ -205,16 +206,16 @@ void VXDDedxPIDModule::event()
         const MCParticle* mother = mcpart->getMother();
         dedxTrack->m_motherPDG = mother ? mother->getPDG() : 0;
 
-        const TVector3 trueMomentum = mcpart->getMomentum();
-        dedxTrack->m_pTrue = trueMomentum.Mag();
+        const ROOT::Math::XYZVector trueMomentum = mcpart->getMomentum();
+        dedxTrack->m_pTrue = trueMomentum.R();
       }
     }
 
     // get momentum (at origin) from fit result
-    const TVector3& trackPos = fitResult->getPosition();
-    const TVector3& trackMom = fitResult->getMomentum();
-    dedxTrack->m_p = trackMom.Mag();
-    dedxTrack->m_cosTheta = trackMom.CosTheta();
+    const ROOT::Math::XYZVector& trackPos = fitResult->getPosition();
+    const ROOT::Math::XYZVector& trackMom = fitResult->getMomentum();
+    dedxTrack->m_p = trackMom.R();
+    dedxTrack->m_cosTheta = cos(trackMom.Theta());
     dedxTrack->m_charge = fitResult->getChargeSign();
 
     // dE/dx values will be calculated using associated RecoTrack
@@ -331,12 +332,12 @@ double VXDDedxPIDModule::getTraversedLength(const PXDCluster* hit, const HelixHe
   static VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   const VXD::SensorInfoBase& sensor = geo.get(hit->getSensorID());
 
-  const TVector3 localPos(hit->getU(), hit->getV(), 0.0); //z-component is height over the center of the detector plane
-  const TVector3& globalPos = sensor.pointToGlobal(localPos);
-  const TVector3& localMomentum = helix->momentum(helix->pathLengthToPoint(globalPos));
+  const ROOT::Math::XYZVector localPos(hit->getU(), hit->getV(), 0.0); //z-component is height over the center of the detector plane
+  const ROOT::Math::XYZVector& globalPos = sensor.pointToGlobal(localPos);
+  const ROOT::Math::XYZVector& localMomentum = helix->momentum(helix->pathLengthToPoint(globalPos));
 
-  const TVector3& sensorNormal = sensor.vectorToGlobal(TVector3(0.0, 0.0, 1.0));
-  const double angle = sensorNormal.Angle(localMomentum); //includes theta and phi components
+  const ROOT::Math::XYZVector& sensorNormal = sensor.vectorToGlobal(ROOT::Math::XYZVector(0.0, 0.0, 1.0));
+  const double angle = ROOT::Math::VectorUtil::Angle(sensorNormal, localMomentum); //includes theta and phi components
 
   //I'm assuming there's only one hit per sensor, there are _very_ rare exceptions to that (most likely curlers)
   return TMath::Min(sensor.getWidth(), sensor.getThickness() / fabs(cos(angle)));
@@ -348,21 +349,21 @@ double VXDDedxPIDModule::getTraversedLength(const SVDCluster* hit, const HelixHe
   static VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   const VXD::SensorInfoBase& sensor = geo.get(hit->getSensorID());
 
-  TVector3 a, b;
+  ROOT::Math::XYZVector a, b;
   if (hit->isUCluster()) {
     const float u = hit->getPosition();
-    a = sensor.pointToGlobal(TVector3(sensor.getBackwardWidth() / sensor.getWidth(0) * u, -0.5 * sensor.getLength(), 0.0));
-    b = sensor.pointToGlobal(TVector3(sensor.getForwardWidth() / sensor.getWidth(0) * u, +0.5 * sensor.getLength(), 0.0));
+    a = sensor.pointToGlobal(ROOT::Math::XYZVector(sensor.getBackwardWidth() / sensor.getWidth(0) * u, -0.5 * sensor.getLength(), 0.0));
+    b = sensor.pointToGlobal(ROOT::Math::XYZVector(sensor.getForwardWidth() / sensor.getWidth(0) * u, +0.5 * sensor.getLength(), 0.0));
   } else {
     const float v = hit->getPosition();
-    a = sensor.pointToGlobal(TVector3(-0.5 * sensor.getWidth(v), v, 0.0));
-    b = sensor.pointToGlobal(TVector3(+0.5 * sensor.getWidth(v), v, 0.0));
+    a = sensor.pointToGlobal(ROOT::Math::XYZVector(-0.5 * sensor.getWidth(v), v, 0.0));
+    b = sensor.pointToGlobal(ROOT::Math::XYZVector(+0.5 * sensor.getWidth(v), v, 0.0));
   }
-  const double pathLength = helix->pathLengthToLine(a, b);
-  const TVector3& localMomentum = helix->momentum(pathLength);
+  const double pathLength = helix->pathLengthToLine(ROOT::Math::XYZVector(a), ROOT::Math::XYZVector(b));
+  const ROOT::Math::XYZVector& localMomentum = helix->momentum(pathLength);
 
-  const TVector3& sensorNormal = sensor.vectorToGlobal(TVector3(0.0, 0.0, 1.0));
-  const double angle = sensorNormal.Angle(localMomentum); //includes theta and phi components
+  const ROOT::Math::XYZVector& sensorNormal = sensor.vectorToGlobal(ROOT::Math::XYZVector(0.0, 0.0, 1.0));
+  const double angle = ROOT::Math::VectorUtil::Angle(sensorNormal, localMomentum); //includes theta and phi components
 
   return TMath::Min(sensor.getWidth(), sensor.getThickness() / fabs(cos(angle)));
 }

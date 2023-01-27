@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
 # Author: The Belle II Collaboration                                     #
@@ -9,169 +6,101 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-##########################################################################
-# Usage: basf2 MadGraph_darkphoton_isr.py 0 (or 1) for ISR Off (or On)
-#
-# MadGraph  Version2.6.1 needed for ISR
-#
-# Example production script using dark model to
-# produce 100 events e+ e- -> gamma A' [->mu+ mu-]
-# in the Belle II labframe at the Y(4S)
-#
-# Setting isr=1 to switch on ISR, otherwise not
-#
-# NOTICE!
-# Please be careful to set the MG parameters listed below, including "mg_el"... "mg_bwcutoff" etc.
-# Especially all these rapidity cuts and minium energy requirements change the cross sections.
-##########################################################################
-
-from basf2 import *
-from beamparameters import add_beamparameters
+import hashlib
 import os
 import subprocess
 
-if len(sys.argv) < 2:
-    print('Please provide ISR parameter')
-    sys.exit()
-if sys.argv[1] == "1":
-    print('ISR is on')
-if sys.argv[1] == "0":
-    print('ISR is off')
+import basf2 as b2
+import pdg
 
-# parameters that can be modified
-isr = int(sys.argv[1])
 
-if isr == 1:
-    mg_lpp1 = '3'
-    mg_lpp2 = '-3'
-else:
-    mg_lpp1 = '0'
-    mg_lpp2 = '0'
+# Check the basf2 location
+basf2_dir = os.environ.get('BELLE2_LOCAL_DIR', os.environ.get('BELLE2_RELEASE_DIR'))
 
-mg_nevents = '100'
+# Generation parameters
+mg_steeringtemplate = f'{basf2_dir}/generators/madgraph/examples/run_darkphoton_isr.steeringtemplate'
+mg_nevents = '1000'
 mg_beamenergy = '10.58/2.'
-mg_generate = 'e+ e- > a ap, ap > mu+ mu-'
-mg_parameter_wap = '0.03102254'
-mg_parameter_map = '1.0e0'
-mg_seed = '1'
-mg_ge = '0.3028177'
-mg_gchi = '0.0'
-mg_el = '0.2'
-mg_ea = '0.2'
-mg_etaa = '3.13'
-mg_etal = '3.13'
-mg_mll = '0.2'
-mg_bwcutoff = '200.'
+b2_seed = b2.get_random_seed().encode('utf-8')
+mg_seed = f'{int(hashlib.sha256(b2_seed).hexdigest(), 16) % 10**8}'
 
-mg_model = \
-    os.path.expandvars('$BELLE2_LOCAL_DIR/generators/madgraph/models/darkphoton'
-                       )
+# Models parameters
+mg_model = f'{basf2_dir}/generators/madgraph/models/Dark_photon_UFO'
+mg_generate = 'e+ e- > a ap, ap > DM DM~'
+mAp = 1.0
+mg_parameter_mAp = str(mAp)
+mg_parameter_mDM = str(mAp / 3.0)
+mg_parameter_gDM = '0.1'
+mg_parameter_kappa = '0.001'
+# this sets the width to 1 keV: switch to 'auto' for allowing MadGraph to compute the width using mAp, mDM and gDM
+mg_parameter_wAp = '0.000001'
 
-# full path to steering template file (full path to model must be inside the template steering file)
-if isr == 1:
-    mg_steeringtemplate = \
-        os.path.expandvars('$BELLE2_LOCAL_DIR/generators/madgraph/examples/run_darkphoton_isr.steeringtemplate'
-                           )
+# Path to output directory
+mg_output = f'Dark_photon_mass_{int(mAp)}_isr'
+if not os.path.exists(mg_output):
+    os.mkdir(mg_output)
 else:
-    mg_steeringtemplate = \
-        os.path.expandvars('$BELLE2_LOCAL_DIR/generators/madgraph/examples/run_darkphoton.steeringtemplate'
-                           )
+    import shutil  # nowa
+    shutil.rmtree(mg_output, ignore_errors=True)
+    os.mkdir(mg_output)
 
-# full path to output directory
-mg_outputdir = \
-    os.path.expandvars('$BELLE2_LOCAL_DIR/generators/madgraph/output/darkphoton_mumu'
-                       )
+# Other stuffs
+mg_externals = 'mg5_aMC'  # MadGraph executable (from the externals)
+mg_steeringfile = f'{mg_output}/run_darkphoton_isr.steering'  # MadGraph steering file (will be created on-the-fly later)
+# MadGraph run_card to be used (param_card is generated automatically)
+mg_runcard = f'{basf2_dir}/generators/madgraph/cards/run_card.dat'
 
-# -------------------------------------------------------
-# no user input needed below this line
+# Write the MadGraph steering file
+mydict = {
+    'MGMODEL': mg_model,
+    'MGGENERATE': mg_generate,
+    'MGOUTPUT': mg_output,
+    'MGRUNDCARD': mg_runcard,
+    'MGBEAMENERGY': mg_beamenergy,
+    'MGNEVENTS': mg_nevents,
+    'MGSEED': mg_seed,
+    'MGPARAMETER_mAp': mg_parameter_mAp,
+    'MGPARAMETER_wAp': mg_parameter_wAp,
+    'MGPARAMETER_mDM': mg_parameter_mDM,
+    'MGPARAMETER_gDM': mg_parameter_gDM,
+    'MGPARAMETER_kappa': mg_parameter_kappa,
+}
+with open(mg_steeringtemplate, 'r') as template:
+    data = template.read()
+    for (key, value) in mydict.items():
+        data = data.replace(key, value)
+steering = open(mg_steeringfile, 'w')
+steering.write(data)
+steering.close()
 
-# full path to MadGraph externals
-mg_externals = 'mg5_aMC'
-
-# full path to steering file (generated automatically, will be overwritten (if existing) or created)
-mg_steeringfile = \
-    os.path.expandvars('$BELLE2_LOCAL_DIR/generators/madgraph/examples/run_darkphoton.steering'
-                       )
-
-# full path to run card (param_card is generated automatically, defaults are overwritten in the steering file)
-mg_runcard = \
-    os.path.expandvars('$BELLE2_LOCAL_DIR/generators/madgraph/cards/run_card.dat'
-                       )
-
-# Replace the output directory and the run card
-mydict = {}
-mydict['MGMODEL'] = mg_model
-mydict['MGOUTPUT'] = mg_outputdir
-mydict['MGRUNDCARD'] = mg_runcard
-mydict['MGNEVENTS'] = mg_nevents
-mydict['MGBEAMENERGY'] = mg_beamenergy
-mydict['MGGENERATE'] = mg_generate
-mydict['MGPARAMETERWAP'] = mg_parameter_wap
-mydict['MGPARAMETERMAP'] = mg_parameter_map
-mydict['MGSEED'] = mg_seed
-mydict['MGlpp1'] = mg_lpp1
-mydict['MGlpp2'] = mg_lpp2
-mydict['MGge'] = mg_ge
-mydict['MGgchi'] = mg_gchi
-mydict['MGel'] = mg_el
-mydict['MGea'] = mg_ea
-mydict['MGetaa'] = mg_etaa
-mydict['MGetal'] = mg_etal
-mydict['MGmll'] = mg_mll
-mydict['MGbwcutoff'] = mg_bwcutoff
-
-fp1 = open(mg_steeringfile, 'w')
-fp2 = open(mg_steeringtemplate, 'r')
-data = fp2.read()
-fp2.close()
-for (key, value) in mydict.items():
-    data = data.replace(key, value)
-fp1.write(data)
-fp1.close()
-
-# run MadGraph
+# Run MadGraph and "gunzip" output file
 subprocess.check_call([mg_externals, mg_steeringfile])
+subprocess.check_call(['gunzip', f'{mg_output}/Events/run_01/unweighted_events.lhe.gz'])
 
-# gunzip the unweighted output file
-subprocess.check_call(['gunzip', mg_outputdir + '/Events/run_01/unweighted_events.lhe.gz'])
+# Run basf2
+pdg.add_particle('Ap', 4900023, mAp, 0.000001, 0, 2)
+pdg.add_particle('DM', 4900101, mAp / 3.0, 0.000001, 0, 1)
+pdg.add_particle('anti-DM', -4900101, mAp / 3.0, 0.000001, 0, 1)
 
+main = b2.Path()
 
-# creating the path for the processing
-set_log_level(LogLevel.ERROR)
+main.add_module('LHEInput',
+                expNum=0,
+                runNum=0,
+                inputFileList=b2.find_file(f'{mg_output}/Events/run_01/unweighted_events.lhe'),
+                makeMaster=True,
+                useWeights=False,
+                nInitialParticles=2,
+                nVirtualParticles=1,
+                wrongSignPz=True)
 
-# creating the path for the processing
-main = create_path()
+main.add_module('BoostMCParticles')
 
-# beam parameters
-beamparameters = add_beamparameters(main, "Y4S")
+main.add_module('SmearPrimaryVertex')
 
-lhereader = register_module('LHEInput')
-lhereader.param('makeMaster', True)
-lhereader.param('inputFileList', [mg_outputdir + '/Events/run_01/unweighted_events.lhe'])
-lhereader.param('useWeights', False)
-lhereader.param('nInitialParticles', 2)
-lhereader.param('nVirtualParticles', 0)
-lhereader.param('boost2Lab', True)
-lhereader.param('wrongSignPz', True)
+main.add_module('Progress')
 
+main.add_module('RootOutput',
+                outputFileName=f'Dark_photon_mass_{int(mAp)}_isr.root')
 
-# Add lhereader module
-main.add_module(lhereader)
-print_params(lhereader)
-
-# Add progress module
-progress = register_module('Progress')
-progress.set_log_level(LogLevel.INFO)
-main.add_module(progress)
-
-# Add rootoutput module
-rootoutput = register_module('RootOutput')
-rootoutput.param('outputFileName', 'LHEReaderMasterOutputDarkMuMu.root')
-main.add_module(rootoutput)
-
-# Add mcparticleprinter module
-main.add_module('PrintMCParticles', logLevel=LogLevel.DEBUG,
-                onlyPrimaries=False)
-
-# Process
-process(main)
+b2.process(main)

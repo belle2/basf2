@@ -88,7 +88,7 @@ namespace Belle2 {
         posU = trackCluster.cluster.posU;
         posV = trackCluster.cluster.posV;
       } else {
-        auto localPoint = Info.pointToLocal(TVector3(tPoint.x, tPoint.y, tPoint.z), true);
+        auto localPoint = Info.pointToLocal(ROOT::Math::XYZVector(tPoint.x, tPoint.y, tPoint.z), true);
         posU = localPoint.X();
         posV = localPoint.Y();
       }
@@ -166,7 +166,7 @@ namespace Belle2 {
     PXDGainMapPar m_gainMap;
 
     /** Track struct for holding required variables */
-    PXD::Track_t track_struct;
+    PXD::Track_t m_track_struct;
     /** Name of the particle list for gain calibration */
     std::string m_PList4GainName = "";
     /** Name of the particle list for efficiency study */

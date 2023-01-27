@@ -23,8 +23,7 @@
 #include <analysis/ContinuumSuppression/FoxWolfram.h>
 #include <analysis/ContinuumSuppression/SphericityEigenvalues.h>
 
-#include <TVector3.h>
-#include <TLorentzVector.h>
+#include <Math/Vector4D.h>
 
 
 using namespace std;
@@ -33,7 +32,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(EventShapeCalculator)
+REG_MODULE(EventShapeCalculator);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -117,9 +116,9 @@ void EventShapeCalculatorModule::event()
   // Calculates thrust and thrust-related quantities
   // --------------------
   if (m_enableThrust) {
-    TVector3 thrust = Thrust::calculateThrust(m_p3List);
-    float thrustVal = thrust.Mag();
-    thrust = (1. / thrustVal) * thrust;
+    ROOT::Math::XYZVector thrust = Thrust::calculateThrust(m_p3List);
+    float thrustVal = thrust.R();
+    thrust = thrust.Unit();
     m_eventShapeContainer->setThrustAxis(thrust);
     m_eventShapeContainer->setThrust(thrustVal);
 
@@ -160,8 +159,8 @@ void EventShapeCalculatorModule::event()
 
     // --- If required, calculates the jet 4-momentum using the thrust axis ---
     if (m_enableJets) {
-      TLorentzVector p4FWD(0., 0., 0., 0.);
-      TLorentzVector p4BKW(0., 0., 0., 0.);
+      ROOT::Math::PxPyPzEVector p4FWD;
+      ROOT::Math::PxPyPzEVector p4BKW;
       for (const auto& p4 : m_p4List) {
         if (p4.Vect().Dot(thrust) > 0)
           p4FWD += p4;
@@ -180,7 +179,7 @@ void EventShapeCalculatorModule::event()
   // --------------------
   if (m_enableCollisionAxis) {
 
-    TVector3 collisionAxis(0., 0., 1.);
+    ROOT::Math::XYZVector collisionAxis(0., 0., 1.);
 
     // --- If required, calculates the cleo cones w/ respect to the collision axis ---
     if (m_enableCleoCones) {
@@ -226,11 +225,11 @@ int EventShapeCalculatorModule::parseParticleLists(vector<string> particleListNa
   if (nParticleLists == 0)
     B2ERROR("No particle lists found. EventShape calculation not performed.");
 
-  // This vector temporary stores the particle objects
+  // This vector temporary stores the mdstSource of particle objects
   // that have been processed so far (not only the momenta)
   // in order to check for duplicates before pushing the 3- and 4- vectors
   // in the corresponding lists
-  std::vector<Particle> tmpParticles;
+  std::vector<int> usedMdstSources;
 
   // Loops over the number of particle lists
   for (unsigned short iList = 0; iList < nParticleLists; iList++) {
@@ -246,20 +245,21 @@ int EventShapeCalculatorModule::parseParticleLists(vector<string> particleListNa
       bool isDuplicate = false;
 
       if (m_checkForDuplicates) {
-        // loops over all the particles loaded so far
-        for (const auto& testPart : tmpParticles) {
-          if (testPart.isCopyOf(part)) {
-            B2WARNING("Duplicate particle found. The new one won't be used for the calculation of the event shape variables. Please, double check your input lists and try to make them mutually exclusive.");
-            isDuplicate = true;
-            break;
-          }
+        int mdstSource = part->getMdstSource();
+
+        auto result = std::find(usedMdstSources.begin(), usedMdstSources.end(), mdstSource);
+        if (result == usedMdstSources.end()) {
+          usedMdstSources.push_back(mdstSource);
+        } else {
+          B2WARNING("Duplicate particle found. The new one won't be used for the calculation of the event shape variables. "
+                    "Please, double check your input lists and try to make them mutually exclusive.");
+          isDuplicate = true;
         }
-        tmpParticles.push_back(*part);
       }
 
       if (!isDuplicate) {
-        TLorentzVector p4CMS = T.rotateLabToCms() * part->get4Vector();
-        // it need to fill an std::vector of TVector3 to use the current FW routines.
+        ROOT::Math::PxPyPzEVector p4CMS = T.rotateLabToCms() * part->get4Vector();
+        // it need to fill an std::vector of XYZVector to use the current FW routines.
         // It will hopefully change in release 3
         m_p4List.push_back(p4CMS);
         m_p3List.push_back(p4CMS.Vect());

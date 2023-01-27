@@ -33,10 +33,10 @@ namespace Belle2 {
   using namespace TOP;
 
   //-----------------------------------------------------------------
-  //                 Register module
+  ///                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPUnpacker)
+  REG_MODULE(TOPUnpacker);
 
   //-----------------------------------------------------------------
   //                 Implementation
@@ -64,6 +64,9 @@ namespace Belle2 {
              "data format as defined in top/include/RawDataTypes.h, 0 = auto detect", 0);
     addParam("addRelations", m_addRelations,
              "if true, make relations to TOPProductionHitDebugs (production debug data format only)", true);
+    addParam("errorSuppressFactor", m_errorSuppressFactor,
+             "error messages suppression factor (0 = no suppression)", (unsigned) 1000);
+
   }
 
   TOPUnpackerModule::~TOPUnpackerModule()
@@ -108,6 +111,14 @@ namespace Belle2 {
 
   void TOPUnpackerModule::event()
   {
+    if (m_resetEventCount) {
+      m_numErrors = m_errorCount;
+      m_errorCount = 0;
+      m_eventCount = 0;
+      m_resetEventCount = false;
+    }
+    m_eventCount++;
+
     // clear output store arrays
     m_digits.clear();
     m_rawDigits.clear();
@@ -178,27 +189,17 @@ namespace Belle2 {
             break;
 
           default:
-            B2ERROR("TOPUnpacker: unknown data format."
-                    << LogVar("Type", (dataFormat >> 8))
-                    << LogVar("Version", (dataFormat & 0xFF)));
-            err = bufferSize;
-
+            if (printTheError()) {
+              B2ERROR("TOPUnpacker: unknown data format, " << getFrontEndName(raw, finesse)
+                      << LogVar("Type", (dataFormat >> 8))
+                      << LogVar("Version", (dataFormat & 0xFF)));
+            }
+            return;
         }
 
-
         if (err != 0) {
-          if (raw.GetMaxNumOfCh(0) <= 4) { // COPPER
-            stringstream copperName;
-            //nodeid format is described on page7 of: https://confluence.desy.de/display/BI/DAQ+WebHome?preview=%2F34029242%2F37487394%2FSetupPocketDAQ_4p1_RawCOPPERDataFormat.pdf
-            copperName << "cpr" << ((raw.GetNodeID(0) >> 24) * 1000 + (raw.GetNodeID(0) & 0x3FF)) << char('a' + finesse);
-            B2ERROR("TOPUnpacker: error in unpacking data from frontend " << copperName.str()
-                    << LogVar("words unused", err)
-                    << LogVar("copper", copperName.str()));
-          } else { // PCIe40
-            int slot = (raw.GetNodeID(0) & 0xF) * 8 - 7 + finesse / 4;
-            std::string name = (slot < 10) ? "s0" : "s";
-            name += std::to_string(slot) + char('a' + finesse % 4);
-            B2ERROR("TOPUnpacker: error in unpacking data from boardstack " << name
+          if (printTheError()) {
+            B2ERROR("TOPUnpacker: error in unpacking data from " << getFrontEndName(raw, finesse)
                     << LogVar("words unused", err));
           }
         }
@@ -206,6 +207,30 @@ namespace Belle2 {
       } // finesse loop
     } // m_rawData loop
 
+  }
+
+
+  std::string TOPUnpackerModule::getFrontEndName(RawTOP& raw, int finesse) const
+  {
+    std::string name;
+    if (raw.GetMaxNumOfCh(0) <= 4) { // COPPER
+      int copper = ((raw.GetNodeID(0) >> 24) * 1000 + (raw.GetNodeID(0) & 0x3FF));
+      name = "frontend cpr" + std::to_string(copper) + char('a' + finesse);
+    } else { // PCIe40
+      int slot = (raw.GetNodeID(0) & 0xF) * 8 - 7 + finesse / 4;
+      name = (slot < 10) ? "boardstack s0" : "boardstack s";
+      name += std::to_string(slot) + char('a' + finesse % 4);
+    }
+    return name;
+  }
+
+
+  bool TOPUnpackerModule::printTheError()
+  {
+    if (m_eventCount < m_errorSuppressFactor * m_numErrors) return false;
+    m_errorCount++;
+    m_resetEventCount = true;
+    return true;
   }
 
 

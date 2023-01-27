@@ -49,7 +49,7 @@ create_validation_histograms(
         (
             "Mreco", 40, 0.08, 0.18,
             "#pi^{0} reconstructed candidates, invariant mass",
-            "Mario Merola <mario.merola@desy.de>; Andrea Selce <selce@infn.it>",
+            "Andrea Selce <selce@infn.it>",
             r"The $\pi^{0}$ invariant mass distribution with $E_{\gamma}>0.05\, \text{GeV}$",
             r"Distribution should be peaking at the nominal $\pi^{0}$ mass.",
             "M(#pi^{0}) [GeV/c^{2}]", "Candidates", "shifter"
@@ -67,7 +67,7 @@ create_validation_histograms(
         (
             "Mmc", 40, 0.08, 0.18,
             "#pi^{0} MC candidates, invariant mass",
-            "Mario Merola <mario.merola@desy.de>; Andrea Selce <selce@infn.it>",
+            "Andrea Selce <selce@infn.it>",
             r"The $\pi^{0}$ invariant mass distribution for truth matched candidates",
             r"Distribution should be peaking at the nominal $\pi^{0}$ mass.",
             "M(#pi^{0}) [GeV/c^{2}]", "Candidates", "shifter"
@@ -76,6 +76,7 @@ create_validation_histograms(
     description=r"$\pi^0$ MC mass distribution",
 )
 
+main.add_module('Progress')
 basf2.process(main)
 print(basf2.statistics)
 
@@ -123,6 +124,7 @@ outputNtuple = ROOT.TNtuple(
     "mean:meanerror:width:widtherror")
 
 
+ROOT.gROOT.SetBatch(True)
 canvas = ROOT.TCanvas("canvas", "pi0 mass fit", 1000, 600)
 canvas.Divide(2, 1)
 canvas.cd(1)
@@ -197,7 +199,7 @@ validation_metadata_update(
     output,
     "pi0_mass",
     title="Pi0 mass fit results",
-    contact="mario.merola@na.infn.it, selce@infn.it",
+    contact="selce@infn.it",
     description="Fit to the invariant mass of the reconstructed and truth matched pi0s",
     check="Consistent numerical fit results. Stable mean and width.",
     metaoptions="shifter")

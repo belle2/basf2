@@ -39,7 +39,7 @@ using namespace std;
 using namespace Belle2;
 
 // Register module in the framework
-REG_MODULE(arichToNtuple)
+REG_MODULE(arichToNtuple);
 
 
 arichToNtupleModule::arichToNtupleModule() :
@@ -145,7 +145,7 @@ void arichToNtupleModule::initialize()
   size_t enumerate = 1;
   for (const string& varStr : m_variables) {
 
-    string branchName = makeROOTCompatible(varStr);
+    string branchName = MakeROOTCompatible::makeROOTCompatible(varStr);
     m_tree->get().Branch(branchName.c_str(), &m_branchAddresses[enumerate], (branchName + "/D").c_str());
 
     // also collection function pointers
@@ -160,7 +160,7 @@ void arichToNtupleModule::initialize()
 
   // add arich related branches
   for (const string& varStr : m_arichVariables) {
-    string branchName = makeROOTCompatible(varStr);
+    string branchName = MakeROOTCompatible::makeROOTCompatible(varStr);
     addARICHBranches(branchName);
   }
 

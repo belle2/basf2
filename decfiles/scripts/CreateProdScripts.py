@@ -365,7 +365,7 @@ class EventType:
 
         # check if the date format is correct
         try:
-            thetime = time.strptime(self.Date(), '%Y%m%d')
+            time.strptime(self.Date(), '%Y%m%d')
         except ValueError:
             logging.error(
                 'In %s, the date format is not correct, it should be YYYYMMDD instead of %s.',
@@ -703,7 +703,7 @@ def writeBkkTable(evttypeid, descriptor, nickname):
     """
 
     global bkk_first, eventid_inbkk
-    TableName = '../doc/table_event.txt'.format(os.environ['DECFILESROOT'])
+    TableName = '../doc/table_event.txt'
     logging.warning(TableName)
     if bkk_first:
         bkk_first = False
@@ -732,7 +732,7 @@ def writeSQLTable(evttypeid, descriptor, nickname):
     """
 
     global sql_first, eventid_insql
-    TableName = '../doc/table_event.sql'.format(os.environ['DECFILESROOT'])
+    TableName = '../doc/table_event.sql'
 
     if sql_first:
         sql_first = False
@@ -759,7 +759,7 @@ def readObsoleteTypeTable():
     Read the table of obsolete events.
     """
 
-    filename = 'doc/table_obsolete.sql'.format(os.environ['DECFILESROOT'])
+    filename = '../doc/table_obsolete.sql'
     global list_of_obsoletes
     try:
         with open(filename, 'rb') as f:
@@ -798,9 +798,9 @@ def run_create(dkfile, remove, python, force):
     eventtype.SetOptionFileName()
 
     # get the first digit of the eventtype
-    AB = eventtype.EventTypeNumber()[0:2]
-    ABX = eventtype.EventTypeNumber()[0:2] + eventtype.E()
-    ABU = eventtype.EventTypeNumber()[0:2] + eventtype.U()
+    eventtype.EventTypeNumber()[0:2]
+    eventtype.EventTypeNumber()[0:2] + eventtype.E()
+    eventtype.EventTypeNumber()[0:2] + eventtype.U()
 
     eventtype.HeaderOptions()
 
@@ -831,91 +831,6 @@ def run_create(dkfile, remove, python, force):
                 '4224, -4224, 4314, -4314, 4324, -4324, 4334, -4334, 4412, -4412, 4414,-4414, 4422, -4422, 4424, -4424, 4432, ' \
                 '-4432, 4434, -4434, 4444, -4444, 14122, -14122,  14124, -14124, 100441'
         eventtype.OptionFile.AddInclusivePIDList(eventtype, pidlist)
-    else:
-        # if Type Signal
-        listing = {  # tau
-                     # Sigma
-                     # Lambda
-                     # Ks
-                     # Xi
-                     # Omega
-            '10': '521, -521, 511, -511, 531, -531, 541, -541, 5122, -5122, 5222, -5222, 5212, -5212, 5112, -5112, 5312, -5312, '
-                  '5322, -5322, 5332, -5332, 5132, -5132, 5232, -5232',
-            '11': '511,-511',
-            '12': '521,-521',
-            '13': '531,-531',
-            '14': '541,-541',
-            '15': '5122,-5122',
-            '19': '521, -521, 511, -511, 531, -531, 541, -541, 5122, -5122, 5332, -5332, 5132, -5132, 5232, -5232',
-            '20': '421, -421, 411, -411, 431, -431, 4122, -4122, 443, 4112, -4112, 4212, -4212, 4222, -4222, 4312, -4312, 4322, '
-                  '-4322, 4332, -4332, 4132, -4132, 4232, -4232, 100443, 441, 10441, 20443, 445, 4214, -4214, 4224, -4224, 4314, '
-                  '-4314, 4324, -4324, 4334, -4334, 4412, -4412, 4414,-4414, 4422, -4422, 4424, -4424, 4432, -4432, 4434, -4434, '
-                  '4444, -4444, 14122, -14122,  14124, -14124, 100441',
-            '21': '411,-411',
-            '22': '421,-421',
-            '23': '431,-431',
-            '24': '443',
-            '25': '4122,-4122',
-            '31': '15,-15',
-            '32': '3222,-3222',
-            '33': '3122,-3122',
-            '34': '310',
-            '35': '3312,-3312',
-            '36': '3334,-3334',
-            '70': '421, -421, 411, -411, 431, -431, 4122, -4122, 443, 4112, -4112, 4212, -4212, 4222, -4222, 4312, -4312, 4322, '
-                  '-4322, 4332, -4332, 4132, -4132, 4232, -4232, 100443, 441, 10441, 20443, 445, 4214, -4214, 4224, -4224, 4314, '
-                  '-4314, 4324, -4324, 4334, -4334, 4412, -4412, 4414,-4414, 4422, -4422, 4424, -4424, 4432, -4432, 4434, -4434, '
-                  '4444, -4444, 14122, -14122,  14124, -14124, 100441',
-            '71': '411,-411',
-            '72': '421,-421',
-            '73': '431,-431',
-            '74': '443',
-            '75': '4122,-4122',
-        }
-        listingExcited = {
-            '270': '413,-413',
-            '271': '423,-423',
-            '272': '433,-433',
-            '273': '435,-435',
-            '274': '425,-425',
-            '275': '415,-415',
-            '276': '10433,-10433',
-            '277': '413,-413',
-            '770': '413,-413',
-            '771': '423,-423',
-            '772': '433,-433',
-            '280': '100443',
-            '281': '9920443',
-            '282': '10443',
-            '283': '10441',
-            '284': '20443',
-            '285': '445',
-            '286': '441',
-            '287': '30443',
-            '180': '553',
-            '181': '100553',
-            '182': '200553',
-            '183': '300553',
-            '184': '9000553',
-            '185': '10551',
-            '186': '20553',
-            '187': '555',
-            '160': '5112,-5112',
-            '161': '5212,-5212',
-            '162': '5222,-5222',
-            '163': '5132,-5132',
-            '164': '5232,-5232',
-            '165': '5332,-5332',
-            '170': '513,-513',
-            '171': '523,-523',
-            '172': '533,-533',
-            '173': '10513,-10513',
-            '174': '10523,-10523',
-            '175': '10533,-10533',
-            '176': '515,-515',
-            '177': '525,-525',
-            '178': '535,-535',
-        }
 
     # Check if exists ParticleTable keyword
     if eventtype.HasParticleTable():

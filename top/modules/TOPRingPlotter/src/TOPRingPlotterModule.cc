@@ -51,7 +51,7 @@ using namespace TOP;
 using namespace Belle2::Variable;
 
 
-REG_MODULE(TOPRingPlotter)
+REG_MODULE(TOPRingPlotter);
 
 TOPRingPlotterModule::TOPRingPlotterModule() : Module()
 {
@@ -307,7 +307,7 @@ void TOPRingPlotterModule::initialize()
   m_branchAddresses.resize(m_variables.size() + 1);
   size_t enumerate = 0;
   for (const std::string& varStr : m_variables) {
-    std::string branchName = makeROOTCompatible(varStr);
+    std::string branchName = MakeROOTCompatible::makeROOTCompatible(varStr);
     m_tree->Branch(branchName.c_str(), &m_branchAddresses[enumerate], (branchName + "/D").c_str());
 
     const Variable::Manager::Var* var = Variable::Manager::Instance().getVariable(varStr);

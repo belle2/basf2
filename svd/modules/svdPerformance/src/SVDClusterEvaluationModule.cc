@@ -11,7 +11,7 @@
 using namespace std;
 using namespace Belle2;
 
-REG_MODULE(SVDClusterEvaluation)
+REG_MODULE(SVDClusterEvaluation);
 
 SVDClusterEvaluationModule::SVDClusterEvaluationModule(): Module()
   , m_interCoor(nullptr)

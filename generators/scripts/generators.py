@@ -14,14 +14,13 @@ in `BELLE2-NOTE-PH-2015-006`_
 .. _BELLE2-NOTE-PH-2015-006: https://docs.belle2.org/record/282
 '''
 
-from basf2 import *
-import os
+import basf2 as b2
 import pdg
 
 
 def get_default_decayfile():
     """Return the default DECAY.dec for Belle2"""
-    return find_file("decfiles/dec/DECAY_BELLE2.DEC")
+    return b2.find_file("decfiles/dec/DECAY_BELLE2.DEC")
 
 
 def add_generator_preselection(
@@ -44,9 +43,9 @@ def add_generator_preselection(
         Adds generator preselection.
         Should be added to the path after the generator.add_abc_generator but before simulation.add_simulation modules
         It uses all particles from the event generator (i.e. primary, non-virtual, non-initial particles).
-        It checks if the required conditions are fullfilled.
+        It checks if the required conditions are fulfilled.
         If not, the events are given to the emptypath.
-        The main usecase is a reduction of simulation time.
+        The main use case is a reduction of simulation time.
         Note that you have to multiply the generated cross section by the retention fraction of the preselection.
 
         Parameters:
@@ -103,6 +102,11 @@ def add_aafh_generator(
         finalstate (str): either "e+e-e+e-", "e+e-mu+mu-", "e+e-tau+tau-", "mu+mu-mu+mu-" or "mu+mu-tau+tau-"
         preselection (bool): if True, select events with at least one medium pt particle in the CDC acceptance
         enableTauDecays (bool): if True, allow tau leptons to decay (using EvtGen)
+        minmass (float): minimum invariant mass
+        subweights (list(float)): list of four or eight values (first four are interpreted as WAP, rest as WBP)
+                                  which specify the relative weights for each of the four sub generators
+        maxsubweight (float): maximum expected subgenerator weight for rejection scheme
+        maxfinalweight (float): maximum expected final weight for rejection scheme
     """
 
     if finalstate == 'e+e-e+e-':
@@ -112,7 +116,7 @@ def add_aafh_generator(
         else:
             aafh_subgeneratorWeights = subweights
         if abs(minmass - 0.5) > 0.01 and not subweights:
-            B2WARNING("add_aafh_generator: non default invariant mass cut without updated subweights requested!")
+            b2.B2WARNING("add_aafh_generator: non default invariant mass cut without updated subweights requested!")
     elif finalstate == 'e+e-mu+mu-':
         aafh_mode = 3
         if not subweights:  # default subweights are for minmass=0.5
@@ -120,17 +124,16 @@ def add_aafh_generator(
         else:
             aafh_subgeneratorWeights = subweights
         if abs(minmass - 0.5) > 0.01 and not subweights:
-            B2WARNING("add_aafh_generator: non default invariant mass cut without updated subweights requested!")
+            b2.B2WARNING("add_aafh_generator: non default invariant mass cut without updated subweights requested!")
     elif finalstate == 'e+e-tau+tau-':
         aafh_mode = 4
-        particle = 'tau-'
         minmass = 0
         if not subweights:
             aafh_subgeneratorWeights = [1.000e+00, 2.214e+00, 1.202e+01, 1.536e+01, 1.000e+00, 1.664e+00, 1.680e+01, 6.934e+00]
         else:
             aafh_subgeneratorWeights = subweights
         if preselection:
-            B2WARNING(
+            b2.B2WARNING(
                 f"You requested a generator preselection for the final state {finalstate}: "
                 "please consider to remove it, since the cross section is small.")
     elif finalstate == 'mu+mu-mu+mu-':
@@ -142,12 +145,11 @@ def add_aafh_generator(
         else:
             aafh_subgeneratorWeights = subweights
         if preselection:
-            B2WARNING(
+            b2.B2WARNING(
                 f"You requested a generator preselection for the final state {finalstate}: "
                 "please consider to remove it, since the cross section is small.")
     elif finalstate == 'mu+mu-tau+tau-':
         aafh_mode = 1
-        particle = 'tau-'
         minmass = 0
         maxsubweight = 3
         if not subweights:
@@ -155,13 +157,13 @@ def add_aafh_generator(
         else:
             aafh_subgeneratorWeights = subweights
         if preselection:
-            B2WARNING(
+            b2.B2WARNING(
                 f"You requested a generator preselection for the final state {finalstate}: "
                 "please consider to remove it, since the cross section is small.")
     elif finalstate == 'tau+tau-tau+tau-':
-        B2FATAL(f"AAFH is not able to generate the {finalstate} final state. Please use KoralW instead.")
+        b2.B2FATAL(f"AAFH is not able to generate the {finalstate} final state. Please use KoralW instead.")
     else:
-        B2FATAL(f"add_aafh_generator final state not supported: {finalstate}")
+        b2.B2FATAL(f"add_aafh_generator final state not supported: {finalstate}")
 
     aafh_maxSubgeneratorWeight = maxsubweight
     aafh_maxFinalWeight = maxfinalweight
@@ -178,7 +180,7 @@ def add_aafh_generator(
     )
 
     if preselection:
-        generator_emptypath = create_path()
+        generator_emptypath = b2.create_path()
         add_generator_preselection(
             path=path,
             emptypath=generator_emptypath,
@@ -191,7 +193,7 @@ def add_aafh_generator(
         if enableTauDecays:
             path.add_module('EvtGenDecay')
         else:
-            B2WARNING("The tau decays will not be generated.")
+            b2.B2WARNING("The tau decays will not be generated.")
 
 
 def add_kkmc_generator(path, finalstate='', signalconfigfile='', useTauolaBelle=False, tauinputfile=''):
@@ -211,52 +213,52 @@ def add_kkmc_generator(path, finalstate='', signalconfigfile='', useTauolaBelle=
     """
 
     #: kkmc input file
-    kkmc_inputfile = find_file('data/generators/kkmc/tauola_bbb.input.dat')
+    kkmc_inputfile = b2.find_file('data/generators/kkmc/tauola_bbb.input.dat')
 
     #: kkmc file that will hold cross section and other information
     kkmc_logfile = 'kkmc_tautau.txt'
 
     #: kkmc configuration file, should be fine as is
-    kkmc_config = find_file('data/generators/kkmc/KK2f_defaults.dat')
+    kkmc_config = b2.find_file('data/generators/kkmc/KK2f_defaults.dat')
 
     #: tau config file (empty for generic mu-mu+ and tau-tau+ with TauolaBelle2)
     kkmc_tauconfigfile = ''
 
     if finalstate == 'tau+tau-':
-        B2WARNING("add_kkmc_generator: please set finalstate as 'tau-tau+'. 'tau+tau-' will be deprecated in the future"
-                  " for consistency in the configuration files.")
+        b2.B2WARNING("add_kkmc_generator: please set finalstate as 'tau-tau+'. 'tau+tau-' will be deprecated in the future"
+                     " for consistency in the configuration files.")
         finalstate = 'tau-tau+'
     if finalstate == 'mu+mu-':
-        B2WARNING("add_kkmc_generator: please set finalstate as 'mu-mu+'. 'mu+mu-' will be deprecated in the future for"
-                  " consistency in the configuration files.")
+        b2.B2WARNING("add_kkmc_generator: please set finalstate as 'mu-mu+'. 'mu+mu-' will be deprecated in the future for"
+                     " consistency in the configuration files.")
         finalstate = 'mu-mu+'
 
     if finalstate == 'tau-tau+':
         if useTauolaBelle:
-            B2INFO("Generating tau pair events with TauolaBelle")
+            b2.B2INFO("Generating tau pair events with TauolaBelle")
             #: If TauolaBelle, the tau decay must be controlled by Pythia flags
-            kkmc_inputfile = find_file('data/generators/kkmc/tau.input.dat')
-            kkmc_tauconfigfile = find_file('data/generators/kkmc/tau_decaytable.dat')
+            kkmc_inputfile = b2.find_file('data/generators/kkmc/tau.input.dat')
+            kkmc_tauconfigfile = b2.find_file('data/generators/kkmc/tau_decaytable.dat')
         #: Check if there is a signal decfile provided by the user
         if not signalconfigfile == '':
-            B2INFO(f"Using config file defined by user: {signalconfigfile}")
+            b2.B2INFO(f"Using config file defined by user: {signalconfigfile}")
             if useTauolaBelle:
-                kkmc_tauconfigfile = find_file(signalconfigfile)
+                kkmc_tauconfigfile = b2.find_file(signalconfigfile)
             else:
-                kkmc_inputfile = find_file(signalconfigfile)
+                kkmc_inputfile = b2.find_file(signalconfigfile)
         #: Check if there is a tauinputfile to override KK2f_defaults. Only [sometimes] needed when using TauolaBelle.
         if not tauinputfile == '':
-            kkmc_inputfile = find_file(tauinputfile)
+            kkmc_inputfile = b2.find_file(tauinputfile)
 
     elif finalstate == 'mu-mu+':
-        kkmc_inputfile = find_file('data/generators/kkmc/mu.input.dat')
+        kkmc_inputfile = b2.find_file('data/generators/kkmc/mu.input.dat')
         kkmc_logfile = 'kkmc_mumu.txt'
 
     else:
-        B2FATAL("add_kkmc_generator final state not supported: {}".format(finalstate))
+        b2.B2FATAL("add_kkmc_generator final state not supported: {}".format(finalstate))
 
     # use KKMC to generate lepton pairs
-    kkgeninput = path.add_module(
+    path.add_module(
         'KKGenInput',
         tauinputFile=kkmc_inputfile,
         KKdefaultFile=kkmc_config,
@@ -271,61 +273,64 @@ def add_evtgen_generator(path, finalstate='', signaldecfile=None, coherentMixing
 
     Parameters:
         path (basf2.Path): path where the generator should be added
-        finalstate (str): Either "charged" for B+/B- or "mixed" for B0/anti-B0
+        finalstate (str): Either "charged" for generation of generic B+/B-, "mixed" for generic B0/anti-B0, or "signal" for
+                          generation of user-defined signal mode
+        signaldecfile (str): path to decfile which defines the signal decay to be generated
+                             (only needed if ``finalstate`` set to "signal")
         coherentMixing: Either True or False. Switches on or off the coherent decay of the B0-B0bar pair.
-                        It should always be True,  unless you are generating Y(5,6S) -> BBar. In the latter case,
-                        setting it False solves the interla limiation of Evtgen that allows to make a
+                        It should always be True, unless you are generating Y(5,6S) -> BBar. In the latter case,
+                        setting it False solves the internal limitation of Evtgen that allows to make a
                         coherent decay only starting from the Y(4S).
         parentParticle (str): initial state (used only if it is not Upsilon(4S).
     """
-    evtgen_userdecfile = find_file('data/generators/evtgen/charged.dec')
+    evtgen_userdecfile = b2.find_file('data/generators/evtgen/charged.dec')
 
     if parentParticle != 'Upsilon(3S)' and parentParticle != 'Upsilon(4S)'\
             and parentParticle != 'Upsilon(5S)' and parentParticle != 'Upsilon(6S)':
-        B2FATAL("add_evtgen_generator initial state not supported: {}".format(parentParticle))
+        b2.B2FATAL("add_evtgen_generator initial state not supported: {}".format(parentParticle))
 
     if finalstate == 'charged':
         pass
     elif finalstate == 'mixed':
-        evtgen_userdecfile = find_file('data/generators/evtgen/mixed.dec')
+        evtgen_userdecfile = b2.find_file('data/generators/evtgen/mixed.dec')
     elif finalstate == 'signal':
         evtgen_userdecfile = signaldecfile
     else:
-        B2FATAL("add_evtgen_generator final state not supported: {}".format(finalstate))
+        b2.B2FATAL("add_evtgen_generator final state not supported: {}".format(finalstate))
 
     if signaldecfile and finalstate in ['charged', 'mixed']:
-        B2WARNING("ignoring decfile: {}".format(signaldecfile))
+        b2.B2WARNING("ignoring decfile: {}".format(signaldecfile))
 
     # use EvtGen
     if parentParticle == 'Upsilon(3S)':
         if finalstate != 'signal':
-            B2FATAL("add_evtgen_generator initial state {} is supported only with 'signal' final state".format(parentParticle))
+            b2.B2FATAL("add_evtgen_generator initial state {} is supported only with 'signal' final state".format(parentParticle))
         if coherentMixing:
             coherentMixing = False
-            B2WARNING("add_evtgen_generator initial state {} has no BB mixing, now switching coherentMixing OFF"
-                      .format(parentParticle))
+            b2.B2WARNING("add_evtgen_generator initial state {} has no BB mixing, now switching coherentMixing OFF"
+                         .format(parentParticle))
 
     if parentParticle == 'Upsilon(5S)':
         if finalstate != 'signal':
-            B2FATAL("add_evtgen_generator initial state {} is supported only with 'signal' final state".format(parentParticle))
+            b2.B2FATAL("add_evtgen_generator initial state {} is supported only with 'signal' final state".format(parentParticle))
         if coherentMixing:
             coherentMixing = False
-            B2WARNING(
+            b2.B2WARNING(
                 "add_evtgen_generator initial state {} is supported only with false coherentMixing, now switching it OFF"
                 .format(parentParticle))
-        pdg.load(find_file('decfiles/dec/Y5S.pdl'))
+        pdg.load(b2.find_file('decfiles/dec/Y5S.pdl'))
 
     if parentParticle == 'Upsilon(6S)':
         if finalstate != 'signal':
-            B2FATAL("add_evtgen_generator initial state {} is supported only with 'signal' final state".format(parentParticle))
+            b2.B2FATAL("add_evtgen_generator initial state {} is supported only with 'signal' final state".format(parentParticle))
         if coherentMixing:
             coherentMixing = False
-            B2WARNING(
+            b2.B2WARNING(
                 "add_evtgen_generator initial state {} is supported only with false coherentMixing, now switching it OFF"
                 .format(parentParticle))
-        pdg.load(find_file('decfiles/dec/Y6S.pdl'))
+        pdg.load(b2.find_file('decfiles/dec/Y6S.pdl'))
 
-    evtgen = path.add_module(
+    path.add_module(
         'EvtGenInput',
         userDECFile=evtgen_userdecfile,
         CoherentMixing=coherentMixing,
@@ -349,24 +354,24 @@ def add_continuum_generator(path, finalstate, userdecfile='', *, skip_on_failure
     """
 
     #: kkmc input file, one for each qqbar mode
-    kkmc_inputfile = find_file('data/generators/kkmc/uubar_nohadronization.input.dat')
+    kkmc_inputfile = b2.find_file('data/generators/kkmc/uubar_nohadronization.input.dat')
 
     #: kkmc file that will hold cross section and other information
     kkmc_logfile = 'kkmc_uubar.txt'
 
     #: pythia configuration, different for ccbar
-    pythia_config = find_file('data/generators/modules/fragmentation/pythia_belle2.dat')
+    pythia_config = b2.find_file('data/generators/modules/fragmentation/pythia_belle2.dat')
 
     #: user decay file
-    decay_user = find_file('data/generators/modules/fragmentation/dec_belle2_qqbar.dec')
+    decay_user = b2.find_file('data/generators/modules/fragmentation/dec_belle2_qqbar.dec')
     if userdecfile == '':
         pass
     else:
-        B2INFO('Replacing default user decfile: {}'.format(userdecfile))
+        b2.B2INFO('Replacing default user decfile: {}'.format(userdecfile))
         decay_user = userdecfile
 
     #: kkmc configuration file, should be fine as is
-    kkmc_config = find_file('data/generators/kkmc/KK2f_defaults.dat')
+    kkmc_config = b2.find_file('data/generators/kkmc/KK2f_defaults.dat')
 
     #: global decay file
     decay_file = get_default_decayfile()
@@ -374,20 +379,20 @@ def add_continuum_generator(path, finalstate, userdecfile='', *, skip_on_failure
     if finalstate == 'uubar':
         pass
     elif finalstate == 'ddbar':
-        kkmc_inputfile = find_file('data/generators/kkmc/ddbar_nohadronization.input.dat')
+        kkmc_inputfile = b2.find_file('data/generators/kkmc/ddbar_nohadronization.input.dat')
         kkmc_logfile = 'kkmc_ddbar.txt'
     elif finalstate == 'ssbar':
-        kkmc_inputfile = find_file('data/generators/kkmc/ssbar_nohadronization.input.dat')
+        kkmc_inputfile = b2.find_file('data/generators/kkmc/ssbar_nohadronization.input.dat')
         kkmc_logfile = 'kkmc_ssbar.txt'
     elif finalstate == 'ccbar':
-        kkmc_inputfile = find_file('data/generators/kkmc/ccbar_nohadronization.input.dat')
-        pythia_config = find_file('data/generators/modules/fragmentation/pythia_belle2_charm.dat')
+        kkmc_inputfile = b2.find_file('data/generators/kkmc/ccbar_nohadronization.input.dat')
+        pythia_config = b2.find_file('data/generators/modules/fragmentation/pythia_belle2_charm.dat')
         kkmc_logfile = 'kkmc_ccbar.txt'
     else:
-        B2FATAL("add_continuum_generator final state not supported: {}".format(finalstate))
+        b2.B2FATAL("add_continuum_generator final state not supported: {}".format(finalstate))
 
     # use KKMC to generate qqbar events (no fragmentation at this stage)
-    kkgeninput = path.add_module(
+    path.add_module(
         'KKGenInput',
         tauinputFile=kkmc_inputfile,
         KKdefaultFile=kkmc_config,
@@ -409,7 +414,7 @@ def add_continuum_generator(path, finalstate, userdecfile='', *, skip_on_failure
     if skip_on_failure:
         # branch to an empty path if PYTHIA failed, this will change the number of events
         # but the file meta data will contain the total number of generated events
-        generator_emptypath = create_path()
+        generator_emptypath = b2.create_path()
         fragmentation.if_value('<1', generator_emptypath)
 
 
@@ -431,6 +436,7 @@ def add_inclusive_continuum_generator(path, finalstate, particles, userdecfile='
         `add_continuum_generator()` to add continuum generation without preselection
 
     Parameters:
+        path (basf2.Path): path to which the generator should be added
         finalstate (str): uubar, ddbar, ssbar, ccbar
         particles (list): A list of particle names or pdg codes. An event is
            only accepted if at lease one of those particles appears in the event.
@@ -442,7 +448,7 @@ def add_inclusive_continuum_generator(path, finalstate, particles, userdecfile='
             `FATAL <LogLevel.FATAL>` error so for rare particles one might need a
             larger number.
     """
-    loop_path = create_path()
+    loop_path = b2.create_path()
     # we might run this more than once so make sure we remove any particles
     # before generating new ones
     loop_path.add_module("PruneDataStore", keepMatchedEntries=False, matchEntries=["MCParticles"])
@@ -466,7 +472,7 @@ def add_bhwide_generator(path, minangle=0.5):
     """
 
     if minangle < 0.0 or minangle > 180.0:
-        B2FATAL("add_bhwide_generator minimum angle too small (<0.0) or too large (>180): {}".format(minangle))
+        b2.B2FATAL("add_bhwide_generator minimum angle too small (<0.0) or too large (>180): {}".format(minangle))
 
     bhwide = path.add_module("BHWideInput")
     bhwide.param('ScatteringAngleRangePositron', [minangle, 180.0 - minangle])
@@ -495,8 +501,8 @@ def add_babayaganlo_generator(path, finalstate='', minenergy=0.01, minangle=10.0
     babayaganlo = path.add_module('BabayagaNLOInput')
 
     if not (fmax == -1.0):
-        B2WARNING(f'The BabayagaNLOInput parameter "FMax" will be set to {fmax} instead to the default value (-1.0). '
-                  'Please do not do this, unless you are extremely sure about this choice.')
+        b2.B2WARNING(f'The BabayagaNLOInput parameter "FMax" will be set to {fmax} instead to the default value (-1.0). '
+                     'Please do not do this, unless you are extremely sure about this choice.')
 
     if finalstate == 'ee':
         babayaganlo.param('FinalState', 'ee')
@@ -511,26 +517,26 @@ def add_babayaganlo_generator(path, finalstate='', minenergy=0.01, minangle=10.0
         babayaganlo.param('FMax', fmax)
 
     else:
-        B2FATAL(f'add_babayaganlo_generator final state not supported: {finalstate}')
+        b2.B2FATAL(f'add_babayaganlo_generator final state not supported: {finalstate}')
 
     if generateInECLAcceptance:
-        B2INFO(f'The final state {finalstate} is preselected requiring both primary particles within the ECL acceptance.')
-        emptypath = Path()
+        b2.B2INFO(f'The final state {finalstate} is preselected requiring both primary particles within the ECL acceptance.')
+        emptypath = b2.Path()
         add_generator_preselection(path=path,
                                    emptypath=emptypath,
                                    applyInCMS=False)
         if finalstate == 'ee':
-            set_module_parameters(path=path,
-                                  name='GeneratorPreselection',
-                                  nChargedMin=2,
-                                  MinChargedTheta=12.4,
-                                  MaxChargedTheta=155.1,)
+            b2.set_module_parameters(path=path,
+                                     name='GeneratorPreselection',
+                                     nChargedMin=2,
+                                     MinChargedTheta=12.4,
+                                     MaxChargedTheta=155.1,)
         elif finalstate == 'gg':
-            set_module_parameters(path=path,
-                                  name='GeneratorPreselection',
-                                  nPhotonMin=2,
-                                  MinPhotonTheta=12.4,
-                                  MaxPhotonTheta=155.1)
+            b2.set_module_parameters(path=path,
+                                     name='GeneratorPreselection',
+                                     nPhotonMin=2,
+                                     MinPhotonTheta=12.4,
+                                     MaxPhotonTheta=155.1)
 
 
 def add_phokhara_generator(path, finalstate=''):
@@ -563,7 +569,7 @@ def add_phokhara_generator(path, finalstate=''):
         phokhara.param('NLO', 0)  # no two loop corrections
         phokhara.param('QED', 0)  # use ISR only, no FSR, no interference
     else:
-        B2FATAL("add_phokhara_generator final state not supported: {}".format(finalstate))
+        b2.B2FATAL("add_phokhara_generator final state not supported: {}".format(finalstate))
 
 
 def add_phokhara_evtgen_combination(
@@ -584,6 +590,7 @@ def add_phokhara_evtgen_combination(
             it does not depend on subsequent J/psi or eta_c decays.
         user_decay_file (str): Name of EvtGen user decay file. The initial
             particle must be the virtual photon (vpho).
+        beam_energy_spread (bool): whether beam energy spread should be simulated
     """
 
     import pdg
@@ -662,19 +669,19 @@ def add_koralw_generator(path, finalstate='', enableTauDecays=True):
 
     decayFile = ''
     if finalstate == 'e+e-e+e-':
-        decayFile = find_file('data/generators/koralw/KoralW_eeee.data')
+        decayFile = b2.find_file('data/generators/koralw/KoralW_eeee.data')
     elif finalstate == 'e+e-mu+mu-':
-        decayFile = find_file('data/generators/koralw/KoralW_eeMuMu.data')
+        decayFile = b2.find_file('data/generators/koralw/KoralW_eeMuMu.data')
     elif finalstate == 'e+e-tau+tau-':
-        decayFile = find_file('data/generators/koralw/KoralW_eeTauTau.data')
+        decayFile = b2.find_file('data/generators/koralw/KoralW_eeTauTau.data')
     elif finalstate == 'mu+mu-mu+mu-':
-        decayFile = find_file('data/generators/koralw/KoralW_MuMuMuMu.data')
+        decayFile = b2.find_file('data/generators/koralw/KoralW_MuMuMuMu.data')
     elif finalstate == 'mu+mu-tau+tau-':
-        decayFile = find_file('data/generators/koralw/KoralW_MuMuTauTau.data')
+        decayFile = b2.find_file('data/generators/koralw/KoralW_MuMuTauTau.data')
     elif finalstate == 'tau+tau-tau+tau-':
-        decayFile = find_file('data/generators/koralw/KoralW_TauTauTauTau.data')
+        decayFile = b2.find_file('data/generators/koralw/KoralW_TauTauTauTau.data')
     else:
-        B2FATAL(f'add_koralw_generator final state not supported: {finalstate}')
+        b2.B2FATAL(f'add_koralw_generator final state not supported: {finalstate}')
 
     path.add_module('KoralWInput',
                     UserDataFile=decayFile)
@@ -683,7 +690,7 @@ def add_koralw_generator(path, finalstate='', enableTauDecays=True):
         if enableTauDecays:
             path.add_module('EvtGenDecay')
         else:
-            B2WARNING('The tau decays will not be generated.')
+            b2.B2WARNING('The tau decays will not be generated.')
 
 
 def add_cosmics_generator(path, components=None,
@@ -719,7 +726,7 @@ def add_cosmics_generator(path, components=None,
             (assuming PMT is put at -z of the counter).
     """
 
-    B2FATAL('''The function "add_cosmics_generator()" is outdated and it is currently not working: please replace
+    b2.B2FATAL('''The function "add_cosmics_generator()" is outdated and it is currently not working: please replace
 
   add_cosmics_generator(path=path)
 
@@ -741,8 +748,8 @@ in your steering file (the module parameter "acceptance" has to be set, see the 
     cosmics_setup.set_cdc_cr_parameters(data_taking_period)
 
     if cosmics_setup.cosmics_period == "201607":
-        B2FATAL("The data taking period 201607 is very special (geometry setup, PMTs etc). This is not handled "
-                "by this script! Please ask the CDC group, if you want to simulate this.")
+        b2.B2FATAL("The data taking period 201607 is very special (geometry setup, PMTs etc). This is not handled "
+                   "by this script! Please ask the CDC group, if you want to simulate this.")
 
     if 'Gearbox' not in path:
         override = [("/Global/length", str(global_box_size[0]), "m"),
@@ -763,10 +770,10 @@ in your steering file (the module parameter "acceptance" has to be set, see the 
     cry = path.add_module('CRYInput')
 
     # cosmic data input
-    cry.param('CosmicDataDir', find_file(cosmics_data_dir))
+    cry.param('CosmicDataDir', b2.find_file(cosmics_data_dir))
 
     # user input file
-    cry.param('SetupFile', find_file(setup_file))
+    cry.param('SetupFile', b2.find_file(setup_file))
 
     # acceptance half-lengths - at least one particle has to enter that box to use that event
     cry.param('acceptLength', accept_box[0])
@@ -786,22 +793,22 @@ in your steering file (the module parameter "acceptance" has to be set, see the 
     # TODO: I still do not fully understand, when the cosmics selector is needed and when not
     if cosmics_setup.cosmics_period not in ["normal", "gcr2017"]:
         # Selector module.
-        cosmics_selector = register_module('CDCCosmicSelector',
-                                           lOfCounter=cosmics_setup.lengthOfCounter,
-                                           wOfCounter=cosmics_setup.widthOfCounter,
-                                           xOfCounter=cosmics_setup.triggerPos[0],
-                                           yOfCounter=cosmics_setup.triggerPos[1],
-                                           zOfCounter=cosmics_setup.triggerPos[2],
-                                           phiOfCounter=0.,
-                                           TOP=top_in_counter,
-                                           propSpeed=cosmics_setup.lightPropSpeed,
-                                           TOF=1,
-                                           cryGenerator=True
-                                           )
+        cosmics_selector = b2.register_module('CDCCosmicSelector',
+                                              lOfCounter=cosmics_setup.lengthOfCounter,
+                                              wOfCounter=cosmics_setup.widthOfCounter,
+                                              xOfCounter=cosmics_setup.triggerPos[0],
+                                              yOfCounter=cosmics_setup.triggerPos[1],
+                                              zOfCounter=cosmics_setup.triggerPos[2],
+                                              phiOfCounter=0.,
+                                              TOP=top_in_counter,
+                                              propSpeed=cosmics_setup.lightPropSpeed,
+                                              TOF=1,
+                                              cryGenerator=True
+                                              )
 
         path.add_module(cosmics_selector)
 
-        empty_path = create_path()
+        empty_path = b2.create_path()
         cosmics_selector.if_false(empty_path)
 
 
@@ -816,22 +823,22 @@ def add_treps_generator(path, finalstate='', useDiscreteAndSortedW=False):
     """
 
     if finalstate == 'e+e-pi+pi-':
-        parameterFile = find_file('generators/treps/data/parameterFiles/treps_par_pipi.dat')
-        differentialCrossSectionFile = find_file('generators/treps/data/differentialCrossSectionFiles/pipidcs.dat')
-        wListTableFile = find_file('generators/treps/data/wListFiles/wlist_table_pipi.dat')
+        parameterFile = b2.find_file('generators/treps/data/parameterFiles/treps_par_pipi.dat')
+        differentialCrossSectionFile = b2.find_file('generators/treps/data/differentialCrossSectionFiles/pipidcs.dat')
+        wListTableFile = b2.find_file('generators/treps/data/wListFiles/wlist_table_pipi.dat')
     elif finalstate == 'e+e-K+K-':
-        parameterFile = find_file('generators/treps/data/parameterFiles/treps_par_kk.dat')
-        differentialCrossSectionFile = find_file('generators/treps/data/differentialCrossSectionFiles/kkdcs.dat')
-        wListTableFile = find_file('generators/treps/data/wListFiles/wlist_table_kk.dat')
+        parameterFile = b2.find_file('generators/treps/data/parameterFiles/treps_par_kk.dat')
+        differentialCrossSectionFile = b2.find_file('generators/treps/data/differentialCrossSectionFiles/kkdcs.dat')
+        wListTableFile = b2.find_file('generators/treps/data/wListFiles/wlist_table_kk.dat')
     elif finalstate == 'e+e-ppbar':
-        parameterFile = find_file('generators/treps/data/parameterFiles/treps_par_ppbar.dat')
-        differentialCrossSectionFile = find_file('generators/treps/data/differentialCrossSectionFiles/ppbardcs.dat')
-        wListTableFile = find_file('generators/treps/data/wListFiles/wlist_table_ppbar.dat')
+        parameterFile = b2.find_file('generators/treps/data/parameterFiles/treps_par_ppbar.dat')
+        differentialCrossSectionFile = b2.find_file('generators/treps/data/differentialCrossSectionFiles/ppbardcs.dat')
+        wListTableFile = b2.find_file('generators/treps/data/wListFiles/wlist_table_ppbar.dat')
     else:
-        B2FATAL("add_treps_generator final state not supported: {}".format(finalstate))
+        b2.B2FATAL("add_treps_generator final state not supported: {}".format(finalstate))
 
     # use TREPS to generate two-photon events.
-    trepsinput = path.add_module(
+    path.add_module(
         'TrepsInput',
         ParameterFile=parameterFile,
         DifferentialCrossSectionFile=differentialCrossSectionFile,

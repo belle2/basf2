@@ -54,6 +54,17 @@ CalibrationAlgorithm::EResult PXDAnalyticGainCalibrationAlgorithm::calibrate()
   // Get counter histograms
   auto cluster_counter = getObjectPtr<TH1I>("PXDClusterCounter");
 
+  // Check if there is any PXD cluster
+  if (cluster_counter == nullptr) {
+    B2WARNING("No PXD cluster reconstructed!");
+    if (not forceContinue)
+      return c_NotEnoughData;
+    else {
+      B2WARNING("Skip processing.");
+      return c_OK;
+    }
+  }
+
   // Extract number of sensors from counter histograms
   auto nSensors = getNumberOfSensors(cluster_counter);
 
@@ -66,12 +77,12 @@ CalibrationAlgorithm::EResult PXDAnalyticGainCalibrationAlgorithm::calibrate()
   if (cluster_counter->GetEntries() < int(safetyFactor * minClusters * nSensors * nBinsU * nBinsV)) {
     if (not forceContinue) {
       B2WARNING("Not enough Data: Only " <<  cluster_counter->GetEntries() << " hits were collected but " << int(
-                  safetyFactor * minClusters *
+                  safetyFactor * minClusters*
                   nSensors * nBinsU * nBinsV) << " needed!");
       return c_NotEnoughData;
     } else {
       B2WARNING("Continue despite low statistics: Only " <<  cluster_counter->GetEntries() << " hits were collected but" << int(
-                  safetyFactor * minClusters *
+                  safetyFactor * minClusters*
                   nSensors * nBinsU * nBinsV) << " would be desirable!");
     }
   }

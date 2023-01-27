@@ -115,7 +115,7 @@ public:
     }
     //If given a pointer to a TClonesArray, create MCParticle at the appropriate index position
     if (m_plist) {
-      new(m_plist->AddrAt(p.getIndex() - 1)) MCParticle(m_plist, p);
+      new (m_plist->AddrAt(p.getIndex() - 1)) MCParticle(m_plist, p);
     }
   }
 

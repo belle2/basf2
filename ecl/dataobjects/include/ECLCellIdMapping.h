@@ -32,7 +32,9 @@ namespace Belle2 {
       m_CellIdToPhiId(c_nECLCellIds + 1),
       m_CellIdToThetaId(c_nECLCellIds + 1),
       m_CellIdToNeighbours5(c_nECLCellIds + 1),
-      m_CellIdToNeighbours7(c_nECLCellIds + 1)
+      m_CellIdToNeighbours7(c_nECLCellIds + 1),
+      m_CellIdToNeighbours9(c_nECLCellIds + 1),
+      m_CellIdToNeighbours11(c_nECLCellIds + 1)
     {
       for (unsigned idx = 0; idx < c_nECLCellIds + 1; idx++) {
         m_CellIdToStoreArrPosition[idx] = -1;
@@ -64,6 +66,26 @@ namespace Belle2 {
     {
       if (cellid > 0 and cellid < c_nECLCellIds + 1) {
         m_CellIdToNeighbours7[cellid] = neighbours;
+      } else {
+        B2ERROR("Cell Id " << cellid << " does not exist.");
+      }
+    }
+
+    /** Set celld id to neighbour9*/
+    void setCellIdToNeighbour9(const int& cellid, const std::vector<short int>& neighbours)
+    {
+      if (cellid > 0 and cellid < c_nECLCellIds + 1) {
+        m_CellIdToNeighbours9[cellid] = neighbours;
+      } else {
+        B2ERROR("Cell Id " << cellid << " does not exist.");
+      }
+    }
+
+    /** Set celld id to neighbour11*/
+    void setCellIdToNeighbour11(const int& cellid, const std::vector<short int>& neighbours)
+    {
+      if (cellid > 0 and cellid < c_nECLCellIds + 1) {
+        m_CellIdToNeighbours11[cellid] = neighbours;
       } else {
         B2ERROR("Cell Id " << cellid << " does not exist.");
       }
@@ -146,6 +168,26 @@ namespace Belle2 {
       }
     }
 
+    /** Get store array from cell id */
+    std::vector<short int>& getCellIdToNeighbour9(const int& cellid)
+    {
+      if (cellid > 0 and cellid < c_nECLCellIds + 1) {
+        return m_CellIdToNeighbours9[cellid];
+      } else {
+        B2FATAL("Cell Id " << cellid << " does not exist.");
+      }
+    }
+
+    /** Get store array from cell id */
+    std::vector<short int>& getCellIdToNeighbour11(const int& cellid)
+    {
+      if (cellid > 0 and cellid < c_nECLCellIds + 1) {
+        return m_CellIdToNeighbours11[cellid];
+      } else {
+        B2FATAL("Cell Id " << cellid << " does not exist.");
+      }
+    }
+
     /** Get phi from cell id */
     double getCellIdToPhi(const int& cellid)
     {
@@ -214,6 +256,12 @@ namespace Belle2 {
 
     /** vector (8736+1 entries) with cell id to 7x7 neighbour vector */
     std::vector<std::vector<short int>> m_CellIdToNeighbours7;
+
+    /** vector (8736+1 entries) with cell id to 9x9 neighbour vector */
+    std::vector<std::vector<short int>> m_CellIdToNeighbours9;
+
+    /** vector (8736+1 entries) with cell id to 11x11 neighbour vector */
+    std::vector<std::vector<short int>> m_CellIdToNeighbours11;
 
     ClassDef(ECLCellIdMapping, 1); /**< ClassDef */
   };

@@ -1,5 +1,5 @@
 Import ('env')
 
-env['LIBS'] = ['framework', 'daq', 'rawdata_dataobjects', 'daq_dataobjects']
+env['LIBS'] = ['framework', 'rawdata_dataobjects', 'daq_dataobjects']
 
 Return ('env')

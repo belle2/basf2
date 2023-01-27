@@ -12,17 +12,17 @@
 #include <alignment/GlobalLabel.h>
 #include <alignment/Hierarchy.h>
 #include <framework/geometry/B2Vector3.h>
-#include <klm/dataobjects/bklm/BKLMHit2d.h>
 #include <klm/bklm/geometry/GeometryPar.h>
-#include <klm/dbobjects/bklm/BKLMAlignment.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
+#include <klm/dataobjects/KLMHit2d.h>
+#include <klm/dbobjects/bklm/BKLMAlignment.h>
 
 #include <genfit/DetPlane.h>
 
 using namespace std;
 using namespace Belle2;
 
-AlignableBKLMRecoHit::AlignableBKLMRecoHit(const BKLMHit2d* hit, const genfit::TrackCandHit*):
+AlignableBKLMRecoHit::AlignableBKLMRecoHit(const KLMHit2d* hit, const genfit::TrackCandHit*):
   genfit::PlanarMeasurement(HIT_DIMENSIONS)
 {
   int section = hit->getSection();
@@ -35,9 +35,9 @@ AlignableBKLMRecoHit::AlignableBKLMRecoHit(const BKLMHit2d* hit, const genfit::T
   m_Module = m_GeoPar->findModule(section, sector, m_Layer);
 
   //+++ global coordinates of the hit
-  global[0] = hit->getGlobalPosition()[0];
-  global[1] = hit->getGlobalPosition()[1];
-  global[2] = hit->getGlobalPosition()[2];
+  global[0] = hit->getPositionX();
+  global[1] = hit->getPositionY();
+  global[2] = hit->getPositionZ();
 
   //+++ local coordinates of the hit
   CLHEP::Hep3Vector local = m_Module->globalToLocal(global);

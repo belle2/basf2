@@ -29,10 +29,10 @@ using namespace std;
 namespace Belle2 {
 
   //-----------------------------------------------------------------
-  //                 Register the Module
+  ///                 Register the Module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPTriggerDigitizer)
+  REG_MODULE(TOPTriggerDigitizer);
 
 
   //-----------------------------------------------------------------
@@ -101,7 +101,7 @@ namespace Belle2 {
     int offsetSamples = waveforms[0]->getOffsetWindows() * TOPRawWaveform::c_WindowSize +
                         (revo9count % 6) * TOPRawWaveform::c_WindowSize / 3;
 
-    int bunchTimeStamp = int((revo9count + gRandom->Rndm()) * c_SamplingCycle / 3.0);
+    int bunchTimeStamp = int((revo9count + gRandom->Rndm()) * static_cast<double>(c_SamplingCycle) / 3.0);
     mcInfo->setBunchTimeStamp(bunchTimeStamp);
 
     int offset = bunchTimeStamp - offsetSamples / c_SamplingCycle;

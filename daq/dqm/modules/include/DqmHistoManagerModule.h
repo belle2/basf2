@@ -32,11 +32,11 @@ namespace Belle2 {
     virtual ~DqmHistoManagerModule();
 
     //! module functions
-    virtual void initialize();
-    virtual void beginRun();
-    virtual void endRun();
-    virtual void event();
-    virtual void terminate();
+    void initialize() override;
+    void beginRun() override;
+    void endRun() override;
+    void event() override;
+    void terminate() override;
 
   private:
     int StreamHistograms(TDirectory*, MsgHandler*);

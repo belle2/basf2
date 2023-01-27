@@ -12,15 +12,15 @@ Flavor tagging
 
     **Prerequisites**:
 
-        * The previous lesson
+    * The previous lesson
 
     **Questions**:
 
-        * How can I distinguish between a :math:`B_\text{tag}^0` and a :math:`\bar B_\text{tag}^0`
+    * How can I distinguish between a :math:`B_\text{tag}^0` and a :math:`\bar B_\text{tag}^0`
 
     **Objectives**:
 
-        * Perform flavor tagging
+    * Perform flavor tagging
 
 How can we distinguish between a :math:`B^0` and a :math:`\bar B^0`? This is not
 as simple as the case where we have a :math:`B^+` vs a :math:`B^-` and can just
@@ -42,10 +42,12 @@ that is, consult this page again: :ref:`conditionsdb_overview`).
 .. admonition:: Exercise
     :class: stacked exercise
 
-    Add a line to your previous steering file that adds the
-    ``analysis_tools_release-04-02`` global tag. For this you need to call the
+    Add a line to your previous steering file that adds the 
+    latest global tag. For this you need to call the
     `prepend_globaltag` method of the `basf2.conditions` object (which is an
     instance of the `ConditionsConfiguration <basf2.ConditionsConfiguration>` class).
+    To get the latest analysis global tag, you can call 
+    `modularAnalysis.getAnalysisGlobaltag`.
 
 .. admonition:: Solution
     :class: solution toggle
@@ -177,6 +179,6 @@ it to ``FBDT_qrCombined``!
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Authors of this lesson
+.. rubric:: Authors of this lesson
 
-    Kilian Lieret
+Kilian Lieret

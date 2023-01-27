@@ -23,7 +23,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(DQMHistAnalysisPXDEff)
+REG_MODULE(DQMHistAnalysisPXDEff);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -37,13 +37,12 @@ DQMHistAnalysisPXDEffModule::DQMHistAnalysisPXDEffModule() : DQMHistAnalysisModu
 
   //Would be much more elegant to get bin numbers from the saved histograms, but would need to retrieve at least one of them before the initialize function for this
   //Or get one and clone it
-  addParam("binsU", m_u_bins, "histogram bins in u direction, needs to be the same as in PXDDQMEfficiency", int(4));
-  addParam("binsV", m_v_bins, "histogram bins in v direction, needs to be the same as in PXDDQMEfficiency", int(6));
+  addParam("binsU", m_u_bins, "histogram bins in u direction, needs to be the same as in PXDDQMEfficiency", int(16));
+  addParam("binsV", m_v_bins, "histogram bins in v direction, needs to be the same as in PXDDQMEfficiency", int(48));
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms were placed",
            std::string("PXDEFF"));
-  addParam("singleHists", m_singleHists, "Also plot one efficiency histogram per module", bool(false));
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:Eff:"));
-  addParam("useEpics", m_useEpics, "useEpics", true);
+  addParam("useEpics", m_useEpics, "Whether to update EPICS PVs.", false);
   addParam("useEpicsRO", m_useEpicsRO, "useEpics ReadOnly", false);
   addParam("ConfidenceLevel", m_confidence, "Confidence Level for error bars and alarms", 0.9544);
   addParam("WarnLevel", m_warnlevel, "Efficiency Warn Level for alarms", 0.92);
@@ -107,26 +106,18 @@ void DQMHistAnalysisPXDEffModule::initialize()
   }
 #endif
 
-
   for (VxdID& aPXDModule : m_PXDModules) {
     TString buff = (std::string)aPXDModule;
     buff.ReplaceAll(".", "_");
 #ifdef _BELLE2_EPICS
     if (m_useEpics) {
-      B2INFO("Connect PVs for " + m_pvPrefix + (std::string)aPXDModule);
       SEVCHK(ca_create_channel((m_pvPrefix + buff).Data(), NULL, NULL, 10, &mychid_eff[aPXDModule]), "ca_create_channel failure");
-      SEVCHK(ca_create_channel((m_pvPrefix + buff + ".LOW").Data(), NULL, NULL, 10, &mychid_low[aPXDModule]),
-             "ca_create_channel failure");
-      SEVCHK(ca_create_channel((m_pvPrefix + buff + ".LOLO").Data(), NULL, NULL, 10, &mychid_lolo[aPXDModule]),
-             "ca_create_channel failure");
     }
 #endif
     TString histTitle = "PXD Hit Efficiency on Module " + (std::string)aPXDModule + ";Pixel in U;Pixel in V";
-    if (m_singleHists) {
-      m_cEffModules[aPXDModule] = new TCanvas((m_histogramDirectoryName + "/c_Eff_").data() + buff);
-      m_hEffModules[aPXDModule] = new TEfficiency("ePXDHitEff_" + buff, histTitle,
-                                                  m_u_bins, -0.5, nu - 0.5, m_v_bins, -0.5, nv - 0.5);
-    }
+    m_cEffModules[aPXDModule] = new TCanvas((m_histogramDirectoryName + "/c_Eff_").data() + buff);
+    m_hEffModules[aPXDModule] = new TEfficiency("ePXDHitEff_" + buff, histTitle,
+                                                m_u_bins, -0.5, nu - 0.5, m_v_bins, -0.5, nv - 0.5);
   }
 
   m_cInnerMap = new TCanvas((m_histogramDirectoryName + "/c_InnerMap").data());
@@ -230,25 +221,19 @@ void DQMHistAnalysisPXDEffModule::beginRun()
     if (m_useEpics) {
       // get warn and error limit
       // as the same array as above, we assume chid exists
-      dbr_double_t tPvData;
-      auto r = ca_get(DBR_DOUBLE, mychid_lolo[m_PXDModules[i]], &tPvData);
-      if (r == ECA_NORMAL) r = ca_pend_io(5.0);// value is only updated here and valid if ECA_NORMAL
+      struct dbr_ctrl_double tPvData;
+      auto r = ca_get(DBR_CTRL_DOUBLE, mychid_eff[m_PXDModules[i]], &tPvData);
+      if (r == ECA_NORMAL) r = ca_pend_io(5.0);
       if (r == ECA_NORMAL) {
-        if (!std::isnan(tPvData)
-            && tPvData > 0.0) {
-          m_hErrorLine->SetBinContent(i + 1, tPvData);
-          if (m_perModuleAlarm) m_errorlevelmod[m_PXDModules[i]] = tPvData;
+        if (!std::isnan(tPvData.lower_alarm_limit)
+            && tPvData.lower_alarm_limit > 0.0) {
+          m_hErrorLine->SetBinContent(i + 1, tPvData.lower_alarm_limit);
+          if (m_perModuleAlarm) m_errorlevelmod[m_PXDModules[i]] = tPvData.lower_alarm_limit;
         }
-      } else {
-        SEVCHK(r, "ca_get or ca_pend_io failure");
-      }
-      r = ca_get(DBR_DOUBLE, mychid_low[m_PXDModules[i]], &tPvData);
-      if (r == ECA_NORMAL) r = ca_pend_io(5.0);// value is only updated here and valid if ECA_NORMAL
-      if (r == ECA_NORMAL) {
-        if (!std::isnan(tPvData)
-            && tPvData > 0.0) {
-          m_hWarnLine->SetBinContent(i + 1, tPvData);
-          if (m_perModuleAlarm) m_warnlevelmod[m_PXDModules[i]] = tPvData;
+        if (!std::isnan(tPvData.lower_warning_limit)
+            && tPvData.lower_warning_limit > 0.0) {
+          m_hWarnLine->SetBinContent(i + 1, tPvData.lower_warning_limit);
+          if (m_perModuleAlarm) m_warnlevelmod[m_PXDModules[i]] = tPvData.lower_warning_limit;
         }
       } else {
         SEVCHK(r, "ca_get or ca_pend_io failure");
@@ -270,13 +255,11 @@ void DQMHistAnalysisPXDEffModule::beginRun()
 
 void DQMHistAnalysisPXDEffModule::event()
 {
-
-  //Save the pointers to create the summary hists later
-  std::map<VxdID, TH1*> mapHits;
-  std::map<VxdID, TH1*> mapMatches;
-
   //Count how many of each type of histogram there are for the averaging
   //std::map<std::string, int> typeCounter;
+
+  m_hInnerMap->Reset();
+  m_hOuterMap->Reset();
 
   for (unsigned int i = 1; i <= m_PXDModules.size(); i++) {
     VxdID& aPXDModule = m_PXDModules[i - 1];
@@ -296,48 +279,41 @@ void DQMHistAnalysisPXDEffModule::event()
     }
     Matches = (TH1*)findHist(locationMatches.Data());
 
-    //Finding only one of them should only happen in very strange situations...
+    // Finding only one of them should only happen in very strange situations...
     if (Hits == nullptr || Matches == nullptr) {
       B2ERROR("Missing histogram for sensor " << aPXDModule);
-      mapHits[aPXDModule] = nullptr;
-      mapMatches[aPXDModule] = nullptr;
     } else {
-      mapHits[aPXDModule] = Hits;
-      mapMatches[aPXDModule] = Matches;
-      if (m_singleHists) {
-        if (m_cEffModules[aPXDModule] && m_hEffModules[aPXDModule]) {// this check creates them with a nullptr ..bad
-          m_hEffModules[aPXDModule]->SetTotalHistogram(*Hits, "f");
-          m_hEffModules[aPXDModule]->SetPassedHistogram(*Matches, "f");
+      if (m_cEffModules[aPXDModule] && m_hEffModules[aPXDModule]) {// this check creates them with a nullptr ..bad
+        m_hEffModules[aPXDModule]->SetTotalHistogram(*Hits, "f");
+        m_hEffModules[aPXDModule]->SetPassedHistogram(*Matches, "f");
 
-          m_cEffModules[aPXDModule]->cd();
-          m_hEffModules[aPXDModule]->Draw("colz");
-          m_cEffModules[aPXDModule]->Modified();
-          m_cEffModules[aPXDModule]->Update();
+        m_cEffModules[aPXDModule]->cd();
+        m_hEffModules[aPXDModule]->Paint("colz"); // not Draw, enforce to create GetPaintedHistogram?
+        m_cEffModules[aPXDModule]->Modified();
+        m_cEffModules[aPXDModule]->Update();
 
-
-          auto h = m_hEffModules[aPXDModule]->GetPaintedHistogram();
-          int s = (2 - aPXDModule.getSensorNumber()) * m_v_bins;
-          int l = (aPXDModule.getLadderNumber() - 1) * m_u_bins;
-          if (m_hInnerMap && aPXDModule.getLayerNumber() == 1) {
-            for (int u = 0; u < m_u_bins; u++) {
-              for (int v = 0; v < m_v_bins; v++) {
-                auto b = h->GetBin(u + 1, v + 1);
-                m_hInnerMap->Fill(u + l, v + s, h->GetBinContent(b));
-              }
+        auto h = m_hEffModules[aPXDModule]->GetPaintedHistogram();
+        int s = (2 - aPXDModule.getSensorNumber()) * m_v_bins;
+        int l = (aPXDModule.getLadderNumber() - 1) * m_u_bins;
+        if (m_hInnerMap && aPXDModule.getLayerNumber() == 1) {
+          for (int u = 0; u < m_u_bins; u++) {
+            for (int v = 0; v < m_v_bins; v++) {
+              auto b = h->GetBin(u + 1, v + 1);
+              m_hInnerMap->Fill(u + l, v + s, h->GetBinContent(b));
             }
           }
-          if (m_hOuterMap && aPXDModule.getLayerNumber() == 2) {
-            for (int u = 0; u < m_u_bins; u++) {
-              for (int v = 0; v < m_v_bins; v++) {
-                auto b = h->GetBin(u + 1, v + 1);
-                m_hOuterMap->Fill(u + l, v + s, h->GetBinContent(b));
-              }
+        }
+        if (m_hOuterMap && aPXDModule.getLayerNumber() == 2) {
+          for (int u = 0; u < m_u_bins; u++) {
+            for (int v = 0; v < m_v_bins; v++) {
+              auto b = h->GetBin(u + 1, v + 1);
+              m_hOuterMap->Fill(u + l, v + s, h->GetBinContent(b));
             }
           }
         }
       }
     }
-  }//One-Module histos finished
+  }// Single-Module histos + 2d overview finished
 
   m_cInnerMap->cd();
   m_hInnerMap->Draw("colz");
@@ -541,7 +517,7 @@ void DQMHistAnalysisPXDEffModule::event()
       if (ay) ay->SetRangeUser(scale_min, 1.0);
       auto ax = gr->GetXaxis();
       if (ax) {
-        ax->Set(m_PXDModules.size() , 0, m_PXDModules.size());
+        ax->Set(m_PXDModules.size(), 0, m_PXDModules.size());
         for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
           TString ModuleName = (std::string)m_PXDModules[i];
           ax->SetBinLabel(i + 1, ModuleName);
@@ -621,8 +597,6 @@ void DQMHistAnalysisPXDEffModule::terminate()
   if (m_useEpics) {
     for (auto& m : mychid_status) SEVCHK(ca_clear_channel(m), "ca_clear_channel failure");
     for (auto& m : mychid_eff) SEVCHK(ca_clear_channel(m.second), "ca_clear_channel failure");
-    for (auto& m : mychid_low) SEVCHK(ca_clear_channel(m.second), "ca_clear_channel failure");
-    for (auto& m : mychid_lolo) SEVCHK(ca_clear_channel(m.second), "ca_clear_channel failure");
     SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
   }
 #endif

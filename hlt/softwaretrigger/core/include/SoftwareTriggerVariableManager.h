@@ -6,10 +6,11 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #pragma once
-
 #include <hlt/softwaretrigger/core/SoftwareTriggerObject.h>
-
 #include <memory>
+#include <variant>
+#include <vector>
+
 
 namespace Belle2 {
   namespace SoftwareTrigger {
@@ -83,6 +84,9 @@ namespace Belle2 {
        */
       typedef SoftwareTriggerVariable Var;
 
+      /** Typedef for variable return type, can either be double, int or bool in std::variant */
+      typedef std::variant<double, int, bool> VarVariant;
+
       /**
        * Make this variable manager a singleton and get the only single instance of the manager.
        * You can still use it multiple times in different modules, as it depends on the map of values
@@ -99,6 +103,14 @@ namespace Belle2 {
        * (and if there is an entry with the same name as the variable in this object).
        */
       SoftwareTriggerVariable* getVariable(const std::string& variableName);
+
+      /**
+       * The GeneralCut parses MetaVariables into its variable name and arguments.
+       * GeneralCut requires any VariableManager to get a variable through this parsed state.
+       * This overload combines the variableName and vector of strings to the original Metavariable call
+       * using boost::algorithm::join and passes it to getVariable(const std::string& variableName)
+       */
+      SoftwareTriggerVariable* getVariable(const std::string& variableName, const std::vector<std::string>& arguments);
 
     private:
       /// Make the constructor private: only use this class as a singleton.

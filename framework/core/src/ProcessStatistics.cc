@@ -155,7 +155,7 @@ void ProcessStatistics::appendUnmergedModules(const ProcessStatistics* otherObje
   //shift indices by #entries missing in otherObject
   const int shift = m_stats.size() - otherObject->m_stats.size();
   if (shift < 0) {
-    B2FATAL("shift negative: " << shift);
+    B2FATAL("shift negative:" << LogVar("shift", shift));
   }
   for (auto pair : otherObject->m_modulesToStatsIndex) {
     m_modulesToStatsIndex[pair.first] = pair.second + shift;

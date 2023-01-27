@@ -26,7 +26,7 @@ namespace Belle2 {
 
     private:
       /// cut on the POCA distance in xy obtained from the helixFitEstimator
-      double m_param_helixFitPocaDCut = 1.0;
+      double m_helixFitPocaDCut = 1.0;
     };
 
   }

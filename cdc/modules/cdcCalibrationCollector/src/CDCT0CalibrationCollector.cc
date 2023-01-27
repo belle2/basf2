@@ -23,7 +23,7 @@ using namespace Belle2;
 using namespace CDC;
 using namespace genfit;
 
-REG_MODULE(CDCT0CalibrationCollector)
+REG_MODULE(CDCT0CalibrationCollector);
 
 CDCT0CalibrationCollectorModule::CDCT0CalibrationCollectorModule() : CalibrationCollectorModule()
 {
@@ -130,7 +130,7 @@ void CDCT0CalibrationCollectorModule::collect()
 
     if (Pval < m_PvalCut || ndf < m_ndfCut) continue;
     //cut at Pt
-    if (fitresult->getMomentum().Perp() < m_MinimumPt) continue;
+    if (fitresult->getMomentum().Rho() < m_MinimumPt) continue;
     //reject events don't have eventT0
     if (m_EventT0Extraction) {
       // event with is fail to extract t0 will be exclude from analysis
@@ -157,9 +157,9 @@ void CDCT0CalibrationCollectorModule::collect()
         if ((kfi->getWeights().at(iMeas))  > 0.5) {
           int boardID = cdcgeo.getBoardID(WireID(lay, IWire));
           const genfit::MeasuredStateOnPlane& mop = kfi->getFittedState();
-          const TVector3 pocaOnWire = mop.getPlane()->getO();//Local wire position
-          //    const TVector3 pocaOnTrack = mop.getPlane()->getU();//residual direction
-          const TVector3 pocaMom = mop.getMom();
+          const B2Vector3D pocaOnWire = mop.getPlane()->getO();//Local wire position
+          //    const B2Vector3D pocaOnTrack = mop.getPlane()->getU();//residual direction
+          const B2Vector3D pocaMom = mop.getMom();
           double alpha = cdcgeo.getAlpha(pocaOnWire, pocaMom) ;
           double theta = cdcgeo.getTheta(pocaMom);
           double x_u = kfi->getFittedState(false).getState()(3);//x fit unbiased
@@ -181,7 +181,7 @@ void CDCT0CalibrationCollectorModule::collect()
           theta = cdcgeo.getOutgoingTheta(alpha, theta);
           alpha = cdcgeo.getOutgoingAlpha(alpha);
 
-          double t_fit = cdcgeo.getDriftTime(std::abs(x_u), lay, lr, alpha , theta);
+          double t_fit = cdcgeo.getDriftTime(std::abs(x_u), lay, lr, alpha, theta);
           //estimate drift time
           double dt_flight;
           double dt_prop;
@@ -194,7 +194,7 @@ void CDCT0CalibrationCollectorModule::collect()
           }
 
           double z = pocaOnWire.Z();
-          TVector3 m_backWirePos = cdcgeo.wireBackwardPosition(wireid, CDCGeometryPar::c_Aligned);
+          B2Vector3D m_backWirePos = cdcgeo.wireBackwardPosition(wireid, CDCGeometryPar::c_Aligned);
           double z_prop = z - m_backWirePos.Z();
           B2DEBUG(99, "z_prop = " << z_prop << " |z " << z << " |back wire poss: " << m_backWirePos.Z());
           dt_prop = z_prop * cdcgeo.getPropSpeedInv(lay);

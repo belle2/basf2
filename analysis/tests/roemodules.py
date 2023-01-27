@@ -77,9 +77,6 @@ nested_list = 'B+:other'
 roe_path.add_module('ParticleLoader',
                     decayStrings=[nested_list + ' -> ' + jpsi_roe_list],
                     useROEs=True)
-roe_path.add_module('ParticleListManipulator',
-                    outputListName=nested_list,
-                    inputListNames=['B+:ROE'])
 
 roe_path.add_module('ParticleStats', particleLists=[nested_list])
 roe_path.add_module('ParticlePrinter', listName=nested_list, fullPrint=True)

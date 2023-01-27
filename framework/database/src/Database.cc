@@ -30,6 +30,7 @@
 #include <framework/database/CentralMetadataProvider.h>
 #include <framework/database/Configuration.h>
 
+#include <algorithm>
 #include <cstdlib>
 
 namespace Belle2 {
@@ -96,7 +97,8 @@ namespace Belle2 {
       m_metadataProvider->getPayloads(event.getExperiment(), event.getRun(), query);
     } catch (std::exception&) {
       // something went wrong with the metadata update ... so let's try next provider
-      B2ERROR("Conditions data: Problem with payload metadata, trying to fall back to next provider ...");
+      B2WARNING("Conditions data: Problem with payload metadata provider, trying to fall back to next provider..."
+                << LogVar("provider", m_currentProvider));
       nextMetadataProvider();
       return getData(event, query);
     }
@@ -155,15 +157,15 @@ namespace Belle2 {
     if (m_metadataConfigurations.empty()) {
       B2FATAL("Conditions data: No more metadata providers available");
     }
-    auto provider = m_metadataConfigurations.back();
+    m_currentProvider = m_metadataConfigurations.back();
     m_metadataConfigurations.pop_back();
     bool remote{false};
-    if (auto pos = provider.find("://"); pos != std::string::npos) {
+    if (auto pos = m_currentProvider.find("://"); pos != std::string::npos) {
       // found a protocol: if file remove, otherwise keep as is and set as remote ...
-      auto protocol = provider.substr(0, pos);
+      auto protocol = m_currentProvider.substr(0, pos);
       boost::algorithm::to_lower(protocol);
       if (protocol == "file") {
-        provider = provider.substr(pos + 3);
+        m_currentProvider = m_currentProvider.substr(pos + 3);
       } else if (protocol == "http" or protocol == "https") {
         remote = true;
       } else {
@@ -173,13 +175,13 @@ namespace Belle2 {
     }
     try {
       if (remote) {
-        m_metadataProvider = std::make_unique<Conditions::CentralMetadataProvider>(provider, m_usableTagStates);
+        m_metadataProvider = std::make_unique<Conditions::CentralMetadataProvider>(m_currentProvider, m_usableTagStates);
       } else {
-        m_metadataProvider = std::make_unique<Conditions::LocalMetadataProvider>(provider, m_usableTagStates);
+        m_metadataProvider = std::make_unique<Conditions::LocalMetadataProvider>(m_currentProvider, m_usableTagStates);
       }
     } catch (std::exception& e) {
       B2WARNING("Conditions data: Metadata provider not usable, trying next one ..."
-                << LogVar("provider", provider) << LogVar("error", e.what()));
+                << LogVar("provider", m_currentProvider) << LogVar("error", e.what()));
       return nextMetadataProvider();
     }
     // and check the tags are useable
@@ -199,6 +201,12 @@ namespace Belle2 {
       // it will not do anything else than setting the final list of globaltags
       conf.setInitialized(true);
       m_globalTags = conf.getFinalListOfTags();
+      // trim the globaltag names for removing leading/trailing whitespaces, since they
+      // are a potential source of FATAL errors
+      std::transform(m_globalTags.begin(), m_globalTags.end(), m_globalTags.begin(),
+      [](const auto & tag) {
+        return boost::algorithm::trim_copy(tag);
+      });
       // and remove duplicates, there's no need to look in the same gt multiple times
       std::set<std::string> seen;
       m_globalTags.erase(std::remove_if(m_globalTags.begin(), m_globalTags.end(),
@@ -210,6 +218,7 @@ namespace Belle2 {
       m_metadataConfigurations = conf.getMetadataProviders();
       // reverse because we want to pop out elements when used
       std::reverse(m_metadataConfigurations.begin(), m_metadataConfigurations.end());
+      m_currentProvider = "";
       m_configState = c_InitGlobaltagList;
     }
     // do we want to stop early?
@@ -246,11 +255,11 @@ namespace Belle2 {
       }
       // If so, warn again ... because
       if (not m_testingPayloads.empty()) {
-        B2WARNING(R"(Conditions data: configured to look for temporary tesing payloads from one or more local folders.
+        B2WARNING(R"(Conditions data: configured to look for temporary testing payloads from one or more local folders.
 
     This will lead to non-reproducible results and is strictly only for testing purposes.
     It is NOT ALLOWED for official productions or data analysis and any results obtained like this WILL NOT BE PUBLISHED.
-  )";);
+  )");
       }
       m_configState = c_Ready;
     }

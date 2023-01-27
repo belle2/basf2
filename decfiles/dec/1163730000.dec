@@ -1,0 +1,30 @@
+# EventType: 1163730000
+# Descriptor:  [B0 -> D0 pi+ l- nu, D0 -> K- pi+] cc
+# NickName: B0_D0pilnu
+# Tested: Yes
+# PhysicsWG: SL
+# Responsible: Kai-Ning Chu
+# Email: kainingchu@hep1.phys.ntu.deu.tw
+# Cuts: None
+# Date: 20220214
+
+Decay Upsilon(4S)
+1.0 B0sig anti-B0sig B0 anti-B0 VSS_BMIX dm;
+Enddecay
+
+Decay anti-B0sig
+
+0.5  D0sig   pi+   e-   anti-nu_e     PHOTOS  GOITY_ROBERTS;
+0.5  D0sig   pi+   mu-  anti-nu_mu    PHOTOS   GOITY_ROBERTS;
+Enddecay
+
+CDecay B0sig
+
+Decay D0sig
+1  K- pi+  PHOTOS PHSP;
+Enddecay
+
+CDecay anti-D0sig
+
+End
+

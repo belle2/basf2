@@ -30,6 +30,9 @@ Standard Particles
 
 	for a choice of the input ``listtype`` parameter among:
 
+	* 'FixedThresh05'
+	* 'FixedThresh09'
+	* 'FixedThresh095'
 	* 'UniformEff60'
 	* 'UniformEff70'
 	* 'UniformEff80'

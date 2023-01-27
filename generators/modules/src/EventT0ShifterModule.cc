@@ -13,7 +13,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(EventT0Shifter)
+REG_MODULE(EventT0Shifter);
 
 EventT0ShifterModule::EventT0ShifterModule() : Module()
 {

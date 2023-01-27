@@ -17,14 +17,39 @@ namespace Belle2 {
   class PhysicsObjectsMiraBelleDstModule : public HistoModule {
   public:
 
+    /**
+     * Constructor.
+     */
     PhysicsObjectsMiraBelleDstModule();
 
+    /**
+     * Initializer.
+     */
     void initialize() override;
+
+    /**
+     * Called when entering a new run.
+     */
     void beginRun() override;
+
+    /**
+     * This method is called for each event.
+     */
     void event() override;
+
+    /**
+     * This method is called if the current run ends.
+     */
     void endRun() override;
+
+    /**
+     * This method is called at the end of the event processing.
+     */
     void terminate() override;
 
+    /**
+     * Definition of the histograms.
+     */
     void defineHisto() override;
 
   private:

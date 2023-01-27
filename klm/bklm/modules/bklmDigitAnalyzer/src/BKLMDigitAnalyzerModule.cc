@@ -19,7 +19,7 @@
 using namespace Belle2;
 
 
-REG_MODULE(BKLMDigitAnalyzer)
+REG_MODULE(BKLMDigitAnalyzer);
 
 
 BKLMDigitAnalyzerModule::BKLMDigitAnalyzerModule() : Module(),
@@ -76,7 +76,7 @@ void BKLMDigitAnalyzerModule::beginRun()
   TString outputRootNameTString(m_outputRootName);
   outputRootNameTString += "_run" + runNumberTString + ".root";
 
-  TString label[2] = {"BF", "BB"};
+  const TString label[2] = {"BF", "BB"};
 
   m_outputRootFile = new TFile(outputRootNameTString, "RECREATE");
   B2INFO("BKLMDigitAnalyzer:: the output file '" << outputRootNameTString.Data() << "' will be created for run " << m_runNumber);

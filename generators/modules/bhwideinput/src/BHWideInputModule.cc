@@ -10,13 +10,15 @@
 
 #include <framework/datastore/StoreArray.h>
 
+#include <Math/Vector3D.h>
+
 using namespace std;
 using namespace Belle2;
 
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(BHWideInput)
+REG_MODULE(BHWideInput);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -79,10 +81,10 @@ void BHWideInputModule::event()
   const MCInitialParticles& initial = m_initial.generate();
 
   // true boost
-  TLorentzRotation boost = initial.getCMSToLab();
+  ROOT::Math::LorentzRotation boost = initial.getCMSToLab();
 
   // vertex
-  TVector3 vertex = initial.getVertex();
+  ROOT::Math::XYZVector vertex = initial.getVertex();
 
   m_mcGraph.clear();
   m_generator.generateEvent(m_mcGraph, vertex, boost);

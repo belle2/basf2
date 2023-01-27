@@ -43,7 +43,7 @@ ZMQHistoServerToFileOutput::ZMQHistoServerToFileOutput(unsigned int maximalUncom
 
 void ZMQHistoServerToFileOutput::mergeAndSend(const std::map<std::string, HistogramMapping>& storedMessages,
                                               const std::optional<unsigned int>& experiment,
-                                              const std::optional<unsigned int>& run, EMessageTypes messageType)
+                                              const std::optional<unsigned int>& run, EMessageTypes /*messageType*/)
 {
   if (storedMessages.empty()) {
     return;

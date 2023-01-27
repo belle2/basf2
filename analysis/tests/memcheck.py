@@ -15,12 +15,13 @@ It is run as a test to make sure the memcheck does not fail because of issues in
 from b2test_utils import skip_test_if_light
 skip_test_if_light()  # light builds don't contain simulation, reconstruction etc; skip before trying to import # noqa
 
-from basf2 import set_random_seed, set_log_level, LogLevel, create_path, Module, find_file, process, statistics
+from basf2 import set_random_seed, set_log_level, LogLevel, create_path, Module, find_file, process, statistics, conditions
 from simulation import add_simulation
-from reconstruction import add_reconstruction, add_mdst_output
+from reconstruction import add_reconstruction
+from mdst import add_mdst_output
 from ROOT import Belle2
 from modularAnalysis import reconstructDecay, rankByHighest, buildRestOfEvent, buildContinuumSuppression, matchMCTruth, \
-    variablesToNtuple
+    variablesToNtuple, getAnalysisGlobaltag
 from stdCharged import stdPi, stdMu
 from vertex import treeFit, TagV
 from flavorTagger import flavorTagger
@@ -34,6 +35,9 @@ set_random_seed(1)
 
 # suppress messages and warnings during processing:
 set_log_level(LogLevel.ERROR)
+
+# add the analysis globaltag (necessary for flavor tagging)
+conditions.prepend_globaltag(getAnalysisGlobaltag())
 
 # create path
 main = create_path()

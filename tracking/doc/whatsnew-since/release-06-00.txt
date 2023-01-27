@@ -1,0 +1,7 @@
+Changes in the tracking package since release-06-00
+----------------------------------------------------
+
+Event Time
+++++++++++
+
+* the tracking estimation of the time of the event is now computed with SVD instead of with CDC

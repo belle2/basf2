@@ -8,6 +8,7 @@ again and checking if they match.
 """
 
 import os
+import sys
 import math
 import basf2 as b2
 import modularAnalysis as ma
@@ -16,7 +17,7 @@ from tempfile import TemporaryDirectory
 # analogous to lhereader.py
 input_filename = b2.find_file("generators/tests/event.hepmc")
 if len(input_filename) == 0:
-    sys.stderr.write("TEST SKIPPED: input file " + filepath + " not found.")
+    sys.stderr.write("TEST SKIPPED: input file " + input_filename + " not found.")
     sys.exit(-1)
 
 with TemporaryDirectory() as tmp:

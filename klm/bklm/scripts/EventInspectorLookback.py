@@ -10,7 +10,7 @@
 ##########################################################################
 
 # Purpose:
-#   basf module to histogram useful values in RawKLM and BKLMHit2d data-objects in an SROOT file.
+#   basf module to histogram useful values in RawKLM and KLMHit2d data-objects in an SROOT file.
 #
 
 import basf2
@@ -125,13 +125,13 @@ class EventInspectorLookback(basf2.Module):
         #: reference to the RPC-time histogram for the currevent value of the lookback window parameter
         self.hist_mappedRPCTimeCalByWindow = self.dict_mappedRPCTimeCalByWindow[self.windowMinValue]
 
-        # Create the BKLMHit2d-related histograms
+        # Create the KLMHit2d-related histograms
 
-        #: scatterplot of end view of forward BKLM for all BKLMHit2ds
+        #: scatterplot of end view of forward BKLM for all KLMHit2ds
         self.hist_occupancyForwardXY = ROOT.TH2F('occupancyForwardXY',
                                                  expRun + 'Forward xy occupancy;x(cm);y(cm)',
                                                  230, -345.0, 345.0, 230, -345.0, 345.0)
-        #: scatterplot of end view of backward BKLM for all BKLMHit2ds
+        #: scatterplot of end view of backward BKLM for all KLMHit2ds
         self.hist_occupancyBackwardXY = ROOT.TH2F('occupancyBackwardXY',
                                                   expRun + 'Backward xy occupancy;x(cm);y(cm)',
                                                   230, -345.0, 345.0, 230, -345.0, 345.0)
@@ -140,7 +140,7 @@ class EventInspectorLookback(basf2.Module):
 
         #: dictionary of scatterplots of end view of forward BKLM, keyed by lookback-window value
         self.dict_occupancyXYByWindow = {}
-        #: dictionary of the number of BKLMHit2ds for each lookback-window value
+        #: dictionary of the number of KLMHit2ds for each lookback-window value
         self.dict_nHit2ds = {}
         for window in range(self.windowMinValue, self.windowMaxValue+1, self.windowStepValue):
             label = "occupancyXYByWindow{0:04x}".format(window)
@@ -203,8 +203,8 @@ class EventInspectorLookback(basf2.Module):
         hist_nRawKLMs.Draw("E0 X0 L")
         hist_nRawKLMs.Draw("HIST SAME")
         canvas.Print(self.pdfName, "Title:{0}".format(hist_nRawKLMs.GetName()))
-        hist_nHit2ds = ROOT.TH1F('nBKLMHit2ds',
-                                 'Mean number of BKLMHit2ds per event;Lookback-window {0} value'.format(self.windowMode),
+        hist_nHit2ds = ROOT.TH1F('nKLMHit2ds',
+                                 'Mean number of KLMHit2ds per event;Lookback-window {0} value'.format(self.windowMode),
                                  nWindows, self.windowMinValue, self.windowMaxValue+self.windowStepValue)
         hist_nHit2ds.SetStats(False)
         hist_nHit2ds.SetMinimum(0)
@@ -266,7 +266,7 @@ class EventInspectorLookback(basf2.Module):
         EventMetaData = Belle2.PyStoreObj('EventMetaData')
         event = EventMetaData.getEvent()
         rawklms = Belle2.PyStoreArray('RawKLMs')
-        hit2ds = Belle2.PyStoreArray('BKLMHit2ds')
+        hit2ds = Belle2.PyStoreArray('KLMHit2ds')
 
         # Process the RawKLMs
 
@@ -283,7 +283,7 @@ class EventInspectorLookback(basf2.Module):
             trigCtime = (rawklm.GetTTCtime(0) & 0x7ffffff) << 3  # (ns)
             for finesse in range(0, 4):
                 dc = (finesse << 2) + (copper & 0x3)
-                sectorFB = self.dcToSectorFB[dc]
+                sectorFB = self.dcToSectorFB[dc]  # noqa (F841) kept for completeness
                 nWords = rawklm.GetDetectorNwords(0, finesse)
                 if nWords <= 0:
                     continue
@@ -308,7 +308,7 @@ class EventInspectorLookback(basf2.Module):
                 for j in range(0, n):
                     word0 = bufSlot[j * 2]
                     word1 = bufSlot[j * 2 + 1]
-                    ctime = word0 & 0xffff
+                    ctime = word0 & 0xffff  # noqa (F841) kept for completeness
                     channel = (word0 >> 16) & 0x7f
                     axis = (word0 >> 23) & 0x01
                     lane = (word0 >> 24) & 0x1f  # 1..2 for scints, 8..20 for RPCs (=readout-board slot - 7)
@@ -326,7 +326,7 @@ class EventInspectorLookback(basf2.Module):
 
         self.dict_nEvents[self.windowValue] += 1
 
-        # Process the BKLMHit2ds
+        # Process the KLMHit2ds
 
         self.dict_nHit2ds[self.windowValue] += len(hit2ds)
         for hit2d in hit2ds:

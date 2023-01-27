@@ -45,7 +45,6 @@ unsigned long
 xor(unsigned long * start, int wordlen)
 {
   unsigned long ret = 0;
-  int i;
   while (wordlen--) {
     ret ^= *(start++);
   }
@@ -57,19 +56,15 @@ int cprfd;
 int
 main(int argc, char **argv)
 {   
-  FILE *fpr;  // for file read modified by Jingzhou Zhao
+  //FILE *fpr;  // for file read modified by Jingzhou Zhao
   char SaveFile[100];// SaveFile
-  int irun;
   char timebuf[100];
-  time_t t;//             
 
   int event=0;
   int ret, i = 0;
-  fd_set rfds, efds;
   int amtfd[4];
   int iii;
   int istop;
-  int istart;    
   int j=1;
   int card_test[4];
   int use_slot = 0; /* bit mask */
@@ -102,14 +97,15 @@ main(int argc, char **argv)
     printf("\n");
   }
 
-  time(&t);
-  strftime(timebuf,sizeof(timebuf),"RUN%Y%m%d%H%M%S",localtime(&t));
+  time_t tt;//             
+  time(&tt);
+  strftime(timebuf,sizeof(timebuf),"RUN%Y%m%d%H%M%S",localtime(&tt));
   strcpy(SaveFile,timebuf);
   strcat(SaveFile,".dat");
   printf("File Name: %s\n",SaveFile);
  
 #ifdef PRINT
-  if((fpr=fopen(SaveFile,"r"))!=NULL) {
+  if((FILE *fpr=fopen(SaveFile,"r"))!=NULL) {
     printf("File: %s exists on the disk!",SaveFile);
     fclose(fpr);
     exit(0);
@@ -143,10 +139,10 @@ main(int argc, char **argv)
 
   while (1) {
     /*        printf("before redo.\n"); */
-    int redo;
     /*        printf("                         after redo.\n"); */
 #if 0
     /* If you want to test select() */
+    fd_set rfds, efds;
     FD_ZERO(&rfds); FD_SET(cprfd, &rfds);
     printf("after Rfds.\n");
     FD_ZERO(&efds); FD_SET(cprfd, &efds);
@@ -188,7 +184,7 @@ main(int argc, char **argv)
     if(buffer[10] != 0) card_test[1] = 1;
     if(buffer[11] != 0) card_test[2] = 1;
     if(buffer[12] != 0) card_test[3] = 1; // by zjz and lza
-    istart = 13;
+    int istart = 13;
     for (iii=0;iii<4;iii++) {
       if (card_test[iii]== 0) 
 	continue;

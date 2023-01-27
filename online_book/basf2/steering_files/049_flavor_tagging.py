@@ -13,7 +13,7 @@ import variables.utils as vu
 filenumber = sys.argv[1]
 
 # set analysis global tag (needed for flavor tagging) [S10]
-b2.conditions.prepend_globaltag("analysis_tools_release-04-02")  # [E10]
+b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())  # [E10]
 
 # create path
 main = b2.Path()

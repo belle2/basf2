@@ -134,7 +134,7 @@ std::string MCParticle::getInfoHTML() const
   out << ",<b>isVirtual</b>=" << isVirtual();
   out << "<br>";
 
-  out << "<b>pT</b>=" << getMomentum().Pt();
+  out << "<b>pT</b>=" << getMomentum().Rho();
   out << ", <b>pZ</b>=" << m_momentum_z;
   out << "<br>";
   std::string unitType = HTML::chooseUnitOfLength(getProductionVertex());
@@ -179,7 +179,7 @@ const MCParticle* MCParticle::getParticleFromGeneralizedIndexString(const std::s
 
     // Check that the daughter index is smaller than the number of daughters of the current root particle
     if (dauIndex >= int(currentPart->getNDaughters()) or dauIndex < 0) {
-      B2WARNING("Daughter index " << dauIndex << " out of range");
+      B2WARNING("Daughter index out of range" << LogVar("daughter index", dauIndex));
       B2WARNING("Trying to access non-existing particle.");
       return nullptr;
     } else {

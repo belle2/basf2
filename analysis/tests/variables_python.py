@@ -35,8 +35,13 @@ v.addAlias('anotherAlias', 'daughter(1, p)')
 for vn in v.getAliasNames():
     assert (vn == 'sigProb' or vn == 'anotherAlias')
 
-assert 'extraInfo__boSignalProbability__bc' == ROOT.Belle2.makeROOTCompatible('extraInfo(SignalProbability)')
-assert 'extraInfo(SignalProbability)' == ROOT.Belle2.invertMakeROOTCompatible('extraInfo__boSignalProbability__bc')
+v.addAlias('formulaAlias', 'abs(3**2)')
+assert v.evaluate('formulaAlias', ROOT.nullptr) == 9.0
+
+
+assert 'extraInfo__boSignalProbability__bc' == ROOT.Belle2.MakeROOTCompatible.makeROOTCompatible('extraInfo(SignalProbability)')
+assert 'extraInfo(SignalProbability)' == ROOT.Belle2.MakeROOTCompatible.invertMakeROOTCompatible(
+    'extraInfo__boSignalProbability__bc')
 
 v.addCollection('kin', std_vector('p', 'px', 'py', 'pz'))
 vec = v.getCollection('kin')

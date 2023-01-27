@@ -32,12 +32,12 @@ class TestTreeFits(unittest.TestCase):
 
         ma.fillParticleList('pi+:a', 'pionID > 0.5', path=main)
 
-        ma.reconstructDecay('K_S0:all -> pi+:a pi-:a', '', 0, path=main)
-        ma.matchMCTruth('K_S0:all', path=main)
+        ma.reconstructDecay('K_S0:pipi -> pi+:a pi-:a', '', 0, path=main)
+        ma.matchMCTruth('K_S0:pipi', path=main)
 
         conf = 0
         main.add_module('TreeFitter',
-                        particleList='K_S0:all',
+                        particleList='K_S0:pipi',
                         confidenceLevel=conf,
                         massConstraintList=[],
                         massConstraintListParticlename=[],
@@ -48,7 +48,7 @@ class TestTreeFits(unittest.TestCase):
         ntupler = basf2.register_module('VariablesToNtuple')
         ntupler.param('fileName', testFile.name)
         ntupler.param('variables', ['chiProb', 'M', 'isSignal'])
-        ntupler.param('particleList', 'K_S0:all')
+        ntupler.param('particleList', 'K_S0:pipi')
         main.add_module(ntupler)
 
         basf2.process(main)
@@ -71,13 +71,14 @@ class TestTreeFits(unittest.TestCase):
 
         self.assertFalse(truePositives == 0, "No signal survived the fit.")
 
-        self.assertTrue(falsePositives < 2586, f"Too many false positives: {falsePositives} out of {allBkg} total bkg events.")
+        self.assertTrue(falsePositives < 3318, f"Too many false positives: {falsePositives} out of {allBkg} total bkg events.")
 
-        self.assertTrue(truePositives > 540, "Signal rejection too high")
+        self.assertTrue(truePositives > 561, "Signal rejection too high")
         self.assertFalse(mustBeZero, f"We should have dropped all candidates with confidence level less than {conf}.")
 
         print("Test passed, cleaning up.")
 
 
 if __name__ == '__main__':
-    unittest.main()
+    with b2test_utils.clean_working_directory():
+        unittest.main()

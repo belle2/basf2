@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
     return 1;
   }
 
-  Belle2::MVA::upload(identifier, db_identifier, exp1, run1, exp2, run2);
+  Belle2::MVA::Utility::upload(identifier, db_identifier, exp1, run1, exp2, run2);
 
 
 }

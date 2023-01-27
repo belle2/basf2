@@ -31,7 +31,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(AnalysisPhase1Study)
+REG_MODULE(AnalysisPhase1Study);
 
 //-----------------------------------------------------------------
 //                 Implementation

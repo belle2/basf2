@@ -8,9 +8,7 @@
 
 // Own include
 #include <analysis/variables/TimeDependentVariables.h>
-#include <analysis/VariableManager/Manager.h>
 
-#include <analysis/utility/PCmsLabTransform.h>
 #include <framework/dbobjects/BeamParameters.h>
 
 // dataobjects
@@ -20,14 +18,16 @@
 
 //utilities
 #include <analysis/utility/DistanceTools.h>
+#include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/RotationTools.h>
+#include <analysis/utility/ReferenceFrame.h>
 
 // framework aux
 #include <framework/gearbox/Const.h>
+#include <framework/geometry/B2Vector3.h>
 
 #include <TMatrixD.h>
 #include <TVectorD.h>
-#include <TVector3.h>
 
 //#include <iostream>
 #include <cmath>
@@ -42,7 +42,7 @@ namespace Belle2 {
     using RotationTools::toVec;
 
     static const double realNaN = std::numeric_limits<double>::quiet_NaN();
-    static const TVector3 vecNaN(realNaN, realNaN, realNaN);
+    static const B2Vector3D vecNaN(realNaN, realNaN, realNaN);
 
     //   ############################################## Time Dependent CPV Analysis Variables  ###############################################
 
@@ -262,40 +262,40 @@ namespace Belle2 {
 
     double vertexBoostDirection(const Particle* part)
     {
-      TVector3 boostDir = PCmsLabTransform().getBoostVector().Unit();
-      TVector3 pos = part->getVertex();
+      B2Vector3D boostDir = PCmsLabTransform().getBoostVector().Unit();
+      B2Vector3F pos = part->getVertex();
       return pos.Dot(boostDir);
     }
 
     double vertexOrthogonalBoostDirection(const Particle* part)
     {
-      TVector3 boost = PCmsLabTransform().getBoostVector();
-      TVector3 orthBoostDir = getUnitOrthogonal(boost);
+      B2Vector3D boost = PCmsLabTransform().getBoostVector();
+      B2Vector3D orthBoostDir = getUnitOrthogonal(boost);
 
-      TVector3 pos = part->getVertex();
+      B2Vector3F pos = part->getVertex();
       return pos.Dot(orthBoostDir);
     }
 
     double vertexTruthBoostDirection(const Particle* part)
     {
       static DBObjPtr<BeamParameters> beamParamsDB;
-      TVector3 boostDir = (beamParamsDB->getHER() + beamParamsDB->getLER()).BoostVector().Unit();
+      B2Vector3D boostDir = -(beamParamsDB->getHER() + beamParamsDB->getLER()).BoostToCM().Unit();
 
       const MCParticle* mcPart = part->getMCParticle();
       if (!mcPart) return realNaN;
-      TVector3 pos = mcPart->getDecayVertex();
+      B2Vector3D pos = mcPart->getDecayVertex();
       return pos.Dot(boostDir);
     }
 
     double vertexTruthOrthogonalBoostDirection(const Particle* part)
     {
       static DBObjPtr<BeamParameters> beamParamsDB;
-      TVector3 boost = (beamParamsDB->getHER() + beamParamsDB->getLER()).BoostVector();
-      TVector3 orthBoostDir = getUnitOrthogonal(boost);
+      B2Vector3D boost = -(beamParamsDB->getHER() + beamParamsDB->getLER()).BoostToCM();
+      B2Vector3D orthBoostDir = getUnitOrthogonal(boost);
 
       const MCParticle* mcPart = part->getMCParticle();
       if (!mcPart) return realNaN;
-      TVector3 pos = mcPart->getDecayVertex();
+      B2Vector3D pos = mcPart->getDecayVertex();
       return pos.Dot(orthBoostDir);
     }
 
@@ -357,6 +357,17 @@ namespace Belle2 {
       return vert->getTagVolErr();
     }
 
+    // cosTheta boost direction
+
+    double particleCosThetaBoostDirection(const Particle* part)
+    {
+      const auto& frame = ReferenceFrame::GetCurrent();
+      B2Vector3D boost = PCmsLabTransform().getBoostVector();
+      ROOT::Math::PxPyPzEVector pxpypze = frame.getMomentum(part);
+      B2Vector3D momentum(pxpypze.Px(), pxpypze.Py(), pxpypze.Pz());
+      return cos(momentum.Angle(boost));
+    }
+
     double particleInternalTagVMCFlavor(const Particle* part)
     {
       auto* vert = part->getRelatedTo<TagVertex>();
@@ -372,7 +383,7 @@ namespace Belle2 {
       if (trackIndex.size() != 1) return realNaN;
       unsigned trackIndexInt = trackIndex.at(0);
 
-      return vert->getVtxFitTrackP(trackIndexInt).Mag();
+      return vert->getVtxFitTrackP(trackIndexInt).R();
     }
 
     double tagTrackMomentumX(const Particle* part, const std::vector<double>& trackIndex)
@@ -383,7 +394,7 @@ namespace Belle2 {
       if (trackIndex.size() != 1) return realNaN;
       unsigned trackIndexInt = trackIndex.at(0);
 
-      return vert->getVtxFitTrackPComponent(trackIndexInt, 0);
+      return vert->getVtxFitTrackP(trackIndexInt).X();
     }
 
     double tagTrackMomentumY(const Particle* part, const std::vector<double>& trackIndex)
@@ -394,7 +405,7 @@ namespace Belle2 {
       if (trackIndex.size() != 1) return realNaN;
       unsigned trackIndexInt = trackIndex.at(0);
 
-      return vert->getVtxFitTrackPComponent(trackIndexInt, 1);
+      return vert->getVtxFitTrackP(trackIndexInt).Y();
     }
 
     double tagTrackMomentumZ(const Particle* part, const std::vector<double>& trackIndex)
@@ -405,7 +416,7 @@ namespace Belle2 {
       if (trackIndex.size() != 1) return realNaN;
       unsigned trackIndexInt = trackIndex.at(0);
 
-      return vert->getVtxFitTrackPComponent(trackIndexInt, 2);
+      return vert->getVtxFitTrackP(trackIndexInt).Z();
     }
 
     double tagTrackZ0(const Particle* part, const std::vector<double>& trackIndex)
@@ -594,7 +605,7 @@ namespace Belle2 {
       const MCParticle* mcParticle(vert->getVtxFitMCParticle(trackIndexInt));
       if (!mcParticle) return realNaN;
 
-      TVector3 mcTagV = vert->getMCTagVertex();
+      B2Vector3D mcTagV = vert->getMCTagVertex();
       if (mcTagV(0)  == realNaN)                                        return realNaN;
       if (mcTagV(0)  == 0 && mcTagV(1) == 0 && mcTagV(2) == 0)          return realNaN;
 
@@ -603,7 +614,7 @@ namespace Belle2 {
                                            mcTagV);
     }
 
-    TVector3 tagTrackTrueVecToTagV(const Particle* part, const std::vector<double>& trackIndex)
+    B2Vector3D tagTrackTrueVecToTagV(const Particle* part, const std::vector<double>& trackIndex)
     {
       auto* vert = part->getRelatedTo<TagVertex>();
       if (!vert) return vecNaN;
@@ -614,7 +625,7 @@ namespace Belle2 {
       const MCParticle* mcParticle(vert->getVtxFitMCParticle(trackIndexInt));
       if (!mcParticle) return vecNaN;
 
-      TVector3 mcTagV = vert->getMCTagVertex();
+      B2Vector3D mcTagV = vert->getMCTagVertex();
       if (mcTagV(0)  == realNaN)                                        return vecNaN;
       if (mcTagV(0)  == 0 && mcTagV(1) == 0 && mcTagV(2) == 0)          return vecNaN;
 
@@ -625,23 +636,23 @@ namespace Belle2 {
 
     double tagTrackTrueVecToTagVX(const Particle* part, const std::vector<double>& trackIndex)
     {
-      TVector3 result = tagTrackTrueVecToTagV(part, trackIndex);
+      B2Vector3D result = tagTrackTrueVecToTagV(part, trackIndex);
       return result(0);
     }
 
     double tagTrackTrueVecToTagVY(const Particle* part, const std::vector<double>& trackIndex)
     {
-      TVector3 result = tagTrackTrueVecToTagV(part, trackIndex);
+      B2Vector3D result = tagTrackTrueVecToTagV(part, trackIndex);
       return result(1);
     }
 
     double tagTrackTrueVecToTagVZ(const Particle* part, const std::vector<double>& trackIndex)
     {
-      TVector3 result = tagTrackTrueVecToTagV(part, trackIndex);
+      B2Vector3D result = tagTrackTrueVecToTagV(part, trackIndex);
       return result(2);
     }
 
-    TVector3 tagTrackTrueMomentum(const Particle* part, const std::vector<double>& trackIndex)
+    B2Vector3D tagTrackTrueMomentum(const Particle* part, const std::vector<double>& trackIndex)
     {
       auto* vert = part->getRelatedTo<TagVertex>();
       if (!vert) return vecNaN;
@@ -657,23 +668,23 @@ namespace Belle2 {
 
     double tagTrackTrueMomentumX(const Particle* part, const std::vector<double>& trackIndex)
     {
-      TVector3 pTrue = tagTrackTrueMomentum(part, trackIndex);
+      B2Vector3D pTrue = tagTrackTrueMomentum(part, trackIndex);
       return pTrue(0);
     }
 
     double tagTrackTrueMomentumY(const Particle* part, const std::vector<double>& trackIndex)
     {
-      TVector3 pTrue = tagTrackTrueMomentum(part, trackIndex);
+      B2Vector3D pTrue = tagTrackTrueMomentum(part, trackIndex);
       return pTrue(1);
     }
 
     double tagTrackTrueMomentumZ(const Particle* part, const std::vector<double>& trackIndex)
     {
-      TVector3 pTrue = tagTrackTrueMomentum(part, trackIndex);
+      B2Vector3D pTrue = tagTrackTrueMomentum(part, trackIndex);
       return pTrue(2);
     }
 
-    TVector3 tagTrackTrueOrigin(const Particle* part, const std::vector<double>& trackIndex)
+    B2Vector3D tagTrackTrueOrigin(const Particle* part, const std::vector<double>& trackIndex)
     {
       auto* vert = part->getRelatedTo<TagVertex>();
       if (!vert) return vecNaN;
@@ -689,19 +700,19 @@ namespace Belle2 {
 
     double tagTrackTrueOriginX(const Particle* part, const std::vector<double>& trackIndex)
     {
-      TVector3 origin = tagTrackTrueOrigin(part, trackIndex);
+      B2Vector3D origin = tagTrackTrueOrigin(part, trackIndex);
       return origin(0);
     }
 
     double tagTrackTrueOriginY(const Particle* part, const std::vector<double>& trackIndex)
     {
-      TVector3 origin = tagTrackTrueOrigin(part, trackIndex);
+      B2Vector3D origin = tagTrackTrueOrigin(part, trackIndex);
       return origin(1);
     }
 
     double tagTrackTrueOriginZ(const Particle* part, const std::vector<double>& trackIndex)
     {
-      TVector3 origin = tagTrackTrueOrigin(part, trackIndex);
+      B2Vector3D origin = tagTrackTrueOrigin(part, trackIndex);
       return origin(2);
     }
 
@@ -786,9 +797,9 @@ namespace Belle2 {
         return nullptr;
       }
 
-      return [variable](const Particle * part) {
+      return [variable](const Particle * part) -> double {
         double sum = cumulate(part, variable, 0, [](double s, double f, double) {return s + f;});
-        double tot = cumulate(part, variable, 0, [](double s, double  , double) {return s + 1;});
+        double tot = cumulate(part, variable, 0, [](double s, double, double) {return s + 1;});
         return (tot > 0) ? sum / tot : realNaN;
       };
     }
@@ -800,9 +811,9 @@ namespace Belle2 {
         return nullptr;
       }
 
-      return [variable](const Particle * part) {
+      return [variable](const Particle * part) -> double {
         double sum = cumulate(part, variable, 0, [](double s, double f, double) {return s + f * f;});
-        double tot = cumulate(part, variable, 0, [](double s, double  , double) {return s + 1;});
+        double tot = cumulate(part, variable, 0, [](double s, double, double) {return s + 1;});
         return (tot > 0) ? sum / tot : realNaN;
       };
     }
@@ -815,7 +826,7 @@ namespace Belle2 {
         return nullptr;
       }
 
-      return [variable](const Particle * part) {
+      return [variable](const Particle * part) -> double {
         double Max = cumulate(part, variable, -DBL_MAX, [](double s, double f, double) {return std::max(s, f);});
         return (Max != -DBL_MAX) ? Max : realNaN;
       };
@@ -828,7 +839,7 @@ namespace Belle2 {
         return nullptr;
       }
 
-      return [variable](const Particle * part) {
+      return [variable](const Particle * part) -> double {
         double Min = cumulate(part, variable, +DBL_MAX, [](double s, double f, double) {return std::min(s, f);});
         return (Min != DBL_MAX) ? Min : realNaN;
       };
@@ -841,9 +852,9 @@ namespace Belle2 {
         return nullptr;
       }
 
-      return [variable](const Particle * part) {
+      return [variable](const Particle * part) -> double {
         double num = cumulate(part, variable, 0, [](double s, double f, double w) {return s + w * f;});
-        double den = cumulate(part, variable, 0, [](double s, double  , double w) {return s + w;});
+        double den = cumulate(part, variable, 0, [](double s, double, double w) {return s + w;});
         return (den > 0) ? num / den : realNaN;
       };
     }
@@ -857,7 +868,7 @@ namespace Belle2 {
 
       return [variable](const Particle * part) -> double {
         double num = cumulate(part, variable, 0, [](double s, double f, double w) {return s + w * f * f;});
-        double den = cumulate(part, variable, 0, [](double s, double  , double w) {return s + w;});
+        double den = cumulate(part, variable, 0, [](double s, double, double w) {return s + w;});
         return (den > 0) ? num / den : realNaN;
       };
     }
@@ -869,7 +880,7 @@ namespace Belle2 {
         return nullptr;
       }
 
-      return [variable](const Particle * part) {
+      return [variable](const Particle * part) -> double {
         return cumulate(part, variable, 0, [](double s, double f, double) {return s + f;});
       };
     }
@@ -880,168 +891,162 @@ namespace Belle2 {
 
     VARIABLE_GROUP("Time Dependent CPV Analysis Variables");
 
-    REGISTER_VARIABLE("TagVx", particleTagVx, "Tag vertex X component");
-    REGISTER_VARIABLE("TagVy", particleTagVy, "Tag vertex Y component");
-    REGISTER_VARIABLE("TagVz", particleTagVz, "Tag vertex Z component");
-    REGISTER_VARIABLE("mcTagVx", particleTruthTagVx, "Generated Tag vertex X component");
-    REGISTER_VARIABLE("mcTagVy", particleTruthTagVy, "Generated Tag vertex Y component");
-    REGISTER_VARIABLE("mcTagVz", particleTruthTagVz, "Generated Tag vertex Z component");
-    REGISTER_VARIABLE("TagVxErr", particleTagVxErr, "Tag vertex X component uncertainty");
-    REGISTER_VARIABLE("TagVyErr", particleTagVyErr, "Tag vertex Y component uncertainty");
-    REGISTER_VARIABLE("TagVzErr", particleTagVzErr, "Tag vertex Z component uncertainty");
+    REGISTER_VARIABLE("TagVx", particleTagVx, "Tag vertex X component", "cm");
+    REGISTER_VARIABLE("TagVy", particleTagVy, "Tag vertex Y component", "cm");
+    REGISTER_VARIABLE("TagVz", particleTagVz, "Tag vertex Z component", "cm");
+    REGISTER_VARIABLE("mcTagVx", particleTruthTagVx, "Generated Tag vertex X component", "cm");
+    REGISTER_VARIABLE("mcTagVy", particleTruthTagVy, "Generated Tag vertex Y component", "cm");
+    REGISTER_VARIABLE("mcTagVz", particleTruthTagVz, "Generated Tag vertex Z component", "cm");
+    REGISTER_VARIABLE("TagVxErr", particleTagVxErr, "Tag vertex X component uncertainty", "cm");
+    REGISTER_VARIABLE("TagVyErr", particleTagVyErr, "Tag vertex Y component uncertainty", "cm");
+    REGISTER_VARIABLE("TagVzErr", particleTagVzErr, "Tag vertex Z component uncertainty", "cm");
     REGISTER_VARIABLE("TagVpVal", particleTagVpVal, "Tag vertex p-Value");
     REGISTER_VARIABLE("TagVNTracks", particleTagVNTracks, "Number of tracks in the tag vertex");
     REGISTER_VARIABLE("TagVType", particleTagVType,
-                      R"DOC(Type of algo for the tag vertex. -1: failed (1,2: single track, deprecated), 3: standard, 4: standard_PXD, 5: no constraint)DOC");
+                      R"DOC(Type of algorithm for the tag vertex. -1: failed (1,2: single track, deprecated), 3: standard, 4: standard_PXD, 5: no constraint)DOC");
     REGISTER_VARIABLE("TagVNDF", particleTagVNDF, "Number of degrees of freedom in the tag vertex fit");
     REGISTER_VARIABLE("TagVChi2", particleTagVChi2, "chi2 value of the tag vertex fit");
     REGISTER_VARIABLE("TagVChi2IP", particleTagVChi2IP, "IP component of chi2 value of the tag vertex fit");
 
     REGISTER_VARIABLE("DeltaT", particleDeltaT,
-                      R"DOC(Proper decay time difference :math:`\Delta t` between signal B-meson :math:`(B_{rec})` and tag B-meson :math:`(B_{tag})` in ps.)DOC");
+                      R"DOC(Proper decay time difference :math:`\Delta t` between signal B-meson :math:`(B_{rec})` and tag B-meson :math:`(B_{tag})`.)DOC",
+                      "ps");
     REGISTER_VARIABLE("DeltaTErr", particleDeltaTErr,
-                      R"DOC(Proper decay time difference :math:`\Delta t` uncertainty in ps)DOC");
+                      R"DOC(Proper decay time difference :math:`\Delta t` uncertainty)DOC", "ps");
     REGISTER_VARIABLE("DeltaTRes", particleDeltaTRes,
-                      R"DOC(:math:`\Delta t` residual in ps, to be used for resolution function studies)DOC");
+                      R"DOC(:math:`\Delta t` residual, to be used for resolution function studies)DOC", "ps");
     REGISTER_VARIABLE("DeltaTBelle", particleDeltaTBelle,
-                      R"DOC([Legacy] :math:`\Delta t` in ps, as it was used in Belle)DOC");
+                      R"DOC([Legacy] :math:`\Delta t`, as it was used in Belle)DOC", "ps");
     REGISTER_VARIABLE("mcDeltaTau", particleMCDeltaTau,
-                      R"DOC(Generated proper decay time difference :math:`\Delta t` in ps: :math:`\tau(B_{\rm rec})-\tau(B_{\rm tag})`)DOC");
+                      R"DOC(Generated proper decay time difference :math:`\Delta t`: :math:`\tau(B_{\rm rec})-\tau(B_{\rm tag})`)DOC", "ps");
     REGISTER_VARIABLE("mcDeltaT", particleMCDeltaT,
-                      R"DOC(Generated proper decay time difference (in z-difference approximation) :math:`\Delta t` in ps: :math:`(l(B_{\rm rec}) - l(B_{\rm tag}))/\beta_{\Upsilon(4S)}\gamma_{\Upsilon(4S)}`)DOC");
+                      R"DOC(Generated proper decay time difference (in z-difference approximation) :math:`\Delta t`: :math:`(l(B_{\rm rec}) - l(B_{\rm tag}))/\beta_{\Upsilon(4S)}\gamma_{\Upsilon(4S)}`)DOC",
+                      "ps");
     REGISTER_VARIABLE("mcDeltaBoost", particleMCDeltaBoost,
                       R"DOC(True difference of decay vertex boost-direction components between signal B-meson :math:`(B_{rec})` and tag B-meson :math:`(B_{tag})`:
-:math:`\Delta l = l(B_{rec}) - l(B_{tag})`)DOC");
+:math:`\Delta l = l(B_{rec}) - l(B_{tag})`)DOC", "cm");
     REGISTER_VARIABLE("DeltaZ", particleDeltaZ,
                       R"DOC(Difference of decay vertex longitudinal components between signal B-meson :math:`(B_{rec})` and tag B-meson :math:`(B_{tag})`:
-:math:`\Delta z = z(B_{rec}) - z(B_{tag})`)DOC");
+:math:`\Delta z = z(B_{rec}) - z(B_{tag})`)DOC", "cm");
     REGISTER_VARIABLE("DeltaZErr", particleDeltaZErr,
-                      R"DOC(Uncertainty of the difference :math:`z(B_{rec}) - z(B_{tag})`)DOC");
-    REGISTER_VARIABLE("DeltaBoost", particleDeltaB, R"DOC(:math:`\Delta z` in the boost direction)DOC");
-    REGISTER_VARIABLE("DeltaBoostErr", particleDeltaBErr, R"DOC(Uncertanty of :math:`\Delta z` in the boost direction)DOC");
+                      R"DOC(Uncertainty of the difference :math:`z(B_{rec}) - z(B_{tag})`)DOC", "cm");
+    REGISTER_VARIABLE("DeltaBoost", particleDeltaB, R"DOC(:math:`\Delta z` in the boost direction)DOC", "cm");
+    REGISTER_VARIABLE("DeltaBoostErr", particleDeltaBErr, R"DOC(Uncertainty of :math:`\Delta z` in the boost direction)DOC", "cm");
 
     REGISTER_VARIABLE("LBoost", vertexBoostDirection,
-                      "Returns the vertex component in the boost direction");
+                      "Returns the vertex component in the boost direction", "cm");
     REGISTER_VARIABLE("OBoost", vertexOrthogonalBoostDirection,
-                      "Returns the vertex component in the direction orthogonal to the boost");
+                      "Returns the vertex component in the direction orthogonal to the boost", "cm");
     REGISTER_VARIABLE("mcLBoost", vertexTruthBoostDirection,
-                      "Returns the MC vertex component in the boost direction");
+                      "Returns the MC vertex component in the boost direction", "cm");
     REGISTER_VARIABLE("mcOBoost", vertexTruthOrthogonalBoostDirection,
-                      "Returns the MC vertex component in the direction orthogonal to the boost");
+                      "Returns the MC vertex component in the direction orthogonal to the boost", "cm");
     REGISTER_VARIABLE("LBoostErr", vertexErrBoostDirection,
-                      "Returns the error of the vertex in the boost direction");
+                      "Returns the error of the vertex in the boost direction", "cm");
     REGISTER_VARIABLE("OBoostErr", vertexErrOrthBoostDirection,
-                      "Returns the error of the vertex in the direction orthogonal to the boost");
+                      "Returns the error of the vertex in the direction orthogonal to the boost", "cm");
 
     REGISTER_VARIABLE("TagVLBoost", tagVBoostDirection,
-                      "Returns the TagV component in the boost direction");
+                      "Returns the TagV component in the boost direction", "cm");
     REGISTER_VARIABLE("TagVOBoost", tagVOrthogonalBoostDirection,
-                      "Returns the TagV component in the direction orthogonal to the boost");
+                      "Returns the TagV component in the direction orthogonal to the boost", "cm");
     REGISTER_VARIABLE("mcTagVLBoost", tagVTruthBoostDirection,
-                      "Returns the MC TagV component in the boost direction");
+                      "Returns the MC TagV component in the boost direction", "cm");
     REGISTER_VARIABLE("mcTagVOBoost", tagVTruthOrthogonalBoostDirection,
-                      "Returns the MC TagV component in the direction orthogonal to the boost");
+                      "Returns the MC TagV component in the direction orthogonal to the boost", "cm");
     REGISTER_VARIABLE("TagVLBoostErr", tagVErrBoostDirection,
-                      "Returns the error of TagV in the boost direction");
+                      "Returns the error of TagV in the boost direction", "cm");
     REGISTER_VARIABLE("TagVOBoostErr", tagVErrOrthogonalBoostDirection,
-                      "Returns the error of TagV in the direction orthogonal to the boost");
+                      "Returns the error of TagV in the direction orthogonal to the boost", "cm");
+
+    REGISTER_VARIABLE("cosAngleBetweenMomentumAndBoostVector", particleCosThetaBoostDirection,
+                      "cosine of the angle between momentum and boost vector");
 
     REGISTER_VARIABLE("internalTagVMCFlavor", particleInternalTagVMCFlavor,
                       "[Expert] [Debugging] This variable is only for internal checks of the TagV module by developers. \n"
                       "It returns the internal mc flavor information of the tag-side B provided by the TagV module.");
 
-    REGISTER_METAVARIABLE("TagTrackMomentum(i) ", tagTrackMomentum,
-                          "return the magnitude of the momentum of the ith track used in the tag vtx fit.", Manager::VariableDataType::c_double);
-    REGISTER_METAVARIABLE("TagTrackMomentumX(i) ", tagTrackMomentumX,
-                          "return the X component of the momentum of the ith track used in the tag vtx fit.", Manager::VariableDataType::c_double);
-    REGISTER_METAVARIABLE("TagTrackMomentumY(i) ", tagTrackMomentumY,
-                          "return the Y component of the momentum of the ith track used in the tag vtx fit.", Manager::VariableDataType::c_double);
-    REGISTER_METAVARIABLE("TagTrackMomentumZ(i) ", tagTrackMomentumZ,
-                          "return the Z component of the momentum of the ith track used in the tag vtx fit.", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("TagTrackMomentum(i) ", tagTrackMomentum,
+                      "Returns the magnitude of the momentum of the ith track used in the tag vtx fit.", "GeV/c");
+    REGISTER_VARIABLE("TagTrackMomentumX(i) ", tagTrackMomentumX,
+                      "Returns the X component of the momentum of the ith track used in the tag vtx fit.", "GeV/c");
+    REGISTER_VARIABLE("TagTrackMomentumY(i) ", tagTrackMomentumY,
+                      "Returns the Y component of the momentum of the ith track used in the tag vtx fit.", "GeV/c");
+    REGISTER_VARIABLE("TagTrackMomentumZ(i) ", tagTrackMomentumZ,
+                      "Returns the Z component of the momentum of the ith track used in the tag vtx fit.", "GeV/c");
 
-    REGISTER_METAVARIABLE("TagTrackZ0(i)", tagTrackZ0, "return the z0 parameter of the ith track used in the tag vtx fit",
-                          Manager::VariableDataType::c_double);
-    REGISTER_METAVARIABLE("TagTrackD0(i)", tagTrackD0, "return the d0 parameter of the ith track used in the tag vtx fit",
-                          Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("TagTrackZ0(i)", tagTrackZ0, "Returns the z0 parameter of the ith track used in the tag vtx fit", "cm");
+    REGISTER_VARIABLE("TagTrackD0(i)", tagTrackD0, "Returns the d0 parameter of the ith track used in the tag vtx fit", "cm");
 
 
-    REGISTER_METAVARIABLE("TagTrackRaveWeight(i)", tagTrackRaveWeight, "returns the weight assigned by Rave to track i",
-                          Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("TagTrackRaveWeight(i)", tagTrackRaveWeight, "Returns the weight assigned by Rave to track i");
 
     REGISTER_VARIABLE("TagVNFitTracks", particleTagVNFitTracks,
                       "returns the number of tracks used by rave to fit the vertex (not counting the ones coming from Kshorts)");
 
-    REGISTER_METAVARIABLE("TagTrackDistanceToConstraint(i)", tagTrackDistanceToConstraint,
-                          "returns the measured distance between the ith tag track and the centre of the constraint.", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("TagTrackDistanceToConstraint(i)", tagTrackDistanceToConstraint,
+                      "Returns the measured distance between the ith tag track and the centre of the constraint.", "cm");
 
-    REGISTER_METAVARIABLE("TagTrackDistanceToConstraintErr(i)", tagTrackDistanceToConstraintErr,
-                          "returns the estimated error on the distance between the ith tag track and the centre of the constraint.",
-                          Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("TagTrackDistanceToConstraintErr(i)", tagTrackDistanceToConstraintErr,
+                      "Returns the estimated error on the distance between the ith tag track and the centre of the constraint.", "cm");
 
-    REGISTER_METAVARIABLE("TagTrackDistanceToConstraintSignificance(i)", tagTrackDistanceToConstraintSignificance,
-                          "returns the significance of the distance between the centre of the constraint and the tag track indexed by track index (computed as distance / uncertainty)",
-                          Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("TagTrackDistanceToConstraintSignificance(i)", tagTrackDistanceToConstraintSignificance,
+                      "Returns the significance of the distance between the centre of the constraint and the tag track indexed by track index (computed as distance / uncertainty)");
 
 
     REGISTER_VARIABLE("TagVDistanceToConstraint", tagVDistanceToConstraint,
-                      "returns the measured distance between the tag vtx and the centre of the constraint.");
+                      "returns the measured distance between the tag vtx and the centre of the constraint.", "cm");
 
     REGISTER_VARIABLE("TagVDistanceToConstraintErr", tagVDistanceToConstraintErr,
-                      "returns the estimated error on the distance between the tag vtx and the centre of the constraint.");
+                      "returns the estimated error on the distance between the tag vtx and the centre of the constraint.", "cm");
 
     REGISTER_VARIABLE("TagVDistanceToConstraintSignificance", tagVDistanceToConstraintSignificance,
                       "returns the significance of the distance between the tag vtx and the centre of the constraint (computed as distance / uncertainty)");
 
-    REGISTER_METAVARIABLE("TagTrackDistanceToTagV(i)", tagTrackDistanceToTagV,
-                          "returns the measured distance between the ith tag track and the tag vtx.", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("TagTrackDistanceToTagV(i)", tagTrackDistanceToTagV,
+                      "Returns the measured distance between the ith tag track and the tag vtx.", "cm");
 
-    REGISTER_METAVARIABLE("TagTrackDistanceToTagVErr(i)", tagTrackDistanceToTagVErr,
-                          "returns the estimated error on the distance between the ith tag track and the tag vtx. Warning: only the uncertainties on the track position parameters are taken into account.",
-                          Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("TagTrackDistanceToTagVErr(i)", tagTrackDistanceToTagVErr, R"DOC(
+                      "Returns the estimated error on the distance between the ith tag track and the tag vtx.
 
-    REGISTER_METAVARIABLE("TagTrackDistanceToTagVSignificance(i)", tagTrackDistanceToTagVSignificance,
-                          "returns the significance of the distance between the tag vtx and the tag track indexed by trackIndex (computed as distance / uncertainty)",
-                          Manager::VariableDataType::c_double);
+                       .. warning:: Only the uncertainties on the track position parameters are taken into account.
+                       )DOC", "cm");
 
-    REGISTER_METAVARIABLE("TagTrackTrueDistanceToTagV(i)", tagTrackTrueDistanceToTagV,
-                          "return the true distance between the true B Tag decay vertex and the p'cle corresponding to the ith tag vtx track.",
-                          Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("TagTrackDistanceToTagVSignificance(i)", tagTrackDistanceToTagVSignificance,
+                      "Returns the significance of the distance between the tag vtx and the tag track indexed by trackIndex (computed as distance / uncertainty)");
 
-    REGISTER_METAVARIABLE("TagTrackTrueVecToTagVX(i)", tagTrackTrueVecToTagVX,
-                          "return the X coordinate of the vector between the mc particle corresponding to the ith tag vtx track and the true tag B decay vertex.",
-                          Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("TagTrackTrueDistanceToTagV(i)", tagTrackTrueDistanceToTagV,
+                      "Returns the true distance between the true B Tag decay vertex and the particle corresponding to the ith tag vtx track.", "cm");
 
-    REGISTER_METAVARIABLE("TagTrackTrueVecToTagVY(i)", tagTrackTrueVecToTagVY,
-                          "return the Y coordinate of the vector between the mc particle corresponding to the ith tag vtx track and the true tag B decay vertex.",
-                          Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("TagTrackTrueVecToTagVX(i)", tagTrackTrueVecToTagVX,
+                      "Returns the X coordinate of the vector between the mc particle corresponding to the ith tag vtx track and the true tag B decay vertex.",
+                      "cm");
 
-    REGISTER_METAVARIABLE("TagTrackTrueVecToTagVZ(i)", tagTrackTrueVecToTagVZ,
-                          "return the Z coordinate of the vector between the mc particle corresponding to the ith tag vtx track and the true tag B decay vertex.",
-                          Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("TagTrackTrueVecToTagVY(i)", tagTrackTrueVecToTagVY,
+                      "Returns the Y coordinate of the vector between the mc particle corresponding to the ith tag vtx track and the true tag B decay vertex.",
+                      "cm");
 
-    REGISTER_METAVARIABLE("TagTrackTrueMomentumX(i)", tagTrackTrueMomentumX,
-                          "return the X component of the true momentum of the MC particle corresponding to the ith tag vtx track.",
-                          Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("TagTrackTrueVecToTagVZ(i)", tagTrackTrueVecToTagVZ,
+                      "Returns the Z coordinate of the vector between the mc particle corresponding to the ith tag vtx track and the true tag B decay vertex.",
+                      "cm");
 
-    REGISTER_METAVARIABLE("TagTrackTrueMomentumY(i)", tagTrackTrueMomentumY,
-                          "return the Y component of the true momentum of the MC particle corresponding to the ith tag vtx track.",
-                          Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("TagTrackTrueMomentumX(i)", tagTrackTrueMomentumX,
+                      "Returns the X component of the true momentum of the MC particle corresponding to the ith tag vtx track.", "GeV/c");
 
-    REGISTER_METAVARIABLE("TagTrackTrueMomentumZ(i)", tagTrackTrueMomentumZ,
-                          "return the Z component of the true momentum of the MC particle corresponding to the ith tag vtx track.",
-                          Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("TagTrackTrueMomentumY(i)", tagTrackTrueMomentumY,
+                      "Returns the Y component of the true momentum of the MC particle corresponding to the ith tag vtx track.", "GeV/c");
 
-    REGISTER_METAVARIABLE("TagTrackTrueOriginX(i)", tagTrackTrueOriginX,
-                          "return the X component of the true origin of the MC particle corresponding to the ith tag vtx track.",
-                          Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("TagTrackTrueMomentumZ(i)", tagTrackTrueMomentumZ,
+                      "Returns the Z component of the true momentum of the MC particle corresponding to the ith tag vtx track.", "GeV/c");
 
-    REGISTER_METAVARIABLE("TagTrackTrueOriginY(i)", tagTrackTrueOriginY,
-                          "return the Y component of the true origin of the MC particle corresponding to the ith tag vtx track.",
-                          Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("TagTrackTrueOriginX(i)", tagTrackTrueOriginX,
+                      "Returns the X component of the true origin of the MC particle corresponding to the ith tag vtx track.", "cm");
 
-    REGISTER_METAVARIABLE("TagTrackTrueOriginZ(i)", tagTrackTrueOriginZ,
-                          "return the Z component of the true origin of the MC particle corresponding to the ith tag vtx track.",
-                          Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("TagTrackTrueOriginY(i)", tagTrackTrueOriginY,
+                      "Returns the Y component of the true origin of the MC particle corresponding to the ith tag vtx track.", "cm");
+
+    REGISTER_VARIABLE("TagTrackTrueOriginZ(i)", tagTrackTrueOriginZ,
+                      "Returns the Z component of the true origin of the MC particle corresponding to the ith tag vtx track.", "cm");
 
     REGISTER_VARIABLE("TagVFitTruthStatus", fitTruthStatus, R"DOC(
 Returns the status of the fit performed with the truth info. Possible values are:
@@ -1083,6 +1088,11 @@ Returns the status of the fit performed with rolled back tracks. Possible values
 
     REGISTER_METAVARIABLE("TagTrackWeightedAverageSquares(var)", tagTrackWeightedAverageSquares,
                           "return the average over the tag tracks of the variable ``var``, weighted by weights of the tag vertex fitter. ``var`` must be one of the TagTrackXXX variables, for example: ``TagTrackWeightedAverageSquares(TagTrackDistanceToConstraint)``.",
+                          Manager::VariableDataType::c_double);
+
+    REGISTER_METAVARIABLE("TagTrackSum(var)", tagTrackSum,
+                          "Returns the sum of the provided variable for all tag tracks. The variable must be one of the TagTrackXXX variables, "
+                          "for example ``TagTrackSum(TagTrackD0)``. The tracks that are assigned a zero weight are ignored.",
                           Manager::VariableDataType::c_double);
   }
 }

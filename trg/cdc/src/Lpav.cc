@@ -509,7 +509,8 @@ namespace Belle2 {
     CLHEP::HepSymMatrix vret(3);
 #endif
 #ifdef HAVE_EXCEPTION
-    try {
+    try
+    {
 #endif
       vret = cov(1).similarity(dldc());
 #ifdef HAVE_EXCEPTION

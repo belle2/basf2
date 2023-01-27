@@ -64,11 +64,11 @@ int SocketIO::write_data(int sock, char* data, int len)
   errno = 0;
   char* ptr = data;
   int bcount = 0;
-  int br = 0;
 
   //  printf("write_data( sock=%d. data=%p. len=%d )\n", sock, data, len);
 
   while (bcount < len) {
+    int br = 0;
     if ((br =::write(sock, ptr, len - bcount)) > 0) {
       bcount += br;
       ptr += br;
@@ -118,7 +118,7 @@ int SocketIO::get_wordbuf(int sock, int* wrdbuf, int len)
     printf("buffer too small : %d(%d)", gcount, len);
     exit(0);
   }
-  int bcount = read_data(sock, (char*)&wrdbuf[1], (gcount - 1) * sizeof(int));
+  read_data(sock, (char*)&wrdbuf[1], (gcount - 1) * sizeof(int));
   //  printf ( "term = %8.8x\n", wrdbuf[gcount-1] );
   return (wrdbuf[0]);
 }
@@ -163,9 +163,9 @@ int SocketIO::read_data(int sock, char* data, int len)
 {
   char* buf = data;
   int bcount = 0;
-  int br = 0;
 
   while (bcount < len) {
+    int br = 0;
     if ((br =::read(sock, buf, len - bcount)) > 0) {
       bcount += br;
       buf += br;
@@ -186,7 +186,7 @@ int SocketIO::read_data(int sock, char* data, int len)
           continue;
         default:
           perror("SocketIO:read");
-          fprintf(stderr, "sock = %d, buf=%x, len = %d\n", sock, buf, len - bcount);
+          fprintf(stderr, "sock = %d, buf=%p, len = %d\n", sock, buf, len - bcount);
           return -1;
       }
     }

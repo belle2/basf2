@@ -200,6 +200,10 @@ over ROE objects related to a certain particle list:
   main_path.for_each('RestOfEvent', 'RestOfEvents', path = roe_path)
 
 
+.. note::
+  Usage of the `SignalSideParticleFilter` module in the ROE loop is mandatory if one 
+  uses several different ROEs with different ROE masks, which will help to avoid missing mask errors.
+
 ROE masks
 ---------
 
@@ -353,6 +357,9 @@ It is possible to load ROE as a particle, which can be manipulated as any other 
   
   # A shorter option:
   # ma.fillParticleListFromROE('B0:tagFromROE -> B0:rec', '', 'cleanMask', path=main_path)
+
+  ma.reconstructDecay('Upsilon(4S):rec -> B0:rec B0:tagFromROE', 'hasCorrectROECombination==1', path=main_path)
+  # 'hasCorrectROECombination' returns 1 if the combination of candidates of B0:rec and B0:tagFromROE is correct
 
 The resulting particle list can be combined with other particles, like
 ``Upsilon(4S) -> B0:tagFromROE B0:rec`` in this example.

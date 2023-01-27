@@ -12,7 +12,7 @@
 #include "cadef.h"
 #endif
 
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 #include <TCanvas.h>
 #include <TString.h>
 #include <TPaveText.h>
@@ -39,10 +39,10 @@ namespace Belle2 {
    *
    * @sa https://agira.desy.de/browse/BII-7853
    */
-  class DQMHistAnalysisSVDDoseModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisSVDDoseModule final : public DQMHistAnalysisModule {
   public:
     DQMHistAnalysisSVDDoseModule();
-    virtual ~DQMHistAnalysisSVDDoseModule();
+    ~DQMHistAnalysisSVDDoseModule();
 
   private:
     /** A struct to define the sensors group we average over.
@@ -64,9 +64,24 @@ namespace Belle2 {
     } MyPV;
 #endif
 
+    /**
+     * Initializer.
+     */
     void initialize() override final;
+
+    /**
+     * Called when entering a new run.
+     */
     void beginRun() override final;
+
+    /**
+     * This method is called for each event.
+     */
     void event() override final;
+
+    /**
+     * This method is called if the current run ends.
+     */
     void endRun() override final;
 
     void updateCanvases(); /**< updated canvas */

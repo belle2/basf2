@@ -258,7 +258,7 @@
          <Intersect>A1spc1</Intersect>
          <MotherVolume>A1spc1</MotherVolume>
          <Material>SC_COIL</Material>
-         <Desc>Magnet</Desc>
+         <Desc>Magnet 1 (Leak field cancel coils)</Desc>
       </Straight>
       <Straight name="A4mag2p1">
          <N desc="Number of planes">2</N>
@@ -270,7 +270,8 @@
          <sec name="r1" unit="cm">2.8</sec>
          <Intersect>A1spc1</Intersect>
          <MotherVolume>A1spc1</MotherVolume>
-         <Material desc="Magnet 2 part 1">Cryo_G-10</Material>
+         <Material>Cryo_G-10</Material>
+	 <Desc>Magnet 2 part 1 (QC1RE)</Desc>
       </Straight>
       <Straight name="A4mag2p2">
          <N desc="Number of planes">4</N>
@@ -289,7 +290,7 @@
          <Intersect>A1spc1</Intersect>
          <MotherVolume>A1spc1</MotherVolume>
          <Material>Fe</Material>
-         <Desc>Magnet 2 part 2 iron yoke</Desc>
+         <Desc>Magnet 2 part 2 iron yoke (QC1RE)</Desc>
       </Straight>
       <Straight name="A4mag2p3">
          <N desc="Number of planes">6</N>
@@ -314,7 +315,7 @@
          <Intersect>A1spc1</Intersect>
          <MotherVolume>A1spc1</MotherVolume>
          <Material>SUS316L</Material>
-         <Desc>Magnet 2 part 3</Desc>
+         <Desc>Magnet 2 part 3 (QC1RE)</Desc>
       </Straight>
       <Straight name="A4mag2p4">
          <N desc="Number of planes">2</N>
@@ -327,7 +328,7 @@
          <Intersect>A1spc1</Intersect>
          <MotherVolume>A1spc1</MotherVolume>
          <Material>SC_COIL</Material>
-         <Desc>Magnet 2 part 4</Desc>
+         <Desc>Magnet 2 part 4 (QC1RE)</Desc>
       </Straight>
       <Straight name="A4mag3p1">
          <N desc="Number of planes">2</N>
@@ -340,7 +341,7 @@
          <Intersect>A1spc1</Intersect>
          <MotherVolume>A1spc1</MotherVolume>
          <Material>Fe</Material>
-         <Desc>Magnet 3 part 1</Desc>
+         <Desc>Magnet 3 part 1 (b3 corrector)</Desc>
       </Straight>
       <Straight name="A4mag3p2">
          <N desc="Number of planes">2</N>
@@ -353,7 +354,7 @@
          <Intersect>A1spc1</Intersect>
          <MotherVolume>A1spc1</MotherVolume>
          <Material>SUS316L</Material>
-         <Desc>Magnet 3 part 2</Desc>
+         <Desc>Magnet 3 part 2 (b3 corrector)</Desc>
       </Straight>
       <Straight name="A4mag4p1">
          <N desc="Number of planes">2</N>
@@ -365,7 +366,7 @@
          <sec name="r1" unit="cm">8.5</sec>
          <MotherVolume>A1spc1</MotherVolume>
          <Material>Fe</Material>
-         <Desc>Magnet 4 part 1</Desc>
+         <Desc>Magnet 4 part 1 (QC2RE)</Desc>
       </Straight>
       <Straight name="A4mag4p2">
          <N desc="Number of planes">2</N>
@@ -376,7 +377,8 @@
          <sec name="r0" unit="cm">5.4</sec>
          <sec name="r1" unit="cm">5.4</sec>
          <MotherVolume>A1spc1</MotherVolume>
-         <Material desc="Magnet 4 part 2">Cryo_G-10</Material>
+         <Material>Cryo_G-10</Material>
+	 <Desc>Magnet 4 part 2  (QC2RE)</Desc>
       </Straight>
       <Straight name="A4mag4p3">
          <N desc="Number of planes">2</N>
@@ -388,7 +390,7 @@
          <sec name="r1" unit="cm">5.4</sec>
          <MotherVolume>A1spc1</MotherVolume>
          <Material>SUS316L</Material>
-         <Desc>Magnet 4 part 3</Desc>
+         <Desc>Magnet 4 part 3 (QC2RE)</Desc>
       </Straight>
       <Straight name="A4mag4p4">
          <N desc="Number of planes">2</N>
@@ -400,7 +402,7 @@
          <sec name="r1" unit="cm">5.4</sec>
          <MotherVolume>A1spc1</MotherVolume>
          <Material>SC_COIL</Material>
-         <Desc>Magnet 4 part 4</Desc>
+         <Desc>Magnet 4 part 4 (QC2RE)</Desc>
       </Straight>
       <Straight name="A4mag4p5">
          <N desc="Number of planes">2</N>
@@ -412,7 +414,7 @@
          <sec name="r1" unit="cm">5.4</sec>
          <MotherVolume>A1spc1</MotherVolume>
          <Material>SUS316L</Material>
-         <Desc>Magnet 4 part 5</Desc>
+         <Desc>Magnet 4 part 5 (QC2RE)</Desc>
       </Straight>
       <Straight name="A4mag4p6">
          <N desc="Number of planes">2</N>
@@ -424,7 +426,7 @@
          <sec name="r1" unit="cm">5.4</sec>
          <MotherVolume>A1spc1</MotherVolume>
          <Material>Cryo_Liq_He</Material>
-         <Desc>Magnet 4 part 6</Desc>
+         <Desc>Magnet 4 part 6 (QC2RE)</Desc>
       </Straight>
       <Straight name="A4mag4p7">
          <N desc="Number of planes">6</N>
@@ -448,7 +450,7 @@
          <sec name="r5" unit="cm">7.6</sec>
          <MotherVolume>A1spc1</MotherVolume>
          <Material>SUS316L</Material>
-         <Desc>Magnet 4 part 7</Desc>
+         <Desc>Magnet 4 part 7 (QC2RE)</Desc>
       </Straight>
       <Straight name="A4mag4p8">
          <N desc="Number of planes">2</N>
@@ -460,7 +462,7 @@
          <sec name="r1" unit="cm">8.0</sec>
          <MotherVolume>A1spc1</MotherVolume>
          <Material>SC_COIL</Material>
-         <Desc>Magnet 4 part 8</Desc>
+         <Desc>Magnet 4 part 8 (QC2RE)</Desc>
       </Straight>
       <Straight name="A4mag4p9">
          <N desc="Number of planes">2</N>
@@ -472,7 +474,7 @@
          <sec name="r1" unit="cm">8.2</sec>
          <MotherVolume>A1spc1</MotherVolume>
          <Material>Cryo_Epoxy</Material>
-         <Desc>Magnet 4 part 9</Desc>
+         <Desc>Magnet 4 part 9 (QC2RE)</Desc>
       </Straight>
       <B1spc1>
          <N desc="Number of planes">28</N>
@@ -645,7 +647,8 @@
          <sec name="r0" unit="cm">2.1</sec>
          <sec name="r1" unit="cm">2.1</sec>
          <MotherVolume>B1spc1</MotherVolume>
-         <Material desc="Magnet 1 part 1">Cryo_G-10</Material>
+         <Material>Cryo_G-10</Material>
+	 <Desc>Magnet 1 part 1 (QC1RP)</Desc>
       </Straight>
       <Straight name="B4mag1p2">
          <N desc="Number of planes">6</N>
@@ -669,7 +672,7 @@
          <sec name="r5" unit="cm">2.5</sec>
          <MotherVolume>B1spc1</MotherVolume>
          <Material>SUS316L</Material>
-         <Desc>Magnet 1 part 2</Desc>
+         <Desc>Magnet 1 part 2 (QC1RP)</Desc>
       </Straight>
       <Straight name="B4mag1p3">
          <N desc="Number of planes">3</N>
@@ -684,7 +687,7 @@
          <sec name="r2" unit="cm">2.5</sec>
          <MotherVolume>B1spc1</MotherVolume>
          <Material>SC_COIL</Material>
-         <Desc>Magnet 1 part 3</Desc>
+         <Desc>Magnet 1 part 3 (QC1RP)</Desc>
       </Straight>
       <Straight name="B4mag2">
          <N desc="Number of planes">5</N>
@@ -705,7 +708,7 @@
          <sec name="r4" unit="cm">4.29</sec>
          <MotherVolume>B1spc1</MotherVolume>
          <Material>SUS316L</Material>
-         <Desc>Magnet 2</Desc>
+         <Desc>Magnet 2 (b3 corrector)</Desc>
       </Straight>
       <Straight name="B4mag3p1">
          <N desc="Number of planes">2</N>
@@ -714,13 +717,12 @@
          <sec name="R0" unit="cm">6.8</sec>
          <sec name="R1" unit="cm">6.8</sec>
          <!--<r0 unit="cm">4.29</r0>
-
-      <sec name="r1" unit="cm">4.71</sec>-->
+         <sec name="r1" unit="cm">4.71</sec>-->
          <sec name="r0" unit="cm">4.4</sec>
          <sec name="r1" unit="cm">4.8</sec>
          <MotherVolume>B1spc1</MotherVolume>
          <Material>Cryo_Liq_He</Material>
-         <Desc>Magnet 3 part 1</Desc>
+         <Desc>Magnet 3 part 1 (QC2RP)</Desc>
       </Straight>
       <Straight name="B4mag3p2">
          <N desc="Number of planes">2</N>
@@ -731,7 +733,8 @@
          <sec name="r0" unit="cm">4.85</sec>
          <sec name="r1" unit="cm">4.85</sec>
          <MotherVolume>B1spc1</MotherVolume>
-         <Material desc="Magnet 3 part 2">Cryo_G-10</Material>
+	 <Material>Cryo_G-10</Material>
+	 <Desc>Magnet 3 part 2 (QC2RP)</Desc>
       </Straight>
       <Straight name="B4mag3p3">
          <N desc="Number of planes">2</N>
@@ -743,7 +746,7 @@
          <sec name="r1" unit="cm">4.85</sec>
          <MotherVolume>B1spc1</MotherVolume>
          <Material>SC_COIL</Material>
-         <Desc>Magnet 3 part 3</Desc>
+         <Desc>Magnet 3 part 3 (QC2RP)</Desc>
       </Straight>
       <Straight name="B4mag3p4">
          <N desc="Number of planes">6</N>
@@ -767,7 +770,7 @@
          <sec name="r5" unit="cm">4.85</sec>
          <MotherVolume>B1spc1</MotherVolume>
          <Material>SUS316L</Material>
-         <Desc>Magnet 3 part 4</Desc>
+         <Desc>Magnet 3 part 4 (QC2RP)</Desc>
       </Straight>
       <Straight name="B4mag3p5">
          <N desc="Number of planes">2</N>
@@ -780,7 +783,7 @@
          <Intersect>B1spc1</Intersect>
          <MotherVolume>B1spc1</MotherVolume>
          <Material>Cryo_Liq_He</Material>
-         <Desc>Magnet 3 part 5</Desc>
+         <Desc>Magnet 3 part 5 (QC2RP)</Desc>
       </Straight>
       <Straight name="B4mag3p6">
          <N desc="Number of planes">2</N>
@@ -793,7 +796,7 @@
          <Intersect>B1spc1</Intersect>
          <MotherVolume>B1spc1</MotherVolume>
          <Material>Fe</Material>
-         <Desc>Magnet 3 part 6</Desc>
+         <Desc>Magnet 3 part 6 (QC2RP)</Desc>
       </Straight>
       <Straight name="B4mag4p1">
          <N desc="Number of planes">2</N>
@@ -856,7 +859,7 @@
          <Desc>Magnet 4 part 9</Desc>
       </Straight>
       <C1wal1>
-         <N desc="Number of planes">23</N>
+         <N desc="Number of planes">18</N>
          <sec name="Z0" unit="cm">63.35</sec>
          <sec name="Z1" unit="cm">95.24</sec>
          <sec name="Z2" unit="cm">101.80</sec>
@@ -874,12 +877,7 @@
          <sec name="Z14" unit="cm">372.15</sec>
          <sec name="Z15" unit="cm">385.97</sec>
          <sec name="Z16" unit="cm">385.97</sec>
-         <sec name="Z17" unit="cm">391.986</sec>
-         <sec name="Z18" unit="cm">391.986</sec>
-         <sec name="Z19" unit="cm">391.99</sec>
-         <sec name="Z20" unit="cm">444.00</sec>
-         <sec name="Z21" unit="cm">444.00</sec>
-         <sec name="Z22" unit="cm">830.00</sec>
+         <sec name="Z17" unit="cm">391.0</sec>
          <sec name="R0" unit="cm">12.25</sec>
          <sec name="R1" unit="cm">22.00</sec>
          <sec name="R2" unit="cm">22.00</sec>
@@ -898,11 +896,6 @@
          <sec name="R15" unit="cm">51.30</sec>
          <sec name="R16" unit="cm">57.00</sec>
          <sec name="R17" unit="cm">57.00</sec>
-         <sec name="R18" unit="cm">68.00</sec>
-         <sec name="R19" unit="cm">68.00</sec>
-         <sec name="R20" unit="cm">68.00</sec>
-         <sec name="R21" unit="cm">75.00</sec>
-         <sec name="R22" unit="cm">75.00</sec>
          <Material>SUS316L</Material>
          <Desc>Vacuum vessel</Desc>
       </C1wal1>
@@ -910,30 +903,28 @@
          <N desc="Number of planes">2</N>
          <sec name="Z0" unit="cm">63.35</sec>
          <sec name="Z1" unit="cm">64.85</sec>
-         <!--Z2 unit="cm">64.85</Z2>
-
-      <sec name="Z3" unit="cm">95.24</sec>
-      <sec name="Z4" unit="cm">95.39</sec>
-      <sec name="Z5" unit="cm">101.80</sec>
-      <sec name="Z6" unit="cm">101.80</sec>
-      <sec name="Z7" unit="cm">102.80</sec-->
          <sec name="R0" unit="cm">12.25</sec>
          <sec name="R1" unit="cm">12.71</sec>
+         <!--Z2 unit="cm">64.85</Z2>
+         <sec name="Z3" unit="cm">95.24</sec>
+         <sec name="Z4" unit="cm">95.39</sec>
+         <sec name="Z5" unit="cm">101.80</sec>
+         <sec name="Z6" unit="cm">101.80</sec>
+         <sec name="Z7" unit="cm">102.80</sec-->
          <!--R2 unit="cm">12.76</R2>
-
-      <sec name="R3" unit="cm">22.00</sec>
-      <sec name="R4" unit="cm">22.00</sec>
-      <sec name="R5" unit="cm">22.00</sec>
-      <sec name="R6" unit="cm">24.00</sec>
-      <sec name="R7" unit="cm">24.00</sec>
-      <sec name="r0" unit="cm">0.00</sec>
-      <sec name="r1" unit="cm">0.00</sec>
-      <sec name="r2" unit="cm">11.66</sec>
-      <sec name="r3" unit="cm">20.96</sec>
-      <sec name="r4" unit="cm">21.00</sec>
-      <sec name="r5" unit="cm">21.00</sec>
-      <sec name="r6" unit="cm">21.00</sec>
-      <sec name="r7" unit="cm">21.00</sec-->
+         <sec name="R3" unit="cm">22.00</sec>
+         <sec name="R4" unit="cm">22.00</sec>
+         <sec name="R5" unit="cm">22.00</sec>
+         <sec name="R6" unit="cm">24.00</sec>
+         <sec name="R7" unit="cm">24.00</sec>
+         <sec name="r0" unit="cm">0.00</sec>
+         <sec name="r1" unit="cm">0.00</sec>
+         <sec name="r2" unit="cm">11.66</sec>
+         <sec name="r3" unit="cm">20.96</sec>
+         <sec name="r4" unit="cm">21.00</sec>
+         <sec name="r5" unit="cm">21.00</sec>
+         <sec name="r6" unit="cm">21.00</sec>
+         <sec name="r7" unit="cm">21.00</sec-->
          <Intersect>C1wal1</Intersect>
          <MotherVolume>C1wal1</MotherVolume>
          <Material>W</Material>
@@ -957,27 +948,27 @@
          <Desc>Vacuum space</Desc>
       </Straight>
       <Straight name="C2spc2">
-         <N desc="Number of planes">10</N>
+         <N desc="Number of planes">6</N>
          <sec name="Z0" unit="cm">232.991</sec>
          <sec name="Z1" unit="cm">233.50</sec>
          <sec name="Z2" unit="cm">233.50</sec>
          <sec name="Z3" unit="cm">347.35</sec>
          <sec name="Z4" unit="cm">352.85</sec>
-         <sec name="Z5" unit="cm">360.34</sec>
-         <sec name="Z6" unit="cm">360.34</sec>
+         <sec name="Z5" unit="cm">360.35</sec>
+         <!--sec name="Z6" unit="cm">360.34</sec>
          <sec name="Z7" unit="cm">372.90</sec>
          <sec name="Z8" unit="cm">389.99</sec>
-         <sec name="Z9" unit="cm">391.49</sec>
+         <sec name="Z9" unit="cm">391.00</sec-->
          <sec name="R0" unit="cm">29.40</sec>
          <sec name="R1" unit="cm">29.40</sec>
          <sec name="R2" unit="cm">29.40</sec>
          <sec name="R3" unit="cm">29.40</sec>
          <sec name="R4" unit="cm">33.25</sec>
          <sec name="R5" unit="cm">33.25</sec>
-         <sec name="R6" unit="cm">38.504</sec>
+         <!--sec name="R6" unit="cm">38.504</sec>
          <sec name="R7" unit="cm">47.30</sec>
          <sec name="R8" unit="cm">47.30</sec>
-         <sec name="R9" unit="cm">48.79</sec>
+         <sec name="R9" unit="cm">48.79</sec-->
          <sec name="r0" unit="cm">26.50</sec>
          <sec name="r1" unit="cm">26.50</sec>
          <sec name="r2" unit="cm">0</sec>
@@ -989,20 +980,32 @@
          <Material>Vacuum</Material>
          <Desc>Vacuum space</Desc>
       </Straight>
+      <!--Straight name="C2spc3">
+         <N desc="Number of planes">2</N>
+         <sec name="Z0" unit="cm">391.0</sec>
+         <sec name="Z1" unit="cm">402.0</sec>
+         <sec name="R0" unit="cm">48.30</sec>
+         <sec name="R1" unit="cm">48.30</sec>
+         <Intersect>C1wal1</Intersect>
+         <MotherVolume>C1wal1</MotherVolume>
+         <Material>Air</Material>
+         <Desc>Open space</Desc>
+      </Straight-->
       <Straight name="C2spc3">
-         <N desc="Number of planes">6</N>
-         <sec name="Z0" unit="cm">391.49</sec>
-         <sec name="Z1" unit="cm">402.00</sec>
-         <sec name="Z2" unit="cm">402.00</sec>
-         <sec name="Z3" unit="cm">450.00</sec>
-         <sec name="Z4" unit="cm">450.00</sec>
-         <sec name="Z5" unit="cm">830.00</sec>
-         <sec name="R0" unit="cm">47.30</sec>
-         <sec name="R1" unit="cm">47.30</sec>
-         <sec name="R2" unit="cm">64.00</sec>
-         <sec name="R3" unit="cm">64.00</sec>
-         <sec name="R4" unit="cm">71.00</sec>
-         <sec name="R5" unit="cm">71.00</sec>
+         <N desc="Number of planes">5</N>
+         <sec name="Z0" unit="cm">360.85</sec>
+         <sec name="Z1" unit="cm">362.85</sec>
+         <sec name="Z2" unit="cm">362.85</sec>
+         <sec name="Z3" unit="cm">372.91</sec>
+         <sec name="Z4" unit="cm">391.00</sec>
+         <sec name="R0" unit="cm">38.50</sec>
+         <sec name="R1" unit="cm">40.25</sec>
+         <sec name="R2" unit="cm">40.25</sec>
+         <sec name="R3" unit="cm">47.30</sec>
+         <sec name="R4" unit="cm">47.30</sec>
+         <sec name="r0" unit="cm">38.00</sec>
+         <sec name="r1" unit="cm">38.00</sec>
+         <sec name="r2" unit="cm">0</sec>
          <Intersect>C1wal1</Intersect>
          <MotherVolume>C1wal1</MotherVolume>
          <Material>Air</Material>
@@ -1031,10 +1034,10 @@
       </Straight>
       <Straight name="C3wal2">
          <N desc="Number of planes">2</N>
-         <sec name="Z0" unit="cm">252.27</sec>
-         <sec name="Z1" unit="cm">350.51</sec>
-         <sec name="R0" unit="cm">27.9</sec>
-         <sec name="R1" unit="cm">27.9</sec>
+         <sec name="Z0" unit="cm">254.0</sec>
+         <sec name="Z1" unit="cm">342.0</sec>
+         <sec name="R0" unit="cm">27.8</sec>
+         <sec name="R1" unit="cm">27.8</sec>
          <Intersect>C1wal1</Intersect>
          <MotherVolume>C2spc2</MotherVolume>
          <Material>SUS316L</Material>
@@ -1114,10 +1117,10 @@
       </Straight>
       <Straight name="C4spc2">
          <N desc="Number of planes">2</N>
-         <sec name="Z0" unit="cm">252.71</sec>
-         <sec name="Z1" unit="cm">350.48</sec>
-         <sec name="R0" unit="cm">27.2</sec>
-         <sec name="R1" unit="cm">27.2</sec>
+         <sec name="Z0" unit="cm">254.3</sec>
+         <sec name="Z1" unit="cm">341.8</sec>
+         <sec name="R0" unit="cm">27.1</sec>
+         <sec name="R1" unit="cm">27.1</sec>
          <Intersect>C1wal1</Intersect>
          <MotherVolume>C3wal2</MotherVolume>
          <Material>Vacuum</Material>
@@ -2151,7 +2154,7 @@
          <Intersect>D1spc1</Intersect>
          <MotherVolume>D1spc1</MotherVolume>
          <Material>SC_COIL</Material>
-         <Desc>Magnet</Desc>
+         <Desc>Magnet 1 (Leak field cancel coils)</Desc>
       </Straight>
       <Straight name="D4mag2p1">
          <N desc="Number of planes">2</N>
@@ -2163,7 +2166,8 @@
          <sec name="r1" unit="cm">2.8</sec>
          <Intersect>D1spc1</Intersect>
          <MotherVolume>D1spc1</MotherVolume>
-         <Material desc="Magnet 2 part 1">Cryo_G-10</Material>
+         <Material>Cryo_G-10</Material>
+	 <Desc>Magnet 2 part 1 (QC1LE)</Desc>
       </Straight>
       <Straight name="D4mag2p2">
          <N desc="Number of planes">2</N>
@@ -2176,7 +2180,7 @@
          <Intersect>D1spc1</Intersect>
          <MotherVolume>D1spc1</MotherVolume>
          <Material>Fe</Material>
-         <Desc>Magnet 2 part 2 iron yoke</Desc>
+         <Desc>Magnet 2 part 2 iron yoke (QC1LE)</Desc>
       </Straight>
       <Straight name="D4mag2p3">
          <N desc="Number of planes">6</N>
@@ -2201,7 +2205,7 @@
          <Intersect>D1spc1</Intersect>
          <MotherVolume>D1spc1</MotherVolume>
          <Material>SUS316L</Material>
-         <Desc>Magnet 2 part 3</Desc>
+         <Desc>Magnet 2 part 3 (QC1LE)</Desc>
       </Straight>
       <Straight name="D4mag2p4">
          <N desc="Number of planes">2</N>
@@ -2214,7 +2218,7 @@
          <Intersect>D1spc1</Intersect>
          <MotherVolume>D1spc1</MotherVolume>
          <Material>SC_COIL</Material>
-         <Desc>Magnet 2 part 4</Desc>
+         <Desc>Magnet 2 part 4 (QC1LE)</Desc>
       </Straight>
       <Straight name="D4mag3p1">
          <N desc="Number of planes">6</N>
@@ -2238,7 +2242,7 @@
          <sec name="r5" unit="cm">5.4</sec>
          <MotherVolume>D1spc1</MotherVolume>
          <Material>SUS316L</Material>
-         <Desc>Magnet 3 part 1</Desc>
+         <Desc>Magnet 3 part 1 (QC2LE)</Desc>
       </Straight>
       <Straight name="D4mag3p2">
          <N desc="Number of planes">8</N>
@@ -2268,7 +2272,7 @@
          <sec name="r7" unit="cm">5.4</sec>
          <MotherVolume>D1spc1</MotherVolume>
          <Material>Cryo_Liq_He</Material>
-         <Desc>Magnet 3 part 2</Desc>
+         <Desc>Magnet 3 part 2 (QC2LE)</Desc>
       </Straight>
       <Straight name="D4mag3p3">
          <N desc="Number of planes">2</N>
@@ -2280,7 +2284,7 @@
          <sec name="r1" unit="cm">7.5</sec>
          <MotherVolume>D1spc1</MotherVolume>
          <Material>Fe</Material>
-         <Desc>Magnet 3 part 3</Desc>
+         <Desc>Magnet 3 part 3 (QC2LE)</Desc>
       </Straight>
       <Straight name="D4mag3p4">
          <N desc="Number of planes">2</N>
@@ -2292,7 +2296,7 @@
          <sec name="r1" unit="cm">6.45</sec>
          <MotherVolume>D1spc1</MotherVolume>
          <Material>SUS316L</Material>
-         <Desc>Magnet 3 part 4</Desc>
+         <Desc>Magnet 3 part 4 (QC2LE)</Desc>
       </Straight>
       <Straight name="D4mag3p5">
          <N desc="Number of planes">2</N>
@@ -2304,7 +2308,7 @@
          <sec name="r1" unit="cm">5.4</sec>
          <MotherVolume>D1spc1</MotherVolume>
          <Material>SC_COIL</Material>
-         <Desc>Magnet 3 part 5</Desc>
+         <Desc>Magnet 3 part 5 (QC2LE)</Desc>
       </Straight>
       <Straight name="D4mag3p6">
          <N desc="Number of planes">2</N>
@@ -2316,7 +2320,7 @@
          <sec name="r1" unit="cm">5.0</sec>
          <MotherVolume>D1spc1</MotherVolume>
          <Material>SUS316L</Material>
-         <Desc>Magnet 3 part 6</Desc>
+         <Desc>Magnet 3 part 6 (QC2LE)</Desc>
       </Straight>
       <E1spc1>
          <N desc="Number of planes">27</N>
@@ -2478,7 +2482,8 @@
          <sec name="r0" unit="cm">2.1</sec>
          <sec name="r1" unit="cm">2.1</sec>
          <MotherVolume>E1spc1</MotherVolume>
-         <Material desc="Magnet 1 part 1">Cryo_G-10</Material>
+         <Material>Cryo_G-10</Material>
+	 <Desc>Magnet 1 part 1 (QC1LP)</Desc>
       </Straight>
       <Straight name="E4mag1p2">
          <N desc="Number of planes">6</N>
@@ -2502,7 +2507,7 @@
          <sec name="r5" unit="cm">2.5</sec>
          <MotherVolume>E1spc1</MotherVolume>
          <Material>SUS316L</Material>
-         <Desc>Magnet 1 part 2</Desc>
+         <Desc>Magnet 1 part 2 (QC1LP)</Desc>
       </Straight>
       <Straight name="E4mag1p3">
          <N desc="Number of planes">3</N>
@@ -2518,7 +2523,7 @@
          <Subtract>E3wal1</Subtract>
          <MotherVolume>E1spc1</MotherVolume>
          <Material>SC_COIL</Material>
-         <Desc>Magnet 1 part 3</Desc>
+         <Desc>Magnet 1 part 3 (QC1LP)</Desc>
       </Straight>
       <Straight name="E4mag2">
          <N desc="Number of planes">3</N>
@@ -2534,7 +2539,7 @@
          <Subtract>E3wal1</Subtract>
          <MotherVolume>E1spc1</MotherVolume>
          <Material>SUS316L</Material>
-         <Desc>Magnet 2</Desc>
+         <Desc>Magnet 2 (corrector)</Desc>
       </Straight>
       <Straight name="E4mag3p1">
          <N desc="Number of planes">4</N>
@@ -2553,7 +2558,7 @@
          <Subtract>E3wal1</Subtract>
          <MotherVolume>E1spc1</MotherVolume>
          <Material>Fe</Material>
-         <Desc>Magnet 3 part 1</Desc>
+         <Desc>Magnet 3 part 1 (QC2LP)</Desc>
       </Straight>
       <Straight name="E4mag3p2">
          <N desc="Number of planes">2</N>
@@ -2566,7 +2571,7 @@
          <Subtract>E3wal1</Subtract>
          <MotherVolume>E1spc1</MotherVolume>
          <Material>Cryo_Liq_He</Material>
-         <Desc>Magnet 3 part 2</Desc>
+         <Desc>Magnet 3 part 2 (QC2LP)</Desc>
       </Straight>
       <Straight name="E4mag3p3">
          <N desc="Number of planes">2</N>
@@ -2577,7 +2582,8 @@
          <sec name="r0" unit="cm">4.85</sec>
          <sec name="r1" unit="cm">4.85</sec>
          <MotherVolume>E1spc1</MotherVolume>
-         <Material desc="Magnet 3 part 3">Cryo_G-10</Material>
+         <Material>Cryo_G-10</Material>
+	 <Desc>Magnet 3 part 3 (QC2LP)</Desc>
       </Straight>
       <Straight name="E4mag3p4">
          <N desc="Number of planes">6</N>
@@ -2601,7 +2607,7 @@
          <sec name="r5" unit="cm">4.85</sec>
          <MotherVolume>E1spc1</MotherVolume>
          <Material>SUS316L</Material>
-         <Desc>Magnet 3 part 4</Desc>
+         <Desc>Magnet 3 part 4 (QC2LP)</Desc>
       </Straight>
       <Straight name="E4mag3p5">
          <N desc="Number of planes">2</N>
@@ -2613,10 +2619,10 @@
          <sec name="r1" unit="cm">4.85</sec>
          <MotherVolume>E1spc1</MotherVolume>
          <Material>SC_COIL</Material>
-         <Desc>Magnet 3 part 5</Desc>
+         <Desc>Magnet 3 part 5 (QC2LP)</Desc>
       </Straight>
       <F1wal1>
-         <N desc="Number of planes">20</N>
+         <N desc="Number of planes">17</N>
          <sec name="Z0" unit="cm">-62.73</sec>
          <sec name="Z1" unit="cm">-74.34</sec>
          <sec name="Z2" unit="cm">-74.34</sec>
@@ -2631,12 +2637,9 @@
          <sec name="Z11" unit="cm">-258.548</sec>
          <sec name="Z12" unit="cm">-291.397</sec>
          <sec name="Z13" unit="cm">-305.515</sec>
-         <sec name="Z14" unit="cm">-331.557</sec>
-         <sec name="Z15" unit="cm">-331.557</sec>
-         <sec name="Z16" unit="cm">-336.941</sec>
-         <sec name="Z17" unit="cm">-339.10</sec>
-         <sec name="Z18" unit="cm">-339.10</sec>
-         <sec name="Z19" unit="cm">-716.10</sec>
+         <sec name="Z14" unit="cm">-326.0</sec>
+         <sec name="Z15" unit="cm">-331.0</sec>
+         <sec name="Z16" unit="cm">-335.0</sec>
          <sec name="R0" unit="cm">12.805</sec>
          <sec name="R1" unit="cm">17.018</sec>
          <sec name="R2" unit="cm">20.25</sec>
@@ -2653,10 +2656,7 @@
          <sec name="R13" unit="cm">55.00</sec>
          <sec name="R14" unit="cm">55.00</sec>
          <sec name="R15" unit="cm">60.00</sec>
-         <sec name="R16" unit="cm">63.00</sec>
-         <sec name="R17" unit="cm">63.00</sec>
-         <sec name="R18" unit="cm">75.00</sec>
-         <sec name="R19" unit="cm">75.00</sec>
+         <sec name="R16" unit="cm">60.00</sec>
          <Material>SUS316L</Material>
          <Desc>Vacuum vessel</Desc>
       </F1wal1>
@@ -2728,17 +2728,11 @@
          <Desc>Vacuum space</Desc>
       </Straight>
       <Straight name="F2spc3">
-         <N desc="Number of planes">4</N>
+         <N desc="Number of planes">2</N>
          <sec name="Z0" unit="cm">-318.663</sec>
-         <sec name="Z10" unit="cm">-335.175</sec>
-         <sec name="Z20" unit="cm">-335.175</sec>
-         <sec name="Z1" unit="cm">-343.175</sec>
-         <sec name="Z2" unit="cm">-343.175</sec>
-         <sec name="Z3" unit="cm">-716.10</sec>
-         <sec name="R0" unit="cm">51.00</sec>
-         <sec name="R1" unit="cm">51.00</sec>
-         <sec name="R2" unit="cm">71.00</sec>
-         <sec name="R3" unit="cm">71.00</sec>
+         <sec name="Z1" unit="cm">-335.0</sec>
+         <sec name="R0" unit="cm">51.0</sec>
+         <sec name="R1" unit="cm">51.0</sec>
          <Intersect>F1wal1</Intersect>
          <MotherVolume>F1wal1</MotherVolume>
          <Material>Air</Material>
@@ -3293,6 +3287,133 @@
          <Desc>QCSR quench shield</Desc>
       </Straight>
 -->
+      <!-- Cryostat supports -->
+
+      <Support name="CryostatSupportL">
+         <sec name="W" unit="mm">1540</sec>
+         <sec name="H" unit="mm">905</sec>
+         <sec name="L" unit="mm">3810</sec>
+         <sec name="X0" unit="mm">0</sec>
+         <sec name="Y0" unit="mm">-237.5</sec>
+         <sec name="Z0" unit="mm">-5255</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <sec name="trdW1" unit="mm">630</sec>
+         <sec name="trdW2" unit="mm">1540</sec>
+         <sec name="trdH" unit="mm">456</sec>
+         <sec name="trdL" unit="mm">100</sec>
+         <sec name="trdX0" unit="mm">0</sec>
+         <sec name="trdY0" unit="mm">442</sec>
+         <sec name="trdZ0" unit="mm">-3400</sec>
+         <sec name="holeW" unit="mm">1400</sec>
+         <sec name="holeH" unit="mm">905</sec>
+         <sec name="holeL" unit="mm">3810</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">50</sec>
+         <sec name="holeDZ" unit="mm">-100</sec>
+         <sec name="trdHoleW" unit="mm">300</sec>
+         <sec name="trdHoleH" unit="mm">460</sec>
+         <sec name="trdHoleL" unit="mm">110</sec>
+         <sec name="trdHoleDX" unit="mm">0</sec>
+         <sec name="trdHoleDY" unit="mm">679.5</sec>
+         <sec name="trdHoleDZ" unit="mm">1855</sec>
+         <sec name="r" unit="mm">370</sec>
+         <sec name="t" unit="mm">110</sec>
+         <sec name="diskDX" unit="mm">0</sec>
+         <sec name="diskDY" unit="mm">237.5</sec>
+         <sec name="diskDZ" unit="mm">1855</sec>
+         <sec name="cutW" unit="mm">80</sec>
+         <sec name="cutH" unit="mm">2460</sec>
+         <sec name="cutL" unit="mm">810</sec>
+         <sec name="cutDX" unit="mm">-735</sec>
+         <sec name="cutDY" unit="mm">404</sec>
+         <sec name="cutDZ" unit="mm">-896</sec>
+         <sec name="cutPHI" unit="rad">1.2153</sec>
+         <Material>SUS316L</Material>
+         <Desc>Left cryostat support</Desc>
+      </Support>
+
+      <Support name="CryostatSupportR">
+         <sec name="W" unit="mm">1540</sec>
+         <sec name="H" unit="mm">945</sec>
+         <sec name="L" unit="mm">3810</sec>
+         <sec name="X0" unit="mm">0</sec>
+         <sec name="Y0" unit="mm">-212.5</sec>
+         <sec name="Z0" unit="mm">5815</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <sec name="trdW1" unit="mm">540</sec>
+         <sec name="trdW2" unit="mm">1540</sec>
+         <sec name="trdH" unit="mm">351</sec>
+         <sec name="trdL" unit="mm">110</sec>
+         <sec name="trdX0" unit="mm">0</sec>
+         <sec name="trdY0" unit="mm">434.5</sec>
+         <sec name="trdZ0" unit="mm">3965</sec>
+         <sec name="holeW" unit="mm">1400</sec>
+         <sec name="holeH" unit="mm">945</sec>
+         <sec name="holeL" unit="mm">3810</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">45</sec>
+         <sec name="holeDZ" unit="mm">110</sec>
+         <sec name="trdHoleW" unit="mm">300</sec>
+         <sec name="trdHoleH" unit="mm">360</sec>
+         <sec name="trdHoleL" unit="mm">120</sec>
+         <sec name="trdHoleDX" unit="mm">0</sec>
+         <sec name="trdHoleDY" unit="mm">647</sec>
+         <sec name="trdHoleDZ" unit="mm">-1850</sec>
+         <sec name="r" unit="mm">480</sec>
+         <sec name="t" unit="mm">120</sec>
+         <sec name="diskDX" unit="mm">0</sec>
+         <sec name="diskDY" unit="mm">212.5</sec>
+         <sec name="diskDZ" unit="mm">-1850</sec>
+         <sec name="cutW" unit="mm">80</sec>
+         <sec name="cutH" unit="mm">2176</sec>
+         <sec name="cutL" unit="mm">800</sec>
+         <sec name="cutDX" unit="mm">-735</sec>
+         <sec name="cutDY" unit="mm">412.5</sec>
+         <sec name="cutDZ" unit="mm">1062</sec>
+         <sec name="cutPHI" unit="rad">-1.1668</sec>
+         <Material>SUS316L</Material>
+         <Desc>Right cryostat support</Desc>
+      </Support>
+
+
+      <!-- Supports' mounts -->
+
+      <Shield name="SupportMountL">
+         <sec name="W" unit="m">1.54</sec>
+         <sec name="H" unit="m">0.84</sec>
+         <sec name="L" unit="m">3.6</sec>
+         <sec name="X0" unit="m">0</sec>
+         <sec name="Y0" unit="m">-1.11</sec>
+         <sec name="Z0" unit="m">-5.3</sec>
+         <sec name="holeW" unit="m">1.42</sec>
+         <sec name="holeH" unit="m">0.7</sec>
+         <sec name="holeL" unit="m">3.52</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <Material>SUS316L</Material>
+         <Desc>Left support mount</Desc>
+      </Shield>
+
+      <Shield name="SupportMountR">
+         <sec name="W" unit="m">1.54</sec>
+         <sec name="H" unit="m">0.845</sec>
+         <sec name="L" unit="m">3.3</sec>
+         <sec name="X0" unit="m">0</sec>
+         <sec name="Y0" unit="m">-1.1075</sec>
+         <sec name="Z0" unit="m">6.0</sec>
+         <sec name="holeW" unit="m">1.42</sec>
+         <sec name="holeH" unit="m">0.7</sec>
+         <sec name="holeL" unit="m">3.22</sec>
+         <sec name="holeDX" unit="mm">0</sec>
+         <sec name="holeDY" unit="mm">0</sec>
+         <sec name="holeDZ" unit="mm">0</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <Material>SUS316L</Material>
+         <Desc>Right support mount</Desc>
+      </Shield>
+
    </Content>
 </DetectorComponent>
 <!--

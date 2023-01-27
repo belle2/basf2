@@ -17,7 +17,8 @@ namespace Belle2 {
      * Sort pair of value and index in descending order with special treatment of NaN
      */
     template <class T>
-    auto higherPair = [](const T& a, const T& b) -> bool {
+    auto higherPair = [](const T& a, const T& b) -> bool
+    {
       // always put NaN to the end
       if (std::isnan(a.first)) return false;
       if (std::isnan(b.first)) return true;
@@ -28,7 +29,8 @@ namespace Belle2 {
      * Sort pair of value and index in ascending order with special treatment of NaN
      */
     template <class T>
-    auto lowerPair = [](const T& a, const T& b) -> bool {
+    auto lowerPair = [](const T& a, const T& b) -> bool
+    {
       // always put NaN to the end
       if (std::isnan(a.first)) return false;
       if (std::isnan(b.first)) return true;

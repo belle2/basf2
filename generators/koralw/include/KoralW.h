@@ -12,7 +12,8 @@
 #include <mdst/dataobjects/MCParticleGraph.h>
 
 /* ROOT headers. */
-#include <TLorentzRotation.h>
+#include <Math/LorentzRotation.h>
+#include <Math/Vector3D.h>
 
 /* C++ headers. */
 #include <string>
@@ -57,7 +58,7 @@ namespace Belle2 {
      * @param vertex generated vertex.
      * @param boost generated boost.
      */
-    void generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, TLorentzRotation boost);
+    void generateEvent(MCParticleGraph& mcGraph, ROOT::Math::XYZVector vertex, ROOT::Math::LorentzRotation boost);
 
     /**
      * Terminates the generator.
@@ -89,11 +90,13 @@ namespace Belle2 {
      * @param mom The 3-momentum of the particle in [GeV].
      * @param vtx The vertex of the particle in [mm].
      * @param pdg The PDG code of the particle.
+     * @param vertex The vertex of the particle in [mm].
+     * @param boost Lorentz boost vector.
      * @param isVirtual If the particle is a virtual particle, such as the incoming particles, set this to true.
-     *
      * @param isInitial If the particle is a initial particle for ISR, set this to true.
      */
-    void storeParticle(MCParticleGraph& mcGraph, const float* mom, const float* vtx, int pdg, TVector3 vertex, TLorentzRotation boost,
+    void storeParticle(MCParticleGraph& mcGraph, const float* mom, const float* vtx, int pdg, ROOT::Math::XYZVector vertex,
+                       ROOT::Math::LorentzRotation boost,
                        bool isVirtual = false, bool isInitial = false);
 
   private:

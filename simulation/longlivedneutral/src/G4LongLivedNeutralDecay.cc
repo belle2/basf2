@@ -59,7 +59,7 @@ G4bool G4LongLivedNeutralDecay::IsApplicable(const G4ParticleDefinition& aPartic
 }
 
 
-G4double G4LongLivedNeutralDecay::GetMeanLifeTime(const G4Track& aTrack  ,
+G4double G4LongLivedNeutralDecay::GetMeanLifeTime(const G4Track& aTrack,
                                                   G4ForceCondition*)
 {
   const G4DynamicParticle* dynamicParticle = aTrack.GetDynamicParticle();
@@ -172,9 +172,9 @@ G4VParticleChange* G4LongLivedNeutralDecay::DecayIt(const G4Track& aTrack, const
     G4cout << "G4LongLivedNeutralDecay::DoIt  : Decay vertex :";
     G4cout << " Time: " << finalGlobalTime / ns << "[ns]";
     G4cout << " proper time: " << finalLocalTime / ns << "[ns]";
-    G4cout << " X:" << (aTrack.GetPosition()).x() / cm << "[cm]";
-    G4cout << " Y:" << (aTrack.GetPosition()).y() / cm << "[cm]";
-    G4cout << " Z:" << (aTrack.GetPosition()).z() / cm << "[cm]";
+    G4cout << " X:" << (aTrack.GetPosition()).X() / cm << "[cm]";
+    G4cout << " Y:" << (aTrack.GetPosition()).Y() / cm << "[cm]";
+    G4cout << " Z:" << (aTrack.GetPosition()).Z() / cm << "[cm]";
     G4cout << G4endl;
     G4cout << "G4LongLivedNeutralDecay::DoIt  : decay products in Lab. Frame" << G4endl;
     products->DumpInfo();
@@ -189,7 +189,7 @@ G4VParticleChange* G4LongLivedNeutralDecay::DecayIt(const G4Track& aTrack, const
     currentPosition = aTrack.GetPosition();
     // create a new track object
     G4Track* secondary = new G4Track(products->PopProducts(),
-                                     finalGlobalTime ,
+                                     finalGlobalTime,
                                      currentPosition);
     // switch on good for tracking flag
     secondary->SetGoodForTrackingFlag();

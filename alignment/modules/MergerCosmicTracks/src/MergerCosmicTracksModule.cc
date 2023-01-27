@@ -58,7 +58,7 @@ void MergerCosmicTracksModule::MergingTracks(RecoTrack* firstRecoTrack, RecoTrac
 {
 
   // y = exp((-p0+x)/p1) + p2 ; where x ~ ADCCounts/NumberOfCDCHits, y ~ momentum
-  float fittedValuesOfFunctions[3] = {50.2380, 21.9203, 19.8463}; // {p0, p1, p2}
+  const float fittedValuesOfFunctions[3] = {50.2380, 21.9203, 19.8463}; // {p0, p1, p2}
 
   // Definition of upper and lower part of CosmicRecoTrack
   RecoTrack* upperTrack;
@@ -218,7 +218,7 @@ void MergerCosmicTracksModule::event()
 
   // Estimation of momentum from dE/dx, when magnetic field is off
   // y = exp((-p0+x)/p1) + p2 ; where x ~ ADCCounts/NumberOfCDCHits, y ~ momentum
-  float fittedValuesOfFunctions[3] = {50.2380, 21.9203, 19.8463}; // {p0, p1, p2}
+  const float fittedValuesOfFunctions[3] = {50.2380, 21.9203, 19.8463}; // {p0, p1, p2}
 
   // bool mergedTracks = false;
 

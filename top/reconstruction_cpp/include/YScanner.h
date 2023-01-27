@@ -16,6 +16,8 @@
 #include <top/reconstruction_cpp/EnergyMask.h>
 #include <vector>
 #include <algorithm>
+#include <cmath>
+#include <map>
 
 
 namespace Belle2 {
@@ -35,9 +37,6 @@ namespace Belle2 {
         double dLen_dx = 0; /**< propagation length over photon detection coordinate x */
         double dLen_de = 0; /**< propagation length over photon energy */
         double dLen_dL = 0; /**< propagation length over running parameter of particle trajectory */
-        double dyD_dx = 0;  /**< unfolded y coordinate at detection over photon detection coordinate x */
-        double dyD_de = 0;  /**< unfolded y coordinate at detection over photon energy */
-        double dyD_dL = 0;  /**< unfolded y coordinate at detection over running parameter of particle trajectory */
         double dyB_dx = 0;  /**< unfolded y coordinate at prism entrance over photon detection coordinate x */
         double dyB_de = 0;  /**< unfolded y coordinate at prism entrance over photon energy */
         double dyB_dL = 0;  /**< unfolded y coordinate at prism entrance over running parameter of particle trajectory */
@@ -69,15 +68,7 @@ namespace Belle2 {
          * @param sol1 displaced solution
          * @return the derivative
          */
-        double dLen_d(const InverseRaytracer::Solution& sol0, const InverseRaytracer::Solution& sol1);
-
-        /**
-         * Calculates the derivative of unfolded y coordinate at detection
-         * @param sol0 central solution
-         * @param sol1 displaced solution
-         * @return the derivative
-         */
-        double dyD_d(const InverseRaytracer::Solution& sol0, const InverseRaytracer::Solution& sol1);
+        static double dLen_d(const InverseRaytracer::Solution& sol0, const InverseRaytracer::Solution& sol1);
 
         /**
          * Calculates the derivative of unfolded y coordinate at prism entrance
@@ -85,7 +76,7 @@ namespace Belle2 {
          * @param sol1 displaced solution
          * @return the derivative
          */
-        double dyB_d(const InverseRaytracer::Solution& sol0, const InverseRaytracer::Solution& sol1);
+        static double dyB_d(const InverseRaytracer::Solution& sol0, const InverseRaytracer::Solution& sol1);
 
         /**
          * Calculates the derivative of Cerenkov azimuthal angle
@@ -93,7 +84,7 @@ namespace Belle2 {
          * @param sol1 displaced solution
          * @return the derivative
          */
-        double dFic_d(const InverseRaytracer::Solution& sol0, const InverseRaytracer::Solution& sol1);
+        static double dFic_d(const InverseRaytracer::Solution& sol0, const InverseRaytracer::Solution& sol1);
       };
 
 
@@ -262,9 +253,10 @@ namespace Belle2 {
        * @param yB unfolded coordinate y of photon at prism entrance (= Bar exit) plane
        * @param dydz photon slope in y-z projection at prism entrance (dy/dz)
        * @param D the derivatives
+       * @param Ny effective number of reflections
        * @param doScan if true decide between scan and merge methods, if false always use merge method
        */
-      void expand(unsigned col, double yB, double dydz, const Derivatives& D, bool doScan) const;
+      void expand(unsigned col, double yB, double dydz, const Derivatives& D, int Ny, bool doScan) const;
 
       /**
        * Returns pixel positions and their sizes
@@ -357,16 +349,23 @@ namespace Belle2 {
       double getSigmaScattering() const {return m_sigmaScat;}
 
       /**
+       * Returns surface roughness parameter in units of photon energy
+       * @return surface roughness parameter [eV]
+       */
+      double getSigmaAlpha() const {return m_sigmaAlpha;}
+
+      /**
        * Returns photon energy distribution
        * @return photon energy distribution
        */
       const Table& getEnergyDistribution() const {return m_energyDistribution;}
 
       /**
-       * Returns photon energy distribution convoluted with multiple scattering
-       * @return photon energy distribution convoluted with multiple scattering
+       * Returns photon energy distributions convoluted with multiple scattering and surface roughness.
+       * Map entries correspond to different Gaussian widths due to different number of reflections.
+       * @return photon energy distributions convoluted with multiple scattering and surface roughness
        */
-      const Table& getQuasyEnergyDistribution() const {return m_quasyEnergyDistribution;}
+      const std::map<int, Table> getQuasyEnergyDistributions() const {return m_quasyEnergyDistributions;}
 
       /**
        * Returns the results of PDF expansion in y
@@ -389,6 +388,12 @@ namespace Belle2 {
        * @return integral of distribution before normalization
        */
       double setEnergyDistribution(double beta) const;
+
+      /**
+       * Sets photon energy distribution convoluted with a normalized Gaussian
+       * @param sigma width of the Gaussian [eV]
+       */
+      void setQuasyEnergyDistribution(double sigma) const;
 
       /**
        * Integrates quasy energy distribution multiplied with energy mask
@@ -466,8 +471,11 @@ namespace Belle2 {
       mutable double m_meanE = 0; /**< mean photon energy */
       mutable double m_rmsE = 0; /**< r.m.s of photon energy */
       mutable double m_sigmaScat = 0; /**< r.m.s. of multiple scattering angle in photon energy units */
+      mutable double m_sigmaAlpha = 0; /**< surface roughness parameter in photon energy units */
       mutable Table m_energyDistribution; /**< photon energy distribution */
-      mutable Table m_quasyEnergyDistribution; /**< photon energy distribution convoluted with multiple scattering */
+      mutable std::map<int, Table>
+      m_quasyEnergyDistributions; /**< photon energy distributions convoluted with Gaussian of different widths */
+      mutable Table* m_quasyEnergyDistribution = nullptr; /**< a pointer to the element in m_quasyEnergyDistributions */
       mutable bool m_aboveThreshold = false; /**< true if beta is above the Cerenkov threshold */
 
       // results of expand method (pixel column dependent)
@@ -489,12 +497,6 @@ namespace Belle2 {
       return (sol1.len - sol0.len) / sol1.step;
     }
 
-    inline double YScanner::Derivatives::dyD_d(const InverseRaytracer::Solution& sol0,
-                                               const InverseRaytracer::Solution& sol1)
-    {
-      return (sol1.yD - sol0.yD) / sol1.step;
-    }
-
     inline double YScanner::Derivatives::dyB_d(const InverseRaytracer::Solution& sol0,
                                                const InverseRaytracer::Solution& sol1)
     {
@@ -504,7 +506,7 @@ namespace Belle2 {
     inline double YScanner::Derivatives::dFic_d(const InverseRaytracer::Solution& sol0,
                                                 const InverseRaytracer::Solution& sol1)
     {
-      if (abs(sol0.cosFic) > abs(sol0.sinFic)) {
+      if (std::abs(sol0.cosFic) > std::abs(sol0.sinFic)) {
         return (sol1.sinFic - sol0.sinFic) / sol0.cosFic / sol1.step;
       } else {
         return -(sol1.cosFic - sol0.cosFic) / sol0.sinFic / sol1.step;

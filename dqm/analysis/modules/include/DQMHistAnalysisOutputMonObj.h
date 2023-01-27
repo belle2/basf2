@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 #include <dqm/dataobjects/DQMFileMetaData.h>
 #include <string>
 #include <TBranch.h>
@@ -16,23 +16,45 @@
 namespace Belle2 {
   /*! Class definition for the module to store MonitoringObject to output root file*/
 
-  class DQMHistAnalysisOutputMonObjModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisOutputMonObjModule final : public DQMHistAnalysisModule {
 
     // Public functions
   public:
 
-    //! Constructor / Destructor
+    /**
+     * Constructor.
+     */
     DQMHistAnalysisOutputMonObjModule();
-    virtual ~DQMHistAnalysisOutputMonObjModule();
 
-    //! Module functions to be called from main process
-    virtual void initialize() override;
+    /**
+     * Destructor.
+     */
+    ~DQMHistAnalysisOutputMonObjModule();
 
-    //! Module functions to be called from event process
-    virtual void beginRun() override;
-    virtual void event() override;
-    virtual void endRun() override;
-    virtual void terminate() override;
+    /**
+     * Initializer.
+     */
+    void initialize() override final;
+
+    /**
+     * Called when entering a new run.
+     */
+    void beginRun() override final;
+
+    /**
+     * This method is called for each event.
+     */
+    void event() override final;
+
+    /**
+     * This method is called if the current run ends.
+     */
+    void endRun() override final;
+
+    /**
+     * This method is called at the end of the event processing.
+     */
+    void terminate() override final;
 
     //! Makes entry with monitoring variables in the run summary TTree
     void addTreeEntry();

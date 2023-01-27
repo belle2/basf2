@@ -92,14 +92,14 @@ int main(int argc, char** argv)
   printf("Start event loop\n");
   // Loop for event records
   for (;;) {
-    int is = file->read(evbuf, MAXEVTSIZE);
-    if (is < 0) {
-      printf("Error in reading file : %d\n", is);
+    int isN = file->read(evbuf, MAXEVTSIZE);
+    if (isN < 0) {
+      printf("Error in reading file : %d\n", isN);
       break;
-    } else if (is > MAXEVTSIZE) {
-      printf("Event size too large : %d\n", is);
+    } else if (isN > MAXEVTSIZE) {
+      printf("Event size too large : %d\n", isN);
       continue;
-    } else if (is == 0) {
+    } else if (isN == 0) {
       delete file;
       if (fileptr == (int)filelist.size()) {
         printf("End of file list reached. Exitting\n");
@@ -111,15 +111,15 @@ int main(int argc, char** argv)
         exit(-1);
       }
       // Skip the first record (StreamerInfo)
-      int is = file->read(evbuf, MAXEVTSIZE);
-      if (is <= 0) {
-        printf("Error in reading file : %d\n", is);
+      int isNow = file->read(evbuf, MAXEVTSIZE);
+      if (isNow <= 0) {
+        printf("Error in reading file : %d\n", isNow);
         exit(-1);
       }
       // Read next record (Event)
-      is = file->read(evbuf, MAXEVTSIZE);
-      if (is < 0) {
-        printf("Error in reading file : %d\n", is);
+      isNow = file->read(evbuf, MAXEVTSIZE);
+      if (isNow < 0) {
+        printf("Error in reading file : %d\n", isNow);
         exit(-1);
       }
       // Wait for 5 sec so that processing of previous file is completed.
@@ -138,9 +138,9 @@ int main(int argc, char** argv)
       printf("StreamerInfo. Skipped....\n");
       continue;
     } else {
-      int is = sock->send(msg);
+      int isNow = sock->send(msg);
       delete msg;
-      if (is <= 0) {
+      if (isNow <= 0) {
         printf("Cannot send event. Exitting\n");
         return -1;
       }
@@ -150,7 +150,7 @@ int main(int argc, char** argv)
       usleep(rand.Poisson(minterval));
 
     nevent++;
-    datasize += (double)is;
+    datasize += (double)isN;
 
     if (nevent % EVENTINTERVAL == 0) {
       gettimeofday(&tnow, NULL);

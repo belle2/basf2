@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <klm/dataobjects/bklm/BKLMHit2d.h>
+#include <klm/dataobjects/KLMHit2d.h>
 #include <klm/bklm/geometry/Module.h>
 
 #include <genfit/PlanarMeasurement.h>
@@ -38,7 +38,7 @@ namespace Belle2 {
     /**
      * Constructor.
      */
-    explicit AlignableBKLMRecoHit(const BKLMHit2d* hit,
+    explicit AlignableBKLMRecoHit(const KLMHit2d* hit,
                                   const genfit::TrackCandHit* trackCandHit);
 
     /**

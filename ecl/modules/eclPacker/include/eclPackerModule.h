@@ -10,6 +10,8 @@
 //Framework
 #include <framework/core/FrameworkExceptions.h>
 #include <framework/core/Module.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 
 //ECL
@@ -51,7 +53,7 @@ namespace Belle2 {
 
   private:
     /** Event number */
-    int m_EvtNum;
+    int m_EvtNum = 0;
 
     /** position in the  data array */
     int m_bufPos;
@@ -67,6 +69,9 @@ namespace Belle2 {
 
     /** eneble/disable compression of waveform data */
     bool m_compressMode;
+
+    /** true-pack data in PCIe40 format, false-pack data in COPPER format */
+    bool m_pcie40Data;
 
     /** the rate of writing of the ADC samples*/
     int m_WaveformRareFactor;
@@ -87,7 +92,7 @@ namespace Belle2 {
     StoreArray<RawECL> m_eclRawCOPPERs;
 
     /** temporary buffer to store ADC data */
-    unsigned int adcBuffer_temp[ECL::ECL_CHANNELS_IN_SHAPER * ECL_ADC_SAMPLES_PER_CHANNEL];
+    unsigned int adcBuffer_temp[static_cast<int>(ECL::ECL_CHANNELS_IN_SHAPER) * static_cast<int>(ECL_ADC_SAMPLES_PER_CHANNEL)];
 
     // number of hits, masks etc ...
     /** array of triggered collectors */
@@ -110,6 +115,8 @@ namespace Belle2 {
     //DataStore variables
     StoreArray<ECLDigit> m_eclDigits; /**< ECLDigit dataStore object*/
     StoreArray<ECLDsp> m_eclDsps; /**< ECLDSP dataStore object*/
+    /** store objptr for EventMetaData **/
+    StoreObjPtr<EventMetaData> m_eventMetaData;
 
     /** write N bits to the collector buffer */
     void writeNBits(unsigned int* buff, unsigned int value, unsigned int bitsToWrite);

@@ -6,8 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef BBBREMINPUTMODULE_H
-#define BBBREMINPUTMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 
@@ -71,6 +70,3 @@ namespace Belle2 {
   };
 
 } // end namespace Belle2
-
-
-#endif /* BBBREMINPUTMODULE_H */

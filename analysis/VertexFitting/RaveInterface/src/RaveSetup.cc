@@ -69,7 +69,7 @@ void RaveSetup::reset()
 }
 
 
-void RaveSetup::setBeamSpot(const TVector3& beamSpot, const TMatrixDSym& beamSpotCov)
+void RaveSetup::setBeamSpot(const B2Vector3D& beamSpot, const TMatrixDSym& beamSpotCov)
 {
   m_beamSpot = beamSpot;
   m_beamSpotCov.ResizeTo(beamSpotCov);
@@ -91,7 +91,7 @@ void RaveSetup::Print()
       B2INFO("use beam spot is false");
     } else {
       B2INFO("use beam spot is true and beam spot position and covariance matrix are:");
-      getRawInstance()->m_beamSpot.Print();
+      getRawInstance()->m_beamSpot.PrintString();
       getRawInstance()->m_beamSpotCov.Print();
     }
     B2INFO("the pointer to rave::VertexFactory is " << getRawInstance()->m_raveVertexFactory);

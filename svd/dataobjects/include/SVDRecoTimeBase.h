@@ -50,7 +50,7 @@ namespace Belle2 {
     }
 
     /** Default constructor for the ROOT IO. */
-    SVDRecoTimeBase() : SVDRecoTimeBase(0, true, std::vector<double>( {0.0}))
+    SVDRecoTimeBase() : SVDRecoTimeBase(0, true, std::vector<double>({0.0}))
     { }
 
     /** Get the sensor ID.

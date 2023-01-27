@@ -6,9 +6,12 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+// Own include
 #include <analysis/variables/OrcaKinFitVariables.h>
 
+// include VariableManager
 #include <analysis/VariableManager/Manager.h>
+
 #include <analysis/dataobjects/Particle.h>
 
 #include <framework/logging/Logger.h>
@@ -131,24 +134,25 @@ I.e. for fits with sufficient constraints remaining to constrain a missing 3-vec
 Returns NaN if Orca was not run or if the ``addUnmeasuredPhoton`` parameter was not set.
         
 .. seealso:: :ref:`kinfit`
-        )DOC");
+        )DOC", "rad");
     REGISTER_VARIABLE("OrcaKinFitUnmeasuredPhi", UnmeasuredPhi, R"DOC(
 The azimuthal angle of the "unmeasured photon" returned by Orca kinematic fitter for specific 1C fits with the ``addUnmeasuredPhoton`` parameter set.
 I.e. for fits with sufficient constraints remaining to constrain a missing 3-vector.
 Returns NaN if Orca was not run or if the ``addUnmeasuredPhoton`` parameter was not set.
         
 .. seealso:: :ref:`kinfit`
-        )DOC");
+        )DOC", "rad");
     REGISTER_VARIABLE("OrcaKinFitUnmeasuredE", UnmeasuredE, R"DOC(
 The energy of the "unmeasured photon" returned by Orca kinematic fitter for specific 1C fits with the ``addUnmeasuredPhoton`` parameter set.
 I.e. for fits with sufficient constraints remaining to constrain a missing 3-vector.
 Returns NaN if Orca was not run or if the ``addUnmeasuredPhoton`` parameter was not set.
         
 .. seealso:: :ref:`kinfit`
-        )DOC");
+        )DOC", "GeV");
     REGISTER_VARIABLE("OrcaKinFitUnmeasuredErrorTheta", UnmeasuredErrorTheta,
-                      "The uncertainty on :b2:var:`OrcaKinFitUnmeasuredTheta`.");
-    REGISTER_VARIABLE("OrcaKinFitUnmeasuredErrorPhi", UnmeasuredErrorPhi, "The uncertainty on :b2:var:`OrcaKinFitUnmeasuredPhi`.");
-    REGISTER_VARIABLE("OrcaKinFitUnmeasuredErrorE", UnmeasuredErrorE, "The uncertainty on :b2:var:`OrcaKinFitUnmeasuredE`.");
+                      "The uncertainty on :b2:var:`OrcaKinFitUnmeasuredTheta`.", "rad");
+    REGISTER_VARIABLE("OrcaKinFitUnmeasuredErrorPhi", UnmeasuredErrorPhi, "The uncertainty on :b2:var:`OrcaKinFitUnmeasuredPhi`.",
+                      "rad");
+    REGISTER_VARIABLE("OrcaKinFitUnmeasuredErrorE", UnmeasuredErrorE, "The uncertainty on :b2:var:`OrcaKinFitUnmeasuredE`.", "GeV");
   }
 }

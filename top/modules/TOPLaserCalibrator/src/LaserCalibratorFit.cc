@@ -17,7 +17,8 @@
 
 namespace Belle2 {
   namespace TOP {
-//Crystal Ball function
+    //Crystal Ball function
+    // cppcheck-suppress constParameter
     double fcnCB(double* x, double* par)
     {
       double m1 = par[1];
@@ -28,7 +29,8 @@ namespace Belle2 {
       return par[0] * f1;
     }
 
-//double Crystal Ball function
+    //double Crystal Ball function
+    // cppcheck-suppress constParameter
     double fcnCB2(double* x, double* par)
     {
       double m1 = par[1];
@@ -142,7 +144,7 @@ namespace Belle2 {
           if (f) {
             f->GetParameters(parms);
             for (int iPar = 0; iPar < 3; iPar++)
-              parmErrs[iPar] = f->GetParError(iPar);
+              parmErrs[iPar] = f->GetParError(iPar); // cppcheck-suppress unreadVariable
             otree->Fill();
             channel++;
           }
@@ -178,7 +180,7 @@ namespace Belle2 {
           if (f) {
             f->GetParameters(parms);
             for (int iPar = 0; iPar < 8; iPar++)
-              parmErrs[iPar] = f->GetParError(iPar);
+              parmErrs[iPar] = f->GetParError(iPar); // cppcheck-suppress unreadVariable
             otree->Fill();
             channel++;
           }
@@ -205,7 +207,7 @@ namespace Belle2 {
           if (f) {
             f->GetParameters(parms);
             for (int iPar = 0; iPar < 5; iPar++)
-              parmErrs[iPar] = f->GetParError(iPar);
+              parmErrs[iPar] = f->GetParError(iPar); // cppcheck-suppress unreadVariable
             otree->Fill();
             channel++;
           }
@@ -287,7 +289,7 @@ namespace Belle2 {
       TH1F* h = m_hist[channel];
       auto func = new TF1("fcnCB2", fcnCB2, m_xmin, m_xmax, 8);
 
-      double vdt[8] = {0.272, 0.242, 0.208, 0.178, 0.113, 0.082, 0.0485, 0.017}; //input para. from MC study, need further studies
+      const double vdt[8] = {0.272, 0.242, 0.208, 0.178, 0.113, 0.082, 0.0485, 0.017}; //input para. from MC study, need further studies
       double parms[8];
       //the input para. need further studies
       parms[0] = 1;

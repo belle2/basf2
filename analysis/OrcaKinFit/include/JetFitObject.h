@@ -98,8 +98,8 @@ namespace Belle2 {
 
       // daniel's new method
       // derivatives of intermediate variable wrt local variable
-      virtual double getFirstDerivative_Meta_Local(int iMeta, int ilocal , int metaSet) const override;
-      virtual double getSecondDerivative_Meta_Local(int iMeta, int ilocal , int jlocal , int metaSet) const override;
+      virtual double getFirstDerivative_Meta_Local(int iMeta, int ilocal, int metaSet) const override;
+      virtual double getSecondDerivative_Meta_Local(int iMeta, int ilocal, int jlocal, int metaSet) const override;
 
       /// Get chi squared from measured and fitted parameters
       //    virtual double getChi2() const;

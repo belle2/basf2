@@ -53,9 +53,10 @@ One can configure :b2:var:`isSignal` to accept missing particles or not to accep
 Marker of unspecified particle
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Particle can be marked as unspecified particle with an at-sign, :code:`'@'`, in the DecayString.
-If the particle is marked as unspecified it will not checked for its identity when doing :ref:`MCMatching`. Any particle which decays into the correct daughters will be flagged as correct. 
-For example the DecayString :code:`'@Xsd -> K+ pi-'` would match all particles which decay into a Kaon and a pion, for example K*, B0, D0, ...
+A particle can be marked as unspecified with an at-sign, :code:`'@'`, in the DecayString.
+If the particle is marked as unspecified its identity will not be checked when doing :ref:`MCMatching`. Any particle which decays into the correct daughters will be flagged as correct. 
+However, even the unspecified particle must be a valid particle defined in the evt.pdl file. All available particle names can be listed by ``b2help-particle``, please see :ref:`b2help-particles`.
+For example the DecayString :code:`'@K*0 -> K+ pi-'` would match all particles which decay into a Kaon and a pion, for example K*, B0, D0, Xsd, ...
 Still the daughters need to be stated correctly so this can be used for "sum of exclusive" decays.
 Here is an example of use:
 
@@ -77,7 +78,7 @@ Markers for Final State Particles
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Final State Particle (FSP) such as :code:`'K+'` or :code:`'pi+'` sometimes decays in the detector and the particle is reconstructed from the secondary decay particle, for example :code:`'pi+ -> mu+ nu_mu'`.
-Although such particle is identified usually as background, in some analysis works, one may wants to accept it. One can add :code:`'(decay)'` to the begging of the particle name in this case.
+Although such particle is identified usually as background, in some analysis works, one may wants to accept it. One can add :code:`'(decay)'` to the beginning of the particle name in this case.
 Similarly, one can add  :code:`'(misID)'` to accept a mis-identified FSP. 
 Here is an example of use:
 

@@ -186,23 +186,26 @@ void CDCGeometryPar::clear()
     for (unsigned j = 0; j < 2; ++j)
       m_zWall[i][j] = 0;
   }
-  for (unsigned i = 0; i < MAX_N_SLAYERS; ++i) {
+  for (unsigned i = 0; i < c_maxNSenseLayers; ++i) {
     m_rSLayer[i] = 0;
     m_zSForwardLayer[i] = 0;
+    m_dzSForwardLayer[i] = 0;
     m_zSBackwardLayer[i] = 0;
+    m_dzSBackwardLayer[i] = 0;
     m_cellSize[i] = 0;
     m_nWires[i] = 0;
     m_offSet[i] = 0;
     m_nShifts[i] = 0;
+    m_propSpeedInv[i] = 0.;
   }
-  for (unsigned i = 0; i < MAX_N_FLAYERS; ++i) {
+  for (unsigned i = 0; i < c_maxNFieldLayers; ++i) {
     m_rFLayer[i] = 0;
     m_zFForwardLayer[i] = 0;
     m_zFBackwardLayer[i] = 0;
   }
 
-  for (unsigned L = 0; L < MAX_N_SLAYERS; ++L) {
-    for (unsigned C = 0; C < MAX_N_SCELLS; ++C) {
+  for (unsigned L = 0; L < c_maxNSenseLayers; ++L) {
+    for (unsigned C = 0; C < c_maxNDriftCells; ++C) {
       for (unsigned i = 0; i < 3; ++i) {
         m_FWirPos        [L][C][i] = 0.;
         m_BWirPos        [L][C][i] = 0.;
@@ -211,9 +214,44 @@ void CDCGeometryPar::clear()
         m_FWirPosAlign   [L][C][i] = 0.;
         m_BWirPosAlign   [L][C][i] = 0.;
       }
+      for (unsigned i = 0; i < 7; ++i) {
+        m_eDepToADCParams[L][C][i] = 0.;
+      }
       m_WireSagCoef        [L][C] = 0.;
       m_WireSagCoefMisalign[L][C] = 0.;
       m_WireSagCoefAlign   [L][C] = 0.;
+      m_t0                 [L][C] = 0.;
+    }
+  }
+
+  for (unsigned L = 0; L < c_maxNSenseLayers; ++L) {
+    for (unsigned i = 0; i < 2; ++i) {
+      for (unsigned alpha = 0; alpha < c_maxNAlphaPoints; ++alpha) {
+        for (unsigned theta = 0; theta < c_maxNThetaPoints; ++theta) {
+          for (unsigned xtparam = 0; xtparam < c_nXTParams; ++xtparam) {
+            m_XT[L][i][alpha][theta][xtparam] = 0.;
+          }
+
+          for (unsigned sigmaparam = 0; sigmaparam < c_nSigmaParams; ++sigmaparam) {
+            m_Sigma[L][i][alpha][theta][sigmaparam] = 0.;
+          }
+        }
+      }
+    }
+  }
+
+  for (unsigned board = 0; board < c_nBoards; ++board) {
+    for (unsigned i = 0; i < 2; ++i) {
+      m_timeWalkCoef[board][i] = 0.;
+    }
+    for (unsigned channel = 0; channel < 48; ++channel) {
+      m_boardAndChannelToWire[board][channel] = 0.;
+    }
+  }
+
+  for (unsigned superLayer = 0; superLayer < c_nSuperLayers; ++superLayer) {
+    for (unsigned layer = 0; layer < 8; ++layer) {
+      m_shiftInSuperLayer[superLayer][layer] = 0;
     }
   }
 
@@ -274,16 +312,17 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
   // Sense wires.
   //
   for (const auto& sense : geom.getSenseLayers()) {
-    int layerId = sense.getId();
-    m_rSLayer[layerId] = sense.getR();
-    m_zSBackwardLayer[layerId] = sense.getZbwd();
-    m_zSForwardLayer[layerId] = sense.getZfwd();
-    m_nWires[layerId] = sense.getNWires();
-    m_nShifts[layerId] = sense.getNShifts();
-    m_offSet[layerId] = sense.getOffset();
-    m_cellSize[layerId] = 2 * M_PI * m_rSLayer[layerId] / (double) m_nWires[layerId];
+    uint layerId = sense.getId();
+
+    m_rSLayer[layerId]          = sense.getR();
+    m_zSBackwardLayer[layerId]  = sense.getZbwd();
+    m_zSForwardLayer[layerId]   = sense.getZfwd();
+    m_nWires[layerId]           = sense.getNWires();
+    m_nShifts[layerId]          = sense.getNShifts();
+    m_offSet[layerId]           = sense.getOffset();
+    m_cellSize[layerId]         = 2 * M_PI * m_rSLayer[layerId] / (double) m_nWires[layerId];
     m_dzSBackwardLayer[layerId] = sense.getDZbwd();
-    m_dzSForwardLayer[layerId] = sense.getDZfwd();
+    m_dzSForwardLayer[layerId]  = sense.getDZfwd();
 
     //correction to z-position
     if (m_senseWireZposMode == 0) {
@@ -306,10 +345,11 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
 
   // Get field layers parameters
   for (const auto& field : geom.getFieldLayers()) {
-    int layerId = field.getId();
-    m_rFLayer[layerId] = field.getR();
-    m_zFBackwardLayer[layerId] = field.getZbwd();
-    m_zFForwardLayer[layerId] = field.getZfwd();
+    uint layerId = field.getId();
+
+    m_rFLayer[layerId]          = field.getR();
+    m_zFBackwardLayer[layerId]  = field.getZbwd();
+    m_zFForwardLayer[layerId]   = field.getZfwd();
   }
 
   // Get sense wire diameter
@@ -324,12 +364,24 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
   // Get field wire diameter
   m_fieldWireDiameter = geom.getFieldDiameter();
 
+  // Get information on the number of (super) layers etc.
+  m_nSenseWires           = geom.getNSenseWires();
+  m_nFieldWires           = geom.getNFieldWires();
+  m_maxNSenseLayers       = geom.getNumberOfSenseLayers();
+  m_maxNFieldLayers       = geom.getNumberOfFieldLayers();
+  m_maxNSuperLayers       = geom.getMaxNumberOfSuperLayers();
+  m_firstLayerOffset      = geom.getOffsetOfFirstLayer();
+  m_firstSuperLayerOffset = geom.getOffsetOfFirstSuperLayer();
+  m_maxNCellsPerLayer     = geom.getMaxNumberOfCellsPerLayer();
+
   //Set various quantities (should be moved to CDC.xml later...)
   m_clockFreq4TDC = geom.getClockFrequency();
+  if (not m_clockSettings.isValid())
+    B2FATAL("HardwareClockSettings payloads are not valid.");
   const double officialClockFreq4TDC = 2 * m_clockSettings->getAcceleratorRF(); // in GHz
-  if (m_clockFreq4TDC != officialClockFreq4TDC) {
+  if (abs(m_clockFreq4TDC - officialClockFreq4TDC) / m_clockFreq4TDC > 1.e-4) {
     B2WARNING("ClockFreq4TDC changed from cdclocal " << scientific << setprecision(6) << m_clockFreq4TDC << " to official " <<
-              officialClockFreq4TDC << " (GHz)!");
+              officialClockFreq4TDC << " (GHz) (difference larger than 0.01%)");
     m_clockFreq4TDC = officialClockFreq4TDC;
   }
   B2DEBUG(100, "CDCGeometryPar: Clock freq. for TDC= " << m_clockFreq4TDC << " (GHz).");
@@ -552,7 +604,7 @@ void CDCGeometryPar::readWirePositionParams(EWirePosition set,  const CDCGeometr
   boost::iostreams::filtering_istream ifs;
   openFileB(ifs, fileName0);
 
-  int iL(0), iC(0);
+  uint iL(0), iC(0);
   const int np = 3;
   double back[np], fwrd[np], tension;
   unsigned nRead = 0;
@@ -570,34 +622,40 @@ void CDCGeometryPar::readWirePositionParams(EWirePosition set,  const CDCGeometr
 
     if (ifs.eof()) break;
 
+    if (iL < m_firstLayerOffset) {
+      continue;
+    }
+
     ++nRead;
 
     for (int i = 0; i < np; ++i) {
       if (set == c_Base) {
-        m_BWirPos[iL][iC][i] += back[i];
-        m_FWirPos[iL][iC][i] += fwrd[i];
+        m_BWirPos[iL][iC][i] += (iL < m_firstLayerOffset) ? 0 : back[i];
+        m_FWirPos[iL][iC][i] += (iL < m_firstLayerOffset) ? 0 : fwrd[i];
       } else if (set == c_Misaligned) {
-        m_BWirPosMisalign[iL][iC][i] = m_BWirPos[iL][iC][i] + back[i];
-        m_FWirPosMisalign[iL][iC][i] = m_FWirPos[iL][iC][i] + fwrd[i];
+        m_BWirPosMisalign[iL][iC][i] = m_BWirPos[iL][iC][i] + ((iL < m_firstLayerOffset) ? 0 : back[i]);
+        m_FWirPosMisalign[iL][iC][i] = m_FWirPos[iL][iC][i] + ((iL < m_firstLayerOffset) ? 0 : fwrd[i]);
       } else if (set == c_Aligned) {
-        m_BWirPosAlign[iL][iC][i] = m_BWirPos[iL][iC][i] + back[i];
-        m_FWirPosAlign[iL][iC][i] = m_FWirPos[iL][iC][i] + fwrd[i];
+        m_BWirPosAlign[iL][iC][i] = m_BWirPos[iL][iC][i] + ((iL < m_firstLayerOffset) ? 0 : back[i]);
+        m_FWirPosAlign[iL][iC][i] = m_FWirPos[iL][iC][i] + ((iL < m_firstLayerOffset) ? 0 : fwrd[i]);
       }
     }
 
     //    double baseTension = 0.;
 
     if (set == c_Base) {
-      m_WireSagCoef[iL][iC] = M_PI * m_senseWireDensity * m_senseWireDiameter * m_senseWireDiameter / (8.*(m_senseWireTension + tension));
+      m_WireSagCoef[iL][iC] = (iL < m_firstLayerOffset) ? 0 : M_PI * m_senseWireDensity * m_senseWireDiameter * m_senseWireDiameter /
+                              (8.*(m_senseWireTension + tension));
       //      std::cout <<"base iL, iC, m_senseWireTension, tension= " << iL <<" " << iC <<" "<< m_senseWireTension <<" "<< tension << std::endl;
     } else if (set == c_Misaligned) {
       double baseTension = M_PI * m_senseWireDensity * m_senseWireDiameter * m_senseWireDiameter / (8.* m_WireSagCoef[iL][iC]);
-      m_WireSagCoefMisalign[iL][iC] = M_PI * m_senseWireDensity * m_senseWireDiameter * m_senseWireDiameter / (8.*
-                                      (baseTension + tension));
+      m_WireSagCoefMisalign[iL][iC] = (iL < m_firstLayerOffset) ? 0 : M_PI * m_senseWireDensity * m_senseWireDiameter *
+                                      m_senseWireDiameter / (8.* (baseTension + tension));
       //      std::cout <<"misa iL, iC,basetension, tension= " << iL <<" " << iC <<" "<< baseTension <<" "<< tension << std::endl;
     } else if (set == c_Aligned) {
       double baseTension = M_PI * m_senseWireDensity * m_senseWireDiameter * m_senseWireDiameter / (8.* m_WireSagCoef[iL][iC]);
-      m_WireSagCoefAlign[iL][iC] = M_PI * m_senseWireDensity * m_senseWireDiameter * m_senseWireDiameter / (8.*(baseTension + tension));
+      m_WireSagCoefAlign[iL][iC] = (iL < m_firstLayerOffset) ? 0 : M_PI * m_senseWireDensity * m_senseWireDiameter *
+                                   m_senseWireDiameter / (8.*(baseTension + tension));
       //      std::cout <<"algn iL, iC,basetension, tension= " << iL <<" " << iC <<" "<< baseTension <<" "<< tension << std::endl;
     }
     //    std::cout << "baseTension,tension= " << baseTension <<" "<< tension << std::endl;
@@ -613,8 +671,8 @@ void CDCGeometryPar::readWirePositionParams(EWirePosition set,  const CDCGeometr
 
   }
 
-  if (nRead != nSenseWires) B2FATAL("CDCGeometryPar::readWirePositionParams: #lines read-in (=" << nRead <<
-                                      ") is inconsistent with total #sense wires (=" << nSenseWires << ") !");
+  if (nRead != m_nSenseWires) B2FATAL("CDCGeometryPar::readWirePositionParams: #lines read-in (=" << nRead <<
+                                        ") is inconsistent with total #sense wires (=" << m_nSenseWires << ") !");
 
   //  ifs.close();
   boost::iostreams::close(ifs);
@@ -625,7 +683,12 @@ void CDCGeometryPar::readWirePositionParams(EWirePosition set,  const CDCGeometr
 void CDCGeometryPar::setWirPosAlignParams()
 {
   // Layer alignment
-  for (unsigned iL = 0; iL < MAX_N_SLAYERS; ++iL) {
+  for (unsigned iL = 0; iL < c_maxNSenseLayers; ++iL) {
+
+    if (iL < m_firstLayerOffset) {
+      continue;
+    }
+
     // wire number 511 = no wire
     auto layerID = WireID(iL, 511);
 
@@ -663,7 +726,12 @@ void CDCGeometryPar::setWirPosAlignParams()
   const int np = 3;
   double back[np], fwrd[np];
 
-  for (unsigned iL = 0; iL < MAX_N_SLAYERS; ++iL) {
+  for (unsigned iL = 0; iL < c_maxNSenseLayers; ++iL) {
+
+    if (iL < m_firstLayerOffset) {
+      continue;
+    }
+
     for (unsigned iC = 0; iC < m_nWires[iL]; ++iC) {
       //      std::cout << "iLiC= " << iL <<" "<< iC << std::endl;
       WireID wire(iL, iC);
@@ -701,7 +769,12 @@ void CDCGeometryPar::setWirPosMisalignParams()
   const int np = 3;
   double back[np], fwrd[np];
 
-  for (unsigned iL = 0; iL < MAX_N_SLAYERS; ++iL) {
+  for (unsigned iL = 0; iL < c_maxNSenseLayers; ++iL) {
+
+    if (iL < m_firstLayerOffset) {
+      continue;
+    }
+
     for (unsigned iC = 0; iC < m_nWires[iL]; ++iC) {
       //      std::cout << "iLiC= " << iL <<" "<< iC << std::endl;
       WireID wire(iL, iC);
@@ -777,7 +850,7 @@ void CDCGeometryPar::newReadXT(const GearDir& gbxParams, const int mode)
   //read alpha bin info.
   unsigned short nAlphaBins = 0;
   if (ifs >> nAlphaBins) {
-    if (nAlphaBins == 0 || nAlphaBins > maxNAlphaPoints) B2FATAL("Fail to read alpha bins !");
+    if (nAlphaBins == 0 || nAlphaBins > c_maxNAlphaPoints) B2FATAL("Fail to read alpha bins !");
   } else {
     B2FATAL("Fail to read alpha bins !");
   }
@@ -791,7 +864,7 @@ void CDCGeometryPar::newReadXT(const GearDir& gbxParams, const int mode)
   //read theta bin info.
   unsigned short nThetaBins = 0;
   if (ifs >> nThetaBins) {
-    if (nThetaBins == 0 || nThetaBins > maxNThetaPoints) B2FATAL("CDCGeometryPar: fail to read theta bins !");
+    if (nThetaBins == 0 || nThetaBins > c_maxNThetaPoints) B2FATAL("CDCGeometryPar: fail to read theta bins !");
   } else {
     B2FATAL("CDCGeometryPar: fail to read theta bins !");
   }
@@ -805,7 +878,7 @@ void CDCGeometryPar::newReadXT(const GearDir& gbxParams, const int mode)
 
   short np = 0;
   unsigned short iCL, iLR;
-  const unsigned short npx = nXTParams - 1;
+  const unsigned short npx = c_nXTParams - 1;
   double xtc[npx];
   double theta, alpha, dummy1;
   unsigned nRead = 0;
@@ -818,6 +891,11 @@ void CDCGeometryPar::newReadXT(const GearDir& gbxParams, const int mode)
   const double epsi = 0.1;
 
   while (ifs >> iCL) {
+
+    if (iCL < m_firstLayerOffset) {
+      continue;
+    }
+
     ifs >> theta >> alpha >> dummy1 >> iLR;
     for (int i = 0; i < np; ++i) {
       ifs >> xtc[i];
@@ -901,7 +979,7 @@ void CDCGeometryPar::newReadSigma(const GearDir& gbxParams, const int mode)
   //read alpha bin info.
   unsigned short nAlphaBins = 0;
   if (ifs >> nAlphaBins) {
-    if (nAlphaBins == 0 || nAlphaBins > maxNAlphaPoints) B2FATAL("Fail to read alpha bins !");
+    if (nAlphaBins == 0 || nAlphaBins > c_maxNAlphaPoints) B2FATAL("Fail to read alpha bins !");
   } else {
     B2FATAL("Fail to read alpha bins !");
   }
@@ -917,7 +995,7 @@ void CDCGeometryPar::newReadSigma(const GearDir& gbxParams, const int mode)
   //read theta bin info.
   unsigned short nThetaBins = 0;
   if (ifs >> nThetaBins) {
-    if (nThetaBins == 0 || nThetaBins > maxNThetaPoints) B2FATAL("CDCGeometryPar: fail to read theta bins !");
+    if (nThetaBins == 0 || nThetaBins > c_maxNThetaPoints) B2FATAL("CDCGeometryPar: fail to read theta bins !");
   } else {
     B2FATAL("CDCGeometryPar: fail to read theta bins !");
   }
@@ -933,7 +1011,7 @@ void CDCGeometryPar::newReadSigma(const GearDir& gbxParams, const int mode)
 
   unsigned short np = 0;
   unsigned short iCL, iLR;
-  double sigma[nSigmaParams];
+  double sigma[c_nSigmaParams]; // cppcheck-suppress constVariable
   double theta, alpha;
   unsigned nRead = 0;
 
@@ -941,13 +1019,18 @@ void CDCGeometryPar::newReadSigma(const GearDir& gbxParams, const int mode)
   //  std:: cout << m_sigmaParamMode <<" "<< np << std::endl;
   if (m_sigmaParamMode < 0 || m_sigmaParamMode > 4) B2FATAL("CDCGeometryPar: invalid sigma-parameterization mode read !");
 
-  if (np > nSigmaParams) B2FATAL("CDCGeometryPar: no. of sigma-params. outside limits !");
+  if (np > c_nSigmaParams) B2FATAL("CDCGeometryPar: no. of sigma-params. outside limits !");
 
   ifs >> m_maxSpaceResol;
 
   const double epsi = 0.1;
 
   while (ifs >> iCL) {
+
+    if (iCL < m_firstLayerOffset) {
+      continue;
+    }
+
     ifs >> theta >> alpha >> iLR;
     //    std::cout << iCL <<" "<< theta <<" "<< alpha <<" "<< iLR << std::endl;
     for (int i = 0; i < np; ++i) {
@@ -1017,7 +1100,7 @@ void CDCGeometryPar::readPropSpeed(const GearDir& gbxParams, const int mode)
   //  openFile(ifs, fileName0);
   openFileA(ifs, fileName0);
 
-  int iL;
+  uint iL;
   double speed;
   unsigned nRead = 0;
 
@@ -1027,13 +1110,13 @@ void CDCGeometryPar::readPropSpeed(const GearDir& gbxParams, const int mode)
 
     ++nRead;
 
-    m_propSpeedInv[iL] = 1. / speed;
+    m_propSpeedInv[iL] = (iL < m_firstLayerOffset) ? 0 : 1. / speed;
 
     if (m_debug) B2DEBUG(150, iL << " " << speed);
   }
 
-  if (nRead != MAX_N_SLAYERS) B2FATAL("CDCGeometryPar::readPropSpeed: #lines read-in (=" << nRead <<
-                                        ") is inconsistent with total #layers (=" << MAX_N_SLAYERS << ") !");
+  if (nRead != c_maxNSenseLayers) B2FATAL("CDCGeometryPar::readPropSpeed: #lines read-in (=" << nRead <<
+                                            ") is inconsistent with total #layers (=" << c_maxNSenseLayers << ") !");
 
   ifs.close();
 }
@@ -1065,8 +1148,8 @@ void CDCGeometryPar::readDeltaz(const GearDir gbxParams)
     if (m_debug) cout << iL << " " << m_bwdDz[iL] << " " << m_fwdDz[iL] << endl;
   }
 
-  if (nRead != MAX_N_SLAYERS) B2FATAL("CDCGeometryPar::readDeltaz: #lines read-in (=" << nRead <<
-                                        ") is inconsistent with total #layers (=" << MAX_N_SLAYERS << ") !");
+  if (nRead != c_maxNSenseLayers) B2FATAL("CDCGeometryPar::readDeltaz: #lines read-in (=" << nRead <<
+                                        ") is inconsistent with total #layers (=" << c_maxNSenseLayers << ") !");
 
   ifs.close();
 }
@@ -1085,26 +1168,30 @@ void CDCGeometryPar::readT0(const GearDir& gbxParams, int mode)
   //  openFile(ifs, fileName0);
   openFileA(ifs, fileName0);
 
-  int iL(0), iC(0);
+  uint iL(0), iC(0);
   float t0(0);
   unsigned nRead = 0;
 
   while (true) {
     ifs >> iL >> iC >> t0;
 
+    if (iL < m_firstLayerOffset) {
+      continue;
+    }
+
     if (ifs.eof()) break;
 
     ++nRead;
 
-    m_t0[iL][iC] = t0;
+    m_t0[iL][iC] = (iL < m_firstLayerOffset) ? 0. : t0;
 
     if (m_debug) {
       B2DEBUG(150, iL << " " << iC << " " << t0);
     }
   }
 
-  if (nRead != nSenseWires) B2FATAL("CDCGeometryPar::readT0: #lines read-in (=" << nRead <<
-                                      ") is inconsistent with total #sense wires (=" << nSenseWires << ") !");
+  if (nRead != m_nSenseWires) B2FATAL("CDCGeometryPar::readT0: #lines read-in (=" << nRead <<
+                                        ") is inconsistent with total #sense wires (=" << m_nSenseWires << ") !");
 
   ifs.close();
 
@@ -1142,8 +1229,8 @@ void CDCGeometryPar::readBadWire(const GearDir gbxParams, int mode)
     }
   }
 
-  if (nRead > nSenseWires) B2FATAL("CDCGeometryPar::readBadWire: #lines read-in (=" << nRead <<
-                                     ") is larger than the total #sense wires (=" << nSenseWires << ") !");
+  if (nRead > m_nSenseWires) B2FATAL("CDCGeometryPar::readBadWire: #lines read-in (=" << nRead <<
+                                     ") is larger than the total #sense wires (=" << m_nSenseWires << ") !");
 
   ifs.close();
 }
@@ -1181,8 +1268,9 @@ void CDCGeometryPar::readTW(const GearDir& gbxParams, const int mode)
     ++nRead;
   }
 
-  if (nRead != nBoards) B2FATAL("CDCGeometryPar::readTW: #lines read-in (=" << nRead << ") is inconsistent with #boards (=" << nBoards
-                                  << ") !");
+  if (nRead != c_nBoards) B2FATAL("CDCGeometryPar::readTW: #lines read-in (=" << nRead << ") is inconsistent with #boards (=" <<
+                                    c_nBoards
+                                    << ") !");
 
   ifs.close();
 }
@@ -1205,16 +1293,16 @@ void CDCGeometryPar::readChMap()
     // Read a relation
     ifs >> iSL >> iL >> iW >> iB >> iC;
     if (ifs.eof()) break;
+    if (iSL >= c_nSuperLayers or iSL < m_firstSuperLayerOffset) continue;
 
-    if (iSL >= nSuperLayers) continue;
     ++nRead;
     WireID wID(iSL, iL, iW);
     m_wireToBoard.insert(pair<WireID, unsigned short>(wID, iB));
   }
 
-  if (nRead != nSenseWires) B2FATAL("CDCGeometryPar::readChMap: #lines read-in (=" << nRead <<
-                                      ") is inconsistent with #sense-wires (="
-                                      << nSenseWires << ") !");
+  if (nRead != m_nSenseWires) B2FATAL("CDCGeometryPar::readChMap: #lines read-in (=" << nRead <<
+                                        ") is inconsistent with #sense-wires (="
+                                        << m_nSenseWires << ") !");
 
   ifs.close();
 }
@@ -1257,10 +1345,10 @@ void CDCGeometryPar::readEDepToADC(const GearDir& gbxParams, const int mode)
   if (groupId > 0) B2FATAL("GgroupId > 0!");
 
 
-  unsigned short cLMin[nSuperLayers], cLMax[nSuperLayers]; //min and max clayer per super-layer
+  unsigned short cLMin[c_nSuperLayers], cLMax[c_nSuperLayers]; //min and max clayer per super-layer
   cLMin[0] = 0;
   cLMax[0] = 7;
-  for (unsigned int sl = 1; sl < nSuperLayers; ++sl) {
+  for (unsigned int sl = 1; sl < c_nSuperLayers; ++sl) {
     cLMin[sl] = cLMax[0] + 6 * sl - 5;
     cLMax[sl] = cLMax[0] + 6 * sl;
   }
@@ -1273,13 +1361,13 @@ void CDCGeometryPar::readEDepToADC(const GearDir& gbxParams, const int mode)
       ifs  >> coef;
       for (unsigned short cL = cLMin[id]; cL <= cLMax[id]; ++cL) { //clayer loop
         for (unsigned short cell = 0; cell < m_nWires[cL]; ++cell) { //cell loop
-          m_eDepToADCParams[cL][cell][i] = coef;
+          m_eDepToADCParams[cL][cell][i] = (cL < m_firstLayerOffset) ? 0 : coef;
           //    B2DEBUG(29, "cL,cell,i,coef= "<< cL <<" "<< cell <<" "<< i <<" "<< coef);
         }
       }
     }
     ++nRead;
-    if (nRead > nSuperLayers) B2FATAL("No. of read in lines > " << nSuperLayers << " !");
+    if (nRead > c_nSuperLayers) B2FATAL("No. of read in lines > " << c_nSuperLayers << " !");
   }
 
   ifs.close();
@@ -1289,8 +1377,8 @@ void CDCGeometryPar::readEDepToADC(const GearDir& gbxParams, const int mode)
 // Set t0 (from DB)
 void CDCGeometryPar::setT0()
 {
-  for (unsigned short iCL = 0; iCL < MAX_N_SLAYERS; ++iCL) {
-    for (unsigned short iW = 0; iW < MAX_N_SCELLS; ++iW) {
+  for (unsigned short iCL = 0; iCL < c_maxNSenseLayers; ++iCL) {
+    for (unsigned short iW = 0; iW < c_maxNDriftCells; ++iW) {
       m_t0[iCL][iW] = 0.;
     }
   }
@@ -1299,7 +1387,7 @@ void CDCGeometryPar::setT0()
     const WireID wid = WireID(ent.first);
     const unsigned short iCL = wid.getICLayer();
     const unsigned short iW  = wid.getIWire();
-    m_t0[iCL][iW]            = ent.second;
+    m_t0[iCL][iW]            = (iCL < m_firstLayerOffset) ? 0. : ent.second;
   }
 
   calcMeanT0();
@@ -1316,7 +1404,7 @@ void CDCGeometryPar::calcMeanT0(double minT0, double maxT0, int maxIt, double nS
     double effiSum = 0.;
     m_meanT0 = 0.;
     double stdvT0 = 0;
-    for (unsigned short iCL = 0; iCL < MAX_N_SLAYERS; ++iCL) {
+    for (unsigned short iCL = 0; iCL < c_maxNSenseLayers; ++iCL) {
       for (unsigned short iW = 0; iW < m_nWires[iCL]; ++iW) {
         if (m_t0[iCL][iW] < minT0 || m_t0[iCL][iW] > maxT0) continue;
         const WireID wid = WireID(iCL, iW);
@@ -1325,8 +1413,8 @@ void CDCGeometryPar::calcMeanT0(double minT0, double maxT0, int maxIt, double nS
         double effi = 1.;
         isDeadWire(wid, effi);
         effiSum += effi;
-        m_meanT0 += effi * m_t0[iCL][iW];
-        stdvT0   += effi * m_t0[iCL][iW] * m_t0[iCL][iW];
+        m_meanT0 += (iCL < m_firstLayerOffset) ? 0. : effi * m_t0[iCL][iW];
+        stdvT0   += (iCL < m_firstLayerOffset) ? 0. : effi * m_t0[iCL][iW] * m_t0[iCL][iW];
       }
     }
     if (effiSum > 0.) {
@@ -1358,7 +1446,7 @@ void CDCGeometryPar::setBadWire()
 void CDCGeometryPar::setPropSpeed()
 {
   for (unsigned short iCL = 0; iCL < (*m_propSpeedFromDB)->getEntries(); ++iCL) {
-    m_propSpeedInv[iCL] = 1. / (*m_propSpeedFromDB)->getSpeed(iCL);
+    m_propSpeedInv[iCL] = (iCL < m_firstLayerOffset) ? 0. : 1. / (*m_propSpeedFromDB)->getSpeed(iCL);
   }
 }
 
@@ -1398,7 +1486,13 @@ void CDCGeometryPar::setXtRel()
 
   m_xtParamMode = (*m_xtRelFromDB)->getXtParamMode();
 
-  for (unsigned short iCL = 0; iCL < MAX_N_SLAYERS; ++iCL) {
+  for (unsigned short iCL = 0; iCL < c_maxNSenseLayers; ++iCL) {
+    if (iCL < m_firstLayerOffset) {
+      // m_XT is initialized to 0, but reading
+      // (*m_xtRelFromDB)->getXtParams(iCL, iLR, iA, iT)
+      // could fail if iCL < m_firstLayerOffset, thus continue as m_XT would be set to 0 in this case anyway
+      continue;
+    }
     for (unsigned short iLR = 0; iLR < 2; ++iLR) {
       for (unsigned short iA = 0; iA < m_nAlphaPoints; ++iA) {
         for (unsigned short iT = 0; iT < m_nThetaPoints; ++iT) {
@@ -1455,7 +1549,7 @@ void CDCGeometryPar::setSResol()
 
   m_maxSpaceResol = (*m_sResolFromDB)->getMaxSpaceResol();
 
-  for (unsigned short iCL = 0; iCL < MAX_N_SLAYERS; ++iCL) {
+  for (unsigned short iCL = 0; iCL < c_maxNSenseLayers; ++iCL) {
     for (unsigned short iLR = 0; iLR < 2; ++iLR) {
       for (unsigned short iA = 0; iA < m_nAlphaPoints4Sgm; ++iA) {
         for (unsigned short iT = 0; iT < m_nThetaPoints4Sgm; ++iT) {
@@ -1463,7 +1557,7 @@ void CDCGeometryPar::setSResol()
           unsigned short np = params.size();
           //    std::cout <<"np4sigma= " << np << std::endl;
           for (unsigned short i = 0; i < np; ++i) {
-            m_Sigma[iCL][iLR][iA][iT][i] = params[i];
+            m_Sigma[iCL][iLR][iA][iT][i] = (iCL < m_firstLayerOffset) ? 0. : params[i];
           }
         }
       }
@@ -1488,11 +1582,9 @@ void CDCGeometryPar::setFFactor()
   for (unsigned short id = 0; id < nEnt; ++id) {
     unsigned short np = ((*m_fFactorFromDB)->getFactors(id)).size();
     if (np != 3) B2FATAL("CDCGeometryPar:: No. of fudge factors != 3!");
-    if (groupId == 0) { //per all-layers
-      for (unsigned short i = 0; i < np; ++i) {
-        m_fudgeFactorForSigma[i] = ((*m_fFactorFromDB)->getFactors(id))[i];
-        B2DEBUG(29, i << " " << m_fudgeFactorForSigma[i]);
-      }
+    for (unsigned short i = 0; i < np; ++i) {
+      m_fudgeFactorForSigma[i] = ((*m_fFactorFromDB)->getFactors(id))[i];
+      B2DEBUG(29, i << " " << m_fudgeFactorForSigma[i]);
     }
   }
 
@@ -1508,8 +1600,8 @@ void CDCGeometryPar::setChMap()
 {
   for (const auto& cm : (*m_chMapFromDB)) {
     const unsigned short isl = cm.getISuperLayer();
-    if (isl >= nSuperLayers) continue;
-    const int il  = cm.getILayer();
+    if (isl >= c_nSuperLayers or isl < m_firstSuperLayerOffset) continue;
+    const uint il  = cm.getILayer();
     const int iw  = cm.getIWire();
     const int iBd = cm.getBoardID();
     const WireID wID(isl, il, iw);
@@ -1526,17 +1618,17 @@ void CDCGeometryPar::setEDepToADCConversions()
   unsigned short groupId = (*m_eDepToADCConversionsFromDB)->getGroupID();
   unsigned short nEnt    = (*m_eDepToADCConversionsFromDB)->getEntries();
   if (groupId == 0) { //per super-layer mode
-    if (nEnt > nSuperLayers) B2FATAL("CDCGeometryPar:: group-id " << groupId << " and #entries " << nEnt << " are inconsistent!");
+    if (nEnt > c_nSuperLayers) B2FATAL("CDCGeometryPar:: group-id " << groupId << " and #entries " << nEnt << " are inconsistent!");
   } else if (groupId == 1) { //per layer mode
-    if (nEnt > MAX_N_SLAYERS) B2FATAL("CDCGeometryPar:: group-id " << groupId << " and #entries " << nEnt << " are inconsistent!");
+    if (nEnt > c_maxNSenseLayers) B2FATAL("CDCGeometryPar:: group-id " << groupId << " and #entries " << nEnt << " are inconsistent!");
   } else {
     B2FATAL("CDCGeometryPar:: Invalid group-id " << groupId << " specified !");
   }
 
-  unsigned short cLMin[nSuperLayers], cLMax[nSuperLayers]; //min and max clayer per super-layer
+  unsigned short cLMin[c_nSuperLayers], cLMax[c_nSuperLayers]; //min and max clayer per super-layer
   cLMin[0] = 0;
   cLMax[0] = 7;
-  for (unsigned int sl = 1; sl < nSuperLayers; ++sl) {
+  for (unsigned int sl = 1; sl < c_nSuperLayers; ++sl) {
     cLMin[sl] = cLMax[0] + 6 * sl - 5;
     cLMax[sl] = cLMax[0] + 6 * sl;
   }
@@ -1548,14 +1640,14 @@ void CDCGeometryPar::setEDepToADCConversions()
       for (unsigned short cL = cLMin[id]; cL <= cLMax[id]; ++cL) { //clayer loop
         for (unsigned short cell = 0; cell < m_nWires[cL]; ++cell) { //cell loop
           for (unsigned short i = 0; i < np; ++i) {
-            m_eDepToADCParams[cL][cell][i] = ((*m_eDepToADCConversionsFromDB)->getParams(id))[i];
+            m_eDepToADCParams[cL][cell][i] = (cL < m_firstLayerOffset) ? 0. : ((*m_eDepToADCConversionsFromDB)->getParams(id))[i];
           }
         }
       }
     } else if (groupId == 1) { //per clayer; id=clayer
       for (unsigned short cell = 0; cell < m_nWires[id]; ++cell) { //cell loop
         for (unsigned short i = 0; i < np; ++i) {
-          m_eDepToADCParams[id][cell][i] = ((*m_eDepToADCConversionsFromDB)->getParams(id))[i];
+          m_eDepToADCParams[id][cell][i] = (id < m_firstLayerOffset) ? 0. : ((*m_eDepToADCConversionsFromDB)->getParams(id))[i];
         }
       }
     } else if (groupId == 2) { //per wire
@@ -1573,12 +1665,12 @@ double CDCGeometryPar::getEDepToADCConvFactor(unsigned short iCL, unsigned short
   //Igen = Imea * [1 + alf*Imea/cth] / [1 + gam*Imea/cth];
   //cth = |costh| + dlt;
   //Igen: original dE/dx; Imea: measured dE/dx with space-charge effect
-  const double  mainF = m_eDepToADCParams[iCL][iW][0];
-  const double& alf   = m_eDepToADCParams[iCL][iW][1];
-  const double& gam   = m_eDepToADCParams[iCL][iW][2];
-  const double& dlt   = m_eDepToADCParams[iCL][iW][3];
-  const double& a     = m_eDepToADCParams[iCL][iW][4];
-  const double& b     = m_eDepToADCParams[iCL][iW][5];
+  const double  mainF = (iCL < m_firstLayerOffset) ? 0. : m_eDepToADCParams[iCL][iW][0];
+  const double& alf   = (iCL < m_firstLayerOffset) ? 0. : m_eDepToADCParams[iCL][iW][1];
+  const double& gam   = (iCL < m_firstLayerOffset) ? 0. : m_eDepToADCParams[iCL][iW][2];
+  const double& dlt   = (iCL < m_firstLayerOffset) ? 0. : m_eDepToADCParams[iCL][iW][3];
+  const double& a     = (iCL < m_firstLayerOffset) ? 0. : m_eDepToADCParams[iCL][iW][4];
+  const double& b     = (iCL < m_firstLayerOffset) ? 0. : m_eDepToADCParams[iCL][iW][5];
   const double cth  = fabs(costh) + dlt;
   const double iGen = edep / dx; // keV/cm
   const double tmp  = cth - gam * iGen;
@@ -1615,12 +1707,17 @@ double CDCGeometryPar::getEDepToADCConvFactor(unsigned short iCL, unsigned short
 void CDCGeometryPar::Print() const
 {}
 
-const TVector3 CDCGeometryPar::wireForwardPosition(int layerID, int cellID, EWirePosition set) const
+const B2Vector3D CDCGeometryPar::wireForwardPosition(uint layerID, int cellID, EWirePosition set) const
 {
+  // return early in case of empty layer, i.e. layerID < m_firstLayerOffset
+  if (layerID < m_firstLayerOffset) {
+    return B2Vector3D(0, 0, 0);
+  }
+
   //  std::cout <<"cdcgeopar::fwdpos set= " << set << std::endl;
-  TVector3 wPos(m_FWirPosAlign[layerID][cellID][0],
-                m_FWirPosAlign[layerID][cellID][1],
-                m_FWirPosAlign[layerID][cellID][2]);
+  B2Vector3D wPos(m_FWirPosAlign[layerID][cellID][0],
+                  m_FWirPosAlign[layerID][cellID][1],
+                  m_FWirPosAlign[layerID][cellID][2]);
 
   if (set == c_Misaligned) {
     wPos.SetX(m_FWirPosMisalign[layerID][cellID][0]);
@@ -1631,17 +1728,23 @@ const TVector3 CDCGeometryPar::wireForwardPosition(int layerID, int cellID, EWir
     wPos.SetY(m_FWirPos        [layerID][cellID][1]);
     wPos.SetZ(m_FWirPos        [layerID][cellID][2]);
   }
+
   return wPos;
 }
 
-const TVector3 CDCGeometryPar::wireForwardPosition(int layerID, int cellID, double z, EWirePosition set) const
+const B2Vector3D CDCGeometryPar::wireForwardPosition(uint layerID, int cellID, double z, EWirePosition set) const
 {
+  // return early in case of empty layer, i.e. layerID < m_firstLayerOffset
+  if (layerID < m_firstLayerOffset) {
+    return B2Vector3D(0, 0, 0);
+  }
+
   double yb_sag = 0.;
   double yf_sag = 0.;
   getWireSagEffect(set, layerID, cellID, z, yb_sag, yf_sag);
 
-  TVector3 wPos(m_FWirPosAlign[layerID][cellID][0], yf_sag,
-                m_FWirPosAlign[layerID][cellID][2]);
+  B2Vector3D wPos(m_FWirPosAlign[layerID][cellID][0], yf_sag,
+                  m_FWirPosAlign[layerID][cellID][2]);
   if (set == c_Misaligned) {
     wPos.SetX(m_FWirPosMisalign[layerID][cellID][0]);
     wPos.SetZ(m_FWirPosMisalign[layerID][cellID][2]);
@@ -1649,14 +1752,20 @@ const TVector3 CDCGeometryPar::wireForwardPosition(int layerID, int cellID, doub
     wPos.SetX(m_FWirPos        [layerID][cellID][0]);
     wPos.SetZ(m_FWirPos        [layerID][cellID][2]);
   }
+
   return wPos;
 }
 
-const TVector3 CDCGeometryPar::wireBackwardPosition(int layerID, int cellID, EWirePosition set) const
+const B2Vector3D CDCGeometryPar::wireBackwardPosition(uint layerID, int cellID, EWirePosition set) const
 {
-  TVector3 wPos(m_BWirPosAlign[layerID][cellID][0],
-                m_BWirPosAlign[layerID][cellID][1],
-                m_BWirPosAlign[layerID][cellID][2]);
+  // return early in case of empty layer, i.e. layerID < m_firstLayerOffset
+  if (layerID < m_firstLayerOffset) {
+    return B2Vector3D(0, 0, 0);
+  }
+
+  B2Vector3D wPos(m_BWirPosAlign[layerID][cellID][0],
+                  m_BWirPosAlign[layerID][cellID][1],
+                  m_BWirPosAlign[layerID][cellID][2]);
 
   if (set == c_Misaligned) {
     wPos.SetX(m_BWirPosMisalign[layerID][cellID][0]);
@@ -1667,17 +1776,23 @@ const TVector3 CDCGeometryPar::wireBackwardPosition(int layerID, int cellID, EWi
     wPos.SetY(m_BWirPos        [layerID][cellID][1]);
     wPos.SetZ(m_BWirPos        [layerID][cellID][2]);
   }
+
   return wPos;
 }
 
-const TVector3 CDCGeometryPar::wireBackwardPosition(int layerID, int cellID, double z, EWirePosition set) const
+const B2Vector3D CDCGeometryPar::wireBackwardPosition(uint layerID, int cellID, double z, EWirePosition set) const
 {
+  // return early in case of empty layer, i.e. layerID < m_firstLayerOffset
+  if (layerID < m_firstLayerOffset) {
+    return B2Vector3D(0, 0, 0);
+  }
+
   double yb_sag = 0.;
   double yf_sag = 0.;
   getWireSagEffect(set, layerID, cellID, z, yb_sag, yf_sag);
 
-  TVector3 wPos(m_BWirPosAlign[layerID][cellID][0], yb_sag,
-                m_BWirPosAlign[layerID][cellID][2]);
+  B2Vector3D wPos(m_BWirPosAlign[layerID][cellID][0], yb_sag,
+                  m_BWirPosAlign[layerID][cellID][2]);
   if (set == c_Misaligned) {
     wPos.SetX(m_BWirPosMisalign[layerID][cellID][0]);
     wPos.SetZ(m_BWirPosMisalign[layerID][cellID][2]);
@@ -1685,10 +1800,11 @@ const TVector3 CDCGeometryPar::wireBackwardPosition(int layerID, int cellID, dou
     wPos.SetX(m_BWirPos        [layerID][cellID][0]);
     wPos.SetZ(m_BWirPos        [layerID][cellID][2]);
   }
+
   return wPos;
 }
 
-double CDCGeometryPar::getWireSagCoef(EWirePosition set, int layerID, int cellID) const
+double CDCGeometryPar::getWireSagCoef(EWirePosition set, uint layerID, int cellID) const
 {
   double coef =    m_WireSagCoef[layerID][cellID];
   if (set == c_Misaligned) {
@@ -1701,19 +1817,19 @@ double CDCGeometryPar::getWireSagCoef(EWirePosition set, int layerID, int cellID
 
 const double* CDCGeometryPar::innerRadiusWireLayer() const
 {
-  static double IRWL[MAX_N_SLAYERS] = {0};
+  static double IRWL[c_maxNSenseLayers] = {0};
 
   IRWL[0] = outerRadiusInnerWall();
   for (unsigned i = 1; i < nWireLayers(); i++)
     //IRWL[i] = (m_rSLayer[i - 1] + m_rSLayer[i]) / 2.;
-    IRWL[i] = m_rFLayer[i - 1];
+    IRWL[i] = (i == m_firstLayerOffset) ? outerRadiusInnerWall() : m_rFLayer[i - 1];
 
   return IRWL;
 }
 
 const double* CDCGeometryPar::outerRadiusWireLayer() const
 {
-  static double ORWL[MAX_N_SLAYERS] = {0};
+  static double ORWL[c_maxNSenseLayers] = {0};
 
   ORWL[nWireLayers() - 1] = innerRadiusOuterWall();
   for (unsigned i = 0; i < nWireLayers() - 1; i++)
@@ -1723,8 +1839,12 @@ const double* CDCGeometryPar::outerRadiusWireLayer() const
   return ORWL;
 }
 
-unsigned CDCGeometryPar::cellId(unsigned layerId, const TVector3& position) const
+unsigned CDCGeometryPar::cellId(unsigned layerId, const B2Vector3D& position) const
 {
+  if (layerId < m_firstLayerOffset) {
+    return 0;
+  }
+
   const unsigned nWires = m_nWires[layerId];
 
   double offset = m_offSet[layerId];
@@ -1734,14 +1854,14 @@ unsigned CDCGeometryPar::cellId(unsigned layerId, const TVector3& position) cons
     const double phiF = phiSize * offset
                         + phiSize * 0.5 * double(m_nShifts[layerId]);
     const double phiB = phiSize * offset;
-    const TVector3 f(m_rSLayer[layerId] * cos(phiF), m_rSLayer[layerId] * sin(phiF), m_zSForwardLayer[layerId]);
-    const TVector3 b(m_rSLayer[layerId] * cos(phiB), m_rSLayer[layerId] * sin(phiB), m_zSBackwardLayer[layerId]);
+    const B2Vector3D f(m_rSLayer[layerId] * cos(phiF), m_rSLayer[layerId] * sin(phiF), m_zSForwardLayer[layerId]);
+    const B2Vector3D b(m_rSLayer[layerId] * cos(phiB), m_rSLayer[layerId] * sin(phiB), m_zSBackwardLayer[layerId]);
 
-    const TVector3 v = f - b;
-    const TVector3 u = v.Unit();
-    const double beta = (0 - b.z()) / u.z();
-    const TVector3 p = b + beta * u;
-    double phi0 = - atan2(p.y(), p.x());
+    const B2Vector3D v = f - b;
+    const B2Vector3D u = v.Unit();
+    const double beta = (0 - b.Z()) / u.Z();
+    const B2Vector3D p = b + beta * u;
+    double phi0 = - atan2(p.Y(), p.X());
     offset += phi0 / (2 * M_PI / double(nWires));
   }*/
 
@@ -1750,14 +1870,14 @@ unsigned CDCGeometryPar::cellId(unsigned layerId, const TVector3& position) cons
     const double phiF = phiSize * (double(i) + offset)
                         + phiSize * 0.5 * double(m_nShifts[layerId]) + m_globalPhiRotation;
     const double phiB = phiSize * (double(i) + offset)   + m_globalPhiRotation;
-    const TVector3 f(m_rSLayer[layerId] * cos(phiF), m_rSLayer[layerId] * sin(phiF), m_zSForwardLayer[layerId]);
-    const TVector3 b(m_rSLayer[layerId] * cos(phiB), m_rSLayer[layerId] * sin(phiB), m_zSBackwardLayer[layerId]);
-    const TVector3 v = f - b;
-    const TVector3 u = v.Unit();
-    const double beta = (position.z() - b.z()) / u.z();
-    const TVector3 p = b + beta * u;
-    double dPhi = std::atan2(position.y(), position.x())
-                  - std::atan2(p.y(), p.x())
+    const B2Vector3D f(m_rSLayer[layerId] * cos(phiF), m_rSLayer[layerId] * sin(phiF), m_zSForwardLayer[layerId]);
+    const B2Vector3D b(m_rSLayer[layerId] * cos(phiB), m_rSLayer[layerId] * sin(phiB), m_zSBackwardLayer[layerId]);
+    const B2Vector3D v = f - b;
+    const B2Vector3D u = v.Unit();
+    const double beta = (position.Z() - b.Z()) / u.Z();
+    const B2Vector3D p = b + beta * u;
+    double dPhi = std::atan2(position.Y(), position.X())
+                  - std::atan2(p.Y(), p.X())
                   + phiSize / 2.;
     while (dPhi < 0) dPhi += (2. * M_PI);
     j = int(dPhi / phiSize);
@@ -1865,6 +1985,13 @@ void CDCGeometryPar::getWireSagEffect(const EWirePosition set, const unsigned la
   //N.B.- Maybe replaced with a bit more accurate formula.
   //    - The electrostatic force effect is not included.
 
+  // return early in case of empty layer, i.e. layerID < m_firstLayerOffset
+  if (layerID < m_firstLayerOffset) {
+    Yb_sag = 0.;
+    Yf_sag = 0.;
+    return;
+  }
+
   double Xb = 0.;
   double Xf = 0.;
   double Yb = 0.;
@@ -1946,27 +2073,28 @@ void CDCGeometryPar::setDesignWirParam(const unsigned layerID, const unsigned ce
   const double phiF = phiSize * (double(C) + offset)
                       + phiSize * 0.5 * double(m_nShifts[L]) + m_globalPhiRotation;
 
-  m_FWirPos[L][C][0] = m_rSLayer[L] * cos(phiF);
-  m_FWirPos[L][C][1] = m_rSLayer[L] * sin(phiF);
-  m_FWirPos[L][C][2] = m_zSForwardLayer[L];
+  m_FWirPos[L][C][0] = (L < m_firstLayerOffset) ? 0. : m_rSLayer[L] * cos(phiF);
+  m_FWirPos[L][C][1] = (L < m_firstLayerOffset) ? 0. : m_rSLayer[L] * sin(phiF);
+  m_FWirPos[L][C][2] = (L < m_firstLayerOffset) ? 0. : m_zSForwardLayer[L];
 
   const double phiB = phiSize * (double(C) + offset) + m_globalPhiRotation;
 
-  m_BWirPos[L][C][0] = m_rSLayer[L] * cos(phiB);
-  m_BWirPos[L][C][1] = m_rSLayer[L] * sin(phiB);
-  m_BWirPos[L][C][2] = m_zSBackwardLayer[L];
+  m_BWirPos[L][C][0] = (L < m_firstLayerOffset) ? 0. : m_rSLayer[L] * cos(phiB);
+  m_BWirPos[L][C][1] = (L < m_firstLayerOffset) ? 0. : m_rSLayer[L] * sin(phiB);
+  m_BWirPos[L][C][2] = (L < m_firstLayerOffset) ? 0. : m_zSBackwardLayer[L];
 
   for (int i = 0; i < 3; ++i) {
-    m_FWirPosMisalign[L][C][i] = m_FWirPos[L][C][i];
-    m_BWirPosMisalign[L][C][i] = m_BWirPos[L][C][i];
-    m_FWirPosAlign   [L][C][i] = m_FWirPos[L][C][i];
-    m_BWirPosAlign   [L][C][i] = m_BWirPos[L][C][i];
+    m_FWirPosMisalign[L][C][i] = (L < m_firstLayerOffset) ? 0. : m_FWirPos[L][C][i];
+    m_BWirPosMisalign[L][C][i] = (L < m_firstLayerOffset) ? 0. : m_BWirPos[L][C][i];
+    m_FWirPosAlign   [L][C][i] = (L < m_firstLayerOffset) ? 0. : m_FWirPos[L][C][i];
+    m_BWirPosAlign   [L][C][i] = (L < m_firstLayerOffset) ? 0. : m_BWirPos[L][C][i];
   }
 
-  m_WireSagCoef[L][C] = M_PI * m_senseWireDensity * m_senseWireDiameter * m_senseWireDiameter / (8. * m_senseWireTension);
+  m_WireSagCoef[L][C] = (L < m_firstLayerOffset) ? 0. : M_PI * m_senseWireDensity * m_senseWireDiameter * m_senseWireDiameter /
+                        (8. * m_senseWireTension);
   //  m_WireSagCoef        [L][C] = 0.;
-  m_WireSagCoefMisalign[L][C] = m_WireSagCoef[L][C];
-  m_WireSagCoefAlign    [L][C] = m_WireSagCoef [L][C];
+  m_WireSagCoefMisalign[L][C] = (L < m_firstLayerOffset) ? 0. : m_WireSagCoef[L][C];
+  m_WireSagCoefAlign   [L][C] = (L < m_firstLayerOffset) ? 0. : m_WireSagCoef[L][C];
 
 }
 
@@ -1999,6 +2127,10 @@ void CDCGeometryPar::outputDesignWirParam(const unsigned layerID, const unsigned
 double CDCGeometryPar::getDriftV(const double time, const unsigned short iCLayer, const unsigned short lr, const double alpha,
                                  const double theta) const
 {
+  if (iCLayer < m_firstLayerOffset) {
+    return 0.;
+  }
+
   double dDdt = 0.;
 
   //calculate min. drift time
@@ -2083,6 +2215,10 @@ double CDCGeometryPar::getDriftV(const double time, const unsigned short iCLayer
 double CDCGeometryPar::getDriftLength0(const double time, const unsigned short iCLayer, const unsigned short lr, const double alpha,
                                        const double theta) const
 {
+  if (iCLayer < m_firstLayerOffset) {
+    return 0.;
+  }
+
   double dist = 0.;
 
   //convert incoming- to outgoing-lr
@@ -2163,6 +2299,10 @@ double CDCGeometryPar::getDriftLength(const double time, const unsigned short iC
                                       const bool calculateMinTime,
                                       const double inputMinTime) const
 {
+  if (iCLayer < m_firstLayerOffset) {
+    return 0.;
+  }
+
   double dist = 0.;
 
   //calculate min. drift time
@@ -2260,6 +2400,10 @@ double CDCGeometryPar::getDriftLength(const double time, const unsigned short iC
 double CDCGeometryPar::getMinDriftTime(const unsigned short iCLayer, const unsigned short lr, const double alpha,
                                        const double theta) const
 {
+  if (iCLayer < m_firstLayerOffset) {
+    return 0.;
+  }
+
   double minTime = 0.;
 
   //convert incoming- to outgoing-lr
@@ -2450,6 +2594,10 @@ double CDCGeometryPar::getMinDriftTime(const unsigned short iCLayer, const unsig
 double CDCGeometryPar::getDriftTime(const double dist, const unsigned short iCLayer, const unsigned short lr, const double alpha,
                                     const double theta) const
 {
+  if (iCLayer < m_firstLayerOffset) {
+    return 0.;
+  }
+
   //to be replaced with a smarter algorithm...
 
   const double eps = 2.5e-1;
@@ -2502,6 +2650,10 @@ double CDCGeometryPar::getDriftTime(const double dist, const unsigned short iCLa
 double CDCGeometryPar::getSigma(const double DriftL0, const unsigned short iCLayer, const unsigned short lr, const double alpha,
                                 const double theta) const
 {
+  if (iCLayer < m_firstLayerOffset) {
+    return 0.;
+  }
+
 
   double sigma = 0.;
   //DriftL0 < 0 for the hit w/driftTime < 0; use |DriftL0| to avoid sigma=nan
@@ -2607,11 +2759,11 @@ double CDCGeometryPar::getSigma(const double DriftL0, const unsigned short iCLay
   return sigma;
 }
 
-unsigned short CDCGeometryPar::getOldLeftRight(const TVector3& posOnWire, const TVector3& posOnTrack,
-                                               const TVector3& momentum) const
+unsigned short CDCGeometryPar::getOldLeftRight(const B2Vector3D& posOnWire, const B2Vector3D& posOnTrack,
+                                               const B2Vector3D& momentum) const
 {
   unsigned short lr = 0;
-  double wCrossT = (posOnWire.Cross(posOnTrack)).z();
+  double wCrossT = (posOnWire.Cross(posOnTrack)).Z();
 
   if (wCrossT < 0.) {
     lr = 0;
@@ -2619,7 +2771,7 @@ unsigned short CDCGeometryPar::getOldLeftRight(const TVector3& posOnWire, const 
     lr = 1;
   } else {
     if ((posOnTrack - posOnWire).Perp() != 0.) {
-      double wCrossP = (posOnWire.Cross(momentum)).z();
+      double wCrossP = (posOnWire.Cross(momentum)).Z();
       if (wCrossP > 0.) {
         if (posOnTrack.Perp() > posOnWire.Perp()) {
           lr = 0;
@@ -2642,21 +2794,21 @@ unsigned short CDCGeometryPar::getOldLeftRight(const TVector3& posOnWire, const 
   return lr;
 }
 
-unsigned short CDCGeometryPar::getNewLeftRightRaw(const TVector3& posOnWire, const TVector3& posOnTrack,
-                                                  const TVector3& momentum) const
+unsigned short CDCGeometryPar::getNewLeftRightRaw(const B2Vector3D& posOnWire, const B2Vector3D& posOnTrack,
+                                                  const B2Vector3D& momentum) const
 {
-  const double distanceCrossP = ((posOnWire - posOnTrack).Cross(momentum)).z();
+  const double distanceCrossP = ((posOnWire - posOnTrack).Cross(momentum)).Z();
   unsigned short int lr = (distanceCrossP > 0.) ? 1 : 0;
   return lr;
 }
 
 //N.B. The following alpha and theta calculations are directly implemented in CDCRecoHit.cc tentatively to avoid a circular dependence betw cdc_dataobjects and cdclib. So be careful when changing the calculations !
-double CDCGeometryPar::getAlpha(const TVector3& posOnWire, const TVector3& momentum) const
+double CDCGeometryPar::getAlpha(const B2Vector3D& posOnWire, const B2Vector3D& momentum) const
 {
-  const double wx = posOnWire.x();
-  const double wy = posOnWire.y();
-  const double px = momentum.x();
-  const double py = momentum.y();
+  const double wx = posOnWire.X();
+  const double wy = posOnWire.Y();
+  const double px = momentum.X();
+  const double py = momentum.Y();
 
   const double cross = wx * py - wy * px;
   const double dot   = wx * px + wy * py;
@@ -2664,9 +2816,9 @@ double CDCGeometryPar::getAlpha(const TVector3& posOnWire, const TVector3& momen
   return atan2(cross, dot);
 }
 
-double CDCGeometryPar::getTheta(const TVector3& momentum) const
+double CDCGeometryPar::getTheta(const B2Vector3D& momentum) const
 {
-  return atan2(momentum.Perp(), momentum.z());
+  return atan2(momentum.Perp(), momentum.Z());
 }
 
 
@@ -2831,14 +2983,15 @@ void CDCGeometryPar::setDisplacement()
     const int iWire = WireID(disp.getEWire()).getIWire();
     //    if (iLayer0 != iLayer) B2FATAL("Layer0 != Layer");
     //    if (iWire0  != iWire) B2FATAL("Wire0 != Wire");
-    m_FWirPos[iLayer][iWire][0] += disp.getXFwd();
-    m_FWirPos[iLayer][iWire][1] += disp.getYFwd();
-    m_FWirPos[iLayer][iWire][2] += disp.getZFwd();
-    m_BWirPos[iLayer][iWire][0] += disp.getXBwd();
-    m_BWirPos[iLayer][iWire][1] += disp.getYBwd();
-    m_BWirPos[iLayer][iWire][2] += disp.getZBwd();
-    m_WireSagCoef[iLayer][iWire] = M_PI * m_senseWireDensity * m_senseWireDiameter * m_senseWireDiameter / (8.*
-                                   (m_senseWireTension + disp.getTension()));
+    m_FWirPos[iLayer][iWire][0] += (iLayer < m_firstLayerOffset) ? 0. : disp.getXFwd();
+    m_FWirPos[iLayer][iWire][1] += (iLayer < m_firstLayerOffset) ? 0. : disp.getYFwd();
+    m_FWirPos[iLayer][iWire][2] += (iLayer < m_firstLayerOffset) ? 0. : disp.getZFwd();
+    m_BWirPos[iLayer][iWire][0] += (iLayer < m_firstLayerOffset) ? 0. : disp.getXBwd();
+    m_BWirPos[iLayer][iWire][1] += (iLayer < m_firstLayerOffset) ? 0. : disp.getYBwd();
+    m_BWirPos[iLayer][iWire][2] += (iLayer < m_firstLayerOffset) ? 0. : disp.getZBwd();
+    m_WireSagCoef[iLayer][iWire] = (iLayer < m_firstLayerOffset) ? 0. : M_PI * m_senseWireDensity * m_senseWireDiameter *
+                                   m_senseWireDiameter / (8.*
+                                                          (m_senseWireTension + disp.getTension()));
     //    std::cout <<"setdisp iL, iC, nominaltension, tension= " << iLayer <<" " << iWire <<" "<< m_senseWireTension <<" "<< disp.getTension() << std::endl;
   }
 }
@@ -2846,16 +2999,16 @@ void CDCGeometryPar::setDisplacement()
 
 void CDCGeometryPar::setShiftInSuperLayer()
 {
-  const unsigned short nLayers[nSuperLayers] = {8, 6, 6, 6, 6, 6, 6, 6, 6}; //tentaive
+  const unsigned short nLayers[c_nSuperLayers] = {8, 6, 6, 6, 6, 6, 6, 6, 6}; //tentaive
 
-  for (unsigned short SLayer = 0; SLayer < nSuperLayers; ++SLayer) {
+  for (unsigned short SLayer = 0; SLayer < c_nSuperLayers; ++SLayer) {
     unsigned short firstCLayer = 0;
     for (unsigned short i = 0; i < SLayer; ++i) {
       firstCLayer += nLayers[i];
     }
     //    std::cout <<"SLayer,firstCLayer= " << SLayer <<" "<< firstCLayer << std::endl;
 
-    TVector3 firstBPos = wireBackwardPosition(firstCLayer, 0);
+    B2Vector3D firstBPos = wireBackwardPosition(firstCLayer, 0);
     for (unsigned short Layer = 0; Layer < nLayers[SLayer]; ++Layer) {
       unsigned short CLayer = firstCLayer + Layer;
 
@@ -2863,7 +3016,7 @@ void CDCGeometryPar::setShiftInSuperLayer()
         m_shiftInSuperLayer[SLayer][Layer] = 0;
 
       } else if (CLayer == firstCLayer + 1) {
-        TVector3 BPos = wireBackwardPosition(CLayer, 0);
+        B2Vector3D BPos = wireBackwardPosition(CLayer, 0);
         m_shiftInSuperLayer[SLayer][Layer] = (BPos.Cross(firstBPos)).Z() > 0. ? -1 : 1;
         //  std::cout <<"CLayer,Layer,shift= " << CLayer <<" "<< Layer <<" "<< m_shiftInSuperLayer[SLayer][Layer] <<" "<< (BPos.Cross(firstBPos)).Z() << std::endl;
 

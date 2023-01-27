@@ -33,7 +33,7 @@ def file_description_set(
     Add file description validation metdata to a ROOT file.
 
     Args:
-        rootfile (TFile, str or pathlib.PurePath): Name of the root file
+        rootfile (ROOT.TFile, str or pathlib.PurePath): Name of the root file
             to open or an already open TFile instance
         description (str):  Common description/information of/about all plots
             in this ROOT file (will be displayed above the plots)
@@ -242,7 +242,7 @@ class ValidationMetadataSetter(basf2.Module):
     def terminate(self):
         """And update the metadata at the end"""
         for name, *metadata in self._variables:
-            name = Belle2.makeROOTCompatible(name)
+            name = Belle2.MakeROOTCompatible.makeROOTCompatible(name)
             validation_metadata_update(self._tfile, name, *metadata)
         if self._description:
             file_description_set(self._tfile, self._description)

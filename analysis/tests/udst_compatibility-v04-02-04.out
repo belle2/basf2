@@ -4,17 +4,26 @@
 [INFO] Added file ${BELLE2_SOFTWARE_DIR}/analysis/tests/udst-v04-02-04.root
 Untested method Particle::appendDaughter
 Untested method Particle::forEachDaughter
+Untested method Particle::getAllDaughters
 Untested method Particle::getArrayPointer
+Untested method Particle::getMostLikelyTrackFitResult
+Untested method Particle::getPDGLifetime
 Untested method Particle::isCopyOf
 Untested method Particle::isMostLikely
+Untested method Particle::isMostLikelyTrackFitResult
 Untested method Particle::overlapsWith
 Untested method Particle::removeDaughter
 Untested method Particle::removeExtraInfo
+Untested method Particle::replaceDaughter
+Untested method Particle::replaceDaughterRecursively
 Untested method Particle::set4Vector
+Untested method Particle::set4VectorDividingByMomentumScaling
 Untested method Particle::setExtraInfo
 Untested method Particle::setJacobiMatrix
 Untested method Particle::setMomentumScalingFactor
+Untested method Particle::setMomentumSmearingFactor
 Untested method Particle::setMomentumVertexErrorMatrix
+Untested method Particle::setPDGCode
 Untested method Particle::setPValue
 Untested method Particle::setProperty
 Untested method Particle::setVertex
@@ -51,6 +60,7 @@ Particle#0:
   getECLCluster(): -> NULL
   getECLClusterEHypothesisBit(): 16
   getECLClusterEnergy(): 0
+  getEffectiveMomentumScale(): 1
   getEnergy(): 0.217494
   getExtraInfo(foo): 1337
   getExtraInfoMap(): 0
@@ -87,7 +97,6 @@ Particle#0:
      3.630041e-07 -7.313290e-07  1.598647e-06  4.527068e-07 
     -2.073125e-07  3.820723e-07  4.527068e-07  4.807957e-07 
   getMomentumMagnitude(): 0.166805
-  getMomentumScalingFactor(): 1
   getMomentumVertexErrorMatrix(): 
      2.384876e-06  2.423749e-07  3.630041e-07 -2.073125e-07 -1.911990e-05 -8.666140e-06 -1.041517e-05 
      2.423749e-07  1.742051e-06 -7.313290e-07  3.820723e-07 -8.177499e-06 -3.707214e-06  2.134244e-05 
@@ -104,10 +113,12 @@ Particle#0:
   getPDGMass(): 0.13957
   getPIDLikelihood(): -> PIDLikelihoods#0
   getPValue(): 0.319611
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:1): -> NULL
   getParticleSource(): 1
@@ -177,6 +188,7 @@ Particle#1:
   getECLCluster(): -> ECLClusters#9
   getECLClusterEHypothesisBit(): 16
   getECLClusterEnergy(): 0.411114
+  getEffectiveMomentumScale(): 1
   getEnergy(): 0.686585
   getExtraInfo(foo): 1337
   getExtraInfoMap(): 0
@@ -213,7 +225,6 @@ Particle#1:
      1.058859e-07  1.877263e-07  2.011676e-06  2.353927e-07 
     -3.857265e-07 -7.399638e-07  2.353927e-07  6.023958e-07 
   getMomentumMagnitude(): 0.477161
-  getMomentumScalingFactor(): 1
   getMomentumVertexErrorMatrix(): 
      1.849829e-06 -3.299135e-07  1.058859e-07 -3.857265e-07 -3.624772e-06  1.926431e-06 -6.652429e-07 
     -3.299135e-07  1.507162e-06  1.877263e-07 -7.399638e-07  2.063310e-06 -1.096318e-06 -1.189123e-06 
@@ -230,10 +241,12 @@ Particle#1:
   getPDGMass(): 0.493677
   getPIDLikelihood(): -> PIDLikelihoods#1
   getPValue(): 0.499614
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:1): -> NULL
   getParticleSource(): 1
@@ -303,6 +316,7 @@ Particle#2:
   getECLCluster(): -> ECLClusters#0
   getECLClusterEHypothesisBit(): 16
   getECLClusterEnergy(): 0.686996
+  getEffectiveMomentumScale(): 1
   getEnergy(): 1.77635
   getExtraInfo(foo): 1337
   getExtraInfoMap(): 0
@@ -339,7 +353,6 @@ Particle#2:
     -1.522034e-06  5.193464e-06  7.544051e-06  8.826362e-06 
     -2.404209e-06  8.141998e-06  8.826362e-06  1.176368e-05 
   getMomentumMagnitude(): 1.70637
-  getMomentumScalingFactor(): 1
   getMomentumVertexErrorMatrix(): 
      2.261926e-06 -1.425377e-06 -1.522034e-06 -2.404209e-06 -1.800183e-06 -5.597088e-07 -6.697425e-07 
     -1.425377e-06  6.704538e-06  5.193464e-06  8.141998e-06 -6.045282e-07 -1.880381e-07  1.991428e-06 
@@ -356,10 +369,12 @@ Particle#2:
   getPDGMass(): 0.493677
   getPIDLikelihood(): -> PIDLikelihoods#4
   getPValue(): 0.361926
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:1): -> NULL
   getParticleSource(): 1
@@ -429,6 +444,7 @@ Particle#3:
   getECLCluster(): -> ECLClusters#11
   getECLClusterEHypothesisBit(): 16
   getECLClusterEnergy(): 0.196737
+  getEffectiveMomentumScale(): 1
   getEnergy(): 1.95978
   getExtraInfo(foo): 1337
   getExtraInfoMap(): 0
@@ -465,7 +481,6 @@ Particle#3:
     -7.669640e-08  1.053252e-07  1.834669e-06 -1.431387e-07 
      1.324831e-05 -1.770759e-05 -1.431387e-07  2.208220e-05 
   getMomentumMagnitude(): 1.95693
-  getMomentumScalingFactor(): 1
   getMomentumVertexErrorMatrix(): 
      8.986522e-06 -9.830403e-06 -7.669640e-08  1.324831e-05 -7.911527e-07 -6.021885e-07  1.787640e-08 
     -9.830403e-06  1.480601e-05  1.053252e-07 -1.770759e-05 -8.177478e-07 -6.224944e-07 -1.903179e-08 
@@ -482,10 +497,12 @@ Particle#3:
   getPDGMass(): 0.105658
   getPIDLikelihood(): -> PIDLikelihoods#6
   getPValue(): 0.292314
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:1): -> NULL
   getParticleSource(): 1
@@ -561,6 +578,7 @@ Particle#4:
   getECLCluster(): -> NULL
   getECLClusterEHypothesisBit(): 1
   getECLClusterEnergy(): 0
+  getEffectiveMomentumScale(): 1
   getEnergy(): 2.46299
   getExtraInfo(foo): 1337
   getExtraInfoMap(): 4
@@ -600,7 +618,6 @@ Particle#4:
     -1.638378e-06  5.459933e-06  9.420245e-06  9.063551e-06 
     -2.786382e-06  7.400577e-06  9.063551e-06  1.236567e-05 
   getMomentumMagnitude(): 1.64441
-  getMomentumScalingFactor(): 1
   getMomentumVertexErrorMatrix(): 
      3.768110e-06 -1.621375e-06 -1.638378e-06 -2.786382e-06 -2.522560e-06  8.245046e-07  5.031475e-07 
     -1.621375e-06  8.142522e-06  5.459933e-06  7.400577e-06  3.686112e-07 -2.931616e-06 -9.050960e-07 
@@ -617,10 +634,12 @@ Particle#4:
   getPDGMass(): 1.86483
   getPIDLikelihood(): -> NULL
   getPValue(): 0.000972417
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
-[WARNING] Daughter index 1 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 1
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:1): -> NULL
   getParticleSource(): 6
@@ -692,6 +711,7 @@ Particle#5:
   getECLCluster(): -> NULL
   getECLClusterEHypothesisBit(): 1
   getECLClusterEnergy(): 0
+  getEffectiveMomentumScale(): 1
   getEnergy(): 2.6805
   getExtraInfo(foo): 1337
   getExtraInfoMap(): 4
@@ -733,7 +753,6 @@ Particle#5:
     -1.836367e-06  4.829331e-06  1.073682e-05  7.659213e-06 
     -2.423175e-06  6.182711e-06  7.659213e-06  6.688197e-06 
   getMomentumMagnitude(): 1.80754
-  getMomentumScalingFactor(): 1
   getMomentumVertexErrorMatrix(): 
      4.398714e-06 -1.430520e-06 -1.836367e-06 -2.423175e-06 -8.789153e-06  8.479720e-06  1.481856e-05 
     -1.430520e-06  9.752373e-06  4.829331e-06  6.182711e-06 -2.241507e-05  2.609423e-05  5.318936e-05 
@@ -821,6 +840,7 @@ Particle#6:
   getECLCluster(): -> NULL
   getECLClusterEHypothesisBit(): 1
   getECLClusterEnergy(): 0
+  getEffectiveMomentumScale(): 1
   getEnergy(): 4.64059
   getExtraInfo(foo): 1337
   getExtraInfoMap(): 2
@@ -869,7 +889,6 @@ Particle#6:
     -2.038258e-06  4.830087e-06  1.257017e-05  7.699532e-06 
      1.063043e-05 -1.185397e-05  7.699532e-06  2.881040e-05 
   getMomentumMagnitude(): 1.72742
-  getMomentumScalingFactor(): 1
   getMomentumVertexErrorMatrix(): 
      1.327345e-05 -1.140316e-05 -2.038258e-06  1.063043e-05 -2.248525e-06  6.476234e-07  3.854928e-08 
     -1.140316e-05  2.430473e-05  4.830087e-06 -1.185397e-05  5.103469e-07 -3.304961e-06 -2.918229e-08 
@@ -958,6 +977,7 @@ Particle#7:
   getECLCluster(): -> NULL
   getECLClusterEHypothesisBit(): 1
   getECLClusterEnergy(): 0
+  getEffectiveMomentumScale(): 1
   getEnergy(): 4.64076
   getExtraInfo(foo): 1337
   getExtraInfoMap(): 2
@@ -1006,7 +1026,6 @@ Particle#7:
     -1.796625e-06  5.643675e-06  1.177245e-05  7.373373e-06 
      1.072781e-05 -1.157117e-05  7.373373e-06  2.866858e-05 
   getMomentumMagnitude(): 1.7281
-  getMomentumScalingFactor(): 1
   getMomentumVertexErrorMatrix(): 
      1.322666e-05 -1.162199e-05 -1.796625e-06  1.072781e-05 -2.304678e-06  8.589848e-07  5.818121e-08 
     -1.162199e-05  2.352751e-05  5.643675e-06 -1.157117e-05  2.019270e-07 -2.374180e-06  3.532256e-08 
@@ -1195,6 +1214,7 @@ Particle#0:
   getECLCluster(): -> NULL
   getECLClusterEHypothesisBit(): 16
   getECLClusterEnergy(): 0
+  getEffectiveMomentumScale(): 1
   getEnergy(): 0.25047
   getExtraInfo(foo): 1337
   getExtraInfoMap(): 0
@@ -1231,7 +1251,6 @@ Particle#0:
      1.190142e-05 -7.437588e-05  2.402235e-04  2.079161e-04 
      1.023199e-05 -6.686219e-05  2.079161e-04  1.805511e-04 
   getMomentumMagnitude(): 0.207979
-  getMomentumScalingFactor(): 1
   getMomentumVertexErrorMatrix(): 
      9.356034e-06 -5.116347e-06  1.190142e-05  1.023199e-05 -3.526643e-04  7.408586e-05 -1.253179e-04 
     -5.116347e-06  3.373402e-05 -7.437588e-05 -6.686219e-05  4.361608e-04 -9.111649e-05 -8.794109e-04 
@@ -1248,10 +1267,12 @@ Particle#0:
   getPDGMass(): 0.13957
   getPIDLikelihood(): -> PIDLikelihoods#0
   getPValue(): 0.875884
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:1): -> NULL
   getParticleSource(): 1
@@ -1321,6 +1342,7 @@ Particle#1:
   getECLCluster(): -> ECLClusters#19
   getECLClusterEHypothesisBit(): 16
   getECLClusterEnergy(): 0.210721
+  getEffectiveMomentumScale(): 1
   getEnergy(): 0.377509
   getExtraInfo(foo): 1337
   getExtraInfoMap(): 0
@@ -1357,7 +1379,6 @@ Particle#1:
      1.854117e-08 -1.272424e-07  1.151283e-06 -6.304840e-08 
      6.306265e-08 -3.623472e-07 -6.304840e-08  3.465334e-07 
   getMomentumMagnitude(): 0.350761
-  getMomentumScalingFactor(): 1
   getMomentumVertexErrorMatrix(): 
      1.115480e-06  8.343928e-08  1.854117e-08  6.306265e-08 -3.443877e-06 -4.543259e-07 -8.396000e-08 
      8.343928e-08  4.332472e-07 -1.272424e-07 -3.623472e-07 -4.418685e-07 -5.830542e-08  6.318927e-07 
@@ -1374,10 +1395,12 @@ Particle#1:
   getPDGMass(): 0.13957
   getPIDLikelihood(): -> PIDLikelihoods#5
   getPValue(): 0.228447
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:1): -> NULL
   getParticleSource(): 1
@@ -1447,6 +1470,7 @@ Particle#2:
   getECLCluster(): -> ECLClusters#16
   getECLClusterEHypothesisBit(): 16
   getECLClusterEnergy(): 0.204082
+  getEffectiveMomentumScale(): 1
   getEnergy(): 1.0223
   getExtraInfo(foo): 1337
   getExtraInfoMap(): 0
@@ -1483,7 +1507,6 @@ Particle#2:
      5.382500e-08 -1.530043e-07  1.849945e-06 -3.553027e-07 
     -1.124982e-06  3.190209e-06 -3.553027e-07  3.382826e-06 
   getMomentumMagnitude(): 1.01683
-  getMomentumScalingFactor(): 1
   getMomentumVertexErrorMatrix(): 
      1.808525e-06 -5.401290e-07  5.382500e-08 -1.124982e-06 -2.089381e-06 -7.694931e-07  1.221353e-07 
     -5.401290e-07  3.220966e-06 -1.530043e-07  3.190209e-06 -8.397223e-07 -3.092592e-07 -2.968287e-07 
@@ -1500,10 +1523,12 @@ Particle#2:
   getPDGMass(): 0.105658
   getPIDLikelihood(): -> PIDLikelihoods#7
   getPValue(): 0.883351
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:1): -> NULL
   getParticleSource(): 1
@@ -1573,6 +1598,7 @@ Particle#3:
   getECLCluster(): -> ECLClusters#22
   getECLClusterEHypothesisBit(): 16
   getECLClusterEnergy(): 0.611101
+  getEffectiveMomentumScale(): 1
   getEnergy(): 0.818124
   getExtraInfo(foo): 1337
   getExtraInfoMap(): 0
@@ -1609,7 +1635,6 @@ Particle#3:
     -1.159233e-06  3.848363e-07  2.262726e-06 -2.288979e-06 
      2.954306e-06 -9.986277e-07 -2.288979e-06  3.811224e-06 
   getMomentumMagnitude(): 0.806131
-  getMomentumScalingFactor(): 1
   getMomentumVertexErrorMatrix(): 
      2.864691e-06 -5.103909e-07 -1.159233e-06  2.954306e-06 -2.949120e-07 -8.158137e-07 -1.686404e-06 
     -5.103909e-07  1.459397e-06  3.848363e-07 -9.986277e-07 -7.127834e-07 -1.971674e-06  5.853811e-07 
@@ -1626,10 +1651,12 @@ Particle#3:
   getPDGMass(): 0.13957
   getPIDLikelihood(): -> PIDLikelihoods#8
   getPValue(): 0.569155
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:1): -> NULL
   getParticleSource(): 1
@@ -1699,6 +1726,7 @@ Particle#4:
   getECLCluster(): -> ECLClusters#7
   getECLClusterEHypothesisBit(): 16
   getECLClusterEnergy(): 0.203255
+  getEffectiveMomentumScale(): 1
   getEnergy(): 0.871856
   getExtraInfo(foo): 1337
   getExtraInfoMap(): 0
@@ -1735,7 +1763,6 @@ Particle#4:
      3.312147e-07 -1.579873e-08  1.692510e-06  1.003329e-06 
      2.152042e-06 -5.669845e-08  1.003329e-06  2.344234e-06 
   getMomentumMagnitude(): 0.860612
-  getMomentumScalingFactor(): 1
   getMomentumVertexErrorMatrix(): 
      2.251220e-06 -4.116405e-08  3.312147e-07  2.152042e-06  2.584427e-10  3.181167e-08  1.114073e-06 
     -4.116405e-08  1.446883e-06 -1.579873e-08 -5.669845e-08 -1.818300e-08 -2.303060e-06 -1.197908e-08 
@@ -1752,10 +1779,12 @@ Particle#4:
   getPDGMass(): 0.13957
   getPIDLikelihood(): -> PIDLikelihoods#9
   getPValue(): 0.0641914
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:1): -> NULL
   getParticleSource(): 1
@@ -1825,6 +1854,7 @@ Particle#5:
   getECLCluster(): -> ECLClusters#18
   getECLClusterEHypothesisBit(): 16
   getECLClusterEnergy(): 0.109431
+  getEffectiveMomentumScale(): 1
   getEnergy(): 0.716815
   getExtraInfo(foo): 1337
   getExtraInfoMap(): 0
@@ -1861,7 +1891,6 @@ Particle#5:
      7.995580e-08 -4.248634e-08  1.844074e-06 -2.076838e-07 
      8.535393e-07 -5.212353e-07 -2.076838e-07  7.403993e-07 
   getMomentumMagnitude(): 0.519718
-  getMomentumScalingFactor(): 1
   getMomentumVertexErrorMatrix(): 
      1.506012e-06  1.674301e-07  7.995580e-08  8.535393e-07 -9.437173e-07 -1.630317e-06 -6.956964e-07 
      1.674301e-07  1.770546e-06 -4.248634e-08 -5.212353e-07 -1.695240e-06 -2.928606e-06  4.143608e-07 
@@ -1878,10 +1907,12 @@ Particle#5:
   getPDGMass(): 0.493677
   getPIDLikelihood(): -> PIDLikelihoods#11
   getPValue(): 0.183412
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:1): -> NULL
   getParticleSource(): 1
@@ -1960,6 +1991,7 @@ Particle#6:
   getECLCluster(): -> NULL
   getECLClusterEHypothesisBit(): 1
   getECLClusterEnergy(): 0
+  getEffectiveMomentumScale(): 1
   getEnergy(): 2.78433
   getExtraInfo(foo): 1337
   getExtraInfoMap(): 4
@@ -2003,7 +2035,6 @@ Particle#6:
     -7.462399e-07  2.328787e-07  6.710843e-06 -1.555906e-06 
      6.024106e-06 -1.926995e-06 -1.555906e-06  7.238530e-06 
   getMomentumMagnitude(): 2.07123
-  getMomentumScalingFactor(): 1
   getMomentumVertexErrorMatrix(): 
      7.658542e-06 -3.456132e-07 -7.462399e-07  6.024106e-06 -2.939871e-06 -3.920271e-08 -5.577546e-08 
     -3.456132e-07  4.925288e-06  2.328787e-07 -1.926995e-06 -2.753727e-07 -2.467676e-06  6.280270e-08 
@@ -2020,10 +2051,12 @@ Particle#6:
   getPDGMass(): 1.86483
   getPIDLikelihood(): -> NULL
   getPValue(): 0.0100756
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
-[WARNING] Daughter index 1 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 1
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:1): -> NULL
   getParticleSource(): 6
@@ -2096,6 +2129,7 @@ Particle#7:
   getECLCluster(): -> NULL
   getECLClusterEHypothesisBit(): 1
   getECLClusterEnergy(): 0
+  getEffectiveMomentumScale(): 1
   getEnergy(): 4.05849
   getExtraInfo(foo): 1337
   getExtraInfoMap(): 2
@@ -2148,7 +2182,6 @@ Particle#7:
     -6.922350e-06 -5.457901e-05  1.949070e-04  1.601252e-04 
     -1.308917e-06 -4.670556e-05  1.601252e-04  1.481520e-04 
   getMomentumMagnitude(): 1.53086
-  getMomentumScalingFactor(): 1
   getMomentumVertexErrorMatrix(): 
      1.270218e-05  8.939125e-07 -6.922350e-06 -1.308917e-06 -2.426294e-06 -2.480672e-07 -8.286161e-08 
      8.939125e-07  2.734556e-05 -5.457901e-05 -4.670556e-05  2.248771e-07 -2.791161e-06 -2.912339e-08 
@@ -2305,6 +2338,7 @@ Particle#0:
   getECLCluster(): -> NULL
   getECLClusterEHypothesisBit(): 16
   getECLClusterEnergy(): 0
+  getEffectiveMomentumScale(): 1
   getEnergy(): 0.202316
   getExtraInfo(foo): 1337
   getExtraInfoMap(): 0
@@ -2341,7 +2375,6 @@ Particle#0:
     -5.069198e-06  1.132149e-07  6.108599e-06  5.269655e-06 
     -9.552706e-06  5.782900e-07  5.269655e-06  7.778036e-06 
   getMomentumMagnitude(): 0.146465
-  getMomentumScalingFactor(): 1
   getMomentumVertexErrorMatrix(): 
      1.274467e-05 -3.833255e-09 -5.069198e-06 -9.552706e-06 -1.370737e-05 -6.711263e-05 -3.111014e-05 
     -3.833255e-09  3.195046e-06  1.132149e-07  5.782900e-07 -9.268030e-06 -4.944625e-05  4.140178e-06 
@@ -2358,10 +2391,12 @@ Particle#0:
   getPDGMass(): 0.13957
   getPIDLikelihood(): -> PIDLikelihoods#0
   getPValue(): 0.671464
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:1): -> NULL
   getParticleSource(): 1
@@ -2431,6 +2466,7 @@ Particle#1:
   getECLCluster(): -> NULL
   getECLClusterEHypothesisBit(): 16
   getECLClusterEnergy(): 0
+  getEffectiveMomentumScale(): 1
   getEnergy(): 0.58826
   getExtraInfo(foo): 1337
   getExtraInfoMap(): 0
@@ -2467,7 +2503,6 @@ Particle#1:
      1.675740e-04 -4.395608e-05  4.356770e-04  2.541986e-04 
      1.076849e-04 -2.711004e-05  2.541986e-04  1.504602e-04 
   getMomentumMagnitude(): 0.319895
-  getMomentumScalingFactor(): 1
   getMomentumVertexErrorMatrix(): 
      1.104127e-04 -2.104612e-05  1.675740e-04  1.076849e-04  4.993551e-07  2.621711e-04  1.217997e-03 
     -2.104612e-05  4.455002e-05 -4.395608e-05 -2.711004e-05  1.173135e-05 -6.298918e-04 -2.800423e-07 
@@ -2484,10 +2519,12 @@ Particle#1:
   getPDGMass(): 0.493677
   getPIDLikelihood(): -> PIDLikelihoods#2
   getPValue(): 0.525692
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:1): -> NULL
   getParticleSource(): 1
@@ -2557,6 +2594,7 @@ Particle#2:
   getECLCluster(): -> NULL
   getECLClusterEHypothesisBit(): 16
   getECLClusterEnergy(): 0
+  getEffectiveMomentumScale(): 1
   getEnergy(): 0.269007
   getExtraInfo(foo): 1337
   getExtraInfoMap(): 0
@@ -2593,7 +2631,6 @@ Particle#2:
     -7.975346e-08  4.099632e-07  1.241266e-06  4.823437e-08 
      2.768347e-08 -1.223286e-07  4.823437e-08  1.147537e-07 
   getMomentumMagnitude(): 0.229967
-  getMomentumScalingFactor(): 1
   getMomentumVertexErrorMatrix(): 
      1.370234e-06  1.733044e-07 -7.975346e-08  2.768347e-08 -6.736900e-06 -1.135078e-06  5.107218e-07 
      1.733044e-07  3.462707e-07  4.099632e-07 -1.223286e-07 -1.122854e-06 -1.891721e-07 -2.618543e-06 
@@ -2610,10 +2647,12 @@ Particle#2:
   getPDGMass(): 0.13957
   getPIDLikelihood(): -> PIDLikelihoods#3
   getPValue(): 0.0212333
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:1): -> NULL
   getParticleSource(): 1
@@ -2683,6 +2722,7 @@ Particle#3:
   getECLCluster(): -> NULL
   getECLClusterEHypothesisBit(): 16
   getECLClusterEnergy(): 0
+  getEffectiveMomentumScale(): 1
   getEnergy(): 0.218745
   getExtraInfo(foo): 1337
   getExtraInfoMap(): 0
@@ -2719,7 +2759,6 @@ Particle#3:
     -3.721748e-07  3.570752e-07  1.523423e-06  5.939967e-08 
      1.144272e-07 -9.947255e-08  5.939967e-08  1.251008e-07 
   getMomentumMagnitude(): 0.168432
-  getMomentumScalingFactor(): 1
   getMomentumVertexErrorMatrix(): 
      1.093942e-06  6.568237e-07 -3.721748e-07  1.144272e-07 -5.921230e-06 -5.850715e-06  3.338264e-06 
      6.568237e-07  1.047096e-06  3.570752e-07 -9.947255e-08 -5.743493e-06 -5.675012e-06 -3.127267e-06 
@@ -2736,10 +2775,12 @@ Particle#3:
   getPDGMass(): 0.13957
   getPIDLikelihood(): -> PIDLikelihoods#4
   getPValue(): 0.430931
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:1): -> NULL
   getParticleSource(): 1
@@ -2809,6 +2850,7 @@ Particle#4:
   getECLCluster(): -> ECLClusters#17
   getECLClusterEHypothesisBit(): 16
   getECLClusterEnergy(): 0.144231
+  getEffectiveMomentumScale(): 1
   getEnergy(): 0.323809
   getExtraInfo(foo): 1337
   getExtraInfoMap(): 0
@@ -2845,7 +2887,6 @@ Particle#4:
      2.903190e-08 -1.026304e-08  1.200384e-06 -7.884701e-09 
      2.230349e-07 -8.801324e-08 -7.884701e-09  2.163126e-07 
   getMomentumMagnitude(): 0.292186
-  getMomentumScalingFactor(): 1
   getMomentumVertexErrorMatrix(): 
      3.597223e-07  2.755312e-07  2.903190e-08  2.230349e-07 -4.483862e-07 -1.325267e-06 -1.392116e-07 
      2.755312e-07  1.081535e-06 -1.026304e-08 -8.801324e-08 -1.316599e-06 -3.891235e-06  5.502808e-08 
@@ -2862,10 +2903,12 @@ Particle#4:
   getPDGMass(): 0.13957
   getPIDLikelihood(): -> PIDLikelihoods#6
   getPValue(): 1.9246e-05
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:1): -> NULL
   getParticleSource(): 1
@@ -2935,6 +2978,7 @@ Particle#5:
   getECLCluster(): -> ECLClusters#10
   getECLClusterEHypothesisBit(): 16
   getECLClusterEnergy(): 0.615124
+  getEffectiveMomentumScale(): 1
   getEnergy(): 1.31976
   getExtraInfo(foo): 1337
   getExtraInfoMap(): 0
@@ -2971,7 +3015,6 @@ Particle#5:
      5.804423e-08 -2.293247e-06  2.262870e-06  2.964633e-06 
      1.682360e-07 -7.249789e-06  2.964633e-06  7.789603e-06 
   getMomentumMagnitude(): 1.31236
-  getMomentumScalingFactor(): 1
   getMomentumVertexErrorMatrix(): 
      1.263974e-06 -1.491824e-07  5.804423e-08  1.682360e-07 -1.243811e-06 -6.849631e-09  6.086488e-09 
     -1.491824e-07  6.938812e-06 -2.293247e-06 -7.249789e-06  9.894879e-08  5.574770e-10 -5.494304e-07 
@@ -2988,10 +3031,12 @@ Particle#5:
   getPDGMass(): 0.13957
   getPIDLikelihood(): -> PIDLikelihoods#7
   getPValue(): 2.88305e-05
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:1): -> NULL
   getParticleSource(): 1
@@ -3061,6 +3106,7 @@ Particle#6:
   getECLCluster(): -> ECLClusters#9
   getECLClusterEHypothesisBit(): 16
   getECLClusterEnergy(): 0.202086
+  getEffectiveMomentumScale(): 1
   getEnergy(): 1.30025
   getExtraInfo(foo): 1337
   getExtraInfoMap(): 0
@@ -3097,7 +3143,6 @@ Particle#6:
      7.753824e-07  2.232045e-06  2.798661e-06  3.471692e-06 
      1.805832e-06  5.292417e-06  3.471692e-06  6.559894e-06 
   getMomentumMagnitude(): 1.29595
-  getMomentumScalingFactor(): 1
   getMomentumVertexErrorMatrix(): 
      1.690126e-06  1.184558e-06  7.753824e-07  1.805832e-06 -1.343523e-06  4.422725e-07  2.383851e-07 
      1.184558e-06  4.730408e-06  2.232045e-06  5.292417e-06  3.895146e-07 -1.281891e-07  9.325664e-07 
@@ -3114,10 +3159,12 @@ Particle#6:
   getPDGMass(): 0.105658
   getPIDLikelihood(): -> PIDLikelihoods#9
   getPValue(): 0.100115
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:1): -> NULL
   getParticleSource(): 1
@@ -3187,6 +3234,7 @@ Particle#7:
   getECLCluster(): -> ECLClusters#15
   getECLClusterEHypothesisBit(): 16
   getECLClusterEnergy(): 0.138186
+  getEffectiveMomentumScale(): 1
   getEnergy(): 0.57597
   getExtraInfo(foo): 1337
   getExtraInfoMap(): 0
@@ -3222,8 +3270,7 @@ Particle#7:
     -1.222089e-07  1.119013e-06 -3.838498e-09 -4.776088e-07 
      7.409999e-09 -3.838498e-09  1.251622e-06  8.363132e-08 
      1.246792e-06 -4.776088e-07  8.363132e-08  1.297594e-06 
-  getMomentumMagnitude(): 0.558803
-  getMomentumScalingFactor(): 1
+  getMomentumMagnitude(): 0.558804
   getMomentumVertexErrorMatrix(): 
      1.323645e-06 -1.222089e-07  7.409999e-09  1.246792e-06 -2.235135e-07 -6.395441e-07  1.642836e-07 
     -1.222089e-07  1.119013e-06 -3.838498e-09 -4.776088e-07 -6.812158e-07 -1.949174e-06 -5.111066e-08 
@@ -3234,16 +3281,18 @@ Particle#7:
      1.642836e-07 -5.111066e-08 -2.777047e-06 -1.342499e-09 -1.509592e-08 -4.243736e-08  7.641618e-06 
   getNDaughters(): 0
   getName(): pi+
-  getP(): 0.558803
+  getP(): 0.558804
   getPDGCode(): 211
   getPDGCodeUsedForFit(): 211
   getPDGMass(): 0.13957
   getPIDLikelihood(): -> PIDLikelihoods#11
   getPValue(): 0.296033
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:1): -> NULL
   getParticleSource(): 1
@@ -3313,6 +3362,7 @@ Particle#8:
   getECLCluster(): -> NULL
   getECLClusterEHypothesisBit(): 16
   getECLClusterEnergy(): 0
+  getEffectiveMomentumScale(): 1
   getEnergy(): 0.480477
   getExtraInfo(foo): 1337
   getExtraInfoMap(): 0
@@ -3349,7 +3399,6 @@ Particle#8:
     -1.828857e-07  5.498379e-08  2.809015e-06  2.470801e-06 
     -1.141687e-06  5.684504e-07  2.470801e-06  2.659783e-06 
   getMomentumMagnitude(): 0.459759
-  getMomentumScalingFactor(): 1
   getMomentumVertexErrorMatrix(): 
      2.586099e-06 -4.425787e-09 -1.828857e-07 -1.141687e-06 -3.118982e-06 -5.525751e-06 -2.112620e-05 
     -4.425787e-09  2.396903e-06  5.498379e-08  5.684504e-07 -5.156141e-06 -9.133788e-06  1.149383e-05 
@@ -3366,10 +3415,12 @@ Particle#8:
   getPDGMass(): 0.13957
   getPIDLikelihood(): -> PIDLikelihoods#13
   getPValue(): 0.0538817
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:1): -> NULL
   getParticleSource(): 1
@@ -3439,6 +3490,7 @@ Particle#9:
   getECLCluster(): -> NULL
   getECLClusterEHypothesisBit(): 16
   getECLClusterEnergy(): 0
+  getEffectiveMomentumScale(): 1
   getEnergy(): 0.71358
   getExtraInfo(foo): 1337
   getExtraInfoMap(): 0
@@ -3475,7 +3527,6 @@ Particle#9:
     -3.433935e-06 -5.751054e-06  4.635488e-06  5.722847e-06 
     -7.466746e-06 -1.255408e-05  5.722847e-06  1.132454e-05 
   getMomentumMagnitude(): 0.515246
-  getMomentumScalingFactor(): 1
   getMomentumVertexErrorMatrix(): 
      6.493538e-06  7.547786e-06 -3.433935e-06 -7.466746e-06 -3.841726e-06  2.179667e-06 -9.103779e-07 
      7.547786e-06  1.459368e-05 -5.751054e-06 -1.255408e-05  1.077008e-06 -6.112391e-07 -1.530494e-06 
@@ -3492,10 +3543,12 @@ Particle#9:
   getPDGMass(): 0.493677
   getPIDLikelihood(): -> PIDLikelihoods#15
   getPValue(): 0.243275
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:1): -> NULL
   getParticleSource(): 1
@@ -3565,6 +3618,7 @@ Particle#10:
   getECLCluster(): -> ECLClusters#22
   getECLClusterEHypothesisBit(): 16
   getECLClusterEnergy(): 0.126154
+  getEffectiveMomentumScale(): 1
   getEnergy(): 0.336043
   getExtraInfo(foo): 1337
   getExtraInfoMap(): 0
@@ -3601,7 +3655,6 @@ Particle#10:
     -9.235088e-05  3.286290e-05  1.128526e-04 -1.358700e-04 
      1.130175e-04 -4.017350e-05 -1.358700e-04  1.647416e-04 
   getMomentumMagnitude(): 0.305688
-  getMomentumScalingFactor(): 1
   getMomentumVertexErrorMatrix(): 
      7.860496e-05 -2.736672e-05 -9.235088e-05  1.130175e-04  7.064315e-06  2.374252e-05 -9.752008e-06 
     -2.736672e-05  1.156186e-05  3.286290e-05 -4.017350e-05 -5.432459e-06 -1.824244e-05  2.917013e-06 
@@ -3618,10 +3671,12 @@ Particle#10:
   getPDGMass(): 0.13957
   getPIDLikelihood(): -> PIDLikelihoods#16
   getPValue(): 0.585684
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:1): -> NULL
   getParticleSource(): 1
@@ -3697,6 +3752,7 @@ Particle#11:
   getECLCluster(): -> NULL
   getECLClusterEHypothesisBit(): 1
   getECLClusterEnergy(): 0
+  getEffectiveMomentumScale(): 1
   getEnergy(): 0.520461
   getExtraInfo(foo): 1337
   getExtraInfoMap(): 4
@@ -3736,7 +3792,6 @@ Particle#11:
     -3.651786e-06  8.026192e-07  6.868699e-06  4.273159e-06 
     -6.415723e-06  1.886149e-06  4.273159e-06  5.926684e-06 
   getMomentumMagnitude(): 0.181777
-  getMomentumScalingFactor(): 1
   getMomentumVertexErrorMatrix(): 
      8.900518e-06 -1.965265e-06 -3.651786e-06 -6.415723e-06 -3.646327e-05  1.083297e-05  1.044480e-06 
     -1.965265e-06  3.154132e-06  8.026192e-07  1.886149e-06  2.311240e-05 -1.238545e-05 -8.492183e-07 
@@ -3753,10 +3808,12 @@ Particle#11:
   getPDGMass(): 0.497611
   getPIDLikelihood(): -> NULL
   getPValue(): 8.77125e-06
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
-[WARNING] Daughter index 1 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 1
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:1): -> NULL
   getParticleSource(): 6
@@ -3835,6 +3892,7 @@ Particle#12:
   getECLCluster(): -> NULL
   getECLClusterEHypothesisBit(): 1
   getECLClusterEnergy(): 0
+  getEffectiveMomentumScale(): 1
   getEnergy(): 2.87857
   getExtraInfo(foo): 1337
   getExtraInfoMap(): 4
@@ -3878,7 +3936,6 @@ Particle#12:
     -3.366107e-06 -8.141586e-06  7.977739e-06  8.774628e-06 
     -5.782842e-06 -2.041411e-05  8.774628e-06  2.046347e-05 
   getMomentumMagnitude(): 2.21091
-  getMomentumScalingFactor(): 1
   getMomentumVertexErrorMatrix(): 
      8.813932e-06  7.342148e-06 -3.366107e-06 -5.782842e-06 -1.899058e-06  4.395604e-07 -1.804177e-07 
      7.342148e-06  2.279901e-05 -8.141586e-06 -2.041411e-05  6.412473e-08 -2.197502e-06  8.878358e-08 
@@ -3895,10 +3952,12 @@ Particle#12:
   getPDGMass(): 1.86483
   getPIDLikelihood(): -> NULL
   getPValue(): 0.662556
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
-[WARNING] Daughter index 1 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 1
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:1): -> NULL
   getParticleSource(): 6
@@ -3977,6 +4036,7 @@ Particle#13:
   getECLCluster(): -> NULL
   getECLClusterEHypothesisBit(): 1
   getECLClusterEnergy(): 0
+  getEffectiveMomentumScale(): 1
   getEnergy(): 2.8283
   getExtraInfo(foo): 1337
   getExtraInfoMap(): 4
@@ -4020,7 +4080,6 @@ Particle#13:
     -3.421644e-06 -8.251303e-06  7.849341e-06  8.785907e-06 
     -5.692313e-06 -2.038784e-05  8.785907e-06  2.047332e-05 
   getMomentumMagnitude(): 2.12363
-  getMomentumScalingFactor(): 1
   getMomentumVertexErrorMatrix(): 
      8.508331e-06  7.403741e-06 -3.421644e-06 -5.692313e-06 -1.789886e-06  2.398291e-07 -8.492555e-08 
      7.403741e-06  2.301126e-05 -8.251303e-06 -2.038784e-05  3.517854e-08 -2.435230e-06  1.915553e-07 
@@ -4037,10 +4096,12 @@ Particle#13:
   getPDGMass(): 1.86483
   getPIDLikelihood(): -> NULL
   getPValue(): 0.798627
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
-[WARNING] Daughter index 1 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 1
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:1): -> NULL
   getParticleSource(): 6
@@ -4119,6 +4180,7 @@ Particle#14:
   getECLCluster(): -> NULL
   getECLClusterEHypothesisBit(): 1
   getECLClusterEnergy(): 0
+  getEffectiveMomentumScale(): 1
   getEnergy(): 2.51469
   getExtraInfo(foo): 1337
   getExtraInfoMap(): 4
@@ -4162,7 +4224,6 @@ Particle#14:
      7.588894e-05  2.155858e-05  4.939915e-04  1.107926e-04 
      2.113032e-04 -5.159938e-05  1.107926e-04  3.091649e-04 
   getMomentumMagnitude(): 1.67832
-  getMomentumScalingFactor(): 1
   getMomentumVertexErrorMatrix(): 
      1.565772e-04 -3.029327e-05  7.588894e-05  2.113032e-04 -1.750221e-06  2.076614e-05 -8.312984e-06 
     -3.029327e-05  2.761478e-05  2.155858e-05 -5.159938e-05  1.577045e-07 -1.852661e-05  6.756127e-06 
@@ -4179,10 +4240,12 @@ Particle#14:
   getPDGMass(): 1.86483
   getPIDLikelihood(): -> NULL
   getPValue(): 0.22181
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
-[WARNING] Daughter index 1 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 1
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:1): -> NULL
   getParticleSource(): 6
@@ -4261,6 +4324,7 @@ Particle#15:
   getECLCluster(): -> NULL
   getECLClusterEHypothesisBit(): 1
   getECLClusterEnergy(): 0
+  getEffectiveMomentumScale(): 1
   getEnergy(): 2.4642
   getExtraInfo(foo): 1337
   getExtraInfoMap(): 4
@@ -4304,7 +4368,6 @@ Particle#15:
      7.825049e-05  2.080137e-05  4.920295e-04  1.136275e-04 
      2.075155e-04 -5.064728e-05  1.136275e-04  3.047338e-04 
   getMomentumMagnitude(): 1.59951
-  getMomentumScalingFactor(): 1
   getMomentumVertexErrorMatrix(): 
      1.532317e-04 -2.902861e-05  7.825049e-05  2.075155e-04 -1.605331e-06  1.479389e-05 -5.882267e-06 
     -2.902861e-05  2.814009e-05  2.080137e-05 -5.064728e-05  1.420016e-07 -1.711192e-05  6.213643e-06 
@@ -4321,10 +4384,12 @@ Particle#15:
   getPDGMass(): 1.86483
   getPIDLikelihood(): -> NULL
   getPValue(): 0.323897
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
-[WARNING] Daughter index 1 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 1
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:1): -> NULL
   getParticleSource(): 6
@@ -4399,6 +4464,7 @@ Particle#16:
   getECLCluster(): -> NULL
   getECLClusterEHypothesisBit(): 1
   getECLClusterEnergy(): 0
+  getEffectiveMomentumScale(): 1
   getEnergy(): 2.68393
   getExtraInfo(foo): 1337
   getExtraInfoMap(): 4
@@ -4444,7 +4510,6 @@ Particle#16:
     -4.354762e-06 -9.746992e-07  9.715212e-06  2.245394e-06 
      3.720576e-06 -8.586238e-06  2.245394e-06  9.886342e-06 
   getMomentumMagnitude(): 1.94329
-  getMomentumScalingFactor(): 1
   getMomentumVertexErrorMatrix(): 
      1.139673e-05 -2.098081e-06 -4.354762e-06  3.720576e-06 -1.469936e-06 -7.156764e-07  3.035774e-07 
     -2.098081e-06  1.078565e-05 -9.746992e-07 -8.586238e-06  8.424776e-08 -2.838229e-06  3.891194e-07 
@@ -4532,6 +4597,7 @@ Particle#17:
   getECLCluster(): -> NULL
   getECLClusterEHypothesisBit(): 1
   getECLClusterEnergy(): 0
+  getEffectiveMomentumScale(): 1
   getEnergy(): 3.0973
   getExtraInfo(foo): 1337
   getExtraInfoMap(): 4
@@ -4577,7 +4643,6 @@ Particle#17:
     -3.422670e-06 -7.987371e-06  8.656712e-06  7.349926e-06 
     -4.719792e-06 -1.704422e-05  7.349926e-06  1.300128e-05 
   getMomentumMagnitude(): 2.35347
-  getMomentumScalingFactor(): 1
   getMomentumVertexErrorMatrix(): 
      9.122455e-06  7.452613e-06 -3.422670e-06 -4.719792e-06 -2.928745e-06  6.102858e-06 -2.466303e-06 
      7.452613e-06  2.327804e-05 -7.987371e-06 -1.704422e-05 -5.542681e-06  2.563172e-05 -1.120437e-05 
@@ -4665,6 +4730,7 @@ Particle#18:
   getECLCluster(): -> NULL
   getECLClusterEHypothesisBit(): 1
   getECLClusterEnergy(): 0
+  getEffectiveMomentumScale(): 1
   getEnergy(): 3.98406
   getExtraInfo(foo): 1337
   getExtraInfoMap(): 2
@@ -4717,7 +4783,6 @@ Particle#18:
     -3.552728e-06  1.276747e-06  1.249209e-05  5.299111e-06 
      5.162388e-06 -2.217575e-06  5.299111e-06  1.259846e-05 
   getMomentumMagnitude(): 1.83786
-  getMomentumScalingFactor(): 1
   getMomentumVertexErrorMatrix(): 
      1.304697e-05 -9.476141e-07 -3.552728e-06  5.162388e-06 -1.660380e-06 -1.054967e-07  1.526096e-08 
     -9.476141e-07  1.550130e-05  1.276747e-06 -2.217575e-06 -2.722411e-07 -1.850648e-06 -8.405628e-08 
@@ -4805,6 +4870,7 @@ Particle#19:
   getECLCluster(): -> NULL
   getECLClusterEHypothesisBit(): 1
   getECLClusterEnergy(): 0
+  getEffectiveMomentumScale(): 1
   getEnergy(): 4.39733
   getExtraInfo(foo): 1337
   getExtraInfoMap(): 2
@@ -4857,7 +4923,6 @@ Particle#19:
     -2.342850e-06 -5.695639e-06  1.140982e-05  1.089140e-05 
     -2.953550e-06 -1.195056e-05  1.089140e-05  1.985827e-05 
   getMomentumMagnitude(): 2.05467
-  getMomentumScalingFactor(): 1
   getMomentumVertexErrorMatrix(): 
      1.122454e-05  8.839649e-06 -2.342850e-06 -2.953550e-06 -1.914919e-06 -3.341660e-07 -1.050436e-07 
      8.839649e-06  2.807875e-05 -5.695639e-06 -1.195056e-05 -2.304182e-07 -1.888686e-06 -1.864868e-07 
@@ -4946,6 +5011,7 @@ Particle#20:
   getECLCluster(): -> NULL
   getECLClusterEHypothesisBit(): 1
   getECLClusterEnergy(): 0
+  getEffectiveMomentumScale(): 1
   getEnergy(): 4.39738
   getExtraInfo(foo): 1337
   getExtraInfoMap(): 2
@@ -4998,7 +5064,6 @@ Particle#20:
     -2.629403e-06 -5.819741e-06  1.127743e-05  1.080402e-05 
     -2.923418e-06 -1.174422e-05  1.080402e-05  1.953887e-05 
   getMomentumMagnitude(): 2.05481
-  getMomentumScalingFactor(): 1
   getMomentumVertexErrorMatrix(): 
      1.080424e-05  8.682736e-06 -2.629403e-06 -2.923418e-06 -1.790668e-06 -1.214108e-07 -1.028986e-08 
      8.682736e-06  2.799869e-05 -5.819741e-06 -1.174422e-05 -1.755057e-07 -1.799611e-06 -1.465318e-07 
@@ -5087,6 +5152,7 @@ Particle#21:
   getECLCluster(): -> NULL
   getECLClusterEHypothesisBit(): 1
   getECLClusterEnergy(): 0
+  getEffectiveMomentumScale(): 1
   getEnergy(): 4.03162
   getExtraInfo(foo): 1337
   getExtraInfoMap(): 2
@@ -5139,7 +5205,6 @@ Particle#21:
      8.130457e-05  2.129879e-05  4.938463e-04  1.350783e-04 
      6.473003e-05 -9.286995e-06  1.350783e-04  6.038451e-05 
   getMomentumMagnitude(): 1.7225
-  getMomentumScalingFactor(): 1
   getMomentumVertexErrorMatrix(): 
      1.526646e-04 -2.521033e-05  8.130457e-05  6.473003e-05 -2.224986e-07  1.339476e-06  1.903650e-07 
     -2.521033e-05  3.090702e-05  2.129879e-05 -9.286995e-06 -1.700723e-06 -3.288712e-06 -4.290589e-07 
@@ -5228,6 +5293,7 @@ Particle#22:
   getECLCluster(): -> NULL
   getECLClusterEHypothesisBit(): 1
   getECLClusterEnergy(): 0
+  getEffectiveMomentumScale(): 1
   getEnergy(): 4.60879
   getExtraInfo(foo): 1337
   getExtraInfoMap(): 2
@@ -5280,7 +5346,6 @@ Particle#22:
     -3.374218e-06 -5.541190e-06  1.304360e-05  1.322336e-05 
     -4.052979e-06 -1.101087e-05  1.322336e-05  2.207928e-05 
   getMomentumMagnitude(): 2.10885
-  getMomentumScalingFactor(): 1
   getMomentumVertexErrorMatrix(): 
      1.122576e-05  8.414449e-06 -3.374218e-06 -4.052979e-06 -1.804334e-06 -6.605155e-08 -8.667651e-08 
      8.414449e-06  2.864673e-05 -5.541190e-06 -1.101087e-05 -1.437118e-07 -2.344342e-06  2.112049e-09 
@@ -5369,6 +5434,7 @@ Particle#23:
   getECLCluster(): -> NULL
   getECLClusterEHypothesisBit(): 1
   getECLClusterEnergy(): 0
+  getEffectiveMomentumScale(): 1
   getEnergy(): 4.3974
   getExtraInfo(foo): 1337
   getExtraInfoMap(): 2
@@ -5421,7 +5487,6 @@ Particle#23:
     -2.600051e-06 -5.794019e-06  1.127501e-05  1.109472e-05 
     -3.158035e-06 -1.231640e-05  1.109472e-05  2.054759e-05 
   getMomentumMagnitude(): 2.05486
-  getMomentumScalingFactor(): 1
   getMomentumVertexErrorMatrix(): 
      1.086046e-05  8.681775e-06 -2.600051e-06 -3.158035e-06 -1.776176e-06 -3.114792e-07  2.296361e-08 
      8.681775e-06  2.795022e-05 -5.794019e-06 -1.231640e-05 -1.469707e-07 -1.967123e-06 -1.032598e-07 
@@ -5510,6 +5575,7 @@ Particle#24:
   getECLCluster(): -> NULL
   getECLClusterEHypothesisBit(): 1
   getECLClusterEnergy(): 0
+  getEffectiveMomentumScale(): 1
   getEnergy(): 4.03182
   getExtraInfo(foo): 1337
   getExtraInfoMap(): 2
@@ -5562,7 +5628,6 @@ Particle#24:
      7.948242e-05  2.202865e-05  4.950420e-04  1.331002e-04 
      6.149075e-05 -9.049258e-06  1.331002e-04  5.794330e-05 
   getMomentumMagnitude(): 1.72237
-  getMomentumScalingFactor(): 1
   getMomentumVertexErrorMatrix(): 
      1.551435e-04 -2.659054e-05  7.948242e-05  6.149075e-05  2.539370e-07  1.282725e-06  3.130448e-07 
     -2.659054e-05  3.119406e-05  2.202865e-05 -9.049258e-06 -1.708344e-06 -3.234487e-06 -3.913105e-07 

@@ -11,10 +11,9 @@
 /* KLM headers. */
 #include <klm/bklm/geometry/GeometryPar.h>
 #include <klm/dataobjects/bklm/BKLMHit1d.h>
-#include <klm/dataobjects/bklm/BKLMHit2d.h>
 #include <klm/dataobjects/eklm/EKLMAlignmentHit.h>
-#include <klm/dataobjects/eklm/EKLMHit2d.h>
 #include <klm/dataobjects/KLMDigit.h>
+#include <klm/dataobjects/KLMHit2d.h>
 #include <klm/dbobjects/KLMTimeCableDelay.h>
 #include <klm/dbobjects/KLMTimeConstants.h>
 #include <klm/dbobjects/KLMTimeResolution.h>
@@ -33,8 +32,8 @@
 namespace Belle2 {
 
   /**
-   * Create BKLMHit1ds from BKLMDigits and then create BKLMHit2ds from BKLMHit1ds;
-   * create EKLMHit2ds from EKLMDigits.
+   * Create BKLMHit1ds from BKLMDigits and then create KLMHit2ds
+   * from BKLMHit1ds; create KLMHit2ds from EKLMDigits.
    */
   class KLMReconstructorModule : public Module {
 
@@ -80,12 +79,12 @@ namespace Belle2 {
     /* Functions. */
 
     /**
-     * Reconstruct BKLMHit1d and BKLMHit2d.
+     * Reconstruct BKLM 2d hits.
      */
     void reconstructBKLMHits();
 
     /**
-     * Reconstruct EKLMHit2d.
+     * Reconstruct EKLNM 2d hits.
      */
     void reconstructEKLMHits();
 
@@ -111,12 +110,12 @@ namespace Belle2 {
      */
     double m_CoincidenceWindow;
 
-    /** Nominal time of prompt BKLMHit2ds. */
+    /** Nominal time of prompt KLMHit2ds. */
     double m_PromptTime;
 
     /**
      * Half-width of the time window relative to the prompt time
-     * for BKLMHit2ds.
+     * for KLMHit2ds.
      */
     double m_PromptWindow;
 
@@ -168,6 +167,9 @@ namespace Belle2 {
     /** KLM digits. */
     StoreArray<KLMDigit> m_Digits;
 
+    /** KLM 2d hits. */
+    StoreArray<KLMHit2d> m_Hit2ds;
+
     /** EventT0. */
     StoreObjPtr<EventT0> m_EventT0;
 
@@ -184,9 +186,6 @@ namespace Belle2 {
 
     /** BKLM 1d hits. */
     StoreArray<BKLMHit1d> m_bklmHit1ds;
-
-    /** BKLM 2d hits. */
-    StoreArray<BKLMHit2d> m_bklmHit2ds;
 
     /* EKLM member variables. */
 
@@ -207,9 +206,6 @@ namespace Belle2 {
 
     /** Transformation data. */
     EKLM::TransformData* m_eklmTransformData;
-
-    /** EKLM 2d hits. */
-    StoreArray<EKLMHit2d> m_eklmHit2ds;
 
     /** Alignment Hits. */
     StoreArray<EKLMAlignmentHit> m_eklmAlignmentHits;

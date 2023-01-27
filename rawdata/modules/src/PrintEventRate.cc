@@ -18,7 +18,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(PrintEventRate)
+REG_MODULE(PrintEventRate);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -91,7 +91,7 @@ void PrintEventRateModule::printCOPPEREvent(RawCOPPER* raw_copper, int i)
   error_flag = (unsigned int)(raw_copper->GetDataType(i));
   if (error_flag) {
     printf("!!!!!!!!! ERROR (RawCOPPER hdr) !!!!!!!!!! : run %d sub %d event %u errflag %.8x nodeID %.8x\n",
-           m_run, m_subrun, m_cur_event, error_flag , raw_copper->GetNodeID(i));
+           m_run, m_subrun, m_cur_event, error_flag, raw_copper->GetNodeID(i));
     m_errcpr++;
   }
 
@@ -304,11 +304,8 @@ void PrintEventRateModule::event()
     m_prev_tot_bytes = m_tot_bytes;
     m_prev_event = m_n_basf2evt;
 
-    /* cppcheck-suppress redundantAssignment */
     m_prev_tot_bytes = m_tot_bytes;
-    /* cppcheck-suppress redundantAssignment */
     m_prev_event = m_n_basf2evt;
-    /* cppcheck-suppress redundantAssignment */
     m_prev_utime = m_cur_utime;
   }
 

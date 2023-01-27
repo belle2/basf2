@@ -19,25 +19,26 @@ namespace Belle2 {
 
     double PhotonState::s_maxLen = 10000;
 
-    PhotonState::PhotonState(const TVector3& position, const TVector3& direction):
+    PhotonState::PhotonState(const ROOT::Math::XYZPoint& position, const ROOT::Math::XYZVector& direction):
       m_x(position.X()), m_y(position.Y()), m_z(position.Z()),
       m_kx(direction.X()), m_ky(direction.Y()), m_kz(direction.Z()),
       m_status(true)
     {}
 
 
-    PhotonState::PhotonState(const TVector3& position, double kx, double ky, double kz):
+    PhotonState::PhotonState(const ROOT::Math::XYZPoint& position, double kx, double ky, double kz):
       m_x(position.X()), m_y(position.Y()), m_z(position.Z()),
       m_kx(kx), m_ky(ky), m_kz(kz),
       m_status(true)
     {}
 
-    PhotonState::PhotonState(const TVector3& position, const TVector3& trackDir, double thc, double fic):
+    PhotonState::PhotonState(const ROOT::Math::XYZPoint& position, const ROOT::Math::XYZVector& trackDir,
+                             double thc, double fic):
       m_x(position.X()), m_y(position.Y()), m_z(position.Z()),
       m_status(true)
     {
-      TVector3 dir(cos(fic) * sin(thc), sin(fic) * sin(thc), cos(thc));
-      dir.RotateUz(trackDir);
+      ROOT::Math::XYZVector dir(cos(fic) * sin(thc), sin(fic) * sin(thc), cos(thc));
+      func::rotateUz(dir, trackDir);
       m_kx = dir.X();
       m_ky = dir.Y();
       m_kz = dir.Z();
@@ -45,8 +46,8 @@ namespace Belle2 {
 
     bool PhotonState::isInside(const RaytracerBase::BarSegment& bar) const
     {
-      if (abs(m_x) > bar.A / 2) return false;
-      if (abs(m_y) > bar.B / 2) return false;
+      if (std::abs(m_x) > bar.A / 2) return false;
+      if (std::abs(m_y) > bar.B / 2) return false;
       if (m_z < bar.zL or m_z > bar.zR) return false;
       return true;
     }
@@ -54,8 +55,8 @@ namespace Belle2 {
 
     bool PhotonState::isInside(const RaytracerBase::BarSegment& bar, const RaytracerBase::Mirror& mirror) const
     {
-      if (abs(m_x) > bar.A / 2) return false;
-      if (abs(m_y) > bar.B / 2) return false;
+      if (std::abs(m_x) > bar.A / 2) return false;
+      if (std::abs(m_y) > bar.B / 2) return false;
       if (m_z < bar.zL) return false;
       double Rsq = pow(m_x - mirror.xc, 2) + pow(m_y - mirror.yc, 2) + pow(m_z - mirror.zc, 2);
       if (Rsq > pow(mirror.R, 2)) return false;
@@ -65,7 +66,7 @@ namespace Belle2 {
 
     bool PhotonState::isInside(const RaytracerBase::Prism& prism) const
     {
-      if (abs(m_x) > prism.A / 2) return false;
+      if (std::abs(m_x) > prism.A / 2) return false;
       if (m_z < prism.zL or m_z > prism.zR) return false;
       if (m_y > prism.yUp or m_y < prism.yDown) return false;
       double y = prism.yDown + (prism.yDown + prism.B / 2) / (prism.zFlat - prism.zR) * (m_z - prism.zFlat);
@@ -78,8 +79,8 @@ namespace Belle2 {
     {
       if (not m_status) return;
 
-      m_cosx = abs(m_kx);
-      m_cosy = abs(m_ky);
+      m_cosx = std::abs(m_kx);
+      m_cosy = std::abs(m_ky);
       m_A = bar.A;
       m_B = bar.B;
       m_type = c_BarSegment;
@@ -106,8 +107,8 @@ namespace Belle2 {
     {
       if (not m_status) return;
 
-      m_cosx = abs(m_kx);
-      m_cosy = abs(m_ky);
+      m_cosx = std::abs(m_kx);
+      m_cosy = std::abs(m_ky);
       m_A = bar.A;
       m_B = bar.B;
       m_type = c_MirrorSegment;
@@ -143,7 +144,7 @@ namespace Belle2 {
         if (nxx == nx) break;
         i++;
         if (i == 10) {
-          if (abs(xmm - xm) < 0.001) break;
+          if (std::abs(xmm - xm) < 0.001) break;
           B2DEBUG(20, "TOP::PhotonState::propagateSemiLinear: not converging");
           return;
         }
@@ -172,8 +173,8 @@ namespace Belle2 {
     {
       if (not m_status) return;
 
-      m_cosx = abs(m_kx);
-      m_cosy = abs(m_ky);
+      m_cosx = std::abs(m_kx);
+      m_cosy = std::abs(m_ky);
       m_A = bar.A;
       m_B = bar.B;
       m_type = c_MirrorSegment;
@@ -213,7 +214,7 @@ namespace Belle2 {
         if (nxx == nx and nyy == ny) break;
         i++;
         if (i == 10) {
-          if (abs(xmm - xm) < 0.001 and abs(ymm - ym) < 0.001) break;
+          if (std::abs(xmm - xm) < 0.001 and std::abs(ymm - ym) < 0.001) break;
           B2DEBUG(20, "TOP::PhotonState::propagateExact: not converging");
           return;
         }
@@ -245,15 +246,15 @@ namespace Belle2 {
 
       m_status = false;
 
-      m_cosx = abs(m_kx);
+      m_cosx = std::abs(m_kx);
       m_A = prism.A;
       m_B = prism.yUp - prism.yDown;
       m_y0 = (prism.yUp + prism.yDown) / 2;
       m_type = c_Prism;
 
       if (m_kz > 0) {
-        if (m_z >= prism.zR or abs(m_ky / m_kz) < abs(prism.slope)) return;
-        if (abs(m_y + m_ky / m_kz * (prism.zR - m_z)) < prism.B / 2) return;
+        if (m_z >= prism.zR or std::abs(m_ky / m_kz) < std::abs(prism.slope)) return;
+        if (std::abs(m_y + m_ky / m_kz * (prism.zR - m_z)) < prism.B / 2) return;
       }
       double ky_in = m_ky;
       double kz_in = m_kz;
@@ -296,7 +297,7 @@ namespace Belle2 {
             m_propLen += len;
             goto success;
           }
-          m_cosy = std::max(m_cosy, abs(ky_in * win.nsy[ii] + kz_in * win.nsz[ii]));
+          m_cosy = std::max(m_cosy, std::abs(ky_in * win.nsy[ii] + kz_in * win.nsz[ii]));
           k += step;
           ii = (ii + 1) % 2;
         }

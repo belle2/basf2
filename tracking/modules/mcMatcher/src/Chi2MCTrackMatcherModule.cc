@@ -11,6 +11,7 @@
 // datastore types
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/Track.h>
+#include <tracking/dataobjects/RecoTrack.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <framework/gearbox/Const.h>
 #include <Eigen/Dense>
@@ -23,7 +24,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(Chi2MCTrackMatcher)
+REG_MODULE(Chi2MCTrackMatcher);
 
 
 
@@ -43,6 +44,16 @@ Chi2MCTrackMatcherModule::Chi2MCTrackMatcherModule() : Module()
            m_param_linalg,
            "Parameter to switch between ROOT and Eigen, to invert the covariance5 matrix. ROOT has shown a shorter runtime therefore its recomended. false: ROOT is used; true: Eigen is used",
            false);
+  addParam("MCRecoTracksArrayName",
+           m_MCRecoTracksArrayName,
+           "Name of the StoreArray of MC RecoTracks which will be related to the PR RecoTracks, "
+           "using the relations to Belle2::MCParticles and Belle2::Tracks",
+           m_MCRecoTracksArrayName);
+  addParam("PRRecoTracksArrayName",
+           m_PRRecoTracksArrayName,
+           "Name of the StoreArray of PR RecoTracks which will be related to the MC RecoTracks, "
+           "using the relations to Belle2::MCParticles and Belle2::Tracks",
+           m_PRRecoTracksArrayName);
 }
 
 void Chi2MCTrackMatcherModule::initialize()
@@ -51,6 +62,20 @@ void Chi2MCTrackMatcherModule::initialize()
   m_MCParticles.isRequired();
   m_Tracks.isRequired();
   m_Tracks.registerRelationTo(m_MCParticles);
+
+  StoreArray<RecoTrack> mcRecoTracks(m_MCRecoTracksArrayName);
+  mcRecoTracks.isOptional();
+  StoreArray<RecoTrack> prRecoTracks(m_PRRecoTracksArrayName);
+  prRecoTracks.isOptional();
+
+  // if both arrays exist we want a relation between them
+  if (mcRecoTracks.isValid() and prRecoTracks.isValid()) {
+    prRecoTracks.registerRelationTo(mcRecoTracks);
+    mcRecoTracks.registerRelationTo(prRecoTracks);
+    prRecoTracks.registerRelationTo(m_MCParticles);
+    m_MCParticles.registerRelationTo(prRecoTracks);
+  }
+
 }
 
 void Chi2MCTrackMatcherModule::event()
@@ -180,6 +205,16 @@ void Chi2MCTrackMatcherModule::event()
     }
     if (chi2Min < cutOff) {
       track.addRelationTo(mcPart_matched);
+      // set relations between MC and PR RecoTracks, needed by tracking validation
+      RecoTrack* mcRecoTrack = mcPart_matched->getRelated<RecoTrack>(m_MCRecoTracksArrayName);
+      RecoTrack* prRecoTrack = track.getRelated<RecoTrack>(m_PRRecoTracksArrayName);
+      if (mcRecoTrack and prRecoTrack) {
+        prRecoTrack->setMatchingStatus(RecoTrack::MatchingStatus::c_matched);
+        prRecoTrack->addRelationTo(mcRecoTrack);
+        mcRecoTrack->addRelationTo(prRecoTrack);
+        prRecoTrack->addRelationTo(mcPart_matched);
+        mcPart_matched->addRelationTo(prRecoTrack);
+      }
     } else {
       m_noMatchCount += 1;
     }

@@ -138,7 +138,7 @@ namespace Belle2 {
     static TRGState decision(const TRGState& input);
 
     /// Function to simulate final trigger decision.
-    static void (* _ftd)(bool* out, bool* in);
+    static void (* _ftd)(bool* out, const bool* in);
 
     /// Makes timing decision.
     static TRGState timingDecision(const TRGState& input,

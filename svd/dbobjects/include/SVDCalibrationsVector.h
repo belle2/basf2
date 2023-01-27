@@ -48,7 +48,7 @@ namespace Belle2 {
 
     /**initialize the calibration vector*/
     static void init(payloadContainerType& svdVector, unsigned int layer,
-                     unsigned int /*ladder*/ , unsigned int /*sensor*/,
+                     unsigned int /*ladder*/, unsigned int /*sensor*/,
                      unsigned int side, const T& defaultT)
     {
       unsigned int numberOfStrips = 0;
@@ -65,7 +65,7 @@ namespace Belle2 {
           numberOfStrips = layer == 3 ? 768 : 512;
       }
 
-      svdVector.resize(numberOfStrips , defaultT);
+      svdVector.resize(numberOfStrips, defaultT);
 
 
     }

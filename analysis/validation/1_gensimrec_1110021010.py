@@ -22,7 +22,8 @@
 import basf2
 from generators import add_evtgen_generator
 from simulation import add_simulation
-from reconstruction import add_reconstruction, add_mdst_output
+from reconstruction import add_reconstruction
+from mdst import add_mdst_output
 
 DECAY_MODE_ID = 1110021010
 OUTPUT_FILENAME = "../%i.dst.root" % DECAY_MODE_ID
@@ -37,5 +38,6 @@ add_evtgen_generator(
 add_simulation(main)     # detector simulation without background overlay
 add_reconstruction(main)  # reconstruction
 add_mdst_output(main, filename=OUTPUT_FILENAME)  # mdst output
+main.add_module('Progress')
 basf2.process(main)
 print(basf2.statistics)

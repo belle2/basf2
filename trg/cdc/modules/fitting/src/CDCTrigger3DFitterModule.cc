@@ -57,6 +57,12 @@ CDCTrigger3DFitterModule::CDCTrigger3DFitterModule() : Module::Module()
            false);
 }
 
+CDCTrigger3DFitterModule::~CDCTrigger3DFitterModule()
+{
+  if (m_commonData != nullptr)
+    delete m_commonData;
+}
+
 void
 CDCTrigger3DFitterModule::initialize()
 {
@@ -256,7 +262,7 @@ CDCTrigger3DFitterModule::finder(int charge, double rho, double phi,
 
   // Pick middle candidate if multiple candidates
   // mean wire diff
-  double meanWireDiff[4] = { 3.68186, 3.3542, 3.9099, 4.48263 };
+  const double meanWireDiff[4] = { 3.68186, 3.3542, 3.9099, 4.48263 };
   for (int iSt = 0; iSt < 4; ++iSt) {
     //cout<<"iSt: "<<iSt<<" nCandidates:"<<candidatesIndex[iSt].size()<<endl;
     //if (candidatesIndex[iSt].size() >1) continue;

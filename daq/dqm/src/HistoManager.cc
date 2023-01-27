@@ -22,7 +22,7 @@ HistoManager::~HistoManager()
 {
 }
 
-bool HistoManager::add(string& subdir, string& name, int pid, TH1* histo)
+bool HistoManager::add(string& subdir, const string& name, int pid, TH1* histo)
 {
   //  printf ( "HistoManager: adding %s to subdir %s from id %d\n",
   //  name.c_str(), subdir.c_str(), pid );
@@ -57,7 +57,7 @@ bool HistoManager::add(string& subdir, string& name, int pid, TH1* histo)
   return false;
 }
 
-bool HistoManager::update(string& subdir, string& name, int pid, TH1* histo)
+bool HistoManager::update(string& subdir, const string& name, int pid, TH1* histo)
 {
   // Register the histogram if not yet done
   if (add(subdir, name, pid, histo)) return true;
@@ -78,11 +78,11 @@ bool HistoManager::update(string& subdir, string& name, int pid, TH1* histo)
   return true;
 }
 
-TH1* HistoManager::get(string& subdir, string& name, int pid)
+TH1* HistoManager::get(const string& subdir, const string& name, int pid)
 {
-  map<string, map<int, TH1*>>& dirlist = m_subdir[subdir];
-  map<int, TH1*>& hlist = dirlist[name];
-  TH1* hist = hlist[pid];
+  const map<string, map<int, TH1*>>& dirlist = m_subdir[subdir];
+  const map<int, TH1*>& hlist = dirlist.at(name);
+  TH1* hist = hlist.at(pid);
   return hist;
 }
 

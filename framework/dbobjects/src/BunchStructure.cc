@@ -22,11 +22,13 @@ namespace Belle2 {
   }
 
 
-  bool BunchStructure::getBucket(unsigned i) const
+  bool BunchStructure::getBucket(int i) const
   {
     if (m_fillPattern.empty()) return (i % 2 == 0);
 
-    return m_fillPattern[i % c_RFBuckets];
+    int k = i % c_RFBuckets;
+    if (k < 0) k += c_RFBuckets;
+    return m_fillPattern[k];
   }
 
 

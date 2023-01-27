@@ -19,7 +19,7 @@ show_event(unsigned long * head, int len)
 {
     int i;
     for (i=0; i<(len/4); i+= 8) {
-        printf("%08d %08x %08x %08x %08x %08x %08x %08x %08x\n", i,
+        printf("%08ld %08lx %08lx %08lx %08lx %08lx %08lx %08lx %08lx\n", i,
             buffer[i], buffer[i+1], buffer[i+2], buffer[i+3],
             buffer[i+4], buffer[i+5], buffer[i+6], buffer[i+7]);
     }
@@ -29,7 +29,6 @@ unsigned long
 xor(unsigned long * start, int wordlen)
 {
     unsigned long ret = 0;
-    int i;
     while (wordlen--) {
         ret ^= *(start++);
     }
@@ -42,10 +41,8 @@ main()
 {
     int event=0;
     int ret, i = 0;
-    fd_set rfds, efds;
     int amtfd[4];
     
-    int j=1;
 
     int val=7;
   int use_slot_A = 0; // configure
@@ -78,7 +75,7 @@ main()
 
     while (1) {
 /*        printf("before redo.\n"); */
-	int redo;
+
 /*        printf("                         after redo.\n"); */
 #if 0
 	/* If you want to test select() */
@@ -130,12 +127,12 @@ main()
 	    }
 
 	    if (header->event_number != event) {
-		printf("bad copper evn = %x should be %x\n", buffer[1], event);
+		printf("bad copper evn = %lx should be %x\n", buffer[1], event);
 	    }
 	}
 
         if (event < 10) { /*  modified by sun */
-            printf("xor = %08x\n", xor((unsigned long *)buffer, ret/4));
+            printf("xor = %08lx\n", xor((unsigned long *)buffer, ret/4));
             show_event(buffer, ret);
         }     /*  modified by sun */
         event++;

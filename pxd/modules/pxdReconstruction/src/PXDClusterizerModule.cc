@@ -328,7 +328,7 @@ void PXDClusterizerModule::writeClusters(VxdID sensorID)
     //Calculate position and error with v as primary axis, possibly different pitch sizes
     calculatePositionError(cls, projV, projU, info.getVPitch(projV.getMinPos()), pitchV, info.getVPitch(projV.getMaxPos()));
 
-    TVector3 lorentzShift = info.getLorentzShift(projU.getPos(), projV.getPos());
+    ROOT::Math::XYZVector lorentzShift = info.getLorentzShift(projU.getPos(), projV.getPos());
     projU.setPos(projU.getPos() - lorentzShift.X());
     projV.setPos(projV.getPos() - lorentzShift.Y());
     B2DEBUG(20, "Lorentz shift: " << lorentzShift.X() << " " << lorentzShift.Y());

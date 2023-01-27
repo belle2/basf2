@@ -35,7 +35,7 @@ using namespace ECL;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(ECLDigitizerPureCsI)
+REG_MODULE(ECLDigitizerPureCsI);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -75,7 +75,7 @@ ECLDigitizerPureCsIModule::~ECLDigitizerPureCsIModule()
 void ECLDigitizerPureCsIModule::initialize()
 {
   m_nEvent  = 0 ;
-  EclConfigurationPure::m_tickPure = m_tickFactor * EclConfiguration::m_tick / EclConfiguration::m_ntrg;
+  EclConfigurationPure::setTickPure(m_tickFactor * EclConfiguration::getTick() / EclConfiguration::m_ntrg);
 
   m_ecldsps.registerInDataStore(eclDspArrayName());
 
@@ -127,7 +127,7 @@ void ECLDigitizerPureCsIModule::event()
 
         // hitE = gRandom->Gaus(hitE, 0.001 * m_photostatresolution * sqrt(hitE * 1000));
       }
-      m_adc[j].AddHit(hitE , hitTime + deltaT, m_ss[m_tbl[j].iss]);
+      m_adc[j].AddHit(hitE, hitTime + deltaT, m_ss[m_tbl[j].iss]);
       if (eclHit.getBackgroundTag() == BackgroundMetaData::bg_none) hitmap[j].push_back(&eclHit);
     }
   }

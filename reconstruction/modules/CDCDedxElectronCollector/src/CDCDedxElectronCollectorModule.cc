@@ -20,7 +20,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(CDCDedxElectronCollector)
+REG_MODULE(CDCDedxElectronCollector);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -226,7 +226,7 @@ void CDCDedxElectronCollectorModule::collect()
 
       const ECLCluster* eclCluster = track->getRelated<ECLCluster>();
       if (eclCluster and eclCluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
-        double TrkEoverP = (eclCluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons)) / (fitResult->getMomentum().Mag());
+        double TrkEoverP = (eclCluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons)) / (fitResult->getMomentum().R());
         if (abs(TrkEoverP - 1.0) > fSetEoverP)continue;
       }
       htstats->Fill(4);

@@ -12,26 +12,26 @@ Gbasf2
 
     **Prerequisites**:
 
-        * `Computing getting started <https://confluence.desy.de/display/BI/Computing+GettingStarted>`_.
-        * A system with SL6 or CentOS 7.
-        * Grid certificate installed in ``~/.globus`` and on the web browser.
-        * :ref:`onlinebook_first_steering_file` lesson.
+    * `Computing getting started <https://confluence.desy.de/display/BI/Computing+GettingStarted>`_.
+    * A system with SL6 or CentOS 7.
+    * Grid certificate installed in ``~/.globus`` and on the web browser.
+    * :ref:`onlinebook_first_steering_file` lesson.
 
     **Questions**:
 
-        * What is gbasf2?
-        * Where to search files on the grid?
-        * How I monitor my jobs?
-        * What to do if I need help?
+    * What is gbasf2?
+    * Where to search files on the grid?
+    * How I monitor my jobs?
+    * What to do if I need help?
 
     **Objectives**:
 
-        * Install gbasf2 and set the environment for using grid tools.
-        * Search datasets stored on the grid.
-        * Submit jobs using gbasf2.
-        * Monitor your jobs and take action if there are issues.
-        * Check the documentation and ask for help if necessary.
-        * Download the output for offline analysis.
+    * Install gbasf2 and set the environment for using grid tools.
+    * Search datasets stored on the grid.
+    * Submit jobs using gbasf2.
+    * Monitor your jobs and take action if there are issues.
+    * Check the documentation and ask for help if necessary.
+    * Download the output for offline analysis.
 
 
 Gbasf2 is the command-line client for submitting grid-based basf2 jobs.
@@ -764,6 +764,6 @@ You can also ask in `questions.belle2.org <https://questions.belle2.org/question
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Author of this lesson
+.. rubric:: Author of this lesson
 
-    Justin Guilliams
+Michel Villanueva, Justin Guilliams

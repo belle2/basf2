@@ -53,10 +53,13 @@ SegmentTripleRelationFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
     return std::make_unique<NoneFilter<BaseSegmentTripleRelationFilter>>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "all") {
     return std::make_unique<AllSegmentTripleRelationFilter>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "truth") {
     return std::make_unique<MCSegmentTripleRelationFilter>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "simple") {
     return std::make_unique<SimpleSegmentTripleRelationFilter>();
   } else {

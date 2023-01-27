@@ -68,7 +68,7 @@ void TxSocketModule::event()
   EvtMessage* msg = m_streamer->streamDataStore(DataStore::c_Event);
 
   // Send the message to Socket
-  int stat = m_sock->send(msg);
+  m_sock->send(msg);
   B2INFO("Tx: objs sent in buffer. Size = " << msg->size());
 
   // Release EvtMessage buffer

@@ -8,6 +8,7 @@
 #pragma once
 
 #include <functional>
+#include <optional>
 
 namespace Belle2 {
 
@@ -42,7 +43,7 @@ namespace Belle2 {
     {
       if (!hasMatch()) {
         // not best match yet, take this one !
-        setBestMatch(item , est);
+        setBestMatch(item, est);
         return true;
       }
 

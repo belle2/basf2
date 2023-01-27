@@ -118,6 +118,9 @@ namespace Belle2 {
     Example for the case that all particles are selected in B+ -> (anti-D0 -> K^- pi^+) pi^+:
     ["B", "D0", "D0_K", "D_pi", "pi"] */
     std::vector<std::string> getSelectionNames();
+    /** Return list of PDG codes of selected particles.
+     */
+    std::vector<int> getSelectionPDGCodes();
     /** return mother. */
     const DecayDescriptorParticle* getMother() const
     {

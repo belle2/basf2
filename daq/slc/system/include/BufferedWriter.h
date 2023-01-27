@@ -27,8 +27,8 @@ namespace Belle2 {
     unsigned char* ptr() { return m_memory; }
     size_t count() const { return m_pos; }
     size_t size() const { return m_size; }
-    virtual size_t write(const void*, size_t);
-    virtual bool available() { return true; }
+    size_t write(const void*, size_t) override;
+    bool available() override { return true; }
 
     // operators
   public:

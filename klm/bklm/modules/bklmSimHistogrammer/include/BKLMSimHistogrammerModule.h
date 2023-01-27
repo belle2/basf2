@@ -10,7 +10,9 @@
 
 /* KLM headers. */
 #include <klm/dataobjects/bklm/BKLMHit1d.h>
-#include <klm/dataobjects/bklm/BKLMHit2d.h>
+#include <klm/dataobjects/KLMDigit.h>
+#include <klm/dataobjects/KLMHit2d.h>
+#include <klm/dataobjects/KLMSimHit.h>
 
 /* Belle 2 headers. */
 #include <framework/core/Module.h>
@@ -27,9 +29,6 @@
 #include <string>
 
 namespace Belle2 {
-
-  class BKLMSimHit;
-  class KLMDigit;
 
   //! Convert BKLM raw simulation hits to digitizations
   class BKLMSimHistogrammerModule : public Module {
@@ -128,14 +127,14 @@ namespace Belle2 {
     float m_realTime;
     //! weight for each event (inverse of the realTime)
     float m_weight;
-    //! BKLMSimHit StoreArray
-    StoreArray<BKLMSimHit> simHits;
+    //! KLMSimHit StoreArray
+    StoreArray<KLMSimHit> simHits;
     //! digits StoreArray
     StoreArray<KLMDigit> digits;
     //! mcParticles StoreArray
     StoreArray<MCParticle> mcParticles;
     //! hits2D StoreArray
-    StoreArray<BKLMHit2d> hits2D;
+    StoreArray<KLMHit2d> hits2D;
     //! hits1D StoreArray
     StoreArray<BKLMHit1d> hits1D;
 

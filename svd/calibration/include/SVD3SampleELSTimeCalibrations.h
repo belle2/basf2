@@ -34,8 +34,8 @@ namespace Belle2 {
     SVD3SampleELSTimeCalibrations() : m_aDBObjPtr(name)
     {
       m_aDBObjPtr.addCallback([ this ](const std::string&) -> void {
-        B2INFO("SVD3SampleELSTimeCalibrations: from now on we are using " <<
-        this->m_aDBObjPtr -> get_uniqueID()); });
+        B2DEBUG(20, "SVD3SampleELSTimeCalibrations: from now on we are using " <<
+                this->m_aDBObjPtr -> get_uniqueID()); });
     }
 
     /** Return the charge (number of electrons/holes) collected on a specific

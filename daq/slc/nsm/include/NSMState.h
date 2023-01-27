@@ -23,6 +23,11 @@ namespace Belle2 {
     NSMState(const NSMState& st) : Enum(st) {}
     ~NSMState()  {}
 
+    /**
+     * Operator =.
+     */
+    const NSMState& operator=(const NSMState& state);
+
   protected:
     NSMState(int id, const char* label)
       : Enum(id, label) {}

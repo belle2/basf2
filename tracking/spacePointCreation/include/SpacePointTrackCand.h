@@ -21,7 +21,6 @@
 // ROOT
 #include <TVectorD.h>
 #include <TMatrixD.h>
-#include <TVector3.h>
 
 // USHRT_MAX
 #include <climits>
@@ -108,7 +107,7 @@ namespace Belle2 {
      * Checks the equality of the pointers to the contained SpacePoints (pdg-code and charge estimate are not compared!)
      * NOTE: returns false if both TrackCands do not contain any SpacePoints
      */
-    bool operator == (const SpacePointTrackCand& rhs);
+    bool operator == (const SpacePointTrackCand& rhs) const;
 
 
     /**
@@ -160,11 +159,11 @@ namespace Belle2 {
     /** get state seed as 6D vector */
     const TVectorD& getStateSeed() const { return m_state6D; }
 
-    /** get position seed as TVector3 */
-    const TVector3 getPosSeed() const { return TVector3(m_state6D[0], m_state6D[1], m_state6D[2]); }
+    /** get position seed as ROOT::Math::XYZVector */
+    const ROOT::Math::XYZVector getPosSeed() const { return ROOT::Math::XYZVector(m_state6D[0], m_state6D[1], m_state6D[2]); }
 
-    /** get momentum seed as TVector3 */
-    const TVector3 getMomSeed() const { return TVector3(m_state6D[3], m_state6D[4], m_state6D[5]); }
+    /** get momentum seed as ROOT::Math::XYZVector */
+    const ROOT::Math::XYZVector getMomSeed() const { return ROOT::Math::XYZVector(m_state6D[3], m_state6D[4], m_state6D[5]); }
 
     /**
      * get the sorting parameters
@@ -256,7 +255,7 @@ namespace Belle2 {
      * print the Track Candidate in its "full beauty".
      * NOTE: prints some parts to stdout, since for printing the state seed the print method form TVectorD is invoked!
      */
-    void print(int debuglevel = 150, const Option_t* = "") const;
+    void print(int debuglevel = 25, const Option_t* = "") const;
 
     /**
      * get the refereeStatus as a string (easier to read than an unsigned short int)

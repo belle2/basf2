@@ -9,7 +9,7 @@
 #pragma once
 
 #include <TObject.h>
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 
 namespace Belle2 {
   /**  This class collects some information of a TrueHit, using
@@ -28,21 +28,21 @@ namespace Belle2 {
   class hitXP: public TObject {
 
   public:
-    TVector3 m_positionMid; /**< poition of hit at midpoint of layer */
-    TVector3 m_positionEntry; /**< poition of hit at entrypoint of layer */
-    TVector3 m_positionExit; /**< poition of hit at exitpoint of layer */
-    TVector3 m_momentumMid; /**< momentum of hit at midpoint of layer */
-    TVector3 m_momentumEntry; /**< momentum of hit at entry of layer */
-    TVector3 m_momentumExit; /**< momentum of hit at exit of layer */
-    TVector3 m_positionLocalMid; /**< poition of hit at midpoint of layer, local coordinate */
-    TVector3 m_positionLocalEntry; /**< poition of hit at entrypoint of layer, local coordinate */
-    TVector3 m_positionLocalExit; /**< poition of hit at exitpoint of layer, local coordinate */
-    TVector3 m_momentumLocalMid; /**< momentum of hit at midpoint of layer, local coordinate */
-    TVector3 m_momentumLocalEntry; /**< momentum of hit at entrypoint of layer, local coordinate */
-    TVector3 m_momentumLocalExit; /**< momentum of hit at exitpoint of layer, local coordinate */
+    ROOT::Math::XYZVector m_positionMid; /**< poition of hit at midpoint of layer */
+    ROOT::Math::XYZVector m_positionEntry; /**< poition of hit at entrypoint of layer */
+    ROOT::Math::XYZVector m_positionExit; /**< poition of hit at exitpoint of layer */
+    ROOT::Math::XYZVector m_momentumMid; /**< momentum of hit at midpoint of layer */
+    ROOT::Math::XYZVector m_momentumEntry; /**< momentum of hit at entry of layer */
+    ROOT::Math::XYZVector m_momentumExit; /**< momentum of hit at exit of layer */
+    ROOT::Math::XYZVector m_positionLocalMid; /**< poition of hit at midpoint of layer, local coordinate */
+    ROOT::Math::XYZVector m_positionLocalEntry; /**< poition of hit at entrypoint of layer, local coordinate */
+    ROOT::Math::XYZVector m_positionLocalExit; /**< poition of hit at exitpoint of layer, local coordinate */
+    ROOT::Math::XYZVector m_momentumLocalMid; /**< momentum of hit at midpoint of layer, local coordinate */
+    ROOT::Math::XYZVector m_momentumLocalEntry; /**< momentum of hit at entrypoint of layer, local coordinate */
+    ROOT::Math::XYZVector m_momentumLocalExit; /**< momentum of hit at exitpoint of layer, local coordinate */
     int m_PDGID = 0; /**< PDGID */
-    TVector3 m_position0; /**< position at IP */
-    TVector3 m_momentum0; /**< momentum at IP */
+    ROOT::Math::XYZVector m_position0; /**< position at IP */
+    ROOT::Math::XYZVector m_momentum0; /**< momentum at IP */
     double m_time = 0; /**< time of the hit */
     int m_sensorSensor = 0; /**< sensor of the hit */
     int m_sensorLayer = 0; /**< layer of the hit */
@@ -61,49 +61,49 @@ namespace Belle2 {
     hitXP() {}
 
     /** get the relative memeber */
-    TVector3 getPositionMid() const { return m_positionMid; }
+    ROOT::Math::XYZVector getPositionMid() const { return m_positionMid; }
 
     /** get the relative memeber */
-    TVector3 getPositionEntry() const { return m_positionEntry; }
+    ROOT::Math::XYZVector getPositionEntry() const { return m_positionEntry; }
 
     /** get the relative memeber */
-    TVector3 getPositionExit() const { return m_positionExit; }
+    ROOT::Math::XYZVector getPositionExit() const { return m_positionExit; }
 
     /** get the relative memeber */
-    TVector3 getMomentumMid() const { return m_momentumMid; }
+    ROOT::Math::XYZVector getMomentumMid() const { return m_momentumMid; }
 
     /** get the relative memeber */
-    TVector3 getMomentumEntry() const { return m_momentumEntry; }
+    ROOT::Math::XYZVector getMomentumEntry() const { return m_momentumEntry; }
 
     /** get the relative memeber */
-    TVector3 getMomentumExit() const { return m_momentumExit; }
+    ROOT::Math::XYZVector getMomentumExit() const { return m_momentumExit; }
 
     /** get the relative memeber */
-    TVector3 getPositionLocalMid() const { return m_positionLocalMid; }
+    ROOT::Math::XYZVector getPositionLocalMid() const { return m_positionLocalMid; }
 
     /** get the relative memeber */
-    TVector3 getPositionLocalEntry() const { return m_positionLocalEntry; }
+    ROOT::Math::XYZVector getPositionLocalEntry() const { return m_positionLocalEntry; }
 
     /** get the relative memeber */
-    TVector3 getPositionLocalExit() const { return m_positionLocalExit; }
+    ROOT::Math::XYZVector getPositionLocalExit() const { return m_positionLocalExit; }
 
     /** get the relative memeber */
-    TVector3 getMomentumLocalMid() const { return m_momentumLocalMid; }
+    ROOT::Math::XYZVector getMomentumLocalMid() const { return m_momentumLocalMid; }
 
     /** get the relative memeber */
-    TVector3 getMomentumLocalEntry() const { return m_momentumLocalEntry; }
+    ROOT::Math::XYZVector getMomentumLocalEntry() const { return m_momentumLocalEntry; }
 
     /** get the relative memeber */
-    TVector3 getMomentumLocalExit() const { return m_momentumLocalExit; }
+    ROOT::Math::XYZVector getMomentumLocalExit() const { return m_momentumLocalExit; }
 
     /** get the relative memeber */
     int getPDGID() const { return m_PDGID; }
 
     /** get the relative memeber */
-    TVector3 getPosition0() const { return m_position0; }
+    ROOT::Math::XYZVector getPosition0() const { return m_position0; }
 
     /** get the relative memeber */
-    TVector3 getMomentum0() const { return m_momentum0; }
+    ROOT::Math::XYZVector getMomentum0() const { return m_momentum0; }
 
     /** get the relative memeber */
     double getTime() const { return m_time; }
@@ -130,7 +130,7 @@ namespace Belle2 {
     double getCharge() const { return m_charge; }
 
     /** get the relative memeber */
-    void setPositionMid(TVector3 position)
+    void setPositionMid(ROOT::Math::XYZVector position)
     {
       m_positionMid.SetX(position.X());
       m_positionMid.SetY(position.Y());
@@ -138,7 +138,7 @@ namespace Belle2 {
     }
 
     /** get the relative memeber */
-    void setPositionEntry(TVector3 position)
+    void setPositionEntry(ROOT::Math::XYZVector position)
     {
       m_positionEntry.SetX(position.X());
       m_positionEntry.SetY(position.Y());
@@ -146,7 +146,7 @@ namespace Belle2 {
     }
 
     /** get the relative memeber */
-    void setPositionExit(TVector3 position)
+    void setPositionExit(ROOT::Math::XYZVector position)
     {
       m_positionExit.SetX(position.X());
       m_positionExit.SetY(position.Y());
@@ -154,7 +154,7 @@ namespace Belle2 {
     }
 
     /** get the relative memeber */
-    void setMomentumMid(TVector3 momentum)
+    void setMomentumMid(ROOT::Math::XYZVector momentum)
     {
       m_momentumMid.SetX(momentum.X());
       m_momentumMid.SetY(momentum.Y());
@@ -162,7 +162,7 @@ namespace Belle2 {
     }
 
     /** get the relative memeber */
-    void setMomentumEntry(TVector3 momentum)
+    void setMomentumEntry(ROOT::Math::XYZVector momentum)
     {
       m_momentumEntry.SetX(momentum.X());
       m_momentumEntry.SetY(momentum.Y());
@@ -170,7 +170,7 @@ namespace Belle2 {
     }
 
     /** get the relative memeber */
-    void setMomentumExit(TVector3 momentum)
+    void setMomentumExit(ROOT::Math::XYZVector momentum)
     {
       m_momentumExit.SetX(momentum.X());
       m_momentumExit.SetY(momentum.Y());
@@ -178,7 +178,7 @@ namespace Belle2 {
     }
 
     /** get the relative memeber */
-    void setPositionLocalMid(TVector3 position)
+    void setPositionLocalMid(ROOT::Math::XYZVector position)
     {
       m_positionLocalMid.SetX(position.X());
       m_positionLocalMid.SetY(position.Y());
@@ -186,7 +186,7 @@ namespace Belle2 {
     }
 
     /** get the relative memeber */
-    void setPositionLocalEntry(TVector3 position)
+    void setPositionLocalEntry(ROOT::Math::XYZVector position)
     {
       m_positionLocalEntry.SetX(position.X());
       m_positionLocalEntry.SetY(position.Y());
@@ -194,7 +194,7 @@ namespace Belle2 {
     }
 
     /** get the relative memeber */
-    void setPositionLocalExit(TVector3 position)
+    void setPositionLocalExit(ROOT::Math::XYZVector position)
     {
       m_positionLocalExit.SetX(position.X());
       m_positionLocalExit.SetY(position.Y());
@@ -202,7 +202,7 @@ namespace Belle2 {
     }
 
     /** get the relative memeber */
-    void setMomentumLocalMid(TVector3 momentum)
+    void setMomentumLocalMid(ROOT::Math::XYZVector momentum)
     {
       m_momentumLocalMid.SetX(momentum.X());
       m_momentumLocalMid.SetY(momentum.Y());
@@ -210,7 +210,7 @@ namespace Belle2 {
     }
 
     /** get the relative memeber */
-    void setMomentumLocalEntry(TVector3 momentum)
+    void setMomentumLocalEntry(ROOT::Math::XYZVector momentum)
     {
       m_momentumLocalEntry.SetX(momentum.X());
       m_momentumLocalEntry.SetY(momentum.Y());
@@ -218,7 +218,7 @@ namespace Belle2 {
     }
 
     /** get the relative memeber */
-    void setMomentumLocalExit(TVector3 momentum)
+    void setMomentumLocalExit(ROOT::Math::XYZVector momentum)
     {
       m_momentumLocalExit.SetX(momentum.X());
       m_momentumLocalExit.SetY(momentum.Y());
@@ -229,7 +229,7 @@ namespace Belle2 {
     void setPDGID(int pdgid) { m_PDGID = pdgid; }
 
     /** get the relative memeber */
-    void setPosition0(TVector3 position)
+    void setPosition0(ROOT::Math::XYZVector position)
     {
       m_position0.SetX(position.X());
       m_position0.SetY(position.Y());
@@ -237,7 +237,7 @@ namespace Belle2 {
     }
 
     /** get the relative memeber */
-    void setMomentum0(TVector3 momentum)
+    void setMomentum0(ROOT::Math::XYZVector momentum)
     {
       m_momentum0.SetX(momentum.X());
       m_momentum0.SetY(momentum.Y());
@@ -279,7 +279,7 @@ namespace Belle2 {
     * input(hit postion, hit momentum, hit charge)
     * output(omega value)
     */
-    double omega(TVector3 xx, TVector3 p, double charge) const;
+    double omega(ROOT::Math::XYZVector xx, ROOT::Math::XYZVector p, double charge) const;
 
 
     /** evaluates the parameter tanLambda (pz/pt) of a helicoidal track
@@ -287,7 +287,7 @@ namespace Belle2 {
     * input(hit postion, hit momentum)
     * output(tanlambda value)
     */
-    double tanLambda(TVector3 xx, TVector3 p) const;
+    double tanLambda(ROOT::Math::XYZVector xx, ROOT::Math::XYZVector p) const;
 
 
     /** evaluates the parameter d0 (impact parameter) of a helicoidal track
@@ -295,7 +295,7 @@ namespace Belle2 {
     * input(hit postion, hit momentum, hit charge)
     * output(d0 value)
     */
-    double d0(TVector3 xx, TVector3 p, double charge) const;
+    double d0(ROOT::Math::XYZVector xx, ROOT::Math::XYZVector p, double charge) const;
 
 
     /** evaluates the parameter phi0 (angle between pT and x) of a helicoidal track
@@ -303,7 +303,7 @@ namespace Belle2 {
     * input(hit postion, hit momentum, hit charge)
     * output(phi0 value)
     */
-    double phi0(const TVector3& xx, TVector3 p, double charge) const;
+    double phi0(const ROOT::Math::XYZVector& xx, ROOT::Math::XYZVector p, double charge) const;
 
 
     /** evaluates the parameter z0 (distance transverse plane-POCA) of a helicoidal track
@@ -311,7 +311,7 @@ namespace Belle2 {
     * input(hit postion, hit momentum, hit charge)
     * output(z0 value)
     */
-    double z0(TVector3 xx, TVector3 p, double charge) const;
+    double z0(ROOT::Math::XYZVector xx, ROOT::Math::XYZVector p, double charge) const;
 
 
     /** evaluate relative parameter using midpoint position and momentum */
@@ -386,6 +386,6 @@ namespace Belle2 {
     };
 
     //! needed by root
-    ClassDef(hitXP, 1);
+    ClassDef(hitXP, 2);
   };
 } /** end namespace Belle2 */

@@ -183,11 +183,11 @@ main(int argc, char **argv)
     for (i=0; i<4; i++) {
       if (! use[i]) continue;
       if (fd[i] < 0) {
-	char DEVICE[256];
-	sprintf(DEVICE, "/dev/copper/fngeneric:%c", 'a' + i);
-	if ((fd[i] = open(DEVICE, o_mode)) < 0) {
+	char dev[256];
+	sprintf(dev, "/dev/copper/fngeneric:%c", 'a' + i);
+	if ((fd[i] = open(dev, o_mode)) < 0) {
 	  fprintf(stderr, "%s: cannot open %s: %s\n",
-		  ARGV0, DEVICE, strerror(errno));
+		  ARGV0, dev, strerror(errno));
 	  exit(1);
 	}
       }

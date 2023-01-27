@@ -22,7 +22,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(DQMHistAnalysisPXDCharge)
+REG_MODULE(DQMHistAnalysisPXDCharge);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -38,7 +38,7 @@ DQMHistAnalysisPXDChargeModule::DQMHistAnalysisPXDChargeModule()
   addParam("RangeLow", m_rangeLow, "Lower boarder for fit", 30.);
   addParam("RangeHigh", m_rangeHigh, "High border for fit", 85.);
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:Charge:"));
-  addParam("useEpics", m_useEpics, "useEpics", true);
+  addParam("useEpics", m_useEpics, "Whether to update EPICS PVs.", false);
   B2DEBUG(99, "DQMHistAnalysisPXDCharge: Constructor done.");
 }
 

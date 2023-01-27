@@ -51,7 +51,7 @@ namespace Belle2 {
         bool setDirtyFlag);
 
     /// Append an event-t0 value with quality information
-    static void addEventT0WithQuality(std::vector<RecoTrack*>& recoTracks, StoreObjPtr<EventT0>& eventT0,
+    static void addEventT0WithQuality(const std::vector<RecoTrack*>& recoTracks, StoreObjPtr<EventT0>& eventT0,
                                       std::vector<EventT0::EventT0Component>& eventT0WithQualityIndex);
 
     /// Small helper function to extract the reduced chi^2 (chi^2/ndf). Returns NaN if ndf is 0.

@@ -10,7 +10,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(RegisterEventLevelTrackingInfo)
+REG_MODULE(RegisterEventLevelTrackingInfo);
 
 RegisterEventLevelTrackingInfoModule::RegisterEventLevelTrackingInfoModule() : Module()
 {

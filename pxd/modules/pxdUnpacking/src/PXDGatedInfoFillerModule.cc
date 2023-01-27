@@ -14,7 +14,7 @@ using namespace Belle2::PXD;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(PXDGatedInfoFiller)
+REG_MODULE(PXDGatedInfoFiller);
 
 //-----------------------------------------------------------------
 //                 Implementation

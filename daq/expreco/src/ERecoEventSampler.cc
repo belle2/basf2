@@ -144,6 +144,7 @@ int ERecoEventSampler::Stop(NSMmsg*, NSMcontext*)
 
 int ERecoEventSampler::Restart(NSMmsg*, NSMcontext*)
 {
+  return 0;
 }
 
 // Server function

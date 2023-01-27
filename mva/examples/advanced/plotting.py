@@ -10,7 +10,7 @@
 
 # You can use the basf2_mva_evaluation.py tool as well
 
-from basf2_mva_util import tree2dict, calculate_roc_auc
+from basf2_mva_util import tree2dict, calculate_auc_efficiency_vs_background_retention
 from basf2_mva_evaluation import plotting
 import ROOT
 
@@ -37,10 +37,19 @@ if __name__ == "__main__":
     p.finish()
     p.save('evaluation.png')
 
-    print('AUC (Ordinary)', calculate_roc_auc(data['extraInfo__boOrdinary__bc'], data['isSignal']))
-    print('AUC (Full)', calculate_roc_auc(data['extraInfo__boFull__bc'], data['isSignal']))
-    print('AUC (Pdf)', calculate_roc_auc(data['extraInfo__boPdf__bc'], data['isSignal']))
-    print('AUC (SPlot)', calculate_roc_auc(data['extraInfo__boSPlot__bc'], data['isSignal']))
-    print('AUC (SPlotCombined)', calculate_roc_auc(data['extraInfo__boSPlotCombined__bc'], data['isSignal']))
-    print('AUC (SPlotBoosted)', calculate_roc_auc(data['extraInfo__boSPlotBoosted__bc'], data['isSignal']))
-    print('AUC (SPlotCombinedBoosted)', calculate_roc_auc(data['extraInfo__boSPlotCombinedBoosted__bc'], data['isSignal']))
+    print('AUC (Ordinary)', calculate_auc_efficiency_vs_background_retention(data['extraInfo__boOrdinary__bc'], data['isSignal']))
+    print('AUC (Full)', calculate_auc_efficiency_vs_background_retention(data['extraInfo__boFull__bc'], data['isSignal']))
+    print('AUC (Pdf)', calculate_auc_efficiency_vs_background_retention(data['extraInfo__boPdf__bc'], data['isSignal']))
+    print('AUC (SPlot)', calculate_auc_efficiency_vs_background_retention(data['extraInfo__boSPlot__bc'], data['isSignal']))
+    print(
+        'AUC (SPlotCombined)',
+        calculate_auc_efficiency_vs_background_retention(
+            data['extraInfo__boSPlotCombined__bc'],
+            data['isSignal']))
+    print(
+        'AUC (SPlotBoosted)',
+        calculate_auc_efficiency_vs_background_retention(
+            data['extraInfo__boSPlotBoosted__bc'],
+            data['isSignal']))
+    print('AUC (SPlotCombinedBoosted)', calculate_auc_efficiency_vs_background_retention(
+        data['extraInfo__boSPlotCombinedBoosted__bc'], data['isSignal']))

@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# disable doxygen check for this file
+# @cond
+
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
 # Author: The Belle II Collaboration                                     #
@@ -630,6 +633,10 @@ class Job:
         if "VO_BELLE2_SW_DIR" in os.environ:
             self.setup_cmds.append(f"""if [ -z "${{VO_BELLE2_SW_DIR}}" ]; then
               export VO_BELLE2_SW_DIR={os.environ['VO_BELLE2_SW_DIR']}
+            fi""")
+        if "BELLE2_EXTERNALS_TOPDIR" in os.environ:
+            self.setup_cmds.append(f"""if [ -z "${{BELLE2_EXTERNALS_TOPDIR}}" ]; then
+              export BELLE2_EXTERNALS_TOPDIR={os.environ['BELLE2_EXTERNALS_TOPDIR']}
             fi""")
         if "BELLE2_RELEASE" in os.environ:
             self.setup_cmds.append(f"source {os.environ['BELLE2_TOOLS']}/b2setup {os.environ['BELLE2_RELEASE']}")

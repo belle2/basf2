@@ -17,7 +17,7 @@
 using namespace std;
 using namespace Belle2;
 
-REG_MODULE(ECLTrackClusterMatchingParametrizationExpert)
+REG_MODULE(ECLTrackClusterMatchingParametrizationExpert);
 
 ECLTrackClusterMatchingParametrizationExpertModule::ECLTrackClusterMatchingParametrizationExpertModule() : Module(),
   m_writeToRoot(1),
@@ -152,9 +152,9 @@ void ECLTrackClusterMatchingParametrizationExpertModule::event()
     }
     const TrackFitResult* fitResult = track.getTrackFitResultWithClosestMass(hypothesis);
 
-    double momentum = fitResult->getMomentum().Mag();
+    double momentum = fitResult->getMomentum().R();
     double pt = fitResult->getTransverseMomentum();
-    double theta = TMath::ACos(fitResult->getMomentum().CosTheta());
+    double theta = fitResult->getMomentum().Theta();
     if (m_useArray) {
       m_true_track_pdg_array->push_back(pdgCode);
       m_trackNo_array->push_back(i);

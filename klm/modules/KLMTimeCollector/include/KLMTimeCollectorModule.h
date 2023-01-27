@@ -11,8 +11,7 @@
 /* KLM headers. */
 #include <klm/calibration/KLMTimeAlgorithm.h>
 #include <klm/bklm/geometry/GeometryPar.h>
-#include <klm/dataobjects/bklm/BKLMHit2d.h>
-#include <klm/dataobjects/eklm/EKLMHit2d.h>
+#include <klm/dataobjects/KLMHit2d.h>
 #include <klm/dbobjects/KLMChannelStatus.h>
 #include <klm/eklm/geometry/GeometryData.h>
 #include <klm/eklm/geometry/TransformData.h>
@@ -70,17 +69,17 @@ namespace Belle2 {
     /**
      * Collect hits information for RPC of BKLM.
      */
-    void collectRPC(RelationVector<BKLMHit2d>&);
+    void collectRPC(RelationVector<KLMHit2d>&);
 
     /**
      * Collect hits information for scintillator of BKLM.
      */
-    void collectScint(RelationVector<BKLMHit2d>&);
+    void collectScint(RelationVector<KLMHit2d>&);
 
     /**
      * Collect hits information for scintillator of EKLM.
      */
-    void collectScintEnd(RelationVector<EKLMHit2d>&);
+    void collectScintEnd(const RelationVector<KLMHit2d>&);
 
     /**
      * Match KLM hit and extHit.
@@ -89,10 +88,7 @@ namespace Belle2 {
       KLMChannelNumber channelID, std::multimap<unsigned int, ExtHit>&);
 
     /** Save position difference betwen matched kLMHit and ExtHit. */
-    void storeDistDiff(TVector3&);
-
-    /** Debug flag. Not used currently. */
-    bool m_Debug;
+    void storeDistDiff(ROOT::Math::XYZVector&);
 
     /** Use event T0 or not. */
     bool m_useEvtT0;
@@ -144,11 +140,8 @@ namespace Belle2 {
     /** Number of tracks. */
     TH1I* m_HnumTrack;
 
-    /** Number of BKLM hits related to track. */
-    TH1I* m_HnBHit2dOfTrack;
-
-    /** Number of EKLM hits related to track. */
-    TH1I* m_HnEHit2dOfTrack;
+    /** Number of KLM hits related to track. */
+    TH1I* m_HnKLMHit2dOfTrack;
 
     /** Difference between global and local position. */
     TH1D* m_HpositionDiff;

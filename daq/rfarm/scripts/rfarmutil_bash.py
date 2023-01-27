@@ -13,8 +13,6 @@
 import os
 import sys
 import subprocess
-import signal
-import socket
 import time
 
 
@@ -24,7 +22,7 @@ import time
 def get_configpath(conffile):
     confdir = str(os.environ.get('RFARM_CONFDIR'))
     if confdir == 'None':
-        print 'RFARM_CONFDIR is not defined. Exit.'
+        print('RFARM_CONFDIR is not defined. Exit.')
         sys.exit()
     cmd = confdir + '/' + conffile + '.conf'
     return cmd
@@ -35,7 +33,7 @@ def get_rfgetconf(conffile, item1, item2='NULL', item3='NULL'):
 
     confdir = str(os.environ.get('RFARM_CONFDIR'))
     if confdir == 'None':
-        print 'RFARM_CONFDIR is not defined. Exit.'
+        print('RFARM_CONFDIR is not defined. Exit.')
         sys.exit()
     cmd = 'rfgetconf ' + get_configpath(conffile) + ' ' + item1 + ' ' + item2 \
         + ' ' + item3
@@ -43,11 +41,11 @@ def get_rfgetconf(conffile, item1, item2='NULL', item3='NULL'):
                          stderr=subprocess.PIPE)
     p.wait()
     output = p.stdout.read()
-#    print output
+#    print(output)
     return output
 
 
-# print "waiting"
+# print("waiting")
 # confout = p.stdout.read()
 
 # NSMD related utilities
@@ -62,8 +60,8 @@ def run_nsmd(nsmdir, port, nsmhost):
     cmd = 'ssh ' + nsmhost + ' "cd ' + nsmdir + '/' + nsmhost \
         + '; export NSMLOGDIR=' + nsmdir + '/' + nsmhost + ';' + nsmd \
         + nsmhost + '"'
-    print cmd
-    p = subprocess.Popen(cmd, shell=True)
+    print(cmd)
+    subprocess.Popen(cmd, shell=True)
     time.sleep(1)
 
 
@@ -75,14 +73,14 @@ def kill_nsmd(port, nsmhost):
     cmd = 'ssh ' + nsmhost + ' "ps -fC nsmd2 | grep ' + port \
         + "| awk '{print \\$2}' \" > temp.pid"
 #    cmd = "ssh -v " + nsmhost + " \"ps -fC nsmd2 | grep " + port + "| awk '{printf(\"klll \%d\", \$2)} | sh' \""
-#    print cmd
+#    print(cmd)
     p = subprocess.Popen(cmd, shell=True)
     p.wait()
     for line in open('temp.pid', 'r'):
         pid = int(line)
         if pid > 0:
             cmd = 'ssh ' + nsmhost + ' "kill ' + str(pid) + '"'
-#            print cmd
+#            print(cmd)
             p = subprocess.Popen(cmd, shell=True)
             p.wait()
 
@@ -97,18 +95,18 @@ def start_nsmd(conffile):
     # Run nsmd on control node
     ctlhost = get_rfgetconf(conffile, 'master', 'ctlhost')
     run_nsmd(nsmdir, port, ctlhost)
-    print 'nsmd on %s started' % ctlhost
+    print('nsmd on %s started' % ctlhost)
 
     # Run nsmd on event server node
     evshost = get_rfgetconf(conffile, 'distributor', 'ctlhost')
     if ctlhost.find(evshost) == -1:
         run_nsmd(nsmdir, port, evshost)
-        print 'nsmd on %s started' % evshost
+        print('nsmd on %s started' % evshost)
 
     # Run nsmd on output server node
     opshost = get_rfgetconf(conffile, 'collector', 'ctlhost')
     run_nsmd(nsmdir, port, opshost)
-    print 'nsmd on %s started' % opshost
+    print('nsmd on %s started' % opshost)
 
     # Run nsmd on event processor nodes
     nnodes = int(get_rfgetconf(conffile, 'processor', 'nnodes'))
@@ -121,7 +119,7 @@ def start_nsmd(conffile):
         if badlist.find(nodeid) == -1:
             evphost = evphostbase + nodeid
             run_nsmd(nsmdir, port, evphost)
-            print 'nsmd on %s started' % evphost
+            print('nsmd on %s started' % evphost)
 
 
 def stop_nsmd(conffile):
@@ -130,18 +128,18 @@ def stop_nsmd(conffile):
     # Kill nsmd on control node
     ctlhost = get_rfgetconf(conffile, 'master', 'ctlhost')
     kill_nsmd(port, ctlhost)
-    print 'nsmd on %s stopped' % ctlhost
+    print('nsmd on %s stopped' % ctlhost)
 
     # Run nsmd on event server node
     evshost = get_rfgetconf(conffile, 'distributor', 'ctlhost')
     if ctlhost.find(evshost) == -1:
         kill_nsmd(port, evshost)
-        print 'nsmd on %s stopped' % evshost
+        print('nsmd on %s stopped' % evshost)
 
     # Run nsmd on output server node
     opshost = get_rfgetconf(conffile, 'collector', 'ctlhost')
     kill_nsmd(port, opshost)
-    print 'nsmd on %s stopped' % opshost
+    print('nsmd on %s stopped' % opshost)
 
     # Run nsmd on event processor nodes
     nnodes = int(get_rfgetconf(conffile, 'processor', 'nnodes'))
@@ -154,7 +152,7 @@ def stop_nsmd(conffile):
         if badlist.find(nodeid) == -1:
             evphost = evphostbase + nodeid
             kill_nsmd(port, evphost)
-            print 'nsmd on %s stopped' % evphost
+            print('nsmd on %s stopped' % evphost)
 
 
 # RFARM server operations
@@ -169,8 +167,8 @@ def run_eventserver(conffile):
     cmd = 'ssh ' + evshost + ' "cd ' + basedir + '; export NSM2_PORT=' + port \
         + '; rf_eventserver ' + get_configpath(conffile) \
         + ' &> distributor/nsmlog.log" '
-    print cmd
-    p = subprocess.Popen(cmd, shell=True)
+    print(cmd)
+    subprocess.Popen(cmd, shell=True)
     time.sleep(1)
 
 
@@ -190,7 +188,7 @@ def stop_eventserver(conffile):
     for pid in open(pidfile, 'r'):
         cmd = 'ssh ' + evshost + ' "kill ' + pid + '; removerb ' + rbufname \
             + "; removeshm " + shmname + '"'
-        print cmd
+        print(cmd)
         p = subprocess.Popen(cmd, shell=True)
         p.wait()
 
@@ -206,8 +204,8 @@ def run_outputserver(conffile):
     cmd = 'ssh ' + opshost + ' "cd ' + basedir + '; export NSM2_PORT=' + port \
         + '; rf_outputserver ' + get_configpath(conffile) \
         + ' &> collector/nsmlog.log" '
-    print cmd
-    p = subprocess.Popen(cmd, shell=True)
+    print(cmd)
+    subprocess.Popen(cmd, shell=True)
     time.sleep(1)
 
 
@@ -229,7 +227,7 @@ def stop_outputserver(conffile):
         cmd = 'ssh ' + opshost + ' "kill ' + pid + '; removerb ' + rbufinname \
               + '; removerb ' + rbufoutname + '; removeshm ' + shmname \
               + '; clear_basf2_ipc"'
-        print cmd
+        print(cmd)
         p = subprocess.Popen(cmd, shell=True)
         p.wait()
 
@@ -244,7 +242,7 @@ def run_eventprocessor(conffile):
     nnodes = int(get_rfgetconf(conffile, 'processor', 'nnodes'))
     procid = int(get_rfgetconf(conffile, 'processor', 'idbase'))
     badlist = get_rfgetconf(conffile, 'processor', 'badlist')
-    id = int(get_rfgetconf(conffile, 'processor', 'idbase'))
+    id = int(get_rfgetconf(conffile, 'processor', 'idbase'))  # noqa
 
     for i in range(procid, procid + nnodes):
         nodenum = '%2.2d' % i
@@ -257,8 +255,8 @@ def run_eventprocessor(conffile):
             cmd = 'ssh ' + evphost + ' "cd ' + basedir + '; export NSM2_PORT=' \
                 + port + '; rf_eventprocessor ' + get_configpath(conffile) \
                 + ' &> evp_' + nodename + '/nsmlog.log" '
-            print cmd
-            p = subprocess.Popen(cmd, shell=True)
+            print(cmd)
+            subprocess.Popen(cmd, shell=True)
             time.sleep(1)
 
 
@@ -268,11 +266,11 @@ def stop_eventprocessor(conffile):
     hostbase = get_rfgetconf(conffile, 'processor', 'ctlhostbase')
     nodebase = get_rfgetconf(conffile, 'processor', 'nodebase')
     basedir = get_rfgetconf(conffile, 'system', 'execdir_base')
-    port = get_rfgetconf(conffile, 'system', 'nsmport')
+    port = get_rfgetconf(conffile, 'system', 'nsmport')  # noqa
     nnodes = int(get_rfgetconf(conffile, 'processor', 'nnodes'))
     procid = int(get_rfgetconf(conffile, 'processor', 'idbase'))
     badlist = get_rfgetconf(conffile, 'processor', 'badlist')
-    id = int(get_rfgetconf(conffile, 'processor', 'idbase'))
+    id = int(get_rfgetconf(conffile, 'processor', 'idbase'))  # noqa
 
     unit = get_rfgetconf(conffile, 'system', 'unitname')
     rbufin = get_rfgetconf(conffile, 'collector', 'ringbufin')
@@ -287,7 +285,7 @@ def stop_eventprocessor(conffile):
             evphost = hostbase + nodeid
             nodename = 'evp_' + nodebase + nodeid
             shmname = unit + ':' + nodename
-            print shmname
+            print(shmname)
             p = subprocess.Popen('rfcommand ' + conffile + ' ' + nodename +
                                  ' RF_UNCONFIGURE', shell=True)
             p.wait()
@@ -298,7 +296,7 @@ def stop_eventprocessor(conffile):
                     + '; removeshm ' + shmname + '; clear_basf2_ipc"'
 #                    + '; removeshm ' +  '"'
 #                    + '; removeshm ' + shmname + '"'
-                print cmd
+                print(cmd)
                 p = subprocess.Popen(cmd, shell=True)
                 p.wait()
 
@@ -314,8 +312,8 @@ def run_dqmserver(conffile):
     cmd = 'ssh ' + dqmhost + ' "cd ' + basedir + '; export NSM2_PORT=' + port \
         + '; rf_dqmserver ' + get_configpath(conffile) \
         + ' &> dqmserver/nsmlog.log" '
-    print cmd
-    p = subprocess.Popen(cmd, shell=True)
+    print(cmd)
+    subprocess.Popen(cmd, shell=True)
     time.sleep(1)
 
 
@@ -329,7 +327,7 @@ def stop_dqmserver(conffile):
     pidfile = basedir + '/dqmserver/pid.data'
     for pid in open(pidfile, 'r'):
         cmd = 'ssh ' + dqmhost + ' "kill ' + pid + '"'
-        print cmd
+        print(cmd)
         p = subprocess.Popen(cmd, shell=True)
         p.wait()
 
@@ -345,8 +343,8 @@ def run_roisender(conffile):
     cmd = 'ssh ' + roihost + ' "cd ' + basedir + '; export NSM2_PORT=' + port \
         + '; rf_roisender ' + get_configpath(conffile) \
         + ' &> roisender/nsmlog.log" '
-    print cmd
-    p = subprocess.Popen(cmd, shell=True)
+    print(cmd)
+    subprocess.Popen(cmd, shell=True)
     time.sleep(1)
 
 
@@ -362,7 +360,7 @@ def stop_roisender(conffile):
     pidfile = basedir + '/roisender/pid.data'
     for pid in open(pidfile, 'r'):
         cmd = 'ssh ' + roihost + ' "kill ' + pid + '; removeshm ' + shmname + '"'
-        print cmd
+        print(cmd)
         p = subprocess.Popen(cmd, shell=True)
         p.wait()
 
@@ -378,8 +376,8 @@ def run_master(conffile):
     cmd = 'ssh ' + masterhost + ' "cd ' + basedir + '; export NSM2_PORT=' \
         + port + '; rf_master_local ' + get_configpath(conffile) \
         + ' &> master/nsmlog.log" '
-    print cmd
-    p = subprocess.Popen(cmd, shell=True)
+    print(cmd)
+    subprocess.Popen(cmd, shell=True)
     time.sleep(1)
 
 
@@ -393,7 +391,7 @@ def stop_master(conffile):
     pidfile = basedir + '/master/pid.data'
     for pid in open(pidfile, 'r'):
         cmd = 'ssh ' + masterhost + ' "kill ' + pid + '"'
-        print cmd
+        print(cmd)
         p = subprocess.Popen(cmd, shell=True)
         p.wait()
 

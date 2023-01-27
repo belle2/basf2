@@ -63,14 +63,14 @@ namespace Belle2 {
       G4double density, fractionmass;
       G4int ncomponents, natoms;
 
-      G4Element* H  = new G4Element("Hydrogen",  symbol = "H"  , z =  1., a =  1.00794 * CLHEP::g / CLHEP::mole);
-      G4Element* He = new G4Element("Helium",    symbol = "He" , z =  2., a =  4.002602 * CLHEP::g / CLHEP::mole);
-      G4Element* C  = new G4Element("Carbon",    symbol = "C"  , z =  6., a = 12.01    * CLHEP::g / CLHEP::mole);
+      G4Element* H  = new G4Element("Hydrogen",  symbol = "H", z =  1., a =  1.00794 * CLHEP::g / CLHEP::mole);
+      G4Element* He = new G4Element("Helium",    symbol = "He", z =  2., a =  4.002602 * CLHEP::g / CLHEP::mole);
+      G4Element* C  = new G4Element("Carbon",    symbol = "C", z =  6., a = 12.01    * CLHEP::g / CLHEP::mole);
       G4Element* O  = new G4Element("Oxygen",    symbol = "O",   z =  8., a = 16.00    * CLHEP::g / CLHEP::mole);
-      G4Element* Si = new G4Element("Silicon",   symbol = "Si" , z = 14., a = 28.09    * CLHEP::g / CLHEP::mole);
-      G4Element* Cl = new G4Element("Chlore",    symbol = "Cl" , z = 17., a = 35.453   * CLHEP::g / CLHEP::mole);
-      G4Element* Cu = new G4Element("Copper",    symbol = "Cu" , z = 29., a = 63.546   * CLHEP::g / CLHEP::mole);
-      G4Element* Zn = new G4Element("Zinc",      symbol = "Zn" , z = 30., a = 65.38    * CLHEP::g / CLHEP::mole);
+      G4Element* Si = new G4Element("Silicon",   symbol = "Si", z = 14., a = 28.09    * CLHEP::g / CLHEP::mole);
+      G4Element* Cl = new G4Element("Chlore",    symbol = "Cl", z = 17., a = 35.453   * CLHEP::g / CLHEP::mole);
+      G4Element* Cu = new G4Element("Copper",    symbol = "Cu", z = 29., a = 63.546   * CLHEP::g / CLHEP::mole);
+      G4Element* Zn = new G4Element("Zinc",      symbol = "Zn", z = 30., a = 65.38    * CLHEP::g / CLHEP::mole);
 
       //Helium 4
       G4Material* gas_4He = new G4Material("gas_4He", density = 0.0001664 * CLHEP::g / CLHEP::cm3, ncomponents = 1, kStateGas,
@@ -97,9 +97,9 @@ namespace Belle2 {
       //G10
       G4Material* TPC_G10 = new G4Material("TPC_G10", density = 1.700 * CLHEP::g / CLHEP::cm3, ncomponents = 4);
       TPC_G10->AddElement(Si, natoms = 1);
-      TPC_G10->AddElement(O , natoms = 2);
-      TPC_G10->AddElement(C , natoms = 3);
-      TPC_G10->AddElement(H , natoms = 3);
+      TPC_G10->AddElement(O, natoms = 2);
+      TPC_G10->AddElement(C, natoms = 3);
+      TPC_G10->AddElement(H, natoms = 3);
 
       //Cu - copper
       G4Material* metalCu = new G4Material("MetalCopper", density = 8.960 * CLHEP::g / CLHEP::cm3, ncomponents = 1);

@@ -28,7 +28,7 @@ index = Belle2.KLMChannelIndex()
 index2 = Belle2.KLMChannelIndex()
 while (index != index2.end()):
     if not (index.getSubdetector == Belle2.KLMElementNumbers.c_BKLM and
-            inded.getLayer >= Belle2.BKLMElementNumbers.c_FirstRPCLayer):
+            index.getLayer >= Belle2.BKLMElementNumbers.c_FirstRPCLayer):
         channel = index.getKLMChannelNumber()
         parameters.setFEEData(channel, data)
     index.increment()

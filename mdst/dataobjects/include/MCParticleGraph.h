@@ -290,7 +290,7 @@ namespace Belle2 {
   inline MCParticleGraph::GraphParticle& MCParticleGraph::addParticle()
   {
     unsigned int index = m_particles.size() + 1;
-    MCParticleGraph::GraphParticle* p = new(m_particles.add()) MCParticleGraph::GraphParticle(this, index);
+    MCParticleGraph::GraphParticle* p = new (m_particles.add()) MCParticleGraph::GraphParticle(this, index);
     return *p;
   }
 

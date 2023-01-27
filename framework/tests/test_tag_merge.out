@@ -1,0 +1,45 @@
+[INFO] Steering file: framework/tests/test_tag_merge.py
+[INFO] Obtaining list of iovs for globaltag main_tag_merge_test_1
+  KLMStripEfficiency r2587 (5, 0, 5, 9)
+  KLMStripEfficiency r2553 (5, 0, 5, 200)
+  KLMStripEfficiency r2615 (5, 10, 5, 35)
+  KLMStripEfficiency r2670 (5, 36, 5, 87)
+  KLMStripEfficiency r2704 (5, 87, 5, 90)
+  KLMStripEfficiency r2810 (5, 91, 5, 100)
+  KLMStripEfficiency r2553 (5, 300, 5, 999)
+  KLMStripEfficiency r2553 (5, 1100, 5, -1)
+[INFO] Obtaining list of iovs for globaltag main_tag_merge_test_2
+  KLMStripEfficiency r2670 (5, 0, 5, 100)
+  KLMStripEfficiency r2914 (5, 199, 5, 250)
+  KLMStripEfficiency r2999 (5, 251, 5, 298)
+  KLMStripEfficiency r2670 (5, 299, 5, 299)
+  KLMStripEfficiency r3001 (5, 300, 5, 399)
+  KLMStripEfficiency r3112 (5, 400, 5, 499)
+[INFO] Obtaining list of iovs for globaltag main_tag_merge_test_3
+  KLMStripEfficiency r3001 (5, 0, 5, 999)
+  KLMStripEfficiency r3205 (5, 999, 5, 1050)
+  KLMStripEfficiency r3299 (5, 1051, 5, -1)
+[INFO] Obtaining list of iovs for globaltag main_tag_merge_test_1
+[ERROR] Overlap for payload KLMStripEfficiency r2670: Overlap between (5, 87, 5, 100) and (5, 36, 5, 87)
+[ERROR] Overlap for payload KLMStripEfficiency r2553: Overlap between (5, 0, 5, 35) and (5, 0, 5, 200)
+[INFO] Obtaining list of iovs for globaltag main_tag_merge_test_2
+[INFO] Obtaining list of iovs for globaltag main_tag_merge_test_3
+[ERROR] Overlap for payload KLMStripEfficiency r3001: Overlap between (5, 999, 5, inf) and (5, 0, 5, 999)
+[INFO] Result of merging the globaltags main_tag_merge_test_1, main_tag_merge_test_2, main_tag_merge_test_3
+--------------------------------------------------------------------------------
+Name                      Rev  First  First  Final  Final  Source
+                               Exp    Run    Exp    Run    
+--------------------------------------------------------------------------------
+KLMStripEfficiency        2587 5      0      5      9      main_tag_merge_test_1
+KLMStripEfficiency        2615 5      10     5      35     main_tag_merge_test_1
+KLMStripEfficiency        2670 5      36     5      86     main_tag_merge_test_1
+KLMStripEfficiency        2704 5      87     5      90     main_tag_merge_test_1
+KLMStripEfficiency        2810 5      91     5      100    main_tag_merge_test_1
+KLMStripEfficiency        2553 5      101    5      200    main_tag_merge_test_1
+KLMStripEfficiency        2914 5      201    5      250    main_tag_merge_test_2
+KLMStripEfficiency        2999 5      251    5      298    main_tag_merge_test_2
+KLMStripEfficiency        2670 5      299    5      299    main_tag_merge_test_2
+KLMStripEfficiency        2553 5      300    5      999    main_tag_merge_test_1
+KLMStripEfficiency        3205 5      1000   5      1050   main_tag_merge_test_3
+KLMStripEfficiency        3299 5      1051   5      1099   main_tag_merge_test_3
+KLMStripEfficiency        2553 5      1100   5      -1     main_tag_merge_test_1

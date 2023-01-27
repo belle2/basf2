@@ -9,8 +9,8 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/dataobjects/bklm/BKLMHit2d.h>
 #include <klm/dataobjects/bklm/BKLMTrack.h>
+#include <klm/dataobjects/KLMHit2d.h>
 #include <klm/bklm/geometry/GeometryPar.h>
 
 /* Belle 2 headers. */
@@ -53,7 +53,7 @@ namespace Belle2 {
     void terminate() override;
 
     //! Judge if two hits come from the same sector
-    bool sameSector(BKLMHit2d* hit1, BKLMHit2d* hit2);
+    bool sameSector(KLMHit2d* hit1, KLMHit2d* hit2);
 
     //! find the closest RecoTrack, match BKLMTrack to RecoTrack, if the matched RecoTrack is found, return true
     bool findClosestRecoTrack(BKLMTrack* bklmTrk, RecoTrack*& closestTrack);
@@ -69,6 +69,18 @@ namespace Belle2 {
 
     //! angle required between RecoTrack and BKLMTrack, if openangle is larger than m_maxAngleRequired, they don't match
     double m_maxAngleRequired = 10;
+
+    //! maximum distance required between track and KLMHit2d to be accepted for efficiency calculation
+    double m_maxDistance = 10;
+
+    //! maximum sigma for hit acceptance during efficiency calculation
+    double m_maxSigma = 5;
+
+    //! minimum number of hits in sector for track finder to run (-2 from initial seed)
+    unsigned int m_minHitList = 2;
+
+    //! max number of hits in sector for track finder to run
+    unsigned int m_maxHitList = 60;
 
     //! do the BKLMTrack fitting in global system (multi-sectors track) or local system (sector by sector)
     bool m_globalFit;
@@ -115,8 +127,8 @@ namespace Belle2 {
     //! BKLMTrack StoreArray
     StoreArray<BKLMTrack> m_storeTracks;
 
-    //! BKLMHit2d StoreArray
-    StoreArray<BKLMHit2d> hits2D;
+    //! KLMHit2d StoreArray
+    StoreArray<KLMHit2d> hits2D;
 
     //! RecoTrack StoreArray
     StoreArray<RecoTrack> recoTracks;
@@ -131,16 +143,16 @@ namespace Belle2 {
     void generateEffi(int section, int sector, int layer);
 
     //! my defined sort function using layer number
-    static bool sortByLayer(BKLMHit2d* hit1, BKLMHit2d* hit2);
+    static bool sortByLayer(KLMHit2d* hit1, KLMHit2d* hit2);
 
     //! judge whether the current layer is understudy
-    bool isLayerUnderStudy(int section, int iSector, int iLayer, BKLMHit2d* hit);
+    bool isLayerUnderStudy(int section, int iSector, int iLayer, KLMHit2d* hit);
 
     //! judge whether the hits come from the sctor understudy
-    bool isSectorUnderStudy(int section, int iSector, BKLMHit2d* hit);
+    bool isSectorUnderStudy(int section, int iSector, KLMHit2d* hit);
 
     //! calculate distance from track to hit
-    double distanceToHit(BKLMTrack* track, BKLMHit2d* hit,
+    double distanceToHit(BKLMTrack* track, KLMHit2d* hit,
                          double& error,
                          double& sigma);
 

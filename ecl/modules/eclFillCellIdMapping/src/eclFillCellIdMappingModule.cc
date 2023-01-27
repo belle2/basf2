@@ -22,7 +22,7 @@ using namespace ECL;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(ECLFillCellIdMapping)
+REG_MODULE(ECLFillCellIdMapping);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -40,8 +40,10 @@ void ECLFillCellIdMappingModule::initialize()
   m_eclCellIdMapping.registerInDataStore();
 
   // make neighbourmap
-  m_NeighbourMap5 = new ECLNeighbours("N", 2);
-  m_NeighbourMap7 = new ECLNeighbours("N", 3);
+  m_NeighbourMap5 = new ECLNeighbours("N", 2, true); //sort them for ecl variable getters
+  m_NeighbourMap7 = new ECLNeighbours("N", 3, true); //sort them for ecl variable getters
+  m_NeighbourMap9  = new ECLNeighbours("N", 4, true); //sort them for ecl variable getters
+  m_NeighbourMap11 = new ECLNeighbours("N", 5, true); //sort them for ecl variable getters
 
   // get phi, theta, phiid, thetaid values
   m_CellIdToPhi.resize(Belle2::ECLCellIdMapping::c_nECLCellIds + 1);
@@ -68,15 +70,17 @@ void ECLFillCellIdMappingModule::event()
 {
   if (!m_eclCellIdMapping) {
     m_eclCellIdMapping.create();
-  }
 
-  for (int idx = 1; idx <= Belle2::ECLCellIdMapping::c_nECLCellIds; idx++) {
-    m_eclCellIdMapping->setCellIdToNeighbour5(idx, m_NeighbourMap5->getNeighbours(idx));
-    m_eclCellIdMapping->setCellIdToNeighbour7(idx, m_NeighbourMap7->getNeighbours(idx));
-    m_eclCellIdMapping->setCellIdToPhi(idx, m_CellIdToPhi[idx]);
-    m_eclCellIdMapping->setCellIdToTheta(idx, m_CellIdToTheta[idx]);
-    m_eclCellIdMapping->setCellIdToPhiId(idx, m_CellIdToPhiId[idx]);
-    m_eclCellIdMapping->setCellIdToThetaId(idx, m_CellIdToThetaId[idx]);
+    for (int idx = 1; idx <= Belle2::ECLCellIdMapping::c_nECLCellIds; idx++) {
+      m_eclCellIdMapping->setCellIdToNeighbour5(idx, m_NeighbourMap5->getNeighbours(idx));
+      m_eclCellIdMapping->setCellIdToNeighbour7(idx, m_NeighbourMap7->getNeighbours(idx));
+      m_eclCellIdMapping->setCellIdToNeighbour9(idx, m_NeighbourMap9->getNeighbours(idx));
+      m_eclCellIdMapping->setCellIdToNeighbour11(idx, m_NeighbourMap11->getNeighbours(idx));
+      m_eclCellIdMapping->setCellIdToPhi(idx, m_CellIdToPhi[idx]);
+      m_eclCellIdMapping->setCellIdToTheta(idx, m_CellIdToTheta[idx]);
+      m_eclCellIdMapping->setCellIdToPhiId(idx, m_CellIdToPhiId[idx]);
+      m_eclCellIdMapping->setCellIdToThetaId(idx, m_CellIdToThetaId[idx]);
+    }
   }
 
   // Fill a vector that can be used to map cellid -> store array position for eclCalDigits.
@@ -91,4 +95,6 @@ void ECLFillCellIdMappingModule::terminate()
 {
   if (m_NeighbourMap5) delete m_NeighbourMap5;
   if (m_NeighbourMap7) delete m_NeighbourMap7;
+  if (m_NeighbourMap9) delete m_NeighbourMap9;
+  if (m_NeighbourMap11) delete m_NeighbourMap11;
 }

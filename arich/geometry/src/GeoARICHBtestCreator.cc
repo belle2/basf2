@@ -303,10 +303,10 @@ namespace Belle2 {
       B2INFO("Creating ARICH " << aeroname << " n=" << RefractiveIndex << " density=" << density / CLHEP::g * CLHEP::cm3 << " g/cm3");
       Materials& materials = Materials::getInstance();
       G4Material* _aerogel = new G4Material(aeroname, density, 4);
-      _aerogel->AddElement(materials.getElement("O")  ,   0.665);
-      _aerogel->AddElement(materials.getElement("H")  ,   0.042);
-      _aerogel->AddElement(materials.getElement("Si") ,   0.292);
-      _aerogel->AddElement(materials.getElement("C")  ,   0.001);
+      _aerogel->AddElement(materials.getElement("O"),   0.665);
+      _aerogel->AddElement(materials.getElement("H"),   0.042);
+      _aerogel->AddElement(materials.getElement("Si"),   0.292);
+      _aerogel->AddElement(materials.getElement("C"),   0.001);
 
 
       const G4double AerogelAbsorbtionLength = 1000 * Unit::mm;
@@ -337,9 +337,9 @@ namespace Belle2 {
 
 
       G4MaterialPropertiesTable* AeroProperty = new G4MaterialPropertiesTable();
-      AeroProperty->AddProperty("RINDEX"   , MomentumBins, AerogelRindex    , NBins);
+      AeroProperty->AddProperty("RINDEX", MomentumBins, AerogelRindex, NBins);
       AeroProperty->AddProperty("ABSLENGTH", MomentumBins, AerogelAbsorption, NBins);
-      AeroProperty->AddProperty("RAYLEIGH" , MomentumBins, AerogelRayleigh, NBins);
+      AeroProperty->AddProperty("RAYLEIGH", MomentumBins, AerogelRayleigh, NBins);
 
 
       _aerogel->SetMaterialPropertiesTable(AeroProperty);
@@ -405,13 +405,13 @@ namespace Belle2 {
         double pz = mwpc.getLength("position/z")  * CLHEP::mm / Unit::mm;
 
         G4Box* mwpcBox = new G4Box("MwpcBox", x / 2., y / 2., z / 2.);
-        G4LogicalVolume* mwpcVol = new G4LogicalVolume(mwpcBox, Materials::get(mwpc.getString("material"))  , "ARICH.mwpc");
+        G4LogicalVolume* mwpcVol = new G4LogicalVolume(mwpcBox, Materials::get(mwpc.getString("material")), "ARICH.mwpc");
         new G4PVPlacement(G4Transform3D(G4RotationMatrix(), G4ThreeVector(px, py, pz) + roffset), mwpcVol, "ARICH.mwpc", topVolume, false,
                           1);
         //setVisibility(*mwpc, true);
 
         int id = mwpc.getInt("@id", -1);
-        B2INFO("GeoARICHBtestCreator:: MWPC ID=" << id);
+        B2INFO("GeoARICHBtestCreator::" << LogVar("MWPC ID", id));
         if (id < 4 && id >= 0) {
           m_mwpc[id].tdc[0]   = mwpc.getInt("tdc/y/up");
           m_mwpc[id].tdc[1]   = mwpc.getInt("tdc/y/down");

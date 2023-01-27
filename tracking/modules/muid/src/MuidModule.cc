@@ -25,10 +25,9 @@
 /* C++ headers. */
 #include <vector>
 
-using namespace std;
 using namespace Belle2;
 
-REG_MODULE(Muid)
+REG_MODULE(Muid);
 
 MuidModule::MuidModule() :
   Module(),
@@ -74,7 +73,7 @@ MuidModule::MuidModule() :
   addParam("EnableVisualization", m_EnableVisualization, "If set to True the Geant4 visualization support is enabled.", false);
   addParam("magneticFieldStepper", m_MagneticFieldStepperName,
            "Chooses the magnetic field stepper used by Geant4. possible values are: default, nystrom, expliciteuler, simplerunge",
-           string("default"));
+           std::string("default"));
   addParam("magneticCacheDistance", m_MagneticCacheDistance,
            "Minimum distance for BField lookup in cm. If the next requested point is closer than this distance than return the flast BField value. 0 means no caching",
            0.0);
@@ -84,7 +83,7 @@ MuidModule::MuidModule() :
            "Parameter to add the found hits also to the reco tracks or not. Is turned off by default. "
            "Make sure to refit the track afterwards.",
            m_addHitsToRecoTrack);
-  vector<string> defaultCommands;
+  std::vector<std::string> defaultCommands;
   addParam("UICommands", m_UICommands, "A list of Geant4 UI commands that should be applied at the start of the job.",
            defaultCommands);
 }

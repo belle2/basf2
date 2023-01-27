@@ -2,6 +2,7 @@ Import('env')
 
 env['LIBS'] = ['mdst_dataobjects',
                'framework',
+               'GenVector',
                'belle_legacy']
 
 Return('env')

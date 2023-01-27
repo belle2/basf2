@@ -5,6 +5,7 @@
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
+
 # Physics skims
 Physics = [
     "skim accept dstar 1",
@@ -20,6 +21,8 @@ Physics = [
     "skim accept fourlep",
     "skim accept tau 2trk",
     "skim accept tau Ntrk",
+    "skim accept b charged",
+    "skim accept b neutral"
 ]
 
 # Skims used for calibration

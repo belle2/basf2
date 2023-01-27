@@ -19,21 +19,20 @@ namespace Belle2 {
   class DuplicateCDCPathPairFilter : public BaseCDCPathPairFilter {
   public:
     /// Input: pair of paths, returns 1 if too many duplicate hits found
-    TrackFindingCDC::Weight operator()(const BaseCDCPathPairFilter::Object& pair) final {
+    TrackFindingCDC::Weight operator()(const BaseCDCPathPairFilter::Object& pair) final
+    {
       const auto& lhs = *pair.first;
       const auto& rhs = *pair.second;
 
       const CDCCKFPath* shortPath = &lhs;
       const CDCCKFPath* longPath = &rhs;
-      if (longPath->size() < shortPath->size())
-      {
+      if (longPath->size() < shortPath->size()) {
         std::swap(shortPath, longPath);
       }
 
       int match = 0;
       int total = shortPath->size() - 1;
-      for (const auto& sState : *shortPath)
-      {
+      for (const auto& sState : *shortPath) {
         if (sState.isSeed()) {
           continue;
         }

@@ -193,7 +193,7 @@ class HLTZMQTestCase(TestCase):
                     raise AssertionError(
                         f"Monitoring did not show the result {search_value} for {search_key}, instead {monitoring[search_key]}")
             else:
-                raise AssertionError(f"Monitoring did not answer in time.")
+                raise AssertionError("Monitoring did not answer in time.")
 
         self.assertNothingMore(socket)
 
@@ -456,7 +456,7 @@ class BaseCollectorTestCase(HLTZMQTestCase):
     def testWrongRegistration(self):
         """test function"""
         # To make it actually look for input messages, it needs at least a single worker
-        output_socket = self.create_output_socket()
+        self.create_output_socket()
 
         # Register first worker
         input_socket = self.create_socket(self.input_port)

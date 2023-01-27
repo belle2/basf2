@@ -16,7 +16,7 @@
 #pragma link C++ class Belle2::CDCAlignment+; // checksum=0x93495a07, version=2
 #pragma link C++ class Belle2::CDCLayerAlignment+; // checksum=0x84c87874, version=1
 #pragma link C++ class Belle2::CDCMisalignment+; // checksum=0x67b5fdae, version=1
-#pragma link C++ class Belle2::CDCGeometry+; // checksum=0xe6063d38, version=4
+#pragma link C++ class Belle2::CDCGeometry+; // checksum=0xb2234303, version=5
 #pragma link C++ class Belle2::CDCGeometry::Rib+; // checksum=0x4ba6e828, version=2
 #pragma link C++ class Belle2::CDCGeometry::Rib2+; // checksum=0xbfd84675, version=1
 #pragma link C++ class Belle2::CDCGeometry::Rib3+; // checksum=0xf00885b5, version=1
@@ -39,11 +39,12 @@
 #pragma link C++ class Belle2::CDCEDepToADCConversions+; // checksum=0x3d6b427c, version=3
 #pragma link C++ class Belle2::CDCWireHitRequirements+; // checksum=0x4c504d88, version=2
 #pragma link C++ class Belle2::CDCCrossTalkLibrary+; // checksum=0x4ace6024, version=2
+#pragma link C++ class Belle2::CDCCorrToThresholds+; // checksum=0xbea4131b, version=2
 #pragma link C++ class Belle2::CDCFudgeFactorsForSigma+; // checksum=0x37bcdd67, version=1
 
 #pragma link C++ class Belle2::asicChannel+; // checksum=0x7a22a583, implicit, version=-1
 #pragma link C++ class Belle2::adcAsicTuple+; // checksum=0x953c3230, implicit, version=-1
-
+#pragma link C++ class Belle2::CDClayerTimeCut+; // checksum=0x6821631B, version=1
 
 #pragma link C++ class std::map <unsigned short, float>+; // checksum=0x868d8139, version=6
 #pragma link C++ class std::vector<float>+; // checksum=0x55a169b, version=6

@@ -23,12 +23,29 @@ namespace Belle2 {
       static constexpr int    m_nsmp     = EclConfiguration::m_nsmp; /**< number of ADC measurements for signal fitting */
       static constexpr double m_tmin     = -15; /**<  lower range of the signal fitting region in ADC clocks */
       static constexpr int    m_ntrg     = EclConfiguration::m_ntrg; /**< number of trigger counts per ADC clock tick */
-      static double           m_tickPure; /**< Digitization clock tick (in microseconds) */
       static constexpr int    m_nlPure   = EclConfiguration::m_nl * 15; /**< length of samples signal in number of ADC clocks */
       static constexpr int    m_ns       = EclConfiguration::m_ns; /**< number of samples per ADC clock */
 
       static constexpr int    m_ndtPure  = m_ns; /**< number of points per ADC tick where signal fit procedure parameters are evaluated */
 
+    private:
+      /** Digitization tick for pure CsI calorimeter (microseconds) */
+      static double m_tickPure;
+
+    public:
+      /** Getter for m_tickPure */
+      static double getTickPure()
+      {
+        if (m_tickPure < 0) {
+          m_tickPure = EclConfiguration::getTick() / EclConfiguration::m_ntrg * 8;
+        }
+        return m_tickPure;
+      }
+      /** Setter for m_tickPure */
+      static void setTickPure(double newval)
+      {
+        m_tickPure = newval;
+      }
 
       /** a struct for a signal sample for the pure CsI calorimeter */
       struct signalsamplepure_t {
@@ -56,16 +73,53 @@ namespace Belle2 {
         void AddHit(const double a, const double t0, const signalsamplepure_t& q);
       };
 
-      /** a struct for the fit parameters for the pure CsI calorimeter */
+      /**
+       * A struct for the fit parameters for a single channel of the pure CsI
+       * calorimeter (in the simulation, all calorimeter channels normally use
+       * the same set of fit parameters).
+       *
+       * For detailed description of the fit algorithm, see ECL-TN-2013-02
+       * (latest version at https://stash.desy.de/users/remnev/repos/ecl-tn-2013-02/browse/digi.pdf)
+       */
       struct fitparamspure_t {
+        /** Matrix used in shape fit algorithm.
+         *  1st index (i): signal sample ID (waveform always contains 15 signal samples)
+         *   0     -> special point that represents average pedestal value
+         *   1..15 -> signal samples
+         *  2nd index (j): tabulated point ID
+         *   0                            -> point at the ADC sample #i
+         *   1..(m_ndtPure-1)             -> points to the right of ADC sample #i
+         *   m_ndtPure..(2*m_ndtPure - 1) -> points to the left of ADC sample #i
+         */
         typedef double double_matrix[16][2 * m_ndtPure];
-        typedef double fine_array[2 * m_ndtPure];
-        double invC[16][16];
-        double_matrix f, f1;
-        double_matrix c100, c010;
-        fine_array c110, c200, c020, c101, c011;
-        double c002;
-        double c001[16];
+        /** Array used in shape fit algorithm.
+         *  1st index: tabulated point ID
+         *   0                            -> point at the signal start
+         *   1..(m_ndtPure-1)             -> points to the right of the signal start
+         *   m_ndtPure..(2*m_ndtPure - 1) -> points to the left of the signal start
+         */
+        typedef double fine_array[2 * m_ndtPure]; /**< sub-array to tabulate signal fit parameters */
+
+        double invC[16][16]; /**< inverse noise covariance matrix */
+        double_matrix f;     /**< signal response function */
+        double_matrix f1;    /**< first derivative of a signal response function */
+        /**
+         * Intermediate coefficients for the left side of the system of linear
+         * equations to reconstruct amplitude, time and pedestal
+         */
+        fine_array c110;
+        fine_array c200; /**< \see c110 */
+        fine_array c020; /**< \see c110 */
+        fine_array c101; /**< \see c110 */
+        fine_array c011; /**< \see c110 */
+        double c002;     /**< \see c110 */
+        /**
+         * Intermediate coefficients for the right side of the system of linear
+         * equations to reconstruct amplitude, time and pedestal
+         */
+        double_matrix c100;
+        double_matrix c010; /**< \see c100 */
+        double c001[16];    /**< \see c100 */
       };
 
     };

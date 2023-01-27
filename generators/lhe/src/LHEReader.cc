@@ -19,7 +19,6 @@
 #include <boost/format.hpp>
 
 #include <TF1.h>
-#include <TLorentzVector.h>
 
 using namespace std;
 using namespace Belle2;
@@ -63,14 +62,14 @@ int LHEReader::getEvent(MCParticleGraph& graph, double& eventWeight)
     if (m_meanDecayLength > 0) {
       if (p.getPDG() == m_pdgDisplaced) {
         TF1 fr("fr", "exp(-x/[0])", 0, 1000000);
-        TLorentzVector p4 = p.get4Vector();
+        ROOT::Math::PxPyPzEVector p4 = p.get4Vector();
         fr.SetRange(m_Rmin, m_Rmax);
         fr.SetParameter(0, m_meanDecayLength * p4.Gamma());
         r = fr.GetRandom();
         x = r * p4.Px() / p4.P();
         y = r * p4.Py() / p4.P();
         z = r * p4.Pz() / p4.P();
-        p.setDecayVertex(TVector3(x, y, z));
+        p.setDecayVertex(x, y, z);
         t = (r / Const::speedOfLight) * (p4.E() / p4.P());
         p.setDecayTime(t);
         p.setValidVertex(true);
@@ -78,7 +77,7 @@ int LHEReader::getEvent(MCParticleGraph& graph, double& eventWeight)
 
       if (mother > 0) {
         if (graph[mother - 1].getPDG() == m_pdgDisplaced) {
-          p.setProductionVertex(TVector3(x, y, z));
+          p.setProductionVertex(x, y, z);
           p.setProductionTime(t);
           p.setValidVertex(true);
         }
@@ -86,7 +85,7 @@ int LHEReader::getEvent(MCParticleGraph& graph, double& eventWeight)
     }
 
     if (m_wrongSignPz) { // this means we have to mirror Pz
-      TLorentzVector p4 = p.get4Vector();
+      ROOT::Math::PxPyPzEVector p4 = p.get4Vector();
       p4.SetPz(-1.0 * p4.Pz());
       p.set4Vector(p4);
     }
@@ -216,7 +215,8 @@ int LHEReader::readParticle(MCParticleGraph::GraphParticle& particle)
       particle.addStatus(MCParticle::c_PrimaryParticle);
       particle.setPDG(static_cast<int>(fields[0]));
       mother = static_cast<int>(fields[2]);
-      particle.setMomentum(TVector3(&fields[6]));
+      particle.setMomentum(ROOT::Math::XYZVector(fields[6], fields[7], fields[8]));
+      particle.setEnergy(fields[9]);
       particle.setMass(fields[10]);
       break;
     default:

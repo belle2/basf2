@@ -15,7 +15,6 @@
 // debugging
 #include <sstream> // used in print method
 
-using namespace std;
 using namespace Belle2;
 
 
@@ -36,27 +35,27 @@ SpacePointTrackCand::SpacePointTrackCand(const std::vector<const Belle2::SpacePo
 
 // 'Equal To' operator for easier comparison of SpacePointTrackCands (e.g. for testing this class)
 // bool operator== (SpacePointTrackCand& lhs, SpacePointTrackCand& rhs)
-bool SpacePointTrackCand::operator== (const SpacePointTrackCand& rhs)
+bool SpacePointTrackCand::operator== (const SpacePointTrackCand& rhs) const
 {
   const auto& lhsHits = this->getHits();
   const auto& rhsHits = rhs.getHits();
 
   // if one TrackCand has no SpacePoint, equality is not possible and further comparing is not needed
   if (lhsHits.size() == 0 || rhsHits.size() == 0) {
-    B2DEBUG(80, "At least one of the SpacePointTrackCands does not contain any SpacePoints");
+    B2DEBUG(28, "At least one of the SpacePointTrackCands does not contain any SpacePoints");
     return false;
   }
 
   // compare number of SpacePoints in TrackCandidate, return false if not equal
   if (lhsHits.size() != rhsHits.size()) {
-    B2DEBUG(80, "Numbers of SpacePoints in SpacePointTrackCands do not match");
+    B2DEBUG(28, "Numbers of SpacePoints in SpacePointTrackCands do not match");
     return false;
   }
 
   // compare pointers to SpacePoint, if one is not equal, return false
   for (unsigned int iSP = 0; iSP < lhsHits.size(); ++iSP) {
     if (lhsHits[iSP] != rhsHits[iSP]) {
-      B2DEBUG(80, "SpacePoints " << iSP << " do not match");
+      B2DEBUG(28, "SpacePoints " << iSP << " do not match");
       return false;
     }
   }
@@ -152,11 +151,11 @@ void SpacePointTrackCand::removeSpacePoint(int indexInTrackCand)
 
 // genfit::TrackCand prints to stdout, as does the Print method from ROOT TVectorD (which is invoked here).
 // I build a stringstrem, which I then hand over B2DEBUG
-// there is a somewhat nasty hack to intercept the output to the stdout by redirecting the stdout to a buffer, which can then be put into a stringstream. This is however platform-dependent and not very C++ like and therefore not done here (this would be needed for having the ROOT output in the log files which are created from within a steering file)
+// there is a somewhat nasty hack to intercept the output to the stdout by redirecting the stdout to a buffer, which can then be put into a std::stringstream. This is however platform-dependent and not very C++ like and therefore not done here (this would be needed for having the ROOT output in the log files which are created from within a steering file)
 // however the LogSystem provides a way to check if ROOT output is actually needed (check the LogLevel and the DebugLevel)
 void SpacePointTrackCand::print(int debuglevel, const Option_t* option) const
 {
-  stringstream output;
+  std::stringstream output;
   output << " ======= SpacePointTrackCand::print() ======= \n";
   output << "This track candidate has " << m_trackSpacePoints.size() << " SpacePoints\n";
   output << "mcTrackId: " << m_MCTrackID << "\n";
@@ -203,12 +202,12 @@ void SpacePointTrackCand::print(int debuglevel, const Option_t* option) const
   B2DEBUG(debuglevel, output.str());
 }
 
-// get referee status as string
+// get referee status as std::string
 // COULDDO: this can possibly be done with switch - case, which is probably faster
 std::string SpacePointTrackCand::getRefereeStatusString(std::string delimiter) const
 {
   std::string statusString;
-  if (getRefereeStatus() == 0) return statusString; // return empty string if there is no status
+  if (getRefereeStatus() == 0) return statusString; // return empty std::string if there is no status
   if (hasRefereeStatus(c_checkedByReferee)) statusString += "checkedByReferee" + delimiter;
   if (hasRefereeStatus(c_checkedClean)) statusString += "checkedClean" + delimiter;
   if (hasRefereeStatus(c_hitsOnSameSensor)) statusString += "hitsOnSameSensor" + delimiter;

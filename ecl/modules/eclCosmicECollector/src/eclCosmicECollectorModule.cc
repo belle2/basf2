@@ -31,7 +31,7 @@ using namespace ECL;
 /**-----------------------------------------------------------------*/
 //                 Register the Module
 /**-----------------------------------------------------------------*/
-REG_MODULE(eclCosmicECollector)
+REG_MODULE(eclCosmicECollector);
 
 /**-----------------------------------------------------------------*/
 //                 Implementation

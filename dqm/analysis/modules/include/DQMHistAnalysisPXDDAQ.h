@@ -12,44 +12,62 @@
 
 #pragma once
 
+#include <dqm/core/DQMHistAnalysis.h>
+
 #ifdef _BELLE2_EPICS
 // EPICS
 #include "cadef.h"
 #endif
 
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
-
-#include <TH1F.h>
 #include <TH2F.h>
-#include <TCanvas.h>
 
 namespace Belle2 {
   /*! DQM Histogram Analysis for PXD DAQ */
 
-  class DQMHistAnalysisPXDDAQModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisPXDDAQModule final : public DQMHistAnalysisModule {
 
     // Public functions
   public:
 
-    //! Constructor
+    /**
+     * Constructor.
+     */
     DQMHistAnalysisPXDDAQModule();
-    //! Destructor
-    ~DQMHistAnalysisPXDDAQModule();
-  private:
 
-    //! Module functions to be called from main process
+    /**
+     * Destructor.
+     */
+    ~DQMHistAnalysisPXDDAQModule();
+
+    /**
+     * Initializer.
+     */
     void initialize(void) override final;
 
-    //! Module functions to be called from event process
+    /**
+     * Called when entering a new run.
+     */
     void beginRun(void) override final;
+
+    /**
+     * This method is called for each event.
+     */
     void event(void) override final;
+
+    /**
+     * This method is called at the end of the event processing.
+     */
     void terminate(void) override final;
+
+  private:
 
     // Data members
     //! name of histogram directory
     std::string m_histogramDirectoryName;
     //! prefix for EPICS PVs
     std::string m_pvPrefix;
+    /** Update entry intervall */
+    int m_minEntries = 10000;
 
     //! Histogram covering all error types
     TH1* m_hDAQError = nullptr;
@@ -60,7 +78,9 @@ namespace Belle2 {
     //! Histogram covering all modules*DHP
     TH1F* m_hMissingDHP = nullptr;
     //! Histogram covering stat
-    TH1F* m_hStatistic = nullptr;
+    TH1D* m_hStatistic = nullptr;
+    //! Histogram preserving last stat upd
+    TH1* m_hDaqStatOld = nullptr;
     //! Final Canvas
     TCanvas* m_cDAQError = nullptr;
     //! Final Canvas
@@ -71,6 +91,8 @@ namespace Belle2 {
     TCanvas* m_cMissingDHP = nullptr;
     //! Final Canvas
     TCanvas* m_cStatistic = nullptr;
+    //! Final Canvas
+    TCanvas* m_cStatisticUpd = nullptr;
 
 
     /** Monitoring Object */

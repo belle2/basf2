@@ -6,6 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <framework/database/DBImportObjPtr.h>
+#include <framework/logging/Logger.h>
 #include <ecl/dbobjects/ECLDigitWaveformParameters.h>
 #include <iostream>
 #include <TFile.h>
@@ -20,7 +21,7 @@ int main()
   //
   TFile* WaveformParameterFileInput = new TFile(FileName, "READ");
   if (!WaveformParameterFileInput or WaveformParameterFileInput->IsZombie()) {
-    std::cout << "Could not open file " << FileName << std::endl;;
+    B2FATAL("Could not open file " << FileName);
   }
   WaveformParameterFileInput->cd();
   TTree* WaveformParametersTree = (TTree*) WaveformParameterFileInput->Get("ParTree");

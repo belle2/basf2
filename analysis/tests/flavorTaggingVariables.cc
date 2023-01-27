@@ -27,7 +27,6 @@
 #include <gtest/gtest.h>
 
 #include <TMatrixFSym.h>
-#include <TLorentzVector.h>
 
 using namespace std;
 using namespace Belle2;
@@ -161,17 +160,17 @@ namespace {
     /** Vector containing the energy, theta, phi and radius values for each charged ROE ECLCluster */
     vector<vector<double>> roeChargedECLClusterProperties{{0.964336, 1.23481, -2.25428, 148.729},
       {0.214864, 0.965066,   -0.232973, 170.008},
-      {0.0148855, 0.914396,  1.01693  , 175.861},
-      {0.524092, 0.956389,   0.854331 , 171.378},
-      {0.230255, 1.33317,    -1.45326 , 144.849}};
+      {0.0148855, 0.914396,  1.01693, 175.861},
+      {0.524092, 0.956389,   0.854331, 171.378},
+      {0.230255, 1.33317,    -1.45326, 144.849}};
 
     unsigned int chargedECLCLusterCounter = 0;
 
     /** Create charged particles from tracks for first ROE. */
     for (unsigned i = 0; i < roeTRFCharges.size(); ++i) {
 
-      TVector3 position(roeTFRProperties[i][0], roeTFRProperties[i][1], roeTFRProperties[i][2]);
-      TVector3 momentum(roeTFRProperties[i][3], roeTFRProperties[i][4], roeTFRProperties[i][5]);
+      ROOT::Math::XYZVector position(roeTFRProperties[i][0], roeTFRProperties[i][1], roeTFRProperties[i][2]);
+      ROOT::Math::XYZVector momentum(roeTFRProperties[i][3], roeTFRProperties[i][4], roeTFRProperties[i][5]);
 
       testsTFRs.appendNew(position, momentum, cov6, roeTRFCharges[i], Const::pion, roeTFRProperties[i][6], bField, roeTRFCDCValues[i],
                           roeTRFVXDValues[i], 0);
@@ -227,7 +226,7 @@ namespace {
 
 
     /** Test if we created the ROE ECLCLusters correctly */
-    TLorentzVector roe1FourVectorECLClusters = roe -> get4VectorNeutralECLClusters();
+    ROOT::Math::PxPyPzEVector roe1FourVectorECLClusters = roe->get4VectorNeutralECLClusters();
 
     B2INFO("The total four momentum of the neutral clusters in the first test ROE is = ("
            << roe1FourVectorECLClusters.E() << ", "

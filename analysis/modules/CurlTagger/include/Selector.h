@@ -24,11 +24,16 @@ namespace Belle2 {
       /** Destructor */
       virtual ~Selector() {};
 
-      /** returns selector response that two particles are actual from same mc/data particle */
+      /** returns selector response after comparing the two particles
+      higher values indicate a higher certainty that the two reconstructed particles
+      correspond to the same underlying true particle */
       virtual float getResponse(Particle*, Particle*) = 0;
 
       /** returns vector of variables used by the selector */
       virtual std::vector<float> getVariables(Particle*, Particle*) = 0;
+
+      /** returns optimal cut to use with selector */
+      virtual float getOptimalResponseCut() {return 0.5;};
 
       /** initialise selector if needed */
       virtual void initialize() {};

@@ -7,22 +7,16 @@
  **************************************************************************/
 
 #include <tracking/modules/spacePointCreator/RT2SPTCConverterModuleDev.h>
-#include <tracking/spacePointCreation/SpacePointTrackCand.h>
 
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <algorithm> // find
 
-#include <svd/dataobjects/SVDCluster.h>
-#include <mdst/dataobjects/MCParticle.h>
-#include <svd/dataobjects/SVDTrueHit.h>
-#include <pxd/dataobjects/PXDTrueHit.h>
-
 using namespace Belle2;
 using ConversionState = std::bitset<2>;
 
-REG_MODULE(RT2SPTCConverter)
+REG_MODULE(RT2SPTCConverter);
 
 RT2SPTCConverterModule::RT2SPTCConverterModule() :
   Module(),
@@ -39,9 +33,9 @@ RT2SPTCConverterModule::RT2SPTCConverterModule() :
   addParam("SVDClusters", m_SVDClusterName, "SVDCluster collection name", std::string(""));
 
   addParam("SVDSpacePointStoreArrayName", m_svdSpacePointsStoreArrayName, "Name of the collection for SVD.",
-           boost::make_optional<std::string>("SVDSpacePoints"));
+           std::make_optional<std::string>("SVDSpacePoints"));
   addParam("PXDSpacePointStoreArrayName", m_pxdSpacePointsStoreArrayName, "Name of the collection for PXD.",
-           boost::make_optional<std::string>("PXDSpacePoints"));
+           std::make_optional<std::string>("PXDSpacePoints"));
 
   // optional input
   addParam("SVDSingleClusterSP", m_SVDSingleClusterSPName, "SVD single Cluster SpacePoints collection name.", std::string(""));
@@ -95,35 +89,29 @@ void RT2SPTCConverterModule::initialize()
   initializeCounters();
 
   // check if all required StoreArrays are here
-  StoreArray<SVDCluster> SVDClusters; SVDClusters.isRequired(m_SVDClusterName);
+  m_SVDClusters.isRequired(m_SVDClusterName);
   if (m_pxdSpacePointsStoreArrayName) {
-    StoreArray<SpacePoint> spacePoints;
-    spacePoints.isRequired(*m_pxdSpacePointsStoreArrayName);
+    m_PXDSpacePoints.isRequired(*m_pxdSpacePointsStoreArrayName);
   }
   if (m_svdSpacePointsStoreArrayName) {
-    StoreArray<SpacePoint> spacePoints;
-    spacePoints.isRequired(*m_svdSpacePointsStoreArrayName);
+    m_SVDSpacePoints.isRequired(*m_svdSpacePointsStoreArrayName);
   }
 
-
-  StoreArray<RecoTrack> recoTracks(m_RecoTracksName);
-  recoTracks.isRequired(m_RecoTracksName);
+  m_RecoTracks.isRequired(m_RecoTracksName);
 
   // registering StoreArray for SpacePointTrackCand
-  StoreArray<SpacePointTrackCand> spTrackCand(m_SPTCName);
-  spTrackCand.registerInDataStore(m_SPTCName, DataStore::c_ErrorIfAlreadyRegistered);
+  m_SpacePointTrackCands.registerInDataStore(m_SPTCName, DataStore::c_ErrorIfAlreadyRegistered);
 
-  StoreArray<MCParticle> mcparticles;
-  if (mcparticles.isOptional()) {
+  if (m_MCParticles.isOptional()) {
     m_mcParticlesPresent = true;
   }
 
   if (m_useTrueHits) {
-    StoreArray<SVDTrueHit> SVDTrueHit; SVDTrueHit.isRequired();
+    m_SVDTrueHit.isRequired();
   }
 
   // register Relation to RecoTrack
-  spTrackCand.registerRelationTo(recoTracks);
+  m_SpacePointTrackCands.registerRelationTo(m_RecoTracks);
 
   m_trackSel = new NoKickRTSel(m_noKickCutsFile, m_noKickOutput);
 
@@ -136,12 +124,7 @@ void RT2SPTCConverterModule::event()
   const int eventCounter = eventMetaDataPtr->getEvent();
   B2DEBUG(20, "RT2SPTCConverter::event(). Processing event " << eventCounter << " --------");
 
-  StoreArray<RecoTrack> m_recoTracks(m_RecoTracksName);
-  StoreArray<SpacePointTrackCand> spacePointTrackCands(m_SPTCName); // output StoreArray
-
-  StoreArray<SVDCluster> svdClusters(m_SVDClusterName);
-
-  for (auto& recoTrack : m_recoTracks) {
+  for (auto& recoTrack : m_RecoTracks) {
 
     // if corresponding flag is set only use fitted tracks
     if (m_convertFittedOnly and not recoTrack.wasFitSuccessful()) continue;
@@ -217,16 +200,16 @@ void RT2SPTCConverterModule::event()
     }
 
     // convert momentum and position seed into a single 6D seed
-    TVector3 momentumSeed = recoTrack.getMomentumSeed();
-    TVector3 positionSeed = recoTrack.getPositionSeed();
+    const ROOT::Math::XYZVector& momentumSeed = recoTrack.getMomentumSeed();
+    const ROOT::Math::XYZVector& positionSeed = recoTrack.getPositionSeed();
 
     TVectorD seed6D(6);
-    seed6D[0] = positionSeed.x();
-    seed6D[1] = positionSeed.y();
-    seed6D[2] = positionSeed.z();
-    seed6D[3] = momentumSeed.Px();
-    seed6D[4] = momentumSeed.Py();
-    seed6D[5] = momentumSeed.Pz();
+    seed6D[0] = positionSeed.X();
+    seed6D[1] = positionSeed.Y();
+    seed6D[2] = positionSeed.Z();
+    seed6D[3] = momentumSeed.X();
+    seed6D[4] = momentumSeed.Y();
+    seed6D[5] = momentumSeed.Z();
     spacePointTC.set6DSeed(seed6D);
     spacePointTC.setCovSeed(recoTrack.getSeedCovariance());
 
@@ -235,7 +218,7 @@ void RT2SPTCConverterModule::event()
       if (m_markRecoTracks) recoTrack.setDirtyFlag(false);
     }
 
-    spacePointTrackCands.appendNew(spacePointTC)->addRelationTo(&recoTrack);
+    m_SpacePointTrackCands.appendNew(spacePointTC)->addRelationTo(&recoTrack);
   } // end RecoTrack loop
 }
 
@@ -286,10 +269,12 @@ RT2SPTCConverterModule::getSpacePointsFromRecoHitInformationViaTrueHits(std::vec
 
     // NOTE: double cluster SVD SP and PXD SP should be stored in the same StoreArray!
     const SpacePoint* relatedSpacePoint = [this, hitInfo, relatedTrueHit]() -> const SpacePoint* {
-      if (m_svdSpacePointsStoreArrayName and hitInfo->getTrackingDetector() == RecoHitInformation::c_SVD) {
+      if (m_svdSpacePointsStoreArrayName and hitInfo->getTrackingDetector() == RecoHitInformation::c_SVD)
+      {
         return relatedTrueHit->getRelatedFrom<SpacePoint>(*m_svdSpacePointsStoreArrayName);
       }
-      if (m_pxdSpacePointsStoreArrayName and hitInfo->getTrackingDetector() == RecoHitInformation::c_PXD) {
+      if (m_pxdSpacePointsStoreArrayName and hitInfo->getTrackingDetector() == RecoHitInformation::c_PXD)
+      {
         return relatedTrueHit->getRelatedFrom<SpacePoint>(*m_pxdSpacePointsStoreArrayName);
       }
       return nullptr;
@@ -373,6 +358,7 @@ RT2SPTCConverterModule::getSpacePointsFromRecoHitInformations(std::vector<RecoHi
               relatedSpacePointsA.size());
 
       // Try to verify SpacePoint by using next cluster to build a U/V pair.
+      // cppcheck-suppress knownConditionTrueFalse
       if (clusterA && clusterB && (clusterA->isUCluster() != clusterB->isUCluster())) {
         auto relatedSpacePointsB = clusterB->getRelationsFrom<SpacePoint>(*m_svdSpacePointsStoreArrayName);
 

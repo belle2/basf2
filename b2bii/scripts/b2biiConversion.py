@@ -68,6 +68,7 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
         convertBeamParameters (bool): Convert beam parameters or use information stored in Belle II database.
         generatorLevelReconstruction (bool): Enables to bypass skims and corrections applied in B2BIIFixMdst.
         generatorLevelMCMatching (bool): Enables to switch MCTruth matching to generator-level particles.
+            This is recommended for analyses with gammas in the final state.
         path (basf2.Path): Path to add modules in.
         entrySequences (list(str)): The number sequences (e.g. 23:42,101) defining
             the entries which are processed for each inputFileName.
@@ -127,11 +128,11 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
     # we need magnetic field which is different than default.
     # shamelessly copied from analysis/scripts/modularAnalysis.py:inputMdst
     from ROOT import Belle2  # reduced scope of potentially-misbehaving import
+    from ROOT.Math import XYZVector
     field = Belle2.MagneticField()
     field.addComponent(
         Belle2.MagneticFieldComponentConstant(
-            Belle2.B2Vector3D(
-                0, 0, 1.5 * Belle2.Unit.T)))
+            XYZVector(0, 0, 1.5 * Belle2.Unit.T)))
     Belle2.DBStore.Instance().addConstantOverride("MagneticField", field, False)
 
     if (not generatorLevelReconstruction):

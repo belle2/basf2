@@ -6,11 +6,11 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef BABAYAGANLO_H
-#define BABAYAGANLO_H
+#pragma once
 
 #include <mdst/dataobjects/MCParticleGraph.h>
-#include <TLorentzRotation.h>
+#include <Math/LorentzRotation.h>
+#include <Math/Vector3D.h>
 #include <utility>
 
 namespace Belle2 {
@@ -176,12 +176,13 @@ namespace Belle2 {
 
     /** Generates one single event.
      * @param mcGraph Reference to the MonteCarlo graph into which the generated particles will be stored.
+     * @param ecm Centre of mass energy.
+     * @param vertex Production vertex.
+     * @param boost Lorentz boost vector.
      */
-    void generateEvent(MCParticleGraph& mcGraph, double ecm, TVector3 vertex, TLorentzRotation boost);
+    void generateEvent(MCParticleGraph& mcGraph, double ecm, ROOT::Math::XYZVector vertex, ROOT::Math::LorentzRotation boost);
 
-    /** Returns weight
-     * @param SDif Returns weight
-     */
+    /** Returns weight */
     double getSDif() {return m_sDif;};
 
     /**
@@ -232,7 +233,7 @@ namespace Belle2 {
     double m_fMax;  /**< Maximum of differential cross section. */
     double m_sDif;  /**< Differential xsec/weight used for event. */
 
-    TLorentzRotation m_boostVector; /**< The Lorentz boost vector for the transformation CMS to LAB frame. */
+    ROOT::Math::LorentzRotation m_boostVector; /**< The Lorentz boost vector for the transformation CMS to LAB frame. */
 
     /** Apply the settings to the internal Fortran generator. */
     void applySettings();
@@ -241,10 +242,14 @@ namespace Belle2 {
      * @param mcGraph Reference to the MonteCarlo graph into which the particle should be stored.
      * @param mom The 3-momentum of the particle in [GeV].
      * @param pdg The PDG code of the particle.
+     * @param vertex Production vertex.
+     * @param boost Lorentz boost vector.
      * @param isVirtual If the particle is a virtual particle, such as the incoming particles, set this to true.
      * @param isInitial If the particle is a initial particle for ISR, set this to true.
+     * @param isISRFSR If the particle is from ISR or FSR, set this to true.
      */
-    void storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, TVector3 vertex, TLorentzRotation boost,
+    void storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, ROOT::Math::XYZVector vertex,
+                       ROOT::Math::LorentzRotation boost,
                        bool isVirtual = false, bool isInitial = false, bool isISRFSR = false);
 
   private:
@@ -253,6 +258,3 @@ namespace Belle2 {
     double m_xpar[100];  /**< Double parameters for BabayagaNLO. */
   };
 }
-
-
-#endif /* BABAYAGANLO_H */

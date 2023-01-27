@@ -16,7 +16,7 @@ using namespace std;
 using namespace Belle2;
 
 
-REG_MODULE(SVDSpacePointCreator)
+REG_MODULE(SVDSpacePointCreator);
 
 SVDSpacePointCreatorModule::SVDSpacePointCreatorModule() :
   Module()

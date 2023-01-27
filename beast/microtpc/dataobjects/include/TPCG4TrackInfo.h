@@ -27,7 +27,7 @@ namespace Belle2 {
   public:
 
     /** default constructor for ROOT */
-    TPCG4TrackInfo(): m_trackID(0) , m_PDG(0), m_Mass(0), m_Energy(0), m_vtx(), m_mom() {}
+    TPCG4TrackInfo(): m_trackID(0), m_PDG(0), m_Mass(0), m_Energy(0), m_vtx(), m_mom() {}
 
 
     /** Standard constructor

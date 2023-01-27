@@ -8,10 +8,12 @@
 
 // Own include
 #include <dqm/analysis/modules/DQMHistAnalysisHLTMonObj.h>
-// software trigger include
-#include <hlt/softwaretrigger/modules/dqm/SoftwareTriggerHLTDQMModule.h>
-//DQM
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+
+// Belle 2 headers.
+#include <hlt/utilities/Units.h>
+
+// C++ headers
+#include <regex>
 
 using namespace std;
 using namespace Belle2;
@@ -41,7 +43,7 @@ void DQMHistAnalysisHLTMonObjModule::initialize()
 
   // make canvases to be added to MonitoringObject
   m_c_filter = new TCanvas("Filter", "filter", 750, 400);
-  m_c_skim = new TCanvas("Skim" , "skim", 400, 400);
+  m_c_skim = new TCanvas("Skim", "skim", 400, 400);
   m_c_hardware = new TCanvas("Hardware", "hardware", 1000, 1000);
   m_c_l1 = new TCanvas("L1", "l1", 750, 400);
 
@@ -53,15 +55,6 @@ void DQMHistAnalysisHLTMonObjModule::initialize()
 
 }
 
-void DQMHistAnalysisHLTMonObjModule::beginRun()
-{
-}
-
-void DQMHistAnalysisHLTMonObjModule::event()
-{
-  // can put the analysis code here or in endRun() function
-  // for the start tests we will store output only end of run so better to put code there
-}
 
 void DQMHistAnalysisHLTMonObjModule::endRun()
 {
@@ -234,7 +227,7 @@ void DQMHistAnalysisHLTMonObjModule::endRun()
   TH1* h_budgetUnit = nullptr;
   TH1* h_memoryUnit = nullptr;
 
-  for (unsigned int index = 1; index <= SoftwareTrigger::HLTUnit::max_hlt_units; index++) {
+  for (unsigned int index = 1; index <= HLTUnits::max_hlt_units; index++) {
     // add budget time per unit
     h_budgetUnit = findHist(("timing_statistics/fullTimePerUnitHistogram_HLT" + std::to_string(index)).c_str());
     double bgunit = 0.;

@@ -22,7 +22,7 @@ namespace Belle2 {
   public:
     /** Default constructor*/
     SVDHistograms():
-      SVDHistograms(H(), H(), H() , H()) {}; /**< the class is built with a default histogram for L3 and L456, U and V sides*/
+      SVDHistograms(H(), H(), H(), H()) {};  /**< the class is built with a default histogram for L3 and L456, U and V sides*/
 
     /** Use @param templateHisto to initialize all the histograms*/
     explicit SVDHistograms(const H& templateHisto):
@@ -44,7 +44,7 @@ namespace Belle2 {
 
     /** This enumeration assure the same semantic of the
     isU methods defined by Peter Kv.*/
-    enum E_side { VIndex = 0 , UIndex = 1 };
+    enum E_side { VIndex = 0, UIndex = 1 };
 
     /** get a reference to the histogram for @param vxdID side @param view
      * please, use the enumeration SVDHistograms::Vindex and
@@ -91,12 +91,12 @@ namespace Belle2 {
       std::string ladder = std::to_string(vxdID.getLadderNumber());
       std::string sensor = std::to_string(vxdID.getSensorNumber());
       std::string view = isU ? "U" : "V" ;
-      base = std::regex_replace(base, std::regex("[@]layer") , layer);
+      base = std::regex_replace(base, std::regex("[@]layer"), layer);
       base = std::regex_replace(base, std::regex("[@]ladder"), ladder);
       base = std::regex_replace(base, std::regex("[@]sensor"), sensor);
-      base = std::regex_replace(base, std::regex("[@]view")  , view);
+      base = std::regex_replace(base, std::regex("[@]view"), view);
       std::string side = isU ? "P" : "N" ;
-      base = std::regex_replace(base, std::regex("[@]side")  , side);
+      base = std::regex_replace(base, std::regex("[@]side"), side);
     }
 
     /** delete pointers*/
@@ -144,7 +144,7 @@ namespace Belle2 {
 
     void customize(H& histogram, VxdID vxdID, int view); /**< customize the histogram with the sensor, view*/
 
-    ClassDef(SVDHistograms , 1); /**< needed by root*/
+    ClassDef(SVDHistograms, 1);  /**< needed by root*/
   };
 
   /** constructor, builds all histograms and customize them*/
@@ -175,7 +175,7 @@ namespace Belle2 {
             H h = layerNumber == 3 && view == UIndex ? templateU3 :
                   layerNumber == 3 && view == VIndex ? templateV3 :
                   view == UIndex ? templateU456 : templateV456 ;
-            customize(h , sensor, view);
+            customize(h, sensor, view);
             m_histograms[layerNumber][ladderNumber][sensorNumber][view] = new H(h);
           }
         }

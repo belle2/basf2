@@ -26,7 +26,7 @@ class ItemFilter:
     """
 
     def __init__(self, args):
-        """initilization, just remember the arguments or parser"""
+        """initialization, just remember the arguments or parser"""
         #: arguments, either :class:`argparse.ArgumentParser` on initialization
         # or :class:`argparse.Namespace` after argument parsing
         self._args = args
@@ -57,7 +57,7 @@ class ItemFilter:
         """
         Convert to a text representation of the form ' [regex filter=TERM exclude=TERM]'.
 
-        The space in the beginnin is intentional to allow easy adding to a
+        The space in the beginning is intentional to allow easy adding to a
         description without extra spaces
 
         If no filtering is performed an empty string is returned. If the

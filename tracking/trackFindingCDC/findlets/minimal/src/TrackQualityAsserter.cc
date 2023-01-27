@@ -20,7 +20,7 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 TrackQualityAsserter::TrackQualityAsserter()
-  : m_param_corrections( {"LayerBreak", "LargeAngle", "OneSuperlayer", "Small"})
+  : m_param_corrections({"LayerBreak", "LargeAngle", "OneSuperlayer", "Small"})
 , m_param_onlyNotFittedTracks(false)
 {
 }

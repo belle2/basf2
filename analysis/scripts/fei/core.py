@@ -45,17 +45,6 @@
  to train all the necessary multivariate classifiers.
 """
 
-# FEI defines own command line options, therefore we disable
-# the ROOT command line options, which otherwise interfere sometimes.
-from ROOT import PyConfig
-PyConfig.IgnoreCommandLineOptions = True  # noqa
-
-# FEI uses multi-threading for parallel execution of tasks therefore
-# the ROOT gui-thread is disabled, which otherwise interferes sometimes
-PyConfig.StartGuiThread = False  # noqa
-import ROOT
-from ROOT import Belle2
-
 # Import basf2
 import basf2
 from basf2 import B2INFO, B2WARNING
@@ -63,12 +52,10 @@ import pybasf2
 import modularAnalysis as ma
 import b2bii
 
-import basf2_mva
-
 # Should come after basf2 import
 import pdg
-
 from fei import config
+import basf2_mva
 
 # Standard python modules
 import collections
@@ -133,13 +120,13 @@ class TrainingDataInformation:
         Read out the number of MC particles from the file created by reconstruct
         """
         # Unique absolute pdg-codes of all particles
+        # Always avoid the top-level 'import ROOT'.
+        import ROOT  # noqa
         root_file = ROOT.TFile.Open(self.filename, 'read')
         mc_counts = {}
 
-        Belle2.Variable.Manager
-
         for key in root_file.GetListOfKeys():
-            variable = Belle2.invertMakeROOTCompatible(key.GetName())
+            variable = ROOT.Belle2.MakeROOTCompatible.invertMakeROOTCompatible(key.GetName())
             pdg = abs(int(variable[len('NumberOfMCParticlesInEvent('):-len(")")]))
             hist = key.ReadObj()
             mc_counts[pdg] = {}
@@ -191,7 +178,7 @@ class FSPLoader:
         else:
             ma.fillParticleLists([('K+:FSP', ''), ('pi+:FSP', ''), ('e+:FSP', ''),
                                   ('mu+:FSP', ''), ('gamma:FSP', ''),
-                                  ('p+:FSP', ''), ('K_L0:FSP', '')], writeOut=True, loadPhotonBeamBackgroundMVA=False, path=path)
+                                  ('p+:FSP', ''), ('K_L0:FSP', '')], writeOut=True, path=path)
             ma.fillParticleList('K_S0:V0 -> pi+ pi-', '', writeOut=True, path=path)
             ma.fillParticleList('Lambda0:V0 -> p+ pi-', '', writeOut=True, path=path)
             ma.fillConvertedPhotonsList('gamma:V0 -> e+ e-', '', writeOut=True, path=path)
@@ -634,6 +621,11 @@ class Teacher:
         """
         Do all trainings for which we find training data
         """
+        # Always avoid the top-level 'import ROOT'.
+        import ROOT  # noqa
+        # FEI uses multi-threading for parallel execution of tasks therefore
+        # the ROOT gui-thread is disabled, which otherwise interferes sometimes
+        ROOT.PyConfig.StartGuiThread = False
         job_list = []
         filename = 'training_input.root'
         if not os.path.isfile(filename):

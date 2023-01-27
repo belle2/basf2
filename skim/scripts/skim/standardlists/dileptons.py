@@ -26,7 +26,6 @@ def loadStdDiLeptons(persistent=True, path=None):
 
     loadStdLooseJpsi2mumu(persistent, path)
     loadStdLooseJpsi2ee(persistent, path)
-    loadStdLooseJpsi2ee_noTOP(persistent, path)
     loadStdLoosePsi2s2mumu(persistent, path)
     loadStdLoosePsi2s2ee(persistent, path)
     loadStdPsi2s2lepton(persistent, path)

@@ -51,7 +51,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     return MyFancyClassifier(parameters)
 
 
-def begin_fit(state, Xtest, Stest, ytest, wtest):
+def begin_fit(state, Xtest, Stest, ytest, wtest, nBatches):
     """
     Is called once per training after get_model.
     You can initialize your training here.
@@ -61,6 +61,7 @@ def begin_fit(state, Xtest, Stest, ytest, wtest):
     @param Stest numpy array containing the spectators of the validation sample
     @param ytest numpy array containing the target values of the validation sample
     @param wtest numpy array containing the weights of the validation sample
+    @param nBatches int containing the number of batches that will be passed to partial_fit in each epoch.
 
     Since our method does not support out-of-core fitting, the usual thing is to add
     some arrays which collect the data passed to partial_fit.
@@ -71,7 +72,7 @@ def begin_fit(state, Xtest, Stest, ytest, wtest):
     return state
 
 
-def partial_fit(state, X, S, y, w, epoch):
+def partial_fit(state, X, S, y, w, epoch, batch):
     """
     Can be called multiple times per training depending on the user configuration:
     If m_nIterations == 1 and m_mini_batch_size == 0 (these are the default values)
@@ -92,7 +93,8 @@ def partial_fit(state, X, S, y, w, epoch):
     @param S numpy array containing the spectators of the training sample
     @param y numpy array containing the target values of the training sample
     @param w numpy array containing the weights of the training sample
-    @param epoch the total number of previous calls to partial_fit
+    @param epoch the index of the current iteration through the total data set.
+    @param batch the index of the current mini batch passed to partial_fit
 
     Since our method doesn't use the streaming capability,
     we just collect the data in our state object.
@@ -179,7 +181,7 @@ if __name__ == "__main__":
                  'daughter(0, dz)', 'daughter(1, dz)',
                  'daughter(0, chiProb)', 'daughter(1, chiProb)', 'daughter(2, chiProb)',
                  'daughter(0, kaonID)', 'daughter(0, pionID)',
-                 'daughterInvariantMass(0, 1)', 'daughterInvariantMass(0, 2)', 'daughterInvariantMass(1, 2)']
+                 'daughterInvM(0, 1)', 'daughterInvM(0, 2)', 'daughterInvM(1, 2)']
 
     general_options = basf2_mva.GeneralOptions()
     general_options.m_datafiles = basf2_mva.vector("train.root")
@@ -240,5 +242,5 @@ if __name__ == "__main__":
 
     # We calculate the AUC ROC value of the returned probability and target,
     # our method is very simple, so the AUC won't be good :-)
-    auc = basf2_mva_util.calculate_roc_auc(p, t)
+    auc = basf2_mva_util.calculate_auc_efficiency_vs_background_retention(p, t)
     print("Custom Method", auc)

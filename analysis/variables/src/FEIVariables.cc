@@ -6,7 +6,13 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+// Own include
 #include <analysis/variables/FEIVariables.h>
+
+// include VariableManager
+#include <analysis/VariableManager/Manager.h>
+
+#include <analysis/dataobjects/Particle.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
@@ -21,7 +27,7 @@ namespace Belle2 {
 
     int mostcommonBTagIndex(const Particle* part)
     {
-      std::map <int, int>tag_candidates;
+      std::map <int, int> tag_candidates;
       const std::vector<const Particle*>& fsp_tag = part->getFinalStateDaughters();
       for (const Particle* fsp : fsp_tag) {
         const MCParticle* mc_fsp = fsp->getMCParticle();
@@ -36,6 +42,7 @@ namespace Belle2 {
       }
       int tag_index = -1;
       int tag_N = 0;
+      // cppcheck-suppress unassignedVariable
       for (const auto& [key, value] : tag_candidates) {
         if (value > tag_N) {
           tag_index = key;

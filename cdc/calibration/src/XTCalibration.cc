@@ -480,7 +480,7 @@ void XTCalibration::readXTFromText()
   short np = 0;
   unsigned short iCL, iLR;
   //  const unsigned short npx = nXTParams - 1;
-  double xtc[npar];
+  double xtc[npar]; // cppcheck-suppress constVariable
   double theta, alpha, dummy1;
   unsigned nRead = 0;
   //  unsigned m_xtParamMode_old;

@@ -207,7 +207,7 @@ namespace Belle2 {
         mean_FWD += TCID[TCId - 1];
       } else if (TCId < 513) { //Barrel
         mean_BAR += TCID[TCId - 1];
-      } else if (TCId > 512) { //Backward Endcap
+      } else { //Backward Endcap
         mean_BWD += TCID[TCId - 1];
       }
     }
@@ -220,7 +220,7 @@ namespace Belle2 {
         if (TCID[TCId - 1] < mean_FWD * 0.1)m_FWD++;
       } else if (TCId < 513) { //Barrel
         if (TCID[TCId - 1] < mean_BAR * 0.1)m_BAR++;
-      } else if (TCId > 512) { //Backward Endcap
+      } else { //Backward Endcap
         if (TCID[TCId - 1] < mean_BWD * 0.1)m_BWD++;
       }
     }
@@ -325,7 +325,7 @@ namespace Belle2 {
     RooDataHist dh("dh", "ecltrg",   x, h_clusterE);
 
     RooRealVar mean("mean",    "mean", 2000, 1000, 2500);
-    RooRealVar sigma("sigma", "sigma",  150 ,   0,   300);
+    RooRealVar sigma("sigma", "sigma",  150,   0,   300);
     RooRealVar tail("tail",    "tail",  0.45,     0,     1);
     RooNovosibirsk novo("novo", "", x, mean, sigma, tail);
     novo.fitTo(dh, RooFit::Extended(0), RooFit::Range(1500, 2200));

@@ -30,6 +30,6 @@ if __name__ == '__main__':
         # 2: b2hlt_triggers download
         subprocess.check_call(['b2hlt_triggers', 'download', '--database', 'online'])
         # 3: b2hlt_triggers add_cut
-        subprocess.check_call(['b2hlt_triggers', 'add_cut', 'filter', 'accept_goats', '"[nTrkLoose > 0]"', '10', 'False'])
+        subprocess.check_call(['b2hlt_triggers', 'add_cut', 'filter', 'accept_goats', '[nTrkLoose > 0]', '10', 'False'])
         # 4: b2hlt_triggers remove_cut
         subprocess.check_call(['b2hlt_triggers', 'remove_cut', 'skim', 'accept_bhabha'])

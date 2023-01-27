@@ -36,7 +36,7 @@ namespace Belle2 {
 
     /**
      * Set group id (parameterized per group)
-     * id=0: superLayerID; =1: layerID; =1: wireID
+     * id=0: superLayerID; =1: layerID; =2: wireID
      */
     void setGroupID(unsigned short mode)
     {

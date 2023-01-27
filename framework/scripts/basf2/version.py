@@ -15,11 +15,11 @@ import basf2
 def get_version():
     version = ''
     try:
-        from ROOT import Belle2
-        import ROOT
+        # Always avoid the top-level 'import ROOT'.
+        import ROOT  # noqa
         ROOT.gSystem.Load('libframework_io')
         ROOT.gROOT.LoadMacro(basf2.find_file("include/framework/io/RootIOUtilities.h"))
-        version = Belle2.RootIOUtilities.getCommitID()
+        version = ROOT.Belle2.RootIOUtilities.getCommitID()
     except AttributeError:
         pass
     return version

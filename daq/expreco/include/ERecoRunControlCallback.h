@@ -21,8 +21,8 @@ namespace Belle2 {
     virtual ~ERecoRunControlCallback() {}
 
   public:
-    virtual void initialize(const DBObject& obj);
-    virtual bool perform(NSMCommunicator& com);
+    void initialize(const DBObject& obj) override;
+    bool perform(NSMCommunicator& com) override;
 
   private:
     ERecoMasterCallback* m_callback;

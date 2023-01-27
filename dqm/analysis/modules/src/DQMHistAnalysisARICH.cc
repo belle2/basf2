@@ -9,9 +9,6 @@
 // Own include
 #include <dqm/analysis/modules/DQMHistAnalysisARICH.h>
 
-//DQM
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
-
 #include <TH1F.h>
 #include <TH2F.h>
 #include <TCanvas.h>
@@ -68,9 +65,6 @@ void DQMHistAnalysisARICHModule::initialize()
   B2DEBUG(20, "DQMHistAnalysisARICH: initialized.");
 }
 
-void DQMHistAnalysisARICHModule::beginRun()
-{
-}
 
 void DQMHistAnalysisARICHModule::event()
 {
@@ -78,7 +72,7 @@ void DQMHistAnalysisARICHModule::event()
   //Show alert by empty bins = red and strange entries = yellow
   //Draw lines on mergerHits histogram for shifters to divide sectors
   TH1* m_h_mergerHit = findHist("ARICH/mergerHit");/**<The number of hits in each Merger Boards*/
-  m_c_mergerHit = find_canvas("ARICH/c_mergerHit");
+  m_c_mergerHit = findCanvas("ARICH/c_mergerHit");
   if (m_h_mergerHit != NULL && m_c_mergerHit != NULL) {
     m_c_mergerHit->Clear();
     m_c_mergerHit->cd();
@@ -115,7 +109,7 @@ void DQMHistAnalysisARICHModule::event()
 
   //Show alert by the ratio of center 2 bins to side 2bins. <1.5 = red, <2 = yellow
   TH1* m_h_bits = findHist("ARICH/bits");/**<The number of hits in each timing bit*/
-  m_c_bits = find_canvas("ARICH/c_bits");
+  m_c_bits = findCanvas("ARICH/c_bits");
   if (m_h_bits != NULL && m_c_bits != NULL) {
     m_c_bits->Clear();
     m_c_bits->cd();
@@ -138,7 +132,7 @@ void DQMHistAnalysisARICHModule::event()
 
   //Show alert by no entry = red and 0 peak = yellow
   TH1* m_h_hitsPerEvent = findHist("ARICH/hitsPerEvent");/**<The number of hits in each triggered event*/
-  m_c_hitsPerEvent = find_canvas("ARICH/c_hitsPerEvent");
+  m_c_hitsPerEvent = findCanvas("ARICH/c_hitsPerEvent");
   if (m_h_hitsPerEvent != NULL && m_c_hitsPerEvent  != NULL) {
     m_c_hitsPerEvent->Clear();
     m_c_hitsPerEvent->cd();
@@ -191,18 +185,4 @@ void DQMHistAnalysisARICHModule::terminate()
 {
 
   B2DEBUG(20, "terminate called");
-}
-
-TCanvas* DQMHistAnalysisARICHModule::find_canvas(TString canvas_name)
-{
-  TIter nextckey(gROOT->GetListOfCanvases());
-  TObject* cobj = NULL;
-
-  while ((cobj = (TObject*)nextckey())) {
-    if (cobj->IsA()->InheritsFrom("TCanvas")) {
-      if (cobj->GetName() == canvas_name)
-        break;
-    }
-  }
-  return (TCanvas*)cobj;
 }

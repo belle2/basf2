@@ -152,8 +152,8 @@ void FastInterceptFinder2DFPGA::fastInterceptFinder2d(const std::vector<std::pai
   // these int-divisions can cause {min, center} or {center, max} to be the same, which is a desired behaviour
   const uint centerx = xmin + (uint)((xmax - xmin) / 2);
   const uint centery = ymin + (uint)((ymax - ymin) / 2);
-  uint xIndexCache[3] = {xmin, centerx, xmax};
-  uint yIndexCache[3] = {ymin, centery, ymax};
+  const uint xIndexCache[3] = {xmin, centerx, xmax};
+  const uint yIndexCache[3] = {ymin, centery, ymax};
 
   for (int i = 0; i < 2 ; ++i) {
     const uint left  = xIndexCache[i];

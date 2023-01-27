@@ -479,6 +479,14 @@ namespace Belle2 {
      */
     std::vector<std::string> getListOfObjects(const TClass* objClass, EDurability durability) const;
 
+    /** Returns a list of names of StoreObjPtr-objects whose class is (or inherits from) RelationContainer.
+     */
+    std::vector<std::string> getListOfRelations(EDurability durability) const;
+
+    /** Returns a (sorted) list of all the content of the DataStore (Objs-Arrays-Relations).
+     */
+    std::vector<std::string> getSortedListOfDataStore(EDurability durability) const;
+
 
     //------------------------------ For internal use --------------------------------------------------
     /** Setter for m_initializeActive.
@@ -515,14 +523,18 @@ namespace Belle2 {
 
     /** creates new datastore with given id, copying the registered objects/arrays from the current one. */
     void createNewDataStoreID(const std::string& id);
+    /** creates empty datastore with given id. */
+    void createEmptyDataStoreID(const std::string& id);
     /** returns ID of current DataStore. */
     std::string currentID() const;
     /** switch to DataStore with given ID. */
     void switchID(const std::string& id);
     /** copy entries (not contents) of current DataStore to the DataStore with given ID. */
-    void copyEntriesTo(const std::string& id, const std::vector<std::string>& entrylist_event = {});
+    void copyEntriesTo(const std::string& id, const std::vector<std::string>& entrylist_event = {}, bool mergeEntries = false);
     /** copy contents (actual array / object contents) of current DataStore to the DataStore with given ID. */
     void copyContentsTo(const std::string& id, const std::vector<std::string>& entrylist_event = {});
+    /** merge contents (actual array / object contents) of current DataStore to the DataStore with given ID. */
+    void mergeContentsTo(const std::string& id, const std::vector<std::string>& entrylist_event = {});
 
   private:
     /** Hidden constructor, as it is a singleton.*/
@@ -587,11 +599,15 @@ namespace Belle2 {
       /** returns ID of current DataStore. */
       const std::string& currentID() const { return m_currentID; }
       /** copy entries (not contents) of current DataStore to the DataStore with given ID. */
-      void copyEntriesTo(const std::string& id, const std::vector<std::string>& entrylist_event = {});
+      void copyEntriesTo(const std::string& id, const std::vector<std::string>& entrylist_event = {}, bool mergeEntries = false);
       /** copy contents (actual array / object contents) of current DataStore to the DataStore with given ID. */
       void copyContentsTo(const std::string& id, const std::vector<std::string>& entrylist_event = {});
+      /** merge contents (actual array / object contents) of current DataStore to the DataStore with given ID. */
+      void mergeContentsTo(const std::string& id, const std::vector<std::string>& entrylist_event = {});
       /** creates new datastore with given id, copying the registered objects/arrays from the current one. */
       void createNewDataStoreID(const std::string& id);
+      /** creates empty datastore with given id. */
+      void createEmptyDataStoreID(const std::string& id);
     private:
       std::vector<DataStoreContents> m_entries; /**< wrapped DataStoreContents. */
       std::map<std::string, int> m_idToIndexMap; /**< Maps DataStore ID to index in m_entries. */

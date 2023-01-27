@@ -13,10 +13,10 @@
 
 import basf2 as b2
 from simulation import add_simulation
-from reconstruction import add_reconstruction, add_mdst_output
+from reconstruction import add_reconstruction
+from mdst import add_mdst_output
 import glob
 import sys
-
 
 event_type = str(sys.argv[1])
 b2.set_random_seed(12345)
@@ -36,7 +36,7 @@ main.add_module(eventinfosetter)
 
 # generate BBbar events
 evtgeninput = b2.register_module('EvtGenInput')
-evtgeninput.param('userDECFile', Belle2.FileSystem.findFile('/decfiles/dec/{0}.dec'.format(event_type)))
+evtgeninput.param('userDECFile', b2.find_file(f'decfiles/dec/{event_type}.dec'))
 main.add_module(evtgeninput)
 
 # detector simulation

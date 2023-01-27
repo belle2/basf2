@@ -101,7 +101,7 @@ namespace Belle2 {
           //phi  *= CLHEP::deg;
           for (int i = 0; i < dim; i++) {
             transform = G4RotateZ3D(phi - M_PI / 2) * G4Translate3D(0, r_pos[i], z_pos[i]) * G4RotateX3D(-M_PI / 2 - thetaZ);
-            new G4PVPlacement(transform, l_dosi, TString::Format("p_dosi_%d", detID).Data() , &topVolume, false, detID);
+            new G4PVPlacement(transform, l_dosi, TString::Format("p_dosi_%d", detID).Data(), &topVolume, false, detID);
             detID++;
           }
         }

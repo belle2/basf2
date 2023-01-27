@@ -25,7 +25,6 @@
 #include <TTree.h>
 
 /* C++ headers. */
-#include <ctime>
 #include <sstream>
 #include <string>
 

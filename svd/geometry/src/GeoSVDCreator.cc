@@ -250,7 +250,7 @@ namespace Belle2 {
                                                       paramsShell.getAngle("gamma")
                                                                      );
 
-        VXDHalfShellPar halfShell(shell.getString("@name") , shell.getAngle("shellAngle", 0));
+        VXDHalfShellPar halfShell(shell.getString("@name"), shell.getAngle("shellAngle", 0));
 
         for (const GearDir& layer : shell.getNodes("Layer")) {
           int layerID = layer.getInt("@id");

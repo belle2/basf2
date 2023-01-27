@@ -322,9 +322,8 @@ if not eventtype:
 newevtype = ''
 parttype = eventtype
 query('Checking general flag')
-general = parttype / 10000000
+general = int(str(parttype)[0])
 flag = 0
-parttype -= general * 10000000
 mother = ''
 for daug in decay:
     if 'sig' in daug:
@@ -359,14 +358,13 @@ if mother:
         warning("Didn't recognise the mother particle. Check general flag manually.")
         flag = general
     if not flag == general:
-        fail(['General flag not compliant. Should be ' + str(flag) + '.Please check.'])
+        fail(['General flag not compliant. Should be ' + str(flag) + '. Please check.'])
     else:
         done()
 newevtype += str(flag)
 
 query('Checking selection flag')
-selection = parttype / 1000000
-parttype -= selection * 1000000
+selection = int(str(parttype)[1])
 flag = selection
 if not mother:
     flag = 0
@@ -477,8 +475,7 @@ done()
 
 query('Checking the decay flag')
 
-decayflag = parttype / 100000
-parttype -= decayflag * 100000
+decayflag = int(str(parttype)[2])
 neutrinos = False
 nFinal = 0
 nCommon = 0
@@ -534,8 +531,7 @@ opencharm = False
 closedcharm = False
 doubleopen = False
 
-charmflag = parttype / 10000
-parttype -= charmflag * 10000
+charmflag = int(str(parttype)[3])
 
 caughtopen = False
 if not mother:
@@ -586,14 +582,13 @@ if doubleopen:
     flag = 9
 
 if not flag == charmflag:
-    fail(['Charm flag is not compliant. Should be :' + str(flag) + '. Please check'])
+    fail(['Charm flag is not compliant. Should be ' + str(flag) + '. Please check'])
 else:
     done()
 newevtype += str(flag)
 
 query('Checking track flag.')
-trackflag = parttype / 1000
-parttype -= trackflag * 1000
+trackflag = int(str(parttype)[4])
 
 maxbf = 0
 maxtracks = 0
@@ -616,15 +611,14 @@ for dec in main_decay:
             maxtracks = tracks
 
 if not trackflag == maxtracks:
-    fail(['Track flag not compliant. Should be: ' +
+    fail(['Track flag not compliant. Should be ' +
           str(maxtracks) + '. Please check.'])
 else:
     done()
 newevtype += str(maxtracks)
 
 query('Checking neutrals flag.')
-neutrals = parttype / 100
-parttype -= neutrals * 100
+neutrals = int(str(parttype)[5])
 
 pi0eta = False
 gamma = False
@@ -677,48 +671,6 @@ newevtype += str(flag)
 
 query('Checking the extra and user for duplicity .')
 
-if settings.use_url:
-    if not zippednos:
-        warning('Cannot parse decfiles webpage')
-        settings.use_url = False
-    else:
-        for (k, v) in zippednos:
-            if filename.partition('=')[0] == v.partition(
-                    '=')[0] and not eventtype / 10 == k / 10:
-                warning(
-                    'The decfile: ' +
-                    v +
-                    ':' +
-                    str(k) +
-                    ' should contain the same decay, therefore the first 7 '
-                    'digits of the eventtype should match. Please check and use the same extra flag.')
-                failed = True
-            if k == eventtype:
-                warning('Error: ' + v + ' has this eventtype already.')
-                failed = True
-            if k / 10 == eventtype / \
-                    10 and not os.path.basename(filename).partition('=')[0] == v.partition('=')[0]:
-                warning(
-                    'The decfile: ' +
-                    v +
-                    ':' +
-                    str(k) +
-                    ' uses this extra flag, but the decay seems different. '
-                    'Please check and use a unique extra flag.')
-                failed = True
-
-    if settings.obs_url:
-
-        if not obsnos:
-            warning('Cannot parse obsoletes trac file.')
-            settings.use_url = False
-        else:
-            if str(eventtype) in obsnos:
-                warning('The eventtype is obsolete on the line ' +
-                        str(obsnos.index(str(eventtype)) + 1) + ' in: ' +
-                        settings.obs_url)
-                failed = True
-
 if not settings.use_url:
     filelist = os.listdir(dkfilespath)
     newtype = 0
@@ -749,7 +701,7 @@ if not settings.use_url:
                 failed = True
 
     if settings.obsoletepath:
-        obsfile = open(settings.obsoletepath + '/table_obsolete.sql')
+        obsfile = open(dkfilespath + '/' + settings.obsoletepath + '/table_obsolete.sql')
         if obsfile:
             for line in obsfile:
                 if int(line.partition('EVTTYPEID = ')[2].partition(

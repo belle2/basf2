@@ -8,7 +8,7 @@
 
 #include <analysis/VariableManager/Utility.h>
 #include <analysis/dataobjects/Particle.h>
-
+#include <framework/logging/Logger.h>
 #include <iostream>
 #include <string>
 #include <memory>
@@ -22,14 +22,17 @@ int main()
             "This program allows you to test variable conditions (see the VariableManager section at https://software.belle2.org/).\n";
   std::cout << "Please input a condition " << std::flush;
   std::getline(std::cin, condition);
+  try {
+    std::unique_ptr<Variable::Cut> cut = Variable::Cut::compile(condition);
+    cut->print();
 
-  std::unique_ptr<Variable::Cut> cut = Variable::Cut::compile(condition);
+    ROOT::Math::PxPyPzEVector momentum(1, 2, 3, 4);
+    Particle p(momentum, 421);
+    std::cout << "This condition is: " << (cut->check(&p) ? "True" : "False") << std::endl;
 
-  cut->print();
-
-  TLorentzVector momentum(1, 2, 3, 4);
-  Particle p(momentum, 421);
-  std::cout << "This condition is: " << (cut->check(&p) ? "True" : "False") << std::endl;
-
-  return 0;
+    return 0;
+  } catch (std::runtime_error& e) {
+    B2FATAL(e.what());
+    return 1;
+  }
 }

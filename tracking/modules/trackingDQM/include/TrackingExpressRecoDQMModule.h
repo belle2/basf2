@@ -12,6 +12,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/EventLevelTrackingInfo.h>
 #include <TH1.h>
+#include <string>
 
 namespace Belle2 {
 
@@ -57,6 +58,10 @@ namespace Belle2 {
     bool m_produce1Dres = true;
     /** if True, the module produces the 2D Track Residual plot for each VXD sensor*/
     bool m_produce2Dres = false;
+    /** Name of the directory for the histograms. */
+    std::string m_histogramDirectoryName = "TrackingERDQM";
+    /** Optional suffix for the histogram's title. */
+    std::string m_histogramTitleSuffix = "";
 
   };
 }

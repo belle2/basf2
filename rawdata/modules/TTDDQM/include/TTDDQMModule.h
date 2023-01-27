@@ -49,6 +49,9 @@ namespace Belle2 {
     TH1I* hBunchInjLER{};      /**< Histogram injected HER bunch (triggers) */
     TH1I* hBunchInjHER{};      /**< Histogram injected LER bunch (triggers) */
 
+    TH1I* hTrigBunchInjLERproj{};  /**< Histogram offset triggered and injected bunch LER */
+    TH1I* hTrigBunchInjHERproj{};  /**< Histogram offset triggered and injected bunch HER */
+
     void initialize() override final; /**< initialize function */
 
     void beginRun() override final;  /**< beginRun function */

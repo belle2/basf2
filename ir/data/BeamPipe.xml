@@ -27,7 +27,7 @@
       <sec name="L13" unit="cm">0.65</sec>
       <sec name="L14" unit="cm">0.25</sec>
       <sec name="L15" unit="cm">0.9</sec>
-      <sec name="L16" unit="cm">1.0</sec>
+      <sec name="L16" unit="cm">0.9</sec>
       <sec name="R1" unit="cm">1.16</sec>
       <sec name="R2" unit="cm">2.5</sec>
       <sec name="R3" unit="cm">2.25</sec>
@@ -39,7 +39,7 @@
       <sec name="R9" unit="cm">2.25</sec>
       <sec name="R10" unit="cm">2.5</sec>
       <sec name="R11" unit="cm">1.45</sec>
-      <Material desc="SUS">SUS316L</Material>      
+      <Material>Ti</Material>      
     </Lv1SUS>
         
     <Lv2OutTi>
@@ -131,6 +131,13 @@
       <sec name="L2" unit="cm">1.555</sec>
       <sec name="L3" unit="cm">4.00</sec>
       <sec name="T1" unit="cm">1.5</sec>
+      <sec name="aR1" unit="cm">1.5</sec>
+      <sec name="aR2" unit="cm">1.8</sec>
+      <sec name="aL1" unit="cm">0.30</sec>
+      <sec name="aL2" unit="cm">0.30</sec>
+      <sec name="aL3" unit="cm">2.75</sec>
+      <sec name="bL2" unit="cm">2.155</sec>
+      <sec name="bL3" unit="cm">4.00</sec>
       <Material>Ta</Material>
     </Lv1TaFwd>
     
@@ -157,6 +164,13 @@
       <!--L3 unit="cm">1.69</L3-->
       <sec name="L3" unit="cm">1.33</sec>
       <sec name="T1" unit="cm">1.5</sec>
+      <sec name="aR1" unit="cm">1.15</sec>
+      <sec name="aR2" unit="cm">1.8</sec>
+      <sec name="aL1" unit="cm">0.30</sec>
+      <sec name="aL2" unit="cm">0.65</sec>
+      <sec name="aL3" unit="cm">3.10</sec>
+      <sec name="bL2" unit="cm">4.00</sec>
+      <sec name="bL3" unit="cm">1.93</sec>
       <Material>Ta</Material>
     </Lv1TaBwd>
     
@@ -193,15 +207,53 @@
     <Lv1TaLERUp>
       <sec name="R1" unit="cm">1.7</sec>
       <sec name="R2" unit="cm">1.7</sec>
-      <sec name="R3" unit="cm">1.2</sec>
-      <sec name="R4" unit="cm">1.2</sec>
+      <sec name="R3" unit="cm">1.0</sec>
+      <sec name="R4" unit="cm">1.0</sec>
+      <sec name="R5" unit="cm">1.5</sec>
+      <sec name="R6" unit="cm">1.5</sec>
+      <sec name="R7" unit="cm">1.05</sec>
+      <sec name="R8" unit="cm">1.05</sec>
+      <sec name="R9" unit="cm">1.4</sec>
+      <sec name="R10" unit="cm">1.4</sec>
+      <sec name="R11" unit="cm">1.2</sec>
+      <sec name="R12" unit="cm">1.2</sec>
       <sec name="L1" unit="cm">30.0</sec>
-      <sec name="L2" unit="cm">56.0</sec>
-      <sec name="L3" unit="cm">56.0</sec>
-      <sec name="L4" unit="cm">100.0</sec>
+      <sec name="L2" unit="cm">48.2</sec>
+      <sec name="L3" unit="cm">48.2</sec>
+      <sec name="L4" unit="cm">50.0</sec>
+      <sec name="L5" unit="cm">50.0</sec>
+      <sec name="L6" unit="cm">55.7</sec>
+      <sec name="L7" unit="cm">55.7</sec>
+      <sec name="L8" unit="cm">59.4</sec>
+      <sec name="L9" unit="cm">59.4</sec>
+      <sec name="L10" unit="cm">62.5</sec>
+      <sec name="L11" unit="cm">62.5</sec>
+      <sec name="L12" unit="cm">100.0</sec>
       <sec name="A1" unit="rad">-0.0415</sec>
       <Material>Cu</Material>      
     </Lv1TaLERUp>
+
+    <Lv1SUSLERUp>
+      <sec name="Z1" unit="cm">54.5</sec>
+      <sec name="Z2" unit="cm">55.7</sec>
+      <sec name="Z3" unit="cm">55.7</sec>
+      <sec name="Z4" unit="cm">59.4</sec>
+      <sec name="Z5" unit="cm">59.4</sec>
+      <sec name="Z6" unit="cm">60.6</sec>
+      <sec name="RI1" unit="cm">1.9</sec>
+      <sec name="RI2" unit="cm">1.9</sec>
+      <sec name="RI3" unit="cm">1.65</sec>
+      <sec name="RI4" unit="cm">1.65</sec>
+      <sec name="RI5" unit="cm">1.9</sec>
+      <sec name="RI6" unit="cm">1.9</sec>
+      <sec name="RO1" unit="cm">2.14</sec>
+      <sec name="RO2" unit="cm">2.14</sec>
+      <sec name="RO3" unit="cm">2.3</sec>
+      <sec name="RO4" unit="cm">2.3</sec>
+      <sec name="RO5" unit="cm">2.14</sec>
+      <sec name="RO6" unit="cm">2.14</sec>
+      <Material>Ti</Material>
+    </Lv1SUSLERUp>
 
     <Lv2VacLERUp>
       <sec name="R1" unit="cm">1.0</sec>
@@ -211,16 +263,54 @@
     <Lv1TaHERDwn>
       <sec name="R1" unit="cm">1.7</sec>
       <sec name="R2" unit="cm">1.7</sec>
-      <sec name="R3" unit="cm">1.2</sec>
-      <sec name="R4" unit="cm">1.2</sec>
+      <sec name="R3" unit="cm">1.0</sec>
+      <sec name="R4" unit="cm">1.0</sec>
+      <sec name="R5" unit="cm">1.5</sec>
+      <sec name="R6" unit="cm">1.5</sec>
+      <sec name="R7" unit="cm">1.05</sec>
+      <sec name="R8" unit="cm">1.05</sec>
+      <sec name="R9" unit="cm">1.4</sec>
+      <sec name="R10" unit="cm">1.4</sec>
+      <sec name="R11" unit="cm">1.2</sec>
+      <sec name="R12" unit="cm">1.2</sec>
       <sec name="L1" unit="cm">30.0</sec>
-      <sec name="L2" unit="cm">56.0</sec>
-      <sec name="L3" unit="cm">56.0</sec>
-      <sec name="L4" unit="cm">100.0</sec>
+      <sec name="L2" unit="cm">48.2</sec>
+      <sec name="L3" unit="cm">48.2</sec> 
+      <sec name="L4" unit="cm">50.0</sec>
+      <sec name="L5" unit="cm">50.0</sec>
+      <sec name="L6" unit="cm">55.7</sec>
+      <sec name="L7" unit="cm">55.7</sec>
+      <sec name="L8" unit="cm">59.4</sec>
+      <sec name="L9" unit="cm">59.4</sec>
+      <sec name="L10" unit="cm">62.5</sec>
+      <sec name="L11" unit="cm">62.5</sec>
+      <sec name="L12" unit="cm">100.0</sec>
       <sec name="A1" unit="rad">0.0415</sec>
       <Material>Cu</Material>
     </Lv1TaHERDwn>
-    
+   
+    <Lv1SUSHERDwn>
+      <sec name="Z1" unit="cm">54.5</sec>
+      <sec name="Z2" unit="cm">55.7</sec>
+      <sec name="Z3" unit="cm">55.7</sec>
+      <sec name="Z4" unit="cm">59.4</sec>
+      <sec name="Z5" unit="cm">59.4</sec>
+      <sec name="Z6" unit="cm">60.6</sec>
+      <sec name="RI1" unit="cm">1.9</sec>
+      <sec name="RI2" unit="cm">1.9</sec>
+      <sec name="RI3" unit="cm">1.65</sec>
+      <sec name="RI4" unit="cm">1.65</sec>
+      <sec name="RI5" unit="cm">1.9</sec>
+      <sec name="RI6" unit="cm">1.9</sec>
+      <sec name="RO1" unit="cm">2.14</sec>
+      <sec name="RO2" unit="cm">2.14</sec>
+      <sec name="RO3" unit="cm">2.3</sec>
+      <sec name="RO4" unit="cm">2.3</sec>
+      <sec name="RO5" unit="cm">2.14</sec>
+      <sec name="RO6" unit="cm">2.14</sec>
+      <Material>Ti</Material>
+    </Lv1SUSHERDwn>
+ 
     <Lv2VacHERDwn>
       <sec name="R1" unit="cm">1.0</sec>
       <Material>Vacuum</Material>
@@ -235,16 +325,55 @@
     <Lv1TaHERUp>
       <sec name="R1" unit="cm">1.7</sec>
       <sec name="R2" unit="cm">1.7</sec>
-      <sec name="R3" unit="cm">1.2</sec>
-      <sec name="R4" unit="cm">1.2</sec>
+      <sec name="R3" unit="cm">1.0</sec>
+      <sec name="R4" unit="cm">1.0</sec>
+      <sec name="R5" unit="cm">1.5</sec>
+      <sec name="R6" unit="cm">1.5</sec>
+      <sec name="R7" unit="cm">1.05</sec>
+      <sec name="R8" unit="cm">1.05</sec>
+      <sec name="R9" unit="cm">1.4</sec>
+      <sec name="R10" unit="cm">1.4</sec>
+      <sec name="R11" unit="cm">1.2</sec>
+      <sec name="R12" unit="cm">1.2</sec>
       <sec name="L1" unit="cm">30.0</sec>
-      <sec name="L2" unit="cm">56.0</sec>
-      <sec name="L3" unit="cm">56.0</sec>
-      <sec name="L4" unit="cm">100.0</sec>
+      <sec name="L2" unit="cm">48.2</sec>
+      <sec name="L3" unit="cm">48.2</sec>
+      <sec name="L4" unit="cm">50.0</sec>
+      <sec name="L5" unit="cm">50.0</sec>
+      <sec name="L6" unit="cm">55.7</sec>
+      <sec name="L7" unit="cm">55.7</sec>
+      <sec name="L8" unit="cm">59.4</sec>
+      <sec name="L9" unit="cm">59.4</sec>
+      <sec name="L10" unit="cm">62.5</sec>
+      <sec name="L11" unit="cm">62.5</sec>
+      <sec name="L12" unit="cm">100.0</sec>
       <sec name="A1" unit="rad">0.0415</sec>
       <Material>Cu</Material>      
     </Lv1TaHERUp>
-        
+  
+    <Lv1SUSHERUp>
+      <sec name="Z1" unit="cm">54.5</sec>
+      <sec name="Z2" unit="cm">55.7</sec>
+      <sec name="Z3" unit="cm">55.7</sec>
+      <sec name="Z4" unit="cm">59.4</sec>
+      <sec name="Z5" unit="cm">59.4</sec>
+      <sec name="Z6" unit="cm">60.6</sec>
+      <sec name="RI1" unit="cm">1.9</sec>
+      <sec name="RI2" unit="cm">1.9</sec>
+      <sec name="RI3" unit="cm">1.65</sec>
+      <sec name="RI4" unit="cm">1.65</sec>
+      <sec name="RI5" unit="cm">1.9</sec>
+      <sec name="RI6" unit="cm">1.9</sec>
+      <sec name="RO1" unit="cm">2.14</sec>
+      <sec name="RO2" unit="cm">2.14</sec>
+      <sec name="RO3" unit="cm">2.3</sec>
+      <sec name="RO4" unit="cm">2.3</sec>
+      <sec name="RO5" unit="cm">2.14</sec>
+      <sec name="RO6" unit="cm">2.14</sec>
+      <Material>Ti</Material>
+    </Lv1SUSHERUp>       
+
+ 
     <Lv2VacHERUp>      
       <sec name="R1" unit="cm">1.0</sec>
       <Material>Vacuum</Material>
@@ -253,21 +382,99 @@
     <Lv1TaLERDwn>
       <sec name="R1" unit="cm">1.7</sec>
       <sec name="R2" unit="cm">1.7</sec>
-      <sec name="R3" unit="cm">1.2</sec>
-      <sec name="R4" unit="cm">1.2</sec>
+      <sec name="R3" unit="cm">1.0</sec>
+      <sec name="R4" unit="cm">1.0</sec>
+      <sec name="R5" unit="cm">1.5</sec>
+      <sec name="R6" unit="cm">1.5</sec>
+      <sec name="R7" unit="cm">1.05</sec>
+      <sec name="R8" unit="cm">1.05</sec>
+      <sec name="R9" unit="cm">1.4</sec>
+      <sec name="R10" unit="cm">1.4</sec>
+      <sec name="R11" unit="cm">1.2</sec>
+      <sec name="R12" unit="cm">1.2</sec>
       <sec name="L1" unit="cm">30.0</sec>
-      <sec name="L2" unit="cm">56.0</sec>
-      <sec name="L3" unit="cm">56.0</sec>
-      <sec name="L4" unit="cm">100.0</sec>
+      <sec name="L2" unit="cm">48.2</sec>
+      <sec name="L3" unit="cm">48.2</sec>
+      <sec name="L4" unit="cm">50.0</sec>
+      <sec name="L5" unit="cm">50.0</sec>
+      <sec name="L6" unit="cm">55.7</sec>
+      <sec name="L7" unit="cm">55.7</sec>
+      <sec name="L8" unit="cm">59.4</sec>
+      <sec name="L9" unit="cm">59.4</sec>
+      <sec name="L10" unit="cm">62.5</sec>
+      <sec name="L11" unit="cm">62.5</sec>
+      <sec name="L12" unit="cm">100.0</sec>
       <sec name="A1" unit="rad">-0.0415</sec>
       <Material>Cu</Material>
     </Lv1TaLERDwn>
-    
+   
+    <Lv1SUSLERDwn>
+      <sec name="Z1" unit="cm">54.5</sec>
+      <sec name="Z2" unit="cm">55.7</sec>
+      <sec name="Z3" unit="cm">55.7</sec>
+      <sec name="Z4" unit="cm">59.4</sec>
+      <sec name="Z5" unit="cm">59.4</sec>
+      <sec name="Z6" unit="cm">60.6</sec>
+      <sec name="RI1" unit="cm">1.9</sec>
+      <sec name="RI2" unit="cm">1.9</sec>
+      <sec name="RI3" unit="cm">1.65</sec>
+      <sec name="RI4" unit="cm">1.65</sec>
+      <sec name="RI5" unit="cm">1.9</sec>
+      <sec name="RI6" unit="cm">1.9</sec>
+      <sec name="RO1" unit="cm">2.14</sec>
+      <sec name="RO2" unit="cm">2.14</sec>
+      <sec name="RO3" unit="cm">2.3</sec>
+      <sec name="RO4" unit="cm">2.3</sec>
+      <sec name="RO5" unit="cm">2.14</sec>
+      <sec name="RO6" unit="cm">2.14</sec>
+      <Material>Ti</Material>
+    </Lv1SUSLERDwn>
+ 
     <Lv2VacLERDwn>
       <sec name="R1" unit="cm">1.0</sec>
       <Material>Vacuum</Material>
     </Lv2VacLERDwn>
+
+    <PXDMountFwd>
+      <sec name="Z1" unit="cm">14.6</sec>
+      <sec name="R1" unit="cm">2.35</sec>
+      <sec name="D1" unit="cm">2.4</sec>
+      <sec name="R2" unit="cm">0.25</sec>
+      <sec name="L1" unit="cm">2.075</sec>
+      <sec name="L2" unit="cm">0.75</sec>
+      <Material>W</Material>
+    </PXDMountFwd>
+
+    <PXDMountFixtureFwd>
+      <sec name="Z1" unit="cm">14.6</sec>
+      <sec name="R1" unit="cm">3.2</sec>
+      <sec name="D1" unit="cm">2.4</sec>
+      <sec name="I1" unit="cm">1.2</sec>
+      <sec name="T1" unit="cm">0.25</sec>
+      <sec name="T2" unit="cm">0.15</sec>
+      <Material>Cu</Material>
+    </PXDMountFixtureFwd>
+
+    <PXDMountBwd>
+      <sec name="Z1" unit="cm">10.8</sec>
+      <sec name="R1" unit="cm">2.35</sec>
+      <sec name="D1" unit="cm">2.4</sec>
+      <sec name="R2" unit="cm">0.25</sec>
+      <sec name="L1" unit="cm">2.075</sec>
+      <sec name="L2" unit="cm">0.75</sec>
+      <Material>W</Material>
+    </PXDMountBwd>
     
+    <PXDMountFixtureBwd>
+      <sec name="Z1" unit="cm">10.8</sec>
+      <sec name="R1" unit="cm">3.2</sec>
+      <sec name="D1" unit="cm">2.4</sec>
+      <sec name="I1" unit="cm">1.2</sec>
+      <sec name="T1" unit="cm">0.25</sec>
+      <sec name="T2" unit="cm">0.15</sec>
+      <Material>Cu</Material>
+    </PXDMountFixtureBwd>
+
   </Content>
 
 </DetectorComponent>

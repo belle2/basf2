@@ -124,9 +124,9 @@ void FastRbuf2DsModule::ReadRbufInThread()
 {
   printf("ReadFileInThread started!!\n");
   int rf_nevt = 0;
-  int size = 0;
   for (;;) {
     char* evtbuf = new char[EvtMessage::c_MaxEventSize];
+    int size;
     while ((size = m_rbuf->remq((int*)evtbuf)) == 0) usleep(20);
     if (size == 0) {
       printf("ReadRbufInThread : ERROR! record with size=0 detected!!!!!\n");

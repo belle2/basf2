@@ -27,7 +27,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(NoKickCutsEval)
+REG_MODULE(NoKickCutsEval);
 
 NoKickCutsEvalModule::NoKickCutsEvalModule() : Module()
 {
@@ -89,7 +89,7 @@ void NoKickCutsEvalModule::initialize()
 
   RelationArray relClusterTrueHits(storeClusters, storeTrueHits);
   RelationArray relClusterMCParticles(storeClusters, storeMCParticles);
-  RelationArray recoTracksToMCParticles(recoTracks , storeMCParticles);
+  RelationArray recoTracksToMCParticles(recoTracks, storeMCParticles);
 
   /** inizialize output TFile with cuts-histograms */
   m_outputFile = new TFile("NoKickCuts.root", "RECREATE");
@@ -112,7 +112,7 @@ void NoKickCutsEvalModule::event()
     if (XP8.size() > 0) {
       for (int i = 0; (i + 1) < (int)XP8.size(); i++) {
         for (int par = 0; par < c_nbinpar; par++) {
-          int p = (int)((XP8.at(i).m_momentum0.Mag() - c_pmin) / c_pwidth);
+          int p = (int)((XP8.at(i).m_momentum0.R() - c_pmin) / c_pwidth);
           if (p > c_nbinp - 1 || p < 0) {
             m_pCounter++;
             continue;

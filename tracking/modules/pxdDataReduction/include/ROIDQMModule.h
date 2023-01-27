@@ -82,15 +82,23 @@ namespace Belle2 {
     TH1F* m_harea; /**< ROis area */
     TH1F* m_hredFactor; /**< reduction factor*/
 
+    /**
+     * Initializer.
+     */
     void initialize(void) override final;
 
+    /**
+     * This method is called for each event.
+     */
     void event(void) override final;
 
+    /**
+     * This method is called at the end of the event processing.
+     */
     void terminate(void) override final;
 
     void defineHisto() override final; /**< define histograms*/
 
   };//end class declaration
-
 
 } // end namespace Belle2

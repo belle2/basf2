@@ -42,6 +42,10 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
     # Check components.
     check_components(components)
 
+    if dqm_mode in ["dont_care", "filtered"]:
+        # TTD trigger and bunch injection monitoring
+        path.add_module('TTDDQM')
+
     if dqm_environment == "expressreco" and (dqm_mode in ["dont_care"]):
         # PXD (not useful on HLT)
         if components is None or 'PXD' in components:
@@ -232,15 +236,13 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
 
     # TOP
     if (components is None or 'TOP' in components) and (dqm_mode in ["dont_care", "filtered"]):
-        if dqm_environment == "expressreco":  # Temporary patch: do not run TOPDQM on HLT
-            topdqm = b2.register_module('TOPDQM')
-            path.add_module(topdqm)
+        topdqm = b2.register_module('TOPDQM')
+        path.add_module(topdqm)
 
     # KLM
     if (components is None or 'KLM' in components) and (dqm_mode in ["dont_care", "filtered"]):
-        if dqm_environment == "expressreco":  # Temporary patch: do not run KLMQM on HLT
-            klmdqm = b2.register_module("KLMDQM")
-            path.add_module(klmdqm)
+        klmdqm = b2.register_module("KLMDQM")
+        path.add_module(klmdqm)
 
     # TRG before all reconstruction runs (so on all events with all unpacked information)
     if (components is None or 'TRG' in components) and (dqm_mode in ["dont_care", "before_filter"]):
@@ -299,7 +301,14 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         if (dqm_environment == "hlt"):
             path.add_module('TrackingHLTDQM')
         else:
-            path.add_module('TrackingExpressRecoDQM')
+            path.add_module('ParallelTrackFilter', min_d0=-0.5, max_d0=0.5, min_z0=-1, max_z0=1,
+                            inputArrayName="", outputINArrayName="TracksFromIP", outputOUTArrayName="TracksNotFromIP")
+            path.add_module('TrackingExpressRecoDQM', histogramDirectoryName="TrackingERDQM_FromIP",
+                            tracksStoreArrayName="TracksFromIP", histogramTitleSuffix=" - Tracks from IP") \
+                .set_name("TrackingExpressRecoDQM_FromIP")
+            path.add_module('TrackingExpressRecoDQM', histogramDirectoryName="TrackingERDQM_NotFromIP",
+                            tracksStoreArrayName="TracksNotFromIP", histogramTitleSuffix=" - Tracks not from IP") \
+                .set_name("TrackingExpressRecoDQM_NotFromIP")
 
     # ARICH
     if (components is None or 'ARICH' in components) and (dqm_mode in ["dont_care", "filtered"]):

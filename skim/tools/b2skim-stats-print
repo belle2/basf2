@@ -469,14 +469,14 @@ def averageCandidateMultiplicity(skim, sample, TestingCombined):
     )
     joinedBlocks = "\n".join([block[0] for block in multiplicityBlocks])
 
-    # Get the second numbers in each line, which are the average candidate
+    # Get the third numbers in each line, which are the average candidate
     # multiplicities of passed events for each particle list.
     floatRegexp = r"\d+\.\d+"
     multiplicityLines = [
         line for line in joinedBlocks.split("\n") if re.findall(floatRegexp, line)
     ]
     multiplicities = [
-        float(re.findall(floatRegexp, line)[1]) for line in multiplicityLines
+        float(re.findall(floatRegexp, line)[2]) for line in multiplicityLines
     ]
 
     averageCandidateMultiplicity = sum(multiplicities) / len(multiplicities)

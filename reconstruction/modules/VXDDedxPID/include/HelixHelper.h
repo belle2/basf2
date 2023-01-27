@@ -8,9 +8,9 @@
 
 #pragma once
 
-#include <TVector3.h>
 #include <Math/Functor.h>
 #include <Math/BrentMinimizer1D.h>
+#include <Math/Vector3D.h>
 
 #include <cmath>
 
@@ -34,34 +34,34 @@ namespace Belle2 {
 
 
     /** construct a helix at an arbitrary position 'poca' (helices built at different points are not comparable) */
-    HelixHelper(const TVector3& poca, const TVector3& momentum_in_poca, int charge):
+    HelixHelper(const ROOT::Math::XYZVector& poca, const ROOT::Math::XYZVector& momentum_in_poca, int charge):
       m_poca(poca)
     {
-      const double pt = momentum_in_poca.Pt();
+      const double pt = momentum_in_poca.Rho();
       const double R = pt / c_cTimesB; //c and magnetic field, should come from some common database later...
 
-      const TVector3& dirInPoca = momentum_in_poca.Unit();
+      const ROOT::Math::XYZVector& dirInPoca = momentum_in_poca.Unit();
 
       //determine the angle phi, distribute it from -pi to pi
-      m_phi = atan2(dirInPoca.y() , dirInPoca.x());
+      m_phi = atan2(dirInPoca.Y(), dirInPoca.X());
 
       //determine sign of d0
       //calculate the sign of the projection of pt(dirInPoca) at d0(poca)
-      const double d0Sign = TMath::Sign(1., poca.x() * dirInPoca.x()
-                                        + poca.y() * dirInPoca.y());
+      const double d0Sign = TMath::Sign(1., poca.X() * dirInPoca.X()
+                                        + poca.Y() * dirInPoca.Y());
 
       //Now set the helix parameters
-      m_d0 = d0Sign * poca.Perp();
+      m_d0 = d0Sign * poca.Rho();
       m_omega = 1 / R * charge;
-      m_z0 = poca.z();
-      m_cotTheta = dirInPoca.z() / dirInPoca.Pt();
+      m_z0 = poca.Z();
+      m_cotTheta = dirInPoca.Z() / dirInPoca.Rho();
     }
 
     /** returns the path length (along the helix) to the helix point closest to p.
      *
      * a path length of 0 corresponds to p = poca
      */
-    double pathLengthToPoint(const TVector3& p) const
+    double pathLengthToPoint(const ROOT::Math::XYZVector& p) const
     {
       minimize_distance_to_point = p;
       helix_object = this; //ok, this is ugly
@@ -80,7 +80,7 @@ namespace Belle2 {
     /** returns the path length (along the helix) to the helix point closest to the line
      *  going through points a and b.
      */
-    double pathLengthToLine(const TVector3& a, const TVector3& b) const
+    double pathLengthToLine(const ROOT::Math::XYZVector& a, const ROOT::Math::XYZVector& b) const
     {
       minimize_distance_to_line_a = a;
       minimize_distance_to_line_b = b;
@@ -102,10 +102,10 @@ namespace Belle2 {
     /** momentum of the particle, at the helix point
      *  corresponding to a flown path length s (from poca).
      */
-    TVector3 momentum(double s = 0) const
+    ROOT::Math::XYZVector momentum(double s = 0) const
     {
       const float pt = c_cTimesB / TMath::Abs(m_omega);
-      return TVector3(
+      return ROOT::Math::XYZVector(
                pt * cos(m_phi - 2 * m_omega * s),
                pt * sin(m_phi - 2 * m_omega * s),
                pt * m_cotTheta
@@ -113,10 +113,10 @@ namespace Belle2 {
     }
 
     /** point on helix corresponding to a flown path length s (from poca) */
-    TVector3 position(double s) const
+    ROOT::Math::XYZVector position(double s) const
     {
       //aproximation (but it does work for straight tracks)
-      return m_poca + TVector3(
+      return m_poca + ROOT::Math::XYZVector(
                s * s * m_omega / 2 * sin(m_phi) + s * cos(m_phi),
                -s * s * m_omega / 2 * cos(m_phi) + s * sin(m_phi),
                s * m_cotTheta
@@ -137,35 +137,35 @@ namespace Belle2 {
     float m_phi;
 
     /** point of closest approach to origin */
-    TVector3 m_poca;
+    ROOT::Math::XYZVector m_poca;
 
     /** minimization function, calculates distance to minimize_distance_to_point */
     static double distanceToPoint(double s)
     {
-      return (helix_object->position(s) - minimize_distance_to_point).Mag();
+      return (helix_object->position(s) - minimize_distance_to_point).R();
     }
 
     /** same as distanceToPoint, but ignoring z coordinate */
     static double distanceToLine(double s)
     {
-      const TVector3& p = helix_object->position(s);
+      const ROOT::Math::XYZVector& p = helix_object->position(s);
       // d = |(p-a) \times (p-b)| / |b-a|
-      return ((p - minimize_distance_to_line_a).Cross(p - minimize_distance_to_line_b)).Mag() / (minimize_distance_to_line_b -
-             minimize_distance_to_line_a).Mag();
+      return ((p - minimize_distance_to_line_a).Cross(p - minimize_distance_to_line_b)).R() / (minimize_distance_to_line_b -
+             minimize_distance_to_line_a).R();
     }
 
     /** user supplied point we're trying to find the nearest helix point to */
-    static TVector3 minimize_distance_to_point;
+    static ROOT::Math::XYZVector minimize_distance_to_point;
     /** first user supplied line we're trying to find the nearest helix point to */
-    static TVector3 minimize_distance_to_line_a;
+    static ROOT::Math::XYZVector minimize_distance_to_line_a;
     /** second user supplied line we're trying to find the nearest helix point to */
-    static TVector3 minimize_distance_to_line_b;
+    static ROOT::Math::XYZVector minimize_distance_to_line_b;
     /** keep a 'this' pointer around for minimization */
     static HelixHelper const* helix_object;
   };
 
-  TVector3 HelixHelper::minimize_distance_to_point(0.0, 0.0, 0.0);
-  TVector3 HelixHelper::minimize_distance_to_line_a(0.0, 0.0, 0.0);
-  TVector3 HelixHelper::minimize_distance_to_line_b(0.0, 0.0, 0.0);
+  ROOT::Math::XYZVector HelixHelper::minimize_distance_to_point(0.0, 0.0, 0.0);
+  ROOT::Math::XYZVector HelixHelper::minimize_distance_to_line_a(0.0, 0.0, 0.0);
+  ROOT::Math::XYZVector HelixHelper::minimize_distance_to_line_b(0.0, 0.0, 0.0);
   HelixHelper const* HelixHelper::helix_object(0);
 }

@@ -34,7 +34,7 @@ using namespace Belle2;
 using namespace Belle2::bklm;
 using namespace Belle2::EKLM;
 
-REG_MODULE(KLMTimeCollector)
+REG_MODULE(KLMTimeCollector);
 
 KLMTimeCollectorModule::KLMTimeCollectorModule() :
   CalibrationCollectorModule(),
@@ -44,8 +44,7 @@ KLMTimeCollectorModule::KLMTimeCollectorModule() :
   m_HeventT0_0(nullptr),
   m_HeventT0_1(nullptr),
   m_HnumTrack(nullptr),
-  m_HnBHit2dOfTrack(nullptr),
-  m_HnEHit2dOfTrack(nullptr),
+  m_HnKLMHit2dOfTrack(nullptr),
   m_HpositionDiff{nullptr},
   m_HpositionXDiff(nullptr),
   m_HpositionYDiff(nullptr),
@@ -60,7 +59,6 @@ KLMTimeCollectorModule::KLMTimeCollectorModule() :
   setDescription("Module for KLM time calibration (data collection).");
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  addParam("debug", m_Debug, "debug mode.", false);
   addParam("inputParticleList", m_inputListName, "input particle list.", std::string("mu+:cali"));
   addParam("useEventT0", m_useEvtT0, "Use event T0 or not.", true);
   addParam("IgnoreBackwardPropagation", m_IgnoreBackwardPropagation,
@@ -71,25 +69,21 @@ KLMTimeCollectorModule::KLMTimeCollectorModule() :
 
 KLMTimeCollectorModule::~KLMTimeCollectorModule()
 {
-  B2INFO("Destructor done..");
 }
-
 
 void KLMTimeCollectorModule::prepare()
 {
   /* Initialize geometry. */
-  //B2INFO("prepare :: Initialize geometry..");
   m_geoParB = bklm::GeometryPar::instance();
   m_geoParE = &(EKLM::GeometryData::Instance());
   m_TransformData = new EKLM::TransformData(true, EKLM::TransformData::c_None);
 
   /* Require input dataobjects. */
-  //B2INFO("prepare :: Require input dataobjects..");
   if (m_useEvtT0)
     m_eventT0.isRequired("EventT0");
   m_tracks.isRequired();
 
-  //B2INFO("prepare :: Initialize outTree..");
+  /* Initialization of output tree. */
   m_outTree = new TTree("time_calibration_data", "");
   m_outTree->Branch("t0",        &m_Event.t0,        "t0/D");
   m_outTree->Branch("flyTime",   &m_Event.flyTime,   "flyTime/D");
@@ -106,13 +100,12 @@ void KLMTimeCollectorModule::prepare()
 
   registerObject<TTree>("time_calibration_data", m_outTree);
 
-  B2DEBUG(20, "prepare :: Initialize histgrams..");
+  /* Initialization of histograms. */
   m_HeventT0_0 = new TH1D("m_HeventT0_0", "collision time before track number request;t0[ns]", 200, -100, 100);
   m_HeventT0_1 = new TH1D("m_HeventT0_1", "collision time after track number request;t0[ns]", 200, -100, 100);
   m_HnumTrack = new TH1I("m_HnnumTrack", "Number of Track;nTrack", 30, 0, 30);
 
-  m_HnBHit2dOfTrack = new TH1I("m_HnBKLMHit2dOfTrack", "Number of BKLMHit2d belong to recTrack;num of BKLMHit2d", 20, 0, 20);
-  m_HnEHit2dOfTrack = new TH1I("m_HnEKLMHit2dOfTrack", "Number of EKLMHit2d belong to recTrack;num of EKLMHit2d", 15, 0, 15);
+  m_HnKLMHit2dOfTrack = new TH1I("m_HnKLMHit2dOfTrack", "Number of KLMHit2d belong to recTrack;num of KLMHit2d", 20, 0, 20);
 
   m_HpositionDiff = new TH1D("m_HpositionDiff", "Dist between extHit and KLMHit2d;dist", 160, 0, 8);
   m_HpositionXDiff = new TH1D("m_HpositionXDiff", "DistX between extHit and KLMHit2d;distX", 100, 0, 5);
@@ -130,8 +123,7 @@ void KLMTimeCollectorModule::prepare()
   registerObject<TH1D>("m_HevtT0_0", m_HeventT0_0);
   registerObject<TH1D>("m_HevtT0_1", m_HeventT0_1);
   registerObject<TH1I>("m_HnTrack", m_HnumTrack);
-  registerObject<TH1I>("m_HnBHit2d", m_HnBHit2dOfTrack);
-  registerObject<TH1I>("m_HnEHit2d", m_HnEHit2dOfTrack);
+  registerObject<TH1I>("m_HnKLMHit2d", m_HnKLMHit2dOfTrack);
 
   registerObject<TH1D>("m_HposiDiff", m_HpositionDiff);
   registerObject<TH1D>("m_HposiXDiff", m_HpositionXDiff);
@@ -151,7 +143,7 @@ void KLMTimeCollectorModule::collect()
   StoreObjPtr<EventMetaData> eventMetaData("EventMetaData", DataStore::c_Event);
 
   m_Event.t0 = 0.0;
-  /* Require event T0 determined from CDC */
+  /* Require event T0 determined from CDC. */
   if (m_useEvtT0) {
     if (!m_eventT0.isValid())
       return;
@@ -161,7 +153,7 @@ void KLMTimeCollectorModule::collect()
     m_Event.t0 = evtT0C.back().eventT0;
   }
 
-  /* Read data meta infor */
+  /* Read event metadata. */
   int runId = eventMetaData->getRun();
   int evtId = eventMetaData->getEvent();
 
@@ -169,10 +161,11 @@ void KLMTimeCollectorModule::collect()
 
   const StoreObjPtr<ParticleList> inputList(m_inputListName);
   unsigned n_track =  inputList->getListSize();
+  /* Return if there are no tracks. */
   if (n_track < 1) {
     B2DEBUG(20, "No necessary tracks in" << LogVar("run", runId) << LogVar("event", evtId));
     return;
-  }  // track existence
+  }
 
   B2DEBUG(20, "debug infor for" << LogVar("run", runId) << LogVar("event", evtId) << LogVar("number of rec tracks", n_track));
 
@@ -190,15 +183,13 @@ void KLMTimeCollectorModule::collect()
 
     // Find data objects related to track
     RelationVector<ExtHit> extHits = track->getRelationsTo<ExtHit>();
-    RelationVector<BKLMHit2d> bklmHit2ds = track->getRelationsTo<BKLMHit2d>();
-    RelationVector<EKLMHit2d> eklmHit2ds = track->getRelationsTo<EKLMHit2d>();
+    RelationVector<KLMHit2d> klmHit2ds = track->getRelationsTo<KLMHit2d>();
 
-    getObjectPtr<TH1I>("m_HnBHit2d")->Fill(int(bklmHit2ds.size()));
-    getObjectPtr<TH1I>("m_HnEHit2d")->Fill(int(eklmHit2ds.size()));
+    getObjectPtr<TH1I>("m_HnKLMHit2d")->Fill(int(klmHit2ds.size()));
 
     B2DEBUG(20, "Track" << LogVar("exthits", extHits.size())
-            << LogVar("BKLMHit2d", bklmHit2ds.size()) << LogVar("EKLMHit2d", eklmHit2ds.size()));
-    if (eklmHit2ds.size() < 2 && bklmHit2ds.size() < 2)
+            << LogVar("KLMHit2d", klmHit2ds.size()));
+    if (klmHit2ds.size() < 2)
       continue;
 
     // Loop for extroplate hits
@@ -262,28 +253,25 @@ void KLMTimeCollectorModule::collect()
         }
       }
     }
-
-    //B2INFO("Hits Collection Done."
-    //        << LogVar("exthits in BKLM", m_vExtHitsB.size()) << LogVar("BKLMHit2d", bklmHit2ds.size())
-    //        << LogVar("exthits in EKLM", m_vExtHitsE.size()) << LogVar("EKLMHit2d", eklmHit2ds.size()));
-
     if (m_vExtHits.size() > 0) {
-      collectScintEnd(eklmHit2ds);
-      collectScint(bklmHit2ds);
+      collectScintEnd(klmHit2ds);
+      collectScint(klmHit2ds);
     }
     if (m_vExtHits_RPC.size() > 0) {
-      collectRPC(bklmHit2ds);
+      collectRPC(klmHit2ds);
     }
   }
 }
 
-void KLMTimeCollectorModule::collectScintEnd(RelationVector<EKLMHit2d>& eklmHit2ds)
+void KLMTimeCollectorModule::collectScintEnd(const RelationVector<KLMHit2d>& klmHit2ds)
 {
   const HepGeom::Transform3D* tr;
   HepGeom::Point3D<double> hitGlobal_extHit, hitLocal_extHit;
   double l;
 
-  for (const EKLMHit2d& hit2d : eklmHit2ds) {
+  for (const KLMHit2d& hit2d : klmHit2ds) {
+    if (hit2d.getSubdetector() != KLMElementNumbers::c_EKLM)
+      continue;
     RelationVector<KLMDigit> digits = hit2d.getRelationsTo<KLMDigit>();
     unsigned nDigit = digits.size();
     getObjectPtr<TH1I>("m_HnDigit_scint_end")->Fill(nDigit);
@@ -307,9 +295,9 @@ void KLMTimeCollectorModule::collectScintEnd(RelationVector<EKLMHit2d>& eklmHit2
 
       m_Event.flyTime = 0.5 * (entryHit.getTOF() + exitHit.getTOF());
 
-      TVector3 positionGlobal_extHit = 0.5 * (entryHit.getPosition() + exitHit.getPosition());
-      TVector3 positionGlobal_digit = hit2d.getPosition();
-      TVector3 positionGlobal_diff = positionGlobal_extHit - positionGlobal_digit;
+      ROOT::Math::XYZVector positionGlobal_extHit = 0.5 * (entryHit.getPosition() + exitHit.getPosition());
+      ROOT::Math::XYZVector positionGlobal_digit = hit2d.getPosition();
+      ROOT::Math::XYZVector positionGlobal_diff = positionGlobal_extHit - positionGlobal_digit;
 
       storeDistDiff(positionGlobal_diff);
 
@@ -331,10 +319,12 @@ void KLMTimeCollectorModule::collectScintEnd(RelationVector<EKLMHit2d>& eklmHit2
   }
 }
 
-void KLMTimeCollectorModule::collectScint(RelationVector<BKLMHit2d>& bklmHit2ds)
+void KLMTimeCollectorModule::collectScint(RelationVector<KLMHit2d>& klmHit2ds)
 {
   double stripWidtm_HZ, stripWidtm_HPhi;
-  for (BKLMHit2d& hit2d : bklmHit2ds) {
+  for (KLMHit2d& hit2d : klmHit2ds) {
+    if (hit2d.getSubdetector() != KLMElementNumbers::c_BKLM)
+      continue;
     if (hit2d.inRPC())
       continue;
     if (hit2d.isOutOfTime())
@@ -344,7 +334,7 @@ void KLMTimeCollectorModule::collectScint(RelationVector<BKLMHit2d>& bklmHit2ds)
     if (bklmHit1ds.size() != 2)
       continue;
 
-    TVector3 positionGlobal_hit2d = hit2d.getGlobalPosition();
+    ROOT::Math::XYZVector positionGlobal_hit2d = hit2d.getPosition();
     const bklm::Module* corMod = m_geoParB->findModule(hit2d.getSection(), hit2d.getSector(), hit2d.getLayer());
     stripWidtm_HZ = corMod->getZStripWidth();
     stripWidtm_HPhi = corMod->getPhiStripWidth();
@@ -372,9 +362,9 @@ void KLMTimeCollectorModule::collectScint(RelationVector<BKLMHit2d>& bklmHit2ds)
         m_Event.inRPC = digitHit.inRPC();
         m_Event.flyTime = 0.5 * (entryHit.getTOF() + exitHit.getTOF());
 
-        TVector3 positionGlobal_extHit = 0.5 * (entryHit.getPosition() + exitHit.getPosition());
-        TVector3 positionGlobal_diff = positionGlobal_extHit - positionGlobal_hit2d;
-        B2DEBUG(20, LogVar("Distance between digit and hit2d", positionGlobal_diff.Mag()));
+        ROOT::Math::XYZVector positionGlobal_extHit = 0.5 * (entryHit.getPosition() + exitHit.getPosition());
+        ROOT::Math::XYZVector positionGlobal_diff = positionGlobal_extHit - positionGlobal_hit2d;
+        B2DEBUG(20, LogVar("Distance between digit and hit2d", positionGlobal_diff.R()));
 
         storeDistDiff(positionGlobal_diff);
         const CLHEP::Hep3Vector positionLocal_extHit = corMod->globalToLocal(CLHEP::Hep3Vector(
@@ -401,9 +391,11 @@ void KLMTimeCollectorModule::collectScint(RelationVector<BKLMHit2d>& bklmHit2ds)
   }
 }
 
-void KLMTimeCollectorModule::collectRPC(RelationVector<BKLMHit2d>& bklmHit2ds)
+void KLMTimeCollectorModule::collectRPC(RelationVector<KLMHit2d>& klmHit2ds)
 {
-  for (BKLMHit2d& hit2d : bklmHit2ds) {
+  for (KLMHit2d& hit2d : klmHit2ds) {
+    if (hit2d.getSubdetector() != KLMElementNumbers::c_BKLM)
+      continue;
     if (!hit2d.inRPC())
       continue;
     if (hit2d.isOutOfTime())
@@ -412,7 +404,7 @@ void KLMTimeCollectorModule::collectRPC(RelationVector<BKLMHit2d>& bklmHit2ds)
     if (bklmHit1ds.size() != 2)
       continue;
 
-    TVector3 positionGlobal_hit2d = hit2d.getGlobalPosition();
+    ROOT::Math::XYZVector positionGlobal_hit2d = hit2d.getPosition();
     const bklm::Module* corMod = m_geoParB->findModule(hit2d.getSection(), hit2d.getSector(), hit2d.getLayer());
     double stripWidtm_HZ = corMod->getZStripWidth();
     double stripWidtm_HPhi = corMod->getPhiStripWidth();
@@ -438,9 +430,9 @@ void KLMTimeCollectorModule::collectRPC(RelationVector<BKLMHit2d>& bklmHit2ds)
         ExtHit& exitHit = *(pair_extHits.second);
 
         m_Event.flyTime = 0.5 * (entryHit.getTOF() + exitHit.getTOF());
-        TVector3 positionGlobal_extHit = 0.5 * (entryHit.getPosition() + exitHit.getPosition());
-        TVector3 positionGlobal_diff = positionGlobal_extHit - positionGlobal_hit2d;
-        B2DEBUG(20, LogVar("Distance between digit and hit2d", positionGlobal_diff.Mag()));
+        ROOT::Math::XYZVector positionGlobal_extHit = 0.5 * (entryHit.getPosition() + exitHit.getPosition());
+        ROOT::Math::XYZVector positionGlobal_diff = positionGlobal_extHit - positionGlobal_hit2d;
+        B2DEBUG(20, LogVar("Distance between digit and hit2d", positionGlobal_diff.R()));
 
         storeDistDiff(positionGlobal_diff);
         const CLHEP::Hep3Vector positionLocal_extHit = corMod->globalToLocal(CLHEP::Hep3Vector(
@@ -476,7 +468,6 @@ std::pair<ExtHit*, ExtHit*> KLMTimeCollectorModule::matchExt(
   std::multimap<unsigned int, ExtHit>::iterator it, itlow, itup;
   itlow = v_ExtHits.lower_bound(channelID);
   itup = v_ExtHits.upper_bound(channelID);
-
   for (it = itlow; it != itup; ++it) {
     if (entryHit == nullptr) {
       entryHit = &(it->second);
@@ -489,35 +480,13 @@ std::pair<ExtHit*, ExtHit*> KLMTimeCollectorModule::matchExt(
       exitHit = &(it->second);
     }
   }
-
-  // switch turn on when entry status avaiable
-  /*
-  switch (eHit.getStatus()) {
-    case EXT_ENTER:
-      if (entryHit == NULL) {
-        entryHit = eHit;
-      } else if (eHit->getTOF() < entryHit.getTOF()) {
-        entryHit = eHit;
-      }
-      break;
-    case EXT_EXIT:
-      if (exitHit == NULL) {
-        exitHit = eHit;
-      } else if (eHit.getTOF() > exitHit.getTOF()) {
-        exitHit = eHit;
-      }
-      break;
-    default:
-      break;
-  }
-  */
   std::pair<ExtHit*, ExtHit*> p_extHits = std::make_pair(entryHit, exitHit);
   return p_extHits;
 }
 
-void KLMTimeCollectorModule::storeDistDiff(TVector3& pDiff)
+void KLMTimeCollectorModule::storeDistDiff(ROOT::Math::XYZVector& pDiff)
 {
-  double diffM = pDiff.Mag();
+  double diffM = pDiff.R();
   double diffX = pDiff.X();
   double diffY = pDiff.Y();
   double diffZ = pDiff.Z();
@@ -532,5 +501,4 @@ void KLMTimeCollectorModule::storeDistDiff(TVector3& pDiff)
 
 void KLMTimeCollectorModule::finish()
 {
-  B2INFO("Data Collection Done.");
 }

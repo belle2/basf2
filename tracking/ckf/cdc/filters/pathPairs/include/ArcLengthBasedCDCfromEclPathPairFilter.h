@@ -16,7 +16,8 @@ namespace Belle2 {
   class ArcLengthBasedCDCfromEclPathPairFilter : public BaseCDCPathPairFilter {
   public:
     /// Input: pair of paths, returns 1 if pair.first to be selected, 0 otherwise.
-    TrackFindingCDC::Weight operator()(const BaseCDCPathPairFilter::Object& pair) final {
+    TrackFindingCDC::Weight operator()(const BaseCDCPathPairFilter::Object& pair) final
+    {
       const auto& lhs = *pair.first;
       const auto& rhs = *pair.second;
       const auto& lhsLastState = lhs.back();
@@ -26,8 +27,7 @@ namespace Belle2 {
       const auto rhsArcLength = - rhsLastState.getArcLength();
 
       // priority is most hits
-      if (lhs.size() != rhs.size())
-      {
+      if (lhs.size() != rhs.size()) {
         return lhs.size() > rhs.size();
       }
 

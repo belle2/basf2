@@ -30,8 +30,15 @@ using namespace std;
 
 namespace Belle2 {
 
-  REG_MODULE(TOPInterimFENtuple)
+  //-----------------------------------------------------------------
+  ///                 Register module
+  //-----------------------------------------------------------------
 
+  REG_MODULE(TOPInterimFENtuple);
+
+  //-----------------------------------------------------------------
+  //                 Implementation
+  //-----------------------------------------------------------------
 
   TOPInterimFENtupleModule::TOPInterimFENtupleModule() : HistoModule()
   {

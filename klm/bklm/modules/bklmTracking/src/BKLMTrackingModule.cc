@@ -18,12 +18,11 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace Belle2::bklm;
 using namespace CLHEP;
 
-REG_MODULE(BKLMTracking)
+REG_MODULE(BKLMTracking);
 
 BKLMTrackingModule::BKLMTrackingModule() : Module(),
   m_effiYX(nullptr),
@@ -47,11 +46,19 @@ BKLMTrackingModule::BKLMTrackingModule() : Module(),
   addParam("MatchToRecoTrack", m_MatchToRecoTrack, "[bool], whether match BKLMTrack to RecoTrack; (default is false)", false);
   addParam("MaxAngleRequired", m_maxAngleRequired,
            "[degree], match BKLMTrack to RecoTrack; angle between them is required to be smaller than (default 10)", double(10.0));
+  addParam("MaxDistance", m_maxDistance,
+           "[cm], During efficiency calculation, distance between track and 2dhit must be smaller than (default 10)", double(10.0));
+  addParam("MaxSigma", m_maxSigma,
+           "[sigma], During efficiency calculation, uncertainty of 2dhit must be smaller than (default 5); ", double(5));
+  addParam("MinHitList", m_minHitList,
+           ", During track finding, a good track after initial seed hits must be larger than is (default 2); ", unsigned(2));
+  addParam("MaxHitList", m_maxHitList,
+           ", During track finding, a good track after initial seed hits must be smaller than is (default 60); ", unsigned(60));
   addParam("fitGlobalBKLMTrack", m_globalFit,
            "[bool], do the BKLMTrack fitting in global system (multi-sectors track) or local system (sector by sector) (default is false, local sys.)",
            false);
   addParam("StudyEffiMode", m_studyEffi, "[bool], run in efficieny study mode (default is false)", false);
-  addParam("outputName", m_outPath , "[string],  output file name containing efficiencies plots ", string("bklmEffi.root"));
+  addParam("outputName", m_outPath, "[string],  output file name containing efficiencies plots ", std::string("bklmEffi.root"));
 }
 
 BKLMTrackingModule::~BKLMTrackingModule()
@@ -72,7 +79,7 @@ void BKLMTrackingModule::initialize()
   if (m_studyEffi)
     B2INFO("BKLMTrackingModule:: this module is running in efficiency study mode!");
 
-  m_file =     new TFile(m_outPath.c_str(), "recreate");
+  m_file = new TFile(m_outPath.c_str(), "recreate");
   TString hname;
   std::string labelFB[2] = {"BB", "BF"};
   int Nbin = 16;
@@ -124,7 +131,7 @@ void BKLMTrackingModule::event()
     for (int iSection = 0; iSection < 2; iSection++) {
       for (int iSector = 0; iSector < 8; iSector++) {
         for (int iLayer = 0; iLayer < 15; iLayer++) {
-          runTracking(1, iSection, iSector , iLayer);
+          runTracking(1, iSection, iSector, iLayer);
           if (m_storeTracks.getEntries() > 0)
             thereIsATrack = true;
           generateEffi(iSection, iSector, iLayer);
@@ -157,11 +164,15 @@ void BKLMTrackingModule::runTracking(int mode, int iSection, int iSector, int iL
     return;
   if (mode == 1) { //efficieny study
     for (int j = 0; j < hits2D.getEntries(); j++) {
+      if (hits2D[j]->getSubdetector() != KLMElementNumbers::c_BKLM)
+        continue;
       hits2D[j]->isOnStaTrack(false);
     }
   }
 
   for (int hi = 0; hi < hits2D.getEntries() - 1; ++hi) {
+    if (hits2D[hi]->getSubdetector() != KLMElementNumbers::c_BKLM)
+      continue;
 
     if (mode == 1 && isLayerUnderStudy(iSection, iSector, iLayer, hits2D[hi]))
       continue;
@@ -179,14 +190,15 @@ void BKLMTrackingModule::runTracking(int mode, int iSection, int iSector, int iL
         continue;
       if (!m_globalFit && !sameSector(hits2D[hi], hits2D[hj]))
         continue;
-      if (sameSector(hits2D[hi], hits2D[hj]) && abs(hits2D[hi]->getLayer() - hits2D[hj]->getLayer()) < 3)
+      if (sameSector(hits2D[hi], hits2D[hj]) &&
+          std::abs(hits2D[hi]->getLayer() - hits2D[hj]->getLayer()) < 3)
         continue;
 
-      std::list<BKLMHit2d*> sectorHitList;
+      std::list<KLMHit2d*> sectorHitList;
       //sectorHitList.push_back(hits2D[hi]);
       //sectorHitList.push_back(hits2D[hj]);
 
-      std::list<BKLMHit2d*> seed;
+      std::list<KLMHit2d*> seed;
       seed.push_back(hits2D[hi]);
       seed.push_back(hits2D[hj]);
 
@@ -213,10 +225,10 @@ void BKLMTrackingModule::runTracking(int mode, int iSection, int iSector, int iL
       /* Require at least four hits (minimum for good track, already two as seed, so here we require 2) but
        * no more than 60 (most likely noise, 60 would be four good tracks).
        */
-      if (sectorHitList.size() < 2 || sectorHitList.size() > 60)
+      if (sectorHitList.size() < m_minHitList || sectorHitList.size() > m_maxHitList)
         continue;
 
-      std::list<BKLMHit2d*> m_hits;
+      std::list<KLMHit2d*> m_hits;
       if (m_finder->filter(seed, sectorHitList, m_hits)) {
         BKLMTrack* m_track = m_storeTracks.appendNew();
         m_track->setTrackParam(m_fitter->getTrackParam());
@@ -227,7 +239,7 @@ void BKLMTrackingModule::runTracking(int mode, int iSection, int iSector, int iL
         m_track->setNumHitOnTrack(m_fitter->getNumHit());
         m_track->setIsValid(m_fitter->isValid());
         m_track->setIsGood(m_fitter->isGood());
-        std::list<BKLMHit2d*>::iterator j;
+        std::list<KLMHit2d*>::iterator j;
         m_hits.sort(sortByLayer);
         for (j = m_hits.begin(); j != m_hits.end(); ++j) {
           (*j)->isOnStaTrack(true);
@@ -314,7 +326,7 @@ void BKLMTrackingModule::terminate()
 
 }
 
-bool BKLMTrackingModule::sameSector(BKLMHit2d* hit1, BKLMHit2d* hit2)
+bool BKLMTrackingModule::sameSector(KLMHit2d* hit1, KLMHit2d* hit2)
 {
   if (hit1->getSection() == hit2->getSection() && hit1->getSector() == hit2->getSector())
     return true;
@@ -326,7 +338,7 @@ bool BKLMTrackingModule::findClosestRecoTrack(BKLMTrack* bklmTrk, RecoTrack*& cl
 {
 
   //StoreArray<RecoTrack> recoTracks;
-  RelationVector<BKLMHit2d> bklmHits = bklmTrk->getRelationsTo<BKLMHit2d> ();
+  RelationVector<KLMHit2d> bklmHits = bklmTrk->getRelationsTo<KLMHit2d> ();
 
   if (bklmHits.size() < 1) {
     B2INFO("BKLMTrackingModule::something is wrong! there is BKLMTrack but no bklmHits");
@@ -340,10 +352,10 @@ bool BKLMTrackingModule::findClosestRecoTrack(BKLMTrack* bklmTrk, RecoTrack*& cl
   double oldAngle = INFINITY;
   closestTrack = nullptr;
   //TVector3 poca = TVector3(0, 0, 0);
-  TVector3 firstBKLMHitPosition(0, 0, 0);
   //bklmHits are already sorted by layer
   //possible two hits in one layer?
-  firstBKLMHitPosition = bklmHits[0]->getGlobalPosition();
+  ROOT::Math::XYZVector hitPosition = bklmHits[0]->getPosition();
+  TVector3 firstBKLMHitPosition(hitPosition.X(), hitPosition.Y(), hitPosition.Z());
 
   TMatrixDSym cov(6);
   TVector3 pos(0, 0, 0);
@@ -396,7 +408,7 @@ bool BKLMTrackingModule::findClosestRecoTrack(BKLMTrack* bklmTrk, RecoTrack*& cl
 void BKLMTrackingModule::generateEffi(int iSection, int iSector, int iLayer)
 {
 
-  set<int> m_pointUsed;
+  std::set<int> m_pointUsed;
   m_pointUsed.clear();
   if (m_storeTracks.getEntries() < 1)
     return;
@@ -407,8 +419,8 @@ void BKLMTrackingModule::generateEffi(int iSection, int iSector, int iLayer)
     int cnt1 = 0;
     int cnt2 = 0;
 
-    RelationVector<BKLMHit2d> relatedHit2D = m_storeTracks[it]->getRelationsTo<BKLMHit2d>();
-    for (const BKLMHit2d& hit2D : relatedHit2D) {
+    RelationVector<KLMHit2d> relatedHit2D = m_storeTracks[it]->getRelationsTo<KLMHit2d>();
+    for (const KLMHit2d& hit2D : relatedHit2D) {
       if (hit2D.getLayer() > iLayer + 1)
         cnt1++;
       if (hit2D.getLayer() < iLayer + 1)
@@ -491,13 +503,13 @@ void BKLMTrackingModule::generateEffi(int iSection, int iSector, int iLayer)
         double error, sigma;
         float distance = distanceToHit(m_storeTracks[it], hits2D[he], error, sigma);
 
-        if (distance < 10 && sigma < 5)
+        if (distance < m_maxDistance && sigma < m_maxSigma)
           m_iffound = true;
         if (m_iffound) {
           m_pointUsed.insert(he);
-          //global[0] = hits2D[he]->getGlobalPosition()[0];
-          //global[1] = hits2D[he]->getGlobalPosition()[1];
-          //global[2] = hits2D[he]->getGlobalPosition()[2];
+          //global[0] = hits2D[he]->getPosition()[0];
+          //global[1] = hits2D[he]->getPosition()[1];
+          //global[2] = hits2D[he]->getPosition()[2];
           m_pass[iSection][iSector]->Fill(iLayer + 1);
           m_passYX->Fill(global[0], global[1]);
           m_passYZ->Fill(global[2], global[1]);
@@ -518,28 +530,28 @@ void BKLMTrackingModule::generateEffi(int iSection, int iSector, int iLayer)
 
 }
 
-bool BKLMTrackingModule::sortByLayer(BKLMHit2d* hit1, BKLMHit2d* hit2)
+bool BKLMTrackingModule::sortByLayer(KLMHit2d* hit1, KLMHit2d* hit2)
 {
 
   return hit1->getLayer() < hit2->getLayer();
 
 }
 
-bool BKLMTrackingModule::isLayerUnderStudy(int section, int iSector, int iLayer, BKLMHit2d* hit)
+bool BKLMTrackingModule::isLayerUnderStudy(int section, int iSector, int iLayer, KLMHit2d* hit)
 {
   if (hit->getSection() == section && hit->getSector() == iSector + 1 &&  hit->getLayer() == iLayer + 1)
     return true;
   else return false;
 }
 
-bool BKLMTrackingModule::isSectorUnderStudy(int section, int iSector, BKLMHit2d* hit)
+bool BKLMTrackingModule::isSectorUnderStudy(int section, int iSector, KLMHit2d* hit)
 {
   if (hit->getSection() == section && hit->getSector() == iSector + 1)
     return true;
   else return false;
 }
 
-double BKLMTrackingModule::distanceToHit(BKLMTrack* track, BKLMHit2d* hit,
+double BKLMTrackingModule::distanceToHit(BKLMTrack* track, KLMHit2d* hit,
                                          double& error,
                                          double& sigma)
 {
@@ -555,7 +567,8 @@ double BKLMTrackingModule::distanceToHit(BKLMTrack* track, BKLMHit2d* hit,
   const Belle2::bklm::Module* refMod = m_GeoPar->findModule(hit->getSection(), hit->getSector(), 1);
   const Belle2::bklm::Module* corMod = m_GeoPar->findModule(hit->getSection(), hit->getSector(), hit->getLayer());
 
-  CLHEP::Hep3Vector globalPos(hit->getGlobalPosition()[0], hit->getGlobalPosition()[1], hit->getGlobalPosition()[2]);
+  CLHEP::Hep3Vector globalPos(hit->getPositionX(), hit->getPositionY(),
+                              hit->getPositionZ());
   CLHEP::Hep3Vector local = refMod->globalToLocal(globalPos);
 
   x = local[0] ;

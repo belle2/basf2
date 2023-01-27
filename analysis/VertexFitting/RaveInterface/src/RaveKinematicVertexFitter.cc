@@ -136,7 +136,7 @@ int RaveKinematicVertexFitter::fit()
   }
   int nOfVertices = -100;
   if (m_useBeamSpot == true) {
-    const TVector3& bsPos = RaveSetup::getRawInstance()->m_beamSpot;
+    const B2Vector3D& bsPos = RaveSetup::getRawInstance()->m_beamSpot;
     const TMatrixDSym& bsCov = RaveSetup::getRawInstance()->m_beamSpotCov;
     const rave::Covariance3D bsCovRave(bsCov(0, 0), bsCov(0, 1), bsCov(0, 2), bsCov(1, 1), bsCov(1, 2), bsCov(2, 2));
     RaveSetup::getRawInstance()->m_raveVertexFactory->setBeamSpot(rave::Ellipsoid3D(rave::Point3D(bsPos.X(), bsPos.Y(), bsPos.Z()),
@@ -262,7 +262,7 @@ int RaveKinematicVertexFitter::fit()
     m_fittedNdf = m_fittedParticle.ndof();
     m_fittedChi2 = m_fittedParticle.chi2();
     m_fittedPValue = ROOT::Math::chisquared_cdf_c(m_fittedChi2, m_fittedNdf);
-    m_fittedPos = m_motherParticlePtr->getVertex();
+    m_fittedPos.SetXYZ(m_motherParticlePtr->getX(), m_motherParticlePtr->getY(), m_motherParticlePtr->getZ());
   }
 
 
@@ -339,10 +339,10 @@ void RaveKinematicVertexFitter::updateDaughters()
       fittedState = rDau[ii].fullstate();
       fittedCov = rDau[ii].fullerror();
 
-      TLorentzVector p4;
-      p4.SetXYZT(fittedState.p4().p3().x(), fittedState.p4().p3().y(), fittedState.p4().p3().z(), fittedState.p4().energy());
+      ROOT::Math::PxPyPzEVector p4(fittedState.p4().p3().x(), fittedState.p4().p3().y(), fittedState.p4().p3().z(),
+                                   fittedState.p4().energy());
 
-      TVector3 x3(fittedState.x(), fittedState.y(), fittedState.z());
+      ROOT::Math::XYZVector x3(fittedState.x(), fittedState.y(), fittedState.z());
 
 
       TMatrixDSym fitted7CovM(7);
@@ -408,7 +408,7 @@ Particle* RaveKinematicVertexFitter::getMother()
   return m_motherParticlePtr;
 }
 
-TVector3 RaveKinematicVertexFitter::getPos()
+ROOT::Math::XYZVector RaveKinematicVertexFitter::getPos()
 {
   return m_fittedPos;
 }
@@ -450,7 +450,7 @@ TMatrixDSym RaveKinematicVertexFitter::getVertexErrorMatrix()
 }
 
 
-TMatrixDSym RaveKinematicVertexFitter::ErrorMatrixMassToEnergy(const TLorentzVector& p4, const TMatrixDSym& MassErr)
+TMatrixDSym RaveKinematicVertexFitter::ErrorMatrixMassToEnergy(const ROOT::Math::PxPyPzEVector& p4, const TMatrixDSym& MassErr)
 {
 
   TMatrix jac(7, 7);
@@ -480,7 +480,7 @@ TMatrixDSym RaveKinematicVertexFitter::ErrorMatrixMassToEnergy(const TLorentzVec
   return EnergyErr;
 }
 
-TMatrixDSym RaveKinematicVertexFitter::ErrorMatrixEnergyToMass(const TLorentzVector& p4, const TMatrixDSym& EnergyErr)
+TMatrixDSym RaveKinematicVertexFitter::ErrorMatrixEnergyToMass(const ROOT::Math::PxPyPzEVector& p4, const TMatrixDSym& EnergyErr)
 {
 
   TMatrix jac(7, 7);

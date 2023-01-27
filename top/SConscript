@@ -3,6 +3,7 @@ Import('env')
 env['LIBS'] = ['framework', 'geometry', 'simulation', 'top_dataobjects',
                'tracking_dataobjects', 'geometry_dbobjects', 'mdst_dataobjects',
 	       'analysis', 'analysis_dataobjects', 'analysis_utility',
+	       'calibration', 'calibration_dataobjects',
 	       'simulation_dataobjects',
                '$ROOT_LIBS', '$GEANT4_LIBS', 'CLHEP']
 

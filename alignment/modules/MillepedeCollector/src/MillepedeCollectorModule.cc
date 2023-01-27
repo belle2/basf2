@@ -25,10 +25,8 @@
 #include <analysis/utility/ReferenceFrame.h>
 #include <framework/core/FileCatalog.h>
 #include <framework/database/DBObjPtr.h>
-#include <framework/dataobjects/EventT0.h>
 #include <framework/dataobjects/FileMetaData.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/dbobjects/BeamParameters.h>
 #include <framework/particledb/EvtGenDatabasePDG.h>
 #include <framework/pcore/ProcHandler.h>
@@ -55,7 +53,7 @@ using namespace alignment;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(MillepedeCollector)
+REG_MODULE(MillepedeCollector);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -159,11 +157,7 @@ MillepedeCollectorModule::MillepedeCollectorModule() : CalibrationCollectorModul
 
 void MillepedeCollectorModule::prepare()
 {
-  StoreObjPtr<EventMetaData> emd;
-  emd.isRequired();
-
-  StoreObjPtr<EventT0> eventT0;
-  //eventT0.isRequired();
+  m_eventT0.isOptional();
 
   if (m_tracks.empty() &&
       m_particles.empty() &&
@@ -182,9 +176,9 @@ void MillepedeCollectorModule::prepare()
   }
 
   if (!m_particles.empty() || !m_vertices.empty() || !m_primaryVertices.empty()) {
-    StoreArray<RecoTrack> recoTracks;
-    StoreArray<Track> tracks;
-    StoreArray<TrackFitResult> trackFitResults;
+    // StoreArray<RecoTrack> recoTracks;
+    // StoreArray<Track> tracks;
+    // StoreArray<TrackFitResult> trackFitResults;
 
     //recoTracks.isRequired();
     //tracks.isRequired();
@@ -259,9 +253,7 @@ void MillepedeCollectorModule::prepare()
 
 void MillepedeCollectorModule::collect()
 {
-  StoreObjPtr<EventMetaData> emd;
-  alignment::GlobalCalibrationManager::getInstance().preCollect(*emd);
-  StoreObjPtr<EventT0> eventT0;
+  alignment::GlobalCalibrationManager::getInstance().preCollect(*m_evtMetaData);
 
   if (!m_useGblTree) {
     // Open new file on request (at start or after being closed)
@@ -303,8 +295,8 @@ void MillepedeCollectorModule::collect()
       getObjectPtr<TH1I>("ndf")->Fill(ndf);
       getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
       getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
-      if (eventT0.isValid() && eventT0->hasEventT0()) {
-        evt0 =  eventT0->getEventT0();
+      if (m_eventT0.isValid() && m_eventT0->hasEventT0()) {
+        evt0 = m_eventT0->getEventT0();
         getObjectPtr<TH1F>("evt0")->Fill(evt0);
       }
 
@@ -329,8 +321,8 @@ void MillepedeCollectorModule::collect()
         getObjectPtr<TH1I>("ndf")->Fill(ndf);
         getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
         getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
-        if (eventT0.isValid() && eventT0->hasEventT0()) {
-          evt0 =  eventT0->getEventT0();
+        if (m_eventT0.isValid() && m_eventT0->hasEventT0()) {
+          evt0 = m_eventT0->getEventT0();
           getObjectPtr<TH1F>("evt0")->Fill(evt0);
         }
 
@@ -362,8 +354,8 @@ void MillepedeCollectorModule::collect()
         getObjectPtr<TH1I>("ndf")->Fill(ndf);
         getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
         getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
-        if (eventT0.isValid() && eventT0->hasEventT0()) {
-          evt0 =  eventT0->getEventT0();
+        if (m_eventT0.isValid() && m_eventT0->hasEventT0()) {
+          evt0 = m_eventT0->getEventT0();
           getObjectPtr<TH1F>("evt0")->Fill(evt0);
         }
 
@@ -407,7 +399,7 @@ void MillepedeCollectorModule::collect()
 
         TMatrixDSym vertexCov(get<TMatrixDSym>(beam));
         TMatrixDSym vertexPrec(get<TMatrixDSym>(beam).Invert());
-        B2Vector3D vertexResidual = - (mother->getVertex() - get<B2Vector3D>(beam));
+        B2Vector3D vertexResidual = - (B2Vector3D(mother->getVertex()) - get<B2Vector3D>(beam));
 
         TVectorD extMeasurements(3);
         extMeasurements[0] = vertexResidual[0];
@@ -499,8 +491,8 @@ void MillepedeCollectorModule::collect()
           getObjectPtr<TH1I>("ndf")->Fill(ndf);
           getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
           getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
-          if (eventT0.isValid() && eventT0->hasEventT0()) {
-            evt0 =  eventT0->getEventT0();
+          if (m_eventT0.isValid() && m_eventT0->hasEventT0()) {
+            evt0 = m_eventT0->getEventT0();
             getObjectPtr<TH1F>("evt0")->Fill(evt0);
           }
 
@@ -515,8 +507,8 @@ void MillepedeCollectorModule::collect()
           getObjectPtr<TH1I>("ndf")->Fill(ndf);
           getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
           getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
-          if (eventT0.isValid() && eventT0->hasEventT0()) {
-            evt0 =  eventT0->getEventT0();
+          if (m_eventT0.isValid() && m_eventT0->hasEventT0()) {
+            evt0 = m_eventT0->getEventT0();
             getObjectPtr<TH1F>("evt0")->Fill(evt0);
           }
 
@@ -579,8 +571,8 @@ void MillepedeCollectorModule::collect()
       getObjectPtr<TH1I>("ndf")->Fill(ndf);
       getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
       getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
-      if (eventT0.isValid() && eventT0->hasEventT0()) {
-        evt0 =  eventT0->getEventT0();
+      if (m_eventT0.isValid() && m_eventT0->hasEventT0()) {
+        evt0 = m_eventT0->getEventT0();
         getObjectPtr<TH1F>("evt0")->Fill(evt0);
       }
 
@@ -635,8 +627,8 @@ void MillepedeCollectorModule::collect()
       getObjectPtr<TH1I>("ndf")->Fill(ndf);
       getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
       getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
-      if (eventT0.isValid() && eventT0->hasEventT0()) {
-        evt0 =  eventT0->getEventT0();
+      if (m_eventT0.isValid() && m_eventT0->hasEventT0()) {
+        evt0 = m_eventT0->getEventT0();
         getObjectPtr<TH1F>("evt0")->Fill(evt0);
       }
 
@@ -676,7 +668,7 @@ void MillepedeCollectorModule::collect()
       daughters.push_back({gbl->collectGblPoints(track12[1], track12[1]->getCardinalRep()), dfdextPlusMinus.second});
 
       TMatrixDSym vertexPrec(get<TMatrixDSym>(getPrimaryVertexAndCov()).Invert());
-      B2Vector3D vertexResidual = - (mother->getVertex() - get<B2Vector3D>(getPrimaryVertexAndCov()));
+      B2Vector3D vertexResidual = - (B2Vector3D(mother->getVertex()) - get<B2Vector3D>(getPrimaryVertexAndCov()));
 
       TMatrixDSym massPrec(1); massPrec(0, 0) = 1. / motherWidth / motherWidth;
       TVectorD massResidual(1); massResidual = - (mother->getMass() - motherMass);
@@ -704,8 +696,8 @@ void MillepedeCollectorModule::collect()
       getObjectPtr<TH1I>("ndf")->Fill(ndf);
       getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
       getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
-      if (eventT0.isValid() && eventT0->hasEventT0()) {
-        evt0 =  eventT0->getEventT0();
+      if (m_eventT0.isValid() && m_eventT0->hasEventT0()) {
+        evt0 = m_eventT0->getEventT0();
         getObjectPtr<TH1F>("evt0")->Fill(evt0);
       }
 
@@ -731,7 +723,7 @@ void MillepedeCollectorModule::collect()
     double E_HER = beam->getHER().E();
     double E_LER = beam->getLER().E();
 
-    double pz = (beam->getHER().Vect() + beam->getLER().Vect())[2];
+    double pz = beam->getHER().Pz() + beam->getLER().Pz();
     double E  = (beam->getHER() + beam->getLER()).E();
 
     double motherMass = beam->getMass();
@@ -797,12 +789,12 @@ void MillepedeCollectorModule::collect()
       auto extPrec = extCov; extPrec.Invert();
 
       TVectorD extMeasurements(7);
-      extMeasurements[0] = - (mother->getVertex() - get<B2Vector3D>(getPrimaryVertexAndCov()))[0];
-      extMeasurements[1] = - (mother->getVertex() - get<B2Vector3D>(getPrimaryVertexAndCov()))[1];
-      extMeasurements[2] = - (mother->getVertex() - get<B2Vector3D>(getPrimaryVertexAndCov()))[2];
-      extMeasurements[3] = - (mother->getMomentum() - (beam->getHER().Vect() + beam->getLER().Vect()))[0];
-      extMeasurements[4] = - (mother->getMomentum() - (beam->getHER().Vect() + beam->getLER().Vect()))[1];
-      extMeasurements[5] = - (mother->getMomentum() - (beam->getHER().Vect() + beam->getLER().Vect()))[2];
+      extMeasurements[0] = - (B2Vector3D(mother->getVertex()) - get<B2Vector3D>(getPrimaryVertexAndCov()))[0];
+      extMeasurements[1] = - (B2Vector3D(mother->getVertex()) - get<B2Vector3D>(getPrimaryVertexAndCov()))[1];
+      extMeasurements[2] = - (B2Vector3D(mother->getVertex()) - get<B2Vector3D>(getPrimaryVertexAndCov()))[2];
+      extMeasurements[3] = - (B2Vector3D(mother->getMomentum()) - (beam->getHER().Vect() + beam->getLER().Vect()))[0];
+      extMeasurements[4] = - (B2Vector3D(mother->getMomentum()) - (beam->getHER().Vect() + beam->getLER().Vect()))[1];
+      extMeasurements[5] = - (B2Vector3D(mother->getMomentum()) - (beam->getHER().Vect() + beam->getLER().Vect()))[2];
       extMeasurements[6] = - (mother->getMass() - motherMass);
 
       B2INFO("mother mass = " << mother->getMass() << "  and beam mass = " << beam->getMass());
@@ -944,8 +936,8 @@ void MillepedeCollectorModule::collect()
         getObjectPtr<TH1I>("ndf")->Fill(ndf);
         getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
         getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
-        if (eventT0.isValid() && eventT0->hasEventT0()) {
-          evt0 =  eventT0->getEventT0();
+        if (m_eventT0.isValid() && m_eventT0->hasEventT0()) {
+          evt0 = m_eventT0->getEventT0();
           getObjectPtr<TH1F>("evt0")->Fill(evt0);
         }
 
@@ -964,8 +956,8 @@ void MillepedeCollectorModule::collect()
         getObjectPtr<TH1I>("ndf")->Fill(ndf);
         getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
         getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
-        if (eventT0.isValid() && eventT0->hasEventT0()) {
-          evt0 =  eventT0->getEventT0();
+        if (m_eventT0.isValid() && m_eventT0->hasEventT0()) {
+          evt0 = m_eventT0->getEventT0();
           getObjectPtr<TH1F>("evt0")->Fill(evt0);
         }
 
@@ -1027,12 +1019,11 @@ void MillepedeCollectorModule::storeTrajectory(gbl::GblTrajectory& trajectory)
 
 std::string MillepedeCollectorModule::getUniqueMilleName()
 {
-  StoreObjPtr<EventMetaData> emd;
   string name = getName();
 
-  name += "-e"   + to_string(emd->getExperiment());
-  name += "-r"   + to_string(emd->getRun());
-  name += "-ev"  + to_string(emd->getEvent());
+  name += "-e"   + to_string(m_evtMetaData->getExperiment());
+  name += "-r"   + to_string(m_evtMetaData->getRun());
+  name += "-ev"  + to_string(m_evtMetaData->getEvent());
 
   if (ProcHandler::parallelProcessingUsed())
     name += "-pid" + to_string(ProcHandler::EvtProcID());
@@ -1300,9 +1291,9 @@ std::pair<TMatrixD, TMatrixD> MillepedeCollectorModule::getTwoBodyToLocalTransfo
 {
   std::vector<TMatrixD> result;
 
-  double px = mother.getMomentum()[0];
-  double py = mother.getMomentum()[1];
-  double pz = mother.getMomentum()[2];
+  double px = mother.getPx();
+  double py = mother.getPy();
+  double pz = mother.getPz();
   double pt = sqrt(px * px + py * py);
   double p  = mother.getMomentumMagnitude();
   double M  = motherMass;
@@ -1316,27 +1307,28 @@ std::pair<TMatrixD, TMatrixD> MillepedeCollectorModule::getTwoBodyToLocalTransfo
   mother2lab(0, 0) = px * pz / pt / p; mother2lab(0, 1) = - py / pt; mother2lab(0, 2) = px / p;
   mother2lab(1, 0) = py * pz / pt / p; mother2lab(1, 1) =   px / pt; mother2lab(1, 2) = py / p;
   mother2lab(2, 0) = - pt / p;         mother2lab(2, 1) =   0;       mother2lab(2, 2) = pz / p;
-  auto lab2mother = mother2lab; lab2mother.Invert();
+  ROOT::Math::Rotation3D lab2mother;
+  lab2mother.SetRotationMatrix(mother2lab); lab2mother.Invert();
 
   // Need to rotate and boost daughters' momenta to know which goes forward (+sign in decay model)
   // and to get the angles theta, phi of the decaying daughter system in mothers' reference frame
   RestFrame boostedFrame(&mother);
-  TLorentzVector fourVector1 = mother.getDaughter(0)->get4Vector();
-  TLorentzVector fourVector2 = mother.getDaughter(1)->get4Vector();
+  ROOT::Math::PxPyPzEVector fourVector1 = mother.getDaughter(0)->get4Vector();
+  ROOT::Math::PxPyPzEVector fourVector2 = mother.getDaughter(1)->get4Vector();
 
   auto mom1 = lab2mother * boostedFrame.getMomentum(fourVector1).Vect();
   auto mom2 = lab2mother * boostedFrame.getMomentum(fourVector2).Vect();
   // One momentum has opposite direction (otherwise should be same in CMS of mother), but which?
   double sign = 1.;
   auto avgMom = 0.5 * (mom1 - mom2);
-  if (avgMom[2] < 0.) {
+  if (avgMom.Z() < 0.) {
     avgMom *= -1.;
     // switch meaning of plus/minus trajectories
     sign = -1.;
   }
 
-  double theta = atan2(avgMom.Perp(), avgMom[2]);
-  double phi = atan2(avgMom[1], avgMom[0]);
+  double theta = atan2(avgMom.rho(), avgMom.Z());
+  double phi = atan2(avgMom.Y(), avgMom.X());
   if (phi < 0.) phi += 2. * TMath::Pi();
 
   double alpha = M / 2. / m;

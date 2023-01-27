@@ -45,6 +45,11 @@ namespace Belle2 {
     NSMData(const NSMData& data);
     virtual ~NSMData();
 
+    /**
+     * Operator =.
+     */
+    const NSMData& operator=(const NSMData& data);
+
   private:
     NSMData(void* pdata, const NSMData& data);
     NSMData(void* pdata, const std::string& dataname,
@@ -77,20 +82,20 @@ namespace Belle2 {
     void search(NameValueList& map, const std::string& name = "") const;
 
   public:
-    virtual void* getValue(const std::string& name);
-    virtual const void* getValue(const std::string& name) const;
-    virtual void setValue(const std::string& name, const void* value, int size);
+    void* getValue(const std::string& name);
+    const void* getValue(const std::string& name) const override;
+    virtual void setValue(const std::string& name, const void* value, int size) override;
     virtual void addValue(const std::string& name, const void* value,
                           DBField::Type type, int length = 0);
-    virtual const std::string& getText(const std::string&) const { return m_empty; }
-    virtual void addText(const std::string&, const std::string&) {}
+    const std::string& getText(const std::string&) const override { return m_empty; }
+    void addText(const std::string&, const std::string&) override {}
 
   public:
-    virtual void readObject(Reader& reader);
-    virtual void writeObject(Writer& writer) const;
+    void readObject(Reader& reader) override;
+    void writeObject(Writer& writer) const override;
 
   protected:
-    virtual void reset();
+    void reset() override;
 
   private:
     void set(void* pdata) { m_pdata = pdata; }

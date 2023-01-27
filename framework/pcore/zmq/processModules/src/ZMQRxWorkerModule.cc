@@ -15,7 +15,7 @@
 using namespace std;
 using namespace Belle2;
 
-REG_MODULE(ZMQRxWorker)
+REG_MODULE(ZMQRxWorker);
 
 ZMQRxWorkerModule::ZMQRxWorkerModule() : Module()
 {

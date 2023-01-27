@@ -17,6 +17,7 @@
 
 #include <framework/utilities/IOIntercept.h>
 
+#include <Math/Vector3D.h>
 #include <string>
 
 namespace Belle2 {
@@ -41,9 +42,13 @@ namespace Belle2 {
     /**
      * Constructor.
      */
-    EvtGenInterface(): m_parent(0), m_Generator(0), m_pinit(0, 0, 0, 0),
+    EvtGenInterface():
+      m_parent(0),
+      m_Generator(0),
+      m_pinit(0, 0, 0, 0),
       m_ParentInitialized(false),
-      m_logCapture("EvtGen", LogConfig::c_Debug, LogConfig::c_Warning, 100, 100) {}
+      m_logCaptureDebug("EvtGen", LogConfig::c_Debug, LogConfig::c_Warning, 20, 20)
+    {}
 
     /**
      * Destructor.
@@ -55,8 +60,8 @@ namespace Belle2 {
               const std::string& userFileName = std::string(""), bool coherentMixing = true);
 
     /** Generate a single event */
-    int simulateEvent(MCParticleGraph& graph, TLorentzVector pParentParticle,
-                      TVector3 pPrimaryVertex, int inclusiveType, const std::string& inclusiveParticle);
+    int simulateEvent(MCParticleGraph& graph, ROOT::Math::PxPyPzEVector pParentParticle,
+                      ROOT::Math::XYZVector pPrimaryVertex, int inclusiveType, const std::string& inclusiveParticle);
 
     /** Simulate a particle decay. */
     int simulateDecay(MCParticleGraph& graph,
@@ -64,12 +69,12 @@ namespace Belle2 {
 
   private:
     /** Convert EvtParticle structure to flat MCParticle list */
-    int addParticles2Graph(EvtParticle* particle, MCParticleGraph& graph, TVector3 pPrimaryVertex,
+    int addParticles2Graph(EvtParticle* particle, MCParticleGraph& graph, ROOT::Math::XYZVector pPrimaryVertex,
                            MCParticleGraph::GraphParticle* parent, double timeOffset = 0);
 
     /** Copy parameters from EvtParticle to MCParticle */
     void updateGraphParticle(EvtParticle* eParticle, MCParticleGraph::GraphParticle* gParticle,
-                             TVector3 pPrimaryVertex, double timeOffset = 0);
+                             ROOT::Math::XYZVector pPrimaryVertex, double timeOffset = 0);
 
   protected:
     EvtParticle* m_parent;      /**<Variable needed for parent particle.  */
@@ -78,7 +83,7 @@ namespace Belle2 {
     EvtVector4R m_pinit;        /**<Variable needed for initial momentum. */
     EvtId m_ParentParticle;     /**<Variable needed for parent particle ID. */
     bool m_ParentInitialized;   /**< Whether parent particle is initialized. */
-    IOIntercept::OutputToLogMessages m_logCapture; /**< Capture evtgen log and transform into basf2 logging. */
+    IOIntercept::OutputToLogMessages m_logCaptureDebug; /**< Capture EvtGen log and transform into basf2 logging as B2DEBUG messages. */
   }; //! end of EvtGen Interface
 
 } //! end of Belle2 namespace

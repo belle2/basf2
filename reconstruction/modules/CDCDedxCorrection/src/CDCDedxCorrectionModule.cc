@@ -17,7 +17,7 @@
 using namespace Belle2;
 using namespace Dedx;
 
-REG_MODULE(CDCDedxCorrection)
+REG_MODULE(CDCDedxCorrection);
 
 CDCDedxCorrectionModule::CDCDedxCorrectionModule() : Module()
 {
@@ -320,10 +320,16 @@ double CDCDedxCorrectionModule::I2D(const double cosTheta, const double I) const
     return I;
   }
 
-  double D = (a != 0) ? (-b + sqrt(b * b - 4.0 * a * c)) / (2.0 * a) : -c / b;
+  double discr = b * b - 4.0 * a * c;
+  if (discr < 0) {
+    B2WARNING("negative discriminant; return uncorrectecd value");
+    return I;
+  }
+
+  double D = (a != 0) ? (-b + sqrt(discr)) / (2.0 * a) : -c / b;
   if (D < 0) {
     B2WARNING("D is less 0! will try another solution");
-    D = (a != 0) ? (-b - sqrt(b * b + 4.0 * a * c)) / (2.0 * a) : -c / b;
+    D = (a != 0) ? (-b - sqrt(discr)) / (2.0 * a) : -c / b;
     if (D < 0) {
       B2WARNING("D is still less 0! just return uncorrectecd value");
       return I;

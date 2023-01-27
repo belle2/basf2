@@ -19,5 +19,10 @@ from b2test_utils import check_error_free
 if __name__ == "__main__":
     # Ignore the nofile .. [missingInclude] that is always at the end of cppcheck
     ignoreme = 'Cppcheck cannot find all the include files'
+    # Ignore the unmatched suppression warning useStlAlgorithm
+    ignoreUnmatchedUseStlAlgorithm = 'Unmatched suppression: useStlAlgorithm'
     check_error_free("b2code-cppcheck", "cppcheck", "b2bii",
-                     lambda x: re.findall(ignoreme, x) or x == "'")
+                     lambda x:
+                     re.findall(ignoreme, x) or
+                     re.findall(ignoreUnmatchedUseStlAlgorithm, x) or
+                     x == "'")

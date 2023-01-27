@@ -36,6 +36,8 @@ void CDCWireTopology::initialize()
 
   // create all wires
   CDC::CDCGeometryPar& cdcGeo = CDC::CDCGeometryPar::Instance();
+  m_FirstLayerOffset = cdcGeo.getOffsetOfFirstLayer();
+
   for (size_t iCLayer = 0; iCLayer < cdcGeo.nWireLayers() ; ++iCLayer) {
     for (size_t iWire = 0; iWire < cdcGeo.nWiresInLayer(iCLayer); ++iWire) {
       m_wires.push_back(CDCWire(WireID(iCLayer, iWire)));
@@ -53,6 +55,12 @@ void CDCWireTopology::initialize()
   // create all superlayers
   std::vector<VectorRange<CDCWireLayer> > layersByISuperLayer =
     adjacent_groupby(m_wireLayers.begin(), m_wireLayers.end(), Common<GetISuperLayer>());
+
+  if (cdcGeo.getOffsetOfFirstSuperLayer() > 0) {
+    for (uint superLayer = 0; superLayer < cdcGeo.getOffsetOfFirstSuperLayer(); ++superLayer) {
+      m_wireSuperLayers.push_back(CDCWireSuperLayer());
+    }
+  }
 
   for (VectorRange<CDCWireLayer> layersForISuperLayer : layersByISuperLayer) {
     m_wireSuperLayers.push_back(CDCWireSuperLayer(layersForISuperLayer));

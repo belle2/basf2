@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
 # Author: The Belle II Collaboration                                     #
@@ -7,15 +5,15 @@
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
+
 import functools
 import collections
 import re
-from variables import variables as _variablemanager
-from variables import std_vector as _std_vector
+import variables
 from typing import Iterable, Union, List, Tuple, Optional
 
 
-def create_aliases(list_of_variables: Iterable[str], wrapper: str, prefix: str) -> List[str]:
+def create_aliases(list_of_variables: Iterable[str], wrapper: str, prefix="") -> List[str]:
     """
     The function creates aliases for variables from the variables list with given wrapper
     and returns list of the aliases.
@@ -52,8 +50,8 @@ def create_aliases(list_of_variables: Iterable[str], wrapper: str, prefix: str) 
     for var in list_of_variables:
         # replace all non-safe characters for alias name with _ (but remove from the end)
         safe = replacement.sub("_", var).strip("_")
-        aliases.append(f"{prefix}_{safe}")
-        _variablemanager.addAlias(aliases[-1], wrapper.format(variable=var))
+        aliases.append(f"{prefix}_{safe}" if prefix else f"{safe}")
+        variables.variables.addAlias(aliases[-1], wrapper.format(variable=var))
 
     return aliases
 
@@ -534,7 +532,7 @@ def add_collection(list_of_variables: Iterable[str], collection_name: str) -> st
         str: name of the variable collection
     """
 
-    _variablemanager.addCollection(collection_name, _std_vector(*tuple(list_of_variables)))
+    variables.variables.addCollection(collection_name, variables.std_vector(*tuple(list_of_variables)))
     return collection_name
 
 
@@ -574,4 +572,4 @@ def create_isSignal_alias(aliasName, flags):
             informationString += "Now one of the input flags is " + str(int) + " ."
             raise ValueError(informationString)
 
-    _variablemanager.addAlias(aliasName, "passesCut(unmask(mcErrors, %d) == %d)" % (mask, 0))
+    variables.variables.addAlias(aliasName, "passesCut(unmask(mcErrors, %d) == %d)" % (mask, 0))

@@ -1,5 +1,6 @@
 Import('env')
 
-env['LIBS'] = ['$ROOT_LIBS', 'framework', 'daq_hbasf2', 'hlt_softwaretrigger_dataobjects', 'rawdata_dataobjects', 'daq_dataobjects', 'boost_program_options', 'tracking_dataobjects']
+env['LIBS'] = ['$ROOT_LIBS', 'framework', 'daq_hbasf2', 'boost_program_options',
+			   'hlt_softwaretrigger_dataobjects', 'rawdata_dataobjects', 'mdst_dataobjects', 'tracking_dataobjects']
 
 Return('env')

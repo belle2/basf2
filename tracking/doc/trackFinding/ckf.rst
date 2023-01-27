@@ -1,7 +1,7 @@
 .. _tracking_ckf: 
 
 Inter-Detector Hit Finding
-==========================
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. warning::
   This documentation is under construction!
@@ -14,19 +14,19 @@ We have several implementations of the CKF, depending on the detector we are ext
 .. _tracking_svd2pxd_ckf:
 
 SVD to PXD CKF
---------------
+""""""""""""""
 
 .. _tracking_svd2cdc_ckf:
 
 SVD to CDC CKF
---------------
+""""""""""""""
 
 .. _tracking_cdc2svd_ckf:
 
 CDC to SVD CKF
---------------
+""""""""""""""
 
 .. _tracking_ecl2cdc_ckf:
 
 ECL to CDC CKF
---------------
+""""""""""""""

@@ -149,7 +149,7 @@ if __name__ == "__main__":
     print("")
 
     svdOccupAndHotStripsCAF = SVDOccupancyAndHotStripsCalibrations(input_files,
-                                                                   ['data_reprocessing_prompt', 'svd_basic', 'svd_loadedOnFADC'])
+                                                                   ['data_reprocessing_prompt', 'svd_basic', 'online'])
 
     cal_fw = CAF()
     cal_fw.add_calibration(svdOccupAndHotStripsCAF)

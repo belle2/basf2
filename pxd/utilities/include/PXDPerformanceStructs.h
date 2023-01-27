@@ -61,9 +61,11 @@ namespace Belle2 {
       /** Update values from a PXDCluster.
        * @param pxdIntercept a PXDIntercept object.
        * @param recoTracksName Name of RecoTrack collection
+       * @param mass Mass of the impinging particle
        * @return the pointer of the related RecoTrack object.
        */
-      RecoTrack* setValues(const PXDIntercept& pxdIntercept, const std::string& recoTracksName = "");
+      RecoTrack* setValues(const PXDIntercept& pxdIntercept, const std::string& recoTracksName = "",
+                           const double& mass = Const::electronMass);
 
       float x;         /**< Global position in x. */
       float y;         /**< Global position in y. */
@@ -86,11 +88,13 @@ namespace Belle2 {
        * @param pxdIntercept a PXDIntercept object.
        * @param recoTracksName Name of RecoTrack collection
        * @param pxdTrackClustersName Name of track matched PXDClusters
+       * @param mass Mass of the impinging particle
        * @return the pointer of the related RecoTrack object.
        */
       RecoTrack* setValues(const PXDIntercept& pxdIntercept,
                            const std::string& recoTracksName = "",
-                           const std::string& pxdTrackClustersName = "PXDClustersFromTracks");
+                           const std::string& pxdTrackClustersName = "PXDClustersFromTracks",
+                           const double& mass = Const::electronMass);
 
       bool usedInTrack;        /**< True if the cluster is used in tracking */
       float dU;                /**< Residual (meas - prediction) in U. */
@@ -112,7 +116,7 @@ namespace Belle2 {
        * @param tfrPtr a pointer of TrackFitResult
        * @param ip The interaction point for correcting d0 and z0
        */
-      void setTrackVariables(const TrackFitResult* tfrPtr, const TVector3& ip);
+      void setTrackVariables(const TrackFitResult* tfrPtr, const ROOT::Math::XYZVector& ip);
 
       /** Update values from a RecoTrack.
        * @param recoTrack A RecoTrack object.
@@ -121,7 +125,7 @@ namespace Belle2 {
        * @param pxdInterceptsName Name of PXDIntercept collection
        * @param pxdTrackClustersName Name of track matched PXDClusters
        */
-      void setValues(const RecoTrack& recoTrack, const TVector3& ip = TVector3(0, 0, 0),
+      void setValues(const RecoTrack& recoTrack, const ROOT::Math::XYZVector& ip = ROOT::Math::XYZVector(0, 0, 0),
                      const std::string& recoTracksName = "",
                      const std::string& pxdInterceptsName = "",
                      const std::string& pxdTrackClustersName = "PXDClustersFromTracks"
@@ -149,7 +153,7 @@ namespace Belle2 {
      */
     template <typename TTrackCluster>
     void TrackBase_t<TTrackCluster>::setTrackVariables(
-      const TrackFitResult* tfrPtr, const TVector3& ip
+      const TrackFitResult* tfrPtr, const ROOT::Math::XYZVector& ip
     )
     {
       if (!tfrPtr) {
@@ -159,13 +163,13 @@ namespace Belle2 {
       nSVDHits = tfrPtr->getHitPatternVXD().getNSVDHits();
       nPXDHits = tfrPtr->getHitPatternVXD().getNPXDHits();
       tanLambda = tfrPtr->getCotTheta();
-      pt = tfrPtr->getMomentum().Perp();
+      pt = tfrPtr->getMomentum().Rho();
       d0 = tfrPtr->getD0();
       z0 = tfrPtr->getZ0();
       phi0 = tfrPtr->getPhi0();
       d0p = d0;
       z0p = z0;
-      if (ip != TVector3(0, 0, 0)) {
+      if (ip != ROOT::Math::XYZVector(0, 0, 0)) {
         // get a helix and change coordinate origin to ip
         auto uHelix = tfrPtr->getUncertainHelix();
         uHelix.passiveMoveBy(ip);
@@ -176,7 +180,7 @@ namespace Belle2 {
 
     template <typename TTrackCluster>
     void TrackBase_t<TTrackCluster>::setValues(
-      const RecoTrack& recoTrack, const TVector3& ip,
+      const RecoTrack& recoTrack, const ROOT::Math::XYZVector& ip,
       const std::string& recoTracksName,
       const std::string& pxdInterceptsName,
       const std::string& pxdTrackClustersName

@@ -12,47 +12,63 @@
 
 #pragma once
 
+#include <dqm/core/DQMHistAnalysis.h>
+
 #ifdef _BELLE2_EPICS
 // EPICS
 #include "cadef.h"
 #endif
 
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
 #include <vxd/dataobjects/VxdID.h>
 
-#include <TEfficiency.h>
-#include <TCanvas.h>
 #include <TH2F.h>
+#include <TEfficiency.h>
 
 namespace Belle2 {
   /*! DQM Histogram Analysis for PXD Efficiency */
 
-  class DQMHistAnalysisPXDEffModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisPXDEffModule final : public DQMHistAnalysisModule {
 
     // Public functions
   public:
 
-    //! Constructor
+    /**
+     * Constructor.
+     */
     DQMHistAnalysisPXDEffModule();
-    //! Destructor
-    ~DQMHistAnalysisPXDEffModule();
-  private:
 
-    //! Module functions to be called from main process
+    /**
+     * Destructor.
+     */
+    ~DQMHistAnalysisPXDEffModule();
+
+    /**
+     * Initializer.
+     */
     void initialize(void) override final;
 
-    //! Module functions to be called from event process
+    /**
+     * Called when entering a new run.
+     */
     void beginRun(void) override final;
+
+    /**
+     * This method is called for each event.
+     */
     void event(void) override final;
+
+    /**
+     * This method is called at the end of the event processing.
+     */
     void terminate(void) override final;
+
+  private:
 
     // Data members
     //! name of histogram directory
     std::string m_histogramDirectoryName;
     //! prefix for EPICS PVs
     std::string m_pvPrefix;
-    //! Flag to trigger creation of additional histograms
-    bool m_singleHists;
     //! u binning for 2d plots
     int m_u_bins;
     //! v binning for 2d plots
@@ -123,10 +139,6 @@ namespace Belle2 {
     std::vector <chid>  mychid_status;
     //! EPICS PVs for Efficiency
     std::map <VxdID, chid> mychid_eff;
-    //! EPICS PVs for Efficiency, low warn limits
-    std::map <VxdID, chid> mychid_low;
-    //! EPICS PVs for Efficiency, low alarm limits
-    std::map <VxdID, chid> mychid_lolo;
 #endif
   };
 } // end namespace Belle2

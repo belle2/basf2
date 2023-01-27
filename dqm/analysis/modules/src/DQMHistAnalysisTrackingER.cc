@@ -9,10 +9,8 @@
 #include <dqm/analysis/modules/DQMHistAnalysisTrackingER.h>
 
 #include <TROOT.h>
-#include <TString.h>
 
-#include <TMath.h>
-#include <iostream>
+#include <string>
 
 using namespace std;
 using namespace Belle2;
@@ -20,7 +18,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(DQMHistAnalysisTrackingER)
+REG_MODULE(DQMHistAnalysisTrackingER);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -49,17 +47,38 @@ void DQMHistAnalysisTrackingERModule::initialize()
 
 void DQMHistAnalysisTrackingERModule::event()
 {
+  // Repeat this for all tracks (no suffix) and tracks from IP (_FromIP suffix)
+  for (const string suffix : {"_FromIP", "_NotFromIP"}) {
+    //compute fraction of tracks with no PXD hits
+    TH1* hNoPXDHits = findHist("TrackingERDQM" + suffix + "/NoOfHitsInTrack_PXD");
+    if (hNoPXDHits != nullptr) {
+      int nTracks = hNoPXDHits->GetEntries();
+      int nTracksNoPXD = hNoPXDHits->GetBinContent(1);
+      if (nTracks > 0)
+        m_monObj->setVariable("tracksNoPXDHit" + suffix, (double)nTracksNoPXD / nTracks);
+    }
 
-  //compute fraction of tracks with no PXD hits
-
-  TH1* hNoPXDHits = findHist("TrackingERDQM/NoOfHitsInTrack_PXD");
-  if (hNoPXDHits != nullptr) {
-
-    int nTracks = hNoPXDHits->GetEntries();
-    int nTracksNoPXD = hNoPXDHits->GetBinContent(1);
-
-    if (nTracks > 0)
-      m_monObj->setVariable("tracksNoPXDHit", (double)nTracksNoPXD / nTracks);
+    // add average number of tracks per event to Mirabelle
+    TH1* hnTracks = findHist("TrackingERDQM" + suffix + "/NoOfTracks");
+    if (hnTracks != nullptr) {
+      double averageNTracks = hnTracks->GetMean();
+      m_monObj->setVariable("nTracksPerEvent" + suffix, averageNTracks);
+    }
+    TH1* hnVXDTracks = findHist("TrackingERDQM" + suffix + "/NoOfTracksInVXDOnly");
+    if (hnVXDTracks != nullptr) {
+      double averageNVXDTracks = hnVXDTracks->GetMean();
+      m_monObj->setVariable("nVXDTracksPerEvent" + suffix, averageNVXDTracks);
+    }
+    TH1* hnCDCTracks = findHist("TrackingERDQM" + suffix + "/NoOfTracksInCDCOnly");
+    if (hnCDCTracks != nullptr) {
+      double averageNCDCTracks = hnCDCTracks->GetMean();
+      m_monObj->setVariable("nCDCTracksPerEvent" + suffix, averageNCDCTracks);
+    }
+    TH1* hnVXDCDCTracks = findHist("TrackingERDQM" + suffix + "/NoOfTracksInVXDCDC");
+    if (hnVXDCDCTracks != nullptr) {
+      double averageNVXDCDCTracks = hnVXDCDCTracks->GetMean();
+      m_monObj->setVariable("nVXDCDCTracksPerEvent" + suffix, averageNVXDCDCTracks);
+    }
   }
 
   //fraction of offtime SVD hits
@@ -90,8 +109,9 @@ void DQMHistAnalysisTrackingERModule::event()
   }
 
   // Compute tracking abort rate for Mirabelle
-  TH1* hAbort = findHist("TrackingERDQM/NumberTrackingErrorFlags");
-  TH1* hAbortReasons = findHist("TrackingERDQM/TrackingErrorFlagsReasons");
+  // Using the _FromIP suffix: these histograms are event-based, so it does not make any difference
+  TH1* hAbort = findHist("TrackingERDQM_FromIP/NumberTrackingErrorFlags");
+  TH1* hAbortReasons = findHist("TrackingERDQM_FromIP/TrackingErrorFlagsReasons");
   if (hAbort != nullptr) {
     double nEvents = hAbort->GetEntries();
     if (nEvents > 0) {

@@ -66,7 +66,7 @@ int PostRawCOPPERFormat_v1::GetDetectorNwords(int n, int finesse_num)
   int nwords = 0;
   if (GetFINESSENwords(n, finesse_num) > 0) {
     nwords = GetFINESSENwords(n, finesse_num)
-             - (SIZE_B2LHSLB_HEADER + SIZE_B2LHSLB_TRAILER +  SIZE_B2LFEE_HEADER + SIZE_B2LFEE_TRAILER);
+             - (static_cast<int>(SIZE_B2LHSLB_HEADER) + SIZE_B2LHSLB_TRAILER +  SIZE_B2LFEE_HEADER + SIZE_B2LFEE_TRAILER);
   }
   return nwords;
 
@@ -276,7 +276,8 @@ int PostRawCOPPERFormat_v1::CheckCRC16(int n, int finesse_num)
   temp_crc16 = CalcCRC16LittleEndian(temp_crc16, &(m_buffer[ tmp_header.POS_TTUTIME ]), 1);
   temp_crc16 = CalcCRC16LittleEndian(temp_crc16, &(m_buffer[ tmp_header.POS_EXP_RUN_NO ]), 1);
   int* buf = GetFINESSEBuffer(n, finesse_num) +  SIZE_B2LHSLB_HEADER + POS_B2L_CTIME;
-  int pos_nwords = finesse_nwords - (SIZE_B2LHSLB_HEADER + POS_B2L_CTIME + SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER);
+  int pos_nwords = finesse_nwords - (static_cast<int>(SIZE_B2LHSLB_HEADER) + POS_B2L_CTIME + SIZE_B2LFEE_TRAILER +
+                                     SIZE_B2LHSLB_TRAILER);
   temp_crc16 = CalcCRC16LittleEndian(temp_crc16, buf, pos_nwords);
 
   //
@@ -292,7 +293,7 @@ int PostRawCOPPERFormat_v1::CheckCRC16(int n, int finesse_num)
   if ((unsigned short)(*buf & 0xFFFF) != temp_crc16) {
     //  if ( false ) {
     PrintData(m_buffer, m_nwords);
-    printf("POST CRC16 error %x %x %d\n", *buf , temp_crc16, GetFINESSENwords(n, finesse_num));
+    printf("POST CRC16 error %x %x %d\n", *buf, temp_crc16, GetFINESSENwords(n, finesse_num));
     printf("\n");
     int* temp_buf = GetFINESSEBuffer(n, finesse_num);
     printf("%.8x ", 0);
@@ -326,7 +327,7 @@ int* PostRawCOPPERFormat_v1::PackDetectorBuf(int* packed_buf_nwords,
 
   int poswords_to = 0;
   int* detector_buf[ 4 ] = { detector_buf_1st, detector_buf_2nd, detector_buf_3rd, detector_buf_4th };
-  int nwords[ 4 ] = { nwords_1st, nwords_2nd, nwords_3rd, nwords_4th };
+  const int nwords[ 4 ] = { nwords_1st, nwords_2nd, nwords_3rd, nwords_4th };
 
   // calculate the event length
   int length_nwords = tmp_header.GetHdrNwords() + SIZE_COPPER_HEADER + SIZE_COPPER_TRAILER + tmp_trailer.GetTrlNwords();
@@ -334,7 +335,7 @@ int* PostRawCOPPERFormat_v1::PackDetectorBuf(int* packed_buf_nwords,
   for (int i = 0; i < 4; i++) {
     if (detector_buf[ i ] == NULL || nwords[ i ] <= 0) continue;    // for an empty FINESSE slot
     length_nwords += nwords[ i ];
-    length_nwords += SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER
+    length_nwords += static_cast<int>(SIZE_B2LHSLB_HEADER) + SIZE_B2LFEE_HEADER
                      + SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER;
   }
 
@@ -361,7 +362,7 @@ int* PostRawCOPPERFormat_v1::PackDetectorBuf(int* packed_buf_nwords,
   packed_buf[ tmp_header.POS_NODE_ID ] = rawcpr_info.node_id; // node ID
 
   // fill the positions of finesse buffers
-  packed_buf[ tmp_header.POS_OFFSET_1ST_FINESSE ] = tmp_header.RAWHEADER_NWORDS + SIZE_COPPER_HEADER;
+  packed_buf[ tmp_header.POS_OFFSET_1ST_FINESSE ] = static_cast<int>(tmp_header.RAWHEADER_NWORDS) + SIZE_COPPER_HEADER;
 
   packed_buf[ tmp_header.POS_OFFSET_2ND_FINESSE ] = packed_buf[ tmp_header.POS_OFFSET_1ST_FINESSE ];
   if (nwords[ 0 ] > 0) {

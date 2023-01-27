@@ -20,7 +20,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(PXDDQMEfficiency)
+REG_MODULE(PXDDQMEfficiency);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -41,8 +41,8 @@ PXDDQMEfficiencyModule::PXDDQMEfficiencyModule() : HistoModule(), m_vxdGeometry(
   addParam("PXDInterceptListName", m_PXDInterceptListName, "name of the list of interceptions", std::string(""));
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
            std::string("PXDEFF"));
-  addParam("binsU", m_u_bins, "histogram bins in u direction", int(4));
-  addParam("binsV", m_v_bins, "histogram bins in v direction", int(6));
+  addParam("binsU", m_u_bins, "histogram bins in u direction", int(16));
+  addParam("binsV", m_v_bins, "histogram bins in v direction", int(48));
   addParam("distCut", m_distcut, "max distance in [cm] for cluster to be counted to a track", double(0.0500));
   addParam("pCut", m_pcut, "Set a cut on the track p-value", double(1e-20));
   addParam("requireROIs", m_requireROIs, "require tracks to lie inside a ROI", bool(false));
@@ -185,7 +185,7 @@ void PXDDQMEfficiencyModule::event()
           //If not, even if measured the cluster was thrown away->Not PXD's fault
           bool fitInsideROI = false;
           for (auto& roit : m_ROIs) {
-            if (aVxdID != roit.getSensorID()) {
+            if (aVxdID != (roit.getSensorID()).getID()) {
               continue; //ROI on other sensor
             }
 

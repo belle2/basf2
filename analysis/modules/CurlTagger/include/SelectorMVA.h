@@ -14,7 +14,10 @@
 #include <vector>
 #include <string>
 
+#include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
 #include <mva/methods/FastBDT.h>
+#include <mva/interface/Interface.h>
+#include <framework/database/DBObjPtr.h>
 
 //Root Includes
 #include "TFile.h"
@@ -28,13 +31,16 @@ namespace Belle2 {
 
     public:
       /** Constructor */
-      SelectorMVA(bool belleFlag, bool trainFlag);
+      SelectorMVA(bool belleFlag, bool trainFlag, std::string tFileName);
 
       /** Destructor */
       ~SelectorMVA();
 
       /** Selector response that this pair of particles come from the same mc/actual particle */
       virtual float getResponse(Particle* iPart, Particle* jPart) override;
+
+      /** returns optimal cut to use with selector */
+      virtual float getOptimalResponseCut() override;
 
       /** returns vector of variables used by this selector. */
       virtual std::vector<float> getVariables(Particle* iPart, Particle* jPart) override;
@@ -47,6 +53,9 @@ namespace Belle2 {
 
       /** finalize whatever needs to be finalized (train the MVA) */
       virtual void finalize() override;
+
+      /** initialize the MVA Expert */
+      void initializeMVA();
 
     private:
 
@@ -65,12 +74,17 @@ namespace Belle2 {
       /**training data tree */
       TTree* m_TTree;
 
+      /** Database pointer to the Database representation of the weightfile */
+      std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>> m_weightfile_representation;
+
+      /** mva weightfile */
+      MVA::Weightfile m_weightfile;
+
       /** mva general options (for the expert)*/
       MVA::GeneralOptions m_generalOptions;
 
       /** mva expert */
       MVA::FastBDTExpert m_expert;
-
 
       // General Options data - just use same names
       /** mva identifier */
@@ -115,7 +129,8 @@ namespace Belle2 {
       Float_t m_TrackOmegaDiffEW;
 
       /** isCurl Truth */
-      Float_t m_IsCurl;
+      Bool_t m_IsCurl;
+
     }; //selectorMVA class
 
   } // curlTagger Module namespace

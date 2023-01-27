@@ -1,0 +1,91 @@
+# EventType: 1296308001
+# Descriptor:  [B- -> D_0*0 tau- nu, D_0*0 -> D0 eta] cc
+# NickName: Bu_Dzerosttaunu_Deta
+# Documentation: b->c tau nu process, D_0* mode (LLSW model)
+# Tested: Yes
+# PhysicsWG: SL
+# Responsible: Henrik Junkerkalefeld
+# Email: junkerkalefeld@physik.uni-bonn.de
+# Cuts: None
+# Date: 20220201
+#
+
+# Turn on PHOTOS for all decays
+yesPhotos
+
+ 
+Alias D_0*0sig D_0*0
+Alias anti-D_0*0sig anti-D_0*0
+ChargeConj D_0*0sig anti-D_0*0sig
+ 
+Decay Upsilon(4S)
+0.500 B+sig B-  VSS;
+0.500 B-sig B+  VSS;
+Enddecay
+ 
+ 
+Decay B-sig
+1.0   D_0*0sig  tau-  anti-nu_tau  LLSW 0.68 -0.2 0.3;
+Enddecay
+CDecay B+sig
+ 
+Decay  D_0*0sig
+1.0    D0 eta                     PHSP;
+Enddecay
+CDecay  anti-D_0*0sig
+
+Decay tau-
+0.178175 e-           anti-nu_e      nu_tau TAULNUNU;
+0.000028 e-  e-   e+  anti-nu_e      nu_tau PYTHIA 21;
+0.173937 mu-          anti-nu_mu     nu_tau TAULNUNU;
+0.108164 pi-                         nu_tau TAUSCALARNU;
+0.000353 pi- gamma                   nu_tau PYTHIA 21;
+0.254941 rho-                        nu_tau TAUVECTORNU;
+0.092595 pi- pi0  pi0                nu_tau TAUHADNU -0.108 0.775 0.149 1.364 0.400 1.23 0.4;
+0.010429 pi- pi0  pi0 pi0            nu_tau PYTHIA 21;
+0.001118 pi- pi0  pi0 pi0 pi0        nu_tau PYTHIA 21;
+0.003817 pi- K0   pi0                nu_tau PYTHIA 21;
+0.000263 pi- K0   pi0 pi0            nu_tau PYTHIA 21;
+0.000235 pi- K_S0 K_S0               nu_tau PYTHIA 21;
+0.000235 pi- K_L0 K_L0               nu_tau PYTHIA 21;
+0.001081 pi- K_S0 K_L0               nu_tau PYTHIA 21;
+0.000018 pi- pi0  K_S0 K_S0          nu_tau PYTHIA 21;
+0.000018 pi- pi0  K_L0 K_L0          nu_tau PYTHIA 21;
+0.000325 pi- pi0  K_S0 K_L0          nu_tau PYTHIA 21;
+0.089868 pi- pi-  pi+                nu_tau TAUHADNU -0.108 0.775 0.149 1.364 0.400 1.23 0.4;
+0.027404 pi- pi-  pi+  pi0           nu_tau PYTHIA 21;
+0.000981 pi- pi-  pi+  pi0  pi0      nu_tau PYTHIA 21;
+0.000014 pi- pi-  pi+  pi0  pi0 pi0  nu_tau PYTHIA 21;
+0.000247 pi- pi-  pi+  K0            nu_tau PYTHIA 21;
+0.006964 K-                          nu_tau TAUSCALARNU;
+0.012712 K*-                         nu_tau TAUVECTORNU;
+0.000647 K-  pi0  pi0                nu_tau PYTHIA 21;
+0.000478 K-  pi0  pi0 pi0            nu_tau PYTHIA 21;
+0.001486 K-  K0                      nu_tau PYTHIA 21;
+0.001500 K-  K0   pi0                nu_tau PYTHIA 21;
+0.002927 K-  pi-  pi+                nu_tau PYTHIA 21;
+0.000394 K-  pi-  pi+ pi0            nu_tau PYTHIA 21;
+0.001435 pi- K-   K+                 nu_tau PYTHIA 21;
+0.000061 pi- K-   K+  pi0            nu_tau PYTHIA 21;
+0.001389 pi- pi0  eta                nu_tau PYTHIA 21;
+0.000195 pi- pi0  pi0 eta            nu_tau PYTHIA 21;
+0.000220 pi- pi-  pi+ eta            nu_tau PYTHIA 21;
+0.000155 K-  eta                     nu_tau PYTHIA 21;
+0.000048 K-  pi0  eta                nu_tau PYTHIA 21;
+0.000094 pi- K0   eta                nu_tau PYTHIA 21;
+0.019494 pi- omega                   nu_tau PYTHIA 21;
+0.004085 pi- pi0  omega              nu_tau PYTHIA 21;
+0.000072 pi- pi0  pi0 omega          nu_tau PYTHIA 21;
+0.000084 pi- pi-  pi+ omega          nu_tau PYTHIA 21;
+0.000410 K-  omega                   nu_tau PYTHIA 21;
+0.000022 K-  K+   K-                 nu_tau PYTHIA 21;
+0.000015 K-  K_S0 K_L0               nu_tau PYTHIA 21;
+0.000827 pi- pi- pi- pi+ pi+         nu_tau PYTHIA 21;
+0.000038 pi- pi- pi- pi+ pi+ pi0     nu_tau PYTHIA 21;
+0.000001 K-  pi- pi- pi+ pi+         nu_tau PYTHIA 21;
+0.000001 K-  pi- pi- pi+ pi+ pi0     nu_tau PYTHIA 21;
+Enddecay
+CDecay tau+
+ 
+End
+

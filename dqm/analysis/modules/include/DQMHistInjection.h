@@ -17,7 +17,7 @@
 #include "cadef.h"
 #endif
 
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 
 #include <TH1.h>
 #include <TCanvas.h>
@@ -25,11 +25,11 @@
 namespace Belle2 {
   /*! DQM Histogram Analysis for PXD Efficiency */
 
-  class DQMHistInjectionModule : public DQMHistAnalysisModule {
+  class DQMHistInjectionModule final : public DQMHistAnalysisModule {
 
 #ifdef _BELLE2_EPICS
     typedef struct MYNODE_struct {
-      chid    mychid; /**< channel ID */
+      chid  mychid; /**< channel ID */
       TH1*  histo = {}; /**< initial histogram */
       std::vector <double> data; /**< vector of data */
     } MYNODE;
@@ -39,19 +39,37 @@ namespace Belle2 {
     // Public functions
   public:
 
-    //! Constructor
+    /**
+     * Constructor.
+     */
     DQMHistInjectionModule();
-    //! Destructor
-    ~DQMHistInjectionModule();
-  private:
 
-    //! Module functions to be called from main process
+    /**
+     * Destructor.
+     */
+    ~DQMHistInjectionModule();
+
+    /**
+     * Initializer.
+     */
     void initialize(void) override final;
 
-    //! Module functions to be called from event process
+    /**
+     * Called when entering a new run.
+     */
     void beginRun(void) override final;
+
+    /**
+     * This method is called for each event.
+     */
     void event(void) override final;
+
+    /**
+     * This method is called at the end of the event processing.
+     */
     void terminate(void) override final;
+
+  private:
 
     // Data members
     //! name of histogram directory

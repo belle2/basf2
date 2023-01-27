@@ -40,7 +40,7 @@ using namespace microtpc;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(MicrotpcStudy)
+REG_MODULE(MicrotpcStudy);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -262,7 +262,7 @@ void MicrotpcStudyModule::event()
   StoreArray<SADMetaHit> sadMetaHits;
   double rate = 0;
   int ring_section = 0;
-  int section_ordering[12] = {1, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2};
+  const int section_ordering[12] = {1, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2};
   for (const auto& sadMetaHit : sadMetaHits) {
     rate = sadMetaHit.getrate();
     double ss = sadMetaHit.getss() / 100.;
@@ -467,10 +467,10 @@ void MicrotpcStudyModule::event()
     if (trID == mcpart.getTrackID()) continue;
     else trID = mcpart.getTrackID();
     int detNb = -1;
-    int nhit = 0;
+    // int nhit = 0; // unused variable
     for (const auto& sHit : SimHits) {
       if (sHit.gettkID() == trID) {
-        detNb = sHit.getdetNb(); nhit++;
+        detNb = sHit.getdetNb(); // nhit++;
         kin = sHit.gettkKEnergy() / 1000;
       }
     }

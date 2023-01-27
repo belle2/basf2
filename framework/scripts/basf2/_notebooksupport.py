@@ -59,7 +59,7 @@ def print_module_html(module):
     name = module.name()
     tname = module.type()
     tname = f" (type {tname})" if tname != name else ""
-    module_html = E.div(f"basf2.Module ", E.b(name), tname, E.p(module.description),
+    module_html = E.div("basf2.Module ", E.b(name), tname, E.p(module.description),
                         E.style("table.b2module * { text-align: left !important; }"))
     cols = ["parameter", "type", "default", "current", "changed", "is required"]
     if len(module.available_params()) > 0:
@@ -87,7 +87,7 @@ def enable_notebooksupport():
     b2core.logging.enable_python_logging = True
 
     # we need to import ROOT because otherwise it can lockup later
-    import ROOT
+    import ROOT  # noqa
 
     # register html converters for common objects
     html_formatter = get_ipython().display_formatter.formatters['text/html']

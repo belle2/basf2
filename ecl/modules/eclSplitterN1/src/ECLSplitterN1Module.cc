@@ -43,8 +43,8 @@ using namespace ECL;
 //-----------------------------------------------------------------
 //                 Register the Module(s)
 //-----------------------------------------------------------------
-REG_MODULE(ECLSplitterN1)
-REG_MODULE(ECLSplitterN1PureCsI)
+REG_MODULE(ECLSplitterN1);
+REG_MODULE(ECLSplitterN1PureCsI);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -329,7 +329,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
 
       // sort the listCrystals and keep the n highest in descending order
       std::sort(listCrystalPairs.begin(), listCrystalPairs.end(), [](const auto & left, const auto & right) {
-        return left.second < right.second;
+        return left.second > right.second;
       });
       std::vector< unsigned int> listCrystals; //cell id
 
@@ -567,9 +567,9 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
           centroidShiftAverage += centroidShift.Mag();
 
           // Debugging output
-          B2DEBUG(175, "   old centroid: " << oldCentroidPos.x() << " cm, " <<  oldCentroidPos.y() << " cm, " <<  oldCentroidPos.z() <<
+          B2DEBUG(175, "   old centroid: " << oldCentroidPos.X() << " cm, " <<  oldCentroidPos.Y() << " cm, " <<  oldCentroidPos.Z() <<
                   "cm");
-          B2DEBUG(175, "   new centroid: " << newCentroidPos.x() << " cm, " <<  newCentroidPos.y() << " cm, " <<  newCentroidPos.z() <<
+          B2DEBUG(175, "   new centroid: " << newCentroidPos.X() << " cm, " <<  newCentroidPos.Y() << " cm, " <<  newCentroidPos.Z() <<
                   "cm");
           B2DEBUG(175, "   centroid shift: " << centroidShift.Mag() << " cm");
 
@@ -741,7 +741,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
 
         // sort the listCrystals and keep the n highest in descending order
         std::sort(listCrystalPairs.begin(), listCrystalPairs.end(), [](const auto & left, const auto & right) {
-          return left.second < right.second;
+          return left.second > right.second;
         });
 
         std::vector< unsigned int> listCrystals; //cell id
@@ -840,7 +840,10 @@ double ECLSplitterN1Module::getEnergySum(std::vector < std::pair<double, double>
 
   double energysum = 0.;
 
-  std::sort(weighteddigits.begin(), weighteddigits.end(), std::greater<std::pair<double, double>>());
+  std::sort(weighteddigits.begin(), weighteddigits.end(), [](const auto & left, const auto & right) {
+    return left.first * left.second > right.first * right.second;
+  });
+
 
   unsigned int min = n;
   if (weighteddigits.size() < n) min = weighteddigits.size();

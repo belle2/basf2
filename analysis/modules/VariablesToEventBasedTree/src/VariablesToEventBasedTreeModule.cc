@@ -9,6 +9,7 @@
 #include <analysis/modules/VariablesToEventBasedTree/VariablesToEventBasedTreeModule.h>
 
 #include <analysis/dataobjects/ParticleList.h>
+#include <analysis/dataobjects/StringWrapper.h>
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/VariableManager/Utility.h>
 #include <framework/logging/Logger.h>
@@ -23,7 +24,7 @@ using namespace std;
 using namespace Belle2;
 
 // Register module in the framework
-REG_MODULE(VariablesToEventBasedTree)
+REG_MODULE(VariablesToEventBasedTree);
 
 
 VariablesToEventBasedTreeModule::VariablesToEventBasedTreeModule() :
@@ -78,7 +79,25 @@ void VariablesToEventBasedTreeModule::initialize()
   }
 
   m_variables = Variable::Manager::Instance().resolveCollections(m_variables);
+  // remove duplicates from list of variables but keep the previous order
+  unordered_set<string> seen;
+  auto newEnd = remove_if(m_variables.begin(), m_variables.end(), [&seen](const string & varStr) {
+    if (seen.find(varStr) != std::end(seen)) return true;
+    seen.insert(varStr);
+    return false;
+  });
+  m_variables.erase(newEnd, m_variables.end());
+
   m_event_variables = Variable::Manager::Instance().resolveCollections(m_event_variables);
+  // remove duplicates from list of variables but keep the previous order
+  unordered_set<string> seenEventVariables;
+  auto eventVariablesEnd = remove_if(m_event_variables.begin(),
+  m_event_variables.end(), [&seenEventVariables](const string & varStr) {
+    if (seenEventVariables.find(varStr) != std::end(seenEventVariables)) return true;
+    seenEventVariables.insert(varStr);
+    return false;
+  });
+  m_event_variables.erase(eventVariablesEnd, m_event_variables.end());
 
   m_tree.registerInDataStore(m_fileName + m_treeName, DataStore::c_DontWriteOut);
   m_tree.construct(m_treeName.c_str(), "");
@@ -88,12 +107,15 @@ void VariablesToEventBasedTreeModule::initialize()
   m_event_valuesDouble.resize(m_event_variables.size());
   m_event_valuesInt.resize(m_event_variables.size());
 
-  m_tree->get().Branch("__event__", &m_event, "__event__/I");
+  m_tree->get().Branch("__event__", &m_event, "__event__/i");
   m_tree->get().Branch("__run__", &m_run, "__run__/I");
   m_tree->get().Branch("__experiment__", &m_experiment, "__experiment__/I");
   m_tree->get().Branch("__production__", &m_production, "__production__/I");
   m_tree->get().Branch("__ncandidates__", &m_ncandidates, "__ncandidates__/I");
   m_tree->get().Branch("__weight__", &m_weight, "__weight__/F");
+
+  if (m_stringWrapper.isOptional("MCDecayString"))
+    m_tree->get().Branch("__MCDecayString__", &m_MCDecayString);
 
   for (unsigned int i = 0; i < m_event_variables.size(); ++i) {
     auto varStr = m_event_variables[i];
@@ -110,11 +132,14 @@ void VariablesToEventBasedTreeModule::initialize()
       B2ERROR("Variable '" << varStr << "' is not available in Variable::Manager!");
     } else {
       if (var->variabletype == Variable::Manager::VariableDataType::c_double) {
-        m_tree->get().Branch(makeROOTCompatible(varStr).c_str(), &m_event_valuesDouble[i], (makeROOTCompatible(varStr) + "/D").c_str());
+        m_tree->get().Branch(MakeROOTCompatible::makeROOTCompatible(varStr).c_str(), &m_event_valuesDouble[i],
+                             (MakeROOTCompatible::makeROOTCompatible(varStr) + "/D").c_str());
       } else if (var->variabletype == Variable::Manager::VariableDataType::c_int) {
-        m_tree->get().Branch(makeROOTCompatible(varStr).c_str(), &m_event_valuesInt[i], (makeROOTCompatible(varStr) + "/I").c_str());
+        m_tree->get().Branch(MakeROOTCompatible::makeROOTCompatible(varStr).c_str(), &m_event_valuesInt[i],
+                             (MakeROOTCompatible::makeROOTCompatible(varStr) + "/I").c_str());
       } else if (var->variabletype == Variable::Manager::VariableDataType::c_bool) {
-        m_tree->get().Branch(makeROOTCompatible(varStr).c_str(), &m_event_valuesInt[i], (makeROOTCompatible(varStr) + "/O").c_str());
+        m_tree->get().Branch(MakeROOTCompatible::makeROOTCompatible(varStr).c_str(), &m_event_valuesInt[i],
+                             (MakeROOTCompatible::makeROOTCompatible(varStr) + "/O").c_str());
       }
       m_event_functions.push_back(var->function);
     }
@@ -131,14 +156,14 @@ void VariablesToEventBasedTreeModule::initialize()
       B2ERROR("Variable '" << varStr << "' is not available in Variable::Manager!");
     } else {
       if (var->variabletype == Variable::Manager::VariableDataType::c_double) {
-        m_tree->get().Branch(makeROOTCompatible(varStr).c_str(), &m_valuesDouble[i][0],
-                             (makeROOTCompatible(varStr) + "[__ncandidates__]/D").c_str());
+        m_tree->get().Branch(MakeROOTCompatible::makeROOTCompatible(varStr).c_str(), &m_valuesDouble[i][0],
+                             (MakeROOTCompatible::makeROOTCompatible(varStr) + "[__ncandidates__]/D").c_str());
       } else if (var->variabletype == Variable::Manager::VariableDataType::c_int) {
-        m_tree->get().Branch(makeROOTCompatible(varStr).c_str(), &m_valuesInt[i][0],
-                             (makeROOTCompatible(varStr) + "[__ncandidates__]/I").c_str());
+        m_tree->get().Branch(MakeROOTCompatible::makeROOTCompatible(varStr).c_str(), &m_valuesInt[i][0],
+                             (MakeROOTCompatible::makeROOTCompatible(varStr) + "[__ncandidates__]/I").c_str());
       } else if (var->variabletype == Variable::Manager::VariableDataType::c_bool) {
-        m_tree->get().Branch(makeROOTCompatible(varStr).c_str(), &m_valuesInt[i][0],
-                             (makeROOTCompatible(varStr) + "[__ncandidates__]/O").c_str());
+        m_tree->get().Branch(MakeROOTCompatible::makeROOTCompatible(varStr).c_str(), &m_valuesInt[i][0],
+                             (MakeROOTCompatible::makeROOTCompatible(varStr) + "[__ncandidates__]/O").c_str());
       }
       m_functions.push_back(var->function);
     }
@@ -196,6 +221,11 @@ void VariablesToEventBasedTreeModule::event()
   m_run = m_eventMetaData->getRun();
   m_experiment = m_eventMetaData->getExperiment();
   m_production = m_eventMetaData->getProduction();
+
+  if (m_stringWrapper.isValid())
+    m_MCDecayString = m_stringWrapper->getString();
+  else
+    m_MCDecayString = "";
 
   StoreObjPtr<ParticleList> particlelist(m_particleList);
   m_ncandidates = particlelist->getListSize();

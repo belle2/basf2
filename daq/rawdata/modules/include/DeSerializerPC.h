@@ -37,10 +37,10 @@ namespace Belle2 {
     virtual ~DeSerializerPCModule();
 
     //! Module functions to be called from main process
-    virtual void initialize();
+    void initialize() override;
 
     //! Module functions to be called from event process
-    virtual void event();
+    void event() override;
 
 
   protected :
@@ -67,7 +67,7 @@ namespace Belle2 {
 
 #ifdef NONSTOP
     //! wait for resume
-    virtual void waitResume();
+    void waitResume() override;
 #endif
 
 

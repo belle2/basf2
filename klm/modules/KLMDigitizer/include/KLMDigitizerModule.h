@@ -157,6 +157,9 @@ namespace Belle2 {
     /** Efficiency determination mode (converted from the string parameter). */
     EfficiencyMode m_EfficiencyMode;
 
+    /** Whether to create multi-strip digits. */
+    bool m_CreateMultiStripDigits;
+
     /** Use debug mode in EKLM::ScintillatorSimulator or not. */
     bool m_Debug;
 

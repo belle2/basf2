@@ -17,6 +17,7 @@
 #include <klm/dbobjects/KLMScintillatorDigitizationParameters.h>
 #include <klm/dbobjects/KLMScintillatorFEEParameters.h>
 #include <klm/dbobjects/KLMStripEfficiency.h>
+#include <klm/rawdata/RawData.h>
 #include <klm/simulation/ScintillatorFirmware.h>
 #include <klm/time/KLMTime.h>
 
@@ -167,6 +168,17 @@ namespace Belle2 {
 
     /** Simulation hit map (by ASIC). */
     std::multimap<KLMElectronicsChannel, const KLMSimHit*> m_MapAsicSimHit;
+
+    /** Digits corresponding to ASIC channels. */
+    KLMDigit* m_AsicDigits[KLM::c_NChannelsAsic];
+
+    /** Simulation hits lower bound for ASIC digit. */
+    std::multimap<KLMChannelNumber, const KLMSimHit*>::iterator
+    m_AsicDigitSimHitsLowerBound[KLM::c_NChannelsAsic];
+
+    /** Simulation hits upper bound for ASIC digit. */
+    std::multimap<KLMChannelNumber, const KLMSimHit*>::iterator
+    m_AsicDigitSimHitsUpperBound[KLM::c_NChannelsAsic];
 
     /** FPGA fitter. */
     KLM::ScintillatorFirmware* m_Fitter;

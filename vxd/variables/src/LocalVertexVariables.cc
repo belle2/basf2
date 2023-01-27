@@ -16,8 +16,7 @@
 #include <vxd/geometry/GeoCache.h>
 
 #include <tuple>
-using namespace std;
-
+// using namespace std;
 
 namespace Belle2 {
   class Particle;
@@ -26,108 +25,116 @@ namespace Belle2 {
 
     static const double realNaN = std::numeric_limits<double>::quiet_NaN();
 
-    // MC Local coordinates and sensor ID from getDecayVertex global coordinates -----------------------------------------------------------------
+    // MC Local coordinates and sensor ID from getDecayVertex global coordinates
 
-    tuple<ROOT::Math::XYZVector, int, int, int> getmcLocalCoordinates(const Particle* part)
+    std::tuple<ROOT::Math::XYZVector, int, int, int> getmcLocalCoordinates(const Particle* part)
     {
       VXD::GeoCache& geo = VXD::GeoCache::getInstance();
       auto* mcparticle = part->getMCParticle();
-      if (!mcparticle) return make_tuple(ROOT::Math::XYZVector(realNaN, realNaN, realNaN), 0, 0, 0);
+      if (!mcparticle)
+        return std::make_tuple(ROOT::Math::XYZVector(realNaN, realNaN, realNaN), 0, 0, 0);
+
       const auto& mcglobal = mcparticle->getDecayVertex();
+
       for (const auto& layer : geo.getLayers()) {
         for (const auto& ladder : geo.getLadders(layer)) {
           for (const auto& sensor : geo.getSensors(ladder)) {
             const auto& sInfo = VXD::GeoCache::get(sensor);
             const auto& mclocal = sInfo.pointToLocal(mcglobal, true);
-            if (sInfo.inside(mclocal)) return make_tuple(mclocal, sensor.getLayerNumber(), sensor.getLadderNumber(), sensor.getSensorNumber());
+            if (sInfo.inside(mclocal))
+              return std::make_tuple(mclocal, sensor.getLayerNumber(), sensor.getLadderNumber(), sensor.getSensorNumber());
           }
         }
       }
-      return make_tuple(ROOT::Math::XYZVector(realNaN, realNaN, realNaN), 0, 0, 0);
+      return std::make_tuple(ROOT::Math::XYZVector(realNaN, realNaN, realNaN), 0, 0, 0);
     }
 
     double mcDecayVertexU(const Particle* part)
     {
-      return get<0>(getmcLocalCoordinates(part)).X();
+      return std::get<0>(getmcLocalCoordinates(part)).X();
     }
 
     double mcDecayVertexV(const Particle* part)
     {
-      return get<0>(getmcLocalCoordinates(part)).Y();
+      return std::get<0>(getmcLocalCoordinates(part)).Y();
     }
 
     double mcDecayVertexW(const Particle* part)
     {
-      return get<0>(getmcLocalCoordinates(part)).Z();
+      return std::get<0>(getmcLocalCoordinates(part)).Z();
     }
     double mcDecayVertexLayer(const Particle* part)
     {
-      return get<1>(getmcLocalCoordinates(part));
+      return std::get<1>(getmcLocalCoordinates(part));
     }
 
     double mcDecayVertexLadder(const Particle* part)
     {
-      return get<2>(getmcLocalCoordinates(part));
+      return std::get<2>(getmcLocalCoordinates(part));
     }
 
     double mcDecayVertexSensor(const Particle* part)
     {
-      return get<3>(getmcLocalCoordinates(part));
+      return std::get<3>(getmcLocalCoordinates(part));
     }
 
-    //Local coordinates and sensor ID from getVertex global coordinates -----------------------------------------------------------------
+    // Local coordinates and sensor ID from getVertex global coordinates
 
-    tuple<ROOT::Math::XYZVector, int, int, int> getLocalCoordinates(const Particle* part)
+    std::tuple<ROOT::Math::XYZVector, int, int, int> getLocalCoordinates(const Particle* part)
     {
       VXD::GeoCache& geo = VXD::GeoCache::getInstance();
       const auto& frame = ReferenceFrame::GetCurrent();
       const auto& global = frame.getVertex(part);
+
       for (const auto& layer : geo.getLayers()) {
         for (const auto& ladder : geo.getLadders(layer)) {
           for (const auto& sensor : geo.getSensors(ladder)) {
+
             const auto& sInfo = VXD::GeoCache::get(sensor);
             const auto& local = sInfo.pointToLocal(global, true);
             if (sInfo.inside(local.X(), local.Y(), 0.1, 0.1)) {
-              if (abs(local.Z()) < 0.1) return make_tuple(local, sensor.getLayerNumber(), sensor.getLadderNumber(), sensor.getSensorNumber());
-              else {
+              if (abs(local.Z()) < 0.1) {
+                return std::make_tuple(local, sensor.getLayerNumber(), sensor.getLadderNumber(), sensor.getSensorNumber());
+              } else {
                 ROOT::Math::XYZVector localz{local.X(), local.Y(), abs(local.Z()) - 0.1};
-                if (sInfo.inside(localz)) return make_tuple(local, sensor.getLayerNumber(), sensor.getLadderNumber(), sensor.getSensorNumber());
+                if (sInfo.inside(localz))
+                  return std::make_tuple(local, sensor.getLayerNumber(), sensor.getLadderNumber(), sensor.getSensorNumber());
               }
             }
-            //if (sInfo.inside(local, 0.1, 0.1, 0.1)) return make_tuple(local, sensor.getLayerNumber(), sensor.getLadderNumber(), sensor.getSensorNumber());
+
           }
         }
       }
-      return make_tuple(ROOT::Math::XYZVector(realNaN, realNaN, realNaN), 0, 0, 0);
+      return std::make_tuple(ROOT::Math::XYZVector(realNaN, realNaN, realNaN), 0, 0, 0);
     }
 
     double particleU(const Particle* part)
     {
-      return get<0>(getLocalCoordinates(part)).X();
+      return std::get<0>(getLocalCoordinates(part)).X();
     }
 
     double particleV(const Particle* part)
     {
-      return get<0>(getLocalCoordinates(part)).Y();
+      return std::get<0>(getLocalCoordinates(part)).Y();
     }
 
     double particleW(const Particle* part)
     {
-      return get<0>(getLocalCoordinates(part)).Z();
+      return std::get<0>(getLocalCoordinates(part)).Z();
     }
     double particleLayer(const Particle* part)
     {
-      return get<1>(getLocalCoordinates(part));
+      return std::get<1>(getLocalCoordinates(part));
     }
 
     double particleLadder(const Particle* part)
     {
-      return get<2>(getLocalCoordinates(part));
+      return std::get<2>(getLocalCoordinates(part));
     }
 
     double particleSensor(const Particle* part)
     {
-      return get<3>(getLocalCoordinates(part));
+      return std::get<3>(getLocalCoordinates(part));
     }
 
     VARIABLE_GROUP("Local Vertex Information");

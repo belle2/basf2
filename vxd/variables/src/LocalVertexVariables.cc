@@ -16,7 +16,6 @@
 #include <vxd/geometry/GeoCache.h>
 
 #include <tuple>
-// using namespace std;
 
 namespace Belle2 {
   class Particle;

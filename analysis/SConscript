@@ -16,8 +16,7 @@ env['LIBS'] = [
     'analysis_utility',
     'analysis_ContinuumSuppression',
     'analysis_ClusterUtility',
-    'b2bii_dataobjects',
-    'vxd'
+    'b2bii_dataobjects'
 ]
 
 Return('env')

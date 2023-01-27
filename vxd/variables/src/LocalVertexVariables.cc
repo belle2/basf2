@@ -6,8 +6,9 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <analysis/variables/VertexVariables.h>
+// #include <analysis/variables/VertexVariables.h>
 #include <analysis/utility/ReferenceFrame.h>
+#include <analysis/VariableManager/Manager.h>
 
 #include <framework/database/DBObjPtr.h>
 #include <framework/logging/Logger.h>

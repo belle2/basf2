@@ -21,8 +21,6 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 
-#include <vxd/geometry/GeoCache.h>
-
 #include <tuple>
 using namespace std;
 

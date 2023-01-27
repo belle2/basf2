@@ -168,6 +168,4 @@ namespace Belle2 {
                       "sensor identification of vertex in case of composite particle, or point of closest approach (POCA) in case of a track");
 
   }
-  class LocalVertexVariablesModule: public Module {};
-  REG_MODULE(LocalVertexVariables);
 }

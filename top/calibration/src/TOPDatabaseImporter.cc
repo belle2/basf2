@@ -54,10 +54,6 @@
 #include "TFile.h"
 #include "TTree.h"
 
-extern "C" {
-  float phind_lambda_(float*); // phase refractive index of quartz (top_geo.F)
-}
-
 using namespace std;
 
 namespace Belle2 {
@@ -1419,7 +1415,7 @@ namespace Belle2 {
         float lambda = pmt.getLambdaFirst();
         float step = pmt.getLambdaStep();
         for (auto& qe : qeData) {
-          double n = phind_lambda_(&lambda); // phase refractive index of quartz
+          double n = TOPGeometryPar::Instance()->getPhaseIndex(TOPGeometryPar::c_hc / lambda); // quartz refractive index
           double reflectance = pow((n - 1) / (n + 1), 2);
           qe /= (1 - reflectance);
           lambda += step;

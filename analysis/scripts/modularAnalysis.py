@@ -3389,8 +3389,7 @@ def buildEventShape(inputListNames=None,
        If the lists provided by the user contain several times the same track (either with
        different mass hypothesis, or once as an independent particle and once as daughter of a
        combined particle) the results won't be reliable.
-       A basic check for duplicates is available setting the checkForDuplicate flags,
-       but is usually quite time consuming.
+       A basic check for duplicates is available setting the checkForDuplicate flags.
 
 
     @param inputListNames     List of ParticleLists used to calculate the
@@ -3416,9 +3415,9 @@ def buildEventShape(inputListNames=None,
     @param jets               Enables the calculation of the hemisphere momenta and masses.
                               Requires thrust = True.
     @param sphericity         Enables the calculation of the sphericity-related quantities.
-    @param checkForDuplicates Perform a check for duplicate particles before adding them. This option
-                              is quite time consuming, instead of using it consider sanitizing
-                              the lists you are passing to the function.
+    @param checkForDuplicates Perform a check for duplicate particles before adding them. Regardless of the value of this option,
+                              it is recommended to consider sanitizing the lists you are passing to the function.
+
     """
 
     if inputListNames is None:

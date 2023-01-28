@@ -396,7 +396,7 @@ void SVDTimeGroupComposerModule::event()
       }
       groupInfo[kj - 1] = key;
     }
-    // sorting signal groups based on height/sigma
+    // sorting signal groups based on gauss-weightage
     for (int ij = 1; ij < int(groupInfo.size()); ij++) {
       key = groupInfo[ij];
       float keynorm = std::get<0>(key);
@@ -410,8 +410,8 @@ void SVDTimeGroupComposerModule::event()
       while (1) {
         if (kj < 0) break;
         float grnorm = std::get<0>(groupInfo[kj]);
-        float grsig  = std::get<2>(groupInfo[kj]);
-        if (grnorm / (grsig * grsig) > keynorm / (keysig * keysig)) break;
+        float grmean = std::get<1>(groupInfo[kj]);
+        if (grnorm * TMath::Exp(-std::fabs(grmean) / 10.) > keynorm * TMath::Exp(-std::fabs(keymean) / 10.)) break;
         groupInfo[kj + 1] = groupInfo[kj];
         kj--;
       }

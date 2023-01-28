@@ -104,6 +104,9 @@ SVDTimeGroupComposerModule::SVDTimeGroupComposerModule() :
   addParam("timeBasedSort", m_timeBasedSort,
            "Clusters belonging to the group nearest to zero is first.",
            bool(false));
+  addParam("exponentialSort", m_exponentialSort,
+           "Group prominence is weighted with exponential weight.",
+           double(0.));
 
   addParam("signalGroupSelection", m_signalGroupSelection,
            "Choose one group near expected signal location.",
@@ -396,27 +399,29 @@ void SVDTimeGroupComposerModule::event()
       }
       groupInfo[kj - 1] = key;
     }
-    // sorting signal groups based on gauss-weightage
-    for (int ij = 1; ij < int(groupInfo.size()); ij++) {
-      key = groupInfo[ij];
-      float keynorm = std::get<0>(key);
-      if (keynorm <= 0) break;
-      float keymean = std::get<1>(key);
-      float keysig  = std::get<2>(key);
-      bool isKeySignal = true;
-      if (keynorm > 0 && (keymean < m_signalRangeLow || keymean > m_signalRangeHigh)) isKeySignal = false;
-      if (!isKeySignal) break;
-      int kj = ij - 1;
-      while (1) {
-        if (kj < 0) break;
-        float grnorm = std::get<0>(groupInfo[kj]);
-        float grmean = std::get<1>(groupInfo[kj]);
-        if (grnorm * TMath::Exp(-std::fabs(grmean) / 10.) > keynorm * TMath::Exp(-std::fabs(keymean) / 10.)) break;
-        groupInfo[kj + 1] = groupInfo[kj];
-        kj--;
+    if (m_exponentialSort > 0.)
+      // sorting signal groups based on expo-weightage
+      for (int ij = 1; ij < int(groupInfo.size()); ij++) {
+        key = groupInfo[ij];
+        float keynorm = std::get<0>(key);
+        if (keynorm <= 0) break;
+        float keymean = std::get<1>(key);
+        bool isKeySignal = true;
+        if (keynorm > 0 && (keymean < m_signalRangeLow || keymean > m_signalRangeHigh)) isKeySignal = false;
+        if (!isKeySignal) break;
+        float keyWt = keynorm * TMath::Exp(-std::fabs(keymean) / m_exponentialSort);
+        int kj = ij - 1;
+        while (1) {
+          if (kj < 0) break;
+          float grnorm = std::get<0>(groupInfo[kj]);
+          float grmean = std::get<1>(groupInfo[kj]);
+          float grWt = grnorm * TMath::Exp(-std::fabs(grmean) / m_exponentialSort);
+          if (grWt > keyWt) break;
+          groupInfo[kj + 1] = groupInfo[kj];
+          kj--;
+        }
+        groupInfo[kj + 1] = key;
       }
-      groupInfo[kj + 1] = key;
-    }
 
     if ((m_useOnlyOneGroup || m_signalGroupSelection || m_flatSignalCut)
         && int(groupInfo.size()) > 1) // keep only one group

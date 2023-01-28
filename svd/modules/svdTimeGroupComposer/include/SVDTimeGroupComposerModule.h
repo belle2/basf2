@@ -85,6 +85,7 @@ namespace Belle2 {
     bool   m_includeOutOfRangeClusters = true; /** Assign groups to under and overflow. */
     bool   m_useOnlyOneGroup    = false; /** Only one group is kept. */
     bool   m_timeBasedSort      = false; /** Group nearest to zero is kept at the first. */
+    double m_exponentialSort    = 0.; /** Group prominence is weighted with exponential weight. */
 
     // modification parameters
     std::string m_nameOfInstance =

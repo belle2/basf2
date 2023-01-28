@@ -325,8 +325,8 @@ void SVDTimeGroupComposerModule::event()
   } else {      // if (!m_gausFill) {
 
     std::vector<std::tuple<double, double, double>> groupInfo; // pars
-    double maxPeak = 0;
-    double maxNorm = 0;
+    double maxPeak = 0.;
+    double maxNorm = 0.;
     while (1) {
 
       int maxBin       = h_clsTime[currentHisto].GetMaximumBin();
@@ -381,7 +381,7 @@ void SVDTimeGroupComposerModule::event()
       float keynorm = std::get<0>(key);
       float keymean = std::get<1>(key);
       bool isKeySignal = true;
-      if (keynorm > 0 && (keymean < m_signalRangeLow || keymean > m_signalRangeHigh)) isKeySignal = false;
+      if (keynorm != 0. && (keymean < m_signalRangeLow || keymean > m_signalRangeHigh)) isKeySignal = false;
       if (isKeySignal) continue;
       int kj = ij + 1;
       while (1) {
@@ -389,12 +389,33 @@ void SVDTimeGroupComposerModule::event()
         float grnorm = std::get<0>(groupInfo[kj]);
         float grmean = std::get<1>(groupInfo[kj]);
         bool isGrSignal = true;
-        if (grnorm > 0 && (grmean < m_signalRangeLow || grmean > m_signalRangeHigh)) isGrSignal = false;
+        if (grnorm != 0. && (grmean < m_signalRangeLow || grmean > m_signalRangeHigh)) isGrSignal = false;
         if (!isGrSignal && (grnorm > keynorm)) break;
         groupInfo[kj - 1] = groupInfo[kj];
         kj++;
       }
       groupInfo[kj - 1] = key;
+    }
+    // sorting signal groups based on height/sigma
+    for (int ij = 1; ij < int(groupInfo.size()); ij++) {
+      key = groupInfo[ij];
+      float keynorm = std::get<0>(key);
+      if (keynorm <= 0) break;
+      float keymean = std::get<1>(key);
+      float keysig  = std::get<2>(key);
+      bool isKeySignal = true;
+      if (keynorm > 0 && (keymean < m_signalRangeLow || keymean > m_signalRangeHigh)) isKeySignal = false;
+      if (!isKeySignal) break;
+      int kj = ij - 1;
+      while (1) {
+        if (kj < 0) break;
+        float grnorm = std::get<0>(groupInfo[kj]);
+        float grsig  = std::get<2>(groupInfo[kj]);
+        if (grnorm / (grsig * grsig) > keynorm / (keysig * keysig)) break;
+        groupInfo[kj + 1] = groupInfo[kj];
+        kj--;
+      }
+      groupInfo[kj + 1] = key;
     }
 
     if ((m_useOnlyOneGroup || m_signalGroupSelection || m_flatSignalCut)

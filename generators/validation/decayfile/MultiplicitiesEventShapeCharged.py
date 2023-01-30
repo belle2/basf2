@@ -21,7 +21,7 @@
 """
 <header>
     <input>../charged.cdst.root</input>
-    <output>MCvalidation.root</output>
+    <output>MCvalidationCharged.root</output>
     <description>Determining multiplicities of different particles on generator level</description>
 </header>
 """
@@ -137,14 +137,14 @@ ma.variablesToNtuple(
     '',
     treename="Multiplicities",
     variables=multi_variables,
-    filename='MCvalidation.root',
+    filename='MCvalidationCharged.root',
     path=path)
-ma.variablesToNtuple('', treename="Split", variables=split_variables, filename='MCvalidation.root', path=path)
+ma.variablesToNtuple('', treename="Split", variables=split_variables, filename='MCvalidationCharged.root', path=path)
 ma.variablesToNtuple(
     '',
     treename="EventShape",
     variables=eventshape_variables,
-    filename='MCvalidation.root',
+    filename='MCvalidationCharged.root',
     path=path)
 
 progress = ma.register_module('Progress')

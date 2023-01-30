@@ -527,6 +527,7 @@ def correctBremsBelle(outputListName,
                       gammaListName,
                       multiplePhotons=True,
                       angleThreshold=0.05,
+                      usePhotonOnlyOnce=False,
                       writeOut=False,
                       path=None):
     """
@@ -549,6 +550,13 @@ def correctBremsBelle(outputListName,
        angleThreshold (float): The maximum angle in radians between the charged particle and the (radiative)
               gamma to be accepted.
        writeOut (bool): whether RootOutput module should save the created ParticleList
+       usePhotonOnlyOnce (bool): If true, a photon is used for correction of the closest charged particle in the inputList.
+                                 If false, a photon is allowed to be used for correction multiple times (Default).
+
+       Warning:
+           One cannot use a photon twice to reconstruct a composite particle. Thus, for example, if ``e+`` and ``e-`` are corrected
+           with a ``gamma``, the pair of ``e+`` and ``e-`` cannot form a ``J/psi -> e+ e-`` candidate.
+
        path (basf2.Path): modules are added to this path
     """
 
@@ -559,6 +567,7 @@ def correctBremsBelle(outputListName,
     fsrcorrector.param('gammaListName', gammaListName)
     fsrcorrector.param('multiplePhotons', multiplePhotons)
     fsrcorrector.param('angleThreshold', angleThreshold)
+    fsrcorrector.param('usePhotonOnlyOnce', usePhotonOnlyOnce)
     fsrcorrector.param('writeOut', writeOut)
     path.add_module(fsrcorrector)
 
@@ -3380,8 +3389,7 @@ def buildEventShape(inputListNames=None,
        If the lists provided by the user contain several times the same track (either with
        different mass hypothesis, or once as an independent particle and once as daughter of a
        combined particle) the results won't be reliable.
-       A basic check for duplicates is available setting the checkForDuplicate flags,
-       but is usually quite time consuming.
+       A basic check for duplicates is available setting the checkForDuplicate flags.
 
 
     @param inputListNames     List of ParticleLists used to calculate the
@@ -3407,9 +3415,9 @@ def buildEventShape(inputListNames=None,
     @param jets               Enables the calculation of the hemisphere momenta and masses.
                               Requires thrust = True.
     @param sphericity         Enables the calculation of the sphericity-related quantities.
-    @param checkForDuplicates Perform a check for duplicate particles before adding them. This option
-                              is quite time consuming, instead of using it consider sanitizing
-                              the lists you are passing to the function.
+    @param checkForDuplicates Perform a check for duplicate particles before adding them. Regardless of the value of this option,
+                              it is recommended to consider sanitizing the lists you are passing to the function.
+
     """
 
     if inputListNames is None:

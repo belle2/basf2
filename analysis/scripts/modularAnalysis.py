@@ -3191,8 +3191,7 @@ def lowEnergyPi0Identification(pi0List, gammaList, payloadNameSuffix,
     The possible suffixes are:\n
       * ``'Belle1'`` for Belle data.
       * ``'Belle2Release5'`` for Belle II release 5 data (MC14, proc12, buckets 16 - 25).\n
-      * ``'Belle2Release6'`` for Belle II release 6 data (MC15, proc13, buckets
-26 - 36).\n
+      * ``'Belle2Release6'`` for Belle II release 6 data (MC15, proc13, buckets 26 - 36).\n
 
     @param[in] path
     Module path.

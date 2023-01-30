@@ -580,34 +580,34 @@ namespace Belle2 {
     /* Histograms of time distribution of one layer before calibration. */
 
     /** BKLM part. */
-    TH1F* h_timeFSL[2][8][15] = {{nullptr}};
+    TH1F* h_timeFSL[2][8][15] = {{{nullptr}}};
 
     /** EKLM part. */
-    TH1F* h_timeFSL_end[2][4][14] = {{nullptr}};
+    TH1F* h_timeFSL_end[2][4][14] = {{{nullptr}}};
 
     /* Histograms of time distribution of one layer after calibration. */
 
     /** BKLM part. */
-    TH1F* hc_timeFSL[2][8][15] = {{nullptr}};
+    TH1F* hc_timeFSL[2][8][15] = {{{nullptr}}};
 
     /** EKLM part. */
-    TH1F* hc_timeFSL_end[2][4][14] = {{nullptr}};
+    TH1F* hc_timeFSL_end[2][4][14] = {{{nullptr}}};
 
     /* Histograms of time distribution of one plane before calibration. */
 
     /** BKLM part. */
-    TH1F* h_timeFSLP[2][8][15][2] = {{nullptr}};
+    TH1F* h_timeFSLP[2][8][15][2] = {{{{nullptr}}}};
 
     /** EKLM part. */
-    TH1F* h_timeFSLP_end[2][4][14][2] = {{nullptr}};
+    TH1F* h_timeFSLP_end[2][4][14][2] = {{{{nullptr}}}};
 
     /* Histograms of time distribution of one plane after calibration. */
 
     /** BKLM part. */
-    TH1F* hc_timeFSLP[2][8][15][2] = {{nullptr}};
+    TH1F* hc_timeFSLP[2][8][15][2] = {{{{nullptr}}}};
 
     /** EKLM part. */
-    TH1F* hc_timeFSLP_end[2][4][14][2] = {{nullptr}};
+    TH1F* hc_timeFSLP_end[2][4][14][2] = {{{{nullptr}}}};
 
     /*
      * Histograms of time distribution dependent on channels
@@ -615,10 +615,10 @@ namespace Belle2 {
      */
 
     /** BKLM part. */
-    TH2F* h2_timeFSLP[2][8][15][2] = {{nullptr}};
+    TH2F* h2_timeFSLP[2][8][15][2] = {{{{nullptr}}}};
 
     /** EKLM part. */
-    TH2F* h2_timeFSLP_end[2][4][14][2] = {{nullptr}};
+    TH2F* h2_timeFSLP_end[2][4][14][2] = {{{{nullptr}}}};
 
     /*
      * Histograms of time distribution dependent on channels
@@ -626,38 +626,38 @@ namespace Belle2 {
      */
 
     /** BKLM part. */
-    TH2F* h2c_timeFSLP[2][8][15][2] = {{nullptr}};
+    TH2F* h2c_timeFSLP[2][8][15][2] = {{{{nullptr}}}};
 
     /** EKLM part. */
-    TH2F* h2c_timeFSLP_end[2][4][14][2] = {{nullptr}};
+    TH2F* h2c_timeFSLP_end[2][4][14][2] = {{{{nullptr}}}};
 
     /* Histograms of time distribution of each channel before calibration. */
 
     /** BKLM part, used for effective light speed estimation. */
-    TH1F* h_timeFSLPC_tc[2][8][15][2][54] = {{nullptr}};
+    TH1F* h_timeFSLPC_tc[2][8][15][2][54] = {{{{{nullptr}}}}};
 
     /** BKLM part. */
-    TH1F* h_timeFSLPC[2][8][15][2][54] = {{nullptr}};
+    TH1F* h_timeFSLPC[2][8][15][2][54] = {{{{{nullptr}}}}};
 
     /** Two-dimensional distributions of time versus propagation length. */
-    TH2F* m_HistTimeLengthBKLM[2][8][15][2][54] = {{nullptr}};
+    TH2F* m_HistTimeLengthBKLM[2][8][15][2][54] = {{{{{nullptr}}}}};
 
     /** EKLM part, used for effective light speed estimation. */
-    TH1F* h_timeFSLPC_tc_end[2][4][14][2][75] = {{nullptr}};
+    TH1F* h_timeFSLPC_tc_end[2][4][14][2][75] = {{{{{nullptr}}}}};
 
     /** EKLM part. */
-    TH1F* h_timeFSLPC_end[2][4][14][2][75] = {{nullptr}};
+    TH1F* h_timeFSLPC_end[2][4][14][2][75] = {{{{{nullptr}}}}};
 
     /** Two-dimensional distributions of time versus propagation length. */
-    TH2F* m_HistTimeLengthEKLM[2][4][14][2][75] = {{nullptr}};
+    TH2F* m_HistTimeLengthEKLM[2][4][14][2][75] = {{{{{nullptr}}}}};
 
     /* Histograms of time distribution of each channel after calibration. */
 
     /** BKLM part. */
-    TH1F* hc_timeFSLPC[2][8][15][2][54] = {{nullptr}};
+    TH1F* hc_timeFSLPC[2][8][15][2][54] = {{{{{nullptr}}}}};
 
     /** EKLM part. */
-    TH1F* hc_timeFSLPC_end[2][4][14][2][75] = {{nullptr}};
+    TH1F* hc_timeFSLPC_end[2][4][14][2][75] = {{{{{nullptr}}}}};
 
     /* Formulas used for fitting. */
 

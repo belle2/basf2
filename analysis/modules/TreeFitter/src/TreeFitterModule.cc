@@ -89,7 +89,8 @@ TreeFitterModule::TreeFitterModule() : Module(), m_nCandidatesBeforeFit(-1), m_n
            1);
   addParam("treatAsInvisible", m_treatAsInvisible,
            "Type::[string]. Decay string to select one particle that will be ignored in the fit.", {});
-  addParam("treatAsInvisibleForVertex", m_treatAsInvisibleForVertex,
+
+  addParam("ignoreFromVertexFit", m_ignoreFromVertexFit,
            "Type::[string]. Decay string to select one particle that will be ignored to determine the vertex position while kept for kinematics determination.", {});
 }
 
@@ -115,13 +116,10 @@ void TreeFitterModule::initialize()
       B2ERROR("TreeFitterModule::initialize Please select exactly one particle to ignore: " << m_treatAsInvisible);
   }
 
-  if (!m_treatAsInvisibleForVertex.empty()) {
-    if (!m_treatAsInvisible.empty())
-      B2ERROR("TreeFitterModule::initialize Using treatAsInvisible and treatAsInvisibleForVertex simultaneously is not supported");
-
-    bool valid = m_pDDescriptorInvisibles.init(m_treatAsInvisibleForVertex);
+  if (!m_ignoreFromVertexFit.empty()) {
+    bool valid = m_pDDescriptorInvisibles.init(m_ignoreFromVertexFit);
     if (!valid)
-      B2ERROR("TreeFitterModule::initialize Invalid Decay Descriptor: " << m_treatAsInvisible);
+      B2ERROR("TreeFitterModule::initialize Invalid Decay Descriptor: " << m_ignoreFromVertexFit);
   }
 
 }
@@ -194,7 +192,7 @@ void TreeFitterModule::event()
         B2ERROR("TreeFitterModule::event No target particle found for " << m_treatAsInvisible);
     }
 
-    if (!m_treatAsInvisibleForVertex.empty()) {
+    if (!m_ignoreFromVertexFit.empty()) {
       std::vector<const Particle*> selParticlesTarget = m_pDDescriptorInvisibles.getSelectionParticles(particle);
 
       for (auto part : selParticlesTarget) {
@@ -205,7 +203,7 @@ void TreeFitterModule::event()
 
         bool isReplaced = particle->replaceDaughterRecursively(targetD, daughterCopy);
         if (!isReplaced)
-          B2ERROR("TreeFitterModule::event No target particle found for " << m_treatAsInvisibleForVertex);
+          B2ERROR("TreeFitterModule::event No target particle found for " << m_ignoreFromVertexFit);
       }
     }
 

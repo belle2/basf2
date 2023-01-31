@@ -1011,6 +1011,6 @@ or `matchedMC`.
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Authors of this lesson
+.. rubric:: Authors of this lesson
 
-    Frank Meier, Kilian Lieret (minor improvements)
+Frank Meier, Kilian Lieret (minor improvements)

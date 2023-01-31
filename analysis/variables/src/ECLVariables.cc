@@ -111,9 +111,11 @@ namespace Belle2 {
     {
 
       const ECLCluster* cluster = particle->getECLCluster();
-      if (cluster)
-        return cluster->getMinTrkDistance();
-
+      if (cluster) {
+        auto minDist = cluster->getMinTrkDistance();
+        if (minDist > 0)
+          return minDist;
+      }
       return std::numeric_limits<float>::quiet_NaN();
     }
 
@@ -925,14 +927,14 @@ Returns an integer code for the ECL region of a cluster.
 
 
     REGISTER_VARIABLE("minC2TDist", eclClusterIsolation, R"DOC(
-Returns distance between ECL cluster and nearest track hitting the ECL.
+Returns the distance between the ECL cluster and its nearest track. 
 
-A cluster comprises the energy depositions of several crystals. All these crystals have slightly
-different orientations in space. A shower direction can be constructed by calculating the weighted
-average of these orientations using the corresponding energy depositions as weights. The intersection
-(more precisely the point of closest approach) of the vector with this direction originating from the
-cluster center and an extrapolated track can be used as reference for the calculation of the track depth.
-It is defined as the distance between this intersection and the track hit position on the front face of the ECL.
+For all tracks in the event, the distance between each of their extrapolated hits in the ECL and the ECL shower 
+position is calculated, and the overall smallest distance is returned. The track array index of the track that is 
+closest to the ECL cluster can be retrieved using `minC2TDistID`. 
+
+If the calculated distance is greater than :math:`250.0`, the returned distance will be capped at :math:`250.0`. 
+If there are no extrapolated hits found in the ECL for the event, NaN will be returned. 
 
 .. note::
     This distance is calculated on the reconstructed level.
@@ -944,10 +946,15 @@ It is defined as the distance between this intersection and the track hit positi
     | Precision: :math:`10` bit
 ..
 )DOC","cm");
-    REGISTER_VARIABLE("minC2TDistID", eclClusterIsolationID, "Nearest track array index");
+    REGISTER_VARIABLE("minC2TDistID", eclClusterIsolationID, R"DOC(
+Returns the track array index of the nearest track to the ECL cluster. The nearest track is calculcated 
+using the `minC2TDist` variable. 
+)DOC");
     REGISTER_METAVARIABLE("minC2TDistVar(variable,particleList=pi-:all)", eclClusterIsolationVar, R"DOC(
-Returns variable value for the nearest track to the given ECL cluster. First argument is a variable name, e.g. nCDCHits. 
-The second argument is the particle list name which will be used to pick up the nearest track, default is pi-:all.
+Returns the variable value of the nearest track to the given ECL cluster as calculated by `minC2TDist`. The 
+first argument is the variable name, e.g. `nCDCHits`, while the second (optional) argument is the particle list name which 
+will be used to pick up the nearest track in the calculation of `minC2TDist`. The default particle list used 
+is ``pi-:all``. 
 )DOC", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("clusterE", eclClusterE, R"DOC(
 Returns ECL cluster's energy corrected for leakage and background.

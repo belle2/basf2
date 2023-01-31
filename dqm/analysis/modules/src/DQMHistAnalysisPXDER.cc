@@ -292,13 +292,6 @@ void DQMHistAnalysisPXDERModule::event()
   }
 }
 
-void DQMHistAnalysisPXDERModule::endRun()
-{
-}
-
-void DQMHistAnalysisPXDERModule::terminate()
-{
-}
 
 void DQMHistAnalysisPXDERModule::getIDsFromIndex(const int Index, int& Layer, int& Ladder, int& Sensor) const
 {

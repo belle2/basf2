@@ -1,5 +1,10 @@
 .. _convertedobjects:
 
+Converted data objects and other information
+============================================
+This section briefly describes what is converted, in what way, and how the
+converted objects should be used in the analysis.
+
 -----------------------------
 Charged Final State Particles
 -----------------------------

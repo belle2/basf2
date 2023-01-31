@@ -55,6 +55,8 @@ namespace Belle2 {
     /** Neighbour maps */
     ECL::ECLNeighbours* m_NeighbourMap5{nullptr}; /**< 5x5 */
     ECL::ECLNeighbours* m_NeighbourMap7{nullptr}; /**< 7x7 */
+    ECL::ECLNeighbours* m_NeighbourMap9{nullptr}; /**< 9x9 */
+    ECL::ECLNeighbours* m_NeighbourMap11{nullptr}; /**< 11x11 */
 
     /** Store object pointer: ECLCellIdToECLCalDigitMapping. */
     StoreObjPtr<ECLCellIdMapping> m_eclCellIdMapping;

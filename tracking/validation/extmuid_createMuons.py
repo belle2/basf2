@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -20,7 +19,7 @@
 """
 <header>
     <output>muon-ExtMuidValidation.root</output>
-    <contact>depietro@infn.it</contact>
+    <contact>giacomo.pietro@kit.edu</contact>
     <description>Create events with 1 muon track for ext/muid validation.</description>
 </header>
 """

@@ -16,7 +16,7 @@ namespace Belle2 {
   /**
    * Creates monitoring object for HLT
    */
-  class DQMHistAnalysisHLTMonObjModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisHLTMonObjModule final : public DQMHistAnalysisModule {
 
   public:
 
@@ -28,32 +28,23 @@ namespace Belle2 {
     /**
      * Destructor
      */
-    virtual ~DQMHistAnalysisHLTMonObjModule();
+    ~DQMHistAnalysisHLTMonObjModule();
 
     /**
      * Initialize the Module.
      */
-    virtual void initialize() override;
+    void initialize() override final;
 
-    /**
-     * Begin run function
-     */
-    virtual void beginRun() override;
-
-    /**
-     * Event processor.
-     */
-    virtual void event() override;
 
     /**
      * End-of-run action.
      */
-    virtual void endRun() override;
+    void endRun() override final;
 
     /**
      * Termination action.
      */
-    virtual void terminate() override;
+    void terminate() override final;
 
   protected:
 

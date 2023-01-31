@@ -1,0 +1,22 @@
+# EventType: 4710821051
+# Descriptor: [vpho_etaY2Sll]
+# NickName: vpho_etaY2Sll 
+# Cuts: None
+# Documentation: Decay for Y(10750) physics
+# PhysicsWG: Bottomonium
+# Tested: Yes
+# Responsible: Junhao YIn 
+# Email: yinjh2012@korea.ac.kr 
+# Date: 20230102
+
+Alias etasig eta
+
+Decay vpho
+1.0 etasig Upsilon(2S)sig  PARTWAVE  0.0 0.0 1.0 0.0 0.0 0.0;
+Enddecay
+
+Decay Upsilon(2S)sig
+0.5 e+ e- PHOTOS VLL;
+0.5 mu+ mu- PHOTOS VLL;
+Enddecay
+End

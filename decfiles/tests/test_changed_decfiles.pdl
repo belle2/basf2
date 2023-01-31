@@ -1,0 +1,12 @@
+* This particle DB contains particle aliases which can't be found in evt.pdl and would otherwise make the test fail.
+* Add new aliases here if the test fails with "Unknown particle name" and the particle shouldn't go into evt.pdl.
+* For the test to pass the particle properties are irrelevant, only the name and id must be unique.
+
+*---------------------------------------------------------------------------------------------------------------------------------------
+*                name                              id      mass/GeV       width/GeV max_Dm/GeV 3*charge 2*spin  lifetime*c/mm   PythiaId
+*---------------------------------------------------------------------------------------------------------------------------------------
+
+add  p Particle  Xb                           1111553           1.0             1.0     100e-3        0      2              0          0
+add  p Particle  Yb10751                      9010554      10.751e+00      0.005e+00    100e-3        0      2              0          0
+
+* No 'end' needed here as the default pdl is concatenated with this file.

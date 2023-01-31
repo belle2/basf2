@@ -54,6 +54,13 @@ Modules
   the output ROOT file name even if the ``-o`` argument is used.
 * Added a module ``BelleNbarMVA`` that applies nbarMVA for Belle I, a DNN trained with ECLCluster variables for discrimination of anti-neutrons against photons. Anti-neutron-like particles have scores closer to 1; photon-like particles have scores closer to 0.
 * Fixed a bug on `NeutralHadron4MomentumCalculator` that misplaces the neutral hadron daughter's index after calculating its momentum.
+ * Added an option ``usePhotonOnlyOnce`` to the function :func:`modularAnalysis.correctBremsBelle`. The default of the option is ``False``
+   so the backward compatibility. If the option is set to ``True``, a photon is used for only the closest charged particle in the
+   input ParticleLists.
+ * Added the argument ``ignoreFromVertexFit`` in :func:`vertex.treeFit` to ignore particles to determine the vertex position. The kinematics of the particles are treated as constant.
+   The ``ignoreFromVertexFit`` option is expected to be used to perform fit without ``K_L0`` or mimic a ``K_S0`` or a ``pi0`` with a control channel by ignoring a track for vertex fit.
+   While, ``treatAsInvisible`` will ignore both for vertex and kinematics. The ``treatAsInvisible`` option is expected to recover an invisible particle's kinematics from beam-constraint.
+   An example of usage can be found in ``analysis/examples/VariableManager/variablesToNtuple.py``.
 
 Variables
 +++++++++
@@ -136,6 +143,18 @@ Modules
  * Added the argument ``treatAsInvisibleForVertex`` in :func:`vertex.treeFit` to ignore particles to determine the vertex position but still valid for kinematics.
    The ``treatAsInvisibleForVertex`` option is expected to mimic a ``K_S0`` or a ``pi0`` with a control channel by ignoring a track for vertex fit.
    While, ``treatAsInvisible`` will ignore both for vertex and kinematics. The ``treatAsInvisible`` option is expected to recover an invisible particle's kinematics from beam-constraint.
+ * Fixed a bug on the :b2:mod:`BestCandidateSelection` that keeps only less than the expected number of candidates when
+   ``allowMultiRank=True`` and ``numBest>0``. Now the module works as documented.
+ * Added an option ``allowAnyParticleSource`` to the function :func:`modularAnalysis.reconstructDecayWithNeutralHadron` to let
+   users apply the mother-mass constraint on a charged particle.
+ * The `findMCDecay` function is fixed so that all output particles have ``isSignal==1``.
+   New option ``appendAllDaughters`` is added so that one can append not only the daughters described in the decay string but all
+   daughters of the matched MCParticle. Another new option ``skipNonPrimaryDaughters`` is added to skip secondary particles when
+   ``appendAllDaughters=True``.
+
+ * The ParticleLists labeled ``:MC``, which were created by default when the `fillParticleListFromMC` is called, are no longer
+   created automatically by the function. Also, the protection that was previously applied to the list labeled ":MC" has been
+   removed.
 
 Changes in the analysis package in light-2210-devonrex
 ------------------------------------------------------

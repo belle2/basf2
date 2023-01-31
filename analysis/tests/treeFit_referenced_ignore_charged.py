@@ -46,7 +46,7 @@ class TestTreeFits(unittest.TestCase):
                         expertUseReferencing=True,
                         ipConstraint=True,
                         updateAllDaughters=True,
-                        treatAsInvisibleForVertex='B0 -> ^pi- pi+ pi0')
+                        ignoreFromVertexFit='B0 -> ^pi- pi+ pi0')
 
         ntupler = basf2.register_module('VariablesToNtuple')
         ntupler.param('fileName', testFile.name)

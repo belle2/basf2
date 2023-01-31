@@ -168,6 +168,14 @@ void TreeFitterModule::event()
     dummyCovMatrix(row, row) = 10000;
   }
 
+  TMatrixFSym dummyCovMatrix_smallMomError(7);
+  for (int row = 0; row < 4; ++row) {
+    dummyCovMatrix_smallMomError(row, row) = 1e-10;
+  }
+  for (int row = 4; row < 7; ++row) {
+    dummyCovMatrix_smallMomError(row, row) = 10000;
+  }
+
   for (unsigned iPart = 0; iPart < nParticles; iPart++) {
     Belle2::Particle* particle = m_plist->getParticle(iPart);
 
@@ -193,6 +201,7 @@ void TreeFitterModule::event()
         Particle* targetD = m_particles[part->getArrayIndex()];
         Particle* daughterCopy = Belle2::ParticleCopy::copyParticle(targetD);
         daughterCopy->writeExtraInfo("treeFitterTreatMeAsInvisible", 1);
+        daughterCopy->setMomentumVertexErrorMatrix(dummyCovMatrix_smallMomError);
 
         bool isReplaced = particle->replaceDaughterRecursively(targetD, daughterCopy);
         if (!isReplaced)

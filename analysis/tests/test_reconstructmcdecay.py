@@ -168,7 +168,6 @@ class TestNewMCDecayFinder(unittest.TestCase):
 
         findMCDecay(
             'B0:3KS',
-            # 'B0 =direct=> [K_S0 =direct=> pi+ pi-] [K_S0 =direct=> pi+ pi-] [K_S0 =direct=> pi+ pi-]',
             'B0 -> [K_S0 -> pi+ pi-] [K_S0 -> pi+ pi-] [K_S0 -> pi+ pi-]',
             path=main)
 

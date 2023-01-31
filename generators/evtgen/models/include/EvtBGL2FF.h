@@ -61,7 +61,12 @@ private:
       a_0 + a_1 * z + a_2 * z^2 + a_3 * z^3
 
       Fitted values cited from
-      R.Glattauer, etc. (Belle) Phys. Rev. D 93,032006 (2016).
+      Bigi, Dante and Gambino, Paolo, Phys. Rev. D. 94.094008 (2016):
+      a+0, a+1, a+2, a+3 : 0.01565, -0.0353, -0.043, 0.194
+      a00, a01, a02, a03 : 0.07932, -0.214, 0.17, -0.958
+
+      NOTE : This is an alternative BGL model. Use it if you understand the difference with the
+      default one called 'EvtBGLFF' in basf2.
 
       B -> D*lnu (l=e, mu):
       a_n, b_n (n = 0,1) and c_n (n = 0,1,2) are free coefficients of z expansion parametrization from

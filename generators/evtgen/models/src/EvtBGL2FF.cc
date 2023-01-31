@@ -60,6 +60,11 @@ EvtBGL2FF::EvtBGL2FF(double bgla_0, double bgla_1, double bglb_0, double bglb_1,
 // C.G.Boyd, B.Grinstein, R.F.Lebed, Phys. Rev. Lett. 74,4603 (1995)
 // and
 // Bigi, Dante and Gambino, Paolo, Phys. Rev. D. 94.094008 (2016)
+// a+0, a+1, a+2, a+3 : 0.01565, -0.0353, -0.043, 0.194
+// a00, a01, a02, a03 : 0.07932, -0.214, 0.17, -0.958
+
+// NOTE : This is an alternative BGL model. Use it if you understand the difference with the
+// default one called 'EvtBGLFF' in basf2.
 
 void EvtBGL2FF::getscalarff(EvtId parent, EvtId,
                             double t, double mass, double* fp, double* f0)

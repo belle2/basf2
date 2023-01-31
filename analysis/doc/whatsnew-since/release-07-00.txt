@@ -60,7 +60,6 @@ Modules
  * Added the argument ``ignoreFromVertexFit`` in :func:`vertex.treeFit` to ignore particles to determine the vertex position. The kinematics of the particles are treated as constant.
    The ``ignoreFromVertexFit`` option is expected to be used to perform fit without ``K_L0`` or mimic a ``K_S0`` or a ``pi0`` with a control channel by ignoring a track for vertex fit.
    While, ``treatAsInvisible`` will ignore both for vertex and kinematics. The ``treatAsInvisible`` option is expected to recover an invisible particle's kinematics from beam-constraint.
-   An example of usage can be found in ``analysis/examples/VariableManager/variablesToNtuple.py``.
 
 Variables
 +++++++++
@@ -143,6 +142,7 @@ Modules
  * Added the argument ``treatAsInvisibleForVertex`` in :func:`vertex.treeFit` to ignore particles to determine the vertex position but still valid for kinematics.
    The ``treatAsInvisibleForVertex`` option is expected to mimic a ``K_S0`` or a ``pi0`` with a control channel by ignoring a track for vertex fit.
    While, ``treatAsInvisible`` will ignore both for vertex and kinematics. The ``treatAsInvisible`` option is expected to recover an invisible particle's kinematics from beam-constraint.
+   An example of usage can be found in ``analysis/examples/VariableManager/variablesToNtuple.py``.
  * Fixed a bug on the :b2:mod:`BestCandidateSelection` that keeps only less than the expected number of candidates when
    ``allowMultiRank=True`` and ``numBest>0``. Now the module works as documented.
  * Added an option ``allowAnyParticleSource`` to the function :func:`modularAnalysis.reconstructDecayWithNeutralHadron` to let

@@ -3217,13 +3217,31 @@ def getBeamBackgroundProbability(particleList, path=None):
 
     import b2bii
     if b2bii.isB2BII():
-        B2ERROR("The beam background probability is not trained for Belle data.")
+        B2ERROR("The beam background MVA is not trained for Belle data.")
 
     basf2.conditions.prepend_globaltag(getAnalysisGlobaltag())
     path.add_module('MVAExpert',
                     listNames=particleList,
                     extraInfoName='beamBackgroundSuppression',
                     identifier='BeamBackgroundMVA')
+
+
+def getFakePhotonProbability(particleList, path=None,):
+    """
+    Assign a probability to each ECL cluster as being signal like (1) compared to fake photon like (0)
+    @param particleList     The input ParticleList, must be a photon list
+    @param path       modules are added to this path
+    """
+
+    import b2bii
+    if b2bii.isB2BII():
+        B2ERROR("The fake photon MVA is not trained for Belle data.")
+
+    basf2.conditions.prepend_globaltag(getAnalysisGlobaltag())
+    path.add_module('MVAExpert',
+                    listNames=particleList,
+                    extraInfoName='fakePhotonSuppression',
+                    identifier='FakePhotonMVA')
 
 
 def getHadronicSplitOffProbability(particleList, path=None,):
@@ -3235,7 +3253,7 @@ def getHadronicSplitOffProbability(particleList, path=None,):
 
     import b2bii
     if b2bii.isB2BII():
-        B2ERROR("The hadronic splitoff probability is not trained for Belle data.")
+        B2ERROR("The hadronic splitoff MVA is not trained for Belle data.")
 
     basf2.conditions.prepend_globaltag(getAnalysisGlobaltag())
     path.add_module('MVAExpert',

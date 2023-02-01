@@ -46,6 +46,17 @@ namespace Belle2 {
       }
     }
 
+    double fakePhotonSuppression(const Particle* particle)
+    {
+      if (particle->hasExtraInfo("fakePhotonSuppression")) {
+        return particle->getExtraInfo("fakePhotonSuppression");
+      } else {
+        B2WARNING("The extraInfo fakePhotonSuppression is not registered! \n"
+                  "This variable is only available for photons, and you either have to run the function getFakePhotonProbability or turn the argument loadFakePhotonMVA to True when using fillParticleList.");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+    }
+
     double hadronicSplitOffSuppression(const Particle* particle)
     {
       if (particle->hasExtraInfo("hadronicSplitOffSuppression")) {
@@ -1311,6 +1322,24 @@ The MVA has been trained using MC and the features used are:
     - `clusterE`
     - `clusterTheta`
     - `clusterZernikeMVA`
+
+Both run-dependent and run-independent weights are available. For more information on this, and for usage recommendations, please see
+the `Neutrals Performance Confluence Page <https://confluence.desy.de/display/BI/Neutrals+Performance>`_.
+)DOC");
+    REGISTER_VARIABLE("fakePhotonSuppression", fakePhotonSuppression, R"DOC(
+Returns the output of an MVA classifier that uses shower-related variables to distinguish true photon clusters from fake photon clusters (e.g. split-offs,
+track-cluster matching failures etc.). Class 1 is for true photon clusters while class 0 is for fake photon clusters. 
+
+The MVA has been trained using MC and the features are:
+
+    - `clusterPulseShapeDiscriminationMVA`
+    - `minC2TDist`
+    - `clusterZernikeMVA`
+    - `clusterE`
+    - `clusterTiming`
+    - `clusterTheta`
+
+This MVA is the same as the one used for `hadronicSplitOffSuppression` but that variable should not be used as it is deprecated and does not use the new weights. 
 
 Both run-dependent and run-independent weights are available. For more information on this, and for usage recommendations, please see
 the `Neutrals Performance Confluence Page <https://confluence.desy.de/display/BI/Neutrals+Performance>`_.

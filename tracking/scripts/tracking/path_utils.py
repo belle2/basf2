@@ -256,6 +256,8 @@ def add_mc_matcher(path, components=None, mc_reco_tracks="MCRecoTracks",
                         CutOffs=chi2_cutoffs,
                         linalg=chi2_linalg)
 
+    path.add_module('TrackToMCParticleRelator')
+
 
 def add_prune_tracks(path, components=None, reco_tracks="RecoTracks"):
     """

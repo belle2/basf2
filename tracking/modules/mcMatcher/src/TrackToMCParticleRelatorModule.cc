@@ -8,9 +8,6 @@
 #include <tracking/modules/mcMatcher/TrackToMCParticleRelatorModule.h>
 
 #include <framework/datastore/RelationVector.h>
-#include <framework/gearbox/Const.h>
-#include <framework/gearbox/Unit.h>
-#include <framework/logging/Logger.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/RecoTrack.h>

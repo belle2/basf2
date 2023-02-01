@@ -822,7 +822,7 @@ def fillSignalSideParticleList(outputListName, decayString, path):
 
 
 def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFitHypothesis=False,
-                      loadPhotonsFromKLM=False, loadPhotonBeamBackgroundMVA=False, loadPhotonHadronicSplitOffMVA=False):
+                      loadPhotonsFromKLM=False, loadPhotonBeamBackgroundMVA=False, loadPhotonFakePhotonMVA=False):
     """
     Creates Particles of the desired types from the corresponding ``mdst`` dataobjects,
     loads them to the ``StoreArray<Particle>`` and fills the ParticleLists.
@@ -895,7 +895,7 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFi
                                      type is not available.
         loadPhotonsFromKLM (bool):   If true, photon candidates will be created from KLMClusters as well.
         loadPhotonBeamBackgroundMVA (bool):    If true, photon candidates will be assigned a beam background probability.
-        loadPhotonHadronicSplitOffMVA (bool):  If true, photon candidates will be assigned a hadronic splitoff probability.
+        loadPhotonFakePhotonMVA (bool):  If true, photon candidates will be assigned a fake photon probability.
     """
 
     pload = register_module('ParticleLoader')
@@ -939,12 +939,12 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFi
 
             # if the user asked for the hadronic splitoff MVA to be added, then also provide this
             # (populates the variable named hadronicSplitOffSuppression)
-            if loadPhotonHadronicSplitOffMVA:
-                getHadronicSplitOffProbability(decayString, path)
+            if loadPhotonFakePhotonMVA:
+                getFakePhotonProbability(decayString, path)
 
 
 def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypothesis=False,
-                     loadPhotonsFromKLM=False, loadPhotonBeamBackgroundMVA=False, loadPhotonHadronicSplitOffMVA=False):
+                     loadPhotonsFromKLM=False, loadPhotonBeamBackgroundMVA=False, loadPhotonFakePhotonMVA=False):
     """
     Creates Particles of the desired type from the corresponding ``mdst`` dataobjects,
     loads them to the StoreArray<Particle> and fills the ParticleList.
@@ -1000,7 +1000,7 @@ def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypo
                                      type is not available.
         loadPhotonsFromKLM (bool):   If true, photon candidates will be created from KLMClusters as well.
         loadPhotonBeamBackgroundMVA (bool):    If true, photon candidates will be assigned a beam background probability.
-        loadPhotonHadronicSplitOffMVA (bool):  If true, photon candidates will be assigned a hadronic splitoff probability.
+        loadPhotonFakePhotonMVA (bool):  If true, photon candidates will be assigned a fake photon probability..
     """
 
     pload = register_module('ParticleLoader')
@@ -1043,8 +1043,8 @@ def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypo
 
         # if the user asked for the hadronic splitoff MVA to be added, then also provide this
         # (populates the variable named hadronicSplitOffSuppression)
-        if loadPhotonHadronicSplitOffMVA:
-            getHadronicSplitOffProbability(decayString, path)
+        if loadPhotonFakePhotonMVA:
+            getFakePhotonProbability(decayString, path)
 
 
 def fillParticleListWithTrackHypothesis(decayString,
@@ -3242,24 +3242,6 @@ def getFakePhotonProbability(particleList, path=None,):
                     listNames=particleList,
                     extraInfoName='fakePhotonSuppression',
                     identifier='FakePhotonMVA')
-
-
-def getHadronicSplitOffProbability(particleList, path=None,):
-    """
-    Assign a probability to each ECL cluster as being signal like (1) compared to hadronic splitoff like (0)
-    @param particleList     The input ParticleList, must be a photon list
-    @param path       modules are added to this path
-    """
-
-    import b2bii
-    if b2bii.isB2BII():
-        B2ERROR("The hadronic splitoff MVA is not trained for Belle data.")
-
-    basf2.conditions.prepend_globaltag(getAnalysisGlobaltag())
-    path.add_module('MVAExpert',
-                    listNames=particleList,
-                    extraInfoName='hadronicSplitOffSuppression',
-                    identifier='HadronicSplitOffMVA')
 
 
 def buildEventKinematics(inputListNames=None, default_cleanup=True, custom_cuts=None,

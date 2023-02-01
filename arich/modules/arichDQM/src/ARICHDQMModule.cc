@@ -160,12 +160,12 @@ namespace Belle2 {
     // Only need the Tracks via relations, but since DQM is only really possible if the
     // Tracks StoreArray is present, make it a requirement instead of optional.
     StoreArray<Track> tracks;
-    tracks.isRequired();
+    tracks.isOptional();
 
     m_arichHits.isRequired();
-    m_arichDigits.isRequired();
-    m_arichTracks.isRequired();
-    m_arichLikelihoods.isRequired();
+    m_arichDigits.isOptional();
+    m_arichTracks.isOptional();
+    m_arichLikelihoods.isOptional();
     m_rawFTSW.isOptional(); /// better use isRequired(), but RawFTSW is not in sim
   }
 

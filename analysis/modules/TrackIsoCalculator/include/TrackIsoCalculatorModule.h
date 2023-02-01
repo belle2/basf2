@@ -147,6 +147,20 @@ namespace Belle2 {
     std::string m_isoScoreVariable;
 
     /**
+     * The name of the variable
+     * representing the PID separation weight of this detector.
+     * Will be read from payload if requested.
+     * Added as particle extraInfo.
+     */
+    std::string  m_detPIDWeightName;
+
+    /**
+     * Weighted sum of (scaled) inverse distances variable per detector.
+     * Added as particle extraInfo.
+     */
+    std::string m_weightedSumInvDistsVariable;
+
+    /**
      * Map that associates to each detector its list of valid layers.
      */
     std::unordered_map<std::string, std::vector<int>> m_detToLayers = {
@@ -197,6 +211,27 @@ namespace Belle2 {
       { {Const::parseDetectors(Const::ECL), 0}, 36.0 },
       { {Const::parseDetectors(Const::ECL), 1}, 36.0 },
       { {Const::parseDetectors(Const::KLM), 0}, 20.0 }
+    };
+
+    /**
+     * Maximal values for the distance (in [cm]) to closest ext. helix, derived in J/psi->ll events.
+     * One for each detector layer.
+     */
+    std::map<std::pair<std::string, int>, double> m_distMaxPerDetLayer = {
+      { {Const::parseDetectors(Const::CDC), 0}, 35. },
+      { {Const::parseDetectors(Const::CDC), 1}, 50. },
+      { {Const::parseDetectors(Const::CDC), 2}, 75. },
+      { {Const::parseDetectors(Const::CDC), 3}, 95. },
+      { {Const::parseDetectors(Const::CDC), 4}, 115. },
+      { {Const::parseDetectors(Const::CDC), 5}, 140. },
+      { {Const::parseDetectors(Const::CDC), 6}, 160. },
+      { {Const::parseDetectors(Const::CDC), 7}, 185. },
+      { {Const::parseDetectors(Const::CDC), 8}, 200. },
+      { {Const::parseDetectors(Const::TOP), 0}, 250. },
+      { {Const::parseDetectors(Const::ARICH), 0}, 250. },
+      { {Const::parseDetectors(Const::ECL), 0}, 300. },
+      { {Const::parseDetectors(Const::ECL), 1}, 350. },
+      { {Const::parseDetectors(Const::KLM), 0}, 500. }
     };
 
     /**
@@ -263,6 +298,28 @@ namespace Belle2 {
      * The per-detector score is normalised in \f$s_{d}\in [0, 1]\f$: values closer to 1 indicate well-isolated particles.
      */
     double getIsoScore(const Particle* iParticle) const;
+
+    /**
+     * Get per-detector weight for this particle from payload, if selected.
+     * Otherwise return a default weight.
+     * Will check if the weight already exists as extraInfo to save time.
+     */
+    double getDetectorWeight(const Particle* iParticle) const;
+
+    /**
+     * Get the sum of the inverse (scaled) minimum distances
+     * over the detector layers \f$d\f$, weighted by the PID detector separation score (if requested):
+
+     \f{equation}{
+       S_{d} = \sum_{d} w_{d} * \frac{D_{d}^{thresh}}{D_{d}}
+     \f}
+
+     * The distance \f$D_{d}\f$ to the closest track helix extrapolation defined in `double getDistAtDetSurface()` is used.
+     * The scaling at the numerator is the threshold distance for this detector to define close-by tracks.
+     * Note that if the PID detector weighting is switched off, \f$w_{d} = -1\f$.
+     * By construction, \f$S_{d}\f$ is a negative number.
+     */
+    double getWeightedSumInvDists(const Particle* iParticle) const;
 
     /**
      * Get the threshold value per detctor layer for the distance to closest ext. helix

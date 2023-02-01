@@ -117,10 +117,20 @@ void TrackIsoCalculatorModule::initialize()
     m_detLayerToRefPartIdxVariable.insert(std::make_pair(iDetLayer, refPartIdxVarName));
 
   }
+
   // Isolation score variable per detector.
   m_isoScoreVariable = "trkIsoScore" + m_detName + "_VS_" + m_pListReferenceName;
   if (m_useHighestProbMassForExt) {
     m_isoScoreVariable += "__useHighestProbMassForExt";
+  }
+
+  // PID weight variable per detector.
+  m_detPIDWeightName = "detPIDWeight_" + m_detName;
+
+  // Weighted sum of (scaled) inverse distances variable per detector.
+  m_weightedSumInvDistsVariable = "weightedSumInvDists" + m_detName + "_VS_" + m_pListReferenceName;
+  if (m_useHighestProbMassForExt) {
+    m_weightedSumInvDistsVariable += "__useHighestProbMassForExt";
   }
 
 }
@@ -276,6 +286,11 @@ void TrackIsoCalculatorModule::event()
     auto iMdstIdx = targetParticle.first;
     auto iParticle = targetParticle.second;
 
+    // Get the sum of inverse minmimum distances (scaled by the threshold distance) over the layers of this detector,
+    // weighted by the PID detector separation score (if requested).
+    auto weightedSumInvDists = this->getWeightedSumInvDists(iParticle);
+    m_particles[iParticle->getArrayIndex()]->writeExtraInfo(m_weightedSumInvDistsVariable, weightedSumInvDists);
+
     auto score = this->getIsoScore(iParticle);
     m_particles[iParticle->getArrayIndex()]->writeExtraInfo(m_isoScoreVariable, score);
 
@@ -293,33 +308,85 @@ void TrackIsoCalculatorModule::event()
 }
 
 
-double TrackIsoCalculatorModule::getIsoScore(const Particle* iParticle) const
+double TrackIsoCalculatorModule::getDetectorWeight(const Particle* iParticle) const
 {
 
-  auto hypo = Const::ChargedStable(std::abs(iParticle->getPDGCode()));
-  auto det = this->getDetEnum(m_detName);
-  auto p = iParticle->getP();
-  auto theta = std::get<double>(Variable::Manager::Instance().getVariable("theta")->function(iParticle));
-
   double detWeight(-1.0);
-  if (!m_excludePIDDetWeights) {
-    detWeight = (*m_DBWeights.get())->getWeight(hypo, det, p, theta);
-    // If w > 0, the detector has detrimental impact on PID:
-    // the value is set to zero to prevent the detector from contributing to the score.
-    // NB: NaN should stay NaN.
-    detWeight = (detWeight < 0 || std::isnan(detWeight)) ? detWeight : 0.0;
+
+  if (!iParticle->hasExtraInfo(m_detPIDWeightName)) {
+
+    if (!m_excludePIDDetWeights) {
+
+      auto hypo = Const::ChargedStable(std::abs(iParticle->getPDGCode()));
+      auto p = iParticle->getP();
+      auto theta = std::get<double>(Variable::Manager::Instance().getVariable("theta")->function(iParticle));
+      auto det = this->getDetEnum(m_detName);
+
+      detWeight = (*m_DBWeights.get())->getWeight(hypo, det, p, theta);
+      // If w > 0, the detector has detrimental impact on PID:
+      // the value is reset to zero to prevent the detector from contributing to the score.
+      // NB: NaN should stay NaN.
+      detWeight = (detWeight < 0 || std::isnan(detWeight)) ? detWeight : 0.0;
+    }
+
+    m_particles[iParticle->getArrayIndex()]->addExtraInfo(m_detPIDWeightName, detWeight);
+
+  } else {
+
+    detWeight = iParticle->getExtraInfo(m_detPIDWeightName);
+
   }
 
-  unsigned int n(0);
+  return detWeight;
+
+}
+
+
+double TrackIsoCalculatorModule::getWeightedSumInvDists(const Particle* iParticle) const
+{
+
+  auto det = this->getDetEnum(m_detName);
+
+  double detWeight = this->getDetectorWeight(iParticle);
+
+  double sumInvDists(0.);
   for (const auto& iLayer : m_detToLayers.at(m_detName)) {
+
     auto iDetLayer = m_detName + std::to_string(iLayer);
     auto distVar = m_detLayerToDistVariable.at(iDetLayer);
     auto threshDist = this->getDistThreshold(det, iLayer);
+
+    if (iParticle->hasExtraInfo(distVar)) {
+      sumInvDists += threshDist / iParticle->getExtraInfo(distVar);
+    }
+
+  }
+
+  return detWeight * sumInvDists;
+
+}
+
+
+double TrackIsoCalculatorModule::getIsoScore(const Particle* iParticle) const
+{
+
+  auto det = this->getDetEnum(m_detName);
+
+  double detWeight = this->getDetectorWeight(iParticle);
+
+  unsigned int n(0);
+  for (const auto& iLayer : m_detToLayers.at(m_detName)) {
+
+    auto iDetLayer = m_detName + std::to_string(iLayer);
+    auto distVar = m_detLayerToDistVariable.at(iDetLayer);
+    auto threshDist = this->getDistThreshold(det, iLayer);
+
     if (iParticle->hasExtraInfo(distVar)) {
       if (iParticle->getExtraInfo(distVar) < threshDist) {
         n++;
       }
     }
+
   }
 
   if (!n) {

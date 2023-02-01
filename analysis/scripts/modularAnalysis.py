@@ -3757,7 +3757,7 @@ def calculateTrackIsolation(
         of each particle to its closest neighbour, defined as the segment connecting the two
         extrapolated track helices intersection points on a given cylindrical surface.
         The distance variables defined in the `VariableManager` is named `minET2ETDist`,
-        the isolation scores are named `minET2ETIsoScore`.
+        the isolation scores are named `minET2ETIsoScore`, `minET2ETIsoScoreAsWeightedAvg`.
 
     The definition of distance and the number of distances that are calculated per sub-detector is based on
     the following recipe:
@@ -3883,7 +3883,10 @@ def calculateTrackIsolation(
             f"minET2ETDist({d}, {d_layer}, {reference_list_name}, {int(highest_prob_mass_for_ext)})"
             for d in detectors for d_layer in det_and_layers[d]]
         # Track isolation score.
-        trackiso_vars += [f"minET2ETIsoScore({reference_list_name}, {int(highest_prob_mass_for_ext)}, {','.join(detectors)})"]
+        trackiso_vars += [
+            f"minET2ETIsoScore({reference_list_name}, {int(highest_prob_mass_for_ext)}, {','.join(detectors)})",
+            f"minET2ETIsoScoreAsWeightedAvg({reference_list_name}, {int(highest_prob_mass_for_ext)}, {','.join(detectors)})",
+        ]
         # Optionally, calculate the input variables for the nearest neighbour in the reference list.
         if vars_for_nearest_part:
             trackiso_vars.extend(

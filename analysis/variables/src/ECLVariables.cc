@@ -1335,6 +1335,9 @@ The MVA has been trained using samples of signal photons and hadronic splitoff p
     - `clusterE1E9`
     - `clusterSecondMoment`
 )DOC");
+    MAKE_DEPRECATED("hadronicSplitOffSuppression", false, "light-2302-genetta", R"DOC(
+Use the variable ``fakePhotonSuppression`` instead which is maintained and uses the latest weight files.
+)DOC");
     REGISTER_VARIABLE("clusterKlId", eclClusterKlId, R"DOC(
 Returns MVA classifier that uses ECL clusters variables to discriminate Klong clusters from em background.
     

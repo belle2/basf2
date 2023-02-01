@@ -1302,21 +1302,18 @@ thresholds for computing PSD variables.
 )DOC");
     REGISTER_VARIABLE("beamBackgroundSuppression", beamBackgroundSuppression, R"DOC(
 Returns the output of an MVA classifier that uses shower-related variables to distinguish true photon clusters from beam background clusters.
-The classes are: 
+Class 1 is for true photon clusters while class 0 is for beam background clusters.
 
-    - 1 for true photon clusters
-    - 0 for beam background clusters
-
-The MVA has been trained using samples of signal photons and beam background photons coming from MC. The features used are (in decreasing order of significance): 
+The MVA has been trained using MC and the features used are:
 
     - `clusterTiming`
     - `clusterPulseShapeDiscriminationMVA`
     - `clusterE`
     - `clusterTheta`
     - `clusterZernikeMVA`
-    - `clusterE1E9`
-    - `clusterLAT`
-    - `clusterSecondMoment`    
+
+Both run-dependent and run-independent weights are available. For more information on this, and for usage recommendations, please see
+the `Neutrals Performance Confluence Page <https://confluence.desy.de/display/BI/Neutrals+Performance>`_.
 )DOC");
     REGISTER_VARIABLE("hadronicSplitOffSuppression", hadronicSplitOffSuppression, R"DOC(
 Returns the output of an MVA classifier that uses shower-related variables to distinguish true photon clusters from hadronic splitoff clusters.

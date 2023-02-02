@@ -428,11 +428,6 @@ namespace {
     EXPECT_FALSE(payload);
   }
 
-  //disable (wrong) warnings about unused functions
-#if defined(__INTEL_COMPILER)
-#pragma warning disable 177
-#endif
-
   /** Test callbacks */
   int callbackCounter = 0;
 

@@ -822,7 +822,7 @@ def fillSignalSideParticleList(outputListName, decayString, path):
 
 
 def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFitHypothesis=False,
-                      loadPhotonsFromKLM=False, loadPhotonBeamBackgroundMVA=False, loadPhotonFakePhotonMVA=False):
+                      loadPhotonsFromKLM=False, loadBeamBackgroundMVA=False, loadFakePhotonMVA=False):
     """
     Creates Particles of the desired types from the corresponding ``mdst`` dataobjects,
     loads them to the ``StoreArray<Particle>`` and fills the ParticleLists.
@@ -894,8 +894,8 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFi
                                      in terms of mass difference will be used if the fit using exact particle
                                      type is not available.
         loadPhotonsFromKLM (bool):   If true, photon candidates will be created from KLMClusters as well.
-        loadPhotonBeamBackgroundMVA (bool):    If true, photon candidates will be assigned a beam background probability.
-        loadPhotonFakePhotonMVA (bool):  If true, photon candidates will be assigned a fake photon probability.
+        loadBeamBackgroundMVA (bool):    If true, photon candidates will be assigned a beam background probability.
+        loadFakePhotonMVA (bool):  If true, photon candidates will be assigned a fake photon probability.
     """
 
     pload = register_module('ParticleLoader')
@@ -934,17 +934,17 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFi
 
             # if the user asked for the beam background MVA to be added, then also provide this
             # (populates the variable named beamBackgroundSuppression)
-            if loadPhotonBeamBackgroundMVA:
+            if loadBeamBackgroundMVA:
                 getBeamBackgroundProbability(decayString, path)
 
             # if the user asked for the hadronic splitoff MVA to be added, then also provide this
             # (populates the variable named hadronicSplitOffSuppression)
-            if loadPhotonFakePhotonMVA:
+            if loadFakePhotonMVA:
                 getFakePhotonProbability(decayString, path)
 
 
 def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypothesis=False,
-                     loadPhotonsFromKLM=False, loadPhotonBeamBackgroundMVA=False, loadPhotonFakePhotonMVA=False):
+                     loadPhotonsFromKLM=False, loadBeamBackgroundMVA=False, loadFakePhotonMVA=False):
     """
     Creates Particles of the desired type from the corresponding ``mdst`` dataobjects,
     loads them to the StoreArray<Particle> and fills the ParticleList.
@@ -999,8 +999,8 @@ def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypo
                                      in terms of mass difference will be used if the fit using exact particle
                                      type is not available.
         loadPhotonsFromKLM (bool):   If true, photon candidates will be created from KLMClusters as well.
-        loadPhotonBeamBackgroundMVA (bool):    If true, photon candidates will be assigned a beam background probability.
-        loadPhotonFakePhotonMVA (bool):  If true, photon candidates will be assigned a fake photon probability.
+        loadBeamBackgroundMVA (bool):    If true, photon candidates will be assigned a beam background probability.
+        loadFakePhotonMVA (bool):  If true, photon candidates will be assigned a fake photon probability.
     """
 
     pload = register_module('ParticleLoader')
@@ -1038,12 +1038,12 @@ def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypo
 
         # if the user asked for the beam background MVA to be added, then also provide this
         # (populates the variable named beamBackgroundProbability)
-        if loadPhotonBeamBackgroundMVA:
+        if loadBeamBackgroundMVA:
             getBeamBackgroundProbability(decayString, path)
 
         # if the user asked for the hadronic splitoff MVA to be added, then also provide this
         # (populates the variable named hadronicSplitOffSuppression)
-        if loadPhotonFakePhotonMVA:
+        if loadFakePhotonMVA:
             getFakePhotonProbability(decayString, path)
 
 

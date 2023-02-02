@@ -1000,7 +1000,7 @@ def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypo
                                      type is not available.
         loadPhotonsFromKLM (bool):   If true, photon candidates will be created from KLMClusters as well.
         loadPhotonBeamBackgroundMVA (bool):    If true, photon candidates will be assigned a beam background probability.
-        loadPhotonFakePhotonMVA (bool):  If true, photon candidates will be assigned a fake photon probability..
+        loadPhotonFakePhotonMVA (bool):  If true, photon candidates will be assigned a fake photon probability.
     """
 
     pload = register_module('ParticleLoader')

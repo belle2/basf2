@@ -78,7 +78,7 @@ def stdXi(fitter='TreeFit', path=None):
         path=path)
 
 
-def stdXi0(gammatype='eff40', path=None, loadPhotonBeamBackgroundMVA=True, loadPhotonHadronicSplitOffMVA=True):
+def stdXi0(gammatype='eff40', path=None, loadBeamBackgroundMVA=True, loadFakePhotonMVA=True):
     r"""
     Reconstruct the standard :math:`\Xi^0` ``ParticleList`` named ``Xi0:std``.
 
@@ -89,8 +89,8 @@ def stdXi0(gammatype='eff40', path=None, loadPhotonBeamBackgroundMVA=True, loadP
                          to select the signal efficiency of the photons used in the pi0 reconstruction
                          (default ``eff40``)
         path (basf2.Path): modules are added to this path building the ``Xi0:std`` list
-        loadPhotonBeamBackgroundMVA (bool): If true, photon candidates will be assigned a beam background probability.
-        loadPhotonHadronicSplitOffMVA (bool): If true, photon candidates will be assigned a hadronic split-off probability.
+        loadBeamBackgroundMVA (bool): If true, photon candidates will be assigned a beam background probability.
+        loadFakePhotonMVA (bool): If true, photon candidates will be assigned a fake photon probability.
     """
 
     if not isB2BII():
@@ -109,8 +109,8 @@ def stdXi0(gammatype='eff40', path=None, loadPhotonBeamBackgroundMVA=True, loadP
         stdPhotons(
             f'pi0{gammatype}_May2020',
             path=path,
-            loadPhotonBeamBackgroundMVA=loadPhotonBeamBackgroundMVA,
-            loadPhotonHadronicSplitOffMVA=loadPhotonHadronicSplitOffMVA)
+            loadBeamBackgroundMVA=loadBeamBackgroundMVA,
+            loadFakePhotonMVA=loadFakePhotonMVA)
         reconstructDecay(f'pi0:reco -> gamma:pi0{gammatype}_May2020 gamma:pi0{gammatype}_May2020',
                          'abs( dM ) < 0.0406',
                          True, path=path)

@@ -117,7 +117,7 @@ output = ROOT.TFile("Pi0_Validation_ntuple.root", "recreate")
 outputNtuple = ROOT.TNtuple(
     "pi0_mass",
     "Pi0 mass fit results",
-    "mean:meanerror:width:widtherror")
+    "mean:meanerror:width:widtherror:mean_MC:meanerror_MC:width_MC:widtherror_MC")
 
 
 ROOT.gROOT.SetBatch(True)
@@ -141,9 +141,6 @@ meanerror = mean.getError()
 width = sig1.getVal()
 widtherror = sig1.getError()
 frame1.Draw("")
-
-outputNtuple.Fill(meanval, meanerror, width, widtherror)
-
 
 canvas.cd(2)
 
@@ -179,7 +176,7 @@ frame2.Draw("")
 
 canvas.Write()
 
-outputNtuple.Fill(meanval_mc, meanerror_mc, width_mc, widtherror_mc)
+outputNtuple.Fill(meanval, meanerror, width, widtherror, meanval_mc, meanerror_mc, width_mc, widtherror_mc)
 
 outputNtuple.Write()
 

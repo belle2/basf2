@@ -119,6 +119,7 @@ void EvtBGL2FF::getscalarff(EvtId parent, EvtId,
 // C.G.Boyd, B.Grinstein and R.F.Lebed, Phys. Rev. D 56,6895(1997)
 // and
 // B.Grinstein, A.Kobach, Phys. Lett. B 771(2017)359-364
+// NOTE : This class should not be used for vector mesons (D*). Use the BGL class instead.
 
 void EvtBGL2FF::getvectorff(EvtId parent, EvtId, double t, double mass, double* a1f,
                             double* a2f, double* vf, double* a0f)

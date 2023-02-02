@@ -68,21 +68,9 @@ private:
       NOTE : This is an alternative BGL model. Use it if you understand the difference with the
       default one called 'EvtBGLFF' in basf2.
 
-      B -> D*lnu (l=e, mu):
-      a_n, b_n (n = 0,1) and c_n (n = 0,1,2) are free coefficients of z expansion parametrization from
-      C.G.Boyd, B.Grinstein and R.F.Lebed, Phys. Rev. D 56,6895(1997) &
-      B.Grinstein, A.Kobach, Phys. Lett. B 771(2017)359-364
+      B -> D*lnu:
 
-      For the expansion of form factors g and f, the order of series N=1, i.e.
-      a_0 + a_1*z
-      For the expansion of form factors F1, the order of series N=2, i.e.
-      c_0 + c_1 * z + c_2 * z**2
-      (g, f and F1 are the sub-terms of helicity amplitude)
-
-      Fitted values are taken from a private discussion of Florian Bernlochner based on
-      B.Grinstein and A.Kobach, Phys. Lett. B 771(2017)359-364
-
-      It should not be used to generate D* with tau, due to the lack of fitted parameters in a0f amplitude.
+      This class should not be used for B -> D* l nu decays. Use the BGL class instead.
 
    **/
 

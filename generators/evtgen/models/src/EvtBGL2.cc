@@ -118,18 +118,10 @@ void EvtBGL2::init()
 
       ::abort();
     }
-  }  else if (d1type == EvtSpinType::VECTOR) {
-    if (getNArg() == 6) {
-      bgl2ffmodel = new EvtBGL2FF(getArg(0), getArg(1), getArg(2), getArg(3), getArg(4), getArg(5));
-      calcamp = new EvtSemiLeptonicVectorAmp;
-    } else {
-      EvtGenReport(EVTGEN_ERROR, "EvtGen") << "BGL2 model for vector meson daughters needs 6 arguments. Sorry." << endl;
-      ::abort();
-    }
-  } else {
-    EvtGenReport(EVTGEN_ERROR, "EvtGen") << "BGL2 model handles only scalar and vector meson daughters. Sorry." << endl;
+  }  else {
+    EvtGenReport(EVTGEN_ERROR, "EvtGen") << "BGL2 model handles only scalar meson daughters. Use the BGL model for vector mesons." <<
+                                         endl;
     ::abort();
   }
-
 
 }

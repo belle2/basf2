@@ -627,18 +627,18 @@ const genfit::MeasuredStateOnPlane& RecoTrack::getMeasuredStateOnPlaneFromLastHi
 }
 
 
-/// helper tuple typedef in the following function.
+// helper tuple typedef in the following function.
 typedef std::tuple<float, float, std::vector<int>> ClsTimeHelperTuple;
-// /**
-//  * Excludes off-time SVD hits while calculating track time.
-//  * Returns cluster time and sigma
-//  */
-// ClsTimeHelperTuple excludeOffTimeClusters(std::vector<ClsTimeHelperTuple>& clusterTimesVec);
-
-ClsTimeHelperTuple excludeOffTimeClusters(std::vector<ClsTimeHelperTuple>& clusterTimesVec)
+/**
+ * Excludes off-time SVD hits while calculating track time.
+ * Returns cluster time and sigma
+ */
+std::pair<float, float> excludeOffTimeClusters(std::vector<ClsTimeHelperTuple>& clusterTimesVec)
 {
 
-  // std::cout << std::endl;
+  if (!int(clusterTimesVec.size())) return std::make_pair(std::numeric_limits<float>::quiet_NaN(),
+                                                            std::numeric_limits<float>::quiet_NaN());
+
   std::map<int, ClsTimeHelperTuple> grInfoOfCls;
   for (auto& item : clusterTimesVec) {
     auto clsTime  = std::get<0>(item);
@@ -646,10 +646,6 @@ ClsTimeHelperTuple excludeOffTimeClusters(std::vector<ClsTimeHelperTuple>& clust
     auto grVec    = std::get<2>(item);
     if (int(grVec.size()))
       for (auto& gr : grVec) {
-        // std::cout << "gr\t" << gr
-        //    << "\tclsTime\t" << clsTime
-        //    << "\tclsSigma\t" << clsSigma
-        //    << std::endl;
         if (auto search = grInfoOfCls.find(gr); search != grInfoOfCls.end()) {
           std::get<0>(grInfoOfCls[gr]) += clsTime;
           std::get<1>(grInfoOfCls[gr]) += clsSigma * clsSigma;
@@ -676,16 +672,6 @@ ClsTimeHelperTuple excludeOffTimeClusters(std::vector<ClsTimeHelperTuple>& clust
       std::get<1>(clsInfo) = std::sqrt(std::get<1>(clsInfo) / (count * (count - 1.)));
     }
     clsInGroups.push_back(clsInfo);
-
-    // auto grId     = std::get<0>(item);
-    // auto trkTime  = std::get<0>(clsInfo);
-    // auto trkSigma = std::get<1>(clsInfo);
-    // std::cout << "grId\t" << grId
-    //        << "\ttrkTime\t" << trkTime
-    //        << "\ttrkSigma\t" << trkSigma
-    //        << "\tnCls\t" << (grVec.size())
-    //        << "\tgr\t" << (grVec.back())
-    //        << std::endl;
   }
 
   {
@@ -703,18 +689,6 @@ ClsTimeHelperTuple excludeOffTimeClusters(std::vector<ClsTimeHelperTuple>& clust
     }
   }
 
-  // std::cout << std::endl;
-  // for (auto& clsInfo : clsInGroups) {
-  //   auto trkTime  = std::get<0>(clsInfo);
-  //   auto trkSigma = std::get<1>(clsInfo);
-  //   auto grVec    = std::get<2>(clsInfo);
-  //   std::cout << "\ttrkTime\t" << trkTime
-  //        << "\ttrkSigma\t" << trkSigma
-  //        << "\tnCls\t" << (grVec.size())
-  //        << "\tgr\t" << (grVec.back())
-  //        << std::endl;
-  // }
-
   // remove unwanted groups
   for (int ij = 1; ij < int(clsInGroups.size()); ij++) {
     int prevGrCnt = (std::get<2>(clsInGroups[ij - 1])).size();
@@ -723,18 +697,6 @@ ClsTimeHelperTuple excludeOffTimeClusters(std::vector<ClsTimeHelperTuple>& clust
       clsInGroups.resize(ij); break;
     }
   }
-
-  // std::cout << std::endl;
-  // for (auto& clsInfo : clsInGroups) {
-  //   auto trkTime  = std::get<0>(clsInfo);
-  //   auto trkSigma = std::get<1>(clsInfo);
-  //   auto grVec    = std::get<2>(clsInfo);
-  //   std::cout << "\ttrkTime\t" << trkTime
-  //        << "\ttrkSigma\t" << trkSigma
-  //        << "\tnCls\t" << (grVec.size())
-  //        << "\tgr\t" << (grVec.back())
-  //        << std::endl;
-  // }
 
   {
     // sorting items in descending cluster sigma
@@ -751,19 +713,7 @@ ClsTimeHelperTuple excludeOffTimeClusters(std::vector<ClsTimeHelperTuple>& clust
     }
   }
 
-  // std::cout << std::endl;
-  // for (auto& clsInfo : clsInGroups) {
-  //   auto trkTime  = std::get<0>(clsInfo);
-  //   auto trkSigma = std::get<1>(clsInfo);
-  //   auto grVec    = std::get<2>(clsInfo);
-  //   std::cout << "\ttrkTime\t" << trkTime
-  //        << "\ttrkSigma\t" << trkSigma
-  //        << "\tnCls\t" << (grVec.size())
-  //        << "\tgr\t" << (grVec.back())
-  //        << std::endl;
-  // }
-
-  return clsInGroups[0];
+  return std::make_pair(std::get<0>(clsInGroups[0]), std::get<1>(clsInGroups[0]));
 }
 
 void RecoTrack::estimateArmTime()
@@ -797,7 +747,7 @@ void RecoTrack::estimateArmTime()
       // Compute the track arm times using SVD cluster times
       if (svdDone && nSVDHits > 1) {
         detIDpost = foundin;
-        ClsTimeHelperTuple clsTimeOutput = excludeOffTimeClusters(clusterTimesVec);
+        std::pair<float, float> clsTimeOutput = excludeOffTimeClusters(clusterTimesVec);
         if (!isOutgoingArm(detIDpre, detIDpost)) {
           m_ingoingArmTime = std::get<0>(clsTimeOutput);
           m_ingoingArmTimeError = std::get<1>(clsTimeOutput);
@@ -822,7 +772,7 @@ void RecoTrack::estimateArmTime()
     // where the track arm times are calculated, so they are calculated here.
     // It will not reset all variables because it is run only at the last recoHit
     if (!trackArmTimeDone && (recoHit == recoHits.back()) && nSVDHits > 1) {
-      ClsTimeHelperTuple clsTimeOutput = excludeOffTimeClusters(clusterTimesVec);
+      std::pair<float, float> clsTimeOutput = excludeOffTimeClusters(clusterTimesVec);
       if (!isOutgoingArm(detIDpre, detIDpost)) {
         m_ingoingArmTime = std::get<0>(clsTimeOutput);
         m_ingoingArmTimeError = std::get<1>(clsTimeOutput);

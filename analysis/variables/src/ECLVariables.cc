@@ -31,8 +31,6 @@
 #include <cmath>
 #include <stack>
 
-#include <string.h>
-
 
 
 namespace Belle2 {
@@ -280,23 +278,9 @@ namespace Belle2 {
     double eclClusterTiming(const Particle* particle)
     {
 
-      if (strcmp(std::getenv("B2BII"), "TRUE") != 0) {
-        const ECLCluster* cluster = particle->getECLCluster();
-        if (cluster) {
-          return cluster->getTime();
-        }
-      }
-      return std::numeric_limits<float>::quiet_NaN();
-    }
-
-    double eclClusterTCTimingBelle(const Particle* particle)
-    {
-
-      if (strcmp(std::getenv("B2BII"), "TRUE") == 0) {
-        const ECLCluster* cluster = particle->getECLCluster();
-        if (cluster) {
-          return cluster->getTime();
-        }
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        return cluster->getTime();
       }
       return std::numeric_limits<float>::quiet_NaN();
     }
@@ -1091,6 +1075,7 @@ as function of true photon energy, true photon direction and beam background lev
 ..
 )DOC","rad");
     REGISTER_VARIABLE("clusterTiming", eclClusterTiming, R"DOC(
+**In Belle II:**
 Returns the time of the ECL cluster. It is calculated as the Photon timing minus the Event t0.
 Photon timing is given by the fitted time of the recorded waveform of the highest energy crystal in the
 cluster. After all calibrations and corrections (including Time-Of-Flight), photons from the interaction
@@ -1106,9 +1091,9 @@ documentation for `clusterHasFailedTiming`). (For MC, the calibrations and corre
     | Upper limit: :math:`1000.0`
     | Precision: :math:`12` bit
 ..
-)DOC","ns");
-    REGISTER_VARIABLE("clusterTCTimingBelle", eclClusterTCTimingBelle, R"DOC(
-[Legacy] Returns the trigger cell (TC) time of the ECL cluster (photon).
+
+**In Belle:**
+Returns the trigger cell (TC) time of the ECL cluster (photon).
 This information is available only in Belle data since experiment 31, and not available in Belle MC.
 Clusters produced at the interaction point in time with the event, have TC time in the range of 9000-11000
 Calculated based on the Appendix of Belle note 831.
@@ -1120,7 +1105,7 @@ Calculated based on the Appendix of Belle note 831.
     | Precision: :math:`12` bit
 ..
 )DOC","ns");
-    REGISTER_VARIABLE("clusterHasFailedTiming", eclClusterHasFailedTiming, R"DOC(
+   REGISTER_VARIABLE("clusterHasFailedTiming", eclClusterHasFailedTiming, R"DOC(
 Status bit for if the ECL cluster's timing fit failed. Photon timing is given by the fitted time
 of the recorded waveform of the highest energetic crystal in a cluster; however, that fit can fail and so
 this variable tells the user if that has happened.

@@ -109,14 +109,9 @@ namespace Belle2 {
     double eclClusterTheta(const Particle* particle);
 
     /**
-     * return ECL cluster's timing
+     * return ECL cluster's timing in Belle II and ECL cluster's TC timing in Belle
      */
     double eclClusterTiming(const Particle* particle);
-
-    /**
-     * return ECL cluster's TC timing in Belle
-     */
-    double eclClusterTCTimingBelle(const Particle* particle);
 
     /**
      * return whether or not ECL cluster's timing fit failed

@@ -662,17 +662,8 @@ std::pair<float, float> excludeOffTimeClusters(std::vector<ClsTimeHelperTuple>& 
   } // for (auto& item : clusterTimesVec) {
 
   std::vector<ClsTimeHelperTuple> clsInGroups;
-  // std::cout << std::endl;
-  for (auto& item : grInfoOfCls) {
-    auto clsInfo = std::get<1>(item);
-    auto grVec   = std::get<2>(clsInfo);
-    float count = grVec.size();
-    if (count > 1.) {
-      std::get<0>(clsInfo) /= count;
-      std::get<1>(clsInfo) = std::sqrt(std::get<1>(clsInfo) / (count * (count - 1.)));
-    }
-    clsInGroups.push_back(clsInfo);
-  }
+  for (auto& item : grInfoOfCls)
+    clsInGroups.push_back(std::get<1>(item));
 
   {
     // sorting items in descending cluster numbers
@@ -697,6 +688,17 @@ std::pair<float, float> excludeOffTimeClusters(std::vector<ClsTimeHelperTuple>& 
       clsInGroups.resize(ij); break;
     }
   }
+
+  // calculate err
+  for (auto& item : clsInGroups) {
+    auto grVec  = std::get<2>(item);
+    float count = grVec.size();
+    if (count > 1.) {
+      std::get<0>(item) /= count;
+      std::get<1>(item) = std::sqrt(std::get<1>(item) / (count * (count - 1.)));
+    }
+  }
+
 
   {
     // sorting items in descending cluster sigma

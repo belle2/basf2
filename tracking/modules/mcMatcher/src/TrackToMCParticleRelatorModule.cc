@@ -40,9 +40,12 @@ void TrackToMCParticleRelatorModule::initialize()
   m_Tracks.isRequired(m_TracksName);
   m_RecoTracks.isRequired(m_RecoTracksName);
   // Can't require MCParticles, as this module is also run during data reconstruction
-  m_MCParticles.isOptional(m_MCParticlesName);
+  StoreArray<MCParticle>  MCParticles;
+  const bool mcParticlesPresent = MCParticles.isOptional(m_MCParticlesName);
 
-  m_Tracks.registerRelationTo(m_MCParticles);
+  if (mcParticlesPresent) {
+    m_Tracks.registerRelationTo(MCParticles);
+  }
 }
 
 void TrackToMCParticleRelatorModule::event()

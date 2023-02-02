@@ -46,6 +46,16 @@ parser.add_argument("--noReco", action="store_true",
                     help="Do not perform the reconstruction")
 parser.add_argument("--test", action="store_true",
                     help="Test with small numbers of events")
+parser.add_argument("--OffOff", action="store_true",
+                    help="OffOff SVD Cluster Selection")
+parser.add_argument("--OnOn", action="store_true",
+                    help="OnOn SVD Cluster Selection")
+parser.add_argument("--OffOn", action="store_true",
+                    help="OffOn SVD Cluster Selection")
+parser.add_argument("--OnOff", action="store_true",
+                    help="OnOff SVD Cluster Selection")
+parser.add_argument("--CoG3TimeCalibration_bucket36", action="store_true",
+                    help="SVD Time calibration")
 args = parser.parse_args()
 b2.B2INFO(f"Steering file args = {args}")
 
@@ -84,10 +94,6 @@ if args.isMC:
     #     usePXDDataReduction=ROIfinding,
     #     simulateT0jitter=simulateJitter)
 
-    # b2conditions.prepend_globaltag("tracking_TEST_SVDTimeSelectionONrev5_VXDTF2TimeFiltersONrev27")
-    b2conditions.prepend_globaltag("tracking_TEST_SVDTimeSelectionOFFrev1_VXDTF2TimeFiltersONrev27")
-    # b2conditions.prepend_globaltag("tracking_TEST_SVDTimeSelectionOFFrev1_VXDTF2TimeFiltersOFFrev28")
-
 else:
     # setup database
     b2conditions.reset()
@@ -95,11 +101,20 @@ else:
     b2conditions.globaltags = ["online"]
     b2conditions.prepend_globaltag("data_reprocessing_prompt")
     b2conditions.prepend_globaltag("patch_main_release-07")
-    # b2conditions.prepend_globaltag("tracking_TEST_SVDTimeSelectionOFFrev1_VXDTF2TimeFiltersONrev27")
-    # b2conditions.prepend_globaltag("tracking_TEST_SVDTimeSelectionONrev5_VXDTF2TimeFiltersOFFrev28")
-    b2conditions.prepend_globaltag("svd_CoG3TimeCalibration_bucket36")
+    if args.CoG3TimeCalibration_bucket36:
+        b2conditions.prepend_globaltag("svd_CoG3TimeCalibration_bucket36")
 
     MCTracking = False
+
+if args.OffOff:
+    b2conditions.prepend_globaltag("tracking_TEST_SVDTimeSelectionOFFrev1_VXDTF2TimeFiltersOFFrev28")
+if args.OnOn:
+    b2conditions.prepend_globaltag("tracking_TEST_SVDTimeSelectionONrev5_VXDTF2TimeFiltersONrev27")
+if args.OffOn:
+    b2conditions.prepend_globaltag("tracking_TEST_SVDTimeSelectionOFFrev1_VXDTF2TimeFiltersONrev27")
+if args.OnOff:
+    b2conditions.prepend_globaltag("tracking_TEST_SVDTimeSelectionONrev5_VXDTF2TimeFiltersOFFrev28")
+
 
 if not args.isMC:
     if args.test:
@@ -137,15 +152,6 @@ if args.is3sample:
     main.add_module(zsonline)
 
 
-# #  SVDTimeGroupComposer
-# main.add_module('SVDClusterizer')
-# svdTimeGroupComposer = b2.register_module('SVDTimeGroupComposer')
-# svdTimeGroupComposer.param('XRange', 160.)
-# svdTimeGroupComposer.param('AverageCountPerBin', 1.)
-# svdTimeGroupComposer.param('Threshold', 1.)
-# main.add_module(svdTimeGroupComposer)
-
-
 if not args.noReco:
     # now do reconstruction:
     trk.add_tracking_reconstruction(
@@ -160,6 +166,14 @@ if args.isMC:
     outputFileName += "_MC"
 if args.is3sample:
     outputFileName += "_emulated3sample"
+if args.OffOff:
+    outputFileName += "_OffOff"
+if args.OnOn:
+    outputFileName += "_OnOn"
+if args.OffOn:
+    outputFileName += "_OffOn"
+if args.OnOff:
+    outputFileName += "_OnOff"
 
 if not args.noReco and not args.noEventT0Tree:
     recoFileName = outputFileName + "_" + str(args.fileTag) + ".root"
@@ -190,6 +204,14 @@ if args.executionTime:
         executionFileName += "_MC"
     if args.is3sample:
         executionFileName += "_emulated3sample"
+    if args.OffOff:
+        executionFileName += "_OffOff"
+    if args.OnOn:
+        executionFileName += "_OnOn"
+    if args.OffOn:
+        executionFileName += "_OffOn"
+    if args.OnOff:
+        executionFileName += "_OnOff"
     executionFileName += "_" + str(args.fileTag) + ".root"
     main.add_module(SVDExtraEventStatisticsModule(executionFileName))
 

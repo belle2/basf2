@@ -45,7 +45,7 @@ def add_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False, 
 
     if(isROIsimulation):
         clusterizerName = '__ROISVDClusterizer'
-        timeGroupComposerName = '__ROISVDTimeGroupComposer'
+        timeGroupComposerName = '__ROISVDTimeGrouping'
         recocreatorName = '__ROISVDRecoDigitCreator'
         dataFormatName = '__ROISVDDataFormat'
         # recoDigitsName = '__ROIsvdRecoDigits'
@@ -54,7 +54,7 @@ def add_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False, 
         missingAPVsClusterCreatorName = '__ROISVDMissingAPVsClusterCreator'
     else:
         clusterizerName = 'SVDClusterizer'
-        timeGroupComposerName = 'SVDTimeGroupComposer'
+        timeGroupComposerName = 'SVDTimeGrouping'
         recocreatorName = 'SVDRecoDigitCreator'
         dataFormatName = 'SVDDataFormat'
         # recoDigitsName = ""
@@ -87,7 +87,6 @@ def add_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False, 
         clusterizer.set_name(clusterizerName)
         clusterizer.param('ShaperDigits', shaperDigitsName)
         clusterizer.param('Clusters', clustersName)
-        # clusterizer.param('returnClusterRawTime', True)
         path.add_module(clusterizer)
 
     if missingAPVsClusterCreatorName not in [e.name() for e in path.modules()]:
@@ -103,35 +102,18 @@ def add_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False, 
         path.add_module(svdTrackingEventLevelMdstInfoFiller)
 
     if timeGroupComposerName not in [e.name() for e in path.modules()]:
-        svdTimeGroupComposer = b2.register_module('SVDTimeGroupComposer')
-        svdTimeGroupComposer.set_name(timeGroupComposerName)
-        svdTimeGroupComposer.param('SVDClusters', clustersName)
-        svdTimeGroupComposer.param('EventLevelTrackingInfoName', nameEventTrackingInfo)
-        svdTimeGroupComposer.param('tRangeLow', -160)
-        svdTimeGroupComposer.param('tRangeHigh', 160)
-        svdTimeGroupComposer.param('averageCountPerBin', 12)
-        svdTimeGroupComposer.param('threshold', 2)
-        svdTimeGroupComposer.param('expSignalLoc', 0)
-        svdTimeGroupComposer.param('signalRangeLow', -50)
-        svdTimeGroupComposer.param('signalRangeHigh', 50)
-        svdTimeGroupComposer.param('applyCentralLimit', True)
-        svdTimeGroupComposer.param('factor', 2)
-        svdTimeGroupComposer.param('iteration', 0)
-        svdTimeGroupComposer.param('gausFill', True)
-        svdTimeGroupComposer.param('fillSigmaN', 3.)
-        svdTimeGroupComposer.param('calSigmaN', 5.)
-        svdTimeGroupComposer.param('accSigmaN', 3.)
-        svdTimeGroupComposer.param('fracThreshold', 0.05)
-        svdTimeGroupComposer.param('minSigma', 1.)
-        svdTimeGroupComposer.param('maxSigma', 15.)
-        svdTimeGroupComposer.param('timeSpread', 5.)
-        svdTimeGroupComposer.param('maxGroups', 20)
-        svdTimeGroupComposer.param('writeGroupInfo', True)
-        svdTimeGroupComposer.param('includeOutOfRangeClusters', True)
-        svdTimeGroupComposer.param('useOnlyOneGroup', False)
-        # svdTimeGroupComposer.param('signalGroupSelection', True)
-        svdTimeGroupComposer.param('flatSignalCut', True)
-        path.add_module(svdTimeGroupComposer)
+        svdTimeGrouping = b2.register_module('SVDTimeGrouping')
+        svdTimeGrouping.set_name(timeGroupComposerName)
+        svdTimeGrouping.param('SVDClusters', clustersName)
+        svdTimeGrouping.param('EventLevelTrackingInfoName', nameEventTrackingInfo)
+        svdTimeGrouping.param('tRangeLow', -160)
+        svdTimeGrouping.param('tRangeHigh', 160)
+        svdTimeGrouping.param('expSignalLoc', 0)
+        svdTimeGrouping.param('signalRangeLow', -50)
+        svdTimeGrouping.param('signalRangeHigh', 50)
+        # svdTimeGrouping.param('signalGroupSelection', True)
+        # svdTimeGrouping.param('flatSignalCut', True)
+        path.add_module(svdTimeGrouping)
 
     # Add SVDSpacePointCreator
     add_svd_SPcreation(path, isROIsimulation)
@@ -197,7 +179,7 @@ def add_rel5_svd_reconstruction(path, isROIsimulation=False, applyMasking=False)
     if(isROIsimulation):
         fitterName = '__ROISVDCoGTimeEstimator'
         clusterizerName = '__ROISVDSimpleClusterizer'
-        timeGroupComposerName = '__ROISVDTimeGroupComposer'
+        timeGroupComposerName = '__ROISVDTimeGrouping'
         dataFormatName = '__ROISVDDataFormat'
         clusterName = '__ROIsvdClusters'
         recoDigitsName = '__ROIsvdRecoDigits'
@@ -206,7 +188,7 @@ def add_rel5_svd_reconstruction(path, isROIsimulation=False, applyMasking=False)
     else:
         fitterName = 'SVDCoGTimeEstimator'
         clusterizerName = 'SVDSimpleClusterizer'
-        timeGroupComposerName = 'SVDTimeGroupComposer'
+        timeGroupComposerName = 'SVDTimeGrouping'
         dataFormatName = 'SVDDataFormat'
         clusterName = ""
         recoDigitsName = ""
@@ -243,7 +225,6 @@ def add_rel5_svd_reconstruction(path, isROIsimulation=False, applyMasking=False)
         clusterizer.set_name(clusterizerName)
         clusterizer.param('RecoDigits', recoDigitsName)
         clusterizer.param('Clusters', clusterName)
-        # clusterizer.param('returnClusterRawTime', True)
         clusterizer.param('useDB', True)
         path.add_module(clusterizer)
 
@@ -260,35 +241,18 @@ def add_rel5_svd_reconstruction(path, isROIsimulation=False, applyMasking=False)
         path.add_module(svdTrackingEventLevelMdstInfoFiller)
 
     if timeGroupComposerName not in [e.name() for e in path.modules()]:
-        svdTimeGroupComposer = b2.register_module('SVDTimeGroupComposer')
-        svdTimeGroupComposer.set_name(timeGroupComposerName)
-        svdTimeGroupComposer.param('SVDClusters', clusterName)
-        svdTimeGroupComposer.param('EventLevelTrackingInfoName', nameEventTrackingInfo)
-        svdTimeGroupComposer.param('tRangeLow', -160)
-        svdTimeGroupComposer.param('tRangeHigh', 160)
-        svdTimeGroupComposer.param('averageCountPerBin', 12)
-        svdTimeGroupComposer.param('threshold', 2)
-        svdTimeGroupComposer.param('expSignalLoc', 0)
-        svdTimeGroupComposer.param('signalRangeLow', -50)
-        svdTimeGroupComposer.param('signalRangeHigh', 50)
-        svdTimeGroupComposer.param('applyCentralLimit', True)
-        svdTimeGroupComposer.param('factor', 2)
-        svdTimeGroupComposer.param('iteration', 0)
-        svdTimeGroupComposer.param('gausFill', True)
-        svdTimeGroupComposer.param('fillSigmaN', 3.)
-        svdTimeGroupComposer.param('calSigmaN', 5.)
-        svdTimeGroupComposer.param('accSigmaN', 3.)
-        svdTimeGroupComposer.param('fracThreshold', 0.05)
-        svdTimeGroupComposer.param('minSigma', 1.)
-        svdTimeGroupComposer.param('maxSigma', 15.)
-        svdTimeGroupComposer.param('timeSpread', 5.)
-        svdTimeGroupComposer.param('maxGroups', 20)
-        svdTimeGroupComposer.param('writeGroupInfo', True)
-        svdTimeGroupComposer.param('includeOutOfRangeClusters', True)
-        svdTimeGroupComposer.param('useOnlyOneGroup', False)
-        # svdTimeGroupComposer.param('signalGroupSelection', True)
-        svdTimeGroupComposer.param('flatSignalCut', True)
-        path.add_module(svdTimeGroupComposer)
+        svdTimeGrouping = b2.register_module('SVDTimeGrouping')
+        svdTimeGrouping.set_name(timeGroupComposerName)
+        svdTimeGrouping.param('SVDClusters', clusterName)
+        svdTimeGrouping.param('EventLevelTrackingInfoName', nameEventTrackingInfo)
+        svdTimeGrouping.param('tRangeLow', -160)
+        svdTimeGrouping.param('tRangeHigh', 160)
+        svdTimeGrouping.param('expSignalLoc', 0)
+        svdTimeGrouping.param('signalRangeLow', -50)
+        svdTimeGrouping.param('signalRangeHigh', 50)
+        # svdTimeGrouping.param('signalGroupSelection', True)
+        # svdTimeGrouping.param('flatSignalCut', True)
+        path.add_module(svdTimeGrouping)
 
     # Add SVDSpacePointCreator
     add_svd_SPcreation(path, isROIsimulation)

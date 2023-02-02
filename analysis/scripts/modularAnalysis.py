@@ -3443,8 +3443,6 @@ def buildEventShape(inputListNames=None,
             fillParticleList(
                 'gamma:evtshape',
                 '',
-                loadPhotonBeamBackgroundMVA=False,
-                loadPhotonHadronicSplitOffMVA=False,
                 path=path)
         particleLists = ['pi+:evtshape', 'gamma:evtshape']
 

@@ -1,11 +1,17 @@
 Changes in the analysis package in light-2302-genetta
 -----------------------------------------------------
+
+Variables
++++++++++
+ * Deprecated `hadronicSplitOffSuppression` which has been replaced with `fakePhotonSuppression`
+
 Modules
 +++++++
  * Added an option ``usePhotonOnlyOnce`` to the function :func:`modularAnalysis.correctBremsBelle`. The default of the option is ``False``
    so the backward compatibility. If the option is set to ``True``, a photon is used for only the closest charged particle in the
    input ParticleLists.
-
+ * Modified parameters for the functions :func:`modularAnalysis.fillParticleList` and :func:`modularAnalysis.fillParticleLists` so that
+   the new parameters are ``loadBeamBackgroundMVA`` and ``loadFakePhotonMVA``
 
 
 Changes in the analysis package in light-2212-foldex

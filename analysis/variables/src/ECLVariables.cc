@@ -59,13 +59,8 @@ namespace Belle2 {
 
     double hadronicSplitOffSuppression(const Particle* particle)
     {
-      if (particle->hasExtraInfo("hadronicSplitOffSuppression")) {
-        return particle->getExtraInfo("hadronicSplitOffSuppression");
-      } else {
-        B2WARNING("The extraInfo hadronicSplitOffSuppression is not registered! \n"
-                  "This variable is only available for photons, and you either have to run the function getHadronicSplitOffProbability or turn the argument loadPhotonHadronicSplitOffMVA to True when using fillParticleList.");
-        return std::numeric_limits<float>::quiet_NaN();
-      }
+      B2WARNING("This variable has been deprecated since light-2302-genetta and is no longer maintained with up to date weights. Please use the variable fakePhotonSuppression instead.");
+      return fakePhotonSuppression(particle);
     }
 
     double eclClusterKlId(const Particle* particle)
@@ -1362,7 +1357,7 @@ The MVA has been trained using samples of signal photons and hadronic splitoff p
     - `clusterSecondMoment`
 )DOC");
     MAKE_DEPRECATED("hadronicSplitOffSuppression", false, "light-2302-genetta", R"DOC(
-Use the variable ``fakePhotonSuppression`` instead which is maintained and uses the latest weight files.
+Use the variable `fakePhotonSuppression` instead which is maintained and uses the latest weight files.
 )DOC");
     REGISTER_VARIABLE("clusterKlId", eclClusterKlId, R"DOC(
 Returns MVA classifier that uses ECL clusters variables to discriminate Klong clusters from em background.

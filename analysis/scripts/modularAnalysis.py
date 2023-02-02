@@ -3289,7 +3289,7 @@ def buildEventKinematics(inputListNames=None, default_cleanup=True, custom_cuts=
         if b2bii.isB2BII():
             copyList('gamma:evtkin', 'gamma:mdst', path=path)
         else:
-            fillParticleList('gamma:evtkin', '', loadPhotonBeamBackgroundMVA=False, loadPhotonHadronicSplitOffMVA=False, path=path)
+            fillParticleList('gamma:evtkin', '', path=path)
         inputListNames += ['gamma:evtkin']
         if default_cleanup:
             B2INFO("Using default cleanup in EventKinematics module.")
@@ -3304,7 +3304,7 @@ def buildEventKinematics(inputListNames=None, default_cleanup=True, custom_cuts=
         if b2bii.isB2BII():
             copyList('gamma:evtshape', 'gamma:mdst', path=path)
         else:
-            fillParticleList('gamma:evtkin', '', loadPhotonBeamBackgroundMVA=False, loadPhotonHadronicSplitOffMVA=False, path=path)
+            fillParticleList('gamma:evtkin', '', path=path)
         particleLists = ['pi+:evtkin', 'gamma:evtkin']
         if default_cleanup:
             if (custom_cuts is not None):

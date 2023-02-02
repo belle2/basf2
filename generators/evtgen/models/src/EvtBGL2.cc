@@ -119,7 +119,7 @@ void EvtBGL2::init()
       ::abort();
     }
   }  else {
-    EvtGenReport(EVTGEN_ERROR, "EvtGen") << "BGL2 model handles only scalar meson daughters. Use the BGL model for vector mesons." <<
+    EvtGenReport(EVTGEN_ERROR, "EvtGen") << "BGL2 model handles only scalar meson daughters. Use the EvtBGL class for vector mesons." <<
                                          endl;
     ::abort();
   }

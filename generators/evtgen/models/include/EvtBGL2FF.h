@@ -30,8 +30,8 @@ public:
                    double t, double mass, double* fp, double* f0);
 
   /** Returns vector ffs */
-  void getvectorff(EvtId parent, EvtId daught, double t, double mass, double* a1f,
-                   double* a2f, double* vf, double* a0f);
+  void getvectorff(EvtId, EvtId, double, double, double*,
+                   double*, double*, double*);
 
   /** Returns tensor ffs */
   void gettensorff(EvtId, EvtId, double, double, double*,
@@ -70,55 +70,34 @@ private:
 
       B -> D*lnu:
 
-      This class should not be used for B -> D* l nu decays. Use the BGL class instead.
+      This class should not be used for B -> D* l nu decays. Use the EvtBGL class instead.
 
    **/
 
-  /** 0th-order z expansion coeffieient for vector form factor: f_+  */
+  /** 0th-order z expansion coefficient for vector form factor: f_+  */
   double ap_0{0};
 
-  /** 1st-order z expansion coeffieient for vector form factor: f_+  */
+  /** 1st-order z expansion coefficient for vector form factor: f_+  */
   double ap_1{0};
 
-  /** 2nd-order z expansion coeffieient for vector form factor: f_+  */
+  /** 2nd-order z expansion coefficient for vector form factor: f_+  */
   double ap_2{0};
 
-  /** 3rd-order z expansion coeffieient for vector form factor: f_+  */
+  /** 3rd-order z expansion coefficient for vector form factor: f_+  */
   double ap_3{0};
 
 
 
-  /** 0th-order z expansion coeffieient for scalar form factor f_0   */
+  /** 0th-order z expansion coefficient for scalar form factor f_0   */
   double a0_0{0};
 
-  /** 1st-order z expansion coeffieient for scalar form factor f_0   */
+  /** 1st-order z expansion coefficient for scalar form factor f_0   */
   double a0_1{0};
 
-  /** 2nd-order z expansion coeffieient for scalar form factor f_0   */
+  /** 2nd-order z expansion coefficient for scalar form factor f_0   */
   double a0_2{0};
 
-  /** 3rd-order z expansion coeffieient for scalar form factor f_0   */
+  /** 3rd-order z expansion coefficient for scalar form factor f_0   */
   double a0_3{0};
-
-
-  /** B->D*lnu z expansion coeffieients  */
-
-  /** 0th-order z expansion coeffieient for form factor g   */
-  double a_0{0};
-
-  /** 1st-order z expansion coeffieient for form factor g   */
-  double a_1{0};
-
-  /** 0th-order z expansion coeffieient for form factor f   */
-  double b_0{0};
-
-  /** 1st-order z expansion coeffieient for form factor f   */
-  double b_1{0};
-
-  /** 1st-order z expansion coeffieient for form factor F1   */
-  double c_1{0};
-
-  /** 2nd-order z expansion coeffieient for form factor F1   */
-  double c_2{0};
 
 };

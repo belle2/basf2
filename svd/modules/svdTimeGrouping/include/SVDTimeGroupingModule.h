@@ -74,7 +74,7 @@ namespace Belle2 {
     int    m_maxGroups          = 20;  /** Groups are not searched beyond this number. */
     double m_calSigmaN          = 5.;  /** Remove upto this sigma of fitted gaus from histogram. */
     double m_accSigmaN          = 3.;  /** Clusters are tagged within this of fitted group. */
-    bool   m_writeGroupInfo     = true;
+    bool   m_writeGroupInfo     = true; /** Write group info in SVDCluster, otherwise empty. */
     bool   m_signalGroupSelection = false; /** Choose one group near expected signal location. */
     bool   m_flatSignalCut      = false; /** Select all clusters within signal range around first gr. */
     bool   m_includeOutOfRangeClusters = true; /** Assign groups to under and overflow. */

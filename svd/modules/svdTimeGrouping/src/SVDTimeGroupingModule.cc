@@ -124,13 +124,9 @@ void SVDTimeGroupingModule::event()
   if (m_factor <= 0 || totClusters <= 0) return;
 
   // number of clusters in signalRange
-  int clsInSignalRange = 0;
   double tmax = -1000; double tmin = 1000;
   for (int ij = 0; ij < totClusters; ij++) {
     double clsTime = m_svdClusters[ij]->getClsTime();
-    if (clsTime > m_signalRangeLow &&
-        clsTime < m_signalRangeHigh)
-      clsInSignalRange++;
     if (clsTime > tmax) tmax = clsTime;
     if (clsTime < tmin) tmin = clsTime;
   }

@@ -50,6 +50,8 @@ namespace Belle2 {
 
     std::string m_maskName; /**< mask name to be applied */
 
+    bool m_writeOut;  /**< toggle output particle list btw. transient/writeOut */
+
   };
 
 } // Belle2 namespace

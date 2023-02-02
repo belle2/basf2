@@ -34,21 +34,27 @@ REG_MODULE(ParticleExtractorFromROE);
 ParticleExtractorFromROEModule::ParticleExtractorFromROEModule() : Module()
 {
   // set module description (e.g. insert text)
-  setDescription("Prints basic or detailed RestOfEvent info to screen. It is possible to print out ROEMasks for specific mask names as well.");
+  setDescription("Extracts Particles that belong to the ROE and fill them into ParticleLists.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   // Add parameters
   std::vector<std::string> defaultList;
   addParam("outputListNames", m_outputListNames,
            "list of ParticleList names to be created", defaultList);
-
   addParam("maskName", m_maskName,
-           "List of all mask names for which the info will be printed.", std::string(""));
+           "List of all mask names for which the info will be printed.",
+           std::string(RestOfEvent::c_defaultMaskName));
+
+  addParam("writeOut", m_writeOut,
+           "If true, the output ParticleList will be saved by RootOutput. If false, it will be ignored when writing the file.", false);
+
 }
 
 void ParticleExtractorFromROEModule::initialize()
 {
   StoreArray<RestOfEvent>().isRequired();
+
+  DataStore::EStoreFlags flags = m_writeOut ? DataStore::c_WriteOut : DataStore::c_DontWriteOut;
 
   const int nLists = m_outputListNames.size();
   m_pdgCodes.resize(nLists);
@@ -77,10 +83,10 @@ void ParticleExtractorFromROEModule::initialize()
     StoreObjPtr<ParticleList> particleList(listName);
     m_pLists[iList] = particleList;
 
-    particleList.registerInDataStore(listName);
+    particleList.registerInDataStore(listName, flags);
     if (listName != antiListName) {
       StoreObjPtr<ParticleList> antiParticleList(antiListName);
-      antiParticleList.registerInDataStore(antiListName);
+      antiParticleList.registerInDataStore(antiListName, flags);
 
       m_antiPLists[iList] = antiParticleList;
     }
@@ -119,11 +125,11 @@ void ParticleExtractorFromROEModule::event()
     const int absPdg = abs(part->getPDGCode());
 
     auto result = std::find(m_absPdgCodes.begin(), m_absPdgCodes.end(), absPdg);
+
     if (result == m_absPdgCodes.end())
       continue;
 
-    int indexList = std::distance(m_absPdgCodes.begin(), result);
-
+    const int indexList = std::distance(m_absPdgCodes.begin(), result);
     m_pLists[indexList]->addParticle(part);
   }
 

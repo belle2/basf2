@@ -1105,7 +1105,7 @@ Calculated based on the Appendix of Belle note 831.
     | Precision: :math:`12` bit
 ..
 )DOC","ns");
-   REGISTER_VARIABLE("clusterHasFailedTiming", eclClusterHasFailedTiming, R"DOC(
+    REGISTER_VARIABLE("clusterHasFailedTiming", eclClusterHasFailedTiming, R"DOC(
 Status bit for if the ECL cluster's timing fit failed. Photon timing is given by the fitted time
 of the recorded waveform of the highest energetic crystal in a cluster; however, that fit can fail and so
 this variable tells the user if that has happened.

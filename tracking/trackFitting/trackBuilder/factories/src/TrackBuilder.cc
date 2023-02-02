@@ -128,6 +128,13 @@ bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack,
   }
 
   B2DEBUG(27, "Number of fitted hypothesis = " << newTrack.getNumberOfFittedHypotheses());
+  if (newTrack.getNumberOfFittedHypotheses() > 0) {
+    Track* addedTrack = tracks.appendNew(newTrack);
+    addedTrack->addRelationTo(&recoTrack);
+    return true;
+  } else {
+    B2DEBUG(28, "No valid fit for any given hypothesis. No Track is added to the Tracks StoreArray.");
+  }
   return true;
 }
 

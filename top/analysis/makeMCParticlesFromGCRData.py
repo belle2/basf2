@@ -20,6 +20,17 @@ from reconstruction import add_cosmics_reconstruction
 from ROOT import Belle2
 import math
 
+# global tags
+# ******************************************************************************************************************
+# note: The patching global tags and their order are bucket number and basf2 version dependent.
+#       Given below is what is needed for cdst files of bucket 16 calibration and January-2023 development version.
+# ******************************************************************************************************************
+b2.conditions.override_globaltags()
+b2.conditions.append_globaltag('patch_main_release-07_noTOP')
+b2.conditions.append_globaltag('data_reprocessing_proc13')  # experiments 7 - 18
+# b2.conditions.append_globaltag('data_reprocessing_prompt')  # experiments 20 - 26
+b2.conditions.append_globaltag('online')
+
 
 class MakeMCParticles(b2.Module):
     ''' make MCParticles from reconstructed cosmic tracks '''
@@ -45,9 +56,9 @@ class MakeMCParticles(b2.Module):
                     continue
                 if abs(extHit.getPdgCode()) != absPDG:
                     continue
-                if extHit.getPosition().Perp() < 123.5:
+                if extHit.getPosition().Rho() < 123.5:
                     continue
-                if extHit.getPosition() * extHit.getMomentum() > 0:
+                if extHit.getPosition().Dot(extHit.getMomentum()) > 0:
                     continue
                 selExtHits.append(extHit)
             if len(selExtHits) == 0:

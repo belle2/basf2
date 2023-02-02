@@ -1315,6 +1315,7 @@ def fillParticleListsFromMC(decayStringsWithCuts,
 
 def extractParticlesFromROE(particleLists,
                             maskName='all',
+                            cut='',
                             writeOut=False,
                             path=None):
     """
@@ -1340,6 +1341,7 @@ def extractParticlesFromROE(particleLists,
 
     @param particleLists (str or list(str)) Name of output ParticleLists
     @param maskName (str)                   Name of the ROE mask to be applied on Particles
+    @param cut (str)                        Cut to be applied on all particleLists
     @param writeOut (bool)                  whether RootOutput module should save the created ParticleList
     @param path (basf2.Path)                modules are added to this path
     """
@@ -1353,6 +1355,10 @@ def extractParticlesFromROE(particleLists,
     pext.param('maskName', maskName)
     pext.param('writeOut', writeOut)
     path.add_module(pext)
+
+    if cut != "":
+        for plist in particleLists:
+            applyCuts(plist, cut, path)
 
 
 def applyCuts(list_name, cut, path):

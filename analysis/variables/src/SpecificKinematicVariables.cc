@@ -186,14 +186,14 @@ namespace Belle2 {
     REGISTER_VARIABLE("recQ2BhSimple", REC_q2BhSimple,
                       "Returns the momentum transfer squared, :math:`q^2`, calculated in CMS as :math:`q^2 = (p_B - p_h)^2`, \n"
                       "where p_h is the CMS momentum of all hadrons in the decay :math:`B \\to H_1 ... H_n \\ell \\nu_\\ell`.\n"
-                      "The B meson momentum in CMS is assumed to be 0.", ":math:`[\\text{GeV}/\\text{c}]^2`");
+                      "The B meson momentum in CMS is assumed to be 0.\n\n", ":math:`[\\text{GeV}/\\text{c}]^2`");
 
     REGISTER_VARIABLE("recQ2Bh", REC_q2Bh,
                       "Returns the momentum transfer squared, :math:`q^2`, calculated in CMS as :math:`q^2 = (p_B - p_h)^2`, \n"
                       "where p_h is the CMS momentum of all hadrons in the decay :math:`B \\to H_1\\dots H_n \\ell \\nu_\\ell`.\n"
                       "This calculation uses a weighted average of the B meson around the reco B cone. \n"
                       "Based on diamond frame calculation of :math:`q^2` following the idea presented in https://www.osti.gov/biblio/1442697 \n"
-                      "It will switch to use of :b2:var:`recQ2BhSimple` if absolute of :b2:var:`cosThetaBetweenParticleAndNominalB`  > 1.",
+                      "It will switch to use of :b2:var:`recQ2BhSimple` if absolute of :b2:var:`cosThetaBetweenParticleAndNominalB`  > 1.\n\n",
                       ":math:`[\\text{GeV}/\\text{c}]^2`");
 
     REGISTER_VARIABLE("recMissM2", REC_MissM2, R"DOC(

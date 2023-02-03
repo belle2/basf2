@@ -923,8 +923,8 @@ Returns an integer code for the ECL region of a cluster.
     | Upper limit: :math:`250.0`
     | Precision: :math:`10` bit
 ..
-)DOC","cm");
 
+)DOC","cm");
 
     REGISTER_VARIABLE("minC2TDist", eclClusterIsolation, R"DOC(
 Returns the distance between the ECL cluster and its nearest track. 
@@ -945,6 +945,7 @@ If there are no extrapolated hits found in the ECL for the event, NaN will be re
     | Upper limit: :math:`250.0`
     | Precision: :math:`10` bit
 ..
+
 )DOC","cm");
     REGISTER_VARIABLE("minC2TDistID", eclClusterIsolationID, R"DOC(
 Returns the track array index of the nearest track to the ECL cluster. The nearest track is calculcated 
@@ -997,22 +998,27 @@ will used mass constrained :math:`\pi^{0}` s anyhow.
     | Precision: :math:`18` bit
     | This value can be changed to a different reference frame with :b2:var:`useCMSFrame`.
 ..
+
 )DOC","GeV");
     REGISTER_VARIABLE("clusterErrorE", eclClusterErrorE, R"DOC(
 Returns ECL cluster's uncertainty on energy
 (from background level and energy dependent tabulation).
+
 )DOC","GeV");
     REGISTER_VARIABLE("clusterErrorPhi", eclClusterErrorPhi, R"DOC(
 Returns ECL cluster's uncertainty on :math:`\phi`
 (from background level and energy dependent tabulation).
+
 )DOC","rad");
     REGISTER_VARIABLE("clusterErrorTheta", eclClusterErrorTheta, R"DOC(
 Returns ECL cluster's uncertainty on :math:`\theta`
 (from background level and energy dependent tabulation).
+
 )DOC","rad");
 
     REGISTER_VARIABLE("clusterR", eclClusterR, R"DOC(
 Returns ECL cluster's centroid distance from :math:`(0,0,0)`.
+
 )DOC","cm");
     REGISTER_VARIABLE("clusterPhi", eclClusterPhi, R"DOC(
 Returns ECL cluster's azimuthal angle :math:`\phi`
@@ -1045,6 +1051,7 @@ as function of true photon energy, true photon direction and beam background lev
     | Upper limit: :math:`\pi`
     | Precision: :math:`16` bit
 ..
+
 )DOC","rad");
     REGISTER_VARIABLE("clusterConnectedRegionID", eclClusterConnectedRegionID, R"DOC(
 Returns ECL cluster's connected region ID.
@@ -1080,6 +1087,7 @@ as function of true photon energy, true photon direction and beam background lev
     | Upper limit: :math:`\pi`
     | Precision: :math:`16` bit
 ..
+
 )DOC","rad");
     REGISTER_VARIABLE("clusterTiming", eclClusterTiming, R"DOC(
 Returns the time of the ECL cluster. It is calculated as the Photon timing minus the Event t0.
@@ -1097,6 +1105,7 @@ documentation for `clusterHasFailedTiming`). (For MC, the calibrations and corre
     | Upper limit: :math:`1000.0`
     | Precision: :math:`12` bit
 ..
+
 )DOC","ns");
     REGISTER_VARIABLE("clusterHasFailedTiming", eclClusterHasFailedTiming, R"DOC(
 Status bit for if the ECL cluster's timing fit failed. Photon timing is given by the fitted time
@@ -1128,6 +1137,7 @@ We remove such clusters in most physics photon lists.
     However, these events create large ECL clusters that can overlap with other ECL clusters
     and it is not clear that a simple rejection is the correction strategy.
 ..
+
 )DOC","ns");
     REGISTER_VARIABLE("clusterHasFailedErrorTiming", eclClusterHasFailedErrorTiming, R"DOC(
 Status bit for if the ECL cluster's timing uncertainty calculation failed. Photon timing is given by the fitted time
@@ -1148,6 +1158,7 @@ Returns energy of the highest energetic crystal in the ECL cluster after reweigh
     | Upper limit: :math:`3.0` (:math:`e^3 = 20.08553\,` GeV)
     | Precision: :math:`18` bit
 ..
+
 )DOC","GeV");
     REGISTER_VARIABLE("clusterCellID", eclClusterCellId,
                       "Returns cellId of the crystal with highest energy in the ECLCluster.");
@@ -1243,6 +1254,7 @@ to a plane perpendicular to the shower axis.
     | Upper limit: :math:`40.0`
     | Precision: :math:`10` bit
 ..
+
 )DOC",":math:`\\text{cm}^2`");
     REGISTER_VARIABLE("clusterLAT", eclClusterLAT, R"DOC(
 Returns lateral energy distribution (shower variable). It is defined as following:
@@ -1372,9 +1384,11 @@ Returns 1.0 if the cluster has the 'neutral hadrons' hypothesis (historically ca
 )DOC");
     REGISTER_VARIABLE("eclExtTheta", eclExtTheta, R"DOC(
 Returns extrapolated :math:`\theta` of particle track associated to the cluster (if any). Requires module ECLTrackCalDigitMatch to be executed.
+
 )DOC","rad");
     REGISTER_VARIABLE("eclExtPhi", eclExtPhi, R"DOC(
 Returns extrapolated :math:`\phi` of particle track associated to the cluster (if any). Requires module ECLTrackCalDigitMatch to be executed..
+
 )DOC","rad");
     REGISTER_VARIABLE("eclExtPhiId", eclExtPhiId, R"DOC(
 Returns extrapolated :math:`\phi` ID of particle track associated to the cluster (if any). Requires module ECLTrackCalDigitMatch to be executed..
@@ -1382,10 +1396,12 @@ Returns extrapolated :math:`\phi` ID of particle track associated to the cluster
     REGISTER_VARIABLE("weightedAverageECLTime", weightedAverageECLTime, R"DOC(
 Returns ECL weighted average time of all clusters (neutrals) and matched clusters (charged) of daughters
 (of any generation) of the provided particle.
+
 )DOC", "ns");
     REGISTER_VARIABLE("maxWeightedDistanceFromAverageECLTime", maxWeightedDistanceFromAverageECLTime, R"DOC(
 Returns maximum weighted distance between time of the cluster of a photon and the ECL average time, amongst
 the clusters (neutrals) and matched clusters (charged) of daughters (of all generations) of the provided particle.
+
 )DOC", "ns");
     REGISTER_VARIABLE("clusterMdstIndex", eclClusterMdstIndex, R"DOC(
 StoreArray index(0 - based) of the MDST ECLCluster (useful for track-based particles matched to a cluster).
@@ -1431,6 +1447,7 @@ If the number exceeds 255 (uint8_t maximum value) the variable is set to 255.
 cluster-matched tracks using the cluster 4-momenta.
 
 Used for ECL-based dark sector physics and debugging track-cluster matching.
+
 )DOC","GeV/:math:`\\text{c}^2`");
 
     REGISTER_METAVARIABLE("photonHasOverlap(cutString, photonlistname, tracklistname)", photonHasOverlap, R"DOC(
@@ -1447,6 +1464,7 @@ Used for ECL-based dark sector physics and debugging track-cluster matching.
     REGISTER_VARIABLE("clusterUncorrE", eclClusterUncorrectedE, R"DOC(
 [Expert] [Calibration] Returns ECL cluster's uncorrected energy. That is, before leakage corrections.
 This variable should only be used for study of the ECL. Please see :b2:var:`clusterE`.
+
 )DOC","GeV");
 
   }

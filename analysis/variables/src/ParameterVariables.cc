@@ -471,10 +471,10 @@ For a frame independent formulation the three component vectors need to be writt
 
 )DOC", "rad");
 
-    REGISTER_VARIABLE("massDifference(i)", massDifference, "Difference in invariant masses of this particle and its i-th daughter",
+    REGISTER_VARIABLE("massDifference(i)", massDifference, "Difference in invariant masses of this particle and its i-th daughter\n\n",
                       "GeV/:math:`\\text{c}^2`");
     REGISTER_VARIABLE("massDifferenceError(i)", massDifferenceError,
-                      "Estimated uncertainty on difference in invariant masses of this particle and its i-th daughter", "GeV/:math:`\\text{c}^2`");
+                      "Estimated uncertainty on difference in invariant masses of this particle and its i-th daughter\n\n", "GeV/:math:`\\text{c}^2`");
     REGISTER_VARIABLE("massDifferenceSignificance(i)", massDifferenceSignificance,
                       "Signed significance of the deviation from the nominal mass difference of this particle and its i-th daughter [(massDiff - NOMINAL_MASS_DIFF)/ErrMassDiff]");
 

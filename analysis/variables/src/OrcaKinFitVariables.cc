@@ -134,25 +134,28 @@ I.e. for fits with sufficient constraints remaining to constrain a missing 3-vec
 Returns NaN if Orca was not run or if the ``addUnmeasuredPhoton`` parameter was not set.
         
 .. seealso:: :ref:`kinfit`
-        )DOC", "rad");
+
+)DOC", "rad");
     REGISTER_VARIABLE("OrcaKinFitUnmeasuredPhi", UnmeasuredPhi, R"DOC(
 The azimuthal angle of the "unmeasured photon" returned by Orca kinematic fitter for specific 1C fits with the ``addUnmeasuredPhoton`` parameter set.
 I.e. for fits with sufficient constraints remaining to constrain a missing 3-vector.
 Returns NaN if Orca was not run or if the ``addUnmeasuredPhoton`` parameter was not set.
         
 .. seealso:: :ref:`kinfit`
-        )DOC", "rad");
+
+)DOC", "rad");
     REGISTER_VARIABLE("OrcaKinFitUnmeasuredE", UnmeasuredE, R"DOC(
 The energy of the "unmeasured photon" returned by Orca kinematic fitter for specific 1C fits with the ``addUnmeasuredPhoton`` parameter set.
 I.e. for fits with sufficient constraints remaining to constrain a missing 3-vector.
 Returns NaN if Orca was not run or if the ``addUnmeasuredPhoton`` parameter was not set.
         
 .. seealso:: :ref:`kinfit`
-        )DOC", "GeV");
+
+)DOC", "GeV");
     REGISTER_VARIABLE("OrcaKinFitUnmeasuredErrorTheta", UnmeasuredErrorTheta,
-                      "The uncertainty on :b2:var:`OrcaKinFitUnmeasuredTheta`.", "rad");
-    REGISTER_VARIABLE("OrcaKinFitUnmeasuredErrorPhi", UnmeasuredErrorPhi, "The uncertainty on :b2:var:`OrcaKinFitUnmeasuredPhi`.",
+                      "The uncertainty on :b2:var:`OrcaKinFitUnmeasuredTheta`.\n\n", "rad");
+    REGISTER_VARIABLE("OrcaKinFitUnmeasuredErrorPhi", UnmeasuredErrorPhi, "The uncertainty on :b2:var:`OrcaKinFitUnmeasuredPhi`.\n\n",
                       "rad");
-    REGISTER_VARIABLE("OrcaKinFitUnmeasuredErrorE", UnmeasuredErrorE, "The uncertainty on :b2:var:`OrcaKinFitUnmeasuredE`.", "GeV");
+    REGISTER_VARIABLE("OrcaKinFitUnmeasuredErrorE", UnmeasuredErrorE, "The uncertainty on :b2:var:`OrcaKinFitUnmeasuredE`.\n\n", "GeV");
   }
 }

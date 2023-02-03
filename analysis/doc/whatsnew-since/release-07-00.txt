@@ -6,7 +6,10 @@ Modules
   ``False`` so the backward compatibility. If the option is set to ``True``, a photon is used for only the closest charged particle
   in the input ParticleLists.
 
-
+Variables
++++++++++
+* Added the variables `EcmsMC` and `totalEnergyMC`, which return the true value of :math:`\sqrt{s}` and the true sum of the
+  energies of all generated particles, respectively.
 
 Changes in the analysis package in light-2212-foldex
 ----------------------------------------------------

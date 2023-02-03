@@ -3173,28 +3173,25 @@ def lowEnergyPi0Identification(pi0List, gammaList, payloadNameSuffix,
     The result is stored as ExtraInfo ``lowEnergyPi0Identification`` for
     the list pi0List.
 
-    @param[in,out] pi0List
-    Pi0 list.
+    Parameters:
+        pi0List (str): Pi0 list.
 
-    @param[in] gammaList
-    Gamma list. First, an energy cut E > 0.2 is applied to the photons from
-    this list. Then, all possible combinations with a pi0 daughter photon are
-    formed except the one corresponding to the reconstructed pi0. The maximum
-    low-energy pi0 veto value is calculated for such photon pairs and used
-    as one of the input variables for the identification classifier.
+        gammaList (str): Gamma list. First, an energy cut E > 0.2 is applied to the photons from this list.
+                         Then, all possible combinations with a pi0 daughter photon are formed except the one
+                         corresponding to the reconstructed pi0.
+                         The maximum low-energy pi0 veto value is calculated for such photon pairs
+                         and used as one of the input variables for the identification classifier.
 
-    @param[in] payloadNameSuffix
-    Payload name suffix. The weight payloads are stored in the analysis global
-    tag and have the following names:\n
-      * ``'LowEnergyPi0Veto' + payloadNameSuffix``
-      * ``'LowEnergyPi0Identification' + payloadNameSuffix``\n
-    The possible suffixes are:\n
-      * ``'Belle1'`` for Belle data.
-      * ``'Belle2Release5'`` for Belle II release 5 data (MC14, proc12, buckets 16 - 25).\n
-      * ``'Belle2Release6'`` for Belle II release 6 data (MC15, proc13, buckets 26 - 36).\n
+        payloadNameSuffix (str): Payload name suffix. The weight payloads are stored in the analysis global
+                                 tag and have the following names:\n
+                                 * ``'LowEnergyPi0Veto' + payloadNameSuffix``
+                                 * ``'LowEnergyPi0Identification' + payloadNameSuffix``\n
+                                 The possible suffixes are:\n
+                                 * ``'Belle1'`` for Belle data.
+                                 * ``'Belle2Release5'`` for Belle II release 5 data (MC14, proc12, buckets 16 - 25).
+                                 * ``'Belle2Release6'`` for Belle II release 6 data (MC15, proc13, buckets 26 - 36).
 
-    @param[in] path
-    Module path.
+        path (basf2.Path): Module path.
     """
 
     import b2bii

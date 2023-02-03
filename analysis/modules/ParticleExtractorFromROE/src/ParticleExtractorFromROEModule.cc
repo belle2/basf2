@@ -34,7 +34,7 @@ REG_MODULE(ParticleExtractorFromROE);
 ParticleExtractorFromROEModule::ParticleExtractorFromROEModule() : Module()
 {
   // set module description (e.g. insert text)
-  setDescription("Extracts Particles that belong to the ROE and fill them into ParticleLists.");
+  setDescription("Extract Particles that belong to the ROE and fill them into ParticleLists.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   // Add parameters

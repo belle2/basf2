@@ -1315,11 +1315,10 @@ def fillParticleListsFromMC(decayStringsWithCuts,
 
 def extractParticlesFromROE(particleLists,
                             maskName='all',
-                            cut='',
                             writeOut=False,
                             path=None):
     """
-    Extracts Particle objects that belong to the Rest-Of-Events and fill them into the ParticleLists.
+    Extract Particle objects that belong to the Rest-Of-Events and fill them into the ParticleLists.
     This function has to be used only in the for_each loops over ROE.
     The types of the particles other than those specified by ``particleLists`` are not stored.
     If one creates a ROE with ``fillWithMostLikely=True`` via `buildRestOfEvent`, for example,
@@ -1341,7 +1340,6 @@ def extractParticlesFromROE(particleLists,
 
     @param particleLists (str or list(str)) Name of output ParticleLists
     @param maskName (str)                   Name of the ROE mask to be applied on Particles
-    @param cut (str)                        Cut to be applied on all particleLists
     @param writeOut (bool)                  whether RootOutput module should save the created ParticleList
     @param path (basf2.Path)                modules are added to this path
     """
@@ -1355,10 +1353,6 @@ def extractParticlesFromROE(particleLists,
     pext.param('maskName', maskName)
     pext.param('writeOut', writeOut)
     path.add_module(pext)
-
-    if cut != "":
-        for plist in particleLists:
-            applyCuts(plist, cut, path)
 
 
 def applyCuts(list_name, cut, path):

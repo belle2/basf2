@@ -6,7 +6,7 @@ Modules
    so the backward compatibility. If the option is set to ``True``, a photon is used for only the closest charged particle in the
    input ParticleLists.
  * New function `modularAnalysis.extractParticlesFromROE` and module `ParticleExtractorFromROE` are implemented.
-   The function extracts Particle objects that belong to a ROE and fill them in ParticleLists. It is available in the ``for_each``
+   The function extracts Particle objects that belong to a ROE and fills them in ParticleLists. It is available in the ``for_each``
    loop over the ROEs (e.g. ``roe_path``).
 
 

@@ -25,23 +25,23 @@ namespace Belle2 {
     TrackToMCParticleRelatorModule();
 
     /** Destructor (empty). */
-    ~TrackToMCParticleRelatorModule();
+    ~TrackToMCParticleRelatorModule() {};
 
-    /** Use this to initialize StoreArrays and relations.
-     */
+    /** Use this to initialize StoreArrays and relations. */
     void initialize() override;
 
-    /** Called once for each event.
-     */
+    /** Called once for each event. */
     void event() override;
+
   private:
-    StoreArray<Track>  m_Tracks;  /**< Tracks StoreArray */
-    StoreArray<RecoTrack>  m_RecoTracks;  /**< RecoTracks StoreArray */
-    StoreArray<MCParticle>  m_MCParticles;  /**< MCParticles StoreArray */
+    StoreArray<Track>  m_Tracks;  ///< Tracks StoreArray */
+    StoreArray<RecoTrack>  m_RecoTracks;  ///< RecoTracks StoreArray
 
     std::string m_TracksName = "";  ///< Track StoreArray name (input).
     std::string m_RecoTracksName = "";   ///< RecoTrack StoreArray name (input).
     std::string m_MCParticlesName = "";   ///< MCParticle StoreArray name ().
+
+    bool m_mcParticlesPresent = true; ///< Are MCParticles present?
 
   };
 }

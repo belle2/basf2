@@ -29,29 +29,23 @@ TrackToMCParticleRelatorModule::TrackToMCParticleRelatorModule() : Module()
   addParam("MCParticlesName", m_MCParticlesName, "Name of the MCParticles StoreArray to be used.", m_MCParticlesName);
 }
 
-
-TrackToMCParticleRelatorModule::~TrackToMCParticleRelatorModule()
-{
-}
-
-
 void TrackToMCParticleRelatorModule::initialize()
 {
   m_Tracks.isRequired(m_TracksName);
   m_RecoTracks.isRequired(m_RecoTracksName);
   // Can't require MCParticles, as this module is also run during data reconstruction
-  StoreArray<MCParticle>  MCParticles;
-  const bool mcParticlesPresent = MCParticles.isOptional(m_MCParticlesName);
+  StoreArray<MCParticle>  mcParticles;
+  m_mcParticlesPresent = mcParticles.isOptional(m_MCParticlesName);
 
-  if (mcParticlesPresent) {
-    m_Tracks.registerRelationTo(MCParticles);
+  if (m_mcParticlesPresent) {
+    m_Tracks.registerRelationTo(mcParticles);
   }
 }
 
 void TrackToMCParticleRelatorModule::event()
 {
   // Don't do anything if MCParticles aren't present
-  if (m_MCParticles.getEntries() == 0) {
+  if (not m_mcParticlesPresent) {
     return;
   }
 

@@ -1862,7 +1862,8 @@ void B2BIIConvertMdstModule::convertMdstECLObject(const Belle::Mdst_ecl& ecl, co
   // The 16 bits: 0-15 contain tdc count
   float prop2 = eclAux.property(2);
   // a float to int conversion
-  int property2 = *reinterpret_cast<int*>(&prop2);
+  int property2;
+  std::memcpy(&property2, &prop2, sizeof(int));
   //decode the bit encoded variables
   int tdccount;
   tdccount  = property2     & 0xffff;

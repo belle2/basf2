@@ -1007,10 +1007,11 @@ namespace Belle2 {
                       "Returns the measured distance between the ith tag track and the tag vtx.", "cm");
 
     REGISTER_VARIABLE("TagTrackDistanceToTagVErr(i)", tagTrackDistanceToTagVErr, R"DOC(
-                      "Returns the estimated error on the distance between the ith tag track and the tag vtx.
+Returns the estimated error on the distance between the ith tag track and the tag vtx.
 
-                       .. warning:: Only the uncertainties on the track position parameters are taken into account.
-                       )DOC", "cm");
+.. warning:: Only the uncertainties on the track position parameters are taken into account.
+
+)DOC", "cm");
 
     REGISTER_VARIABLE("TagTrackDistanceToTagVSignificance(i)", tagTrackDistanceToTagVSignificance,
                       "Returns the significance of the distance between the tag vtx and the tag track indexed by trackIndex (computed as distance / uncertainty)");
@@ -1051,19 +1052,19 @@ namespace Belle2 {
     REGISTER_VARIABLE("TagVFitTruthStatus", fitTruthStatus, R"DOC(
 Returns the status of the fit performed with the truth info. Possible values are:
 
-    - -1: no related TagVertex found
-    - 0: fit performed with measured parameters
-    - 1: fit performed with true parameters
-    - 2: unable to recover truth parameters
+- -1: no related TagVertex found
+- 0: fit performed with measured parameters
+- 1: fit performed with true parameters
+- 2: unable to recover truth parameters
 )DOC");
 
     REGISTER_VARIABLE("TagVRollBackStatus", rollbackStatus, R"DOC(
 Returns the status of the fit performed with rolled back tracks. Possible values are:
 
-    - -1: no related TagVertex found
-    - 0: fit performed with measured parameters
-    - 1: fit performed with true parameters
-    - 2: unable to recover truth parameters
+- -1: no related TagVertex found
+- 0: fit performed with measured parameters
+- 1: fit performed with true parameters
+- 2: unable to recover truth parameters
 )DOC");
 
     REGISTER_METAVARIABLE("TagTrackMax(var)", tagTrackMax,

@@ -807,9 +807,8 @@ namespace Belle2 {
 [Eventbased][Legacy] Returns total energy in ECL in the event as used in Belle 1 analyses.
 
 .. warning::
-
   For Belle II use cases use either ``totalEnergyOfParticlesInList(gamma:all)``,
-  or (probably better) fill a photon list with some minimal cleanup cuts and use that instea
+  or (probably better) fill a photon list with some minimal cleanup cuts and use that instead:
 
   .. code-block:: python
 
@@ -1007,9 +1006,10 @@ Returns NaN for data.
 [Eventbased][Calibration] The Event t0, is the time of the event relative to the trigger time.
 
 .. note::
-  The event time can be measured by several sub-detectors including the SVD, CDC, ECL, and TOP.
-  This eventT0 variable is the final combined value of all the event time measurements.
-  Currently, only the SVD and ECL are used in this combination.
+    The event time can be measured by several sub-detectors including the SVD, CDC, ECL, and TOP.
+    This eventT0 variable is the final combined value of all the event time measurements.
+    Currently, only the SVD and ECL are used in this combination.
+
 )DOC","ns");
   }
 }

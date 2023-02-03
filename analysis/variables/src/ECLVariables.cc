@@ -897,9 +897,9 @@ alias for (clusterE / p).
     REGISTER_VARIABLE("clusterReg", eclClusterDetectionRegion, R"DOC(
 Returns an integer code for the ECL region of a cluster.
 
-    - 1: forward, 2: barrel, 3: backward,
-    - 11: between FWD and barrel, 13: between BWD and barrel,
-    - 0: otherwise
+- 1: forward, 2: barrel, 3: backward,
+- 11: between FWD and barrel, 13: between BWD and barrel,
+- 0: otherwise
 )DOC");
     REGISTER_VARIABLE("clusterDeltaLTemp", eclClusterDeltaL, R"DOC(
 | Returns DeltaL for the shower shape.
@@ -968,17 +968,17 @@ due to unavoidable longitudinal and transverse leakage that can be further modif
 algorithm and beam backgrounds.The peak position of the photon energy distributions are corrected to
 match the true photon energy in MC:
 
-    - Leakage correction: Using large MC samples of mono-energetic single photons, a correction factor
-      :math:`f` as function of reconstructed detector position, reconstructed photon energy and beam backgrounds
-      is determined via :math:`f = \frac{\text{peak_reconstructed}}{\text{energy_true}}`.
+- Leakage correction: Using large MC samples of mono-energetic single photons, a correction factor
+  :math:`f` as function of reconstructed detector position, reconstructed photon energy and beam backgrounds
+  is determined via :math:`f = \frac{\text{peak_reconstructed}}{\text{energy_true}}`.
 
-    - Cluster energy calibration (data only): To reach the target precision of :math:`< 1.8\%` energy
-      resolution for high energetic photons, the remaining difference between MC and data must be calibrated
-      using kinematically fit muon pairs. This calibration is only applied to data and not to MC and will
-      take time to develop.
-    
-    - Energy Bias Correction module, sub-percent correction, is NOT applied on clusterE, but on photon energy 
-      and momentum. Only applied to data.  
+- Cluster energy calibration (data only): To reach the target precision of :math:`< 1.8\%` energy
+  resolution for high energetic photons, the remaining difference between MC and data must be calibrated
+  using kinematically fit muon pairs. This calibration is only applied to data and not to MC and will
+  take time to develop.
+
+- Energy Bias Correction module, sub-percent correction, is NOT applied on clusterE, but on photon energy
+  and momentum. Only applied to data.
 
 It is important to note that after perfect leakage correction and cluster energy calibration,
 the :math:`\pi^{0}` mass peak will be shifted slightly to smaller values than the PDG average
@@ -1292,9 +1292,9 @@ Returns number of charged tracks matched to this cluster.
 .. note::
     Sometimes (perfectly correctly) two tracks are extrapolated into the same cluster.
 
-        - For charged particles, this should return at least 1 (but sometimes 2 or more).
-        - For neutrals, this should always return 0.
-        - Returns NaN if there is no cluster.
+    - For charged particles, this should return at least 1 (but sometimes 2 or more).
+    - For neutrals, this should always return 0.
+    - Returns NaN if there is no cluster.
 )DOC");
     REGISTER_VARIABLE("clusterHasPulseShapeDiscrimination", eclClusterHasPulseShapeDiscrimination, R"DOC(
 Status bit to indicate if cluster has digits with waveforms that passed energy and :math:`\chi^2`
@@ -1304,48 +1304,48 @@ thresholds for computing PSD variables.
 Returns the output of an MVA classifier that uses shower-related variables to distinguish true photon clusters from beam background clusters.
 The classes are: 
 
-    - 1 for true photon clusters
-    - 0 for beam background clusters
+- 1 for true photon clusters
+- 0 for beam background clusters
 
 The MVA has been trained using samples of signal photons and beam background photons coming from MC. The features used are (in decreasing order of significance): 
 
-    - `clusterTiming`
-    - `clusterPulseShapeDiscriminationMVA`
-    - `clusterE`
-    - `clusterTheta`
-    - `clusterZernikeMVA`
-    - `clusterE1E9`
-    - `clusterLAT`
-    - `clusterSecondMoment`    
+- `clusterTiming`
+- `clusterPulseShapeDiscriminationMVA`
+- `clusterE`
+- `clusterTheta`
+- `clusterZernikeMVA`
+- `clusterE1E9`
+- `clusterLAT`
+- `clusterSecondMoment`
 )DOC");
     REGISTER_VARIABLE("hadronicSplitOffSuppression", hadronicSplitOffSuppression, R"DOC(
 Returns the output of an MVA classifier that uses shower-related variables to distinguish true photon clusters from hadronic splitoff clusters.
 The classes are: 
 
-    - 1 for true photon clusters
-    - 0 for hadronic splitoff clusters
+- 1 for true photon clusters
+- 0 for hadronic splitoff clusters
 
 The MVA has been trained using samples of signal photons and hadronic splitoff photons coming from MC. The features used are (in decreasing order of significance): 
 
-    - `clusterPulseShapeDiscriminationMVA`
-    - `minC2TDist`
-    - `clusterZernikeMVA`
-    - `clusterE`
-    - `clusterLAT`
-    - `clusterE1E9`
-    - `clusterSecondMoment`
+- `clusterPulseShapeDiscriminationMVA`
+- `minC2TDist`
+- `clusterZernikeMVA`
+- `clusterE`
+- `clusterLAT`
+- `clusterE1E9`
+- `clusterSecondMoment`
 )DOC");
     REGISTER_VARIABLE("clusterKlId", eclClusterKlId, R"DOC(
 Returns MVA classifier that uses ECL clusters variables to discriminate Klong clusters from em background.
     
-    - 1 for Kl
-    - 0 for background
+- 1 for Kl
+- 0 for background
 )DOC");
     REGISTER_VARIABLE("clusterPulseShapeDiscriminationMVA", eclPulseShapeDiscriminationMVA, R"DOC(
 Returns MVA classifier that uses pulse shape discrimination to identify electromagnetic vs hadronic showers.
 
-    - 1 for electromagnetic showers
-    - 0 for hadronic showers
+- 1 for electromagnetic showers
+- 0 for hadronic showers
 )DOC");
     REGISTER_VARIABLE("clusterNumberOfHadronDigits", eclClusterNumberOfHadronDigits, R"DOC(
 Returns ECL cluster's number of hadron digits in cluster (pulse shape discrimination variable).

@@ -335,10 +335,10 @@ flight distance in the transverse plane.
 [Legacy] Returns 2.0, 1.0, 0.0 as an indication of goodness of :math:`\Lambda^0` candidates, 
 based on:
 
-    * The distance of the two daughter tracks at their interception at z axis,
-    * the minimum distance of the daughter tracks and the IP in xy plane,
-    * the difference of the azimuthal angle of the vertex vector and the momentum vector,
-    * and the flight distance of the Lambda0 candidates in xy plane.
+* The distance of the two daughter tracks at their interception at z axis,
+* the minimum distance of the daughter tracks and the IP in xy plane,
+* the difference of the azimuthal angle of the vertex vector and the momentum vector,
+* and the flight distance of the Lambda0 candidates in xy plane.
 
 It reproduces the ``goodLambda()`` function in Belle.
 

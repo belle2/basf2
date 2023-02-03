@@ -728,7 +728,7 @@ Evaluates a variable value in the thrust reference frame.
 
 
     REGISTER_VARIABLE("sphericity", sphericity, R"DOC(
-[Eventbased] Event sphericity, defined as the linear combination of the sphericity eigenvalues :math:`\\lambda_i`: :math:`S = (3/2)(\\lambda_2+\\lambda_3)`.
+[Eventbased] Event sphericity, defined as the linear combination of the sphericity eigenvalues :math:`\lambda_i`: :math:`S = (3/2)(\lambda_2+\lambda_3)`.
 
 .. warning:: You have to run the Event Shape builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.

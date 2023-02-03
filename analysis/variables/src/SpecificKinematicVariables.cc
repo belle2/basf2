@@ -196,10 +196,11 @@ namespace Belle2 {
                       "It will switch to use of :b2:var:`recQ2BhSimple` if absolute of :b2:var:`cosThetaBetweenParticleAndNominalB`  > 1.",
                       ":math:`[\\text{GeV}/\\text{c}]^2`");
 
-    REGISTER_VARIABLE("recMissM2", REC_MissM2,
-                      "Returns the invariant mass squared of the missing momentum calculated assumings the"
-                      "reco B is at rest and calculating the neutrino (missing) momentum from :math:`p_\\nu = p_B - p_\\mathrm{had} - p_\\mathrm{lep}`",
-                      ":math:`[\\text{GeV}/\\text{c}^2]^2`");
+    REGISTER_VARIABLE("recMissM2", REC_MissM2, R"DOC(
+                      Returns the invariant mass squared of the missing momentum calculated assumings the
+                      reco B is at rest and calculating the neutrino (missing) momentum from :math:`p_\nu = p_B - p_{\rm had} - p_{\rm lep}`
+
+                      )DOC", ":math:`[\\text{GeV}/\\text{c}^2]^2`");
 
 
 

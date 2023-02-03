@@ -121,7 +121,7 @@ Returns NaN if Orca was not run.
         
 .. seealso:: :ref:`kinfit`
         )DOC");
-    // TODO: explan the actual error codes
+    // TODO: explain the actual error codes
     REGISTER_VARIABLE("OrcaKinFitErrorCode", ErrorCode, R"DOC(
 The error code returned by the Orca kinematic fitter.
 Returns NaN if Orca was not run.

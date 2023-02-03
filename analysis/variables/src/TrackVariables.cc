@@ -596,18 +596,21 @@ point-of-closest-approach (POCA) in the :math:`r-\phi` plane.
         study or some debugging).
 
 Returns NaN if called for something other than a track-based particle.
-    )DOC", "cm");
+
+)DOC", "cm");
     REGISTER_VARIABLE("phi0", trackPhi0, R"DOC(
 Returns the tracking parameter :math:`\phi_0`, the angle of the transverse
 momentum in the :math:`r-\phi` plane.
 
 Returns NaN if called for something other than a track-based particle.
-    )DOC", "rad");
+
+)DOC", "rad");
     REGISTER_VARIABLE("omega", trackOmega, R"DOC(
 Returns the tracking parameter :math:`\omega`, the curvature of the track.
 
 Returns NaN if called for something other than a track-based particle.
-		      )DOC", ":math:`\\text{cm}^{-1}`");
+
+)DOC", ":math:`\\text{cm}^{-1}`");
     REGISTER_VARIABLE("z0", trackZ0, R"DOC(
 Returns the tracking parameter :math:`z_0`, the z-coordinate of the
 point-of-closest-approach (POCA).
@@ -620,7 +623,8 @@ point-of-closest-approach (POCA).
         study or some debugging).
 
 Returns NaN if called for something other than a track-based particle.
-    )DOC", "cm");
+
+)DOC", "cm");
     REGISTER_VARIABLE("tanLambda", trackTanLambda, R"DOC(
 Returns :math:`\tan\lambda`, the slope of the track in the :math:`r-z` plane.
 
@@ -633,7 +637,8 @@ point-of-closest-approach (POCA) in the :math:`r-\phi` plane.
 .. seealso:: :b2:var:`d0`, :b2:var:`d0Pull`
 
 Returns NaN if called for something other than a track-based particle.
-    )DOC", "cm");
+
+)DOC", "cm");
     REGISTER_VARIABLE("phi0Err", trackPhi0Error, R"DOC(
 Returns the uncertainty on :math:`\phi_0`, the angle of the transverse momentum
 in the :math:`r-\phi` plane.
@@ -641,14 +646,16 @@ in the :math:`r-\phi` plane.
 .. seealso:: :b2:var:`phi0`, :b2:var:`phi0Pull`
 
 Returns NaN if called for something other than a track-based particle.
-    )DOC", "rad");
+
+)DOC", "rad");
     REGISTER_VARIABLE("omegaErr", trackOmegaError, R"DOC(
 Returns the uncertainty on :math:`\omega`, the curvature of the track.
 
 .. seealso:: :b2:var:`omega`, :b2:var:`omegaPull`
 
 Returns NaN if called for something other than a track-based particle.
-    )DOC", ":math:`\\text{cm}^{-1}`");
+
+)DOC", ":math:`\\text{cm}^{-1}`");
     REGISTER_VARIABLE("z0Err", trackZ0Error, R"DOC(
 Returns the uncertainty on :math:`z_0`, the z-coordinate of the
 point-of-closest-approach (POCA).
@@ -656,7 +663,8 @@ point-of-closest-approach (POCA).
 .. seealso:: :b2:var:`z0`, :b2:var:`z0Pull`
 
 Returns NaN if called for something other than a track-based particle."
-    )DOC", "cm");
+
+)DOC", "cm");
     REGISTER_VARIABLE("tanLambdaErr", trackTanLambdaError, R"DOC(
 Returns the uncertainty on :math:`\tan\lambda`, the slope of the track in the
 :math:`r-z` plane.
@@ -782,6 +790,7 @@ Returns the time at which the track is produced relative to the time of the coll
 Both the time of the collision and the track time are computed using only SVD hits.
 Returns NaN if SVD EventT0 is NaN, or if no SVD Hits are attached to the track.
 For more details, see :ref:`Time Extraction <tracking_eventTimeExtraction>` page.
-    )DOC", "ns");
+
+)DOC", "ns");
   }
 }

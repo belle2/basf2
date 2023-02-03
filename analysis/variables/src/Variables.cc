@@ -1177,7 +1177,8 @@ where :math:`\sum` runs over i = px, py, pz and :math:`mc(p_i)` is the mc truth 
     REGISTER_VARIABLE("M", particleMass, R"DOC(
 The particle's mass.
 
-Note that this is context-dependent variable and can take different values depending on the situation. This should be the "best" value possible with the information provided.
+Note that this is context-dependent variable and can take different values depending on the situation. This should be the "best"
+value possible with the information provided.
 
 - If this particle is track- or cluster- based, then this is the value of the mass hypothesis.
 - If this particle is an MC particle then this is the mass of that particle.
@@ -1223,10 +1224,13 @@ Note that this is context-dependent variable and can take different values depen
     REGISTER_VARIABLE("mRecoil", recoilMass,
                       "Invariant mass of the system recoiling against given Particle", "GeV/:math:`\\text{c}^2`");
     REGISTER_VARIABLE("m2Recoil", recoilMassSquared,
-                      "invariant mass squared of the system recoiling against given Particle", ":math:`[\\text{GeV}/\\text{c}^2]^2`");
-    REGISTER_VARIABLE("m2RecoilSignalSide", m2RecoilSignalSide,
-                      "Squared recoil mass of the signal side which is calculated in the CMS frame under the assumption that the signal and tag side are produced back to back and the tag side energy equals the beam energy. The variable must be applied to the Upsilon and the tag side must be the first, the signal side the second daughter",
-                      ":math:`[\\text{GeV}/\\text{c}^2]^2`");
+                      "invariant mass squared of the system recoiling against given Particle\n\n", ":math:`[\\text{GeV}/\\text{c}^2]^2`");
+    REGISTER_VARIABLE("m2RecoilSignalSide", m2RecoilSignalSide, R"DOC(
+                       Squared recoil mass of the signal side which is calculated in the CMS frame under the assumption that the
+                       signal and tag side are produced back to back and the tag side energy equals the beam energy. The variable
+                       must be applied to the Upsilon and the tag side must be the first, the signal side the second daughter
+
+                       )DOC", ":math:`[\\text{GeV}/\\text{c}^2]^2`");
 
     REGISTER_VARIABLE("b2bTheta", b2bTheta,
                       "Polar angle in the lab system that is back-to-back to the particle in the CMS. Useful for low multiplicity studies.", "rad");
@@ -1241,21 +1245,26 @@ Note that this is context-dependent variable and can take different values depen
     REGISTER_VARIABLE("ArmenterosLongitudinalMomentumAsymmetry", ArmenterosLongitudinalMomentumAsymmetry,
                       "Longitudinal momentum asymmetry of V0's daughters.\n"
                       "The mother (V0) is required to have exactly two daughters");
-    REGISTER_VARIABLE("ArmenterosDaughter1Qt", ArmenterosDaughter1Qt,
-                      "Transverse momentum of the first daughter with respect to the V0 mother.\n"
-                      "The mother is required to have exactly two daughters", "GeV/c");
-    REGISTER_VARIABLE("ArmenterosDaughter2Qt", ArmenterosDaughter2Qt,
-                      "Transverse momentum of the second daughter with respect to the V0 mother.\n"
-                      "The mother is required to have exactly two daughters", "GeV/c");
+    REGISTER_VARIABLE("ArmenterosDaughter1Qt", ArmenterosDaughter1Qt, R"DOC(
+                       Transverse momentum of the first daughter with respect to the V0 mother.
+                       The mother is required to have exactly two daughters
+
+                       )DOC", "GeV/c");
+    REGISTER_VARIABLE("ArmenterosDaughter2Qt", ArmenterosDaughter2Qt, R"DOC(
+                       Transverse momentum of the second daughter with respect to the V0 mother.
+                       The mother is required to have exactly two daughters
+
+                       )DOC", "GeV/c");
 
     VARIABLE_GROUP("Miscellaneous");
     REGISTER_VARIABLE("nRemainingTracksInEvent",  nRemainingTracksInEvent,
                       "Number of tracks in the event - Number of tracks( = charged FSPs) of particle.");
     REGISTER_VARIABLE("trackMatchType", trackMatchType, R"DOC(
 
-                      * -1 particle has no ECL cluster
-                      *  0 particle has no associated track
-                      *  1 there is a matched track called connected - region(CR) track match
+* -1 particle has no ECL cluster
+*  0 particle has no associated track
+*  1 there is a matched track called connected - region(CR) track match
+
                       )DOC");
     MAKE_DEPRECATED("trackMatchType", true, "light-2012-minos", R"DOC(
                      Use better variables like `trackNECLClusters`, `clusterTrackMatch`, and `nECLClusterTrackMatches`.)DOC");

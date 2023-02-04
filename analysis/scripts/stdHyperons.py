@@ -78,7 +78,7 @@ def stdXi(fitter='TreeFit', path=None):
         path=path)
 
 
-def stdXi0(gammatype='eff40', path=None, loadBeamBackgroundMVA=True, loadFakePhotonMVA=True):
+def stdXi0(gammatype='eff40', beamBackgroundMVAWeight="", fakePhotonMVAWeight="", path=None):
     r"""
     Reconstruct the standard :math:`\Xi^0` ``ParticleList`` named ``Xi0:std``.
 
@@ -88,9 +88,22 @@ def stdXi0(gammatype='eff40', path=None, loadBeamBackgroundMVA=True, loadFakePho
         gammatype (str): specify either ``eff60``, ``eff50``, ``eff40``, ``eff30``, or ``eff20``
                          to select the signal efficiency of the photons used in the pi0 reconstruction
                          (default ``eff40``)
+
+        beamBackgroundMVAWeight (str): type of weight file for beam background MVA; if empty, beam background MVA will not be used
+
+                          .. tip::
+                              Please refer to the
+                              `Neutrals Performance Confluence page <https://confluence.desy.de/display/BI/Neutrals+Performance>`_
+                              for information on the beam background MVA.
+
+        fakePhotonMVAWeight (str): type of weight file for fake photon MVA; if empty, fake photon MVA will not be used
+
+                          .. tip::
+                              Please refer to the
+                              `Neutrals Performance Confluence page <https://confluence.desy.de/display/BI/Neutrals+Performance>`_
+                              for information on the fake photon MVA.
+
         path (basf2.Path): modules are added to this path building the ``Xi0:std`` list
-        loadBeamBackgroundMVA (bool): If true, photon candidates will be assigned a beam background probability.
-        loadFakePhotonMVA (bool): If true, photon candidates will be assigned a fake photon probability.
     """
 
     if not isB2BII():
@@ -109,8 +122,8 @@ def stdXi0(gammatype='eff40', path=None, loadBeamBackgroundMVA=True, loadFakePho
         stdPhotons(
             f'pi0{gammatype}_May2020',
             path=path,
-            loadBeamBackgroundMVA=loadBeamBackgroundMVA,
-            loadFakePhotonMVA=loadFakePhotonMVA)
+            beamBackgroundMVAWeight=beamBackgroundMVAWeight,
+            fakePhotonMVAWeight=fakePhotonMVAWeight)
         reconstructDecay(f'pi0:reco -> gamma:pi0{gammatype}_May2020 gamma:pi0{gammatype}_May2020',
                          'abs( dM ) < 0.0406',
                          True, path=path)

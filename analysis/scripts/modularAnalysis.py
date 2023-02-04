@@ -3184,11 +3184,12 @@ def lowEnergyPi0Identification(pi0List, gammaList, payloadNameSuffix,
                     Belle1=b2bii.isB2BII())
 
 
-def getBeamBackgroundProbability(particleList, path=None):
+def getBeamBackgroundProbability(particleList, weight, path=None):
     """
     Assign a probability to each ECL cluster as being signal like (1) compared to beam background like (0)
-    @param particleList     The input ParticleList, must be a photon list
-    @param path       modules are added to this path
+    @param particleList    the input ParticleList, must be a photon list
+    @param weight    type of weight file to use
+    @param path    modules are added to this path
     """
 
     import b2bii
@@ -3199,14 +3200,15 @@ def getBeamBackgroundProbability(particleList, path=None):
     path.add_module('MVAExpert',
                     listNames=particleList,
                     extraInfoName='beamBackgroundSuppression',
-                    identifier='BeamBackgroundMVA')
+                    identifier=f'BeamBackgroundMVA_{weight}')
 
 
-def getFakePhotonProbability(particleList, path=None,):
+def getFakePhotonProbability(particleList, weight, path=None):
     """
     Assign a probability to each ECL cluster as being signal like (1) compared to fake photon like (0)
-    @param particleList     The input ParticleList, must be a photon list
-    @param path       modules are added to this path
+    @param particleList    the input ParticleList, must be a photon list
+    @param weight    type of weight file to use
+    @param path    modules are added to this path
     """
 
     import b2bii
@@ -3217,7 +3219,7 @@ def getFakePhotonProbability(particleList, path=None,):
     path.add_module('MVAExpert',
                     listNames=particleList,
                     extraInfoName='fakePhotonSuppression',
-                    identifier='FakePhotonMVA')
+                    identifier=f'FakePhotonMVA_{weight}')
 
 
 def buildEventKinematics(inputListNames=None, default_cleanup=True, custom_cuts=None,

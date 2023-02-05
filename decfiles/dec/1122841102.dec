@@ -1,0 +1,36 @@
+# EventType: 1122841102
+# Descriptor: [B0 -> X(3872) [ -> Jpsi [ -> l+ l-] gamma ] KS0 ]cc
+# NickName: Bd_X(3872)KS_Jpsig_l+l-
+# Documentation:
+# Tested: yes
+# Physics WG: Quarkonium
+# Responsible: Sourabh Chutia
+# Email: ph21070@iisermohali.ac.in
+# Cuts: None
+# Date: 20230202
+# Comments:
+
+# Define aliases
+Alias X(3872)sig X_1(3872)
+Alias Jpsi_sig J/psi
+
+Decay Upsilon(4S)
+0.5000 B0sig anti-B0    VSS_BMIX dm;
+0.5000 B0 anti-B0sig    VSS_BMIX dm;
+Enddecay
+
+Decay B0sig
+1.000 X(3872)sig KS0   SVS;
+Enddecay
+CDecay anti-B0sig
+
+Decay X(3872)sig
+1.000 Jpsi_sig gamma   VVP 1.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0;
+Enddecay
+
+Decay Jpsi_sig
+0.500 e+ e-           PHOTOS VLL;
+0.500 mu+ mu-         PHOTOS VLL;
+Enddecay
+
+End

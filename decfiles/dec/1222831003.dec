@@ -1,0 +1,36 @@
+# EventType: 1222831003
+# Descriptor: [B+ -> X(3872) [ -> psi(2S) [ -> l+ l-] gamma ] K+ ]cc
+# NickName: Bu_X(3872)K_Psi2Sg__l+l-
+# Documentation:
+# Tested: yes
+# Physics WG: Quarkonium
+# Responsible: Sourabh Chutia
+# Email: ph21070@iisermohali.ac.in
+# Cuts: None
+# Date: 20230202
+# Comments:
+
+# Define aliases
+Alias X(3872)sig X_1(3872)
+Alias psi2S_sig psi(2S)
+
+Decay Upsilon(4S)
+0.5000 B+sig B-    VSS;
+0.5000 B+ B-sig    VSS;
+Enddecay
+
+Decay B+sig
+1.000 X(3872)sig K+   SVS;
+Enddecay
+CDecay B-sig
+
+Decay X(3872)sig
+1.000 psi2S_sig gamma   VVP 1.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0;
+Enddecay
+
+Decay psi2S_sig
+0.5000 e+ e-  PHOTOS VLL ;
+0.5000 mu+ mu- PHOTOS VLL ;
+Enddecay
+
+End

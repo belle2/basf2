@@ -41,9 +41,11 @@
 #include <framework/gearbox/Const.h>
 #include <framework/utilities/Conversion.h>
 
+#include <Math/Boost.h>
 #include <Math/Vector4D.h>
 #include <TRandom.h>
 #include <TVectorF.h>
+using namespace ROOT::Math;
 
 #include <iostream>
 #include <cmath>

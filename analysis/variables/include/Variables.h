@@ -175,66 +175,6 @@ namespace Belle2 {
     double particleInvariantMassLambda(const Particle* part);
 
     /**
-     * return particle's pdg code
-     */
-    int particlePDGCode(const Particle* part);
-
-    /**
-     * return cosine of angle between momentum and vertex vector in particle xy-plane in LAB frame (origin of vertex vector is IP)
-     */
-    double cosAngleBetweenMomentumAndVertexVectorInXYPlane(const Particle* part);
-
-    /**
-     * return cosine of angle between momentum and vertex vector of particle in LAB frame (origin of vertex vector is IP)
-     */
-    double cosAngleBetweenMomentumAndVertexVector(const Particle* part);
-
-    /**
-     * cosine of the angle in CMS between momentum the reconstructed particle and a nominal B particle.
-     * It is somewhere between -1 and 1 if only a single massless particle like a neutrino is missing in the reconstruction.
-     */
-    double cosThetaBetweenParticleAndNominalB(const Particle* part);
-
-    /**
-     * Returns the cosine of the angle between the particle and the thrust axis
-     * of the event, as calculate by the EventShapeCalculator module.
-     */
-    double cosToThrustOfEvent(const Particle* part);
-
-    /**
-     * return the (i,j)-th element of the MomentumVertex covariance matrix
-     * Ordering of the elements in the error matrix is: px, py, pz, E, x, y, z
-     */
-    double covMatrixElement(const Particle*, const std::vector<double>& element);
-
-    /**
-     * return momentum deviation chi^2 value calculated as
-     * chi^2 = sum_i (p_i - mc(p_i))^2/sigma(p_i)^2, where sum runs over i = px, py, pz and
-     * mc(p_i) is the mc truth value and sigma(p_i) is the estimated error of i-th component of momentum vector
-     */
-    double momentumDeviationChi2(const Particle*);
-
-    /**
-     * return mass (determined from particle's 4-momentum vector)
-     */
-    double particleMass(const Particle* part);
-
-    /**
-     * return mass minus nominal mass
-     */
-    double particleDMass(const Particle* part);
-
-    /**
-     * return mass (determined from particle's daughter 4-momentum vectors)
-     */
-    double particleInvariantMassFromDaughters(const Particle* part);
-
-    /**
-     * return mass (determined from particle's daughter 4-momentum vectors under proton mass assumption)
-     */
-    double particleInvariantMassLambda(const Particle* part);
-
-    /**
      * return uncertainty of the invariant mass
      */
     double particleInvariantMassError(const Particle* part);

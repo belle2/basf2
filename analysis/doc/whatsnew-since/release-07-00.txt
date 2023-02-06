@@ -2,10 +2,7 @@ Changes in the analysis package in light-2302-genetta
 -----------------------------------------------------
 Modules
 +++++++
- * Added an option ``usePhotonOnlyOnce`` to the function :func:`modularAnalysis.correctBremsBelle`. The default of the option is ``False``
-   so the backward compatibility. If the option is set to ``True``, a photon is used for only the closest charged particle in the
-   input ParticleLists.
- * Fixed a bug on the `findMCDecay` that the decay of ``K_S0`` cannot be specified.
+* Fixed a bug on the `findMCDecay` that the decay of ``K_S0`` cannot be specified.
 * Added an option ``usePhotonOnlyOnce`` to the function :func:`modularAnalysis.correctBremsBelle`. The default of the option is
   ``False`` so the backward compatibility. If the option is set to ``True``, a photon is used for only the closest charged particle
   in the input ParticleLists.

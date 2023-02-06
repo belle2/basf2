@@ -415,9 +415,10 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("momentaTripleProduct(i,j,k)", momentaTripleProduct, R"DOC(
 a triple-product of three momenta of final-state particles in the mother rest frame: :math:`C_T=\vec{p}_i\cdot(\vec{p}_j\times\vec{p}_k)`.
-For four-body decay M->D1D2D3D3, momentaTripleProduct(0,1,2) returns a triple-product of three momenta of D1D2D3 in the mother M rest frame. 
+For four-body decay M->D1D2D3D4, momentaTripleProduct(0,1,2) returns a triple-product of three momenta of D1D2D3 in the mother M rest frame. 
 It also supports the three-body decay in which one daughter has a secondary decay, 
-e.g. for M->(R->D1D2)D3D4, momentaTripleProduct(0,1,2) returns a triple-product of three momenta of D1D3D4 in the mother M rest frame.
+e.g. for M->(R->D1D2)D3D4, momentaTripleProduct(0,1,2) returns a triple-product of three momenta of D1D3D4 in the mother M rest frame
+(i.e. the first index indicates the granddaughter's index for three-body decays).
 )DOC"); 
 
   }

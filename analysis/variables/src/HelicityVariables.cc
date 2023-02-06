@@ -284,29 +284,23 @@ namespace Belle2 {
       return - iDaughter4Vector.Vect().Dot(mother4Vector.Vect()) / iDaughter4Vector.P() / mother4Vector.P();
     }
 
-    double momentaTripleProduct(const Particle* mother, const std::vector<double>& indices)
+    double momentaTripleProduct(const Particle* mother, const std::vector<std::string>& indices)
     {
       if (indices.size() != 3) {
-        B2FATAL("Wrong number of arguments for momentaTripleProduct: three are needed.");
-      }
-      if (mother->getNDaughters() < 3) {
-        B2FATAL("Currently momentaTripleProduct() only supports the four-body (M->D1D2D3D4) or three-body (M->[R->D1D2]D3D4) decays.");
+        B2FATAL("Wrong number of arguments for momentaTripleProduct: three (particles) are needed.");
       }
 
-      int iDau = std::lround(indices[0]);
-      int jDau = std::lround(indices[1]);
-      int kDau = std::lround(indices[2]);
+      auto iDau = indices[0];
+      auto jDau = indices[1];
+      auto kDau = indices[2];
 
-      const Particle* iDaughter = mother->getNDaughters() == 3 ? mother->getDaughter(0)->getDaughter(iDau) : mother->getDaughter(iDau);
-      if (!iDaughter) {
-        if (mother->getNDaughters() == 4) B2FATAL("Couldn't find the " << iDau << "th daughter.");
-        else if (mother->getNDaughters() == 3) B2FATAL("Couldn't find the " << iDau <<
-                                                         "th granddaughter (daughter of the first daughter).");
-      }
-      const Particle* jDaughter =  mother->getDaughter(jDau);
+      const Particle* iDaughter = mother->getParticleFromGeneralizedIndexString(iDau);
+      if (!iDaughter)
+        B2FATAL("Couldn't find the " << iDau << "th daughter.");
+      const Particle* jDaughter =  mother->getParticleFromGeneralizedIndexString(jDau);
       if (!jDaughter)
         B2FATAL("Couldn't find the " << jDau << "th daughter.");
-      const Particle* kDaughter =  mother->getDaughter(kDau);
+      const Particle* kDaughter =  mother->getParticleFromGeneralizedIndexString(kDau);
       if (!kDaughter)
         B2FATAL("Couldn't find the " << kDau << "th daughter.");
 
@@ -414,11 +408,9 @@ namespace Belle2 {
                       and the momentum of the :math:`K^-`, both momenta in the rest frame of the :math:`K^- K^{*0}`.)DOC");
 
     REGISTER_VARIABLE("momentaTripleProduct(i,j,k)", momentaTripleProduct, R"DOC(
-a triple-product of three momenta of final-state particles in the mother rest frame: :math:`C_T=\vec{p}_i\cdot(\vec{p}_j\times\vec{p}_k)`.
-For four-body decay M->D1D2D3D4, momentaTripleProduct(0,1,2) returns a triple-product of three momenta of D1D2D3 in the mother M rest frame. 
-It also supports the three-body decay in which one daughter has a secondary decay, 
-e.g. for M->(R->D1D2)D3D4, momentaTripleProduct(0,1,2) returns a triple-product of three momenta of D1D3D4 in the mother M rest frame
-(i.e. the first index indicates the granddaughter's index for three-body decays).
+a triple-product of three momenta of offspring in the mother rest frame: :math:`C_T=\vec{p}_i\cdot(\vec{p}_j\times\vec{p}_k)`. For examples,
+In a four-body decay M->D1D2D3D4, momentaTripleProduct(0,1,2) returns CT using the momenta of D1D2D3 particles. 
+In other decays involving secondary decay, e.g. for M->(R->D1D2)D3D4, momentaTripleProduct(0:0,1,2) returns C_T using momenta of D1D3D4 particles.
 )DOC"); 
 
   }

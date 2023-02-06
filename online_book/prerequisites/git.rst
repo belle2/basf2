@@ -26,7 +26,7 @@
     **Objectives**:
 
     * Learn to use the world's most successful version control system
-    * Get ready to contribute to Belle 2 software
+    * Get ready to contribute to Belle II software
 
 Creating a physics analysis or developing a piece of software is not a straight
 forward process without errors. There will be a lot of changes to the scripts,

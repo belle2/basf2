@@ -19,6 +19,8 @@
 #include <framework/utilities/Conversion.h>
 #include <framework/gearbox/Const.h>
 
+#include <boost/algorithm/string.hpp>
+
 #include <Math/Boost.h>
 #include <Math/Vector4D.h>
 using namespace ROOT::Math;

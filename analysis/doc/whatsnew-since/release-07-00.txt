@@ -16,6 +16,9 @@ Modules
    ``loadBeamBackgroundMVA`` and ``loadFakePhotonMVA``, and they are now strings to specify which weight files should be used.
    For run-independent training use ``MCri`` while for run-dependent training use ``MCrd``. More information on the new weights can be found
    on the `Neutrals Performance Confluence Page <https://confluence.desy.de/display/BI/Neutrals+Performance>`_.  
+ * Added an optional parameter ``biasCorrectionTable`` to `stdHyperons` so that users can specify a table name with photon energy bias corrections
+   for the ``stdXi0`` particle list. The latest information on the bias correction can be found on the 
+   `Neutrals Performance Confluence Page <https://confluence.desy.de/display/BI/Neutrals+Performance>`_. 
 
 
 Changes in the analysis package in light-2212-foldex

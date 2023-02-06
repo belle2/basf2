@@ -78,7 +78,7 @@ def stdXi(fitter='TreeFit', path=None):
         path=path)
 
 
-def stdXi0(gammatype='eff40', beamBackgroundMVAWeight="", fakePhotonMVAWeight="", path=None):
+def stdXi0(gammatype='eff40', beamBackgroundMVAWeight="", fakePhotonMVAWeight="", biasCorrectionTable="", path=None):
     r"""
     Reconstruct the standard :math:`\Xi^0` ``ParticleList`` named ``Xi0:std``.
 
@@ -103,6 +103,13 @@ def stdXi0(gammatype='eff40', beamBackgroundMVAWeight="", fakePhotonMVAWeight=""
                               `Neutrals Performance Confluence page <https://confluence.desy.de/display/BI/Neutrals+Performance>`_
                               for information on the fake photon MVA.
 
+        biasCorrectionTable (str): correction table for the photon energy bias correction (should only be applied to data)
+
+                          .. tip::
+                              Please refer to the
+                              `Neutrals Performance Confluence page <https://confluence.desy.de/display/BI/Neutrals+Performance>`_
+                              for information on the names of available correction tables.
+
         path (basf2.Path): modules are added to this path building the ``Xi0:std`` list
     """
 
@@ -123,7 +130,8 @@ def stdXi0(gammatype='eff40', beamBackgroundMVAWeight="", fakePhotonMVAWeight=""
             f'pi0{gammatype}_May2020',
             path=path,
             beamBackgroundMVAWeight=beamBackgroundMVAWeight,
-            fakePhotonMVAWeight=fakePhotonMVAWeight)
+            fakePhotonMVAWeight=fakePhotonMVAWeight,
+            biasCorrectionTable=biasCorrectionTable)
         reconstructDecay(f'pi0:reco -> gamma:pi0{gammatype}_May2020 gamma:pi0{gammatype}_May2020',
                          'abs( dM ) < 0.0406',
                          True, path=path)

@@ -98,7 +98,12 @@ def add_pxd_packer(path):
     path.add_module(pxdpacker)
 
 
-def add_pxd_reconstruction(path, clusterName=None, digitsName=None, usePXDClusterShapes=False):
+def add_pxd_reconstruction(
+        path,
+        clusterName='PXDClusters',
+        digitsName=None,
+        usePXDClusterShapes=False,
+        spacePointsName='PXDSpacePoints'):
 
     # register EventTrackingInfo
     if 'RegisterEventLevelTrackingInfo' not in path:
@@ -120,6 +125,11 @@ def add_pxd_reconstruction(path, clusterName=None, digitsName=None, usePXDCluste
         path.add_module(clusterizer)
 
     path.add_module('PXDTrackingEventLevelMdstInfoFiller')
+
+    if 'PXDSpacePointCreator' not in [e.name() for e in path.modules()]:
+        path.add_module('PXDSpacePointCreator',
+                        PXDClusters=clusterName if clusterName else '',
+                        SpacePoints=spacePointsName)
 
 
 def add_pxd_simulation(path, digitsName=None, activatePixelMasks=True, activateGainCorrection=True):

@@ -3344,7 +3344,7 @@ def buildEventKinematics(inputListNames=None, default_cleanup=True, custom_cuts=
         B2INFO("Creating particle lists pi+:evtkin and gamma:evtkin to get the global kinematics of the event.")
         fillParticleList('pi+:evtkin', '', path=path)
         if b2bii.isB2BII():
-            copyList('gamma:evtshape', 'gamma:mdst', path=path)
+            copyList('gamma:evtkin', 'gamma:mdst', path=path)
         else:
             fillParticleList('gamma:evtkin', '', loadPhotonBeamBackgroundMVA=False, loadPhotonHadronicSplitOffMVA=False, path=path)
         particleLists = ['pi+:evtkin', 'gamma:evtkin']

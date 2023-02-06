@@ -112,7 +112,8 @@ void ParticleCombinerModule::initialize()
     }
   }
 
-  if (daughtersNetCharge != EvtPDLUtil::charge(m_pdgCode)) {
+  // The electric charge check makes no sense for an inclusive decay
+  if (!m_decaydescriptor.isIgnoreMassive() and daughtersNetCharge != EvtPDLUtil::charge(m_pdgCode)) {
     if (!m_allowChargeViolation) {
       B2FATAL("Your decay string " << m_decayString << " violates electric charge conservation!\n"
               "If you want to allow this you can set the argument 'allowChargeViolation' to True. Something like:\n"

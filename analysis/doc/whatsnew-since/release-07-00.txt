@@ -9,8 +9,9 @@ Modules
 
 Variables
 +++++++++
-* Added the variables `EcmsMC` and `totalEnergyMC`, which return the true value of :math:`\sqrt{s}` and the true sum of the
-  energies of all generated particles, respectively.
+ * New variable `momentaTripleProduct(i,j,k)` is added for the searches for CP violation via T-odd correlations in multi-body decays.
+ * Added the variables `EcmsMC` and `totalEnergyMC`, which return the true value of :math:`\sqrt{s}` and the true sum of the
+   energies of all generated particles, respectively.
 
 Changes in the analysis package in light-2212-foldex
 ----------------------------------------------------
@@ -30,7 +31,6 @@ Signal embedding
 
 Variables
 +++++++++
- * New variable `momentaTripleProduct(i,j,k)` is added for the searches for CP violation via T-odd correlations in multi-body decays.
  * Extended the variable `useAlternativeDaughterHypothesis` to variables using daughters' pdg codes, e.g. `InvM`.
  * New metavariable `useDaughterRestFrame` to calculate a variable in the rest frame of the given daughters is added.
  * New variable `cosHelicityAngleForQuasiTwoBodyDecay` is added for the angular analysis on a quasi-two-body decay.

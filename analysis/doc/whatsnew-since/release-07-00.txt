@@ -9,7 +9,7 @@ Modules
 
 Variables
 +++++++++
- * New variable `momentaTripleProduct(i,j,k)` is added for the searches for CP violation via T-odd correlations in multi-body decays.
+ * New variable `momentaTripleProduct` is added for the searches for CP violation via T-odd correlations in multi-body decays.
  * Added the variables `EcmsMC` and `totalEnergyMC`, which return the true value of :math:`\sqrt{s}` and the true sum of the
    energies of all generated particles, respectively.
 

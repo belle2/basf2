@@ -142,9 +142,9 @@ def stdPhotons(
 
     if listtype not in ['loose', 'tight']:
         if beamBackgroundMVAWeight:
-            ma.getBeamBackgroundProbability(decayString=f'gamma:{listtype}', weight=beamBackgroundMVAWeight, path=path)
+            ma.getBeamBackgroundProbability(particleList=f'gamma:{listtype}', weight=beamBackgroundMVAWeight, path=path)
         if fakePhotonMVAWeight:
-            ma.getFakePhotonProbability(decayString=f'gamma:{listtype}', weight=fakePhotonMVAWeight, path=path)
+            ma.getFakePhotonProbability(particleList=f'gamma:{listtype}', weight=fakePhotonMVAWeight, path=path)
         if biasCorrectionTable:
             ma.correctEnergyBias(inputListNames=[f'gamma:{listtype}'], tableName=biasCorrectionTable, path=path)
 

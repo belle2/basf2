@@ -155,6 +155,9 @@ namespace Belle2 {
     /** Decay descriptor of the invisible particles */
     DecayDescriptor m_pDDescriptorInvisibles;
 
+    /** Decay descriptor of the ignored particles */
+    DecayDescriptor m_pDDescriptorForIgnoring;
+
     /** StoreArray of Particles */
     StoreArray<Particle> m_particles;
 

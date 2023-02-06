@@ -109,12 +109,6 @@ namespace Belle2 {
     double particleXp(const Particle* part);
 
     /**
-     * return a triple-product of three momenta of offspring in the mother rest frame
-     * for multi-body decays: C_T = p_1 * (p2 x p3)
-     */
-    double particleCT(const Particle* mother, const std::vector<double>& indices);
-
-    /**
      * return particle's pdg code
      */
     int particlePDGCode(const Particle* part);

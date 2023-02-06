@@ -284,6 +284,49 @@ namespace Belle2 {
       return - iDaughter4Vector.Vect().Dot(mother4Vector.Vect()) / iDaughter4Vector.P() / mother4Vector.P();
     }
 
+    double TripleProductOfMomenta(const Particle* mother, const std::vector<double>& indices)
+    {
+      if (indices.size() != 3) {
+        B2FATAL("Wrong number of arguments for TripleProductOfMomenta: three are needed.");
+      }
+      if (mother->getNDaughters() < 3) {
+        B2FATAL("Currently getCT() only supports the four-body (M->D1D2D3D4) or three-body (M->[R->D1D2]D3D4) decays.");
+      }
+
+      int iDau = std::lround(indices[0]);
+      int jDau = std::lround(indices[1]);
+      int kDau = std::lround(indices[2]);
+
+      const Particle* iDaughter = mother->getNDaughters() == 3 ? mother->getDaughter(0)->getDaughter(iDau) : mother->getDaughter(iDau);
+      if (!iDaughter) {
+        if (mother->getNDaughters() == 4) B2FATAL("Couldn't find the " << iDau << "th daughter.");
+        else if (mother->getNDaughters() == 3) B2FATAL("Couldn't find the " << iDau <<
+                                                         "th granddaughter (daughter of the first daughter).");
+      }
+      const Particle* jDaughter =  mother->getDaughter(jDau);
+      if (!jDaughter)
+        B2FATAL("Couldn't find the " << jDau << "th daughter.");
+      const Particle* kDaughter =  mother->getDaughter(kDau);
+      if (!kDaughter)
+        B2FATAL("Couldn't find the " << kDau << "th daughter.");
+
+      PxPyPzEVector mother4Vector = mother->get4Vector();
+      PxPyPzEVector iDaughter4Vector = iDaughter->get4Vector();
+      PxPyPzEVector jDaughter4Vector = jDaughter->get4Vector();
+      PxPyPzEVector kDaughter4Vector = kDaughter->get4Vector();
+
+      B2Vector3D motherBoost = mother4Vector.BoostToCM();
+
+      // We boost the momenta of offspring to the reference frame of the mother.
+      iDaughter4Vector = Boost(motherBoost) * iDaughter4Vector;
+      jDaughter4Vector = Boost(motherBoost) * jDaughter4Vector;
+      kDaughter4Vector = Boost(motherBoost) * kDaughter4Vector;
+
+      // cross product: p_j x p_k
+      B2Vector3D jkDaughterCrossProduct = jDaughter4Vector.Vect().Cross(kDaughter4Vector.Vect());
+      // triple product: p_i * (p_j x p_k)
+      return iDaughter4Vector.Vect().Dot(jkDaughterCrossProduct) ;
+    }
 
     VARIABLE_GROUP("Helicity variables");
 
@@ -370,6 +413,12 @@ namespace Belle2 {
                       the selected indices are (1, 2), the variable will return the angle between the momentum of the :math:`\bar{B}^0` 
                       and the momentum of the :math:`K^-`, both momenta in the rest frame of the :math:`K^- K^{*0}`.)DOC");
 
+    REGISTER_VARIABLE("TripleProductOfMomenta(i,j,k)", TripleProductOfMomenta, R"DOC(
+a triple-product of three momenta of final-state particles in the mother rest frame: :math:`C_T=\vec{p}_i\cdot(\vec{p}_j\times\vec{p}_k)`.
+For four-body decay M->D1D2D3D3, getCT(0,1,2) returns a triple-product of three momenta of D1D2D3 in the mother M rest frame. 
+It also supports the three-body decay in which one daughter has a secondary decay, 
+e.g. for M->(R->D1D2)D3D4, getCT(0,1,2) returns a triple-product of three momenta of D1D3D4 in the mother M rest frame.
+)DOC"); 
 
   }
 }

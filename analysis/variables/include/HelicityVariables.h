@@ -83,5 +83,11 @@ namespace Belle2 {
      */
     double cosHelicityAngleForQuasiTwoBodyDecay(const Particle* mother, const std::vector<double>& indices);
 
+    /**
+     * return a triple-product of three momenta of offspring (i,j,k) in the mother rest frame
+     * for multi-body decays: C_T = p_i * (p_j x p_k)
+     */
+    double TripleProductOfMomenta(const Particle* mother, const std::vector<double>& indices);
+
   }
 } // Belle2 namespace

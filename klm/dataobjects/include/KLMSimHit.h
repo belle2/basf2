@@ -8,6 +8,10 @@
 
 #pragma once
 
+/* KLM headers. */
+#include <klm/dataobjects/bklm/BKLMElementNumbers.h>
+#include <klm/dataobjects/KLMElementNumbers.h>
+
 /* Belle 2 headers. */
 #include <simulation/dataobjects/SimHitBase.h>
 
@@ -18,26 +22,23 @@
 namespace Belle2 {
 
   /**
-   * Class EKLMSimHit stores information on particular Geant step;
-   * using information from TrackID and ParentTrackID it is possible
-   * to restore the hit tree and thus another type of hits.
+   * KLM simulation hit.
    */
-
-  class EKLMSimHit : public SimHitBase {
+  class KLMSimHit : public SimHitBase {
 
   public:
 
     /**
      * Constructor.
      */
-    EKLMSimHit()
+    KLMSimHit()
     {
     }
 
     /**
      * Destructor.
      */
-    ~EKLMSimHit()
+    ~KLMSimHit()
     {
     }
 
@@ -105,6 +106,24 @@ namespace Belle2 {
     }
 
     /**
+     * Get subdetector number.
+     * @return Subdetector number.
+     */
+    int getSubdetector() const
+    {
+      return m_Subdetector;
+    }
+
+    /**
+     * Set subdetector number.
+     * @param[in] subdetector Subdetector number.
+     */
+    void setSubdetector(int subdetector)
+    {
+      m_Subdetector = subdetector;
+    }
+
+    /**
      * Get section number.
      * @return Section number.
      */
@@ -168,6 +187,14 @@ namespace Belle2 {
     }
 
     /**
+     * Check whether the hit is from phi plane.
+     */
+    bool isPhiReadout() const
+    {
+      return (m_Plane == BKLMElementNumbers::c_PhiPlane);
+    }
+
+    /**
      * Set plane number.
      * @param[in] plane Plane number.
      */
@@ -192,6 +219,34 @@ namespace Belle2 {
     void setStrip(int strip)
     {
       m_Strip = strip;
+    }
+
+    /**
+     * Get last strip number.
+     * @return Last strip number.
+     */
+    int getLastStrip() const
+    {
+      return m_LastStrip;
+    }
+
+    /**
+     * Set last strip number.
+     * @param[in] lastStrip Last strip number.
+     */
+    void setLastStrip(int lastStrip)
+    {
+      m_LastStrip = lastStrip;
+    }
+
+    /**
+     * Determine whether the hit is in RPC or scintillator.
+     * @return Whether hit is in RPC (true) or scintillator (false).
+     */
+    bool inRPC() const
+    {
+      return (m_Subdetector == KLMElementNumbers::c_BKLM &&
+              m_Layer >= BKLMElementNumbers::c_FirstRPCLayer);
     }
 
     /**
@@ -228,6 +283,24 @@ namespace Belle2 {
     void setTime(float time)
     {
       m_Time = time;
+    }
+
+    /**
+     * Get signal propagation time.
+     * @return Time of propagation (ns) from strip to sensor.
+     */
+    float getPropagationTime() const
+    {
+      return m_PropagationTime;
+    }
+
+    /**
+     * Set signal propagation time.
+     * @param[in] propagationTime Time of propagation (ns) from strip to sensor.
+     */
+    void setPropagationTime(float propagationTime)
+    {
+      m_PropagationTime = propagationTime;
     }
 
     /**
@@ -401,6 +474,9 @@ namespace Belle2 {
     /** Volume identifier. */
     int m_volid = -1;
 
+    /** Number of subdetector. */
+    int m_Subdetector = 0;
+
     /** Number of section. */
     int m_Section = 0;
 
@@ -416,11 +492,17 @@ namespace Belle2 {
     /** Number of strip. */
     int m_Strip = 0;
 
+    /** Number of last strip (for BKLM RPC hits). */
+    int m_LastStrip;
+
     /** Time of the hit. */
     float m_Time = -1;
 
     /** Energy deposition. */
     float m_EDep = -1;
+
+    /** Time of propagation (ns) from hit to sensor. */
+    float m_PropagationTime = 0;
 
     /** Local position X coordinate. */
     float m_localX = 0;
@@ -453,7 +535,7 @@ namespace Belle2 {
     float m_pZ = 0;
 
     /** Class version. */
-    ClassDefOverride(Belle2::EKLMSimHit, 3);
+    ClassDefOverride(Belle2::KLMSimHit, 1);
 
   };
 

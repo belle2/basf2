@@ -123,6 +123,15 @@ void KLMElementNumbers::channelNumberToElementNumbers(
   }
 }
 
+KLMPlaneNumber KLMElementNumbers::planeNumber(
+  int subdetector, int section, int sector, int layer, int plane) const
+{
+  if (subdetector == c_BKLM)
+    return planeNumberBKLM(section, sector, layer, plane);
+  else
+    return planeNumberEKLM(section, sector, layer, plane);
+}
+
 KLMPlaneNumber KLMElementNumbers::planeNumberBKLM(
   int section, int sector, int layer, int plane) const
 {

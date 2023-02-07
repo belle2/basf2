@@ -9,10 +9,6 @@
 /* Own header. */
 #include <klm/bklm/modules/bklmSimHistogrammer/BKLMSimHistogrammerModule.h>
 
-/* KLM headers. */
-#include <klm/dataobjects/bklm/BKLMSimHit.h>
-#include <klm/dataobjects/KLMDigit.h>
-
 /* Belle 2 headers. */
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreArray.h>
@@ -137,7 +133,7 @@ void BKLMSimHistogrammerModule::event()
     int scaledTag = -1;
     RelationVector<KLMDigit> bklmDigits = hits1D[i]->getRelationsTo<KLMDigit>();
     for (const auto& bklmDigit : bklmDigits) {
-      RelationVector<BKLMSimHit> relatedSimHits = bklmDigit.getRelationsWith<BKLMSimHit>();
+      RelationVector<KLMSimHit> relatedSimHits = bklmDigit.getRelationsWith<KLMSimHit>();
       for (const auto& simHit : relatedSimHits) {
         auto bgTag = simHit.getBackgroundTag();
         scaledTag = bgTag;
@@ -167,7 +163,7 @@ void BKLMSimHistogrammerModule::event()
     for (const auto& hit1d : related1DHits) {
       RelationVector<KLMDigit> bklmDigits = hit1d.getRelationsTo<KLMDigit>();
       for (const auto& bklmDigit : bklmDigits) {
-        RelationVector<BKLMSimHit> relatedSimHits = bklmDigit.getRelationsWith<BKLMSimHit>();
+        RelationVector<KLMSimHit> relatedSimHits = bklmDigit.getRelationsWith<KLMSimHit>();
         for (const auto& simHit : relatedSimHits) {
           auto bgTag = simHit.getBackgroundTag();
           scaledTag = bgTag;
@@ -202,7 +198,7 @@ void BKLMSimHistogrammerModule::event()
     }
   }
   for (int h = 0; h < nSimHit; ++h) {
-    BKLMSimHit* simHit = simHits[h];
+    KLMSimHit* simHit = simHits[h];
 
     RelationVector<MCParticle> bklmMCParticles = simHit->getRelationsFrom<MCParticle>();
     if (bklmMCParticles.size() > 0) {

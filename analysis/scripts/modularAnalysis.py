@@ -3170,23 +3170,28 @@ def lowEnergyPi0Identification(pi0List, gammaList, payloadNameSuffix,
                                path=None):
     """
     Calculate low-energy pi0 identification.
-    The result is stored as ExtraInfo ``lowEnergyPi0Identification``.
+    The result is stored as ExtraInfo ``lowEnergyPi0Identification`` for
+    the list pi0List.
 
-    @param pi0List              Pi0 list.
-    @param gammaList            Gamma list. First, an energy cut E > 0.2 is applied
-                                to the photons from this list. Then, all possible combinations with a pi0
-                                daughter photon are formed except the one corresponding to
-                                the reconstructed pi0. The maximum low-energy pi0 veto value is calculated
-                                for such photon pairs and used as one of the input variables for
-                                the identification classifier.
-    @param payloadNameSuffix    Payload name suffix. The weight payloads are stored in
-                                the analysis global tag and have the following names:\n
-                                  * ``'LowEnergyPi0Veto' + payloadNameSuffix``
-                                  * ``'LowEnergyPi0Identification' + payloadNameSuffix``\n
-                                The possible suffixes are:\n
-                                  * ``'Belle1'`` for Belle data.
-                                  * ``'Belle2Release5'`` for Belle II release 5 data (MC14, proc12, buckets 16 - 25).\n
-    @param path                 Module path.
+    Parameters:
+        pi0List (str): Pi0 list.
+
+        gammaList (str): Gamma list. First, an energy cut E > 0.2 is applied to the photons from this list.
+                         Then, all possible combinations with a pi0 daughter photon are formed except the one
+                         corresponding to the reconstructed pi0.
+                         The maximum low-energy pi0 veto value is calculated for such photon pairs
+                         and used as one of the input variables for the identification classifier.
+
+        payloadNameSuffix (str): Payload name suffix. The weight payloads are stored in the analysis global
+                                 tag and have the following names:\n
+                                 * ``'LowEnergyPi0Veto' + payloadNameSuffix``
+                                 * ``'LowEnergyPi0Identification' + payloadNameSuffix``\n
+                                 The possible suffixes are:\n
+                                 * ``'Belle1'`` for Belle data.
+                                 * ``'Belle2Release5'`` for Belle II release 5 data (MC14, proc12, buckets 16 - 25).
+                                 * ``'Belle2Release6'`` for Belle II release 6 data (MC15, proc13, buckets 26 - 36).
+
+        path (basf2.Path): Module path.
     """
 
     import b2bii
@@ -3302,7 +3307,7 @@ def buildEventKinematics(inputListNames=None, default_cleanup=True, custom_cuts=
         B2INFO("Creating particle lists pi+:evtkin and gamma:evtkin to get the global kinematics of the event.")
         fillParticleList('pi+:evtkin', '', path=path)
         if b2bii.isB2BII():
-            copyList('gamma:evtshape', 'gamma:mdst', path=path)
+            copyList('gamma:evtkin', 'gamma:mdst', path=path)
         else:
             fillParticleList('gamma:evtkin', '', loadPhotonBeamBackgroundMVA=False, loadPhotonHadronicSplitOffMVA=False, path=path)
         particleLists = ['pi+:evtkin', 'gamma:evtkin']
@@ -3389,8 +3394,7 @@ def buildEventShape(inputListNames=None,
        If the lists provided by the user contain several times the same track (either with
        different mass hypothesis, or once as an independent particle and once as daughter of a
        combined particle) the results won't be reliable.
-       A basic check for duplicates is available setting the checkForDuplicate flags,
-       but is usually quite time consuming.
+       A basic check for duplicates is available setting the checkForDuplicate flags.
 
 
     @param inputListNames     List of ParticleLists used to calculate the
@@ -3416,9 +3420,9 @@ def buildEventShape(inputListNames=None,
     @param jets               Enables the calculation of the hemisphere momenta and masses.
                               Requires thrust = True.
     @param sphericity         Enables the calculation of the sphericity-related quantities.
-    @param checkForDuplicates Perform a check for duplicate particles before adding them. This option
-                              is quite time consuming, instead of using it consider sanitizing
-                              the lists you are passing to the function.
+    @param checkForDuplicates Perform a check for duplicate particles before adding them. Regardless of the value of this option,
+                              it is recommended to consider sanitizing the lists you are passing to the function.
+
     """
 
     if inputListNames is None:

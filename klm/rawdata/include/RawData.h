@@ -18,6 +18,9 @@ namespace Belle2 {
 
   namespace KLM {
 
+    /** Number of channels in ASIC. */
+    const int c_NChannelsAsic = 15;
+
     /**
      * Channel group.
      */

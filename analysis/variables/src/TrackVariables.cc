@@ -36,6 +36,28 @@ namespace Belle2 {
 
     static const double realNaN = std::numeric_limits<double>::quiet_NaN();
     static const B2Vector3D vecNaN(realNaN, realNaN, realNaN);
+    static const std::unordered_map<std::string, std::vector<double>> detector_map = {
+      {"CDC", {16.8, 150.0, -75.0}},
+      {"CDC0", {16.8, 150.0, -75.0}},
+      {"CDC1", {25.7, 150.0, -75.0}},
+      {"CDC2", {36.52, 150.0, -75.0}},
+      {"CDC3", {47.69, 150.0, -75.0}},
+      {"CDC4", {58.41, 150.0, -75.0}},
+      {"CDC5", {69.53, 150.0, -75.0}},
+      {"CDC6", {80.25, 150.0, -75.0}},
+      {"CDC7", {91.37, 150.0, -75.0}},
+      {"CDC8", {102.09, 150.0, -75.0}},
+      {"TOP", {117.8, 193.0, -94.0}},
+      {"TOP0", {117.8, 193.0, -94.0}},
+      {"ARICH", {117.8, 193.0, -94.0}},
+      {"ARICH0", {117.8, 193.0, -94.0}},
+      {"ECL", {125.0, 196.0, -102.0}},
+      {"ECL0", {125.0, 196.0, -102.0}},
+      {"ECL1", {140.0, 211.0, -117.0}},
+      {"KLM", {202.0, 283.9, -189.9}},
+      {"KLM0", {202.0, 283.9, -189.9}},
+    };
+
 
     double trackNHits(const Particle* part, const Const::EDetector& det)
     {
@@ -330,6 +352,44 @@ namespace Belle2 {
       B2Vector3D position = getPositionOnHelix(part, pars);
       if (position == vecNaN) return realNaN;
       return position.Phi();
+    }
+
+    Manager::FunctionPtr trackHelixExtThetaOnDet(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() != 1 && arguments.size() != 2)
+        B2FATAL("Exactly one (+1 optional) parameter (detector_surface_name, [useHighestProbMass]) is required for helixExtThetaOnDet.");
+      if (detector_map.find(arguments[0]) == detector_map.end())
+        B2FATAL("Given detector surface name is not supported.");
+
+      std::vector<double> parameters = detector_map.at(arguments[0]);
+      if (arguments.size() == 2)
+        parameters.push_back(std::stod(arguments[1]));
+
+      auto func = [parameters](const Particle * part) -> double {
+        B2Vector3D position = getPositionOnHelix(part, parameters);
+        if (position == vecNaN) return realNaN;
+        return position.Theta();
+      };
+      return func;
+    }
+
+    Manager::FunctionPtr trackHelixExtPhiOnDet(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() != 1 && arguments.size() != 2)
+        B2FATAL("Exactly one (+1 optional) parameter (detector_surface_name, [useHighestProbMass]) is required for helixExtPhiOnDet.");
+      if (detector_map.find(arguments[0]) == detector_map.end())
+        B2FATAL("Given detector surface name is not supported.");
+
+      std::vector<double> parameters = detector_map.at(arguments[0]);
+      if (arguments.size() == 2)
+        parameters.push_back(std::stod(arguments[1]));
+
+      auto func = [parameters](const Particle * part) -> double {
+        B2Vector3D position = getPositionOnHelix(part, parameters);
+        if (position == vecNaN) return realNaN;
+        return position.Phi();
+      };
+      return func;
     }
 
 
@@ -738,6 +798,24 @@ Returns NaN if called for something other than a track-based particle.
     REGISTER_VARIABLE("helixExtPhi(radius, z fwd, z bwd, useHighestProbMass=0)", trackHelixExtPhi,
                       "Returns phi of extrapolated helix parameters. If ``useHighestProbMass=1`` is set, the extrapolation will use the track fit result for the mass hypothesis with the highest pValue.\n\n",
                       "rad");
+
+    REGISTER_METAVARIABLE("helixExtThetaOnDet(detector_surface_name, useHighestProbMass=0)", trackHelixExtThetaOnDet,
+                          R"DOC(Returns theta of extrapolated helix parameters on the given detector surface. The unit of angle is `rad`.
+                          If ``useHighestProbMass=1`` is set, the extrapolation will use the track fit result for the mass hypothesis with the highest pValue.
+                          The supported detector surface names are ``{'CDC', 'TOP', 'ARICH', 'ECL', 'KLM'}``.
+                          Also, the detector name with number of meaningful-layer is supported, e.g. ``'CDC8'``: last superlayer of CDC, ``'ECL1'``: mid-point of ECL.
+
+                          ..note:: You can find more information in `modularAnalysis.calculateTrackIsolation`.
+                          )DOC", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("helixExtPhiOnDet(detector_surface_name, useHighestProbMass=0)", trackHelixExtPhiOnDet,
+                          R"DOC(Returns phi of extrapolated helix parameters on the given detector surface. The unit of angle is `rad`.
+                          If ``useHighestProbMass=1`` is set, the extrapolation will use the track fit result for the mass hypothesis with the highest pValue.
+                          The supported detector surface names are ``{'CDC', 'TOP', 'ARICH', 'ECL', 'KLM'}``.
+                          Also, the detector name with number of meaningful-layer is supported, e.g. ``'CDC8'``: last superlayer of CDC, ``'ECL1'``: mid-point of ECL.
+
+                          ..note:: You can find more information in `modularAnalysis.calculateTrackIsolation`.
+                          )DOC", Manager::VariableDataType::c_double);
+
 
     REGISTER_VARIABLE("nExtraCDCHits", nExtraCDCHits, R"DOC(
 [Eventbased] The number of CDC hits in the event not assigned to any track.

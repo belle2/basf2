@@ -87,7 +87,7 @@ namespace Belle2 {
     /**
      * return a triple-product of three momenta of offspring (i,j,k) in the mother rest frame:  C_T = p_i * (p_j x p_k)
      */
-    double momentaTripleProduct(const Particle* mother, const std::vector<std::string>& indices);
+    Manager::FunctionPtr momentaTripleProduct(const std::vector<std::string>& arguments);
 
   }
 } // Belle2 namespace

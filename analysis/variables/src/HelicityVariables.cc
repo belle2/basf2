@@ -286,43 +286,45 @@ namespace Belle2 {
       return - iDaughter4Vector.Vect().Dot(mother4Vector.Vect()) / iDaughter4Vector.P() / mother4Vector.P();
     }
 
-    double momentaTripleProduct(const Particle* mother, const std::vector<std::string>& indices)
+    Manager::FunctionPtr momentaTripleProduct(const std::vector<std::string>& arguments)
     {
-      if (indices.size() != 3) {
+      if (arguments.size() != 3) {
         B2FATAL("Wrong number of arguments for momentaTripleProduct: three (particles) are needed.");
       }
 
-      auto iDau = indices[0];
-      auto jDau = indices[1];
-      auto kDau = indices[2];
+      // wrap with func and return it
+      auto func = [arguments](const Particle * mother) -> double {
+        auto iDau = arguments[0];
+        auto jDau = arguments[1];
+        auto kDau = arguments[2];
 
-      const Particle* iDaughter = mother->getParticleFromGeneralizedIndexString(iDau);
-      if (!iDaughter)
-        B2FATAL("Couldn't find the " << iDau << "th daughter.");
-      const Particle* jDaughter =  mother->getParticleFromGeneralizedIndexString(jDau);
-      if (!jDaughter)
-        B2FATAL("Couldn't find the " << jDau << "th daughter.");
-      const Particle* kDaughter =  mother->getParticleFromGeneralizedIndexString(kDau);
-      if (!kDaughter)
-        B2FATAL("Couldn't find the " << kDau << "th daughter.");
+        const Particle* iDaughter = mother->getParticleFromGeneralizedIndexString(iDau);
+        if (!iDaughter) B2FATAL("Couldn't find the " << iDau << "th daughter.");
+        const Particle* jDaughter =  mother->getParticleFromGeneralizedIndexString(jDau);
+        if (!jDaughter) B2FATAL("Couldn't find the " << jDau << "th daughter.");
+        const Particle* kDaughter =  mother->getParticleFromGeneralizedIndexString(kDau);
+        if (!kDaughter) B2FATAL("Couldn't find the " << kDau << "th daughter.");
 
-      PxPyPzEVector mother4Vector = mother->get4Vector();
-      PxPyPzEVector iDaughter4Vector = iDaughter->get4Vector();
-      PxPyPzEVector jDaughter4Vector = jDaughter->get4Vector();
-      PxPyPzEVector kDaughter4Vector = kDaughter->get4Vector();
+        PxPyPzEVector mother4Vector = mother->get4Vector();
+        PxPyPzEVector iDaughter4Vector = iDaughter->get4Vector();
+        PxPyPzEVector jDaughter4Vector = jDaughter->get4Vector();
+        PxPyPzEVector kDaughter4Vector = kDaughter->get4Vector();
 
-      B2Vector3D motherBoost = mother4Vector.BoostToCM();
+        B2Vector3D motherBoost = mother4Vector.BoostToCM();
 
-      // We boost the momenta of offspring to the reference frame of the mother.
-      iDaughter4Vector = Boost(motherBoost) * iDaughter4Vector;
-      jDaughter4Vector = Boost(motherBoost) * jDaughter4Vector;
-      kDaughter4Vector = Boost(motherBoost) * kDaughter4Vector;
+        // We boost the momenta of offspring to the reference frame of the mother.
+        iDaughter4Vector = Boost(motherBoost) * iDaughter4Vector;
+        jDaughter4Vector = Boost(motherBoost) * jDaughter4Vector;
+        kDaughter4Vector = Boost(motherBoost) * kDaughter4Vector;
 
-      // cross product: p_j x p_k
-      B2Vector3D jkDaughterCrossProduct = jDaughter4Vector.Vect().Cross(kDaughter4Vector.Vect());
-      // triple product: p_i * (p_j x p_k)
-      return iDaughter4Vector.Vect().Dot(jkDaughterCrossProduct) ;
+        // cross product: p_j x p_k
+        B2Vector3D jkDaughterCrossProduct = jDaughter4Vector.Vect().Cross(kDaughter4Vector.Vect());
+        // triple product: p_i * (p_j x p_k)
+        return iDaughter4Vector.Vect().Dot(jkDaughterCrossProduct) ;
+      };
+      return func;
     }
+
 
     VARIABLE_GROUP("Helicity variables");
 
@@ -413,7 +415,7 @@ namespace Belle2 {
 a triple-product of three momenta of offspring in the mother rest frame: :math:`C_T=\vec{p}_i\cdot(\vec{p}_j\times\vec{p}_k)`. For examples,
 In a four-body decay M->D1D2D3D4, momentaTripleProduct(0,1,2) returns CT using the momenta of D1D2D3 particles. 
 In other decays involving secondary decay, e.g. for M->(R->D1D2)D3D4, momentaTripleProduct(0:0,1,2) returns C_T using momenta of D1D3D4 particles.
-)DOC"); 
+)DOC", Manager::VariableDataType::c_double); 
 
   }
 }

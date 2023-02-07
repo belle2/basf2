@@ -953,45 +953,51 @@ Returns -1 in case of unknown process.
 
 Returns 0 if the particle is primary, i.e. produced by the event generator and not Geant4. Particles produced by Geant4 (i.e. secondary particles) include those produced in interaction with detector material, Bremsstrahlung, and the decay products of long-lived particles (e.g. muons, pions, K_S0, K_L0, Lambdas, ...).
 
-    List of possible values (taken from the Geant4 source)
+List of possible values (taken from the Geant4 source of
+`G4DecayProcessType <https://github.com/Geant4/geant4/blob/v10.6.3/source/processes/decay/include/G4DecayProcessType.hh>`_,
+`G4HadronicProcessType <https://github.com/Geant4/geant4/blob/v10.6.3/source/processes/hadronic/management/include/G4HadronicProcessType.hh>`_,
+`G4TransportationProcessType <https://github.com/Geant4/geant4/blob/v10.6.3/source/processes/transportation/include/G4TransportationProcessType.hh>`_ and
+`G4EmProcessSubType <https://github.com/Geant4/geant4/blob/v10.6.3/source/processes/electromagnetic/utils/include/G4EmProcessSubType.hh>`_)
 
-    * 1 Coulomb scattering
-    * 2 Ionisation
-    * 3 Bremsstrahlung
-    * 4 Pair production by charged
-    * 5 Annihilation
-    * 6 Annihilation to mu mu
-    * 7 Annihilation to hadrons
-    * 8 Nuclear stopping
-    * 9 Electron general process
-    * 10 Multiple scattering
-    * 11 Rayleigh
-    * 12 Photo-electric effect
-    * 13 Compton scattering
-    * 14 Gamma conversion
-    * 15 Gamma conversion to mu mu
-    * 16 Gamma general process
-    * 21 Cerenkov
-    * 22 Scintillation
-    * 23 Synchrotron radiation
-    * 24 Transition radiation
-    * 91 Transportation
-    * 92 Coupled transportation
-    * 111 Hadron elastic
-    * 121 Hadron inelastic
-    * 131 Capture
-    * 132 Mu atomic capture
-    * 141 Fission
-    * 151 Hadron at rest
-    * 152 Lepton at rest
-    * 161 Charge exchange
-    * 201 Decay
-    * 202 Decay with spin
-    * 203 Decay (pion make spin)
-    * 211 Unknown decay
-    * 221 Mu atom decay
-    * 231 External decay
+* 1 Coulomb scattering
+* 2 Ionisation
+* 3 Bremsstrahlung
+* 4 Pair production by charged
+* 5 Annihilation
+* 6 Annihilation to mu mu
+* 7 Annihilation to hadrons
+* 8 Nuclear stopping
+* 9 Electron general process
+* 10 Multiple scattering
+* 11 Rayleigh
+* 12 Photo-electric effect
+* 13 Compton scattering
+* 14 Gamma conversion
+* 15 Gamma conversion to mu mu
+* 16 Gamma general process
+* 21 Cerenkov
+* 22 Scintillation
+* 23 Synchrotron radiation
+* 24 Transition radiation
+* 91 Transportation
+* 92 Coupled transportation
+* 111 Hadron elastic
+* 121 Hadron inelastic
+* 131 Capture
+* 132 Mu atomic capture
+* 141 Fission
+* 151 Hadron at rest
+* 152 Lepton at rest
+* 161 Charge exchange
+* 201 Decay
+* 202 Decay with spin
+* 203 Decay (pion make spin)
+* 210 Radioactive decay
+* 211 Unknown decay
+* 221 Mu atom decay
+* 231 External decay
 
+.. note:: This is what `modularAnalysis.printMCParticles` shows as ``creation process`` when ``showStatus`` is set to ``True``.
 )DOC");
     REGISTER_VARIABLE("mcParticleStatus", mcParticleStatus,
                       "Returns status bits of related MCParticle or NaN if MCParticle relation is not set.");

@@ -59,8 +59,8 @@ void TrackFitResultEstimatorModule::initialize()
 void TrackFitResultEstimatorModule::event()
 {
 
-  TMatrixDSym dummyCovariance(7);
-  for (int row = 0; row < 7; ++row) {
+  TMatrixDSym dummyCovariance(6);
+  for (int row = 0; row < 6; ++row) {
     dummyCovariance(row, row) = 10000;
   }
 

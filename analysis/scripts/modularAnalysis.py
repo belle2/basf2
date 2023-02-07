@@ -4002,6 +4002,21 @@ def scaleError(outputListName, inputListName,
     path.add_module(scale_error)
 
 
+def estimateAndAttachTrackFitResult(inputListName, path=None):
+    """
+    Create a TrackFitResult estimating from the momentum of a charged Particle and make a relation between them.
+    The IP position is used for the estimation of TrackFitResult.
+
+    @param inputListName Name of input charged ParticleList
+
+    """
+
+    estimator = register_module("TrackFitResultEstimator")
+    estimator.set_name("trackFitResultEstimator_" + inputListName)
+    estimator.param("inputListName", inputListName)
+    path.add_module(estimator)
+
+
 def correctEnergyBias(inputListNames, tableName, path=None):
     """
     Scale energy of the particles according to the scaling factor.

@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <analysis/modules/TrackHelixEstimator/TrackHelixEstimator.h>
+#include <analysis/modules/TrackFitResultEstimator/TrackFitResultEstimator.h>
 
 #include <framework/datastore/RelationArray.h>
 #include <framework/geometry/BFieldManager.h>
@@ -24,13 +24,13 @@ using namespace ROOT::Math;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(TrackHelixEstimator);
+REG_MODULE(TrackFitResultEstimator);
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-TrackHelixEstimatorModule::TrackHelixEstimatorModule() : Module()
+TrackFitResultEstimatorModule::TrackFitResultEstimatorModule() : Module()
 {
   // Set module properties
   setDescription("Create a TrackFitResult from a Particle's momentum and make a relation between them."); // more information should be added.
@@ -41,7 +41,7 @@ TrackHelixEstimatorModule::TrackHelixEstimatorModule() : Module()
            std::string(""));
 }
 
-void TrackHelixEstimatorModule::initialize()
+void TrackFitResultEstimatorModule::initialize()
 {
   DecayDescriptor decaydescriptor;
   bool valid = decaydescriptor.init(m_inputListName);
@@ -56,7 +56,7 @@ void TrackHelixEstimatorModule::initialize()
   m_particles.registerRelationTo(m_trackfitresults);
 }
 
-void TrackHelixEstimatorModule::event()
+void TrackFitResultEstimatorModule::event()
 {
 
   TMatrixDSym dummyCovariance(7);

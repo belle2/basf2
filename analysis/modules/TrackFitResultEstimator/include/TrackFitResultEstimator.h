@@ -20,16 +20,16 @@
 
 namespace Belle2 {
   /**
-  * Create a TrackFitResult from a Particle's momentum and make a relation between them.
+  * Create a TrackFitResult from the momentum of a Particle and make a relation between them.
   */
-  class TrackHelixEstimatorModule : public Module {
+  class TrackFitResultEstimatorModule : public Module {
 
   public:
 
     /**
     * Constructor
     */
-    TrackHelixEstimatorModule();
+    TrackFitResultEstimatorModule();
 
     /**
      * Initialize the Module.

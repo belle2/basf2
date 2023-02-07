@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <analysis/VariableManager/Manager.h>
+
 #include <vector>
 #include <string>
 

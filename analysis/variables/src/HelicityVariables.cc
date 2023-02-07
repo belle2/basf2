@@ -9,6 +9,8 @@
 // Own include
 #include <analysis/variables/HelicityVariables.h>
 
+#include <analysis/VariableManager/Utility.h>
+
 #include <analysis/variables/EventVariables.h>
 
 #include <analysis/dataobjects/Particle.h>

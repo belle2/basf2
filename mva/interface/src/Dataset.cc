@@ -705,6 +705,9 @@ namespace Belle2 {
 
     void ROOTDataset::setTargetRootInputType()
     {
+      // if we don't pass a target_variable just take the default type.
+      if (m_general_options.m_target_variable.empty()) return;
+
       std::string branchName = Belle2::MakeROOTCompatible::makeROOTCompatible(m_general_options.m_target_variable);
 
       TBranch* branch = m_tree->GetBranch(branchName.c_str());

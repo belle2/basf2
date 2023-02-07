@@ -413,7 +413,7 @@ namespace Belle2 {
                       the selected indices are (1, 2), the variable will return the angle between the momentum of the :math:`\bar{B}^0` 
                       and the momentum of the :math:`K^-`, both momenta in the rest frame of the :math:`K^- K^{*0}`.)DOC");
 
-    REGISTER_VARIABLE("momentaTripleProduct(i,j,k)", momentaTripleProduct, R"DOC(
+    REGISTER_METAVARIABLE("momentaTripleProduct(i,j,k)", momentaTripleProduct, R"DOC(
 a triple-product of three momenta of offspring in the mother rest frame: :math:`C_T=\vec{p}_i\cdot(\vec{p}_j\times\vec{p}_k)`. For examples,
 In a four-body decay M->D1D2D3D4, momentaTripleProduct(0,1,2) returns CT using the momenta of D1D2D3 particles. 
 In other decays involving secondary decay, e.g. for M->(R->D1D2)D3D4, momentaTripleProduct(0:0,1,2) returns C_T using momenta of D1D3D4 particles.

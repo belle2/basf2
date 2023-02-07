@@ -9,9 +9,9 @@ Modules
 
 Variables
 +++++++++
- * New variable `momentaTripleProduct` is added for the searches for CP violation via T-odd correlations in multi-body decays.
- * Added the variables `EcmsMC` and `totalEnergyMC`, which return the true value of :math:`\sqrt{s}` and the true sum of the
-   energies of all generated particles, respectively.
+* New variable `momentaTripleProduct` is added for the searches for CP violation via T-odd correlations in multi-body decays.
+* Added the variables `EcmsMC` and `totalEnergyMC`, which return the true value of :math:`\sqrt{s}` and the true sum of the
+  energies of all generated particles, respectively.
 
 Changes in the analysis package in light-2212-foldex
 ----------------------------------------------------

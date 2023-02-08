@@ -56,7 +56,8 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
                                   enableNisKsFinder=True,
                                   HadronA=True, HadronB=True,
                                   enableRecTrg=False, enableEvtcls=True,
-                                  SmearTrack=2, enableLocalDB=True):
+                                  SmearTrack=2, enableLocalDB=True,
+                                  convertNbar=False):
     """
     Loads Belle MDST file and converts in each event the Belle MDST dataobjects to Belle II MDST
     data objects and loads them to the StoreArray.
@@ -169,10 +170,12 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
     convert.param("nisKsInfo", enableNisKsFinder)
     convert.param("RecTrg", enableRecTrg)
     convert.param("convertEvtcls", enableEvtcls)
+    convert.param("convertNbar", convertNbar)
     # convert.logging.set_log_level(LogLevel.DEBUG)
     # convert.logging.set_info(LogLevel.DEBUG, LogInfo.LEVEL | LogInfo.MESSAGE)
     path.add_module(convert)
-    path.add_module('BelleNbarMVA', particleList='anti-n0:mdst', identifier='nbarMVA')
+    if (convertNbar is True):
+        path.add_module('BelleNbarMVA', particleList='anti-n0:mdst', identifier='nbarMVA')
 
 
 def parse_process_url(url):

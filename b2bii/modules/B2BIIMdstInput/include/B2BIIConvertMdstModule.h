@@ -151,6 +151,7 @@ namespace Belle2 {
 
     bool m_convertTrkExtra; /**< Flag to switch on conversion of first(last)_{x,y,z} of mdst_trk_fit */
 
+    bool m_convertNbar; /**< Flag to create anti-n0:mdst list from gamma:mdst */
     /**
      * E9/E25 threshold value
      * clusters with a value above this threshold are classified as neutral

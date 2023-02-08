@@ -180,6 +180,7 @@ B2BIIConvertMdstModule::B2BIIConvertMdstModule() : Module(),
   addParam("nisKsInfo", m_nisEnable, "Flag to switch on conversion of nisKsFinder info", true);
   addParam("RecTrg", m_convertRecTrg, "Flag to switch on conversion of rectrg_summary3", false);
   addParam("TrkExtra", m_convertTrkExtra, " Flag to switch on conversion of first_x,y,z and last_x,y,z from Mdst_trk_fit", true);
+  addParam("convertNbar", m_convertNbar, " Flag to switch on conversion of nbar:mdst (copy from gamma:mdst)", false);
 
   m_realData = false;
 
@@ -369,7 +370,7 @@ void B2BIIConvertMdstModule::event()
   if (m_convertRecTrg) convertRecTrgTable();
 
   // 13. Copy nbar from Gamma with the cut E > 0.5 GeV
-  copyNbarFromGamma();
+  if (m_convertNbar) copyNbarFromGamma();
 
 }
 

@@ -2,7 +2,7 @@ Changes in the analysis package in light-2302-genetta
 -----------------------------------------------------
 Modules
 +++++++
-* New function `modularAnalysis.estimateAndAttachTrackFitResult` and module `TrackFitEstimator` are added. It creates a
+* New function `modularAnalysis.estimateAndAttachTrackFitResult` and module `TrackFitResultEstimator` are added. It creates a
   ``TrackFitResult`` from the momentum of the Particle and creates a relation between them. The main use case is the tracking
   efficiency study by extrapolating the recoil particle to the detector surfaces.
 * Fixed a bug on the `findMCDecay` that the decay of ``K_S0`` cannot be specified.

@@ -315,6 +315,22 @@ namespace Belle2 {
       return h.getPositionAtArcLength2D(l);
     }
 
+    B2Vector3D getPositionOnHelix(const Particle* part, const std::vector<double>& pars)
+    {
+      if (pars.size() == 4 and pars[3]) {
+        const Track* track = part->getTrack();
+        if (!track)
+          return vecNaN;
+
+        auto highestProbMass = part->getMostLikelyTrackFitResult().first;
+        const TrackFitResult* trackFit = track->getTrackFitResultWithClosestMass(highestProbMass);
+        return getPositionOnHelix(trackFit, pars);
+      } else {
+        const TrackFitResult* trackFit = part->getTrackFitResult();
+        return getPositionOnHelix(trackFit, pars);
+      }
+    }
+
     // returns extrapolated theta position based on helix parameters
     double trackHelixExtTheta(const Particle* part, const std::vector<double>& pars)
     {
@@ -323,21 +339,7 @@ namespace Belle2 {
         B2FATAL("Exactly three (+1 optional) parameters (r, zfwd, zbwd, [useHighestProbMass]) required for helixExtTheta.");
       }
 
-      B2Vector3D position;
-
-      if (nParams == 4 and pars[3]) {
-        const Track* track = part->getTrack();
-        if (!track)
-          return realNaN;
-
-        auto highestProbMass = part->getMostLikelyTrackFitResult().first;
-        const TrackFitResult* trackFit = track->getTrackFitResultWithClosestMass(highestProbMass);
-        position = getPositionOnHelix(trackFit, pars);
-      } else {
-        const TrackFitResult* trackFit = part->getTrackFitResult();
-        position = getPositionOnHelix(trackFit, pars);
-      }
-
+      B2Vector3D position = getPositionOnHelix(part, pars);
       if (position == vecNaN) return realNaN;
       return position.Theta();
     }
@@ -350,20 +352,7 @@ namespace Belle2 {
         B2FATAL("Exactly three (+1 optional) parameters (r, zfwd, zbwd, [useHighestProbMass]) required for helixExtPhi.");
       }
 
-      B2Vector3D position;
-
-      if (nParams == 4 and pars[3]) {
-        const Track* track = part->getTrack();
-        if (!track)
-          return realNaN;
-
-        auto highestProbMass = part->getMostLikelyTrackFitResult().first;
-        const TrackFitResult* trackFit = track->getTrackFitResultWithClosestMass(highestProbMass);
-        position = getPositionOnHelix(trackFit, pars);
-      } else {
-        const TrackFitResult* trackFit = part->getTrackFitResult();
-        position = getPositionOnHelix(trackFit, pars);
-      }
+      B2Vector3D position = getPositionOnHelix(part, pars);
       if (position == vecNaN) return realNaN;
       return position.Phi();
     }
@@ -381,22 +370,7 @@ namespace Belle2 {
 
       auto func = [parameters](const Particle * part) -> double {
 
-        B2Vector3D position;
-        if (parameters.size() == 4 and parameters[3])
-        {
-          const Track* track = part->getTrack();
-          if (!track)
-            return realNaN;
-
-          auto highestProbMass = part->getMostLikelyTrackFitResult().first;
-          const TrackFitResult* trackFit = track->getTrackFitResultWithClosestMass(highestProbMass);
-          position = getPositionOnHelix(trackFit, parameters);
-        } else
-        {
-          const TrackFitResult* trackFit = part->getTrackFitResult();
-          position = getPositionOnHelix(trackFit, parameters);
-        }
-
+        B2Vector3D position = getPositionOnHelix(part, parameters);
         if (position == vecNaN) return realNaN;
         return position.Theta();
       };
@@ -416,22 +390,7 @@ namespace Belle2 {
 
       auto func = [parameters](const Particle * part) -> double {
 
-        B2Vector3D position;
-        if (parameters.size() == 4 and parameters[3])
-        {
-          const Track* track = part->getTrack();
-          if (!track)
-            return realNaN;
-
-          auto highestProbMass = part->getMostLikelyTrackFitResult().first;
-          const TrackFitResult* trackFit = track->getTrackFitResultWithClosestMass(highestProbMass);
-          position = getPositionOnHelix(trackFit, parameters);
-        } else
-        {
-          const TrackFitResult* trackFit = part->getTrackFitResult();
-          position = getPositionOnHelix(trackFit, parameters);
-        }
-
+        B2Vector3D position = getPositionOnHelix(part, parameters);
         if (position == vecNaN) return realNaN;
         return position.Phi();
       };

@@ -177,7 +177,7 @@ namespace Belle2 {
     /** StoreArray ECLDsp. */
     StoreArray<ECLDsp> m_eclDSPs;
 
-    /**< StoreArray ECLDigit */
+    /** StoreArray ECLDigit. */
     StoreArray<ECLDigit> m_eclDigits;
 
   };

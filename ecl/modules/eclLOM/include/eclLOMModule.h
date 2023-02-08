@@ -112,10 +112,10 @@ namespace Belle2 {
       double m_com_th[2]; /**< Monte Carlo thetha of the final state particles in CMS frame.*/
       double m_com_ph[2]; /**< Monte Carlo phi of the final state particles in CMS frame.*/
 
-      /* MC particles. */
+      /** MC particles. */
       StoreArray<MCParticle> m_MCParticles;
 
-      /* Trigger waveforms. */
+      /** Trigger waveforms. */
       StoreArray<TRGECLWaveform> m_TrgEclWaveforms;
 
       //important output

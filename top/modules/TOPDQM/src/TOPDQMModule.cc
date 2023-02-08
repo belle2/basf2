@@ -9,7 +9,7 @@
 // Module manager
 #include <framework/core/HistoModule.h>
 
-// Own include
+// Own header.
 #include <top/modules/TOPDQM/TOPDQMModule.h>
 #include <top/geometry/TOPGeometryPar.h>
 

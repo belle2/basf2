@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-/* Own include. */
+/* Own header. */
 #include <dqm/modules/PhysicsObjectsDQM/IPDQMModule.h>
 
 /* Basf2 headers. */

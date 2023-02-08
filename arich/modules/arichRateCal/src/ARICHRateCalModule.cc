@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <arich/modules/arichRateCal/ARICHRateCalModule.h>
 #include <arich/dataobjects/ARICHThParam.h>
 #include <arich/dataobjects/ARICHRawDigit.h>

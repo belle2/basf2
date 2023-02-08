@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <top/modules/TOPDoublePulseGenerator/TOPCalPulseGeneratorModule.h>
 #include <top/geometry/TOPGeometryPar.h>
 

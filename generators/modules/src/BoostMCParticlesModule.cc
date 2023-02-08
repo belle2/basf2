@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-/* Own include. */
+/* Own header. */
 #include <generators/modules/BoostMCParticlesModule.h>
 
 /* Basf2 headers. */

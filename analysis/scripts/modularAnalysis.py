@@ -822,7 +822,7 @@ def fillSignalSideParticleList(outputListName, decayString, path):
 
 
 def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFitHypothesis=False,
-                      loadPhotonsFromKLM=False, loadPhotonBeamBackgroundMVA=False, loadPhotonHadronicSplitOffMVA=False):
+                      loadPhotonsFromKLM=False):
     """
     Creates Particles of the desired types from the corresponding ``mdst`` dataobjects,
     loads them to the ``StoreArray<Particle>`` and fills the ParticleLists.
@@ -894,8 +894,6 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFi
                                      in terms of mass difference will be used if the fit using exact particle
                                      type is not available.
         loadPhotonsFromKLM (bool):   If true, photon candidates will be created from KLMClusters as well.
-        loadPhotonBeamBackgroundMVA (bool):    If true, photon candidates will be assigned a beam background probability.
-        loadPhotonHadronicSplitOffMVA (bool):  If true, photon candidates will be assigned a hadronic splitoff probability.
     """
 
     pload = register_module('ParticleLoader')
@@ -932,19 +930,9 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFi
             if not loadPhotonsFromKLM:
                 applyCuts(decayString, 'isFromECL', path)
 
-            # if the user asked for the beam background MVA to be added, then also provide this
-            # (populates the variable named beamBackgroundSuppression)
-            if loadPhotonBeamBackgroundMVA:
-                getBeamBackgroundProbability(decayString, path)
-
-            # if the user asked for the hadronic splitoff MVA to be added, then also provide this
-            # (populates the variable named hadronicSplitOffSuppression)
-            if loadPhotonHadronicSplitOffMVA:
-                getHadronicSplitOffProbability(decayString, path)
-
 
 def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypothesis=False,
-                     loadPhotonsFromKLM=False, loadPhotonBeamBackgroundMVA=False, loadPhotonHadronicSplitOffMVA=False):
+                     loadPhotonsFromKLM=False):
     """
     Creates Particles of the desired type from the corresponding ``mdst`` dataobjects,
     loads them to the StoreArray<Particle> and fills the ParticleList.
@@ -999,8 +987,6 @@ def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypo
                                      in terms of mass difference will be used if the fit using exact particle
                                      type is not available.
         loadPhotonsFromKLM (bool):   If true, photon candidates will be created from KLMClusters as well.
-        loadPhotonBeamBackgroundMVA (bool):    If true, photon candidates will be assigned a beam background probability.
-        loadPhotonHadronicSplitOffMVA (bool):  If true, photon candidates will be assigned a hadronic splitoff probability.
     """
 
     pload = register_module('ParticleLoader')
@@ -1035,16 +1021,6 @@ def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypo
         # but the user has to explicitly request them.
         if not loadPhotonsFromKLM:
             applyCuts(decayString, 'isFromECL', path)
-
-        # if the user asked for the beam background MVA to be added, then also provide this
-        # (populates the variable named beamBackgroundProbability)
-        if loadPhotonBeamBackgroundMVA:
-            getBeamBackgroundProbability(decayString, path)
-
-        # if the user asked for the hadronic splitoff MVA to be added, then also provide this
-        # (populates the variable named hadronicSplitOffSuppression)
-        if loadPhotonHadronicSplitOffMVA:
-            getHadronicSplitOffProbability(decayString, path)
 
 
 def fillParticleListWithTrackHypothesis(decayString,
@@ -3213,40 +3189,42 @@ def lowEnergyPi0Identification(pi0List, gammaList, payloadNameSuffix,
                     Belle1=b2bii.isB2BII())
 
 
-def getBeamBackgroundProbability(particleList, path=None):
+def getBeamBackgroundProbability(particleList, weight, path=None):
     """
     Assign a probability to each ECL cluster as being signal like (1) compared to beam background like (0)
-    @param particleList     The input ParticleList, must be a photon list
-    @param path       modules are added to this path
+    @param particleList    the input ParticleList, must be a photon list
+    @param weight    type of weight file to use
+    @param path    modules are added to this path
     """
 
     import b2bii
     if b2bii.isB2BII():
-        B2ERROR("The beam background probability is not trained for Belle data.")
+        B2ERROR("The beam background MVA is not trained for Belle data.")
 
     basf2.conditions.prepend_globaltag(getAnalysisGlobaltag())
     path.add_module('MVAExpert',
                     listNames=particleList,
                     extraInfoName='beamBackgroundSuppression',
-                    identifier='BeamBackgroundMVA')
+                    identifier=f'BeamBackgroundMVA_{weight}')
 
 
-def getHadronicSplitOffProbability(particleList, path=None,):
+def getFakePhotonProbability(particleList, weight, path=None):
     """
-    Assign a probability to each ECL cluster as being signal like (1) compared to hadronic splitoff like (0)
-    @param particleList     The input ParticleList, must be a photon list
-    @param path       modules are added to this path
+    Assign a probability to each ECL cluster as being signal like (1) compared to fake photon like (0)
+    @param particleList    the input ParticleList, must be a photon list
+    @param weight    type of weight file to use
+    @param path    modules are added to this path
     """
 
     import b2bii
     if b2bii.isB2BII():
-        B2ERROR("The hadronic splitoff probability is not trained for Belle data.")
+        B2ERROR("The fake photon MVA is not trained for Belle data.")
 
     basf2.conditions.prepend_globaltag(getAnalysisGlobaltag())
     path.add_module('MVAExpert',
                     listNames=particleList,
-                    extraInfoName='hadronicSplitOffSuppression',
-                    identifier='HadronicSplitOffMVA')
+                    extraInfoName='fakePhotonSuppression',
+                    identifier=f'FakePhotonMVA_{weight}')
 
 
 def buildEventKinematics(inputListNames=None, default_cleanup=True, custom_cuts=None,
@@ -3294,7 +3272,7 @@ def buildEventKinematics(inputListNames=None, default_cleanup=True, custom_cuts=
         if b2bii.isB2BII():
             copyList('gamma:evtkin', 'gamma:mdst', path=path)
         else:
-            fillParticleList('gamma:evtkin', '', loadPhotonBeamBackgroundMVA=False, loadPhotonHadronicSplitOffMVA=False, path=path)
+            fillParticleList('gamma:evtkin', '', path=path)
         inputListNames += ['gamma:evtkin']
         if default_cleanup:
             B2INFO("Using default cleanup in EventKinematics module.")
@@ -3309,7 +3287,7 @@ def buildEventKinematics(inputListNames=None, default_cleanup=True, custom_cuts=
         if b2bii.isB2BII():
             copyList('gamma:evtkin', 'gamma:mdst', path=path)
         else:
-            fillParticleList('gamma:evtkin', '', loadPhotonBeamBackgroundMVA=False, loadPhotonHadronicSplitOffMVA=False, path=path)
+            fillParticleList('gamma:evtkin', '', path=path)
         particleLists = ['pi+:evtkin', 'gamma:evtkin']
         if default_cleanup:
             if (custom_cuts is not None):
@@ -3448,8 +3426,6 @@ def buildEventShape(inputListNames=None,
             fillParticleList(
                 'gamma:evtshape',
                 '',
-                loadPhotonBeamBackgroundMVA=False,
-                loadPhotonHadronicSplitOffMVA=False,
                 path=path)
         particleLists = ['pi+:evtshape', 'gamma:evtshape']
 

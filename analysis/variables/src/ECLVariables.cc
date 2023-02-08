@@ -46,15 +46,21 @@ namespace Belle2 {
       }
     }
 
-    double hadronicSplitOffSuppression(const Particle* particle)
+    double fakePhotonSuppression(const Particle* particle)
     {
-      if (particle->hasExtraInfo("hadronicSplitOffSuppression")) {
-        return particle->getExtraInfo("hadronicSplitOffSuppression");
+      if (particle->hasExtraInfo("fakePhotonSuppression")) {
+        return particle->getExtraInfo("fakePhotonSuppression");
       } else {
-        B2WARNING("The extraInfo hadronicSplitOffSuppression is not registered! \n"
-                  "This variable is only available for photons, and you either have to run the function getHadronicSplitOffProbability or turn the argument loadPhotonHadronicSplitOffMVA to True when using fillParticleList.");
+        B2WARNING("The extraInfo fakePhotonSuppression is not registered! \n"
+                  "This variable is only available for photons, and you either have to run the function getFakePhotonProbability or turn the argument loadFakePhotonMVA to True when using fillParticleList.");
         return std::numeric_limits<float>::quiet_NaN();
       }
+    }
+
+    double hadronicSplitOffSuppression(const Particle* particle)
+    {
+      B2WARNING("This variable has been deprecated since light-2302-genetta and is no longer maintained with up to date weights. Please use the variable fakePhotonSuppression instead.");
+      return fakePhotonSuppression(particle);
     }
 
     double eclClusterKlId(const Particle* particle)
@@ -1314,21 +1320,36 @@ thresholds for computing PSD variables.
 )DOC");
     REGISTER_VARIABLE("beamBackgroundSuppression", beamBackgroundSuppression, R"DOC(
 Returns the output of an MVA classifier that uses shower-related variables to distinguish true photon clusters from beam background clusters.
-The classes are: 
+Class 1 is for true photon clusters while class 0 is for beam background clusters.
 
-- 1 for true photon clusters
-- 0 for beam background clusters
-
-The MVA has been trained using samples of signal photons and beam background photons coming from MC. The features used are (in decreasing order of significance): 
+The MVA has been trained using MC and the features used are:
 
 - `clusterTiming`
 - `clusterPulseShapeDiscriminationMVA`
 - `clusterE`
 - `clusterTheta`
 - `clusterZernikeMVA`
-- `clusterE1E9`
-- `clusterLAT`
-- `clusterSecondMoment`
+
+Both run-dependent and run-independent weights are available. For more information on this, and for usage recommendations, please see
+the `Neutrals Performance Confluence Page <https://confluence.desy.de/display/BI/Neutrals+Performance>`_.
+)DOC");
+    REGISTER_VARIABLE("fakePhotonSuppression", fakePhotonSuppression, R"DOC(
+Returns the output of an MVA classifier that uses shower-related variables to distinguish true photon clusters from fake photon clusters (e.g. split-offs,
+track-cluster matching failures etc.). Class 1 is for true photon clusters while class 0 is for fake photon clusters. 
+
+The MVA has been trained using MC and the features are:
+
+- `clusterPulseShapeDiscriminationMVA`
+- `minC2TDist`
+- `clusterZernikeMVA`
+- `clusterE`
+- `clusterTiming`
+- `clusterTheta`
+
+This MVA is the same as the one used for `hadronicSplitOffSuppression` but that variable should not be used as it is deprecated and does not use the new weights. 
+
+Both run-dependent and run-independent weights are available. For more information on this, and for usage recommendations, please see
+the `Neutrals Performance Confluence Page <https://confluence.desy.de/display/BI/Neutrals+Performance>`_.
 )DOC");
     REGISTER_VARIABLE("hadronicSplitOffSuppression", hadronicSplitOffSuppression, R"DOC(
 Returns the output of an MVA classifier that uses shower-related variables to distinguish true photon clusters from hadronic splitoff clusters.
@@ -1346,6 +1367,9 @@ The MVA has been trained using samples of signal photons and hadronic splitoff p
 - `clusterLAT`
 - `clusterE1E9`
 - `clusterSecondMoment`
+)DOC");
+    MAKE_DEPRECATED("hadronicSplitOffSuppression", false, "light-2302-genetta", R"DOC(
+                     Use the variable `fakePhotonSuppression` instead which is maintained and uses the latest weight files.
 )DOC");
     REGISTER_VARIABLE("clusterKlId", eclClusterKlId, R"DOC(
 Returns MVA classifier that uses ECL clusters variables to discriminate Klong clusters from em background.

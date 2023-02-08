@@ -6,12 +6,22 @@ Modules
 * Added an option ``usePhotonOnlyOnce`` to the function :func:`modularAnalysis.correctBremsBelle`. The default of the option is
   ``False`` so the backward compatibility. If the option is set to ``True``, a photon is used for only the closest charged particle
   in the input ParticleLists.
+* Modified parameters for the functions :func:`modularAnalysis.fillParticleList` and :func:`modularAnalysis.fillParticleLists` so
+  that they no longer contain parameters that load the beam background or fake photon (formerly hadronic split-off) MVA.
+* Parameters for `stdPhotons`, `stdPi0s` and `stdHyperons` have been changed in both name and type. The new parameters are called
+  ``loadBeamBackgroundMVA`` and ``loadFakePhotonMVA``, and they are now strings to specify which weight files should be used. For
+  run-independent training use ``MCri`` while for run-dependent training use ``MCrd``. More information on the new weights can be
+  found on the `Neutrals Performance Confluence Page <https://confluence.desy.de/display/BI/Neutrals+Performance>`_.
+* Added an optional parameter ``biasCorrectionTable`` to `stdHyperons` so that users can specify a table name with photon energy
+  bias corrections for the ``stdXi0`` particle list. The latest information on the bias correction can be found on the `Neutrals
+  Performance Confluence Page <https://confluence.desy.de/display/BI/Neutrals+Performance>`_.
 
 Variables
 +++++++++
 * New variable `momentaTripleProduct` is added for the searches for CP violation via T-odd correlations in multi-body decays.
 * Added the variables `EcmsMC` and `totalEnergyMC`, which return the true value of :math:`\sqrt{s}` and the true sum of the
   energies of all generated particles, respectively.
+* Deprecated `hadronicSplitOffSuppression` which has been replaced with `fakePhotonSuppression`
 
 Changes in the analysis package in light-2212-foldex
 ----------------------------------------------------

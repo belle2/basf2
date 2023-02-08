@@ -1,4 +1,5 @@
-[INFO] Steering file: analysis/tests/test_b2info-luminosity.py
+[INFO] Steering file: test_b2info-luminosity.py
+/sw/belle2/validation-data/luminosity/
 [INFO] Need to get some runs from RunDB for exp [18]
 [INFO] Reading exp 18 from rundb (this can take a while depending on the size of the query)
 [INFO] Read 302 runs from exp 18
@@ -166,4 +167,41 @@ Exp   Run Lumi [/pb] +/-             date length int Lumi [/fb] +/- int Lumi Del
 [INFO] RECORDED online RunDB     : L =    1.172 +/- 0.000 /fb =   0.0012 +/- 0.000  /ab
 [INFO] -------------------- Total Luminosity --------------------
 [INFO] RECORDED online RunDB     : L =    1.172 +/- 0.000 /fb =   0.0012 +/- 0.000  /ab
+[INFO] Saving run-by-run luminosity informations to luminosityByRuns.csv
+[INFO] Need to get some runs from RunDB for exp [12, 14]
+[INFO] Read 2607 runs for experiment 12-14
+[INFO] Using processing proc13 (and prompt) for luminosity information
+[INFO] No Selection on good runs (use --good)
+[INFO] No Selection on beam-energy (use --beam-energy XX)
+[INFO] Num runs: 615
+[INFO] -------------------- Luminosity by Beam Eenrgy --------------------
+[INFO] RECORDED offline 4S        : L =   16.418 +/- 0.005 /fb =   0.0164 +/- 0.000  /ab
+[INFO] RECORDED offline 4S_offres : L =    8.685 +/- 0.002 /fb =   0.0087 +/- 0.000  /ab
+[INFO] -------------------- Luminosity by Exp and Beam Eenrgy --------------------
+[INFO] RECORDED offline   12 4S_offres : L =    8.685 +/- 0.002 /fb =   0.0087 +/- 0.000 /ab
+[INFO] RECORDED offline   14 4S        : L =   16.418 +/- 0.005 /fb =   0.0164 +/- 0.000 /ab
+[INFO] -------------------- Luminosity by processing --------------------
+[INFO] RECORDED offline proc13    : L =   25.088 +/- 0.006 /fb =   0.0251 +/- 0.000  /ab
+[INFO] RECORDED offline prompt    : L =    0.015 +/- 0.000 /fb =   0.0000 +/- 0.000  /ab
+[INFO] -------------------- Total Luminosity --------------------
+[INFO] RECORDED offline prompt    : L =   25.102 +/- 0.006 /fb =   0.0251 +/- 0.000  /ab
+[INFO] Saving run-by-run luminosity informations to luminosityByRuns.csv
+[INFO] Need to get some runs from RunDB for exp [12, 14]
+[INFO] Read 2607 runs for experiment 12-14
+[INFO] Using processing proc12 (and prompt) for luminosity information
+[INFO] No Selection on good runs (use --good)
+[INFO] No Selection on beam-energy (use --beam-energy XX)
+[INFO] Num runs: 2015
+[INFO] -------------------- Luminosity by Beam Eenrgy --------------------
+[INFO] RECORDED offline 4S        : L =   71.061 +/- 0.007 /fb =   0.0711 +/- 0.000  /ab
+[INFO] RECORDED offline 4S_offres : L =    8.716 +/- 0.002 /fb =   0.0087 +/- 0.000  /ab
+[INFO] -------------------- Luminosity by Exp and Beam Eenrgy --------------------
+[INFO] RECORDED offline   12 4S        : L =   54.642 +/- 0.004 /fb =   0.0546 +/- 0.000 /ab
+[INFO] RECORDED offline   12 4S_offres : L =    8.716 +/- 0.002 /fb =   0.0087 +/- 0.000 /ab
+[INFO] RECORDED offline   14 4S        : L =   16.418 +/- 0.005 /fb =   0.0164 +/- 0.000 /ab
+[INFO] -------------------- Luminosity by processing --------------------
+[INFO] RECORDED offline proc12    : L =   63.358 +/- 0.005 /fb =   0.0634 +/- 0.000  /ab
+[INFO] RECORDED offline prompt    : L =   16.418 +/- 0.005 /fb =   0.0164 +/- 0.000  /ab
+[INFO] -------------------- Total Luminosity --------------------
+[INFO] RECORDED offline prompt    : L =   79.776 +/- 0.007 /fb =   0.0798 +/- 0.000  /ab
 [INFO] Saving run-by-run luminosity informations to luminosityByRuns.csv

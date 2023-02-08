@@ -1,13 +1,13 @@
 # EventType: 1790022050
-# Descriptor:[Upsilon6S_omgchib0_inclusive]
-# NickName:Upsilon6S_omgchib0_inclusive
-# Documentation:Decay for Y(6S) physics
-# Tested:no
+# Descriptor: [Upsilon6S_omgchib0_inclusive]
+# NickName: Upsilon6S_omgchib0_inclusive
+# Documentation: Decay for Y(6S) physics
+# Tested: no
 # PhysicsWG: Bottomonium
-# Responsible:  Suxian Li
-# Email:  lisuxian@buaa.edu.cn
+# Responsible: Suxian Li
+# Email: lisuxian@buaa.edu.cn
 # Cuts: None
-# Date:20180413
+# Date: 20180413
 #
 # June 2021 Automated: Converted PYTHIA ids
 #   Automated conversion of all PYTHIA decay ids to Pythia 8 using conversion defined in evtgen/src/EvtGenExternal/EvtPythiaEngine.cpp
@@ -21,7 +21,7 @@ Decay omega
 Enddecay
 
 Decay chi_b0
-#S-> gamma V    Partial wave (L,S)=(0,1)
+#S-> gamma V    Partial wave (L,S)=(0,1)
 0.01900 gamma Upsilon HELAMP 1. 0. 1. 0.; #best values from BBR 2014, using B(Y2S->gamma chib)
 0.24525 d anti-d PYTHIA 91;
 0.24525 u anti-u PYTHIA 91;

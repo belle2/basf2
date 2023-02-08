@@ -2,6 +2,9 @@ Changes in the analysis package in light-2302-genetta
 -----------------------------------------------------
 Modules
 +++++++
+* New function `modularAnalysis.estimateAndAttachTrackFitResult` and module `TrackFitEstimator` are added. It creates a
+  ``TrackFitResult`` from the momentum of the Particle and creates a relation between them. The main use case is the tracking
+  efficiency study by extrapolating the recoil particle to the detector surfaces.
 * Fixed a bug on the `findMCDecay` that the decay of ``K_S0`` cannot be specified.
 * Added an option ``usePhotonOnlyOnce`` to the function :func:`modularAnalysis.correctBremsBelle`. The default of the option is
   ``False`` so the backward compatibility. If the option is set to ``True``, a photon is used for only the closest charged particle
@@ -11,6 +14,8 @@ Variables
 +++++++++
 * Added the variables `EcmsMC` and `totalEnergyMC`, which return the true value of :math:`\sqrt{s}` and the true sum of the
   energies of all generated particles, respectively.
+* New variables `helixExtThetaOnDet` and `helixExtPhiOnDet` are added. They returns theta and phi of extrapolated helix parameters
+  on the detector surface given by the argument.
 
 Changes in the analysis package in light-2212-foldex
 ----------------------------------------------------

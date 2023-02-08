@@ -4004,11 +4004,16 @@ def scaleError(outputListName, inputListName,
 
 def estimateAndAttachTrackFitResult(inputListName, path=None):
     """
-    Create a TrackFitResult estimating from the momentum of a Particle and make a relation between them.
-    The IP position is used for the estimation of TrackFitResult.
+    Create a TrackFitResult from the momentum of the Particle assuming it originates from the IP and make a relation between them.
+    The covariance, detector hit information, and fit-related information (pValue, NDF) are assigned meaningless values. The input
+    Particles must not have already Track or TrackFitResult and thus are supposed to be composite particles, recoil, dummy
+    particles, and so on.
+
+
+    .. warning:: Since the source type is not overwritten as Track, not all track-related variables are guaranteed to be available.
+
 
     @param inputListName Name of input ParticleList
-
     """
 
     estimator = register_module("TrackFitResultEstimator")

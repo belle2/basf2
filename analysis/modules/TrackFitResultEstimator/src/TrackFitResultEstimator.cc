@@ -33,7 +33,12 @@ REG_MODULE(TrackFitResultEstimator);
 TrackFitResultEstimatorModule::TrackFitResultEstimatorModule() : Module()
 {
   // Set module properties
-  setDescription("Create a TrackFitResult from a Particle's momentum and make a relation between them."); // more information should be added.
+  setDescription(R"DOC(
+Create a TrackFitResult from the momentum of the Particle assuming it originates from the IP and make a relation between them. The
+covariance, detector hit information, and fit-related information (pValue, NDF) are assigned meaningless values. The input
+Particles must not have already Track or TrackFitResult and thus are supposed to be composite particles, recoil, dummy particles,
+and so on. Since the source type is not overwritten as Track, not all track-related variables are guaranteed to be available.
+)DOC");
 
   // Parameter definitions
   addParam("inputListName", m_inputListName,

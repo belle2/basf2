@@ -2030,7 +2030,6 @@ namespace Belle2 {
 
 
         double output = 0;
-        int nTargets = 0;
         for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i)
         {
           Particle* iParticle = ListOfParticles->getParticle(i);
@@ -2052,25 +2051,10 @@ namespace Belle2 {
                                                         targetParticle));
           if (isTargetOfRightCategory == 1) {
             output = 1;
-            nTargets += 1; targetParticlesCategory.push_back(targetParticle);
+            targetParticlesCategory.push_back(targetParticle);
           } else if (isTargetOfRightCategory == -2 && output != 1)
             output = realNaN;
         }
-
-        /*            if (nTargets > 1) {
-                      B2INFO("The Category " << categoryName << " has " <<  std::to_string(nTargets) << " target tracks.");
-                      for (auto& iTargetParticlesCategory : targetParticlesCategory) {
-                      const MCParticle* MCp = iTargetParticlesCategory->getMCParticle();
-
-                      RelationVector<Particle> mcRelations = MCp->getRelationsFrom<Particle>();
-                      if (mcRelations.size() > 1) B2WARNING("MCparticle is related to two particles");
-
-                      B2INFO("MCParticle has pdgCode = " << MCp->getPDG() << ", MCMother has pdgCode = " << MCp-> getMother()->getPDG() << " and " <<
-                      MCp-> getMother()->getNDaughters() << " daughters.");
-
-                      for (auto& iDaughter : MCp->getMother()->getDaughters()) B2INFO("iDaughter PDGCode = " << iDaughter->getPDG());
-                      }
-                      }*/
 
         return output;
       };
@@ -2234,11 +2218,11 @@ namespace Belle2 {
     REGISTER_VARIABLE("lambdaFlavor", lambdaFlavor,
                       "[Expert] Returns 1.0 if particle is ``Lambda0``, -1.0 in case of ``anti-Lambda0``, 0.0 otherwise.");
     REGISTER_VARIABLE("isLambda", isLambda,  "[Expert] Returns 1.0 if particle is truth-matched to ``Lambda0``, 0.0 otherwise.");
-    REGISTER_VARIABLE("lambdaZError", lambdaZError,  "[Expert] Returns the variance of the z-component of the decay vertex.",":math:`\\text{cm}^2`");
+    REGISTER_VARIABLE("lambdaZError", lambdaZError,  "[Expert] Returns the variance of the z-component of the decay vertex.\n\n",":math:`\\text{cm}^2`");
     REGISTER_VARIABLE("momentumOfSecondDaughter", momentumOfSecondDaughter,
-                      "[Expert] Returns the momentum of second daughter if exists, 0. otherwise.","GeV/c");
+                      "[Expert] Returns the momentum of second daughter if exists, 0. otherwise.\n\n","GeV/c");
     REGISTER_VARIABLE("momentumOfSecondDaughterCMS", momentumOfSecondDaughterCMS,
-                      "[Expert] Returns the momentum of the second daughter in the centre-of-mass system, 0. if this daughter doesn't exist.","GeV/c");
+                      "[Expert] Returns the momentum of the second daughter in the centre-of-mass system, 0. if this daughter doesn't exist.\n\n","GeV/c");
     REGISTER_VARIABLE("chargeTimesKaonLiklihood", chargeTimesKaonLiklihood,
                       "[Expert] Returns ``q*(highest PID_Likelihood for Kaons)``, 0. otherwise.");
     REGISTER_VARIABLE("ptTracksRoe", transverseMomentumOfChargeTracksInRoe, R"DOC(

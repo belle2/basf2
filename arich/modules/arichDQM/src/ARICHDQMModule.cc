@@ -132,41 +132,6 @@ namespace Belle2 {
     h_ARICHEOccAfterInjLer = new TH1F("ARICHEOccInjLER", "ARICHEOccInjLER/Time;Time in #mus;Triggers/Time (#mus bins)", 4000, 0, 20000);
     h_ARICHEOccAfterInjHer = new TH1F("ARICHEOccInjHER", "ARICHEOccInjHER/Time;Time in #mus;Triggers/Time (#mus bins)", 4000, 0, 20000);
 
-    //Select "LIVE" monitoring histograms
-    h_chStat->SetOption("LIVE");
-    h_aeroStat->SetOption("LIVE");
-
-    h_chHit->SetOption("LIVE");
-    h_chipHit->SetOption("LIVE");
-    h_hapdHit->SetOption("LIVE");
-
-    h_chDigit->SetOption("LIVE");
-    h_chipDigit->SetOption("LIVE");
-    h_hapdDigit->SetOption("LIVE");
-    h_mergerHit->SetOption("LIVE");
-    h_bitsPerMergerNorm->SetOption("LIVE");
-    h_bitsPerHapdMerger->SetOption("LIVE");
-
-    h_aerogelHit->SetOption("LIVE");
-    h_bits->SetOption("LIVE");
-    h_hitsPerTrack2D->SetOption("LIVE");
-    h_tracks2D->SetOption("LIVE");
-
-    h_hitsPerEvent->SetOption("LIVE");
-    h_theta->SetOption("LIVE");
-    h_hitsPerTrack->SetOption("LIVE");
-    h_trackPerEvent->SetOption("LIVE");
-    h_flashPerAPD->SetOption("LivE");
-
-    for (int i = 0; i < 6; i++) {
-      h_secTheta[i]->SetOption("LIVE");
-      h_secHitsPerTrack[i]->SetOption("LIVE");
-    }
-    h_ARICHOccAfterInjLer->SetOption("LIVE");
-    h_ARICHEOccAfterInjLer->SetOption("LIVE");
-    h_ARICHOccAfterInjHer->SetOption("LIVE");
-    h_ARICHEOccAfterInjHer->SetOption("LIVE");
-
     //Set the minimum to 0
     h_chDigit->SetMinimum(0);
     h_chipDigit->SetMinimum(0);

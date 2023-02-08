@@ -65,9 +65,6 @@ void DQMHistAnalysisARICHModule::initialize()
   B2DEBUG(20, "DQMHistAnalysisARICH: initialized.");
 }
 
-void DQMHistAnalysisARICHModule::beginRun()
-{
-}
 
 void DQMHistAnalysisARICHModule::event()
 {

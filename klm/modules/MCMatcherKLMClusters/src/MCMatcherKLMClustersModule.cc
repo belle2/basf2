@@ -11,10 +11,9 @@
 
 /* KLM headers. */
 #include <klm/dataobjects/bklm/BKLMHit1d.h>
-#include <klm/dataobjects/bklm/BKLMSimHit.h>
-#include <klm/dataobjects/eklm/EKLMSimHit.h>
 #include <klm/dataobjects/KLMDigit.h>
 #include <klm/dataobjects/KLMHit2d.h>
+#include <klm/dataobjects/KLMSimHit.h>
 
 /* Belle 2 headers. */
 #include <mdst/dataobjects/MCParticle.h>
@@ -80,8 +79,8 @@ void MCMatcherKLMClustersModule::event()
           bklmHit1ds[i3]->getRelationsTo<KLMDigit>();
         n4 = bklmDigits.size();
         for (i4 = 0; i4 < n4; i4++) {
-          RelationVector<BKLMSimHit> bklmSimHits =
-            bklmDigits[i4]->getRelationsTo<BKLMSimHit>();
+          RelationVector<KLMSimHit> bklmSimHits =
+            bklmDigits[i4]->getRelationsTo<KLMSimHit>();
           n5 = bklmSimHits.size();
           for (i5 = 0; i5 < n5; i5++) {
             RelationVector<MCParticle> bklmMCParticles =
@@ -128,8 +127,8 @@ void MCMatcherKLMClustersModule::event()
         eklmHit2ds[i2]->getRelationsTo<KLMDigit>();
       n3 = eklmDigits.size();
       for (i3 = 0; i3 < n3; i3++) {
-        RelationVector<EKLMSimHit> eklmSimHits =
-          eklmDigits[i3]->getRelationsTo<EKLMSimHit>();
+        RelationVector<KLMSimHit> eklmSimHits =
+          eklmDigits[i3]->getRelationsTo<KLMSimHit>();
         n4 = eklmSimHits.size();
         for (i4 = 0; i4 < n4; i4++) {
           RelationVector<MCParticle> eklmMCParticles =

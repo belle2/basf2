@@ -6,8 +6,10 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-/* Basf2 headers. */
+/* Own header. */
 #include <mdst/dataobjects/KlId.h>
+
+/* Basf2 headers. */
 #include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/ECLCluster.h>
 

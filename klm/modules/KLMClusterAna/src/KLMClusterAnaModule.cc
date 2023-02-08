@@ -9,7 +9,7 @@
 /* Own header. */
 #include <klm/modules/KLMClusterAna/KLMClusterAnaModule.h>
 
-/* Other Basf2 headers. */
+/* Basf2 headers. */
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 

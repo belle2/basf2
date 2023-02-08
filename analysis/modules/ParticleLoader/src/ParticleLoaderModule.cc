@@ -139,6 +139,7 @@ void ParticleLoaderModule::initialize()
       // Mother particle
       const DecayDescriptorParticle* mother = m_decaydescriptor.getMother();
       int nProducts = m_decaydescriptor.getNDaughters();
+      m_properties = m_decaydescriptor.getProperty() | mother->getProperty(); // only used for V0s
 
       int pdgCode  = mother->getPDGCode();
       // The default list name is "all"
@@ -551,6 +552,7 @@ void ParticleLoaderModule::v0sToParticles()
       ROOT::Math::PxPyPzEVector v0Momentum = newDaugP->get4Vector() + newDaugM->get4Vector();
       Particle v0P(v0Momentum, v0Type.getPDGCode(), v0FlavorType,
                    Particle::EParticleSourceObject::c_V0, v0->getArrayIndex());
+      v0P.setProperty(m_properties);
 
       // add the daughters of the V0 (in the correct order) and don't update
       // the type to c_Composite (i.e. maintain c_V0)

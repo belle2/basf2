@@ -49,13 +49,14 @@ namespace Belle2 {
     private:
 
       // Parameters of the energy dependent time walk function
-      //   Default values measured by Alex Kuzmin
-      double energyDependenceTimeOffsetFitParam_p1 = 0  ;               /**< p1 in "energy dependence equation" */
-      double energyDependenceTimeOffsetFitParam_p2 = 88449. ;           /**< p2 in "energy dependence equation" */
-      double energyDependenceTimeOffsetFitParam_p3 = 0.20867E+06 ;      /**< p3 in "energy dependence equation" */
-      double energyDependenceTimeOffsetFitParam_p4 = 3.1482 ;           /**< p4 in "energy dependence equation" */
-      double energyDependenceTimeOffsetFitParam_p5 = 7.4747 ;           /**< p5 in "energy dependence equation" */
-      double energyDependenceTimeOffsetFitParam_p6 = 1279.3 ;           /**< p6 in "energy dependence equation" */
+      //   Default values measured by Alex Kuzmin based on local testpulse calibration
+      //   2023.02 Updated to the new version by Alex Bobrov based on Bhabha skim data (exp 24)
+      double energyDependenceTimeOffsetFitParam_p1 = -1.966 ;      /**< p1 in "energy dependence equation" */
+      double energyDependenceTimeOffsetFitParam_p2 = 46350. ;      /**< p2 in "energy dependence equation" */
+      double energyDependenceTimeOffsetFitParam_p3 = 264600.;      /**< p3 in "energy dependence equation" */
+      double energyDependenceTimeOffsetFitParam_p4 = 1.813  ;      /**< p4 in "energy dependence equation" */
+      double energyDependenceTimeOffsetFitParam_p5 = 7.532  ;      /**< p5 in "energy dependence equation" */
+      double energyDependenceTimeOffsetFitParam_p6 = 428.3  ;      /**< p6 in "energy dependence equation" */
 
     }; // ECLTimingUtilities class
   } // namespace ECL

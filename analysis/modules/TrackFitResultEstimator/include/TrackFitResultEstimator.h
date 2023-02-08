@@ -12,9 +12,12 @@
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/database/DBObjPtr.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <mdst/dataobjects/TrackFitResult.h>
+#include <mdst/dbobjects/BeamSpot.h>
+
 
 #include <string>
 
@@ -44,10 +47,12 @@ namespace Belle2 {
 
   private:
 
-    std::string m_inputListName;  /**< The name of input charged ParticleList */
+    std::string m_inputListName;  /**< The name of input ParticleList */
     StoreObjPtr<ParticleList>  m_inputparticleList; /**< StoreObjptr for input charged ParticleList */
     StoreArray<Particle> m_particles; /**< StoreArray of Particle objects */
     StoreArray<TrackFitResult> m_trackfitresults; /**< StoreArray of TrackFitResult objects */
+
+    DBObjPtr<BeamSpot> m_beamSpotDB; /**< Beam spot database object */
 
   };
 }

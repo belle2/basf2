@@ -37,7 +37,7 @@ TrackFitResultEstimatorModule::TrackFitResultEstimatorModule() : Module()
 
   // Parameter definitions
   addParam("inputListName", m_inputListName,
-           "The name of input charged ParticleList. Only the charged particle is available.",
+           "The name of input ParticleList.",
            std::string(""));
 }
 
@@ -49,8 +49,9 @@ void TrackFitResultEstimatorModule::initialize()
     B2ERROR("Invalid input ParticleList name: " << m_inputListName);
 
   const int pdg = decaydescriptor.getMother()->getPDGCode();
-  if (TDatabasePDG::Instance()->GetParticle(pdg)->Charge() == 0)
-    B2ERROR("The input ParticleList is for a neutral particle. The charged particle is required.");
+  if (abs(TDatabasePDG::Instance()->GetParticle(pdg)->Charge()) > 3)
+    B2WARNING("The absolute value of charge of input ParticleList is grater than 1. Helix requires abs(charge) <= 1. "
+              "The sign of charge will be used instead.");
 
   m_inputparticleList.isRequired(m_inputListName);
   m_particles.registerRelationTo(m_trackfitresults);
@@ -64,10 +65,13 @@ void TrackFitResultEstimatorModule::event()
     dummyCovariance(row, row) = 10000;
   }
 
-  ClusterUtils cUtil;
-  const XYZVector IPPosition = cUtil.GetIPPosition(); // do we want to use another position?
+  XYZVector position;
+  if (m_beamSpotDB)
+    position = XYZVector(m_beamSpotDB->getIPPosition().X(), m_beamSpotDB->getIPPosition().Y(), m_beamSpotDB->getIPPosition().Z());
+  else
+    position = XYZVector(0, 0, 0);
 
-  const double bfield = BFieldManager::getFieldInTesla(IPPosition).Z();
+  const double bfield = BFieldManager::getFieldInTesla(position).Z();
 
   for (unsigned i = 0; i < m_inputparticleList->getListSize(); i++) {
     Particle* part = m_inputparticleList->getParticle(i);
@@ -75,10 +79,14 @@ void TrackFitResultEstimatorModule::event()
     if (part->getTrack() or part->getTrackFitResult())
       B2ERROR("Particle is already related to the Track or TrackFitResult object.");
 
-    TrackFitResult* trkfit = m_trackfitresults.appendNew(IPPosition,
+    int charge = 0;
+    if (part->getCharge() != 0)
+      charge = (part->getCharge() > 0) ? 1 : -1;
+
+    TrackFitResult* trkfit = m_trackfitresults.appendNew(position,
                                                          part->getMomentum(),
                                                          dummyCovariance,
-                                                         part->getCharge(),
+                                                         charge,
                                                          Const::ParticleType(part->getPDGCode()),
                                                          -1, // pValue
                                                          bfield,

@@ -4004,10 +4004,10 @@ def scaleError(outputListName, inputListName,
 
 def estimateAndAttachTrackFitResult(inputListName, path=None):
     """
-    Create a TrackFitResult estimating from the momentum of a charged Particle and make a relation between them.
+    Create a TrackFitResult estimating from the momentum of a Particle and make a relation between them.
     The IP position is used for the estimation of TrackFitResult.
 
-    @param inputListName Name of input charged ParticleList
+    @param inputListName Name of input ParticleList
 
     """
 

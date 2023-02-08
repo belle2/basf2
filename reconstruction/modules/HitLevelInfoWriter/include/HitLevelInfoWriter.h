@@ -8,13 +8,13 @@
 
 #pragma once
 
-#include <reconstruction/dataobjects/CDCDedxTrack.h>
-
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
+#include <mdst/dbobjects/BeamSpot.h>
+#include <mdst/dataobjects/PIDLikelihood.h>
 
 #include <genfit/Track.h>
 
@@ -23,7 +23,9 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/core/Module.h>
+#include <framework/gearbox/Const.h>
 
+#include <reconstruction/dataobjects/CDCDedxTrack.h>
 #include <reconstruction/dbobjects/CDCDedxScaleFactor.h>
 #include <reconstruction/dbobjects/CDCDedxWireGain.h>
 #include <reconstruction/dbobjects/CDCDedxRunGain.h>
@@ -32,7 +34,8 @@
 #include <reconstruction/dbobjects/CDCDedx1DCell.h>
 #include <reconstruction/dbobjects/CDCDedxADCNonLinearity.h> //new in rel5
 #include <reconstruction/dbobjects/CDCDedxCosineEdge.h> //new in rel5
-#include <mdst/dbobjects/BeamSpot.h>
+#include <reconstruction/dbobjects/CDCDedxHadronCor.h>
+#include <reconstruction/dataobjects/DedxConstants.h>
 
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/Particle.h>
@@ -43,6 +46,7 @@
 #include <TFile.h>
 #include <TTree.h>
 #include <TString.h>
+#include <TMath.h>
 
 class TH2F;
 
@@ -75,13 +79,52 @@ namespace Belle2 {
     /** Create the output TFiles and TTrees. */
     void bookOutput(std::string filename);
 
+    /**
+     * Function to recalculate the dedx with latest constants
+     **/
+    void recalculateDedx(CDCDedxTrack* dedxTrack, std::map<int, std::vector<double>>& l_var);
+
+    /**
+     * Function to get the correction factor
+     **/
+    double GetCorrection(int& adc, int layer, int wireID, double doca, double enta, double costheta) const;
+
+    /**
+     * Function to apply the hadron correction
+     **/
+    void HadronCorrection(double costheta, double& dedx) const;
+
+    /**
+     * hadron saturation parameterization part 2
+     **/
+    double D2I(const double cosTheta, const double D) const;
+
+    /**
+     * hadron saturation parameterization part 1
+     **/
+    double I2D(const double cosTheta, const double I) const;
+
+    /** Save arithmetic and truncated mean for the 'dedx' values.
+       *
+       * @param mean              calculated arithmetic mean
+       * @param truncatedMean     calculated truncated mean
+       * @param truncatedMeanErr  error for truncatedMean
+       * @param dedx              input values
+       */
+    void calculateMeans(double* mean, double* truncatedMean, double* truncatedMeanErr, const std::vector<double>& dedx) const;
+
+    /** for all particles, save chi values into 'chi'
+    * chi array of chi values to be modified
+    **/
+    void saveChiValue(double(&chi)[Const::ChargedStable::c_SetSize], CDCDedxTrack* dedxTrack, double dedx) const;
+
   private:
 
     std::string m_strOutputBaseName; /**< Base name for the output ROOT files */
     std::vector<std::string> m_strParticleList; /**< Vector of ParticleLists to write out */
     std::vector<std::string> m_filename; /**< full names of the output ROOT files */
-    std::vector<TFile*> m_file; /**< output ROOT files */
-    std::vector<TTree*> m_tree; /**< output ROOT trees */
+    std::vector<TFile* > m_file;  /**< output ROOT files */
+    std::vector<TTree* > m_tree;  /**< output ROOT trees */
 
     StoreArray<CDCDedxTrack> m_dedxTracks; /**< Required array of CDCDedxTracks */
     StoreArray<Track> m_tracks; /**< Required array of input Tracks */
@@ -155,12 +198,19 @@ namespace Belle2 {
     double m_runGain{ -1.}; /**< calibration run gain */
 
     // hadron cal and PID related variables
-    double m_chie{ -1.};  /**< chi value for electron hypothesis */
-    double m_chimu{ -1.}; /**< chi value for muon hypothesis */
-    double m_chipi{ -1.}; /**< chi value for pion hypothesis */
-    double m_chik{ -1.};  /**< chi value for kaon hypothesis */
-    double m_chip{ -1.};  /**< chi value for proton hypothesis */
-    double m_chid{ -1.};  /**< chi value for deuteron hypothesis */
+    double m_chieOld{ -1.};  /**< chi value for electron hypothesis */
+    double m_chimuOld{ -1.}; /**< chi value for muon hypothesis */
+    double m_chipiOld{ -1.}; /**< chi value for pion hypothesis */
+    double m_chikOld{ -1.};  /**< chi value for kaon hypothesis */
+    double m_chipOld{ -1.};  /**< chi value for proton hypothesis */
+    double m_chidOld{ -1.};  /**< chi value for deuteron hypothesis */
+
+    double m_chie{ -1.};  /**< modified chi value for electron hypothesis */
+    double m_chimu{ -1.}; /**< modified chi value for muon hypothesis */
+    double m_chipi{ -1.}; /**< modified chi value for pion hypothesis */
+    double m_chik{ -1.};  /**< modified chi value for kaon hypothesis */
+    double m_chip{ -1.};  /**< modified chi value for proton hypothesis */
+    double m_chid{ -1.};  /**< modified chi value for deuteron hypothesis */
 
     double m_prese{ -1.};  /**< pred reso for electron hypothesis */
     double m_presmu{ -1.}; /**< pred reso for muon hypothesis */
@@ -223,11 +273,14 @@ namespace Belle2 {
     DBObjPtr<CDCDedx1DCell> m_DB1DCell; /**< 1D correction DB object */
     DBObjPtr<CDCDedxADCNonLinearity> m_DBNonlADC; /**< hadron saturation non linearity */
     DBObjPtr<CDCDedxCosineEdge> m_DBCosEdgeCor; /**< cosine edge calibration */
+    DBObjPtr<CDCDedxHadronCor> m_DBHadronCor; /**< hadron saturation parameters */
+
+    std::vector<double> m_hadronpars; /**< hadron saturation parameters */
 
     bool nodeadwire; /**< write only active wires */
     //Flag to enable and disable set of variables
     bool enableHitLevel; /**< Flag to switch on/off hit level info */
     bool enableExtraVar; /**< Flag to switch on/off extra level info and some available w/ release/5 only */
-
+    bool m_relative; /**< Flag to switch on/off relative constants */
   };
 } // Belle2 namespace

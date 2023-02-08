@@ -6,10 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <framework/gearbox/Const.h>
 #include <reconstruction/modules/HitLevelInfoWriter/HitLevelInfoWriter.h>
-#include <reconstruction/dataobjects/DedxConstants.h>
-#include <mdst/dataobjects/PIDLikelihood.h>
 
 using namespace Belle2;
 using namespace Dedx;
@@ -26,6 +23,7 @@ HitLevelInfoWriterModule::HitLevelInfoWriterModule() : Module()
   addParam("enableHitLevel", enableHitLevel, "True or False for Hit level variables", false);
   addParam("enableExtraVar", enableExtraVar, "True or False for extra track/hit level variables", false);
   addParam("nodeadwire", nodeadwire, "True or False for deadwire hit variables", true);
+  addParam("relativeCorrections", m_relative, "If true, apply corrections relative to those used in production", false);
 
 }
 
@@ -89,7 +87,8 @@ void HitLevelInfoWriterModule::event()
       }
 
       if (dedxTrack->size() == 0 || dedxTrack->size() > 200) continue;
-      if (dedxTrack->getCosTheta() < -1.0 || dedxTrack->getCosTheta() > 1.0) continue;
+      if (dedxTrack->getCosTheta() < TMath::Cos(150.0 * TMath::DegToRad()))continue; //-0.866
+      if (dedxTrack->getCosTheta() > TMath::Cos(17.0 * TMath::DegToRad())) continue; //0.95
 
       // fill the event meta data
       StoreObjPtr<EventMetaData> evtMetaData;
@@ -204,6 +203,7 @@ void HitLevelInfoWriterModule::event()
   }
 }
 
+//---------------------------------------------------------------------------------------
 void HitLevelInfoWriterModule::terminate()
 {
 
@@ -217,8 +217,8 @@ void HitLevelInfoWriterModule::terminate()
   }
 }
 
-void
-HitLevelInfoWriterModule::fillTrack(const TrackFitResult* fitResult)
+//---------------------------------------------------------------------------------------
+void HitLevelInfoWriterModule::fillTrack(const TrackFitResult* fitResult)
 {
   ROOT::Math::XYZVector trackMom = fitResult->getMomentum();
   m_p = trackMom.R();
@@ -255,8 +255,8 @@ HitLevelInfoWriterModule::fillTrack(const TrackFitResult* fitResult)
   m_dz = frame.getVertex(ROOT::Math::XYZVector(helix.getPerigee())).Z();
 }
 
-void
-HitLevelInfoWriterModule::fillDedx(CDCDedxTrack* dedxTrack)
+//---------------------------------------------------------------------------------------
+void HitLevelInfoWriterModule::fillDedx(CDCDedxTrack* dedxTrack)
 {
   // clear the containers first
   clearEntries();
@@ -273,13 +273,6 @@ HitLevelInfoWriterModule::fillDedx(CDCDedxTrack* dedxTrack)
   }
 
   h_nhits = dedxTrack->size();
-  l_nhits = dedxTrack->getNLayerHits();
-  l_nhitsused = dedxTrack->getNLayerHitsUsed();
-
-  m_mean = dedxTrack->getDedxMean();
-  m_trunc = dedxTrack->getDedx();
-  m_truncNoSat = dedxTrack->getDedxNoSat();
-  m_error = dedxTrack->getDedxError();
 
   // Get the calibration constants
   m_scale = m_DBScaleFactor->getScaleFactor();
@@ -291,14 +284,20 @@ HitLevelInfoWriterModule::fillDedx(CDCDedxTrack* dedxTrack)
   } else {
     m_cosEdgeCor = 1.0;
   }
+  m_hadronpars = m_DBHadronCor->getHadronPars();
 
+  //variable to save layer variables
+  std::map<int, std::vector<double>>l_var;
 
-  m_chie = dedxTrack->getChi(0);
-  m_chimu = dedxTrack->getChi(1);
-  m_chipi = dedxTrack->getChi(2);
-  m_chik = dedxTrack->getChi(3);
-  m_chip = dedxTrack->getChi(4);
-  m_chid = dedxTrack->getChi(5);
+  //Modify the hit level dedx
+  recalculateDedx(dedxTrack, l_var);
+
+  m_chieOld = dedxTrack->getChi(0);
+  m_chimuOld = dedxTrack->getChi(1);
+  m_chipiOld = dedxTrack->getChi(2);
+  m_chikOld = dedxTrack->getChi(3);
+  m_chipOld = dedxTrack->getChi(4);
+  m_chidOld = dedxTrack->getChi(5);
 
   m_pmeane = dedxTrack->getPmean(0);
   m_pmeanmu = dedxTrack->getPmean(1);
@@ -317,12 +316,19 @@ HitLevelInfoWriterModule::fillDedx(CDCDedxTrack* dedxTrack)
   // Get the vector of dE/dx values for all layers
   double lout = 0, lin = 0, increment = 0;
   int lastlayer = 0;
+
+  l_nhits = l_var[0].size();
+  // add a factor of 0.51 here to make sure we are rounding appropriately...
+  const int lEdgeTrunc = int(l_nhits * 0.05 + 0.51);
+  const int hEdgeTrunc = int(l_nhits * (1 - 0.25) + 0.51);
+  l_nhitsused = hEdgeTrunc - lEdgeTrunc;
+
   for (int il = 0; il < l_nhits; ++il) {
-    l_nhitscombined[il] = dedxTrack->getNHitsCombined(il);
-    l_wirelongesthit[il] = dedxTrack->getWireLongestHit(il);
-    l_layer[il] = dedxTrack->getLayer(il);
-    l_path[il] = dedxTrack->getLayerPath(il);
-    l_dedx[il] = dedxTrack->getLayerDedx(il);
+    l_nhitscombined[il] = l_var[0][il];
+    l_wirelongesthit[il] = l_var[1][il];
+    l_layer[il] = l_var[2][il];
+    l_path[il] = l_var[3][il];
+    l_dedx[il] = l_var[4][il];
 
     if (l_layer[il] > lastlayer) lout++;
     else if (l_layer[il] < lastlayer) lin++;
@@ -337,7 +343,8 @@ HitLevelInfoWriterModule::fillDedx(CDCDedxTrack* dedxTrack)
   if (enableHitLevel) {
     for (int ihit = 0; ihit < h_nhits; ++ihit) {
 
-      if (nodeadwire && m_DBWireGains->getWireGain(h_wire[ihit]) == 0)continue;
+      //if (nodeadwire && m_DBWireGains->getWireGain(dedxTrack->getWire(ihit)) == 0)continue;
+
       h_lwire[ihit] = dedxTrack->getWireInLayer(ihit);
       h_wire[ihit] = dedxTrack->getWire(ihit);
       h_layer[ihit] = dedxTrack->getHitLayer(ihit);
@@ -367,10 +374,251 @@ HitLevelInfoWriterModule::fillDedx(CDCDedxTrack* dedxTrack)
       h_onedCor[ihit] = m_DB1DCell->getMean(h_layer[ihit], h_entaRS[ihit]);
     }
   }
+
 }
 
-void
-HitLevelInfoWriterModule::clearEntries()
+//---------------------------------------------------------------------------------------
+void HitLevelInfoWriterModule::recalculateDedx(CDCDedxTrack* dedxTrack, std::map<int, std::vector<double>>& l_var)
+{
+  std::vector<double> newLayerHits;
+  double newLayerDe = 0, newLayerDx = 0;
+  int nhitscombined = 0; // number of hits combined per layer
+  int wirelongesthit = 0; // wire number of longest hit
+  double longesthit = 0; // path length of longest hit
+
+  for (int ihit = 0; ihit < h_nhits; ++ihit) {
+    int jadcbase = dedxTrack->getADCBaseCount(ihit);
+    int jLayer = dedxTrack->getHitLayer(ihit);
+    double jWire = dedxTrack->getWire(ihit);
+    double jNDocaRS = dedxTrack->getDocaRS(ihit) / dedxTrack->getCellHalfWidth(ihit);
+    double jEntaRS = dedxTrack->getEntaRS(ihit);
+    double jPath = dedxTrack->getPath(ihit);
+
+    double correction = dedxTrack->getScaleFactor() * dedxTrack->getRunGain() * dedxTrack->getCosineCorrection() *
+                        dedxTrack->getCosEdgeCorrection() *
+                        dedxTrack->getTwoDCorrection(ihit) * dedxTrack->getOneDCorrection(ihit) * dedxTrack->getNonLADCCorrection(ihit);
+    if (dedxTrack->getWireGain(ihit) > 0) correction *= dedxTrack->getWireGain(ihit); //also keep dead wire
+
+    if (m_relative) {
+      //get same base adc + rel correction factor
+      correction *= GetCorrection(jadcbase, jLayer, jWire, jNDocaRS, jEntaRS, m_cosTheta);
+      if (!m_DBWireGains && dedxTrack->getWireGain(ihit) == 0) correction = 0;
+    } else {
+      //get modifed adc + abs correction factor
+      correction = GetCorrection(jadcbase, jLayer, jWire, jNDocaRS, jEntaRS, m_cosTheta);
+    }
+
+    double newhitdedx = 1.0;
+
+    newhitdedx *= jadcbase * std::sqrt(1 - m_cosTheta * m_cosTheta) / jPath;
+
+    if (correction != 0) {
+      newhitdedx /= correction;
+      if (m_DBWireGains->getWireGain(jWire) != 0) {
+        newLayerDe += jadcbase / correction;
+        newLayerDx += jPath;
+        if (jPath > longesthit) {
+          longesthit = jPath;
+          wirelongesthit = jWire;
+        }
+        nhitscombined++;
+      }
+    } else newhitdedx = 0;
+
+    dedxTrack->setDedx(ihit, newhitdedx);
+
+    if (ihit + 1 < h_nhits && dedxTrack->getHitLayer(ihit + 1) == jLayer) {
+      continue;
+    } else {
+      if (newLayerDx != 0) {
+        double totalDistance = newLayerDx / std::sqrt(1 - m_cosTheta * m_cosTheta);
+        double newLayerDedx = newLayerDe / totalDistance ;
+        newLayerHits.push_back(newLayerDedx);
+        l_var[0].push_back(nhitscombined);
+        l_var[1].push_back(wirelongesthit);
+        l_var[2].push_back(jLayer);
+        l_var[3].push_back(totalDistance);
+        l_var[4].push_back(newLayerDedx);
+      }
+
+      newLayerDe = 0;
+      newLayerDx = 0;
+      nhitscombined = 0;
+      wirelongesthit = 0;
+      longesthit = 0;
+    }
+  }
+
+  // recalculate the truncated means
+  double dedxmean, dedxtrunc, dedxtruncNoSat, dedxerror;
+
+  calculateMeans(&dedxmean, &dedxtruncNoSat, &dedxerror, newLayerHits);
+
+  dedxtrunc = dedxtruncNoSat;
+
+  HadronCorrection(m_cosTheta, dedxtrunc);
+  m_mean = dedxmean;
+  m_trunc = dedxtrunc;
+  m_truncNoSat = dedxtruncNoSat;
+  m_error = dedxerror;
+
+  // save the PID information
+  double cdcChi[Const::ChargedStable::c_SetSize];
+  saveChiValue(cdcChi, dedxTrack, m_trunc);
+  m_chie = cdcChi[0];
+  m_chimu = cdcChi[1];
+  m_chipi = cdcChi[2];
+  m_chik = cdcChi[3];
+  m_chip = cdcChi[4];
+  m_chid = cdcChi[5];
+}
+
+//---------------------------------------------------------------------------------------
+double HitLevelInfoWriterModule::GetCorrection(int& adc, int layer, int wireID, double doca, double enta, double costheta) const
+{
+  double correction = 1.0;
+  correction *= m_DBScaleFactor->getScaleFactor();
+  correction *= m_DBRunGain->getRunGain();
+  correction *= m_DB2DCell->getMean(layer, doca, enta);
+  correction *= m_DB1DCell->getMean(layer, enta);
+  correction *= m_DBCosineCor->getMean(costheta);
+  if (costheta <= -0.850 || costheta >= 0.950) correction *= m_DBCosEdgeCor->getMean(costheta);
+  if (m_DBWireGains->getWireGain(wireID) > 0)  correction *= m_DBWireGains->getWireGain(wireID);
+
+  //last is only for abs constant
+  if (!m_relative) adc = m_DBNonlADC->getCorrectedADC(adc, layer);
+
+  return correction;
+}
+
+//---------------------------------------------------------------------------------------
+void HitLevelInfoWriterModule::HadronCorrection(double costheta, double& dedx) const
+{
+  dedx = D2I(costheta, I2D(costheta, 1.00) / 1.00 * dedx);
+}
+
+//---------------------------------------------------------------------------------------
+double HitLevelInfoWriterModule::D2I(const double cosTheta, const double D) const
+{
+  double absCosTheta   = fabs(cosTheta);
+  double projection    = pow(absCosTheta, m_hadronpars[3]) + m_hadronpars[2];
+  if (projection == 0) {
+    B2WARNING("Something wrong with dE/dx hadron constants!");
+    return D;
+  }
+
+  double chargeDensity = D / projection;
+  double numerator     = 1 + m_hadronpars[0] * chargeDensity;
+  double denominator   = 1 + m_hadronpars[1] * chargeDensity;
+
+  if (denominator == 0) {
+    B2WARNING("Something wrong with dE/dx hadron constants!");
+    return D;
+  }
+
+  double I = D * m_hadronpars[4] * numerator / denominator;
+  return I;
+}
+
+//---------------------------------------------------------------------------------------
+double HitLevelInfoWriterModule::I2D(const double cosTheta, const double I) const
+{
+  double absCosTheta = fabs(cosTheta);
+  double projection  = pow(absCosTheta, m_hadronpars[3]) + m_hadronpars[2];
+
+  if (projection == 0 || m_hadronpars[4] == 0) {
+    B2WARNING("Something wrong with dE/dx hadron constants!");
+    return I;
+  }
+
+  double a =  m_hadronpars[0] / projection;
+  double b =  1 - m_hadronpars[1] / projection * (I / m_hadronpars[4]);
+  double c = -1.0 * I / m_hadronpars[4];
+
+  if (b == 0 && a == 0) {
+    B2WARNING("both a and b coefficiants for hadron correction are 0");
+    return I;
+  }
+
+  double discr = b * b - 4.0 * a * c;
+  if (discr < 0) {
+    B2WARNING("negative discriminant; return uncorrectecd value");
+    return I;
+  }
+
+  double D = (a != 0) ? (-b + sqrt(discr)) / (2.0 * a) : -c / b;
+  if (D < 0) {
+    B2WARNING("D is less 0! will try another solution");
+    D = (a != 0) ? (-b - sqrt(discr)) / (2.0 * a) : -c / b;
+    if (D < 0) {
+      B2WARNING("D is still less 0! just return uncorrectecd value");
+      return I;
+    }
+  }
+
+  return D;
+}
+
+//---------------------------------------------------------------------------------------
+void HitLevelInfoWriterModule::calculateMeans(double* mean, double* truncMean, double* truncMeanErr,
+                                              const std::vector<double>& dedx) const
+{
+  // Calculate the truncated average by skipping the lowest & highest
+  // events in the array of dE/dx values
+  std::vector<double> sortedDedx = dedx;
+  std::sort(sortedDedx.begin(), sortedDedx.end());
+  sortedDedx.erase(std::remove(sortedDedx.begin(), sortedDedx.end(), 0), sortedDedx.end());
+  sortedDedx.shrink_to_fit();
+
+  double truncMeanTmp = 0.0, meanTmp = 0.0, sumOfSqs = 0.0;
+  int nValTrunc = 0;
+  const int numDedx = sortedDedx.size();
+
+  // add a factor of 0.51 here to make sure we are rounding appropriately...
+  const int lEdgeTrunc = int(numDedx * 0.05 + 0.51);
+  const int hEdgeTrunc = int(numDedx * (1 - 0.25) + 0.51);
+  for (int i = 0; i < numDedx; i++) {
+    meanTmp += sortedDedx[i];
+    if (i >= lEdgeTrunc and i < hEdgeTrunc) {
+      truncMeanTmp += sortedDedx[i];
+      sumOfSqs += sortedDedx[i] * sortedDedx[i];
+      nValTrunc++;
+    }
+  }
+
+  if (numDedx != 0) meanTmp /= numDedx;
+
+  if (nValTrunc != 0) truncMeanTmp /= nValTrunc;
+  else truncMeanTmp = meanTmp;
+
+  *mean = meanTmp;
+  *truncMean = truncMeanTmp;
+
+  if (nValTrunc > 1)
+    *truncMeanErr = sqrt(sumOfSqs / double(nValTrunc) - truncMeanTmp * truncMeanTmp) / double(nValTrunc - 1);
+  else *truncMeanErr = 0;
+
+}
+
+//---------------------------------------------------------------------------------------
+void HitLevelInfoWriterModule::saveChiValue(double(&chi)[Const::ChargedStable::c_SetSize], CDCDedxTrack* dedxTrack,
+                                            double dedx) const
+{
+  // determine a chi value for each particle type
+  Const::ParticleSet set = Const::chargedStableSet;
+  for (const Const::ChargedStable pdgIter : set) {
+
+    // determine the predicted mean and resolution
+    double mean = dedxTrack->getPmean(pdgIter.getIndex());
+    double sigma = dedxTrack->getPreso(pdgIter.getIndex());
+
+    // fill the chi value for this particle type
+    if (sigma != 0) chi[pdgIter.getIndex()] = ((dedx - mean) / (sigma));
+  }
+}
+
+//---------------------------------------------------------------------------------------
+void HitLevelInfoWriterModule::clearEntries()
 {
   for (int il = 0; il < 200; ++il) {
     l_nhitscombined[il] = 0;
@@ -408,8 +656,8 @@ HitLevelInfoWriterModule::clearEntries()
   }
 }
 
-void
-HitLevelInfoWriterModule::bookOutput(std::string filename)
+//---------------------------------------------------------------------------------------
+void HitLevelInfoWriterModule::bookOutput(std::string filename)
 {
   // register output root file
   m_file.push_back(new TFile(filename.c_str(), "RECREATE"));
@@ -476,6 +724,13 @@ HitLevelInfoWriterModule::bookOutput(std::string filename)
   m_tree[i]->Branch("chiK", &m_chik, "chiK/D");
   m_tree[i]->Branch("chiP", &m_chip, "chiP/D");
   m_tree[i]->Branch("chiD", &m_chid, "chiD/D");
+
+  m_tree[i]->Branch("chiEOld", &m_chieOld, "chiEOld/D");
+  m_tree[i]->Branch("chiMuOld", &m_chimuOld, "chiMuOld/D");
+  m_tree[i]->Branch("chiPiOld", &m_chipiOld, "chiPiOld/D");
+  m_tree[i]->Branch("chiKOld", &m_chikOld, "chiKOld/D");
+  m_tree[i]->Branch("chiPOld", &m_chipOld, "chiPOld/D");
+  m_tree[i]->Branch("chiDOld", &m_chidOld, "chiDOld/D");
 
   m_tree[i]->Branch("pmeanE", &m_pmeane, "pmeanE/D");
   m_tree[i]->Branch("pmeanMu", &m_pmeanmu, "pmeanMu/D");

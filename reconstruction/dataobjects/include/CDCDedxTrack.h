@@ -131,6 +131,9 @@ namespace Belle2 {
     /** Return the run gain for this track */
     double getRunGain() const { return m_runGain; }
 
+    /** Return the scale factor for this track */
+    double getScaleFactor() const { return m_scale; }
+
     /** Get the track-level MC dE/dx mean for this track */
     double getSimulatedDedx() const { return m_simDedx; }
 

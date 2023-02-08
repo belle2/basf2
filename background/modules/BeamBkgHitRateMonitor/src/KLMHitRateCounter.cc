@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-/* Belle2 headers. */
+/* Basf2 headers. */
 #include <background/modules/BeamBkgHitRateMonitor/KLMHitRateCounter.h>
 
 using namespace Belle2::Background;

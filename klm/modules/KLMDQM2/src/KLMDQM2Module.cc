@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <klm/modules/KLMDQM2/KLMDQM2Module.h>
 #include <mdst/dataobjects/Track.h>
 

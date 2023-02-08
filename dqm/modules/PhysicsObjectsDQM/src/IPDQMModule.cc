@@ -9,7 +9,7 @@
 /* Own include. */
 #include <dqm/modules/PhysicsObjectsDQM/IPDQMModule.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/utility/ReferenceFrame.h>
 #include <framework/logging/Logger.h>

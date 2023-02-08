@@ -9,7 +9,7 @@
 /* Own include. */
 #include <generators/modules/BoostMCParticlesModule.h>
 
-/* Belle2 headers. */
+/* Basf2 headers. */
 #include <framework/dataobjects/MCInitialParticles.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>

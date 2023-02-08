@@ -8,7 +8,7 @@
 
 #pragma once
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <analysis/dataobjects/ParticleList.h>
 #include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>

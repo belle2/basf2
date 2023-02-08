@@ -10,7 +10,7 @@
 #include <TMatrixD.h>
 #include <bitset>
 
-/* Belle2 headers. */
+/* Basf2 headers. */
 #include <mdst/dataobjects/ECLCluster.h>
 #include <framework/logging/Logger.h>
 

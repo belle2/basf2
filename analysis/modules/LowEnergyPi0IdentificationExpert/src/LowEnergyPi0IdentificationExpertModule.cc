@@ -9,7 +9,7 @@
 /* Own header. */
 #include <analysis/modules/LowEnergyPi0IdentificationExpert/LowEnergyPi0IdentificationExpertModule.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <analysis/variables/ECLVariables.h>
 #include <analysis/variables/HelicityVariables.h>
 #include <mva/interface/Interface.h>

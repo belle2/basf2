@@ -9,7 +9,7 @@
 // Own include
 #include <dqm/analysis/modules/DQMHistAnalysisHLTMonObj.h>
 
-// Belle 2 headers.
+// Basf2 headers.
 #include <hlt/utilities/Units.h>
 
 // C++ headers

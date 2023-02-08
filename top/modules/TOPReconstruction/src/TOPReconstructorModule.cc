@@ -8,6 +8,8 @@
 
 // Own header.
 #include <top/modules/TOPReconstruction/TOPReconstructorModule.h>
+
+// TOP headers.
 #include <top/reconstruction_cpp/TOPRecoManager.h>
 #include <top/geometry/TOPGeometryPar.h>
 

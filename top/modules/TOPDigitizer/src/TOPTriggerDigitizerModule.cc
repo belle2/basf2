@@ -5,10 +5,11 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
+
 // Own header.
 #include <top/modules/TOPDigitizer/TOPTriggerDigitizerModule.h>
 
-// Hit classes
+// TOP headers.
 #include <top/dataobjects/TOPRawWaveform.h>
 #include <top/dataobjects/TOPTriggerDigit.h>
 #include <top/dataobjects/TOPTriggerMCInfo.h>

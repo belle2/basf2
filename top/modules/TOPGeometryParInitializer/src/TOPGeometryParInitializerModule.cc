@@ -8,6 +8,8 @@
 
 // Own header.
 #include <top/modules/TOPGeometryParInitializer/TOPGeometryParInitializerModule.h>
+
+// TOP headers.
 #include <top/geometry/TOPGeometryPar.h>
 
 // framework aux

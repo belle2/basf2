@@ -8,6 +8,8 @@
 
 // Own header.
 #include <top/modules/TOPLaserCalibrator/TOPLaserCalibratorModule.h>
+
+// TOP headers.
 #include <top/modules/TOPLaserCalibrator/LaserCalibratorFit.h>
 
 // framework - DataStore

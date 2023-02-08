@@ -9,6 +9,7 @@
 // Own header.
 #include <top/modules/TOPNtuple/TOPNtupleModule.h>
 
+// TOP headers.
 #include <top/geometry/TOPGeometryPar.h>
 
 // framework - DataStore

@@ -6,12 +6,14 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Module manager
-#include <framework/core/HistoModule.h>
-
 // Own header.
 #include <top/modules/TOPDQM/TOPDQMModule.h>
+
+// TOP headers.
 #include <top/geometry/TOPGeometryPar.h>
+
+// Module manager
+#include <framework/core/HistoModule.h>
 
 // framework - DataStore
 #include <framework/datastore/StoreArray.h>

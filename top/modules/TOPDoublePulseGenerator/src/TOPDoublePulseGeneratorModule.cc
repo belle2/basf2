@@ -8,6 +8,8 @@
 
 // Own header.
 #include <top/modules/TOPDoublePulseGenerator/TOPDoublePulseGeneratorModule.h>
+
+// TOP headers.
 #include <top/geometry/TOPGeometryPar.h>
 
 // framework - DataStore

@@ -8,8 +8,12 @@
 
 // Own header.
 #include <top/modules/TOPAligner/TOPAlignerModule.h>
+
+// TOP headers.
 #include <top/geometry/TOPGeometryPar.h>
 #include <top/reconstruction_cpp/TOPTrack.h>
+
+// Basf2 headers.
 #include <framework/logging/Logger.h>
 
 // root

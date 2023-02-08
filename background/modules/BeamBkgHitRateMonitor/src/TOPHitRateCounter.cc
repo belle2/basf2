@@ -8,6 +8,8 @@
 
 // Own header.
 #include <background/modules/BeamBkgHitRateMonitor/TOPHitRateCounter.h>
+
+// Basf2 headers.
 #include <top/geometry/TOPGeometryPar.h>
 
 // framework aux

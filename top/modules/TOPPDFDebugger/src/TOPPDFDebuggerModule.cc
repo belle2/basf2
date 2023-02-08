@@ -8,6 +8,8 @@
 
 // Own header.
 #include <top/modules/TOPPDFDebugger/TOPPDFDebuggerModule.h>
+
+// TOP headers.
 #include <top/geometry/TOPGeometryPar.h>
 #include <top/reconstruction_cpp/TOPRecoManager.h>
 #include <top/reconstruction_cpp/TOPTrack.h>

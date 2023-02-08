@@ -8,6 +8,8 @@
 
 // Own header.
 #include <top/modules/TOPPacker/TOPPackerModule.h>
+
+// TOP headers.
 #include <top/RawDataTypes.h>
 
 // framework - DataStore

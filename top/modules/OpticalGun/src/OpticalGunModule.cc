@@ -8,6 +8,8 @@
 
 // Own header.
 #include <top/modules/OpticalGun/OpticalGunModule.h>
+
+// TOP headers.
 #include <top/geometry/TOPGeometryPar.h>
 
 // framework aux

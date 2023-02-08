@@ -56,12 +56,14 @@ if arguments.belle1:
 else:
     payload_name_suffix = 'Belle2Release5'
 
+# lowEnergyPi0Identification requires a payload stored in the analysis global tag
+# One has to manually append (or prepend) it
 if b2bii.isB2BII():
     tag = ma.getAnalysisGlobaltagB2BII()
 else:
     tag = ma.getAnalysisGlobaltag()
 
-basf2.conditions.prepend_globaltag(tag)
+basf2.conditions.append_globaltag(tag)
 
 ma.lowEnergyPi0Identification(pi0_list, 'gamma:pi0', payload_name_suffix,
                               path=analysis_path)

@@ -12,9 +12,6 @@
 // TOP headers.
 #include <top/geometry/TOPGeometryPar.h>
 
-// Module manager
-#include <framework/core/HistoModule.h>
-
 // framework - DataStore
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>

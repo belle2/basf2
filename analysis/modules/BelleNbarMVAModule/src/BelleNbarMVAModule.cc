@@ -18,7 +18,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(BelleNbarMVA)
+REG_MODULE(BelleNbarMVA);
 
 BelleNbarMVAModule::BelleNbarMVAModule() : Module(), m_model()
 {

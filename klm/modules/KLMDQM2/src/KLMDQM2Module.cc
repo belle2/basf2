@@ -101,13 +101,11 @@ void KLMDQM2Module::defineHisto()
                                "Matched Hits in BKLM Plane",
                                m_PlaneNumBKLM, 0.5, 0.5 + m_PlaneNumBKLM);
   m_MatchedHitsBKLM->GetXaxis()->SetTitle("Layer Number");
-  //m_MatchedHitsBKLM->SetOption("LIVE");
 
   m_AllExtHitsBKLM = new TH1F("all_ext_hitsBKLM",
                               "All ExtHits in BKLM Plane",
                               m_PlaneNumBKLM, 0.5, 0.5 + m_PlaneNumBKLM);
   m_AllExtHitsBKLM->GetXaxis()->SetTitle("Layer number");
-  //m_AllExtHitsBKLM->SetOption("LIVE");
 
 
 
@@ -115,13 +113,11 @@ void KLMDQM2Module::defineHisto()
                                "Matched Hits in EKLM Plane",
                                m_PlaneNumEKLM, 0.5, m_PlaneNumEKLM + 0.5);
   m_MatchedHitsEKLM->GetXaxis()->SetTitle("Plane number");
-  //m_MatchedHitsEKLM->SetOption("LIVE");
 
   m_AllExtHitsEKLM = new TH1F("all_ext_hitsEKLM",
                               "All ExtHits in EKLM Plane",
                               m_PlaneNumEKLM, 0.5, m_PlaneNumEKLM + 0.5);
   m_AllExtHitsEKLM->GetXaxis()->SetTitle("Plane number");
-  //m_AllExtHitsEKLM->SetOption("LIVE");
 
 
 
@@ -135,13 +131,11 @@ void KLMDQM2Module::defineHisto()
                                      "Matched Hits in BKLM Sector",
                                      BKLMMaxSectors, 0.5, 0.5 + BKLMMaxSectors);
   m_MatchedHitsBKLMSector->GetXaxis()->SetTitle("Sector Number");
-  //m_MatchedHitsBKLMSector->SetOption("LIVE");
 
   m_AllExtHitsBKLMSector = new TH1F("all_ext_hitsBKLMSector",
                                     "All ExtHits in BKLM Sector",
                                     BKLMMaxSectors, 0.5, 0.5 + BKLMMaxSectors);
   m_AllExtHitsBKLMSector->GetXaxis()->SetTitle("Sector number");
-  //m_AllExtHitsBKLMSector->SetOption("LIVE");
 
 
 
@@ -149,13 +143,11 @@ void KLMDQM2Module::defineHisto()
                                      "Matched Hits in EKLM Sector",
                                      EKLMMaxSectors, 0.5, EKLMMaxSectors + 0.5);
   m_MatchedHitsEKLMSector->GetXaxis()->SetTitle("Sector number");
-  //m_MatchedHitsEKLMSector->SetOption("LIVE");
 
   m_AllExtHitsEKLMSector = new TH1F("all_ext_hitsEKLMSector",
                                     "All ExtHits in EKLM Sector",
                                     EKLMMaxSectors, 0.5, EKLMMaxSectors + 0.5);
   m_AllExtHitsEKLMSector->GetXaxis()->SetTitle("Sector number");
-  //m_AllExtHitsEKLMSector->SetOption("LIVE");
 
 }//end of defineHisto
 

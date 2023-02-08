@@ -18,16 +18,6 @@
 
 #include <Eigen/Dense>
 
-/* disables the false positive warning of Intel icc about iter_pair_range::epmty() being unused
-tracking/modules/mcMatcher/src/MCRecoTracksMatcherModule.cc:55: warning #177: function
-"::iter_pair_range::empty [with Iter=std::_Rb_tree_const_iterator::DetId={Belle2::Const::EDetector},
-::HitId={int}>, ::WeightedRecoTrackId>>]" was declared but never referenced
-bool empty() const
-*/
-#ifdef __INTEL_COMPILER
-#pragma warning disable 177
-#endif
-
 using namespace Belle2;
 
 REG_MODULE(MCRecoTracksMatcher);

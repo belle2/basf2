@@ -374,7 +374,7 @@ class GammaGammaControlKLMDark(BaseSkim):
     ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
-        stdPhotons("all", path=path, loadPhotonBeamBackgroundMVA=False)
+        stdPhotons("all", path=path)
 
     TestSampleProcess = "gg"
 
@@ -507,7 +507,7 @@ class RadBhabhaV0Control(BaseSkim):
     ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
-        stdPhotons("all", path=path, loadPhotonBeamBackgroundMVA=False)
+        stdPhotons("all", path=path)
         stdE("all", path=path)
 
     def build_lists(self, path):
@@ -551,7 +551,7 @@ class InelasticDarkMatter(BaseSkim):
     ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
-        stdPhotons("all", path=path, loadPhotonBeamBackgroundMVA=False)
+        stdPhotons("all", path=path)
         stdE("all", path=path)
 
     def build_lists(self, path):

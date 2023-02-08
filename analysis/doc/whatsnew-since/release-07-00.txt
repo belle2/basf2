@@ -15,6 +15,8 @@ Modules
 * Added an optional parameter ``biasCorrectionTable`` to `stdHyperons` so that users can specify a table name with photon energy
   bias corrections for the ``stdXi0`` particle list. The latest information on the bias correction can be found on the `Neutrals
   Performance Confluence Page <https://confluence.desy.de/display/BI/Neutrals+Performance>`_.
+* Added a parameter ``updateAllDaughters`` to `stdKshorts` and `stdLambdas` so that users can instruct the vertex fitter to
+  update the variables of the V0 daughters. The parameter is ``False`` by default for backward compatibility.
 
 Variables
 +++++++++

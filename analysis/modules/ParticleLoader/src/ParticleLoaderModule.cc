@@ -173,10 +173,12 @@ void ParticleLoaderModule::initialize()
         }
       } else if (m_useMCParticles) {
         B2WARNING("ParticleList " << listName << " already exists and will not be created again. " <<
-                  "The given options (addDaughters, skipNonPrimaryDaughters, skipNonPrimary) do not applied on the existing list.");
+                  "Please note that the given options (addDaughters, skipNonPrimaryDaughters, skipNonPrimary) do not apply to "
+                  << listName);
       } else if (m_loadChargedCluster) {
         B2WARNING("ParticleList " << listName << " already exists and will not be created again. " <<
-                  "The given option, useOnlyMostEnergeticECLCluster, do not applied on the existing list.");
+                  "Please note that the given option, useOnlyMostEnergeticECLCluster, does not apply to "
+                  << listName);
       }
 
       if (not isValidPDGCode(pdgCode) and (m_useMCParticles == false and m_useROEs == false and m_useDummy == false))
@@ -781,15 +783,9 @@ bool ParticleLoaderModule::isValidECLCluster(const ECLCluster* cluster, const in
       and not cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))
     return false;
 
-  // don't fill a KLong list with clusters that don't have the neutral
+  // don't fill a KLong nor a (anti-)neutron list with clusters that don't have the neutral
   // hadron hypothesis set (ECL people call this N2)
-  if (pdgCode == Const::Klong.getPDGCode()
-      and not cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron))
-    return false;
-
-  // don't fill a neutron list with clusters that don't have the neutral
-  // hadron hypothesis set (ECL people call this N2)
-  if (abs(pdgCode) == Const::neutron.getPDGCode()
+  if ((pdgCode == Const::Klong.getPDGCode() or abs(pdgCode) == Const::neutron.getPDGCode())
       and not cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron))
     return false;
 
@@ -802,15 +798,16 @@ void ParticleLoaderModule::assignMCParticleFromECLCluster(Particle* newPart,
   // ECLCluster can be matched to multiple MCParticles
   // order the relations by weights and set Particle -> multiple MCParticle relation
   // preserve the weight
-  RelationVector<MCParticle> mcRelations = cluster->getRelationsTo<MCParticle>();
+  const RelationVector<MCParticle> mcRelations = cluster->getRelationsTo<MCParticle>();
 
   // order relations by weights
   std::vector<std::pair<int, double>> weightsAndIndices;
   for (unsigned int iMCParticle = 0; iMCParticle < mcRelations.size(); iMCParticle++) {
     const MCParticle* relMCParticle = mcRelations[iMCParticle];
-    double weight = mcRelations.weight(iMCParticle);
-    if (relMCParticle)
+    if (relMCParticle) {
+      double weight = mcRelations.weight(iMCParticle);
       weightsAndIndices.emplace_back(relMCParticle->getArrayIndex(), weight);
+    }
   }
 
   // sort descending by weight
@@ -866,7 +863,7 @@ void ParticleLoaderModule::chargedClustersToParticles()
       antiPlist->bindAntiParticleList(*(plist));
     }
 
-    StoreObjPtr<ParticleList> sourceList(m_sourceParticleListName);
+    const StoreObjPtr<ParticleList> sourceList(m_sourceParticleListName);
     if (!sourceList.isValid())
       B2FATAL("ParticleList " << m_sourceParticleListName << " could not be found or is not valid!");
 
@@ -893,7 +890,7 @@ void ParticleLoaderModule::chargedClustersToParticles()
       } else {
 
         // loop over all clusters matched to this track
-        RelationVector<ECLCluster> clusters =  sourceTrack->getRelationsTo<ECLCluster>();
+        const RelationVector<ECLCluster> clusters =  sourceTrack->getRelationsTo<ECLCluster>();
         for (unsigned int iCluster = 0; iCluster < clusters.size(); iCluster++) {
           const ECLCluster* cluster = clusters[iCluster];
           if (!isValidECLCluster(cluster, pdgCode, false))

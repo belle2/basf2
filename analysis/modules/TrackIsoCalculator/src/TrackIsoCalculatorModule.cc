@@ -8,6 +8,7 @@
 
 #include <analysis/modules/TrackIsoCalculator/TrackIsoCalculatorModule.h>
 #include <analysis/DecayDescriptor/DecayDescriptorParticle.h>
+#include <analysis/utility/DetectorSurface.h>
 
 #include <cmath>
 #include <iomanip>
@@ -100,10 +101,10 @@ void TrackIsoCalculatorModule::initialize()
   boost::to_upper(m_detName);
 
   // The total number of layers of this detector.
-  m_nLayers = m_detToLayers[m_detName].size();
+  m_nLayers = DetectorSurface::detToLayers[m_detName].size();
 
   // Define the name(s) of the variables for this detector to be stored as extraInfo.
-  for (const auto& iLayer : m_detToLayers[m_detName]) {
+  for (const auto& iLayer : DetectorSurface::detToLayers[m_detName]) {
 
     auto iDetLayer = m_detName + std::to_string(iLayer);
 
@@ -139,7 +140,7 @@ void TrackIsoCalculatorModule::event()
   targetParticles.reserve(nMotherParticles);
 
   // Loop over the layer of the input detector.
-  for (const auto& iLayer : m_detToLayers[m_detName]) {
+  for (const auto& iLayer : DetectorSurface::detToLayers[m_detName]) {
 
     auto iDetLayer = m_detName + std::to_string(iLayer);
 
@@ -170,7 +171,7 @@ void TrackIsoCalculatorModule::event()
   const auto nParticlesReference = m_pListReference->getListSize();
 
   // Loop over the layer of the input detector.
-  for (const auto& iLayer : m_detToLayers[m_detName]) {
+  for (const auto& iLayer : DetectorSurface::detToLayers[m_detName]) {
 
     auto iDetLayer = m_detName + std::to_string(iLayer);
 
@@ -311,7 +312,7 @@ double TrackIsoCalculatorModule::getIsoScore(const Particle* iParticle) const
   }
 
   unsigned int n(0);
-  for (const auto& iLayer : m_detToLayers.at(m_detName)) {
+  for (const auto& iLayer : DetectorSurface::detToLayers.at(m_detName)) {
     auto iDetLayer = m_detName + std::to_string(iLayer);
     auto distVar = m_detLayerToDistVariable.at(iDetLayer);
     auto threshDist = this->getDistThreshold(det, iLayer);
@@ -345,14 +346,14 @@ double TrackIsoCalculatorModule::getDistAtDetSurface(const Particle* iParticle,
 {
 
   // Radius and z boundaries of the cylinder describing this detector's surface.
-  const auto rho = m_detLayerToSurfBoundaries.at(detLayerName).m_rho;
-  const auto zfwd = m_detLayerToSurfBoundaries.at(detLayerName).m_zfwd;
-  const auto zbwd = m_detLayerToSurfBoundaries.at(detLayerName).m_zbwd;
+  const auto rho = DetectorSurface::detLayerToSurfBoundaries.at(detLayerName).m_rho;
+  const auto zfwd = DetectorSurface::detLayerToSurfBoundaries.at(detLayerName).m_zfwd;
+  const auto zbwd = DetectorSurface::detLayerToSurfBoundaries.at(detLayerName).m_zbwd;
   // Polar angle boundaries between barrel and endcaps.
-  const auto th_fwd = m_detLayerToSurfBoundaries.at(detLayerName).m_th_fwd;
-  const auto th_fwd_brl = m_detLayerToSurfBoundaries.at(detLayerName).m_th_fwd_brl;
-  const auto th_bwd_brl = m_detLayerToSurfBoundaries.at(detLayerName).m_th_bwd_brl;
-  const auto th_bwd = m_detLayerToSurfBoundaries.at(detLayerName).m_th_bwd;
+  const auto th_fwd = DetectorSurface::detLayerToSurfBoundaries.at(detLayerName).m_th_fwd;
+  const auto th_fwd_brl = DetectorSurface::detLayerToSurfBoundaries.at(detLayerName).m_th_fwd_brl;
+  const auto th_bwd_brl = DetectorSurface::detLayerToSurfBoundaries.at(detLayerName).m_th_bwd_brl;
+  const auto th_bwd = DetectorSurface::detLayerToSurfBoundaries.at(detLayerName).m_th_bwd;
 
   std::string nameExtTheta = "helixExtTheta(" + std::to_string(rho) + "," + std::to_string(zfwd) + "," + std::to_string(zbwd) + ")";
   if (m_useHighestProbMassForExt) {

@@ -13,6 +13,7 @@
 #include <analysis/VariableManager/Manager.h>
 
 #include <analysis/dataobjects/Particle.h>
+#include <analysis/utility/DetectorSurface.h>
 
 // framework - DataStore
 #include <framework/datastore/StoreObjPtr.h>
@@ -36,28 +37,6 @@ namespace Belle2 {
 
     static const double realNaN = std::numeric_limits<double>::quiet_NaN();
     static const B2Vector3D vecNaN(realNaN, realNaN, realNaN);
-    static const std::unordered_map<std::string, std::vector<double>> detector_map = {
-      {"CDC", {16.8, 150.0, -75.0}},
-      {"CDC0", {16.8, 150.0, -75.0}},
-      {"CDC1", {25.7, 150.0, -75.0}},
-      {"CDC2", {36.52, 150.0, -75.0}},
-      {"CDC3", {47.69, 150.0, -75.0}},
-      {"CDC4", {58.41, 150.0, -75.0}},
-      {"CDC5", {69.53, 150.0, -75.0}},
-      {"CDC6", {80.25, 150.0, -75.0}},
-      {"CDC7", {91.37, 150.0, -75.0}},
-      {"CDC8", {102.09, 150.0, -75.0}},
-      {"TOP", {117.8, 193.0, -94.0}},
-      {"TOP0", {117.8, 193.0, -94.0}},
-      {"ARICH", {117.8, 193.0, -94.0}},
-      {"ARICH0", {117.8, 193.0, -94.0}},
-      {"ECL", {125.0, 196.0, -102.0}},
-      {"ECL0", {125.0, 196.0, -102.0}},
-      {"ECL1", {140.0, 211.0, -117.0}},
-      {"KLM", {202.0, 283.9, -189.9}},
-      {"KLM0", {202.0, 283.9, -189.9}},
-    };
-
 
     double trackNHits(const Particle* part, const Const::EDetector& det)
     {
@@ -361,10 +340,20 @@ namespace Belle2 {
     {
       if (arguments.size() != 1 && arguments.size() != 2)
         B2FATAL("Exactly one (+1 optional) parameter (detector_surface_name, [useHighestProbMass]) is required for helixExtThetaOnDet.");
-      if (detector_map.find(arguments[0]) == detector_map.end())
+
+      std::vector<double> parameters(3);
+      const std::string det = arguments[0];
+      if (DetectorSurface::detToSurfBoundaries.find(det) != DetectorSurface::detToSurfBoundaries.end()) {
+        parameters[0] = DetectorSurface::detToSurfBoundaries.at(det).m_rho;
+        parameters[1] = DetectorSurface::detToSurfBoundaries.at(det).m_zfwd;
+        parameters[2] = DetectorSurface::detToSurfBoundaries.at(det).m_zbwd;
+      } else if (DetectorSurface::detLayerToSurfBoundaries.find(det) != DetectorSurface::detLayerToSurfBoundaries.end()) {
+        parameters[0] = DetectorSurface::detLayerToSurfBoundaries.at(det).m_rho;
+        parameters[1] = DetectorSurface::detLayerToSurfBoundaries.at(det).m_zfwd;
+        parameters[2] = DetectorSurface::detLayerToSurfBoundaries.at(det).m_zbwd;
+      } else
         B2FATAL("Given detector surface name is not supported.");
 
-      std::vector<double> parameters = detector_map.at(arguments[0]);
       if (arguments.size() == 2)
         parameters.push_back(std::stod(arguments[1]));
 
@@ -381,10 +370,20 @@ namespace Belle2 {
     {
       if (arguments.size() != 1 && arguments.size() != 2)
         B2FATAL("Exactly one (+1 optional) parameter (detector_surface_name, [useHighestProbMass]) is required for helixExtPhiOnDet.");
-      if (detector_map.find(arguments[0]) == detector_map.end())
+
+      std::vector<double> parameters(3);
+      const std::string det = arguments[0];
+      if (DetectorSurface::detToSurfBoundaries.find(det) != DetectorSurface::detToSurfBoundaries.end()) {
+        parameters[0] = DetectorSurface::detToSurfBoundaries.at(det).m_rho;
+        parameters[1] = DetectorSurface::detToSurfBoundaries.at(det).m_zfwd;
+        parameters[2] = DetectorSurface::detToSurfBoundaries.at(det).m_zbwd;
+      } else if (DetectorSurface::detLayerToSurfBoundaries.find(det) != DetectorSurface::detLayerToSurfBoundaries.end()) {
+        parameters[0] = DetectorSurface::detLayerToSurfBoundaries.at(det).m_rho;
+        parameters[1] = DetectorSurface::detLayerToSurfBoundaries.at(det).m_zfwd;
+        parameters[2] = DetectorSurface::detLayerToSurfBoundaries.at(det).m_zbwd;
+      } else
         B2FATAL("Given detector surface name is not supported.");
 
-      std::vector<double> parameters = detector_map.at(arguments[0]);
       if (arguments.size() == 2)
         parameters.push_back(std::stod(arguments[1]));
 

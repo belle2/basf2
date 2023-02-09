@@ -47,6 +47,10 @@ namespace Belle2 {
     float m_th_bwd; /**< Upper theta edge of bwd region [rad] */
   };
 
+  /**
+   * Detector surfaces information.
+   * Contains the unordered_maps that associate to each detector its valid cylindrical surface's boundaries.
+   */
   struct DetectorSurface {
 
     /**

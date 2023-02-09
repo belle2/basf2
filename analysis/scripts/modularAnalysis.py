@@ -1289,6 +1289,40 @@ def fillParticleListsFromMC(decayStringsWithCuts,
             applyCuts(decayString, cut, path)
 
 
+def fillParticleListFromChargedCluster(outputParticleList,
+                                       inputParticleList,
+                                       cut,
+                                       useOnlyMostEnergeticECLCluster=True,
+                                       writeOut=False,
+                                       path=None):
+    """
+    Creates the Particle object from ECLCluster and KLMCluster that are being matched with the Track of inputParticleList.
+
+    @param outputParticleList       The output ParticleList. The neutral final state particles are supported.
+    @param inputParticleList        The input ParticleList that is required to have the relation to the Track object.
+    @param cut                      Particles need to pass these selection criteria to be added to the ParticleList
+    @param useOnlyMostEnergeticECLCluster If True, only the most energetic ECLCluster among ones that are matched with the Track is
+                                          used. If False, all matched ECLClusters are loaded. The default is True. Regardless of
+                                          this option, the KLMCluster is loaded.
+    @param writeOut                whether RootOutput module should save the created ParticleList
+    @param path                    modules are added to this path
+    """
+
+    pload = register_module('ParticleLoader')
+    pload.set_name('ParticleLoader_' + outputParticleList)
+
+    pload.param('decayStrings', [outputParticleList])
+    pload.param('sourceParticleListName', inputParticleList)
+    pload.param('writeOut', writeOut)
+    pload.param('loadChargedCluster', True)
+    pload.param('useOnlyMostEnergeticECLCluster', useOnlyMostEnergeticECLCluster)
+    path.add_module(pload)
+
+    # apply a cut if a non-empty cut string is provided
+    if cut != "":
+        applyCuts(outputParticleList, cut, path)
+
+
 def applyCuts(list_name, cut, path):
     """
     Removes particle candidates from ``list_name`` that do not pass ``cut``

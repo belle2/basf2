@@ -10,25 +10,20 @@
 # Date: 20230202
 # Comments:
 
-# Define aliases
-Alias chi_c1sig chi_c1
-Alias Jpsi_sig J/psi
-
 Decay Upsilon(4S)
-0.5000 B0sig anti-B0    VSS_BMIX dm;
-0.5000 B0 anti-B0sig    VSS_BMIX dm;
+1.0    B0  anti-B0  B0sig  anti-B0sig     VSS_BMIX dm;
 Enddecay
 
 Decay B0sig
-1.000 chi_c1sig KS0   SVS;
+1.000 chi_c1sig K_S0   SVS;
 Enddecay
 CDecay anti-B0sig
 
 Decay chi_c1sig
-1.000 Jpsi_sig gamma   VVP 1.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0;
+1.000 J/psisig gamma   VVP 1.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0;
 Enddecay
 
-Decay Jpsi_sig
+Decay J/psisig
 0.500 e+ e-           PHOTOS VLL;
 0.500 mu+ mu-         PHOTOS VLL;
 Enddecay

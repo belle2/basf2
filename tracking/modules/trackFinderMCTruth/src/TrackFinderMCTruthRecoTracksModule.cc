@@ -121,6 +121,12 @@ TrackFinderMCTruthRecoTracksModule::TrackFinderMCTruthRecoTracksModule() : Modul
            "\"is:X\" where X is a PDG code: particle must have this code. "
            "\"from:X\" any of the particles's ancestors must have this (X) code",
            std::vector<std::string>(1, "primary"));
+  addParam("onlyCheckMotherPdgCode",
+           m_onlyCheckMotherPdgCode,
+           "Which particles in the list m_fromPdgCodes to check for the ancestors. "
+           "If true, only check the mother to be contained in m_fromPdgCodes, if false, check all ancestors in m_fromPdgCodes. "
+           "This is useful to e.g. search for slow pions from D* decays.",
+           m_onlyCheckMotherPdgCode);
 
   addParam("EnergyCut",
            m_energyCut,
@@ -459,18 +465,28 @@ void TrackFinderMCTruthRecoTracksModule::event()
       MCParticle* currentMother = aMcParticlePtr->getMother();
       int nFalsePdgCodes = 0;
       int nAncestor = 0;
+      bool foundMother = false;
       while (currentMother not_eq nullptr) {
         int currentMotherPdgCode = currentMother->getPDG();
         for (int i = 0; i not_eq nFromPdgCodes; ++i) {
           if (m_fromPdgCodes[i] not_eq currentMotherPdgCode) {
             ++nFalsePdgCodes;
+          } else {
+            foundMother = true;
+            // if (m_onlyCheckMotherPdgCode) {
+            //   break;
+            // }
           }
         }
 
-        currentMother = currentMother->getMother();
-        ++nAncestor;
+        if (m_onlyCheckMotherPdgCode) {
+          currentMother = nullptr;
+        } else {
+          currentMother = currentMother->getMother();
+          ++nAncestor;
+        }
       }
-      if (nFalsePdgCodes == (nAncestor * nFromPdgCodes)) {
+      if (nFalsePdgCodes == (nAncestor * nFromPdgCodes) or not(m_onlyCheckMotherPdgCode and foundMother)) {
         B2DEBUG(20, "particle does not have and ancestor with one of the user provided pdg codes and will therefore be skipped");
         continue; //goto next mcParticle, do not make track candidate
       }

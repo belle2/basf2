@@ -214,27 +214,6 @@ namespace Belle2 {
     };
 
     /**
-     * Maximal values for the distance (in [cm]) to closest ext. helix, derived in J/psi->ll events.
-     * One for each detector layer.
-     */
-    std::map<std::pair<std::string, int>, double> m_distMaxPerDetLayer = {
-      { {Const::parseDetectors(Const::CDC), 0}, 35. },
-      { {Const::parseDetectors(Const::CDC), 1}, 50. },
-      { {Const::parseDetectors(Const::CDC), 2}, 75. },
-      { {Const::parseDetectors(Const::CDC), 3}, 95. },
-      { {Const::parseDetectors(Const::CDC), 4}, 115. },
-      { {Const::parseDetectors(Const::CDC), 5}, 140. },
-      { {Const::parseDetectors(Const::CDC), 6}, 160. },
-      { {Const::parseDetectors(Const::CDC), 7}, 185. },
-      { {Const::parseDetectors(Const::CDC), 8}, 200. },
-      { {Const::parseDetectors(Const::TOP), 0}, 250. },
-      { {Const::parseDetectors(Const::ARICH), 0}, 250. },
-      { {Const::parseDetectors(Const::ECL), 0}, 300. },
-      { {Const::parseDetectors(Const::ECL), 1}, 350. },
-      { {Const::parseDetectors(Const::KLM), 0}, 500. }
-    };
-
-    /**
      * The event information. Used for debugging purposes.
      */
     StoreObjPtr<EventMetaData> m_event_metadata;

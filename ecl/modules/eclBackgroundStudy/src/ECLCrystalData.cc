@@ -6,14 +6,15 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-//This module
+/* Own header. */
 #include <ecl/modules/eclBackgroundStudy/ECLCrystalData.h>
 
-//Framework
+/* Basf2 headers. */
 #include <framework/logging/Logger.h>
 
-//STL
+/* C++ headers. */
 #include <cmath>
+
 #define PI 3.14159265358979323846
 #define DEGTORAD 1.74532925199432955e-02
 

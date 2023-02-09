@@ -8,10 +8,8 @@
 
 #pragma once
 
-//Calibration
+/* Basf2 headers. */
 #include <calibration/CalibrationCollectorModule.h>
-
-//Framework
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 

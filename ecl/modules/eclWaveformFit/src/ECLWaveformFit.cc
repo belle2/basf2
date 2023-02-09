@@ -205,7 +205,7 @@ void ECLWaveformFitModule::loadTemplateParameterArray()
   if (m_IsMCFlag == 0) {
     //load data templates
     std::vector<double>  Ptemp(11), Htemp(11), Dtemp(11);
-    for (int i = 0; i < 8736; i++) {
+    for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++) {
       for (int j = 0; j < 11; j++) {
         Ptemp[j] = (double)m_WaveformParameters->getPhotonParameters(i + 1)[j];
         Htemp[j] = (double)m_WaveformParameters->getHadronParameters(i + 1)[j];
@@ -235,19 +235,19 @@ void ECLWaveformFitModule::beginRun()
   m_IsMCFlag = Environment::Instance().isMC();
   m_TemplatesLoaded = false;
 
-  m_ADCtoEnergy.resize(8736);
+  m_ADCtoEnergy.resize(ECLElementNumbers::c_NCrystals);
   if (m_CrystalElectronics.isValid()) {
-    for (int i = 0; i < 8736; i++)
+    for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++)
       m_ADCtoEnergy[i] = m_CrystalElectronics->getCalibVector()[i];
   }
   if (m_CrystalEnergy.isValid()) {
-    for (int i = 0; i < 8736; i++)
+    for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++)
       m_ADCtoEnergy[i] *= m_CrystalEnergy->getCalibVector()[i];
   }
 
   //Load covariance matricies from database;
   if (m_CovarianceMatrix) {
-    for (int id = 1; id <= 8736; id++) {
+    for (int id = 1; id <= ECLElementNumbers::c_NCrystals; id++) {
       constexpr int N = 31;
       std::vector<double> buf(N);
       std::vector<double> reg(N);

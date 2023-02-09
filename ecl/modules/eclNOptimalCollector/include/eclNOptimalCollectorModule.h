@@ -6,9 +6,12 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-
 #pragma once
 
+/* ECL headers. */
+#include <ecl/dataobjects/ECLElementNumbers.h>
+
+/* Basf2 headers. */
 #include <calibration/CalibrationCollectorModule.h>
 #include <framework/datastore/StoreArray.h>
 
@@ -67,7 +70,7 @@ namespace Belle2 {
     const int nCrysMax = 21; /**< max number of crystals used to calculate energy */
 
     int nCrystalGroups; /**< sort the crystals into this many groups */
-    int iGroupOfCrystal[8736]; /**< group number of each crystal */
+    int iGroupOfCrystal[ECLElementNumbers::c_NCrystals]; /**< group number of each crystal */
 
     ECL::ECLNeighbours* neighbours{nullptr}; /**< neighbours to crystal */
 

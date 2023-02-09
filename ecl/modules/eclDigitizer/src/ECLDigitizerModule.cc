@@ -137,41 +137,41 @@ void ECLDigitizerModule::beginRun()
   }
 
   calibration_t def = {1, 0};
-  m_calib.assign(8736, def);
+  m_calib.assign(ECLElementNumbers::c_NCrystals, def);
 
   if (m_CrystalElectronics.isValid()) {
-    for (int i = 0; i < 8736; i++)
+    for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++)
       m_calib[i].ascale /= m_CrystalElectronics->getCalibVector()[i];
   }
   if (m_CrystalEnergy.isValid()) {
-    for (int i = 0; i < 8736; i++)
+    for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++)
       m_calib[i].ascale /= m_CrystalEnergy->getCalibVector()[i] * 20000.0;
   }
   if (m_CrystalElectronicsTime.isValid()) {
-    for (int i = 0; i < 8736; i++)
+    for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++)
       m_calib[i].tshift += m_CrystalElectronicsTime->getCalibVector()[i] * ns_per_tick;
   }
   if (m_CrystalTimeOffset.isValid()) {
-    for (int i = 0; i < 8736; i++)
+    for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++)
       m_calib[i].tshift += m_CrystalTimeOffset->getCalibVector()[i] * ns_per_tick;
   }
   if (m_CrateTimeOffset.isValid()) {
-    for (int i = 0; i < 8736; i++)
+    for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++)
       m_calib[i].tshift += m_CrateTimeOffset->getCalibVector()[i] * ns_per_tick;
   }
   if (m_MCTimeOffset.isValid()) {
-    for (int i = 0; i < 8736; i++)
+    for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++)
       m_calib[i].tshift += m_MCTimeOffset->getCalibVector()[i] * ns_per_tick;
   }
-  m_Awave.assign(8736, -1);
+  m_Awave.assign(ECLElementNumbers::c_NCrystals, -1);
   if (m_WaveformThresholdOverride < 0) {
     if (m_FPGAWaveform.isValid()) {
-      for (int i = 0; i < 8736; i++)
+      for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++)
         m_Awave[i] = m_FPGAWaveform->getCalibVector()[i];
     }
   } else {
     //If m_WaveformThresholdOverride > 0 override ECL_FPGA_StoreWaveform;
-    for (int i = 0; i < 8736; i++)
+    for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++)
       m_Awave[i] = m_WaveformThresholdOverride * m_calib[i].ascale; // convert GeV to ADC
   }
 

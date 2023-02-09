@@ -8,30 +8,16 @@
 
 #pragma once
 
-/* Basf2 headers. */
-#include <framework/core/Module.h>
-
 namespace Belle2 {
 
-  /** Dump location and direction of all ECL crystals */
-  class ECLDumpGeometryModule : public Module {
+  /**
+   * ECL element numbers.
+   */
+  namespace ECLElementNumbers {
 
-  public:
+    /** Number of crystals. */
+    const int c_NCrystals = 8736;
 
-    /**
-     * Constructor: Sets the description, the properties and the parameters of the module.
-     */
-    ECLDumpGeometryModule();
+  }
 
-    /** Register input and output data */
-    virtual void initialize() override;
-
-    /** Event */
-    virtual void event() override;
-
-  private:
-    bool firstEvent = true; /**< print out geometry in the first event */
-
-  };
 }
-

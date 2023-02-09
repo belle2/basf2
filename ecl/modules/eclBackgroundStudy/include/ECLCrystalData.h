@@ -8,6 +8,9 @@
 
 #pragma once
 
+/* ECL headers. */
+#include <ecl/dataobjects/ECLElementNumbers.h>
+
 namespace Belle2 {
 
   /**
@@ -73,7 +76,7 @@ namespace Belle2 {
     /** Number of crystals in preceding theta rings (endcaps only) */
     static const int sumPrevious[24];
 
-    const int nECLCrystalTot = 8736; /**< Total number of ECL crystals     */
+    const int nECLCrystalTot = ECLElementNumbers::c_NCrystals; /**< Total number of ECL crystals     */
     const int nECLCrystalBAR = 6624; /**< Number of Barrel ECL crystals    */
     const int nECLCrystalECF = 1152; /**< Number of FWD ECL end-capcrystals*/
     const int nECLCrystalECB =  960; /**< Number of BWD ECL end-capcrystals*/

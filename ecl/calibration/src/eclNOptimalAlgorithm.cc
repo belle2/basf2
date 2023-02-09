@@ -6,19 +6,25 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+/* Own header. */
 #include <ecl/calibration/eclNOptimalAlgorithm.h>
+
+/* ECL headers. */
+#include <ecl/dataobjects/ECLElementNumbers.h>
 #include <ecl/dbobjects/ECLnOptimal.h>
+
+/* Basf2 headers. */
 #include <framework/database/DBObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/database/DBStore.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreObjPtr.h>
 
-
-#include "TH2F.h"
-#include "TROOT.h"
-#include "TMath.h"
-#include "TF1.h"
+/* ROOT headers. */
+#include <TF1.h>
+#include <TH2F.h>
+#include <TMath.h>
+#include <TROOT.h>
 
 using namespace std;
 using namespace Belle2;
@@ -233,7 +239,7 @@ CalibrationAlgorithm::EResult eclNOptimalAlgorithm::calibrate()
 
   //..Also read in and normalize group number for each cellID
   auto groupNumberOfEachCellID = getObjectPtr<TH1F>("groupNumberOfEachCellID");
-  for (int ic = 1; ic <= 8736; ic++) {
+  for (int ic = 1; ic <= ECLElementNumbers::c_NCrystals; ic++) {
     const double groupNum = groupNumberOfEachCellID->GetBinContent(ic);
     groupNumberOfEachCellID->SetBinContent(ic, groupNum / scale);
     groupNumberOfEachCellID->SetBinError(ic, 0.);
@@ -317,7 +323,7 @@ CalibrationAlgorithm::EResult eclNOptimalAlgorithm::calibrate()
 
   const int iFirstBarrel = 1153; // first barrel cellID
   const int iLastBarrel = 7776; // last barrel cellID
-  const int nCrystalsTotal = 8736;
+  const int nCrystalsTotal = ECLElementNumbers::c_NCrystals;
   for (int cellID = 1; cellID <= nCrystalsTotal; cellID++) {
 
     //..Group number of this cellID
@@ -844,7 +850,7 @@ CalibrationAlgorithm::EResult eclNOptimalAlgorithm::calibrate()
 
   //..Group number of each cellID
   std::vector<int> groupNumber;
-  for (int cellID = 1; cellID <= 8736; cellID++) {
+  for (int cellID = 1; cellID <= ECLElementNumbers::c_NCrystals; cellID++) {
     const int iGroup = (int)(0.5 + groupNumberOfEachCellID->GetBinContent(cellID));
     groupNumber.push_back(iGroup);
   }

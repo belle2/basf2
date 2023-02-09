@@ -92,7 +92,7 @@ namespace Belle2 {
     /*** See inDefineHisto method for branches description ***/
     int m_tree_evt_num = -1;    /**< Event number for debug TTree output*/
     int m_tree_run = -1;     /**< Run number for debug TTree output */
-    int m_tree_cid = -1;     /**< ECL Cell ID (1..8736) for debug TTree output */
+    int m_tree_cid = -1;     /**< ECL Cell ID (1..ECLElementNumbers::c_NCrystals) for debug TTree output */
     double m_tree_dt99 = -1;  /**< dt99 for cluster */
     double m_tree_time = -1; /**< Calibrated time */
 

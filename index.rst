@@ -1,5 +1,5 @@
 Belle II Software Documentation
-==============================
+===============================
 
 This document contains documentation of the Belle II software, its command line
 tools and the Python programming interface.

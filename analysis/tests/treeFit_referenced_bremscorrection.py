@@ -38,7 +38,7 @@ class TestTreeFits(unittest.TestCase):
         ma.matchMCTruth('J/psi:corrected', path=main)
 
         ma.applyCuts('J/psi:corrected',
-                     'formula(daughter(0, extraInfo(bremsCorrected)) + daughter(1, extraInfo(bremsCorrected)))==2 and isSignal==1',
+                     'daughterSumOf(extraInfo(bremsCorrected)) == 2 and isSignal==1',
                      path=main)
         ma.applyEventCuts('nParticlesInList(J/psi:corrected)', path=main)
 
@@ -90,7 +90,7 @@ class TestTreeFits(unittest.TestCase):
         chiProbImproved = ntuple.GetEntries("(chiProb > chiProb_woCorrection) && (abs(dM) < abs(dM_woCorrection))")
         chiProbWorsened = ntuple.GetEntries("(chiProb < chiProb_woCorrection) && (abs(dM) < abs(dM_woCorrection))")
 
-        self.assertFalse(dMImproved < 229, "Brems-correction does not improve mass-reconstruction very much.")
+        self.assertTrue(dMImproved == 229, "Brems-correction algorithm or setting have been changed.")
 
         print(f"Vertex fit quality improved due to the brems-correction, # of candidates = {chiProbImproved}")
         print(f"Vertex fit quality worsened due to the brems-correction, # of candidates = {chiProbWorsened}")

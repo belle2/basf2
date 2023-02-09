@@ -79,7 +79,7 @@ namespace Belle2 {
     bool   m_flatSignalCut      = false; /** Select all clusters within signal range around first gr. */
     bool   m_includeOutOfRangeClusters = true; /** Assign groups to under and overflow. */
     bool   m_useOnlyOneGroup    = false; /** Only one group is kept. */
-    double m_exponentialSort    = 0.; /** Group prominence is weighted with exponential weight. */
+    double m_exponentialSort    = 30.; /** Group prominence is weighted with exponential weight. */
 
     // modification parameters
     std::string m_nameOfInstance =

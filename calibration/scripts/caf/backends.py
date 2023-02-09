@@ -858,7 +858,7 @@ class Result():
         self._is_ready = False
         #: After our first attempt to view the exit code file once the job is 'finished',
         #  how long should we wait for it to exist before timing out?
-        self.time_to_wait_for_exit_code_file = timedelta(minutes=5)
+        self.time_to_wait_for_exit_code_file = timedelta(minutes=20)
         #: Time we started waiting for the exit code file to appear
         self.exit_code_file_initial_time = None
 

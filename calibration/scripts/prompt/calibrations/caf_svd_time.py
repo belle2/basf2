@@ -51,6 +51,7 @@ settings = CalibrationSettings(name="caf_svd_time",
                                                                     INPUT_DATA_FILTERS["Magnet"]["On"]]},
                                depends_on=[],
                                expert_config={
+                                   "timeAlgorithms": ["CoG6", "CoG3", "ELS3"],
                                    "max_events_per_run": 50000,
                                    "isMC": False,
                                })
@@ -239,6 +240,7 @@ def get_calibrations(input_data, **kwargs):
 
     file_to_iov_physics = input_data["hadron_calib"]
     expert_config = kwargs.get("expert_config")
+    timeAlgorithms = expert_config["timeAlgorithms"]
     max_events_per_run = expert_config["max_events_per_run"]  # Maximum number of events selected per each run
     isMC = expert_config["isMC"]
 
@@ -355,17 +357,44 @@ def get_calibrations(input_data, **kwargs):
     # add the two cog collectors to it.
     ####
 
+    # Check what time algorithms (CoG6, CoG3, ELS3) will be calibrated according to expert input
+    list_of_clusterizers = []
+    list_of_algorithms = []
+    for a in timeAlgorithms:
+        if a == "CoG3":
+            list_of_clusterizers.append(cog3)
+            list_of_algorithms.append(algo_cog3)
+        if a == "CoG6":
+            list_of_clusterizers.append(cog6)
+            list_of_algorithms.append(algo_cog6)
+        if a == "ELS3":
+            list_of_clusterizers.append(els3)
+            list_of_algorithms.append(algo_els3)
+
     pre_collector_path = create_pre_collector_path(
-        clusterizers=[cog6, cog3, els3],
+        clusterizers=list_of_clusterizers,
         isMC=isMC, max_events_per_run=max_events_per_run)
-    pre_collector_path.add_module(coll_cog6)
-    pre_collector_path.add_module(coll_cog3)
+
+    # Decide what collector will be "managed" by the CAF
+    collector_managed_by_CAF = coll_els3
+    if "ELS3" in timeAlgorithms:
+        collector_managed_by_CAF = coll_els3
+        if "CoG6" in timeAlgorithms:
+            pre_collector_path.add_module(coll_cog6)
+        if "CoG3" in timeAlgorithms:
+            pre_collector_path.add_module(coll_cog3)
     # We leave the coll_els3 to be the one "managed" by the CAF
+    elif "CoG3" in timeAlgorithms:
+        collector_managed_by_CAF = coll_cog3
+        if "CoG6" in timeAlgorithms:
+            pre_collector_path.add_module(coll_cog6)
+    else:
+        collector_managed_by_CAF = coll_cog6
 
     # calibration setup
     calibration = Calibration("SVDTime",
-                              collector=coll_els3,   # The other collectors are in the pre_collector_path itself
-                              algorithms=[algo_cog3, algo_cog6, algo_els3],
+                              collector=collector_managed_by_CAF,  # The other collectors are in the pre_collector_path itself
+                              algorithms=list_of_algorithms,
                               input_files=good_input_files,
                               pre_collector_path=pre_collector_path)
 
@@ -447,18 +476,43 @@ def get_calibrations(input_data, **kwargs):
         prefix=val_coll_els3.name(),
         min_entries=10000)
 
+    list_of_val_clusterizers = []
+    list_of_val_algorithms = []
+    for a in timeAlgorithms:
+        if a == "CoG3":
+            list_of_val_clusterizers.append(val_cog3)
+            list_of_val_clusterizers.append(val_cog3_onTracks)
+            list_of_val_algorithms.append(val_algo_cog3)
+        if a == "CoG6":
+            list_of_val_clusterizers.append(val_cog6)
+            list_of_val_clusterizers.append(val_cog6_onTracks)
+            list_of_val_algorithms.append(val_algo_cog6)
+        if a == "ELS3":
+            list_of_val_clusterizers.append(val_els3)
+            list_of_val_clusterizers.append(val_els3_onTracks)
+            list_of_val_algorithms.append(val_algo_els3)
+
     val_pre_collector_path = create_pre_collector_path(
-        clusterizers=[val_cog6, val_cog6_onTracks,
-                      val_cog3, val_cog3_onTracks,
-                      val_els3, val_els3_onTracks],
+        clusterizers=list_of_val_clusterizers,
         isMC=isMC, max_events_per_run=max_events_per_run, is_validation=True)
-    val_pre_collector_path.add_module(val_coll_cog6)
-    val_pre_collector_path.add_module(val_coll_cog3)
+
+    val_collector_managed_by_CAF = val_coll_els3
+    if "ELS3" in timeAlgorithms:
+        val_collector_managed_by_CAF = val_coll_els3
+        if "CoG6" in timeAlgorithms:
+            val_pre_collector_path.add_module(val_coll_cog6)
+        if "CoG3" in timeAlgorithms:
+            val_pre_collector_path.add_module(val_coll_cog3)
+    elif "CoG3" in timeAlgorithms:
+        val_collector_managed_by_CAF = val_coll_cog3
+        if "CoG6" in timeAlgorithms:
+            val_pre_collector_path.add_module(val_coll_cog6)
+    else:
+        val_collector_managed_by_CAF = val_coll_cog6
 
     val_calibration = Calibration("SVDTimeValidation",
-                                  collector=val_coll_els3,
-                                  algorithms=[val_algo_cog3, val_algo_cog6,
-                                              val_algo_els3],
+                                  collector=val_collector_managed_by_CAF,
+                                  algorithms=list_of_val_algorithms,
                                   input_files=good_input_files,
                                   pre_collector_path=val_pre_collector_path)
 

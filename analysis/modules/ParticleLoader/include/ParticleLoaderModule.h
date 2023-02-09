@@ -108,6 +108,11 @@ namespace Belle2 {
   private:
 
     /**
+     * Check if the options on how to load the Particle are valid.
+     */
+    bool isValidOptions() const;
+
+    /**
      * Loads specified MCParticles as Particle to StoreArray<Particle>
      */
     void mcParticlesToParticles();
@@ -130,12 +135,12 @@ namespace Belle2 {
     /**
      * Checks if the given ECLCluster is valid for the pdgCode.
      */
-    bool isValidECLCluster(const ECLCluster* cluster, const int pdgCode, bool onlyNeutral);
+    bool isValidECLCluster(const ECLCluster* cluster, const int pdgCode, bool onlyNeutral) const;
 
     /**
      * Assigns the MCParticle relation to the newPart. The given cluster is used to find the best MCParticle matching.
      */
-    void assignMCParticleFromECLCluster(Particle* newPart, const ECLCluster* cluster);
+    void assignMCParticleFromECLCluster(Particle* newPart, const ECLCluster* cluster) const;
 
     /**
      * Loads ECLCluster and KLMCluster objects that are being matched with Track as Particle to StoreArray<Particle> and adds it to the ParticleList

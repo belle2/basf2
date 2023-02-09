@@ -103,9 +103,25 @@ ParticleLoaderModule::ParticleLoaderModule() : Module()
            true);
 }
 
+
+bool ParticleLoaderModule::isValidOptions() const
+{
+  const std::vector<bool> options = {m_useMCParticles, m_useROEs, m_useDummy, m_loadChargedCluster};
+  int counter = 0;
+  for (auto opt : options)
+    if (opt) counter++;
+
+  return bool(counter < 2);
+}
+
 void ParticleLoaderModule::initialize()
 {
   B2INFO("ParticleLoader's Summary of Actions:");
+
+  if (!isValidOptions())
+    B2FATAL("The options on how to load the Particle are not valid. The incompatible combination of options is selected. "
+            << "useMCParticles: " << m_useMCParticles << ", useROEs: " << m_useROEs << ", useDummy: " << m_useDummy
+            << ", loadChargedCluster: " << m_loadChargedCluster);
 
   m_particles.registerInDataStore();
   m_particleExtraInfoMap.registerInDataStore();
@@ -763,7 +779,7 @@ void ParticleLoaderModule::eclAndKLMClustersToParticles()
   } // loop over particle lists
 }
 
-bool ParticleLoaderModule::isValidECLCluster(const ECLCluster* cluster, const int pdgCode, bool onlyNeutral)
+bool ParticleLoaderModule::isValidECLCluster(const ECLCluster* cluster, const int pdgCode, bool onlyNeutral) const
 {
   if (!cluster)
     return false;
@@ -792,8 +808,7 @@ bool ParticleLoaderModule::isValidECLCluster(const ECLCluster* cluster, const in
   return true;
 }
 
-void ParticleLoaderModule::assignMCParticleFromECLCluster(Particle* newPart,
-                                                          const ECLCluster* cluster)
+void ParticleLoaderModule::assignMCParticleFromECLCluster(Particle* newPart, const ECLCluster* cluster) const
 {
   // ECLCluster can be matched to multiple MCParticles
   // order the relations by weights and set Particle -> multiple MCParticle relation

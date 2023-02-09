@@ -6,8 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef ECLLOMMODULE_H
-#define ECLLOMMODULE_H
+#pragma once
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/core/Module.h>
@@ -151,7 +150,3 @@ namespace Belle2 {
     };
   }//namespace ECL
 }//namespace Belle2
-
-#endif
-
-

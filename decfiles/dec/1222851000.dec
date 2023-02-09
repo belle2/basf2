@@ -10,10 +10,6 @@
 # Date: 20230202
 # Comments:
 
-# Define aliases
-Alias X(3872)sig X_1(3872)
-Alias psi2S_sig psi(2S)
-Alias Jpsi_sig J/psi
 
 Decay Upsilon(4S)
 0.5000 B+sig B-    VSS;
@@ -21,19 +17,19 @@ Decay Upsilon(4S)
 Enddecay
 
 Decay B+sig
-1.000 X(3872)sig K+   SVS;
+1.000 X_1(3872)sig  K+   SVS;
 Enddecay
 CDecay B-sig
 
-Decay X(3872)sig
-1.000 psi2S_sig gamma   VVP 1.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0;
+Decay X_1(3872)sig
+1.000 psi(2S)sig  gamma   VVP 1.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0;
 Enddecay
 
-Decay psi2S_sig
-1.000 Jpsi_sig pi+ pi-   VVPIPI ;
+Decay psi(2S)sig
+1.000 J/psisig  pi+ pi-   VVPIPI ;
 Enddecay
 
-Decay Jpsi_sig
+Decay J/psisig
 0.500 e+ e-           PHOTOS VLL;
 0.500 mu+ mu-         PHOTOS VLL;
 Enddecay

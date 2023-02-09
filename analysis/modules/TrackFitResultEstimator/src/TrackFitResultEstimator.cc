@@ -70,11 +70,9 @@ void TrackFitResultEstimatorModule::event()
     dummyCovariance(row, row) = 10000;
   }
 
-  XYZVector position;
+  XYZVector position(0,0,0);
   if (m_beamSpotDB)
     position = XYZVector(m_beamSpotDB->getIPPosition().X(), m_beamSpotDB->getIPPosition().Y(), m_beamSpotDB->getIPPosition().Z());
-  else
-    position = XYZVector(0, 0, 0);
 
   const double bfield = BFieldManager::getFieldInTesla(position).Z();
 
@@ -84,9 +82,9 @@ void TrackFitResultEstimatorModule::event()
     if (part->getTrack() or part->getTrackFitResult())
       B2ERROR("Particle is already related to the Track or TrackFitResult object.");
 
-    int charge = 0;
-    if (part->getCharge() != 0)
-      charge = (part->getCharge() > 0) ? 1 : -1;
+    int charge = part->getCharge();
+    if (abs(charge)>1)
+      charge = charge / abs(charge);
 
     TrackFitResult* trkfit = m_trackfitresults.appendNew(position,
                                                          part->getMomentum(),

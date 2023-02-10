@@ -86,6 +86,7 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
             `here <https://belle.kek.jp/secured/wiki/doku.php?id=physics:charm:tracksmearing>`_.
             Set to 0 to skip smearing (automatically set to 0 internally for real data).
         enableLocalDB (bool): Enables to use local payloads.
+        convertNbar (bool): Enables conversion of anti-n0:mdst.
     """
 
     # If we are on KEKCC make sure we load the correct NeuroBayes library
@@ -174,7 +175,7 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
     # convert.logging.set_log_level(LogLevel.DEBUG)
     # convert.logging.set_info(LogLevel.DEBUG, LogInfo.LEVEL | LogInfo.MESSAGE)
     path.add_module(convert)
-    if (convertNbar is True):
+    if convertNbar:
         path.add_module('BelleNbarMVA', particleList='anti-n0:mdst', identifier='nbarMVA')
 
 

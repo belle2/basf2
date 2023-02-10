@@ -8,9 +8,12 @@
 
 #pragma once
 
+// Basf2 headers
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <analysis/dataobjects/ParticleList.h>
+
+// frugally-deep header
 #define FDEEP_FLOAT_TYPE double
 #include <fdeep/fdeep.hpp>
 

@@ -6,14 +6,21 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+// Own header
+#include <analysis/modules/BelleNbarMVAModule/BelleNbarMVAModule.h>
+
+//Basf2 headers
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/Database.h>
 #include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
 #include <mdst/dataobjects/ECLCluster.h>
-#include <vector>
-#include <analysis/modules/BelleNbarMVAModule/BelleNbarMVAModule.h>
-#define FDEEP_FLOAT_TYPE double
+
+// C++ headers
 #include <string>
+#include <vector>
+
+// frugally-deep header
+#define FDEEP_FLOAT_TYPE double
 #include <fdeep/fdeep.hpp>
 
 using namespace Belle2;

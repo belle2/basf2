@@ -107,10 +107,6 @@ namespace Belle2 {
 
   private:
 
-    /**
-     * Check if the options on how to load the Particle are valid.
-     */
-    bool isValidOptions() const;
 
     /**
      * Loads specified MCParticles as Particle to StoreArray<Particle>

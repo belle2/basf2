@@ -104,21 +104,11 @@ ParticleLoaderModule::ParticleLoaderModule() : Module()
 }
 
 
-bool ParticleLoaderModule::isValidOptions() const
-{
-  const std::vector<bool> options = {m_useMCParticles, m_useROEs, m_useDummy, m_loadChargedCluster};
-  int counter = 0;
-  for (auto opt : options)
-    if (opt) counter++;
-
-  return bool(counter < 2);
-}
-
 void ParticleLoaderModule::initialize()
 {
   B2INFO("ParticleLoader's Summary of Actions:");
 
-  if (!isValidOptions())
+  if ((int)m_useMCParticles + (int)m_useROEs + (int)m_useDummy + (int)m_loadChargedCluster > 2)
     B2FATAL("The options on how to load the Particle are not valid. The incompatible combination of options is selected. "
             << "useMCParticles: " << m_useMCParticles << ", useROEs: " << m_useROEs << ", useDummy: " << m_useDummy
             << ", loadChargedCluster: " << m_loadChargedCluster);
@@ -243,6 +233,14 @@ void ParticleLoaderModule::initialize()
       } else if (m_useMCParticles) {
         B2INFO("   -> MDST source: MCParticles");
         m_MCParticles2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle);
+      } else if (m_loadChargedCluster) {
+        if (abs(pdgCode) == abs(Const::photon.getPDGCode()) || abs(pdgCode) == abs(Const::Klong.getPDGCode())
+            || abs(pdgCode) == abs(Const::neutron.getPDGCode())) {
+          m_ChargedCluster2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle);
+          B2INFO("   -> MDST source: ECLClusters and KLMClusters being matched with Tracks");
+        } else {
+          B2ERROR("The Particle type must be gamma, K_L0, or (anti-)n0 for the loadChargedCluster option.");
+        }
       } else {
         bool chargedFSP = Const::chargedStableSet.contains(Const::ParticleType(abs(pdgCode)));
         if (chargedFSP) {
@@ -252,13 +250,8 @@ void ParticleLoaderModule::initialize()
 
         if (abs(pdgCode) == abs(Const::photon.getPDGCode())) {
           if (m_addDaughters == false) {
-            if (m_loadChargedCluster) {
-              m_ChargedCluster2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle);
-              B2INFO("   -> MDST source: ECLClusters being matched with Tracks");
-            } else {
-              m_ECLKLMClusters2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle);
-              B2INFO("   -> MDST source: ECLClusters and KLMClusters");
-            }
+            m_ECLKLMClusters2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle);
+            B2INFO("   -> MDST source: ECLClusters and KLMClusters");
           } else {
             B2INFO("   -> MDST source: V0");
             m_V02Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle);
@@ -789,6 +782,7 @@ bool ParticleLoaderModule::isValidECLCluster(const ECLCluster* cluster, const in
   // for now
   if (!cluster->isNeutral() and onlyNeutral)
     return false;
+
   if (not cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)
       and not cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron))
     return false;

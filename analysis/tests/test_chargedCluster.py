@@ -44,10 +44,15 @@ class TestChargedCluster(unittest.TestCase):
         ma.fillParticleListFromChargedCluster('gamma:klmF', 'pi+:klm', '',
                                               useOnlyMostEnergeticECLCluster=False, path=main)
 
+        ma.fillParticleListFromChargedCluster('K_L0:ecl', 'pi+:ecl', '', path=main)
+        ma.fillParticleListFromChargedCluster('K_L0:klm', 'pi+:klm', '', path=main)
+
         ma.applyCuts('gamma:bestecl', 'isFromECL', path=main)
         ma.applyCuts('gamma:allecl', 'isFromECL', path=main)
         ma.applyCuts('gamma:klmT', 'isFromKLM', path=main)
         ma.applyCuts('gamma:klmF', 'isFromKLM', path=main)
+        ma.applyCuts('K_L0:ecl', 'isFromECL', path=main)
+        ma.applyCuts('K_L0:klm', 'isFromKLM', path=main)
 
         vm.addAlias('n_pi_ecl', 'nParticlesInList(pi+:ecl)')
         vm.addAlias('n_pi_klm', 'nParticlesInList(pi+:klm)')
@@ -55,11 +60,15 @@ class TestChargedCluster(unittest.TestCase):
         vm.addAlias('n_gamma_allecl', 'nParticlesInList(gamma:allecl)')
         vm.addAlias('n_gamma_klmT', 'nParticlesInList(gamma:klmT)')
         vm.addAlias('n_gamma_klmF', 'nParticlesInList(gamma:klmF)')
+        vm.addAlias('n_KL_ecl', 'nParticlesInList(K_L0:ecl)')
+        vm.addAlias('n_KL_klm', 'nParticlesInList(K_L0:klm)')
 
         ntupler = register_module('VariablesToNtuple')
         ntupler.param('fileName', testFile.name)
         ntupler.param('variables',
-                      ['n_pi_ecl', 'n_pi_klm', 'n_gamma_bestecl', 'n_gamma_allecl', 'n_gamma_klmT', 'n_gamma_klmF'])
+                      ['n_pi_ecl', 'n_pi_klm',
+                       'n_gamma_bestecl', 'n_gamma_allecl', 'n_gamma_klmT', 'n_gamma_klmF',
+                       'n_KL_ecl', 'n_KL_klm'])
         main.add_module(ntupler)
 
         b2test_utils.safe_process(main, 1000)
@@ -71,11 +80,19 @@ class TestChargedCluster(unittest.TestCase):
 
         nEntries = ntuple.GetEntries()
 
+        # charged cluster seems always having flag of N1 (n photon). Is it true?
         sameNumberForPiAndGamma_ECL = ntuple.GetEntries("n_pi_ecl == n_gamma_bestecl")
-        sameNumberForPiAndGamma_KLM = ntuple.GetEntries("n_pi_klm == n_gamma_klmT")
+        # not the case for N2?
+        sameNumberForPiAndHadron_ECL = ntuple.GetEntries("n_pi_ecl >= n_KL_ecl")
+        # KLM cluster has no preference for particle type
+        sameNumberForPiAndBothGammaHadron_KLM = ntuple.GetEntries("(n_pi_klm == n_gamma_klmT) && (n_pi_klm == n_KL_klm)")
 
-        self.assertTrue(nEntries == sameNumberForPiAndGamma_ECL, "Charged ECL-cluster is not correctly loaded.")
-        self.assertTrue(nEntries == sameNumberForPiAndGamma_KLM, "Charged KLM-cluster is not correctly loaded.")
+        self.assertTrue(nEntries == sameNumberForPiAndGamma_ECL,
+                        "Charged ECL-cluster is not correctly loaded for gamma.")
+        self.assertTrue(nEntries == sameNumberForPiAndHadron_ECL,
+                        "Charged ECL-cluster is not correctly loaded for neutral hadron.")
+        self.assertTrue(nEntries == sameNumberForPiAndBothGammaHadron_KLM,
+                        "Charged KLM-cluster is not correctly loaded for both gamma and neutral hadron.")
 
         allIsGreaterThanBest = ntuple.GetEntries("n_gamma_allecl >= n_gamma_bestecl")
         self.assertTrue(nEntries == allIsGreaterThanBest, "Charged ECL-cluster is missed with useOnlyMostEnergeticECLCluster=False")

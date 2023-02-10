@@ -8,12 +8,13 @@
 
 #pragma once
 
-#include <framework/core/Module.h>
 #include <analysis/VariableManager/Manager.h>
+#include <analysis/dataobjects/RestOfEvent.h>
+
+#include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/pcore/RootMergeable.h>
-#include <analysis/dataobjects/RestOfEvent.h>
 
 #include <TTree.h>
 #include <TFile.h>

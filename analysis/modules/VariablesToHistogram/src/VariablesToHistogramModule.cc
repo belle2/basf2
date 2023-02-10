@@ -8,12 +8,16 @@
 
 #include <analysis/modules/VariablesToHistogram/VariablesToHistogramModule.h>
 
+// analysis
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/VariableManager/Manager.h>
+
+// framework
 #include <framework/logging/Logger.h>
 #include <framework/pcore/ProcHandler.h>
-#include <framework/utilities/MakeROOTCompatible.h>
 #include <framework/core/ModuleParam.templateDetails.h>
+#include <framework/core/Environment.h>
+#include <framework/utilities/MakeROOTCompatible.h>
 #include <framework/utilities/RootFileCreationManager.h>
 
 #include <memory>
@@ -44,7 +48,8 @@ VariablesToHistogramModule::VariablesToHistogramModule() :
            "List of variable pairs to save. Variables are taken from Variable::Manager, and are identical to those available to e.g. ParticleSelector.",
            emptylist_2d);
 
-  addParam("fileName", m_fileName, "Name of ROOT file for output.", string("VariablesToHistogram.root"));
+  addParam("fileName", m_fileName, "Name of ROOT file for output. Can be overridden using the -o argument to basf2.",
+           string("VariablesToHistogram.root"));
   addParam("directory", m_directory, "Directory for all histograms **inside** the file to allow for histograms from multiple "
            "particlelists in the same file without conflicts", m_directory);
 
@@ -55,6 +60,14 @@ void VariablesToHistogramModule::initialize()
 {
   if (not m_particleList.empty())
     StoreObjPtr<ParticleList>().isRequired(m_particleList);
+
+  // override the output file name with the provided with the -o option
+  const std::string& outputFileArgument = Environment::Instance().getOutputFileOverride();
+  if (!outputFileArgument.empty())
+    m_fileName = outputFileArgument;
+
+  if (!m_fileNameSuffix.empty())
+    m_fileName = m_fileName.insert(m_fileName.rfind(".root"), m_fileNameSuffix);
 
   // Check if we can access the given file
   m_file = RootFileCreationManager::getInstance().getFile(m_fileName);

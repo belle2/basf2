@@ -1,5 +1,4 @@
 [INFO] Steering file: test_b2info-luminosity.py
-/sw/belle2/validation-data/luminosity/
 [INFO] Need to get some runs from RunDB for exp [18]
 [INFO] Reading exp 18 from rundb (this can take a while depending on the size of the query)
 [INFO] Read 302 runs from exp 18

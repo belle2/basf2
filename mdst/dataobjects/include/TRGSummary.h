@@ -261,7 +261,7 @@ namespace Belle2 {
     ETimingQuality m_timQuality = TTYQ_NONE;
 
     /** the prescale factor of each bit*/
-    unsigned int m_prescaleBits[c_ntrgWords][c_trgWordSize] = {0};
+    unsigned int m_prescaleBits[c_ntrgWords][c_trgWordSize] = {{0}};
 
     /** Poisson random trigger in injection veto or not */
     bool m_isPoissonInInjectionVeto = false;

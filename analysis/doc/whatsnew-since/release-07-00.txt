@@ -11,9 +11,9 @@ MCMatching of K_S0
   We modified the MCMatching algorithm and assigned the MCError flags of missing daughters on the ``K_S0`` properly. The most of
   "fake-signal" ``K_S0`` candidates are now correctly identified as background (i.e. ``isSignal==0``).
 * There remains a small fraction of "fake-signal" candidates that decay interacting with the detector material but having only
-  two pions. The effect is expected to be small, for example, that is about ``0.005%`` in the :math:`\tau^- \to \ell^- K_S^0 K_S^0` 
-  process. You can identify such events with the `mcSecPhysProc` variable that returns the secondary process of the Geant4,
-  namely ``countFSPDaughters(mcPrimary==0 and mcSecPhysProc!=201)>0``.
+  two pions. The effect is expected to be small, for example, that is about ``0.0005%`` in the tau-LFV process,
+  :math:`\tau^- \to \ell^- K_S^0 K_S^0`. You can identify such events with the `mcSecPhysProc` variable that returns the secondary
+  process of the Geant4, namely ``countFSPDaughters(mcPrimary==0 and mcSecPhysProc!=201)>0``.
 
 
 Modules

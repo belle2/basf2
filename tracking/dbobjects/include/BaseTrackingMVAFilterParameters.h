@@ -12,7 +12,7 @@
 
 namespace Belle2 {
   /** Class for the MVA filter payloads. */
-  class BaseTrackingMVAFilterParameters : public TObject {
+  class BaseTrackingMVAFilterParameters {
   public:
     /** Default constructor */
     BaseTrackingMVAFilterParameters() : m_cutValue(-1.), m_weightFileIdentifier("") {}

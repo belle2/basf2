@@ -482,7 +482,6 @@ void XTCalibration::readXTFromText()
   //  const unsigned short npx = nXTParams - 1;
   double xtc[npar]; // cppcheck-suppress constVariable
   double theta, alpha, dummy1;
-  unsigned nRead = 0;
   //  unsigned m_xtParamMode_old;
   ifs >> xtmode_old >> np;
 
@@ -493,7 +492,6 @@ void XTCalibration::readXTFromText()
     for (int i = 0; i < np; ++i) {
       ifs >> xtc[i];
     }
-    ++nRead;
 
     int ith = -99;
     for (unsigned short i = 0; i < ntheta_old; ++i) {

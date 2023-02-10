@@ -221,15 +221,15 @@ class MetavariableDataTypeTest(unittest.TestCase):
         files = files.stdout.decode().split("\n")
         files = list(filter(lambda file: file.endswith(".cc"), files))
 
-        # There should be at least 10 files
-        self.assertGreaterEqual(len(files), 10)
+        # There should be at least 12 files
+        self.assertGreaterEqual(len(files), 12)
         # We track the number of metavariables to make sure we don't miss some
         num_metavariables = 0
         for filepath in files:
             num_metavariables += self.process_file(filepath)
 
-        # We should get at least 205 registering statements
-        self.assertGreaterEqual(num_metavariables, 205)
+        # We should get at least 222 registering statements
+        self.assertGreaterEqual(num_metavariables, 222)
 
 
 if __name__ == "__main__":

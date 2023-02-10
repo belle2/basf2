@@ -82,7 +82,6 @@ namespace Belle2 {
         ARICHRawDigit* rawdigit = rawdigits.appendNew(type, ver, boardid, febno, length_all, mrg_evtno);
         rawdigit->setCopperId(raw.GetNodeID(0));
         rawdigit->setHslbId(finesse);
-        int nfebs = 0;
         while (m_ibyte < length_all) {
           int type_feb = calbyte(buf);
           ver = calbyte(buf);
@@ -105,7 +104,6 @@ namespace Belle2 {
             }
           }
           ARICHRawDigit::FEBDigit feb;
-          nfebs++;
           if (type_feb == 0x02) {//Raw mode
             int ch = 143;
             //B2INFO("raw mode");

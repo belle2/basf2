@@ -168,7 +168,6 @@ namespace Belle2 {
           rawdigit->setPcieChId(finesse);
         }
 
-        int nfebs = 0;
         //-- end of RawDigit for Merger info
 
         // record the ibyte here
@@ -271,7 +270,6 @@ namespace Belle2 {
             }
           }
           ARICHRawDigit::FEBDigit feb;
-          nfebs++;
           if (type_feb == 0x02) {//Raw mode
             int ch = 143;
             //B2INFO("raw mode");

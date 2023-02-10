@@ -17,6 +17,14 @@ Modules
   Performance Confluence Page <https://confluence.desy.de/display/BI/Neutrals+Performance>`_.
 * Added a parameter ``updateAllDaughters`` to `stdKshorts` and `stdLambdas` so that users can instruct the vertex fitter to
   update the variables of the V0 daughters. The parameter is ``False`` by default for backward compatibility.
+* Added the argument ``ignoreFromVertexFit`` in :func:`vertex.treeFit` to ignore particles to determine the vertex position. The
+  kinematics of the particles are treated as constant. The ``ignoreFromVertexFit`` option is expected to be used to perform fit
+  without ``K_L0`` or mimic a ``K_S0`` or a ``pi0`` with a control channel by ignoring a track for vertex fit. While,
+  ``treatAsInvisible`` will ignore both for vertex and kinematics. The ``treatAsInvisible`` option is expected to recover an
+  invisible particle's kinematics from beam-constraint.
+* Fixed a bug of the TreeFit with the Bremsstrahlung correction tools, `modularAnalysis.correctBrems` and
+  `modularAnalysis.correctBremsBelle`. The position uncertainties of the brems-corrected particle were wrongly assigned.
+  This bug does not affect the kinematics very much but induces a bias on the position and its uncertainty.
 
 Variables
 +++++++++

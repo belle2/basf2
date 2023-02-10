@@ -166,12 +166,9 @@ void TreeFitterModule::event()
     dummyCovMatrix(row, row) = 10000;
   }
 
-  TMatrixFSym dummyCovMatrix_smallMomError(7);
+  TMatrixFSym dummyCovMatrix_smallMomError(dummyCovMatrix);
   for (int row = 0; row < 4; ++row) {
     dummyCovMatrix_smallMomError(row, row) = 1e-10;
-  }
-  for (int row = 4; row < 7; ++row) {
-    dummyCovMatrix_smallMomError(row, row) = 10000;
   }
 
   for (unsigned iPart = 0; iPart < nParticles; iPart++) {

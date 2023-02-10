@@ -12,13 +12,13 @@
 
 namespace Belle2 {
   /** Class for the MVA filter payloads. */
-  class BaseTrackingMVAFilterPayload : public TObject {
+  class BaseTrackingMVAFilterParameters : public TObject {
   public:
     /** Default constructor */
-    BaseTrackingMVAFilterPayload() : m_cutValue(-1.), m_weightFileIdentifier("") {}
+    BaseTrackingMVAFilterParameters() : m_cutValue(-1.), m_weightFileIdentifier("") {}
 
     /** Destructor */
-    ~BaseTrackingMVAFilterPayload() {}
+    ~BaseTrackingMVAFilterParameters() {}
 
     /** Set the MVA filter cut value (-1 if not used) */
     void setCutValue(const double cutValue)
@@ -50,6 +50,6 @@ namespace Belle2 {
     /** Name of the MVA weightfile */
     std::string m_weightFileIdentifier;
 
-    ClassDef(BaseTrackingMVAFilterPayload, 1);  /**< ClassDef, necessary for ROOT */
+    ClassDef(BaseTrackingMVAFilterParameters, 1);  /**< ClassDef, necessary for ROOT */
   };
 }

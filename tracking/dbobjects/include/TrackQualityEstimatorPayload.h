@@ -7,11 +7,11 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/dbobjects/BaseTrackingMVAFilterPayload.h>
+#include <tracking/dbobjects/BaseTrackingMVAFilterParameters.h>
 
 namespace Belle2 {
   /** Class for the TrackQualityEstimator MVA filter payloads. */
-  class TrackQualityEstimatorPayload : public BaseTrackingMVAFilterPayload {
+  class TrackQualityEstimatorPayload : public BaseTrackingMVAFilterParameters {
   public:
     /** Default constructor */
     TrackQualityEstimatorPayload() {}

@@ -66,7 +66,7 @@ namespace Belle2 {
     {
       Super::initialize();
 
-      m_mvaPayload = std::make_unique<OptionalDBObjPtr<BaseTrackingMVAFilterPayload>>(m_DBPayloadName);
+      m_mvaPayload = std::make_unique<OptionalDBObjPtr<BaseTrackingMVAFilterParameters>>(m_DBPayloadName);
       if (m_mvaPayload->isValid()) {
         m_identifier = (*m_mvaPayload)->getIdentifierName();
         m_cutValue = (*m_mvaPayload)->getCutValue();

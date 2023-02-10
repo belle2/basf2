@@ -254,7 +254,7 @@ namespace Belle2 {
         }
 
         bool priority1rise = (*Hitmap)[6].riseEdge(changeTime[i]);
-        bool priority2rise = ((*Hitmap)[7].riseEdge(changeTime[i]) |
+        bool priority2rise = ((*Hitmap)[7].riseEdge(changeTime[i]) or
                               (*Hitmap)[8].riseEdge(changeTime[i]));
 
         /// output for Tracker & N.N
@@ -1106,7 +1106,7 @@ namespace Belle2 {
         }
 
         bool priority1rise = (*Hitmap)[6].riseEdge(changeTime[i]);
-        bool priority2rise = ((*Hitmap)[7].riseEdge(changeTime[i]) |
+        bool priority2rise = ((*Hitmap)[7].riseEdge(changeTime[i]) or
                               (*Hitmap)[8].riseEdge(changeTime[i]));
 
         /// output for Tracker & N.N
@@ -2506,7 +2506,7 @@ namespace Belle2 {
         }
 
         bool priority1rise = pri0->riseEdge(ct);
-        bool priority2rise = pri1->riseEdge(ct) | pri2->riseEdge(ct);
+        bool priority2rise = pri1->riseEdge(ct) or pri2->riseEdge(ct);
 
         /// output for Tracker & N.N
         //ready for output
@@ -2692,7 +2692,7 @@ namespace Belle2 {
         }
 
         bool priority1rise = pri0->riseEdge(ct);
-        bool priority2rise = pri1->riseEdge(ct) | pri2->riseEdge(ct);
+        bool priority2rise = pri1->riseEdge(ct) or pri2->riseEdge(ct);
 
         /// output for Tracker & N.N
         //ready for output
@@ -2790,7 +2790,7 @@ namespace Belle2 {
         if (found3 && (lv[i] == 3))
           cout << "!!! simulateTSF something wrong(found3)" << endl;
 
-        if ((lv[i] == 1) & (lv[i] == 2))
+        if ((lv[i] == 1) and (lv[i] == 2))
           found1or2 = true;
         else if (lv[i] == 3)
           found3 = true;

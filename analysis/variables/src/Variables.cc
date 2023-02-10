@@ -47,6 +47,7 @@
 
 #include <iostream>
 #include <cmath>
+#include <boost/algorithm/string.hpp>
 
 
 using namespace std;
@@ -1096,6 +1097,14 @@ namespace Belle2 {
 
       std::vector<std::string> detectorNames(arguments.begin() + 2, arguments.end());
 
+      std::string detNamesConcat("");
+      for (auto& detName : detectorNames) {
+        boost::to_upper(detName);
+        detNamesConcat += "_" + detName;
+      }
+
+      std::string extraInfo = "trkIsoScore" + detNamesConcat + "_VS_" + referenceListName + extraSuffix;
+
       auto func = [ = ](const Particle * part) -> double {
 
         StoreObjPtr<ParticleList> refPartList(referenceListName);
@@ -1104,24 +1113,17 @@ namespace Belle2 {
           B2FATAL("Invalid Listname " << referenceListName << " given to minET2ETIsoScore!");
         }
 
-        double scoreSum(0.0);
-        for (auto& detName : detectorNames)
+        if (!part->hasExtraInfo(extraInfo))
         {
-          std::string extraInfo = "trkIsoScore" + detName + "_VS_" + referenceListName + extraSuffix;
-          if (!part->hasExtraInfo(extraInfo)) {
-            return std::numeric_limits<float>::quiet_NaN();
-          }
-          auto scoreDet = part->getExtraInfo(extraInfo);
-          if (std::isnan(scoreDet)) {
-            return std::numeric_limits<float>::quiet_NaN();
-          }
-          scoreSum += scoreDet;
+          return std::numeric_limits<float>::quiet_NaN();
+        }
+        auto scoreDet = part->getExtraInfo(extraInfo);
+        if (std::isnan(scoreDet))
+        {
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
-        // Normalise sum of scores between [0, 1]
-        auto minScore = 0.;
-        auto maxScore = detectorNames.size();
-        return (scoreSum - minScore) / (maxScore - minScore);
+        return scoreDet;
 
       };
 
@@ -1149,6 +1151,14 @@ namespace Belle2 {
 
       std::vector<std::string> detectorNames(arguments.begin() + 2, arguments.end());
 
+      std::string detNamesConcat("");
+      for (auto& detName : detectorNames) {
+        boost::to_upper(detName);
+        detNamesConcat += "_" + detName;
+      }
+
+      std::string extraInfo = "trkIsoScoreAsWeightedAvg" + detNamesConcat + "_VS_" + referenceListName + extraSuffix;
+
       auto func = [ = ](const Particle * part) -> double {
 
         StoreObjPtr<ParticleList> refPartList(referenceListName);
@@ -1157,43 +1167,17 @@ namespace Belle2 {
           B2FATAL("Invalid Listname " << referenceListName << " given to minET2ETIsoScoreAsWeightedAvg!");
         }
 
-        double N(0.0); // Numerator: the weighted sums of scaled inverse distances variable per detector layer, summed over all input detectors.
-        double D(0.0); // Denominator: the sPID detector separation weights, summed over all input detectors.
-        for (auto& detName : detectorNames)
+        if (!part->hasExtraInfo(extraInfo))
         {
-
-          std::string extraInfo = "weightedSumInvDists" + detName + "_VS_" + referenceListName + extraSuffix;
-          if (!part->hasExtraInfo(extraInfo)) {
-            return std::numeric_limits<float>::quiet_NaN();
-          }
-          auto scoreDet = part->getExtraInfo(extraInfo);
-          if (std::isnan(scoreDet)) {
-            return std::numeric_limits<float>::quiet_NaN();
-          }
-          N += scoreDet;
-
-          std::string detPIDWeightName = "detPIDWeight_" + detName;
-          if (!part->hasExtraInfo(detPIDWeightName)) {
-            return std::numeric_limits<float>::quiet_NaN();
-          }
-          auto detPIDWeight = part->getExtraInfo(detPIDWeightName);
-          if (std::isnan(detPIDWeight)) {
-            return std::numeric_limits<float>::quiet_NaN();
-          }
-          D += detPIDWeight;
-
+          return std::numeric_limits<float>::quiet_NaN();
+        }
+        auto scoreDet = part->getExtraInfo(extraInfo);
+        if (std::isnan(scoreDet))
+        {
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
-        auto w = N / D;
-
-        // Normalise weighted average between [0, 1].
-        // But first, clip values that are too large.
-        auto minScore = 0.;
-        auto maxScore = 1e2;
-        w = (std::min(N / D, maxScore) - minScore) / (maxScore - minScore);
-
-        // Ensure larger score for well-isolated tracks.
-        return 1. - w;
+        return scoreDet;
 
       };
 
@@ -1390,7 +1374,7 @@ The definition is based on the track helices extrapolation.
 
    \begin{split}
 
-     s &= 1 - \sum_{\mathrm{det}} -w_{\mathrm{det}} \cdot \frac{\sum_{i}^{N_{\mathrm{det}}^{\mathrm{layers}}} H(i)}{N_{\mathrm{det}}^{\mathrm{layers}}}, \\
+     s &= \sum_{\mathrm{det}} 1 - \left(-w_{\mathrm{det}} \cdot \frac{\sum_{i}^{N_{\mathrm{det}}^{\mathrm{layers}}} H(i)}{N_{\mathrm{det}}^{\mathrm{layers}}}\right), \\
 
      H(i) &=
        \begin{cases}
@@ -1409,14 +1393,14 @@ The score is normalised in [0, 1], where values closer to 1 indicates a well-iso
 * The first argument is the reference particle list name used to search for the nearest neighbour.
 * The second argument is an integer ("boolean") flag: if 1, it is assumed the extrapolation was done with the most probable mass hypothesis for the track fit;
   if 0, it is assumed the mass hypothesis matching the particle lists' PDG was used.
-* The remaining arguments are a comma-separated list of detector names. At least one must be chosen among {CDC, TOP, ARICH, ECL, KLM}.
+* The remaining arguments are a comma-separated list of detector names, which must correspond to the one given to the `TrackIsoCalculator` module.
 
 .. note::
     The PID detector weights :math:`w_{\mathrm{det}}` are non-trivial only if ``excludePIDDetWeights=false`` in the ``TrackIsoCalculator`` module configuration.
-    Otherwise :math:`\lvert w_{\mathrm{det}} \rvert = 1`.
+    Otherwise :math:`w_{\mathrm{det}} = -1`.
 
 .. note::
-    This variable requires to run the ``TrackIsoCalculator`` module first.
+    This variable requires to run the `TrackIsoCalculator` module first.
     Note that the choice of input parameters of this metafunction must correspond to the settings used to configure the module!
 
 )DOC",
@@ -1438,14 +1422,14 @@ The score is normalised in [0, 1], where values closer to 1 indicates a well-iso
 * The first argument is the reference particle list name used to search for the nearest neighbour.
 * The second argument is an integer ("boolean") flag: if 1, it is assumed the extrapolation was done with the most probable mass hypothesis for the track fit;
   if 0, it is assumed the mass hypothesis matching the particle lists' PDG was used.
-* The remaining arguments are a comma-separated list of detector names. At least one must be chosen among {CDC, TOP, ARICH, ECL, KLM}.
+* The remaining arguments are a comma-separated list of detector names, which must correspond to the one given to the `TrackIsoCalculator` module.
 
 .. note::
     The PID detector weights :math:`w_{\mathrm{det}}` are non-trivial only if ``excludePIDDetWeights=false`` in the ``TrackIsoCalculator`` module configuration.
     Otherwise :math:`\lvert w_{\mathrm{det}} \rvert = 1`.
 
 .. note::
-    This variable requires to run the ``TrackIsoCalculator`` module first.
+    This variable requires to run the `TrackIsoCalculator` module first.
     Note that the choice of input parameters of this metafunction must correspond to the settings used to configure the module!
 
 )DOC",

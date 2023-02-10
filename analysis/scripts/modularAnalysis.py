@@ -3867,14 +3867,13 @@ def calculateTrackIsolation(
 
         ref_pdg = pdg.from_name(reference_list_name.split(":")[0])
 
-        for det in detectors:
-            trackiso = path.add_module("TrackIsoCalculator",
-                                       decayString=processed_dec,
-                                       detectorName=det,
-                                       particleListReference=reference_list_name,
-                                       useHighestProbMassForExt=highest_prob_mass_for_ext,
-                                       excludePIDDetWeights=exclude_pid_det_weights)
-            trackiso.set_name(f"TrackIsoCalculator{det}_{processed_dec}_VS_{reference_list_name}")
+        trackiso = path.add_module("TrackIsoCalculator",
+                                   decayString=processed_dec,
+                                   detectorNames=list(detectors),
+                                   particleListReference=reference_list_name,
+                                   useHighestProbMassForExt=highest_prob_mass_for_ext,
+                                   excludePIDDetWeights=exclude_pid_det_weights)
+        trackiso.set_name(f"TrackIsoCalculator_{'_'.join(detectors)}_{processed_dec}_VS_{reference_list_name}")
 
         # Metavariables for the distances to the closest reference tracks at each detector surface.
         # Always calculate them.
@@ -3884,8 +3883,8 @@ def calculateTrackIsolation(
             for d in detectors for d_layer in det_and_layers[d]]
         # Track isolation score.
         trackiso_vars += [
-            f"minET2ETIsoScore({reference_list_name}, {int(highest_prob_mass_for_ext)}, {','.join(detectors)})",
-            f"minET2ETIsoScoreAsWeightedAvg({reference_list_name}, {int(highest_prob_mass_for_ext)}, {','.join(detectors)})",
+            f"minET2ETIsoScore({reference_list_name}, {int(highest_prob_mass_for_ext)}, {', '.join(detectors)})",
+            f"minET2ETIsoScoreAsWeightedAvg({reference_list_name}, {int(highest_prob_mass_for_ext)}, {', '.join(detectors)})",
         ]
         # Optionally, calculate the input variables for the nearest neighbour in the reference list.
         if vars_for_nearest_part:

@@ -52,6 +52,8 @@ VariablesToHistogramModule::VariablesToHistogramModule() :
            string("VariablesToHistogram.root"));
   addParam("directory", m_directory, "Directory for all histograms **inside** the file to allow for histograms from multiple "
            "particlelists in the same file without conflicts", m_directory);
+  addParam("fileNameSuffix", m_fileNameSuffix, "The suffix of the output ROOT file to be appended before ``.root``.",
+           string(""));
 
   m_file = nullptr;
 }

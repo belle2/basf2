@@ -2790,7 +2790,7 @@ namespace Belle2 {
         if (found3 && (lv[i] == 3))
           cout << "!!! simulateTSF something wrong(found3)" << endl;
 
-        if ((lv[i] == 1) and (lv[i] == 2))
+        if ((lv[i] == 1) or (lv[i] == 2))
           found1or2 = true;
         else if (lv[i] == 3)
           found3 = true;

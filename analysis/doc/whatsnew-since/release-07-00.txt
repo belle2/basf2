@@ -1,5 +1,21 @@
 Changes in the analysis package in light-2302-genetta
 -----------------------------------------------------
+MCMatching of K_S0
+++++++++++++++++++
+* Modified the MCMatching algorithm for the ``K_S0`` particle. The MCError flags of missing daughters (e.g.
+  ``c_MissMassiveParticle``. please see :ref:`Error_flags`) was not assigned to the ``K_S0``. It was not a problem for the 
+  :math:`K_S^0 \to \pi^+ \pi^-` process, because ``K_S0`` fails to be matched to the MCParticle when one of ``pi+`` is missed.
+  However, when the ``K_S0`` decays interacting with the detector material, it can have many daughters. If the ``K_S0`` is
+  reconstructed from two pions of these daughters, it was considered as "signal" (i.e. ``isSignal==1``) even though its 
+  kinematics was wrongly reconstructed.
+  We modified the MCMatching algorithm and assigned the MCError flags of missing daughters on the ``K_S0`` properly. The most of
+  "fake-signal" ``K_S0`` candidates are now correctly identified as background (i.e. ``isSignal==0``).
+* There remains a small fraction of "fake-signal" candidates that decay interacting with the detector material but having only
+  two pions. The effect is expected to be small, for example, that is about ``0.0005%`` in the tau-LFV process,
+  :math:`\tau^- \to \ell^- K_S^0 K_S^0`. You can identify such events with the `mcSecPhysProc` variable that returns the secondary
+  process of the Geant4, namely ``countFSPDaughters(mcPrimary==0 and mcSecPhysProc!=201)>0``.
+
+
 Modules
 +++++++
 * Fixed a bug on the `findMCDecay` that the decay of ``K_S0`` cannot be specified.
@@ -32,6 +48,7 @@ Variables
 * Added the variables `EcmsMC` and `totalEnergyMC`, which return the true value of :math:`\sqrt{s}` and the true sum of the
   energies of all generated particles, respectively.
 * Deprecated `hadronicSplitOffSuppression` which has been replaced with `fakePhotonSuppression`
+* New variables `countFSPDaughters` and `countDescendants` are added to get number of daughters which passes the given selection.
 
 Changes in the analysis package in light-2212-foldex
 ----------------------------------------------------

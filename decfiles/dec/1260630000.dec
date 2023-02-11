@@ -4,7 +4,7 @@
 #		       	      	      [tau- -> e- anti-nu_e nu_tau] 
 #		       	      	      [tau- -> mu- anti-nu_mu nu_tau] 
 #		       	      	      [tau- -> pi- nu_tau] 
-# NickName: Bu_Ktautau
+# NickName: Bu_Ktautau_tau_lnunu_pinu 
 # Documentation: Signal MC of B+ -> K+ tau+ tau- where taus decay to leptons and pions
 # Tested: Yes
 # Responsible: Debjit Ghosh

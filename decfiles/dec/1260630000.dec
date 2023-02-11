@@ -1,0 +1,42 @@
+# EventType: 1260630000
+# Descriptor: Y(4S) -> B+ B-
+# 	      	       [B+ -> K+ tau+ tau-] cc
+#		       	      	      [tau- -> e- anti-nu_e nu_tau] 
+#		       	      	      [tau- -> mu- anti-nu_mu nu_tau] 
+#		       	      	      [tau- -> pi- nu_tau] 
+# NickName: Bu_Ktautau
+# Documentation: Signal MC of B+ -> K+ tau+ tau- where taus decay to leptons and pions
+# Tested: Yes
+# Responsible: Debjit Ghosh
+# Email: debjit.ghosh@ts.infn.it
+# PhysicsWG: EWP
+# Cuts: None
+# Date: 10/02/2023
+
+# Define Aliases
+#Alias myB+sig B+
+#Alias myB-sig B-
+#ChargeConj myB+sig myB-sig
+#Alias mytau+sig tau+
+#Alias mytau-sig tau-
+#ChargeConj mytau+sig mytau-sig
+
+# Upsilon(4S) decay
+Decay Upsilon(4S)
+0.5 B+sig B-    VSS;
+0.5 B+    B-sig VSS;
+Enddecay
+
+Decay B+sig
+1.0 K+ tau+sig tau-sig BTOSLLBALL;
+Enddecay
+CDecay B-sig
+
+Decay tau-sig
+0.3871 e- anti-nu_e nu_tau TAULNUNU;
+0.3778 mu- anti-nu_mu nu_tau TAULNUNU;
+0.2351 pi- nu_tau TAUSCALARNU;
+Enddecay
+CDecay tau+sig
+
+End

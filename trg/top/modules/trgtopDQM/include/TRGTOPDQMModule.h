@@ -97,14 +97,14 @@ namespace Belle2 {
     TH1I* h_top_gdl_match_decision_number[nskim_topdqm] = {nullptr};
 
     /** Number of TOP L1 decisions */
-    TH1I* h_N_decision[nskim_topdqm][nHistClasses] = {nullptr};
+    TH1I* h_N_decision[nskim_topdqm][nHistClasses] = {{nullptr}};
 
     /** Combined t0 decisions: all, the earliest and second best **/
 
-    TH1I* h_topSlotSegment[nskim_topdqm][16] = {nullptr};
-    TH1I* h_topSlotNHits[nskim_topdqm][16] = {nullptr};
-    TH1I* h_topSlotLogL[nskim_topdqm][16] = {nullptr};
-    TH1I* h_topSlotT0[nskim_topdqm][16] = {nullptr};
+    TH1I* h_topSlotSegment[nskim_topdqm][16] = {{nullptr}};
+    TH1I* h_topSlotNHits[nskim_topdqm][16] = {{nullptr}};
+    TH1I* h_topSlotLogL[nskim_topdqm][16] = {{nullptr}};
+    TH1I* h_topSlotT0[nskim_topdqm][16] = {{nullptr}};
 
     TH1I* h_topSlotAll[nskim_topdqm] = {nullptr};
     TH1I* h_topSegmentAll[nskim_topdqm] = {nullptr};
@@ -151,11 +151,11 @@ namespace Belle2 {
 
     TH2I* h_topNSlotsCombinedTimingVsNHitsTopAll[nskim_topdqm] = {nullptr};
 
-    TH2I* h_topNHitVsNhit[nskim_topdqm][nHistClasses] = {nullptr};
-    TH2I* h_topSlotVsSlot[nskim_topdqm][nHistClasses] = {nullptr};
-    TH2I* h_topT0VsT0[nskim_topdqm][nHistClasses] = {nullptr};
-    TH2I* h_topSegmentVsSegment[nskim_topdqm][nHistClasses] = {nullptr};
-    TH2I* h_topLogLVsLogL[nskim_topdqm][nHistClasses] = {nullptr};
+    TH2I* h_topNHitVsNhit[nskim_topdqm][nHistClasses] = {{nullptr}};
+    TH2I* h_topSlotVsSlot[nskim_topdqm][nHistClasses] = {{nullptr}};
+    TH2I* h_topT0VsT0[nskim_topdqm][nHistClasses] = {{nullptr}};
+    TH2I* h_topSegmentVsSegment[nskim_topdqm][nHistClasses] = {{nullptr}};
+    TH2I* h_topLogLVsLogL[nskim_topdqm][nHistClasses] = {{nullptr}};
 
     TH1I* h_topTrigType[nskim_topdqm] = {nullptr};
     TH1I* h_topTimingResiduals[nskim_topdqm] = {nullptr};
@@ -200,12 +200,12 @@ namespace Belle2 {
     TH1I* h_topGdlRvcDiff2Bad[nskim_topdqm] = {nullptr};
     TH1I* h_topGdlRvcDiff3Bad[nskim_topdqm] = {nullptr};
 
-    TH1I* h_topCombinedTimingTop[nskim_topdqm][nHistClasses] = {nullptr};
-    TH1I* h_topNSlotsCombinedTimingTop[nskim_topdqm][nHistClasses] = {nullptr};
-    TH1I* h_topNHitSum[nskim_topdqm][nHistClasses] = {nullptr};
-    TH1I* h_topNHitBestSlot[nskim_topdqm][nHistClasses] = {nullptr};
-    //    TH1I* h_topT0DecisionNumberBestSlot[nskim_topdqm][nHistClasses] = {nullptr};
-    TH1I* h_topLogLSum[nskim_topdqm][nHistClasses] = {nullptr};
+    TH1I* h_topCombinedTimingTop[nskim_topdqm][nHistClasses] = {{nullptr}};
+    TH1I* h_topNSlotsCombinedTimingTop[nskim_topdqm][nHistClasses] = {{nullptr}};
+    TH1I* h_topNHitSum[nskim_topdqm][nHistClasses] = {{nullptr}};
+    TH1I* h_topNHitBestSlot[nskim_topdqm][nHistClasses] = {{nullptr}};
+    //    TH1I* h_topT0DecisionNumberBestSlot[nskim_topdqm][nHistClasses] = {{nullptr}};
+    TH1I* h_topLogLSum[nskim_topdqm][nHistClasses] = {{nullptr}};
 
     TH1I* h_gdl_ecltop_timing_diff_5ns[nskim_topdqm] = {nullptr};
     TH1I* h_gdl_cdctop_timing_diff_5ns[nskim_topdqm] = {nullptr};
@@ -219,14 +219,14 @@ namespace Belle2 {
     TH1I* h_top_ecltop_timing_diff_best_slot_2ns[nskim_topdqm] = {nullptr};
     TH1I* h_gdl_cdctop_timing_diff_2ns[nskim_topdqm] = {nullptr};
 
-    TH1I* h_top_ecltop_timing_diff_2ns[nskim_topdqm][nHistClasses] = {nullptr};
-    TH1I* h_top_ecltop_timing_combined_diff_2ns[nskim_topdqm][nHistClasses] = {nullptr};
-    TH1I* h_top_ecltop_timing_best_slot_diff_2ns[nskim_topdqm][nHistClasses] = {nullptr};
+    TH1I* h_top_ecltop_timing_diff_2ns[nskim_topdqm][nHistClasses] = {{nullptr}};
+    TH1I* h_top_ecltop_timing_combined_diff_2ns[nskim_topdqm][nHistClasses] = {{nullptr}};
+    TH1I* h_top_ecltop_timing_best_slot_diff_2ns[nskim_topdqm][nHistClasses] = {{nullptr}};
 
-    TH2I* h_top_ecltop_timing_diff_vs_toptop[nskim_topdqm][nHistClasses] = {nullptr};
-    TH2I* h_gdl_ecltop_timing_diff_vs_toptop[nskim_topdqm][nHistClasses] = {nullptr};
-    TH2I* h_gdl_ecltop_timing_diff_vs_ecltop[nskim_topdqm][nHistClasses] = {nullptr};
-    TH2I* h_gdl_ecltop_timing_diff_vs_ecltop_best_slot[nskim_topdqm][nHistClasses] = {nullptr};
+    TH2I* h_top_ecltop_timing_diff_vs_toptop[nskim_topdqm][nHistClasses] = {{nullptr}};
+    TH2I* h_gdl_ecltop_timing_diff_vs_toptop[nskim_topdqm][nHistClasses] = {{nullptr}};
+    TH2I* h_gdl_ecltop_timing_diff_vs_ecltop[nskim_topdqm][nHistClasses] = {{nullptr}};
+    TH2I* h_gdl_ecltop_timing_diff_vs_ecltop_best_slot[nskim_topdqm][nHistClasses] = {{nullptr}};
 
     TH2I* h_gdl_top_rvc_vs_top_timing[nskim_topdqm] = {nullptr};
 
@@ -247,10 +247,10 @@ namespace Belle2 {
     TH2I* h_gdl_ecltop_timing_diff_vs_nhits[nskim_topdqm] = {nullptr};
     TH2I* h_gdl_ecltop_timing_diff_vs_logl[nskim_topdqm] = {nullptr};
 
-    TH2I* h_gdl_ecltop_timing_diff_vs_slot_2ns[nskim_topdqm][nHistClasses] = {nullptr};
-    TH2I* h_gdl_ecltop_timing_diff_vs_segment_2ns[nskim_topdqm][nHistClasses] = {nullptr};
-    TH2I* h_gdl_ecltop_timing_diff_vs_nhits_2ns[nskim_topdqm][nHistClasses] = {nullptr};
-    TH2I* h_gdl_ecltop_timing_diff_vs_logl_2ns[nskim_topdqm][nHistClasses] = {nullptr};
+    TH2I* h_gdl_ecltop_timing_diff_vs_slot_2ns[nskim_topdqm][nHistClasses] = {{nullptr}};
+    TH2I* h_gdl_ecltop_timing_diff_vs_segment_2ns[nskim_topdqm][nHistClasses] = {{nullptr}};
+    TH2I* h_gdl_ecltop_timing_diff_vs_nhits_2ns[nskim_topdqm][nHistClasses] = {{nullptr}};
+    TH2I* h_gdl_ecltop_timing_diff_vs_logl_2ns[nskim_topdqm][nHistClasses] = {{nullptr}};
 
     TH2I* h_topTC2IdVsTC1IdAll[nskim_topdqm] = {nullptr};
     TH2I* h_topTC2EnergyVsTC1EnergyAll[nskim_topdqm] = {nullptr};
@@ -287,7 +287,7 @@ namespace Belle2 {
     DBObjPtr<TRGGDLDBUnpacker> m_gdlUnpacker;
 
     int gdlLeafBitMap[320] = {0};
-    char gdlLeafNames[320][100] = {0};
+    char gdlLeafNames[320][100] = {{0}};
 
     int gdl_e_timtype = 0;
     int gdl_e_gdll1rvc = 0;

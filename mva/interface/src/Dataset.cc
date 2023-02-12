@@ -565,7 +565,6 @@ namespace Belle2 {
     {
       // Deactivate all branches by default
       m_tree->SetBranchStatus("*", false);
-      std::string typeName;
 
       if (!m_general_options.m_weight_variable.empty()) {
         if (m_general_options.m_weight_variable == "__weight__") {

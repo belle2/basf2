@@ -48,7 +48,7 @@ VariablesToNtupleModule::VariablesToNtupleModule() :
            "List of variables (or collections) to save. Variables are taken from Variable::Manager, and are identical to those available to e.g. ParticleSelector.",
            emptylist);
 
-  addParam("fileName", m_fileName, "Name of ROOT file for output. Can be overridden using the -o argument to basf2.",
+  addParam("fileName", m_fileName, "Name of ROOT file for output. Can be overridden using the -o argument of basf2.",
            string("VariablesToNtuple.root"));
   addParam("treeName", m_treeName, "Name of the NTuple in the saved file.", string("ntuple"));
   addParam("basketSize", m_basketsize, "Size of baskets in Output NTuple in bytes.", 1600);
@@ -75,7 +75,7 @@ void VariablesToNtupleModule::initialize()
 
   // Initializing the output root file
 
-  // override the output file name with the provided with the -o option
+  // override the output file name with what's been provided with the -o option
   const std::string& outputFileArgument = Environment::Instance().getOutputFileOverride();
   if (!outputFileArgument.empty())
     m_fileName = outputFileArgument;

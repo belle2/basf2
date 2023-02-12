@@ -1905,7 +1905,9 @@ def variablesToNtuple(decayString, variables, treename='variables', filename='nt
         basketsize (int): size of baskets in the output ntuple in bytes
         signalSideParticleList (str): The name of the signal-side ParticleList.
                                       Only valid if the module is called in a for_each loop over the RestOfEvent.
-        filenameSuffix (str): suffix to be appended the filename before ``.root``.
+        filenameSuffix (str): suffix to be appended to the filename before ``.root``.
+
+    .. tip:: The output filename can be overridden using the ``-o`` argument of basf2.
     """
 
     output = register_module('VariablesToNtuple')
@@ -1941,7 +1943,9 @@ def variablesToHistogram(decayString,
             Useful if you want to have different histograms in the same file to separate them.
         prefixDecayString (bool): If True the decayString will be prepended to the directory name to allow for more
             programmatic naming of the structure in the file.
-        filenameSuffix (str): suffix to be appended the filename before ``.root``.
+        filenameSuffix (str): suffix to be appended to the filename before ``.root``.
+
+    .. tip:: The output filename can be overridden using the ``-o`` argument of basf2.
     """
 
     if variables_2d is None:

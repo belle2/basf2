@@ -16,6 +16,8 @@
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
+#include <pxd/dataobjects/PXDCluster.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -80,6 +82,14 @@ bool PXDStateBasicVarSet::extract(const BasePXDStateFilter::Object* pair)
   var<named("segment")>() = sensorInfo.getSegmentNumber();
   var<named("id")>() = sensorInfo.getID();
 
+  const auto& clusters = spacePoint->getRelationsTo<PXDCluster>();
+  B2ASSERT("Must be related to exactly 1 cluster", clusters.size() == 1);
+  var<named("cluster_charge")>() = clusters[0]->getCharge();
+  var<named("cluster_seed_charge")>() = clusters[0]->getSeedCharge();
+  var<named("cluster_size")>() = clusters[0]->getSize();
+  var<named("cluster_size_u")>() = clusters[0]->getUSize();
+  var<named("cluster_size_v")>() = clusters[0]->getVSize();
+
   var<named("last_layer")>() = 0;
   var<named("last_ladder")>() = 0;
   var<named("last_sensor")>() = 0;
@@ -96,6 +106,14 @@ bool PXDStateBasicVarSet::extract(const BasePXDStateFilter::Object* pair)
     var<named("last_sensor")>() = parentSensorInfo.getSensorNumber();
     var<named("last_segment")>() = parentSensorInfo.getSegmentNumber();
     var<named("last_id")>() = parentSensorInfo.getID();
+
+    const auto& parentclusters = parentSpacePoint->getRelationsTo<PXDCluster>();
+    B2ASSERT("Must be related to exactly 1 cluster", parentclusters.size() == 1);
+    var<named("last_cluster_charge")>() = parentclusters[0]->getCharge();
+    var<named("last_cluster_seed_charge")>() = parentclusters[0]->getSeedCharge();
+    var<named("last_cluster_size")>() = parentclusters[0]->getSize();
+    var<named("last_cluster_size_u")>() = parentclusters[0]->getUSize();
+    var<named("last_cluster_size_v")>() = parentclusters[0]->getVSize();
   }
 
   const double residual = m_kalmanStepper.calculateResidual(firstMeasurement, *state);

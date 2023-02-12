@@ -95,6 +95,11 @@ bool PXDStateBasicVarSet::extract(const BasePXDStateFilter::Object* pair)
   var<named("last_sensor")>() = 0;
   var<named("last_segment")>() = 0;
   var<named("last_id")>() = 0;
+  var<named("last_cluster_charge")>() = 0;
+  var<named("last_cluster_seed_charge")>() = 0;
+  var<named("last_cluster_size")>() = 0;
+  var<named("last_cluster_size_u")>() = 0;
+  var<named("last_cluster_size_v")>() = 0;
 
   const CKFToPXDState* parent = previousStates.back();
   const SpacePoint* parentSpacePoint = parent->getHit();

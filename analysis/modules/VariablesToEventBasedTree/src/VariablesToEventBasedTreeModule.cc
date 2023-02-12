@@ -50,7 +50,7 @@ VariablesToEventBasedTreeModule::VariablesToEventBasedTreeModule() :
            "List of variables (or collections) to save for each event. Variables are taken from Variable::Manager, and are identical to those available to e.g. ParticleSelector. Only event-based variables are allowed here.",
            emptylist);
 
-  addParam("fileName", m_fileName, "Name of ROOT file for output. Can be overridden using the -o argument to basf2.",
+  addParam("fileName", m_fileName, "Name of ROOT file for output. Can be overridden using the -o argument of basf2.",
            string("VariablesToEventBasedTree.root"));
   addParam("treeName", m_treeName, "Name of the NTuple in the saved file.", string("tree"));
   addParam("maxCandidates", m_maxCandidates, "The maximum number of candidates in the ParticleList per entry of the Tree.", 100u);
@@ -69,7 +69,7 @@ void VariablesToEventBasedTreeModule::initialize()
   m_eventMetaData.isRequired();
   StoreObjPtr<ParticleList>().isRequired(m_particleList);
 
-  // override the output file name with the provided with the -o option
+  // override the output file name with what's been provided with the -o option
   const std::string& outputFileArgument = Environment::Instance().getOutputFileOverride();
   if (!outputFileArgument.empty())
     m_fileName = outputFileArgument;

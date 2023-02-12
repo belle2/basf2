@@ -1298,7 +1298,7 @@ def fillParticleListFromChargedCluster(outputParticleList,
     """
     Creates the Particle object from ECLCluster and KLMCluster that are being matched with the Track of inputParticleList.
 
-    @param outputParticleList       The output ParticleList. The neutral final state particles are supported.
+    @param outputParticleList       The output ParticleList. Only neutral final state particles are supported.
     @param inputParticleList        The input ParticleList that is required to have the relation to the Track object.
     @param cut                      Particles need to pass these selection criteria to be added to the ParticleList
     @param useOnlyMostEnergeticECLCluster If True, only the most energetic ECLCluster among ones that are matched with the Track is

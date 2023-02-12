@@ -23,7 +23,7 @@ typedef const py::tuple& Nodetuple;
 
 namespace Belle2 {
   /**
-   * Forward declaration of function defined in framework/utilities/GeneralCut.cc
+   * Forward declaration of function defined in framework/utilities/CutHelpers.cc
   **/
   bool almostEqualDouble(const double& a, const double& b);
 

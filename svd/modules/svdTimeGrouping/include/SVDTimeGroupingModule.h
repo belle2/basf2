@@ -61,7 +61,7 @@ namespace Belle2 {
     double m_expSignalLoc       =  0.;   /** Expected location of signal. */
     double m_signalRangeLow     = -50;   /** Expected time range of signal hits. */
     double m_signalRangeHigh    =  50;   /** Expected time range of signal hits. */
-    int    m_factor             = 2;     /** Fine divisions of histogram. */
+    int    m_factor             =   2;   /** Fine divisions of histogram. Also disables the module if zero. */
     std::vector<float> m_clsSizeVsSigma[2] = { /** cls-time resolution -> 0: V, 1: U */
       {3.49898, 2.94008, 3.46766, 5.3746, 6.68848, 7.35446, 7.35983, 7.71601, 10.6172, 13.4805},
       {6.53642, 3.76216, 3.30086, 3.95969, 5.49408, 7.07294, 8.35687, 8.94839, 9.23135, 10.485}
@@ -75,10 +75,9 @@ namespace Belle2 {
     double m_calSigmaN          = 5.;  /** Remove upto this sigma of fitted gaus from histogram. */
     double m_accSigmaN          = 3.;  /** Clusters are tagged within this of fitted group. */
     bool   m_writeGroupInfo     = true; /** Write group info in SVDCluster, otherwise empty. */
-    bool   m_signalGroupSelection = false; /** Choose one group near expected signal location. */
-    bool   m_flatSignalCut      = false; /** Select all clusters within signal range around first gr. */
+    int    m_signalGroupSelection = m_maxGroups; /** Select the first few prominent signal groups. */
+    bool   m_formSuperGroup     = false; /** Form a super-group using the selected signal groups. */
     bool   m_includeOutOfRangeClusters = true; /** Assign groups to under and overflow. */
-    bool   m_useOnlyOneGroup    = false; /** Only one group is kept. */
     double m_exponentialSort    = 30.; /** Group prominence is weighted with exponential weight. */
 
     // modification parameters

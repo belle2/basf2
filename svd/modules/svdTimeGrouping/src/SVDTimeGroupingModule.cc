@@ -83,18 +83,15 @@ SVDTimeGroupingModule::SVDTimeGroupingModule() :
   addParam("includeOutOfRangeClusters", m_includeOutOfRangeClusters,
            "Assign groups to under and overflow.",
            bool(true));
-  addParam("useOnlyOneGroup", m_useOnlyOneGroup,
-           "Only one group is kept.",
-           bool(false));
   addParam("exponentialSort", m_exponentialSort,
            "Group prominence is weighted with exponential weight.",
            double(30.));
 
   addParam("signalGroupSelection", m_signalGroupSelection,
            "Choose one group near expected signal location.",
-           bool(false));
-  addParam("flatSignalCut", m_flatSignalCut,
-           "Select all clusters within signal range around first group.",
+           int(20));
+  addParam("formSuperGroup", m_formSuperGroup,
+           "Form a super-group.",
            bool(false));
 }
 
@@ -105,11 +102,8 @@ void SVDTimeGroupingModule::initialize()
   // prepare all store:
   m_svdClusters.isRequired(m_svdClustersName);
 
-  if (m_signalGroupSelection || m_flatSignalCut || m_useOnlyOneGroup)
-    m_includeOutOfRangeClusters = false;
+  if (m_signalGroupSelection != m_maxGroups) m_includeOutOfRangeClusters = false;
 
-  if (m_useOnlyOneGroup) B2WARNING("Only the first group is kept.");
-  if (m_signalGroupSelection) B2WARNING("Only the Probable signal group is chosen.");
   if (m_factor <= 0) B2WARNING("Module is ineffective.");
   if (m_tRangeHigh - m_tRangeLow < 10.) B2FATAL("tRange should not be less than 10 (hard-coded).");
 
@@ -124,16 +118,16 @@ void SVDTimeGroupingModule::event()
   if (m_factor <= 0 || totClusters <= 0) return;
 
   // number of clusters in signalRange
-  double tmax = -1000; double tmin = 1000;
+  double tmpRange[2] = {std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN()};
   for (int ij = 0; ij < totClusters; ij++) {
     double clsTime = m_svdClusters[ij]->getClsTime();
-    if (clsTime > tmax) tmax = clsTime;
-    if (clsTime < tmin) tmin = clsTime;
+    if (std::isnan(tmpRange[0]) || clsTime > tmpRange[0]) tmpRange[0] = clsTime;
+    if (std::isnan(tmpRange[1]) || clsTime < tmpRange[1]) tmpRange[1] = clsTime;
   }
   double tRangeHigh = m_tRangeHigh;
   double tRangeLow  = m_tRangeLow;
-  if (tRangeHigh > tmax) tRangeHigh = tmax;
-  if (tRangeLow  < tmin) tRangeLow  = tmin;
+  if (tRangeHigh > tmpRange[0]) tRangeHigh = tmpRange[0];
+  if (tRangeLow  < tmpRange[1]) tRangeLow  = tmpRange[1];
 
   int xbin = tRangeHigh - tRangeLow;
   if (xbin < 1) xbin = 1;
@@ -256,14 +250,29 @@ void SVDTimeGroupingModule::event()
       groupInfo[kj + 1] = key;
     }
 
-  if ((m_useOnlyOneGroup || m_signalGroupSelection || m_flatSignalCut)
-      && int(groupInfo.size()) > 1) // keep only one group
-    groupInfo.resize(1);
+  if (m_signalGroupSelection < int(groupInfo.size())) groupInfo.resize(m_signalGroupSelection);
 
-  if (m_flatSignalCut)
-    groupInfo[0] = std::make_tuple(std::get<0>(groupInfo[0]),
-                                   std::get<1>(groupInfo[0]),
-                                   (m_signalRangeHigh - m_signalRangeLow) * 0.5 / m_accSigmaN);
+  if (m_formSuperGroup && int(groupInfo.size()) > 1) {
+    double endPoints[2] = {std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN()};
+    double sum = 0;
+    for (int ij = 0; ij < int(groupInfo.size()); ij++) {
+      double pars[3] = {std::get<0>(groupInfo[ij]), std::get<1>(groupInfo[ij]), std::get<2>(groupInfo[ij])};
+      if (pars[2] == 0) continue;
+      sum += pars[0];
+      double beginPos = pars[1] - m_accSigmaN * pars[2];
+      double   endPos = pars[1] + m_accSigmaN * pars[2];
+      if (std::isnan(endPoints[0]) || beginPos < endPoints[0]) endPoints[0] = beginPos;
+      if (std::isnan(endPoints[1]) || endPos   > endPoints[1]) endPoints[1] = endPos;
+    } // for (int ij = 0; ij < int(groupInfo.size()); ij++) {
+    if (!std::isnan(endPoints[0]) && !std::isnan(endPoints[1])) {
+      if (endPoints[0] < tRangeLow)  endPoints[0] = tRangeLow;
+      if (endPoints[1] > tRangeHigh) endPoints[1] = tRangeHigh;
+      double mean  = (endPoints[1] + endPoints[0]) * 0.5;
+      double sigma = (endPoints[1] - endPoints[0]) * 0.5 / m_accSigmaN;
+      groupInfo[0] = std::make_tuple(sum, mean, sigma);
+      groupInfo.resize(1);
+    }
+  } // if (m_formSuperGroup) {
 
   // make all clusters groupless if no groups are found
   if (int(groupInfo.size()) == 0)

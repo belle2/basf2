@@ -46,6 +46,7 @@ Modules
   be applied to all output files. If you need to save multiple TTrees with the same name, please use the new argument
   ``filenameSuffix`` of `modularAnalysis.variablesToNtuple` to differentiate the output files. The ``filenameSuffix`` is appended to
   the output ROOT file name even if the ``-o`` argument is used.
+* Fixed a bug on `NeutralHadron4MomentumCalculator` that misplaces the neutral hadron daughter's index after calculating its momentum.
 
 Variables
 +++++++++

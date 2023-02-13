@@ -109,8 +109,7 @@ It's 0 for composite particles.
     Two particles of the same type can also have the same :b2:var:`mdstIndex`. This would mean that they are created from the same object. 
     For example, if pion and kaon have the same :b2:var:`mdstIndex` it means that they are created from the same track.
 
-
- .. tip::
+.. tip::
     If you are looking for unique identifier of the particle, please use :b2:var:`uniqueParticleIdentifier`.
     )DOC");
     REGISTER_VARIABLE("uniqueParticleIdentifier", uniqueParticleIdentifier, R"DOC(

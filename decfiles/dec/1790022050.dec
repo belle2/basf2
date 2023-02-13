@@ -12,11 +12,13 @@
 # June 2021 Automated: Converted PYTHIA ids
 #   Automated conversion of all PYTHIA decay ids to Pythia 8 using conversion defined in evtgen/src/EvtGenExternal/EvtPythiaEngine.cpp
 
+Alias omegasig omega
+
 Decay Upsilon(6S)
-1.0 omega chi_b0 PHSP;
+1.0 omegasig chi_b0 PHSP;
 Enddecay
 
-Decay omega
+Decay omegasig
 1.0 pi+ pi- pi0 OMEGA_DALITZ;
 Enddecay
 

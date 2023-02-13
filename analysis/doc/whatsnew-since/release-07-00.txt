@@ -41,6 +41,11 @@ Modules
 * Fixed a bug of the TreeFit with the Bremsstrahlung correction tools, `modularAnalysis.correctBrems` and
   `modularAnalysis.correctBremsBelle`. The position uncertainties of the brems-corrected particle were wrongly assigned.
   This bug does not affect the kinematics very much but induces a bias on the position and its uncertainty.
+* Allowed ``-o`` argument of basf2 to override the output ROOT filename of `VariablesToNtuple`, `VariablesToEventBasedTree`, and
+  `VariablesToHistogram` modules, e.g. ``basf2 script.py -o new.root``. If the modules are called more than once, the override will
+  be applied to all output files. If you need to save multiple TTrees with the same name, please use the new argument
+  ``filenameSuffix`` of `modularAnalysis.variablesToNtuple` to differentiate the output files. The ``filenameSuffix`` is appended to
+  the output ROOT file name even if the ``-o`` argument is used.
 
 Variables
 +++++++++

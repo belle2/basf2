@@ -5,7 +5,7 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 #pragma link C++ class Belle2::Particle+; // checksum=0x694ee2d8, version=16
-#pragma link C++ class Belle2::ParticleList+; // checksum=0x98887650, version=3
+#pragma link C++ class Belle2::ParticleList+; // checksum=0xa5bad8a, version=4
 #pragma link C++ class Belle2::RestOfEvent+; // checksum=0xe86f1658, version=8
 #pragma link C++ class Belle2::TagVertex+; // checksum=0xf7b6169c, version=6
 #pragma link C++ class Belle2::ContinuumSuppression+; // checksum=0x8f4ac744, version=2
@@ -103,7 +103,7 @@
   version="[-5]"                                \
   targetClass="Belle2::TagVertex"               \
   target="m_tagVertex"                          \
-  code="{m_tagVertex = onfile.m_tagVertex;}"    \
+  code="{m_tagVertex = ROOT::Math::XYZVector(onfile.m_tagVertex.X(), onfile.m_tagVertex.Y(), onfile.m_tagVertex.Z());}"    \
 
 // In version 6 the data type of the member m_mcTagV has been
 // changed from TVector3 to XYZVector
@@ -113,7 +113,7 @@
   version="[4-5]"                               \
   targetClass="Belle2::TagVertex"               \
   target="m_mcTagV"                             \
-  code="{m_mcTagV = onfile.m_mcTagV;}"          \
+  code="{m_mcTagV = ROOT::Math::XYZVector(onfile.m_mcTagV.X(), onfile.m_mcTagV.Y(), onfile.m_mcTagV.Z());}"          \
 
 // In version 6 the data type of the member m_constraintCenter
 // has been changed from TVector3 to XYZVector
@@ -123,7 +123,7 @@
   version="[-5]"                                            \
   targetClass="Belle2::TagVertex"                           \
   target="m_constraintCenter"                               \
-  code="{m_constraintCenter = onfile.m_constraintCenter;}"  \
+  code="{m_constraintCenter = ROOT::Math::XYZVector(onfile.m_constraintCenter.X(), onfile.m_constraintCenter.Y(), onfile.m_constraintCenter.Z());}"  \
 
 // ----------------------------------------------------------------------------
 // EventKinematics evolution
@@ -145,7 +145,7 @@
   version="[-2]"                                          \
   targetClass="Belle2::EventKinematics"                   \
   target="m_missingMomentum"                              \
-  code="{m_missingMomentum = onfile.m_missingMomentum;}"  \
+  code="{m_missingMomentum = ROOT::Math::XYZVector(onfile.m_missingMomentum.X(), onfile.m_missingMomentum.Y(), onfile.m_missingMomentum.Z());}"  \
 
 // In version 3 the data type of the member m_missingMomentumCMS has been
 // changed from TVector3 to XYZVector
@@ -155,7 +155,7 @@
   version="[-2]"                                               \
   targetClass="Belle2::EventKinematics"                        \
   target="m_missingMomentumCMS"                                \
-  code="{m_missingMomentumCMS = onfile.m_missingMomentumCMS;}" \
+  code="{m_missingMomentumCMS = ROOT::Math::XYZVector(onfile.m_missingMomentumCMS.X(), onfile.m_missingMomentumCMS.Y(), onfile.m_missingMomentumCMS.Z());}" \
 
 // ----------------------------------------------------------------------------
 // RestOfEvent evolution
@@ -179,7 +179,7 @@
   version="[1]"                               \
   targetClass="Belle2::ContinuumSuppression"  \
   target="m_thrustO"                          \
-  code="{m_thrustO = onfile.m_thrustO;}"      \
+  code="{m_thrustO = ROOT::Math::XYZVector(onfile.m_thrustO.X(), onfile.m_thrustO.Y(), onfile.m_thrustO.Z());}"      \
 
 #pragma read                                  \
   sourceClass="Belle2::ContinuumSuppression"  \
@@ -187,7 +187,7 @@
   version="[1]"                               \
   targetClass="Belle2::ContinuumSuppression"  \
   target="m_thrustB"                          \
-  code="{m_thrustB = onfile.m_thrustB;}"      \
+  code="{m_thrustB = ROOT::Math::XYZVector(onfile.m_thrustB.X(), onfile.m_thrustB.Y(), onfile.m_thrustB.Z());}"      \
 
 // ----------------------------------------------------------------------------
 // EventShapeContainer evolution
@@ -199,7 +199,7 @@
   version="[1]"                                 \
   targetClass="Belle2::EventShapeContainer"     \
   target="m_thrustAxis"                         \
-  code="{m_thrustAxis = onfile.m_thrustAxis;}"  \
+  code="{m_thrustAxis = ROOT::Math::XYZVector(onfile.m_thrustAxis.X(), onfile.m_thrustAxis.Y(), onfile.m_thrustAxis.Z());}"  \
 
 // In version 2 the data type of the member m_spherocityAxis has been
 // changed from TVector3 to XYZVector
@@ -209,18 +209,60 @@
   version="[1]"                                         \
   targetClass="Belle2::EventShapeContainer"             \
   target="m_spherocityAxis"                             \
-  code="{m_spherocityAxis = onfile.m_spherocityAxis;}"  \
+  code="{m_spherocityAxis = ROOT::Math::XYZVector(onfile.m_spherocityAxis.X(), onfile.m_spherocityAxis.Y(), onfile.m_spherocityAxis.Z());}"  \
 
 // In version 2 the data type of the member m_sphericityEigenvector
 // has been changed from array of TVector3 to array of XYZVector
-#pragma read                                                                \
-  sourceClass="Belle2::EventShapeContainer"                                 \
-  source="TVector3 m_sphericityEigenvector[3]"                              \
-  version="[1]"                                                             \
-  targetClass="Belle2::EventShapeContainer"                                 \
-  target="m_sphericityEigenvector"                                          \
-  code="{for (int i = 0; i < 3; i++)                                        \
-           m_sphericityEigenvector[i] = onfile.m_sphericityEigenvector[i];  \
-       }"                                                                   \
+#pragma read                                                                                          \
+  sourceClass="Belle2::EventShapeContainer"                                                           \
+  source="TVector3 m_sphericityEigenvector[3]"                                                        \
+  version="[1]"                                                                                       \
+  targetClass="Belle2::EventShapeContainer"                                                           \
+  target="m_sphericityEigenvector"                                                                    \
+  code="{for (int i = 0; i < 3; i++)                                                                  \
+           m_sphericityEigenvector[i] = ROOT::Math::XYZVector(onfile.m_sphericityEigenvector[i].X(),  \
+                                                              onfile.m_sphericityEigenvector[i].Y(),  \
+                                                              onfile.m_sphericityEigenvector[i].Z()); \
+       }"                                                                                             \
+
+// In version 2 the data type of the member m_forwardHemisphere4Momentum
+// has been changed from TLorentzVector to PxPyPzEVector
+#pragma read                                                                                                  \
+  sourceClass="Belle2::EventShapeContainer"                                                                   \
+  source="TLorentzVector m_forwardHemisphere4Momentum"                                                        \
+  version="[1]"                                                                                               \
+  targetClass="Belle2::EventShapeContainer"                                                                   \
+  target="m_forwardHemisphere4Momentum"                                                                       \
+  code="{m_forwardHemisphere4Momentum = ROOT::Math::PxPyPzEVector(onfile.m_forwardHemisphere4Momentum.Px(),   \
+                                                                  onfile.m_forwardHemisphere4Momentum.Py(),   \
+                                                                  onfile.m_forwardHemisphere4Momentum.Pz(),   \
+                                                                  onfile.m_forwardHemisphere4Momentum.E());}" \
+
+// In version 2 the data type of the member m_backwardHemisphere4Momentum
+// has been changed from TLorentzVector to PxPyPzEVector
+#pragma read                                                                                                    \
+  sourceClass="Belle2::EventShapeContainer"                                                                     \
+  source="TLorentzVector m_backwardHemisphere4Momentum"                                                         \
+  version="[1]"                                                                                                 \
+  targetClass="Belle2::EventShapeContainer"                                                                     \
+  target="m_backwardHemisphere4Momentum"                                                                        \
+  code="{m_backwardHemisphere4Momentum = ROOT::Math::PxPyPzEVector(onfile.m_backwardHemisphere4Momentum.Px(),   \
+                                                                   onfile.m_backwardHemisphere4Momentum.Py(),   \
+                                                                   onfile.m_backwardHemisphere4Momentum.Pz(),   \
+                                                                   onfile.m_backwardHemisphere4Momentum.E());}" \
+// ----------------------------------------------------------------------------
+// ParticleList evolution
+// In version 4, the member m_isReserved has been added
+#pragma read                                     \
+  sourceClass="Belle2::ParticleList"             \
+  source="std::string m_thisListName; int m_pdg" \
+  version="[-3]"                                 \
+  targetClass="Belle2::ParticleList"             \
+  target="m_isReserved"                          \
+  code="{std::string label = onfile.m_thisListName.substr(onfile.m_thisListName.find_first_of(':')+1);                                                 \
+         if ((Belle2::Const::finalStateParticlesSet.contains(Belle2::Const::ParticleType(abs(onfile.m_pdg))) and label == \"all\") or label == \"V0\") \
+           m_isReserved = true;                                                                                                                        \
+         else                                                                                                                                          \
+           m_isReserved = false;}"                                                                                                                     \
 
 #endif

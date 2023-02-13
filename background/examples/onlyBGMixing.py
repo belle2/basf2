@@ -14,7 +14,7 @@ import os
 import sys
 from simulation import add_simulation
 from reconstruction import add_reconstruction
-from reconstruction import add_mdst_output
+from mdst import add_mdst_output
 import glob
 
 # ----------------------------------------------------------------------------------

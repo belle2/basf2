@@ -147,8 +147,8 @@ void ParticleLoaderModule::initialize()
       if (m_useROEs) listName = mother->getFullName();
       // dummy particles get the full name
       else if (m_useDummy) listName = mother->getFullName();
-      // MC particles get the label "MC"
-      else if (m_useMCParticles) listName = mother->getName() + ":MC";
+      // MC particles get the full name
+      else if (m_useMCParticles) listName = mother->getFullName();
       // V0s get the label "V0"
       else if (nProducts > 0) listName = mother->getName() + ":V0";
 
@@ -164,6 +164,9 @@ void ParticleLoaderModule::initialize()
           StoreObjPtr<ParticleList> antiParticleList(antiListName);
           antiParticleList.registerInDataStore(flags);
         }
+      } else if (m_useMCParticles) {
+        B2WARNING("ParticleList " << listName << " already exists and will not be created again. " <<
+                  "The given options (addDaughters, skipNonPrimaryDaughters, skipNonPrimary) do not applied on the existing list.");
       }
 
       if (not isValidPDGCode(pdgCode) and (m_useMCParticles == false and m_useROEs == false and m_useDummy == false))
@@ -176,25 +179,26 @@ void ParticleLoaderModule::initialize()
            || (abs(pdgCode) == abs(Const::photon.getPDGCode()) && m_addDaughters == true)))
         mdstSourceIsV0 = true;
 
-      if (mdstSourceIsV0 == false) {
+      if (mdstSourceIsV0) {
+        if (nProducts == 2) {
+          m_properties = m_decaydescriptor.getProperty() | mother->getProperty(); // only used for V0s
+          if (m_decaydescriptor.getDaughter(0)->getMother()->getPDGCode() * m_decaydescriptor.getDaughter(1)->getMother()->getPDGCode() > 0)
+            B2ERROR("MDST source of the particle list is V0, the two daughters should have opposite charge");
+        } else {
+          B2ERROR("ParticleLoaderModule::initialize Invalid input DecayString " << decayString
+                  << ". MDST source of the particle list is V0, DecayString should contain exactly two daughters, as well as the mother particle.");
+        }
+      } else {
         if (nProducts > 0) {
-          if (!m_useROEs and !m_useDummy) {
-            B2ERROR("ParticleLoaderModule::initialize Invalid input DecayString " << decayString
-                    << ". DecayString should not contain any daughters, only the mother particle.");
-          } else {
+          if (m_useROEs or m_useDummy) {
             B2INFO("ParticleLoaderModule: Replacing the source particle list name by " <<
                    m_decaydescriptor.getDaughter(0)->getMother()->getFullName()
                    << " all other daughters will be ignored.");
             m_sourceParticleListName = m_decaydescriptor.getDaughter(0)->getMother()->getFullName();
+          } else {
+            B2ERROR("ParticleLoaderModule::initialize Invalid input DecayString " << decayString
+                    << ". DecayString should not contain any daughters, only the mother particle.");
           }
-        }
-      } else {
-        if (nProducts != 2)
-          B2ERROR("ParticleLoaderModule::initialize Invalid input DecayString " << decayString
-                  << ". MDST source of the particle list is V0, DecayString should contain exactly two daughters, as well as the mother particle.");
-        else {
-          if (m_decaydescriptor.getDaughter(0)->getMother()->getPDGCode() * m_decaydescriptor.getDaughter(1)->getMother()->getPDGCode() > 0)
-            B2ERROR("MDST source of the particle list is V0, the two daughters should have opposite charge");
         }
       }
 
@@ -460,6 +464,8 @@ void ParticleLoaderModule::v0sToParticles()
       antiPlist->bindAntiParticleList(*(plist));
     }
 
+    plist->setEditable(true); // :V0 list is originally reserved. we have to set it as editable.
+
     // load reconstructed V0s as Kshorts (pi-pi+ combination), Lambdas (p+pi- combinations), and converted photons (e-e+ combinations)
     for (int i = 0; i < m_v0s.getEntries(); i++) {
       const V0* v0 = m_v0s[i];
@@ -546,6 +552,7 @@ void ParticleLoaderModule::v0sToParticles()
       ROOT::Math::PxPyPzEVector v0Momentum = newDaugP->get4Vector() + newDaugM->get4Vector();
       Particle v0P(v0Momentum, v0Type.getPDGCode(), v0FlavorType,
                    Particle::EParticleSourceObject::c_V0, v0->getArrayIndex());
+      v0P.setProperty(m_properties);
 
       // add the daughters of the V0 (in the correct order) and don't update
       // the type to c_Composite (i.e. maintain c_V0)
@@ -561,6 +568,8 @@ void ParticleLoaderModule::v0sToParticles()
       Particle* newPart = m_particles.appendNew(v0P);
       plist->addParticle(newPart);
     }
+
+    plist->setEditable(false); // set the :V0 list as not editable.
   }
 }
 
@@ -593,6 +602,8 @@ void ParticleLoaderModule::tracksToParticles()
 
       antiPlist->bindAntiParticleList(*(plist));
     }
+
+    plist->setEditable(true); // :all list is originally reserved. we have to set it as editable.
 
     // the inner loop over all tracks from which Particles
     // are created, and get sorted in the particle lists
@@ -644,6 +655,8 @@ void ParticleLoaderModule::tracksToParticles()
 
       } // sanity check correct particle type
     } // loop over tracks
+
+    plist->setEditable(false); // set the :all list as not editable.
   } // particle lists
 }
 
@@ -675,6 +688,8 @@ void ParticleLoaderModule::eclAndKLMClustersToParticles()
 
       antiPlist->bindAntiParticleList(*(plist));
     }
+
+    plist->setEditable(true); // :all list is originally reserved. we have to set it as editable.
 
     // load reconstructed neutral ECL clusters as photons or Klongs or neutrons
     for (int i = 0; i < m_eclclusters.getEntries(); i++) {
@@ -777,6 +792,8 @@ void ParticleLoaderModule::eclAndKLMClustersToParticles()
       // add particle to list
       plist->addParticle(newPart);
     }
+
+    plist->setEditable(false); // set the :all list as not editable.
   } // loop over particle lists
 }
 
@@ -793,8 +810,6 @@ void ParticleLoaderModule::mcParticlesToParticles()
     bool isSelfConjugatedParticle = get<c_IsPListSelfConjugated>(mcParticle2Plist);
 
     StoreObjPtr<ParticleList> plist(listName);
-    // since a particle list in the ParticleLoader always contains all possible objects
-    // we check whether it already exists in this path and can skip any further steps if it does
     if (plist.isValid())
       continue;
     plist.create();
@@ -826,6 +841,7 @@ void ParticleLoaderModule::mcParticlesToParticles()
 
       plist->addParticle(newPart);
     }
+
   }
 }
 

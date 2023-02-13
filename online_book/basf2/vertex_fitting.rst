@@ -12,17 +12,17 @@ Vertex fitting
 
     **Prerequisites**:
 
-        * The previous lesson
+    * The previous lesson
 
     **Questions**:
 
-        * What is a vertex fit?
-        * When do I want to perform a vertex fit?
-        * How should I choose my fit and constraints?
+    * What is a vertex fit?
+    * When do I want to perform a vertex fit?
+    * How should I choose my fit and constraints?
 
     **Objectives**:
 
-        * Perform vertex fit of a decay
+    * Perform vertex fit of a decay
 
 Introduction
 ------------
@@ -305,6 +305,6 @@ As an exercise we will focus on the first two.
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Authors of this lesson
+.. rubric:: Authors of this lesson
 
-    Francesco Tenchini
+Francesco Tenchini

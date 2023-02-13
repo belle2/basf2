@@ -116,11 +116,11 @@ namespace Belle2 {
      * tracking; in this case, a second call of this method is required after
      * creation of the BKLM and EKLM hits store arrays.
      * @param recoTracks  Reference to the store array where the new RecoTrack list is located
-     * @param cdcHitsStoreArrayName  name of the StoreArray holding the CDCHits lists
-     * @param svdHitsStoreArrayName  name of the StoreArray holding the SVDClusters lists
      * @param pxdHitsStoreArrayName  name of the StoreArray holding the PXDClusters lists
-     * @param bklmHitsStoreArrayName  name of the StoreArray holding the CDCHits lists
-     * @param eklmHitsStoreArrayName  name of the StoreArray holding the CDCHits lists
+     * @param svdHitsStoreArrayName  name of the StoreArray holding the SVDClusters lists
+     * @param cdcHitsStoreArrayName  name of the StoreArray holding the CDCHits lists
+     * @param bklmHitsStoreArrayName  name of the StoreArray holding the BKLMHits lists
+     * @param eklmHitsStoreArrayName  name of the StoreArray holding the EKLMHits lists
      * @param recoHitInformationStoreArrayName  name of the StoreArray holding RecoHitInformation lists
      */
     static void registerRequiredRelations(
@@ -141,17 +141,17 @@ namespace Belle2 {
        * @param seedPosition A position on the helix of the track seed. Only the perigee of the helix will be saved.
        * @param seedMomentum The seed momentum of the helix on the given position.
        * @param seedCharge The seed charge of the helix
-       * @param storeArrayNameOfCDCHits The name of the store array where the related cdc hits are stored.
-       * @param storeArrayNameOfSVDHits The name of the store array where the related svd hits are stored.
-       * @param storeArrayNameOfPXDHits The name of the store array where the related pxd hits are stored.
-       * @param storeArrayNameOfBKLMHits The name of the store array where the related pxd hits are stored.
-       * @param storeArrayNameOfEKLMHits The name of the store array where the related pxd hits are stored.
+       * @param storeArrayNameOfPXDHits The name of the store array where the related PXD hits are stored.
+       * @param storeArrayNameOfSVDHits The name of the store array where the related SVD hits are stored.
+       * @param storeArrayNameOfCDCHits The name of the store array where the related CDC hits are stored.
+       * @param storeArrayNameOfBKLMHits The name of the store array where the related BKLM hits are stored.
+       * @param storeArrayNameOfEKLMHits The name of the store array where the related EKLM hits are stored.
        * @param storeArrayNameOfRecoHitInformation The name of the store array where the related hit information are stored.
        */
     RecoTrack(const ROOT::Math::XYZVector& seedPosition, const ROOT::Math::XYZVector& seedMomentum, const short int seedCharge,
-              const std::string& storeArrayNameOfCDCHits = "",
-              const std::string& storeArrayNameOfSVDHits = "",
               const std::string& storeArrayNameOfPXDHits = "",
+              const std::string& storeArrayNameOfSVDHits = "",
+              const std::string& storeArrayNameOfCDCHits = "",
               const std::string& storeArrayNameOfBKLMHits = "",
               const std::string& storeArrayNameOfEKLMHits = "",
               const std::string& storeArrayNameOfRecoHitInformation = "");
@@ -165,11 +165,11 @@ namespace Belle2 {
      * Create a reco track from a genfit::TrackCand and save it to the given store array.
      * @param trackCand The genfit::TrackCand from which to create the new object.
      * @param storeArrayNameOfRecoTracks The store array where the new object should be saved.
-     * @param storeArrayNameOfCDCHits The name of the store array where the related cdc hits are stored.
-     * @param storeArrayNameOfSVDHits The name of the store array where the related svd hits are stored.
-     * @param storeArrayNameOfPXDHits The name of the store array where the related pxd hits are stored.
-     * @param storeArrayNameOfBKLMHits The name of the store array where the related bklm hits are stored.
-     * @param storeArrayNameOfEKLMHits The name of the store array where the related eklm hits are stored.
+     * @param storeArrayNameOfPXDHits The name of the store array where the related PXD hits are stored.
+     * @param storeArrayNameOfSVDHits The name of the store array where the related SVD hits are stored.
+     * @param storeArrayNameOfCDCHits The name of the store array where the related CDC hits are stored.
+     * @param storeArrayNameOfBKLMHits The name of the store array where the related BKLM hits are stored.
+     * @param storeArrayNameOfEKLMHits The name of the store array where the related EKLM hits are stored.
      * @param storeArrayNameOfRecoHitInformation The name of the store array where the related hit information are stored.
      * @param recreateSortingParameters The VXDTF does not set the sorting parameters correctly (they are all 0).
      *        This flag can be used to recover the parameters.
@@ -178,9 +178,9 @@ namespace Belle2 {
      */
     static RecoTrack* createFromTrackCand(const genfit::TrackCand& trackCand,
                                           const std::string& storeArrayNameOfRecoTracks = "",
-                                          const std::string& storeArrayNameOfCDCHits = "",
-                                          const std::string& storeArrayNameOfSVDHits = "",
                                           const std::string& storeArrayNameOfPXDHits = "",
+                                          const std::string& storeArrayNameOfSVDHits = "",
+                                          const std::string& storeArrayNameOfCDCHits = "",
                                           const std::string& storeArrayNameOfBKLMHits = "",
                                           const std::string& storeArrayNameOfEKLMHits = "",
                                           const std::string& storeArrayNameOfRecoHitInformation = "",
@@ -387,14 +387,14 @@ namespace Belle2 {
     const genfit::TrackPoint* getCreatedTrackPoint(const RecoHitInformation* recoHitInformation) const;
 
     // Hits Added Questioning
-    /// Returns true if the track has cdc hits.
-    bool hasCDCHits() const { return getRelatedFrom<UsedCDCHit>(m_storeArrayNameOfCDCHits) != nullptr; }
+    /// Returns true if the track has pxd hits.
+    bool hasPXDHits() const { return getRelatedFrom<UsedPXDHit>(m_storeArrayNameOfPXDHits) != nullptr; }
 
     /// Returns true if the track has svd hits.
     bool hasSVDHits() const { return getRelatedFrom<UsedSVDHit>(m_storeArrayNameOfSVDHits) != nullptr; }
 
-    /// Returns true if the track has pxd hits.
-    bool hasPXDHits() const { return getRelatedFrom<UsedPXDHit>(m_storeArrayNameOfPXDHits) != nullptr; }
+    /// Returns true if the track has cdc hits.
+    bool hasCDCHits() const { return getRelatedFrom<UsedCDCHit>(m_storeArrayNameOfCDCHits) != nullptr; }
 
     /// Returns true if the track has bklm hits.
     bool hasBKLMHits() const { return getRelatedFrom<UsedBKLMHit>(m_storeArrayNameOfBKLMHits) != nullptr; }
@@ -413,14 +413,14 @@ namespace Belle2 {
     }
 
     // Hits Questioning
-    /// Return the number of cdc hits.
-    unsigned int getNumberOfCDCHits() const { return getNumberOfHitsOfGivenType<UsedCDCHit>(m_storeArrayNameOfCDCHits); }
+    /// Return the number of pxd hits.
+    unsigned int getNumberOfPXDHits() const { return getNumberOfHitsOfGivenType<UsedPXDHit>(m_storeArrayNameOfPXDHits); }
 
     /// Return the number of svd hits.
     unsigned int getNumberOfSVDHits() const { return getNumberOfHitsOfGivenType<UsedSVDHit>(m_storeArrayNameOfSVDHits); }
 
-    /// Return the number of pxd hits.
-    unsigned int getNumberOfPXDHits() const { return getNumberOfHitsOfGivenType<UsedPXDHit>(m_storeArrayNameOfPXDHits); }
+    /// Return the number of cdc hits.
+    unsigned int getNumberOfCDCHits() const { return getNumberOfHitsOfGivenType<UsedCDCHit>(m_storeArrayNameOfCDCHits); }
 
     /// Return the number of bklm hits.
     unsigned int getNumberOfBKLMHits() const { return getNumberOfHitsOfGivenType<UsedBKLMHit>(m_storeArrayNameOfBKLMHits); }
@@ -431,25 +431,24 @@ namespace Belle2 {
     /// Return the number of cdc + svd + pxd + bklm + eklm hits.
     unsigned int getNumberOfTotalHits() const
     {
-      return getNumberOfCDCHits() + getNumberOfPXDHits() +
-             getNumberOfSVDHits() + getNumberOfBKLMHits() + getNumberOfEKLMHits();
+      return getNumberOfPXDHits() + getNumberOfSVDHits() + getNumberOfCDCHits() +
+             getNumberOfBKLMHits() + getNumberOfEKLMHits();
     }
 
     /// Return the number of cdc + svd + pxd  hits.
     unsigned int getNumberOfTrackingHits() const
     {
-      return getNumberOfCDCHits() + getNumberOfPXDHits() +
-             getNumberOfSVDHits();
+      return getNumberOfPXDHits() + getNumberOfSVDHits() + getNumberOfCDCHits();
     }
 
-    /// Return an unsorted list of cdc hits.
-    std::vector<Belle2::RecoTrack::UsedCDCHit*> getCDCHitList() const { return getHitList<UsedCDCHit>(m_storeArrayNameOfCDCHits); }
+    /// Return an unsorted list of pxd hits.
+    std::vector<Belle2::RecoTrack::UsedPXDHit*> getPXDHitList() const { return getHitList<UsedPXDHit>(m_storeArrayNameOfPXDHits); }
 
     /// Return an unsorted list of svd hits.
     std::vector<Belle2::RecoTrack::UsedSVDHit*> getSVDHitList() const { return getHitList<UsedSVDHit>(m_storeArrayNameOfSVDHits); }
 
-    /// Return an unsorted list of pxd hits.
-    std::vector<Belle2::RecoTrack::UsedPXDHit*> getPXDHitList() const { return getHitList<UsedPXDHit>(m_storeArrayNameOfPXDHits); }
+    /// Return an unsorted list of cdc hits.
+    std::vector<Belle2::RecoTrack::UsedCDCHit*> getCDCHitList() const { return getHitList<UsedCDCHit>(m_storeArrayNameOfCDCHits); }
 
     /// Return an unsorted list of bklm hits.
     std::vector<Belle2::RecoTrack::UsedBKLMHit*> getBKLMHitList() const { return getHitList<UsedBKLMHit>(m_storeArrayNameOfBKLMHits); }
@@ -457,14 +456,14 @@ namespace Belle2 {
     /// Return an unsorted list of eklm hits.
     std::vector<Belle2::RecoTrack::UsedEKLMHit*> getEKLMHitList() const { return getHitList<UsedEKLMHit>(m_storeArrayNameOfEKLMHits); }
 
-    /// Return a sorted list of cdc hits. Sorted by the sortingParameter.
-    std::vector<Belle2::RecoTrack::UsedCDCHit*> getSortedCDCHitList() const { return getSortedHitList<UsedCDCHit>(m_storeArrayNameOfCDCHits); }
+    /// Return a sorted list of pxd hits. Sorted by the sortingParameter.
+    std::vector<Belle2::RecoTrack::UsedPXDHit*> getSortedPXDHitList() const { return getSortedHitList<UsedPXDHit>(m_storeArrayNameOfPXDHits); }
 
     /// Return a sorted list of svd hits. Sorted by the sortingParameter.
     std::vector<Belle2::RecoTrack::UsedSVDHit*> getSortedSVDHitList() const { return getSortedHitList<UsedSVDHit>(m_storeArrayNameOfSVDHits); }
 
-    /// Return a sorted list of pxd hits. Sorted by the sortingParameter.
-    std::vector<Belle2::RecoTrack::UsedPXDHit*> getSortedPXDHitList() const { return getSortedHitList<UsedPXDHit>(m_storeArrayNameOfPXDHits); }
+    /// Return a sorted list of cdc hits. Sorted by the sortingParameter.
+    std::vector<Belle2::RecoTrack::UsedCDCHit*> getSortedCDCHitList() const { return getSortedHitList<UsedCDCHit>(m_storeArrayNameOfCDCHits); }
 
     /// Return a sorted list of bklm hits. Sorted by the sortingParameter.
     std::vector<Belle2::RecoTrack::UsedBKLMHit*> getSortedBKLMHitList() const { return getSortedHitList<UsedBKLMHit>(m_storeArrayNameOfBKLMHits); }
@@ -566,13 +565,11 @@ namespace Belle2 {
       return m_nSVDHitsOfIngoingArm;
     }
 
-    /// Swap arm times, booleans and nSVDHits
-    void swapArmTimes()
-    {
-      std::swap(m_outgoingArmTime, m_ingoingArmTime);
-      std::swap(m_hasOutgoingArmTime, m_hasIngoingArmTime);
-      std::swap(m_nSVDHitsOfOutgoingArm, m_nSVDHitsOfIngoingArm);
-    }
+    /** Flip the direction of the RecoTrack by inverting the momentum vector and the charge.
+     *  In addition, also the ingoing and outgoing arms and arm times are swapped.
+     *  @param representation Track representation to be used to get the MeasuredStateOnPlane at the last hit
+     */
+    void flipTrackDirectionAndCharge(const genfit::AbsTrackRep* representation = nullptr);
 
     /// Return the position, the momentum and the charge of the first measured state on plane or - if unfitted - the seeds.
     std::tuple<ROOT::Math::XYZVector, ROOT::Math::XYZVector, short> extractTrackState() const;
@@ -719,14 +716,14 @@ namespace Belle2 {
     }
 
     // Store Array Names
-    /// Name of the store array of the cdc hits.
-    const std::string& getStoreArrayNameOfCDCHits() const { return m_storeArrayNameOfCDCHits; }
+    /// Name of the store array of the pxd hits.
+    const std::string& getStoreArrayNameOfPXDHits() const { return m_storeArrayNameOfPXDHits; }
 
     /// Name of the store array of the svd hits.
     const std::string& getStoreArrayNameOfSVDHits() const { return m_storeArrayNameOfSVDHits; }
 
-    /// Name of the store array of the pxd hits.
-    const std::string& getStoreArrayNameOfPXDHits() const { return m_storeArrayNameOfPXDHits; }
+    /// Name of the store array of the cdc hits.
+    const std::string& getStoreArrayNameOfCDCHits() const { return m_storeArrayNameOfCDCHits; }
 
     /// Name of the store array of the bklm hits.
     const std::string& getStoreArrayNameOfBKLMHits() const { return m_storeArrayNameOfBKLMHits; }
@@ -736,6 +733,16 @@ namespace Belle2 {
 
     /// Name of the store array of the reco hit informations.
     const std::string& getStoreArrayNameOfRecoHitInformation() const { return m_storeArrayNameOfRecoHitInformation; }
+
+    /// Revert the sorting order of the RecoHitInformation
+    void revertRecoHitInformationSorting()
+    {
+      const uint recoHitInformationSize = getRecoHitInformations().size();
+      for (auto RecoHitInfo : getRecoHitInformations()) {
+        // The "-1" ensures that the sorting parameter still is in range 0...size-1 instead of 1...size
+        RecoHitInfo->setSortingParameter(recoHitInformationSize - RecoHitInfo->getSortingParameter() - 1);
+      }
+    }
 
     /**
      * Call a function on all hits of the given type in the store array, that are related to this track.
@@ -878,12 +885,12 @@ namespace Belle2 {
     genfit::Track m_genfitTrack;
     /// Storage for the charge. All other helix parameters are saved in the genfit::Track.
     short int m_charge = 1;
-    /// Store array name of added CDC hits.
-    std::string m_storeArrayNameOfCDCHits = "";
-    /// Store array name of added SVD hits.
-    std::string m_storeArrayNameOfSVDHits = "";
     /// Store array name of added PXD hits.
     std::string m_storeArrayNameOfPXDHits = "";
+    /// Store array name of added SVD hits.
+    std::string m_storeArrayNameOfSVDHits = "";
+    /// Store array name of added CDC hits.
+    std::string m_storeArrayNameOfCDCHits = "";
     /// Store array name of added BKLM hits.
     std::string m_storeArrayNameOfBKLMHits = "";
     /// Store array name of added EKLM hits.
@@ -1035,6 +1042,14 @@ namespace Belle2 {
       return hitList;
     }
 
+    /// Swap arm times, booleans and nSVDHits
+    void swapArmTimes()
+    {
+      std::swap(m_outgoingArmTime, m_ingoingArmTime);
+      std::swap(m_hasOutgoingArmTime, m_hasIngoingArmTime);
+      std::swap(m_nSVDHitsOfOutgoingArm, m_nSVDHitsOfIngoingArm);
+    }
+
     /// Helper: Check the dirty flag and produce a warning, whenever a fit result is accessed.
     void checkDirtyFlag() const
     {
@@ -1044,7 +1059,7 @@ namespace Belle2 {
     }
 
     /** Making this class a ROOT class.*/
-    ClassDefOverride(RecoTrack, 13);
+    ClassDefOverride(RecoTrack, 14);
   };
 
   /**

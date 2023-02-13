@@ -223,7 +223,6 @@ namespace Belle2 {
 
         const MCParticle* mother = currParticle->getMother();
 
-        int mm = 0;
         while (mother) {
           const MCParticle* pommother = mother->getMother();
           if (!pommother) {
@@ -243,7 +242,6 @@ namespace Belle2 {
             originpt->Fill(pt);
           }
           mother = pommother;
-          mm++;
         }
       }
     }

@@ -20,7 +20,7 @@
 namespace Belle2 {
   /*! Class definition for the output module of Sequential ROOT I/O */
 
-  class DQMHistAnalysisV0Module : public DQMHistAnalysisModule {
+  class DQMHistAnalysisV0Module final : public DQMHistAnalysisModule {
 
     //! List of histograms for display
     typedef std::map<std::string, TH1*> HistList;
@@ -47,10 +47,10 @@ namespace Belle2 {
     std::string m_OverlayPath = "";
 
     //! Module functions to be called from main process
-    void initialize() override;
+    void initialize() override final;
 
     //! Module functions to be called from event process
-    void event() override;
+    void event() override final;
 
   };
 } // end namespace Belle2

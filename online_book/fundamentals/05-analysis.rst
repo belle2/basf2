@@ -10,13 +10,13 @@ Analysis
 
     **Prerequisites**:
 
-        * :ref:`Fundamentals Introduction <onlinebook_fundamentals_introduction>`
-        * :ref:`Fundamentals of Data Processing <onlinebook_fundamentals_datataking>`
+    * :ref:`Fundamentals Introduction <onlinebook_fundamentals_introduction>`
+    * :ref:`Fundamentals of Data Processing <onlinebook_fundamentals_datataking>`
 
     **Objectives**:
 
-        * The concept of Skimming
-        * Reconstructed and Combined particles
+    * The concept of Skimming
+    * Reconstructed and Combined particles
 
 
 The Skimming
@@ -79,7 +79,7 @@ starting from those signals and combined particles that are reconstructed as sum
     :math:`\tau` is
     :math:`L = \gamma\beta\tau c`. The Lorentz factor is :math:`\gamma = \frac{E}{Mc^2}` while :math:`\beta = pc/E`,
     therefore :math:`L = \tau p/M`. From this:
-    :math:`L_{\mu} \approx 63` m and :math:`L_{D^0} \approx 170` μm. Only the muon reaches
+    :math:`L_{\mu} \approx 6234` m and :math:`L_{D^+} \approx 165` μm. Only the muon reaches
     the tracking system.
 
 
@@ -120,7 +120,7 @@ starting from those signals and combined particles that are reconstructed as sum
       leaving a signal. However, such a short track would be very difficult to reconstruct, and it's
       much more convenient to reconstruct these hyperons by looking at their (almost) stable decay products.
     * Finally, there's one last category of stable charged particles we can detect: light (anti-)nuclei such as the
-      deuteron, tritium or helium. These can be produced ether in the :math:`e^+e^-` collision or, much more
+      deuteron, tritium or helium. These can be produced either in the :math:`e^+e^-` collision or, much more
       easily, by spallation processes on the inner detector materials.
 
 
@@ -151,7 +151,7 @@ Reconstructed particle
     different reconstruction objects: charged particles are reconstructed from tracks, photons and
     :math:`K_L` from ECL or KLM clusters. Of course a charged track entering the ECL will leave a signal,
     so one can have a cluster attached to a charged tracks.
-    The tracking can only measure ether 3-momentum of a particle, so to calculate its 4-momentum one
+    The tracking can only measure either 3-momentum of a particle, so to calculate its 4-momentum one
     has to make an assumption on the mass. This is usually based on the response of the PID system.
     On the other hand clusters provide a measurement of the energy, but not of the momentum. To get it, we
     make both an assumption on the particle mass, and on its production point (all photons and :math:`K_L` are
@@ -176,10 +176,10 @@ V0
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Author(s) of this lesson
+.. rubric:: Author(s) of this lesson
 
-    Umberto Tamponi,
-    Martin Ritter,
-    Oskar Hartbrich,
-    Michael Eliachevitch,
-    Sam Cunliffe
+Umberto Tamponi,
+Martin Ritter,
+Oskar Hartbrich,
+Michael Eliachevitch,
+Sam Cunliffe

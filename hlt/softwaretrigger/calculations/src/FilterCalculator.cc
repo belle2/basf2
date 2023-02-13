@@ -95,6 +95,7 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
 
   calculationResult["netChargeLoose"] = 0; /**< net charge of loose tracks */
   calculationResult["maximumPCMS"] = NAN; /**< maximum p* of loose tracks (GeV/c) */
+  calculationResult["maximumPLab"] = NAN; /**< maximum pLab of loose tracks (GeV/c) */
   calculationResult["eexx"] = 0;
   calculationResult["ee1leg1trk"] = 0; /**< Bhabha, 2 tracks, at least 1 of which has ECL info */
   calculationResult["nEhighLowAng"] = 0; /**< number of clusters with E*>m_Ehigh, low angles */
@@ -258,6 +259,7 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
     const ROOT::Math::PxPyPzEVector& momentumLab = trackFitResult->get4Momentum();
     const ROOT::Math::PxPyPzEVector momentumCMS = boostrotate.rotateLabToCms() * momentumLab;
     double pCMS = momentumCMS.P();
+    double pLab = momentumLab.P();
 
     // Find the maximum pt negative [0] and positive [1] tracks without z0 cut
     const double pT = trackFitResult->getTransverseMomentum();
@@ -267,7 +269,7 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
       newMaximum.pT = pT;
       newMaximum.track = &track;
       newMaximum.pCMS = pCMS;
-      newMaximum.pLab = momentumLab.P();
+      newMaximum.pLab = pLab;
       newMaximum.p4CMS = momentumCMS;
       newMaximum.p4Lab = momentumLab;
       maximumPtTracksWithoutZCut[charge] = newMaximum;
@@ -280,6 +282,10 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
 
       if (std::isnan(calculationResult["maximumPCMS"]) or pCMS > calculationResult["maximumPCMS"]) {
         calculationResult["maximumPCMS"] = pCMS;
+      }
+
+      if (std::isnan(calculationResult["maximumPLab"]) or pLab > calculationResult["maximumPLab"]) {
+        calculationResult["maximumPLab"] = pLab;
       }
 
       // Find the maximum pt negative [0] and positive [1] tracks

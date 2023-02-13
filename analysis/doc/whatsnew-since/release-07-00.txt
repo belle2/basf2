@@ -53,6 +53,7 @@ Modules
   ``filenameSuffix`` of `modularAnalysis.variablesToNtuple` to differentiate the output files. The ``filenameSuffix`` is appended to
   the output ROOT file name even if the ``-o`` argument is used.
 * Added a module ``BelleNbarMVA`` that applies nbarMVA for Belle I, a DNN trained with ECLCluster variables for discrimination of anti-neutrons against photons. Anti-neutron-like particles have scores closer to 1; photon-like particles have scores closer to 0.
+* Fixed a bug on `NeutralHadron4MomentumCalculator` that misplaces the neutral hadron daughter's index after calculating its momentum.
 
 Variables
 +++++++++

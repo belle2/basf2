@@ -71,6 +71,7 @@ QED = [
     "filter selee1leg1clst",
     "filter selee1leg1trk",
     "filter eexxSelectB",
+    "filter eexxHighP",
     "filter radiative BhabhaB",
     "filter selectmumu",
     "filter single muon",

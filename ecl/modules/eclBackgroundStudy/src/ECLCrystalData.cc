@@ -10,13 +10,11 @@
 #include <ecl/modules/eclBackgroundStudy/ECLCrystalData.h>
 
 /* Basf2 headers. */
+#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
 /* C++ headers. */
 #include <cmath>
-
-#define PI 3.14159265358979323846
-#define DEGTORAD 1.74532925199432955e-02
 
 using namespace Belle2;
 
@@ -168,12 +166,12 @@ void ECLCrystalData::Eval()
 
 double ECLCrystalData::EvalX()
 {
-  return m_PosR * cos(DEGTORAD * m_PosP);
+  return m_PosR * cos(Unit::deg * m_PosP);
 }
 
 double ECLCrystalData::EvalY()
 {
-  return m_PosR * sin(DEGTORAD * m_PosP);
+  return m_PosR * sin(Unit::deg * m_PosP);
 }
 
 
@@ -228,7 +226,7 @@ double ECLCrystalData::EvalPhi()
 double ECLCrystalData::EvalZ()
 {
   if (IsEndCap()) {
-    return EndcapRadius[GetCrystalIndex()] * cos(DEGTORAD * theta[m_theta_ID]);
+    return EndcapRadius[GetCrystalIndex()] * cos(Unit::deg * theta[m_theta_ID]);
   }
 
   return BarrelZ[GetCrystalIndex()];
@@ -237,7 +235,7 @@ double ECLCrystalData::EvalZ()
 double ECLCrystalData::EvalR()
 {
   if (IsEndCap()) {
-    return EndcapRadius[GetCrystalIndex()] * sin(DEGTORAD * theta[m_theta_ID]);
+    return EndcapRadius[GetCrystalIndex()] * sin(Unit::deg * theta[m_theta_ID]);
   }
 
   return 147.7;

@@ -6,8 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef ECLCONFIGURATION_H_
-#define ECLCONFIGURATION_H_
+#pragma once
 
 /* ECL headers. */
 #include <ecl/dataobjects/ECLElementNumbers.h>
@@ -117,4 +116,3 @@ namespace Belle2 {
     };
   }
 }
-#endif

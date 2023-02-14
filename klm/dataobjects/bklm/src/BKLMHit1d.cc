@@ -12,7 +12,7 @@
 /* KLM headers. */
 #include <klm/dataobjects/bklm/BKLMStatus.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/logging/Logger.h>
 
 /* C++ headers. */

@@ -16,7 +16,7 @@
 #include <klm/eklm/geometry/GeometryData.h>
 #include <klm/eklm/geometry/TransformData.h>
 
-/* Belle 2 headers */
+/* Basf2 headers */
 #include <calibration/CalibrationCollectorModule.h>
 #include <framework/dataobjects/EventT0.h>
 #include <framework/datastore/StoreArray.h>

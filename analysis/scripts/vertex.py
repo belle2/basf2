@@ -234,6 +234,7 @@ def treeFit(
     customOriginCovariance=[0.0048, 0, 0, 0, 0.003567, 0, 0, 0, 0.0400],
     originDimension=3,
     treatAsInvisible='',
+    ignoreFromVertexFit='',
     path=None,
 ):
     """
@@ -270,6 +271,7 @@ def treeFit(
         originDimension (int): If the origin or IP constraint (``customOriginVertex`` or ``ipConstraint``) are used,
             this specifies the dimension of the constraint (3D or 2D).
         treatAsInvisible (str): Decay string to select one particle that will be treated as invisible in the fit.
+        ignoreFromVertexFit (str): Decay string to select particles that will be ignored to determine the vertex position.
         path (basf2.Path): modules are added to this path
     """
     treeFitter = register_module("TreeFitter")
@@ -288,6 +290,7 @@ def treeFit(
     treeFitter.param('customOriginCovariance', customOriginCovariance)
     treeFitter.param('originDimension', originDimension)
     treeFitter.param('treatAsInvisible', treatAsInvisible)
+    treeFitter.param('ignoreFromVertexFit', ignoreFromVertexFit)
     path.add_module(treeFitter)
 
 

@@ -8,15 +8,18 @@
 
 #pragma once
 
-#include <framework/core/Module.h>
+/* ECL headers. */
 #include <ecl/utility/ECLChannelMapper.h>
 
+/* Basf2 headers. */
 #include <calibration/CalibrationCollectorModule.h>
+#include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
-#include <framework/datastore/StoreArray.h>
+#include <framework/dataobjects/EventMetaData.h>
 #include <framework/dataobjects/EventT0.h>
-
+#include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
+
 class TTree ;
 
 namespace Belle2 {
@@ -69,6 +72,8 @@ namespace Belle2 {
     std::unique_ptr< Belle2::ECL::ECLChannelMapper> m_crystalMapper =
       std::make_unique<Belle2::ECL::ECLChannelMapper>();
 
+    /** Event metadata. */
+    StoreObjPtr<EventMetaData> m_EventMetaData;
 
     StoreObjPtr<SoftwareTriggerResult> m_TrgResult; /**< Store array for Trigger selection */
     /**
@@ -106,9 +111,6 @@ namespace Belle2 {
 
     /** Mapper of ecl channels to various other objects, like crates */
     DBObjPtr<Belle2::ECLChannelMap> m_channelMapDB; /**< database object */
-
-
-
 
     int     m_tree_crateid = -1;            /**< Crate ID for debug TTree output */
     double  m_tree_tcrate = -1;             /**< Crate time for debug TTree output */

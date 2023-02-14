@@ -12,7 +12,7 @@
 #include <klm/dbobjects/KLMLikelihoodParameters.h>
 #include <klm/muid/MuidElementNumbers.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/database/DBObjPtr.h>
 
 namespace Belle2 {

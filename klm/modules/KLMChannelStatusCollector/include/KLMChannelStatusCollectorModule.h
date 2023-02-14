@@ -14,7 +14,7 @@
 #include <klm/dataobjects/KLMChannelMapValue.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <calibration/CalibrationCollectorModule.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>

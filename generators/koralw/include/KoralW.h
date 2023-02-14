@@ -8,7 +8,7 @@
 
 #pragma once
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <mdst/dataobjects/MCParticleGraph.h>
 
 /* ROOT headers. */

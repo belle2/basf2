@@ -23,21 +23,25 @@
  * to perform the calibration itself.                                     *
  **************************************************************************/
 
-
+/* Own header. */
 #include <ecl/modules/eclBhabhaTimeCalibrationValidationCollector/eclBhabhaTimeCalibrationValidationCollectorModule.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/gearbox/Const.h>
-#include <ecl/dbobjects/ECLCrystalCalib.h>
-#include <ecl/dataobjects/ECLDigit.h>
-#include <ecl/dataobjects/ECLCalDigit.h>
-#include <ecl/dataobjects/ECLTrig.h>
-#include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/HitPatternCDC.h>
-#include <ecl/digitization/EclConfiguration.h>
-#include <analysis/utility/PCmsLabTransform.h>
-#include <analysis/ClusterUtility/ClusterUtils.h>
 
+/* ECL headers. */
+#include <ecl/dataobjects/ECLCalDigit.h>
+#include <ecl/dataobjects/ECLDigit.h>
+#include <ecl/dataobjects/ECLTrig.h>
+#include <ecl/dbobjects/ECLCrystalCalib.h>
+#include <ecl/digitization/EclConfiguration.h>
+
+/* Basf2 headers. */
+#include <analysis/ClusterUtility/ClusterUtils.h>
+#include <analysis/utility/PCmsLabTransform.h>
+#include <framework/gearbox/Const.h>
+#include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/HitPatternCDC.h>
+#include <mdst/dataobjects/Track.h>
+
+/* ROOT headers. */
 #include <TH2F.h>
 #include <TTree.h>
 #include <TFile.h>
@@ -137,9 +141,8 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::prepare()
 
 
   //=== MetaData
-  StoreObjPtr<EventMetaData> evtMetaData ;
-  B2INFO("eclBhabhaTimeCalibrationValidationCollector: Experiment = " << evtMetaData->getExperiment() <<
-         "  run = " << evtMetaData->getRun()) ;
+  B2INFO("eclBhabhaTimeCalibrationValidationCollector: Experiment = " << m_EventMetaData->getExperiment() <<
+         "  run = " << m_EventMetaData->getRun()) ;
 
   //=== Create histograms and register them in the data store
 
@@ -580,12 +583,10 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::collect()
 
 
   //=== For each good electron cluster in the processed event and fill histogram.
-
-  StoreObjPtr<EventMetaData> evtMetaData ;
   for (long unsigned int i = 0 ; i < goodClustTimes.size() ; i++) {
     getObjectPtr<TH1F>("clusterTime")->Fill(goodClustTimes[i]) ;
     getObjectPtr<TH2F>("clusterTime_cid")->Fill(goodClustMaxEcrys_cid[i] + 0.001, goodClustTimes[i], 1) ;
-    getObjectPtr<TH2F>("clusterTime_run")->Fill(evtMetaData->getRun() + 0.001, goodClustTimes[i], 1) ;
+    getObjectPtr<TH2F>("clusterTime_run")->Fill(m_EventMetaData->getRun() + 0.001, goodClustTimes[i], 1) ;
     getObjectPtr<TH2F>("clusterTimeClusterE")->Fill(goodClustE[i], goodClustTimes[i], 1) ;
     getObjectPtr<TH2F>("dt99_clusterE")->Fill(goodClustE[i], goodClust_dt99[i], 1) ;
 
@@ -598,8 +599,8 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::collect()
       m_tree_t0_unc    = evt_t0_unc ;
       m_E_electron_clust = goodClustE[i] ;
       m_NtightTracks   = nTrkTight ;
-      m_tree_evt_num   = evtMetaData->getEvent() ;
-      m_tree_run       = evtMetaData->getRun() ;
+      m_tree_evt_num   = m_EventMetaData->getEvent() ;
+      m_tree_run       = m_EventMetaData->getRun() ;
       m_tree_cid       = goodClustMaxEcrys_cid[i] ;
       m_tree_dt99      = goodClust_dt99[i] ;
 
@@ -624,8 +625,8 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::collect()
   if (m_saveTree) {
     m_tree_t0          = evt_t0 ;
     m_tree_t0_unc      = evt_t0_unc ;
-    m_tree_evt_num     = evtMetaData->getEvent() ;
-    m_tree_run         = evtMetaData->getRun() ;
+    m_tree_evt_num     = m_EventMetaData->getEvent() ;
+    m_tree_run         = m_EventMetaData->getRun() ;
     m_NtightTracks     = nTrkTight ;
     m_tree_E0          = goodClustE[0] ;
     m_tree_E1          = goodClustE[1] ;
@@ -635,7 +636,7 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::collect()
     m_dbg_tree_event->Fill() ;
 
 
-    int runNum = evtMetaData->getRun();
+    int runNum = m_EventMetaData->getRun();
     if (m_tree_PreviousRun != runNum) {
       for (int icrate = 1; icrate <= 52; icrate++) {
         m_tree_run        = runNum ;

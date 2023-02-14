@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <arich/modules/arichPacker/ARICHPackerModule.h>
 
 // framework - DataStore
@@ -21,8 +21,6 @@
 #include <rawdata/dataobjects/RawARICH.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <bitset>
-
-using namespace std;
 
 namespace Belle2 {
 
@@ -48,8 +46,8 @@ namespace Belle2 {
     addParam("version", m_version, "dataformat version", unsigned(6));
     addParam("bitMask", m_bitMask, "hit bit mask (4 bits/channel)", (unsigned)0xF);
     addParam("debug", m_debug, "print packed bitmap", 0);
-    addParam("inputDigitsName", m_inputDigitsName, "name of ARICHDigit store array", string(""));
-    addParam("outputRawDataName", m_outputRawDataName, "name of RawARICH store array", string(""));
+    addParam("inputDigitsName", m_inputDigitsName, "name of ARICHDigit store array", std::string(""));
+    addParam("outputRawDataName", m_outputRawDataName, "name of RawARICH store array", std::string(""));
 
   }
 
@@ -67,10 +65,6 @@ namespace Belle2 {
     rawData.registerInDataStore();
   }
 
-  void ARICHPackerModule::beginRun()
-  {
-  }
-
   void ARICHPackerModule::event()
   {
 
@@ -80,7 +74,7 @@ namespace Belle2 {
 
     int nModules = N_MERGERS * N_FEB2MERGER;
 
-    vector<const ARICHDigit*>* sortedDigits = new vector<const ARICHDigit*>[nModules];
+    std::vector<const ARICHDigit*>* sortedDigits = new std::vector<const ARICHDigit*>[nModules];
     int nPacked = 0;
     for (const auto& digit : digits) {
       int moduleID = digit.getModuleID();
@@ -180,7 +174,7 @@ namespace Belle2 {
         if (m_debug) {
           std::cout << "Pack finesse: " << finesse << std::endl;
           for (int i = 0; i < bufferSize[finesse]; i++) {
-            std::cout << i << "-th word bitset " << bitset<32>(buf[i]) << std::endl;
+            std::cout << i << "-th word bitset " << std::bitset<32>(buf[i]) << std::endl;
           }
         }
       }
@@ -245,18 +239,6 @@ namespace Belle2 {
     }
 
   }
-
-
-
-
-  void ARICHPackerModule::endRun()
-  {
-  }
-
-  void ARICHPackerModule::terminate()
-  {
-  }
-
 
 } // end Belle2 namespace
 

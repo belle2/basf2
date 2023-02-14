@@ -98,8 +98,8 @@ void TRGGDLUnpackerModule::initialize()
 
     if (m_print_dbmap) {
 
-      int aBitMap[320][2] = {0};
-      int aBitMap_extra[100][3] = { -1};
+      int aBitMap[320][2] = {{0}};
+      int aBitMap_extra[100][3] = {{ -1}};
       for (int i = 0; i < n_leafsExtra; i++) {
         aBitMap_extra[i][0] = m_dbunpacker->getBitMap_extra(i, 0);
         aBitMap_extra[i][1] = m_dbunpacker->getBitMap_extra(i, 1);

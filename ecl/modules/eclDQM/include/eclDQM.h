@@ -23,7 +23,7 @@
 #include <framework/database/DBObjPtr.h>
 
 //ECL
-#include <ecl/utility/ECLChannelMapper.h>
+#include <ecl/mapper/ECLChannelMapper.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 

@@ -25,7 +25,7 @@
 #include <ecl/dataobjects/ECLTrig.h>
 #include <ecl/dataobjects/ECLDsp.h>
 #include <ecl/dataobjects/ECLElementNumbers.h>
-#include <ecl/utility/ECLChannelMapper.h>
+#include <ecl/mapper/ECLChannelMapper.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 
 //TRG

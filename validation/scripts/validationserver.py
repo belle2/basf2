@@ -446,8 +446,9 @@ class ValidationRoot:
         #: Gitlab config
         self.gitlab_config = gitlab_config
 
-        #: placeholder variables for path and revision label for issue creation
+        #: placeholder variable for path
         self.plot_path = None
+        #: placeholder variable for revision label
         self.revision_label = None
 
     @cherrypy.expose

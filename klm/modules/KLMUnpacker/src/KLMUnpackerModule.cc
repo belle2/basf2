@@ -14,7 +14,7 @@
 #include <klm/dataobjects/KLMScintillatorFirmwareFitResult.h>
 #include <klm/rawdata/RawData.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;

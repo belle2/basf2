@@ -13,7 +13,7 @@
 #include <klm/eklm/geometry/G4TriangularPrism.h>
 #include <klm/simulation/SensitiveDetector.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <geometry/CreatorFactory.h>
 #include <geometry/Materials.h>
 #include <geometry/utilities.h>

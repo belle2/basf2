@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <arich/modules/arichUnpacker/ARICHUnpackerModule.h>
 
 #include <arich/modules/arichUnpacker/ARICHRawDataHeader.h>
@@ -29,8 +29,6 @@
 
 // print bitset
 #include <bitset>
-
-using namespace std;
 
 namespace Belle2 {
 
@@ -55,10 +53,10 @@ namespace Belle2 {
     addParam("bitMask", m_bitMask, "hit bit mask (8 bits/channel, only used for unsuppresed format!)", (uint8_t)0xFF);
     addParam("debug", m_debug, "prints debug information", 0);
 
-    addParam("inputRawDataName", m_inputRawDataName, "name of RawARICH store array", string(""));
-    addParam("outputDigitsName", m_outputDigitsName, "name of ARICHDigit store array", string(""));
-    addParam("outputRawDigitsName", m_outputRawDigitsName, "name of ARICHRawDigit store array", string(""));
-    addParam("outputarichinfoName", m_outputarichinfoName, "name of ARICHInfo store array", string(""));
+    addParam("inputRawDataName", m_inputRawDataName, "name of RawARICH store array", std::string(""));
+    addParam("outputDigitsName", m_outputDigitsName, "name of ARICHDigit store array", std::string(""));
+    addParam("outputRawDigitsName", m_outputRawDigitsName, "name of ARICHRawDigit store array", std::string(""));
+    addParam("outputarichinfoName", m_outputarichinfoName, "name of ARICHInfo store array", std::string(""));
     addParam("RawUnpackerMode", m_rawmode, "Activate RawUnpacker mode", 0);
     addParam("DisableUnpackerMode", m_disable_unpacker, "Disable Regular Unpacker mode", 0);
 
@@ -83,10 +81,6 @@ namespace Belle2 {
     StoreObjPtr<ARICHInfo> arichinfo(m_outputarichinfoName);
     arichinfo.registerInDataStore();
 
-  }
-
-  void ARICHUnpackerModule::beginRun()
-  {
   }
 
   void ARICHUnpackerModule::event()
@@ -536,16 +530,6 @@ namespace Belle2 {
       std::cout << i << "-th word bitset: " << std::bitset<32>(*(buffer + i)) << std::endl;
     }
   }
-
-
-  void ARICHUnpackerModule::endRun()
-  {
-  }
-
-  void ARICHUnpackerModule::terminate()
-  {
-  }
-
 
 } // end Belle2 namespace
 

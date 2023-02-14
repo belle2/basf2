@@ -9,7 +9,7 @@
 /* Own header. */
 #include <klm/geometry/GeoKLMCreator.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <geometry/CreatorFactory.h>
 
 using namespace Belle2;

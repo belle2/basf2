@@ -6,38 +6,36 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-//THIS MODULE
+/* Own header. */
 #include <ecl/modules/eclDQM/eclDQM.h>
 
-//Boost
-#include <boost/format.hpp>
-#include <boost/range/combine.hpp>
+/* ECL headers. */
+#include <ecl/dataobjects/ECLCalDigit.h>
+#include <ecl/dataobjects/ECLDigit.h>
+#include <ecl/dataobjects/ECLDsp.h>
+#include <ecl/dataobjects/ECLElementNumbers.h>
+#include <ecl/dataobjects/ECLTrig.h>
+#include <ecl/geometry/ECLGeometryPar.h>
+#include <ecl/utility/ECLChannelMapper.h>
 
-//FRAMEWORK
+/* Basf2 headers. */
 #include <framework/core/HistoModule.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
-
-//ECL
-#include <ecl/dataobjects/ECLDigit.h>
-#include <ecl/dataobjects/ECLCalDigit.h>
-#include <ecl/dataobjects/ECLTrig.h>
-#include <ecl/dataobjects/ECLDsp.h>
-#include <ecl/dataobjects/ECLElementNumbers.h>
-#include <ecl/utility/ECLChannelMapper.h>
-#include <ecl/geometry/ECLGeometryPar.h>
-
-//TRG
 #include <mdst/dataobjects/TRGSummary.h>
 
-//ROOT
-#include <TProfile.h>
+/* Boost headers. */
+#include <boost/format.hpp>
+#include <boost/range/combine.hpp>
+
+/* ROOT headers. */
+#include <TDirectory.h>
 #include <TH1F.h>
 #include <TH2F.h>
-#include <TDirectory.h>
+#include <TProfile.h>
 
-//STL
+/* C++ headers. */
 #include <iostream>
 #include <iterator>
 #include <cmath>

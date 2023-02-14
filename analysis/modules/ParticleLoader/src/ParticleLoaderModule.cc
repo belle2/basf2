@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <analysis/modules/ParticleLoader/ParticleLoaderModule.h>
 
 // framework aux
@@ -179,25 +179,26 @@ void ParticleLoaderModule::initialize()
            || (abs(pdgCode) == abs(Const::photon.getPDGCode()) && m_addDaughters == true)))
         mdstSourceIsV0 = true;
 
-      if (mdstSourceIsV0 == false) {
+      if (mdstSourceIsV0) {
+        if (nProducts == 2) {
+          m_properties = m_decaydescriptor.getProperty() | mother->getProperty(); // only used for V0s
+          if (m_decaydescriptor.getDaughter(0)->getMother()->getPDGCode() * m_decaydescriptor.getDaughter(1)->getMother()->getPDGCode() > 0)
+            B2ERROR("MDST source of the particle list is V0, the two daughters should have opposite charge");
+        } else {
+          B2ERROR("ParticleLoaderModule::initialize Invalid input DecayString " << decayString
+                  << ". MDST source of the particle list is V0, DecayString should contain exactly two daughters, as well as the mother particle.");
+        }
+      } else {
         if (nProducts > 0) {
-          if (!m_useROEs and !m_useDummy) {
-            B2ERROR("ParticleLoaderModule::initialize Invalid input DecayString " << decayString
-                    << ". DecayString should not contain any daughters, only the mother particle.");
-          } else {
+          if (m_useROEs or m_useDummy) {
             B2INFO("ParticleLoaderModule: Replacing the source particle list name by " <<
                    m_decaydescriptor.getDaughter(0)->getMother()->getFullName()
                    << " all other daughters will be ignored.");
             m_sourceParticleListName = m_decaydescriptor.getDaughter(0)->getMother()->getFullName();
+          } else {
+            B2ERROR("ParticleLoaderModule::initialize Invalid input DecayString " << decayString
+                    << ". DecayString should not contain any daughters, only the mother particle.");
           }
-        }
-      } else {
-        if (nProducts != 2)
-          B2ERROR("ParticleLoaderModule::initialize Invalid input DecayString " << decayString
-                  << ". MDST source of the particle list is V0, DecayString should contain exactly two daughters, as well as the mother particle.");
-        else {
-          if (m_decaydescriptor.getDaughter(0)->getMother()->getPDGCode() * m_decaydescriptor.getDaughter(1)->getMother()->getPDGCode() > 0)
-            B2ERROR("MDST source of the particle list is V0, the two daughters should have opposite charge");
         }
       }
 
@@ -551,6 +552,7 @@ void ParticleLoaderModule::v0sToParticles()
       ROOT::Math::PxPyPzEVector v0Momentum = newDaugP->get4Vector() + newDaugM->get4Vector();
       Particle v0P(v0Momentum, v0Type.getPDGCode(), v0FlavorType,
                    Particle::EParticleSourceObject::c_V0, v0->getArrayIndex());
+      v0P.setProperty(m_properties);
 
       // add the daughters of the V0 (in the correct order) and don't update
       // the type to c_Composite (i.e. maintain c_V0)

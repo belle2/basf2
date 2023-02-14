@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <analysis/variables/MetaVariables.h>
 
 #include <analysis/VariableManager/Utility.h>
@@ -2136,6 +2136,54 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr countFSPDaughters(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        std::string cutString = arguments[0];
+        std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(cutString));
+        auto func = [cut](const Particle * particle) -> int {
+
+          std::vector<const Particle*> fspDaughters;
+          particle->fillFSPDaughters(fspDaughters);
+
+          int n = 0;
+          for (auto& daughter : fspDaughters)
+          {
+            if (cut->check(daughter))
+              ++n;
+          }
+          return n;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function countFSPDaughters");
+      }
+    }
+
+    Manager::FunctionPtr countDescendants(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        std::string cutString = arguments[0];
+        std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(cutString));
+        auto func = [cut](const Particle * particle) -> int {
+
+          std::vector<const Particle*> allDaughters;
+          particle->fillAllDaughters(allDaughters);
+
+          int n = 0;
+          for (auto& daughter : allDaughters)
+          {
+            if (cut->check(daughter))
+              ++n;
+          }
+          return n;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function countDescendants");
+      }
+    }
+
     Manager::FunctionPtr numberOfNonOverlappingParticles(const std::vector<std::string>& arguments)
     {
 
@@ -3048,6 +3096,12 @@ Specifying the lab frame is useful in some corner-cases. For example:
     REGISTER_METAVARIABLE("countDaughters(cut)", countDaughters,
                       "Returns number of direct daughters which satisfy the cut.\n"
                       "Used by the skimming package (for what exactly?)", Manager::VariableDataType::c_int);
+    REGISTER_METAVARIABLE("countFSPDaughters(cut)", countDescendants,
+			  "Returns number of final-state daughters which satisfy the cut.",
+			  Manager::VariableDataType::c_int);
+    REGISTER_METAVARIABLE("countDescendants(cut)", countDescendants,
+			  "Returns number of descendants for all generations which satisfy the cut.",
+			  Manager::VariableDataType::c_int);
     REGISTER_METAVARIABLE("varFor(pdgCode, variable)", varFor,
                       "Returns the value of the variable for the given particle if its abs(pdgCode) agrees with the given one.\n"
                       "E.g. ``varFor(11, p)`` returns the momentum if the particle is an electron or a positron.", Manager::VariableDataType::c_double);

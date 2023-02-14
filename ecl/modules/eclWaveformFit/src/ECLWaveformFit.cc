@@ -6,25 +6,23 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// ECL
+/* Own header. */
 #include <ecl/modules/eclWaveformFit/ECLWaveformFit.h>
-#include <ecl/dbobjects/ECLCrystalCalib.h>
+
+/* ECL headers. */
 #include <ecl/digitization/EclConfiguration.h>
 #include <ecl/digitization/shaperdsp.h>
-#include <ecl/dbobjects/ECLDigitWaveformParameters.h>
-#include <ecl/dbobjects/ECLDigitWaveformParametersForMC.h>
-#include <ecl/dbobjects/ECLAutoCovariance.h>
 
-//FRAMEWORK
+/* Basf2 headers. */
 #include <framework/core/Environment.h>
-#include <framework/database/DBObjPtr.h>
 
-//ROOT
+/* ROOT headers. */
 #include <TMinuit.h>
 #include <TMatrixD.h>
 #include <TMatrixDSym.h>
 #include <TDecompChol.h>
 
+/* C++ headers. */
 #include <numeric>
 
 using namespace Belle2;
@@ -206,13 +204,12 @@ void ECLWaveformFitModule::loadTemplateParameterArray()
 
   if (m_IsMCFlag == 0) {
     //load data templates
-    DBObjPtr<ECLDigitWaveformParameters>  WavePars("ECLDigitWaveformParameters");
     std::vector<double>  Ptemp(11), Htemp(11), Dtemp(11);
     for (int i = 0; i < 8736; i++) {
       for (int j = 0; j < 11; j++) {
-        Ptemp[j] = (double)WavePars->getPhotonParameters(i + 1)[j];
-        Htemp[j] = (double)WavePars->getHadronParameters(i + 1)[j];
-        Dtemp[j] = (double)WavePars->getDiodeParameters(i + 1)[j];
+        Ptemp[j] = (double)m_WaveformParameters->getPhotonParameters(i + 1)[j];
+        Htemp[j] = (double)m_WaveformParameters->getHadronParameters(i + 1)[j];
+        Dtemp[j] = (double)m_WaveformParameters->getDiodeParameters(i + 1)[j];
       }
       new (&m_si[i][0]) SignalInterpolation2(Ptemp);
       new (&m_si[i][1]) SignalInterpolation2(Htemp);
@@ -220,12 +217,11 @@ void ECLWaveformFitModule::loadTemplateParameterArray()
     }
   } else {
     //load mc template
-    DBObjPtr<ECLDigitWaveformParametersForMC>  WaveParsMC("ECLDigitWaveformParametersForMC");
     std::vector<double>  Ptemp(11), Htemp(11), Dtemp(11);
     for (int j = 0; j < 11; j++) {
-      Ptemp[j] = (double)WaveParsMC->getPhotonParameters()[j];
-      Htemp[j] = (double)WaveParsMC->getHadronParameters()[j];
-      Dtemp[j] = (double)WaveParsMC->getDiodeParameters()[j];
+      Ptemp[j] = (double)m_WaveformParametersForMC->getPhotonParameters()[j];
+      Htemp[j] = (double)m_WaveformParametersForMC->getHadronParameters()[j];
+      Dtemp[j] = (double)m_WaveformParametersForMC->getDiodeParameters()[j];
     }
     new (&m_si[0][0]) SignalInterpolation2(Ptemp);
     new (&m_si[0][1]) SignalInterpolation2(Htemp);
@@ -239,19 +235,23 @@ void ECLWaveformFitModule::beginRun()
   m_IsMCFlag = Environment::Instance().isMC();
   m_TemplatesLoaded = false;
 
-  DBObjPtr<ECLCrystalCalib> Ael("ECLCrystalElectronics"), Aen("ECLCrystalEnergy");
   m_ADCtoEnergy.resize(8736);
-  if (Ael) for (int i = 0; i < 8736; i++) m_ADCtoEnergy[i] = Ael->getCalibVector()[i];
-  if (Aen) for (int i = 0; i < 8736; i++) m_ADCtoEnergy[i] *= Aen->getCalibVector()[i];
+  if (m_CrystalElectronics.isValid()) {
+    for (int i = 0; i < 8736; i++)
+      m_ADCtoEnergy[i] = m_CrystalElectronics->getCalibVector()[i];
+  }
+  if (m_CrystalEnergy.isValid()) {
+    for (int i = 0; i < 8736; i++)
+      m_ADCtoEnergy[i] *= m_CrystalEnergy->getCalibVector()[i];
+  }
 
   //Load covariance matricies from database;
   if (m_CovarianceMatrix) {
-    DBObjPtr<ECLAutoCovariance> cov;
     for (int id = 1; id <= 8736; id++) {
       constexpr int N = 31;
       std::vector<double> buf(N);
       std::vector<double> reg(N);
-      cov->getAutoCovariance(id, buf.data());
+      m_AutoCovariance->getAutoCovariance(id, buf.data());
       double x0 = N;
       reg = buf;
       while (!makecovariance(m_c[id - 1], N, reg.data()))

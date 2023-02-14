@@ -9,12 +9,17 @@
 #ifndef ECLLOMMODULE_H
 #define ECLLOMMODULE_H
 
+/* Basf2 headers. */
 #include <framework/datastore/StoreArray.h>
 #include <framework/core/Module.h>
-#include "TTree.h"
-#include "TFile.h"
-#include "TH1D.h"
-#include "TH2D.h"
+#include <mdst/dataobjects/MCParticle.h>
+#include <trg/ecl/dataobjects/TRGECLWaveform.h>
+
+/* ROOT headers. */
+#include <TTree.h>
+#include <TFile.h>
+#include <TH1D.h>
+#include <TH2D.h>
 
 namespace Belle2 {
   namespace ECL {
@@ -106,6 +111,12 @@ namespace Belle2 {
       double m_com_en[2]; /**< Monte Carlo energy of the final state particles in CMS frame.*/
       double m_com_th[2]; /**< Monte Carlo thetha of the final state particles in CMS frame.*/
       double m_com_ph[2]; /**< Monte Carlo phi of the final state particles in CMS frame.*/
+
+      /** MC particles. */
+      StoreArray<MCParticle> m_MCParticles;
+
+      /** Trigger waveforms. */
+      StoreArray<TRGECLWaveform> m_TrgEclWaveforms;
 
       //important output
       bool m_isBhabha; /**< Bha-bha signal for an event.*/

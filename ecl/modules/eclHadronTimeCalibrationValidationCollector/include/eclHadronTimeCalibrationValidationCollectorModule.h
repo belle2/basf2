@@ -14,13 +14,16 @@
 
 #pragma once
 
-#include <framework/core/Module.h>
+/* ECL headers. */
 #include <ecl/utility/ECLChannelMapper.h>
 
+/* Basf2 headers. */
 #include <calibration/CalibrationCollectorModule.h>
+#include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
-#include <framework/datastore/StoreArray.h>
+#include <framework/dataobjects/EventMetaData.h>
 #include <framework/dataobjects/EventT0.h>
+#include <framework/datastore/StoreArray.h>
 
 class TTree ;
 
@@ -71,7 +74,8 @@ namespace Belle2 {
     //StoreArray<ECLDigit> m_eclDigitArray; /**< Required input array of ECLDigits */
     StoreArray<ECLCalDigit> m_eclCalDigitArray; /**< Required input array of ECLCalDigits */
 
-
+    /** Event metadata. */
+    StoreObjPtr<EventMetaData> m_EventMetaData;
 
     /**
      * StoreObjPtr for T0. The event t0 class has an overall event t0 so use that as presumably some code has been run to determine what the best t0 is to use.

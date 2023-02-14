@@ -17,7 +17,7 @@
 #include <klm/dataobjects/KLMPlaneArrayIndex.h>
 #include <klm/dbobjects/KLMChannelStatus.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <analysis/dataobjects/ParticleList.h>
 #include <framework/core/HistoModule.h>
 #include <framework/database/DBObjPtr.h>

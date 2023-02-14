@@ -196,11 +196,11 @@ void ECLBackgroundModule::event()
 
   double edepSum = 0;
   //double edepSumTheta[nECLThetaID] = {0};
-  //double E_tot[nECLCrystalTot] = {0};
+  //double E_tot[ECLElementNumbers::c_NCrystals] = {0};
 
 
   auto edepSumTheta = new double[nECLThetaID]();
-  auto E_tot = new double[nECLCrystalTot]();
+  auto E_tot = new double[ECLElementNumbers::c_NCrystals]();
 
   auto EinTheta = new bool[nECLThetaID]();
   std::fill_n(EinTheta, nECLThetaID, false);
@@ -264,7 +264,7 @@ void ECLBackgroundModule::event()
 
 
   //for pileup noise estimation. To properly produce pileup noise plot, see comment at EOF.
-  for (int iECLCell = 0; iECLCell < nECLCrystalTot; iECLCell++) {
+  for (int iECLCell = 0; iECLCell < ECLElementNumbers::c_NCrystals; iECLCell++) {
     edep      = E_tot[iECLCell];
     m_thetaID = Crystal[iECLCell]->GetThetaID();
     NperRing  = Crystal[iECLCell]->GetNperThetaID();
@@ -465,7 +465,7 @@ int ECLBackgroundModule::FillARICHBeamBack(BeamBackHit* aBBHit) { return 1;}
 
 int ECLBackgroundModule::BuildECL()
 {
-  for (int i = 0; i < nECLCrystalTot; i++) {
+  for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++) {
     Crystal[i] = new ECLCrystalData(i);
   }
   return 1;
@@ -483,13 +483,13 @@ int ECLBackgroundModule::SetPosHistos(TH1F* h, TH2F* hFWD, TH2F* hBAR, TH2F* hBW
   //std::string BARname = h->GetTitle() + std::string("BAR");
 
   // Fill 2D histograms with the values in the 1D histogram
-  for (int i = 0; i < nECLCrystalTot; i++)  {
+  for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++)  {
     float value = h->GetBinContent(i + 1);
 
-    if (i < nECLCrystalECF) {
+    if (i < ECLElementNumbers::c_NCrystalsForward) {
       hFWD->Fill(floor(Crystal[i]->GetX()), floor(Crystal[i]->GetY()), value);
 
-    } else if (i >= (nECLCrystalBAR + nECLCrystalECF)) {
+    } else if (i >= ECLElementNumbers::c_NCrystalsForwardBarrel) {
       hBWD->Fill(floor(Crystal[i]->GetX()), floor(Crystal[i]->GetY()), value);
 
     } else
@@ -512,7 +512,7 @@ TH2F* ECLBackgroundModule::BuildPosHisto(TH1F* h, const char* sub)
     std::string _title = h->GetTitle() + std::string(" -- Forward Endcap;x(cm);y(cm)");
     h_out = new TH2F(_name.c_str(), _title.c_str(), 90, -150, 150, 90, -150, 150); //position in cm
     h_out->Sumw2();
-    for (int i = 0; i < nECLCrystalECF; i++)  {
+    for (int i = 0; i < ECLElementNumbers::c_NCrystalsForward; i++)  {
       double value = h->GetBinContent(i + 1);
       h_out->Fill(floor(Crystal[i]->GetX()),
                   floor(Crystal[i]->GetY()),
@@ -525,7 +525,7 @@ TH2F* ECLBackgroundModule::BuildPosHisto(TH1F* h, const char* sub)
     std::string _title = h->GetTitle() + std::string(" -- Backward Endcap;x(cm);y(cm)");
     h_out = new TH2F(_name.c_str(), _title.c_str(), 90, -150, 150, 90, -150, 150); //position in cm
     h_out->Sumw2();
-    for (int i = (nECLCrystalBAR + nECLCrystalECF); i < nECLCrystalTot; i++) {
+    for (int i = ECLElementNumbers::c_NCrystalsForwardBarrel; i < ECLElementNumbers::c_NCrystals; i++) {
       double value = h->GetBinContent(i + 1);
       h_out->Fill(floor(Crystal[i]->GetX()),
                   floor(Crystal[i]->GetY()),
@@ -539,7 +539,7 @@ TH2F* ECLBackgroundModule::BuildPosHisto(TH1F* h, const char* sub)
     std::string _title = h->GetTitle() + std::string(" -- Barrel;#theta_{ID};#phi_{ID}");
     h_out = new TH2F(_name.c_str(), _title.c_str(), 47, 12, 59, 144, 0, 144); //position in cm (along z and along r*phi)
     h_out->Sumw2();
-    for (int i = nECLCrystalECF; i < (nECLCrystalBAR + nECLCrystalECF); i++) {
+    for (int i = ECLElementNumbers::c_NCrystalsForward; i < ECLElementNumbers::c_NCrystalsForwardBarrel; i++) {
       double value = h->GetBinContent(i + 1);
       h_out->Fill(Crystal[i]->GetThetaID(),  Crystal[i]->GetPhiID(), value);
     }
@@ -583,7 +583,7 @@ TH1F*   ECLBackgroundModule::BuildThetaIDWideHisto(TH1F* h_cry)
   h_out->Sumw2();
 
   //Make histo for total mass, then divide!
-  for (int i = 0; i < nECLCrystalTot; i++)  {
+  for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++)  {
     h_out->Fill(Crystal[i]->GetThetaID(), h_cry->GetBinContent(i + 1) * Crystal[i]->GetMass());
     h_mass.Fill(Crystal[i]->GetThetaID(), Crystal[i]->GetMass());
     h_mass.SetBinError(Crystal[i]->GetThetaID(), 0);

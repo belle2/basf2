@@ -267,9 +267,9 @@ void eclNOptimalCollectorModule::collect()
 
   //..ECL region forward/barrel/backward
   int iRegion = 1;
-  if (iCellId < iFirstBarrel) {
+  if (ECLElementNumbers::isForward(iCellId)) {
     iRegion = 0;
-  } else if (iCellId > iLastBarrel) {
+  } else if (ECLElementNumbers::isBackward(iCellId)) {
     iRegion = 2;
   }
 

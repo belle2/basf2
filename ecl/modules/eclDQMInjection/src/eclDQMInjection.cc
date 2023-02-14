@@ -256,8 +256,8 @@ void ECLDQMInjectionModule::event()
             //== Identify which histogram to fill (HER/LER,FWD/BAR/BWD)
             int cid = aECLDsp.getCellId();
             int part_id = 0;              // forward endcap
-            if (cid >= 1153) part_id = 1; // barrel
-            if (cid >= 7777) part_id = 2; // backward endcap
+            if (ECLElementNumbers::isBarrel(cid)) part_id = 1; // barrel
+            if (ECLElementNumbers::isBackward(cid)) part_id = 2; // backward endcap
 
             int hist_id = is_her * 3 * range_count + part_id * range_count + range_id;
             // NOTE: We are using the approximate conversion to energy here.

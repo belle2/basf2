@@ -734,7 +734,7 @@ void Particle::removeDaughter(const Particle* daughter, const bool updateType)
     m_particleSource = c_Undefined;
 }
 
-bool Particle::replaceDaughter(const Particle* oldDaughter, const Particle* newDaughter)
+bool Particle::replaceDaughter(const Particle* oldDaughter, Particle* newDaughter)
 {
   int index = oldDaughter->getArrayIndex();
 
@@ -744,13 +744,15 @@ bool Particle::replaceDaughter(const Particle* oldDaughter, const Particle* newD
       m_daughterIndices.insert(ite_index, newDaughter->getArrayIndex());
       auto ite_property =  m_daughterProperties.erase(m_daughterProperties.begin() + i);
       m_daughterProperties.insert(ite_property, Particle::PropertyFlags::c_Ordinary);
+
+      newDaughter->writeExtraInfo("original_index", index);
       return true;
     }
   }
   return false;
 }
 
-bool Particle::replaceDaughterRecursively(const Particle* oldDaughter, const Particle* newDaughter)
+bool Particle::replaceDaughterRecursively(const Particle* oldDaughter, Particle* newDaughter)
 {
   bool isReplaced = this->replaceDaughter(oldDaughter, newDaughter);
   if (isReplaced)

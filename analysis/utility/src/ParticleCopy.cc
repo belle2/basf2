@@ -22,6 +22,7 @@ Particle* ParticleCopy::copyParticle(const Particle* original)
   // make a copy of a particle
   Particle* copy = array.appendNew(*original);
   copy->copyRelations(original);
+  copy->writeExtraInfo("original_index", original->getArrayIndex());
 
   // Copy its daughters as well.
   // At this stage the copy of the particle
@@ -47,6 +48,8 @@ Particle* ParticleCopy::copyParticle(const Particle* original)
     copy->removeDaughter(originalDaughter, updateType);
     // append copied daughter instead
     copy->appendDaughter(daughterCopy, updateType);
+
+    daughterCopy->writeExtraInfo("original_index", originalDaughter->getArrayIndex());
   }
 
   return copy;
@@ -73,5 +76,7 @@ void ParticleCopy::copyDaughters(Belle2::Particle* mother)
     mother->removeDaughter(originalDaughter, updateType);
     // append copied daughter instead at the end of the daughters' vector
     mother->appendDaughter(daughterCopy, updateType);
+
+    daughterCopy->writeExtraInfo("original_index", originalDaughter->getArrayIndex());
   }
 }

@@ -1,0 +1,7 @@
+Changes in the analysis package in light-2302-genetta
+-----------------------------------------------------
+
+Conversion
+++++++++++
+
+* Added an option to copy ``anti-n0:mdst` from ``gamma:mdst``

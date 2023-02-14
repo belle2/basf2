@@ -14,7 +14,6 @@
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
 
 // framework aux
 #include <framework/logging/Logger.h>
@@ -30,7 +29,6 @@
 #include <TVector3.h>
 #include <TRandom3.h>
 
-using namespace std;
 using namespace boost;
 
 namespace Belle2 {
@@ -69,14 +67,11 @@ namespace Belle2 {
 
   void ARICHDigitizerModule::initialize()
   {
-    // Print set parameters
-    printModuleParams();
-
     // QE at 400nm (3.1eV) applied in SensitiveDetector
     m_maxQE = m_simPar->getQE(3.1);
 
-    StoreArray<ARICHDigit> digits;
-    digits.registerInDataStore();
+    m_ARICHSimHits.isRequired();
+    m_ARICHDigits.registerInDataStore();
 
     m_bgOverlay = false;
     StoreObjPtr<BackgroundInfo> bgInfo("", DataStore::c_Persistent);
@@ -94,16 +89,6 @@ namespace Belle2 {
   void ARICHDigitizerModule::event()
   {
 
-    // Get the collection of ARICHSimHits from the Data store.
-    //------------------------------------------------------
-    StoreArray<ARICHSimHit> arichSimHits;
-    //-----------------------------------------------------
-
-    // Get the collection of arichDigits from the Data store,
-    // (or have one created)
-    //-----------------------------------------------------
-    StoreArray<ARICHDigit> arichDigits;
-
     //---------------------------------------------------------------------
     // Convert SimHits one by one to digitizer hits.
     //---------------------------------------------------------------------
@@ -111,26 +96,21 @@ namespace Belle2 {
     // We try to include the effect of opposite-polarity crosstalk among channels
     // on each chip, which depend on number of p.e. on chip
 
-    std::map<pair<int, int>, int> photoElectrons; // this contains number of photoelectrons falling on each channel
-    std::map<pair<int, int>, int> chipHits; // this contains number of photoelectrons on each chip
-
-    // Get number of photon hits in this event
-    int nHits = arichSimHits.getEntries();
+    std::map<std::pair<int, int>, int> photoElectrons; // this contains number of photoelectrons falling on each channel
+    std::map<std::pair<int, int>, int> chipHits; // this contains number of photoelectrons on each chip
 
     // Loop over all photon hits
-    for (int iHit = 0; iHit < nHits; ++iHit) {
-
-      ARICHSimHit* aSimHit = arichSimHits[iHit];
+    for (const ARICHSimHit& aSimHit : m_ARICHSimHits) {
 
       // check for time window
-      double globaltime = aSimHit->getGlobalTime();
+      double globaltime = aSimHit.getGlobalTime();
 
       if (globaltime < 0. || globaltime > m_timeWindow) continue;
 
-      TVector2 locpos(aSimHit->getLocalPosition().X(), aSimHit->getLocalPosition().Y());
+      TVector2 locpos(aSimHit.getLocalPosition().X(), aSimHit.getLocalPosition().Y());
 
       // Get id of module
-      int moduleID = aSimHit->getModuleID();
+      int moduleID = aSimHit.getModuleID();
 
       if (m_bdistort) magFieldDistorsion(locpos, moduleID);
 
@@ -158,8 +138,8 @@ namespace Belle2 {
       if (gRandom->Uniform(1.) > qe_scale) continue;
 
       // photon was converted to photoelectron
-      chipHits[make_pair(moduleID, asicChannel / 36)] += 1;
-      photoElectrons[make_pair(moduleID, asicChannel)] += 1;
+      chipHits[std::make_pair(moduleID, asicChannel / 36)] += 1;
+      photoElectrons[std::make_pair(moduleID, asicChannel)] += 1;
 
     }
 
@@ -172,7 +152,7 @@ namespace Belle2 {
       double npe = double(it->second);
 
       // reduce efficiency
-      npe /= (1.0 + m_simPar->getChipNegativeCrosstalk() * (double(chipHits[make_pair(modch.first, modch.second / 36)]) - 1.0));
+      npe /= (1.0 + m_simPar->getChipNegativeCrosstalk() * (double(chipHits[std::make_pair(modch.first, modch.second / 36)]) - 1.0));
       if (npe < 1.0 && gRandom->Uniform(1) > npe) continue;
 
       // Make hit bitmap (depends on number of p.e. on channel). For now bitmap is 0001 for single p.e., 0011 for 2 p.e., ...
@@ -184,7 +164,7 @@ namespace Belle2 {
       }
 
       // make new digit!
-      arichDigits.appendNew(modch.first, modch.second, bitmap);
+      m_ARICHDigits.appendNew(modch.first, modch.second, bitmap);
 
     }
 
@@ -196,7 +176,7 @@ namespace Belle2 {
       if (!m_modInfo->isActive(id)) continue;
       int nbkg = gRandom->Poisson(m_bkgLevel);
       for (int i = 0; i < nbkg; i++) {
-        arichDigits.appendNew(id, gRandom->Integer(144), bitmap);
+        m_ARICHDigits.appendNew(id, gRandom->Integer(144), bitmap);
       }
     }
 
@@ -220,15 +200,6 @@ namespace Belle2 {
     shift = shift.Rotate(-phi);
     hit.SetX(hit.X() + shift.X());
     hit.SetY(hit.Y() + shift.Y());
-  }
-
-  void ARICHDigitizerModule::endRun()
-  {
-  }
-
-  void ARICHDigitizerModule::terminate()
-  {
-
   }
 
 } // end Belle2 namespace

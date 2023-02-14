@@ -9,7 +9,6 @@
 
 #include <framework/logging/Logger.h>
 #include <framework/geometry/B2Vector3.h>
-#include <framework/gearbox/Const.h>
 
 #include <analysis/dataobjects/Particle.h>
 #include <mdst/dataobjects/KLMCluster.h>

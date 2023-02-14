@@ -14,7 +14,7 @@
 /* External headers. */
 #include <TTree.h>
 
-/* Belle2 headers. */
+/* Basf2 headers. */
 #include <background/modules/BeamBkgHitRateMonitor/HitRateBase.h>
 #include <klm/dataobjects/KLMDigit.h>
 #include <klm/dataobjects/KLMElementNumbers.h>

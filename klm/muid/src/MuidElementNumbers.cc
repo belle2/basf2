@@ -9,7 +9,7 @@
 /* Own header. */
 #include <klm/muid/MuidElementNumbers.h>
 
-/* Belle2 headers. */
+/* Basf2 headers. */
 #include <framework/gearbox/Const.h>
 
 using namespace Belle2;

@@ -14,7 +14,7 @@
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/eklm/geometry/GeometryData.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <simulation/background/BkgSensitiveDetector.h>
 
 /* Geant4 headers. */

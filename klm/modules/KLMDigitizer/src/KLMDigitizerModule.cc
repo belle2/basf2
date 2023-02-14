@@ -14,7 +14,7 @@
 #include <klm/dataobjects/KLMScintillatorFirmwareFitResult.h>
 #include <klm/simulation/ScintillatorSimulator.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/dataobjects/BackgroundMetaData.h>
 #include <mdst/dataobjects/MCParticle.h>
 

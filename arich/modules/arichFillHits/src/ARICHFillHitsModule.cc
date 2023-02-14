@@ -22,8 +22,6 @@
 // magnetic field manager
 #include <framework/geometry/BFieldManager.h>
 
-using namespace std;
-
 namespace Belle2 {
 
   //-----------------------------------------------------------------
@@ -62,10 +60,6 @@ namespace Belle2 {
     arichHits.registerInDataStore();
 
     arichHits.registerRelationTo(digits);
-  }
-
-  void ARICHFillHitsModule::beginRun()
-  {
   }
 
   void ARICHFillHitsModule::event()
@@ -159,15 +153,6 @@ namespace Belle2 {
     hitpos.SetX(hitpos.X() - shift.X());
     hitpos.SetY(hitpos.Y() - shift.Y());
   }
-
-  void ARICHFillHitsModule::endRun()
-  {
-  }
-
-  void ARICHFillHitsModule::terminate()
-  {
-  }
-
 
 } // end Belle2 namespace
 

@@ -1890,7 +1890,7 @@ def printList(list_name, full, path):
 
 
 def variablesToNtuple(decayString, variables, treename='variables', filename='ntuple.root', path=None, basketsize=1600,
-                      signalSideParticleList=""):
+                      signalSideParticleList="", filenameSuffix=""):
     """
     Creates and fills a flat ntuple with the specified variables from the VariableManager.
     If a decayString is provided, then there will be one entry per candidate (for particle in list of candidates).
@@ -1905,6 +1905,9 @@ def variablesToNtuple(decayString, variables, treename='variables', filename='nt
         basketsize (int): size of baskets in the output ntuple in bytes
         signalSideParticleList (str): The name of the signal-side ParticleList.
                                       Only valid if the module is called in a for_each loop over the RestOfEvent.
+        filenameSuffix (str): suffix to be appended to the filename before ``.root``.
+
+    .. tip:: The output filename can be overridden using the ``-o`` argument of basf2.
     """
 
     output = register_module('VariablesToNtuple')
@@ -1915,6 +1918,7 @@ def variablesToNtuple(decayString, variables, treename='variables', filename='nt
     output.param('treeName', treename)
     output.param('basketSize', basketsize)
     output.param('signalSideParticleList', signalSideParticleList)
+    output.param('fileNameSuffix', filenameSuffix)
     path.add_module(output)
 
 
@@ -1924,7 +1928,8 @@ def variablesToHistogram(decayString,
                          filename='ntuple.root',
                          path=None, *,
                          directory=None,
-                         prefixDecayString=False):
+                         prefixDecayString=False,
+                         filenameSuffix=""):
     """
     Creates and fills a flat ntuple with the specified variables from the VariableManager
 
@@ -1938,6 +1943,9 @@ def variablesToHistogram(decayString,
             Useful if you want to have different histograms in the same file to separate them.
         prefixDecayString (bool): If True the decayString will be prepended to the directory name to allow for more
             programmatic naming of the structure in the file.
+        filenameSuffix (str): suffix to be appended to the filename before ``.root``.
+
+    .. tip:: The output filename can be overridden using the ``-o`` argument of basf2.
     """
 
     if variables_2d is None:
@@ -1948,6 +1956,7 @@ def variablesToHistogram(decayString,
     output.param('variables', variables)
     output.param('variables_2d', variables_2d)
     output.param('fileName', filename)
+    output.param('fileNameSuffix', filenameSuffix)
     if directory is not None or prefixDecayString:
         if directory is None:
             directory = ""

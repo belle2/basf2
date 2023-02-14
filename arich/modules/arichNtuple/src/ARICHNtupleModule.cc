@@ -35,8 +35,6 @@
 #include <TVector3.h>
 #include <vector>
 
-using namespace std;
-
 namespace Belle2 {
 
   //-----------------------------------------------------------------
@@ -57,7 +55,7 @@ namespace Belle2 {
     setDescription("The module saves variables needed for performance analysis, such as postion and momentum of the hit, likelihoods for hypotheses and number of photons.");
 
     // Add parameters
-    addParam("outputFile", m_outputFile, "ROOT output file name", string("ARICHNtuple.root"));
+    addParam("outputFile", m_outputFile, "ROOT output file name", std::string("ARICHNtuple.root"));
   }
 
   ARICHNtupleModule::~ARICHNtupleModule()
@@ -131,10 +129,6 @@ namespace Belle2 {
     StoreArray<ARICHHit> arichHits;
     arichHits.isRequired();
 
-  }
-
-  void ARICHNtupleModule::beginRun()
-  {
   }
 
   void ARICHNtupleModule::event()
@@ -335,12 +329,6 @@ namespace Belle2 {
       }
       m_tree->Fill();
     }
-  }
-
-
-
-  void ARICHNtupleModule::endRun()
-  {
   }
 
   void ARICHNtupleModule::terminate()

@@ -11,6 +11,7 @@
 
 from matplotlib import pyplot as pl
 from basf2 import logging, LogLevel, create_path, process
+from hist_utils import hist2array
 import ROOT as root
 import numpy as np
 import matplotlib as mpl
@@ -71,13 +72,8 @@ def plot_hist(region, **argk):
     h = rmaterial_file.Get("Ray/%s_x0" % region)
     if not h:
         return None
-    nbins = h.GetNbinsX()
-    data = np.zeros(nbins + 1)
-    for i in range(nbins):
-        data[i] = h.GetBinContent(i + 1)
-    edges = []
-    edges.append(np.empty(nbins + 1))
-    h.GetLowEdge(edges[-1])
+    data, edges = hist2array(h, return_edges=True)
+    data = np.append(data, 0)
     edges[-1][-1] = h.GetXaxis().GetXmax()
     # now plot
     pl.plot(edges[0], data, drawstyle="steps-post", **argk)

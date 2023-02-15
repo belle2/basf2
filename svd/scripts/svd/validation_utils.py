@@ -98,14 +98,9 @@ def get_agreament2(histo_eventT0, histo_onTracks, min_entries=100):
 
 
 def make_roc(hist_sgn, hist_bkg, lower_is_better=False, two_sided=True):
-    nbins = hist_sgn.GetNbinsX()
-    dist_sgn = np.zeros(nbins)
-    for i in range(nbins):
-        dist_sgn[i] = hist_sgn.GetBinContent(i + 1)
-    nbins = hist_bkg.GetNbinsX()
-    dist_bkg = np.zeros(nbins)
-    for i in range(nbins):
-        dist_bkg[i] = hist_bkg.GetBinContent(i + 1)
+    from hist_utils import hist2array
+    dist_sgn = hist2array(hist_sgn)
+    dist_bkg = hist2array(hist_bkg)
     dist_sgn = dist_sgn/dist_sgn.sum()
     dist_bkg = dist_bkg/dist_bkg.sum()
     if two_sided:
@@ -138,20 +133,10 @@ def np2plt_hist(np_hist):
 
 
 def make_combined_plot(pattern, histos, title=None):
-    _onTracks = get_combined(histos['onTracks'], pattern)
-    nbins = _onTracks.GetNbinsX()
-    h_onTracks = np.zeros(nbins)
-    for i in range(nbins):
-        h_onTracks[i] = _onTracks.GetBinContent(i + 1)
-    _offTracks = get_combined(histos['offTracks'], pattern)
-    nbins = _offTracks.GetNbinsX()
-    h_offTracks = np.zeros(nbins)
-    for i in range(nbins):
-        h_offTracks[i] = _offTracks.GetBinContent(i + 1)
-    nbins = histos['eventT0'].GetNbinsX()
-    h_eventT0 = np.zeros(nbins)
-    for i in range(nbins):
-        h_eventT0[i] = histos['eventT0'].GetBinContent(i + 1)
+    from hist_utils import hist2array
+    h_onTracks = hist2array(get_combined(histos['onTracks'], pattern), return_edges=True)
+    h_offTracks = hist2array(get_combined(histos['offTracks'], pattern), return_edges=True)
+    h_eventT0 = hist2array(histos['eventT0'], return_edges=True)
 
     # normalise h_eventT0 to have same number of entries as h_onTracks
     h_eventT0 = (h_eventT0[0]*sum(h_onTracks[0])/sum(h_eventT0[0]), h_eventT0[1])

@@ -23,8 +23,8 @@ from matplotlib.backends.backend_pdf import PdfPages
 #: Tells the automated system some details of this script
 settings = ValidationSettings(name='KLM alignment',
                               description=__doc__,
-                              download_files=[],
-                              expert_config={})
+                              download_files=['stdout'],
+                              expert_config=None)
 
 
 def get_result(job_path, tmp_dir):
@@ -307,7 +307,7 @@ def draw_BKLM_pics(BKLM_values, BKLM_errors, BKLM_chi2, pdfPages):
     plt.close('all')
 
 
-def run_validation(job_path, job_path_prev):
+def run_validation(job_path, job_path_prev, arg3, arg4, arg5):
     '''
     Run the validation.
     The script compares the most recent alignment result with the previous results by calculating the residuals.

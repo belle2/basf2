@@ -29,7 +29,7 @@ REG_MODULE(MCSlowPionPXDROICreator);
 MCSlowPionPXDROICreatorModule::MCSlowPionPXDROICreatorModule() : Module()
 {
   // Set module properties
-  setDescription("PXDClustersFromTracks module for creating a new StoreArray of track matched PXDCluster.");
+  setDescription("Create artificial ROI just for PXDDigits from slow pions from D* decays based on MC information.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   // Parameter definitions

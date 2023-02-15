@@ -19,7 +19,7 @@ namespace Belle2 {
 
   /**
    * The MCSlowPionPXDROICreatorModule module
-   * Create artificial ROI just for PXDDigits from slow pions from D* decays.
+   * Create artificial ROI just for PXDDigits from slow pions from D* decays on MC information.
    */
   class MCSlowPionPXDROICreatorModule : public Module {
 

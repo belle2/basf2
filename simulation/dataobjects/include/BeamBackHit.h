@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <Math/Vector3D.h>
 #include <TObject.h>
 #include <TVector3.h>
 #include <TString.h>
@@ -44,14 +45,18 @@ namespace Belle2 {
      * @param trackLength the length of the track in the volume
      * @param nWeight the effective neutron weight
      */
-    BeamBackHit(int subDet, int iden, int PDG, int trackID, TVector3 position,
-                TVector3 momentum, double t, double E_start, double E_end,
-                double eDep, double trackLength, double nWeight):
+    BeamBackHit(int subDet, int iden, int PDG, int trackID,
+                const ROOT::Math::XYZVector& position,
+                const ROOT::Math::XYZVector& momentum,
+                double t, double E_start, double E_end, double eDep,
+                double trackLength, double nWeight):
       m_subDet(subDet), m_identifier(iden), m_PDG(PDG), m_trackID(trackID),
-      m_position(position), m_momentum(momentum), m_t(t), m_E_start(E_start),
-      m_E_end(E_end), m_energyDeposit(eDep), m_trackLength(trackLength),
-      m_neutronWeight(nWeight)
-    {}
+      m_t(t), m_E_start(E_start), m_E_end(E_end), m_energyDeposit(eDep),
+      m_trackLength(trackLength), m_neutronWeight(nWeight)
+    {
+      setPosition(position);
+      setMomentum(momentum);
+    }
 
     //! Get the subdetector name in which the hit occured
     TString getSubDetName() const
@@ -83,10 +88,16 @@ namespace Belle2 {
     int getTrackID() const { return m_trackID;}
 
     //! Get global position of the particle hit
-    const TVector3& getPosition() const { return m_position; }
+    ROOT::Math::XYZVector getPosition() const
+    {
+      return ROOT::Math::XYZVector(m_position.X(), m_position.Y(), m_position.Z());
+    }
 
     //! Get momentum of the particle hit
-    const TVector3& getMomentum() const { return m_momentum; }
+    ROOT::Math::XYZVector getMomentum() const
+    {
+      return ROOT::Math::XYZVector(m_momentum.X(), m_momentum.Y(), m_momentum.Z());
+    }
 
     //! Get the time at which the hit occured
     double getTime() const { return m_t; }
@@ -119,10 +130,20 @@ namespace Belle2 {
     void setTrackID(int trackID) {m_trackID = trackID;}
 
     //! Set global position of the particle hit
-    void setPosition(TVector3 position)  {  m_position = position; }
+    void setPosition(ROOT::Math::XYZVector position)
+    {
+      m_position.SetX(position.X());
+      m_position.SetY(position.Y());
+      m_position.SetZ(position.Z());
+    }
 
     //! Set momentum of the particle hit
-    void setMomentum(TVector3 momentum)  {  m_momentum = momentum; }
+    void setMomentum(ROOT::Math::XYZVector momentum)
+    {
+      m_momentum.SetX(momentum.X());
+      m_momentum.SetY(momentum.Y());
+      m_momentum.SetZ(momentum.Z());
+    }
 
     //! Set the time at which the hit occured
     void setTime(double t)  {  m_t = t; }

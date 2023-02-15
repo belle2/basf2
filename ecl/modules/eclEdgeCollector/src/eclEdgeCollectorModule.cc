@@ -15,9 +15,9 @@
 #include <ecl/geometry/ECLGeometryPar.h>
 
 /* ROOT headers. */
+#include <Math/Vector3D.h>
 #include <TH2F.h>
 #include <TMath.h>
-#include <TVector3.h>
 
 
 using namespace Belle2;
@@ -98,12 +98,12 @@ void eclEdgeCollectorModule::collect()
     //..ECL geometry
     Belle2::ECL::ECLGeometryPar* eclGeometry = Belle2::ECL::ECLGeometryPar::Instance();
     for (int cellID = 1; cellID <= ECLElementNumbers::c_NCrystals; cellID++) {
-      TVector3 crystalPos = eclGeometry->GetCrystalPos(cellID - 1);
-      TVector3 crystalDirection = eclGeometry->GetCrystalVec(cellID - 1);
+      ROOT::Math::XYZVector crystalPos = eclGeometry->GetCrystalPos(cellID - 1);
+      ROOT::Math::XYZVector crystalDirection = eclGeometry->GetCrystalVec(cellID - 1);
       getObjectPtr<TH1F>("eclCrystalX")->SetBinContent(cellID, crystalPos.X());
       getObjectPtr<TH1F>("eclCrystalY")->SetBinContent(cellID, crystalPos.Y());
       getObjectPtr<TH1F>("eclCrystalZ")->SetBinContent(cellID, crystalPos.Z());
-      getObjectPtr<TH1F>("eclCrystalR")->SetBinContent(cellID, crystalPos.Mag());
+      getObjectPtr<TH1F>("eclCrystalR")->SetBinContent(cellID, crystalPos.R());
       getObjectPtr<TH1F>("eclCrystalTheta")->SetBinContent(cellID, crystalPos.Theta());
       getObjectPtr<TH1F>("eclCrystalPhi")->SetBinContent(cellID, crystalPos.Phi());
       getObjectPtr<TH1F>("eclCrystalDirTheta")->SetBinContent(cellID, crystalDirection.Theta());
@@ -122,7 +122,7 @@ void eclEdgeCollectorModule::collect()
       //..Print out some for debugging purposes
       if (cellID % 1000 == 0) {
         B2INFO("cellID " << cellID << ": theta " << crystalPos.Theta() << " phi " <<
-               crystalPos.Phi() << " R " << crystalPos.Mag() << " thetaEdge " << thetaEdge << " phiEdge " << phiEdge);
+               crystalPos.Phi() << " R " << crystalPos.R() << " thetaEdge " << thetaEdge << " phiEdge " << phiEdge);
       }
     }
   }

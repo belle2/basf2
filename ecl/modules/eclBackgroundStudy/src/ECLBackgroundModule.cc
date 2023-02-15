@@ -23,9 +23,9 @@
 #include <simulation/dataobjects/BeamBackHit.h>
 
 /* ROOT headers. */
+#include <Math/Vector3D.h>
 #include <TH1F.h>
 #include <TH2F.h>
-#include <TVector3.h>
 
 using namespace std;
 using namespace Belle2;
@@ -306,7 +306,7 @@ void ECLBackgroundModule::event()
     pid           = aBeamBackSimHit->getPDG();
     int SubDet    = aBeamBackSimHit->getSubDet();
     Energy = aBeamBackSimHit->getEnergy();
-    //TVector3 rHit          = aBeamBackSimHit->getPosition(); //currently not used
+    //ROOT::Math::XYZVector rHit          = aBeamBackSimHit->getPosition(); //currently not used
 
 
     if (SubDet == 6) { //ECL
@@ -432,11 +432,11 @@ int ECLBackgroundModule::FillARICHBeamBack(BeamBackHit* aBBHit)
   double _eDep     = aBBHit->getEnergyDeposit();
   float _trlen     = aBBHit->getTrackLength();
   int _pid         = aBBHit->getPDG();
-  TVector3 _posHit = aBBHit->getPosition();
+  ROOT::Math::XYZVector _posHit = aBBHit->getPosition();
 
   int _moduleID    = m_arichgp->getCopyNo(_posHit);
 
-  double r = _posHit.Perp();
+  double r = _posHit.Rho();
   int _ring = 0;
 
   _ring = ARICHmod2row(_moduleID);

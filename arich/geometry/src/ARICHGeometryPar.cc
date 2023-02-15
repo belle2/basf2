@@ -382,6 +382,12 @@ namespace Belle2 {
     return -1;
   }
 
+  int ARICHGeometryPar::getCopyNo(const ROOT::Math::XYZVector& hit)
+  {
+    TVector3 hitVector(hit.X(), hit.Y(), hit.Z());
+    return getCopyNo(hitVector);
+  }
+
   TVector3 ARICHGeometryPar::getOrigin(int copyNo)
   {
     TVector2 origin;

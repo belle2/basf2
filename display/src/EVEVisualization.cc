@@ -1429,7 +1429,9 @@ void EVEVisualization::addKLMCluster(const KLMCluster* cluster)
   const double layerThicknessCm = 3.16; //TDR, Fig 10.2
   const double layerDistanceCm = 9.1 - layerThicknessCm;
 
-  TVector3 startPos = cluster->getClusterPosition(); //position of first RPC plane
+  // Pposition of first RPC plane.
+  ROOT::Math::XYZVector position = cluster->getClusterPosition();
+  TVector3 startPos(position.X(), position.Y(), position.Z());
   TVector3 dir; //direction of cluster stack, Mag() == distance between planes
   TVector3 a, b; //defines RPC plane
   bool isBarrel = (startPos.Z() > -175.0 and startPos.Z() < 270.0);

@@ -25,6 +25,7 @@
 // framework aux
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
+#include <framework/geometry/XYZVectorToTVector3Converter.h>
 
 #include <TCanvas.h>
 #include <TLegend.h>
@@ -256,7 +257,7 @@ namespace Belle2 {
       int subdet = tophit->getSubDet();
       if (subdet != 5) continue;
 
-      auto pos = tophit->getPosition();
+      TVector3 pos = XYZToTVector(tophit->getPosition());
       double phi = pos.XYvector().Phi_0_2pi(pos.XYvector().Phi()) / 3.14159265358979 * 180.;
       int barID = int (phi / 22.5 + 0.5);
       if (barID == 16) {

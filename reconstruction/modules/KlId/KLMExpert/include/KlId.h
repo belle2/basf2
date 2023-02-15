@@ -15,6 +15,7 @@
 #include <mdst/dataobjects/TrackFitResult.h>
 
 #include <framework/gearbox/Const.h>
+#include <framework/geometry/XYZVectorToTVector3Converter.h>
 #include <framework/logging/Logger.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <genfit/Exception.h>
@@ -28,14 +29,15 @@ namespace Belle2::KlongId {
   /**get Belle stle track flag */
   int BelleTrackFlag(const Belle2::KLMCluster& cluster, const float angle = 0.26)
   {
-    const TVector3& pos = cluster.getClusterPosition();
+    const ROOT::Math::XYZVector& pos = cluster.getClusterPosition();
 
     Belle2::StoreArray<Belle2::TrackFitResult> tracks;
     for (const Belle2::TrackFitResult& track : tracks) {
       const ROOT::Math::XYZVector& trackPos = track.getPosition();
 
-      if (ROOT::Math::VectorUtil::Angle(trackPos, pos) < angle) {
-        B2DEBUG(20, "BelleFlagTracklAngle::" << ROOT::Math::VectorUtil::Angle(trackPos, pos));
+      double trackAngle = ROOT::Math::VectorUtil::Angle(trackPos, pos);
+      if (trackAngle < angle) {
+        B2DEBUG(20, "BelleFlagTracklAngle::" << trackAngle);
         return 1;
       }
     }
@@ -46,15 +48,16 @@ namespace Belle2::KlongId {
   /**get Belle stle ECL flag */
   int BelleECLFlag(const Belle2::KLMCluster& cluster, const float angle = 0.26)
   {
-    const TVector3& pos = cluster.getClusterPosition();
+    const ROOT::Math::XYZVector& pos = cluster.getClusterPosition();
     Belle2::StoreArray<Belle2::ECLCluster> eclclusters;
 
     for (const Belle2::ECLCluster& eclcluster : eclclusters) {
 
-      const TVector3& clusterPos = eclcluster.getClusterPosition();
+      const ROOT::Math::XYZVector& clusterPos = eclcluster.getClusterPosition();
 
-      if (clusterPos.Angle(pos) < angle) {
-        B2DEBUG(20, "BelleFlagECLAngle::" << clusterPos.Angle(pos));
+      double clusterAngle = ROOT::Math::VectorUtil::Angle(clusterPos, pos);
+      if (clusterAngle < angle) {
+        B2DEBUG(20, "BelleFlagECLAngle::" << clusterAngle);
         return 1;
       }
     }
@@ -197,7 +200,7 @@ namespace Belle2::KlongId {
    * Find the closest ECLCluster with a neutral hadron hypothesis, and return it with its distance.
    * If there are no suitabile ECLClusters, a nullptr is returned.
    */
-  std::pair<Belle2::ECLCluster*, double> findClosestECLCluster(const TVector3& klmClusterPosition,
+  std::pair<Belle2::ECLCluster*, double> findClosestECLCluster(const ROOT::Math::XYZVector& klmClusterPosition,
       const Belle2::ECLCluster::EHypothesisBit eclhypothesis = Belle2::ECLCluster::EHypothesisBit::c_neutralHadron)
   {
 
@@ -212,8 +215,9 @@ namespace Belle2::KlongId {
 
         if (eclcluster.hasHypothesis(eclhypothesis)) {
 
-          const TVector3& eclclusterPos = eclcluster.getClusterPosition();
-          double angularDist = eclclusterPos.Angle(klmClusterPosition);
+          const ROOT::Math::XYZVector& eclclusterPos = eclcluster.getClusterPosition();
+          double angularDist = ROOT::Math::VectorUtil::Angle(
+                                 eclclusterPos, klmClusterPosition);
           if (angularDist < closestECLAngleDist) {
             closestECLAngleDist = angularDist;
             indexOfClosestCluster = index;
@@ -229,7 +233,7 @@ namespace Belle2::KlongId {
 
 
   /** find nearest KLMCluster, tis distance and the av intercluster distance */
-  std::tuple<const Belle2::KLMCluster*, double, double> findClosestKLMCluster(const TVector3& klmClusterPosition)
+  std::tuple<const Belle2::KLMCluster*, double, double> findClosestKLMCluster(const ROOT::Math::XYZVector& klmClusterPosition)
   {
 
     Belle2::StoreArray<Belle2::KLMCluster> klmClusters;
@@ -244,8 +248,8 @@ namespace Belle2::KlongId {
       unsigned int indexOfClosestCluster = 0;
       for (const Belle2::KLMCluster& nextCluster : klmClusters) {
 
-        const TVector3& nextClusterPos = nextCluster.getClusterPosition();
-        const TVector3& clustDistanceVec = nextClusterPos - klmClusterPosition;
+        const ROOT::Math::XYZVector& nextClusterPos = nextCluster.getClusterPosition();
+        const ROOT::Math::XYZVector& clustDistanceVec = nextClusterPos - klmClusterPosition;
 
         double nextClusterDist = clustDistanceVec.Mag2();
         avInterClusterDist = avInterClusterDist + nextClusterDist;
@@ -266,13 +270,14 @@ namespace Belle2::KlongId {
 
 
   /** find nearest genfit track and return it and its distance  */
-  std::tuple<Belle2::RecoTrack*, double, std::unique_ptr<const TVector3> > findClosestTrack(const TVector3& clusterPosition,
-      float cutAngle)
+  std::tuple<Belle2::RecoTrack*, double, std::unique_ptr<const ROOT::Math::XYZVector> > findClosestTrack(
+    const ROOT::Math::XYZVector& clusterPosition,
+    float cutAngle)
   {
     Belle2::StoreArray<Belle2::RecoTrack> genfitTracks;
     double oldDistance = 10000000;//dont wanna use infty cos that kills tmva...
     Belle2::RecoTrack* closestTrack = nullptr;
-    TVector3 poca = TVector3(0, 0, 0);
+    ROOT::Math::XYZVector poca = ROOT::Math::XYZVector(0, 0, 0);
 
 
     for (Belle2::RecoTrack& track : genfitTracks) {
@@ -283,12 +288,15 @@ namespace Belle2::KlongId {
         state_for_cut = track.getMeasuredStateOnPlaneFromFirstHit();
 
         // only use tracks that are close cos the extrapolation takes ages
-        if (clusterPosition.Angle(state_for_cut.getPos()) < cutAngle) {
+        double angle = ROOT::Math::VectorUtil::Angle(clusterPosition, state_for_cut.getPos());
+        if (angle < cutAngle) {
           state = track.getMeasuredStateOnPlaneFromLastHit();
-          state.extrapolateToPoint(clusterPosition);
-          const TVector3& trackPos = state.getPos();
+          state.extrapolateToPoint(XYZToTVector(clusterPosition));
+          const TVector3& position = state.getPos();
+          const ROOT::Math::XYZVector trackPos(
+            position.X(), position.Y(), position.Z());
 
-          const TVector3& distanceVecCluster = clusterPosition - trackPos;
+          const ROOT::Math::XYZVector& distanceVecCluster = clusterPosition - trackPos;
           double newDistance = distanceVecCluster.Mag2();
 
           // overwrite old distance
@@ -303,11 +311,11 @@ namespace Belle2::KlongId {
     }// for gftrack
 
     if (not closestTrack) {
-      return std::make_tuple(nullptr, oldDistance, std::unique_ptr<const TVector3>(nullptr));
+      return std::make_tuple(nullptr, oldDistance, std::unique_ptr<const ROOT::Math::XYZVector>(nullptr));
     } else {
       // actually this is fine because of the datastore
       // cppcheck-suppress returnDanglingLifetime
-      return std::make_tuple(closestTrack, oldDistance, std::unique_ptr<const TVector3>(new TVector3(poca)));
+      return std::make_tuple(closestTrack, oldDistance, std::unique_ptr<const ROOT::Math::XYZVector>(new ROOT::Math::XYZVector(poca)));
     }
   }
 }//end namespace

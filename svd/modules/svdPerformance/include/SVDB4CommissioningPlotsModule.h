@@ -14,7 +14,6 @@
 #include <framework/datastore/StoreArray.h>
 
 #include <svd/dataobjects/SVDCluster.h>
-#include <svd/dataobjects/SVDRecoDigit.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/RecoTrack.h>
@@ -53,7 +52,6 @@ namespace Belle2 {
     virtual void endRun() override; /**< write histogrmas */
 
     std::string m_ShaperDigitName; /**< SVDSHaperDigit StoreArray name*/
-    std::string m_RecoDigitName; /**< SVDRecoDigit StoreArray name*/
     std::string m_ClusterName; /**< SVDCluster StoreArray name*/
     std::string m_TrackFitResultName; /**< TrackFitResult name*/
     std::string m_TrackName; /**< Track StoreArray name*/
@@ -71,7 +69,6 @@ namespace Belle2 {
     SVDNoiseCalibrations m_NoiseCal; /**< SVDNoise Calibrations db object*/
     SVDPulseShapeCalibrations m_PulseShapeCal; /**<SVDPulseShaper calibrations db object*/
 
-    StoreArray<SVDRecoDigit> m_svdRecos; /**<SVDRecoDigit StoreArray*/
     StoreArray<SVDCluster> m_svdClusters; /**<SVDCluster StoreArray*/
     StoreArray<RecoTrack> m_recoTracks; /**<RecoTrack StoreArray*/
     StoreArray<Track> m_Tracks; /**<Track StoreArray*/
@@ -84,12 +81,6 @@ namespace Belle2 {
     TH1F* m_Pvalue = nullptr; /**< track p value*/
     TH1F* m_mom = nullptr; /**< track momentum*/
     TH1F* m_nSVDhits = nullptr; /**< track momentum*/
-
-    //RECO
-    SVDHistograms<TH1F>* h_recoCharge = nullptr; /**< SVDRecoDigits Charge */
-    SVDHistograms<TH1F>* h_recoEnergy = nullptr; /**< SVDRecoDigits Energy */
-    SVDHistograms<TH1F>* h_recoTime = nullptr; /**< SVDRecoDigits Time */
-    SVDHistograms<TH1F>* h_recoNoise = nullptr; /**< SVDRecoDigits Noise */
 
     //CLUSTER
     SVDHistograms<TH1F>* h_clusterCharge = nullptr; /**< SVDClusters Charge */

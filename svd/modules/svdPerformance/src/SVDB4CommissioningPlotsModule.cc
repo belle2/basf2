@@ -26,7 +26,6 @@ SVDB4CommissioningPlotsModule::SVDB4CommissioningPlotsModule() : Module()
 
   addParam("outputFileName", m_rootFileName, "Name of output root file.", std::string("SVDB4CommissioningPlots_output.root"));
 
-  addParam("RecoDigitsName", m_RecoDigitName, "Name of RecoDigit Store Array.", std::string("SVDRecoDigits"));
   addParam("ClustersName", m_ClusterName, "Name of Cluster Store Array.", std::string("SVDClusters"));
   addParam("TrackListName", m_TrackName, "Name of Track Store Array.", std::string("Tracks"));
   addParam("TrackFitResultListName", m_TrackFitResultName, "Name of TracksFitResult Store Array.", std::string("TrackFitResults"));
@@ -35,14 +34,12 @@ SVDB4CommissioningPlotsModule::SVDB4CommissioningPlotsModule() : Module()
 void SVDB4CommissioningPlotsModule::initialize()
 {
 
-  m_svdRecos.isOptional(m_RecoDigitName);
   m_svdClusters.isRequired(m_ClusterName);
   m_Tracks.isOptional(m_TrackName);
   m_recoTracks.isOptional();
   m_tfr.isOptional(m_TrackFitResultName);
 
 
-  B2INFO("      RecoDigits: " << m_RecoDigitName);
   B2INFO("        Clusters: " << m_ClusterName);
   B2INFO("          Tracks: " << m_TrackName);
   B2INFO(" TrackFitResults: " << m_TrackFitResultName);
@@ -58,30 +55,6 @@ void SVDB4CommissioningPlotsModule::beginRun()
 {
   m_nEvents = 0;
 
-  //RECO DIGITS
-  TH1F hRecoCharge("reco_charge_L@layerL@ladderS@sensor@view",
-                   "Charge of RecoDigits in @layer.@ladder.@sensor @view/@side side",
-                   100, 0, 1000);
-  hRecoCharge.GetXaxis()->SetTitle("charge (ke-)");
-  h_recoCharge = new SVDHistograms<TH1F>(hRecoCharge);
-
-  TH1F hRecoEnergy("reco_energy_L@layerL@ladderS@sensor@view",
-                   "Energy of RecoDigits in @layer.@ladder.@sensor @view/@side side",
-                   100, 0, 360);
-  hRecoEnergy.GetXaxis()->SetTitle("energy (keV)");
-  h_recoEnergy = new SVDHistograms<TH1F>(hRecoEnergy);
-
-  TH1F hRecoTime("reco_time_L@layerL@ladderS@sensor@view",
-                 "Time of RecoDigits in @layer.@ladder.@sensor @view/@side side",
-                 200, -100, 100);
-  hRecoTime.GetXaxis()->SetTitle("time (ns)");
-  h_recoTime = new SVDHistograms<TH1F>(hRecoTime);
-
-  TH1F hRecoNoise("reco_noise_L@layerL@ladderS@sensor@view",
-                  "Noise of RecoDigits in @layer.@ladder.@sensor @view/@side side",
-                  200, 300, 1800);
-  hRecoNoise.GetXaxis()->SetTitle("strip noise (e-)");
-  h_recoNoise = new SVDHistograms<TH1F>(hRecoNoise);
 
   //CLUSTER NOT RELATED TO TRACKS
   TH1F hClusterCharge("cluster_charge_L@layerL@ladderS@sensor@view",
@@ -223,23 +196,6 @@ void SVDB4CommissioningPlotsModule::event()
     B2DEBUG(1, "%%%%%%%% NEW EVENT,  number of Tracks =  " << m_Tracks.getEntries());
 
 
-  //reco digits
-  if (m_svdRecos.isValid()) {
-    for (int digi = 0 ; digi < m_svdRecos.getEntries(); digi++) {
-
-      VxdID::baseType theVxdID = (VxdID::baseType)m_svdRecos[digi]->getSensorID();
-      int side = m_svdRecos[digi]->isUStrip();
-      int cellID = m_svdRecos[digi]->getCellID();
-
-      float thisNoise = m_NoiseCal.getNoiseInElectrons(theVxdID, side, cellID);
-
-      h_recoNoise->fill(theVxdID, side, thisNoise);
-      h_recoCharge->fill(theVxdID, side, m_svdRecos[digi]->getCharge() / 1000.);
-      h_recoEnergy->fill(theVxdID, side, m_svdRecos[digi]->getCharge()*c_eTOkeV);
-      h_recoTime->fill(theVxdID, side, m_svdRecos[digi]->getTime());
-    }
-  }
-
   //clusters  NOT related to tracks
   for (int cl = 0 ; cl < m_svdClusters.getEntries(); cl++) {
 
@@ -291,7 +247,6 @@ void SVDB4CommissioningPlotsModule::endRun()
     m_mom->Write();
     m_nSVDhits->Write();
 
-    TDirectory* dir_reco = oldDir->mkdir("recoDigits");
     TDirectory* dir_clusterAssigned = oldDir->mkdir("clusters_assigned");
     TDirectory* dir_clusterNotAssigned = oldDir->mkdir("clusters_not_assigned");
 
@@ -299,18 +254,11 @@ void SVDB4CommissioningPlotsModule::endRun()
 
     for (auto layer : geoCache.getLayers(VXD::SensorInfoBase::SVD)) {
       TString layerName = Form("layer%d", layer.getLayerNumber());
-      TDirectory* dir_reco_layer = dir_reco->mkdir(layerName.Data());
       TDirectory* dir_clusterAssigned_layer = dir_clusterAssigned->mkdir(layerName.Data());
       TDirectory* dir_clusterNotAssigned_layer = dir_clusterNotAssigned->mkdir(layerName.Data());
       for (auto ladder : geoCache.getLadders(layer))
         for (Belle2::VxdID sensor :  geoCache.getSensors(ladder))
           for (int view = SVDHistograms<TH1F>::VIndex ; view < SVDHistograms<TH1F>::UIndex + 1; view++) {
-
-            dir_reco_layer->cd();
-            (h_recoCharge->getHistogram(sensor, view))->Write();
-            (h_recoEnergy->getHistogram(sensor, view))->Write();
-            (h_recoTime->getHistogram(sensor, view))->Write();
-            (h_recoNoise->getHistogram(sensor, view))->Write();
             dir_clusterAssigned_layer->cd();
             (h_clusterTrkCharge->getHistogram(sensor, view))->Write();
             (h_clusterTrkSNR->getHistogram(sensor, view))->Write();

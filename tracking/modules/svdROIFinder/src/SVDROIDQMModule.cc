@@ -182,7 +182,7 @@ void SVDROIDQMModule::createHistosDictionaries()
     svdLayers.insert(Belle2::VxdID(m_specificLayer, 0, 0));
     itSvdLayers = svdLayers.begin();
   } else {
-    B2INFO("Not specific layer selected, producing plots of alla layers");
+    B2INFO("Not specific layer selected, producing plots for all layers");
   }
 
   while (itSvdLayers != svdLayers.end()) {

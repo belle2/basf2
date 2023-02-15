@@ -65,7 +65,9 @@ void MCSlowPionPXDROICreatorModule::event()
 
   for (const MCParticle& mcParticle : m_MCParticles) {
     // Nothing to do if the particle is not a slow pion from a D* -> D pi^{\pm} decay
-    if (not(std::abs(mcParticle.getPDG()) == 211 and
+    // or if there is no mother particle e.g. when using particle gun.
+    if (not mcParticle.getMother() or
+        not(std::abs(mcParticle.getPDG()) == 211 and
             std::abs(mcParticle.getMother()->getPDG()) == 413)) {
       continue;
     }

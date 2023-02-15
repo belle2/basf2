@@ -91,7 +91,7 @@ ParticleLists, which are filled with particle objects created for each
    this information in the analysis, you can redo the mass constraint fit in basf2.
 
 Since release-07, you can set ``convertNbar`` to ``true`` to copy Particles with energy
-above 500 MeV in `gamma:mdst` to create a ParticleList `anti-n0:mdst`. In the steering file,
+above 500 MeV in ``gamma:mdst`` to create a ParticleList ``anti-n0:mdst``. In the steering file,
 you should use the module ``BelleNbarMVA`` to evaluate an MVA dedicated to the separation of
 anti-neutrons from photons. As for the kinematic variable, you are advised to use
 ``reconstructDecayWithNeutralHadron`` to reconstruct the neutral hadron's 4-momentum

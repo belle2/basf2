@@ -1892,7 +1892,17 @@ void B2BIIConvertMdstModule::convertMdstECLObject(const Belle::Mdst_ecl& ecl, co
   eclCluster->setEnergyRaw(eclAux.mass());
   eclCluster->setE9oE21(eclAux.e9oe25());
   eclCluster->setEnergyHighestCrystal(eclAux.seed());
-  eclCluster->setTime(eclAux.property(0));
+  // The property 2 of eclAux contains the timing information
+  // in a bit encoded format.
+  // The 16 bits: 0-15 contain tdc count
+  float prop2 = eclAux.property(2);
+  // a float to int conversion
+  int property2;
+  std::memcpy(&property2, &prop2, sizeof(int));
+  //decode the bit encoded variables
+  int tdccount;
+  tdccount  = property2     & 0xffff;
+  eclCluster->setTime(tdccount);
   eclCluster->setNumberOfCrystals(eclAux.nhits());
 }
 

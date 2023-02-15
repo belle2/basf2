@@ -132,7 +132,7 @@ class ClassificationOverview:
             rdf = ROOT.RDataFrame(input_tree, self.output_file_name)
         else:
             rdf = ROOT.RDataFrame(input_tree, self.output_file_name.GetName())
-        input_array = rdf.AsNumpy(branch_names)
+        input_array = np.column_stack(list(rdf.AsNumpy(branch_names).values()))
         input_record_array = input_array.view(np.recarray)
 
         if filters:

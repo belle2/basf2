@@ -1,5 +1,5 @@
-Changes in the analysis package in light-2302-genetta
------------------------------------------------------
+Changes in the b2bii package since release-07-00
+------------------------------------------------
 
 Conversion
 ++++++++++

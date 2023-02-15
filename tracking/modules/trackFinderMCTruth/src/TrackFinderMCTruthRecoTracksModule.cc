@@ -121,12 +121,14 @@ TrackFinderMCTruthRecoTracksModule::TrackFinderMCTruthRecoTracksModule() : Modul
            "\"is:X\" where X is a PDG code: particle must have this code. "
            "\"from:X\" any of the particles's ancestors must have this (X) code",
            std::vector<std::string>(1, "primary"));
-  addParam("onlyCheckMotherPdgCode",
-           m_onlyCheckMotherPdgCode,
-           "Which particles in the list m_fromPdgCodes to check for the ancestors. "
-           "If true, only check the mother to be contained in m_fromPdgCodes, if false, check all ancestors in m_fromPdgCodes. "
-           "This is useful to e.g. search for slow pions from D* decays.",
-           m_onlyCheckMotherPdgCode);
+  addParam("onlyCheckDirectMotherPdgCode",
+           m_onlyCheckDirectMotherPdgCode,
+           "To be used together with WhichParticles to select the ancestor and daughters. "
+           "If true, only check the direct mother to be contained in the list of possible ancestors. "
+           "If false, check all ancestors in in the list of possible ancestors. "
+           "This could be used to e.g. only create MCRecoTracks for slow pions from D* decays instead of creating an MCRecoTrack "
+           "for every pion as long as the D* is one of its ancestors.",
+           m_onlyCheckDirectMotherPdgCode);
 
   addParam("EnergyCut",
            m_energyCut,
@@ -473,20 +475,20 @@ void TrackFinderMCTruthRecoTracksModule::event()
             ++nFalsePdgCodes;
           } else {
             foundMother = true;
-            // if (m_onlyCheckMotherPdgCode) {
+            // if (m_onlyCheckDirectMotherPdgCode) {
             //   break;
             // }
           }
         }
 
-        if (m_onlyCheckMotherPdgCode) {
+        if (m_onlyCheckDirectMotherPdgCode) {
           currentMother = nullptr;
         } else {
           currentMother = currentMother->getMother();
           ++nAncestor;
         }
       }
-      if (nFalsePdgCodes == (nAncestor * nFromPdgCodes) or not(m_onlyCheckMotherPdgCode and foundMother)) {
+      if (nFalsePdgCodes == (nAncestor * nFromPdgCodes) or not(m_onlyCheckDirectMotherPdgCode and foundMother)) {
         B2DEBUG(20, "particle does not have and ancestor with one of the user provided pdg codes and will therefore be skipped");
         continue; //goto next mcParticle, do not make track candidate
       }

@@ -489,7 +489,7 @@ class PXDGainMapChecker(ConditionCheckerBase):
         return sensor_db_content.mean()
 
     def set_hist_content(self, h2, sensor_db_content):
-        rdf = ROOT.RDF.MakeNumpyDataFrame(sensor_db_content)
+        rdf = ROOT.RDF.MakeNumpyDataFrame(sensor_db_content.reshape(h2.GetNbinsX(), h2.GetNbinsY()))
         h2 = rdf.Histo2D(h2)
 
     def draw_plots(self, canvas=None, cname="PXDGain", ymin=0.5, ymax=2.5, **kwargs):

@@ -3230,7 +3230,7 @@ Returns 1 if the particle's matched MC particle is also matched to a particle in
     REGISTER_METAVARIABLE("originalParticle(variable)", originalParticle, R"DOC(
                       Returns value of variable for the original particle from which the given particle is copied.
 
-                      The copy of particle is created, for example, when the vertex fit updates the daughters and `modularAnalysis.copyParticle` is called.
+                      The copy of particle is created, for example, when the vertex fit updates the daughters and `modularAnalysis.copyParticles` is called.
                       Returns NaN if the given particle is not copied and so there is no original particle.
                       )DOC", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("daughter(i, variable)", daughter, R"DOC(
@@ -3244,7 +3244,7 @@ Returns 1 if the particle's matched MC particle is also matched to a particle in
     REGISTER_METAVARIABLE("originalDaughter(i, variable)", originalDaughter, R"DOC(
                       Returns value of variable for the original particle from which the i-th daughter is copied.
 
-                      The copy of particle is created, for example,  when the vertex fit updates the daughters and `modularAnalysis.copyParticle` is called.
+                      The copy of particle is created, for example,  when the vertex fit updates the daughters and `modularAnalysis.copyParticles` is called.
                       Returns NaN if the daughter is not copied and so there is no original daughter.
 
                       Returns NaN if particle is nullptr or if the given daughter-index is out of bound (>= amount of daughters).

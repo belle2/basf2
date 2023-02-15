@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <pxd/modules/mcSlowPionPXDROICreator/MCSlowPionPXDROICreatorModule.h>
+#include <tracking/modules/pxdDataReduction/MCSlowPionPXDROICreatorModule.h>
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
 

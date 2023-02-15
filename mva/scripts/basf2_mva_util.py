@@ -27,8 +27,8 @@ def chain2dict(chain, tree_columns, dict_columns=None):
     try:
         from ROOT import RDataFrame
         rdf = RDataFrame(chain)
-        d = rdf.AsNumpy(tree_columns)
-        d.dtype.names = dict_columns
+        d = np.column_stack(list(rdf.AsNumpy(tree_columns).values()))
+        d = np.core.records.fromarrays(d.transpose(), names=dict_columns)
     except ImportError:
         d = {column: np.zeros((chain.GetEntries(),)) for column in dict_columns}
         for iEvent, event in enumerate(chain):

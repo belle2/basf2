@@ -51,7 +51,7 @@ namespace Belle2 {
     StoreArray<MCParticle> m_MCParticles; /**< StoreArray for the MCParticles */
     StoreArray<ROIid> m_ROIs;             /**< StoreArray for the ROIs */
 
-    short m_ROISize = 10; /**< ROI size */
+    short m_ROISize = 20; /**< ROI size */
 
     uint m_slowPiCounter = 0; /**< Count the slow pions in MC for debugging*/
     uint m_ROICounter = 0;    /**< Count the ROI that are created for debugging */

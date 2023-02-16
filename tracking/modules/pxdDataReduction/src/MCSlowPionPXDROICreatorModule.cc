@@ -92,10 +92,10 @@ void MCSlowPionPXDROICreatorModule::event()
       const short vCell = digit.getVCellID();
 
       // Check consistency of cells to only create ROIs that are fully contained on a sensor
-      const short minU = uCell - m_ROISize >= 0   ? uCell - m_ROISize : 0;
-      const short maxU = uCell + m_ROISize <= 249 ? uCell + m_ROISize : 249;
-      const short minV = vCell - m_ROISize >= 0   ? vCell - m_ROISize : 0;
-      const short maxV = vCell + m_ROISize <= 767 ? vCell + m_ROISize : 767;
+      const short minU = uCell - m_ROISize / 2 >= 0   ? uCell - m_ROISize / 2 : 0;
+      const short maxU = uCell + m_ROISize / 2 <= 249 ? uCell + m_ROISize / 2 : 249;
+      const short minV = vCell - m_ROISize / 2 >= 0   ? vCell - m_ROISize / 2 : 0;
+      const short maxV = vCell + m_ROISize / 2 <= 767 ? vCell + m_ROISize / 2 : 767;
 
       m_ROIs.appendNew(ROIid(minU, maxU, minV, maxV, sensor));
       m_ROICounter++;

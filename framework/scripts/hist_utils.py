@@ -12,6 +12,15 @@ import numpy as np
 
 
 def hist2array(hist, return_edges=False):
+    """
+    Function to convert a histogram into a numpy array and optionally also
+    return a list of the bin edges
+    Parameters:
+        hist: one-dimensional histogram
+        return_edges (bool): flag whether bin edges should be calculated and returned
+    Return:
+        numpy array and optionally a list of the bin edges
+    """
     nbins = hist.GetNbinsX()
     arr = np.zeros(nbins)
     for i in range(nbins):

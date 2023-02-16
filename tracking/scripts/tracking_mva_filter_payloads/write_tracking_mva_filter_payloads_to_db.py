@@ -12,8 +12,7 @@ from ROOT import Belle2
 import basf2
 
 
-def write_tracking_mva_filter_payloads_to_db(dbobj: object = None,
-                                             dbobj_name: str = None,
+def write_tracking_mva_filter_payloads_to_db(dbobj_name: str = None,
                                              iovList=(0, 0, 0, 0),
                                              weightfile_identifier: str = None,
                                              cut_value: float = None):
@@ -26,9 +25,9 @@ def write_tracking_mva_filter_payloads_to_db(dbobj: object = None,
     :param cut_value Cut value
     """
 
+    dbobj = Belle2.TrackingMVAFilterParameters()
     # Just a small sanity check for a valid IoV (expLow, runLow, expHigh, runHigh) and valid parameters
-    if (dbobj is None) or \
-       (dbobj_name is None) or \
+    if (dbobj_name is None) or \
        (len(iovList) != 4) or \
        (weightfile_identifier is None) or \
        (cut_value is None):
@@ -48,10 +47,9 @@ def write_tracking_mva_filter_payloads_to_db(dbobj: object = None,
 
 
 if __name__ == "__main__":
-    dbobj = Belle2.TrackQualityEstimatorPayload()
-    write_tracking_mva_filter_payloads_to_db(dbobj, "TrackQualityEstimatorParameters",
+    write_tracking_mva_filter_payloads_to_db("TrackQualityEstimatorParameters",
                                              (0,    0,    0, -1), "trackfindingcdc_TrackQualityIndicator", 0.7)
-    write_tracking_mva_filter_payloads_to_db(dbobj, "TrackQualityEstimatorParameters",
+    write_tracking_mva_filter_payloads_to_db("TrackQualityEstimatorParameters",
                                              (1002, 0, 1002, -1), "trackfindingcdc_TrackQualityIndicator", 0.7)
-    write_tracking_mva_filter_payloads_to_db(dbobj, "TrackQualityEstimatorParameters",
+    write_tracking_mva_filter_payloads_to_db("TrackQualityEstimatorParameters",
                                              (1003, 0, 1003, -1), "trackfindingcdc_TrackQualityIndicator", 0.7)

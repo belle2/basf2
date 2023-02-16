@@ -15,7 +15,7 @@
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 
 #include <framework/database/DBObjPtr.h>
-#include <tracking/dbobjects/BaseTrackingMVAFilterParameters.h>
+#include <tracking/dbobjects/TrackingMVAFilterParameters.h>
 
 #include <memory>
 #include <string>
@@ -79,8 +79,8 @@ namespace Belle2 {
       /// Name of the DB payload
       std::string m_DBPayloadName = "";
 
-      /// Pointer to the BaseTrackingMVAFilterParameters base class
-      std::unique_ptr<DBObjPtr<BaseTrackingMVAFilterParameters>> m_mvaPayload;
+      /// Pointer to the TrackingMVAFilterParameters base class
+      std::unique_ptr<DBObjPtr<TrackingMVAFilterParameters>> m_mvaPayload;
 
       /// MVA Expert to examine the object
       std::unique_ptr<MVAExpert> m_mvaExpert;

@@ -115,7 +115,7 @@ void SVDTimeGroupingModule::initialize()
 void SVDTimeGroupingModule::event()
 {
   int totClusters = m_svdClusters.getEntries();
-  if (m_factor <= 0 || totClusters <= 0) return;
+  if (m_factor <= 0 || totClusters < 10) return;
 
   // number of clusters in signalRange
   double tmpRange[2] = {std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN()};
@@ -252,28 +252,6 @@ void SVDTimeGroupingModule::event()
 
   if (m_signalGroupSelection < int(groupInfo.size())) groupInfo.resize(m_signalGroupSelection);
 
-  if (m_formSuperGroup && int(groupInfo.size()) > 1) {
-    double endPoints[2] = {std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN()};
-    double sum = 0;
-    for (int ij = 0; ij < int(groupInfo.size()); ij++) {
-      double pars[3] = {std::get<0>(groupInfo[ij]), std::get<1>(groupInfo[ij]), std::get<2>(groupInfo[ij])};
-      if (pars[2] == 0) continue;
-      sum += pars[0];
-      double beginPos = pars[1] - m_accSigmaN * pars[2];
-      double   endPos = pars[1] + m_accSigmaN * pars[2];
-      if (std::isnan(endPoints[0]) || beginPos < endPoints[0]) endPoints[0] = beginPos;
-      if (std::isnan(endPoints[1]) || endPos   > endPoints[1]) endPoints[1] = endPos;
-    } // for (int ij = 0; ij < int(groupInfo.size()); ij++) {
-    if (!std::isnan(endPoints[0]) && !std::isnan(endPoints[1])) {
-      if (endPoints[0] < tRangeLow)  endPoints[0] = tRangeLow;
-      if (endPoints[1] > tRangeHigh) endPoints[1] = tRangeHigh;
-      double mean  = (endPoints[1] + endPoints[0]) * 0.5;
-      double sigma = (endPoints[1] - endPoints[0]) * 0.5 / m_accSigmaN;
-      groupInfo[0] = std::make_tuple(sum, mean, sigma);
-      groupInfo.resize(1);
-    }
-  } // if (m_formSuperGroup) {
-
   // make all clusters groupless if no groups are found
   if (int(groupInfo.size()) == 0)
     for (int jk = 0; jk < totClusters; jk++)
@@ -281,7 +259,7 @@ void SVDTimeGroupingModule::event()
 
   for (int ij = 0; ij < int(groupInfo.size()); ij++) {
     double pars[3] = {std::get<0>(groupInfo[ij]), std::get<1>(groupInfo[ij]), std::get<2>(groupInfo[ij])};
-    if (pars[2] == 0) continue;
+    if (pars[2] == 0 && ij != int(groupInfo.size()) - 1) continue;
     double beginPos = pars[1] - m_accSigmaN * pars[2];
     double   endPos = pars[1] + m_accSigmaN * pars[2];
     if (beginPos < tRangeLow) beginPos = tRangeLow;
@@ -290,15 +268,20 @@ void SVDTimeGroupingModule::event()
             << " beginPos " << beginPos << " endPos " << endPos);
     for (int jk = 0; jk < totClusters; jk++) {
       double clsTime = m_svdClusters[jk]->getClsTime();
-      if (clsTime >= beginPos && clsTime <= endPos) {
-        m_svdClusters[jk]->getTimeGroupId().push_back(ij);
+      if (pars[2] != 0 && clsTime >= beginPos && clsTime <= endPos) {
+        if (m_formSuperGroup) {
+          if (int(m_svdClusters[jk]->getTimeGroupId().size()) == 0)
+            m_svdClusters[jk]->getTimeGroupId().push_back(0);
+        } else
+          m_svdClusters[jk]->getTimeGroupId().push_back(ij);
         if (m_writeGroupInfo) m_svdClusters[jk]->getTimeGroupInfo().push_back(std::make_tuple(pars[0], pars[1], pars[2]));
         B2DEBUG(1, "   accepted cluster " << jk
-                << " clsTime " << clsTime);
+                << " clsTime " << clsTime
+                << " GroupId " << m_svdClusters[jk]->getTimeGroupId().back());
       } else {
         B2DEBUG(1, "     rejected cluster " << jk
                 << " clsTime " << clsTime);
-        if (ij == int(groupInfo.size()) - 1 && !int(m_svdClusters[jk]->getTimeGroupId().size())) { // leftover clusters
+        if (ij == int(groupInfo.size()) - 1 && int(m_svdClusters[jk]->getTimeGroupId().size()) == 0) { // leftover clusters
           if (m_includeOutOfRangeClusters &&
               clsTime < tRangeLow)
             m_svdClusters[jk]->getTimeGroupId().push_back(ij + 1);       // underflow

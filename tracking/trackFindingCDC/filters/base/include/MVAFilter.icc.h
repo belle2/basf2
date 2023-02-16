@@ -73,6 +73,9 @@ namespace Belle2 {
         B2DEBUG(20,
                 "MVAFilter: Using DBObject " << m_DBPayloadName << " with weightfile " << m_identifier << " and cut value " << m_cutValue << ".");
       }
+      // else {
+      //   B2FATAL("No valid MVAFilter payload with name " + m_DBPayloadName + " was found.");
+      // }
 
       std::vector<Named<Float_t*>> namedVariables = Super::getVarSet().getNamedVariables();
       m_mvaExpert = std::make_unique<MVAExpert>(m_identifier, std::move(namedVariables));

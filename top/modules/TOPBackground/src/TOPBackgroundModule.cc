@@ -25,7 +25,7 @@
 // framework aux
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
-#include <framework/geometry/XYZVectorToTVector3Converter.h>
+#include <framework/geometry/VectorUtil.h>
 
 #include <TCanvas.h>
 #include <TLegend.h>

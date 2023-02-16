@@ -48,7 +48,7 @@
 #include <framework/dataobjects/DisplayData.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/ColorPalette.h>
-#include <framework/geometry/XYZVectorToTVector3Converter.h>
+#include <framework/geometry/VectorUtil.h>
 
 #include <Math/VectorUtil.h>
 #include <TEveArrow.h>

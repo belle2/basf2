@@ -10,8 +10,17 @@
 
 /* ROOT headers. */
 #include <Math/Vector3D.h>
+#include <TVector3.h>
 
 namespace Belle2 {
+
+  /**
+   * Helper function to convert XYZVector to TVector3
+   */
+  static constexpr auto XYZToTVector = [](const ROOT::Math::XYZVector& a)
+  {
+    return TVector3(a.X(), a.Y(), a.Z());
+  };
 
   namespace VectorUtil {
 
@@ -30,9 +39,7 @@ namespace Belle2 {
       const double x = amag * sinTheta * std::cos(phi);
       const double y = amag * sinTheta * std::sin(phi);
       const double z = amag * std::cos(theta);
-      vector.SetX(x);
-      vector.SetY(y);
-      vector.SetZ(z);
+      vector.SetXYZ(x, y, z);
     }
 
   }

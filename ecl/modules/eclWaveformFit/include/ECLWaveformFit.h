@@ -41,20 +41,6 @@ namespace Belle2 {
     const float& operator[](int i) const { return m_covMatPacked[i];}
   };
 
-  /** Struct to return signal function information
-   * f0 is the function value
-   * f1 is the first derivative
-   * f2 is the second derivative
-   */
-  struct val_der_t {
-    /** see struct description */
-    double f0;
-    /** see struct description */
-    double f1;
-    /** see struct description */
-    double f2;
-  };
-
   /** Interpolate signal shape using function values and the first derivative.
    */
   struct SignalInterpolation2 {
@@ -75,10 +61,10 @@ namespace Belle2 {
     constexpr static double c_dtn = c_dt / c_ndt;
     /** inverted time substep */
     constexpr static double c_idtn = c_ndt / c_dt;
-    /**
-     * storage for function value + first derivative
-     */
-    std::pair<double, double> m_F[c_nt * c_ndt + c_ntail];
+
+    /** Function ([0]) and derivative ([1]) values. */
+    double m_FunctionInterpolation[c_nt * c_ndt + c_ntail][2];
+
     /**
      * assuming exponential drop of the signal function far away from 0, extrapolate it to +inf
      * f(i_last + i) = f(i_last)*m_r0^i
@@ -93,11 +79,16 @@ namespace Belle2 {
     SignalInterpolation2() {};
     /** Constructor with parameters with the parameter layout as in ECLDigitWaveformParameters*/
     explicit SignalInterpolation2(const std::vector<double>&);
+
     /**
-     *  returns signal shape(+derivatives) in 31 equidistant time points
-     *  starting from T0
+     * Returns signal shape(+derivatives) in 31 equidistant time points
+     * starting from t0.
+     * @param[in]  t0           Time.
+     * @param[out] function     Function values.
+     * @param[out][ derivatives Derivatives.
      */
-    void getshape(double, val_der_t*) const;
+    void getshape(double t0, double* function, double* derivatives) const;
+
   };
 
   /** Module performs offline fit for saved ecl waveforms.

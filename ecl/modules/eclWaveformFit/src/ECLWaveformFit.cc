@@ -39,45 +39,55 @@ REG_MODULE(ECLWaveformFit);
 //anonymous namespace for data objects used by both ECLWaveformFitModule class and FCN2h funciton for MINUIT minimization.
 namespace {
 
+  // Number of fit points.
+  const int c_NFitPoints = 31;
+
   //adc data array
-  std::vector<double> fitA(31);
+  double fitA[c_NFitPoints];
 
   //g_si: photon template signal shape
   //g_sih: hadron template signal shape
   const SignalInterpolation2* g_si;
   const SignalInterpolation2* g_sih;
 
-  // covariance matrix and noise level
-  std::vector< std::vector<double> > currentCovMat;
+  /** Covariance matrix. */
+  static double s_CurrentCovMat[c_NFitPoints][c_NFitPoints];
+
+  /** Noise level. */
   double aNoise;
 
   //Function to minimize in photon template + hadron template fit. (chi2)
   // cppcheck-suppress constParameter ; TF1 fit functions cannot have const parameters
   void FCN2h(int&, double* grad, double& f, double* p, int)
   {
-    constexpr int N = 31;
-    std::vector<double> df(N);
-    std::vector<double> da(N);
+    double df[c_NFitPoints];
+    double da[c_NFitPoints];
     const double Ag = p[1], B = p[0], T = p[2], Ah = p[3];
     double chi2 = 0, gAg = 0, gB = 0, gT = 0, gAh = 0;
 
     //getting photon and hadron component shapes for set of fit parameters
-    val_der_t ADg[N], ADh[N];
-    g_si->getshape(T, ADg);
-    g_sih->getshape(T, ADh);
+    double amplitudeGamma[c_NFitPoints], derivativesGamma[c_NFitPoints];
+    double amplitudeHadron[c_NFitPoints], derivativesHadron[c_NFitPoints];
+    g_si->getshape(T, amplitudeGamma, derivativesGamma);
+    g_sih->getshape(T, amplitudeHadron, derivativesHadron);
 
     //computing difference between current fit result and adc data array
-    for (int i = 0; i < N; ++i) df[i] = fitA[i] - (Ag * ADg[i].f0 + Ah * ADh[i].f0 + B);
+    for (int i = 0; i < c_NFitPoints; ++i)
+      df[i] = fitA[i] - (Ag * amplitudeGamma[i] + Ah * amplitudeHadron[i] + B);
 
     //computing chi2.
-    for (int i = 0; i < N; ++i) da[i] = std::inner_product(currentCovMat[i].begin(), currentCovMat[i].end(), df.begin(), 0.0);
+    for (int i = 0; i < c_NFitPoints; ++i) {
+      da[i] = 0;
+      for (int j = 0; j < c_NFitPoints; ++j)
+        da[i] += s_CurrentCovMat[i][j] * df[j];
+    }
 
-    for (int i = 0; i < N; ++i) {
+    for (int i = 0; i < c_NFitPoints; ++i) {
       chi2 += da[i] * df[i];
       gB   -= da[i];
-      gAg  -= da[i] * ADg[i].f0;
-      gT   -= da[i] * (ADg[i].f1 * Ag + ADh[i].f1 * Ah);
-      gAh  -= da[i] * ADh[i].f0;
+      gAg  -= da[i] * amplitudeGamma[i];
+      gT   -= da[i] * (derivativesGamma[i] * Ag + derivativesHadron[i] * Ah);
+      gAh  -= da[i] * amplitudeHadron[i];
     }
 
     f = chi2;
@@ -91,35 +101,44 @@ namespace {
   // cppcheck-suppress constParameter ; TF1 fit functions cannot have const parameters
   void FCN2h2(int&, double* grad, double& f, double* p, int)
   {
-    const int N = 31;
-    std::vector<double> df(N);
-    std::vector<double> da(N);
+    double df[c_NFitPoints];
+    double da[c_NFitPoints];
     const double A2 = p[4], T2 = p[5];
     const double Ag = p[1], B = p[0], T = p[2], Ah = p[3];
     double chi2 = 0, gA2  = 0, gT2 = 0;
     double gAg = 0, gB = 0, gT = 0, gAh = 0;
 
     //getting photon and hadron component shapes for set of fit parameters
-    val_der_t ADg[N], AD2[N], ADh[N];
-    g_si->getshape(T, ADg);
-    g_si->getshape(T2, AD2);//background photon
-    g_sih->getshape(T, ADh);
+    double amplitudeGamma[c_NFitPoints], derivativesGamma[c_NFitPoints];
+    double amplitudeGamma2[c_NFitPoints], derivativesGamma2[c_NFitPoints];
+    double amplitudeHadron[c_NFitPoints], derivativesHadron[c_NFitPoints];
+    g_si->getshape(T, amplitudeGamma, derivativesGamma);
+    // Background photon.
+    g_si->getshape(T2, amplitudeGamma2, derivativesGamma2);
+    g_sih->getshape(T, amplitudeHadron, derivativesHadron);
 
     //computing difference between current fit result and adc data array
-    for (int i = 0; i < N; ++i) df[i] = fitA[i] - (Ag * ADg[i].f0 + Ah * ADh[i].f0 + A2 * AD2[i].f0 + B);
+    for (int i = 0; i < c_NFitPoints; ++i) {
+      df[i] = fitA[i] - (Ag * amplitudeGamma[i] + Ah * amplitudeHadron[i]
+                         + A2 * amplitudeGamma2[i] + B);
+    }
 
     //computing chi2.
-    for (int i = 0; i < N; ++i) da[i] = std::inner_product(currentCovMat[i].begin(), currentCovMat[i].end(), df.begin(), 0.0);
+    for (int i = 0; i < c_NFitPoints; ++i) {
+      da[i] = 0;
+      for (int j = 0; j < c_NFitPoints; ++j)
+        da[i] += s_CurrentCovMat[i][j] * df[j];
+    }
 
-    for (int i = 0; i < N; ++i) {
+    for (int i = 0; i < c_NFitPoints; ++i) {
       chi2 += da[i] * df[i];
       gB  -= da[i];
-      gAg  -= da[i] * ADg[i].f0;
-      gAh  -= da[i] * ADh[i].f0;
-      gT   -= da[i] * (ADg[i].f1 * Ag + ADh[i].f1 * Ah);;
+      gAg  -= da[i] * amplitudeGamma[i];
+      gAh  -= da[i] * amplitudeHadron[i];
+      gT   -= da[i] * (derivativesGamma[i] * Ag + derivativesHadron[i] * Ah);
 
-      gA2 -= da[i] * AD2[i].f0;
-      gT2 -= da[i] * AD2[i].f1 * A2;
+      gA2 -= da[i] * amplitudeGamma2[i];
+      gT2 -= da[i] * derivativesGamma2[i] * A2;
     }
     f = chi2;
     grad[0] = 2 * gB;
@@ -137,12 +156,11 @@ namespace {
     for (int k = 0; k < n; k++) dst[k] = src[k] / (1 + exp((k - u0) / u1));
   }
 
-  // transform autocovariance function of 31 elements to the covariance matrix
+  // transform autocovariance function of c_NFitPoints elements to the covariance matrix
   bool makecovariance(CovariancePacked& M, const int nnoise, const double* acov)
   {
-    const int ns = 31;
-    TMatrixDSym E(ns);
-    for (int i = 0; i < ns; i++)
+    TMatrixDSym E(c_NFitPoints);
+    for (int i = 0; i < c_NFitPoints; i++)
       for (int j = 0; j < i + 1; j++)
         if (i - j < nnoise) E(i, j) = E(j, i) = acov[i - j];
 
@@ -151,7 +169,7 @@ namespace {
 
     if (status) {
       int count = 0;
-      for (int i = 0; i < ns; i++)
+      for (int i = 0; i < c_NFitPoints; i++)
         for (int j = 0; j < i + 1; j++)
           M[count++] = E(i, j);
       M.sigma = sqrtf(acov[0]);
@@ -163,14 +181,10 @@ namespace {
   // here we inflate it to full square form in double format
   void unpackcovariance(const CovariancePacked& matrixPacked)
   {
-    const int ns = 31;
     int count = 0;
-    currentCovMat.clear();
-    currentCovMat.resize(ns);
-    for (int i = 0; i < ns; i++) {
-      currentCovMat[i].resize(ns);
+    for (int i = 0; i < c_NFitPoints; i++) {
       for (int j = 0; j < i + 1; j++) {
-        currentCovMat[i][j] = currentCovMat[j][i] = matrixPacked[count++];
+        s_CurrentCovMat[i][j] = s_CurrentCovMat[j][i] = matrixPacked[count++];
       }
     }
     aNoise = matrixPacked.sigma;
@@ -248,24 +262,20 @@ void ECLWaveformFitModule::beginRun()
   //Load covariance matricies from database;
   if (m_CovarianceMatrix) {
     for (int id = 1; id <= ECLElementNumbers::c_NCrystals; id++) {
-      constexpr int N = 31;
-      std::vector<double> buf(N);
-      std::vector<double> reg(N);
+      std::vector<double> buf(c_NFitPoints);
+      std::vector<double> reg(c_NFitPoints);
       m_AutoCovariance->getAutoCovariance(id, buf.data());
-      double x0 = N;
+      double x0 = c_NFitPoints;
       reg = buf;
-      while (!makecovariance(m_c[id - 1], N, reg.data()))
-        regularize(buf.data(), reg.data(), N, x0 -= 1, 1);
+      while (!makecovariance(m_c[id - 1], c_NFitPoints, reg.data()))
+        regularize(buf.data(), reg.data(), c_NFitPoints, x0 -= 1, 1);
     }
   } else {
     //default covariance matrix is identity for all crystals
     const double isigma = 1 / 7.5;
-    currentCovMat.clear();
-    currentCovMat.resize(31);
-    for (int i = 0; i < 31; ++i) {
-      currentCovMat[i].resize(31);
-      for (int j = 0; j < 31; ++j) {
-        currentCovMat[i][j] = (i == j) * isigma * isigma;
+    for (int i = 0; i < c_NFitPoints; ++i) {
+      for (int j = 0; j < c_NFitPoints; ++j) {
+        s_CurrentCovMat[i][j] = (i == j) * isigma * isigma;
       }
     }
   }
@@ -438,9 +448,9 @@ void ECLWaveformFitModule::Fit2h(double& B, double& Ag, double& T, double& Ah, d
   double dt = 0.5;
   double amax = 0;
   int jmax = 6;
-  for (int j = 0; j < 31; j++) if (amax < fitA[j]) { amax = fitA[j]; jmax = j;}
+  for (int j = 0; j < c_NFitPoints; j++) if (amax < fitA[j]) { amax = fitA[j]; jmax = j;}
   double sumB0 = 0; int jsum = 0;
-  for (int j = 0; j < 31; j++) if (j < jmax - 3 || jmax + 4 < j) { sumB0 += fitA[j]; ++jsum;}
+  for (int j = 0; j < c_NFitPoints; j++) if (j < jmax - 3 || jmax + 4 < j) { sumB0 += fitA[j]; ++jsum;}
   double B0 = sumB0 / jsum;
   amax -= B0;
   if (amax < 0) amax = 10;
@@ -477,10 +487,10 @@ void ECLWaveformFitModule::Fit2hExtraPhoton(double& B, double& Ag, double& T, do
   int ierflg = 0;
   double dt = 0.5;
   double amax = 0; int jmax = 6;
-  for (int j = 0; j < 31; j++) if (amax < fitA[j]) { amax = fitA[j]; jmax = j;}
+  for (int j = 0; j < c_NFitPoints; j++) if (amax < fitA[j]) { amax = fitA[j]; jmax = j;}
 
   double amax1 = 0; int jmax1 = 6;
-  for (int j = 0; j < 31; j++)
+  for (int j = 0; j < c_NFitPoints; j++)
     if (j < jmax - 3 || jmax + 4 < j) {
       if (j == 0) {
         if (amax1 < fitA[j] && fitA[j + 1] < fitA[j]) { amax1 = fitA[j]; jmax1 = j;}
@@ -492,7 +502,7 @@ void ECLWaveformFitModule::Fit2hExtraPhoton(double& B, double& Ag, double& T, do
     }
 
   double sumB0 = 0; int jsum = 0;
-  for (int j = 0; j < 31; j++) if ((j < jmax - 3 || jmax + 4 < j) && (j < jmax1 - 3 || jmax1 + 4 < j)) { sumB0 += fitA[j]; ++jsum;}
+  for (int j = 0; j < c_NFitPoints; j++) if ((j < jmax - 3 || jmax + 4 < j) && (j < jmax1 - 3 || jmax1 + 4 < j)) { sumB0 += fitA[j]; ++jsum;}
   double B0 = sumB0 / jsum;
   amax -= B0; amax = std::max(10.0, amax);
   amax1 -= B0; amax1 = std::max(10.0, amax1);
@@ -540,78 +550,103 @@ SignalInterpolation2::SignalInterpolation2(const std::vector<double>& s)
   dd_t t[(c_nt + c_ntail)*c_ndt];
   dsp.fillarray(sizeof(t) / sizeof(t[0]), t);
 
-  for (int i = 0; i < c_nt * c_ndt; i++) m_F[i] = t[i];
-  for (int i = 0; i < c_ntail; i++) m_F[c_nt * c_ndt + i] = t[c_nt * c_ndt + i * c_ndt];
-  const auto& Fm = *(std::end(m_F) - 2), &F0 = *(std::end(m_F) - 1);
-  m_r0 = F0.first / Fm.first;
-  m_r1 = F0.second / Fm.second;
+  for (int i = 0; i < c_nt * c_ndt; i++) {
+    m_FunctionInterpolation[i][0] = t[i].first;
+    m_FunctionInterpolation[i][1] = t[i].second;
+  }
+  for (int i = 0; i < c_ntail; i++) {
+    int j = c_nt * c_ndt + i;
+    int k = c_nt * c_ndt + i * c_ndt;
+    m_FunctionInterpolation[j][0] = t[k].first;
+    m_FunctionInterpolation[j][1] = t[k].second;
+  }
+  int i1 = c_nt * c_ndt + c_ntail - 2;
+  int i2 = c_nt * c_ndt + c_ntail - 1;
+  m_r0 = m_FunctionInterpolation[i2][0] / m_FunctionInterpolation[i1][0];
+  m_r1 = m_FunctionInterpolation[i2][1] / m_FunctionInterpolation[i1][1];
 }
 
 /**
- *  returns signal shape(+derivatives) in 31 equidistant time points
+ *  returns signal shape(+derivatives) in c_NFitPoints equidistant time points
  *  starting from T0
  */
-void SignalInterpolation2::getshape(double t0, val_der_t* A) const
+void SignalInterpolation2::getshape(
+  double t0, double* function, double* derivatives) const
 {
-  const int iend0 = c_nt * c_ndt, iend1 = c_nt * c_ndt + c_ntail;
-  const val_der_t* Aend = A + 31;
+  const int iend0 = c_nt * c_ndt;
+  const int iend1 = c_nt * c_ndt + c_ntail;
 
-  //if before pulse start time (negative times) return 0
+  // If before pulse start time (negative times), return 0.
+  int k = 0;
   while (t0 < 0) {
-    *A = {0, 0, 0};
-    if (++A >= Aend) return;
+    function[k] = 0;
+    derivatives[k] = 0;
     t0 += c_dt;
+    ++k;
+    if (k >= c_NFitPoints)
+      return;
   }
 
-  //function below evaluates the template value and the first and second derivative values for the point.
-  double x = t0 * c_idtn, ix = floor(x), w = x - ix;
+  //function below evaluates the template value and the first derivative value for the point.
+  double x = t0 * c_idtn;
+  double ix = floor(x);
+  double w = x - ix;
   int i = ix;
-  double w2 = w * w, hw2 = 0.5 * w2, tw3 = ((1. / 6) * w) * w2;
-  auto I = [this, &w, &hw2, &tw3](int j, double idt, double dt) {
-    double a[4],
-           f0 = m_F[j].first, f1 = m_F[j + 1].first,
-           fp0 = m_F[j].second, fp1 = m_F[j + 1].second,
-           dfdt = (f1 - f0) * idt, fp = fp1 + fp0;
+  double w2 = w * w;
+  double hw2 = 0.5 * w2;
+  double tw3 = ((1. / 6) * w) * w2;
+  auto I = [this, &w, &hw2, &tw3](int j, double idt, double dt, double & f, double & d) {
+    double a[4];
+    double f0 = m_FunctionInterpolation[j][0];
+    double f1 = m_FunctionInterpolation[j + 1][0];
+    double fp0 = m_FunctionInterpolation[j][1];
+    double fp1 = m_FunctionInterpolation[j + 1][1];
+    double dfdt = (f1 - f0) * idt;
+    double fp = fp1 + fp0;
 
     a[0] = f0;
     a[1] = fp0;
     a[2] = -((fp + fp0) - 3 * dfdt);
     a[3] = ((fp) - 2 * dfdt);
 
-    double b2 = 2 * a[2], b3 = 6 * a[3];
-    val_der_t y;
-    y.f0 = a[0] + dt * (a[1] * w + b2 * hw2 + b3 * tw3); //function value
-    y.f1 = a[1] + b2 * w + b3 * hw2; // first derivative of function value
-    y.f2 = (b2 + b3 * w) * idt; //second derivative of function value
-    return y;
+    double b2 = 2 * a[2];
+    double b3 = 6 * a[3];
+    f = a[0] + dt * (a[1] * w + b2 * hw2 + b3 * tw3);
+    d = a[1] + b2 * w + b3 * hw2;
   };
 
   //signal interpolation for short time steps used for points at the beginning of the pulse where the pulse is quickly changing (eg rise)
   //iend0 indicates first region of pulse
   while (i < iend0) {
-    *A = I(i, c_idtn, c_dtn);
-    if (++A >= Aend) return;
+    I(i, c_idtn, c_dtn, function[k], derivatives[k]);
     i += c_ndt;
     t0 += c_dt;
+    ++k;
+    if (k >= c_NFitPoints)
+      return;
   }
 
-  x = t0 * c_idt; ix = floor(x); w = x - ix;
+  x = t0 * c_idt;
+  ix = floor(x);
+  w = x - ix;
   int j = ix;
   i = (j - c_nt) + iend0;
-  w2 = w * w, hw2 = 0.5 * w2, tw3 = ((1. / 6) * w) * w2;
+  w2 = w * w;
+  hw2 = 0.5 * w2;
+  tw3 = ((1. / 6) * w) * w2;
 
   //signal interpolation for long time steps used for points in the tail region of the pulse
   //iend1 indicates end of pulse
   while (i < iend1 - 1) {
-    *A = I(i++, c_idt, c_dt);
-    if (++A >= Aend) return;
+    I(i, c_idt, c_dt, function[k], derivatives[k]);
+    ++i;
+    ++k;
+    if (k >= c_NFitPoints)
+      return;
   }
-
-  while (A < Aend) {
-    const val_der_t& p = *(A - 1);
-    val_der_t& y = *A++;
-    y.f0 = p.f0 * m_r0; // function value
-    y.f1 = p.f1 * m_r1; // first derivative of function value
-    y.f2 = 0;  // second derivative of function value
+  while (k < c_NFitPoints) {
+    function[k] = function[k - 1] * m_r0;
+    derivatives[k] = derivatives[k - 1] * m_r1;
+    ++k;
   }
 }

@@ -20,6 +20,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/geometry/B2Vector3.h>
+#include <framework/geometry/VectorUtil.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
@@ -504,11 +505,11 @@ namespace Belle2 {
           (crystalCenterPosition - extHitPosition).Dot(
             crystalOrientation.Unit()) * crystalOrientation.Unit();
         if (varid == varType::phiOffset) {
-          return TVector2::Phi_mpi_pi(extHitPosition.Phi() - crystalPositionOnSurface.Phi());
+          return VectorUtil::phiMinusPiPi(extHitPosition.Phi() - crystalPositionOnSurface.Phi());
         } else if (varid == varType::thetaOffset) {
           return extHitPosition.Theta() - crystalPositionOnSurface.Theta();
         } else if (varid == varType::phiPointing) {
-          return TVector2::Phi_mpi_pi(trackPointing.Phi() - crystalOrientation.Phi());
+          return VectorUtil::phiMinusPiPi(trackPointing.Phi() - crystalOrientation.Phi());
         } else if (varid == varType::thetaPointing) {
           return trackPointing.Theta() - crystalOrientation.Theta();
         }

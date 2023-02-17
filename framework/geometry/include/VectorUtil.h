@@ -42,6 +42,18 @@ namespace Belle2 {
       vector.SetXYZ(x, y, z);
     }
 
+    /**
+     * Return angle in the range [0, 2 * M_PI) that differs from
+     * the agrument by 2 * M_PI * n.
+     */
+    double phi0TwoPi(double angle);
+
+    /**
+     * Return angle in the range [-M_PI, M_PI) that differs from
+     * the agrument by 2 * M_PI * n.
+     */
+    double phiMinusPiPi(double angle);
+
   }
 
 }

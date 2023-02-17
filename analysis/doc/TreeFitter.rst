@@ -46,9 +46,9 @@ The vertex fitter has a convenience function: `vertex.treeFit`.
 
 .. hint:: The TreeFit will most likely change the kinematic properties of the decay head (mother) and,
           if the option ``updateAllDaughters`` is turned on, also of the daughter particles.
-          The variables of daughters before the TreeFit can be available with the meta-variable `originalDaughter`.
-          For the variables of the mother particle, one can store the quantities in the extraInfo field by running the
-          `variablesToExtraInfo` before the TreeFit so one can get them with the `extraInfo`.
+          The variables of daughters before the TreeFit can be accessed with the meta-variable `originalDaughter`.
+          For the variables of the mother particle, one can store the quantities in the extraInfo field by running
+          `variablesToExtraInfo` before the TreeFit and then accessing them via the variable `extraInfo`.
 
 Troubleshooting and FAQ
 -----------------------

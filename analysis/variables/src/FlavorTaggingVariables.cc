@@ -1833,6 +1833,80 @@ namespace Belle2 {
       return func;
     }
 
+
+    Manager::FunctionPtr QpTrack(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() != 3) {
+        B2FATAL("Wrong number of arguments (3 required) for meta function QpTrack");
+      }
+
+      auto particleListName = arguments[0];
+      auto outputExtraInfo = arguments[1];
+      auto rankingExtraInfo = arguments[2];
+
+      unsigned indexRanking = find(availableExtraInfos.begin(), availableExtraInfos.end(),
+                                   rankingExtraInfo) - availableExtraInfos.begin();
+      unsigned indexOutput  = find(availableExtraInfos.begin(), availableExtraInfos.end(),
+                                   outputExtraInfo)  - availableExtraInfos.begin();
+
+      if (indexRanking == availableExtraInfos.size() or indexOutput == availableExtraInfos.size()) {
+        string strAvailableForIsRightTrack;
+        for (const auto& name : availableForIsRightTrack)
+          strAvailableForIsRightTrack += name + " ";
+        string strAvailableForIsRightCategory;
+        for (const auto& name : availableForIsRightCategory)
+          strAvailableForIsRightCategory += name + " ";
+
+        B2FATAL("QpTrack: Not available category " << rankingExtraInfo <<
+                ". The possibilities for isRightTrack() are " << endl << strAvailableForIsRightTrack << " MaximumPstar" << endl <<
+                "The possibilities for isRightCategory() are " << endl << strAvailableForIsRightCategory);
+      }
+
+      auto func = [particleListName, indexOutput, indexRanking](const Particle * particle) -> double {
+        StoreObjPtr<ParticleList> ListOfParticles(particleListName);
+        if (!ListOfParticles.isValid()) return 0;
+
+        const Track* trackOfGivenParticle = particle->getTrack();
+
+        Particle* target = nullptr; //Particle selected as target
+        for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i)
+        {
+          Particle* particlei = ListOfParticles->getParticle(i);
+          if (!particlei)
+            continue;
+
+          if (particlei->getTrack() == trackOfGivenParticle) {
+            target = particlei;
+            break;
+          }
+        }
+
+        // nothing found
+        if (!target) return 0;
+
+        double qTarget = 0; //Flavor of the track selected as target
+        // Get the flavor of the track selected as target
+        if (indexRanking == 10 || indexRanking == 21)   // Lambda
+        {
+          qTarget = (-1) * target->getPDGCode() / abs(target->getPDGCode());
+          //     IntermediateElectron    IntermediateMuon        IntermediateKinLepton   SlowPion
+        } else if (indexRanking == 1 || indexRanking == 3 || indexRanking == 5 || indexRanking == 7 ||
+                   indexRanking == 12 || indexRanking == 14 || indexRanking == 16 || indexRanking == 18)
+        {
+          qTarget = (-1) * target->getCharge();
+        } else
+        {
+          qTarget = target->getCharge();
+        }
+
+        //Get the probability of being right classified flavor from event level
+        double prob = target->getExtraInfo(availableExtraInfos[indexOutput]);
+
+        return qTarget * prob;
+      };
+      return func;
+    }
+
     Manager::FunctionPtr variableOfTarget(const std::vector<std::string>& arguments)
     {
 
@@ -2384,6 +2458,14 @@ The particles in the list are ranked according to a flavor tagging extraInfo, pr
 allowed values are same as in :b2:var:`hasHighestProbInCat`.
 The values for the three top particles is combined into an effective (weighted) output.
 )DOC", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("QpTrack(particleListName, outputExtraInfo, rankingExtraInfo)", QpTrack,  R"DOC(
+[Expert] Returns the :math:`q*p` value of the particle in a given particle list provided as the 1st argument that is originated from the same Track of given particle.
+where :math:`p` is the probability of a category stored as extraInfo, provided as the 2nd argument, 
+allowed values are same as in :b2:var:`hasHighestProbInCat`.
+The particle is selected after ranking according to a flavor tagging extraInfo, provided as the 3rd argument, 
+allowed values are same as in :b2:var:`hasHighestProbInCat`.
+)DOC", Manager::VariableDataType::c_double);
+
     REGISTER_METAVARIABLE("variableOfTarget(particleListName, inputVariable, rankingExtraInfo)", variableOfTarget, R"DOC(
 [Eventbased][Expert] Returns the value of an input variable provided as the 2nd argument for a particle selected from the given list provided as the 1st argument.
 The particles are ranked according to a flavor tagging extraInfo, provided as the 2nd argument, 

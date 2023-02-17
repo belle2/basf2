@@ -47,6 +47,9 @@ Modules
   ``filenameSuffix`` of `modularAnalysis.variablesToNtuple` to differentiate the output files. The ``filenameSuffix`` is appended to
   the output ROOT file name even if the ``-o`` argument is used.
 * Fixed a bug on `NeutralHadron4MomentumCalculator` that misplaces the neutral hadron daughter's index after calculating its momentum.
+* New function `modularAnalysis.extractParticlesFromROE` and module `ParticleExtractorFromROE` are implemented.
+  The function extracts Particle objects that belong to a ROE and fills them in ParticleLists. It is available in the ``for_each``
+  loop over the ROEs (e.g. ``roe_path``).
 
 Variables
 +++++++++

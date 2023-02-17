@@ -195,6 +195,7 @@ namespace Belle2 {
     bool m_useOnlyMostEnergeticECLCluster;  /**< If true, only the most energetic ECLCluster is used */
 
     DecayDescriptor m_decaydescriptor; /**< Decay descriptor for parsing the user specified DecayString */
+    int m_properties; /**< Particle property to be assigned only on V0s. Flags are defined in Particle::PropertyFlags */
 
     std::vector<std::string> m_decayStrings; /**< Input decay strings specifying the particles being created/loaded */
 

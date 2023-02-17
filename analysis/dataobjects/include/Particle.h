@@ -418,7 +418,7 @@ namespace Belle2 {
      * @param oldDaughter pointer to the daughter that will be removed
      * @param newDaughter pointer to the particle that will be added as a daughter
      */
-    bool replaceDaughter(const Particle* oldDaughter, const Particle* newDaughter);
+    bool replaceDaughter(const Particle* oldDaughter, Particle* newDaughter);
 
     /**
      * Apply replaceDaughter to all Particles in the decay tree by looping recursively through
@@ -426,7 +426,7 @@ namespace Belle2 {
      * @param oldDaughter pointer to the daughter that will be removed
      * @param newDaughter pointer to the particle that will be added as a daughter
      */
-    bool replaceDaughterRecursively(const Particle* oldDaughter, const Particle* newDaughter);
+    bool replaceDaughterRecursively(const Particle* oldDaughter, Particle* newDaughter);
 
     // getters
 
@@ -1000,6 +1000,23 @@ namespace Belle2 {
      */
     void updateJacobiMatrix();
 
+    /**
+     * Fill final state particle daughters into a vector
+     *
+     * Function is called recursively
+     * @param fspDaughters vector of daughter particles
+     */
+    void fillFSPDaughters(std::vector<const Belle2::Particle*>& fspDaughters) const;
+
+    /**
+     * Fill all generations' daughters into a vector
+     *
+     * Function is called recursively
+     * @param allDaughters vector of daughter particles
+     */
+    void fillAllDaughters(std::vector<const Belle2::Particle*>& allDaughters) const;
+
+
   private:
 
     // persistent data members
@@ -1079,20 +1096,6 @@ namespace Belle2 {
      * @param jacobiMatrix 4x6 error matrix
      */
     void storeJacobiMatrix(const TMatrixF& jacobiMatrix);
-    /**
-     * Fill final state particle daughters into a vector
-     *
-     * Function is called recursively
-     * @param fspDaughters vector of daughter particles
-     */
-    void fillFSPDaughters(std::vector<const Belle2::Particle*>& fspDaughters) const;
-    /**
-     * Fill all generations' daughters into a vector
-     *
-     * Function is called recursively
-     * @param allDaughters vector of daughter particles
-     */
-    void fillAllDaughters(std::vector<const Belle2::Particle*>& allDaughters) const;
 
     /**
      * Fill vector with (PDGCode, MdstSource) pairs for the entire decay chain.

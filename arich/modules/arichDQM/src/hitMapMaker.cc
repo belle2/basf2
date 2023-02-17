@@ -29,8 +29,6 @@
 #include <vector>
 #include <fstream>
 
-using namespace std;
-
 namespace Belle2 {
 
   TH2* moduleHitMap(TH1* hitMap, int moduleID)

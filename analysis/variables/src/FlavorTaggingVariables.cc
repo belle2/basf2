@@ -114,7 +114,6 @@ namespace Belle2 {
       static const double P_MAX(3.2);
 
       // Charged tracks
-      //
       const auto& roeTracks = roe->getChargedParticles();
       for (auto& roeChargedParticle : roeTracks) {
         // TODO: Add helix and KVF with IpProfile once available. Port from L163-199 of:
@@ -1686,31 +1685,31 @@ namespace Belle2 {
 
 
     // List of available extrainfos used in QpOf, weightedQpOf and variableOfTarget.
-    std::vector<std::string> availableExtraInfos = {     "isRightTrack(Electron)",             // 0
-                                                         "isRightTrack(IntermediateElectron)", // 1
-                                                         "isRightTrack(Muon)",                 // 2
-                                                         "isRightTrack(IntermediateMuon)",     // 3
-                                                         "isRightTrack(KinLepton)",            // 4
-                                                         "isRightTrack(IntermediateKinLepton)",// 5
-                                                         "isRightTrack(Kaon)",                 // 6
-                                                         "isRightTrack(SlowPion)",             // 7
-                                                         "isRightTrack(FastHadron)",           // 8
-                                                         "isRightTrack(MaximumPstar)",         // 9
-                                                         "isRightTrack(Lambda)",               // 10
-                                                         "isRightCategory(Electron)",             // 11
-                                                         "isRightCategory(IntermediateElectron)", // 12
-                                                         "isRightCategory(Muon)",                 // 13
-                                                         "isRightCategory(IntermediateMuon)",     // 14
-                                                         "isRightCategory(KinLepton)",            // 15
-                                                         "isRightCategory(IntermediateKinLepton)",// 16
-                                                         "isRightCategory(Kaon)",                 // 17
-                                                         "isRightCategory(SlowPion)",             // 18
-                                                         "isRightCategory(FastHadron)",           // 19
-                                                         "isRightCategory(MaximumPstar)",         // 20
-                                                         "isRightCategory(Lambda)",               // 21
-                                                         "isRightCategory(KaonPion)",             // 22
-                                                         "isRightCategory(FSC)",                  // 23
-                                                   };
+    const std::vector<std::string> availableExtraInfos = {"isRightTrack(Electron)",             // 0
+                                                          "isRightTrack(IntermediateElectron)", // 1
+                                                          "isRightTrack(Muon)",                 // 2
+                                                          "isRightTrack(IntermediateMuon)",     // 3
+                                                          "isRightTrack(KinLepton)",            // 4
+                                                          "isRightTrack(IntermediateKinLepton)",// 5
+                                                          "isRightTrack(Kaon)",                 // 6
+                                                          "isRightTrack(SlowPion)",             // 7
+                                                          "isRightTrack(FastHadron)",           // 8
+                                                          "isRightTrack(MaximumPstar)",         // 9
+                                                          "isRightTrack(Lambda)",               // 10
+                                                          "isRightCategory(Electron)",             // 11
+                                                          "isRightCategory(IntermediateElectron)", // 12
+                                                          "isRightCategory(Muon)",                 // 13
+                                                          "isRightCategory(IntermediateMuon)",     // 14
+                                                          "isRightCategory(KinLepton)",            // 15
+                                                          "isRightCategory(IntermediateKinLepton)",// 16
+                                                          "isRightCategory(Kaon)",                 // 17
+                                                          "isRightCategory(SlowPion)",             // 18
+                                                          "isRightCategory(FastHadron)",           // 19
+                                                          "isRightCategory(MaximumPstar)",         // 20
+                                                          "isRightCategory(Lambda)",               // 21
+                                                          "isRightCategory(KaonPion)",             // 22
+                                                          "isRightCategory(FSC)",                  // 23
+                                                         };
 
     Manager::FunctionPtr QpOf(const std::vector<std::string>& arguments)
     {

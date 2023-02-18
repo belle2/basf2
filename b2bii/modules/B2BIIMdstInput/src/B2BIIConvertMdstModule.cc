@@ -1079,7 +1079,7 @@ void B2BIIConvertMdstModule::copyNbarFromGamma()
 {
   StoreObjPtr<ParticleList> plist("anti-n0:mdst");
   plist.create();
-  plist->initialize(-2112, "anti-n0:mdst");
+  plist->initialize(Const::antiNeutron.getPDGCode(), "anti-n0:mdst");
 
   B2DEBUG(99, "Getting gamma:mdst in copyNbarFromGamma");
   StoreObjPtr<ParticleList> plist_gamma("gamma:mdst");

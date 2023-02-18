@@ -39,9 +39,6 @@ add_reconstruction(main)
 for m in main.modules():
     if m.name() == 'CDCDedxPID':
         m.param('enableDebugOutput', True)
-    if m.name() == 'VXDDedxPID':
-        m.param('enableDebugOutput', True)
-        # m.param('usePXD', True)
 
 
 output = basf2.register_module('RootOutput')

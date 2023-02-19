@@ -372,7 +372,7 @@ double TrackIsoCalculatorModule::getWeightedSumNonIsoLayers(const Particle* iPar
 {
 
   auto det = this->getDetEnum(detName);
-  auto nLayers = m_detToLayers.at(detName).size();
+  auto nLayers = DetectorSurface::detToLayers.at(detName).size();
 
   unsigned int n(0);
   for (const auto& iLayer : DetectorSurface::detToLayers.at(detName)) {
@@ -412,7 +412,7 @@ double TrackIsoCalculatorModule::getWeightedSumInvDists(const Particle* iParticl
   auto det = this->getDetEnum(detName);
 
   double sumInvDists(0.);
-  for (const auto& iLayer : m_detToLayers.at(detName)) {
+  for (const auto& iLayer : DetectorSurface::detToLayers.at(detName)) {
 
     auto iDetLayer = detName + std::to_string(iLayer);
     auto distVar = m_detLayerToDistVariable.at(iDetLayer);

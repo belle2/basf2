@@ -96,7 +96,7 @@ void ParticleExtractorFromROEModule::initialize()
 
 void ParticleExtractorFromROEModule::event()
 {
-  for (int iList = 0; iList < m_outputListNames.size(); iList++) {
+  for (size_t iList = 0; iList < m_outputListNames.size(); iList++) {
 
     const std::string listName = m_outputListNames[iList];
     const std::string antiListName = m_outputAntiListNames[iList];

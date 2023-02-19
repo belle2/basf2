@@ -1185,36 +1185,39 @@ namespace Belle2 {
     }
 
     VARIABLE_GROUP("Kinematics");
-    REGISTER_VARIABLE("p", particleP, "momentum magnitude", "GeV/c");
-    REGISTER_VARIABLE("E", particleE, "energy", "GeV");
+    REGISTER_VARIABLE("p", particleP, "momentum magnitude\n\n", "GeV/c");
+    REGISTER_VARIABLE("E", particleE, "energy\n\n", "GeV");
 
-    REGISTER_VARIABLE("E_uncertainty", particleEUncertainty, R"DOC(energy uncertainty (:math:`\sqrt{\sigma^2}`))DOC", "GeV");
+    REGISTER_VARIABLE("E_uncertainty", particleEUncertainty, R"DOC(
+                      energy uncertainty (:math:`\sqrt{\sigma^2}`)
+
+                      )DOC", "GeV");
     REGISTER_VARIABLE("ECLClusterE_uncertainty", particleClusterEUncertainty,
-                      "energy uncertainty as given by the underlying ECL cluster", "GeV");
-    REGISTER_VARIABLE("px", particlePx, "momentum component x", "GeV/c");
-    REGISTER_VARIABLE("py", particlePy, "momentum component y", "GeV/c");
-    REGISTER_VARIABLE("pz", particlePz, "momentum component z", "GeV/c");
-    REGISTER_VARIABLE("pt", particlePt, "transverse momentum", "GeV/c");
+                      "energy uncertainty as given by the underlying ECL cluster\n\n", "GeV");
+    REGISTER_VARIABLE("px", particlePx, "momentum component x\n\n", "GeV/c");
+    REGISTER_VARIABLE("py", particlePy, "momentum component y\n\n", "GeV/c");
+    REGISTER_VARIABLE("pz", particlePz, "momentum component z\n\n", "GeV/c");
+    REGISTER_VARIABLE("pt", particlePt, "transverse momentum\n\n", "GeV/c");
     REGISTER_VARIABLE("xp", particleXp,
                       "scaled momentum: the momentum of the particle in the CMS as a fraction of its maximum available momentum in the collision");
-    REGISTER_VARIABLE("pErr", particlePErr, "error of momentum magnitude", "GeV/c");
-    REGISTER_VARIABLE("pxErr", particlePxErr, "error of momentum component x", "GeV/c");
-    REGISTER_VARIABLE("pyErr", particlePyErr, "error of momentum component y", "GeV/c");
-    REGISTER_VARIABLE("pzErr", particlePzErr, "error of momentum component z", "GeV/c");
-    REGISTER_VARIABLE("ptErr", particlePtErr, "error of transverse momentum", "GeV/c");
+    REGISTER_VARIABLE("pErr", particlePErr, "error of momentum magnitude\n\n", "GeV/c");
+    REGISTER_VARIABLE("pxErr", particlePxErr, "error of momentum component x\n\n", "GeV/c");
+    REGISTER_VARIABLE("pyErr", particlePyErr, "error of momentum component y\n\n", "GeV/c");
+    REGISTER_VARIABLE("pzErr", particlePzErr, "error of momentum component z\n\n", "GeV/c");
+    REGISTER_VARIABLE("ptErr", particlePtErr, "error of transverse momentum\n\n", "GeV/c");
     REGISTER_VARIABLE("momVertCovM(i,j)", covMatrixElement,
                       "returns the (i,j)-th element of the MomentumVertex Covariance Matrix (7x7).\n"
-                      "Order of elements in the covariance matrix is: px, py, pz, E, x, y, z.", "GeV/c, GeV/c, GeV/c, GeV, cm, cm, cm");
+                      "Order of elements in the covariance matrix is: px, py, pz, E, x, y, z.\n\n", "GeV/c, GeV/c, GeV/c, GeV, cm, cm, cm");
     REGISTER_VARIABLE("momDevChi2", momentumDeviationChi2, R"DOC(
 momentum deviation :math:`\chi^2` value calculated as :math:`\chi^2 = \sum_i (p_i - mc(p_i))^2/\sigma(p_i)^2`,
 where :math:`\sum` runs over i = px, py, pz and :math:`mc(p_i)` is the mc truth value and :math:`\sigma(p_i)` is the estimated error of i-th component of momentum vector
 )DOC");
-    REGISTER_VARIABLE("theta", particleTheta, "polar angle", "rad");
-    REGISTER_VARIABLE("thetaErr", particleThetaErr, "error of polar angle", "rad");
+    REGISTER_VARIABLE("theta", particleTheta, "polar angle\n\n", "rad");
+    REGISTER_VARIABLE("thetaErr", particleThetaErr, "error of polar angle\n\n", "rad");
     REGISTER_VARIABLE("cosTheta", particleCosTheta, "momentum cosine of polar angle");
     REGISTER_VARIABLE("cosThetaErr", particleCosThetaErr, "error of momentum cosine of polar angle");
-    REGISTER_VARIABLE("phi", particlePhi, "momentum azimuthal angle", "rad");
-    REGISTER_VARIABLE("phiErr", particlePhiErr, "error of momentum azimuthal angle", "rad");
+    REGISTER_VARIABLE("phi", particlePhi, "momentum azimuthal angle\n\n", "rad");
+    REGISTER_VARIABLE("phiErr", particlePhiErr, "error of momentum azimuthal angle\n\n", "rad");
     REGISTER_VARIABLE("PDG", particlePDGCode, "PDG code");
     REGISTER_VARIABLE("cosAngleBetweenMomentumAndVertexVectorInXYPlane",
                       cosAngleBetweenMomentumAndVertexVectorInXYPlane,
@@ -1228,90 +1231,101 @@ where :math:`\sum` runs over i = px, py, pz and :math:`mc(p_i)` is the mc truth 
     REGISTER_VARIABLE("cosToThrustOfEvent", cosToThrustOfEvent,
                       "Returns the cosine of the angle between the particle and the thrust axis of the event, as calculate by the EventShapeCalculator module. buildEventShape() must be run before calling this variable");
 
-    REGISTER_VARIABLE("ImpactXY"  , ImpactXY , "The impact parameter of the given particle in the xy plane", "cm");
+    REGISTER_VARIABLE("ImpactXY"  , ImpactXY , "The impact parameter of the given particle in the xy plane\n\n", "cm");
 
     REGISTER_VARIABLE("M", particleMass, R"DOC(
 The particle's mass.
 
-Note that this is context-dependent variable and can take different values depending on the situation. This should be the "best" value possible with the information provided.
+Note that this is context-dependent variable and can take different values depending on the situation. This should be the "best"
+value possible with the information provided.
 
 - If this particle is track- or cluster- based, then this is the value of the mass hypothesis.
 - If this particle is an MC particle then this is the mass of that particle.
 - If this particle is composite, then *initially* this takes the value of the invariant mass of the daughters.
 - If this particle is composite and a *mass or vertex fit* has been performed then this may be updated by the fit.
 
-  * You will see a difference between this mass and the :b2:var:`InvM`.
-  )DOC", "GeV/:math:`\\text{c}^2`");
-    REGISTER_VARIABLE("dM", particleDMass, "mass minus nominal mass", "GeV/:math:`\\text{c}^2`");
-    REGISTER_VARIABLE("Q", particleQ, "energy released in decay", "GeV");
-    REGISTER_VARIABLE("dQ", particleDQ, ":b2:var:`Q` minus nominal energy released in decay", "GeV");
-    REGISTER_VARIABLE("Mbc", particleMbc, "beam constrained mass", "GeV/:math:`\\text{c}^2`");
-    REGISTER_VARIABLE("deltaE", particleDeltaE, "difference between :b2:var:`E` and half the center of mass energy", "GeV");
-    REGISTER_VARIABLE("M2", particleMassSquared, "The particle's mass squared.", ":math:`[\\text{GeV}/\\text{c}^2]^2`");
+* You will see a difference between this mass and the :b2:var:`InvM`.
+
+)DOC", "GeV/:math:`\\text{c}^2`");
+    REGISTER_VARIABLE("dM", particleDMass, "mass minus nominal mass\n\n", "GeV/:math:`\\text{c}^2`");
+    REGISTER_VARIABLE("Q", particleQ, "energy released in decay\n\n", "GeV");
+    REGISTER_VARIABLE("dQ", particleDQ, ":b2:var:`Q` minus nominal energy released in decay\n\n", "GeV");
+    REGISTER_VARIABLE("Mbc", particleMbc, "beam constrained mass\n\n", "GeV/:math:`\\text{c}^2`");
+    REGISTER_VARIABLE("deltaE", particleDeltaE, "difference between :b2:var:`E` and half the center of mass energy\n\n", "GeV");
+    REGISTER_VARIABLE("M2", particleMassSquared, "The particle's mass squared.\n\n", ":math:`[\\text{GeV}/\\text{c}^2]^2`");
 
     REGISTER_VARIABLE("InvM", particleInvariantMassFromDaughtersDisplaced,
                       "invariant mass (determined from particle's daughter 4-momentum vectors). If this particle is V0 or decays at rho > 5 mm, its daughter 4-momentum vectors at fitted vertex are taken.\n"
-                      "If this particle has no daughters, defaults to :b2:var:`M`.", "GeV/:math:`\\text{c}^2`");
+                      "If this particle has no daughters, defaults to :b2:var:`M`.\n\n", "GeV/:math:`\\text{c}^2`");
     REGISTER_VARIABLE("InvMLambda", particleInvariantMassLambda,
                       "Invariant mass (determined from particle's daughter 4-momentum vectors), assuming the first daughter is a pion and the second daughter is a proton.\n"
-                      "If the particle has not 2 daughters, it returns just the mass value.", "GeV/:math:`\\text{c}^2`");
+                      "If the particle has not 2 daughters, it returns just the mass value.\n\n", "GeV/:math:`\\text{c}^2`");
 
     REGISTER_VARIABLE("ErrM", particleInvariantMassError,
-                      "uncertainty of invariant mass", "GeV/:math:`\\text{c}^2`");
+                      "uncertainty of invariant mass\n\n", "GeV/:math:`\\text{c}^2`");
     REGISTER_VARIABLE("SigM", particleInvariantMassSignificance,
                       "signed deviation of particle's invariant mass from its nominal mass in units of the uncertainty on the invariant mass (:b2:var:`dM`/:b2:var:`ErrM`)");
 
     REGISTER_VARIABLE("pxRecoil", recoilPx,
-                      "component x of 3-momentum recoiling against given Particle", "GeV/c");
+                      "component x of 3-momentum recoiling against given Particle\n\n", "GeV/c");
     REGISTER_VARIABLE("pyRecoil", recoilPy,
-                      "component y of 3-momentum recoiling against given Particle", "GeV/c");
+                      "component y of 3-momentum recoiling against given Particle\n\n", "GeV/c");
     REGISTER_VARIABLE("pzRecoil", recoilPz,
-                      "component z of 3-momentum recoiling against given Particle", "GeV/c");
+                      "component z of 3-momentum recoiling against given Particle\n\n", "GeV/c");
 
     REGISTER_VARIABLE("pRecoil", recoilMomentum,
-                      "magnitude of 3 - momentum recoiling against given Particle", "GeV/c");
+                      "magnitude of 3 - momentum recoiling against given Particle\n\n", "GeV/c");
     REGISTER_VARIABLE("pRecoilTheta", recoilMomentumTheta,
-                      "Polar angle of a particle's missing momentum", "rad");
+                      "Polar angle of a particle's missing momentum\n\n", "rad");
     REGISTER_VARIABLE("pRecoilPhi", recoilMomentumPhi,
-                      "Azimuthal angle of a particle's missing momentum", "rad");
+                      "Azimuthal angle of a particle's missing momentum\n\n", "rad");
     REGISTER_VARIABLE("eRecoil", recoilEnergy,
-                      "energy recoiling against given Particle", "GeV");
+                      "energy recoiling against given Particle\n\n", "GeV");
     REGISTER_VARIABLE("mRecoil", recoilMass,
-                      "Invariant mass of the system recoiling against given Particle", "GeV/:math:`\\text{c}^2`");
+                      "Invariant mass of the system recoiling against given Particle\n\n", "GeV/:math:`\\text{c}^2`");
     REGISTER_VARIABLE("m2Recoil", recoilMassSquared,
-                      "invariant mass squared of the system recoiling against given Particle", ":math:`[\\text{GeV}/\\text{c}^2]^2`");
-    REGISTER_VARIABLE("m2RecoilSignalSide", m2RecoilSignalSide,
-                      "Squared recoil mass of the signal side which is calculated in the CMS frame under the assumption that the signal and tag side are produced back to back and the tag side energy equals the beam energy. The variable must be applied to the Upsilon and the tag side must be the first, the signal side the second daughter",
-                      ":math:`[\\text{GeV}/\\text{c}^2]^2`");
+                      "invariant mass squared of the system recoiling against given Particle\n\n", ":math:`[\\text{GeV}/\\text{c}^2]^2`");
+    REGISTER_VARIABLE("m2RecoilSignalSide", m2RecoilSignalSide, R"DOC(
+                       Squared recoil mass of the signal side which is calculated in the CMS frame under the assumption that the
+                       signal and tag side are produced back to back and the tag side energy equals the beam energy. The variable
+                       must be applied to the Upsilon and the tag side must be the first, the signal side the second daughter
+
+                       )DOC", ":math:`[\\text{GeV}/\\text{c}^2]^2`");
 
     REGISTER_VARIABLE("b2bTheta", b2bTheta,
-                      "Polar angle in the lab system that is back-to-back to the particle in the CMS. Useful for low multiplicity studies.", "rad");
+                      "Polar angle in the lab system that is back-to-back to the particle in the CMS. Useful for low multiplicity studies.\n\n", "rad");
     REGISTER_VARIABLE("b2bPhi", b2bPhi,
-                      "Azimuthal angle in the lab system that is back-to-back to the particle in the CMS. Useful for low multiplicity studies.", "rad");
+                      "Azimuthal angle in the lab system that is back-to-back to the particle in the CMS. Useful for low multiplicity studies.\n\n",
+                      "rad");
     REGISTER_VARIABLE("b2bClusterTheta", b2bClusterTheta,
-                      "Polar angle in the lab system that is back-to-back to the particle's associated ECLCluster in the CMS. Returns NAN if no cluster is found. Useful for low multiplicity studies.",
+                      "Polar angle in the lab system that is back-to-back to the particle's associated ECLCluster in the CMS. Returns NAN if no cluster is found. Useful for low multiplicity studies.\n\n",
                       "rad");
     REGISTER_VARIABLE("b2bClusterPhi", b2bClusterPhi,
-                      "Azimuthal angle in the lab system that is back-to-back to the particle's associated ECLCluster in the CMS. Returns NAN if no cluster is found. Useful for low multiplicity studies.",
+                      "Azimuthal angle in the lab system that is back-to-back to the particle's associated ECLCluster in the CMS. Returns NAN if no cluster is found. Useful for low multiplicity studies.\n\n",
                       "rad");
     REGISTER_VARIABLE("ArmenterosLongitudinalMomentumAsymmetry", ArmenterosLongitudinalMomentumAsymmetry,
                       "Longitudinal momentum asymmetry of V0's daughters.\n"
                       "The mother (V0) is required to have exactly two daughters");
-    REGISTER_VARIABLE("ArmenterosDaughter1Qt", ArmenterosDaughter1Qt,
-                      "Transverse momentum of the first daughter with respect to the V0 mother.\n"
-                      "The mother is required to have exactly two daughters", "GeV/c");
-    REGISTER_VARIABLE("ArmenterosDaughter2Qt", ArmenterosDaughter2Qt,
-                      "Transverse momentum of the second daughter with respect to the V0 mother.\n"
-                      "The mother is required to have exactly two daughters", "GeV/c");
+    REGISTER_VARIABLE("ArmenterosDaughter1Qt", ArmenterosDaughter1Qt, R"DOC(
+                       Transverse momentum of the first daughter with respect to the V0 mother.
+                       The mother is required to have exactly two daughters
+
+                       )DOC", "GeV/c");
+    REGISTER_VARIABLE("ArmenterosDaughter2Qt", ArmenterosDaughter2Qt, R"DOC(
+                       Transverse momentum of the second daughter with respect to the V0 mother.
+                       The mother is required to have exactly two daughters
+
+                       )DOC", "GeV/c");
 
     VARIABLE_GROUP("Miscellaneous");
     REGISTER_VARIABLE("nRemainingTracksInEvent",  nRemainingTracksInEvent,
                       "Number of tracks in the event - Number of tracks( = charged FSPs) of particle.");
     REGISTER_VARIABLE("trackMatchType", trackMatchType, R"DOC(
 
-                      * -1 particle has no ECL cluster
-                      *  0 particle has no associated track
-                      *  1 there is a matched track called connected - region(CR) track match
+* -1 particle has no ECL cluster
+*  0 particle has no associated track
+*  1 there is a matched track called connected - region(CR) track match
+
                       )DOC");
     MAKE_DEPRECATED("trackMatchType", true, "light-2012-minos", R"DOC(
                      Use better variables like `trackNECLClusters`, `clusterTrackMatch`, and `nECLClusterTrackMatches`.)DOC");
@@ -1323,7 +1337,7 @@ Note that this is context-dependent variable and can take different values depen
     REGISTER_VARIABLE("printParticle", printParticle,
                       "For debugging, print Particle and daughter PDG codes, plus MC match. Returns 0.");
     REGISTER_VARIABLE("mcMomTransfer2", particleMCMomentumTransfer2,
-                      "Return the true momentum transfer to lepton pair in a B(semi -) leptonic B meson decay.", "GeV/c");
+                      "Return the true momentum transfer to lepton pair in a B(semi -) leptonic B meson decay.\n\n", "GeV/c");
     REGISTER_VARIABLE("False", False,
                       "returns always 0, used for testing and debugging.");
     REGISTER_VARIABLE("True", True,

@@ -296,7 +296,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'basf2.tex', 'Belle 2 Software Documentation',
+    (master_doc, 'basf2.tex', 'Belle II Software Documentation',
      author, 'manual'),
 ]
 

@@ -19,7 +19,7 @@
 #pragma link C++ class Belle2::ECLHit+; // checksum=0xc5a4962f, version=4
 #pragma link C++ class Belle2::ECLDebugHit+; // checksum=0xbe219607, version=1
 #pragma link C++ class Belle2::ECLHitAssignment+; // checksum=0x2bf88ae8, version=1
-#pragma link C++ class Belle2::ECLShower+; // checksum=0x43d87cb1, version=16
+#pragma link C++ class Belle2::ECLShower+; // checksum=0x16a46f92, version=17
 #pragma link C++ class Belle2::ECLPidLikelihood+; // checksum=0x25e90278, version=3
 #pragma link C++ class Belle2::ECLCNNPid+; // checksum=0x9cef66b7, version=1
 

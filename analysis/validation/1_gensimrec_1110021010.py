@@ -26,14 +26,14 @@ from reconstruction import add_reconstruction
 from mdst import add_mdst_output
 
 DECAY_MODE_ID = 1110021010
-OUTPUT_FILENAME = "../%i.dst.root" % DECAY_MODE_ID
+OUTPUT_FILENAME = f"../{DECAY_MODE_ID}.dst.root"
 
 basf2.set_random_seed(12345)  # for reproducibility
 main = basf2.Path()
 main.add_module('EventInfoSetter', evtNumList=[1000])
 add_evtgen_generator(
     main, 'signal',
-    basf2.find_file('decfiles/dec/1110021010.dec')
+    basf2.find_file(f'decfiles/dec/{DECAY_MODE_ID}.dec')
 )                        # signal event generation
 add_simulation(main)     # detector simulation without background overlay
 add_reconstruction(main)  # reconstruction

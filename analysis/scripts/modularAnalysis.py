@@ -822,7 +822,7 @@ def fillSignalSideParticleList(outputListName, decayString, path):
 
 
 def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFitHypothesis=False,
-                      loadPhotonsFromKLM=False, loadPhotonBeamBackgroundMVA=False, loadPhotonHadronicSplitOffMVA=False):
+                      loadPhotonsFromKLM=False):
     """
     Creates Particles of the desired types from the corresponding ``mdst`` dataobjects,
     loads them to the ``StoreArray<Particle>`` and fills the ParticleLists.
@@ -894,8 +894,6 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFi
                                      in terms of mass difference will be used if the fit using exact particle
                                      type is not available.
         loadPhotonsFromKLM (bool):   If true, photon candidates will be created from KLMClusters as well.
-        loadPhotonBeamBackgroundMVA (bool):    If true, photon candidates will be assigned a beam background probability.
-        loadPhotonHadronicSplitOffMVA (bool):  If true, photon candidates will be assigned a hadronic splitoff probability.
     """
 
     pload = register_module('ParticleLoader')
@@ -932,19 +930,9 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFi
             if not loadPhotonsFromKLM:
                 applyCuts(decayString, 'isFromECL', path)
 
-            # if the user asked for the beam background MVA to be added, then also provide this
-            # (populates the variable named beamBackgroundSuppression)
-            if loadPhotonBeamBackgroundMVA:
-                getBeamBackgroundProbability(decayString, path)
-
-            # if the user asked for the hadronic splitoff MVA to be added, then also provide this
-            # (populates the variable named hadronicSplitOffSuppression)
-            if loadPhotonHadronicSplitOffMVA:
-                getHadronicSplitOffProbability(decayString, path)
-
 
 def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypothesis=False,
-                     loadPhotonsFromKLM=False, loadPhotonBeamBackgroundMVA=False, loadPhotonHadronicSplitOffMVA=False):
+                     loadPhotonsFromKLM=False):
     """
     Creates Particles of the desired type from the corresponding ``mdst`` dataobjects,
     loads them to the StoreArray<Particle> and fills the ParticleList.
@@ -999,8 +987,6 @@ def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypo
                                      in terms of mass difference will be used if the fit using exact particle
                                      type is not available.
         loadPhotonsFromKLM (bool):   If true, photon candidates will be created from KLMClusters as well.
-        loadPhotonBeamBackgroundMVA (bool):    If true, photon candidates will be assigned a beam background probability.
-        loadPhotonHadronicSplitOffMVA (bool):  If true, photon candidates will be assigned a hadronic splitoff probability.
     """
 
     pload = register_module('ParticleLoader')
@@ -1035,16 +1021,6 @@ def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypo
         # but the user has to explicitly request them.
         if not loadPhotonsFromKLM:
             applyCuts(decayString, 'isFromECL', path)
-
-        # if the user asked for the beam background MVA to be added, then also provide this
-        # (populates the variable named beamBackgroundProbability)
-        if loadPhotonBeamBackgroundMVA:
-            getBeamBackgroundProbability(decayString, path)
-
-        # if the user asked for the hadronic splitoff MVA to be added, then also provide this
-        # (populates the variable named hadronicSplitOffSuppression)
-        if loadPhotonHadronicSplitOffMVA:
-            getHadronicSplitOffProbability(decayString, path)
 
 
 def fillParticleListWithTrackHypothesis(decayString,
@@ -1311,6 +1287,48 @@ def fillParticleListsFromMC(decayStringsWithCuts,
         # apply a cut if a non-empty cut string is provided
         if cut != "":
             applyCuts(decayString, cut, path)
+
+
+def extractParticlesFromROE(particleLists,
+                            maskName='all',
+                            writeOut=False,
+                            path=None):
+    """
+    Extract Particle objects that belong to the Rest-Of-Events and fill them into the ParticleLists.
+    This function has to be used only in the for_each loops over ROE.
+    The types of the particles other than those specified by ``particleLists`` are not stored.
+    If one creates a ROE with ``fillWithMostLikely=True`` via `buildRestOfEvent`, for example,
+    one should create particleLists for not only ``pi+``, ``gamma``, ``K_L0`` but also other charged final state particles.
+
+    .. code-block:: python
+
+        buildRestOfEvent('B0:sig', fillWithMostLikely=True, path=mypath)
+
+        roe_path = create_path()
+        deadEndPath = create_path()
+        signalSideParticleFilter('B0:sig', '', roe_path, deadEndPath)
+
+        plists = ['%s:in_roe' % ptype for ptype in ['pi+', 'gamma', 'K_L0', 'K+', 'p+', 'e+', 'mu+']]
+        extractParticlesFromROE(plists, maskName='all', path=roe_path)
+
+        mypath.for_each('RestOfEvent', 'RestOfEvents', roe_path)
+
+
+    @param particleLists (str or list(str)) Name of output ParticleLists
+    @param maskName (str)                   Name of the ROE mask to be applied on Particles
+    @param writeOut (bool)                  whether RootOutput module should save the created ParticleList
+    @param path (basf2.Path)                modules are added to this path
+    """
+
+    if isinstance(particleLists, str):
+        particleLists = [particleLists]
+
+    pext = register_module('ParticleExtractorFromROE')
+    pext.set_name('ParticleExtractorFromROE_' + '_'.join(particleLists))
+    pext.param('outputListNames', particleLists)
+    pext.param('maskName', maskName)
+    pext.param('writeOut', writeOut)
+    path.add_module(pext)
 
 
 def applyCuts(list_name, cut, path):
@@ -1914,7 +1932,7 @@ def printList(list_name, full, path):
 
 
 def variablesToNtuple(decayString, variables, treename='variables', filename='ntuple.root', path=None, basketsize=1600,
-                      signalSideParticleList=""):
+                      signalSideParticleList="", filenameSuffix=""):
     """
     Creates and fills a flat ntuple with the specified variables from the VariableManager.
     If a decayString is provided, then there will be one entry per candidate (for particle in list of candidates).
@@ -1929,6 +1947,9 @@ def variablesToNtuple(decayString, variables, treename='variables', filename='nt
         basketsize (int): size of baskets in the output ntuple in bytes
         signalSideParticleList (str): The name of the signal-side ParticleList.
                                       Only valid if the module is called in a for_each loop over the RestOfEvent.
+        filenameSuffix (str): suffix to be appended to the filename before ``.root``.
+
+    .. tip:: The output filename can be overridden using the ``-o`` argument of basf2.
     """
 
     output = register_module('VariablesToNtuple')
@@ -1939,6 +1960,7 @@ def variablesToNtuple(decayString, variables, treename='variables', filename='nt
     output.param('treeName', treename)
     output.param('basketSize', basketsize)
     output.param('signalSideParticleList', signalSideParticleList)
+    output.param('fileNameSuffix', filenameSuffix)
     path.add_module(output)
 
 
@@ -1948,7 +1970,8 @@ def variablesToHistogram(decayString,
                          filename='ntuple.root',
                          path=None, *,
                          directory=None,
-                         prefixDecayString=False):
+                         prefixDecayString=False,
+                         filenameSuffix=""):
     """
     Creates and fills a flat ntuple with the specified variables from the VariableManager
 
@@ -1962,6 +1985,9 @@ def variablesToHistogram(decayString,
             Useful if you want to have different histograms in the same file to separate them.
         prefixDecayString (bool): If True the decayString will be prepended to the directory name to allow for more
             programmatic naming of the structure in the file.
+        filenameSuffix (str): suffix to be appended to the filename before ``.root``.
+
+    .. tip:: The output filename can be overridden using the ``-o`` argument of basf2.
     """
 
     if variables_2d is None:
@@ -1972,6 +1998,7 @@ def variablesToHistogram(decayString,
     output.param('variables', variables)
     output.param('variables_2d', variables_2d)
     output.param('fileName', filename)
+    output.param('fileNameSuffix', filenameSuffix)
     if directory is not None or prefixDecayString:
         if directory is None:
             directory = ""
@@ -3170,23 +3197,28 @@ def lowEnergyPi0Identification(pi0List, gammaList, payloadNameSuffix,
                                path=None):
     """
     Calculate low-energy pi0 identification.
-    The result is stored as ExtraInfo ``lowEnergyPi0Identification``.
+    The result is stored as ExtraInfo ``lowEnergyPi0Identification`` for
+    the list pi0List.
 
-    @param pi0List              Pi0 list.
-    @param gammaList            Gamma list. First, an energy cut E > 0.2 is applied
-                                to the photons from this list. Then, all possible combinations with a pi0
-                                daughter photon are formed except the one corresponding to
-                                the reconstructed pi0. The maximum low-energy pi0 veto value is calculated
-                                for such photon pairs and used as one of the input variables for
-                                the identification classifier.
-    @param payloadNameSuffix    Payload name suffix. The weight payloads are stored in
-                                the analysis global tag and have the following names:\n
-                                  * ``'LowEnergyPi0Veto' + payloadNameSuffix``
-                                  * ``'LowEnergyPi0Identification' + payloadNameSuffix``\n
-                                The possible suffixes are:\n
-                                  * ``'Belle1'`` for Belle data.
-                                  * ``'Belle2Release5'`` for Belle II release 5 data (MC14, proc12, buckets 16 - 25).\n
-    @param path                 Module path.
+    Parameters:
+        pi0List (str): Pi0 list.
+
+        gammaList (str): Gamma list. First, an energy cut E > 0.2 is applied to the photons from this list.
+                         Then, all possible combinations with a pi0 daughter photon are formed except the one
+                         corresponding to the reconstructed pi0.
+                         The maximum low-energy pi0 veto value is calculated for such photon pairs
+                         and used as one of the input variables for the identification classifier.
+
+        payloadNameSuffix (str): Payload name suffix. The weight payloads are stored in the analysis global
+                                 tag and have the following names:\n
+                                 * ``'LowEnergyPi0Veto' + payloadNameSuffix``
+                                 * ``'LowEnergyPi0Identification' + payloadNameSuffix``\n
+                                 The possible suffixes are:\n
+                                 * ``'Belle1'`` for Belle data.
+                                 * ``'Belle2Release5'`` for Belle II release 5 data (MC14, proc12, buckets 16 - 25).
+                                 * ``'Belle2Release6'`` for Belle II release 6 data (MC15, proc13, buckets 26 - 36).
+
+        path (basf2.Path): Module path.
     """
 
     import b2bii
@@ -3208,40 +3240,42 @@ def lowEnergyPi0Identification(pi0List, gammaList, payloadNameSuffix,
                     Belle1=b2bii.isB2BII())
 
 
-def getBeamBackgroundProbability(particleList, path=None):
+def getBeamBackgroundProbability(particleList, weight, path=None):
     """
     Assign a probability to each ECL cluster as being signal like (1) compared to beam background like (0)
-    @param particleList     The input ParticleList, must be a photon list
-    @param path       modules are added to this path
+    @param particleList    the input ParticleList, must be a photon list
+    @param weight    type of weight file to use
+    @param path    modules are added to this path
     """
 
     import b2bii
     if b2bii.isB2BII():
-        B2ERROR("The beam background probability is not trained for Belle data.")
+        B2ERROR("The beam background MVA is not trained for Belle data.")
 
     basf2.conditions.prepend_globaltag(getAnalysisGlobaltag())
     path.add_module('MVAExpert',
                     listNames=particleList,
                     extraInfoName='beamBackgroundSuppression',
-                    identifier='BeamBackgroundMVA')
+                    identifier=f'BeamBackgroundMVA_{weight}')
 
 
-def getHadronicSplitOffProbability(particleList, path=None,):
+def getFakePhotonProbability(particleList, weight, path=None):
     """
-    Assign a probability to each ECL cluster as being signal like (1) compared to hadronic splitoff like (0)
-    @param particleList     The input ParticleList, must be a photon list
-    @param path       modules are added to this path
+    Assign a probability to each ECL cluster as being signal like (1) compared to fake photon like (0)
+    @param particleList    the input ParticleList, must be a photon list
+    @param weight    type of weight file to use
+    @param path    modules are added to this path
     """
 
     import b2bii
     if b2bii.isB2BII():
-        B2ERROR("The hadronic splitoff probability is not trained for Belle data.")
+        B2ERROR("The fake photon MVA is not trained for Belle data.")
 
     basf2.conditions.prepend_globaltag(getAnalysisGlobaltag())
     path.add_module('MVAExpert',
                     listNames=particleList,
-                    extraInfoName='hadronicSplitOffSuppression',
-                    identifier='HadronicSplitOffMVA')
+                    extraInfoName='fakePhotonSuppression',
+                    identifier=f'FakePhotonMVA_{weight}')
 
 
 def buildEventKinematics(inputListNames=None, default_cleanup=True, custom_cuts=None,
@@ -3289,7 +3323,7 @@ def buildEventKinematics(inputListNames=None, default_cleanup=True, custom_cuts=
         if b2bii.isB2BII():
             copyList('gamma:evtkin', 'gamma:mdst', path=path)
         else:
-            fillParticleList('gamma:evtkin', '', loadPhotonBeamBackgroundMVA=False, loadPhotonHadronicSplitOffMVA=False, path=path)
+            fillParticleList('gamma:evtkin', '', path=path)
         inputListNames += ['gamma:evtkin']
         if default_cleanup:
             B2INFO("Using default cleanup in EventKinematics module.")
@@ -3302,9 +3336,9 @@ def buildEventKinematics(inputListNames=None, default_cleanup=True, custom_cuts=
         B2INFO("Creating particle lists pi+:evtkin and gamma:evtkin to get the global kinematics of the event.")
         fillParticleList('pi+:evtkin', '', path=path)
         if b2bii.isB2BII():
-            copyList('gamma:evtshape', 'gamma:mdst', path=path)
+            copyList('gamma:evtkin', 'gamma:mdst', path=path)
         else:
-            fillParticleList('gamma:evtkin', '', loadPhotonBeamBackgroundMVA=False, loadPhotonHadronicSplitOffMVA=False, path=path)
+            fillParticleList('gamma:evtkin', '', path=path)
         particleLists = ['pi+:evtkin', 'gamma:evtkin']
         if default_cleanup:
             if (custom_cuts is not None):
@@ -3443,8 +3477,6 @@ def buildEventShape(inputListNames=None,
             fillParticleList(
                 'gamma:evtshape',
                 '',
-                loadPhotonBeamBackgroundMVA=False,
-                loadPhotonHadronicSplitOffMVA=False,
                 path=path)
         particleLists = ['pi+:evtshape', 'gamma:evtshape']
 
@@ -4002,6 +4034,26 @@ def scaleError(outputListName, inputListName,
     scale_error.param('d0MomentumThreshold', d0MomThr)
     scale_error.param('z0MomentumThreshold', z0MomThr)
     path.add_module(scale_error)
+
+
+def estimateAndAttachTrackFitResult(inputListName, path=None):
+    """
+    Create a TrackFitResult from the momentum of the Particle assuming it originates from the IP and make a relation between them.
+    The covariance, detector hit information, and fit-related information (pValue, NDF) are assigned meaningless values. The input
+    Particles must not have already Track or TrackFitResult and thus are supposed to be composite particles, recoil, dummy
+    particles, and so on.
+
+
+    .. warning:: Since the source type is not overwritten as Track, not all track-related variables are guaranteed to be available.
+
+
+    @param inputListName Name of input ParticleList
+    """
+
+    estimator = register_module("TrackFitResultEstimator")
+    estimator.set_name("trackFitResultEstimator_" + inputListName)
+    estimator.param("inputListName", inputListName)
+    path.add_module(estimator)
 
 
 def correctEnergyBias(inputListNames, tableName, path=None):

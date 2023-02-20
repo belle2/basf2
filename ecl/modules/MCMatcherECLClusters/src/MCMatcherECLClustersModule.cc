@@ -141,12 +141,11 @@ void MCMatcherECLClustersModule::event()
 
   // reuse Index
   std::fill_n(Index, 8736, -1);
-  const TClonesArray* ed = m_eclDigits.getPtr();
-  TObject** oed = ed->GetObjectRef();
-  for (int i = 0, imax = ed->GetEntries(); i < imax; i++) { // avoiding call of StoreArray::getArrayIndex() member function
-    const ECLDigit& t = static_cast<const ECLDigit&>(*oed[i]);
-    if (t.getAmp() <= 0) continue;
-    Index[t.getCellId() - 1] = i;
+  k = 0;
+  for (const ECLDigit& eclDigit : m_eclDigits) {
+    if (eclDigit.getAmp() <= 0) continue;
+    Index[eclDigit.getCellId() - 1] = k;
+    ++k;
   }
 
   const RelationArray& p2eh = m_mcParticleToECLHitRelationArray;

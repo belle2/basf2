@@ -1,5 +1,5 @@
 # EventType: 1110040002
-# Descriptor: [B0 -> (rho0 -> pi+ pi-) (rho0 -> pi+ pi-) ]cc f_L=0
+# Descriptor: [B0 -> (rho0 -> pi+ pi-) (rho0 -> pi+ pi-) ]cc f_L=1
 # NickName: Bd_rho0rho0
 # Documentation:    Decay mode for phi2/alpha and rediscoveries, longitdudinal polarization only
 # Reponsible: J. Skorupa

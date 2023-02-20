@@ -1,6 +1,6 @@
 # EventType: 4120440000.dec
-# Descriptor: [Yb_[sigma_0-> pi+pi-][Y1S->mu+mu-]]
-# NickName: Yb_sigmai0Y1S_pipimumu
+# Descriptor: [vpho_[sigma_0-> pi+pi-][Y1S->mu+mu-]]
+# NickName: vpho_sigmai0Y1S_pipimumu
 # Cuts: None
 # Documentation: Yb10751 decay
 # PhysicsWG: Bottomonium
@@ -10,11 +10,9 @@
 # Date: 20230102
 # Parameters of the Yb10751 particle: pdg.add_particle("Yb10751",9010554,10.751e+00,0.005e+00,0,1)
 
-
 Alias sigma_0sig sigma_0
-Alias Yb10751sig Yb10751
 
-Decay Yb10751sig
+Decay vpho
 1.0   Upsilonsig sigma_0sig  PHSP;
 Enddecay
 

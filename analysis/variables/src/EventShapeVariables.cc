@@ -28,14 +28,14 @@ namespace Belle2 {
     double foxWolframR(const Particle*, const std::vector<double>& index)
     {
       if (index.size() != 1) {
-        B2ERROR("foxWolframR cannot be called without providing the moment order");
+        B2FATAL("foxWolframR cannot be called without providing the moment order");
         return std::numeric_limits<float>::quiet_NaN();
       }
 
       int order = std::lround(index[0]);
 
       if (order < 0 || order > 8) {
-        B2ERROR("The Fox-Wolfram moment order must be within 0 and 8.");
+        B2FATAL("The Fox-Wolfram moment order must be within 0 and 8.");
         return std::numeric_limits<float>::quiet_NaN();
       }
 
@@ -45,7 +45,7 @@ namespace Belle2 {
         return std::numeric_limits<float>::quiet_NaN();
       }
       if (evtShapeCont->getFWMoment(0) == 0) {
-        B2ERROR("The 0th-order FoxWolfram moment is zero");
+        B2INFO("The 0th-order FoxWolfram moment is zero");
         return std::numeric_limits<float>::quiet_NaN();
       }
       return evtShapeCont->getFWMoment(order) / evtShapeCont->getFWMoment(0);
@@ -54,14 +54,14 @@ namespace Belle2 {
     double foxWolframH(const Particle*, const std::vector<double>& index)
     {
       if (index.size() != 1) {
-        B2ERROR("foxWolframH cannot be called without providing the moment order");
+        B2FATAL("foxWolframH cannot be called without providing the moment order");
         return std::numeric_limits<float>::quiet_NaN();
       }
 
       int order = std::lround(index[0]);
 
       if (order < 0 || order > 8) {
-        B2ERROR("The Fox-Wolfram moment order must be within 0 and 8.");
+        B2FATAL("The Fox-Wolfram moment order must be within 0 and 8.");
         return std::numeric_limits<float>::quiet_NaN();
       }
 
@@ -76,7 +76,7 @@ namespace Belle2 {
     Manager::FunctionPtr harmonicMoment(const std::vector<std::string>& arguments)
     {
       if (arguments.size() != 2) {
-        B2ERROR("harmonicMoment requires two arguments: the harmonic order (0-8) and the reference axis name (thrust or collision)");
+        B2FATAL("harmonicMoment requires two arguments: the harmonic order (0-8) and the reference axis name (thrust or collision)");
         return nullptr;
       }
 
@@ -84,18 +84,18 @@ namespace Belle2 {
       try {
         order = Belle2::convertString<int>(arguments[0]);
       } catch (std::invalid_argument&) {
-        B2ERROR("First argument of harmonicMoment must be an integer");
+        B2FATAL("First argument of harmonicMoment must be an integer");
         return nullptr;
       }
       std::string axisName =  arguments[1];
       boost::to_lower(axisName);
 
       if (order < 0 || order > 8) {
-        B2ERROR("The Fox-Wolfram moment order must be within 0 and 8.");
+        B2FATAL("The Fox-Wolfram moment order must be within 0 and 8.");
         return nullptr;
       }
       if (axisName != "thrust" && axisName != "collision") {
-        B2ERROR("Invalid axis name "  << arguments[1] << ". The valid options are thrust and collision");
+        B2FATAL("Invalid axis name "  << arguments[1] << ". The valid options are thrust and collision");
         return nullptr;
       }
 
@@ -117,7 +117,7 @@ namespace Belle2 {
     Manager::FunctionPtr cleoCone(const std::vector<std::string>& arguments)
     {
       if (arguments.size() != 2) {
-        B2ERROR("cleoCone requires two arguments: the cone order (0-9) and the reference axis name (thrust or collision)");
+        B2FATAL("cleoCone requires two arguments: the cone order (0-9) and the reference axis name (thrust or collision)");
         return nullptr;
       }
 
@@ -125,18 +125,18 @@ namespace Belle2 {
       try {
         order = Belle2::convertString<int>(arguments[0]);
       } catch (std::invalid_argument&) {
-        B2ERROR("Argument of cleoCone must be an integer");
+        B2FATAL("Argument of cleoCone must be an integer");
         return nullptr;
       }
       std::string axisName =  arguments[1];
       boost::to_lower(axisName);
 
       if (order < 0 || order > 8) {
-        B2ERROR("The CLEO cone order must be within 0 and 8.");
+        B2FATAL("The CLEO cone order must be within 0 and 8.");
         return nullptr;
       }
       if (axisName != "thrust" && axisName != "collision") {
-        B2ERROR("Invalid axis name "  << arguments[1] << ". The valid options are thrust and collision");
+        B2FATAL("Invalid axis name "  << arguments[1] << ". The valid options are thrust and collision");
         return nullptr;
       }
 
@@ -163,7 +163,7 @@ namespace Belle2 {
         return std::numeric_limits<float>::quiet_NaN();
       }
       if (evtShapeCont->getFWMoment(0) == 0) {
-        B2ERROR("The 0th-order FoxWolfram moment is zero");
+        B2INFO("The 0th-order FoxWolfram moment is zero");
         return std::numeric_limits<float>::quiet_NaN();
       }
       return evtShapeCont->getFWMoment(1) / evtShapeCont->getFWMoment(0);
@@ -177,7 +177,7 @@ namespace Belle2 {
         return std::numeric_limits<float>::quiet_NaN();
       }
       if (evtShapeCont->getFWMoment(0) == 0) {
-        B2ERROR("The 0th-order FoxWolfram moment is zero");
+        B2INFO("The 0th-order FoxWolfram moment is zero");
         return std::numeric_limits<float>::quiet_NaN();
       }
       return evtShapeCont->getFWMoment(2) / evtShapeCont->getFWMoment(0);
@@ -191,7 +191,7 @@ namespace Belle2 {
         return std::numeric_limits<float>::quiet_NaN();
       }
       if (evtShapeCont->getFWMoment(0) == 0) {
-        B2ERROR("The 0th-order FoxWolfram moment is zero");
+        B2INFO("The 0th-order FoxWolfram moment is zero");
         return std::numeric_limits<float>::quiet_NaN();
       }
       return evtShapeCont->getFWMoment(3) / evtShapeCont->getFWMoment(0);
@@ -205,7 +205,7 @@ namespace Belle2 {
         return std::numeric_limits<float>::quiet_NaN();
       }
       if (evtShapeCont->getFWMoment(0) == 0) {
-        B2ERROR("The 0th-order FoxWolfram moment is zero");
+        B2INFO("The 0th-order FoxWolfram moment is zero");
         return std::numeric_limits<float>::quiet_NaN();
       }
       return evtShapeCont->getFWMoment(4) / evtShapeCont->getFWMoment(0);

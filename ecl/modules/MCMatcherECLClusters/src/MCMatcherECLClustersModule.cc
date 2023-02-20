@@ -57,11 +57,13 @@ void MCMatcherECLClustersModule::initialize()
   m_eclClusters.isRequired(eclClusterArrayName());
   m_eclShowers.isRequired(eclShowerArrayName());
 
-  m_mcParticles.registerRelationTo(m_eclHits);
-  m_eclCalDigits.registerRelationTo(m_mcParticles);
-  m_eclDigits.registerRelationTo(m_mcParticles);
-  m_eclShowers.registerRelationTo(m_mcParticles);
-  m_eclClusters.registerRelationTo(m_mcParticles);
+  if (m_mcParticles.isValid()) {
+    m_mcParticles.registerRelationTo(m_eclHits);
+    m_eclCalDigits.registerRelationTo(m_mcParticles);
+    m_eclDigits.registerRelationTo(m_mcParticles);
+    m_eclShowers.registerRelationTo(m_mcParticles);
+    m_eclClusters.registerRelationTo(m_mcParticles);
+  }
 }
 
 void MCMatcherECLClustersModule::event()

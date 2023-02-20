@@ -26,7 +26,7 @@
 #include <tracking/dataobjects/ExtHit.h>
 
 /* ROOT headers. */
-#include <framework/geometry/VectorUtil.h>
+#include <Math/VectorUtil.h>
 
 using namespace std;
 

@@ -75,7 +75,7 @@ namespace Belle2 {
     if (m_trackID != track.GetTrackID()) {
       //TrackID changed, store track informations
       m_trackID = track.GetTrackID();
-      //Get world momentum
+      //Get world position
       const G4ThreeVector& worldPosition = preStep.GetPosition();
       m_startPos.SetXYZ(worldPosition.x() * Unit::mm / Unit::cm, worldPosition.y() * Unit::mm / Unit::cm,
                         worldPosition.z() * Unit::mm / Unit::cm);

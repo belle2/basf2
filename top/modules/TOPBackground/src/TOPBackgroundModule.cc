@@ -25,7 +25,6 @@
 // framework aux
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
-#include <framework/geometry/VectorUtil.h>
 
 #include <TCanvas.h>
 #include <TLegend.h>
@@ -257,8 +256,8 @@ namespace Belle2 {
       int subdet = tophit->getSubDet();
       if (subdet != 5) continue;
 
-      TVector3 pos = XYZToTVector(tophit->getPosition());
-      double phi = pos.XYvector().Phi_0_2pi(pos.XYvector().Phi()) / 3.14159265358979 * 180.;
+      auto pos = tophit->getPosition();
+      double phi = ROOT::Math::VectorUtil::Phi_0_2pi(pos.Phi()) / M_PI * 180;
       int barID = int (phi / 22.5 + 0.5);
       if (barID == 16) {
         barID = 0;

@@ -11,7 +11,8 @@
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
-#include <framework/geometry/VectorUtil.h>
+
+#include <Math/VectorUtil.h>
 
 #include <cmath>
 #include <boost/format.hpp>
@@ -580,7 +581,7 @@ namespace Belle2 {
 
     double size = (m_aeroRout - m_aeroRin) / double(m_tileNr);
     double r = locpos.Mod();
-    double phi = VectorUtil::phi0TwoPi(locpos.Phi());
+    double phi = ROOT::Math::VectorUtil::Phi_0_2pi(locpos.Phi());
     int nr = int((r - m_aeroRin) / size);
 
     if (r < m_aeroRin + nr * size + m_tileGap / 2. || r >  m_aeroRin + (nr + 1)*size - m_tileGap / 2.) return 0;

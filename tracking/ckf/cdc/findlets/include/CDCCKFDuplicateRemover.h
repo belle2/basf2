@@ -17,7 +17,8 @@
 #include <tracking/trackFindingCDC/filters/base/ChooseableFilter.icc.h>
 
 #include <ecl/dataobjects/ECLShower.h>
-#include <framework/geometry/VectorUtil.h>
+
+#include <Math/VectorUtil.h>
 
 namespace Belle2 {
   /// Remove duplicate paths created from ECLShowers
@@ -130,7 +131,7 @@ namespace Belle2 {
         while (iter2 < goodResults.end()) {
           // find tracks from close-by seeds (use small strip in phi direction as expected from Bremsstrahlung)
           // to disregard this filter set duplicateSeed_maxPhi and duplicateSeed_maxTheta to negative values
-          if (std::abs(VectorUtil::phiMinusPiPi(iter2->front().getSeed()->getPositionSeed().Phi() - phiClus)) < duplicateSeed_maxPhi
+          if (std::abs(ROOT::Math::VectorUtil::Phi_mpi_pi(iter2->front().getSeed()->getPositionSeed().Phi() - phiClus)) < duplicateSeed_maxPhi
               && std::abs(iter2->front().getSeed()->getPositionSeed().Theta() - thetaClus) < duplicateSeed_maxTheta) {
             // let filter decide which one to keep
             bool isDuplicate = m_filter_duplicateSeed({&*iter, &*iter2}) > 0;

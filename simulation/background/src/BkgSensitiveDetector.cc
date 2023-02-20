@@ -75,7 +75,7 @@ namespace Belle2 {
     if (m_trackID != track.GetTrackID()) {
       //TrackID changed, store track informations
       m_trackID = track.GetTrackID();
-      //Get world position
+      //Get world momentum
       const G4ThreeVector& worldPosition = preStep.GetPosition();
       m_startPos.SetXYZ(worldPosition.x() * Unit::mm / Unit::cm, worldPosition.y() * Unit::mm / Unit::cm,
                         worldPosition.z() * Unit::mm / Unit::cm);
@@ -114,11 +114,7 @@ namespace Belle2 {
         if ((sector == 0) && (m_eclrepscale == 2) && ((id & 1) != 0)) id += 144; // barrel odd-numbered diodes in sector 0 -> sector 144
         id += sector * m_eclrepscale;
       }
-      ROOT::Math::XYZVector position(
-        m_startPos.X(), m_startPos.Y(), m_startPos.Z());
-      ROOT::Math::XYZVector momentum(
-        m_startMom.X(), m_startMom.Y(), m_startMom.Z());
-      beamBackHits.appendNew(m_subDet, id, pdgCode, m_trackID, position, momentum, m_startTime, m_startEnergy, endEnergy,
+      beamBackHits.appendNew(m_subDet, id, pdgCode, m_trackID, m_startPos, m_startMom, m_startTime, m_startEnergy, endEnergy,
                              m_energyDeposit, m_trackLength, neutWeight);
 
 

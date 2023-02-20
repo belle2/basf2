@@ -14,7 +14,7 @@
 #include <tracking/trackFindingCDC/topology/CDCWire.h>
 #include <tracking/trackFindingCDC/utilities/ReversedRange.h>
 
-#include <framework/geometry/VectorUtil.h>
+#include <Math/VectorUtil.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -293,7 +293,10 @@ void TrackQualityTools::removeHitsInTheBeginningIfAngleLarge(CDCTrack& track, do
     const double currentAngle = recoHit.getRecoPos2D().phi();
     if (not std::isnan(lastAngle)) {
       const double delta = currentAngle - lastAngle;
-      const double normalizedDelta = std::min(VectorUtil::phi0TwoPi(delta), VectorUtil::phi0TwoPi(-delta));
+      const double normalizedDelta =
+        std::min(
+          ROOT::Math::VectorUtil::Phi_0_2pi(delta),
+          ROOT::Math::VectorUtil::Phi_0_2pi(-delta));
       if (fabs(normalizedDelta) > maximalAngle) {
         removeAfterThis = true;
         recoHit.getWireHit().getAutomatonCell().setAssignedFlag();

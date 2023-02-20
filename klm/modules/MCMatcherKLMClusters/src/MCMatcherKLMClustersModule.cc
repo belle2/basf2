@@ -54,10 +54,6 @@ void MCMatcherKLMClustersModule::initialize()
   }
 }
 
-void MCMatcherKLMClustersModule::beginRun()
-{
-}
-
 void MCMatcherKLMClustersModule::event()
 {
   // Don't do anything if MCParticles aren't present
@@ -179,12 +175,3 @@ void MCMatcherKLMClustersModule::event()
       m_KLMClusters[i1]->addRelationTo(it->first, it->second / weightSum);
   }
 }
-
-void MCMatcherKLMClustersModule::endRun()
-{
-}
-
-void MCMatcherKLMClustersModule::terminate()
-{
-}
-

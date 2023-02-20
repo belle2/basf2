@@ -8,19 +8,16 @@
 # Responsible: Yang Li
 # Email: y_li21@m.fudan.edu.cn
 # Date: 20230102
-# Parameters of the Yb10751 particle: pdg.add_particle("Yb10751",9010554,10.751e+00,0.005e+00,0,1)
-
-Alias f_0sig f_0
 
 Decay vpho
-1.0   Upsilonsig f_0sig  PHSP;
+1.0   Upsilon f_0  PHSP;
 Enddecay
 
-Decay f_0sig
+Decay f_0
 1.0   pi+ pi- PHSP;
 Enddecay
 
-Decay Upsilonsig
+Decay Upsilon
 1.0  mu+ mu-  PHSP;
 Enddecay
 End

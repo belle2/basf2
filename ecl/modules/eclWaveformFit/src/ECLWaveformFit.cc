@@ -36,11 +36,28 @@ REG_MODULE(ECLWaveformFit);
 //                 Implementation
 //-----------------------------------------------------------------
 
+extern "C" {
+
+  // Load inverse covariance matrix from the packed form.
+  // @param[in] packed_matrix Packed matrix.
+  void ecl_waveform_fit_load_inverse_covariance(const float* packed_matrix);
+
+  // Multiply vector by the stored inverse covariance matrix.
+  // @param[out] y Result vector.
+  // @param[in]  x Vector.
+  void ecl_waveform_fit_multiply_inverse_covariance(double* y, const double* x);
+
+};
+
+
 //anonymous namespace for data objects used by both ECLWaveformFitModule class and FCN2h funciton for MINUIT minimization.
 namespace {
 
   // Number of fit points.
   const int c_NFitPoints = 31;
+
+  // Number of fit points for vectorized data.
+  const int c_NFitPointsVector = 32;
 
   //adc data array
   double fitA[c_NFitPoints];
@@ -51,7 +68,7 @@ namespace {
   const SignalInterpolation2* g_sih;
 
   /** Covariance matrix. */
-  static double s_CurrentCovMat[c_NFitPoints][c_NFitPoints];
+  double s_CurrentCovMat[c_NFitPoints][c_NFitPoints] = {0};
 
   /** Noise level. */
   double aNoise;
@@ -60,8 +77,8 @@ namespace {
   // cppcheck-suppress constParameter ; TF1 fit functions cannot have const parameters
   void FCN2h(int&, double* grad, double& f, double* p, int)
   {
-    double df[c_NFitPoints];
-    double da[c_NFitPoints];
+    double df[c_NFitPointsVector];
+    double da[c_NFitPointsVector];
     const double Ag = p[1], B = p[0], T = p[2], Ah = p[3];
     double chi2 = 0, gAg = 0, gB = 0, gT = 0, gAh = 0;
 
@@ -72,16 +89,14 @@ namespace {
     g_sih->getshape(T, amplitudeHadron, derivativesHadron);
 
     //computing difference between current fit result and adc data array
+    #pragma omp simd
     for (int i = 0; i < c_NFitPoints; ++i)
       df[i] = fitA[i] - (Ag * amplitudeGamma[i] + Ah * amplitudeHadron[i] + B);
 
     //computing chi2.
-    for (int i = 0; i < c_NFitPoints; ++i) {
-      da[i] = 0;
-      for (int j = 0; j < c_NFitPoints; ++j)
-        da[i] += s_CurrentCovMat[i][j] * df[j];
-    }
+    ecl_waveform_fit_multiply_inverse_covariance(da, df);
 
+    #pragma omp simd reduction(+:chi2) reduction(-:gB,gAg,gT,gAh)
     for (int i = 0; i < c_NFitPoints; ++i) {
       chi2 += da[i] * df[i];
       gB   -= da[i];
@@ -118,18 +133,16 @@ namespace {
     g_sih->getshape(T, amplitudeHadron, derivativesHadron);
 
     //computing difference between current fit result and adc data array
+    #pragma omp simd
     for (int i = 0; i < c_NFitPoints; ++i) {
       df[i] = fitA[i] - (Ag * amplitudeGamma[i] + Ah * amplitudeHadron[i]
                          + A2 * amplitudeGamma2[i] + B);
     }
 
     //computing chi2.
-    for (int i = 0; i < c_NFitPoints; ++i) {
-      da[i] = 0;
-      for (int j = 0; j < c_NFitPoints; ++j)
-        da[i] += s_CurrentCovMat[i][j] * df[j];
-    }
+    ecl_waveform_fit_multiply_inverse_covariance(da, df);
 
+    #pragma omp simd reduction(+:chi2) reduction(-:gB,gAg,gT,gAh)
     for (int i = 0; i < c_NFitPoints; ++i) {
       chi2 += da[i] * df[i];
       gB  -= da[i];
@@ -181,12 +194,7 @@ namespace {
   // here we inflate it to full square form in double format
   void unpackcovariance(const CovariancePacked& matrixPacked)
   {
-    int count = 0;
-    for (int i = 0; i < c_NFitPoints; i++) {
-      for (int j = 0; j < i + 1; j++) {
-        s_CurrentCovMat[i][j] = s_CurrentCovMat[j][i] = matrixPacked[count++];
-      }
-    }
+    ecl_waveform_fit_load_inverse_covariance(matrixPacked.m_covMatPacked);
     aNoise = matrixPacked.sigma;
   }
 
@@ -348,8 +356,9 @@ void ECLWaveformFitModule::event()
 
     const int id = aECLDsp.getCellId() - 1;
 
-    //Filling array with ADC values.
-    for (int j = 0; j < ec.m_nsmp; j++) fitA[j] = aECLDsp.getDspA()[j];
+    // Filling array with ADC values.
+    for (int j = 0; j < ec.m_nsmp; j++)
+      fitA[j] = aECLDsp.getDspA()[j];
 
     //setting relation of eclDSP to aECLDigit
     const ECLDigit* d = nullptr;
@@ -566,17 +575,10 @@ SignalInterpolation2::SignalInterpolation2(const std::vector<double>& s)
   m_r1 = m_FunctionInterpolation[i2][1] / m_FunctionInterpolation[i1][1];
 }
 
-/**
- *  returns signal shape(+derivatives) in c_NFitPoints equidistant time points
- *  starting from T0
- */
 void SignalInterpolation2::getshape(
   double t0, double* function, double* derivatives) const
 {
-  const int iend0 = c_nt * c_ndt;
-  const int iend1 = c_nt * c_ndt + c_ntail;
-
-  // If before pulse start time (negative times), return 0.
+  /* If before pulse start time (negative times), return 0. */
   int k = 0;
   while (t0 < 0) {
     function[k] = 0;
@@ -587,63 +589,97 @@ void SignalInterpolation2::getshape(
       return;
   }
 
-  //function below evaluates the template value and the first derivative value for the point.
+  /* Function and derivative values. */
+  double f0[c_NFitPoints], f1[c_NFitPoints];
+  double fp0[c_NFitPoints], fp1[c_NFitPoints];
+
+  /* Interpolate first c_nt points (short time steps). */
   double x = t0 * c_idtn;
   double ix = floor(x);
   double w = x - ix;
-  int i = ix;
+  int j = ix;
   double w2 = w * w;
   double hw2 = 0.5 * w2;
   double tw3 = ((1. / 6) * w) * w2;
-  auto I = [this, &w, &hw2, &tw3](int j, double idt, double dt, double & f, double & d) {
-    double a[4];
-    double f0 = m_FunctionInterpolation[j][0];
-    double f1 = m_FunctionInterpolation[j + 1][0];
-    double fp0 = m_FunctionInterpolation[j][1];
-    double fp1 = m_FunctionInterpolation[j + 1][1];
-    double dfdt = (f1 - f0) * idt;
-    double fp = fp1 + fp0;
 
-    a[0] = f0;
-    a[1] = fp0;
-    a[2] = -((fp + fp0) - 3 * dfdt);
-    a[3] = ((fp) - 2 * dfdt);
+  /* Number of interpolation points. */
+  int iMax = k + c_nt;
+  if (iMax > c_NFitPoints)
+    iMax = c_NFitPoints;
 
-    double b2 = 2 * a[2];
-    double b3 = 6 * a[3];
-    f = a[0] + dt * (a[1] * w + b2 * hw2 + b3 * tw3);
-    d = a[1] + b2 * w + b3 * hw2;
-  };
-
-  //signal interpolation for short time steps used for points at the beginning of the pulse where the pulse is quickly changing (eg rise)
-  //iend0 indicates first region of pulse
-  while (i < iend0) {
-    I(i, c_idtn, c_dtn, function[k], derivatives[k]);
-    i += c_ndt;
-    t0 += c_dt;
-    ++k;
-    if (k >= c_NFitPoints)
-      return;
+  /* Fill interpolation points. */
+  for (int i = k; i < iMax; ++i) {
+    f0[i] = m_FunctionInterpolation[j][0];
+    f1[i] = m_FunctionInterpolation[j + 1][0];
+    fp0[i] = m_FunctionInterpolation[j][1];
+    fp1[i] = m_FunctionInterpolation[j + 1][1];
+    j = j + c_ndt;
   }
 
+  /* Interpolation. */
+  #pragma omp simd
+  for (int i = k; i < iMax; ++i) {
+    double a[4];
+    double dfdt = (f1[i] - f0[i]) * c_idtn;
+    double fp = fp1[i] + fp0[i];
+    a[0] = f0[i];
+    a[1] = fp0[i];
+    a[2] = -((fp + fp0[i]) - 3 * dfdt);
+    a[3] = fp - 2 * dfdt;
+    double b2 = 2 * a[2];
+    double b3 = 6 * a[3];
+    function[i] = a[0] + c_dtn * (a[1] * w + b2 * hw2 + b3 * tw3);
+    derivatives[i] = a[1] + b2 * w + b3 * hw2;
+  }
+  t0 = t0 + c_dt * c_nt;
+  if (iMax == c_NFitPoints)
+    return;
+  k = iMax;
+
+  /* Interpolate next c_ntail points (long time steps). */
   x = t0 * c_idt;
   ix = floor(x);
   w = x - ix;
-  int j = ix;
-  i = (j - c_nt) + iend0;
+  j = ix; /* j == c_nt */
+  j = (j - c_nt) + c_nt * c_ndt;
   w2 = w * w;
   hw2 = 0.5 * w2;
   tw3 = ((1. / 6) * w) * w2;
 
-  //signal interpolation for long time steps used for points in the tail region of the pulse
-  //iend1 indicates end of pulse
-  while (i < iend1 - 1) {
-    I(i, c_idt, c_dt, function[k], derivatives[k]);
-    ++i;
-    ++k;
-    if (k >= c_NFitPoints)
-      return;
+  /* Number of interpolation points. */
+  iMax = k + c_ntail;
+  if (iMax > c_NFitPoints)
+    iMax = c_NFitPoints;
+
+  /* Fill interpolation points. */
+  for (int i = k; i < iMax; ++i) {
+    f0[i] = m_FunctionInterpolation[j][0];
+    f1[i] = m_FunctionInterpolation[j + 1][0];
+    fp0[i] = m_FunctionInterpolation[j][1];
+    fp1[i] = m_FunctionInterpolation[j + 1][1];
+    j = j + 1;
   }
+
+  /* Interpolation. */
+  #pragma omp simd
+  for (int i = k; i < iMax; ++i) {
+    double a[4];
+    double dfdt = (f1[i] - f0[i]) * c_idt;
+    double fp = fp1[i] + fp0[i];
+    a[0] = f0[i];
+    a[1] = fp0[i];
+    a[2] = -((fp + fp0[i]) - 3 * dfdt);
+    a[3] = fp - 2 * dfdt;
+    double b2 = 2 * a[2];
+    double b3 = 6 * a[3];
+    function[i] = a[0] + c_dt * (a[1] * w + b2 * hw2 + b3 * tw3);
+    derivatives[i] = a[1] + b2 * w + b3 * hw2;
+  }
+  if (iMax == c_NFitPoints)
+    return;
+  k = iMax;
+
+  /* Exponential tail. */
   while (k < c_NFitPoints) {
     function[k] = function[k - 1] * m_r0;
     derivatives[k] = derivatives[k - 1] * m_r1;

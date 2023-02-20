@@ -142,7 +142,7 @@ namespace {
     //computing chi2.
     ecl_waveform_fit_multiply_inverse_covariance(da, df);
 
-    #pragma omp simd reduction(+:chi2) reduction(-:gB,gAg,gT,gAh)
+    #pragma omp simd reduction(+:chi2) reduction(-:gB,gAg,gT,gAh,gA2,gT2)
     for (int i = 0; i < c_NFitPoints; ++i) {
       chi2 += da[i] * df[i];
       gB  -= da[i];
@@ -188,14 +188,6 @@ namespace {
       M.sigma = sqrtf(acov[0]);
     }
     return status;
-  }
-
-  // to save space we keep only upper triangular part of the covariance matrix in float format
-  // here we inflate it to full square form in double format
-  void unpackcovariance(const CovariancePacked& matrixPacked)
-  {
-    ecl_waveform_fit_load_inverse_covariance(matrixPacked.m_covMatPacked);
-    aNoise = matrixPacked.sigma;
   }
 
 }
@@ -270,13 +262,13 @@ void ECLWaveformFitModule::beginRun()
   //Load covariance matricies from database;
   if (m_CovarianceMatrix) {
     for (int id = 1; id <= ECLElementNumbers::c_NCrystals; id++) {
-      std::vector<double> buf(c_NFitPoints);
-      std::vector<double> reg(c_NFitPoints);
-      m_AutoCovariance->getAutoCovariance(id, buf.data());
+      double buf[c_NFitPoints];
+      double reg[c_NFitPoints];
+      m_AutoCovariance->getAutoCovariance(id, buf);
       double x0 = c_NFitPoints;
-      reg = buf;
-      while (!makecovariance(m_c[id - 1], c_NFitPoints, reg.data()))
-        regularize(buf.data(), reg.data(), c_NFitPoints, x0 -= 1, 1);
+      std::memcpy(reg, buf, c_NFitPoints * sizeof(double));
+      while (!makecovariance(m_c[id - 1], c_NFitPoints, reg))
+        regularize(buf, reg, c_NFitPoints, x0 -= 1, 1);
     }
   } else {
     //default covariance matrix is identity for all crystals
@@ -386,7 +378,10 @@ void ECLWaveformFitModule::event()
     }
 
     //get covariance matrix for cell id
-    if (m_CovarianceMatrix)  unpackcovariance(m_c[id]);
+    if (m_CovarianceMatrix) {
+      ecl_waveform_fit_load_inverse_covariance(m_c[id].m_covMatPacked);
+      aNoise = m_c[id].sigma;
+    }
 
     //Calling optimized fit photon template + hadron template (fit type = 0)
     double p2_b, p2_a, p2_t, p2_a1, p2_chi2, p_extraPhotonEnergy, p_extraPhotonTime;

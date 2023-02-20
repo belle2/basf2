@@ -40,6 +40,12 @@ def array2hist(array, hist):
         array: array
         hist: histogram
     """
-    nbins = len(array)
-    for i in range(nbins):
-        hist.SetBinContent(i + 1, array[i])
+    ndim = array.ndim
+    if ndim == 1:
+        nbins = len(array)
+        for i in range(nbins):
+            hist.SetBinContent(i + 1, array[i])
+    elif ndim == 2:
+        for i in range(hist.GetNbinsX()):
+            for j in range(hist.GetNbinsY()):
+                hist.SetBinContent(i + 1, j + 1, array[i, j])

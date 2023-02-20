@@ -78,6 +78,7 @@ void SignalSideParticleFilterModule::event()
       continue;
 
     if (iParticlelist->contains(particle)) {
+      // cut should be called only if the particle is in the ParticleList
       if (m_cut->check(particle)) {
         setReturnValue(true);
         return;

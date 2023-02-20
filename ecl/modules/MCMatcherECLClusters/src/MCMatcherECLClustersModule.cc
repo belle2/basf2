@@ -64,10 +64,6 @@ void MCMatcherECLClustersModule::initialize()
   m_eclClusters.registerRelationTo(m_mcParticles);
 }
 
-void MCMatcherECLClustersModule::beginRun()
-{
-}
-
 void MCMatcherECLClustersModule::event()
 {
   // Don't do anything if MCParticles aren't present
@@ -184,12 +180,4 @@ void MCMatcherECLClustersModule::event()
       eclCluster->addRelationTo(mcParticle, weight);
     }
   }
-}
-
-void MCMatcherECLClustersModule::endRun()
-{
-}
-
-void MCMatcherECLClustersModule::terminate()
-{
 }

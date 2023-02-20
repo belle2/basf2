@@ -74,15 +74,13 @@ void MCMatcherECLClustersModule::event()
   }
 
   //CalDigits
-  short int Index[8736];
-  std::fill_n(Index, 8736, -1);
-  const TClonesArray* cd = m_eclCalDigits.getPtr();
-  TObject** ocd = cd->GetObjectRef();
-  for (int i = 0, imax = cd->GetEntries(); i < imax; i++) { // avoiding call of StoreArray::getArrayIndex() member function
-    const ECLCalDigit& t = static_cast<const ECLCalDigit&>(*ocd[i]);
-    double calEnergy = t.getEnergy(); // Calibrated Energy in GeV
+  short int Index[8736] = {-1};
+  int k = 0;
+  for (const ECLCalDigit& eclCalDigit : m_eclCalDigits) {
+    double calEnergy = eclCalDigit.getEnergy(); // Calibrated Energy in GeV
     if (calEnergy < 0) continue;
-    Index[t.getCellId() - 1] = i;
+    Index[eclCalDigit.getCellId() - 1] = k;
+    ++k;
   }
 
   const RelationArray& p2sh = m_mcParticleToECLSimHitRelationArray;

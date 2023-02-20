@@ -51,11 +51,11 @@ void MCMatcherECLClustersModule::initialize()
 {
   m_mcParticles.isOptional();
 
-  m_eclHits.registerInDataStore();
-  m_eclCalDigits.registerInDataStore(eclCalDigitArrayName());
-  m_eclDigits.registerInDataStore(eclDigitArrayName());
-  m_eclClusters.registerInDataStore(eclClusterArrayName());
-  m_eclShowers.registerInDataStore(eclShowerArrayName());
+  m_eclHits.isRequired();
+  m_eclCalDigits.isRequired(eclCalDigitArrayName());
+  m_eclDigits.isRequired(eclDigitArrayName());
+  m_eclClusters.isRequired(eclClusterArrayName());
+  m_eclShowers.isRequired(eclShowerArrayName());
 
   m_mcParticles.registerRelationTo(m_eclHits);
   m_eclCalDigits.registerRelationTo(m_mcParticles);

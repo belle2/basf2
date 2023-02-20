@@ -116,8 +116,8 @@ namespace {
   // cppcheck-suppress constParameter ; TF1 fit functions cannot have const parameters
   void FCN2h2(int&, double* grad, double& f, double* p, int)
   {
-    double df[c_NFitPoints];
-    double da[c_NFitPoints];
+    double df[c_NFitPointsVector];
+    double da[c_NFitPointsVector];
     const double A2 = p[4], T2 = p[5];
     const double Ag = p[1], B = p[0], T = p[2], Ah = p[3];
     double chi2 = 0, gA2  = 0, gT2 = 0;

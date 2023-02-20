@@ -49,7 +49,7 @@ MCMatcherECLClustersModule::~MCMatcherECLClustersModule()
 
 void MCMatcherECLClustersModule::initialize()
 {
-  m_mcParticles.registerInDataStore();
+  m_mcParticles.isOptional();
 
   m_eclHits.registerInDataStore();
   m_eclCalDigits.registerInDataStore(eclCalDigitArrayName());
@@ -70,6 +70,10 @@ void MCMatcherECLClustersModule::beginRun()
 
 void MCMatcherECLClustersModule::event()
 {
+  // Don't do anything if MCParticles aren't present
+  if (not m_mcParticles.isValid()) {
+    return;
+  }
 
   //CalDigits
   short int Index[8736];

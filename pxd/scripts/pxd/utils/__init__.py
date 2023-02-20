@@ -181,11 +181,15 @@ def df_calculate_eff(df, num="nTrackClusters", den="nTrackPoints", output_var="e
       den (str): column used as the denominator
       output_var (str): column for saving efficiency
     """
-    data = {key: df[key].values for key in [num, den]}
-    rdf = ROOT.RDF.MakeNumpyDataFrame(data)
-    nBins = rdf.Count()
-    h_num = rdf.Histo1D < int > ({"h_num", "h_num", nBins, 0., nBins}, num)
-    h_den = rdf.Histo1D < int > ({"h_den", "h_den", nBins, 0., nBins}, den)
+    nums = df[num].to_numpy()
+    dens = df[den].to_numpy()
+    from hist_utils import array2hist
+    nBins = len(nums)
+    assert len(nums) == len(dens), "len(numerators) != len(denominators)"
+    h_num = ROOT.TH1I("h_num", "h_num", nBins, 0, nBins)
+    h_den = ROOT.TH1I("h_den", "h_den", nBins, 0, nBins)
+    array2hist(nums, h_num)
+    array2hist(dens, h_den)
     h_eff = ROOT.TEfficiency(h_num, h_den)
     df[output_var] = df[num] / df[den]
     df[output_var+"_err_low"] = [h_eff.GetEfficiencyErrorLow(i+1) for i in range(nBins)]

@@ -31,3 +31,15 @@ def hist2array(hist, return_edges=False):
         hist.GetLowEdge(edges[-1])
         return arr, edges
     return arr
+
+
+def array2hist(array, hist):
+    """
+    Function to fill a histogram from an array
+    Parameters:
+        array: array
+        hist: histogram
+    """
+    nbins = len(array)
+    for i in range(nbins):
+        hist.SetBinContent(i + 1, array[i])

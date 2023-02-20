@@ -353,7 +353,7 @@ double TrackIsoCalculatorModule::getDetectorWeight(const Particle* iParticle, co
 
   auto hypo = Const::ChargedStable(std::abs(iParticle->getPDGCode()));
   auto p = iParticle->getP();
-  auto theta = std::get<double>(Variable::Manager::Instance().getVariable("theta")->function(iParticle));
+  auto theta = iParticle->getMomentum().Theta();
   auto det = this->getDetEnum(detName);
 
   auto detWeight = (*m_DBWeights.get())->getWeight(hypo, det, p, theta);

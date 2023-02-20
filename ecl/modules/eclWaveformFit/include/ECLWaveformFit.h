@@ -62,8 +62,11 @@ namespace Belle2 {
     /** inverted time substep */
     constexpr static double c_idtn = c_ndt / c_dt;
 
-    /** Function ([0]) and derivative ([1]) values. */
-    double m_FunctionInterpolation[c_nt * c_ndt + c_ntail][2];
+    /** Function values. */
+    double m_FunctionInterpolation[c_nt * c_ndt + c_ntail];
+
+    /** Derivative values. */
+    double m_DerivativeInterpolation[c_nt * c_ndt + c_ntail];
 
     /**
      * assuming exponential drop of the signal function far away from 0, extrapolate it to +inf

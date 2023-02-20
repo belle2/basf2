@@ -555,19 +555,19 @@ SignalInterpolation2::SignalInterpolation2(const std::vector<double>& s)
   dsp.fillarray(sizeof(t) / sizeof(t[0]), t);
 
   for (int i = 0; i < c_nt * c_ndt; i++) {
-    m_FunctionInterpolation[i][0] = t[i].first;
-    m_FunctionInterpolation[i][1] = t[i].second;
+    m_FunctionInterpolation[i] = t[i].first;
+    m_DerivativeInterpolation[i] = t[i].second;
   }
   for (int i = 0; i < c_ntail; i++) {
     int j = c_nt * c_ndt + i;
     int k = c_nt * c_ndt + i * c_ndt;
-    m_FunctionInterpolation[j][0] = t[k].first;
-    m_FunctionInterpolation[j][1] = t[k].second;
+    m_FunctionInterpolation[j] = t[k].first;
+    m_DerivativeInterpolation[j] = t[k].second;
   }
   int i1 = c_nt * c_ndt + c_ntail - 2;
   int i2 = c_nt * c_ndt + c_ntail - 1;
-  m_r0 = m_FunctionInterpolation[i2][0] / m_FunctionInterpolation[i1][0];
-  m_r1 = m_FunctionInterpolation[i2][1] / m_FunctionInterpolation[i1][1];
+  m_r0 = m_FunctionInterpolation[i2] / m_FunctionInterpolation[i1];
+  m_r1 = m_DerivativeInterpolation[i2] / m_DerivativeInterpolation[i1];
 }
 
 void SignalInterpolation2::getshape(
@@ -585,8 +585,8 @@ void SignalInterpolation2::getshape(
   }
 
   /* Function and derivative values. */
-  double f0[c_NFitPoints], f1[c_NFitPoints];
-  double fp0[c_NFitPoints], fp1[c_NFitPoints];
+  double function0[c_NFitPoints], function1[c_NFitPoints];
+  double derivative0[c_NFitPoints], derivative1[c_NFitPoints];
 
   /* Interpolate first c_nt points (short time steps). */
   double x = t0 * c_idtn;
@@ -604,10 +604,10 @@ void SignalInterpolation2::getshape(
 
   /* Fill interpolation points. */
   for (int i = k; i < iMax; ++i) {
-    f0[i] = m_FunctionInterpolation[j][0];
-    f1[i] = m_FunctionInterpolation[j + 1][0];
-    fp0[i] = m_FunctionInterpolation[j][1];
-    fp1[i] = m_FunctionInterpolation[j + 1][1];
+    function0[i] = m_FunctionInterpolation[j];
+    function1[i] = m_FunctionInterpolation[j + 1];
+    derivative0[i] = m_DerivativeInterpolation[j];
+    derivative1[i] = m_DerivativeInterpolation[j + 1];
     j = j + c_ndt;
   }
 
@@ -615,11 +615,11 @@ void SignalInterpolation2::getshape(
   #pragma omp simd
   for (int i = k; i < iMax; ++i) {
     double a[4];
-    double dfdt = (f1[i] - f0[i]) * c_idtn;
-    double fp = fp1[i] + fp0[i];
-    a[0] = f0[i];
-    a[1] = fp0[i];
-    a[2] = -((fp + fp0[i]) - 3 * dfdt);
+    double dfdt = (function1[i] - function0[i]) * c_idtn;
+    double fp = derivative1[i] + derivative0[i];
+    a[0] = function0[i];
+    a[1] = derivative0[i];
+    a[2] = -((fp + derivative0[i]) - 3 * dfdt);
     a[3] = fp - 2 * dfdt;
     double b2 = 2 * a[2];
     double b3 = 6 * a[3];
@@ -635,35 +635,34 @@ void SignalInterpolation2::getshape(
   x = t0 * c_idt;
   ix = floor(x);
   w = x - ix;
-  j = ix; /* j == c_nt */
-  j = (j - c_nt) + c_nt * c_ndt;
   w2 = w * w;
   hw2 = 0.5 * w2;
   tw3 = ((1. / 6) * w) * w2;
 
   /* Number of interpolation points. */
-  iMax = k + c_ntail;
+  iMax = k + c_ntail - 1;
   if (iMax > c_NFitPoints)
     iMax = c_NFitPoints;
-
-  /* Fill interpolation points. */
-  for (int i = k; i < iMax; ++i) {
-    f0[i] = m_FunctionInterpolation[j][0];
-    f1[i] = m_FunctionInterpolation[j + 1][0];
-    fp0[i] = m_FunctionInterpolation[j][1];
-    fp1[i] = m_FunctionInterpolation[j + 1][1];
-    j = j + 1;
-  }
 
   /* Interpolation. */
   #pragma omp simd
   for (int i = k; i < iMax; ++i) {
+    j = c_nt * c_ndt + i - k;
+    /*
+     * The interpolation step is the same as the distance between
+     * the fit points. It is possible to load the values in the interpolation
+     * loop while keeping its vectorization.
+     */
+    double f0 = m_FunctionInterpolation[j];
+    double f1 = m_FunctionInterpolation[j + 1];
+    double fp0 = m_DerivativeInterpolation[j];
+    double fp1 = m_DerivativeInterpolation[j + 1];
     double a[4];
-    double dfdt = (f1[i] - f0[i]) * c_idt;
-    double fp = fp1[i] + fp0[i];
-    a[0] = f0[i];
-    a[1] = fp0[i];
-    a[2] = -((fp + fp0[i]) - 3 * dfdt);
+    double dfdt = (f1 - f0) * c_idt;
+    double fp = fp1 + fp0;
+    a[0] = f0;
+    a[1] = fp0;
+    a[2] = -((fp + fp0) - 3 * dfdt);
     a[3] = fp - 2 * dfdt;
     double b2 = 2 * a[2];
     double b3 = 6 * a[3];

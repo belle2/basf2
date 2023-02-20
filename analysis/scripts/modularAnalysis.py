@@ -1289,6 +1289,48 @@ def fillParticleListsFromMC(decayStringsWithCuts,
             applyCuts(decayString, cut, path)
 
 
+def extractParticlesFromROE(particleLists,
+                            maskName='all',
+                            writeOut=False,
+                            path=None):
+    """
+    Extract Particle objects that belong to the Rest-Of-Events and fill them into the ParticleLists.
+    This function has to be used only in the for_each loops over ROE.
+    The types of the particles other than those specified by ``particleLists`` are not stored.
+    If one creates a ROE with ``fillWithMostLikely=True`` via `buildRestOfEvent`, for example,
+    one should create particleLists for not only ``pi+``, ``gamma``, ``K_L0`` but also other charged final state particles.
+
+    .. code-block:: python
+
+        buildRestOfEvent('B0:sig', fillWithMostLikely=True, path=mypath)
+
+        roe_path = create_path()
+        deadEndPath = create_path()
+        signalSideParticleFilter('B0:sig', '', roe_path, deadEndPath)
+
+        plists = ['%s:in_roe' % ptype for ptype in ['pi+', 'gamma', 'K_L0', 'K+', 'p+', 'e+', 'mu+']]
+        extractParticlesFromROE(plists, maskName='all', path=roe_path)
+
+        mypath.for_each('RestOfEvent', 'RestOfEvents', roe_path)
+
+
+    @param particleLists (str or list(str)) Name of output ParticleLists
+    @param maskName (str)                   Name of the ROE mask to be applied on Particles
+    @param writeOut (bool)                  whether RootOutput module should save the created ParticleList
+    @param path (basf2.Path)                modules are added to this path
+    """
+
+    if isinstance(particleLists, str):
+        particleLists = [particleLists]
+
+    pext = register_module('ParticleExtractorFromROE')
+    pext.set_name('ParticleExtractorFromROE_' + '_'.join(particleLists))
+    pext.param('outputListNames', particleLists)
+    pext.param('maskName', maskName)
+    pext.param('writeOut', writeOut)
+    path.add_module(pext)
+
+
 def applyCuts(list_name, cut, path):
     """
     Removes particle candidates from ``list_name`` that do not pass ``cut``
@@ -1890,7 +1932,7 @@ def printList(list_name, full, path):
 
 
 def variablesToNtuple(decayString, variables, treename='variables', filename='ntuple.root', path=None, basketsize=1600,
-                      signalSideParticleList=""):
+                      signalSideParticleList="", filenameSuffix=""):
     """
     Creates and fills a flat ntuple with the specified variables from the VariableManager.
     If a decayString is provided, then there will be one entry per candidate (for particle in list of candidates).
@@ -1905,6 +1947,9 @@ def variablesToNtuple(decayString, variables, treename='variables', filename='nt
         basketsize (int): size of baskets in the output ntuple in bytes
         signalSideParticleList (str): The name of the signal-side ParticleList.
                                       Only valid if the module is called in a for_each loop over the RestOfEvent.
+        filenameSuffix (str): suffix to be appended to the filename before ``.root``.
+
+    .. tip:: The output filename can be overridden using the ``-o`` argument of basf2.
     """
 
     output = register_module('VariablesToNtuple')
@@ -1915,6 +1960,7 @@ def variablesToNtuple(decayString, variables, treename='variables', filename='nt
     output.param('treeName', treename)
     output.param('basketSize', basketsize)
     output.param('signalSideParticleList', signalSideParticleList)
+    output.param('fileNameSuffix', filenameSuffix)
     path.add_module(output)
 
 
@@ -1924,7 +1970,8 @@ def variablesToHistogram(decayString,
                          filename='ntuple.root',
                          path=None, *,
                          directory=None,
-                         prefixDecayString=False):
+                         prefixDecayString=False,
+                         filenameSuffix=""):
     """
     Creates and fills a flat ntuple with the specified variables from the VariableManager
 
@@ -1938,6 +1985,9 @@ def variablesToHistogram(decayString,
             Useful if you want to have different histograms in the same file to separate them.
         prefixDecayString (bool): If True the decayString will be prepended to the directory name to allow for more
             programmatic naming of the structure in the file.
+        filenameSuffix (str): suffix to be appended to the filename before ``.root``.
+
+    .. tip:: The output filename can be overridden using the ``-o`` argument of basf2.
     """
 
     if variables_2d is None:
@@ -1948,6 +1998,7 @@ def variablesToHistogram(decayString,
     output.param('variables', variables)
     output.param('variables_2d', variables_2d)
     output.param('fileName', filename)
+    output.param('fileNameSuffix', filenameSuffix)
     if directory is not None or prefixDecayString:
         if directory is None:
             directory = ""
@@ -3981,6 +4032,26 @@ def scaleError(outputListName, inputListName,
     scale_error.param('d0MomentumThreshold', d0MomThr)
     scale_error.param('z0MomentumThreshold', z0MomThr)
     path.add_module(scale_error)
+
+
+def estimateAndAttachTrackFitResult(inputListName, path=None):
+    """
+    Create a TrackFitResult from the momentum of the Particle assuming it originates from the IP and make a relation between them.
+    The covariance, detector hit information, and fit-related information (pValue, NDF) are assigned meaningless values. The input
+    Particles must not have already Track or TrackFitResult and thus are supposed to be composite particles, recoil, dummy
+    particles, and so on.
+
+
+    .. warning:: Since the source type is not overwritten as Track, not all track-related variables are guaranteed to be available.
+
+
+    @param inputListName Name of input ParticleList
+    """
+
+    estimator = register_module("TrackFitResultEstimator")
+    estimator.set_name("trackFitResultEstimator_" + inputListName)
+    estimator.param("inputListName", inputListName)
+    path.add_module(estimator)
 
 
 def correctEnergyBias(inputListNames, tableName, path=None):

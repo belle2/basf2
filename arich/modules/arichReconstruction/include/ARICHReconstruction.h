@@ -5,9 +5,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-
-#ifndef ARICHRECONSTRUCTION_H
-#define ARICHRECONSTRUCTION_H
+#pragma once
 
 #include <arich/dbobjects/ARICHGeometryConfig.h>
 #include <arich/dbobjects/ARICHReconstructionPar.h>
@@ -179,6 +177,3 @@ namespace Belle2 {
   };
 
 } // end of namespace Belle2
-
-#endif // ARICHRECONSTRUCTION_H
-

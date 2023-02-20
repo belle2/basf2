@@ -151,9 +151,8 @@ void MCMatcherECLClustersModule::event()
   const RelationArray& p2eh = m_mcParticleToECLHitRelationArray;
   //RelationArray& ed2p = m_eclDigitToMCParticleRelationArray;
   ECLHit** eclhits = (ECLHit**)(m_eclHits.getPtr()->GetObjectRef());
-  for (int i = 0, imax = p2eh.getEntries(); i < imax; i++) {
-    const RelationElement& re = p2eh[i];
-    const std::vector<unsigned int>& eclhitindx = re.getToIndices();
+  for (const auto& relationElement : p2eh) {
+    const std::vector<unsigned int>& eclhitindx = relationElement.getToIndices();
     for (unsigned int j : eclhitindx) {
       const ECLHit* t = eclhits[j];
       int id = t->getCellId() - 1;
@@ -161,7 +160,7 @@ void MCMatcherECLClustersModule::event()
           && Index[id] >=
           0) { //ed2p.add(Index[id], re.getFromIndex()); // old relation setter from ECLDigit to MC particle, not working when pure CsI digits are introduced
         const ECLDigit* mdigit = m_eclDigits[Index[id]];
-        mdigit->addRelationTo(mcs[re.getFromIndex()]);
+        mdigit->addRelationTo(mcs[relationElement.getFromIndex()]);
       }
     }
   }

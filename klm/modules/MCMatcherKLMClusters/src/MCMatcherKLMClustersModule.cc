@@ -39,15 +39,18 @@ MCMatcherKLMClustersModule::~MCMatcherKLMClustersModule()
 
 void MCMatcherKLMClustersModule::initialize()
 {
-  StoreArray<MCParticle> mcParticles;
   m_KLMClusters.isRequired();
-  mcParticles.isRequired();
-  m_KLMClusters.registerRelationTo(mcParticles);
+  m_MCParticles.isOptional();
+  if (m_MCParticles.isValid()) {
+    m_KLMClusters.registerRelationTo(m_MCParticles);
+  }
   if (m_Hit2dRelations) {
     StoreArray<KLMHit2d> bklmHit2ds;
     StoreArray<KLMHit2d> eklmHit2ds;
-    bklmHit2ds.registerRelationTo(mcParticles);
-    eklmHit2ds.registerRelationTo(mcParticles);
+    if (m_MCParticles.isValid()) {
+      bklmHit2ds.registerRelationTo(m_MCParticles);
+      eklmHit2ds.registerRelationTo(m_MCParticles);
+    }
   }
 }
 
@@ -57,6 +60,11 @@ void MCMatcherKLMClustersModule::beginRun()
 
 void MCMatcherKLMClustersModule::event()
 {
+  // Don't do anything if MCParticles aren't present
+  if (not m_MCParticles.isValid()) {
+    return;
+  }
+
   double weightSum;
   /* cppcheck-suppress variableScope */
   int i1, i2, i3, i4, i5, i6, n1, n2, n3, n4, n5, n6;

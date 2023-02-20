@@ -14,6 +14,7 @@
 #include <mdst/dataobjects/KLMCluster.h>
 
 namespace Belle2 {
+  class MCParticle;
 
   /**
    * Module for MC matching for KLM clusters.
@@ -64,6 +65,9 @@ namespace Belle2 {
 
     /** KLM clusters. */
     StoreArray<KLMCluster> m_KLMClusters;
+
+    /** MCParticles StoreArray */
+    StoreArray<MCParticle> m_MCParticles;
 
   };
 

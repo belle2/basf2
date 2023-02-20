@@ -51,19 +51,28 @@ namespace Belle2 {
     StoreArray<ECLShower> m_eclShowers; /**< ECLShowers StoreArray*/
 
     /** Default name ECLDigits */
-    virtual const char* eclDigitArrayName() const
+    std::string m_eclDigitArrayName = "";
+    /** Default name ECLCalDigits */
+    std::string m_eclCalDigitArrayName = "";
+    /** Default name ECLClusters */
+    std::string m_eclClusterArrayName = "";
+    /** Default name ECLShowers */
+    std::string m_eclShowerArrayName = "";
+
+    /** Default name ECLDigits */
+    virtual const char* getECLDigitArrayName() const
     { return "ECLDigits" ; }
 
     /** Default name ECLCalDigits */
-    virtual const char* eclCalDigitArrayName() const
+    virtual const char* getECLCalDigitArrayName() const
     { return "ECLCalDigits" ; }
 
     /** Default name ECLClusters */
-    virtual const char* eclClusterArrayName() const
+    virtual const char* getECLClusterArrayName() const
     { return "ECLClusters" ; }
 
     /** Default name ECLShowers */
-    virtual const char* eclShowerArrayName() const
+    virtual const char* getECLShowerArrayName() const
     { return "ECLShowers" ; }
 
     RelationArray m_mcParticleToECLHitRelationArray; /**< MCParticles to ECLHits RelationArray*/
@@ -78,19 +87,19 @@ namespace Belle2 {
   public:
 
     /** PureCsI name ECLDigitsPureCsI */
-    virtual const char* eclDigitArrayName() const override
+    virtual const char* getECLDigitArrayName() const override
     { return "ECLDigitsPureCsI" ; }
 
     /** PureCsI name ECLCalDigitsPureCsI */
-    virtual const char* eclCalDigitArrayName() const override
+    virtual const char* getECLCalDigitArrayName() const override
     { return "ECLCalDigitsPureCsI" ; }
 
     /** PureCsI name ECLShowersPureCsI */
-    virtual const char* eclShowerArrayName() const override
+    virtual const char* getECLShowerArrayName() const override
     { return "ECLShowersPureCsI" ; }
 
     /** PureCsI name ECLClustersPureCsI */
-    virtual const char* eclClusterArrayName() const override
+    virtual const char* getECLClusterArrayName() const override
     { return "ECLClustersPureCsI" ; }
 
   };

@@ -31,10 +31,10 @@ REG_MODULE(MCMatcherECLClustersPureCsI);
 //-----------------------------------------------------------------
 
 MCMatcherECLClustersModule::MCMatcherECLClustersModule() : Module(),
-  m_eclCalDigits(eclCalDigitArrayName()),
-  m_eclDigits(eclDigitArrayName()),
-  m_eclClusters(eclClusterArrayName()),
-  m_eclShowers(eclShowerArrayName()),
+  m_eclDigitArrayName(getECLDigitArrayName()),
+  m_eclCalDigitArrayName(getECLCalDigitArrayName()),
+  m_eclClusterArrayName(getECLClusterArrayName()),
+  m_eclShowerArrayName(getECLShowerArrayName()),
   m_mcParticleToECLHitRelationArray(m_mcParticles, m_eclHits),
   m_mcParticleToECLSimHitRelationArray(m_mcParticles, m_eclSimHits)
 {
@@ -52,10 +52,10 @@ void MCMatcherECLClustersModule::initialize()
   m_mcParticles.isOptional();
 
   m_eclHits.isRequired();
-  m_eclCalDigits.isRequired(eclCalDigitArrayName());
-  m_eclDigits.isRequired(eclDigitArrayName());
-  m_eclClusters.isRequired(eclClusterArrayName());
-  m_eclShowers.isRequired(eclShowerArrayName());
+  m_eclCalDigits.isRequired(m_eclCalDigitArrayName);
+  m_eclDigits.isRequired(m_eclDigitArrayName);
+  m_eclClusters.isRequired(m_eclClusterArrayName);
+  m_eclShowers.isRequired(m_eclShowerArrayName);
 
   if (m_mcParticles.isValid()) {
     m_mcParticles.registerRelationTo(m_eclHits);
@@ -119,7 +119,7 @@ void MCMatcherECLClustersModule::event()
       double shower_mcParWeight = 0; //Weight between shower and MCParticle
 
       //Loop on ECLCalDigits related to this MCParticle
-      const auto shower_CalDigitRelations = shower.getRelationsTo<ECLCalDigit>(eclCalDigitArrayName());
+      const auto shower_CalDigitRelations = shower.getRelationsTo<ECLCalDigit>(m_eclCalDigitArrayName);
       for (unsigned int iRelation = 0; iRelation < shower_CalDigitRelations.size(); ++iRelation) {
 
         //Retrieve calDigit
@@ -172,7 +172,7 @@ void MCMatcherECLClustersModule::event()
   // to create the relation between ECLCluster->MCParticle with the same weight as
   // the relation between ECLShower->MCParticle.  StoreArray<ECLCluster> eclClusters;
   for (const auto& eclShower : m_eclShowers) {
-    const ECLCluster* eclCluster = eclShower.getRelatedFrom<ECLCluster>(eclClusterArrayName());
+    const ECLCluster* eclCluster = eclShower.getRelatedFrom<ECLCluster>(m_eclClusterArrayName);
     if (!eclCluster) continue;
 
     const RelationVector<MCParticle> mcParticles = eclShower.getRelationsTo<MCParticle>();

@@ -98,8 +98,10 @@ anti-neutrons from photons. As for the kinematic variable, you are advised to us
 with mother mass constraint.
 
 .. note::
-   See also Anti-neutron identification (Belle Note 1592) for more information about
+   See also Anti-neutron identification (`BN1592`_) for more information about
    ``BelleNbarMVA``.
+
+.. _BN1592: https://belle.kek.jp/secured/belle_note/gn1592/bn1592_v3.0.pdf
 
 ------------
 V0 Particles

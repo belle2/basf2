@@ -6,7 +6,7 @@
 #pragma link C++ nestedclasses;
 
 #pragma link C++ class Belle2::SimHitBase+; // checksum=0xf68f360, version=3
-#pragma link C++ class Belle2::BeamBackHit+; // checksum=0x3cc4b2fe, version=2
+#pragma link C++ class Belle2::BeamBackHit+; // checksum=0xe6e14558, version=2
 #pragma link C++ class Belle2::MCParticleTrajectory+; // checksum=0x7957688e, version=1
 #pragma link C++ class Belle2::MCTrajectoryPoint+; // checksum=0xc11b5e2b, version=-1
 #pragma link C++ class Belle2::SimClockState+; // checksum=0x6a8a681e, version=2
@@ -47,5 +47,35 @@
   targetClass="Belle2::BeamBackHit" target="m_momentumZ" \
   include="TVector3.h" \
   code="{m_momentumZ = onfile.m_momentum.Z();}"
+
+#pragma read sourceClass="Belle2::BeamBackHit" version="[-1]" \
+  source="double m_t" \
+  targetClass="Belle2::BeamBackHit" target="m_t" \
+  code="{m_t = onfile.m_t;}"
+
+#pragma read sourceClass="Belle2::BeamBackHit" version="[-1]" \
+  source="double m_E_start" \
+  targetClass="Belle2::BeamBackHit" target="m_E_start" \
+  code="{m_E_start = onfile.m_E_start;}"
+
+#pragma read sourceClass="Belle2::BeamBackHit" version="[-1]" \
+  source="double m_E_end" \
+  targetClass="Belle2::BeamBackHit" target="m_E_end" \
+  code="{m_E_end = onfile.m_E_end;}"
+
+#pragma read sourceClass="Belle2::BeamBackHit" version="[-1]" \
+  source="double m_energyDeposit" \
+  targetClass="Belle2::BeamBackHit" target="m_energyDeposit" \
+  code="{m_energyDeposit = onfile.m_energyDeposit;}"
+
+#pragma read sourceClass="Belle2::BeamBackHit" version="[-1]" \
+  source="double m_trackLength" \
+  targetClass="Belle2::BeamBackHit" target="m_trackLength" \
+  code="{m_trackLength = onfile.m_trackLength;}"
+
+#pragma read sourceClass="Belle2::BeamBackHit" version="[-1]" \
+  source="double m_neutronWeight" \
+  targetClass="Belle2::BeamBackHit" target="m_neutronWeight" \
+  code="{m_neutronWeight = onfile.m_neutronWeight;}"
 
 #endif

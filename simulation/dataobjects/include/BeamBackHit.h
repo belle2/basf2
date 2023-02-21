@@ -199,22 +199,22 @@ namespace Belle2 {
     float m_momentumZ;
 
     /** Time at which the hit occured. */
-    double m_t;
+    float m_t;
 
     /** Energy of particle at entrance into the volume. */
-    double m_E_start;
+    float m_E_start;
 
     /** Energy of the particle when leaving the volume. */
-    double m_E_end;
+    float m_E_end;
 
     /** Energy deposited in sensitive volume. */
-    double m_energyDeposit;
+    float m_energyDeposit;
 
     /** Length of the track in the volume. */
-    double m_trackLength;
+    float m_trackLength;
 
     /** The effective neutron weight. */
-    double m_neutronWeight;
+    float m_neutronWeight;
 
     /** Class version. */
     ClassDef(BeamBackHit, 2);

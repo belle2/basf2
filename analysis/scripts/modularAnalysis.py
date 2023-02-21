@@ -26,12 +26,13 @@ def setAnalysisConfigParams(configParametersAndValues, path):
     These are:
 
     - 'tupleStyle': 'Default' (default) or 'Laconic'
-      o) defines the style of the branch name in the ntuple
+
+      - defines the style of the branch name in the ntuple
 
     - 'mcMatchingVersion': Specifies what version of mc matching algorithm is going to be used:
 
-          - 'Belle' - analysis of Belle MC
-          - 'BelleII' (default) - all other cases
+      - 'Belle' - analysis of Belle MC
+      - 'BelleII' (default) - all other cases
 
     @param configParametersAndValues dictionary of parameters and their values of the form {param1: value, param2: value, ...)
     @param modules are added to this path
@@ -2300,15 +2301,12 @@ def looseMCTruth(list_name, path):
     The results of loose mc matching algorithm are stored to the following extraInfo
     items:
 
-      - looseMCMotherPDG: PDG code of most common mother
-      - looseMCMotherIndex: 1-based StoreArray<MCParticle> index of most common mother
-      - looseMCWrongDaughterN: number of daughters that don't originate from the most
-                               common mother
-      - looseMCWrongDaughterPDG: PDG code of the daughter that doesn't originate from
-                                 the most common mother
-                                 (only if looseMCWrongDaughterN = 1)
-      - looseMCWrongDaughterBiB: 1 if the wrong daughter is Beam Induced Background
-                                 Particle
+    - looseMCMotherPDG: PDG code of most common mother
+    - looseMCMotherIndex: 1-based StoreArray<MCParticle> index of most common mother
+    - looseMCWrongDaughterN: number of daughters that don't originate from the most common mother
+    - looseMCWrongDaughterPDG: PDG code of the daughter that doesn't originate from the most common mother (only if
+      looseMCWrongDaughterN = 1)
+    - looseMCWrongDaughterBiB: 1 if the wrong daughter is Beam Induced Background Particle
 
     @param list_name name of the input ParticleList
     @param path      modules are added to this path
@@ -2424,16 +2422,16 @@ def appendROEMask(list_name,
 
     - append a ROE mask with all tracks in ROE coming from the IP region
 
-        .. code-block:: python
+    .. code-block:: python
 
-            appendROEMask('B+:sig', 'IPtracks', '[dr < 2] and [abs(dz) < 5]', path=mypath)
+        appendROEMask('B+:sig', 'IPtracks', '[dr < 2] and [abs(dz) < 5]', path=mypath)
 
     - append a ROE mask with only ECL-based particles that pass as good photon candidates
 
-        .. code-block:: python
+    .. code-block:: python
 
-            goodPhotons = 'inCDCAcceptance and clusterErrorTiming < 1e6 and [clusterE1E9 > 0.4 or E > 0.075]'
-            appendROEMask('B+:sig', 'goodROEGamma', '', goodPhotons, path=mypath)
+        goodPhotons = 'inCDCAcceptance and clusterErrorTiming < 1e6 and [clusterE1E9 > 0.4 or E > 0.075]'
+        appendROEMask('B+:sig', 'goodROEGamma', '', goodPhotons, path=mypath)
 
 
     @param list_name             name of the input ParticleList
@@ -2462,13 +2460,13 @@ def appendROEMasks(list_name, mask_tuples, path=None):
 
     - Example for two tuples, one with and one without fractions
 
-        .. code-block:: python
+    .. code-block:: python
 
-            ipTracks     = ('IPtracks', '[dr < 2] and [abs(dz) < 5]', '', '')
-            goodPhotons = 'inCDCAcceptance and [clusterErrorTiming < 1e6] and [clusterE1E9 > 0.4 or E > 0.075]'
-            goodROEGamma = ('ROESel', '[dr < 2] and [abs(dz) < 5]', goodPhotons, '')
-            goodROEKLM     = ('IPtracks', '[dr < 2] and [abs(dz) < 5]', '', 'nKLMClusterTrackMatches == 0')
-            appendROEMasks('B+:sig', [ipTracks, goodROEGamma, goodROEKLM], path=mypath)
+        ipTracks     = ('IPtracks', '[dr < 2] and [abs(dz) < 5]', '', '')
+        goodPhotons = 'inCDCAcceptance and [clusterErrorTiming < 1e6] and [clusterE1E9 > 0.4 or E > 0.075]'
+        goodROEGamma = ('ROESel', '[dr < 2] and [abs(dz) < 5]', goodPhotons, '')
+        goodROEKLM     = ('IPtracks', '[dr < 2] and [abs(dz) < 5]', '', 'nKLMClusterTrackMatches == 0')
+        appendROEMasks('B+:sig', [ipTracks, goodROEGamma, goodROEKLM], path=mypath)
 
     @param list_name             name of the input ParticleList
     @param mask_tuples           array of ROEMask list tuples to be appended
@@ -2563,15 +2561,15 @@ def keepInROEMasks(list_name, mask_names, cut_string, path=None):
 
     - keep only those tracks that were used in provided particle list
 
-        .. code-block:: python
+    .. code-block:: python
 
-            keepInROEMasks('pi+:goodTracks', 'mask', '', path=mypath)
+        keepInROEMasks('pi+:goodTracks', 'mask', '', path=mypath)
 
     - keep only those clusters that were used in provided particle list and pass a cut, apply to several masks
 
-        .. code-block:: python
+    .. code-block:: python
 
-            keepInROEMasks('gamma:goodClusters', ['mask1', 'mask2'], 'E > 0.1', path=mypath)
+        keepInROEMasks('gamma:goodClusters', ['mask1', 'mask2'], 'E > 0.1', path=mypath)
 
 
     @param list_name    name of the input ParticleList
@@ -2604,15 +2602,15 @@ def discardFromROEMasks(list_name, mask_names, cut_string, path=None):
 
     - discard tracks that were used in provided particle list
 
-        .. code-block:: python
+    .. code-block:: python
 
-            discardFromROEMasks('pi+:badTracks', 'mask', '', path=mypath)
+        discardFromROEMasks('pi+:badTracks', 'mask', '', path=mypath)
 
     - discard clusters that were used in provided particle list and pass a cut, apply to several masks
 
-        .. code-block:: python
+    .. code-block:: python
 
-            discardFromROEMasks('gamma:badClusters', ['mask1', 'mask2'], 'E < 0.1', path=mypath)
+        discardFromROEMasks('gamma:badClusters', ['mask1', 'mask2'], 'E < 0.1', path=mypath)
 
 
     @param list_name    name of the input ParticleList
@@ -2644,9 +2642,9 @@ def optimizeROEWithV0(list_name, mask_names, cut_string, path=None):
 
     - treat tracks from K_S0 inside mass window separately, replace track momenta with K_S0 momentum
 
-        .. code-block:: python
+    .. code-block:: python
 
-            optimizeROEWithV0('K_S0:opt', 'mask', '0.450 < M < 0.550', path=mypath)
+        optimizeROEWithV0('K_S0:opt', 'mask', '0.450 < M < 0.550', path=mypath)
 
     @param list_name    name of the input ParticleList
     @param mask_names   array of ROEMasks to be updated
@@ -4030,6 +4028,7 @@ def addPi0VetoEfficiencySystematics(particleList, decayString, tableName, thresh
     @param path           the module is added to this path
 
     The following extraInfo are available related with the given particleList:
+
     * Pi0VetoEfficiencySystematics_{mode}{suffix}_data_MC_ratio             : weight of Data/MC for the veto efficiency
     * Pi0VetoEfficiencySystematics_{mode}{suffix}_data_MC_uncertainty_stat  : the statistical uncertainty of the weight
     * Pi0VetoEfficiencySystematics_{mode}{suffix}_data_MC_uncertainty_sys   : the systematic uncertainty of the weight
@@ -4106,6 +4105,7 @@ def getNbarIDMVA(particleList, path=None):
     It is not used to predict n0.
     Currently, this can be used only for ECL cluster.
     output will be stored in extraInfo(nbarID); -1 means MVA invalid
+
     @param particleList     The input ParticleList
     @param path             modules are added to this path
     """

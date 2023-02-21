@@ -2334,6 +2334,7 @@ namespace Belle2 {
           std::sort(weightsAndIndices.begin(), weightsAndIndices.end(),
                     ValueIndexPairSorting::higherPair<decltype(weightsAndIndices)::value_type>);
 
+          // cppcheck-suppress containerOutOfBounds
           const MCParticle* mcp = mcps.object(weightsAndIndices[0].second);
 
           Particle tmpPart(mcp);

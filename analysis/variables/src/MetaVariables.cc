@@ -17,6 +17,7 @@
 #include <analysis/utility/ReferenceFrame.h>
 #include <analysis/utility/EvtPDLUtil.h>
 #include <analysis/utility/ParticleCopy.h>
+#include <analysis/utility/ValueIndexPairSorting.h>
 #include <analysis/ClusterUtility/ClusterUtils.h>
 #include <analysis/variables/VariableFormulaConstructor.h>
 
@@ -2330,12 +2331,8 @@ namespace Belle2 {
             weightsAndIndices.emplace_back(mcps.weight(i), i);
 
           // sort descending by weight
-          std::sort(
-            weightsAndIndices.begin(), weightsAndIndices.end(),
-            [](const std::pair<double, int>& l, const std::pair<double, int>& r)
-          {
-            return l.first > r.first;
-          });
+          std::sort(weightsAndIndices.begin(), weightsAndIndices.end(),
+                    ValueIndexPairSorting::higherPair<decltype(weightsAndIndices)::value_type>);
 
           const MCParticle* mcp = mcps.object(weightsAndIndices[0].second);
 

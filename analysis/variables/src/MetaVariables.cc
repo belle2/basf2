@@ -3531,8 +3531,8 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                       "Returns NaN if no matched MCParticle exists.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("clusterBestMatchedMCParticle(variable)", clusterBestMatchedMCParticle,
                       "Returns variable output for the MCParticle that is best-matched with the ECLCluster of the given Particle.\n"
-		      "When the variable is called for ``gamma`` and if the ``gamma`` is matched with MCParticle, it works same as `matchedMC`.\n"
-		      "While, the variable is called for ``gamma`` that fails to match with MCParticle, it provides the mdst-level MCMatching information abouth the ECLCluster.\n"
+                      "When the variable is called for ``gamma`` and if the ``gamma`` is matched with MCParticle, it works same as `matchedMC`.\n"
+                      "While, the variable is called for ``gamma`` that fails to match with MCParticle, it provides the mdst-level MCMatching information abouth the ECLCluster.\n"
                       "Returns NaN if no matched ECLCluster nor MCParticle exists", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("countInList(particleList, cut='')", countInList, "[Eventbased] "
                       "Returns number of particle which pass given in cut in the specified particle list.\n"

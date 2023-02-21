@@ -10,7 +10,6 @@
 #include <analysis/variables/MetaVariables.h>
 
 #include <analysis/VariableManager/Utility.h>
-#include <framework/dataobjects/EventExtraInfo.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/RestOfEvent.h>
@@ -24,6 +23,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventExtraInfo.h>
 #include <framework/utilities/Conversion.h>
 #include <framework/utilities/MakeROOTCompatible.h>
 #include <framework/gearbox/Const.h>
@@ -1820,6 +1820,39 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr originalParticle(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        auto func = [var](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return std::numeric_limits<float>::quiet_NaN();
+
+          StoreArray<Particle> particles;
+          if (!particle->hasExtraInfo("original_index"))
+            return std::numeric_limits<float>::quiet_NaN();
+
+          auto originalParticle = particles[particle->getExtraInfo("original_index")];
+          if (!originalParticle)
+            return std::numeric_limits<float>::quiet_NaN();
+          auto var_result = var->function(originalParticle);
+          if (std::holds_alternative<double>(var_result))
+          {
+            return std::get<double>(var_result);
+          } else if (std::holds_alternative<int>(var_result))
+          {
+            return std::get<int>(var_result);
+          } else if (std::holds_alternative<bool>(var_result))
+          {
+            return std::get<bool>(var_result);
+          } else return std::numeric_limits<double>::quiet_NaN();
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function originalParticle");
+      }
+    }
+
     Manager::FunctionPtr daughter(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 2) {
@@ -1838,6 +1871,46 @@ namespace Belle2 {
           else
           {
             auto var_result = var->function(particle->getDaughter(daughterNumber));
+            if (std::holds_alternative<double>(var_result)) {
+              return std::get<double>(var_result);
+            } else if (std::holds_alternative<int>(var_result)) {
+              return std::get<int>(var_result);
+            } else if (std::holds_alternative<bool>(var_result)) {
+              return std::get<bool>(var_result);
+            } else return std::numeric_limits<double>::quiet_NaN();
+          }
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function daughter");
+      }
+    }
+
+    Manager::FunctionPtr originalDaughter(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        int daughterNumber = 0;
+        try {
+          daughterNumber = Belle2::convertString<int>(arguments[0]);
+        } catch (std::invalid_argument&) {
+          B2FATAL("First argument of daughter meta function must be integer!");
+        }
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
+        auto func = [var, daughterNumber](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return std::numeric_limits<float>::quiet_NaN();
+          if (daughterNumber >= int(particle->getNDaughters()))
+            return std::numeric_limits<float>::quiet_NaN();
+          else
+          {
+            StoreArray<Particle> particles;
+            if (!particle->getDaughter(daughterNumber)->hasExtraInfo("original_index"))
+              return std::numeric_limits<float>::quiet_NaN();
+            auto originalDaughter = particles[particle->getDaughter(daughterNumber)->getExtraInfo("original_index")];
+            if (!originalDaughter)
+              return std::numeric_limits<float>::quiet_NaN();
+
+            auto var_result = var->function(originalDaughter);
             if (std::holds_alternative<double>(var_result)) {
               return std::get<double>(var_result);
             } else if (std::holds_alternative<int>(var_result)) {
@@ -3154,11 +3227,25 @@ Returns 1 if the particle's matched MC particle is also matched to a particle in
 
     REGISTER_METAVARIABLE("isGrandDaughterOfList(particleListNames)", isGrandDaughterOfList,
                       "Returns 1 if the given particle is a grand daughter of at least one of the particles in the given particle Lists.", Manager::VariableDataType::c_bool);
+    REGISTER_METAVARIABLE("originalParticle(variable)", originalParticle, R"DOC(
+                      Returns value of variable for the original particle from which the given particle is copied.
+
+                      The copy of particle is created, for example, when the vertex fit updates the daughters and `modularAnalysis.copyParticles` is called.
+                      Returns NaN if the given particle is not copied and so there is no original particle.
+                      )DOC", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("daughter(i, variable)", daughter, R"DOC(
                       Returns value of variable for the i-th daughter. E.g.
 
                       * ``daughter(0, p)`` returns the total momentum of the first daughter.
                       * ``daughter(0, daughter(1, p)`` returns the total momentum of the second daughter of the first daughter.
+
+                      Returns NaN if particle is nullptr or if the given daughter-index is out of bound (>= amount of daughters).
+                      )DOC", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("originalDaughter(i, variable)", originalDaughter, R"DOC(
+                      Returns value of variable for the original particle from which the i-th daughter is copied.
+
+                      The copy of particle is created, for example,  when the vertex fit updates the daughters and `modularAnalysis.copyParticles` is called.
+                      Returns NaN if the daughter is not copied and so there is no original daughter.
 
                       Returns NaN if particle is nullptr or if the given daughter-index is out of bound (>= amount of daughters).
                       )DOC", Manager::VariableDataType::c_double);

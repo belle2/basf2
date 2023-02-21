@@ -20,7 +20,6 @@
 #include <mdst/dataobjects/MCParticle.h>
 
 // framework - DataStore
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/RelationArray.h>
 
@@ -29,7 +28,6 @@
 #include <framework/gearbox/Const.h>
 #include <framework/geometry/B2Vector3.h>
 
-using namespace std;
 using namespace boost;
 
 namespace Belle2 {
@@ -45,17 +43,18 @@ namespace Belle2 {
     //                 Implementation
     //-----------------------------------------------------------------
 
-    ARICHBackgroundModule::ARICHBackgroundModule() : Module(), phpos(TVector3()), phmom(TVector3()),
-      phVtx(TVector3()), phMmom(TVector3()), phMvtx(TVector3()), phPvtx(TVector3()), phPmom(TVector3()),
-      phGMvtx(TVector3()), phGMmom(TVector3()), modOrig(TVector3()), source(0), phPDG(0), phMPDG(0), phPPDG(0),
-      phGMPDG(0), type(0), edep(0.0), ttime(0.0), moduleID(0), phnw(0.0), trlen(0.0), en(0.0), ff(NULL),
-      TrHits(NULL)
+    ARICHBackgroundModule::ARICHBackgroundModule() : Module(), m_phpos(TVector3()), m_phmom(TVector3()),
+      m_phVtx(TVector3()), m_phMmom(TVector3()), m_phMvtx(TVector3()), m_phPvtx(TVector3()), m_phPmom(TVector3()),
+      m_phGMvtx(TVector3()), m_phGMmom(TVector3()), m_modOrig(TVector3()), m_source(0), m_phPDG(0), m_phMPDG(0), m_phPPDG(0),
+      m_phGMPDG(0), m_type(0), m_edep(0.0), m_ttime(0.0), m_moduleID(0), m_phnw(0.0), m_trackLength(0.0), m_energy(0.0),
+      m_outputFile(NULL),
+      m_outputTree(NULL)
     {
       // Set description()
       setDescription("ARICHBackground module. Used to extract information relevant for ARICH background from background files");
 
       // Add parameters
-      addParam("FileName", m_filename, "output file name", string("mytree.root"));
+      addParam("FileName", m_filename, "output file name", std::string("mytree.root"));
       addParam("BkgTag", m_bkgTag, "background type tag (appended to hits in the output tree", 0);
 
     }
@@ -67,36 +66,33 @@ namespace Belle2 {
 
     void ARICHBackgroundModule::initialize()
     {
-      // Print set parameters
-      printModuleParams();
+      m_outputFile = new TFile(m_filename.c_str(), "RECREATE");
 
-      ff = new TFile(m_filename.c_str(), "RECREATE");
+      m_outputTree = new TTree("m_outputTree", "tree of arich background hits");
+      m_outputTree->Branch("source", &m_source, "m_source/I");
+      m_outputTree->Branch("phpos", "TVector3", &m_phpos);
+      m_outputTree->Branch("phmom", "TVector3", &m_phmom);
+      m_outputTree->Branch("phVtx", "TVector3", &m_phVtx);
+      m_outputTree->Branch("phMmom", "TVector3", &m_phMmom);
+      m_outputTree->Branch("phMvtx", "TVector3", &m_phMvtx);
+      m_outputTree->Branch("phPvtx", "TVector3", &m_phPvtx);
+      m_outputTree->Branch("phPmom", "TVector3", &m_phPmom);
+      m_outputTree->Branch("phGMvtx", "TVector3", &m_phGMvtx);
+      m_outputTree->Branch("phGMmom", "TVector3", &m_phGMmom);
+      m_outputTree->Branch("modOrig", "TVector3", &m_modOrig);
+      m_outputTree->Branch("phPDG", &m_phPDG, "m_phPDG/I");
+      m_outputTree->Branch("phMPDG", &m_phMPDG, "m_phMPDG/I");
+      m_outputTree->Branch("phPPDG", &m_phPPDG, "m_phPPDG/I");
+      m_outputTree->Branch("phGMPDG", &m_phGMPDG, "m_phGMPDG/I");
+      m_outputTree->Branch("type", &m_type, "m_type/I");
+      m_outputTree->Branch("edep", &m_edep, "m_edep/D");
+      m_outputTree->Branch("ttime", &m_ttime, "m_ttime/D");
+      m_outputTree->Branch("moduleID", &m_moduleID, "m_moduleID/I");
+      m_outputTree->Branch("phnw", &m_phnw, "m_phnw/D");
+      m_outputTree->Branch("trackLength", &m_trackLength, "m_trackLength/D");
+      m_outputTree->Branch("energy", &m_energy, "m_energy/D");
 
-      TrHits = new TTree("TrHits", "tree of arich background hits");
-      TrHits->Branch("source", &source, "source/I");
-      TrHits->Branch("phpos", "TVector3", &phpos);
-      TrHits->Branch("phmom", "TVector3", &phmom);
-      TrHits->Branch("phVtx", "TVector3", &phVtx);
-      TrHits->Branch("phMmom", "TVector3", &phMmom);
-      TrHits->Branch("phMvtx", "TVector3", &phMvtx);
-      TrHits->Branch("phPvtx", "TVector3", &phPvtx);
-      TrHits->Branch("phPmom", "TVector3", &phPmom);
-      TrHits->Branch("phGMvtx", "TVector3", &phGMvtx);
-      TrHits->Branch("phGMmom", "TVector3", &phGMmom);
-      TrHits->Branch("modOrig", "TVector3", &modOrig);
-      TrHits->Branch("phPDG", &phPDG, "phPDG/I");
-      TrHits->Branch("phMPDG", &phMPDG, "phMPDG/I");
-      TrHits->Branch("phPPDG", &phPPDG, "phPPDG/I");
-      TrHits->Branch("phGMPDG", &phGMPDG, "phGMPDG/I");
-      TrHits->Branch("type", &type, "type/I");
-      TrHits->Branch("edep", &edep, "edep/D");
-      TrHits->Branch("ttime", &ttime, "ttime/D");
-      TrHits->Branch("moduleID", &moduleID, "moduleID/I");
-      TrHits->Branch("phnw", &phnw, "phnw/D");
-      TrHits->Branch("trlen", &trlen, "trlen/D");
-      TrHits->Branch("en", &en, "en/D");
-
-      source = m_bkgTag;
+      m_source = m_bkgTag;
     }
 
     void ARICHBackgroundModule::beginRun()
@@ -108,141 +104,115 @@ namespace Belle2 {
 
     void ARICHBackgroundModule::event()
     {
+      for (const BeamBackHit& arichBeamBkgHit : m_BeamBackHits) {
 
-      StoreArray<MCParticle> mcParticles;
-
-      StoreArray<ARICHSimHit>  arichSimHits;
-
-      StoreArray<BeamBackHit> beamBackHits;
-
-      StoreArray<ARICHDigit> arichDigits;
-
-      int nHits = beamBackHits.getEntries();
-
-      for (int iHit = 0; iHit < nHits; ++iHit) {
-
-        BeamBackHit* arichhit = beamBackHits[iHit];
-        int subdet = arichhit->getSubDet();
+        int subdet = arichBeamBkgHit.getSubDet();
         if (subdet != 4) continue;
-        type = 0;
-        if (arichhit->getIdentifier() == 1) type = 1;
-        edep = arichhit->getEnergyDeposit();
-        ttime = arichhit->getTime();
-        phPDG = arichhit->getPDG();
-        phpos = arichhit->getPosition();
-        phmom = arichhit->getMomentum();
-        moduleID = m_arichgp->getDetectorPlane().pointSlotID(phpos.X(), phpos.Y());
-        double r = m_arichgp->getDetectorPlane().getSlotR(moduleID);
-        double phi = m_arichgp->getDetectorPlane().getSlotPhi(moduleID);
-        modOrig = TVector3(r * cos(phi), r * sin(phi), 0);
-        en = arichhit->getEnergy();
+        m_type = 0;
+        if (arichBeamBkgHit.getIdentifier() == 1) m_type = 1;
+        m_edep = arichBeamBkgHit.getEnergyDeposit();
+        m_ttime = arichBeamBkgHit.getTime();
+        m_phPDG = arichBeamBkgHit.getPDG();
+        m_phpos = arichBeamBkgHit.getPosition();
+        m_phmom = arichBeamBkgHit.getMomentum();
+        m_moduleID = m_arichgp->getDetectorPlane().pointSlotID(m_phpos.X(), m_phpos.Y());
+        double r = m_arichgp->getDetectorPlane().getSlotR(m_moduleID);
+        double phi = m_arichgp->getDetectorPlane().getSlotPhi(m_moduleID);
+        m_modOrig = TVector3(r * cos(phi), r * sin(phi), 0);
+        m_energy = arichBeamBkgHit.getEnergy();
 
-        if (phPDG == Const::neutron.getPDGCode()) {
-          phnw = arichhit->getNeutronWeight();
-          trlen = arichhit->getTrackLength();
+        if (m_phPDG == Const::neutron.getPDGCode()) {
+          m_phnw = arichBeamBkgHit.getNeutronWeight();
+          m_trackLength = arichBeamBkgHit.getTrackLength();
         }
-        phVtx = TVector3(0, 0, 0); phMvtx = TVector3(0, 0, 0);  phMmom = TVector3(0, 0, 0);
-        phMPDG = -1; phPPDG = -1; phGMPDG = -1;
-        phPvtx = TVector3(0, 0, 0); phPmom = TVector3(0, 0, 0); phGMvtx = TVector3(0, 0, 0); phGMmom = TVector3(0, 0, 0);
+        m_phVtx = TVector3(0, 0, 0); m_phMvtx = TVector3(0, 0, 0);  m_phMmom = TVector3(0, 0, 0);
+        m_phMPDG = -1; m_phPPDG = -1; m_phGMPDG = -1;
+        m_phPvtx = TVector3(0, 0, 0); m_phPmom = TVector3(0, 0, 0); m_phGMvtx = TVector3(0, 0, 0); m_phGMmom = TVector3(0, 0, 0);
 
-        RelationIndex<MCParticle, BeamBackHit> relBeamBackHitToMCParticle(mcParticles, beamBackHits);
-        if (relBeamBackHitToMCParticle.getFirstElementTo(arichhit)) {
-          const MCParticle* currParticle = relBeamBackHitToMCParticle.getFirstElementTo(arichhit)->from;
-          phVtx = B2Vector3D(currParticle->getVertex());
+        RelationIndex<MCParticle, BeamBackHit> relBeamBackHitToMCParticle(m_MCParticles, m_BeamBackHits);
+        if (relBeamBackHitToMCParticle.getFirstElementTo(arichBeamBkgHit)) {
+          const MCParticle* currParticle = relBeamBackHitToMCParticle.getFirstElementTo(arichBeamBkgHit)->from;
+          m_phVtx = B2Vector3D(currParticle->getVertex());
           const MCParticle* mother = currParticle->getMother();
           int mm = 0;
           while (mother) {
             if (mm == 0) {
-              phMPDG = mother->getPDG();
-              phMvtx = B2Vector3D(mother->getVertex());
-              phMmom = B2Vector3D(mother->getMomentum());
+              m_phMPDG = mother->getPDG();
+              m_phMvtx = B2Vector3D(mother->getVertex());
+              m_phMmom = B2Vector3D(mother->getMomentum());
             }
             if (mm == 1) {
-              phGMPDG = mother->getPDG();
-              phGMvtx = B2Vector3D(mother->getVertex());
-              phGMmom = B2Vector3D(mother->getMomentum());
+              m_phGMPDG = mother->getPDG();
+              m_phGMvtx = B2Vector3D(mother->getVertex());
+              m_phGMmom = B2Vector3D(mother->getMomentum());
             }
             const MCParticle* pommother = mother->getMother();
             if (!pommother) {
-              phPPDG = mother->getPDG();
-              phPvtx = B2Vector3D(mother->getVertex());
-              phPmom = B2Vector3D(mother->getMomentum());
+              m_phPPDG = mother->getPDG();
+              m_phPvtx = B2Vector3D(mother->getVertex());
+              m_phPmom = B2Vector3D(mother->getMomentum());
             }
             mother = pommother;
             mm++;
           }
 
         }
-        TrHits->Fill();
+        m_outputTree->Fill();
       }
 
-      nHits = arichSimHits.getEntries();
+      // these assignments are the same in every iteration of the loop
+      // so just assign them once outside the loop
+      m_type = 2;
+      m_phPDG = 0;
+      m_edep = 0;
+      for (const ARICHSimHit& arichsimhit : m_ARICHSimHits) {
+        m_moduleID = arichsimhit.getModuleID();
+        m_ttime = arichsimhit.getGlobalTime();
 
-      for (int iHit = 0; iHit < nHits; ++iHit) {
-        ARICHSimHit* simHit = arichSimHits[iHit];
-        moduleID = simHit->getModuleID();
-        type = 2;
-        phPDG = 0;
-        edep = 0;
-        ttime = simHit->getGlobalTime();
-
-        phVtx = TVector3(0, 0, 0); phMvtx = TVector3(0, 0, 0);  phMmom = TVector3(0, 0, 0);
-        phMPDG = -1; phPPDG = -1; phGMPDG = -1; phmom = TVector3(0, 0, 0);
-        phPvtx = TVector3(0, 0, 0); phPmom = TVector3(0, 0, 0); phGMvtx = TVector3(0, 0, 0); phGMmom = TVector3(0, 0, 0);
-        RelationIndex<MCParticle, ARICHSimHit> relSimHitToMCParticle(mcParticles, arichSimHits);
-        if (relSimHitToMCParticle.getFirstElementTo(simHit)) {
-          const MCParticle* currParticle = relSimHitToMCParticle.getFirstElementTo(simHit)->from;
-          phVtx = B2Vector3D(currParticle->getVertex());
+        m_phVtx = TVector3(0, 0, 0); m_phMvtx = TVector3(0, 0, 0);  m_phMmom = TVector3(0, 0, 0);
+        m_phMPDG = -1; m_phPPDG = -1; m_phGMPDG = -1; m_phmom = TVector3(0, 0, 0);
+        m_phPvtx = TVector3(0, 0, 0); m_phPmom = TVector3(0, 0, 0); m_phGMvtx = TVector3(0, 0, 0); m_phGMmom = TVector3(0, 0, 0);
+        RelationIndex<MCParticle, ARICHSimHit> relSimHitToMCParticle(m_MCParticles, m_ARICHSimHits);
+        if (relSimHitToMCParticle.getFirstElementTo(arichsimhit)) {
+          const MCParticle* currParticle = relSimHitToMCParticle.getFirstElementTo(arichsimhit)->from;
+          m_phVtx = B2Vector3D(currParticle->getVertex());
           const MCParticle* mother = currParticle->getMother();
           int mm = 0;
           while (mother) {
             if (mm == 0) {
-              phMPDG = mother->getPDG();
-              phMvtx = B2Vector3D(mother->getVertex());
-              phMmom = B2Vector3D(mother->getMomentum());
+              m_phMPDG = mother->getPDG();
+              m_phMvtx = B2Vector3D(mother->getVertex());
+              m_phMmom = B2Vector3D(mother->getMomentum());
             }
             if (mm == 1) {
-              phGMPDG = mother->getPDG();
-              phGMvtx = B2Vector3D(mother->getVertex());
-              phGMmom = B2Vector3D(mother->getMomentum());
+              m_phGMPDG = mother->getPDG();
+              m_phGMvtx = B2Vector3D(mother->getVertex());
+              m_phGMmom = B2Vector3D(mother->getMomentum());
             }
             const MCParticle* pommother = mother->getMother();
             if (!pommother) {
-              phPPDG = mother->getPDG();
-              phPvtx = B2Vector3D(mother->getVertex());
-              phPmom = B2Vector3D(mother->getMomentum());
+              m_phPPDG = mother->getPDG();
+              m_phPvtx = B2Vector3D(mother->getVertex());
+              m_phPmom = B2Vector3D(mother->getMomentum());
             }
             mother = pommother;
             mm++;
           }
 
         }
-        TrHits->Fill();
+        m_outputTree->Fill();
       }
-    }
-
-    void ARICHBackgroundModule::endRun()
-    {
     }
 
     void ARICHBackgroundModule::terminate()
     {
-      // CPU time end
-
       // Announce
       B2INFO("ARICHBackground finished.");
 
-      //TrHits->Write();
-      ff->Write();
-      ff->Close();
-
+      //m_outputTree->Write();
+      m_outputFile->Write();
+      m_outputFile->Close();
     }
-
-    void ARICHBackgroundModule::printModuleParams() const
-    {
-
-    }
-
 
   } // end arich namespace
 } // end Belle2 namespace

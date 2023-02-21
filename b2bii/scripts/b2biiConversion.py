@@ -37,15 +37,6 @@ def setupBelleDatabaseServer():
     os.environ['BELLE_POSTGRES_SERVER'] = belleDBServer
 
 
-def setupBelleMagneticField(path):
-    """
-    This function set the Belle Magnetic field (constant).
-    """
-    b2.B2WARNING(
-        'setupBelleMagneticField function is obsolete. Please remove it from your scripts. '
-        'The Belle magnetic field is now being set via the settings in inputMdst(List) fucntion.')
-
-
 def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
                                   useBelleDBServer=None,
                                   convertBeamParameters=True,

@@ -1289,6 +1289,48 @@ def fillParticleListsFromMC(decayStringsWithCuts,
             applyCuts(decayString, cut, path)
 
 
+def extractParticlesFromROE(particleLists,
+                            maskName='all',
+                            writeOut=False,
+                            path=None):
+    """
+    Extract Particle objects that belong to the Rest-Of-Events and fill them into the ParticleLists.
+    This function has to be used only in the for_each loops over ROE.
+    The types of the particles other than those specified by ``particleLists`` are not stored.
+    If one creates a ROE with ``fillWithMostLikely=True`` via `buildRestOfEvent`, for example,
+    one should create particleLists for not only ``pi+``, ``gamma``, ``K_L0`` but also other charged final state particles.
+
+    .. code-block:: python
+
+        buildRestOfEvent('B0:sig', fillWithMostLikely=True, path=mypath)
+
+        roe_path = create_path()
+        deadEndPath = create_path()
+        signalSideParticleFilter('B0:sig', '', roe_path, deadEndPath)
+
+        plists = ['%s:in_roe' % ptype for ptype in ['pi+', 'gamma', 'K_L0', 'K+', 'p+', 'e+', 'mu+']]
+        extractParticlesFromROE(plists, maskName='all', path=roe_path)
+
+        mypath.for_each('RestOfEvent', 'RestOfEvents', roe_path)
+
+
+    @param particleLists (str or list(str)) Name of output ParticleLists
+    @param maskName (str)                   Name of the ROE mask to be applied on Particles
+    @param writeOut (bool)                  whether RootOutput module should save the created ParticleList
+    @param path (basf2.Path)                modules are added to this path
+    """
+
+    if isinstance(particleLists, str):
+        particleLists = [particleLists]
+
+    pext = register_module('ParticleExtractorFromROE')
+    pext.set_name('ParticleExtractorFromROE_' + '_'.join(particleLists))
+    pext.param('outputListNames', particleLists)
+    pext.param('maskName', maskName)
+    pext.param('writeOut', writeOut)
+    path.add_module(pext)
+
+
 def applyCuts(list_name, cut, path):
     """
     Removes particle candidates from ``list_name`` that do not pass ``cut``
@@ -3990,6 +4032,26 @@ def scaleError(outputListName, inputListName,
     scale_error.param('d0MomentumThreshold', d0MomThr)
     scale_error.param('z0MomentumThreshold', z0MomThr)
     path.add_module(scale_error)
+
+
+def estimateAndAttachTrackFitResult(inputListName, path=None):
+    """
+    Create a TrackFitResult from the momentum of the Particle assuming it originates from the IP and make a relation between them.
+    The covariance, detector hit information, and fit-related information (pValue, NDF) are assigned meaningless values. The input
+    Particles must not have already Track or TrackFitResult and thus are supposed to be composite particles, recoil, dummy
+    particles, and so on.
+
+
+    .. warning:: Since the source type is not overwritten as Track, not all track-related variables are guaranteed to be available.
+
+
+    @param inputListName Name of input ParticleList
+    """
+
+    estimator = register_module("TrackFitResultEstimator")
+    estimator.set_name("trackFitResultEstimator_" + inputListName)
+    estimator.param("inputListName", inputListName)
+    path.add_module(estimator)
 
 
 def correctEnergyBias(inputListNames, tableName, path=None):

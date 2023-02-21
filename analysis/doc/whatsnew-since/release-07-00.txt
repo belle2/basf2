@@ -18,6 +18,9 @@ MCMatching of K_S0
 
 Modules
 +++++++
+* New function `modularAnalysis.estimateAndAttachTrackFitResult` and module `TrackFitResultEstimator` are added. It creates a
+  ``TrackFitResult`` from the momentum of the Particle and creates a relation between them. The main use case is the tracking
+  efficiency study by extrapolating the recoil particle to the detector surfaces.
 * Fixed a bug on the `findMCDecay` that the decay of ``K_S0`` cannot be specified.
 * Added an option ``usePhotonOnlyOnce`` to the function :func:`modularAnalysis.correctBremsBelle`. The default of the option is
   ``False`` so the backward compatibility. If the option is set to ``True``, a photon is used for only the closest charged particle
@@ -46,6 +49,10 @@ Modules
   be applied to all output files. If you need to save multiple TTrees with the same name, please use the new argument
   ``filenameSuffix`` of `modularAnalysis.variablesToNtuple` to differentiate the output files. The ``filenameSuffix`` is appended to
   the output ROOT file name even if the ``-o`` argument is used.
+* Fixed a bug on `NeutralHadron4MomentumCalculator` that misplaces the neutral hadron daughter's index after calculating its momentum.
+* New function `modularAnalysis.extractParticlesFromROE` and module `ParticleExtractorFromROE` are implemented.
+  The function extracts Particle objects that belong to a ROE and fills them in ParticleLists. It is available in the ``for_each``
+  loop over the ROEs (e.g. ``roe_path``).
 
 Variables
 +++++++++
@@ -54,6 +61,11 @@ Variables
   energies of all generated particles, respectively.
 * Deprecated `hadronicSplitOffSuppression` which has been replaced with `fakePhotonSuppression`
 * New variables `countFSPDaughters` and `countDescendants` are added to get number of daughters which passes the given selection.
+* New meta-variables `originalParticle` and `originalDaughter` are added to get the variable of the original particle from which
+  the given particle or the specified daughter. One can get the variables of the daughters particles before they are updated by the 
+  vertex fit, for example.
+* New variables `helixExtThetaOnDet` and `helixExtPhiOnDet` are added. They returns theta and phi of extrapolated helix parameters
+  on the detector surface given by the argument.
 
 Changes in the analysis package in light-2212-foldex
 ----------------------------------------------------

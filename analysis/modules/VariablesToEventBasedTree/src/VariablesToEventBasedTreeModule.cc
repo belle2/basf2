@@ -260,6 +260,7 @@ void VariablesToEventBasedTreeModule::event()
 
       if (iPart >= m_maxCandidates) {
         B2WARNING("Maximum number of candidates exceeded in VariablesToEventBasedTree module. I will skip additional candidates");
+        m_ncandidates = m_maxCandidates;
         break;
       }
 

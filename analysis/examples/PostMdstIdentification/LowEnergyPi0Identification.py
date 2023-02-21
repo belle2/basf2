@@ -19,7 +19,6 @@ import b2biiConversion
 import modularAnalysis as ma
 import variables.collections as vc
 from variables import variables
-import b2bii
 
 # Arguments.
 parser = argparse.ArgumentParser()
@@ -53,16 +52,13 @@ ma.reconstructDecay('pi0:gamma -> gamma:pi0 gamma:pi0', mass_cut,
                     path=analysis_path)
 if arguments.belle1:
     payload_name_suffix = 'Belle1'
-else:
-    payload_name_suffix = 'Belle2Release5'
-
-# lowEnergyPi0Identification requires a payload stored in the analysis global tag
-# One has to manually append (or prepend) it
-if b2bii.isB2BII():
     tag = ma.getAnalysisGlobaltagB2BII()
 else:
+    payload_name_suffix = 'Belle2Release5'
     tag = ma.getAnalysisGlobaltag()
 
+# lowEnergyPi0Identification requires a payload stored in the analysis global tag
+# It must be appended (or prepended) manually
 basf2.conditions.append_globaltag(tag)
 
 ma.lowEnergyPi0Identification(pi0_list, 'gamma:pi0', payload_name_suffix,

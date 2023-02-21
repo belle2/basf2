@@ -2312,6 +2312,56 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr clusterBestMatchedMCParticle(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+
+        auto func = [var](const Particle * particle) -> double {
+
+          const ECLCluster* cluster = particle->getECLCluster();
+          if (!cluster) return std::numeric_limits<double>::quiet_NaN();
+
+          auto mcps = cluster->getRelationsTo<MCParticle>();
+          if (mcps.size() == 0) return std::numeric_limits<double>::quiet_NaN();
+
+          std::vector<std::pair<double, int>> weightsAndIndices;
+          for (unsigned int i = 0; i < mcps.size(); ++i)
+            weightsAndIndices.emplace_back(mcps.weight(i), i);
+
+          // sort descending by weight
+          std::sort(
+            weightsAndIndices.begin(), weightsAndIndices.end(),
+            [](const std::pair<double, int>& l, const std::pair<double, int>& r)
+          {
+            return l.first > r.first;
+          });
+
+          const MCParticle* mcp = mcps.object(weightsAndIndices[0].second);
+
+          Particle tmpPart(mcp);
+          auto var_result = var->function(&tmpPart);
+          if (std::holds_alternative<double>(var_result))
+          {
+            return std::get<double>(var_result);
+          } else if (std::holds_alternative<int>(var_result))
+          {
+            return std::get<int>(var_result);
+          } else if (std::holds_alternative<bool>(var_result))
+          {
+            return std::get<bool>(var_result);
+          } else
+          {
+            return std::numeric_limits<double>::quiet_NaN();
+          }
+        };
+
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function clusterBestMatchedMCParticle");
+      }
+    }
+
     double matchedMCHasPDG(const Particle* particle, const std::vector<double>& pdgCode)
     {
       if (pdgCode.size() != 1) {
@@ -3479,6 +3529,11 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                       "This may not work too well if your variable requires accessing daughters of the particle.\n"
                       "E.g. ``matchedMC(p)`` returns the total momentum of the related MCParticle.\n"
                       "Returns NaN if no matched MCParticle exists.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("clusterBestMatchedMCParticle(variable)", clusterBestMatchedMCParticle,
+                      "Returns variable output for the MCParticle that is best-matched with the ECLCluster of the given Particle.\n"
+		      "When the variable is called for ``gamma`` and if the ``gamma`` is matched with MCParticle, it works same as `matchedMC`.\n"
+		      "While, the variable is called for ``gamma`` that fails to match with MCParticle, it provides the mdst-level MCMatching information abouth the ECLCluster.\n"
+                      "Returns NaN if no matched ECLCluster nor MCParticle exists", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("countInList(particleList, cut='')", countInList, "[Eventbased] "
                       "Returns number of particle which pass given in cut in the specified particle list.\n"
                       "Useful for creating statistics about the number of particles in a list.\n"

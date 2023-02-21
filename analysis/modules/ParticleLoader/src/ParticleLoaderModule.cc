@@ -108,7 +108,7 @@ void ParticleLoaderModule::initialize()
 {
   B2INFO("ParticleLoader's Summary of Actions:");
 
-  if ((int)m_useMCParticles + (int)m_useROEs + (int)m_useDummy + (int)m_loadChargedCluster > 2)
+  if ((int)m_useMCParticles + (int)m_useROEs + (int)m_useDummy + (int)m_loadChargedCluster > 1)
     B2FATAL("The options on how to load the Particle are not valid. The incompatible combination of options is selected. "
             << "useMCParticles: " << m_useMCParticles << ", useROEs: " << m_useROEs << ", useDummy: " << m_useDummy
             << ", loadChargedCluster: " << m_loadChargedCluster);

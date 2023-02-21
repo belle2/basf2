@@ -36,6 +36,8 @@ Modules
   Performance Confluence Page <https://confluence.desy.de/display/BI/Neutrals+Performance>`_.
 * Added a parameter ``updateAllDaughters`` to `stdKshorts` and `stdLambdas` so that users can instruct the vertex fitter to
   update the variables of the V0 daughters. The parameter is ``False`` by default for backward compatibility.
+* New function `modularAnalysis.fillParticleListFromChargedCluster` is added to load the neutral final-state-particles from the
+  ECL and KLM clusters that are being matched with the Track of input ParticleList.
 * Added the argument ``ignoreFromVertexFit`` in :func:`vertex.treeFit` to ignore particles to determine the vertex position. The
   kinematics of the particles are treated as constant. The ``ignoreFromVertexFit`` option is expected to be used to perform fit
   without ``K_L0`` or mimic a ``K_S0`` or a ``pi0`` with a control channel by ignoring a track for vertex fit. While,

@@ -74,13 +74,15 @@ void MCMatcherECLClustersModule::event()
   }
 
   //CalDigits
-  short int Index[8736] = {-1};
-  int k = 0;
-  for (const ECLCalDigit& eclCalDigit : m_eclCalDigits) {
-    double calEnergy = eclCalDigit.getEnergy(); // Calibrated Energy in GeV
+  short int Index[8736];
+  std::fill_n(Index, 8736, -1);
+  const TClonesArray* cd = m_eclCalDigits.getPtr();
+  TObject** ocd = cd->GetObjectRef();
+  for (int i = 0, imax = cd->GetEntries(); i < imax; i++) { // avoiding call of StoreArray::getArrayIndex() member function
+    const ECLCalDigit& t = static_cast<const ECLCalDigit&>(*ocd[i]);
+    double calEnergy = t.getEnergy(); // Calibrated Energy in GeV
     if (calEnergy < 0) continue;
-    Index[eclCalDigit.getCellId() - 1] = k;
-    ++k;
+    Index[t.getCellId() - 1] = i;
   }
 
   const RelationArray& p2sh = m_mcParticleToECLSimHitRelationArray;
@@ -141,18 +143,20 @@ void MCMatcherECLClustersModule::event()
 
   // reuse Index
   std::fill_n(Index, 8736, -1);
-  k = 0;
-  for (const ECLDigit& eclDigit : m_eclDigits) {
-    if (eclDigit.getAmp() <= 0) continue;
-    Index[eclDigit.getCellId() - 1] = k;
-    ++k;
+  const TClonesArray* ed = m_eclDigits.getPtr();
+  TObject** oed = ed->GetObjectRef();
+  for (int i = 0, imax = ed->GetEntries(); i < imax; i++) { // avoiding call of StoreArray::getArrayIndex() member function
+    const ECLDigit& t = static_cast<const ECLDigit&>(*oed[i]);
+    if (t.getAmp() <= 0) continue;
+    Index[t.getCellId() - 1] = i;
   }
 
   const RelationArray& p2eh = m_mcParticleToECLHitRelationArray;
   //RelationArray& ed2p = m_eclDigitToMCParticleRelationArray;
   ECLHit** eclhits = (ECLHit**)(m_eclHits.getPtr()->GetObjectRef());
-  for (const auto& relationElement : p2eh) {
-    const std::vector<unsigned int>& eclhitindx = relationElement.getToIndices();
+  for (int i = 0, imax = p2eh.getEntries(); i < imax; i++) {
+    const RelationElement& re = p2eh[i];
+    const std::vector<unsigned int>& eclhitindx = re.getToIndices();
     for (unsigned int j : eclhitindx) {
       const ECLHit* t = eclhits[j];
       int id = t->getCellId() - 1;
@@ -160,7 +164,7 @@ void MCMatcherECLClustersModule::event()
           && Index[id] >=
           0) { //ed2p.add(Index[id], re.getFromIndex()); // old relation setter from ECLDigit to MC particle, not working when pure CsI digits are introduced
         const ECLDigit* mdigit = m_eclDigits[Index[id]];
-        mdigit->addRelationTo(mcs[relationElement.getFromIndex()]);
+        mdigit->addRelationTo(mcs[re.getFromIndex()]);
       }
     }
   }

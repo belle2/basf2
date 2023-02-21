@@ -66,6 +66,8 @@ Variables
   vertex fit, for example.
 * New variables `helixExtThetaOnDet` and `helixExtPhiOnDet` are added. They returns theta and phi of extrapolated helix parameters
   on the detector surface given by the argument.
+* New variable `clusterBestMatchedMCParticle` is added to access the MCParticle that is related to the ECLCluster but not to the
+  Particle object.
 
 Changes in the analysis package in light-2212-foldex
 ----------------------------------------------------

@@ -93,13 +93,11 @@ ParticleLists, which are filled with particle objects created for each
 You can also set the argument ``convertNbar`` of `convertBelleMdstToBelleIIMdst` to ``true`` to copy Particles with an energy
 above 500 MeV in ``gamma:mdst`` and create a ParticleList ``anti-n0:mdst``. In the steering file,
 you should use the module ``BelleNbarMVA`` to evaluate an MVA dedicated to the separation of
-anti-neutrons from photons. As for the kinematic variable, you are advised to use
-``reconstructDecayWithNeutralHadron`` to reconstruct the neutral hadron's 4-momentum
-with mother mass constraint.
-
-.. note::
-   See also Anti-neutron identification (`BN1592`_) for more information about
-   ``BelleNbarMVA``.
+anti-neutrons from photons. Assuming that you have appended the globaltag ``BellePID``,
+the call would be ``your_path.add_module('BelleNbarMVA', particleList='anti-n0:mdst', identifier='nbarMVA')``,
+where the identifier is a pre-trained model stored in ``BellePID`` and illustrated in `BN1592`_.
+As for the kinematic variable, you are advised to use ``reconstructDecayWithNeutralHadron`` to
+reconstruct the neutral hadron's 4-momentum with mother mass constraint.
 
 .. _BN1592: https://belle.kek.jp/secured/belle_note/gn1592/bn1592_v3.0.pdf
 

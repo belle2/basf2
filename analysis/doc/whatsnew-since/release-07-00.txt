@@ -53,6 +53,10 @@ Modules
 * New function `modularAnalysis.extractParticlesFromROE` and module `ParticleExtractorFromROE` are implemented.
   The function extracts Particle objects that belong to a ROE and fills them in ParticleLists. It is available in the ``for_each``
   loop over the ROEs (e.g. ``roe_path``).
+* Fixed a bug of the TreeFit with the particle loaded from the KLMCluster. The mass of the particle, which should have been fixed
+  with the PDG value, was floated in the TreeFit. Now it is fixed and the fit results get more reasonable.
+  However, since the covariance matrix of the KLMCluster is not properly set yet, the performance of the TreeFit with these
+  particles is not guaranteed.
 
 Variables
 +++++++++

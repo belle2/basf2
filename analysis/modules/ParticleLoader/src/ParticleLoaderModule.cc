@@ -93,11 +93,25 @@ ParticleLoaderModule::ParticleLoaderModule() : Module()
   addParam("dummyTreatAsInvisible", m_dummyTreatAsInvisible,
            "Should treeFitter treat the particle as invisible?", true);
 
+  addParam("loadChargedCluster", m_loadChargedCluster,
+           "Load neutral Particles from the clusters being matched with the track of the sourceParticleList",
+           false);
+  addParam("useOnlyMostEnergeticECLCluster", m_useOnlyMostEnergeticECLCluster,
+           "If true, the most energetic ECLCluster among ones matching with the Track is used. "
+           "If false, all matched ECLCluster are used. "
+           "This option is checked only when loadChargedCluster=True.",
+           true);
 }
+
 
 void ParticleLoaderModule::initialize()
 {
   B2INFO("ParticleLoader's Summary of Actions:");
+
+  if ((int)m_useMCParticles + (int)m_useROEs + (int)m_useDummy + (int)m_loadChargedCluster > 1)
+    B2FATAL("The options on how to load the Particle are not valid. The incompatible combination of options is selected. "
+            << "useMCParticles: " << m_useMCParticles << ", useROEs: " << m_useROEs << ", useDummy: " << m_useDummy
+            << ", loadChargedCluster: " << m_loadChargedCluster);
 
   m_particles.registerInDataStore();
   m_particleExtraInfoMap.registerInDataStore();
@@ -132,7 +146,7 @@ void ParticleLoaderModule::initialize()
     for (auto decayString : m_decayStrings) {
 
       // obtain the output particle lists from the decay string
-      bool valid = m_decaydescriptor.init(decayString);
+      const bool valid = m_decaydescriptor.init(decayString);
       if (!valid)
         B2ERROR("ParticleLoaderModule::initialize Invalid input DecayString: " << decayString);
 
@@ -143,14 +157,13 @@ void ParticleLoaderModule::initialize()
       int pdgCode  = mother->getPDGCode();
       // The default list name is "all"
       string listName = mother->getName() + ":all";
-      // ROE particles get the full name
-      if (m_useROEs) listName = mother->getFullName();
-      // dummy particles get the full name
-      else if (m_useDummy) listName = mother->getFullName();
-      // MC particles get the full name
-      else if (m_useMCParticles) listName = mother->getFullName();
+
+      // Full name for ROE, dummy, MCParticle, chargedCluster particles
+      if (m_useROEs or m_useDummy or m_useMCParticles or m_loadChargedCluster)
+        listName = mother->getFullName();
       // V0s get the label "V0"
-      else if (nProducts > 0) listName = mother->getName() + ":V0";
+      else if (nProducts > 0)
+        listName = mother->getName() + ":V0";
 
       string antiListName = ParticleListName::antiParticleListName(listName);
       bool isSelfConjugatedParticle = (listName == antiListName);
@@ -166,7 +179,12 @@ void ParticleLoaderModule::initialize()
         }
       } else if (m_useMCParticles) {
         B2WARNING("ParticleList " << listName << " already exists and will not be created again. " <<
-                  "The given options (addDaughters, skipNonPrimaryDaughters, skipNonPrimary) do not applied on the existing list.");
+                  "Please note that the given options (addDaughters, skipNonPrimaryDaughters, skipNonPrimary) do not apply to "
+                  << listName);
+      } else if (m_loadChargedCluster) {
+        B2WARNING("ParticleList " << listName << " already exists and will not be created again. " <<
+                  "Please note that the given option, useOnlyMostEnergeticECLCluster, does not apply to "
+                  << listName);
       }
 
       if (not isValidPDGCode(pdgCode) and (m_useMCParticles == false and m_useROEs == false and m_useDummy == false))
@@ -202,6 +220,9 @@ void ParticleLoaderModule::initialize()
         }
       }
 
+      if (m_loadChargedCluster and m_sourceParticleListName == "")
+        B2ERROR("The sourceParticleListName is not given. The charged ParticleList is required for the chargedCluster loading.");
+
       // add PList to corresponding collection of Lists
       B2INFO(" o) creating (anti-)ParticleList with name: " << listName << " (" << antiListName << ")");
       if (m_useROEs) {
@@ -213,6 +234,14 @@ void ParticleLoaderModule::initialize()
       } else if (m_useMCParticles) {
         B2INFO("   -> MDST source: MCParticles");
         m_MCParticles2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle);
+      } else if (m_loadChargedCluster) {
+        if (abs(pdgCode) == abs(Const::photon.getPDGCode()) || abs(pdgCode) == abs(Const::Klong.getPDGCode())
+            || abs(pdgCode) == abs(Const::neutron.getPDGCode())) {
+          m_ChargedCluster2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle);
+          B2INFO("   -> MDST source: ECLClusters and KLMClusters being matched with Tracks");
+        } else {
+          B2ERROR("The Particle type must be gamma, K_L0, or (anti-)n0 for the loadChargedCluster option.");
+        }
       } else {
         bool chargedFSP = Const::chargedStableSet.contains(Const::ParticleType(abs(pdgCode)));
         if (chargedFSP) {
@@ -265,6 +294,8 @@ void ParticleLoaderModule::event()
     dummyToParticles();
   else if (m_useMCParticles)
     mcParticlesToParticles();
+  else if (m_loadChargedCluster)
+    chargedClustersToParticles();
   else {
     tracksToParticles();
     eclAndKLMClustersToParticles();
@@ -671,6 +702,7 @@ void ParticleLoaderModule::eclAndKLMClustersToParticles()
     string antiListName = get<c_AntiPListName>(eclKLMCluster2Plist);
     int pdgCode = get<c_PListPDGCode>(eclKLMCluster2Plist);
     bool isSelfConjugatedParticle = get<c_IsPListSelfConjugated>(eclKLMCluster2Plist);
+    Const::ParticleType thisType(pdgCode);
 
     StoreObjPtr<ParticleList> plist(listName);
     // since a particle list in the ParticleLoader always contains all possible objects
@@ -695,50 +727,7 @@ void ParticleLoaderModule::eclAndKLMClustersToParticles()
     for (int i = 0; i < m_eclclusters.getEntries(); i++) {
       const ECLCluster* cluster      = m_eclclusters[i];
 
-      // ECLClusters can be reconstructed under different hypotheses, for
-      // example photons or neutral hadrons, we only load particles from these
-      // for now
-      if (!cluster->isNeutral()) continue;
-      if (not cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)
-          and not cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron))
-        continue;
-
-      // ECLCluster can be matched to multiple MCParticles
-      // order the relations by weights and set Particle -> multiple MCParticle relation
-      // preserve the weight
-      RelationVector<MCParticle> mcRelations = cluster->getRelationsTo<MCParticle>();
-      // order relations by weights
-      std::vector<std::pair<int, double>> weightsAndIndices;
-      for (unsigned int iMCParticle = 0; iMCParticle < mcRelations.size(); iMCParticle++) {
-        const MCParticle* relMCParticle = mcRelations[iMCParticle];
-        double weight = mcRelations.weight(iMCParticle);
-        if (relMCParticle)
-          weightsAndIndices.emplace_back(relMCParticle->getArrayIndex(), weight);
-      }
-      // sort descending by weight
-      std::sort(weightsAndIndices.begin(), weightsAndIndices.end(),
-      [](const std::pair<int, double>& left, const std::pair<int, double>& right) {
-        return left.second > right.second;
-      });
-
-      Const::ParticleType thisType(pdgCode);
-
-      // don't fill photon list with clusters that don't have
-      // the nPhotons hypothesis (ECL people call this N1)
-      if (pdgCode == Const::photon.getPDGCode()
-          and not cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))
-        continue;
-
-      // don't fill a KLong list with clusters that don't have the neutral
-      // hadron hypothesis set (ECL people call this N2)
-      if (pdgCode == Const::Klong.getPDGCode()
-          and not cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron))
-        continue;
-
-      // don't fill a neutron list with clusters that don't have the neutral
-      // hadron hypothesis set (ECL people call this N2)
-      if (abs(pdgCode) == Const::neutron.getPDGCode()
-          and not cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron))
+      if (!isValidECLCluster(cluster, pdgCode, true))
         continue;
 
       // create particle and check it before adding to list
@@ -749,19 +738,7 @@ void ParticleLoaderModule::eclAndKLMClustersToParticles()
       }
       Particle* newPart = m_particles.appendNew(particle);
 
-      // set relations to mcparticles
-      for (auto& weightsAndIndex : weightsAndIndices) {
-        const MCParticle* relMCParticle = m_mcparticles[weightsAndIndex.first];
-        double weight = weightsAndIndex.second;
-
-        // TODO: study this further and avoid hard-coded values
-        // set the relation only if the MCParticle(reconstructed Particle)'s
-        // energy contribution to this cluster amounts to at least 30(20)%
-        if (relMCParticle)
-          if (weight / newPart->getECLClusterEnergy() > 0.20
-              && weight / relMCParticle->getEnergy() > 0.30)
-            newPart->addRelationTo(relMCParticle, weight);
-      }
+      assignMCParticleFromECLCluster(newPart, cluster);
 
       // add particle to list
       plist->addParticle(newPart);
@@ -794,6 +771,175 @@ void ParticleLoaderModule::eclAndKLMClustersToParticles()
     }
 
     plist->setEditable(false); // set the :all list as not editable.
+  } // loop over particle lists
+}
+
+bool ParticleLoaderModule::isValidECLCluster(const ECLCluster* cluster, const int pdgCode, bool onlyNeutral) const
+{
+  if (!cluster)
+    return false;
+
+  // ECLClusters can be reconstructed under different hypotheses, for
+  // example photons or neutral hadrons, we only load particles from these
+  // for now
+  if (!cluster->isNeutral() and onlyNeutral)
+    return false;
+
+  if (not cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)
+      and not cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron))
+    return false;
+
+  // don't fill photon list with clusters that don't have
+  // the nPhotons hypothesis (ECL people call this N1)
+  if (pdgCode == Const::photon.getPDGCode()
+      and not cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))
+    return false;
+
+  // don't fill a KLong nor a (anti-)neutron list with clusters that don't have the neutral
+  // hadron hypothesis set (ECL people call this N2)
+  if ((pdgCode == Const::Klong.getPDGCode() or abs(pdgCode) == Const::neutron.getPDGCode())
+      and not cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron))
+    return false;
+
+  return true;
+}
+
+void ParticleLoaderModule::assignMCParticleFromECLCluster(Particle* newPart, const ECLCluster* cluster) const
+{
+  // ECLCluster can be matched to multiple MCParticles
+  // order the relations by weights and set Particle -> multiple MCParticle relation
+  // preserve the weight
+  const RelationVector<MCParticle> mcRelations = cluster->getRelationsTo<MCParticle>();
+
+  // order relations by weights
+  std::vector<std::pair<int, double>> weightsAndIndices;
+  for (unsigned int iMCParticle = 0; iMCParticle < mcRelations.size(); iMCParticle++) {
+    const MCParticle* relMCParticle = mcRelations[iMCParticle];
+    if (relMCParticle) {
+      double weight = mcRelations.weight(iMCParticle);
+      weightsAndIndices.emplace_back(relMCParticle->getArrayIndex(), weight);
+    }
+  }
+
+  // sort descending by weight
+  std::sort(weightsAndIndices.begin(), weightsAndIndices.end(),
+  [](const std::pair<int, double>& left, const std::pair<int, double>& right) {
+    return left.second > right.second;
+  });
+
+  // set relations to mcparticles
+  for (auto& weightsAndIndex : weightsAndIndices) {
+    const MCParticle* relMCParticle = m_mcparticles[weightsAndIndex.first];
+    double weight = weightsAndIndex.second;
+
+    // TODO: study this further and avoid hard-coded values
+    // set the relation only if the MCParticle(reconstructed Particle)'s
+    // energy contribution to this cluster amounts to at least 30(20)%
+    if (relMCParticle)
+      if (weight / newPart->getECLClusterEnergy() > 0.20
+          && weight / relMCParticle->getEnergy() > 0.30)
+        newPart->addRelationTo(relMCParticle, weight);
+  }
+
+}
+
+void ParticleLoaderModule::chargedClustersToParticles()
+{
+  if (m_ChargedCluster2Plists.empty()) // nothing to do
+    return;
+
+  // loop over all ParticleLists
+  for (auto chargedCluster2Plist : m_ChargedCluster2Plists) {
+
+    string listName = get<c_PListName>(chargedCluster2Plist);
+    string antiListName = get<c_AntiPListName>(chargedCluster2Plist);
+    int pdgCode = get<c_PListPDGCode>(chargedCluster2Plist);
+    bool isSelfConjugatedParticle = get<c_IsPListSelfConjugated>(chargedCluster2Plist);
+    Const::ParticleType thisType(pdgCode);
+
+    StoreObjPtr<ParticleList> plist(listName);
+    // since a particle list in the ParticleLoader always contains all possible objects
+    // we check whether it already exists in this path and can skip any further steps if it does
+    if (plist.isValid())
+      continue;
+    plist.create();
+    plist->initialize(pdgCode, listName);
+
+    // create anti-particle list if necessary
+    if (!isSelfConjugatedParticle) {
+      StoreObjPtr<ParticleList> antiPlist(antiListName);
+      antiPlist.create();
+      antiPlist->initialize(-1 * pdgCode, antiListName);
+
+      antiPlist->bindAntiParticleList(*(plist));
+    }
+
+    const StoreObjPtr<ParticleList> sourceList(m_sourceParticleListName);
+    if (!sourceList.isValid())
+      B2FATAL("ParticleList " << m_sourceParticleListName << " could not be found or is not valid!");
+
+    for (unsigned int iPart = 0; iPart < sourceList->getListSize(); iPart++) {
+
+      const Particle* sourcePart = sourceList->getParticle(iPart);
+      const Track* sourceTrack = sourceList->getParticle(iPart)->getTrack();
+      if (!sourceTrack)
+        continue;
+
+      // ECL clusters
+      if (m_useOnlyMostEnergeticECLCluster) {
+
+        const ECLCluster* cluster = sourcePart->getECLCluster();
+        if (isValidECLCluster(cluster, pdgCode, false)) {
+          Particle particle(cluster, thisType);
+          if (particle.getParticleSource() != Particle::c_ECLCluster) {
+            B2FATAL("Particle created from ECLCluster does not have ECLCluster type.");
+          }
+          Particle* newPart = m_particles.appendNew(particle);
+          assignMCParticleFromECLCluster(newPart, cluster);
+          plist->addParticle(newPart);
+        }
+      } else {
+
+        // loop over all clusters matched to this track
+        const RelationVector<ECLCluster> clusters =  sourceTrack->getRelationsTo<ECLCluster>();
+        for (unsigned int iCluster = 0; iCluster < clusters.size(); iCluster++) {
+          const ECLCluster* cluster = clusters[iCluster];
+          if (!isValidECLCluster(cluster, pdgCode, false))
+            continue; // go to next iCluster
+
+          Particle particle(cluster, thisType);
+          if (particle.getParticleSource() != Particle::c_ECLCluster) {
+            B2FATAL("Particle created from ECLCluster does not have ECLCluster type.");
+          }
+          Particle* newPart = m_particles.appendNew(particle);
+          assignMCParticleFromECLCluster(newPart, cluster);
+          plist->addParticle(newPart);
+        }
+      }
+
+      // KLM clusters
+      const KLMCluster* cluster = sourcePart->getKLMCluster();
+      if (!cluster) continue; // go to next iPart
+
+      if (std::isnan(cluster->getMomentumMag())) {
+        B2DEBUG(19, "Skipping KLMCluster because its momentum is NaN. "
+                "This can happen if the timing calibration is missing or wrong, so that the velocity is calculated to be negative.");
+        continue;
+      }
+
+      // create particle and check its type before adding it to list
+      Particle particle(cluster, pdgCode);
+      if (particle.getParticleSource() != Particle::c_KLMCluster) {
+        B2FATAL("Particle created from KLMCluster does not have KLMCluster type.");
+      }
+      Particle* newPart = m_particles.appendNew(particle);
+
+      const MCParticle* mcParticle = cluster->getRelated<MCParticle>();
+      if (mcParticle) newPart->addRelationTo(mcParticle);
+
+      plist->addParticle(newPart);
+    }
+
   } // loop over particle lists
 }
 

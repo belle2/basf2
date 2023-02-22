@@ -43,14 +43,12 @@ A possible use case is to select only true candidates from signal MC and only wr
 """
 
 from ROOT import PyConfig
-PyConfig.IgnoreCommandLineOptions = True
+PyConfig.IgnoreCommandLineOptions = True  # noqa
 
 import argparse
 import numpy as np
-from root_pandas import read_root
-import uproot 
+import uproot
 from sklearn.model_selection import train_test_split
-import os
 
 
 def get_argument_parser():
@@ -110,8 +108,8 @@ if __name__ == '__main__':
     # Load the data
     print("Load data")
 
-    df_sig = uproot.concatenate(data_sig, columns, cut=cut_sig, library = 'pd')
-    df_bkg = uproot.concatenate(data_bkg, columns, cut=cut_bkg, library = 'pd')
+    df_sig = uproot.concatenate(data_sig, columns, cut=cut_sig, library='pd')
+    df_bkg = uproot.concatenate(data_bkg, columns, cut=cut_bkg, library='pd')
 
     n_sig = len(df_sig)
     n_bkg = len(df_bkg)
@@ -128,7 +126,7 @@ if __name__ == '__main__':
         print('Adjusting signal/background ratio from %f to %f.' % (n_sig/float(n_bkg+n_sig), args.fsig))
         assert 0 < args.fsig < 1, 'Please provide a signal fraction within [0,1]'
 
-        if n_sig>=n_bkg:
+        if n_sig >= n_bkg:
             fs = (args.fsig*n_bkg) / ((1-args.fsig)*n_sig)
             print("\t Warning: sampling down signal")
             df_sig = df_sig.sample(int(n_sig*fs))
@@ -156,7 +154,7 @@ if __name__ == '__main__':
         if filename.endswith('.root'):
             filename = filename.split('.root')[0]
 
-        print('Creating output files\n\t -  %s \n\t -  %s' % (filename+ '_train.root', filename + '_test.root'))
+        print('Creating output files\n\t -  %s \n\t -  %s' % (filename + '_train.root', filename + '_test.root'))
 
         with uproot.recreate(filename + '_train.root') as outfile:
             outfile[args.treename] = df_train
@@ -167,4 +165,3 @@ if __name__ == '__main__':
         print('Creating output file\n\t -  %s' % args.output)
         with uproot.recreate(args.output) as outfile:
             outfile[args.treename] = df
-

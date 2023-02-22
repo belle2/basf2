@@ -21,6 +21,8 @@ Modules
 * New function `modularAnalysis.estimateAndAttachTrackFitResult` and module `TrackFitResultEstimator` are added. It creates a
   ``TrackFitResult`` from the momentum of the Particle and creates a relation between them. The main use case is the tracking
   efficiency study by extrapolating the recoil particle to the detector surfaces.
+* Removed the prepending of the analysis global tag inside the modularAnalysis functions, `lowEnergyPi0Identification`,
+  `getBeamBackgroundProbability`, `getFakePhotonProbability`, and `getNbarIDMVA`, so that the priority of global tags gets clearer.
 * Fixed a bug on the `findMCDecay` that the decay of ``K_S0`` cannot be specified.
 * Added an option ``usePhotonOnlyOnce`` to the function :func:`modularAnalysis.correctBremsBelle`. The default of the option is
   ``False`` so the backward compatibility. If the option is set to ``True``, a photon is used for only the closest charged particle

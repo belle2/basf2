@@ -1248,11 +1248,6 @@ def flavorTagger(
         # Events containing ROE without B-Meson (but not empty) are discarded for training
         ma.signalSideParticleListsFilter(
             particleLists,
-            '',
-            roe_path,
-            deadEndPath)
-        ma.signalSideParticleListsFilter(
-            particleLists,
             'nROE_Charged(' + maskName + ', 0) > 0 and abs(qrCombined) == 1',
             roe_path,
             deadEndPath)
@@ -1263,14 +1258,11 @@ def flavorTagger(
             if eventLevel('Expert', weightFiles, categories, roe_path):
 
                 ma.rankByHighest('pi+:inRoe', 'p', numBest=0, allowMultiRank=False, path=roe_path)
-                # TODO: VariablesToNtuple can accept empty for listName if the variables are event-based.
-                #       But it seems that alias is not accepted even it is defined from event-based variables.
-                #       For now, the dummy particle is created and set.
                 ma.fillParticleListFromDummy('vpho:dummy', path=roe_path)
                 ma.variablesToNtuple('vpho:dummy',
                                      alias_list_for_GNN,
                                      treename='tree',
-                                     filename=f'{filesDirectory}/FlavorTagger_GNN_sampled_{fileId}.root',
+                                     filename=f'{filesDirectory}/FlavorTagger_GNN_sampled{fileId}.root',
                                      signalSideParticleList=particleLists[0],
                                      path=roe_path)
 

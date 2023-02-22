@@ -27,17 +27,13 @@ namespace Belle2 {
 
     double foxWolframR(const Particle*, const std::vector<double>& index)
     {
-      if (index.size() != 1) {
+      if (index.size() != 1)
         B2FATAL("foxWolframR cannot be called without providing the moment order");
-        return std::numeric_limits<float>::quiet_NaN();
-      }
 
       int order = std::lround(index[0]);
 
-      if (order < 0 || order > 8) {
+      if (order < 0 || order > 8)
         B2FATAL("The Fox-Wolfram moment order must be within 0 and 8.");
-        return std::numeric_limits<float>::quiet_NaN();
-      }
 
       StoreObjPtr<EventShapeContainer> evtShapeCont;
       if (!evtShapeCont) {
@@ -53,17 +49,13 @@ namespace Belle2 {
 
     double foxWolframH(const Particle*, const std::vector<double>& index)
     {
-      if (index.size() != 1) {
+      if (index.size() != 1)
         B2FATAL("foxWolframH cannot be called without providing the moment order");
-        return std::numeric_limits<float>::quiet_NaN();
-      }
 
       int order = std::lround(index[0]);
 
-      if (order < 0 || order > 8) {
+      if (order < 0 || order > 8)
         B2FATAL("The Fox-Wolfram moment order must be within 0 and 8.");
-        return std::numeric_limits<float>::quiet_NaN();
-      }
 
       StoreObjPtr<EventShapeContainer> evtShapeCont;
       if (!evtShapeCont) {
@@ -75,29 +67,23 @@ namespace Belle2 {
 
     Manager::FunctionPtr harmonicMoment(const std::vector<std::string>& arguments)
     {
-      if (arguments.size() != 2) {
+      if (arguments.size() != 2)
         B2FATAL("harmonicMoment requires two arguments: the harmonic order (0-8) and the reference axis name (thrust or collision)");
-        return nullptr;
-      }
 
       int order = -1;
       try {
         order = Belle2::convertString<int>(arguments[0]);
       } catch (std::invalid_argument&) {
         B2FATAL("First argument of harmonicMoment must be an integer");
-        return nullptr;
       }
       std::string axisName =  arguments[1];
       boost::to_lower(axisName);
 
-      if (order < 0 || order > 8) {
+      if (order < 0 || order > 8)
         B2FATAL("The Fox-Wolfram moment order must be within 0 and 8.");
-        return nullptr;
-      }
-      if (axisName != "thrust" && axisName != "collision") {
+
+      if (axisName != "thrust" && axisName != "collision")
         B2FATAL("Invalid axis name "  << arguments[1] << ". The valid options are thrust and collision");
-        return nullptr;
-      }
 
       auto func = [order, axisName](const Particle*) -> double{
         StoreObjPtr<EventShapeContainer> evtShapeCont;
@@ -116,29 +102,23 @@ namespace Belle2 {
 
     Manager::FunctionPtr cleoCone(const std::vector<std::string>& arguments)
     {
-      if (arguments.size() != 2) {
+      if (arguments.size() != 2)
         B2FATAL("cleoCone requires two arguments: the cone order (0-9) and the reference axis name (thrust or collision)");
-        return nullptr;
-      }
 
       int order = -1;
       try {
         order = Belle2::convertString<int>(arguments[0]);
       } catch (std::invalid_argument&) {
         B2FATAL("Argument of cleoCone must be an integer");
-        return nullptr;
       }
       std::string axisName =  arguments[1];
       boost::to_lower(axisName);
 
-      if (order < 0 || order > 8) {
+      if (order < 0 || order > 8)
         B2FATAL("The CLEO cone order must be within 0 and 8.");
-        return nullptr;
-      }
-      if (axisName != "thrust" && axisName != "collision") {
+
+      if (axisName != "thrust" && axisName != "collision")
         B2FATAL("Invalid axis name "  << arguments[1] << ". The valid options are thrust and collision");
-        return nullptr;
-      }
 
       auto func = [order, axisName](const Particle*) -> double{
         StoreObjPtr<EventShapeContainer> evtShapeCont;

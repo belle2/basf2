@@ -14,8 +14,9 @@
 
 //STL
 #include <cmath>
-#define PI 3.14159265358979323846
-#define DEGTORAD 1.74532925199432955e-02
+
+// ROOT
+#include <TMath.h>
 
 using namespace Belle2;
 
@@ -167,12 +168,12 @@ void ECLCrystalData::Eval()
 
 double ECLCrystalData::EvalX()
 {
-  return m_PosR * cos(DEGTORAD * m_PosP);
+  return m_PosR * cos(TMath::DegToRad() * m_PosP);
 }
 
 double ECLCrystalData::EvalY()
 {
-  return m_PosR * sin(DEGTORAD * m_PosP);
+  return m_PosR * sin(TMath::DegToRad() * m_PosP);
 }
 
 
@@ -227,7 +228,7 @@ double ECLCrystalData::EvalPhi()
 double ECLCrystalData::EvalZ()
 {
   if (IsEndCap()) {
-    return EndcapRadius[GetCrystalIndex()] * cos(DEGTORAD * theta[m_theta_ID]);
+    return EndcapRadius[GetCrystalIndex()] * cos(TMath::DegToRad() * theta[m_theta_ID]);
   }
 
   return BarrelZ[GetCrystalIndex()];
@@ -236,7 +237,7 @@ double ECLCrystalData::EvalZ()
 double ECLCrystalData::EvalR()
 {
   if (IsEndCap()) {
-    return EndcapRadius[GetCrystalIndex()] * sin(DEGTORAD * theta[m_theta_ID]);
+    return EndcapRadius[GetCrystalIndex()] * sin(TMath::DegToRad() * theta[m_theta_ID]);
   }
 
   return 147.7;

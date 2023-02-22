@@ -30,7 +30,7 @@ Modules
 * Modified parameters for the functions :func:`modularAnalysis.fillParticleList` and :func:`modularAnalysis.fillParticleLists` so
   that they no longer contain parameters that load the beam background or fake photon (formerly hadronic split-off) MVA.
 * Parameters for `stdPhotons`, `stdPi0s` and `stdHyperons` have been changed in both name and type. The new parameters are called
-  ``loadBeamBackgroundMVA`` and ``loadFakePhotonMVA``, and they are now strings to specify which weight files should be used. For
+  ``beamBackgroundMVAWeight`` and ``fakePhotonMVAWeight``, and they are now strings to specify which weight files should be used. For
   run-independent training use ``MCri`` while for run-dependent training use ``MCrd``. More information on the new weights can be
   found on the `Neutrals Performance Confluence Page <https://confluence.desy.de/display/BI/Neutrals+Performance>`_.
 * Added an optional parameter ``biasCorrectionTable`` to `stdHyperons` so that users can specify a table name with photon energy

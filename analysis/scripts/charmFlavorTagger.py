@@ -12,39 +12,36 @@ import basf2
 import variables as va
 import modularAnalysis as ma
 
-def CharmFlavorTagger(particle_lists,
+def CharmFlavorTagger(particle_list,
                      path=None):
     """
     Interfacing for the CharmFlavorTagger.
 
     This function requires a reconstructed D meson signal particle list with a built RestOfEvent.
 
-    :param particle_lists:  string or list[string], particle list(s) of the reconstructed signal D meson
+    :param particle_list:  string, particle list of the reconstructed signal D meson
     :param path: basf2 path obj
     :return: None
     """
-
-    if isinstance(particle_lists, str):
-        particle_lists = [particle_lists]
 
     # create roe specific paths
     roe_path = basf2.create_path()
     dead_end_path = basf2.create_path()
 
     # define cft specific lists to enable multiple calls, if someone really wants to do that
-    extension = particle_lists[0].replace(':', '_to_')
+    extension = particle_list.replace(':', '_to_')
     roe_particle_list_cut = 'isInRestOfEvent == 1 and dr < 1 and abs(dz) < 3'
     roe_particle_list = 'pi+:cft' + '_' + extension
 
     # filter rest of events only for specific particle list
-    ma.signalSideParticleListsFilter(particle_lists, '', roe_path, dead_end_path)
+    ma.signalSideParticleListsFilter(particle_list, '', roe_path, dead_end_path)
 
     # create final state particle lists
     ma.fillParticleList(roe_particle_list, roe_particle_list_cut, path=roe_path)
 
     # compute ranking variable and additional CFT input variables, PID_diff=pionID-kaonID, deltaR=sqrt(deltaPhi**2+deltaEta**2)
     rank_variable = 'opang_shift'
-    va.variables.addAlias(rank_variable,f"abs(formula(angleToClosestInList({particle_lists[0]}) - 3.14159265359/2))")
+    va.variables.addAlias(rank_variable,f"abs(formula(angleToClosestInList({particle_list}) - 3.14159265359/2))")
     va.variables.addAlias("eta","formula(-1*log(tan(formula(theta/2))))")
     va.variables.addAlias("phi_sig","particleRelatedToCurrentROE(phi)")
     va.variables.addAlias("eta_sig","particleRelatedToCurrentROE(eta)")
@@ -71,7 +68,7 @@ def CharmFlavorTagger(particle_lists,
     
     # apply CFT with MVAExpert module and write output to extraInfo
     expert_module = basf2.register_module('MVAExpert')
-    expert_module.param('listNames', particle_lists)
+    expert_module.param('listNames', particle_list)
     expert_module.param('identifier', 'CFT.xml')
 
     expert_module.param('extraInfoName', 'CFT_out')

@@ -40,7 +40,6 @@ Hough3DFinder::Hough3DFinder(void) :
   m_commonData(0), m_outputVhdlDirname("./VHDL/finder3D")
 {
   m_mode = 2;
-  m_Trg_PI = 3.141592653589793;
   m_outputLutDirname = m_outputVhdlDirname + "/" + "LutData";
   // Make driftMap
   m_driftMap = new int* [4];
@@ -502,8 +501,8 @@ void Hough3DFinder::runFinderVersion1(const vector<double>& trackVariables, cons
     m_foundZ[i] = (m_bestCot * m_cotStepSize + m_cotStart) * tsArcS[i] + (m_bestZ0 * m_z0StepSize);
     m_foundPhiSt[i] = fitPhi0 + charge * acos(m_rr[i] / 2 / rho) + 2 * asin((m_ztostraw[i] - m_foundZ[i]) * tan(
                         m_anglest[i]) / 2 / m_rr[i]);
-    if (m_foundPhiSt[i] > 2 * m_Trg_PI) m_foundPhiSt[i] -= 2 * m_Trg_PI;
-    if (m_foundPhiSt[i] < 0) m_foundPhiSt[i] += 2 * m_Trg_PI;
+    if (m_foundPhiSt[i] > 2 * M_PI) m_foundPhiSt[i] -= 2 * M_PI;
+    if (m_foundPhiSt[i] < 0) m_foundPhiSt[i] += 2 * M_PI;
   }
   //cout<<"JB FoundPhiSt[0]: "<<m_foundPhiSt[0]<<" FoundPhiSt[1]: "<<m_foundPhiSt[1]<<" FoundPhiSt[2]: "<<m_foundPhiSt[2]<<" FoundPhiSt[3]: "<<m_foundPhiSt[3]<<endl;
 
@@ -547,15 +546,15 @@ void Hough3DFinder::runFinderVersion2(const vector<double>& trackVariables, vect
       //int t_tdc = (stTSDrift[iLayer][iTS] >> 4);
       //int t_lr = ((stTSDrift[iLayer][iTS] >> 2) & 3);
       int t_priorityPosition = (stTSDrift[iLayer][iTS] & 3);
-      //int t_tsId = int(stTSs[iLayer][iTS]*m_nWires[iLayer]/2/2/m_Trg_PI+0.5);
+      //int t_tsId = int(stTSs[iLayer][iTS]*m_nWires[iLayer]/2/2/M_PI+0.5);
       //cout<<"iSt:"<<iLayer<<" tsId:"<<t_tsId<<" pp:"<<t_priorityPosition<<endl;
       // Reject second priority TSs.
       if (t_priorityPosition != 3) continue;
       // Find number of wire difference
       tsDiffSt = m_stAxPhi[iLayer] - stTSs[iLayer][iTS];
-      if (tsDiffSt > m_Trg_PI) tsDiffSt -= 2 * m_Trg_PI;
-      if (tsDiffSt < -m_Trg_PI) tsDiffSt += 2 * m_Trg_PI;
-      tsDiffSt = tsDiffSt / 2 / m_Trg_PI * m_nWires[iLayer] / 2;
+      if (tsDiffSt > M_PI) tsDiffSt -= 2 * M_PI;
+      if (tsDiffSt < -M_PI) tsDiffSt += 2 * M_PI;
+      tsDiffSt = tsDiffSt / 2 / M_PI * m_nWires[iLayer] / 2;
       //cout<<"JB ["<<iLayer<<"]["<<iTS<<"] tsDiffSt: "<<tsDiffSt<<" stTSs:"<<stTSs[iLayer][iTS]<<" rho: "<<rho<<" phi0: "<<fitPhi0<<" m_stAxPhi:"<<m_stAxPhi[iLayer]<<endl;
       // Save index if condition is in 10 wires
       if (iLayer % 2 == 0) {
@@ -599,9 +598,9 @@ void Hough3DFinder::runFinderVersion2(const vector<double>& trackVariables, vect
       double bestDiff = 999;
       for (int iTS = 0; iTS < int((*m_geoCandidatesIndex)[iLayer].size()); iTS++) {
         tsDiffSt = m_stAxPhi[iLayer] - stTSs[iLayer][(*m_geoCandidatesIndex)[iLayer][iTS]];
-        if (tsDiffSt > m_Trg_PI) tsDiffSt -= 2 * m_Trg_PI;
-        if (tsDiffSt < -m_Trg_PI) tsDiffSt += 2 * m_Trg_PI;
-        tsDiffSt = tsDiffSt / 2 / m_Trg_PI * m_nWires[iLayer] / 2;
+        if (tsDiffSt > M_PI) tsDiffSt -= 2 * M_PI;
+        if (tsDiffSt < -M_PI) tsDiffSt += 2 * M_PI;
+        tsDiffSt = tsDiffSt / 2 / M_PI * m_nWires[iLayer] / 2;
         // Pick the better TS
         //if(abs(abs(tsDiffSt)-5) < bestDiff){
         if (abs(abs(tsDiffSt) - meanWireDiff[iLayer]) < bestDiff) {
@@ -661,11 +660,11 @@ void Hough3DFinder::runFinderVersion3(const vector<double>& trackVariables, vect
   for (unsigned iLayer = 0; iLayer < 4; iLayer++) {
     //cout<<"["<<iLayer<<"] size:"<<stTSs[iLayer].size()<<endl;
     for (unsigned iTS = 0; iTS < stTSs[iLayer].size(); iTS++) {
-      iHitTS = int(stTSs[iLayer][iTS] * m_nWires[iLayer] / 2 / 2 / m_Trg_PI + 0.5);
+      iHitTS = int(stTSs[iLayer][iTS] * m_nWires[iLayer] / 2 / 2 / M_PI + 0.5);
       driftInfo = stTSDrift[iLayer][iTS];
       if (m_verboseFlag) cout << "[" << iLayer << "] TSId: " << iHitTS << " stTSs: " << stTSs[iLayer][iTS] << " driftInfo:" << driftInfo
                                 << " priorityPosition:" << (driftInfo & 3) << endl;
-      //cout<<iHitTS*2*m_Trg_PI/m_nWires[iLayer]*2<<endl;
+      //cout<<iHitTS*2*M_PI/m_nWires[iLayer]*2<<endl;
       m_hitMap[iLayer][iHitTS] = 1;
       m_driftMap[iLayer][iHitTS] = driftInfo;
     } // End iTS
@@ -695,12 +694,12 @@ void Hough3DFinder::runFinderVersion3(const vector<double>& trackVariables, vect
   //  double t_dPhiAx_c = 0;
   //  if(charge==1) t_dPhiAx = t_phiAx+fitPhi0;
   //  else t_dPhiAx = -t_phiAx+fitPhi0;
-  //  if(t_dPhiAx < 0) t_dPhiAx_c = t_dPhiAx + 2* m_Trg_PI;
-  //  else if (t_dPhiAx > 2*m_Trg_PI) t_dPhiAx_c = t_dPhiAx - 2*m_Trg_PI;
+  //  if(t_dPhiAx < 0) t_dPhiAx_c = t_dPhiAx + 2* M_PI;
+  //  else if (t_dPhiAx > 2*M_PI) t_dPhiAx_c = t_dPhiAx - 2*M_PI;
   //  else t_dPhiAx_c = t_dPhiAx;
   //  double t_dPhiAxWire = 0;
-  //  if( iLayer%2 == 0 ) t_dPhiAxWire = int(t_dPhiAx_c/2/m_Trg_PI*m_nWires[iLayer]/2);
-  //  else t_dPhiAxWire = int(t_dPhiAx_c/2/m_Trg_PI*m_nWires[iLayer]/2 + 1);
+  //  if( iLayer%2 == 0 ) t_dPhiAxWire = int(t_dPhiAx_c/2/M_PI*m_nWires[iLayer]/2);
+  //  else t_dPhiAxWire = int(t_dPhiAx_c/2/M_PI*m_nWires[iLayer]/2 + 1);
   //  cout<<"iSt:"<<iLayer<<" phiAx:"<<t_phiAx<<" phi0:"<<fitPhi0<<" dPhiAx:"<<t_dPhiAx<<" charge:"<<charge<<endl;
   //  cout<<"      dPhiAx_c:"<<t_dPhiAx_c<<" dPhiAxWire:"<<t_dPhiAxWire<<endl;
   //}
@@ -714,8 +713,8 @@ void Hough3DFinder::runFinderVersion3(const vector<double>& trackVariables, vect
     m_commonData = new Belle2::TRGCDCJSignalData();
   }
   // Setup firmware parameters
-  double phiMax = m_Trg_PI;
-  double phiMin = -m_Trg_PI;
+  double phiMax = M_PI;
+  double phiMin = -M_PI;
   int phiBitSize = 13;
   // pt = 0.3*1.5*rho*0.01;
   /* cppcheck-suppress variableScope */
@@ -735,7 +734,7 @@ void Hough3DFinder::runFinderVersion3(const vector<double>& trackVariables, vect
   }
   mConstD["acosLUTInBitSize"] = rhoBitSize;
   mConstD["acosLUTOutBitSize"] = phiBitSize - 1;
-  mConstD["Trg_PI"] = m_Trg_PI;
+  mConstD["Trg_PI"] = M_PI;
 
   // Constrain rho to rhoMax. For removing warnings when changing to signals.
   {

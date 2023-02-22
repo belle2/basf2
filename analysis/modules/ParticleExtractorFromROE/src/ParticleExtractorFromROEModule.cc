@@ -134,7 +134,7 @@ void ParticleExtractorFromROEModule::event()
     const int nSignalSideCandidates = signaSideParticleList->getListSize();
 
     if (nSignalSideCandidates > 1) {
-      B2ERROR("Signal side ParticleList have more than one candidates. There must be only one candidate.");
+      B2ERROR("Signal side ParticleList has more than one candidate. There must be only one candidate.");
       return;
     } else if (nSignalSideCandidates == 0) {
       return;

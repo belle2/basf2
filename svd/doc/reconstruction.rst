@@ -167,6 +167,10 @@ Creation of Clusters in disabled-APV regions
 
 In case one or more APV readout chips are disabled during data taking, a *fake* cluster is created in the middle of the region in order not to loose the information of the hit on the other side of the sensor. For more details see :b2:mod:`SVDMissingAPVsClusterCreator`.
 
+SVD Cluster Grouping
+---------------------------
+Clusters are grouped based on their time. Clusters from same origin should be nearer to each other on the time axis.
+
 :ref:`SpacePoint<svdsps>` Creation
 ----------------------------------
 

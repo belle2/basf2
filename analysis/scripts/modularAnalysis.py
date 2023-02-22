@@ -1325,15 +1325,18 @@ def fillParticleListFromChargedCluster(outputParticleList,
 
 
 def extractParticlesFromROE(particleLists,
+                            signalSideParticleList=None,
                             maskName='all',
                             writeOut=False,
                             path=None):
     """
     Extract Particle objects that belong to the Rest-Of-Events and fill them into the ParticleLists.
-    This function has to be used only in the for_each loops over ROE.
     The types of the particles other than those specified by ``particleLists`` are not stored.
     If one creates a ROE with ``fillWithMostLikely=True`` via `buildRestOfEvent`, for example,
     one should create particleLists for not only ``pi+``, ``gamma``, ``K_L0`` but also other charged final state particles.
+
+    When one calls the function in the main path, one has to set the argument ``signalSideParticleList`` and the signal side
+    ParticleList must have only one candidate.
 
     .. code-block:: python
 
@@ -1346,10 +1349,18 @@ def extractParticlesFromROE(particleLists,
         plists = ['%s:in_roe' % ptype for ptype in ['pi+', 'gamma', 'K_L0', 'K+', 'p+', 'e+', 'mu+']]
         extractParticlesFromROE(plists, maskName='all', path=roe_path)
 
+        # one can analyze these ParticleLists in the roe_path
+
         mypath.for_each('RestOfEvent', 'RestOfEvents', roe_path)
+
+        rankByLowest('B0:sig', 'deltaE', numBest=1, path=mypath)
+        extractParticlesFromROE(plists, signalSideParticleList='B0:sig', maskName='all', path=roe_path)
+
+        # one can analyze these ParticleLists in the main path
 
 
     @param particleLists (str or list(str)) Name of output ParticleLists
+    @param signalSideParticleList (str)     Name of signal side ParticleList
     @param maskName (str)                   Name of the ROE mask to be applied on Particles
     @param writeOut (bool)                  whether RootOutput module should save the created ParticleList
     @param path (basf2.Path)                modules are added to this path
@@ -1361,6 +1372,8 @@ def extractParticlesFromROE(particleLists,
     pext = register_module('ParticleExtractorFromROE')
     pext.set_name('ParticleExtractorFromROE_' + '_'.join(particleLists))
     pext.param('outputListNames', particleLists)
+    if signalSideParticleList is not None:
+        pext.param('signalSideParticleListName', signalSideParticleList)
     pext.param('maskName', maskName)
     pext.param('writeOut', writeOut)
     path.add_module(pext)

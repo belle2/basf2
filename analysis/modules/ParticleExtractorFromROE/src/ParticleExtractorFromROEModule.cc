@@ -14,7 +14,6 @@
 #include <framework/datastore/StoreArray.h>
 
 // analysis
-#include <analysis/dataobjects/RestOfEvent.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/DecayDescriptor/DecayDescriptorParticle.h>
 #include <analysis/DecayDescriptor/ParticleListName.h>
@@ -41,6 +40,8 @@ ParticleExtractorFromROEModule::ParticleExtractorFromROEModule() : Module()
   std::vector<std::string> defaultList;
   addParam("outputListNames", m_outputListNames,
            "list of ParticleList names to be created", defaultList);
+  addParam("signalSideParticleListName", m_signalSideParticleListName,
+           "Name of signal side ParticleList. It is required if the function is called in the main path.", std::string(""));
   addParam("maskName", m_maskName,
            "List of all mask names for which the info will be printed.",
            std::string(RestOfEvent::c_defaultMaskName));
@@ -92,7 +93,11 @@ void ParticleExtractorFromROEModule::initialize()
     }
   }
 
+  if (not m_signalSideParticleListName.empty())
+    StoreObjPtr<ParticleList>().isRequired(m_signalSideParticleListName);
+
 }
+
 
 void ParticleExtractorFromROEModule::event()
 {
@@ -113,25 +118,47 @@ void ParticleExtractorFromROEModule::event()
     }
   }
 
+
   StoreObjPtr<RestOfEvent> roe("RestOfEvent");
-  if (not roe.isValid()) {
-    B2ERROR("RestOfEvent object is not valid.");
-    return;
+  if (roe.isValid()) {
+    const RestOfEvent* roe_tmp = &(*roe);
+    extractParticlesFromROE(roe_tmp);
+  } else {
+
+    if (m_signalSideParticleListName.empty()) {
+      B2ERROR("RestOfEvent object is not valid and signalSideListName is not provided");
+      return;
+    }
+
+    StoreObjPtr<ParticleList> signaSideParticleList(m_signalSideParticleListName);
+    const int nSignalSideCandidates = signaSideParticleList->getListSize();
+
+    if (nSignalSideCandidates > 1) {
+      B2ERROR("Signal side ParticleList have more than one candidates. There must be only one candidate.");
+      return;
+    } else if (nSignalSideCandidates == 0) {
+      return;
+    }
+
+    const Particle* particle = signaSideParticleList->getParticle(0);
+    const RestOfEvent* roe_from_particle = particle->getRelatedTo<RestOfEvent>();
+    extractParticlesFromROE(roe_from_particle);
   }
 
+}
+
+void ParticleExtractorFromROEModule::extractParticlesFromROE(const RestOfEvent* roe)
+{
   auto particlesInROE = roe->getParticles(m_maskName, /* unpackComposite */ true);
 
   for (auto part : particlesInROE) {
     const int absPdg = abs(part->getPDGCode());
 
     auto result = std::find(m_absPdgCodes.begin(), m_absPdgCodes.end(), absPdg);
-
     if (result == m_absPdgCodes.end())
       continue;
 
     const int indexList = std::distance(m_absPdgCodes.begin(), result);
     m_pLists[indexList]->addParticle(part);
   }
-
 }
-

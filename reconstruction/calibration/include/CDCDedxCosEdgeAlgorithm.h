@@ -99,7 +99,7 @@ namespace Belle2 {
     /**
     * funtion to draw dedx histograms for each bin
     */
-    void plotHist(vector<TH1D*>& hdedx, map<int, vector<double>>& fPars, string& type);
+    void plotHist(vector<TH1D*>& hdedx, map<int, vector<double>>& fPars, string type);
 
     /**
     * function to draw the fit parameters (relative gains and resolutions)

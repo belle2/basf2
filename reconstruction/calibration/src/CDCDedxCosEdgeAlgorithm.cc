@@ -252,7 +252,7 @@ void CDCDedxCosEdgeAlgorithm::fitGaussianWRange(TH1D*& temphist, fitstatus& stat
 
 //------------------------------------
 void CDCDedxCosEdgeAlgorithm::plotHist(vector<TH1D*>& hdedx, map<int, vector<double>>& vpars,
-                                       string& type)
+                                       string type)
 {
   TCanvas ctmp("ctmp", "ctmp", 1200, 1200);
   ctmp.Divide(5, 4);

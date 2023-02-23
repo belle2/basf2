@@ -1,5 +1,12 @@
 Changes in the analysis package in light-2302-genetta
 -----------------------------------------------------
+
+Charm Flavor Tagger
++++++++++++++++++++
+* The Charm Flavor Tagger algorithm has been added in ``analysis/scripts/charmFlavorTagger.py``. This allows for the determination
+  of the signal flavor of neutral D mesons with information from the ROE. The CFT output, qr, is saved in the extraInfo field of 
+  the signal particle. 
+
 MCMatching of K_S0
 ++++++++++++++++++
 * Modified the MCMatching algorithm for the ``K_S0`` particle. The MCError flags of missing daughters (e.g.

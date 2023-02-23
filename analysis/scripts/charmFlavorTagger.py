@@ -12,7 +12,7 @@ import basf2
 import variables as va
 import modularAnalysis as ma
 
-def charmFlavorTagger(particle_list,uniqueIdentifier='CFT.xml',
+def charmFlavorTagger(particle_list,uniqueIdentifier='CFT',
                      path=None):
     """
     Interfacing for the Charm Flavor Tagger.

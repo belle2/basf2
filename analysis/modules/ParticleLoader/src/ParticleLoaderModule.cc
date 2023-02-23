@@ -16,6 +16,7 @@
 // utilities
 #include <analysis/DecayDescriptor/ParticleListName.h>
 #include <analysis/utility/PCmsLabTransform.h>
+#include <analysis/utility/ValueIndexPairSorting.h>
 
 #include <utility>
 
@@ -812,25 +813,23 @@ void ParticleLoaderModule::assignMCParticleFromECLCluster(Particle* newPart, con
   const RelationVector<MCParticle> mcRelations = cluster->getRelationsTo<MCParticle>();
 
   // order relations by weights
-  std::vector<std::pair<int, double>> weightsAndIndices;
+  std::vector<std::pair<double, int>> weightsAndIndices;
   for (unsigned int iMCParticle = 0; iMCParticle < mcRelations.size(); iMCParticle++) {
     const MCParticle* relMCParticle = mcRelations[iMCParticle];
     if (relMCParticle) {
       double weight = mcRelations.weight(iMCParticle);
-      weightsAndIndices.emplace_back(relMCParticle->getArrayIndex(), weight);
+      weightsAndIndices.emplace_back(weight, relMCParticle->getArrayIndex());
     }
   }
 
   // sort descending by weight
   std::sort(weightsAndIndices.begin(), weightsAndIndices.end(),
-  [](const std::pair<int, double>& left, const std::pair<int, double>& right) {
-    return left.second > right.second;
-  });
+            ValueIndexPairSorting::higherPair<decltype(weightsAndIndices)::value_type>);
 
   // set relations to mcparticles
   for (auto& weightsAndIndex : weightsAndIndices) {
-    const MCParticle* relMCParticle = m_mcparticles[weightsAndIndex.first];
-    double weight = weightsAndIndex.second;
+    const MCParticle* relMCParticle = m_mcparticles[weightsAndIndex.second];
+    double weight = weightsAndIndex.first;
 
     // TODO: study this further and avoid hard-coded values
     // set the relation only if the MCParticle(reconstructed Particle)'s

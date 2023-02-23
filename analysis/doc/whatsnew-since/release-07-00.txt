@@ -30,7 +30,7 @@ Modules
 * Modified parameters for the functions :func:`modularAnalysis.fillParticleList` and :func:`modularAnalysis.fillParticleLists` so
   that they no longer contain parameters that load the beam background or fake photon (formerly hadronic split-off) MVA.
 * Parameters for `stdPhotons`, `stdPi0s` and `stdHyperons` have been changed in both name and type. The new parameters are called
-  ``loadBeamBackgroundMVA`` and ``loadFakePhotonMVA``, and they are now strings to specify which weight files should be used. For
+  ``beamBackgroundMVAWeight`` and ``fakePhotonMVAWeight``, and they are now strings to specify which weight files should be used. For
   run-independent training use ``MCri`` while for run-dependent training use ``MCrd``. More information on the new weights can be
   found on the `Neutrals Performance Confluence Page <https://confluence.desy.de/display/BI/Neutrals+Performance>`_.
 * Added an optional parameter ``biasCorrectionTable`` to `stdHyperons` so that users can specify a table name with photon energy
@@ -55,10 +55,8 @@ Modules
   the output ROOT file name even if the ``-o`` argument is used.
 * Fixed a bug on `NeutralHadron4MomentumCalculator` that misplaces the neutral hadron daughter's index after calculating its momentum.
 * New function `modularAnalysis.extractParticlesFromROE` and module `ParticleExtractorFromROE` are implemented.
-  The function extracts Particle objects that belong to a ROE and fills them in ParticleLists. It is available in the ``for_each``
-  loop over the ROEs (e.g. ``roe_path``).
-  ``filenameSuffix`` of `modularAnalysis.variablesToNtuple` to differentiate the output files. The ``filenameSuffix`` is appended
-  to the output ROOT file name even if the ``-o`` argument is used.
+  The function extracts Particle objects that belong to a ROE and fills them in ParticleLists. It is available both in the
+  ``for_each`` loop over the ROEs (e.g. ``roe_path``) and the main path if the signal side ParticleList has only one candidate.
 * Fixed a bug on `NeutralHadron4MomentumCalculator` that misplaces the neutral hadron daughter's index after calculating its
   momentum.
 * Added a module ``BelleNbarMVA`` that applies nbarMVA for Belle, a DNN trained with ECLCluster variables for discrimination of

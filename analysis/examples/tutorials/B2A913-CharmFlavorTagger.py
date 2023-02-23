@@ -33,12 +33,8 @@ import variables.utils as vu
 # create path
 cft_path = b2.Path()
 
-# Environment of the MC or data sample
-environmentType = "default"
-
 # load input ROOT file
-ma.inputMdst(environmentType='default',
-             filename=b2.find_file('Dst2D0pi.root', 'examples', False),
+ma.inputMdst(filename=b2.find_file('Dst2D0pi.root', 'examples', False),
              path=cft_path)
 
 # create pion and kaon particle lists
@@ -64,7 +60,7 @@ ma.buildRestOfEvent(target_list_name='D0:sig',
                     path=cft_path)
 
 # Charm Flavor Tagging Function.
-cft.CharmFlavorTagger(
+cft.charmFlavorTagger(
     'D0:sig',uniqueIdentifier='CFT.xml',
     path=cft_path)
 

@@ -12,10 +12,10 @@ import basf2
 import variables as va
 import modularAnalysis as ma
 
-def CharmFlavorTagger(particle_list,uniqueIdentifier='CFT.xml',
+def charmFlavorTagger(particle_list,uniqueIdentifier='CFT.xml',
                      path=None):
     """
-    Interfacing for the CharmFlavorTagger.
+    Interfacing for the Charm Flavor Tagger.
 
     This function requires a reconstructed D meson signal particle list with a built RestOfEvent.
 

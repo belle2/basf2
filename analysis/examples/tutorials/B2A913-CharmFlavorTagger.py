@@ -65,7 +65,7 @@ ma.buildRestOfEvent(target_list_name='D0:sig',
 
 # Charm Flavor Tagging Function.
 cft.CharmFlavorTagger(
-    'D0:sig',
+    'D0:sig',uniqueIdentifier='CFT.xml',
     path=cft_path)
 
 # Select variables that will be stored to ntuple

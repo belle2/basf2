@@ -12,7 +12,7 @@ import basf2
 import variables as va
 import modularAnalysis as ma
 
-def CharmFlavorTagger(particle_list,
+def CharmFlavorTagger(particle_list,uniqueIdentifier='CFT.xml',
                      path=None):
     """
     Interfacing for the CharmFlavorTagger.
@@ -20,6 +20,7 @@ def CharmFlavorTagger(particle_list,
     This function requires a reconstructed D meson signal particle list with a built RestOfEvent.
 
     :param particle_list:  string, particle list of the reconstructed signal D meson
+    :param uniqueIdentifier: string, database identifier for the method
     :param path: basf2 path obj
     :return: None
     """
@@ -34,7 +35,7 @@ def CharmFlavorTagger(particle_list,
     roe_particle_list = 'pi+:cft' + '_' + extension
 
     # filter rest of events only for specific particle list
-    ma.signalSideParticleListsFilter(particle_list, '', roe_path, dead_end_path)
+    ma.signalSideParticleFilter(particle_list, '', roe_path, dead_end_path)
 
     # create final state particle lists
     ma.fillParticleList(roe_particle_list, roe_particle_list_cut, path=roe_path)
@@ -68,8 +69,8 @@ def CharmFlavorTagger(particle_list,
     
     # apply CFT with MVAExpert module and write output to extraInfo
     expert_module = basf2.register_module('MVAExpert')
-    expert_module.param('listNames', particle_list)
-    expert_module.param('identifier', 'CFT.xml')
+    expert_module.param('listNames', [particle_list])
+    expert_module.param('identifier', uniqueIdentifier)
 
     expert_module.param('extraInfoName', 'CFT_out')
 

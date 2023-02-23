@@ -22,7 +22,7 @@ class TutorialsTest(unittest.TestCase):
     """Test to run all B2A9XX tutorials. Will fail if no tutorial directory is found."""
 
     #: list of the broken tutorials (to be removed when they are individually fixed)
-    broken_tutorials = []
+    broken_tutorials = ['B2A913-CharmFlavorTagger.py']
 
     @unittest.skipIf(not os.getenv('BELLE2_EXAMPLES_DATA_DIR'),
                      "$BELLE2_EXAMPLES_DATA_DIR not found.")

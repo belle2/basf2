@@ -15,6 +15,12 @@ MCMatching of K_S0
   :math:`\tau^- \to \ell^- K_S^0 K_S^0`. You can identify such events with the `mcSecPhysProc` variable that returns the secondary
   process of the Geant4, namely ``countFSPDaughters(mcPrimary==0 and mcSecPhysProc!=201)>0``.
 
+Graph Neural Network based Flavor Tagger
+++++++++++++++++++++++++++++++++++++++++
+* The Graph Neural Network based Flavor Tagger is available from the basf2. The new options ``useGNN`` and ``identifierGNN`` are
+  added to `flavorTagger.flavorTagger`. If ``useGNN`` is set to ``True`` and ``identifierGNN`` is set to the trained weight file
+  name, the qr value is stored in the alias variable ``qrGNN``. One can find the information on the identifier and the global tag
+  which includes the payload on the `TDCPV WG Confluence Page <https://confluence.desy.de/display/BI/Recipes+for+TDCPV+tools>`_.
 
 Modules
 +++++++

@@ -407,7 +407,6 @@ namespace Belle2 {
       /**
        * Returns all values for a specified variableType and branchName. The values are read from a root file.
        * The type is inferred from the given memberVariableTarget name.
-       * @tparam T type memberVariable of this class which has to be updated (float, double)
        * @param variableType defines {feature, weights, spectator, target}
        * @param branchName name of the branch to read
        * @param memberVariableTarget variable the branch address from the root file is set to
@@ -417,7 +416,7 @@ namespace Belle2 {
                                                    Variable::Manager::VarVariant& memberVariableTarget);
 
       /**
-       * Tries to infer the data-type of the spectator and feature variaables in a root file
+       * Tries to infer the data-type of the spectator and feature variables in a root file
        */
       void setRootInputType();
 
@@ -433,7 +432,6 @@ namespace Belle2 {
 
       /**
        * sets the branch address for a scalar variable to a given target
-       * @tparam T target type (float, double)
        * @param variableType defines {feature, weights, spectator, target}
        * @param variableName name of the variable, usually defined in general_options
        * @param variableTarget variable, the address is set to
@@ -454,7 +452,6 @@ namespace Belle2 {
 
       /**
        * sets the branch address for a vector of VarVariant to a given target
-       * @tparam T target type (std::vector<float>, std::vector<double>)
        * @param variableType defines {feature, weights, spectator, target}
        * @param variableName names of the variable, usually defined in general_options
        * @param varVariantTargets variables, the address is set to

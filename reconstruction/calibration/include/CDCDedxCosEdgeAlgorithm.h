@@ -10,14 +10,17 @@
 
 #include <TH1D.h>
 #include <TPaveText.h>
-#include <TF1.h>
-#include <TCanvas.h>
-#include <TH1I.h>
-#include <TLegend.h>
+
+#include<map>
+#include<vector>
 
 #include <reconstruction/dbobjects/CDCDedxCosineEdge.h>
 #include <calibration/CalibrationAlgorithm.h>
 #include <framework/database/DBObjPtr.h>
+
+enum fitstatus {FitOK, FitFailed, LowStats};
+
+using namespace std;
 
 namespace Belle2 {
 
@@ -41,27 +44,17 @@ namespace Belle2 {
     /**
     * function to merge paylaods (if relative)
     */
-    void setMergePayload(bool value = true) {isMerge = value;}
-
-    /**
-    * function to store new payload after full calibration
-    */
-    void createPayload(std::vector<std::vector<double>>& vfinalconst);
+    void setMergePayload(bool value = true) {m_isMerge = value;}
 
     /**
     * function enable monitoring plots
     */
-    void setMonitoringPlots(bool value = false) {isMakePlots = value;}
+    void setMonitoringPlots(bool value = false) {m_isMakePlots = value;}
 
     /**
     * set sigma to restrict fit in (mean+/sigma) range
     */
     void setFitWidth(double value = 2.5) {m_sigLim = value;}
-
-    /**
-    * function to perform gaus fit for given histogram
-    */
-    void FitGaussianWRange(TH1D*& temphist, std::string& status);
 
     /**
     * function to set number of cosine bins on (equal posi and negi side)
@@ -94,19 +87,29 @@ namespace Belle2 {
     void getExpRunInfo();
 
     /**
+    * function to perform gaus fit for given histogram
+    */
+    void fitGaussianWRange(TH1D*& temphist, fitstatus& status);
+
+    /**
+    * function to store new payload after full calibration
+    */
+    void createPayload(vector<vector<double>>& vfinalconst);
+
+    /**
     * funtion to draw dedx histograms for each bin
     */
-    void plotHist(TH1D* hdEdx[], std::map<int, std::vector<double>> fPars, std::string type);
+    void plotHist(vector<TH1D*>& hdedx, map<int, vector<double>>& fPars, string& type);
 
     /**
     * function to draw the fit parameters (relative gains and resolutions)
     */
-    void plotFitPars(std::map<int, std::vector<double>> fPars_Neg, std::map<int, std::vector<double>> fPars_Pos);
+    void plotFitPars(map<int, vector<double>>& fPars_Neg, map<int, vector<double>>& fPars_Pos);
 
     /**
-    * function to draw the final calibration constants and comparison
+    * function to draw the final calibration constants and comparison with old constants
     */
-    void plotConstants(std::vector<std::vector<double>> vfinalconst);
+    void plotConstants(vector<vector<double>>& vfinalconst);
 
     /**
      * function to draw the stats plots
@@ -128,29 +131,29 @@ namespace Belle2 {
     /**
      * function to change histogram styles
      */
-    void setHistCosmetics(TH1D* hist, Color_t color, double min, double max, double size)
+    void setHistCosmetics(TH1D& hist, Color_t color, double min, double max, double size)
     {
-      hist->SetMarkerStyle(20);
-      hist->SetMarkerSize(0.60);
-      hist->SetMarkerColor(color);
-      hist->SetLineColor(color);
-      hist->SetStats(0);
-      hist->GetYaxis()->SetRangeUser(min, max);
-      hist->GetXaxis()->SetLabelSize(size);
-      hist->GetYaxis()->SetLabelSize(size);
+      hist.SetMarkerStyle(20);
+      hist.SetMarkerSize(0.60);
+      hist.SetMarkerColor(color);
+      hist.SetLineColor(color);
+      hist.SetStats(0);
+      hist.GetYaxis()->SetRangeUser(min, max);
+      hist.GetXaxis()->SetLabelSize(size);
+      hist.GetYaxis()->SetLabelSize(size);
     }
 
   protected:
 
     /**
-    * Cosine algorithm
+    * Cosine edge algorithm
     */
     virtual EResult calibrate() override;
 
   private:
 
-    bool isMakePlots; /**< enable saving plots */
-    bool isMerge; /**< merge payload if calculated relative */
+    bool m_isMakePlots; /**< enable saving plots */
+    bool m_isMerge; /**< merge payload if calculated relative */
 
     double m_sigLim; /**< gaussian fit sigma limit */
     unsigned int m_npBins; /**< number of bins across cosine range */
@@ -162,7 +165,7 @@ namespace Belle2 {
     double m_dedxMin; /**< min dedx range */
     double m_dedxMax; /**< max dedx range */
 
-    std::string m_suffix; /**< suffix for better plot naming */
+    string m_suffix; /**< suffix for better plot naming */
 
     DBObjPtr<CDCDedxCosineEdge> m_DBCosineCor; /**< CoseEdge correction DB object */
   };

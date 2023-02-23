@@ -6,7 +6,13 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+#include <TF1.h>
+#include <TCanvas.h>
+#include <TH1I.h>
+#include <TLegend.h>
+
 #include <reconstruction/calibration/CDCDedxCosEdgeAlgorithm.h>
+
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -14,8 +20,8 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 CDCDedxCosEdgeAlgorithm::CDCDedxCosEdgeAlgorithm() :
   CalibrationAlgorithm("CDCDedxElectronCollector"),
-  isMakePlots(true),
-  isMerge(true),
+  m_isMakePlots(true),
+  m_isMerge(true),
   m_sigLim(2.5),
   m_npBins(20),
   m_negMin(-0.870),
@@ -41,7 +47,7 @@ CalibrationAlgorithm::EResult CDCDedxCosEdgeAlgorithm::calibrate()
 
   // Get data objects
   auto ttree = getObjectPtr<TTree>("tree");
-  if (ttree->GetEntries() < 100)return c_NotEnoughData;
+  if (ttree->GetEntries() < 100) return c_NotEnoughData;
 
   double dedx, costh; int charge;
   ttree->SetBranchAddress("dedx", &dedx);
@@ -49,7 +55,7 @@ CalibrationAlgorithm::EResult CDCDedxCosEdgeAlgorithm::calibrate()
   ttree->SetBranchAddress("charge", &charge);
 
   // make histograms to store dE/dx values in bins of cos(theta)
-  TH1D* hdedx_negi[m_npBins], *hdedx_posi[m_npBins];
+  vector<TH1D*> hdedx_negi, hdedx_posi;
 
   const double bwnegi = (m_negMax - m_negMin) / m_npBins;
   const double bwposi = (m_posMax - m_posMin) / m_npBins;
@@ -58,14 +64,14 @@ CalibrationAlgorithm::EResult CDCDedxCosEdgeAlgorithm::calibrate()
 
     double mincos = i * bwposi + m_posMin;
     double maxcos = mincos + bwposi;
-    std::string title = Form("costh: %0.04f, %0.04f(%s)", mincos, maxcos, m_suffix.data());
-    hdedx_posi[i] = new TH1D(Form("hdedx_posi%d_%s", i, m_suffix.data()), "", m_dedxBins, m_dedxMin, m_dedxMax);
+    string title = Form("costh: %0.04f, %0.04f(%s)", mincos, maxcos, m_suffix.data());
+    hdedx_posi.push_back(new TH1D(Form("hdedx_posi%d_%s", i, m_suffix.data()), "", m_dedxBins, m_dedxMin, m_dedxMax));
     hdedx_posi[i]->SetTitle(Form("%s;dedx;entries", title.data()));
 
     mincos = i * bwnegi + m_negMin;
     maxcos = mincos + bwnegi;
     title = Form("costh: %0.04f, %0.04f(%s)", mincos, maxcos, m_suffix.data());
-    hdedx_negi[i] = new TH1D(Form("hdedx_negi%d_%s", i, m_suffix.data()), "", m_dedxBins, m_dedxMin, m_dedxMax);
+    hdedx_negi.push_back(new TH1D(Form("hdedx_negi%d_%s", i, m_suffix.data()), "", m_dedxBins, m_dedxMin, m_dedxMax));
     hdedx_negi[i]->SetTitle(Form("%s;dedx;entries", title.data()));
   }
 
@@ -76,7 +82,7 @@ CalibrationAlgorithm::EResult CDCDedxCosEdgeAlgorithm::calibrate()
 
     //if track is a junk
     if (dedx <= 0 || charge == 0) continue;
-    if (costh > -0.850 && costh < 0.950)continue;
+    if (costh > -0.850 && costh < 0.950) continue;
 
     if (costh > 0) {
       icosbin = int((costh - m_posMin) / bwposi);
@@ -85,27 +91,26 @@ CalibrationAlgorithm::EResult CDCDedxCosEdgeAlgorithm::calibrate()
       icosbin = int((costh - m_negMin) / bwnegi);
       hdedx_negi[icosbin]->Fill(dedx);
     }
-
   }
 
-  std::map<int, std::vector<double>> vneg_fitpars;
-  std::map<int, std::vector<double>> vpos_fitpars;
+  map<int, vector<double>> vneg_fitpars;
+  map<int, vector<double>> vpos_fitpars;
 
-  std::vector<double> vneg_const, vpos_const;
-  std::vector<std::vector<double>> vfinal_const;
+  vector<double> vneg_const, vpos_const;
+  vector<vector<double>> vfinal_const;
 
   for (unsigned int i = 0; i < m_npBins; ++i) {
 
-    std::string fitstatus = "";
+    fitstatus status;
 
     //Fit dedx in negative cos bins
-    FitGaussianWRange(hdedx_negi[i], fitstatus);
-    if (fitstatus != "FitOK") {
+    fitGaussianWRange(hdedx_negi[i], status);
+    if (status != FitOK) {
       vneg_fitpars[0].push_back(1.0);
       vneg_fitpars[1].push_back(0.0);
       vneg_fitpars[2].push_back(0.0);
       vneg_fitpars[3].push_back(0.0);
-      hdedx_negi[i]->SetTitle(Form("%s, Fit(%s)", hdedx_negi[i]->GetTitle(), fitstatus.data()));
+      hdedx_negi[i]->SetTitle(Form("%s, Fit(%d)", hdedx_negi[i]->GetTitle(), status));
     } else {
       vneg_fitpars[0].push_back(hdedx_negi[i]->GetFunction("gaus")->GetParameter(1));
       vneg_fitpars[1].push_back(hdedx_negi[i]->GetFunction("gaus")->GetParError(1));
@@ -116,13 +121,13 @@ CalibrationAlgorithm::EResult CDCDedxCosEdgeAlgorithm::calibrate()
     vneg_const.push_back(vneg_fitpars[0][i]);
 
     //Fit dedx in positive cos bins
-    FitGaussianWRange(hdedx_posi[i], fitstatus);
-    if (fitstatus != "FitOK") {
+    fitGaussianWRange(hdedx_posi[i], status);
+    if (status != FitOK) {
       vpos_fitpars[0].push_back(1.0);
       vpos_fitpars[1].push_back(0.0);
       vpos_fitpars[2].push_back(0.0);
       vpos_fitpars[3].push_back(0.0);
-      hdedx_posi[i]->SetTitle(Form("%s, Fit(%s)", hdedx_posi[i]->GetTitle(), fitstatus.data()));
+      hdedx_posi[i]->SetTitle(Form("%s, Fit(%d)", hdedx_posi[i]->GetTitle(), status));
     } else {
       vpos_fitpars[0].push_back(hdedx_posi[i]->GetFunction("gaus")->GetParameter(1));
       vpos_fitpars[1].push_back(hdedx_posi[i]->GetFunction("gaus")->GetParError(1));
@@ -138,7 +143,7 @@ CalibrationAlgorithm::EResult CDCDedxCosEdgeAlgorithm::calibrate()
 
   createPayload(vfinal_const);
 
-  if (isMakePlots) {
+  if (m_isMakePlots) {
 
     //1. draw dedx dist of individual bins
     plotHist(hdedx_posi, vpos_fitpars, "pos");
@@ -177,14 +182,14 @@ void CDCDedxCosEdgeAlgorithm::getExpRunInfo()
 
   updateDBObjPtrs(1, rstart, estart);
 
-  if (m_suffix.length() > 0)m_suffix = Form("%s_e%d_r%dr%d", m_suffix.data(), estart, rstart, rend);
+  if (m_suffix.length() > 0) m_suffix = Form("%s_e%d_r%dr%d", m_suffix.data(), estart, rstart, rend);
   else  m_suffix = Form("e%d_r%dr%d", estart, rstart, rend);
 }
 
 //------------------------------------
-void CDCDedxCosEdgeAlgorithm::createPayload(std::vector<std::vector<double>>& vfinalconst)
+void CDCDedxCosEdgeAlgorithm::createPayload(vector<vector<double>>& vfinalconst)
 {
-  if (isMerge) {
+  if (m_isMerge) {
     if (m_DBCosineCor->getSize(-1) != int(m_npBins) || m_DBCosineCor->getSize(1) != int(m_npBins))
       B2FATAL("CDCDedxCosEdgeAlgorithm: Can't merge paylaods with different size");
 
@@ -197,7 +202,7 @@ void CDCDedxCosEdgeAlgorithm::createPayload(std::vector<std::vector<double>>& vf
       B2INFO("CosEdge Const (<0), bin# " << ibin << ", rel " << relg << ", previous " << prevg << ", merged " <<  newg);
       vfinalconst[0].at(ibin) *= (double)m_DBCosineCor->getMean(-1, ibin);
       vfinalconst[0].at(ibin) /= (0.5 * (vfinalconst[0].at(m_npBins - 1) + vfinalconst[0].at(m_npBins - 2)));
-      printf("hello\n ");
+
       //costh > 0
       prevg = m_DBCosineCor->getMean(1, ibin);
       relg = vfinalconst[1].at(ibin);
@@ -214,18 +219,18 @@ void CDCDedxCosEdgeAlgorithm::createPayload(std::vector<std::vector<double>>& vf
 }
 
 //------------------------------------
-void CDCDedxCosEdgeAlgorithm::FitGaussianWRange(TH1D*& temphist, std::string& status)
+void CDCDedxCosEdgeAlgorithm::fitGaussianWRange(TH1D*& temphist, fitstatus& status)
 {
   if (temphist->Integral() < 500) { //atleast 1k bhabha events
     B2INFO(Form("\t insufficient fit stats (%0.00f) for (%s)", temphist->Integral(), temphist->GetName()));
-    status = "LowStats";
+    status = LowStats;
     return;
   } else {
     temphist->GetXaxis()->SetRange(temphist->FindFirstBinAbove(0, 1), temphist->FindLastBinAbove(0, 1));
     int fs = temphist->Fit("gaus", "QR");
     if (fs != 0) {
       B2INFO(Form("\tFit (round 1) for hist (%s) failed (status = %d)", temphist->GetName(), fs));
-      status = "FitFailed";
+      status = FitFailed;
       return;
     } else {
       double fdEdxMean = temphist->GetFunction("gaus")->GetParameter(1);
@@ -234,32 +239,33 @@ void CDCDedxCosEdgeAlgorithm::FitGaussianWRange(TH1D*& temphist, std::string& st
       fs = temphist->Fit("gaus", "QR", "", fdEdxMean - m_sigLim * width, fdEdxMean + m_sigLim * width);
       if (fs != 0) {
         B2INFO(Form("\tFit (round 2) for hist (%s) failed (status = %d)", temphist->GetName(), fs));
-        status = "FitFailed";
+        status = FitFailed;
         return;
       } else {
         temphist->GetXaxis()->SetRangeUser(fdEdxMean - 5.0 * width, fdEdxMean + 5.0 * width);
         B2INFO(Form("\tFit for hist (%s) sucessfull (status = %d)", temphist->GetName(), fs));
-        status = "FitOK";
+        status = FitOK;
       }
     }
   }
 }
 
 //------------------------------------
-void CDCDedxCosEdgeAlgorithm::plotHist(TH1D* hdedx[], std::map<int, std::vector<double>> vpars, std::string type)
+void CDCDedxCosEdgeAlgorithm::plotHist(vector<TH1D*>& hdedx, map<int, vector<double>>& vpars,
+                                       string& type)
 {
-  TCanvas* ctmp = new TCanvas("ctmp", "ctmp", 1200, 1200);
-  ctmp->Divide(5, 4);
+  TCanvas ctmp("ctmp", "ctmp", 1200, 1200);
+  ctmp.Divide(5, 4);
 
-  std::stringstream psname;
+  stringstream psname;
   psname << Form("cdcdedx_cosedgecal_fits_%s_%s.pdf[", type.data(), m_suffix.data());
-  ctmp->Print(psname.str().c_str());
+  ctmp.Print(psname.str().c_str());
   psname.str("");
   psname << Form("cdcdedx_cosedgecal_fits_%s_%s.pdf", type.data(), m_suffix.data());
 
   for (unsigned int i = 0; i < m_npBins; ++i) {
 
-    ctmp->cd(i % 20 + 1); // each canvas is 2x2
+    ctmp.cd(i % 20 + 1); // each canvas is 2x2
     hdedx[i]->SetStats(0);
     hdedx[i]->SetFillColor(kAzure - 9);
     hdedx[i]->DrawCopy();
@@ -267,75 +273,79 @@ void CDCDedxCosEdgeAlgorithm::plotHist(TH1D* hdedx[], std::map<int, std::vector<
     TPaveText* pt = new TPaveText(0.5, 0.73, 0.8, 0.89, "NBNDC");
     setTextCosmetics(pt, 0.04258064);
     pt->AddText(Form("#mu_{fit}: %0.03f#pm%0.03f", vpars[0][i], vpars[1][i]));
-    pt->AddText(Form("#sigma_{fit}: %0.03f", vpars[2][i]));
+    pt->AddText(Form("#sigma_{fit}: %0.03f#pm%0.03f", vpars[2][i], vpars[3][i]));
     pt->Draw("same");
 
     if ((i + 1) % 20 == 0 || (i + 1) == m_npBins) {
-      ctmp->Print(psname.str().c_str());
-      ctmp->Clear("D");
+      ctmp.Print(psname.str().c_str());
+      ctmp.Clear("D");
     }
+
+    delete hdedx[i];
   }
+
   psname.str("");
   psname << Form("cdcdedx_cosedgecal_fits_%s_%s.pdf]", type.data(), m_suffix.data());
-  ctmp->Print(psname.str().c_str());
-  delete ctmp;
+  ctmp.Print(psname.str().c_str());
 }
 
 //------------------------------------
-void CDCDedxCosEdgeAlgorithm::plotFitPars(std::map<int, std::vector<double>> vneg_fitpars,
-                                          std::map<int, std::vector<double>> vpos_fitpars)
+void CDCDedxCosEdgeAlgorithm::plotFitPars(map<int, vector<double>>& vneg_fitpars,
+                                          map<int, vector<double>>& vpos_fitpars)
 {
   // For qa pars
-  TCanvas* cQa = new TCanvas("cQa", "cQa", 1200, 1200);
-  cQa->Divide(2, 2);
+  TCanvas cQa("cQa", "cQa", 1200, 1200);
+  cQa.Divide(2, 2);
 
   double min[2] = {0.85, 0.04};
   double max[2] = {1.05, 0.3};
 
-  std::string vars[2] = {"#mu_{fit}", "#sigma_{fit}"};
-  std::string side[2] = {"pcos", "ncos"};
+  string vars[2] = {"#mu_{fit}", "#sigma_{fit}"};
+  string side[2] = {"pcos", "ncos"};
 
-  TH1D* htemp = 0x0;
   for (int is = 0; is < 2; is++) {
+
+    double minp = m_negMin, maxp = m_negMax;
+    if (is == 0) {
+      minp = m_posMin;
+      maxp = m_posMax;
+    }
+
     for (int iv = 0; iv < 2; iv++) {
-      std::string hname = Form("hpar_%s_%s_%s", vars[iv].data(), side[is].data(), m_suffix.data());
-      if (is == 0) {
-        htemp  = new TH1D(Form("%s", hname.data()), "", m_npBins, m_posMin, m_posMax);
-        htemp->SetTitle(Form("Constant (%s), cos#theta:(%0.02f, %0.02f);cos(#theta);const", vars[iv].data(), m_posMin, m_posMax));
-      } else {
-        htemp  = new TH1D(Form("%s", hname.data()), "", m_npBins, m_negMin, m_negMax);
-        htemp->SetTitle(Form("Constant (%s), cos#theta:(%0.02f, %0.02f);cos(#theta);const", vars[iv].data(), m_negMin, m_negMax));
-      }
+
+      string hname = Form("hpar_%s_%s_%s", vars[iv].data(), side[is].data(), m_suffix.data());
+
+      TH1D htemp(Form("%s", hname.data()), "", m_npBins, minp, maxp);
+      htemp.SetTitle(Form("Constant (%s), cos#theta:(%0.02f, %0.02f);cos(#theta);const", vars[iv].data(), minp, maxp));
 
       for (unsigned int ib = 0; ib < m_npBins; ib++) {
         if (is == 0) {
-          htemp->SetBinContent(ib + 1, vpos_fitpars[2 * iv][ib]);
-          htemp->SetBinError(ib + 1, vpos_fitpars[2 * iv + 1][ib]);
+          htemp.SetBinContent(ib + 1, vpos_fitpars[2 * iv][ib]);
+          htemp.SetBinError(ib + 1, vpos_fitpars[2 * iv + 1][ib]);
         } else {
-          htemp->SetBinContent(ib + 1, vneg_fitpars[2 * iv][ib]);
-          htemp->SetBinError(ib + 1, vneg_fitpars[2 * iv + 1][ib]);
+          htemp.SetBinContent(ib + 1, vneg_fitpars[2 * iv][ib]);
+          htemp.SetBinError(ib + 1, vneg_fitpars[2 * iv + 1][ib]);
         }
       }
-      setHistCosmetics(htemp, iv * 2 + 2, min[iv], max[iv], 0.03);
-      cQa->cd(2 * iv + 1 + is); //1,3,2,4
+
+      setHistCosmetics(htemp, iv * 2 + 2, min[iv], max[iv], 0.025);
+
+      cQa.cd(2 * iv + 1 + is); //1,3,2,4
       gPad->SetGridx(1);
       gPad->SetGridy(1);
-      htemp->DrawCopy("");
+      htemp.DrawCopy("");
     }
   }
-  cQa->SaveAs(Form("cdcdedx_cosedgecal_relconst_%s.pdf", m_suffix.data()));
-  cQa->SaveAs(Form("cdcdedx_cosedgecal_relconst_%s.root", m_suffix.data()));
-  delete htemp;
+  cQa.SaveAs(Form("cdcdedx_cosedgecal_relconst_%s.pdf", m_suffix.data()));
+  cQa.SaveAs(Form("cdcdedx_cosedgecal_relconst_%s.root", m_suffix.data()));
 }
 
 //------------------------------------
-void CDCDedxCosEdgeAlgorithm::plotConstants(std::vector<std::vector<double>> vfinalconst)
+void CDCDedxCosEdgeAlgorithm::plotConstants(vector<vector<double>>& vfinalconst)
 {
 
   TCanvas ctmp_const("ctmp_const", "ctmp_const", 900, 450);
   ctmp_const.Divide(2, 1);
-
-  TH1D* holdconst[2], *hnewconst[2];
 
   for (int i = 0; i < 2; i++) {
 
@@ -345,29 +355,36 @@ void CDCDedxCosEdgeAlgorithm::plotConstants(std::vector<std::vector<double>> vfi
       max = m_posMax;
     }
 
-    holdconst[i] = new TH1D(Form("holdconst%d_%s", i, m_suffix.data()), "", m_npBins, min, max);
-    holdconst[i]->SetTitle(Form("constant comparision, cos#theta:(%0.02f, %0.02f);cos(#theta);const", min, max));
+    TH1D holdconst(Form("holdconst%d_%s", i, m_suffix.data()), "", m_npBins, min, max);
+    holdconst.SetTitle(Form("constant comparision, cos#theta:(%0.02f, %0.02f);cos(#theta);const", min, max));
 
-    hnewconst[i] = new TH1D(Form("hnewconst%d_%s", i, m_suffix.data()), "", m_npBins, min, max);
+    TH1D hnewconst(Form("hnewconst%d_%s", i, m_suffix.data()), "", m_npBins, min, max);
 
     int iside = 2 * i - 1; //-1 or +1 for neg and pos cosine side
     for (int ibin = 0; ibin < m_DBCosineCor->getSize(iside); ibin++) {
-      holdconst[i]->SetBinContent(ibin + 1, (double)m_DBCosineCor->getMean(iside, ibin));
-      hnewconst[i]->SetBinContent(ibin + 1, vfinalconst[i].at(ibin));
+      holdconst.SetBinContent(ibin + 1, (double)m_DBCosineCor->getMean(iside, ibin));
+      hnewconst.SetBinContent(ibin + 1, vfinalconst[i].at(ibin));
     }
 
     ctmp_const.cd(i + 1);
     gPad->SetGridx(1);
     gPad->SetGridy(1);
-    setHistCosmetics(holdconst[i], kBlack, 0., 1.10, 0.025);
-    holdconst[i]->DrawCopy("");
-    setHistCosmetics(hnewconst[i], kRed, 0., 1.10, 0.025);
-    hnewconst[i]->DrawCopy("same");
 
-    auto legend = new TLegend(0.4, 0.75, 0.56, 0.85);
-    legend->AddEntry(holdconst[i], "Old", "lep");
-    legend->AddEntry(hnewconst[i], "New", "lep");
-    legend->Draw();
+    setHistCosmetics(holdconst, kBlack, 0.0, 1.10, 0.025);
+    holdconst.DrawCopy("");
+
+    setHistCosmetics(hnewconst, kRed, 0.0, 1.10, 0.025);
+    hnewconst.DrawCopy("same");
+
+    TPaveText* pt = new TPaveText(0.47, 0.73, 0.77, 0.89, "NBNDC");
+    setTextCosmetics(pt, 0.02258064);
+
+    TText* told = pt->AddText("old const");
+    told->SetTextColor(kBlack);
+    TText* tnew = pt->AddText("new const");
+    tnew->SetTextColor(kRed);
+    pt->Draw("same");
+
   }
 
   ctmp_const.SaveAs(Form("cdcdedx_cosedgecal_constcomp_%s.pdf", m_suffix.data()));
@@ -378,11 +395,11 @@ void CDCDedxCosEdgeAlgorithm::plotConstants(std::vector<std::vector<double>> vfi
 void CDCDedxCosEdgeAlgorithm::plotStats()
 {
 
-  TCanvas* cstats = new TCanvas("cstats", "cstats", 1000, 500);
-  cstats->SetBatch(kTRUE);
-  cstats->Divide(2, 1);
+  TCanvas cstats("cstats", "cstats", 1000, 500);
+  cstats.SetBatch(kTRUE);
+  cstats.Divide(2, 1);
 
-  cstats->cd(1);
+  cstats.cd(1);
   auto hestats = getObjectPtr<TH1I>("hestats");
   if (hestats) {
     hestats->SetName(Form("hestats_%s", m_suffix.data()));
@@ -390,13 +407,12 @@ void CDCDedxCosEdgeAlgorithm::plotStats()
     hestats->DrawCopy("");
   }
 
-  cstats->cd(2);
+  cstats.cd(2);
   auto htstats = getObjectPtr<TH1I>("htstats");
   if (htstats) {
-    hestats->SetName(Form("htstats_%s", m_suffix.data()));
+    htstats->SetName(Form("htstats_%s", m_suffix.data()));
     htstats->DrawCopy("");
-    hestats->SetStats(0);
+    htstats->SetStats(0);
   }
-  cstats->Print(Form("cdcdedx_cosedgecal_stats_%s.pdf", m_suffix.data()));
-  delete cstats;
+  cstats.Print(Form("cdcdedx_cosedgecal_stats_%s.pdf", m_suffix.data()));
 }

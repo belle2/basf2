@@ -3826,7 +3826,7 @@ def calculateTrackIsolation(
         of each particle to its closest neighbour, defined as the segment connecting the two
         extrapolated track helices intersection points on a given cylindrical surface.
         The distance variables defined in the `VariableManager` is named `minET2ETDist`,
-        the isolation scores are named `minET2ETIsoScore`.
+        the isolation scores are named `minET2ETIsoScore`, `minET2ETIsoScoreAsWeightedAvg`.
 
     The definition of distance and the number of distances that are calculated per sub-detector is based on
     the following recipe:
@@ -3936,14 +3936,13 @@ def calculateTrackIsolation(
 
         ref_pdg = pdg.from_name(reference_list_name.split(":")[0])
 
-        for det in detectors:
-            trackiso = path.add_module("TrackIsoCalculator",
-                                       decayString=processed_dec,
-                                       detectorName=det,
-                                       particleListReference=reference_list_name,
-                                       useHighestProbMassForExt=highest_prob_mass_for_ext,
-                                       excludePIDDetWeights=exclude_pid_det_weights)
-            trackiso.set_name(f"TrackIsoCalculator{det}_{processed_dec}_VS_{reference_list_name}")
+        trackiso = path.add_module("TrackIsoCalculator",
+                                   decayString=processed_dec,
+                                   detectorNames=list(detectors),
+                                   particleListReference=reference_list_name,
+                                   useHighestProbMassForExt=highest_prob_mass_for_ext,
+                                   excludePIDDetWeights=exclude_pid_det_weights)
+        trackiso.set_name(f"TrackIsoCalculator_{'_'.join(detectors)}_{processed_dec}_VS_{reference_list_name}")
 
         # Metavariables for the distances to the closest reference tracks at each detector surface.
         # Always calculate them.
@@ -3952,7 +3951,10 @@ def calculateTrackIsolation(
             f"minET2ETDist({d}, {d_layer}, {reference_list_name}, {int(highest_prob_mass_for_ext)})"
             for d in detectors for d_layer in det_and_layers[d]]
         # Track isolation score.
-        trackiso_vars += [f"minET2ETIsoScore({reference_list_name}, {int(highest_prob_mass_for_ext)}, {','.join(detectors)})"]
+        trackiso_vars += [
+            f"minET2ETIsoScore({reference_list_name}, {int(highest_prob_mass_for_ext)}, {', '.join(detectors)})",
+            f"minET2ETIsoScoreAsWeightedAvg({reference_list_name}, {int(highest_prob_mass_for_ext)}, {', '.join(detectors)})",
+        ]
         # Optionally, calculate the input variables for the nearest neighbour in the reference list.
         if vars_for_nearest_part:
             trackiso_vars.extend(

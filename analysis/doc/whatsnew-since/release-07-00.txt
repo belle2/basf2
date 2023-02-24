@@ -3,10 +3,10 @@ Changes in the analysis package in light-2302-genetta
 MCMatching of K_S0
 ++++++++++++++++++
 * Modified the MCMatching algorithm for the ``K_S0`` particle. The MCError flags of missing daughters (e.g.
-  ``c_MissMassiveParticle``. please see :ref:`Error_flags`) was not assigned to the ``K_S0``. It was not a problem for the 
+  ``c_MissMassiveParticle``. please see :ref:`Error_flags`) was not assigned to the ``K_S0``. It was not a problem for the
   :math:`K_S^0 \to \pi^+ \pi^-` process, because ``K_S0`` fails to be matched to the MCParticle when one of ``pi+`` is missed.
   However, when the ``K_S0`` decays interacting with the detector material, it can have many daughters. If the ``K_S0`` is
-  reconstructed from two pions of these daughters, it was considered as "signal" (i.e. ``isSignal==1``) even though its 
+  reconstructed from two pions of these daughters, it was considered as "signal" (i.e. ``isSignal==1``) even though its
   kinematics was wrongly reconstructed.
   We modified the MCMatching algorithm and assigned the MCError flags of missing daughters on the ``K_S0`` properly. The most of
   "fake-signal" ``K_S0`` candidates are now correctly identified as background (i.e. ``isSignal==0``).
@@ -68,6 +68,10 @@ Modules
 * Added a module ``BelleNbarMVA`` that applies nbarMVA for Belle, a DNN trained with ECLCluster variables for discrimination of
   anti-neutrons against photons. Anti-neutron-like particles have scores closer to 1; photon-like particles have scores closer to
   0.
+  The function extracts Particle objects that belong to a ROE and fills them in ParticleLists. It is available in the ``for_each``
+  loop over the ROEs (e.g. ``roe_path``).
+* New interface for module `TrackIsoCalculator` that allow creating a single module instance for multiple detectors.
+  The module now also calculates an isolation score per particle according to a new definition (see Variables).
 
 Variables
 +++++++++
@@ -77,12 +81,14 @@ Variables
 * Deprecated `hadronicSplitOffSuppression` which has been replaced with `fakePhotonSuppression`
 * New variables `countFSPDaughters` and `countDescendants` are added to get number of daughters which passes the given selection.
 * New meta-variables `originalParticle` and `originalDaughter` are added to get the variable of the original particle from which
-  the given particle or the specified daughter. One can get the variables of the daughters particles before they are updated by the 
+  the given particle or the specified daughter. One can get the variables of the daughters particles before they are updated by the
   vertex fit, for example.
 * New variables `helixExtThetaOnDet` and `helixExtPhiOnDet` are added. They returns theta and phi of extrapolated helix parameters
   on the detector surface given by the argument.
 * New variable `clusterBestMatchedMCParticle` is added to access the MCParticle that is related to the ECLCluster but not to the
   Particle object.
+* New variable `minET2ETIsoScoreAsWeightedAvg` that returns a particle's isolation score based on a weighted average of inverse distances
+  at each input detector layers.
 
 Changes in the analysis package in light-2212-foldex
 ----------------------------------------------------

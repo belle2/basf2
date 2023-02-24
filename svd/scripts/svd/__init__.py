@@ -105,14 +105,7 @@ def add_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False, 
         svdTimeGrouping = b2.register_module('SVDTimeGrouping')
         svdTimeGrouping.set_name(timeGroupComposerName)
         svdTimeGrouping.param('SVDClusters', clustersName)
-        svdTimeGrouping.param('EventLevelTrackingInfoName', nameEventTrackingInfo)
-        svdTimeGrouping.param('tRangeLow', -160)
-        svdTimeGrouping.param('tRangeHigh', 160)
-        svdTimeGrouping.param('expSignalLoc', 0)
-        svdTimeGrouping.param('signalRangeLow', -50)
-        svdTimeGrouping.param('signalRangeHigh', 50)
-        # svdTimeGrouping.param('signalGroupSelection', True)
-        # svdTimeGrouping.param('flatSignalCut', True)
+        svdTimeGrouping.param('factor', 0)  # disabled by default
         path.add_module(svdTimeGrouping)
 
     # Add SVDSpacePointCreator
@@ -244,14 +237,7 @@ def add_rel5_svd_reconstruction(path, isROIsimulation=False, applyMasking=False)
         svdTimeGrouping = b2.register_module('SVDTimeGrouping')
         svdTimeGrouping.set_name(timeGroupComposerName)
         svdTimeGrouping.param('SVDClusters', clusterName)
-        svdTimeGrouping.param('EventLevelTrackingInfoName', nameEventTrackingInfo)
-        svdTimeGrouping.param('tRangeLow', -160)
-        svdTimeGrouping.param('tRangeHigh', 160)
-        svdTimeGrouping.param('expSignalLoc', 0)
-        svdTimeGrouping.param('signalRangeLow', -50)
-        svdTimeGrouping.param('signalRangeHigh', 50)
-        # svdTimeGrouping.param('signalGroupSelection', True)
-        # svdTimeGrouping.param('flatSignalCut', True)
+        svdTimeGrouping.param('factor', 0)  # disabled by default
         path.add_module(svdTimeGrouping)
 
     # Add SVDSpacePointCreator

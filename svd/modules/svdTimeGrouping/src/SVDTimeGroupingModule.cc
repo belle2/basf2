@@ -31,8 +31,6 @@ SVDTimeGroupingModule::SVDTimeGroupingModule() :
   // 1. Collections.
   addParam("SVDClusters", m_svdClustersName,
            "SVDCluster collection name", string(""));
-  addParam("EventLevelTrackingInfoName", m_eventLevelTrackingInfoName,
-           "EventLevelTrackingInfo collection name", string(""));
 
   // 2.Modification parameters:
   addParam("tRangeLow", m_tRangeLow, "This sets the x-range of histogram in ns.",
@@ -60,7 +58,7 @@ SVDTimeGroupingModule::SVDTimeGroupingModule() :
            double(5.));
   addParam("accSigmaN", m_accSigmaN,
            "Accept hits upto N sigma.",
-           double(3.));
+           double(5.));
   addParam("fracThreshold", m_fracThreshold,
            "Do not fit bellow this threshold.",
            double(0.05));
@@ -89,7 +87,7 @@ SVDTimeGroupingModule::SVDTimeGroupingModule() :
 
   addParam("signalGroupSelection", m_signalGroupSelection,
            "Choose one group near expected signal location.",
-           int(20));
+           int(1));
   addParam("formSuperGroup", m_formSuperGroup,
            "Form a super-group.",
            bool(false));

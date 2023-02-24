@@ -54,8 +54,6 @@ namespace Belle2 {
     StoreArray<SVDCluster>
     m_svdClusters; /**< the storeArray for svdClusters as member, is faster than recreating link for each event */
 
-    std::string m_eventLevelTrackingInfoName = ""; /**< Name of the EventLevelTrackingInfo */
-
     double m_tRangeLow          = -160.; /** Half-x range of time histogram */
     double m_tRangeHigh         =  160.; /** Half-x range of time histogram */
     double m_expSignalLoc       =  0.;   /** Expected location of signal. */
@@ -73,15 +71,12 @@ namespace Belle2 {
     double m_timeSpread         = 5.;  /** Fit gaussian within this range of the peak. */
     int    m_maxGroups          = 20;  /** Groups are not searched beyond this number. */
     double m_calSigmaN          = 5.;  /** Remove upto this sigma of fitted gaus from histogram. */
-    double m_accSigmaN          = 3.;  /** Clusters are tagged within this of fitted group. */
+    double m_accSigmaN          = 5.;  /** Clusters are tagged within this of fitted group. */
     bool   m_writeGroupInfo     = true; /** Write group info in SVDCluster, otherwise empty. */
-    int    m_signalGroupSelection = m_maxGroups; /** Select the first few prominent signal groups. */
+    int    m_signalGroupSelection = 1; /** Select the first few prominent signal groups. */
     bool   m_formSuperGroup     = false; /** Form a super-group using the selected signal groups. */
     bool   m_includeOutOfRangeClusters = true; /** Assign groups to under and overflow. */
     double m_exponentialSort    = 30.; /** Group prominence is weighted with exponential weight. */
 
-    // modification parameters
-    std::string m_nameOfInstance =
-      ""; /**< allows the user to set an identifier for this module. Usefull if one wants to use several instances of that module */
   };
 } // end namespace Belle2

@@ -445,6 +445,54 @@ void B2BIIConvertMdstModule::convertIPProfile(bool beginRun)
   m_beamSpot.setIP(TVector3(ip.x(), ip.y(), ip.z()), cov);
 }
 
+void B2BIIConvertMdstModule::convertMdstChargedTable()
+{
+  // Relations
+  RelationArray tracksToMCParticles(m_tracks, m_mcParticles);
+
+  // Loop over all Belle charged tracks
+  Belle::Mdst_charged_Manager& m = Belle::Mdst_charged_Manager::get_manager();
+  for (Belle::Mdst_charged_Manager::iterator chargedIterator = m.begin(); chargedIterator != m.end(); ++chargedIterator) {
+    Belle::Mdst_charged belleTrack = *chargedIterator;
+
+    auto track = m_tracks.appendNew();
+
+    // convert MDST_Charged -> Track
+    convertMdstChargedObject(belleTrack, track);
+
+    convertPIDData(belleTrack, track);
+
+    if (m_realData)
+      continue;
+
+    // create Track -> MCParticle relation
+    // step 1: MDSTCharged -> Gen_hepevt
+    const Belle::Gen_hepevt& hep0 = get_hepevt(belleTrack);
+    if (hep0 == 0)
+      continue;
+    const Belle::Gen_hepevt* hep = nullptr;
+    switch (m_mcMatchingMode) {
+      case c_Direct:
+        hep = &hep0;
+        break;
+      case c_GeneratorLevel:
+        hep = &gen_level(hep0);
+        break;
+    }
+    // step 2: Gen_hepevt -> MCParticle
+    if (genHepevtToMCParticle.count(hep->get_ID()) > 0) {
+      int matchedMCParticle = genHepevtToMCParticle[hep->get_ID()];
+
+      // step 3: set the relation
+      tracksToMCParticles.add(track->getArrayIndex(), matchedMCParticle);
+
+      testMCRelation(*hep, m_mcParticles[matchedMCParticle], "Track");
+    } else {
+      B2DEBUG(99, "Can not find MCParticle corresponding to this gen_hepevt (Panther ID = " << hep->get_ID() << ")");
+      B2DEBUG(99, "Gen_hepevt: Panther ID = " << hep->get_ID() << "; idhep = " << hep->idhep() << "; isthep = " << hep->isthep());
+    }
+  }
+}
 
 void B2BIIConvertMdstModule::convertMdstVee2Table()
 {
@@ -976,54 +1024,6 @@ void B2BIIConvertMdstModule::convertMdstKLMTable()
   }
 }
 
-void B2BIIConvertMdstModule::convertMdstChargedTable()
-{
-  // Relations
-  RelationArray tracksToMCParticles(m_tracks, m_mcParticles);
-
-  // Loop over all Belle charged tracks
-  Belle::Mdst_charged_Manager& m = Belle::Mdst_charged_Manager::get_manager();
-  for (Belle::Mdst_charged_Manager::iterator chargedIterator = m.begin(); chargedIterator != m.end(); ++chargedIterator) {
-    Belle::Mdst_charged belleTrack = *chargedIterator;
-
-    auto track = m_tracks.appendNew();
-
-    // convert MDST_Charged -> Track
-    convertMdstChargedObject(belleTrack, track);
-
-    convertPIDData(belleTrack, track);
-
-    if (m_realData)
-      continue;
-
-    // create Track -> MCParticle relation
-    // step 1: MDSTCharged -> Gen_hepevt
-    const Belle::Gen_hepevt& hep0 = get_hepevt(belleTrack);
-    if (hep0 == 0)
-      continue;
-    const Belle::Gen_hepevt* hep = nullptr;
-    switch (m_mcMatchingMode) {
-      case c_Direct:
-        hep = &hep0;
-        break;
-      case c_GeneratorLevel:
-        hep = &gen_level(hep0);
-        break;
-    }
-    // step 2: Gen_hepevt -> MCParticle
-    if (genHepevtToMCParticle.count(hep->get_ID()) > 0) {
-      int matchedMCParticle = genHepevtToMCParticle[hep->get_ID()];
-
-      // step 3: set the relation
-      tracksToMCParticles.add(track->getArrayIndex(), matchedMCParticle);
-
-      testMCRelation(*hep, m_mcParticles[matchedMCParticle], "Track");
-    } else {
-      B2DEBUG(99, "Can not find MCParticle corresponding to this gen_hepevt (Panther ID = " << hep->get_ID() << ")");
-      B2DEBUG(99, "Gen_hepevt: Panther ID = " << hep->get_ID() << "; idhep = " << hep->idhep() << "; isthep = " << hep->isthep());
-    }
-  }
-}
 
 void B2BIIConvertMdstModule::convertMdstGammaTable()
 {

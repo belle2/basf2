@@ -26,7 +26,6 @@ from basf2 import (
     statistics,
     register_module,
 )
-from basf2 import conditions as b2conditions
 from simulation import add_simulation
 from beamparameters import add_beamparameters
 from validation import statistics_plots, event_timing_plot
@@ -34,10 +33,6 @@ from validation import statistics_plots, event_timing_plot
 set_random_seed(12345)
 
 main = create_path()
-
-b2conditions.prepend_globaltag("tracking_TEST_SVDTimeSelectionOFFrev1_VXDTF2TimeFiltersONrev27")
-# b2conditions.prepend_globaltag("tracking_TEST_SVDTimeSelectionONrev5_VXDTF2TimeFiltersONrev27")
-# b2conditions.prepend_globaltag("tracking_TEST_SVDTimeSelectionOFFrev1_VXDTF2TimeFiltersOFFrev28")
 
 # specify number of events to be generated
 eventinfosetter = register_module("EventInfoSetter")

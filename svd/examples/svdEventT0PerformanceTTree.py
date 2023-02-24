@@ -19,13 +19,11 @@
 
 import basf2 as b2
 from basf2 import conditions as b2conditions
-from svd.executionTime_utils import SVDExtraEventStatisticsModule
 import rawdata as raw
 import tracking as trk
 import simulation as sim
+import glob
 import argparse
-from background import get_background_files
-import generators as ge
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("--fileDir", default="./",
@@ -36,32 +34,14 @@ parser.add_argument("--isMC", action="store_true",
                     help="Use Simulation")
 parser.add_argument("--is3sample", action="store_true",
                     help="Emulate SVD 3 samples")
-parser.add_argument("--noEventT0Tree", action="store_true",
-                    help="Do not store eventT0 time tree")
 parser.add_argument("--RootOutput", action="store_true",
                     help="Store svd clusters before reconstruction to root file")
-parser.add_argument("--executionTime", action="store_true",
-                    help="Store exection time tree")
 parser.add_argument("--noReco", action="store_true",
                     help="Do not perform the reconstruction")
 parser.add_argument("--test", action="store_true",
                     help="Test with small numbers of events")
-parser.add_argument("--OffOff", action="store_true",
-                    help="OffOff SVD Cluster Selection")
-parser.add_argument("--OnOn", action="store_true",
-                    help="OnOn SVD Cluster Selection")
-parser.add_argument("--OffOn", action="store_true",
-                    help="OffOn SVD Cluster Selection")
-parser.add_argument("--OnOff", action="store_true",
-                    help="OnOff SVD Cluster Selection")
-parser.add_argument("--CoG3TimeCalibration_bucket36", action="store_true",
-                    help="SVD Time calibration")
 args = parser.parse_args()
 b2.B2INFO(f"Steering file args = {args}")
-
-if args.test:
-    b2.set_log_level(b2.LogLevel.DEBUG)
-    b2.set_debug_level(1)
 
 main = b2.create_path()
 
@@ -71,9 +51,9 @@ if args.isMC:
     # options for simulation:
     # expList = [1003]
     expList = [0]
-    numEvents = 10
-    bkgFiles = get_background_files()  # Phase3 background
-    # bkgFiles = None  # uncomment to remove  background
+    numEvents = 20
+    bkgFiles = glob.glob('/sw/belle2/bkg/*.root')  # Phase3 background
+    bkgFiles = None  # uncomment to remove  background
     simulateJitter = False
     ROIfinding = False
     MCTracking = False
@@ -82,18 +62,14 @@ if args.isMC:
     eventinfosetter.param('runList', [0])
     eventinfosetter.param('evtNumList', [numEvents])
     main.add_module(eventinfosetter)
-    ge.add_evtgen_generator(path=main, finalstate='mixed')
-    # main.add_module('EvtGenInput')
+    main.add_module('EvtGenInput')
 
-    sim.add_simulation(main, bkgfiles=bkgFiles)
-
-    # sim.add_simulation(
-    #     main,
-    #     bkgfiles=bkgFiles,
-    #     forceSetPXDDataReduction=True,
-    #     usePXDDataReduction=ROIfinding,
-    #     simulateT0jitter=simulateJitter)
-
+    sim.add_simulation(
+        main,
+        bkgfiles=bkgFiles,
+        forceSetPXDDataReduction=True,
+        usePXDDataReduction=ROIfinding,
+        simulateT0jitter=simulateJitter)
 else:
     # setup database
     b2conditions.reset()
@@ -101,30 +77,18 @@ else:
     b2conditions.globaltags = ["online"]
     b2conditions.prepend_globaltag("data_reprocessing_prompt")
     b2conditions.prepend_globaltag("patch_main_release-07")
-    if args.CoG3TimeCalibration_bucket36:
-        b2conditions.prepend_globaltag("svd_CoG3TimeCalibration_bucket36")
 
     MCTracking = False
 
-if args.OffOff:
-    b2conditions.prepend_globaltag("tracking_TEST_SVDTimeSelectionOFFrev1_VXDTF2TimeFiltersOFFrev28")
-if args.OnOn:
-    b2conditions.prepend_globaltag("tracking_TEST_SVDTimeSelectionONrev5_VXDTF2TimeFiltersONrev27")
-if args.OffOn:
-    b2conditions.prepend_globaltag("tracking_TEST_SVDTimeSelectionOFFrev1_VXDTF2TimeFiltersONrev27")
-if args.OnOff:
-    b2conditions.prepend_globaltag("tracking_TEST_SVDTimeSelectionONrev5_VXDTF2TimeFiltersOFFrev28")
-
-
-if not args.isMC:
-    if args.test:
-        main.add_module('RootInput', entrySequences=['0:100'])
-    else:
-        main.add_module('RootInput')
+if args.test:
+    main.add_module('RootInput', entrySequences=['0:100'])
+else:
+    main.add_module('RootInput')
 
     main.add_module("Gearbox")
     main.add_module('Geometry', useDB=True)
 
+if not args.isMC:
     raw.add_unpackers(main)
 
     if args.is3sample:
@@ -151,13 +115,18 @@ if args.is3sample:
     zsonline.param("ShaperDigitsIN", "SVDShaperDigits")
     main.add_module(zsonline)
 
-
-if not args.noReco:
+if args.noReco:
+    #  clusterizer
+    main.add_module('SVDClusterizer')
+else:
     # now do reconstruction:
+    # clusterizer added by default
     trk.add_tracking_reconstruction(
         main,
         mcTrackFinding=MCTracking,
-        append_full_grid_cdc_eventt0=True)
+        append_full_grid_cdc_eventt0=True,
+        trackFitHypotheses=[211])  # ,
+    #    skipHitPreparerAdding=True)
 
 
 # fill TTrees
@@ -166,54 +135,16 @@ if args.isMC:
     outputFileName += "_MC"
 if args.is3sample:
     outputFileName += "_emulated3sample"
-if args.OffOff:
-    outputFileName += "_OffOff"
-if args.OnOn:
-    outputFileName += "_OnOn"
-if args.OffOn:
-    outputFileName += "_OffOn"
-if args.OnOff:
-    outputFileName += "_OnOff"
 
-if not args.noReco and not args.noEventT0Tree:
+if not args.noReco:
     recoFileName = outputFileName + "_" + str(args.fileTag) + ".root"
     main.add_module('SVDEventT0PerformanceTTree', outputFileName=recoFileName)
 
 if args.RootOutput:
     rootOutFileName = outputFileName + "_RootOutput_" + str(args.fileTag) + ".root"
-    main.add_module(
-        'RootOutput',
-        outputFileName=rootOutFileName,
-        branchNames=[
-            'EventT0', 'OnlineEventT0s',
-            'TRGECLUnpackerStores',
-            'SVDEventInfo', 'SVDEventInfoSim',
-            'SVDClusters',
-            'Tracks',
-            'RecoTracks', 'MCRecoTracks',
-            'SVDTrueHits',
-            'SVDShaperDigits',
-            'SVDSpacePoints',
-            'MCParticles'
-        ]
-    )
-
-if args.executionTime:
-    executionFileName = str(args.fileDir) + "SVDExecutionTime"
-    if args.isMC:
-        executionFileName += "_MC"
-    if args.is3sample:
-        executionFileName += "_emulated3sample"
-    if args.OffOff:
-        executionFileName += "_OffOff"
-    if args.OnOn:
-        executionFileName += "_OnOn"
-    if args.OffOn:
-        executionFileName += "_OffOn"
-    if args.OnOff:
-        executionFileName += "_OnOff"
-    executionFileName += "_" + str(args.fileTag) + ".root"
-    main.add_module(SVDExtraEventStatisticsModule(executionFileName))
+    main.add_module('RootOutput',
+                    outputFileName=rootOutFileName,
+                    branchNames=['SVDClusters'])
 
 main.add_module('Progress')
 

@@ -391,6 +391,5 @@ def add_svd_SPcreation(path, isROIsimulation=False):
         spCreatorSVD.param('NameOfInstance', 'SVDSpacePoints')
         spCreatorSVD.param('SpacePoints', nameSPs)
         spCreatorSVD.param('SVDClusters', svd_clusters)
-        spCreatorSVD.param('useSVDGroupInfo', True)
         spCreatorSVD.param('EventLevelTrackingInfoName', nameEventTrackingInfo)
         path.add_module(spCreatorSVD)

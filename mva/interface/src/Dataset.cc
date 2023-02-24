@@ -369,7 +369,7 @@ namespace Belle2 {
     }
 
 
-    float ROOTDataset::castVarVariantToFloat(Variable::Manager::VarVariant& variant) const
+    float ROOTDataset::castVarVariantToFloat(RootDatasetVarVariant& variant) const
     {
       if (std::holds_alternative<double>(variant))
         return static_cast<float>(std::get<double>(variant));
@@ -452,7 +452,7 @@ namespace Belle2 {
     }
 
     std::vector<float> ROOTDataset::getVectorFromTTreeVariant(std::string& variableType, std::string& branchName,
-                                                              Variable::Manager::VarVariant& memberVariableTarget)
+                                                              RootDatasetVarVariant& memberVariableTarget)
     {
       if (std::holds_alternative<double>(memberVariableTarget))
         return getVectorFromTTree(variableType, branchName, std::get<double>(memberVariableTarget));
@@ -530,7 +530,7 @@ namespace Belle2 {
     }
 
     void ROOTDataset::setScalarVariableAddressVariant(std::string& variableType, std::string& variableName,
-                                                      Variable::Manager::VarVariant& varVariantTarget)
+                                                      RootDatasetVarVariant& varVariantTarget)
     {
       if (std::holds_alternative<double>(varVariantTarget))
         setScalarVariableAddress(variableType, variableName, std::get<double>(varVariantTarget));
@@ -554,7 +554,7 @@ namespace Belle2 {
 
 
     void ROOTDataset::setVectorVariableAddressVariant(std::string& variableType, std::vector<std::string>& variableNames,
-                                                      std::vector<Variable::Manager::VarVariant>& varVariantTargets)
+                                                      std::vector<RootDatasetVarVariant>& varVariantTargets)
     {
       for (unsigned int i = 0; i < variableNames.size(); ++i) {
         ROOTDataset::setScalarVariableAddressVariant(variableType, variableNames[i], varVariantTargets[i]);
@@ -591,7 +591,7 @@ namespace Belle2 {
     }
 
 
-    void ROOTDataset::initialiseVarVariantType(const std::string type, Variable::Manager::VarVariant& varVariantTarget)
+    void ROOTDataset::initialiseVarVariantType(const std::string type, RootDatasetVarVariant& varVariantTarget)
     {
       if (type == "Double_t")
         varVariantTarget = 0.0;
@@ -608,7 +608,7 @@ namespace Belle2 {
     }
 
 
-    void ROOTDataset::initialiseVarVariantForBranch(const std::string branch_name, Variable::Manager::VarVariant& varVariantTarget)
+    void ROOTDataset::initialiseVarVariantForBranch(const std::string branch_name, RootDatasetVarVariant& varVariantTarget)
     {
       auto compatible_branch_name = Belle2::MakeROOTCompatible::makeROOTCompatible(branch_name).c_str();
       // try the branch as is first then fall back to root safe name.

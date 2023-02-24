@@ -393,6 +393,25 @@ namespace Belle2 {
       virtual std::vector<float> getSpectator(unsigned int iSpectator) override;
 
       /**
+       * Virtual destructor
+       */
+      virtual ~ROOTDataset();
+
+    protected:
+      /** Typedef for variable types supported by the mva ROOTDataset, can be one of double, float, int or bool in std::variant */
+      typedef std::variant<double, int, bool, float> RootDatasetVarVariant;
+
+      TChain* m_tree = nullptr; /**< Pointer to the TChain containing the data */
+      std::vector<RootDatasetVarVariant> m_input_variant; /**< Contains all feature values of the currently loaded event */
+      std::vector<RootDatasetVarVariant>
+      m_spectators_variant; /**< Contains all spectators values of the currently loaded event */
+      RootDatasetVarVariant m_weight_variant; /**< Contains the weight of the currently loaded event */
+      RootDatasetVarVariant m_target_variant; /**< Contains the target value of the currently loaded event */
+
+
+    private:
+
+      /**
        * Returns all values for a specified variableType and branchName. The values are read from a root file.
        * The type is inferred from the given memberVariableTarget name.
        * @tparam T type memberVariable of this class which has to be updated (float, double)
@@ -413,7 +432,7 @@ namespace Belle2 {
        * @return filled vector from a branch, converted to float
        */
       std::vector<float> getVectorFromTTreeVariant(std::string& variableType, std::string& branchName,
-                                                   Variable::Manager::VarVariant& memberVariableTarget);
+                                                   RootDatasetVarVariant& memberVariableTarget);
 
       /**
        * Tries to infer the data-type of the spectator and feature variables in a root file
@@ -437,7 +456,7 @@ namespace Belle2 {
        * @param variableTarget variable, the address is set to
        */
       void setScalarVariableAddressVariant(std::string& variableType, std::string& variableName,
-                                           Variable::Manager::VarVariant& variableTarget);
+                                           RootDatasetVarVariant& variableTarget);
 
       /**
        * sets the branch address for a vector variable to a given target
@@ -457,20 +476,14 @@ namespace Belle2 {
        * @param varVariantTargets variables, the address is set to
        */
       void setVectorVariableAddressVariant(std::string& variableType, std::vector<std::string>& variableName,
-                                           std::vector<Variable::Manager::VarVariant>& varVariantTargets);
+                                           std::vector<RootDatasetVarVariant>& varVariantTargets);
 
       /**
        * Determines the data type of the target variable and sets it to m_target_data_type
        */
       void setTargetRootInputType();
 
-      /**
-       * Virtual destructor
-       */
-      virtual ~ROOTDataset();
 
-
-    private:
       /**
        * Sets the branch addresses of all features, weight and target again
        */
@@ -487,14 +500,14 @@ namespace Belle2 {
        * Casts a VarVariant which can contain <double,int,bool,float> to float
        * @param variant the VarVariant to cast
        */
-      float castVarVariantToFloat(Variable::Manager::VarVariant&) const;
+      float castVarVariantToFloat(RootDatasetVarVariant&) const;
 
       /**
        * Initialises the VarVariant.
        * @param type defines which alternative to use for the variant {Double_t, Float_t, Int_t, Bool_t}
        * @param varVariantTarget variant to initialise.
        */
-      void initialiseVarVariantType(const std::string, Variable::Manager::VarVariant&);
+      void initialiseVarVariantType(const std::string, RootDatasetVarVariant&);
 
       /**
        * Infers the type (double,float,int,bool) from the TTree and initialises the VarVariant
@@ -502,15 +515,7 @@ namespace Belle2 {
        * @param branch_name branch name in the datafile
        * @param varVariantTarget variant to initialise
        */
-      void initialiseVarVariantForBranch(const std::string, Variable::Manager::VarVariant&);
-
-    protected:
-      TChain* m_tree = nullptr; /**< Pointer to the TChain containing the data */
-      std::vector<Variable::Manager::VarVariant> m_input_variant; /**< Contains all feature values of the currently loaded event */
-      std::vector<Variable::Manager::VarVariant>
-      m_spectators_variant; /**< Contains all spectators values of the currently loaded event */
-      Variable::Manager::VarVariant m_weight_variant; /**< Contains the weight of the currently loaded event */
-      Variable::Manager::VarVariant m_target_variant; /**< Contains the target value of the currently loaded event */
+      void initialiseVarVariantForBranch(const std::string, RootDatasetVarVariant&);
     };
   }
 }

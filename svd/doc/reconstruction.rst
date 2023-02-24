@@ -292,7 +292,7 @@ All clusters on one side of each sensor are combined with all clusters on the ot
 
       |t_u - t_v| < \Delta t_{\rm max}
 
-#. exclude ``SpacePoints`` in which ``useSVDGroupInfo`` parameter is :math:`True` and the two clusters does not belong to the same SVD groups:
+#. exclude ``SpacePoints`` in which ``useSVDGroupInfo`` parameter is :math:`True` and the two clusters does not belong to the same SVD groups.
 
 The choice of the cut and of the threshold is stored in the :ref:`SVDHitTimeSelection<svdhittimeselection>`.
 

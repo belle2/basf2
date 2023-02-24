@@ -10,7 +10,7 @@
 ##########################################################################
 
 # ---------------------------------------------------------------------------------------
-# Checks the unpacking of raw data given in Interim FE format
+# Checks the unpacking of raw data
 # Usage: basf2 checkUnpacking.py -i <file_name.sroot> [<debug_level>]
 #   debug_level 21: to print additional information on errors
 #   debug_level 22: to print buffer sizes and additional information on errors

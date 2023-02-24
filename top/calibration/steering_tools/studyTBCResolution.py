@@ -328,7 +328,6 @@ for fname in files:
 
 if dbaddress != 'none':
     print("using local DB " + dbaddress)
-    b2.reset_database()
     b2.conditions.append_testing_payloads(dbaddress + "/localDB.txt")
 else:
     print("database not set. Continuing without calibrations")

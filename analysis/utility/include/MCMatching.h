@@ -35,7 +35,7 @@ namespace Belle2 {
       c_MissGamma             = 16, /**< A photon (not FSR) is missing (not reconstructed). */
       c_MissMassiveParticle   = 32, /**< A generated massive FSP is missing (not reconstructed). */
       c_MissKlong             = 64, /**< A Klong is missing (not reconstructed). */
-      c_MisID                 = 128, /**< One of the charged final state particles is mis-identified. */
+      c_MisID                 = 128, /**< One of the charged final state particles is mis-identified, i.e. PDG != mcPDG. This can be due to the mis-identification of particle type (i.e. abs(PDG) != abs(mcPDG)) and/or the wrong charge assignment (i.e. charge != mcCharge). */
       c_AddedWrongParticle    = 256, /**< A non-FSP Particle has wrong PDG code, meaning one of the daughters (or their daughters) belongs to another Particle. */
       c_InternalError         = 512, /**< There was an error in MC matching. Not a valid match. Might indicate fake/background track or cluster. */
       c_MissPHOTOS            = 1024, /**< A photon created by PHOTOS was not reconstructed (based on MCParticle::c_IsPHOTOSPhoton) */

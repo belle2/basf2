@@ -10,7 +10,6 @@
 
 Alias anti-K*0sig anti-K*0
 Alias K*0sig K*0
-Alias pi0sig pi0
 
 
 Decay Upsilon(4S)
@@ -20,23 +19,23 @@ Enddecay
 
 
 Decay B+sig
-1.0 Ds*+sig pi0sig PHOTOS SVS;
+1.0 D_s*+sig pi0 PHOTOS SVS;
 Enddecay
 
 CDecay B-sig
 
-Decay Ds*+sig
-1.0 Ds+sig gamma PHOTOS VSP_PWAVE;
+Decay D_s*+sig
+1.0 D_s+sig gamma PHOTOS VSP_PWAVE;
 Enddecay
 
-CDecay Ds*-sig
+CDecay D_s*-sig
 
 
-Decay Ds+sig
+Decay D_s+sig
 1.0 anti-K*0sig K+  PHOTOS SVS;
 Enddecay
 
-CDecay Ds-sig
+CDecay D_s-sig
 
 Decay anti-K*0sig
 1.0 K- pi+  PHOTOS VSS;
@@ -44,9 +43,6 @@ Enddecay
 
 CDecay K*0sig
 
-Decay pi0sig
-1.0 gamma gamma PHSP;
-Enddecay
 
 End
 

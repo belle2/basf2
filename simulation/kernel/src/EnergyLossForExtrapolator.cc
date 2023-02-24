@@ -284,6 +284,7 @@ void EnergyLossForExtrapolator::Initialisation()
   m_MscatElectron    = PrepareTable();
 
   G4LossTableBuilder& builder = *(G4LossTableManager::Instance()->GetTableBuilder());
+  builder.SetBaseMaterialActive(false);
 
   B2DEBUG(20, "EnergyLossForExtrapolator Builds electron tables");
   ComputeElectronDEDX(m_Electron, m_DedxElectron);

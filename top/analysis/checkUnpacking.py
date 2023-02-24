@@ -12,8 +12,8 @@
 # ---------------------------------------------------------------------------------------
 # Checks the unpacking of raw data given in Interim FE format
 # Usage: basf2 checkUnpacking.py -i <file_name.sroot> [<debug_level>]
-#   debug_level 100: to print additional information on errors
-#   debug_level 200: to print buffer sizes and additional information on errors
+#   debug_level 21: to print additional information on errors
+#   debug_level 22: to print buffer sizes and additional information on errors
 # ---------------------------------------------------------------------------------------
 
 import basf2 as b2
@@ -24,18 +24,19 @@ argvs = sys.argv
 if len(argvs) > 1:
     debuglevel = int(argvs[1])
 
-# Define a global tag (note: the one given bellow will become out-dated!)
-b2.use_central_database('data_reprocessing_proc8')
+# Define a global tag
+b2.conditions.override_globaltags()
+b2.conditions.append_globaltag('online')
 
 # Create path
 main = b2.create_path()
 
 # input
 roinput = b2.register_module('SeqRootInput')
-# roinput = register_module('RootInput')
+# roinput = b2.register_module('RootInput')
 main.add_module(roinput)
 
-# conversion from RawCOPPER or RawDataBlock to RawDetector objects
+# conversion from RawCOPPER or RawDataBlock to RawDetector objects (needed if PocketDAQ)
 converter = b2.register_module('Convert2RawDet')
 main.add_module(converter)
 

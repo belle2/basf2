@@ -20,6 +20,7 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/geometry/B2Vector3.h>
+#include <framework/geometry/VectorUtil.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
 
 // Belle II dataobjects
@@ -34,6 +35,7 @@
 #include <Math/RotationY.h>
 #include <Math/Vector3D.h>
 #include <Math/Vector4D.h>
+#include <Math/Point3D.h>
 
 #include <limits>
 #include <algorithm>
@@ -887,54 +889,6 @@ void B2BIIConvertMdstModule::convertGenHepEvtTable()
   m_particleGraph.generateList();
 }
 
-void B2BIIConvertMdstModule::convertMdstChargedTable()
-{
-  // Relations
-  RelationArray tracksToMCParticles(m_tracks, m_mcParticles);
-
-  // Loop over all Belle charged tracks
-  Belle::Mdst_charged_Manager& m = Belle::Mdst_charged_Manager::get_manager();
-  for (Belle::Mdst_charged_Manager::iterator chargedIterator = m.begin(); chargedIterator != m.end(); ++chargedIterator) {
-    Belle::Mdst_charged belleTrack = *chargedIterator;
-
-    auto track = m_tracks.appendNew();
-
-    // convert MDST_Charged -> Track
-    convertMdstChargedObject(belleTrack, track);
-
-    convertPIDData(belleTrack, track);
-
-    if (m_realData)
-      continue;
-
-    // create Track -> MCParticle relation
-    // step 1: MDSTCharged -> Gen_hepevt
-    const Belle::Gen_hepevt& hep0 = get_hepevt(belleTrack);
-    if (hep0 == 0)
-      continue;
-    const Belle::Gen_hepevt* hep = nullptr;
-    switch (m_mcMatchingMode) {
-      case c_Direct:
-        hep = &hep0;
-        break;
-      case c_GeneratorLevel:
-        hep = &gen_level(hep0);
-        break;
-    }
-    // step 2: Gen_hepevt -> MCParticle
-    if (genHepevtToMCParticle.count(hep->get_ID()) > 0) {
-      int matchedMCParticle = genHepevtToMCParticle[hep->get_ID()];
-
-      // step 3: set the relation
-      tracksToMCParticles.add(track->getArrayIndex(), matchedMCParticle);
-
-      testMCRelation(*hep, m_mcParticles[matchedMCParticle], "Track");
-    } else {
-      B2DEBUG(99, "Can not find MCParticle corresponding to this gen_hepevt (Panther ID = " << hep->get_ID() << ")");
-      B2DEBUG(99, "Gen_hepevt: Panther ID = " << hep->get_ID() << "; idhep = " << hep->idhep() << "; isthep = " << hep->isthep());
-    }
-  }
-}
 
 void B2BIIConvertMdstModule::convertMdstECLTable()
 {
@@ -1019,6 +973,55 @@ void B2BIIConvertMdstModule::convertMdstKLMTable()
     convertMdstKLMObject(mdstKlm_cluster, B2KlmCluster);
     mdstKlmToKLMCluster[mdstKlm_cluster.get_ID()] = B2KlmCluster->getArrayIndex();
 
+  }
+}
+
+void B2BIIConvertMdstModule::convertMdstChargedTable()
+{
+  // Relations
+  RelationArray tracksToMCParticles(m_tracks, m_mcParticles);
+
+  // Loop over all Belle charged tracks
+  Belle::Mdst_charged_Manager& m = Belle::Mdst_charged_Manager::get_manager();
+  for (Belle::Mdst_charged_Manager::iterator chargedIterator = m.begin(); chargedIterator != m.end(); ++chargedIterator) {
+    Belle::Mdst_charged belleTrack = *chargedIterator;
+
+    auto track = m_tracks.appendNew();
+
+    // convert MDST_Charged -> Track
+    convertMdstChargedObject(belleTrack, track);
+
+    convertPIDData(belleTrack, track);
+
+    if (m_realData)
+      continue;
+
+    // create Track -> MCParticle relation
+    // step 1: MDSTCharged -> Gen_hepevt
+    const Belle::Gen_hepevt& hep0 = get_hepevt(belleTrack);
+    if (hep0 == 0)
+      continue;
+    const Belle::Gen_hepevt* hep = nullptr;
+    switch (m_mcMatchingMode) {
+      case c_Direct:
+        hep = &hep0;
+        break;
+      case c_GeneratorLevel:
+        hep = &gen_level(hep0);
+        break;
+    }
+    // step 2: Gen_hepevt -> MCParticle
+    if (genHepevtToMCParticle.count(hep->get_ID()) > 0) {
+      int matchedMCParticle = genHepevtToMCParticle[hep->get_ID()];
+
+      // step 3: set the relation
+      tracksToMCParticles.add(track->getArrayIndex(), matchedMCParticle);
+
+      testMCRelation(*hep, m_mcParticles[matchedMCParticle], "Track");
+    } else {
+      B2DEBUG(99, "Can not find MCParticle corresponding to this gen_hepevt (Panther ID = " << hep->get_ID() << ")");
+      B2DEBUG(99, "Gen_hepevt: Panther ID = " << hep->get_ID() << "; idhep = " << hep->idhep() << "; isthep = " << hep->isthep());
+    }
   }
 }
 
@@ -1871,36 +1874,38 @@ double B2BIIConvertMdstModule::computeTrkMinDistanceBelle(ECLCluster* eclCluster
   const double m_extZBWD(-102.2);
   double minDist(10000);
 
-//get cluster info
-  const int Reg = eclCluster->getDetectorRegion();
+  // get cluster info
+  const int reg = eclCluster->getDetectorRegion();
   double eclClusterR_surface(999.);
-  if (Reg == 1) {eclClusterR_surface = m_extZFWD / cos(eclCluster->getTheta());}
-  else if (Reg == 3) {eclClusterR_surface = m_extZBWD / cos(eclCluster->getTheta());}
+  if (reg == 1) {eclClusterR_surface = m_extZFWD / cos(eclCluster->getTheta());}
+  else if (reg == 3) {eclClusterR_surface = m_extZBWD / cos(eclCluster->getTheta());}
   else {eclClusterR_surface = m_extRadius / sin(eclCluster->getTheta());}
 
-  TVector3 eclCluster_surface_position(0, 0, 0);
-  eclCluster_surface_position.SetMagThetaPhi(eclClusterR_surface,  eclCluster->getTheta(),  eclCluster->getPhi());
+  ROOT::Math::XYZVector eclCluster_surface_position(0, 0, 0);
+  VectorUtil::setMagThetaPhi(eclCluster_surface_position, eclClusterR_surface,  eclCluster->getTheta(),  eclCluster->getPhi());
+  //eclCluster_surface_position.SetMagThetaPhi(eclClusterR_surface,  eclCluster->getTheta(),  eclCluster->getPhi());
 
   for (const auto& track : m_tracks) {
-    const TrackFitResult* trackFit = track.getTrackFitResult(Const::ChargedStable(Const::pion));
+    const TrackFitResult* trackFit = track.getTrackFitResultWithClosestMass(Const::ChargedStable(Const::pion));
+    //const TrackFitResult* trackFit = track.getTrackFitResult(Const::ChargedStable(Const::pion));
 
-//get the track parameters
+    // get the track parameters
     const double z0        = trackFit->getZ0();
     const double tanlambda = trackFit->getTanLambda();
 
-// use the helix class
+    // use the helix class
     Helix h = trackFit->getHelix();
 
-// extrapolate to radius
+    // extrapolate to radius
     const double lHelixRadius = h.getArcLength2DAtCylindricalR(m_extRadius) > 0 ? h.getArcLength2DAtCylindricalR(m_extRadius) : 999999.;
 
-// extrapolate to FWD z
+    // extrapolate to FWD z
     const double lFWD = (m_extZFWD - z0) / tanlambda > 0 ? (m_extZFWD - z0) / tanlambda : 999999.;
 
-// extrapolate to backward z
+    // extrapolate to backward z
     const double lBWD = (m_extZBWD - z0) / tanlambda > 0 ? (m_extZBWD - z0) / tanlambda : 999999.;
 
-// pick smalles arclength
+    // pick smallest arclength
     const double l = std::min(std::min(lHelixRadius, lFWD), lBWD);
 
     B2DEBUG(50, lHelixRadius << " " << lFWD << " " << lBWD << " -> " << l);
@@ -1912,10 +1917,11 @@ double B2BIIConvertMdstModule::computeTrkMinDistanceBelle(ECLCluster* eclCluster
     else if (l == lFWD) {helixExtR_surface = m_extZFWD / cos(ext_helix.Theta());}
     else if (l == lBWD) {helixExtR_surface = m_extZBWD / cos(ext_helix.Theta());}
 
-    TVector3 helixExt_surface_position(0, 0, 0);
-    helixExt_surface_position.SetMagThetaPhi(helixExtR_surface, ext_helix.Theta(), ext_helix.Phi());
+    ROOT::Math::XYZVector helixExt_surface_position(0, 0, 0);
+    VectorUtil::setMagThetaPhi(helixExt_surface_position, helixExtR_surface, ext_helix.Theta(), ext_helix.Phi());
+    //helixExt_surface_position.SetMagThetaPhi(helixExtR_surface, ext_helix.Theta(), ext_helix.Phi());
 
-    double distance = (eclCluster_surface_position - helixExt_surface_position).Mag();
+    double distance = (eclCluster_surface_position - helixExt_surface_position).R();
     if (distance < minDist) {minDist = distance;}
   }
   if (minDist > 9999) minDist = -1;

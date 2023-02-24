@@ -238,7 +238,7 @@ namespace Belle2 {
     void convertMdstECLObject(const Belle::Mdst_ecl& ecl, const Belle::Mdst_ecl_aux& eclAux, ECLCluster* eclCluster);
 
     /**
-     * calculate the minimun distance between a cluster and a set of tracks on the ECL suface.
+     * calculate the minimal distance between a cluster and a set of tracks on the ECL surface.
      */
     double computeTrkMinDistanceBelle(ECLCluster* eclCluster);
 

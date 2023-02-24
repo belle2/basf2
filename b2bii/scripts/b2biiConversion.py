@@ -167,6 +167,7 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
     # convert.logging.set_info(LogLevel.DEBUG, LogInfo.LEVEL | LogInfo.MESSAGE)
     path.add_module(convert)
     if convertNbar:
+        b2.conditions.append_globaltag('BellePID')
         path.add_module('BelleNbarMVA', particleList='anti-n0:mdst', identifier='nbarMVA')
 
 

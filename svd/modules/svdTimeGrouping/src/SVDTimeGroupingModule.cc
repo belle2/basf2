@@ -17,7 +17,7 @@ using namespace Belle2;
 
 REG_MODULE(SVDTimeGrouping);
 
-double mygaus(double* x, double* par)
+double mygaus(const double* x, const double* par)
 {
   return par[0] * exp(-0.5 * std::pow((x[0] - par[1]) / par[2], 2)) / (sqrt(2.*TMath::Pi()) * par[2]);
 }

@@ -296,6 +296,6 @@ This is a list of the ``svd`` modules used for reconstruction.
 
 .. b2-modules::
    :package: svd
-   :modules: SVDUnpacker, SVDClusterizer, SVDMissingAPVsClusterCreator, SVDSpacePointCreator, SVDRecoDigitCreator
+   :modules: SVDUnpacker, SVDClusterizer, SVDTimeGrouping, SVDMissingAPVsClusterCreator, SVDSpacePointCreator, SVDRecoDigitCreator
    :io-plots:
 

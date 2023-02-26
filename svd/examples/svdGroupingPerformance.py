@@ -135,6 +135,7 @@ class SVDGroupingPerformance(b2.Module):
 
         timeBin = int(maxTime - minTime)
 
+        #: \cond
         self.TH1F_Index = {}
         self.TH1F_Store = []
         TH1F_Store_Count = 0
@@ -146,6 +147,10 @@ class SVDGroupingPerformance(b2.Module):
         self.reso_TH2D_Histogram_Index = {}
         self.reso_TH2D_Histograms = []
         reso_TH2D_Histograms_Count = 0
+
+        self.outputFileName = str(args.fileDir) + str(args.moduleName) + outputFileTag
+        self.f = TFile(self.outputFileName + ".root", "RECREATE")
+        #: \endcond
 
         # EventT0s
 
@@ -395,9 +400,6 @@ class SVDGroupingPerformance(b2.Module):
         self.reso_TH2D_Histograms[-1].GetYaxis().SetTitle("Total SVD Clusters")
         self.reso_TH2D_Histogram_Index["reso_eclTCEmax_vs_totalClusters_PostTracking"] = reso_TH2D_Histograms_Count
         reso_TH2D_Histograms_Count += 1
-
-        self.outputFileName = str(args.fileDir) + str(args.moduleName) + outputFileTag
-        self.f = TFile(self.outputFileName + ".root", "RECREATE")
 
     def event(self):
         ''' Event loop'''

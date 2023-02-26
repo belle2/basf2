@@ -234,13 +234,13 @@ void SVDTimeGroupingModule::event()
       bool isKeySignal = true;
       if (keynorm > 0 && (keymean < m_signalRangeLow || keymean > m_signalRangeHigh)) isKeySignal = false;
       if (!isKeySignal) break;
-      float keyWt = keynorm * TMath::Exp(-std::fabs(keymean) / m_exponentialSort);
+      float keyWt = keynorm * TMath::Exp(-std::fabs(keymean - m_expSignalLoc) / m_exponentialSort);
       int kj = ij - 1;
       while (1) {
         if (kj < 0) break;
         float grnorm = std::get<0>(groupInfo[kj]);
         float grmean = std::get<1>(groupInfo[kj]);
-        float grWt = grnorm * TMath::Exp(-std::fabs(grmean) / m_exponentialSort);
+        float grWt = grnorm * TMath::Exp(-std::fabs(grmean - m_expSignalLoc) / m_exponentialSort);
         if (grWt > keyWt) break;
         groupInfo[kj + 1] = groupInfo[kj];
         kj--;

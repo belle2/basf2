@@ -27,8 +27,6 @@
 #include <sstream>
 #include <TH2F.h>
 
-using namespace std;
-
 namespace Belle2 {
 
   //-----------------------------------------------------------------
@@ -149,15 +147,5 @@ namespace Belle2 {
     }
 
   }
-
-
-  void ARICHRateCalModule::endRun()
-  {
-  }
-
-  void ARICHRateCalModule::terminate()
-  {
-  }
-
 
 } // end Belle2 namespace

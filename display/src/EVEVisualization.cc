@@ -25,7 +25,6 @@
 #include <display/ObjectInfo.h>
 
 #include <vxd/geometry/GeoCache.h>
-#include <klm/dataobjects/bklm/BKLMSimHitPosition.h>
 #include <klm/bklm/geometry/GeometryPar.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/dataobjects/CDCRecoHit.h>
@@ -1080,14 +1079,7 @@ void EVEVisualization::addSimHit(const SVDSimHit* hit, const MCParticle* particl
   const ROOT::Math::XYZVector& global_pos = geo.get(hit->getSensorID()).pointToGlobal(hit->getPosIn());
   addSimHit(global_pos, particle);
 }
-void EVEVisualization::addSimHit(const BKLMSimHit* hit, const MCParticle* particle)
-{
-  TVector3 global_pos;
-  BKLMSimHitPosition* p = hit->getRelatedFrom<BKLMSimHitPosition>();
-  if (p) global_pos = p->getPosition();
-  addSimHit(global_pos, particle);
-}
-void EVEVisualization::addSimHit(const EKLMSimHit* hit, const MCParticle* particle)
+void EVEVisualization::addSimHit(const KLMSimHit* hit, const MCParticle* particle)
 {
   const TVector3& global_pos = hit->getPosition();
   addSimHit(global_pos, particle);

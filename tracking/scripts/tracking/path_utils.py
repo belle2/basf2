@@ -372,7 +372,7 @@ def add_svd_track_finding(
         components,
         input_reco_tracks,
         output_reco_tracks,
-        svd_ckf_mode="VXDTF2_after",
+        svd_ckf_mode="SVD_after",
         use_mc_truth=False,
         add_both_directions=True,
         temporary_reco_tracks="SVDRecoTracks",

@@ -30,8 +30,7 @@
 #include <top/dataobjects/TOPSimHit.h>
 #include <arich/dataobjects/ARICHSimHit.h>
 #include <ecl/dataobjects/ECLHit.h>
-#include <klm/dataobjects/bklm/BKLMSimHit.h>
-#include <klm/dataobjects/eklm/EKLMSimHit.h>
+#include <klm/dataobjects/KLMSimHit.h>
 #include <simulation/dataobjects/BeamBackHit.h>
 
 // MetaData
@@ -261,10 +260,8 @@ void BeamBkgMixerModule::initialize()
       bkg.tree->SetBranchAddress("ARICHSimHits", &m_simHits.ARICH);
     if (m_ECL and bkg.tree->GetBranch("ECLHits"))
       bkg.tree->SetBranchAddress("ECLHits", &m_simHits.ECL);
-    if (m_KLM and bkg.tree->GetBranch("BKLMSimHits"))
-      bkg.tree->SetBranchAddress("BKLMSimHits", &m_simHits.BKLM);
-    if (m_KLM and bkg.tree->GetBranch("EKLMSimHits"))
-      bkg.tree->SetBranchAddress("EKLMSimHits", &m_simHits.EKLM);
+    if (m_KLM and bkg.tree->GetBranch("KLMSimHits"))
+      bkg.tree->SetBranchAddress("KLMSimHits", &m_simHits.KLM);
     if (m_VTX and bkg.tree->GetBranch("VTXSimHits"))
       bkg.tree->SetBranchAddress("VTXSimHits", &m_simHits.VTX);
 
@@ -308,11 +305,8 @@ void BeamBkgMixerModule::initialize()
   StoreArray<ECLHit> eclHits;
   if (m_ECL) eclHits.registerInDataStore();
 
-  StoreArray<BKLMSimHit> bklmSimHits;
-  if (m_KLM) bklmSimHits.registerInDataStore();
-
-  StoreArray<EKLMSimHit> eklmSimHits;
-  if (m_KLM) eklmSimHits.registerInDataStore();
+  StoreArray<KLMSimHit> klmSimHits;
+  if (m_KLM) klmSimHits.registerInDataStore();
 
   StoreArray<VTXSimHit> vtxSimHits;
   if (m_VTX) vtxSimHits.registerInDataStore();
@@ -364,8 +358,7 @@ void BeamBkgMixerModule::event()
   StoreArray<TOPSimHit> topSimHits;
   StoreArray<ARICHSimHit> arichSimHits;
   StoreArray<ECLHit> eclHits;
-  StoreArray<BKLMSimHit> bklmSimHits;
-  StoreArray<EKLMSimHit> eklmSimHits;
+  StoreArray<KLMSimHit> klmSimHits;
   StoreArray<VTXSimHit> vtxSimHits;
   StoreArray<BeamBackHit> beamBackHits;
   StoreObjPtr<BackgroundInfo> bkgInfo("", DataStore::c_Persistent);
@@ -388,8 +381,7 @@ void BeamBkgMixerModule::event()
         addSimHits(topSimHits, m_simHits.TOP, timeShift, m_minTime, m_maxTime);
         addSimHits(arichSimHits, m_simHits.ARICH, timeShift, m_minTime, m_maxTime);
         addSimHits(eclHits, m_simHits.ECL, timeShift, m_minTime, m_maxTime);
-        addSimHits(bklmSimHits, m_simHits.BKLM, timeShift, m_minTime, m_maxTime);
-        addSimHits(eklmSimHits, m_simHits.EKLM, timeShift, m_minTime, m_maxTime);
+        addSimHits(klmSimHits, m_simHits.KLM, timeShift, m_minTime, m_maxTime);
         addSimHits(vtxSimHits, m_simHits.VTX, timeShift, m_minTime, m_maxTime);
         addBeamBackHits(beamBackHits, m_simHits.BeamBackHits, timeShift,
                         m_minTime, m_maxTime);

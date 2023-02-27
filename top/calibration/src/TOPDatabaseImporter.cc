@@ -54,10 +54,6 @@
 #include "TFile.h"
 #include "TTree.h"
 
-extern "C" {
-  float phind_lambda_(float*); // phase refractive index of quartz (top_geo.F)
-}
-
 using namespace std;
 
 namespace Belle2 {
@@ -556,7 +552,7 @@ namespace Belle2 {
   }
 
 
-  void TOPDatabaseImporter::getSampleTimeCalibrationInfo()
+  void TOPDatabaseImporter::printSampleTimeCalibrationInfo()
   {
     DBObjPtr<TOPCalTimebase> timeBase;
     if (!timeBase.isValid()) {
@@ -583,11 +579,12 @@ namespace Belle2 {
           if (timeBase->isAvailable(scrodID[bs], channel)) ncal[bs]++;
         }
       }
-      if (ncal[0] + ncal[1] + ncal[2] + ncal[3] == 0) continue;
 
       cout << "Slot " << moduleID << endl;
       for (int bs = 0; bs < 4; bs++) {
-        cout << "  scrodID " << scrodID[bs] << ": " << ncal[bs] << "/128" << endl;
+        cout << "  scrodID " << scrodID[bs] << ": " << ncal[bs] << "/128";
+        if (ncal[bs] < 128) cout << " (" << 128 - ncal[bs] << " missing)";
+        cout << endl;
       }
     }
 
@@ -849,7 +846,7 @@ namespace Belle2 {
   }
 
 
-  void TOPDatabaseImporter::importPmtInstallationData(string fileName, string treeName ,
+  void TOPDatabaseImporter::importPmtInstallationData(string fileName, string treeName,
                                                       int firstExp, int firstRun,
                                                       int lastExp, int lastRun)
   {
@@ -1418,7 +1415,7 @@ namespace Belle2 {
         float lambda = pmt.getLambdaFirst();
         float step = pmt.getLambdaStep();
         for (auto& qe : qeData) {
-          double n = phind_lambda_(&lambda); // phase refractive index of quartz
+          double n = TOPGeometryPar::Instance()->getPhaseIndex(TOPGeometryPar::c_hc / lambda); // quartz refractive index
           double reflectance = pow((n - 1) / (n + 1), 2);
           qe /= (1 - reflectance);
           lambda += step;

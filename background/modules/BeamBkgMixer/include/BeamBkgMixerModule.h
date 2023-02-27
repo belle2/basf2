@@ -79,8 +79,7 @@ namespace Belle2 {
       TClonesArray* TOP; /**< TOP SimHits from collision file */
       TClonesArray* ARICH; /**< ARICH SimHits from collision file */
       TClonesArray* ECL; /**< ECL SimHits from collision file */
-      TClonesArray* BKLM; /**< BKLM SimHits from collision file */
-      TClonesArray* EKLM; /**< EKLM SimHits from collision file */
+      TClonesArray* KLM; /**< KLM SimHits from collision file */
       TClonesArray* VTX; /**< VTX SimHits from collision file */
       TClonesArray* BeamBackHits; /**< BeamBackHits from collision file */
 
@@ -88,7 +87,7 @@ namespace Belle2 {
        * default constructor
        */
       BkgHits():
-        PXD(0), SVD(0), CDC(0), TOP(0), ARICH(0), ECL(0), BKLM(0), EKLM(0), VTX(0),
+        PXD(0), SVD(0), CDC(0), TOP(0), ARICH(0), ECL(0), KLM(0), VTX(0),
         BeamBackHits(0)
       {}
     };
@@ -193,8 +192,7 @@ namespace Belle2 {
                          double timeShift, double minTime, double maxTime)
     {
       // Match SubDet id from BeamBackHits to whether we keep it or not
-      // KLM is a single component, but it has different hits for BKLM and EKLM.
-      bool keep[] = {false, m_PXD, m_SVD, m_CDC, m_ARICH, m_TOP, m_ECL, m_KLM, m_KLM, m_VTX};
+      bool keep[] = {false, m_PXD, m_SVD, m_CDC, m_ARICH, m_TOP, m_ECL, m_KLM, m_VTX};
       if (!cloneArray) return;
       if (!hits.isValid()) return;
       // this is basically a copy of addSimHits but we only add the

@@ -13,10 +13,10 @@
 
 #include <dqm/analysis/shminput/DQMHistAnalysisInput.h>
 
-#include <ctime>
-
 #include <TROOT.h>
 #include <TKey.h>
+
+#include <ctime>
 
 using namespace Belle2;
 
@@ -208,11 +208,6 @@ void DQMHistAnalysisInputModule::event()
   B2INFO("DQMHistAnalysisInput: " << m_memname + ": Exp " + expno + ", Run " + runno + ", RunType " + rtype + ", Last Updated " +
          mmt.AsString());
 
-  for (size_t i = 0; i < hs.size(); i++) {
-    TH1* h = hs[i];
-    addHist("", h->GetName(), h);
-    B2DEBUG(1, "Found : " << h->GetName() << " : " << h->GetEntries());
-  }
 
   m_count++;
   m_eventMetaDataPtr.create();
@@ -220,6 +215,19 @@ void DQMHistAnalysisInputModule::event()
   m_eventMetaDataPtr->setRun(m_runno);
   m_eventMetaDataPtr->setEvent(m_count);
   m_eventMetaDataPtr->setTime(mt.Convert());
+
+  //setExpNr(m_expno); // redundant access from MetaData
+  //setRunNr(m_runno); // redundant access from MetaData
+  // ExtractRunType();// Run Type is processed above already, just take it
+  setRunType(rtype);
+  ExtractEvent(hs);
+
+  // this code must be run after "event processed" has been extracted
+  for (size_t i = 0; i < hs.size(); i++) {
+    TH1* h = hs[i];
+    addHist("", h->GetName(), h);
+    B2DEBUG(1, "Found : " << h->GetName() << " : " << h->GetEntries());
+  }
 }
 
 void DQMHistAnalysisInputModule::endRun()

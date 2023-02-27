@@ -809,20 +809,20 @@ namespace Belle2 {
                      The same value can be calculated with the more generic variable `pValue`,
                      so replace the current call with ``daughter(i, pValue)``.)DOC");
     /// helix parameters
-    REGISTER_VARIABLE("v0DaughterD0(i)",        v0DaughterTrackD0,        "d0 of the i-th daughter track fit", "cm");
+    REGISTER_VARIABLE("v0DaughterD0(i)",        v0DaughterTrackD0,        "d0 of the i-th daughter track fit\n\n", "cm");
     MAKE_DEPRECATED("v0DaughterD0", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `d0`,
                      so replace the current call with ``daughter(i, d0)``.)DOC");
-    REGISTER_VARIABLE("v0DaughterPhi0(i)",      v0DaughterTrackPhi0,      "phi0 of the i-th daughter track fit", "rad");
+    REGISTER_VARIABLE("v0DaughterPhi0(i)",      v0DaughterTrackPhi0,      "phi0 of the i-th daughter track fit\n\n", "rad");
     MAKE_DEPRECATED("v0DaughterPhi0", false, "light-2104-poseidon", R"DOC(
                  The same value can be calculated with the more generic variable `phi0`,
                  so replace the current call with ``daughter(i, phi0)``.)DOC");
-    REGISTER_VARIABLE("v0DaughterOmega(i)",     v0DaughterTrackOmega,     "omega of the i-th daughter track fit",
+    REGISTER_VARIABLE("v0DaughterOmega(i)",     v0DaughterTrackOmega,     "omega of the i-th daughter track fit\n\n",
                       ":math:`\\text{cm}^{-1}`");
     MAKE_DEPRECATED("v0DaughterOmega", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `omega`,
                      so replace the current call with ``daughter(i, omega)``.)DOC");
-    REGISTER_VARIABLE("v0DaughterZ0(i)",        v0DaughterTrackZ0,        "z0 of the i-th daughter track fit", "cm");
+    REGISTER_VARIABLE("v0DaughterZ0(i)",        v0DaughterTrackZ0,        "z0 of the i-th daughter track fit\n\n", "cm");
     MAKE_DEPRECATED("v0DaughterZ0", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `z0`,
                      so replace the current call with ``daughter(i, z0)``.)DOC");
@@ -831,20 +831,20 @@ namespace Belle2 {
                      The same value can be calculated with the more generic variable `tanLambda`,
                      so replace the current call with ``daughter(i, tanLambda)``.)DOC");
     /// error of helix parameters
-    REGISTER_VARIABLE("v0DaughterD0Error(i)", v0DaughterTrackD0Error, "d0 error of the i-th daughter track fit", "cm");
+    REGISTER_VARIABLE("v0DaughterD0Error(i)", v0DaughterTrackD0Error, "d0 error of the i-th daughter track fit\n\n", "cm");
     MAKE_DEPRECATED("v0DaughterD0Error", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `d0Err`,
                      so replace the current call with ``daughter(i, d0Err)``.)DOC");
-    REGISTER_VARIABLE("v0DaughterPhi0Error(i)", v0DaughterTrackPhi0Error, "phi0 error of the i-th daughter track fit", "rad");
+    REGISTER_VARIABLE("v0DaughterPhi0Error(i)", v0DaughterTrackPhi0Error, "phi0 error of the i-th daughter track fit\n\n", "rad");
     MAKE_DEPRECATED("v0DaughterPhi0Error", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `phi0Err`,
                      so replace the current call with ``daughter(i, phi0Err)``.)DOC");
-    REGISTER_VARIABLE("v0DaughterOmegaError(i)", v0DaughterTrackOmegaError, "omega error of the i-th daughter track fit",
+    REGISTER_VARIABLE("v0DaughterOmegaError(i)", v0DaughterTrackOmegaError, "omega error of the i-th daughter track fit\n\n",
                       ":math:`\\text{cm}^{-1}`");
     MAKE_DEPRECATED("v0DaughterOmegaError", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `omegaErr`,
                      so replace the current call with ``daughter(i, omegaErr)``.)DOC");
-    REGISTER_VARIABLE("v0DaughterZ0Error(i)", v0DaughterTrackZ0Error, "z0 error of the i-th daughter track fit", "cm");
+    REGISTER_VARIABLE("v0DaughterZ0Error(i)", v0DaughterTrackZ0Error, "z0 error of the i-th daughter track fit\n\n", "cm");
     MAKE_DEPRECATED("v0DaughterZ0Error", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `z0Err`,
                      so replace the current call with ``daughter(i, z0Err)``.)DOC");
@@ -855,13 +855,17 @@ namespace Belle2 {
 
     /// V0 daughter helix parameters with V0 vertex as pivot
     REGISTER_VARIABLE("V0d0(id)", v0DaughterD0,
-                      "Return the d0 impact parameter of a V0's daughter with daughterID index with the V0 vertex point as a pivot for the track.", "cm");
+                      "Return the d0 impact parameter of a V0's daughter with daughterID index with the V0 vertex point as a pivot for the track.\n\n",
+                      "cm");
     REGISTER_VARIABLE("V0Deltad0", v0DaughterD0Diff,
-                      "Return the difference between d0 impact parameters of V0's daughters with the V0 vertex point as a pivot for the track.", "cm");
+                      "Return the difference between d0 impact parameters of V0's daughters with the V0 vertex point as a pivot for the track.\n\n",
+                      "cm");
     REGISTER_VARIABLE("V0z0(id)", v0DaughterZ0,
-                      "Return the z0 impact parameter of a V0's daughter with daughterID index with the V0 vertex point as a pivot for the track.", "cm");
+                      "Return the z0 impact parameter of a V0's daughter with daughterID index with the V0 vertex point as a pivot for the track.\n\n",
+                      "cm");
     REGISTER_VARIABLE("V0Deltaz0", v0DaughterZ0Diff,
-                      "Return the difference between z0 impact parameters of V0's daughters with the V0 vertex point as a pivot for the track.", "cm");
+                      "Return the difference between z0 impact parameters of V0's daughters with the V0 vertex point as a pivot for the track.\n\n",
+                      "cm");
 
     /// pull of helix parameters with the reco. vertex as the pivot
     REGISTER_VARIABLE("v0DaughterD0PullWithTrueVertexAsPivot(i)",       v0DaughterHelixWithTrueVertexAsPivotD0Pull,
@@ -903,43 +907,43 @@ namespace Belle2 {
     /// helix parameters and covariance matrix elements
     REGISTER_VARIABLE("v0DaughterTau(i,j)",        v0DaughterTrackParam5AtIPPerigee,
                       "j-th track parameter (at IP perigee) of the i-th daughter track. "
-                      "j:  0:d0, 1:phi0, 2:omega, 3:z0, 4:tanLambda", "cm, rad, :math:`\\text{cm}^{-1}`, cm, unitless");
+                      "j:  0:d0, 1:phi0, 2:omega, 3:z0, 4:tanLambda\n\n", "cm, rad, :math:`\\text{cm}^{-1}`, cm, unitless");
     REGISTER_VARIABLE("v0DaughterCov(i,j)",        v0DaughterTrackParamCov5x5AtIPPerigee,
                       "j-th element of the 15 covariance matrix elements (at IP perigee) of the i-th daughter track. "
                       "(0,0), (0,1) ... (1,1), (1,2) ... (2,2) ..."
-                      "index order is:  0:d0, 1:phi0, 2:omega, 3:z0, 4:tanLambda", "cm, rad, :math:`\\text{cm}^{-1}`, cm, unitless");
+                      "index order is:  0:d0, 1:phi0, 2:omega, 3:z0, 4:tanLambda\n\n", "cm, rad, :math:`\\text{cm}^{-1}`, cm, unitless");
     /// Converted photon variables
     REGISTER_VARIABLE("convertedPhotonInvariantMass(i,j)",       convertedPhotonInvariantMass,
-                      "Invariant mass of the i-j daughter system as defined in https://indico.belle2.org/event/3644/contributions/18622/attachments/9401/14443/Photon_vertexin_B2GM.pdf, assuming it's a converted photon",
+                      "Invariant mass of the i-j daughter system as defined in https://indico.belle2.org/event/3644/contributions/18622/attachments/9401/14443/Photon_vertexin_B2GM.pdf, assuming it's a converted photon\n\n",
                       "GeV/:math:`\\text{c}^2`");
     REGISTER_VARIABLE("convertedPhotonDelTanLambda(i,j)",       convertedPhotonDelTanLambda,
                       "Discriminating variable Delta-TanLambda calculated for daughters (i,j) as defined in https://indico.belle2.org/event/3644/contributions/18622/attachments/9401/14443/Photon_vertexin_B2GM.pdf, assuming it's a converted photon");
     REGISTER_VARIABLE("convertedPhotonDelR(i,j)",       convertedPhotonDelR,
-                      "Discriminating variable Delta-R calculated for daughters (i,j) as defined in https://indico.belle2.org/event/3644/contributions/18622/attachments/9401/14443/Photon_vertexin_B2GM.pdf, assuming it's a converted photon",
+                      "Discriminating variable Delta-R calculated for daughters (i,j) as defined in https://indico.belle2.org/event/3644/contributions/18622/attachments/9401/14443/Photon_vertexin_B2GM.pdf, assuming it's a converted photon\n\n",
                       "cm");
     REGISTER_VARIABLE("convertedPhotonDelZ(i,j)",       convertedPhotonDelZ,
-                      "Discriminating variable Delta-Z calculated for daughters (i,j) as defined in https://indico.belle2.org/event/3644/contributions/18622/attachments/9401/14443/Photon_vertexin_B2GM.pdf, assuming it's a converted photon",
+                      "Discriminating variable Delta-Z calculated for daughters (i,j) as defined in https://indico.belle2.org/event/3644/contributions/18622/attachments/9401/14443/Photon_vertexin_B2GM.pdf, assuming it's a converted photon\n\n",
                       "cm");
     REGISTER_VARIABLE("convertedPhotonX(i,j)",       convertedPhotonX,
-                      "Estimate of vertex X coordinate  calculated for daughters (i,j) as defined in https://indico.belle2.org/event/3644/contributions/18622/attachments/9401/14443/Photon_vertexin_B2GM.pdf, assuming it's a converted photon",
+                      "Estimate of vertex X coordinate  calculated for daughters (i,j) as defined in https://indico.belle2.org/event/3644/contributions/18622/attachments/9401/14443/Photon_vertexin_B2GM.pdf, assuming it's a converted photon\n\n",
                       "cm");
     REGISTER_VARIABLE("convertedPhotonY(i,j)",       convertedPhotonY,
-                      "Estimate of vertex Y coordinate  calculated for daughters (i,j) as defined in https://indico.belle2.org/event/3644/contributions/18622/attachments/9401/14443/Photon_vertexin_B2GM.pdf, assuming it's a converted photon",
+                      "Estimate of vertex Y coordinate  calculated for daughters (i,j) as defined in https://indico.belle2.org/event/3644/contributions/18622/attachments/9401/14443/Photon_vertexin_B2GM.pdf, assuming it's a converted photon\n\n",
                       "cm");
     REGISTER_VARIABLE("convertedPhotonZ(i,j)",       convertedPhotonZ,
-                      "Estimate of vertex Z coordinate  calculated for daughters (i,j) as defined in https://indico.belle2.org/event/3644/contributions/18622/attachments/9401/14443/Photon_vertexin_B2GM.pdf, assuming it's a converted photon",
+                      "Estimate of vertex Z coordinate  calculated for daughters (i,j) as defined in https://indico.belle2.org/event/3644/contributions/18622/attachments/9401/14443/Photon_vertexin_B2GM.pdf, assuming it's a converted photon\n\n",
                       "cm");
     REGISTER_VARIABLE("convertedPhotonRho(i,j)",       convertedPhotonRho,
-                      "Estimate of vertex Rho  calculated for daughters (i,j) as defined in https://indico.belle2.org/event/3644/contributions/18622/attachments/9401/14443/Photon_vertexin_B2GM.pdf, assuming it's a converted photon",
+                      "Estimate of vertex Rho  calculated for daughters (i,j) as defined in https://indico.belle2.org/event/3644/contributions/18622/attachments/9401/14443/Photon_vertexin_B2GM.pdf, assuming it's a converted photon\n\n",
                       "cm");
     REGISTER_VARIABLE("convertedPhotonPx(i,j)", convertedPhotonPx,
-                      "Estimate of x-component of photon momentum calculated for daughters (i,j) as defined in https://indico.belle2.org/event/3644/contributions/18622/attachments/9401/14443/Photon_vertexin_B2GM.pdf, assuming it's a converted photon",
+                      "Estimate of x-component of photon momentum calculated for daughters (i,j) as defined in https://indico.belle2.org/event/3644/contributions/18622/attachments/9401/14443/Photon_vertexin_B2GM.pdf, assuming it's a converted photon\n\n",
                       "GeV/c");
     REGISTER_VARIABLE("convertedPhotonPy(i,j)", convertedPhotonPy,
-                      "Estimate of y-component of photon momentum calculated for daughters (i,j) as defined in https://indico.belle2.org/event/3644/contributions/18622/attachments/9401/14443/Photon_vertexin_B2GM.pdf, assuming it's a converted photon",
+                      "Estimate of y-component of photon momentum calculated for daughters (i,j) as defined in https://indico.belle2.org/event/3644/contributions/18622/attachments/9401/14443/Photon_vertexin_B2GM.pdf, assuming it's a converted photon\n\n",
                       "GeV/c");
     REGISTER_VARIABLE("convertedPhotonPz(i,j)", convertedPhotonPz,
-                      "Estimate of z-component of photon momentum calculated for daughters (i,j) as defined in https://indico.belle2.org/event/3644/contributions/18622/attachments/9401/14443/Photon_vertexin_B2GM.pdf, assuming it's a converted photon",
+                      "Estimate of z-component of photon momentum calculated for daughters (i,j) as defined in https://indico.belle2.org/event/3644/contributions/18622/attachments/9401/14443/Photon_vertexin_B2GM.pdf, assuming it's a converted photon\n\n",
                       "GeV/c");
     /// check whether the innermost VXD hits are shared among daoughters
     REGISTER_VARIABLE("v0DaughtersShare1stHit", v0DaughtersShareInnermostHit,

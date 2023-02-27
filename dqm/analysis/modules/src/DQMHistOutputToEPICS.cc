@@ -12,6 +12,7 @@
 
 
 #include <dqm/analysis/modules/DQMHistOutputToEPICS.h>
+#include <framework/core/ModuleParam.templateDetails.h>
 
 using namespace std;
 using namespace Belle2;

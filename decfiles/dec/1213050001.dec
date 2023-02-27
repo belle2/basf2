@@ -1,0 +1,39 @@
+# EventType: 1213050001
+# Descriptor: [B+ -> [anti-D0 -> K+ pi-] pi+ pi- pi+]
+# NickName: Bu_D0pi+pi-pi+_K+pi-
+# Documentation: Measuring Branching fraction of B+ -> anti-D0 pi+pi-pi+
+# Tested: Yes
+# PhysicsWG: BTOCHARM
+# Responsible: Shubhajit Sana
+# Email: ph18b004@smail.iitm.ac.in
+# Cuts: None
+# Date: 18/01/23
+
+#
+# Y(4S) -> B+ B- 
+#
+
+Decay Upsilon(4S)
+0.5 B+sig B-    VSS; 
+0.5 B+ B-sig    VSS;
+Enddecay
+
+#
+# B+ -> anti-D0 pi+ pi- pi+
+#
+
+Decay B+sig
+1.0 anti-D0sig pi+ pi- pi+     PHSP;
+Enddecay
+CDecay B-sig
+
+#
+# anti-D0 -> K+ pi-
+#
+
+Decay anti-D0sig
+1.0 K+ pi-  PHSP;
+Enddecay
+CDecay D0sig
+
+End

@@ -27,7 +27,7 @@
 namespace Belle2 {
   /*! DQM Histogram Analysis for PXD Efficiency */
 
-  class DQMHistAnalysisPXDEffModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisPXDEffModule final : public DQMHistAnalysisModule {
 
     // Public functions
   public:

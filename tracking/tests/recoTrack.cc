@@ -26,14 +26,14 @@ namespace Belle2 {
     {
       /// Name of the RecoTrack store array.
       m_storeArrayNameOfRecoTracks = "ILoveRecoTracks";
-      /// Name of the CDC hits store array.
-      m_storeArrayNameOfCDCHits = "CDCHitsAreCool";
-      /// Name of the SVD hits store array.
-      m_storeArrayNameOfSVDHits = "WhatAboutSVD";
       /// Name of the PXD hits store array.
       m_storeArrayNameOfPXDHits = "PXDsILike";
       /// Name of the VTX hits store array.
       m_storeArrayNameOfVTXHits = "VTXisNewBoyInTown";
+      /// Name of the SVD hits store array.
+      m_storeArrayNameOfSVDHits = "WhatAboutSVD";
+      /// Name of the CDC hits store array.
+      m_storeArrayNameOfCDCHits = "CDCHitsAreCool";
       /// Name of the BKLM hits store array.
       m_storeArrayNameOfBKLMHits = "KeepBKLMsAlive";
       /// Name of the EKLM hits store array.
@@ -44,26 +44,26 @@ namespace Belle2 {
       //--- Setup -----------------------------------------------------------------------
       // We do not use the KLM store arrays to test, if the RecoTrack can be used without them.
       DataStore::Instance().setInitializeActive(true);
-      StoreArray<CDCHit> cdcHits(m_storeArrayNameOfCDCHits);
-      cdcHits.registerInDataStore();
-      StoreArray<SVDCluster> svdHits(m_storeArrayNameOfSVDHits);
-      svdHits.registerInDataStore();
       StoreArray<PXDCluster> pxdHits(m_storeArrayNameOfPXDHits);
       pxdHits.registerInDataStore();
       StoreArray<VTXCluster> vtxHits(m_storeArrayNameOfVTXHits);
       vtxHits.registerInDataStore();
+      StoreArray<SVDCluster> svdHits(m_storeArrayNameOfSVDHits);
+      svdHits.registerInDataStore();
+      StoreArray<CDCHit> cdcHits(m_storeArrayNameOfCDCHits);
+      cdcHits.registerInDataStore();
       StoreArray<RecoTrack> recoTracks(m_storeArrayNameOfRecoTracks);
       recoTracks.registerInDataStore();
       StoreArray<RecoHitInformation> recoHitInformations(m_storeArrayNameOfHitInformation);
       recoHitInformations.registerInDataStore();
 
-      cdcHits.registerRelationTo(recoTracks);
-      svdHits.registerRelationTo(recoTracks);
       pxdHits.registerRelationTo(recoTracks);
       vtxHits.registerRelationTo(recoTracks);
-      recoHitInformations.registerRelationTo(cdcHits);
-      recoHitInformations.registerRelationTo(svdHits);
+      svdHits.registerRelationTo(recoTracks);
+      cdcHits.registerRelationTo(recoTracks);
       recoHitInformations.registerRelationTo(pxdHits);
+      recoHitInformations.registerRelationTo(svdHits);
+      recoHitInformations.registerRelationTo(cdcHits);
       recoHitInformations.registerRelationTo(vtxHits);
 
       recoTracks.registerRelationTo(recoHitInformations);
@@ -84,20 +84,20 @@ namespace Belle2 {
       ROOT::Math::XYZVector momentum(-1, -0.5, 1.123);
       short int charge = 1;
       m_recoTrack = recoTracks.appendNew(position, momentum, charge,
-                                         m_storeArrayNameOfCDCHits, m_storeArrayNameOfSVDHits, m_storeArrayNameOfPXDHits, m_storeArrayNameOfVTXHits,
+                                         m_storeArrayNameOfPXDHits, m_storeArrayNameOfSVDHits, m_storeArrayNameOfVTXHits, m_storeArrayNameOfCDCHits,
                                          m_storeArrayNameOfBKLMHits, m_storeArrayNameOfEKLMHits, m_storeArrayNameOfHitInformation);
       m_recoTrack2 = recoTracks.appendNew(position, momentum, charge,
-                                          m_storeArrayNameOfCDCHits, m_storeArrayNameOfSVDHits, m_storeArrayNameOfPXDHits, m_storeArrayNameOfVTXHits,
+                                          m_storeArrayNameOfPXDHits, m_storeArrayNameOfSVDHits, m_storeArrayNameOfVTXHits, m_storeArrayNameOfCDCHits,
                                           m_storeArrayNameOfBKLMHits, m_storeArrayNameOfEKLMHits, m_storeArrayNameOfHitInformation);
     }
 
     RecoTrack* m_recoTrack; /**< pointer to recoTrack */
     RecoTrack* m_recoTrack2; /**< pointer to other recoTrack */
     std::string m_storeArrayNameOfRecoTracks; /**< name of recoTracks storeArray */
-    std::string m_storeArrayNameOfCDCHits; /**< name of storeArray with CDC hits */
-    std::string m_storeArrayNameOfSVDHits; /**< name of storeArray with SVD hits */
     std::string m_storeArrayNameOfPXDHits; /**< name of storeArray with PXD hits */
+    std::string m_storeArrayNameOfSVDHits; /**< name of storeArray with SVD hits */
     std::string m_storeArrayNameOfVTXHits; /**< name of storeArray with VTX hits */
+    std::string m_storeArrayNameOfCDCHits; /**< name of storeArray with CDC hits */
     std::string m_storeArrayNameOfBKLMHits; /**< name of storeArray with BKLM hits */
     std::string m_storeArrayNameOfEKLMHits; /**< name of storeArray with EKLM hits */
     std::string m_storeArrayNameOfHitInformation; /**< name of storeArray with hit information */
@@ -223,8 +223,7 @@ namespace Belle2 {
 
     // convert it to a RecoTrack
     RecoTrack* recoTrackFromGenfit = RecoTrack::createFromTrackCand(newCreatedTrackCand, m_storeArrayNameOfRecoTracks,
-                                     m_storeArrayNameOfCDCHits, m_storeArrayNameOfSVDHits,
-                                     m_storeArrayNameOfPXDHits, m_storeArrayNameOfVTXHits,
+                                     m_storeArrayNameOfPXDHits, m_storeArrayNameOfSVDHits, m_storeArrayNameOfVTXHits, m_storeArrayNameOfCDCHits,
                                      m_storeArrayNameOfBKLMHits, m_storeArrayNameOfEKLMHits,
                                      m_storeArrayNameOfHitInformation);
 
@@ -265,8 +264,7 @@ namespace Belle2 {
     ASSERT_EQ(m_recoTrack->getNumberOfTotalHits(), 3);
 
     RecoTrack* recoTrackFromGenfit = RecoTrack::createFromTrackCand(exportedTrackCand, m_storeArrayNameOfRecoTracks,
-                                     m_storeArrayNameOfCDCHits, m_storeArrayNameOfSVDHits,
-                                     m_storeArrayNameOfPXDHits, m_storeArrayNameOfVTXHits,
+                                     m_storeArrayNameOfPXDHits, m_storeArrayNameOfSVDHits, m_storeArrayNameOfVTXHits, m_storeArrayNameOfCDCHits,
                                      m_storeArrayNameOfBKLMHits, m_storeArrayNameOfEKLMHits,
                                      m_storeArrayNameOfHitInformation);
 
@@ -293,8 +291,8 @@ namespace Belle2 {
     StoreArray<RecoTrack> recoTracks(m_storeArrayNameOfRecoTracks);
 
     auto recoTrack = recoTracks.appendNew(m_recoTrack->getPositionSeed(), m_recoTrack->getMomentumSeed(), m_recoTrack->getChargeSeed(),
-                                          m_storeArrayNameOfCDCHits, m_storeArrayNameOfSVDHits, m_storeArrayNameOfPXDHits,
-                                          m_storeArrayNameOfVTXHits, m_storeArrayNameOfBKLMHits, m_storeArrayNameOfEKLMHits,
+                                          m_storeArrayNameOfPXDHits, m_storeArrayNameOfSVDHits, m_storeArrayNameOfVTXHits, m_storeArrayNameOfCDCHits,
+                                          m_storeArrayNameOfBKLMHits, m_storeArrayNameOfEKLMHits,
                                           m_storeArrayNameOfHitInformation);
     EXPECT_FALSE(recoTrack->hasCDCHits());
 
@@ -323,8 +321,8 @@ namespace Belle2 {
 
     RecoTrack* recoTrack2 = recoTracks.appendNew(m_recoTrack->getPositionSeed(), m_recoTrack->getMomentumSeed(),
                                                  m_recoTrack->getChargeSeed(),
-                                                 m_storeArrayNameOfCDCHits, m_storeArrayNameOfSVDHits, m_storeArrayNameOfPXDHits,
-                                                 m_storeArrayNameOfVTXHits, m_storeArrayNameOfBKLMHits, m_storeArrayNameOfEKLMHits,
+                                                 m_storeArrayNameOfPXDHits, m_storeArrayNameOfSVDHits, m_storeArrayNameOfVTXHits, m_storeArrayNameOfCDCHits,
+                                                 m_storeArrayNameOfBKLMHits, m_storeArrayNameOfEKLMHits,
                                                  m_storeArrayNameOfHitInformation);
     recoTrack2->addCDCHit(cdcHits[1], 2);
 
@@ -353,8 +351,8 @@ namespace Belle2 {
     StoreArray<RecoTrack> recoTracks(m_storeArrayNameOfRecoTracks);
     RecoTrack* recoTrack = recoTracks.appendNew(m_recoTrack->getPositionSeed(), momentum,
                                                 m_recoTrack->getChargeSeed(),
-                                                m_storeArrayNameOfCDCHits, m_storeArrayNameOfSVDHits, m_storeArrayNameOfPXDHits,
-                                                m_storeArrayNameOfVTXHits, m_storeArrayNameOfBKLMHits, m_storeArrayNameOfEKLMHits,
+                                                m_storeArrayNameOfPXDHits, m_storeArrayNameOfSVDHits, m_storeArrayNameOfVTXHits, m_storeArrayNameOfCDCHits,
+                                                m_storeArrayNameOfBKLMHits, m_storeArrayNameOfEKLMHits,
                                                 m_storeArrayNameOfHitInformation);
 
     // SVD Hits

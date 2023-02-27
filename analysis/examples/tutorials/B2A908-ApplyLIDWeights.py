@@ -22,8 +22,6 @@ import argparse
 
 def argparser():
 
-    from modularAnalysis import getAnalysisGlobaltag
-
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawTextHelpFormatter)
 
@@ -35,7 +33,7 @@ def argparser():
     parser.add_argument("--global_tag_append",
                         type=str,
                         nargs="+",
-                        default=[getAnalysisGlobaltag()],
+                        default=['analysis_tools_light-2302-genetta'],
                         help="List of names of conditions DB global tag(s) to append on top of GT replay.\n"
                         "NB: these GTs will have lowest priority over GT replay.\n"
                         "The order of the sequence passed determines the priority of the GTs, w/ the highest coming first.\n"

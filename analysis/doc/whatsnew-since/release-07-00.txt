@@ -79,6 +79,10 @@ Modules
   loop over the ROEs (e.g. ``roe_path``).
 * New interface for module `TrackIsoCalculator` that allow creating a single module instance for multiple detectors.
   The module now also calculates an isolation score per particle according to a new definition (see Variables).
+* Fixed a bug of the TreeFit with the particle loaded from the KLMCluster. The mass of the particle, which should have been fixed
+  with the PDG value, was floated in the TreeFit. Now it is fixed and the fit results get more reasonable.
+  However, since the covariance matrix of the KLMCluster is not properly set yet, the performance of the TreeFit with these
+  particles is not guaranteed.
 
 Variables
 +++++++++

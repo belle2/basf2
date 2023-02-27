@@ -64,14 +64,6 @@ parser.add_argument("--executionTime", action="store_true",
                     help="Store exection time tree")
 parser.add_argument("--test", action="store_true",
                     help="Test with small numbers of events")
-parser.add_argument("--OffOff", action="store_true",
-                    help="OffOff SVD Cluster Selection")
-parser.add_argument("--OnOn", action="store_true",
-                    help="OnOn SVD Cluster Selection")
-parser.add_argument("--OffOn", action="store_true",
-                    help="OffOn SVD Cluster Selection")
-parser.add_argument("--OnOff", action="store_true",
-                    help="OnOff SVD Cluster Selection")
 args = parser.parse_args()
 b2.B2INFO(f"Steering file args = {args}")
 
@@ -95,14 +87,6 @@ if args.doSVDGrouping:
         outputFileTag += "_SuperGroup"
     if args.useSVDGroupInfo:
         outputFileTag += "_UsedInSPs"
-if args.OffOff:
-    outputFileTag += "_OffOff"
-if args.OnOn:
-    outputFileTag += "_OnOn"
-if args.OffOn:
-    outputFileTag += "_OffOn"
-if args.OnOff:
-    outputFileTag += "_OnOff"
 outputFileTag += "_" + str(args.fileTag)
 
 
@@ -476,7 +460,6 @@ class SVDGroupingPerformance(b2.Module):
                 eclTCEmax, len(clusterList))
         fillOnce = 0
         for d in clusterList:
-            # print(type(d))
             clsTime = d.getClsTime()
 
             self.TH1F_Store[self.TH1F_Index["th1f_clsTime_PreTracking"]].Fill(clsTime)
@@ -488,7 +471,7 @@ class SVDGroupingPerformance(b2.Module):
 
             groupIds = d.getTimeGroupId()
             groupInfo = d.getTimeGroupInfo()
-            # print(len(groupIds), len(groupInfo))
+
             minId = 1000
             par0 = -1000
             par1 = -1000
@@ -532,15 +515,12 @@ class SVDGroupingPerformance(b2.Module):
         recoTrackList = Belle2.PyStoreArray('RecoTracks')
         nTracks = len(recoTrackList)
         nClusters = 0
-        # print("nTracks ", nTracks)
         for recoTrk in recoTrackList:
-            # print(type(recoTrk))
             if not recoTrk.wasFitSuccessful():
                 nTracks -= 1
                 continue
 
             trackList = recoTrk.getRelationsFrom('Tracks')
-            # print("trackList ", len(trackList))
             if len(trackList) == 0:
                 nTracks -= 1
                 continue
@@ -551,7 +531,6 @@ class SVDGroupingPerformance(b2.Module):
                 self.TH1F_Store[self.TH1F_Index["th1f_trackTimeCDCRef"]].Fill(trkTime0 - cdcEventT0)
 
             clusterList = recoTrk.getRelationsFrom("SVDClusters")
-            # print("SVD Hits ", len(clusterList))
             nClusters += len(clusterList)
             if len(clusterList) == 0:
                 continue
@@ -638,10 +617,8 @@ b2.set_random_seed(args.seed)
 
 if args.isMC:
     # options for simulation:
-    # expList = [1003]
     expList = [0]
     numEvents = 10
-    # bkgFiles = glob.glob('/home/surya/products/basf2/bkg_files/*.root')  # Phase3 background
     bkgFiles = get_background_files()  # Phase3 background
     # bkgFiles = None  # uncomment to remove  background
     simulateJitter = False
@@ -653,7 +630,6 @@ if args.isMC:
     eventinfosetter.param('evtNumList', [numEvents])
     main.add_module(eventinfosetter)
     ge.add_evtgen_generator(path=main, finalstate='mixed')
-    # main.add_module('EvtGenInput')
 
     sim.add_simulation(main, bkgfiles=bkgFiles)
 
@@ -677,16 +653,6 @@ else:
         b2conditions.prepend_globaltag("svd_CoG3TimeCalibration_bucket32_withGrouping_pol3")
 
     MCTracking = False
-
-
-if args.OffOff:
-    b2conditions.prepend_globaltag("tracking_TEST_SVDTimeSelectionOFFrev1_VXDTF2TimeFiltersOFFrev28")
-if args.OnOn:
-    b2conditions.prepend_globaltag("tracking_TEST_SVDTimeSelectionONrev5_VXDTF2TimeFiltersONrev27")
-if args.OffOn:
-    b2conditions.prepend_globaltag("tracking_TEST_SVDTimeSelectionOFFrev1_VXDTF2TimeFiltersONrev27")
-if args.OnOff:
-    b2conditions.prepend_globaltag("tracking_TEST_SVDTimeSelectionONrev5_VXDTF2TimeFiltersOFFrev28")
 
 
 if not args.isMC:

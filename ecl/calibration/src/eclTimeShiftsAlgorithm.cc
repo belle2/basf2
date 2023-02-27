@@ -65,6 +65,21 @@ CalibrationAlgorithm::EResult eclTimeShiftsAlgorithm::calibrate()
   /* Conversion coefficient from ADC ticks to nanoseconds
      1/(4fRF) = 0.4913 ns/clock tick, where fRF is the accelerator RF frequency.
      Same for all crystals.  */
+
+  //..First need to set event, run, exp number
+  const auto expRunList =  getRunList();
+  const int iEvt = 1;
+  const int iRun = expRunList[0].second;
+  const int iExp = expRunList[0].first;
+
+  StoreObjPtr<EventMetaData> evtPtrForRF;
+  DataStore::Instance().setInitializeActive(true);
+  evtPtrForRF.registerInDataStore();
+  DataStore::Instance().setInitializeActive(false);
+  evtPtrForRF.construct(iEvt, iRun, iExp);
+  DBStore& dbstoreForRF = DBStore::Instance();
+  dbstoreForRF.update();
+
   const double TICKS_TO_NS = 1.0 / (4.0 * EclConfiguration::getRF()) * 1e3;
 
 

@@ -11,6 +11,10 @@
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
 
+#include <TH1D.h>
+#include <TF1.h>
+#include <TMath.h>
+
 using namespace std;
 using namespace Belle2;
 
@@ -32,36 +36,19 @@ SVDTimeGroupingModule::SVDTimeGroupingModule() :
   addParam("SVDClusters", m_svdClustersName,
            "SVDCluster collection name", string(""));
 
-  // 2.Modification parameters:
-  addParam("tRangeLow", m_tRangeLow, "This sets the x-range of histogram in ns.",
+  // 2. Fill time Histogram:
+  addParam("tRangeLow", m_tRangeLow, "This sets the x- range of histogram in ns.",
            double(-160.));
-  addParam("tRangeHigh", m_tRangeHigh, "This sets the x-range of histogram in ns.",
+  addParam("tRangeHigh", m_tRangeHigh, "This sets the x+ range of histogram in ns.",
            double(160.));
-  addParam("expSignalLoc", m_expSignalLoc,
-           "Expected location of signal.",
-           double(0.));
-  addParam("signalRangeLow", m_signalRangeLow,
-           "Expected time range of signal hits.",
-           double(-50.));
-  addParam("signalRangeHigh", m_signalRangeHigh,
-           "Expected time range of signal hits.",
-           double(50.));
-  addParam("factor", m_factor,
+  addParam("rebinningFactor", m_rebinningFactor,
            "Fine divisions of histogram.",
            int(2));
-
   addParam("fillSigmaN", m_fillSigmaN,
            "Fill cluster times upto N sigma.",
            double(3.));
-  addParam("calSigmaN", m_calSigmaN,
-           "Evaluate gauss upto N sigma.",
-           double(5.));
-  addParam("accSigmaN", m_accSigmaN,
-           "Accept hits upto N sigma.",
-           double(5.));
-  addParam("fracThreshold", m_fracThreshold,
-           "Do not fit bellow this threshold.",
-           double(0.05));
+
+  // 3. Search peaks:
   addParam("minSigma", m_minSigma,
            "Lower limit of cluster time sigma for fit.",
            double(1.));
@@ -71,26 +58,49 @@ SVDTimeGroupingModule::SVDTimeGroupingModule() :
   addParam("timeSpread", m_timeSpread,
            "Time range for the fit.",
            double(5.));
+  addParam("removeSigmaN", m_removeSigmaN,
+           "Evaluate and remove gauss upto N sigma.",
+           double(5.));
+  addParam("fracThreshold", m_fracThreshold,
+           "Do not fit if peak falls below this threshold.",
+           double(0.05));
   addParam("maxGroups", m_maxGroups,
            "Maximum groups to be accepted.",
            int(20));
-  addParam("writeGroupInfo", m_writeGroupInfo,
-           "Write group info into SVDClusters.",
-           bool(true));
 
-  addParam("includeOutOfRangeClusters", m_includeOutOfRangeClusters,
-           "Assign groups to under and overflow.",
-           bool(true));
+  // 4. Sort groups:
+  addParam("expSignalLoc", m_expSignalLoc,
+           "Expected location of signal.",
+           double(0.));
+  addParam("signalRangeLow", m_signalRangeLow,
+           "Expected low range of signal hits.",
+           double(-50.));
+  addParam("signalRangeHigh", m_signalRangeHigh,
+           "Expected high range of signal hits.",
+           double(50.));
   addParam("exponentialSort", m_exponentialSort,
            "Group prominence is weighted with exponential weight.",
            double(30.));
 
+  // 5. Signal group selection:
   addParam("signalGroupSelection", m_signalGroupSelection,
            "Choose one group near expected signal location.",
            int(1));
   addParam("formSuperGroup", m_formSuperGroup,
            "Form a super-group.",
            bool(false));
+  addParam("acceptSigmaN", m_acceptSigmaN,
+           "Accept clusters upto N sigma.",
+           double(5.));
+  addParam("writeGroupInfo", m_writeGroupInfo,
+           "Write group info into SVDClusters.",
+           bool(true));
+
+  // 6. Hande out of range clusters:
+  addParam("includeOutOfRangeClusters", m_includeOutOfRangeClusters,
+           "Assign groups to under and overflow.",
+           bool(true));
+
 }
 
 
@@ -102,7 +112,7 @@ void SVDTimeGroupingModule::initialize()
 
   if (m_signalGroupSelection != m_maxGroups) m_includeOutOfRangeClusters = false;
 
-  if (m_factor <= 0) B2WARNING("Module is ineffective.");
+  if (m_rebinningFactor <= 0) B2WARNING("Module is ineffective.");
   if (m_tRangeHigh - m_tRangeLow < 10.) B2FATAL("tRange should not be less than 10 (hard-coded).");
 
   B2DEBUG(1, "SVDTimeGroupingModule \nsvdClusters: " << m_svdClusters.getName());
@@ -113,7 +123,7 @@ void SVDTimeGroupingModule::initialize()
 void SVDTimeGroupingModule::event()
 {
   int totClusters = m_svdClusters.getEntries();
-  if (m_factor <= 0 || totClusters < 10) return;
+  if (m_rebinningFactor <= 0 || totClusters < 10) return;
 
   // number of clusters in signalRange
   double tmpRange[2] = {std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN()};
@@ -129,7 +139,7 @@ void SVDTimeGroupingModule::event()
 
   int xbin = tRangeHigh - tRangeLow;
   if (xbin < 1) xbin = 1;
-  xbin *= m_factor;
+  xbin *= m_rebinningFactor;
   if (xbin < 2) xbin = 2;
   B2DEBUG(1, "tRange: [" << tRangeLow << "," << tRangeHigh << "], xBin: " << xbin);
 
@@ -150,7 +160,7 @@ void SVDTimeGroupingModule::event()
       float tbinc = h_clsTime.GetBinCenter(ijx);
       h_clsTime.Fill(tbinc, TMath::Gaus(tbinc, gCenter, gSigma, true));
     }
-  } // for (int ij = 0; ij < totClusters; ij++) {
+  }
 
   std::vector<std::tuple<double, double, double>> groupInfo; // pars
   double maxPeak = 0.;
@@ -177,8 +187,8 @@ void SVDTimeGroupingModule::event()
       if (maxPeak != 0 && maxNorm == 0) maxNorm = pars[0];
       if (maxNorm != 0 && pars[0] < maxNorm * m_fracThreshold) break;
 
-      int startBin = h_clsTime.FindBin(pars[1] - m_calSigmaN * pars[2]);
-      int   endBin = h_clsTime.FindBin(pars[1] + m_calSigmaN * pars[2]);
+      int startBin = h_clsTime.FindBin(pars[1] - m_removeSigmaN * pars[2]);
+      int   endBin = h_clsTime.FindBin(pars[1] + m_removeSigmaN * pars[2]);
       if (startBin < 1) startBin = 1;
       if (endBin > xbin)  endBin = xbin;
       for (int ijx = startBin; ijx <= endBin; ijx++) {
@@ -192,9 +202,9 @@ void SVDTimeGroupingModule::event()
       B2DEBUG(1, " group " << int(groupInfo.size())
               << " pars[0] " << pars[0] << " pars[1] " << pars[1] << " pars[2] " << pars[2]);
       if (int(groupInfo.size()) >= m_maxGroups) break;
-    } else break;   // if(!status) {
+    } else break;
 
-  } // while(1) {
+  }
 
   // resizing to max
   groupInfo.resize(m_maxGroups, std::make_tuple(0., 0., 0.));
@@ -258,8 +268,8 @@ void SVDTimeGroupingModule::event()
   for (int ij = 0; ij < int(groupInfo.size()); ij++) {
     double pars[3] = {std::get<0>(groupInfo[ij]), std::get<1>(groupInfo[ij]), std::get<2>(groupInfo[ij])};
     if (pars[2] == 0 && ij != int(groupInfo.size()) - 1) continue;
-    double beginPos = pars[1] - m_accSigmaN * pars[2];
-    double   endPos = pars[1] + m_accSigmaN * pars[2];
+    double beginPos = pars[1] - m_acceptSigmaN * pars[2];
+    double   endPos = pars[1] + m_acceptSigmaN * pars[2];
     if (beginPos < tRangeLow) beginPos = tRangeLow;
     if (endPos > tRangeHigh)  endPos   = tRangeHigh;
     B2DEBUG(1, " group " << ij
@@ -292,8 +302,8 @@ void SVDTimeGroupingModule::event()
                   << " GroupId " << m_svdClusters[jk]->getTimeGroupId().back());
         }
       }
-    } // for (int jk = 0; jk < totClusters; jk++) {
-  } // for (int ij = 0; ij < int(groupInfo.size()); ij++) {
+    }
+  }
 
 }
 

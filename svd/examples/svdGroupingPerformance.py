@@ -708,12 +708,12 @@ for moda in main.modules():
             moda.param("expSignalLoc",    sigLoc)
             moda.param('signalRangeLow',  sigMin)
             moda.param('signalRangeHigh', sigMax)
-            moda.param("factor", 2)
+            moda.param("rebinningFactor", 2)
             moda.param("signalGroupSelection", args.signalGroupSelection)
             moda.param("formSuperGroup", args.formSuperGroup)
             moda.param("exponentialSort", args.exponentialSort)
         else:
-            moda.param("factor", 0)
+            moda.param("rebinningFactor", 0)
     if moda.name() == 'SVDSpacePointCreator':
         moda.param("useSVDGroupInfo", args.useSVDGroupInfo)
 

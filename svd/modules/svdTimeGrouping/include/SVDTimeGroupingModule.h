@@ -14,10 +14,6 @@
 
 #include <string>
 
-#include <TH1D.h>
-#include <TF1.h>
-#include <TMath.h>
-
 namespace Belle2 {
   /**
    * Imports Clusters of the SVD detector and converts them to spacePoints.
@@ -58,25 +54,25 @@ namespace Belle2 {
      */
     StoreArray<SVDCluster> m_svdClusters;
 
-    double m_tRangeLow          = -160.; /**< Half-x range of time histogram */
-    double m_tRangeHigh         =  160.; /**< Half-x range of time histogram */
+    double m_tRangeLow          = -160.; /**< Expected low range of time histogram */
+    double m_tRangeHigh         =  160.; /**< Expected high range of time histogram */
+    int    m_rebinningFactor    =   2;   /**< Fine divisions of histogram. Also disables the module if zero. */
+    double m_fillSigmaN         = 3.;    /**< Fill gaus in histogram bins within this to save time. */
+    double m_minSigma           = 1.;    /**< Lower limit of fit parameter. */
+    double m_maxSigma           = 15.;   /**< Higher limit of fit parameter. */
+    double m_timeSpread         = 5.;    /**< Fit gaussian within this range of the peak. */
+    double m_removeSigmaN       = 5.;    /**< Remove upto this sigma of fitted gaus from histogram. */
+    double m_fracThreshold      = 0.05;  /**< Below threshold clusters are not searched anymore. */
+    int    m_maxGroups          = 20;    /**< Groups are not searched beyond this number. */
     double m_expSignalLoc       =  0.;   /**< Expected location of signal. */
-    double m_signalRangeLow     = -50;   /**< Expected time range of signal hits. */
-    double m_signalRangeHigh    =  50;   /**< Expected time range of signal hits. */
-    int    m_factor             =   2;   /**< Fine divisions of histogram. Also disables the module if zero. */
-    double m_fillSigmaN         = 3.;  /**< Fill gaus in histogram bins within this to save time. */
-    double m_fracThreshold      = 0.05;  /**< Bellow threshold clusters are not searched anymore. */
-    double m_minSigma           = 1.;  /**< Limit of fit parameter. */
-    double m_maxSigma           = 15.;   /**< Limit of fit parameter. */
-    double m_timeSpread         = 5.;  /**< Fit gaussian within this range of the peak. */
-    int    m_maxGroups          = 20;  /**< Groups are not searched beyond this number. */
-    double m_calSigmaN          = 5.;  /**< Remove upto this sigma of fitted gaus from histogram. */
-    double m_accSigmaN          = 5.;  /**< Clusters are tagged within this of fitted group. */
-    bool   m_writeGroupInfo     = true; /**< Write group info in SVDCluster, otherwise empty. */
-    int    m_signalGroupSelection = 1; /**< Select the first few prominent signal groups. */
+    double m_signalRangeLow     = -50;   /**< Expected low range of signal hits. */
+    double m_signalRangeHigh    =  50;   /**< Expected high range of signal hits. */
+    double m_exponentialSort    = 30.;   /**< Group prominence is weighted with exponential weight. */
+    int    m_signalGroupSelection = 1;   /**< Select the first few prominent signal groups. */
     bool   m_formSuperGroup     = false; /**< Form a super-group using the selected signal groups. */
+    double m_acceptSigmaN       = 5.;    /**< Clusters are tagged within this of fitted group. */
+    bool   m_writeGroupInfo     = true;  /**< Write group info in SVDCluster, otherwise kept empty. */
     bool   m_includeOutOfRangeClusters = true; /**< Assign groups to under and overflow. */
-    double m_exponentialSort    = 30.; /**< Group prominence is weighted with exponential weight. */
 
     /**
      * cls-time resolution -> 0: V, 1: U

@@ -1354,7 +1354,7 @@ def extractParticlesFromROE(particleLists,
         mypath.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
         rankByLowest('B0:sig', 'deltaE', numBest=1, path=mypath)
-        extractParticlesFromROE(plists, signalSideParticleList='B0:sig', maskName='all', path=roe_path)
+        extractParticlesFromROE(plists, signalSideParticleList='B0:sig', maskName='all', path=mypath)
 
         # one can analyze these ParticleLists in the main path
 

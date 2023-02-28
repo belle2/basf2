@@ -8,6 +8,9 @@
 # Cuts: None
 # Date: 20230202
 
+Alias D_s*+sig D_s*+
+Alias D_s*-sig D_s*-
+ChargeConj D_s*+sig D_s*-sig
 
 Decay Upsilon(4S)
 0.5 B+sig B-  VSS;

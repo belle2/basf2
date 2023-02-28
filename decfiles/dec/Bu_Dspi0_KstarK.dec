@@ -8,9 +8,9 @@
 # Cuts: None
 # Date: 20230202
 
-
 Alias anti-K*0sig anti-K*0
 Alias K*0sig K*0
+ChargeConj K*0sig anti-K*0sig
 
 
 Decay Upsilon(4S)

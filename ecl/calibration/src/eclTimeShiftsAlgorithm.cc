@@ -12,6 +12,8 @@
 #include <ecl/dbobjects/ECLReferenceCrystalPerCrateCalib.h>
 #include <ecl/digitization/EclConfiguration.h>
 #include <ecl/utility/ECLChannelMapper.h>
+#include <framework/dbobjects/HardwareClockSettings.h>
+
 #include "TH1F.h"
 #include "TString.h"
 #include "TFile.h"
@@ -71,15 +73,8 @@ CalibrationAlgorithm::EResult eclTimeShiftsAlgorithm::calibrate()
   const int iEvt = 1;
   const int iRun = expRunList[0].second;
   const int iExp = expRunList[0].first;
-
-  StoreObjPtr<EventMetaData> evtPtrForRF;
-  DataStore::Instance().setInitializeActive(true);
-  evtPtrForRF.registerInDataStore();
-  DataStore::Instance().setInitializeActive(false);
-  evtPtrForRF.construct(iEvt, iRun, iExp);
-  DBStore& dbstoreForRF = DBStore::Instance();
-  dbstoreForRF.update();
-
+  DBObjPtr<Belle2::HardwareClockSettings> clock_info("HardwareClockSettings");
+  updateDBObjPtrs(iEvt, iRun, iExp);
   const double TICKS_TO_NS = 1.0 / (4.0 * EclConfiguration::getRF()) * 1e3;
 
 

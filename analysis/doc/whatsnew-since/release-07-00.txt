@@ -83,6 +83,8 @@ Modules
   with the PDG value, was floated in the TreeFit. Now it is fixed and the fit results get more reasonable.
   However, since the covariance matrix of the KLMCluster is not properly set yet, the performance of the TreeFit with these
   particles is not guaranteed.
+* Added an option ``overwriteRank`` to the `modularAnalysis.rankByHighest` and `modularAnalysis.rankByLowest` to overwrite the 
+  extraInfo of rank when the particle has already the extraInfo.
 
 Variables
 +++++++++

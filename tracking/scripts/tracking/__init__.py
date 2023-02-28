@@ -259,7 +259,7 @@ def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=Fa
         path.add_module('V0Finder', RecoTracks=reco_tracks, v0FitterMode=1)
 
     # flip & refit to fix the charge of some tracks
-    if flip_recoTrack and 'PXD' in components:
+    if flip_recoTrack and is_pxd_used(components):
         add_flipping_of_recoTracks(path, reco_tracks="RecoTracks")
 
     # estimate the track time

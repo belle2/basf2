@@ -713,7 +713,9 @@ void Hough3DFinder::runFinderVersion3(const vector<double>& trackVariables, vect
     m_commonData = new Belle2::TRGCDCJSignalData();
   }
   // Setup firmware parameters
+  /* cppcheck-suppress variableScope */
   double phiMax = M_PI;
+  /* cppcheck-suppress variableScope */
   double phiMin = -M_PI;
   int phiBitSize = 13;
   // pt = 0.3*1.5*rho*0.01;

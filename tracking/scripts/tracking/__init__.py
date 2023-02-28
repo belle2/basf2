@@ -106,7 +106,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
     :param append_full_grid_cdc_eventt0: If True, the module FullGridChi2TrackTimeExtractor is added to the path
                                       and provides the CDC temporary EventT0.
     :param v0_finding: if false, the V0Finder module is not executed
-    :param flip_recoTrack: if true, add the recoTracks flipping function in the postfilter
+    :param flip_recoTrack: if true, add the recoTracks flipping function in the postfilter (only if PXD is present)
     """
 
     add_prefilter_tracking_reconstruction(
@@ -246,7 +246,7 @@ def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=Fa
     :param reco_tracks: Name of the StoreArray where the reco tracks should be stored
     :param prune_temporary_tracks: If false, store all information of the single CDC and VXD tracks before merging.
         If true, prune them.
-    :param flip_recoTrack: if true, add the recoTracks flipping function in the postfilter
+    :param flip_recoTrack: if true, add the recoTracks flipping function in the postfilter (only if PXD is present)
     """
 
     # V0 finding
@@ -254,7 +254,7 @@ def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=Fa
         path.add_module('V0Finder', RecoTracks=reco_tracks, v0FitterMode=1)
 
     # flip & refit to fix the charge of some tracks
-    if flip_recoTrack:
+    if flip_recoTrack and 'PXD' in components:
         add_flipping_of_recoTracks(path, reco_tracks="RecoTracks")
 
     # estimate the track time

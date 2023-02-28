@@ -411,8 +411,8 @@ void CDCDedxCosEdgeAlgorithm::plotStats()
   auto htstats = getObjectPtr<TH1I>("htstats");
   if (htstats) {
     htstats->SetName(Form("htstats_%s", m_suffix.data()));
-    htstats->DrawCopy("");
     htstats->SetStats(0);
+    htstats->DrawCopy("");
   }
   cstats.Print(Form("cdcdedx_cosedgecal_stats_%s.pdf", m_suffix.data()));
 }

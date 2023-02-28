@@ -17,10 +17,9 @@ using namespace CDC;
 //-----------------------------------------------------------------
 CDCDedxWireGainAlgorithm::CDCDedxWireGainAlgorithm() :
   CalibrationAlgorithm("CDCDedxElectronCollector"),
-  c_nwireCDC(c_nSenseWires),
-  isMakePlots(true),
-  isMerge(true),
-  isWireTruc(false),
+  m_isMakePlots(true),
+  m_isMerge(true),
+  m_isWireTruc(false),
   m_dedxBins(250),
   m_dedxMin(0.0),
   m_dedxMax(5.0),
@@ -48,20 +47,20 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
   auto ttree = getObjectPtr<TTree>("tree");
   if (ttree->GetEntries() < 100)return c_NotEnoughData;
 
-  std::vector<int>* wire = 0;
+  vector<int>* wire = 0;
   ttree->SetBranchAddress("wire", &wire);
 
-  std::vector<double>* dedxhit = 0;
+  vector<double>* dedxhit = 0;
   ttree->SetBranchAddress("dedxhit", &dedxhit);
 
   // dedxhit vector to store dE/dx values for each wire
-  std::map<int, std::vector<double>> wirededx;
+  map<int, vector<double>> wirededx;
 
   //IL = Inner Layer and OL = Outer Layer
-  TH1D* hdedxL[2];
-  std::string label[2] = {"IL", "OL"};
-  for (int iL = 0; iL < 2; iL++)
-    hdedxL[iL] = new TH1D(Form("hdedx%s_%s", label[iL].data(), m_suffix.data()), "", m_dedxBins, m_dedxMin, m_dedxMax);
+  array<TH1D*, 2> hdedxL;
+  string label[2] = {"IL", "OL"};
+  for (int il = 0; il < 2; il++)
+    hdedxL[il] = new TH1D(Form("hdedx%s_%s", label[il].data(), m_suffix.data()), "", m_dedxBins, m_dedxMin, m_dedxMax);
 
   for (int i = 0; i < ttree->GetEntries(); ++i) {
     ttree->GetEvent(i);
@@ -79,24 +78,25 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
   int minstat = 0;
   for (unsigned int jw = 0; jw < c_nwireCDC; ++jw)
     if (wirededx[jw].size() <= 100) minstat++;
-  if (minstat > 0.10 * c_nwireCDC)  return c_NotEnoughData;
+
+  if (minstat > 0.10 * c_nwireCDC) return c_NotEnoughData;
 
   //25-75 is average bin # for trunction
-  unsigned int minbinL[2], maxbinL[2];
-  for (int iL = 0; iL < 2; iL++) {
-    getTruncatedBins(hdedxL[iL], minbinL[iL], maxbinL[iL]);
-    hdedxL[iL]->SetTitle(Form("%s(%s);%d;%d", label[iL].data(), m_suffix.data(), minbinL[iL], maxbinL[iL]));
+  array<unsigned int, 2> minbinL, maxbinL;
+  for (int il = 0; il < 2; il++) {
+    getTruncatedBins(hdedxL[il], minbinL[il], maxbinL[il]);
+    hdedxL[il]->SetTitle(Form("%s(%s);%d;%d", label[il].data(), m_suffix.data(), minbinL[il], maxbinL[il]));
   }
 
-  std::vector<double> vrel_mean;
-  std::vector<double> vdedx_means;
+  vector<double> vrel_mean;
+  vector<double> vdedx_means;
 
-  TH1D* hdedxhit[c_nwireCDC];
+  array<TH1D*, c_nwireCDC>  hdedxhit;
 
   B2INFO("Creating CDCGeometryPar object");
   CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance(&(*m_cdcGeo));
 
-  std::array<double, 56> layermean;
+  array<double, c_maxNSenseLayers> layermean;
   int activelayers = 0;
   double layeravg = 0.0;
 
@@ -116,7 +116,7 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
       }
 
       unsigned int minbin, maxbin;
-      if (!isWireTruc) {
+      if (!m_isWireTruc) {
         getTruncatedBins(hdedxhit[jwire], minbin, maxbin);
       } else {
         if (jwire < 1280) {
@@ -136,7 +136,7 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
       vrel_mean.push_back(dedxmean);
 
       double prewg = m_DBWireGains->getWireGain(jwire);
-      if (prewg > 0.0 && isMerge) {
+      if (prewg > 0.0 && m_isMerge) {
         vdedx_means.push_back(dedxmean * prewg);
         B2INFO("merged-wireGain: [" << jwire << "], prewgvious = " << prewg << ", rel = " << dedxmean << ", merged = " << vdedx_means.at(
                  jwire));
@@ -161,14 +161,14 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
   }
 
   //normalisation of wiregains to get outergain ~1.0
-  if (activelayers > 0)layeravg /= activelayers;
+  if (activelayers > 0) layeravg /= activelayers;
 
   for (unsigned int iw = 0; iw < c_nwireCDC; ++iw) {
     vrel_mean.at(iw) /= layeravg;
     vdedx_means.at(iw) /= layeravg;
   }
 
-  if (isMakePlots) {
+  if (m_isMakePlots) {
 
     //1. Inner and Outer layer dE/dx distributions
     plotLayerDist(hdedxL);
@@ -200,7 +200,7 @@ void CDCDedxWireGainAlgorithm::getExpRunInfo()
 
   int cruns = 0;
   for (auto expRun : getRunList()) {
-    if (cruns == 0)B2INFO("CDCDedxWireGain: start exp " << expRun.first << " and run " << expRun.second << "");
+    if (cruns == 0) B2INFO("CDCDedxWireGain: start exp " << expRun.first << " and run " << expRun.second << "");
     cruns++;
   }
 
@@ -213,12 +213,12 @@ void CDCDedxWireGainAlgorithm::getExpRunInfo()
 
   updateDBObjPtrs(1, rstart, estart);
 
-  if (m_suffix.length() > 0)m_suffix = Form("%s_e%d_r%dr%d", m_suffix.data(), estart, rstart, rend);
+  if (m_suffix.length() > 0) m_suffix = Form("%s_e%d_r%dr%d", m_suffix.data(), estart, rstart, rend);
   else  m_suffix = Form("e%d_r%dr%d", estart, rstart, rend);
 }
 
 //--------------------------
-void CDCDedxWireGainAlgorithm::createPayload(std::vector<double> vdedx_means)
+void CDCDedxWireGainAlgorithm::createPayload(vector<double>& vdedx_means)
 {
 
   B2INFO("dE/dx Calibration done for " << vdedx_means.size() << " CDC wires");
@@ -233,7 +233,7 @@ double CDCDedxWireGainAlgorithm::getTruncationMean(TH1D* hdedxhit, int binlow, i
   //calculating truncation average
   if (hdedxhit->Integral() < 100) return 1.0;
 
-  if (binlow <= 0 || binhigh > hdedxhit->GetNbinsX())return 1.0;
+  if (binlow <= 0 || binhigh > hdedxhit->GetNbinsX()) return 1.0;
 
   double binweights = 0., sumofbc = 0.;
   for (int ibin = binlow; ibin <= binhigh; ibin++) {
@@ -275,25 +275,25 @@ void CDCDedxWireGainAlgorithm::getTruncatedBins(TH1D* hdedxhit, unsigned int& bi
 }
 
 //--------------------------
-void CDCDedxWireGainAlgorithm::plotLayerDist(TH1D* hdedxL[2])
+void CDCDedxWireGainAlgorithm::plotLayerDist(array<TH1D*, 2> hdedxL)
 {
 
   TCanvas cldedx("cldedx", "IL/OL dedxhit dist", 900, 400);
   cldedx.Divide(2, 1);
 
-  for (int iL = 0; iL < 2; iL++) {
-    cldedx.cd(iL + 1);
+  for (int il = 0; il < 2; il++) {
+    cldedx.cd(il + 1);
 
-    int minbin = std::stoi(hdedxL[iL]->GetXaxis()->GetTitle());
-    int maxbin = std::stoi(hdedxL[iL]->GetYaxis()->GetTitle());
-    double lowedge = hdedxL[iL]->GetXaxis()->GetBinLowEdge(minbin);
-    double upedge = hdedxL[iL]->GetXaxis()->GetBinUpEdge(maxbin);
+    int minbin = stoi(hdedxL[il]->GetXaxis()->GetTitle());
+    int maxbin = stoi(hdedxL[il]->GetYaxis()->GetTitle());
+    double lowedge = hdedxL[il]->GetXaxis()->GetBinLowEdge(minbin);
+    double upedge = hdedxL[il]->GetXaxis()->GetBinUpEdge(maxbin);
 
-    hdedxL[iL]->SetFillColor(kYellow);
-    hdedxL[iL]->SetTitle(Form("%s, trunc(%0.02f - %0.02f);dedxhit;entries", hdedxL[iL]->GetTitle(), lowedge, upedge));
-    hdedxL[iL]->Draw("histo");
+    hdedxL[il]->SetFillColor(kYellow);
+    hdedxL[il]->SetTitle(Form("%s, trunc(%0.02f - %0.02f);dedxhit;entries", hdedxL[il]->GetTitle(), lowedge, upedge));
+    hdedxL[il]->Draw("histo");
 
-    TH1D* hdedxLC = (TH1D*)hdedxL[iL]->Clone(Form("%s_c", hdedxL[iL]->GetName()));
+    TH1D* hdedxLC = (TH1D*)hdedxL[il]->Clone(Form("%s_c", hdedxL[il]->GetName()));
     hdedxLC->GetXaxis()->SetRange(minbin, maxbin);
     hdedxLC->SetFillColor(kAzure + 1);
     hdedxLC->Draw("same histo");
@@ -303,23 +303,23 @@ void CDCDedxWireGainAlgorithm::plotLayerDist(TH1D* hdedxL[2])
 }
 
 //------------------------------------
-void CDCDedxWireGainAlgorithm::plotWireDist(TH1D* hist[], std::vector<double>vrel_mean)
+void CDCDedxWireGainAlgorithm::plotWireDist(array<TH1D*, c_nwireCDC> hist, vector<double>& vrel_mean)
 {
 
-  TCanvas* ctmp = new TCanvas(Form("cdcdedx_%s", m_suffix.data()), "", 1200, 1200);
-  ctmp->Divide(4, 4);
-  ctmp->SetBatch(kTRUE);
+  TCanvas ctmp(Form("cdcdedx_%s", m_suffix.data()), "", 1200, 1200);
+  ctmp.Divide(4, 4);
+  ctmp.SetBatch(kTRUE);
 
-  std::stringstream psname;
+  stringstream psname;
   psname << Form("cdcdedx_wgcal_%s.pdf[", m_suffix.data());
-  ctmp->Print(psname.str().c_str());
+  ctmp.Print(psname.str().c_str());
   psname.str("");
   psname << Form("cdcdedx_wgcal_%s.pdf", m_suffix.data());
 
   for (unsigned int iw = 0; iw < c_nwireCDC; iw++) {
 
-    int minbin = std::stoi(hist[iw]->GetXaxis()->GetTitle());
-    int maxbin = std::stoi(hist[iw]->GetYaxis()->GetTitle());
+    int minbin = stoi(hist[iw]->GetXaxis()->GetTitle());
+    int maxbin = stoi(hist[iw]->GetYaxis()->GetTitle());
 
     hist[iw]->SetFillColor(kYellow - 9);
     hist[iw]->SetTitle(Form("%s, rel. #mu_{trunc} %0.03f;dedxhit;entries", hist[iw]->GetTitle(), vrel_mean.at(iw)));
@@ -328,8 +328,8 @@ void CDCDedxWireGainAlgorithm::plotWireDist(TH1D* hist[], std::vector<double>vre
       hist[iw]->SetLineColor(kRed);
       hist[iw]->SetLineWidth(2);
     }
-    ctmp->cd(iw % 16 + 1);
-    hist[iw]->Draw();
+    ctmp.cd(iw % 16 + 1);
+    hist[iw]->DrawCopy();
 
     TH1D* hdedxhitC = (TH1D*)hist[iw]->Clone(Form("%sC", hist[iw]->GetName()));
     hdedxhitC->GetXaxis()->SetRange(minbin, maxbin);
@@ -337,49 +337,50 @@ void CDCDedxWireGainAlgorithm::plotWireDist(TH1D* hist[], std::vector<double>vre
     hdedxhitC->DrawCopy("same histo");
 
     if (((iw + 1) % 16 == 0) || iw == (c_nwireCDC - 1))  {
-      ctmp->Print(psname.str().c_str());
-      ctmp->Clear("D");
+      ctmp.Print(psname.str().c_str());
+      ctmp.Clear("D");
     }
+    delete hist[iw];
+    delete hdedxhitC;
   }
 
   psname.str("");
   psname << Form("cdcdedx_wgcal_%s.pdf]", m_suffix.data());
-  ctmp->Print(psname.str().c_str());
-  delete ctmp;
+  ctmp.Print(psname.str().c_str());
 }
 
 //------------------------------------
-void CDCDedxWireGainAlgorithm::plotWireGain(std::vector<double>vdedx_means, std::vector<double>vrel_mean, double layeravg)
+void CDCDedxWireGainAlgorithm::plotWireGain(vector<double>& vdedx_means, vector<double>& vrel_mean, double layeravg)
 {
 
   //saving final constants in a histograms for validation
   TCanvas cwconst("cwconst", "", 900, 500);
   TCanvas cwconstvar("cwconstvar", "", 500, 400);
 
-  TH1D* hconstpw[2], *hconstpwvar[2];
+  array<TH1D*, 2> hconstpw, hconstpwvar;
 
   for (int i = 0; i < 2; i++) {
 
     hconstpw[i] = new TH1D(Form("hconstpw_%d_%s", i, m_suffix.data()), "", c_nwireCDC, -0.5, 14335.5);
     hconstpw[i]->SetTitle(Form("wiregain const  (%s); wire numbers;<dedxhit>", m_suffix.data()));
-    if (isMerge
+    if (m_isMerge
         && i == 0) hconstpw[i]->SetTitle(Form("merged wiregain rel-const  (%s), avg = %0.03f; wire numbers;<dedxhit>", m_suffix.data(),
                                                 layeravg));
 
     hconstpwvar[i] = new TH1D(Form("hconstpwvar_%s", m_suffix.data()), "", 400, -0.5, 2.5);
     hconstpwvar[i]->SetTitle(Form("wiregain const (%s); wire gains; nentries", m_suffix.data()));
-    if (isMerge
+    if (m_isMerge
         && i == 0) hconstpwvar[i]->SetTitle(Form("merged wiregain rel-const (%s), avg = %0.03f; wire gains; nentries", m_suffix.data(),
                                                    layeravg));
 
     for (unsigned int iw = 0; iw < c_nwireCDC; iw++) {
 
       double gain = vdedx_means.at(iw);
-      if (isMerge && i == 1) gain =  vrel_mean.at(iw);
+      if (m_isMerge && i == 1) gain =  vrel_mean.at(iw);
       hconstpw[i]->SetBinContent(iw + 1, gain);
       hconstpwvar[i]->Fill(gain);
 
-      if (iw % 500 == 0)hconstpw[i]->GetXaxis()->SetBinLabel(iw + 1, Form("w%d", iw + 1));
+      if (iw % 500 == 0) hconstpw[i]->GetXaxis()->SetBinLabel(iw + 1, Form("w%d", iw + 1));
     }
 
     hconstpw[i]->SetLineColor(i * 2 + 2);
@@ -394,48 +395,48 @@ void CDCDedxWireGainAlgorithm::plotWireGain(std::vector<double>vdedx_means, std:
   cwconst.cd();
   cwconst.SetGridy(1);
   hconstpw[0]->Draw("");
-  if (isMerge) hconstpw[1]->Draw("same");
+  if (m_isMerge) hconstpw[1]->Draw("same");
 
   cwconstvar.cd();
   hconstpwvar[0]->Draw("hist");
-  if (isMerge) hconstpwvar[1]->Draw("hist same");
+  if (m_isMerge) hconstpwvar[1]->Draw("hist same");
 
   cwconst.SaveAs(Form("cdcdedx_wgcal_wireconst_%s.pdf", m_suffix.data()));
   cwconstvar.SaveAs(Form("cdcdedx_wgcal_wireconstvar_%s.pdf", m_suffix.data()));
-
 }
 
 //------------------------------------
-void CDCDedxWireGainAlgorithm::plotLayerGain(std::array<double, 56> layermean, double layeravg)
+void CDCDedxWireGainAlgorithm::plotLayerGain(array<double, c_maxNSenseLayers>& layermean, double layeravg)
 {
 
-  TH1D* hlayeravg = new TH1D(Form("hlayeravg_%s", m_suffix.data()), "", c_maxNSenseLayers, -0.5, 55.5);
-  hlayeravg->SetTitle(Form("layer gain avg (%s); layer numbers;<dedxhit>", m_suffix.data()));
+  TH1D hlayeravg(Form("hlayeravg_%s", m_suffix.data()), "", c_maxNSenseLayers, -0.5, 55.5);
+  hlayeravg.SetTitle(Form("layer gain avg (%s); layer numbers;<dedxhit>", m_suffix.data()));
 
-  for (unsigned int iL = 0; iL < c_maxNSenseLayers; iL++) {
-    hlayeravg->SetBinContent(iL + 1, layermean[iL]);
-    if (iL % 2 == 0 || iL == c_maxNSenseLayers - 1)hlayeravg->GetXaxis()->SetBinLabel(iL + 1, Form("L%d", iL));
+  for (unsigned int il = 0; il < c_maxNSenseLayers; il++) {
+    hlayeravg.SetBinContent(il + 1, layermean[il]);
+    if (il % 2 == 0 || il == c_maxNSenseLayers - 1) hlayeravg.GetXaxis()->SetBinLabel(il + 1, Form("L%d", il));
   }
 
   TCanvas clayeravg("clayeravg", "clayeravg", 800, 500);
   clayeravg.SetGridy(1);
   clayeravg.cd();
   gStyle->SetOptStat("ne");
-  hlayeravg->LabelsOption("u", "X");
-  hlayeravg->SetLineColor(kBlue);
-  hlayeravg->GetYaxis()->SetRangeUser(-0.1, 3.5);
-  hlayeravg->SetTitle(Form("%s, avg = %0.03f (abs)", hlayeravg->GetTitle(), layeravg));
-  hlayeravg->LabelsDeflate();
-  hlayeravg->Draw("");
+  hlayeravg.LabelsOption("u", "X");
+  hlayeravg.SetLineColor(kBlue);
+  hlayeravg.GetYaxis()->SetRangeUser(-0.1, 3.5);
+  hlayeravg.SetTitle(Form("%s, avg = %0.03f (abs)", hlayeravg.GetTitle(), layeravg));
+  hlayeravg.LabelsDeflate();
+  hlayeravg.Draw("");
   TLine* tl = new TLine(-0.5, layeravg, 55.5, layeravg);
   tl->SetLineColor(kRed);
   tl->DrawClone("same");
   clayeravg.SaveAs(Form("cdcdedx_wgcal_layeravg_%s.pdf", m_suffix.data()));
+  delete tl;
 }
 
-
 //------------------------------------
-void CDCDedxWireGainAlgorithm::plotWGPerLayer(std::vector<double>vdedx_means, std::array<double, 56> layermean, double layeravg)
+void CDCDedxWireGainAlgorithm::plotWGPerLayer(vector<double>& vdedx_means, array<double, c_maxNSenseLayers>& layermean,
+                                              double layeravg)
 {
 
   CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance(&(*m_cdcGeo));
@@ -444,7 +445,7 @@ void CDCDedxWireGainAlgorithm::plotWGPerLayer(std::vector<double>vdedx_means, st
   clconst.Divide(2, 2);
   clconst.SetBatch(kTRUE);
 
-  std::stringstream psnameL;
+  stringstream psnameL;
   psnameL << Form("cdcdedx_wgcal_layerconst_%s.pdf[", m_suffix.data());
   clconst.Print(psnameL.str().c_str());
   psnameL.str(""); psnameL << Form("cdcdedx_wgcal_layerconst_%s.pdf", m_suffix.data());
@@ -454,15 +455,15 @@ void CDCDedxWireGainAlgorithm::plotWGPerLayer(std::vector<double>vdedx_means, st
   for (unsigned int il = 0; il < c_maxNSenseLayers; ++il) {
 
     unsigned int nwires = cdcgeo.nWiresInLayer(il);
-    TH1D* hconstpl = new TH1D(Form("hconstpwvar_l%d_%s", il, m_suffix.data()), "", nwires, jwire, jwire + nwires);
-    hconstpl->SetTitle(Form("abs-const, layer: %d (%s); wire numbers;<dedxhit>", il, m_suffix.data()));
+    TH1D hconstpl(Form("hconstpwvar_l%d_%s", il, m_suffix.data()), "", nwires, jwire, jwire + nwires);
+    hconstpl.SetTitle(Form("abs-const, layer: %d (%s); wire numbers;<dedxhit>", il, m_suffix.data()));
 
     for (unsigned int iw = 0; iw < nwires; ++iw) {
-      hconstpl->SetBinContent(iw + 1, vdedx_means.at(jwire));
+      hconstpl.SetBinContent(iw + 1, vdedx_means.at(jwire));
       if (il < 32) {
-        if (iw % 10 == 0)hconstpl->GetXaxis()->SetBinLabel(iw + 1, Form("w%d", jwire));
+        if (iw % 10 == 0) hconstpl.GetXaxis()->SetBinLabel(iw + 1, Form("w%d", jwire));
       } else {
-        if (iw % 15 == 0)hconstpl->GetXaxis()->SetBinLabel(iw + 1, Form("w%d", jwire));
+        if (iw % 15 == 0) hconstpl.GetXaxis()->SetBinLabel(iw + 1, Form("w%d", jwire));
       }
       jwire++;
     }
@@ -472,13 +473,13 @@ void CDCDedxWireGainAlgorithm::plotWGPerLayer(std::vector<double>vdedx_means, st
     clconst.cd(il % 4 + 1);
     gStyle->SetOptStat("ne");
 
-    hconstpl->SetTitle(Form("%s, avg = %0.03f", hconstpl->GetTitle(), lmean));
+    hconstpl.SetTitle(Form("%s, avg = %0.03f", hconstpl.GetTitle(), lmean));
 
-    if (il < 8)hconstpl->GetYaxis()->SetRangeUser(-0.1, 4.0);
-    else hconstpl->GetYaxis()->SetRangeUser(-0.1, 2.0);
-    hconstpl->SetFillColor(kAzure - 1);
-    hconstpl->LabelsOption("u", "X");
-    hconstpl->DrawCopy("hist");
+    if (il < 8) hconstpl.GetYaxis()->SetRangeUser(-0.1, 4.0);
+    else hconstpl.GetYaxis()->SetRangeUser(-0.1, 2.0);
+    hconstpl.SetFillColor(kAzure - 1);
+    hconstpl.LabelsOption("u", "X");
+    hconstpl.DrawCopy("hist");
 
     TLine* tlc = new TLine(jwire - nwires, lmean, jwire, lmean);
     tlc->SetLineColor(kRed);
@@ -490,7 +491,6 @@ void CDCDedxWireGainAlgorithm::plotWGPerLayer(std::vector<double>vdedx_means, st
     }
 
     delete tlc;
-    hconstpl->Reset();
   }
 
   psnameL.str("");
@@ -517,9 +517,9 @@ void CDCDedxWireGainAlgorithm::plotEventStats()
   cstats.cd(2);
   auto htstats = getObjectPtr<TH1I>("htstats");
   if (htstats) {
-    hestats->SetName(Form("htstats_%s", m_suffix.data()));
+    htstats->SetName(Form("htstats_%s", m_suffix.data()));
+    htstats->SetStats(0);
     htstats->DrawCopy("");
-    hestats->SetStats(0);
   }
 
   cstats.Print(Form("cdcdedx_wgcal_stats_%s.pdf", m_suffix.data()));

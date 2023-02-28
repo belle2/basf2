@@ -24,14 +24,18 @@
 #include <TLegend.h>
 
 #include <framework/database/DBObjPtr.h>
-#include <cdc/geometry/CDCGeometryPar.h>
-#include <cdc/geometry/CDCGeometryParConstants.h>
+#include <framework/database/IntervalOfValidity.h>
+
 #include <reconstruction/dbobjects/CDCDedxBadWires.h>
 #include <reconstruction/dbobjects/CDCDedxWireGain.h>
+
 #include <calibration/CalibrationAlgorithm.h>
 
-#include <framework/database/IntervalOfValidity.h>
 #include <cdc/dbobjects/CDCGeometry.h>
+#include <cdc/geometry/CDCGeometryPar.h>
+#include <cdc/geometry/CDCGeometryParConstants.h>
+
+using namespace std;
 
 namespace Belle2 {
 
@@ -56,30 +60,30 @@ namespace Belle2 {
     /**
     * function to enable plotting
     */
-    void setMonitoringPlots(bool value = false) {isMakePlots = value;}
+    void setMonitoringPlots(bool value = false) {m_isMakePlots = value;}
 
     /**
     * function to set high dedx fraction threshold
     */
-    void setHighFracThers(double value) {m_fracThers = value;}
+    void setHighFracThres(double value) {m_fracThres = value;}
 
     /**
-    * function to set RMS thershold
+    * function to set RMS Threshold
     */
-    void setRMSThers(double value) {m_rmsThers = value;}
+    void setRMSThres(double value) {m_rmsThres = value;}
 
     /**
-    * function to set Mean thershold
+    * function to set Mean Threshold
     */
-    void setMeanThers(double value) {m_meanThers = value;}
+    void setMeanThres(double value) {m_meanThres = value;}
 
     /**
      * function to choose adc or dedx as variable
      */
     void setADC(bool value = false)
     {
-      isADC = value;
-      if (isADC) m_varMax = 1000.0;
+      m_isADC = value;
+      if (m_isADC) m_varMax = 1000.0;
       else m_varMax = 7.0;
     }
 
@@ -101,27 +105,27 @@ namespace Belle2 {
     /**
       * function to draw per wire plots
       */
-    void plotWireDist(std::vector<double> m_inwires, std::map<int, std::vector<double>> vhitvar, double amean, double arms);
+    void plotWireDist(const vector<double>& inwires, map<int, vector<double>>& vhitvar);
 
     /**
      * function to print canvas
      */
-    void printCanvas(TList* list, TList* hflist, Color_t color, double amean, double arms);
+    void printCanvas(TList* list, TList* hflist, Color_t color);
 
     /**
      * function to plot wire status map (all, bad and dead)
      */
-    void plotBadWireMap(std::vector<double> m_badwires, std::vector<double> m_deadwires);
+    void plotBadWireMap(const vector<double>& vbadwires, const vector<double>& vdeadwires);
 
     /**
-     * function to get wire map with input file (all, good and dead)
+     * function to get wire map with input file (all, bad and dead)
      */
-    TH2F* getHistoPattern(std::vector<double> m_inwires, const std::string& suffix, int& total);
+    TH2F* getHistoPattern(const vector<double>& inwires, const string& suffix, int& total);
 
     /**
      * function to plot the QA (decision) parameters
      */
-    void plotQaPars(std::map<int, std::vector<double>> qapars, double amean, double arms);
+    void plotQaPars(map<int, vector<double>>& qapars);
 
     /**
      * function to draw the stats
@@ -163,18 +167,20 @@ namespace Belle2 {
 
     unsigned int c_nwireCDC; /**< number of wires in CDC */
 
-    bool isMakePlots; /**< produce plots for status */
-    bool isADC; /**< Use adc if(true) else dedx for calibration*/
+    bool m_isMakePlots; /**< produce plots for status */
+    bool m_isADC; /**< Use adc if(true) else dedx for calibration*/
 
     int m_varBins; /**< number of bins for input variable */
     double m_varMin; /**< min range for input variable */
     double m_varMax; /**< max range for input variable */
-    double m_meanThers; /**< mean thershold accepted for good wire */
-    double m_rmsThers; /**< rms thershold accepted for good wire */
-    double m_fracThers; /**< high-frac thershold accepted for good wire */
+    double m_meanThres; /**< mean Threshold accepted for good wire */
+    double m_rmsThres; /**< rms Threshold accepted for good wire */
+    double m_fracThres; /**< high-frac Threshold accepted for good wire */
+    double m_amean; /**< average mean of dedx for all wires */
+    double m_arms; /**< average rms of dedx for all wires */
 
-    std::string m_varName; /**< string to set var name (adc or dedx) */
-    std::string m_suffix; /**< suffix string for naming plots */
+    string m_varName; /**< string to set var name (adc or dedx) */
+    string m_suffix; /**< suffix string for naming plots */
 
     DBObjPtr<CDCDedxBadWires> m_DBBadWires; /**< Badwire DB object */
     DBObjPtr<CDCDedxWireGain> m_DBWireGains; /**< Wiregain DB object */

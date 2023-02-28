@@ -105,7 +105,7 @@ void SPTC2RTConverterModule::createRecoTrack(const SpacePointTrackCand& spacePoi
   // are in the wrong places. This does not hurt at the moment because values values and defaults coincide
   // by chance.
   RecoTrack* newRecoTrack = m_recoTracks.appendNew(position, momentum, charge,
-                                                   m_param_pxdHitsStoreArrayName, m_param_svdHitsStoreArrayName,
+                                                   m_param_pxdHitsStoreArrayName, m_param_svdHitsStoreArrayName, m_param_vtxHitsStoreArrayName,
                                                    "", "", "", m_param_recoHitInformationStoreArrayName);
 
   // Set information not required by constructor

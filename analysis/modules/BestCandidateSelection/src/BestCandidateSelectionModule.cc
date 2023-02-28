@@ -182,6 +182,7 @@ void BestCandidateSelectionModule::event()
     else if (m_overwriteRank)
       p->setExtraInfo(m_outputVariableName, rank);
 
+    m_inputList->addParticle(p);
     previous_val = candidate.first;
 
 

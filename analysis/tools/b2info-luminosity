@@ -126,7 +126,7 @@ def argparser():
     parser.add_argument("--dboffline",
                         dest="dbofflie",
                         action="store",
-                        default="/group/belle2/dataprod/Luminosity/OffLineLuminosity.db",
+                        default="/group/belle2/dataprod/Luminosity/OffLineLuminosity_v2.db",
                         help="DataBase path for OffLine Lumi (for developers)")
     parser.add_argument("--token",
                         dest="token",

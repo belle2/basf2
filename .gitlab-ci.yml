@@ -45,13 +45,13 @@ default:
 workflow:
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-    - if: $CI_PIPELINE_SOURCE == 'push' && ($CI_COMMIT_BRANCH == 'main' || $CI_COMMIT_BRANCH =~ /^release/) && $CI_COMMIT_TITLE =~ /Merge branch.*/
+    - if: $CI_PIPELINE_SOURCE == 'push' && ($CI_COMMIT_BRANCH == 'main' || $CI_COMMIT_BRANCH =~ /^release/ || $CI_COMMIT_BRANCH == 'upgrade') && $CI_COMMIT_TITLE =~ /Merge branch.*/
     - if: $GITLAB_FORCE_RUNNING_PIPELINE == 'yes'
 
 check-librarians:
   stage: check-librarians
   rules:
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == 'main'
   needs: []
   script:
     - echo "stage start time -> $(date +%H:%M:%S)"
@@ -85,7 +85,7 @@ run-tests:
     - b2code-option opt
     - b2setup
     - b2test-units --gtest_output=xml:${BELLE2_LOCAL_DIR}/tests_report/tests-google.xml
-    - b2test-scripts -j $(nproc) --filter "^framework/tests/(?!(foreach.py|sphinx.py))" --xml=${BELLE2_LOCAL_DIR}/tests_report/tests-framework.xml --timeout 1200
+    - b2test-scripts -j $(nproc) --exclude "framework/tests/foreach.py" --xml=${BELLE2_LOCAL_DIR}/tests_report/tests-framework.xml --timeout 1200
     - b2test-scripts -j $(nproc) --filter "^(?!framework/tests/.*)" --xml=${BELLE2_LOCAL_DIR}/tests_report/tests-non-framework.xml --timeout 1200
     - echo "stage stop time -> $(date +%H:%M:%S)"
 

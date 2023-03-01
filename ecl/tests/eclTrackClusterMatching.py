@@ -17,6 +17,9 @@ class CheckTrackClusterMatching(b2.Module):
     """
 
     def event(self):
+        """
+        Load tracks from StoreArray for each event, and perform tests of module
+        """
 
         tracks = Belle2.PyStoreArray("Tracks")
 

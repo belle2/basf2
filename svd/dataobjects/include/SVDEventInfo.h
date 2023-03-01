@@ -12,6 +12,8 @@
 #include <cmath>
 #include <svd/dataobjects/SVDModeByte.h>
 #include <svd/dataobjects/SVDTriggerType.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/dbobjects/HardwareClockSettings.h>
 
 
 namespace Belle2 {
@@ -88,7 +90,7 @@ namespace Belle2 {
      *  and the FTSW (Trigger) reference
      */
     float getSVD2FTSWTimeShift(int firstFrame) const
-    { return 4000. / 509 * (3 - SVDModeByte(m_modeByte).getTriggerBin() + 4 * firstFrame); }
+    { return m_apvClockPeriod / 4 * (3 - SVDModeByte(m_modeByte).getTriggerBin() + 4 * firstFrame); }
 
     /** returns the number of samples:
      *  6, 3 or 1
@@ -108,7 +110,7 @@ namespace Belle2 {
 
         int nTriggerClocks = SVDModeByte(m_modeByte).getTriggerBin() + m_relativeTimeShift;
 
-        return floor(nTriggerClocks / 4) * 16000. / 509.;
+        return floor(nTriggerClocks / 4) * m_apvClockPeriod;
       }
 
       return 0;
@@ -195,8 +197,14 @@ namespace Belle2 {
     int m_relativeTimeShift = 0; /**< relative shift in units of APV-clock/4 between 3- and 6-sample acquired events */
     int m_nAPVsamples = 0; /**< number of acquired samples */
 
+    /** Hardware Clocks*/
+    DBObjPtr<HardwareClockSettings> m_hwClock;
+
+    /** APV clock period*/
+    double m_apvClockPeriod = 1. / m_hwClock->getClockFrequency(Const::EDetector::SVD, "sampling");
+
     /**class def needed by root*/
-    ClassDef(SVDEventInfo, 2);
+    ClassDef(SVDEventInfo, 3);
 
   }; //class
 } // namespace Belle2

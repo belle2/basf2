@@ -164,21 +164,6 @@ namespace Belle2 {
      */
     int getFirstFrame() const { return m_firstFrame; }
 
-    /** Get ID of the time-group.
-     * @return time-group ID
-     */
-    std::vector<int>& getTimeGroupId() { return m_timeGroupId; }
-
-    /** Get time-group parameters.
-     * @return time-group parameters
-     */
-    std::vector<std::tuple<float, float, float>>& getTimeGroupInfo() { return m_timeGroupInfo; }
-
-    /** Get ID of the time-group.
-     * @return time-group ID
-     */
-    const std::vector<int>& getTimeGroupId() const { return m_timeGroupId; }
-
     /** Get cluster quality indicator
     * @return probability that cluster is generated from signal hit.
     */
@@ -188,6 +173,16 @@ namespace Belle2 {
     * @return error in probability that cluster is generated from signal hit.
     */
     double getQualityError() const { return m_qualityIndicatorError; }
+
+    /** Get ID of the time-group.
+     * @return time-group ID
+     */
+    const std::vector<int>& getTimeGroupId() const { return m_timeGroupId; }
+
+    /** Get time-group parameters.
+     * @return time-group parameters
+     */
+    const std::vector<std::tuple<float, float, float>>& getTimeGroupInfo() const { return m_timeGroupInfo; }
 
     /** Set position of the cluster
     *
@@ -221,7 +216,15 @@ namespace Belle2 {
       m_qualityIndicatorError = qualityIndicatorError;
     }
 
+    /** Set ID of the time-group.
+     * @return reference to time-group ID
+     */
+    std::vector<int>& setTimeGroupId() { return m_timeGroupId; }
 
+    /** Set time-group parameters.
+     * @return reference to the time-group parameters
+     */
+    std::vector<std::tuple<float, float, float>>& setTimeGroupInfo() { return m_timeGroupInfo; }
 
     /** Get a string representation of the cluster. */
     std::string print() const

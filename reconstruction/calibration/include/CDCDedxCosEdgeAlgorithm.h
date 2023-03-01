@@ -20,8 +20,6 @@
 
 enum fitstatus {FitOK, FitFailed, LowStats};
 
-using namespace std;
-
 namespace Belle2 {
 
   /**
@@ -94,22 +92,22 @@ namespace Belle2 {
     /**
     * function to store new payload after full calibration
     */
-    void createPayload(vector<vector<double>>& vfinalconst);
+    void createPayload(std::vector<std::vector<double>>& vfinalconst);
 
     /**
     * funtion to draw dedx histograms for each bin
     */
-    void plotHist(vector<TH1D*>& hdedx, map<int, vector<double>>& fPars, string type);
+    void plotHist(std::vector<TH1D*>& hdedx, std::map<int, std::vector<double>>& fPars, std::string type);
 
     /**
     * function to draw the fit parameters (relative gains and resolutions)
     */
-    void plotFitPars(map<int, vector<double>>& fPars_Neg, map<int, vector<double>>& fPars_Pos);
+    void plotFitPars(std::map<int, std::vector<double>>& fPars_Neg, std::map<int, std::vector<double>>& fPars_Pos);
 
     /**
     * function to draw the final calibration constants and comparison with old constants
     */
-    void plotConstants(vector<vector<double>>& vfinalconst);
+    void plotConstants(std::vector<std::vector<double>>& vfinalconst);
 
     /**
      * function to draw the stats plots
@@ -165,7 +163,7 @@ namespace Belle2 {
     double m_dedxMin; /**< min dedx range */
     double m_dedxMax; /**< max dedx range */
 
-    string m_suffix; /**< suffix for better plot naming */
+    std::string m_suffix; /**< suffix for better plot naming */
 
     DBObjPtr<CDCDedxCosineEdge> m_DBCosineCor; /**< CoseEdge correction DB object */
   };

@@ -14,6 +14,7 @@
 #include <reconstruction/calibration/CDCDedxCosEdgeAlgorithm.h>
 
 using namespace Belle2;
+using namespace std;
 
 //-----------------------------------------------------------------
 //                 Implementation

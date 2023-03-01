@@ -164,6 +164,11 @@ void SVDPerformanceTTreeModule::initialize()
 
 }
 
+void SVDPerformanceTTreeModule::beginRun()
+{
+  /** APV clock period*/
+  m_apvClockPeriod = 1. / m_hwClock->getClockFrequency(Const::EDetector::SVD, "sampling");
+}
 void SVDPerformanceTTreeModule::event()
 {
 

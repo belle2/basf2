@@ -33,6 +33,8 @@ namespace Belle2 {
     void terminate() override;
     /** Compute the variables and fill the tree*/
     void event() override;
+    /** Compute the APV clock period*/
+    void beginRun() override;
 
   private:
 
@@ -41,7 +43,7 @@ namespace Belle2 {
     /** Hardware Clocks*/
     DBObjPtr<HardwareClockSettings> m_hwClock;
     /** APV clock period*/
-    double m_apvClockPeriod = 1. / m_hwClock->getClockFrequency(Const::EDetector::SVD, "sampling");
+    double m_apvClockPeriod = std::numeric_limits<double>::quiet_NaN();
 
     std::string m_rootFileName = "";   /**< root file name */
     TFile* m_rootFilePtr = nullptr; /**< pointer at root file used for storing histograms */

@@ -265,7 +265,6 @@ namespace Belle2 {
       // get reconstructed photons associated with track
       const std::vector<ARICHPhoton>& photons = arichTrack.getPhotons();
       m_arich.nRec = photons.size();
-      int nphot = 0;
       for (auto it = photons.begin(); it != photons.end(); ++it) {
         ARICHPhoton iph = *it;
         if (iph.getHitID() < arichHits.getEntries()) {
@@ -276,7 +275,6 @@ namespace Belle2 {
           iph.setHitID(chid);
         }
         m_arich.photons.push_back(iph);
-        nphot++;
       }
 
       TVector3 recPos = arichTrack.getPosition();

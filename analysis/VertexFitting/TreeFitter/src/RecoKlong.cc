@@ -23,7 +23,7 @@ namespace TreeFitter {
     RecoParticle(particle, mother),
     m_dim(3),
     m_init(false),
-    m_useEnergy(true),
+    m_useEnergy(false),
     m_clusterPars(),
     m_covariance()
   {
@@ -42,7 +42,7 @@ namespace TreeFitter {
     const double distanceToMother = vertexToCluster.norm();
     const double energy =  m_clusterPars(3);
     const double pdgMass = particle()->getPDGMass();
-    const double absMom = -1 * std::sqrt(energy * energy - pdgMass * pdgMass);
+    const double absMom = std::sqrt(energy * energy - pdgMass * pdgMass);
 
     const int momindex = momIndex();
 
@@ -50,8 +50,6 @@ namespace TreeFitter {
       //px = |p| dx/|dx|
       fitparams.getStateVector()(momindex + i) = absMom * vertexToCluster(i) / distanceToMother;
     }
-
-    fitparams.getStateVector()(momindex + 3) = energy ;
 
     return ErrCode(ErrCode::Status::success);
   }
@@ -103,8 +101,8 @@ namespace TreeFitter {
     m_clusterPars(0) = cluster_pos.X();
     m_clusterPars(1) = cluster_pos.Y();
     m_clusterPars(2) = cluster_pos.Z();
-    m_clusterPars(3) = sqrt(particle()->getPDGMass() * particle()->getPDGMass() + cluster->getMomentumMag() *
-                            cluster->getMomentumMag());
+    m_clusterPars(3) = sqrt(particle()->getPDGMass() * particle()->getPDGMass() +
+                            cluster->getMomentumMag() * cluster->getMomentumMag());
 
     auto p_vec = particle()->getMomentum();
     // find highest momentum, eliminate dim with highest mom
@@ -136,7 +134,8 @@ namespace TreeFitter {
     // p_vec[m_i1] must not be 0
     const double elim = (m_clusterPars[m_i1] - x_vertex[m_i1]) / p_vec[m_i1];
     const double mom = p_vec.norm();
-    const double energy = fitparams.getStateVector()(momindex + 3);
+    const double pdgMass = particle()->getPDGMass();
+    const double energy = std::sqrt(mom * mom + pdgMass * pdgMass);
 
     // r'
     Eigen::Matrix<double, 3, 1> residual3 = Eigen::Matrix<double, 3, 1>::Zero(3, 1);
@@ -179,7 +178,6 @@ namespace TreeFitter {
     p.getH()(2, momindex + m_i1) = -1. * p_vec[m_i1] / mom;
     p.getH()(2, momindex + m_i2) = -1. * p_vec[m_i2] / mom;
     p.getH()(2, momindex + m_i3) = -1. * p_vec[m_i3] / mom;
-    p.getH()(2, momindex + 3) = -1;
 
     return ErrCode(ErrCode::Status::success);
   }

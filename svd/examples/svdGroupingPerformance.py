@@ -43,15 +43,15 @@ parser.add_argument("--moduleName", default="SVDGroupingPerformance",
 parser.add_argument("--isMC", action="store_true",
                     help="Use Simulation")
 parser.add_argument("--isRawTime", action="store_true",
-                    help="Raw SVD Time")
+                    help="Compute Raw SVD Time")
 parser.add_argument("--doSVDGrouping", action="store_true",
-                    help="Assign Groups to SVD Clusters")
-parser.add_argument("--exponentialSort", type=float, default=30,
-                    help="Select only one group")
-parser.add_argument("--signalGroupSelection", type=int, default=20,
-                    help="Select only few groups")
+                    help="Perform grouping of SVD Clusters")
+parser.add_argument("--signalLifetime", type=float, default=30,
+                    help="Lifetime of Signal when computing exponential-weigth for sorting signal groups")
+parser.add_argument("--numberOfSignalGroups", type=int, default=20,
+                    help="Select only few signal groups")
 parser.add_argument("--formSuperGroup", action="store_true",
-                    help="form super group using selected")
+                    help="Assign groupId 0 to every signal groups")
 parser.add_argument("--useSVDGroupInfo", action="store_true",
                     help="Use SVD Grouping info in SVDSpacePointCreator")
 parser.add_argument("--CoG3TimeCalibration_bucket36", action="store_true",
@@ -81,7 +81,7 @@ if args.isRawTime:
     outputFileTag += "_RawTime"
 if args.doSVDGrouping:
     outputFileTag += "_Grouping"
-    outputFileTag += "_expoSort" + str(int(args.exponentialSort))
+    outputFileTag += "_sigLifeTime" + str(int(args.signalLifetime))
     outputFileTag += "_Signal" + str(int(args.signalGroupSelection))
     if args.formSuperGroup:
         outputFileTag += "_SuperGroup"
@@ -705,13 +705,13 @@ for moda in main.modules():
         if args.doSVDGrouping:
             moda.param('tRangeLow',  minTime)
             moda.param('tRangeHigh', maxTime)
-            moda.param("expSignalLoc",    sigLoc)
-            moda.param('signalRangeLow',  sigMin)
-            moda.param('signalRangeHigh', sigMax)
+            moda.param("expectedSignalTimeCenter",    sigLoc)
+            moda.param('expectedSignalTimeMin',  sigMin)
+            moda.param('expectedSignalTimeMax', sigMax)
             moda.param("rebinningFactor", 2)
-            moda.param("signalGroupSelection", args.signalGroupSelection)
+            moda.param("numberOfSignalGroups", args.numberOfSignalGroups)
             moda.param("formSuperGroup", args.formSuperGroup)
-            moda.param("exponentialSort", args.exponentialSort)
+            moda.param("signalLifetime", args.exponentialSort)
         else:
             moda.param("rebinningFactor", 0)
     if moda.name() == 'SVDSpacePointCreator':

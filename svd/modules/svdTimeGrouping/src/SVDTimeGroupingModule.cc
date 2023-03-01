@@ -29,7 +29,7 @@ double mygaus(const double* x, const double* par)
 SVDTimeGroupingModule::SVDTimeGroupingModule() :
   Module()
 {
-  setDescription("Imports Clusters of the SVD detector and Assign time-group Id.");
+  setDescription("Assigns the time-group Id to SVD clusters.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   // 1. Collections.
@@ -37,57 +37,57 @@ SVDTimeGroupingModule::SVDTimeGroupingModule() :
            "SVDCluster collection name", string(""));
 
   // 2. Fill time Histogram:
-  addParam("tRangeLow", m_tRangeLow, "This sets the x- range of histogram in ns.",
+  addParam("tRangeLow", m_tRangeLow, "This sets the x- range of histogram [ns].",
            double(-160.));
-  addParam("tRangeHigh", m_tRangeHigh, "This sets the x+ range of histogram in ns.",
+  addParam("tRangeHigh", m_tRangeHigh, "This sets the x+ range of histogram [ns].",
            double(160.));
   addParam("rebinningFactor", m_rebinningFactor,
-           "Fine divisions of histogram.",
+           "Time bin width is 1/rebinningFactor ns. Disables the module if zero",
            int(2));
   addParam("fillSigmaN", m_fillSigmaN,
-           "Fill cluster times upto N sigma.",
+           "Number of Gaussian sigmas (= hardcoded resolutions) used to fill the time histogram for each cluster.",
            double(3.));
 
   // 3. Search peaks:
   addParam("minSigma", m_minSigma,
-           "Lower limit of cluster time sigma for fit.",
+           "Lower limit of cluster time sigma for the fit for the peak-search [ns].",
            double(1.));
   addParam("maxSigma", m_maxSigma,
-           "Upper limit of cluster time sigma for fit.",
+           "Upper limit of cluster time sigma for the fit for the peak-search [ns].",
            double(15.));
-  addParam("timeSpread", m_timeSpread,
-           "Time range for the fit.",
+  addParam("fitRangeHalfWidth", m_fitRangeHalfWidth,
+           "half width of the range in which the fit for the peak-search is performed [ns].",
            double(5.));
   addParam("removeSigmaN", m_removeSigmaN,
            "Evaluate and remove gauss upto N sigma.",
            double(5.));
   addParam("fracThreshold", m_fracThreshold,
-           "Do not fit if peak falls below this threshold.",
+           "Minimum fraction of candidates in a peak considered for fitting for the peak-search.",
            double(0.05));
   addParam("maxGroups", m_maxGroups,
-           "Maximum groups to be accepted.",
+           "Maximum number of groups to be accepted.",
            int(20));
 
   // 4. Sort groups:
-  addParam("expSignalLoc", m_expSignalLoc,
-           "Expected location of signal.",
+  addParam("expectedSignalTimeCenter", m_expectedSignalTimeCenter,
+           "Expected time of the signal [ns].",
            double(0.));
-  addParam("signalRangeLow", m_signalRangeLow,
-           "Expected low range of signal hits.",
+  addParam("expectedSignalTimeMin", m_expectedSignalTimeMin,
+           "Expected low range of signal hits [ns].",
            double(-50.));
-  addParam("signalRangeHigh", m_signalRangeHigh,
-           "Expected high range of signal hits.",
+  addParam("expectedSignalTimeMax", m_expectedSignalTimeMax,
+           "Expected high range of signal hits [ns].",
            double(50.));
-  addParam("exponentialSort", m_exponentialSort,
-           "Group prominence is weighted with exponential weight.",
+  addParam("signalLifetime", m_signalLifetime,
+           "Group prominence is weighted with exponential weight with a lifetime defined by this parameter [ns].",
            double(30.));
 
   // 5. Signal group selection:
-  addParam("signalGroupSelection", m_signalGroupSelection,
-           "Choose one group near expected signal location.",
+  addParam("numberOfSignalGroups", m_numberOfSignalGroups,
+           "Number of groups expected to contain the signal clusters.",
            int(1));
   addParam("formSuperGroup", m_formSuperGroup,
-           "Form a super-group.",
+           "Form a single super-group.",
            bool(false));
   addParam("acceptSigmaN", m_acceptSigmaN,
            "Accept clusters upto N sigma.",
@@ -110,7 +110,7 @@ void SVDTimeGroupingModule::initialize()
   // prepare all store:
   m_svdClusters.isRequired(m_svdClustersName);
 
-  if (m_signalGroupSelection != m_maxGroups) m_includeOutOfRangeClusters = false;
+  if (m_numberOfSignalGroups != m_maxGroups) m_includeOutOfRangeClusters = false;
 
   if (m_rebinningFactor <= 0) B2WARNING("Module is ineffective.");
   if (m_tRangeHigh - m_tRangeLow < 10.) B2FATAL("tRange should not be less than 10 (hard-coded).");
@@ -170,16 +170,17 @@ void SVDTimeGroupingModule::event()
     int maxBin       = h_clsTime.GetMaximumBin();
     double maxBinPos = h_clsTime.GetBinCenter(maxBin);
     double maxBinCnt = h_clsTime.GetBinContent(maxBin);
-    if (maxPeak == 0 && maxBinPos > m_signalRangeLow && maxBinPos < m_signalRangeHigh)
+    if (maxPeak == 0 && maxBinPos > m_expectedSignalTimeMin && maxBinPos < m_expectedSignalTimeMax)
       maxPeak = maxBinCnt;
     if (maxPeak != 0 && maxBinCnt < maxPeak * m_fracThreshold) break;
 
     TF1 ngaus("ngaus", mygaus, tRangeLow, tRangeHigh, 3);
-    double maxPar0 = maxBinCnt * std::sqrt(2.*TMath::Pi()) * m_timeSpread;
+    double maxPar0 = maxBinCnt * std::sqrt(2.*TMath::Pi()) * m_fitRangeHalfWidth;
     ngaus.SetParameter(0, maxBinCnt); ngaus.SetParLimits(0, maxPar0 * 0.01, maxPar0 * 2.);
-    ngaus.SetParameter(1, maxBinPos); ngaus.SetParLimits(1, maxBinPos - m_timeSpread * 0.2, maxBinPos + m_timeSpread * 0.2);
-    ngaus.SetParameter(2, m_timeSpread); ngaus.SetParLimits(2, m_minSigma, m_maxSigma);
-    int status = h_clsTime.Fit("ngaus", "NQ0", "", maxBinPos - m_timeSpread, maxBinPos + m_timeSpread);
+    ngaus.SetParameter(1, maxBinPos);
+    ngaus.SetParLimits(1, maxBinPos - m_fitRangeHalfWidth * 0.2, maxBinPos + m_fitRangeHalfWidth * 0.2);
+    ngaus.SetParameter(2, m_fitRangeHalfWidth); ngaus.SetParLimits(2, m_minSigma, m_maxSigma);
+    int status = h_clsTime.Fit("ngaus", "NQ0", "", maxBinPos - m_fitRangeHalfWidth, maxBinPos + m_fitRangeHalfWidth);
     if (!status) {
       double pars[3] = {ngaus.GetParameter(0), ngaus.GetParameter(1), std::fabs(ngaus.GetParameter(2))};
       if (pars[2] <= m_minSigma + 0.01) break;
@@ -217,7 +218,7 @@ void SVDTimeGroupingModule::event()
     float keynorm = std::get<0>(key);
     float keymean = std::get<1>(key);
     bool isKeySignal = true;
-    if (keynorm != 0. && (keymean < m_signalRangeLow || keymean > m_signalRangeHigh)) isKeySignal = false;
+    if (keynorm != 0. && (keymean < m_expectedSignalTimeMin || keymean > m_expectedSignalTimeMax)) isKeySignal = false;
     if (isKeySignal) continue;
     int kj = ij + 1;
     while (1) {
@@ -225,7 +226,7 @@ void SVDTimeGroupingModule::event()
       float grnorm = std::get<0>(groupInfo[kj]);
       float grmean = std::get<1>(groupInfo[kj]);
       bool isGrSignal = true;
-      if (grnorm != 0. && (grmean < m_signalRangeLow || grmean > m_signalRangeHigh)) isGrSignal = false;
+      if (grnorm != 0. && (grmean < m_expectedSignalTimeMin || grmean > m_expectedSignalTimeMax)) isGrSignal = false;
       if (!isGrSignal && (grnorm > keynorm)) break;
       groupInfo[kj - 1] = groupInfo[kj];
       kj++;
@@ -235,22 +236,22 @@ void SVDTimeGroupingModule::event()
 
   // sorting signal groups based on expo-weight
   // this decreases chance of near-signal bkg groups getting picked
-  if (m_exponentialSort > 0.)
+  if (m_signalLifetime > 0.)
     for (int ij = 1; ij < int(groupInfo.size()); ij++) {
       key = groupInfo[ij];
       float keynorm = std::get<0>(key);
       if (keynorm <= 0) break;
       float keymean = std::get<1>(key);
       bool isKeySignal = true;
-      if (keynorm > 0 && (keymean < m_signalRangeLow || keymean > m_signalRangeHigh)) isKeySignal = false;
+      if (keynorm > 0 && (keymean < m_expectedSignalTimeMin || keymean > m_expectedSignalTimeMax)) isKeySignal = false;
       if (!isKeySignal) break;
-      float keyWt = keynorm * TMath::Exp(-std::fabs(keymean - m_expSignalLoc) / m_exponentialSort);
+      float keyWt = keynorm * TMath::Exp(-std::fabs(keymean - m_expectedSignalTimeCenter) / m_signalLifetime);
       int kj = ij - 1;
       while (1) {
         if (kj < 0) break;
         float grnorm = std::get<0>(groupInfo[kj]);
         float grmean = std::get<1>(groupInfo[kj]);
-        float grWt = grnorm * TMath::Exp(-std::fabs(grmean - m_expSignalLoc) / m_exponentialSort);
+        float grWt = grnorm * TMath::Exp(-std::fabs(grmean - m_expectedSignalTimeCenter) / m_signalLifetime);
         if (grWt > keyWt) break;
         groupInfo[kj + 1] = groupInfo[kj];
         kj--;
@@ -258,7 +259,7 @@ void SVDTimeGroupingModule::event()
       groupInfo[kj + 1] = key;
     }
 
-  if (m_signalGroupSelection < int(groupInfo.size())) groupInfo.resize(m_signalGroupSelection);
+  if (m_numberOfSignalGroups < int(groupInfo.size())) groupInfo.resize(m_numberOfSignalGroups);
 
   // make all clusters groupless if no groups are found
   if (int(groupInfo.size()) == 0)

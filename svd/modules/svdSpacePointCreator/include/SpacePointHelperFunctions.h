@@ -112,11 +112,16 @@ namespace Belle2 {
         if (useSVDGroupInfo) {
           const std::vector<int>& uTimeGroupId = uCluster->getTimeGroupId();
           const std::vector<int>& vTimeGroupId = vCluster->getTimeGroupId();
-          if (int(uTimeGroupId.size()) && int(vTimeGroupId.size())) {
+
+          if (int(uTimeGroupId.size()) && int(vTimeGroupId.size())) { // indirect check if the clusterizer module is disabled
             bool isContinue = true;
-            for (auto& uitem : uTimeGroupId)
+            for (auto& uitem : uTimeGroupId) {
+              if (uitem < 0) continue;
               for (auto& vitem : vTimeGroupId)
-                if (uitem >= 0 && vitem >= 0 && uitem == vitem) { isContinue = false; break; }
+                if (vitem >= 0 && uitem == vitem) { isContinue = false; break; }
+              if (!isContinue) break;
+            }
+
             if (isContinue) {
               B2DEBUG(1, "Cluster combination rejected due to different time-group Id.");
               continue;

@@ -56,7 +56,7 @@ SVDSpacePointCreatorModule::SVDSpacePointCreatorModule() :
            unsigned(m_numMaxSpacePoints));
 
   addParam("useSVDGroupInfo", m_useSVDGroupInfo,
-           "Use SVD group info to reject combinations",
+           "Use SVD group info to reject combinations from clusters belonging to different groups",
            bool(false));
 
 }

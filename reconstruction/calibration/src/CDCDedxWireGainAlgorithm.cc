@@ -10,7 +10,7 @@
 
 using namespace Belle2;
 using namespace CDC;
-
+using namespace std;
 
 //-----------------------------------------------------------------
 //                 Implementation

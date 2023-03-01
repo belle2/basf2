@@ -31,8 +31,6 @@
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/geometry/CDCGeometryParConstants.h>
 
-using namespace std;
-
 const unsigned int c_nwireCDC = c_nSenseWires;
 
 namespace Belle2 {
@@ -77,7 +75,7 @@ namespace Belle2 {
     /**
     * function to finally store new payload after full calibration
     */
-    void createPayload(vector<double>& vdedx_tmeans);
+    void createPayload(std::vector<double>& vdedx_tmeans);
 
     /**
     * function to get bins of trunction from histogram
@@ -92,27 +90,27 @@ namespace Belle2 {
     /**
     * function to draw dE/dx for inner/outer layer
     */
-    void plotLayerDist(array<TH1D*, 2> hdedxL);
+    void plotLayerDist(std::array<TH1D*, 2> hdedxL);
 
     /**
     * function to draw dE/dx histograms for each wire
     */
-    void plotWireDist(array<TH1D*, c_nwireCDC> hist, vector<double>& vrel_mean);
+    void plotWireDist(std::array<TH1D*, c_nwireCDC> hist, std::vector<double>& vrel_mean);
 
     /**
     * function to draw wire gains
     */
-    void plotWireGain(vector<double>& vdedx_means, vector<double>& vrel_mean, double layeravg);
+    void plotWireGain(std::vector<double>& vdedx_means, std::vector<double>& vrel_mean, double layeravg);
 
     /**
     * function to draw layer gains
     */
-    void plotLayerGain(array<double, c_maxNSenseLayers>& layermean, double layeravg);
+    void plotLayerGain(std::array<double, c_maxNSenseLayers>& layermean, double layeravg);
 
     /**
     * function to draw WG per layer
     */
-    void plotWGPerLayer(vector<double>& vdedx_means, array<double, c_maxNSenseLayers>& layermean, double layeravg);
+    void plotWGPerLayer(std::vector<double>& vdedx_means, std::array<double, c_maxNSenseLayers>& layermean, double layeravg);
 
     /**
     * function to draw statstics
@@ -146,7 +144,7 @@ namespace Belle2 {
     double m_truncMin; /**< min trunc range for mean */
     double m_truncMax; /**< max trunc range for mean */
 
-    string m_suffix; /**< suffix string to seperate plots */
+    std::string m_suffix; /**< suffix string to seperate plots */
 
     DBObjPtr<CDCDedxWireGain> m_DBWireGains; /**< Wire gain DB object */
     DBObjPtr<CDCDedxBadWires> m_DBBadWires; /**< Bad wire DB object */

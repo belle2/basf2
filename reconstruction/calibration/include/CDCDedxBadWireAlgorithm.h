@@ -35,7 +35,6 @@
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/geometry/CDCGeometryParConstants.h>
 
-using namespace std;
 
 namespace Belle2 {
 
@@ -105,7 +104,7 @@ namespace Belle2 {
     /**
       * function to draw per wire plots
       */
-    void plotWireDist(const vector<double>& inwires, map<int, vector<double>>& vhitvar);
+    void plotWireDist(const std::vector<double>& inwires, std::map<int, std::vector<double>>& vhitvar);
 
     /**
      * function to print canvas
@@ -115,17 +114,17 @@ namespace Belle2 {
     /**
      * function to plot wire status map (all, bad and dead)
      */
-    void plotBadWireMap(const vector<double>& vbadwires, const vector<double>& vdeadwires);
+    void plotBadWireMap(const std::vector<double>& vbadwires, const std::vector<double>& vdeadwires);
 
     /**
      * function to get wire map with input file (all, bad and dead)
      */
-    TH2F* getHistoPattern(const vector<double>& inwires, const string& suffix, int& total);
+    TH2F* getHistoPattern(const std::vector<double>& inwires, const std::string& suffix, int& total);
 
     /**
      * function to plot the QA (decision) parameters
      */
-    void plotQaPars(map<int, vector<double>>& qapars);
+    void plotQaPars(std::map<int, std::vector<double>>& qapars);
 
     /**
      * function to draw the stats
@@ -179,8 +178,8 @@ namespace Belle2 {
     double m_amean; /**< average mean of dedx for all wires */
     double m_arms; /**< average rms of dedx for all wires */
 
-    string m_varName; /**< string to set var name (adc or dedx) */
-    string m_suffix; /**< suffix string for naming plots */
+    std::string m_varName; /**< std::string to set var name (adc or dedx) */
+    std::string m_suffix; /**< suffix std::string for naming plots */
 
     DBObjPtr<CDCDedxBadWires> m_DBBadWires; /**< Badwire DB object */
     DBObjPtr<CDCDedxWireGain> m_DBWireGains; /**< Wiregain DB object */

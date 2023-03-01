@@ -32,7 +32,6 @@ REG_MODULE(ParticleWeighting);
 //-----------------------------------------------------------------
 
 ParticleWeightingModule::ParticleWeightingModule() : Module()
-
 {
   setDescription("Append weights from the database into the extraInfo of Particles.");
   addParam("tableName", m_tableName, "ID of table used for reweighing");
@@ -60,7 +59,6 @@ WeightInfo ParticleWeightingModule::getInfo(const Particle* p)
 
 void ParticleWeightingModule::initialize()
 {
-  m_particles.isRequired();
   m_inputList.isRequired(m_inputListName);
   m_ParticleWeightingLookUpTable = std::make_unique<DBObjPtr<ParticleWeightingLookUpTable>>(m_tableName);
 }
@@ -72,14 +70,10 @@ void ParticleWeightingModule::event()
     B2WARNING("Input list " << m_inputList.getName() << " was not created?");
     return;
   }
-  const unsigned int numParticles = m_inputList->getListSize();
-  for (unsigned int i = 0; i < numParticles; i++) {
-    const Particle* ppointer = m_inputList->getParticle(i);
-    double index = ppointer->getArrayIndex();
-    Particle* p = m_particles[index];
-    WeightInfo info = getInfo(p);
+  for (auto& p : *m_inputList) {
+    WeightInfo info = getInfo(&p);
     for (const auto& entry : info) {
-      p->addExtraInfo(m_tableName + "_" + entry.first, entry.second);
+      p.addExtraInfo(m_tableName + "_" + entry.first, entry.second);
     }
   }
 }

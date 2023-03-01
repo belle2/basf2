@@ -29,7 +29,6 @@ namespace Belle2 {
     std::string m_inputListName; /**< name of input particle list. */
     StoreObjPtr<ParticleList> m_inputList; /**< input particle list */
     std::unique_ptr<DBObjPtr<ParticleWeightingLookUpTable>> m_ParticleWeightingLookUpTable; /**< Pointer to the table in DB */
-    StoreArray<Particle> m_particles; /**< StoreArray of Particles */
 
   public:
 

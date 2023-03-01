@@ -40,7 +40,7 @@ class CheckTrackClusterMatching(b2.Module):
                         "ECLClusters", "AngularDistance") is not None, "Relation set with AngularDistance method does not exist"
 
 
-main.add_module('EventInfoSetter', evtNumList=[1000])
+main.add_module('EventInfoSetter', evtNumList=[10])
 
 main.add_module('ParticleGun',
                 pdgCodes=[11],

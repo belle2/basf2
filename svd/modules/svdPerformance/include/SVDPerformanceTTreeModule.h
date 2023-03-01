@@ -10,7 +10,9 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/database/DBObjPtr.h>
 #include <framework/dataobjects/EventT0.h>
+#include <framework/dbobjects/HardwareClockSettings.h>
 
 #include <TTree.h>
 #include <TFile.h>
@@ -35,6 +37,11 @@ namespace Belle2 {
   private:
 
     StoreObjPtr<EventT0> m_EventT0; /**< event T0 */
+
+    /** Hardware Clocks*/
+    DBObjPtr<HardwareClockSettings> m_hwClock;
+    /** APV clock period*/
+    double m_apvClockPeriod = 1. / m_hwClock->getClockFrequency(Const::EDetector::SVD, "sampling");
 
     std::string m_rootFileName = "";   /**< root file name */
     TFile* m_rootFilePtr = nullptr; /**< pointer at root file used for storing histograms */

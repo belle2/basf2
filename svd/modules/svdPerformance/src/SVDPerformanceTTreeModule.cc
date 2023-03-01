@@ -330,10 +330,10 @@ void SVDPerformanceTTreeModule::event()
               m_svdStripPosition.push_back(misalignedStripPos - svd_1->getPosition() + m_svdClPos);
             }
 
-          m_cdcEventT0_3SRF = m_cdcEventT0 - 4000 / 509.*(3 - m_svdTB + 4 * m_svdFF);
-          m_cdcEventT0_6SRF = m_cdcEventT0_3SRF + 16000 / 509.* m_svdFF;
-          m_svdClTime_3SRF = m_svdClTime - 4000 / 509.*(3 - m_svdTB + 4 * m_svdFF);
-          m_svdClTime_6SRF = m_svdClTime_3SRF + 16000 / 509.* m_svdFF;
+          m_cdcEventT0_3SRF = eventinfo->getTimeInSVDReference(m_cdcEventT0, m_svdFF);
+          m_cdcEventT0_6SRF = m_cdcEventT0_3SRF + m_apvClockPeriod * m_svdFF;
+          m_svdClTime_3SRF = eventinfo->getTimeInSVDReference(m_svdClTime, m_svdFF);
+          m_svdClTime_6SRF = m_svdClTime_3SRF + m_apvClockPeriod * m_svdFF;
 
           m_t_U->Fill();
 
@@ -405,10 +405,11 @@ void SVDPerformanceTTreeModule::event()
               m_svdStripPosition.push_back(misalignedStripPos - svd_1->getPosition() + m_svdClPos);
             }
 
-          m_cdcEventT0_3SRF = m_cdcEventT0 - 4000 / 509.*(3 - m_svdTB + 4 * m_svdFF);
-          m_cdcEventT0_6SRF = m_cdcEventT0_3SRF + 16000 / 509.* m_svdFF;
-          m_svdClTime_3SRF = m_svdClTime - 4000 / 509.*(3 - m_svdTB + 4 * m_svdFF);
-          m_svdClTime_6SRF = m_svdClTime_3SRF + 16000 / 509.* m_svdFF;
+          m_cdcEventT0_3SRF = eventinfo->getTimeInSVDReference(m_cdcEventT0, m_svdFF);
+          m_cdcEventT0_6SRF = m_cdcEventT0_3SRF + m_apvClockPeriod * m_svdFF;
+          m_svdClTime_3SRF = eventinfo->getTimeInSVDReference(m_svdClTime, m_svdFF);
+          m_svdClTime_6SRF = m_svdClTime_3SRF + m_apvClockPeriod * m_svdFF;
+
 
           m_t_V->Fill();
         }

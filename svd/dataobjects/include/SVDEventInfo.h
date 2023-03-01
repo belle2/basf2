@@ -84,11 +84,8 @@ namespace Belle2 {
     SVDModeByte getModeByte() const
     { return m_modeByte; }
 
-    /** returns the time shift between SVD reference
-     *  and FTSW (Trigger) reference:
-     *  time in FTSW reference = time in SVD reference + time shift
-     *  for clusters, additional information of the first frame is
-     *  used to improve the precision
+    /** returns the time shift between SVD reference (t = 0 at the FF)
+     *  and the FTSW (Trigger) reference
      */
     float getSVD2FTSWTimeShift(int firstFrame) const
     { return 4000. / 509 * (3 - SVDModeByte(m_modeByte).getTriggerBin() + 4 * firstFrame); }
@@ -127,7 +124,7 @@ namespace Belle2 {
     }
 
     /** getTimeInFTSWReference
-     * it takes the cluster time in SVD reference (in either 3- or 6-sample DAQ mode)
+     * it takes the cluster time in SVD reference (t = 0 at FF, in either 3- or 6-sample DAQ mode)
      * and the firstFrame and provides the time in the FTWS reference.
      * DO NOT USE WITH EventT0!
      * In the SVD reference t=0 is the time of the first sample, regardless if the event is acquired in 3- or 6-sample DAQ mode
@@ -140,7 +137,7 @@ namespace Belle2 {
 
     /** getTimeInSVDReference
      * it takes the cluster time in FTSW reference and provides
-     * the time in the SVD reference for that event.
+     * the time in the SVD reference (t = 0 at FF) for that event.
      * If used with EventT0, it returns EventT0 synchronized to the SVD reference.
      * In the SVD reference t=0 is the time of the first sample, regardless if the event is acquired in 3- or 6-sample DAQ mode
      */

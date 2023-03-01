@@ -180,7 +180,7 @@ namespace Belle2 {
     const std::vector<int>& getTimeGroupId() const { return m_timeGroupId; }
 
     /** Get time-group parameters.
-     * @return time-group parameters
+     * @return time-group parameters (integral, center, sigma)
      */
     const std::vector<std::tuple<float, float, float>>& getTimeGroupInfo() const { return m_timeGroupInfo; }
 
@@ -222,7 +222,7 @@ namespace Belle2 {
     std::vector<int>& setTimeGroupId() { return m_timeGroupId; }
 
     /** Set time-group parameters.
-     * @return reference to the time-group parameters
+     * @return reference to the time-group parameters (integral, center, sigma)
      */
     std::vector<std::tuple<float, float, float>>& setTimeGroupInfo() { return m_timeGroupInfo; }
 
@@ -255,7 +255,8 @@ namespace Belle2 {
     float m_clsChi2;           /**< Chi2 for time/amplitude fit */
     int m_firstFrame;           /**< firstFrame computed with the MaxSum algorithm */
     std::vector<int> m_timeGroupId;    /**< Grouping of clusters in time */
-    std::vector<std::tuple<float, float, float>> m_timeGroupInfo; /**< TimeGroup Gaussian Parameters */
+    std::vector<std::tuple<float, float, float>> m_timeGroupInfo; /**< TimeGroup Gaussian Parameters,
+                   (integral, center, sigma) */
     double m_qualityIndicator = {0.};  /**< Probability of signal cluster */
     double m_qualityIndicatorError = {0.};  /**< Error associated with probability calcualtion */
 

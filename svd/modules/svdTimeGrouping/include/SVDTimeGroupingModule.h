@@ -54,6 +54,9 @@ namespace Belle2 {
      */
     StoreArray<SVDCluster> m_svdClusters;
 
+    bool   m_useClusterRawTime  = false; /**< Prepare module to work in raw-time if this
+      parameter is set. */
+
     double m_tRangeLow          = -160.; /**< Expected low range of time histogram [ns]. */
     double m_tRangeHigh         =  160.; /**< Expected high range of time histogram [ns]. */
     int    m_rebinningFactor    =   2; /**< Time bin width is 1/m_rebinningFactor ns. Also disables
@@ -67,8 +70,8 @@ namespace Belle2 {
     double m_fitRangeHalfWidth  = 5.; /**< Half width of the range in which the fit for the
            peak-search is performed [ns]. */
     double m_removeSigmaN       = 5.; /**< Remove upto this sigma of fitted gaus from histogram. */
-    double m_fracThreshold      = 0.05; /**< Minimum fraction of candidates in a peak considered
-             for fitting for the peak-search. */
+    double m_fracThreshold      = 0.05; /**< Minimum fraction of candidates in a peak (wrt to the
+             highest peak) considered for fitting in the peak-search. */
     int    m_maxGroups          = 20; /**< maximum number of groups to be accepted. */
     double m_expectedSignalTimeCenter =   0; /**< Expected time of the signal [ns]. */
     double m_expectedSignalTimeMin    = -50; /**< Expected low range of signal hits [ns]. */
@@ -77,12 +80,13 @@ namespace Belle2 {
             with a lifetime defined by this parameter [ns]. */
     int    m_numberOfSignalGroups = 1; /**< Number of groups expected to contain the signal
             clusters. */
-    bool   m_formSuperGroup     = false; /**< Form a single super-group. */
+    bool   m_formSigleSignalGroup = false; /**< Assign groupID = 0 to all clusters belonging to
+                the signal groups. */
     double m_acceptSigmaN       = 5.;    /**< Clusters are tagged within this of fitted group. */
     bool   m_writeGroupInfo     = true;  /**< Write group info in SVDCluster, otherwise kept empty. */
     bool   m_includeOutOfRangeClusters = true; /**< Assign groups to under and overflow. */
 
-    /*! cls-time resolution -> 0: V, 1: U */
+    /*! cls-time resolution based on clsSize -> 0: V, 1: U */
     std::vector<float> m_clsSizeVsSigma[2] = {
       {3.49898, 2.94008, 3.46766, 5.3746, 6.68848, 7.35446, 7.35983, 7.71601, 10.6172, 13.4805},
       {6.53642, 3.76216, 3.30086, 3.95969, 5.49408, 7.07294, 8.35687, 8.94839, 9.23135, 10.485}

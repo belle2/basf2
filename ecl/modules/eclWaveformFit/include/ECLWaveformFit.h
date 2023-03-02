@@ -8,13 +8,18 @@
 
 #pragma once
 
-// FRAMEWORK
-#include <framework/core/Module.h>
-#include <framework/datastore/StoreArray.h>
-
-// ECL
+/* ECL headers. */
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLDsp.h>
+#include <ecl/dbobjects/ECLAutoCovariance.h>
+#include <ecl/dbobjects/ECLCrystalCalib.h>
+#include <ecl/dbobjects/ECLDigitWaveformParameters.h>
+#include <ecl/dbobjects/ECLDigitWaveformParametersForMC.h>
+
+/* Basf2 headers. */
+#include <framework/core/Module.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/datastore/StoreArray.h>
 
 class TMinuit;
 
@@ -135,8 +140,6 @@ namespace Belle2 {
 
 
   private:
-    StoreArray<ECLDsp> m_eclDSPs;  /**< StoreArray ECLDsp */
-    StoreArray<ECLDigit> m_eclDigits;   /**< StoreArray ECLDigit */
 
     double m_EnergyThreshold{0.03};  /**< energy threshold to fit pulse offline*/
     double m_chi2Threshold25dof{57.1};  /**< chi2 threshold (25 dof) to classify offline fit as good fit.*/
@@ -155,5 +158,27 @@ namespace Belle2 {
     CovariancePacked m_c[8736] = {};  /**< Packed covariance matrices */
     bool m_CovarianceMatrix{true};  /**< Option to use crystal dependent covariance matrices.*/
     bool m_IsMCFlag{false};  /**< Flag to indicate if running over data or MC.*/
+
+    /** Crystal electronics. */
+    DBObjPtr<ECLCrystalCalib> m_CrystalElectronics{"ECLCrystalElectronics"};
+
+    /** Crystal energy. */
+    DBObjPtr<ECLCrystalCalib> m_CrystalEnergy{"ECLCrystalEnergy"};
+
+    /** Waveform parameters. */
+    DBObjPtr<ECLDigitWaveformParameters> m_WaveformParameters;
+
+    /** Waveform parameters for MC. */
+    DBObjPtr<ECLDigitWaveformParametersForMC> m_WaveformParametersForMC;
+
+    /** Autocovariance. */
+    DBObjPtr<ECLAutoCovariance> m_AutoCovariance;
+
+    /** StoreArray ECLDsp. */
+    StoreArray<ECLDsp> m_eclDSPs;
+
+    /** StoreArray ECLDigit. */
+    StoreArray<ECLDigit> m_eclDigits;
+
   };
 } // end Belle2 namespace

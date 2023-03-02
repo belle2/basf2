@@ -11,7 +11,7 @@
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dataobjects/KLMSectorArrayIndex.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/logging/Logger.h>
 
 /* ROOT headers. */

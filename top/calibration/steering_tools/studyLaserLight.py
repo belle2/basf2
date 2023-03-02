@@ -174,8 +174,7 @@ for fname in files:
 
 if dbaddress != 'none':
     print("using local DB " + dbaddress)
-    b2.reset_database()
-    b2.use_local_database(dbaddress + "/localDB.txt", dbaddress)
+    b2.conditions.append_testing_payloads(dbaddress + "/localDB.txt")
 else:
     print("database not set. Continuing without calibrations")
 
@@ -183,7 +182,7 @@ else:
 b2.set_log_level(b2.LogLevel.ERROR)
 
 # Define a global tag (note: the one given bellow can be out-dated!)
-b2.use_central_database('data_reprocessing_proc8')
+b2.conditions.append_globaltag('data_reprocessing_proc8')
 
 # Create path
 main = b2.create_path()

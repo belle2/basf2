@@ -167,160 +167,30 @@ void SVDTimeGroupingModule::event()
 
   std::vector<GroupInfo> groupInfoVector; // Gauss paramerers (integral, center, sigma)
 
+  FindGausPeaks searchPeaks(h_clsTime, groupInfoVector);
+  // setting the parameters
+  searchPeaks.setSignalTime(m_expectedSignalTimeCenter, m_expectedSignalTimeMin, m_expectedSignalTimeMax);
+  searchPeaks.setSigmaLimits(m_minSigma, m_maxSigma);
+  searchPeaks.setFitHalfWidth(m_fitRangeHalfWidth);
+  searchPeaks.setSigmaN(m_removeSigmaN);
+  searchPeaks.setFracThreshold(m_fracThreshold);
+  searchPeaks.setMaxGroups(m_maxGroups);
+  searchPeaks.setSignalLifeTime(m_signalLifetime);
+  // performing the search
+  searchPeaks.doTheSearch();
+  // resize to max
+  searchPeaks.resizeToMaxSize();
+  // sorting background groups
+  searchPeaks.sortBackgroundGroups();
+  // sorting signal groups
+  searchPeaks.sortSignalGroups();
 
-
-  double maxPeak     = 0.;  //   height of the highest peak in signal region [expectedSignalTimeMin, expectedSignalTimeMax]
-  double maxIntegral = 0.;  // integral of the highest peak in signal region [expectedSignalTimeMin, expectedSignalTimeMax]
-
-  bool amDone = false;
-  int  roughCleaningCounter = 0; // handle to take care when fit does not conserves
-  while (!amDone) {
-
-    // take the bin corresponding to the highest peak
-    int    maxBin        = h_clsTime.GetMaximumBin();
-    double maxBinCenter  = h_clsTime.GetBinCenter(maxBin);
-    double maxBinContent = h_clsTime.GetBinContent(maxBin);
-
-    // Set maxPeak for the first time
-    if (maxPeak == 0 &&
-        maxBinCenter > m_expectedSignalTimeMin && maxBinCenter < m_expectedSignalTimeMax)
-      maxPeak = maxBinContent;
-
-    // we are done if the the height of the this peak is below threshold
-    if (maxPeak != 0 && maxBinContent < maxPeak * m_fracThreshold) amDone = true;
-
-
-
-    // preparing the gaus function for fitting the peak
-    TF1 ngaus("ngaus", myGaus, tRangeLow, tRangeHigh, 3);
-
-    // setting the parameters according to the maxBinCenter and maxBinContnet
-    double maxPar0 = maxBinContent * 2.50662827463100024 * m_fitRangeHalfWidth;
-    ngaus.SetParameter(0, maxBinContent);
-    ngaus.SetParLimits(0,
-                       maxPar0 * 0.01,
-                       maxPar0 * 2.);
-    ngaus.SetParameter(1, maxBinCenter);
-    ngaus.SetParLimits(1,
-                       maxBinCenter - m_fitRangeHalfWidth * 0.2,
-                       maxBinCenter + m_fitRangeHalfWidth * 0.2);
-    ngaus.SetParameter(2, m_fitRangeHalfWidth);
-    ngaus.SetParLimits(2,
-                       m_minSigma,
-                       m_maxSigma);
-
-
-    // fitting the gauss at the peak the in range [-fitRangeHalfWidth, fitRangeHalfWidth]
-    int status = h_clsTime.Fit("ngaus", "NQ0", "",
-                               maxBinCenter - m_fitRangeHalfWidth,
-                               maxBinCenter + m_fitRangeHalfWidth);
-
-
-    if (!status) {    // if fit converges
-
-      double pars[3] = {
-        ngaus.GetParameter(0),     // integral
-        ngaus.GetParameter(1),     // center
-        std::fabs(ngaus.GetParameter(2)) // sigma
-      };
-
-      // fit converges but paramters are at limit
-      // Do a rough cleaning
-      if (pars[2] <= m_minSigma + 0.01 || pars[2] >= m_maxSigma - 0.01) {
-        // subtract the faulty part from the histogram
-        subtractGausFromHistogram(h_clsTime, maxPar0, maxBinCenter, m_fitRangeHalfWidth, m_removeSigmaN);
-        if (roughCleaningCounter++ > m_maxGroups) amDone = true;
-        continue;
-      }
-
-      // Set maxIntegral for the first time
-      if (maxPeak != 0 && maxIntegral == 0) maxIntegral = pars[0];
-
-      // we are done if the the integral of the this peak is below threshold
-      if (maxIntegral != 0 && pars[0] < maxIntegral * m_fracThreshold) amDone = true;
-
-
-      // now subtract the fitted gaussian from the histogram
-      subtractGausFromHistogram(h_clsTime, pars[0], pars[1], pars[2], m_removeSigmaN);
-
-      // store group information (integral, position, width)
-      groupInfoVector.push_back(std::make_tuple(pars[0], pars[1], pars[2]));
-      B2DEBUG(1, " group " << int(groupInfoVector.size())
-              << " pars[0] " << pars[0] << " pars[1] " << pars[1] << " pars[2] " << pars[2]);
-      if (int(groupInfoVector.size()) >= m_maxGroups) amDone = true;
-
-    } else {    // fit did not converges
-      // subtract the faulty part from the histogram
-      subtractGausFromHistogram(h_clsTime, maxPar0, maxBinCenter, m_fitRangeHalfWidth, m_removeSigmaN);
-      if (roughCleaningCounter++ > m_maxGroups) amDone = true;
-      continue;
-    }
-  }
-
-  // resizing to max
-  // this helps in sorting the groups
-  groupInfoVector.resize(m_maxGroups, std::make_tuple(0., 0., 0.));
-
-
-
-  // background group sorting
-
-  // the probability of being signal is max at groupID = 0 and decreases with group number increasing.
-  // the probability of being background is max at groupID = 19 and increases with group number decreasing.
-  GroupInfo key;
-  for (int ij = int(groupInfoVector.size()) - 2; ij >= 0; ij--) {
-    key = groupInfoVector[ij];
-    double keynorm = std::get<0>(key);
-    double keymean = std::get<1>(key);
-    bool isKeySignal = true;
-    if (keynorm != 0. && (keymean < m_expectedSignalTimeMin || keymean > m_expectedSignalTimeMax)) isKeySignal = false;
-    if (isKeySignal) continue;
-    int kj = ij + 1;
-    while (1) {
-      if (kj >= int(groupInfoVector.size())) break;
-      double grnorm = std::get<0>(groupInfoVector[kj]);
-      double grmean = std::get<1>(groupInfoVector[kj]);
-      bool isGrSignal = true;
-      if (grnorm != 0. && (grmean < m_expectedSignalTimeMin || grmean > m_expectedSignalTimeMax)) isGrSignal = false;
-      if (!isGrSignal && (grnorm > keynorm)) break;
-      groupInfoVector[kj - 1] = groupInfoVector[kj];
-      kj++;
-    }
-    groupInfoVector[kj - 1] = key;
-  }
-
-  // sorting signal groups based on expo-weight
-  // this decreases chance of near-signal bkg groups getting picked
-  if (m_signalLifetime > 0.)
-    for (int ij = 1; ij < int(groupInfoVector.size()); ij++) {
-      key = groupInfoVector[ij];
-      double keynorm = std::get<0>(key);
-      if (keynorm <= 0) break;
-      double keymean = std::get<1>(key);
-      bool isKeySignal = true;
-      if (keynorm > 0 && (keymean < m_expectedSignalTimeMin || keymean > m_expectedSignalTimeMax)) isKeySignal = false;
-      if (!isKeySignal) break;
-      double keyWt = keynorm * TMath::Exp(-std::fabs(keymean - m_expectedSignalTimeCenter) / m_signalLifetime);
-      int kj = ij - 1;
-      while (1) {
-        if (kj < 0) break;
-        double grnorm = std::get<0>(groupInfoVector[kj]);
-        double grmean = std::get<1>(groupInfoVector[kj]);
-        double grWt = grnorm * TMath::Exp(-std::fabs(grmean - m_expectedSignalTimeCenter) / m_signalLifetime);
-        if (grWt > keyWt) break;
-        groupInfoVector[kj + 1] = groupInfoVector[kj];
-        kj--;
-      }
-      groupInfoVector[kj + 1] = key;
-    }
-
+  // only select few signal groups
   if (m_numberOfSignalGroups < int(groupInfoVector.size())) groupInfoVector.resize(m_numberOfSignalGroups);
 
 
 
-
-
-  // make all clusters groupless if no groups are found
+  // assign all clusters groupId = -1 if no groups are found
   if (int(groupInfoVector.size()) == 0)
     for (int jk = 0; jk < totClusters; jk++)
       m_svdClusters[jk]->setTimeGroupId().push_back(-1);
@@ -343,7 +213,7 @@ void SVDTimeGroupingModule::event()
     // do not continue the last loop.
     // we assign the group Id to leftover clusters at the last loop.
 
-    // for this group, accept the groups falling within 5(default) sigma of group center
+    // for this group, accept the clusters falling within 5(default) sigma of group center
     double lowestAcceptedTime  = pars[1] - m_acceptSigmaN * pars[2];
     double highestAcceptedTime = pars[1] + m_acceptSigmaN * pars[2];
     if (lowestAcceptedTime < tRangeLow)   lowestAcceptedTime  = tRangeLow;
@@ -369,7 +239,7 @@ void SVDTimeGroupingModule::event()
         // this is independent of group id, that means,
         // group info is correctly associated even if formSingleSignalGroup flag is on.
         if (m_writeGroupInfo)
-          m_svdClusters[jk]->setTimeGroupInfo().push_back(std::make_tuple(pars[0], pars[1], pars[2]));
+          m_svdClusters[jk]->setTimeGroupInfo().push_back(GroupInfo(pars[0], pars[1], pars[2]));
 
         B2DEBUG(1, "   accepted cluster " << jk
                 << " clsTime " << clsTime

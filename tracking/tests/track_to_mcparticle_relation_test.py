@@ -50,7 +50,7 @@ set_random_seed(12345)
 main = create_path()
 
 # specify number of events to be generated
-main.add_module('EventInfoSetter', expList=[0], evtNumList=[100], runList=[1])
+main.add_module('EventInfoSetter', expList=[0], evtNumList=[5], runList=[1])
 main.add_module('ParticleGun',
                 pdgCodes=[211],
                 nTracks=1,

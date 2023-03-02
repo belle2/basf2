@@ -6,8 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef ECLCONFIGURATION_H_
-#define ECLCONFIGURATION_H_
+#pragma once
 
 namespace Belle2 {
   namespace ECL {
@@ -113,4 +112,3 @@ namespace Belle2 {
     };
   }
 }
-#endif

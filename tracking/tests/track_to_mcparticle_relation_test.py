@@ -26,8 +26,6 @@ class CheckPresenceOfTrackToMCParticleRelation(Module):
         #: MCParticles StoreArray
         self.MCParticles = Belle2.PyStoreArray('MCParticles')
         self.MCParticles.isRequired()
-        #: List of bad events
-        self.badEvents = [9]  # For some reason, event 9 is bad, as the only in 100. So we skip it. Why? I don't know.
         #: Count the event number to jump the bad events
         self.eventCount = 1
 
@@ -37,10 +35,8 @@ class CheckPresenceOfTrackToMCParticleRelation(Module):
         assert self.Tracks.getEntries() > 0, "Size of Tracks StoreArray is 0."
         for track in self.Tracks:
             track_to_mcparticle_relations = track.getRelationsTo('MCParticles')
-            if self.eventCount not in self.badEvents:
-                assert track_to_mcparticle_relations.size() > 0, \
-                        "Somehow there are no relations from this track to an MCParticle. Why? I don't know. \
-                         Likely the track is from a fake RecoTrack."
+            assert track_to_mcparticle_relations.size() > 0, "Somehow there are no relations from this track to an MCParticle. \
+                                                              Why? I don't know. Likely the track is from a fake RecoTrack."
 
         self.eventCount += 1
 

@@ -1325,15 +1325,18 @@ def fillParticleListFromChargedCluster(outputParticleList,
 
 
 def extractParticlesFromROE(particleLists,
+                            signalSideParticleList=None,
                             maskName='all',
                             writeOut=False,
                             path=None):
     """
     Extract Particle objects that belong to the Rest-Of-Events and fill them into the ParticleLists.
-    This function has to be used only in the for_each loops over ROE.
     The types of the particles other than those specified by ``particleLists`` are not stored.
     If one creates a ROE with ``fillWithMostLikely=True`` via `buildRestOfEvent`, for example,
     one should create particleLists for not only ``pi+``, ``gamma``, ``K_L0`` but also other charged final state particles.
+
+    When one calls the function in the main path, one has to set the argument ``signalSideParticleList`` and the signal side
+    ParticleList must have only one candidate.
 
     .. code-block:: python
 
@@ -1346,10 +1349,18 @@ def extractParticlesFromROE(particleLists,
         plists = ['%s:in_roe' % ptype for ptype in ['pi+', 'gamma', 'K_L0', 'K+', 'p+', 'e+', 'mu+']]
         extractParticlesFromROE(plists, maskName='all', path=roe_path)
 
+        # one can analyze these ParticleLists in the roe_path
+
         mypath.for_each('RestOfEvent', 'RestOfEvents', roe_path)
+
+        rankByLowest('B0:sig', 'deltaE', numBest=1, path=mypath)
+        extractParticlesFromROE(plists, signalSideParticleList='B0:sig', maskName='all', path=mypath)
+
+        # one can analyze these ParticleLists in the main path
 
 
     @param particleLists (str or list(str)) Name of output ParticleLists
+    @param signalSideParticleList (str)     Name of signal side ParticleList
     @param maskName (str)                   Name of the ROE mask to be applied on Particles
     @param writeOut (bool)                  whether RootOutput module should save the created ParticleList
     @param path (basf2.Path)                modules are added to this path
@@ -1361,6 +1372,8 @@ def extractParticlesFromROE(particleLists,
     pext = register_module('ParticleExtractorFromROE')
     pext.set_name('ParticleExtractorFromROE_' + '_'.join(particleLists))
     pext.param('outputListNames', particleLists)
+    if signalSideParticleList is not None:
+        pext.param('signalSideParticleListName', signalSideParticleList)
     pext.param('maskName', maskName)
     pext.param('writeOut', writeOut)
     path.add_module(pext)
@@ -1801,6 +1814,7 @@ def rankByHighest(particleList,
                   outputVariable='',
                   allowMultiRank=False,
                   cut='',
+                  overwriteRank=False,
                   path=None):
     """
     Ranks particles in the input list by the given variable (highest to lowest), and stores an integer rank for each Particle
@@ -1827,6 +1841,7 @@ def rankByHighest(particleList,
     @param outputVariable   Name for the variable that will be created which contains the rank, Default is '${variable}_rank'.
     @param allowMultiRank   If true, candidates with the same value will get the same rank.
     @param cut              Only candidates passing the cut will be ranked. The others will have rank -1
+    @param overwriteRank    If true, the extraInfo of rank is overwritten when the particle has already the extraInfo.
     @param path             modules are added to this path
     """
 
@@ -1838,6 +1853,7 @@ def rankByHighest(particleList,
     bcs.param('outputVariable', outputVariable)
     bcs.param('allowMultiRank', allowMultiRank)
     bcs.param('cut', cut)
+    bcs.param('overwriteRank', overwriteRank)
     path.add_module(bcs)
 
 
@@ -1847,6 +1863,7 @@ def rankByLowest(particleList,
                  outputVariable='',
                  allowMultiRank=False,
                  cut='',
+                 overwriteRank=False,
                  path=None):
     """
     Ranks particles in the input list by the given variable (lowest to highest), and stores an integer rank for each Particle
@@ -1873,6 +1890,7 @@ def rankByLowest(particleList,
     @param outputVariable   Name for the variable that will be created which contains the rank, Default is '${variable}_rank'.
     @param allowMultiRank   If true, candidates with the same value will get the same rank.
     @param cut              Only candidates passing the cut will be ranked. The others will have rank -1
+    @param overwriteRank    If true, the extraInfo of rank is overwritten when the particle has already the extraInfo.
     @param path             modules are added to this path
     """
 
@@ -1885,6 +1903,7 @@ def rankByLowest(particleList,
     bcs.param('allowMultiRank', allowMultiRank)
     bcs.param('outputVariable', outputVariable)
     bcs.param('cut', cut)
+    bcs.param('overwriteRank', overwriteRank)
     path.add_module(bcs)
 
 
@@ -3813,7 +3832,7 @@ def calculateTrackIsolation(
         of each particle to its closest neighbour, defined as the segment connecting the two
         extrapolated track helices intersection points on a given cylindrical surface.
         The distance variables defined in the `VariableManager` is named `minET2ETDist`,
-        the isolation scores are named `minET2ETIsoScore`.
+        the isolation scores are named `minET2ETIsoScore`, `minET2ETIsoScoreAsWeightedAvg`.
 
     The definition of distance and the number of distances that are calculated per sub-detector is based on
     the following recipe:
@@ -3923,14 +3942,13 @@ def calculateTrackIsolation(
 
         ref_pdg = pdg.from_name(reference_list_name.split(":")[0])
 
-        for det in detectors:
-            trackiso = path.add_module("TrackIsoCalculator",
-                                       decayString=processed_dec,
-                                       detectorName=det,
-                                       particleListReference=reference_list_name,
-                                       useHighestProbMassForExt=highest_prob_mass_for_ext,
-                                       excludePIDDetWeights=exclude_pid_det_weights)
-            trackiso.set_name(f"TrackIsoCalculator{det}_{processed_dec}_VS_{reference_list_name}")
+        trackiso = path.add_module("TrackIsoCalculator",
+                                   decayString=processed_dec,
+                                   detectorNames=list(detectors),
+                                   particleListReference=reference_list_name,
+                                   useHighestProbMassForExt=highest_prob_mass_for_ext,
+                                   excludePIDDetWeights=exclude_pid_det_weights)
+        trackiso.set_name(f"TrackIsoCalculator_{'_'.join(detectors)}_{processed_dec}_VS_{reference_list_name}")
 
         # Metavariables for the distances to the closest reference tracks at each detector surface.
         # Always calculate them.
@@ -3939,7 +3957,10 @@ def calculateTrackIsolation(
             f"minET2ETDist({d}, {d_layer}, {reference_list_name}, {int(highest_prob_mass_for_ext)})"
             for d in detectors for d_layer in det_and_layers[d]]
         # Track isolation score.
-        trackiso_vars += [f"minET2ETIsoScore({reference_list_name}, {int(highest_prob_mass_for_ext)}, {','.join(detectors)})"]
+        trackiso_vars += [
+            f"minET2ETIsoScore({reference_list_name}, {int(highest_prob_mass_for_ext)}, {', '.join(detectors)})",
+            f"minET2ETIsoScoreAsWeightedAvg({reference_list_name}, {int(highest_prob_mass_for_ext)}, {', '.join(detectors)})",
+        ]
         # Optionally, calculate the input variables for the nearest neighbour in the reference list.
         if vars_for_nearest_part:
             trackiso_vars.extend(

@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <arich/modules/arichPacker/ARICHPackerModule.h>
 
 // framework - DataStore
@@ -75,14 +75,12 @@ namespace Belle2 {
     int nModules = N_MERGERS * N_FEB2MERGER;
 
     std::vector<const ARICHDigit*>* sortedDigits = new std::vector<const ARICHDigit*>[nModules];
-    int nPacked = 0;
     for (const auto& digit : digits) {
       int moduleID = digit.getModuleID();
       unsigned mergerID = m_mergerMap->getMergerID(moduleID);
       if (!mergerID) { B2WARNING("No module2merger mapping for module ID: " <<  moduleID << "; Digit will not be packed!"); continue;}
       if (!m_copperMap->getCopperID(mergerID)) { B2WARNING("No merger2copper mapping for merger ID: " <<  mergerID << "; Digit will not be packed!"); continue;}
       sortedDigits[moduleID - 1].push_back(&digit);
-      nPacked++;
     }
 
     int buffer[4][ARICH_BUFFER_NWORDS];

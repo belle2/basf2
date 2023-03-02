@@ -6,9 +6,10 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <top/modules/TOPBackground/TOPBackgroundModule.h>
 
+// TOP headers.
 #include <top/dataobjects/TOPBarHit.h>
 #include <top/dataobjects/TOPDigit.h>
 #include <top/dataobjects/TOPSimHit.h>

@@ -19,6 +19,10 @@ Changes since release-07
 
 .. include:: analysis/doc/whatsnew-since/release-07-00.txt
 
+.. List of changes for the b2bii package
+
+.. include:: b2bii/doc/whatsnew-since/release-07-00.txt
+
 .. List of changes for the mva package
 
 .. include:: mva/doc/whatsnew-since/release-07-00.txt

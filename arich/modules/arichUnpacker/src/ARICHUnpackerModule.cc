@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <arich/modules/arichUnpacker/ARICHUnpackerModule.h>
 
 #include <arich/modules/arichUnpacker/ARICHRawDataHeader.h>
@@ -162,7 +162,6 @@ namespace Belle2 {
           rawdigit->setPcieChId(finesse);
         }
 
-        int nfebs = 0;
         //-- end of RawDigit for Merger info
 
         // record the ibyte here
@@ -265,7 +264,6 @@ namespace Belle2 {
             }
           }
           ARICHRawDigit::FEBDigit feb;
-          nfebs++;
           if (type_feb == 0x02) {//Raw mode
             int ch = 143;
             //B2INFO("raw mode");

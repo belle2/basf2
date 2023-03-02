@@ -399,7 +399,7 @@ namespace Belle2 {
 
     protected:
       /** Typedef for variable types supported by the mva ROOTDataset, can be one of double, float, int or bool in std::variant */
-      typedef std::variant<double, int, bool, float> RootDatasetVarVariant;
+      typedef std::variant<double, float, int, bool> RootDatasetVarVariant;
 
       TChain* m_tree = nullptr; /**< Pointer to the TChain containing the data */
       std::vector<RootDatasetVarVariant> m_input_variant; /**< Contains all feature values of the currently loaded event */

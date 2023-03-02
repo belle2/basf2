@@ -157,7 +157,7 @@ void SVDTimeGroupingModule::event()
     double gCenter = m_svdClusters[ij]->getClsTime();
 
     // adding/filling a gauss to histogram
-    insertGausToHistogram(h_clsTime, 1., gCenter, gSigma, m_fillSigmaN);
+    addGausToHistogram(h_clsTime, 1., gCenter, gSigma, m_fillSigmaN);
   }
 
 
@@ -228,7 +228,7 @@ void SVDTimeGroupingModule::event()
       // Do a rough cleaning
       if (pars[2] <= m_minSigma + 0.01 || pars[2] >= m_maxSigma - 0.01) {
         // subtract the faulty part from the histogram
-        insertGausToHistogram(h_clsTime, maxPar0, maxBinCenter, m_fitRangeHalfWidth, m_removeSigmaN, false);
+        subtractGausFromHistogram(h_clsTime, maxPar0, maxBinCenter, m_fitRangeHalfWidth, m_removeSigmaN);
         if (roughCleaningCounter++ > m_maxGroups) amDone = true;
         continue;
       }
@@ -241,7 +241,7 @@ void SVDTimeGroupingModule::event()
 
 
       // now subtract the fitted gaussian from the histogram
-      insertGausToHistogram(h_clsTime, pars[0], pars[1], pars[2], m_removeSigmaN, false);
+      subtractGausFromHistogram(h_clsTime, pars[0], pars[1], pars[2], m_removeSigmaN);
 
       // store group information (integral, position, width)
       groupInfoVector.push_back(std::make_tuple(pars[0], pars[1], pars[2]));
@@ -251,7 +251,7 @@ void SVDTimeGroupingModule::event()
 
     } else {    // fit did not converges
       // subtract the faulty part from the histogram
-      insertGausToHistogram(h_clsTime, maxPar0, maxBinCenter, m_fitRangeHalfWidth, m_removeSigmaN, false);
+      subtractGausFromHistogram(h_clsTime, maxPar0, maxBinCenter, m_fitRangeHalfWidth, m_removeSigmaN);
       if (roughCleaningCounter++ > m_maxGroups) amDone = true;
       continue;
     }

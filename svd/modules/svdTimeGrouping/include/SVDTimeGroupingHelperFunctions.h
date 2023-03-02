@@ -26,13 +26,14 @@ namespace Belle2 {
     return par[0] * TMath::Gaus(x[0], par[1], par[2], true);
   }
 
+
   /** Add (or Subtract) a Gaussian to (or from) a histogram
    *
    * The gauss is calculated upto the sigmaN passed to the function.
    */
-  inline void insertGausToHistogram(TH1D& hist,
-                                    const double& integral, const double& center, const double& sigma,
-                                    const double& sigmaN, const bool& isAddition = true)
+  inline void addGausToHistogram(TH1D& hist,
+                                 const double& integral, const double& center, const double& sigma,
+                                 const double& sigmaN, const bool& isAddition = true)
   {
     int startBin = hist.FindBin(center - sigmaN * sigma);
     int   endBin = hist.FindBin(center + sigmaN * sigma);
@@ -48,6 +49,18 @@ namespace Belle2 {
 
       hist.SetBinContent(ijx, tbincontent);
     }
+  }
+
+
+  /**  Subtract a Gaussian from a histogram
+   *
+   * The gauss is calculated upto the sigmaN passed to the function.
+   */
+  inline void subtractGausFromHistogram(TH1D& hist,
+                                        const double& integral, const double& center, const double& sigma,
+                                        const double& sigmaN)
+  {
+    addGausToHistogram(hist, integral, center, sigma, sigmaN, false);
   }
 
 } /* end of namespace Belle2 */

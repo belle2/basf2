@@ -451,7 +451,7 @@ namespace Belle2 {
       m_tree = nullptr;
     }
 
-    std::vector<float> ROOTDataset::getVectorFromTTreeVariant(std::string& variableType, std::string& branchName,
+    std::vector<float> ROOTDataset::getVectorFromTTreeVariant(const std::string& variableType, const std::string& branchName,
                                                               RootDatasetVarVariant& memberVariableTarget)
     {
       if (std::holds_alternative<double>(memberVariableTarget))
@@ -467,7 +467,7 @@ namespace Belle2 {
     }
 
     template<class T>
-    std::vector<float> ROOTDataset::getVectorFromTTree(std::string& variableType, std::string& branchName,
+    std::vector<float> ROOTDataset::getVectorFromTTree(const std::string& variableType, const std::string& branchName,
                                                        T& memberVariableTarget)
     {
       int nentries = getNumberOfEvents();
@@ -508,7 +508,7 @@ namespace Belle2 {
     }
 
     template<class T>
-    void ROOTDataset::setScalarVariableAddress(std::string& variableType, std::string& variableName,
+    void ROOTDataset::setScalarVariableAddress(const std::string& variableType, const std::string& variableName,
                                                T& variableTarget)
     {
       if (not variableName.empty()) {
@@ -529,7 +529,7 @@ namespace Belle2 {
       }
     }
 
-    void ROOTDataset::setScalarVariableAddressVariant(std::string& variableType, std::string& variableName,
+    void ROOTDataset::setScalarVariableAddressVariant(const std::string& variableType, const std::string& variableName,
                                                       RootDatasetVarVariant& varVariantTarget)
     {
       if (std::holds_alternative<double>(varVariantTarget))
@@ -545,7 +545,7 @@ namespace Belle2 {
     }
 
     template<class T>
-    void ROOTDataset::setVectorVariableAddress(std::string& variableType, std::vector<std::string>& variableNames,
+    void ROOTDataset::setVectorVariableAddress(const std::string& variableType, const std::vector<std::string>& variableNames,
                                                T& variableTargets)
     {
       for (unsigned int i = 0; i < variableNames.size(); ++i)
@@ -553,7 +553,7 @@ namespace Belle2 {
     }
 
 
-    void ROOTDataset::setVectorVariableAddressVariant(std::string& variableType, std::vector<std::string>& variableNames,
+    void ROOTDataset::setVectorVariableAddressVariant(const std::string& variableType, const std::vector<std::string>& variableNames,
                                                       std::vector<RootDatasetVarVariant>& varVariantTargets)
     {
       for (unsigned int i = 0; i < variableNames.size(); ++i) {

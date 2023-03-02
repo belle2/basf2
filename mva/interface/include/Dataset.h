@@ -421,7 +421,7 @@ namespace Belle2 {
        * @return filled vector from a branch, converted to float
        */
       template<class T>
-      std::vector<float> getVectorFromTTree(std::string& variableType, std::string& branchName, T& memberVariableTarget);
+      std::vector<float> getVectorFromTTree(const std::string& variableType, const std::string& branchName, T& memberVariableTarget);
 
       /**
        * Returns all values for a specified variableType and branchName. The values are read from a root file.
@@ -431,7 +431,7 @@ namespace Belle2 {
        * @param memberVariableTarget variable the branch address from the root file is set to
        * @return filled vector from a branch, converted to float
        */
-      std::vector<float> getVectorFromTTreeVariant(std::string& variableType, std::string& branchName,
+      std::vector<float> getVectorFromTTreeVariant(const std::string& variableType, const std::string& branchName,
                                                    RootDatasetVarVariant& memberVariableTarget);
 
       /**
@@ -447,7 +447,7 @@ namespace Belle2 {
        * @param variableTarget variable, the address is set to
        */
       template<class T>
-      void setScalarVariableAddress(std::string& variableType, std::string& variableName, T& variableTarget);
+      void setScalarVariableAddress(const std::string& variableType, const std::string& variableName, T& variableTarget);
 
       /**
        * sets the branch address for a scalar variable to a given target
@@ -455,7 +455,7 @@ namespace Belle2 {
        * @param variableName name of the variable, usually defined in general_options
        * @param variableTarget variable, the address is set to
        */
-      void setScalarVariableAddressVariant(std::string& variableType, std::string& variableName,
+      void setScalarVariableAddressVariant(const std::string& variableType, const std::string& variableName,
                                            RootDatasetVarVariant& variableTarget);
 
       /**
@@ -466,7 +466,7 @@ namespace Belle2 {
        * @param variableTargets variables, the address is set to
        */
       template<class T>
-      void setVectorVariableAddress(std::string& variableType, std::vector<std::string>& variableName,
+      void setVectorVariableAddress(const std::string& variableType, const std::vector<std::string>& variableName,
                                     T& variableTargets);
 
       /**
@@ -475,7 +475,7 @@ namespace Belle2 {
        * @param variableName names of the variable, usually defined in general_options
        * @param varVariantTargets variables, the address is set to
        */
-      void setVectorVariableAddressVariant(std::string& variableType, std::vector<std::string>& variableName,
+      void setVectorVariableAddressVariant(const std::string& variableType, const std::vector<std::string>& variableName,
                                            std::vector<RootDatasetVarVariant>& varVariantTargets);
 
       /**

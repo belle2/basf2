@@ -321,8 +321,6 @@ CalibrationAlgorithm::EResult eclNOptimalAlgorithm::calibrate()
   std::vector<int> crystalsPerGroup;
   crystalsPerGroup.resize(nCrystalGroups, 0);
 
-  const int iFirstBarrel = 1153; // first barrel cellID
-  const int iLastBarrel = 7776; // last barrel cellID
   const int nCrystalsTotal = ECLElementNumbers::c_NCrystals;
   for (int cellID = 1; cellID <= nCrystalsTotal; cellID++) {
 
@@ -332,10 +330,10 @@ CalibrationAlgorithm::EResult eclNOptimalAlgorithm::calibrate()
     //..Energy boundaries of previous payload, which depend on the ECL region
     std::vector<float> eUpperBoundariesPrev = eUpperBoundariesBrlPrev;
     int iRegion = 1; // barrel
-    if (cellID < iFirstBarrel) {
+    if (ECLElementNumbers::isForward(cellID)) {
       eUpperBoundariesPrev = eUpperBoundariesFwdPrev;
       iRegion = 0;
-    } else if (cellID > iLastBarrel) {
+    } else if (ECLElementNumbers::isBackward(cellID)) {
       eUpperBoundariesPrev = eUpperBoundariesBwdPrev;
       iRegion = 2;
     }

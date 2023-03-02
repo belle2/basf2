@@ -164,14 +164,6 @@ namespace Belle2 {
     int ARICHmod2row(int modID);
 
     //ECL channels
-    /** Total number of ECL crystals   */
-    static const int nECLCrystalTot = ECLElementNumbers::c_NCrystals;
-    /** Number of Barrel ECL crystals  */
-    const int nECLCrystalBAR = 6624;
-    /** Number of FWD ECL end-capcrystals */
-    const int nECLCrystalECF = 1152;
-    /** Number of BWD ECL end-capcrystals */
-    const int nECLCrystalECB =  960;
     /** Number of thetaID values */
     static const int nECLThetaID = 69;
 

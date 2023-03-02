@@ -196,11 +196,11 @@ bool EclData::isCrystalInSubsystem(int crystal, EclData::EclSubsystem subsys)
     case ALL:
       return true;
     case BARR:
-      return crystal >= 1153 && crystal <= 7776;
+      return ECLElementNumbers::isBarrel(crystal);
     case FORW:
-      return crystal < 1153;
+      return ECLElementNumbers::isForward(crystal);
     case BACKW:
-      return crystal > 7776;
+      return ECLElementNumbers::isBackward(crystal);
     default:
       return false;
   }

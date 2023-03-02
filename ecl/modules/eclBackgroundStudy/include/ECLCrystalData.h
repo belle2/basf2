@@ -76,12 +76,6 @@ namespace Belle2 {
     /** Number of crystals in preceding theta rings (endcaps only) */
     static const int sumPrevious[24];
 
-    const int nECLCrystalTot = ECLElementNumbers::c_NCrystals; /**< Total number of ECL crystals     */
-    const int nECLCrystalBAR = 6624; /**< Number of Barrel ECL crystals    */
-    const int nECLCrystalECF = 1152; /**< Number of FWD ECL end-capcrystals*/
-    const int nECLCrystalECB =  960; /**< Number of BWD ECL end-capcrystals*/
-
-
     /** Barrel crystal mass */
     static const float CrystalMassEndcap[132];
     /** Endcap crystal mass */

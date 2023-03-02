@@ -249,53 +249,59 @@ namespace Belle2 {
 
   void FindGausPeaks::sortBackgroundGroups()
   {
-    GroupInfo key;
+    GroupInfo keyGroup;
     for (int ij = int(m_groupInfoVector.size()) - 2; ij >= 0; ij--) {
-      key = m_groupInfoVector[ij];
-      double keynorm = std::get<0>(key);
-      double keymean = std::get<1>(key);
-      bool isKeySignal = true;
-      if (keynorm != 0. && (keymean < m_expectedSignalTimeMin || keymean > m_expectedSignalTimeMax)) isKeySignal = false;
-      if (isKeySignal) continue;
+      keyGroup = m_groupInfoVector[ij];
+      double keyGroupIntegral = std::get<0>(keyGroup);
+      double keyGroupCenter = std::get<1>(keyGroup);
+      bool isKeyGroupSignal = true;
+      if (keyGroupIntegral != 0. &&
+          (keyGroupCenter < m_expectedSignalTimeMin || keyGroupCenter > m_expectedSignalTimeMax))
+        isKeyGroupSignal = false;
+      if (isKeyGroupSignal) continue; // skip if signal
+
       int kj = ij + 1;
-      while (1) {
-        if (kj >= int(m_groupInfoVector.size())) break;
-        double grnorm = std::get<0>(m_groupInfoVector[kj]);
-        double grmean = std::get<1>(m_groupInfoVector[kj]);
-        bool isGrSignal = true;
-        if (grnorm != 0. && (grmean < m_expectedSignalTimeMin || grmean > m_expectedSignalTimeMax)) isGrSignal = false;
-        if (!isGrSignal && (grnorm > keynorm)) break;
+      while (kj < int(m_groupInfoVector.size())) {
+        double otherGroupIntegral = std::get<0>(m_groupInfoVector[kj]);
+        double otherGroupCenter = std::get<1>(m_groupInfoVector[kj]);
+        bool isOtherGroupSignal = true;
+        if (otherGroupIntegral != 0. &&
+            (otherGroupCenter < m_expectedSignalTimeMin || otherGroupCenter > m_expectedSignalTimeMax))
+          isOtherGroupSignal = false;
+        if (!isOtherGroupSignal && (otherGroupIntegral > keyGroupIntegral)) break;
         m_groupInfoVector[kj - 1] = m_groupInfoVector[kj];
         kj++;
       }
-      m_groupInfoVector[kj - 1] = key;
+      m_groupInfoVector[kj - 1] = keyGroup;
     }
   }
 
   void FindGausPeaks::sortSignalGroups()
   {
     if (m_signalLifetime > 0.) {
-      GroupInfo key;
+      GroupInfo keyGroup;
       for (int ij = 1; ij < int(m_groupInfoVector.size()); ij++) {
-        key = m_groupInfoVector[ij];
-        double keynorm = std::get<0>(key);
-        if (keynorm <= 0) break;
-        double keymean = std::get<1>(key);
-        bool isKeySignal = true;
-        if (keynorm > 0 && (keymean < m_expectedSignalTimeMin || keymean > m_expectedSignalTimeMax)) isKeySignal = false;
-        if (!isKeySignal) break;
-        double keyWt = keynorm * TMath::Exp(-std::fabs(keymean - m_expectedSignalTimeCenter) / m_signalLifetime);
+        keyGroup = m_groupInfoVector[ij];
+        double keyGroupIntegral = std::get<0>(keyGroup);
+        if (keyGroupIntegral <= 0) break;
+        double keyGroupCenter = std::get<1>(keyGroup);
+        bool isKeyGroupSignal = true;
+        if (keyGroupIntegral > 0 &&
+            (keyGroupCenter < m_expectedSignalTimeMin || keyGroupCenter > m_expectedSignalTimeMax))
+          isKeyGroupSignal = false;
+        if (!isKeyGroupSignal) break; // skip the backgrounds
+
+        double keyWt = keyGroupIntegral * TMath::Exp(-std::fabs(keyGroupCenter - m_expectedSignalTimeCenter) / m_signalLifetime);
         int kj = ij - 1;
-        while (1) {
-          if (kj < 0) break;
-          double grnorm = std::get<0>(m_groupInfoVector[kj]);
-          double grmean = std::get<1>(m_groupInfoVector[kj]);
-          double grWt = grnorm * TMath::Exp(-std::fabs(grmean - m_expectedSignalTimeCenter) / m_signalLifetime);
+        while (kj >= 0) {
+          double otherGroupIntegral = std::get<0>(m_groupInfoVector[kj]);
+          double otherGroupCenter = std::get<1>(m_groupInfoVector[kj]);
+          double grWt = otherGroupIntegral * TMath::Exp(-std::fabs(otherGroupCenter - m_expectedSignalTimeCenter) / m_signalLifetime);
           if (grWt > keyWt) break;
           m_groupInfoVector[kj + 1] = m_groupInfoVector[kj];
           kj--;
         }
-        m_groupInfoVector[kj + 1] = key;
+        m_groupInfoVector[kj + 1] = keyGroup;
       }
     }
   }

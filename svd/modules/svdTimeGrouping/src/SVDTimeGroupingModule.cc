@@ -267,8 +267,8 @@ void SVDTimeGroupingModule::event()
 
         }
       }
-    }
-  }
+    } // end of loop over all clusters
+  }   // end of loop over groups
 
 }
 

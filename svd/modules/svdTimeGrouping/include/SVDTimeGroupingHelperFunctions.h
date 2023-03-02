@@ -104,7 +104,7 @@ namespace Belle2 {
     /*! set max groups */
     void setMaxGroups(const int& groups) { m_maxGroups = groups; }
     /*! set signal lifetime for exponential-weighted sort */
-    void setSignalLifeTime(const double& val) { m_signalLifetime = val; }
+    void setSignalLifetime(const double& val) { m_signalLifetime = val; }
 
     /*! now find the peaks */
     void doTheSearch();

@@ -175,7 +175,7 @@ void SVDTimeGroupingModule::event()
   searchPeaks.setSigmaN(m_removeSigmaN);
   searchPeaks.setFracThreshold(m_fracThreshold);
   searchPeaks.setMaxGroups(m_maxGroups);
-  searchPeaks.setSignalLifeTime(m_signalLifetime);
+  searchPeaks.setSignalLifetime(m_signalLifetime);
   // performing the search
   searchPeaks.doTheSearch();
   // resize to max

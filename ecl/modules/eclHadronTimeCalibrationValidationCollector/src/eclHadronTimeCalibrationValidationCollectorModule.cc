@@ -141,7 +141,8 @@ void eclHadronTimeCalibrationValidationCollectorModule::prepare()
   registerObject<TH1F>("clusterTime", clusterTime) ;
 
   auto clusterTime_cid = new TH2F("clusterTime_cid",
-                                  ";crystal Cell ID ;Photon ECL cluster time [ns]", 8736, 1, 8736 + 1, nbins, min_t, max_t) ;
+                                  ";crystal Cell ID ;Photon ECL cluster time [ns]", ECLElementNumbers::c_NCrystals, 1, ECLElementNumbers::c_NCrystals + 1, nbins,
+                                  min_t, max_t) ;
   registerObject<TH2F>("clusterTime_cid", clusterTime_cid) ;
 
   auto clusterTime_run = new TH2F("clusterTime_run",
@@ -185,7 +186,7 @@ void eclHadronTimeCalibrationValidationCollectorModule::collect()
 
 
   // Storage crystal energies
-  m_EperCrys.resize(8736);
+  m_EperCrys.resize(ECLElementNumbers::c_NCrystals);
   for (auto& eclCalDigit : m_eclCalDigitArray) {
     int tempCrysID = eclCalDigit.getCellId() - 1;
     m_EperCrys[tempCrysID] = eclCalDigit.getEnergy();

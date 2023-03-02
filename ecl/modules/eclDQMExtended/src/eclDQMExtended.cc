@@ -6,32 +6,33 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-//THIS MODULE
+/* Own header. */
 #include <ecl/modules/eclDQMExtended/eclDQMExtended.h>
 
-//FRAMEWORK
+/* ECL headers. */
+#include <ecl/dataobjects/ECLElementNumbers.h>
+#include <ecl/utility/ECLDspEmulator.h>
+#include <ecl/utility/ECLDspUtilities.h>
+
+/* Basf2 headers. */
 #include <framework/core/HistoModule.h>
 #include <framework/logging/Logger.h>
 
-//ECL
-#include <ecl/utility/ECLDspUtilities.h>
-#include <ecl/utility/ECLDspEmulator.h>
-
-//STL
-#include <regex>
-#include <map>
-#include <vector>
-#include <string>
-#include <iostream>
-
-//ROOT
+/* ROOT headers. */
+#include <TDirectory.h>
 #include <TH1F.h>
 #include <TH2F.h>
-#include <TDirectory.h>
 
-//BOOST
+/* Boost headers. */
 #include <boost/filesystem.hpp>
 #include <boost/format.hpp>
+
+/* C++ headers. */
+#include <iostream>
+#include <map>
+#include <regex>
+#include <string>
+#include <vector>
 
 
 //NAMESPACE(S)
@@ -149,13 +150,14 @@ void ECLDQMEXTENDEDModule::defineHisto()
   h_timefail_quality->SetFillColor(kPink - 4);
   h_timefail_quality->GetXaxis()->SetTitle("FPGA fit qual. -1-all evts,0-good,1-int overflow,2-low amp,3-bad chi2");
 
-  h_ampfail_cellid = new TH1F("ampfail_cellid", "Cell IDs w/ amp inconsistencies", 8736, 1, 8737);
+  h_ampfail_cellid = new TH1F("ampfail_cellid", "Cell IDs w/ amp inconsistencies", ECLElementNumbers::c_NCrystals, 1, 8737);
   h_ampfail_cellid->GetXaxis()->SetTitle("Cell ID");
 
-  h_timefail_cellid = new TH1F("timefail_cellid", "Cell IDs w/ time inconsistencies", 8736, 1, 8737);
+  h_timefail_cellid = new TH1F("timefail_cellid", "Cell IDs w/ time inconsistencies", ECLElementNumbers::c_NCrystals, 1, 8737);
   h_timefail_cellid->GetXaxis()->SetTitle("Cell ID");
 
-  h_amptimefail_cellid = new TH1F("amptimefail_cellid", "Cell IDs w/ time and amp inconsistencies", 8736, 1, 8737);
+  h_amptimefail_cellid = new TH1F("amptimefail_cellid", "Cell IDs w/ time and amp inconsistencies", ECLElementNumbers::c_NCrystals, 1,
+                                  8737);
   h_amptimefail_cellid->GetXaxis()->SetTitle("Cell ID");
 
   h_ampfail_shaperid = new TH1F("ampfail_shaperid", "Shaper IDs w/ amp inconsistencies", 624, 1, 625);
@@ -176,7 +178,8 @@ void ECLDQMEXTENDEDModule::defineHisto()
   h_amptimefail_crateid = new TH1F("amptimefail_crateid", "Crate IDs w/ time and amp inconsistencies", 52, 1, 53);
   h_amptimefail_crateid->GetXaxis()->SetTitle("Crate ID (same as ECLCollector ID)");
 
-  h_qualityfail_cellid = new TH1F("qualityfail_cellid", "Cell IDs w/ fit qual inconsistencies", 8736, 1, 8737);
+  h_qualityfail_cellid = new TH1F("qualityfail_cellid", "Cell IDs w/ fit qual inconsistencies", ECLElementNumbers::c_NCrystals, 1,
+                                  8737);
   h_qualityfail_cellid->GetXaxis()->SetTitle("Cell ID");
 
   h_qualityfail_shaperid = new TH1F("qualityfail_shaperid", "Shaper IDs w/ fit qual inconsistencies", 624, 1, 625);
@@ -196,12 +199,12 @@ void ECLDQMEXTENDEDModule::defineHisto()
 
   if (m_SaveDetailedFitData) {
     h_ampdiff_cellid = new TH2F("ampdiff_cellid", "Amp. diff. (Emulator-Data) for amp inconsistencies",
-                                8736, 1, 8737, 239, -262143, 262143);
+                                ECLElementNumbers::c_NCrystals, 1, 8737, 239, -262143, 262143);
     h_ampdiff_cellid->GetXaxis()->SetTitle("Cell ID");
     h_ampdiff_cellid->GetYaxis()->SetTitle("Amplitude difference");
 
     h_timediff_cellid = new TH2F("timediff_cellid", "Time diff. (Emulator-Data) for time inconsistencies",
-                                 8736, 1, 8737, 239, -4095, 4095);
+                                 ECLElementNumbers::c_NCrystals, 1, 8737, 239, -4095, 4095);
     h_timediff_cellid->GetXaxis()->SetTitle("Cell ID");
     h_timediff_cellid->GetYaxis()->SetTitle("Time difference");
 

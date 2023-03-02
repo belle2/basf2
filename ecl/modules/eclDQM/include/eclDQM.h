@@ -114,11 +114,11 @@ namespace Belle2 {
 
 
     /** WF sampling points for digit array.   */
-    int m_DspArray[8736][31] = {};
+    int m_DspArray[ECLElementNumbers::c_NCrystals][31] = {};
     /** Pedestal average values.   */
-    double m_PedestalMean[8736] = {};
+    double m_PedestalMean[ECLElementNumbers::c_NCrystals] = {};
     /** Pedestal rms error values.    */
-    double m_PedestalRms[8736] = {};
+    double m_PedestalRms[ECLElementNumbers::c_NCrystals] = {};
 
     /** Histogram: Total event no (auxiliary) to normalize hit map . */
     TH1F* h_evtot{nullptr};

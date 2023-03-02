@@ -5,18 +5,20 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//This module
+
+/* Own header. */
 #include <ecl/modules/eclDisplay/EclData.h>
 
-//ROOT
-#include <TLeaf.h>
-#include <TFile.h>
+/* ECL headers. */
+#include <ecl/dataobjects/ECLCalDigit.h>
+#include <ecl/dataobjects/ECLElementNumbers.h>
 
-//Framework
+/* Basf2 headers. */
 #include <framework/logging/Logger.h>
 
-//ECL
-#include <ecl/dataobjects/ECLCalDigit.h>
+/* ROOT headers. */
+#include <TFile.h>
+#include <TLeaf.h>
 
 using namespace Belle2;
 
@@ -145,7 +147,7 @@ void EclData::initEventRanges()
 
 int EclData::getCrystalCount()
 {
-  return 8736;
+  return ECLElementNumbers::c_NCrystals;
 }
 
 TTree* EclData::getTree()

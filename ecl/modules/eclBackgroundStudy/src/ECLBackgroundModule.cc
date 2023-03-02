@@ -5,31 +5,27 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//This module
+
+/* Own header. */
 #include <ecl/modules/eclBackgroundStudy/ECLBackgroundModule.h>
 
-//Root
-#include <TVector3.h>
-#include <TH1F.h>
-#include <TH2F.h>
-
-//Framework
-#include <framework/logging/Logger.h>
-
-//ECL
-#include <ecl/modules/eclBackgroundStudy/ECLCrystalData.h>
+/* ECL headers. */
 #include <ecl/dataobjects/ECLShower.h>
 #include <ecl/dataobjects/ECLSimHit.h>
+#include <ecl/modules/eclBackgroundStudy/ECLCrystalData.h>
 
+/* Basf2 headers. */
 #ifdef DOARICH
-#include <arich/geometry/ARICHGeometryPar.h>
+#  include <arich/geometry/ARICHGeometryPar.h>
 #endif
-
-//Simulation
+#include <framework/logging/Logger.h>
+#include <mdst/dataobjects/MCParticle.h>
 #include <simulation/dataobjects/BeamBackHit.h>
 
-//MDST
-#include <mdst/dataobjects/MCParticle.h>
+/* ROOT headers. */
+#include <TH1F.h>
+#include <TH2F.h>
+#include <TVector3.h>
 
 #define PI 3.14159265358979323846
 
@@ -118,11 +114,14 @@ void ECLBackgroundModule::defineHisto()
   //////////////////////////////////////////
 
   //Doses
-  hEMDose = new TH1F("hEMDose",  "Crystal Radiation Dose; Cell ID ; Gy/yr", 8736, 0, 8736);
-  hEnergyPerCrystal = new TH1F("hEnergyPerCrystal", "Energy per crystal; Cell ID; GeV", 8736, 0, 8736);
+  hEMDose = new TH1F("hEMDose",  "Crystal Radiation Dose; Cell ID ; Gy/yr", ECLElementNumbers::c_NCrystals, 0,
+                     ECLElementNumbers::c_NCrystals);
+  hEnergyPerCrystal = new TH1F("hEnergyPerCrystal", "Energy per crystal; Cell ID; GeV", ECLElementNumbers::c_NCrystals, 0,
+                               ECLElementNumbers::c_NCrystals);
 
   //Diodes
-  hDiodeFlux  = new TH1F("hDiodeFlux",  "Diode Neutron Flux ; Cell ID ; 1MeV-equiv / cm^{2} yr", 8736, 0, 8736);
+  hDiodeFlux  = new TH1F("hDiodeFlux",  "Diode Neutron Flux ; Cell ID ; 1MeV-equiv / cm^{2} yr", ECLElementNumbers::c_NCrystals, 0,
+                         ECLElementNumbers::c_NCrystals);
 
   //Radiation spectra
   hEgamma = new TH1F("hEgamma", "Log Spectrum of the photons hitting the crystals / 1 MeV; log_{10}(E_{#gamma}/1MeV) ", 500, -4, 3);
@@ -386,7 +385,7 @@ void ECLBackgroundModule::endRun()
 
   //print doses of crystals of interest
   for (int i = 0; i < (int)m_CryInt.size(); i++) {
-    if (m_CryInt[i] > 8736) {
+    if (m_CryInt[i] > ECLElementNumbers::c_NCrystals) {
       B2WARNING("ECLBackgroundModule: Invalid cell ID. must be less than 8736");
       continue;
     }

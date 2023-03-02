@@ -29,6 +29,7 @@
 /* ECL headers. */
 #include <ecl/dataobjects/ECLCalDigit.h>
 #include <ecl/dataobjects/ECLDigit.h>
+#include <ecl/dataobjects/ECLElementNumbers.h>
 #include <ecl/dataobjects/ECLTrig.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 #include <ecl/digitization/EclConfiguration.h>
@@ -171,7 +172,8 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::prepare()
   registerObject<TH1F>("clusterTime", clusterTime) ;
 
   auto clusterTime_cid = new TH2F("clusterTime_cid",
-                                  ";crystal Cell ID ;Electron ECL cluster time [ns]", 8736, 1, 8736 + 1, nbins, min_t, max_t) ;
+                                  ";crystal Cell ID ;Electron ECL cluster time [ns]", ECLElementNumbers::c_NCrystals, 1, ECLElementNumbers::c_NCrystals + 1, nbins,
+                                  min_t, max_t) ;
   registerObject<TH2F>("clusterTime_cid", clusterTime_cid) ;
 
   auto clusterTime_run = new TH2F("clusterTime_run",
@@ -290,7 +292,7 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::collect()
   vector<float> Crate_time_unc_ns(52, 0.0); /**< vector derived from DB object */
 
   // Make a crate time offset vector with an entry per crate (instead of per crystal) and convert from ADC counts to ns.
-  for (int crysID = 1; crysID <= 8736; crysID++) {
+  for (int crysID = 1; crysID <= ECLElementNumbers::c_NCrystals; crysID++) {
     int crateID_temp = m_crystalMapper->getCrateID(crysID);
     Crate_time_ns[crateID_temp - 1] = m_CrateTime[crysID] * TICKS_TO_NS;
     Crate_time_unc_ns[crateID_temp - 1] = m_CrateTimeUnc[crysID] * TICKS_TO_NS;
@@ -299,7 +301,7 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::collect()
 
 
   // Storage crystal energies
-  m_EperCrys.resize(8736);
+  m_EperCrys.resize(ECLElementNumbers::c_NCrystals);
   for (auto& eclCalDigit : m_eclCalDigitArray) {
     int tempCrysID = eclCalDigit.getCellId() - 1;
     m_EperCrys[tempCrysID] = eclCalDigit.getEnergy();

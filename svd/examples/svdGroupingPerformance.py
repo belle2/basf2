@@ -50,7 +50,7 @@ parser.add_argument("--signalLifetime", type=float, default=30,
                     help="Lifetime of Signal when computing exponential-weigth for sorting signal groups")
 parser.add_argument("--numberOfSignalGroups", type=int, default=20,
                     help="Select only few signal groups")
-parser.add_argument("--formSuperGroup", action="store_true",
+parser.add_argument("--formSingleSignalGroup", action="store_true",
                     help="Assign groupId 0 to every signal groups")
 parser.add_argument("--useSVDGroupInfo", action="store_true",
                     help="Use SVD Grouping info in SVDSpacePointCreator")
@@ -82,8 +82,8 @@ if args.isRawTime:
 if args.doSVDGrouping:
     outputFileTag += "_Grouping"
     outputFileTag += "_sigLifeTime" + str(int(args.signalLifetime))
-    outputFileTag += "_Signal" + str(int(args.signalGroupSelection))
-    if args.formSuperGroup:
+    outputFileTag += "_Signal" + str(int(args.numberOfSignalGroups))
+    if args.formSingleSignalGroup:
         outputFileTag += "_SuperGroup"
     if args.useSVDGroupInfo:
         outputFileTag += "_UsedInSPs"
@@ -710,8 +710,8 @@ for moda in main.modules():
             moda.param('expectedSignalTimeMax', sigMax)
             moda.param("rebinningFactor", 2)
             moda.param("numberOfSignalGroups", args.numberOfSignalGroups)
-            moda.param("formSuperGroup", args.formSuperGroup)
-            moda.param("signalLifetime", args.exponentialSort)
+            moda.param("formSingleSignalGroup", args.formSingleSignalGroup)
+            moda.param("signalLifetime", args.signalLifetime)
         else:
             moda.param("rebinningFactor", 0)
     if moda.name() == 'SVDSpacePointCreator':

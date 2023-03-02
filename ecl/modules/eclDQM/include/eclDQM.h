@@ -8,24 +8,17 @@
 
 #pragma once
 
-// Copied 6 lines below from PXDDQMModule.h
-#undef DQM
-#ifndef DQM
-#include <framework/core/HistoModule.h>
-#else
-#include <daq/dqm/modules/DqmHistoManagerModule.h>
-#endif
-
-//FRAMEWORK
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/core/ModuleParam.templateDetails.h>
-#include <framework/database/DBObjPtr.h>
-
-//ECL
+/* ECL headers. */
 #include <ecl/utility/ECLChannelMapper.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
+
+/* Basf2 headers. */
+#include <framework/core/HistoModule.h>
+#include <framework/core/ModuleParam.templateDetails.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/database/DBObjPtr.h>
 
 class TH1F;
 class TH2F;

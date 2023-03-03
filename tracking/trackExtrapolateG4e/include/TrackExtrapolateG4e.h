@@ -13,7 +13,7 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/TrackClusterSeparation.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>

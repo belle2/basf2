@@ -1354,7 +1354,7 @@ def extractParticlesFromROE(particleLists,
         mypath.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
         rankByLowest('B0:sig', 'deltaE', numBest=1, path=mypath)
-        extractParticlesFromROE(plists, signalSideParticleList='B0:sig', maskName='all', path=roe_path)
+        extractParticlesFromROE(plists, signalSideParticleList='B0:sig', maskName='all', path=mypath)
 
         # one can analyze these ParticleLists in the main path
 
@@ -1814,6 +1814,7 @@ def rankByHighest(particleList,
                   outputVariable='',
                   allowMultiRank=False,
                   cut='',
+                  overwriteRank=False,
                   path=None):
     """
     Ranks particles in the input list by the given variable (highest to lowest), and stores an integer rank for each Particle
@@ -1840,6 +1841,7 @@ def rankByHighest(particleList,
     @param outputVariable   Name for the variable that will be created which contains the rank, Default is '${variable}_rank'.
     @param allowMultiRank   If true, candidates with the same value will get the same rank.
     @param cut              Only candidates passing the cut will be ranked. The others will have rank -1
+    @param overwriteRank    If true, the extraInfo of rank is overwritten when the particle has already the extraInfo.
     @param path             modules are added to this path
     """
 
@@ -1851,6 +1853,7 @@ def rankByHighest(particleList,
     bcs.param('outputVariable', outputVariable)
     bcs.param('allowMultiRank', allowMultiRank)
     bcs.param('cut', cut)
+    bcs.param('overwriteRank', overwriteRank)
     path.add_module(bcs)
 
 
@@ -1860,6 +1863,7 @@ def rankByLowest(particleList,
                  outputVariable='',
                  allowMultiRank=False,
                  cut='',
+                 overwriteRank=False,
                  path=None):
     """
     Ranks particles in the input list by the given variable (lowest to highest), and stores an integer rank for each Particle
@@ -1886,6 +1890,7 @@ def rankByLowest(particleList,
     @param outputVariable   Name for the variable that will be created which contains the rank, Default is '${variable}_rank'.
     @param allowMultiRank   If true, candidates with the same value will get the same rank.
     @param cut              Only candidates passing the cut will be ranked. The others will have rank -1
+    @param overwriteRank    If true, the extraInfo of rank is overwritten when the particle has already the extraInfo.
     @param path             modules are added to this path
     """
 
@@ -1898,6 +1903,7 @@ def rankByLowest(particleList,
     bcs.param('allowMultiRank', allowMultiRank)
     bcs.param('outputVariable', outputVariable)
     bcs.param('cut', cut)
+    bcs.param('overwriteRank', overwriteRank)
     path.add_module(bcs)
 
 

@@ -8,13 +8,13 @@
 
 #pragma once
 
-//STL
-#include <vector>
-#include <set>
-
-//Root
-#include <TTree.h>
+/* ROOT headers. */
 #include <TH1F.h>
+#include <TTree.h>
+
+/* C++ headers. */
+#include <set>
+#include <vector>
 
 namespace Belle2 {
 

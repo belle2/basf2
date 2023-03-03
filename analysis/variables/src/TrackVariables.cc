@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own includes
+// Own header.
 #include <analysis/variables/TrackVariables.h>
 
 // include VariableManager

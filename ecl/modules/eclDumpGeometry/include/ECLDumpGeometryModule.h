@@ -8,6 +8,7 @@
 
 #pragma once
 
+/* Basf2 headers. */
 #include <framework/core/Module.h>
 
 namespace Belle2 {

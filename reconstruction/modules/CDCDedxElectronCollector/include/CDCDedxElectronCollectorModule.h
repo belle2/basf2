@@ -11,13 +11,16 @@
 #include <vector>
 
 #include <calibration/CalibrationCollectorModule.h>
+
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
 #include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/ECLCluster.h>
+
 #include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
+
 #include <reconstruction/dataobjects/CDCDedxTrack.h>
 #include <reconstruction/dbobjects/CDCDedxWireGain.h>
 
@@ -51,7 +54,6 @@ namespace Belle2 {
     */
     void setEoverPCutValue(double value) {m_setEoP = value;}
 
-
   private:
     /**
     * Electron collector variables
@@ -70,16 +72,16 @@ namespace Belle2 {
     double m_setEoP; /**< Cut of E over P value */
 
     /// event level information
-    double m_injRing{-1};  /**< her or ler  */
-    double m_injTime{-1};  /**< time since last injection */
+    double m_injRing{ -1}; /**< her or ler  */
+    double m_injTime{ -1}; /**< time since last injection */
 
     /// track level information
-    double m_dedx{-1}; /**< dE/dx truncated mean */
-    double m_costh{-1}; /**< track cos(theta) */
-    double m_p{-1}; /**< track momentum */
+    double m_dedx{ -1}; /**< dE/dx truncated mean */
+    double m_costh{ -1}; /**< track cos(theta) */
+    double m_p{ -1}; /**< track momentum */
     int m_charge{0}; /**< track momentum */
-    int m_run{-1}; /**<run number */
-    int m_nhits{-1}; /**< number of dE/dx hits on the track */
+    int m_run{ -1}; /**<run number */
+    int m_nhits{ -1}; /**< number of dE/dx hits on the track */
 
     /// hit level information
     std::vector<int> m_wire;       /**< wire number for the hit */
@@ -88,22 +90,22 @@ namespace Belle2 {
     std::vector<double> m_enta;    /**< entrance angle for the hit */
     std::vector<double> m_docaRS;    /**< rescaled distance of closest approach for the hit */
     std::vector<double> m_entaRS;    /**< rescaled entrance angle for the hit */
-    std::vector<double> m_dedxHit; /**< dE/dx for the hit */
+    std::vector<double> m_dedxhit; /**< dE/dx for the hit */
 
-    bool isCosth;/**< flag to write costh in tree  */
-    bool isMom;/**< flag to write momentum in treet */
-    bool isCharge;/**< flag to write charge in treet */
-    bool isRun;/**< flag to write run number in tree */
-    bool isWire;/**< flag to write wire number in tree */
-    bool isLayer;/**< flag to write layer number in tree */
-    bool isDoca;/**< flag to write doca in tree */
-    bool isEnta;/**< flag to write enta in tree */
-    bool isDocaRS;/**< flag to write rescaled doca in tree */
-    bool isEntaRS;/**< flag to write rescaled enta in tree */
-    bool isDedxHit;/**< flag to write dedxhits in tree */
-    bool isBhabha;/**< flag to select bhabha event */
-    bool isRadee;/**< flag to select radee event */
-    bool isTrgSel; /**< flag to enable trigger skim (off deafult) */
-    bool isInjTime; /**< flag to enable trigger skim (off deafult) */
+    bool m_isCosth;         /**< flag to write costh in tree  */
+    bool m_isMom;           /**< flag to write momentum in treet */
+    bool m_isCharge;        /**< flag to write charge in treet */
+    bool m_isRun;           /**< flag to write run number in tree */
+    bool m_isWire;          /**< flag to write wire number in tree */
+    bool m_isLayer;         /**< flag to write layer number in tree */
+    bool m_isDoca;          /**< flag to write doca in tree */
+    bool m_isEnta;          /**< flag to write enta in tree */
+    bool m_isDocaRS;        /**< flag to write rescaled doca in tree */
+    bool m_isEntaRS;        /**< flag to write rescaled enta in tree */
+    bool m_isDedxhit;       /**< flag to write dedxhits in tree */
+    bool m_isBhabha;     /**< flag to select bhabha event */
+    bool m_isRadee;  /**< flag to select radee event */
+    bool m_isTrgSel;    /**< flag to enable trigger skim selected in the module (off deafult) */
+    bool m_isInjTime; /**< flag to enable trigger skim (off deafult) */
   };
 }

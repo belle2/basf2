@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <arich/modules/arichMCParticles/ARICHMCParticlesModule.h>
 
 // framework - DataStore
@@ -16,8 +16,9 @@
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
-
-using namespace std;
+#include <mdst/dataobjects/Track.h>
+#include <tracking/dataobjects/ExtHit.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 namespace Belle2 {
 
@@ -56,22 +57,18 @@ namespace Belle2 {
 
   }
 
-  void ARICHMCParticlesModule::beginRun()
-  {
-  }
-
   void ARICHMCParticlesModule::event()
   {
-    Const::EDetector myDetID = Const::EDetector::ARICH; // arich
-    Const::ChargedStable hypothesis = Const::pion;
-    int pdgCode = abs(hypothesis.getPDGCode());
+    const Const::EDetector arich = Const::EDetector::ARICH; // arich
+    const Const::ChargedStable particleHypothesis = Const::pion;
+    const int pdgCode = abs(particleHypothesis.getPDGCode());
 
     for (int itrk = 0; itrk < m_tracks.getEntries(); ++itrk) {
 
       const Track* track = m_tracks[itrk];
-      const TrackFitResult* fitResult = track->getTrackFitResultWithClosestMass(hypothesis);
+      const TrackFitResult* fitResult = track->getTrackFitResultWithClosestMass(particleHypothesis);
       if (!fitResult) {
-        B2ERROR("No TrackFitResult for " << hypothesis.getPDGCode());
+        B2ERROR("No TrackFitResult for " << particleHypothesis.getPDGCode());
         continue;
       }
 
@@ -82,10 +79,10 @@ namespace Belle2 {
 
       for (unsigned i = 0; i < extHits.size(); i++) {
         const ExtHit* extHit = extHits[i];
-        if (abs(extHit->getPdgCode()) != pdgCode) continue;
-        if (extHit->getDetectorID() != myDetID) continue;
-        if (extHit->getStatus() != EXT_EXIT) continue; // particles registered at the EXIT of the Al plate
-        if (extHit->getMomentum().Z() < 0.0) continue; // track passes in backward
+        if (abs(extHit->getPdgCode()) != pdgCode or
+            extHit->getDetectorID() != arich or
+            extHit->getStatus() != EXT_EXIT or // particles registered at the EXIT of the Al plate
+            extHit->getMomentum().Z() < 0.0) continue; // track passes in backward
         if (extHit->getCopyID() == 6789) {
           //MCParticle arichMCP = *particle;
           MCParticle* arichP = m_arichMCPs.appendNew(*particle);
@@ -97,20 +94,6 @@ namespace Belle2 {
     }
 
   }
-
-
-  void ARICHMCParticlesModule::endRun()
-  {
-  }
-
-  void ARICHMCParticlesModule::terminate()
-  {
-  }
-
-  void ARICHMCParticlesModule::printModuleParams() const
-  {
-  }
-
 
 } // end Belle2 namespace
 

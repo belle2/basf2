@@ -8,11 +8,17 @@
 
 #pragma once
 
-#include <framework/core/Module.h>
+#include <cmath>
+#include <algorithm>
+#include <TMath.h>
+#include <vector>
 
+#include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/database/DBObjPtr.h>
 
+#include <reconstruction/dataobjects/CDCDedxTrack.h>
+#include <reconstruction/dataobjects/DedxConstants.h>
 #include <reconstruction/dbobjects/CDCDedxScaleFactor.h>
 #include <reconstruction/dbobjects/CDCDedxMomentumCor.h>
 #include <reconstruction/dbobjects/CDCDedxWireGain.h>
@@ -28,7 +34,8 @@
 #include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
 
 
-#include <vector>
+#include <cdc/geometry/CDCGeometryParConstants.h>
+#include <cdc/geometry/CDCGeometryPar.h>
 
 namespace Belle2 {
   class CDCDedxTrack;
@@ -67,7 +74,7 @@ namespace Belle2 {
     void TimeGainCorrection(double& dedx, double ring, double time) const;
 
     /** Perform a wire gain correction */
-    void WireGainCorrection(int wireID, double& dedx) const;
+    void WireGainCorrection(int wireID, double& dedx, int layer) const;
 
     /** Perform a 2D correction */
     void TwoDCorrection(int layer, double doca, double enta, double& dedx) const;
@@ -132,6 +139,7 @@ namespace Belle2 {
     DBObjPtr<CDCDedxADCNonLinearity> m_DBNonlADC; /**< hadron saturation non linearity */
     DBObjPtr<CDCDedxCosineEdge> m_DBCosEdgeCor; /**< cosine edge calibration */
     std::vector<double> m_hadronpars; /**< hadron saturation parameters */
+    std::array<double, 56> m_lgainavg; /**< average calibration factor for the layer */
 
     /** Recalculate the dE/dx mean values after corrections */
     void calculateMeans(double* mean, double* truncatedMean, double* truncatedMeanErr, const std::vector<double>& dedx) const;

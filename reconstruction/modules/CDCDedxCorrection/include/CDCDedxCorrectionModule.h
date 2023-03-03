@@ -33,7 +33,6 @@
 
 #include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
 
-
 #include <cdc/geometry/CDCGeometryParConstants.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 

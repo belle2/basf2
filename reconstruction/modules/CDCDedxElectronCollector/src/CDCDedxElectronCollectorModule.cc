@@ -148,141 +148,140 @@ void CDCDedxElectronCollectorModule::collect()
       hestats->Fill(3);
       return;
     } else  if (m_isRadee && !m_isBhabha && !eRadBhabha) {
-      B2WARNING("requested radee only but event not found: going back");
-      hestats->Fill(3);
+        B2WARNING("requested radee only but event not found: going back");
+        hestats->Fill(3);
+        return;
+      }
+    } else {
+      hestats->GetXaxis()->SetBinLabel(2, "inact1");
+      hestats->GetXaxis()->SetBinLabel(3, "inact2");
+      hestats->GetXaxis()->SetBinLabel(4, "inact3");
+    }
+
+    StoreObjPtr<EventMetaData> eventMetaDataPtr;
+    int run = eventMetaDataPtr->getRun();
+    if (m_isRun)m_run = run;
+    int nTracks = m_dedxTracks.getEntries();
+    if (nTracks >= 4) {
+      B2WARNING("too many tracks: unclean bhabha or radee event: " << nTracks);
+      hestats->Fill(4);
       return;
     }
-  } else {
-    hestats->GetXaxis()->SetBinLabel(2, "inact1");
-    hestats->GetXaxis()->SetBinLabel(3, "inact2");
-    hestats->GetXaxis()->SetBinLabel(4, "inact3");
-  }
 
-  StoreObjPtr<EventMetaData> eventMetaDataPtr;
-  int run = eventMetaDataPtr->getRun();
-  if (m_isRun)m_run = run;
+    hestats->Fill(5);
 
-  int nTracks = m_dedxTracks.getEntries();
-  if (nTracks >= 4) {
-    B2WARNING("too many tracks: unclean bhabha or radee event: " << nTracks);
-    hestats->Fill(4);
-    return;
-  }
+    //Collector object access
+    auto tree = getObjectPtr<TTree>("tree");
+    auto htstats = getObjectPtr<TH1I>("htstats");
+    auto hmeans = getObjectPtr<TH1D>("means");
 
-  hestats->Fill(5);
+    for (int idedx = 0; idedx < nTracks; idedx++) {
 
-  //Collector object access
-  auto tree = getObjectPtr<TTree>("tree");
-  auto htstats = getObjectPtr<TH1I>("htstats");
-  auto hmeans = getObjectPtr<TH1D>("means");
+      CDCDedxTrack* dedxTrack = m_dedxTracks[idedx];
+      if (!dedxTrack) {
+        B2WARNING("No dedx track: Going back: " << idedx);
+        continue;
+      }
 
-  for (int idedx = 0; idedx < nTracks; idedx++) {
+      const Track* track = dedxTrack->getRelatedFrom<Track>();
+      if (!track) {
+        B2WARNING("No track: Going back: " << idedx);
+        continue;
+      }
 
-    CDCDedxTrack* dedxTrack = m_dedxTracks[idedx];
-    if (!dedxTrack) {
-      B2WARNING("No dedx track: Going back: " << idedx);
-      continue;
-    }
+      const TrackFitResult* fitResult = track->getTrackFitResultWithClosestMass(Const::pion);
+      if (!fitResult) {
+        B2WARNING("No related fit for this track...");
+        continue;
+      }
 
-    const Track* track = dedxTrack->getRelatedFrom<Track>();
-    if (!track) {
-      B2WARNING("No track: Going back: " << idedx);
-      continue;
-    }
+      m_dedx = dedxTrack->getDedxNoSat();
+      m_p = dedxTrack->getMomentum();
+      m_costh = dedxTrack->getCosTheta();
+      m_charge = fitResult->getChargeSign();
+      m_injTime = dedxTrack->getInjectionTime();
+      m_injRing = dedxTrack->getInjectionRing();
+      htstats->Fill(0);
 
-    const TrackFitResult* fitResult = track->getTrackFitResultWithClosestMass(Const::pion);
-    if (!fitResult) {
-      B2WARNING("No related fit for this track...");
-      continue;
-    }
+      if (m_cuts) {
+        // apply cleanup cuts
+        if (fabs(fitResult->getD0()) >= 1.0)continue;
+        if (fabs(fitResult->getZ0()) >= 1.0) continue;
+        htstats->Fill(1);
 
-    m_dedx = dedxTrack->getDedxNoSat();
-    m_p = dedxTrack->getMomentum();
-    m_costh = dedxTrack->getCosTheta();
-    m_charge = fitResult->getChargeSign();
-    m_injTime = dedxTrack->getInjectionTime();
-    m_injRing = dedxTrack->getInjectionRing();
-    htstats->Fill(0);
+        //if outside CDC
+        if (m_costh < TMath::Cos(150.0 * TMath::DegToRad()))continue; //-0.866
+        if (m_costh > TMath::Cos(17.0 * TMath::DegToRad())) continue; //0.95
+        htstats->Fill(2);
 
-    if (m_cuts) {
-      // apply cleanup cuts
-      if (fabs(fitResult->getD0()) >= 1.0)continue;
-      if (fabs(fitResult->getZ0()) >= 1.0) continue;
-      htstats->Fill(1);
+        m_nhits = dedxTrack->size();
+        if (m_nhits > m_maxHits) continue;
 
-      //if outside CDC
-      if (m_costh < TMath::Cos(150.0 * TMath::DegToRad()))continue; //-0.866
-      if (m_costh > TMath::Cos(17.0 * TMath::DegToRad())) continue; //0.95
-      htstats->Fill(2);
-
-      m_nhits = dedxTrack->size();
-      if (m_nhits > m_maxHits) continue;
-
-      //making some cuts based on acceptance
-      if (m_costh > -0.55 && m_costh < 0.820) {
-        if (dedxTrack->getNLayerHits() < 25)continue; //all CDC layer available here
-      } else {
-        if (m_costh <= -0.62 || m_costh >= 0.880) {
-          if (dedxTrack->getNLayerHits() < 10)continue; //less layer available here
-          if (m_costh > 0 && dedxTrack->getNLayerHits() < 13)continue;
+        //making some cuts based on acceptance
+        if (m_costh > -0.55 && m_costh < 0.820) {
+          if (dedxTrack->getNLayerHits() < 25)continue; //all CDC layer available here
         } else {
-          if (dedxTrack->getNLayerHits() < 18)continue;
+          if (m_costh <= -0.62 || m_costh >= 0.880) {
+            if (dedxTrack->getNLayerHits() < 10)continue; //less layer available here
+            if (m_costh > 0 && dedxTrack->getNLayerHits() < 13)continue;
+          } else {
+            if (dedxTrack->getNLayerHits() < 18)continue;
+          }
         }
+        htstats->Fill(3);
+
+        const ECLCluster* eclCluster = track->getRelated<ECLCluster>();
+        if (eclCluster and eclCluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
+          double TrkEoverP = (eclCluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons)) / (fitResult->getMomentum().R());
+          if (abs(TrkEoverP - 1.0) > m_setEoP)continue;
+        }
+        htstats->Fill(4);
       }
-      htstats->Fill(3);
 
-      const ECLCluster* eclCluster = track->getRelated<ECLCluster>();
-      if (eclCluster and eclCluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
-        double TrkEoverP = (eclCluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons)) / (fitResult->getMomentum().R());
-        if (abs(TrkEoverP - 1.0) > m_setEoP)continue;
+      //if dealing with radee here (do a safe side cleanup)
+      if (m_isRadee) {
+          if (nTracks != 2)continue; //exactly 2 tracks
+          bool goodradee = false;
+          //checking if dedx of other track is restricted
+          //will not do too much as radee is clean enough
+          for (int jdedx = 0; jdedx < nTracks; jdedx++) {
+            CDCDedxTrack* dedxOtherTrack = m_dedxTracks[abs(jdedx - 1)];
+            if (!dedxOtherTrack)continue;
+            if (abs(dedxOtherTrack->getDedxNoSat() - 1.0) > 0.25)continue; //loose for uncalibrated
+            goodradee = true;
+            break;
+          }
+          if (!goodradee)continue;
+          htstats->Fill(5);
+        }
+
+
+        // Make sure to remove all the data in vectors from the previous track
+        if (m_isWire)m_wire.clear();
+        if (m_isLayer)m_layer.clear();
+        if (m_isDoca)m_doca.clear();
+        if (m_isEnta)m_enta.clear();
+        if (m_isDocaRS)m_docaRS.clear();
+        if (m_isEntaRS)m_entaRS.clear();
+        if (m_isDedxhit)m_dedxhit.clear();
+
+        // Simple numbers don't need to be cleared
+        // make sure to use the truncated mean without the hadron saturation correction
+
+        for (int i = 0; i < m_nhits; ++i) {
+          // if (m_DBWireGains->getWireGain(dedxTrack->getWire(i)) == 0)continue;
+          if (m_isWire)m_wire.push_back(dedxTrack->getWire(i));
+          if (m_isLayer)m_layer.push_back(dedxTrack->getHitLayer(i));
+          if (m_isDoca)m_doca.push_back(dedxTrack->getDoca(i));
+          if (m_isEnta)m_enta.push_back(dedxTrack->getEnta(i));
+          if (m_isDocaRS)m_docaRS.push_back(dedxTrack->getDocaRS(i) / dedxTrack->getCellHalfWidth(i));
+          if (m_isEntaRS)m_entaRS.push_back(dedxTrack->getEntaRS(i));
+          if (m_isDedxhit)m_dedxhit.push_back(dedxTrack->getDedx(i));
+        }
+
+        // Track and/or hit information filled as per config
+        htstats->Fill(6);
+        hmeans->Fill(m_dedx);
+        tree->Fill();
       }
-      htstats->Fill(4);
     }
-
-    //if dealing with radee here (do a safe side cleanup)
-    if (m_isRadee) {
-      if (nTracks != 2)continue; //exactly 2 tracks
-      bool goodradee = false;
-      //checking if dedx of other track is restricted
-      //will not do too much as radee is clean enough
-      for (int jdedx = 0; jdedx < nTracks; jdedx++) {
-        CDCDedxTrack* dedxOtherTrack = m_dedxTracks[abs(jdedx - 1)];
-        if (!dedxOtherTrack)continue;
-        if (abs(dedxOtherTrack->getDedxNoSat() - 1.0) > 0.25)continue; //loose for uncalibrated
-        goodradee = true;
-        break;
-      }
-      if (!goodradee)continue;
-      htstats->Fill(5);
-    }
-
-
-    // Make sure to remove all the data in vectors from the previous track
-    if (m_isWire)m_wire.clear();
-    if (m_isLayer)m_layer.clear();
-    if (m_isDoca)m_doca.clear();
-    if (m_isEnta)m_enta.clear();
-    if (m_isDocaRS)m_docaRS.clear();
-    if (m_isEntaRS)m_entaRS.clear();
-    if (m_isDedxhit)m_dedxhit.clear();
-
-    // Simple numbers don't need to be cleared
-    // make sure to use the truncated mean without the hadron saturation correction
-
-    for (int i = 0; i < m_nhits; ++i) {
-      // if (m_DBWireGains->getWireGain(dedxTrack->getWire(i)) == 0)continue;
-      if (m_isWire)m_wire.push_back(dedxTrack->getWire(i));
-      if (m_isLayer)m_layer.push_back(dedxTrack->getHitLayer(i));
-      if (m_isDoca)m_doca.push_back(dedxTrack->getDoca(i));
-      if (m_isEnta)m_enta.push_back(dedxTrack->getEnta(i));
-      if (m_isDocaRS)m_docaRS.push_back(dedxTrack->getDocaRS(i) / dedxTrack->getCellHalfWidth(i));
-      if (m_isEntaRS)m_entaRS.push_back(dedxTrack->getEntaRS(i));
-      if (m_isDedxhit)m_dedxhit.push_back(dedxTrack->getDedx(i));
-    }
-
-    // Track and/or hit information filled as per config
-    htstats->Fill(6);
-    hmeans->Fill(m_dedx);
-    tree->Fill();
-  }
-}

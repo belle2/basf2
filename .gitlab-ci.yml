@@ -34,7 +34,10 @@ default:
     - git config user.email "something@something.com"
     - git config user.name "someone"
     - git config --global --add safe.directory $(dirname ${GITLAB_BELLE2_TOOLS_B2SETUP})
-    - git fetch && git merge origin/${CI_MERGE_REQUEST_TARGET_BRANCH_NAME} --allow-unrelated-histories --strategy-option ours
+    - |
+      if [ "${CI_PIPELINE_SOURCE}" == "merge_request_event" ]; then
+        git fetch && git merge origin/${CI_MERGE_REQUEST_TARGET_BRANCH_NAME} --allow-unrelated-histories --strategy-option ours
+      fi
     # Preliminary operations necessary for basf2
     - unset DISPLAY
     - if [ ! -f .release ]; then echo "head" > .release; fi

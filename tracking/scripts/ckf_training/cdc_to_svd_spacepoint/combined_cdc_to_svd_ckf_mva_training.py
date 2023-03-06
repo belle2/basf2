@@ -458,12 +458,40 @@ class MainTask(b2luigi.WrapperTask):
                 experiment_numbers, fast_bdt_options
         ):
 
-            for layer in [3, 4, 5, 6, 7]:
+            # yield SplitNMergeSimTask(
+            #     # bkgfiles_dir=MainTask.bkgfiles_by_exp[self.experiment_number],
+            #     # random_seed=self.random_seed,
+            #     # n_events=self.n_events,
+            #     # experiment_number=self.experiment_number,
+            #     bkgfiles_dir=MainTask.bkgfiles_by_exp[experiment_number],
+            #     random_seed="self.random_seed",
+            #     n_events=self.n_events_training,
+            #     experiment_number=experiment_number,
+            # )
+
+            # for layer in [3, 4, 5, 6, 7]:
+            #     yield self.clone(
+            #         StateRecordingTask,
+            #         layer=layer,
+            #         experiment_number=experiment_number,
+            #         n_events_training=self.n_events_training
+            #     )
+            # #yield self.clone(
+            # #    StateRecordingTask,
+            # #    layer=7,
+            # #    experiment_number=experiment_number,
+            # #    n_events_training=self.n_events_training
+            # #)
+
+            record_files = ["records1.root", "records2.root", "records3.root"]
+            tree_names = ["records1", "records2", "records3"]
+            for file, tree in zip(record_files, tree_names):
                 yield self.clone(
-                    StateRecordingTask,
-                    layer=layer,
+                    CKFStateFilterTeacherTask,
+                    records_file_name=file,
+                    tree_name=tree,
+                    n_events_training=self.n_events_training,
                     experiment_number=experiment_number,
-                    n_events_training=self.n_events_training
                 )
 
 

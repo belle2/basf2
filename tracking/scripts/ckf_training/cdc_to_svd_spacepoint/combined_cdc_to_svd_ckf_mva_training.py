@@ -19,6 +19,8 @@ import background
 import simulation
 from packaging import version
 
+from ckf_training import my_basf2_mva_teacher
+
 # wrap python modules that are used here but not in the externals into a try except block
 install_helpstring_formatter = ("\nCould not find {module} python module.Try installing it via\n"
                                 "  python3 -m pip install [--user] {module}\n")
@@ -310,6 +312,95 @@ class StateRecordingTask(Basf2PathTask):
             records1_fname=self.get_output_file_name("records1.root"),
             records2_fname=self.get_output_file_name("records2.root"),
             records3_fname=self.get_output_file_name("records3.root"),
+        )
+
+
+class CKFStateFilterTeacherTask(Basf2Task):
+    """
+    A teacher task runs the basf2 mva teacher on the training data provided by a
+    data collection task.
+
+    Since teacher tasks are needed for all quality estimators covered by this
+    steering file and the only thing that changes is the required data
+    collection task and some training parameters, I decided to use inheritance
+    and have the basic functionality in this base class/interface and have the
+    specific teacher tasks inherit from it.
+    """
+    #: Name of the records file to be processed
+    records_file_name = b2luigi.Parameter()
+    #: Name of the tree to be processed
+    tree_name = b2luigi.Parameter()
+
+    #: Number of events to generate for the training data set.
+    n_events_training = b2luigi.IntParameter()
+    #: Experiment number of the conditions database, e.g. defines simulation geometry
+    experiment_number = b2luigi.IntParameter()
+    #: Feature/variable to use as truth label in the quality estimator MVA classifier.
+    training_target = b2luigi.Parameter(
+        #: \cond
+        default="truth"
+        #: \endcond
+    )
+    #: List of collected variables to not use in the training of the QE MVA classifier.
+    # In addition to variables containing the "truth" substring, which are excluded by default.
+    exclude_variables = b2luigi.ListParameter(
+        #: \cond
+        hashed=True, default=[]
+        #: \endcond
+    )
+    #: Hyperparameter option of the FastBDT algorithm. default are the FastBDT default values.
+    fast_bdt_option = b2luigi.ListParameter(
+        #: \cond
+        hashed=True, default=[200, 8, 3, 0.1]
+        #: \endcond
+    )
+
+    def get_weightfile_xml_identifier(self, fast_bdt_option=None, filter_number=1):
+        """
+        Name of the xml weightfile that is created by the teacher task.
+        It is subsequently used as a local weightfile in the following validation tasks.
+        """
+        weightfile_name = f"trk_CDCToSVDSpacePointStateFilter_{filter_number}"
+        return weightfile_name + ".weights.xml"
+
+    def requires(self):
+        """
+        Generate list of luigi Tasks that this Task depends on.
+        """
+        for layer in [3, 4, 5, 6, 7]:
+            yield self.clone(
+                StateRecordingTask,
+                layer=layer,
+                experiment_number=self.experiment_number,
+                n_events_training=self.n_events_training
+            )
+
+    def output(self):
+        """
+        Generate list of output files that the task should produce.
+        The task is considered finished if and only if the outputs all exist.
+        """
+        yield self.add_to_output(self.get_weightfile_xml_identifier())
+
+    def process(self):
+        """
+        Use basf2_mva teacher to create MVA weightfile from collected training
+        data variables.
+
+        This is the main process that is dispatched by the ``run`` method that
+        is inherited from ``Basf2Task``.
+        """
+        records_files = self.get_input_file_names(self.records_file_name)
+
+        print(records_files)
+
+        my_basf2_mva_teacher(
+            records_files=records_files,
+            tree_name=self.tree_name,
+            weightfile_identifier=self.get_output_file_name(self.get_weightfile_xml_identifier()),
+            target_variable=self.training_target,
+            exclude_variables=self.exclude_variables,
+            fast_bdt_option=self.fast_bdt_option,
         )
 
 

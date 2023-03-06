@@ -264,8 +264,8 @@ class ComparisonBase(ABC):
         if not self._has_correct_types():
             msg = (
                 "Comparison of {} (Type {}) with {} (Type {}) not "
-                "supported.\nPlease open a JIRA issue (validation "
-                "component) if you need this supported. "
+                "supported.\nPlease open a GitLab issue (validation "
+                "issue) if you need this supported. "
             )
             raise ObjectsNotSupported(
                 msg.format(
@@ -559,7 +559,7 @@ class Chi2Test(PvalueTest):
                 "'validation/scripts/validationcomparison.py' on your root "
                 "file and the reference. Run 'validationcomparison.py "
                 "--help' for info. If problem persists, please open "
-                "JIRA issue (validation component)."
+                "GitLab issue (validation label)."
             )
             raise ComparisonFailed(msg)
 

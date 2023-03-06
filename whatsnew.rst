@@ -346,7 +346,7 @@ We do not expect to *remove* it, but *do not recommend* its use for any real phy
 
 Instead we recommend you use either KFit (`vertex.kFit`) for fast/simple fits, or TreeFit (`vertex.treeFit`) for more complex fits and fitting the full decay chain.
 Please check the :ref:`TreeFitter` pages for details about the constraints available.
-If you are unable to use TreeFitter because of missing functionality, please `submit a feature request <https://agira.desy.de/projects/BII>`_!
+If you are unable to use TreeFitter because of missing functionality, please `submit a feature request <https://gitlab.desy.de/belle2/software/basf2/-/issues>`_!
 
 .. warning:: The default fitter for `vertex.fitVertex` has been changed to KFit.
 

@@ -7,6 +7,8 @@ Additional Features
   - ``:ref:`b2-modindex``` (:ref:`b2-modindex`)
   - ``:ref:`b2-varindex``` (:ref:`b2-varindex`)
 
-* We have support for easy linking to JIRA issues by using
-  ``:issue:`BII-XXXX```, for example ``:issue:`BII-8``` (:issue:`BII-8`)
+
+.. FIXME: let's check if this still works
+.. * We have support for easy linking to GitLab issues by using
+..  ``:issue:`BII-XXXX```, for example ``:issue:`BII-8``` (:issue:`BII-8`)
 

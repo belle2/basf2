@@ -83,3 +83,11 @@ def my_basf2_mva_teacher(
     fastbdt_options.m_shrinkage = fast_bdt_option[3]
     # Train a MVA method and store the weightfile (MVAFastBDT.root) locally.
     basf2_mva.teacher(general_options, fastbdt_options)
+
+
+def create_fbdt_option_string(fast_bdt_option):
+    """
+    returns a readable string created by the fast_bdt_option array
+    """
+    return "_nTrees" + str(fast_bdt_option[0]) + "_nCuts" + str(fast_bdt_option[1]) + "_nLevels" + \
+        str(fast_bdt_option[2]) + "_shrin" + str(int(round(100*fast_bdt_option[3], 0)))

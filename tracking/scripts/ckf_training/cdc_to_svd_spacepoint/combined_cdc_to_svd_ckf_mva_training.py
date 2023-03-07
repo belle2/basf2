@@ -320,6 +320,8 @@ class StateRecordingTask(Basf2PathTask):
         path.add_module("Geometry")
         path.add_module("SetupGenfitExtrapolation")
 
+        add_hit_preparation_modules(path, components=["SVD"])
+
         add_track_finding(path, reco_tracks="CDCRecoTracks", components=["CDC"], prune_temporary_tracks=False)
 
         path.add_module('TrackFinderMCTruthRecoTracks',
@@ -333,8 +335,6 @@ class StateRecordingTask(Basf2PathTask):
                         mcRecoTracksStoreArrayName="MCRecoTracks",
                         prRecoTracksStoreArrayName="CDCRecoTracks")
         path.add_module("DAFRecoFitter", recoTracksStoreArrayName="CDCRecoTracks")
-
-        add_hit_preparation_modules(path, components=["SVD"])
 
         path.add_module("CDCToSVDSpacePointCKF",
                         inputRecoTrackStoreArrayName="CDCRecoTracks",

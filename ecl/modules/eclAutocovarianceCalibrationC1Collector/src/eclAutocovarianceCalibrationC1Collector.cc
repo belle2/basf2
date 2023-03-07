@@ -7,7 +7,7 @@
  **************************************************************************/
 
 //This module`
-#include <ecl/modules/eclWaveformCovMatCollector/eclWaveformCovMatCollectorC1.h>
+#include <ecl/modules/eclAutocovarianceCalibrationC1Collector/eclAutocovarianceCalibrationC1Collector.h>
 
 //Root
 #include <TH2I.h>
@@ -26,29 +26,30 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Modules
 //-----------------------------------------------------------------
-REG_MODULE(eclWaveformCovMatCollectorC1)
+REG_MODULE(eclAutocovarianceCalibrationC1Collector)
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
 // constructor
-eclWaveformCovMatCollectorC1Module::eclWaveformCovMatCollectorC1Module()
+eclAutocovarianceCalibrationC1CollectorModule::eclAutocovarianceCalibrationC1CollectorModule()
 {
   // Set module properties
   setDescription("Module to export histogram of noise in waveforms from random trigger events");
   setPropertyFlags(c_ParallelProcessingCertified);
 }
 
-void eclWaveformCovMatCollectorC1Module::prepare()
+void eclAutocovarianceCalibrationC1CollectorModule::prepare()
 {
 
   /**----------------------------------------------------------------------------------------*/
-  B2INFO("eclWaveformCovMatCollectorC1: Experiment = " << m_evtMetaData->getExperiment() << "  run = " << m_evtMetaData->getRun());
+  B2INFO("eclAutocovarianceCalibrationC1Collector: Experiment = " << m_evtMetaData->getExperiment() << "  run = " <<
+         m_evtMetaData->getRun());
 
   /**----------------------------------------------------------------------------------------*/
   /** Create the histograms and register them in the data store */
   auto PPVsCrysID = new TH2I("PPVsCrysID", "Peak to peak amplitude for each crystal;crystal ID;Peak to peak Amplitud (ADC)", 8736, 0,
-                             8736, 1000, 0, 1000);
+                             8736, 2000, 0, 2000);
   registerObject<TH2I>("PPVsCrysID", PPVsCrysID);
 
   m_eclDsps.registerInDataStore();
@@ -56,7 +57,7 @@ void eclWaveformCovMatCollectorC1Module::prepare()
 }
 
 
-void eclWaveformCovMatCollectorC1Module::collect()
+void eclAutocovarianceCalibrationC1CollectorModule::collect()
 {
 
   const int NumDsp = m_eclDsps.getEntries();
@@ -80,7 +81,9 @@ void eclWaveformCovMatCollectorC1Module::collect()
 
       int PeakToPeak = maxADC - minADC;
 
-      getObjectPtr<TH1I>("PPVsCrysID")->Fill(id, PeakToPeak);
+      //B2INFO(PeakToPeak);
+
+      getObjectPtr<TH2I>("PPVsCrysID")->Fill(id, PeakToPeak);
 
     }
   }

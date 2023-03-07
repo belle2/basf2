@@ -401,10 +401,8 @@ class CKFStateFilterTeacherTask(Basf2Task):
     and have the basic functionality in this base class/interface and have the
     specific teacher tasks inherit from it.
     """
-    #: Name of the records file to be processed
-    records_file_name = b2luigi.Parameter()
-    #: Name of the tree to be processed
-    tree_name = b2luigi.Parameter()
+    #: Number of the filter for which the records files are to be processed
+    filter_number = b2luigi.IntParameter()
 
     #: Number of events to generate for the training data set.
     n_events_training = b2luigi.IntParameter()
@@ -455,7 +453,7 @@ class CKFStateFilterTeacherTask(Basf2Task):
         Generate list of output files that the task should produce.
         The task is considered finished if and only if the outputs all exist.
         """
-        yield self.add_to_output(self.get_weightfile_xml_identifier())
+        yield self.add_to_output(self.get_weightfile_xml_identifier(filter_number=self.filter_number))
 
     def process(self):
         """
@@ -465,14 +463,14 @@ class CKFStateFilterTeacherTask(Basf2Task):
         This is the main process that is dispatched by the ``run`` method that
         is inherited from ``Basf2Task``.
         """
-        records_files = self.get_input_file_names(self.records_file_name)
-
-        print(records_files)
+        records_files = self.get_input_file_names(f"records{self.filter_number}.root")
+        tree_name = f"records{self.filter_number}"
+        print(f"Processed records files: {records_files=},\nfeature tree name: {tree_name=}")
 
         my_basf2_mva_teacher(
             records_files=records_files,
-            tree_name=self.tree_name,
-            weightfile_identifier=self.get_output_file_name(self.get_weightfile_xml_identifier()),
+            tree_name=tree_name,
+            weightfile_identifier=self.get_output_file_name(self.get_weightfile_xml_identifier(filter_number=self.filter_number)),
             target_variable=self.training_target,
             exclude_variables=self.exclude_variables,
             fast_bdt_option=self.fast_bdt_option,
@@ -558,13 +556,21 @@ class MainTask(b2luigi.WrapperTask):
             # #    n_events_training=self.n_events_training
             # #)
 
-            record_files = ["records1.root", "records2.root", "records3.root"]
-            tree_names = ["records1", "records2", "records3"]
-            for file, tree in zip(record_files, tree_names):
+            # record_files = ["records1.root", "records2.root", "records3.root"]
+            # tree_names = ["records1", "records2", "records3"]
+            # for file, tree in zip(record_files, tree_names):
+            #     yield self.clone(
+            #         CKFStateFilterTeacherTask,
+            #         records_file_name=file,
+            #         tree_name=tree,
+            #         n_events_training=self.n_events_training,
+            #         experiment_number=experiment_number,
+            #     )
+            filter_numbers = [1, 2, 3]
+            for filter_number in filter_numbers:
                 yield self.clone(
                     CKFStateFilterTeacherTask,
-                    records_file_name=file,
-                    tree_name=tree,
+                    filter_number=filter_number,
                     n_events_training=self.n_events_training,
                     experiment_number=experiment_number,
                 )

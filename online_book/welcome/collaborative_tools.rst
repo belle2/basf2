@@ -182,7 +182,7 @@ Let's assume you are working on an analysis when...
   You have a crash or a segmentation fault, or the output cannot possibly be
   correct.
   **You probably have a bug.**
-  Bugs should be reported at `https://gitlab.desy.de/belle2/software/basf2/-/issues`_.
+  Bugs should be reported at `<https://gitlab.desy.de/belle2/software/basf2/-/issues>`_.
   You should continue to try and investigate and understand it yourself.
 
 ... with the grid

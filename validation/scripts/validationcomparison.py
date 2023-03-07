@@ -265,7 +265,7 @@ class ComparisonBase(ABC):
             msg = (
                 "Comparison of {} (Type {}) with {} (Type {}) not "
                 "supported.\nPlease open a GitLab issue (validation "
-                "issue) if you need this supported. "
+                "label) if you need this supported. "
             )
             raise ObjectsNotSupported(
                 msg.format(

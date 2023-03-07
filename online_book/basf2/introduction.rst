@@ -200,7 +200,7 @@ You will meet this at the end of this lesson.
 .. admonition:: Solution
      :class: toggle solution
 
-     The source code is online `here <https://gitlab.desy.de/belle2/software/basf2/-/tree/main/`_.
+     The source code is online `here <https://gitlab.desy.de/belle2/software/basf2>`_.
      The list of **packages** is simply the list of directories in the software
      directory.
 

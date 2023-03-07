@@ -86,7 +86,7 @@
 # December 2021, V. Bertacchi (bertacchi@cppm.in2p3.fr)
 #   fixed a_1+ and a_10 BR decay table to restore isospin simmetry and reimplement the resonant contribution (KK*)
 #   rescaled B->DKK* BR to take into account of resonant contribution B->D(a1->KK*), preserving the BR(NR+Res)= Belle measurement (https://doi.org/10.1016/S0370-2693(02)02373-0)
-#   https://stash.desy.de/projects/B2/repos/basf2/pull-requests/581/overview
+#   https://gitlab.desy.de/belle2/software/basf2/-/merge_requests/581
 #
 # March 2022, H. Svidras (henrikas.svidras@desy.de)
 #   Corrected the BTOXSGAMMA model branching fraction to the correct inclusive B->Xs gamma decay branching fraction in the PDG

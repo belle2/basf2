@@ -155,25 +155,25 @@ void PXDGatedModeDQMModule::event()
 {
 
   for (auto& it : m_rawTTD) {
-    B2DEBUG(29, "TTD FTSW : " << hex << it.GetTTUtime(0) << " " << it.GetTTCtime(0) << " EvtNr " << it.GetEveNo(0)  << " Type " <<
-            (it.GetTTCtimeTRGType(0) & 0xF) << " TimeSincePrev " << it.GetTimeSincePrevTrigger(0) << " TimeSinceInj " <<
-            it.GetTimeSinceLastInjection(0) << " IsHER " << it.GetIsHER(0) << " Bunch " << it.GetBunchNumber(0));
+    // B2DEBUG(29, "TTD FTSW : " << hex << it.GetTTUtime(0) << " " << it.GetTTCtime(0) << " EvtNr " << it.GetEveNo(0)  << " Type " <<
+    //         (it.GetTTCtimeTRGType(0) & 0xF) << " TimeSincePrev " << it.GetTimeSincePrevTrigger(0) << " TimeSinceInj " <<
+    //         it.GetTimeSinceLastInjection(0) << " IsHER " << it.GetIsHER(0) << " Bunch " << it.GetBunchNumber(0));
 
     // get last injection time
-    auto difference = it.GetTimeSinceLastInjection(0);
+    auto difference = m_EventLevelTriggerTimeInfo->getTimeSinceLastInjection();
     // check time overflow, too long ago
     if (difference != 0x7FFFFFFF) {
-      auto isher = it.GetIsHER(0);
+      auto isher = m_EventLevelTriggerTimeInfo->isHER();
       float diff2 = difference / (508.877 / 4.); //  127MHz clock ticks to us, inexact rounding
-      int bunch_trg = it.GetBunchNumber(0);
-      int time_inj  = it.GetTimeSinceLastInjection(0);
+      int bunch_trg = m_EventLevelTriggerTimeInfo->getBunchNumber();
+      int time_inj  = m_EventLevelTriggerTimeInfo->getTimeSinceLastInjection();
       int bunch_inj = (bunch_trg - time_inj) % 1280;
       if (bunch_inj < 0) bunch_inj += 1280;
       int rgate = bunch_inj / (1280. / 96.); // 0-96 ?
       if ((isher && diff2 >= m_minTimeCutHER && diff2 <= m_maxTimeCutHER) ||
           (!isher && diff2 >= m_minTimeCutLER && diff2 <= m_maxTimeCutLER)
          ) { // be sure that we fill only in gating region
-        hBunchTrg->Fill(it.GetBunchNumber(0) & 0x7FF);
+        hBunchTrg->Fill(m_EventLevelTriggerTimeInfo->getBunchNumber() & 0x7FF);
         if (isher) hBunchInjHER->Fill(bunch_inj);
         else hBunchInjLER->Fill(bunch_inj);
         for (auto& p : m_storeRawHits) {
@@ -299,6 +299,6 @@ void PXDGatedModeDQMModule::event()
         }
       }
     }
-    break;
+    //   break;
+    // }
   }
-}

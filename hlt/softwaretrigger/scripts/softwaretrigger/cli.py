@@ -185,9 +185,9 @@ def print_function(args):
         pd.set_option('display.max_columns', 500)
         pd.set_option('display.width', 1000)
         print(df)
-    elif args.format == "jira":
+    elif args.format in ["github", "gitlab"]:
         from tabulate import tabulate
-        print(tabulate(df, tablefmt="jira", showindex=False, headers="keys"))
+        print(tabulate(df, tablefmt="github", showindex=False, headers="keys"))
     elif args.format == "grid":
         from tabulate import tabulate
         print(tabulate(df, tablefmt="grid", showindex=False, headers="keys"))
@@ -414,7 +414,8 @@ top in the localdb will be shown.
                               type=DownloadableDatabase, default=DownloadableDatabase("online,localdb:latest"))
     choices = ["human-readable", "json", "list", "pandas"]
     try:
-        choices += ['jira', 'grid']
+        from tabulate import tabulate  # noqa
+        choices += ['github', 'gitlab', 'grid']
     except ImportError:
         pass
     print_parser.add_argument("--format", help="Choose the format how to print the trigger cuts. "

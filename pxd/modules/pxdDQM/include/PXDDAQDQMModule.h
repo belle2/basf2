@@ -11,10 +11,11 @@
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <rawdata/dataobjects/RawFTSW.h>
+// #include <rawdata/dataobjects/RawFTSW.h>
 #include <pxd/dataobjects/PXDDAQStatus.h>
 #include <vxd/geometry/GeoCache.h>
 #include <rawdata/dataobjects/RawSVD.h>
+#include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
 
 #include <TH2.h>
 #include <TH1.h>
@@ -45,8 +46,11 @@ namespace Belle2 {
       /** Input array for SVD/x-check HLT EODB . */
       StoreArray<RawSVD> m_rawSVD;
 
-      /** Input array for TTD/FTSW */
-      StoreArray<RawFTSW> m_rawTTD;
+      // /** Input array for TTD/FTSW */
+      // StoreArray<RawFTSW> m_rawTTD;
+      
+      /** Output object for TTD mdst object */
+      StoreObjPtr<EventLevelTriggerTimeInfo> m_EventLevelTriggerTimeInfo;
 
       /** the geometry */
       VXD::GeoCache& m_vxdGeometry;

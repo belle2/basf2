@@ -11,8 +11,9 @@
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <rawdata/dataobjects/RawFTSW.h>
+// #include <rawdata/dataobjects/RawFTSW.h>
 #include <pxd/dataobjects/PXDDAQStatus.h>
+#include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
 
 #include <TH2F.h>
 #include <string>
@@ -36,8 +37,11 @@ namespace Belle2 {
     private:
       std::string m_histogramDirectoryName; /**< Name of the histogram directory in ROOT file */
 
-      /** Input array for DAQ Status. */
-      StoreArray<RawFTSW> m_rawTTD;
+      // /** Input array for TTD/FTSW */
+      // StoreArray<RawFTSW> m_rawTTD;
+      
+      /** Output object for TTD mdst object */
+      StoreObjPtr<EventLevelTriggerTimeInfo> m_EventLevelTriggerTimeInfo;
 
       /** Input array for DAQ Status. */
       StoreObjPtr<PXDDAQStatus> m_storeDAQEvtStats;

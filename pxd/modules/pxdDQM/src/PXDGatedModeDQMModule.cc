@@ -117,8 +117,10 @@ void PXDGatedModeDQMModule::defineHisto()
 void PXDGatedModeDQMModule::initialize()
 {
   REG_HISTOGRAM
-  m_rawTTD.isOptional(); /// TODO better use isRequired(), but RawFTSW is not in sim, thus tests are failing
+  // m_rawTTD.isOptional(); /// TODO better use isRequired(), but RawFTSW is not in sim, thus tests are failing
   m_storeRawHits.isRequired(m_PXDRawHitsName);
+  m_EventLevelTriggerTimeInfo.isRequired();
+
 }
 
 void PXDGatedModeDQMModule::beginRun()
@@ -154,151 +156,151 @@ void PXDGatedModeDQMModule::beginRun()
 void PXDGatedModeDQMModule::event()
 {
 
-  for (auto& it : m_rawTTD) {
-    // B2DEBUG(29, "TTD FTSW : " << hex << it.GetTTUtime(0) << " " << it.GetTTCtime(0) << " EvtNr " << it.GetEveNo(0)  << " Type " <<
-    //         (it.GetTTCtimeTRGType(0) & 0xF) << " TimeSincePrev " << it.GetTimeSincePrevTrigger(0) << " TimeSinceInj " <<
-    //         it.GetTimeSinceLastInjection(0) << " IsHER " << it.GetIsHER(0) << " Bunch " << it.GetBunchNumber(0));
+  // for (auto& it : m_rawTTD) {
+  // B2DEBUG(29, "TTD FTSW : " << hex << it.GetTTUtime(0) << " " << it.GetTTCtime(0) << " EvtNr " << it.GetEveNo(0)  << " Type " <<
+  //         (it.GetTTCtimeTRGType(0) & 0xF) << " TimeSincePrev " << it.GetTimeSincePrevTrigger(0) << " TimeSinceInj " <<
+  //         it.GetTimeSinceLastInjection(0) << " IsHER " << it.GetIsHER(0) << " Bunch " << it.GetBunchNumber(0));
 
-    // get last injection time
-    auto difference = m_EventLevelTriggerTimeInfo->getTimeSinceLastInjection();
-    // check time overflow, too long ago
-    if (difference != 0x7FFFFFFF) {
-      auto isher = m_EventLevelTriggerTimeInfo->isHER();
-      float diff2 = difference / (508.877 / 4.); //  127MHz clock ticks to us, inexact rounding
-      int bunch_trg = m_EventLevelTriggerTimeInfo->getBunchNumber();
-      int time_inj  = m_EventLevelTriggerTimeInfo->getTimeSinceLastInjection();
-      int bunch_inj = (bunch_trg - time_inj) % 1280;
-      if (bunch_inj < 0) bunch_inj += 1280;
-      int rgate = bunch_inj / (1280. / 96.); // 0-96 ?
-      if ((isher && diff2 >= m_minTimeCutHER && diff2 <= m_maxTimeCutHER) ||
-          (!isher && diff2 >= m_minTimeCutLER && diff2 <= m_maxTimeCutLER)
-         ) { // be sure that we fill only in gating region
-        hBunchTrg->Fill(m_EventLevelTriggerTimeInfo->getBunchNumber() & 0x7FF);
-        if (isher) hBunchInjHER->Fill(bunch_inj);
-        else hBunchInjLER->Fill(bunch_inj);
-        for (auto& p : m_storeRawHits) {
-          auto charge = p.getCharge();
-          if (charge > m_chargeCut) {
-            int v = int(p.getVCellID()) - rgate * 4;
-            if (v < 0) v += 768;
-            int v2 = int(p.getVCellID()) + rgate * 4;
-            if (v2 >= 768) v2 -= 768;
-            if (isher) {
-              auto h = hGatedModeMapHER[std::make_pair(p.getSensorID(), rgate)];
-              if (h) {
-                h->Fill(p.getUCellID(), p.getVCellID());
-              }
-              auto h2 = hGatedModeProjHER[p.getSensorID()];
-              if (h2) {
-                h2->Fill(rgate, p.getVCellID());
-              }
-              auto h3 = hGatedModeMapSubHER[p.getSensorID()];
-              if (h3) {
-                h3->Fill(p.getUCellID(), v);
-              }
-              auto h4 = hGatedModeMapAddHER[p.getSensorID()];
-              if (h4) {
-                h4->Fill(p.getUCellID(), v2);
-              }
-              auto h5 = hGatedModeMapADCHER[std::make_pair(p.getSensorID(), rgate)];
-              if (h5) {
-                h5->Fill(p.getUCellID(), p.getVCellID(), p.getCharge());
-              }
-              auto h6 = hGatedModeProjADCHER[p.getSensorID()];
-              if (h6) {
-                h6->Fill(rgate, p.getVCellID(), p.getCharge());
-              }
-              auto h7 = hGatedModeMapSubADCHER[p.getSensorID()];
-              if (h7) {
-                h7->Fill(p.getUCellID(), v, p.getCharge());
-              }
-              auto h8 = hGatedModeMapAddADCHER[p.getSensorID()];
-              if (h8) {
-                h8->Fill(p.getUCellID(), v2, p.getCharge());
-              }
-            } else {
-              auto h = hGatedModeMapLER[std::make_pair(p.getSensorID(), rgate)];
-              if (h) {
-                h->Fill(p.getUCellID(), p.getVCellID());
-              }
-              auto h2 = hGatedModeProjLER[p.getSensorID()];
-              if (h2) {
-                h2->Fill(rgate, p.getVCellID());
-              }
-              auto h3 = hGatedModeMapSubLER[p.getSensorID()];
-              if (h3) {
-                h3->Fill(p.getUCellID(), v);
-              }
-              auto h4 = hGatedModeMapAddLER[p.getSensorID()];
-              if (h4) {
-                h4->Fill(p.getUCellID(), v2);
-              }
-              auto h5 = hGatedModeMapADCLER[std::make_pair(p.getSensorID(), rgate)];
-              if (h5) {
-                h5->Fill(p.getUCellID(), p.getVCellID(), p.getCharge());
-              }
-              auto h6 = hGatedModeProjADCLER[p.getSensorID()];
-              if (h6) {
-                h6->Fill(rgate, p.getVCellID(), p.getCharge());
-              }
-              auto h7 = hGatedModeMapSubADCLER[p.getSensorID()];
-              if (h7) {
-                h7->Fill(p.getUCellID(), v, p.getCharge());
-              }
-              auto h8 = hGatedModeMapAddADCLER[p.getSensorID()];
-              if (h8) {
-                h8->Fill(p.getUCellID(), v2, p.getCharge());
-              }
-            }
-          }
-          if (m_chargeCutHigh > 30) {
-
-            if (isher) {
-              auto h = hGatedModeMapCutHER[std::make_pair(p.getSensorID(), rgate)];
-              if (h) {
-                h->Fill(p.getUCellID(), p.getVCellID());
-              }
-              auto h2 = hGatedModeMapCutADCHER[std::make_pair(p.getSensorID(), rgate)];
-              if (h2) {
-                h2->Fill(p.getUCellID(), p.getVCellID(), p.getCharge());
-              }
-            } else {
-              auto h = hGatedModeMapCutLER[std::make_pair(p.getSensorID(), rgate)];
-              if (h) {
-                h->Fill(p.getUCellID(), p.getVCellID());
-              }
-              auto h2 = hGatedModeMapCutADCLER[std::make_pair(p.getSensorID(), rgate)];
-              if (h2) {
-                h2->Fill(p.getUCellID(), p.getVCellID(), p.getCharge());
-              }
-            }
-          }
-        }
-      } else if (diff2 > m_outsideTimeCut) {
-        rgate = 96;
-        for (auto& p : m_storeRawHits) {
+  // get last injection time
+  auto difference = m_EventLevelTriggerTimeInfo->getTimeSinceLastInjection();
+  // check time overflow, too long ago
+  if (difference != 0x7FFFFFFF) {
+    auto isher = m_EventLevelTriggerTimeInfo->isHER();
+    float diff2 = difference / (508.877 / 4.); //  127MHz clock ticks to us, inexact rounding
+    int bunch_trg = m_EventLevelTriggerTimeInfo->getBunchNumber();
+    int time_inj  = m_EventLevelTriggerTimeInfo->getTimeSinceLastInjection();
+    int bunch_inj = (bunch_trg - time_inj) % 1280;
+    if (bunch_inj < 0) bunch_inj += 1280;
+    int rgate = bunch_inj / (1280. / 96.); // 0-96 ?
+    if ((isher && diff2 >= m_minTimeCutHER && diff2 <= m_maxTimeCutHER) ||
+        (!isher && diff2 >= m_minTimeCutLER && diff2 <= m_maxTimeCutLER)
+       ) { // be sure that we fill only in gating region
+      hBunchTrg->Fill(m_EventLevelTriggerTimeInfo->getBunchNumber() & 0x7FF);
+      if (isher) hBunchInjHER->Fill(bunch_inj);
+      else hBunchInjLER->Fill(bunch_inj);
+      for (auto& p : m_storeRawHits) {
+        auto charge = p.getCharge();
+        if (charge > m_chargeCut) {
+          int v = int(p.getVCellID()) - rgate * 4;
+          if (v < 0) v += 768;
+          int v2 = int(p.getVCellID()) + rgate * 4;
+          if (v2 >= 768) v2 -= 768;
           if (isher) {
             auto h = hGatedModeMapHER[std::make_pair(p.getSensorID(), rgate)];
             if (h) {
               h->Fill(p.getUCellID(), p.getVCellID());
             }
-            auto h2 = hGatedModeMapADCHER[std::make_pair(p.getSensorID(), rgate)];
+            auto h2 = hGatedModeProjHER[p.getSensorID()];
             if (h2) {
-              h2->Fill(p.getUCellID(), p.getVCellID(), p.getCharge());
+              h2->Fill(rgate, p.getVCellID());
+            }
+            auto h3 = hGatedModeMapSubHER[p.getSensorID()];
+            if (h3) {
+              h3->Fill(p.getUCellID(), v);
+            }
+            auto h4 = hGatedModeMapAddHER[p.getSensorID()];
+            if (h4) {
+              h4->Fill(p.getUCellID(), v2);
+            }
+            auto h5 = hGatedModeMapADCHER[std::make_pair(p.getSensorID(), rgate)];
+            if (h5) {
+              h5->Fill(p.getUCellID(), p.getVCellID(), p.getCharge());
+            }
+            auto h6 = hGatedModeProjADCHER[p.getSensorID()];
+            if (h6) {
+              h6->Fill(rgate, p.getVCellID(), p.getCharge());
+            }
+            auto h7 = hGatedModeMapSubADCHER[p.getSensorID()];
+            if (h7) {
+              h7->Fill(p.getUCellID(), v, p.getCharge());
+            }
+            auto h8 = hGatedModeMapAddADCHER[p.getSensorID()];
+            if (h8) {
+              h8->Fill(p.getUCellID(), v2, p.getCharge());
             }
           } else {
             auto h = hGatedModeMapLER[std::make_pair(p.getSensorID(), rgate)];
             if (h) {
               h->Fill(p.getUCellID(), p.getVCellID());
             }
-            auto h2 = hGatedModeMapADCLER[std::make_pair(p.getSensorID(), rgate)];
+            auto h2 = hGatedModeProjLER[p.getSensorID()];
+            if (h2) {
+              h2->Fill(rgate, p.getVCellID());
+            }
+            auto h3 = hGatedModeMapSubLER[p.getSensorID()];
+            if (h3) {
+              h3->Fill(p.getUCellID(), v);
+            }
+            auto h4 = hGatedModeMapAddLER[p.getSensorID()];
+            if (h4) {
+              h4->Fill(p.getUCellID(), v2);
+            }
+            auto h5 = hGatedModeMapADCLER[std::make_pair(p.getSensorID(), rgate)];
+            if (h5) {
+              h5->Fill(p.getUCellID(), p.getVCellID(), p.getCharge());
+            }
+            auto h6 = hGatedModeProjADCLER[p.getSensorID()];
+            if (h6) {
+              h6->Fill(rgate, p.getVCellID(), p.getCharge());
+            }
+            auto h7 = hGatedModeMapSubADCLER[p.getSensorID()];
+            if (h7) {
+              h7->Fill(p.getUCellID(), v, p.getCharge());
+            }
+            auto h8 = hGatedModeMapAddADCLER[p.getSensorID()];
+            if (h8) {
+              h8->Fill(p.getUCellID(), v2, p.getCharge());
+            }
+          }
+        }
+        if (m_chargeCutHigh > 30) {
+
+          if (isher) {
+            auto h = hGatedModeMapCutHER[std::make_pair(p.getSensorID(), rgate)];
+            if (h) {
+              h->Fill(p.getUCellID(), p.getVCellID());
+            }
+            auto h2 = hGatedModeMapCutADCHER[std::make_pair(p.getSensorID(), rgate)];
+            if (h2) {
+              h2->Fill(p.getUCellID(), p.getVCellID(), p.getCharge());
+            }
+          } else {
+            auto h = hGatedModeMapCutLER[std::make_pair(p.getSensorID(), rgate)];
+            if (h) {
+              h->Fill(p.getUCellID(), p.getVCellID());
+            }
+            auto h2 = hGatedModeMapCutADCLER[std::make_pair(p.getSensorID(), rgate)];
             if (h2) {
               h2->Fill(p.getUCellID(), p.getVCellID(), p.getCharge());
             }
           }
         }
       }
+    } else if (diff2 > m_outsideTimeCut) {
+      rgate = 96;
+      for (auto& p : m_storeRawHits) {
+        if (isher) {
+          auto h = hGatedModeMapHER[std::make_pair(p.getSensorID(), rgate)];
+          if (h) {
+            h->Fill(p.getUCellID(), p.getVCellID());
+          }
+          auto h2 = hGatedModeMapADCHER[std::make_pair(p.getSensorID(), rgate)];
+          if (h2) {
+            h2->Fill(p.getUCellID(), p.getVCellID(), p.getCharge());
+          }
+        } else {
+          auto h = hGatedModeMapLER[std::make_pair(p.getSensorID(), rgate)];
+          if (h) {
+            h->Fill(p.getUCellID(), p.getVCellID());
+          }
+          auto h2 = hGatedModeMapADCLER[std::make_pair(p.getSensorID(), rgate)];
+          if (h2) {
+            h2->Fill(p.getUCellID(), p.getVCellID(), p.getCharge());
+          }
+        }
+      }
     }
-    //   break;
-    // }
   }
+  //   break;
+  // }
+}

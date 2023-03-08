@@ -143,8 +143,10 @@ void PXDDAQDQMModule::initialize()
 {
   REG_HISTOGRAM
   m_storeDAQEvtStats.isRequired();
-  m_rawTTD.isOptional(); /// TODO better use isRequired(), but RawFTSW is not in sim, thus tests are failing
+  // m_rawTTD.isOptional(); /// TODO better use isRequired(), but RawFTSW is not in sim, thus tests are failing
   m_rawSVD.isOptional(); /// just for checking EODB / Hlt rejections
+  m_EventLevelTriggerTimeInfo.isRequired();
+
 }
 
 void PXDDAQDQMModule::beginRun()
@@ -282,7 +284,7 @@ void PXDDAQDQMModule::event()
 //             (it.GetTTCtimeTRGType(0) & 0xF) << " TimeSincePrev " << it.GetTimeSincePrevTrigger(0) << " TimeSinceInj " <<
 //             it.GetTimeSinceLastInjection(0) << " IsHER " << it.GetIsHER(0) << " Bunch " << it.GetBunchNumber(0));
 
-  double lasttrig = m_EventLevelTriggerTimeInfo->GetTimeSincePrevTrigger() / 127.; //  127MHz clock ticks to us, inexact rounding
+  double lasttrig = m_EventLevelTriggerTimeInfo->getTimeSincePrevTrigger() / 127.; //  127MHz clock ticks to us, inexact rounding
   if (eodbFlag && hEODBTrgDiff) hEODBTrgDiff->Fill(lasttrig);
   if (cm63Flag && hCM63TrgDiff) hCM63TrgDiff->Fill(lasttrig);
   if (truncFlag && hTruncTrgDiff) hTruncTrgDiff->Fill(lasttrig);

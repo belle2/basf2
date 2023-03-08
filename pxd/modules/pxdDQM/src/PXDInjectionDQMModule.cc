@@ -152,7 +152,9 @@ void PXDInjectionDQMModule::defineHisto()
 void PXDInjectionDQMModule::initialize()
 {
   REG_HISTOGRAM
-  m_rawTTD.isOptional(); /// TODO better use isRequired(), but RawFTSW is not in sim, thus tests are failing
+  // m_rawTTD.isOptional(); /// TODO better use isRequired(), but RawFTSW is not in sim, thus tests are failing
+  m_EventLevelTriggerTimeInfo.isRequired();
+
   if (m_useClusters) {
     m_storeClusters.isRequired(m_PXDClustersName);
   } else {

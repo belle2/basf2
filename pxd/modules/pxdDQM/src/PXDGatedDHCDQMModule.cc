@@ -47,7 +47,8 @@ void PXDGatedDHCDQMModule::initialize()
 {
   REG_HISTOGRAM
   m_storeDAQEvtStats.isRequired();
-  m_rawTTD.isRequired();
+  // m_rawTTD.isRequired();
+  m_EventLevelTriggerTimeInfo.isRequired();
 }
 
 void PXDGatedDHCDQMModule::beginRun()

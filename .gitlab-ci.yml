@@ -59,8 +59,6 @@ workflow:
 
 prepare-pipeline:
   stage: prepare-pipeline
-  rules:
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
   needs: []
   variables:
     GITLAB_IS_FIRST_STAGE: "yes"

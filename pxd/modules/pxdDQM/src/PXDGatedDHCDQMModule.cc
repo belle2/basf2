@@ -47,7 +47,6 @@ void PXDGatedDHCDQMModule::initialize()
 {
   REG_HISTOGRAM
   m_storeDAQEvtStats.isRequired();
-  // m_rawTTD.isRequired();
   m_EventLevelTriggerTimeInfo.isRequired();
 }
 
@@ -68,7 +67,6 @@ void PXDGatedDHCDQMModule::event()
 
   if (m_EventLevelTriggerTimeInfo->isValid()) {
 
-    // for (auto& it : m_rawTTD) {
     // B2DEBUG(29, "TTD FTSW : " << hex << it.GetTTUtime(0) << " " << it.GetTTCtime(0) << " EvtNr " << it.GetEveNo(0)  << " Type " <<
     //         (it.GetTTCtimeTRGType(0) & 0xF) << " TimeSincePrev " << it.GetTimeSincePrevTrigger(0) << " TimeSinceInj " <<
     //         it.GetTimeSinceLastInjection(0) << " IsHER " << it.GetIsHER(0) << " Bunch " << it.GetBunchNumber(0));

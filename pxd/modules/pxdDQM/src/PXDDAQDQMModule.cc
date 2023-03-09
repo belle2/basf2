@@ -143,7 +143,6 @@ void PXDDAQDQMModule::initialize()
 {
   REG_HISTOGRAM
   m_storeDAQEvtStats.isRequired();
-  // m_rawTTD.isOptional(); /// TODO better use isRequired(), but RawFTSW is not in sim, thus tests are failing
   m_rawSVD.isOptional(); /// just for checking EODB / Hlt rejections
   m_EventLevelTriggerTimeInfo.isRequired();
 
@@ -285,10 +284,6 @@ void PXDDAQDQMModule::event()
   }
   // And check if the stored data is valid
   if (m_EventLevelTriggerTimeInfo->isValid()) {
-
-// Now fill the histograms which need flags set above
-// the code is unluckily a copy of whats in PXDInjection Module, but there we dont have the DAQ flags :-/
-    // for (auto& it : m_rawTTD) {
 //     B2DEBUG(29, "TTD FTSW : " << hex << it.GetTTUtime(0) << " " << it.GetTTCtime(0) << " EvtNr " << it.GetEveNo(0)  << " Type " <<
 //             (it.GetTTCtimeTRGType(0) & 0xF) << " TimeSincePrev " << it.GetTimeSincePrevTrigger(0) << " TimeSinceInj " <<
 //             it.GetTimeSinceLastInjection(0) << " IsHER " << it.GetIsHER(0) << " Bunch " << it.GetBunchNumber(0));

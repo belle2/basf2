@@ -64,6 +64,7 @@ void eclAutocovarianceCalibrationC1CollectorModule::collect()
 
   //Random Trigger Event
   if (NumDsp == 8736) {
+    //if (NumDsp >0) {
 
     for (auto& aECLDsp : m_eclDsps) {
 

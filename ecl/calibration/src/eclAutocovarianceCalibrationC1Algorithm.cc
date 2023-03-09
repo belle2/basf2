@@ -83,37 +83,37 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC1Algorithm::calibrate
   PPThreshold->setCalibVector(cryIDs, PPamps);
   saveCalibration(PPThreshold, "ECLAutocovarianceCalibrationC1Threshold");
   B2INFO("eclAutocovarianceCalibrationC1Algorithm: successfully stored ECLAutocovarianceCalibrationC1Threshold constants");
-
-  /**-----------------------------------------------------------------------------------------------*/
-  /** Write output to DB if requested and successful */
-  //bool DBsuccess = false;
-  //if (m_storeConst == 0 || (m_storeConst == 1 && allFitsOK)) {
-  //  DBsuccess = true;
-  //  /** Store expected energies */
-  //  std::vector<float> tempE;
-  //  std::vector<float> tempUnc;
-  //  for (int crysID = 0; crysID < ECLElementNumbers::c_NCrystals; crysID++) {
-  //    tempE.push_back(ExpEnergyperCrys->GetBinContent(crysID + 1));
-  //    tempUnc.push_back(ExpEnergyperCrys->GetBinError(crysID + 1));
-  //  }
-  //  ECLCrystalCalib* ExpectedE = new ECLCrystalCalib();
-  //  ExpectedE->setCalibVector(tempE, tempUnc);
-  //  saveCalibration(ExpectedE, "ECLExpGammaGammaE");
-  //  B2INFO("eclCosmicEAlgorithm: successfully stored expected energies ECLExpGammaGammaE");
-  //}
-
-  //hEnergy->Write();
-
-  /**-----------------------------------------------------------------------------------------------*/
-  /** Clean up histograms in case Algorithm is called again */
-  TH2I* dummy;
-  dummy = (TH2I*)gROOT->FindObject("PeakVsCrysID"); delete dummy;
-
-  /**-----------------------------------------------------------------------------------------------*/
-  /** Set the return code appropriately */
-  //if (m_storeConst == -1) {
-  //  B2INFO("eclGammaGammaEAlgorithm performed fits but was not asked to store contants");
-  //  return c_Failure;
-  //}
+//
+//  /**-----------------------------------------------------------------------------------------------*/
+//  /** Write output to DB if requested and successful */
+//  //bool DBsuccess = false;
+//  //if (m_storeConst == 0 || (m_storeConst == 1 && allFitsOK)) {
+//  //  DBsuccess = true;
+//  //  /** Store expected energies */
+//  //  std::vector<float> tempE;
+//  //  std::vector<float> tempUnc;
+//  //  for (int crysID = 0; crysID < ECLElementNumbers::c_NCrystals; crysID++) {
+//  //    tempE.push_back(ExpEnergyperCrys->GetBinContent(crysID + 1));
+//  //    tempUnc.push_back(ExpEnergyperCrys->GetBinError(crysID + 1));
+//  //  }
+//  //  ECLCrystalCalib* ExpectedE = new ECLCrystalCalib();
+//  //  ExpectedE->setCalibVector(tempE, tempUnc);
+//  //  saveCalibration(ExpectedE, "ECLExpGammaGammaE");
+//  //  B2INFO("eclCosmicEAlgorithm: successfully stored expected energies ECLExpGammaGammaE");
+//  //}
+//
+//  //hEnergy->Write();
+//
+//  /**-----------------------------------------------------------------------------------------------*/
+//  /** Clean up histograms in case Algorithm is called again */
+//  TH2I* dummy;
+//  dummy = (TH2I*)gROOT->FindObject("PeakVsCrysID"); delete dummy;
+//
+//  /**-----------------------------------------------------------------------------------------------*/
+//  /** Set the return code appropriately */
+//  //if (m_storeConst == -1) {
+//  //  B2INFO("eclGammaGammaEAlgorithm performed fits but was not asked to store contants");
+//  //  return c_Failure;
+//  //}
   return c_OK;
 }

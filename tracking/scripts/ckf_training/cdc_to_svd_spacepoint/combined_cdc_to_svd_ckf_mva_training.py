@@ -576,41 +576,49 @@ class ResultRecordingTask(Basf2PathTask):
                         prRecoTracksStoreArrayName="CDCRecoTracks")
         path.add_module("DAFRecoFitter", recoTracksStoreArrayName="CDCRecoTracks")
 
-        path.add_module(
-            "CDCToSVDSpacePointCKF",
-            minimalPtRequirement=0,
-            minimalHitRequirement=1,
-            useAssignedHits=False,
-            inputRecoTrackStoreArrayName="CDCRecoTracks",
-            outputRecoTrackStoreArrayName="VXDRecoTracks",
-            outputRelationRecoTrackStoreArrayName="CDCRecoTracks",
-            hitFilter="sensor",
-            seedFilter="distance",
-            relationCheckForDirection="backward",
-            reverseSeed=False,
-            writeOutDirection="backward",
-            firstHighFilter="mva",
-            firstHighFilterParameters={
-                "identifier": self.get_input_file_names("trk_CDCToSVDSpacePointStateFilter_1.weights.xml")[0],
-                "cut": 0.0001},
-            firstHighUseNStates=10,
-            advanceHighFilter="advance",
-            secondHighFilter="mva",
-            secondHighFilterParameters={
-                "identifier": self.get_input_file_names("trk_CDCToSVDSpacePointStateFilter_2.weights.xml")[0],
-                "cut": 0.0001},
-            secondHighUseNStates=10,
-            updateHighFilter="fit",
-            thirdHighFilter="mva",
-            thirdHighFilterParameters={
-                "identifier": self.get_input_file_names("trk_CDCToSVDSpacePointStateFilter_3.weights.xml")[0],
-                "cut": 0.0001},
-            thirdHighUseNStates=10,
-            filter="recording",
-            filterParameters={
-                    "rootFileName": result_filter_records_name},
-            exportTracks=False,
-            enableOverlapResolving=True)
+        path.add_module("CDCToSVDSpacePointCKF",
+                        minimalPtRequirement=0,
+                        minimalHitRequirement=1,
+
+                        useAssignedHits=False,
+
+                        inputRecoTrackStoreArrayName="CDCRecoTracks",
+                        outputRecoTrackStoreArrayName="VXDRecoTracks",
+                        outputRelationRecoTrackStoreArrayName="CDCRecoTracks",
+                        hitFilter="sensor",
+                        seedFilter="distance",
+
+                        relationCheckForDirection="backward",
+                        reverseSeed=False,
+                        writeOutDirection="backward",
+
+                        firstHighFilter="mva",
+                        firstHighFilterParameters={
+                            "identifier": self.get_input_file_names("trk_CDCToSVDSpacePointStateFilter_1.weights.xml")[0],
+                            "cut": 0.0001},
+                        firstHighUseNStates=10,
+
+                        advanceHighFilter="advance",
+
+                        secondHighFilter="mva",
+                        secondHighFilterParameters={
+                            "identifier": self.get_input_file_names("trk_CDCToSVDSpacePointStateFilter_2.weights.xml")[0],
+                            "cut": 0.0001},
+                        secondHighUseNStates=10,
+
+                        updateHighFilter="fit",
+
+                        thirdHighFilter="mva",
+                        thirdHighFilterParameters={
+                            "identifier": self.get_input_file_names("trk_CDCToSVDSpacePointStateFilter_3.weights.xml")[0],
+                            "cut": 0.0001},
+                        thirdHighUseNStates=10,
+
+                        filter="recording",
+                        filterParameters={"rootFileName": result_filter_records_name},
+                        exportTracks=False,
+
+                        enableOverlapResolving=True)
 
         return path
 

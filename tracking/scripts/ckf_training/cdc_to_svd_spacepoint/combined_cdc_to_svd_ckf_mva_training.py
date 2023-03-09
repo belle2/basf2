@@ -418,7 +418,47 @@ class CKFStateFilterTeacherTask(Basf2Task):
     # In addition to variables containing the "truth" substring, which are excluded by default.
     exclude_variables = b2luigi.ListParameter(
         #: \cond
-        hashed=True, default=[]
+        # hashed=True, default=[]
+        hashed=True, default=[
+                "id",
+                "last_id",
+                "number",
+                "last_layer",
+
+                "seed_cdc_hits",
+                "seed_svd_hits",
+                "seed_lowest_svd_layer",
+                "seed_lowest_cdc_layer",
+                "quality_index_triplet",
+                "quality_index_circle",
+                "quality_index_helix",
+                "cluster_1_charge",
+                "cluster_2_charge",
+                "mean_rest_cluster_charge",
+                "min_rest_cluster_charge",
+                "std_rest_cluster_charge",
+                "cluster_1_seed_charge",
+                "cluster_2_seed_charge",
+                "mean_rest_cluster_seed_charge",
+                "min_rest_cluster_seed_charge",
+                "std_rest_cluster_seed_charge",
+                "cluster_1_size",
+                "cluster_2_size",
+                "mean_rest_cluster_size",
+                "min_rest_cluster_size",
+                "std_rest_cluster_size",
+                "cluster_1_snr",
+                "cluster_2_snr",
+                "mean_rest_cluster_snr",
+                "min_rest_cluster_snr",
+                "std_rest_cluster_snr",
+                "cluster_1_charge_over_size",
+                "cluster_2_charge_over_size",
+                "mean_rest_cluster_charge_over_size",
+                "min_rest_cluster_charge_over_size",
+                "std_rest_cluster_charge_over_size",
+
+        ]
         #: \endcond
     )
     #: Hyperparameter option of the FastBDT algorithm. default are the FastBDT default values.

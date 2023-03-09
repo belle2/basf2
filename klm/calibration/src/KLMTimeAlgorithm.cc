@@ -12,7 +12,7 @@
 /* KLM headers. */
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/database/Database.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/DBStore.h>

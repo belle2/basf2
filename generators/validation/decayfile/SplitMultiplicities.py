@@ -18,6 +18,11 @@
 # a reco particle list as input.
 #############################################################
 
+"""
+<header>
+    <noexecute>Definition of helper class</noexecute>
+</header>
+"""
 
 from ROOT import Belle2
 import basf2

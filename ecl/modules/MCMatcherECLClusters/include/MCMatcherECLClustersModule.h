@@ -6,12 +6,12 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-
 #pragma once
 
+/* Basf2 headers. */
 #include <framework/core/Module.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
+#include <framework/datastore/StoreArray.h>
 
 namespace Belle2 {
   class MCParticle;
@@ -35,19 +35,10 @@ namespace Belle2 {
     /** Initialize variables, print info, and start CPU clock. */
     virtual void initialize() override;
 
-    /** Nothing so far.*/
-    virtual void beginRun() override;
-
     /** Actual digitization of all hits in the ECL.
      *
      */
     virtual void event() override;
-
-    /** Nothing so far. */
-    virtual void endRun() override;
-
-    /** Stopping of CPU clock.*/
-    virtual void terminate() override;
 
   private:
 
@@ -60,19 +51,28 @@ namespace Belle2 {
     StoreArray<ECLShower> m_eclShowers; /**< ECLShowers StoreArray*/
 
     /** Default name ECLDigits */
-    virtual const char* eclDigitArrayName() const
+    std::string m_eclDigitArrayName = "";
+    /** Default name ECLCalDigits */
+    std::string m_eclCalDigitArrayName = "";
+    /** Default name ECLClusters */
+    std::string m_eclClusterArrayName = "";
+    /** Default name ECLShowers */
+    std::string m_eclShowerArrayName = "";
+
+    /** Default name ECLDigits */
+    virtual const char* getECLDigitArrayName() const
     { return "ECLDigits" ; }
 
     /** Default name ECLCalDigits */
-    virtual const char* eclCalDigitArrayName() const
+    virtual const char* getECLCalDigitArrayName() const
     { return "ECLCalDigits" ; }
 
     /** Default name ECLClusters */
-    virtual const char* eclClusterArrayName() const
+    virtual const char* getECLClusterArrayName() const
     { return "ECLClusters" ; }
 
     /** Default name ECLShowers */
-    virtual const char* eclShowerArrayName() const
+    virtual const char* getECLShowerArrayName() const
     { return "ECLShowers" ; }
 
     RelationArray m_mcParticleToECLHitRelationArray; /**< MCParticles to ECLHits RelationArray*/
@@ -87,19 +87,19 @@ namespace Belle2 {
   public:
 
     /** PureCsI name ECLDigitsPureCsI */
-    virtual const char* eclDigitArrayName() const override
+    virtual const char* getECLDigitArrayName() const override
     { return "ECLDigitsPureCsI" ; }
 
     /** PureCsI name ECLCalDigitsPureCsI */
-    virtual const char* eclCalDigitArrayName() const override
+    virtual const char* getECLCalDigitArrayName() const override
     { return "ECLCalDigitsPureCsI" ; }
 
     /** PureCsI name ECLShowersPureCsI */
-    virtual const char* eclShowerArrayName() const override
+    virtual const char* getECLShowerArrayName() const override
     { return "ECLShowersPureCsI" ; }
 
     /** PureCsI name ECLClustersPureCsI */
-    virtual const char* eclClusterArrayName() const override
+    virtual const char* getECLClusterArrayName() const override
     { return "ECLClustersPureCsI" ; }
 
   };

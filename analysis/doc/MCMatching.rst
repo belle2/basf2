@@ -7,15 +7,19 @@ Truth-matching
 MC matching
 -----------
 
+A general overview of the main MC matching algorithm and its user interface can be found in the
+proceeding `Monte Carlo matching in the Belle II software <https://doi.org/10.1051/epjconf/202125103021>`_
+for the CHEP 2021 conference.
+
 ~~~~~~~~~~~~~~~~~~~~~~
 First, you must run it
 ~~~~~~~~~~~~~~~~~~~~~~
+
 MCMatching relates ``Particle`` and ``MCParticle`` objects. 
 
 .. important:: 
         Most MC matching variables will have non-trivial values only if the :b2:mod:`MCMatcherParticles` module is actually executed.
         It can be executed by adding the module to your path, there is a `modularAnalysis.matchMCTruth` convenience function to do this.
-
 
 ~~~~
 Core
@@ -392,7 +396,54 @@ tracking-level     analysis-level
 ---------------
 Photon matching
 ---------------
-Details of photon matching efficiency can be found `in this talk <https://confluence.desy.de/download/attachments/53768739/2017_12_mcmatching_ferber.pdf>`_. If you want to contribute, please feel free to move material from the talk to this section (:issue:`BII-5316`).
+
+To understand the method of photon matching, a basic introduction to the ECL objects used during the reconstruction of simulated data is required. 
+
+Starting with ``ECLSimHits`` from the GEANT4 simulation, ``ECLDigits`` are created and then calibrated to make ``ECLCalDigit`` objects which store the energy and 
+time of a single ECL crystal. The ``ECLCalDigits`` are then grouped to make ``ECLShower`` objects. The shower objects are corrected and calibrated, and used to 
+calculate shower-shape quantities and certain particle likelihoods (these calculations are derived using information stored in subsets of the ``ECLCalDigits`` that form the 
+shower). Following this, track matching is performed between reconstructed tracks and shower objects. The last step is the conversion of the ``ECLShower`` object into a mdst 
+``ECLCluster`` object which is the highest level ECL reconstruction object. 
+
+Each ``ECLShower`` object (and by extension each ``ECLCluster`` object) holds weighted **relations** to a maximum of twenty-one ``ECLCalDigits``, with the weights 
+calculated using the fraction of energy each ``ECLCalDigit`` contributes to each shower. In addition to this, the ``ECLCalDigit`` can itself have a weighted relation to none, one or many ``MCParticles``. This is calculated 
+using the total energy deposited by the ``MCParticle`` in each ``ECLCalDigit``. A diagram that visualises these relations is given in :numref:`photon_matching`.  
+
+.. _photon_matching:
+
+.. figure:: figs/photon_matching.png
+   :width: 45em
+   :align: center
+
+   Schematic diagram showing the weighted relations between ECL reconstruction objects and simulated particles.  
+
+The overall weight for the relation between an ``ECLCluster`` object and a ``MCParticle`` is then given by the product of the weight between the corresponding ``ECLShower`` and ``ECLCalDigit`` and the weight 
+between the ``ECLCalDigit`` and ``MCParticle``. For example, the weight of the relation between the first ``ECLCluster`` in :numref:`photon_matching` and MCParticle :math:`\gamma_2` is given by :math:`1.0\times 0.8=0.8` GeV.   
+
+An ``ECLCluster`` that is not matched to any track is reconstructed as a photon ``Particle``, and relations between the photon ``Particle`` and ``MCParticles`` are only set at the user-analysis level if the following conditions 
+are met:
+
+1) :math:`\mathrm{weight}/{E_\mathrm{rec}} > 0.2` GeV
+2) :math:`\mathrm{weight}/{E_\mathrm{true}} > 0.3` GeV
+
+where the *weight* here refers to the relation with the largest weight. This means that if multiple relations between a given ``Particle`` and ``MCParticles`` exist, only the relation with the largest weight will be used, and the 
+corresponding ``MCParticle`` with this relation will be used to decide the photon matching. 
+
+A photon match is made if `mcErrors` == 0 and the ``MCParticle`` has a `mcPDG` == 22. If the chosen ``MCParticle`` does not correspond to a true photon, then the `mcErrors` :math:`\neq` 0 and no correct match will be made (even if 
+another one of the smaller-weighted relations for the particle is correct).  
+
+Information regarding these weights can be accessed on a user-analysis level using the following variables:
+
+* `mcMatchWeight`
+* `clusterTotalMCMatchWeight`
+* `clusterBestMCMatchWeight`
+* `clusterMCMatchWeight`
+
+.. note:: 
+        These weight variables can be used to help isolate photons that originate from **beam background processes**. Such photons typically have a very low total weight. 
+
+This information has been extracted from `this talk <https://confluence.desy.de/download/attachments/53768739/2017_12_mcmatching_ferber.pdf>`_. 
+More details about MC matching for photons can be found there and from the references therein. 
 
 .. _TopologyAnalysis:
 

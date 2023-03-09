@@ -187,108 +187,113 @@ void PXDInjectionDQMModule::beginRun()
 
 void PXDInjectionDQMModule::event()
 {
-
-  // for (auto& it : m_rawTTD) {
-  // B2DEBUG(29, "TTD FTSW : " << hex << it.GetTTUtime(0) << " " << it.GetTTCtime(0) << " EvtNr " << it.GetEveNo(0)  << " Type " <<
-  //         (it.GetTTCtimeTRGType(0) & 0xF) << " TimeSincePrev " << it.GetTimeSincePrevTrigger(0) << " TimeSinceInj " <<
-  //         it.GetTimeSinceLastInjection(0) << " IsHER " << it.GetIsHER(0) << " Bunch " << it.GetBunchNumber(0));
-
-  // get last injection time
-  hTriggersAfterTrigger->Fill(m_EventLevelTriggerTimeInfo->getTimeSincePrevTrigger() / 127.);
-  hTriggersPerBunch->Fill(m_EventLevelTriggerTimeInfo->getBunchNumber());
-
-  auto difference = m_EventLevelTriggerTimeInfo->getTimeSinceLastInjection();
-  // check time overflow, too long ago
-  if (difference != 0x7FFFFFFF) {
-    // count raw pixel hits or clusters per module, only if necessary
-    unsigned int all = 0;
-    std::map <VxdID, int> freq;// count the number of RawHits per sensor
-    if (m_useClusters) {
-      for (auto& p : m_storeClusters) {
-        freq[p.getSensorID()]++;
-        all++;
-      }
-    } else {
-      for (auto& p : m_storeRawHits) {
-        freq[p.getSensorID()]++;
-        all++;
-      }
-    }
-    float diff2 = difference / 127.; //  127MHz clock ticks to us, inexact rounding
-    if (m_EventLevelTriggerTimeInfo->isHER()) {
-      hOccAfterInjHER->Fill(diff2, all);
-      hEOccAfterInjHER->Fill(diff2);
-//         hTrigAfterInjHER->Fill(diff2, diff2 - int(diff2 / (5120 / 508.)) * (5120 / 508.));
-      if (m_createMaxHist) {
-        auto bin = hMaxOccAfterInjHER->FindBin(diff2);
-        auto value = hMaxOccAfterInjHER->GetBinContent(bin);
-        if (all > value) hMaxOccAfterInjHER->SetBinContent(bin, all);
-      }
-      for (auto& a : hOccModAfterInjHER) {
-        if (a.second) a.second->Fill(diff2, freq[a.first]);
-      }
-      if (m_createMaxHist) {
-        for (auto& a : hMaxOccModAfterInjHER) {
-          if (a.second) {
-            auto bin = a.second->FindBin(diff2);
-            auto value = a.second->GetBinContent(bin);
-            if (freq[a.first] > value) a.second->SetBinContent(bin, freq[a.first]);
-          }
-        }
-      }
-      if (hOccAfterInjHERGate) {
-        if (m_useClusters) {
-          // Cluster does not contain VCellID, need to change histogramm completely
-          // -> doesnt work with clusters!
-//             for (auto& p : m_storeClusters) {
-//               hOccAfterInjHERGate->Fill(diff2, p.getVCellID() / 4);
-//             }
-        } else {
-          for (auto& p : m_storeRawHits) {
-            hOccAfterInjHERGate->Fill(diff2, p.getRow() / 4);
-            hOccModAfterInjHERGate[p.getSensorID()]->Fill(diff2, p.getRow() / 4);
-          }
-        }
-      }
-    } else {
-      hOccAfterInjLER->Fill(diff2, all);
-      hEOccAfterInjLER->Fill(diff2);
-//         hTrigAfterInjLER->Fill(diff2, diff2 - int(diff2 / (5120 / 508.)) * (5120 / 508.));
-      if (m_createMaxHist) {
-        auto bin = hMaxOccAfterInjLER->FindBin(diff2);
-        auto value = hMaxOccAfterInjLER->GetBinContent(bin);
-        if (all > value) hMaxOccAfterInjLER->SetBinContent(bin, all);
-      }
-      for (auto& a : hOccModAfterInjLER) {
-        if (a.second) a.second->Fill(diff2, freq[a.first]);
-      }
-      if (m_createMaxHist) {
-        for (auto& a : hMaxOccModAfterInjLER) {
-          if (a.second) {
-            auto bin = a.second->FindBin(diff2);
-            auto value = a.second->GetBinContent(bin);
-            if (freq[a.first] > value) a.second->SetBinContent(bin, freq[a.first]);
-          }
-        }
-
-      }
-      if (hOccAfterInjLERGate) {
-        if (m_useClusters) {
-          // Cluster does not contain VCellID, need to change histogramm completely
-          // -> doesnt work with clusters!
-//             for (auto& p : m_storeClusters) {
-//               hOccAfterInjLERGate->Fill(diff2, p.getVCellID() / 4);
-//             }
-        } else {
-          for (auto& p : m_storeRawHits) {
-            hOccAfterInjLERGate->Fill(diff2, p.getRow() / 4);
-            hOccModAfterInjLERGate[p.getSensorID()]->Fill(diff2, p.getRow() / 4);
-          }
-        }
-      }
-    }
+  // Check if the pointer is valid
+  if (!m_EventLevelTriggerTimeInfo.isValid()) {
+    B2WARNING("StoreObjPtr<EventLevelTriggerTimeInfo> does not exist, are you running over data reconstructed with release-05 or earlier?");
   }
+  // And check if the stored data is valid
+  if (m_EventLevelTriggerTimeInfo->isValid()) {
+    // B2DEBUG(29, "TTD FTSW : " << hex << it.GetTTUtime(0) << " " << it.GetTTCtime(0) << " EvtNr " << it.GetEveNo(0)  << " Type " <<
+    //         (it.GetTTCtimeTRGType(0) & 0xF) << " TimeSincePrev " << it.GetTimeSincePrevTrigger(0) << " TimeSinceInj " <<
+    //         it.GetTimeSinceLastInjection(0) << " IsHER " << it.GetIsHER(0) << " Bunch " << it.GetBunchNumber(0));
 
-  //   break;
-  // }
+    // get last injection time
+    hTriggersAfterTrigger->Fill(m_EventLevelTriggerTimeInfo->getTimeSincePrevTrigger() / 127.);
+    // hTriggersAfterTrigger->Fill(m_EventLevelTriggerTimeInfo->getTimeSincePrevTrigger() / 64.);
+    hTriggersPerBunch->Fill(m_EventLevelTriggerTimeInfo->getBunchNumber());
+
+    auto difference = m_EventLevelTriggerTimeInfo->getTimeSinceLastInjection();
+    // check time overflow, too long ago
+    if (difference != 0x7FFFFFFF) {
+      // count raw pixel hits or clusters per module, only if necessary
+      unsigned int all = 0;
+      std::map <VxdID, int> freq;// count the number of RawHits per sensor
+      if (m_useClusters) {
+        for (auto& p : m_storeClusters) {
+          freq[p.getSensorID()]++;
+          all++;
+        }
+      } else {
+        for (auto& p : m_storeRawHits) {
+          freq[p.getSensorID()]++;
+          all++;
+        }
+      }
+      float diff2 = difference / 127.; //  127MHz clock ticks to us, inexact rounding
+      if (m_EventLevelTriggerTimeInfo->isHER()) {
+        hOccAfterInjHER->Fill(diff2, all);
+        hEOccAfterInjHER->Fill(diff2);
+        //         hTrigAfterInjHER->Fill(diff2, diff2 - int(diff2 / (5120 / 508.)) * (5120 / 508.));
+        if (m_createMaxHist) {
+          auto bin = hMaxOccAfterInjHER->FindBin(diff2);
+          auto value = hMaxOccAfterInjHER->GetBinContent(bin);
+          if (all > value) hMaxOccAfterInjHER->SetBinContent(bin, all);
+        }
+        for (auto& a : hOccModAfterInjHER) {
+          if (a.second) a.second->Fill(diff2, freq[a.first]);
+        }
+        if (m_createMaxHist) {
+          for (auto& a : hMaxOccModAfterInjHER) {
+            if (a.second) {
+              auto bin = a.second->FindBin(diff2);
+              auto value = a.second->GetBinContent(bin);
+              if (freq[a.first] > value) a.second->SetBinContent(bin, freq[a.first]);
+            }
+          }
+        }
+        if (hOccAfterInjHERGate) {
+          if (m_useClusters) {
+            // Cluster does not contain VCellID, need to change histogramm completely
+            // -> doesnt work with clusters!
+            //             for (auto& p : m_storeClusters) {
+            //               hOccAfterInjHERGate->Fill(diff2, p.getVCellID() / 4);
+            //             }
+          } else {
+            for (auto& p : m_storeRawHits) {
+              hOccAfterInjHERGate->Fill(diff2, p.getRow() / 4);
+              hOccModAfterInjHERGate[p.getSensorID()]->Fill(diff2, p.getRow() / 4);
+            }
+          }
+        }
+      } else {
+        hOccAfterInjLER->Fill(diff2, all);
+        hEOccAfterInjLER->Fill(diff2);
+        //         hTrigAfterInjLER->Fill(diff2, diff2 - int(diff2 / (5120 / 508.)) * (5120 / 508.));
+        if (m_createMaxHist) {
+          auto bin = hMaxOccAfterInjLER->FindBin(diff2);
+          auto value = hMaxOccAfterInjLER->GetBinContent(bin);
+          if (all > value) hMaxOccAfterInjLER->SetBinContent(bin, all);
+        }
+        for (auto& a : hOccModAfterInjLER) {
+          if (a.second) a.second->Fill(diff2, freq[a.first]);
+        }
+        if (m_createMaxHist) {
+          for (auto& a : hMaxOccModAfterInjLER) {
+            if (a.second) {
+              auto bin = a.second->FindBin(diff2);
+              auto value = a.second->GetBinContent(bin);
+              if (freq[a.first] > value) a.second->SetBinContent(bin, freq[a.first]);
+            }
+          }
+
+        }
+        if (hOccAfterInjLERGate) {
+          if (m_useClusters) {
+            // Cluster does not contain VCellID, need to change histogramm completely
+            // -> doesnt work with clusters!
+            //             for (auto& p : m_storeClusters) {
+            //               hOccAfterInjLERGate->Fill(diff2, p.getVCellID() / 4);
+            //             }
+          } else {
+            for (auto& p : m_storeRawHits) {
+              hOccAfterInjLERGate->Fill(diff2, p.getRow() / 4);
+              hOccModAfterInjLERGate[p.getSensorID()]->Fill(diff2, p.getRow() / 4);
+            }
+          }
+        }
+      }
+    }
+  } else {
+    B2WARNING("Data stored in StoreObjPtr<EventLevelTriggerTimeInfo> is not valid.");
+  }
 }

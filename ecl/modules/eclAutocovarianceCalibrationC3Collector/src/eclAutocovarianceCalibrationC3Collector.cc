@@ -7,7 +7,7 @@
  **************************************************************************/
 
 //This module`
-#include <ecl/modules/eclAutocovarianceCalibrationC2Collector/eclAutocovarianceCalibrationC2Collector.h>
+#include <ecl/modules/eclAutocovarianceCalibrationC3Collector/eclAutocovarianceCalibrationC3Collector.h>
 
 //Root
 #include <TH1F.h>
@@ -26,14 +26,14 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Modules
 //-----------------------------------------------------------------
-REG_MODULE(eclAutocovarianceCalibrationC2Collector)
+REG_MODULE(eclAutocovarianceCalibrationC3Collector)
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
 // constructor
-eclAutocovarianceCalibrationC2CollectorModule::eclAutocovarianceCalibrationC2CollectorModule() : CalibrationCollectorModule(),
-  m_ECLAutocovarianceCalibrationC2Threshold("ECLAutocovarianceCalibrationC1Threshold")
+eclAutocovarianceCalibrationC3CollectorModule::eclAutocovarianceCalibrationC3CollectorModule() : CalibrationCollectorModule(),
+  m_ECLAutocovarianceCalibrationC3Threshold("ECLAutocovarianceCalibrationC1Threshold")
 {
   // Set module properties
   setDescription("Module to export histogram of noise in waveforms from random trigger events");
@@ -41,11 +41,11 @@ eclAutocovarianceCalibrationC2CollectorModule::eclAutocovarianceCalibrationC2Col
   addParam("BaselineLimit", m_BaselineLimit, "Number of waveforms required to compute baseline", 10000);
 }
 
-void eclAutocovarianceCalibrationC2CollectorModule::prepare()
+void eclAutocovarianceCalibrationC3CollectorModule::prepare()
 {
 
   /**----------------------------------------------------------------------------------------*/
-  B2INFO("eclAutocovarianceCalibrationC2Collector: Experiment = " << m_evtMetaData->getExperiment() << "  run = " <<
+  B2INFO("eclAutocovarianceCalibrationC3Collector: Experiment = " << m_evtMetaData->getExperiment() << "  run = " <<
          m_evtMetaData->getRun());
 
   /**----------------------------------------------------------------------------------------*/
@@ -53,7 +53,7 @@ void eclAutocovarianceCalibrationC2CollectorModule::prepare()
   auto BaselineVsCrysID = new TH1F("BaselinevsCrysID", "Baseline for each crystal;crystal ID;Baseline (ADC)", 8736, 0, 8736);
   registerObject<TH1F>("BaselineVsCrysID", BaselineVsCrysID);
 
-  m_PeakToPeakThresholds = m_ECLAutocovarianceCalibrationC2Threshold->getCalibVector();
+  m_PeakToPeakThresholds = m_ECLAutocovarianceCalibrationC3Threshold->getCalibVector();
 
   m_eclDsps.registerInDataStore();
   m_eclDigits.registerInDataStore();
@@ -66,7 +66,7 @@ void eclAutocovarianceCalibrationC2CollectorModule::prepare()
 }
 
 
-void eclAutocovarianceCalibrationC2CollectorModule::collect()
+void eclAutocovarianceCalibrationC3CollectorModule::collect()
 {
 
   const int NumDsp = m_eclDsps.getEntries();
@@ -74,8 +74,7 @@ void eclAutocovarianceCalibrationC2CollectorModule::collect()
   //Random Trigger Event
   if (NumDsp == 8736) {
 
-    B2INFO(NumDsp);
-
+    //B2INFO(NumDsp);
     //if (NumDsp >0) {
 
     for (auto& aECLDsp : m_eclDsps) {

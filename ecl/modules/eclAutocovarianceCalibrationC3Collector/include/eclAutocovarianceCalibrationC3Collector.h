@@ -21,13 +21,13 @@ namespace Belle2 {
   class ECLCrystalCalib;
 
   /** Calibration collector module that uses delayed Bhabha to compute coveriance matrix */
-  class eclAutocovarianceCalibrationC2CollectorModule : public CalibrationCollectorModule {
+  class eclAutocovarianceCalibrationC3CollectorModule : public CalibrationCollectorModule {
 
   public:
 
     /** Constructor.
      */
-    eclAutocovarianceCalibrationC2CollectorModule();
+    eclAutocovarianceCalibrationC3CollectorModule();
 
     /** Define histograms and read payloads from DB */
     void prepare() override;
@@ -41,7 +41,7 @@ namespace Belle2 {
     StoreArray<ECLDsp> m_eclDsps; /**< Required input array of ECLDSPs */
     StoreObjPtr<EventMetaData> m_evtMetaData; /**< dataStore EventMetaData */
 
-    DBObjPtr<ECLCrystalCalib> m_ECLAutocovarianceCalibrationC2Threshold;
+    DBObjPtr<ECLCrystalCalib> m_ECLAutocovarianceCalibrationC3Threshold;
     std::vector<float> m_PeakToPeakThresholds; /**< vector of thresholds obtained from DB object */
 
     int m_BaselineLimit; /**< Number of waveforms required to compute baseline  */

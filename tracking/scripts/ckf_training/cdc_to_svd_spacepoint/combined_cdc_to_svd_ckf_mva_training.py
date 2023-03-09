@@ -307,7 +307,7 @@ class StateRecordingTask(Basf2PathTask):
             experiment_number=self.experiment_number,
         )
 
-    def create_recording_path(self, layer, records1_fname, records2_fname, records3_fname):
+    def create_state_recording_path(self, layer, records1_fname, records2_fname, records3_fname):
         path = basf2.create_path()
 
         file_list = []
@@ -382,7 +382,7 @@ class StateRecordingTask(Basf2PathTask):
         return path
 
     def create_path(self):
-        return self.create_recording_path(
+        return self.create_state_recording_path(
             layer=self.layer,
             records1_fname=self.get_output_file_name("records1.root"),
             records2_fname=self.get_output_file_name("records2.root"),
@@ -477,6 +477,109 @@ class CKFStateFilterTeacherTask(Basf2Task):
         )
 
 
+class ResultRecordingTask(Basf2PathTask):
+    result_filter_records_name = b2luigi.Parameter()
+    experiment_number = b2luigi.IntParameter()
+    n_events_training = b2luigi.IntParameter()
+
+    def output(self):
+        yield self.add_to_output(self.result_filter_records_name)
+
+    def requires(self):
+        yield SplitNMergeSimTask(
+            bkgfiles_dir=MainTask.bkgfiles_by_exp[self.experiment_number],
+            random_seed="self.random_seed",
+            n_events=self.n_events_training,
+            experiment_number=self.experiment_number,
+        )
+        filter_numbers = [1, 2, 3]
+        for filter_number in filter_numbers:
+            yield self.clone(
+                CKFStateFilterTeacherTask,
+                filter_number=filter_number,
+                n_events_training=self.n_events_training,
+                experiment_number=self.experiment_number,
+            )
+
+    def create_result_recording_path(self, result_filter_records_name):
+        path = basf2.create_path()
+
+        file_list = []
+        for _, file_name in self.get_input_file_names().items():
+            # if ".root" in (*file_name):
+            #    file_list.append(*file_name)
+            print(f"{file_name}")
+            file_list.append(*file_name)
+        print("\n\n\n")
+        print("#####"*20)
+        print(f"{file_list}")
+        file_list = [x for x in file_list if ".root" in x]
+        path.add_module("RootInput", inputFileNames=file_list)
+
+        path.add_module("Gearbox")
+        path.add_module("Geometry")
+        path.add_module("SetupGenfitExtrapolation")
+
+        add_hit_preparation_modules(path, components=["SVD"])
+
+        add_track_finding(path, reco_tracks="CDCRecoTracks", components=["CDC"], prune_temporary_tracks=False)
+
+        path.add_module('TrackFinderMCTruthRecoTracks',
+                        RecoTracksStoreArrayName="MCRecoTracks",
+                        WhichParticles=[],
+                        UsePXDHits=True,
+                        UseSVDHits=True,
+                        UseCDCHits=True)
+
+        path.add_module("MCRecoTracksMatcher", UsePXDHits=False, UseSVDHits=False, UseCDCHits=True,
+                        mcRecoTracksStoreArrayName="MCRecoTracks",
+                        prRecoTracksStoreArrayName="CDCRecoTracks")
+        path.add_module("DAFRecoFitter", recoTracksStoreArrayName="CDCRecoTracks")
+
+        path.add_module(
+            "CDCToSVDSpacePointCKF",
+            minimalPtRequirement=0,
+            minimalHitRequirement=1,
+            useAssignedHits=False,
+            inputRecoTrackStoreArrayName="CDCRecoTracks",
+            outputRecoTrackStoreArrayName="VXDRecoTracks",
+            outputRelationRecoTrackStoreArrayName="CDCRecoTracks",
+            hitFilter="sensor",
+            seedFilter="distance",
+            relationCheckForDirection="backward",
+            reverseSeed=False,
+            writeOutDirection="backward",
+            firstHighFilter="mva",
+            firstHighFilterParameters={
+                "identifier": self.get_input_file_names("trk_CDCToSVDSpacePointStateFilter_1.weights.xml")[0],
+                "cut": 0.0001},
+            firstHighUseNStates=10,
+            advanceHighFilter="advance",
+            secondHighFilter="mva",
+            secondHighFilterParameters={
+                "identifier": self.get_input_file_names("trk_CDCToSVDSpacePointStateFilter_2.weights.xml")[0],
+                "cut": 0.0001},
+            secondHighUseNStates=10,
+            updateHighFilter="fit",
+            thirdHighFilter="mva",
+            thirdHighFilterParameters={
+                "identifier": self.get_input_file_names("trk_CDCToSVDSpacePointStateFilter_3.weights.xml")[0],
+                "cut": 0.0001},
+            thirdHighUseNStates=10,
+            filter="recording",
+            filterParameters={
+                    "rootFileName": result_filter_records_name},
+            exportTracks=False,
+            enableOverlapResolving=True)
+
+        return path
+
+    def create_path(self):
+        return self.create_result_recording_path(
+            result_filter_records_name=self.get_output_file_name(self.result_filter_records_name),
+        )
+
+
 class MainTask(b2luigi.WrapperTask):
     """
     Wrapper task that needs to finish for b2luigi to finish running this steering file.
@@ -566,14 +669,21 @@ class MainTask(b2luigi.WrapperTask):
             #         n_events_training=self.n_events_training,
             #         experiment_number=experiment_number,
             #     )
-            filter_numbers = [1, 2, 3]
-            for filter_number in filter_numbers:
-                yield self.clone(
-                    CKFStateFilterTeacherTask,
-                    filter_number=filter_number,
+
+            # filter_numbers = [1, 2, 3]
+            # for filter_number in filter_numbers:
+            #     yield self.clone(
+            #         CKFStateFilterTeacherTask,
+            #         filter_number=filter_number,
+            #         n_events_training=self.n_events_training,
+            #         experiment_number=experiment_number,
+            #     )
+
+            yield ResultRecordingTask(
+                    result_filter_records_name="filter_records.root",
                     n_events_training=self.n_events_training,
                     experiment_number=experiment_number,
-                )
+            )
 
 
 if __name__ == "__main__":

@@ -186,24 +186,17 @@ void PXDInjectionDQMModule::beginRun()
 
 void PXDInjectionDQMModule::event()
 {
-  // Check if the pointer is valid
-  if (!m_EventLevelTriggerTimeInfo.isValid()) {
-    B2WARNING("StoreObjPtr<EventLevelTriggerTimeInfo> does not exist, are you running over data reconstructed with release-05 or earlier?");
-  }
   // And check if the stored data is valid
   if (m_EventLevelTriggerTimeInfo->isValid()) {
-    // B2DEBUG(29, "TTD FTSW : " << hex << it.GetTTUtime(0) << " " << it.GetTTCtime(0) << " EvtNr " << it.GetEveNo(0)  << " Type " <<
-    //         (it.GetTTCtimeTRGType(0) & 0xF) << " TimeSincePrev " << it.GetTimeSincePrevTrigger(0) << " TimeSinceInj " <<
-    //         it.GetTimeSinceLastInjection(0) << " IsHER " << it.GetIsHER(0) << " Bunch " << it.GetBunchNumber(0));
-
     // get last injection time
     hTriggersAfterTrigger->Fill(m_EventLevelTriggerTimeInfo->getTimeSincePrevTrigger() / 127.);
     // hTriggersAfterTrigger->Fill(m_EventLevelTriggerTimeInfo->getTimeSincePrevTrigger() / 64.);
     hTriggersPerBunch->Fill(m_EventLevelTriggerTimeInfo->getBunchNumber());
 
-    auto difference = m_EventLevelTriggerTimeInfo->getTimeSinceLastInjection();
     // check time overflow, too long ago
-    if (difference != 0x7FFFFFFF) {
+    if (m_EventLevelTriggerTimeInfo->hasInjection()) {
+      auto difference = m_EventLevelTriggerTimeInfo->getTimeSinceLastInjection();
+
       // count raw pixel hits or clusters per module, only if necessary
       unsigned int all = 0;
       std::map <VxdID, int> freq;// count the number of RawHits per sensor
@@ -292,7 +285,5 @@ void PXDInjectionDQMModule::event()
         }
       }
     }
-  } else {
-    B2WARNING("Data stored in StoreObjPtr<EventLevelTriggerTimeInfo> is not valid.");
   }
 }

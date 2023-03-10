@@ -154,20 +154,12 @@ void PXDGatedModeDQMModule::beginRun()
 
 void PXDGatedModeDQMModule::event()
 {
-  // Check if the pointer is valid
-  if (!m_EventLevelTriggerTimeInfo.isValid()) {
-    B2WARNING("StoreObjPtr<EventLevelTriggerTimeInfo> does not exist, are you running over data reconstructed with release-05 or earlier?");
-  }
   // And check if the stored data is valid
   if (m_EventLevelTriggerTimeInfo->isValid()) {
-    // B2DEBUG(29, "TTD FTSW : " << hex << it.GetTTUtime(0) << " " << it.GetTTCtime(0) << " EvtNr " << it.GetEveNo(0)  << " Type " <<
-    //         (it.GetTTCtimeTRGType(0) & 0xF) << " TimeSincePrev " << it.GetTimeSincePrevTrigger(0) << " TimeSinceInj " <<
-    //         it.GetTimeSinceLastInjection(0) << " IsHER " << it.GetIsHER(0) << " Bunch " << it.GetBunchNumber(0));
-
-    // get last injection time
-    auto difference = m_EventLevelTriggerTimeInfo->getTimeSinceLastInjection();
     // check time overflow, too long ago
-    if (difference != 0x7FFFFFFF) {
+    if (m_EventLevelTriggerTimeInfo->hasInjection()) {
+      // get last injection time
+      auto difference = m_EventLevelTriggerTimeInfo->getTimeSinceLastInjection();
       auto isher = m_EventLevelTriggerTimeInfo->isHER();
       float diff2 = difference / (508.877 / 4.); //  127MHz clock ticks to us, inexact rounding
       int bunch_trg = m_EventLevelTriggerTimeInfo->getBunchNumber();
@@ -304,7 +296,5 @@ void PXDGatedModeDQMModule::event()
         }
       }
     }
-  } else {
-    B2WARNING("Data stored in StoreObjPtr<EventLevelTriggerTimeInfo> is not valid.");
   }
 }

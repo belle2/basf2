@@ -278,15 +278,9 @@ void PXDDAQDQMModule::event()
   }
 
 
-  // Check if the pointer is valid
-  if (!m_EventLevelTriggerTimeInfo.isValid()) {
-    B2WARNING("StoreObjPtr<EventLevelTriggerTimeInfo> does not exist, are you running over data reconstructed with release-05 or earlier?");
-  }
+
   // And check if the stored data is valid
   if (m_EventLevelTriggerTimeInfo->isValid()) {
-//     B2DEBUG(29, "TTD FTSW : " << hex << it.GetTTUtime(0) << " " << it.GetTTCtime(0) << " EvtNr " << it.GetEveNo(0)  << " Type " <<
-//             (it.GetTTCtimeTRGType(0) & 0xF) << " TimeSincePrev " << it.GetTimeSincePrevTrigger(0) << " TimeSinceInj " <<
-//             it.GetTimeSinceLastInjection(0) << " IsHER " << it.GetIsHER(0) << " Bunch " << it.GetBunchNumber(0));
 
     double lasttrig = m_EventLevelTriggerTimeInfo->getTimeSincePrevTrigger() / 127.; //  127MHz clock ticks to us, inexact rounding
     if (eodbFlag && hEODBTrgDiff) hEODBTrgDiff->Fill(lasttrig);
@@ -294,10 +288,10 @@ void PXDDAQDQMModule::event()
     if (truncFlag && hTruncTrgDiff) hTruncTrgDiff->Fill(lasttrig);
     if (missingFlag && hMissTrgDiff) hMissTrgDiff->Fill(lasttrig);
 
-    // get last injection time
-    auto difference = m_EventLevelTriggerTimeInfo->getTimeSinceLastInjection();
     // check time overflow, too long ago
-    if (difference != 0x7FFFFFFF) {
+    if (m_EventLevelTriggerTimeInfo->hasInjection()) {
+      // get last injection time
+      auto difference = m_EventLevelTriggerTimeInfo->getTimeSinceLastInjection();
       double diff2 = difference / 127.; //  127MHz clock ticks to us, inexact rounding
       if (m_EventLevelTriggerTimeInfo->isHER()) {
         if (eodbFlag) {
@@ -339,8 +333,6 @@ void PXDDAQDQMModule::event()
         }
       }
     }
-  } else {
-    B2WARNING("Data stored in StoreObjPtr<EventLevelTriggerTimeInfo> is not valid.");
   }
 
 // make some nice statistics

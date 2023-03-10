@@ -89,8 +89,8 @@ BremsFinderModule::BremsFinderModule() :
   See also:
     `eclTrackBremFinder module`_
                  
-  .. _eclTrackBremFinder module: https://stash.desy.de/projects/B2/repos/basf2/browse/ecl/modules/eclTrackBremFinder
-  .. _here: https://stash.desy.de/projects/B2/repos/basf2/browse/ecl/modules/eclTrackBremFinder/src/BremFindingMatchCompute.cc)DOC");
+  .. _eclTrackBremFinder module: https://gitlab.desy.de/belle2/software/basf2/-/tree/main/ecl/modules/eclTrackBremFinder
+  .. _here: https://gitlab.desy.de/belle2/software/basf2/-/tree/main/ecl/modules/eclTrackBremFinder/src/BremFindingMatchCompute.cc)DOC");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   // Add parameters

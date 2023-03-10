@@ -15,8 +15,8 @@
     :class: hint toggle stacked
 
     If you know how to do it, we recommend you to report bugs and other requests
-    with `JIRA <https://agira.desy.de/>`_. Make sure to use the
-    ``documentation-training`` component of the ``Belle II Software`` project.
+    with `GitLab <https://gitlab.desy.de/belle2/software/basf2/-/issues>`_.
+    Make sure to use the ``documentation-training`` label of the ``basf2`` project.
 
     If you just want to give very quick feedback, use the last box
     "Quick feedback".

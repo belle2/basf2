@@ -282,7 +282,9 @@ namespace Belle2 {
       if (good_event()) {
         result = 1;
       } else {
-        result = -1;
+        if (m_saveResultExtraInfo)
+          m_eventExtraInfo->addExtraInfo("FixMdstResult", -1);
+        setReturnValue(-1);
         B2DEBUG(99, "B2BIIFixMdst: Not a good event");
         return;
       }

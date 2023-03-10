@@ -6,9 +6,12 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-
 #pragma once
 
+/* ECL headers. */
+#include <ecl/dataobjects/ECLElementNumbers.h>
+
+/* Basf2 headers. */
 #include <calibration/CalibrationCollectorModule.h>
 #include <framework/datastore/StoreArray.h>
 
@@ -61,13 +64,11 @@ namespace Belle2 {
     std::vector< std::vector<int> > iEnergies;/**< Generated energies in MeV in each region */
     const int iFirstCellId = 161; /**< first useful cellID (first of thetaID 3) */
     const int iLastCellId = 8608; /**< first useful cellID (last of thetaID 66) */
-    const int iFirstBarrel = 1153; /**< first barrel cellID */
-    const int iLastBarrel = 7776; /**< last barrel cellID */
     const int nLeakReg = 3; /**< 0 = forward, 1 = barrel, 2 = backward */
     const int nCrysMax = 21; /**< max number of crystals used to calculate energy */
 
     int nCrystalGroups; /**< sort the crystals into this many groups */
-    int iGroupOfCrystal[8736]; /**< group number of each crystal */
+    int iGroupOfCrystal[ECLElementNumbers::c_NCrystals]; /**< group number of each crystal */
 
     ECL::ECLNeighbours* neighbours{nullptr}; /**< neighbours to crystal */
 

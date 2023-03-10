@@ -191,14 +191,14 @@ def set_GNNFlavorTagger_aliases(categories):
             listName = AvailableCategories[cat].particleList
             varName = f'QpTrack({listName}, isRightCategory({cat}), isRightCategory({cat}))'
 
-            varWithRank = f'ifNANgiveX(getVariableByRank(pi+:inRoe, p, {varName}, {rank}), 0)'
+            varWithRank = f'ifNANgiveX(getVariableByRank(pi+:inRoe, FT_p, {varName}, {rank}), 0)'
             aliasWithRank = f'{cat}_rank{rank}'
 
             variables.variables.addAlias(aliasWithRank, varWithRank)
             alias_list.append(aliasWithRank)
 
         for alias, var in var_dict.items():
-            varWithRank = f'ifNANgiveX(getVariableByRank(pi+:inRoe, p, {var}, {rank}), 0)'
+            varWithRank = f'ifNANgiveX(getVariableByRank(pi+:inRoe, FT_p, {var}, {rank}), 0)'
             aliasWithRank = f'{alias}_rank{rank}'
 
             variables.variables.addAlias(aliasWithRank, varWithRank)
@@ -1257,7 +1257,8 @@ def flavorTagger(
         if useGNN:
             if eventLevel('Expert', weightFiles, categories, roe_path):
 
-                ma.rankByHighest('pi+:inRoe', 'p', numBest=0, allowMultiRank=False, path=roe_path)
+                ma.rankByHighest('pi+:inRoe', 'p', numBest=0, allowMultiRank=False,
+                                 outputVariable='FT_p_rank', overwriteRank=True, path=roe_path)
                 ma.fillParticleListFromDummy('vpho:dummy', path=roe_path)
                 ma.variablesToNtuple('vpho:dummy',
                                      alias_list_for_GNN,
@@ -1299,7 +1300,8 @@ def flavorTagger(
             add_default_FlavorTagger_aliases()
 
             if useGNN:
-                ma.rankByHighest('pi+:inRoe', 'p', numBest=0, allowMultiRank=False, path=roe_path)
+                ma.rankByHighest('pi+:inRoe', 'p', numBest=0, allowMultiRank=False,
+                                 outputVariable='FT_p_rank', overwriteRank=True, path=roe_path)
                 ma.fillParticleListFromDummy('vpho:dummy', path=roe_path)
                 roe_path.add_module('MVAExpert',
                                     listNames='vpho:dummy',

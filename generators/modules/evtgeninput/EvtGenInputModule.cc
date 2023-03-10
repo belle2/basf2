@@ -13,7 +13,7 @@
 #include <generators/evtgen/EvtGenInterface.h>
 #include <generators/evtgen/EvtGenUtilities.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/utilities/FileSystem.h>
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/MCParticleGraph.h>

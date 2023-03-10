@@ -38,6 +38,7 @@ def setupBelleDatabaseServer():
 
 
 def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
+                                  saveResultExtraInfo=False,
                                   useBelleDBServer=None,
                                   convertBeamParameters=True,
                                   generatorLevelReconstruction=False,
@@ -133,6 +134,7 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
         fix = b2.register_module('B2BIIFixMdst')
         # fix.logging.set_log_level(LogLevel.DEBUG)
         # fix.logging.set_info(LogLevel.DEBUG, LogInfo.LEVEL | LogInfo.MESSAGE)
+        fix.param('SaveResultExtraInfo', saveResultExtraInfo)
         # Hadron skim settings
         fix.param('HadronA', HadronA)
         fix.param('HadronB', HadronB)

@@ -212,11 +212,15 @@ namespace Belle2 {
     addParam("Reprocess_version", m_reprocess_version_specified, "Specify reprocess version", -1);
     addParam("5Srun", m_5Srun, "5S,2S,1S run or not", 0);
     addParam("Check_version_consistency", m_check_version_consistency, "Check consistency betw. env. variable and mdst version", 1);
+    addParam("SaveResultExtraInfo", m_saveResultExtraInfo,
+             "Whether to save result as EventExtraInfo.", false);
   }
 
   void B2BIIFixMdstModule::initialize()
   {
     Muid_init();
+    if (m_saveResultExtraInfo)
+      m_eventExtraInfo.registerInDataStore();
   }
 
   void B2BIIFixMdstModule::terminate()
@@ -226,9 +230,15 @@ namespace Belle2 {
 
   void B2BIIFixMdstModule::event()
   {
+    int result;
+
+    if (!m_eventExtraInfo.isValid())
+      m_eventExtraInfo.create();
 
     if ((BsCouTab(BELLE_EVENT) == 0) || (BsCouTab(MDST_EVENT_ADD) == 0)) {
       B2INFO("Warning from B2BIIFixMdst: No Belle_event or Mdst_event_add table; no correction for event");
+      if (m_saveResultExtraInfo)
+        m_eventExtraInfo->addExtraInfo("FixMdstResult", -1);
       setReturnValue(-1);
       return;
     }
@@ -270,14 +280,14 @@ namespace Belle2 {
 
     if (m_good_event == 1) {
       if (good_event()) {
-        setReturnValue(1);
+        result = 1;
       } else {
-        setReturnValue(-1);
+        result = -1;
         B2DEBUG(99, "B2BIIFixMdst: Not a good event");
         return;
       }
     } else {
-      setReturnValue(0);
+      result = 0;
     }
 
     if (m_l4passed_only == 1) {
@@ -285,6 +295,8 @@ namespace Belle2 {
         struct l4_summary* l =
           (struct l4_summary*) BsGetEnt(L4_SUMMARY, 1, BBS_No_Index);
         if (l->m_type == 0) {
+          if (m_saveResultExtraInfo)
+            m_eventExtraInfo->addExtraInfo("FixMdstResult", -1);
           setReturnValue(-1);
           B2DEBUG(99, "B2BIIFixMdst: L4 cut");
           return;
@@ -297,6 +309,8 @@ namespace Belle2 {
       Belle::Evtcls_flag_Manager::iterator  it1 = EvtFlagMgr.begin();
       if (it1 != EvtFlagMgr.end() && *it1) {
         if ((*it1).flag(0) < 10) {
+          if (m_saveResultExtraInfo)
+            m_eventExtraInfo->addExtraInfo("FixMdstResult", -1);
           setReturnValue(-1);
           B2DEBUG(99, "B2BIIFixMdst: HadA cut");
           return;
@@ -310,6 +324,8 @@ namespace Belle2 {
       Belle::Evtcls_hadronic_flag_Manager::iterator ith = HadMgr.begin();
       if (ith != HadMgr.end() && *ith) {
         if ((*ith).hadronic_flag(2) <= 0) {
+          if (m_saveResultExtraInfo)
+            m_eventExtraInfo->addExtraInfo("FixMdstResult", -1);
           setReturnValue(-1);
           B2DEBUG(99, "B2BIIFixMdst: HadB cut");
           return;
@@ -323,12 +339,16 @@ namespace Belle2 {
       if ((m_reprocess_version == 0 && bevt.count() > 0 && bevt[0].ExpNo() >= 39) ||
           (m_reprocess_version >= 1)) {
         if (Belle::Mdst_ecl_trk_Manager::get_manager().count() > m_limit_mdst_ecl_trk) {
+          if (m_saveResultExtraInfo)
+            m_eventExtraInfo->addExtraInfo("FixMdstResult", -1);
           setReturnValue(-1);
           B2INFO("B2BIIFixMdst: " <<  Belle::Mdst_ecl_trk_Manager::get_manager().count() << " " << m_limit_mdst_ecl_trk);
           return;
         }
         if (Belle::Mdst_klm_cluster_hit_Manager::get_manager().count()
             > m_limit_mdst_klm_cluster_hit) {
+          if (m_saveResultExtraInfo)
+            m_eventExtraInfo->addExtraInfo("FixMdstResult", -1);
           setReturnValue(-1);
           B2INFO("B2BIIFixMdst: " <<  Belle::Mdst_klm_cluster_hit_Manager::get_manager().count() << " " << m_limit_mdst_klm_cluster_hit);
           return;
@@ -345,7 +365,9 @@ namespace Belle2 {
 
     if (m_mapped_expno > 0) Muid_event();
 
-    return;
+    if (m_saveResultExtraInfo)
+      m_eventExtraInfo->addExtraInfo("FixMdstResult", result);
+    setReturnValue(result);
   }
 
   void B2BIIFixMdstModule::beginRun()

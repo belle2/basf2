@@ -7,7 +7,7 @@
  **************************************************************************/
 
 /* Own header. */
-#include <ecl/calibration/eclAutocovarianceCalibrationC2Algorithm.h>
+#include <ecl/calibration/eclAutocovarianceCalibrationC3Algorithm.h>
 
 /* ECL headers. */
 #include <ecl/dataobjects/ECLElementNumbers.h>
@@ -23,15 +23,15 @@ using namespace Belle2;
 using namespace ECL;
 
 /**-----------------------------------------------------------------------------------------------*/
-eclAutocovarianceCalibrationC2Algorithm::eclAutocovarianceCalibrationC2Algorithm():
-  CalibrationAlgorithm("eclAutocovarianceCalibrationC2Collector")
+eclAutocovarianceCalibrationC3Algorithm::eclAutocovarianceCalibrationC3Algorithm():
+  CalibrationAlgorithm("eclAutocovarianceCalibrationC3Collector")
 {
   setDescription(
     "Perform energy calibration of ecl crystals by fitting a Novosibirsk function to energy deposited by photons in e+e- --> gamma gamma"
   );
 }
 
-CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC2Algorithm::calibrate()
+CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC3Algorithm::calibrate()
 {
 
 
@@ -40,43 +40,33 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC2Algorithm::calibrate
 
   ///**-----------------------------------------------------------------------------------------------*/
   ///** Histograms containing the data collected by eclGammaGammaECollectorModule */
-  auto BaselineInfoVsCrysID = getObjectPtr<TH2F>("BaselineInfoVsCrysID");
-
-  std::vector<float> cryIDs;
-  std::vector<float> baselines;
+  auto BaselineInfoVsCrysID = getObjectPtr<TH2F>("CovarianceMatrixInfoVsCrysID");
 
   for (int crysID = 0; crysID < ECLElementNumbers::c_NCrystals; crysID++) {
 
     float totalCounts = BaselineInfoVsCrysID->GetBinContent(crysID + 1, 32);
-    float baseline = 0.0;
-    for (int i = 0; i < 31; i++) {
-      baseline += BaselineInfoVsCrysID->GetBinContent(crysID + 1, i + 1);
-    }
-    baseline /= 31.0;
-    baseline /= totalCounts;
 
-    B2INFO(crysID << " baseline: " << baseline);
 
-    cryIDs.push_back(crysID + 1);
-    baselines.push_back(baseline);
+    //cryIDs.push_back(crysID + 1);
+    //baselines.push_back(baseline);
 
-    B2INFO("eclAutocovarianceCalibrationC2Algorithm crysID baseline totalCounts  " << crysID << " " << baseline << " " << totalCounts);
+    B2INFO("eclAutocovarianceCalibrationC3Algorithm crysID totalCounts  " << crysID << " " << totalCounts << " " << totalCounts);
 
   }
 
-  auto gBaselineVsCrysID = new TGraph(cryIDs.size(), cryIDs.data(), baselines.data());
-  gBaselineVsCrysID->SetName("gBaselineVsCrysID");
+  //auto gBaselineVsCrysID = new TGraph(cryIDs.size(), cryIDs.data(), baselines.data());
+  //gBaselineVsCrysID->SetName("gBaselineVsCrysID");
 
   /** Write out the basic histograms in all cases */
   TString fName = m_outputName;
   TFile* histfile = new TFile(fName, "recreate");
 
   BaselineInfoVsCrysID->Write();
-  gBaselineVsCrysID->Write();
+  //gBaselineVsCrysID->Write();
 
-  ECLCrystalCalib* PPThreshold = new ECLCrystalCalib();
-  PPThreshold->setCalibVector(cryIDs, baselines);
-  saveCalibration(PPThreshold, "ECLAutocovarianceCalibrationC2Baseline");
+  //ECLCrystalCalib* PPThreshold = new ECLCrystalCalib();
+  //PPThreshold->setCalibVector(cryIDs, baselines);
+  //saveCalibration(PPThreshold, "ECLAutocovarianceCalibrationC3Baseline");
 
   return c_OK;
 }

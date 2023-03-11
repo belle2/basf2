@@ -64,7 +64,8 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC1Algorithm::calibrate
     cryIDs.push_back(crysID + 1);
     PPamps.push_back(counter);
 
-    B2INFO(crysID << " " << counter << " " << fraction);
+    B2INFO("eclAutocovarianceCalibrationC1Algorithm: crysID counter fraction Total " << crysID << " " << counter << " " << fraction <<
+           " " << Total);
   }
 
   auto gPPVsCrysID = new TGraph(cryIDs.size(), cryIDs.data(), PPamps.data());
@@ -80,7 +81,7 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC1Algorithm::calibrate
   //histfile->Close();
 
   ECLCrystalCalib* PPThreshold = new ECLCrystalCalib();
-  PPThreshold->setCalibVector(cryIDs, PPamps);
+  PPThreshold->setCalibVector(PPamps, cryIDs);
   saveCalibration(PPThreshold, "ECLAutocovarianceCalibrationC1Threshold");
   B2INFO("eclAutocovarianceCalibrationC1Algorithm: successfully stored ECLAutocovarianceCalibrationC1Threshold constants");
 //

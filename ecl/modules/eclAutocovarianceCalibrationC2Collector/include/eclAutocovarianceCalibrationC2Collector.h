@@ -41,14 +41,8 @@ namespace Belle2 {
     StoreArray<ECLDsp> m_eclDsps; /**< Required input array of ECLDSPs */
     StoreObjPtr<EventMetaData> m_evtMetaData; /**< dataStore EventMetaData */
 
-    DBObjPtr<ECLCrystalCalib> m_ECLAutocovarianceCalibrationC2Threshold;
+    DBObjPtr<ECLCrystalCalib> m_ECLAutocovarianceCalibrationC1Threshold;
     std::vector<float> m_PeakToPeakThresholds; /**< vector of thresholds obtained from DB object */
-
-    int m_BaselineLimit; /**< Number of waveforms required to compute baseline  */
-    std::vector< std::vector<float > > m_Baseline; /**< vector of thresholds obtained from DB object */
-    std::vector< int > m_counter; /**< vector of thresholds obtained from DB object */
-    std::vector<bool> m_BaselineComputed; /**< vector of thresholds obtained from DB object */
-
 
   };
 } // end Belle2 namespace

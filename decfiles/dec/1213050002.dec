@@ -1,0 +1,56 @@
+# EventType: 1213050002
+# Descriptor: Y(4S) -> B+ B-
+#                     [B+ -> [anti-D0 -> K+ pi-] [rho0 -> pi+ pi-] pi+]
+#                      B- -> anything
+# NickName: Bu_D0rho0pi+_K+pi-
+
+# Tested: Yes
+# PhysicsWG: BTOCHARM
+# Responsible: Shubhajit Sana
+# Email: ph18b004@smail.iitm.ac.in
+# Cuts: None
+# Date: 09/03/23
+
+#
+# Aliases
+#
+
+Alias      rho0sig    rho0
+ChargeConj rho0sig    rho0sig
+
+#
+# Y(4S) -> B+ B- 
+#
+
+Decay Upsilon(4S)
+0.5 B+sig B-    VSS; 
+0.5 B+ B-sig    VSS;
+Enddecay
+
+#
+# B+ -> anti-D0 rho0  pi+
+#
+
+Decay B+sig
+1.0 anti-D0sig rho0sig pi+  PHSP;
+Enddecay
+CDecay B-sig
+
+#
+# anti-D0 -> K+ pi-
+#
+
+Decay anti-D0sig
+1.0 K+ pi-  PHSP;
+Enddecay
+CDecay D0sig
+
+#
+# rho0 -> pi- pi+
+#
+
+Decay rho0sig
+1.0 pi+ pi- VSS;
+Enddecay
+
+End

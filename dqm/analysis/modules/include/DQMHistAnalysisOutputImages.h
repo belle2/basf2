@@ -17,7 +17,7 @@
 namespace Belle2 {
   /*! Class definition for the output to image module */
 
-  class DQMHistAnalysisOutputImagesModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisOutputImagesModule final : public DQMHistAnalysisModule {
 
     // Public functions
   public:

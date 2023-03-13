@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -63,8 +62,7 @@ histo.param('histoFileName', 'DQMhistograms.root')  # File to save histograms
 main.add_module(histo)
 
 # Gearbox: access to database (xml files)
-gearbox = b2.register_module('Gearbox')
-main.add_module(gearbox)
+main.add_module('Gearbox')
 
 # Geometry
 # only ARICH and magnetic field
@@ -157,8 +155,7 @@ main.add_module(arichdqm)
 # main.add_module(display)
 
 # Show progress of processing
-progress = b2.register_module('Progress')
-main.add_module(progress)
+main.add_module('Progress')
 
 # Process events
 b2.process(main)
@@ -172,14 +169,10 @@ if (options.rootbatch):
 else:
     com = 'root -l ' + options.filename + ' ' + home + '/arich/utility/scripts/plotEfficiency.C'
 
-if not (options.hepr):
-    if not (options.overlap):
-        if not (options.rootoff):
-            os.system(com)
+if not (options.hepr or options.overlap or options.rootoff):
+    os.system(com)
 
 # Retrieve of the histograms from TCanvas produced by plotEfficiency.C
 com = 'root -l -b -q ' + 'ARICHPerformance.root' + ' ' + home + '/arich/utility/scripts/plotEfficiencyConvertTCanvasToHist.C'
-if not (options.hepr):
-    if not (options.overlap):
-        if not (options.rootoff):
-            os.system(com)
+if not (options.hepr or options.overlap or options.rootoff):
+    os.system(com)

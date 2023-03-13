@@ -11,7 +11,6 @@
 
 # ---------------------------------------------------------------------------------------
 # Display of waveforms with feature extraction points superimposed
-# Unpacker is set for Interim FE format v2.1
 # Usage: basf2 showFEWaveforms.py -i <file_name.sroot>
 # ---------------------------------------------------------------------------------------
 
@@ -188,8 +187,9 @@ class WFDisplay(b2.Module):
                 if tlpfResult:
                     tlpfgraph = TGraph(2)
                     tlpfgraph.SetMarkerStyle(25)
-#                    tlpfgraph.SetPoint(0, tlpfResult.getMean(), tlpfResult.getAmplitude() + tlpfResult.getBackgroundOffset())
-#                    tlpfgraph.SetPoint(1, tlpfResult.getMean(), tlpfResult.getBackgroundOffset())
+                    tlpfgraph.SetPoint(0, tlpfResult.getRisingEdge(),
+                                       tlpfResult.getAmplitude() / 2 + tlpfResult.getBackgroundOffset())
+                    tlpfgraph.SetPoint(1, tlpfResult.getRisingEdge(), tlpfResult.getBackgroundOffset())
                     print('Template Fit Chisquare: ', tlpfResult.getChisquare())
                     self.tlpfgraphs[k].append(tlpfgraph)
 
@@ -207,8 +207,9 @@ class WFDisplay(b2.Module):
 
 b2.set_log_level(b2.LogLevel.INFO)
 
-# Define a global tag (note: the one given bellow will become out-dated!)
-b2.use_central_database('data_reprocessing_proc8')
+# Define a global tag
+b2.conditions.override_globaltags()
+b2.conditions.append_globaltag('online')
 
 # Create path
 main = b2.create_path()

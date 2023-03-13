@@ -7,23 +7,23 @@
  **************************************************************************/
 #pragma once
 
-// STL
-#include <cstdint>
-#include <string>
+/* ECL headers. */
+#include <ecl/dataobjects/ECLDigit.h>
+#include <ecl/modules/eclLocalRunCalibration/ECLLocalRunCalibUnit.h>
 
-// FRAMEWORK
+/* Basf2 headers. */
 #include <framework/core/Module.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
-// ECL
-#include <ecl/dataobjects/ECLDigit.h>
-#include <ecl/modules/eclLocalRunCalibration/ECLLocalRunCalibUnit.h>
-
-// ROOT
-#include <TTree.h>
+/* ROOT headers. */
 #include <TH1F.h>
+#include <TTree.h>
+
+/* C++ headers. */
+#include <cstdint>
+#include <string>
 
 namespace Belle2 {
   /**

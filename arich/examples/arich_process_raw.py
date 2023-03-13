@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -13,7 +12,7 @@
 # It converts arich raw data to arichDigits and arichHits
 # Using "-t 1" option the cdc tracks are also reconstructed and stored into
 # the output root file (along with the arichHits).
-# Using option "-a 1" only the data from events that contain reconstruced track hit
+# Using option "-a 1" only the data from events that contain reconstructed track hit
 # in the is included into the output file.
 # ARICHDQM module is also included, it produces "DQMhistograms.root" with some basic
 # dqm histograms (using all events). You can conveniently display some of them using
@@ -73,8 +72,7 @@ main.add_module(histo)
 
 # build geometry if display option
 if int(options.tracking):
-    gearbox = b2.register_module('Gearbox')
-    main.add_module(gearbox)
+    main.add_module('Gearbox')
     geometry = b2.register_module('Geometry')
     geometry.param('useDB', 1)
     main.add_module(geometry)
@@ -86,7 +84,7 @@ main.add_module(unPacker)
 
 # create ARICHHits from ARICHDigits
 arichHits = b2.register_module('ARICHFillHits')
-# set bitmask for makin hits form digits
+# set bitmask for making hits from digits
 arichHits.param("bitMask", 0xFF)
 main.add_module(arichHits)
 
@@ -98,10 +96,8 @@ if int(options.tracking):
     add_cosmics_reconstruction(main, 'CDC', False)
 
 if int(options.gdl):
-    trggdlUnpacker = b2.register_module("TRGGDLUnpacker")
-    main.add_module(trggdlUnpacker)
-    trggdlsummary = b2.register_module('TRGGDLSummary')
-    main.add_module(trggdlsummary)
+    main.add_module('TRGGDLUnpacker')
+    main.add_module('TRGGDLSummary')
 
 # create simple DQM histograms
 arichHists = b2.register_module('ARICHDQM')
@@ -123,8 +119,7 @@ if(options.output != ''):
         main.add_module(output)
 
 # show progress
-progress = b2.register_module('Progress')
-main.add_module(progress)
+main.add_module('Progress')
 
 if int(options.arichtrk):
     arichHists.if_value('==1', store)

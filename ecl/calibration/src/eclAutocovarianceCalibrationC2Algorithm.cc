@@ -40,17 +40,18 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC2Algorithm::calibrate
 
   ///**-----------------------------------------------------------------------------------------------*/
   ///** Histograms containing the data collected by eclGammaGammaECollectorModule */
-  auto BaselineInfoVsCrysID = getObjectPtr<TH2F>("BaselineInfoVsCrysID");
+  auto m_BaselineInfoVsCrysID = getObjectPtr<TH2F>("m_BaselineInfoVsCrysID");
 
   std::vector<float> cryIDs;
   std::vector<float> baselines;
 
   for (int crysID = 0; crysID < ECLElementNumbers::c_NCrystals; crysID++) {
 
-    float totalCounts = BaselineInfoVsCrysID->GetBinContent(crysID + 1, 32);
+    float totalCounts = m_BaselineInfoVsCrysID->GetBinContent(m_BaselineInfoVsCrysID->GetBin(crysID + 1, 32));
     float baseline = 0.0;
     for (int i = 0; i < 31; i++) {
-      baseline += BaselineInfoVsCrysID->GetBinContent(crysID + 1, i + 1);
+      //B2INFO(i<<" "<<m_BaselineInfoVsCrysID->Fill(crysID,i,0)/totalCounts<<" "<<m_BaselineInfoVsCrysID->Fill(crysID,i,0));
+      baseline += float(m_BaselineInfoVsCrysID->GetBinContent(m_BaselineInfoVsCrysID->GetBin(crysID + 1, i + 1)));
     }
     baseline /= 31.0;
     baseline /= totalCounts;
@@ -71,11 +72,11 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC2Algorithm::calibrate
   TString fName = m_outputName;
   TFile* histfile = new TFile(fName, "recreate");
 
-  BaselineInfoVsCrysID->Write();
+  m_BaselineInfoVsCrysID->Write();
   gBaselineVsCrysID->Write();
 
   ECLCrystalCalib* PPThreshold = new ECLCrystalCalib();
-  PPThreshold->setCalibVector(cryIDs, baselines);
+  PPThreshold->setCalibVector(baselines, cryIDs);
   saveCalibration(PPThreshold, "ECLAutocovarianceCalibrationC2Baseline");
 
   return c_OK;

@@ -15,6 +15,9 @@
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 
+//Root
+#include <TH2F.h>
+
 namespace Belle2 {
 
   class ECLDigit;
@@ -35,11 +38,15 @@ namespace Belle2 {
     /** Select events and crystals and accumulate histograms */
     void collect() override;
 
+    void closeRun() override;
+
   private:
 
     StoreArray<ECLDigit> m_eclDigits; /**< Required input array of ECLDigits */
     StoreArray<ECLDsp> m_eclDsps; /**< Required input array of ECLDSPs */
     StoreObjPtr<EventMetaData> m_evtMetaData; /**< dataStore EventMetaData */
+
+    TH2F* PPVsCrysID;
 
   };
 } // end Belle2 namespace

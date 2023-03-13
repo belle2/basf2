@@ -10,27 +10,31 @@
 //Calibration
 #include <calibration/CalibrationCollectorModule.h>
 
-//Root
-#include <TH2F.h>
+#include <ecl/dbobjects/ECLAutoCovariance.h>
 
 //Framework
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
+
+//Root
+#include <TH2F.h>
+#include <TMatrixDSym.h>
 
 namespace Belle2 {
 
   class ECLDigit;
   class ECLDsp;
   class ECLCrystalCalib;
+  class ECLAutoCovariance;
 
   /** Calibration collector module that uses delayed Bhabha to compute coveriance matrix */
-  class eclAutocovarianceCalibrationC3CollectorModule : public CalibrationCollectorModule {
+  class eclAutocovarianceCalibrationC4CollectorModule : public CalibrationCollectorModule {
 
   public:
 
     /** Constructor.
      */
-    eclAutocovarianceCalibrationC3CollectorModule();
+    eclAutocovarianceCalibrationC4CollectorModule();
 
     /** Define histograms and read payloads from DB */
     void prepare() override;
@@ -50,11 +54,11 @@ namespace Belle2 {
     std::vector<float> m_PeakToPeakThresholds; /**< vector of thresholds obtained from DB object */
     DBObjPtr<ECLCrystalCalib> m_ECLAutocovarianceCalibrationC2Baseline;
     std::vector<float> m_Baselines; /**< vector of thresholds obtained from DB object */
-    std::vector<float> m_tempArray; /**< vector of thresholds obtained from DB object */
-    TH2F* CovarianceMatrixInfoVsCrysID;
-    int count;
+    DBObjPtr<ECLAutoCovariance> m_ECLAutocovarianceCalibrationC3Autocovariances;
 
-    float myHist[8736][32];
+    TH2F* Chi2VsCrysID;
+
+    std::vector<TMatrixDSym> m_NoiseMatrix;
 
   };
 } // end Belle2 namespace

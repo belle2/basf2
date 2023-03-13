@@ -13,10 +13,15 @@
 #include <ecl/dataobjects/ECLElementNumbers.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 
+#include <framework/database/DBImportObjPtr.h>
+#include <ecl/dbobjects/ECLAutoCovariance.h>
+
 /* ROOT headers. */
 #include <TFile.h>
 #include <TGraph.h>
 #include <TH2I.h>
+#include"TMatrixDSym.h"
+#include"TDecompChol.h"
 
 using namespace std;
 using namespace Belle2;
@@ -36,32 +41,58 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC3Algorithm::calibrate
 
 
   ///** Put root into batch mode so that we don't try to open a graphics window */
-  //gROOT->SetBatch();
+  gROOT->SetBatch();
+
+  int m_CountLimit = 1000;
 
   ///**-----------------------------------------------------------------------------------------------*/
   ///** Histograms containing the data collected by eclGammaGammaECollectorModule */
-  auto BaselineInfoVsCrysID = getObjectPtr<TH2F>("CovarianceMatrixInfoVsCrysID");
+  auto CovarianceMatrixInfoVsCrysID = getObjectPtr<TH2F>("CovarianceMatrixInfoVsCrysID");
+
+  ECLAutoCovariance* Autocovariances = new ECLAutoCovariance();
 
   for (int crysID = 0; crysID < ECLElementNumbers::c_NCrystals; crysID++) {
 
-    float totalCounts = BaselineInfoVsCrysID->GetBinContent(crysID + 1, 32);
+    float totalCounts = CovarianceMatrixInfoVsCrysID->GetBinContent(CovarianceMatrixInfoVsCrysID->GetBin(crysID + 1, 32));
 
+    if (totalCounts < m_CountLimit) {
+      B2INFO("eclAutocovarianceCalibrationC3Algorithm: Warning Below Count Limit: crysID totalCounts m_CountLimit: " << crysID << " " <<
+             totalCounts << " " << m_CountLimit);
+    }
 
-    //cryIDs.push_back(crysID + 1);
-    //baselines.push_back(baseline);
+    //B2INFO("CEKCK: "<<CovarianceMatrixInfoVsCrysID->GetBinContent(crysID + 1,1));
 
-    B2INFO("eclAutocovarianceCalibrationC3Algorithm crysID totalCounts  " << crysID << " " << totalCounts << " " << totalCounts);
+    TMatrixDSym NoiseMatrix;
+    NoiseMatrix.ResizeTo(31, 31);
+    for (int i = 0; i < 31; i++) {
+      for (int j = 0; j < 31; j++) {
+        int index = abs(i - j);
+        NoiseMatrix(i, j) = float(CovarianceMatrixInfoVsCrysID->GetBinContent(CovarianceMatrixInfoVsCrysID->GetBin(crysID + 1,
+                                  index + 1))) / totalCounts / (float(31.0 - index));
+      }
+    }
+
+    double tempAutoCov[31];
+
+    for (int i = 0; i < 31; i++) tempAutoCov[i] = NoiseMatrix(0, i);
+    Autocovariances->setAutoCovariance(crysID + 1, tempAutoCov);
+
+    //NoiseMatrix.Print();
+
+    TDecompChol dc(NoiseMatrix);
+    bool InvertStatus = dc.Invert(NoiseMatrix);
+    if (InvertStatus == false)  B2INFO("eclAutocovarianceCalibrationC3Algorithm crysID InvertStatus [0][0] totalCounts: " << crysID <<
+                                         " " << InvertStatus << " " << NoiseMatrix(0, 0) << " " << totalCounts);
 
   }
 
-  //auto gBaselineVsCrysID = new TGraph(cryIDs.size(), cryIDs.data(), baselines.data());
-  //gBaselineVsCrysID->SetName("gBaselineVsCrysID");
+  saveCalibration(Autocovariances, "ECLAutocovarianceCalibrationC3Autocovariances");
 
   /** Write out the basic histograms in all cases */
-  TString fName = m_outputName;
-  TFile* histfile = new TFile(fName, "recreate");
+  //TString fName = m_outputName;
+  //TFile* histfile = new TFile(fName, "recreate");
 
-  BaselineInfoVsCrysID->Write();
+  //CovarianceMatrixInfoVsCrysID->Write();
   //gBaselineVsCrysID->Write();
 
   //ECLCrystalCalib* PPThreshold = new ECLCrystalCalib();

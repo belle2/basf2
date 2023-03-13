@@ -9,9 +9,6 @@
 //This module`
 #include <ecl/modules/eclAutocovarianceCalibrationC1Collector/eclAutocovarianceCalibrationC1Collector.h>
 
-//Root
-#include <TH2I.h>
-
 //Framework
 #include <framework/dataobjects/EventMetaData.h>
 
@@ -48,9 +45,9 @@ void eclAutocovarianceCalibrationC1CollectorModule::prepare()
 
   /**----------------------------------------------------------------------------------------*/
   /** Create the histograms and register them in the data store */
-  auto PPVsCrysID = new TH2I("PPVsCrysID", "Peak to peak amplitude for each crystal;crystal ID;Peak to peak Amplitud (ADC)", 8736, 0,
-                             8736, 2000, 0, 2000);
-  registerObject<TH2I>("PPVsCrysID", PPVsCrysID);
+  PPVsCrysID = new TH2F("PPVsCrysID", "Peak to peak amplitude for each crystal;crystal ID;Peak to peak Amplitud (ADC)", 8736, 0,
+                        8736, 2000, 0, 2000);
+  registerObject<TH2F>("PPVsCrysID", PPVsCrysID);
 
   m_eclDsps.registerInDataStore();
   m_eclDigits.registerInDataStore();
@@ -71,21 +68,31 @@ void eclAutocovarianceCalibrationC1CollectorModule::collect()
       const int id = aECLDsp.getCellId() - 1;
 
       int minADC = aECLDsp.getDspA()[0];
-      int maxADC = aECLDsp.getDspA()[0];
+      int maxADC = minADC;
 
-      for (int i = 0; i < 31; i++) {
+      for (int i = 1; i < 31; i++) {
 
-        if (aECLDsp.getDspA()[i] < minADC) minADC = aECLDsp.getDspA()[i];
-        if (aECLDsp.getDspA()[i] > maxADC) maxADC = aECLDsp.getDspA()[i];
+        int value = aECLDsp.getDspA()[i];
+        if (value < minADC) minADC = value;
+        if (value > maxADC) maxADC = value;
 
       }
 
-      int PeakToPeak = maxADC - minADC;
+      float PeakToPeak = maxADC - minADC;
 
-      //B2INFO(PeakToPeak);
+      //B2INFO(PeakToPeak<<" "<<PeakToPeakf);
 
-      getObjectPtr<TH2I>("PPVsCrysID")->Fill(id, PeakToPeak);
+      PPVsCrysID->Fill(id, PeakToPeak);
 
+    }
+  }
+}
+
+void eclAutocovarianceCalibrationC1CollectorModule::closeRun()
+{
+  for (int i = 0; i < 8736; i++) {
+    for (int j = 0; j < 2000; j++) {
+      getObjectPtr<TH2>("PPVsCrysID")->SetBinContent(i + 1, j + 1, PPVsCrysID->GetBinContent(i + 1, j + 1));
     }
   }
 }

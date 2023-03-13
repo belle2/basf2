@@ -16,7 +16,7 @@
 /* ROOT headers. */
 #include <TFile.h>
 #include <TGraph.h>
-#include <TH2I.h>
+#include <TH2F.h>
 
 using namespace std;
 using namespace Belle2;
@@ -41,14 +41,14 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC1Algorithm::calibrate
 
   /**-----------------------------------------------------------------------------------------------*/
   /** Histograms containing the data collected by eclGammaGammaECollectorModule */
-  auto PPVsCrysID = getObjectPtr<TH2I>("PPVsCrysID");
+  auto PPVsCrysID = getObjectPtr<TH2F>("PPVsCrysID");
 
   std::vector<float> cryIDs;
   std::vector<float> PPamps;
 
   for (int crysID = 0; crysID < ECLElementNumbers::c_NCrystals; crysID++) {
 
-    TH1D* hPP = PPVsCrysID->ProjectionY("hPP", crysID + 1, crysID + 1);
+    TH1F* hPP = (TH1F*)PPVsCrysID->ProjectionY("hPP", crysID + 1, crysID + 1);
 
     int Total = hPP->GetEntries();
     int subTotal = 0;

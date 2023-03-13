@@ -14,6 +14,9 @@
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 
+//Root
+#include <TH2F.h>
+
 namespace Belle2 {
 
   class ECLDigit;
@@ -35,6 +38,8 @@ namespace Belle2 {
     /** Select events and crystals and accumulate histograms */
     void collect() override;
 
+    void closeRun() override;
+
   private:
 
     StoreArray<ECLDigit> m_eclDigits; /**< Required input array of ECLDigits */
@@ -43,6 +48,10 @@ namespace Belle2 {
 
     DBObjPtr<ECLCrystalCalib> m_ECLAutocovarianceCalibrationC1Threshold;
     std::vector<float> m_PeakToPeakThresholds; /**< vector of thresholds obtained from DB object */
+
+    float myHist[8736][32];
+
+    TH2F* m_BaselineInfoVsCrysID;
 
   };
 } // end Belle2 namespace

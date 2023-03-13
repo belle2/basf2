@@ -105,7 +105,7 @@ namespace Belle2 {
     short m_eventWinNum[c_NMaxHitEvent] = {0}; /**< "m_firstWindow" in TOPDigit */
     short m_trigWinNum[c_NMaxHitEvent] = {0}; /**< "m_lastWriteAddr" in TOPRawDigit, window # when trigger is issued  */
     short m_revo9Counter[c_NMaxHitEvent] = {0}; /**< "m_revo9Counter" in TOPRawDigit  */
-    short m_winNumList[c_NMaxHitEvent][c_NWindow] = {0}; /**< list of window numbers for recorded waveform, valid only when waveform analysis is enabled */
+    short m_winNumList[c_NMaxHitEvent][c_NWindow] = {{0}}; /**< list of window numbers for recorded waveform, valid only when waveform analysis is enabled */
     bool m_windowsInOrder[c_NMaxHitEvent] = {0}; /**< "areWindowsInOrder()" ; false if the window number of all (4) windows taken from TOPRawWaveform::getReferenceWindows() are consecutive */
     unsigned char m_hitQuality[c_NMaxHitEvent] = {0}; /**< "m_quality" in TOPDigit, =0:junk, =1:good, =2:charge sharing, =3:cross talk, =4:cal. pulse, +10 if cal. pulse is properly identified for the asic, +100(+200) for the first(second) calibration signal itself  */
     bool m_isReallyJunk[c_NMaxHitEvent] = {0}; /**< true if pedestal jump or other invalid hit is detected, not saved */
@@ -123,7 +123,7 @@ namespace Belle2 {
     short m_nHitOfflineFE[c_NMaxHitEvent] = {0}; /**< number of hits for each pixel */
     short m_waveformStartSample[c_NMaxHitEvent] = {0}; /**< start sample number of waveform segment (only for production FW) */
     unsigned short m_nWaveformSample[c_NMaxHitEvent] = {0}; /**< number of waveform samples */
-    short m_waveform[c_NMaxHitEvent][c_NWaveformSample] = {0}; /**< waveform from TOPRawWaveform, if not exist, filled with -32767 */
+    short m_waveform[c_NMaxHitEvent][c_NWaveformSample] = {{0}}; /**< waveform from TOPRawWaveform, if not exist, filled with -32767 */
 
     short m_nFEHeader = 0; /**< m_FEHeaders in TOPInterimFEInfo, the total # of FE headers found */
     short m_nEmptyFEHeader = 0; /**< m_emptyFEHeaders in TOPInterimFEInfo, the total # of empty FE headers */

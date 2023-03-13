@@ -71,6 +71,17 @@ void DQMHistAnalysisModule::addDeltaPar(const std::string& dirname, const std::s
   s_deltaList[fullname] = new HistDelta(t, p, a);
 }
 
+bool DQMHistAnalysisModule::hasDeltaPar(const std::string& dirname, const std::string& histname)
+{
+  std::string fullname;
+  if (dirname.size() > 0) {
+    fullname = dirname + "/" + histname;
+  } else {
+    fullname = histname;
+  }
+  return s_deltaList.find(fullname) != s_deltaList.end(); // contains() if we switch to C++20
+}
+
 TH1* DQMHistAnalysisModule::getDelta(const std::string& dirname, const std::string& histname, int n, bool onlyIfUpdated)
 {
   std::string fullname;

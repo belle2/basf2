@@ -151,8 +151,8 @@ if __name__ == '__main__':
     for datafile in datafiles:
         rootchain.Add(datafile)
 
-    variables_data = basf2_mva_util.tree2dict(rootchain, root_variables, list(variable_abbreviations.values()))
-    spectators_data = basf2_mva_util.tree2dict(rootchain, root_spectators, list(spectator_abbreviations.values()))
+    variables_data = basf2_mva_util.chain2dict(rootchain, root_variables, list(variable_abbreviations.values()))
+    spectators_data = basf2_mva_util.chain2dict(rootchain, root_spectators, list(spectator_abbreviations.values()))
 
     if args.fillnan:
         for column in variable_abbreviations.values():

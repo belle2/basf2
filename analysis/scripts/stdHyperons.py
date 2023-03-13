@@ -78,7 +78,7 @@ def stdXi(fitter='TreeFit', path=None):
         path=path)
 
 
-def stdXi0(gammatype='eff40', path=None, loadPhotonBeamBackgroundMVA=True, loadPhotonHadronicSplitOffMVA=True):
+def stdXi0(gammatype='eff40', beamBackgroundMVAWeight="", fakePhotonMVAWeight="", biasCorrectionTable="", path=None):
     r"""
     Reconstruct the standard :math:`\Xi^0` ``ParticleList`` named ``Xi0:std``.
 
@@ -88,9 +88,29 @@ def stdXi0(gammatype='eff40', path=None, loadPhotonBeamBackgroundMVA=True, loadP
         gammatype (str): specify either ``eff60``, ``eff50``, ``eff40``, ``eff30``, or ``eff20``
                          to select the signal efficiency of the photons used in the pi0 reconstruction
                          (default ``eff40``)
+
+        beamBackgroundMVAWeight (str): type of weight file for beam background MVA; if empty, beam background MVA will not be used
+
+                          .. tip::
+                              Please refer to the
+                              `Neutrals Performance Confluence page <https://confluence.desy.de/display/BI/Neutrals+Performance>`_
+                              for information on the beam background MVA.
+
+        fakePhotonMVAWeight (str): type of weight file for fake photon MVA; if empty, fake photon MVA will not be used
+
+                          .. tip::
+                              Please refer to the
+                              `Neutrals Performance Confluence page <https://confluence.desy.de/display/BI/Neutrals+Performance>`_
+                              for information on the fake photon MVA.
+
+        biasCorrectionTable (str): correction table for the photon energy bias correction (should only be applied to data)
+
+                          .. tip::
+                              Please refer to the
+                              `Neutrals Performance Confluence page <https://confluence.desy.de/display/BI/Neutrals+Performance>`_
+                              for information on the names of available correction tables.
+
         path (basf2.Path): modules are added to this path building the ``Xi0:std`` list
-        loadPhotonBeamBackgroundMVA (bool): If true, photon candidates will be assigned a beam background probability.
-        loadPhotonHadronicSplitOffMVA (bool): If true, photon candidates will be assigned a hadronic split-off probability.
     """
 
     if not isB2BII():
@@ -109,8 +129,9 @@ def stdXi0(gammatype='eff40', path=None, loadPhotonBeamBackgroundMVA=True, loadP
         stdPhotons(
             f'pi0{gammatype}_May2020',
             path=path,
-            loadPhotonBeamBackgroundMVA=loadPhotonBeamBackgroundMVA,
-            loadPhotonHadronicSplitOffMVA=loadPhotonHadronicSplitOffMVA)
+            beamBackgroundMVAWeight=beamBackgroundMVAWeight,
+            fakePhotonMVAWeight=fakePhotonMVAWeight,
+            biasCorrectionTable=biasCorrectionTable)
         reconstructDecay(f'pi0:reco -> gamma:pi0{gammatype}_May2020 gamma:pi0{gammatype}_May2020',
                          'abs( dM ) < 0.0406',
                          True, path=path)

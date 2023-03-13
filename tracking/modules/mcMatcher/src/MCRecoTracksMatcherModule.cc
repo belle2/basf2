@@ -18,16 +18,6 @@
 
 #include <Eigen/Dense>
 
-/* disables the false positive warning of Intel icc about iter_pair_range::epmty() being unused
-tracking/modules/mcMatcher/src/MCRecoTracksMatcherModule.cc:55: warning #177: function
-"::iter_pair_range::empty [with Iter=std::_Rb_tree_const_iterator::DetId={Belle2::Const::EDetector},
-::HitId={int}>, ::WeightedRecoTrackId>>]" was declared but never referenced
-bool empty() const
-*/
-#ifdef __INTEL_COMPILER
-#pragma warning disable 177
-#endif
-
 using namespace Belle2;
 
 REG_MODULE(MCRecoTracksMatcher);
@@ -556,6 +546,7 @@ void MCRecoTracksMatcherModule::event()
 
     RecoTrack* mcRecoTrack = m_MCRecoTracks[mcId];
     MCParticle* mcParticle = mcRecoTrack->getRelated<MCParticle>();
+
     B2ASSERT("No relation from MCRecoTrack to MCParticle.", mcParticle);
 
     const MostWeightEfficientPRId& mostWeightEfficientPRId_for_mcId =
@@ -572,11 +563,22 @@ void MCRecoTracksMatcherModule::event()
       const RelationVector<Track> fittedTracks = prRecoTrack->getRelationsFrom<Track>(m_TracksStoreArrayName);
       short nPositiveCharges = 0;
       short nNegativeCharges = 0;
+
+
+
       if (fittedTracks.size() > 0) {
+
         for (const auto& fittedTrack : fittedTracks) {
-          const TrackFitResult* trackFitResult = fittedTrack.getTrackFitResultWithClosestMass(Const::ChargedStable(std::abs(
-                                                   mcParticle->getPDG())));
-          trackFitResult->getChargeSign() > 0 ? nPositiveCharges++ : nNegativeCharges++;
+
+          // catch rare case we track long lived non-chargedStable particles (e.g. Sigma)
+          try {
+            const TrackFitResult* trackFitResult = fittedTrack.getTrackFitResultWithClosestMass(Const::ChargedStable(std::abs(
+                                                     mcParticle->getPDG())));
+            trackFitResult->getChargeSign() > 0 ? nPositiveCharges++ : nNegativeCharges++;
+          } catch (...) {
+            const TrackFitResult* trackFitResult = fittedTrack.getTrackFitResultWithClosestMass(Const::pion);
+            trackFitResult->getChargeSign() > 0 ? nPositiveCharges++ : nNegativeCharges++;
+          }
         }
       }
       if (nPositiveCharges > 0 and nNegativeCharges > 0) {

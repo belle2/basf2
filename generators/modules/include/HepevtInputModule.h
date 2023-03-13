@@ -8,7 +8,7 @@
 
 #pragma once
 
-/* Belle2 headers. */
+/* Basf2 headers. */
 #include <framework/core/Module.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>

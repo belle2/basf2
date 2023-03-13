@@ -70,15 +70,6 @@ namespace TreeFitter {
       return m_globalState;
     }
 
-    /** get a reference to an element of the state vector todo replace by setter? */
-    double& getRefToElementOfStateVec(int row) { return m_globalState(row, 0); }
-
-    /** get a const reference to an element of the state vector todo replace by setter? */
-    const double& getRefToElementOfStateVec(int row) const { return m_globalState(row, 0); }
-
-    /** get an covaraince diagonal element   */
-    double getCovDiaElement(int counter) { return m_globalCovariance(counter, counter); }
-
     /** reset the staevector */
     void resetStateVector();
 
@@ -91,20 +82,11 @@ namespace TreeFitter {
     /** test if the covariance makes sense */
     bool testCovariance() const;
 
-    /** increment nconstraints vec */
-    int& incrementNConstraintsVec(int row) { return m_nConstraintsVec[row];}
-
-    /** returns a reference(!) to the number of constraints for rows parameter. Used to reset that value. */
-    int& nConstraintsVec(int row) { return m_nConstraintsVec[row - 1]; }
-
     /** get chi2 of statevector*/
     double chiSquare() const {return m_chiSquare;};
 
     /** get numer of degrees of freedom */
     int nDof() const;
-
-    /** some constraints are special the geometric for example */
-    void addNConstraint(int value) { m_nConstraints += value; }
 
     /** increment global chi2 */
     void addChiSquare(double chisq, int nconstraints)

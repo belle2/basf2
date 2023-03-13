@@ -1,0 +1,28 @@
+# EventType: 4120440002.dec
+# Descriptor: [Yb_[f_2-> pi+pi-][Y1S->mu+mu-]]
+# NickName: Yb_f2Y1S_pipimumu
+# Cuts: None
+# Documentation: Yb10751 decay
+# PhysicsWG: Bottomonium
+# Tested: Yes
+# Responsible: Yang Li
+# Email: y_li21@m.fudan.edu.cn
+# Date: 20230102
+# Parameters of the Yb10751 particle: pdg.add_particle("Yb10751",9010554,10.751e+00,0.005e+00,0,1)
+
+
+Alias Yb10751sig Yb10751
+Alias f_2sig f_2
+
+Decay Yb10751sig
+1.0   Upsilonsig f_2sig  PHSP;
+Enddecay
+
+Decay f_2sig
+1.0   pi+ pi- TSS;
+Enddecay
+
+Decay Upsilonsig
+1.0  mu+ mu-  PHSP;
+Enddecay
+End

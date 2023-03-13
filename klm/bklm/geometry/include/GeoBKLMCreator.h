@@ -12,7 +12,7 @@
 #include <klm/bklm/geometry/GeometryPar.h>
 #include <klm/dbobjects/bklm/BKLMGeometryPar.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/database/DBImportObjPtr.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/IntervalOfValidity.h>

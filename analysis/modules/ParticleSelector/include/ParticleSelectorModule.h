@@ -57,6 +57,8 @@ namespace Belle2 {
 
     std::string m_cutParameter;  /**< selection criteria */
     std::unique_ptr<Variable::Cut> m_cut; /**< cut object which performs the cuts */
+
+    bool m_exceptionForGammaAll = false; /**< true if the particleList is gamma:all and cut is isFromECL */
   };
 
 } // Belle2 namespace

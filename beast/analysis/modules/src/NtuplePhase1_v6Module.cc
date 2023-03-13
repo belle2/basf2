@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <beast/analysis/modules/NtuplePhase1_v6Module.h>
 #include <beast/analysis/modules/BEASTTree_v5.h>
 

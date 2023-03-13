@@ -53,46 +53,84 @@ namespace Belle2 {
     /**
      * The list of Histograms.
      */
-    static HistList g_hist;
+    static HistList s_histList;
     /**
      * The list of MonitoringObjects.
      */
-    static MonObjList g_monObj;
+    static MonObjList s_monObjList;
 
     /**
      * The list of Delta Histograms and settings.
      */
-    static DeltaList g_delta;
+    static DeltaList s_deltaList;
 
     /**
      * The list of canvas updated status.
      */
-    static CanvasUpdatedList g_canvasup;
+    static CanvasUpdatedList s_canvasUpdatedList;
+
+    /**
+     * Number of Events processed to fill histograms.
+     * Attention: histograms are updates asynchronously
+     * Thus the number for a specific histogram may be lower or
+     * higher. If you need precise number, you must fill
+     * it in the histogram itself (e.g. underflow bin)
+     */
+    inline static int s_eventProcessed = 0;
+
+    /**
+     * The Run type.
+     */
+    inline static std::string s_runType = "";
 
   public:
     /**
      * Get the list of the histograms.
      * @return The list of the histograms.
      */
-    static const HistList& getHistList() { return g_hist;};
+    static const HistList& getHistList() { return s_histList;};
 
     /**
      * Get the list of MonitoringObjects.
      * @return The list of the MonitoringObjects.
      */
-    static const MonObjList& getMonObjList() { return g_monObj;};
+    static const MonObjList& getMonObjList() { return s_monObjList;};
 
     /**
      * Get the list of the delta histograms.
      * @return The list of the delta histograms.
      */
-    static const DeltaList& getDeltaList() { return g_delta;};
+    static const DeltaList& getDeltaList() { return s_deltaList;};
 
     /**
      * Get the list of the canvas update status.
      * @return The list of the canvases.
      */
-    static const CanvasUpdatedList& getCanvasUpdatedList() { return g_canvasup;};
+    static const CanvasUpdatedList& getCanvasUpdatedList() { return s_canvasUpdatedList;};
+
+    /**
+     * Get the Run Type.
+     * @return Run type string.
+     */
+    static const std::string& getRunType(void) { return s_runType;};
+
+    /**
+     * Get the number of processed events. (Attention, asynch histogram updates!)
+     * @return Processed events.
+     */
+    static int getEventProcessed(void) { return s_eventProcessed;};
+
+    /**
+     * Set the Run Type.
+     * @par t Run type string.
+     */
+    void setRunType(std::string& t) {s_runType = t;};
+
+    /**
+     * Set the number of processed events. (Attention, asynch histogram updates!)
+     * @par e Processed events.
+     */
+    void setEventProcessed(int e) {s_eventProcessed = e;};
 
     /**
      * Find canvas by name
@@ -203,7 +241,15 @@ namespace Belle2 {
      * @param p numerical parameter depnding on type, e.g. number of entries
      * @param a amount of histograms in the past
      */
-    void addDeltaPar(const std::string& dirname, const std::string& histname, int t, int p, unsigned int a);
+    void addDeltaPar(const std::string& dirname, const std::string& histname,  HistDelta::EDeltaType t, int p, unsigned int a);
+
+    /**
+     * Check if Delta histogram parameters exist for histogram.
+     * @param dirname directory
+     * @param histname name of histogram
+     * @return true if parameters have been set already
+     */
+    bool hasDeltaPar(const std::string& dirname, const std::string& histname);
 
     /**
      * Mark canvas as updated (or not)
@@ -211,6 +257,16 @@ namespace Belle2 {
      * @param updated was updated
      */
     void UpdateCanvas(std::string name, bool updated = true);
+
+    /**
+     * Extract Run Type from histogram title, called from input module
+     */
+    void ExtractRunType(std::vector <TH1*>& hs);
+
+    /**
+     * Extract event processed from daq histogram, called from input module
+     */
+    void ExtractEvent(std::vector <TH1*>& hs);
 
     // Public functions
   public:

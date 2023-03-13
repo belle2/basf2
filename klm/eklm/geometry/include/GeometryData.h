@@ -11,7 +11,7 @@
 /* KLM headers. */
 #include <klm/dbobjects/eklm/EKLMGeometry.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/gearbox/GearDir.h>
 

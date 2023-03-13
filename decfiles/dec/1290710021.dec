@@ -16,7 +16,7 @@ StringFlav:probStoUD=0.300
 
 #
 Decay Upsilon(4S)
-0.5 B+sig  B-:sig                      VSS;
+0.5 B+sig  B-sig                      VSS;
 Enddecay
 #
 Decay B+sig

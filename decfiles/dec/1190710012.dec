@@ -11,7 +11,7 @@
 #
 
 Decay Upsilon(4S)
-1.0     B0sig anti-B0sig B0sig anti-B0sig                   VSS_BMIX dm;
+1.0     B0sig anti-B0sig B0 anti-B0                   VSS_BMIX dm;
 Enddecay
 #
 Decay anti-B0sig

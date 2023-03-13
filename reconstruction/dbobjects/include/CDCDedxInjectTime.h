@@ -219,7 +219,7 @@ namespace Belle2 {
 
         if (it <= 2) {
           double diff = m_injectionvar[iv].at(2) - m_injectionvar[iv].at(1) ;
-          if (diff < -0.015) { //difference above 1.5%
+          if (diff < -0.015) { //difference above 1.0%
             thisbin = it;
             if (it == 1) nextbin = it;
             else nextbin = it + 1;
@@ -252,7 +252,7 @@ namespace Belle2 {
      * different for LER and HER
     */
     std::vector<std::vector<double>> m_injectionvar; /**< vector to store payload values*/
-    ClassDef(CDCDedxInjectTime, 1); /**< ClassDef */
+    ClassDef(CDCDedxInjectTime, 3); /**< ClassDef */
 
   };
 } // end namespace Belle2

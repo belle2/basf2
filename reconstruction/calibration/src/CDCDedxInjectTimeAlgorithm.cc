@@ -9,6 +9,8 @@
 #include <reconstruction/calibration/CDCDedxInjectTimeAlgorithm.h>
 
 using namespace Belle2;
+using namespace std;
+
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
@@ -18,11 +20,11 @@ CDCDedxInjectTimeAlgorithm::CDCDedxInjectTimeAlgorithm() :
   m_dedxBins(500),
   m_dedxMin(0.0),
   m_dedxMax(2.5),
-  isminStat(false),
-  ismakePlots(true),
-  isMerge(false),
   m_countR(0),
   m_thersE(1000),
+  m_isminStat(false),
+  m_ismakePlots(true),
+  m_isMerge(false),
   m_prefix("cdcdedx_injcal"),
   m_suffix("")
 {
@@ -44,7 +46,7 @@ CalibrationAlgorithm::EResult CDCDedxInjectTimeAlgorithm::calibrate()
 
   // Get data objects
   auto ttree = getObjectPtr<TTree>("tree");
-  if (!ttree)return c_NotEnoughData;
+  if (!ttree) return c_NotEnoughData;
 
   double dedx = 0.0, injtime = 0.0, injring = 1.0;
   ttree->SetBranchAddress("dedx", &dedx);
@@ -53,9 +55,9 @@ CalibrationAlgorithm::EResult CDCDedxInjectTimeAlgorithm::calibrate()
 
   //way to define time bins/edges only once
   if (m_countR == 0) {
-    defineTimeBins(); //returns vtlocaledges
-    m_tbins = vtlocaledges.size() - 1;
-    m_tedges = &vtlocaledges[0];
+    defineTimeBins(); //returns m_vtlocaledges
+    m_tbins = m_vtlocaledges.size() - 1;
+    m_tedges = &m_vtlocaledges[0];
     m_countR++;
   }
 
@@ -77,11 +79,11 @@ CalibrationAlgorithm::EResult CDCDedxInjectTimeAlgorithm::calibrate()
     if (dedx <= 0 || injtime < 0 || injring < 0) continue;
 
     //add larger times to the last bin
-    if (injtime > m_tedges[m_tbins])injtime = m_tedges[m_tbins] - 10.0;
+    if (injtime > m_tedges[m_tbins]) injtime = m_tedges[m_tbins] - 10.0;
 
     //injection ring
     int wr = 0;
-    if (injring > 0.5)wr = 1;
+    if (injring > 0.5) wr = 1;
 
     //injection time bin
     unsigned int tb = htimes->GetXaxis()->FindBin(injtime);
@@ -89,8 +91,8 @@ CalibrationAlgorithm::EResult CDCDedxInjectTimeAlgorithm::calibrate()
     tb = tb - 1;
 
     htimes->Fill(injtime);
-    if (injtime < tzedges[1])hztime[wr][0]->Fill(injtime);
-    else if (injtime < tzedges[2])hztime[wr][1]->Fill(injtime);
+    if (injtime < tzedges[1]) hztime[wr][0]->Fill(injtime);
+    else if (injtime < tzedges[2]) hztime[wr][1]->Fill(injtime);
     else hztime[wr][2]->Fill(injtime);
 
     hdedx[wr][tb]->Fill(dedx);
@@ -98,9 +100,9 @@ CalibrationAlgorithm::EResult CDCDedxInjectTimeAlgorithm::calibrate()
   }
 
   //keep merging runs to achive enough stats
-  isminStat = false;
+  m_isminStat = false;
   checkStatistics(hdedx);
-  if (isminStat) {
+  if (m_isminStat) {
     deleteHisto(htime);
     deleteHisto(hdedx);
     deleteTimeHisto(hztime);
@@ -109,25 +111,20 @@ CalibrationAlgorithm::EResult CDCDedxInjectTimeAlgorithm::calibrate()
   }
 
   //clear vector of existing constants
-  //map<int, vector<double>> m_vmeans, m_vresos, m_vtimes;
+  map<int, vector<double>> vmeans, vresos, vtimes;
   for (unsigned int ir = 0; ir < c_rings; ir++) {
-    m_vmeans[ir].clear();
-    m_vresos[ir].clear();
-    m_vtimes[ir].clear();
-    m_vmeanserr[ir].clear();
-    m_vresoserr[ir].clear();
-    m_vtimeserr[ir].clear();
+
     for (unsigned int it = 0; it < m_tbins; it++) {
       double mean = 1.00, meanerr = 0.0;
       double reso = 0.07, resoerr = 0.0;
       double avgtime = htime[ir][it]->GetMean();
       double avgtimeerr = htime[ir][it]->GetMeanError();
       if (hdedx[ir][it]->Integral() > 250) {
-        string status = "";
+        fstatus status;
         fitGaussianWRange(hdedx[ir][it], status);
-        if (status != "FitOK") {
+        if (status != fitOK) {
           mean = hdedx[ir][it]->GetMean();
-          hdedx[ir][it]->SetTitle(Form("%s, (%s)", hdedx[ir][it]->GetTitle(), status.data()));
+          hdedx[ir][it]->SetTitle(Form("%s, (%d)", hdedx[ir][it]->GetTitle(), status));
         } else {
           mean = hdedx[ir][it]->GetFunction("gaus")->GetParameter(1);
           meanerr = hdedx[ir][it]->GetFunction("gaus")->GetParError(1);
@@ -137,34 +134,35 @@ CalibrationAlgorithm::EResult CDCDedxInjectTimeAlgorithm::calibrate()
           hdedx[ir][it]->SetTitle(Form("%s, %s", hdedx[ir][it]->GetTitle(), title.data()));
         }
       }
-      m_vmeans[ir].push_back(mean);
-      m_vresos[ir].push_back(reso);
-      m_vtimes[ir].push_back(avgtime);
-      m_vmeanserr[ir].push_back(meanerr);
-      m_vresoserr[ir].push_back(resoerr);
-      m_vtimeserr[ir].push_back(avgtimeerr);
+
+      vmeans[ir * 2].push_back(mean);
+      vresos[ir * 2].push_back(reso);
+      vtimes[ir * 2].push_back(avgtime);
+      vmeans[ir * 2 + 1].push_back(meanerr);
+      vresos[ir * 2 + 1].push_back(resoerr);
+      vtimes[ir * 2 + 1].push_back(avgtimeerr);
     }
   }
 
-  map<int, vector<double>> m_vmeanscorr;
-  correctBinBias(m_vmeanscorr, m_vtimes, htimes, "mean");
-  map<int, vector<double>> m_vresoscorr;
-  correctBinBias(m_vresoscorr, m_vtimes, htimes, "reso");
+  map<int, vector<double>> vmeanscorr;
+  correctBinBias(vmeanscorr, vmeans, vtimes, htimes);//, "mean");
+  map<int, vector<double>> vresoscorr;
+  correctBinBias(vresoscorr, vresos, vtimes, htimes);//, "reso");
 
   //preparing final payload
-  vinjPayload.clear();
-  vinjPayload.reserve(6);
+  m_vinjPayload.clear();
+  m_vinjPayload.reserve(6);
   for (int ir = 0; ir < 2; ir++) {
-    vinjPayload.push_back(vtlocaledges);
-    vinjPayload.push_back(m_vmeanscorr[ir]);
-    vinjPayload.push_back(m_vresoscorr[ir]);
+    m_vinjPayload.push_back(m_vtlocaledges);
+    m_vinjPayload.push_back(vmeanscorr[ir * 2]);
+    m_vinjPayload.push_back(vresoscorr[ir * 2]);
   }
 
   //used
-  array<double, numdedx::nrings> m_scale;
-  createPayload(m_scale);
+  array<double, numdedx::nrings> scale;
+  createPayload(scale);
 
-  if (ismakePlots) {
+  if (m_ismakePlots) {
 
     //0 plot event track statistics
     plotEventStats();
@@ -179,10 +177,10 @@ CalibrationAlgorithm::EResult CDCDedxInjectTimeAlgorithm::calibrate()
     plotBinLevelDist(htime, "timedist");
 
     //4 plot relative const., bias-bias corrected, avg time
-    plotRelConstants(m_vmeanscorr, m_vresoscorr, htime);
+    plotRelConstants(vmeanscorr, vresoscorr, vmeans, vresos, htime);
 
     //5 plot final merged const. and comparison to old
-    plotFinalConstants(m_scale);
+    plotFinalConstants(vmeans, vresos, scale);
 
   }
 
@@ -197,7 +195,7 @@ CalibrationAlgorithm::EResult CDCDedxInjectTimeAlgorithm::calibrate()
 }
 
 //----------------------------------------
-void CDCDedxInjectTimeAlgorithm::fitGaussianWRange(TH1D*& temphist, string& status)
+void CDCDedxInjectTimeAlgorithm::fitGaussianWRange(TH1D*& temphist, fstatus& status)
 {
   double histmean = temphist->GetMean();
   double histrms = temphist->GetRMS();
@@ -206,7 +204,7 @@ void CDCDedxInjectTimeAlgorithm::fitGaussianWRange(TH1D*& temphist, string& stat
   int fs = temphist->Fit("gaus", "Q0");
   if (fs != 0) {
     B2INFO(Form("\tFit (round 1) for hist (%s) failed (status = %d)", temphist->GetName(), fs));
-    status = "FitFailed";
+    status = fitFailed;
     return;
   } else {
     double mean = temphist->GetFunction("gaus")->GetParameter(1);
@@ -215,12 +213,12 @@ void CDCDedxInjectTimeAlgorithm::fitGaussianWRange(TH1D*& temphist, string& stat
     fs = temphist->Fit("gaus", "QR", "", mean - m_sigmaR * width, mean + m_sigmaR * width);
     if (fs != 0) {
       B2INFO(Form("\tFit (round 2) for hist (%s) failed (status = %d)", temphist->GetName(), fs));
-      status = "FitFailed";
+      status = fitFailed;
       return;
     } else {
       temphist->GetXaxis()->SetRangeUser(mean - 5.0 * width, mean + 5.0 * width);
       B2INFO(Form("\tFit for hist (%s) sucessfull (status = %d)", temphist->GetName(), fs));
-      status = "FitOK";
+      status = fitOK;
     }
   }
 }
@@ -243,7 +241,7 @@ void CDCDedxInjectTimeAlgorithm::getExpRunInfo()
 
   updateDBObjPtrs(1, erStart.second, erStart.first);
 
-  if (isminStat) {
+  if (m_isminStat) {
     m_suffix = Form("e%dr%dto%d_nruns%d", estart, rstart, rend, cruns);
     B2INFO("\t+ run = " << rend << ", m_suffix = " << m_suffix << "");
   } else {
@@ -257,24 +255,24 @@ void CDCDedxInjectTimeAlgorithm::defineTimeBins()
 {
   //empty local vector or find a way to execulate this function
   //only once
-  if (!vtlocaledges.empty())vtlocaledges.clear();
-  if (vtedges.empty()) {
+  if (!m_vtlocaledges.empty()) m_vtlocaledges.clear();
+  if (m_vtedges.empty()) {
     double fixedges[69];
-    // vtlocaledges.reserve(69);
+    // m_vtlocaledges.reserve(69);
     for (int ib = 0; ib < 69; ib++) {
       fixedges[ib] = ib * 0.5 * 1e3;
-      if (ib > 40 && ib <= 60)fixedges[ib] = fixedges[ib - 1] + 1.0 * 1e3;
-      else if (ib > 60 && ib <= 64)fixedges[ib] = fixedges[ib - 1] + 10.0 * 1e3;
-      else if (ib > 64 && ib <= 65)fixedges[ib] = fixedges[ib - 1] + 420.0 * 1e3;
-      else if (ib > 65 && ib <= 66)fixedges[ib] = fixedges[ib - 1] + 500.0 * 1e3;
-      else if (ib > 66)fixedges[ib] = fixedges[ib - 1] + 2e6;
+      if (ib > 40 && ib <= 60) fixedges[ib] = fixedges[ib - 1] + 1.0 * 1e3;
+      else if (ib > 60 && ib <= 64) fixedges[ib] = fixedges[ib - 1] + 10.0 * 1e3;
+      else if (ib > 64 && ib <= 65) fixedges[ib] = fixedges[ib - 1] + 420.0 * 1e3;
+      else if (ib > 65 && ib <= 66) fixedges[ib] = fixedges[ib - 1] + 500.0 * 1e3;
+      else if (ib > 66) fixedges[ib] = fixedges[ib - 1] + 2e6;
       //cout << ib << ", value " << fixedges[ib] << endl;
-      vtlocaledges.push_back(fixedges[ib]);
+      m_vtlocaledges.push_back(fixedges[ib]);
     }
   } else {
-    // vtlocaledges.reserve(vtedges.size());
-    for (unsigned int ib = 0; ib < vtedges.size(); ib++)
-      vtlocaledges.push_back(vtedges.at(ib));
+    // m_vtlocaledges.reserve(m_vtedges.size());
+    for (unsigned int ib = 0; ib < m_vtedges.size(); ib++)
+      m_vtlocaledges.push_back(m_vtedges.at(ib));
   }
 }
 
@@ -319,7 +317,7 @@ void CDCDedxInjectTimeAlgorithm::checkStatistics(array<vector<TH1D*>, numdedx::n
     for (unsigned int it = 3; it < m_tbins; it++) {
       //check statiscs from 1-40ms
       if (m_tedges[it] < 4e4 && hvar[ir][it]->Integral() < m_thersE) {
-        isminStat = true;
+        m_isminStat = true;
         break;
       } else continue;
     }
@@ -327,73 +325,73 @@ void CDCDedxInjectTimeAlgorithm::checkStatistics(array<vector<TH1D*>, numdedx::n
 }
 
 //------------------------------------
-void CDCDedxInjectTimeAlgorithm::correctBinBias(map<int, vector<double>>& m_varcorr, map<int, vector<double>>& m_time,
-                                                TH1D*& htimes, string svar)
+void CDCDedxInjectTimeAlgorithm::correctBinBias(map<int, vector<double>>& varcorr, map<int, vector<double>>& var,
+                                                map<int, vector<double>>& time, TH1D*& htimes)
 {
   //Deep copy OK
-  if (svar == "mean")m_varcorr = m_vmeans;
-  else if (svar == "reso")m_varcorr = m_vresos;
+  varcorr = var;
+  // else if (svar == "reso")varcorr = vresos;
 
   for (int ir = 0; ir < 2; ir++) {
 
-    for (int ix = m_varcorr[ir].size(); ix -- > 0;) {
+    for (int ix = varcorr[ir * 2].size(); ix -- > 0;) {
 
       double var_thisbin = 1.0;
-      if (svar == "mean")var_thisbin = m_vmeans[ir].at(ix);
-      else if (svar == "reso")var_thisbin = m_vresos[ir].at(ix);
+      var_thisbin = var[ir * 2].at(ix);
+      // else if (svar == "reso")var_thisbin = vresos[ir].at(ix);
 
-      double atime_thisbin = m_time[ir].at(ix);
+      double atime_thisbin = time[ir * 2].at(ix);
       double ctime_thisbin = htimes->GetBinCenter(ix + 1);
 
       if (atime_thisbin > 0 && atime_thisbin < 4e4 * 0.99) {
 
         double var_nextbin = 1.0;
-        if (svar == "mean")var_nextbin = m_vmeans[ir].at(ix + 1);
-        else if (svar == "reso")var_nextbin = m_vresos[ir].at(ix + 1);
+        var_nextbin = var[ir * 2].at(ix + 1);
+        // else if (svar == "reso")var_nextbin = vresos[ir].at(ix + 1);
         double var_diff = var_nextbin - var_thisbin;
 
-        double atime_nextbin = m_time[ir].at(ix + 1);
+        double atime_nextbin = time[ir * 2].at(ix + 1);
         double atime_diff = atime_nextbin - atime_thisbin;
 
         double slope = (atime_diff > 0) ? var_diff / atime_diff : -1.0;
 
         //extrapolation after veto only
-        if (var_diff > 0 && slope > 0)m_varcorr[ir].at(ix) = var_thisbin + (ctime_thisbin - atime_thisbin) * (slope);
+        if (var_diff > 0 && slope > 0)varcorr[ir * 2].at(ix) = var_thisbin + (ctime_thisbin - atime_thisbin) * (slope);
         printf("\t %s ix = %d, center = %0.2f(%0.3f), var = %0.5f(%0.5f) \n", m_sring[ir].data(), ix, ctime_thisbin, atime_thisbin,
-               var_thisbin, m_varcorr[ir].at(ix));
+               var_thisbin, varcorr[ir * 2].at(ix));
       } else {
         printf("\t %s --> ix = %d, center = %0.2f(%0.3f), var = %0.5f(%0.5f) \n", m_sring[ir].data(), ix, ctime_thisbin, atime_thisbin,
-               var_thisbin, m_varcorr[ir].at(ix));
+               var_thisbin, varcorr[ir * 2].at(ix));
       }
     }
   }
 }
 
 //-------------------------------------
-void CDCDedxInjectTimeAlgorithm::createPayload(array<double, numdedx::nrings>& m_scale)
+void CDCDedxInjectTimeAlgorithm::createPayload(array<double, numdedx::nrings>& scale)
 {
-  if (isMerge) {
+  if (m_isMerge) {
     //merge only no change in payload structure
     bool incomp_bin = false;
     vector<vector<double>> oldvectors;
-    if (m_DBInjectTime)oldvectors = m_DBInjectTime->getConstVector();
+    if (m_DBInjectTime) oldvectors = m_DBInjectTime->getConstVector();
     int vsize = oldvectors.size();
     if (vsize != 6) incomp_bin = true;
     else {
       for (int iv = 0; iv < vsize; iv++) {
-        if (oldvectors[iv].size() != vinjPayload[iv].size())incomp_bin = true;
+        if (oldvectors[iv].size() != m_vinjPayload[iv].size())incomp_bin = true;
       }
     }
     if (!incomp_bin) {
       B2INFO("CDCDedxInjectTimeAlgorithm: started merging relative constants");
       for (int ir = 0; ir < 2; ir++) {//merging only means
-        unsigned int msize = vinjPayload[ir * 3 + 1].size();
+        unsigned int msize = m_vinjPayload[ir * 3 + 1].size();
         for (unsigned int im = 0; im < msize; im++) {
-          double relvalue = vinjPayload[ir * 3 + 1].at(im);
+          double relvalue = m_vinjPayload[ir * 3 + 1].at(im);
           double oldvalue = oldvectors[ir * 3 + 1].at(im);
           double merged = oldvalue * relvalue;
           printf("%s: rel %0.03f, old %0.03f, merged %0.03f\n", m_suffix.data(), relvalue, oldvalue, merged);
-          vinjPayload[ir * 3 + 1].at(im) *= oldvectors[ir * 3 + 1].at(im) ;
+          m_vinjPayload[ir * 3 + 1].at(im) *= oldvectors[ir * 3 + 1].at(im) ;
         }
       }
     } else B2ERROR("CDCDedxInjectTimeAlgorithm: found incompatible bins for merging");
@@ -402,26 +400,26 @@ void CDCDedxInjectTimeAlgorithm::createPayload(array<double, numdedx::nrings>& m
   B2INFO("CDCDedxInjectTimeAlgorithm: normalising constants with plateau");
   for (unsigned int ir = 0; ir < c_rings; ir++) {
     //scaling means with time >40ms
-    unsigned int msize = vinjPayload[ir * 3 + 1].size();
+    unsigned int msize = m_vinjPayload[ir * 3 + 1].size();
     int countsum = 0;
-    m_scale[ir] = 0;
+    scale[ir] = 0;
     for (unsigned int im = 0; im < msize; im++) {
-      double time = vinjPayload[ir * 3].at(im);
-      double mean = vinjPayload[ir * 3 + 1].at(im);
+      double time = m_vinjPayload[ir * 3].at(im);
+      double mean = m_vinjPayload[ir * 3 + 1].at(im);
       if (time > 4e4 && mean > 0) {
-        m_scale[ir]  += mean;
+        scale[ir]  += mean;
         countsum++;
       }
     }
-    if (countsum > 0 && m_scale[ir] > 0) {
-      m_scale[ir] /= countsum;
+    if (countsum > 0 && scale[ir] > 0) {
+      scale[ir] /= countsum;
       for (unsigned int im = 0; im < msize; im++) {
-        vinjPayload[ir * 3 + 1].at(im) /= m_scale[ir];
+        m_vinjPayload[ir * 3 + 1].at(im) /= scale[ir];
       }
     }
   }
   //saving payloads;
-  CDCDedxInjectTime* gains = new CDCDedxInjectTime(vinjPayload);
+  CDCDedxInjectTime* gains = new CDCDedxInjectTime(m_vinjPayload);
   saveCalibration(gains, "CDCDedxInjectTime");
   B2INFO("dE/dx Injection time calibration done");
 }
@@ -429,80 +427,77 @@ void CDCDedxInjectTimeAlgorithm::createPayload(array<double, numdedx::nrings>& m
 //------------------------------------
 void CDCDedxInjectTimeAlgorithm::plotBinLevelDist(array<vector<TH1D*>, numdedx::nrings>& hvar, string var)
 {
-  TCanvas* cfit = new TCanvas("cfit", "cfit", 1000, 500);
-  cfit->Divide(2, 1);
+  TCanvas cfit("cfit", "cfit", 1000, 500);
+  cfit.Divide(2, 1);
   stringstream psname_fit;
   psname_fit << Form("%s_%s_%s.pdf[", m_prefix.data(), var.data(), m_suffix.data());
-  cfit->Print(psname_fit.str().c_str());
+  cfit.Print(psname_fit.str().c_str());
   psname_fit.str("");
   psname_fit << Form("%s_%s_%s.pdf", m_prefix.data(), var.data(), m_suffix.data());
   for (unsigned int it = 0; it < m_tbins; it++) {
     for (unsigned int ir = 0; ir < c_rings; ir++) {
-      cfit->cd(ir + 1);
+      cfit.cd(ir + 1);
       hvar[ir][it]->SetFillColorAlpha(ir + 5, 0.25);
       hvar[ir][it]->Draw();
     }
-    cfit->Print(psname_fit.str().c_str());
+    cfit.Print(psname_fit.str().c_str());
   }
   psname_fit.str("");
   psname_fit << Form("%s_%s_%s.pdf]", m_prefix.data(), var.data(), m_suffix.data());
-  cfit->Print(psname_fit.str().c_str());
-  delete cfit;
+  cfit.Print(psname_fit.str().c_str());
 }
 
 //----------------------------------------
 void CDCDedxInjectTimeAlgorithm::plotEventStats()
 {
   // draw event and track statistics
-  TCanvas* cestat = new TCanvas("cestat", "cestat", 1000, 500);
-  cestat->SetBatch(kTRUE);
-  cestat->Divide(2, 1);
+  TCanvas cestat("cestat", "cestat", 1000, 500);
+  cestat.SetBatch(kTRUE);
+  cestat.Divide(2, 1);
 
-  cestat->cd(1);
+  cestat.cd(1);
   auto hestats = getObjectPtr<TH1I>("hestats");
   if (hestats) {
     hestats->SetName(Form("hestats_%s", m_suffix.data()));
     hestats->SetStats(0);
     hestats->Draw("hist text");
   }
-  cestat->cd(2);
+  cestat.cd(2);
   auto htstats = getObjectPtr<TH1I>("htstats");
   if (htstats) {
     htstats->SetName(Form("htstats_%s", m_suffix.data()));
     htstats->SetStats(0);
     htstats->Draw("hist text");
   }
-  cestat->Print(Form("%s_eventstat_%s.pdf", m_prefix.data(), m_suffix.data()));
-  delete cestat;
+  cestat.Print(Form("%s_eventstat_%s.pdf", m_prefix.data(), m_suffix.data()));
 }
 
 //------------------------------------
 void CDCDedxInjectTimeAlgorithm::plotInjectionTime(array<array<TH1D*, 3>, numdedx::nrings>& hvar)
 {
-  TCanvas* ctzoom = new TCanvas("ctzoom", "ctzoom", 1500, 450);
-  ctzoom->SetBatch(kTRUE);
-  ctzoom->Divide(3, 1);
+  TCanvas ctzoom("ctzoom", "ctzoom", 1500, 450);
+  ctzoom.SetBatch(kTRUE);
+  ctzoom.Divide(3, 1);
   for (int wt = 0; wt < 3; wt++) {
-    ctzoom->cd(wt + 1);
-    if (wt == 2)gPad->SetLogy();
+    ctzoom.cd(wt + 1);
+    if (wt == 2) gPad->SetLogy();
     for (unsigned int ir = 0; ir < c_rings; ir++) {
       hvar[ir][wt]->SetStats(0);
       hvar[ir][wt]->SetFillColorAlpha(5 + ir, 0.20);
       if (ir == 0) {
         double max1 = hvar[ir][wt]->GetMaximum();
         double max2 = hvar[c_rings - 1][wt]->GetMaximum();
-        if (max2 > max1)hvar[ir][wt]->SetMaximum(max2 * 1.05);
+        if (max2 > max1) hvar[ir][wt]->SetMaximum(max2 * 1.05);
         hvar[ir][wt]->Draw("");
       } else hvar[ir][wt]->Draw("same");
     }
   }
-  ctzoom->Print(Form("%s_timezoom_%s.pdf]", m_prefix.data(), m_suffix.data()));
-  delete ctzoom;
+  ctzoom.Print(Form("%s_timezoom_%s.pdf]", m_prefix.data(), m_suffix.data()));
 }
 
 //------------------------------------
-void CDCDedxInjectTimeAlgorithm::plotRelConstants(map<int, vector<double>>& m_meancorr, map<int, vector<double>>& m_resocorr,
-                                                  array<vector<TH1D*>, numdedx::nrings>& htime)
+void CDCDedxInjectTimeAlgorithm::plotRelConstants(map<int, vector<double>>& meancorr, map<int, vector<double>>& resocorr,
+                                                  map<int, vector<double>>& vmeans, map<int, vector<double>>& vresos, array<vector<TH1D*>, numdedx::nrings>& htime)
 {
   string sname[3] = {"mean", "reso", "timestat"};
   const int lcolors[c_rings] = {2, 4};
@@ -549,20 +544,20 @@ void CDCDedxInjectTimeAlgorithm::plotRelConstants(map<int, vector<double>>& m_me
 
       string label = getTimeBinLabel(m_tedges[it], it);
 
-      hmean[ir]->SetBinContent(it + 1, m_vmeans[ir].at(it));
-      hmean[ir]->SetBinError(it + 1, m_vmeanserr[ir].at(it));
+      hmean[ir]->SetBinContent(it + 1, vmeans[ir * 2].at(it));
+      hmean[ir]->SetBinError(it + 1, vmeans[ir * 2 + 1].at(it));
       hmean[ir]->GetXaxis()->SetBinLabel(it + 1, label.data());
 
-      hreso[ir]->SetBinContent(it + 1, m_vresos[ir].at(it) / m_vmeans[ir].at(it));
-      hreso[ir]->SetBinError(it + 1, m_vresoserr[ir].at(it));
+      hreso[ir]->SetBinContent(it + 1, vresos[ir * 2].at(it) / vmeans[ir * 2].at(it));
+      hreso[ir]->SetBinError(it + 1, vresos[ir * 2 + 1].at(it));
       hreso[ir]->GetXaxis()->SetBinLabel(it + 1, label.data());
 
-      hmeancorr[ir]->SetBinContent(it + 1, m_meancorr[ir].at(it));
-      hmeancorr[ir]->SetBinError(it + 1, m_vmeanserr[ir].at(it));
+      hmeancorr[ir]->SetBinContent(it + 1, meancorr[ir * 2].at(it));
+      hmeancorr[ir]->SetBinError(it + 1, vmeans[ir * 2 + 1].at(it));
       hmeancorr[ir]->GetXaxis()->SetBinLabel(it + 1, label.data());
 
-      hresocorr[ir]->SetBinContent(it + 1, m_resocorr[ir].at(it) / m_meancorr[ir].at(it));
-      hresocorr[ir]->SetBinError(it + 1, m_vresoserr[ir].at(it));
+      hresocorr[ir]->SetBinContent(it + 1, resocorr[ir * 2].at(it) / meancorr[ir * 2].at(it));
+      hresocorr[ir]->SetBinError(it + 1, vresos[ir * 2 + 1].at(it));
       hresocorr[ir]->GetXaxis()->SetBinLabel(it + 1, label.data());
 
       htimestat[ir]->SetBinContent(it + 1, htime[ir][it]->Integral());
@@ -607,7 +602,8 @@ void CDCDedxInjectTimeAlgorithm::plotRelConstants(map<int, vector<double>>& m_me
 }
 
 //------------------------------------
-void CDCDedxInjectTimeAlgorithm::plotFinalConstants(array<double, numdedx::nrings>& m_scale)
+void CDCDedxInjectTimeAlgorithm::plotFinalConstants(map<int, vector<double>>& vmeans, map<int, vector<double>>& vresos,
+                                                    array<double, numdedx::nrings>& scale)
 {
   vector<vector<double>> oldvectors;
   if (m_DBInjectTime)oldvectors = m_DBInjectTime->getConstVector();
@@ -649,9 +645,9 @@ void CDCDedxInjectTimeAlgorithm::plotFinalConstants(array<double, numdedx::nring
         string label = getTimeBinLabel(m_tedges[it], it);
         double mean = 0.0, reso = 0.0;
         if (ip == 0) {
-          mean = vinjPayload[ir * 3 + 1].at(it);
+          mean = m_vinjPayload[ir * 3 + 1].at(it);
           //reso is reso/mu (reso is relative so mean needs to be relative)
-          reso = m_vresos[ir].at(it) / m_vmeans[ir].at(it);
+          reso = vresos[ir * 2].at(it) / vmeans[ir * 2].at(it);
         } else {
           mean = oldvectors[ir * 3 + 1].at(it);
           reso = oldvectors[ir * 3 + 2].at(it) / oldvectors[ir * 3 + 1].at(it);
@@ -659,16 +655,16 @@ void CDCDedxInjectTimeAlgorithm::plotFinalConstants(array<double, numdedx::nring
 
         //old payloads
         hmean[ir][ip]->SetBinContent(it + 1, mean);
-        hmean[ir][ip]->SetBinError(it + 1, m_vmeanserr[ir].at(it));
+        hmean[ir][ip]->SetBinError(it + 1, vmeans[ir * 2 + 1].at(it));
         hmean[ir][ip]->GetXaxis()->SetBinLabel(it + 1, label.data());
 
         hreso[ir][ip]->SetBinContent(it + 1, reso);
-        hreso[ir][ip]->SetBinError(it + 1, m_vresoserr[ir].at(it));
+        hreso[ir][ip]->SetBinError(it + 1, vresos[ir * 2 + 1].at(it));
         hreso[ir][ip]->GetXaxis()->SetBinLabel(it + 1, label.data());
       }
       cconst[0]->cd();
       if (ip == 1)mleg->AddEntry(hmean[ir][ip], Form("%s, %s", m_sring[ir].data(), stype[ip].data()), "lep");
-      else mleg->AddEntry(hmean[ir][ip], Form("%s, %s (scaled by %0.03f)", m_sring[ir].data(), stype[ip].data(), m_scale[ir]), "lep");
+      else mleg->AddEntry(hmean[ir][ip], Form("%s, %s (scaled by %0.03f)", m_sring[ir].data(), stype[ip].data(), scale[ir]), "lep");
       setHistStyle(hmean[ir][ip], lcolors[ir], lmarker[ip] + ir * 2, 0.60, 1.05);
       if (ir == 0 && ip == 0)hmean[ir][ip]->Draw("");
       else hmean[ir][ip]->Draw("same");

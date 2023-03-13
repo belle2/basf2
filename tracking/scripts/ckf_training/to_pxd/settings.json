@@ -1,0 +1,14 @@
+{
+    "result_path": "output/",
+    "batch_system": "htcondor",
+    "n_events_training": 1000,
+    "n_events_testing": 500,
+    "n_events_per_task": 100,
+    "workers": 500,
+    "basf2_processes_per_worker": 0,
+    "globaltags": [],
+    "experiment_numbers": [0],
+    "bkgfiles_by_exp": {
+        "0": "/pnfs/desy.de/belle/local/group/belle2/dataprod/BGOverlay/nominal_phase3/prerelease-07-00-00a/overlay/BGx1/set0/"
+    }
+}

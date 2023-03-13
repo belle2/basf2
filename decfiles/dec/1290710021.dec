@@ -7,7 +7,7 @@
 # Tested: Yes
 # PhysicsWG: SL
 # Responsible: Tommy Martinov
-# Email: tommy.martinov@desy.de, moritz.bauer@kit.edu
+# Email: tommy.martinov@desy.de
 # Cuts: None
 # Date: 20231003
 #
@@ -16,7 +16,8 @@ StringFlav:probStoUD=0.300
 
 #
 Decay Upsilon(4S)
-0.5 B+sig  B-sig                      VSS;
+0.5 B+sig  B-                      VSS;
+0.5 B-sig  B+                      VSS;
 Enddecay
 #
 Decay B+sig

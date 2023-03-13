@@ -346,7 +346,7 @@ void Variable::Manager::registerVariable(const std::string& name, const Variable
     m_variables[name] = var;
     m_variablesInRegistrationOrder.push_back(var.get());
     if (!unit.empty()) {
-      var.get()->extendDescriptionString("\n\n :Unit: " + unit);
+      var.get()->extendDescriptionString(":Unit: " + unit);
     }
   } else {
     B2FATAL("A variable named '" << name << "' was already registered! Note that all variables need a unique name!");
@@ -370,7 +370,7 @@ void Variable::Manager::registerVariable(const std::string& name, const Variable
     m_parameter_variables[rawName] = var;
     m_variablesInRegistrationOrder.push_back(var.get());
     if (!unit.empty()) {
-      var.get()->extendDescriptionString("\n\n :Unit: " + unit);
+      var.get()->extendDescriptionString(":Unit: " + unit);
     }
   } else {
     B2FATAL("A variable named '" << name << "' was already registered! Note that all variables need a unique name!");

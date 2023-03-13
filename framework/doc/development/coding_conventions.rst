@@ -113,8 +113,8 @@ Names should be precise, colorful and in self-explanatory English:
 
    * template arguments begin with ``A`` followed by a capital letter
 
-   * use the prefix ``m_`` for member variables, ``s_`` for static member variables, and
-     ``c_`` for constants
+   * use the prefix ``m_`` for member variables, ``s_`` for static member variables, ``h_`` or ``m_h`` 
+     for histogram member variables, and ``c_`` for constants
 
    * *Python*: use all upper case with underscores for constants; always use
      ``self``/``cls`` as first argument of instance/class methods

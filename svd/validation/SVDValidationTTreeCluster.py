@@ -11,11 +11,11 @@
 
 """
 <header>
-    <contact> SVD Software Group, svd-software@belle2.org </contact>
     <description>
     This module is used for the SVD validation.
     It gets information about clusters and truehits, saving in a ttree in a ROOT file.
     </description>
+    <noexecute>SVD validation helper class</noexecute>
 </header>
 """
 

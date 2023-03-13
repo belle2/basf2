@@ -46,7 +46,7 @@ namespace Belle2 {
     /**
     * Set range for EoP cut
     */
-    void setEoverPCutValue(double value) {fSetEoverP = value;}
+    void setEoverPCutValue(double value) {m_setEoverP = value;}
 
 
   private:
@@ -64,13 +64,14 @@ namespace Belle2 {
 
     /// module params
     int m_maxNumHits; /**< maximum number of hits allowed */
-    double fSetEoverP; /**< Cut of E over P value */
+    double m_setEoverP; /**< Cut of E over P value */
+
     /// track level information
     double m_dedx = -1;  /**< dE/dx truncated mean */
     double m_costh = -1; /**< track cos(theta) */
     double m_p = -1; /**< track momentum */
     int m_charge = 0; /**< track momentum */
-    int m_run = 1;/**<run number */
+    int m_run = 1;  /**<run number */
     int m_nhits = -1;    /**< number of dE/dx hits on the track */
 
     /// hit level information
@@ -81,21 +82,22 @@ namespace Belle2 {
     std::vector<double> m_docaRS;    /**< rescaled distance of closest approach for the hit */
     std::vector<double> m_entaRS;    /**< rescaled entrance angle for the hit */
     std::vector<double> m_dedxhit; /**< dE/dx for the hit */
+    std::vector<double> m_adccorr; /**< adc corrected for the hit */
 
-
-    bool IsCosth; /**< flag to write costh in tree  */
-    bool IsMom;/**< flag to write momentum in treet */
-    bool IsCharge;/**< flag to write charge in treet */
-    bool IsRun;/**< flag to write run number in tree */
-    bool IsWire;/**< flag to write wire number in tree */
-    bool IsLayer;/**< flag to write layer number in tree */
-    bool IsDoca;/**< flag to write doca in tree */
-    bool IsEnta;/**< flag to write enta in tree */
-    bool IsDocaRS;/**< flag to write rescaled doca in tree */
-    bool IsEntaRS;/**< flag to write rescaled enta in tree */
-    bool Isdedxhit;    /**< flag to write dedxhits in tree */
-    bool IsBhabhaEvt; /**< flag to select bhabha event */
-    bool IsRadBhabhaEvt; /**< flag to select radee event */
-    bool enableTrgSel; /**< flag to enable trigger skim selected in the module (off deafult) */
+    bool m_isCosth;         /**< flag to write costh in tree  */
+    bool m_isMom;           /**< flag to write momentum in treet */
+    bool m_isCharge;        /**< flag to write charge in treet */
+    bool m_isRun;           /**< flag to write run number in tree */
+    bool m_isWire;          /**< flag to write wire number in tree */
+    bool m_isLayer;         /**< flag to write layer number in tree */
+    bool m_isDoca;          /**< flag to write doca in tree */
+    bool m_isEnta;          /**< flag to write enta in tree */
+    bool m_isDocaRS;        /**< flag to write rescaled doca in tree */
+    bool m_isEntaRS;        /**< flag to write rescaled enta in tree */
+    bool m_isDedxhit;       /**< flag to write dedxhits in tree */
+    bool m_isADCcorr;       /**< flag to write adc corrected in tree */
+    bool m_isBhabhaEvt;     /**< flag to select bhabha event */
+    bool m_isRadBhabhaEvt;  /**< flag to select radee event */
+    bool m_enableTrgSel;    /**< flag to enable trigger skim selected in the module (off deafult) */
   };
 }

@@ -5,35 +5,34 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//This module
+
+/* Own header. */
 #include <ecl/modules/eclDigitCalibration/ECLDigitCalibratorModule.h>
 
-//STL
-#include <unordered_map>
-
-// ROOT
-#include "TH1F.h"
-#include "TFile.h"
-
-// ECL
-#include <ecl/dataobjects/ECLDigit.h>
+/* ECL headers. */
 #include <ecl/dataobjects/ECLCalDigit.h>
-#include <ecl/digitization/EclConfiguration.h>
-#include <ecl/dataobjects/ECLPureCsIInfo.h>
+#include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLDsp.h>
-#include <ecl/utility/utilityFunctions.h>
-#include <ecl/geometry/ECLGeometryPar.h>
+#include <ecl/dataobjects/ECLPureCsIInfo.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
+#include <ecl/digitization/EclConfiguration.h>
+#include <ecl/geometry/ECLGeometryPar.h>
+#include <ecl/utility/utilityFunctions.h>
 
-// FRAMEWORK
+/* Basf2 headers. */
+#include <framework/core/Environment.h>
 #include <framework/gearbox/Unit.h>
+#include <framework/geometry/B2Vector3.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
-#include <framework/geometry/B2Vector3.h>
-#include <framework/core/Environment.h>
-
-//MDST
 #include <mdst/dataobjects/EventLevelClusteringInfo.h>
+
+/* ROOT headers. */
+#include <TFile.h>
+#include <TH1F.h>
+
+/* C++ headers. */
+#include <unordered_map>
 
 using namespace std;
 using namespace Belle2;

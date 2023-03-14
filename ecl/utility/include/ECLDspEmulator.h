@@ -48,7 +48,7 @@ namespace Belle2 {
      * @param[in] fg33[16][192] Array used to estimate pedestal height in signal.
      *
      * @param[in] y[31]  Array of signal measurements
-     * @param[in] ttrig2 Trigger time (0-23)
+     * @param[in] ttrig2 Trigger time (0-191)
      *
      * @param[in] la_thr    Low amplitude threshold
      * @param[in] hit_thr   Hit threshold

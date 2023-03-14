@@ -67,7 +67,7 @@ namespace TreeFitter {
 
     for (int row = 0; row < 3; ++row) { //then the x block
       for (int col = 0; col <= row; ++col) {
-        m_covariance(row, col) = cov7in[3 + row][3 + col];
+        m_covariance(row, col) = cov7in[4 + row][4 + col];
       }
     }
   }

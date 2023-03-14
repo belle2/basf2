@@ -13,7 +13,7 @@
 #include <klm/eklm/geometry/Circle2D.h>
 #include <klm/eklm/geometry/Line2D.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/Database.h>
 #include <framework/logging/Logger.h>

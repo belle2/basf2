@@ -14,7 +14,7 @@
 #include <klm/dataobjects/KLMScintillatorFirmwareFitResult.h>
 #include <klm/simulation/ScintillatorSimulator.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/dataobjects/BackgroundMetaData.h>
 #include <mdst/dataobjects/MCParticle.h>
 
@@ -48,6 +48,8 @@ KLMDigitizerModule::KLMDigitizerModule() :
   addParam("Efficiency", m_Efficiency,
            "Efficiency determination mode (\"Strip\" or \"Plane\").",
            std::string("Plane"));
+  addParam("CreateMultiStripDigits", m_CreateMultiStripDigits,
+           "Whether to create multi-strip digits.", false);
   addParam("Debug", m_Debug,
            "Debug mode (generates additional output files with histograms).",
            false);
@@ -144,77 +146,216 @@ bool KLMDigitizerModule::efficiencyCorrection(float efficiency)
   return (selection < efficiency);
 }
 
-void KLMDigitizerModule::digitize()
+void KLMDigitizerModule::digitizeRPC()
+{
+  std::multimap<KLMChannelNumber, const KLMSimHit*>::iterator
+  it, it2, lowerBound, upperBound;
+  it = m_MapChannelSimHit.begin();
+  while (it != m_MapChannelSimHit.end()) {
+    lowerBound = it;
+    upperBound = m_MapChannelSimHit.upper_bound(it->first);
+    it = upperBound;
+    if (m_EfficiencyMode == c_Strip) {
+      float efficiency = m_StripEfficiency->getEfficiency(lowerBound->first);
+      if (!efficiencyCorrection(efficiency))
+        continue;
+    }
+    int strip = BKLMElementNumbers::getStripByModule(
+                  m_ElementNumbers->localChannelNumberBKLM(lowerBound->first));
+    /* Select hit that has the smallest time. */
+    it2 = lowerBound;
+    const KLMSimHit* hit = lowerBound->second;
+    double time = hit->getTime();
+    ++it2;
+    while (it2 != upperBound) {
+      if (it2->second->getTime() < time) {
+        time = it2->second->getTime();
+        hit = it2->second;
+      }
+      ++it2;
+    }
+    KLMDigit* digit = m_Digits.appendNew(hit, strip);
+    it2 = lowerBound;
+    while (it2 != upperBound) {
+      digit->addRelationTo(it2->second);
+      ++it2;
+    }
+  }
+}
+
+void KLMDigitizerModule::digitizeScintillator()
 {
   uint16_t tdc;
   KLM::ScintillatorSimulator simulator(
     &(*m_DigPar), m_Fitter,
     m_DigitizationInitialTime * m_Time->getCTimePeriod(), m_Debug);
   const KLMScintillatorFEEData* FEEData;
-  std::multimap<KLMChannelNumber, const KLMSimHit*>::iterator it, it2, ub;
-  for (it = m_SimHitChannelMap.begin(); it != m_SimHitChannelMap.end();
-       it = m_SimHitChannelMap.upper_bound(it->first)) {
-    const KLMSimHit* simHit = it->second;
-    ub = m_SimHitChannelMap.upper_bound(it->first);
-    bool rpc = simHit->inRPC();
+  std::multimap<KLMChannelNumber, const KLMSimHit*>::iterator
+  it, lowerBound, upperBound;
+  for (int i = 0; i < KLM::c_NChannelsAsic; ++i)
+    m_AsicDigits[i] = nullptr;
+  it = m_MapChannelSimHit.begin();
+  while (it != m_MapChannelSimHit.end()) {
+    lowerBound = it;
+    upperBound = m_MapChannelSimHit.upper_bound(it->first);
+    it = upperBound;
+    const KLMSimHit* simHit = lowerBound->second;
     if (m_EfficiencyMode == c_Strip) {
-      float efficiency = m_StripEfficiency->getEfficiency(it->first);
+      float efficiency = m_StripEfficiency->getEfficiency(lowerBound->first);
       if (!efficiencyCorrection(efficiency))
         continue;
     }
-    if (rpc) {
-      int strip = BKLMElementNumbers::getStripByModule(
-                    m_ElementNumbers->localChannelNumberBKLM(it->first));
-      /* Select hit that has the smallest time. */
-      it2 = it;
-      const KLMSimHit* hit = it->second;
-      double time = hit->getTime();
-      ++it2;
-      while (it2 != ub) {
-        if (it2->second->getTime() < time) {
-          time = it2->second->getTime();
-          hit = it2->second;
-        }
-        ++it2;
-      }
-      KLMDigit* digit = m_Digits.appendNew(hit, strip);
-      digit->addRelationTo(simHit);
+    if (m_ChannelSpecificSimulation) {
+      FEEData = m_FEEPar->getFEEData(lowerBound->first);
+      if (FEEData == nullptr)
+        B2FATAL("Incomplete KLM scintillator FEE data.");
+      simulator.setFEEData(FEEData);
+    }
+    simulator.simulate(lowerBound, upperBound);
+    if (simulator.getNGeneratedPhotoelectrons() == 0)
+      continue;
+    const KLMElectronicsChannel* electronicsChannel =
+      m_ElectronicsMap->getElectronicsChannel(lowerBound->first);
+    int channel = (electronicsChannel->getChannel() - 1) %
+                  KLM::c_NChannelsAsic;
+    KLMDigit* digit = new KLMDigit(simHit);
+    m_AsicDigits[channel] = digit;
+    m_AsicDigitSimHitsLowerBound[channel] = lowerBound;
+    m_AsicDigitSimHitsUpperBound[channel] = upperBound;
+    digit->setMCTime(simulator.getMCTime());
+    digit->setSiPMMCTime(simulator.getSiPMMCTime());
+    digit->setNGeneratedPhotoelectrons(
+      simulator.getNGeneratedPhotoelectrons());
+    if (simulator.getFitStatus() ==
+        KLM::c_ScintillatorFirmwareSuccessfulFit) {
+      tdc = simulator.getFPGAFit()->getStartTime();
+      digit->setCharge(simulator.getFPGAFit()->getMinimalAmplitude());
     } else {
-      if (m_ChannelSpecificSimulation) {
-        FEEData = m_FEEPar->getFEEData(it->first);
-        if (FEEData == nullptr)
-          B2FATAL("Incomplete KLM scintillator FEE data.");
-        simulator.setFEEData(FEEData);
+      tdc = 0;
+      digit->setCharge(m_DigPar->getADCRange() - 1);
+    }
+    digit->setTDC(tdc);
+    digit->setTime(m_Time->getTimeSimulation(tdc, true));
+    digit->setFitStatus(simulator.getFitStatus());
+    digit->setNPhotoelectrons(simulator.getNPhotoelectrons());
+    digit->setEnergyDeposit(simulator.getEnergy());
+    if (m_SaveFPGAFit && (simulator.getFitStatus() ==
+                          KLM::c_ScintillatorFirmwareSuccessfulFit)) {
+      KLMScintillatorFirmwareFitResult* fit =
+        m_FPGAFits.appendNew(*simulator.getFPGAFit());
+      digit->addRelationTo(fit);
+    }
+  }
+}
+
+void KLMDigitizerModule::digitizeAsic()
+{
+  std::multimap<KLMElectronicsChannel, const KLMSimHit*>::iterator
+  it, it2, upperBound;
+  std::multimap<KLMChannelNumber, const KLMSimHit*>::iterator it3;
+  it = m_MapAsicSimHit.begin();
+  while (it != m_MapAsicSimHit.end()) {
+    upperBound = m_MapAsicSimHit.upper_bound(it->first);
+    m_MapChannelSimHit.clear();
+    for (it2 = it; it2 != upperBound; ++it2) {
+      const KLMSimHit* hit = it2->second;
+      KLMChannelNumber channel =
+        m_ElementNumbers->channelNumber(
+          hit->getSubdetector(), hit->getSection(), hit->getSector(),
+          hit->getLayer(), hit->getPlane(), hit->getStrip());
+      m_MapChannelSimHit.insert(
+        std::pair<KLMChannelNumber, const KLMSimHit*>(channel, hit));
+    }
+    digitizeScintillator();
+    if (m_CreateMultiStripDigits) {
+      int nDigits = 0;
+      for (int i = 0; i < KLM::c_NChannelsAsic; ++i) {
+        if (m_AsicDigits[i] != nullptr)
+          nDigits += 1;
       }
-      simulator.simulate(it, ub);
-      if (simulator.getNGeneratedPhotoelectrons() == 0)
-        continue;
-      KLMDigit* digit = m_Digits.appendNew(simHit);
-      digit->addRelationTo(simHit);
-      digit->setMCTime(simulator.getMCTime());
-      digit->setSiPMMCTime(simulator.getSiPMMCTime());
-      digit->setNGeneratedPhotoelectrons(
-        simulator.getNGeneratedPhotoelectrons());
-      if (simulator.getFitStatus() ==
-          KLM::c_ScintillatorFirmwareSuccessfulFit) {
-        tdc = simulator.getFPGAFit()->getStartTime();
-        digit->setCharge(simulator.getFPGAFit()->getMinimalAmplitude());
-      } else {
-        tdc = 0;
-        digit->setCharge(m_DigPar->getADCRange() - 1);
+      bool multiStripMode = (nDigits >= 2);
+      int i = 0;
+      while (i < KLM::c_NChannelsAsic) {
+        KLMDigit* digit = m_AsicDigits[i];
+        if (digit == nullptr) {
+          ++i;
+          continue;
+        }
+        int minGroupChannel, maxGroupChannel;
+        if (i < 4) {
+          minGroupChannel = 1;
+          maxGroupChannel = 4;
+        } else if (i < 8) {
+          minGroupChannel = 5;
+          maxGroupChannel = 8;
+        } else if (i < 12) {
+          minGroupChannel = 9;
+          maxGroupChannel = 12;
+        } else {
+          minGroupChannel = 13;
+          maxGroupChannel = KLM::c_NChannelsAsic;
+        }
+        KLMDigit* arrayDigit = m_Digits.appendNew(*digit);
+        KLMElectronicsChannel electronicsChannel(it->first);
+        int asic = electronicsChannel.getChannel();
+        bool connectedChannelFound = false;
+        int minStrip, maxStrip;
+        for (int j = minGroupChannel; j <= maxGroupChannel; ++j) {
+          electronicsChannel.setChannel(KLM::c_NChannelsAsic * asic + j);
+          const KLMChannelNumber* detectorChannel =
+            m_ElectronicsMap->getDetectorChannel(&electronicsChannel);
+          if (detectorChannel != nullptr) {
+            int subdetector, section, sector, layer, plane, strip;
+            m_ElementNumbers->channelNumberToElementNumbers(
+              *detectorChannel, &subdetector, &section, &sector, &layer,
+              &plane, &strip);
+            if (!connectedChannelFound) {
+              connectedChannelFound = true;
+              minStrip = strip;
+              maxStrip = strip;
+            } else {
+              if (strip < minStrip)
+                minStrip = strip;
+              if (strip > maxStrip)
+                maxStrip = strip;
+            }
+          }
+        }
+        /* This should never happen. */
+        if (!connectedChannelFound)
+          B2FATAL("Cannot find connected electronics channels.");
+        if (multiStripMode) {
+          arrayDigit->setStrip(minStrip);
+          arrayDigit->setLastStrip(maxStrip);
+        }
+        for (int j = i; j < maxGroupChannel; ++j) {
+          if (m_AsicDigits[j] == nullptr)
+            continue;
+          for (it3 = m_AsicDigitSimHitsLowerBound[j];
+               it3 != m_AsicDigitSimHitsUpperBound[j]; ++it3) {
+            arrayDigit->addRelationTo(it3->second);
+          }
+        }
+        i = maxGroupChannel;
       }
-      digit->setTDC(tdc);
-      digit->setTime(m_Time->getTimeSimulation(tdc, true));
-      digit->setFitStatus(simulator.getFitStatus());
-      digit->setNPhotoelectrons(simulator.getNPhotoelectrons());
-      digit->setEnergyDeposit(simulator.getEnergy());
-      if (m_SaveFPGAFit && (simulator.getFitStatus() ==
-                            KLM::c_ScintillatorFirmwareSuccessfulFit)) {
-        KLMScintillatorFirmwareFitResult* fit =
-          m_FPGAFits.appendNew(*simulator.getFPGAFit());
-        digit->addRelationTo(fit);
+      for (i = 0; i < KLM::c_NChannelsAsic; ++i) {
+        if (m_AsicDigits[i] != nullptr)
+          delete m_AsicDigits[i];
+      }
+    } else {
+      for (int i = 0; i < KLM::c_NChannelsAsic; ++i) {
+        KLMDigit* digit = m_AsicDigits[i];
+        if (digit == nullptr)
+          continue;
+        KLMDigit* arrayDigit = m_Digits.appendNew(*digit);
+        for (it3 = m_AsicDigitSimHitsLowerBound[i];
+             it3 != m_AsicDigitSimHitsUpperBound[i]; ++it3) {
+          arrayDigit->addRelationTo(it3->second);
+        }
+        delete digit;
       }
     }
+    it = upperBound;
   }
 }
 
@@ -222,9 +363,10 @@ void KLMDigitizerModule::event()
 {
   int i;
   KLMChannelNumber channel;
-  m_SimHitChannelMap.clear();
+  m_MapChannelSimHit.clear();
+  m_MapAsicSimHit.clear();
   if (m_EfficiencyMode == c_Plane) {
-    m_SimHitPlaneMap.clear();
+    m_MapPlaneSimHit.clear();
     for (i = 0; i < m_SimHits.getEntries(); i++) {
       const KLMSimHit* hit = m_SimHits[i];
       /* For RPCs. */
@@ -241,7 +383,7 @@ void KLMDigitizerModule::event()
           m_ElementNumbers->planeNumber(
             hit->getSubdetector(), hit->getSection(), hit->getSector(),
             hit->getLayer(), hit->getPlane());
-        m_SimHitPlaneMap.insert(
+        m_MapPlaneSimHit.insert(
           std::pair<KLMPlaneNumber, const KLMSimHit*>(plane, hit));
       } else {
         B2ASSERT("The KLMSimHit is not related to any MCParticle and "
@@ -252,7 +394,7 @@ void KLMDigitizerModule::event()
             hit->getSubdetector(), hit->getSection(), hit->getSector(),
             hit->getLayer(), hit->getPlane(), hit->getStrip());
         if (checkActive(channel))
-          m_SimHitChannelMap.insert(
+          m_MapChannelSimHit.insert(
             std::pair<KLMChannelNumber, const KLMSimHit*>(channel, hit));
       }
     }
@@ -260,8 +402,8 @@ void KLMDigitizerModule::event()
     std::multimap<const MCParticle*, const KLMSimHit*> particleHitMap;
     std::multimap<const MCParticle*, const KLMSimHit*>::iterator
     itParticle, it2Particle;
-    it = m_SimHitPlaneMap.begin();
-    while (it != m_SimHitPlaneMap.end()) {
+    it = m_MapPlaneSimHit.begin();
+    while (it != m_MapPlaneSimHit.end()) {
       particleHitMap.clear();
       it2 = it;
       while (true) {
@@ -270,7 +412,7 @@ void KLMDigitizerModule::event()
         particleHitMap.insert(
           std::pair<const MCParticle*, const KLMSimHit*>(particle, hit));
         ++it2;
-        if (it2 == m_SimHitPlaneMap.end())
+        if (it2 == m_MapPlaneSimHit.end())
           break;
         if (it2->first != it->first)
           break;
@@ -287,15 +429,27 @@ void KLMDigitizerModule::event()
         bool hitSelected = efficiencyCorrection(efficiency);
         while (true) {
           hit = it2Particle->second;
+          bool rpc = hit->inRPC();
           if (hitSelected) {
             for (int s = hit->getStrip(); s <= hit->getLastStrip(); ++s) {
               channel =
                 m_ElementNumbers->channelNumber(
                   hit->getSubdetector(), hit->getSection(), hit->getSector(),
                   hit->getLayer(), hit->getPlane(), s);
-              if (checkActive(channel)) {
-                m_SimHitChannelMap.insert(
+              if (!checkActive(channel))
+                continue;
+              if (rpc) {
+                m_MapChannelSimHit.insert(
                   std::pair<KLMChannelNumber, const KLMSimHit*>(channel, hit));
+              } else {
+                const KLMElectronicsChannel* electronicsChannel =
+                  m_ElectronicsMap->getElectronicsChannel(channel);
+                if (electronicsChannel == nullptr)
+                  B2FATAL("Incomplete electronics map.");
+                KLMElectronicsChannel asic = electronicsChannel->getAsic();
+                m_MapAsicSimHit.insert(
+                  std::pair<KLMElectronicsChannel, const KLMSimHit*>(
+                    asic, hit));
               }
             }
           }
@@ -320,7 +474,7 @@ void KLMDigitizerModule::event()
                       hit->getSection(), hit->getSector(), hit->getLayer(),
                       hit->getPlane(), s);
           if (checkActive(channel)) {
-            m_SimHitChannelMap.insert(
+            m_MapChannelSimHit.insert(
               std::pair<KLMChannelNumber, const KLMSimHit*>(channel, hit));
           }
         }
@@ -329,13 +483,19 @@ void KLMDigitizerModule::event()
                     hit->getSubdetector(), hit->getSection(), hit->getSector(),
                     hit->getLayer(), hit->getPlane(), hit->getStrip());
         if (checkActive(channel)) {
-          m_SimHitChannelMap.insert(
-            std::pair<KLMChannelNumber, const KLMSimHit*>(channel, hit));
+          const KLMElectronicsChannel* electronicsChannel =
+            m_ElectronicsMap->getElectronicsChannel(channel);
+          if (electronicsChannel == nullptr)
+            B2FATAL("Incomplete electronics map.");
+          KLMElectronicsChannel asic = electronicsChannel->getAsic();
+          m_MapAsicSimHit.insert(
+            std::pair<KLMElectronicsChannel, const KLMSimHit*>(asic, hit));
         }
       }
     }
   }
-  digitize();
+  digitizeRPC();
+  digitizeAsic();
 }
 
 void KLMDigitizerModule::endRun()

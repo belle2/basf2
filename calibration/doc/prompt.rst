@@ -76,7 +76,7 @@ The ``settings`` variable
 
 This must be a variable of the type :py:class:`prompt.CalibrationSettings`.
 It defines the input data requirements for the script and gives a human readable name and description.
-It also defines the contact expert username (which should be same as the one in JIRA), and a list of
+It also defines the contact expert username (which should be same as the one in GitLab), and a list of
 other prompt calibrations that the script depends on.
 This list will be used to define the task order in the automatic system, it will not affect running
 the script standalone.

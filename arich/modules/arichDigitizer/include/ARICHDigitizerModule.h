@@ -6,10 +6,10 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef ARICHDIGITIZERMODULE_H
-#define ARICHDIGITIZERMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
 #include <arich/dbobjects/ARICHGeometryConfig.h>
 #include <arich/dbobjects/ARICHSimulationPar.h>
 #include <arich/dbobjects/ARICHModulesInfo.h>
@@ -20,6 +20,9 @@
 #include <string>
 
 namespace Belle2 {
+  class ARICHDigit;
+  class ARICHSimHit;
+
   /** ARICH digitizer module.
     *
     * This module takes the hits form GEANT4 simulation (ARICHSimHit),
@@ -68,25 +71,6 @@ namespace Belle2 {
      */
     void magFieldDistorsion(TVector2& hit, int copyno);
 
-    /**
-     * End-of-run action.
-     *
-     * Save run-related stuff, such as statistics.
-     */
-    virtual void endRun() override;
-
-    /**
-     * Termination action.
-     *
-     * Clean-up, close files, summarize statistics, etc.
-     */
-    virtual void terminate() override;
-
-    /**
-     *Prints module parameters.
-     */
-    void printModuleParams() const {};
-
   private:
 
     std::string m_inColName;         /**< Input collection name from simulation */
@@ -100,6 +84,9 @@ namespace Belle2 {
     DBObjPtr<ARICHChannelMask> m_chnMask;     /**< list of dead channels from the DB */
     DBObjPtr<ARICHChannelMapping> m_chnMap;   /**< HAPD (x,y) to asic channel mapping */
 
+    StoreArray<ARICHDigit> m_ARICHDigits;     /**< StoreArray containing the ARICHDigits */
+    StoreArray<ARICHSimHit> m_ARICHSimHits;   /**< StoreArray containing the ARICHSimHits */
+
     /* Other members.*/
     double m_maxQE;                  /**< QE at 400nm (from QE curve applied in SensitveDetector) */
     double m_timeWindow;             /**< Readout time window width in ns */
@@ -110,5 +97,3 @@ namespace Belle2 {
   };
 
 } // Belle2 namespace
-
-#endif // ARICHDIGITIZERMODULE_H

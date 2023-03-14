@@ -7,15 +7,19 @@ Truth-matching
 MC matching
 -----------
 
+A general overview of the main MC matching algorithm and its user interface can be found in the
+proceeding `Monte Carlo matching in the Belle II software <https://doi.org/10.1051/epjconf/202125103021>`_
+for the CHEP 2021 conference.
+
 ~~~~~~~~~~~~~~~~~~~~~~
 First, you must run it
 ~~~~~~~~~~~~~~~~~~~~~~
+
 MCMatching relates ``Particle`` and ``MCParticle`` objects. 
 
 .. important:: 
         Most MC matching variables will have non-trivial values only if the :b2:mod:`MCMatcherParticles` module is actually executed.
         It can be executed by adding the module to your path, there is a `modularAnalysis.matchMCTruth` convenience function to do this.
-
 
 ~~~~
 Core

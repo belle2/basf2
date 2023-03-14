@@ -24,7 +24,6 @@
 #include <TRotation.h>
 #include <TRandom3.h>
 
-using namespace std;
 using namespace boost;
 
 namespace Belle2 {

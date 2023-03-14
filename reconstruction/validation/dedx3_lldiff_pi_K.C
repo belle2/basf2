@@ -7,8 +7,8 @@
  **************************************************************************/
 /*
   <header>
-  <input>EvtGenSimRec_dedx.root</input>
-  <contact>jkumar@andrew.cmu.edu</contact>
+  <input>ParticleGunSimRec_dedx.root</input>
+  <contact>renu2@andrew.cmu.edu</contact>
   <description>check log-likelihood difference pi vs. K</description>
   </header>
 */
@@ -133,5 +133,5 @@ void dedx3_lldiff_pi_K()
 {
   gROOT->SetStyle("Plain");
   
-  plot("../EvtGenSimRec_dedx.root");
+  plot("../ParticleGunSimRec_dedx.root");
 }

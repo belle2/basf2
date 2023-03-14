@@ -217,7 +217,6 @@ void SVDHotStripFinderModule::endRun()
     VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
     std::set<Belle2::VxdID> svdLayers = aGeometry.getLayers(VXD::SensorInfoBase::SVD);
     std::set<Belle2::VxdID>::iterator itSvdLayers = svdLayers.begin();
-    int itsensor = 0; //sensor numbering
     while ((itSvdLayers != svdLayers.end())
            && (itSvdLayers->getLayerNumber() != 7)) { //loop on Layers
 
@@ -321,7 +320,6 @@ void SVDHotStripFinderModule::endRun()
 
             B2DEBUG(1, " L" << layer << "." << ladder << "." << sensor << ".isU=" << k);
 
-            itsensor++;
           }
           ++itSvdSensors;
         }

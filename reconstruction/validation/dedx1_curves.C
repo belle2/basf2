@@ -7,8 +7,8 @@
  **************************************************************************/
 /*
 <header>
-  <input>EvtGenSimRec_dedx.root</input>
-  <contact>jkumar@andrew.cmu.edu</contact>
+  <input>ParticleGunSimRec_dedx.root</input>
+  <contact>renu2@andrew.cmu.edu</contact>
   <description>Plot dE/dx over momentum</description>
   </header>
 */
@@ -136,5 +136,5 @@ void plot(const TString &input_filename)
 void dedx1_curves()
 {
   gROOT->SetStyle("Plain");
-  plot("../EvtGenSimRec_dedx.root");
+  plot("../ParticleGunSimRec_dedx.root");
 }

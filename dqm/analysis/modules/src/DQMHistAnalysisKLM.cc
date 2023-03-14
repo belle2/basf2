@@ -9,7 +9,7 @@
 /* Own header. */
 #include <dqm/analysis/modules/DQMHistAnalysisKLM.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <klm/dataobjects/KLMChannelIndex.h>
 
 /* ROOT headers. */
@@ -104,9 +104,7 @@ void DQMHistAnalysisKLMModule::beginRun()
   m_DeadEndcapModules.clear();
   m_MaskedChannels.clear();
 
-  m_RunType = findHist("DQMInfo/rtype");
-  m_RunTypeString = m_RunType ? m_RunType->GetTitle() : "";
-  m_IsNullRun = (m_RunTypeString == "null");
+  m_IsNullRun = (getRunType() == "null");
 }
 
 void DQMHistAnalysisKLMModule::endRun()

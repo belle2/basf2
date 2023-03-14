@@ -28,7 +28,7 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
-#include <analysis/dataobjects/EventExtraInfo.h>
+#include <framework/dataobjects/EventExtraInfo.h>
 
 #include <vector>
 #include <tuple>
@@ -107,6 +107,7 @@ namespace Belle2 {
 
   private:
 
+
     /**
      * Loads specified MCParticles as Particle to StoreArray<Particle>
      */
@@ -126,6 +127,21 @@ namespace Belle2 {
      * Loads ECLCluster and KLMCluster object as Particle to StoreArray<Particle> and adds it to the ParticleList
      */
     void eclAndKLMClustersToParticles();
+
+    /**
+     * Checks if the given ECLCluster is valid for the pdgCode.
+     */
+    bool isValidECLCluster(const ECLCluster* cluster, const int pdgCode, bool onlyNeutral) const;
+
+    /**
+     * Assigns the MCParticle relation to the newPart. The given cluster is used to find the best MCParticle matching.
+     */
+    void assignMCParticleFromECLCluster(Particle* newPart, const ECLCluster* cluster) const;
+
+    /**
+     * Loads ECLCluster and KLMCluster objects that are being matched with Track as Particle to StoreArray<Particle> and adds it to the ParticleList
+     */
+    void chargedClustersToParticles();
 
     /**
      * Loads V0 object as Particle of specified type to StoreArray<Particle> and adds it to the ParticleList
@@ -175,7 +191,11 @@ namespace Belle2 {
 
     bool m_useDummy;  /**< Switch to load dummy as Particle */
 
+    bool m_loadChargedCluster;  /**< Switch to load charged-cluster  */
+    bool m_useOnlyMostEnergeticECLCluster;  /**< If true, only the most energetic ECLCluster is used */
+
     DecayDescriptor m_decaydescriptor; /**< Decay descriptor for parsing the user specified DecayString */
+    int m_properties; /**< Particle property to be assigned only on V0s. Flags are defined in Particle::PropertyFlags */
 
     std::vector<std::string> m_decayStrings; /**< Input decay strings specifying the particles being created/loaded */
 
@@ -186,6 +206,7 @@ namespace Belle2 {
     std::vector<PList>
     m_ECLKLMClusters2Plists; /**< Collection of PLists that will collect Particles created from ECLClusters and KLMClusters */
     std::vector<PList> m_Dummies2Plists; /**< Collection of PLists that will collect Particles created from Dummies */
+    std::vector<PList> m_ChargedCluster2Plists; /**< Collection of PLists that will collect Particles created from charged-cluster */
 
 
     bool m_writeOut;  /**< toggle particle list btw. transient/persistent */

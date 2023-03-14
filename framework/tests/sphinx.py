@@ -41,6 +41,8 @@ if __name__ == "__main__":
     ignoreincludeproblem = 'Problems with "include" directive path'
     #: ignore missing track matching link
     ignoretrackmatching = 'trk_matching'
+    #: ignore missing tracking_eventtimeextraction
+    ignoretrackingeventtimeextraction = 'tracking_eventtimeextraction'
 
     check_error_free("b2code-sphinx-warnings", "sphinx", None,
                      lambda x:
@@ -51,7 +53,8 @@ if __name__ == "__main__":
                      re.findall(ignorevalidationtools, x) or
                      re.findall(ignoreincludeproblem, x) or
                      re.findall(ignoreonlinebook, x) or
-                     re.findall(ignoretrackmatching, x),
+                     re.findall(ignoretrackmatching, x) or
+                     re.findall(ignoretrackingeventtimeextraction, x),
                      ['--light']
                      )
     if not light_build:

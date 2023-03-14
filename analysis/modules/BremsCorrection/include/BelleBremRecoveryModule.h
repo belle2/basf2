@@ -52,6 +52,11 @@ namespace Belle2 {
      */
     virtual void event() override;
 
+    /**
+     * Correct lepton kinematics using the selectedGammas. Create a new Particle and add it into the output ParticleList.
+     */
+    void correctLepton(const Particle* lepton, std::vector<Particle*> selectedGammas);
+
     enum {c_DimMatrix = 7};
 
   private:
@@ -74,6 +79,7 @@ namespace Belle2 {
     double m_angleThres; /**< input max angle to be accepted (in radian) */
     bool m_writeOut;  /**< toggle output particle list btw. transient/writeOut */
     bool m_isMultiPho; /**<multiple or one bremphoton addition option  */
+    bool m_usePhotonOnlyOnce; /**< Each brems photon can be used to correct only one particle (the one with the smallest relation weight) */
   };
 
 } // Belle2 namespace

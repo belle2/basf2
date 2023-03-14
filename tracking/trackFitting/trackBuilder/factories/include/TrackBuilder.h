@@ -8,7 +8,7 @@
 #pragma once
 
 #include <string>
-#include <TVector3.h>
+#include <framework/geometry/B2Vector3.h>
 
 namespace Belle2 {
 
@@ -48,8 +48,8 @@ namespace Belle2 {
       const std::string& trackColName,
       const std::string& trackFitResultColName,
       const std::string& mcParticleColName,
-      const TVector3& beamSpot = TVector3(0., 0., 0.),
-      const TVector3& beamAxis = TVector3(0., 0., 1.)
+      const B2Vector3D& beamSpot = B2Vector3D(0., 0., 0.),
+      const B2Vector3D& beamAxis = B2Vector3D(0., 0., 1.)
     ) :
       m_trackColName(trackColName),
       m_trackFitResultColName(trackFitResultColName),
@@ -89,9 +89,9 @@ namespace Belle2 {
     /// MCParticleColName (input, optional).
     std::string m_mcParticleColName;
     ///  Extrapolation target, origin.
-    TVector3 m_beamSpot;
+    B2Vector3D m_beamSpot;
     ///  Extrapolation target, positive z direction.
-    TVector3 m_beamAxis;
+    B2Vector3D m_beamAxis;
   };
 
 }

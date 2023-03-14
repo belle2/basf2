@@ -15,16 +15,17 @@ using namespace Belle2;
 hitXPDerivate::hitXPDerivate(const SVDTrueHit& hit, const SVDCluster& cluster, const MCParticle& particle,
                              const VXD::SensorInfoBase& sensor)
 {
-  m_positionMid = sensor.pointToGlobal(TVector3(hit.getU(), hit.getV(), hit.getW()), false); /** position at midpoint */
-  m_positionEntry = sensor.pointToGlobal(TVector3(hit.getEntryU(), hit.getEntryV(), hit.getEntryW()),
+  m_positionMid = sensor.pointToGlobal(ROOT::Math::XYZVector(hit.getU(), hit.getV(), hit.getW()), false); /** position at midpoint */
+  m_positionEntry = sensor.pointToGlobal(ROOT::Math::XYZVector(hit.getEntryU(), hit.getEntryV(), hit.getEntryW()),
                                          false); /** position at entrypoint */
-  m_positionExit = sensor.pointToGlobal(TVector3(hit.getExitU(), hit.getExitV(), hit.getExitW()), false); /** position at exitpoint */
+  m_positionExit = sensor.pointToGlobal(ROOT::Math::XYZVector(hit.getExitU(), hit.getExitV(), hit.getExitW()),
+                                        false); /** position at exitpoint */
   m_momentumMid = sensor.vectorToGlobal(hit.getMomentum(), false); /** momentum ad midpoint */
   m_momentumEntry = sensor.vectorToGlobal(hit.getEntryMomentum(), false); /** momentum at entrypoint */
   m_momentumExit = sensor.vectorToGlobal(hit.getExitMomentum(), false); /** momentum at exitpoint */
-  m_positionLocalMid = TVector3(hit.getU(), hit.getV(), hit.getW()); /** local position at midpoint */
-  m_positionLocalEntry = TVector3(hit.getEntryU(), hit.getEntryV(), hit.getEntryW()); /** local position at entrypoint */
-  m_positionLocalExit = TVector3(hit.getExitU(), hit.getExitV(), hit.getExitW()); /** local position at exitpoint */
+  m_positionLocalMid = ROOT::Math::XYZVector(hit.getU(), hit.getV(), hit.getW()); /** local position at midpoint */
+  m_positionLocalEntry = ROOT::Math::XYZVector(hit.getEntryU(), hit.getEntryV(), hit.getEntryW()); /** local position at entrypoint */
+  m_positionLocalExit = ROOT::Math::XYZVector(hit.getExitU(), hit.getExitV(), hit.getExitW()); /** local position at exitpoint */
   m_momentumLocalMid = hit.getMomentum(); /** local momentum at midpoint */
   m_momentumLocalEntry = hit.getEntryMomentum(); /** local momentum ad entrypoint */
   m_momentumLocalExit = hit.getExitMomentum(); /** local momentum at exitpoint */
@@ -49,16 +50,17 @@ hitXPDerivate::hitXPDerivate(const SVDTrueHit& hit, const SVDCluster& cluster, c
 
 hitXPDerivate::hitXPDerivate(const PXDTrueHit& hit, const MCParticle& particle, const VXD::SensorInfoBase& sensor)
 {
-  m_positionMid = sensor.pointToGlobal(TVector3(hit.getU(), hit.getV(), hit.getW()), false); /** position at midpoint */
-  m_positionEntry = sensor.pointToGlobal(TVector3(hit.getEntryU(), hit.getEntryV(), hit.getEntryW()),
+  m_positionMid = sensor.pointToGlobal(ROOT::Math::XYZVector(hit.getU(), hit.getV(), hit.getW()), false); /** position at midpoint */
+  m_positionEntry = sensor.pointToGlobal(ROOT::Math::XYZVector(hit.getEntryU(), hit.getEntryV(), hit.getEntryW()),
                                          false); /** position at entrypoint */
-  m_positionExit = sensor.pointToGlobal(TVector3(hit.getExitU(), hit.getExitV(), hit.getExitW()), false); /** position at exitpoint */
+  m_positionExit = sensor.pointToGlobal(ROOT::Math::XYZVector(hit.getExitU(), hit.getExitV(), hit.getExitW()),
+                                        false); /** position at exitpoint */
   m_momentumMid = sensor.vectorToGlobal(hit.getMomentum(), false); /** momentum ad midpoint */
   m_momentumEntry = sensor.vectorToGlobal(hit.getEntryMomentum(), false); /** momentum at entrypoint */
   m_momentumExit = sensor.vectorToGlobal(hit.getExitMomentum(), false); /** momentum at exitpoint */
-  m_positionLocalMid = TVector3(hit.getU(), hit.getV(), hit.getW()); /** local position at midpoint */
-  m_positionLocalEntry = TVector3(hit.getEntryU(), hit.getEntryV(), hit.getEntryW()); /** local position at entrypoint */
-  m_positionLocalExit = TVector3(hit.getExitU(), hit.getExitV(), hit.getExitW()); /** local position at exitpoint */
+  m_positionLocalMid = ROOT::Math::XYZVector(hit.getU(), hit.getV(), hit.getW()); /** local position at midpoint */
+  m_positionLocalEntry = ROOT::Math::XYZVector(hit.getEntryU(), hit.getEntryV(), hit.getEntryW()); /** local position at entrypoint */
+  m_positionLocalExit = ROOT::Math::XYZVector(hit.getExitU(), hit.getExitV(), hit.getExitW()); /** local position at exitpoint */
   m_momentumLocalMid = hit.getMomentum(); /** local momentum at midpoint */
   m_momentumLocalEntry = hit.getEntryMomentum(); /** local momentum ad entrypoint */
   m_momentumLocalExit = hit.getExitMomentum(); /** local momentum at exitpoint */

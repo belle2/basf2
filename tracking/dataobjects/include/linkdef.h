@@ -7,7 +7,7 @@
 
 #pragma link C++ class Belle2::ExtHit+; // checksum=0x6b296224, version=8
 #pragma link C++ class Belle2::TrackClusterSeparation+; // checksum=0x8d25ce5e, version=3
-#pragma link C++ class Belle2::V0ValidationVertex+; // checksum=0xceabe91f, version=1
+#pragma link C++ class Belle2::V0ValidationVertex+; // checksum=0xce9006fc, version=2
 #pragma link C++ class Belle2::FullSecID+; // checksum=0xa4543536, version=-1
 
 #pragma link C++ class pair <bool, double>+; // checksum=0x90c0afc6, version=-1
@@ -27,16 +27,16 @@
 #pragma link C++ class Belle2::VXDIntercept+; // checksum=0xbb836403, version=1
 #pragma link C++ class Belle2::PXDIntercept+; // checksum=0x756ab835, version=2
 #pragma link C++ class Belle2::SVDIntercept+; // checksum=0x14d0197f, version=4
-#pragma link C++ class Belle2::RecoTrack+; // checksum=0xe65b7a8c, version=12
+#pragma link C++ class Belle2::RecoTrack+; // checksum=0xf8191917, version=14
 #pragma link C++ class Belle2::RecoHitInformation+; // checksum=0xcf616f27, version=6
-#pragma link C++ class Belle2::BremHit+; // checksum=0x56052b3a, version=1
+#pragma link C++ class Belle2::BremHit+; // checksum=0xc51e119f, version=2
 #pragma link C++ class Belle2::SectorMapConfig+; // checksum=0x4ef40736, version=2
-#pragma link C++ class Belle2::hitXP+; // checksum=0xdd9d6ff4, version=1
-#pragma link C++ class Belle2::hitXPDerivate+; // checksum=0xfa2e4b3c, version=1
+#pragma link C++ class Belle2::hitXP+; // checksum=0x30c07c0a, version=2
+#pragma link C++ class Belle2::hitXPDerivate+; // checksum=0x4d515752, version=2
 #pragma link C++ class std::vector<Belle2::hitXP>+; // checksum=0x26380ecc, version=6
 #pragma link C++ class std::vector<Belle2::hitXPDerivate>+; // checksum=0x82b91048, version=6
 
-#pragma link C++ class Belle2::SpacePointInfo+; // checksum=0xa7b6f75a, version=1
+#pragma link C++ class Belle2::SpacePointInfo+; // checksum=0xb7462bee, version=2
 #pragma link C++ class Belle2::FilterInfo+; // checksum=0xc33c4990, version=1
 #pragma link C++ class std::vector<Belle2::FilterInfo>+; // checksum=0x4718205b, version=6
 #pragma link C++ class std::vector<Belle2::SpacePointInfo>+; // checksum=0x8273c275, version=6
@@ -110,3 +110,177 @@
   sourceClass="Belle2::TrackClusterSeparation" source="double m_TrackRotationAngle" version="[-2]" \
   targetClass="Belle2::TrackClusterSeparation" target="m_TrackRotationAngle" \
   code = "{ m_TrackRotationAngle = onfile.m_TrackRotationAngle; }"
+
+// V0ValidationVertex evolution
+// In version 2- (1)
+//   o   m_fittedVertexPosition is of type ROOT::Math::XYZVector (TVector3)
+#pragma read \
+  sourceClass="Belle2::V0ValidationVertex" source="TVector3 m_fittedVertexPosition" version="[-1]" \
+  targetClass="Belle2::V0ValidationVertex" target="m_fittedVertexPosition" \
+  code = "{ \
+            m_fittedVertexPosition.SetXYZ(onfile.m_fittedVertexPosition.X(), \
+                                          onfile.m_fittedVertexPosition.Y(), \
+                                          onfile.m_fittedVertexPosition.Z()); \
+          }"
+
+// BremHit evolution
+// In version 2- (1)
+//   o   m_position is of type ROOT::Math::XYZVector (TVector3)
+#pragma read \
+  sourceClass="Belle2::BremHit" source="TVector3 m_position" version="[-1]" \
+  targetClass="Belle2::BremHit" target="m_position" \
+  code = "{ \
+            m_position.SetXYZ(onfile.m_position.X(), \
+                              onfile.m_position.Y(), \
+                              onfile.m_position.Z()); \
+          }"
+
+// SpacePointInfo evolution
+// In version 2- (1)
+//   o   m_position is of type ROOT::Math::XYZVector (TVector3)
+//   o   m_positionError is of type ROOT::Math::XYZVector (TVector3)
+#pragma read \
+  sourceClass="Belle2::SpacePointInfo" source="TVector3 m_position" version="[-1]" \
+  targetClass="Belle2::SpacePointInfo" target="m_position" \
+  code = "{ \
+            m_position.SetXYZ(onfile.m_position.X(), \
+                              onfile.m_position.Y(), \
+                              onfile.m_position.Z()); \
+          }"
+#pragma read \
+  sourceClass="Belle2::SpacePointInfo" source="TVector3 m_positionError" version="[-1]" \
+  targetClass="Belle2::SpacePointInfo" target="m_positionError" \
+  code = "{ \
+            m_positionError.SetXYZ(onfile.m_positionError.X(), \
+                                   onfile.m_positionError.Y(), \
+                                   onfile.m_positionError.Z()); \
+          }"
+
+// hitXP evolution
+// In version 2- (1)
+//   o   m_position is of type ROOT::Math::XYZVector (TVector3)
+//   o   m_positionEntry is of type ROOT::Math::XYZVector (TVector3)
+//   o   m_positionExit is of type ROOT::Math::XYZVector (TVector3)
+//   o   m_momentumMid is of type ROOT::Math::XYZVector (TVector3)
+//   o   m_momentumEntry is of type ROOT::Math::XYZVector (TVector3)
+//   o   m_momentumExit is of type ROOT::Math::XYZVector (TVector3)
+//   o   m_positionLocalMid is of type ROOT::Math::XYZVector (TVector3)
+//   o   m_positionLocalEntry is of type ROOT::Math::XYZVector (TVector3)
+//   o   m_positionLocalExit is of type ROOT::Math::XYZVector (TVector3)
+//   o   m_momentumLocalMid is of type ROOT::Math::XYZVector (TVector3)
+//   o   m_momentumLocalEntry is of type ROOT::Math::XYZVector (TVector3)
+//   o   m_momentumLocalExit is of type ROOT::Math::XYZVector (TVector3)
+//   o   m_position0 is of type ROOT::Math::XYZVector (TVector3)
+//   o   m_momentum0 is of type ROOT::Math::XYZVector (TVector3)
+#pragma read \
+  sourceClass="Belle2::hitXP" source="TVector3 m_positionMid" version="[-1]" \
+  targetClass="Belle2::hitXP" target="m_positionMid" \
+  code = "{ \
+            m_positionMid.SetXYZ(onfile.m_positionMid.X(), \
+                                 onfile.m_positionMid.Y(), \
+                                 onfile.m_positionMid.Z()); \
+          }"
+#pragma read \
+  sourceClass="Belle2::hitXP" source="TVector3 m_positionEntry" version="[-1]" \
+  targetClass="Belle2::hitXP" target="m_positionEntry" \
+  code = "{ \
+            m_positionEntry.SetXYZ(onfile.m_positionEntry.X(), \
+                                   onfile.m_positionEntry.Y(), \
+                                   onfile.m_positionEntry.Z()); \
+          }"
+#pragma read \
+  sourceClass="Belle2::hitXP" source="TVector3 m_positionExit" version="[-1]" \
+  targetClass="Belle2::hitXP" target="m_positionExit" \
+  code = "{ \
+            m_positionExit.SetXYZ(onfile.m_positionExit.X(), \
+                                  onfile.m_positionExit.Y(), \
+                                  onfile.m_positionExit.Z()); \
+          }"
+#pragma read \
+  sourceClass="Belle2::hitXP" source="TVector3 m_momentumMid" version="[-1]" \
+  targetClass="Belle2::hitXP" target="m_momentumMid" \
+  code = "{ \
+            m_momentumMid.SetXYZ(onfile.m_momentumMid.X(), \
+                                 onfile.m_momentumMid.Y(), \
+                                 onfile.m_momentumMid.Z()); \
+          }"
+#pragma read \
+  sourceClass="Belle2::hitXP" source="TVector3 m_momentumEntry" version="[-1]" \
+  targetClass="Belle2::hitXP" target="m_momentumEntry" \
+  code = "{ \
+            m_momentumEntry.SetXYZ(onfile.m_momentumEntry.X(), \
+                                   onfile.m_momentumEntry.Y(), \
+                                   onfile.m_momentumEntry.Z()); \
+          }"
+#pragma read \
+  sourceClass="Belle2::hitXP" source="TVector3 m_momentumExit" version="[-1]" \
+  targetClass="Belle2::hitXP" target="m_momentumExit" \
+  code = "{ \
+            m_momentumExit.SetXYZ(onfile.m_momentumExit.X(), \
+                                  onfile.m_momentumExit.Y(), \
+                                  onfile.m_momentumExit.Z()); \
+          }"
+#pragma read \
+  sourceClass="Belle2::hitXP" source="TVector3 m_positionLocalMid" version="[-1]" \
+  targetClass="Belle2::hitXP" target="m_positionLocalMid" \
+  code = "{ \
+            m_positionLocalMid.SetXYZ(onfile.m_positionLocalMid.X(), \
+                                      onfile.m_positionLocalMid.Y(), \
+                                      onfile.m_positionLocalMid.Z()); \
+          }"
+#pragma read \
+  sourceClass="Belle2::hitXP" source="TVector3 m_positionLocalEntry" version="[-1]" \
+  targetClass="Belle2::hitXP" target="m_positionLocalEntry" \
+  code = "{ \
+            m_positionLocalEntry.SetXYZ(onfile.m_positionLocalEntry.X(), \
+                                        onfile.m_positionLocalEntry.Y(), \
+                                        onfile.m_positionLocalEntry.Z()); \
+          }"
+#pragma read \
+  sourceClass="Belle2::hitXP" source="TVector3 m_positionLocalExit" version="[-1]" \
+  targetClass="Belle2::hitXP" target="m_positionLocalExit" \
+  code = "{ \
+            m_positionLocalExit.SetXYZ(onfile.m_positionLocalExit.X(), \
+                                       onfile.m_positionLocalExit.Y(), \
+                                       onfile.m_positionLocalExit.Z()); \
+          }"
+#pragma read \
+  sourceClass="Belle2::hitXP" source="TVector3 m_momentumLocalMid" version="[-1]" \
+  targetClass="Belle2::hitXP" target="m_momentumLocalMid" \
+  code = "{ \
+            m_momentumLocalMid.SetXYZ(onfile.m_momentumLocalMid.X(), \
+                                      onfile.m_momentumLocalMid.Y(), \
+                                      onfile.m_momentumLocalMid.Z()); \
+          }"
+#pragma read \
+  sourceClass="Belle2::hitXP" source="TVector3 m_momentumLocalEntry" version="[-1]" \
+  targetClass="Belle2::hitXP" target="m_momentumLocalEntry" \
+  code = "{ \
+            m_momentumLocalEntry.SetXYZ(onfile.m_momentumLocalEntry.X(), \
+                                        onfile.m_momentumLocalEntry.Y(), \
+                                        onfile.m_momentumLocalEntry.Z()); \
+          }"
+#pragma read \
+  sourceClass="Belle2::hitXP" source="TVector3 m_momentumLocalExit" version="[-1]" \
+  targetClass="Belle2::hitXP" target="m_momentumLocalExit" \
+  code = "{ \
+            m_momentumLocalExit.SetXYZ(onfile.m_momentumLocalExit.X(), \
+                                       onfile.m_momentumLocalExit.Y(), \
+                                       onfile.m_momentumLocalExit.Z()); \
+          }"
+#pragma read \
+  sourceClass="Belle2::hitXP" source="TVector3 m_position0" version="[-1]" \
+  targetClass="Belle2::hitXP" target="m_position0" \
+  code = "{ \
+            m_position0.SetXYZ(onfile.m_position0.X(), \
+                               onfile.m_position0.Y(), \
+                               onfile.m_position0.Z()); \
+          }"
+#pragma read \
+  sourceClass="Belle2::hitXP" source="TVector3 m_momentum0" version="[-1]" \
+  targetClass="Belle2::hitXP" target="m_momentum0" \
+  code = "{ \
+            m_momentum0.SetXYZ(onfile.m_momentum0.X(), \
+                               onfile.m_momentum0.Y(), \
+                               onfile.m_momentum0.Z()); \
+          }"

@@ -38,7 +38,6 @@
 #include <framework/gearbox/Const.h>
 
 #include <TMatrixDSym.h>
-#include <TVector3.h>
 
 #include <ostream>
 

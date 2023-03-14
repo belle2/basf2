@@ -13,8 +13,8 @@ import struct
 import pdg
 import basf2
 import pybasf2
+import uproot
 
-# inspect is also used by LogPythonInterface. Do not remove
 import numpy as np
 
 
@@ -53,16 +53,19 @@ class DecayHashMap:
 
     def __init__(self, rootfile, removeRadiativeGammaFlag=False):
         """Constructor"""
-        import root_numpy  # noqa
         # Always avoid the top-level 'import ROOT'.
         import ROOT  # noqa
-        ntuple = root_numpy.root2array(rootfile)
+        with uproot.open(rootfile) as rf:
+            trees = rf.keys()
+            assert len(trees) == 1
+            ntuple = rf[trees[0]].arrays(library='np')
         # self._removeGammaFlag = removeRadiativeGammaFlag
         #: Dict Int -> DecayStrings
         self._string = {}
         #: Dict Int -> Reconstructed DecayTree
         self._forest = {}
-        for decayHash, decayHashExtended, decayString in ntuple:
+        for decayHash, decayHashExtended, decayString in zip(
+                ntuple['decayHash'], ntuple['decayHashExtended'], ntuple['decayString']):
             decayInt = ROOT.Belle2.DecayForest.decayHashFloatToInt(decayHash, decayHashExtended)
             if decayInt in self._string:
                 continue

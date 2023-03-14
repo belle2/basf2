@@ -17,7 +17,7 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
 #include <analysis/dataobjects/ParticleList.h>
-#include <analysis/dataobjects/EventExtraInfo.h>
+#include <framework/dataobjects/EventExtraInfo.h>
 #include <analysis/dataobjects/RestOfEvent.h>
 #include <analysis/utility/ReferenceFrame.h>
 #include <framework/datastore/StoreArray.h>
@@ -66,7 +66,7 @@ namespace {
       DataStore::Instance().setInitializeActive(false);
 
       TestUtilities::TestParticleFactory factory;
-      B2Vector3D ipposition(0, 0, 0);
+      ROOT::Math::XYZVector ipposition(0, 0, 0);
       ROOT::Math::PxPyPzEVector b0momentum(3, 0, 0, 5);
       factory.produceParticle(string("^B0 -> [^K*0 -> [^K_S0 -> ^pi+ ^pi-] [^pi0 -> ^gamma ^gamma]] ^e+ ^e-"),
                               b0momentum, ipposition);

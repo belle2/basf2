@@ -1,0 +1,81 @@
+# EventType: 1163340002
+# Descriptor: [B0 -> [D*+ -> [D0 -> K- pi+ pi+ pi-] pi-] [tau -> l nu nu] nu]cc
+# NickName: Bd_Dst+taunu
+# Documentation: B0 -> D*+ tau nu, D*+ -> D0 pi+, D0 -> K- pi+ pi+ pi-, tau -> e(mu) nu nu, background mode for inclusive tagging R(D(*)).
+# Dominant channel: anti-B0 -> D*+(->D0(->a1+(-> rho0 pi+) K-) pi+) tau-(-> l- nu anti-nu) anti-nu
+# Tested: Yes
+# PhysicsWG: SL
+# Responsible: Tia Crane
+# Email: tcrane@hawaii.edu 
+# Cuts: None
+# Date: 20221017
+
+Alias K*0sig K*0
+Alias anti-K*0sig anti-K*0
+ChargeConj K*0sig anti-K*0sig
+
+Alias K_1-sig K_1-
+Alias K_1+sig K_1+
+ChargeConj K_1-sig K_1+sig
+
+Alias a_1-sig a_1-
+Alias a_1+sig a_1+
+ChargeConj a_1-sig a_1+sig
+
+yesPhotos
+
+Decay Upsilon(4S)
+1.0            B0  anti-B0  B0sig  anti-B0sig                    VSS_BMIX dm;
+Enddecay
+
+
+Decay anti-B0sig
+1.0            D*+sig  tau-sig  anti-nu_tau                      HQET3 0.912 1.205 1.15 1.404 0.854;
+Enddecay
+CDecay B0sig
+
+
+Decay D*+sig
+1.0            D0sig  pi+                                        VSS;
+Enddecay
+CDecay D*-sig
+
+
+Decay D0sig
+0.005328       K-  rho0  pi+                                     PHSP;
+0.0158         anti-K*0sig  rho0                                 SVV_HELAMP  1.0 0.0 1.0 0.0 1.0 0.0;
+0.043          a_1+sig  K-                                       SVS;
+0.016          K_1-sig  pi+                                      SVS;
+0.0088         K-  pi+  pi+  pi-                                 PHSP;
+Enddecay
+CDecay anti-D0sig
+
+
+Decay K_1+sig
+0.140000000    rho0  K+                                          VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
+0.106700000    K*0sig  pi+                                       VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
+0.144400000    K+  pi+  pi-                                      PHSP;
+Enddecay
+CDecay K_1-sig
+
+
+Decay K*0sig
+1.0            K+  pi-                                           VSS;
+Enddecay
+CDecay anti-K*0sig
+
+
+Decay a_1+sig
+1.0            rho0  pi+                                         VVS_PWAVE .9788 0.0 0.0 0.0 .0212 0.0;
+Enddecay
+CDecay a_1-sig
+
+
+Decay tau-sig
+0.178175       e-           anti-nu_e      nu_tau                TAULNUNU;
+0.173937       mu-          anti-nu_mu     nu_tau                TAULNUNU;
+Enddecay
+CDecay tau+sig
+
+
+End

@@ -28,6 +28,7 @@
 #include "trg/cdc/TrackSegmentFinder.h"
 #include "framework/datastore/StoreArray.h"
 #include "framework/datastore/RelationArray.h"
+#include <framework/geometry/B2Vector3.h>
 #include "cdc/dataobjects/CDCSimHit.h"
 #include "mdst/dataobjects/MCParticle.h"
 #include "trg/cdc/FrontEnd.h"
@@ -253,7 +254,7 @@ namespace Belle2 {
         }
 
         bool priority1rise = (*Hitmap)[6].riseEdge(changeTime[i]);
-        bool priority2rise = ((*Hitmap)[7].riseEdge(changeTime[i]) |
+        bool priority2rise = ((*Hitmap)[7].riseEdge(changeTime[i]) or
                               (*Hitmap)[8].riseEdge(changeTime[i]));
 
         /// output for Tracker & N.N
@@ -307,7 +308,8 @@ namespace Belle2 {
     result.push_back(resultT);
     result.push_back(resultE);
 
-    delete [] LUTValue;
+    // cppcheck-suppress uninitdata
+    delete[] LUTValue;
     delete Hitmap;
 
     return result;
@@ -445,8 +447,8 @@ namespace Belle2 {
       // Find L/R, phi of priority wires
       vector<int> priorityLRs(3);
       vector<float> priorityPhis(3);
-      TVector3 posOnTrack;
-      TVector3 posOnWire;
+      B2Vector3D posOnTrack;
+      B2Vector3D posOnWire;
       if (priority->hit() != 0) {
         int iSimHit = priority->hit()->iCDCSimHit();
         priorityLRs[0] = SimHits[iSimHit]->getPosFlag();
@@ -647,7 +649,7 @@ namespace Belle2 {
         bitset<9> hitSuperLayers(particleNHitTS[iMCParticle]);
         int numberHitSuperLayers = hitSuperLayers.count();
         //cout<<"iMCParticle: "<< iMCParticle << " # hit TS: "<<numberHitSuperLayers<<" MC # TS: "<<lastSLHit<<endl;
-        float mcPt = mcParticles[iMCParticle]->getMomentum().Perp();
+        float mcPt = mcParticles[iMCParticle]->getMomentum().Rho();
         float efficiency;
         if (lastSLHit == 0) efficiency = -1;
         else efficiency = float(numberHitSuperLayers) / lastSLHit;
@@ -1104,7 +1106,7 @@ namespace Belle2 {
         }
 
         bool priority1rise = (*Hitmap)[6].riseEdge(changeTime[i]);
-        bool priority2rise = ((*Hitmap)[7].riseEdge(changeTime[i]) |
+        bool priority2rise = ((*Hitmap)[7].riseEdge(changeTime[i]) or
                               (*Hitmap)[8].riseEdge(changeTime[i]));
 
         /// output for Tracker & N.N
@@ -1160,7 +1162,8 @@ namespace Belle2 {
     result.push_back(resultT);
     result.push_back(resultE);
 
-    delete [] LUTValue;
+    // cppcheck-suppress uninitdata
+    delete[] LUTValue;
     delete Hitmap;
 
     return result;
@@ -2503,7 +2506,7 @@ namespace Belle2 {
         }
 
         bool priority1rise = pri0->riseEdge(ct);
-        bool priority2rise = pri1->riseEdge(ct) | pri2->riseEdge(ct);
+        bool priority2rise = pri1->riseEdge(ct) or pri2->riseEdge(ct);
 
         /// output for Tracker & N.N
         //ready for output
@@ -2572,7 +2575,8 @@ namespace Belle2 {
     result.push_back(resultT);
     result.push_back(resultE);
 
-    delete [] LUTValue;
+    // cppcheck-suppress uninitdata
+    delete[] LUTValue;
     delete Hitmap;
 
     return result;
@@ -2688,7 +2692,7 @@ namespace Belle2 {
         }
 
         bool priority1rise = pri0->riseEdge(ct);
-        bool priority2rise = pri1->riseEdge(ct) | pri2->riseEdge(ct);
+        bool priority2rise = pri1->riseEdge(ct) or pri2->riseEdge(ct);
 
         /// output for Tracker & N.N
         //ready for output
@@ -2786,7 +2790,7 @@ namespace Belle2 {
         if (found3 && (lv[i] == 3))
           cout << "!!! simulateTSF something wrong(found3)" << endl;
 
-        if ((lv[i] == 1) & (lv[i] == 2))
+        if ((lv[i] == 1) or (lv[i] == 2))
           found1or2 = true;
         else if (lv[i] == 3)
           found3 = true;
@@ -2796,7 +2800,8 @@ namespace Belle2 {
     result.push_back(resultT);
     result.push_back(resultE);
 
-    delete [] LUTValue;
+    // cppcheck-suppress uninitdata
+    delete[] LUTValue;
     delete Hitmap;
 
     return result;

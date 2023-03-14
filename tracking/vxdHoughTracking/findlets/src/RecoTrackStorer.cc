@@ -119,8 +119,8 @@ void RecoTrackStorer::apply(std::vector<SpacePointTrackCand>& finishedResults,
     auto sortedHits = thisSPTC.getSortedHits();
     const auto& estimatorResult = m_estimator->estimateQualityAndProperties(sortedHits);
 
-    const TVector3& trackPosition = TVector3(sortedHits.front()->X(), sortedHits.front()->Y(), sortedHits.front()->Z());
-    const TVector3& trackMomentum = *estimatorResult.p;
+    const ROOT::Math::XYZVector trackPosition(sortedHits.front()->X(), sortedHits.front()->Y(), sortedHits.front()->Z());
+    const ROOT::Math::XYZVector& trackMomentum = *estimatorResult.p;
     const short& trackChargeSeed = estimatorResult.curvatureSign ? -1 * (*(estimatorResult.curvatureSign)) : 0;
     const double qi = estimatorResult.qualityIndicator;
 

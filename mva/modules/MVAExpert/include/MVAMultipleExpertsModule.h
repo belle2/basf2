@@ -17,7 +17,7 @@
 #include <framework/database/DBObjPtr.h>
 
 #include <analysis/VariableManager/Manager.h>
-#include <analysis/dataobjects/EventExtraInfo.h>
+#include <framework/dataobjects/EventExtraInfo.h>
 
 #include <vector>
 #include <string>
@@ -108,8 +108,8 @@ namespace Belle2 {
 
     std::vector<std::unique_ptr<MVA::SingleDataset>> m_datasets; /**< Vector of pointers to the current input datasets */
 
-    std::vector<bool>
-    m_overwriteExistingExtraInfo; /**< if true, when the given extraInfo is already defined, the old extraInfo value is overwritten */
+    std::vector<int>
+    m_overwriteExistingExtraInfo; /**< vector of -1/0/1/2: overwrite if lower/ don't overwrite / overwrite if higher/ always overwrite, in case the given extraInfo for the corresponding method is already defined. */
     std::vector<bool> m_existGivenExtraInfo; /**< check if the given extraInfo is already defined. */
 
     std::vector<unsigned int>

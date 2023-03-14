@@ -33,7 +33,6 @@ namespace Belle2 {
 
   using Eigen::VectorXd;
   using Eigen::MatrixXd;
-  using namespace std;
 
 
 //return values of -2*log(p(x)), where p(x) is normalized to 1 over the fitted range
@@ -124,7 +123,7 @@ namespace Belle2 {
 
 
 // get data transformed into the grid such that (chebFunVals dot m_dataGrid) == logL
-  pair<VectorXd, MatrixXd> ChebFitter::getDataGridWithCov() const
+  std::pair<VectorXd, MatrixXd> ChebFitter::getDataGridWithCov() const
   {
     double a = m_nodes[0];
     double b = m_nodes[m_nodes.size() - 1];
@@ -144,12 +143,12 @@ namespace Belle2 {
     VectorXd gridVals = coefs * polSum;
     MatrixXd gridValsCov = coefs * polSum2 * coefs.transpose();
 
-    return make_pair(gridVals, gridValsCov);
+    return std::make_pair(gridVals, gridValsCov);
   }
 
 
 //Minimize using ROOT minimizer
-  pair<Pars, MatrixXd> ChebFitter::fitData(Pars pars, Limits limits, bool UseCheb)
+  std::pair<Pars, MatrixXd> ChebFitter::fitData(Pars pars, Limits limits, bool UseCheb)
   {
     m_useCheb = UseCheb;
 
@@ -172,7 +171,7 @@ namespace Belle2 {
     m_parNames.clear();
     int k = 0;
     for (auto p : pars) {
-      string n    = p.first;
+      std::string n    = p.first;
       double vCnt = p.second;
       if (limits.count(n) == 1) {
         double vMin = limits.at(n).first;
@@ -207,7 +206,7 @@ namespace Belle2 {
         covMat(i, j) = minimum->CovMatrix(i, j);
 
     // print pars
-    stringstream log;
+    std::stringstream log;
     log << "Minuit status : " << minimum->Status() << ", ";
     for (auto p : parsF)
       log << "\"" << p.first << "\" : " << p.second << ", ";
@@ -216,7 +215,7 @@ namespace Belle2 {
 
     delete minimum;
 
-    return make_pair(parsF, covMat);
+    return std::make_pair(parsF, covMat);
   }
 
 

@@ -9,8 +9,10 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <TTree.h>
+#include <framework/datastore/StoreArray.h>
+#include <mdst/dataobjects/MCParticle.h>
 #include <tracking/dataobjects/hitXP.h>
+#include <TTree.h>
 #include <TFile.h>
 
 #include <set>
@@ -123,6 +125,8 @@ namespace Belle2 {
     std::vector<double> m_EtanlambdaEntry; /**< external tanlambda parameter at entry point */
     std::vector<double> m_Etanlambda0; /**< external tanlambda parameter at IP */
     int m_Eprimary = 0; /**< external flag for primary particles */
+
+    StoreArray<MCParticle> m_MCParticles;   /**< MCParticles StoreArray */
 
   protected:
 

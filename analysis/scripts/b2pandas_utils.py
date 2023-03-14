@@ -109,6 +109,8 @@ class VariablesToHDF5(basf2.Module):
         """save and close the output"""
         self._table.flush()
         self._hdf5file.close()
+        import ROOT
+        ROOT.Belle2.MetadataService.Instance().addHDF5File(self._filename)
 
 
 def make_mcerrors_readable(dataframe, column="mcErrors"):

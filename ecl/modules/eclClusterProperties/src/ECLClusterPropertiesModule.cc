@@ -85,7 +85,7 @@ double ECLClusterPropertiesModule::computeTrkMinDistance(const ECLShower& shower
       if (abs(extHit.getPdgCode()) != pdgCode) continue;
       if ((extHit.getDetectorID() !=  Const::EDetector::ECL)) continue;
       if (extHit.getCopyID() == -1) continue;
-      trkpos = extHit.getPosition();
+      trkpos = extHit.getPositionTVector3();
       double distance = (cryCenter - trkpos).Mag();
       if (distance < minDist) {
         trackID = track.getArrayIndex();
@@ -121,7 +121,7 @@ void ECLClusterPropertiesModule::computeDepth(const ECLShower& shower, double& l
   for (const auto& track : cluster->getRelationsFrom<Track>("", m_trackClusterRelationName)) {
     const TrackFitResult* fit = track.getTrackFitResultWithClosestMass(Const::pion);
     double cp = 0;
-    if (fit != 0) cp = fit->getMomentum().Mag();
+    if (fit != 0) cp = fit->getMomentum().R();
     if (cp > p) {
       selectedTrk = &track;
       p = cp;
@@ -133,8 +133,8 @@ void ECLClusterPropertiesModule::computeDepth(const ECLShower& shower, double& l
     if ((extHit.getDetectorID() !=  Const::EDetector::ECL)) continue;
     if (extHit.getStatus() != EXT_ENTER) continue;
     if (extHit.getCopyID() == -1) continue;
-    trkpos = extHit.getPosition();
-    trkdir = extHit.getMomentum().Unit();
+    trkpos = extHit.getPositionTVector3();
+    trkdir = extHit.getMomentumTVector3().Unit();
     found = true;
     break;
   }

@@ -5,24 +5,22 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//This module
+
+/* Own header. */
 #include <ecl/modules/eclTrackCalDigitMatch/ECLTrackCalDigitMatchModule.h>
 
-//Framework
-#include <framework/logging/Logger.h>
+/* ECL headers. */
+#include <ecl/dataobjects/ECLCalDigit.h>
+#include <ecl/dataobjects/ECLElementNumbers.h>
+#include <ecl/geometry/ECLGeometryPar.h>
+
+/* Basf2 headers. */
+#include <analysis/dataobjects/ECLEnergyCloseToTrack.h>
 #include <framework/dataobjects/Helix.h>
 #include <framework/gearbox/Const.h>
-
-//MDST
-#include <mdst/dataobjects/TrackFitResult.h>
+#include <framework/logging/Logger.h>
 #include <mdst/dataobjects/Track.h>
-
-//ECL
-#include <ecl/geometry/ECLGeometryPar.h>
-#include <ecl/dataobjects/ECLCalDigit.h>
-
-//Analysis
-#include <analysis/dataobjects/ECLEnergyCloseToTrack.h>
+#include <mdst/dataobjects/TrackFitResult.h>
 
 using namespace Belle2;
 using namespace std;
@@ -97,7 +95,7 @@ void ECLTrackCalDigitMatchModule::initialize()
                       };
   }
 
-  m_eclCalDigitsArray.resize(8736 + 1);
+  m_eclCalDigitsArray.resize(ECLElementNumbers::c_NCrystals + 1);
 }
 
 void ECLTrackCalDigitMatchModule::event()
@@ -140,8 +138,8 @@ void ECLTrackCalDigitMatchModule::event()
 
     B2DEBUG(50, lHelixRadius << " " << lFWD << " " << lBWD << " -> " << l);
 
-    TVector3 posHelix = h.getPositionAtArcLength2D(l);
-    const double exttheta = atan2(posHelix.Perp(), posHelix.Z());
+    ROOT::Math::XYZVector posHelix = h.getPositionAtArcLength2D(l);
+    const double exttheta = atan2(posHelix.Rho(), posHelix.Z());
     const double extphi = atan2(posHelix.Y(), posHelix.X());
 
     // check if the extrapolation reaches the requested radius

@@ -16,7 +16,7 @@
 #include <klm/eklm/geometry/GeometryData.h>
 #include <klm/eklm/geometry/TransformData.h>
 
-/* Belle 2 headers */
+/* Basf2 headers */
 #include <calibration/CalibrationCollectorModule.h>
 #include <framework/dataobjects/EventT0.h>
 #include <framework/datastore/StoreArray.h>
@@ -88,10 +88,7 @@ namespace Belle2 {
       KLMChannelNumber channelID, std::multimap<unsigned int, ExtHit>&);
 
     /** Save position difference betwen matched kLMHit and ExtHit. */
-    void storeDistDiff(TVector3&);
-
-    /** Debug flag. Not used currently. */
-    bool m_Debug;
+    void storeDistDiff(ROOT::Math::XYZVector&);
 
     /** Use event T0 or not. */
     bool m_useEvtT0;

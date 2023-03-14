@@ -3,7 +3,7 @@
 # NickName: B0_3KS_6pi+pi-
 # Documentation: Decay mode for sensitivity studies
 # Tested: Yes
-# PhysicsWG: TDPCV
+# PhysicsWG: TDCPV
 # Responsible: Alessandro Gaz
 # Email: gaz@hepl.phys.nagoya-u.ac.jp
 # Cuts: None
@@ -12,12 +12,8 @@
 #
 #
 #
-Alias      K_S0sig1  K_S0
-ChargeConj K_S0sig1  K_S0sig1
-Alias      K_S0sig2  K_S0
-ChargeConj K_S0sig2  K_S0sig2
-Alias      K_S0sig3  K_S0
-ChargeConj K_S0sig3  K_S0sig3
+Alias      K_S0sig  K_S0
+ChargeConj K_S0sig  K_S0sig
 #
 #
 Decay Upsilon(4S)
@@ -25,17 +21,11 @@ Decay Upsilon(4S)
 Enddecay
 #
 Decay B0sig
-1.000	 K_S0sig1    K_S0sig2    K_S0sig3                           PHSP; 
+1.000	 K_S0sig    K_S0sig    K_S0sig                           PHSP; 
 Enddecay
 CDecay anti-B0sig
 #
-Decay K_S0sig1
-1        pi+       pi-                 PHSP;
-Enddecay
-Decay K_S0sig2
-1        pi+       pi-                 PHSP;
-Enddecay
-Decay K_S0sig3
+Decay K_S0sig
 1        pi+       pi-                 PHSP;
 Enddecay
 #

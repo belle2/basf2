@@ -11,7 +11,6 @@
 
 #include "tracking/trackFindingVXD/trackSegmentTools/FilterBase.h"
 
-using namespace std;
 using namespace Belle2;
 
 void SectorFriendship::prepareCompatibilityTable()

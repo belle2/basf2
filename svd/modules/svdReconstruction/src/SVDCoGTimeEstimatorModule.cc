@@ -7,6 +7,7 @@
  **************************************************************************/
 
 #include <svd/modules/svdReconstruction/SVDCoGTimeEstimatorModule.h>
+#include <TMath.h>
 
 using namespace Belle2;
 using namespace std;

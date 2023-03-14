@@ -31,7 +31,7 @@ std::vector<std::pair<float, float>> VXDSimHit::getElectronProfile() const
 
 std::vector<std::pair<float, float>> VXDSimHit::getElectronsConstantDistance(double length) const
 {
-  double totalLength = (getPosOut() - getPosIn()).Mag();
+  double totalLength = (getPosOut() - getPosIn()).R();
   const int nSteps = (int)(totalLength / length) + 1;
   std::vector<std::pair<float, float>> result;
   result.reserve(nSteps);

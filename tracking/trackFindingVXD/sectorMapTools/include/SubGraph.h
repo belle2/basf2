@@ -125,7 +125,7 @@ namespace Belle2 {
       for (auto& entry : m_minMaxValues) {
         out += entry.first + " " + entry.second.print() + "  ";
       }
-      B2DEBUG(1, "SubGraph::getFinalQuantileValues: minMaxFound:\n" << out);
+      B2DEBUG(20, "SubGraph::getFinalQuantileValues: minMaxFound:\n" << out);
       return m_minMaxValues;
     }
 

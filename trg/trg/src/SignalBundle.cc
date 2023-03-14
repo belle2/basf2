@@ -138,7 +138,6 @@ namespace Belle2 {
 
       bool active = true;
       int nLoops = 0;
-      // cppcheck-suppress knownConditionTrueFalse
       while (active) {
         int clk = states[i] + nLoops;
         lastClock = clk;

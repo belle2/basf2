@@ -10,8 +10,8 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <framework/dataobjects/Helix.h>
 #include <framework/geometry/BFieldManager.h>
+#include <framework/geometry/B2Vector3.h>
 
-using namespace std;
 using namespace Belle2;
 
 REG_MODULE(PlaneTriggerTrackTimeEstimator);
@@ -32,9 +32,9 @@ const
   B2ASSERT("Position must have 3 components.", m_param_triggerPlanePosition.size() == 3);
   B2ASSERT("Normal direction must have 3 components.", m_param_triggerPlaneNormalDirection.size() == 3);
 
-  TVector3 triggerPlanePosition(m_param_triggerPlanePosition[0], m_param_triggerPlanePosition[1], m_param_triggerPlanePosition[2]);
-  TVector3 triggerPlaneNormalDirection(m_param_triggerPlaneNormalDirection[0], m_param_triggerPlaneNormalDirection[1],
-                                       m_param_triggerPlaneNormalDirection[2]);
+  B2Vector3D triggerPlanePosition(m_param_triggerPlanePosition[0], m_param_triggerPlanePosition[1], m_param_triggerPlanePosition[2]);
+  B2Vector3D triggerPlaneNormalDirection(m_param_triggerPlaneNormalDirection[0], m_param_triggerPlaneNormalDirection[1],
+                                         m_param_triggerPlaneNormalDirection[2]);
 
   try {
     const double s = measuredStateOnPlane.extrapolateToPlane(genfit::SharedPlanePtr(new genfit::DetPlane(triggerPlanePosition,
@@ -54,9 +54,9 @@ double PlaneTriggerTrackTimeEstimatorModule::estimateFlightLengthUsingSeedInform
   B2ASSERT("Position must have 3 components.", m_param_triggerPlanePosition.size() == 3);
   B2ASSERT("Normal direction must have 3 components.", m_param_triggerPlaneNormalDirection.size() == 3);
 
-  const TVector3& momentum = recoTrack.getMomentumSeed();
+  const ROOT::Math::XYZVector& momentum = recoTrack.getMomentumSeed();
   const short int charge = recoTrack.getChargeSeed();
-  const TVector3& position = recoTrack.getPositionSeed();
+  const ROOT::Math::XYZVector& position = recoTrack.getPositionSeed();
 
   const double bZ = BFieldManager::getField(0, 0, 0).Z() / Unit::T;
   const Helix h(position, momentum, charge, bZ);
@@ -65,9 +65,9 @@ double PlaneTriggerTrackTimeEstimatorModule::estimateFlightLengthUsingSeedInform
 
   double arcLengthOfIntersection = NAN;
 
-  TVector3 triggerPlanePosition(m_param_triggerPlanePosition[0], m_param_triggerPlanePosition[1], m_param_triggerPlanePosition[2]);
-  TVector3 triggerPlaneNormalDirection(m_param_triggerPlaneNormalDirection[0], m_param_triggerPlaneNormalDirection[1],
-                                       m_param_triggerPlaneNormalDirection[2]);
+  B2Vector3D triggerPlanePosition(m_param_triggerPlanePosition[0], m_param_triggerPlanePosition[1], m_param_triggerPlanePosition[2]);
+  B2Vector3D triggerPlaneNormalDirection(m_param_triggerPlaneNormalDirection[0], m_param_triggerPlaneNormalDirection[1],
+                                         m_param_triggerPlaneNormalDirection[2]);
 
   // Currently, there are only one cases implemented!
   // Case 1: Plane for a certain z:

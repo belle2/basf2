@@ -8,8 +8,9 @@
 
 #pragma once
 
-#include <TVector3.h>
-#include <TRotation.h>
+#include <Math/Vector3D.h>
+#include <Math/Point3D.h>
+#include <Math/Transform3D.h>
 #include <cmath>
 #include <algorithm>
 
@@ -39,15 +40,13 @@ namespace Belle2 {
        * @param charge particle charge in units of elementary charge
        * @param Bz magnetic field z-component (we assume other two are negligible)
        */
-      void set(const TVector3& position, const TVector3& momentum, double charge, double Bz);
+      void set(const ROOT::Math::XYZPoint& position, const ROOT::Math::XYZVector& momentum, double charge, double Bz);
 
       /**
-       * Sets transformation from the frame in which helix is constructed to module local frame.
-       * Transformation is: inverse translation first then inverse rotation
-       * @param rotation rotation matrix
-       * @param translation translation vector
+       * Sets transformation from the frame in which helix is constructed (nominal frame) to module local frame.
+       * @param transform transformation from local to nominal frame
        */
-      void setTransformation(const TRotation& rotation, const TVector3& translation);
+      void setTransformation(const ROOT::Math::Transform3D& transform) {m_transformInv = transform.Inverse();}
 
       /**
        * Moves reference position along helix by length
@@ -60,22 +59,22 @@ namespace Belle2 {
        * @param length distance along helix measured from the reference position
        * @return position (in module local frame if transformation is set)
        */
-      TVector3 getPosition(double length) const;
+      ROOT::Math::XYZPoint getPosition(double length) const;
 
       /**
        * Returns particle direction at given length
        * @param length distance along helix measured from the reference position
        * @return direction (in module local frame if transformation is set)
        */
-      TVector3 getDirection(double length) const;
+      ROOT::Math::XYZVector getDirection(double length) const;
 
       /**
-       * Returns the distance along helix to the nearest intersection with a plane nearly parallel to z axis
+       * Returns the distance along helix to the nearest intersection with the plane nearly parallel to z axis
        * @param point point on the plane
        * @param normal plane normal
        * @return signed distance (NaN if cross-section doesn't exist)
        */
-      double getDistanceToPlane(const TVector3& point, const TVector3& normal) const;
+      double getDistanceToPlane(const ROOT::Math::XYZPoint& point, const ROOT::Math::XYZVector& normal) const;
 
     private:
 
@@ -110,8 +109,7 @@ namespace Belle2 {
       double& ky = m_phi0; /**< direction in y for zero magnetic field */
       double& kz = m_kz; /**< direction in z for zero magnetic field */
 
-      TRotation m_rotationInv; /**< inverse of rotation matrix */
-      TVector3 m_translation;  /**< translation vector */
+      ROOT::Math::Transform3D m_transformInv; /**< transformation from nominal to local frame */
 
     };
 

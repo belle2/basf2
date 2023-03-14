@@ -9,7 +9,6 @@
 /* Own header. */
 #include <klm/dataobjects/KLMMuidHit.h>
 
-using namespace std;
 using namespace Belle2;
 
 KLMMuidHit::KLMMuidHit() :

@@ -11,12 +11,12 @@
 
 """
 <header>
-  <contact>G. Casarosa giulia.casarosa@desy.de</contact>
   <description>
     This module is used for the SVD validation.
-    It gets information about SpacePoints, saving
+    It gets information about all SpacePoints, saving
     in a ttree in a ROOT file.
   </description>
+  <noexecute>SVD validation helper class</noexecute>
 </header>
 """
 
@@ -64,10 +64,8 @@ class SVDValidationTTreeSpacePoint(b2.Module):
                 self.tree.Branch(key, addressof(self.data, key), key + formstring)
 
     def event(self):
-        """Find digit with a cluster and save needed information"""
+        """Find SVD SpacePoints in the event"""
 
-        # Start with SpacePoints and use the relation to get the corresponding
-        # digits
         spacepoints = Belle2.PyStoreArray('SVDSpacePoints')
 
         for sp in spacepoints:
@@ -93,14 +91,11 @@ class SVDValidationTTreeSpacePoint(b2.Module):
                 else:
                     sensorType = 1
             self.data.sensor_type = sensorType
-            ladderNum = sensorID.getLadderNumber()
-            self.data.ladder = ladderNum
+            self.data.ladder = sensorID.getLadderNumber()
 
             # space point information
-            timeU = sp.TimeU()
-            timeV = sp.TimeV()
-            self.data.time_u = timeU
-            self.data.time_v = timeV
+            self.data.time_u = sp.TimeU()
+            self.data.time_v = sp.TimeV()
 
             # Fill tree
             self.file.cd()

@@ -60,6 +60,7 @@ main.add_module(
         "TRGSummary",
         "MCParticles"])
 
+main.add_module('Progress')
 # main
 b2.process(main)
 print(b2.statistics)

@@ -12,7 +12,7 @@
 #include <vector>
 #include <tuple>
 #include <functional>
-#include <TVector3.h>
+#include <framework/geometry/B2Vector3.h>
 #include <TTree.h>
 #include <Eigen/Dense>
 
@@ -26,11 +26,11 @@
 namespace Belle2::InvariantMassMuMuCalib {
 
   static const double realNaN = std::numeric_limits<double>::quiet_NaN();
-  static const TVector3 vecNaN(realNaN, realNaN, realNaN);
+  static const B2Vector3D vecNaN(realNaN, realNaN, realNaN);
 
   /** track parameters (neglecting curvature) */
   struct Track {
-    TVector3 p = vecNaN; ///< momentum vector of the track
+    B2Vector3D p = vecNaN; ///< momentum vector of the track
     double pid = realNaN; ///< particle ID of mu/e separation
   };
 

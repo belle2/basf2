@@ -33,7 +33,7 @@ void Chi2BasedEventTimeExtractor::apply(std::vector<RecoTrack*>& recoTracks)
   double uncertainty = derivatives.second;
 
   if (std::isnan(extractedDeltaT0)) {
-    B2DEBUG(50, "Extracted delta t0 is nan. Aborting");
+    B2DEBUG(25, "Extracted delta t0 is nan. Aborting");
     return;
   }
 
@@ -44,12 +44,12 @@ void Chi2BasedEventTimeExtractor::apply(std::vector<RecoTrack*>& recoTracks)
   }
 
   if (std::abs(extractedDeltaT0) > m_param_maximalExtractedT0) {
-    B2DEBUG(50, "Extracted t0 of " << extractedDeltaT0 << " is too large");
+    B2DEBUG(25, "Extracted t0 of " << extractedDeltaT0 << " is too large");
     return;
   }
 
   EventT0::EventT0Component eventT0Component(extractedDeltaT0, uncertainty, Const::CDC, "chi2");
   m_eventT0->setEventT0(eventT0Component);
   m_wasSuccessful = true;
-  B2DEBUG(50, "Chi2 gave a result of " << extractedDeltaT0);
+  B2DEBUG(25, "Chi2 gave a result of " << extractedDeltaT0);
 }

@@ -14,6 +14,6 @@ using namespace TrackFindingCDC;
 REG_MODULE(TFCDC_TrackQualityEstimator);
 
 TFCDC_TrackQualityEstimatorModule::TFCDC_TrackQualityEstimatorModule()
-  : Super( {"CDCTrackVector"})
+  : Super({"CDCTrackVector"})
 {
 }

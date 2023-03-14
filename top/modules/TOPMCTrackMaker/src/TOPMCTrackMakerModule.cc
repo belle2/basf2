@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <top/modules/TOPMCTrackMaker/TOPMCTrackMakerModule.h>
 
 // framework - DataStore
@@ -102,7 +102,7 @@ namespace Belle2 {
       if (!barHit) continue;
 
       TMatrixDSym cov(6); // infinite precission
-      fitResults.appendNew(B2Vector3D(mcParticle.getVertex()),
+      fitResults.appendNew(mcParticle.getVertex(),
                            mcParticle.getMomentum(),
                            cov,
                            mcParticle.getCharge(),
@@ -116,7 +116,7 @@ namespace Belle2 {
       track->addRelationTo(&mcParticle);
 
       const Const::ChargedStable& chargedStable = Const::pion;
-      double pmom = barHit->getMomentum().Mag();
+      double pmom = barHit->getMomentum().R();
       double mass = chargedStable.getMass();
       double beta = pmom / sqrt(pmom * pmom + mass * mass);
       double tof = barHit->getLength() / beta / Const::speedOfLight;

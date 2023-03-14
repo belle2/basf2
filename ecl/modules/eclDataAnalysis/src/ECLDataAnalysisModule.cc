@@ -2347,7 +2347,7 @@ void ECLDataAnalysisModule::event()
       m_trkPx->push_back(atrk->getMomentum().X());
       m_trkPy->push_back(atrk->getMomentum().Y());
       m_trkPz->push_back(atrk->getMomentum().Z());
-      m_trkP->push_back(atrk->getMomentum().Mag());
+      m_trkP->push_back(atrk->getMomentum().R());
       m_trkTheta->push_back(atrk->getMomentum().Theta());
       m_trkPhi->push_back(atrk->getMomentum().Phi());
       m_trkX->push_back(atrk->getPosition().X());

@@ -136,6 +136,18 @@ void Variable::Manager::printAliases()
   B2INFO("=====================================");
 }
 
+std::string Variable::Manager::resolveAlias(const std::string& alias)
+{
+
+  assertValidName(alias);
+
+  if (m_alias.find(alias) == m_alias.end()) {
+    return alias;
+  } else {
+    return m_alias[alias];
+  }
+}
+
 bool Variable::Manager::addCollection(const std::string& collection, const std::vector<std::string>& variables)
 {
 
@@ -334,7 +346,7 @@ void Variable::Manager::registerVariable(const std::string& name, const Variable
     m_variables[name] = var;
     m_variablesInRegistrationOrder.push_back(var.get());
     if (!unit.empty()) {
-      var.get()->extendDescriptionString("\n\n :Unit: " + unit);
+      var.get()->extendDescriptionString(":Unit: " + unit);
     }
   } else {
     B2FATAL("A variable named '" << name << "' was already registered! Note that all variables need a unique name!");
@@ -358,7 +370,7 @@ void Variable::Manager::registerVariable(const std::string& name, const Variable
     m_parameter_variables[rawName] = var;
     m_variablesInRegistrationOrder.push_back(var.get());
     if (!unit.empty()) {
-      var.get()->extendDescriptionString("\n\n :Unit: " + unit);
+      var.get()->extendDescriptionString(":Unit: " + unit);
     }
   } else {
     B2FATAL("A variable named '" << name << "' was already registered! Note that all variables need a unique name!");

@@ -81,6 +81,7 @@ namespace Belle2 {
 
     DBObjPtr<BeamSpot> m_BeamSpotDB; /**< beam spot payload from the database*/
     BeamSpot m_BeamSpot; /**< beam spot payload */
+    StoreObjPtr<EventMetaData> m_EventMetaData; /**< EventMetaData */
 
   };
 }

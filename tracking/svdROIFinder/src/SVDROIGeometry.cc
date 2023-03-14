@@ -14,7 +14,6 @@
 
 #include <set>
 
-using namespace std;
 using namespace Belle2;
 
 
@@ -71,7 +70,7 @@ SVDROIGeometry::fillPlaneList(double toleranceZ,
 
 
 void
-SVDROIGeometry::appendSelectedPlanes(std::list<ROIDetPlane>* selectedPlanes, TVector3 recoTrackPosition, int layer)
+SVDROIGeometry::appendSelectedPlanes(std::list<ROIDetPlane>* selectedPlanes, ROOT::Math::XYZVector recoTrackPosition, int layer)
 {
 
 

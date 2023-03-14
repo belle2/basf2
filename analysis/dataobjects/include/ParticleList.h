@@ -156,7 +156,8 @@ namespace Belle2 {
       m_particleStore("Particles"),
       m_thisListName(),
       m_antiListName(),
-      m_antiList(nullptr)
+      m_antiList(nullptr),
+      m_isReserved(false)
     {
     }
 
@@ -288,6 +289,14 @@ namespace Belle2 {
     Particle* getParticle(unsigned i, bool includingAntiList = true) const;
 
     /**
+     * Returns the particle from the list matching the given mdst array index, if any is found.
+     * @param mdstIdx mdst array index
+     * @param includingAntiList consider anti-particle list as well?
+     * @return pointer to Particle or NULL if no match is found.
+     */
+    Particle* getParticleWithMdstIdx(unsigned int mdstIdx, bool includingAntiList = true) const;
+
+    /**
      * Returns the number of flavor-specific particles or self-conjugated particles in this list or its anti-particle list
      *
      * @param K ParticleType - Particle or SelfConjugatedParticle
@@ -316,6 +325,22 @@ namespace Belle2 {
      * Prints the list
      */
     void print() const;
+
+    /**
+     * Sets m_isReserved so that the reserved list can be edited.
+     */
+    void setEditable(bool editable, bool includingAntiList = true)
+    {
+      m_isReserved = !editable;
+      if (includingAntiList and !m_antiListName.empty())
+        getAntiParticleList().setEditable(editable, false);
+    };
+
+    /**
+     * Returns m_isReserved
+     */
+    bool getIsReserved() const { return m_isReserved; };
+
 
     /** Return a short summary of this object's contents in HTML format. */
     std::string getInfoHTML() const;
@@ -355,7 +380,9 @@ namespace Belle2 {
     /** keep anti-list around for performance. */
     mutable StoreObjPtr<ParticleList>* m_antiList; //! transient
 
-    ClassDef(ParticleList, 3); /**< Class to hold a list of particles, anti-particles and self-conjugated particles. */
+    bool m_isReserved = false;  /**< True if the list name is reserved */
+
+    ClassDef(ParticleList, 4); /**< Class to hold a list of particles, anti-particles and self-conjugated particles. */
 
     friend class ParticleSubset;
   };

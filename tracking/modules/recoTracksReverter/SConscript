@@ -4,6 +4,10 @@ env['LIBS'] = [
     'tracking_dataobjects',
     'tracking',
     'mdst_dataobjects',
+    'cdc_dataobjects',
+    'klm_dataobjects',
+    'pxd_dataobjects',
+    'svd_dataobjects',
     'framework']
 
 Return('env')

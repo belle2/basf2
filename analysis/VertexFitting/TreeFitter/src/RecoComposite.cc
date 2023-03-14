@@ -16,12 +16,6 @@
 
 namespace TreeFitter {
 
-  RecoComposite::RecoComposite(Belle2::Particle* particle, const ParticleBase* mother)
-    : ParticleBase(particle, mother), m_params(), m_hasEnergy(true)
-  {
-    updateParams();
-  }
-
   RecoComposite::RecoComposite(Belle2::Particle* particle, const ParticleBase* mother, const ConstraintConfiguration& config,
                                bool massConstraint)
     : ParticleBase(particle, mother, &config), m_params(), m_hasEnergy(true), m_massconstraint(massConstraint)
@@ -73,7 +67,7 @@ namespace TreeFitter {
 
     for (int row = 0; row < 3; ++row) { //then the x block
       for (int col = 0; col <= row; ++col) {
-        m_covariance(row, col) = cov7in[3 + row][3 + col];
+        m_covariance(row, col) = cov7in[4 + row][4 + col];
       }
     }
   }

@@ -185,9 +185,9 @@ def print_function(args):
         pd.set_option('display.max_columns', 500)
         pd.set_option('display.width', 1000)
         print(df)
-    elif args.format == "jira":
+    elif args.format in ["github", "gitlab"]:
         from tabulate import tabulate
-        print(tabulate(df, tablefmt="jira", showindex=False, headers="keys"))
+        print(tabulate(df, tablefmt="github", showindex=False, headers="keys"))
     elif args.format == "grid":
         from tabulate import tabulate
         print(tabulate(df, tablefmt="grid", showindex=False, headers="keys"))
@@ -344,10 +344,10 @@ Examples:
 
     %(prog)s print
 
-* Print the version of the cuts which was present in 8/1 online in a format understandable by JIRA
+* Print the version of the cuts which was present in 8/1 online in a format understandable by GitLab
   (you need to have the tabulate package installed)
 
-    %(prog)s print --database "online:8/1" --format jira
+    %(prog)s print --database "online:8/1" --format plain
 
 * Add a new skim cut named "accept_b2bcluster_3D" with the specified parameters and upload it to localdb
 
@@ -414,7 +414,8 @@ top in the localdb will be shown.
                               type=DownloadableDatabase, default=DownloadableDatabase("online,localdb:latest"))
     choices = ["human-readable", "json", "list", "pandas"]
     try:
-        choices += ['jira', 'grid']
+        from tabulate import tabulate  # noqa
+        choices += ['github', 'gitlab', 'grid']
     except ImportError:
         pass
     print_parser.add_argument("--format", help="Choose the format how to print the trigger cuts. "

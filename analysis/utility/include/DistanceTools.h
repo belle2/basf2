@@ -27,7 +27,8 @@ namespace Belle2 {
     /**
      * Returns the Point Of Closest Approach of a track to a vertex
      */
-    B2Vector3D poca(B2Vector3D const& trackPos, B2Vector3D const& trackP, B2Vector3D const& vtxPos);
+    ROOT::Math::XYZVector poca(ROOT::Math::XYZVector const& trackPos, ROOT::Math::XYZVector const& trackP,
+                               ROOT::Math::XYZVector const& vtxPos);
 
     /**
      * Returns the 3D vector between a vertex and a track's point of closest approach to that vertex

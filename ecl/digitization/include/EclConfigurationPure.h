@@ -6,9 +6,9 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef ECLCONFIGURATIONPURE_H
-#define ECLCONFIGURATIONPURE_H
+#pragma once
 
+/* ECL headers. */
 #include <ecl/digitization/EclConfiguration.h>
 
 class TH1F;
@@ -126,5 +126,3 @@ namespace Belle2 {
 
   }
 }
-
-#endif

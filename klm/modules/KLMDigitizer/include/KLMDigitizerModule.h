@@ -21,7 +21,7 @@
 #include <klm/simulation/ScintillatorFirmware.h>
 #include <klm/time/KLMTime.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
@@ -156,6 +156,9 @@ namespace Belle2 {
 
     /** Efficiency determination mode (converted from the string parameter). */
     EfficiencyMode m_EfficiencyMode;
+
+    /** Whether to create multi-strip digits. */
+    bool m_CreateMultiStripDigits;
 
     /** Use debug mode in EKLM::ScintillatorSimulator or not. */
     bool m_Debug;

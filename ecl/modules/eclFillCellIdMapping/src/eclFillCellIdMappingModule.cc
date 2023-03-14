@@ -6,14 +6,17 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+/* Own header. */
 #include <ecl/modules/eclFillCellIdMapping/eclFillCellIdMappingModule.h>
 
-#include <ecl/dataobjects/ECLCellIdMapping.h>
+/* ECL headers. */
 #include <ecl/dataobjects/ECLCalDigit.h>
-
+#include <ecl/dataobjects/ECLCellIdMapping.h>
+#include <ecl/dataobjects/ECLElementNumbers.h>
 #include <ecl/geometry/ECLNeighbours.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 
+/* Basf2 headers. */
 #include <framework/geometry/B2Vector3.h>
 
 using namespace Belle2;
@@ -46,15 +49,15 @@ void ECLFillCellIdMappingModule::initialize()
   m_NeighbourMap11 = new ECLNeighbours("N", 5, true); //sort them for ecl variable getters
 
   // get phi, theta, phiid, thetaid values
-  m_CellIdToPhi.resize(Belle2::ECLCellIdMapping::c_nECLCellIds + 1);
-  m_CellIdToTheta.resize(Belle2::ECLCellIdMapping::c_nECLCellIds + 1);
-  m_CellIdToPhiId.resize(Belle2::ECLCellIdMapping::c_nECLCellIds + 1);
-  m_CellIdToThetaId.resize(Belle2::ECLCellIdMapping::c_nECLCellIds + 1);
+  m_CellIdToPhi.resize(ECLElementNumbers::c_NCrystals + 1);
+  m_CellIdToTheta.resize(ECLElementNumbers::c_NCrystals + 1);
+  m_CellIdToPhiId.resize(ECLElementNumbers::c_NCrystals + 1);
+  m_CellIdToThetaId.resize(ECLElementNumbers::c_NCrystals + 1);
 
   // Geometry instance.
   m_geom = ECLGeometryPar::Instance();
 
-  for (int idx = 1; idx <= Belle2::ECLCellIdMapping::c_nECLCellIds; idx++) {
+  for (int idx = 1; idx <= ECLElementNumbers::c_NCrystals; idx++) {
     B2Vector3D vectorPosition = m_geom->GetCrystalPos(idx - 1);
 
     m_CellIdToPhi[idx] = vectorPosition.Phi();
@@ -71,7 +74,7 @@ void ECLFillCellIdMappingModule::event()
   if (!m_eclCellIdMapping) {
     m_eclCellIdMapping.create();
 
-    for (int idx = 1; idx <= Belle2::ECLCellIdMapping::c_nECLCellIds; idx++) {
+    for (int idx = 1; idx <= ECLElementNumbers::c_NCrystals; idx++) {
       m_eclCellIdMapping->setCellIdToNeighbour5(idx, m_NeighbourMap5->getNeighbours(idx));
       m_eclCellIdMapping->setCellIdToNeighbour7(idx, m_NeighbourMap7->getNeighbours(idx));
       m_eclCellIdMapping->setCellIdToNeighbour9(idx, m_NeighbourMap9->getNeighbours(idx));

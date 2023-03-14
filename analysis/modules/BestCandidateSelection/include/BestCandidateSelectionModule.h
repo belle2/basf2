@@ -49,6 +49,7 @@ namespace Belle2 {
     int m_numBest; /**< Number of best candidates to keep. */
     std::string m_cutParameter; /**< Selection for candidates to be ranked. */
     std::unique_ptr<Variable::Cut> m_cut; /**< cut object which performs the cuts */
+    bool m_overwriteRank; /**< If true, the extraInfo of rank is overwritten when the particle has already the extraInfo. */
 
     StoreArray<Particle> m_particles; /**< StoreArray of Particle objects */
     StoreObjPtr<ParticleList> m_inputList; /**< input particle list */

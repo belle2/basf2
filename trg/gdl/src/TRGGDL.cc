@@ -293,10 +293,8 @@ namespace Belle2 {
       std::string str;
       std::vector<std::string> algs;
       std::ifstream isload(_algFilePath.c_str(), std::ios::in);
-      int index = 0;
       while (std::getline(isload, str)) {
         algs.push_back(str);
-        index++;
       }
       isload.close();
 
@@ -435,10 +433,8 @@ namespace Belle2 {
         std::string str;
         std::vector<std::string> algs;
         std::ifstream isload(_algFilePath.c_str(), std::ios::in);
-        int index = 0;
         while (std::getline(isload, str)) {
           algs.push_back(str);
-          index++;
         }
         isload.close();
 
@@ -756,7 +752,6 @@ namespace Belle2 {
     }
 
     char b[800];
-    unsigned lines = 0;
     while (! ifs.eof()) {
       ifs.getline(b, 800);
 
@@ -769,8 +764,6 @@ namespace Belle2 {
 
       if (w1.size())
         _input.push_back(w1);
-
-      ++lines;
     }
 
   }
@@ -784,7 +777,6 @@ namespace Belle2 {
     }
 
     char b[800];
-    unsigned lines = 0;
     while (! ifs.eof()) {
       ifs.getline(b, 800);
 
@@ -797,8 +789,6 @@ namespace Belle2 {
 
       if (w1.size())
         _output.push_back(w1);
-
-      ++lines;
     }
 
   }
@@ -812,7 +802,6 @@ namespace Belle2 {
     }
 
     char b[800];
-    unsigned lines = 0;
     while (! ifs.eof()) {
       ifs.getline(b, 800);
 
@@ -829,8 +818,6 @@ namespace Belle2 {
 
       if (w2.size())
         _algorithm.push_back(w2);
-
-      ++lines;
     }
 
   }

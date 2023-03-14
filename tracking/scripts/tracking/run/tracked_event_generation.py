@@ -134,9 +134,9 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
         if self.fit_tracks:
             # Fit tracks
             gen_fitter_module = basf2.register_module('DAFRecoFitter')
-            gen_fitter_module.param({'pdgCodesToUseForFitting': [13]})
+            gen_fitter_module.param({'pdgCodesToUseForFitting': [211]})
             path.add_module(gen_fitter_module)
-            trackbuilder = basf2.register_module('TrackCreator', pdgCodes=[13])
+            trackbuilder = basf2.register_module('TrackCreator', pdgCodes=[211])
             path.add_module(trackbuilder)
 
         return path

@@ -13,7 +13,7 @@
 #include <klm/dataobjects/bklm/BKLMStatus.h>
 #include <klm/dataobjects/KLMDigit.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/datastore/RelationsObject.h>
 
 /* C++ headers. */

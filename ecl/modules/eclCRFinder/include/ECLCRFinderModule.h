@@ -92,7 +92,7 @@ namespace Belle2 {
     std::vector <int>  m_cellIdToGrowthVec; /**< cellid -> growth digits. */
     std::vector <int>  m_cellIdToDigitVec; /**< cellid -> above threshold digits. */
 
-    /** vector (8736+1 entries) with cell id to store array positions */
+    /** vector (ECLElementNumbers::c_NCrystals + 1 entries) with cell id to store array positions */
     std::vector< int > m_calDigitStoreArrPosition;
 
     // USE POSITION IN STORE ARRAY!!!

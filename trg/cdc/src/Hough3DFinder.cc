@@ -373,7 +373,7 @@ namespace Belle2 {
         for (unsigned iTS = 0; iTS < mcTSList.size(); iTS++) {
           unsigned iCDCSimHit = mcTSList[iTS]->iCDCSimHit();
           CDCSimHit* aCDCSimHit = SimHits[iCDCSimHit];
-          TVector3 posWire = aCDCSimHit->getPosWire();
+          B2Vector3D posWire = aCDCSimHit->getPosWire();
           m_mVector["mcTSsX"][iTS] = posWire.X();
           m_mVector["mcTSsY"][iTS] = posWire.Y();
         }

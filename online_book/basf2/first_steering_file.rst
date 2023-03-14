@@ -29,7 +29,7 @@ First steering file
 In this hands-on tutorial you'll be writing your first steering file. Our
 ultimate goal is to reconstruct :math:`B^0 \to J/\Psi(\to e^+e^-)K_S^0(\to
 \pi^+\pi^+)`. You'll be learning step-by-step what is necessary to achieve
-this, and in the end you will produce a plot of the B meson candidates. As you
+this, and in the end you will produce a plot of the :math:`B` meson candidates. As you
 have already learned in the previous sections, basf2 provides a large variety
 of functionality. While the final steering file of this lesson will be working
 and producing some reasonable output, there are many possible extensions that
@@ -67,9 +67,9 @@ Now let's get started with your steering file!
     Open an empty file with an editor of your choice. Add three lines that do
     the following:
 
-    * Importing the ``basf2`` python library
-    * Creating a `basf2.Path` (call it ``main``)
-    * Processing the path with `basf2.process`
+    * Import the ``basf2`` python library (it might be convenient to set an abbreviation, e.g. ``b2``)
+    * Create a `basf2.Path` (call it ``main``)
+    * Process the path with `basf2.process`
 
     Save the file as ``myanalysis.py``.
 
@@ -83,9 +83,9 @@ Now let's get started with your steering file!
 
     .. code-block:: python
 
-        import basf2
-        main = basf2.Path()
-        basf2.process(main)
+        import basf2 as b2
+        main = b2.Path()
+        b2.process(main)
 
 Running steering files is as easy as calling ``basf2 myanalysis.py`` on the
 command-line.
@@ -153,9 +153,9 @@ former.
 
 In a later lesson you'll learn how and where to find input files for your
 analysis. For the purpose of this tutorial we have prepared some local input
-files. They should be available in the
-``${BELLE2_EXAMPLES_DATA_DIR}/starterkit/2021`` directory on KEKCC, DESY and
-other servers.
+files of :math:`B^0 \to J/\Psi K_S^0`. They should be available in the
+``${BELLE2_EXAMPLES_DATA_DIR}/starterkit/2021`` directory on KEKCC, NAF, and
+other servers. The files' names start with the decfile number 1111540100.
 
 .. admonition:: If you're working from an institute server
     :class: stacked toggle
@@ -170,7 +170,7 @@ other servers.
     :class: toggle
 
     In this case you might first need to copy the data files to your home
-    directory on your local machine from kekcc or DESY via a SSH connection (cf.
+    directory on your local machine from kekcc or DESY via an SSH connection (cf.
     :ref:`onlinebook_ssh`) and then either change the  path accordingly or set
     the ``BELLE2_EXAMPLES_DATA_DIR`` environment  variable to point to the right
     directory. Note that we might not be able to provide you with the same level
@@ -223,7 +223,7 @@ A helpful function to get common data files from the examples directory is
 
     Don't forget to import `modularAnalysis` (this is the module that contains
     `inputMdstList`). It might be convenient to set an abbreviation, e.g.
-    ``ma``. Then you have to set the correct values for the three required
+    ``ma``. Then you have to set the correct values for the two required
     arguments of `inputMdstList`.
 
 .. admonition:: Solution
@@ -232,23 +232,23 @@ A helpful function to get common data files from the examples directory is
     .. literalinclude:: steering_files/010_first_steering_file.py
         :linenos:
 
-In the solution to the last task we have added empty lines, shortcuts for the
-imports, and some comments. This helps to give the script a better structure
-and allows yourself and others to easier understand what's going on in the
+In the solution to the last task we have added empty lines, some comments, and used shortcuts for the
+imports. This helps to give the script a better structure
+and allows yourself and others to better understand what's going on in the
 steering file. In the very first line we have also added a
 `shebang <https://en.wikipedia.org/wiki/Shebang_(Unix)>`_ to define
 that the steering file should be executed with a python interpreter.
 
 So far, the input file has been completely hard-coded. But as we've seen
 before the file names only differ by the final suffix. We can be a little bit
-more flexible by providing this integer as a command-line argument. Then, we
-can select a different input file when running the steering file and without
+more flexibility by providing this integer as a command-line argument. Then, we
+can select a different input file when running the steering file, and without
 having to change anything in the script itself.
 
 .. admonition:: Task
     :class: exercise stacked
 
-    Adjust your steering file so that you can select via an integer as
+    Adjust your steering file so that you can select via an integer as a
     command-line argument which file is going to be processed.
 
 .. admonition:: Hint
@@ -256,7 +256,7 @@ having to change anything in the script itself.
 
     You should have learned about command-line arguments in `this
     <https://swcarpentry.github.io/python-novice-inflammation/12-cmdline/index.html>`_
-    part of the python introduction of the software carpentry. Otherwise, go
+    part of the python introduction from Software Carpentry. Otherwise, go
     back and refresh your memory. All you have to do is to import the system
     library, store the correct command-line argument (from ``sys.argv``) in a local
     variable ``filenumber``, and extend the path string to include it.
@@ -264,7 +264,7 @@ having to change anything in the script itself.
 .. admonition:: Hint
     :class: toggle xhint stacked
 
-    Get the integer from the command line with
+    You can get the integer from the command line arguments using
 
     .. code-block:: python
 
@@ -292,7 +292,7 @@ having to change anything in the script itself.
     Make sure that from now on you always supply a number every time you run your
     steering file, e.g. ``basf2 myanalysis.py 1``.
 
-    Else you will get an exception like
+    Otherwise you will get an exception like this
 
     .. code-block::
 
@@ -306,7 +306,7 @@ Filling particle lists
 
 The mdst data objects (Tracks, ECLCluster, KLMCluster, V0s) of the input file
 have to be transferred into Particle data objects. This is done via the
-`ParticleLoader` module and its wrapper function `fillParticleList`.
+`ParticleLoader` module and its wrapper function (convenience function) `fillParticleList`.
 
 .. admonition:: Exercise
     :class: exercise stacked
@@ -333,7 +333,7 @@ hypothesis used in the track fit.
 Each particle used in the ``decayString`` argument of the `fillParticleList`
 function can be extended with a label. This is useful to distinguish between
 multiple lists of the same particle type with different selection criteria,
-e.g. soft and hard photons.
+e.g. soft and hard electrons.
 
 .. code-block:: python
 
@@ -351,7 +351,7 @@ e.g. soft and hard photons.
              execution of your script.
 
 There are standard particle lists with predefined selection criteria. While
-those for charged final state particles should only be used in early stages of
+those for charged final state particles should only be used in the early stages of
 your analysis and be replaced with dedicated selections adjusted to the needs
 of the decay mode you are studying, it is recommended to use them for V0s
 (:math:`K_S^0`, :math:`\Lambda^0`). They are part of the library `stdV0s`.
@@ -371,15 +371,15 @@ of the decay mode you are studying, it is recommended to use them for V0s
 .. admonition:: Solution
     :class: toggle solution
 
-    It's ``K_S0:merged`` because it is a combination of Kshorts created
+    It's ``K_S0:merged`` because it is a combination of :math:`K_S^0` candidates created
     directly from V0s found in the tracking and combinations of two charged
     pions.
 
 .. admonition:: Task
     :class: exercise stacked
 
-    Extend your steering file by loading electrons, positrons, and :math:`K_S^0`s. At
-    the very end of your script you should also print a summary table of all
+    Extend your steering file by loading electrons, positrons, and :math:`K_S^0` candidates. At
+    the very end of your script you should also print a summary table of all the
     modules added to your path using the function `statistics`.
 
 .. admonition:: Hint
@@ -418,7 +418,7 @@ of the decay mode you are studying, it is recommended to use them for V0s
 .. admonition:: Hint
     :class: xhint stacked toggle
 
-    Don't forget to include a number, e.g. ``1`` as command line argument to
+    Don't forget to include a number, e.g. ``1`` as a command line argument to
     specify the input file number!
 
 .. admonition:: Solution
@@ -432,7 +432,7 @@ of the decay mode you are studying, it is recommended to use them for V0s
     to be between 0.45 and 0.55 GeV/c :superscript:`2`.
 
     The module ``TreeFitter_K_S0:RD`` takes the longest. It's a vertex fit of
-    the Kshort candidates. You will learn more about vertex fits in
+    the :math:`K_S^0` candidates. You will learn more about vertex fits in
     :ref:`onlinebook_vertex_fitting`.
 
 In the previous task you should have learned how useful it is to carefully
@@ -440,21 +440,20 @@ study the output. This is especially relevant if there are warning or error
 messages. Remember to never ignore them as they usually point to some serious
 issue, either in the way you have written your steering file or in the basf2
 software itself. In the latter case you are encouraged to report the problem
-so that it can be fixed by some experts (maybe you even become this expert one
-day yourself).
+so that it can be fixed by some experts (maybe you yourself will become this expert one day).
 
 In order to purify a sample it makes sense to apply at least loose selection
 criteria. This can be based on the particle identification (e.g. `electronID`
 for electrons and positrons), requiring the tracks to originate from close to the
-interaction point (`dr` and `dz`), and having a polar angle in the acceptance
+interaction point (by using `dr` and `dz`), and having a polar angle in the acceptance
 of the CDC (`thetaInCDCAcceptance`).
 
 .. admonition:: Exercise
     :class: exercise stacked
 
     Find out what's the difference between ``dr`` and ``dz``, e.g. why do we
-    not have to explicitly ask for the absolute value of dr, and the angular
-    range of the CDC acceptance (as implemented in the software).
+    not have to explicitly ask for the absolute value of dr? What's the angular
+    range of the CDC acceptance (as implemented in the software)?
 
 .. admonition:: Hint
     :class: toggle xhint stacked
@@ -475,7 +474,7 @@ of the CDC (`thetaInCDCAcceptance`).
 
     The polar range of the CDC acceptance is :math:`17^\circ < \theta <
     150^\circ` as written `here
-    <https://stash.desy.de/projects/B2/repos/basf2/browse/analysis/variables/src/AcceptanceVariables.cc#25>`_
+    <https://gitlab.desy.de/belle2/software/basf2/-/tree/main/analysis/variables/src/AcceptanceVariables.cc#27>`_.
 
 .. admonition:: Task
     :class: exercise stacked
@@ -496,7 +495,7 @@ of the CDC (`thetaInCDCAcceptance`).
 
     .. literalinclude:: steering_files/013_first_steering_file.py
         :start-at: S10
-        :end-at: E10
+        :end-at: E10 
 
 
 .. note:: Marker comments in the solution code
@@ -521,19 +520,19 @@ analysis software is the `ParticleCombiner`. It takes those particle lists and
 finds all **unique** combinations. The same particle can of course not be used
 twice, e.g. the two positive pions in :math:`D^0 \to K^- \pi^+ \pi^+ \pi^-`
 have to be different mdst track objects. However, all of this is taken care of
-internally. For multi-body decays like the one described above there can
+internally. For multi-body decays like the one described above there, can
 easily be many multiple candidates, which share some particles but differ by
 at least one final state particle.
 
-The wrapper function (convenience function) for the `ParticleCombiner` is
+The wrapper function for the `ParticleCombiner` is
 called `reconstructDecay`. Its first argument is a `DecayString`, which is a
 combination of a mother particle (list), an arrow, and daughter particles. The
 `DecayString` has its own grammar with several markers, keywords, and arrow
 types. It is especially useful for inclusive reconstructions (reconstructions
 in which only part of the decay products are specified, e.g. only requiring
-charged leptons in the final state; opposite: exclusive). Follow the
+charged leptons in the final state; the opposite would be exclusive reconstructions). Follow the
 provided link if you want to learn more about the `DecayString`. For the
-purpose of this tutorial we do not need any of those fancy extensions, the
+purpose of this tutorial, we do not need any of those fancy extensions as the
 default arrow type ``->`` suffices. However, it is important to know how the
 particles themselves need to be written in the decay string.
 
@@ -556,14 +555,14 @@ particles themselves need to be written in the decay string.
     particle name in a decay string, there will be an error message telling
     you that it is unknown.
 
-    The invariant mass of the :math:`J/\Psi` is set to be 3.0969 GeV/c :superscript:`2`.
+    The invariant mass of the :math:`J/\Psi` is set to 3.0969 GeV/c :superscript:`2`.
 
 .. admonition:: Task
     :class: exercise stacked
 
     Extend the steering file by first forming :math:`J/\Psi` candidates from
-    electron-positron combinations and then combining them with Kshorts to
-    form B0 candidates.
+    electron-positron combinations, and then combining them with a :math:`K_S^0` to
+    form :math:`B^0` candidates.
 
     Include a ``dM < 0.11`` cut for the :math:`J/\Psi`.
 
@@ -591,7 +590,7 @@ particles themselves need to be written in the decay string.
 Writing out information to an ntuple
 ------------------------------------
 
-To separate signal from background and extract physics parameter, an offline
+To separate signal from background events, and to extract physics parameters, an offline
 analysis has to be performed. The final step of the steering file is to write
 out information in a so called ntuple using `variablesToNtuple`. It can
 contain one entry per candidate or one entry per event.
@@ -624,20 +623,20 @@ as
 
     \text{M}_{\rm bc} = \sqrt{E_{\rm beam}^2 - \mathbf{p}_{B}^2}
 
-For correctly reconstructed B mesons this variable should peak at the B meson
+For correctly reconstructed :math:`B` mesons this variable should peak at the :math:`B` meson
 mass.
 
 .. admonition:: Task
     :class: exercise stacked
 
-    Save the beam-constrained B mass of each B candidate in an output ntuple.
+    Add some code that saves the beam-constrained :math:`B` mass of each :math:`B` candidate in an output ntuple.
     Then, run your steering file.
 
 .. admonition:: Hint
     :class: toggle xhint stacked
 
-    The variable for the beam-constrained B mass is called `Mbc`. It has to be
-    provided as element of a list to the argument ``variables`` of the
+    The variable for the beam-constrained :math:`B` mass is called `Mbc`. It has to be
+    provided as an element of a list to the argument ``variables`` of the
     `variablesToNtuple` function.
 
 .. admonition:: Solution
@@ -653,11 +652,12 @@ happen to fulfill all your selection criteria.
 .. admonition:: Task
     :class: exercise stacked
 
-    Write a short python script, in which you load the root ntuple from the
-    previous exercise to a dataframe and then plot the distribution of the
-    beam-constrained mass into a histogram with 100 bins in the range 4.3 to
-    5.3 GeV/c :superscript:`2`. Can you identify the signal and background
-    components?
+    Write a short python script in which you load the root ntuple from the
+    previous exercise into a dataframe and then plot the distribution of the
+    beam-constrained mass using a histogram with 100 bins between the range 4.3 to
+    5.3 GeV/c :superscript:`2`. 
+
+    Can you identify the signal and background components?
 
 .. admonition:: Hint
     :class: toggle xhint stacked
@@ -694,8 +694,8 @@ happen to fulfill all your selection criteria.
         :width: 40em
         :align: center
 
-        There is a (signal) peak at the nominal B mass of 5.28 GeV/c
-        :superscript:`2` and lots of background candidates as a shoulder left
+        There is a (signal) peak at the nominal :math:`B` mass of 5.28 GeV/c
+        :superscript:`2` and lots of background candidates as a broad bump left
         of the peak.
 
 Adding MC information
@@ -703,7 +703,7 @@ Adding MC information
 
 For the beam-constrained mass we know pretty well how the signal distribution
 should look like. But what's the resolution and how much background actually
-extends under the signal peak? On MC we have the advantage that we know what
+extends under the signal peak? With MC, we have the advantage that we know what
 has been generated. Therefore, we can add a flag to every candidate to
 classify it as signal or background. Furthermore, we can study our background
 sources if we know what the reconstruction has falsely identified.
@@ -727,8 +727,8 @@ definitely read it to understand at least the basics.
     :class: toggle solution
 
     You need to run the `MCMatcherParticles` module, most conveniently
-    available via the wrapper function `modularAnalysis.matchMCTruth`. If run
-    for the head of the decay chain, it only needs to be called once because
+    available via the wrapper function `modularAnalysis.matchMCTruth`. If this is
+    run on the head of the decay chain, it only needs to be called once because
     the relations of all (grand)^N-daughter particles are set recursively.
 
 .. ---------------------
@@ -736,9 +736,9 @@ definitely read it to understand at least the basics.
 .. admonition:: Task
     :class: exercise stacked
 
-    Add MC matching for all particles of the decay chain and add the
-    information whether the reconstructed B meson is a signal candidate to the
-    ntuple. Run the steering file and again.
+    Add MC matching for all particles of the decay chain, and save 
+    information on whether the reconstructed :math:`B` meson is a signal candidate to the
+    ntuple. Run the steering file again.
 
 .. admonition:: Hint
     :class: toggle xhint stacked
@@ -749,7 +749,7 @@ definitely read it to understand at least the basics.
     :class: toggle xhint stacked
 
     Which variable is added by `matchMCTruth`? Remember to add it to the
-    output!
+    ntuple!
 
 .. admonition:: Solution
     :class: toggle solution
@@ -793,8 +793,8 @@ definitely read it to understand at least the basics.
         :width: 40em
         :align: center
 
-        The background peaks around 5 GeV/c :superscript:`2`, but indeed
-        extends into the signal peak region.
+        The background peaks around 5 GeV/c :superscript:`2`, but does also
+        extend into the signal peak region.
 
 As you could see, it makes sense to cut on `Mbc` from below. A complementary
 variable that can be used to cut away background is :math:`\Delta E` (`deltaE`).
@@ -802,13 +802,13 @@ variable that can be used to cut away background is :math:`\Delta E` (`deltaE`).
 .. admonition:: Exercise
     :class: exercise stacked
 
-    When combining your :math:`J/\Psi` with your :math:`K_S^0` introduce a cut
+    When combining your :math:`J/\Psi` with your :math:`K_S^0`, introduce a cut
     :math:`\text{M}_{\rm bc} > 5.2` and :math:`|\Delta E|<0.15`.
 
 .. admonition:: Hint
     :class: xhint stacked toggle
 
-    Take a look at the ``cut`` argument to `reconstructDecay`. You will also
+    Take a look at the ``cut`` argument for `reconstructDecay`. You will also
     need the `abs` metafunction.
 
 .. admonition:: Solution
@@ -826,15 +826,15 @@ their shapes, we need to use other variables to achieve the same on collision
 data. Initially, it makes sense to look at many different variables and try to
 find those with discriminating power between signal and background. The most
 basic information are the kinematic properties like the energy and the
-momentum (and its components). In basf2 collections of variables for several
-topics are prepared. You can find the information in the
+momentum (and its components). In basf2, collections of variables for several
+topics are pre-prepared. You can find the information in the
 :ref:`analysis/doc/Variables:Collections and Lists` section of the
 documentation.
 
 .. admonition:: Exercise
     :class: exercise stacked
 
-    Find out to which variable collections the two variables belong that we
+    Find out which variable collections contain the variables we have
     added to the ntuple so far.
 
 .. admonition:: Solution
@@ -847,8 +847,8 @@ documentation.
 .. admonition:: Task
     :class: exercise stacked
 
-    Save all kinematics information, both the truth and the reconstructed
-    values, of the B meson to the ntuple. Also use the variable collections
+    Save all the kinematic information, both the truth and the reconstructed
+    values, of the :math:`B` meson to the ntuple. Also, use the variable collections
     from the last exercise to replace the individual list.
 
 .. admonition:: Hint
@@ -865,21 +865,21 @@ documentation.
 
 .. hint::
 
-    If you have trouble to understand what we are doing with the ``b_vars``
+    If you have trouble understanding what we are doing with the ``b_vars``
     list, simply add a couple of ``print(b_vars)`` between the definition and
     the operations on it. You might also want to take another look at `your
-    training on lists
-    <https://swcarpentry.github.io/python-novice-inflammation/05-lists/index.html>`_.
+    understanding of lists
+    <https://swcarpentry.github.io/python-novice-inflammation/04-lists/index.html>`_.
 
 
 Variable aliases
 ----------------
 
-Apart from variables for the mother B-meson, we are also interested in
+Apart from variables for the mother :math:`B` meson, we are also interested in the
 information of the other daughter and granddaughter variables. You can access
 them via the `daughter` meta variable, which takes an integer and a variable
 name as input arguments. The integer (0-based) counts through the daughter
-particles, ``daughter(0, p)`` would for example be the momentum of the first
+particles, e.g. ``daughter(0, p)`` would be the momentum of the first
 daughter, in our case of the :math:`J/\Psi`. This function can also be used
 recursively.
 
@@ -891,10 +891,10 @@ recursively.
 .. admonition:: Solution
     :class: toggle solution
 
-    It's the energy of the positive muon.
+    It's the energy of the positive electron.
 
-In principle, one can add these nested variables directly to the ntuple
-but the brackets have to be escaped (i.e. replaced with "normal" characters)
+In principle, one can add these nested variables directly to the ntuple,
+but the brackets have to be escaped (i.e. replaced with "normal" characters),
 and the resulting variable name in the ntuple is not very user-friendly or
 intuitive. For example ``daughter(0, daughter(0, E))`` becomes
 ``daughter__bo0__cm__spdaughter__bo0__cm__spE__bc__bc``. Not exactly pretty,
@@ -906,7 +906,7 @@ This can be done with `addAlias`.
 .. admonition:: Exercise
     :class: exercise stacked
 
-    How can you replace ``daughter(0, daughter(0, E))`` with ``mup_E``?
+    How can you replace ``daughter(0, daughter(0, E))`` with ``ep_E``?
 
 .. admonition:: Hint
     :class: toggle xhint stacked
@@ -920,13 +920,12 @@ This can be done with `addAlias`.
 
         from variables import variables as vm
 
-
-        vm.addAlias("mup_E", "daughter(0, daughter(0, E))")
+        vm.addAlias("ep_E", "daughter(0, daughter(0, E))")
 
 However, this can quickly fill up many, many lines. Therefore, there are utils
 to easily create aliases. The most useful is probably
 `create_aliases_for_selected`. It lets you select particles from a decay
-string via the ``^`` operator, for which you want to define aliases, and also
+string via the ``^`` operator for which you want to define aliases, and also
 set a prefix. Another utility is `create_aliases`, which is particularly
 useful to wrap a list of variables in another meta-variable like `useCMSFrame`
 or `matchedMC`.
@@ -935,8 +934,8 @@ or `matchedMC`.
     :class: exercise stacked
 
     Add PID and track variables for all charged final state particles and the
-    invariant mass of the intermediate resonances to the ntuple. Also add the
-    standard variables from before for all particles in the decay chain, the
+    invariant mass of the intermediate resonances to the ntuple. Also, add the
+    standard variables from before for all particles in the decay chain, and include the
     kinematics both in the lab and the CMS frame.
 
 .. admonition:: Hint: Where to look
@@ -985,14 +984,14 @@ or `matchedMC`.
 
 .. hint::
 
-    To get more information about the aliases that we are creating, simply use
+    To get more information about the aliases we are creating, simply use
     `VariableManager.printAliases` (``vm.printAliases()``) just before
     processing your path.
 
 .. seealso::
 
     Some more example steering files that center around the `VariableManager`
-    can be found `on stash <https://stash.desy.de/projects/B2/repos/basf2/browse/analysis/examples/VariableManager>`_.
+    can be found `on stash <https://gitlab.desy.de/belle2/software/basf2/-/tree/main/analysis/examples/VariableManager>`_.
 
 .. admonition:: Exercise
     :class: exercise
@@ -1012,6 +1011,6 @@ or `matchedMC`.
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Authors of this lesson
+.. rubric:: Authors of this lesson
 
-    Frank Meier, Kilian Lieret (minor improvements)
+Frank Meier, Kilian Lieret (minor improvements)

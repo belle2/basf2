@@ -64,15 +64,15 @@ std::string MCRecoTrackMatchingStatusColorMap::map(int index __attribute__((unus
   MCParticle* mcParticle = recoTrack.getRelatedTo<MCParticle>();
   bool isPrimary = mcParticle->isPrimaryParticle();
   switch (mcMatchInfo) {
-    case MCToPRMatchInfo::c_Matched:
+    case MCToPRMatchInfo::c_matched:
       return isPrimary ?  "green" : "limegreen";
       break;
 
-    case MCToPRMatchInfo::c_Merged:
+    case MCToPRMatchInfo::c_merged:
       return isPrimary ?  "blue" : "cornflowerblue";
       break;
 
-    case MCToPRMatchInfo::c_Missing:
+    case MCToPRMatchInfo::c_missing:
       return isPrimary ?  "darkred" : "crimson";
       break;
 

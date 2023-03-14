@@ -20,7 +20,7 @@
 import sys
 
 import basf2
-from reconstruction import add_mdst_output
+from mdst import add_mdst_output
 
 rootFileName = '../DSTtoMDST'
 logFileName = rootFileName + '.log'

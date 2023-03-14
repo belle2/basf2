@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <analysis/variables/EventShapeVariables.h>
 
 #include <analysis/dataobjects/Particle.h>
@@ -27,17 +27,13 @@ namespace Belle2 {
 
     double foxWolframR(const Particle*, const std::vector<double>& index)
     {
-      if (index.size() != 1) {
-        B2ERROR("foxWolframR cannot be called without providing the moment order");
-        return std::numeric_limits<float>::quiet_NaN();
-      }
+      if (index.size() != 1)
+        B2FATAL("foxWolframR cannot be called without providing the moment order");
 
       int order = std::lround(index[0]);
 
-      if (order < 0 || order > 8) {
-        B2ERROR("The Fox-Wolfram moment order must be within 0 and 8.");
-        return std::numeric_limits<float>::quiet_NaN();
-      }
+      if (order < 0 || order > 8)
+        B2FATAL("The Fox-Wolfram moment order must be within 0 and 8.");
 
       StoreObjPtr<EventShapeContainer> evtShapeCont;
       if (!evtShapeCont) {
@@ -45,7 +41,7 @@ namespace Belle2 {
         return std::numeric_limits<float>::quiet_NaN();
       }
       if (evtShapeCont->getFWMoment(0) == 0) {
-        B2ERROR("The 0th-order FoxWolfram moment is zero");
+        B2INFO("The 0th-order FoxWolfram moment is zero");
         return std::numeric_limits<float>::quiet_NaN();
       }
       return evtShapeCont->getFWMoment(order) / evtShapeCont->getFWMoment(0);
@@ -53,17 +49,13 @@ namespace Belle2 {
 
     double foxWolframH(const Particle*, const std::vector<double>& index)
     {
-      if (index.size() != 1) {
-        B2ERROR("foxWolframH cannot be called without providing the moment order");
-        return std::numeric_limits<float>::quiet_NaN();
-      }
+      if (index.size() != 1)
+        B2FATAL("foxWolframH cannot be called without providing the moment order");
 
       int order = std::lround(index[0]);
 
-      if (order < 0 || order > 8) {
-        B2ERROR("The Fox-Wolfram moment order must be within 0 and 8.");
-        return std::numeric_limits<float>::quiet_NaN();
-      }
+      if (order < 0 || order > 8)
+        B2FATAL("The Fox-Wolfram moment order must be within 0 and 8.");
 
       StoreObjPtr<EventShapeContainer> evtShapeCont;
       if (!evtShapeCont) {
@@ -75,29 +67,23 @@ namespace Belle2 {
 
     Manager::FunctionPtr harmonicMoment(const std::vector<std::string>& arguments)
     {
-      if (arguments.size() != 2) {
-        B2ERROR("harmonicMoment requires two arguments: the harmonic order (0-8) and the reference axis name (thrust or collision)");
-        return nullptr;
-      }
+      if (arguments.size() != 2)
+        B2FATAL("harmonicMoment requires two arguments: the harmonic order (0-8) and the reference axis name (thrust or collision)");
 
       int order = -1;
       try {
         order = Belle2::convertString<int>(arguments[0]);
       } catch (std::invalid_argument&) {
-        B2ERROR("First argument of harmonicMoment must be an integer");
-        return nullptr;
+        B2FATAL("First argument of harmonicMoment must be an integer");
       }
       std::string axisName =  arguments[1];
       boost::to_lower(axisName);
 
-      if (order < 0 || order > 8) {
-        B2ERROR("The Fox-Wolfram moment order must be within 0 and 8.");
-        return nullptr;
-      }
-      if (axisName != "thrust" && axisName != "collision") {
-        B2ERROR("Invalid axis name "  << arguments[1] << ". The valid options are thrust and collision");
-        return nullptr;
-      }
+      if (order < 0 || order > 8)
+        B2FATAL("The Fox-Wolfram moment order must be within 0 and 8.");
+
+      if (axisName != "thrust" && axisName != "collision")
+        B2FATAL("Invalid axis name "  << arguments[1] << ". The valid options are thrust and collision");
 
       auto func = [order, axisName](const Particle*) -> double{
         StoreObjPtr<EventShapeContainer> evtShapeCont;
@@ -116,29 +102,23 @@ namespace Belle2 {
 
     Manager::FunctionPtr cleoCone(const std::vector<std::string>& arguments)
     {
-      if (arguments.size() != 2) {
-        B2ERROR("cleoCone requires two arguments: the cone order (0-9) and the reference axis name (thrust or collision)");
-        return nullptr;
-      }
+      if (arguments.size() != 2)
+        B2FATAL("cleoCone requires two arguments: the cone order (0-9) and the reference axis name (thrust or collision)");
 
       int order = -1;
       try {
         order = Belle2::convertString<int>(arguments[0]);
       } catch (std::invalid_argument&) {
-        B2ERROR("Argument of cleoCone must be an integer");
-        return nullptr;
+        B2FATAL("Argument of cleoCone must be an integer");
       }
       std::string axisName =  arguments[1];
       boost::to_lower(axisName);
 
-      if (order < 0 || order > 8) {
-        B2ERROR("The CLEO cone order must be within 0 and 8.");
-        return nullptr;
-      }
-      if (axisName != "thrust" && axisName != "collision") {
-        B2ERROR("Invalid axis name "  << arguments[1] << ". The valid options are thrust and collision");
-        return nullptr;
-      }
+      if (order < 0 || order > 8)
+        B2FATAL("The CLEO cone order must be within 0 and 8.");
+
+      if (axisName != "thrust" && axisName != "collision")
+        B2FATAL("Invalid axis name "  << arguments[1] << ". The valid options are thrust and collision");
 
       auto func = [order, axisName](const Particle*) -> double{
         StoreObjPtr<EventShapeContainer> evtShapeCont;
@@ -163,7 +143,7 @@ namespace Belle2 {
         return std::numeric_limits<float>::quiet_NaN();
       }
       if (evtShapeCont->getFWMoment(0) == 0) {
-        B2ERROR("The 0th-order FoxWolfram moment is zero");
+        B2INFO("The 0th-order FoxWolfram moment is zero");
         return std::numeric_limits<float>::quiet_NaN();
       }
       return evtShapeCont->getFWMoment(1) / evtShapeCont->getFWMoment(0);
@@ -177,7 +157,7 @@ namespace Belle2 {
         return std::numeric_limits<float>::quiet_NaN();
       }
       if (evtShapeCont->getFWMoment(0) == 0) {
-        B2ERROR("The 0th-order FoxWolfram moment is zero");
+        B2INFO("The 0th-order FoxWolfram moment is zero");
         return std::numeric_limits<float>::quiet_NaN();
       }
       return evtShapeCont->getFWMoment(2) / evtShapeCont->getFWMoment(0);
@@ -191,7 +171,7 @@ namespace Belle2 {
         return std::numeric_limits<float>::quiet_NaN();
       }
       if (evtShapeCont->getFWMoment(0) == 0) {
-        B2ERROR("The 0th-order FoxWolfram moment is zero");
+        B2INFO("The 0th-order FoxWolfram moment is zero");
         return std::numeric_limits<float>::quiet_NaN();
       }
       return evtShapeCont->getFWMoment(3) / evtShapeCont->getFWMoment(0);
@@ -205,7 +185,7 @@ namespace Belle2 {
         return std::numeric_limits<float>::quiet_NaN();
       }
       if (evtShapeCont->getFWMoment(0) == 0) {
-        B2ERROR("The 0th-order FoxWolfram moment is zero");
+        B2INFO("The 0th-order FoxWolfram moment is zero");
         return std::numeric_limits<float>::quiet_NaN();
       }
       return evtShapeCont->getFWMoment(4) / evtShapeCont->getFWMoment(0);
@@ -592,6 +572,7 @@ namespace Belle2 {
 
 .. warning:: You have to run the Event Shape builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.
+
 )DOC",":math:`\\text{GeV}^2`/:math:`\\text{c}^2`");
     REGISTER_METAVARIABLE("harmonicMoment(i, axisName)", harmonicMoment, R"DOC(
 [Eventbased] Returns i-th order harmonic moment, calculated with respect to the axis ``axisName``.
@@ -645,30 +626,35 @@ Evaluates a variable value in the thrust reference frame.
 
 .. warning:: You have to run the Event Shape builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.
+
 )DOC","GeV/c");
     REGISTER_VARIABLE("harmonicMomentThrust1", harmonicMomentThrust1, R"DOC(
 [Eventbased] Harmonic moment of the 1st order calculated with respect to the thrust axis.
 
 .. warning:: You have to run the Event Shape builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.
+
 )DOC","GeV/c");
     REGISTER_VARIABLE("harmonicMomentThrust2", harmonicMomentThrust2, R"DOC(
 [Eventbased] Harmonic moment of the 2nd order calculated with respect to the thrust axis.
 
 .. warning:: You have to run the Event Shape builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.
+
 )DOC","GeV/c");
     REGISTER_VARIABLE("harmonicMomentThrust3", harmonicMomentThrust3, R"DOC(
 [Eventbased] Harmonic moment of the 3rd order calculated with respect to the thrust axis.
 
 .. warning:: You have to run the Event Shape builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.
+
 )DOC","GeV/c");
     REGISTER_VARIABLE("harmonicMomentThrust4", harmonicMomentThrust4, R"DOC(
 [Eventbased] Harmonic moment of the 4th order calculated with respect to the thrust axis.
 
 .. warning:: You have to run the Event Shape builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.
+
 )DOC","GeV/c");
 
     REGISTER_VARIABLE("cleoConeThrust0", cleoConeThrust0, R"DOC(
@@ -728,7 +714,7 @@ Evaluates a variable value in the thrust reference frame.
 
 
     REGISTER_VARIABLE("sphericity", sphericity, R"DOC(
-[Eventbased] Event sphericity, defined as the linear combination of the sphericity eigenvalues :math:`\\lambda_i`: :math:`S = (3/2)(\\lambda_2+\\lambda_3)`.
+[Eventbased] Event sphericity, defined as the linear combination of the sphericity eigenvalues :math:`\lambda_i`: :math:`S = (3/2)(\lambda_2+\lambda_3)`.
 
 .. warning:: You have to run the Event Shape builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.
@@ -776,72 +762,84 @@ Evaluates a variable value in the thrust reference frame.
 
 .. warning:: You have to run the Event Shape builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.
+
 )DOC","GeV/:math:`\\text{c}^2`");
     REGISTER_VARIABLE("forwardHemisphereX", forwardHemisphereX, R"DOC(
 [Eventbased] X component of the total momentum of the particles flying in the same direction as the thrust axis.
 
 .. warning:: You have to run the Event Shape builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.
+
 )DOC","GeV/c");
     REGISTER_VARIABLE("forwardHemisphereY", forwardHemisphereY, R"DOC(
 [Eventbased] Y component of the total momentum of the particles flying in the same direction as the thrust axis.
 
 .. warning:: You have to run the Event Shape builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.
+
 )DOC","GeV/c");
     REGISTER_VARIABLE("forwardHemisphereZ", forwardHemisphereZ, R"DOC(
 [Eventbased] Z component of the total momentum of the particles flying in the same  direction of the thrust axis.
 
 .. warning:: You have to run the Event Shape builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.
+
 )DOC","GeV/c");
     REGISTER_VARIABLE("forwardHemisphereMomentum", forwardHemisphereMomentum, R"DOC(
 [Eventbased] Total momentum of the particles flying in the same direction as the thrust axis.
 
 .. warning:: You have to run the Event Shape builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.
+
 )DOC","GeV/c");
     REGISTER_VARIABLE("forwardHemisphereEnergy", forwardHemisphereEnergy, R"DOC(
 [Eventbased] Total energy of the particles flying in the same direction as the thrust axis.
 
 .. warning:: You have to run the Event Shape builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.
+
 )DOC","GeV");
     REGISTER_VARIABLE("backwardHemisphereMass", backwardHemisphereMass, R"DOC(
 [Eventbased] Invariant mass of the particles flying in the direction opposite to the thrust axis.
 
 .. warning:: You have to run the Event Shape builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.
+
 )DOC","GeV/:math:`\\text{c}^2`");
     REGISTER_VARIABLE("backwardHemisphereX", backwardHemisphereX, R"DOC(
 [Eventbased] X component of the total momentum of the particles flying in the direction opposite to the thrust axis.
 
 .. warning:: You have to run the Event Shape builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.
+
 )DOC","GeV/c");
     REGISTER_VARIABLE("backwardHemisphereY", backwardHemisphereY, R"DOC(
 [Eventbased] Y component of the total momentum of the particles flying in the direction opposite to the thrust axis.
 
 .. warning:: You have to run the Event Shape builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.
+
 )DOC","GeV/c");
     REGISTER_VARIABLE("backwardHemisphereZ", backwardHemisphereZ, R"DOC(
 [Eventbased] Z component of the total momentum of the particles flying in the direction opposite to the thrust axis.
 
 .. warning:: You have to run the Event Shape builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.
+
 )DOC","GeV/c");
     REGISTER_VARIABLE("backwardHemisphereMomentum", backwardHemisphereMomentum, R"DOC(
 [Eventbased] Total momentum of the particles flying in the direction opposite to the thrust axis.
 
 .. warning:: You have to run the Event Shape builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.
+
 )DOC","GeV/c");
     REGISTER_VARIABLE("backwardHemisphereEnergy", backwardHemisphereEnergy, R"DOC(
 [Eventbased] Total energy of the particles flying in the direction opposite to the thrust axis.
 
 .. warning:: You have to run the Event Shape builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.
+
 )DOC","GeV");
 
   }

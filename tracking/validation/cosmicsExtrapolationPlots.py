@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -55,7 +54,7 @@ class CosmicsExtapolationPlotModule(basf2.Module):
 
     def __init__(self):
         """Initialization."""
-        super(CosmicsExtapolationPlotModule, self).__init__()
+        super().__init__()
 
         #: Output file name.
         self.output_file = ROOT.TFile('CosmicsExtrapolationPlots.root',

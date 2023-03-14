@@ -9,7 +9,7 @@
 
 #include <tracking/trackFitting/fitter/base/TrackFitter.h>
 
-#include <TVector3.h>
+#include <framework/geometry/B2Vector3.h>
 
 using namespace Belle2;
 
@@ -137,10 +137,10 @@ double BaseTrackTimeEstimatorModule::estimateTimeSeedUsingFittedInformation(Reco
     // When the readout position should be used, calculate the propagation time of the signal from the hit to the
     // readout position.
     if (m_param_useReadoutPosition) {
-      const TVector3& position = measuredState.getPos();
+      const ROOT::Math::XYZVector& position = ROOT::Math::XYZVector(measuredState.getPos());
       B2ASSERT("Readout Position must have 3 components.", m_param_readoutPosition.size() == 3);
-      const TVector3 readoutPositionAsTVector3(m_param_readoutPosition[0], m_param_readoutPosition[1], m_param_readoutPosition[2]);
-      const double propagationLength = (position - readoutPositionAsTVector3).Mag();
+      const ROOT::Math::XYZVector readoutPosition(m_param_readoutPosition[0], m_param_readoutPosition[1], m_param_readoutPosition[2]);
+      const double propagationLength = (position - readoutPosition).R();
       const double propagationTime = propagationLength / m_param_readoutPositionPropagationSpeed;
 
       return flightTime - propagationTime;

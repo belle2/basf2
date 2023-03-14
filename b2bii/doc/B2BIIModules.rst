@@ -1,3 +1,7 @@
+===============
+b2bii functions
+===============
+
 b2biiConversion
 ===============
 .. automodule:: b2biiConversion

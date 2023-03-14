@@ -10,6 +10,11 @@ env['TOOLS_LIBS']['b2klm-indexToNumber'] = ['framework',
                                             'stdc++', 
                                             '$ROOT_LIBS']
 
+env['TOOLS_LIBS']['b2klm-likelihood-parameters'] = [
+  'klm', 'klm_dataobjects',
+  'analysis', 'analysis_dataobjects', 'framework',
+  '$ROOT_LIBS']
+
 env['TOOLS_LIBS']['b2klm-numberToIndex'] = ['framework',
                                             'klm', 'klm_dataobjects',
                                             'stdc++', 

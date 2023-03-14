@@ -20,43 +20,46 @@ from ROOT.Belle2 import TOPDatabaseImporter
 import sys
 import glob
 
-# define a local database with write access
-# (will be created automatically, if doesn't exist)
-b2.use_local_database("localDB/localDB.txt", "localDB", False)
+# define local database with write access
+b2.conditions.expert_settings(save_payloads="localDB/localDB.txt")
+
+# get a list of root files containing calibration constants
+folder_name = 'tbc'  # location of output files from TOPTimeBaseCalibrator
+fNames = glob.glob(folder_name + '/*.root')
+if len(fNames) == 0:
+    print('No root files found in', folder_name)
+    sys.exit()
+
+# convert the list to a single string
+fileNames = ''
+for fName in fNames:
+    fileNames = fileNames + ' ' + fName
+
+
+class PayloadImporter(b2.Module):
+    ''' Payload importer using TOPDatabaseImporter '''
+
+    def initialize(self):
+        ''' Import timebase calibration '''
+
+        dbImporter = TOPDatabaseImporter()
+        dbImporter.importSampleTimeCalibration(fileNames)
+
 
 # create path
 main = b2.create_path()
 
 # Event info setter - execute single event
-eventinfosetter = b2.register_module('EventInfoSetter')
-eventinfosetter.param('evtNumList', [1])
-main.add_module(eventinfosetter)
+main.add_module('EventInfoSetter')
 
-# Gearbox - access to xml files
-gearbox = b2.register_module('Gearbox')
-main.add_module(gearbox)
+# Gearbox
+main.add_module('Gearbox')
 
-geometry = b2.register_module('Geometry')
-geometry.param('useDB', False)
-geometry.param('components', ['TOP'])
-main.add_module(geometry)
+# Geometry parameters
+main.add_module('TOPGeometryParInitializer', useDB=False)
+
+# Importer
+main.add_module(PayloadImporter())
 
 # process single event
 b2.process(main)
-
-# and then run the importer (note: input file is not there - must change the path!)
-dbImporter = TOPDatabaseImporter()
-
-dir = 'tbc'  # location of output files from TOPTimeBaseCalibrator
-fNames = glob.glob(dir + '/*.root')
-if len(fNames) == 0:
-    print('No root files found in', dir)
-    sys.exit()
-fileNames = ''
-
-# convert a list to a single string (since list doesn't work for some reasons)
-for fName in fNames:
-    fileNames = fileNames + ' ' + fName
-
-# import constants
-dbImporter.importSampleTimeCalibration(fileNames)

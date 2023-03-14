@@ -36,6 +36,16 @@ namespace Belle2 {
     void event() override;
 
   private:
+    /// StoreArray name of the PXD hits.
+    std::string m_param_pxdHitsStoreArrayName = "";
+    /// StoreArray name of the SVD hits.
+    std::string m_param_svdHitsStoreArrayName = "";
+    /// StoreArray name of the CDC hits.
+    std::string m_param_cdcHitsStoreArrayName = "";
+    /// StoreArray name of the BKLM hits.
+    std::string m_param_bklmHitsStoreArrayName = "";
+    /// StoreArray name of the EKLM hits.
+    std::string m_param_eklmHitsStoreArrayName = "";
     /// Name of the input StoreArray
     std::string m_inputStoreArrayName;
     /// store array for the input RecoTracks
@@ -46,6 +56,9 @@ namespace Belle2 {
     StoreArray<RecoTrack> m_inputRecoTracksFlipped;
     /// flipping cuts could be read from the DB
     OptionalDBObjPtr<TrackFlippingCuts> m_flipCutsFromDB{"TRKTrackFlipAndRefit_MVA_cuts"};
+
+    /// StoreArray of TrackFitResult, only default name should be considered here
+    StoreArray<TrackFitResult> m_trackFitResults;
   };
 }
 

@@ -8,7 +8,7 @@
 
 #pragma once
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/datastore/StoreArray.h>
 
 namespace Belle2 {
@@ -17,6 +17,9 @@ namespace Belle2 {
   class KLMDigitRaw;
 
   namespace KLM {
+
+    /** Number of channels in ASIC. */
+    const int c_NChannelsAsic = 15;
 
     /**
      * Channel group.

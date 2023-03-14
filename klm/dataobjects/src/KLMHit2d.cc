@@ -9,7 +9,7 @@
 /* Own header. */
 #include <klm/dataobjects/KLMHit2d.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;

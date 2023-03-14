@@ -214,7 +214,7 @@ elif option == 'intel':
     global_env['LD'] = 'xild'
     global_env['LINK'] = 'icpx'
     global_env['SHLINK'] = 'icpx'
-    global_env.Append(CCFLAGS=['-Wno-debug-disables-optimization', '-Wshadow'])
+    global_env.Append(CCFLAGS=['-fp-model=precise', '-O2', '-Wshadow'])
 elif option == 'clang':
     clang_dir = None
     for dir in os.environ.get('PATH', '').split(os.pathsep):
@@ -227,7 +227,7 @@ elif option == 'clang':
     global_env['CC'] = 'clang'
     global_env['CXX'] = 'clang++'
     # enable a few extra warnings warnings but disable the missing braces warning, because it can lead
-    # to false positives in conjuction with std::array : https://llvm.org/bugs/show_bug.cgi?id=21629
+    # to false positives in conjunction with std::array : https://llvm.org/bugs/show_bug.cgi?id=21629
     global_env.Append(CCFLAGS=["-O3", "-Wno-missing-braces", '-Wmissing-field-initializers', '-Wshadow', '-Wno-unused-command-line-argument'],
                       CXXFLAGS=["-Wheader-hygiene"])
     # make sure clang uses the correct paths to the gcc std c++ and not the
@@ -289,7 +289,7 @@ if (not global_env.GetOption('clean')) and (not global_env.GetOption('help')):
 # cling remembers include paths to be able to find them at run-time, so only use -I here
 # remove all compiler warnings
 global_env['CLINGFLAGS'] = [s.replace('-isystem', '-I') for s in global_env['CCFLAGS']
-                            if not (s.startswith("-W") or s.startswith('-wd')) and s not in ['-g', '-O3', '-flto']] + \
+                            if not (s.startswith("-W") or s.startswith('-wd') or s.startswith('-fp-model')) and s not in ['-g', '-O3', '-flto']] + \
                            ["-noIncludePaths"]
 
 special_targets = ['tests', 'b2test-units', 'include', 'lib', 'bin', 'modules', 'data', 'scripts']
@@ -363,7 +363,7 @@ if len(global_env['TEST_FILES']) > 0:
 # build sphinx documentation if the --sphinx option is used
 if global_env.GetOption("sphinx"):
     light_option = " --light " if GetOption('light') else ""
-    sphinx_targets = ['html', 'latex', 'json']
+    sphinx_targets = ['html', 'latex']
     for sphinx_target in sphinx_targets:
         sphinx = global_env.Command(f'build/{sphinx_target}', 'index.rst', f"b2code-sphinx-build {light_option} -t {sphinx_target}")
         global_env.Depends(sphinx, ['scripts', 'data', 'lib', 'bin', 'modules'])

@@ -99,16 +99,16 @@ namespace Belle2 {
     // TH1I* h_inp_fall[N_BITS_RESERVED][nskim_gdldqm];
     //! itd bits
     TH1I* h_itd[nskim_gdldqm] = {nullptr};
-    TH1I* h_itd_rise[N_BITS_RESERVED][nskim_gdldqm] = {nullptr};
-    TH1I* h_itd_fall[N_BITS_RESERVED][nskim_gdldqm] = {nullptr};
+    TH1I* h_itd_rise[N_BITS_RESERVED][nskim_gdldqm] = {{nullptr}};
+    TH1I* h_itd_fall[N_BITS_RESERVED][nskim_gdldqm] = {{nullptr}};
     //! ftd bits
     TH1I* h_ftd[nskim_gdldqm] = {nullptr};
-    TH1I* h_ftd_rise[N_BITS_RESERVED][nskim_gdldqm] = {nullptr};
-    TH1I* h_ftd_fall[N_BITS_RESERVED][nskim_gdldqm] = {nullptr};
+    TH1I* h_ftd_rise[N_BITS_RESERVED][nskim_gdldqm] = {{nullptr}};
+    TH1I* h_ftd_fall[N_BITS_RESERVED][nskim_gdldqm] = {{nullptr}};
     //! psn bits
     TH1I* h_psn[nskim_gdldqm] = {nullptr};
-    TH1I* h_psn_rise[N_BITS_RESERVED][nskim_gdldqm] = {nullptr};
-    TH1I* h_psn_fall[N_BITS_RESERVED][nskim_gdldqm] = {nullptr};
+    TH1I* h_psn_rise[N_BITS_RESERVED][nskim_gdldqm] = {{nullptr}};
+    TH1I* h_psn_fall[N_BITS_RESERVED][nskim_gdldqm] = {{nullptr}};
     TH1I* h_psn_extra[nskim_gdldqm] = {nullptr};
     TH1I* h_psn_extra_fast[nskim_gdldqm] = {nullptr};
     TH1I* h_psn_effect_to_l1[nskim_gdldqm] = {nullptr};
@@ -159,12 +159,12 @@ namespace Belle2 {
     static const int n_output_pure_extra = 13;
     static const char* output_pure_extra[n_output_pure_extra];
     static const int nsample_fast = 500; //number of sample for fast efficiency monitor
-    int array_psn_extra_fast[nskim_gdldqm][nsample_fast][n_output_extra] = {0}; //array to store past nsample events
+    int array_psn_extra_fast[nskim_gdldqm][nsample_fast][n_output_extra] = {{{0}}}; //array to store past nsample events
 
     //condition database for unpacker
     DBObjPtr<TRGGDLDBUnpacker> m_unpacker;
     int LeafBitMap[320] = {0};
-    char LeafNames[320][100] = {0};
+    char LeafNames[320][100] = {{0}};
     int _e_timtype = 0;
     int _e_gdll1rvc = 0;
     int _e_coml1rvc = 0;

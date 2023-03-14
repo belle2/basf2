@@ -17,7 +17,7 @@ An an example of how to produce performance plots from the ntuple can be found a
 ARICHStandAlone.py 
 ------------------
 
-Stand-alone simulation and reconstruction of ARICH detector (no other detectors included). The simulation is much,much faster than full detector simulation, so it is useful for large statistics studies of ARICH detector (reconstruction algorithm, geometry effects, etc..). One has to be aware that in this case the track information (position and direction at aerogel plane) is taken from MC (and not from reconstructed tracks), and smeared to mimic tracking resolution. However, a simple Gaussian smearing is done, which can lead to significant diffrences in performance of stand-alone and full detector simulations (especially at low fake rates, due to very badly reconstructed tracks which are not reproduced by Gaussian smearing). With this in mind, stand-alone simulation is very useful at least for the start of your studies, as it enables very large statistics sample in short time. 
+Stand-alone simulation and reconstruction of ARICH detector (no other detectors included). The simulation is much,much faster than full detector simulation, so it is useful for large statistics studies of ARICH detector (reconstruction algorithm, geometry effects, etc..). One has to be aware that in this case the track information (position and direction at aerogel plane) is taken from MC (and not from reconstructed tracks), and smeared to mimic tracking resolution. However, a simple Gaussian smearing is done, which can lead to significant differences in performance of stand-alone and full detector simulations (especially at low fake rates, due to very badly reconstructed tracks which are not reproduced by Gaussian smearing). With this in mind, stand-alone simulation is very useful at least for the start of your studies, as it enables very large statistics sample in short time. 
 
 ARICHStandAlone.py by default generates and reconstructs 1000 particle gun events (pi and K). 
 The output of script is again ntuple from ARICHNtuple module (see previous example). 
@@ -30,7 +30,7 @@ This example demonstrates how to generate BB events (evtgen_gen.py), run the sim
 
 Separation into three parts is done for practical reason. For example, if you want to study the reconstruction method, you first generate and simulate events, store the output in root files, and then study reconstruction on these events (obviously it is impractical to run simulation, which takes ages, over and over again if you study the effect of some change in reconstruction).
 
-Finally the output of evtgen_rec.py is again root file with ntpule from ARICHNtuple module.
+Finally the output of evtgen_rec.py is again root file with ntuple from ARICHNtuple module.
 
 ----------------------
 ARICHCosmicTestData.py   

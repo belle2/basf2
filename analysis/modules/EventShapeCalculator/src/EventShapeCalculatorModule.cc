@@ -32,7 +32,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(EventShapeCalculator)
+REG_MODULE(EventShapeCalculator);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -74,8 +74,8 @@ void EventShapeCalculatorModule::event()
 
   if (!m_eventShapeContainer) m_eventShapeContainer.create();
 
-  parseParticleLists(m_particleListNames);
-
+  const int nPart = parseParticleLists(m_particleListNames);
+  if (nPart == 0) return;
 
   // --------------------
   // Calculates the FW moments
@@ -223,13 +223,13 @@ int EventShapeCalculatorModule::parseParticleLists(vector<string> particleListNa
 
   unsigned short nParticleLists = particleListNames.size();
   if (nParticleLists == 0)
-    B2ERROR("No particle lists found. EventShape calculation not performed.");
+    B2WARNING("No particle lists found. EventShape calculation not performed.");
 
-  // This vector temporary stores the particle objects
+  // This vector temporary stores the mdstSource of particle objects
   // that have been processed so far (not only the momenta)
   // in order to check for duplicates before pushing the 3- and 4- vectors
   // in the corresponding lists
-  std::vector<Particle> tmpParticles;
+  std::vector<int> usedMdstSources;
 
   // Loops over the number of particle lists
   for (unsigned short iList = 0; iList < nParticleLists; iList++) {
@@ -245,15 +245,16 @@ int EventShapeCalculatorModule::parseParticleLists(vector<string> particleListNa
       bool isDuplicate = false;
 
       if (m_checkForDuplicates) {
-        // loops over all the particles loaded so far
-        for (const auto& testPart : tmpParticles) {
-          if (testPart.isCopyOf(part)) {
-            B2WARNING("Duplicate particle found. The new one won't be used for the calculation of the event shape variables. Please, double check your input lists and try to make them mutually exclusive.");
-            isDuplicate = true;
-            break;
-          }
+        int mdstSource = part->getMdstSource();
+
+        auto result = std::find(usedMdstSources.begin(), usedMdstSources.end(), mdstSource);
+        if (result == usedMdstSources.end()) {
+          usedMdstSources.push_back(mdstSource);
+        } else {
+          B2WARNING("Duplicate particle found. The new one won't be used for the calculation of the event shape variables. "
+                    "Please, double check your input lists and try to make them mutually exclusive.");
+          isDuplicate = true;
         }
-        tmpParticles.push_back(*part);
       }
 
       if (!isDuplicate) {

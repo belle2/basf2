@@ -51,7 +51,7 @@ using namespace TOP;
 using namespace Belle2::Variable;
 
 
-REG_MODULE(TOPRingPlotter)
+REG_MODULE(TOPRingPlotter);
 
 TOPRingPlotterModule::TOPRingPlotterModule() : Module()
 {
@@ -214,8 +214,8 @@ void TOPRingPlotterModule::initialize()
 
   // Check the list of pdg hypotheses
   for (auto pdg : m_pdgHyp) {
-    if ((pdg != Const::electron.getPDGCode()) & (pdg != Const::pion.getPDGCode()) & (pdg != Const::kaon.getPDGCode()) &
-        (pdg != Const::muon.getPDGCode()) & (pdg != Const::proton.getPDGCode()))
+    if ((pdg != Const::electron.getPDGCode()) and (pdg != Const::pion.getPDGCode()) and (pdg != Const::kaon.getPDGCode()) and
+        (pdg != Const::muon.getPDGCode()) and (pdg != Const::proton.getPDGCode()))
       B2FATAL("Invalid PDG hypothesis for the PDF evaluation: " << pdg);
     short duplicateCount = 0;
     for (auto pdg2 : m_pdgHyp) {

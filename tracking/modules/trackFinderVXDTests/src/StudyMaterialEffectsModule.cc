@@ -15,17 +15,15 @@
 
 #include <vxd/geometry/SensorInfoBase.h>
 
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 #include "TMath.h"
 
-
-using namespace std;
 using namespace Belle2;
 
 
-REG_MODULE(StudyMaterialEffects)
+REG_MODULE(StudyMaterialEffects);
 
-StudyMaterialEffectsModule::StudyMaterialEffectsModule() : Module(), m_tree("materialEffectsStudyOutput" , DataStore::c_Persistent)
+StudyMaterialEffectsModule::StudyMaterialEffectsModule() : Module(), m_tree("materialEffectsStudyOutput", DataStore::c_Persistent)
 {
   setDescription("StudyMaterialEffects- should be used with single track pGuns and without magnetic field.");
 
@@ -169,10 +167,10 @@ B2Vector3D StudyMaterialEffectsModule::getGlobalPosition(const SVDTrueHit* trueH
   const Belle2::VXD::SensorInfoBase* aSensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(vxdID);
 
   if (useEntry) {
-    B2Vector3D pos = aSensorInfo->pointToGlobal(TVector3(trueHit->getEntryU(), trueHit->getEntryV(), 0), true);
+    B2Vector3D pos = aSensorInfo->pointToGlobal(ROOT::Math::XYZVector(trueHit->getEntryU(), trueHit->getEntryV(), 0), true);
     return pos;
   }
-  B2Vector3D pos = aSensorInfo->pointToGlobal(TVector3(trueHit->getExitU(), trueHit->getExitV(), 0), true);
+  B2Vector3D pos = aSensorInfo->pointToGlobal(ROOT::Math::XYZVector(trueHit->getExitU(), trueHit->getExitV(), 0), true);
   return pos;
 }
 

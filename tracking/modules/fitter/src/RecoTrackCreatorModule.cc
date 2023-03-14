@@ -8,12 +8,10 @@
 #include <tracking/modules/fitter/RecoTrackCreatorModule.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/RecoHitInformation.h>
-#include <mdst/dataobjects/MCParticle.h>
 
-using namespace std;
 using namespace Belle2;
 
-REG_MODULE(RecoTrackCreator)
+REG_MODULE(RecoTrackCreator);
 
 RecoTrackCreatorModule::RecoTrackCreatorModule() :
   Module()
@@ -47,20 +45,17 @@ void RecoTrackCreatorModule::initialize()
 {
   // Read in genfit::TrackCands
   // Write our RecoTracks
-  StoreArray<genfit::TrackCand> trackCandidates(m_param_trackCandidatesStoreArrayName);
-  trackCandidates.isRequired();
+  m_TrackCandidates.isRequired(m_param_trackCandidatesStoreArrayName);
 
-  StoreArray<RecoTrack> recoTracks(m_param_recoTracksStoreArrayName);
-  recoTracks.registerInDataStore();
-  recoTracks.registerRelationTo(trackCandidates);
-  trackCandidates.registerRelationTo(recoTracks);
+  m_RecoTracks.registerInDataStore(m_param_recoTracksStoreArrayName);
+  m_RecoTracks.registerRelationTo(m_TrackCandidates);
+  m_TrackCandidates.registerRelationTo(m_RecoTracks);
 
-  StoreArray<MCParticle> mcParticles;
-  if (mcParticles.isOptional()) {
-    recoTracks.registerRelationTo(mcParticles);
+  if (m_MCParticles.isOptional()) {
+    m_RecoTracks.registerRelationTo(m_MCParticles);
   }
 
-  RecoTrack::registerRequiredRelations(recoTracks,
+  RecoTrack::registerRequiredRelations(m_RecoTracks,
                                        m_param_pxdHitsStoreArrayName,
                                        m_param_svdHitsStoreArrayName,
                                        m_param_cdcHitsStoreArrayName,
@@ -71,17 +66,11 @@ void RecoTrackCreatorModule::initialize()
 
 void RecoTrackCreatorModule::event()
 {
-  StoreArray<genfit::TrackCand> trackCandidates(m_param_trackCandidatesStoreArrayName);
-
-  StoreArray<RecoTrack> recoTracks(m_param_recoTracksStoreArrayName);
-
-  StoreArray<RecoHitInformation> recoHitInformations(m_param_recoHitInformationStoreArrayName);
-
-  StoreArray<MCParticle> mcParticles;
+//   StoreArray<RecoHitInformation> recoHitInformations(m_param_recoHitInformationStoreArrayName);
 
   // ugly..
 
-  for (const genfit::TrackCand& trackCandidate : trackCandidates) {
+  for (const genfit::TrackCand& trackCandidate : m_TrackCandidates) {
 
     if (trackCandidate.getNHits() < 3) {
       B2WARNING("Number of hits of track candidate is smaller than 3. Not creating track out of it.");
@@ -89,17 +78,17 @@ void RecoTrackCreatorModule::event()
     }
 
     RecoTrack* newRecoTrack = RecoTrack::createFromTrackCand(trackCandidate, m_param_recoTracksStoreArrayName,
-                                                             m_param_cdcHitsStoreArrayName, m_param_svdHitsStoreArrayName, m_param_pxdHitsStoreArrayName,
-                                                             m_param_recoHitInformationStoreArrayName,
-                                                             "", "", m_param_recreateSortingParameters);
+                                                             m_param_pxdHitsStoreArrayName, m_param_svdHitsStoreArrayName, m_param_cdcHitsStoreArrayName,
+                                                             "", "", m_param_recoHitInformationStoreArrayName,
+                                                             m_param_recreateSortingParameters);
 
 
     newRecoTrack->addRelationTo(&trackCandidate);
 
     // Add also the MC information
     const int mcParticleID = trackCandidate.getMcTrackId();
-    if (mcParticleID >= 0 and mcParticles.isOptional() and mcParticles.getEntries() > 0) {
-      MCParticle* relatedMCParticle = mcParticles[mcParticleID];
+    if (mcParticleID >= 0 and m_MCParticles.isOptional() and m_MCParticles.getEntries() > 0) {
+      MCParticle* relatedMCParticle = m_MCParticles[mcParticleID];
       if (relatedMCParticle) {
         newRecoTrack->addRelationTo(relatedMCParticle);
       } else {

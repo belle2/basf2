@@ -280,6 +280,11 @@ namespace Belle2 {
     double tagVErrOrthogonalBoostDirection(const Particle* particle);
 
     /**
+     * return cosine of the angle between momentum and boost vector
+     */
+    double particleCosThetaBoostDirection(const Particle* part);
+
+    /**
      * Returns internal mc flavor used in the TagV module. Only to be used for internal checks by developers.
      *
      */

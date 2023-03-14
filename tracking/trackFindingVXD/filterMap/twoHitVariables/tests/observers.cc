@@ -68,7 +68,7 @@ namespace VXDTFObserversTest {
   /** returns a pxdCluster with given sensorID and local coordinates */
   PXDCluster providePXDCluster(double u, double v, VxdID aVxdID, double uError = 0.1, double vError = 0.1)
   {
-    return PXDCluster(aVxdID, u, v, uError, vError, 0, 0, 1, 1, 1, 1 , 1, 1);
+    return PXDCluster(aVxdID, u, v, uError, vError, 0, 0, 1, 1, 1, 1, 1, 1);
   }
 
 
@@ -900,9 +900,9 @@ namespace VXDTFObserversTest {
 
     //     Filter< Distance3DSquared<SpacePoint>, Range<double, double>, VectorOfObservers<Distance3DSquared> > filter(unobservedFilter);
     Filter< Distance3DSquared<SpacePoint>, Range<double, double>, InfoObserver > observedFilter(unobservedFilter);
-    SpacePoint x1 = provideSpacePointDummy(1, 0.0f , 0.0f, 0.0f);
-    SpacePoint x2 = provideSpacePointDummy(1, 0.5f , 0.0f, 0.0f);
-    SpacePoint x3 = provideSpacePointDummy(1, 2.0f , 0.0f, 0.0f);
+    SpacePoint x1 = provideSpacePointDummy(1, 0.0f, 0.0f, 0.0f);
+    SpacePoint x2 = provideSpacePointDummy(1, 0.5f, 0.0f, 0.0f);
+    SpacePoint x3 = provideSpacePointDummy(1, 2.0f, 0.0f, 0.0f);
     auto myCounter = counter<Distance3DSquared<SpacePoint>>();
     myCounter.resetCounter();
 
@@ -934,18 +934,18 @@ namespace VXDTFObserversTest {
 
     observedFilter.accept(x2, x1);
     observedFilter.accept(x3, x1);
-    EXPECT_EQ(0 , myCounter.used);
+    EXPECT_EQ(0, myCounter.used);
 
     Filter< Distance3DSquared<SpacePoint>, Range<double, double>, ProvideBasicInfoObserver > anotherObservedFilter(
       unobservedFilter);
 
     anotherObservedFilter.accept(x2, x1);
     anotherObservedFilter.accept(x3, x1);
-    EXPECT_EQ(2 , myCounter.used);
-    EXPECT_EQ(1 , myCounter.accepted);
-    EXPECT_EQ(1 , myCounter.rejected);
-    EXPECT_EQ(0 , myCounter.wasInf);
-    EXPECT_EQ(0 , myCounter.wasNan);
+    EXPECT_EQ(2, myCounter.used);
+    EXPECT_EQ(1, myCounter.accepted);
+    EXPECT_EQ(1, myCounter.rejected);
+    EXPECT_EQ(0, myCounter.wasInf);
+    EXPECT_EQ(0, myCounter.wasNan);
   }
 
 

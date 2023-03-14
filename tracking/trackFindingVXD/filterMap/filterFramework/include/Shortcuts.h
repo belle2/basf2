@@ -247,7 +247,7 @@ namespace Belle2 {
   typename std::enable_if <
   std::is_base_of<SelectionVariable<typename Var::argumentType, Var::c_Nargs, typename Var::variableType>, Var>::value
   && std::is_arithmetic<ArithmeticLower>::value
-  && std::is_arithmetic<ArithmeticUpper>::value ,
+  && std::is_arithmetic<ArithmeticUpper>::value,
   Filter<Var, Range<ArithmeticLower, ArithmeticUpper>, Observer >>::type
   operator < (const Filter<Var, LowerBoundedSet<ArithmeticLower>, Observer>& filter, ArithmeticUpper upperBound)
   {
@@ -273,12 +273,12 @@ namespace Belle2 {
   typename std::enable_if <
   std::is_base_of<SelectionVariable<typename Var::argumentType, Var::c_Nargs, typename Var::variableType>, Var>::value
   && std::is_arithmetic<ArithmeticLower>::value
-  && std::is_arithmetic<ArithmeticUpper>::value ,
+  && std::is_arithmetic<ArithmeticUpper>::value,
   Filter<Var, Range<ArithmeticLower, ArithmeticUpper>, Observer >>::type
   operator > (const Filter<Var, UpperBoundedSet<ArithmeticUpper>, Observer>& filter, ArithmeticLower lowerBound)
   {
     return Filter<Var, Range<ArithmeticLower, ArithmeticUpper>, Observer>
-           (Range<ArithmeticLower, ArithmeticUpper> (lowerBound , filter.getRange().getSup()));
+           (Range<ArithmeticLower, ArithmeticUpper> (lowerBound, filter.getRange().getSup()));
   }
 
 
@@ -299,7 +299,7 @@ namespace Belle2 {
   typename std::enable_if <
   std::is_base_of<SelectionVariable<typename Var::argumentType, Var::c_Nargs, typename Var::variableType>, Var>::value
   && std::is_arithmetic<ArithmeticLower>::value
-  && std::is_arithmetic<ArithmeticUpper>::value ,
+  && std::is_arithmetic<ArithmeticUpper>::value,
   Filter<Var, ClosedRange<ArithmeticLower, ArithmeticUpper>, Observer >>::type
   operator <= (const Filter<Var, ClosedLowerBoundedSet<ArithmeticLower>, Observer>& filter, ArithmeticUpper upperBound)
   {
@@ -325,11 +325,11 @@ namespace Belle2 {
   typename std::enable_if <
   std::is_base_of<SelectionVariable<typename Var::argumentType, Var::c_Nargs, typename Var::variableType>, Var>::value
   && std::is_arithmetic<ArithmeticLower>::value
-  && std::is_arithmetic<ArithmeticUpper>::value ,
+  && std::is_arithmetic<ArithmeticUpper>::value,
   Filter<Var, ClosedRange<ArithmeticLower, ArithmeticUpper>, Observer >>::type
-  operator >= (const Filter<Var, ClosedUpperBoundedSet<ArithmeticUpper> , Observer>& filter, ArithmeticLower lowerBound)
+  operator >= (const Filter<Var, ClosedUpperBoundedSet<ArithmeticUpper>, Observer>& filter, ArithmeticLower lowerBound)
   {
     return Filter<Var, ClosedRange<ArithmeticLower, ArithmeticUpper>, Observer>
-           (ClosedRange<ArithmeticLower, ArithmeticUpper> (lowerBound , filter.getRange().getSup()));
+           (ClosedRange<ArithmeticLower, ArithmeticUpper> (lowerBound, filter.getRange().getSup()));
   }
 }

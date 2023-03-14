@@ -24,7 +24,7 @@ using namespace Belle2::PXD::PXDError;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(PXDUnpackerOld)
+REG_MODULE(PXDUnpackerOld);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -958,7 +958,7 @@ void PXDUnpackerOldModule::unpack_dhc_frame(void* data, const int len, const int
             B2DEBUG(29, "DHC-Meta Experiment number mismatch" <<
                     LogVar("DHC exp nr",
                            dhc.data_dhc_start_frame->get_experiment()) <<
-                    LogVar("META exp nr" , m_meta_experiment));
+                    LogVar("META exp nr", m_meta_experiment));
           }
           m_errorMask[c_nrMETA_MM_DHC_ERS] = true;
         }
@@ -966,7 +966,7 @@ void PXDUnpackerOldModule::unpack_dhc_frame(void* data, const int len, const int
           if (!(m_suppressErrorMask[c_nrMETA_MM_DHC_ERS])) {
             B2WARNING("DHC-Meta Run number mismatch");
             B2DEBUG(29, "DHC-Meta Run number mismatch" <<
-                    LogVar("DHC Run nr" ,
+                    LogVar("DHC Run nr",
                            dhc.data_dhc_start_frame->get_run()) <<
                     LogVar("META run nr", m_meta_run_nr));
           }
@@ -989,7 +989,7 @@ void PXDUnpackerOldModule::unpack_dhc_frame(void* data, const int len, const int
             B2DEBUG(29, "DHC-Meta 32 bit event number mismatch" <<
                     LogVar("DHC trigger nr", (((unsigned int) dhc.data_dhc_start_frame->getEventNrHi() << 16) |
                                               dhc.data_dhc_start_frame->getEventNrLo())) <<
-                    LogVar("META trigger nr" , (unsigned int)(m_meta_event_nr & 0xFFFFFFFF)));
+                    LogVar("META trigger nr", (unsigned int)(m_meta_event_nr & 0xFFFFFFFF)));
           }
           m_errorMask[c_nrMETA_MM_DHC] = true;
         }
@@ -1010,13 +1010,13 @@ void PXDUnpackerOldModule::unpack_dhc_frame(void* data, const int len, const int
                     LogVar("Meta Time $", static_cast < std::ostringstream && >(std::ostringstream() << hex << m_meta_time).str()) <<
                     LogVar("Trigger Type",  static_cast < std::ostringstream
                            && >(std::ostringstream() << hex << (dhc.data_dhc_start_frame->time_tag_lo_and_type & 0xF)).str()) <<
-                    LogVar("Meta seconds: $" , static_cast < std::ostringstream && >(std::ostringstream() <<  hex << m_meta_sec).str()) <<
-                    LogVar("DHC seconds $" , static_cast < std::ostringstream && >(std::ostringstream() <<  hex << trig_sec).str()) <<
-                    LogVar("Seconds difference $" , static_cast < std::ostringstream
+                    LogVar("Meta seconds: $", static_cast < std::ostringstream && >(std::ostringstream() <<  hex << m_meta_sec).str()) <<
+                    LogVar("DHC seconds $", static_cast < std::ostringstream && >(std::ostringstream() <<  hex << trig_sec).str()) <<
+                    LogVar("Seconds difference $", static_cast < std::ostringstream
                            && >(std::ostringstream() << hex << (trig_sec - m_meta_sec)).str()) <<
-                    LogVar("Meta ticks from 127MHz $" , static_cast < std::ostringstream && >(std::ostringstream() <<  hex << m_meta_ticks).str()) <<
-                    LogVar("DHC ticks from 127MHz $" , static_cast < std::ostringstream && >(std::ostringstream() << hex << trig_ticks).str()) <<
-                    LogVar("Tick difference $" , static_cast < std::ostringstream
+                    LogVar("Meta ticks from 127MHz $", static_cast < std::ostringstream && >(std::ostringstream() <<  hex << m_meta_ticks).str()) <<
+                    LogVar("DHC ticks from 127MHz $", static_cast < std::ostringstream && >(std::ostringstream() << hex << trig_ticks).str()) <<
+                    LogVar("Tick difference $", static_cast < std::ostringstream
                            && >(std::ostringstream() << hex << (trig_ticks - m_meta_ticks)).str()));
           }
         } else {

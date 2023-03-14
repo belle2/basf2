@@ -17,7 +17,7 @@
 using namespace Belle2;
 
 // Register module in the framework
-REG_MODULE(ParticleStats)
+REG_MODULE(ParticleStats);
 
 ParticleStatsModule::ParticleStatsModule() : Module()
 {

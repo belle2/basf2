@@ -79,15 +79,29 @@ namespace Belle2 {
 
 
 
-    float m_eventT0 = -99; /**< final event T0 */
-    float m_eventT0Err = -99; /**< final event T0 error */
-    float m_cdcEventT0 = -99; /**< CDC event T0 */
-    float m_cdcEventT0Err = -99; /**< CDC event T0 */
-    float m_topEventT0 = -99; /**< TOP event T0 error */
-    float m_topEventT0Err = -99; /**< TOP event T0 error */
+    float m_eventT0             = std::numeric_limits<float>::quiet_NaN(); /**< final event T0 */
+    float m_eventT0Err          = std::numeric_limits<float>::quiet_NaN(); /**< final event T0 error */
+    float m_svdEventT0          = std::numeric_limits<float>::quiet_NaN(); /**< SVD event T0 */
+    float m_svdEventT0Err       = std::numeric_limits<float>::quiet_NaN(); /**< SVD event T0 Error */
+    float m_svdOnlineEventT0    = std::numeric_limits<float>::quiet_NaN(); /**< SVD online event T0 */
+    float m_svdOnlineEventT0Err = std::numeric_limits<float>::quiet_NaN(); /**< SVD online event T0 Error */
+    float m_cdcEventT0          = std::numeric_limits<float>::quiet_NaN(); /**< CDC event T0 */
+    float m_cdcEventT0Err       = std::numeric_limits<float>::quiet_NaN(); /**< CDC event T0 Error */
+    float m_cdcOnlineEventT0    = std::numeric_limits<float>::quiet_NaN(); /**< CDC online event T0 */
+    float m_cdcOnlineEventT0Err = std::numeric_limits<float>::quiet_NaN(); /**< CDC online event T0 Error */
+    float m_topEventT0          = std::numeric_limits<float>::quiet_NaN(); /**< TOP event T0 */
+    float m_topEventT0Err       = std::numeric_limits<float>::quiet_NaN(); /**< TOP event T0 Error */
+    float m_topOnlineEventT0    = std::numeric_limits<float>::quiet_NaN(); /**< TOP online event T0 */
+    float m_topOnlineEventT0Err = std::numeric_limits<float>::quiet_NaN(); /**< TOP online event T0 Error */
+    float m_eclEventT0          = std::numeric_limits<float>::quiet_NaN(); /**< ECL event T0 */
+    float m_eclEventT0Err       = std::numeric_limits<float>::quiet_NaN(); /**< ECL event T0 Error */
+    float m_eclOnlineEventT0    = std::numeric_limits<float>::quiet_NaN(); /**< ECL online event T0 */
+    float m_eclOnlineEventT0Err = std::numeric_limits<float>::quiet_NaN(); /**< ECL online event T0 Error */
+    int m_eclTCEmax             = std::numeric_limits<int>::quiet_NaN();   /**< ECal TC Emax  */
+    int m_eclTCid               = std::numeric_limits<int>::quiet_NaN();   /**< ECal TC id  */
     int m_nTracks = 0; /**< number of tracks in the event*/
     int m_svdTB = -1; /**< trigger bin */
-    float m_trueEventT0 = -99; /**< true event t0 */
+    float m_trueEventT0         = std::numeric_limits<float>::quiet_NaN(); /**< true event t0 */
     int m_exp = -99; /**< experiment number */
     int m_run = -99; /**< run number */
     int m_event = -99; /**< event number */

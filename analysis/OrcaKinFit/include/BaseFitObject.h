@@ -280,14 +280,14 @@ namespace Belle2 {
       // DANIEL added
       // derivatives of intermediate variables wrt object's local parameters
       // these must be implemented by the derived classes for each type of object
-      virtual double getFirstDerivative_Meta_Local(int iMeta ,
-                                                   int ilocal ,
+      virtual double getFirstDerivative_Meta_Local(int iMeta,
+                                                   int ilocal,
                                                    int metaSet
                                                   ) const = 0;
 
       virtual double getSecondDerivative_Meta_Local(int iMeta,
-                                                    int ilocal ,
-                                                    int jlocal ,
+                                                    int ilocal,
+                                                    int jlocal,
                                                     int metaSet
                                                    ) const = 0;
 

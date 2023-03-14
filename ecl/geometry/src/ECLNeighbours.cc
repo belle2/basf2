@@ -6,17 +6,18 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// ECL GEOMETRY
+/* ECL headers. */
+#include <ecl/dataobjects/ECLElementNumbers.h>
 #include <ecl/geometry/ECLNeighbours.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 
-// FRAMEWORK
-#include <framework/logging/Logger.h>
+/* Basf2 headers. */
 #include <framework/gearbox/Unit.h>
+#include <framework/logging/Logger.h>
 
-// OTHER
-#include "TMath.h"
-#include "TVector3.h"
+/* ROOT headers. */
+#include <TMath.h>
+#include <TVector3.h>
 
 using namespace Belle2;
 using namespace ECL;
@@ -36,24 +37,24 @@ ECLNeighbours::ECLNeighbours(const std::string& neighbourDef, const double par, 
     B2DEBUG(150, "ECLNeighbours::ECLNeighbours: initialize " << neighbourDef << ", n x n: " << parToInt * 2 + 1 << " x " << parToInt * 2
             + 1);
     if ((parToInt >= 0) and (parToInt < 11)) initializeN(parToInt, sorted);
-    else B2FATAL("ECLNeighbours::ECLNeighbours: " << parToInt << " is an invalid parameter (must be between 0 and 10)!");
+    else B2FATAL("ECLNeighbours::ECLNeighbours: " << LogVar("parameter", parToInt) << "Invalid parameter (must be between 0 and 10)!");
   } else if (neighbourDef == "NC") {
     B2DEBUG(150, "ECLNeighbours::ECLNeighbours: initialize " << neighbourDef << ", n x n (minus corners): " << parToInt * 2 + 1 << " x "
             <<
             parToInt * 2 + 1);
     if ((parToInt >= 0) and (parToInt < 11)) initializeNC(parToInt);
-    else B2FATAL("ECLNeighbours::ECLNeighbours: " << parToInt << " is an invalid parameter (must be between 0 and 10)!");
+    else B2FATAL("ECLNeighbours::ECLNeighbours: " << LogVar("parameter", parToInt) << "Invalid parameter (must be between 0 and 10)!");
   } else if (neighbourDef == "NLegacy") {
     B2DEBUG(150, "ECLNeighbours::ECLNeighbours: initialize " << neighbourDef << ", n x n: " << parToInt * 2 + 1 << " x " << parToInt * 2
             + 1);
     if ((parToInt >= 0) and (parToInt < 11)) initializeNLegacy(parToInt);
-    else B2FATAL("ECLNeighbours::ECLNeighbours: " << parToInt << " is an invalid parameter (must be between 0 and 10)!");
+    else B2FATAL("ECLNeighbours::ECLNeighbours: " << LogVar("parameter", parToInt) << "Invalid parameter (must be between 0 and 10)!");
   } else if (neighbourDef == "NCLegacy") {
     B2DEBUG(150, "ECLNeighbours::ECLNeighbours: initialize " << neighbourDef << ", n x n (minus corners): " << parToInt * 2 + 1 << " x "
             <<
             parToInt * 2 + 1);
     if ((parToInt >= 0) and (parToInt < 11)) initializeNCLegacy(parToInt, 1);
-    else B2FATAL("ECLNeighbours::ECLNeighbours: " << parToInt << " is an invalid parameter (must be between 0 and 10)!");
+    else B2FATAL("ECLNeighbours::ECLNeighbours: " << LogVar("parameter", parToInt) << "Invalid parameter (must be between 0 and 10)!");
   }
   // or neighbours depend on the distance:
   else if (neighbourDef == "R") {
@@ -95,7 +96,7 @@ void ECLNeighbours::initializeR(double radius)
   // ECL geometry
   ECLGeometryPar* geom = ECLGeometryPar::Instance();
 
-  for (int i = 0; i < 8736; i++) {
+  for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++) {
     // get the central one
     TVector3 direction = geom->GetCrystalVec(i);
     TVector3 position  = geom->GetCrystalPos(i);
@@ -127,7 +128,7 @@ void ECLNeighbours::initializeF(double frac)
   // ECL geometry
   ECLGeometryPar* geom = ECLGeometryPar::Instance();
 
-  for (int i = 0; i < 8736; i++) {
+  for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++) {
     // this vector will hold all neighbours for the i-th crystal
     std::vector<short int> neighbours;
 
@@ -139,9 +140,9 @@ void ECLNeighbours::initializeF(double frac)
     // add the two in the same theta ring
     const short int phiInc = increasePhiId(pid, tid, 1);
     const short int phiDec = decreasePhiId(pid, tid, 1);
-    neighbours.push_back(geom->GetCellID(tid , pid) + 1);
-    neighbours.push_back(geom->GetCellID(tid , phiInc) + 1);
-    neighbours.push_back(geom->GetCellID(tid , phiDec) + 1);
+    neighbours.push_back(geom->GetCellID(tid, pid) + 1);
+    neighbours.push_back(geom->GetCellID(tid, phiInc) + 1);
+    neighbours.push_back(geom->GetCellID(tid, phiDec) + 1);
 
     double fracPos = (pid + 0.5) / m_crystalsPerRing[tid];
 
@@ -224,7 +225,7 @@ void ECLNeighbours::initializeF(double frac)
 void ECLNeighbours::initializeN(const int n, const bool sorted)
 {
   // This is the "NxN-edges" case (in the barrel)
-  for (int i = 0; i < 8736; i++) {
+  for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++) {
 
     // this vector will hold all neighbours for the i-th crystal
     std::vector<short int> neighbours;
@@ -313,7 +314,7 @@ void ECLNeighbours::initializeNC(const int n)
   // ECL geometry
   ECLGeometryPar* geom = ECLGeometryPar::Instance();
 
-  for (int i = 0; i < 8736; i++) {
+  for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++) {
     std::vector<short int> neighbours = m_neighbourMap.at(i + 1);
     std::vector<short int> neighbours_temp;
 
@@ -327,8 +328,8 @@ void ECLNeighbours::initializeNC(const int n)
       if (abs(thetaid - centerthetaid) == n) {
         const short int phiInc = increasePhiId(geom->GetPhiID(), geom->GetThetaID(), 1);
         const short int phiDec = decreasePhiId(geom->GetPhiID(), geom->GetThetaID(), 1);
-        const int cid1 = geom->GetCellID(thetaid , phiInc) + 1;
-        const int cid2 = geom->GetCellID(thetaid , phiDec) + 1;
+        const int cid1 = geom->GetCellID(thetaid, phiInc) + 1;
+        const int cid2 = geom->GetCellID(thetaid, phiDec) + 1;
 
         // if that crystal has two neighbours in the same theta-ring, it will not be removed
         if (!((std::find(neighbours.begin(), neighbours.end(), cid1) != neighbours.end()) and
@@ -353,7 +354,7 @@ void ECLNeighbours::initializeNLegacy(int n)
 
   // This is the "NxN-edges" case (in the barrel)
   // in the endcaps we project the neighbours to the outer and inner rings.
-  for (int i = 0; i < 8736; i++) {
+  for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++) {
 
     // this vector will hold all neighbours for the i-th crystal
     std::vector<short int> neighbours;
@@ -381,7 +382,7 @@ void ECLNeighbours::initializeNLegacy(int n)
       const std::vector<short int> phiList = getPhiIdsInBetween(thisPhiInc, thisPhiDec, theta);
 
       for (unsigned int k = 0; k < phiList.size(); ++k) {
-        neighbours.push_back(geom->GetCellID(theta , phiList.at(k)) + 1);
+        neighbours.push_back(geom->GetCellID(theta, phiList.at(k)) + 1);
       }
     }
 
@@ -399,7 +400,7 @@ void ECLNeighbours::initializeNCLegacy(const int n, const int corners)
 
   // This is the "NxN-edges" minus edges case (in the barrel)
   // in the endcaps we project the neighbours to the outer and inner rings.
-  for (int i = 0; i < 8736; i++) {
+  for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++) {
 
     // this vector will hold all neighbours for the i-th crystal
     std::vector<short int> neighbours;
@@ -431,7 +432,7 @@ void ECLNeighbours::initializeNCLegacy(const int n, const int corners)
       else phiList = getPhiIdsInBetween(thisPhiInc, thisPhiDec, theta);
 
       for (unsigned int k = 0; k < phiList.size(); ++k) {
-        neighbours.push_back(geom->GetCellID(theta , phiList.at(k)) + 1);
+        neighbours.push_back(geom->GetCellID(theta, phiList.at(k)) + 1);
       }
     }
 

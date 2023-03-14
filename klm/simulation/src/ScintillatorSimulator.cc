@@ -12,8 +12,9 @@
 /* KLM headers. */
 #include <klm/bklm/geometry/GeometryPar.h>
 #include <klm/eklm/geometry/GeometryData.h>
+#include <klm/dataobjects/KLMElementNumbers.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/gearbox/Unit.h>
@@ -32,12 +33,7 @@ using namespace Belle2;
 
 static const char MemErr[] = "Memory allocation error.";
 
-static bool compareBKLMSimHits(const BKLMSimHit* hit1, const BKLMSimHit* hit2)
-{
-  return hit1->getEnergyDeposit() < hit2->getEnergyDeposit();
-}
-
-static bool compareEKLMSimHits(const EKLMSimHit* hit1, const EKLMSimHit* hit2)
+static bool compareKLMSimHits(const KLMSimHit* hit1, const KLMSimHit* hit2)
 {
   return hit1->getEnergyDeposit() < hit2->getEnergyDeposit();
 }
@@ -49,14 +45,11 @@ void KLM::ScintillatorSimulator::reallocPhotoElectronBuffers(int size)
    * Here there is a memory leak in case of realloc() failure, but it does not
    * matter because a fatal error is issued in this case.
    */
-  /* cppcheck-suppress memleakOnRealloc */
   m_Photoelectrons =
     (struct Photoelectron*)realloc(m_Photoelectrons,
                                    size * sizeof(struct Photoelectron));
-  /* cppcheck-suppress memleakOnRealloc */
   m_PhotoelectronIndex = (int*)realloc(m_PhotoelectronIndex,
                                        size * sizeof(int));
-  /* cppcheck-suppress memleakOnRealloc */
   m_PhotoelectronIndex2 = (int*)realloc(m_PhotoelectronIndex2,
                                         size * sizeof(int));
   if (size != 0) {
@@ -168,83 +161,60 @@ void KLM::ScintillatorSimulator::prepareSimulation()
 }
 
 void KLM::ScintillatorSimulator::simulate(
-  const std::multimap<KLMChannelNumber, const BKLMSimHit*>::iterator& firstHit,
-  const std::multimap<KLMChannelNumber, const BKLMSimHit*>::iterator& end)
+  const std::multimap<KLMChannelNumber, const KLMSimHit*>::iterator& firstHit,
+  const std::multimap<KLMChannelNumber, const KLMSimHit*>::iterator& end)
 {
   m_stripName = "strip_" + std::to_string(firstHit->first);
   prepareSimulation();
   bklm::GeometryPar* geoPar = bklm::GeometryPar::instance();
-  const BKLMSimHit* hit = firstHit->second;
-  const bklm::Module* module =
-    geoPar->findModule(hit->getSection(), hit->getSector(), hit->getLayer());
-  double stripLength =
-    2.0 * (hit->isPhiReadout() ?
-           module->getPhiScintHalfLength(hit->getStrip()) :
-           module->getZScintHalfLength(hit->getStrip()));
-  std::vector<const BKLMSimHit*> hits;
-  for (std::multimap<KLMChannelNumber, const BKLMSimHit*>::iterator it = firstHit;
-       it != end; ++it)
-    hits.push_back(it->second);
-  std::sort(hits.begin(), hits.end(), compareBKLMSimHits);
-  for (std::vector<const BKLMSimHit*>::iterator it = hits.begin();
-       it != hits.end(); ++it) {
-    hit = *it;
-    m_Energy = m_Energy + hit->getEnergyDeposit();
-    /* Poisson mean for number of photons. */
-    double nPhotons = hit->getEnergyDeposit() * m_DigPar->getNPEperMeV();
-    /* Fill histograms. */
-    double sipmDistance = hit->getPropagationTime() *
-                          m_DigPar->getFiberLightSpeed();
-    double time = hit->getTime() + hit->getPropagationTime();
-    if (m_MCTime < 0) {
-      m_MCTime = hit->getTime();
-      m_SiPMMCTime = time;
-    } else {
-      if (hit->getTime() < m_MCTime)
-        m_MCTime = hit->getTime();
-      if (time < m_SiPMMCTime)
-        m_SiPMMCTime = time;
-    }
-    int generatedPhotons = gRandom->Poisson(nPhotons);
-    generatePhotoelectrons(stripLength, sipmDistance, generatedPhotons,
-                           hit->getTime(), false);
-    if (m_DigPar->getMirrorReflectiveIndex() > 0) {
-      generatedPhotons = gRandom->Poisson(nPhotons);
-      generatePhotoelectrons(stripLength, sipmDistance, generatedPhotons,
-                             hit->getTime(), true);
-    }
+  const KLMSimHit* hit = firstHit->second;
+  double stripLength;
+  bool isBKLM = (hit->getSubdetector() == KLMElementNumbers::c_BKLM);
+  if (isBKLM) {
+    const bklm::Module* module =
+      geoPar->findModule(hit->getSection(), hit->getSector(), hit->getLayer());
+    stripLength =
+      2.0 * (hit->isPhiReadout() ?
+             module->getPhiScintHalfLength(hit->getStrip()) :
+             module->getZScintHalfLength(hit->getStrip()));
+  } else {
+    stripLength = EKLM::GeometryData::Instance().getStripLength(
+                    hit->getStrip()) / CLHEP::mm * Unit::mm;
   }
-  performSimulation();
-}
-
-void KLM::ScintillatorSimulator::simulate(
-  const std::multimap<KLMChannelNumber, const EKLMSimHit*>::iterator& firstHit,
-  const std::multimap<KLMChannelNumber, const EKLMSimHit*>::iterator& end)
-{
-  m_stripName = "strip_" + std::to_string(firstHit->first);
-  prepareSimulation();
-  const EKLMSimHit* hit = firstHit->second;
-  double stripLength = EKLM::GeometryData::Instance().getStripLength(
-                         hit->getStrip()) / CLHEP::mm * Unit::mm;
-  std::vector<const EKLMSimHit*> hits;
-  for (std::multimap<KLMChannelNumber, const EKLMSimHit*>::iterator it = firstHit;
+  std::vector<const KLMSimHit*> hits;
+  for (std::multimap<KLMChannelNumber, const KLMSimHit*>::iterator it = firstHit;
        it != end; ++it)
     hits.push_back(it->second);
-  std::sort(hits.begin(), hits.end(), compareEKLMSimHits);
-  for (std::vector<const EKLMSimHit*>::iterator it = hits.begin();
+  std::sort(hits.begin(), hits.end(), compareKLMSimHits);
+  for (std::vector<const KLMSimHit*>::iterator it = hits.begin();
        it != hits.end(); ++it) {
     hit = *it;
     m_Energy = m_Energy + hit->getEnergyDeposit();
     /* Poisson mean for number of photons. */
     double nPhotons = hit->getEnergyDeposit() * m_DigPar->getNPEperMeV();
     /* Fill histograms. */
-    double sipmDistance = 0.5 * stripLength - hit->getLocalPosition().x();
-    double time = hit->getTime() +
-                  sipmDistance / m_DigPar->getFiberLightSpeed();
-    if (m_MCTime < 0)
-      m_MCTime = time;
-    else
-      m_MCTime = time < m_MCTime ? time : m_MCTime;
+    double sipmDistance, time;
+    if (isBKLM) {
+      sipmDistance = hit->getPropagationTime() *
+                     m_DigPar->getFiberLightSpeed();
+      time = hit->getTime() + hit->getPropagationTime();
+      if (m_MCTime < 0) {
+        m_MCTime = hit->getTime();
+        m_SiPMMCTime = time;
+      } else {
+        if (hit->getTime() < m_MCTime)
+          m_MCTime = hit->getTime();
+        if (time < m_SiPMMCTime)
+          m_SiPMMCTime = time;
+      }
+    } else {
+      sipmDistance = 0.5 * stripLength - hit->getLocalPosition().X();
+      time = hit->getTime() + sipmDistance / m_DigPar->getFiberLightSpeed();
+      if (m_MCTime < 0)
+        m_MCTime = time;
+      else
+        m_MCTime = time < m_MCTime ? time : m_MCTime;
+    }
     int generatedPhotons = gRandom->Poisson(nPhotons);
     generatePhotoelectrons(stripLength, sipmDistance, generatedPhotons,
                            hit->getTime(), false);

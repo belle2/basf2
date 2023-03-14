@@ -15,7 +15,8 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <set>
 #include <TH2F.h>
-#include <TVector3.h>
+#include <Math/Vector3D.h>
+#include <Math/Point3D.h>
 
 
 namespace Belle2 {
@@ -82,8 +83,8 @@ namespace Belle2 {
     StoreArray<Track> m_tracks; /**< collection of tracks */
     StoreArray<TOPDigit> m_digits; /**< collection of digits */
 
-    TVector3 m_avrgMomentum; /**< average particle momentum at bar entrance (bar frame) */
-    TVector3 m_avrgPosition; /**< average particle position at bar entrance (bar frame) */
+    ROOT::Math::XYZVector m_avrgMomentum; /**< average particle momentum at bar entrance (bar frame) */
+    ROOT::Math::XYZPoint m_avrgPosition; /**< average particle position at bar entrance (bar frame) */
     int m_numTracks = 0;     /**< number of tracks */
     std::set<int> m_slotIDs;      /**< slot ID's that are hit by particle */
     std::set<int> m_PDGCodes;     /**< particle PDG codes */

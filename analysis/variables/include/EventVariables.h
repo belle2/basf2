@@ -67,6 +67,21 @@ namespace Belle2 {
     int nMCParticles(const Particle*);
 
     /**
+     * return number of primary MCParticles in event
+     */
+    int nPrimaryMCParticles(const Particle*);
+
+    /**
+     * return number of initial primary MCParticles in event
+     */
+    int nInitialPrimaryMCParticles(const Particle*);
+
+    /**
+     * return number of virtual primary MCParticles in event
+     */
+    int nVirtualPrimaryMCParticles(const Particle*);
+
+    /**
     * return experiment number
     */
     int expNum(const Particle*);
@@ -110,6 +125,16 @@ namespace Belle2 {
      * return nominal beam energy
      */
     double getBeamE(const Particle*);
+
+    /**
+     * return true sqrt(s) value
+     */
+    double getCMSEnergyMC(const Particle*);
+
+    /**
+     * return true energy sum of all the generated particles
+     */
+    double getTotalEnergyMC(const Particle*);
 
     /**
      * return x coordinate of the IP used for MC generation

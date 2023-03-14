@@ -21,7 +21,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SVDLocalCalibrationsCheck)
+REG_MODULE(SVDLocalCalibrationsCheck);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -727,7 +727,7 @@ int SVDLocalCalibrationsCheckModule::hasAnyProblem(TH1F* h, float cutAve, float 
 {
 
   float average = h->GetMean();
-  if (abs(average) > cutAve)
+  if (std::fabs(average) > cutAve)
     return 1;
 
   TAxis* xaxis = h->GetXaxis();

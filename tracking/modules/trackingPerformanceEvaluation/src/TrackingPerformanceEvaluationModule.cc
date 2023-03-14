@@ -15,8 +15,6 @@
 
 #include <vxd/geometry/GeoCache.h>
 
-#include <mdst/dataobjects/MCParticle.h>
-#include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
 #include <mdst/dataobjects/HitPatternVXD.h>
 
@@ -24,8 +22,6 @@
 #include <svd/reconstruction/SVDRecoHit.h>
 #include <svd/reconstruction/SVDRecoHit2D.h>
 #include <cdc/dataobjects/CDCRecoHit.h>
-
-#include <tracking/dataobjects/RecoTrack.h>
 
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <pxd/dataobjects/PXDCluster.h>
@@ -36,14 +32,12 @@
 
 #include <root/TObject.h>
 
-#include <boost/foreach.hpp>
-
 using namespace Belle2;
 
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(TrackingPerformanceEvaluation)
+REG_MODULE(TrackingPerformanceEvaluation);
 
 TrackingPerformanceEvaluationModule::TrackingPerformanceEvaluationModule() :
   Module()
@@ -69,17 +63,11 @@ TrackingPerformanceEvaluationModule::~TrackingPerformanceEvaluationModule()
 void TrackingPerformanceEvaluationModule::initialize()
 {
   // MCParticles, Tracks, RecoTracks, MCRecoTracks needed for this module
-  StoreArray<MCParticle> mcParticles;
-  mcParticles.isRequired(m_MCParticlesName);
+  m_MCParticles.isRequired(m_MCParticlesName);
+  m_PRRecoTracks.isRequired(m_RecoTracksName);
+  m_MCRecoTracks.isRequired(m_MCRecoTracksName);
 
-  StoreArray<RecoTrack> recoTracks;
-  recoTracks.isRequired(m_RecoTracksName);
-
-  StoreArray<RecoTrack> mcRecoTracks;
-  mcRecoTracks.isRequired(m_MCRecoTracksName);
-
-  StoreArray<Track> tracks;
-  tracks.isRequired(m_TracksName);
+  m_Tracks.isRequired(m_TracksName);
 
   //create list of histograms to be saved in the rootfile
   m_histoList = new TList;
@@ -356,24 +344,20 @@ void TrackingPerformanceEvaluationModule::beginRun()
 
 void TrackingPerformanceEvaluationModule::event()
 {
-
-  StoreArray<MCParticle> mcParticles(m_MCParticlesName);
-
-  B2Vector3D magField = BFieldManager::getField(0, 0, 0) / Unit::T;
+  ROOT::Math::XYZVector magField = BFieldManager::getField(0, 0, 0) / Unit::T;
 
   bool hasTrack = false;
-  B2DEBUG(99, "+++++ 1. loop on MCParticles");
-  BOOST_FOREACH(MCParticle & mcParticle, mcParticles) {
+  B2DEBUG(29, "+++++ 1. loop on MCParticles");
+  for (const MCParticle& mcParticle : m_MCParticles) {
 
     if (! isTraceable(mcParticle))
       continue;
 
     int pdgCode = mcParticle.getPDG();
-    B2DEBUG(99, "MCParticle has PDG code " << pdgCode);
+    B2DEBUG(29, "MCParticle has PDG code " << pdgCode);
 
     int nFittedTracksMCRT = 0;
     int nFittedTracks = 0;
-    int nFittedTrackswPXDHits = 0;
 
     MCParticleInfo mcParticleInfo(mcParticle, magField);
 
@@ -425,7 +409,7 @@ void TrackingPerformanceEvaluationModule::event()
     RelationVector<Track> Tracks_fromMCParticle = DataStore::getRelationsWithObj<Track>(&mcParticle);
     m_multiplicityTracks->Fill(Tracks_fromMCParticle.size());
 
-    B2DEBUG(99, Tracks_fromMCParticle.size() << " Tracks related to this MCParticle");
+    B2DEBUG(29, Tracks_fromMCParticle.size() << " Tracks related to this MCParticle");
 
     for (int trk = 0; trk < (int)Tracks_fromMCParticle.size(); trk++) {
 
@@ -444,7 +428,6 @@ void TrackingPerformanceEvaluationModule::event()
 
           if (fitResult->getHitPatternVXD().getNPXDHits() > 0) {
             m_h3_TrackswPXDHitsPerMCParticle->Fill(mcParticleInfo.getPt(), mcParticleInfo.getPtheta(), mcParticleInfo.getPphi());
-            nFittedTrackswPXDHits++;
           }
 
           m_h3_TracksPerMCParticle->Fill(mcParticleInfo.getPt(), mcParticleInfo.getPtheta(), mcParticleInfo.getPphi());
@@ -482,12 +465,12 @@ void TrackingPerformanceEvaluationModule::event()
   }
 
 
-  B2DEBUG(99, "+++++ 2. loop on Tracks");
+  B2DEBUG(29, "+++++ 2. loop on Tracks");
 
   //2. retrieve all the MCParticles related to the Tracks
   StoreArray<Track> tracks(m_TracksName);
 
-  BOOST_FOREACH(Track & track, tracks) {
+  for (const Track& track : m_Tracks) {
 
     int nMCParticles = 0;
 
@@ -499,8 +482,8 @@ void TrackingPerformanceEvaluationModule::event()
 
     m_h1_pValue->Fill(fitResult->getPValue());
 
-    TVector3 momentum = fitResult->getMomentum();
-    m_h3_Tracks->Fill(momentum.Pt(), momentum.Theta(), momentum.Phi());
+    ROOT::Math::XYZVector momentum = fitResult->getMomentum();
+    m_h3_Tracks->Fill(momentum.Rho(), momentum.Theta(), momentum.Phi());
 
     fillTrackErrParams2DHistograms(fitResult);
 
@@ -529,7 +512,7 @@ void TrackingPerformanceEvaluationModule::event()
     for (int mcp = 0; mcp < (int)MCParticles_fromTrack.size(); mcp++)
       if (isTraceable(*MCParticles_fromTrack[mcp])) {
         nMCParticles ++;
-        m_h3_MCParticlesPerTrack->Fill(momentum.Pt(), momentum.Theta(), momentum.Phi());
+        m_h3_MCParticlesPerTrack->Fill(momentum.Rho(), momentum.Theta(), momentum.Phi());
       }
     //    }
 
@@ -538,40 +521,31 @@ void TrackingPerformanceEvaluationModule::event()
   }
 
 
-  B2DEBUG(99, "+++++ 3. loop on MCRecoTracks");
+  B2DEBUG(29, "+++++ 3. loop on MCRecoTracks");
 
-  //3. retrieve all MCRecoTracks
-  StoreArray<RecoTrack> mcRecoTracks(m_MCRecoTracksName);
-  StoreArray<PXDCluster> pxdClusters;
-  StoreArray<SVDCluster> svdClusters;
-  StoreArray<CDCHit> cdcHit;
+  for (const RecoTrack& mcRecoTrack : m_MCRecoTracks) {
 
-
-  BOOST_FOREACH(RecoTrack & mcRecoTrack, mcRecoTracks) {
-
-    int nRecoTrack = 0;
     bool hasRecoTrack = false;
 
     //3.a retrieve the RecoTrack
     RelationVector<RecoTrack> RecoTracks_fromMCRecoTrack = DataStore::getRelationsWithObj<RecoTrack>(&mcRecoTrack);
-    B2DEBUG(99, "~ " << RecoTracks_fromMCRecoTrack.size() << " RecoTracks related to this MCRecoTrack");
+    B2DEBUG(29, "~ " << RecoTracks_fromMCRecoTrack.size() << " RecoTracks related to this MCRecoTrack");
     m_multiplicityRecoTracksPerMCRT->Fill(RecoTracks_fromMCRecoTrack.size());
 
     //3.a retrieve the MCParticle
     RelationVector<MCParticle> MCParticles_fromMCRecoTrack = DataStore::getRelationsWithObj<MCParticle>(&mcRecoTrack);
 
-    B2DEBUG(99, "~~~ " << MCParticles_fromMCRecoTrack.size() << " MCParticles related to this MCRecoTrack");
+    B2DEBUG(29, "~~~ " << MCParticles_fromMCRecoTrack.size() << " MCParticles related to this MCRecoTrack");
     for (int mcp = 0; mcp < (int)MCParticles_fromMCRecoTrack.size(); mcp++) {
 
       //3.b retrieve all RecoTracks related to the MCRecoTrack
       RelationVector<RecoTrack> RecoTracks_fromMCParticle = DataStore::getRelationsWithObj<RecoTrack>
                                                             (MCParticles_fromMCRecoTrack[mcp]);
 
-      B2DEBUG(99, "~~~~~ " << RecoTracks_fromMCParticle.size() << " RecoTracks related to this MCParticle");
+      B2DEBUG(29, "~~~~~ " << RecoTracks_fromMCParticle.size() << " RecoTracks related to this MCParticle");
       for (int tc = 0; tc < (int)RecoTracks_fromMCParticle.size(); tc++)
         if (!hasRecoTrack) {
           hasRecoTrack = true;
-          nRecoTrack++;
         }
 
     }
@@ -579,12 +553,11 @@ void TrackingPerformanceEvaluationModule::event()
   }
 
 
-  B2DEBUG(99, "+++++ 4. loop on RecoTracks");
+  B2DEBUG(29, "+++++ 4. loop on RecoTracks");
 
   //4. retrieve all RecoTracks
-  StoreArray<RecoTrack> RecoTracks;
 
-  BOOST_FOREACH(RecoTrack & recoTrack, RecoTracks) {
+  for (const RecoTrack& recoTrack : m_PRRecoTracks) {
 
     //   int nMCRecoTrack = 0;
 
@@ -597,14 +570,14 @@ void TrackingPerformanceEvaluationModule::event()
     //4.a retrieve the MCParticle
     RelationVector<MCParticle> MCParticles_fromRecoTrack = DataStore::getRelationsWithObj<MCParticle>(&recoTrack);
 
-    B2DEBUG(99, "~~~ " << MCParticles_fromRecoTrack.size() << " MCParticles related to this RecoTrack");
+    B2DEBUG(29, "~~~ " << MCParticles_fromRecoTrack.size() << " MCParticles related to this RecoTrack");
     for (int mcp = 0; mcp < (int)MCParticles_fromRecoTrack.size(); mcp++) {
 
       //4.b retrieve all MCRecoTracks related to the RecoTrack
       RelationVector<RecoTrack> mcRecoTracks_fromMCParticle = DataStore::getRelationsWithObj<RecoTrack>
     (MCParticles_fromRecoTrack[mcp], m_MCRecoTracksName);
 
-      B2DEBUG(99, "~~~~~ " << mcRecoTracks_fromMCParticle.size() << " MCRecoTracks related to this MCParticle");
+      B2DEBUG(29, "~~~~~ " << mcRecoTracks_fromMCParticle.size() << " MCRecoTracks related to this MCParticle");
       for (int mctc = 0; mctc < (int)mcRecoTracks_fromMCParticle.size(); mctc++) {
         nMCRecoTrack++;
 
@@ -741,17 +714,17 @@ void  TrackingPerformanceEvaluationModule::fillTrackParams1DHistograms(const Tra
   double px_res = fitResult->getMomentum().X() - mcParticleInfo.getPx();
   double py_res = fitResult->getMomentum().Y() - mcParticleInfo.getPy();
   double pz_res = fitResult->getMomentum().Z() - mcParticleInfo.getPz();
-  double p_res = (fitResult->getMomentum().Mag() - mcParticleInfo.getP()) / mcParticleInfo.getP();
-  double pt_res = (fitResult->getMomentum().Pt() - mcParticleInfo.getPt()) / mcParticleInfo.getPt();
+  double p_res = (fitResult->getMomentum().R() - mcParticleInfo.getP()) / mcParticleInfo.getP();
+  double pt_res = (fitResult->getMomentum().Rho() - mcParticleInfo.getPt()) / mcParticleInfo.getPt();
 
   //track parameters residuals in position:
   double x_res = fitResult->getPosition().X() - mcParticleInfo.getX();
   double y_res = fitResult->getPosition().Y() - mcParticleInfo.getY();
   double z_res = fitResult->getPosition().Z() - mcParticleInfo.getZ();
-  double r_res = fitResult->getPosition().Perp() - sqrt(mcParticleInfo.getX() * mcParticleInfo.getX() + mcParticleInfo.getY() *
-                                                        mcParticleInfo.getY());
-  double rtot_res = fitResult->getPosition().Mag() - sqrt(mcParticleInfo.getX() * mcParticleInfo.getX() + mcParticleInfo.getY() *
-                                                          mcParticleInfo.getY() + mcParticleInfo.getZ() * mcParticleInfo.getZ());
+  double r_res = fitResult->getPosition().Rho() - sqrt(mcParticleInfo.getX() * mcParticleInfo.getX() + mcParticleInfo.getY() *
+                                                       mcParticleInfo.getY());
+  double rtot_res = fitResult->getPosition().R() - sqrt(mcParticleInfo.getX() * mcParticleInfo.getX() + mcParticleInfo.getY() *
+                                                        mcParticleInfo.getY() + mcParticleInfo.getZ() * mcParticleInfo.getZ());
 
   m_h1_d0_err->Fill(d0_err);
   m_h1_phi_err->Fill(phi_err);
@@ -786,7 +759,7 @@ void  TrackingPerformanceEvaluationModule::fillTrackParams1DHistograms(const Tra
   m_h1_cotTheta_pll->Fill(cotTheta_res / cotTheta_err);
 
 
-  m_h2_OmegaerrOmegaVSpt->Fill(fitResult->getMomentum().Pt(), omega_err / mcParticleInfo.getOmega());
+  m_h2_OmegaerrOmegaVSpt->Fill(fitResult->getMomentum().Rho(), omega_err / mcParticleInfo.getOmega());
 
 
 }
@@ -800,13 +773,13 @@ void  TrackingPerformanceEvaluationModule::fillTrackErrParams2DHistograms(const 
   double z0_err =  sqrt((fitResult->getCovariance5())[3][3]);
   double cotTheta_err = sqrt((fitResult->getCovariance5())[4][4]);
 
-  TVector3 momentum = fitResult->getMomentum();
+  ROOT::Math::XYZVector momentum = fitResult->getMomentum();
 
-  double px = momentum.Px();
-  double py = momentum.Py();
-  double pz = momentum.Pz();
-  double pt = momentum.Pt();
-  double p = momentum.Mag();
+  double px = momentum.x();
+  double py = momentum.y();
+  double pz = momentum.z();
+  double pt = momentum.Rho();
+  double p = momentum.R();
   double mass = fitResult->getParticleType().getMass();
   double beta = p / sqrt(p * p + mass * mass);
   double sinTheta = TMath::Sin(momentum.Theta());
@@ -845,7 +818,7 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
   if (fitResult) {
     d0_err = sqrt((fitResult->getCovariance5())[0][0]);
     z0_err = sqrt((fitResult->getCovariance5())[3][3]);
-    pt = fitResult->getMomentum().Pt();
+    pt = fitResult->getMomentum().Rho();
   }
 
   const bool hasCDChit[56] = { false };
@@ -872,7 +845,7 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
           B2WARNING(" No KalmanFitterInfo associated to the TrackPoint!");
 
         double detId(-999);
-        TVector3 globalHit(-999, -999, -999);
+        ROOT::Math::XYZVector globalHit(-999, -999, -999);
 
         PXDRecoHit* pxdHit =  dynamic_cast<PXDRecoHit*>(absMeas);
         SVDRecoHit2D* svdHit2D =  dynamic_cast<SVDRecoHit2D*>(absMeas);
@@ -897,7 +870,7 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
 
           m_h2_TrackPointFitWeightVXD->Fill(sensor.getLayerNumber(), weight);
           const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(sensor);
-          globalHit = aSensorInfo.pointToGlobal(TVector3(uCoor, vCoor, 0), true);
+          globalHit = aSensorInfo.pointToGlobal(ROOT::Math::XYZVector(uCoor, vCoor, 0), true);
 
 
           const PXDCluster* pxdcl = pxdHit->getCluster();
@@ -936,7 +909,7 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
           m_h2_TrackPointFitWeightVXD->Fill(sensor.getLayerNumber(), weight);
 
           const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(sensor);
-          globalHit = aSensorInfo.pointToGlobal(TVector3(uCoor, vCoor, 0), true);
+          globalHit = aSensorInfo.pointToGlobal(ROOT::Math::XYZVector(uCoor, vCoor, 0), true);
 
         } else if (svdHit) {
 
@@ -958,7 +931,7 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
 
           m_h2_TrackPointFitWeightVXD->Fill(sensor.getLayerNumber(), weight);
           const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(sensor);
-          globalHit = aSensorInfo.pointToGlobal(TVector3(uCoor, vCoor, 0), true);
+          globalHit = aSensorInfo.pointToGlobal(ROOT::Math::XYZVector(uCoor, vCoor, 0), true);
         } else if (cdcHit) {
 
           if (kalmanInfo)
@@ -980,7 +953,7 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
 
         m_h2_VXDhitsPR_xy->Fill(globalHit.X(), globalHit.Y());
 
-        m_h2_VXDhitsPR_rz->Fill(globalHit.Z(), globalHit.Perp());
+        m_h2_VXDhitsPR_rz->Fill(globalHit.Z(), globalHit.Rho());
 
       }
 

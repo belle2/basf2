@@ -12,11 +12,10 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 
-#include <boost/optional.hpp>
-
+#include <optional>
+#include <set>
 #include <string>
 #include <unordered_map>
-#include <set>
 
 namespace Belle2 {
 
@@ -168,6 +167,6 @@ namespace Belle2 {
      * Provides a similar interface to StoreObjPtr and allows us to check when not initialized/valid easily.
      * Can be moved to a std::optional when/if we move to C++17.
      */
-    boost::optional<EventMetaData> m_manualEvent;
+    std::optional<EventMetaData> m_manualEvent;
   };
 } // namespace Belle2

@@ -17,7 +17,7 @@ using namespace Belle2;
 // Utility function
 inline double getClockSeconds() { return Utils::getClock() / 1e9; }
 
-REG_MODULE(DQMHistAnalysisSVDDose)
+REG_MODULE(DQMHistAnalysisSVDDose);
 
 DQMHistAnalysisSVDDoseModule::DQMHistAnalysisSVDDoseModule()
 {

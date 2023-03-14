@@ -16,7 +16,8 @@ namespace Belle2 {
   class SizeCDCPathFilter : public BaseCDCPathFilter {
   public:
     /// Main function: return the size of the path
-    TrackFindingCDC::Weight operator()(const BaseCDCPathFilter::Object& path) final {
+    TrackFindingCDC::Weight operator()(const BaseCDCPathFilter::Object& path) final
+    {
       return path.size();
     }
   };

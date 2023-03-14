@@ -40,7 +40,7 @@ void CDCDedxDatabaseImporter::importPDFs()
 {
   TClonesArray dedxPDFs("Belle2::DedxPDFs");
   TFile* infile = TFile::Open(m_inputFileNames[0].c_str(), "READ");
-  new(dedxPDFs[0]) DedxPDFs(infile);
+  new (dedxPDFs[0]) DedxPDFs(infile);
 
   IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
   Database::Instance().storeData(m_name, dedxPDFs[0], iov);
@@ -50,7 +50,7 @@ void CDCDedxDatabaseImporter::importScaleFactor(double scale)
 {
 
   TClonesArray scaleFactor("Belle2::CDCDedxScaleFactor");
-  new(scaleFactor[0]) CDCDedxScaleFactor(scale);
+  new (scaleFactor[0]) CDCDedxScaleFactor(scale);
 
   IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
   Database::Instance().storeData(m_name, scaleFactor[0], iov);
@@ -96,7 +96,7 @@ void CDCDedxDatabaseImporter::importHadronCorrection()
   for (int bin = 2; bin <= parhist->GetNbinsX(); ++bin) {
     hadroncor.push_back(parhist->GetBinContent(bin));
   }
-  new(hadronCorrection[0]) CDCDedxHadronCor(version, hadroncor);
+  new (hadronCorrection[0]) CDCDedxHadronCor(version, hadroncor);
 
   IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
   Database::Instance().storeData(m_name, hadronCorrection[0], iov);
@@ -142,7 +142,7 @@ void CDCDedxDatabaseImporter::importMeanParameters()
   for (int bin = 2; bin <= parhist->GetNbinsX(); ++bin) {
     meanpars.push_back(parhist->GetBinContent(bin));
   }
-  new(meanParameters[0]) CDCDedxMeanPars(version, meanpars);
+  new (meanParameters[0]) CDCDedxMeanPars(version, meanpars);
 
   IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
   Database::Instance().storeData(m_name, meanParameters[0], iov);
@@ -188,7 +188,7 @@ void CDCDedxDatabaseImporter::importSigmaParameters()
   for (int bin = 2; bin <= parhist->GetNbinsX(); ++bin) {
     sigmapars.push_back(parhist->GetBinContent(bin));
   }
-  new(sigmaParameters[0]) CDCDedxSigmaPars(version, sigmapars);
+  new (sigmaParameters[0]) CDCDedxSigmaPars(version, sigmapars);
 
   IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
   Database::Instance().storeData(m_name, sigmaParameters[0], iov);

@@ -17,7 +17,7 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
 #include <analysis/dataobjects/ParticleList.h>
-#include <analysis/dataobjects/EventExtraInfo.h>
+#include <framework/dataobjects/EventExtraInfo.h>
 #include <analysis/dataobjects/RestOfEvent.h>
 #include <analysis/utility/ReferenceFrame.h>
 #include <framework/datastore/StoreArray.h>
@@ -66,9 +66,10 @@ namespace {
       DataStore::Instance().setInitializeActive(false);
 
       TestUtilities::TestParticleFactory factory;
-      B2Vector3D ipposition(0, 0, 0);
+      ROOT::Math::XYZVector ipposition(0, 0, 0);
       ROOT::Math::PxPyPzEVector b0momentum(3, 0, 0, 5);
-      factory.produceParticle(string("^B0 -> [^K_S0 -> ^pi+ ^pi-] [^pi0 -> ^gamma ^gamma] ^e+ ^e-"), b0momentum, ipposition);
+      factory.produceParticle(string("^B0 -> [^K*0 -> [^K_S0 -> ^pi+ ^pi-] [^pi0 -> ^gamma ^gamma]] ^e+ ^e-"),
+                              b0momentum, ipposition);
     }
 
     /** clear datastore */
@@ -80,37 +81,55 @@ namespace {
   TEST_F(InclusiveVariablesTest, nCompositeDaughters)
   {
     StoreArray<Particle> myParticles;
-    auto* var = Manager::Instance().getVariable("nCompositeDaughters");
-    EXPECT_EQ(std::get<int>(var->function(myParticles[8])), 2);
+    auto* var = Manager::Instance().getVariable("nCompositeDaughters()");
+    EXPECT_EQ(std::get<int>(var->function(myParticles[9])), 1);
+    var = Manager::Instance().getVariable("nCompositeDaughters(313)");
+    EXPECT_EQ(std::get<int>(var->function(myParticles[9])), 1);
+    var = Manager::Instance().getVariable("nCompositeDaughters(111)");
+    EXPECT_EQ(std::get<int>(var->function(myParticles[9])), 0);
+    var = Manager::Instance().getVariable("nCompositeDaughters(310)");
+    EXPECT_EQ(std::get<int>(var->function(myParticles[9])), 0);
+  }
+  TEST_F(InclusiveVariablesTest, nCompositeAllGenerationDaughters)
+  {
+    StoreArray<Particle> myParticles;
+    auto* var = Manager::Instance().getVariable("nCompositeAllGenerationDaughters()");
+    EXPECT_EQ(std::get<int>(var->function(myParticles[9])), 3);
+    var = Manager::Instance().getVariable("nCompositeAllGenerationDaughters(313)");
+    EXPECT_EQ(std::get<int>(var->function(myParticles[9])), 1);
+    var = Manager::Instance().getVariable("nCompositeAllGenerationDaughters(111)");
+    EXPECT_EQ(std::get<int>(var->function(myParticles[9])), 1);
+    var = Manager::Instance().getVariable("nCompositeAllGenerationDaughters(310)");
+    EXPECT_EQ(std::get<int>(var->function(myParticles[9])), 1);
   }
   TEST_F(InclusiveVariablesTest, nPhotonDaughters)
   {
     StoreArray<Particle> myParticles;
     auto* var = Manager::Instance().getVariable("nDaughterPhotons");
-    EXPECT_EQ(std::get<int>(var->function(myParticles[8])), 2);
+    EXPECT_EQ(std::get<int>(var->function(myParticles[9])), 2);
   }
   TEST_F(InclusiveVariablesTest, nDaughterNeutralHadrons)
   {
     StoreArray<Particle> myParticles;
     auto* var = Manager::Instance().getVariable("nDaughterNeutralHadrons");
-    EXPECT_EQ(std::get<int>(var->function(myParticles[8])), 0);
+    EXPECT_EQ(std::get<int>(var->function(myParticles[9])), 0);
   }
   TEST_F(InclusiveVariablesTest, nChargedDaughters)
   {
     StoreArray<Particle> myParticles;
     auto* var = Manager::Instance().getVariable("nDaughterCharged()");
-    EXPECT_EQ(std::get<int>(var->function(myParticles[8])), 4);
+    EXPECT_EQ(std::get<int>(var->function(myParticles[9])), 4);
     var = Manager::Instance().getVariable("nDaughterCharged(11)");
-    EXPECT_EQ(std::get<int>(var->function(myParticles[8])), 2);
+    EXPECT_EQ(std::get<int>(var->function(myParticles[9])), 2);
     var = Manager::Instance().getVariable("nDaughterCharged(211)");
-    EXPECT_EQ(std::get<int>(var->function(myParticles[8])), 2);
+    EXPECT_EQ(std::get<int>(var->function(myParticles[9])), 2);
 
   }
   TEST_F(InclusiveVariablesTest, daughterAverageOf)
   {
     StoreArray<Particle> myParticles;
     auto* var = Manager::Instance().getVariable("daughterAverageOf(PDG)");
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(myParticles[8])), 105.25);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(myParticles[9])), float(313 + 11 - 11) / 3);
   }
 
 }

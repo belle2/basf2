@@ -30,7 +30,7 @@
 #include <mdst/dataobjects/MCParticleGraph.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
-#include <analysis/dataobjects/EventExtraInfo.h>
+#include <framework/dataobjects/EventExtraInfo.h>
 #include <b2bii/dataobjects/BelleTrkExtra.h>
 
 // Replace BeamParameters
@@ -151,6 +151,7 @@ namespace Belle2 {
 
     bool m_convertTrkExtra; /**< Flag to switch on conversion of first(last)_{x,y,z} of mdst_trk_fit */
 
+    bool m_convertNbar; /**< Flag to create anti-n0:mdst list from gamma:mdst */
     /**
      * E9/E25 threshold value
      * clusters with a value above this threshold are classified as neutral
@@ -199,6 +200,11 @@ namespace Belle2 {
      * Reads all entries of Mdst_Gamma Panther table, creates a particle list 'gamma:mdst' and adds them to StoreArray<Particles>.
      */
     void convertMdstGammaTable();
+
+    /**
+     * Copies Particles in 'gamma:mdst' with energy > 0.5 GeV to be anti-n0:mdst
+     */
+    void copyNbarFromGamma();
 
     /**
      * Reads all entries of Mdst_Klong Panther table, creates a particle list 'K_L0:mdst' and adds them to StoreArray<Particles>.

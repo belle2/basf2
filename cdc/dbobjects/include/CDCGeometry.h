@@ -920,7 +920,7 @@ namespace Belle2 {
       /**
        * Append a new node.
        */
-      void appendNode(double rmin, double rmax , double z);
+      void appendNode(double rmin, double rmax, double z);
 
       /**
        * Get the number of the mother volume nodes.

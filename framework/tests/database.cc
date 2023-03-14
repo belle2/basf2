@@ -89,7 +89,7 @@ namespace {
           name += experiment;
           query.push_back(Database::DBImportQuery("TNamed", new TNamed(name, name), iov));
 
-          new(array[experiment - 1]) TObject;
+          new (array[experiment - 1]) TObject;
           array[experiment - 1]->SetUniqueID(experiment);
           Database::Instance().storeData("TObjects", &array, iov);
 
@@ -428,11 +428,6 @@ namespace {
     EXPECT_FALSE(payload);
   }
 
-  //disable (wrong) warnings about unused functions
-#if defined(__INTEL_COMPILER)
-#pragma warning disable 177
-#endif
-
   /** Test callbacks */
   int callbackCounter = 0;
 
@@ -553,7 +548,7 @@ namespace {
 
     DBObjPtr<TNamed> named;
     EXPECT_TRUE(named.isValid());
-    double Bz = BFieldManager::getFieldInTesla({0, 0, 0}).Z();
+    double Bz = BFieldManager::getField(0, 0, 0).Z() / Unit::T;
     EXPECT_EQ(Bz, 1.5);
     DBStore::Instance().reset();
     //Ok, on next access the DBObjPtr should try to reconnect
@@ -566,7 +561,7 @@ namespace {
     field->addComponent(new Belle2::MagneticFieldComponentConstant({0, 0, 1.5 * Belle2::Unit::T}));
     Belle2::DBStore::Instance().addConstantOverride("MagneticField", field, false);
     //So now it should work again
-    Bz = BFieldManager::getFieldInTesla({0, 0, 0}).Z();
+    Bz = BFieldManager::getField(0, 0, 0).Z() / Unit::T;
     EXPECT_EQ(Bz, 1.5);
   }
 
@@ -624,7 +619,7 @@ namespace {
           name += experiment;
           query.push_back(Database::DBImportQuery("TNamed", new TNamed(name, name), iov));
 
-          new(array[experiment - 1]) TObject;
+          new (array[experiment - 1]) TObject;
           array[experiment - 1]->SetUniqueID(experiment);
           Database::Instance().storeData("TObjects", &array, iov);
 

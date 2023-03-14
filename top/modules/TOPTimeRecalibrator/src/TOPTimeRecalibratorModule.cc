@@ -6,8 +6,10 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <top/modules/TOPTimeRecalibrator/TOPTimeRecalibratorModule.h>
+
+// TOP headers.
 #include <top/geometry/TOPGeometryPar.h>
 
 // framework - DataStore
@@ -25,10 +27,10 @@ namespace Belle2 {
   using namespace TOP;
 
   //-----------------------------------------------------------------
-  //                 Register module
+  ///                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPTimeRecalibrator)
+  REG_MODULE(TOPTimeRecalibrator);
 
   //-----------------------------------------------------------------
   //                 Implementation

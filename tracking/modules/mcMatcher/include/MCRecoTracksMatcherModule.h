@@ -9,6 +9,10 @@
 
 #include <framework/core/Module.h>
 #include <framework/gearbox/Const.h>
+#include <framework/datastore/StoreArray.h>
+#include <tracking/dataobjects/RecoTrack.h>
+#include <mdst/dataobjects/MCParticle.h>
+
 
 namespace Belle2 {
   /*!
@@ -57,18 +61,47 @@ namespace Belle2 {
    *  In the following a more detailed explaination is given for the matching and
    *  the classification of PRTracks and MCTracks.
    *
-   *  The PRTracks can be classified into four categories, which are described in the following
+   *  The PRTracks can be classified into six categories:
+   *
+   *  - UNDEFINED
+   *      - Status of the track *before* any real status has been set.
+   *      - If the track status is still UNDEFINED after matching, something went wrong.
+   *
    *  - MATCHED
    *      - The highest efficiency PRTrack of the highest purity MCTrack to this PRTrack is the same as this PRTrack.
+   *      - In addition, the charge of the PRTrack and the one of the MCTrack are the same.
    *      - This means the PRTrack contains a high contribution of only one MCTrack and
-   *        is also the best of all PRTracks describing this MCTrack.
+   *        is also the best of all PRTracks describing this MCTrack (including the charge).
+   *      - The McTrackId property of matched PRTrack is set to the MCTrackId property of the MCTrack,
+   *        which is usually the index of the MCParticle in its corresponding StoreArray.
+   *      - Also the relation from PRTrack to MCParticle is added.
+   *      - The purity relation is setup from the PRTrack to the MCTrack with the (positive) purity as weight.
+   *
+   * - WRONG CHARGE
+   *      - The highest efficiency PRTrack of the highest purity MCTrack to this PRTrack is the same as this PRTrack.
+   *      - But, the charge of the PRTrack and the one of the MCTrack are NOT the same.
+   *      - This means the PRTrack contains a high contribution of only one MCTrack and
+   *        is also the best of all PRTracks describing this MCTrack, but the charge is wrong.
    *      - The McTrackId property of matched PRTrack is set to the MCTrackId property of the MCTrack,
    *        which is usually the index of the MCParticle in its corresponding StoreArray.
    *      - Also the relation from PRTrack to MCParticle is added.
    *      - The purity relation is setup from the PRTrack to the MCTrack with the (positive) purity as weight.
    *
    *  - CLONE
-   *      - The highest purity MCTrack as a different highest efficiency PRTrack than this track.
+   *      - The highest purity MCTrack has a different highest efficiency PRTrack than this track.
+   *      - Anyway, the charge of the PRTrack and the one of the MCTrack are the same.
+   *      - This means the PRTrack contains high contributions of only one MCTrack
+   *        but a different other PRTrack contains an even higher contribution to this MCTrack.
+   *      - Only if the relateClonesToMCParticles parameter is active
+   *        The McTrackId property of cloned PRTracks is set to the MCTrackId property of the MCTrack.
+   *        Else it will be set to -9.
+   *      - Also the relation from PRTrack to MCParticle is added, only if the relateClonesToMCParticles parameter is active.
+   *      - The purity relation is always setup from the PRTrack to the MCTrack with the _negative_ purity as weight,
+   *        to be able to distinguish them from the matched tracks.
+   *
+   *  - CLONE WRONG CHARGE
+   *      - The highest purity MCTrack has a different highest efficiency PRTrack than this track.
+   *      - Moreover, the charge of the PRTrack and the one of the MCTrack are NOT the same.
    *      - This means the PRTrack contains high contributions of only one MCTrack
    *        but a different other PRTrack contains an even higher contribution to this MCTrack.
    *      - Only if the relateClonesToMCParticles parameter is active
@@ -97,14 +130,34 @@ namespace Belle2 {
    *      - PRTracks classified as ghost are not entered in the purity RelationArray.
    *  .
    *
-   *  MCTracks are classified into three categories:
+   *  MCTracks are classified into five categories:
+   *
+   *  - UNDEFINED
+   *      - Status of the track *before* any real status has been set.
+   *      - If the track status is still UNDEFINED after matching, something went wrong.
+   *
    *  - MATCHED
    *      - The highest purity MCTrack of the highest efficiency PRTrack of this MCTrack is the same as this MCTrack.
+   *      - In addition, the charge of the MCTrack and the one of the PRTrack are the same.
+   *      - This means the MCTrack is well described by a PRTrack and this PRTrack has only a significant contribution from this MCTrack.
+   *      - The efficiency relation is setup from the MCTrack to the PRTrack with the (positive) efficiency as weight.
+   *
+   *  - WRONG CHARGE
+   *      - The highest purity MCTrack of the highest efficiency PRTrack of this MCTrack is the same as this MCTrack.
+   *      - But, the charge of the MCTrack and the one of the PRTrack are NOT the same.
    *      - This means the MCTrack is well described by a PRTrack and this PRTrack has only a significant contribution from this MCTrack.
    *      - The efficiency relation is setup from the MCTrack to the PRTrack with the (positive) efficiency as weight.
    *
    *  - MERGED
    *      - The highest purity MCTrack of the highest efficiency PRTrack of this MCTrack is not the same as this MCTrack.
+   *      - Anyway, the charge of this MCTrack and the one of the PRTrack are the same.
+   *      - This means this MCTrack is mostly contained in a PRTrack, which in turn however better describes a MCTrack different form this.
+   *      - The efficiency relation is setup from the MCTrack to the PRTrack with the _negative_ efficiency as weight,
+   *        to be able to distinguish them from the matched tracks.
+   *
+   *  - MERGED WRONG CHARGE
+   *      - The highest purity MCTrack of the highest efficiency PRTrack of this MCTrack is not the same as this MCTrack.
+   *      - Moreover, the charge of this MCTrack and the one of the PRTrack are NOT the same.
    *      - This means this MCTrack is mostly contained in a PRTrack, which in turn however better describes a MCTrack different form this.
    *      - The efficiency relation is setup from the MCTrack to the PRTrack with the _negative_ efficiency as weight,
    *        to be able to distinguish them from the matched tracks.
@@ -128,23 +181,29 @@ namespace Belle2 {
     void event() final;
 
   private: //Parameters
-    //! Parameter : RecoTracks store array name from the patter recognition
-    std::string m_param_prRecoTracksStoreArrayName;
+    //! Parameter : Name of the RecoTracks StoreArray from pattern recognition
+    std::string m_prRecoTracksStoreArrayName;
 
-    //! Parameter : RecoTracks store array name from the mc recognition
-    std::string m_param_mcRecoTracksStoreArrayName;
+    //! Parameter : Name of the RecoTracks StoreArray from MC track finding
+    std::string m_mcRecoTracksStoreArrayName;
+
+    //! Parameter : Name of the Tracks StoreArray
+    std::string m_TracksStoreArrayName;
 
     //! Parameter : Switch whether PXDHits should be used in the matching
-    bool m_param_usePXDHits;
+    bool m_usePXDHits;
 
     //! Parameter : Switch whether SVDHits should be used in the matching
-    bool m_param_useSVDHits;
+    bool m_useSVDHits;
 
     //! Parameter : Switch whether CDCHits should be used in the matching
-    bool m_param_useCDCHits;
+    bool m_useCDCHits;
 
     //! Parameter : Switch whether only axial CDCHits should be used
-    bool m_param_useOnlyAxialCDCHits;
+    bool m_useOnlyAxialCDCHits;
+
+    //! Use fitted tracks for matching
+    bool m_useFittedTracks = true;
 
     /*!
      *  Parameter : Minimal purity of a PRTrack to be considered matchable to a MCTrack.
@@ -152,7 +211,7 @@ namespace Belle2 {
      *  This number encodes how many correct hits are minimally need to compensate for a false hits.
      *  The default 2. / 3. suggests that for each background hit can be compensated by two correct hits.
      */
-    double m_param_minimalPurity;
+    double m_minimalPurity;
 
     /*!
      *  Parameter : Minimal efficiency for a MCTrack to be considered matchable to a PRTrack
@@ -160,16 +219,22 @@ namespace Belle2 {
      *  This number encodes which fraction of the true hits must at least be in the reconstructed track.
      *  The default 0.05 suggests that at least 5% of the true hits should have been picked up.
      */
-    double m_param_minimalEfficiency;
+    double m_minimalEfficiency;
 
-  public: // Other variables
+    StoreArray<MCParticle>  m_MCParticles;  /**< StoreArray containing MCParticles */
+    StoreArray<RecoTrack>   m_PRRecoTracks; /**< StoreArray containing PR RecoTracks */
+    StoreArray<RecoTrack>   m_MCRecoTracks; /**< StoreArray containing MC RecoTracks */
+    StoreArray<PXDCluster>  m_PXDClusters;  /**< StoreArray containing PXDClusters */
+    StoreArray<SVDCluster>  m_SVDClusters;  /**< StoreArray containing SVDClusters */
+    StoreArray<CDCHit>      m_CDCHits;      /**< StoreArray containing CDCHits */
+
+    //! Flag to indicated whether the Monte Carlo track are on the DataStore
+    bool m_mcParticlesPresent = false;
+
     //! Descriptive type defintion for a number of degrees of freedom.
     using NDF = int;
 
     //! Map storing the standard number degrees of freedom for a single hit by detector */
     std::map<int, NDF> m_ndf_by_detId = {{Const::PXD, 2}, {Const::SVD, 1}, {Const::CDC, 1}};
-
-    //! Flag to indicated whether the Monte Carlo track are on the DataStore
-    bool m_mcParticlesPresent = false;
   };
 }

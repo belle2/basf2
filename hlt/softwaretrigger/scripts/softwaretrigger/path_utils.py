@@ -5,8 +5,8 @@
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
+
 import basf2
-import ROOT
 from softwaretrigger import constants
 import modularAnalysis
 import stdV0s
@@ -32,7 +32,7 @@ def add_online_dqm(path, run_type, dqm_environment, components, dqm_mode, create
         add_cosmic_dqm(path, components=components, dqm_environment=dqm_environment,
                        dqm_mode=dqm_mode, create_hlt_unit_histograms=create_hlt_unit_histograms)
     else:
-        basf2.B2FATAL("Run type {} not supported.".format(run_type))
+        basf2.B2FATAL(f"Run type {run_type} not supported.")
 
     if dqm_mode in ["dont_care", "all_events"]:
         path.add_module('DelayDQM', title=dqm_environment, histogramDirectoryName='DAQ')
@@ -140,7 +140,7 @@ def add_skim_software_trigger(path, store_array_debug_prescale=0):
     modularAnalysis.fillParticleList("pi+:skim", 'pt>0.2 and abs(d0) < 2 and abs(z0) < 4', path=path)
     modularAnalysis.fillParticleList("pi+:hadb", 'p>0.1 and abs(d0) < 2 and abs(z0) < 4', path=path)
     modularAnalysis.fillParticleList("pi+:tau", 'abs(d0) < 2 and abs(z0) < 8', path=path)
-    modularAnalysis.fillParticleList("gamma:skim", 'E>0.1', loadPhotonBeamBackgroundMVA=False, path=path)
+    modularAnalysis.fillParticleList("gamma:skim", 'E>0.1', path=path)
     stdV0s.stdKshorts(path=path, fitter='KFit')
     modularAnalysis.cutAndCopyList('K_S0:dstSkim', 'K_S0:merged', 'goodBelleKshort == 1', True, path=path)
     stdV0s.stdLambdas(path=path)
@@ -148,8 +148,7 @@ def add_skim_software_trigger(path, store_array_debug_prescale=0):
     modularAnalysis.fillParticleList("pi+:dstSkim", 'abs(d0) < 2 and abs(z0) < 4', path=path)
     modularAnalysis.fillParticleList("gamma:loose", 'theta > 0.296706 and theta < 2.61799 and \
     [[clusterReg == 1 and E > 0.03] or [clusterReg == 2 and E > 0.02] or [clusterReg == 3 and E > 0.03]] and \
-    [abs(clusterTiming) < formula(1.0 * clusterErrorTiming) or E > 0.1] and [clusterE1E9 > 0.3 or E > 0.1]',
-                                     loadPhotonBeamBackgroundMVA=False, path=path)
+    [abs(clusterTiming) < formula(1.0 * clusterErrorTiming) or E > 0.1] and [clusterE1E9 > 0.3 or E > 0.1]', path=path)
     modularAnalysis.reconstructDecay('pi0:loose -> gamma:loose gamma:loose', '0.075 < M < 0.175', 1, True, path=path)
     modularAnalysis.cutAndCopyList('pi0:veryLooseFit', 'pi0:loose', '', True, path=path)
     vertex.kFit('pi0:veryLooseFit', 0.0, 'mass', path=path)
@@ -240,6 +239,10 @@ def hlt_event_abort(module, condition, error_flag):
     Create a discard path suitable for HLT processing, i.e. set an error flag and
     keep only the metadata.
     """
+
+    # Always avoid the top-level 'import ROOT'.
+    import ROOT  # noqa
+
     p = basf2.Path()
     p.add_module("EventErrorFlag", errorFlag=error_flag)
     add_store_only_metadata_path(p)

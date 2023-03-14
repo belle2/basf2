@@ -5,8 +5,10 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
+
 #pragma once
 
+/* Basf2 headers. */
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 
@@ -50,10 +52,10 @@ namespace Belle2 {
 
     std::vector < int > m_eclCalDigitsArray; /**< eclCalDigits in array */
 
-    std::map <int , std::vector<int> > m_FWD3Barrel; /**< map between phi id and FWD3 cell ids on the barrel side */
-    std::map <int , std::vector<int> > m_FWD3Endcap; /**< map between phi id and FWD3 cell ids on the endcap side */
-    std::map <int , std::vector<int> > m_BWD3Barrel; /**< map between phi id and BWD3 cell ids on the barrel side */
-    std::map <int , std::vector<int> > m_BWD3Endcap; /**< map between phi id and BWD3 cell ids on the endcap side */
+    std::map <int, std::vector<int> > m_FWD3Barrel;  /**< map between phi id and FWD3 cell ids on the barrel side */
+    std::map <int, std::vector<int> > m_FWD3Endcap;  /**< map between phi id and FWD3 cell ids on the endcap side */
+    std::map <int, std::vector<int> > m_BWD3Barrel;  /**< map between phi id and BWD3 cell ids on the barrel side */
+    std::map <int, std::vector<int> > m_BWD3Endcap;  /**< map between phi id and BWD3 cell ids on the endcap side */
 
     ECL::ECLGeometryPar* geom{nullptr}; /**<ECL geometry */
 

@@ -5,28 +5,26 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//This module
+
+/* Own header. */
 #include <ecl/modules/eclMuMuECollector/eclMuMuECollectorModule.h>
 
-//ROOT
-#include <TH2F.h>
-
-//Framework
-#include <framework/gearbox/Const.h>
-#include <framework/dataobjects/EventMetaData.h>
-
-//Tracking
-#include <tracking/dataobjects/ExtHit.h>
-
-//ECL
+/* ECL headers. */
 #include <ecl/dataobjects/ECLDigit.h>
-#include <ecl/geometry/ECLNeighbours.h>
+#include <ecl/dataobjects/ECLElementNumbers.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
+#include <ecl/geometry/ECLNeighbours.h>
 
-//MDST
+/* Basf2 headers. */
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/gearbox/Const.h>
+#include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TRGSummary.h>
-#include <mdst/dataobjects/ECLCluster.h>
+#include <tracking/dataobjects/ExtHit.h>
+
+/* ROOT headers. */
+#include <TH2F.h>
 
 using namespace std;
 using namespace Belle2;
@@ -36,7 +34,7 @@ using namespace ECL;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(eclMuMuECollector)
+REG_MODULE(eclMuMuECollector);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -71,40 +69,48 @@ void eclMuMuECollectorModule::prepare()
 
   /**----------------------------------------------------------------------------------------*/
   /** Create the histograms and register them in the data store */
-  auto TrkPerCrysID = new TH1F("TrkPerCrysID", "track extrapolations per crystalID;crystal ID", 8736, 0, 8736);
+  auto TrkPerCrysID = new TH1F("TrkPerCrysID", "track extrapolations per crystalID;crystal ID", ECLElementNumbers::c_NCrystals, 0,
+                               ECLElementNumbers::c_NCrystals);
   registerObject<TH1F>("TrkPerCrysID", TrkPerCrysID);
 
-  auto EnVsCrysID = new TH2F("EnVsCrysID", "Normalized energy for each crystal;crystal ID;E/Expected", 8736, 0, 8736, 240, 0.1, 2.5);
+  auto EnVsCrysID = new TH2F("EnVsCrysID", "Normalized energy for each crystal;crystal ID;E/Expected", ECLElementNumbers::c_NCrystals,
+                             0, ECLElementNumbers::c_NCrystals, 240, 0.1, 2.5);
   registerObject<TH2F>("EnVsCrysID", EnVsCrysID);
 
-  auto ExpEvsCrys = new TH1F("ExpEvsCrys", "Sum expected energy vs crystal ID;crystal ID;Energy (GeV)", 8736, 0, 8736);
+  auto ExpEvsCrys = new TH1F("ExpEvsCrys", "Sum expected energy vs crystal ID;crystal ID;Energy (GeV)",
+                             ECLElementNumbers::c_NCrystals, 0, ECLElementNumbers::c_NCrystals);
   registerObject<TH1F>("ExpEvsCrys", ExpEvsCrys);
 
   auto ElecCalibvsCrys = new TH1F("ElecCalibvsCrys", "Sum electronics calib const vs crystal ID;crystal ID;calibration constant",
-                                  8736, 0, 8736);
+                                  ECLElementNumbers::c_NCrystals, 0, ECLElementNumbers::c_NCrystals);
   registerObject<TH1F>("ElecCalibvsCrys", ElecCalibvsCrys);
 
   auto InitialCalibvsCrys = new TH1F("InitialCalibvsCrys",
-                                     "Sum initial muon pair calib const vs crystal ID;crystal ID;calibration constant", 8736, 0, 8736);
+                                     "Sum initial muon pair calib const vs crystal ID;crystal ID;calibration constant", ECLElementNumbers::c_NCrystals, 0,
+                                     ECLElementNumbers::c_NCrystals);
   registerObject<TH1F>("InitialCalibvsCrys", InitialCalibvsCrys);
 
-  auto CalibEntriesvsCrys = new TH1F("CalibEntriesvsCrys", "Entries in calib vs crys histograms;crystal ID;Entries per crystal", 8736,
-                                     0, 8736);
+  auto CalibEntriesvsCrys = new TH1F("CalibEntriesvsCrys", "Entries in calib vs crys histograms;crystal ID;Entries per crystal",
+                                     ECLElementNumbers::c_NCrystals,
+                                     0, ECLElementNumbers::c_NCrystals);
   registerObject<TH1F>("CalibEntriesvsCrys", CalibEntriesvsCrys);
 
   /** Raw digit quantities for debugging purposes only */
-  auto RawDigitAmpvsCrys = new TH2F("RawDigitAmpvsCrys", "Digit Amplitude vs crystal ID;crystal ID;Amplitude", 8736, 0, 8736, 250, 0,
+  auto RawDigitAmpvsCrys = new TH2F("RawDigitAmpvsCrys", "Digit Amplitude vs crystal ID;crystal ID;Amplitude",
+                                    ECLElementNumbers::c_NCrystals, 0, ECLElementNumbers::c_NCrystals, 250, 0,
                                     25000);
   registerObject<TH2F>("RawDigitAmpvsCrys", RawDigitAmpvsCrys);
 
-  auto RawDigitTimevsCrys = new TH2F("RawDigitTimevsCrys", "Digit Time vs crystal ID;crystal ID;Time", 8736, 0, 8736, 200, -2000,
+  auto RawDigitTimevsCrys = new TH2F("RawDigitTimevsCrys", "Digit Time vs crystal ID;crystal ID;Time", ECLElementNumbers::c_NCrystals,
+                                     0, ECLElementNumbers::c_NCrystals, 200, -2000,
                                      2000);
   registerObject<TH2F>("RawDigitTimevsCrys", RawDigitTimevsCrys);
 
   //..Diagnose possible cable swaps
   auto hitCrysVsExtrapolatedCrys = new TH2F("hitCrysVsExtrapolatedCrys",
-                                            "Crystals with high energy vs extrapolated crystals with no energy;extrapolated crystalID;High crystalID", 8736, 0, 8736, 8736, 0,
-                                            8736);
+                                            "Crystals with high energy vs extrapolated crystals with no energy;extrapolated crystalID;High crystalID",
+                                            ECLElementNumbers::c_NCrystals, 0, ECLElementNumbers::c_NCrystals, ECLElementNumbers::c_NCrystals, 0,
+                                            ECLElementNumbers::c_NCrystals);
   registerObject<TH2F>("hitCrysVsExtrapolatedCrys", hitCrysVsExtrapolatedCrys);
 
 
@@ -144,7 +150,7 @@ void eclMuMuECollectorModule::prepare()
   B2INFO("requireL1: " << m_requireL1);
 
   /** Resize vectors */
-  EperCrys.resize(8736);
+  EperCrys.resize(ECLElementNumbers::c_NCrystals);
 
   /**----------------------------------------------------------------------------------------*/
   /** Get expected energies and calibration constants from DB. Need to call hasChanged() for later comparison */
@@ -160,7 +166,7 @@ void eclMuMuECollectorModule::prepare()
   }
 
   /** Verify that we have valid values for the starting calibrations */
-  for (int crysID = 0; crysID < 8736; crysID++) {
+  for (int crysID = 0; crysID < ECLElementNumbers::c_NCrystals; crysID++) {
     if (ElectronicsCalib[crysID] <= 0) {B2FATAL("eclMuMuECollector: ElectronicsCalib = " << ElectronicsCalib[crysID] << " for crysID = " << crysID);}
     if (ExpMuMuE[crysID] == 0) {B2FATAL("eclMuMuECollector: ExpMuMuE = 0 for crysID = " << crysID);}
     if (MuMuECalib[crysID] == 0) {B2FATAL("eclMuMuECollector: MuMuECalib = 0 for crysID = " << crysID);}
@@ -182,7 +188,7 @@ void eclMuMuECollectorModule::collect()
 
   /** Record the input database constants for the first call */
   if (iEvent == 0) {
-    for (int crysID = 0; crysID < 8736; crysID++) {
+    for (int crysID = 0; crysID < ECLElementNumbers::c_NCrystals; crysID++) {
       getObjectPtr<TH1F>("ExpEvsCrys")->Fill(crysID + 0.001, ExpMuMuE[crysID]);
       getObjectPtr<TH1F>("ElecCalibvsCrys")->Fill(crysID + 0.001, ElectronicsCalib[crysID]);
       getObjectPtr<TH1F>("InitialCalibvsCrys")->Fill(crysID + 0.001, MuMuECalib[crysID]);
@@ -225,7 +231,7 @@ void eclMuMuECollectorModule::collect()
     }
 
     /** Verify that we have valid values for the starting calibrations */
-    for (int crysID = 0; crysID < 8736; crysID++) {
+    for (int crysID = 0; crysID < ECLElementNumbers::c_NCrystals; crysID++) {
       if (ElectronicsCalib[crysID] <= 0) {B2FATAL("eclMuMuECollector: ElectronicsCalib = " << ElectronicsCalib[crysID] << " for crysID = " << crysID);}
       if (ExpMuMuE[crysID] == 0) {B2FATAL("eclMuMuECollector: ExpMuMuE = 0 for crysID = " << crysID);}
       if (MuMuECalib[crysID] == 0) {B2FATAL("eclMuMuECollector: MuMuECalib = 0 for crysID = " << crysID);}
@@ -276,7 +282,7 @@ void eclMuMuECollectorModule::collect()
   int extCrysID[2] = { -1, -1};
   Const::EDetector eclID = Const::EDetector::ECL;
   for (int imu = 0; imu < 2; imu++) {
-    TVector3 temppos[2] = {};
+    ROOT::Math::XYZVector temppos[2] = {};
     int IDEnter = -99;
     for (auto& extHit : m_trackArray[iTrack[imu]]->getRelationsTo<ExtHit>()) {
       int pdgCode = extHit.getPdgCode();
@@ -294,7 +300,7 @@ void eclMuMuECollectorModule::collect()
         temppos[1] = extHit.getPosition();
 
         /** Keep track of this crystal if the track length is long enough. Note that if minTrackLength is less than half the crystal length, we will keep only the first extrapolation due to break */
-        double trackLength = (temppos[1] - temppos[0]).Mag();
+        double trackLength = (temppos[1] - temppos[0]).R();
         if (trackLength > m_minTrackLength) {extCrysID[imu] = temp0;}
         break;
       }

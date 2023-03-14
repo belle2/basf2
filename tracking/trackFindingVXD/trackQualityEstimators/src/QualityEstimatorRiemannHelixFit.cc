@@ -177,7 +177,7 @@ double QualityEstimatorRiemannHelixFit::estimateQuality(std::vector<SpacePoint c
 
   // Adding chi2 and chi2_z, thus creating a chi2 distribution with (n-3) + (n-2) = 2n-5 degrees of freedom
   m_results.chiSquared = chi2 + chi2_z;
-  B2DEBUG(75, "Chi Squared of extended Riemann = " << * (m_results.chiSquared) << std::endl);
+  B2DEBUG(25, "Chi Squared of extended Riemann = " << * (m_results.chiSquared) << std::endl);
 
   Precision pZ = pT * p(1);
   momVec(2) = pZ;

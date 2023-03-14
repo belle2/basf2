@@ -9,13 +9,13 @@
 /* Own header. */
 #include <hlt/modules/onlineEventT0/OnlineEventT0CreatorModule.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/core/Environment.h>
 #include <framework/logging/LogConfig.h>
 
 using namespace Belle2;
 
-REG_MODULE(OnlineEventT0Creator)
+REG_MODULE(OnlineEventT0Creator);
 
 OnlineEventT0CreatorModule::OnlineEventT0CreatorModule() : Module()
 {

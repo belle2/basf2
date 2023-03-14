@@ -214,6 +214,7 @@ namespace Belle2 {
         free(directory_template);
       }
 
+      // cppcheck-suppress unreadVariable
       auto guard = ScopeGuard::guardWorkingDirectory(directory);
 
       std::string jobName = specific_options.m_prefix;
@@ -293,6 +294,7 @@ namespace Belle2 {
     // Implement me!
     Weightfile TMVATeacherMulticlass::train(Dataset& training_data) const
     {
+      B2ERROR("Training TMVAMulticlass classifiers within the MVA package has not been implemented yet.");
       (void) training_data;
       return Weightfile();
     }
@@ -315,6 +317,7 @@ namespace Belle2 {
         free(directory_template);
       }
 
+      // cppcheck-suppress unreadVariable
       auto guard = ScopeGuard::guardWorkingDirectory(directory);
 
       std::string jobName = specific_options.m_prefix;
@@ -381,7 +384,7 @@ namespace Belle2 {
       // Initialize TMVA and ROOT stuff
       TMVA::Tools::Instance();
 
-      m_expert = std::make_unique<TMVA::Reader>("!Color:!Silent");
+      m_expert = std::make_unique<TMVA::Reader>("!Color:Silent");
 
       GeneralOptions general_options;
       weightfile.getOptions(general_options);

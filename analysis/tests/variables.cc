@@ -18,7 +18,7 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
 #include <analysis/dataobjects/ParticleList.h>
-#include <analysis/dataobjects/EventExtraInfo.h>
+#include <framework/dataobjects/EventExtraInfo.h>
 #include <analysis/dataobjects/RestOfEvent.h>
 #include <analysis/utility/ReferenceFrame.h>
 
@@ -66,7 +66,7 @@ namespace {
     gearbox.open("geometry/Belle2.xml", false);
 
     {
-      Particle p({ 0.1 , -0.4, 0.8, 1.0 }, 411);
+      Particle p({ 0.1, -0.4, 0.8, 1.0 }, 411);
 
       TMatrixFSym error(7);
       error.Zero();
@@ -197,9 +197,9 @@ namespace {
       }
 
       {
-        Particle pinv({ -0.1 , 0.4, -0.8, 1.0 }, 411);
+        Particle pinv({ -0.1, 0.4, -0.8, 1.0 }, 411);
         UseReferenceFrame<RestFrame> dummy(&pinv);
-        Particle p2({ 0.0 , 0.0, 0.0, 0.4358899}, 411);
+        Particle p2({ 0.0, 0.0, 0.0, 0.4358899}, 411);
         EXPECT_FLOAT_EQ(0.9, particleP(&p2));
         EXPECT_FLOAT_EQ(1.0, particleE(&p2));
         EXPECT_FLOAT_EQ(0.1, particlePx(&p2));
@@ -212,7 +212,7 @@ namespace {
     }
 
     {
-      Particle p({ 0.0 , 0.0, 0.0, 0.0 }, 411);
+      Particle p({ 0.0, 0.0, 0.0, 0.0 }, 411);
       EXPECT_FLOAT_EQ(0.0, particleP(&p));
       EXPECT_FLOAT_EQ(0.0, particleE(&p));
       EXPECT_FLOAT_EQ(0.0, particlePx(&p));
@@ -266,7 +266,7 @@ namespace {
     gearbox.close();
     gearbox.open("geometry/Belle2.xml", false);
 
-    Particle p({ 0.1 , -0.4, 0.8, 1.0 }, 11);
+    Particle p({ 0.1, -0.4, 0.8, 1.0 }, 11);
     p.setPValue(0.5);
     p.setVertex(XYZVector(1.0, 2.0, 2.0));
 
@@ -288,7 +288,7 @@ namespace {
     }
 
     {
-      Particle p2({ 0.1 , -0.4, 0.8, 1.0 }, 11);
+      Particle p2({ 0.1, -0.4, 0.8, 1.0 }, 11);
       p2.setPValue(0.5);
       p2.setVertex(XYZVector(1.0, 2.0, 2.0));
 
@@ -307,7 +307,7 @@ namespace {
     {
       Particle p2({ 0.0 , 1.0, 0.0, 1.0 }, 11);
       p2.setPValue(0.5);
-      p2.setVertex(B2Vector3D(1.0, 0.0, 2.0));
+      p2.setVertex(XYZVector(1.0, 0.0, 2.0));
 
       UseReferenceFrame<RestFrame> dummy(&p2);
       EXPECT_FLOAT_EQ(0.0, particleDX(&p));
@@ -344,11 +344,11 @@ namespace {
     // Generate a random put orthogonal pair of vectors in the r-phi plane
     ROOT::Math::Cartesian2D d(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
     ROOT::Math::Cartesian2D pt(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
-    d.SetXY(d.X(), -(d.X()*pt.x()) / pt.y());
+    d.SetXY(d.X(), -(d.X()*pt.X()) / pt.Y());
 
     // Add a random z component
-    B2Vector3D position(d.X(), d.Y(), generator.Uniform(-1, 1));
-    B2Vector3D momentum(pt.x(), pt.y(), generator.Uniform(-1, 1));
+    ROOT::Math::XYZVector position(d.X(), d.Y(), generator.Uniform(-1, 1));
+    ROOT::Math::XYZVector momentum(pt.X(), pt.Y(), generator.Uniform(-1, 1));
 
     auto CDCValue = static_cast<unsigned long long int>(0x300000000000000);
 
@@ -384,7 +384,7 @@ namespace {
     Track* savedTrack2 = myTracks.appendNew(secondTrack);
     myParticles.appendNew(savedTrack2, Const::ChargedStable(11));
     myV0s.appendNew(V0(std::pair(savedTrack, myResults[0]), std::pair(savedTrack2, myResults[1])));
-    const PxPyPzEVector v0Momentum(2 * momentum.x(), 2 * momentum.y(), 2 * momentum.z(), (momentum * 2).Mag());
+    const PxPyPzEVector v0Momentum(2 * momentum.X(), 2 * momentum.Y(), 2 * momentum.Z(), (momentum * 2).R());
     auto v0particle = myParticles.appendNew(v0Momentum, 22,
                                             Particle::c_Unflavored, Particle::c_V0, 0);
     v0particle->appendDaughter(0, false);
@@ -465,7 +465,7 @@ namespace {
       // create a reco track (one has to also mock up a track fit result)
       TMatrixDSym cov(6);
       trackfits.appendNew(
-        B2Vector3D(), B2Vector3D(), cov, -1, Const::electron, 0.5, 1.5,
+        ROOT::Math::XYZVector(), ROOT::Math::XYZVector(), cov, -1, Const::electron, 0.5, 1.5,
         static_cast<unsigned long long int>(0x300000000000000), 16777215, 0);
       auto* electron_tr = tracks.appendNew(Track());
       electron_tr->setTrackFitResultIndex(Const::electron, 0);
@@ -473,7 +473,7 @@ namespace {
 
       TMatrixDSym cov1(6);
       trackfits.appendNew(
-        B2Vector3D(), B2Vector3D(), cov1, -1, Const::pion, 0.51, 1.5,
+        ROOT::Math::XYZVector(), ROOT::Math::XYZVector(), cov1, -1, Const::pion, 0.51, 1.5,
         static_cast<unsigned long long int>(0x300000000000000), 16777215, 0);
       auto* pion_tr = tracks.appendNew(Track());
       pion_tr->setTrackFitResultIndex(Const::pion, 0);
@@ -704,13 +704,13 @@ namespace {
     auto* mcParticle = mcParticles.appendNew();
     mcParticle->setPDG(Const::electron.getPDGCode());
     mcParticle->setStatus(MCParticle::c_PrimaryParticle);
-    auto* p1 = particles.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
+    auto* p1 = particles.appendNew(PxPyPzEVector({ 0.0, -0.4, 0.8, 1.0}), 11);
     p1->addRelationTo(mcParticle);
 
     mcParticle = mcParticles.appendNew();
     mcParticle->setPDG(-Const::electron.getPDGCode());
     mcParticle->setStatus(MCParticle::c_PrimaryParticle);
-    auto* p2 = particles.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
+    auto* p2 = particles.appendNew(PxPyPzEVector({ 0.0, -0.4, 0.8, 1.0}), 11);
     p2->addRelationTo(mcParticle);
 
     const Manager::Var* var = Manager::Instance().getVariable("isContinuumEvent");
@@ -734,13 +734,13 @@ namespace {
     auto* mcParticle = mcParticles2.appendNew();
     mcParticle->setPDG(Const::photon.getPDGCode());
     mcParticle->setStatus(MCParticle::c_PrimaryParticle);
-    auto* p3 = particles2.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
+    auto* p3 = particles2.appendNew(PxPyPzEVector({ 0.0, -0.4, 0.8, 1.0}), 11);
     p3->addRelationTo(mcParticle);
 
     mcParticle = mcParticles2.appendNew();
     mcParticle->setPDG(300553);
     mcParticle->setStatus(MCParticle::c_PrimaryParticle);
-    auto* p4 = particles2.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), 300553);
+    auto* p4 = particles2.appendNew(PxPyPzEVector({ 0.0, -0.4, 0.8, 1.0}), 300553);
     p4->addRelationTo(mcParticle);
 
     const Manager::Var* var2 = Manager::Instance().getVariable("isContinuumEvent");
@@ -764,13 +764,13 @@ namespace {
     auto* mcParticle = mcParticles3.appendNew();
     mcParticle->setPDG(Const::photon.getPDGCode());
     mcParticle->setStatus(MCParticle::c_PrimaryParticle);
-    auto* p5 = particles3.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
+    auto* p5 = particles3.appendNew(PxPyPzEVector({ 0.0, -0.4, 0.8, 1.0}), 11);
     p5->addRelationTo(mcParticle);
 
     mcParticle = mcParticles3.appendNew();
     mcParticle->setPDG(300553);
     mcParticle->setStatus(MCParticle::c_PrimaryParticle);
-    auto* p6 = particles3.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), 15);
+    auto* p6 = particles3.appendNew(PxPyPzEVector({ 0.0, -0.4, 0.8, 1.0}), 15);
     p6->addRelationTo(mcParticle);
 
     const Manager::Var* var3 = Manager::Instance().getVariable("isContinuumEvent");
@@ -835,7 +835,7 @@ namespace {
     gearbox.close();
     gearbox.open("geometry/Belle2.xml", false);
 
-    Particle p({ 0.1 , -0.4, 0.8, 1.0 }, 411);
+    Particle p({ 0.1, -0.4, 0.8, 1.0 }, 411);
     p.setVertex(XYZVector(1.0, 2.0, 2.0));
 
     const Manager::Var* var = Manager::Instance().getVariable("p");
@@ -865,7 +865,7 @@ namespace {
 
   TEST_F(MetaVariableTest, useLabFrame)
   {
-    Particle p({ 0.1 , -0.4, 0.8, 1.0 }, 411);
+    Particle p({ 0.1, -0.4, 0.8, 1.0 }, 411);
     p.setVertex(XYZVector(1.0, 2.0, 2.0));
 
     const Manager::Var* var = Manager::Instance().getVariable("p");
@@ -900,7 +900,7 @@ namespace {
     gearbox.close();
     gearbox.open("geometry/Belle2.xml", false);
 
-    Particle p({ 0.1 , -0.4, 0.8, 1.0 }, 411);
+    Particle p({ 0.1, -0.4, 0.8, 1.0 }, 411);
     p.setVertex(XYZVector(1.0, 2.0, 2.0));
 
     const Manager::Var* var = Manager::Instance().getVariable("p");
@@ -969,7 +969,7 @@ namespace {
 
   TEST_F(MetaVariableTest, extraInfo)
   {
-    Particle p({ 0.1 , -0.4, 0.8, 1.0 }, 11);
+    Particle p({ 0.1, -0.4, 0.8, 1.0 }, 11);
     p.addExtraInfo("pi", 3.14);
 
     const Manager::Var* var = Manager::Instance().getVariable("extraInfo(pi)");
@@ -1008,7 +1008,7 @@ namespace {
 
   TEST_F(MetaVariableTest, particleCached)
   {
-    Particle p({ 0.1 , -0.4, 0.8, 2.0 }, 11);
+    Particle p({ 0.1, -0.4, 0.8, 2.0 }, 11);
     const Manager::Var* var = Manager::Instance().getVariable("particleCached(px)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 0.1);
@@ -1022,7 +1022,7 @@ namespace {
 
   TEST_F(MetaVariableTest, basicMathTest)
   {
-    Particle p({ 0.1 , -0.4, 0.8, 2.0 }, 411);
+    Particle p({ 0.1, -0.4, 0.8, 2.0 }, 411);
 
     const Manager::Var* var = Manager::Instance().getVariable("abs(py)");
     ASSERT_NE(var, nullptr);
@@ -1074,7 +1074,7 @@ namespace {
     // keep particle-based tests here, and operator precedence tests (etc) in
     // framework with the parser itself
 
-    Particle p({ 0.1 , -0.4, 0.8, 2.0 }, -411);
+    Particle p({ 0.1, -0.4, 0.8, 2.0 }, -411);
 
     const Manager::Var* var = Manager::Instance().getVariable("formula(px + py)");
     ASSERT_NE(var, nullptr);
@@ -1148,8 +1148,8 @@ namespace {
 
   TEST_F(MetaVariableTest, passesCut)
   {
-    Particle p({ 0.1 , -0.4, 0.8, 2.0 }, 411);
-    Particle p2({ 0.1 , -0.4, 0.8, 4.0 }, 411);
+    Particle p({ 0.1, -0.4, 0.8, 2.0 }, 411);
+    Particle p2({ 0.1, -0.4, 0.8, 4.0 }, 411);
 
     const Manager::Var* var = Manager::Instance().getVariable("passesCut(E < 3)");
     ASSERT_NE(var, nullptr);
@@ -1209,10 +1209,10 @@ namespace {
     auto* mcDaughter2 = mcParticles[4];
     mcDaughter2->setStatus(MCParticle::c_PrimaryParticle);
 
-    auto* pGrandMother = particles.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), -521);
+    auto* pGrandMother = particles.appendNew(PxPyPzEVector({ 0.0, -0.4, 0.8, 1.0}), -521);
     pGrandMother->addRelationTo(mcGrandMother);
 
-    auto* pMother = particles.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), 13);
+    auto* pMother = particles.appendNew(PxPyPzEVector({ 0.0, -0.4, 0.8, 1.0}), 13);
     pMother->addRelationTo(mcMother);
 
 
@@ -1267,16 +1267,16 @@ namespace {
     tracks.registerInDataStore();
     DataStore::Instance().setInitializeActive(false);
 
-    Particle p({ 0.1 , -0.4, 0.8, 2.0 }, 11);
-    Particle p2({ 0.1 , -0.4, 0.8, 4.0 }, 11);
+    Particle p({ 0.1, -0.4, 0.8, 2.0 }, 11);
+    Particle p2({ 0.1, -0.4, 0.8, 4.0 }, 11);
 
-    track_fit_results.appendNew(B2Vector3D(0.1, 0.1, 0.1), B2Vector3D(0.1, 0.0, 0.0),
+    track_fit_results.appendNew(ROOT::Math::XYZVector(0.1, 0.1, 0.1), ROOT::Math::XYZVector(0.1, 0.0, 0.0),
                                 TMatrixDSym(6), 1, Const::pion, 0.01, 1.5, 0, 0, 0);
-    track_fit_results.appendNew(B2Vector3D(0.1, 0.1, 0.1), B2Vector3D(0.15, 0.0, 0.0),
+    track_fit_results.appendNew(ROOT::Math::XYZVector(0.1, 0.1, 0.1), ROOT::Math::XYZVector(0.15, 0.0, 0.0),
                                 TMatrixDSym(6), 1, Const::pion, 0.01, 1.5, 0, 0, 0);
-    track_fit_results.appendNew(B2Vector3D(0.1, 0.1, 0.1), B2Vector3D(0.4, 0.0, 0.0),
+    track_fit_results.appendNew(ROOT::Math::XYZVector(0.1, 0.1, 0.1), ROOT::Math::XYZVector(0.4, 0.0, 0.0),
                                 TMatrixDSym(6), 1, Const::pion, 0.01, 1.5, 0, 0, 0);
-    track_fit_results.appendNew(B2Vector3D(0.1, 0.1, 0.1), B2Vector3D(0.6, 0.0, 0.0),
+    track_fit_results.appendNew(ROOT::Math::XYZVector(0.1, 0.1, 0.1), ROOT::Math::XYZVector(0.6, 0.0, 0.0),
                                 TMatrixDSym(6), 1, Const::pion, 0.01, 1.5, 0, 0, 0);
 
     tracks.appendNew()->setTrackFitResultIndex(Const::pion, 0);
@@ -1298,8 +1298,8 @@ namespace {
 
   TEST_F(MetaVariableTest, NumberOfMCParticlesInEvent)
   {
-    Particle p({ 0.1 , -0.4, 0.8, 2.0 }, 11);
-    Particle p2({ 0.1 , -0.4, 0.8, 4.0 }, 11);
+    Particle p({ 0.1, -0.4, 0.8, 2.0 }, 11);
+    Particle p2({ 0.1, -0.4, 0.8, 4.0 }, 11);
 
     StoreArray<MCParticle> mcParticles;
     auto* mcParticle = mcParticles.appendNew();
@@ -1428,17 +1428,17 @@ namespace {
     auto* mcDaughter2 = mcParticles[4];
     mcDaughter2->setStatus(MCParticle::c_PrimaryParticle);
 
-    auto* pGrandMother = particles.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), -521);
+    auto* pGrandMother = particles.appendNew(PxPyPzEVector({ 0.0, -0.4, 0.8, 1.0}), -521);
     pGrandMother->addRelationTo(mcGrandMother);
 
-    auto* pMother = particles.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), 13);
+    auto* pMother = particles.appendNew(PxPyPzEVector({ 0.0, -0.4, 0.8, 1.0}), 13);
     pMother->addRelationTo(mcMother);
 
     // Test for particle that has no MC match
-    auto* p_noMC = particles.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), 13);
+    auto* p_noMC = particles.appendNew(PxPyPzEVector({ 0.0, -0.4, 0.8, 1.0}), 13);
 
     // Test for particle that has MC match, but MC match has no daughter
-    auto* p_noDaughter = particles.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
+    auto* p_noDaughter = particles.appendNew(PxPyPzEVector({ 0.0, -0.4, 0.8, 1.0}), 11);
     p_noDaughter->addRelationTo(mcDaughter1);
 
     const Manager::Var* var = Manager::Instance().getVariable("mcDaughter(0, PDG)");
@@ -1516,20 +1516,20 @@ namespace {
     auto* mcDaughter2 = mcParticles[4];
     mcDaughter2->setStatus(MCParticle::c_PrimaryParticle);
 
-    auto* p1 = particles.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
+    auto* p1 = particles.appendNew(PxPyPzEVector({ 0.0, -0.4, 0.8, 1.0}), 11);
     p1->addRelationTo(mcDaughter1);
 
-    auto* p2 = particles.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), 14);
+    auto* p2 = particles.appendNew(PxPyPzEVector({ 0.0, -0.4, 0.8, 1.0}), 14);
     p2->addRelationTo(mcDaughter2);
 
-    auto* pMother = particles.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), 13);
+    auto* pMother = particles.appendNew(PxPyPzEVector({ 0.0, -0.4, 0.8, 1.0}), 13);
     pMother->addRelationTo(mcMother);
 
     // For test of particle that has no MC match
-    auto* p_noMC = particles.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
+    auto* p_noMC = particles.appendNew(PxPyPzEVector({ 0.0, -0.4, 0.8, 1.0}), 11);
 
     // For test of particle that has MC match, but MC match has no mother
-    auto* p_noMother = particles.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), -521);
+    auto* p_noMother = particles.appendNew(PxPyPzEVector({ 0.0, -0.4, 0.8, 1.0}), -521);
     p_noMother->addRelationTo(mcGrandMother);
 
     const Manager::Var* var = Manager::Instance().getVariable("mcMother(PDG)");
@@ -1598,11 +1598,11 @@ namespace {
     auto* mcDaughter2 = mcParticles[4];
     mcDaughter2->setStatus(MCParticle::c_PrimaryParticle);
 
-    auto* p1 = particles.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
+    auto* p1 = particles.appendNew(PxPyPzEVector({ 0.0, -0.4, 0.8, 1.0}), 11);
     p1->addRelationTo(mcDaughter1);
 
     // For test of particle that has no MC match
-    auto* p_noMC = particles.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), 211);
+    auto* p_noMC = particles.appendNew(PxPyPzEVector({ 0.0, -0.4, 0.8, 1.0}), 211);
 
     const Manager::Var* var = Manager::Instance().getVariable("genParticle(0, PDG)");
     ASSERT_NE(var, nullptr);
@@ -1693,11 +1693,11 @@ namespace {
     auto* mcDaughter2 = mcParticles[4];
     mcDaughter2->setStatus(MCParticle::c_PrimaryParticle);
 
-    auto* p1 = particles.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
+    auto* p1 = particles.appendNew(PxPyPzEVector({ 0.0, -0.4, 0.8, 1.0}), 11);
     p1->addRelationTo(mcDaughter1);
 
     // For test of particle that has no MC match
-    auto* p_noMC = particles.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), 211);
+    auto* p_noMC = particles.appendNew(PxPyPzEVector({ 0.0, -0.4, 0.8, 1.0}), 211);
 
     const Manager::Var* var = Manager::Instance().getVariable("genUpsilon4S(PDG)");
     ASSERT_NE(var, nullptr);
@@ -1741,7 +1741,7 @@ namespace {
     auto* mcP2 = mcParticles[1];
     mcP2->setStatus(MCParticle::c_PrimaryParticle);
 
-    auto* someParticle = particles.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
+    auto* someParticle = particles.appendNew(PxPyPzEVector({ 0.0, -0.4, 0.8, 1.0}), 11);
     someParticle->addRelationTo(mcP1);
 
     var = Manager::Instance().getVariable("genUpsilon4S(PDG)");
@@ -2231,8 +2231,8 @@ namespace {
 
   TEST_F(MetaVariableTest, abs)
   {
-    Particle p({ 0.1 , -0.4, 0.8, 2.0 }, 11);
-    Particle p2({ -0.1 , -0.4, 0.8, 4.0 }, -11);
+    Particle p({ 0.1, -0.4, 0.8, 2.0 }, 11);
+    Particle p2({ -0.1, -0.4, 0.8, 4.0 }, -11);
 
     const Manager::Var* var = Manager::Instance().getVariable("abs(px)");
     ASSERT_NE(var, nullptr);
@@ -2243,8 +2243,8 @@ namespace {
 
   TEST_F(MetaVariableTest, sin)
   {
-    Particle p({ 3.14159265359 / 2.0 , -0.4, 0.8, 1.0}, 11);
-    Particle p2({ 0.0 , -0.4, 0.8, 1.0 }, -11);
+    Particle p({ 3.14159265359 / 2.0, -0.4, 0.8, 1.0}, 11);
+    Particle p2({ 0.0, -0.4, 0.8, 1.0 }, -11);
 
     const Manager::Var* var = Manager::Instance().getVariable("sin(px)");
     ASSERT_NE(var, nullptr);
@@ -2255,8 +2255,8 @@ namespace {
 
   TEST_F(MetaVariableTest, cos)
   {
-    Particle p({ 3.14159265359 / 2.0 , -0.4, 0.8, 1.0}, 11);
-    Particle p2({ 0.0 , -0.4, 0.8, 1.0 }, -11);
+    Particle p({ 3.14159265359 / 2.0, -0.4, 0.8, 1.0}, 11);
+    Particle p2({ 0.0, -0.4, 0.8, 1.0 }, -11);
 
     const Manager::Var* var = Manager::Instance().getVariable("cos(px)");
     ASSERT_NE(var, nullptr);
@@ -2283,19 +2283,19 @@ namespace {
     auto* mcParticle = mcParticles.appendNew();
     mcParticle->setPDG(Const::electron.getPDGCode());
     mcParticle->setStatus(MCParticle::c_PrimaryParticle);
-    auto* p1 = particles.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
+    auto* p1 = particles.appendNew(PxPyPzEVector({ 0.0, -0.4, 0.8, 1.0}), 11);
     p1->addRelationTo(mcParticle);
 
     mcParticle = mcParticles.appendNew();
     mcParticle->setPDG(-Const::electron.getPDGCode());
     mcParticle->setStatus(MCParticle::c_PrimaryParticle);
-    auto* p2 = particles.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
+    auto* p2 = particles.appendNew(PxPyPzEVector({ 0.0, -0.4, 0.8, 1.0}), 11);
     p2->addRelationTo(mcParticle);
 
     mcParticle = mcParticles.appendNew();
     mcParticle->setPDG(Const::photon.getPDGCode());
     mcParticle->setStatus(MCParticle::c_PrimaryParticle);
-    auto* p3 = particles.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
+    auto* p3 = particles.appendNew(PxPyPzEVector({ 0.0, -0.4, 0.8, 1.0}), 11);
     p3->addRelationTo(mcParticle);
 
     // Test if matchedMC also works for particle which already is an MCParticle.
@@ -2321,11 +2321,11 @@ namespace {
     outputList.create();
     outputList->initialize(22, "pList1");
 
-    particles.appendNew(Particle({0.5 , 0.4 , 0.5 , 0.8}, 22, Particle::c_Unflavored, Particle::c_Undefined, 2));
-    particles.appendNew(Particle({0.5 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 3));
-    particles.appendNew(Particle({0.4 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 4));
-    particles.appendNew(Particle({0.5 , 0.4 , 0.8 , 1.1}, 22, Particle::c_Unflavored, Particle::c_Undefined, 5));
-    particles.appendNew(Particle({0.3 , 0.3 , 0.4 , 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 6));
+    particles.appendNew(Particle({0.5, 0.4, 0.5, 0.8}, 22, Particle::c_Unflavored, Particle::c_Undefined, 2));
+    particles.appendNew(Particle({0.5, 0.2, 0.7, 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 3));
+    particles.appendNew(Particle({0.4, 0.2, 0.7, 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 4));
+    particles.appendNew(Particle({0.5, 0.4, 0.8, 1.1}, 22, Particle::c_Unflavored, Particle::c_Undefined, 5));
+    particles.appendNew(Particle({0.3, 0.3, 0.4, 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 6));
 
     outputList->addParticle(0, 22, Particle::c_Unflavored);
     outputList->addParticle(1, 22, Particle::c_Unflavored);
@@ -2365,8 +2365,8 @@ namespace {
     gammalist->initialize(22, "testGammaList");
 
     // mock up two photons
-    Particle goingin({0.5 , 0.4 , 0.5 , 0.8}, 22, Particle::c_Unflavored, Particle::c_Undefined, 0);
-    Particle notgoingin({0.3 , 0.3 , 0.4 , 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 1);
+    Particle goingin({0.5, 0.4, 0.5, 0.8}, 22, Particle::c_Unflavored, Particle::c_Undefined, 0);
+    Particle notgoingin({0.3, 0.3, 0.4, 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 1);
     auto* inthelist = particles.appendNew(goingin);
     auto* notinthelist = particles.appendNew(notgoingin);
 
@@ -2399,8 +2399,8 @@ namespace {
     particlelist.create();
     particlelist->initialize(22, listname);
 
-    Particle goingin({0.5 , 0.4 , 0.5 , 0.8}, 22, Particle::c_Unflavored, Particle::c_Undefined, 0);
-    Particle notgoingin({0.3 , 0.3 , 0.4 , 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 1);
+    Particle goingin({0.5, 0.4, 0.5, 0.8}, 22, Particle::c_Unflavored, Particle::c_Undefined, 0);
+    Particle notgoingin({0.3, 0.3, 0.4, 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 1);
     auto* inthelist = particles.appendNew(goingin);
     auto* notinthelist = particles.appendNew(notgoingin);
 
@@ -2473,8 +2473,8 @@ namespace {
     EXPECT_EQ(std::get<int>(vsensible->function(notcopied)), 0);
 
     // now mock up some other type particles
-    Particle composite({0.5 , 0.4 , 0.5 , 0.8}, 512, Particle::c_Unflavored, Particle::c_Composite, 0);
-    Particle undefined({0.3 , 0.3 , 0.4 , 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 1);
+    Particle composite({0.5, 0.4, 0.5, 0.8}, 512, Particle::c_Unflavored, Particle::c_Composite, 0);
+    Particle undefined({0.3, 0.3, 0.4, 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 1);
     auto* composite_ = particles.appendNew(undefined);
     auto* undefined_ = particles.appendNew(composite);
     EXPECT_EQ(std::get<int>(vsensible->function(composite_)), -1);
@@ -2527,18 +2527,18 @@ namespace {
     mcyetanotherelectron->setStatus(MCParticle::c_PrimaryParticle);
 
     // particles
-    auto* photon = particles.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), 22);
+    auto* photon = particles.appendNew(PxPyPzEVector({ 0.0, -0.4, 0.8, 1.0}), 22);
     photon->addRelationTo(mcphoton);
     list->addParticle(photon);
 
-    auto* electron = particles.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), 22);
+    auto* electron = particles.appendNew(PxPyPzEVector({ 0.0, -0.4, 0.8, 1.0}), 22);
     electron->addRelationTo(mcelectron);
     list->addParticle(electron);
 
-    auto* other = particles.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), 22);
+    auto* other = particles.appendNew(PxPyPzEVector({ 0.0, -0.4, 0.8, 1.0}), 22);
     other->addRelationTo(mcanotherelectron);
 
-    auto* yetanotherelectron = particles.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), 22);
+    auto* yetanotherelectron = particles.appendNew(PxPyPzEVector({ 0.0, -0.4, 0.8, 1.0}), 22);
     yetanotherelectron->addRelationTo(mcyetanotherelectron);
     anotherlist->addParticle(yetanotherelectron);
     // not in the list
@@ -2555,8 +2555,8 @@ namespace {
     EXPECT_FALSE(std::get<bool>(vsensible->function(yetanotherelectron)));
 
     // now mock up some other type particles
-    Particle composite({0.5 , 0.4 , 0.5 , 0.8}, 512, Particle::c_Unflavored, Particle::c_Composite, 0);
-    Particle undefined({0.3 , 0.3 , 0.4 , 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 1);
+    Particle composite({0.5, 0.4, 0.5, 0.8}, 512, Particle::c_Unflavored, Particle::c_Composite, 0);
+    Particle undefined({0.3, 0.3, 0.4, 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 1);
     auto* composite_ = particles.appendNew(undefined);
     auto* undefined_ = particles.appendNew(composite);
     EXPECT_FALSE(std::get<bool>(vsensible->function(composite_)));
@@ -2595,9 +2595,9 @@ namespace {
 
     // create some photons in an stdvector
     std::vector<Particle> gammavector = {
-      Particle({ -1.0 , -1.0 , 0.8, 1.7}, // this should be the most b2b to our reference particle
+      Particle({ -1.0, -1.0, 0.8, 1.7},   // this should be the most b2b to our reference particle
       22, Particle::c_Unflavored, Particle::c_Undefined, 0),
-      Particle({0.2 , 0.7 , 0.9, 3.4},    // should be the closest
+      Particle({0.2, 0.7, 0.9, 3.4},      // should be the closest
       22, Particle::c_Unflavored, Particle::c_Undefined, 1),
     };
     // put the photons in the StoreArray
@@ -2610,7 +2610,7 @@ namespace {
 
     // add the reference particle (electron) to the StoreArray
     const auto* electron = particles.appendNew(
-                             Particle({1.0 , 1.0 , 0.5, 1.6},  // somewhere in the +ve quarter of the detector
+                             Particle({1.0, 1.0, 0.5, 1.6},    // somewhere in the +ve quarter of the detector
                                       11, Particle::c_Unflavored, Particle::c_Undefined, 2) // needs to be incremented if we add to gamma vector
                            );
 
@@ -2705,11 +2705,11 @@ namespace {
 
     // create some photons in an stdvector
     std::vector<Particle> gammavector = {
-      Particle({0.5 , 0.4 , 0.4 , 0.8}, 22, Particle::c_Unflavored, Particle::c_Undefined, 0),
-      Particle({0.5 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 1),
-      Particle({0.4 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 2),
-      Particle({0.5 , 0.4 , 0.8 , 1.1}, 22, Particle::c_Unflavored, Particle::c_Undefined, 3),
-      Particle({0.3 , 0.3 , 0.4 , 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 4)
+      Particle({0.5, 0.4, 0.4, 0.8}, 22, Particle::c_Unflavored, Particle::c_Undefined, 0),
+      Particle({0.5, 0.2, 0.7, 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 1),
+      Particle({0.4, 0.2, 0.7, 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 2),
+      Particle({0.5, 0.4, 0.8, 1.1}, 22, Particle::c_Unflavored, Particle::c_Undefined, 3),
+      Particle({0.3, 0.3, 0.4, 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 4)
     };
 
     // put the photons in the StoreArray
@@ -2746,11 +2746,11 @@ namespace {
 
     // create some photons in an stdvector
     std::vector<Particle> gammavector = {
-      Particle({0.5 , 0.4 , 0.5 , 0.8}, 22, Particle::c_Unflavored, Particle::c_Undefined, 0),
-      Particle({0.5 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 1),
-      Particle({0.4 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 2),
-      Particle({0.5 , 0.4 , 0.8 , 1.1}, 22, Particle::c_Unflavored, Particle::c_Undefined, 3),
-      Particle({0.3 , 0.3 , 0.4 , 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 4)
+      Particle({0.5, 0.4, 0.5, 0.8}, 22, Particle::c_Unflavored, Particle::c_Undefined, 0),
+      Particle({0.5, 0.2, 0.7, 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 1),
+      Particle({0.4, 0.2, 0.7, 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 2),
+      Particle({0.5, 0.4, 0.8, 1.1}, 22, Particle::c_Unflavored, Particle::c_Undefined, 3),
+      Particle({0.3, 0.3, 0.4, 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 4)
     };
 
     // put the photons in the StoreArray
@@ -2787,11 +2787,11 @@ namespace {
 
     // create some photons in an stdvector
     std::vector<Particle> gammavector = {
-      Particle({0.5 , 0.4 , 0.5 , 0.8}, 22, Particle::c_Unflavored, Particle::c_Undefined, 0),
-      Particle({0.5 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 1),
-      Particle({0.4 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 2),
-      Particle({0.5 , 0.4 , 0.8 , 1.1}, 22, Particle::c_Unflavored, Particle::c_Undefined, 3),
-      Particle({0.3 , 0.3 , 0.4 , 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 4)
+      Particle({0.5, 0.4, 0.5, 0.8}, 22, Particle::c_Unflavored, Particle::c_Undefined, 0),
+      Particle({0.5, 0.2, 0.7, 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 1),
+      Particle({0.4, 0.2, 0.7, 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 2),
+      Particle({0.5, 0.4, 0.8, 1.1}, 22, Particle::c_Unflavored, Particle::c_Undefined, 3),
+      Particle({0.3, 0.3, 0.4, 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 4)
     };
 
     // put the photons in the StoreArray
@@ -2828,11 +2828,11 @@ namespace {
 
     // create some photons in an stdvector
     std::vector<Particle> gammavector = {
-      Particle({0.5 , 0.4 , 0.5 , 0.8}, 22, Particle::c_Unflavored, Particle::c_Undefined, 0),
-      Particle({0.5 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 1),
-      Particle({0.4 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 2),
-      Particle({0.5 , 0.4 , 0.8 , 1.1}, 22, Particle::c_Unflavored, Particle::c_Undefined, 3),
-      Particle({0.3 , 0.3 , 0.4 , 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 4)
+      Particle({0.5, 0.4, 0.5, 0.8}, 22, Particle::c_Unflavored, Particle::c_Undefined, 0),
+      Particle({0.5, 0.2, 0.7, 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 1),
+      Particle({0.4, 0.2, 0.7, 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 2),
+      Particle({0.5, 0.4, 0.8, 1.1}, 22, Particle::c_Unflavored, Particle::c_Undefined, 3),
+      Particle({0.3, 0.3, 0.4, 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 4)
     };
 
     // put the photons in the StoreArray
@@ -2869,11 +2869,11 @@ namespace {
 
     // create some photons in an stdvector
     std::vector<Particle> gammavector = {
-      Particle({0.5 , 0.4 , 0.5 , 0.8}, 22, Particle::c_Unflavored, Particle::c_Undefined, 0),
-      Particle({0.5 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 1),
-      Particle({0.4 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 2),
-      Particle({0.5 , 0.4 , 0.8 , 1.1}, 22, Particle::c_Unflavored, Particle::c_Undefined, 3),
-      Particle({0.3 , 0.3 , 0.4 , 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 4)
+      Particle({0.5, 0.4, 0.5, 0.8}, 22, Particle::c_Unflavored, Particle::c_Undefined, 0),
+      Particle({0.5, 0.2, 0.7, 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 1),
+      Particle({0.4, 0.2, 0.7, 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 2),
+      Particle({0.5, 0.4, 0.8, 1.1}, 22, Particle::c_Unflavored, Particle::c_Undefined, 3),
+      Particle({0.3, 0.3, 0.4, 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 4)
     };
 
     // put the photons in the StoreArray
@@ -2908,9 +2908,9 @@ namespace {
     outputList.create();
     outputList->initialize(22, "pList1");
 
-    auto* p1 = particles.appendNew(Particle({0.5 , 0.4 , 0.5 , 0.8}, 22, Particle::c_Unflavored, Particle::c_Undefined, 2));
-    auto* p2 = particles.appendNew(Particle({0.5 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 3));
-    auto* p3 = particles.appendNew(Particle({0.5 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 4));
+    auto* p1 = particles.appendNew(Particle({0.5, 0.4, 0.5, 0.8}, 22, Particle::c_Unflavored, Particle::c_Undefined, 2));
+    auto* p2 = particles.appendNew(Particle({0.5, 0.2, 0.7, 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 3));
+    auto* p3 = particles.appendNew(Particle({0.5, 0.2, 0.7, 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 4));
 
     outputList->addParticle(0, 22, Particle::c_Unflavored);
     outputList->addParticle(1, 22, Particle::c_Unflavored);
@@ -2928,7 +2928,7 @@ namespace {
     StoreArray<Particle> particles;
     DataStore::EStoreFlags flags = DataStore::c_DontWriteOut;
 
-    const Particle* p = particles.appendNew(Particle({0.8 , 0.8 , 1.131370849898476039041351 , 1.6}, 22,
+    const Particle* p = particles.appendNew(Particle({0.8, 0.8, 1.131370849898476039041351, 1.6}, 22,
                                                      Particle::c_Unflavored, Particle::c_Undefined, 1));
 
     StoreObjPtr<ParticleList> outputList("pList1");
@@ -2938,12 +2938,12 @@ namespace {
     outputList.create();
     outputList->initialize(22, "pList1");
 
-    particles.appendNew(Particle({0.5 , 0.4953406774856531014212777 , 0.5609256753154148484773173 , 0.9}, 22,
+    particles.appendNew(Particle({0.5, 0.4953406774856531014212777, 0.5609256753154148484773173, 0.9}, 22,
                                  Particle::c_Unflavored, Particle::c_Undefined, 2));         //m=0.135
-    particles.appendNew(Particle({0.5 , 0.2 , 0.72111 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 3));    //m=0.3582
-    particles.appendNew(Particle({0.4 , 0.2 , 0.78102 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 4));    //m=0.3908
-    particles.appendNew(Particle({0.5 , 0.4 , 0.89443 , 1.1}, 22, Particle::c_Unflavored, Particle::c_Undefined, 5));    //m=0.2369
-    particles.appendNew(Particle({0.3 , 0.3 , 0.42426 , 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 6));    //m=0.0036
+    particles.appendNew(Particle({0.5, 0.2, 0.72111, 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 3));       //m=0.3582
+    particles.appendNew(Particle({0.4, 0.2, 0.78102, 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 4));       //m=0.3908
+    particles.appendNew(Particle({0.5, 0.4, 0.89443, 1.1}, 22, Particle::c_Unflavored, Particle::c_Undefined, 5));       //m=0.2369
+    particles.appendNew(Particle({0.3, 0.3, 0.42426, 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 6));       //m=0.0036
 
     outputList->addParticle(1, 22, Particle::c_Unflavored);
     outputList->addParticle(2, 22, Particle::c_Unflavored);
@@ -2958,11 +2958,11 @@ namespace {
     outputList2.create();
     outputList2->initialize(22, "pList2");
 
-    particles.appendNew(Particle({0.5 , -0.4 , 0.63246 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 7));    //m=1.1353
-    particles.appendNew(Particle({0.5 , 0.2 , 0.72111 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 8));     //m=0.3582
-    particles.appendNew(Particle({0.4 , 0.2 , 0.78102 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 9));     //m=0.3908
-    particles.appendNew(Particle({0.5 , 0.4 , 0.89443 , 1.1}, 22, Particle::c_Unflavored, Particle::c_Undefined, 10));    //m=0.2369
-    particles.appendNew(Particle({0.3 , 0.3 , 0.42426 , 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 11));    //m=0.0036
+    particles.appendNew(Particle({0.5, -0.4, 0.63246, 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 7));       //m=1.1353
+    particles.appendNew(Particle({0.5, 0.2, 0.72111, 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 8));        //m=0.3582
+    particles.appendNew(Particle({0.4, 0.2, 0.78102, 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 9));        //m=0.3908
+    particles.appendNew(Particle({0.5, 0.4, 0.89443, 1.1}, 22, Particle::c_Unflavored, Particle::c_Undefined, 10));       //m=0.2369
+    particles.appendNew(Particle({0.3, 0.3, 0.42426, 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 11));       //m=0.0036
 
     outputList2->addParticle(6, 22, Particle::c_Unflavored);
     outputList2->addParticle(7, 22, Particle::c_Unflavored);
@@ -2996,11 +2996,11 @@ namespace {
 
     // create some photons in an stdvector
     std::vector<Particle> gammavector = {
-      Particle({0.5 , 0.4 , 0.4 , 0.8}, 22, Particle::c_Unflavored, Particle::c_Undefined, 0),
-      Particle({0.5 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 1),
-      Particle({0.4 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 2),
-      Particle({0.5 , 0.4 , 0.8 , 1.1}, 22, Particle::c_Unflavored, Particle::c_Undefined, 3),
-      Particle({0.3 , 0.3 , 0.4 , 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 4)
+      Particle({0.5, 0.4, 0.4, 0.8}, 22, Particle::c_Unflavored, Particle::c_Undefined, 0),
+      Particle({0.5, 0.2, 0.7, 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 1),
+      Particle({0.4, 0.2, 0.7, 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 2),
+      Particle({0.5, 0.4, 0.8, 1.1}, 22, Particle::c_Unflavored, Particle::c_Undefined, 3),
+      Particle({0.3, 0.3, 0.4, 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 4)
     };
 
     // put the photons in the StoreArray
@@ -3061,11 +3061,11 @@ namespace {
 
     // create some photons in an stdvector
     std::vector<Particle> gammavector = {
-      Particle({0.5 , 0.4 , 0.4 , 0.8}, 22, Particle::c_Unflavored, Particle::c_Undefined, 0),
-      Particle({0.5 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 1),
-      Particle({0.4 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 2),
-      Particle({0.5 , 0.4 , 0.8 , 1.1}, 22, Particle::c_Unflavored, Particle::c_Undefined, 3),
-      Particle({0.3 , 0.3 , 0.4 , 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 4)
+      Particle({0.5, 0.4, 0.4, 0.8}, 22, Particle::c_Unflavored, Particle::c_Undefined, 0),
+      Particle({0.5, 0.2, 0.7, 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 1),
+      Particle({0.4, 0.2, 0.7, 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 2),
+      Particle({0.5, 0.4, 0.8, 1.1}, 22, Particle::c_Unflavored, Particle::c_Undefined, 3),
+      Particle({0.3, 0.3, 0.4, 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 4)
     };
 
     // put the photons in the StoreArray
@@ -3073,10 +3073,7 @@ namespace {
       particles.appendNew(g);
 
     // put the photons in the test lists
-    if (gammavector.size() % 2 == 0) {
-      evengammalist->addParticle(0, 22, Particle::c_Unflavored);
-    } else
-      oddgammalist->addParticle(0, 22, Particle::c_Unflavored);
+    oddgammalist->addParticle(0, 22, Particle::c_Unflavored);
     for (size_t i = 1; i < gammavector.size(); i++) {
       oddgammalist->addParticle(i, 22, Particle::c_Unflavored);
       evengammalist->addParticle(i, 22, Particle::c_Unflavored);
@@ -4204,10 +4201,10 @@ namespace {
     // Generate a random put orthogonal pair of vectors in the r-phi plane
     ROOT::Math::Cartesian2D d(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
     ROOT::Math::Cartesian2D pt(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
-    d.SetXY(d.X(), -(d.X()*pt.x()) / pt.y());
+    d.SetXY(d.X(), -(d.X()*pt.X()) / pt.Y());
     // Add a random z component
-    B2Vector3D position(d.X(), d.Y(), generator.Uniform(-1, 1));
-    B2Vector3D momentum(pt.x(), pt.y(), generator.Uniform(-1, 1));
+    ROOT::Math::XYZVector position(d.X(), d.Y(), generator.Uniform(-1, 1));
+    ROOT::Math::XYZVector momentum(pt.X(), pt.Y(), generator.Uniform(-1, 1));
 
     auto CDCValue = static_cast<unsigned long long int>(0x300000000000000);
     tfrs.appendNew(position, momentum, cov6, charge, Const::electron, pValue, bField, CDCValue, 16777215, 0);
@@ -4267,8 +4264,7 @@ namespace {
     // Likelihoods for all detectors but SVD
     auto* lAllNoSVD = likelihood.appendNew();
 
-    for (unsigned int iDet(0); iDet < Const::PIDDetectors::c_size; iDet++) {
-      const auto det =  Const::PIDDetectors::c_set[iDet];
+    for (const auto& det : Const::PIDDetectorSet::set()) {
       for (const auto& hypo : Const::chargedStableSet) {
         if (det != Const::SVD) {
           lAllNoSVD->setLogLikelihood(det, hypo, lAll->getLogL(hypo, det));
@@ -4456,10 +4452,10 @@ namespace {
     // Generate a random put orthogonal pair of vectors in the r-phi plane
     ROOT::Math::Cartesian2D d(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
     ROOT::Math::Cartesian2D pt(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
-    d.SetXY(d.X(), -(d.X()*pt.x()) / pt.y());
+    d.SetXY(d.X(), -(d.X()*pt.X()) / pt.Y());
     // Add a random z component
-    B2Vector3D position(d.X(), d.Y(), generator.Uniform(-1, 1));
-    B2Vector3D momentum(pt.x(), pt.y(), generator.Uniform(-1, 1));
+    ROOT::Math::XYZVector position(d.X(), d.Y(), generator.Uniform(-1, 1));
+    ROOT::Math::XYZVector momentum(pt.X(), pt.Y(), generator.Uniform(-1, 1));
 
     auto CDCValue = static_cast<unsigned long long int>(0x300000000000000);
     tfrs.appendNew(position, momentum, cov6, charge, Const::electron, pValue, bField, CDCValue, 16777215, 0);
@@ -4845,7 +4841,7 @@ namespace {
       MCParticle mcKs;
       mcKs.setPDG(Const::Kshort.getPDGCode());
       mcKs.setDecayVertex(4.0, 5.0, 0.0);
-      mcKs.setProductionVertex(B2Vector3D(1.0, 2.0, 3.0));
+      mcKs.setProductionVertex(1.0, 2.0, 3.0);
       mcKs.setMassFromPDG();
       mcKs.setMomentum(1.164, 1.55200, 0);
       mcKs.setStatus(MCParticle::c_PrimaryParticle);

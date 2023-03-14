@@ -15,10 +15,12 @@
 
 #include <mdst/dataobjects/HitPatternVXD.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
+#include <mdst/dataobjects/ECLCluster.h>
 
 // Belle II utilities
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
+#include <framework/geometry/B2Vector3.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
 
 // Belle II dataobjects
@@ -150,7 +152,7 @@ void fill7x7ErrorMatrix(const TrackFitResult* tfr, TMatrixDSym& error7x7, const 
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(B2BIIConvertMdst)
+REG_MODULE(B2BIIConvertMdst);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -178,6 +180,7 @@ B2BIIConvertMdstModule::B2BIIConvertMdstModule() : Module(),
   addParam("nisKsInfo", m_nisEnable, "Flag to switch on conversion of nisKsFinder info", true);
   addParam("RecTrg", m_convertRecTrg, "Flag to switch on conversion of rectrg_summary3", false);
   addParam("TrkExtra", m_convertTrkExtra, " Flag to switch on conversion of first_x,y,z and last_x,y,z from Mdst_trk_fit", true);
+  addParam("convertNbar", m_convertNbar, " Flag to switch on conversion of nbar:mdst (copy from gamma:mdst)", false);
 
   m_realData = false;
 
@@ -225,6 +228,8 @@ void B2BIIConvertMdstModule::initializeDataStore()
 
   StoreObjPtr<ParticleList> gammaParticleList("gamma:mdst");
   gammaParticleList.registerInDataStore();
+  StoreObjPtr<ParticleList> nbarParticleList("anti-n0:mdst");
+  nbarParticleList.registerInDataStore();
   StoreObjPtr<ParticleList> pi0ParticleList("pi0:mdst");
   pi0ParticleList.registerInDataStore();
   StoreObjPtr<ParticleList> kShortParticleList("K_S0:mdst");
@@ -363,6 +368,9 @@ void B2BIIConvertMdstModule::event()
 
   // 12. Convert trigger information from rectrg_summary3
   if (m_convertRecTrg) convertRecTrgTable();
+
+  // 13. Copy nbar from Gamma with the cut E > 0.5 GeV
+  if (m_convertNbar) copyNbarFromGamma();
 
 }
 
@@ -874,9 +882,7 @@ void B2BIIConvertMdstModule::convertGenHepEvtTable()
     // Select particles without mother.
     if (!(hep.moFirst() == 0 && hep.moLast() == 0))
       continue;
-    // Ignore particles with code 911, they are used for CDC data.
-    if (hep.idhep() == 911)
-      continue;
+
     int position = m_particleGraph.size();
     m_particleGraph.addParticle();
     genHepevtToMCParticle[hep.get_ID()] = position;
@@ -902,8 +908,8 @@ void B2BIIConvertMdstModule::convertGenHepEvtTable()
     MCParticleGraph::GraphParticle* currMother = currFamily.first;
     Belle::Gen_hepevt& currDaughter = currFamily.second;
 
-    // Skip particles with idhep = 0 or 911 (CDC data).
-    if (currDaughter.idhep() == 0 || currDaughter.idhep() == 911)
+    // Skip particles with idhep = 0.
+    if (currDaughter.idhep() == 0)
       continue;
 
     //putting the daughter in the graph:
@@ -946,7 +952,6 @@ void B2BIIConvertMdstModule::convertMdstECLTable()
 
   // Loop over all Belle Mdst_ecl
   Belle::Mdst_ecl_Manager& ecl_manager = Belle::Mdst_ecl_Manager::get_manager();
-  // cppcheck-suppress constVariable; cppcheck doesn't understand the manager initialisation
   Belle::Mdst_ecl_aux_Manager& ecl_aux_manager = Belle::Mdst_ecl_aux_Manager::get_manager();
 
   for (Belle::Mdst_ecl_Manager::iterator eclIterator = ecl_manager.begin(); eclIterator != ecl_manager.end(); ++eclIterator) {
@@ -1067,6 +1072,32 @@ void B2BIIConvertMdstModule::convertMdstGammaTable()
     MCParticle* matchedMCParticle = B2EclCluster->getRelated<MCParticle>();
     if (matchedMCParticle)
       B2Gamma->addRelationTo(matchedMCParticle);
+  }
+}
+
+void B2BIIConvertMdstModule::copyNbarFromGamma()
+{
+  StoreObjPtr<ParticleList> plist("anti-n0:mdst");
+  plist.create();
+  plist->initialize(Const::antiNeutron.getPDGCode(), "anti-n0:mdst");
+
+  B2DEBUG(99, "Getting gamma:mdst in copyNbarFromGamma");
+  StoreObjPtr<ParticleList> plist_gamma("gamma:mdst");
+  for (const Particle& gamma : *plist_gamma) {
+    auto* eclCluster = gamma.getECLCluster();
+    // Pre-select energetic gamma
+    if (eclCluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons) <= 0.5) continue;
+    B2DEBUG(99, "Copying anti-n0:mdst from gamma:mdst");
+    Particle* nbar = m_particles.appendNew(eclCluster, Const::antiNeutron);
+    plist->addParticle(nbar);
+
+    if (m_realData)
+      continue;
+
+    // Relation to MCParticle
+    MCParticle* matchedMCParticle = eclCluster->getRelated<MCParticle>();
+    if (matchedMCParticle)
+      nbar->addRelationTo(matchedMCParticle);
   }
 }
 
@@ -1365,14 +1396,14 @@ void B2BIIConvertMdstModule::convertPIDData(const Belle::Mdst_charged& belleTrac
   double tofL[c_nHyp];
   double cdcL[c_nHyp];
   for (int i = 0; i < c_nHyp; i++) {
-    accL[i] = tofL[i] = cdcL[i] = 1.0;
+    accL[i] = tofL[i] = cdcL[i] = 1.0; // cppcheck-suppress unreadVariable
   }
 #ifdef HAVE_KID_ACC
   //accq0 = 3, as implemented in acc_prob3()
   const auto& acc = belleTrack.acc();
   if (acc and acc.quality() == 0) {
     for (int i = 0; i < c_nHyp; i++)
-      accL[i] = likelihoods[i] = acc_pid(belleTrack, i);
+      accL[i] = likelihoods[i] = acc_pid(belleTrack, i); // cppcheck-suppress unreadVariable
     setLikelihoods(pid, Const::ARICH, likelihoods, true);
   }
 #endif
@@ -1382,7 +1413,7 @@ void B2BIIConvertMdstModule::convertPIDData(const Belle::Mdst_charged& belleTrac
   const Belle::Mdst_tof& tof = belleTrack.tof();
   if (tof and tof.quality() == 0) {
     for (int i = 0; i < c_nHyp; i++)
-      tofL[i] = likelihoods[i] = tof.pid(i);
+      tofL[i] = likelihoods[i] = tof.pid(i); // cppcheck-suppress unreadVariable
     setLikelihoods(pid, Const::TOP, likelihoods, true);
   }
 
@@ -1393,7 +1424,7 @@ void B2BIIConvertMdstModule::convertPIDData(const Belle::Mdst_charged& belleTrac
   if (trk.dEdx() > 0) {
     for (int i = 0; i < c_nHyp; i++) {
       likelihoods[i] = trk.pid(i);
-      cdcL[i] = cdc_pid(belleTrack, i);
+      cdcL[i] = cdc_pid(belleTrack, i); // cppcheck-suppress unreadVariable
     }
     setLikelihoods(pid, Const::CDC, likelihoods, true);
   }
@@ -1841,6 +1872,8 @@ void B2BIIConvertMdstModule::convertMdstECLObject(const Belle::Mdst_ecl& ecl, co
     eclCluster->setIsTrack(ecl.match() == 1);
 
   eclCluster->setEnergy(ecl.energy()); //must happen before setCovarianceMatrix()!
+  if (eclCluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons) > 0.5)
+    eclCluster->addHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron);
   eclCluster->setPhi(ecl.phi());
   eclCluster->setTheta(ecl.theta());
   eclCluster->setR(ecl.r());
@@ -1859,7 +1892,17 @@ void B2BIIConvertMdstModule::convertMdstECLObject(const Belle::Mdst_ecl& ecl, co
   eclCluster->setEnergyRaw(eclAux.mass());
   eclCluster->setE9oE21(eclAux.e9oe25());
   eclCluster->setEnergyHighestCrystal(eclAux.seed());
-  eclCluster->setTime(eclAux.property(0));
+  // The property 2 of eclAux contains the timing information
+  // in a bit encoded format.
+  // The 16 bits: 0-15 contain tdc count
+  float prop2 = eclAux.property(2);
+  // a float to int conversion
+  int property2;
+  std::memcpy(&property2, &prop2, sizeof(int));
+  //decode the bit encoded variables
+  int tdccount;
+  tdccount  = property2     & 0xffff;
+  eclCluster->setTime(tdccount);
   eclCluster->setNumberOfCrystals(eclAux.nhits());
 }
 
@@ -2148,8 +2191,8 @@ TrackFitResult B2BIIConvertMdstModule::createTrackFitResult(const CLHEP::HepLore
                                                             const uint32_t hitPatternVXDInitializer,
                                                             const uint16_t ndf)
 {
-  TVector3 pos(position.x(),  position.y(),  position.z());
-  TVector3 mom(momentum.px(), momentum.py(), momentum.pz());
+  ROOT::Math::XYZVector pos(position.x(),  position.y(),  position.z());
+  ROOT::Math::XYZVector mom(momentum.px(), momentum.py(), momentum.pz());
 
   TMatrixDSym errMatrix(6);
   for (unsigned i = 0; i < 7; i++) {

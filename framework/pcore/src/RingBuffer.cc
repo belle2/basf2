@@ -201,7 +201,6 @@ int RingBuffer::insq(const int* buf, int size, bool checkTx)
     if (size > m_bufinfo->size + 2) {
       throw std::runtime_error("[RingBuffer::insq ()] Inserted item (size: " + std::to_string(size) +
                                ") is larger than RingBuffer (size: " + std::to_string(m_bufinfo->size + 2) + ")!");
-      return -1;
     }
     m_bufinfo->errtype = 0;
     int* wptr = m_buftop + m_bufinfo->wptr;
@@ -242,8 +241,7 @@ int RingBuffer::insq(const int* buf, int size, bool checkTx)
       return size;
     } else {
       if (m_bufinfo->rptr >= size + 2) { // buffer full and wptr>rptr
-        // this should be dead code but I don't understand it well enough to delete it so let's suppress the cppcheck warning
-        // cppcheck-suppress knownConditionTrueFalse
+        // this should be dead code but I don't understand it well enough to delete it
         if (m_bufinfo->errtype != 0) {
           B2ERROR("insq: Error in errtype 1; current=" << m_bufinfo->errtype);
           return -1;

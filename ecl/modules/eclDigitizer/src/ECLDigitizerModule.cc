@@ -5,34 +5,34 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//This module
+
+/* Own header. */
 #include <ecl/modules/eclDigitizer/ECLDigitizerModule.h>
 
-// Root
-#include <TRandom.h>
-#include <TFile.h>
-#include <TTree.h>
-
-//Framework
-#include <framework/logging/Logger.h>
-#include <framework/utilities/FileSystem.h>
-#include <framework/gearbox/Unit.h>
-
-//ECL
-#include <ecl/digitization/algorithms.h>
-#include <ecl/digitization/shaperdsp.h>
-#include <ecl/digitization/ECLCompress.h>
-#include <ecl/geometry/ECLGeometryPar.h>
-#include <ecl/dbobjects/ECLCrystalCalib.h>
-#include <ecl/dbobjects/ECLWaveformData.h>
-#include <ecl/dataobjects/ECLHit.h>
-#include <ecl/dataobjects/ECLSimHit.h>
+/* ECL headers. */
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLDsp.h>
 #include <ecl/dataobjects/ECLDspWithExtraMCInfo.h>
+#include <ecl/dataobjects/ECLHit.h>
+#include <ecl/dataobjects/ECLSimHit.h>
 #include <ecl/dataobjects/ECLTrig.h>
 #include <ecl/dataobjects/ECLWaveforms.h>
+#include <ecl/dbobjects/ECLWaveformData.h>
+#include <ecl/digitization/algorithms.h>
+#include <ecl/digitization/ECLCompress.h>
+#include <ecl/digitization/shaperdsp.h>
+#include <ecl/geometry/ECLGeometryPar.h>
 #include <ecl/utility/ECLDspUtilities.h>
+
+/* Basf2 headers. */
+#include <framework/gearbox/Unit.h>
+#include <framework/logging/Logger.h>
+#include <framework/utilities/FileSystem.h>
+
+/* ROOT headers. */
+#include <TFile.h>
+#include <TRandom.h>
+#include <TTree.h>
 
 using namespace std;
 using namespace Belle2;
@@ -41,13 +41,16 @@ using namespace ECL;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(ECLDigitizer)
+REG_MODULE(ECLDigitizer);
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-ECLDigitizerModule::ECLDigitizerModule() : Module(), m_waveformParametersMC("ECLDigitWaveformParametersForMC")
+ECLDigitizerModule::ECLDigitizerModule() : Module(), m_waveformParametersMC("ECLDigitWaveformParametersForMC"),
+  m_waveformParameters("ECLWFParameters"),
+  m_algoParameters("ECLWFAlgoParams"),
+  m_noiseParameters("ECLWFNoiseParams")
 {
   //Set module properties
   setDescription("Creates ECLDigiHits from ECLHits.");
@@ -76,6 +79,12 @@ ECLDigitizerModule::ECLDigitizerModule() : Module(), m_waveformParametersMC("ECL
            "Use DSP coefficients from the database for the processing. This "
            "will significantly reduce performance so this option is to be "
            "used for testing only.", false);
+  addParam("useWaveformParameters", m_useWaveformParameters,
+           "Use ECLWF{Parameters,AlgoParams,NoiseParams} payloads", true);
+  addParam("unitscale", m_unitscale,
+           "Normalization coefficient for ECL signal shape. "
+           "If positive, use same static value for all ECL channels. "
+           "If negative, calculate dynamically at beginRun().", -1.0);
 
 }
 
@@ -112,8 +121,6 @@ void ECLDigitizerModule::initialize()
   if (m_waveformMaker)
     m_eclWaveforms.registerInDataStore(m_eclWaveformsName);
 
-  readDSPDB();
-
   m_adc.resize(EclConfiguration::m_nch);
 
   EclConfiguration::get().setBackground(m_background);
@@ -122,41 +129,59 @@ void ECLDigitizerModule::initialize()
 void ECLDigitizerModule::beginRun()
 {
   const EclConfiguration& ec = EclConfiguration::get();
-  DBObjPtr<ECLCrystalCalib>
-  Ael("ECLCrystalElectronics"),
-      Aen("ECLCrystalEnergy"),
-      Tel("ECLCrystalElectronicsTime"),
-      Ten("ECLCrystalTimeOffset"),
-      Tct("ECLCrateTimeOffset"),
-      Tmc("ECLMCTimeOffset"),
-      Awave("ECL_FPGA_StoreWaveform");
   double ns_per_tick = 1.0 / (4.0 * ec.getRF()) * 1e3;// ~0.49126819903043308239 ns/tick
 
-  calibration_t def = {1, 0};
-  m_calib.assign(8736, def);
-
-  if (Ael) for (int i = 0; i < 8736; i++) m_calib[i].ascale /= Ael->getCalibVector()[i];
-  if (Aen) for (int i = 0; i < 8736; i++) m_calib[i].ascale /= Aen->getCalibVector()[i] * 20000.0;
-
-  if (Tel) for (int i = 0; i < 8736; i++) m_calib[i].tshift += Tel->getCalibVector()[i] * ns_per_tick;
-  if (Ten) for (int i = 0; i < 8736; i++) m_calib[i].tshift += Ten->getCalibVector()[i] * ns_per_tick;
-  if (Tct) for (int i = 0; i < 8736; i++) m_calib[i].tshift += Tct->getCalibVector()[i] * ns_per_tick;
-  if (Tmc) for (int i = 0; i < 8736; i++) m_calib[i].tshift += Tmc->getCalibVector()[i] * ns_per_tick;
-
-  m_Awave.assign(8736, -1);
-  if (m_WaveformThresholdOverride < 0) {
-    if (Awave) for (int i = 0; i < 8736; i++) m_Awave[i] = Awave->getCalibVector()[i];
-  } else {
-    //If m_WaveformThresholdOverride > 0 override ECL_FPGA_StoreWaveform;
-    for (int i = 0; i < 8736; i++) m_Awave[i] = m_WaveformThresholdOverride * m_calib[i].ascale; // convert GeV to ADC
+  if (m_useWaveformParameters || m_loadOnce) {
+    readDSPDB();
+    m_loadOnce = false;
   }
 
-  if (m_HadronPulseShape)  callbackHadronSignalShapes();
+  calibration_t def = {1, 0};
+  m_calib.assign(ECLElementNumbers::c_NCrystals, def);
+
+  if (m_CrystalElectronics.isValid()) {
+    for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++)
+      m_calib[i].ascale /= m_CrystalElectronics->getCalibVector()[i];
+  }
+  if (m_CrystalEnergy.isValid()) {
+    for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++)
+      m_calib[i].ascale /= m_CrystalEnergy->getCalibVector()[i] * 20000.0;
+  }
+  if (m_CrystalElectronicsTime.isValid()) {
+    for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++)
+      m_calib[i].tshift += m_CrystalElectronicsTime->getCalibVector()[i] * ns_per_tick;
+  }
+  if (m_CrystalTimeOffset.isValid()) {
+    for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++)
+      m_calib[i].tshift += m_CrystalTimeOffset->getCalibVector()[i] * ns_per_tick;
+  }
+  if (m_CrateTimeOffset.isValid()) {
+    for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++)
+      m_calib[i].tshift += m_CrateTimeOffset->getCalibVector()[i] * ns_per_tick;
+  }
+  if (m_MCTimeOffset.isValid()) {
+    for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++)
+      m_calib[i].tshift += m_MCTimeOffset->getCalibVector()[i] * ns_per_tick;
+  }
+  m_Awave.assign(ECLElementNumbers::c_NCrystals, -1);
+  if (m_WaveformThresholdOverride < 0) {
+    if (m_FPGAWaveform.isValid()) {
+      for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++)
+        m_Awave[i] = m_FPGAWaveform->getCalibVector()[i];
+    }
+  } else {
+    //If m_WaveformThresholdOverride > 0 override ECL_FPGA_StoreWaveform;
+    for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++)
+      m_Awave[i] = m_WaveformThresholdOverride * m_calib[i].ascale; // convert GeV to ADC
+  }
+
+  if (m_HadronPulseShape)
+    callbackHadronSignalShapes();
 
   // Initialize channel mapper at run start to account for possible
   // changes in ECL mapping between runs.
   if (!m_eclMapper.initFromDB()) {
-    B2FATAL("ECL Packer: Can't initialize eclChannelMapper!");
+    B2FATAL("ECLDigitizer: Can't initialize eclChannelMapper!");
   }
 }
 
@@ -535,20 +560,38 @@ void ECLDigitizerModule::readDSPDB()
 {
   const EclConfiguration& ec = EclConfiguration::get();
 
-  string dataFileName;
-  if (m_background) {
-    dataFileName = FileSystem::findFile("/data/ecl/ECL-WF-BG.root");
-    B2DEBUG(150, "ECLDigitizer: Reading configuration data with background from: " << dataFileName);
-  } else {
-    dataFileName = FileSystem::findFile("/data/ecl/ECL-WF.root");
-    B2DEBUG(150, "ECLDigitizer: Reading configuration data without background from: " << dataFileName);
-  }
-  assert(! dataFileName.empty());
+  TFile* rootfile = nullptr;
+  TTree* tree  = nullptr;
+  TTree* tree2 = nullptr;
+  TTree* tree3 = nullptr;
 
-  TFile rootfile(dataFileName.c_str());
-  TTree* tree  = (TTree*) rootfile.Get("EclWF");
-  TTree* tree2 = (TTree*) rootfile.Get("EclAlgo");
-  TTree* tree3 = (TTree*) rootfile.Get("EclNoise");
+  if (m_useWaveformParameters) {
+    bool hasChanged = false;
+    hasChanged |= m_waveformParameters.hasChanged();
+    hasChanged |= m_algoParameters.hasChanged();
+    hasChanged |= m_noiseParameters.hasChanged();
+
+    if (!hasChanged) return;
+
+    tree  = const_cast<TTree*>(&*m_waveformParameters);
+    tree2 = const_cast<TTree*>(&*m_algoParameters);
+    tree3 = const_cast<TTree*>(&*m_noiseParameters);
+  } else {
+    string dataFileName;
+    if (m_background) {
+      dataFileName = FileSystem::findFile("/data/ecl/ECL-WF-BG.root");
+      B2DEBUG(150, "ECLDigitizer: Reading configuration data with background from: " << dataFileName);
+    } else {
+      dataFileName = FileSystem::findFile("/data/ecl/ECL-WF.root");
+      B2DEBUG(150, "ECLDigitizer: Reading configuration data without background from: " << dataFileName);
+    }
+    assert(! dataFileName.empty());
+
+    rootfile = new TFile(dataFileName.c_str(), "read");
+    tree  = (TTree*) rootfile->Get("EclWF");
+    tree2 = (TTree*) rootfile->Get("EclAlgo");
+    tree3 = (TTree*) rootfile->Get("EclNoise");
+  }
 
   if (tree == 0 || tree2 == 0 || tree3 == 0) B2FATAL("Data not found");
 
@@ -637,7 +680,7 @@ void ECLDigitizerModule::readDSPDB()
   tree->SetBranchStatus("ncellId", 0); // do not read it at the moment
   tree->SetBranchStatus("cellId", 0); // do not read it at the moment
 
-// fill parameters for each (Waveform x AlgoParams) parameter set
+  // fill parameters for each (Waveform x AlgoParams) parameter set
   for (unsigned int ip = 0; ip < pairIdx.size(); ip++) {
     const uint_pair_t& p = pairIdx[ip];
     tree->GetEntry(p.first); // retrieve data to eclWFData pointer
@@ -666,7 +709,7 @@ void ECLDigitizerModule::readDSPDB()
 
   if (eclWFData) delete eclWFData;
 
-  rootfile.Close();
+  if (!m_useWaveformParameters) rootfile->Close();
 }
 
 void ECLDigitizerModule::repack(const ECLWFAlgoParams& eclWFAlgo, algoparams_t& t)
@@ -713,6 +756,14 @@ void ECLDigitizerModule::getfitparams(const ECLWaveformData& eclWFData, const EC
   int ib = 1 << eclWFAlgo.getkb();
   int ic = 1 << eclWFAlgo.getkc();
 
+  double dbl_f   [192][16];
+  double dbl_f1  [192][16];
+  double dbl_fg31[192][16];
+  double dbl_fg32[192][16];
+  double dbl_fg33[192][16];
+  double dbl_fg41[24][16];
+  double dbl_fg43[24][16];
+
   int_array_192x16_t& ref_f    = p.f;
   int_array_192x16_t& ref_f1   = p.f1;
   int_array_192x16_t& ref_fg31 = p.fg31;
@@ -721,7 +772,13 @@ void ECLDigitizerModule::getfitparams(const ECLWaveformData& eclWFData, const EC
   int_array_24x16_t&  ref_fg41 = p.fg41;
   int_array_24x16_t&  ref_fg43 = p.fg43;
 
-  ShaperDSP_t dsp(MP, 27.7221);
+  // Dynamic normalization coefficient for shape function
+  double fm = 0;
+
+  double unitscale = 1.0;
+  if (m_unitscale > 0) unitscale = m_unitscale;
+
+  ShaperDSP_t dsp(MP, unitscale);
   dsp.settimestride(ec.m_step);
   dsp.setseedoffset(ec.m_step / ec.m_ndt);
   dsp.settimeseed(-(ec.m_step - (ec.m_step / ec.m_ndt)));
@@ -734,6 +791,7 @@ void ECLDigitizerModule::getfitparams(const ECLWaveformData& eclWFData, const EC
     for (int j = 0; j < 16; j++) {
       double g0 = 0, g1 = 0, g2 = 0;
       for (int i = 0; i < 16; i++) {
+        if (fm < f[i].first) fm = f[i].first;
         g0 += ssd[j][i] * f[i].first;
         g1 += ssd[j][i] * f[i].second;
         g2 += ssd[j][i];
@@ -763,16 +821,16 @@ void ECLDigitizerModule::getfitparams(const ECLWaveformData& eclWFData, const EC
     for (int i = 0; i < 16; i++) {
       double w = i ? 1.0 : 1. / 16.;
 
-      ref_f   [k][i] = lrint(f[i].first  * iff * w);
-      ref_f1  [k][i] = lrint(f[i].second * iff * w * sd);
+      dbl_f   [k][i] = (f[i].first  * iff * w);
+      dbl_f1  [k][i] = (f[i].second * iff * w * sd);
 
       double fg31 = (a00 * sg0[i] + a01 * sg1[i] + a02 * sg2[i]) * igg2;
       double fg32 = (a01 * sg0[i] + a11 * sg1[i] + a12 * sg2[i]) * igg2;
       double fg33 = (a02 * sg0[i] + a12 * sg1[i] + a22 * sg2[i]) * igg2;
 
-      ref_fg31[k][i] = lrint(fg31 * ia * w);
-      ref_fg32[k][i] = lrint(fg32 * ib * w * isd);
-      ref_fg33[k][i] = lrint(fg33 * ic * w);
+      dbl_fg31[k][i] = (fg31 * ia * w);
+      dbl_fg32[k][i] = (fg32 * ib * w * isd);
+      dbl_fg33[k][i] = (fg33 * ic * w);
     }
 
     //first approximation without time correction
@@ -786,9 +844,24 @@ void ECLDigitizerModule::getfitparams(const ECLWaveformData& eclWFData, const EC
 
         double fg41 = (g2g2 * sg0[i] - g0g2 * sg2[i]) * igg1;
         double fg43 = (g0g0 * sg2[i] - g0g2 * sg0[i]) * igg1;
-        ref_fg41[jk][i] = lrint(fg41 * ia * w);
-        ref_fg43[jk][i] = lrint(fg43 * ic * w);
+        dbl_fg41[jk][i] = (fg41 * ia * w);
+        dbl_fg43[jk][i] = (fg43 * ic * w);
       }
+    }
+  }
+  // Ignore dynamically calculated normalization coefficient if
+  // unitscale is set to a static positive value.
+  if (m_unitscale > 0) fm = 1.0;
+  for (int k = 0; k < 2 * ec.m_ndt; k++) {
+    for (int j = 0; j < 16; j++) {
+      ref_f   [k][j] = lrint(dbl_f   [k][j] / fm);
+      ref_f1  [k][j] = lrint(dbl_f1  [k][j] / fm);
+      ref_fg31[k][j] = lrint(dbl_fg31[k][j] * fm);
+      ref_fg32[k][j] = lrint(dbl_fg32[k][j] * fm);
+      ref_fg33[k][j] = lrint(dbl_fg33[k][j]);
+      if (k >= 24) continue;
+      ref_fg41[k][j] = lrint(dbl_fg41[k][j] * fm);
+      ref_fg43[k][j] = lrint(dbl_fg43[k][j]);
     }
   }
 }

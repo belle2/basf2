@@ -57,7 +57,7 @@ namespace Belle2 {
 
       G4bool isotopes = false;
 
-      G4Element*  O = man->FindOrBuildElement("O" , isotopes);
+      G4Element*  O = man->FindOrBuildElement("O", isotopes);
       G4Element* Bi = man->FindOrBuildElement("Bi", isotopes);
       G4Element* Ge = man->FindOrBuildElement("Ge", isotopes);
 
@@ -84,15 +84,15 @@ namespace Belle2 {
 
         //create bgo volume
         G4Trap* s_BGO = new G4Trap("s_BGO",
-                                   activeParams.getLength("cDz") / 2.*CLHEP::cm ,
-                                   activeParams.getLength("cDtheta") ,
-                                   activeParams.getLength("cDphi") ,
-                                   activeParams.getLength("cDy1") / 2.*CLHEP::cm ,
-                                   activeParams.getLength("cDx2") / 2.*CLHEP::cm ,
-                                   activeParams.getLength("cDx1") / 2.*CLHEP::cm , 0,
-                                   activeParams.getLength("cDy2") / 2.*CLHEP::cm ,
-                                   activeParams.getLength("cDx4") / 2.*CLHEP::cm ,
-                                   activeParams.getLength("cDx3") / 2.*CLHEP::cm , 0);
+                                   activeParams.getLength("cDz") / 2.*CLHEP::cm,
+                                   activeParams.getLength("cDtheta"),
+                                   activeParams.getLength("cDphi"),
+                                   activeParams.getLength("cDy1") / 2.*CLHEP::cm,
+                                   activeParams.getLength("cDx2") / 2.*CLHEP::cm,
+                                   activeParams.getLength("cDx1") / 2.*CLHEP::cm, 0,
+                                   activeParams.getLength("cDy2") / 2.*CLHEP::cm,
+                                   activeParams.getLength("cDx4") / 2.*CLHEP::cm,
+                                   activeParams.getLength("cDx3") / 2.*CLHEP::cm, 0);
 
         //G4LogicalVolume* l_BGO = new G4LogicalVolume(s_BGO, geometry::Materials::get("BGO"), "l_BGO", 0, m_sensitive);
         G4LogicalVolume* l_BGO = new G4LogicalVolume(s_BGO, BGO_BGO, "l_BGO", 0, m_sensitive);

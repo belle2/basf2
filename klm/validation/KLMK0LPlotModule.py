@@ -11,7 +11,7 @@
 
 """
 <header>
-    <contact>Kirill Chilikin (chilikin@lebedev.ru)</contact>
+    <noexecute>Definition of plotting class</noexecute>
     <description>Creation of KLM K0L validation plots.</description>
 </header>
 """
@@ -20,6 +20,7 @@ import basf2
 import ROOT
 from ROOT import Belle2
 from ROOT import TNamed
+from ROOT.Math import XYZVector
 import math
 import numpy
 
@@ -36,7 +37,7 @@ class KLMK0LPlotModule(basf2.Module):
         self.check_eklm = check_eklm
         #: Output file.
         self.output_file = ROOT.TFile(output_file, 'recreate')
-        contact = 'Kirill Chilikin (chilikin@lebedev.ru)'
+        contact = 'Leo Piilonen (piilonen@vt.edu)'
         #: Number of K0L histogram.
         self.hist_nkl = ROOT.TH1F('k0l_number',
                                   'Number of KLM clusters per 1 MC particle',
@@ -163,7 +164,7 @@ class KLMK0LPlotModule(basf2.Module):
         functions.Add(TNamed('Contact', contact))
         functions.Add(TNamed('MetaOptions', 'shifter'))
         #: Average vertex.
-        self.vertex_k_av = ROOT.TVector3(0, 0, 0)
+        self.vertex_k_av = XYZVector(0, 0, 0)
         #: Vertex list.
         self.vertex = []
         #: Average momentum.
@@ -190,9 +191,9 @@ class KLMK0LPlotModule(basf2.Module):
             time = mc_particle.getDecayTime()
             momentum = mc_particle.getMomentum()
             if (self.check_eklm):
-                x = vertex.x()
-                y = vertex.y()
-                z = vertex.z()
+                x = vertex.X()
+                y = vertex.Y()
+                z = vertex.Z()
                 r = math.sqrt(x * x + y * y)
                 if (r < 132.5 or r > 329.0):
                     continue
@@ -204,7 +205,7 @@ class KLMK0LPlotModule(basf2.Module):
             klm_clusters = mc_particle.getRelationsFrom('KLMClusters')
             self.hist_nkl.Fill(len(klm_clusters))
             for klm_cluster in klm_clusters:
-                vertex_k = klm_cluster.getClusterPosition() - vertex
+                vertex_k = XYZVector(klm_cluster.getClusterPosition()) - vertex
                 self.vertex.append(vertex_k)
                 self.vertex_k_av = self.vertex_k_av + vertex_k
                 self.momentum.append(klm_cluster.getMomentumMag())
@@ -212,11 +213,11 @@ class KLMK0LPlotModule(basf2.Module):
                     klm_cluster.getMomentumMag()
                 time_k = klm_cluster.getTime()
                 four_momentum_k = klm_cluster.getMomentum()
-                self.hist_xres.Fill(vertex_k.x())
-                self.hist_yres.Fill(vertex_k.y())
-                self.hist_zres.Fill(vertex_k.z())
+                self.hist_xres.Fill(vertex_k.X())
+                self.hist_yres.Fill(vertex_k.Y())
+                self.hist_zres.Fill(vertex_k.Z())
                 self.hist_tres.Fill(time_k - time)
-                self.hist_pres.Fill(four_momentum_k.P() - momentum.Mag())
+                self.hist_pres.Fill(four_momentum_k.P() - momentum.R())
                 self.hist_ptres.Fill(four_momentum_k.Theta() - momentum.Theta())
                 self.hist_ppres.Fill(four_momentum_k.Phi() - momentum.Phi())
 
@@ -231,31 +232,31 @@ class KLMK0LPlotModule(basf2.Module):
         corr_mat_err = numpy.zeros((4, 4))
         for i in range(len(self.vertex)):
             cov_mat[0][0] = cov_mat[0][0] + \
-                (self.vertex[i].x() - self.vertex_k_av.x()) * \
-                (self.vertex[i].x() - self.vertex_k_av.x())
+                (self.vertex[i].X() - self.vertex_k_av.X()) * \
+                (self.vertex[i].X() - self.vertex_k_av.X())
             cov_mat[0][1] = cov_mat[0][1] + \
-                (self.vertex[i].x() - self.vertex_k_av.x()) * \
-                (self.vertex[i].y() - self.vertex_k_av.y())
+                (self.vertex[i].X() - self.vertex_k_av.X()) * \
+                (self.vertex[i].Y() - self.vertex_k_av.Y())
             cov_mat[0][2] = cov_mat[0][2] + \
-                (self.vertex[i].x() - self.vertex_k_av.x()) * \
-                (self.vertex[i].z() - self.vertex_k_av.z())
+                (self.vertex[i].X() - self.vertex_k_av.X()) * \
+                (self.vertex[i].Z() - self.vertex_k_av.Z())
             cov_mat[0][3] = cov_mat[0][3] + \
-                (self.vertex[i].x() - self.vertex_k_av.x()) * \
+                (self.vertex[i].X() - self.vertex_k_av.X()) * \
                 (self.momentum[i] - self.momentum_av)
             cov_mat[1][1] = cov_mat[1][1] + \
-                (self.vertex[i].y() - self.vertex_k_av.y()) * \
-                (self.vertex[i].y() - self.vertex_k_av.y())
+                (self.vertex[i].Y() - self.vertex_k_av.Y()) * \
+                (self.vertex[i].Y() - self.vertex_k_av.Y())
             cov_mat[1][2] = cov_mat[1][2] + \
-                (self.vertex[i].y() - self.vertex_k_av.y()) * \
-                (self.vertex[i].z() - self.vertex_k_av.z())
+                (self.vertex[i].Y() - self.vertex_k_av.Y()) * \
+                (self.vertex[i].Z() - self.vertex_k_av.Z())
             cov_mat[1][3] = cov_mat[1][3] + \
-                (self.vertex[i].y() - self.vertex_k_av.y()) * \
+                (self.vertex[i].Y() - self.vertex_k_av.Y()) * \
                 (self.momentum[i] - self.momentum_av)
             cov_mat[2][2] = cov_mat[2][2] + \
-                (self.vertex[i].z() - self.vertex_k_av.z()) * \
-                (self.vertex[i].z() - self.vertex_k_av.z())
+                (self.vertex[i].Z() - self.vertex_k_av.Z()) * \
+                (self.vertex[i].Z() - self.vertex_k_av.Z())
             cov_mat[2][3] = cov_mat[2][3] + \
-                (self.vertex[i].z() - self.vertex_k_av.z()) * \
+                (self.vertex[i].Z() - self.vertex_k_av.Z()) * \
                 (self.momentum[i] - self.momentum_av)
             cov_mat[3][3] = cov_mat[3][3] + \
                 (self.momentum[i] - self.momentum_av) * \
@@ -265,31 +266,31 @@ class KLMK0LPlotModule(basf2.Module):
                 cov_mat[i][j] = cov_mat[i][j] / (len(self.vertex) - 1)
         for i in range(len(self.vertex)):
             cov_mat_err[0][0] = cov_mat_err[0][0] + \
-                pow((self.vertex[i].x() - self.vertex_k_av.x()) *
-                    (self.vertex[i].x() - self.vertex_k_av.x()) - cov_mat[0][0], 2)
+                pow((self.vertex[i].X() - self.vertex_k_av.X()) *
+                    (self.vertex[i].X() - self.vertex_k_av.X()) - cov_mat[0][0], 2)
             cov_mat_err[0][1] = cov_mat_err[0][1] + \
-                pow((self.vertex[i].x() - self.vertex_k_av.x()) *
-                    (self.vertex[i].y() - self.vertex_k_av.y()) - cov_mat[0][1], 2)
+                pow((self.vertex[i].X() - self.vertex_k_av.X()) *
+                    (self.vertex[i].Y() - self.vertex_k_av.Y()) - cov_mat[0][1], 2)
             cov_mat_err[0][2] = cov_mat_err[0][2] + \
-                pow((self.vertex[i].x() - self.vertex_k_av.x()) *
-                    (self.vertex[i].z() - self.vertex_k_av.z()) - cov_mat[0][2], 2)
+                pow((self.vertex[i].X() - self.vertex_k_av.X()) *
+                    (self.vertex[i].Z() - self.vertex_k_av.Z()) - cov_mat[0][2], 2)
             cov_mat_err[0][3] = cov_mat_err[0][3] + \
-                pow((self.vertex[i].x() - self.vertex_k_av.x()) *
+                pow((self.vertex[i].X() - self.vertex_k_av.X()) *
                     (self.momentum[i] - self.momentum_av) - cov_mat[0][3], 2)
             cov_mat_err[1][1] = cov_mat_err[1][1] + \
-                pow((self.vertex[i].y() - self.vertex_k_av.y()) *
-                    (self.vertex[i].y() - self.vertex_k_av.y()) - cov_mat[1][1], 2)
+                pow((self.vertex[i].Y() - self.vertex_k_av.Y()) *
+                    (self.vertex[i].Y() - self.vertex_k_av.Y()) - cov_mat[1][1], 2)
             cov_mat_err[1][2] = cov_mat_err[1][2] + \
-                pow((self.vertex[i].y() - self.vertex_k_av.y()) *
-                    (self.vertex[i].z() - self.vertex_k_av.z()) - cov_mat[1][2], 2)
+                pow((self.vertex[i].Y() - self.vertex_k_av.Y()) *
+                    (self.vertex[i].Z() - self.vertex_k_av.Z()) - cov_mat[1][2], 2)
             cov_mat_err[1][3] = cov_mat_err[1][3] + \
-                pow((self.vertex[i].y() - self.vertex_k_av.y()) *
+                pow((self.vertex[i].Y() - self.vertex_k_av.Y()) *
                     (self.momentum[i] - self.momentum_av) - cov_mat[1][3], 2)
             cov_mat_err[2][2] = cov_mat_err[2][2] + \
-                pow((self.vertex[i].z() - self.vertex_k_av.z()) *
-                    (self.vertex[i].z() - self.vertex_k_av.z()) - cov_mat[2][2], 2)
+                pow((self.vertex[i].Z() - self.vertex_k_av.Z()) *
+                    (self.vertex[i].Z() - self.vertex_k_av.Z()) - cov_mat[2][2], 2)
             cov_mat_err[2][3] = cov_mat_err[2][3] + \
-                pow((self.vertex[i].z() - self.vertex_k_av.z()) *
+                pow((self.vertex[i].Z() - self.vertex_k_av.Z()) *
                     (self.momentum[i] - self.momentum_av) - cov_mat[2][3], 2)
             cov_mat_err[3][3] = cov_mat_err[3][3] + \
                 pow((self.momentum[i] - self.momentum_av) *

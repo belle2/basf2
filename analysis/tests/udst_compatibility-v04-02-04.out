@@ -3,19 +3,29 @@
 [INFO] Starting event processing, random seed is set to '1'
 [INFO] Added file ${BELLE2_SOFTWARE_DIR}/analysis/tests/udst-v04-02-04.root
 Untested method Particle::appendDaughter
+Untested method Particle::fillAllDaughters
+Untested method Particle::fillFSPDaughters
 Untested method Particle::forEachDaughter
+Untested method Particle::getAllDaughters
 Untested method Particle::getArrayPointer
+Untested method Particle::getMostLikelyTrackFitResult
+Untested method Particle::getPDGLifetime
 Untested method Particle::isCopyOf
 Untested method Particle::isMostLikely
+Untested method Particle::isMostLikelyTrackFitResult
 Untested method Particle::overlapsWith
 Untested method Particle::removeDaughter
 Untested method Particle::removeExtraInfo
+Untested method Particle::replaceDaughter
+Untested method Particle::replaceDaughterRecursively
 Untested method Particle::set4Vector
+Untested method Particle::set4VectorDividingByMomentumScaling
 Untested method Particle::setExtraInfo
 Untested method Particle::setJacobiMatrix
 Untested method Particle::setMomentumScalingFactor
 Untested method Particle::setMomentumSmearingFactor
 Untested method Particle::setMomentumVertexErrorMatrix
+Untested method Particle::setPDGCode
 Untested method Particle::setPValue
 Untested method Particle::setProperty
 Untested method Particle::setVertex
@@ -105,10 +115,12 @@ Particle#0:
   getPDGMass(): 0.13957
   getPIDLikelihood(): -> PIDLikelihoods#0
   getPValue(): 0.319611
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:1): -> NULL
   getParticleSource(): 1
@@ -231,10 +243,12 @@ Particle#1:
   getPDGMass(): 0.493677
   getPIDLikelihood(): -> PIDLikelihoods#1
   getPValue(): 0.499614
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:1): -> NULL
   getParticleSource(): 1
@@ -357,10 +371,12 @@ Particle#2:
   getPDGMass(): 0.493677
   getPIDLikelihood(): -> PIDLikelihoods#4
   getPValue(): 0.361926
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:1): -> NULL
   getParticleSource(): 1
@@ -483,10 +499,12 @@ Particle#3:
   getPDGMass(): 0.105658
   getPIDLikelihood(): -> PIDLikelihoods#6
   getPValue(): 0.292314
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:1): -> NULL
   getParticleSource(): 1
@@ -618,10 +636,12 @@ Particle#4:
   getPDGMass(): 1.86483
   getPIDLikelihood(): -> NULL
   getPValue(): 0.000972417
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
-[WARNING] Daughter index 1 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 1
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:1): -> NULL
   getParticleSource(): 6
@@ -809,7 +829,7 @@ Particle#6:
   getAcoplanarity(): nan
   getCharge(): 0
   getCosHelicity(): -0.64592
-  getCosHelicityDaughter(0): -0.442569
+  getCosHelicityDaughter(0): -0.442572
   getDaughter(0): -> Particles#5
   getDaughter(1): -> Particles#3
   getDaughterIndices(): size(2)
@@ -1249,10 +1269,12 @@ Particle#0:
   getPDGMass(): 0.13957
   getPIDLikelihood(): -> PIDLikelihoods#0
   getPValue(): 0.875884
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:1): -> NULL
   getParticleSource(): 1
@@ -1375,10 +1397,12 @@ Particle#1:
   getPDGMass(): 0.13957
   getPIDLikelihood(): -> PIDLikelihoods#5
   getPValue(): 0.228447
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:1): -> NULL
   getParticleSource(): 1
@@ -1501,10 +1525,12 @@ Particle#2:
   getPDGMass(): 0.105658
   getPIDLikelihood(): -> PIDLikelihoods#7
   getPValue(): 0.883351
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:1): -> NULL
   getParticleSource(): 1
@@ -1627,10 +1653,12 @@ Particle#3:
   getPDGMass(): 0.13957
   getPIDLikelihood(): -> PIDLikelihoods#8
   getPValue(): 0.569155
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:1): -> NULL
   getParticleSource(): 1
@@ -1753,10 +1781,12 @@ Particle#4:
   getPDGMass(): 0.13957
   getPIDLikelihood(): -> PIDLikelihoods#9
   getPValue(): 0.0641914
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:1): -> NULL
   getParticleSource(): 1
@@ -1879,10 +1909,12 @@ Particle#5:
   getPDGMass(): 0.493677
   getPIDLikelihood(): -> PIDLikelihoods#11
   getPValue(): 0.183412
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:1): -> NULL
   getParticleSource(): 1
@@ -2021,10 +2053,12 @@ Particle#6:
   getPDGMass(): 1.86483
   getPIDLikelihood(): -> NULL
   getPValue(): 0.0100756
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
-[WARNING] Daughter index 1 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 1
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:1): -> NULL
   getParticleSource(): 6
@@ -2082,7 +2116,7 @@ Particle#7:
   getAcoplanarity(): nan
   getCharge(): 0
   getCosHelicity(): -0.11513
-  getCosHelicityDaughter(0): -0.969922
+  getCosHelicityDaughter(0): -0.969923
   getDaughter(0): -> Particles#6
   getDaughter(1): -> Particles#0
   getDaughterIndices(): size(3)
@@ -2359,10 +2393,12 @@ Particle#0:
   getPDGMass(): 0.13957
   getPIDLikelihood(): -> PIDLikelihoods#0
   getPValue(): 0.671464
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:1): -> NULL
   getParticleSource(): 1
@@ -2485,10 +2521,12 @@ Particle#1:
   getPDGMass(): 0.493677
   getPIDLikelihood(): -> PIDLikelihoods#2
   getPValue(): 0.525692
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:1): -> NULL
   getParticleSource(): 1
@@ -2611,10 +2649,12 @@ Particle#2:
   getPDGMass(): 0.13957
   getPIDLikelihood(): -> PIDLikelihoods#3
   getPValue(): 0.0212333
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:1): -> NULL
   getParticleSource(): 1
@@ -2737,10 +2777,12 @@ Particle#3:
   getPDGMass(): 0.13957
   getPIDLikelihood(): -> PIDLikelihoods#4
   getPValue(): 0.430931
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:1): -> NULL
   getParticleSource(): 1
@@ -2863,10 +2905,12 @@ Particle#4:
   getPDGMass(): 0.13957
   getPIDLikelihood(): -> PIDLikelihoods#6
   getPValue(): 1.9246e-05
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:1): -> NULL
   getParticleSource(): 1
@@ -2989,10 +3033,12 @@ Particle#5:
   getPDGMass(): 0.13957
   getPIDLikelihood(): -> PIDLikelihoods#7
   getPValue(): 2.88305e-05
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:1): -> NULL
   getParticleSource(): 1
@@ -3115,10 +3161,12 @@ Particle#6:
   getPDGMass(): 0.105658
   getPIDLikelihood(): -> PIDLikelihoods#9
   getPValue(): 0.100115
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:1): -> NULL
   getParticleSource(): 1
@@ -3224,7 +3272,7 @@ Particle#7:
     -1.222089e-07  1.119013e-06 -3.838498e-09 -4.776088e-07 
      7.409999e-09 -3.838498e-09  1.251622e-06  8.363132e-08 
      1.246792e-06 -4.776088e-07  8.363132e-08  1.297594e-06 
-  getMomentumMagnitude(): 0.558803
+  getMomentumMagnitude(): 0.558804
   getMomentumVertexErrorMatrix(): 
      1.323645e-06 -1.222089e-07  7.409999e-09  1.246792e-06 -2.235135e-07 -6.395441e-07  1.642836e-07 
     -1.222089e-07  1.119013e-06 -3.838498e-09 -4.776088e-07 -6.812158e-07 -1.949174e-06 -5.111066e-08 
@@ -3235,16 +3283,18 @@ Particle#7:
      1.642836e-07 -5.111066e-08 -2.777047e-06 -1.342499e-09 -1.509592e-08 -4.243736e-08  7.641618e-06 
   getNDaughters(): 0
   getName(): pi+
-  getP(): 0.558803
+  getP(): 0.558804
   getPDGCode(): 211
   getPDGCodeUsedForFit(): 211
   getPDGMass(): 0.13957
   getPIDLikelihood(): -> PIDLikelihoods#11
   getPValue(): 0.296033
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:1): -> NULL
   getParticleSource(): 1
@@ -3367,10 +3417,12 @@ Particle#8:
   getPDGMass(): 0.13957
   getPIDLikelihood(): -> PIDLikelihoods#13
   getPValue(): 0.0538817
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:1): -> NULL
   getParticleSource(): 1
@@ -3493,10 +3545,12 @@ Particle#9:
   getPDGMass(): 0.493677
   getPIDLikelihood(): -> PIDLikelihoods#15
   getPValue(): 0.243275
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:1): -> NULL
   getParticleSource(): 1
@@ -3619,10 +3673,12 @@ Particle#10:
   getPDGMass(): 0.13957
   getPIDLikelihood(): -> PIDLikelihoods#16
   getPValue(): 0.585684
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:1): -> NULL
   getParticleSource(): 1
@@ -3754,10 +3810,12 @@ Particle#11:
   getPDGMass(): 0.497611
   getPIDLikelihood(): -> NULL
   getPValue(): 8.77125e-06
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
-[WARNING] Daughter index 1 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 1
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:1): -> NULL
   getParticleSource(): 6
@@ -3896,10 +3954,12 @@ Particle#12:
   getPDGMass(): 1.86483
   getPIDLikelihood(): -> NULL
   getPValue(): 0.662556
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
-[WARNING] Daughter index 1 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 1
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:1): -> NULL
   getParticleSource(): 6
@@ -4038,10 +4098,12 @@ Particle#13:
   getPDGMass(): 1.86483
   getPIDLikelihood(): -> NULL
   getPValue(): 0.798627
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
-[WARNING] Daughter index 1 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 1
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:1): -> NULL
   getParticleSource(): 6
@@ -4180,10 +4242,12 @@ Particle#14:
   getPDGMass(): 1.86483
   getPIDLikelihood(): -> NULL
   getPValue(): 0.22181
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
-[WARNING] Daughter index 1 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 1
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:1): -> NULL
   getParticleSource(): 6
@@ -4322,10 +4386,12 @@ Particle#15:
   getPDGMass(): 1.86483
   getPIDLikelihood(): -> NULL
   getPValue(): 0.323897
-[WARNING] Daughter index 0 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 0
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:0): -> NULL
-[WARNING] Daughter index 1 out of range
+[WARNING] Daughter index out of range
+	Daughter index = 1
 [WARNING] Trying to access non-existing particle.
   getParticleFromGeneralizedIndexString(0:1): -> NULL
   getParticleSource(): 6
@@ -4520,7 +4586,7 @@ Particle#17:
   getAcoplanarity(): nan
   getCharge(): -1
   getCosHelicity(): 0.968225
-  getCosHelicityDaughter(0): -0.991568
+  getCosHelicityDaughter(0): -0.991567
   getDaughter(0): -> Particles#13
   getDaughter(1): -> Particles#2
   getDaughterIndices(): size(2)
@@ -4793,7 +4859,7 @@ Particle#19:
   getAcoplanarity(): nan
   getCharge(): 0
   getCosHelicity(): 0.864864
-  getCosHelicityDaughter(0): -0.860502
+  getCosHelicityDaughter(0): -0.860573
   getDaughter(0): -> Particles#17
   getDaughter(1): -> Particles#6
   getDaughterIndices(): size(2)
@@ -4932,7 +4998,7 @@ Particle#20:
   getAcoplanarity(): nan
   getCharge(): 0
   getCosHelicity(): 0.103753
-  getCosHelicityDaughter(0): -0.9903
+  getCosHelicityDaughter(0): -0.990299
   getDaughter(0): -> Particles#13
   getDaughter(1): -> Particles#2
   getDaughterIndices(): size(3)
@@ -5072,7 +5138,7 @@ Particle#21:
 	# of daughters = 3
   getAcoplanarity(): nan
   getCharge(): 0
-  getCosHelicity(): 0.0519248
+  getCosHelicity(): 0.0519247
   getCosHelicityDaughter(0): -0.997131
   getDaughter(0): -> Particles#15
   getDaughter(1): -> Particles#2
@@ -5214,7 +5280,7 @@ Particle#22:
   getAcoplanarity(): nan
   getCharge(): 0
   getCosHelicity(): -0.638687
-  getCosHelicityDaughter(0): -0.990805
+  getCosHelicityDaughter(0): -0.990804
   getDaughter(0): -> Particles#13
   getDaughter(1): -> Particles#8
   getDaughterIndices(): size(3)

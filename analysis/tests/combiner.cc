@@ -1021,6 +1021,8 @@ namespace {
     klong_1->initialize(Const::Klong.getPDGCode(), "K_L0:1");
 
     // add particles to lists
+    pipAll->setEditable(true);
+
     pipAll->addParticle(pip_1);
     pipAll->addParticle(pip_2);
     pipAll->addParticle(pip_3);
@@ -1029,6 +1031,10 @@ namespace {
     pipAll->addParticle(pim_2);
     pipAll->addParticle(pim_3);
 
+    pipAll->setEditable(false);
+
+    kpAll->setEditable(true);
+
     kpAll->addParticle(kp_1);
     kpAll->addParticle(kp_2);
     kpAll->addParticle(kp_3);
@@ -1036,6 +1042,8 @@ namespace {
     kpAll->addParticle(km_1);
     kpAll->addParticle(km_2);
     kpAll->addParticle(km_3);
+
+    kpAll->setEditable(false);
 
     pipGood->addParticle(pip_1_copy);
     pipGood->addParticle(pim_1_copy);
@@ -1218,9 +1226,9 @@ namespace {
       D02Kpi_1->addParticle(iparticle, particle.getPDGCode(), particle.getFlavorType());
     }
     EXPECT_EQ(18, D02Kpi_1->getListSize());
-    EXPECT_EQ(9 , D02Kpi_1->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle));
-    EXPECT_EQ(9 , D02Kpi_1->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle, true));
-    EXPECT_EQ(0 , D02Kpi_1->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle));
+    EXPECT_EQ(9, D02Kpi_1->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle));
+    EXPECT_EQ(9, D02Kpi_1->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle, true));
+    EXPECT_EQ(0, D02Kpi_1->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle));
 
     ParticleGenerator combiner_D02Kpi_2("D0:kpi2 -> K-:all pi+:good");
     combiner_D02Kpi_2.init();
@@ -1233,9 +1241,9 @@ namespace {
       D02Kpi_2->addParticle(iparticle, particle.getPDGCode(), particle.getFlavorType());
     }
     EXPECT_EQ(6,  D02Kpi_2->getListSize());
-    EXPECT_EQ(3 , D02Kpi_2->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle));
-    EXPECT_EQ(3 , D02Kpi_2->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle, true));
-    EXPECT_EQ(0 , D02Kpi_2->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle));
+    EXPECT_EQ(3, D02Kpi_2->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle));
+    EXPECT_EQ(3, D02Kpi_2->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle, true));
+    EXPECT_EQ(0, D02Kpi_2->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle));
 
     ParticleGenerator combiner_D02KK_1("D0:kk1 -> K-:all K+:all");
     combiner_D02KK_1.init();
@@ -1248,10 +1256,10 @@ namespace {
       D02KK_1->addParticle(iparticle, particle.getPDGCode(), particle.getFlavorType());
     }
     EXPECT_EQ(9,  D02KK_1->getListSize());
-    EXPECT_EQ(0 , D02KK_1->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle));
-    EXPECT_EQ(0 , D02KK_1->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle, true));
-    EXPECT_EQ(9 , D02KK_1->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle));
-    EXPECT_EQ(9 , D02KK_1->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle, true));
+    EXPECT_EQ(0, D02KK_1->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle));
+    EXPECT_EQ(0, D02KK_1->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle, true));
+    EXPECT_EQ(9, D02KK_1->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle));
+    EXPECT_EQ(9, D02KK_1->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle, true));
 
     ParticleGenerator combiner_D02KK_2("D0:kk2 -> K-:all K+:good");
     combiner_D02KK_2.init();
@@ -1264,10 +1272,10 @@ namespace {
       D02KK_2->addParticle(iparticle, particle.getPDGCode(), particle.getFlavorType());
     }
     EXPECT_EQ(5,  D02KK_2->getListSize());
-    EXPECT_EQ(0 , D02KK_2->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle));
-    EXPECT_EQ(0 , D02KK_2->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle, true));
-    EXPECT_EQ(5 , D02KK_2->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle));
-    EXPECT_EQ(5 , D02KK_2->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle, true));
+    EXPECT_EQ(0, D02KK_2->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle));
+    EXPECT_EQ(0, D02KK_2->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle, true));
+    EXPECT_EQ(5, D02KK_2->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle));
+    EXPECT_EQ(5, D02KK_2->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle, true));
 
     ParticleGenerator combiner_D02KK_3("D0:kk3 -> K-:all K+:good2");
     combiner_D02KK_3.init();
@@ -1280,10 +1288,10 @@ namespace {
       D02KK_3->addParticle(iparticle, particle.getPDGCode(), particle.getFlavorType());
     }
     EXPECT_EQ(9,  D02KK_3->getListSize());
-    EXPECT_EQ(0 , D02KK_3->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle));
-    EXPECT_EQ(0 , D02KK_3->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle, true));
-    EXPECT_EQ(9 , D02KK_3->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle));
-    EXPECT_EQ(9 , D02KK_3->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle, true));
+    EXPECT_EQ(0, D02KK_3->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle));
+    EXPECT_EQ(0, D02KK_3->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle, true));
+    EXPECT_EQ(9, D02KK_3->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle));
+    EXPECT_EQ(9, D02KK_3->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle, true));
 
 
     ParticleGenerator combiner_D02KLg1("D0:klg1 -> K_L0:1 gamma:1");
@@ -1298,9 +1306,9 @@ namespace {
       D0KLg_1->addParticle(iparticle, particle.getPDGCode(), particle.getFlavorType());
     }
     EXPECT_EQ(3, D0KLg_1->getListSize());
-    EXPECT_EQ(0 , D0KLg_1->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle));
-    EXPECT_EQ(0 , D0KLg_1->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle, true));
-    EXPECT_EQ(3 , D0KLg_1->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle));
+    EXPECT_EQ(0, D0KLg_1->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle));
+    EXPECT_EQ(0, D0KLg_1->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle, true));
+    EXPECT_EQ(3, D0KLg_1->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle));
 
     combiner_D02KLg2.init();
     while (combiner_D02KLg2.loadNext()) {
@@ -1312,9 +1320,9 @@ namespace {
       D0KLg_2->addParticle(iparticle, particle.getPDGCode(), particle.getFlavorType());
     }
     EXPECT_EQ(3, D0KLg_2->getListSize());
-    EXPECT_EQ(0 , D0KLg_2->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle));
-    EXPECT_EQ(0 , D0KLg_2->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle, true));
-    EXPECT_EQ(3 , D0KLg_2->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle));
+    EXPECT_EQ(0, D0KLg_2->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle));
+    EXPECT_EQ(0, D0KLg_2->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle, true));
+    EXPECT_EQ(3, D0KLg_2->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle));
 
     // more examples
     // D+ -> K- pi+ pi+
@@ -1354,9 +1362,9 @@ namespace {
       DpKpipi_1->addParticle(iparticle, particle.getPDGCode(), particle.getFlavorType());
     }
     EXPECT_EQ(18, DpKpipi_1->getListSize());
-    EXPECT_EQ(9 , DpKpipi_1->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle));
-    EXPECT_EQ(9 , DpKpipi_1->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle, true));
-    EXPECT_EQ(0 , DpKpipi_1->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle));
+    EXPECT_EQ(9, DpKpipi_1->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle));
+    EXPECT_EQ(9, DpKpipi_1->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle, true));
+    EXPECT_EQ(0, DpKpipi_1->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle));
 
     ParticleGenerator combiner_DpKpipi_2("D+:kpipi1 -> K-:all pi+:all pi+:good");
     combiner_DpKpipi_2.init();
@@ -1369,9 +1377,9 @@ namespace {
       DpKpipi_2->addParticle(iparticle, particle.getPDGCode(), particle.getFlavorType());
     }
     EXPECT_EQ(12, DpKpipi_2->getListSize());
-    EXPECT_EQ(6 , DpKpipi_2->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle));
-    EXPECT_EQ(6 , DpKpipi_2->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle, true));
-    EXPECT_EQ(0 , DpKpipi_2->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle));
+    EXPECT_EQ(6, DpKpipi_2->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle));
+    EXPECT_EQ(6, DpKpipi_2->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle, true));
+    EXPECT_EQ(0, DpKpipi_2->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle));
 
     // D*+ -> D0 pi+
     StoreObjPtr<ParticleList> DSTp_1("D*+:D0kpi1pi");
@@ -1410,9 +1418,9 @@ namespace {
       DSTp_1->addParticle(iparticle, particle.getPDGCode(), particle.getFlavorType());
     }
     EXPECT_EQ(12, DSTp_1->getListSize());
-    EXPECT_EQ(6 , DSTp_1->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle));
-    EXPECT_EQ(6 , DSTp_1->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle, true));
-    EXPECT_EQ(0 , DSTp_1->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle));
+    EXPECT_EQ(6, DSTp_1->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle));
+    EXPECT_EQ(6, DSTp_1->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle, true));
+    EXPECT_EQ(0, DSTp_1->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle));
 
     ParticleGenerator combiner_DSTp_2("D*+:D0kk2pi -> D0:kk2 pi+:good");
     combiner_DSTp_2.init();
@@ -1425,9 +1433,9 @@ namespace {
       DSTp_2->addParticle(iparticle, particle.getPDGCode(), particle.getFlavorType());
     }
     EXPECT_EQ(4, DSTp_2->getListSize());
-    EXPECT_EQ(2 , DSTp_2->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle));
-    EXPECT_EQ(2 , DSTp_2->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle, true));
-    EXPECT_EQ(0 , DSTp_2->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle));
+    EXPECT_EQ(2, DSTp_2->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle));
+    EXPECT_EQ(2, DSTp_2->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle, true));
+    EXPECT_EQ(0, DSTp_2->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle));
 
     // pi0:1 -> gamma:1 gamma:1
     StoreObjPtr<ParticleList> pi0_1("pi0:1");
@@ -1451,9 +1459,9 @@ namespace {
       pi0_1->addParticle(iparticle, particle.getPDGCode(), particle.getFlavorType());
     }
     EXPECT_EQ(3, pi0_1->getListSize());
-    EXPECT_EQ(0 , pi0_1->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle));
-    EXPECT_EQ(0 , pi0_1->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle, true));
-    EXPECT_EQ(3 , pi0_1->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle));
+    EXPECT_EQ(0, pi0_1->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle));
+    EXPECT_EQ(0, pi0_1->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle, true));
+    EXPECT_EQ(3, pi0_1->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle));
 
     // pi0:1copy -> gamma:1 gamma:1
     StoreObjPtr<ParticleList> pi0_1copy("pi0:1copy");
@@ -1499,9 +1507,9 @@ namespace {
       pi0_2->addParticle(iparticle, particle.getPDGCode(), particle.getFlavorType());
     }
     EXPECT_EQ(6, pi0_2->getListSize());
-    EXPECT_EQ(0 , pi0_2->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle));
-    EXPECT_EQ(0 , pi0_2->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle, true));
-    EXPECT_EQ(6 , pi0_2->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle));
+    EXPECT_EQ(0, pi0_2->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle));
+    EXPECT_EQ(0, pi0_2->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle, true));
+    EXPECT_EQ(6, pi0_2->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle));
 
     // eta:1 -> gamma:2 gamma:2
     StoreObjPtr<ParticleList> eta_1("eta:1");
@@ -1525,9 +1533,9 @@ namespace {
       eta_1->addParticle(iparticle, particle.getPDGCode(), particle.getFlavorType());
     }
     EXPECT_EQ(6, eta_1->getListSize());
-    EXPECT_EQ(0 , eta_1->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle));
-    EXPECT_EQ(0 , eta_1->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle, true));
-    EXPECT_EQ(6 , eta_1->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle));
+    EXPECT_EQ(0, eta_1->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle));
+    EXPECT_EQ(0, eta_1->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle, true));
+    EXPECT_EQ(6, eta_1->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle));
 
     // eta:1copy -> gamma:2 gamma:2
     StoreObjPtr<ParticleList> eta_1copy("eta:1copy");
@@ -1577,10 +1585,10 @@ namespace {
       B0_1->addParticle(iparticle, particle.getPDGCode(), particle.getFlavorType());
     }
     EXPECT_EQ(3,   B0_1->getListSize());
-    EXPECT_EQ(0 ,  B0_1->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle));
-    EXPECT_EQ(0 ,  B0_1->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle, true));
-    EXPECT_EQ(3 ,  B0_1->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle));
-    EXPECT_EQ(3 , aB0_1->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle));
+    EXPECT_EQ(0,  B0_1->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle));
+    EXPECT_EQ(0,  B0_1->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle, true));
+    EXPECT_EQ(3,  B0_1->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle));
+    EXPECT_EQ(3, aB0_1->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle));
 
     // B0:2 -> pi0:1 pi0:1copy
     StoreObjPtr<ParticleList>  B0_2("B0:2");
@@ -1608,10 +1616,10 @@ namespace {
       B0_2->addParticle(iparticle, particle.getPDGCode(), particle.getFlavorType());
     }
     EXPECT_EQ(0,   B0_2->getListSize());
-    EXPECT_EQ(0 ,  B0_2->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle));
-    EXPECT_EQ(0 ,  B0_2->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle, true));
-    EXPECT_EQ(0 ,  B0_2->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle));
-    EXPECT_EQ(0 , aB0_2->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle));
+    EXPECT_EQ(0,  B0_2->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle));
+    EXPECT_EQ(0,  B0_2->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle, true));
+    EXPECT_EQ(0,  B0_2->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle));
+    EXPECT_EQ(0, aB0_2->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle));
 
     // B0:3 -> eta:1 eta:1copy
     StoreObjPtr<ParticleList>  B0_3("B0:3");
@@ -1639,10 +1647,10 @@ namespace {
       B0_3->addParticle(iparticle, particle.getPDGCode(), particle.getFlavorType());
     }
     EXPECT_EQ(3,   B0_3->getListSize());
-    EXPECT_EQ(0 ,  B0_3->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle));
-    EXPECT_EQ(0 ,  B0_3->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle, true));
-    EXPECT_EQ(3 ,  B0_3->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle));
-    EXPECT_EQ(3 , aB0_3->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle));
+    EXPECT_EQ(0,  B0_3->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle));
+    EXPECT_EQ(0,  B0_3->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle, true));
+    EXPECT_EQ(3,  B0_3->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle));
+    EXPECT_EQ(3, aB0_3->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle));
 
     // B0:4 -> pi0:2 eta:1
     StoreObjPtr<ParticleList>  B0_4("B0:4");
@@ -1670,10 +1678,10 @@ namespace {
       B0_4->addParticle(iparticle, particle.getPDGCode(), particle.getFlavorType());
     }
     EXPECT_EQ(6,   B0_4->getListSize());
-    EXPECT_EQ(0 ,  B0_4->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle));
-    EXPECT_EQ(0 ,  B0_4->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle, true));
-    EXPECT_EQ(6 ,  B0_4->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle));
-    EXPECT_EQ(6 , aB0_4->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle));
+    EXPECT_EQ(0,  B0_4->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle));
+    EXPECT_EQ(0,  B0_4->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle, true));
+    EXPECT_EQ(6,  B0_4->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle));
+    EXPECT_EQ(6, aB0_4->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle));
 
   }
 }  // namespace

@@ -31,7 +31,7 @@ namespace {
 
 void CDCMCMap::clear()
 {
-  B2DEBUG(100, "In CDCMCMap::clear()");
+  B2DEBUG(25, "In CDCMCMap::clear()");
   m_simHitsByHit.clear();
 
   m_hitsByMCParticle.clear();
@@ -43,7 +43,7 @@ void CDCMCMap::clear()
 
 void CDCMCMap::fill()
 {
-  B2DEBUG(100, "In CDCMCMap::fill()");
+  B2DEBUG(25, "In CDCMCMap::fill()");
   clear();
 
   fillSimHitByHitMap();
@@ -53,13 +53,13 @@ void CDCMCMap::fill()
   validateRelations();
   validateReassignedSecondaries();
 
-  B2DEBUG(100, "m_simHitsByHit.size(): " << m_simHitsByHit.size());
+  B2DEBUG(25, "m_simHitsByHit.size(): " << m_simHitsByHit.size());
 
-  B2DEBUG(100, "m_hitsByMCParticle.size(): " << m_hitsByMCParticle.size());
-  B2DEBUG(100, "m_simHitsByMCParticle.size(): " << m_simHitsByMCParticle.size());
+  B2DEBUG(25, "m_hitsByMCParticle.size(): " << m_hitsByMCParticle.size());
+  B2DEBUG(25, "m_simHitsByMCParticle.size(): " << m_simHitsByMCParticle.size());
 
-  B2DEBUG(100, "m_reassignedSecondaryHits.size(): " << m_reassignedSecondaryHits.size());
-  B2DEBUG(100, "m_reassignedSecondarySimHits.size(): " << m_reassignedSecondarySimHits.size());
+  B2DEBUG(25, "m_reassignedSecondaryHits.size(): " << m_reassignedSecondaryHits.size());
+  B2DEBUG(25, "m_reassignedSecondarySimHits.size(): " << m_reassignedSecondarySimHits.size());
 }
 
 void CDCMCMap::fillSimHitByHitMap()
@@ -159,17 +159,17 @@ void CDCMCMap::fillMCParticleByHitMap()
     auto itSorted = std::is_sorted_until(simHits.begin(), simHits.end(), lessFlightTime);
     if (itSorted != simHits.end()) {
       ++nSortedIncorretly;
-      B2DEBUG(100,
+      B2DEBUG(25,
               "CDCSimHits for MCParticle " << ptrMCParticle->getArrayIndex()
               << " only sorted correctly up to hit number "
               << std::distance(simHits.begin(), itSorted));
       --itSorted;
-      B2DEBUG(100,
+      B2DEBUG(25,
               "Between wire " << (*itSorted)->getWireID() << " " << (*itSorted)->getFlightTime()
               << "ns "
               << (*itSorted)->getArrayIndex());
       ++itSorted;
-      B2DEBUG(100,
+      B2DEBUG(25,
               "and wire " << (*itSorted)->getWireID() << " " << (*itSorted)->getFlightTime()
               << "ns "
               << (*itSorted)->getArrayIndex());

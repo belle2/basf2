@@ -107,8 +107,8 @@ void CDCCKFResultStorer::apply(const std::vector<CDCCKFResult>& results)
       continue;
     }
 
-    const TVector3& trackPosition = trackState->getPos();
-    const TVector3& trackMomentum = trackState->getMom();
+    const ROOT::Math::XYZVector& trackPosition = ROOT::Math::XYZVector(trackState->getPos());
+    const ROOT::Math::XYZVector& trackMomentum = ROOT::Math::XYZVector(trackState->getMom());
     const double trackCharge = trackState->getCharge();
 
     RecoTrack* newRecoTrack = m_outputRecoTracks.appendNew(trackPosition, trackMomentum, trackCharge);

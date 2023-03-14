@@ -64,7 +64,7 @@ namespace TreeFitter {
                                               );
 
     /** vertex --> helix */
-    static void helixFromVertex(const Eigen::Matrix<double, 1, 6>& positionAndMomentum ,
+    static void helixFromVertex(const Eigen::Matrix<double, 1, 6>& positionAndMomentum,
                                 int charge, double Bz,
                                 Belle2::Helix& helix,
                                 double& L,
@@ -74,8 +74,8 @@ namespace TreeFitter {
     /** helix --> vertex */
     static void vertexFromHelix(const Belle2::Helix& helix,
                                 double L, double Bz,
-                                Belle2::B2Vector3D& position,
-                                Belle2::B2Vector3D& momentum, int& charge);
+                                ROOT::Math::XYZVector& position,
+                                ROOT::Math::XYZVector& momentum, int& charge);
 
     /** map of the helix parameters by list index */
     static std::string helixParName(int i) ;

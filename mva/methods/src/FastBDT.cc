@@ -224,7 +224,6 @@ namespace Belle2 {
         nBinningLevels.push_back(nCuts);
       }
 
-      // cppcheck-suppress unsignedLessThanZero
       for (unsigned int iSpectator = 0; iSpectator < numberOfSpectators; ++iSpectator) {
         auto feature = training_data.getSpectator(iSpectator);
 

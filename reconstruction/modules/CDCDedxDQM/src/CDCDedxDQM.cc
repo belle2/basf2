@@ -11,7 +11,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(CDCDedxDQM)
+REG_MODULE(CDCDedxDQM);
 
 //---------------------------------
 CDCDedxDQMModule::CDCDedxDQMModule(): HistoModule()
@@ -143,7 +143,7 @@ void CDCDedxDQMModule::event()
 
     UncertainHelix helix = fitResult->getUncertainHelix();
     static DBObjPtr<BeamSpot> beamSpotDB;
-    helix.passiveMoveBy(beamSpotDB->getIPPosition());
+    helix.passiveMoveBy(ROOT::Math::XYZVector(beamSpotDB->getIPPosition()));
     const auto& frame = ReferenceFrame::GetCurrent();
     double dr = frame.getVertex(ROOT::Math::XYZVector(helix.getPerigee())).Rho();
     double dz = frame.getVertex(ROOT::Math::XYZVector(helix.getPerigee())).Z();
@@ -176,7 +176,7 @@ void CDCDedxDQMModule::event()
     double pCDC = dedxTrack->getMomentum();
     if (pCDC <= 0) continue;
 
-    double pTrk = fitResult->getMomentum().Mag();
+    double pTrk = fitResult->getMomentum().R();
     if (pTrk <= 0) continue;
 
     if (IsBhabhaEvt) {

@@ -100,7 +100,7 @@ namespace Belle2 {
       const TGeoHMatrix& transform = getMisalignmentTransform(sensorID);
       // We need entry point as a reference - the point on the original track unaffected by passage through the sensor. We also don't care for w and set it to zero.
       const double xea[3] = {hit->getEntryU(), hit->getEntryV(), 0.0};
-      TVector3 tev(hit->getEntryMomentum().Unit());
+      ROOT::Math::XYZVector tev(hit->getEntryMomentum().Unit());
       const double tea[3] = {tev.X(), tev.Y(), tev.Z()};
       double xca[3], tca[3];
       transform.MasterToLocal(xea, xca);

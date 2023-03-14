@@ -152,12 +152,12 @@ namespace Belle2 {
     //...Clear input signal bundle...
     if (_isb) {
       for (unsigned i = 0; i < _isb->size(); i++)
-        delete(* _isb)[i];
+        delete (* _isb)[i];
       delete _isb;
     }
     if (_osb) {
       for (unsigned i = 0; i < _osb->size(); i++)
-        delete(* _osb)[i];
+        delete (* _osb)[i];
       delete _osb;
     }
 

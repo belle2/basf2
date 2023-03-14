@@ -3,6 +3,7 @@ Import('env')
 env['LIBS'] = [
     'framework',
     'analysis_dataobjects',
+    'analysis_dbobjects',
     'mdst_dataobjects',
     'mdst_dbobjects',
     '$ROOT_LIBS',

@@ -59,9 +59,11 @@ PathFilterFactory::create(const std::string& filterName) const
   if (filterName == "all") {
     return std::make_unique<TrackFindingCDC::AllFilter<BasePathFilter>>();
   }
+  // cppcheck-suppress knownConditionTrueFalse
   if (filterName == "none") {
     return std::make_unique<TrackFindingCDC::NoneFilter<BasePathFilter>>();
   }
+  // cppcheck-suppress knownConditionTrueFalse
   if (filterName == "twoHitVirtualIP") {
     return std::make_unique<TwoHitVirtualIPFilter>();
   }

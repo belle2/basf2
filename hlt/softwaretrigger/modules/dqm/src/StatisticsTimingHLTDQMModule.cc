@@ -5,13 +5,14 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
+
 #include <hlt/softwaretrigger/modules/dqm/StatisticsTimingHLTDQMModule.h>
-#include <hlt/softwaretrigger/modules/dqm/SoftwareTriggerHLTDQMModule.h>
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/core/ProcessStatistics.h>
 #include <framework/core/ModuleStatistics.h>
 #include <framework/gearbox/Unit.h>
+#include <hlt/utilities/Units.h>
 
 #include <TDirectory.h>
 
@@ -22,7 +23,7 @@
 using namespace Belle2;
 using namespace SoftwareTrigger;
 
-REG_MODULE(StatisticsTimingHLTDQM)
+REG_MODULE(StatisticsTimingHLTDQM);
 
 StatisticsTimingHLTDQMModule::StatisticsTimingHLTDQMModule() : HistoModule()
 {
@@ -81,17 +82,17 @@ void StatisticsTimingHLTDQMModule::defineHisto()
 
   if (m_param_create_hlt_unit_histograms) {
     m_fullTimeMeanPerUnitHistogram = new TH1F("fullTimeMeanPerUnitHistogram", "Mean Budget Time Per Unit [ms]",
-                                              HLTUnit::max_hlt_units + 1, 0,
-                                              HLTUnit::max_hlt_units + 1);
+                                              HLTUnits::max_hlt_units + 1, 0,
+                                              HLTUnits::max_hlt_units + 1);
     m_fullTimeMeanPerUnitHistogram->SetStats(false);
     m_fullTimeMeanPerUnitHistogram->SetXTitle("HLT unit number");
     m_processingTimeMeanPerUnitHistogram = new TH1F("processingTimeMeanPerUnitHistogram", "Mean Processing Time Per Unit [ms]",
-                                                    HLTUnit::max_hlt_units + 1, 0,
-                                                    HLTUnit::max_hlt_units + 1);
+                                                    HLTUnits::max_hlt_units + 1, 0,
+                                                    HLTUnits::max_hlt_units + 1);
     m_processingTimeMeanPerUnitHistogram->SetStats(false);
     m_processingTimeMeanPerUnitHistogram->SetXTitle("HLT unit number");
 
-    for (unsigned int index = 1; index <= HLTUnit::max_hlt_units; index++) {
+    for (unsigned int index = 1; index <= HLTUnits::max_hlt_units; index++) {
       m_fullTimePerUnitHistograms.emplace(index, new TH1F(("fullTimePerUnitHistogram_HLT" + std::to_string(index)).c_str(),
                                                           ("Budget Time Per Unit: HLT" + std::to_string(index) + " [ms]").c_str(), m_fullTimeNBins, 0, m_fullTimeMax));
       m_fullTimePerUnitHistograms[index]->StatOverflows(true);
@@ -106,8 +107,8 @@ void StatisticsTimingHLTDQMModule::defineHisto()
     }
 
     m_processesPerUnitHistogram = new TH1F("processesPerUnitHistogram", "Number of Processes Per Unit",
-                                           HLTUnit::max_hlt_units + 1, 0,
-                                           HLTUnit::max_hlt_units + 1);
+                                           HLTUnits::max_hlt_units + 1, 0,
+                                           HLTUnits::max_hlt_units + 1);
     m_processesPerUnitHistogram->SetXTitle("HLT unit number");
   }
 
@@ -124,7 +125,7 @@ void StatisticsTimingHLTDQMModule::initialize()
 
   if (m_param_create_hlt_unit_histograms) {
     std::ifstream file;
-    file.open(HLTUnit::hlt_unit_file);
+    file.open(HLTUnits::hlt_unit_file);
     if (file.good()) {
       std::string host;
       getline(file, host);

@@ -60,7 +60,7 @@ namespace Belle2 {
                 std::vector<std::pair<ROOT::Math::XYZVector, int>> p3_cms_q_roe,
                 const ROOT::Math::PxPyPzEVector& p_cms_missA,
                 const ROOT::Math::PxPyPzEVector& p_cms_missB,
-                double et[2]
+                const double et[2]
                );
 
     /**

@@ -56,10 +56,12 @@ SVDPairFilterFactory::create(const std::string& filterName) const
     return std::make_unique<TrackFindingCDC::AllFilter<BaseSVDPairFilter>>();
   }
 
+  // cppcheck-suppress knownConditionTrueFalse
   if (filterName == "none") {
     return std::make_unique<TrackFindingCDC::NoneFilter<BaseSVDPairFilter>>();
   }
 
+  // cppcheck-suppress knownConditionTrueFalse
   if (filterName == "sensor") {
     return std::make_unique<SensorSVDPairFilter>();
   }

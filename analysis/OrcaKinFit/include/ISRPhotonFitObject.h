@@ -58,8 +58,8 @@ namespace Belle2 {
       virtual double getDPz(int ilocal) const override;
       virtual double getDE(int ilocal) const override;
 
-      virtual double getFirstDerivative_Meta_Local(int iMeta, int ilocal , int metaSet) const override;
-      virtual double getSecondDerivative_Meta_Local(int iMeta, int ilocal , int jlocal, int metaSet) const override;
+      virtual double getFirstDerivative_Meta_Local(int iMeta, int ilocal, int metaSet) const override;
+      virtual double getSecondDerivative_Meta_Local(int iMeta, int ilocal, int jlocal, int metaSet) const override;
 
       virtual int getNPar() const override {return NPAR;}
 

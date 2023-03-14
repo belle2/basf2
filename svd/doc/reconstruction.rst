@@ -7,6 +7,9 @@ The SVD reconstruction starts with :ref:`SVDShaperDigits<svdshapers>` and :ref:`
 
 Several algorithms are available for cluster charge, time and position reconstruction, and they are specified as parameters of the :b2:mod:`SVDClusterizer` module (``chargeAlgorithm{3/6}Samples``, ``timeAlgorithm{3/6}Samples``, ``positionAlgorithm{3/6}Samples``).
 
+When we reconstruct simulated events, fudge factors are applied to the cluster time and position in order to
+reproduce the resolution that we measure in data, see :ref:`SVDMCClusterPositionFudge<svdfudgeposition>` and :ref:`SVDMCClusterTimeFudge<svdfudgetime>`.
+
 Use the following python function if you want to add the SVD reconstruction to your steering file:
 
 .. autofunction:: svd.__init__.add_svd_reconstruction

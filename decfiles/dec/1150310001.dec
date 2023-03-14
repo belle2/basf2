@@ -1,0 +1,26 @@
+# EventType: 1150310001   
+# Descriptor: [B0 -> pi tau nu ]cc
+# NickName: Bd_pitaunu
+# Documentation: with generic tau decays
+# Tested: YES
+# PhysicsWG: SL
+# Responsible: Karol Adamczyk, Anja Novosel
+# Email: karol.adamczyk@ijs.si, anja.novosel@ijs.si
+# Cuts: None
+# Date: 20220627
+
+# Turn on PHOTOS for all decays
+yesPhotos
+
+Decay Upsilon(4S)
+1.0     B0sig anti-B0sig B0 anti-B0     VSS_BMIX dm;
+Enddecay
+#
+
+Decay B0sig
+1.0     pi-     tau+      nu_tau     BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52;
+Enddecay
+CDecay anti-B0sig
+
+#
+End

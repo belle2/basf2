@@ -176,11 +176,18 @@ def stdLep(pdgId,
     * 'FixedThresh05', PID cut of > 0.5 for each particle in the list.
     * 'FixedThresh09', PID cut of > 0.9 for each particle in the list.
     * 'FixedThresh095', PID cut of > 0.95 for each particle in the list.
+    * 'FixedThresh099', PID cut of > 0.99 for each particle in the list.
     * 'UniformEff60' 60% lepton efficiency list, uniform in a given multi-dimensional parametrisation.
     * 'UniformEff70' 70% lepton efficiency list, uniform in a given multi-dimensional parametrisation.
     * 'UniformEff80' 80% lepton efficiency list, uniform in a given multi-dimensional parametrisation.
     * 'UniformEff90' 90% lepton efficiency list, uniform in a given multi-dimensional parametrisation.
     * 'UniformEff95' 95% lepton efficiency list, uniform in a given multi-dimensional parametrisation.
+    * 'UniformPiFR5EM1' 50% pion to lepton fake rate, uniform in a given multi-dimensional parametrisation.
+    * 'UniformPiFR1EM1' 10% pion to lepton fake rate, uniform in a given multi-dimensional parametrisation.
+    * 'UniformPiFR5EM2' 5% pion to lepton fake rate, uniform in a given multi-dimensional parametrisation.
+    * 'UniformPiFR1EM2' 1% pion to lepton fake rate, uniform in a given multi-dimensional parametrisation.
+    * 'UniformPiFR5EM3' 0.5% pion to lepton fake rate, uniform in a given multi-dimensional parametrisation.
+    * 'UniformPiFR1EM3' 0.1% pion to lepton fake rate, uniform in a given multi-dimensional parametrisation.
 
     The function creates a ``ParticleList``, selecting particles according to the chosen ``working_point``,
     and decorates each candidate in the list with the nominal Data/MC :math:`\\ell` ID efficiency and
@@ -259,18 +266,25 @@ def stdLep(pdgId,
         "FixedThresh05",
         "FixedThresh09",
         "FixedThresh095",
+        "FixedThresh099",
         "UniformEff60",
         "UniformEff70",
         "UniformEff80",
         "UniformEff90",
         "UniformEff95",
+        "UniformPiFR5EM1",
+        "UniformPiFR1EM1",
+        "UniformPiFR5EM2",
+        "UniformPiFR1EM2",
+        "UniformPiFR5EM3",
+        "UniformPiFR1EM3",
     )
 
     available_methods = ("likelihood", "bdt")
     available_classificators = ("global", "binary")
 
     if working_point not in working_points:
-        b2.B2ERROR("The requested lepton list working point is not defined. \
+        b2.B2ERROR(f"The requested lepton list working point: {working_point} is not defined. \
                    Please refer to the stdLep and stdCharged documentation.")
         return None
 
@@ -343,26 +357,19 @@ def stdLep(pdgId,
 
     # Depending on the release associated to the chosen LID recommendations GT,
     # some variable names and aliases may need to be reset.
-    if int(release) == 5:
+    if int(release) in [5, 6]:
         if lepton == electron:
-            b2.B2INFO("The likelihood-based electron ID in release 5 samples is defined w/o the SVD and the TOP")
+            b2.B2INFO(f"The likelihood-based electron ID in release {release} samples is defined w/o the SVD and the TOP")
             pid_variables["likelihood"]["global"]["var"][electron] = "electronID_noSVD_noTOP"
             pid_variables["likelihood"]["global"]["alias"][electron] = "electronID_noSVD_noTOP"
             pid_variables["likelihood"]["binary"]["var"][electron] = f"binaryElectronID_noSVD_noTOP({pion})"
             pid_variables["likelihood"]["binary"]["alias"][electron] = "binaryElectronID_noSVD_noTOP_pi"
         else:
-            b2.B2INFO("The likelihood-based muon ID in release 5 samples is defined w/o the SVD")
+            b2.B2INFO(f"The likelihood-based muon ID in release {release} samples is defined w/o the SVD")
             pid_variables["likelihood"]["global"]["var"][muon] = "muonID_noSVD"
             pid_variables["likelihood"]["global"]["alias"][muon] = "muonID_noSVD"
             pid_variables["likelihood"]["binary"]["var"][muon] = f"binaryPID_noSVD({muon}, {pion})"
             pid_variables["likelihood"]["binary"]["alias"][muon] = "binaryMuonID_noSVD_pi"
-    if int(release) == 6:
-        if lepton == electron:
-            b2.B2INFO("The likelihood-based electron ID in release 6 samples is defined w/o the TOP")
-            pid_variables["likelihood"]["global"]["var"][electron] = "electronID_noTOP"
-            pid_variables["likelihood"]["global"]["alias"][electron] = "electronID_noTOP"
-            pid_variables["likelihood"]["binary"]["var"][electron] = f"binaryElectronID_noTOP({pion})"
-            pid_variables["likelihood"]["binary"]["alias"][electron] = "binaryElectronID_noTOP_pi"
 
     # Create the aliases.
     pid_var = pid_variables[method][classification]["var"][lepton]

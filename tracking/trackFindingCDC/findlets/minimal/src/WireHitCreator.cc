@@ -73,6 +73,11 @@ void WireHitCreator::exposeParameters(ModuleParamList* moduleParamList, const st
                                 "List of super layers to be used.",
                                 m_param_useSuperLayers);
 
+  moduleParamList->addParameter(prefixed(prefix, "maxDriftTimes"),
+                                m_param_maxDriftTimes,
+                                "Maximum drift time (nsec) allowed per super layer (in order of super layer#0-8). Default payload-based cut is applied if this value is negative",
+                                m_param_maxDriftTimes);
+
   moduleParamList->addParameter(prefixed(prefix, "useLayers"),
                                 m_param_useLayers,
                                 "List of layers to be used. "
@@ -151,6 +156,11 @@ void WireHitCreator::initialize()
     FlightTimeEstimator::instance(std::make_unique<BeamEventFlightTimeEstimator>());
   }
 
+  int nSL = m_param_maxDriftTimes.size();
+  for (int iSL = 0; iSL < nSL; ++iSL) {
+    m_maxDriftTimes.at(iSL) = m_param_maxDriftTimes.at(iSL);
+  }
+
   if (not m_param_useSuperLayers.empty()) {
     for (const ISuperLayer iSL : m_param_useSuperLayers) {
       m_useSuperLayers.at(iSL) = true;
@@ -220,6 +230,12 @@ void WireHitCreator::apply(std::vector<CDCWireHit>& outputWireHits)
   std::map<int, size_t> nHitsByMCParticleId;
 
   outputWireHits.reserve(nHits);
+
+  // make sure that DB object for time cut is valid:
+  if (not m_DBCDClayerTimeCut.isValid()) {
+    B2FATAL("CDClayerTimeCut DB object is invalid");
+  }
+
   for (const CDCHit& hit : hits) {
 
     if (hit.getICLayer() < geometryPar.getOffsetOfFirstLayer() or
@@ -256,7 +272,18 @@ void WireHitCreator::apply(std::vector<CDCWireHit>& outputWireHits)
       continue;
     }
 
+    // Exclude hit with large drift time
+    // In the following, the tof correction is off; the propagation-delay corr. is off (default of the translator); the event time corr. is on when it is available.
+    const double approxDriftTime = tdcCountTranslator.getDriftTime(hit.getTDCCount(), wireID, 0, 0, hit.getADCCount());
     ISuperLayer iSL = wireID.getISuperLayer();
+
+    // If input module parameter is set to positive value, use it. Otherwise use DB
+    if (m_maxDriftTimes.at(iSL) > 0) {
+      if (approxDriftTime > m_maxDriftTimes.at(iSL)) continue;
+    } else {
+      if (m_DBCDClayerTimeCut->getLayerTimeCut(iSL) > 0 && approxDriftTime > m_DBCDClayerTimeCut->getLayerTimeCut(iSL)) continue;
+    }
+
     if (not m_useSuperLayers[iSL]) continue;
     unsigned short layer = wireID.getICLayer();
     if (not m_useLayers[layer]) continue;
@@ -363,7 +390,7 @@ void WireHitCreator::apply(std::vector<CDCWireHit>& outputWireHits)
 
   if (not m_param_useMCParticleIds.empty()) {
     for (const std::pair<int, size_t> nHitsForMCParticleId : nHitsByMCParticleId) {
-      B2DEBUG(100,
+      B2DEBUG(25,
               "MC particle " << nHitsForMCParticleId.first << " #hits "
               << nHitsForMCParticleId.second);
     }

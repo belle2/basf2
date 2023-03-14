@@ -17,7 +17,7 @@
 #endif
 
 //DQM
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 
 
 //ARICH
@@ -34,7 +34,7 @@ namespace Belle2 {
   /**
    * Make summary of data quality from reconstruction
    */
-  class DQMHistAnalysisTRGGDLModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisTRGGDLModule final : public DQMHistAnalysisModule {
 
   public:
 
@@ -46,36 +46,30 @@ namespace Belle2 {
     /**
      * Destructor
      */
-    virtual ~DQMHistAnalysisTRGGDLModule();
+    ~DQMHistAnalysisTRGGDLModule();
 
     /**
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */
-    virtual void initialize() override;
-
-    /**
-     * Called when entering a new run.
-     * Set run dependent things like run header parameters, alignment, etc.
-     */
-    virtual void beginRun() override;
+    void initialize() override final;
 
     /**
      * Event processor.
      */
-    virtual void event() override;
+    void event() override final;
 
     /**
      * End-of-run action.
      * Save run-related stuff, such as statistics.
      */
-    virtual void endRun() override;
+    void endRun() override final;
 
     /**
      * Termination action.
      * Clean-up, close files, summarize statistics, etc.
      */
-    virtual void terminate() override;
+    void terminate() override final;
 
   protected:
     bool m_debug;/**<debug*/
@@ -149,11 +143,11 @@ namespace Belle2 {
       "stt with c4|hie"
     };
 
-    TCanvas* m_c_eff_shifter = nullptr;                 /**<Canvas for TRGGDL efficiency, simplified one for CR shifter*/
-    TCanvas* m_c_eff_shifter_fast = nullptr;                 /**<Canvas for TRGGDL efficiency, simplified one for CR shifter*/
-    TH1D* m_h_eff_shifter = nullptr;                    /**<Histogram for TRGGDL efficiency, simplified one for CR shifter*/
-    TH1D* m_h_eff_shifter_fast = nullptr;                    /**<Histogram for TRGGDL efficiency, simplified one for CR shifter*/
-    static const int n_eff_shifter = 14;                /**<number of bins for the simplified efficiency histogram*/
+    TCanvas* m_c_eff_shifter = nullptr;       /**<Canvas for TRGGDL efficiency, simplified one for CR shifter*/
+    TCanvas* m_c_eff_shifter_fast = nullptr;  /**<Canvas for TRGGDL efficiency, simplified one for CR shifter*/
+    TH1D* m_h_eff_shifter = nullptr;          /**<Histogram for TRGGDL efficiency, simplified one for CR shifter*/
+    TH1D* m_h_eff_shifter_fast = nullptr;     /**<Histogram for TRGGDL efficiency, simplified one for CR shifter*/
+    static const int n_eff_shifter = 14;      /**<number of bins for the simplified efficiency histogram*/
     const char* c_eff_shifter[n_eff_shifter] = {
       "CDC fff",
       "CDC ffo",
@@ -188,7 +182,7 @@ namespace Belle2 {
     TLine* m_line_limit_low_shifter[n_eff_shifter] = {}; /**<lower limit line for the simplified efficiency histogram*/
     TLine* m_line_limit_high_shifter[n_eff_shifter] = {}; /**<upper limit line for the simplified efficiency histogram*/
     double m_limit_low_shifter[n_eff_shifter] = {
-      0.80, 0.80, 0.80, 0.80, 0.80, 0.80, 0.40, 0.05, 0.35, 0.80, 0.20, 0.40, 0.00, 0.70
+      0.80, 0.80, 0.80, 0.80, 0.80, 0.80, 0.35, 0.05, 0.25, 0.80, 0.20, 0.40, 0.00, 0.70
     }; /**<lower limit value in each bin*/
     double m_limit_high_shifter[n_eff_shifter] = {
       0.95, 0.95, 0.95, 0.95, 1.00, 1.00, 0.50, 0.20, 0.55, 1.00, 0.40, 0.70, 1.00, 0.90
@@ -197,7 +191,7 @@ namespace Belle2 {
     TH1* m_rtype = nullptr; /**< histogram from DQMInfo with runtype */
     TString m_runtype; /**< string with runtype: physics or cosmic */
 
-    /** flag if to export to EPICS */
+    /** flag if exporting to EPICS */
     bool m_useEpics;
 
 #ifdef _BELLE2_EPICS

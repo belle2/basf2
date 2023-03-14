@@ -9,7 +9,7 @@
 /* Own header. */
 #include <online_book/awesome/modules/AWESOMEBasic/AWESOMEBasicModule.h>
 
-/* Belle2 headers. */
+/* Basf2 headers. */
 #include <framework/logging/Logger.h>
 
 /* --------- WARNING ------------------------------------------------------
@@ -27,7 +27,7 @@ using namespace Belle2::AWESOME;
  * class name will be appended automatically so every module has to be named
  * <NAME>Module.
  */
-REG_MODULE(AWESOMEBasic)
+REG_MODULE(AWESOMEBasic);
 
 AWESOMEBasicModule::AWESOMEBasicModule() :
   Module(),

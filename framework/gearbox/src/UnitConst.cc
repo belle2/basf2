@@ -33,58 +33,58 @@ namespace Belle2 {
   /**
    * Standard units with the value = 1.
    */
-  DEFINE_UNIT(cm    , 1.); /**< Standard of [length] */
-  DEFINE_UNIT(ns    , 1.); /**< Standard of [time] */
-  DEFINE_UNIT(GHz   , 1.); /**< Standard of [frequency] */
-  DEFINE_UNIT(rad   , 1.); /**< Standard of [angle] */
-  DEFINE_UNIT(GeV   , 1.); /**< Standard of [energy, momentum, mass] */
-  DEFINE_UNIT(K     , 1.); /**< Standard of [temperature] */
-  DEFINE_UNIT(e     , 1.); /**< Standard of [electric charge] */
+  DEFINE_UNIT(cm, 1.);     /**< Standard of [length] */
+  DEFINE_UNIT(ns, 1.);     /**< Standard of [time] */
+  DEFINE_UNIT(GHz, 1.);    /**< Standard of [frequency] */
+  DEFINE_UNIT(rad, 1.);    /**< Standard of [angle] */
+  DEFINE_UNIT(GeV, 1.);    /**< Standard of [energy, momentum, mass] */
+  DEFINE_UNIT(K, 1.);      /**< Standard of [temperature] */
+  DEFINE_UNIT(e, 1.);      /**< Standard of [electric charge] */
 
   /**
    * Practical units with the value = 1.
    * These units are NOT consistent with the other standard units.
    * Please use them carefully.
    */
-  DEFINE_UNIT_NAME(g_cm3 , 1., "g/cm3"); /**< Standard of [density] */
+  DEFINE_UNIT_NAME(g_cm3, 1., "g/cm3");  /**< Standard of [density] */
 
   /**
    * Derived units
    */
 
 // length units
-  DEFINE_UNIT(km  , Unit::cm * 1e5);   /**< [kilometers] */
-  DEFINE_UNIT(m   , Unit::cm * 1e2);   /**< [meters] */
-  DEFINE_UNIT(mm  , Unit::m  * 1e-3);  /**< [millimeters] */
-  DEFINE_UNIT(um  , Unit::m  * 1e-6);  /**< [micrometers] */
-  DEFINE_UNIT(nm  , Unit::m  * 1e-9);  /**< [nanometers] */
-  DEFINE_UNIT(pm  , Unit::m  * 1e-12); /**< [picometers] */
-  DEFINE_UNIT(fm  , Unit::m  * 1e-15); /**< [femtometers] */
+  DEFINE_UNIT(km, Unit::cm * 1e5);     /**< [kilometers] */
+  DEFINE_UNIT(m, Unit::cm * 1e2);      /**< [meters] */
+  DEFINE_UNIT(mm, Unit::m  * 1e-3);    /**< [millimeters] */
+  DEFINE_UNIT(um, Unit::m  * 1e-6);    /**< [micrometers] */
+  DEFINE_UNIT(nm, Unit::m  * 1e-9);    /**< [nanometers] */
+  DEFINE_UNIT(pm, Unit::m  * 1e-12);   /**< [picometers] */
+  DEFINE_UNIT(fm, Unit::m  * 1e-15);   /**< [femtometers] */
 
 // area units
-  DEFINE_UNIT(m2  , Unit::m * Unit::m);      /**< [square meters] */
-  DEFINE_UNIT(cm2 , Unit::cm * Unit::cm);    /**< [square centimeters] */
-  DEFINE_UNIT(mm2 , Unit::mm * Unit::mm);    /**< [square millimeters] */
+  DEFINE_UNIT(m2, Unit::m * Unit::m);        /**< [square meters] */
+  DEFINE_UNIT(cm2, Unit::cm * Unit::cm);     /**< [square centimeters] */
+  DEFINE_UNIT(mm2, Unit::mm * Unit::mm);     /**< [square millimeters] */
 
-  DEFINE_UNIT(b   , Unit::m2 * 1e-28); /**< [barn] */
-  DEFINE_UNIT(mb  , Unit::b  * 1e-3);  /**< [millibarn] */
-  DEFINE_UNIT(ub  , Unit::b  * 1e-6);  /**< [microbarn] */
-  DEFINE_UNIT(nb  , Unit::b  * 1e-9);  /**< [nanobarn] */
-  DEFINE_UNIT(pb  , Unit::b  * 1e-12); /**< [picobarn] */
-  DEFINE_UNIT(fb  , Unit::b  * 1e-15); /**< [femtobarn] */
-  DEFINE_UNIT(ab  , Unit::b  * 1e-18); /**< [attobarn] */
+  DEFINE_UNIT(b, Unit::m2 * 1e-28);    /**< [barn] */
+  DEFINE_UNIT(mb, Unit::b  * 1e-3);    /**< [millibarn] */
+  DEFINE_UNIT(ub, Unit::b  * 1e-6);    /**< [microbarn] */
+  DEFINE_UNIT(nb, Unit::b  * 1e-9);    /**< [nanobarn] */
+  DEFINE_UNIT(pb, Unit::b  * 1e-12);   /**< [picobarn] */
+  DEFINE_UNIT(fb, Unit::b  * 1e-15);   /**< [femtobarn] */
+  DEFINE_UNIT(ab, Unit::b  * 1e-18);   /**< [attobarn] */
 
 // volume units
-  DEFINE_UNIT(m3  , Unit::m * Unit::m * Unit::m);    /**< [cubic meters] */
-  DEFINE_UNIT(cm3 , Unit::cm * Unit::cm * Unit::cm); /**< [cubic centimeters] */
-  DEFINE_UNIT(mm3 , Unit::mm * Unit::mm * Unit::mm); /**< [cubic millimeters] */
+  DEFINE_UNIT(m3, Unit::m * Unit::m * Unit::m);      /**< [cubic meters] */
+  DEFINE_UNIT(cm3, Unit::cm * Unit::cm * Unit::cm);  /**< [cubic centimeters] */
+  DEFINE_UNIT(mm3, Unit::mm * Unit::mm * Unit::mm);  /**< [cubic millimeters] */
 
 // time units
-  DEFINE_UNIT(s   , Unit::ns * 1e9);   /**< [second] */
-  DEFINE_UNIT(ms  , Unit::s  * 1e-3);  /**< [millisecond] */
-  DEFINE_UNIT(us  , Unit::s  * 1e-6);  /**< [microsecond] */
-  DEFINE_UNIT(ps  , Unit::s  * 1e-12); /**< [picosecond] */
-  DEFINE_UNIT(fs  , Unit::s  * 1e-15); /**< [femtosecond] */
+  DEFINE_UNIT(s, Unit::ns * 1e9);      /**< [second] */
+  DEFINE_UNIT(ms, Unit::s  * 1e-3);    /**< [millisecond] */
+  DEFINE_UNIT(us, Unit::s  * 1e-6);    /**< [microsecond] */
+  DEFINE_UNIT(ps, Unit::s  * 1e-12);   /**< [picosecond] */
+  DEFINE_UNIT(fs, Unit::s  * 1e-15);   /**< [femtosecond] */
 
 // frequency units
   DEFINE_UNIT(Hz,   Unit::GHz * 1e-9);        /**< [Hertz] */
@@ -93,33 +93,33 @@ namespace Belle2 {
   DEFINE_UNIT(mHz,  Unit::GHz * 1e-12);       /**< [Millihertz] */
 
 // angle units
-  DEFINE_UNIT(mrad , Unit::rad * 1e-3);  /**< [millirad] */
-  DEFINE_UNIT(deg  , TMath::DegToRad()); /**< degree to radians */
+  DEFINE_UNIT(mrad, Unit::rad * 1e-3);   /**< [millirad] */
+  DEFINE_UNIT(deg, TMath::DegToRad());   /**< degree to radians */
 
 // energy units
-  DEFINE_UNIT(eV  , Unit::GeV * 1e-9); /**< [electronvolt] */
-  DEFINE_UNIT(keV , Unit::eV  * 1e3);  /**< [kiloelectronvolt] */
-  DEFINE_UNIT(MeV , Unit::eV  * 1e6);  /**< [megaelectronvolt] */
-  DEFINE_UNIT(TeV , Unit::eV  * 1e12);  /**< [teraelectronvolt] */
-  DEFINE_UNIT(J   , 1.0 / TMath::Qe() * Unit::eV); /**< [joule] */
-  DEFINE_UNIT(V   , Unit::eV / Unit::e); /**< Standard of [voltage] */
+  DEFINE_UNIT(eV, Unit::GeV * 1e-9);   /**< [electronvolt] */
+  DEFINE_UNIT(keV, Unit::eV  * 1e3);   /**< [kiloelectronvolt] */
+  DEFINE_UNIT(MeV, Unit::eV  * 1e6);   /**< [megaelectronvolt] */
+  DEFINE_UNIT(TeV, Unit::eV  * 1e12);   /**< [teraelectronvolt] */
+  DEFINE_UNIT(J, 1.0 / TMath::Qe() * Unit::eV);    /**< [joule] */
+  DEFINE_UNIT(V, Unit::eV / Unit::e);    /**< Standard of [voltage] */
 
 // charge units
-  DEFINE_UNIT(C  , 1.0 / TMath::Qe() * Unit::e); /**< [Coulomb] */
-  DEFINE_UNIT(fC , Unit::C / 1.0e15);            /**< [femtoCoulomb] */
+  DEFINE_UNIT(C, 1.0 / TMath::Qe() * Unit::e);   /**< [Coulomb] */
+  DEFINE_UNIT(fC, Unit::C / 1.0e15);             /**< [femtoCoulomb] */
 
 // magnetic field units
-  DEFINE_UNIT(T  , Unit::V * Unit::s / Unit::m2); /**< [Tesla] */
-  DEFINE_UNIT(mT , Unit::T * 1e-3);               /**< [millitesla] */
-  DEFINE_UNIT(Gauss , Unit::T * 1e-4);            /**< [Gauss] */
-  DEFINE_UNIT(kGauss , Unit::Gauss * 1e3);        /**< [kiloGauss] */
+  DEFINE_UNIT(T, Unit::V * Unit::s / Unit::m2);   /**< [Tesla] */
+  DEFINE_UNIT(mT, Unit::T * 1e-3);                /**< [millitesla] */
+  DEFINE_UNIT(Gauss, Unit::T * 1e-4);             /**< [Gauss] */
+  DEFINE_UNIT(kGauss, Unit::Gauss * 1e3);         /**< [kiloGauss] */
 
 // density units
-  DEFINE_UNIT_NAME(mg_cm3  , Unit::g_cm3 * 1e-3, "mg/cm3"); /**< [mg/cm^3] */
-  DEFINE_UNIT_NAME(kg_cm3  , Unit::g_cm3 * 1e3, "kg/cm3");  /**< [kg/cm^3] */
-  DEFINE_UNIT_NAME(g_mm3   , Unit::g_cm3 / Unit::mm3, "g/mm3");  /**< [g/mm^3] */
-  DEFINE_UNIT_NAME(mg_mm3  , Unit::mg_cm3 / Unit::mm3, "mg/mm3"); /**< [mg/mm^3] */
-  DEFINE_UNIT_NAME(kg_mm3  , Unit::kg_cm3 / Unit::mm3, "kg/mm3"); /**< [kg/mm^3] */
+  DEFINE_UNIT_NAME(mg_cm3, Unit::g_cm3 * 1e-3, "mg/cm3");   /**< [mg/cm^3] */
+  DEFINE_UNIT_NAME(kg_cm3, Unit::g_cm3 * 1e3, "kg/cm3");    /**< [kg/cm^3] */
+  DEFINE_UNIT_NAME(g_mm3, Unit::g_cm3 / Unit::mm3, "g/mm3");     /**< [g/mm^3] */
+  DEFINE_UNIT_NAME(mg_mm3, Unit::mg_cm3 / Unit::mm3, "mg/mm3");   /**< [mg/mm^3] */
+  DEFINE_UNIT_NAME(kg_mm3, Unit::kg_cm3 / Unit::mm3, "kg/mm3");   /**< [kg/mm^3] */
 
 
   double Unit::convertValue(double value, const std::string& unitString)
@@ -172,6 +172,49 @@ std::string Const::parseDetectors(EDetector det)
   else if (det == Const::TEST)  return "TEST";
   else B2FATAL("Unknown detector component: " << det);
   return "INVALID";
+}
+
+Const::DetectorSet::Iterator& Const::DetectorSet::Iterator::operator++()
+{
+  while (1) {
+    m_SetBit = m_SetBit << 1;
+    if (m_SetBit >= 0x1000) {
+      m_SetBit = invalidDetector;
+      return *this;
+    }
+    if ((m_DetectorSetBits & m_SetBit) != 0)
+      break;
+  }
+  m_Index++;
+  return *this;
+}
+
+bool Const::DetectorSet::Iterator::operator==(
+  const Const::DetectorSet::Iterator& iterator)
+{
+  return m_SetBit == iterator.m_SetBit;
+}
+
+bool Const::DetectorSet::Iterator::operator!=(
+  const Const::DetectorSet::Iterator& iterator)
+{
+  return m_SetBit != iterator.m_SetBit;
+}
+
+Const::DetectorSet::Iterator Const::DetectorSet::begin() const
+{
+  uint16_t setBit = 1;
+  while ((m_bits & setBit) == 0) {
+    setBit = setBit << 1;
+    if (setBit >= 0x1000)
+      return Const::DetectorSet::Iterator(0, m_bits, invalidDetector);
+  }
+  return Const::DetectorSet::Iterator(0, m_bits, setBit);
+}
+
+Const::DetectorSet::Iterator Const::DetectorSet::end() const
+{
+  return Const::DetectorSet::Iterator(0, m_bits, invalidDetector);
 }
 
 Const::DetectorSet operator + (const Const::DetectorSet& firstSet, const Const::DetectorSet& secondSet)
@@ -238,16 +281,6 @@ int Const::DetectorSet::getIndex(EDetector det) const
   return index;
 }
 
-Const::EDetector Const::DetectorSet::operator [](int index) const
-{
-  if (index < 0) return Const::invalidDetector;
-  for (unsigned short setBit = 1; setBit < 0x1000; setBit *= 2) {
-    if ((m_bits & setBit) != 0) --index;
-    if (index < 0) return getDetector(setBit);
-  }
-  return Const::invalidDetector;
-}
-
 size_t Const::DetectorSet::size() const
 {
   int size = 0;
@@ -257,10 +290,10 @@ size_t Const::DetectorSet::size() const
   return size;
 }
 
-std::string Const::DetectorSet::__repr__() const
+std::string Const::DetectorSet::__str__() const
 {
   std::string result = "<set: ";
-  std::string detectorNames[] = {"invalidDetector", "PXD", "SVD", "CDC", "TOP", "ARICH", "ECL", "KLM", "IR", "TRG", "DAQ", "BEAST", "TEST"};
+  const std::string detectorNames[] = {"invalidDetector", "PXD", "SVD", "CDC", "TOP", "ARICH", "ECL", "KLM", "IR", "TRG", "DAQ", "BEAST", "TEST"};
   for (size_t index = 1; index <= Const::TEST; index++) {
     if (contains(EDetector(index))) {
       if (result.size() > 6) {
@@ -354,6 +387,7 @@ const Const::Cluster Const::clusterjunk = Const::clusterSet.find(9900001);
 const Const::ParticleType Const::photon = Const::ParticleType(22);
 const Const::ParticleType Const::pi0 = Const::ParticleType(111);
 const Const::ParticleType Const::neutron = Const::ParticleType(2112);
+const Const::ParticleType Const::antiNeutron = Const::ParticleType(-2112);
 const Const::ParticleType Const::Kshort = Const::ParticleType(310);
 const Const::ParticleType Const::Klong = Const::ParticleType(130);
 const Const::ParticleType Const::Lambda = Const::ParticleType(3122);

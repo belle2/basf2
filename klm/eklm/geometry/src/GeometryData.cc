@@ -13,7 +13,7 @@
 #include <klm/eklm/geometry/Circle2D.h>
 #include <klm/eklm/geometry/Line2D.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/Database.h>
 #include <framework/logging/Logger.h>
@@ -481,6 +481,8 @@ void EKLM::GeometryData::initializeFromGearbox(const GearDir* gearDir)
   ShieldDetailGeometry shieldDetailGeometry;
   GearDir gd(*gearDir);
   gd.append("/EKLM");
+  /* Beam-background study. */
+  m_BeamBackgroundStudy = gd.getBool("BeamBackgroundStudy");
   /* Numbers of elements. */
   m_NSections = gd.getInt("NSections");
   m_ElementNumbers->checkSection(m_NSections);

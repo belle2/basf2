@@ -6,17 +6,22 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-
+/* Own header. */
 #include <ecl/modules/eclTimeShiftsPlottingCollector/eclTimeShiftsPlottingCollectorModule.h>
-#include <framework/gearbox/Const.h>
+
+/* ECL headers. */
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 #include <ecl/dbobjects/ECLReferenceCrystalPerCrateCalib.h>
 #include <ecl/digitization/EclConfiguration.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 
+/* Basf2 headers. */
+#include <framework/gearbox/Const.h>
+
+/* ROOT headers. */
+#include <TFile.h>
 #include <TH2F.h>
 #include <TTree.h>
-#include <TFile.h>
 
 using namespace Belle2;
 using namespace ECL;
@@ -25,7 +30,7 @@ using namespace std;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(eclTimeShiftsPlottingCollector)
+REG_MODULE(eclTimeShiftsPlottingCollector);
 
 //-----------------------------------------------------------------
 //                 Implementation

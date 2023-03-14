@@ -24,7 +24,7 @@ using namespace Belle2;
 using namespace CDC;
 
 // register module
-REG_MODULE(CDCDigitizer)
+REG_MODULE(CDCDigitizer);
 CDCDigitizerModule::CDCDigitizerModule() : Module(),
   m_cdcgp(), m_gcp(), m_aCDCSimHit(), m_posFlag(0),
   m_driftLength(0.0), m_flightTime(0.0), m_globalTime(0.0),
@@ -46,10 +46,14 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
            string("CDCHits4Trg"));
 
   //Relations
-  addParam("MCParticlesToCDCSimHitsName",  m_MCParticlesToSimHitsName,
+  addParam("MCParticlesToCDCSimHitsName", m_MCParticlesToSimHitsName,
            "Name of relation between MCParticles and CDCSimHits used",     string(""));
-  addParam("CDCSimHistToCDCHitsName",      m_SimHitsTOCDCHitsName,
+  addParam("CDCSimHistToCDCHitsName", m_SimHitsTOCDCHitsName,
            "Name of relation between the CDCSimHits and the CDCHits used", string(""));
+  addParam("OptionalFirstMCParticlesToHitsName",  m_OptionalFirstMCParticlesToHitsName,
+           "Optional name of relation between the first MCParticles and CDCHits used", string("FirstMatchedParticles"));
+  addParam("OptionalAllMCParticlesToHitsName", m_OptionalAllMCParticlesToHitsName,
+           "Optional name of relation between all MCParticles and CDCHits used", string("AllMatchedParticles"));
 
 
   //Parameters for Digitization
@@ -152,13 +156,19 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
   addParam("DebugLevel4XTalk", m_debugLevel4XTalk, "Debug level for crosstalk; 20-29 are usable.", 21);
 
   //Gain smearing
-  addParam("GasGainSmearing", m_gasGainSmearing, "Switch for gas gain smearing; true: on; false: off", m_gasGainSmearing);
+  addParam("GasGainSmearing", m_gasGainSmearing, "Switch for gas gain smearing for ADC simulation; true: on; false: off",
+           m_gasGainSmearing);
   addParam("EffWForGasGainSmearing", m_effWForGasGainSmearing,
            "Effective energy (keV) needed for one electron production for gas gain smearing; average for alpha- and beta-sources.",
            m_effWForGasGainSmearing);
   addParam("ThetaOfPolyaFunction", m_thetaOfPolya, "Theta of Polya function for gas gain smearing", m_thetaOfPolya);
   addParam("ExtraADCSmearing", m_extraADCSmearing, "Switch for extra ADC smearing; true: on; false: off", m_extraADCSmearing);
   //  addParam("SigmaForExtraADCSmearing", m_sigmaForExtraADCSmearing, "Gaussian sigma for extra ADC smearing; specify range [0,1]", m_sigmaForExtraADCSmearing);
+
+  // Switch for optional relations
+  addParam("MatchAllMCParticles", m_matchAllMCParticles, "Switch to store all MCRelations that produced a SimHit", false);
+  addParam("MatchFirstMCParticles", m_matchFirstMCParticles,
+           "Switch to store all MCRelations for the first three SimHits instead of only the first", false);
 
 #if defined(CDC_DEBUG)
   cout << " " << endl;
@@ -175,6 +185,9 @@ void CDCDigitizerModule::initialize()
   m_cdcHits.registerInDataStore(m_outputCDCHitsName);
   m_simHits.registerRelationTo(m_cdcHits);
   m_mcParticles.registerRelationTo(m_cdcHits);
+  m_mcParticles.registerRelationTo(m_cdcHits, DataStore::c_Event, DataStore::c_WriteOut, m_OptionalFirstMCParticlesToHitsName);
+  m_mcParticles.registerRelationTo(m_cdcHits, DataStore::c_Event, DataStore::c_WriteOut, m_OptionalAllMCParticlesToHitsName);
+
   // Arrays for trigger.
   m_cdcHits4Trg.registerInDataStore(m_outputCDCHitsName4Trg);
   m_simHits.registerRelationTo(m_cdcHits4Trg);
@@ -254,6 +267,12 @@ void CDCDigitizerModule::initialize()
     }
   }
 
+  m_corrToThresholdFromDB = new DBObjPtr<CDCCorrToThresholds>;
+  if ((*m_corrToThresholdFromDB).isValid()) {
+  } else {
+    B2FATAL("CDCCorrToThresholds invalid!");
+  }
+
 #if defined(CDC_DEBUG)
   cout << " " << endl;
   cout << "CDCDigitizer initialize" << endl;
@@ -319,6 +338,11 @@ void CDCDigitizerModule::event()
   map<pair<WireID, unsigned>, SignalInfo> signalMapTrg;
   map<pair<WireID, unsigned>, SignalInfo>::iterator iterSignalMapTrg;
 
+  // signal map for all MCParticles: Wire <-> MCArrayIndex
+  map<WireID, std::set<int>> particleMap;
+  map<WireID, std::set<int>>::iterator iterParticleMap;
+
+
   // Set time window per event
   if (m_tSimMode == 0 || m_tSimMode == 1) {
     int trigBin = 0;
@@ -376,11 +400,11 @@ void CDCDigitizerModule::event()
     //basically align flag should be always on since on/off is controlled by the input alignment.xml file itself.
     m_align = true;
 
-    TVector3 bwpAlign = m_cdcgp->wireBackwardPosition(m_wireID, CDCGeometryPar::c_Aligned);
-    TVector3 fwpAlign = m_cdcgp->wireForwardPosition(m_wireID, CDCGeometryPar::c_Aligned);
+    B2Vector3D bwpAlign = m_cdcgp->wireBackwardPosition(m_wireID, CDCGeometryPar::c_Aligned);
+    B2Vector3D fwpAlign = m_cdcgp->wireForwardPosition(m_wireID, CDCGeometryPar::c_Aligned);
 
-    TVector3 bwp = m_cdcgp->wireBackwardPosition(m_wireID);
-    TVector3 fwp = m_cdcgp->wireForwardPosition(m_wireID);
+    B2Vector3D bwp = m_cdcgp->wireBackwardPosition(m_wireID);
+    B2Vector3D fwp = m_cdcgp->wireForwardPosition(m_wireID);
 
     //skip correction for wire-position alignment if unnecessary
     if ((bwpAlign - bwp).Mag() == 0. && (fwpAlign - fwp).Mag() == 0.) m_align = false;
@@ -392,9 +416,9 @@ void CDCDigitizerModule::event()
       fwp = fwpAlign;
 
       if (m_correctForWireSag) {
-        double zpos = m_posWire.z();
-        double bckYSag = bwp.y();
-        double forYSag = fwp.y();
+        double zpos = m_posWire.Z();
+        double bckYSag = bwp.Y();
+        double forYSag = fwp.Y();
 
         //        CDCGeometryPar::EWirePosition set = m_align ?
         //                                            CDCGeometryPar::c_Aligned : CDCGeometryPar::c_Base;
@@ -406,11 +430,11 @@ void CDCDigitizerModule::event()
         fwp.SetY(forYSag);
       }
 
-      const TVector3 L = 5. * m_momentum.Unit(); //(cm) tentative
-      TVector3 posIn  = m_posTrack - L;
-      TVector3 posOut = m_posTrack + L;
-      TVector3 posTrack = m_posTrack;
-      TVector3 posWire = m_posWire;
+      const B2Vector3D L = 5. * m_momentum.Unit(); //(cm) tentative
+      B2Vector3D posIn  = m_posTrack - L;
+      B2Vector3D posOut = m_posTrack + L;
+      B2Vector3D posTrack = m_posTrack;
+      B2Vector3D posWire = m_posWire;
 
       //      m_driftLength = m_cdcgp->ClosestApproach(bwp, fwp, posIn, posOut, posTrack, posWire);
       m_driftLength = ClosestApproach(bwp, fwp, posIn, posOut, posTrack, posWire);
@@ -462,7 +486,7 @@ void CDCDigitizerModule::event()
 
     //Sum ADC count
     const double stepLength  = m_aCDCSimHit->getStepLength() * Unit::cm;
-    const double costh = m_momentum.z() / m_momentum.Mag();
+    const double costh = m_momentum.Z() / m_momentum.Mag();
     double hitdE = m_aCDCSimHit->getEnergyDep();
     if (m_cdcgp->getMaterialDefinitionMode() != 2) {  // for non wire-by-wire mode
       static EDepInGas& edpg = EDepInGas::getInstance();
@@ -487,7 +511,6 @@ void CDCDigitizerModule::event()
 
     //Apply energy threshold
     // If hitdE < dEThreshold, the hit is ignored
-    // M. Uchida 2012.08.31
     double dEThreshold = 0.;
     if (m_useDB4FEE && m_useDB4EDepToADC) {
       dEThreshold = m_tdcThresh[m_boardID] / convFactorForThreshold * Unit::keV;
@@ -495,6 +518,7 @@ void CDCDigitizerModule::event()
       dEThreshold = (m_wireID.getISuperLayer() == 0) ? m_tdcThreshold4Inner : m_tdcThreshold4Outer;
       dEThreshold *= Unit::eV;
     }
+    dEThreshold *= (*m_corrToThresholdFromDB)->getParam(m_wireID.getICLayer());
     B2DEBUG(m_debugLevel, "hitdE,dEThreshold,driftLength " << hitdE << " " << dEThreshold << " " << hitDriftLength);
 
     if (hitdE < dEThreshold) {
@@ -537,7 +561,7 @@ void CDCDigitizerModule::event()
     const double a = bwpAlign.X();
     const double b = bwpAlign.Y();
     const double c = bwpAlign.Z();
-    const TVector3 fmbAlign = fwpAlign - bwpAlign;
+    const B2Vector3D fmbAlign = fwpAlign - bwpAlign;
     const double lmn = 1. / fmbAlign.Mag();
     const double l = fmbAlign.X() * lmn;
     const double m = fmbAlign.Y() * lmn;
@@ -563,6 +587,28 @@ void CDCDigitizerModule::event()
             maxDriftL << "m_driftLength= " << m_driftLength);
 
     iterSignalMap = signalMap.find(m_wireID);
+
+    if (m_matchAllMCParticles) {
+      iterParticleMap = particleMap.find(m_wireID);
+      RelationVector<MCParticle> rels = m_aCDCSimHit->getRelationsFrom<MCParticle>();
+
+      int mcIndex = -1;
+      if (rels.size() != 0) {
+        if (rels.weight(0) > 0) {
+          const MCParticle* mcparticle = rels[0];
+          mcIndex = int(mcparticle->getIndex());
+        }
+      }
+
+      if (mcIndex >= 0) {
+        if (iterParticleMap == particleMap.end()) {
+          std::set<int> vecmc = {mcIndex};
+          particleMap.insert(make_pair(m_wireID, vecmc));
+        } else {
+          iterParticleMap->second.insert(mcIndex);
+        }
+      }
+    }
 
     if (iterSignalMap == signalMap.end()) {
       // new entry
@@ -665,6 +711,58 @@ void CDCDigitizerModule::event()
       const MCParticle* mcparticle = rels[0];
       double weight = rels.weight(0);
       mcparticle->addRelationTo(firstHit, weight);
+    }
+
+    // Set relations to all particles that created a SimHit
+    if (m_matchAllMCParticles) {
+      iterParticleMap = particleMap.find(iterSignalMap->first);
+      if (iterParticleMap != particleMap.end()) {
+        std::set<int> vv = iterParticleMap->second;
+        for (std::set<int>::iterator it = vv.begin(); it != vv.end(); ++it) {
+          // set all relations
+          int idx = *it;
+          MCParticle* part = m_mcParticles[idx - 1];
+          part->addRelationTo(firstHit, 1.0, m_OptionalAllMCParticlesToHitsName);
+        }
+      }
+    }
+
+    //set all relations to first hit if requested but dont create additional hits!
+    // relation 1
+    if (m_matchFirstMCParticles > 0) {
+      if (iterSignalMap->second.m_simHitIndex >= 0) {
+        RelationVector<MCParticle> rels1 = m_simHits[iterSignalMap->second.m_simHitIndex]->getRelationsFrom<MCParticle>();
+        if (rels1.size() != 0) {
+          //assumption: only one MCParticle
+          const MCParticle* mcparticle = rels1[0];
+          double weight = rels1.weight(0);
+          mcparticle->addRelationTo(firstHit, weight, m_OptionalFirstMCParticlesToHitsName);
+        }
+      }
+
+      // relation 2
+      if (iterSignalMap->second.m_simHitIndex2 >= 0) {
+        RelationVector<MCParticle> rels2 = m_simHits[iterSignalMap->second.m_simHitIndex2]->getRelationsFrom<MCParticle>();
+        if (rels2.size() != 0) {
+          //assumption: only one MCParticle
+          const MCParticle* mcparticle = rels2[0];
+          double weight = rels2.weight(0);
+          mcparticle->addRelationTo(firstHit, weight, m_OptionalFirstMCParticlesToHitsName);
+        }
+      }
+
+      // relation 3
+      if (iterSignalMap->second.m_simHitIndex3 >= 0) {
+        RelationVector<MCParticle> rels3 = m_simHits[iterSignalMap->second.m_simHitIndex3]->getRelationsFrom<MCParticle>();
+        if (rels3.size() != 0) {
+          //assumption: only one MCParticle
+          const MCParticle* mcparticle = rels3[0];
+          double weight = rels3.weight(0);
+          mcparticle->addRelationTo(firstHit, weight, m_OptionalFirstMCParticlesToHitsName);
+        }
+      }
+
+
     }
 
     //Set 2nd-hit related things if it exists
@@ -819,7 +917,7 @@ double CDCDigitizerModule::smearDriftLength(const double driftLength, const doub
 #endif
 
   // Smear drift length
-  double newDL = gRandom->Gaus(driftLength + mean , resolution);
+  double newDL = gRandom->Gaus(driftLength + mean, resolution);
   while (newDL <= 0.) newDL = gRandom->Gaus(driftLength + mean, resolution);
   //  cout << "totalFugeF in Digi= " << m_totalFudgeFactor << endl;
   return newDL;
@@ -907,7 +1005,7 @@ double CDCDigitizerModule::getDriftTime(const double driftLength, const bool add
   if (addDelay) {
     //calculate signal propagation length in the wire
     CDCGeometryPar::EWirePosition set = m_align ? CDCGeometryPar::c_Aligned : CDCGeometryPar::c_Base;
-    TVector3 backWirePos = m_cdcgp->wireBackwardPosition(m_wireID, set);
+    B2Vector3D backWirePos = m_cdcgp->wireBackwardPosition(m_wireID, set);
 
     double propLength = (m_posWire - backWirePos).Mag();
     //    if (m_cdcgp->getSenseWireZposMode() == 1) {
@@ -969,10 +1067,11 @@ void CDCDigitizerModule::makeSignalsAfterShapers(const WireID& wid, double dEinG
   }
 
   if (m_gasGainSmearing) {
-    //TODO: replace the following sum with a gaussian for large nElectrons if gas-gain smearing turns out to be important
-    const double nElectrons = dEInkeV / m_effWForGasGainSmearing;
+    const int nElectrons = std::round(dEInkeV / m_effWForGasGainSmearing);
     double relGain = 0;
-    if (nElectrons >= 1) {
+    if (20 <= nElectrons) {
+      relGain = std::max(0., gRandom->Gaus(1., sqrt(1. / (nElectrons * (1. + m_thetaOfPolya)))));
+    } else if (1 <= nElectrons) {
       for (int i = 1; i <= nElectrons; ++i) {
         relGain += Polya();
       }

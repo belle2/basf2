@@ -6,35 +6,34 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// THIS MODULE
+/* Own header. */
 #include <ecl/modules/eclSplitterN1/ECLSplitterN1Module.h>
 
-//STL
-#include <string>
-#include <utility>      // std::pair
-#include <algorithm>    // std::find
-
-//Root
-#include "TFile.h"
-#include "TGraph2D.h"
-#include "TH1F.h"
-
-// FRAMEWORK
-#include <framework/logging/Logger.h>
-#include <framework/utilities/FileSystem.h>
-#include <framework/geometry/B2Vector3.h>
-
-// ECL
-#include <ecl/utility/Position.h>
+/* ECL header. */
 #include <ecl/dataobjects/ECLCalDigit.h>
 #include <ecl/dataobjects/ECLConnectedRegion.h>
+#include <ecl/dataobjects/ECLElementNumbers.h>
 #include <ecl/dataobjects/ECLLocalMaximum.h>
 #include <ecl/dataobjects/ECLShower.h>
-#include <ecl/geometry/ECLNeighbours.h>
 #include <ecl/geometry/ECLGeometryPar.h>
+#include <ecl/geometry/ECLNeighbours.h>
+#include <ecl/utility/Position.h>
 
-// MDST
+/* Basf2 headers. */
+#include <framework/geometry/B2Vector3.h>
+#include <framework/logging/Logger.h>
+#include <framework/utilities/FileSystem.h>
 #include <mdst/dataobjects/EventLevelClusteringInfo.h>
+
+/* ROOT headers. */
+#include <TFile.h>
+#include <TGraph2D.h>
+#include <TH1F.h>
+
+/* C++ headers. */
+#include <algorithm>
+#include <string>
+#include <utility>
 
 // NAMESPACES
 using namespace Belle2;
@@ -43,8 +42,8 @@ using namespace ECL;
 //-----------------------------------------------------------------
 //                 Register the Module(s)
 //-----------------------------------------------------------------
-REG_MODULE(ECLSplitterN1)
-REG_MODULE(ECLSplitterN1PureCsI)
+REG_MODULE(ECLSplitterN1);
+REG_MODULE(ECLSplitterN1PureCsI);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -134,8 +133,8 @@ void ECLSplitterN1Module::initialize()
   m_NeighbourMap21 = new ECLNeighbours("NC", 2); // NC: 5x5 excluding corners = 21
 
   // initialize the vector that gives the relation between cellid and store array position
-  m_StoreArrPosition.resize(8736 + 1);
-  m_StoreArrPositionLM.resize(8736 + 1);
+  m_StoreArrPosition.resize(ECLElementNumbers::c_NCrystals + 1);
+  m_StoreArrPositionLM.resize(ECLElementNumbers::c_NCrystals + 1);
 
   // read the Background correction factors (for full background)
   m_fileBackgroundNorm = new TFile(m_fileBackgroundNormName.c_str(), "READ");
@@ -567,9 +566,9 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
           centroidShiftAverage += centroidShift.Mag();
 
           // Debugging output
-          B2DEBUG(175, "   old centroid: " << oldCentroidPos.x() << " cm, " <<  oldCentroidPos.y() << " cm, " <<  oldCentroidPos.z() <<
+          B2DEBUG(175, "   old centroid: " << oldCentroidPos.X() << " cm, " <<  oldCentroidPos.Y() << " cm, " <<  oldCentroidPos.Z() <<
                   "cm");
-          B2DEBUG(175, "   new centroid: " << newCentroidPos.x() << " cm, " <<  newCentroidPos.y() << " cm, " <<  newCentroidPos.z() <<
+          B2DEBUG(175, "   new centroid: " << newCentroidPos.X() << " cm, " <<  newCentroidPos.Y() << " cm, " <<  newCentroidPos.Z() <<
                   "cm");
           B2DEBUG(175, "   centroid shift: " << centroidShift.Mag() << " cm");
 

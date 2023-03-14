@@ -33,7 +33,7 @@ namespace Belle2 {
     {
       m_aDBObjPtr.addCallback([ this ](const std::string&) -> void {
         B2DEBUG(20, "SVDCoGOnlyPositionError: from now on we are using " <<
-        this->m_aDBObjPtr -> get_uniqueID()); });
+                this->m_aDBObjPtr -> get_uniqueID()); });
     }
 
     /** Return the position error

@@ -45,13 +45,13 @@ namespace Belle2 {
       /// Stay connected to the DataStore for timing improvement.
       StoreArray<SVDCluster> m_svdClusters;
       /// Name of array of SVDCluster.
-      std::string m_param_nameSVDClusters = "SVDClusters";
+      std::string m_nameSVDClusters = "SVDClusters";
 
       /// Strategy used to resolve overlaps.
-      std::string m_param_resolveMethod = "greedy";
+      std::string m_resolveMethod = "greedy";
 
       /// Minimum of activityState of candidate required to be accepted by the algorithm.
-      double m_param_minActivityState = 0.7;
+      double m_minActivityState = 0.7;
     };
 
   }

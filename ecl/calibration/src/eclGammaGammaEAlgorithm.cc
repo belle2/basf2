@@ -6,14 +6,19 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+/* Own header. */
 #include <ecl/calibration/eclGammaGammaEAlgorithm.h>
+
+/* ECL headers. */
+#include <ecl/dataobjects/ECLElementNumbers.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 
-#include "TH2F.h"
-#include "TFile.h"
-#include "TMath.h"
-#include "TF1.h"
-#include "TROOT.h"
+/* ROOT headers. */
+#include <TF1.h>
+#include <TFile.h>
+#include <TH2F.h>
+#include <TMath.h>
+#include <TROOT.h>
 
 using namespace std;
 using namespace Belle2;
@@ -21,6 +26,7 @@ using namespace ECL;
 
 /**-----------------------------------------------------------------------------------------------*/
 /** Novosibirsk function, plus constant H. Ikeda et al., Nuclear Instruments and Methods A 441 (2000) 401-426 */
+// cppcheck-suppress constParameter ; TF1 fit functions cannot have const parameters
 double eclGammaGammaNovoConst(double* x, double* par)
 {
   double qc = 0;
@@ -117,15 +123,17 @@ CalibrationAlgorithm::EResult eclGammaGammaEAlgorithm::calibrate()
   /**-----------------------------------------------------------------------------------------------*/
   /** Record the number of entries per crystal in the normalized energy histogram and calculate the average expected energy per crystal and calibration constants from Collector */
 
-  TH1F* IntegralVsCrysID = new TH1F("IntegralVsCrysID", "Integral of EnVsCrysID for each crystal;crystal ID;Entries", 8736, 0, 8736);
-  TH1F* AverageExpECrys = new TH1F("AverageExpECrys", "Average expected E per crys from collector;Crystal ID;Energy (GeV)", 8736, 0,
-                                   8736);
+  TH1F* IntegralVsCrysID = new TH1F("IntegralVsCrysID", "Integral of EnVsCrysID for each crystal;crystal ID;Entries",
+                                    ECLElementNumbers::c_NCrystals, 0, ECLElementNumbers::c_NCrystals);
+  TH1F* AverageExpECrys = new TH1F("AverageExpECrys", "Average expected E per crys from collector;Crystal ID;Energy (GeV)",
+                                   ECLElementNumbers::c_NCrystals, 0,
+                                   ECLElementNumbers::c_NCrystals);
   TH1F* AverageElecCalib = new TH1F("AverageElecCalib", "Average electronics calib const vs crystal;Crystal ID;Calibration constant",
-                                    8736, 0, 8736);
+                                    ECLElementNumbers::c_NCrystals, 0, ECLElementNumbers::c_NCrystals);
   TH1F* AverageInitCalib = new TH1F("AverageInitCalib", "Average initial calib const vs crystal;Crystal ID;Calibration constant",
-                                    8736, 0, 8736);
+                                    ECLElementNumbers::c_NCrystals, 0, ECLElementNumbers::c_NCrystals);
 
-  for (int crysID = 0; crysID < 8736; crysID++) {
+  for (int crysID = 0; crysID < ECLElementNumbers::c_NCrystals; crysID++) {
     TH1D* hEnergy = EnVsCrysID->ProjectionY("hEnergy", crysID + 1, crysID + 1);
     int Integral = hEnergy->Integral();
     IntegralVsCrysID->SetBinContent(crysID + 1, Integral);
@@ -184,21 +192,32 @@ CalibrationAlgorithm::EResult eclGammaGammaEAlgorithm::calibrate()
   /** Some prep for the many fits about to follow  */
 
   /** histograms to store results for database */
-  TH1F* CalibVsCrysID = new TH1F("CalibVsCrysID", "Calibration constant vs crystal ID;crystal ID;counts per GeV", 8736, 0, 8736);
-  TH1F* ExpEnergyperCrys = new TH1F("ExpEnergyperCrys", "Expected energy per crystal;Crystal ID;Peak energy (GeV)", 8736, 0, 8736);
+  TH1F* CalibVsCrysID = new TH1F("CalibVsCrysID", "Calibration constant vs crystal ID;crystal ID;counts per GeV",
+                                 ECLElementNumbers::c_NCrystals, 0, ECLElementNumbers::c_NCrystals);
+  TH1F* ExpEnergyperCrys = new TH1F("ExpEnergyperCrys", "Expected energy per crystal;Crystal ID;Peak energy (GeV)",
+                                    ECLElementNumbers::c_NCrystals, 0, ECLElementNumbers::c_NCrystals);
 
   /** Diagnostic histograms */
-  TH1F* PeakVsCrysID = new TH1F("PeakVsCrysID", "Peak of Novo fit vs crystal ID;crystal ID;Peak normalized energy", 8736, 0, 8736);
-  TH1F* EdgeVsCrysID = new TH1F("EdgeVsCrysID", "Upper edge of Novo fit vs crystal ID;crystal ID;Maximum normalized energy", 8736, 0,
-                                8736);
-  TH1F* effSigVsCrysID = new TH1F("effSigVsCrysID", "effSigma vs crystal ID;crystal ID;sigma)", 8736, 0, 8736);
-  TH1F* etaVsCrysID = new TH1F("etaVsCrysID", "eta vs crystal ID;crystal ID;Novo eta parameter", 8736, 0, 8736);
-  TH1F* constVsCrysID = new TH1F("constVsCrysID", "fit constant vs crystal ID;crystal ID;fit constant", 8736, 0, 8736);
-  TH1F* normVsCrysID = new TH1F("normVsCrysID", "Novosibirsk normalization vs crystal ID;crystal ID;normalization", 8736, 0, 8736);
-  TH1F* fitLimitVsCrysID = new TH1F("fitLimitVsCrysID", "fit range lower limit vs crystal ID;crystal ID;upper fit limit", 8736, 0,
-                                    8736);
-  TH1F* StatusVsCrysID = new TH1F("StatusVsCrysID", "Fit status vs crystal ID;crystal ID;Fit status", 8736, 0, 8736);
-  TH1F* FitProbVsCrysID = new TH1F("FitProbVsCrysID", "Fit probability vs crystal id;crystal ID;Fit probability", 8736, 0, 8736);
+  TH1F* PeakVsCrysID = new TH1F("PeakVsCrysID", "Peak of Novo fit vs crystal ID;crystal ID;Peak normalized energy",
+                                ECLElementNumbers::c_NCrystals, 0, ECLElementNumbers::c_NCrystals);
+  TH1F* EdgeVsCrysID = new TH1F("EdgeVsCrysID", "Upper edge of Novo fit vs crystal ID;crystal ID;Maximum normalized energy",
+                                ECLElementNumbers::c_NCrystals, 0,
+                                ECLElementNumbers::c_NCrystals);
+  TH1F* effSigVsCrysID = new TH1F("effSigVsCrysID", "effSigma vs crystal ID;crystal ID;sigma)", ECLElementNumbers::c_NCrystals, 0,
+                                  ECLElementNumbers::c_NCrystals);
+  TH1F* etaVsCrysID = new TH1F("etaVsCrysID", "eta vs crystal ID;crystal ID;Novo eta parameter", ECLElementNumbers::c_NCrystals, 0,
+                               ECLElementNumbers::c_NCrystals);
+  TH1F* constVsCrysID = new TH1F("constVsCrysID", "fit constant vs crystal ID;crystal ID;fit constant",
+                                 ECLElementNumbers::c_NCrystals, 0, ECLElementNumbers::c_NCrystals);
+  TH1F* normVsCrysID = new TH1F("normVsCrysID", "Novosibirsk normalization vs crystal ID;crystal ID;normalization",
+                                ECLElementNumbers::c_NCrystals, 0, ECLElementNumbers::c_NCrystals);
+  TH1F* fitLimitVsCrysID = new TH1F("fitLimitVsCrysID", "fit range lower limit vs crystal ID;crystal ID;upper fit limit",
+                                    ECLElementNumbers::c_NCrystals, 0,
+                                    ECLElementNumbers::c_NCrystals);
+  TH1F* StatusVsCrysID = new TH1F("StatusVsCrysID", "Fit status vs crystal ID;crystal ID;Fit status", ECLElementNumbers::c_NCrystals,
+                                  0, ECLElementNumbers::c_NCrystals);
+  TH1F* FitProbVsCrysID = new TH1F("FitProbVsCrysID", "Fit probability vs crystal id;crystal ID;Fit probability",
+                                   ECLElementNumbers::c_NCrystals, 0, ECLElementNumbers::c_NCrystals);
 
   /** 1D summary histograms */
   TH1F* hStatus = new TH1F("hStatus", "Fit status", 25, -5, 20);
@@ -446,7 +465,7 @@ CalibrationAlgorithm::EResult eclGammaGammaEAlgorithm::calibrate()
 
   /**---------------------------------------------------------------------------------------------*/
   /** Interpret results of fit as expected energy or calibration constant */
-  for (int crysID = 0; crysID < 8736; crysID++) {
+  for (int crysID = 0; crysID < ECLElementNumbers::c_NCrystals; crysID++) {
     int histbin = crysID + 1;
     double fitstatus = StatusVsCrysID->GetBinContent(histbin);
     double upperEdge = EdgeVsCrysID->GetBinContent(histbin);
@@ -486,7 +505,7 @@ CalibrationAlgorithm::EResult eclGammaGammaEAlgorithm::calibrate()
       /** Store expected energies */
       std::vector<float> tempE;
       std::vector<float> tempUnc;
-      for (int crysID = 0; crysID < 8736; crysID++) {
+      for (int crysID = 0; crysID < ECLElementNumbers::c_NCrystals; crysID++) {
         tempE.push_back(ExpEnergyperCrys->GetBinContent(crysID + 1));
         tempUnc.push_back(ExpEnergyperCrys->GetBinError(crysID + 1));
       }
@@ -500,7 +519,7 @@ CalibrationAlgorithm::EResult eclGammaGammaEAlgorithm::calibrate()
       /** Store calibration constants */
       std::vector<float> tempCalib;
       std::vector<float> tempCalibUnc;
-      for (int crysID = 0; crysID < 8736; crysID++) {
+      for (int crysID = 0; crysID < ECLElementNumbers::c_NCrystals; crysID++) {
         tempCalib.push_back(CalibVsCrysID->GetBinContent(crysID + 1));
         tempCalibUnc.push_back(CalibVsCrysID->GetBinError(crysID + 1));
       }

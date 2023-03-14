@@ -13,7 +13,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SVD3SamplesEmulator)
+REG_MODULE(SVD3SamplesEmulator);
 
 //-----------------------------------------------------------------
 //                 Implementation

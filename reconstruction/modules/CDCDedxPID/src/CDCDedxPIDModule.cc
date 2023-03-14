@@ -38,7 +38,7 @@ using namespace Belle2;
 using namespace CDC;
 using namespace Dedx;
 
-REG_MODULE(CDCDedxPID)
+REG_MODULE(CDCDedxPID);
 
 CDCDedxPIDModule::CDCDedxPIDModule() : Module()
 {
@@ -219,22 +219,22 @@ void CDCDedxPIDModule::event()
         const MCParticle* mother = mcpart->getMother();
         dedxTrack->m_motherPDG = mother ? mother->getPDG() : 0;
 
-        const TVector3 trueMomentum = mcpart->getMomentum();
-        dedxTrack->m_pTrue = trueMomentum.Mag();
-        dedxTrack->m_cosThetaTrue = trueMomentum.CosTheta();
+        const ROOT::Math::XYZVector trueMomentum = mcpart->getMomentum();
+        dedxTrack->m_pTrue = trueMomentum.R();
+        dedxTrack->m_cosThetaTrue = cos(trueMomentum.Theta());
       }
     } else {
       dedxTrack->m_pdg = -999;
     }
 
     // get momentum (at origin) from fit result
-    const TVector3& trackMom = fitResult->getMomentum();
-    dedxTrack->m_p = trackMom.Mag();
+    const ROOT::Math::XYZVector& trackMom = fitResult->getMomentum();
+    dedxTrack->m_p = trackMom.R();
     bool nomom = (dedxTrack->m_p != dedxTrack->m_p);
     double costh = std::cos(std::atan(1 / fitResult->getCotTheta()));
     int charge = 1;
     if (!nomom) {
-      costh = trackMom.CosTheta();
+      costh = cos(trackMom.Theta());
       charge = fitResult->getChargeSign();
     }
     dedxTrack->m_cosTheta = costh;
@@ -279,12 +279,10 @@ void CDCDedxPIDModule::event()
     // loop over all CDC hits from this track
     // Get the TrackPoints, which contain the hit information we need.
     // Then iterate over each point.
-    int tpcounter = 0;
     const std::vector< genfit::AbsTrackRep* >& gftrackRepresentations = recoTrack->getRepresentations();
     const std::vector< genfit::TrackPoint* >& gftrackPoints = recoTrack->getHitPointsWithMeasurement();
     for (std::vector< genfit::TrackPoint* >::const_iterator tp = gftrackPoints.begin();
          tp != gftrackPoints.end(); ++tp) {
-      tpcounter++;
 
       // should also be possible to use this for svd and pxd hits...
       genfit::AbsMeasurement* aAbsMeasurementPtr = (*tp)->getRawMeasurement(0);
@@ -425,10 +423,10 @@ void CDCDedxPIDModule::event()
         if (phidiff > -3.1416 && (phidiff < 0 || phidiff > 3.1416)) doca *= -1;
 
         // The opening angle of the track momentum direction
-        const double px = pocaMom.x();
-        const double py = pocaMom.y();
-        const double wx = pocaOnWire.x();
-        const double wy = pocaOnWire.y();
+        const double px = pocaMom.X();
+        const double py = pocaMom.Y();
+        const double wx = pocaOnWire.X();
+        const double wy = pocaOnWire.Y();
         const double cross = wx * py - wy * px;
         const double dot   = wx * px + wy * py;
         double entAng = atan2(cross, dot);
@@ -750,10 +748,16 @@ double CDCDedxPIDModule::I2D(const double cosTheta, const double I) const
     return I;
   }
 
-  double D = (a != 0) ? (-b + sqrt(b * b - 4.0 * a * c)) / (2.0 * a) : -c / b;
+  double discr = b * b - 4.0 * a * c;
+  if (discr < 0) {
+    B2WARNING("negative discriminant; return uncorrectecd value");
+    return I;
+  }
+
+  double D = (a != 0) ? (-b + sqrt(discr)) / (2.0 * a) : -c / b;
   if (D < 0) {
     B2WARNING("D is less 0! will try another solution");
-    D = (a != 0) ? (-b - sqrt(b * b + 4.0 * a * c)) / (2.0 * a) : -c / b;
+    D = (a != 0) ? (-b - sqrt(discr)) / (2.0 * a) : -c / b;
     if (D < 0) {
       B2WARNING("D is still less 0! just return uncorrectecd value");
       return I;

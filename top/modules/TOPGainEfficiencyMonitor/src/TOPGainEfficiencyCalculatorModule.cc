@@ -30,10 +30,10 @@
 namespace Belle2 {
 
   //-----------------------------------------------------------------
-  //                 Register the Module
+  ///                 Register the Module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPGainEfficiencyCalculator)
+  REG_MODULE(TOPGainEfficiencyCalculator);
 
 
   //-----------------------------------------------------------------
@@ -618,7 +618,6 @@ namespace Belle2 {
     return;
   }
 
-  // cppcheck-suppress constParameter
   double TOPGainEfficiencyCalculatorModule::TOPGainFunc(double* var, double* par)
   {
 

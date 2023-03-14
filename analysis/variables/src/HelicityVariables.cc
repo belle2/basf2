@@ -6,17 +6,22 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <analysis/variables/HelicityVariables.h>
+
+#include <analysis/VariableManager/Utility.h>
 
 #include <analysis/variables/EventVariables.h>
 
 #include <analysis/dataobjects/Particle.h>
 
 #include <analysis/utility/ReferenceFrame.h>
+#include <analysis/VariableManager/Manager.h>
 
 #include <framework/utilities/Conversion.h>
 #include <framework/gearbox/Const.h>
+
+#include <boost/algorithm/string.hpp>
 
 #include <Math/Boost.h>
 #include <Math/Vector4D.h>
@@ -120,165 +125,128 @@ namespace Belle2 {
     }
 
 
-    Manager::FunctionPtr cosHelicityAngleBeamMomentum(const std::vector<std::string>& arguments)
+    double cosHelicityAngleBeamMomentum(const Particle* mother, const std::vector<double>& index)
     {
-      int idau = 0;
-      if (arguments.size() == 1) {
-        try {
-          idau = Belle2::convertString<int>(arguments[0]);
-        } catch (std::invalid_argument&) {
-          B2FATAL("The argument of cosHelicityAngleWrtCMSFrame must be an integer!");
-        }
-      } else {
+      if (index.size() != 1) {
         B2FATAL("Wrong number of arguments for cosHelicityAngleIfCMSIsTheMother");
       }
-      auto func = [idau](const Particle * mother) -> double {
-        const Particle* part = mother->getDaughter(idau);
-        if (!part)
-        {
-          B2FATAL("Couldn't find the " << idau << "th daughter");
-        }
 
-        PxPyPzEVector beam4Vector(getBeamPx(nullptr), getBeamPy(nullptr), getBeamPz(nullptr), getBeamE(nullptr));
-        PxPyPzEVector part4Vector = part->get4Vector();
-        PxPyPzEVector mother4Vector = mother->get4Vector();
+      int idau = std::lround(index[0]);
 
-        B2Vector3D motherBoost = mother4Vector.BoostToCM();
+      const Particle* part = mother->getDaughter(idau);
+      if (!part) {
+        B2FATAL("Couldn't find the " << idau << "th daughter");
+      }
 
-        beam4Vector = Boost(motherBoost) * beam4Vector;
-        part4Vector = Boost(motherBoost) * part4Vector;
+      PxPyPzEVector beam4Vector(getBeamPx(nullptr), getBeamPy(nullptr), getBeamPz(nullptr), getBeamE(nullptr));
+      PxPyPzEVector part4Vector = part->get4Vector();
+      PxPyPzEVector mother4Vector = mother->get4Vector();
 
-        return - part4Vector.Vect().Dot(beam4Vector.Vect()) / part4Vector.P() / beam4Vector.P();
-      };
-      return func;
+      B2Vector3D motherBoost = mother4Vector.BoostToCM();
+
+      beam4Vector = Boost(motherBoost) * beam4Vector;
+      part4Vector = Boost(motherBoost) * part4Vector;
+
+      return - part4Vector.Vect().Dot(beam4Vector.Vect()) / part4Vector.P() / beam4Vector.P();
     }
 
 
-    Manager::FunctionPtr cosHelicityAngle(const std::vector<std::string>& arguments)
+    double cosHelicityAngle(const Particle* mother, const std::vector<double>& indices)
     {
-      int iDau = 0;
-      int iGrandDau = 0;
-      if (arguments.size() == 2) {
-        try {
-          iDau = Belle2::convertString<int>(arguments[0]);
-          iGrandDau = Belle2::convertString<int>(arguments[1]);
-        } catch (std::invalid_argument&) {
-          B2FATAL("The two arguments of cosHelicityAngleIfRefFrameIsTheDaughter must be integers!");
-        }
-      } else {
+      if (indices.size() != 2) {
         B2FATAL("Wrong number of arguments for cosHelicityAngleIfRefFrameIsTheDaughter: two are needed.");
       }
-      auto func = [iDau, iGrandDau](const Particle * mother) -> double {
 
-        const Particle* daughter = mother->getDaughter(iDau);
-        if (!daughter)
-          B2FATAL("Couldn't find the " << iDau << "th daughter.");
+      int iDau = std::lround(indices[0]);
+      int iGrandDau = std::lround(indices[1]);
 
-        const Particle* grandDaughter = daughter->getDaughter(iGrandDau);
-        if (!grandDaughter)
-          B2FATAL("Couldn't find the " << iGrandDau << "th daughter of the " << iDau << "th daughter.");
+      const Particle* daughter = mother->getDaughter(iDau);
+      if (!daughter)
+        B2FATAL("Couldn't find the " << iDau << "th daughter.");
 
+      const Particle* grandDaughter = daughter->getDaughter(iGrandDau);
+      if (!grandDaughter)
+        B2FATAL("Couldn't find the " << iGrandDau << "th daughter of the " << iDau << "th daughter.");
 
-        PxPyPzEVector mother4Vector = mother->get4Vector();
-        PxPyPzEVector daughter4Vector = daughter->get4Vector();
-        PxPyPzEVector grandDaughter4Vector = grandDaughter->get4Vector();
+      PxPyPzEVector mother4Vector = mother->get4Vector();
+      PxPyPzEVector daughter4Vector = daughter->get4Vector();
+      PxPyPzEVector grandDaughter4Vector = grandDaughter->get4Vector();
 
-        B2Vector3D daughterBoost = daughter4Vector.BoostToCM();
+      B2Vector3D daughterBoost = daughter4Vector.BoostToCM();
 
-        // We boost the momentum of the mother and of the granddaughter to the reference frame of the daughter.
-        grandDaughter4Vector = Boost(daughterBoost) * grandDaughter4Vector;
-        mother4Vector = Boost(daughterBoost) * mother4Vector;
+      // We boost the momentum of the mother and of the granddaughter to the reference frame of the daughter.
+      grandDaughter4Vector = Boost(daughterBoost) * grandDaughter4Vector;
+      mother4Vector = Boost(daughterBoost) * mother4Vector;
 
-        return - grandDaughter4Vector.Vect().Dot(mother4Vector.Vect()) / grandDaughter4Vector.P() / mother4Vector.P();
-
-      };
-      return func;
+      return - grandDaughter4Vector.Vect().Dot(mother4Vector.Vect()) / grandDaughter4Vector.P() / mother4Vector.P();
     }
 
-    Manager::FunctionPtr cosAcoplanarityAngle(const std::vector<std::string>& arguments)
+    double cosAcoplanarityAngle(const Particle* mother, const std::vector<double>& granddaughters)
     {
-      int iGrandDau1 = 0;
-      int iGrandDau2 = 0;
-      if (arguments.size() == 2) {
-        try {
-          iGrandDau1 = Belle2::convertString<int>(arguments[0]);
-          iGrandDau2 = Belle2::convertString<int>(arguments[1]);
-        } catch (std::invalid_argument&) {
-          B2FATAL("The two arguments of cosAcoplanarityAngleIfRefFrameIsTheMother must be integers!");
-        }
-      } else {
+      if (granddaughters.size() != 2) {
         B2FATAL("Wrong number of arguments for cosAcoplanarityAngleIfRefFrameIsTheMother: two are needed.");
       }
-      auto func = [iGrandDau1, iGrandDau2](const Particle * mother) -> double {
 
-        if (mother->getNDaughters() != 2)
-          B2FATAL("cosAcoplanarityAngleIfRefFrameIsTheMother: this variable works only for two-body decays.");
+      if (mother->getNDaughters() != 2)
+        B2FATAL("cosAcoplanarityAngleIfRefFrameIsTheMother: this variable works only for two-body decays.");
 
-        const Particle* daughter1 = mother-> getDaughter(0);
-        const Particle* daughter2 = mother-> getDaughter(1);
+      int iGrandDau1 = std::lround(granddaughters[0]);
+      int iGrandDau2 = std::lround(granddaughters[1]);
 
-        const Particle* grandDaughter1 = daughter1 -> getDaughter(iGrandDau1);
-        if (!grandDaughter1)
-          B2FATAL("Couldn't find the " << iGrandDau1 << "th daughter of the first daughter.");
+      const Particle* daughter1 = mother->getDaughter(0);
+      const Particle* daughter2 = mother->getDaughter(1);
 
-        const Particle* grandDaughter2 = daughter2 -> getDaughter(iGrandDau2);
-        if (!grandDaughter2)
-          B2FATAL("Couldn't find the " << iGrandDau2 << "th daughter of the second daughter.");
+      const Particle* grandDaughter1 = daughter1->getDaughter(iGrandDau1);
+      if (!grandDaughter1)
+        B2FATAL("Couldn't find the " << iGrandDau1 << "th daughter of the first daughter.");
 
-        PxPyPzEVector mother4Vector = mother->get4Vector();
-        PxPyPzEVector daughter4Vector1 = daughter1->get4Vector();
-        PxPyPzEVector daughter4Vector2 = daughter2->get4Vector();
-        PxPyPzEVector grandDaughter4Vector1 = grandDaughter1->get4Vector();
-        PxPyPzEVector grandDaughter4Vector2 = grandDaughter2->get4Vector();
+      const Particle* grandDaughter2 = daughter2->getDaughter(iGrandDau2);
+      if (!grandDaughter2)
+        B2FATAL("Couldn't find the " << iGrandDau2 << "th daughter of the second daughter.");
 
-        B2Vector3D motherBoost = mother4Vector.BoostToCM();
-        B2Vector3D daughter1Boost = daughter4Vector1.BoostToCM();
-        B2Vector3D daughter2Boost = daughter4Vector2.BoostToCM();
+      PxPyPzEVector mother4Vector = mother->get4Vector();
+      PxPyPzEVector daughter4Vector1 = daughter1->get4Vector();
+      PxPyPzEVector daughter4Vector2 = daughter2->get4Vector();
+      PxPyPzEVector grandDaughter4Vector1 = grandDaughter1->get4Vector();
+      PxPyPzEVector grandDaughter4Vector2 = grandDaughter2->get4Vector();
 
-        // Boosting daughters to reference frame of the mother
-        daughter4Vector1 = Boost(motherBoost) * daughter4Vector1;
-        daughter4Vector2 = Boost(motherBoost) * daughter4Vector2;
+      B2Vector3D motherBoost = mother4Vector.BoostToCM();
+      B2Vector3D daughter1Boost = daughter4Vector1.BoostToCM();
+      B2Vector3D daughter2Boost = daughter4Vector2.BoostToCM();
 
-        // Boosting each granddaughter to reference frame of its mother
-        grandDaughter4Vector1 = Boost(daughter1Boost) * grandDaughter4Vector1;
-        grandDaughter4Vector2 = Boost(daughter2Boost) * grandDaughter4Vector2;
+      // Boosting daughters to reference frame of the mother
+      daughter4Vector1 = Boost(motherBoost) * daughter4Vector1;
+      daughter4Vector2 = Boost(motherBoost) * daughter4Vector2;
 
-        // We calculate the normal vectors of the decay two planes
-        B2Vector3D normalVector1 = daughter4Vector1.Vect().Cross(grandDaughter4Vector1.Vect());
-        B2Vector3D normalVector2 = daughter4Vector2.Vect().Cross(grandDaughter4Vector2.Vect());
+      // Boosting each granddaughter to reference frame of its mother
+      grandDaughter4Vector1 = Boost(daughter1Boost) * grandDaughter4Vector1;
+      grandDaughter4Vector2 = Boost(daughter2Boost) * grandDaughter4Vector2;
 
-        return std::cos(normalVector1.Angle(normalVector2));
+      // We calculate the normal vectors of the decay two planes
+      B2Vector3D normalVector1 = daughter4Vector1.Vect().Cross(grandDaughter4Vector1.Vect());
+      B2Vector3D normalVector2 = daughter4Vector2.Vect().Cross(grandDaughter4Vector2.Vect());
 
-      };
-      return func;
+      return std::cos(normalVector1.Angle(normalVector2));
     }
-
 
     double cosHelicityAnglePrimary(const Particle* part)
     {
       return part->getCosHelicity();
     }
 
-    Manager::FunctionPtr cosHelicityAngleDaughter(const std::vector<std::string>& arguments)
+    double cosHelicityAngleDaughter(const Particle* part, const std::vector<double>& indices)
     {
-      int iDaughter = 0;
-      int iGrandDaughter = 0;
-      if ((arguments.size() == 0) || (arguments.size() > 2)) {
+      if ((indices.size() == 0) || (indices.size() > 2)) {
         B2FATAL("Wrong number of arguments for cosHelicityAngleDaughter: one or two are needed.");
       }
-      try {
-        iDaughter = Belle2::convertString<int>(arguments[0]);
-        if (arguments.size() == 2) {
-          iGrandDaughter = Belle2::convertString<int>(arguments[1]);
-        }
-      } catch (std::invalid_argument&) {
-        B2FATAL("The arguments of cosHelicityAngleDaughter must be integers!");
+
+      int iDaughter = std::lround(indices[0]);
+      int iGrandDaughter = 0;
+      if (indices.size() == 2) {
+        iGrandDaughter = std::lround(indices[1]);
       }
 
-      auto func = [iDaughter, iGrandDaughter](const Particle * part) -> double {
-        return part->getCosHelicityDaughter(iDaughter, iGrandDaughter);
-      };
-      return func;
+      return part->getCosHelicityDaughter(iDaughter, iGrandDaughter);
     }
 
     double acoplanarityAngle(const Particle* part)
@@ -287,11 +255,82 @@ namespace Belle2 {
     }
 
 
+    double cosHelicityAngleForQuasiTwoBodyDecay(const Particle* mother, const std::vector<double>& indices)
+    {
+      if (indices.size() != 2) {
+        B2FATAL("Wrong number of arguments for cosHelicityAngleForQuasiTwoBodyDecay: two are needed.");
+      }
+
+      if (mother->getNDaughters() != 3)
+        return std::numeric_limits<float>::quiet_NaN();
+
+      int iDau = std::lround(indices[0]);
+      int jDau = std::lround(indices[1]);
+
+      const Particle* iDaughter = mother->getDaughter(iDau);
+      if (!iDaughter)
+        return std::numeric_limits<float>::quiet_NaN();
+
+      const Particle* jDaughter = mother->getDaughter(jDau);
+      if (!jDaughter)
+        return std::numeric_limits<float>::quiet_NaN();
+
+      PxPyPzEVector mother4Vector = mother->get4Vector();
+      PxPyPzEVector iDaughter4Vector = iDaughter->get4Vector();
+      PxPyPzEVector jDaughter4Vector = jDaughter->get4Vector();
+
+      PxPyPzEVector resonance4Vector = iDaughter4Vector + jDaughter4Vector;
+      B2Vector3D resonanceBoost = resonance4Vector.BoostToCM();
+
+      iDaughter4Vector = Boost(resonanceBoost) * iDaughter4Vector;
+      mother4Vector = Boost(resonanceBoost) * mother4Vector;
+
+      return - iDaughter4Vector.Vect().Dot(mother4Vector.Vect()) / iDaughter4Vector.P() / mother4Vector.P();
+    }
+
+    Manager::FunctionPtr momentaTripleProduct(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() != 3) {
+        B2FATAL("Wrong number of arguments for momentaTripleProduct: three (particles) are needed.");
+      }
+
+      // wrap with func and return it
+      auto func = [arguments](const Particle * mother) -> double {
+        auto iDau = arguments[0];
+        auto jDau = arguments[1];
+        auto kDau = arguments[2];
+
+        const Particle* iDaughter = mother->getParticleFromGeneralizedIndexString(iDau);
+        if (!iDaughter) B2FATAL("Couldn't find the " << iDau << "th daughter.");
+        const Particle* jDaughter =  mother->getParticleFromGeneralizedIndexString(jDau);
+        if (!jDaughter) B2FATAL("Couldn't find the " << jDau << "th daughter.");
+        const Particle* kDaughter =  mother->getParticleFromGeneralizedIndexString(kDau);
+        if (!kDaughter) B2FATAL("Couldn't find the " << kDau << "th daughter.");
+
+        PxPyPzEVector mother4Vector = mother->get4Vector();
+        PxPyPzEVector iDaughter4Vector = iDaughter->get4Vector();
+        PxPyPzEVector jDaughter4Vector = jDaughter->get4Vector();
+        PxPyPzEVector kDaughter4Vector = kDaughter->get4Vector();
+
+        B2Vector3D motherBoost = mother4Vector.BoostToCM();
+
+        // We boost the momenta of offspring to the reference frame of the mother.
+        iDaughter4Vector = Boost(motherBoost) * iDaughter4Vector;
+        jDaughter4Vector = Boost(motherBoost) * jDaughter4Vector;
+        kDaughter4Vector = Boost(motherBoost) * kDaughter4Vector;
+
+        // cross product: p_j x p_k
+        B2Vector3D jkDaughterCrossProduct = jDaughter4Vector.Vect().Cross(kDaughter4Vector.Vect());
+        // triple product: p_i * (p_j x p_k)
+        return iDaughter4Vector.Vect().Dot(jkDaughterCrossProduct) ;
+      };
+      return func;
+    }
+
+
     VARIABLE_GROUP("Helicity variables");
 
-    REGISTER_VARIABLE("cosHelicityAngleMomentum",
-                      cosHelicityAngleMomentum,
-                      R"DOC(
+    REGISTER_VARIABLE("cosHelicityAngleMomentum", cosHelicityAngleMomentum, R"DOC(
                       If the given particle has two daughters: cosine of the angle between the line defined by the momentum difference of the two daughters
                       in the frame of the given particle (mother)
                       and the momentum of the given particle in the lab frame.
@@ -302,25 +341,20 @@ namespace Belle2 {
 
                       Otherwise, it returns 0.)DOC");
 
-    REGISTER_VARIABLE("cosHelicityAngleMomentumPi0Dalitz",
-                      cosHelicityAngleMomentumPi0Dalitz,
-                      R"DOC(
+    REGISTER_VARIABLE("cosHelicityAngleMomentumPi0Dalitz", cosHelicityAngleMomentumPi0Dalitz, R"DOC(
                       To be used for the decay :math:`\pi^0 \to e^+ e^- \gamma`: 
                       cosine of the angle between the momentum of the gamma in the frame of the given particle (mother)
                       and the momentum of the given particle in the lab frame.
 
                       Otherwise, it returns 0.)DOC");
 
-    REGISTER_METAVARIABLE("cosHelicityAngleBeamMomentum(i)", cosHelicityAngleBeamMomentum,
-                          R"DOC(
+    REGISTER_VARIABLE("cosHelicityAngleBeamMomentum(i)", cosHelicityAngleBeamMomentum, R"DOC(
                       Cosine of the helicity angle of the :math:`i`-th daughter of the particle provided,
                       assuming that the mother of the provided particle corresponds to the centre-of-mass system, whose parameters are
-                      automatically loaded by the function, given the accelerator's conditions.)DOC",
-                          Manager::VariableDataType::c_double);
+                      automatically loaded by the function, given the accelerator's conditions.)DOC");
 
-    REGISTER_METAVARIABLE("cosHelicityAngle(i, j)", cosHelicityAngle,
-                          R"DOC(
-                      Cosine of the helicity angle between the momentum of the provided particle and the momentum of the selected granddaughter
+    REGISTER_VARIABLE("cosHelicityAngle(i, j)", cosHelicityAngle, R"DOC(
+                      Cosine of the helicity angle between the momentum of the selected granddaughter and the direction opposite to the momentum of the provided particle 
                       in the reference frame of the selected daughter (:math:`\theta_1` and :math:`\theta_2` in the
                       `PDG <https://journals.aps.org/prd/abstract/10.1103/PhysRevD.98.030001>`_ 2018, p. 722).
 
@@ -328,14 +362,12 @@ namespace Belle2 {
 
                       For example, in the decay :math:`B^0 \to \left(J/\psi \to \mu^+ \mu^-\right) \left(K^{*0} \to K^+ \pi^-\right)`, 
                       if the provided particle is :math:`B^0` and the selected indices are (0, 0),
-                      the variable will return the angle between the momentum of the :math:`B^0` and the momentum of the :math:`\mu^+`,
-                      both momenta in the rest frame of the :math:`J/\psi`.
+                      the variable will return the angle between the momentum of the :math:`\mu^+` and the direction opposite to the momentum of 
+                      the :math:`B^0`, both momenta in the rest frame of the :math:`J/\psi`.
 
-                      This variable is needed for angular analyses of :math:`B`-meson decays into two vector particles.)DOC",
-                          Manager::VariableDataType::c_double);
+                      This variable is needed for angular analyses of :math:`B`-meson decays into two vector particles.)DOC");
 
-    REGISTER_METAVARIABLE("cosAcoplanarityAngle(i, j)", cosAcoplanarityAngle,
-                          R"DOC(
+    REGISTER_VARIABLE("cosAcoplanarityAngle(i, j)", cosAcoplanarityAngle, R"DOC(
                       Cosine of the acoplanarity angle (:math:`\Phi` in the `PDG Polarization Review <http://pdg.lbl.gov/2019/reviews/rpp2018-rev-b-decays-polarization.pdf>`_).
                       Given a two-body decay, the acoplanarity angle is defined as
                       the angle between the two decay planes in the reference frame of the mother. 
@@ -348,16 +380,13 @@ namespace Belle2 {
                       second granddaughter. 
 
                       For example, in the decay :math:`B^0 \to \left(J/\psi \to \mu^+ \mu^-\right) \left(K^{*0} \to K^+ \pi^-\right)`, if the provided particle is :math:`B^0` and the selected indices are (0, 0),
-                      the variable will return the acoplanarity using the :math:`\mu^+` and the :math:`K^+` granddaughters.)DOC",
-                          Manager::VariableDataType::c_double);
+                      the variable will return the acoplanarity using the :math:`\mu^+` and the :math:`K^+` granddaughters.)DOC");
 
-    REGISTER_VARIABLE("cosHelicityAnglePrimary", cosHelicityAnglePrimary,
-                      R"DOC(
+    REGISTER_VARIABLE("cosHelicityAnglePrimary", cosHelicityAnglePrimary, R"DOC(
                       Cosine of the helicity angle (see``Particle::getCosHelicity``) assuming the center of mass system as mother rest frame.
                       See `PDG Polarization Review <http://pdg.lbl.gov/2019/reviews/rpp2018-rev-b-decays-polarization.pdf>`_ for the definition of the helicity angle.)DOC");
 
-    REGISTER_METAVARIABLE("cosHelicityAngleDaughter(i [, j] )", cosHelicityAngleDaughter,
-                          R"DOC(
+    REGISTER_VARIABLE("cosHelicityAngleDaughter(i [, j] )", cosHelicityAngleDaughter, R"DOC(
                       Cosine of the helicity angle of the i-th daughter (see ``Particle::getCosHelicityDaughter``).
                       The optional second argument is the index of the granddaughter that defines the angle, default is 0.
 
@@ -366,13 +395,30 @@ namespace Belle2 {
                       If the selected index is 1 the variable will return the helicity angle of the :math:`K^+` (defined via the rest frame of the :math:`K^{*0}`).
                       In rare cases if one wanted the helicity angle of the second granddaughter, indices 1,1 would return the helicity angle of the :math:`\pi^-`).
 
-                      See `PDG Polarization Review <http://pdg.lbl.gov/2019/reviews/rpp2018-rev-b-decays-polarization.pdf>`_ for the definition of the helicity angle.)DOC",
-                          Manager::VariableDataType::c_double);
+                      See `PDG Polarization Review <http://pdg.lbl.gov/2019/reviews/rpp2018-rev-b-decays-polarization.pdf>`_ for the definition of the helicity angle.)DOC");
 
-    REGISTER_VARIABLE("acoplanarityAngle", acoplanarityAngle,
-                      R"DOC(
-                      Acoplanarity angle (see ``Particle::getAcoplanarity``) assuming a two body decay of the particle and its daughters.
-                      See `PDG Polarization Review <http://pdg.lbl.gov/2019/reviews/rpp2018-rev-b-decays-polarization.pdf>`_ for the definition of the acoplanarity angle.)DOC");
+    REGISTER_VARIABLE("acoplanarityAngle", acoplanarityAngle, R"DOC(
+Acoplanarity angle (see ``Particle::getAcoplanarity``) assuming a two body decay of the particle and its daughters.
+See `PDG Polarization Review <http://pdg.lbl.gov/2019/reviews/rpp2018-rev-b-decays-polarization.pdf>`_ for the definition of the acoplanarity angle.
+
+)DOC", "rad");
+
+    REGISTER_VARIABLE("cosHelicityAngleForQuasiTwoBodyDecay(i, j)", cosHelicityAngleForQuasiTwoBodyDecay, R"DOC(
+                      Cosine of the helicity angle between the momentum of the provided particle and the momentum of the first selected
+                      daughter (i-th) in the reference frame of the sum of two selected daughters (i-th + j-th).
+
+                      The variable is supposed to be used for the analysis of a quasi-two-body decay. The number of daughters of the given 
+                      particle must be three. Otherwise, the variable returns NaN.
+
+                      For example, in the decay :math:`\bar{B}^0 \to D^+ K^- K^{*0}`, if the provided particle is :math:`\bar{B}^0` and
+                      the selected indices are (1, 2), the variable will return the angle between the momentum of the :math:`\bar{B}^0` 
+                      and the momentum of the :math:`K^-`, both momenta in the rest frame of the :math:`K^- K^{*0}`.)DOC");
+
+    REGISTER_METAVARIABLE("momentaTripleProduct(i,j,k)", momentaTripleProduct, R"DOC(
+a triple-product of three momenta of offspring in the mother rest frame: :math:`C_T=\vec{p}_i\cdot(\vec{p}_j\times\vec{p}_k)`. For examples,
+In a four-body decay M->D1D2D3D4, momentaTripleProduct(0,1,2) returns CT using the momenta of D1D2D3 particles. 
+In other decays involving secondary decay, e.g. for M->(R->D1D2)D3D4, momentaTripleProduct(0:0,1,2) returns C_T using momenta of D1D3D4 particles.
+)DOC", Manager::VariableDataType::c_double); 
 
   }
 }

@@ -32,7 +32,7 @@ using namespace Pythia8;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(Fragmentation)
+REG_MODULE(Fragmentation);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -143,6 +143,10 @@ void FragmentationModule::initialize()
       B2INFO("Using non-standard DECAY file \"" << m_DecFile << "\"");
     }
     evtgen = new EvtGenDecays(m_Pythia, evtGen);
+    // Set signal particle suffix.
+    // Signal particle names must end in "sig" in user decay file.
+    evtgen->signalSuffix = "sig";
+    // Read the user decay file.
     evtgen->readDecayFile(m_UserDecFile);
     // Workaround for Pythia bug. It is the only way to call
     // EvtGenDecays::updateData(true) to disable particle decays
@@ -358,7 +362,7 @@ int FragmentationModule::addParticleToPYTHIA(const MCParticle& mcParticle)
 
   //get some basic kinematics
   const double mass   = mcParticle.getMass();
-  const TVector3& p   = mcParticle.getMomentum();
+  const ROOT::Math::XYZVector& p   = mcParticle.getMomentum();
   const double energy = sqrt(mass * mass + p.Mag2());
 
   //add this (anti)quark to the m_PythiaEvent

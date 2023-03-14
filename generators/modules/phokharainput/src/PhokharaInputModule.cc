@@ -18,7 +18,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(PhokharaInput)
+REG_MODULE(PhokharaInput);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -39,13 +39,13 @@ PhokharaInputModule::PhokharaInputModule() : Module(), m_initial(BeamParameters:
   addParam("Epsilon", m_epsilon, "Soft/hard photon separator", 0.0001);
   addParam("nMaxTrials", m_nMaxTrials, "Maximum trials per event", 10000);
   addParam("Weighted", m_weighted, "generate weighted events", 0);
-
-  addParam("LO", m_LO, "ph0  Born: 1ph(0), Born: 0ph(1), only Born: 0ph(-1)", 0);
+  addParam("LO", m_LO, "ph0 Born: 1ph(0), Born: 0ph(1), only Born: 0ph(-1)", 0);
   addParam("NLO", m_NLO, "1 photon : Born(0), NLO(1)", 0);
   addParam("FullNLO", m_fullNLO, "full NLO : No(0), Yes(1). Allowed only for ph0=1, nlo=1, fsr=2, fsrnlo=1", 0);
   addParam("QED", m_QED, "ISR only(0, default), ISR+FSR(1), ISR+INT+FSR(2)", 0);
   addParam("IFSNLO", m_IFSNLO, "IFSNLO: no(0), yes(1)", 0);
-  addParam("Alpha", m_alpha, "Vacuum polarization switch: off (0), on (1,[by Fred Jegerlehner], default), on (2,[by Thomas Teubner])",
+  addParam("Alpha", m_alpha,
+           "Vacuum polarization switch: off (0), on (1, [by Fred Jegerlehner], default), on (2, [by Thomas Teubner])",
            1);
   addParam("PionFF", m_pionff, "Pion FF: KS PionFormFactor(0, default), GS old 1), GS new(2)", 0);
   addParam("PionStructure", m_pionstructure,
@@ -68,25 +68,20 @@ PhokharaInputModule::PhokharaInputModule() : Module(), m_initial(BeamParameters:
                180.0));
 
   addParam("MinInvMassHadronsGamma", m_MinInvMassHadronsGamma, "Minimal hadrons/muons-gamma invariant mass squared [GeV^2]", 0.0);
-  addParam("MinInvMassHadrons", m_MinInvMassHadrons, "Minimal hadrons/muons invariant mass squared [GeV^2]", 0.2);
+  addParam("MinInvMassHadrons", m_MinInvMassHadrons, "Minimal hadrons/muons invariant mass squared [GeV^2]", 0.01);
   addParam("ForceMinInvMassHadronsCut", m_ForceMinInvMassHadronsCut,
-           "Force application of the MinInvMassHadrons cut "
-           "It is ignored by PHOKHARA with LO = 1, NLO = 1.",
+           "Force application of the MinInvMassHadrons cut. It is ignored by PHOKHARA with LO = 1, NLO = 1.",
            false);
   addParam("MaxInvMassHadrons", m_MaxInvMassHadrons, "Maximal hadrons/muons invariant mass squared [GeV^2]", 112.0);
   addParam("MinEnergyGamma", m_MinEnergyGamma, "Minimal photon energy/missing energy, must be greater than 0.0098 * CMS energy [GeV]",
            0.15);
-
   const std::string defaultParameterFile =
     FileSystem::findFile("/data/generators/phokhara/const_and_model_paramall10.0.dat");
   addParam("ParameterFile", m_ParameterFile,
            "File that contains particle properties.",
            defaultParameterFile);
   addParam("BeamEnergySpread", m_BeamEnergySpread,
-           "Simulate beam-energy spread (initializes PHOKHARA for every "
-           "event - very slow).", false);
-//   addParam("InputFile", m_InputFile, "File that contain input configuration", FileSystem::findFile("/data/generators/phokhara/input_9.1.dat"));
-
+           "Simulate beam-energy spread (initializes PHOKHARA for every event - very slow).", false);
 }
 
 //-----------------------------------------------------------------
@@ -164,7 +159,7 @@ void PhokharaInputModule::event()
   ROOT::Math::LorentzRotation boost = initial.getCMSToLab();
 
   // vertex
-  TVector3 vertex = initial.getVertex();
+  ROOT::Math::XYZVector vertex = initial.getVertex();
 
   m_mcGraph.clear();
   if (m_BeamEnergySpread) {

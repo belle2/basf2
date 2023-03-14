@@ -29,6 +29,19 @@ AbstractDBObject::~AbstractDBObject()
   reset();
 }
 
+const AbstractDBObject& AbstractDBObject::operator=(
+  const AbstractDBObject& object)
+{
+  Serializable::operator=(object);
+  m_index = object.m_index;
+  m_path = object.m_path;
+  m_id = object.m_id;
+  m_name = object.m_name;
+  m_name_v = object.m_name_v;
+  m_pro_m = object.m_pro_m;
+  return *this;
+}
+
 void AbstractDBObject::reset()
 {
   m_path = "";

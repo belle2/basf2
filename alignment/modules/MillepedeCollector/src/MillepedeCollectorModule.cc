@@ -53,7 +53,7 @@ using namespace alignment;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(MillepedeCollector)
+REG_MODULE(MillepedeCollector);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -1321,14 +1321,14 @@ std::pair<TMatrixD, TMatrixD> MillepedeCollectorModule::getTwoBodyToLocalTransfo
   // One momentum has opposite direction (otherwise should be same in CMS of mother), but which?
   double sign = 1.;
   auto avgMom = 0.5 * (mom1 - mom2);
-  if (avgMom.z() < 0.) {
+  if (avgMom.Z() < 0.) {
     avgMom *= -1.;
     // switch meaning of plus/minus trajectories
     sign = -1.;
   }
 
-  double theta = atan2(avgMom.rho(), avgMom.z());
-  double phi = atan2(avgMom.y(), avgMom.x());
+  double theta = atan2(avgMom.rho(), avgMom.Z());
+  double phi = atan2(avgMom.Y(), avgMom.X());
   if (phi < 0.) phi += 2. * TMath::Pi();
 
   double alpha = M / 2. / m;

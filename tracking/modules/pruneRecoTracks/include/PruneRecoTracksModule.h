@@ -10,6 +10,8 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/SelectSubset.h>
 #include <tracking/dataobjects/RecoHitInformation.h>
+#include <framework/datastore/StoreArray.h>
+#include <tracking/dataobjects/RecoTrack.h>
 
 /**
  * This module calls RecoTrack::prune to remove hits before
@@ -41,6 +43,9 @@ namespace Belle2 {
 
     /// Remove pruned reco hits or leave this for PruneRecoHitsModule
     bool m_do_remove_hits{false};
+
+    StoreArray<RecoTrack> m_RecoTracks; /**< RecoTracks StoreArray */
+    StoreArray<RecoHitInformation> m_RecoHitInformations; /**< RecoHitInformations StoreArray */
 
   }; // end class
 } // end namespace Belle2

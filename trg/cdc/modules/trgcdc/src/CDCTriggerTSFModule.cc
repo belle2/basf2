@@ -9,6 +9,7 @@
 
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <cdc/dataobjects/CDCRawHit.h>
+#include <cdc/dataobjects/WireID.h>
 #include <mdst/dataobjects/MCParticle.h>
 
 #include <cdc/geometry/CDCGeometryPar.h>
@@ -75,7 +76,15 @@ CDCTriggerTSFModule::CDCTriggerTSFModule() : Module::Module()
   addParam("Crosstalk_tdcfilter",
            m_crosstalk_tdcfilter,
            "TDC based crosstalk filtering logic on CDCFE. True:enable False:disable",
-           true);
+           false);
+  addParam("ADC_cut_enable",
+           m_adcflag,
+           "remove hits with lower ADC than cut threshold. True:enable False:disable",
+           false);
+  addParam("ADC_cut_threshold",
+           m_adccut,
+           "Threshold for the adc cut.  Default: -1",
+           -1);
 }
 
 void
@@ -114,7 +123,6 @@ CDCTriggerTSFModule::initialize()
   int is = -1;
   int ias = -1;
   int iss = -1;
-  /* cppcheck-suppress variableScope */
   unsigned axialStereoLayerId;
   unsigned axialStereoSuperLayerId = 0;
   unsigned nWires = 0;
@@ -189,38 +197,38 @@ CDCTriggerTSFModule::initialize()
   const int shape[2][30] = {
     {
       -2, 0, // relative layer id, relative wire id
-      -1, -1,
-      -1, 0,
-      0, -1,
-      0, 0,
-      0, 1,
-      1, -2,
-      1, -1,
-      1, 0,
-      1, 1,
-      2, -2,
-      2, -1,
-      2, 0,
-      2, 1,
-      2, 2
-    },
+        -1, -1,
+        -1, 0,
+        0, -1,
+        0, 0,
+        0, 1,
+        1, -2,
+        1, -1,
+        1, 0,
+        1, 1,
+        2, -2,
+        2, -1,
+        2, 0,
+        2, 1,
+        2, 2
+      },
     {
       -2, -1,
-      -2, 0,
-      -2, 1,
-      -1, -1,
-      -1, 0,
-      0, 0,
-      1, -1,
-      1, 0,
-      2, -1,
-      2, 0,
-      2, 1,
-      0, 0,
-      0, 0,
-      0, 0,
-      0, 0
-    }
+        -2, 0,
+        -2, 1,
+        -1, -1,
+        -1, 0,
+        0, 0,
+        1, -1,
+        1, 0,
+        2, -1,
+        2, 0,
+        2, 1,
+        0, 0,
+        0, 0,
+        0, 0,
+        0, 0
+      }
   };
   const int layerOffset[2] = {5, 2};
   unsigned id = 0;
@@ -329,19 +337,18 @@ CDCTriggerTSFModule::event()
 
   if (m_crosstalk_tdcfilter) {
     //check number of hits in each asic
-    int ncdchit_asic[500][6] = {0};
+    int ncdchit_asic[500][6] = {{0}};
     vector<int> id_ncdchit_asic[500][6];
     for (int i = 0; i < m_cdcHits.getEntries(); ++i) {
-      RelationVector<CDCRawHit> cdcrawHits = m_cdcHits[i]->getRelationsTo<CDCRawHit>();
-      if (cdcrawHits.size() > 0) {
-        CDCRawHit* cdcrawhit = cdcrawHits[0];
-        int boardid = cdcrawhit->getBoardId();
-        int fechid = cdcrawhit->getFEChannel();
-        int asicid = fechid / 8;
-        if (boardid >= 0 && boardid < 500 && asicid >= 0 && asicid < 6) {
-          ncdchit_asic[boardid][asicid]++;
-          id_ncdchit_asic[boardid][asicid].push_back(i);
-        }
+      UChar_t lay = m_cdcHits[i]->getICLayer();
+      UShort_t IWire = m_cdcHits[i]->getIWire();
+      WireID wireid(lay, IWire);
+      int boardid = cdc.getBoardID(wireid);
+      int fechid = cdc.getChannelID(wireid);
+      int asicid = fechid / 8;
+      if (boardid >= 0 && boardid < 500 && asicid >= 0 && asicid < 6) {
+        ncdchit_asic[boardid][asicid]++;
+        id_ncdchit_asic[boardid][asicid].push_back(i);
       }
     }
     //check 16ns time coinsidence if >=4 hits are found in the same asic
@@ -355,16 +362,18 @@ CDCTriggerTSFModule::event()
           }
           std::sort(tdc_asic.begin(), tdc_asic.end());
           for (int ncoin = ncdchit_asic[i][j]; ncoin >= 4; ncoin--) {
+            bool breakOuterLoop = false;
             for (int k = 0; k < ncdchit_asic[i][j] - ncoin; k++) {
               if (tdc_asic[k + ncoin - 1] - tdc_asic[k] <= 16) {
                 for (int l = k; l < k + ncoin - 1; l++) {
                   filtered_hit[id_ncdchit_asic[i][j][l]] = 1;
                 }
-                //break loop
-                ncoin = 0;
-                k = 8;
+                breakOuterLoop = true;
+                break;
               }
             }
+            if (breakOuterLoop)
+              break;
           }
           tdc_asic.clear();
         }
@@ -384,6 +393,11 @@ CDCTriggerTSFModule::event()
     }
     // skim crosstalk hit
     if (filtered_hit[i] == 1)continue;
+
+    // remove hits with low ADC
+    if (m_adcflag) {
+      if (h.getADCCount() < m_adccut)continue;
+    }
 
     TRGCDCWire& w =
       (TRGCDCWire&) superLayers[h.getISuperLayer()][h.getILayer()]->cell(h.getIWire());

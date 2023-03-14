@@ -20,6 +20,6 @@ REG_MODULE(FullGridChi2TrackTimeExtractor);
 REG_MODULE(FullGridDriftLengthTrackTimeExtractor);
 
 CDCHitBasedT0ExtractionModule::CDCHitBasedT0ExtractionModule()
-  : Super( {"CDCWireHitVector"})
+  : Super({"CDCWireHitVector"})
 {
 }

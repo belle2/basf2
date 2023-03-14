@@ -1,0 +1,31 @@
+# EventType: 1120024100 
+# Descriptor: [B0 -> rho- K_0*+]cc
+# NickName: Bd_rhoK_0sta
+# Documentation: 2 Body charmless process 
+# Reponsible: Yu Nakazawa
+# Email: nakancyo@post.kek.jp
+# Tested: yes
+# PhysicsWG: BToCharmless
+# Cuts: None
+# Date: 29/04/2022
+#
+#
+#
+Decay Upsilon(4S)
+1.0     B0sig anti-B0sig B0 anti-B0			VSS_BMIX dm;
+Enddecay
+### 
+### 
+### 
+Decay B0sig
+0.5  rho-  K_0*+        PHOTOS SVS;
+0.5  rho+  K_0*-        PHOTOS SVS;
+Enddecay
+CDecay anti-B0sig
+###
+###
+###
+###
+###
+End
+

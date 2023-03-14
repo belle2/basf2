@@ -1,0 +1,30 @@
+# EventType: 1122841103
+# Descriptor: [B0 -> X(3872) [ -> psi(2S) [ -> l+ l-] gamma ] KS0 ]cc
+# NickName: Bd_X(3872)KS_Psi2Sg_l+l-
+# Documentation:
+# Tested: yes
+# Physics WG: Quarkonium
+# Responsible: Sourabh Chutia
+# Email: ph21070@iisermohali.ac.in
+# Cuts: None
+# Date: 20230202
+# Comments:
+
+Decay Upsilon(4S)
+1.0    B0  anti-B0  B0sig  anti-B0sig     VSS_BMIX dm;
+Enddecay
+
+Decay B0sig
+1.000 X_1(3872)sig K_S0   SVS;
+Enddecay
+CDecay anti-B0sig
+
+Decay X_1(3872)sig
+1.000 psi(2S)sig  gamma   VVP 1.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0;
+Enddecay
+
+Decay psi(2S)sig
+0.4000 e+ e-  PHOTOS VLL ;
+0.4000 mu+ mu- PHOTOS VLL ;
+Enddecay
+End

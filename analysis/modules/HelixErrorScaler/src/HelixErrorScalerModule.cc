@@ -23,7 +23,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(HelixErrorScaler)
+REG_MODULE(HelixErrorScaler);
 
 //-----------------------------------------------------------------
 //                 Implementation

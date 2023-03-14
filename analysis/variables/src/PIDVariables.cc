@@ -6,16 +6,22 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <analysis/variables/PIDVariables.h>
 
 #include <analysis/dataobjects/Particle.h>
+#include <analysis/utility/ReferenceFrame.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
 
 // framework aux
 #include <framework/logging/Logger.h>
 #include <framework/utilities/Conversion.h>
 #include <framework/gearbox/Const.h>
+
+// database
+//#include <framework/database/DBObjPtr.h>
+#include <analysis/dbobjects/PIDCalibrationWeight.h>
+#include <analysis/utility/PIDCalibrationWeightUtil.h>
 
 #include <boost/algorithm/string.hpp>
 
@@ -124,7 +130,7 @@ namespace Belle2 {
         const PIDLikelihood* pid = part->getPIDLikelihood();
         if (!pid)
           return std::numeric_limits<float>::quiet_NaN();
-        // No information form any subdetector in the list
+        // No information from any subdetector in the list
         if (pid->getLogL(hypType, detectorSet) == 0)
           return std::numeric_limits<float>::quiet_NaN();
 
@@ -163,7 +169,7 @@ namespace Belle2 {
       auto func = [hypType, testType, detectorSet](const Particle * part) -> double {
         const PIDLikelihood* pid = part->getPIDLikelihood();
         if (!pid) return std::numeric_limits<float>::quiet_NaN();
-        // No information form any subdetector in the list
+        // No information from any subdetector in the list
         if (pid->getLogL(hypType, detectorSet) == 0)
           return std::numeric_limits<float>::quiet_NaN();
 
@@ -267,34 +273,227 @@ namespace Belle2 {
       return func;
     }
 
+    Manager::FunctionPtr pidWeightedLogLikelihoodValueExpert(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() < 3) {
+        B2ERROR("Need at least three arguments to pidWeightedLogLikelihoodValueExpert");
+        return nullptr;
+      }
+      std::string matrixName = arguments[0];
+
+      int pdgCode;
+      try {
+        pdgCode = Belle2::convertString<int>(arguments[1]);
+      } catch (std::invalid_argument& e) {
+        B2ERROR("Second argument of pidWeightedLogLikelihoodValueExpert must be a PDG code");
+        return nullptr;
+      }
+      std::vector<std::string> detectors(arguments.begin() + 2, arguments.end());
+      Const::PIDDetectorSet detectorSet = parseDetectors(detectors);
+      auto hypType = Const::ChargedStable(abs(pdgCode));
+
+      auto func = [hypType, detectorSet, matrixName](const Particle * part) -> double {
+        PIDCalibrationWeightUtil weightMatrix(matrixName);
+        const PIDLikelihood* pid = part->getPIDLikelihood();
+        if (!pid)
+          return std::numeric_limits<float>::quiet_NaN();
+        // No information from any subdetector in the list
+        if (pid->getLogL(hypType, detectorSet) == 0)
+          return std::numeric_limits<float>::quiet_NaN();
+
+        const auto& frame = ReferenceFrame::GetCurrent();
+        auto mom = frame.getMomentum(part);
+        auto p = mom.P();
+        auto theta = mom.Theta();
+
+        double LogL = 0;
+        for (const Const::EDetector& detector : Const::PIDDetectorSet::set())
+        {
+          if (detectorSet.contains(detector))
+            LogL += pid->getLogL(hypType, detector) * weightMatrix.getWeight(hypType.getPDGCode(), detector, p, theta);
+        }
+        return LogL;
+      };
+
+      return func;
+    }
+
+    Manager::FunctionPtr pidWeightedProbabilityExpert(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() < 3) {
+        B2ERROR("Need at least three arguments for pidWeightedProbabilityExpert");
+        return nullptr;
+      }
+      std::string matrixName = arguments[0];
+
+      int pdgCodeHyp = 0;
+      try {
+        pdgCodeHyp = Belle2::convertString<int>(arguments[1]);
+      } catch (std::invalid_argument& e) {
+        B2ERROR("Second argument of pidWeightedProbabilityExpert must be PDG code");
+        return nullptr;
+      }
+
+      std::vector<std::string> detectors(arguments.begin() + 2, arguments.end());
+      Const::PIDDetectorSet detectorSet = parseDetectors(detectors);
+      auto hypType = Const::ChargedStable(abs(pdgCodeHyp));
+
+      auto func = [hypType, detectorSet, matrixName](const Particle * part) -> double {
+        PIDCalibrationWeightUtil weightMatrix(matrixName);
+        const PIDLikelihood* pid = part->getPIDLikelihood();
+        if (!pid) return std::numeric_limits<float>::quiet_NaN();
+        // No information from any subdetector in the list
+        if (pid->getLogL(hypType, detectorSet) == 0)
+          return std::numeric_limits<float>::quiet_NaN();
+
+        const auto& frame = ReferenceFrame::GetCurrent();
+        auto mom = frame.getMomentum(part);
+        auto p = mom.P();
+        auto theta = mom.Theta();
+
+        double LogL[Const::ChargedStable::c_SetSize];
+        double LogL_max = 0;
+        bool hasMax = false;
+        for (const auto& pdgIter : Const::chargedStableSet)
+        {
+          const int index_pdg = pdgIter.getIndex();
+
+          LogL[index_pdg] = 0;
+          for (const Const::EDetector& detector : Const::PIDDetectorSet::set()) {
+            if (detectorSet.contains(detector))
+              LogL[index_pdg] += pid->getLogL(pdgIter, detector) * weightMatrix.getWeight(pdgIter.getPDGCode(), detector, p, theta);
+          }
+
+          if (!hasMax || (LogL[index_pdg] > LogL_max)) {
+            LogL_max = LogL[index_pdg];
+            hasMax = true;
+          }
+        }
+
+        double norm = 0;
+        for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; ++i)
+          norm += exp(LogL[i] - LogL_max);
+
+        if (norm > 0)
+          return exp(LogL[hypType.getIndex()] - LogL_max) / norm;
+        else
+          return -1;
+      };
+      return func;
+    }
+
+
+    Manager::FunctionPtr pidWeightedPairProbabilityExpert(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() < 4) {
+        B2ERROR("Need at least four arguments to pidWeightedPairProbabilityExpert");
+        return nullptr;
+      }
+      std::string matrixName = arguments[0];
+
+      int pdgCodeHyp = 0, pdgCodeTest = 0;
+      try {
+        pdgCodeHyp = Belle2::convertString<int>(arguments[1]);
+      } catch (std::invalid_argument& e) {
+        B2ERROR("Second argument of pidWeightedPairProbabilityExpert must be PDG code");
+        return nullptr;
+      }
+      try {
+        pdgCodeTest = Belle2::convertString<int>(arguments[2]);
+      } catch (std::invalid_argument& e) {
+        B2ERROR("Third argument of pidWeightedPairProbabilityExpert must be PDG code");
+        return nullptr;
+      }
+
+      std::vector<std::string> detectors(arguments.begin() + 3, arguments.end());
+
+      Const::PIDDetectorSet detectorSet = parseDetectors(detectors);
+      auto hypType = Const::ChargedStable(abs(pdgCodeHyp));
+      auto testType = Const::ChargedStable(abs(pdgCodeTest));
+
+      auto func = [hypType, testType, detectorSet, matrixName](const Particle * part) -> double {
+        PIDCalibrationWeightUtil weightMatrix(matrixName);
+
+        const PIDLikelihood* pid = part->getPIDLikelihood();
+        if (!pid) return std::numeric_limits<float>::quiet_NaN();
+        // No information from any subdetector in the list
+        if (pid->getLogL(hypType, detectorSet) == 0)
+          return std::numeric_limits<float>::quiet_NaN();
+
+        const auto& frame = ReferenceFrame::GetCurrent();
+        auto mom = frame.getMomentum(part);
+        auto p = mom.P();
+        auto theta = mom.Theta();
+
+        double LogL_hypType(0), LogL_testType(0);
+        for (const Const::EDetector& detector : Const::PIDDetectorSet::set())
+        {
+          if (detectorSet.contains(detector)) {
+            LogL_hypType += pid->getLogL(hypType, detector) * weightMatrix.getWeight(hypType.getPDGCode(), detector, p, theta);
+            LogL_testType += pid->getLogL(testType, detector) * weightMatrix.getWeight(testType.getPDGCode(), detector, p, theta);
+          }
+        }
+
+        double deltaLogL = LogL_testType - LogL_hypType;
+        double res;
+        if (deltaLogL < 0)
+        {
+          double eLogL = exp(deltaLogL);
+          res = 1. / (1. + eLogL);
+        } else
+        {
+          double eLogL = exp(-deltaLogL);
+          res = eLogL / (1.0 + eLogL);
+        }
+
+        if (std::isfinite(res))
+          return res;
+
+        return 0;
+      };
+      return func;
+    }
+
     double electronID(const Particle* part)
     {
-      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(11, ALL)")->function(part));
+      static Manager::FunctionPtr pidFunction =
+        pidProbabilityExpert({"11", "ALL"});
+      return std::get<double>(pidFunction(part));
     }
 
     double muonID(const Particle* part)
     {
-      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(13, ALL)")->function(part));
+      static Manager::FunctionPtr pidFunction =
+        pidProbabilityExpert({"13", "ALL"});
+      return std::get<double>(pidFunction(part));
     }
 
     double pionID(const Particle* part)
     {
-      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(211, ALL)")->function(part));
+      static Manager::FunctionPtr pidFunction =
+        pidProbabilityExpert({"211", "ALL"});
+      return std::get<double>(pidFunction(part));
     }
 
     double kaonID(const Particle* part)
     {
-      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(321, ALL)")->function(part));
+      static Manager::FunctionPtr pidFunction =
+        pidProbabilityExpert({"321", "ALL"});
+      return std::get<double>(pidFunction(part));
     }
 
     double protonID(const Particle* part)
     {
-      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(2212, ALL)")->function(part));
+      static Manager::FunctionPtr pidFunction =
+        pidProbabilityExpert({"2212", "ALL"});
+      return std::get<double>(pidFunction(part));
     }
 
     double deuteronID(const Particle* part)
     {
-      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(1000010020, ALL)")->function(part));
+      static Manager::FunctionPtr pidFunction =
+        pidProbabilityExpert({"1000010020", "ALL"});
+      return std::get<double>(pidFunction(part));
     }
 
     double binaryPID(const Particle* part, const std::vector<double>& arguments)
@@ -313,38 +512,49 @@ namespace Belle2 {
     double electronID_noSVD(const Particle* part)
     {
       // Excluding SVD for electron ID. This variable is temporary. BII-8760
-      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(11, CDC, TOP, ARICH, ECL, KLM)")->function(part));
+      static Manager::FunctionPtr pidFunction =
+        pidProbabilityExpert({"11", "CDC", "TOP", "ARICH", "ECL", "KLM"});
+      return std::get<double>(pidFunction(part));
     }
 
     double muonID_noSVD(const Particle* part)
     {
       // Excluding SVD for muon ID. This variable is temporary. BII-8760
-      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(13, CDC, TOP, ARICH, ECL, KLM)")->function(part));
+      static Manager::FunctionPtr pidFunction =
+        pidProbabilityExpert({"13", "CDC", "TOP", "ARICH", "ECL", "KLM"});
+      return std::get<double>(pidFunction(part));
     }
 
     double pionID_noSVD(const Particle* part)
     {
       // Excluding SVD for pion ID. This variable is temporary. BII-8760
-      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(211, CDC, TOP, ARICH, ECL, KLM)")->function(part));
+      static Manager::FunctionPtr pidFunction =
+        pidProbabilityExpert({"211", "CDC", "TOP", "ARICH", "ECL", "KLM"});
+      return std::get<double>(pidFunction(part));
     }
 
     double kaonID_noSVD(const Particle* part)
     {
       // Excluding SVD for kaon ID. This variable is temporary. BII-8760
-      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(321, CDC, TOP, ARICH, ECL, KLM)")->function(part));
+      static Manager::FunctionPtr pidFunction =
+        pidProbabilityExpert({"321", "CDC", "TOP", "ARICH", "ECL", "KLM"});
+      return std::get<double>(pidFunction(part));
     }
 
     double protonID_noSVD(const Particle* part)
     {
       // Excluding SVD for proton ID. This variable is temporary. BII-8760
-      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(2212, CDC, TOP, ARICH, ECL, KLM)")->function(part));
+      static Manager::FunctionPtr pidFunction =
+        pidProbabilityExpert({"2212", "CDC", "TOP", "ARICH", "ECL", "KLM"});
+      return std::get<double>(pidFunction(part));
     }
 
     double deuteronID_noSVD(const Particle* part)
     {
       // Excluding SVD for deuteron ID. This variable is temporary. BII-8760
-      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(1000010020, CDC, TOP, ARICH, ECL, KLM)")->function(
-                                part));
+      static Manager::FunctionPtr pidFunction =
+        pidProbabilityExpert({"1000010020", "CDC", "TOP", "ARICH", "ECL", "KLM"});
+      return std::get<double>(pidFunction(part));
     }
 
     double binaryPID_noSVD(const Particle* part, const std::vector<double>& arguments)
@@ -364,7 +574,9 @@ namespace Belle2 {
     double electronID_noTOP(const Particle* part)
     {
       // Excluding TOP for electron ID. This variable is temporary. BII-8444
-      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(11, SVD, CDC, ARICH, ECL, KLM)")->function(part));
+      static Manager::FunctionPtr pidFunction =
+        pidProbabilityExpert({"11", "SVD", "CDC", "ARICH", "ECL", "KLM"});
+      return std::get<double>(pidFunction(part));
     }
 
     double binaryElectronID_noTOP(const Particle* part, const std::vector<double>& arguments)
@@ -387,7 +599,9 @@ namespace Belle2 {
     double electronID_noSVD_noTOP(const Particle* part)
     {
       // Excluding SVD and TOP for electron ID. This variable is temporary. BII-8444, BII-8760.
-      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(11, CDC, ARICH, ECL, KLM)")->function(part));
+      static Manager::FunctionPtr pidFunction =
+        pidProbabilityExpert({"11", "CDC", "ARICH", "ECL", "KLM"});
+      return std::get<double>(pidFunction(part));
     }
 
     double binaryElectronID_noSVD_noTOP(const Particle* part, const std::vector<double>& arguments)
@@ -406,6 +620,71 @@ namespace Belle2 {
 
       return std::get<double>(Manager::Instance().getVariable(var)->function(part));
     }
+
+
+    double pionID_noARICHwoECL(const Particle* part)
+    {
+      // remove arich if no ecl cluster + identified as kaon in arich
+      const ECLCluster* cluster = part->getECLCluster();
+      if (!cluster) {
+        const PIDLikelihood* pid = part->getPIDLikelihood();
+        if (!pid) return std::numeric_limits<float>::quiet_NaN();
+        if (pid->getLogL(Const::kaon, Const::ARICH) > pid->getLogL(Const::pion, Const::ARICH)) {
+          static Manager::FunctionPtr pidFunction =
+            pidProbabilityExpert({"211", "SVD", "CDC", "TOP", "ECL", "KLM"});
+          return std::get<double>(pidFunction(part));
+        }
+      }
+      return pionID(part);
+    }
+
+
+    double kaonID_noARICHwoECL(const Particle* part)
+    {
+      // remove arich if no ecl cluster + identified as kaon in arich
+      const ECLCluster* cluster = part->getECLCluster();
+      if (!cluster) {
+        const PIDLikelihood* pid = part->getPIDLikelihood();
+        if (!pid) return std::numeric_limits<float>::quiet_NaN();
+        if (pid->getLogL(Const::kaon, Const::ARICH) > pid->getLogL(Const::pion, Const::ARICH)) {
+          static Manager::FunctionPtr pidFunction =
+            pidProbabilityExpert({"321", "SVD", "CDC", "TOP", "ECL", "KLM"});
+          return std::get<double>(pidFunction(part));
+        }
+      }
+      return kaonID(part);
+    }
+
+
+    double binaryPID_noARICHwoECL(const Particle* part, const std::vector<double>& arguments)
+    {
+      // Excluding ARICH for tracks without ECL cluster and identified as heavier of the two hypotheses from binary ID.
+      if (arguments.size() != 2) {
+        B2ERROR("The variable binaryPID_noARICHwoECL needs exactly two arguments: the PDG codes of two hypotheses.");
+        return std::numeric_limits<float>::quiet_NaN();;
+      }
+      int pdgCodeHyp = std::abs(int(std::lround(arguments[0])));
+      int pdgCodeTest = std::abs(int(std::lround(arguments[1])));
+      auto hypType = Const::ChargedStable(abs(pdgCodeHyp));
+      auto testType = Const::ChargedStable(abs(pdgCodeTest));
+
+      const ECLCluster* cluster = part->getECLCluster();
+      if (!cluster) {
+        const PIDLikelihood* pid = part->getPIDLikelihood();
+        if (!pid) return std::numeric_limits<float>::quiet_NaN();
+        double lkhdiff = pid->getLogL(hypType, Const::ARICH) - pid->getLogL(testType, Const::ARICH);
+        if ((lkhdiff > 0 && pdgCodeHyp > pdgCodeTest) || (lkhdiff < 0 && pdgCodeHyp < pdgCodeTest)) {
+          return std::get<double>(Manager::Instance().getVariable("pidPairProbabilityExpert(" + std::to_string(
+                                                                    pdgCodeHyp) + ", " + std::to_string(
+                                                                    pdgCodeTest) + ", SVD, CDC, TOP, ECL, KLM)")->function(part));
+        }
+      }
+
+      return binaryPID(part, arguments);
+
+    }
+
+
 
     double antineutronID(const Particle* particle)
     {
@@ -441,10 +720,9 @@ namespace Belle2 {
 
       auto func = [hypType, detectorSet](const Particle * part) -> double {
         auto name = "pidChargedBDTScore_" + std::to_string(hypType.getPDGCode());
-        for (size_t iDet(0); iDet < detectorSet.size(); ++iDet)
+        for (const Const::EDetector& detector : detectorSet)
         {
-          auto det = detectorSet[iDet];
-          name += "_" + std::to_string(det);
+          name += "_" + std::to_string(detector);
         }
         return (part->hasExtraInfo(name)) ? part->getExtraInfo(name) : std::numeric_limits<float>::quiet_NaN();
       };
@@ -479,56 +757,155 @@ namespace Belle2 {
 
       auto func = [hypType, testType, detectorSet](const Particle * part) -> double {
         auto name = "pidPairChargedBDTScore_" + std::to_string(hypType.getPDGCode()) + "_VS_" + std::to_string(testType.getPDGCode());
-        for (size_t iDet(0); iDet < detectorSet.size(); ++iDet)
+        for (const Const::EDetector& detector : detectorSet)
         {
-          auto det = detectorSet[iDet];
-          name += "_" + std::to_string(det);
+          name += "_" + std::to_string(detector);
         }
         return (part->hasExtraInfo(name)) ? part->getExtraInfo(name) : std::numeric_limits<float>::quiet_NaN();
       };
       return func;
     }
 
-    Manager::FunctionPtr mostLikelyPDG(const std::vector<std::string>& arguments)
+    double mostLikelyPDG(const Particle* part, const std::vector<double>& arguments)
     {
       if (arguments.size() != 0 and arguments.size() != Const::ChargedStable::c_SetSize) {
         B2ERROR("Need zero or exactly " << Const::ChargedStable::c_SetSize << " arguments for pidMostLikelyPDG");
-        return nullptr;
+        return std::numeric_limits<double>::quiet_NaN();
       }
       double prob[Const::ChargedStable::c_SetSize];
       if (arguments.size() == 0) {
         for (unsigned int i = 0; i < Const::ChargedStable::c_SetSize; i++) prob[i] = 1. / Const::ChargedStable::c_SetSize;
+      } else {
+        copy(arguments.begin(), arguments.end(), prob);
       }
-      if (arguments.size() == Const::ChargedStable::c_SetSize) {
-        try {
-          int i = 0;
-          for (std::string arg : arguments) {
-            prob[i++] = Belle2::convertString<float>(arg);
-          }
-        } catch (std::invalid_argument& e) {
-          B2ERROR("All arguments of mostLikelyPDG must be a float number");
-          return nullptr;
-        }
-      }
-      auto func = [prob](const Particle * part) -> double {
-        auto* pid = part->getPIDLikelihood();
-        if (!pid) return std::numeric_limits<double>::quiet_NaN();
-        return pid->getMostLikely(prob).getPDGCode();
-      };
-      return func;
+
+      auto* pid = part->getPIDLikelihood();
+      if (!pid) return std::numeric_limits<double>::quiet_NaN();
+      return pid->getMostLikely(prob).getPDGCode();
     }
 
-    Manager::FunctionPtr isMostLikely(const std::vector<std::string>& arguments)
+    bool isMostLikely(const Particle* part, const std::vector<double>& arguments)
     {
-      if (arguments.size() != 0 and arguments.size() != 6) {
+      if (arguments.size() != 0 and arguments.size() != Const::ChargedStable::c_SetSize) {
         B2ERROR("Need zero or exactly " << Const::ChargedStable::c_SetSize << " arguments for pidIsMostLikely");
+        return false;
+      }
+      return mostLikelyPDG(part, arguments) == abs(part->getPDGCode());
+    }
+
+    Manager::FunctionPtr weightedElectronID(const std::vector<std::string>& arguments)
+    {
+      std::string varName;
+      if (arguments.size() == 0) {
+        varName = "pidWeightedProbabilityExpert(PIDCalibrationWeightMatrix, 11, ALL)";
+      } else if (arguments.size() == 1) {
+        varName = "pidWeightedProbabilityExpert(" + arguments[0] + ", 11, ALL)";
+      } else {
+        B2ERROR("Need zero or one argument for weightedElectronID");
         return nullptr;
       }
-      auto func = [arguments](const Particle * part) -> bool {
-        return std::get<double>(mostLikelyPDG(arguments)(part)) == abs(part->getPDGCode());
+
+      const Variable::Manager::Var* var = Manager::Instance().getVariable(varName);
+      auto func = [var](const Particle * particle) -> double {
+        return std::get<double>(var->function(particle));
       };
       return func;
-    }
+    };
+
+    Manager::FunctionPtr weightedMuonID(const std::vector<std::string>& arguments)
+    {
+      std::string varName;
+      if (arguments.size() == 0) {
+        varName = "pidWeightedProbabilityExpert(PIDCalibrationWeightMatrix, 13, ALL)";
+      } else if (arguments.size() == 1) {
+        varName = "pidWeightedProbabilityExpert(" + arguments[0] + ", 13, ALL)";
+      } else {
+        B2ERROR("Need zero or one argument for weightedMuonID");
+        return nullptr;
+      }
+
+      const Variable::Manager::Var* var = Manager::Instance().getVariable(varName);
+      auto func = [var](const Particle * particle) -> double {
+        return std::get<double>(var->function(particle));
+      };
+      return func;
+    };
+
+    Manager::FunctionPtr weightedPionID(const std::vector<std::string>& arguments)
+    {
+      std::string varName;
+      if (arguments.size() == 0) {
+        varName = "pidWeightedProbabilityExpert(PIDCalibrationWeightMatrix, 211, ALL)";
+      } else if (arguments.size() == 1) {
+        varName = "pidWeightedProbabilityExpert(" + arguments[0] + ", 211, ALL)";
+      } else {
+        B2ERROR("Need zero or one argument for weightedPionID");
+        return nullptr;
+      }
+
+      const Variable::Manager::Var* var = Manager::Instance().getVariable(varName);
+      auto func = [var](const Particle * particle) -> double {
+        return std::get<double>(var->function(particle));
+      };
+      return func;
+    };
+
+    Manager::FunctionPtr weightedKaonID(const std::vector<std::string>& arguments)
+    {
+      std::string varName;
+      if (arguments.size() == 0) {
+        varName = "pidWeightedProbabilityExpert(PIDCalibrationWeightMatrix, 321, ALL)";
+      } else if (arguments.size() == 1) {
+        varName = "pidWeightedProbabilityExpert(" + arguments[0] + ", 321, ALL)";
+      } else {
+        B2ERROR("Need zero or one argument for weightedKaonID");
+        return nullptr;
+      }
+
+      const Variable::Manager::Var* var = Manager::Instance().getVariable(varName);
+      auto func = [var](const Particle * particle) -> double {
+        return std::get<double>(var->function(particle));
+      };
+      return func;
+    };
+
+    Manager::FunctionPtr weightedProtonID(const std::vector<std::string>& arguments)
+    {
+      std::string varName;
+      if (arguments.size() == 0) {
+        varName = "pidWeightedProbabilityExpert(PIDCalibrationWeightMatrix, 2212, ALL)";
+      } else if (arguments.size() == 1) {
+        varName = "pidWeightedProbabilityExpert(" + arguments[0] + ", 2212, ALL)";
+      } else {
+        B2ERROR("Need zero or one argument for weightedProtonID");
+        return nullptr;
+      }
+
+      const Variable::Manager::Var* var = Manager::Instance().getVariable(varName);
+      auto func = [var](const Particle * particle) -> double {
+        return std::get<double>(var->function(particle));
+      };
+      return func;
+    };
+
+    Manager::FunctionPtr weightedDeuteronID(const std::vector<std::string>& arguments)
+    {
+      std::string varName;
+      if (arguments.size() == 0) {
+        varName = "pidWeightedProbabilityExpert(PIDCalibrationWeightMatrix, 1000010020, ALL)";
+      } else if (arguments.size() == 1) {
+        varName = "pidWeightedProbabilityExpert(" + arguments[0] + ", 1000010020, ALL)";
+      } else {
+        B2ERROR("Need zero or one argument for weightedDeuteronID");
+        return nullptr;
+      }
+
+      const Variable::Manager::Var* var = Manager::Instance().getVariable(varName);
+      auto func = [var](const Particle * particle) -> double {
+        return std::get<double>(var->function(particle));
+      };
+      return func;
+    };
 
     //*************
     // B2BII
@@ -639,9 +1016,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("nbarID", antineutronID, R"DOC(
 Returns MVA classifier for antineutron PID.
 
-    - 1  signal(antineutron) like
-    - 0  background like
-    - -1 invalid using this PID due to some ECL variables used unavailable
+- 1  signal(antineutron) like
+- 0  background like
+- -1 invalid using this PID due to some ECL variables used unavailable
 
 This PID is only for antineutron. Neutron is also considered as background.
 The variables used are `clusterPulseShapeDiscriminationMVA`, `clusterE`, `clusterLAT`, `clusterE1E9`, `clusterE9E21`,
@@ -673,6 +1050,63 @@ The variables used are `clusterPulseShapeDiscriminationMVA`, `clusterE`, `cluste
     REGISTER_METAVARIABLE("binaryElectronID_noSVD_noTOP(pdgCodeTest)", binaryElectronID_noSVD_noTOP,
                           "**(SPECIAL (TEMP) variable)** Returns the binary probability for the electron mass hypothesis with respect to another mass hypothesis using all detector components, *excluding the SVD and the TOP*. *NB:* this variable must be used in place of `binaryPID` (``pdgCode1=11``) when analysing data (MC) processed (simulated) in **release 5**",
                           Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("pionID_noARICHwoECL", pionID_noARICHwoECL,
+                      "**(SPECIAL (TEMP) variable)** pion identification probability defined as :math:`\\mathcal{L}_\\pi/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors but ARICH info excluded for tracks without associated ECL cluster");
+    REGISTER_VARIABLE("kaonID_noARICHwoECL", kaonID_noARICHwoECL,
+                      "**(SPECIAL (TEMP) variable)** kaon identification probability defined as :math:`\\mathcal{L}_K/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors but ARICH info excluded for tracks without associated ECL cluster");
+    REGISTER_METAVARIABLE("binaryPID_noARICHwoECL(pdgCode1, pdgCode2)", binaryPID_noARICHwoECL,
+                          "Returns the binary probability for the first provided mass hypothesis with respect to the second mass hypothesis using all detector components, but ARICH info excluded for tracks without associated ECL cluster",
+                          Manager::VariableDataType::c_double);
+
+
+    REGISTER_METAVARIABLE("weightedElectronID(weightMatrixName)", weightedElectronID,
+                          R"DOC(
+weighted electron identification probability defined as :math:`\frac{\mathcal{\tilde{L}}_e}{\sum_{i=e,\mu,\pi,K,p,d} \mathcal{\tilde{L}}_i}`,
+where :math:`\mathcal{\tilde{L}}_i` is defined as :math:`\log\mathcal{\tilde{L}}_i = \sum_{j={\mathrm{SVD, CDC, TOP, ARICH, ECL, KLM}}} \mathcal{w}_{ij}\log\mathcal{L}_{ij}`.
+The :math:`\mathcal{L}_{ij}` is the original likelihood and :math:`\mathcal{w}_{ij}` is the PID calibration weight of i-th particle type and j-th detector.
+One can provide the name of the weight matrix as the argument.
+)DOC",
+                          Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("weightedMuonID(weightMatrixName)", weightedMuonID,
+			  R"DOC(
+weighted muon identification probability defined as :math:`\frac{\mathcal{\tilde{L}}_\mu}{\sum_{i=e,\mu,\pi,K,p,d} \mathcal{\tilde{L}}_i}`,
+where :math:`\mathcal{\tilde{L}}_i` is defined as :math:`\log\mathcal{\tilde{L}}_i = \sum_{j={\mathrm{SVD, CDC, TOP, ARICH, ECL, KLM}}} \mathcal{w}_{ij}\log\mathcal{L}_{ij}`.
+The :math:`\mathcal{L}_{ij}` is the original likelihood and :math:`\mathcal{w}_{ij}` is the PID calibration weight of i-th particle type and j-th detector.
+One can provide the name of the weight matrix as the argument.
+)DOC",
+                          Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("weightedPionID(weightMatrixName)", weightedPionID,
+			  R"DOC(
+weighted pion identification probability defined as :math:`\frac{\mathcal{\tilde{L}}_\pi}{\sum_{i=e,\mu,\pi,K,p,d} \mathcal{\tilde{L}}_i}`,
+where :math:`\mathcal{\tilde{L}}_i` is defined as :math:`\log\mathcal{\tilde{L}}_i = \sum_{j={\mathrm{SVD, CDC, TOP, ARICH, ECL, KLM}}} \mathcal{w}_{ij}\log\mathcal{L}_{ij}`.
+The :math:`\mathcal{L}_{ij}` is the original likelihood and :math:`\mathcal{w}_{ij}` is the PID calibration weight of i-th particle type and j-th detector.
+One can provide the name of the weight matrix as the argument.
+)DOC",
+                          Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("weightedKaonID(weightMatrixName)", weightedKaonID,
+			  R"DOC(
+weighted kaon identification probability defined as :math:`\frac{\mathcal{\tilde{L}}_K}{\sum_{i=e,\mu,\pi,K,p,d} \mathcal{\tilde{L}}_i}`,
+where :math:`\mathcal{\tilde{L}}_i` is defined as :math:`\log\mathcal{\tilde{L}}_i = \sum_{j={\mathrm{SVD, CDC, TOP, ARICH, ECL, KLM}}} \mathcal{w}_{ij}\log\mathcal{L}_{ij}`.
+The :math:`\mathcal{L}_{ij}` is the original likelihood and :math:`\mathcal{w}_{ij}` is the PID calibration weight of i-th particle type and j-th detector.
+One can provide the name of the weight matrix as the argument.
+)DOC",
+                          Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("weightedProtonID(weightMatrixName)", weightedProtonID,
+			  R"DOC(
+weighted proton identification probability defined as :math:`\frac{\mathcal{\tilde{L}}_p}{\sum_{i=e,\mu,\pi,K,p,d} \mathcal{\tilde{L}}_i}`,
+where :math:`\mathcal{\tilde{L}}_i` is defined as :math:`\log\mathcal{\tilde{L}}_i = \sum_{j={\mathrm{SVD, CDC, TOP, ARICH, ECL, KLM}}} \mathcal{w}_{ij}\log\mathcal{L}_{ij}`.
+The :math:`\mathcal{L}_{ij}` is the original likelihood and :math:`\mathcal{w}_{ij}` is the PID calibration weight of i-th particle type and j-th detector.
+One can provide the name of the weight matrix as the argument.
+)DOC",
+                          Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("weightedDeuteronID(weightMatrixName)", weightedDeuteronID,
+			  R"DOC(
+weighted deuteron identification probability defined as :math:`\frac{\mathcal{\tilde{L}}_d}{\sum_{i=e,\mu,\pi,K,p,d} \mathcal{\tilde{L}}_i}`,
+where :math:`\mathcal{\tilde{L}}_i` is defined as :math:`\log\mathcal{\tilde{L}}_i = \sum_{j={\mathrm{SVD, CDC, TOP, ARICH, ECL, KLM}}} \mathcal{w}_{ij}\log\mathcal{L}_{ij}`.
+The :math:`\mathcal{L}_{ij}` is the original likelihood and :math:`\mathcal{w}_{ij}` is the PID calibration weight of i-th particle type and j-th detector.
+One can provide the name of the weight matrix as the argument.
+)DOC",
+                          Manager::VariableDataType::c_double);
 
     // Metafunctions for experts to access the basic PID quantities
     VARIABLE_GROUP("PID_expert");
@@ -681,25 +1115,43 @@ The variables used are `clusterPulseShapeDiscriminationMVA`, `clusterE`, `cluste
     REGISTER_METAVARIABLE("pidDeltaLogLikelihoodValueExpert(pdgCode1, pdgCode2, detectorList)", pidDeltaLogLikelihoodValueExpert,
                           "returns LogL(hyp1) - LogL(hyp2) (aka DLL) for two mass hypotheses and a set of detectors.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("pidPairProbabilityExpert(pdgCodeHyp, pdgCodeTest, detectorList)", pidPairProbabilityExpert,
-                          "Pair (or binary) probability for the pdgCodeHyp mass hypothesis respect to the pdgCodeTest one, using an arbitrary set of detectors. :math:`\\mathcal{L}_{hyp}/(\\mathcal{L}_{test}+\\mathcal{L}_{hyp}`",
+                          "Pair (or binary) probability for the pdgCodeHyp mass hypothesis respect to the pdgCodeTest one, using an arbitrary set of detectors. :math:`\\mathcal{L}_{hyp}/(\\mathcal{L}_{test}+\\mathcal{L}_{hyp})`",
                           Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("pidProbabilityExpert(pdgCodeHyp, detectorList)", pidProbabilityExpert,
-                          "probability for the pdgCodeHyp mass hypothesis respect to all the other ones, using an arbitrary set of detectors :math:`\\mathcal{L}_{hyp}/(\\Sigma_{\\text{all~hyp}}\\mathcal{L}_{i}`. ",
+                          "probability for the pdgCodeHyp mass hypothesis respect to all the other ones, using an arbitrary set of detectors :math:`\\mathcal{L}_{hyp}/(\\Sigma_{\\text{all~hyp}}\\mathcal{L}_{i})`. ",
                           Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("pidMissingProbabilityExpert(detectorList)", pidMissingProbabilityExpert,
                           "returns 1 if the PID probabiliy is missing for the provided detector list, otherwise 0. ", Manager::VariableDataType::c_double);
-    REGISTER_METAVARIABLE("pidMostLikelyPDG(ePrior=1/6, muPrior=1/6, piPrior=1/6, KPrior=1/6, pPrior=1/6, dPrior=1/6)", mostLikelyPDG,
-                          R"DOC(
+    REGISTER_VARIABLE("pidMostLikelyPDG(ePrior=1/6, muPrior=1/6, piPrior=1/6, KPrior=1/6, pPrior=1/6, dPrior=1/6)", mostLikelyPDG,
+                      R"DOC(
 Returns PDG code of the largest PID likelihood, or NaN if PID information is not available.
 This function accepts either no arguments, or 6 floats as priors for the charged particle hypotheses
-following the order shown in the metavariable's declaration. Flat priors are assumed as default.)DOC",
-                          Manager::VariableDataType::c_double);
-    REGISTER_METAVARIABLE("pidIsMostLikely(ePrior=1/6, muPrior=1/6, piPrior=1/6, KPrior=1/6, pPrior=1/6, dPrior=1/6)", isMostLikely,
-                          R"DOC(
+following the order shown in the metavariable's declaration. Flat priors are assumed as default.)DOC");
+    REGISTER_VARIABLE("pidIsMostLikely(ePrior=1/6, muPrior=1/6, piPrior=1/6, KPrior=1/6, pPrior=1/6, dPrior=1/6)", isMostLikely, R"DOC(
 Returns True if the largest PID likelihood of a given particle corresponds to its particle hypothesis.
 This function accepts either no arguments, or 6 floats as priors for the charged particle hypotheses
-following the order shown in the metavariable's declaration. Flat priors are assumed as default.)DOC",
-                          Manager::VariableDataType::c_bool);
+following the order shown in the metavariable's declaration. Flat priors are assumed as default.)DOC");
+
+    REGISTER_METAVARIABLE("pidWeightedLogLikelihoodValueExpert(weightMatrixName, pdgCode, detectorList)",
+                          pidWeightedLogLikelihoodValueExpert,
+                          "returns the weighted log likelihood value of for a specific mass hypothesis and set of detectors, "
+                          ":math:`\\log\\mathcal{\\tilde{L}}_{hyp} = \\sum_{j\\in\\mathrm{detectorList}} \\mathcal{w}_{hyp,j}\\log\\mathcal{L}_{hyp,j}`. "
+                          "The :math:`\\mathcal{L}_{ij}` is the original likelihood and :math:`\\mathcal{w}_{ij}` is the PID calibration weight of i-th particle type and j-th detector.",
+                          Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("pidWeightedPairProbabilityExpert(weightMatrixName, pdgCodeHyp, pdgCodeTest, detectorList)",
+                          pidWeightedPairProbabilityExpert,
+                          "Weighted pair (or binary) probability for the pdgCodeHyp mass hypothesis with respect to the pdgCodeTest one, using an arbitrary set of detectors, "
+                          ":math:`\\mathcal{\\tilde{L}}_{hyp}/(\\mathcal{\\tilde{L}}_{test}+\\mathcal{\\tilde{L}}_{hyp})` where :math:`\\mathcal{\\tilde{L}}_{i}` is defined as "
+                          ":math:`\\log\\mathcal{\\tilde{L}}_{i} = \\sum_{j\\in\\mathrm{detectorList}} \\mathcal{w}_{i,j}\\log\\mathcal{L}_{i,j}`. "
+                          "The :math:`\\mathcal{L}_{ij}` is the original likelihood and :math:`\\mathcal{w}_{ij}` is the PID calibration weight of i-th particle type and j-th detector.",
+                          Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("pidWeightedProbabilityExpert(weightMatrixName, pdgCodeHyp, detectorList)",
+                          pidWeightedProbabilityExpert,
+                          "Weighted probability for the pdgCodeHyp mass hypothesis with respect to all the other ones, using an arbitrary set of detectors, "
+                          ":math:`\\mathcal{\\tilde{L}}_{hyp}/\\sum_{i=e,\\mu,\\pi,K,p,d} \\mathcal{\\tilde{L}}_i` where :math:`\\mathcal{\\tilde{L}}_{i}` is defined as "
+                          ":math:`\\log\\mathcal{\\tilde{L}}_{i} = \\sum_{j\\in\\mathrm{detectorList}} \\mathcal{w}_{i,j}\\log\\mathcal{L}_{i,j}`. "
+                          "The :math:`\\mathcal{L}_{ij}` is the original likelihood and :math:`\\mathcal{w}_{ij}` is the PID calibration weight of i-th particle type and j-th detector.",
+                          Manager::VariableDataType::c_double);
 
     // B2BII PID
     VARIABLE_GROUP("Belle PID variables");

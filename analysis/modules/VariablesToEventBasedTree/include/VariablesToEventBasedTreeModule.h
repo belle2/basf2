@@ -7,8 +7,10 @@
  **************************************************************************/
 
 #pragma once
-#include <framework/core/Module.h>
+
 #include <analysis/VariableManager/Manager.h>
+
+#include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/pcore/RootMergeable.h>
@@ -18,6 +20,8 @@
 #include <string>
 
 namespace Belle2 {
+
+  class StringWrapper;
 
   /** Module to calculate variables specified by the user for a given ParticleList
    *  and save them into a TTree. The Tree is event-based, meaning that the variables of each candidate for each event
@@ -56,6 +60,8 @@ namespace Belle2 {
     std::string m_fileName;
     /** Name of the TTree. */
     std::string m_treeName;
+    /** Suffix to be appended to the output file name. */
+    std::string m_fileNameSuffix;
 
     /** ROOT file for output. */
     std::shared_ptr<TFile> m_file{nullptr};
@@ -93,5 +99,7 @@ namespace Belle2 {
     /** event metadata (get event number etc) */
     StoreObjPtr<EventMetaData> m_eventMetaData;
 
+    std::string m_MCDecayString; /**< MC decay string to be filled */
+    StoreObjPtr<StringWrapper> m_stringWrapper; /**< string wrapper storing the MCDecayString */
   };
 } // end namespace Belle2

@@ -37,7 +37,7 @@ namespace Belle2 {
      *
      * Output: boolean variable as flag for bad strips.
      */
-    bool isBad(VxdID , bool , unsigned char) const
+    bool isBad(VxdID, bool, unsigned char) const
     {
       return false;
     }

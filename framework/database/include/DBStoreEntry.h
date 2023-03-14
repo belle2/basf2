@@ -8,6 +8,7 @@
 #pragma once
 
 #include <framework/database/IntervalOfValidity.h>
+#include <framework/database/IntraRunDependency.h>
 
 #include <string>
 #include <unordered_set>
@@ -16,7 +17,6 @@ class TFile;
 
 namespace Belle2 {
   class EventMetaData;
-  class IntraRunDependency;
   class DBAccessorBase;
 
   /** Class to hold one entry from the ConditionsDB in the DBStore
@@ -113,6 +113,8 @@ namespace Belle2 {
     bool keepUntilExpired() const { return m_keep; }
     /** return whether or not the payload might change even during the run */
     bool isIntraRunDependent() const { return (bool)m_intraRunDependency; }
+    /** return the boundaries of the intra-run changes of the payload, if any */
+    const std::vector<unsigned int> getIntraRunBoundaries() const { if (isIntraRunDependent()) return m_intraRunDependency->getBoundaries(); return std::vector<unsigned int> {}; }
     /** Register an Accessor object to be notified on changes by calling DBAccessorBase::storeEntryChanged() */
     void registerAccessor(DBAccessorBase* object) { m_accessors.insert(object); }
     /** Deregister an Accessor object and remove it from the list of registered objects */

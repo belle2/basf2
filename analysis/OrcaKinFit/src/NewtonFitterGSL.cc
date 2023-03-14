@@ -481,7 +481,7 @@ namespace Belle2 {
       return chi2;
     }
 
-    void NewtonFitterGSL::printMy(double Ma[], double yo[], int idime)
+    void NewtonFitterGSL::printMy(const double Ma[], const double yo[], int idime)
     {
       for (int i = 0; i < idime; ++i) {
         B2INFO(i << "  [ " << Ma[idime * i + 0]);

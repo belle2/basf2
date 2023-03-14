@@ -17,7 +17,7 @@
 // root:
 #include <TTree.h>
 #include <TFile.h>
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 
 // stl:
 #include <string>
@@ -50,7 +50,7 @@ namespace Belle2 {
 
 
     /** short-cut for typical algorithm-types used */
-    template<class DataType> using AnalyzingAlgorithm = AnalyzingAlgorithmBase<DataType, AnalizerTCInfo, TVector3>;
+    template<class DataType> using AnalyzingAlgorithm = AnalyzingAlgorithmBase<DataType, AnalizerTCInfo, ROOT::Math::XYZVector>;
 
 
     /** contains algorithms and its raw data to be streamed into ttrees.
@@ -150,7 +150,7 @@ namespace Belle2 {
       if (m_file != nullptr) {
         B2FATAL("RootParameterTracker::initialize(), there was a file already linked to this ParameterTracker, which is invalid, please read the documentation!");
       }
-      B2DEBUG(5, "RootParameterTracker::initialize(), given parameters are fileName/fileTreatment: " << fileName << "/" <<
+      B2DEBUG(20, "RootParameterTracker::initialize(), given parameters are fileName/fileTreatment: " << fileName << "/" <<
               fileTreatment);
       m_file = new TFile(fileName.c_str(), fileTreatment.c_str()); // alternative: UPDATE
       m_file->ls();
@@ -185,11 +185,11 @@ namespace Belle2 {
        *   if tc.tctype == currenttcType
        *    fill internalLinkContainer with result of applied algorithm
        * */
-      B2DEBUG(15, "RootParameterTracker::collectData(), size of given tcVector is: " << tcVector.size());
+      B2DEBUG(21, "RootParameterTracker::collectData(), size of given tcVector is: " << tcVector.size());
 
       for (const AnalizerTCInfo& tc : tcVector) {
         std::string tcTypeName = TCType::getTypeName(tc.getType());
-        B2DEBUG(50, "RootParameterTracker::collectData(), executing TC of type: " << tcTypeName);
+        B2DEBUG(22, "RootParameterTracker::collectData(), executing TC of type: " << tcTypeName);
 
         collectData4DoubleAlgorithms(tcTypeName, tc);
         collectData4IntAlgorithms(tcTypeName, tc);
@@ -201,7 +201,7 @@ namespace Belle2 {
     /** fills tree/branches with their stuff, clear intermediate results afterwards */
     void fillRoot()
     {
-      B2DEBUG(15, "RootParameterTracker::fillRoot(), Executing " << m_treeBox.size() << " ttrees.");
+      B2DEBUG(21, "RootParameterTracker::fillRoot(), Executing " << m_treeBox.size() << " ttrees.");
 
       m_file->cd(); //important! without this the famework root I/O (SimpleOutput etc) could mix with the root I/O of this module
 //       m_file->ls();
@@ -235,7 +235,7 @@ namespace Belle2 {
     /** final cleanup and closing rootFile */
     void terminate()
     {
-      B2DEBUG(2, "RootParameterTracker::terminate(), Writing results to root-file and clean up heap.");
+      B2DEBUG(20, "RootParameterTracker::terminate(), Writing results to root-file and clean up heap.");
       if (m_file == nullptr) {
         B2WARNING("RootParameterTracker::terminate(): no rootFile found! skipping writing data into root file!");
         return;
@@ -248,7 +248,7 @@ namespace Belle2 {
         boxEntry.second->Write();
 
         if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 5, PACKAGENAME()) == true) {
-          B2DEBUG(5, "RootParameterTracker::terminate(), TTree " << boxEntry.first << " was written:");
+          B2DEBUG(20, "RootParameterTracker::terminate(), TTree " << boxEntry.first << " was written:");
           // boxEntry.second->Print();
         }
       }

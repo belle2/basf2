@@ -13,7 +13,7 @@ import variables
 from typing import Iterable, Union, List, Tuple, Optional
 
 
-def create_aliases(list_of_variables: Iterable[str], wrapper: str, prefix: str) -> List[str]:
+def create_aliases(list_of_variables: Iterable[str], wrapper: str, prefix="") -> List[str]:
     """
     The function creates aliases for variables from the variables list with given wrapper
     and returns list of the aliases.
@@ -50,7 +50,7 @@ def create_aliases(list_of_variables: Iterable[str], wrapper: str, prefix: str) 
     for var in list_of_variables:
         # replace all non-safe characters for alias name with _ (but remove from the end)
         safe = replacement.sub("_", var).strip("_")
-        aliases.append(f"{prefix}_{safe}")
+        aliases.append(f"{prefix}_{safe}" if prefix else f"{safe}")
         variables.variables.addAlias(aliases[-1], wrapper.format(variable=var))
 
     return aliases
@@ -555,8 +555,9 @@ def create_isSignal_alias(aliasName, flags):
     unmasking (setting bits to zero)
     the ``c_MissGamma`` bit (16 or 0b00010000) and ``c_MissNeutrino`` bit (8 or 0b00001000) in mcErrors.
 
-    For more information, please check this `example script <https://stash.desy.de/projects/B2/repos/basf2/
-    browse/analysis/examples/VariableManager/isSignalAcceptFlags.py>`_.
+    For more information, please check this
+    `example script
+    <https://gitlab.desy.de/belle2/software/basf2/-/tree/main/analysis/examples/VariableManager/isSignalAcceptFlags.py>`_.
 
     Parameters:
         aliasName (str): the name of the alias to be set

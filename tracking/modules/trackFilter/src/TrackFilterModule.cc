@@ -35,7 +35,7 @@ TNtuple* TrackFilterModule::m_rejectedNtpl = nullptr;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(TrackFilter)
+REG_MODULE(TrackFilter);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -143,7 +143,7 @@ bool TrackFilterModule::isSelected(const Track* track)
   if (tfr->getPValue() < m_min_Pval)
     isExcluded = true;
 
-  if (tfr->getMomentum().Perp() < m_min_pT)
+  if (tfr->getMomentum().Rho() < m_min_pT)
     isExcluded = true;
 
   HitPatternVXD hitPatternVXD = tfr->getHitPatternVXD();
@@ -162,7 +162,7 @@ bool TrackFilterModule::isSelected(const Track* track)
 
 }
 
-void TrackFilterModule::fillControlNtuples(const Track* track , bool isSelected)
+void TrackFilterModule::fillControlNtuples(const Track* track, bool isSelected)
 {
 
   int pionCode = 211;
@@ -176,7 +176,7 @@ void TrackFilterModule::fillControlNtuples(const Track* track , bool isSelected)
   float tanDip = tfr->getTanLambda();
   float omega = tfr->getOmega();
 
-  double pt = tfr->getMomentum().Pt();
+  double pt = tfr->getMomentum().Rho();
   ROOT::Math::PxPyPzEVector pStar = tfr->get4Momentum();
   ROOT::Math::BoostZ boost(3. / 11);
   pStar = boost(pStar);

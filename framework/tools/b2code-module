@@ -190,7 +190,7 @@ if __name__ == "__main__":
     # get module methods
     methods_header = ''
     methods_src = ''
-    print('lease select the required module methods:', flush=True)
+    print('Please select the required module methods:', flush=True)
     for method in ['initialize', 'beginRun', 'event', 'endRun', 'terminate', 'destructor']:
         if method == 'initialize' and init_src != '':
             selected = True
@@ -332,7 +332,7 @@ if __name__ == "__main__":
 
     using namespace Belle2;
 
-    REG_MODULE(%(module)s)
+    REG_MODULE(%(module)s);
 
     %(module)sModule::%(module)sModule() : Module()%(constructor)s
     {

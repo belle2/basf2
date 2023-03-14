@@ -9,9 +9,13 @@
 #define TRGTOPUNPACKER_H
 
 #include <string>
+#include <algorithm>
 
 #include "rawdata/dataobjects/RawTRG.h"
-#include "trg/top/dataobjects/TRGTOPUnpackerStore.h"
+//#include "trg/top/dataobjects/TRGTOPUnpackerStore.h"
+#include "trg/top/dataobjects/TRGTOPCombinedT0Decision.h"
+
+#include "trg/top/dataobjects/TRGTOPSlotTiming.h"
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/core/Module.h>
@@ -59,11 +63,11 @@ namespace Belle2 {
     /** returns version of TRGGDLUnpackerModule.*/
     std::string version() const;
 
-    /** Read data from TRG copper.*/
-    virtual void readCOPPEREvent(RawTRG*, int);
+    /** Read data from TRG DAQ.*/
+    virtual void readDAQEvent(RawTRG*, int, int);
 
     /** Unpacker main function.*/
-    virtual void fillTreeTRGTOP(int*);
+    virtual void unpackT0Decisions(int*, int);
 
   protected:
 
@@ -71,10 +75,21 @@ namespace Belle2 {
     int m_trigType;       /**Trigger type */
     int m_nodeId;         /**Our read-out ID */
     int m_nWords;         /**N words in raw data */
+    bool m_pciedata;         /**PCIe40 data or copper data */
+
+    bool m_reportedAlreadyRun_1;
+    bool m_reportedAlreadyRun_2;
+
+    bool m_overrideControlBits;
 
   private:
 
-    StoreArray<TRGTOPUnpackerStore>  m_TRGTOPCombinedTimingArray;
+    // time period of revo strobe in "ns" (assuming the clock of "125MHz")
+    static constexpr int revoToNS = 1280 * 8;
+
+    //    StoreArray<TRGTOPUnpackerStore>  m_TRGTOPCombinedTimingArray;
+    StoreArray<TRGTOPCombinedT0Decision>  m_TRGTOPCombinedT0DecisionArray;
+    StoreArray<TRGTOPSlotTiming>  m_TRGTOPSlotTimingArray;
 
   };
 }

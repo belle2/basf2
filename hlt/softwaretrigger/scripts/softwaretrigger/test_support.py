@@ -5,14 +5,15 @@
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
+
+import os
 import random
 import shutil
 import subprocess
-import os
 import sys
-import tempfile
 from glob import glob
 
+import b2test_utils
 import basf2
 import generators
 from simulation import add_simulation
@@ -38,6 +39,15 @@ class CheckForCorrectHLTResults(basf2.Module):
             basf2.B2FATAL("ROIs are not present")
 
 
+def get_file_name(base_path, run_type, location, passthrough, simulate_events_of_doom_buster):
+    mode = ""
+    if passthrough:
+        mode += "_passthrough"
+    if simulate_events_of_doom_buster:
+        mode += "_eodb"
+    return os.path.join(base_path, f"{location.name}_{run_type.name}{mode}.root")
+
+
 def generate_input_file(run_type, location, output_file_name, exp_number, passthrough,
                         simulate_events_of_doom_buster):
     """
@@ -54,7 +64,7 @@ def generate_input_file(run_type, location, output_file_name, exp_number, passth
       EventsOfDoomBuster module by inflating the number of CDC hits
     """
     if os.path.exists(output_file_name):
-        return
+        return 1
 
     basf2.set_random_seed(12345)
 
@@ -158,6 +168,8 @@ def generate_input_file(run_type, location, output_file_name, exp_number, passth
 
     basf2.process(path)
 
+    return 0
+
 
 def test_script(script_location, input_file_name, temp_dir):
     """
@@ -176,29 +188,45 @@ def test_script(script_location, input_file_name, temp_dir):
 
     random_seed = "".join(random.choices("abcdef", k=4))
 
-    histos_file_name = os.path.join(temp_dir, f"{random_seed}_histos.root")
+    histos_file_name = f"{random_seed}_histos.root"
     output_file_name = os.path.join(temp_dir, f"{random_seed}_output.root")
     # TODO: should we use the default global tag here?
     globaltags = list(basf2.conditions.default_globaltags)
     num_processes = 1
 
+    # Because the script name is hard-coded in the run control GUI,
+    # we must jump into the script directory
+    cwd = os.getcwd()
     os.chdir(os.path.dirname(script_location))
-    cmd = [sys.executable, script_location,
-           "--central-db-tag"] + globaltags + [
+    cmd1 = [sys.executable, script_location, "--central-db-tag"] + globaltags + [
         "--input-file", os.path.abspath(input_file_name),
-        "--histo-output-file", os.path.abspath(histos_file_name),
+        "--histo-output-file", os.path.join(temp_dir, f"{histos_file_name}"),
         "--output-file", os.path.abspath(output_file_name),
         "--number-processes", str(num_processes),
-        input_buffer, output_buffer, str(histo_port)]
+        input_buffer, output_buffer, str(histo_port)
+    ]
+    subprocess.check_call(cmd1)
 
-    subprocess.check_call(cmd)
+    # Move the output file with DQM histograms under the expected location:
+    # for reasons we don't want to know, they are saved under the current directory
+    # even if a valid and existing working directory is specified
+    if os.path.exists(histos_file_name):
+        final_histos_file_name = os.path.join(temp_dir, histos_file_name)
+        shutil.copy(histos_file_name, os.path.join(temp_dir, final_histos_file_name))
+        os.unlink(histos_file_name)
 
-    test_path = basf2.Path()
-    test_path.add_module("RootInput", inputFileName=output_file_name)
-    test_path.add_module(CheckForCorrectHLTResults())
+    # Go back to the original directory for safety
+    os.chdir(cwd)
 
     if "expressreco" not in script_location and "beam_reco" in script_location:
-        basf2.process(test_path)
+        # Check the integrity of HLT result
+        test_path = basf2.Path()
+        test_path.add_module("RootInput", inputFileName=output_file_name)
+        test_path.add_module(CheckForCorrectHLTResults())
+        assert(b2test_utils.safe_process(test_path) == 0)
+        # Check the size of DQM histograms
+        cmd2 = ["hlt-check-dqm-size", final_histos_file_name]
+        subprocess.check_call(cmd2)
 
 
 def test_folder(location, run_type, exp_number, phase, passthrough=False,
@@ -224,19 +252,21 @@ def test_folder(location, run_type, exp_number, phase, passthrough=False,
     :param simulate_events_of_doom_buster: if true, simulate the effect of the
                      EventsOfDoomBuster module by inflating the number of CDC hits
     """
-    temp_dir = tempfile.mkdtemp()
-    output_file_name = os.path.join(temp_dir, f"{location.name}_{run_type.name}.root")
-    generate_input_file(run_type=run_type, location=location,
-                        output_file_name=output_file_name, exp_number=exp_number,
-                        passthrough=passthrough,
-                        simulate_events_of_doom_buster=simulate_events_of_doom_buster)
+
+    # The test is already run in a clean, temporary directory
+    temp_dir = os.getcwd()
+    prepare_path = os.environ["BELLE2_PREPARE_PATH"]
+    input_file_name = get_file_name(
+        prepare_path, run_type, location, passthrough, simulate_events_of_doom_buster)
+    # generate_input_file(run_type=run_type, location=location,
+    #                    output_file_name=output_file_name, exp_number=exp_number,
+    #                    passthrough=passthrough,
+    #                    simulate_events_of_doom_buster=simulate_events_of_doom_buster)
 
     script_dir = basf2.find_file(f"hlt/operation/{phase}/global/{location.name}/evp_scripts/")
     run_at_least_one = False
     for script_location in glob(os.path.join(script_dir, f"run_{run_type.name}*.py")):
         run_at_least_one = True
-        test_script(script_location, input_file_name=output_file_name, temp_dir=temp_dir)
+        test_script(script_location, input_file_name=input_file_name, temp_dir=temp_dir)
 
     assert run_at_least_one
-
-    shutil.rmtree(temp_dir)

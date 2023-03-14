@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -53,7 +52,7 @@ main.add_module('FullSim')
 # And finally the MaterialScan module
 materialscan = main.add_module("MaterialScan", logLevel=LogLevel.INFO)
 
-# Create a detailed Materialbudget for the beampipe
+# Create a detailed Materialbudget for the beam pipe
 # 1) 100x100 raster starting from IP looking at the acceptance
 # 2) 200x200 raster of the ZX plane between Z=-50 to 60 cm and X=-16 to
 #    16 cm, starting at Y=-16cm and scanning the next 32cm along Y
@@ -119,7 +118,7 @@ materialscan.param({
     'planar.minV': -120,
     # Maximum value for the second axis
     'planar.maxV': 120,
-    # Split output by Material names insted of by Region
+    # Split output by Material names instead of by Region
     'planar.splitByMaterials': True,
     # Specify the names of Materials to ignore in the scan.
     # Default is Air and Vacuum

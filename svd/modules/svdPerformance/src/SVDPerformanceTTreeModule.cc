@@ -37,7 +37,7 @@ using namespace std;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SVDPerformanceTTree)
+REG_MODULE(SVDPerformanceTTree);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -183,7 +183,7 @@ void SVDPerformanceTTreeModule::event()
     if (tfr) {
       m_svdTrkd0 = tfr->getD0();
       m_svdTrkz0 = tfr->getZ0();
-      m_svdTrkpT = tfr->getMomentum().Perp();
+      m_svdTrkpT = tfr->getMomentum().Rho();
       ROOT::Math::PxPyPzEVector pStar = tfr->get4Momentum();
       ROOT::Math::BoostZ boost(3. / 11);
       pStar = boost(pStar);
@@ -233,11 +233,11 @@ void SVDPerformanceTTreeModule::event()
           const int strips_1 = svd_1->getSize();
 
           const double res_U_1 = resUnBias_1.GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
-          const TVector3 svdLocal_1(svd_1->getPosition(), svd_predIntersect_1[4], 0.);
+          const ROOT::Math::XYZVector svdLocal_1(svd_1->getPosition(), svd_predIntersect_1[4], 0.);
           const VXD::SensorInfoBase& svdSensor_1 = geo.get(svd_id_1);
-          const TVector3& svdGlobal_1 = svdSensor_1.pointToGlobal(svdLocal_1);
-          double svdPhi_1 = atan2(svdGlobal_1(1), svdGlobal_1(0));
-          double svdZ_1 = svdGlobal_1(2);
+          const ROOT::Math::XYZVector& svdGlobal_1 = svdSensor_1.pointToGlobal(svdLocal_1);
+          double svdPhi_1 = atan2(svdGlobal_1.Y(), svdGlobal_1.X()); // maybe use svdGlobal_1.Phi()
+          double svdZ_1 = svdGlobal_1.Z();
 
           //Fill SVD tree for u-overlaps if required by the user
           m_svdRes = res_U_1;
@@ -306,11 +306,11 @@ void SVDPerformanceTTreeModule::event()
         } else {
           const int strips_1 = svd_1->getSize();
           const double res_V_1 = resUnBias_1.GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
-          const TVector3 svdLocal_1(svd_predIntersect_1[3], svd_1->getPosition(), 0.);
+          const ROOT::Math::XYZVector svdLocal_1(svd_predIntersect_1[3], svd_1->getPosition(), 0.);
           const VXD::SensorInfoBase& svdSensor_1 = geo.get(svd_id_1);
-          const TVector3& svdGlobal_1 = svdSensor_1.pointToGlobal(svdLocal_1);
-          double svdPhi_1 = atan2(svdGlobal_1(1), svdGlobal_1(0));
-          double svdZ_1 = svdGlobal_1(2);
+          const ROOT::Math::XYZVector& svdGlobal_1 = svdSensor_1.pointToGlobal(svdLocal_1);
+          double svdPhi_1 = atan2(svdGlobal_1.Y(), svdGlobal_1.X());  // maybe use svdGlobal_1.Phi()
+          double svdZ_1 = svdGlobal_1.Z();
 
           m_svdRes = res_V_1;
           m_svdClTime = svd_1->getClsTime();

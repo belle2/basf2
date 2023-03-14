@@ -10,7 +10,6 @@ import argparse
 import multiprocessing
 
 import basf2
-import ROOT
 
 from softwaretrigger import constants
 from pxd import add_roi_payload_assembler, add_roi_finder
@@ -149,6 +148,10 @@ def add_hlt_processing(path,
     """
     Add all modules for processing on HLT filter machines
     """
+
+    # Always avoid the top-level 'import ROOT'.
+    import ROOT  # noqa
+
     path.add_module('StatisticsSummary').set_name('Sum_Wait')
 
     if unpacker_components is None:
@@ -283,7 +286,7 @@ def add_expressreco_processing(path,
             add_cosmics_reconstruction(path, components=reco_components, pruneTracks=False,
                                        skipGeometryAdding=True, **kwargs)
         else:
-            basf2.B2FATAL("Run Type {} not supported.".format(run_type))
+            basf2.B2FATAL(f"Run Type {run_type} not supported.")
 
     path_utils.add_expressreco_dqm(path, run_type, components=reco_components)
 

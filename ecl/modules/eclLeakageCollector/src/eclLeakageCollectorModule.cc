@@ -18,6 +18,8 @@
 #include <TVector3.h>
 #include <TMath.h>
 #include <TTree.h>
+#include <Math/Vector3D.h>
+#include <Math/VectorUtil.h>
 
 //..mdst
 #include <mdst/dataobjects/MCParticle.h>
@@ -37,7 +39,7 @@ using namespace ECL;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(eclLeakageCollector)
+REG_MODULE(eclLeakageCollector);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -176,8 +178,8 @@ void eclLeakageCollectorModule::collect()
   //-----------------------------------------------------------------
   //..Generated MC particle (always the first entry in the list)
   double mcLabE = m_mcParticleArray[0]->getEnergy();
-  TVector3 mcp3 = m_mcParticleArray[0]->getMomentum();
-  B2Vector3D vertex = m_mcParticleArray[0]->getProductionVertex();
+  ROOT::Math::XYZVector mcp3 = m_mcParticleArray[0]->getMomentum();
+  ROOT::Math::XYZVector vertex = m_mcParticleArray[0]->getProductionVertex();
 
   //-----------------------------------------------------------------
   //..Find the shower closest to the MC true angle
@@ -196,9 +198,9 @@ void eclLeakageCollectorModule::collect()
       position.SetMag(m_eclShowerArray[is]->getR());
 
       //..Direction is difference between position and vertex
-      TVector3 direction = position - vertex;
+      ROOT::Math::XYZVector direction = ROOT::Math::XYZVector(position) - vertex;
 
-      double angle = direction.Angle(mcp3);
+      double angle = ROOT::Math::VectorUtil::Angle(direction, mcp3);
       if (angle < minAngle) {
         minAngle = angle;
         minShower = is;
@@ -252,8 +254,8 @@ void eclLeakageCollectorModule::collect()
   measuredLocation.SetTheta(thetaLocation);
   measuredLocation.SetPhi(phiLocation);
   measuredLocation.SetMag(radius);
-  TVector3 measuredDirection = measuredLocation - vertex;
-  t_locationError = radius * measuredDirection.Angle(mcp3);
+  ROOT::Math::XYZVector measuredDirection = ROOT::Math::XYZVector(measuredLocation) - vertex;
+  t_locationError = radius * ROOT::Math::VectorUtil::Angle(measuredDirection, mcp3);
 
   //-----------------------------------------------------------------
   //..Done

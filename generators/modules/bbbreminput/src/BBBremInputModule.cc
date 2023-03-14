@@ -14,13 +14,15 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 
+#include <Math/Vector3D.h>
+
 using namespace std;
 using namespace Belle2;
 
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(BBBremInput)
+REG_MODULE(BBBremInput);
 
 
 //-----------------------------------------------------------------
@@ -80,7 +82,7 @@ void BBBremInputModule::event()
   ROOT::Math::LorentzRotation boost = initial.getCMSToLab();
 
   // vertex
-  TVector3 vertex = initial.getVertex();
+  ROOT::Math::XYZVector vertex = initial.getVertex();
 
   m_mcGraph.clear();
   double weight = m_generator.generateEvent(m_mcGraph, vertex, boost);

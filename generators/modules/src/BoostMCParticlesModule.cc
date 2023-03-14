@@ -6,10 +6,10 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-/* Own include. */
+/* Own header. */
 #include <generators/modules/BoostMCParticlesModule.h>
 
-/* Belle2 headers. */
+/* Basf2 headers. */
 #include <framework/dataobjects/MCInitialParticles.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
@@ -19,7 +19,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(BoostMCParticles)
+REG_MODULE(BoostMCParticles);
 
 BoostMCParticlesModule::BoostMCParticlesModule() : Module(), m_firstEvent{true}, m_initial(0)
 {
@@ -59,7 +59,7 @@ void BoostMCParticlesModule::event()
       mcParticle.setProductionTime(productionVertex.T() / Const::speedOfLight);
     }
     if (mcParticle.getDecayTime() != 0.) { // Boost only if the decay vertex is not the default one.
-      B2Vector3D v = mcParticle.getDecayVertex();
+      ROOT::Math::XYZVector v = mcParticle.getDecayVertex();
       ROOT::Math::PxPyPzEVector decayVertex(v.X(), v.Y(), v.Z(), Const::speedOfLight * mcParticle.getDecayTime());
       decayVertex = m_boost * decayVertex;
       mcParticle.setDecayVertex(decayVertex.X(), decayVertex.Y(), decayVertex.Z());

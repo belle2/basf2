@@ -20,7 +20,7 @@
 import sys
 
 import basf2
-from reconstruction import add_mdst_output
+from mdst import add_mdst_output
 
 rootFileName = '../DSTtoMDST'
 logFileName = rootFileName + '.log'
@@ -32,6 +32,7 @@ input.param('inputFileName', '../GenericB_GENSIMRECtoDST.dst.root')
 main.add_module(input)
 add_mdst_output(main, True, '../DSTtoMDST.mdst.root')
 
+main.add_module('Progress')
 basf2.process(main)
 
 # Print call statistics

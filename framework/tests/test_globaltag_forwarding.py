@@ -20,6 +20,7 @@ import unittest
 
 class TestGTForwarding(unittest.TestCase):
     """Test that we forward globaltags correctly"""
+
     def test_it(self):
         """Only one test here ..."""
         inputfile = b2test_utils.require_file("mdst12.root", "validation", self)

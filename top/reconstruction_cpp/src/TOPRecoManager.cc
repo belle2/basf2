@@ -176,6 +176,23 @@ namespace Belle2 {
       B2INFO("TOPRecoManager: new relative pixel efficiencies have been passed to reconstruction");
     }
 
+    void TOPRecoManager::setMirrorCenter(int moduleID, double xc, double yc)
+    {
+      auto& inverseRaytracers = getInstance().inverseRaytracers();
+      auto& fastRaytracers = getInstance().fastRaytracers();
+      auto& yScanners = getInstance().yScanners();
+      unsigned k = moduleID - 1;
+      if (k < yScanners.size()) {
+        inverseRaytracers[k].setMirrorCenter(xc, yc);
+        fastRaytracers[k].setMirrorCenter(xc, yc);
+        yScanners[k].setMirrorCenter(xc, yc);
+        return;
+      }
+
+      B2ERROR("TOPRecoManager::setMirrorCenter: invalid moduleID" << LogVar("moduleID", moduleID));
+    }
+
+
   } // namespace TOP
 } // namespace Belle2
 

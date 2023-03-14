@@ -21,7 +21,7 @@ using namespace Belle2;
 using namespace CDC;
 
 // register module
-REG_MODULE(CDCCrossTalkAdder)
+REG_MODULE(CDCCrossTalkAdder);
 CDCCrossTalkAdderModule::CDCCrossTalkAdderModule() : Module()
 {
   // Set description

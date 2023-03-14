@@ -17,7 +17,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(ParallelTrackFilter)
+REG_MODULE(ParallelTrackFilter);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -107,7 +107,7 @@ bool ParallelTrackFilterModule::isSelected(const Track* track)
   if (tfr->getPValue() < m_minPval)
     return false;
 
-  if (tfr->getMomentum().Perp() < m_minPT)
+  if (tfr->getMomentum().Rho() < m_minPT)
     return false;
 
   HitPatternVXD hitPatternVXD = tfr->getHitPatternVXD();

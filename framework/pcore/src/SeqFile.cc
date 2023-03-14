@@ -26,16 +26,20 @@ SeqFile::SeqFile(const std::string& filename, const std::string& rwflag, char* s
                  bool filenameIsPattern):
   m_filename(filename)
 {
-  if (filename.empty()) {
+  if (m_filename.empty()) {
     B2ERROR("SeqFile: Empty filename given");
     return;
   }
   bool readonly = rwflag.find('w') == std::string::npos;
+  // CAF use URL input style and add a prefix that need to be removed for sroot files
+  if (m_filename.compare(0, 7, "file://") == 0) {
+    m_filename = m_filename.substr(7, m_filename.size() - 7);
+  }
   // is the file already compressed?
-  m_compressed = filename.size() > 3 && filename.compare(filename.size() - 3, 3, ".gz") == 0;
+  m_compressed = m_filename.size() > 3 && m_filename.compare(m_filename.size() - 3, 3, ".gz") == 0;
   // strip .gz suffix to add it at the end automatically and correctly for subsequent files
   if (m_compressed) {
-    m_filename = filename.substr(0, filename.size() - 3);
+    m_filename = m_filename.substr(0, m_filename.size() - 3);
   }
   // check if we want different naming scheme using boost::format
   if (filenameIsPattern) {
@@ -60,14 +64,14 @@ SeqFile::SeqFile(const std::string& filename, const std::string& rwflag, char* s
   openFile(m_filename, readonly);
   // if that fails and it's not already assumed to be compressed try again adding .gz to the name
   if (m_fd < 0 && !m_compressed) {
-    B2WARNING("SeqFile: error opening '" << filename << "': " << strerror(errno)
+    B2WARNING("SeqFile: error opening '" << m_filename << "': " << strerror(errno)
               << ", trying again with '.gz'");
     m_compressed = true;
     openFile(m_filename, readonly);
   }
   // is the file open now?
   if (m_fd < 0) {
-    B2ERROR("SeqFile: error opening '" << filename << "': " << strerror(errno));
+    B2ERROR("SeqFile: error opening '" << m_filename << "': " << strerror(errno));
   } else {
     B2INFO("SeqFile: " << m_filename << " opened (fd=" << m_fd << ")");
   }

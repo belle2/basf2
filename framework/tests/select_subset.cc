@@ -52,7 +52,7 @@ namespace {
     // The following map type is ment as a container of all the relations
     // from m_fromElement to al other elements in all the store arrays.
     // It maps the "To" KeyElement to the weight of Relation.
-    using FromTargetElementsToWeight =  map< KeyElementType , double >;
+    using FromTargetElementsToWeight =  map< KeyElementType, double >;
 
 
     class Relations {
@@ -159,10 +159,6 @@ namespace {
 
     };
 
-//disable warnings about unused functions
-#if defined(__INTEL_COMPILER)
-#pragma warning disable 177
-#endif
 
     class NamedSet {
 
@@ -275,26 +271,21 @@ namespace {
         fromElement->second.appendNewRelationTo(toName, toKey, weight);
       }
 
-      [[nodiscard]] bool isPresentRelationFromTo(const KeyElementType& fromKey, const string& otherSetName ,
+      [[nodiscard]] bool isPresentRelationFromTo(const KeyElementType& fromKey, const string& otherSetName,
                                                  const KeyElementType& toKey) const
       {
         auto fromElement = m_set.find(fromKey);
         if (fromElement != m_set.end()) {
           return fromElement->second.isPresentRelationTo(otherSetName, toKey);
         } else {
-          static int i(0);
-          if (i ++ < 999 || (i % 100) == 0) {
-            cout << "Error: from: " << getName() << " id " <<  fromKey  <<
-                 " -> " << otherSetName << " id " << toKey << endl;
-            for (const auto& element : m_set)
-              cout << element.first << "\t";
-            cout << endl;
-            for (const auto& element : m_storeArray)
-              cout << element.GetUniqueID() << "\t";
-            cout << endl;
-          } else if (i == 1000) {
-            cout << "Skipping 99% of the following errors" << endl;
-          }
+          cout << "Error: from: " << getName() << " id " <<  fromKey  <<
+               " -> " << otherSetName << " id " << toKey << endl;
+          for (const auto& element : m_set)
+            cout << element.first << "\t";
+          cout << endl;
+          for (const auto& element : m_storeArray)
+            cout << element.GetUniqueID() << "\t";
+          cout << endl;
           return false;
         }
       }
@@ -305,7 +296,7 @@ namespace {
         return fromElement->second.getAllRelations(toOtherSetName);
       }
 
-      using StlRelationArray = map< KeyElementType , FromTargetElementsToWeight >;
+      using StlRelationArray = map< KeyElementType, FromTargetElementsToWeight >;
 
       [[nodiscard]] StlRelationArray getRestrictedDomainRelationTo(const string& toOtherSetName)const
       {
@@ -576,13 +567,13 @@ namespace {
         KeyElementType to_key   = set.second.storedArray()[to_index]->GetUniqueID();
 
 
-        if (getNamedSet().isPresentRelationFromTo(from_key, set.first , to_key))
+        if (getNamedSet().isPresentRelationFromTo(from_key, set.first, to_key))
           return; // Arrow already drawn
 
 
         double weight = getWeight();
 
-        getNamedSet().appendNewRelationTo(from_key, set.first, to_key , weight);
+        getNamedSet().appendNewRelationTo(from_key, set.first, to_key, weight);
 
         RelationArray setToOtherSet(getSet(), set.second.storedArray());
         setToOtherSet.add(from_index, to_index, weight);
@@ -608,7 +599,7 @@ namespace {
 
         double weight = getWeight();
 
-        otherSet.second.appendNewRelationTo(from_key, getSetName(), to_key , weight);
+        otherSet.second.appendNewRelationTo(from_key, getSetName(), to_key, weight);
 
         //otherSet.second.storedArray()[ from_index ]->SetBinContent( 0 , to_index , weight);
 
@@ -626,12 +617,12 @@ namespace {
         KeyElementType to_key = getSet()[to_index]->GetUniqueID();
 
 
-        if (getNamedSet().isPresentRelationFromTo(from_key, getSetName() , to_key))
+        if (getNamedSet().isPresentRelationFromTo(from_key, getSetName(), to_key))
           return; // Arrow already drawn
 
         double weight = getWeight();
 
-        getNamedSet().appendNewRelationTo(from_key, getSetName(), to_key , weight);
+        getNamedSet().appendNewRelationTo(from_key, getSetName(), to_key, weight);
 
         RelationArray setToSet(getSet(), getSet());
 
@@ -685,7 +676,7 @@ namespace {
           double weight = subsetToOtherSet[ relation ].getWeight(to_index);
           KeyElementType toElementKey =  otherSet.second.storedArray()[to]->GetUniqueID();
 
-          theInducedRelation.find(fromElementKey)->second.insert(pair< KeyElementType, double> (toElementKey , weight));
+          theInducedRelation.find(fromElementKey)->second.insert(pair< KeyElementType, double> (toElementKey, weight));
 
         }
       }
@@ -758,7 +749,7 @@ namespace {
           double weight = subsetFromOtherSet[ relation ].getWeight(to_index);
           KeyElementType toElementKey =  subset[to]->GetUniqueID();
 
-          theInducedRelation.find(fromElementKey)->second.insert(pair< KeyElementType, double> (toElementKey , weight));
+          theInducedRelation.find(fromElementKey)->second.insert(pair< KeyElementType, double> (toElementKey, weight));
 
         }
       }
@@ -828,7 +819,7 @@ namespace {
           double weight = selfRelation[ relation ].getWeight(to_index);
           KeyElementType toElementKey =  subset[to]->GetUniqueID();
 
-          theInducedRelation.find(fromElementKey)->second.insert(pair< KeyElementType, double> (toElementKey , weight));
+          theInducedRelation.find(fromElementKey)->second.insert(pair< KeyElementType, double> (toElementKey, weight));
 
         }
       }

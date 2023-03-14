@@ -12,7 +12,7 @@
 """
 <header>
     <input>KLMK0LOutput.root</input>
-    <contact>Kirill Chilikin (chilikin@lebedev.ru)</contact>
+    <contact>Leo Piilonen (piilonen@vt.edu)</contact>
     <description>Creation of KLM K0L validation plots.</description>
 </header>
 """
@@ -34,5 +34,6 @@ main = basf2.create_path()
 main.add_module(root_input)
 main.add_module(klmk0lplot)
 
+main.add_module('Progress')
 # Run.
 basf2.process(main)

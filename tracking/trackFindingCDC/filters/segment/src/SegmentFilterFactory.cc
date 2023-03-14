@@ -68,12 +68,16 @@ SegmentFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
     return std::make_unique<NoneSegmentFilter>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "all") {
     return std::make_unique<AllSegmentFilter>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "bkg_truth") {
     return std::make_unique<BkgMCSegmentFilter>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "bkg_recording") {
     return std::make_unique<BkgRecordingSegmentFilter>("BackgroundSegmentFilter.root");
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "bkg_mva") {
     return std::make_unique<BkgMVASegmentFilter>("trackfindingcdc_BackgroundSegmentFilter");
   } else {

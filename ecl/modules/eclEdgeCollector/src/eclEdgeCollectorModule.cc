@@ -6,12 +6,18 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+/* Own header. */
 #include <ecl/modules/eclEdgeCollector/eclEdgeCollectorModule.h>
-#include <TH2F.h>
-#include <TVector3.h>
-#include <TMath.h>
-#include <ecl/geometry/ECLGeometryPar.h>
+
+/* ECL headers. */
+#include <ecl/dataobjects/ECLElementNumbers.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
+#include <ecl/geometry/ECLGeometryPar.h>
+
+/* ROOT headers. */
+#include <TH2F.h>
+#include <TMath.h>
+#include <TVector3.h>
 
 
 using namespace Belle2;
@@ -19,7 +25,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(eclEdgeCollector)
+REG_MODULE(eclEdgeCollector);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -35,37 +41,44 @@ eclEdgeCollectorModule::eclEdgeCollectorModule() : CalibrationCollectorModule(),
 void eclEdgeCollectorModule::prepare()
 {
   //..Define histograms
-  auto eclCrystalX = new TH1F("eclCrystalX", "x of each crystal;cellID;x (cm)", 8736, 1, 8737);
+  auto eclCrystalX = new TH1F("eclCrystalX", "x of each crystal;cellID;x (cm)", ECLElementNumbers::c_NCrystals, 1, 8737);
   registerObject<TH1F>("eclCrystalX", eclCrystalX);
 
-  auto eclCrystalY = new TH1F("eclCrystalY", "y of each crystal;cellID;y(cm)", 8736, 1, 8737);
+  auto eclCrystalY = new TH1F("eclCrystalY", "y of each crystal;cellID;y(cm)", ECLElementNumbers::c_NCrystals, 1, 8737);
   registerObject<TH1F>("eclCrystalY", eclCrystalY);
 
-  auto eclCrystalZ = new TH1F("eclCrystalZ", "z of each crystal;cellID;z (cm)", 8736, 1, 8737);
+  auto eclCrystalZ = new TH1F("eclCrystalZ", "z of each crystal;cellID;z (cm)", ECLElementNumbers::c_NCrystals, 1, 8737);
   registerObject<TH1F>("eclCrystalZ", eclCrystalZ);
 
-  auto eclCrystalR = new TH1F("eclCrystalR", "R (3d) of each crystal;cellID;R (cm)", 8736, 1, 8737);
+  auto eclCrystalR = new TH1F("eclCrystalR", "R (3d) of each crystal;cellID;R (cm)", ECLElementNumbers::c_NCrystals, 1, 8737);
   registerObject<TH1F>("eclCrystalR", eclCrystalR);
 
-  auto eclCrystalTheta = new TH1F("eclCrystalTheta", "theta of each crystal location;cellID;theta (rad)", 8736, 1, 8737);
+  auto eclCrystalTheta = new TH1F("eclCrystalTheta", "theta of each crystal location;cellID;theta (rad)",
+                                  ECLElementNumbers::c_NCrystals, 1, 8737);
   registerObject<TH1F>("eclCrystalTheta", eclCrystalTheta);
 
-  auto eclCrystalPhi = new TH1F("eclCrystalPhi", "phi of each crystal location;cellID;phi (rad)", 8736, 1, 8737);
+  auto eclCrystalPhi = new TH1F("eclCrystalPhi", "phi of each crystal location;cellID;phi (rad)", ECLElementNumbers::c_NCrystals, 1,
+                                8737);
   registerObject<TH1F>("eclCrystalPhi", eclCrystalPhi);
 
-  auto eclCrystalDirTheta = new TH1F("eclCrystalDirTheta", "theta of each crystal direction;cellID;theta (rad)", 8736, 1, 8737);
+  auto eclCrystalDirTheta = new TH1F("eclCrystalDirTheta", "theta of each crystal direction;cellID;theta (rad)",
+                                     ECLElementNumbers::c_NCrystals, 1, 8737);
   registerObject<TH1F>("eclCrystalDirTheta", eclCrystalDirTheta);
 
-  auto eclCrystalDirPhi = new TH1F("eclCrystalDirPhi", "phi of each crystal direction;cellID;phi (rad)", 8736, 1, 8737);
+  auto eclCrystalDirPhi = new TH1F("eclCrystalDirPhi", "phi of each crystal direction;cellID;phi (rad)",
+                                   ECLElementNumbers::c_NCrystals, 1, 8737);
   registerObject<TH1F>("eclCrystalDirPhi", eclCrystalDirPhi);
 
-  auto eclCrystalEdgeTheta = new TH1F("eclCrystalEdgeTheta", "lower edge of each crystal in theta;cellID;theta (rad)", 8736, 1, 8737);
+  auto eclCrystalEdgeTheta = new TH1F("eclCrystalEdgeTheta", "lower edge of each crystal in theta;cellID;theta (rad)",
+                                      ECLElementNumbers::c_NCrystals, 1, 8737);
   registerObject<TH1F>("eclCrystalEdgeTheta", eclCrystalEdgeTheta);
 
-  auto eclCrystalEdgePhi = new TH1F("eclCrystalEdgePhi", "lower edge of each crystal in phi;cellID;phi (rad)", 8736, 1, 8737);
+  auto eclCrystalEdgePhi = new TH1F("eclCrystalEdgePhi", "lower edge of each crystal in phi;cellID;phi (rad)",
+                                    ECLElementNumbers::c_NCrystals, 1, 8737);
   registerObject<TH1F>("eclCrystalEdgePhi", eclCrystalEdgePhi);
 
-  auto eclEdgeCounter = new TH1F("eclEdgeCounter", "dummy histogram to count collector calls;cellID;calls", 8736, 1, 8737);
+  auto eclEdgeCounter = new TH1F("eclEdgeCounter", "dummy histogram to count collector calls;cellID;calls",
+                                 ECLElementNumbers::c_NCrystals, 1, 8737);
   registerObject<TH1F>("eclEdgeCounter", eclEdgeCounter);
 
 }
@@ -84,7 +97,7 @@ void eclEdgeCollectorModule::collect()
 
     //..ECL geometry
     Belle2::ECL::ECLGeometryPar* eclGeometry = Belle2::ECL::ECLGeometryPar::Instance();
-    for (int cellID = 1; cellID <= 8736; cellID++) {
+    for (int cellID = 1; cellID <= ECLElementNumbers::c_NCrystals; cellID++) {
       TVector3 crystalPos = eclGeometry->GetCrystalPos(cellID - 1);
       TVector3 crystalDirection = eclGeometry->GetCrystalVec(cellID - 1);
       getObjectPtr<TH1F>("eclCrystalX")->SetBinContent(cellID, crystalPos.X());
@@ -101,7 +114,8 @@ void eclEdgeCollectorModule::collect()
       float thetaEdge = crystalPos.Theta() - offsetTheta[cellID - 1];
       getObjectPtr<TH1F>("eclCrystalEdgeTheta")->SetBinContent(cellID, thetaEdge);
 
-      float phiEdge = crystalPos.Phi() - offsetPhi[cellID - 1];
+      float phiEdge = crystalPos.Phi();
+      if (!offsetPhi.empty()) phiEdge -= offsetPhi[cellID - 1];
       if (phiEdge < -TMath::Pi()) {phiEdge += 2 * TMath::Pi();}
       getObjectPtr<TH1F>("eclCrystalEdgePhi")->SetBinContent(cellID, phiEdge);
 

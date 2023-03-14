@@ -23,6 +23,9 @@
 #include <svd/reconstruction/SVDRecoChargeFactory.h>
 #include <svd/reconstruction/SVDRecoPositionFactory.h>
 
+#include <TRandom.h>
+
+#include <math.h>
 
 using namespace std;
 using namespace Belle2;
@@ -32,7 +35,7 @@ using namespace Belle2::SVD;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SVDClusterizer)
+REG_MODULE(SVDClusterizer);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -111,7 +114,7 @@ void SVDClusterizerModule::beginRun()
     if (!m_recoConfig.isValid())
       B2FATAL("no valid configuration found for SVD reconstruction");
     else
-      B2INFO("SVDRecoConfiguration: from now on we are using " << m_recoConfig->get_uniqueID());
+      B2DEBUG(20, "SVDRecoConfiguration: from now on we are using " << m_recoConfig->get_uniqueID());
 
     m_timeRecoWith6SamplesAlgorithm = m_recoConfig->getTimeRecoWith6Samples();
     m_timeRecoWith3SamplesAlgorithm = m_recoConfig->getTimeRecoWith3Samples();
@@ -398,10 +401,17 @@ void SVDClusterizerModule::finalizeCluster(Belle2::SVD::RawCluster& rawCluster)
 
     //..and write relations
     writeClusterRelations(rawCluster);
+
+    //alter cluster position and time on MC to match resolution measured on data
+    bool isMC = Environment::Instance().isMC();
+    if (isMC) {
+      alterClusterPosition();
+      alterClusterTime();
+    }
   }
 }
 
-void SVDClusterizerModule::writeClusterRelations(Belle2::SVD::RawCluster& rawCluster)
+void SVDClusterizerModule::writeClusterRelations(const Belle2::SVD::RawCluster& rawCluster)
 {
   RelationArray relClusterDigit(m_storeClusters, m_storeDigits, m_relClusterShaperDigitName);
 
@@ -478,6 +488,63 @@ double SVDClusterizerModule::applyLorentzShiftCorrection(double position, VxdID 
 
   return position;
 }
+
+void SVDClusterizerModule::alterClusterPosition()
+{
+  // alter the position of the last cluster in the array
+  int clsIndex = m_storeClusters.getEntries() - 1;
+
+  // get the necessary information on the cluster
+  float clsPosition = m_storeClusters[clsIndex]->getPosition();
+  VxdID sensorID = m_storeClusters[clsIndex]->getSensorID();
+  bool isU = m_storeClusters[clsIndex]->isUCluster();
+  int layerNum = sensorID.getLayerNumber();
+
+  // get the first true hit in the array
+  SVDTrueHit* trueHit = m_storeClusters[clsIndex]->getRelatedTo<SVDTrueHit>(m_storeTrueHitsName);
+
+  // get the track's incident angle
+  double trkAngle = 0.;
+
+  // check if cluster has associated true hit
+  if (trueHit) {
+    double trkLength = isU ? trueHit->getExitU() - trueHit->getEntryU() : trueHit->getExitV() - trueHit->getEntryV();
+    double trkHeight = std::abs(trueHit->getExitW() - trueHit->getEntryW());
+    trkAngle = atan2(trkLength, trkHeight);
+  }
+
+  // get the appropriate sigma to alter the position
+  double sigma = m_mcPositionFudgeFactor.getFudgeFactor(sensorID, isU, trkAngle);
+
+  // do the job
+  float fudgeFactor = (float) gRandom->Gaus(0., sigma);
+  m_storeClusters[clsIndex]->setPosition(clsPosition + fudgeFactor);
+
+  B2DEBUG(20, "Layer number: " << layerNum << ", is U side: " << isU << ", track angle: " << trkAngle << ", sigma: " << sigma <<
+          ", cluster position: " << clsPosition << ", fudge factor: " << fudgeFactor);
+}
+
+void SVDClusterizerModule::alterClusterTime()
+{
+  // alter the time of the last cluster in the array
+  int clsIndex = m_storeClusters.getEntries() - 1;
+
+  // get the necessary information on the cluster
+  float clsTime = m_storeClusters[clsIndex]->getClsTime();
+  VxdID sensorID = m_storeClusters[clsIndex]->getSensorID();
+  bool isU = m_storeClusters[clsIndex]->isUCluster();
+
+  // get the appropriate sigma to alter the time
+  double sigma = m_mcTimeFudgeFactor.getFudgeFactor(sensorID, isU);
+
+  // do the job
+  float fudgeFactor = (float) gRandom->Gaus(0., sigma);
+  m_storeClusters[clsIndex]->setClsTime(clsTime + fudgeFactor);
+
+  B2DEBUG(20, "Layer number: " << sensorID.getLayerNumber() << ", is U side: " << isU << ", sigma: " << sigma <<
+          ", cluster time: " << clsTime << ", fudge factor: " << fudgeFactor);
+}
+
 void SVDClusterizerModule::endRun()
 {
 

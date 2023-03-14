@@ -32,7 +32,7 @@ namespace Belle2 {
 
     /** This enumeration assure the same semantic of the
     isU methods defined by Peter Kv.*/
-    enum E_side { VIndex = 0 , UIndex = 1 };
+    enum E_side { VIndex = 0, UIndex = 1 };
 
     /** get a reference to the histogram for @param vxdID side @param view and @param apv
      * please, use the enumeration SVDAPVHistograms::Vindex and
@@ -90,13 +90,13 @@ namespace Belle2 {
       std::string sensor = std::to_string(vxdID.getSensorNumber());
       std::string apv = std::to_string(user_apv);
       std::string view = isU ? "U" : "V" ;
-      base = std::regex_replace(base, std::regex("[@]layer") , layer);
+      base = std::regex_replace(base, std::regex("[@]layer"), layer);
       base = std::regex_replace(base, std::regex("[@]ladder"), ladder);
       base = std::regex_replace(base, std::regex("[@]sensor"), sensor);
-      base = std::regex_replace(base, std::regex("[@]view")  , view);
+      base = std::regex_replace(base, std::regex("[@]view"), view);
       std::string side = isU ? "P" : "N" ;
-      base = std::regex_replace(base, std::regex("[@]side")  , side);
-      base = std::regex_replace(base, std::regex("[@]apv")  , apv);
+      base = std::regex_replace(base, std::regex("[@]side"), side);
+      base = std::regex_replace(base, std::regex("[@]apv"), apv);
     }
 
     /** delete pointers*/
@@ -139,7 +139,7 @@ namespace Belle2 {
 
     void customize(H& histogram, VxdID vxdID, int view, int apv); /**< customize the histogram with the sensor, view and APV numbers*/
 
-    ClassDef(SVDAPVHistograms , 1); /**< needed by root*/
+    ClassDef(SVDAPVHistograms, 1);  /**< needed by root*/
   };
 
   /** constructor, builds all histograms and customize them*/
@@ -175,7 +175,7 @@ namespace Belle2 {
             for (int apv = 0; apv < nAPV; apv ++) {
 
               H h = templateAPV;
-              customize(h , sensor, view, apv);
+              customize(h, sensor, view, apv);
               m_histograms[layerNumber][ladderNumber][sensorNumber][view][apv] = new H(h);
             }
           }

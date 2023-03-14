@@ -11,12 +11,11 @@
 
 /* KLM headers. */
 #include <klm/dataobjects/bklm/BKLMHit1d.h>
-#include <klm/dataobjects/bklm/BKLMSimHit.h>
-#include <klm/dataobjects/eklm/EKLMSimHit.h>
 #include <klm/dataobjects/KLMDigit.h>
 #include <klm/dataobjects/KLMHit2d.h>
+#include <klm/dataobjects/KLMSimHit.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <mdst/dataobjects/MCParticle.h>
 
 /* C++ headers. */
@@ -24,7 +23,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(MCMatcherKLMClusters)
+REG_MODULE(MCMatcherKLMClusters);
 
 MCMatcherKLMClustersModule::MCMatcherKLMClustersModule() : Module()
 {
@@ -40,24 +39,28 @@ MCMatcherKLMClustersModule::~MCMatcherKLMClustersModule()
 
 void MCMatcherKLMClustersModule::initialize()
 {
-  StoreArray<MCParticle> mcParticles;
   m_KLMClusters.isRequired();
-  mcParticles.isRequired();
-  m_KLMClusters.registerRelationTo(mcParticles);
+  m_MCParticles.isOptional();
+  if (m_MCParticles.isValid()) {
+    m_KLMClusters.registerRelationTo(m_MCParticles);
+  }
   if (m_Hit2dRelations) {
     StoreArray<KLMHit2d> bklmHit2ds;
     StoreArray<KLMHit2d> eklmHit2ds;
-    bklmHit2ds.registerRelationTo(mcParticles);
-    eklmHit2ds.registerRelationTo(mcParticles);
+    if (m_MCParticles.isValid()) {
+      bklmHit2ds.registerRelationTo(m_MCParticles);
+      eklmHit2ds.registerRelationTo(m_MCParticles);
+    }
   }
-}
-
-void MCMatcherKLMClustersModule::beginRun()
-{
 }
 
 void MCMatcherKLMClustersModule::event()
 {
+  // Don't do anything if MCParticles aren't present
+  if (not m_MCParticles.isValid()) {
+    return;
+  }
+
   double weightSum;
   /* cppcheck-suppress variableScope */
   int i1, i2, i3, i4, i5, i6, n1, n2, n3, n4, n5, n6;
@@ -80,8 +83,8 @@ void MCMatcherKLMClustersModule::event()
           bklmHit1ds[i3]->getRelationsTo<KLMDigit>();
         n4 = bklmDigits.size();
         for (i4 = 0; i4 < n4; i4++) {
-          RelationVector<BKLMSimHit> bklmSimHits =
-            bklmDigits[i4]->getRelationsTo<BKLMSimHit>();
+          RelationVector<KLMSimHit> bklmSimHits =
+            bklmDigits[i4]->getRelationsTo<KLMSimHit>();
           n5 = bklmSimHits.size();
           for (i5 = 0; i5 < n5; i5++) {
             RelationVector<MCParticle> bklmMCParticles =
@@ -128,8 +131,8 @@ void MCMatcherKLMClustersModule::event()
         eklmHit2ds[i2]->getRelationsTo<KLMDigit>();
       n3 = eklmDigits.size();
       for (i3 = 0; i3 < n3; i3++) {
-        RelationVector<EKLMSimHit> eklmSimHits =
-          eklmDigits[i3]->getRelationsTo<EKLMSimHit>();
+        RelationVector<KLMSimHit> eklmSimHits =
+          eklmDigits[i3]->getRelationsTo<KLMSimHit>();
         n4 = eklmSimHits.size();
         for (i4 = 0; i4 < n4; i4++) {
           RelationVector<MCParticle> eklmMCParticles =
@@ -172,12 +175,3 @@ void MCMatcherKLMClustersModule::event()
       m_KLMClusters[i1]->addRelationTo(it->first, it->second / weightSum);
   }
 }
-
-void MCMatcherKLMClustersModule::endRun()
-{
-}
-
-void MCMatcherKLMClustersModule::terminate()
-{
-}
-

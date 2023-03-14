@@ -22,7 +22,7 @@ using namespace std;
 
 using namespace Belle2;
 
-REG_MODULE(SVDHotStripFinder)
+REG_MODULE(SVDHotStripFinder);
 SVDHotStripFinderModule::SVDHotStripFinderModule() : Module()
 {
   setDescription("The svdHotStripFinder module finds hot strips in SVD data SVDShaperDigit");
@@ -217,7 +217,6 @@ void SVDHotStripFinderModule::endRun()
     VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
     std::set<Belle2::VxdID> svdLayers = aGeometry.getLayers(VXD::SensorInfoBase::SVD);
     std::set<Belle2::VxdID>::iterator itSvdLayers = svdLayers.begin();
-    int itsensor = 0; //sensor numbering
     while ((itSvdLayers != svdLayers.end())
            && (itSvdLayers->getLayerNumber() != 7)) { //loop on Layers
 
@@ -278,7 +277,7 @@ void SVDHotStripFinderModule::endRun()
             for (int l = 0; l < nstrips; l++) {
               hotStripsDBObjPtr->set(layer, ladder, sensor, k, l, (int)hsflag[l]);
               if (hsflag[l] == 0) {
-                hm_occupancy_after->getHistogram(*itSvdSensors, k)->SetBinContent(l + 1 , stripOccAfterAbsCut[l]);
+                hm_occupancy_after->getHistogram(*itSvdSensors, k)->SetBinContent(l + 1, stripOccAfterAbsCut[l]);
                 hm_occAfter->fill(*itSvdSensors, k, stripOccAfterAbsCut[l]);
               } else {
                 hm_hot_strips->getHistogram(*itSvdSensors, k)->SetBinContent(l + 1, 1);
@@ -321,7 +320,6 @@ void SVDHotStripFinderModule::endRun()
 
             B2DEBUG(1, " L" << layer << "." << ladder << "." << sensor << ".isU=" << k);
 
-            itsensor++;
           }
           ++itSvdSensors;
         }

@@ -5,30 +5,27 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//This module`
+
+/* Own header. */
 #include <ecl/modules/eclee5x5Collector/eclee5x5CollectorModule.h>
 
-//Root
-#include <TH2F.h>
-#include <Math/Vector3D.h>
-#include <Math/Vector4D.h>
-
-//Analysis
-#include <analysis/ClusterUtility/ClusterUtils.h>
-
-//Framework
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/datastore/RelationVector.h>
-
-//MDST
-#include <mdst/dataobjects/TRGSummary.h>
-#include <mdst/dataobjects/ECLCluster.h>
-
-//ECL
-#include <ecl/dataobjects/ECLDigit.h>
+/* ECL headers. */
 #include <ecl/dataobjects/ECLCalDigit.h>
+#include <ecl/dataobjects/ECLDigit.h>
+#include <ecl/dataobjects/ECLElementNumbers.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 
+/* Basf2 headers. */
+#include <analysis/ClusterUtility/ClusterUtils.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/RelationVector.h>
+#include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/TRGSummary.h>
+
+/* ROOT headers. */
+#include <Math/Vector3D.h>
+#include <Math/Vector4D.h>
+#include <TH2F.h>
 
 using namespace std;
 using namespace Belle2;
@@ -37,7 +34,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(eclee5x5Collector)
+REG_MODULE(eclee5x5Collector);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -78,35 +75,42 @@ void eclee5x5CollectorModule::prepare()
 
   /**----------------------------------------------------------------------------------------*/
   /** Create the histograms and register them in the data store */
-  auto EnVsCrysID = new TH2F("EnVsCrysID", "Normalized 5x5 energy for each crystal;crystal ID;E25/Expected", 8736, 0, 8736, 200, 0.7,
+  auto EnVsCrysID = new TH2F("EnVsCrysID", "Normalized 5x5 energy for each crystal;crystal ID;E25/Expected",
+                             ECLElementNumbers::c_NCrystals, 0, ECLElementNumbers::c_NCrystals, 200, 0.7,
                              1.2);
   registerObject<TH2F>("EnVsCrysID", EnVsCrysID);
 
-  auto RvsCrysID = new TH1F("RvsCrysID", "E_exp x E_crysID / sigma^2;crysID;sum of E_exp x E_crysID/sigma^2", 8736, 0, 8736);
+  auto RvsCrysID = new TH1F("RvsCrysID", "E_exp x E_crysID / sigma^2;crysID;sum of E_exp x E_crysID/sigma^2",
+                            ECLElementNumbers::c_NCrystals, 0, ECLElementNumbers::c_NCrystals);
   registerObject("RvsCrysID", RvsCrysID);
 
-  auto NRvsCrysID = new TH1F("NRvsCrysID", "Entries in RvsCrysID vs crysID;crysID;Entries in RvsCrysID", 8736, 0, 8736);
+  auto NRvsCrysID = new TH1F("NRvsCrysID", "Entries in RvsCrysID vs crysID;crysID;Entries in RvsCrysID",
+                             ECLElementNumbers::c_NCrystals, 0, ECLElementNumbers::c_NCrystals);
   registerObject("NRvsCrysID", NRvsCrysID);
 
-  auto Qmatrix = new TH2F("Qmatrix", "E_i x E_j/sigma^2;crysID i;crysID j", 8736, 0, 8736, 8736, 0, 8736);
+  auto Qmatrix = new TH2F("Qmatrix", "E_i x E_j/sigma^2;crysID i;crysID j", ECLElementNumbers::c_NCrystals, 0,
+                          ECLElementNumbers::c_NCrystals, ECLElementNumbers::c_NCrystals, 0, ECLElementNumbers::c_NCrystals);
   registerObject("Qmatrix", Qmatrix);
 
 
   auto ElecCalibvsCrys = new TH1F("ElecCalibvsCrys", "Sum electronics calib const vs crystal ID;crystal ID;calibration constant",
-                                  8736, 0, 8736);
+                                  ECLElementNumbers::c_NCrystals, 0, ECLElementNumbers::c_NCrystals);
   registerObject<TH1F>("ElecCalibvsCrys", ElecCalibvsCrys);
-  auto ExpEvsCrys = new TH1F("ExpEvsCrys", "Sum expected energy calib const vs crystalID;crystal ID;calibration constant", 8736, 0,
-                             8736);
+  auto ExpEvsCrys = new TH1F("ExpEvsCrys", "Sum expected energy calib const vs crystalID;crystal ID;calibration constant",
+                             ECLElementNumbers::c_NCrystals, 0,
+                             ECLElementNumbers::c_NCrystals);
   registerObject<TH1F>("ExpEvsCrys", ExpEvsCrys);
   auto InitialCalibvsCrys = new TH1F("InitialCalibvsCrys", "Sum initial calib const vs crystal ID;crystal ID;calibration constant",
-                                     8736, 0, 8736);
+                                     ECLElementNumbers::c_NCrystals, 0, ECLElementNumbers::c_NCrystals);
   registerObject<TH1F>("InitialCalibvsCrys", InitialCalibvsCrys);
 
-  auto CalibEntriesvsCrys = new TH1F("CalibEntriesvsCrys", "Entries in calib vs crys histograms;crystal ID;Entries per crystal", 8736,
-                                     0, 8736);
+  auto CalibEntriesvsCrys = new TH1F("CalibEntriesvsCrys", "Entries in calib vs crys histograms;crystal ID;Entries per crystal",
+                                     ECLElementNumbers::c_NCrystals,
+                                     0, ECLElementNumbers::c_NCrystals);
   registerObject<TH1F>("CalibEntriesvsCrys", CalibEntriesvsCrys);
 
-  auto EntriesvsCrys = new TH1F("EntriesvsCrys", "Selected Bhabha clusters vs crystal ID;crystal ID;Entries", 8736, 0, 8736);
+  auto EntriesvsCrys = new TH1F("EntriesvsCrys", "Selected Bhabha clusters vs crystal ID;crystal ID;Entries",
+                                ECLElementNumbers::c_NCrystals, 0, ECLElementNumbers::c_NCrystals);
   registerObject<TH1F>("EntriesvsCrys", EntriesvsCrys);
 
   auto dPhivsThetaID = new TH2F("dPhivsThetaID",
@@ -129,8 +133,8 @@ void eclee5x5CollectorModule::prepare()
   B2INFO("requireL1: " << m_requireL1);
 
   /** Resize vectors */
-  EperCrys.resize(8736);
-  m_thetaID.resize(8736);
+  EperCrys.resize(ECLElementNumbers::c_NCrystals);
+  m_thetaID.resize(ECLElementNumbers::c_NCrystals);
 
   /** ECL geometry */
   m_eclNeighbours5x5 = new ECL::ECLNeighbours("N", 2);
@@ -159,7 +163,7 @@ void eclee5x5CollectorModule::prepare()
   }
 
   /** Verify that we have valid values for the payloads */
-  for (int crysID = 0; crysID < 8736; crysID++) {
+  for (int crysID = 0; crysID < ECLElementNumbers::c_NCrystals; crysID++) {
     if (ElectronicsCalib[crysID] <= 0) {B2FATAL("eclee5x5Collector: ElectronicsCalib = " << ElectronicsCalib[crysID] << " for crysID = " << crysID);}
     if (Expee5x5E[crysID] == 0) {B2FATAL("eclee5x5Collector: Expee5x5E = 0 for crysID = " << crysID);}
     if (ee5x5Calib[crysID] == 0) {B2FATAL("eclee5x5Collector: ee5x5Calib = 0 for crysID = " << crysID);}
@@ -169,7 +173,7 @@ void eclee5x5CollectorModule::prepare()
   /** Required data objects */
   m_eclClusterArray.isRequired();
   m_eclCalDigitArray.isRequired();
-  m_eclDigitArray.isRequired();
+  if (!m_useCalDigits) {m_eclDigitArray.isRequired();}
   m_evtMetaData.isRequired();
 
   /**----------------------------------------------------------------------------------------*/
@@ -196,7 +200,7 @@ void eclee5x5CollectorModule::collect()
 
   /** Record the input database constants for the first call */
   if (storeCalib) {
-    for (int crysID = 0; crysID < 8736; crysID++) {
+    for (int crysID = 0; crysID < ECLElementNumbers::c_NCrystals; crysID++) {
       getObjectPtr<TH1F>("ExpEvsCrys")->Fill(crysID + 0.001, Expee5x5E[crysID]);
       getObjectPtr<TH1F>("ElecCalibvsCrys")->Fill(crysID + 0.001, ElectronicsCalib[crysID]);
       getObjectPtr<TH1F>("InitialCalibvsCrys")->Fill(crysID + 0.001, ee5x5Calib[crysID]);
@@ -233,7 +237,7 @@ void eclee5x5CollectorModule::collect()
     }
 
     /** Verify that we have valid values for the starting calibrations */
-    for (int crysID = 0; crysID < 8736; crysID++) {
+    for (int crysID = 0; crysID < ECLElementNumbers::c_NCrystals; crysID++) {
       if (ElectronicsCalib[crysID] <= 0) {B2FATAL("eclee5x5Collector: ElectronicsCalib = " << ElectronicsCalib[crysID] << " for crysID = " << crysID);}
       if (Expee5x5E[crysID] == 0) {B2FATAL("eclee5x5Collector: Expee5x5E = 0 for crysID = " << crysID);}
       if (ee5x5Calib[crysID] == 0) {B2FATAL("eclee5x5Collector: ee5x5Calib = 0 for crysID = " << crysID);}

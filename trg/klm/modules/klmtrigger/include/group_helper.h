@@ -152,7 +152,7 @@ namespace Belle2::group_helper {
       return ret;
     }
 
-    template <typename A1 , typename... ARGGS>
+    template <typename A1, typename... ARGGS>
     struct __get_element {
 
       template<class ARRAY_T>
@@ -265,7 +265,7 @@ namespace Belle2::group_helper {
 
 
   template <typename CONTAINER_T, typename INIT_T, typename OP_T = plus, typename PROJECTION_T =  identity>
-  auto accumulate(const  CONTAINER_T& container, INIT_T init, OP_T op = plus {} , PROJECTION_T proj = identity{})
+  auto accumulate(const  CONTAINER_T& container, INIT_T init, OP_T op = plus {}, PROJECTION_T proj = identity{})
   {
     for (const auto& e : container)
       init = op(init, proj(e));
@@ -273,7 +273,7 @@ namespace Belle2::group_helper {
   }
 
   template <typename CONTAINER_T, typename OP_T = group_helper::greater<int>, typename PROJECTION_T =  identity>
-  auto count_if(const  CONTAINER_T& container, OP_T op = group_helper::greater<int> {0} , PROJECTION_T proj = identity{})
+  auto count_if(const  CONTAINER_T& container, OP_T op = group_helper::greater<int> {0}, PROJECTION_T proj = identity{})
   {
     int i = 0;
     for (const auto& e : container)
@@ -284,7 +284,7 @@ namespace Belle2::group_helper {
 
   template <typename CONTAINER_T, typename CONDITION_T, typename DEFAULT_T = int, typename PROJECTION_T =  identity>
   auto first_or_default(const  CONTAINER_T& container, const CONDITION_T& con,  DEFAULT_T default__ = 0,
-                        PROJECTION_T proj = identity {})
+  PROJECTION_T proj = identity {})
   {
     decltype(proj(container[0])) ret = default__;
     for (const auto& e : container) {

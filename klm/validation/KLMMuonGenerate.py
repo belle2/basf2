@@ -64,5 +64,6 @@ main_path.add_module('RootOutput',
                      outputFileName=output_filename,
                      branchNames=['MCParticles', 'KLMMuidLikelihoods', 'KLMDigits', 'KLMHit2ds', 'EventT0'])
 
+main_path.add_module('Progress')
 basf2.process(main_path)
 print(basf2.statistics)

@@ -114,6 +114,10 @@ bool Variable::Manager::addAlias(const std::string& alias, const std::string& va
   return true;
 }
 
+void Variable::Manager::clearAliases()
+{
+  m_alias.clear();
+}
 
 void Variable::Manager::printAliases()
 {
@@ -130,6 +134,18 @@ void Variable::Manager::printAliases()
            ' ') << " --> " << a.second);
   }
   B2INFO("=====================================");
+}
+
+std::string Variable::Manager::resolveAlias(const std::string& alias)
+{
+
+  assertValidName(alias);
+
+  if (m_alias.find(alias) == m_alias.end()) {
+    return alias;
+  } else {
+    return m_alias[alias];
+  }
 }
 
 bool Variable::Manager::addCollection(const std::string& collection, const std::vector<std::string>& variables)
@@ -330,7 +346,7 @@ void Variable::Manager::registerVariable(const std::string& name, const Variable
     m_variables[name] = var;
     m_variablesInRegistrationOrder.push_back(var.get());
     if (!unit.empty()) {
-      var.get()->extendDescriptionString("\n\n :Unit: " + unit);
+      var.get()->extendDescriptionString(":Unit: " + unit);
     }
   } else {
     B2FATAL("A variable named '" << name << "' was already registered! Note that all variables need a unique name!");
@@ -354,7 +370,7 @@ void Variable::Manager::registerVariable(const std::string& name, const Variable
     m_parameter_variables[rawName] = var;
     m_variablesInRegistrationOrder.push_back(var.get());
     if (!unit.empty()) {
-      var.get()->extendDescriptionString("\n\n :Unit: " + unit);
+      var.get()->extendDescriptionString(":Unit: " + unit);
     }
   } else {
     B2FATAL("A variable named '" << name << "' was already registered! Note that all variables need a unique name!");
@@ -462,7 +478,6 @@ double Variable::Manager::evaluate(const std::string& varName, const Particle* p
   const Var* var = getVariable(varName);
   if (!var) {
     throw std::runtime_error("Variable::Manager::evaluate(): variable '" + varName + "' not found!");
-    return 0.0; //never reached, suppresses cppcheck warning
   }
 
   if (var->variabletype == Variable::Manager::VariableDataType::c_double)

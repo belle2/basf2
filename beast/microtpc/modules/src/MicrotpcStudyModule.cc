@@ -40,7 +40,7 @@ using namespace microtpc;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(MicrotpcStudy)
+REG_MODULE(MicrotpcStudy);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -467,10 +467,10 @@ void MicrotpcStudyModule::event()
     if (trID == mcpart.getTrackID()) continue;
     else trID = mcpart.getTrackID();
     int detNb = -1;
-    int nhit = 0;
+    // int nhit = 0; // unused variable
     for (const auto& sHit : SimHits) {
       if (sHit.gettkID() == trID) {
-        detNb = sHit.getdetNb(); nhit++;
+        detNb = sHit.getdetNb(); // nhit++;
         kin = sHit.gettkKEnergy() / 1000;
       }
     }

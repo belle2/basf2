@@ -20,7 +20,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(InclusiveDstarReconstruction)
+REG_MODULE(InclusiveDstarReconstruction);
 
 //-----------------------------------------------------------------
 //                 Implementation

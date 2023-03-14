@@ -79,8 +79,7 @@ namespace Belle2 {
       {
         if (beamSpot == true) {
           if (RaveSetup::getRawInstance()->m_useBeamSpot == false) {
-            B2ERROR("Beam spot information cannot be used because the beam spot position and covariance was not set in RaveSetup");
-            throw;
+            B2FATAL("Beam spot information cannot be used because the beam spot position and covariance was not set in RaveSetup");
           }
           m_useBeamSpot = true;
         } else {

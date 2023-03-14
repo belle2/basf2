@@ -155,7 +155,8 @@ The following restrictions apply:
         if(br && br->GetTargetClass() == FileMetaData::Class() && std::string(br->GetName()) == "FileMetaData")
           continue;
         // Make sure the branch is mergeable
-        if(!br || !br->GetTargetClass()->InheritsFrom(Mergeable::Class())){
+        if(!br) continue;
+        if(!br->GetTargetClass()->InheritsFrom(Mergeable::Class())){
           B2ERROR("Branch " << std::quoted(br->GetName()) << " in persistent tree not inheriting from Mergable");
           continue;
         }

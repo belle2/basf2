@@ -24,7 +24,7 @@ using boost::format;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(DQMHistAnalysisPXDFits)
+REG_MODULE(DQMHistAnalysisPXDFits);
 
 //-----------------------------------------------------------------
 //                 Implementation

@@ -10,10 +10,11 @@ import pathlib
 import tempfile
 import numpy as np
 
-
 from tensorflow.keras.layers import Dense, Input
 from tensorflow.keras.models import Model, load_model
 from tensorflow.keras.losses import binary_crossentropy
+import tensorflow as tf
+from basf2 import B2WARNING
 
 
 class State(object):
@@ -79,7 +80,6 @@ def load(obj):
 
         for index, key in enumerate(obj[2]):
             setattr(state, key, obj[3][index])
-
     return state
 
 
@@ -87,21 +87,34 @@ def apply(state, X):
     """
     Apply estimator to passed data.
     """
-    r = state.model.predict(X).flatten()
+    # convert array input to tensor to avoid creating a new graph for each input
+    # calling the model directly is faster than using the predict method in most of our applications
+    # as we do a loop over events.
+    r = state.model(tf.convert_to_tensor(np.atleast_2d(X), dtype=tf.float32), training=False).numpy()
+    if r.shape[1] == 1:
+        r = r[:, 0]  # cannot use squeeze because we might have output of shape [1,X classes]
     return np.require(r, dtype=np.float32, requirements=['A', 'W', 'C', 'O'])
 
 
-def begin_fit(state, Xtest, Stest, ytest, wtest):
+def begin_fit(state, Xtest, Stest, ytest, wtest, nBatches):
     """
     Returns just the state object
     """
     return state
 
 
-def partial_fit(state, X, S, y, w, epoch):
+def partial_fit(state, X, S, y, w, epoch, batch):
     """
     Pass received data to tensorflow.keras session
     """
+    if epoch > 0:
+        B2WARNING("The keras training interface has been called with specific_options.m_nIterations > 1."
+                  " In the default implementation this should not be done as keras handles the number of epochs internally.")
+
+    if batch > 0:
+        B2WARNING("The keras training interface has been called with specific_options.m_mini_batch_size > 1."
+                  " In the default implementation this should not be done as keras handles the number of batches internally.")
+
     state.model.fit(X, y, batch_size=100, epochs=10)
     return False
 

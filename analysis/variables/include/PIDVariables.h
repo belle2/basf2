@@ -281,6 +281,16 @@ namespace Belle2 {
     Manager::FunctionPtr pidWeightedPairProbabilityExpert(const std::vector<std::string>& arguments);
 
     /**
+     * @return neural-network based PID likelihood
+     * For expert's use only!!
+     * The first argument should be the db object name of the neural network parameters.
+     * The second argument is the particle hypothesis as string
+     * Examples:
+     * pi probability =  pidNeuralNetworkValueExpert(PIDNeuralNetworkParameters, 211);
+     */
+    Manager::FunctionPtr pidNeuralNetworkValueExpert(const std::vector<std::string>& arguments);
+
+    /**
     * @return  weighted posterior probability for a certain mass hypothesis, taking into account all the possible alternatives. Any set of detectors can be used to calculate the likelihood ratios.
     * For expert's use only!!
     * The first argument should be the db object name of the calibration weight matrix.

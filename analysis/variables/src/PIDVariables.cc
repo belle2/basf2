@@ -22,6 +22,7 @@
 //#include <framework/database/DBObjPtr.h>
 #include <analysis/dbobjects/PIDCalibrationWeight.h>
 #include <analysis/utility/PIDCalibrationWeightUtil.h>
+#include <analysis/utility/PIDNeuralNetwork.h>
 
 #include <boost/algorithm/string.hpp>
 
@@ -379,6 +380,109 @@ namespace Belle2 {
         else
           return -1;
       };
+      return func;
+    }
+
+
+    Manager::FunctionPtr pidNeuralNetworkValueExpert(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() != 2) {
+        B2ERROR("Need pdg code and PIDNeuralNetworkParameters name for pidNeuralNetworkValueExpert");
+        return nullptr;
+      }
+      std::string parameterSetName = arguments[0];
+
+      int pdgCode;
+      try {
+        pdgCode = abs(Belle2::convertString<int>(arguments[1]));
+      } catch (std::invalid_argument& e) {
+        B2ERROR("Second argument of pidNeuralNetworkValueExpert must be a PDG code");
+        return nullptr;
+      }
+
+      auto neuralNetworkPtr = std::make_shared<PIDNeuralNetwork>(parameterSetName);
+
+      /**
+       * Input mapping:
+       * Preparing the set if input variables is done by first creating a
+       * list `inputsAll` of all possible input variables in an order defined by this function.
+       * Then only those variables that are needed by the used neural network are selected
+       * and ordered accordingly. This allows to employ different neural networks with different
+       * inputs using the same code. For performance reasons, we first create a mapping between the
+       * index in the enural-network input array and the inputsAll here once, as this requires
+       * time-consuming string comparisons, and then use this mapping in the code that collects the inputs
+       * for each track below.
+       * CAUTION: If you change the list of inputsAll here, you have to change it also the loop the collects
+       *          the input variables of each track in the code below.
+       */
+      // build list of all input names
+      std::vector<std::string> inputsAllNames;
+      for (const Const::EDetector& detector : Const::PIDDetectorSet::set()) {
+        for (const auto& hypeType : Const::chargedStableSet) {
+          inputsAllNames.push_back("pidLogLikelihood_Of_" + std::to_string(abs(hypeType.getPDGCode())) + "_From_" + Const::parseDetectors(
+                                     detector));
+        }
+      }
+      inputsAllNames.push_back("momentum");
+      inputsAllNames.push_back("cosTheta");
+      inputsAllNames.push_back("phi");
+      inputsAllNames.push_back("charge");
+      const size_t inputsAllSize = inputsAllNames.size();
+
+      //build mapping for neural-network inputs
+      std::vector<size_t> mapInputsNN2InputsAll;  // mapInputsNN2InputsAll[<NN-index>] = <all-index>
+      for (const auto& inputName : neuralNetworkPtr->getInputNames()) {
+        const auto itr = std::find(inputsAllNames.begin(), inputsAllNames.end(), inputName);
+        if (itr == inputsAllNames.end()) {
+          B2ERROR("Neural network needs input '" + inputName + "', but this input is not (yet) available!");
+          return nullptr;
+        }
+        mapInputsNN2InputsAll.push_back(static_cast<size_t>(itr - inputsAllNames.begin()));
+      }
+
+
+      auto func = [neuralNetworkPtr, pdgCode, mapInputsNN2InputsAll, inputsAllSize](const Particle * part) -> double {
+        const auto& neuralNetwork = *neuralNetworkPtr;
+        const PIDLikelihood* pid = part->getPIDLikelihood();
+        if (!pid)
+          return std::numeric_limits<float>::quiet_NaN();
+        {
+          auto hypType = Const::ChargedStable(pdgCode);
+          if (pid->getLogL(hypType) == 0)
+            return std::numeric_limits<float>::quiet_NaN();
+        }
+
+        /**
+         * prepare inputs
+         * CAUTION: If you change the inputs stored in `inputsAll` or their order,
+         * you have to change the input mapping created above
+         */
+        std::vector<float> inputsAll;
+        inputsAll.reserve(inputsAllSize);
+        const auto& frame = ReferenceFrame::GetCurrent();
+        const auto mom = frame.getMomentum(part);
+        for (const Const::EDetector& detector : Const::PIDDetectorSet::set())
+        {
+          for (const auto& hypeType : Const::chargedStableSet) {
+            inputsAll.push_back(pid->getLogL(hypeType, detector));
+          }
+        }
+        inputsAll.push_back(mom.P());
+        inputsAll.push_back(cos(mom.Theta()));
+        inputsAll.push_back(mom.Phi());
+        inputsAll.push_back(part->getCharge());
+
+        // collect only those inputs needed for the neural network in the correct order
+        std::vector<float> inputsNN;
+        inputsNN.reserve(neuralNetwork.getInputSize());
+        for (const auto& indexAll : mapInputsNN2InputsAll)
+        {
+          inputsNN.push_back(inputsAll[indexAll]);
+        }
+
+        return neuralNetwork.predict(pdgCode, inputsNN);
+      };
+
       return func;
     }
 
@@ -1151,6 +1255,12 @@ following the order shown in the metavariable's declaration. Flat priors are ass
                           ":math:`\\mathcal{\\tilde{L}}_{hyp}/\\sum_{i=e,\\mu,\\pi,K,p,d} \\mathcal{\\tilde{L}}_i` where :math:`\\mathcal{\\tilde{L}}_{i}` is defined as "
                           ":math:`\\log\\mathcal{\\tilde{L}}_{i} = \\sum_{j\\in\\mathrm{detectorList}} \\mathcal{w}_{i,j}\\log\\mathcal{L}_{i,j}`. "
                           "The :math:`\\mathcal{L}_{ij}` is the original likelihood and :math:`\\mathcal{w}_{ij}` is the PID calibration weight of i-th particle type and j-th detector.",
+                          Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("pidNeuralNetworkValueExpert(PIDNeuralNetworksParametersName, pdgCodeHyp)",
+                          pidNeuralNetworkValueExpert,
+                          "Probability for the pdgCodeHype calculated from a neural network, which uses high-level information as inputs,  "
+                          "such as the likelihood from the 6 subdetectors for PID for all 6 hypotheses, "
+                          ":math:`\\mathcal{\\tilde{L}}_{hyp}^{det}`, or the track momentum and charge",
                           Manager::VariableDataType::c_double);
 
     // B2BII PID

@@ -32,9 +32,10 @@ TrackIsoCalculatorModule::TrackIsoCalculatorModule() : Module()
   addParam("particleListReference",
            m_pListReferenceName,
            "The name of the input ParticleList of reference tracks. Must be a charged stable particle as defined in Const::chargedStableSet.");
-  addParam("detectorName",
-           m_detName,
-           "The name of the detector at whose (cylindrical) surface(s) we extrapolate each helix's polar and azimuthal angle. Allowed values: {CDC, TOP, ARICH, ECL, KLM}.");
+  addParam("detectorNames",
+           m_detNames,
+           "The list of names of the detectors at whose (cylindrical) surface(s) we extrapolate each helix's polar and azimuthal angle. Allowed values: {CDC, TOP, ARICH, ECL, KLM}.",
+           std::vector<std::string>());
   addParam("useHighestProbMassForExt",
            m_useHighestProbMassForExt,
            "If this option is set, the helix extrapolation for the target and reference particles will use the track fit result for the most probable mass hypothesis, namely, the one that gives the highest chi2Prob of the fit.",
@@ -77,9 +78,7 @@ void TrackIsoCalculatorModule::initialize()
 
   m_pListReference.isRequired(m_pListReferenceName);
 
-  B2INFO("Calculating track-based isolation variables at "
-         << m_detName
-         << " surface(s) for the decay string: "
+  B2INFO("Calculating track-based isolation variables for the decay string: "
          << m_decayString
          << " using the reference ParticleList: "
          << m_pListReferenceName
@@ -97,31 +96,39 @@ void TrackIsoCalculatorModule::initialize()
     B2INFO("Will use track fit result for the most probable mass hypothesis in helix extrapolation.");
   }
 
-  // Ensure we use uppercase detector labels.
-  boost::to_upper(m_detName);
+  std::string detNamesConcat("");
 
-  // The total number of layers of this detector.
-  m_nLayers = DetectorSurface::detToLayers.at(m_detName).size();
+  for (auto& detName : m_detNames) {
 
-  // Define the name(s) of the variables for this detector to be stored as extraInfo.
-  for (const auto& iLayer : DetectorSurface::detToLayers.at(m_detName)) {
+    // Ensure we use uppercase detector labels.
+    boost::to_upper(detName);
 
-    auto iDetLayer = m_detName + std::to_string(iLayer);
+    detNamesConcat += "_" + detName;
 
-    auto distVarName = "distToClosestTrkAt" + iDetLayer + "_VS_" + m_pListReferenceName;
-    if (m_useHighestProbMassForExt) {
-      distVarName += "__useHighestProbMassForExt";
+    // Define the name(s) of the variables for this detector to be stored as extraInfo.
+    for (const auto& iLayer : DetectorSurface::detToLayers.at(detName)) {
+
+
+      auto iDetLayer = detName + std::to_string(iLayer);
+
+      auto distVarName = "distToClosestTrkAt" + iDetLayer + "_VS_" + m_pListReferenceName;
+      if (m_useHighestProbMassForExt) {
+        distVarName += "__useHighestProbMassForExt";
+      }
+      auto refPartIdxVarName =  "idxOfClosestPartAt" + iDetLayer + "In_" + m_pListReferenceName;
+
+      m_detLayerToDistVariable.insert(std::make_pair(iDetLayer, distVarName));
+      m_detLayerToRefPartIdxVariable.insert(std::make_pair(iDetLayer, refPartIdxVarName));
+
     }
-    auto refPartIdxVarName =  "idxOfClosestPartAt" + iDetLayer + "In_" + m_pListReferenceName;
 
-    m_detLayerToDistVariable.insert(std::make_pair(iDetLayer, distVarName));
-    m_detLayerToRefPartIdxVariable.insert(std::make_pair(iDetLayer, refPartIdxVarName));
-
-  }
-  // Isolation score variable per detector.
-  m_isoScoreVariable = "trkIsoScore" + m_detName + "_VS_" + m_pListReferenceName;
-  if (m_useHighestProbMassForExt) {
-    m_isoScoreVariable += "__useHighestProbMassForExt";
+    // Isolation score variable.
+    m_isoScoreVariable = "trkIsoScore" + detNamesConcat + "_VS_" + m_pListReferenceName;
+    m_isoScoreVariableAsWeightedAvg = "trkIsoScoreAsWeightedAvg" + detNamesConcat + "_VS_" + m_pListReferenceName;
+    if (m_useHighestProbMassForExt) {
+      m_isoScoreVariable += "__useHighestProbMassForExt";
+      m_isoScoreVariableAsWeightedAvg += "__useHighestProbMassForExt";
+    }
   }
 
 }
@@ -139,153 +146,196 @@ void TrackIsoCalculatorModule::event()
   std::unordered_map<unsigned int, const Particle*> targetParticles;
   targetParticles.reserve(nMotherParticles);
 
-  // Loop over the layer of the input detector.
-  for (const auto& iLayer : DetectorSurface::detToLayers.at(m_detName)) {
+  for (unsigned int iPart(0); iPart < nMotherParticles; ++iPart) {
 
-    auto iDetLayer = m_detName + std::to_string(iLayer);
+    auto iParticle = m_pListTarget->getParticle(iPart);
 
-    for (unsigned int iPart(0); iPart < nMotherParticles; ++iPart) {
+    // Loop over the input detectors.
+    for (const auto& detName : m_detNames) {
 
-      auto iParticle = m_pListTarget->getParticle(iPart);
+      // Loop over the layer of the input detector.
+      for (const auto& iLayer : DetectorSurface::detToLayers.at(detName)) {
 
-      if (m_nSelectedDaughters) {
-        for (auto* iDaughter : m_decaydescriptor.getSelectionParticles(iParticle)) {
-          // Check if the distance for this target particle has been set already,
-          // e.g. by a previous instance of this module.
-          if (iDaughter->hasExtraInfo(m_detLayerToDistVariable[iDetLayer])) {
+        auto iDetLayer = detName + std::to_string(iLayer);
+
+        if (m_nSelectedDaughters) {
+          for (auto* iDaughter : m_decaydescriptor.getSelectionParticles(iParticle)) {
+            // Check if the distance for this target particle has been set already,
+            // e.g. by a previous instance of this module.
+            if (iDaughter->hasExtraInfo(m_detLayerToDistVariable[iDetLayer])) {
+              continue;
+            }
+            targetParticles.insert({iDaughter->getMdstArrayIndex(), iDaughter});
+          }
+        } else {
+          if (iParticle->hasExtraInfo(m_detLayerToDistVariable[iDetLayer])) {
             continue;
           }
-          targetParticles.insert({iDaughter->getMdstArrayIndex(), iDaughter});
+          targetParticles.insert({iParticle->getMdstArrayIndex(), iParticle});
         }
-      } else {
-        if (iParticle->hasExtraInfo(m_detLayerToDistVariable[iDetLayer])) {
-          continue;
-        }
-        targetParticles.insert({iParticle->getMdstArrayIndex(), iParticle});
-      }
 
+      }
     }
   }
 
   const auto nParticlesTarget = targetParticles.size();
   const auto nParticlesReference = m_pListReference->getListSize();
 
-  // Loop over the layer of the input detector.
-  for (const auto& iLayer : DetectorSurface::detToLayers.at(m_detName)) {
+  // Loop over the input detectors.
+  for (const auto& detName : m_detNames) {
 
-    auto iDetLayer = m_detName + std::to_string(iLayer);
+    // Loop over the layer of the input detector.
+    for (const auto& iLayer : DetectorSurface::detToLayers.at(detName)) {
 
-    B2DEBUG(11, "\n"
-            << "Detector surface: " << iDetLayer << "\n"
-            << "nMotherParticles: " << nMotherParticles << "\n"
-            << "nParticlesTarget: " << nParticlesTarget << "\n"
-            << "nParticlesReference: " << nParticlesReference);
-
-    double dummyDist(-1.0);
-
-    // Store the pair-wise distances in a map,
-    // where the keys are pairs of mdst indexes.
-    std::map<std::pair<unsigned int, unsigned int>, double> particleMdstIdxPairsToDist;
-
-    // Loop over input particle list
-    for (const auto& targetParticle : targetParticles) {
-
-      auto iMdstIdx = targetParticle.first;
-      auto iParticle = targetParticle.second;
-
-      for (unsigned int jPart(0); jPart < nParticlesReference; ++jPart) {
-
-        auto jParticle = m_pListReference->getParticle(jPart);
-        auto jMdstIdx = jParticle->getMdstArrayIndex();
-
-        auto partMdstIdxPair = std::make_pair(iMdstIdx, jMdstIdx);
-
-        // Set dummy distance if same particle.
-        if (iMdstIdx == jMdstIdx) {
-          particleMdstIdxPairsToDist[partMdstIdxPair] = dummyDist;
-          continue;
-        }
-        // If:
-        //
-        // - the mass hypothesis of the best fit is used, OR
-        // - the mass hypothesis of the 'default' fit of the two particles is the same,
-        //
-        // avoid re-doing the calculation if a pair with the flipped mdst indexes in the map already exists.
-        if (m_useHighestProbMassForExt || (iParticle->getPDGCodeUsedForFit() == jParticle->getPDGCodeUsedForFit())) {
-          if (particleMdstIdxPairsToDist.count({jMdstIdx, iMdstIdx})) {
-            particleMdstIdxPairsToDist[partMdstIdxPair] = particleMdstIdxPairsToDist[ {jMdstIdx, iMdstIdx}];
-            continue;
-          }
-        }
-        // Calculate the pair-wise distance.
-        particleMdstIdxPairsToDist[partMdstIdxPair] = this->getDistAtDetSurface(iParticle, jParticle, iDetLayer);
-      }
-
-    }
-
-    // For each particle in the input list, find the minimum among all distances to the reference particles.
-    for (const auto& targetParticle : targetParticles) {
-
-      auto iMdstIdx = targetParticle.first;
-      auto iParticle = targetParticle.second;
-
-      // Save the distances and the mdst indexes of the reference particles.
-      std::vector<std::pair<double, unsigned int>> iDistancesAndRefMdstIdxs;
-      for (const auto& [mdstIdxs, dist] : particleMdstIdxPairsToDist) {
-        if (mdstIdxs.first == iMdstIdx) {
-          if (!std::isnan(dist) && dist >= 0) {
-            iDistancesAndRefMdstIdxs.push_back(std::make_pair(dist, mdstIdxs.second));
-          }
-        }
-      }
-
-      if (!iDistancesAndRefMdstIdxs.size()) {
-        B2DEBUG(12, "The container of distances is empty. Perhaps the target and reference lists contain the same exact particles?");
-        continue;
-      }
-
-      const auto minDist = *std::min_element(std::begin(iDistancesAndRefMdstIdxs), std::end(iDistancesAndRefMdstIdxs),
-      [](const auto & l, const auto & r) {return l.first < r.first;});
-
-      auto jParticle = m_pListReference->getParticleWithMdstIdx(minDist.second);
+      auto iDetLayer = detName + std::to_string(iLayer);
 
       B2DEBUG(11, "\n"
-              << "Particle w/ mdstIndex[" << iMdstIdx << "] (PDG = "
-              << iParticle->getPDGCode() << "). Closest charged particle w/ mdstIndex["
-              << minDist.second
-              << "] (PDG = " << jParticle->getPDGCode()
-              << ") at " << iDetLayer
-              << " surface is found at D = " << minDist.first
-              << " [cm]\n"
-              << "Storing extraInfo variables:\n"
-              << m_detLayerToDistVariable[iDetLayer]
-              << "\n"
-              << m_detLayerToRefPartIdxVariable[iDetLayer]);
+              << "Detector surface: " << iDetLayer << "\n"
+              << "nMotherParticles: " << nMotherParticles << "\n"
+              << "nParticlesTarget: " << nParticlesTarget << "\n"
+              << "nParticlesReference: " << nParticlesReference);
 
-      if (!iParticle->hasExtraInfo(m_detLayerToDistVariable[iDetLayer])) {
-        m_particles[iParticle->getArrayIndex()]->addExtraInfo(m_detLayerToDistVariable[iDetLayer], minDist.first);
+      double dummyDist(-1.0);
+
+      // Store the pair-wise distances in a map,
+      // where the keys are pairs of mdst indexes.
+      std::map<std::pair<unsigned int, unsigned int>, double> particleMdstIdxPairsToDist;
+
+      // Loop over input particle list
+      for (const auto& targetParticle : targetParticles) {
+
+        auto iMdstIdx = targetParticle.first;
+        auto iParticle = targetParticle.second;
+
+        for (unsigned int jPart(0); jPart < nParticlesReference; ++jPart) {
+
+          auto jParticle = m_pListReference->getParticle(jPart);
+          auto jMdstIdx = jParticle->getMdstArrayIndex();
+
+          auto partMdstIdxPair = std::make_pair(iMdstIdx, jMdstIdx);
+
+          // Set dummy distance if same particle.
+          if (iMdstIdx == jMdstIdx) {
+            particleMdstIdxPairsToDist[partMdstIdxPair] = dummyDist;
+            continue;
+          }
+          // If:
+          //
+          // - the mass hypothesis of the best fit is used, OR
+          // - the mass hypothesis of the 'default' fit of the two particles is the same,
+          //
+          // avoid re-doing the calculation if a pair with the flipped mdst indexes in the map already exists.
+          if (m_useHighestProbMassForExt || (iParticle->getPDGCodeUsedForFit() == jParticle->getPDGCodeUsedForFit())) {
+            if (particleMdstIdxPairsToDist.count({jMdstIdx, iMdstIdx})) {
+              particleMdstIdxPairsToDist[partMdstIdxPair] = particleMdstIdxPairsToDist[ {jMdstIdx, iMdstIdx}];
+              continue;
+            }
+          }
+          // Calculate the pair-wise distance.
+          particleMdstIdxPairsToDist[partMdstIdxPair] = this->getDistAtDetSurface(iParticle, jParticle, iDetLayer);
+        }
+
       }
-      m_particles[iParticle->getArrayIndex()]->writeExtraInfo(m_detLayerToRefPartIdxVariable[iDetLayer], minDist.second);
 
-    } // end loop over input particle list.
+      // For each particle in the input list, find the minimum among all distances to the reference particles.
+      for (const auto& targetParticle : targetParticles) {
 
-  } // end loop over detector layers.
+        auto iMdstIdx = targetParticle.first;
+        auto iParticle = targetParticle.second;
 
-  // Store the isolation score per target particle for the given detector.
+        // Save the distances and the mdst indexes of the reference particles.
+        std::vector<std::pair<double, unsigned int>> iDistancesAndRefMdstIdxs;
+        for (const auto& [mdstIdxs, dist] : particleMdstIdxPairsToDist) {
+          if (mdstIdxs.first == iMdstIdx) {
+            if (!std::isnan(dist) && dist >= 0) {
+              iDistancesAndRefMdstIdxs.push_back(std::make_pair(dist, mdstIdxs.second));
+            }
+          }
+        }
+
+        if (!iDistancesAndRefMdstIdxs.size()) {
+          B2DEBUG(12, "The container of distances is empty. Perhaps the target and reference lists contain the same exact particles?");
+          continue;
+        }
+
+        const auto minDist = *std::min_element(std::begin(iDistancesAndRefMdstIdxs), std::end(iDistancesAndRefMdstIdxs),
+        [](const auto & l, const auto & r) {return l.first < r.first;});
+
+        auto jParticle = m_pListReference->getParticleWithMdstIdx(minDist.second);
+
+        B2DEBUG(11, "\n"
+                << "Particle w/ mdstIndex[" << iMdstIdx << "] (PDG = "
+                << iParticle->getPDGCode() << "). Closest charged particle w/ mdstIndex["
+                << minDist.second
+                << "] (PDG = " << jParticle->getPDGCode()
+                << ") at " << iDetLayer
+                << " surface is found at D = " << minDist.first
+                << " [cm]\n"
+                << "Storing extraInfo variables:\n"
+                << m_detLayerToDistVariable[iDetLayer]
+                << "\n"
+                << m_detLayerToRefPartIdxVariable[iDetLayer]);
+
+        if (!iParticle->hasExtraInfo(m_detLayerToDistVariable[iDetLayer])) {
+          m_particles[iParticle->getArrayIndex()]->addExtraInfo(m_detLayerToDistVariable[iDetLayer], minDist.first);
+        }
+        m_particles[iParticle->getArrayIndex()]->writeExtraInfo(m_detLayerToRefPartIdxVariable[iDetLayer], minDist.second);
+
+      } // end loop over input particle list.
+
+    } // end loop over detector layers.
+
+  } // end loop over input detectors.
+
+  // Now calculate the isolation score for each target particle.
   for (const auto& targetParticle : targetParticles) {
 
     auto iMdstIdx = targetParticle.first;
     auto iParticle = targetParticle.second;
 
-    auto score = this->getIsoScore(iParticle);
-    m_particles[iParticle->getArrayIndex()]->writeExtraInfo(m_isoScoreVariable, score);
+    // Initialise isolation score.
+    double isoScore(0.0);
+    double isoScoreAsWeightedAvg(0.0);
+    double sumWeights(0.0);
+
+    B2DEBUG(11, "Particle w/ mdstIndex[" << iMdstIdx << "] (PDG = " << iParticle->getPDGCode() << ").");
+
+    for (const auto& detName : m_detNames) {
+
+      auto detWeight = this->getDetectorWeight(iParticle, detName);
+
+      auto weightedSumNonIsoLayers = this->getWeightedSumNonIsoLayers(iParticle, detName, detWeight);
+      auto weightedSumInvDists = this->getWeightedSumInvDists(iParticle, detName, detWeight);
+
+      isoScore += weightedSumNonIsoLayers;
+      isoScoreAsWeightedAvg += weightedSumInvDists;
+      sumWeights += detWeight;
+
+    }
+
+    // Normalise the isolation score to lie in [0, 1].
+    auto minScore = 0.;
+    auto maxScore = m_detNames.size();
+    isoScore = (isoScore - minScore) / (maxScore - minScore);
+
+    isoScoreAsWeightedAvg /= sumWeights;
+    // Normalise weighted average between [0, 1].
+    // But first, clip values that are too large.
+    // Finally, ensure a larger score is assigned for well-isolated tracks.
+    isoScoreAsWeightedAvg = 1. - ((std::min(isoScoreAsWeightedAvg, 1e2) - minScore) / (1e2 - minScore));
 
     B2DEBUG(11, "\n"
-            << "Particle w/ mdstIndex[" << iMdstIdx << "] (PDG = " << iParticle->getPDGCode() << ").\n"
-            << "Isolation score in the " << m_detName << ": s = " << score
+            << "Isolation score: " << isoScore
+            << "\n"
+            << "Isolation score (as weighted avg): " << isoScoreAsWeightedAvg
             << "\n"
             << "Storing extraInfo variable:\n"
-            << m_isoScoreVariable);
+            << m_isoScoreVariable
+            << "\n"
+            << m_isoScoreVariableAsWeightedAvg);
+
+    m_particles[iParticle->getArrayIndex()]->writeExtraInfo(m_isoScoreVariable, isoScore);
+    m_particles[iParticle->getArrayIndex()]->writeExtraInfo(m_isoScoreVariableAsWeightedAvg, isoScoreAsWeightedAvg);
 
   }
 
@@ -294,48 +344,87 @@ void TrackIsoCalculatorModule::event()
 }
 
 
-double TrackIsoCalculatorModule::getIsoScore(const Particle* iParticle) const
+double TrackIsoCalculatorModule::getDetectorWeight(const Particle* iParticle, const std::string& detName) const
 {
 
-  auto hypo = Const::ChargedStable(std::abs(iParticle->getPDGCode()));
-  auto det = this->getDetEnum(m_detName);
-  auto p = iParticle->getP();
-  auto theta = std::get<double>(Variable::Manager::Instance().getVariable("theta")->function(iParticle));
-
-  double detWeight(-1.0);
-  if (!m_excludePIDDetWeights) {
-    detWeight = (*m_DBWeights.get())->getWeight(hypo, det, p, theta);
-    // If w > 0, the detector has detrimental impact on PID:
-    // the value is set to zero to prevent the detector from contributing to the score.
-    // NB: NaN should stay NaN.
-    detWeight = (detWeight < 0 || std::isnan(detWeight)) ? detWeight : 0.0;
+  if (m_excludePIDDetWeights) {
+    return -1.;
   }
 
+  auto hypo = Const::ChargedStable(std::abs(iParticle->getPDGCode()));
+  auto p = iParticle->getP();
+  auto theta = iParticle->getMomentum().Theta();
+  auto det = this->getDetEnum(detName);
+
+  auto detWeight = (*m_DBWeights.get())->getWeight(hypo, det, p, theta);
+  // If w > 0, the detector has detrimental impact on PID:
+  // the value is reset to zero to prevent the detector from contributing to the score.
+  // NB: NaN should stay NaN.
+  detWeight = (detWeight < 0 || std::isnan(detWeight)) ? detWeight : 0.0;
+
+  return detWeight;
+
+}
+
+
+double TrackIsoCalculatorModule::getWeightedSumNonIsoLayers(const Particle* iParticle, const std::string& detName,
+                                                            const float detWeight) const
+{
+
+  auto det = this->getDetEnum(detName);
+  auto nLayers = DetectorSurface::detToLayers.at(detName).size();
+
   unsigned int n(0);
-  for (const auto& iLayer : DetectorSurface::detToLayers.at(m_detName)) {
-    auto iDetLayer = m_detName + std::to_string(iLayer);
+  for (const auto& iLayer : DetectorSurface::detToLayers.at(detName)) {
+    auto iDetLayer = detName + std::to_string(iLayer);
     auto distVar = m_detLayerToDistVariable.at(iDetLayer);
     auto threshDist = this->getDistThreshold(det, iLayer);
+
     if (iParticle->hasExtraInfo(distVar)) {
       if (iParticle->getExtraInfo(distVar) < threshDist) {
         n++;
       }
     }
+
   }
 
   if (!n) {
-    B2DEBUG(12, "\nNo close-enough neighbours to this particle in the " << m_detName << " were found.");
+    B2DEBUG(12, "\nNo close-enough neighbours to this particle in the " << detName << " were found.");
   }
 
-  if (n > m_nLayers) {
-    B2FATAL("\nTotal layers in " << m_detName << ": N=" << m_nLayers
+  if (n > nLayers) {
+    B2FATAL("\nTotal layers in " << detName << ": N=" << nLayers
             << "\n"
             << "Layers w/ a close-enough particle: n=" << n
             << "\n"
             << "n > N ?? Abort...");
   }
 
-  return 1. - (-detWeight * (n / m_nLayers));
+  return 1. - (-detWeight * (n / nLayers));
+
+}
+
+
+double TrackIsoCalculatorModule::getWeightedSumInvDists(const Particle* iParticle, const std::string& detName,
+                                                        const float detWeight) const
+{
+
+  auto det = this->getDetEnum(detName);
+
+  double sumInvDists(0.);
+  for (const auto& iLayer : DetectorSurface::detToLayers.at(detName)) {
+
+    auto iDetLayer = detName + std::to_string(iLayer);
+    auto distVar = m_detLayerToDistVariable.at(iDetLayer);
+    auto threshDist = this->getDistThreshold(det, iLayer);
+
+    if (iParticle->hasExtraInfo(distVar)) {
+      sumInvDists += threshDist / iParticle->getExtraInfo(distVar);
+    }
+
+  }
+
+  return detWeight * sumInvDists;
 
 }
 
@@ -378,7 +467,7 @@ double TrackIsoCalculatorModule::getDistAtDetSurface(const Particle* iParticle,
   const auto iExtInBWDEndcap = (iExtTheta >= th_bwd_brl && iExtTheta < th_bwd);
   const auto jExtInBWDEndcap = (jExtTheta >= th_bwd_brl && jExtTheta < th_bwd);
 
-  if (m_detName == "CDC" || m_detName == "TOP") {
+  if (boost::contains(detLayerName, "CDC") || boost::contains(detLayerName, "TOP")) {
 
     // If any of the two extrapolated tracks is not in the barrel region of the CDC/TOP, the distance is undefined.
     if (!iExtInBarrel || !jExtInBarrel) {
@@ -398,13 +487,13 @@ double TrackIsoCalculatorModule::getDistAtDetSurface(const Particle* iParticle,
 
   } else {
 
-    if (m_detName == "ARICH") {
+    if (boost::contains(detLayerName, "ARICH")) {
       // If any of the two tracks is not in the ARICH theta acceptance, the distance is undefined.
       if (!iExtInFWDEndcap || !jExtInFWDEndcap) {
         return std::numeric_limits<double>::quiet_NaN();
       }
     }
-    if (m_detName == "ECL" || m_detName == "KLM") {
+    if (boost::contains(detLayerName, "ECL") || boost::contains(detLayerName, "KLM")) {
 
       // For ECL and KLM, we require track pairs to be both in the barrel,
       // both in the FWD endcap, or both in the FWD endcap. Otherwise, the distance is undefined.

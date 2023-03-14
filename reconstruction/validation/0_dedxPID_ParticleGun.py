@@ -12,7 +12,7 @@
 """
 <header>
   <input>PartGunChargedStableGenSim.root</input>
-  <output>EvtGenSimRec_dedx.root</output>
+  <output>ParticleGunSimRec_dedx.root</output>
   <description>Generates dE/dx debug data (DedxTracks) for testing</description>
   <contact>renu2@andrew.cmu.edu</contact>
 </header>
@@ -39,13 +39,10 @@ add_reconstruction(main)
 for m in main.modules():
     if m.name() == 'CDCDedxPID':
         m.param('enableDebugOutput', True)
-    if m.name() == 'VXDDedxPID':
-        m.param('enableDebugOutput', True)
-        # m.param('usePXD', True)
 
 
 output = basf2.register_module('RootOutput')
-output.param('outputFileName', '../EvtGenSimRec_dedx.root')
+output.param('outputFileName', '../ParticleGunSimRec_dedx.root')
 # let's keep this small
 output.param('branchNames', ['CDCDedxLikelihoods', 'CDCDedxTracks', 'VXDDedxLikelihoods', 'VXDDedxTracks', 'EventMetaData'])
 main.add_module(output)

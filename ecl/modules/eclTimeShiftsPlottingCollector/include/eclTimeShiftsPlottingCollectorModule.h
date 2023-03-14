@@ -17,13 +17,16 @@
 
 #pragma once
 
-#include <framework/core/Module.h>
+/* ECL headers. */
+#include <ecl/dataobjects/ECLElementNumbers.h>
 #include <ecl/utility/ECLChannelMapper.h>
-#include <calibration/CalibrationCollectorModule.h>
-#include <framework/database/DBObjPtr.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/dataobjects/EventMetaData.h>
 
+/* Basf2 headers. */
+#include <calibration/CalibrationCollectorModule.h>
+#include <framework/core/Module.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/StoreArray.h>
 
 class TTree;
 
@@ -96,7 +99,7 @@ namespace Belle2 {
                                           several runs.  Different initial value
                                           from the current run number variable. */
 
-    const int NUM_CRYSTALS = 8736;    /**< Number of crystals in the ECL */
+    const int NUM_CRYSTALS = ECLElementNumbers::c_NCrystals;    /**< Number of crystals in the ECL */
 
   };
 }

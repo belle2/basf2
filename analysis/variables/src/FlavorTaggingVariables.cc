@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <analysis/variables/FlavorTaggingVariables.h>
 #include <analysis/variables/ROEVariables.h>
 

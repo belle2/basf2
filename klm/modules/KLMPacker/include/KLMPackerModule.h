@@ -13,7 +13,7 @@
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dbobjects/KLMElectronicsMap.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>

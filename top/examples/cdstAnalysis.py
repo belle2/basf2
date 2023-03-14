@@ -24,13 +24,12 @@ from variables import variables
 # global tags
 # ******************************************************************************************************************
 # note: The patching global tags and their order are bucket number and basf2 version dependent.
-#       Given below is what is needed for cdst files of bucket 16 calibration and February-2022 development version.
+#       Given below is what is needed for cdst files of bucket 16 calibration and January-2023 development version.
 # ******************************************************************************************************************
 conditions.override_globaltags()
-conditions.append_globaltag('patch_main_release-07')
-conditions.append_globaltag('svd_reco_configuration_patch')
-conditions.append_globaltag('data_reprocessing_prompt')
-conditions.append_globaltag('dp_recon_release6_patch')
+conditions.append_globaltag('patch_main_release-07_noTOP')
+conditions.append_globaltag('data_reprocessing_proc13')  # experiments 7 - 18
+# conditions.append_globaltag('data_reprocessing_prompt')  # experiments 20 - 26
 conditions.append_globaltag('online')
 
 # create path

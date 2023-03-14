@@ -11,7 +11,6 @@
 #include <framework/core/HistoModule.h>
 #include <vxd/geometry/GeoCache.h>
 #include <framework/datastore/StoreArray.h>
-// #include <rawdata/dataobjects/RawFTSW.h>
 #include <pxd/dataobjects/PXDRawHit.h>
 #include <pxd/dataobjects/PXDCluster.h>
 #include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
@@ -47,9 +46,6 @@ namespace Belle2 {
       bool m_createMaxHist{false};///< create max hits histogram, not multi processing save!!
       bool m_createGateHist{false};///< create per gate hits 2d histogram
 
-      // /** Input array for TTD/FTSW */
-      // StoreArray<RawFTSW> m_rawTTD;
-      
       /** Output object for TTD mdst object */
       StoreObjPtr<EventLevelTriggerTimeInfo> m_EventLevelTriggerTimeInfo;
 

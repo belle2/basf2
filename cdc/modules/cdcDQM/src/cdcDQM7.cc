@@ -136,11 +136,8 @@ void cdcDQM7Module::defineHisto()
   //
   bmap_2 = new TH2D("bmap_2", "", 75, 0, 75, 4, 0, 4);
 
-  // LIVE
-  h_tdc_sL[6]->SetOption("LIVE");
   h_tdc_sL[6]->SetOption("hist");
 
-  h_board_out_tdc->SetOption("LIVE");
   h_board_out_tdc->SetOption("hist");
 
   // set

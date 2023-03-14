@@ -8,11 +8,11 @@
 
 #pragma once
 
-// FRAMEWORK
+/* Basf2 headers. */
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Unit.h>
-#include <framework/geometry/B2Vector3.h> // faster than TVector3
+#include <framework/geometry/B2Vector3.h>
 
 class TTree;
 class TFile;
@@ -137,7 +137,7 @@ namespace Belle2 {
     // Constants
     const double c_minEnergyCut = 5.0 * Belle2::Unit::MeV; /**< Minimum LM energy */
 
-    /** vector (8736+1 entries) with cell id to store array positions */
+    /** vector (ECLElementNumbers::c_NCrystals + 1 entries) with cell id to store array positions */
     std::vector< int > m_StoreArrPosition;
 
     /** Neighbour maps. */

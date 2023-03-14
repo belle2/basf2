@@ -8,6 +8,10 @@
 
 #pragma once
 
+/* ECL headers. */
+#include <ecl/dataobjects/ECLElementNumbers.h>
+
+/* ROOT headers. */
 #include <TObject.h>
 
 namespace Belle2 {
@@ -23,7 +27,7 @@ namespace Belle2 {
     {
 
       for (int i = 0; i < 11; i++) {
-        for (int j = 0; j < 8736; j++) {
+        for (int j = 0; j < ECLElementNumbers::c_NCrystals; j++) {
           m_PhotonPars[j][i] = 0.;
           m_HadronPars[j][i] = 0.;
           m_DiodePars[j][i] = 0.;
@@ -59,9 +63,9 @@ namespace Belle2 {
     ~ECLDigitWaveformParameters() {};
 
   private:
-    float m_PhotonPars[8736][11];  /**< photon parameters all crystals*/
-    float m_HadronPars[8736][11];  /**< hadron parameters all crystals*/
-    float m_DiodePars[8736][11];   /**< diode parameters all crystals*/
+    float m_PhotonPars[ECLElementNumbers::c_NCrystals][11];  /**< photon parameters all crystals*/
+    float m_HadronPars[ECLElementNumbers::c_NCrystals][11];  /**< hadron parameters all crystals*/
+    float m_DiodePars[ECLElementNumbers::c_NCrystals][11];   /**< diode parameters all crystals*/
 
     //2 convert vector of double to array of floats (SL)
     //1 Initial Version

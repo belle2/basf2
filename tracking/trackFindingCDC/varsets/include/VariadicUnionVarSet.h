@@ -12,12 +12,12 @@
 
 #include <tracking/trackFindingCDC/utilities/EvalVariadic.h>
 #include <tracking/trackFindingCDC/utilities/Named.h>
-#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 #include <tracking/trackFindingCDC/utilities/MayBePtr.h>
 
-#include <vector>
-#include <string>
 #include <cassert>
+#include <memory>
+#include <string>
+#include <vector>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -48,7 +48,7 @@ namespace Belle2 {
       /// Create the union variable set.
       explicit VariadicUnionVarSet()
       {
-        EvalVariadic{(m_multiVarSet.push_back(makeUnique<AVarSets>()), std::ignore)...};
+        EvalVariadic{(m_multiVarSet.push_back(std::make_unique<AVarSets>()), std::ignore)...};
         assert(m_multiVarSet.size() == sizeof...(AVarSets));
       }
 
@@ -56,7 +56,8 @@ namespace Belle2 {
       using Super::extract;
 
       /// Initialize all contained variable set before event processing.
-      void initialize() final {
+      void initialize() final
+      {
         this->addProcessingSignalListener(&m_multiVarSet);
         Super::initialize();
       }
@@ -65,7 +66,8 @@ namespace Belle2 {
        *  Main method that extracts the variable values from the complex object.
        *  @returns  Indication whether the extraction could be completed successfully.
        */
-      bool extract(const Object* obj) final {
+      bool extract(const Object* obj) final
+      {
         return m_multiVarSet.extract(obj);
       }
 

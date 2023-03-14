@@ -32,7 +32,7 @@ DQMHistDeltaHistoModule::DQMHistDeltaHistoModule()
   : DQMHistAnalysisModule()
 {
   addParam("Interval", m_interval, "Interval time for diff histos [s]", 180);
-  addParam("MonitoredHistos", m_monitored_histos, "List of histograms to monitor", vector<string>());
+  addParam("MonitoredHistos", m_monitoredHistos, "List of histograms to monitor", vector<string>());
   B2DEBUG(20, "DQMHistDeltaHisto: Constructor done.");
 }
 
@@ -43,9 +43,9 @@ void DQMHistDeltaHistoModule::initialize()
 {
   gROOT->cd();
   B2DEBUG(20, "DQMHistDeltaHisto: initialized.");
-  for (auto& histoname : m_monitored_histos) {
+  for (auto& histoname : m_monitoredHistos) {
     queue<SSNODE*> hq;
-    m_histos_queues[histoname] = hq;
+    m_histosQueues[histoname] = hq;
   }
   m_evtMetaDataPtr.isRequired();
 }
@@ -54,8 +54,8 @@ void DQMHistDeltaHistoModule::initialize()
 void DQMHistDeltaHistoModule::beginRun()
 {
   B2DEBUG(20, "DQMHistDeltaHisto: beginRun called.");
-  for (auto& histoname : m_monitored_histos) {
-    queue<SSNODE*>& hq = m_histos_queues[histoname];
+  for (auto& histoname : m_monitoredHistos) {
+    queue<SSNODE*>& hq = m_histosQueues[histoname];
     while (!hq.empty()) {
       SSNODE* nn = hq.front();
       clear_node(nn);
@@ -81,11 +81,11 @@ void DQMHistDeltaHistoModule::event()
   }
   time_t cur_mtime = m_evtMetaDataPtr->getTime();
 
-  for (auto& histoname : m_monitored_histos) {
+  for (auto& histoname : m_monitoredHistos) {
     TH1* hh = findHist(histoname.c_str());
     if (hh == nullptr) continue;
     if (hh->GetDimension() != 1) continue;
-    queue<SSNODE*>& hq = m_histos_queues[histoname];
+    queue<SSNODE*>& hq = m_histosQueues[histoname];
     if (hq.empty()) {
       SSNODE* n = new SSNODE;
       n->histo = (TH1*)hh->Clone();

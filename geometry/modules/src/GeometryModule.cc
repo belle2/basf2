@@ -76,7 +76,7 @@ void GeometryModule::initialize()
   if (m_createGeometryPayload) {
     B2INFO("Creating Database configuration.");
     if (m_payloadIov.size() != 4) {
-      B2ERROR("Geometry: payloadIov must be ecactly 4 values: [first experiment, first run, final experiment, final run]");
+      B2ERROR("Geometry: payloadIov must be exactly 4 values: [first experiment, first run, final experiment, final run]");
       return;
     }
     DBImportObjPtr<GeoConfiguration> import;

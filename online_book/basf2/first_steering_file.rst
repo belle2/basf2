@@ -474,7 +474,7 @@ of the CDC (`thetaInCDCAcceptance`).
 
     The polar range of the CDC acceptance is :math:`17^\circ < \theta <
     150^\circ` as written `here
-    <https://stash.desy.de/projects/B2/repos/basf2/browse/analysis/variables/src/AcceptanceVariables.cc#27>`_.
+    <https://gitlab.desy.de/belle2/software/basf2/-/tree/main/analysis/variables/src/AcceptanceVariables.cc#27>`_.
 
 .. admonition:: Task
     :class: exercise stacked
@@ -991,7 +991,7 @@ or `matchedMC`.
 .. seealso::
 
     Some more example steering files that center around the `VariableManager`
-    can be found `on stash <https://stash.desy.de/projects/B2/repos/basf2/browse/analysis/examples/VariableManager>`_.
+    can be found `on stash <https://gitlab.desy.de/belle2/software/basf2/-/tree/main/analysis/examples/VariableManager>`_.
 
 .. admonition:: Exercise
     :class: exercise
@@ -1011,6 +1011,6 @@ or `matchedMC`.
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Authors of this lesson
+.. rubric:: Authors of this lesson
 
-    Frank Meier, Kilian Lieret (minor improvements)
+Frank Meier, Kilian Lieret (minor improvements)
